@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{383E2844-41A4-488F-A683-D3EAE9AF4AF5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Krystals4ObjectLibrary</RootNamespace>
+    <AssemblyName>Krystals4ObjectLibrary</AssemblyName>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="SuperStrand.cs" />
+    <Compile Include="Modulator.cs" />
+    <Compile Include="Expander.cs" />
+    <Compile Include="ExpansionKrystal.cs" />
+    <Compile Include="ModulationKrystal.cs" />
+    <Compile Include="PermutationKrystal.cs" />
+    <Compile Include="ExpansionTreeView.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PermutationTreeView.cs" />
+    <Compile Include="Strand.cs" />
+    <Compile Include="Expansion.cs" />
+    <Compile Include="Krystal.cs" />
+    <Compile Include="KrystalFamily.cs" />
+    <Compile Include="KrystalStatics.cs" />
+    <Compile Include="PointR.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ModulationTreeView.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
+      <Project>{E68C2A79-CDAB-46F5-A6EE-534CE2D99577}</Project>
+      <Name>Moritz.Globals</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

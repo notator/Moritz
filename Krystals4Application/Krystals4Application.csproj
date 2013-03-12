@@ -1,0 +1,283 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{93791484-2CA8-427A-9D19-3232D3753983}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Krystals4Application</RootNamespace>
+    <AssemblyName>Krystals4Application</AssemblyName>
+    <StartupObject>Krystals4Application.Program</StartupObject>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <PublishUrl>http://localhost/Krystals4Application/</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Krystals4ObjectLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Krystals4ObjectLibrary\bin\Debug\Krystals4ObjectLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AboutKrystals4.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AboutKrystals4.Designer.cs">
+      <DependentUpon>AboutKrystals4.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ExpansionEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ExpansionEditor.Designer.cs">
+      <DependentUpon>ExpansionEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Krystals4ControlLibrary\FloatControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Krystals4ControlLibrary\FloatControl.Designer.cs">
+      <DependentUpon>FloatControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Krystals4ControlLibrary\KrystalFilenameControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Krystals4ControlLibrary\KrystalFilenameControl.Designer.cs">
+      <DependentUpon>KrystalFilenameControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Krystals4ControlLibrary\PointGroupParameters.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Krystals4ControlLibrary\PointGroupParameters.Designer.cs">
+      <DependentUpon>PointGroupParameters.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Krystals4ControlLibrary\SimpleUintControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Krystals4ControlLibrary\UIntControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Krystals4ControlLibrary\UIntControl.Designer.cs">
+      <DependentUpon>UIntControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Krystals4ControlLibrary\UIntTable.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Krystals4ControlLibrary\UIntTable.Designer.cs">
+      <DependentUpon>UIntTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Krystals4ControlLibrary\UnsignedIntSequenceControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Krystals4ControlLibrary\UnsignedIntSequenceControl.Designer.cs">
+      <DependentUpon>UnsignedIntSequenceControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MainWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainWindow.Designer.cs">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ModulationEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ModulationEditor.Designer.cs">
+      <DependentUpon>ModulationEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NewConstantKrystalDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewConstantKrystalDialog.Designer.cs">
+      <DependentUpon>NewConstantKrystalDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NewExpansionDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewExpansionDialog.Designer.cs">
+      <DependentUpon>NewExpansionDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NewLineKrystalDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewLineKrystalDialog.Designer.cs">
+      <DependentUpon>NewLineKrystalDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NewModulationDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewModulationDialog.Designer.cs">
+      <DependentUpon>NewModulationDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NewPlanetDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewPlanetDialog.Designer.cs">
+      <DependentUpon>NewPlanetDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="AboutKrystals4.resx">
+      <DependentUpon>AboutKrystals4.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ExpansionEditor.resx">
+      <DependentUpon>ExpansionEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Krystals4ControlLibrary\FloatControl.resx">
+      <DependentUpon>FloatControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Krystals4ControlLibrary\KrystalFilenameControl.resx">
+      <DependentUpon>KrystalFilenameControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Krystals4ControlLibrary\PointGroupParameters.resx">
+      <DependentUpon>PointGroupParameters.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Krystals4ControlLibrary\UIntControl.resx">
+      <DependentUpon>UIntControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Krystals4ControlLibrary\UIntTable.resx">
+      <DependentUpon>UIntTable.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Krystals4ControlLibrary\UnsignedIntSequenceControl.resx">
+      <DependentUpon>UnsignedIntSequenceControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainWindow.resx">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ModulationEditor.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ModulationEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NewConstantKrystalDialog.resx">
+      <DependentUpon>NewConstantKrystalDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NewExpansionDialog.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>NewExpansionDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NewLineKrystalDialog.resx">
+      <DependentUpon>NewLineKrystalDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NewModulationDialog.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>NewModulationDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NewPlanetDialog.resx">
+      <DependentUpon>NewPlanetDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
+      <Project>{E68C2A79-CDAB-46F5-A6EE-534CE2D99577}</Project>
+      <Name>Moritz.Globals</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Krystals\Moritz.Krystals.csproj">
+      <Project>{DF448BEC-155B-4A56-82BD-8FD1978A85AF}</Project>
+      <Name>Moritz.Krystals</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

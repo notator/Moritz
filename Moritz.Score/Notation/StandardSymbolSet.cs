@@ -1,0 +1,854 @@
+﻿using System.Drawing;
+using System.Diagnostics;
+using System.Collections.Generic;
+
+using Moritz.Score.Midi;
+
+namespace Moritz.Score.Notation
+{
+    public class StandardSymbolSet : SymbolSet
+    {
+        /// <summary>
+        /// This constructor can be called with both parameters null,
+        /// just to get the overridden properties.
+        /// </summary>
+        public StandardSymbolSet()
+            : base()
+        {
+        }
+
+        /// <summary>
+        /// Writes this score's SVG defs element
+        /// </summary>
+        /// <param name="w"></param>
+        public override void WriteSymbolDefinitions(SvgWriter w)
+        {
+            w.SvgStartDefs(null);
+            WriteTrebleClefSymbolDef(w);
+            WriteTrebleClef8SymbolDef(w);
+            WriteTrebleClefMulti8SymbolDef(w, 2);
+            WriteTrebleClefMulti8SymbolDef(w, 3);
+            WriteBassClefSymbolDef(w);
+            WriteBassClef8SymbolDef(w);
+            WriteBassClefMulti8SymbolDef(w, 2);
+            WriteBassClefMulti8SymbolDef(w, 3);
+            for(int i = 1; i < 6; i++)
+            {
+                WriteRightFlagBlock(w, i);
+                WriteLeftFlagBlock(w, i);
+            }
+            w.SvgEndDefs(); // end of defs
+        }
+        #region symbol definitions
+        /// <summary>
+        /// [g id="trebleClef"]
+        ///   [text x="0" y="0" font-size="1px" font-family="CLicht"] &amp; [/text]
+        /// [/g]
+        /// </summary>
+        private void WriteTrebleClefSymbolDef(SvgWriter svgw)
+        {
+            svgw.WriteStartElement("g");
+            svgw.WriteAttributeString("id", "trebleClef");
+            svgw.WriteStartElement("text");
+            svgw.WriteAttributeString("x", "0");
+            svgw.WriteAttributeString("y", "0");
+            svgw.WriteAttributeString("font-size", "1px");
+            svgw.WriteAttributeString("font-family", "CLicht");
+            svgw.WriteString("&");
+            svgw.WriteEndElement(); // text
+            svgw.WriteEndElement(); // g
+        }
+        /// <summary>
+        /// [g id="trebleClef8"]
+        ///   [text x="0" y="0" font-size="1px" font-family="CLicht"] &amp; [/text]
+        ///   [text x="0.28" y="-1.17" font-size="0.66667px" font-family="CLicht"]•[/text]
+        /// [/g]
+        /// </summary>
+        private void WriteTrebleClef8SymbolDef(SvgWriter svgw)
+        {
+            svgw.WriteStartElement("g");
+            svgw.WriteAttributeString("id", "trebleClef8");
+            svgw.WriteStartElement("text");
+            svgw.WriteAttributeString("x", "0");
+            svgw.WriteAttributeString("y", "0");
+            svgw.WriteAttributeString("font-size", "1px");
+            svgw.WriteAttributeString("font-family", "CLicht");
+            svgw.WriteString("&");
+            svgw.WriteEndElement(); // text
+            svgw.WriteStartElement("text");
+            svgw.WriteAttributeString("x", "0.28");
+            svgw.WriteAttributeString("y", "-1.17");
+            svgw.WriteAttributeString("font-size", "0.67px");
+            svgw.WriteAttributeString("font-family", "CLicht");
+            svgw.WriteString("•");
+            svgw.WriteEndElement(); // text
+            svgw.WriteEndElement(); // g
+        }
+        /// <summary>
+        /// [g id="trebleClef2x8"]
+        ///     [text x="0" y="0" font-size="1px" font-family="CLicht"]&amp;[/text]
+        ///     [text x="0.037" y="-1.17" font-size="0.67px" font-family="CLicht"]™[/text]
+        ///     [text x="0.252" y="-1.17" font-size="0.4px" font-family="Estrangelo Edessa"]x[/text]
+        ///     [text x="0.441" y="-1.17" font-size="0.67px" font-family="CLicht"]•[/text]
+        /// [/g]
+        /// and
+        /// [g id="trebleClef3x8"]
+        ///     [text x="0" y="0" font-size="1px" font-family="CLicht"]&amp;[/text]
+        ///     [text x="0.037" y="-1.17" font-size="0.67px" font-family="CLicht"]£[/text]
+        ///     [text x="0.252" y="-1.17" font-size="0.4px" font-family="Estrangelo Edessa"]x[/text]
+        ///     [text x="0.441" y="-1.17" font-size="0.67px" font-family="CLicht"]•[/text]
+        /// [/g]
+        /// </summary>
+        private void WriteTrebleClefMulti8SymbolDef(SvgWriter svgw, int octaveShift)
+        {
+            svgw.WriteStartElement("g");
+            svgw.WriteAttributeString("id", "trebleClef" + octaveShift.ToString() + "x8");
+
+            svgw.WriteStartElement("text");
+            svgw.WriteAttributeString("x", "0");
+            svgw.WriteAttributeString("y", "0");
+            svgw.WriteAttributeString("font-size", "1px");
+            svgw.WriteAttributeString("font-family", "CLicht");
+            svgw.WriteString("&");
+            svgw.WriteEndElement(); // text
+
+            svgw.WriteStartElement("text");
+            svgw.WriteAttributeString("x", "0.037");
+            svgw.WriteAttributeString("y", "-1.17");
+            svgw.WriteAttributeString("font-size", "0.67px");
+            svgw.WriteAttributeString("font-family", "CLicht");
+            switch(octaveShift)
+            {
+                case 2:
+                    svgw.WriteString("™");
+                    break;
+                case 3:
+                    svgw.WriteString("£");
+                    break;
+            }
+            svgw.WriteEndElement(); // text
+
+            svgw.WriteStartElement("text");
+            svgw.WriteAttributeString("x", "0.252");
+            svgw.WriteAttributeString("y", "-1.17");
+            svgw.WriteAttributeString("font-size", "0.4px");
+            svgw.WriteAttributeString("font-family", "Estrangelo Edessa");
+            svgw.WriteString("x");
+            svgw.WriteEndElement(); // text
+
+            svgw.WriteStartElement("text");
+            svgw.WriteAttributeString("x", "0.441");
+            svgw.WriteAttributeString("y", "-1.17");
+            svgw.WriteAttributeString("font-size", "0.67px");
+            svgw.WriteAttributeString("font-family", "CLicht");
+            svgw.WriteString("•");
+            svgw.WriteEndElement(); // text
+
+            svgw.WriteEndElement(); // g
+        }
+        /// <summary>
+        /// [g id="bassClef"]
+        ///   [text x="0" y="0" font-size="1px" font-family="CLicht"]?[/text]
+        /// [/g]
+        /// </summary>
+        private void WriteBassClefSymbolDef(SvgWriter svgw)
+        {
+            svgw.WriteStartElement("g");
+            svgw.WriteAttributeString("id", "bassClef");
+            svgw.WriteStartElement("text");
+            svgw.WriteAttributeString("x", "0");
+            svgw.WriteAttributeString("y", "0");
+            svgw.WriteAttributeString("font-size", "1px");
+            svgw.WriteAttributeString("font-family", "CLicht");
+            svgw.WriteString("?");
+            svgw.WriteEndElement(); // text
+            svgw.WriteEndElement(); // g
+        }
+        /// <summary>
+        /// [g id="bassClef8"]
+        ///    [text x="0" y="0" font-size="1px" font-family="CLicht"]?[/text]
+        ///    [text x="0.16" y="1.1" font-size="0.67px" font-family="CLicht"]•[/text]
+        /// [/g]
+        /// </summary>
+        private void WriteBassClef8SymbolDef(SvgWriter svgw)
+        {
+            svgw.WriteStartElement("g");
+            svgw.WriteAttributeString("id", "bassClef8");
+            svgw.WriteStartElement("text");
+            svgw.WriteAttributeString("x", "0");
+            svgw.WriteAttributeString("y", "0");
+            svgw.WriteAttributeString("font-size", "1px");
+            svgw.WriteAttributeString("font-family", "CLicht");
+            svgw.WriteString("?");
+            svgw.WriteEndElement(); // text
+            svgw.WriteStartElement("text");
+            svgw.WriteAttributeString("x", "0.16");
+            svgw.WriteAttributeString("y", "1.1");
+            svgw.WriteAttributeString("font-size", "0.67px");
+            svgw.WriteAttributeString("font-family", "CLicht");
+            svgw.WriteString("•");
+            svgw.WriteEndElement(); // text
+            svgw.WriteEndElement(); // g
+        }
+        /// <summary>
+        /// [g id="bassClef2x8"]
+        ///     [text x="0" y="0" font-size="1px" font-family="CLicht"]?[/text]
+        ///     [text x="0" y="1.1" font-size="0.67px" font-family="CLicht"]™[/text]
+        ///     [text x="0.215" y="1.1" font-size="0.4px" font-family="Estrangelo Edessa"]x[/text]
+        ///     [text x="0.404" y="1.1" font-size="0.67px" font-family="CLicht"]•[/text]
+        /// [/g]
+        /// and
+        /// [g id="bassClef3x8"]
+        ///     [text x="0" y="0" font-size="1px" font-family="CLicht"]?[/text]
+        ///     [text x="0" y="1.1" font-size="0.67px" font-family="CLicht"]£[/text]
+        ///     [text x="0.194" y="1.1" font-size="0.4px" font-family="Estrangelo Edessa"]x[/text]
+        ///     [text x="0.383" y="1.1" font-size="0.67px" font-family="CLicht"]•[/text]
+        /// [/g]
+        /// </summary>
+        private void WriteBassClefMulti8SymbolDef(SvgWriter svgw, int octaveShift)
+        {
+            svgw.WriteStartElement("g");
+            svgw.WriteAttributeString("id", "bassClef" + octaveShift.ToString() + "x8");
+
+            svgw.WriteStartElement("text");
+            svgw.WriteAttributeString("x", "0");
+            svgw.WriteAttributeString("y", "0");
+            svgw.WriteAttributeString("font-size", "1px");
+            svgw.WriteAttributeString("font-family", "CLicht");
+            svgw.WriteString("?");
+            svgw.WriteEndElement(); // text
+
+            svgw.WriteStartElement("text");
+            svgw.WriteAttributeString("x", "0");
+            svgw.WriteAttributeString("y", "1.1");
+            svgw.WriteAttributeString("font-size", "0.67px");
+            svgw.WriteAttributeString("font-family", "CLicht");
+            switch(octaveShift)
+            {
+                case 2:
+                    svgw.WriteString("™");
+                    break;
+                case 3:
+                    svgw.WriteString("£");
+                    break;
+            }
+            svgw.WriteEndElement(); // text
+
+            svgw.WriteStartElement("text");
+            svgw.WriteAttributeString("x", "0.194");
+            svgw.WriteAttributeString("y", "1.1");
+            svgw.WriteAttributeString("font-size", "0.4px");
+            svgw.WriteAttributeString("font-family", "Estrangelo Edessa");
+            svgw.WriteString("x");
+            svgw.WriteEndElement(); // text
+
+            svgw.WriteStartElement("text");
+            svgw.WriteAttributeString("x", "0.383");
+            svgw.WriteAttributeString("y", "1.1");
+            svgw.WriteAttributeString("font-size", "0.67px");
+            svgw.WriteAttributeString("font-family", "CLicht");
+            svgw.WriteString("•");
+            svgw.WriteEndElement(); // text
+
+            svgw.WriteEndElement(); // g
+        }
+
+        private void WriteRightFlagBlock(SvgWriter svgw, int nFlags)
+        {
+            svgw.WriteFlagBlock(nFlags, true);
+        }
+        private void WriteLeftFlagBlock(SvgWriter svgw, int nFlags)
+        {
+            svgw.WriteFlagBlock(nFlags, false);
+        }
+        #endregion symbol definitions
+
+        public override void WriteJavaScriptDefinitions(SvgWriter w)
+        {
+            //StringBuilder functions = new StringBuilder();
+            //functions.Append(GetBBoxFromRect());
+            //functions.Append("\n");
+            //functions.Append(AddRectFrame());
+            //w.WriteStartElement("script");
+            //w.WriteAttributeString("type", "text/ecmascript");
+            //w.WriteString(functions.ToString());
+            //w.WriteEndElement();
+        }
+        #region JavaScript function definitions (commented out)
+        //private StringBuilder GetBBoxFromRect()
+        //{
+        //    StringBuilder fn = new StringBuilder();
+        //    fn.Append("function getBBoxFromRect (client_rect, hOffset_px, vOffset_px)\n");
+        //    fn.Append("{\n");
+        //    fn.Append("if (! hOffset_px) {hOffset_px=0;}\n");
+        //    fn.Append("if (! vOffset_px) {vOffset_px=0;}\n");
+        //    fn.Append("var box = document.createElementNS( document.rootElement.namespaceURI, 'rect' );\n");
+
+        //    fn.Append("if (client_rect)\n");
+        //    fn.Append("{\n");
+        //    fn.Append("box.setAttribute('x', client_rect.left - hOffset_px);\\n");
+        //    fn.Append("box.setAttribute('y', client_rect.top - vOffset_px);\n");
+        //    fn.Append("box.setAttribute('width', client_rect.width + hOffset_px * 2);\n");
+        //    fn.Append("box.setAttribute('height', client_rect.height + vOffset_px * 2);\n");
+        //    fn.Append("}\n");
+        //    fn.Append("return box;\n");
+        //    fn.Append("}\n");
+        //    return fn;
+        //}
+        //private StringBuilder AddRectFrame()
+        //{
+        //    StringBuilder fn = new StringBuilder();
+        //    fn.Append("function addRectFrame (elem_id, strokeWidth, hPadding, vPadding)\n");
+        //    fn.Append("{\n");
+        //    fn.Append("var elem = document.getElementById(elem_id);\n");
+        //    fn.Append("if (elem)\n");
+        //    fn.Append("{\n");
+        //    fn.Append("var f = elem.getClientRects();\n");
+        //    fn.Append("if (f)\n");
+        //    fn.Append("{\n");
+        //    fn.Append("var bbox = getBBoxFromRect(f[0], hPadding, vPadding);\n");
+        //    fn.Append("bbox.setAttribute(\n");
+        //    fn.Append("'style',\n");
+        //    fn.Append("'fill: none;'+\n");
+        //    fn.Append("'stroke: black;'+\n");
+        //    fn.Append("'stroke-width: ' + strokeWidth + 'px;'\n");
+        //    fn.Append(");\n");
+        //    fn.Append("elem.parentNode.appendChild(bbox);\n");
+        //    fn.Append("}\n");
+        //    fn.Append("}\n");
+        //    fn.Append("}\n");
+        //    return fn;
+        //}
+        #endregion JavaScript function definitions
+
+        public override Metrics NoteObjectMetrics(Graphics graphics, NoteObject noteObject, VerticalDir voiceStemDirection, float gap, float strokeWidth)
+        {
+            Metrics returnMetrics = null;
+            ClefSign clef = noteObject as ClefSign;
+            Barline barline = noteObject as Barline;
+            CautionaryChordSymbol cautionaryChordSymbol = noteObject as CautionaryChordSymbol;
+            ChordSymbol chord = noteObject as ChordSymbol;
+            RestSymbol rest = noteObject as RestSymbol;
+            if(barline != null)
+            {
+                returnMetrics = new BarlineMetrics(graphics, barline, gap);
+            }
+            else if(clef != null)
+            {
+                if(clef.ClefName != "n")
+                    returnMetrics = new ClefMetrics(clef, gap);
+            }
+            else if(cautionaryChordSymbol != null)
+            {
+                returnMetrics = new ChordMetrics(graphics, cautionaryChordSymbol, voiceStemDirection, gap, strokeWidth);
+            }
+            else if(chord != null)
+            {
+                returnMetrics = new ChordMetrics(graphics, chord, voiceStemDirection, gap, strokeWidth);
+            }
+            else if(rest != null)
+            {
+                // All rests are originally created on the centre line.
+                // They are moved vertically later, if they are on a 2-Voice staff.
+                returnMetrics = new RestMetrics(graphics, rest, gap, noteObject.Voice.Staff.NumberOfStafflines, strokeWidth);
+            }
+
+            return returnMetrics;
+        }
+
+        public override DurationSymbol GetDurationSymbol(Voice voice, LocalizedMidiDurationDef lmdd, bool firstLmddInVoice,
+            ref byte currentVelocity)
+        {
+            DurationSymbol durationSymbol = null;
+            MidiChordDef midiChordDef = lmdd.MidiChordDef;
+            OverlapLmddAtStartOfBar olaso = lmdd as OverlapLmddAtStartOfBar;
+
+            PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
+            float musicFontHeight = pageFormat.MusicFontHeight;
+            float cautionaryFontHeight = pageFormat.CautionaryNoteheadsFontHeight;
+            int minimumCrotchetDuration = pageFormat.MinimumCrotchetDuration;
+ 
+            if(midiChordDef != null)
+            {
+                ChordSymbol chordSymbol = new ChordSymbol(voice, lmdd, minimumCrotchetDuration, musicFontHeight);
+
+                if(midiChordDef.MidiVelocitySymbol != currentVelocity)
+                {
+                    chordSymbol.AddDynamic(midiChordDef.MidiVelocitySymbol, currentVelocity);
+                    currentVelocity = midiChordDef.MidiVelocitySymbol;
+                }
+                durationSymbol = chordSymbol;
+            }
+            else if(olaso != null && firstLmddInVoice)
+            {
+                CautionaryChordSymbol cautionaryChordSymbol = new CautionaryChordSymbol(voice, olaso, cautionaryFontHeight);
+                durationSymbol = cautionaryChordSymbol;
+            }
+            else
+            {
+                RestSymbol restSymbol = new RestSymbol(voice, lmdd, minimumCrotchetDuration, musicFontHeight);
+                durationSymbol = restSymbol;
+            }
+
+            return durationSymbol;
+        }
+
+        public void ForceNaturalsInSynchronousChords(Staff staff)
+        {
+            Debug.Assert(staff.Voices.Count == 2);
+            foreach(ChordSymbol voice0chord in staff.Voices[0].ChordSymbols)
+            {
+                foreach(ChordSymbol voice1chord in staff.Voices[1].ChordSymbols)
+                {
+                    if(voice0chord.MsPosition == voice1chord.MsPosition)
+                    {
+                        ForceNaturals(voice0chord, voice1chord);
+                        break;
+                    }
+                    if(voice0chord.MsPosition < voice1chord.MsPosition)
+                        break;
+                }               
+            }
+        }
+
+        /// <summary>
+        /// Force the display of naturals where the synchronous chords share a diatonic pitch,
+        /// and one of them is not natural.
+        /// </summary>
+        private void ForceNaturals(ChordSymbol synchChord1, ChordSymbol synchChord2)
+        {
+            Debug.Assert(synchChord1.MsPosition == synchChord2.MsPosition);
+            foreach(Head head1 in synchChord1.HeadsTopDown)
+            {
+                foreach(Head head2 in synchChord2.HeadsTopDown)
+                {
+                    if(head1.Pitch == head2.Pitch)
+                    {
+                        if(head1.Alteration != 0)
+                            head2.DisplayAccidental = DisplayAccidental.force;
+                        if(head2.Alteration != 0)
+                            head1.DisplayAccidental = DisplayAccidental.force;
+                        break;
+                    }
+                }
+            }
+        }
+
+        public override void AdjustRestsVertically(List<Staff> staves)
+        {
+            foreach(Staff staff in staves)
+            {
+                if(staff.Voices.Count == 2)
+                {
+                    staff.AdjustRestsVertically();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 20.01.2012 N.B. Neither this function nor ChordMetrics.MoveAuxilliariesToLyricHeight()
+        /// have been thoroughly tested yet. 
+        /// This function should align the lyrics in each voice, moving ornaments and dynamics 
+        /// which are on the same side of the staff. (Lyrics are closest to the staff.)
+        /// </summary>
+        public override void AlignLyrics(List<Staff> staves)
+        {
+            foreach(Staff staff in staves)
+            {
+                for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
+                {
+                    VerticalDir voiceStemDirection = VerticalDir.none;
+                    if(staff.Voices.Count > 1)
+                    {   // 2-Voice staff
+                        if(voiceIndex == 0)
+                            voiceStemDirection = VerticalDir.up; // top voice
+                        else
+                            voiceStemDirection = VerticalDir.down; // bottom voice
+                    }
+
+                    float lyricMaxTop = float.MinValue;
+                    float lyricMinBottom = float.MaxValue;
+                    foreach(ChordSymbol chordSymbol in staff.Voices[voiceIndex].ChordSymbols)
+                    {
+                        Metrics lyricMetrics = chordSymbol.ChordMetrics.LyricMetrics;
+                        if(lyricMetrics != null)
+                        {
+                            lyricMaxTop = (lyricMaxTop > lyricMetrics.Top) ? lyricMaxTop : lyricMetrics.Top;
+                            lyricMinBottom = (lyricMinBottom < lyricMetrics.Bottom) ? lyricMinBottom : lyricMetrics.Bottom;
+                        }
+                    }
+                    if(lyricMaxTop != float.MinValue)
+                    {   // the voice has lyrics
+                        if(voiceStemDirection == VerticalDir.none || voiceStemDirection == VerticalDir.down)
+                        {
+                            // the lyrics are below the staff
+                            float lyricMinTop = staff.Metrics.StafflinesBottom + (staff.SVGSystem.Score.PageFormat.Gap * 1.5F);
+                            lyricMaxTop = lyricMaxTop > lyricMinTop ? lyricMaxTop : lyricMinTop;
+                        }
+                        foreach(ChordSymbol chordSymbol in staff.Voices[voiceIndex].ChordSymbols)
+                        {
+                            chordSymbol.ChordMetrics.MoveAuxilliariesToLyricHeight(voiceStemDirection, lyricMaxTop, lyricMinBottom);
+                        }
+                    }
+                }
+            }
+        }
+
+        public override void AddNoteheadExtenderLines(List<Staff> staves, float rightMarginPos, float gap, float extenderStrokeWidth, float hairlinePadding)
+        {
+            AddExtendersAtTheBeginningsofStaves(staves, rightMarginPos, gap, extenderStrokeWidth, hairlinePadding);
+            AddExtendersInStaves(staves, extenderStrokeWidth, gap, hairlinePadding);
+            AddExtendersAtTheEndsOfStaves(staves, rightMarginPos, gap, extenderStrokeWidth, hairlinePadding);
+        }
+        #region private to AddNoteheadExtenderLines()
+        private void AddExtendersAtTheBeginningsofStaves(List<Staff> staves, float rightMarginPos, float gap, float extenderStrokeWidth, float hairlinePadding)
+        {
+            foreach(Staff staff in staves)
+            foreach(Voice voice in staff.Voices)
+            {
+                List<NoteObject> noteObjects = voice.NoteObjects;
+                ClefSign firstClef = null;
+                CautionaryChordSymbol cautionaryChordSymbol = null;
+                ChordSymbol firstChord = null;
+                RestSymbol firstRest = null;
+                for(int index = 0; index < noteObjects.Count; ++index)
+                {
+                    if(firstClef == null)
+                        firstClef = noteObjects[index] as ClefSign;
+                    if(cautionaryChordSymbol == null)
+                        cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
+                    if(firstChord == null)
+                        firstChord = noteObjects[index] as ChordSymbol;
+                    if(firstRest == null)
+                        firstRest = noteObjects[index] as RestSymbol;
+
+                    if(firstClef != null
+                    && (cautionaryChordSymbol != null || firstChord != null || firstRest != null))
+                        break;
+                }
+
+                if(firstClef != null && cautionaryChordSymbol != null)
+                {
+                    // create brackets
+                    List<CautionaryBracketMetrics> cbMetrics = cautionaryChordSymbol.ChordMetrics.CautionaryBracketsMetrics;
+                    Debug.Assert(cbMetrics.Count == 2);
+                    Metrics clefMetrics = firstClef.Metrics;
+
+                    // extender left of cautionary
+                    List<float> ys = cautionaryChordSymbol.ChordMetrics.HeadsOriginYs;
+                    List<float> x1s = GetEqualFloats(clefMetrics.Right - (hairlinePadding * 2), ys.Count);
+                    List<float> x2s = GetEqualFloats(cbMetrics[0].Left, ys.Count);
+                    cautionaryChordSymbol.ChordMetrics.NoteheadExtendersMetricsBefore =
+                        CreateExtenders(x1s, x2s, ys, extenderStrokeWidth, gap, true);
+
+                    // extender right of cautionary
+                    x1s = GetEqualFloats(cbMetrics[1].Right, ys.Count);
+                    x2s = GetCautionaryRightExtenderX2s(cautionaryChordSymbol, voice.NoteObjects, x1s, ys, hairlinePadding);
+                    cautionaryChordSymbol.ChordMetrics.NoteheadExtendersMetrics = 
+                        CreateExtenders(x1s, x2s, ys, extenderStrokeWidth, gap, true);
+                }
+            }
+        }
+        private List<float> GetCautionaryRightExtenderX2s(CautionaryChordSymbol cautionaryChordSymbol1,
+            List<NoteObject> noteObjects, List<float> x1s, List<float> ys, float hairlinePadding)
+        {
+            List<float> x2s = new List<float>();
+            DurationSymbol dc2 = GetFollowingChordOrRestSymbol(noteObjects);
+            ChordSymbol chord2 = dc2 as ChordSymbol;
+            RestSymbol rest2 = dc2 as RestSymbol;
+            if(chord2 != null)
+            {
+                x2s = GetX2sFromChord2(ys, chord2.ChordMetrics, hairlinePadding);
+            }
+            else if(rest2 != null)
+            {
+                float x2 = rest2.Metrics.Left - hairlinePadding;
+                x2s = GetEqualFloats(x2, x1s.Count);
+            }
+            else // dc2 == null
+            {
+                Debug.Assert(dc2 == null);
+                // This voice has no further chords or rests,
+                // so draw extenders to the right margin.
+                // extend to the right margin
+                PageFormat pageFormat = cautionaryChordSymbol1.Voice.Staff.SVGSystem.Score.PageFormat;
+                float rightMarginPos = pageFormat.RightMarginPos;
+                float gap = pageFormat.Gap;
+                x2s = GetEqualFloats(rightMarginPos + gap, ys.Count);
+            }
+            return x2s;
+        }
+        /// <summary>
+        /// Returns the first chordSymbol or restSymbol after the first cautionaryChordSymbol.
+        /// Null is returned if no chordSymbol or RestSymbol is found in the noteObjects.
+        /// </summary>
+        /// <param name="noteObjects"></param>
+        /// <returns></returns>
+        private DurationSymbol GetFollowingChordOrRestSymbol(List<NoteObject> noteObjects)
+        {
+            DurationSymbol durationSymbol = null;
+            bool chord1Found = false;
+            foreach(NoteObject noteObject in noteObjects)
+            {
+                if(chord1Found == false && noteObject is CautionaryChordSymbol)
+                {
+                    chord1Found = true;
+                    continue;
+                }
+
+                if(chord1Found)
+                {
+                    ChordSymbol chordSymbol = noteObject as ChordSymbol;
+                    if(chordSymbol != null)
+                        durationSymbol = chordSymbol;
+
+                    RestSymbol restSymbol = noteObject as RestSymbol;
+                    if(restSymbol != null)
+                        durationSymbol = restSymbol;
+                }
+
+                if(durationSymbol != null)
+                    break;
+            }
+            return durationSymbol;
+        }
+        private void AddExtendersInStaves(List<Staff> staves, float extenderStrokeWidth, float gap, float hairlinePadding)
+        {
+            foreach(Staff staff in staves)
+            foreach(Voice voice in staff.Voices)
+            {
+                List<NoteObject> noteObjects = voice.NoteObjects;
+                int index = 0;
+                while(index < noteObjects.Count - 1)
+                {
+                    // noteObjects.Count - 1 because index is immediately incremented when a continuing 
+                    // chord or rest is found, and it should always be less than noteObjects.Count.
+                    ChordSymbol chord1 = noteObjects[index] as ChordSymbol;
+                    if(chord1 != null && chord1.LocalizedMidiDurationDef.MsDurationToNextBarline != null)
+                    {
+                        List<float> x1s = GetX1sFromChord1(chord1.ChordMetrics, hairlinePadding);
+                        List<float> x2s = null;
+                        List<float> ys = null;
+
+                        ++index;
+                        while(index < noteObjects.Count)
+                        {
+                            CautionaryChordSymbol cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
+                            ChordSymbol chord2 = noteObjects[index] as ChordSymbol;
+                            RestSymbol rest2 = noteObjects[index] as RestSymbol;
+                            if(cautionaryChordSymbol != null)
+                            {
+                                cautionaryChordSymbol.Visible = false;
+                            }
+                            else if(chord2 != null)
+                            {
+                                ys = chord1.ChordMetrics.HeadsOriginYs;
+                                x2s = GetX2sFromChord2(ys, chord2.ChordMetrics, hairlinePadding);
+                                break;
+                            }
+                            else if(rest2 != null)
+                            {
+                                float x2 = rest2.Metrics.Left - hairlinePadding;
+                                ys = chord1.ChordMetrics.HeadsOriginYs;
+                                x2s = GetEqualFloats(x2, x1s.Count);
+                                break;
+                            }
+                            ++index;
+                        }
+
+                        if(x2s != null && ys != null)
+                        {
+                            bool hasContinuingBeamBlock =
+                                ((chord1.BeamBlock != null) && (chord1.BeamBlock.Chords[chord1.BeamBlock.Chords.Count - 1] != chord1));
+                            if(hasContinuingBeamBlock)
+                                Debug.Assert(true);
+
+                            bool drawExtender = false;
+                            if(chord1.DurationClass > DurationClass.semiquaver)
+                                drawExtender = true;
+                            if(chord1.DurationClass < DurationClass.crotchet && hasContinuingBeamBlock)
+                                drawExtender = false;
+
+                            chord1.ChordMetrics.NoteheadExtendersMetrics =
+                                CreateExtenders(x1s, x2s, ys, extenderStrokeWidth, gap, drawExtender);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        ++index;
+                    }
+                }
+            }
+        }
+        private void AddExtendersAtTheEndsOfStaves(List<Staff> staves, float rightMarginPos, float gap, float extenderStrokeWidth, float hairlinePadding)
+        {
+            foreach(Staff staff in staves)
+            foreach(Voice voice in staff.Voices)
+            {
+                List<NoteObject> noteObjects = voice.NoteObjects;
+                ChordSymbol lastChord = null;
+                RestSymbol lastRest = null;
+                for(int index = noteObjects.Count - 1; index >= 0; --index)
+                {
+                    lastChord = noteObjects[index] as ChordSymbol;
+                    lastRest = noteObjects[index] as RestSymbol;
+                    if(lastChord != null || lastRest != null)
+                        break;
+                }
+
+                if(lastChord != null && lastChord.LocalizedMidiDurationDef.MsDurationToNextBarline != null)
+                {
+                    List<float> x1s = GetX1sFromChord1(lastChord.ChordMetrics, hairlinePadding);
+                    List<float> x2s = GetEqualFloats(rightMarginPos + gap, x1s.Count);
+                    List<float> ys = lastChord.ChordMetrics.HeadsOriginYs;
+                    lastChord.ChordMetrics.NoteheadExtendersMetrics =
+                        CreateExtenders(x1s, x2s, ys, extenderStrokeWidth, gap, true);
+                }
+            }
+        }
+        /// <summary>
+        /// Extenders are created for chords of all duration classes, but only displayed on crotchets or greater.
+        /// This is so that extenders become part of the staff's edge, which is used when shifting staves and drawing barlines.
+        /// Extenders shorter than a gap are not created.
+        /// </summary>
+        private List<NoteheadExtenderMetrics> CreateExtenders(List<float> x1s, List<float> x2s, List<float> ys, float extenderStrokeWidth, float gap, bool drawExtender)
+        {
+            Debug.Assert(ys.Count == x1s.Count);
+            Debug.Assert(ys.Count == x2s.Count);
+            Debug.Assert(ys.Count > 0);
+            List<NoteheadExtenderMetrics> noteheadExtendersMetrics = new List<NoteheadExtenderMetrics>();
+            for(int i = 0; i < ys.Count; ++i)
+            {
+                //if((x2s[i] - x1s[i]) > gap)
+                //{
+                    NoteheadExtenderMetrics nem =
+                        new NoteheadExtenderMetrics(x1s[i], x2s[i], ys[i], extenderStrokeWidth, gap, drawExtender);
+
+                    noteheadExtendersMetrics.Add(nem);
+                //}
+            }
+            return noteheadExtendersMetrics;
+        }
+        private List<float> GetX1sFromChord1(ChordMetrics chord1Metrics, float hairlinePadding)
+        {
+            List<float> x1s = new List<float>();
+            LedgerlineBlockMetrics upperLedgerlineMetrics = chord1Metrics.UpperLedgerlineBlockMetrics;
+            LedgerlineBlockMetrics lowerLedgerlineMetrics = chord1Metrics.LowerLedgerlineBlockMetrics;
+            List<HeadMetrics> headsMetrics = chord1Metrics.HeadsMetrics;
+            Debug.Assert(headsMetrics.Count > 0);
+
+            foreach(HeadMetrics headmetrics in headsMetrics)
+            {
+                float x1 = headmetrics.Right;
+                if(upperLedgerlineMetrics != null
+                && headmetrics.OriginY >= upperLedgerlineMetrics.Top && headmetrics.OriginY <= upperLedgerlineMetrics.Bottom)
+                    x1 = upperLedgerlineMetrics.Right;
+                if(lowerLedgerlineMetrics != null
+                && headmetrics.OriginY >= lowerLedgerlineMetrics.Top && headmetrics.OriginY <= lowerLedgerlineMetrics.Bottom)
+                    x1 = lowerLedgerlineMetrics.Right;
+
+                x1s.Add(x1 + hairlinePadding);
+            }
+            return x1s;
+        }
+        private List<float> GetX2sFromChord2(List<float> ys, ChordMetrics chord2Metrics, float hairlinePadding)
+        {
+            List<float> x2s = new List<float>();
+            LedgerlineBlockMetrics c2UpperLedgerlineMetrics = chord2Metrics.UpperLedgerlineBlockMetrics;
+            LedgerlineBlockMetrics c2LowerLedgerlineMetrics = chord2Metrics.LowerLedgerlineBlockMetrics;
+            List<HeadMetrics> c2headsMetrics = chord2Metrics.HeadsMetrics;
+            Debug.Assert(c2headsMetrics.Count > 0);
+            List<AccidentalMetrics> c2AccidentalsMetrics = chord2Metrics.TopDownAccidentalsMetrics;
+
+            float verticalPadding = hairlinePadding * 4.0f;
+            foreach(float y in ys)
+            {
+                float x2 = float.MaxValue;
+                if(c2UpperLedgerlineMetrics != null)
+                {
+                    if(y >= (c2UpperLedgerlineMetrics.Top - verticalPadding)
+                    && y <= (c2UpperLedgerlineMetrics.Bottom + verticalPadding))
+                        x2 = x2 < c2UpperLedgerlineMetrics.Left ? x2 : c2UpperLedgerlineMetrics.Left;
+                }
+                if(c2LowerLedgerlineMetrics != null)
+                {
+                    if(y >= (c2LowerLedgerlineMetrics.Top - verticalPadding)
+                    && y <= (c2LowerLedgerlineMetrics.Bottom + verticalPadding))
+                        x2 = x2 < c2LowerLedgerlineMetrics.Left ? x2 : c2LowerLedgerlineMetrics.Left;
+                }
+                foreach(HeadMetrics headMetrics in c2headsMetrics)
+                {
+                    if(y >= (headMetrics.Top - verticalPadding)
+                    && y <= (headMetrics.Bottom + verticalPadding))
+                        x2 = x2 < headMetrics.Left ? x2 : headMetrics.Left;
+                }
+                foreach(AccidentalMetrics accidentalMetrics in c2AccidentalsMetrics)
+                {
+                    if(y >= (accidentalMetrics.Top - verticalPadding)
+                    && y <= (accidentalMetrics.Bottom + verticalPadding))
+                        x2 = x2 < accidentalMetrics.Left ? x2 : accidentalMetrics.Left;
+                }
+                x2s.Add(x2 - hairlinePadding);
+            }
+
+            float minX = float.MaxValue;
+            foreach(float x in x2s)
+            {
+                minX = minX < x ? minX : x;
+            }
+            List<float> x2sMinimum = new List<float>();
+            foreach(float x in x2s)
+                x2sMinimum.Add(minX);
+
+            return x2sMinimum;
+        }
+        private List<float> GetEqualFloats(float x2, int count)
+        {
+            List<float> x2s = new List<float>();
+            for(int i = 0; i < count; ++i)
+            {
+                x2s.Add(x2);
+            }
+            return x2s;
+        }
+        #endregion
+
+        public override void FinalizeBeamBlocks(List<Staff> staves)
+        {
+            foreach(Staff staff in staves)
+            {
+                foreach(Voice voice in staff.Voices)
+                {
+                    voice.FinalizeBeamBlocks();
+                }
+                if(staff.Voices.Count == 2)
+                {
+                    staff.AdjustStemAndBeamBlockHeights(0);
+                    staff.AdjustStemAndBeamBlockHeights(1);
+                }
+            }
+        }
+
+        /// <summary>
+        /// This function sets the lengths of beamed stems (including the positions of their attached dynamics etc.
+        /// so that collision checking can be done as accurately as possible in JustifyHorizontally().
+        /// It does this by calling FinalizeBeamBlocks(), which is called again after JustifyHorizontally(),
+        /// and then deleting the beams that that function adds.
+        /// At the time this function is called, chords are distributed proportionally to their duration, so the 
+        /// beams which are constructed here are not exactly correct. The outer stem tips of each beam should, 
+        /// however, be fairly close to their final positions.
+        /// </summary>
+        public override void SetBeamedStemLengths(List<Staff> staves)
+        {
+            FinalizeBeamBlocks(staves);
+            foreach(Staff staff in staves)
+            {
+                foreach(Voice voice in staff.Voices)
+                {
+                    voice.RemoveBeamBlockBeams();
+                }
+            }
+        }
+    }
+}

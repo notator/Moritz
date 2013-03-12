@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="richTextBox1.Text" xml:space="preserve">
+    <value>Keyboards:
+0: grand piano
+1: bright piano
+2: electric grand
+3: honkytonk
+4: electric piano A
+5: electric piano B
+6: harpsichord
+7: clavinet
+
+Chromatic percussion:
+8: celesta
+9: glockenspiel
+10: musicbox
+11: vibraphone
+12: marimba
+13: xylophone
+14: tubular bells
+15: dulcimer
+
+Organs:
+16: drawbar organ
+17: percussive organ
+18: rock organ
+19: church organ
+20: reed organ
+21: accordion
+22: harmonica
+23: tango accordeon
+
+Guitars:
+24: nylon string guitar
+25: steel string guitar
+26: electric jazz guitar
+27: electric clean guitar
+28: electric muted guitar
+29: overdriven guitar
+30: distortion guitar
+31: guitar harmonics
+</value>
+  </data>
+  <data name="richTextBox2.Text" xml:space="preserve">
+    <value>Bass:
+32: acoustic bass
+33: electric bass fingers
+34: electric bass picks
+35: fretless bass
+36: slap bass A
+37: slap bass B
+38: synth bass A
+39: synth bass B
+
+Strings, Timpani:
+40: violin
+41: viola
+42: violoncello
+43: doublebass
+44: tremolo strings
+45: pizzicato strings
+46: orchestral strings
+47: timpani
+
+Ensemble:
+48: string ensemble A
+49: string ensemble B
+50: synth strings A
+51: synth strings B
+52: choir aahs
+53: voice oohs
+54: voice
+55: orchestra hit
+
+Brass:
+56: trumpet
+57: trombone
+58: tuba
+59: muted trumpet
+60: horn
+61: brass section
+62: synth brass A
+63: synth brass B
+</value>
+  </data>
+  <data name="richTextBox3.Text" xml:space="preserve">
+    <value>Reeds:
+64: soprano saxophone
+65: alto saxophone
+66: tenor saxophone
+67: baritone saxophone
+68: oboe
+69: english horn
+70: bassoon
+71: clarinet
+
+Pipes:
+72: piccolo
+73: flute
+74: recorder
+75: pan flute
+76: blown bottle
+77: shakuhachi
+78: whistle
+79: ocarina
+
+Synth lead:
+80: synth square
+81: synth sawtooth
+82: synth calliope
+83: synth chiff
+84: synth charang
+85: synth lead voice
+86: synth fifths
+87: synth bass lead
+
+Synth pad:
+88: pad new age
+89: pad warm
+90: pad poly synth
+91: pad choir
+92: pad bowed
+93: pad metallic
+94: pad halo
+95: pad sweep
+
+</value>
+  </data>
+  <data name="richTextBox4.Text" xml:space="preserve">
+    <value>Synth effects:
+96: rain
+97: soundtrack
+98: crystal
+99: atmosphere
+100: brightness
+101: goblins
+102: echoes
+103: scifi
+
+Ethnic:
+104: sitar
+105: banjo
+106: shamisen
+107: koto
+108: kalimba
+109: bagpipe
+110: fiddle
+111: shanai
+
+Percussive:
+112: tinkle bell
+113: agogo
+114: steel drums
+115: woodblock
+116: taiko
+117: melodic tom
+118: synth drum
+119: reverse cymbal
+
+Sound effects:
+120: guitar fret
+121: breath
+122: seashore
+123: bird tweet
+124: telephone
+125: helicopter
+126: applause
+127: gunshot
+</value>
+  </data>
+</root>

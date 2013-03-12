@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{9B5FE3BA-F992-4064-9563-6C4A5616195C}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Moritz</RootNamespace>
+    <AssemblyName>Moritz</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AboutMoritz.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AboutMoritz.designer.cs">
+      <DependentUpon>AboutMoritz.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MoritzForm1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MoritzForm1.Designer.cs">
+      <DependentUpon>MoritzForm1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NewScoreDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewScoreDialog.Designer.cs">
+      <DependentUpon>NewScoreDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PreferencesDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PreferencesDialog.Designer.cs">
+      <DependentUpon>PreferencesDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="AboutMoritz.resx">
+      <DependentUpon>AboutMoritz.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MoritzForm1.resx">
+      <DependentUpon>MoritzForm1.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NewScoreDialog.resx">
+      <DependentUpon>NewScoreDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PreferencesDialog.resx">
+      <DependentUpon>PreferencesDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Krystals4Application\Krystals4Application.csproj">
+      <Project>{93791484-2CA8-427A-9D19-3232D3753983}</Project>
+      <Name>Krystals4Application</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Krystals4ObjectLibrary\Krystals4ObjectLibrary.csproj">
+      <Project>{383E2844-41A4-488F-A683-D3EAE9AF4AF5}</Project>
+      <Name>Krystals4ObjectLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.AssistantComposer\Moritz.AssistantComposer.csproj">
+      <Project>{AE8A988A-2F63-4377-8630-DF9020877362}</Project>
+      <Name>Moritz.AssistantComposer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.AssistantPerformer\Moritz.AssistantPerformer.csproj">
+      <Project>{C42FEC1B-4FBD-472A-A866-9B5A08984A63}</Project>
+      <Name>Moritz.AssistantPerformer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
+      <Project>{E68C2A79-CDAB-46F5-A6EE-534CE2D99577}</Project>
+      <Name>Moritz.Globals</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Score\Moritz.Score.csproj">
+      <Project>{0507FAED-FF81-45A4-90AF-923D25DDA758}</Project>
+      <Name>Moritz.Score</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="_revision58Log.txt" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
