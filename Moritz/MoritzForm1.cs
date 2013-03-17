@@ -161,11 +161,10 @@ namespace Moritz
         private void WriteDefaultMetadata(XmlWriter w)
         {
             w.WriteStartElement("metadata");
-            w.WriteStartElement("websiteLinks");
+            w.WriteStartElement("websiteLink");
             w.WriteAttributeString("aboutLinkText", "");
             w.WriteAttributeString("aboutLinkURL", "");
-            w.WriteAttributeString("recording", "");
-            w.WriteEndElement(); // websiteLinks
+            w.WriteEndElement(); // websiteLink
             w.WriteEndElement(); // metadata
         }
         private void WriteDefaultDimensions(XmlWriter w)

@@ -327,16 +327,7 @@ namespace Moritz.Score
 
                 w.WriteEndElement(); // end svgPages div element
 
-                WriteLinksAndPlayer(w,
-                        _pageFormat.AboutLinkText,
-                        _pageFormat.AboutLinkURL,
-                        _pageFormat.Recording,
-                        _pageFormat.LeftScreenMarginPos,
-                        _pageFormat.Page1ScreenTitleY);
-
                 w.WriteEndElement(); // end centredReferenceDiv div element
-
-                WriteJavascriptIncludes(w);
 
                 w.WriteEndElement(); // end body element
                 w.WriteEndElement(); // end html element
@@ -360,114 +351,6 @@ namespace Moritz.Score
             w.WriteEndElement(); // link
 
             w.WriteEndElement(); // head
-        }
-
-        /// <summary>
-        /// The mp3Recording argument is currently ignored. Though I've left it in the pageFormat definition
-        /// and Moritz dialogs for the moment.
-        /// MP3 recordings should be included in the "About" documents for each composition instead.
-        /// The MIDIPlayer "about" link and start button are created instead. (10.6.2012)
-        /// </summary>
-        /// <param name="w"></param>
-        /// <param name="aboutLinkText"></param>
-        /// <param name="aboutURL"></param>
-        /// <param name="mp3recording"></param>
-        /// <param name="left"></param>
-        /// <param name="titleBaseline"></param>
-        private void WriteLinksAndPlayer(
-            XmlWriter w,
-            string aboutLinkText,
-            string aboutURL,
-            string mp3recording,
-            float left,
-            float titleBaseline)
-        {
-            w.WriteStartElement("div");
-            w.WriteAttributeString("id", "linksAndPlayer");
-            w.WriteAttributeString("style", "font-family: Lucida Sans Unicode, Verdana, Arial, Geneva, Sans-Serif; font-size: 11px;");
-
-            Debug.Assert(!String.IsNullOrEmpty(aboutURL) && !String.IsNullOrEmpty(aboutLinkText));
-
-            w.WriteStartElement("a");
-            w.WriteAttributeString("id", "aboutTheScoreLink"); 
-            w.WriteAttributeString("style", "position: absolute; top: 17px; left: 52px;");
-            w.WriteAttributeString("href", aboutURL);
-            w.WriteString(aboutLinkText);
-            w.WriteEndElement(); // aboutTheScoreLink
-
-            w.WriteStartElement("a");
-            w.WriteAttributeString("id", "aboutMidiPlayerLink");
-            w.WriteAttributeString("style", "position: absolute; top: 17px; left: 150px; visibility: hidden");
-            w.WriteAttributeString("href", "http://james-ingram-act-two.de/open-source/midiPlayer/aboutMidiPlayer.html");
-            w.WriteString("About MIDI Player");
-            w.WriteEndElement(); // aboutMidiPlayerLink
-
-            w.WriteStartElement("button");
-            w.WriteAttributeString("id", "midiPlayerButton");
-            w.WriteAttributeString("style", "position: absolute; margin: 0px; top: 33px; left: 50px;");
-            w.WriteString("MIDI Player");
-            w.WriteEndElement(); // button
-
-            // the midi output device selector is connected here in Javascript
-            w.WriteStartElement("select");
-            w.WriteAttributeString("id", "midiOutputDeviceSelector");
-            w.WriteAttributeString("style", "font-size: 9pt; font-family: Lucida Sans Unicode, Verdana, Arial, Geneva, Sans-Serif; " +
-                                    "position: absolute; top: 32px; left: 25px; width: 220px; visibility: hidden");
-            w.WriteEndElement(); // select
-
-            w.WriteEndElement(); // linksAndPlayer div
-            #region obsolete
-            /*****************
-             * This is the code which used to create the mp3 player at the top of the score
-            float linkHeight = 11;
-            float linkTop;
-            int mp3PlayerWidth = 300;
-            int mp3PlayerHeight = 18;
-            if(!String.IsNullOrEmpty(mp3recording))
-            {
-                float playerTop = titleBaseline - mp3PlayerHeight;
-                StringBuilder styleSB = new StringBuilder();
-                styleSB.Append("position: absolute; top: 0; left: 0; margin-left:25px; margin-top:" + playerTop.ToString(M.En_USNumberFormat) + "px");
-                w.WriteStartElement("object");
-                w.WriteAttributeString("type", "application/x-shockwave-flash");
-                w.WriteAttributeString("data", M.MoritzFlashPlayerFolder + "/player_mp3_maxi.swf");
-                w.WriteAttributeString("style", styleSB.ToString());
-                w.WriteAttributeString("width", mp3PlayerWidth.ToString());
-                w.WriteAttributeString("height", mp3PlayerHeight.ToString());
-                w.WriteStartElement("param");
-                w.WriteAttributeString("name", "movie");
-                w.WriteAttributeString("value", M.MoritzFlashPlayerFolder + "/player_mp3_maxi.swf");
-                w.WriteEndElement(); // param 1
-                w.WriteStartElement("param");
-                w.WriteAttributeString("name", "wmode");
-                w.WriteAttributeString("value", "transparent");
-                w.WriteEndElement(); // param 2
-                w.WriteStartElement("param");
-                w.WriteAttributeString("name", "FlashVars");
-                w.WriteAttributeString("value", "mp3=" + M.Preferences.OnlineUserAudioFolder + "/" + 
-                    mp3recording + "&" + "config=" + M.MoritzFlashPlayerFolder + "/config_maxi.txt");
-                w.WriteEndElement(); // param 3
-                w.WriteEndElement(); // object
-            }
-            ***********************/
-            #endregion
-        }
-
-        private void WriteJavascriptIncludes(XmlWriter w)
-        {
-            w.WriteComment("Midibridge software is copyright 2012 abudaan http://abumarkub.net \n" +
-                "the code is licensed under MIT\n" + "http://abumarkub.net/midibridge/license" + "\n");
-            w.WriteStartElement("script");
-            w.WriteAttributeString("src", "lib/midibridge-0.6.3.min.js");
-            w.WriteAttributeString("type", "text/javascript");
-            w.WriteEndElement();
-
-            w.WriteComment("Midiplayer software is copyright 2012 James Ingram\n" +
-            "the code is licensed under MIT\n" + "http://james-ingram-act-two.de/open-source/license.html" + "\n");
-            w.WriteStartElement("script");
-            w.WriteAttributeString("src", "lib/midiPlayer-12.6.2012.min.js");
-            w.WriteAttributeString("type", "text/javascript");
-            w.WriteEndElement(); 
         }
 
         private List<string> SaveSVGPages()
@@ -520,12 +403,6 @@ namespace Moritz.Score
         {
             Debug.Assert(Notator != null);
             Notator.SymbolSet.WriteSymbolDefinitions(w);
-        }
-        public void WriteJavaScriptDefinitions(SvgWriter w)
-        {
-            Debug.Assert(Notator != null);
-            // Other sets of JavaScript definitions are also possible...
-            Notator.SymbolSet.WriteJavaScriptDefinitions(w);
         }
 
         #endregion save SVG score

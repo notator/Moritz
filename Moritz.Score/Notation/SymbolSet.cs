@@ -12,7 +12,6 @@ namespace Moritz.Score.Notation
         }
 
         public abstract void WriteSymbolDefinitions(SvgWriter w);
-        public abstract void WriteJavaScriptDefinitions(SvgWriter w);
         public abstract Metrics NoteObjectMetrics(Graphics graphics, NoteObject noteObject, VerticalDir voiceStemDirection, float gap, float storkeWidth);
         public abstract DurationSymbol GetDurationSymbol(Voice voice, LocalizedMidiDurationDef lmdd, bool firstLmddInVoice,
             ref byte currentVelocity);

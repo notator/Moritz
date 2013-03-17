@@ -62,10 +62,6 @@ namespace Moritz.Score
         /// the "about" file's URL.
         /// </summary>
         public string AboutLinkURL;
-        /// <summary>
-        /// the name of the file to be stored in "../audio"
-        /// </summary>
-        public string Recording;
         #endregion
 
         #region notation

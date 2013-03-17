@@ -52,7 +52,6 @@ namespace Moritz.AssistantComposer
             textBoxes.Add(Page1TitleYTextBox);
             textBoxes.Add(Page1TitleHeightTextBox);
             textBoxes.Add(Page1AuthorHeightTextBox);
-            textBoxes.Add(RecordingTextBox);
             textBoxes.Add(AboutLinkTextTextBox);
             textBoxes.Add(AboutLinkURLTextBox);
             textBoxes.Add(MetadataCommentTextBox);
@@ -78,7 +77,6 @@ namespace Moritz.AssistantComposer
 
             this.AboutLinkTextTextBox.Text = "";
             this.AboutLinkURLTextBox.Text = "";
-            this.RecordingTextBox.Text = "";
         }
 
         public void Read(XmlReader r)
@@ -130,7 +128,7 @@ namespace Moritz.AssistantComposer
         private void GetWebsiteLinks(XmlReader r)
         {
             Debug.Assert(r.Name == "metadata");
-            M.ReadToXmlElementTag(r, "websiteLinks");
+            M.ReadToXmlElementTag(r, "websiteLink");
             int count = r.AttributeCount;
             for(int i = 0; i < count; i++)
             {
@@ -142,9 +140,6 @@ namespace Moritz.AssistantComposer
                         break;
                     case "aboutLinkURL":
                         this.AboutLinkURLTextBox.Text = r.Value;
-                        break;
-                    case "recording":
-                        this.RecordingTextBox.Text = r.Value;
                         break;
                 }
             }
@@ -254,11 +249,10 @@ namespace Moritz.AssistantComposer
             if(!String.IsNullOrEmpty(MetadataCommentTextBox.Text))
                 w.WriteAttributeString("comment", this.MetadataCommentTextBox.Text);
 
-            w.WriteStartElement("websiteLinks");
+            w.WriteStartElement("websiteLink");
             w.WriteAttributeString("aboutLinkText", this.AboutLinkTextTextBox.Text);
             w.WriteAttributeString("aboutLinkURL", this.AboutLinkURLTextBox.Text);
-            w.WriteAttributeString("recording", this.RecordingTextBox.Text);
-            w.WriteEndElement(); // websiteLinks
+            w.WriteEndElement(); // websiteLink
             w.WriteEndElement(); // metadata
         }
         public void WriteDimensions(XmlWriter w)
@@ -307,7 +301,6 @@ namespace Moritz.AssistantComposer
 
         public string AboutLinkText { get { return AboutLinkTextTextBox.Text; } }
         public string AboutLinkURL { get { return AboutLinkURLTextBox.Text; } }
-        public string Recording { get { return RecordingTextBox.Text; } }
 
         private void DeselectAll()
         {

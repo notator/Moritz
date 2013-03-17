@@ -37,11 +37,8 @@
             this.LandscapeCheckBox = new System.Windows.Forms.CheckBox();
             this.PaperSizeComboBox = new System.Windows.Forms.ComboBox();
             this.WebsiteLinksGroupBox = new System.Windows.Forms.GroupBox();
-            this.RecordingTextBox = new System.Windows.Forms.TextBox();
             this.AboutLinkTextTextBox = new System.Windows.Forms.TextBox();
             this.AboutLinkURLTextBox = new System.Windows.Forms.TextBox();
-            this.RecordingHelpLabel = new System.Windows.Forms.Label();
-            this.RecordingLabel = new System.Windows.Forms.Label();
             this.AboutLinkTextLabel = new System.Windows.Forms.Label();
             this.AboutLinkURLLabel = new System.Windows.Forms.Label();
             this.MarginsGroupBox = new System.Windows.Forms.GroupBox();
@@ -127,9 +124,10 @@
             // 
             // SaveSettingsButton
             // 
+            this.SaveSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.SaveSettingsButton.Enabled = false;
             this.SaveSettingsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.SaveSettingsButton.Location = new System.Drawing.Point(534, 393);
+            this.SaveSettingsButton.Location = new System.Drawing.Point(534, 355);
             this.SaveSettingsButton.Name = "SaveSettingsButton";
             this.SaveSettingsButton.Size = new System.Drawing.Size(106, 26);
             this.SaveSettingsButton.TabIndex = 7;
@@ -170,28 +168,17 @@
             // 
             // WebsiteLinksGroupBox
             // 
-            this.WebsiteLinksGroupBox.Controls.Add(this.RecordingTextBox);
             this.WebsiteLinksGroupBox.Controls.Add(this.AboutLinkTextTextBox);
             this.WebsiteLinksGroupBox.Controls.Add(this.AboutLinkURLTextBox);
-            this.WebsiteLinksGroupBox.Controls.Add(this.RecordingHelpLabel);
-            this.WebsiteLinksGroupBox.Controls.Add(this.RecordingLabel);
             this.WebsiteLinksGroupBox.Controls.Add(this.AboutLinkTextLabel);
             this.WebsiteLinksGroupBox.Controls.Add(this.AboutLinkURLLabel);
             this.WebsiteLinksGroupBox.ForeColor = System.Drawing.Color.Brown;
             this.WebsiteLinksGroupBox.Location = new System.Drawing.Point(19, 278);
             this.WebsiteLinksGroupBox.Name = "WebsiteLinksGroupBox";
-            this.WebsiteLinksGroupBox.Size = new System.Drawing.Size(621, 103);
+            this.WebsiteLinksGroupBox.Size = new System.Drawing.Size(621, 67);
             this.WebsiteLinksGroupBox.TabIndex = 5;
             this.WebsiteLinksGroupBox.TabStop = false;
             this.WebsiteLinksGroupBox.Text = "website links";
-            // 
-            // RecordingTextBox
-            // 
-            this.RecordingTextBox.Location = new System.Drawing.Point(67, 66);
-            this.RecordingTextBox.Name = "RecordingTextBox";
-            this.RecordingTextBox.Size = new System.Drawing.Size(270, 20);
-            this.RecordingTextBox.TabIndex = 2;
-            this.RecordingTextBox.TextChanged += new System.EventHandler(this.RecordingTextBox_TextChanged);
             // 
             // AboutLinkTextTextBox
             // 
@@ -208,28 +195,6 @@
             this.AboutLinkURLTextBox.Size = new System.Drawing.Size(494, 20);
             this.AboutLinkURLTextBox.TabIndex = 1;
             this.AboutLinkURLTextBox.TextChanged += new System.EventHandler(this.AboutLinkURLTextBox_TextChanged);
-            // 
-            // RecordingHelpLabel
-            // 
-            this.RecordingHelpLabel.AutoSize = true;
-            this.RecordingHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.RecordingHelpLabel.Location = new System.Drawing.Point(343, 62);
-            this.RecordingHelpLabel.Name = "RecordingHelpLabel";
-            this.RecordingHelpLabel.Size = new System.Drawing.Size(215, 28);
-            this.RecordingHelpLabel.TabIndex = 133;
-            this.RecordingHelpLabel.Text = "The recording must be located in the\r\nonline user audio folder (see preferences)." +
-    "";
-            // 
-            // RecordingLabel
-            // 
-            this.RecordingLabel.AutoSize = true;
-            this.RecordingLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.RecordingLabel.Location = new System.Drawing.Point(11, 69);
-            this.RecordingLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.RecordingLabel.Name = "RecordingLabel";
-            this.RecordingLabel.Size = new System.Drawing.Size(53, 14);
-            this.RecordingLabel.TabIndex = 97;
-            this.RecordingLabel.Text = "recording";
             // 
             // AboutLinkTextLabel
             // 
@@ -454,8 +419,9 @@
             // 
             // ShowMainScoreFormButton
             // 
+            this.ShowMainScoreFormButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShowMainScoreFormButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.ShowMainScoreFormButton.Location = new System.Drawing.Point(19, 393);
+            this.ShowMainScoreFormButton.Location = new System.Drawing.Point(19, 355);
             this.ShowMainScoreFormButton.Name = "ShowMainScoreFormButton";
             this.ShowMainScoreFormButton.Size = new System.Drawing.Size(137, 26);
             this.ShowMainScoreFormButton.TabIndex = 8;
@@ -478,7 +444,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
-            this.ClientSize = new System.Drawing.Size(658, 434);
+            this.ClientSize = new System.Drawing.Size(658, 396);
             this.ControlBox = false;
             this.Controls.Add(this.UnitsHelpLabel);
             this.Controls.Add(this.ShowMainScoreFormButton);
@@ -520,11 +486,8 @@
         private System.Windows.Forms.CheckBox LandscapeCheckBox;
         private System.Windows.Forms.ComboBox PaperSizeComboBox;
         private System.Windows.Forms.GroupBox WebsiteLinksGroupBox;
-        private System.Windows.Forms.TextBox RecordingTextBox;
         private System.Windows.Forms.TextBox AboutLinkTextTextBox;
         private System.Windows.Forms.TextBox AboutLinkURLTextBox;
-        private System.Windows.Forms.Label RecordingHelpLabel;
-        private System.Windows.Forms.Label RecordingLabel;
         private System.Windows.Forms.Label AboutLinkTextLabel;
         private System.Windows.Forms.Label AboutLinkURLLabel;
         private System.Windows.Forms.GroupBox MarginsGroupBox;

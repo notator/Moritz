@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Xml;
 
+using System;
+
 using Moritz.Globals;
 using Moritz.Score.Midi;
 
@@ -18,7 +20,7 @@ namespace Moritz.Score
         public SvgPage(SvgScore containerScore, int pageNumber, string pagePath)
         {
             _score = containerScore;
-            _pageMetrics = null;
+            _pageFormat = null;
             _pageNumber = pageNumber;
             _infoTextInfo = null;
 
@@ -117,7 +119,7 @@ namespace Moritz.Score
         public SvgPage(SvgScore containerScore, PageFormat pageFormat, int pageNumber, TextInfo infoTextInfo, List<SvgSystem> pageSystems, bool lastPage)
         {
             _score = containerScore;
-            _pageMetrics = pageFormat;
+            _pageFormat = pageFormat;
             _pageNumber = pageNumber;
             _infoTextInfo = infoTextInfo;
 
@@ -183,7 +185,7 @@ namespace Moritz.Score
                     // The following works, because the top staffline of each system is currently at 0.
                     // Found by experiment that adding (_pageMetrics.Gap / 3F) gives good results in both studies.
                     // old version: deltaY -= (deltaY % _pageMetrics.Gap);
-                    deltaY = deltaY - (deltaY % _pageMetrics.Gap) + (_pageMetrics.Gap / 3F);
+                    deltaY = deltaY - (deltaY % _pageFormat.Gap) + (_pageFormat.Gap / 3F);
                     system.Metrics.Move(0F, deltaY);
                     top = system.Metrics.NotesBottom + systemSeparation;
                 }
@@ -201,22 +203,24 @@ namespace Moritz.Score
 
             _score.WriteSymbolDefinitions(w);
             _score.WriteMidiChordDefinitions(w);
-            _score.WriteJavaScriptDefinitions(w);
 
             #region pageObjects
-            w.SvgRect("frame", 0, 0, _pageMetrics.Right, _pageMetrics.Bottom, "black", 1, "white", null);
+            w.SvgRect("frame", 0, 0, _pageFormat.Right, _pageFormat.Bottom, "#CCCCCC", 1, "white", null);
+
+            WriteStyle(w);
+
             w.SvgText(_infoTextInfo, 80, 80);
 
             if(_pageNumber == 1)
             {
-                WriteMainTitleAndAuthor(w, metadata);
+                WritePage1LinkTitleAndAuthor(w, metadata);
             }
             #endregion
 
             int systemNumber = 1;
             foreach(SvgSystem system in Systems)
             {
-                system.WriteSVG(w, pageNumber, systemNumber++, _pageMetrics);
+                system.WriteSVG(w, pageNumber, systemNumber++, _pageFormat);
             }
             w.WriteEndElement(); // closes the svg element
             w.WriteEndDocument();
@@ -231,35 +235,92 @@ namespace Moritz.Score
             w.WriteStartElement("svg", "http://www.w3.org/2000/svg");
             w.WriteAttributeString("version", "1.1");
             w.WriteAttributeString("baseProfile", "full");
-            w.WriteAttributeString("width", _pageMetrics.ScreenRight.ToString()); // the intended screen display size (100%)
-            w.WriteAttributeString("height", _pageMetrics.ScreenBottom.ToString()); // the intended screen display size (100%)
-            string viewBox = "0 0 " + _pageMetrics.Right.ToString() + " " + _pageMetrics.Bottom.ToString();
+            w.WriteAttributeString("width", _pageFormat.ScreenRight.ToString()); // the intended screen display size (100%)
+            w.WriteAttributeString("height", _pageFormat.ScreenBottom.ToString()); // the intended screen display size (100%)
+            string viewBox = "0 0 " + _pageFormat.Right.ToString() + " " + _pageFormat.Bottom.ToString();
             w.WriteAttributeString("viewBox", viewBox); // the size of SVG's internal drawing surface (400%)
             w.WriteAttributeString("xmlns", "xlink", null, "http://www.w3.org/1999/xlink");
             w.WriteAttributeString("xmlns", "score", null, "http://www.james-ingram-act-two.de/open-source/svgScoreExtensions.html");
         }
 
+        // This style stops the cursor changing to an I-beam every time it
+        // passes over text (such as noteheads, clefs, dynamics etc.)
+        private void WriteStyle(SvgWriter w)
+        {
+            w.WriteStartElement("style");
+            w.WriteString("text:hover{cursor:default;}");
+            w.WriteEndElement();
+        }
+
         /// <summary>
         /// Adds the main title and the author to the first page.
         /// </summary>
-        protected void WriteMainTitleAndAuthor(SvgWriter w, Metadata metadata)
+        protected void WritePage1LinkTitleAndAuthor(SvgWriter w, Metadata metadata)
         {
+            string fontFamily = "Estrangelo Edessa";
+
             TextInfo titleInfo =
-                new TextInfo(metadata.MainTitle, "Estrangelo Edessa", _pageMetrics.Page1TitleHeight,
+                new TextInfo(metadata.MainTitle, fontFamily, _pageFormat.Page1TitleHeight,
                     null, TextHorizAlign.center);
             TextInfo authorInfo =
-              new TextInfo(metadata.Author, "Estrangelo Edessa", _pageMetrics.Page1AuthorHeight,
+              new TextInfo(metadata.Author, fontFamily, _pageFormat.Page1AuthorHeight,
                   null, TextHorizAlign.right);
             w.WriteStartElement("g");
-            w.WriteAttributeString("id", "page1TitleAndAuthor" + SvgScore.UniqueID_Number);
-            w.SvgText(titleInfo, _pageMetrics.Right / 2F, _pageMetrics.Page1TitleY);
-            w.SvgText(authorInfo, _pageMetrics.RightMarginPos, _pageMetrics.Page1TitleY);
+            w.WriteAttributeString("id", "page1LinkTitleAndAuthor" + SvgScore.UniqueID_Number);
+
+            WriteAboutLink(w, _pageFormat.AboutLinkURL, _pageFormat.AboutLinkText, fontFamily, _pageFormat.LeftMarginPos, _pageFormat.Page1TitleY);
+
+            w.SvgText(titleInfo, _pageFormat.Right / 2F, _pageFormat.Page1TitleY);
+            w.SvgText(authorInfo, _pageFormat.RightMarginPos, _pageFormat.Page1TitleY);
             w.WriteEndElement(); // group
+        }
+
+        /// <summary>
+        /// Creates a link to the "About" file for this score (on my website).
+        /// MP3 recordings should be included in the "About" documents for each composition.
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="aboutURL"></param> 
+        /// <param name="aboutLinkText"></param>
+        /// <param name="fontFamily"></param>
+        /// <param name="left"></param>
+        /// <param name="titleBaseline"></param>
+        private void WriteAboutLink(
+            XmlWriter w,
+            string aboutURL,
+            string aboutLinkText,
+            string fontFamily,
+            float left,
+            float titleBaseline)
+        {
+            Debug.Assert(!String.IsNullOrEmpty(aboutURL) && !String.IsNullOrEmpty(aboutLinkText));
+
+            w.WriteStartElement("a");
+            w.WriteAttributeString("class", "linkClass");
+            w.WriteAttributeString("xlink", "href", null, aboutURL);
+            w.WriteAttributeString("xlink", "show", null, "new"); // open link in new window
+
+            w.WriteStartElement("text");
+            w.WriteAttributeString("x", left.ToString(M.En_USNumberFormat));
+            w.WriteAttributeString("y", titleBaseline.ToString(M.En_USNumberFormat));
+            w.WriteAttributeString("fill", "#1010C6");
+            w.WriteAttributeString("text-anchor", "left");
+            w.WriteAttributeString("font-size", _pageFormat.Page1AuthorHeight.ToString(M.En_USNumberFormat));
+            w.WriteAttributeString("font-family", fontFamily);
+
+            w.WriteStartElement("style");
+            w.WriteString(".linkClass:hover{text-decoration:underline;}");
+            w.WriteEndElement();
+
+            w.WriteString(aboutLinkText);
+
+            w.WriteEndElement(); // text
+            w.WriteEndElement(); // a         
         }
 
         #region used when creating graphic score
         private readonly SvgScore _score;
-        private PageFormat _pageMetrics;
+        private PageFormat _pageFormat;
         private readonly int _pageNumber;
         private TextInfo _infoTextInfo;
         #endregion

@@ -650,7 +650,7 @@ namespace Moritz.AssistantComposer
 
             SetFrame(pageFormat);
 
-            SetWebsiteLinks(pageFormat);
+            SetWebsiteLink(pageFormat);
 
             SetNotation(pageFormat);
 
@@ -692,12 +692,11 @@ namespace Moritz.AssistantComposer
             pageFormat.LeftMarginPos = damf.LeftMarginWidth * pageFormat.ViewBoxMagnification;
             pageFormat.BottomMarginPos = pageFormat.BottomVBPX - (damf.BottomMarginWidth * pageFormat.ViewBoxMagnification);
         }
-        private void SetWebsiteLinks(PageFormat pageFormat)
+        private void SetWebsiteLink(PageFormat pageFormat)
         {
             DimensionsAndMetadataForm damf = _dimensionsAndMetadataForm;
             pageFormat.AboutLinkText = damf.AboutLinkText;
             pageFormat.AboutLinkURL = damf.AboutLinkURL;
-            pageFormat.Recording = damf.Recording;
         }
 
         private void SetNotation(PageFormat pageFormat)
