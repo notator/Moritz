@@ -78,7 +78,7 @@ namespace Moritz.Score.Midi
                             r.MoveToAttribute(0);
                             Debug.Assert(r.Name == "xlink:href");
                             string midiChordDefID = r.Value.Remove(0, 1);
-                            SetFromMidiChordDefs(scoreMidiDurationDefs, midiChordDefID, msDuration);
+                            SetFromMidiChordDefs(scoreMidiDurationDefs, midiChordDefID);
                             //midiChordDef = new MidiChordDef(this._score.MidiChordDefs[midiChordDefID], msDuration);
                             break;
                         case "score:basicChords":
@@ -111,85 +111,24 @@ namespace Moritz.Score.Midi
             }
         }
 
-        private void SetFromMidiChordDefs(Dictionary<string, MidiDurationDef> scoreMidiDurationDefs, string midiChordDefID, int msDuration)
+        private void SetFromMidiChordDefs(Dictionary<string, MidiDurationDef> scoreMidiDurationDefs, string midiChordDefID)
         {
-            MidiChordDef clone = new MidiChordDef(scoreMidiDurationDefs[midiChordDefID], msDuration);
+            MidiDurationDef originalMdd = scoreMidiDurationDefs[midiChordDefID];
+            MidiChordDef original = originalMdd as MidiChordDef;
+            Debug.Assert(original != null);
 
-            this.MsDuration = msDuration;
-            this._bank = clone.Bank;
-            this._patch = clone.Patch;
-            this._volume = clone.Volume;
-            this._ornamentNumberSymbol = clone.OrnamentNumberSymbol;
-            this._pitchWheelDeviation = clone.PitchWheelDeviation;
-            this._midiHeadSymbols = clone.MidiHeadSymbols;
-            this._midiVelocitySymbol = clone.MidiVelocitySymbol;
-            this._minimumBasicMidiChordMsDuration = clone.MinimumBasicMidiChordMsDuration;
+            this._bank = original.Bank;
+            this._patch = original.Patch;
+            this._volume = original.Volume;
+            this._ornamentNumberSymbol = original.OrnamentNumberSymbol;
+            this._pitchWheelDeviation = original.PitchWheelDeviation;
+            this._midiHeadSymbols = original.MidiHeadSymbols;
+            this._midiVelocitySymbol = original.MidiVelocitySymbol;
+            this._minimumBasicMidiChordMsDuration = original.MinimumBasicMidiChordMsDuration;
 
-            BasicMidiChordDefs = clone.BasicMidiChordDefs;
-            MidiChordSliderDefs = clone.MidiChordSliderDefs;
+            BasicMidiChordDefs = original.BasicMidiChordDefs;
+            MidiChordSliderDefs = original.MidiChordSliderDefs;
         }
-
-        /// <summary>
-        /// Creates a clone of the first argument, then fits the BasicMidiChordDefs into the given msDuration.
-        /// Used when the first argument comes from a #use definition (in the midiDefs section of an SVG-MIDI file).
-        /// Also used in MidiScore.GetMidiChannelMoments(SvgScore svgScore).
-        /// </summary>
-        /// <param name="midiChordDef"></param>
-        public MidiChordDef(MidiDurationDef midiDurationDef, int msDuration)
-        {
-            MidiChordDef midiChordDef = midiDurationDef as MidiChordDef;
-            Debug.Assert(midiChordDef != null);
-
-            #region Clone the first argument
-            BasicMidiChordDefs = new List<BasicMidiChordDef>(midiChordDef.BasicMidiChordDefs);
-            this._hasChordOff = midiChordDef.HasChordOff;
-            this.ID = "localChord" + UniqueChordID.ToString();
-
-            if(midiChordDef.MidiChordSliderDefs != null)
-            {
-                List<byte> pitchWheelMsbs = null;
-                if(midiChordDef.MidiChordSliderDefs.PitchWheelMsbs != null)
-                    pitchWheelMsbs = new List<byte>(midiChordDef.MidiChordSliderDefs.PitchWheelMsbs);
-                List<byte> panMsbs = null;
-                if(midiChordDef.MidiChordSliderDefs.PanMsbs != null)
-                    panMsbs = new List<byte>(midiChordDef.MidiChordSliderDefs.PanMsbs);
-                List<byte> modulationWheelMsbs = null;
-                if(midiChordDef.MidiChordSliderDefs.ModulationWheelMsbs != null)
-                    modulationWheelMsbs = new List<byte>(midiChordDef.MidiChordSliderDefs.ModulationWheelMsbs);
-                List<byte> expressionMsbs = null;
-                if(midiChordDef.MidiChordSliderDefs.ExpressionMsbs != null)
-                    expressionMsbs = new List<byte>(midiChordDef.MidiChordSliderDefs.ExpressionMsbs);
-                this.MidiChordSliderDefs = new MidiChordSliderDefs(pitchWheelMsbs, panMsbs, modulationWheelMsbs, expressionMsbs);
-            }
-
-            this._midiHeadSymbols = null;
-            if(midiChordDef.MidiHeadSymbols != null)
-                _midiHeadSymbols = new List<byte>(midiChordDef.MidiHeadSymbols);
-            this._midiVelocitySymbol = midiChordDef.MidiVelocitySymbol;
-            this._minimumBasicMidiChordMsDuration = midiChordDef.MinimumBasicMidiChordMsDuration;
-            this.MsDuration = msDuration;
-            this._ornamentNumberSymbol = midiChordDef.OrnamentNumberSymbol;
-            this._pitchWheelDeviation = midiChordDef.PitchWheelDeviation;
-            this._bank = midiChordDef.Bank;
-            this._patch = midiChordDef.Patch;
-            this._volume = midiChordDef.Volume;
-            #endregion
-
-            FitToDuration(msDuration);
-        }
-
-        ///// <summary>
-        ///// Reads a MidiChordDef from a file, then fits the BasicMidiChordDefs into the given msDuration.
-        ///// (MidiChordDefs saved inline in an SVG-MIDI score should already be fit into the msDuration...)
-        ///// </summary>
-        ///// <param name="r"></param>
-        ///// <param name="msDuration"></param>
-        //public MidiChordDef(XmlReader r, int msDuration)
-        //    : this(r)
-        //{
-        //    MsDuration = msDuration;
-        //    FitToDuration(msDuration);
-        //}
 
         private void FitToDuration(int msDuration)
         {
@@ -201,10 +140,6 @@ namespace Moritz.Score.Midi
             {
                 // Note that FitToDuration() may shorten the BasicMidiChordDefs list.
                 BasicMidiChordDefs = FitToDuration(BasicMidiChordDefs, MsDuration, MinimumBasicMidiChordMsDuration);
-            }
-            else if(BasicMidiChordDefs.Count == 1)
-            {
-                BasicMidiChordDefs[0].MsDuration = MsDuration;
             }
         }
 
@@ -221,28 +156,21 @@ namespace Moritz.Score.Midi
         /// <returns></returns>
         private List<int> GetDurations(int msDuration, List<int> relativeDurations, int ornamentMinMsDuration)
         {
-            int numberOfOrnamentChords = 0;
-            float factor;
+            int numberOfOrnamentChords = GetNumberOfOrnamentChords(msDuration, relativeDurations, ornamentMinMsDuration);
 
-            GetNumberOfOrnamentChordsAndFactor(msDuration, relativeDurations, ornamentMinMsDuration,
-                out numberOfOrnamentChords, out factor);
-
-            List<int> intDurations = GetIntDurations(msDuration, relativeDurations, numberOfOrnamentChords, factor);
+            List<int> intDurations = GetIntDurations(msDuration, relativeDurations, numberOfOrnamentChords);
             return intDurations;
         }
 
         /// <summary>
-        /// This function returns
-        /// 1. the maximum number of ornament chords that can be fit into the given msDuration using the given
-        ///     relativeDurations and minimumOrnamentChordMsDuration.
-        /// 2. The factor by which to multiply the (first numberOfOrnamentChords) relativeDurations to arrive at msDuration.
+        /// This function returns the maximum number of ornament chords that can be fit into the given msDuration
+        /// using the given relativeDurations and minimumOrnamentChordMsDuration.
         /// </summary>
-        private void GetNumberOfOrnamentChordsAndFactor(int msDuration, List<int> relativeDurations, int minimumOrnamentChordMsDuration,
-            out int numberOfOrnamentChords, out float factor)
+        private int GetNumberOfOrnamentChords(int msDuration, List<int> relativeDurations, int minimumOrnamentChordMsDuration)
         {
             bool okay = true;
-            numberOfOrnamentChords = 1;
-            factor = 1.0F;
+            int numberOfOrnamentChords = 1;
+            float factor = 1.0F;
             // try each ornament length in turn until okay is true
             for(int numChords = relativeDurations.Count; numChords > 0; --numChords)
             {
@@ -264,6 +192,7 @@ namespace Moritz.Score.Midi
                 }
             }
             Debug.Assert(okay);
+            return numberOfOrnamentChords;
         }
 
         private List<int> GetBasicMidiChordDurations(List<BasicMidiChordDef> ornamentChords)
@@ -281,36 +210,43 @@ namespace Moritz.Score.Midi
         /// It also ensures that the sum of the ints in the List is exactly equal to msDuration.
         /// This function is also used when setting the duration of a MidiMelodyDef.
         /// </summary>
-        public List<int> GetIntDurations(int msDuration, List<int> relativeDurations, int numberOfOrnamentChords, float factor)
+        public static List<int> GetIntDurations(int msDuration, List<int> relativeDurations, int numberOfOrnamentChords)
         {
-            List<float> floatDurations = new List<float>();
+            int sumRelative = 0;
             for(int i = 0; i < numberOfOrnamentChords; ++i)
-                floatDurations.Add(relativeDurations[i] * factor);
-            // basicDurations are the float durations taking into account minimumOrnamentChordMsDuration
-
-            float fSum = 0F;
-            int iSum = 0;
-            List<int> actualIntDurations = new List<int>();
-            foreach(float fd in floatDurations)
             {
-                fSum += fd;
-                int integer = (int)(fSum - iSum);
-                iSum += integer;
-                actualIntDurations.Add(integer);
+                sumRelative += relativeDurations[i];
+            }
+            // basicDurations are the float durations taking into account minimumOrnamentChordMsDuration
+            float factor = ((float)msDuration / (float)sumRelative);
+            float fPos = 0;
+            List<int> intPositions = new List<int>();
+            for(int i = 0; i < numberOfOrnamentChords; ++i)
+            {
+                intPositions.Add((int)(Math.Floor(fPos)));
+                fPos += (relativeDurations[i] * factor);
+            }
+            intPositions.Add((int)Math.Floor(fPos));
+
+            List<int> intDurations = new List<int>();
+            for(int i = 0; i < numberOfOrnamentChords; ++i)
+            {
+                int intDuration = (int)(intPositions[i + 1] - intPositions[i]);
+                intDurations.Add(intDuration);
             }
 
             int intSum = 0;
-            foreach(int i in actualIntDurations)
+            foreach(int i in intDurations)
                 intSum += i;
             Debug.Assert(intSum <= msDuration);
             if(intSum < msDuration)
             {
-                int lastDuration = actualIntDurations[actualIntDurations.Count - 1];
+                int lastDuration = intDurations[intDurations.Count - 1];
                 lastDuration += (msDuration - intSum);
-                actualIntDurations.RemoveAt(actualIntDurations.Count - 1);
-                actualIntDurations.Add(lastDuration);
+                intDurations.RemoveAt(intDurations.Count - 1);
+                intDurations.Add(lastDuration);
             }
-            return actualIntDurations;
+            return intDurations;
         }
 
         public void SetDuration(int msDuration)
@@ -356,28 +292,30 @@ namespace Moritz.Score.Midi
         public static int UniqueChordID { get { return ++_uniqueChordID; } }
 
         /// <summary>
-        /// Fits the durations of the basicMidiChordDefs to the msOuterDuration, shortening the list if necessary.
+        /// Returns a new list of basicMidiChordDefs having the msOuterDuration, shortening the list if necessary.
         /// </summary>
         /// <param name="basicMidiChordDefs"></param>
         /// <param name="msOuterDuration"></param>
         /// <param name="minimumMsDuration"></param>
         /// <returns></returns>
-        protected List<BasicMidiChordDef> FitToDuration(List<BasicMidiChordDef> basicMidiChordDefs, int msOuterDuration, int minimumMsDuration)
+        protected List<BasicMidiChordDef> FitToDuration(List<BasicMidiChordDef> bmcd, int msOuterDuration, int minimumMsDuration)
         {
-            List<int> relativeDurations = GetBasicMidiChordDurations(basicMidiChordDefs);
+            List<int> relativeDurations = GetBasicMidiChordDurations(bmcd);
             List<int> msDurations = GetDurations(msOuterDuration, relativeDurations, minimumMsDuration);
-            // msDurations count can be less than basicMidiChordDefs.Count
-            while(basicMidiChordDefs.Count > msDurations.Count)
-                basicMidiChordDefs.RemoveAt(basicMidiChordDefs.Count - 1);
+            // msDurations count can be less than bmcd.Count
 
-            Debug.Assert(basicMidiChordDefs.Count == msDurations.Count);
-
-            for(int i = 0; i < msDurations.Count; ++i)
+            List<BasicMidiChordDef> rList = new List<BasicMidiChordDef>();
+            int i = 0;
+            BasicMidiChordDef b;
+            while(rList.Count < msDurations.Count)
             {
-                basicMidiChordDefs[i].MsDuration = msDurations[i];
+                b = bmcd[i];
+                rList.Add(new BasicMidiChordDef(msDurations[i], b.BankIndex, b.PatchIndex, b.HasChordOff, b.Notes, b.Velocities));
             }
 
-            return basicMidiChordDefs;
+            Debug.Assert(rList.Count == msDurations.Count);
+
+            return rList;
         }
 
         public string ID;
@@ -402,7 +340,19 @@ namespace Moritz.Score.Midi
         public byte? PitchWheelDeviation { get { return _pitchWheelDeviation; } }
         public bool HasChordOff { get { return _hasChordOff; } }
         public int MinimumBasicMidiChordMsDuration { get { return _minimumBasicMidiChordMsDuration; } }
+        public List<int> BasicChordDurations
+        {
+            get
+            {
+                List<int> rList = new List<int>();
+                foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+                {
+                    rList.Add(bmcd.MsDuration);
+                }
+                return rList;
+            }
+        }
         public MidiChordSliderDefs MidiChordSliderDefs = null;
         public List<BasicMidiChordDef> BasicMidiChordDefs = new List<BasicMidiChordDef>();
-   }
+    }
 }

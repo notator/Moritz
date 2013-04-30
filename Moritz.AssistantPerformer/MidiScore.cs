@@ -62,11 +62,10 @@ namespace Moritz.AssistantPerformer
                                 msPosition = (int)(((float)lmdd.MsPosition) / _performanceOptions.SpeedFactor);
                                 msDuration = (int)(((float)lmdd.MsDuration) / _performanceOptions.SpeedFactor);
                             }
-                            // Make a local copy of the midiChordDef here, so that repeat performances are at the proper speed.
-                            MidiChordDef localMidiChordDef = new MidiChordDef(midiChordDef, msDuration);
+
                             // The following constructor only creates Midi controls if the channel state has to be changed.
                             // (It updates the channel state accordingly.)
-                            MidiChord midiChord = new MidiChord(channel, localMidiChordDef, msPosition, channelState,
+                            MidiChord midiChord = new MidiChord(channel, midiChordDef, msPosition, msDuration, channelState,
                                 _performanceOptions.MinimumOrnamentChordMsDuration);
 
                             if(!channelMoments.ContainsKey(channel))

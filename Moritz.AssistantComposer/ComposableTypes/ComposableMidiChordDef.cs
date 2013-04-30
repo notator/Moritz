@@ -348,7 +348,7 @@ namespace Moritz.AssistantComposer
             if(krystalPalette.OrnamentSettings == null || ornamentNumber == 0)
             {
                 BasicMidiChordDefs.Add(rootChord);
-                BasicMidiChordDefs[0].MsDuration = bcs.Durations[valueIndex];
+                BasicMidiChordDefs[0] = new BasicMidiChordDef(BasicMidiChordDefs[0], bcs.Durations[valueIndex]); 
             }
             else
             {

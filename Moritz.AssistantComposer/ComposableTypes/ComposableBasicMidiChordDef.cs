@@ -36,7 +36,7 @@ namespace Moritz.AssistantComposer
             Debug.Assert(bcs.MidiPitches != null && bcs.MidiPitches.Count > 0);
             Debug.Assert(bcs.ChordDensities != null && bcs.ChordDensities.Count > 0);
 
-            MsDuration = bcs.Durations[index]; // recalculated later, if this is an ornament chord
+            _msDuration = bcs.Durations[index]; // recalculated later, if this is an ornament chord
 
             byte density = bcs.ChordDensities[index];
             Notes = GetMidiNotes(bcs, index, density);

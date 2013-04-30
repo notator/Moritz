@@ -14,13 +14,24 @@ namespace Moritz.Score.Midi
 
         public BasicMidiChordDef(int msDuration, byte? bank, byte? patch, bool hasChordOff, List<byte> pitches, List<byte> velocities)
         {
-            MsDuration = msDuration;
+            _msDuration = msDuration; // read-only!
             BankIndex = bank;
             PatchIndex = patch;
             HasChordOff = hasChordOff;
             Notes = pitches;
             Velocities = velocities;
         }
+
+        public BasicMidiChordDef(BasicMidiChordDef original, int msDuration)
+        {
+            _msDuration = msDuration; // read-only!
+            BankIndex = original.BankIndex;
+            PatchIndex = original.PatchIndex;
+            HasChordOff = original.HasChordOff;
+            Notes = original.Notes;
+            Velocities = original.Velocities;
+        }
+
         public BasicMidiChordDef(XmlReader r)
         {
             // The reader is at the beginning of a "score:basicChord" element
@@ -32,11 +43,8 @@ namespace Moritz.Score.Midi
                 r.MoveToAttribute(i);
                 switch(r.Name)
                 {
-                    //case "msPosition": // msPositions are not written to the <midiDefs> section of an SVG-MIDI file.
-                    //    MsPosition = int.Parse(r.Value);
-                    //    break;
                     case "msDuration":
-                        MsDuration = int.Parse(r.Value);
+                        _msDuration = int.Parse(r.Value); // read-only!
                         break;
                     case "bank":
                         BankIndex = byte.Parse(r.Value);
@@ -68,7 +76,7 @@ namespace Moritz.Score.Midi
 
             //if(writeMsPosition) // positions are not written to the midiDefs section of an SVG-MIDI file
             //    w.WriteAttributeString("msPosition", MsPosition.ToString());
-            w.WriteAttributeString("msDuration", MsDuration.ToString());
+            w.WriteAttributeString("msDuration", _msDuration.ToString());
             if(BankIndex != null && BankIndex != M.DefaultBankIndex)
                 w.WriteAttributeString("bank", BankIndex.ToString());
             if(PatchIndex != null)
@@ -83,8 +91,9 @@ namespace Moritz.Score.Midi
             w.WriteEndElement();
         }
 
-        //public int MsPosition = 0;
-        public int MsDuration = 0;
+        // MsDuration is read-only!
+        public int MsDuration { get { return _msDuration; } }
+        protected int _msDuration = 0;
 
         public List<byte> Notes = new List<byte>(); // A string of midiPitch numbers separated by spaces.
         public List<byte> Velocities = new List<byte>(); // A string of midi velocity values separated by spaces.

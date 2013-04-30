@@ -67,25 +67,6 @@ namespace Moritz.AssistantComposer
             MsPosition = _localizedMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rests
         }
 
-        /// <summary>
-        /// Clone constructor.
-        /// Note that new LocalizedMidiDurationDef objects are created, and that these contain cloned MidiChordDefs.
-        /// Changing the content of a MidiChordDef will only change it in the particular MidiMelodyDef instance.
-        /// However, LocalizedMidiDurationDef.MsPosition is independent of its MidiChordDef.
-        /// LocalizedMidiDurationDef.MsDuration cannot be changed.
-        /// </summary>
-        /// <param name="mdsd"></param>
-        public MidiMelodyDef(MidiMelodyDef mdsd)
-        {
-            foreach(LocalizedMidiDurationDef lmdd in mdsd)
-            {
-                MidiChordDef mcd = new MidiChordDef(lmdd.MidiChordDef, lmdd.MsDuration);
-                LocalizedMidiDurationDef newLmdd = new LocalizedMidiDurationDef(mcd);
-                _localizedMidiDurationDefs.Add(newLmdd);
-            }
-            MsPosition = _localizedMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rest definitions
-        }
-
         public void Add(LocalizedMidiDurationDef lmdd)
         {
             Debug.Assert(_localizedMidiDurationDefs.Count > 0);
@@ -123,26 +104,16 @@ namespace Moritz.AssistantComposer
                     relativeDurations.Add(lmdd.MsDuration);
                 }
 
-                int msDuration = value;
-                float factor = ((float)msDuration / (float)MsDuration);
-                MidiChordDef firstMCD = null;
-                foreach(LocalizedMidiDurationDef lmdd in _localizedMidiDurationDefs) 
-                {
-                    firstMCD = lmdd.MidiChordDef;
-                    if(firstMCD != null)
-                        break;
-                }
-                Debug.Assert(firstMCD != null);
-                List<int> newDurations = firstMCD.GetIntDurations(msDuration, relativeDurations, relativeDurations.Count, factor);
+                int newMsDuration = value;
+                float factor = ((float)newMsDuration / (float)MsDuration);
+                List<int> newDurations = MidiChordDef.GetIntDurations(newMsDuration, relativeDurations, relativeDurations.Count);
 
-                List<LocalizedMidiDurationDef> newLmdds = new List<LocalizedMidiDurationDef>();
-                for(int i = 0; i < relativeDurations.Count; ++i )
+                int i = 0;
+                foreach (LocalizedMidiDurationDef lmdd in _localizedMidiDurationDefs)
                 {
-                    LocalizedMidiDurationDef lmdd = _localizedMidiDurationDefs[i];
-                    MidiChordDef mcd = new MidiChordDef(lmdd.MidiChordDef, newDurations[i]);
-                    newLmdds.Add(new LocalizedMidiDurationDef(mcd));
+                    lmdd.MsDuration = newDurations[i++];
                 }
-                _localizedMidiDurationDefs = newLmdds;
+
                 MsPosition = _localizedMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rest definitions
             }
         }

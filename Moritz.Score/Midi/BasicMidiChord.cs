@@ -8,11 +8,11 @@ namespace Moritz.Score.Midi
 {
     public class BasicMidiChord
     {
-        public BasicMidiChord(int channel, MidiChord midiChord, BasicMidiChordDef bmcd)
+        public BasicMidiChord(int channel, MidiChord midiChord, BasicMidiChordDef bmcd, int realMsDuration)
         {
             MidiChord = midiChord;
             //MsPosition = bmcd.MsPosition;
-            MsDuration = bmcd.MsDuration;
+            MsDuration = realMsDuration;
 
             if(bmcd.BankIndex != null)
             {

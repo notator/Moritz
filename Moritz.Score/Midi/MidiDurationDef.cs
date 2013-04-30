@@ -44,7 +44,11 @@ namespace Moritz.Score.Midi
         /// This field is set if the chord crosses a barline. Rests never cross barlines, they are always split.
         /// </summary>
         public int? MsDurationToNextBarline = null;
-        public readonly int MsDuration = 0;
+
+        // can be changed
+        public int MsDuration { get { return _msDuration; } set { _msDuration = value; } }
+        private int _msDuration = 0;
+
         public int MsPosition { get { return _msPosition; } set { _msPosition = value; } }
         private int _msPosition = 0;
     }

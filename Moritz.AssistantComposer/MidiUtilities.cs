@@ -733,7 +733,7 @@ namespace Moritz.AssistantComposer
                     Debug.Assert(pitches.Count == velocities.Count);
                     MidiChordDef midiChordDef = new ComposableMidiChordDef(pitches, velocities, msDuration, hasChordOff, midiControls);
                     midiControls.Clear();
-                    MidiChord midiChord = new MidiChord(channel, midiChordDef, onPos, channelState, M.DefaultMinimumBasicMidiChordMsDuration);
+                    MidiChord midiChord = new MidiChord(channel, midiChordDef, onPos, midiChordDef.MsDuration, channelState, M.DefaultMinimumBasicMidiChordMsDuration);
                     if(!returnDict.ContainsKey(onPos))
                         returnDict.Add(onPos, new List<MidiChord>());
                     returnDict[onPos].Add(midiChord);

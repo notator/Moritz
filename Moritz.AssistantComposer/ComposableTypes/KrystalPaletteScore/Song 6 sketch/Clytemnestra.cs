@@ -65,7 +65,7 @@ namespace Moritz.AssistantComposer
                     if(remainingChordsInPhrase > 1)
                     {
                         momentDef.MidiChordDefs[0].MsDuration = momentDef.MsWidth;
-                        momentDef.MidiChordDefs[0].BasicMidiChordDefs[0].MsDuration = momentDef.MsWidth;
+                        momentDef.MidiChordDefs[0].BasicMidiChordDefs[0] = new BasicMidiChordDef(momentDef.MidiChordDefs[0].BasicMidiChordDefs[0], momentDef.MsWidth); 
                         --remainingChordsInPhrase;
                     }
                     else
@@ -75,7 +75,7 @@ namespace Moritz.AssistantComposer
                         {
                             // this happens once at the end of the penultimate phrase in verse 1
                             momentDef.MidiChordDefs[0].MsDuration = momentDef.MsWidth / 3;
-                            momentDef.MidiChordDefs[0].BasicMidiChordDefs[0].MsDuration = momentDef.MsWidth / 3;
+                            momentDef.MidiChordDefs[0].BasicMidiChordDefs[0] = new BasicMidiChordDef(momentDef.MidiChordDefs[0].BasicMidiChordDefs[0], momentDef.MsWidth / 3); 
                         }
 
                         ++phraseIndex;

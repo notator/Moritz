@@ -12,18 +12,19 @@ namespace Moritz.Score.Midi
     /// </summary>
     public class MidiChord : MidiDurationSymbol
     {
-        public MidiChord(int channel, MidiChordDef midiChordDef, int msPosition, ChannelState channelState, int minimumOrnamentChordMsDuration)
-            : base(channel, msPosition, midiChordDef.MsDuration)
+        public MidiChord(int channel, MidiChordDef midiChordDef, int msPosition, int msDuration, ChannelState channelState, int minimumOrnamentChordMsDuration)
+            : base(channel, msPosition, msDuration)
         {
-            Debug.Assert(midiChordDef.BasicMidiChordDefs.Count > 0);
-            List<BasicMidiChordDef> realBasicMidiChordDefs =
-                GetRealBasicMidiChordDefs(midiChordDef.BasicMidiChordDefs, minimumOrnamentChordMsDuration);
+            List<BasicMidiChordDef> basicMidiChordDefs = midiChordDef.BasicMidiChordDefs;
+            Debug.Assert(basicMidiChordDefs.Count > 0);
+            List<int> realBasicMidiChordDurations = MidiChordDef.GetIntDurations(msDuration, midiChordDef.BasicChordDurations, basicMidiChordDefs.Count);
 
-            _firstChordNotes = new List<byte>(realBasicMidiChordDefs[0].Notes);
+            _firstChordNotes = new List<byte>(midiChordDef.BasicMidiChordDefs[0].Notes);
             var notesToStop = new SortedSet<byte>();
-            foreach(BasicMidiChordDef basicMidiChordDef in realBasicMidiChordDefs)
-            { 
-                this.BasicMidiChords.Add(new BasicMidiChord(channel, this, basicMidiChordDef));
+            int i = 0;
+            foreach(BasicMidiChordDef basicMidiChordDef in midiChordDef.BasicMidiChordDefs)
+            {
+                this.BasicMidiChords.Add(new BasicMidiChord(channel, this, basicMidiChordDef, realBasicMidiChordDurations[i++]));
                 if(basicMidiChordDef.HasChordOff)
                 {
                     foreach(byte note in basicMidiChordDef.Notes)
@@ -37,11 +38,11 @@ namespace Moritz.Score.Midi
             if(midiChordDef.HasChordOff && notesToStop.Count > 0)
                 SetChordOff(channel, notesToStop);
 
-            if(realBasicMidiChordDefs[0].BankIndex == null && midiChordDef.Bank != null && midiChordDef.Bank != channelState.Bank)
+            if(basicMidiChordDefs[0].BankIndex == null && midiChordDef.Bank != null && midiChordDef.Bank != channelState.Bank)
             {
                 Bank = new BankControl(channel, (byte)midiChordDef.Bank);
             }
-            if(realBasicMidiChordDefs[0].PatchIndex == null && midiChordDef.Patch != null && midiChordDef.Patch != channelState.Patch)
+            if(basicMidiChordDefs[0].PatchIndex == null && midiChordDef.Patch != null && midiChordDef.Patch != channelState.Patch)
             {
                 Patch = new PatchControl(channel, (byte)midiChordDef.Patch);
             }
@@ -54,7 +55,7 @@ namespace Moritz.Score.Midi
                 PitchWheelDeviation = new PitchWheelDeviation(channel, (byte)midiChordDef.PitchWheelDeviation);
             }
             if(midiChordDef.MidiChordSliderDefs != null)
-                CreateSliders(channel, midiChordDef.MidiChordSliderDefs, midiChordDef.MsDuration, channelState);
+                CreateSliders(channel, midiChordDef.MidiChordSliderDefs, msDuration, channelState);
         }
 
         /// <summary>
@@ -64,40 +65,40 @@ namespace Moritz.Score.Midi
         /// <param name="svgMidiChordDefs"></param>
         /// <param name="minimumOrnamentChordMsDuration"></param>
         /// <returns></returns>
-        private List<BasicMidiChordDef> GetRealBasicMidiChordDefs(List<BasicMidiChordDef> basicMidiChordDefs, int minimumOrnamentChordMsDuration)
-        {
-            //Debug.Assert(svgMidiChordDefs.Count > 1);
+        //private List<BasicMidiChordDef> GetRealBasicMidiChordDefs(List<BasicMidiChordDef> basicMidiChordDefs, int minimumOrnamentChordMsDuration)
+        //{
+        //    //Debug.Assert(svgMidiChordDefs.Count > 1);
 
-            List<float> basicDurations = new List<float>();
-            // basicDurations are the durations between *positions* in svgMidiChordDefs. 
-            #region get basic durations
-            int totalMsDuration = 0;
-            for(int i = 0; i < basicMidiChordDefs.Count; ++i)
-            {
-                basicDurations.Add((float)basicMidiChordDefs[i].MsDuration);
-                totalMsDuration += basicMidiChordDefs[i].MsDuration;
-            }
-            #endregion
+        //    List<float> basicDurations = new List<float>();
+        //    // basicDurations are the durations between *positions* in svgMidiChordDefs. 
+        //    #region get basic durations
+        //    int totalMsDuration = 0;
+        //    for(int i = 0; i < basicMidiChordDefs.Count; ++i)
+        //    {
+        //        basicDurations.Add((float)basicMidiChordDefs[i].MsDuration);
+        //        totalMsDuration += basicMidiChordDefs[i].MsDuration;
+        //    }
+        //    #endregion
 
-            float durationFactor = GetDurationFactor(basicDurations, minimumOrnamentChordMsDuration);
-            List<BasicMidiChordDef> realMidiChordDefs = null;
-            if(durationFactor > 1F)
-            {
-                realMidiChordDefs = new List<BasicMidiChordDef>();
-                List<int> durations = GetDurations(totalMsDuration, basicDurations, durationFactor);
-                // durations is the right length (may be shorter than basicMidiChordDefs)
-                for(int i = 0; i < durations.Count; ++i)
-                {
-                    BasicMidiChordDef b = basicMidiChordDefs[i];
-                    BasicMidiChordDef bmcd = new BasicMidiChordDef(durations[i], b.BankIndex, b.PatchIndex, b.HasChordOff, b.Notes, b.Velocities);
-                    realMidiChordDefs.Add(bmcd);
-                }
-            }
-            else
-                realMidiChordDefs = basicMidiChordDefs; 
+        //    float durationFactor = GetDurationFactor(basicDurations, minimumOrnamentChordMsDuration);
+        //    List<BasicMidiChordDef> realMidiChordDefs = null;
+        //    if(durationFactor > 1F)
+        //    {
+        //        realMidiChordDefs = new List<BasicMidiChordDef>();
+        //        List<int> durations = GetDurations(totalMsDuration, basicDurations, durationFactor);
+        //        // durations is the right length (may be shorter than basicMidiChordDefs)
+        //        for(int i = 0; i < durations.Count; ++i)
+        //        {
+        //            BasicMidiChordDef b = basicMidiChordDefs[i];
+        //            BasicMidiChordDef bmcd = new BasicMidiChordDef(durations[i], b.BankIndex, b.PatchIndex, b.HasChordOff, b.Notes, b.Velocities);
+        //            realMidiChordDefs.Add(bmcd);
+        //        }
+        //    }
+        //    else
+        //        realMidiChordDefs = basicMidiChordDefs; 
 
-            return realMidiChordDefs;
-        }
+        //    return realMidiChordDefs;
+        //}
         private float GetDurationFactor(List<float> basicDurations, int minimumOrnamentChordMsDuration)
         {
             float smallest = float.MaxValue;
@@ -177,7 +178,7 @@ namespace Moritz.Score.Midi
         private void CreateSliders(int channel, MidiChordSliderDefs sliderDefs, int msDuration, ChannelState channelState)
         {
             if(sliderDefs.ModulationWheelMsbs != null)
-                this.ModulationWheelSlider = new MidiModulationWheelSlider(sliderDefs.ModulationWheelMsbs, channel, msDuration);         
+                this.ModulationWheelSlider = new MidiModulationWheelSlider(sliderDefs.ModulationWheelMsbs, channel, msDuration);
             if(sliderDefs.PanMsbs != null)
                 this.PanSlider = new MidiPanSlider(sliderDefs.PanMsbs, channel, msDuration);
             if(sliderDefs.PitchWheelMsbs != null)
@@ -188,7 +189,7 @@ namespace Moritz.Score.Midi
 
         public byte Velocity
         {
-            get{return BasicMidiChords[0].Velocity;}
+            get { return BasicMidiChords[0].Velocity; }
             set
             {
                 Debug.Assert(value <= 127);
@@ -209,7 +210,7 @@ namespace Moritz.Score.Midi
             bmcd.HasChordOff = true;
 
             BasicMidiChords.Clear();
-            BasicMidiChords.Add(new BasicMidiChord(this.Channel, this, bmcd));
+            BasicMidiChords.Add(new BasicMidiChord(this.Channel, this, bmcd, this.MsDuration));
         }
 
         //public void SetMidiPitches(List<byte> midiPitches)
@@ -241,7 +242,7 @@ namespace Moritz.Score.Midi
             {
                 existingBasePitches.Add(mbc.ChordOn.Notes[0].Pitch);
             }
-            int originalRoot = existingBasePitches[0]; 
+            int originalRoot = existingBasePitches[0];
             for(int i = 0; i < existingBasePitches.Count; ++i)
             {
                 int originalDiff = existingBasePitches[i] - originalRoot;
@@ -249,7 +250,7 @@ namespace Moritz.Score.Midi
                 foreach(int midiPitch in midiPitches)
                 {
                     int newPitch = midiPitch + originalDiff;
-                    newPitch = newPitch < 0 ? 0: newPitch;
+                    newPitch = newPitch < 0 ? 0 : newPitch;
                     newPitch = newPitch > 127 ? 127 : newPitch;
                     newPitches.Add((byte)newPitch);
                 }
@@ -268,7 +269,7 @@ namespace Moritz.Score.Midi
                     velocities.Add(bmc.Velocity);
 
                 BasicMidiChordDef bmcd = new BasicMidiChordDef(msDuration, bank, patch, hasChordOff, newPitches, velocities);
-                newBasicMidiChords.Add(new BasicMidiChord(this.Channel, this, bmcd));
+                newBasicMidiChords.Add(new BasicMidiChord(this.Channel, this, bmcd, this.MsDuration));
             }
             this.BasicMidiChords = newBasicMidiChords;
         }
@@ -285,11 +286,11 @@ namespace Moritz.Score.Midi
             FreeWorker(this.BasicMidiChordsBackgroundWorker);
             if(ModulationWheelSlider != null)
                 FreeWorker(this.ModulationWheelSlider.BackgroundWorker);
-            if(PanSlider != null) 
+            if(PanSlider != null)
                 FreeWorker(this.PanSlider.BackgroundWorker);
-            if(PitchWheelSlider != null) 
+            if(PitchWheelSlider != null)
                 FreeWorker(this.PitchWheelSlider.BackgroundWorker);
-            if(ExpressionSlider != null) 
+            if(ExpressionSlider != null)
                 FreeWorker(this.ExpressionSlider.BackgroundWorker);
         }
 

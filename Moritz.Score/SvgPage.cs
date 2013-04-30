@@ -1,9 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.Windows.Forms; // MessageBox
 using System.Diagnostics;
 using System.IO;
 using System.Xml;
-
-using System;
 
 using Moritz.Globals;
 using Moritz.Score.Midi;
@@ -103,14 +103,6 @@ namespace Moritz.Score
             return newVoice;
         }
 
-        //private void GetMidiChordDef(XmlReader r, Voice voice, int msPosition, int msDuration)
-        //{
-        //    MidiChordDef midiChordDef = new MidiChordDef(r);
-        //    voice.MidiDurationDefs.Add(midiChordDef);
-        //    //newChord.ReadMidiInfo(r, _score.MidiChordDefs);
-        //}
-
-        //}
         /// <summary>
         /// The systems contain Metrics info, but their top staffline is at 0.
         /// The systems are moved to their correct vertical positions on the page here.
@@ -198,7 +190,12 @@ namespace Moritz.Score
         /// <param name="w"></param>
         public void WriteSVG(SvgWriter w, Metadata metadata, int pageNumber)
         {
-            WriteSvgPageHeader(w);
+            w.WriteStartDocument(); // standalone="no"
+            w.WriteProcessingInstruction("xml-stylesheet", "href=\"http://james-ingram-act-two.de/fontsStyleSheet.css\" type=\"text/css\"");
+            w.WriteStartElement("svg", "http://www.w3.org/2000/svg");
+
+            WriteSvgHeader(w, pageNumber);
+
             metadata.WriteSVG(w);
 
             _score.WriteSymbolDefinitions(w);
@@ -226,13 +223,8 @@ namespace Moritz.Score
             w.WriteEndDocument();
         }
 
-        public void WriteSvgPageHeader(SvgWriter w)
+        private void WriteSvgHeader(SvgWriter w, int pageNumber)
         {
-            w.WriteStartDocument(); // standalone="no"
-
-            w.WriteProcessingInstruction("xml-stylesheet", "href=\"http://james-ingram-act-two.de/fontsStyleSheet.css\" type=\"text/css\"");
-
-            w.WriteStartElement("svg", "http://www.w3.org/2000/svg");
             w.WriteAttributeString("version", "1.1");
             w.WriteAttributeString("baseProfile", "full");
             w.WriteAttributeString("width", _pageFormat.ScreenRight.ToString()); // the intended screen display size (100%)
@@ -241,6 +233,20 @@ namespace Moritz.Score
             w.WriteAttributeString("viewBox", viewBox); // the size of SVG's internal drawing surface (400%)
             w.WriteAttributeString("xmlns", "xlink", null, "http://www.w3.org/1999/xlink");
             w.WriteAttributeString("xmlns", "score", null, "http://www.james-ingram-act-two.de/open-source/svgScoreExtensions.html");
+            if(pageNumber == 1)
+            {
+                w.WriteAttributeString("onload", "onLoad()"); // function called when page 1 has loaded
+                WriteScriptLink(w);
+            }
+        }
+
+        // writes the line: <script xlink:href="../../ap/SVG.js" type="text/javascript"/>
+        private void WriteScriptLink(SvgWriter w)
+        {
+            w.WriteStartElement("script");
+            w.WriteAttributeString("xlink", "href", null, "../../ap/SVG.js");
+            w.WriteAttributeString("type", "text/javascript");
+            w.WriteEndElement(); // script
         }
 
         // This style stops the cursor changing to an I-beam every time it
@@ -253,7 +259,7 @@ namespace Moritz.Score
         }
 
         /// <summary>
-        /// Adds the main title and the author to the first page.
+        /// Adds the link, main title and the author to the first page.
         /// </summary>
         protected void WritePage1LinkTitleAndAuthor(SvgWriter w, Metadata metadata)
         {
@@ -276,8 +282,9 @@ namespace Moritz.Score
         }
 
         /// <summary>
-        /// Creates a link to the "About" file for this score (on my website).
-        /// MP3 recordings should be included in the "About" documents for each composition.
+        /// If both _pageFormat.AboutLinkURL and _pageFormat.AboutLinkText are set, 
+        /// creates a link to the "About" file for this score (on my website).
+        /// Audio recordings should be included in the "About" documents for each composition.
         /// </summary>
         /// <param name="w"></param>
         /// <param name="aboutURL"></param> 
@@ -293,29 +300,34 @@ namespace Moritz.Score
             float left,
             float titleBaseline)
         {
-            Debug.Assert(!String.IsNullOrEmpty(aboutURL) && !String.IsNullOrEmpty(aboutLinkText));
+            if(!String.IsNullOrEmpty(aboutURL) && !String.IsNullOrEmpty(aboutLinkText))
+            {
+                w.WriteStartElement("a");
+                w.WriteAttributeString("class", "linkClass");
+                w.WriteAttributeString("xlink", "href", null, aboutURL);
+                w.WriteAttributeString("xlink", "show", null, "new"); // open link in new window
 
-            w.WriteStartElement("a");
-            w.WriteAttributeString("class", "linkClass");
-            w.WriteAttributeString("xlink", "href", null, aboutURL);
-            w.WriteAttributeString("xlink", "show", null, "new"); // open link in new window
+                w.WriteStartElement("text");
+                w.WriteAttributeString("x", left.ToString(M.En_USNumberFormat));
+                w.WriteAttributeString("y", titleBaseline.ToString(M.En_USNumberFormat));
+                w.WriteAttributeString("fill", "#1010C6");
+                w.WriteAttributeString("text-anchor", "left");
+                w.WriteAttributeString("font-size", _pageFormat.Page1AuthorHeight.ToString(M.En_USNumberFormat));
+                w.WriteAttributeString("font-family", fontFamily);
 
-            w.WriteStartElement("text");
-            w.WriteAttributeString("x", left.ToString(M.En_USNumberFormat));
-            w.WriteAttributeString("y", titleBaseline.ToString(M.En_USNumberFormat));
-            w.WriteAttributeString("fill", "#1010C6");
-            w.WriteAttributeString("text-anchor", "left");
-            w.WriteAttributeString("font-size", _pageFormat.Page1AuthorHeight.ToString(M.En_USNumberFormat));
-            w.WriteAttributeString("font-family", fontFamily);
+                w.WriteStartElement("style");
+                w.WriteString(".linkClass:hover{text-decoration:underline;}");
+                w.WriteEndElement();
 
-            w.WriteStartElement("style");
-            w.WriteString(".linkClass:hover{text-decoration:underline;}");
-            w.WriteEndElement();
+                w.WriteString(aboutLinkText);
 
-            w.WriteString(aboutLinkText);
-
-            w.WriteEndElement(); // text
-            w.WriteEndElement(); // a         
+                w.WriteEndElement(); // text
+                w.WriteEndElement(); // a 
+            }
+            else
+            {
+                MessageBox.Show("A link to my website document about this score should be provided in the Assistant Composer's Metadata dialog.", "Reminder");
+            }
         }
 
         #region used when creating graphic score
