@@ -117,7 +117,7 @@ namespace Moritz.AssistantPerformer.Runtime
         /// Performs a single moment in the assistant's _moments list.
         /// Note that ordinary MidiChords are sent in the main user thread,
         /// but ornaments are sent in a background thread.
-        /// This is so that the caller can indtroduce pauses between the moment performances.
+        /// This is so that the caller can introduce pauses between the moment performances.
         /// </summary>
         /// <param name="assistantsMomentIndex"></param>
         public void PerformOneMoment(int assistantsMomentIndex)

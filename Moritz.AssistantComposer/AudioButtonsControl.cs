@@ -218,7 +218,15 @@ namespace Moritz.AssistantComposer
                 _midiEventDemoButtons[index].Select();
                 Refresh();
                 assistant.PerformOneMoment(index - numberOfRests);
-                Thread.Sleep(krystalPalette.BasicChordSettings.Durations[index]);
+                // old: Thread.Sleep(krystalPalette.BasicChordSettings.Durations[index]);
+                // begin new:
+                if(index > 0)
+                {
+                    // This blocks the current thread (keeps the button selected)
+                    // If index == 0, it is blocked by the assistant.
+                    Thread.Sleep(krystalPalette.BasicChordSettings.Durations[index]);
+                }
+                // end new
             }
             this._restLabels[0].Select(); // just to deselect everything
             Refresh();

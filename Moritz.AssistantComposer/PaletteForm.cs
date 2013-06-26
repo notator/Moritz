@@ -257,7 +257,7 @@ namespace Moritz.AssistantComposer
         private void TouchAllTextBoxes()
         {
             _bcc.TouchAllTextBoxes();
-            BankIndicesTextBox_Leave(PatchIndicesTextBox, null);
+            BankIndicesTextBox_Leave(BankIndicesTextBox, null);
             PatchIndicesTextBox_Leave(PatchIndicesTextBox, null);
             VolumesTextBox_Leave(VolumesTextBox, null);
             PitchwheelDeviationsTextBox_Leave(PitchwheelDeviationsTextBox, null);
