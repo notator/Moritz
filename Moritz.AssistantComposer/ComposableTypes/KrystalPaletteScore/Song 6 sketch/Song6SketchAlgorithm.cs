@@ -16,8 +16,8 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// The Song6Algorithm uses neither krystals nor palettes.
         /// </summary>
-        public Song6SketchAlgorithm()
-            : base(null, null)
+        public Song6SketchAlgorithm(List<Krystal> krystals, List<PaletteDef> paletteDefs)
+            : base(krystals, paletteDefs)
         {
         }
 
@@ -56,7 +56,7 @@ namespace Moritz.AssistantComposer
 
             string algorithmFolderPath = M.Preferences.LocalScoresRootFolder + "\\Song 6 sketch";
             string midiInputFolder = algorithmFolderPath + "\\midi";
-            _clytemnestra = new Clytemnestra(midiInputFolder, interludeBars);
+            _clytemnestra = new Clytemnestra(midiInputFolder, interludeBars, _paletteDefs);
 
             foreach(Voice clytemnestraBar in _clytemnestra.Bars)
             {
@@ -96,7 +96,7 @@ namespace Moritz.AssistantComposer
         public override int NumberOfBars(string algorithmFolderPath)
         {
             string midiFolder = algorithmFolderPath + "\\midi";
-            Clytemnestra clytemnestra = new Clytemnestra(midiFolder, InterludeBars);
+            Clytemnestra clytemnestra = new Clytemnestra(midiFolder, InterludeBars, _paletteDefs);
             return clytemnestra.Bars.Count;
         }
 

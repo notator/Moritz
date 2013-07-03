@@ -90,7 +90,7 @@
       <DependentUpon>BasicPercussionControl.cs</DependentUpon>
     </Compile>
     <Compile Include="ComposableTypes\ComposableBasicMidiChordDef.cs" />
-    <Compile Include="ComposableTypes\ComposableMidiChordDef.cs" />
+    <Compile Include="ComposableTypes\LocalMidiChordDef.cs" />
     <Compile Include="ComposableTypes\ComposableScore.cs" />
     <Compile Include="PaletteForm.cs">
       <SubType>Form</SubType>

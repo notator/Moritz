@@ -175,7 +175,7 @@ false.
 
 28.02.2012 rev58.175
 Bug Fix: Chords are now really being multiplied correctly by ornaments!
-This was fairly complicated, but the main fix was in ComposableMidiChordDef.DoTranspositionAndVelocities().
+This was fairly complicated, but the main fix was in LocalMidiChordDef.DoTranspositionAndVelocities().
 Bank and patch values in the ornaments palette are now truly optional. If they exist, they override the values
 in the main palette. In Study 2c, ornament banks and patches are not overridden (the fields are empty).
  

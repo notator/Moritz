@@ -8,13 +8,75 @@ using Moritz.Score.Midi;
 
 namespace Moritz.AssistantComposer
 {
-    internal class ComposableMidiChordDef : MidiChordDef
+     //<summary>
+     // A LocalMidiChordDef is saved locally in SVG files,
+     // not as a 'used' reference to a MidiChordDef definition in a palette.
+     //</summary>
+    internal class LocalMidiChordDef : MidiChordDef
     {
+        /// <summary>
+        /// A deep clone of the argument
+        /// </summary>
+        /// <param name="midiChordDef"></param>
+        public LocalMidiChordDef(MidiChordDef mcd)
+        {
+            ID = "localChord" + UniqueChordID.ToString();
+
+            _bank = mcd.Bank;
+            _patch = mcd.Patch;
+            _volume = mcd.Volume;
+            _pitchWheelDeviation = mcd.PitchWheelDeviation;
+            _hasChordOff = mcd.HasChordOff;
+            _minimumBasicMidiChordMsDuration = mcd.MinimumBasicMidiChordMsDuration;
+
+            _msDuration = mcd.MsDuration;
+            _volume = mcd.Volume;
+
+             _midiVelocitySymbol = mcd.MidiVelocitySymbol;
+            _ornamentNumberSymbol = mcd.OrnamentNumberSymbol;
+            _midiHeadSymbols = new List<byte>(mcd.MidiHeadSymbols);
+
+            MidiChordSliderDefs mcsd = mcd.MidiChordSliderDefs;
+            if(mcsd != null)
+            {
+                List<byte> pwMsbs = null;
+                List<byte> panMsbs = null;
+                List<byte> mwMsbs = null;
+                List<byte> eMsbs = null;
+                if(mcsd.PitchWheelMsbs != null && mcsd.PitchWheelMsbs.Count > 0)
+                {
+                    pwMsbs = new List<byte>(mcsd.PitchWheelMsbs);
+                }
+                if(mcsd.PanMsbs != null && mcsd.PanMsbs.Count > 0)
+                {
+                    panMsbs = new List<byte>(mcsd.PanMsbs);
+                }
+                if(mcsd.ModulationWheelMsbs != null && mcsd.ModulationWheelMsbs.Count > 0)
+                {
+                    mwMsbs = new List<byte>(mcsd.ModulationWheelMsbs);
+                }
+                if(mcsd.ExpressionMsbs != null && mcsd.ExpressionMsbs.Count > 0)
+                {
+                    eMsbs = new List<byte>(mcsd.ExpressionMsbs);
+                }
+                if(pwMsbs != null || panMsbs != null || mwMsbs != null || eMsbs != null)
+                {
+                    MidiChordSliderDefs = new MidiChordSliderDefs(pwMsbs, panMsbs, mwMsbs, eMsbs);
+                }
+            }
+            foreach(BasicMidiChordDef bmcd in mcd.BasicMidiChordDefs)
+            {
+                List<byte> pitches = new List<byte>(bmcd.Notes);
+                List<byte> velocities = new List<byte>(bmcd.Velocities);
+                BasicMidiChordDefs.Add(new BasicMidiChordDef(bmcd.MsDuration, bmcd.BankIndex, bmcd.PatchIndex, bmcd.HasChordOff, pitches, velocities));
+            }
+        }
+
         /// <summary>
         /// Constructor used when converting a midi file to a list of Moments.
         /// This MidiChordDef contains a single BasicMidiChordDef. It does not support sliders.
         /// </summary>
-        public ComposableMidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff,
+        public LocalMidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff,
             List<MidiControl> midiControls)
             : base()
         {
@@ -43,7 +105,7 @@ namespace Moritz.AssistantComposer
         /// Constructor used when converting a midi file to a list of Moments.
         /// This MidiChordDef contains a single BasicMidiChordDef. It does not support sliders.
         /// </summary>
-        public ComposableMidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff,
+        public LocalMidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff,
             List<MidiControlDef> midiControlDefs)
             : base()
         {
@@ -304,7 +366,7 @@ namespace Moritz.AssistantComposer
         /// Its parameters can be overridden in the score and/or in a live performance.
         /// A chordID must be supplied when writing score:midiDefs, but is omitted when simply reading a palette.
         /// </summary>
-        public ComposableMidiChordDef(string chordID, Palette krystalPalette, int valueIndex)
+        public LocalMidiChordDef(string chordID, Palette krystalPalette, int valueIndex)
             : base()
         {
             ID = chordID;
@@ -526,5 +588,17 @@ namespace Moritz.AssistantComposer
 
             return ornamentValuesList[ornamentIndex];
         }
+
+        // This class is saved as an individual chordDef in SVG files,
+        // so it allows ALL its fields to be set, even after construction.
+        public List<byte> MidiHeadSymbols { set { _midiHeadSymbols = value; } }
+        public byte MidiVelocitySymbol { set { _midiVelocitySymbol = value; } }
+        public int OrnamentNumberSymbol { set { _ornamentNumberSymbol = value; } }
+        public byte? Bank { set { _bank = value; } }
+        public byte? Patch { set { _patch = value; } }
+        public byte? Volume { set { _volume = value; } }
+        public byte? PitchWheelDeviation { set { _pitchWheelDeviation = value; } }
+        public bool HasChordOff { set { _hasChordOff = value; } }
+        public int MinimumBasicMidiChordMsDuration { set { _minimumBasicMidiChordMsDuration = value; } }
     }
 }

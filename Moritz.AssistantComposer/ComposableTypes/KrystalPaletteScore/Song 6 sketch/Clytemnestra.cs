@@ -12,11 +12,14 @@ namespace Moritz.AssistantComposer
     /// </summary>
     public class Clytemnestra
     {
-        public Clytemnestra(string midiFolder, List<List<int>> interludeBars)
+        public Clytemnestra(string midiFolder, List<List<int>> interludeBars, List<PaletteDef> paletteDefs)
         {
             List<List<MomentDef>> momentDefsListPerVerse = GetMomentDefsListPerVerse(midiFolder);
-            momentDefsListPerVerse = AdjustPhrases(momentDefsListPerVerse);
-            momentDefsListPerVerse = AdjustControls(momentDefsListPerVerse);
+            if(paletteDefs != null)
+            {
+                momentDefsListPerVerse = AdjustPhrases(momentDefsListPerVerse);
+                momentDefsListPerVerse = AdjustControls(momentDefsListPerVerse, paletteDefs);
+            }
             _bars = GetBars(momentDefsListPerVerse, interludeBars);
         }
         private List<List<MomentDef>> GetMomentDefsListPerVerse(string midiFolder)
@@ -87,9 +90,10 @@ namespace Moritz.AssistantComposer
             return momentDefsListPerVerse;
         }
         /// <summary>
-        /// Removes all controls except patch (which is set to 71 (MIDI "clarinet"))
+        /// Sets the MidiChordDefs to LocalMidiChordDefs whose definitions are taken from palettes,
+        /// but whose msDurations are those defined in the phrases.
         /// </summary>
-        private List<List<MomentDef>> AdjustControls(List<List<MomentDef>> momentDefsListPerVerse)
+        private List<List<MomentDef>> AdjustControls(List<List<MomentDef>> momentDefsListPerVerse, List<PaletteDef> paletteDefs)
         {
             for(int verseIndex = 0; verseIndex < 5; ++verseIndex)
             {
@@ -98,13 +102,17 @@ namespace Moritz.AssistantComposer
                 {
                     MidiChordDef mcd = momentDef.MidiChordDefs[0]; // there is only one
 
-                    MidiChordDef midiChordDef = new ComposableMidiChordDef(mcd.MidiHeadSymbols, new List<byte>(){64},
-                        mcd.MsDuration, true, new List<MidiControl>());
+                    MidiChordDef paletteDef = paletteDefs[0][0] as MidiChordDef;
 
-                    midiChordDef.BasicMidiChordDefs[0].PatchIndex = 71; // Midi "clarinet"
+                    Debug.Assert(mcd != null); // a MidiRestDef!
+                    Debug.Assert(paletteDef != null); // a MidiRestDef!
+
+                    LocalMidiChordDef localMidiChordDef = new LocalMidiChordDef(paletteDef);
+
+                    localMidiChordDef.MsDuration = mcd.MsDuration; 
 
                     momentDef.MidiChordDefs.Clear();
-                    momentDef.MidiChordDefs.Add(midiChordDef);
+                    momentDef.MidiChordDefs.Add(localMidiChordDef);
                 }
             }
             return momentDefsListPerVerse;

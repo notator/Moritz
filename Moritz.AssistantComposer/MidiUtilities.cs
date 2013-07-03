@@ -232,7 +232,7 @@ namespace Moritz.AssistantComposer
                         }
                     }
                     Debug.Assert(pitches.Count == velocities.Count);
-                    MidiChordDef midiChordDef = new ComposableMidiChordDef(pitches, velocities, msDuration, hasChordOff, midiControlDefs);
+                    MidiChordDef midiChordDef = new LocalMidiChordDef(pitches, velocities, msDuration, hasChordOff, midiControlDefs);
                     if(!returnDict.ContainsKey(onPos))
                         returnDict.Add(onPos, new List<MidiChordDef>());
                     returnDict[onPos].Add(midiChordDef);
@@ -731,7 +731,7 @@ namespace Moritz.AssistantComposer
                         }
                     }
                     Debug.Assert(pitches.Count == velocities.Count);
-                    MidiChordDef midiChordDef = new ComposableMidiChordDef(pitches, velocities, msDuration, hasChordOff, midiControls);
+                    MidiChordDef midiChordDef = new LocalMidiChordDef(pitches, velocities, msDuration, hasChordOff, midiControls);
                     midiControls.Clear();
                     MidiChord midiChord = new MidiChord(channel, midiChordDef, onPos, midiChordDef.MsDuration, channelState, M.DefaultMinimumBasicMidiChordMsDuration);
                     if(!returnDict.ContainsKey(onPos))

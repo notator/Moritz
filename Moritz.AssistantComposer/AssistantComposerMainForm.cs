@@ -1630,7 +1630,7 @@ namespace Moritz.AssistantComposer
                     midiAlgorithm = new Study2cAlgorithm(null, null);
                     break;
                 case "Song 6 sketch":
-                    midiAlgorithm = new Song6SketchAlgorithm();
+                    midiAlgorithm = new Song6SketchAlgorithm(null, null);
                     break;
                 case "Study 3 sketch":
                     midiAlgorithm = new Study3SketchAlgorithm(null, null);

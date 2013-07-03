@@ -32,7 +32,7 @@ namespace Moritz.AssistantComposer
                     midiAlgorithm = new Study2cAlgorithm(krystals, paletteDefs);
                     break;
                 case "Song 6 sketch":
-                    midiAlgorithm = new Song6SketchAlgorithm();
+                    midiAlgorithm = new Song6SketchAlgorithm(krystals, paletteDefs);
                     break;
                 case "Study 3 sketch":
                     midiAlgorithm = new Study3SketchAlgorithm(krystals, paletteDefs);
@@ -67,7 +67,7 @@ namespace Moritz.AssistantComposer
                     {
                         string id = "palette" + (paletteIndex + 1).ToString() +
                             "_chord" + (valueIndex + 1).ToString();
-                        mdd = new ComposableMidiChordDef(id, palette, valueIndex);
+                        mdd = new LocalMidiChordDef(id, palette, valueIndex);
                     }
                     midiDurationDefs.Add(mdd);
                 }
