@@ -40,7 +40,7 @@ namespace Moritz.AssistantComposer
             List<List<int>> mcMsDurPerVerse = MidiChordDefMsDurationsPerVerse;
             List<List<string>> lyricsPerVerse = LyricsPerVerse;
 
-            MomentDef finalMomentDef = null;
+            MomentDef previousMomentDef = null;
 
             for(int verseIndex = 0; verseIndex < 5; ++verseIndex)
             {
@@ -78,14 +78,18 @@ namespace Moritz.AssistantComposer
                     //localMidiChordDef.BasicMidiChordDefs[0].Notes[0] = 50;
 
                     momentDef.MidiChordDefs.Add(localMidiChordDef);
-                    momentDef.MsWidth = localMidiChordDef.MsDuration;
 
-                    //if(finalMomentDef != null) // the previous moment
-                    //{
-                    //    finalMomentDef.MsWidth = momentDef.MsPosition - finalMomentDef.MsPosition;
-                    //}
+                    if(syllableIndex > 0)
+                    {
+                        previousMomentDef.MsWidth = momentDef.MsPosition - previousMomentDef.MsPosition;
+                    }
 
-                    //finalMomentDef = momentDef;
+                    if(syllableIndex == vowels.Count - 1)
+                    {
+                        momentDef.MsWidth = momentDef.MidiChordDefs[0].MsDuration;
+                    }
+
+                    previousMomentDef = momentDef;
                 }
             }
         }

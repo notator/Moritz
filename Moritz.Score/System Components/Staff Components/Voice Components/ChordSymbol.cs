@@ -28,7 +28,7 @@ namespace Moritz.Score
 
                 if(midiChordDef.Lyric != null)
                 {
-                    TextInfo textInfo = new TextInfo(midiChordDef.Lyric, "Arial", (float)(FontHeight / 2.2F), TextHorizAlign.center);
+                    TextInfo textInfo = new TextInfo(midiChordDef.Lyric, "Arial", (float)(FontHeight / 2F), TextHorizAlign.center);
                     Lyric lyric = new Lyric(this, textInfo);
                     DrawObjects.Add(lyric);
                 }
