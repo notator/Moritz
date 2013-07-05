@@ -12,12 +12,12 @@ namespace Moritz.AssistantComposer
     /// The Algorithm for Song 6.
     /// This will develope as composition progresses...
     /// </summary>
-    internal class Song6SketchAlgorithm : MidiCompositionAlgorithm
+    internal class SongSixAlgorithm : MidiCompositionAlgorithm
     {
         /// <summary>
         /// The Song6Algorithm uses neither krystals nor palettes.
         /// </summary>
-        public Song6SketchAlgorithm(List<Krystal> krystals, List<PaletteDef> paletteDefs)
+        public SongSixAlgorithm(List<Krystal> krystals, List<PaletteDef> paletteDefs)
             : base(krystals, paletteDefs)
         {
         }

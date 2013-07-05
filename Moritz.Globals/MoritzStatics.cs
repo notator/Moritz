@@ -45,7 +45,7 @@ namespace Moritz.Globals
         public static List<string> Algorithms = new List<string>()
         {
             "Study 2c",
-            "Song 6 sketch",
+            "Song Six",
             "Study 3 sketch"
         };
 
