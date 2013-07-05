@@ -65,14 +65,7 @@ namespace Moritz.AssistantComposer
         /// Returns the number of bars created by the algorithm.
         /// </summary>
         /// <returns></returns>
-        public abstract int NumberOfBars(string algorithmFolderPath);
-
-        /// <summary>
-        /// Adds a single syllable to each chord that has a lyric.
-        /// Lyrics are pure annotations, having no meaning to the AssistantPerformer.
-        /// </summary>
-        /// <param name="systems"></param>
-        public virtual void AddLyrics(List<SvgSystem> systems) { }
+        public abstract int NumberOfBars();
 
         /// <summary>
         /// Returns the position of the end of the last LocalizedMidiDurationDef

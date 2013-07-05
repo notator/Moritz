@@ -25,6 +25,13 @@ namespace Moritz.Score
                 {
                     AddOrnamentSymbol("~" + midiChordDef.OrnamentNumberSymbol.ToString());
                 }
+
+                if(midiChordDef.Lyric != null)
+                {
+                    TextInfo textInfo = new TextInfo(midiChordDef.Lyric, "Arial", (float)(FontHeight / 2.2F), TextHorizAlign.center);
+                    Lyric lyric = new Lyric(this, textInfo);
+                    DrawObjects.Add(lyric);
+                }
             }
             
             // note that all chord symbols have a stem! 

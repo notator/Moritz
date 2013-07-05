@@ -51,7 +51,7 @@ namespace Moritz.AssistantComposer
             systemVoices.Add(voice);
             voicesPerSystem.Add(systemVoices);
 
-            Debug.Assert(voicesPerSystem.Count == NumberOfBars(null));
+            Debug.Assert(voicesPerSystem.Count == NumberOfBars());
 
             return voicesPerSystem;
         }
@@ -60,7 +60,7 @@ namespace Moritz.AssistantComposer
         /// The number of bars produced by DoAlgorithm().
         /// </summary>
         /// <returns></returns>
-        public override int NumberOfBars(string algorithmFolderPath)
+        public override int NumberOfBars()
         {
             return 1;
         }

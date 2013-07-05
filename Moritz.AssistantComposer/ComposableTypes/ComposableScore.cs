@@ -67,7 +67,7 @@ namespace Moritz.AssistantComposer
                     {
                         string id = "palette" + (paletteIndex + 1).ToString() +
                             "_chord" + (valueIndex + 1).ToString();
-                        mdd = new LocalMidiChordDef(id, palette, valueIndex);
+                        mdd = new PaletteMidiChordDef(id, palette, valueIndex);
                     }
                     midiDurationDefs.Add(mdd);
                 }
@@ -88,8 +88,6 @@ namespace Moritz.AssistantComposer
             if(_pageFormat.ChordSymbolType != "none") // set by AudioButtonsControl
             {
                 Notator.AddSymbolsToSystems(this.Systems);
-
-                _midiAlgorithm.AddLyrics(this.Systems);
 
                 FinalizeSystemStructure(); // adds barlines, joins bars to create systems, etc.
 

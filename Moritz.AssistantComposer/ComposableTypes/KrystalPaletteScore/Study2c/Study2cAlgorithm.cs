@@ -29,14 +29,6 @@ namespace Moritz.AssistantComposer
         {
             return new List<byte>() { 0, 1, 2 };
         }
-
-        /// <summary>
-        /// no lyrics in this test
-        /// </summary>
-        /// <param name="systems"></param>
-        public override void AddLyrics(List<SvgSystem> systems)
-        {
-        }
         
         /// <summary>
         /// Sets the midi content of the score, independent of its notation.
@@ -66,7 +58,7 @@ namespace Moritz.AssistantComposer
                 bars.Add(bar);
             }
 
-            Debug.Assert(bars.Count == NumberOfBars(null));
+            Debug.Assert(bars.Count == NumberOfBars());
 
             return bars;
         }
@@ -75,7 +67,7 @@ namespace Moritz.AssistantComposer
         /// The number of bars produced by DoAlgorithm().
         /// </summary>
         /// <returns></returns>
-        public override int NumberOfBars(string algorithmFolderPath)
+        public override int NumberOfBars()
         {
             // this value was determined experimentally when running the algorithm 
             return 74;

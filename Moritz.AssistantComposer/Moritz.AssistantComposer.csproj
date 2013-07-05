@@ -56,6 +56,7 @@
     <Compile Include="AudioButtonsControl.Designer.cs">
       <DependentUpon>AudioButtonsControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="ComposableTypes\PaletteMidiChordDef.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\PaletteDemoScore\PaletteDemoScore.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\Study2c\Study2cAlgorithm.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\Song 6 sketch\Clytemnestra.cs" />

@@ -45,7 +45,7 @@ namespace Moritz.AssistantComposer
 
             ScoreComboBox.SelectedIndexChanged -= ScoreComboBox_SelectedIndexChanged;
             ScoreComboBox.SelectedIndex = ScoreComboBox.Items.IndexOf(scoreName);
-            GetSelectedSettings(_settingsPath, _algorithmFolderPath, _algorithm);
+            GetSelectedSettings(_settingsPath, _algorithm);
             ScoreComboBox.SelectedIndexChanged += ScoreComboBox_SelectedIndexChanged;
             _dimensionsAndMetadataForm.Text = scoreName + ": Page Dimensions and Metadata";
 
@@ -826,7 +826,7 @@ namespace Moritz.AssistantComposer
                     else
                         currentStartBar = startBars[i];
                 }
-                if(startBars[0] != 1 || startBars[startBars.Count - 1] > _algorithm.NumberOfBars(_algorithmFolderPath))
+                if(startBars[0] != 1 || startBars[startBars.Count - 1] > _algorithm.NumberOfBars())
                     SetTextBoxState(SystemStartBarsTextBox, false);
                 else
                     SetTextBoxState(SystemStartBarsTextBox, true);
@@ -1243,14 +1243,14 @@ namespace Moritz.AssistantComposer
             _scoreFolderPath = Path.GetDirectoryName(_settingsPath);
             _dimensionsAndMetadataForm.Text = scoreName + ": Page Dimensions and Metadata";
 
-            GetSelectedSettings(_settingsPath, _algorithmFolderPath, _algorithm);
+            GetSelectedSettings(_settingsPath, _algorithm);
         }
-        private void GetSelectedSettings(string settingsPath, string algorithmFolderPath, MidiCompositionAlgorithm algorithm)
+        private void GetSelectedSettings(string settingsPath, MidiCompositionAlgorithm algorithm)
         {
             LoadSettings(settingsPath);
 
             SetMidiChannelsPerVoicePerStaffHelpLabel(algorithm.MidiChannels());
-            SetSystemStartBarsHelpLabel(algorithm.NumberOfBars(algorithmFolderPath));
+            SetSystemStartBarsHelpLabel(algorithm.NumberOfBars());
             MidiChannelsPerVoicePerStaffTextBox_Leave(null, null);
             SetSettingsHaveBeenSaved();
         }

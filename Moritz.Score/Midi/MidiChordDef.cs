@@ -333,6 +333,8 @@ namespace Moritz.Score.Midi
         protected byte _midiVelocitySymbol;
         public int OrnamentNumberSymbol { get { return _ornamentNumberSymbol; } }
         protected int _ornamentNumberSymbol = 0;
+        public string Lyric { get { return _lyric; } set { _lyric = value; } }
+        protected string _lyric = null;
 
         public byte? Bank { get { return _bank; } }
         public byte? Patch { get { return _patch; } }
