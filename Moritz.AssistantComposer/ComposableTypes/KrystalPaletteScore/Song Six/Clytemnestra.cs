@@ -70,8 +70,8 @@ namespace Moritz.AssistantComposer
                     #region 
                     // Bank, Patch and Volume are added to *every* chord so that performances can start anywhere.
                     // If the interpreter is clever enough, repeated controls are not actually sent.
-                    localMidiChordDef.Bank = (byte)(verseIndex + 1);
-                    localMidiChordDef.Patch = (byte)121; // General MIDI "breath noise"
+                    localMidiChordDef.Bank = (byte)(0);
+                    localMidiChordDef.Patch = (byte)(123 + verseIndex); // top 5 patches in bank 0
                     localMidiChordDef.Volume = (byte)127;
                     localMidiChordDef.Lyric = lyrics[syllableIndex];
                     #endregion
