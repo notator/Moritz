@@ -43,6 +43,7 @@ namespace Moritz.AssistantComposer
         public override List<List<Voice>> DoAlgorithm()
         {
             List<List<Voice>> bars = new List<List<Voice>>();
+            int clytemnestrasChannelIndex = 0;
 
             // The blockMsDurations at positions 1,3,5,7,9,11 will probably be changed by birds and/or winds.
             // They have been set here for tesing purposes during the composition of Clytemnestra.
@@ -50,7 +51,7 @@ namespace Moritz.AssistantComposer
             List<int> blockMsDurations = new List<int>(){8000,0,8000,0,8000,0,8000,0,8000,0,8000};
 
             // Clytemnestra sets the durations of blocks 2,4,6,8,10
-            Clytemnestra clytemnestra = new Clytemnestra(_paletteDefs, blockMsDurations);
+            Clytemnestra clytemnestra = new Clytemnestra(clytemnestrasChannelIndex, blockMsDurations);
 
             // compose other momentDefs here (using blockMsDurations)
             // Birds birds = new Birds(_paletteDefs, out blockDurations);

@@ -14,11 +14,9 @@ namespace Moritz.AssistantComposer
     /// </summary>
     public class Clytemnestra
     {
-        public Clytemnestra(List<PaletteDef> paletteDefs, List<int> blockMsDurations)
+        public Clytemnestra(int clytemnestrasChannelIndex, List<int> blockMsDurations)
         {
-            Debug.Assert(paletteDefs != null);
-
-            SetMomentDefsListPerVerse(paletteDefs);
+            SetMomentDefsListPerVerse(clytemnestrasChannelIndex);
             SetBlockMsDurations(blockMsDurations);
             SetBarLineMsPositionsPerBlock();
         }
@@ -27,75 +25,75 @@ namespace Moritz.AssistantComposer
         /// Sets _momentDefsListPerVerse to contain a list of MomentDefs for each verse.
         /// Each MomentDef is positioned with respect to the beginning of its verse, and contains
         /// a single LocalMidiChordDef in its MidiChordDefs list.
-        /// Each LocalMidiChordDef contains a clone of a PaletteMidiChordDef, whose duration has
-        /// been customised according to MidiChordDefMsDurationsPerVerse.
-        /// The PaletteMidiChordDef is found using VowelPaletteIndicesPerVerse
         /// </summary>
-        private void SetMomentDefsListPerVerse(List<PaletteDef> paletteDefs)
+        private void SetMomentDefsListPerVerse(int clytemnestrasChannelIndex)
         {
             _momentDefsListPerVerse = new List<List<MomentDef>>();
 
-            List<List<int>> vowelsPerVerse = VowelPaletteIndicesPerVerse;
-            List<List<int>> mdMsPosPerVerse = MomentDefMsPositionsPerVerse;
-            List<List<int>> mcMsDurPerVerse = MidiChordDefMsDurationsPerVerse;
+            List<List<int>> momentDefMsWidthPerVerse = MomentDefMsWidthPerVerse;
+            List<List<int>> midiChordDefMsDurPerVerse = MidiChordDefMsDurationsPerVerse;
             List<List<string>> lyricsPerVerse = LyricsPerVerse;
-
-            MomentDef previousMomentDef = null;
 
             for(int verseIndex = 0; verseIndex < 5; ++verseIndex)
             {
-                int paletteIndex = 0;
+                int momentMsPos = 0;
 
-                List<int> vowels = vowelsPerVerse[verseIndex];
-                List<int> mdMsPos = mdMsPosPerVerse[verseIndex];
-                List<int> mcMsDur = mcMsDurPerVerse[verseIndex];
+                List<int> momentMsWidth = momentDefMsWidthPerVerse[verseIndex];
+                List<int> midiChordMsDur = midiChordDefMsDurPerVerse[verseIndex];
                 List<string> lyrics = lyricsPerVerse[verseIndex];
 
                 List<MomentDef> momentDefs = new List<MomentDef>();
                 _momentDefsListPerVerse.Add(momentDefs);
 
-                for(int syllableIndex = 0; syllableIndex < vowels.Count; ++syllableIndex)
-                {                    
-                    paletteIndex = vowels[syllableIndex];
-                    PaletteMidiChordDef paletteMidiChordDef = paletteDefs[paletteIndex][0] as PaletteMidiChordDef;
+                List<byte> velocity = new List<byte>() { (byte)127 };
 
-                    Debug.Assert(paletteMidiChordDef != null); // a MidiRestDef!
+                for(int syllableIndex = 0; syllableIndex < momentMsWidth.Count; ++syllableIndex)
+                {
+                    Debug.Assert(midiChordMsDur[syllableIndex] <= momentMsWidth[syllableIndex]);
 
-                    MomentDef momentDef = new MomentDef(mdMsPos[syllableIndex]);
+                    MomentDef momentDef = new MomentDef(momentMsPos);
+                    momentDef.MsWidth = momentMsWidth[syllableIndex];
                     momentDefs.Add(momentDef);
 
-                    LocalMidiChordDef localMidiChordDef = new LocalMidiChordDef(paletteMidiChordDef);
+                    #region midiControls
+                    List<byte> pitch = new List<byte>() { (byte)syllableIndex }; // the syllables are organised like this in the soundfont.
+                    int msDuration = midiChordMsDur[syllableIndex];
+                    List<MidiControl> midiControls = new List<MidiControl>();
+                    // Expression is added to every chord so that performances can start anywhere.
+                    // If the interpreter is clever enough, repeated controls are not actually sent.
+                    Expression expression = new Expression(clytemnestrasChannelIndex, (byte)127, ControlContinuation.NoChange);
+                    midiControls.Add(expression);
+                    #endregion
 
-                    localMidiChordDef.MsDuration = mcMsDur[syllableIndex];
+                    LocalMidiChordDef localMidiChordDef = new LocalMidiChordDef(pitch, velocity, msDuration, true, midiControls);
+
+                    #region 
+                    // Bank, Patch and Volume are added to *every* chord so that performances can start anywhere.
+                    // If the interpreter is clever enough, repeated controls are not actually sent.
+                    localMidiChordDef.Bank = (byte)(verseIndex + 1);
+                    localMidiChordDef.Patch = (byte)121; // General MIDI "breath noise"
+                    localMidiChordDef.Volume = (byte)127;
                     localMidiChordDef.Lyric = lyrics[syllableIndex];
+                    #endregion
 
-                    // the following can determine what is seen
-                    //localMidiChordDef.MidiHeadSymbols = new List<byte>(){50, 55};
+                    // the following determine what is seen
+                    localMidiChordDef.MidiHeadSymbols = new List<byte>(){67}; // display middle G, even though "pitch" is different.
                     //localMidiChordDef.MidiVelocitySymbol = 65;
 
-                    //// the following can determine what is heard
-                    //localMidiChordDef.BasicMidiChordDefs[0].Velocities[0] = 64;
-                    //localMidiChordDef.BasicMidiChordDefs[0].Notes[0] = 50;
+                    // the following could determine what is heard
+                    //localMidiChordDef.BasicMidiChordDefs[0].Velocities = new List<byte>() { (byte)127 };
+                    //localMidiChordDef.BasicMidiChordDefs[0].Notes = new List<byte>() { (byte)syllableIndex };
 
                     momentDef.MidiChordDefs.Add(localMidiChordDef);
 
-                    if(syllableIndex > 0)
-                    {
-                        previousMomentDef.MsWidth = momentDef.MsPosition - previousMomentDef.MsPosition;
-                    }
-
-                    if(syllableIndex == vowels.Count - 1)
-                    {
-                        momentDef.MsWidth = momentDef.MidiChordDefs[0].MsDuration;
-                    }
-
-                    previousMomentDef = momentDef;
+                    momentMsPos += momentDef.MsWidth;
                 }
             }
         }
 
         /// <summary>
         /// Sets the msDurations of blocks 2,4,6,8,10 to the durations of the Verses.
+        /// The durations of blocks 1,3,5,7,9,11 will be set by the birds and wind.
         /// </summary>
         /// <param name="blockMsDurations"></param>
         private void SetBlockMsDurations(List<int> blockMsDurations)
@@ -169,101 +167,47 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// the palette _index_ for the vowel of each syllable in the song (per Verse).
+        /// The msWidth of each momentDef (the msDuration between momentDefs).
         /// </summary>
-        private List<List<int>> VowelPaletteIndicesPerVerse
-        {
-            get
-            {
-                // Vowels have the following palette indices:
-                // had:0, hard:1, hayed:2, head:3, heed:4, herd:5, hid:6 hod:7, hood:8, who'd:9
-                List<int> v1PaletteIndices = new List<int>()
-                {7,1,5,4,6,6,1,1,9,4,
-                 1,1,6,7,5,1,5,2,4,5,
-                 1,4,6,4,6,7,6,1,5,2,
-                 1,9,0,9,9,7,5,6,6,2,
-                 1,4,5,1,5,3,6,3,7,3};
-
-                List<int> v2PaletteIndices = new List<int>()
-                {7,1,5,4,1,1,9,6,5,1,
-                 0,1,5,0,5,0,7,5,5,4,
-                 7,1,1,2,9,2,4,9,1,2,
-                 7,1,5,2,6,3,2,1,5,7,
-                 5,6,6,7,5,0,6,1,5,1};
-
-                List<int> v3PaletteIndices = new List<int>()
-                {7,1,5,4,4,5,4,4,6,9,
-                 0,2,6,7,7,2,5,7,1,3,
-                 7,3,7,5,1,7,1,5,6,2,
-                 4,7,6,5,3,6,5,1,6,1,
-                 0,0,4,7,6,5,1,1,8,2};
-
-                List<int> v4PaletteIndices = new List<int>()
-                {7,0,4,3,3,1,7,2,5,2,
-                 1,2,1,2,5,0,5,9,6,6,
-                 1,1,4,7,7,0,7,1,7,1,
-                 0,1,1,4,7,5,5,9,5,7,
-                 1,7,4,6,1,0,5,1,5,4,
-                 0,4,5,5,5,5,0,7,2,3,
-                 0,3,5,7,4,1,4,7,5,2,
-                 7,4,1,6,8,1,5,0,4,7,
-                 5,1,4,7,4,2,7,6,6,2};
-
-                List<int> v5PaletteIndices = new List<int>()
-                {6,4,4,7,2,2,7,2,
-                 5,4,0,9,9,1,2,2,1,7 };
-
-                List<List<int>> vowelPaletteIndices = new List<List<int>>();
-                vowelPaletteIndices.Add(v1PaletteIndices);
-                vowelPaletteIndices.Add(v2PaletteIndices);
-                vowelPaletteIndices.Add(v3PaletteIndices);
-                vowelPaletteIndices.Add(v4PaletteIndices);
-                vowelPaletteIndices.Add(v5PaletteIndices);
-                return vowelPaletteIndices;
-            }
-        }
-        /// <summary>
-        /// the msPosition (with respect to the beginning of its verse) of each syllable's MomentDef.
-        /// </summary>
-        private List<List<int>> MomentDefMsPositionsPerVerse
+        private List<List<int>> MomentDefMsWidthPerVerse
         {
             get
             {
                 List<int> verse1 = new List<int>()
-                {0,1230,1774,2079,3142,3540,3838,4154,4799,5152,
-                 7271,7725,8712,9080,9393,9832,10313,10649,11826,12215,
-                 13409,13859,14218,14535,15176,15534,15928,16208,16544,16901,
-                 17619,18104,18858,19189,19953,20314,20605,20937,21337,21735,
-                 22680,23675,24037,24328,24592,24888,25282,25662,26235,26619};
+                {2962,1189,410,2371,584,366,363,890,380,3225,
+                 836,1807,440,373,601,396,302,1451,410,1282,
+                 431,413,655,1424,356,672,367,818,380,654,
+                 329,1512,551,934,329,480,635,414,441,1857,
+                 1288,585,574,481,335,329,180,937,614,1102};
 
                 List<int> verse2 = new List<int>()
-                {0,1200,1947,2302,3892,4326,5039,5301,5618,5967,
-                 6431,6816,7066,7355,7611,7944,8293,8756,9121,9502,
-                 10506,11319,11568,11806,12466,12793,13167,13579,13898,14231,
-                 15712,16511,16808,17110,18315,18657,19025,19364,19736,20191,
-                 21475,21916,22492,23187,23554,23938,24546,24862,25225,25692};
+                {1739,1074,291,1986,634,847,313,530,693,693,
+                 347,462,462,400,351,758,473,680,678,1607,
+                 1209,333,277,836,453,544,589,588,266,2018,
+                 1290,275,294,1274,400,668,439,347,274,1427,
+                 326,679,693,365,269,532,292,578,284,1149};
 
                 List<int> verse3 = new List<int>()
-                {0,1678,2610,3435,5261,5712,6661,7443,7951,8630,
-                 9886,10580,11239,12011,12630,13095,13738,14451,14927,15514,
-                 18144,19142,19472,19800,20359,20703,21915,22288,22753,23266,
-                 25223,25831,26411,26781,27572,28383,28803,29303,30169,30735,
-                 32698,33151,33603,33985,34723,35121,35596,36231,36964,37446};
+                {1914,1233,384,3223,500,846,650,652,484,1830,
+                 875,484,757,493,321,757,835,503,477,3537,
+                 1140,438,375,509,406,1280,384,529,247,2103,
+                 777,449,462,546,978,520,122,742,518,2595,
+                 573,438,371,590,326,623,424,417,436,762};
 
                 List<int> verse4 = new List<int>()
-                {0,931,1262,1570,1935,2480,2776,3096,3527,4035,
-                 5511,6018,6569,6865,7228,8134,8421,8702,9006,9402,
-                 10118,10506,10810,11140,11424,11942,12209,12511,13093,13523,
-                 14417,14848,15500,15828,16117,16378,16643,17227,17857,18217,
-                 20356,21410,21783,22155,22900,23256,23623,23884,24163,24477,
-                 25901,26330,27170,27487,27752,28021,28514,28851,29847,30202,
-                 30871,31217,31528,31890,32589,33419,33776,34052,34319,34628,
-                 34898,35177,35478,35899,36367,36824,37559,38875,39190,39551,
-                 40438,40771,41062,41371,42030,42400,43001,43363,43636,43987};
-
+                {699,346,395,521,382,263,175,295,806,1799,
+                 616,434,416,213,1441,395,105,416,599,670,
+                 380,501,318,218,490,259,287,501,280,1116,
+                 446,921,318,401,355,156,354,216,321,4209,
+                 572,599,670,829,354,659,460,360,259,820,
+                 527,714,444,308,170,706,599,1100,580,723,
+                 394,406,175,839,622,522,351,372,340,388,
+                 170,363,213,625,501,365,1823,361,576,604,
+                 259,478,401,1159,266,921,266,337,501,933};
+                
                 List<int> verse5 = new List<int>()
-                {0,478,1697,2091,2414,2786,3160,3676,
-                 5922,6415,7412,7844,8311,8759,9434,10184,11024,12595};
+                {812,861,758,500,420,406,528,2396,
+                 604,1630,621,851,681,1615,1595,1438,2374,6843};
 
                 List<List<int>> returnList = new List<List<int>>();
                 returnList.Add(verse1);
@@ -276,47 +220,49 @@ namespace Moritz.AssistantComposer
             }
         }
         /// <summary>
-        /// returns the msDuration of each syllable's MidiChordDef.
+        /// Returns the msDuration of each syllable's MidiChordDef.
+        /// If this value is less than the corresponding moment.MsWidth,
+        /// The chord, which is at the beginning of the moment, is followed by a rest.
         /// </summary>
         private List<List<int>> MidiChordDefMsDurationsPerVerse
         {
             get
             {
                 List<int> verse1 = new List<int>()
-                {866,544,305,839,398,298,316,645,353,1172,
-                 454,329,368,313,439,481,336,392,389,1194,
-                 450,359,317,641,358,394,280,336,357,718,
-                 485,661,331,764,361,291,332,400,398,945,
-                 995,362,291,264,296,394,380,573,384,1271};
+                {1716,1189,410,856,584,366,363,890,380,1364,
+                 836,1251,440,373,601,396,302,699,410,1282,
+                 431,413,655,591,356,672,367,818,380,654,
+                 329,897,551,934,329,480,635,414,441,876,
+                 1288,585,574,481,335,329,180,937,614,1102};
 
                 List<int> verse2 = new List<int>()
-                {781,747,355,852,434,597,262,317,349,464,
-                 385,250,289,256,333,349,463,365,381,789,
-                 813,249,238,660,327,374,412,319,333,911,
-                 799,297,302,915,342,368,339,372,455,1009,
-                 441,576,695,367,384,608,316,363,467,1323};
+                {929,1074,291,1015,634,847,313,530,693,693,
+                 347,462,462,400,351,758,473,680,678,693,
+                 1209,333,277,836,453,544,589,588,266,1402,
+                 1290,275,294,668,400,668,439,347,274,889,
+                 326,679,693,365,269,532,292,578,284,1149};
 
                 List<int> verse3 = new List<int>()
-                {1177,932,825,1299,451,949,782,508,679,1256,
-                 694,659,772,619,465,643,713,476,587,1526,
-                 998,330,328,559,344,1212,373,465,513,957,
-                 608,580,370,791,811,420,500,866,566,1262,
-                 453,452,382,738,398,475,635,733,482,1437};
+                {1342,1233,384,1140,500,846,650,652,484,1153,
+                 875,484,757,493,321,757,835,503,477,987,
+                 1140,438,375,509,406,1280,384,529,247,896,
+                 777,449,462,546,978,520,122,742,518,993,
+                 573,438,371,590,326,623,424,417,436,762};
 
                 List<int> verse4 = new List<int>()
-                {931,331,308,365,545,296,320,431,508,1003,
-                 507,551,296,363,906,287,281,304,396,716,
-                 388,304,330,284,518,267,302,582,430,894,
-                 431,652,328,289,261,265,584,630,360,1129,
-                 1054,373,372,745,356,367,261,279,314,474,
-                 429,840,317,265,269,493,337,856,355,669,
-                 346,311,362,699,830,357,276,267,309,270,
-                 279,301,421,468,457,735,880,315,361,887,
-                 333,291,309,659,370,601,362,273,351,1638};
+                {699,346,395,521,382,263,175,295,806,918,
+                 616,434,416,213,1441,395,105,416,599,670,
+                 380,501,318,218,490,259,287,501,280,1116,
+                 446,921,318,401,355,156,354,216,321,939,
+                 572,599,670,829,354,659,460,360,259,820,
+                 527,714,444,308,170,706,599,591,580,723,
+                 394,406,175,839,622,522,351,372,340,388,
+                 170,363,213,625,501,365,410,361,576,604,
+                 259,478,401,1159,266,921,266,337,501,933};
 
                 List<int> verse5 = new List<int>()
-                {478,1219,394,323,372,374,516,1322,
-                 493,997,432,467,448,675,750,840,816,3183};
+                {812,861,758,500,420,406,528,1195,
+                 604,1630,621,851,681,1615,1595,1438,1111,6843};
 
                 List<List<int>> returnList = new List<List<int>>();
                 returnList.Add(verse1);
@@ -376,7 +322,7 @@ namespace Moritz.AssistantComposer
                 List<string> verse5 = new List<string>()
                 {
                     "Give", "ear", "ye", "God-", "dess-", "es", "of", "Hell!",
-                    "A", "dream", "that", "once", "was", "Cly-", "tem-", "nes-", "tra", "calls!"
+                    "A", "dream", "that", "once", "was", "Cly-", "tam-", "nes-", "tra", "calls!"
                 };
 
                 List<List<string>> lyrics = new List<List<string>>();
