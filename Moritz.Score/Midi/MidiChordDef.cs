@@ -123,7 +123,7 @@ namespace Moritz.Score.Midi
             this._ornamentNumberSymbol = original.OrnamentNumberSymbol;
             this._pitchWheelDeviation = original.PitchWheelDeviation;
             this._midiHeadSymbols = original.MidiHeadSymbols;
-            this._midiVelocitySymbol = original.MidiVelocitySymbol;
+            this._midiVelocity = original.MidiVelocity;
             this._minimumBasicMidiChordMsDuration = original.MinimumBasicMidiChordMsDuration;
 
             BasicMidiChordDefs = original.BasicMidiChordDefs;
@@ -329,8 +329,8 @@ namespace Moritz.Score.Midi
 
         public List<byte> MidiHeadSymbols { get { return _midiHeadSymbols; } }
         protected List<byte> _midiHeadSymbols = null;
-        public byte MidiVelocitySymbol { get { return _midiVelocitySymbol; } }
-        protected byte _midiVelocitySymbol;
+        public byte MidiVelocity { get { return _midiVelocity; } }
+        protected byte _midiVelocity;
         public int OrnamentNumberSymbol { get { return _ornamentNumberSymbol; } }
         protected int _ornamentNumberSymbol = 0;
         public string Lyric { get { return _lyric; } set { _lyric = value; } }

@@ -314,10 +314,10 @@ namespace Moritz.Score.Notation
             {
                 ChordSymbol chordSymbol = new ChordSymbol(voice, lmdd, minimumCrotchetDuration, musicFontHeight);
 
-                if(midiChordDef.MidiVelocitySymbol != currentVelocity)
+                if(midiChordDef.MidiVelocity != currentVelocity)
                 {
-                    chordSymbol.AddDynamic(midiChordDef.MidiVelocitySymbol, currentVelocity);
-                    currentVelocity = midiChordDef.MidiVelocitySymbol;
+                    chordSymbol.AddDynamic(midiChordDef.MidiVelocity, currentVelocity);
+                    currentVelocity = midiChordDef.MidiVelocity;
                 }
                 durationSymbol = chordSymbol;
             }

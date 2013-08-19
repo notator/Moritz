@@ -29,7 +29,7 @@ namespace Moritz.AssistantComposer
             BasicChordSettings bcs = krystalPalette.BasicChordSettings;
             BasicMidiChordDef rootChord = new ComposableBasicMidiChordDef(krystalPalette, valueIndex);
             _midiHeadSymbols = rootChord.Notes;
-            _midiVelocitySymbol = bcs.Velocities[valueIndex];
+            _midiVelocity = bcs.Velocities[valueIndex];
             if(krystalPalette.OrnamentNumbers != null && krystalPalette.OrnamentNumbers.Count > 0)
                 _ornamentNumberSymbol = krystalPalette.OrnamentNumbers[valueIndex];
 

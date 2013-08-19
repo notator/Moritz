@@ -33,6 +33,7 @@ namespace Moritz.AssistantComposer
             List<List<int>> momentDefMsWidthPerVerse = MomentDefMsWidthPerVerse;
             List<List<int>> midiChordDefMsDurPerVerse = MidiChordDefMsDurationsPerVerse;
             List<List<string>> lyricsPerVerse = LyricsPerVerse;
+            List<byte> verseVelocities = new List<byte>() { (byte)60, (byte)75, (byte)90, (byte)105, (byte)120 };
 
             for(int verseIndex = 0; verseIndex < 5; ++verseIndex)
             {
@@ -44,9 +45,8 @@ namespace Moritz.AssistantComposer
 
                 List<MomentDef> momentDefs = new List<MomentDef>();
                 _momentDefsListPerVerse.Add(momentDefs);
-
-                List<byte> velocity = new List<byte>() { (byte)127 };
-
+                List<byte> velocity = new List<byte>() { verseVelocities[verseIndex] };
+ 
                 for(int syllableIndex = 0; syllableIndex < momentMsWidth.Count; ++syllableIndex)
                 {
                     Debug.Assert(midiChordMsDur[syllableIndex] <= momentMsWidth[syllableIndex]);
@@ -176,7 +176,7 @@ namespace Moritz.AssistantComposer
                 List<int> verse1 = new List<int>()
                 {2962,1189,410,2371,584,366,363,890,380,3225,
                  836,1807,440,373,601,396,302,1451,410,1282,
-                 431,413,655,1424,356,672,367,818,380,654,
+                 431,413,655,1424,356,672,367,531,487,706,
                  329,1512,551,934,329,480,635,414,441,1857,
                  1288,585,574,481,335,329,180,937,614,1102};
 
@@ -231,7 +231,7 @@ namespace Moritz.AssistantComposer
                 List<int> verse1 = new List<int>()
                 {1716,1189,410,856,584,366,363,890,380,1364,
                  836,1251,440,373,601,396,302,699,410,1282,
-                 431,413,655,591,356,672,367,818,380,654,
+                 431,413,655,591,356,672,367,531,487,706,
                  329,897,551,934,329,480,635,414,441,876,
                  1288,585,574,481,335,329,180,937,614,1102};
 
@@ -283,7 +283,7 @@ namespace Moritz.AssistantComposer
                 {
                     "What!", "Slum-", "ber", "ye?", "Is", "this", "a", "time", "to", "sleep?",
                     "While", "I,", "dis-", "hon-", "oured", "by", "the", "dead,", "re-", "proached",
-                    "Un-", "ceas-","ing-", "ly,", "be-", "cause", "in", "right-", "eous", "rage",
+                    "Un-", "ceas-","ing-", "ly,", "be-", "cause", "in", "righ-", "teous", "rage",
                     "I", "slew,", "am", "doomed", "to", "wan-", "der", "in", "dis-", "grace",
                     "Shunned", "e-", "ven", "by", "the", "de-", "ni-", "zens", "of", "Hell."
                 };

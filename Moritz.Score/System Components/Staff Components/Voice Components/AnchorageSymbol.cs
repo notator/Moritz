@@ -50,40 +50,39 @@ namespace Moritz.Score
         /// </summary>
         public byte Velocity = 0;
 
-        public void AddDynamic(float velocityPercent, float currentVelocityPercent)
+        public void AddDynamic(byte midiVelocity, byte currentVelocity)
         {
-            if(velocityPercent != currentVelocityPercent)
+            if(midiVelocity != currentVelocity)
             {
                 string dynamicString = "";
                 #region get dynamicString and _dynamic
-                float midiVelocity = velocityPercent * 1.27F;
                 // note that cLicht has pppp and ffff, but these dynamics are not used here (in Study2)
                 // These are the dynamicStrings for cLicht
-                if(midiVelocity > 120F)
+                if(midiVelocity > 112F)
                 {
                     dynamicString = "Ï";
                 }
-                else if(midiVelocity > 110.01F)
+                else if(midiVelocity > 96)
                 {
                     dynamicString = "ƒ";
                 }
-                else if(midiVelocity > 85.01F)
+                else if(midiVelocity > 80)
                 {
                     dynamicString = "f";
                 }
-                else if(midiVelocity > 60.01F)
+                else if(midiVelocity > 64)
                 {
                     dynamicString = "F";
                 }
-                else if(midiVelocity > 40.01F)
+                else if(midiVelocity > 48)
                 {
                     dynamicString = "P";
                 }
-                else if(midiVelocity > 32.01F)
+                else if(midiVelocity > 32)
                 {
                     dynamicString = "p";
                 }
-                else if(midiVelocity > 20.01F)
+                else if(midiVelocity > 16)
                 {
                     dynamicString = "π";
                 }

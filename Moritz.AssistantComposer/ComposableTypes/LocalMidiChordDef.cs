@@ -32,7 +32,7 @@ namespace Moritz.AssistantComposer
             _msDuration = mcd.MsDuration;
             _volume = mcd.Volume;
 
-             _midiVelocitySymbol = mcd.MidiVelocitySymbol;
+             _midiVelocity = mcd.MidiVelocity;
             _ornamentNumberSymbol = mcd.OrnamentNumberSymbol;
             _midiHeadSymbols = new List<byte>(mcd.MidiHeadSymbols);
 
@@ -89,7 +89,7 @@ namespace Moritz.AssistantComposer
             _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 
             _midiHeadSymbols = pitches;
-            _midiVelocitySymbol = velocities[0];
+            _midiVelocity = velocities[0];
             _ornamentNumberSymbol = 0;
 
             MidiChordSliderDefs = null;
@@ -118,7 +118,7 @@ namespace Moritz.AssistantComposer
             _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 
             _midiHeadSymbols = pitches;
-            _midiVelocitySymbol = velocities[0];
+            _midiVelocity = velocities[0];
             _ornamentNumberSymbol = 0;
 
             MidiChordSliderDefs = null;
@@ -365,7 +365,7 @@ namespace Moritz.AssistantComposer
         // This class is saved as an individual chordDef in SVG files,
         // so it allows ALL its fields to be set, even after construction.
         public new List<byte> MidiHeadSymbols { set { _midiHeadSymbols = value; } }
-        public new byte MidiVelocitySymbol { set { _midiVelocitySymbol = value; } }
+        public new byte MidiVelocitySymbol { set { _midiVelocity = value; } }
         public new int OrnamentNumberSymbol { set { _ornamentNumberSymbol = value; } }
         public new byte? Bank { set { _bank = value; } }
         public new byte? Patch { set { _patch = value; } }

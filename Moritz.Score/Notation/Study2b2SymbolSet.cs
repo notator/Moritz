@@ -157,9 +157,9 @@ namespace Moritz.Score.Notation
             {
                 Study2b2ChordSymbol study2b2ChordSymbol = new Study2b2ChordSymbol(voice, lmdd, minimumCrotchetDuration, musicFontHeight);
 
-                if(midiChordDef.MidiVelocitySymbol != currentVelocity)
+                if(midiChordDef.MidiVelocity != currentVelocity)
                 {
-                    currentVelocity = midiChordDef.MidiVelocitySymbol;
+                    currentVelocity = midiChordDef.MidiVelocity;
                 }
 
                 study2b2ChordSymbol.FontHeight = study2b2ChordSymbol.FontHeight * (0.5F + (currentVelocity / 200F));
