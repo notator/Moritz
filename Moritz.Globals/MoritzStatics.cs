@@ -31,7 +31,9 @@ namespace Moritz.Globals
             MoritzKrystalScoreSettingsExtension = ".mkss";
 
             string myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            MoritzFolder = myDocuments + @"Moritz";
+            //MoritzFolder = myDocuments + @"Moritz";
+            // MoritzFolder moved to C:, 9th September 2013
+            MoritzFolder = @"C:\Moritz";
 
             MoritzXMLSchemasFolder = "http://james-ingram-act-two.de/open-source/XMLSchemas";
             MoritzFlashPlayerFolder = "http://james-ingram-act-two.de";
