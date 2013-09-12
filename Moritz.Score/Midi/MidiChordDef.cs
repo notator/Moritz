@@ -302,18 +302,16 @@ namespace Moritz.Score.Midi
         {
             List<int> relativeDurations = GetBasicMidiChordDurations(bmcd);
             List<int> msDurations = GetDurations(msOuterDuration, relativeDurations, minimumMsDuration);
-            // msDurations count can be less than bmcd.Count
+            
+            // msDurations.Count can be less than bmcd.Count
 
             List<BasicMidiChordDef> rList = new List<BasicMidiChordDef>();
-            int i = 0;
             BasicMidiChordDef b;
-            while(rList.Count < msDurations.Count)
+            for(int i = 0; i < msDurations.Count; ++i)
             {
                 b = bmcd[i];
                 rList.Add(new BasicMidiChordDef(msDurations[i], b.BankIndex, b.PatchIndex, b.HasChordOff, b.Notes, b.Velocities));
             }
-
-            Debug.Assert(rList.Count == msDurations.Count);
 
             return rList;
         }
