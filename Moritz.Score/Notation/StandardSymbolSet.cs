@@ -522,6 +522,7 @@ namespace Moritz.Score.Notation
         }
         /// <summary>
         /// Returns the first chordSymbol or restSymbol after the first cautionaryChordSymbol.
+        /// If there are cautionaryChordSymbols between the first and the returned chordSymbol or restSymbol, they are rendered invisible.
         /// Null is returned if no chordSymbol or RestSymbol is found in the noteObjects.
         /// </summary>
         /// <param name="noteObjects"></param>
@@ -529,17 +530,24 @@ namespace Moritz.Score.Notation
         private DurationSymbol GetFollowingChordOrRestSymbol(List<NoteObject> noteObjects)
         {
             DurationSymbol durationSymbol = null;
-            bool chord1Found = false;
+            bool firstCautionaryChordSymbolFound = false;
             foreach(NoteObject noteObject in noteObjects)
             {
-                if(chord1Found == false && noteObject is CautionaryChordSymbol)
+                if(firstCautionaryChordSymbolFound == false && noteObject is CautionaryChordSymbol)
                 {
-                    chord1Found = true;
+                    firstCautionaryChordSymbolFound = true;
                     continue;
                 }
 
-                if(chord1Found)
+                if(firstCautionaryChordSymbolFound)
                 {
+                    CautionaryChordSymbol followingCautionary = noteObject as CautionaryChordSymbol;
+                    if(followingCautionary != null)
+                    {
+                        followingCautionary.Visible = false;
+                        continue;
+                    }
+
                     ChordSymbol chordSymbol = noteObject as ChordSymbol;
                     if(chordSymbol != null)
                         durationSymbol = chordSymbol;
@@ -613,7 +621,7 @@ namespace Moritz.Score.Notation
 
                             chord1.ChordMetrics.NoteheadExtendersMetrics =
                                 CreateExtenders(x1s, x2s, ys, extenderStrokeWidth, gap, drawExtender);
-                            break;
+                            //break;
                         }
                     }
                     else
@@ -631,11 +639,18 @@ namespace Moritz.Score.Notation
                 List<NoteObject> noteObjects = voice.NoteObjects;
                 ChordSymbol lastChord = null;
                 RestSymbol lastRest = null;
+                CautionaryChordSymbol cautionary = null;
                 for(int index = noteObjects.Count - 1; index >= 0; --index)
                 {
                     lastChord = noteObjects[index] as ChordSymbol;
                     lastRest = noteObjects[index] as RestSymbol;
-                    if(lastChord != null || lastRest != null)
+                    cautionary = noteObjects[index] as CautionaryChordSymbol;
+                    if(cautionary != null)
+                    {
+                        cautionary.Visible = false;
+                        // a CautionaryChordSymbol is a ChordSymbol, but we have not found a real one yet. 
+                    }
+                    else if(lastChord != null || lastRest != null)
                         break;
                 }
 

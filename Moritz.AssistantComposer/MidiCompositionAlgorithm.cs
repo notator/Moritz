@@ -111,7 +111,8 @@ namespace Moritz.AssistantComposer
                 secondBar.Add(secondBarVoice);
                 foreach(LocalizedMidiDurationDef lmdd in voice.LocalizedMidiDurationDefs)
                 {
-                    int lmddEndPos = lmdd.MsPosition + lmdd.MsDuration;
+                    int lmddMsDuration = (lmdd.MsDurationToNextBarline == null) ? lmdd.MsDuration : (int) lmdd.MsDurationToNextBarline;
+                    int lmddEndPos = lmdd.MsPosition + lmddMsDuration;
                     if(lmdd.MsPosition >= absoluteSplitPos)
                     {
                         Debug.Assert(lmddEndPos <= originalBarEndPos);

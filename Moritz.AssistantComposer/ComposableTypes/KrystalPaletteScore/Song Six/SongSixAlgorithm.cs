@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System;
 
 using Moritz.Score;
 using Moritz.Score.Midi;
-using Moritz.Globals;
 using Krystals4ObjectLibrary;
 
 namespace Moritz.AssistantComposer
@@ -14,9 +14,6 @@ namespace Moritz.AssistantComposer
     /// </summary>
     internal class SongSixAlgorithm : MidiCompositionAlgorithm
     {
-        /// <summary>
-        /// The Song6Algorithm uses neither krystals nor palettes.
-        /// </summary>
         public SongSixAlgorithm(List<Krystal> krystals, List<PaletteDef> paletteDefs)
             : base(krystals, paletteDefs)
         {
@@ -27,7 +24,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         public override List<byte> MidiChannels()
         {
-            return new List<byte>() { 0 };
+            return new List<byte>() { 0, 1 };
         }
 
         /// <summary>
@@ -43,30 +40,36 @@ namespace Moritz.AssistantComposer
         public override List<List<Voice>> DoAlgorithm()
         {
             List<List<Voice>> bars = new List<List<Voice>>();
-            int clytemnestrasChannelIndex = 0;
+            int nBirdVoices = 0; // birds have not yet been composed. Set this value later to the correct value.
+            int clytemnestrasChannelIndex = nBirdVoices;
+            int topWindChannelIndex = clytemnestrasChannelIndex + 1;
 
-            // The blockMsDurations at positions 1,3,5,7,9,11 will probably be changed by birds and/or winds.
-            // They have been set here for tesing purposes during the composition of Clytemnestra.
+            // The blockMsDurations at positions 1,3,5,7,9,11 will be changed here later to better reflect the content of the Winds and Birds.
+            // They have been set here for tesing purposes while composing Clytemnestra.
             // Clytemnestra sets the durations of blocks 2,4,6,8,10
-            List<int> blockMsDurations = new List<int>(){8000,0,8000,0,8000,0,8000,0,8000,0,8000};
+            List<int> blockMsDurations = new List<int>(){20000,0,8000,0,8000,0,8000,0,8000,0,8000};
 
             // Clytemnestra sets the durations of blocks 2,4,6,8,10
             Clytemnestra clytemnestra = new Clytemnestra(clytemnestrasChannelIndex, blockMsDurations);
 
-            // compose other momentDefs here (using blockMsDurations)
-            // Birds birds = new Birds(_paletteDefs, out blockDurations);
-            // Winds winds = new Winds(_paletteDefs, out blockdurations);
+            // The durations of the Winds are adjusted to the blockMsDurations
+            Winds winds = new Winds(_krystals, _paletteDefs, topWindChannelIndex, blockMsDurations);
+            //Birds birds = new Birds(_krystals, _paletteDefs, nBirdVoices, blockMsDurations);
 
             List<int> blockMsPositions = GetBlockPositions(blockMsDurations); // for convenience...
 
             Voice clytemnestrasVoice = GetClytemnestrasVoice(clytemnestra.MomentDefsListPerVerse, blockMsPositions, blockMsDurations);
-            // List<Voice> birdsVoices = GetBirdsVoices(birds.MomentDefListPerVoicePerBlock, blockMsPositions, blockMsDurations);
-            // List<Voice> windsVoices = GetWindsVoices(winds.MomentDefListPerVoicePerBlock, blockMsPositions, blockMsDurations);
 
             List<Voice> wholePiece = new List<Voice>();
+            //foreach(Voice voice in birds.Voices)
+            //{
+            //    wholePiece.Add(voice);
+            //} 
             wholePiece.Add(clytemnestrasVoice);
-            // add birdsVoices
-            // add windsVoices 
+            foreach(Voice voice in winds.Voices)
+            {
+                wholePiece.Add(voice);
+            } 
 
             List<int> barlineMsPositions = GetBarlineMsPositions(blockMsDurations, clytemnestra.BarlineMsPositionsPerBlock
                 //, birds.BarlineMsPositionsPerBlock,
@@ -77,8 +80,8 @@ namespace Moritz.AssistantComposer
             // It does however contain the positions of the other barlines that begin blocks.
 
             bars = GetBars(wholePiece, barlineMsPositions);
-
-            //Debug.Assert(bars.Count == NumberOfBars());
+            Console.WriteLine("bars.Count = " + bars.Count.ToString());
+            Debug.Assert(bars.Count == NumberOfBars());
 
             return bars;
         }
@@ -244,7 +247,7 @@ namespace Moritz.AssistantComposer
         /// <returns></returns>
         public override int NumberOfBars()
         {
-            return 1;
+            return 84;
         }
     }
 }

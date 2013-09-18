@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -282,6 +283,50 @@ namespace Moritz.Score
             }
             return beamBlocks;
         }
+
+        #region LocalizedMidiDurationDef list utilities
+        /// This is a utility function for adjusting the duration of _any_ list of LocalizedMidiDurationDefs.
+        /// The list does not have to belong to any particular voice, but it must contain a sequence of LocalizedMidiDurationDefs whose
+        /// MsPosition and MsDuration fields have been set. 
+        /// This function stretches or compresses the whole list of LocalizedMidiDurationDef so that it has the totalMsDuration.
+        /// The MsPosition of the first LocalizedMidiDurationDef in the list remains as it is, the other MsPositions are re-calculated.
+        /// The MsDurations are then re-calculated from the new MsPositions.
+        /// The final lmdd's MsDuration is set to totalMsDuration - finalLMDD.MsPosition.
+        public static void SetLMDDListMsDuration(List<LocalizedMidiDurationDef> lmdds, int totalMsDuration)
+        {
+            LocalizedMidiDurationDef lastLmdd = lmdds[lmdds.Count - 1];
+            int currentTotalDuration = lastLmdd.MsPosition + lastLmdd.MsDuration;
+            int firstPosition = lmdds[0].MsPosition;
+            float factor = ((float)totalMsDuration / (float)currentTotalDuration);
+
+            foreach(LocalizedMidiDurationDef lmdd in lmdds)
+            {
+                lmdd.MsPosition = (int)(firstPosition + ((lmdd.MsPosition - firstPosition) * factor));
+            }
+            for(int i = 1; i < lmdds.Count; ++i)
+            {
+                lmdds[i - 1].MsDuration = lmdds[i].MsPosition - lmdds[i - 1].MsPosition;
+                //Console.WriteLine("MsPosition=" + lmdds[i - 1].MsPosition.ToString() + "  MsDuration=" + lmdds[i - 1].MsDuration.ToString());
+            }
+            lastLmdd.MsDuration = totalMsDuration - (lastLmdd.MsPosition - firstPosition);
+            //Console.WriteLine("MsPosition=" + lastLmdd.MsPosition.ToString() + "  MsDuration=" + lastLmdd.MsDuration.ToString());
+        }
+
+        /// This is a utility function for adjusting the msPosition of _any_ list of LocalizedMidiDurationDefs.
+        /// The list does not have to belong to any particular voice, but it must contain a sequence of LocalizedMidiDurationDefs whose
+        /// MsPosition and MsDuration fields have been set consistently.
+        /// This function simply shifts the position of each lmdd in the list by (initialMsPosition - lmdds[0].MsPosition).
+        /// It does not change the lmdd.MsDuration fields.
+        public static void SetLMDDListMsPosition(List<LocalizedMidiDurationDef> lmdds, int msPosition)
+        {
+            int positionShift = msPosition - lmdds[0].MsPosition;
+            foreach(LocalizedMidiDurationDef lmdd in lmdds)
+            {
+                lmdd.MsPosition += positionShift;
+            }
+        }
+
+        #endregion
 
         #region Enumerators
         public IEnumerable AnchorageSymbols
