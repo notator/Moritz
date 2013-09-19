@@ -480,6 +480,13 @@ namespace Moritz.Score.Notation
                     List<float> ys = cautionaryChordSymbol.ChordMetrics.HeadsOriginYs;
                     List<float> x1s = GetEqualFloats(clefMetrics.Right - (hairlinePadding * 2), ys.Count);
                     List<float> x2s = GetEqualFloats(cbMetrics[0].Left, ys.Count);
+                    for(int i = 0; i < x2s.Count; ++i)
+                    {
+                        if((x2s[i] - x1s[i]) < gap)
+                        {
+                            x1s[i] = x2s[i] - gap;
+                        }
+                    }
                     cautionaryChordSymbol.ChordMetrics.NoteheadExtendersMetricsBefore =
                         CreateExtenders(x1s, x2s, ys, extenderStrokeWidth, gap, true);
 
@@ -674,16 +681,17 @@ namespace Moritz.Score.Notation
             Debug.Assert(ys.Count == x1s.Count);
             Debug.Assert(ys.Count == x2s.Count);
             Debug.Assert(ys.Count > 0);
+
             List<NoteheadExtenderMetrics> noteheadExtendersMetrics = new List<NoteheadExtenderMetrics>();
             for(int i = 0; i < ys.Count; ++i)
             {
-                //if((x2s[i] - x1s[i]) > gap)
-                //{
+                if((x2s[i] - x1s[i]) > (gap / 2))
+                {
                     NoteheadExtenderMetrics nem =
                         new NoteheadExtenderMetrics(x1s[i], x2s[i], ys[i], extenderStrokeWidth, gap, drawExtender);
 
                     noteheadExtendersMetrics.Add(nem);
-                //}
+                }
             }
             return noteheadExtendersMetrics;
         }
@@ -746,6 +754,7 @@ namespace Moritz.Score.Notation
                     && y <= (accidentalMetrics.Bottom + verticalPadding))
                         x2 = x2 < accidentalMetrics.Left ? x2 : accidentalMetrics.Left;
                 }
+                x2 = x2 < float.MaxValue ? x2 : chord2Metrics.Left;
                 x2s.Add(x2 - hairlinePadding);
             }
 
