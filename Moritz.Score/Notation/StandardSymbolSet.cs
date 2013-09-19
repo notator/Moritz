@@ -302,7 +302,7 @@ namespace Moritz.Score.Notation
             ref byte currentVelocity)
         {
             DurationSymbol durationSymbol = null;
-            MidiChordDef midiChordDef = lmdd.MidiChordDef;
+            MidiChordDef midiChordDef = lmdd.LocalMidiChordDef;
             OverlapLmddAtStartOfBar olaso = lmdd as OverlapLmddAtStartOfBar;
 
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;

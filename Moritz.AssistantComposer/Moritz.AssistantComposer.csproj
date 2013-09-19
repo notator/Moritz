@@ -69,7 +69,7 @@
       <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
     </Compile>
     <Compile Include="IPaletteForm.cs" />
-    <Compile Include="MidiDefList.cs" />
+    <Compile Include="MidiDefSequence.cs" />
     <Compile Include="PaletteDef.cs" />
     <Compile Include="MidiCompositionAlgorithm.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\PaletteDemoScore\PaletteDemoAlgorithm.cs" />
@@ -92,7 +92,6 @@
       <DependentUpon>BasicPercussionControl.cs</DependentUpon>
     </Compile>
     <Compile Include="ComposableTypes\ComposableBasicMidiChordDef.cs" />
-    <Compile Include="ComposableTypes\LocalMidiChordDef.cs" />
     <Compile Include="ComposableTypes\ComposableScore.cs" />
     <Compile Include="PaletteForm.cs">
       <SubType>Form</SubType>

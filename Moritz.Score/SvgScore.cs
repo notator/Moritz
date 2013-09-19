@@ -927,7 +927,7 @@ namespace Moritz.Score
                     lastBarline = b;
             }
             LocalizedMidiDurationDef lmdd = lastChordSymbol.LocalizedMidiDurationDef;
-            LocalizedMidiDurationDef newlmdd = new LocalizedMidiDurationDef(lmdd.MidiChordDef,lmdd.MsPosition,lmdd.MsDuration - durationToSubtract);
+            LocalizedMidiDurationDef newlmdd = new LocalizedMidiDurationDef(lmdd.LocalMidiChordDef,lmdd.MsPosition,lmdd.MsDuration - durationToSubtract);
             ChordSymbol replacementChord = new ChordSymbol(voice, newlmdd, _pageFormat.MinimumCrotchetDuration, _pageFormat.MusicFontHeight);
 
             voice.NoteObjects.RemoveAt(lastChordIndex);

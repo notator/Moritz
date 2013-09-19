@@ -6,20 +6,34 @@ namespace Moritz.Score.Midi
     public class LocalizedMidiDurationDef
     {
         /// <summary>
-        /// Use the other constructor to create a rest.
+        /// The other constructor (LocalizedMidiDurationDef(int msDuration)) can be used to create a rest.
         /// </summary>
         /// <param name="midiDurationDef"></param>
         /// <param name="msDuration"></param>
         public LocalizedMidiDurationDef(MidiDurationDef midiDurationDef)
         {
-            MidiChordDef = midiDurationDef as MidiChordDef; // null if midiDurationDef is a midiRestDef
-            MsPosition = 0;
-            MsDuration = midiDurationDef.MsDuration;
+            MidiChordDef midiChordDef = midiDurationDef as MidiChordDef; // null if midiDurationDef is a midiRestDef
+            if(midiChordDef == null)
+            {
+                LocalMidiChordDef = null;
+            }
+            else
+            {
+                LocalMidiChordDef = new LocalMidiChordDef(midiChordDef); // a deep clone
+            }
+            if(midiDurationDef != null)
+            {
+                MsDuration = midiDurationDef.MsDuration;
+            }
         }
 
+        /// <summary>
+        /// This constructor can be used to construct a rest.
+        /// </summary>
+        /// <param name="msDuration"></param>
         public LocalizedMidiDurationDef(int msDuration)
         {
-            MidiChordDef = null; // null if midiDurationDef is a midiRestDef
+            LocalMidiChordDef = null; // null if midiDurationDef is a midiRestDef
             MsPosition = 0; // can be reset later
             MsDuration = msDuration;
             Debug.Assert(MsDuration > 0);
@@ -29,16 +43,16 @@ namespace Moritz.Score.Midi
         /// Used to create instances of FinalLMDDInVoice.
         /// </summary>
         public LocalizedMidiDurationDef(MidiDurationDef midiDurationDef, int msPosition, int msDuration)
+            : this(midiDurationDef)
         {
-            MidiChordDef = midiDurationDef as MidiChordDef; // null if midiDurationDef is a midiRestDef
             MsPosition = msPosition;
             MsDuration = msDuration;
         }
 
         /// <summary>
-        /// This LocalizedMidiDurationDef represents a rest if MidiChordDef==null.
+        /// This LocalMidiChordDef represents a rest if LocalMidiChordDef==null.
         /// </summary>
-        public readonly MidiChordDef MidiChordDef = null;
+        public readonly LocalMidiChordDef LocalMidiChordDef = null;
 
         /// <summary>
         /// This field is set if the chord crosses a barline. Rests never cross barlines, they are always split.

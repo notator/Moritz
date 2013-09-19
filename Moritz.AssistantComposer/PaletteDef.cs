@@ -8,7 +8,6 @@ namespace Moritz.AssistantComposer
 {
     public class PaletteDef : IEnumerable
     {
-        private List<MidiDurationDef> _midiDurationDefs = null;
         public PaletteDef(List<MidiDurationDef> midiDurationDefs)
         {
             _midiDurationDefs = new List<MidiDurationDef>();
@@ -31,6 +30,8 @@ namespace Moritz.AssistantComposer
         {
             return new PaletteEnum(_midiDurationDefs);
         }
+
+        private List<MidiDurationDef> _midiDurationDefs = null;
     }
 
     public class PaletteEnum : IEnumerator

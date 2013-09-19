@@ -29,7 +29,7 @@ namespace Moritz.AssistantComposer
             List<List<int>> kValues = krystal.GetValues((uint)1);
             List<int> sequence = kValues[0];
 
-            MidiDefList midiDefList = new MidiDefList(paletteDef, sequence);
+            MidiDefSequence midiDefSequence = new MidiDefSequence(paletteDef, sequence);
             int finalTotalDuration = 0;
             for(int i = 0; i < 11; ++i)
             {
@@ -37,9 +37,9 @@ namespace Moritz.AssistantComposer
             }
 
             // The durations of the contained LocalizedMidiDurationDefs are adjusted to the blockMsDurations
-            midiDefList.MsDuration = finalTotalDuration;
+            midiDefSequence.MsDuration = finalTotalDuration;
 
-            baseVoice.LocalizedMidiDurationDefs = midiDefList.LocalizedMidiDurationDefs;
+            baseVoice.LocalizedMidiDurationDefs = midiDefSequence.LocalizedMidiDurationDefs;
 
             return baseVoice;
         }

@@ -19,7 +19,7 @@ namespace Moritz.AssistantComposer
     ///         ...
     ///     }
     /// </summary>
-    public class MidiDefList : IEnumerable
+    public class MidiDefSequence : IEnumerable
     {
         // private enumerator class
         // see http://support.microsoft.com/kb/322022/en-us
@@ -68,7 +68,7 @@ namespace Moritz.AssistantComposer
         /// The MsPositions and MsDurations in the list are checked for consistency.
         /// </summary>
         /// <param name="lmdds"></param>
-        public MidiDefList(List<LocalizedMidiDurationDef> lmdds)
+        public MidiDefSequence(List<LocalizedMidiDurationDef> lmdds)
         {
             Debug.Assert(lmdds.Count > 0);
             for(int i = 1; i < lmdds.Count; ++i)
@@ -79,11 +79,11 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// sequence contains a list of values in range 1..numberOfMididurationDefs in the paletteDef.
+        /// sequence contains a list of values in range 1..paletteDef.MidiDurationDefsCount.
         /// </summary>
         /// <param name="paletteDef"></param>
         /// <param name="sequence"></param>
-        public MidiDefList(PaletteDef paletteDef, List<int> sequence)
+        public MidiDefSequence(PaletteDef paletteDef, List<int> sequence)
         {
             int msPosition = 0;
 
@@ -105,7 +105,7 @@ namespace Moritz.AssistantComposer
         /// Constructs a MidiDefList at MsPosition=0, containing the localized sequence of MidiDurationDefs in the PaletteDef.
         /// </summary>
         /// <param name="midiDurationDefs"></param>
-        public MidiDefList(PaletteDef midiDurationDefs)
+        public MidiDefSequence(PaletteDef midiDurationDefs)
         {
             Debug.Assert(midiDurationDefs != null);
             foreach(MidiDurationDef midiDurationDef in midiDurationDefs)

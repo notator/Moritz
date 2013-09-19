@@ -15,7 +15,7 @@ namespace Moritz.Score
             : base(voice, lmdd, minimumCrotchetDurationMS, fontSize)
         {
             _localizedMidiDurationDef = lmdd;
-            MidiChordDef midiChordDef = lmdd.MidiChordDef;
+            MidiChordDef midiChordDef = lmdd.LocalMidiChordDef;
             // midiChordDef is null for cautionary chords
             if(midiChordDef != null)
             {
@@ -74,25 +74,6 @@ namespace Moritz.Score
                 return VerticalDir.up;
         }
 
-        ///// <summary>
-        ///// Returns the maximum (positive) horizontal distance by which this chord symbol overlaps
-        ///// (any characters in) the previous noteObjectMoment (which contains barlines, rests and
-        ///// chords from both voices in a 2-voice staff).
-        ///// This function overrides the function used by rests and barlines.
-        ///// </summary>
-        ///// <param name="previousAS"></param>
-        //public virtual float OverlapWidth(NoteObjectMoment previousNOM)
-        //{
-        //    float overlap = float.MinValue;
-        //    float localOverlap = 0F;
-        //    foreach(AnchorageSymbol previousAS in previousNOM.AnchorageSymbols)
-        //    {
-        //        localOverlap = this.Metrics.OverlapWidth(previousAS);
-        //        overlap = overlap > localOverlap ? overlap : localOverlap;
-        //    }
-        //    return overlap;
-        //}
-
         public override void WriteSVG(SvgWriter w)
         {
             if(ChordMetrics.BeamBlock != null)
@@ -136,17 +117,17 @@ namespace Moritz.Score
         {
             w.WriteStartElement("score", "midiChord", null);
             w.WriteAttributeString("id", midiId);
-            string ID = LocalizedMidiDurationDef.MidiChordDef.ID; 
+            string ID = LocalizedMidiDurationDef.LocalMidiChordDef.ID; 
             if(ID != null && !(ID.StartsWith("localChord")))
             {
                 w.WriteStartElement("use");
-                w.WriteAttributeString("xlink", "href", null, "#" + LocalizedMidiDurationDef.MidiChordDef.ID);
+                w.WriteAttributeString("xlink", "href", null, "#" + LocalizedMidiDurationDef.LocalMidiChordDef.ID);
                 w.WriteEndElement(); // use
             }
             else
             {
                 Debug.Assert(LocalizedMidiDurationDef != null);
-                this.LocalizedMidiDurationDef.MidiChordDef.WriteSvg(w);
+                this.LocalizedMidiDurationDef.LocalMidiChordDef.WriteSvg(w);
             }
             w.WriteEndElement(); // midiChord
         }

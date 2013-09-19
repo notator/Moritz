@@ -148,7 +148,7 @@ namespace Moritz.Score.Notation
             ref byte currentVelocity)
         {
             DurationSymbol durationSymbol = null;
-            MidiChordDef midiChordDef = lmdd.MidiChordDef;
+            MidiChordDef midiChordDef = lmdd.LocalMidiChordDef;
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
             float musicFontHeight = pageFormat.MusicFontHeight;
             int minimumCrotchetDuration = pageFormat.MinimumCrotchetDuration;

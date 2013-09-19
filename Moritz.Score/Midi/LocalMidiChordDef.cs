@@ -4,15 +4,14 @@ using System.Diagnostics;
 using Multimedia.Midi;
 
 using Moritz.Globals;
-using Moritz.Score.Midi;
 
-namespace Moritz.AssistantComposer
+namespace Moritz.Score.Midi
 {
      //<summary>
      // A LocalMidiChordDef is saved locally in SVG files,
      // not as a 'used' reference to a MidiChordDef definition in a palette.
      //</summary>
-    internal class LocalMidiChordDef : MidiChordDef
+    public class LocalMidiChordDef : MidiChordDef
     {
         /// <summary>
         /// A deep clone of the argument
@@ -25,6 +24,7 @@ namespace Moritz.AssistantComposer
             _bank = mcd.Bank;
             _patch = mcd.Patch;
             _volume = mcd.Volume;
+            _lyric = mcd.Lyric; // this is currently not set in palettes (19.09.2013)
             _pitchWheelDeviation = mcd.PitchWheelDeviation;
             _hasChordOff = mcd.HasChordOff;
             _minimumBasicMidiChordMsDuration = mcd.MinimumBasicMidiChordMsDuration;
@@ -365,7 +365,7 @@ namespace Moritz.AssistantComposer
         // This class is saved as an individual chordDef in SVG files,
         // so it allows ALL its fields to be set, even after construction.
         public new List<byte> MidiHeadSymbols { set { _midiHeadSymbols = value; } }
-        public new byte MidiVelocitySymbol { set { _midiVelocity = value; } }
+        public new byte MidiVelocity { set { _midiVelocity = value; } }
         public new int OrnamentNumberSymbol { set { _ornamentNumberSymbol = value; } }
         public new byte? Bank { set { _bank = value; } }
         public new byte? Patch { set { _patch = value; } }
