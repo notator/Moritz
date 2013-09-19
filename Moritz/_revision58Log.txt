@@ -31,14 +31,14 @@ Javascript projects include:
 		oo	Write javascript code for reading midiChord data when the corresponding graphic object is clicked.
 
 	-- Start work on Song 6 again.
-		oo	Think about the structure, and about using MidiMelodyDefs and MidiMelodyBlocks (see below).
-			MidiMelodyDefs (which already exist as a class) could be constucted by rotating and otherwise 
-			deforming other MidiMelodyDefs (transpositions etc.). Think in terms of foreground/background 
+		oo	Think about the structure, and about using MidiDefLists and MidiMelodyBlocks (see below).
+			MidiDefLists (which already exist as a class) could be constucted by rotating and otherwise 
+			deforming other MidiDefLists (transpositions etc.). Think in terms of foreground/background 
 			(see notebook). I think I should stick with one midiChannel per voice, so all the chords in a 
-			MidiMelodyDef will always have the same channel. Multichannel MidiMelodyDefs would get too 
+			MidiDefList will always have the same channel. Multichannel MidiDefLists would get too 
 			complicated. But there could be a higher level MidiMelodyBlock class containing parallel 
-			MidiMelodyDefs. Such a class could define appropriate functions for adjusting the contained 
-			MidiMelodyDefs...
+			MidiDefLists. Such a class could define appropriate functions for adjusting the contained 
+			MidiDefLists...
 		oo	Complete the krystals and palettes by copying birdsong audio files, and maybe other audio files
 			such as recorded syllables from the Song 6 text. Possibly use slowed-down audio samples, speeding 
 			up the midi by shortening the overall duration later.
@@ -917,12 +917,12 @@ is created at the start of the voice continuation in the next bar.
 SvgSystem.MomentSymbols(): corrected the final barline position for chords which cross final staff barlines.
 This was necessary for correct justification.
 Added int? LocalizedMidiDurationDef.MsDurationToNextBarline, which is set for chords which cross barlines.
-Deleted the LocalizedMidiDurationDef.MidiMelodyDef and LocalizedMidiDurationDef.NextLMDD fields.
+Deleted the LocalizedMidiDurationDef.MidiDefList and LocalizedMidiDurationDef.NextLMDD fields.
 Deleted SvgScore.FinalizeTies().
 
 07.11.2011 rev58.91
 Beams now cross barlines within a system, but dont continue at the left or right of systems.
-They are not related to MidiMelodyDefs, but are simply as long as possible within each system.
+They are not related to MidiDefLists, but are simply as long as possible within each system.
 They are broken by rests (if rest.IsTieContinuation is false) or clefs or chords which have no beams because
 they are too long (crotchets, minims, semibreves, breves).
 
@@ -945,7 +945,7 @@ Currently, "tied" notes are notated as two chords without a graphic tie.
 MidiCompositionAlgorithm.SplitBar(): Chords and rests are now always split when they cross barlines.
 Added a pointer: LocalizedMidiDurationDef.NextTiedChord. This links the two halves of a chord which has been 
 split across a barline.
-Added a pointer from LocalizedMidiDurationDef to its containing MidiMelodyDef. This should enable beams to be
+Added a pointer from LocalizedMidiDurationDef to its containing MidiDefList. This should enable beams to be
 drawn across barlines.
 Currently, "tied" notes are notated as two chords without a tie.
 
@@ -965,16 +965,16 @@ Test3 (splitting bars) begun: Composing Bars 3 to 5 of the test file, to test ch
 barlines correctly when the bars are moved onto the same or different systems.
   
 03.11.2011 rev58.85
-Added and tested the setting of MidiMelodyDef.MsDuration.
-Added the MidiMelodyDef.EndMsPosition property. Removed all external additions of MsPosition + MsDuration.
+Added and tested the setting of MidiDefList.MsDuration.
+Added the MidiDefList.EndMsPosition property. Removed all external additions of MsPosition + MsDuration.
 Tidied up the Song6TestsAlgorithm.DoAlgorithm() code.
 
 03.11.2011 rev58.84
-Bar 2 of Song6Tests completed. TODO: add MidiMelodyDef.MsDuration set, and a MidiMelodyDef.FinalMsPos property.
+Bar 2 of Song6Tests completed. TODO: add MidiDefList.MsDuration set, and a MidiDefList.FinalMsPos property.
 Remove all additions of MsPosition + MsDuration.
 
 03.11.2011 rev58.83
-Defined a MidiMelodyDef class.
+Defined a MidiDefList class.
 
 03.11.2011 rev58.82
 Beginning to create a new algorithm using note-groups.

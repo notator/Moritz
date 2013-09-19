@@ -208,7 +208,7 @@ namespace Moritz.Score.Midi
         /// <summary>
         /// This function returns a List whose count is numberOfOrnamentChords.
         /// It also ensures that the sum of the ints in the List is exactly equal to msDuration.
-        /// This function is also used when setting the duration of a MidiMelodyDef.
+        /// This function is also used when setting the duration of a MidiDefList.
         /// </summary>
         public static List<int> GetIntDurations(int msDuration, List<int> relativeDurations, int numberOfOrnamentChords)
         {

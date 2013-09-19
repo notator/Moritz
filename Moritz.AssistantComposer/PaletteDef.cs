@@ -20,6 +20,7 @@ namespace Moritz.AssistantComposer
         }
 
         public MidiDurationDef this[int i] { get { return _midiDurationDefs[i]; } }
+        public int MidiDurationDefsCount { get { return _midiDurationDefs.Count; } }
 
         IEnumerator IEnumerable.GetEnumerator()
         {

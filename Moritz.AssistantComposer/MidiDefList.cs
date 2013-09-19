@@ -10,9 +10,16 @@ namespace Moritz.AssistantComposer
     /// <summary>
     /// A temporal sequence of LocalizedMidiDurationDef objects.
     /// The objects can define either notes or rests.
-    /// (If the LocalizedMidiDurationDef.MidiChordDef is null, the contained object is a rest.) 
+    /// (If the LocalizedMidiDurationDef.MidiChordDef is null, the contained object is a rest.)
+    /// 
+    /// This class is IEnumerable, so that foreach loops can be used.
+    /// For example:
+    ///     foreach(LocalizedMidiDurationDef lmd in midiDefList)
+    ///     {
+    ///         ...
+    ///     }
     /// </summary>
-    public class MidiMelodyDef : IEnumerable
+    public class MidiDefList : IEnumerable
     {
         // private enumerator class
         // see http://support.microsoft.com/kb/322022/en-us
@@ -56,7 +63,49 @@ namespace Moritz.AssistantComposer
             }
         }  //end nested class
 
-        public MidiMelodyDef(PaletteDef midiDurationDefs)
+        /// <summary>
+        /// The argument may not be an empty list.
+        /// The MsPositions and MsDurations in the list are checked for consistency.
+        /// </summary>
+        /// <param name="lmdds"></param>
+        public MidiDefList(List<LocalizedMidiDurationDef> lmdds)
+        {
+            Debug.Assert(lmdds.Count > 0);
+            for(int i = 1; i < lmdds.Count; ++i)
+            {
+                Debug.Assert(lmdds[i - 1].MsPosition + lmdds[i - 1].MsDuration == lmdds[i].MsPosition);
+            }
+            _localizedMidiDurationDefs = lmdds;
+        }
+
+        /// <summary>
+        /// sequence contains a list of values in range 1..numberOfMididurationDefs in the paletteDef.
+        /// </summary>
+        /// <param name="paletteDef"></param>
+        /// <param name="sequence"></param>
+        public MidiDefList(PaletteDef paletteDef, List<int> sequence)
+        {
+            int msPosition = 0;
+
+            foreach(int value in sequence)
+            {
+                Debug.Assert((value >= 1 && value <= paletteDef.MidiDurationDefsCount), "value out of range in sequence");
+                MidiDurationDef midiDurationDef = paletteDef[value - 1];
+                LocalizedMidiDurationDef noteDef = new LocalizedMidiDurationDef(midiDurationDef);
+                Debug.Assert(midiDurationDef.MsDuration > 0);
+                Debug.Assert(noteDef.MsDuration == midiDurationDef.MsDuration);
+                noteDef.MsPosition = msPosition;
+                msPosition += noteDef.MsDuration;
+                _localizedMidiDurationDefs.Add(noteDef);
+                //Console.WriteLine("MsPosition=" + noteDef.MsPosition.ToString() + "  MsDuration=" + noteDef.MsDuration.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Constructs a MidiDefList at MsPosition=0, containing the localized sequence of MidiDurationDefs in the PaletteDef.
+        /// </summary>
+        /// <param name="midiDurationDefs"></param>
+        public MidiDefList(PaletteDef midiDurationDefs)
         {
             Debug.Assert(midiDurationDefs != null);
             foreach(MidiDurationDef midiDurationDef in midiDurationDefs)
@@ -82,7 +131,7 @@ namespace Moritz.AssistantComposer
             MsPosition = _localizedMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rests 
         }
         /// <summary>
-        /// The duration of this MidiMelodyDef in milliseconds.
+        /// The duration of this MidiDefList in milliseconds.
         /// Setting this.MsDuration does not change this.MsPosition, but moves this.EndMsPosition. 
         /// </summary>
         public int MsDuration
@@ -105,7 +154,7 @@ namespace Moritz.AssistantComposer
                 }
 
                 int newMsDuration = value;
-                float factor = ((float)newMsDuration / (float)MsDuration);
+                Debug.Assert(newMsDuration > 0);
                 List<int> newDurations = MidiChordDef.GetIntDurations(newMsDuration, relativeDurations, relativeDurations.Count);
 
                 int i = 0;
@@ -133,6 +182,7 @@ namespace Moritz.AssistantComposer
             {
                 Debug.Assert(_localizedMidiDurationDefs.Count > 0);
                 int absolutePosition = value;
+                Debug.Assert(absolutePosition >= 0);
                 foreach(LocalizedMidiDurationDef lmdd in _localizedMidiDurationDefs)
                 {
                     lmdd.MsPosition = absolutePosition;
@@ -142,8 +192,6 @@ namespace Moritz.AssistantComposer
         }
         /// <summary>
         /// The absolute position of the end of the last note or rest in the sequence.
-        /// Setting this.EndMsPosition, sets this.MsDuration without changing this.MsPosition.
-        /// Setting this.EndMsPosition will fail if EndMsPosition is not greater than MsPosition. 
         /// </summary>
         public int EndMsPosition 
         { 
@@ -153,13 +201,6 @@ namespace Moritz.AssistantComposer
                 LocalizedMidiDurationDef lastLmdd = _localizedMidiDurationDefs[_localizedMidiDurationDefs.Count - 1];
                 return lastLmdd.MsPosition + lastLmdd.MsDuration; 
             }
-            set
-            {
-                int endMsPosition = value; 
-                Debug.Assert(endMsPosition > MsPosition);
-                int msDuration = endMsPosition - MsPosition;
-                MsDuration = msDuration; // sets the durations of all the contained note and rest defs
-            }
         }
 
         public IEnumerator GetEnumerator()
@@ -167,6 +208,7 @@ namespace Moritz.AssistantComposer
             return new MyEnumerator(_localizedMidiDurationDefs);
         }
 
+        public List<LocalizedMidiDurationDef> LocalizedMidiDurationDefs { get { return _localizedMidiDurationDefs; } } 
         private List<LocalizedMidiDurationDef> _localizedMidiDurationDefs = new List<LocalizedMidiDurationDef>();
     }
 }
