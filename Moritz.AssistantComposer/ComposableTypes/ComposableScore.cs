@@ -67,6 +67,10 @@ namespace Moritz.AssistantComposer
                     {
                         string id = "palette" + (paletteIndex + 1).ToString() +
                             "_chord" + (valueIndex + 1).ToString();
+                        /// A PaletteMidiChordDef is a MidiChordDef which is saved in or retreived from a palette.
+                        /// It can be 'used' in SVG files, but is usually converted to a LocalMidiChordDef
+                        /// (which is saved locally in an SVG file).
+                        /// LocalizedMidiChordDefs are LocalMidiChordDefs with MsPositon and msDuration attributes.
                         mdd = new PaletteMidiChordDef(id, palette, valueIndex);
                     }
                     midiDurationDefs.Add(mdd);

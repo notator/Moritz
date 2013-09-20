@@ -8,15 +8,17 @@ using Moritz.Score.Midi;
 
 namespace Moritz.AssistantComposer
 {
-     ///<summary>
-     /// A PaletteMidiChordDef is a MidiChordDef saved in or retreived from a palette.
-     /// It is 'used' in SVG files,
-     ///</summary>
+    ///<summary>
+    /// A PaletteMidiChordDef is a MidiChordDef which is saved in or retreived from a palette.
+    /// PaletteMidiChordDefs can be 'used' in SVG files, but are usually converted to LocalMidiChordDefs.
+    /// Related classes:
+    /// 1. A LocalMidiChordDef is a MidiChordDef which is saved locally in an SVG file.
+    /// 2. A LocalizedMidiChordDef is a LocalMidiChordDef with additional MsPositon and msDuration attributes.
+    //</summary>
     internal class PaletteMidiChordDef : MidiChordDef
     {
         /// <summary>
-        /// A PaletteMidiChordDef is a component of a PaletteDef, and has readonly fields so that
-        /// the runtime paletteDef cannot be changed inadvertently.
+        /// A PaletteMidiChordDef is a component of a PaletteDef.
         /// PaletteMidiChordDefs are saved in score:midiChord in score:midiDefs in SVG files. 
         /// </summary>
         public PaletteMidiChordDef(string chordID, Palette krystalPalette, int valueIndex)

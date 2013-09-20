@@ -7,14 +7,18 @@ using Moritz.Globals;
 
 namespace Moritz.Score.Midi
 {
-     //<summary>
-     // A LocalMidiChordDef is saved locally in SVG files,
-     // not as a 'used' reference to a MidiChordDef definition in a palette.
-     //</summary>
+    ///<summary>
+    /// A LocalMidiChordDef is a MidiChordDef which is saved locally in an SVG file.
+    /// Related classes:
+    /// 1. A PaletteMidiChordDef is a MidiChordDef which is saved in or retreived from a palette.
+    /// PaletteMidiChordDefs can be 'used' in SVG files, but are usually converted to LocalMidiChordDef.
+    /// 2. A LocalizedMidiChordDef is a LocalMidiChordDef with additional MsPositon and msDuration attributes.
+    //</summary>
     public class LocalMidiChordDef : MidiChordDef
     {
         /// <summary>
-        /// A deep clone of the argument
+        /// A deep clone of the argument. This class is saved as an individual chordDef in SVG files,
+        /// so it allows ALL its attributes to be set, even after construction.
         /// </summary>
         /// <param name="midiChordDef"></param>
         public LocalMidiChordDef(MidiChordDef mcd)
@@ -32,7 +36,7 @@ namespace Moritz.Score.Midi
             _msDuration = mcd.MsDuration;
             _volume = mcd.Volume;
 
-             _midiVelocity = mcd.MidiVelocity;
+            _midiVelocity = mcd.MidiVelocity;
             _ornamentNumberSymbol = mcd.OrnamentNumberSymbol;
             _midiHeadSymbols = new List<byte>(mcd.MidiHeadSymbols);
 
@@ -73,8 +77,7 @@ namespace Moritz.Score.Midi
         }
 
         /// <summary>
-        /// Constructor used when converting a midi file to a list of Moments.
-        /// This MidiChordDef contains a single BasicMidiChordDef. It does not support sliders.
+        /// This constructor creates a LocalMidiChordDef containing a single BasicMidiChordDef and no sliders.
         /// </summary>
         public LocalMidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff,
             List<MidiControl> midiControls)
@@ -102,8 +105,7 @@ namespace Moritz.Score.Midi
 
 
         /// <summary>
-        /// Constructor used when converting a midi file to a list of Moments.
-        /// This MidiChordDef contains a single BasicMidiChordDef. It does not support sliders.
+        /// This constructor creates a LocalMidiChordDef containing a single BasicMidiChordDef and no sliders.
         /// </summary>
         public LocalMidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff,
             List<MidiControlDef> midiControlDefs)
@@ -163,65 +165,65 @@ namespace Moritz.Score.Midi
                 switch(controllerType)
                 {
                     case ControllerType.AllSoundOff:
-                    {
-                        if(midiControl is AllSoundOff)
-                            returnMidiControl = midiControl;
-                        break;
-                    }
+                        {
+                            if(midiControl is AllSoundOff)
+                                returnMidiControl = midiControl;
+                            break;
+                        }
                     case ControllerType.AllNotesOff:
-                    {
-                        if(midiControl is AllNotesOff)
-                            returnMidiControl = midiControl;
-                        break;
-                    }
+                        {
+                            if(midiControl is AllNotesOff)
+                                returnMidiControl = midiControl;
+                            break;
+                        }
                     case ControllerType.AllControllersOff:
-                    {
-                        if(midiControl is AllControllersOff)
-                            returnMidiControl = midiControl;
-                        break;
-                    }
+                        {
+                            if(midiControl is AllControllersOff)
+                                returnMidiControl = midiControl;
+                            break;
+                        }
                     case ControllerType.Balance:
-                    {
-                        if(midiControl is Balance)
-                            returnMidiControl = midiControl;
-                        break;
-                    }
+                        {
+                            if(midiControl is Balance)
+                                returnMidiControl = midiControl;
+                            break;
+                        }
                     case ControllerType.BankSelect:
-                    {
-                        if(midiControl is BankControl)
-                            returnMidiControl = midiControl;
-                        break;
-                    }
+                        {
+                            if(midiControl is BankControl)
+                                returnMidiControl = midiControl;
+                            break;
+                        }
                     case ControllerType.RegisteredParameterCoarse: // standard Midi for pitchwheel deviation...
-                    {
-                        if(midiControl is PitchWheelDeviation)
-                            returnMidiControl = midiControl;
-                        break;
-                    }
+                        {
+                            if(midiControl is PitchWheelDeviation)
+                                returnMidiControl = midiControl;
+                            break;
+                        }
                     case ControllerType.Expression:
-                    {
-                        if(midiControl is Expression)
-                            returnMidiControl = midiControl;
-                        break;
-                    }
+                        {
+                            if(midiControl is Expression)
+                                returnMidiControl = midiControl;
+                            break;
+                        }
                     case ControllerType.ModulationWheel:
-                    {
-                        if(midiControl is ModulationWheel)
-                            returnMidiControl = midiControl;
-                        break;
-                    }
+                        {
+                            if(midiControl is ModulationWheel)
+                                returnMidiControl = midiControl;
+                            break;
+                        }
                     case ControllerType.Pan:
-                    {
-                        if(midiControl is Pan)
-                            returnMidiControl = midiControl;
-                        break;
-                    }
+                        {
+                            if(midiControl is Pan)
+                                returnMidiControl = midiControl;
+                            break;
+                        }
                     case ControllerType.Volume:
-                    {
-                        if(midiControl is Volume)
-                            returnMidiControl = midiControl;
-                        break;
-                    }
+                        {
+                            if(midiControl is Volume)
+                                returnMidiControl = midiControl;
+                            break;
+                        }
                 }
                 if(returnMidiControl != null)
                     break;
@@ -244,55 +246,55 @@ namespace Moritz.Score.Midi
                 switch(controllerType)
                 {
                     case ControllerType.AllSoundOff:
-                    {
-                        returnValue = midiControlDef.Value;
-                        break;
-                    }
+                        {
+                            returnValue = midiControlDef.Value;
+                            break;
+                        }
                     case ControllerType.AllNotesOff:
-                    {
-                        returnValue = midiControlDef.Value;
-                        break;
-                    }
+                        {
+                            returnValue = midiControlDef.Value;
+                            break;
+                        }
                     case ControllerType.AllControllersOff:
-                    {
-                        returnValue = midiControlDef.Value;
-                        break;
-                    }
+                        {
+                            returnValue = midiControlDef.Value;
+                            break;
+                        }
                     case ControllerType.Balance:
-                    {
-                        returnValue = midiControlDef.Value;
-                        break;
-                    }
+                        {
+                            returnValue = midiControlDef.Value;
+                            break;
+                        }
                     case ControllerType.BankSelect:
-                    {
-                        returnValue = midiControlDef.Value;
-                        break;
-                    }
+                        {
+                            returnValue = midiControlDef.Value;
+                            break;
+                        }
                     case ControllerType.RegisteredParameterCoarse: // standard Midi for pitchwheel deviation...
-                    {
-                        returnValue = midiControlDef.Value;
-                        break;
-                    }
+                        {
+                            returnValue = midiControlDef.Value;
+                            break;
+                        }
                     case ControllerType.Expression:
-                    {
-                        returnValue = midiControlDef.Value;
-                        break;
-                    }
+                        {
+                            returnValue = midiControlDef.Value;
+                            break;
+                        }
                     case ControllerType.ModulationWheel:
-                    {
-                        returnValue = midiControlDef.Value;
-                        break;
-                    }
+                        {
+                            returnValue = midiControlDef.Value;
+                            break;
+                        }
                     case ControllerType.Pan:
-                    {
-                        returnValue = midiControlDef.Value;
-                        break;
-                    }
+                        {
+                            returnValue = midiControlDef.Value;
+                            break;
+                        }
                     case ControllerType.Volume:
-                    {
-                        returnValue = midiControlDef.Value;
-                        break;
-                    }
+                        {
+                            returnValue = midiControlDef.Value;
+                            break;
+                        }
                 }
                 if(returnValue != null)
                     break;
@@ -312,17 +314,17 @@ namespace Moritz.Score.Midi
                 switch(channelCommand)
                 {
                     case ChannelCommand.ProgramChange:
-                    {
-                        if(midiControl is PatchControl)
-                            returnMidiControl = midiControl;
-                        break;
-                    }
+                        {
+                            if(midiControl is PatchControl)
+                                returnMidiControl = midiControl;
+                            break;
+                        }
                     case ChannelCommand.PitchWheel:
-                    {
-                        if(midiControl is PitchWheel)
-                            returnMidiControl = midiControl;
-                        break;
-                    }
+                        {
+                            if(midiControl is PitchWheel)
+                                returnMidiControl = midiControl;
+                            break;
+                        }
                 }
                 if(returnMidiControl != null)
                     break;
@@ -345,15 +347,15 @@ namespace Moritz.Score.Midi
                 switch(channelCommand)
                 {
                     case ChannelCommand.ProgramChange:
-                    {
-                        returnValue = midiControlDef.Value;
-                        break;
-                    }
+                        {
+                            returnValue = midiControlDef.Value;
+                            break;
+                        }
                     case ChannelCommand.PitchWheel:
-                    {
-                        returnValue = midiControlDef.Value;
-                        break;
-                    }
+                        {
+                            returnValue = midiControlDef.Value;
+                            break;
+                        }
                 }
                 if(returnValue != null)
                     break;
