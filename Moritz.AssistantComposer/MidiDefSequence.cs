@@ -21,48 +21,6 @@ namespace Moritz.AssistantComposer
     /// </summary>
     public class MidiDefSequence : IEnumerable
     {
-        // private enumerator class
-        // see http://support.microsoft.com/kb/322022/en-us
-        private class MyEnumerator : IEnumerator
-        {
-            public List<LocalizedMidiDurationDef> _localizedMidiDurationDefs;
-            int position = -1;
-            //constructor
-            public MyEnumerator(List<LocalizedMidiDurationDef> localizedMidiDurationDefs)
-            {
-                _localizedMidiDurationDefs = localizedMidiDurationDefs;
-            }
-            private IEnumerator getEnumerator()
-            {
-                return (IEnumerator)this;
-            }
-            //IEnumerator
-            public bool MoveNext()
-            {
-                position++;
-                return (position < _localizedMidiDurationDefs.Count);
-            }
-            //IEnumerator
-            public void Reset()
-            { position = -1; }
-            //IEnumerator
-            public object Current
-            {
-                get
-                {
-                    try
-                    {
-                        return _localizedMidiDurationDefs[position];
-                    }
-                    catch(IndexOutOfRangeException)
-                    {
-                        Debug.Assert(false);
-                        return null;
-                    }
-                }
-            }
-        }  //end nested class
-
         /// <summary>
         /// The argument may not be an empty list.
         /// The MsPositions and MsDurations in the list are checked for consistency.
@@ -89,7 +47,7 @@ namespace Moritz.AssistantComposer
 
             foreach(int value in sequence)
             {
-                Debug.Assert((value >= 1 && value <= paletteDef.MidiDurationDefsCount), "value out of range in sequence");
+                Debug.Assert((value >= 1 && value <= paletteDef.MidiDurationDefsCount), "Illegal argument: value out of range in sequence");
                 MidiDurationDef midiDurationDef = paletteDef[value - 1];
                 LocalizedMidiDurationDef noteDef = new LocalizedMidiDurationDef(midiDurationDef);
                 Debug.Assert(midiDurationDef.MsDuration > 0);
@@ -132,7 +90,8 @@ namespace Moritz.AssistantComposer
         }
         /// <summary>
         /// The duration of this MidiDefList in milliseconds.
-        /// Setting this.MsDuration does not change this.MsPosition, but moves this.EndMsPosition. 
+        /// Setting this.MsDuration stretches or compresses all the durations in the list to fit the given total duration.
+        /// It does not change this.MsPosition, but does affect this.EndMsPosition. 
         /// </summary>
         public int MsDuration
         {
@@ -202,13 +161,70 @@ namespace Moritz.AssistantComposer
                 return lastLmdd.MsPosition + lastLmdd.MsDuration; 
             }
         }
-
-        public IEnumerator GetEnumerator()
+        /// <summary>
+        /// Transpose the MidiDefSequence up by the number of semitones given in the argument.
+        /// Negative interval values transpose down.
+        /// It is not an error if Midi pitch values would exceed the range 0..127.
+        /// In this case, they are silently coerced to 0 or 127 respectively.
+        /// </summary>
+        /// <param name="interval"></param>
+        public void Transpose(int interval)
         {
-            return new MyEnumerator(_localizedMidiDurationDefs);
+            foreach(LocalizedMidiDurationDef lmdd in _localizedMidiDurationDefs)
+            {
+                lmdd.Transpose(interval);
+            }
         }
 
         public List<LocalizedMidiDurationDef> LocalizedMidiDurationDefs { get { return _localizedMidiDurationDefs; } } 
         private List<LocalizedMidiDurationDef> _localizedMidiDurationDefs = new List<LocalizedMidiDurationDef>();
+
+        #region Enumerator
+        public IEnumerator GetEnumerator()
+        {
+            return new MyEnumerator(_localizedMidiDurationDefs);
+        }
+        // private enumerator class
+        // see http://support.microsoft.com/kb/322022/en-us
+        private class MyEnumerator : IEnumerator
+        {
+            public List<LocalizedMidiDurationDef> _localizedMidiDurationDefs;
+            int position = -1;
+            //constructor
+            public MyEnumerator(List<LocalizedMidiDurationDef> localizedMidiDurationDefs)
+            {
+                _localizedMidiDurationDefs = localizedMidiDurationDefs;
+            }
+            private IEnumerator getEnumerator()
+            {
+                return (IEnumerator)this;
+            }
+            //IEnumerator
+            public bool MoveNext()
+            {
+                position++;
+                return (position < _localizedMidiDurationDefs.Count);
+            }
+            //IEnumerator
+            public void Reset()
+            { position = -1; }
+            //IEnumerator
+            public object Current
+            {
+                get
+                {
+                    try
+                    {
+                        return _localizedMidiDurationDefs[position];
+                    }
+                    catch(IndexOutOfRangeException)
+                    {
+                        Debug.Assert(false);
+                        return null;
+                    }
+                }
+            }
+        }  //end nested class
+        #endregion
     }
 }

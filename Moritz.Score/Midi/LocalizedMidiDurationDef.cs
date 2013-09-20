@@ -58,6 +58,23 @@ namespace Moritz.Score.Midi
         public readonly LocalMidiChordDef LocalMidiChordDef = null;
 
         /// <summary>
+        /// Transpose up by the number of semitones given in the argument.
+        /// Negative interval values transpose down.
+        /// If this is a MidiRestDef, nothing happens and the function returns silently.
+        /// It this is a LocalMidiChordDef, is not an error if Midi pitch values would exceed the range 0..127.
+        /// In this case, they are silently coerced to 0 or 127 respectively.
+        /// </summary>
+        /// <param name="interval"></param>
+        public void Transpose(int interval)
+        {
+            if(LocalMidiChordDef != null)
+            {
+                // this is not a rest.
+                LocalMidiChordDef.Transpose(interval);                
+            }
+        }
+
+        /// <summary>
         /// This field is set if the chord crosses a barline. Rests never cross barlines, they are always split.
         /// </summary>
         public int? MsDurationToNextBarline = null;

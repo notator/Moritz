@@ -30,6 +30,9 @@ namespace Moritz.AssistantComposer
             List<int> sequence = kValues[0];
 
             MidiDefSequence midiDefSequence = new MidiDefSequence(paletteDef, sequence);
+
+            midiDefSequence.Transpose(-4);
+
             int finalTotalDuration = 0;
             for(int i = 0; i < 11; ++i)
             {

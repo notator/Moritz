@@ -363,6 +363,74 @@ namespace Moritz.Score.Midi
             return returnValue;
         }
 
+        /// <summary>
+        /// Transpose (both notation and sound) by the number of semitones given in the argument.
+        /// Negative interval values transpose down.
+        /// It is not an error if Midi values would exceed the range 0..127.
+        /// In this case, they are silently coerced to 0 or 127 respectively.
+        /// </summary>
+        public void Transpose(int interval)
+        {
+            for(int i = 0; i < _midiHeadSymbols.Count; ++i)
+            {
+                _midiHeadSymbols[i] = GetTrimmedValue(_midiHeadSymbols[i] + interval);
+            }
+            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+            {
+                List<byte> notes = bmcd.Notes;
+                for(int i = 0; i < notes.Count; ++i)
+                {
+                    notes[i] = GetTrimmedValue(notes[i] + interval);
+                }
+                bmcd.Notes = ReduceList(notes);
+            }
+        }
+
+        private byte GetTrimmedValue(int value)
+        {
+            value = (value > 127) ? 127 : value;
+            value = (value < 0) ? 0 : value;
+            return (byte)value;
+        }
+
+        /// <summary>
+        /// Returns a list in which duplicate 0 and 127 values have been removed.
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        private List<byte> ReduceList(List<byte> list)
+        {
+            List<byte> reducedList = new List<byte>();
+            bool minvalFound = false;
+            bool maxvalFound = false;
+            for(int i = 0; i < list.Count; ++i)
+            {
+                if(list[i] == 0)
+                {
+                    if(!minvalFound)
+                    {
+                        reducedList.Add(0);
+                        minvalFound = true;
+                    }
+                }
+                else if(list[i] == 127)
+                {
+                    if(!maxvalFound)
+                    {
+                        reducedList.Add(127);
+                        maxvalFound = true;
+                    }
+                }
+                else
+                {
+                    reducedList.Add(list[i]);
+                }
+            }
+            if(list.Count == reducedList.Count)
+                return list;
+            else
+                return reducedList;
+        }
 
         // This class is saved as an individual chordDef in SVG files,
         // so it allows ALL its fields to be set, even after construction.
