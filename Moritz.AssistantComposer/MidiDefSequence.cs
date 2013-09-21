@@ -176,6 +176,9 @@ namespace Moritz.AssistantComposer
             }
         }
 
+        // TODO
+        // public void AdjustVelocity(int interval) // like Transpose()
+
         public List<LocalizedMidiDurationDef> LocalizedMidiDurationDefs { get { return _localizedMidiDurationDefs; } } 
         private List<LocalizedMidiDurationDef> _localizedMidiDurationDefs = new List<LocalizedMidiDurationDef>();
 

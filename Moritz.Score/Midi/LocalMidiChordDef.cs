@@ -16,15 +16,20 @@ namespace Moritz.Score.Midi
     //</summary>
     public class LocalMidiChordDef : MidiChordDef
     {
+        public LocalMidiChordDef()
+            :base()
+        {
+            ID = "localChord" + UniqueChordID.ToString();
+        }
+
         /// <summary>
         /// A deep clone of the argument. This class is saved as an individual chordDef in SVG files,
         /// so it allows ALL its attributes to be set, even after construction.
         /// </summary>
         /// <param name="midiChordDef"></param>
         public LocalMidiChordDef(MidiChordDef mcd)
+            :this()
         {
-            ID = "localChord" + UniqueChordID.ToString();
-
             _bank = mcd.Bank;
             _patch = mcd.Patch;
             _volume = mcd.Volume;
@@ -81,10 +86,8 @@ namespace Moritz.Score.Midi
         /// </summary>
         public LocalMidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff,
             List<MidiControl> midiControls)
-            : base()
+            : this()
         {
-            ID = "localChord" + UniqueChordID.ToString();
-
             _msDuration = msDuration;
             _volume = GetControlHiValue(ControllerType.Volume, midiControls);
             _pitchWheelDeviation = GetControlValue(ControllerType.RegisteredParameterCoarse, midiControls);
@@ -103,16 +106,13 @@ namespace Moritz.Score.Midi
             BasicMidiChordDefs.Add(new BasicMidiChordDef(msDuration, bank, patch, hasChordOff, pitches, velocities));
         }
 
-
         /// <summary>
         /// This constructor creates a LocalMidiChordDef containing a single BasicMidiChordDef and no sliders.
         /// </summary>
         public LocalMidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff,
             List<MidiControlDef> midiControlDefs)
-            : base()
+            : this()
         {
-            ID = "localChord" + UniqueChordID.ToString();
-
             _msDuration = msDuration;
             _volume = GetControlDefHiValue(ControllerType.Volume, midiControlDefs);
             _pitchWheelDeviation = GetControlDefValue(ControllerType.RegisteredParameterCoarse, midiControlDefs);

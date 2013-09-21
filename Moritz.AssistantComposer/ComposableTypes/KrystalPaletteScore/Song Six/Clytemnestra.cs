@@ -45,6 +45,8 @@ namespace Moritz.AssistantComposer
 
                 List<MomentDef> momentDefs = new List<MomentDef>();
                 _momentDefsListPerVerse.Add(momentDefs);
+
+                byte patch = (byte)(123 + verseIndex); // top 5 patches in bank 0
                 List<byte> velocity = new List<byte>() { verseVelocities[verseIndex] };
  
                 for(int syllableIndex = 0; syllableIndex < momentMsWidth.Count; ++syllableIndex)
@@ -55,36 +57,29 @@ namespace Moritz.AssistantComposer
                     momentDef.MsWidth = momentMsWidth[syllableIndex];
                     momentDefs.Add(momentDef);
 
-                    #region midiControls
                     List<byte> pitch = new List<byte>() { (byte)syllableIndex }; // the syllables are organised like this in the soundfont.
                     int msDuration = midiChordMsDur[syllableIndex];
-                    List<MidiControl> midiControls = new List<MidiControl>();
-                    // Expression is added to every chord so that performances can start anywhere.
-                    // If the interpreter is clever enough, repeated controls are not actually sent.
-                    Expression expression = new Expression(clytemnestrasChannelIndex, (byte)127, ControlContinuation.NoChange);
-                    midiControls.Add(expression);
-                    #endregion
-
-                    LocalMidiChordDef localMidiChordDef = new LocalMidiChordDef(pitch, velocity, msDuration, true, midiControls);
 
                     #region 
+                    LocalMidiChordDef lmcd = new LocalMidiChordDef();
+                    lmcd.MsDuration = msDuration;
+                    lmcd.Volume = (byte)100;
+                    lmcd.HasChordOff = true;
                     // Bank, Patch and Volume are added to *every* chord so that performances can start anywhere.
                     // If the interpreter is clever enough, repeated controls are not actually sent.
-                    localMidiChordDef.Bank = (byte)(0);
-                    localMidiChordDef.Patch = (byte)(123 + verseIndex); // top 5 patches in bank 0
-                    localMidiChordDef.Volume = (byte)127;
-                    localMidiChordDef.Lyric = lyrics[syllableIndex];
-                    #endregion
+                    lmcd.Bank = (byte)(0);
+                    lmcd.Patch = patch;
+                    lmcd.Lyric = lyrics[syllableIndex];
+                    // these two attributes determine the symbols in the score.
+                    lmcd.MidiHeadSymbols = new List<byte>(){67}; // display middle G, even though "pitch" is different.
+                    lmcd.MidiVelocity = velocity[0]; // determines the visible dynamic symbol
+                    // the following determine what is actually heard 
+                    List<byte> expressionMsbs = new List<byte>() { (byte)65 };
+                    lmcd.MidiChordSliderDefs = new MidiChordSliderDefs(null, null, null, expressionMsbs);
+                    lmcd.BasicMidiChordDefs.Add(new BasicMidiChordDef(msDuration, 0, patch, true, pitch, velocity));
+                    #endregion                    
 
-                    // the following determine what is seen
-                    localMidiChordDef.MidiHeadSymbols = new List<byte>(){67}; // display middle G, even though "pitch" is different.
-                    //localMidiChordDef.MidiVelocitySymbol = 65;
-
-                    // the following could determine what is heard
-                    //localMidiChordDef.BasicMidiChordDefs[0].Velocities = new List<byte>() { (byte)127 };
-                    //localMidiChordDef.BasicMidiChordDefs[0].Notes = new List<byte>() { (byte)syllableIndex };
-
-                    momentDef.MidiChordDefs.Add(localMidiChordDef);
+                    momentDef.MidiChordDefs.Add(lmcd);
 
                     momentMsPos += momentDef.MsWidth;
                 }
