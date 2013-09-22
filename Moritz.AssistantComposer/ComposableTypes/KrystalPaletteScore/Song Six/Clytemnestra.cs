@@ -63,7 +63,7 @@ namespace Moritz.AssistantComposer
                     #region 
                     LocalMidiChordDef lmcd = new LocalMidiChordDef();
                     lmcd.MsDuration = msDuration;
-                    lmcd.Volume = (byte)100;
+                    lmcd.Volume = (byte)100; // 100 is the default, and is not written into the score. Other values ARE added to each chord.
                     lmcd.HasChordOff = true;
                     // Bank, Patch and Volume are added to *every* chord so that performances can start anywhere.
                     // If the interpreter is clever enough, repeated controls are not actually sent.

@@ -43,7 +43,7 @@ namespace Moritz.Score.Midi
         }
 
         /// <summary>
-        /// Used to create instances of FinalLMDDInVoice.
+        /// Used to create clones and instances of FinalLMDDInVoice.
         /// </summary>
         public LocalizedMidiDurationDef(MidiDurationDef midiDurationDef, int msPosition, int msDuration)
             : this(midiDurationDef)

@@ -24,7 +24,16 @@ namespace Moritz.AssistantComposer
         /// </summary>
         public override List<byte> MidiChannels()
         {
-            return new List<byte>() { 0, 1 };
+            return new List<byte>() { 0, 1, 2 };
+        }
+
+        /// <summary>
+        /// The number of bars produced by DoAlgorithm().
+        /// </summary>
+        /// <returns></returns>
+        public override int NumberOfBars()
+        {
+            return 84;
         }
 
         /// <summary>
@@ -246,13 +255,5 @@ namespace Moritz.AssistantComposer
             return bars;
         }
 
-        /// <summary>
-        /// The number of bars produced by DoAlgorithm().
-        /// </summary>
-        /// <returns></returns>
-        public override int NumberOfBars()
-        {
-            return 84;
-        }
     }
 }

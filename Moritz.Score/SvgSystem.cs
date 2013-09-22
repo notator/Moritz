@@ -494,12 +494,14 @@ namespace Moritz.Score
         /// <typeparam name="Type">DurationSymbol, ChordSymbol, RestSymbol</typeparam>
         private List<NoteObjectMoment> MomentSymbols()
         {
-            int finalBarlineMsPosition = 0;
+            int finalBarlineMsPosition = FinalBarlineMsPosition(this.Staves[0].Voices[0]);
+
             SortedDictionary<int, NoteObjectMoment> dict = new SortedDictionary<int, NoteObjectMoment>();
             Barline barline = null;
             ClefSign clef = null;
             foreach(Voice voice in this.Voices)
             {
+                #region foreach noteObject
                 foreach(NoteObject noteObject in voice.NoteObjects)
                 {
                     if(noteObject is ClefSign)
@@ -509,15 +511,6 @@ namespace Moritz.Score
                     DurationSymbol durationSymbol = noteObject as DurationSymbol;
                     if(durationSymbol != null)
                     {
-                        ChordSymbol chordSymbol = durationSymbol as ChordSymbol;
-                        if(chordSymbol != null && chordSymbol.LocalizedMidiDurationDef.MsDurationToNextBarline != null)
-                        {
-                            finalBarlineMsPosition =
-                                durationSymbol.MsPosition + (int)chordSymbol.LocalizedMidiDurationDef.MsDurationToNextBarline;
-                        }
-                        else
-                            finalBarlineMsPosition = durationSymbol.MsPosition + durationSymbol.MsDuration;
-
                         if(!dict.ContainsKey(durationSymbol.MsPosition))
                         {
                             dict.Add(durationSymbol.MsPosition, new NoteObjectMoment(durationSymbol));
@@ -538,6 +531,7 @@ namespace Moritz.Score
                         }
                     }
                 }
+                #endregion
 
                 if(clef != null) // final clef
                 {
@@ -576,6 +570,29 @@ namespace Moritz.Score
             #endregion
 
             return momentSymbols;
+        }
+
+        private int FinalBarlineMsPosition(Voice voice)
+        {
+            Debug.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline);
+            
+            int finalBarlineMsPosition = 0;
+            DurationSymbol lastDurationSymbol = voice.NoteObjects[voice.NoteObjects.Count -2] as DurationSymbol;
+
+            Debug.Assert(lastDurationSymbol != null);
+ 
+            CautionaryChordSymbol cautionaryChordSymbol = lastDurationSymbol as CautionaryChordSymbol;
+            if(cautionaryChordSymbol != null)
+            {
+                finalBarlineMsPosition =
+                        cautionaryChordSymbol.MsPosition + (int)cautionaryChordSymbol.LocalizedMidiDurationDef.MsDurationToNextBarline;
+            }
+            else // ordinary ChordSymbol or RestSymbol
+            {
+                finalBarlineMsPosition = lastDurationSymbol.MsPosition + lastDurationSymbol.MsDuration;
+            }
+
+            return finalBarlineMsPosition;
         }
         /// <summary>
         /// Moves clefs and barlines to the left of the following duration symbols, leaving a hairline gap between the symbols.

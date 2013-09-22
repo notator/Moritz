@@ -16,22 +16,28 @@ namespace Moritz.AssistantComposer
         {
             Debug.Assert(blockMsDurations.Count == 11);
 
-            int nWindsVoices = 1; // including the baseVoice
-            Voice baseVoice = GetBaseVoice(krystals[0], paletteDefs[0], topWindChannelIndex + nWindsVoices - 1, blockMsDurations);
+            int nWindsVoices = 2; // including the baseVoice
+
+            MidiDefSequence baseMidiDefSequence = GetBaseMidiDefSequence(krystals[0], paletteDefs[0], blockMsDurations);
+            Voice baseVoice = new Voice(null, (byte)(topWindChannelIndex + nWindsVoices - 1));
+            baseVoice.LocalizedMidiDurationDefs = baseMidiDefSequence.LocalizedMidiDurationDefs;
             _voices.Insert(0, baseVoice);
+
             // etc. -- create and insert other wind voices, so that wind channels are ordered top down in order of channel.
+            MidiDefSequence tenorMidiDefSequence = GetTenorMidiDefSequence(baseMidiDefSequence);
+            Voice tenorVoice = new Voice(null, (byte)(topWindChannelIndex + nWindsVoices - 2));
+            tenorVoice.LocalizedMidiDurationDefs = tenorMidiDefSequence.LocalizedMidiDurationDefs;
+            _voices.Insert(0, tenorVoice);
         }
 
-        private Voice GetBaseVoice(Krystal krystal, PaletteDef paletteDef, int baseWindChannelIndex, List<int> blockMsDurations)
+        private MidiDefSequence GetBaseMidiDefSequence(Krystal krystal, PaletteDef paletteDef, List<int> blockMsDurations)
         {
-            Voice baseVoice = new Voice(null, (byte) baseWindChannelIndex);
-
             List<List<int>> kValues = krystal.GetValues((uint)1);
             List<int> sequence = kValues[0];
 
-            MidiDefSequence midiDefSequence = new MidiDefSequence(paletteDef, sequence);
+            MidiDefSequence baseMidiDefSequence = new MidiDefSequence(paletteDef, sequence);
 
-            midiDefSequence.Transpose(-4);
+            baseMidiDefSequence.Transpose(-4);
 
             int finalTotalDuration = 0;
             for(int i = 0; i < 11; ++i)
@@ -40,11 +46,20 @@ namespace Moritz.AssistantComposer
             }
 
             // The durations of the contained LocalizedMidiDurationDefs are adjusted to the blockMsDurations
-            midiDefSequence.MsDuration = finalTotalDuration;
+            baseMidiDefSequence.MsDuration = finalTotalDuration;
 
-            baseVoice.LocalizedMidiDurationDefs = midiDefSequence.LocalizedMidiDurationDefs;
+            return baseMidiDefSequence;
+        }
 
-            return baseVoice;
+        private MidiDefSequence GetTenorMidiDefSequence(MidiDefSequence baseMidiDefSequence)
+        {
+            MidiDefSequence tenorMidiDefSequence = baseMidiDefSequence.Clone();
+
+            tenorMidiDefSequence.LocalizedMidiDurationDefs.Reverse();
+            tenorMidiDefSequence.MsPosition = 0;
+            tenorMidiDefSequence.Transpose(24);
+
+            return tenorMidiDefSequence;
         }
 
         // each voice has the duration of the whole piece

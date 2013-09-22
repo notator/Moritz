@@ -74,6 +74,23 @@ namespace Moritz.AssistantComposer
             MsPosition = _localizedMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rests
         }
 
+        /// <summary>
+        /// Returns a deep clone of this MidiDefSequence.
+        /// </summary>
+        /// <param name="midiDefSequence"></param>
+        /// <returns></returns>
+        public MidiDefSequence Clone()
+        {
+            List<LocalizedMidiDurationDef> clonedLmdds = new List<LocalizedMidiDurationDef>();
+            foreach(LocalizedMidiDurationDef lmdd in this.LocalizedMidiDurationDefs)
+            {
+                LocalizedMidiDurationDef clonedLmdd = new LocalizedMidiDurationDef(lmdd.LocalMidiChordDef, lmdd.MsPosition, lmdd.MsDuration);
+                clonedLmdds.Add(clonedLmdd);
+            }
+
+            return new MidiDefSequence(clonedLmdds);
+        }
+
         public void Add(LocalizedMidiDurationDef lmdd)
         {
             Debug.Assert(_localizedMidiDurationDefs.Count > 0);
