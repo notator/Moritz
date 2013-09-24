@@ -328,7 +328,70 @@ namespace Moritz.AssistantComposer
                 lyrics.Add(verse5);
                 return lyrics;
             }
-        }   
+        }
+
+        /// <summary>
+        /// returns Clytamnestra's voice for the whole piece including rests (but no bars)
+        /// </summary>
+        public Voice GetVoice(List<List<MomentDef>> momentDefsListPerVerse, List<int> blockMsPositions, List<int> blockMsDurations)
+        {
+            Debug.Assert(momentDefsListPerVerse.Count == 5);
+            Debug.Assert(blockMsPositions.Count == 11);
+            Debug.Assert(blockMsDurations.Count == 11);
+
+            Voice voice = new Voice(null, 0); // midiChannel 0
+
+            int blockIndex = 0;
+            LocalizedMidiDurationDef rmdd = new LocalizedMidiDurationDef(blockMsDurations[blockIndex]);
+            Debug.Assert(rmdd.MsDuration > 0);
+
+            rmdd.MsPosition = blockMsPositions[blockIndex];
+            voice.LocalizedMidiDurationDefs.Add(rmdd);
+
+            for(int verseIndex = 0; verseIndex < 5; ++verseIndex)
+            {
+                blockIndex++;
+
+                List<MomentDef> momentDefs = momentDefsListPerVerse[verseIndex];
+
+                for(int momentDefIndex = 0; momentDefIndex < momentDefs.Count; ++momentDefIndex)
+                {
+                    MomentDef momentDef = momentDefs[momentDefIndex];
+                    momentDef.MsPosition += blockMsPositions[blockIndex];
+
+                    int restWidth = momentDef.MsWidth - momentDef.MaximumMsDuration;
+                    rmdd = null;
+                    if(restWidth > 0)
+                    {
+                        momentDef.MsWidth -= restWidth;
+                        rmdd = new LocalizedMidiDurationDef(restWidth);
+                        Debug.Assert(rmdd.MsDuration > 0);
+
+                        rmdd.MsPosition = momentDef.MsPosition + momentDef.MsWidth;
+                    }
+
+                    MidiChordDef mcd = momentDef.MidiChordDefs[0];
+                    LocalizedMidiDurationDef lmdd = new LocalizedMidiDurationDef(mcd, momentDef.MsPosition, momentDef.MsWidth);
+                    Debug.Assert(lmdd.MsDuration > 0);
+
+                    voice.LocalizedMidiDurationDefs.Add(lmdd);
+
+                    if(rmdd != null)
+                    {
+                        voice.LocalizedMidiDurationDefs.Add(rmdd);
+                    }
+                }
+
+                blockIndex++;
+                rmdd = new LocalizedMidiDurationDef(blockMsDurations[blockIndex]);
+                Debug.Assert(rmdd.MsDuration > 0);
+
+                rmdd.MsPosition = blockMsPositions[blockIndex];
+                voice.LocalizedMidiDurationDefs.Add(rmdd);
+            }
+            return voice;
+        }
+
         
         private List<List<MomentDef>> _momentDefsListPerVerse;
         public List<List<MomentDef>> MomentDefsListPerVerse { get { return _momentDefsListPerVerse; } }
