@@ -55,35 +55,23 @@ namespace Moritz.AssistantComposer
             List<int> baseWindChordNumberPerClytBlock = new List<int>() { 6, 21, 36, 52, 67 };
             #endregion
 
-            List<List<Voice>> bars = new List<List<Voice>>();
-            int nBirdVoices = 0; // birds have not yet been composed. Set this value later to the correct value.
-            int clytemnestrasChannelIndex = nBirdVoices;
-            int topWindChannelIndex = clytemnestrasChannelIndex + 1;
-
             // The blockMsDurations at positions 1,3,5,7,9,11 will be set by the Winds (possibly taking account of the birds).
             // Clytemnestra sets the durations of blocks 2,4,6,8,10 (see below).
             List<int> blockMsDurations = new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-            Clytemnestra clytemnestra = new Clytemnestra(clytemnestrasChannelIndex, blockMsDurations);
+            Clytemnestra clytemnestra = new Clytemnestra(blockMsDurations);
             // Clytemnestra has now set the durations of blocks 2,4,6,8,10
 
             Winds winds = new Winds(_krystals, _paletteDefs, nBaseWindChords);
 
             SetBlockMsDurations(blockMsDurations, winds.MidiDefSequences[0], baseWindChordNumberPerClytBlock);
 
-            //Birds birds = new Birds(winds, _krystals, _paletteDefs, nBirdVoices, blockMsDurations);
+            clytemnestra.MidiDefSequence = clytemnestra.GetMidiDefSequence(blockMsDurations);
 
-            List<int> blockMsPositions = GetBlockPositions(blockMsDurations); // for convenience...
+            //Birds birds = new Birds(clytemnestra, winds, _krystals, _paletteDefs, nBirdVoices, blockMsDurations);
 
-            Voice clytemnestrasVoice = clytemnestra.GetVoice(clytemnestra.MomentDefsListPerVerse, blockMsPositions, blockMsDurations);
-
-            List<Voice> wholePiece = new List<Voice>(); 
-            wholePiece.Add(clytemnestrasVoice);
-            List<Voice> windVoices = winds.GetVoices(clytemnestrasChannelIndex + 1);
-            foreach(Voice voice in windVoices)
-            {
-                wholePiece.Add(voice);
-            } 
+            // wholePiece contains one Voice per channel (not divided into bars
+            List<Voice> wholePiece = GetVoices(/*birds,*/ clytemnestra, winds); 
 
             List<int> barlineMsPositions = GetBarlineMsPositions(blockMsDurations, clytemnestra.BarlineMsPositionsPerBlock
                 //, birds.BarlineMsPositionsPerBlock,
@@ -92,7 +80,7 @@ namespace Moritz.AssistantComposer
 
             // barlineMsPositions does not contain msPos=0 or the position of the final barline
             // It does however contain the positions of the other barlines that begin blocks.
-
+            List<List<Voice>> bars = new List<List<Voice>>();
             bars = GetBars(wholePiece, barlineMsPositions);
             Console.WriteLine("bars.Count = " + bars.Count.ToString());
             Debug.Assert(bars.Count == NumberOfBars());
@@ -121,16 +109,30 @@ namespace Moritz.AssistantComposer
             blockMsDurations[10] = baseMidiDefSequence.EndMsPosition - msPosPerClytBlock[4] - blockMsDurations[9];
         }
 
-        private List<int> GetBlockPositions(List<int> blockMsDurations)
+        private List<Voice> GetVoices(/*Birds birds,*/ Clytemnestra clytemnestra, Winds winds)
         {
-            List<int> poss = new List<int>() { 0 };
-            int prevPos = 0;
-            for(int i = 0; i < 10; ++i)
+            byte channelIndex = 0;
+            List<Voice> voices = new List<Voice>();
+
+            //List<Voice> birdVoices = birds.GetVoices(channelIndex);
+            //foreach(Voice voice in birdVoices)
+            //{
+            //    voices.Add(voice);
+            //    channelIndex++;
+            //}
+
+            Voice clytemnestrasVoice = new Voice(null, channelIndex++);
+            clytemnestrasVoice.LocalizedMidiDurationDefs = clytemnestra.MidiDefSequence.LocalizedMidiDurationDefs;
+            voices.Add(clytemnestrasVoice);
+
+            List<Voice> windVoices = winds.GetVoices(channelIndex);
+
+            foreach(Voice voice in windVoices)
             {
-                poss.Add(blockMsDurations[i] + prevPos);
-                prevPos = poss[i+1];
+                voices.Add(voice);
             }
-            return poss;
+
+            return voices;
         }
 
         /// <summary>

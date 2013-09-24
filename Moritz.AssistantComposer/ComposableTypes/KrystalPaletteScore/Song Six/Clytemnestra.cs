@@ -14,9 +14,9 @@ namespace Moritz.AssistantComposer
     /// </summary>
     public class Clytemnestra
     {
-        public Clytemnestra(int clytemnestrasChannelIndex, List<int> blockMsDurations)
+        public Clytemnestra(List<int> blockMsDurations)
         {
-            SetMomentDefsListPerVerse(clytemnestrasChannelIndex);
+            SetMomentDefsListPerVerse();
             SetBlockMsDurations(blockMsDurations);
             SetBarLineMsPositionsPerBlock();
         }
@@ -26,7 +26,7 @@ namespace Moritz.AssistantComposer
         /// Each MomentDef is positioned with respect to the beginning of its verse, and contains
         /// a single LocalMidiChordDef in its MidiChordDefs list.
         /// </summary>
-        private void SetMomentDefsListPerVerse(int clytemnestrasChannelIndex)
+        private void SetMomentDefsListPerVerse()
         {
             _momentDefsListPerVerse = new List<List<MomentDef>>();
 
@@ -331,28 +331,30 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// returns Clytamnestra's voice for the whole piece including rests (but no bars)
+        /// returns Clytamnestra's MidiDefSequence for the whole piece including rests (but no bars)
         /// </summary>
-        public Voice GetVoice(List<List<MomentDef>> momentDefsListPerVerse, List<int> blockMsPositions, List<int> blockMsDurations)
+        public MidiDefSequence GetMidiDefSequence(List<int> blockMsDurations)
         {
-            Debug.Assert(momentDefsListPerVerse.Count == 5);
-            Debug.Assert(blockMsPositions.Count == 11);
+            Debug.Assert(_momentDefsListPerVerse.Count == 5);
             Debug.Assert(blockMsDurations.Count == 11);
 
-            Voice voice = new Voice(null, 0); // midiChannel 0
-
             int blockIndex = 0;
+            List<int> blockMsPositions = GetBlockPositions(blockMsDurations); // for convenience...
+            Debug.Assert(blockMsPositions.Count == 11);
+
+            List<LocalizedMidiDurationDef> localizedMidiDurationDefs = new List<LocalizedMidiDurationDef>();
+
             LocalizedMidiDurationDef rmdd = new LocalizedMidiDurationDef(blockMsDurations[blockIndex]);
             Debug.Assert(rmdd.MsDuration > 0);
 
             rmdd.MsPosition = blockMsPositions[blockIndex];
-            voice.LocalizedMidiDurationDefs.Add(rmdd);
+            localizedMidiDurationDefs.Add(rmdd);
 
             for(int verseIndex = 0; verseIndex < 5; ++verseIndex)
             {
                 blockIndex++;
 
-                List<MomentDef> momentDefs = momentDefsListPerVerse[verseIndex];
+                List<MomentDef> momentDefs = _momentDefsListPerVerse[verseIndex];
 
                 for(int momentDefIndex = 0; momentDefIndex < momentDefs.Count; ++momentDefIndex)
                 {
@@ -374,11 +376,11 @@ namespace Moritz.AssistantComposer
                     LocalizedMidiDurationDef lmdd = new LocalizedMidiDurationDef(mcd, momentDef.MsPosition, momentDef.MsWidth);
                     Debug.Assert(lmdd.MsDuration > 0);
 
-                    voice.LocalizedMidiDurationDefs.Add(lmdd);
+                    localizedMidiDurationDefs.Add(lmdd);
 
                     if(rmdd != null)
                     {
-                        voice.LocalizedMidiDurationDefs.Add(rmdd);
+                        localizedMidiDurationDefs.Add(rmdd);
                     }
                 }
 
@@ -387,14 +389,28 @@ namespace Moritz.AssistantComposer
                 Debug.Assert(rmdd.MsDuration > 0);
 
                 rmdd.MsPosition = blockMsPositions[blockIndex];
-                voice.LocalizedMidiDurationDefs.Add(rmdd);
+                localizedMidiDurationDefs.Add(rmdd);
             }
-            return voice;
+
+            MidiDefSequence midiDefSequence = new MidiDefSequence(localizedMidiDurationDefs);
+            return midiDefSequence;
         }
 
-        
+        private List<int> GetBlockPositions(List<int> blockMsDurations)
+        {
+            List<int> poss = new List<int>() { 0 };
+            int prevPos = 0;
+            for(int i = 0; i < 10; ++i)
+            {
+                poss.Add(blockMsDurations[i] + prevPos);
+                prevPos = poss[i + 1];
+            }
+            return poss;
+        }
+
         private List<List<MomentDef>> _momentDefsListPerVerse;
-        public List<List<MomentDef>> MomentDefsListPerVerse { get { return _momentDefsListPerVerse; } }
+
+        public MidiDefSequence MidiDefSequence = null;
 
         private List<List<int>> _barlineMsPositionsPerBlock;
         public List<List<int>> BarlineMsPositionsPerBlock { get { return _barlineMsPositionsPerBlock; } }
