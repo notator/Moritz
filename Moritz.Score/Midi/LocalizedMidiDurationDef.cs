@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Moritz.Score.Midi
 {
     ///<summary>
-    /// A LocalizedMidiChordDef is a LocalMidiChordDef with additional MsPositon and msDuration attributes.
+    /// A LocalizedMidiDurationDef is a LocalMidiChordDef or LocalMidirestDef with additional MsPositon and msDuration attributes.
     /// Related classes:
     /// 1. A LocalMidiChordDef is a MidiChordDef which is saved locally in an SVG file.
     /// 2. A PaletteMidiChordDef is a MidiChordDef which is saved in or retreived from a palette.
@@ -13,15 +13,17 @@ namespace Moritz.Score.Midi
     public class LocalizedMidiDurationDef
     {
         public LocalizedMidiDurationDef(MidiDurationDef midiDurationDef)
-        {
+        { 
             MidiChordDef midiChordDef = midiDurationDef as MidiChordDef; // null if midiDurationDef is a midiRestDef or null
-            if(midiChordDef == null)
+            if(midiChordDef != null)
             {
-                LocalMidiChordDef = null;
+                LocalMidiDurationDef = new LocalMidiChordDef(midiChordDef); // a deep clone with a special id string.
             }
             else
             {
-                LocalMidiChordDef = new LocalMidiChordDef(midiChordDef); // a deep clone with a special id string.
+                MidiRestDef midiRestDef = midiDurationDef as MidiRestDef;
+                Debug.Assert(midiRestDef != null);
+                LocalMidiDurationDef = new LocalMidiRestDef(midiRestDef);
             }
             // MsPosition and MsDuration default to 0.
             if(midiDurationDef != null)
@@ -31,15 +33,16 @@ namespace Moritz.Score.Midi
         }
 
         /// <summary>
-        /// This constructor can be used to construct a rest.
+        /// This constructor can be used to construct a restDef at MsPosition=0.
+        /// The MsPosition and/or MsDuration can be changed later.
         /// </summary>
         /// <param name="msDuration"></param>
         public LocalizedMidiDurationDef(int msDuration)
         {
-            LocalMidiChordDef = null; // null if midiDurationDef is a midiRestDef
+            Debug.Assert(msDuration > 0);
+            LocalMidiDurationDef = new LocalMidiRestDef(new MidiRestDef("", msDuration));
             MsPosition = 0; // can be reset later
             MsDuration = msDuration;
-            Debug.Assert(MsDuration > 0);
         }
 
         /// <summary>
@@ -53,11 +56,6 @@ namespace Moritz.Score.Midi
         }
 
         /// <summary>
-        /// This LocalMidiChordDef represents a rest if LocalMidiChordDef==null.
-        /// </summary>
-        public readonly LocalMidiChordDef LocalMidiChordDef = null;
-
-        /// <summary>
         /// Transpose up by the number of semitones given in the argument.
         /// Negative interval values transpose down.
         /// If this is a MidiRestDef, nothing happens and the function returns silently.
@@ -67,12 +65,18 @@ namespace Moritz.Score.Midi
         /// <param name="interval"></param>
         public void Transpose(int interval)
         {
-            if(LocalMidiChordDef != null)
+            LocalMidiChordDef lmcd = LocalMidiDurationDef as LocalMidiChordDef;
+            if(lmcd != null)
             {
                 // this is not a rest.
-                LocalMidiChordDef.Transpose(interval);                
+                lmcd.Transpose(interval);                
             }
         }
+
+        /// <summary>
+        /// A LocalMidiRestDef or a LocalMidiChordDef.
+        /// </summary>
+        public readonly MidiDurationDef LocalMidiDurationDef = null;
 
         /// <summary>
         /// This field is set if the chord crosses a barline. Rests never cross barlines, they are always split.
@@ -92,17 +96,11 @@ namespace Moritz.Score.Midi
     /// This class is created while splitting systems.
     /// It is used when notating them.
     /// </summary>
-    public class OverlapLmddAtStartOfBar : LocalizedMidiDurationDef
+    public class LocalizedCautionaryChordDef : LocalizedMidiDurationDef
     {
-        public OverlapLmddAtStartOfBar(int msPosition, int msDuration, MidiChordDef cautionaryMidiChordDef)
-            : base(null, msPosition, msDuration)
+        public LocalizedCautionaryChordDef(MidiChordDef cautionaryMidiChordDef, int msPosition, int msDuration)
+            : base(cautionaryMidiChordDef, msPosition, msDuration)
         {
-            CautionaryMidiChordDef = cautionaryMidiChordDef;
         }
-        /// <summary>
-        /// Used to create cautionary chord at the beginning of a staff,
-        /// and to find the heights of extension lines for such a chord.
-        /// </summary>
-        public readonly MidiChordDef CautionaryMidiChordDef;
     }
 }

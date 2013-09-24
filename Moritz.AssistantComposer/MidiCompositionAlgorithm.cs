@@ -85,9 +85,9 @@ namespace Moritz.AssistantComposer
         /// The second is the end of the argument bar beginning at absoluteSplitPos.
         /// The final LocalizedMidiDurationDef in each voice.LocalizedMidiDurationDefs list is converted
         /// to a FinalLMDDInVoice object containing an MsDurationToBarline property.
-        /// If a chord or rest overlaps a barline, an OverlapLmddAtStartOfBar object is created at the
-        /// start of the voice.LocalizedMidiDurationDefs in the second bar. An OverlapLmddAtStartOfBar
-        /// object is a kind of rest which is used while justifying systems, but is not displayed and
+        /// If a chord or rest overlaps a barline, a LocalizedCautionaryChordDef object is created at the
+        /// start of the voice.LocalizedMidiDurationDefs in the second bar. A LocalizedCautionaryChordDef
+        /// object is a kind of chord which is used while justifying systems, but is not displayed and
         /// does not affect performance.
         /// </summary>
         protected List<List<Voice>> SplitBar(List<Voice> originalBar, int absoluteSplitPos)
@@ -122,24 +122,24 @@ namespace Moritz.AssistantComposer
                     if(lmddEndPos > absoluteSplitPos)
                     {
                         int durationAfterBarline = lmddEndPos - absoluteSplitPos;
-                        if(lmdd.LocalMidiChordDef == null)
+                        if(lmdd.LocalMidiDurationDef is MidiRestDef)
                         {
                             // This is a rest. Split it.
-                            LocalizedMidiDurationDef firstLmdd = new LocalizedMidiDurationDef(lmdd.LocalMidiChordDef, lmdd.MsPosition, absoluteSplitPos - lmdd.MsPosition);
+                            LocalizedMidiDurationDef firstLmdd = new LocalizedMidiDurationDef(lmdd.LocalMidiDurationDef, lmdd.MsPosition, absoluteSplitPos - lmdd.MsPosition);
                             firstLmdd.MsDurationToNextBarline = absoluteSplitPos - lmdd.MsPosition;
                             firstBarVoice.LocalizedMidiDurationDefs.Add(firstLmdd);
 
-                            LocalizedMidiDurationDef secondLmdd = new LocalizedMidiDurationDef(lmdd.LocalMidiChordDef, absoluteSplitPos, durationAfterBarline);
+                            LocalizedMidiDurationDef secondLmdd = new LocalizedMidiDurationDef(lmdd.LocalMidiDurationDef, absoluteSplitPos, durationAfterBarline);
                             secondBarVoice.LocalizedMidiDurationDefs.Add(secondLmdd);
                         }
                         else
                         {
                             // This is a chord. Set the position of the following barline, and
-                            // Add an OverlapLmddAtStartOfBar at the beginning of the following bar.
+                            // Add an LocalizedCautionaryChordDef at the beginning of the following bar.
                             lmdd.MsDurationToNextBarline = absoluteSplitPos - lmdd.MsPosition;
                             firstBarVoice.LocalizedMidiDurationDefs.Add(lmdd);
 
-                            OverlapLmddAtStartOfBar secondLmdd = new OverlapLmddAtStartOfBar(absoluteSplitPos, durationAfterBarline, lmdd.LocalMidiChordDef);
+                            LocalizedCautionaryChordDef secondLmdd = new LocalizedCautionaryChordDef( lmdd.LocalMidiDurationDef as MidiChordDef, absoluteSplitPos, durationAfterBarline);
                             secondBarVoice.LocalizedMidiDurationDefs.Add(secondLmdd);
                         }
                     }
@@ -169,8 +169,8 @@ namespace Moritz.AssistantComposer
                     List<int> consecRestIndices = new List<int>();
                     for(int i = 0; i < voice.LocalizedMidiDurationDefs.Count - 1; i++)
                     {
-                        MidiChordDef mcd1 = voice.LocalizedMidiDurationDefs[i].LocalMidiChordDef;
-                        MidiChordDef mcd2 = voice.LocalizedMidiDurationDefs[i + 1].LocalMidiChordDef;
+                        MidiChordDef mcd1 = voice.LocalizedMidiDurationDefs[i].LocalMidiDurationDef as MidiChordDef;
+                        MidiChordDef mcd2 = voice.LocalizedMidiDurationDefs[i + 1].LocalMidiDurationDef as MidiChordDef;
                         if(mcd1 == null && mcd2 == null)
                         {
                             if(!consecRestIndices.Contains(i))
@@ -205,7 +205,7 @@ namespace Moritz.AssistantComposer
                             for(int j = indToReplace.Count - 1; j >= 0; j--)
                             {
                                 LocalizedMidiDurationDef lmdd = voice.LocalizedMidiDurationDefs[indToReplace[j]];
-                                Debug.Assert(lmdd.LocalMidiChordDef == null);
+                                Debug.Assert(lmdd.LocalMidiDurationDef == null);
                                 Debug.Assert(lmdd.MsDuration > 0);
                                 msDuration += lmdd.MsDuration;
                                 voice.LocalizedMidiDurationDefs.RemoveAt(indToReplace[j]);

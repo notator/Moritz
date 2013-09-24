@@ -9,7 +9,7 @@ using Moritz.Score.Midi;
 namespace Moritz.AssistantComposer
 {
     /// <summary>
-    /// Encapsulates the composition of Clytamnestra's Voice
+    /// Encapsulates the composition of Clytemnestra's Voice
     /// and the positions of barlines -- which are actually set in Song6SketchAlgorithm.DoAlgorithm().
     /// </summary>
     public class Clytemnestra

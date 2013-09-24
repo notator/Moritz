@@ -56,7 +56,7 @@ namespace Moritz.AssistantComposer
             // The blockMsDurations at positions 1,3,5,7,9,11 will be changed here later to better reflect the content of the Winds and Birds.
             // They have been set here for tesing purposes while composing Clytemnestra.
             // Clytemnestra sets the durations of blocks 2,4,6,8,10 (see below).
-            List<int> blockMsDurations = new List<int>(){20000,0,8000,0,8000,0,8000,0,8000,0,8000};
+            List<int> blockMsDurations = new List<int>() { 95606, 0, 101963, 0, 101963, 0, 101963, 0, 101963, 0, 108322 };
 
             Clytemnestra clytemnestra = new Clytemnestra(clytemnestrasChannelIndex, blockMsDurations);
             // Clytemnestra has now set the durations of blocks 2,4,6,8,10 to

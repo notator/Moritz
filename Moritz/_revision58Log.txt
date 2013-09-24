@@ -907,12 +907,12 @@ class is greater than quaver, and the chord straddles a barline. ExtensionLineMe
 SvgSystem.AddNoteheadExtenderLines().
 ExtenderLines are working except for when they start at the beginning of a staff as the result of being
 continued from the previous systems.
-Added OverlapLmddAtStartOfBar.CautionaryMidiChordDef field. TODO: use this to create cautionary chords and
+Added LocalizedCautionaryChordDef.CautionaryMidiChordDef field. TODO: use this to create cautionary chords and
 their extenders. 
  
 08.11.2011 rev58.92
 MidiCompositionAlgorithm.SplitBar(): Rests are always split over barlines. If a chord straddles a barline,
-its LocalizedMidiDurationDef.MsDurationToNextBarline field is set and an OverlapLmddAtStartOfBar object
+its LocalizedMidiDurationDef.MsDurationToNextBarline field is set and an LocalizedCautionaryChordDef object
 is created at the start of the voice continuation in the next bar.
 SvgSystem.MomentSymbols(): corrected the final barline position for chords which cross final staff barlines.
 This was necessary for correct justification.
@@ -935,7 +935,7 @@ Deleted the class LastLMDDInVoice. (Was left over from an undone edit.)
 
 07.11.2011 rev58.89
 Notator.AddSymbolsToSystems(): Suppressed short ties across barlines, by resetting the duration of the first 
-chord to the total duration of the tied chords, and replacing the second chord by an OverlapLmddAtStartOfBar.
+chord to the total duration of the tied chords, and replacing the second chord by an LocalizedCautionaryChordDef.
 The suppression is done if the first chord's duration is less than a quaver, and the second chord is not tied
 to a further chord. This is done before bars are joined to systems. 
 TODO: Replace suppressed "ties" at the ends of systems.
@@ -957,7 +957,7 @@ or 3 Systems. Rests are split:
 In other words: Whole bar rests are created where possible. This will mean that barlines can be drawn through
 long rests.
 Note that the total duration of a chord is contained in its first symbol, but that there is an
-OverlapLmddAtStartOfBar object at the start of the following voice. This object might be used to draw
+LocalizedCautionaryChordDef object at the start of the following voice. This object might be used to draw
 cautionary chords at the start of systems.
 
 05.11.2011 rev58.86

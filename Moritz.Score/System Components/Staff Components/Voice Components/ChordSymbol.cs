@@ -15,8 +15,7 @@ namespace Moritz.Score
             : base(voice, lmdd, minimumCrotchetDurationMS, fontSize)
         {
             _localizedMidiDurationDef = lmdd;
-            MidiChordDef midiChordDef = lmdd.LocalMidiChordDef;
-            // midiChordDef is null for cautionary chords
+            MidiChordDef midiChordDef = lmdd.LocalMidiDurationDef as MidiChordDef;
             if(midiChordDef != null)
             {
                 SetHeads(midiChordDef.MidiHeadSymbols);
@@ -117,18 +116,23 @@ namespace Moritz.Score
         {
             w.WriteStartElement("score", "midiChord", null);
             w.WriteAttributeString("id", midiId);
-            string ID = LocalizedMidiDurationDef.LocalMidiChordDef.ID; 
-            if(ID != null && !(ID.StartsWith("localChord")))
-            {
-                w.WriteStartElement("use");
-                w.WriteAttributeString("xlink", "href", null, "#" + LocalizedMidiDurationDef.LocalMidiChordDef.ID);
-                w.WriteEndElement(); // use
-            }
-            else
-            {
-                Debug.Assert(LocalizedMidiDurationDef != null);
-                this.LocalizedMidiDurationDef.LocalMidiChordDef.WriteSvg(w);
-            }
+            LocalMidiChordDef lmcd = LocalizedMidiDurationDef.LocalMidiDurationDef as LocalMidiChordDef;
+            Debug.Assert(lmcd != null);
+            string ID = lmcd.ID;
+            Debug.Assert(ID != null && ID.StartsWith("localChord"));
+            lmcd.WriteSvg(w);
+            // The above two lines used to be:
+            //if(ID != null && !(ID.StartsWith("localChord")))
+            //{
+            //    w.WriteStartElement("use");
+            //    w.WriteAttributeString("xlink", "href", null, "#" + lmcd.ID);
+            //    w.WriteEndElement(); // use
+            //}
+            //else
+            //{
+            //    lmcd.WriteSvg(w);
+            //}
+
             w.WriteEndElement(); // midiChord
         }
 

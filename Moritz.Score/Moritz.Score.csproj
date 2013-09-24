@@ -58,6 +58,7 @@
     <Compile Include="Midi\BasicMidiChordDef.cs" />
     <Compile Include="Midi\ChannelState.cs" />
     <Compile Include="Midi\ChordMessage.cs" />
+    <Compile Include="Midi\LocalMidiRestDef.cs" />
     <Compile Include="Midi\LocalizedMidiDurationDef.cs" />
     <Compile Include="Midi\LocalMidiChordDef.cs" />
     <Compile Include="Midi\MidiChord.cs" />

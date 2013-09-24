@@ -302,15 +302,20 @@ namespace Moritz.Score.Notation
             ref byte currentVelocity)
         {
             DurationSymbol durationSymbol = null;
-            MidiChordDef midiChordDef = lmdd.LocalMidiChordDef;
-            OverlapLmddAtStartOfBar olaso = lmdd as OverlapLmddAtStartOfBar;
+            LocalizedCautionaryChordDef lccd = lmdd as LocalizedCautionaryChordDef;  
+            MidiChordDef midiChordDef = lmdd.LocalMidiDurationDef as MidiChordDef;
 
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
             float musicFontHeight = pageFormat.MusicFontHeight;
             float cautionaryFontHeight = pageFormat.CautionaryNoteheadsFontHeight;
             int minimumCrotchetDuration = pageFormat.MinimumCrotchetDuration;
  
-            if(midiChordDef != null)
+            if(lccd != null && firstLmddInVoice)
+            {
+                CautionaryChordSymbol cautionaryChordSymbol = new CautionaryChordSymbol(voice, lccd, cautionaryFontHeight);
+                durationSymbol = cautionaryChordSymbol;
+            } 
+            else if(midiChordDef != null)
             {
                 ChordSymbol chordSymbol = new ChordSymbol(voice, lmdd, minimumCrotchetDuration, musicFontHeight);
 
@@ -320,11 +325,6 @@ namespace Moritz.Score.Notation
                     currentVelocity = midiChordDef.MidiVelocity;
                 }
                 durationSymbol = chordSymbol;
-            }
-            else if(olaso != null && firstLmddInVoice)
-            {
-                CautionaryChordSymbol cautionaryChordSymbol = new CautionaryChordSymbol(voice, olaso, cautionaryFontHeight);
-                durationSymbol = cautionaryChordSymbol;
             }
             else
             {

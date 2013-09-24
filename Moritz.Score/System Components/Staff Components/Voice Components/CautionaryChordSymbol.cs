@@ -8,25 +8,23 @@ namespace Moritz.Score
 {
     internal class CautionaryChordSymbol : ChordSymbol
     {
-        public CautionaryChordSymbol(Voice voice, OverlapLmddAtStartOfBar olaso, float fontSize)
-            : base(voice, olaso, 600, fontSize)
+        public CautionaryChordSymbol(Voice voice, LocalizedCautionaryChordDef lccd, float fontSize)
+            : base(voice, lccd, 600, fontSize)
         {
             _durationClass = DurationClass.cautionary;
             _msDuration = 0;
             Stem.Draw = false;
-            // _localizedMidiDurationDef.MidiChordDef is null
-            // the original msDuration can still be found at 
-            CautionaryMidiChordDef = olaso.CautionaryMidiChordDef;
-            if(CautionaryMidiChordDef != null)
-            {
-                SetHeads(CautionaryMidiChordDef.MidiHeadSymbols);
+ 
+            //MidiChordDef mcd = lccd.LocalMidiDurationDef as MidiChordDef;
+            //if(mcd != null)
+            //{
+            //    SetHeads(mcd.MidiHeadSymbols);
 
-                if(CautionaryMidiChordDef.OrnamentNumberSymbol != 0)
-                {
-                    AddOrnamentSymbol("~" + CautionaryMidiChordDef.OrnamentNumberSymbol.ToString());
-                }
-            }
-
+            //    if(mcd.OrnamentNumberSymbol != 0)
+            //    {
+            //        AddOrnamentSymbol("~" + mcd.OrnamentNumberSymbol.ToString());
+            //    }
+            //}
         }
 
         public override void WriteSVG(SvgWriter w)

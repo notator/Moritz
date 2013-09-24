@@ -18,6 +18,8 @@ namespace Moritz.AssistantComposer
     ///     {
     ///         ...
     ///     }
+    /// It is also indexable, as in:
+    ///     LocalizedMidiDurationDef lmdd = midiDefList[index];
     /// </summary>
     public class MidiDefSequence : IEnumerable
     {
@@ -25,7 +27,6 @@ namespace Moritz.AssistantComposer
         /// The argument may not be an empty list.
         /// The MsPositions and MsDurations in the list are checked for consistency.
         /// </summary>
-        /// <param name="lmdds"></param>
         public MidiDefSequence(List<LocalizedMidiDurationDef> lmdds)
         {
             Debug.Assert(lmdds.Count > 0);
@@ -39,8 +40,6 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// sequence contains a list of values in range 1..paletteDef.MidiDurationDefsCount.
         /// </summary>
-        /// <param name="paletteDef"></param>
-        /// <param name="sequence"></param>
         public MidiDefSequence(PaletteDef paletteDef, List<int> sequence)
         {
             int msPosition = 0;
@@ -61,8 +60,7 @@ namespace Moritz.AssistantComposer
 
         /// <summary>
         /// Constructs a MidiDefList at MsPosition=0, containing the localized sequence of MidiDurationDefs in the PaletteDef.
-        /// </summary>
-        /// <param name="midiDurationDefs"></param>
+        /// </summary
         public MidiDefSequence(PaletteDef midiDurationDefs)
         {
             Debug.Assert(midiDurationDefs != null);
@@ -77,14 +75,12 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// Returns a deep clone of this MidiDefSequence.
         /// </summary>
-        /// <param name="midiDefSequence"></param>
-        /// <returns></returns>
         public MidiDefSequence Clone()
         {
             List<LocalizedMidiDurationDef> clonedLmdds = new List<LocalizedMidiDurationDef>();
             foreach(LocalizedMidiDurationDef lmdd in this.LocalizedMidiDurationDefs)
             {
-                LocalizedMidiDurationDef clonedLmdd = new LocalizedMidiDurationDef(lmdd.LocalMidiChordDef, lmdd.MsPosition, lmdd.MsDuration);
+                LocalizedMidiDurationDef clonedLmdd = new LocalizedMidiDurationDef(lmdd.LocalMidiDurationDef, lmdd.MsPosition, lmdd.MsDuration);
                 clonedLmdds.Add(clonedLmdd);
             }
 
@@ -176,6 +172,26 @@ namespace Moritz.AssistantComposer
                 Debug.Assert(_localizedMidiDurationDefs.Count > 0);
                 LocalizedMidiDurationDef lastLmdd = _localizedMidiDurationDefs[_localizedMidiDurationDefs.Count - 1];
                 return lastLmdd.MsPosition + lastLmdd.MsDuration; 
+            }
+        }
+        public int Count { get { return _localizedMidiDurationDefs.Count; } }
+        public LocalizedMidiDurationDef this[int i]
+        {
+            get
+            {
+                if(i < 0 || i >= _localizedMidiDurationDefs.Count)
+                {
+                    throw new IndexOutOfRangeException();
+                }
+                return _localizedMidiDurationDefs[i];
+            }
+            set
+            {
+                if(i < 0 || i >= _localizedMidiDurationDefs.Count)
+                {
+                    throw new IndexOutOfRangeException();
+                }
+                _localizedMidiDurationDefs[i] = value;
             }
         }
         /// <summary>

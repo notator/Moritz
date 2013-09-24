@@ -13,12 +13,12 @@ namespace Moritz.Score
         public RestSymbol(Voice voice, LocalizedMidiDurationDef lmdd, int minimumCrotchetDurationMS, float fontHeight)
             : base(voice, lmdd, minimumCrotchetDurationMS, fontHeight)
         {
-            OverlapLmddAtStartOfBar = lmdd as OverlapLmddAtStartOfBar;
+            LocalizedCautionaryChordDef = lmdd as LocalizedCautionaryChordDef;
         }
 
         public override void WriteSVG(SvgWriter w)
         {
-            if(OverlapLmddAtStartOfBar == null)
+            if(LocalizedCautionaryChordDef == null)
             {
                 w.SvgStartGroup("rest" + SvgScore.UniqueID_Number);
                 w.WriteAttributeString("score", "object", null, "rest");
@@ -46,11 +46,11 @@ namespace Moritz.Score
 
 		#region display attributes
         /// <summary>
-        /// If OverlapLmddAtStartOfBar is set:
+        /// If LocalizedCautionaryChordDef is set:
         /// a) this rest is used like any other rest when justifying systems, but
         /// b) it is not displayed, and does not affect the temporal positions or durations of any chords. 
         /// </summary>
-        public OverlapLmddAtStartOfBar OverlapLmddAtStartOfBar = null;
+        public LocalizedCautionaryChordDef LocalizedCautionaryChordDef = null;
 		#endregion display attributes
 		#region verticalPos attributes
 		public bool Centered = false; // capella default
