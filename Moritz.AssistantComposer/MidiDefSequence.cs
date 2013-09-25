@@ -209,6 +209,80 @@ namespace Moritz.AssistantComposer
             }
         }
 
+        /// <summary>
+        /// _localizedMidiDurationDefs[alignIndex] (=lmddAlign) is moved to MsPosition, and the surrounding symbols are spread accordingly
+        /// between those at anchor1Index and anchor2Index. The symbols at anchor1Index (=lmddA1) and anchor2Index (=lmddA2)do not move.
+        /// An exception is thrown if an attempt is made to move any lmdd which is aligned to a barline.
+        /// barMsPositions contains the msPositions of all barlines except the last. (begins with 0)
+        /// </summary>
+        internal void AlignChordOrRest(List<int> barMsPositions, int anchor1Index, int alignIndex, int anchor2Index, int toMsPosition)
+        {
+            // throws an exception if there's a problem.
+            CheckAlignDefArgs(barMsPositions, anchor1Index, alignIndex, anchor2Index, toMsPosition);
+
+            List<LocalizedMidiDurationDef> lmdds = _localizedMidiDurationDefs;
+            int anchor1MsPosition = lmdds[anchor1Index].MsPosition;
+            int fromMsPosition = lmdds[alignIndex].MsPosition;
+            int anchor2MsPosition = lmdds[anchor2Index].MsPosition;
+
+            float leftFactor = (float)(((float)(toMsPosition - anchor1MsPosition))/((float)(fromMsPosition - anchor1MsPosition)));
+            for(int i = anchor1Index + 1; i < alignIndex; ++i)
+            {
+                lmdds[i].MsPosition = anchor1MsPosition + ((int)((lmdds[i].MsPosition - anchor1MsPosition) * leftFactor));           
+            }
+            lmdds[alignIndex].MsPosition = toMsPosition;
+            float rightFactor = (float)(((float)(anchor2MsPosition - toMsPosition)) / ((float)(anchor2MsPosition - fromMsPosition)));
+            for(int i = anchor2Index - 1; i > alignIndex; --i)
+            {
+                lmdds[i].MsPosition = anchor2MsPosition - ((int)((anchor2MsPosition - lmdds[i].MsPosition) * rightFactor));
+            }
+
+            for(int i = anchor1Index + 1; i <= anchor2Index; ++i)
+            {
+                lmdds[i - 1].MsDuration = lmdds[i].MsPosition - lmdds[i - 1].MsPosition;
+            }
+        }
+
+        private void CheckAlignDefArgs(List<int> barMsPositions, int anchor1Index, int alignIndex, int anchor2Index, int toMsPosition)
+        {
+            List<LocalizedMidiDurationDef> lmdds = _localizedMidiDurationDefs; 
+            int count = lmdds.Count;
+            string msg = "\nError in MidiDefSequence.cs,\nfunction AlignDefMsPosition()\n\n";
+            if(anchor1Index >= count || alignIndex >= count || anchor2Index >= count)
+            {
+                throw new Exception(msg + "Index out of range.\n" +
+                    "\ncount=" + count.ToString() +
+                    "\nanchor1Index=" + anchor1Index.ToString() +
+                    "\nalignIndex=" + alignIndex.ToString() +
+                    "\nanchor2Index=" + anchor2Index.ToString());
+            }
+            if(anchor1Index >= alignIndex || anchor2Index <= alignIndex)
+            {
+                throw new Exception(msg + "Index out of order.\n" +
+                    "\nanchor1Index=" + anchor1Index.ToString() +
+                    "\nalignIndex=" + alignIndex.ToString() +
+                    "\nanchor2Index=" + anchor2Index.ToString());
+            }
+            for(int index = anchor1Index + 1; index < anchor2Index; ++index)
+            {
+                if(barMsPositions.Contains(lmdds[index].MsPosition))
+                {
+                    throw new Exception(msg + "Can't move chord or rest attached to a barline.\n" +
+                        "\nindex=" + index.ToString());
+                }
+            }
+            int a1MsPos = lmdds[anchor1Index].MsPosition;
+            int a2MsPos = lmdds[anchor2Index].MsPosition;
+            if(toMsPosition <= a1MsPos || toMsPosition >= a2MsPos)
+            {
+                throw new Exception(msg + "Target (msPos) position out of range.\n" +
+                    "\nanchor1Index=" + anchor1Index.ToString() +
+                    "\nalignIndex=" + alignIndex.ToString() +
+                    "\nanchor2Index=" + anchor2Index.ToString() +
+                    "\ntoMsPosition=" + toMsPosition.ToString());  
+            }
+        }
+
         // TODO
         // public void AdjustVelocity(int interval) // like Transpose()
 

@@ -138,13 +138,24 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// Moves LocalizedMidiDurationDefs in both bass and treble winds to align with
+        /// Moves certain LocalizedMidiDurationDefs in both bass and treble winds to align with
         /// LocalizedMidiDurationDefs in clytemnestra.
-        /// LocalizedMidiDurationDefs at barlineMsPositions may not move.
+        /// LocalizedMidiDurationDefs which are already at a barlineMsPosition may not move.
         /// </summary>
         /// <param name="barlineMsPositions"></param>
-        internal void AdjustMsPositions(MidiDefSequence clytemnestra, List<int> barlineMsPositions)
+        internal void AlignChords(MidiDefSequence clytemnestra, List<int> barlineMsPositions)
         {
+            List<int> barMsPositions = new List<int>(barlineMsPositions);
+            barMsPositions.Insert(0, 0);
+            MidiDefSequence bassWind = MidiDefSequences[0];
+            MidiDefSequence tenorWind = MidiDefSequences[1];
+
+            int barNumber = 10;
+            int anchor1Index = 10;
+            int alignIndex = 12;
+            int anchor2Index = 15;
+            //bassWind.AdjustDefMsPosition(barMsPositions, anchor1index, alignIndex, anchor2index, toMsPos);
+            tenorWind.AlignChordOrRest(barMsPositions, anchor1Index, alignIndex, anchor2Index, barMsPositions[barNumber - 1]);
 
         }
 

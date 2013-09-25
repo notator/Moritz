@@ -79,8 +79,12 @@ namespace Moritz.AssistantComposer
             // barlineMsPositions is an argument to a new function, to be added to MidiDefSequence:
             //    AdjustDefMsPosition(barlineMsPositions, anchor1index, defIndex, newDefMsPos, anchor2index)
             //
+            // barlineMsPositions does not contain msPos=0 or the position of the final barline
+            // It does however contain all the other barline positions.
 
-            winds.AdjustMsPositions(clytemnestra.MidiDefSequence, barlineMsPositions);
+            winds.AlignChords(clytemnestra.MidiDefSequence, barlineMsPositions);
+
+            Debug.Assert(barlineMsPositions.Count == NumberOfBars() - 1);
 
             //Birds birds = new Birds(clytemnestra, winds, _krystals, _paletteDefs, blockMsDurations);
 
