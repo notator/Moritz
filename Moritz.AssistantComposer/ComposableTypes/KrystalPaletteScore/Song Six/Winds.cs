@@ -21,6 +21,8 @@ namespace Moritz.AssistantComposer
 
             SetBaseWindIndexLyrics(baseMidiDefSequence);
 
+            SetTenorWindIndexLyrics(tenorMidiDefSequence);
+
             // etc. -- create and add other wind voices, so that wind channels are ordered bottom to top.
             // (MidiDefSequences[0] is the base Wind sequence.
         }
@@ -70,12 +72,40 @@ namespace Moritz.AssistantComposer
 
         private void SetBaseWindIndexLyrics(MidiDefSequence baseMidiDefSequence)
         {
+            SetLyrics(baseMidiDefSequence, BaseWindKrystalStrandIndices);
+        }
+
+        private void SetTenorWindIndexLyrics(MidiDefSequence tenorMidiDefSequence)
+        {
+            List<int> tenorWindKrystalStrandIndices = new List<int>(){0};
+            int count = tenorMidiDefSequence.Count;
             foreach(int index in BaseWindKrystalStrandIndices)
             {
-                LocalMidiChordDef lmcd = baseMidiDefSequence[index].LocalMidiDurationDef as LocalMidiChordDef;
+                int newIndex = count - index;
+                if(newIndex > 0 && newIndex < count)
+                {
+                    tenorWindKrystalStrandIndices.Add(newIndex);
+                }
+            }
+
+            SetLyrics(tenorMidiDefSequence, tenorWindKrystalStrandIndices);
+        }
+
+        private void SetLyrics(MidiDefSequence midiDefSequence, List<int> strandIndices)
+        {
+            for(int index = 0; index < midiDefSequence.Count; ++index)
+            {
+                LocalMidiChordDef lmcd = midiDefSequence[index].LocalMidiDurationDef as LocalMidiChordDef;
                 if(lmcd != null)
                 {
-                    lmcd.Lyric = index.ToString();
+                    if(strandIndices.Contains(index))
+                    {
+                        lmcd.Lyric = ">>" + index.ToString() + "<<";
+                    }
+                    else
+                    {
+                        lmcd.Lyric = index.ToString();
+                    }
                 }
             }
         }
@@ -107,6 +137,17 @@ namespace Moritz.AssistantComposer
             return barlineMsPositions;
         }
 
+        /// <summary>
+        /// Moves LocalizedMidiDurationDefs in both bass and treble winds to align with
+        /// LocalizedMidiDurationDefs in clytemnestra.
+        /// LocalizedMidiDurationDefs at barlineMsPositions may not move.
+        /// </summary>
+        /// <param name="barlineMsPositions"></param>
+        internal void AdjustMsPositions(MidiDefSequence clytemnestra, List<int> barlineMsPositions)
+        {
+
+        }
+
         #region attributes
         internal List<int> BaseWindKrystalStrandIndices = new List<int>();
 
@@ -114,6 +155,5 @@ namespace Moritz.AssistantComposer
         // The sequences are in bottom to top order. MidiDefSequences[0] is the base Wind
         internal List<MidiDefSequence> MidiDefSequences = new List<MidiDefSequence>();
         #endregion
-
     }
 }
