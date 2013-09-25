@@ -80,14 +80,8 @@ namespace Moritz.AssistantComposer
             }
         }
 
-        public List<int> BaseWindKrystalStrandIndices = new List<int>();
-
-        // each MidiDefSequence has the duration of the whole piece
-        // The sequences are in bottom to top order. MidiDefSequences[0] is the base Wind
-        public List<MidiDefSequence> MidiDefSequences = new List<MidiDefSequence>();
-
         // each voice has the duration of the whole piece
-        public List<Voice> GetVoices(int topWindChannelIndex)
+        internal List<Voice> GetVoices(int topWindChannelIndex)
         {
             List<Voice> voices = new List<Voice>();
             int windChannelIndex = topWindChannelIndex;
@@ -99,5 +93,27 @@ namespace Moritz.AssistantComposer
             }
             return voices;
         }
+
+        internal List<int> AddInterludeBarlinePositions(List<int> barlineMsPositions)
+        {
+            List<int> newBarlineIndices = new List<int>() { 1, 3, 5, 15, 27, 40, 45, 57, 63, 77 }; // by inspection of the score
+            MidiDefSequence bassWind = MidiDefSequences[0];
+            foreach(int index in newBarlineIndices)
+            {
+                barlineMsPositions.Add(bassWind.LocalizedMidiDurationDefs[index].MsPosition);
+            }
+            barlineMsPositions.Sort();
+
+            return barlineMsPositions;
+        }
+
+        #region attributes
+        internal List<int> BaseWindKrystalStrandIndices = new List<int>();
+
+        // each MidiDefSequence has the duration of the whole piece
+        // The sequences are in bottom to top order. MidiDefSequences[0] is the base Wind
+        internal List<MidiDefSequence> MidiDefSequences = new List<MidiDefSequence>();
+        #endregion
+
     }
 }

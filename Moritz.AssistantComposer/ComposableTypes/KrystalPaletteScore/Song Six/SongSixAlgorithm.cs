@@ -33,7 +33,7 @@ namespace Moritz.AssistantComposer
         /// <returns></returns>
         public override int NumberOfBars()
         {
-            return 84;
+            return 94;
         }
 
         /// <summary>
@@ -72,22 +72,21 @@ namespace Moritz.AssistantComposer
 
             clytemnestra.MidiDefSequence = clytemnestra.GetMidiDefSequence(blockMsDurations);
 
+            List<int> barlineMsPositions = clytemnestra.GetBarlineMsPositions(blockMsDurations);
+            barlineMsPositions = winds.AddInterludeBarlinePositions(barlineMsPositions);
+
+            // LocalMidiDurationDefs at barlineMsPositions cannot be shifted sideways.
+            // barlineMsPositions is an argument to a new function, to be added to MidiDefSequence:
+            //    AdjustDefMsPosition(barlineMsPositions, anchor1index, defIndex, newDefMsPos, anchor2index)
+            //
+            //winds.AdjustMsPositions(barlineMsPositions);
+
             //Birds birds = new Birds(clytemnestra, winds, _krystals, _paletteDefs, blockMsDurations);
 
             // system contains one Voice per channel (not divided into bars)
-            List<Voice> system = GetVoices(/*birds,*/ clytemnestra, winds); 
+            List<Voice> system = GetVoices(/*birds,*/ clytemnestra, winds);
 
-            List<int> barlineMsPositions = GetBarlineMsPositions(blockMsDurations, clytemnestra.BarlineMsPositionsPerBlock
-                //, birds.BarlineMsPositionsPerBlock,
-                //winds.BarlineMsPositionsPerBlock,
-                );
-
-            // barlineMsPositions does not contain msPos=0 or the position of the final barline
-            // It does however contain the positions of the other barlines that begin blocks.
-            List<List<Voice>> bars = new List<List<Voice>>();
-            bars = GetBars(system, barlineMsPositions);
-            Console.WriteLine("bars.Count = " + bars.Count.ToString());
-            Debug.Assert(bars.Count == NumberOfBars());
+            List<List<Voice>> bars = GetBars(system, barlineMsPositions);
 
             return bars;
         }
@@ -153,71 +152,22 @@ namespace Moritz.AssistantComposer
             return voices;
         }
 
-        /// <summary>
-        /// When the birds and winds have been composed, the arguments birdsBarlineMsPositionsPerBlock and
-        /// windsBarlineMsPositionsPerBlock should be added to this function (there are comments inside, showing how they will be used).
-        /// Both these arguments should (like clytemnestrasBarlineMsPositionsPerBlock) contain 11 lists of ints (1 per block).
-        /// The contained msPositionsPerBlock lists should contain the positions of the barlines relative to the start of the block, but
-        /// contain neither the first barline in the block (=0) nor the position of the end of the block.
-        /// </summary>
-        /// <returns>A sorted list of barline positions. The list contains neither the first position (=0) nor the last position</returns>
-        private List<int> GetBarlineMsPositions(List<int> blockMsDurations, List<List<int>> clytemnestrasBarlineMsPositionsPerBlock)
-        { 
-            // The list to be returned. Will contain neither the first (=0) nor the final barline positions.
-            List<int> barlineMsPoss = new List<int>();
-
-            // Simply the position of each block. 11 values, 1 per block (starting with 0).
-            List<int> blockMsPoss = new List<int>() {0};
-
-            Debug.Assert(blockMsDurations.Count == 11);
-
-            int prevPos = 0;
-            for(int i = 0; i < 10; ++i)
-            {
-                int msPos = blockMsDurations[i] + prevPos;
-                barlineMsPoss.Add(msPos);
-                blockMsPoss.Add(msPos);
-                prevPos = msPos;
-            }
-
-            Debug.Assert(barlineMsPoss.Count == 10);
-            Debug.Assert(blockMsPoss.Count == 11);
-            Debug.Assert(clytemnestrasBarlineMsPositionsPerBlock.Count == 11);
-            //Debug.Assert(birdsBarlineMsPositionsPerBlock.Count == 11);
-            //Debug.Assert(windsBarlineMsPositionsPerBlock.Count == 11);
-
-            for(int i = 0; i < 11; ++i)
-            {
-                AddBarlinePositions(barlineMsPoss, blockMsPoss[i], clytemnestrasBarlineMsPositionsPerBlock[i]);
-                // AddBarlinePositions(barlineMsPoss, blockMsPoss[i], birdsBarlineMsPositionsPerBlock);
-                // AddBarlinePositions(barlineMsPoss, blockMsPoss[i], windssBarlineMsPositionsPerBlock);
-            }
-
-            barlineMsPoss.Sort();
-
-            return barlineMsPoss;
-        }
-
-        private void AddBarlinePositions(List<int> barlineMsPoss, int blockMsPos, List<int> blockBarlineMsPositions)
+        private List<List<Voice>> GetBars(List<Voice> system, List<int> barlineMsPositions)
         {
-            if(blockBarlineMsPositions != null && blockBarlineMsPositions.Count > 0)
-            {
-                foreach(int msPosReBlock in blockBarlineMsPositions)
-                {
-                    int msPos = blockMsPos + msPosReBlock;
-                    if(!barlineMsPoss.Contains(msPos))
-                    {
-                        barlineMsPoss.Add(msPos);
-                    }
-                }
-            }
+            // barlineMsPositions does not contain msPos=0 or the position of the final barline
+            // It does however contain all the other barline positions.
+            List<List<Voice>> bars = new List<List<Voice>>();
+            bars = GetBarsFromBarlineMsPositions(system, barlineMsPositions);
+            Console.WriteLine("bars.Count = " + bars.Count.ToString());
+            Debug.Assert(bars.Count == NumberOfBars());
+            return bars;
         }
 
         /// <summary>
         /// Splits the voices (currently in a single bar) into bars
         /// barlineMsPositions contains neither msPosition 0, nor the position of the final barline.
         /// </summary>
-        private List<List<Voice>> GetBars(List<Voice> voices, List<int> barLineMsPositions)
+        private List<List<Voice>> GetBarsFromBarlineMsPositions(List<Voice> voices, List<int> barLineMsPositions)
         {
             List<List<Voice>> bars = new List<List<Voice>>();
             List<List<Voice>> twoBars = null;

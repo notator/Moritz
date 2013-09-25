@@ -18,7 +18,7 @@ namespace Moritz.AssistantComposer
         {
             SetMomentDefsListPerVerse();
             SetBlockMsDurations(blockMsDurations);
-            SetBarLineMsPositionsPerBlock();
+            GetBarLineMsPositionsPerBlock();
         }
 
         /// <summary>
@@ -106,18 +106,12 @@ namespace Moritz.AssistantComposer
             }
         }
 
-        /// <summary>
-        /// Sets _barlineMsPositions containing the msPosition of each bar
-        /// (not including 0 for bar 1, and not including the msPosition of the final barline).
-        /// Each rest before and after a verse is set to one Bar, and the barlines in the verses are set
-        /// to the same MomentDef positions as in the original sketch.
-        /// </summary>
-        private void SetBarLineMsPositionsPerBlock()
+        private List<List<int>> GetBarLineMsPositionsPerBlock()
         {
             List<List<int>> barlineIndicesPerVerse = BarlineIndicesPerVerse;
-            _barlineMsPositionsPerBlock = new List<List<int>>();
+            List<List<int>> barlineMsPositionsPerBlock = new List<List<int>>();
             int blockIndex = 0;
-            _barlineMsPositionsPerBlock.Add(new List<int>()); // no barlines for block 1
+            barlineMsPositionsPerBlock.Add(new List<int>()); // no barlines for block 1
 
             for(int vIndex = 0; vIndex < _momentDefsListPerVerse.Count; ++vIndex)
             {
@@ -131,11 +125,13 @@ namespace Moritz.AssistantComposer
                     blockBarlinePoss.Add(momentDefs[index].MsPosition);
                 }
 
-                _barlineMsPositionsPerBlock.Add(blockBarlinePoss);
+                barlineMsPositionsPerBlock.Add(blockBarlinePoss);
 
                 blockIndex++;
-                _barlineMsPositionsPerBlock.Add(new List<int>()); // no barlines for odd numbered blocks
+                barlineMsPositionsPerBlock.Add(new List<int>()); // no barlines for odd numbered blocks
             }
+
+            return barlineMsPositionsPerBlock;
         }
 
         /// <summary>
@@ -408,12 +404,60 @@ namespace Moritz.AssistantComposer
             return poss;
         }
 
+        /// <summary>
+        /// returns a sorted list of barline positions. The list contains neither the first position (=0) nor the last position
+        /// </summary>
+        public List<int> GetBarlineMsPositions(List<int> blockMsDurations)
+        {
+            // The list to be returned. Will contain neither the first (=0) nor the final barline positions.
+            List<int> barlineMsPoss = new List<int>();
+            List<List<int>> barlineMsPositionsPerBlock = GetBarLineMsPositionsPerBlock();
+
+            // Simply the position of each block. 11 values, 1 per block (starting with 0).
+            List<int> blockMsPoss = new List<int>() { 0 };
+
+            Debug.Assert(blockMsDurations.Count == 11);
+
+            int prevPos = 0;
+            for(int i = 0; i < 10; ++i)
+            {
+                int msPos = blockMsDurations[i] + prevPos;
+                barlineMsPoss.Add(msPos);
+                blockMsPoss.Add(msPos);
+                prevPos = msPos;
+            }
+
+            Debug.Assert(barlineMsPoss.Count == 10);
+            Debug.Assert(blockMsPoss.Count == 11);
+            Debug.Assert(barlineMsPositionsPerBlock.Count == 11);
+
+            for(int i = 0; i < 11; ++i)
+            {
+                AddBarlinePositions(barlineMsPoss, blockMsPoss[i], barlineMsPositionsPerBlock[i]);
+            }
+
+            barlineMsPoss.Sort();
+
+            return barlineMsPoss;
+        }
+
+        private void AddBarlinePositions(List<int> barlineMsPoss, int blockMsPos, List<int> blockBarlineMsPositions)
+        {
+            if(blockBarlineMsPositions != null && blockBarlineMsPositions.Count > 0)
+            {
+                foreach(int msPos in blockBarlineMsPositions)
+                {
+                    if(!barlineMsPoss.Contains(msPos))
+                    {
+                        barlineMsPoss.Add(msPos);
+                    }
+                }
+            }
+        }
+
         private List<List<MomentDef>> _momentDefsListPerVerse;
 
         public MidiDefSequence MidiDefSequence = null;
-
-        private List<List<int>> _barlineMsPositionsPerBlock;
-        public List<List<int>> BarlineMsPositionsPerBlock { get { return _barlineMsPositionsPerBlock; } }
 
     }
 }
