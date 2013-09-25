@@ -51,8 +51,12 @@ namespace Moritz.AssistantComposer
             #region Composed values (constants)
             // the number of values in the first five krystal blocks (the krystal actually has six blocks)
             int nBaseWindChords = 82;
-            // The chord number, in the base wind, at which each of Clytemnestra's blocks start.
-            List<int> baseWindChordNumberPerClytBlock = new List<int>() { 6, 21, 36, 52, 67 };
+
+            // Krystals included in the Song Six.mkss file can be examined by hovering over the _krystals variable.
+            // Currently:
+            //  _krystals[0] is xk3(7.7.1)-3: The first 6 blocks (=21 strands =82 values) are the palette values defining bass wind
+            //  _krystals[1] is xk2(7.7.1)-2: The density input for _krystals[0]
+            //  _krystals[2] is lk1(7)-1    : The density input for _krystals[1]
             #endregion
 
             // The blockMsDurations at positions 1,3,5,7,9,11 will be set by the Winds (possibly taking account of the birds).
@@ -64,14 +68,14 @@ namespace Moritz.AssistantComposer
 
             Winds winds = new Winds(_krystals, _paletteDefs, nBaseWindChords);
 
-            SetBlockMsDurations(blockMsDurations, winds.MidiDefSequences[0], baseWindChordNumberPerClytBlock);
+            SetBlockMsDurations(blockMsDurations, winds);
 
             clytemnestra.MidiDefSequence = clytemnestra.GetMidiDefSequence(blockMsDurations);
 
-            //Birds birds = new Birds(clytemnestra, winds, _krystals, _paletteDefs, nBirdVoices, blockMsDurations);
+            //Birds birds = new Birds(clytemnestra, winds, _krystals, _paletteDefs, blockMsDurations);
 
-            // wholePiece contains one Voice per channel (not divided into bars
-            List<Voice> wholePiece = GetVoices(/*birds,*/ clytemnestra, winds); 
+            // system contains one Voice per channel (not divided into bars)
+            List<Voice> system = GetVoices(/*birds,*/ clytemnestra, winds); 
 
             List<int> barlineMsPositions = GetBarlineMsPositions(blockMsDurations, clytemnestra.BarlineMsPositionsPerBlock
                 //, birds.BarlineMsPositionsPerBlock,
@@ -81,7 +85,7 @@ namespace Moritz.AssistantComposer
             // barlineMsPositions does not contain msPos=0 or the position of the final barline
             // It does however contain the positions of the other barlines that begin blocks.
             List<List<Voice>> bars = new List<List<Voice>>();
-            bars = GetBars(wholePiece, barlineMsPositions);
+            bars = GetBars(system, barlineMsPositions);
             Console.WriteLine("bars.Count = " + bars.Count.ToString());
             Debug.Assert(bars.Count == NumberOfBars());
 
@@ -93,12 +97,21 @@ namespace Moritz.AssistantComposer
         /// </summary>
         /// <param name="blockMsDurations"></param>
         /// <param name="totalMsDuration"></param>
-        private void SetBlockMsDurations(List<int> blockMsDurations, MidiDefSequence baseMidiDefSequence, List<int> baseWindChordNumberPerClytBlock)
+        private void SetBlockMsDurations(List<int> blockMsDurations, Winds winds)
         {
             List<int> msPosPerClytBlock = new List<int>();
-            foreach(int chordNumber in baseWindChordNumberPerClytBlock)
+            MidiDefSequence bassWind = winds.MidiDefSequences[0];
+            List<int> baseWindChordIndexPerClytBlock = new List<int>();
+
+            baseWindChordIndexPerClytBlock.Add(winds.BaseWindKrystalStrandIndices[4]);  // strand 5
+            baseWindChordIndexPerClytBlock.Add(winds.BaseWindKrystalStrandIndices[7]);  // strand 8 (verse 1 has 3 strands
+            baseWindChordIndexPerClytBlock.Add(winds.BaseWindKrystalStrandIndices[10]); // strand 11 (verse 2 has 3 strands)
+            baseWindChordIndexPerClytBlock.Add(winds.BaseWindKrystalStrandIndices[13]); // strand 14 (verse 3 has 3 strands)
+            baseWindChordIndexPerClytBlock.Add(winds.BaseWindKrystalStrandIndices[18]); // strand 19 (verse 4 has 5 strands, verse 5 has 3 strands)
+
+            foreach(int chordIndex in baseWindChordIndexPerClytBlock)
             {
-                msPosPerClytBlock.Add(baseMidiDefSequence[chordNumber - 1].MsPosition);
+                msPosPerClytBlock.Add(bassWind[chordIndex].MsPosition);
             }
 
             blockMsDurations[0] = msPosPerClytBlock[0];
@@ -106,7 +119,12 @@ namespace Moritz.AssistantComposer
             blockMsDurations[4] = msPosPerClytBlock[2] - msPosPerClytBlock[1] - blockMsDurations[3];
             blockMsDurations[6] = msPosPerClytBlock[3] - msPosPerClytBlock[2] - blockMsDurations[5];
             blockMsDurations[8] = msPosPerClytBlock[4] - msPosPerClytBlock[3] - blockMsDurations[7];
-            blockMsDurations[10] = baseMidiDefSequence.EndMsPosition - msPosPerClytBlock[4] - blockMsDurations[9];
+            blockMsDurations[10] = bassWind.EndMsPosition - msPosPerClytBlock[4] - blockMsDurations[9];
+
+            for(int i = 0; i < blockMsDurations.Count; ++i)
+            {
+                Debug.Assert(blockMsDurations[i] > 0, "Block " + (i+1).ToString() + " would have negative duration.");
+            }
         }
 
         private List<Voice> GetVoices(/*Birds birds,*/ Clytemnestra clytemnestra, Winds winds)

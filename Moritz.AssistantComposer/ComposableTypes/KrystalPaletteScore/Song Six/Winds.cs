@@ -19,6 +19,8 @@ namespace Moritz.AssistantComposer
             MidiDefSequence tenorMidiDefSequence = GetTenorMidiDefSequence(baseMidiDefSequence);
             MidiDefSequences.Add(tenorMidiDefSequence);
 
+            SetBaseWindIndexLyrics(baseMidiDefSequence);
+
             // etc. -- create and add other wind voices, so that wind channels are ordered bottom to top.
             // (MidiDefSequences[0] is the base Wind sequence.
         }
@@ -26,12 +28,14 @@ namespace Moritz.AssistantComposer
         private MidiDefSequence GetBaseMidiDefSequence(Krystal krystal, PaletteDef paletteDef, int nBaseChords)
         {
             List<List<int>> kValues = krystal.GetValues((uint)1);
-            List<int> sequence = kValues[0];
+            List<int> sequence = kValues[0]; // the flat list of values
             sequence = sequence.GetRange(0, nBaseChords);
 
             MidiDefSequence baseMidiDefSequence = new MidiDefSequence(paletteDef, sequence);
 
             baseMidiDefSequence.Transpose(-4);
+
+            BaseWindKrystalStrandIndices = GetBaseWindStrandIndices(krystal, nBaseChords);
 
             return baseMidiDefSequence;
         }
@@ -46,6 +50,37 @@ namespace Moritz.AssistantComposer
 
             return tenorMidiDefSequence;
         }
+
+        private List<int> GetBaseWindStrandIndices(Krystal krystal, int nBaseChords)
+        {
+            List<int> strandIndices = new List<int>();
+            List<Strand> strands = krystal.Strands;
+            int index = 0;
+            foreach(Strand strand in strands)
+            {
+                if(index >= nBaseChords)
+                {
+                    break;
+                }
+                strandIndices.Add(index);
+                index += strand.Values.Count;
+            }
+            return strandIndices;
+        }
+
+        private void SetBaseWindIndexLyrics(MidiDefSequence baseMidiDefSequence)
+        {
+            foreach(int index in BaseWindKrystalStrandIndices)
+            {
+                LocalMidiChordDef lmcd = baseMidiDefSequence[index].LocalMidiDurationDef as LocalMidiChordDef;
+                if(lmcd != null)
+                {
+                    lmcd.Lyric = index.ToString();
+                }
+            }
+        }
+
+        public List<int> BaseWindKrystalStrandIndices = new List<int>();
 
         // each MidiDefSequence has the duration of the whole piece
         // The sequences are in bottom to top order. MidiDefSequences[0] is the base Wind
