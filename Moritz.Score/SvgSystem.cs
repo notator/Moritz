@@ -206,8 +206,13 @@ namespace Moritz.Score
 
             symbolSet.FinalizeBeamBlocks(Staves);
             symbolSet.AlignLyrics(Staves);
+            SvgSystem nextSystem = null;
+            if(systemNumber < this.Score.Systems.Count)
+            {
+                nextSystem = this.Score.Systems[systemNumber];
+            } 
             symbolSet.AddNoteheadExtenderLines(Staves, pageFormat.RightMarginPos, pageFormat.Gap, 
-                pageFormat.NoteheadExtenderStrokeWidth, pageFormat.StafflineStemStrokeWidth);
+                pageFormat.NoteheadExtenderStrokeWidth, pageFormat.StafflineStemStrokeWidth, nextSystem);
 
             AlignStaffnamesInLeftMargin(leftMargin, pageFormat.Gap);
 

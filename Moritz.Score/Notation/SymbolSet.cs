@@ -33,7 +33,7 @@ namespace Moritz.Score.Notation
         /// Feb. 2012: Currently only the StandardSymbolSet supports notehead extender lines. 
         /// </summary>
         public virtual void AddNoteheadExtenderLines(List<Staff> staves,
-            float rightMarginPos, float gap, float extenderStrokeWidth, float hairlinePadding) { }
+            float rightMarginPos, float gap, float extenderStrokeWidth, float hairlinePadding, SvgSystem nextSystem) { }
 
         /// <summary>
         /// This function

@@ -150,10 +150,24 @@ namespace Moritz.AssistantComposer
             MidiDefSequence bassWind = MidiDefSequences[0];
             MidiDefSequence tenorWind = MidiDefSequences[1];
 
-            int barNumber = 10;
-            int anchor1Index = 10;
-            int alignIndex = 12;
-            int anchor2Index = 15;
+            int barNumber = 6;
+            int anchor1Index = 9;
+            int alignIndex = 10;
+            int anchor2Index = 11;
+            //bassWind.AdjustDefMsPosition(barMsPositions, anchor1index, alignIndex, anchor2index, toMsPos);
+            tenorWind.AlignChordOrRest(barMsPositions, anchor1Index, alignIndex, anchor2Index, barMsPositions[barNumber - 1]);
+
+            barNumber = 8;
+            anchor1Index = 10;
+            alignIndex = 11;
+            anchor2Index = 12;
+            //bassWind.AdjustDefMsPosition(barMsPositions, anchor1index, alignIndex, anchor2index, toMsPos);
+            tenorWind.AlignChordOrRest(barMsPositions, anchor1Index, alignIndex, anchor2Index, barMsPositions[barNumber - 1]);
+
+            barNumber = 10;
+            anchor1Index = 11;
+            alignIndex = 12;
+            anchor2Index = 13;
             //bassWind.AdjustDefMsPosition(barMsPositions, anchor1index, alignIndex, anchor2index, toMsPos);
             tenorWind.AlignChordOrRest(barMsPositions, anchor1Index, alignIndex, anchor2Index, barMsPositions[barNumber - 1]);
 

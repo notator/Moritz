@@ -436,11 +436,11 @@ namespace Moritz.Score.Notation
             }
         }
 
-        public override void AddNoteheadExtenderLines(List<Staff> staves, float rightMarginPos, float gap, float extenderStrokeWidth, float hairlinePadding)
+        public override void AddNoteheadExtenderLines(List<Staff> staves, float rightMarginPos, float gap, float extenderStrokeWidth, float hairlinePadding, SvgSystem nextSystem)
         {
             AddExtendersAtTheBeginningsofStaves(staves, rightMarginPos, gap, extenderStrokeWidth, hairlinePadding);
             AddExtendersInStaves(staves, extenderStrokeWidth, gap, hairlinePadding);
-            AddExtendersAtTheEndsOfStaves(staves, rightMarginPos, gap, extenderStrokeWidth, hairlinePadding);
+            AddExtendersAtTheEndsOfStaves(staves, rightMarginPos, gap, extenderStrokeWidth, hairlinePadding, nextSystem);
         }
         #region private to AddNoteheadExtenderLines()
         private void AddExtendersAtTheBeginningsofStaves(List<Staff> staves, float rightMarginPos, float gap, float extenderStrokeWidth, float hairlinePadding)
@@ -502,10 +502,16 @@ namespace Moritz.Score.Notation
             List<NoteObject> noteObjects, List<float> x1s, List<float> ys, float hairlinePadding)
         {
             List<float> x2s = new List<float>();
-            DurationSymbol dc2 = GetFollowingChordOrRestSymbol(noteObjects);
-            ChordSymbol chord2 = dc2 as ChordSymbol;
-            RestSymbol rest2 = dc2 as RestSymbol;
-            if(chord2 != null)
+            NoteObject no2 = GetFollowingChordRestOrBarlineSymbol(noteObjects);
+            Barline barline = no2 as Barline;
+            ChordSymbol chord2 = no2 as ChordSymbol;
+            RestSymbol rest2 = no2 as RestSymbol;
+            if(barline != null)
+            {
+                float x2 = barline.Metrics.OriginX;
+                x2s = GetEqualFloats(x2, x1s.Count);
+            }
+            else if(chord2 != null)
             {
                 x2s = GetX2sFromChord2(ys, chord2.ChordMetrics, hairlinePadding);
             }
@@ -514,9 +520,9 @@ namespace Moritz.Score.Notation
                 float x2 = rest2.Metrics.Left - hairlinePadding;
                 x2s = GetEqualFloats(x2, x1s.Count);
             }
-            else // dc2 == null
+            else // no2 == null
             {
-                Debug.Assert(dc2 == null);
+                Debug.Assert(no2 == null);
                 // This voice has no further chords or rests,
                 // so draw extenders to the right margin.
                 // extend to the right margin
@@ -530,16 +536,18 @@ namespace Moritz.Score.Notation
         /// <summary>
         /// Returns the first chordSymbol or restSymbol after the first cautionaryChordSymbol.
         /// If there are cautionaryChordSymbols between the first and the returned chordSymbol or restSymbol, they are rendered invisible.
-        /// Null is returned if no chordSymbol or RestSymbol is found in the noteObjects.
+        /// If there is a barline immediately preceding the durationSymbol that would otherwise be returned, the barline is returned.
+        /// Null is returned if no further chordSymbol or RestSymbol is found in the noteObjects.
         /// </summary>
         /// <param name="noteObjects"></param>
         /// <returns></returns>
-        private DurationSymbol GetFollowingChordOrRestSymbol(List<NoteObject> noteObjects)
+        private NoteObject GetFollowingChordRestOrBarlineSymbol(List<NoteObject> noteObjects)
         {
-            DurationSymbol durationSymbol = null;
+            NoteObject noteObjectToReturn = null;
             bool firstCautionaryChordSymbolFound = false;
-            foreach(NoteObject noteObject in noteObjects)
+            for(int i = 0; i < noteObjects.Count; ++i)
             {
+                NoteObject noteObject = noteObjects[i];
                 if(firstCautionaryChordSymbolFound == false && noteObject is CautionaryChordSymbol)
                 {
                     firstCautionaryChordSymbolFound = true;
@@ -555,19 +563,22 @@ namespace Moritz.Score.Notation
                         continue;
                     }
 
-                    ChordSymbol chordSymbol = noteObject as ChordSymbol;
-                    if(chordSymbol != null)
-                        durationSymbol = chordSymbol;
+                    if(noteObject is ChordSymbol)
+                        noteObjectToReturn = noteObject;
 
-                    RestSymbol restSymbol = noteObject as RestSymbol;
-                    if(restSymbol != null)
-                        durationSymbol = restSymbol;
+                    if(noteObject is RestSymbol)
+                        noteObjectToReturn = noteObject;
                 }
 
-                if(durationSymbol != null)
+                if(noteObjectToReturn != null) // a ChordSymbol or a RestSymbol (not a CautionaryChordSymbol)
+                {
+                    Barline barline = noteObjects[i - 1] as Barline;
+                    if(barline != null)
+                        noteObjectToReturn = barline;
                     break;
+                }
             }
-            return durationSymbol;
+            return noteObjectToReturn;
         }
         private void AddExtendersInStaves(List<Staff> staves, float extenderStrokeWidth, float gap, float hairlinePadding)
         {
@@ -581,54 +592,62 @@ namespace Moritz.Score.Notation
                     // noteObjects.Count - 1 because index is immediately incremented when a continuing 
                     // chord or rest is found, and it should always be less than noteObjects.Count.
                     ChordSymbol chord1 = noteObjects[index] as ChordSymbol;
-                    if(chord1 != null && chord1.LocalizedMidiDurationDef.MsDurationToNextBarline != null)
+                    if(chord1 != null)
                     {
                         List<float> x1s = GetX1sFromChord1(chord1.ChordMetrics, hairlinePadding);
                         List<float> x2s = null;
                         List<float> ys = null;
-
                         ++index;
-                        while(index < noteObjects.Count)
+                        if(chord1.LocalizedMidiDurationDef.MsDurationToNextBarline != null)
                         {
-                            CautionaryChordSymbol cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
-                            ChordSymbol chord2 = noteObjects[index] as ChordSymbol;
-                            RestSymbol rest2 = noteObjects[index] as RestSymbol;
-                            if(cautionaryChordSymbol != null)
+                            while(index < noteObjects.Count)
                             {
-                                cautionaryChordSymbol.Visible = false;
+                                CautionaryChordSymbol cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
+                                ChordSymbol chord2 = noteObjects[index] as ChordSymbol;
+                                RestSymbol rest2 = noteObjects[index] as RestSymbol;
+                                if(cautionaryChordSymbol != null)
+                                {
+                                    cautionaryChordSymbol.Visible = false;
+                                }
+                                else if(chord2 != null)
+                                {
+                                    ys = chord1.ChordMetrics.HeadsOriginYs;
+                                    x2s = GetX2sFromChord2(ys, chord2.ChordMetrics, hairlinePadding);
+                                    break;
+                                }
+                                else if(rest2 != null)
+                                {
+                                    float x2 = rest2.Metrics.Left - hairlinePadding;
+                                    ys = chord1.ChordMetrics.HeadsOriginYs;
+                                    x2s = GetEqualFloats(x2, x1s.Count);
+                                    break;
+                                }
+                                ++index;
                             }
-                            else if(chord2 != null)
+
+                            if(x2s != null && ys != null)
                             {
-                                ys = chord1.ChordMetrics.HeadsOriginYs;
-                                x2s = GetX2sFromChord2(ys, chord2.ChordMetrics, hairlinePadding);
-                                break;
+                                bool hasContinuingBeamBlock =
+                                    ((chord1.BeamBlock != null) && (chord1.BeamBlock.Chords[chord1.BeamBlock.Chords.Count - 1] != chord1));
+                                if(hasContinuingBeamBlock)
+                                    Debug.Assert(true);
+
+                                Barline barline = noteObjects[index - 1] as Barline;
+                                if(barline != null)
+                                {
+                                    float x2 = barline.Metrics.OriginX;
+                                    x2s = GetEqualFloats(x2, x1s.Count);
+                                }
+                                bool drawExtender = false;
+                                if(chord1.DurationClass > DurationClass.semiquaver)
+                                    drawExtender = true;
+                                if(chord1.DurationClass < DurationClass.crotchet && hasContinuingBeamBlock)
+                                    drawExtender = false;
+
+                                chord1.ChordMetrics.NoteheadExtendersMetrics =
+                                    CreateExtenders(x1s, x2s, ys, extenderStrokeWidth, gap, drawExtender);
+                                //break;
                             }
-                            else if(rest2 != null)
-                            {
-                                float x2 = rest2.Metrics.Left - hairlinePadding;
-                                ys = chord1.ChordMetrics.HeadsOriginYs;
-                                x2s = GetEqualFloats(x2, x1s.Count);
-                                break;
-                            }
-                            ++index;
-                        }
-
-                        if(x2s != null && ys != null)
-                        {
-                            bool hasContinuingBeamBlock =
-                                ((chord1.BeamBlock != null) && (chord1.BeamBlock.Chords[chord1.BeamBlock.Chords.Count - 1] != chord1));
-                            if(hasContinuingBeamBlock)
-                                Debug.Assert(true);
-
-                            bool drawExtender = false;
-                            if(chord1.DurationClass > DurationClass.semiquaver)
-                                drawExtender = true;
-                            if(chord1.DurationClass < DurationClass.crotchet && hasContinuingBeamBlock)
-                                drawExtender = false;
-
-                            chord1.ChordMetrics.NoteheadExtendersMetrics =
-                                CreateExtenders(x1s, x2s, ys, extenderStrokeWidth, gap, drawExtender);
-                            //break;
                         }
                     }
                     else
@@ -638,38 +657,69 @@ namespace Moritz.Score.Notation
                 }
             }
         }
-        private void AddExtendersAtTheEndsOfStaves(List<Staff> staves, float rightMarginPos, float gap, float extenderStrokeWidth, float hairlinePadding)
+        private void AddExtendersAtTheEndsOfStaves(List<Staff> staves, float rightMarginPos, float gap, float extenderStrokeWidth,
+            float hairlinePadding, SvgSystem nextSystem)
         {
-            foreach(Staff staff in staves)
-            foreach(Voice voice in staff.Voices)
+            for(int staffIndex = 0; staffIndex < staves.Count; ++staffIndex)
             {
-                List<NoteObject> noteObjects = voice.NoteObjects;
-                ChordSymbol lastChord = null;
-                RestSymbol lastRest = null;
-                CautionaryChordSymbol cautionary = null;
-                for(int index = noteObjects.Count - 1; index >= 0; --index)
+                Staff staff = staves[staffIndex];
+                for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                 {
-                    lastChord = noteObjects[index] as ChordSymbol;
-                    lastRest = noteObjects[index] as RestSymbol;
-                    cautionary = noteObjects[index] as CautionaryChordSymbol;
-                    if(cautionary != null)
+                    Voice voice = staff.Voices[voiceIndex];
+                    List<NoteObject> noteObjects = voice.NoteObjects;
+                    ChordSymbol lastChord = null;
+                    RestSymbol lastRest = null;
+                    CautionaryChordSymbol cautionary = null;
+                    for(int index = noteObjects.Count - 1; index >= 0; --index)
                     {
-                        cautionary.Visible = false;
-                        // a CautionaryChordSymbol is a ChordSymbol, but we have not found a real one yet. 
+                        lastChord = noteObjects[index] as ChordSymbol;
+                        lastRest = noteObjects[index] as RestSymbol;
+                        cautionary = noteObjects[index] as CautionaryChordSymbol;
+                        if(cautionary != null)
+                        {
+                            cautionary.Visible = false;
+                            // a CautionaryChordSymbol is a ChordSymbol, but we have not found a real one yet. 
+                        }
+                        else if(lastChord != null || lastRest != null)
+                            break;
                     }
-                    else if(lastChord != null || lastRest != null)
-                        break;
-                }
 
-                if(lastChord != null && lastChord.LocalizedMidiDurationDef.MsDurationToNextBarline != null)
-                {
-                    List<float> x1s = GetX1sFromChord1(lastChord.ChordMetrics, hairlinePadding);
-                    List<float> x2s = GetEqualFloats(rightMarginPos + gap, x1s.Count);
-                    List<float> ys = lastChord.ChordMetrics.HeadsOriginYs;
-                    lastChord.ChordMetrics.NoteheadExtendersMetrics =
-                        CreateExtenders(x1s, x2s, ys, extenderStrokeWidth, gap, true);
+                    if(lastChord != null && lastChord.LocalizedMidiDurationDef.MsDurationToNextBarline != null)
+                    {
+                        List<float> x1s = GetX1sFromChord1(lastChord.ChordMetrics, hairlinePadding);
+                        List<float> x2s;
+                        List<float> ys = lastChord.ChordMetrics.HeadsOriginYs;
+                        if(nextSystem != null && FirstDurationSymbolOnNextSystemIsCautionary(nextSystem.Staves[staffIndex].Voices[voiceIndex]))
+                        {
+                             x2s = GetEqualFloats(rightMarginPos + gap, x1s.Count);
+                        }
+                        else
+                        {
+                            x2s = GetEqualFloats(rightMarginPos, x1s.Count);
+                        }
+                        lastChord.ChordMetrics.NoteheadExtendersMetrics =
+                            CreateExtenders(x1s, x2s, ys, extenderStrokeWidth, gap, true);
+                    }
                 }
             }
+        }
+
+        private bool FirstDurationSymbolOnNextSystemIsCautionary(Voice voiceOnNextSystem)
+        {
+            bool firstDurationSymbolIsCautionary = false;
+            foreach(NoteObject noteObject in voiceOnNextSystem.NoteObjects)
+            {
+                if(noteObject is CautionaryChordSymbol)
+                {
+                    firstDurationSymbolIsCautionary = true;
+                    break;
+                }
+                else if(noteObject is ChordSymbol || noteObject is RestSymbol)
+                {
+                    break;
+                }  
+            }
+            return firstDurationSymbolIsCautionary;
         }
         /// <summary>
         /// Extenders are created for chords of all duration classes, but only displayed on crotchets or greater.
