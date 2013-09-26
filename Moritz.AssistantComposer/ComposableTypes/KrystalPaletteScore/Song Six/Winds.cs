@@ -11,9 +11,9 @@ namespace Moritz.AssistantComposer
 {
     class Winds
     {
-        public Winds(List<Krystal> krystals, List<PaletteDef> paletteDefs, int nBaseChords)
+        public Winds(List<Krystal> krystals, List<PaletteDef> paletteDefs)
         {
-            MidiDefSequence baseMidiDefSequence = GetBaseMidiDefSequence(krystals[0], paletteDefs[0], nBaseChords);
+            MidiDefSequence baseMidiDefSequence = GetBaseMidiDefSequence(krystals[2], paletteDefs[0]);
             MidiDefSequences.Add(baseMidiDefSequence);
 
             MidiDefSequence tenorMidiDefSequence = GetTenorMidiDefSequence(baseMidiDefSequence);
@@ -27,17 +27,24 @@ namespace Moritz.AssistantComposer
             // (MidiDefSequences[0] is the base Wind sequence.
         }
 
-        private MidiDefSequence GetBaseMidiDefSequence(Krystal krystal, PaletteDef paletteDef, int nBaseChords)
+        /// <summary>
+        /// The krystal is xk3(7.7.1)-9.krys:
+        ///     expander: e(7.7.1).kexp
+        ///     density and points inputs: xk2(7.7.1)-9.krys
+        /// Ancestor krystal (xk2(7.7.1)-9.krys):
+        ///     expander: e(7.7.1).kexp
+        ///     density and points inputs: lk1(6)-1.krys containing the line {1, 2, 3, 4, 5, 6}
+        /// </summary>
+        private MidiDefSequence GetBaseMidiDefSequence(Krystal krystal, PaletteDef paletteDef)
         {
             List<List<int>> kValues = krystal.GetValues((uint)1);
             List<int> sequence = kValues[0]; // the flat list of values
-            sequence = sequence.GetRange(0, nBaseChords);
 
             MidiDefSequence baseMidiDefSequence = new MidiDefSequence(paletteDef, sequence);
 
             baseMidiDefSequence.Transpose(-4);
 
-            BaseWindKrystalStrandIndices = GetBaseWindStrandIndices(krystal, nBaseChords);
+            BaseWindKrystalStrandIndices = GetBaseWindStrandIndices(krystal);
 
             return baseMidiDefSequence;
         }
@@ -53,17 +60,13 @@ namespace Moritz.AssistantComposer
             return tenorMidiDefSequence;
         }
 
-        private List<int> GetBaseWindStrandIndices(Krystal krystal, int nBaseChords)
+        private List<int> GetBaseWindStrandIndices(Krystal krystal)
         {
             List<int> strandIndices = new List<int>();
             List<Strand> strands = krystal.Strands;
             int index = 0;
             foreach(Strand strand in strands)
             {
-                if(index >= nBaseChords)
-                {
-                    break;
-                }
                 strandIndices.Add(index);
                 index += strand.Values.Count;
             }

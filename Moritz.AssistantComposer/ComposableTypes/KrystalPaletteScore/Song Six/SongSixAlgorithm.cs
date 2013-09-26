@@ -48,25 +48,25 @@ namespace Moritz.AssistantComposer
         /// </returns>
         public override List<List<Voice>> DoAlgorithm()
         {
-            #region Composed values (constants)
-            // the number of values in the first five krystal blocks (the krystal actually has six blocks)
-            int nBaseWindChords = 82;
+            /// _krystals[0] is lk1(6)-1.krys containing the line {1, 2, 3, 4, 5, 6}
+            /// _krystals[1] is xk2(7.7.1)-9.krys, expanded using:
+            ///         expander: e(7.7.1).kexp
+            ///         density and points inputs: lk1(6)-1.krys 
+            /// _krystals[2] is xk3(7.7.1)-9.krys, expanded using:
+            ///         expander: e(7.7.1).kexp
+            ///         density and points inputs: xk2(7.7.1)-9.krys
+            ///
+            /// The bass wind is constructed from _krystals[2] as a flat sequence.
+            /// The tenor wind is the bass wind in reverse.
 
-            // Krystals included in the Song Six.mkss file can be examined by hovering over the _krystals variable.
-            // Currently:
-            //  _krystals[0] is xk3(7.7.1)-3: The first 6 blocks (=21 strands =82 values) are the palette values defining bass wind
-            //  _krystals[1] is xk2(7.7.1)-2: The density input for _krystals[0]
-            //  _krystals[2] is lk1(7)-1    : The density input for _krystals[1]
-            #endregion
-
-            // The blockMsDurations at positions 1,3,5,7,9,11 will be set by the Winds (possibly taking account of the birds).
             // Clytemnestra sets the durations of blocks 2,4,6,8,10 (see below).
+            // The blockMsDurations at positions 1,3,5,7,9,11 will be set by the Winds.
             List<int> blockMsDurations = new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
             Clytemnestra clytemnestra = new Clytemnestra(blockMsDurations);
             // Clytemnestra has now set the durations of blocks 2,4,6,8,10
 
-            Winds winds = new Winds(_krystals, _paletteDefs, nBaseWindChords);
+            Winds winds = new Winds(_krystals, _paletteDefs);
 
             SetBlockMsDurations(blockMsDurations, winds);
 
