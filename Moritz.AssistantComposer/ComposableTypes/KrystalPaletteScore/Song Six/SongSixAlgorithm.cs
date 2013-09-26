@@ -33,7 +33,7 @@ namespace Moritz.AssistantComposer
         /// <returns></returns>
         public override int NumberOfBars()
         {
-            return 94;
+            return 93;
         }
 
         /// <summary>
@@ -82,7 +82,14 @@ namespace Moritz.AssistantComposer
             // barlineMsPositions does not contain msPos=0 or the position of the final barline
             // It does however contain all the other barline positions.
 
+
+
+
+            // temporarily commented out (function to be completed)
             winds.AlignChords(clytemnestra.MidiDefSequence, barlineMsPositions);
+
+
+
 
             Debug.Assert(barlineMsPositions.Count == NumberOfBars() - 1);
 
