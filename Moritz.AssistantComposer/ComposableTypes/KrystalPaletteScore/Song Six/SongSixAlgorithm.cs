@@ -86,7 +86,7 @@ namespace Moritz.AssistantComposer
 
 
             // temporarily commented out (function to be completed)
-            winds.AlignChords(clytemnestra.MidiDefSequence, barlineMsPositions);
+            //winds.AlignChords(clytemnestra.MidiDefSequence, barlineMsPositions);
 
 
 
