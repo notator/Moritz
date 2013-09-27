@@ -202,7 +202,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ComposableTypes\KrystalPaletteScore\Song Six\palette1Backup.txt" />
+    <Content Include="ComposableTypes\KrystalPaletteScore\Song Six\krystalsReference.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
