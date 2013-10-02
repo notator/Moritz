@@ -24,7 +24,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         public override List<byte> MidiChannels()
         {
-            return new List<byte>() { 0, 1, 2 };
+            return new List<byte>() { 0, 1, 2, 3, 4, 5 };
         }
 
         /// <summary>
