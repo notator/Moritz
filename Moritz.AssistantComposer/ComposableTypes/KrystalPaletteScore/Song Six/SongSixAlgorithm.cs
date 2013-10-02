@@ -66,7 +66,7 @@ namespace Moritz.AssistantComposer
             Clytemnestra clytemnestra = new Clytemnestra(blockMsDurations);
             // Clytemnestra has now set the durations of blocks 2,4,6,8,10
 
-            Winds winds = new Winds(_krystals, _paletteDefs); // only constructs winds 4 and 5 -- see ConstructUpperWinds() below.
+            Winds winds = new Winds(_krystals, _paletteDefs); // only constructs wind 5 -- see ConstructUpperWinds() below.
 
             SetBlockMsDurations(blockMsDurations, winds);
 
@@ -100,7 +100,7 @@ namespace Moritz.AssistantComposer
         private void SetBlockMsDurations(List<int> blockMsDurations, Winds winds)
         {
             List<int> msPosPerClytBlock = new List<int>();
-            MidiDefSequence bassWind = winds.MidiDefSequences[0];
+            MidiDefSequence wind5 = winds.MidiDefSequences[0];
             List<int> baseWindChordIndexPerClytBlock = new List<int>();
 
             baseWindChordIndexPerClytBlock.Add(winds.BaseWindKrystalStrandIndices[4]);  // strand 5
@@ -111,7 +111,7 @@ namespace Moritz.AssistantComposer
 
             foreach(int chordIndex in baseWindChordIndexPerClytBlock)
             {
-                msPosPerClytBlock.Add(bassWind[chordIndex].MsPosition);
+                msPosPerClytBlock.Add(wind5[chordIndex].MsPosition);
             }
 
             blockMsDurations[0] = msPosPerClytBlock[0];
@@ -119,7 +119,7 @@ namespace Moritz.AssistantComposer
             blockMsDurations[4] = msPosPerClytBlock[2] - msPosPerClytBlock[1] - blockMsDurations[3];
             blockMsDurations[6] = msPosPerClytBlock[3] - msPosPerClytBlock[2] - blockMsDurations[5];
             blockMsDurations[8] = msPosPerClytBlock[4] - msPosPerClytBlock[3] - blockMsDurations[7];
-            blockMsDurations[10] = bassWind.EndMsPosition - msPosPerClytBlock[4] - blockMsDurations[9];
+            blockMsDurations[10] = wind5.EndMsPosition - msPosPerClytBlock[4] - blockMsDurations[9];
 
             for(int i = 0; i < blockMsDurations.Count; ++i)
             {

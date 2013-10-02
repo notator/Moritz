@@ -12,24 +12,19 @@ namespace Moritz.AssistantComposer
     class Winds
     {
         /// <summary>
-        /// Constructs the initial state of the lowest two Winds (4 and 5), putting them in the public WindDefSequences
-        /// Wind channels are ordered bottom to top. i.e. MidiDefSequences[0] is always the Wind 5 (bass) sequence.
+        /// Constructs the initial state of the lowest Wind (5), putting it in the public WindDefSequences list.
+        /// Wind channels are ordered bottom to top. i.e. MidiDefSequences[0] is always the Wind 5 (lowest) sequence.
         /// Also sets the public BaseWindKrystalStrandIndices attribute.
         /// </summary>
         public Winds(List<Krystal> krystals, List<PaletteDef> paletteDefs)
         {
-            MidiDefSequence windSequence5 = GetBaseMidiDefSequence(krystals[2], paletteDefs[0]);
-            windSequence5.Transpose(-13);
-            MidiDefSequences.Add(windSequence5);
-
-            MidiDefSequence windSequence4 = ReversedMidiDefSequence(windSequence5);
-            SetLyricsToIndex(windSequence4);
-            windSequence4.Transpose(7);
-            MidiDefSequences.Add(windSequence4);
+            BaseWindKrystalStrandIndices = GetBaseWindStrandIndices(krystals[2]);
+            
+            MidiDefSequence wind5Sequence = GetWind5Sequence(krystals[2], paletteDefs[0]);
+            wind5Sequence.Transpose(-13);
+            MidiDefSequences.Add(wind5Sequence);
 
             // The other winds are created later, when the barline positions are known
-
-            BaseWindKrystalStrandIndices = GetBaseWindStrandIndices(krystals[2]);
         }
 
         /// <summary>
@@ -40,7 +35,7 @@ namespace Moritz.AssistantComposer
         ///     expander: e(7.7.1).kexp
         ///     density and points inputs: lk1(6)-1.krys containing the line {1, 2, 3, 4, 5, 6}
         /// </summary>
-        private MidiDefSequence GetBaseMidiDefSequence(Krystal krystal, PaletteDef paletteDef)
+        private MidiDefSequence GetWind5Sequence(Krystal krystal, PaletteDef paletteDef)
         {
             List<List<int>> kValues = krystal.GetValues((uint)1);
             List<int> sequence = kValues[0]; // the flat list of values
@@ -50,21 +45,6 @@ namespace Moritz.AssistantComposer
             SetWind5LyricsToIndex(wind5Sequence);
 
             return wind5Sequence;
-        }
-
-        /// <summary>
-        /// returns a new MidiDefSequence containing clones of the LocalizedMidiDurationDefs in the argument in reverse order.
-        /// </summary>
-        /// <param name="originalMidiDefSequence"></param>
-        /// <returns></returns>
-        private MidiDefSequence ReversedMidiDefSequence(MidiDefSequence originalMidiDefSequence)
-        {
-            MidiDefSequence newReversedMidiDefSequence = originalMidiDefSequence.Clone();
-
-            newReversedMidiDefSequence.LocalizedMidiDurationDefs.Reverse();
-            newReversedMidiDefSequence.MsPosition = 0;
-
-            return newReversedMidiDefSequence;
         }
 
         private List<int> GetBaseWindStrandIndices(Krystal krystal)
@@ -82,7 +62,7 @@ namespace Moritz.AssistantComposer
 
         /// <summary>
         /// This function sets the lyrics in wind 5 to the index of the LocalMidiDurationDef,
-        /// and adds an additional markers around each lyric which begin a strand in the krystal.
+        /// and adds additional markers around each lyric which begin a strand in the krystal.
         /// </summary>
         /// <param name="wind5Sequence"></param>
         private void SetWind5LyricsToIndex(MidiDefSequence wind5Sequence)
@@ -120,7 +100,9 @@ namespace Moritz.AssistantComposer
             }
         }
 
-        // each voice has the duration of the whole piece (voices 1, 2 and 3 begin with a rest)
+        /// <summary>
+        /// Each voice has the duration of the whole piece. Some voices begin with rest(s).
+        /// </summary>
         internal List<Voice> GetVoices(int topWindChannelIndex)
         {
             List<Voice> voices = new List<Voice>();
@@ -147,40 +129,89 @@ namespace Moritz.AssistantComposer
             return barlineMsPositions;
         }
 
- 
         /// <summary>
-        /// wind3 will start at bar 21 (after verse 1)
-        /// wind2 will start at bar 40 (after verse 2)
-        /// wind1 will start at bar 58 (after verse 3)
+        /// wind4 starts at bar 1. It is a rotated clone of wind5. The previous beginning of the cycle is at bar 83. 
+        /// wind3 starts with a rest. Chords start at bar 21 (after verse 1)
+        /// wind2 starts with a rest. Chords start at bar 40 (after verse 2)
+        /// wind1 starts with a rest. Chords start at bar 58 (after verse 3)
         /// </summary>
         /// <param name="barlineMsPositions"></param>
         internal void ConstructUpperWinds(List<int> barlineMsPositions)
         {
             int startMsPosition;
             int finalBarlineMsPosition = barlineMsPositions[barlineMsPositions.Count-1];
+            MidiDefSequence wind5Sequence = MidiDefSequences[0];
+            // wind 4
+            MidiDefSequence wind4Sequence = GetWind4Sequence(wind5Sequence, barlineMsPositions);
+            SetLyricsToIndex(wind4Sequence);
+            wind4Sequence.Transpose(7);
+            MidiDefSequences.Add(wind4Sequence);
             // wind 3
             startMsPosition = barlineMsPositions[20];
-            MidiDefSequence windSequence3 = GetUpperWindSequence(MidiDefSequences[0], startMsPosition, finalBarlineMsPosition);
-            windSequence3.Transpose(12);
-            SetLyricsToIndex(windSequence3);
-            MidiDefSequences.Add(windSequence3);
+            MidiDefSequence wind3Sequence = GetUpperWindSequence(wind5Sequence, startMsPosition, finalBarlineMsPosition);
+            wind3Sequence.Transpose(12);
+            SetLyricsToIndex(wind3Sequence);
+            MidiDefSequences.Add(wind3Sequence);
             // wind 2
             startMsPosition = barlineMsPositions[39];
-            MidiDefSequence windSequence2 = GetUpperWindSequence(MidiDefSequences[0], startMsPosition, finalBarlineMsPosition);
-            windSequence2.Transpose(19);
-            SetLyricsToIndex(windSequence2);
-            MidiDefSequences.Add(windSequence2);
+            MidiDefSequence wind2Sequence = GetUpperWindSequence(wind5Sequence, startMsPosition, finalBarlineMsPosition);
+            wind2Sequence.Transpose(19);
+            SetLyricsToIndex(wind2Sequence);
+            MidiDefSequences.Add(wind2Sequence);
             // wind 1
             startMsPosition = barlineMsPositions[57];
-            MidiDefSequence windSequence1 = GetUpperWindSequence(MidiDefSequences[0], startMsPosition, finalBarlineMsPosition);
-            windSequence1.Transpose(24);
-            SetLyricsToIndex(windSequence1);
-            MidiDefSequences.Add(windSequence1);
+            MidiDefSequence wind1Sequence = GetUpperWindSequence(wind5Sequence, startMsPosition, finalBarlineMsPosition);
+            wind1Sequence.Transpose(24);
+            SetLyricsToIndex(wind1Sequence);
+            MidiDefSequences.Add(wind1Sequence);
         }
 
         /// <summary>
-        /// Creates a new Wind, which begins with a rest of duration startMsPosition,
-        /// followed by a clone of the beginning of the original wind.
+        /// Returns a MidiDefSequence containing clones of the LocalizedMidiDurationDefs in the MidiDefSequence argument,
+        /// rotated so that the original first LocalizedMidiDurationDef is positioned at bar 83.
+        /// The LocalizedMidiDurationDefs before bar 83 are stretched to fit. 
+        /// The LocalizedMidiDurationDefs after bar 83 are compressed to fit. 
+        /// </summary>
+        /// <param name="originalMidiDefSequence"></param>
+        /// <returns></returns>
+        private MidiDefSequence GetWind4Sequence(MidiDefSequence originalMidiDefSequence, List<int> barlineMsPositions)
+        {
+            MidiDefSequence tempSequence = originalMidiDefSequence.Clone();
+            int finalBarlineMsPosition = barlineMsPositions[barlineMsPositions.Count - 1];
+            int msDurationAfterSynch = finalBarlineMsPosition - barlineMsPositions[82]; 
+
+            List<LocalizedMidiDurationDef> originalLmdds = tempSequence.LocalizedMidiDurationDefs;
+            List<LocalizedMidiDurationDef> originalStartLmdds = new List<LocalizedMidiDurationDef>();
+            List<LocalizedMidiDurationDef> wind4Lmdds = new List<LocalizedMidiDurationDef>();
+            int accumulatingMsDuration = 0;
+            for(int i = 0; i < tempSequence.Count; ++i)
+            {
+                if(accumulatingMsDuration <= msDurationAfterSynch)
+                {
+                    originalStartLmdds.Add(originalLmdds[i]);
+                    accumulatingMsDuration += originalLmdds[i].MsDuration;
+                }
+                else
+                {
+                    wind4Lmdds.Add(originalLmdds[i]);
+                }
+            }
+            wind4Lmdds.AddRange(originalStartLmdds);
+
+            int msPosition = 0;
+            foreach(LocalizedMidiDurationDef lmdd in wind4Lmdds)
+            {
+                lmdd.MsPosition = msPosition;
+                msPosition += lmdd.MsDuration;
+            }
+            MidiDefSequence wind4Sequence = new MidiDefSequence(wind4Lmdds);
+
+            return wind4Sequence;
+        }
+
+        /// <summary>
+        /// Creates a new Wind, which begins with a rest of duration=startMsPosition,
+        /// followed by a clone of the beginning of the originalWind (=Wind 5).
         /// As much of the originalWind is used as possible. The cloned LocalizedMidiDurationDefs are stretched to fit exactly.
         /// </summary>
         private MidiDefSequence GetUpperWindSequence(MidiDefSequence originalWind, int startMsPosition, int finalBarlineMsPosition)
@@ -202,7 +233,7 @@ namespace Moritz.AssistantComposer
             {
                 newWindSequence.LocalizedMidiDurationDefs.RemoveAt(i);
             }
-            newWindSequence.MsDuration = msDuration; // stretches the sequence
+            newWindSequence.MsDuration = msDuration; // stretches or compresses the sequence
             LocalizedMidiDurationDef lmdd = new LocalizedMidiDurationDef(startMsPosition);
             newWindSequence.LocalizedMidiDurationDefs.Insert(0, lmdd);
             newWindSequence.MsPosition = 0;
@@ -223,7 +254,8 @@ namespace Moritz.AssistantComposer
 
             wind2.AlignChordOrRest(barMsPositions, 1, 49, 57, barMsPositions[91]);
             wind3.AlignChordOrRest(barMsPositions, 1, 10, 67, barMsPositions[39]);
-            wind4.AlignChordOrRest(barMsPositions, 0, 19, 82, barMsPositions[20]);
+            wind4.AlignChordOrRest(barMsPositions, 0, 16, 82, barMsPositions[20]);
+            wind4.AlignChordOrRest(barMsPositions, 16, 57, 82, barMsPositions[82]);
         }
 
         #region attributes
