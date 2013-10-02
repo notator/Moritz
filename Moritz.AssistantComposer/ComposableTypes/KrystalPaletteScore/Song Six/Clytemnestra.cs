@@ -408,12 +408,12 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// returns a sorted list of barline positions. The list contains neither the first position (=0) nor the last position
+        /// Returns a sorted list of barline positions.
+        /// The list contains the positions of both the first barline (=0) and the last.
         /// </summary>
         public List<int> GetBarlineMsPositions(List<int> blockMsDurations)
         {
-            // The list to be returned. Will contain neither the first (=0) nor the final barline positions.
-            List<int> barlineMsPoss = new List<int>();
+            List<int> barlineMsPoss = new List<int>() {0}; // the position of the first barline
             List<List<int>> barlineMsPositionsPerBlock = GetBarLineMsPositionsPerBlock();
 
             // Simply the position of each block. 11 values, 1 per block (starting with 0).
@@ -430,7 +430,7 @@ namespace Moritz.AssistantComposer
                 prevPos = msPos;
             }
 
-            Debug.Assert(barlineMsPoss.Count == 10);
+            Debug.Assert(barlineMsPoss.Count == 11);
             Debug.Assert(blockMsPoss.Count == 11);
             Debug.Assert(barlineMsPositionsPerBlock.Count == 11);
 
@@ -438,6 +438,9 @@ namespace Moritz.AssistantComposer
             {
                 AddBarlinePositions(barlineMsPoss, blockMsPoss[i], barlineMsPositionsPerBlock[i]);
             }
+
+            int msPosLastBarline = blockMsPoss[10] + blockMsDurations[10];
+            barlineMsPoss.Add(msPosLastBarline);
 
             barlineMsPoss.Sort();
 

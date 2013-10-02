@@ -66,32 +66,21 @@ namespace Moritz.AssistantComposer
             Clytemnestra clytemnestra = new Clytemnestra(blockMsDurations);
             // Clytemnestra has now set the durations of blocks 2,4,6,8,10
 
-            Winds winds = new Winds(_krystals, _paletteDefs);
+            Winds winds = new Winds(_krystals, _paletteDefs); // only constructs winds 4 and 5 -- see ConstructUpperWinds() below.
 
             SetBlockMsDurations(blockMsDurations, winds);
 
             clytemnestra.MidiDefSequence = clytemnestra.GetMidiDefSequence(blockMsDurations);
 
             List<int> barlineMsPositions = clytemnestra.GetBarlineMsPositions(blockMsDurations);
+            // barlineMsPositions contains both the position of bar 1 (0ms) and the position of the final barline
             barlineMsPositions = winds.AddInterludeBarlinePositions(barlineMsPositions);
 
-            // LocalMidiDurationDefs at barlineMsPositions cannot be shifted sideways.
-            // barlineMsPositions is an argument to a new function, to be added to MidiDefSequence:
-            //    AdjustDefMsPosition(barlineMsPositions, anchor1index, defIndex, newDefMsPos, anchor2index)
-            //
-            // barlineMsPositions does not contain msPos=0 or the position of the final barline
-            // It does however contain all the other barline positions.
+            Debug.Assert(barlineMsPositions.Count == NumberOfBars() + 1); // includes bar 1 (mPos=0) and the final barline.
+            
+            winds.ConstructUpperWinds(barlineMsPositions);
 
-
-
-
-            // temporarily commented out (function to be completed)
-            //winds.AlignChords(clytemnestra.MidiDefSequence, barlineMsPositions);
-
-
-
-
-            Debug.Assert(barlineMsPositions.Count == NumberOfBars() - 1);
+            winds.AlignChords(barlineMsPositions);
 
             //Birds birds = new Birds(clytemnestra, winds, _krystals, _paletteDefs, blockMsDurations);
 
@@ -166,25 +155,23 @@ namespace Moritz.AssistantComposer
 
         private List<List<Voice>> GetBars(List<Voice> system, List<int> barlineMsPositions)
         {
-            // barlineMsPositions does not contain msPos=0 or the position of the final barline
-            // It does however contain all the other barline positions.
+            // barlineMsPositions contains both msPos=0 and the position of the final barline
             List<List<Voice>> bars = new List<List<Voice>>();
             bars = GetBarsFromBarlineMsPositions(system, barlineMsPositions);
-            Console.WriteLine("bars.Count = " + bars.Count.ToString());
             Debug.Assert(bars.Count == NumberOfBars());
             return bars;
         }
 
         /// <summary>
         /// Splits the voices (currently in a single bar) into bars
-        /// barlineMsPositions contains neither msPosition 0, nor the position of the final barline.
+        /// barlineMsPositions contains both msPosition 0, and the position of the final barline.
         /// </summary>
         private List<List<Voice>> GetBarsFromBarlineMsPositions(List<Voice> voices, List<int> barLineMsPositions)
         {
             List<List<Voice>> bars = new List<List<Voice>>();
             List<List<Voice>> twoBars = null;
 
-            for(int i = barLineMsPositions.Count - 1; i >= 0; --i)
+            for(int i = barLineMsPositions.Count - 2; i >= 1; --i)
             {
                 twoBars = SplitBar(voices, barLineMsPositions[i]);
                 bars.Insert(0, twoBars[1]);

@@ -12,25 +12,24 @@ namespace Moritz.AssistantComposer
     class Winds
     {
         /// <summary>
-        /// Sets the public WindDefSequences and BaseWindKrystalStrandIndices attributes.
-        /// Wind channels are ordered bottom to top. i.e. MidiDefSequences[0] is the Wind 5 (bass) sequence.
+        /// Constructs the initial state of the lowest two Winds (4 and 5), putting them in the public WindDefSequences
+        /// Wind channels are ordered bottom to top. i.e. MidiDefSequences[0] is always the Wind 5 (bass) sequence.
+        /// Also sets the public BaseWindKrystalStrandIndices attribute.
         /// </summary>
         public Winds(List<Krystal> krystals, List<PaletteDef> paletteDefs)
         {
             MidiDefSequence windSequence5 = GetBaseMidiDefSequence(krystals[2], paletteDefs[0]);
+            windSequence5.Transpose(-13);
             MidiDefSequences.Add(windSequence5);
 
             MidiDefSequence windSequence4 = ReversedMidiDefSequence(windSequence5);
+            SetLyricsToIndex(windSequence4);
             windSequence4.Transpose(7);
             MidiDefSequences.Add(windSequence4);
 
-            // windSequence3 will start at bar 21 (after verse 1)
-            // windSequence2 will start at bar 40 (after verse 2)
-            // windSequence1 will start at bar 58 (after verse 3)            
+            // The other winds are created later, when the barline positions are known
 
-            SetWind5LyricsToIndex(windSequence5);
-            SetLyricsToIndex(windSequence4);
-            //SetIndexLyrics(altoMidiDefSequence);
+            BaseWindKrystalStrandIndices = GetBaseWindStrandIndices(krystals[2]);
         }
 
         /// <summary>
@@ -46,13 +45,11 @@ namespace Moritz.AssistantComposer
             List<List<int>> kValues = krystal.GetValues((uint)1);
             List<int> sequence = kValues[0]; // the flat list of values
 
-            MidiDefSequence baseMidiDefSequence = new MidiDefSequence(paletteDef, sequence);
+            MidiDefSequence wind5Sequence = new MidiDefSequence(paletteDef, sequence);
 
-            baseMidiDefSequence.Transpose(-13);
+            SetWind5LyricsToIndex(wind5Sequence);
 
-            BaseWindKrystalStrandIndices = GetBaseWindStrandIndices(krystal);
-
-            return baseMidiDefSequence;
+            return wind5Sequence;
         }
 
         /// <summary>
@@ -150,100 +147,29 @@ namespace Moritz.AssistantComposer
             return barlineMsPositions;
         }
 
-        // I've commented the following function out because I don't after all want to align so many wind chords.
-        // Going back to no bass or tenor chords aligned. Alto and soprano winds will be constructed inside the
-        // tenor and base chords, and _they_ will probably be aligned. I need to finish composing the winds
-        // before doing the aligning...
+ 
+        /// <summary>
+        /// wind3 will start at bar 21 (after verse 1)
+        /// wind2 will start at bar 40 (after verse 2)
+        /// wind1 will start at bar 58 (after verse 3)
+        /// </summary>
+        /// <param name="barlineMsPositions"></param>
+        internal void ConstructUpperWinds(List<int> barlineMsPositions)
+        {
+            //throw new NotImplementedException();
+        }
 
-        ///// <summary>
-        ///// Moves certain LocalizedMidiDurationDefs in both bass and treble winds to align with
-        ///// LocalizedMidiDurationDefs in clytemnestra.
-        ///// LocalizedMidiDurationDefs which are already at a barlineMsPosition may not move.
-        ///// </summary>
-        ///// <param name="barlineMsPositions"></param>
-        //internal void AlignChords(MidiDefSequence clytemnestra, List<int> barlineMsPositions)
-        //{
-        //    List<int> barMsPositions = new List<int>(barlineMsPositions);
-        //    barMsPositions.Insert(0, 0);
-        //    MidiDefSequence bassWind = MidiDefSequences[0];
-        //    MidiDefSequence tenorWind = MidiDefSequences[1];
+        /// <summary>
+        /// Moves various LocalizedMidiDurationDefs in the winds to align with barlines
+        /// </summary>
+        internal void AlignChords(List<int> barMsPositions)
+        {
+            MidiDefSequence wind5 = MidiDefSequences[0];
+            MidiDefSequence wind4 = MidiDefSequences[1];
 
-        //    #region tenor wind
-        //    // verse 1
-        //    List<int> clytemnestraIndices = new List<int>() { 3, 12, 18, 27, 39, 49 };
-        //    for(int i = 10; i < 16; ++i)
-        //    {
-        //        tenorWind.AlignChordOrRest(barMsPositions, i - 1, i, i + 1, clytemnestra[clytemnestraIndices[i - 10]].MsPosition);
-        //    }
-        //    // interlude
-        //    tenorWind.AlignChordOrRest(barMsPositions, 15, 19, 21, bassWind[18].MsPosition);
-        //    tenorWind.AlignChordOrRest(barMsPositions, 19, 21, 22, bassWind[20].MsPosition);
-        //    // verse 2
-        //    clytemnestraIndices = new List<int>() { 67, 81, 93, 101 };
-        //    for(int i = 22; i < 26; ++i)
-        //    {
-        //        tenorWind.AlignChordOrRest(barMsPositions, i - 1, i, i + 1, clytemnestra[clytemnestraIndices[i - 22]].MsPosition);
-        //    }
-        //    // verse 3
-        //    clytemnestraIndices = new List<int>() { 119, 124, 131, 141, 151, 162, 170 };
-        //    for(int i = 34; i < 41; ++i)
-        //    {
-        //        tenorWind.AlignChordOrRest(barMsPositions, i - 1, i, i + 1, clytemnestra[clytemnestraIndices[i - 34]].MsPosition);
-        //    }
-        //    // verse 4
-        //    clytemnestraIndices = new List<int>() { 177, 188, 198, 208, 217, 225, 240, 254, 267 };
-        //    for(int i = 50; i < 59; ++i)
-        //    {
-        //        tenorWind.AlignChordOrRest(barMsPositions, i - 1, i, i + 1, clytemnestra[clytemnestraIndices[i - 50]].MsPosition);
-        //    }
-        //    // interlude
-        //    tenorWind.AlignChordOrRest(barMsPositions, 59, 62, 72, bassWind[61].MsPosition);
-        //    tenorWind.AlignChordOrRest(barMsPositions, 62, 64, 72, bassWind[63].MsPosition);
-        //    tenorWind.AlignChordOrRest(barMsPositions, 64, 69, 72, bassWind[67].MsPosition);
-        //    tenorWind.AlignChordOrRest(barMsPositions, 69, 71, 72, bassWind[69].MsPosition);
-        //    // verse 5
-        //    clytemnestraIndices = new List<int>() { 270,281 };
-        //    for(int i = 72; i < 74; ++i)
-        //    {
-        //        tenorWind.AlignChordOrRest(barMsPositions, i - 1, i, i + 1, clytemnestra[clytemnestraIndices[i - 72]].MsPosition);
-        //    }
-        //    tenorWind.AlignChordOrRest(barMsPositions, 74, 81, 82, bassWind[81].MsPosition); // align the final note
-        //    tenorWind.AlignChordOrRest(barMsPositions, 73, 74, 81, clytemnestra[287].MsPosition);
-        //    #endregion
-        //    #region bass wind
-        //    // verse 1
-        //    clytemnestraIndices = new List<int>() { 7, 16, 27, 38, 49, 58 };
-        //    for(int i = 9; i < 15; ++i)
-        //    {
-        //        bassWind.AlignChordOrRest(barMsPositions, i - 1, i, i + 1, clytemnestra[clytemnestraIndices[i - 9]].MsPosition);
-        //    }
-        //    // verse 2
-        //    clytemnestraIndices = new List<int>() { 71, 86, 94, 107 };
-        //    for(int i = 21; i < 25; ++i)
-        //    {
-        //        bassWind.AlignChordOrRest(barMsPositions, i - 1, i, i + 1, clytemnestra[clytemnestraIndices[i - 21]].MsPosition);
-        //    }
-        //    // verse 3
-        //    clytemnestraIndices = new List<int>() { 126, 137, 144, 152, 164, 173 };
-        //    for(int i = 34; i < 40; ++i)
-        //    {
-        //        bassWind.AlignChordOrRest(barMsPositions, i - 1, i, i + 1, clytemnestra[clytemnestraIndices[i - 34]].MsPosition);
-        //    }
-        //    // verse 4
-        //    clytemnestraIndices = new List<int>() { 192, 206, 215, 221, 234, 246, 257 };
-        //    for(int i = 50; i < 57; ++i)
-        //    {
-        //        bassWind.AlignChordOrRest(barMsPositions, i - 1, i, i + 1, clytemnestra[clytemnestraIndices[i - 50]].MsPosition);
-        //    }
-        //    // verse 5
-        //    clytemnestraIndices = new List<int>() { 279,283,288 };
-        //    for(int i = 71; i < 74; ++i)
-        //    {
-        //        bassWind.AlignChordOrRest(barMsPositions, i - 1, i, i + 1, clytemnestra[clytemnestraIndices[i - 71]].MsPosition);
-        //    }
-        //    bassWind.AlignChordOrRest(barMsPositions, 73, 74, 77, clytemnestra[289].MsPosition);
-        //    #endregion
-        //}
+            wind4.AlignChordOrRest(barMsPositions, 0, 19, 82, barMsPositions[20]);
+            //wind4.AlignChordOrRest(barMsPositions, 19, 29, 82, barMsPositions[39]);
+        }
 
         #region attributes
         internal List<int> BaseWindKrystalStrandIndices = new List<int>();
