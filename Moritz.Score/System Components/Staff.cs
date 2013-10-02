@@ -557,8 +557,14 @@ namespace Moritz.Score
         private void AdjustLowerChordXPosition(ChordSymbol upperChord, ChordSymbol lowerChord)
         {
             Debug.Assert(upperChord.MsPosition == lowerChord.MsPosition);
-            Debug.Assert(upperChord.Stem.Direction == VerticalDir.up);
-            Debug.Assert(lowerChord.Stem.Direction == VerticalDir.down);
+            if(!(upperChord is CautionaryChordSymbol))
+            {
+                Debug.Assert(upperChord.Stem.Direction == VerticalDir.up);
+            }
+            if(!(lowerChord is CautionaryChordSymbol))
+            {
+                Debug.Assert(lowerChord.Stem.Direction == VerticalDir.down);
+            }
 
             List<HeadMetrics> upperChordHeadMetrics = upperChord.ChordMetrics.HeadsMetrics; // a clone
             List<HeadMetrics> lowerChordHeadMetrics = lowerChord.ChordMetrics.HeadsMetrics; // a clone

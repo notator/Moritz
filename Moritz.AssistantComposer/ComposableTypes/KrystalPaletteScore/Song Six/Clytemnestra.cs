@@ -33,7 +33,8 @@ namespace Moritz.AssistantComposer
             List<List<int>> momentDefMsWidthPerVerse = MomentDefMsWidthPerVerse;
             List<List<int>> midiChordDefMsDurPerVerse = MidiChordDefMsDurationsPerVerse;
             List<List<string>> lyricsPerVerse = LyricsPerVerse;
-            List<byte> verseVelocities = new List<byte>() { (byte)60, (byte)75, (byte)90, (byte)105, (byte)120 };
+            List<byte> verseVelocities = new List<byte>() { (byte)64, (byte)75, (byte)90, (byte)105, (byte)120 };
+            List<byte> verseVolumes = new List<byte>() { (byte)120, (byte)100, (byte)100, (byte)100, (byte)100 };
 
             for(int verseIndex = 0; verseIndex < 5; ++verseIndex)
             {
@@ -48,6 +49,7 @@ namespace Moritz.AssistantComposer
 
                 byte patch = (byte)(123 + verseIndex); // top 5 patches in bank 0
                 List<byte> velocity = new List<byte>() { verseVelocities[verseIndex] };
+                byte volume = verseVolumes[verseIndex];
  
                 for(int syllableIndex = 0; syllableIndex < momentMsWidth.Count; ++syllableIndex)
                 {
@@ -63,7 +65,8 @@ namespace Moritz.AssistantComposer
                     #region 
                     LocalMidiChordDef lmcd = new LocalMidiChordDef();
                     lmcd.MsDuration = msDuration;
-                    lmcd.Volume = (byte)100; // 100 is the default, and is not written into the score. Other values ARE added to each chord.
+                    //lmcd.Volume = (byte)100; // 100 is the default, and is not written into the score. Other values ARE added to each chord.
+                    lmcd.Volume = volume;
                     lmcd.HasChordOff = true;
                     // Bank, Patch and Volume are added to *every* chord so that performances can start anywhere.
                     // If the interpreter is clever enough, repeated controls are not actually sent.
@@ -167,7 +170,7 @@ namespace Moritz.AssistantComposer
                 List<int> verse1 = new List<int>()
                 {2962,1189,410,2371,584,366,363,890,380,3225,
                  836,1807,440,373,601,396,302,1451,410,1282,
-                 431,413,655,1424,356,672,367,531,487,706,
+                 431,413,655,1424,356,672,367,570,550,706,
                  329,1512,551,934,329,480,635,414,441,1857,
                  1288,585,574,481,335,329,180,937,614,1102};
 
@@ -222,7 +225,7 @@ namespace Moritz.AssistantComposer
                 List<int> verse1 = new List<int>()
                 {1716,1189,410,856,584,366,363,890,380,1364,
                  836,1251,440,373,601,396,302,699,410,1282,
-                 431,413,655,591,356,672,367,531,487,706,
+                 431,413,655,591,356,672,367,570,550,706,
                  329,897,551,934,329,480,635,414,441,876,
                  1288,585,574,481,335,329,180,937,614,1102};
 
