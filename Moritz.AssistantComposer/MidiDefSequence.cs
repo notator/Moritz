@@ -212,15 +212,17 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// _localizedMidiDurationDefs[alignIndex] (=lmddAlign) is moved to MsPosition, and the surrounding symbols are spread accordingly
         /// between those at anchor1Index and anchor2Index. The symbols at anchor1Index (=lmddA1) and anchor2Index (=lmddA2)do not move.
-        /// An exception is thrown if an attempt is made to move any lmdd which is aligned to a barline.
-        /// barMsPositions contains the msPositions of all barlines except the last. (begins with 0)
-        /// Note that alignIndex cannot be 0,
-        /// and that anchor2Index CAN be equal to _localizedMidiDurationDefs.Count (i.e.on the final barline).
+        /// Note that alignIndex cannot be 0, and that anchor2Index CAN be equal to _localizedMidiDurationDefs.Count (i.e.on the final barline).
+        /// This function checks that 
+        ///     1. anchor1Index is in range 0..(alignIndex - 1),
+        ///     2. anchor2Index is in range (alignIndex + 1).._localizedMidiDurationDefs.Count
+        ///     3. toPosition is greater than the msPosition at anchor1Index and less than the msPosition at anchor2Index.
+        /// and throws an appropriate exception if there is a problem.
         /// </summary>
-        internal void AlignChordOrRest(List<int> barMsPositions, int anchor1Index, int alignIndex, int anchor2Index, int toMsPosition)
+        internal void AlignChordOrRest(int anchor1Index, int alignIndex, int anchor2Index, int toMsPosition)
         {
             // throws an exception if there's a problem.
-            CheckAlignDefArgs(barMsPositions, anchor1Index, alignIndex, anchor2Index, toMsPosition);
+            CheckAlignDefArgs(anchor1Index, alignIndex, anchor2Index, toMsPosition);
 
             List<LocalizedMidiDurationDef> lmdds = _localizedMidiDurationDefs;
             int anchor1MsPosition = lmdds[anchor1Index].MsPosition;
@@ -264,20 +266,27 @@ namespace Moritz.AssistantComposer
             #endregion
         }
 
-        private void CheckAlignDefArgs(List<int> barMsPositions, int anchor1Index, int alignIndex, int anchor2Index, int toMsPosition)
+
+        /// <summary>
+        /// Throws an exception if
+        ///     1. the index arguments are not in ascending order. (None of them may not be equal either.)
+        ///     2. any of the index arguments are out of range (anchor2Index CAN be _localizedMidiDurationDefs.Count -- the final barline)
+        ///     3. toPosition is not greater than the msPosition at anchor1Index and less than the msPosition at anchor2Index.
+        /// </summary>
+        private void CheckAlignDefArgs(int anchor1Index, int alignIndex, int anchor2Index, int toMsPosition)
         {
             List<LocalizedMidiDurationDef> lmdds = _localizedMidiDurationDefs; 
             int count = lmdds.Count;
             string msg = "\nError in MidiDefSequence.cs,\nfunction AlignDefMsPosition()\n\n";
-            if(alignIndex == 0)
+            if(anchor1Index >= alignIndex || anchor2Index <= alignIndex)
             {
-                throw new Exception(msg + "Can't move chord or rest at index 0.\n" +
-                    "\ncount=" + count.ToString() +
+                throw new Exception(msg + "Index out of order.\n" +
                     "\nanchor1Index=" + anchor1Index.ToString() +
                     "\nalignIndex=" + alignIndex.ToString() +
                     "\nanchor2Index=" + anchor2Index.ToString());
-            }
-            if(anchor1Index >= count || alignIndex >= count || anchor2Index > count) // anchor2Index can be at the final barline (=count)!
+            }            
+            if((anchor1Index > (count - 2) || alignIndex > (count - 1) || anchor2Index > count)// anchor2Index can be at the final barline (=count)!
+                || (anchor1Index < 0 || alignIndex < 1 || anchor2Index < 2))
             {
                 throw new Exception(msg + "Index out of range.\n" +
                     "\ncount=" + count.ToString() +
@@ -285,21 +294,7 @@ namespace Moritz.AssistantComposer
                     "\nalignIndex=" + alignIndex.ToString() +
                     "\nanchor2Index=" + anchor2Index.ToString());
             }
-            if(anchor1Index >= alignIndex || anchor2Index <= alignIndex)
-            {
-                throw new Exception(msg + "Index out of order.\n" +
-                    "\nanchor1Index=" + anchor1Index.ToString() +
-                    "\nalignIndex=" + alignIndex.ToString() +
-                    "\nanchor2Index=" + anchor2Index.ToString());
-            }
-            for(int index = anchor1Index + 1; index < anchor2Index; ++index)
-            {
-                if(index < lmdds.Count && barMsPositions.Contains(lmdds[index].MsPosition))
-                {
-                    throw new Exception(msg + "Can't move chord or rest attached to a barline.\n" +
-                        "\nindex=" + index.ToString());
-                }
-            }
+
             int a1MsPos = lmdds[anchor1Index].MsPosition;
             int a2MsPos;
             if(anchor2Index == lmdds.Count)
@@ -317,6 +312,46 @@ namespace Moritz.AssistantComposer
                     "\nalignIndex=" + alignIndex.ToString() +
                     "\nanchor2Index=" + anchor2Index.ToString() +
                     "\ntoMsPosition=" + toMsPosition.ToString());  
+            }
+        }
+
+        /// <summary>
+        /// Returns 0 if msPosition is negative,
+        /// Returns the index of the last LocalizedMidiDurationDef if msPosition is beyond the end of the sequence.
+        /// </summary>
+        /// <param name="msPosition"></param>
+        /// <returns></returns>
+        internal int FirstIndexAtOrAfterMsPos(int msPosition)
+        {
+            int index = _localizedMidiDurationDefs.Count - 1; // the final index
+            for(int i = 0; i < _localizedMidiDurationDefs.Count; ++i)
+            {
+                if(_localizedMidiDurationDefs[i].MsPosition >= msPosition)
+                {
+                    index = i;
+                    break;
+                }
+            }
+            return index;
+        }
+
+        /// <summary>
+        /// Transposes the LocalizedMidiDurationDefs from the firstGlissedIndex upto including the lastGlissedIndex
+        /// by an equally increasing amount, so that the final LocalizedMidiDurationDef is transposed by glissInterval.
+        /// firstGlissedIndex and lastGlissedIndex can be equal.
+        /// glissInterval can be negative.
+        /// </summary>
+        internal void StepwiseGliss(int firstGlissedIndex, int lastGlissedIndex, int glissInterval)
+        {
+            Debug.Assert(firstGlissedIndex <= lastGlissedIndex);
+
+            int nSteps = (lastGlissedIndex - firstGlissedIndex) + 1;
+            double interval = ((double)glissInterval) / nSteps;
+            double step = interval;
+            for(int index = firstGlissedIndex; index <= lastGlissedIndex; ++index)
+            {
+                _localizedMidiDurationDefs[index].Transpose((int)Math.Round(interval));
+                interval += step;
             }
         }
 
@@ -373,5 +408,6 @@ namespace Moritz.AssistantComposer
             }
         }  //end nested class
         #endregion
+
     }
 }

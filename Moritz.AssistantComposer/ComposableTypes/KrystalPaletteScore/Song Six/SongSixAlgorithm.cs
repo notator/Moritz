@@ -78,9 +78,7 @@ namespace Moritz.AssistantComposer
 
             Debug.Assert(barlineMsPositions.Count == NumberOfBars() + 1); // includes bar 1 (mPos=0) and the final barline.
             
-            winds.ConstructUpperWinds(barlineMsPositions);
-
-            winds.AlignChords(barlineMsPositions);
+            winds.CompleteTheWinds(barlineMsPositions);
 
             //Birds birds = new Birds(clytemnestra, winds, _krystals, _paletteDefs, blockMsDurations);
 
