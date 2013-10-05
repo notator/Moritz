@@ -69,7 +69,7 @@
       <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
     </Compile>
     <Compile Include="IPaletteForm.cs" />
-    <Compile Include="MidiDefSequence.cs" />
+    <Compile Include="MidiPhrase.cs" />
     <Compile Include="PaletteDef.cs" />
     <Compile Include="MidiCompositionAlgorithm.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\PaletteDemoScore\PaletteDemoAlgorithm.cs" />

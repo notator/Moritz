@@ -330,9 +330,9 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// returns Clytamnestra's MidiDefSequence for the whole piece including rests (but no bars)
+        /// returns Clytamnestra's MidiPhrase for the whole piece including rests (but no bars)
         /// </summary>
-        public MidiDefSequence GetMidiDefSequence(List<int> blockMsDurations)
+        public MidiPhrase GetMidiPhrase(List<int> blockMsDurations)
         {
             Debug.Assert(_momentDefsListPerVerse.Count == 5);
             Debug.Assert(blockMsDurations.Count == 11);
@@ -391,8 +391,8 @@ namespace Moritz.AssistantComposer
                 localizedMidiDurationDefs.Add(rmdd);
             }
 
-            MidiDefSequence midiDefSequence = new MidiDefSequence(localizedMidiDurationDefs);
-            return midiDefSequence;
+            MidiPhrase midiPhrase = new MidiPhrase(localizedMidiDurationDefs);
+            return midiPhrase;
         }
 
         private List<int> GetBlockPositions(List<int> blockMsDurations)
@@ -463,7 +463,7 @@ namespace Moritz.AssistantComposer
 
         private List<List<MomentDef>> _momentDefsListPerVerse;
 
-        public MidiDefSequence MidiDefSequence = null;
+        public MidiPhrase MidiPhrase = null;
 
     }
 }

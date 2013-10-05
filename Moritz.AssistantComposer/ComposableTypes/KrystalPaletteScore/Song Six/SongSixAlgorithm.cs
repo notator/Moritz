@@ -70,7 +70,7 @@ namespace Moritz.AssistantComposer
 
             SetBlockMsDurations(blockMsDurations, winds);
 
-            clytemnestra.MidiDefSequence = clytemnestra.GetMidiDefSequence(blockMsDurations);
+            clytemnestra.MidiPhrase = clytemnestra.GetMidiPhrase(blockMsDurations);
 
             List<int> barlineMsPositions = clytemnestra.GetBarlineMsPositions(blockMsDurations);
             // barlineMsPositions contains both the position of bar 1 (0ms) and the position of the final barline
@@ -98,7 +98,7 @@ namespace Moritz.AssistantComposer
         private void SetBlockMsDurations(List<int> blockMsDurations, Winds winds)
         {
             List<int> msPosPerClytBlock = new List<int>();
-            MidiDefSequence wind5 = winds.MidiDefSequences[0];
+            MidiPhrase wind5 = winds.MidiPhrases[0];
             List<int> baseWindChordIndexPerClytBlock = new List<int>();
 
             baseWindChordIndexPerClytBlock.Add(winds.BaseWindKrystalStrandIndices[4]);  // strand 5
@@ -138,7 +138,7 @@ namespace Moritz.AssistantComposer
             //}
 
             Voice clytemnestrasVoice = new Voice(null, channelIndex++);
-            clytemnestrasVoice.LocalizedMidiDurationDefs = clytemnestra.MidiDefSequence.LocalizedMidiDurationDefs;
+            clytemnestrasVoice.LocalizedMidiDurationDefs = clytemnestra.MidiPhrase.LocalizedMidiDurationDefs;
             voices.Add(clytemnestrasVoice);
 
             List<Voice> windVoices = winds.GetVoices(channelIndex);
