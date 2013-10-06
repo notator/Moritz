@@ -86,6 +86,22 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
+        /// Rests dont have lyrics, so their index in the MidiPhrase can't be shown as a lyric. 
+        /// </summary>
+        /// <param name="midiPhrase"></param>
+        public void SetLyricsToIndex()
+        {
+            for(int index = 0; index < _localMidiDurationDefs.Count; ++index)
+            {
+                UniqueMidiChordDef lmcd = _localMidiDurationDefs[index].UniqueMidiDurationDef as UniqueMidiChordDef;
+                if(lmcd != null)
+                {
+                    lmcd.Lyric = index.ToString();
+                }
+            }
+        }
+
+        /// <summary>
         /// Appends the new lmdd to the end of the list.
         /// </summary>
         /// <param name="lmdd"></param>
@@ -116,12 +132,7 @@ namespace Moritz.AssistantComposer
         {
             get
             {
-                int msDuration = 0;
-                foreach(LocalMidiDurationDef lmdd in _localMidiDurationDefs)
-                {
-                    msDuration += lmdd.MsDuration;
-                }
-                return msDuration;
+                return this.EndMsPosition;
             }
             set
             {
@@ -322,73 +333,188 @@ namespace Moritz.AssistantComposer
             }
         }
 
+        #region SetContour()
         /// <summary>
-        /// Re-orders the LocalMidiDurationDefs in this MidiPhrase.
-        /// <para>1. creates sub-midiPhrases using the partitionSizes in the first argument (see parameter info below).</para>   
-        /// <para>2. Sorts the sub-midiPhrases into ascending order of the base pitch of their first chord. If a sub-MidiPhrase</para>
-        /// <para>    contains no chords, it is put at the beginning of the sort. If two sub-MidiPhrases have the same initial</para>
-        /// <para>    base pitch, they stay in the same order as they were.</para>
-        /// <para>3. Re-orders the sub-midiPhrases according to the contour retrieved (from the static K.Contour[] array) using</para>
-        /// <para>    partitions.Count and the contourNumber and axisNumber arguments.</para>
-        /// <para>4. Concatenates the re-ordered sub-MidiPhrases, sets their MsPositions (by setting the starting MsPosition to</para>
-        /// <para>    the original MsPosition), and assigns the result to this.LocalMidiDurationDefs.</para>
+        /// Re-orders the LocalMidiDurationDefs in (part of) this MidiPhrase.
+        /// <para>1. creates partitions (lists of LocalMidiDurationDefs) using the startAtIndex and partitionSizes in the first two</para>
+        /// <para>-  arguments (see parameter info below).</para>   
+        /// <para>2. Sorts the partitions into ascending order of their lowest pitches.
+        /// <para>3. Re-orders the partitions according to the contour retrieved (from the static K.Contour[] array) using</para>
+        /// <para>-  the contourNumber and axisNumber arguments.</para>
+        /// <para>4. Concatenates the re-ordered partitions, re-sets their MsPositions, and replaces the LocalMidiDurationDefs in</para>
+        /// <para>-  the original List with the result.</para>
+        /// <para>5. If setLyricsToIndex is true, sets the lyrics to the new indices</para>
+        /// <para>SpecialCases:</para>
+        /// <para>If a partition contains a single LocalMidiRestDef, it stays where it is and the other LocalMidiDurationDefs are</para>
+        /// <para>re-ordered around it.</para>
+        /// <para>If two sub-MidiPhrases have the same initial base pitch, they stay in the same order as they were (not necessarily</para>
+        /// <para>together, of course.)</para>
         /// </summary>
-        /// <param name="partitionSizes">Contains the number of LocalMidiDurationDefs in each sub-midiPhrase to be re-ordered.
-        /// <para>This partitionSizess list must contain:</para>
-        /// <para>    0 or more ints and less than 8 ints.</para>
-        /// <para>    ints which are all greater than 0 and less than or equal to LocalMidiDurationDefs.Count.</para>
-        /// <para>    The sum of all the ints must be equal to LocalMidiDurationDefs.Count.</para>
+        /// <param name="startAtIndex">The index in LocalMidiDurationDefs at which to start the re-ordering.
+        /// </param>
+        /// <param name="partitionSizes">The number of LocalMidiDurationDefs in each sub-midiPhrase to be re-ordered.
+        /// <para>This partitionSizes list must contain:</para>
+        /// <para>    1..7 int sizes.</para>
+        /// <para>    sizes which are all greater than 0.</para>
+        /// <para>    The sum of all the sizes + startAtIndex must be less than or equal to LocalMidiDurationDefs.Count.</para>
         /// <para>An Exception is thrown if any of these conditions is not met.</para>
-        /// <para>If the partitions list is empty, or contains only one value (equal to LocalMidiDurationDefs.Count),</para>
-        /// <para>the value is ignored, and this function returns silently without doing anything.</para>
+        /// <para>If the partitions list contains only one value, this function returns silently without doing anything.</para>
         /// </param>
         /// <param name="contourNumber">A value greater than or equal to 1, and less than or equal to 12. An exception is thrown if this is not the case.</param>
         /// <param name="axisNumber">A value greater than or equal to 1, and less than or equal to 12 An exception is thrown if this is not the case.</param>
-        internal void SetContour(List<int> partitionSizes, int contourNumber, int axisNumber)
+        internal void SetContour(int startAtIndex, List<int> partitionSizes, int contourNumber, int axisNumber, bool setLyricsToIndex)
         {
-            CheckSetContourArgs(partitionSizes, contourNumber, axisNumber);
-            List<LocalMidiDurationDef> oldLmdds = _localMidiDurationDefs;
+            CheckSetContourArgs(startAtIndex, partitionSizes, contourNumber, axisNumber);
+
+            List<List<LocalMidiDurationDef>> partitions = GetPartitions(startAtIndex, partitionSizes);
+
+            // Remove any partitions (from the partitions list) that contain only a single LocalMidiRestDef
+            // Store them (the rests), with their original partition indices, in the returned list of KeyValuePairs.
+            List<KeyValuePair<int, List<LocalMidiDurationDef>>> restPartitions = GetRestPartitions(partitions);
+
+            if(partitions.Count > 1)
+            {
+                // All the partitions now contain at least one LocalMidiChordDef
+                // Sort into ascending order (part 2 of the above comment)
+                partitions = SortPartitions(partitions);
+                // re-order the partitions (part 3 of the above comment)
+                partitions = DoContouring(partitions, contourNumber, axisNumber);
+            }
+
+            RestoreRestPartitions(partitions, restPartitions);
+
+            List<LocalMidiDurationDef> sortedLmdds = ConvertPartitionsToFlatLmdds(startAtIndex, partitions);
+
+            for(int i = 0; i < sortedLmdds.Count; ++i)
+            {
+                _localMidiDurationDefs[startAtIndex + i] = sortedLmdds[i];
+            }
+
+            if(setLyricsToIndex)
+            {
+                SetLyricsToIndex();
+            }            
+        }
+
+        private List<LocalMidiDurationDef> ConvertPartitionsToFlatLmdds(int startAtIndex, List<List<LocalMidiDurationDef>> partitions)
+        {
+            List<LocalMidiDurationDef> newLmdds = new List<LocalMidiDurationDef>();
+            int msPosition = _localMidiDurationDefs[startAtIndex].MsPosition;
+            foreach(List<LocalMidiDurationDef> partition in partitions)
+            {
+                foreach(LocalMidiDurationDef pLmdd in partition)
+                {
+                    pLmdd.MsPosition = msPosition;
+                    msPosition += pLmdd.MsDuration;
+                    newLmdds.Add(pLmdd);
+                }
+            }
+            return newLmdds;
+        }
+
+        /// <summary>
+        /// Re-insert the restPartitions at their original positions
+        /// </summary>
+        private void RestoreRestPartitions(List<List<LocalMidiDurationDef>> partitions, List<KeyValuePair<int, List<LocalMidiDurationDef>>> restPartitions)
+        {
+            for(int i = restPartitions.Count - 1; i >= 0; --i)
+            {
+                KeyValuePair<int, List<LocalMidiDurationDef>> kvp = restPartitions[i];
+                partitions.Insert(kvp.Key, kvp.Value);
+            }
+        }
+
+        private List<List<LocalMidiDurationDef>> GetPartitions(int startAtIndex, List<int> partitionSizes)
+        {
             List<List<LocalMidiDurationDef>> partitions = new List<List<LocalMidiDurationDef>>();
-            int lmddIndex = 0;
+            int lmddIndex = startAtIndex;
             foreach(int size in partitionSizes)
             {
                 List<LocalMidiDurationDef> partition = new List<LocalMidiDurationDef>();
                 for(int i = 0; i < size; ++i)
                 {
-                    partition.Add(oldLmdds[lmddIndex++]);
+                    partition.Add(_localMidiDurationDefs[lmddIndex++]);
                 }
+                partitions.Add(partition);
             }
-            
-            // Sort into ascending order (part 2 of the above comment)
-            partitions = SortPartitions(partitions);
-            // re-order the partitions (part 3 of the above comment)
-            partitions = DoContouring(partitions, contourNumber, axisNumber);
-
-            List<LocalMidiDurationDef> newLmdds = new List<LocalMidiDurationDef>();
-            foreach(List<LocalMidiDurationDef> partition in partitions)
-            {
-                foreach(LocalMidiDurationDef pLmdd in partition)
-                {
-                    newLmdds.Add(pLmdd);
-                }
-            }
-            int msPosition = this.MsPosition;
-            _localMidiDurationDefs = newLmdds;
-            this.MsPosition = msPosition; // resets all the msPosition values.
+            return partitions;
         }
 
         /// <summary>
-        /// Returns the result of sorting the partitions into ascending order of the base pitch of their first chord.
-        /// <para>If a sub-MidiPhrase contains no chords, it is put at the beginning of the sort.</para>
-        /// <para>If two sub-MidiPhrases have the same initial base pitch, they stay in the same order as they were.</para>
+        /// Remove any partitions (from partitions) that contain only a single LocalMidiRestDef.
+        /// Store them, with their original partition indices, in the returned list of KeyValuePairs.
+        /// </summary>
+        private List<KeyValuePair<int, List<LocalMidiDurationDef>>> GetRestPartitions(List<List<LocalMidiDurationDef>> partitions)
+        {
+            List<List<LocalMidiDurationDef>> newPartitions = new List<List<LocalMidiDurationDef>>();
+            List<KeyValuePair<int, List<LocalMidiDurationDef>>> restPartitions = new List<KeyValuePair<int, List<LocalMidiDurationDef>>>();
+            for(int i = 0; i < partitions.Count; ++i)
+            {
+                List<LocalMidiDurationDef> partition = partitions[i];
+                if(partition.Count == 1 && partition[0].UniqueMidiDurationDef is UniqueMidiRestDef)
+                {
+                    restPartitions.Add(new KeyValuePair<int, List<LocalMidiDurationDef>>(i, partition));
+                }
+                else
+                {
+                    newPartitions.Add(partition);
+                }
+            }
+
+            partitions = newPartitions;
+            return restPartitions;
+        }
+
+        /// <summary>
+        /// Returns the result of sorting the partitions into ascending order of their lowest pitches.
+        /// <para>All the partitions contain at least one UniqueMidiChordDef</para>
+        /// <para>If two partitions have the same lowest pitch, they stay in the same order as they were</para>
+        /// <para>(not necessarily together, of course.)</para>    
         /// </summary>
         private List<List<LocalMidiDurationDef>> SortPartitions(List<List<LocalMidiDurationDef>> partitions)
         {
+            List<byte> lowestPitches = GetLowestPitches(partitions);
+            List<byte> sortedLowestPitches = new List<byte>(lowestPitches);
+            sortedLowestPitches.Sort();
+
             List<List<LocalMidiDurationDef>> sortedPartitions = new List<List<LocalMidiDurationDef>>();
+            foreach(byte lowestPitch in sortedLowestPitches)
+            {
+                int pitchIndex = lowestPitches.FindIndex(item => item == lowestPitch);
+                sortedPartitions.Add(partitions[pitchIndex]);
+                lowestPitches[pitchIndex] = byte.MaxValue;
+            }
 
             return sortedPartitions;
         }
-
+        /// <summary>
+        /// Returns a list containing the lowest pitch in each partition
+        /// </summary>
+        private List<byte> GetLowestPitches(List<List<LocalMidiDurationDef>> partitions)
+        {
+            List<byte> lowestPitches = new List<byte>();
+            foreach(List<LocalMidiDurationDef> partition in partitions)
+            {
+                byte lowestPitch = byte.MaxValue;
+                foreach(LocalMidiDurationDef lmdd in partition)
+                {
+                    UniqueMidiChordDef umcd = lmdd.UniqueMidiDurationDef as UniqueMidiChordDef;
+                    if(umcd != null) // partitions can contain rests, which are however ignored here
+                    {
+                        foreach(BasicMidiChordDef bmcd in umcd.BasicMidiChordDefs)
+                        {
+                            foreach(byte note in bmcd.Notes)
+                            {
+                                lowestPitch = (lowestPitch < note) ? lowestPitch : note;
+                            }
+                        }
+                    }
+                }
+                Debug.Assert(lowestPitch != byte.MaxValue, "There must be at least one UniqueMidiChordDef in the partition.");
+                lowestPitches.Add(lowestPitch);
+            }
+            return lowestPitches;
+        }
         /// <summary>
         /// Re-orders the partitions according to the contour retrieved (from the static K.Contour[] array)
         /// <para>using partitions.Count and the contourNumber and axisNumber arguments.</para>
@@ -410,27 +536,41 @@ namespace Moritz.AssistantComposer
 
             return contouredPartitions;
         }
-
-        private void CheckSetContourArgs(List<int> partitions, int contourNumber, int axisNumber)
+        /// <summary>
+        /// Throws an exception if one of the following conditions is not met.
+        /// <para>startAtIndex is a valid index in the LocalMidiDurationDefs list</para>
+        /// <para>partitionSizes.Count is greater than 0, and less than 8.</para>
+        /// <para>all sizes in partitionSizes are greater then 0.</para>
+        /// <para>the sum of startAtIndex plus all the partition sizes is not greater than LocalMidiDurationDefs.Count</para>
+        /// <para>contourNumber is in the range 1..12</para>
+        /// <para>axisNumber is in the range 1..12</para>
+        /// </summary>
+        private void CheckSetContourArgs(int startAtIndex, List<int> partitionSizes, int contourNumber, int axisNumber)
         {
             List<LocalMidiDurationDef> lmdds = _localMidiDurationDefs;
-            if(partitions.Count < 0 || partitions.Count > 7)
+            if(startAtIndex < 0 || startAtIndex > lmdds.Count - 1)
             {
-                throw new ArgumentException("partitions.Count must be in range 0..7");
+                throw new ArgumentException("startAtIndex is out of range.");
             }
-            int sum = 0;
-            foreach(int i in partitions)
+            if(partitionSizes.Count < 1 || partitionSizes.Count > 7)
             {
-                if(i < 0 || i > lmdds.Count)
+                throw new ArgumentException("partitionSizes.Count must be in range 1..7");
+            }
+
+            int totalNumberOfLmdds = startAtIndex;
+            foreach(int size in partitionSizes)
+            {
+                if(size < 1)
                 {
-                    throw new ArgumentException("partition size out of range 1.." + lmdds.Count.ToString());
+                    throw new ArgumentException("partitions must contain at least one LocalMidiDurationDef");
                 }
-                sum += i;
+                totalNumberOfLmdds += size;
+                if(totalNumberOfLmdds > lmdds.Count)
+                {
+                    throw new ArgumentException("partitions are too big or start too late"); 
+                }
             }
-            if(sum != lmdds.Count)
-            {
-                throw new ArgumentException("The sum of the partition sizes must be " + lmdds.Count.ToString());
-            }
+
             if(contourNumber < 1 || contourNumber > 12)
             {
                 throw new ArgumentException("contourNumber out of range 1..12");
@@ -440,6 +580,7 @@ namespace Moritz.AssistantComposer
                 throw new ArgumentException("axisNumber out of range 1..12");
             }
         }
+        #endregion
 
         /// <summary>
         /// Returns 0 if msPosition is negative,

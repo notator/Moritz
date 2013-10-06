@@ -80,6 +80,10 @@ namespace Moritz.AssistantComposer
             
             winds.CompleteTheWinds(barlineMsPositions);
 
+            //code for testing MidiPhrase.SetContour(...)
+            //MidiPhrase contouredPhrase = winds.MidiPhrases[0];
+            //contouredPhrase.SetContour(11, new List<int>() { 1, 4, 1, 2 }, 1, 1, true);
+
             //Birds birds = new Birds(clytemnestra, winds, _krystals, _paletteDefs, blockMsDurations);
 
             // system contains one Voice per channel (not divided into bars)
