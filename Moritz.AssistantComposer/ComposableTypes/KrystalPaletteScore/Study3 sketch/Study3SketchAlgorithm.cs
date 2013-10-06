@@ -90,16 +90,16 @@ namespace Moritz.AssistantComposer
             int msPosition = 0;
             foreach(MidiDurationDef midiDurationDef in midiDurationDefs)
             {
-                LocalizedMidiDurationDef noteDef = new LocalizedMidiDurationDef(midiDurationDef);
-                LocalizedMidiDurationDef restDef = new LocalizedMidiDurationDef(1500 - midiDurationDef.MsDuration);
+                LocalMidiDurationDef noteDef = new LocalMidiDurationDef(midiDurationDef);
+                LocalMidiDurationDef restDef = new LocalMidiDurationDef(1500 - midiDurationDef.MsDuration);
                 Debug.Assert(midiDurationDef.MsDuration > 0);
                 Debug.Assert(noteDef.MsDuration == midiDurationDef.MsDuration);
                 noteDef.MsPosition = msPosition;
                 msPosition += noteDef.MsDuration; // for this test score
                 restDef.MsPosition = msPosition;
                 msPosition += restDef.MsDuration; // for this test score
-                voice.LocalizedMidiDurationDefs.Add(noteDef);
-                voice.LocalizedMidiDurationDefs.Add(restDef);
+                voice.LocalMidiDurationDefs.Add(noteDef);
+                voice.LocalMidiDurationDefs.Add(restDef);
             }
         }
         #endregion CreateBar1()
@@ -137,9 +137,9 @@ namespace Moritz.AssistantComposer
                 int mdsdEndPos = midiPhrases[i].EndMsPosition;
                 if(maxBarMsPos > mdsdEndPos)
                 {
-                    LocalizedMidiDurationDef rest2Def = new LocalizedMidiDurationDef(maxBarMsPos - mdsdEndPos);
+                    LocalMidiDurationDef rest2Def = new LocalMidiDurationDef(maxBarMsPos - mdsdEndPos);
                     rest2Def.MsPosition = mdsdEndPos;
-                    bar[i].LocalizedMidiDurationDefs.Add(rest2Def);
+                    bar[i].LocalMidiDurationDefs.Add(rest2Def);
                 }
             }
             return bar;
@@ -151,18 +151,18 @@ namespace Moritz.AssistantComposer
         /// </summary>
         private int WriteVoiceMidiDurationDefsInBar2(Voice voice, MidiPhrase midiPhrase, int msPosition, int bar2StartMsPos)
         {
-            LocalizedMidiDurationDef rest1Def = null;
+            LocalMidiDurationDef rest1Def = null;
             if(msPosition > bar2StartMsPos)
             {
-                rest1Def = new LocalizedMidiDurationDef(msPosition - bar2StartMsPos);
+                rest1Def = new LocalMidiDurationDef(msPosition - bar2StartMsPos);
                 rest1Def.MsPosition = bar2StartMsPos;
-                voice.LocalizedMidiDurationDefs.Add(rest1Def);
+                voice.LocalMidiDurationDefs.Add(rest1Def);
             }
 
             midiPhrase.MsPosition = msPosition;
-            foreach(LocalizedMidiDurationDef lmdd in midiPhrase)
+            foreach(LocalMidiDurationDef lmdd in midiPhrase)
             {
-                voice.LocalizedMidiDurationDefs.Add(lmdd);
+                voice.LocalMidiDurationDefs.Add(lmdd);
             }
 
             return midiPhrase.EndMsPosition;

@@ -298,12 +298,12 @@ namespace Moritz.Score.Notation
             return returnMetrics;
         }
 
-        public override DurationSymbol GetDurationSymbol(Voice voice, LocalizedMidiDurationDef lmdd, bool firstLmddInVoice,
+        public override DurationSymbol GetDurationSymbol(Voice voice, LocalMidiDurationDef lmdd, bool firstLmddInVoice,
             ref byte currentVelocity)
         {
             DurationSymbol durationSymbol = null;
             LocalizedCautionaryChordDef lccd = lmdd as LocalizedCautionaryChordDef;  
-            MidiChordDef midiChordDef = lmdd.LocalMidiDurationDef as MidiChordDef;
+            MidiChordDef midiChordDef = lmdd.UniqueMidiDurationDef as MidiChordDef;
 
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
             float musicFontHeight = pageFormat.MusicFontHeight;
@@ -598,7 +598,7 @@ namespace Moritz.Score.Notation
                         List<float> x2s = null;
                         List<float> ys = null;
                         ++index;
-                        if(chord1.LocalizedMidiDurationDef.MsDurationToNextBarline != null)
+                        if(chord1.LocalMidiDurationDef.MsDurationToNextBarline != null)
                         {
                             while(index < noteObjects.Count)
                             {
@@ -684,7 +684,7 @@ namespace Moritz.Score.Notation
                             break;
                     }
 
-                    if(lastChord != null && lastChord.LocalizedMidiDurationDef.MsDurationToNextBarline != null)
+                    if(lastChord != null && lastChord.LocalMidiDurationDef.MsDurationToNextBarline != null)
                     {
                         List<float> x1s = GetX1sFromChord1(lastChord.ChordMetrics, hairlinePadding);
                         List<float> x2s;

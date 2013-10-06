@@ -8,15 +8,15 @@ using Moritz.Globals;
 namespace Moritz.Score.Midi
 {
     ///<summary>
-    /// A LocalMidiChordDef is a MidiChordDef which is saved locally in an SVG file.
+    /// A UniqueMidiChordDef is a MidiChordDef which is saved locally in an SVG file.
     /// Related classes:
     /// 1. A PaletteMidiChordDef is a MidiChordDef which is saved in or retreived from a palette.
-    /// PaletteMidiChordDefs can be 'used' in SVG files, but are usually converted to LocalMidiChordDef.
-    /// 2. A LocalizedMidiChordDef is a LocalMidiChordDef with additional MsPositon and msDuration attributes.
+    /// PaletteMidiChordDefs can be 'used' in SVG files, but are usually converted to UniqueMidiChordDef.
+    /// 2. A LocalizedMidiChordDef is a UniqueMidiChordDef with additional MsPositon and msDuration attributes.
     //</summary>
-    public class LocalMidiChordDef : MidiChordDef
+    public class UniqueMidiChordDef : MidiChordDef
     {
-        public LocalMidiChordDef()
+        public UniqueMidiChordDef()
             :base()
         {
             ID = "localChord" + UniqueChordID.ToString();
@@ -25,11 +25,14 @@ namespace Moritz.Score.Midi
         /// <summary>
         /// A deep clone of the argument. This class is saved as an individual chordDef in SVG files,
         /// so it allows ALL its attributes to be set, even after construction.
+        /// The argument may not be null.
         /// </summary>
         /// <param name="midiChordDef"></param>
-        public LocalMidiChordDef(MidiChordDef mcd)
+        public UniqueMidiChordDef(MidiChordDef mcd)
             :this()
         {
+            Debug.Assert(mcd != null);
+
             _bank = mcd.Bank;
             _patch = mcd.Patch;
             _volume = mcd.Volume;
@@ -82,9 +85,9 @@ namespace Moritz.Score.Midi
         }
 
         /// <summary>
-        /// This constructor creates a LocalMidiChordDef containing a single BasicMidiChordDef and no sliders.
+        /// This constructor creates a UniqueMidiChordDef containing a single BasicMidiChordDef and no sliders.
         /// </summary>
-        public LocalMidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff,
+        public UniqueMidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff,
             List<MidiControl> midiControls)
             : this()
         {
@@ -107,9 +110,9 @@ namespace Moritz.Score.Midi
         }
 
         /// <summary>
-        /// This constructor creates a LocalMidiChordDef containing a single BasicMidiChordDef and no sliders.
+        /// This constructor creates a UniqueMidiChordDef containing a single BasicMidiChordDef and no sliders.
         /// </summary>
-        public LocalMidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff,
+        public UniqueMidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff,
             List<MidiControlDef> midiControlDefs)
             : this()
         {

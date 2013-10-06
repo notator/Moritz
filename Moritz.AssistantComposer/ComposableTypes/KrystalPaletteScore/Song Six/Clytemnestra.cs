@@ -24,7 +24,7 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// Sets _momentDefsListPerVerse to contain a list of MomentDefs for each verse.
         /// Each MomentDef is positioned with respect to the beginning of its verse, and contains
-        /// a single LocalMidiChordDef in its MidiChordDefs list.
+        /// a single UniqueMidiChordDef in its MidiChordDefs list.
         /// </summary>
         private void SetMomentDefsListPerVerse()
         {
@@ -63,7 +63,7 @@ namespace Moritz.AssistantComposer
                     int msDuration = midiChordMsDur[syllableIndex];
 
                     #region 
-                    LocalMidiChordDef lmcd = new LocalMidiChordDef();
+                    UniqueMidiChordDef lmcd = new UniqueMidiChordDef();
                     lmcd.MsDuration = msDuration;
                     //lmcd.Volume = (byte)100; // 100 is the default, and is not written into the score. Other values ARE added to each chord.
                     lmcd.Volume = volume;
@@ -341,9 +341,9 @@ namespace Moritz.AssistantComposer
             List<int> blockMsPositions = GetBlockPositions(blockMsDurations); // for convenience...
             Debug.Assert(blockMsPositions.Count == 11);
 
-            List<LocalizedMidiDurationDef> localizedMidiDurationDefs = new List<LocalizedMidiDurationDef>();
+            List<LocalMidiDurationDef> localizedMidiDurationDefs = new List<LocalMidiDurationDef>();
 
-            LocalizedMidiDurationDef rmdd = new LocalizedMidiDurationDef(blockMsDurations[blockIndex]);
+            LocalMidiDurationDef rmdd = new LocalMidiDurationDef(blockMsDurations[blockIndex]);
             Debug.Assert(rmdd.MsDuration > 0);
 
             rmdd.MsPosition = blockMsPositions[blockIndex];
@@ -365,14 +365,14 @@ namespace Moritz.AssistantComposer
                     if(restWidth > 0)
                     {
                         momentDef.MsWidth -= restWidth;
-                        rmdd = new LocalizedMidiDurationDef(restWidth);
+                        rmdd = new LocalMidiDurationDef(restWidth);
                         Debug.Assert(rmdd.MsDuration > 0);
 
                         rmdd.MsPosition = momentDef.MsPosition + momentDef.MsWidth;
                     }
 
                     MidiChordDef mcd = momentDef.MidiChordDefs[0];
-                    LocalizedMidiDurationDef lmdd = new LocalizedMidiDurationDef(mcd, momentDef.MsPosition, momentDef.MsWidth);
+                    LocalMidiDurationDef lmdd = new LocalMidiDurationDef(mcd, momentDef.MsPosition, momentDef.MsWidth);
                     Debug.Assert(lmdd.MsDuration > 0);
 
                     localizedMidiDurationDefs.Add(lmdd);
@@ -384,7 +384,7 @@ namespace Moritz.AssistantComposer
                 }
 
                 blockIndex++;
-                rmdd = new LocalizedMidiDurationDef(blockMsDurations[blockIndex]);
+                rmdd = new LocalMidiDurationDef(blockMsDurations[blockIndex]);
                 Debug.Assert(rmdd.MsDuration > 0);
 
                 rmdd.MsPosition = blockMsPositions[blockIndex];

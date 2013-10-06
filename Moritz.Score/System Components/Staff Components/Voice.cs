@@ -336,7 +336,7 @@ namespace Moritz.Score
 
         #endregion Enumerators
 
-        public List<LocalizedMidiDurationDef> LocalizedMidiDurationDefs = new List<LocalizedMidiDurationDef>();
+        public List<LocalMidiDurationDef> LocalMidiDurationDefs = new List<LocalMidiDurationDef>();
 
         /// <summary>
         /// This field is set by composition algorithms.

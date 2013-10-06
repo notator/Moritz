@@ -116,7 +116,7 @@ namespace Moritz.Score
                     {
                         SvgSystem system = Systems[sysIndex];
                         Voice voice = system.Staves[staffIndex].Voices[voiceIndex];
-                        foreach(LocalizedMidiDurationDef lmdd in voice.LocalizedMidiDurationDefs)
+                        foreach(LocalMidiDurationDef lmdd in voice.LocalMidiDurationDefs)
                         {
                             lmdd.MsPosition = msPosition;
                             msPosition += lmdd.MsDuration;
@@ -515,7 +515,7 @@ namespace Moritz.Score
                                 fontSize = rest.FontHeight;
                                 voice.NoteObjects.RemoveAt(indToReplace[j]);
                             }
-                            LocalizedMidiDurationDef lmdd = new LocalizedMidiDurationDef(msDuration);
+                            LocalMidiDurationDef lmdd = new LocalMidiDurationDef(msDuration);
                             lmdd.MsPosition = msPos;
                             RestSymbol newRest = new RestSymbol(voice, lmdd, minimumCrotchetDuration, _pageFormat.MusicFontHeight);
                             newRest.MsPosition = msPos;
@@ -926,8 +926,8 @@ namespace Moritz.Score
                 if(b != null)
                     lastBarline = b;
             }
-            LocalizedMidiDurationDef lmdd = lastChordSymbol.LocalizedMidiDurationDef;
-            LocalizedMidiDurationDef newlmdd = new LocalizedMidiDurationDef(lmdd.LocalMidiDurationDef,lmdd.MsPosition,lmdd.MsDuration - durationToSubtract);
+            LocalMidiDurationDef lmdd = lastChordSymbol.LocalMidiDurationDef;
+            LocalMidiDurationDef newlmdd = new LocalMidiDurationDef(lmdd.UniqueMidiDurationDef,lmdd.MsPosition,lmdd.MsDuration - durationToSubtract);
             ChordSymbol replacementChord = new ChordSymbol(voice, newlmdd, _pageFormat.MinimumCrotchetDuration, _pageFormat.MusicFontHeight);
 
             voice.NoteObjects.RemoveAt(lastChordIndex);

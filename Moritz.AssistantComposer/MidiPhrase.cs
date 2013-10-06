@@ -4,38 +4,36 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Collections;
 using Moritz.Score.Midi;
+using Krystals4ObjectLibrary;
 
 namespace Moritz.AssistantComposer
 {
     /// <summary>
-    /// A temporal sequence of LocalizedMidiDurationDef objects.
-    /// The objects can define either notes or rests.
-    /// (If the LocalizedMidiDurationDef.MidiChordDef is null, the contained object is a rest.)
-    /// 
-    /// This class is IEnumerable, so that foreach loops can be used.
-    /// For example:
-    ///     foreach(LocalizedMidiDurationDef lmd in midiPhrase)
-    ///     {
-    ///         ...
-    ///     }
-    /// It is also indexable, as in:
-    ///     LocalizedMidiDurationDef lmdd = midiPhrase[index];
+    /// A temporal sequence of LocalMidiDurationDef objects.
+    /// <para>The objects can define either notes or rests.</para>
+    /// <para>(LocalMidiDurationDef.UniqueMidiDurationDef is either a UniqueMidiChordDef or a UniqueMidiRestDef.)</para>
+    /// <para></para>
+    /// <para>This class is IEnumerable, so that foreach loops can be used.</para>
+    /// <para>For example:</para>
+    /// <para>foreach(LocalMidiDurationDef lmd in midiPhrase) { ... }</para>
+    /// <para>It is also indexable, as in:</para>
+    /// <para>LocalMidiDurationDef lmdd = midiPhrase[index];</para>
     /// </summary>
     public class MidiPhrase : IEnumerable
     {
         /// <summary>
         /// The argument may not be an empty list.
-        /// The MsPositions and MsDurations in the list are checked for consistency.
-        /// The new MidiPhrase's LocalizedMidiDurationDefs list is simply set to the argument (which is not cloned).
+        /// <para>The MsPositions and MsDurations in the list are checked for consistency.</para>
+        /// <para>The new MidiPhrase's LocalMidiDurationDefs list is simply set to the argument (which is not cloned).</para>
         /// </summary>
-        public MidiPhrase(List<LocalizedMidiDurationDef> lmdds)
+        public MidiPhrase(List<LocalMidiDurationDef> lmdds)
         {
             Debug.Assert(lmdds.Count > 0);
             for(int i = 1; i < lmdds.Count; ++i)
             {
                 Debug.Assert(lmdds[i - 1].MsPosition + lmdds[i - 1].MsDuration == lmdds[i].MsPosition);
             }
-            _localizedMidiDurationDefs = lmdds;
+            _localMidiDurationDefs = lmdds;
         }
 
         /// <summary>
@@ -49,13 +47,12 @@ namespace Moritz.AssistantComposer
             {
                 Debug.Assert((value >= 1 && value <= paletteDef.MidiDurationDefsCount), "Illegal argument: value out of range in sequence");
                 MidiDurationDef midiDurationDef = paletteDef[value - 1];
-                LocalizedMidiDurationDef noteDef = new LocalizedMidiDurationDef(midiDurationDef);
+                LocalMidiDurationDef noteDef = new LocalMidiDurationDef(midiDurationDef);
                 Debug.Assert(midiDurationDef.MsDuration > 0);
                 Debug.Assert(noteDef.MsDuration == midiDurationDef.MsDuration);
                 noteDef.MsPosition = msPosition;
                 msPosition += noteDef.MsDuration;
-                _localizedMidiDurationDefs.Add(noteDef);
-                //Console.WriteLine("MsPosition=" + noteDef.MsPosition.ToString() + "  MsDuration=" + noteDef.MsDuration.ToString());
+                _localMidiDurationDefs.Add(noteDef);
             }
         }
 
@@ -67,10 +64,10 @@ namespace Moritz.AssistantComposer
             Debug.Assert(midiDurationDefs != null);
             foreach(MidiDurationDef midiDurationDef in midiDurationDefs)
             {
-                LocalizedMidiDurationDef lmdd = new LocalizedMidiDurationDef(midiDurationDef);
-                _localizedMidiDurationDefs.Add(lmdd);
+                LocalMidiDurationDef lmdd = new LocalMidiDurationDef(midiDurationDef);
+                _localMidiDurationDefs.Add(lmdd);
             }
-            MsPosition = _localizedMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rests
+            MsPosition = _localMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rests
         }
 
         /// <summary>
@@ -78,10 +75,10 @@ namespace Moritz.AssistantComposer
         /// </summary>
         public MidiPhrase Clone()
         {
-            List<LocalizedMidiDurationDef> clonedLmdds = new List<LocalizedMidiDurationDef>();
-            foreach(LocalizedMidiDurationDef lmdd in this.LocalizedMidiDurationDefs)
+            List<LocalMidiDurationDef> clonedLmdds = new List<LocalMidiDurationDef>();
+            foreach(LocalMidiDurationDef lmdd in this.LocalMidiDurationDefs)
             {
-                LocalizedMidiDurationDef clonedLmdd = new LocalizedMidiDurationDef(lmdd.LocalMidiDurationDef, lmdd.MsPosition, lmdd.MsDuration);
+                LocalMidiDurationDef clonedLmdd = new LocalMidiDurationDef(lmdd.UniqueMidiDurationDef, lmdd.MsPosition, lmdd.MsDuration);
                 clonedLmdds.Add(clonedLmdd);
             }
 
@@ -92,23 +89,23 @@ namespace Moritz.AssistantComposer
         /// Appends the new lmdd to the end of the list.
         /// </summary>
         /// <param name="lmdd"></param>
-        public void Add(LocalizedMidiDurationDef lmdd)
+        public void Add(LocalMidiDurationDef lmdd)
         {
-            Debug.Assert(_localizedMidiDurationDefs.Count > 0);
-            LocalizedMidiDurationDef lastLmdd = _localizedMidiDurationDefs[_localizedMidiDurationDefs.Count - 1];
+            Debug.Assert(_localMidiDurationDefs.Count > 0);
+            LocalMidiDurationDef lastLmdd = _localMidiDurationDefs[_localMidiDurationDefs.Count - 1];
             lmdd.MsPosition = lastLmdd.MsPosition + lastLmdd.MsDuration;
-            _localizedMidiDurationDefs.Add(lmdd);
+            _localMidiDurationDefs.Add(lmdd);
         }
         /// <summary>
         /// removes the lmdd from the list, and then resets the positions of all the lmdds in the list.
         /// </summary>
         /// <param name="lmdd"></param>
-        public void Remove(LocalizedMidiDurationDef lmdd)
+        public void Remove(LocalMidiDurationDef lmdd)
         {
-            Debug.Assert(_localizedMidiDurationDefs.Count > 0);
-            Debug.Assert(_localizedMidiDurationDefs.Contains(lmdd));
-            _localizedMidiDurationDefs.Remove(lmdd);
-            MsPosition = _localizedMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rests 
+            Debug.Assert(_localMidiDurationDefs.Count > 0);
+            Debug.Assert(_localMidiDurationDefs.Contains(lmdd));
+            _localMidiDurationDefs.Remove(lmdd);
+            MsPosition = _localMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rests 
         }
         /// <summary>
         /// The total duration of this MidiPhrase in milliseconds.
@@ -120,7 +117,7 @@ namespace Moritz.AssistantComposer
             get
             {
                 int msDuration = 0;
-                foreach(LocalizedMidiDurationDef lmdd in _localizedMidiDurationDefs)
+                foreach(LocalMidiDurationDef lmdd in _localMidiDurationDefs)
                 {
                     msDuration += lmdd.MsDuration;
                 }
@@ -129,7 +126,7 @@ namespace Moritz.AssistantComposer
             set
             {
                 List<int> relativeDurations = new List<int>();
-                foreach(LocalizedMidiDurationDef lmdd in _localizedMidiDurationDefs)
+                foreach(LocalMidiDurationDef lmdd in _localMidiDurationDefs)
                 {
                     relativeDurations.Add(lmdd.MsDuration);
                 }
@@ -139,12 +136,12 @@ namespace Moritz.AssistantComposer
                 List<int> newDurations = MidiChordDef.GetIntDurations(newMsDuration, relativeDurations, relativeDurations.Count);
 
                 int i = 0;
-                foreach (LocalizedMidiDurationDef lmdd in _localizedMidiDurationDefs)
+                foreach (LocalMidiDurationDef lmdd in _localMidiDurationDefs)
                 {
                     lmdd.MsDuration = newDurations[i++];
                 }
 
-                MsPosition = _localizedMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rest definitions
+                MsPosition = _localMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rest definitions
             }
         }
         /// <summary>
@@ -156,15 +153,15 @@ namespace Moritz.AssistantComposer
         { 
             get 
             { 
-                Debug.Assert(_localizedMidiDurationDefs.Count > 0);
-                return _localizedMidiDurationDefs[0].MsPosition;
+                Debug.Assert(_localMidiDurationDefs.Count > 0);
+                return _localMidiDurationDefs[0].MsPosition;
             } 
             set 
             {
-                Debug.Assert(_localizedMidiDurationDefs.Count > 0);
+                Debug.Assert(_localMidiDurationDefs.Count > 0);
                 int absolutePosition = value;
                 Debug.Assert(absolutePosition >= 0);
-                foreach(LocalizedMidiDurationDef lmdd in _localizedMidiDurationDefs)
+                foreach(LocalMidiDurationDef lmdd in _localMidiDurationDefs)
                 {
                     lmdd.MsPosition = absolutePosition;
                     absolutePosition += lmdd.MsDuration;
@@ -178,33 +175,33 @@ namespace Moritz.AssistantComposer
         { 
             get 
             {
-                Debug.Assert(_localizedMidiDurationDefs.Count > 0);
-                LocalizedMidiDurationDef lastLmdd = _localizedMidiDurationDefs[_localizedMidiDurationDefs.Count - 1];
+                Debug.Assert(_localMidiDurationDefs.Count > 0);
+                LocalMidiDurationDef lastLmdd = _localMidiDurationDefs[_localMidiDurationDefs.Count - 1];
                 return lastLmdd.MsPosition + lastLmdd.MsDuration; 
             }
         }
-        public int Count { get { return _localizedMidiDurationDefs.Count; } }
+        public int Count { get { return _localMidiDurationDefs.Count; } }
         /// <summary>
         /// Indexer. Allows individual lmdds to be accessed using array notation on the MidiPhrase.
         /// e.g. lmdd = midiPhrase[3].
         /// </summary>
-        public LocalizedMidiDurationDef this[int i]
+        public LocalMidiDurationDef this[int i]
         {
             get
             {
-                if(i < 0 || i >= _localizedMidiDurationDefs.Count)
+                if(i < 0 || i >= _localMidiDurationDefs.Count)
                 {
                     throw new IndexOutOfRangeException();
                 }
-                return _localizedMidiDurationDefs[i];
+                return _localMidiDurationDefs[i];
             }
             set
             {
-                if(i < 0 || i >= _localizedMidiDurationDefs.Count)
+                if(i < 0 || i >= _localMidiDurationDefs.Count)
                 {
                     throw new IndexOutOfRangeException();
                 }
-                _localizedMidiDurationDefs[i] = value;
+                _localMidiDurationDefs[i] = value;
             }
         }
         /// <summary>
@@ -216,7 +213,7 @@ namespace Moritz.AssistantComposer
         /// <param name="interval"></param>
         public void Transpose(int interval)
         {
-            foreach(LocalizedMidiDurationDef lmdd in _localizedMidiDurationDefs)
+            foreach(LocalMidiDurationDef lmdd in _localMidiDurationDefs)
             {
                 lmdd.Transpose(interval);
             }
@@ -231,12 +228,12 @@ namespace Moritz.AssistantComposer
         ///     3. toPosition is greater than the msPosition at anchor1Index and less than the msPosition at anchor2Index.
         /// and throws an appropriate exception if there is a problem.
         /// </summary>
-        internal void AlignChordOrRest(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPosition)
+        internal void AlignObjectAtIndex(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPosition)
         {
             // throws an exception if there's a problem.
             CheckAlignDefArgs(anchor1Index, indexToAlign, anchor2Index, toMsPosition);
 
-            List<LocalizedMidiDurationDef> lmdds = _localizedMidiDurationDefs;
+            List<LocalMidiDurationDef> lmdds = _localMidiDurationDefs;
             int anchor1MsPosition = lmdds[anchor1Index].MsPosition;
             int fromMsPosition = lmdds[indexToAlign].MsPosition;
             int anchor2MsPosition;
@@ -285,7 +282,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         private void CheckAlignDefArgs(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPosition)
         {
-            List<LocalizedMidiDurationDef> lmdds = _localizedMidiDurationDefs; 
+            List<LocalMidiDurationDef> lmdds = _localMidiDurationDefs; 
             int count = lmdds.Count;
             string msg = "\nError in MidiPhrase.cs,\nfunction AlignDefMsPosition()\n\n";
             if(anchor1Index >= indexToAlign || anchor2Index <= indexToAlign)
@@ -326,17 +323,136 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
+        /// Re-orders the LocalMidiDurationDefs in this MidiPhrase.
+        /// <para>1. creates sub-midiPhrases using the partitionSizes in the first argument (see parameter info below).</para>   
+        /// <para>2. Sorts the sub-midiPhrases into ascending order of the base pitch of their first chord. If a sub-MidiPhrase</para>
+        /// <para>    contains no chords, it is put at the beginning of the sort. If two sub-MidiPhrases have the same initial</para>
+        /// <para>    base pitch, they stay in the same order as they were.</para>
+        /// <para>3. Re-orders the sub-midiPhrases according to the contour retrieved (from the static K.Contour[] array) using</para>
+        /// <para>    partitions.Count and the contourNumber and axisNumber arguments.</para>
+        /// <para>4. Concatenates the re-ordered sub-MidiPhrases, sets their MsPositions (by setting the starting MsPosition to</para>
+        /// <para>    the original MsPosition), and assigns the result to this.LocalMidiDurationDefs.</para>
+        /// </summary>
+        /// <param name="partitionSizes">Contains the number of LocalMidiDurationDefs in each sub-midiPhrase to be re-ordered.
+        /// <para>This partitionSizess list must contain:</para>
+        /// <para>    0 or more ints and less than 8 ints.</para>
+        /// <para>    ints which are all greater than 0 and less than or equal to LocalMidiDurationDefs.Count.</para>
+        /// <para>    The sum of all the ints must be equal to LocalMidiDurationDefs.Count.</para>
+        /// <para>An Exception is thrown if any of these conditions is not met.</para>
+        /// <para>If the partitions list is empty, or contains only one value (equal to LocalMidiDurationDefs.Count),</para>
+        /// <para>the value is ignored, and this function returns silently without doing anything.</para>
+        /// </param>
+        /// <param name="contourNumber">A value greater than or equal to 1, and less than or equal to 12. An exception is thrown if this is not the case.</param>
+        /// <param name="axisNumber">A value greater than or equal to 1, and less than or equal to 12 An exception is thrown if this is not the case.</param>
+        internal void SetContour(List<int> partitionSizes, int contourNumber, int axisNumber)
+        {
+            CheckSetContourArgs(partitionSizes, contourNumber, axisNumber);
+            List<LocalMidiDurationDef> oldLmdds = _localMidiDurationDefs;
+            List<List<LocalMidiDurationDef>> partitions = new List<List<LocalMidiDurationDef>>();
+            int lmddIndex = 0;
+            foreach(int size in partitionSizes)
+            {
+                List<LocalMidiDurationDef> partition = new List<LocalMidiDurationDef>();
+                for(int i = 0; i < size; ++i)
+                {
+                    partition.Add(oldLmdds[lmddIndex++]);
+                }
+            }
+            
+            // Sort into ascending order (part 2 of the above comment)
+            partitions = SortPartitions(partitions);
+            // re-order the partitions (part 3 of the above comment)
+            partitions = DoContouring(partitions, contourNumber, axisNumber);
+
+            List<LocalMidiDurationDef> newLmdds = new List<LocalMidiDurationDef>();
+            foreach(List<LocalMidiDurationDef> partition in partitions)
+            {
+                foreach(LocalMidiDurationDef pLmdd in partition)
+                {
+                    newLmdds.Add(pLmdd);
+                }
+            }
+            int msPosition = this.MsPosition;
+            _localMidiDurationDefs = newLmdds;
+            this.MsPosition = msPosition; // resets all the msPosition values.
+        }
+
+        /// <summary>
+        /// Returns the result of sorting the partitions into ascending order of the base pitch of their first chord.
+        /// <para>If a sub-MidiPhrase contains no chords, it is put at the beginning of the sort.</para>
+        /// <para>If two sub-MidiPhrases have the same initial base pitch, they stay in the same order as they were.</para>
+        /// </summary>
+        private List<List<LocalMidiDurationDef>> SortPartitions(List<List<LocalMidiDurationDef>> partitions)
+        {
+            List<List<LocalMidiDurationDef>> sortedPartitions = new List<List<LocalMidiDurationDef>>();
+
+            return sortedPartitions;
+        }
+
+        /// <summary>
+        /// Re-orders the partitions according to the contour retrieved (from the static K.Contour[] array)
+        /// <para>using partitions.Count and the contourNumber and axisNumber arguments.</para>
+        /// <para>Does not change the inner contents of the partitions themselves.</para>
+        /// </summary>
+        /// <returns>A re-ordered list of partitions</returns>
+        private List<List<LocalMidiDurationDef>> DoContouring(List<List<LocalMidiDurationDef>> partitions, int contourNumber, int axisNumber)
+        {
+            List<List<LocalMidiDurationDef>> contouredPartitions = new List<List<LocalMidiDurationDef>>();
+            int[] contour = K.Contour(partitions.Count, contourNumber, axisNumber);
+            foreach(int number in contour)
+            {
+                // K.Contour() always returns an array containing 7 values.
+                // For densities less than 7, the final values are 0.
+                if(number == 0) 
+                    break;
+                contouredPartitions.Add(partitions[number - 1]);
+            }
+
+            return contouredPartitions;
+        }
+
+        private void CheckSetContourArgs(List<int> partitions, int contourNumber, int axisNumber)
+        {
+            List<LocalMidiDurationDef> lmdds = _localMidiDurationDefs;
+            if(partitions.Count < 0 || partitions.Count > 7)
+            {
+                throw new ArgumentException("partitions.Count must be in range 0..7");
+            }
+            int sum = 0;
+            foreach(int i in partitions)
+            {
+                if(i < 0 || i > lmdds.Count)
+                {
+                    throw new ArgumentException("partition size out of range 1.." + lmdds.Count.ToString());
+                }
+                sum += i;
+            }
+            if(sum != lmdds.Count)
+            {
+                throw new ArgumentException("The sum of the partition sizes must be " + lmdds.Count.ToString());
+            }
+            if(contourNumber < 1 || contourNumber > 12)
+            {
+                throw new ArgumentException("contourNumber out of range 1..12");
+            }
+            if(axisNumber < 1 || axisNumber > 12)
+            {
+                throw new ArgumentException("axisNumber out of range 1..12");
+            }
+        }
+
+        /// <summary>
         /// Returns 0 if msPosition is negative,
-        /// Returns the index of the last LocalizedMidiDurationDef if msPosition is beyond the end of the sequence.
+        /// Returns the index of the last LocalMidiDurationDef if msPosition is beyond the end of the sequence.
         /// </summary>
         /// <param name="msPosition"></param>
         /// <returns></returns>
         internal int FirstIndexAtOrAfterMsPos(int msPosition)
         {
-            int index = _localizedMidiDurationDefs.Count - 1; // the final index
-            for(int i = 0; i < _localizedMidiDurationDefs.Count; ++i)
+            int index = _localMidiDurationDefs.Count - 1; // the final index
+            for(int i = 0; i < _localMidiDurationDefs.Count; ++i)
             {
-                if(_localizedMidiDurationDefs[i].MsPosition >= msPosition)
+                if(_localMidiDurationDefs[i].MsPosition >= msPosition)
                 {
                     index = i;
                     break;
@@ -345,8 +461,8 @@ namespace Moritz.AssistantComposer
             return index;
         }
         /// <summary>
-        /// Transposes the LocalizedMidiDurationDefs from the firstGlissedIndex upto including the lastGlissedIndex
-        /// by an equally increasing amount, so that the final LocalizedMidiDurationDef is transposed by glissInterval.
+        /// Transposes the LocalMidiDurationDefs from the firstGlissedIndex upto including the lastGlissedIndex
+        /// by an equally increasing amount, so that the final LocalMidiDurationDef is transposed by glissInterval.
         /// firstGlissedIndex and lastGlissedIndex can be equal.
         /// glissInterval can be negative.
         /// </summary>
@@ -359,7 +475,7 @@ namespace Moritz.AssistantComposer
             double step = interval;
             for(int index = firstGlissedIndex; index <= lastGlissedIndex; ++index)
             {
-                _localizedMidiDurationDefs[index].Transpose((int)Math.Round(interval));
+                _localMidiDurationDefs[index].Transpose((int)Math.Round(interval));
                 interval += step;
             }
         }
@@ -367,22 +483,22 @@ namespace Moritz.AssistantComposer
         // TODO
         // public void AdjustVelocity(int interval) // like Transpose()
 
-        public List<LocalizedMidiDurationDef> LocalizedMidiDurationDefs { get { return _localizedMidiDurationDefs; } } 
-        private List<LocalizedMidiDurationDef> _localizedMidiDurationDefs = new List<LocalizedMidiDurationDef>();
+        public List<LocalMidiDurationDef> LocalMidiDurationDefs { get { return _localMidiDurationDefs; } } 
+        private List<LocalMidiDurationDef> _localMidiDurationDefs = new List<LocalMidiDurationDef>();
 
         #region Enumerator
         public IEnumerator GetEnumerator()
         {
-            return new MyEnumerator(_localizedMidiDurationDefs);
+            return new MyEnumerator(_localMidiDurationDefs);
         }
         // private enumerator class
         // see http://support.microsoft.com/kb/322022/en-us
         private class MyEnumerator : IEnumerator
         {
-            public List<LocalizedMidiDurationDef> _localizedMidiDurationDefs;
+            public List<LocalMidiDurationDef> _localizedMidiDurationDefs;
             int position = -1;
             //constructor
-            public MyEnumerator(List<LocalizedMidiDurationDef> localizedMidiDurationDefs)
+            public MyEnumerator(List<LocalMidiDurationDef> localizedMidiDurationDefs)
             {
                 _localizedMidiDurationDefs = localizedMidiDurationDefs;
             }

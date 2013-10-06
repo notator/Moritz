@@ -138,7 +138,7 @@ namespace Moritz.AssistantComposer
             //}
 
             Voice clytemnestrasVoice = new Voice(null, channelIndex++);
-            clytemnestrasVoice.LocalizedMidiDurationDefs = clytemnestra.MidiPhrase.LocalizedMidiDurationDefs;
+            clytemnestrasVoice.LocalMidiDurationDefs = clytemnestra.MidiPhrase.LocalMidiDurationDefs;
             voices.Add(clytemnestrasVoice);
 
             List<Voice> windVoices = winds.GetVoices(channelIndex);

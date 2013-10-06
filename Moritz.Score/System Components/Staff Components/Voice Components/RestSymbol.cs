@@ -10,7 +10,7 @@ namespace Moritz.Score
 {
 	internal class RestSymbol : DurationSymbol
 	{
-        public RestSymbol(Voice voice, LocalizedMidiDurationDef lmdd, int minimumCrotchetDurationMS, float fontHeight)
+        public RestSymbol(Voice voice, LocalMidiDurationDef lmdd, int minimumCrotchetDurationMS, float fontHeight)
             : base(voice, lmdd, minimumCrotchetDurationMS, fontHeight)
         {
             LocalizedCautionaryChordDef = lmdd as LocalizedCautionaryChordDef;

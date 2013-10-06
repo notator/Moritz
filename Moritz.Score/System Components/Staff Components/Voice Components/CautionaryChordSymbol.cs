@@ -15,7 +15,7 @@ namespace Moritz.Score
             _msDuration = 0;
             Stem.Draw = false;
  
-            //MidiChordDef mcd = lccd.LocalMidiDurationDef as MidiChordDef;
+            //MidiChordDef mcd = lccd.UniqueMidiDurationDef as MidiChordDef;
             //if(mcd != null)
             //{
             //    SetHeads(mcd.MidiHeadSymbols);

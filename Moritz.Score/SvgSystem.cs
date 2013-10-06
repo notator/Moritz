@@ -590,7 +590,7 @@ namespace Moritz.Score
             if(cautionaryChordSymbol != null)
             {
                 finalBarlineMsPosition =
-                        cautionaryChordSymbol.MsPosition + (int)cautionaryChordSymbol.LocalizedMidiDurationDef.MsDurationToNextBarline;
+                        cautionaryChordSymbol.MsPosition + (int)cautionaryChordSymbol.LocalMidiDurationDef.MsDurationToNextBarline;
             }
             else // ordinary ChordSymbol or RestSymbol
             {

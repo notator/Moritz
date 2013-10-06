@@ -50,9 +50,9 @@ namespace Moritz.AssistantPerformer
                     Voice voice = voices[i];
                     int channel = voice.MidiChannel;
                     ChannelState channelState = new ChannelState();
-                    foreach(LocalizedMidiDurationDef lmdd in voice.LocalizedMidiDurationDefs)
+                    foreach(LocalMidiDurationDef lmdd in voice.LocalMidiDurationDefs)
                     {
-                        MidiChordDef midiChordDef = lmdd.LocalMidiDurationDef as MidiChordDef;
+                        MidiChordDef midiChordDef = lmdd.UniqueMidiDurationDef as MidiChordDef;
                         if(midiChordDef != null) // not interested in rests here
                         {
                             int msPosition = lmdd.MsPosition;

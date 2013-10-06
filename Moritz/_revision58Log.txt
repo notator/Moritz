@@ -175,7 +175,7 @@ false.
 
 28.02.2012 rev58.175
 Bug Fix: Chords are now really being multiplied correctly by ornaments!
-This was fairly complicated, but the main fix was in LocalMidiChordDef.DoTranspositionAndVelocities().
+This was fairly complicated, but the main fix was in UniqueMidiRestDef.DoTranspositionAndVelocities().
 Bank and patch values in the ornaments palette are now truly optional. If they exist, they override the values
 in the main palette. In Study 2c, ornament banks and patches are not overridden (the fields are empty).
  
@@ -912,12 +912,12 @@ their extenders.
  
 08.11.2011 rev58.92
 MidiCompositionAlgorithm.SplitBar(): Rests are always split over barlines. If a chord straddles a barline,
-its LocalizedMidiDurationDef.MsDurationToNextBarline field is set and an LocalizedCautionaryChordDef object
+its LocalMidiDurationDef.MsDurationToNextBarline field is set and an LocalizedCautionaryChordDef object
 is created at the start of the voice continuation in the next bar.
 SvgSystem.MomentSymbols(): corrected the final barline position for chords which cross final staff barlines.
 This was necessary for correct justification.
-Added int? LocalizedMidiDurationDef.MsDurationToNextBarline, which is set for chords which cross barlines.
-Deleted the LocalizedMidiDurationDef.MidiDefList and LocalizedMidiDurationDef.NextLMDD fields.
+Added int? LocalMidiDurationDef.MsDurationToNextBarline, which is set for chords which cross barlines.
+Deleted the LocalMidiDurationDef.MidiDefList and LocalMidiDurationDef.NextLMDD fields.
 Deleted SvgScore.FinalizeTies().
 
 07.11.2011 rev58.91
@@ -943,9 +943,9 @@ Currently, "tied" notes are notated as two chords without a graphic tie.
 
 07.11.2011 rev58.88
 MidiCompositionAlgorithm.SplitBar(): Chords and rests are now always split when they cross barlines.
-Added a pointer: LocalizedMidiDurationDef.NextTiedChord. This links the two halves of a chord which has been 
+Added a pointer: LocalMidiDurationDef.NextTiedChord. This links the two halves of a chord which has been 
 split across a barline.
-Added a pointer from LocalizedMidiDurationDef to its containing MidiDefList. This should enable beams to be
+Added a pointer from LocalMidiDurationDef to its containing MidiDefList. This should enable beams to be
 drawn across barlines.
 Currently, "tied" notes are notated as two chords without a tie.
 
@@ -1185,7 +1185,7 @@ objects:
     WriteSymbolDefinitions(SvgWriter w);
     WriteJavaScriptDefinitions(SvgWriter w);
     NoteObjectMetrics(Graphics graphics, NoteObject noteObject, float gap, float storkeWidth);
-    GetDurationSymbol(Voice voice, LocalizedMidiDurationDef lmdd, ref byte currentChannelVelocity, 
+    GetDurationSymbol(Voice voice, LocalMidiDurationDef lmdd, ref byte currentChannelVelocity, 
         int minimumCrotchetDuration, float musicFontHeight);
 Specialized Notators load the symbolSet they want to use, and calls to the above functions are made through the
 Notator.SymbolSet object.
@@ -1330,7 +1330,7 @@ impossible cast.
 Major refactoring: "logical" values are now ints, and have been renamed accordingly (e.g. logicalWidth -> msDuration).
 
 15.07.2011 rev58.34
-Bug Fix: MidiScore:GetMidiChannelMoments() now takes account of msPositions in LocalizedMidiDurationDefs.
+Bug Fix: MidiScore:GetMidiChannelMoments() now takes account of msPositions in LocalMidiDurationDefs.
 The single event buttons now work.
 TODO: Performance now throws an exception.
 
@@ -1352,14 +1352,14 @@ TODO: Add the old SetAllMidiDurationDefMsPositions(_score.Systems) function to t
 
 14.07.2011 rev58.30
 Removed the SetAllMidiDurationDefMsPositions(_score.Systems) function from CompositionAlgorithm.FinalizeAlgorithm().
-MsPositions are now set at the point where MidiDurationDefs are inserted in LocalizedMidiDurationDefs during the
+MsPositions are now set at the point where MidiDurationDefs are inserted in LocalMidiDurationDefs during the
 composition algorithm.
 TODO: Can I remove MsPositions from MidiDurationDefs altogether? Including MidiChordDefs and BasicMidiChordDefs?
 
 14.07.2011 rev58.29
-A Score is now created for Study 3b! Voice now contains a LocalizedMidiDurationDefs list. LocalisedMidiDurationDefs
+A Score is now created for Study 3b! Voice now contains a LocalMidiDurationDefs list. LocalisedMidiDurationDefs
 have both their msPosition and MsDuration fields set. KrystalPalettes define non-localised MidiDurationDefs having
-no MsPosition. LocalizedMidiDurationDefs are created by composition algorithms or by loading from an SVG-MIDI file.
+no MsPosition. LocalMidiDurationDefs are created by composition algorithms or by loading from an SVG-MIDI file.
 
 14.07.2011 rev58.28b
 Some minor but important changes. About to set the number of stafflines per staff.

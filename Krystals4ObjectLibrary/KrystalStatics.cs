@@ -80,13 +80,13 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         /// <param name="density">A value greater than 0, and less than or equal to 7</param>
         /// <param name="contourNumberMod12">A value greater than or equal to 1, and less than or equal to 12</param>
-        /// <param name="axisMod12">A value greater than or equal to 1, and less than or equal to 12</param>
+        /// <param name="axisNumberMod12">A value greater than or equal to 1, and less than or equal to 12</param>
         /// <returns></returns>
-        public static int[] Contour(int density, int contourNumberMod12, int axisMod12)
+        public static int[] Contour(int density, int contourNumberMod12, int axisNumberMod12)
         {
             Debug.Assert( density > 0 && density <= 7
                 && contourNumberMod12 > 0 && contourNumberMod12 <= 12
-                && axisMod12 > 0 && axisMod12 <= 12);
+                && axisNumberMod12 > 0 && axisNumberMod12 <= 12);
 
             #region contours
             // These arrays are the contours those used for 'beyond the symbolic' - notebook July 1986
@@ -175,11 +175,11 @@ namespace Krystals4ObjectLibrary
             }
             else
             {
-                int axis = rectifiedCoordinates[density - 2, axisMod12 - 1];
+                int axisNumber = rectifiedCoordinates[density - 2, axisNumberMod12 - 1];
                 int contourNumber = rectifiedCoordinates[density - 2, contourNumberMod12 - 1];
                 for(int j = 0; j < density; j++)
                 {
-                    contour[j] = contours[density - 2][contourNumber - 1, axis - 1, j];
+                    contour[j] = contours[density - 2][contourNumber - 1, axisNumber - 1, j];
                 }
             }
 

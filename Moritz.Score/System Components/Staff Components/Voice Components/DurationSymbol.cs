@@ -12,7 +12,7 @@ namespace Moritz.Score
         /// <summary>
         /// Used by the Assistant Composer
         /// </summary>
-        public DurationSymbol(Voice voice, LocalizedMidiDurationDef lmdd, int minimumCrotchetDuration, float fontHeight)
+        public DurationSymbol(Voice voice, LocalMidiDurationDef lmdd, int minimumCrotchetDuration, float fontHeight)
             : base(voice, fontHeight)
         {
             _msDuration = lmdd.MsDuration;

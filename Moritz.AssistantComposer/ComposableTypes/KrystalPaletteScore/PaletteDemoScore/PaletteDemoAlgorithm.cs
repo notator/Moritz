@@ -42,8 +42,8 @@ namespace Moritz.AssistantComposer
             Voice voice = new Voice(null, 0);
             foreach(MidiDurationDef midiDurationDef in _paletteDefs[0])
             {
-                LocalizedMidiDurationDef lmdd = new LocalizedMidiDurationDef(midiDurationDef);
-                voice.LocalizedMidiDurationDefs.Add(lmdd);
+                LocalMidiDurationDef lmdd = new LocalMidiDurationDef(midiDurationDef);
+                voice.LocalMidiDurationDefs.Add(lmdd);
             }
 
             List<List<Voice>> voicesPerSystem = new List<List<Voice>>();

@@ -11,11 +11,11 @@ namespace Moritz.Score
 {
     public class ChordSymbol : DurationSymbol
     {
-        public ChordSymbol(Voice voice, LocalizedMidiDurationDef lmdd, int minimumCrotchetDurationMS, float fontSize)
+        public ChordSymbol(Voice voice, LocalMidiDurationDef lmdd, int minimumCrotchetDurationMS, float fontSize)
             : base(voice, lmdd, minimumCrotchetDurationMS, fontSize)
         {
             _localizedMidiDurationDef = lmdd;
-            MidiChordDef midiChordDef = lmdd.LocalMidiDurationDef as MidiChordDef;
+            MidiChordDef midiChordDef = lmdd.UniqueMidiDurationDef as MidiChordDef;
             if(midiChordDef != null)
             {
                 SetHeads(midiChordDef.MidiHeadSymbols);
@@ -116,7 +116,7 @@ namespace Moritz.Score
         {
             w.WriteStartElement("score", "midiChord", null);
             w.WriteAttributeString("id", midiId);
-            LocalMidiChordDef lmcd = LocalizedMidiDurationDef.LocalMidiDurationDef as LocalMidiChordDef;
+            UniqueMidiChordDef lmcd = LocalMidiDurationDef.UniqueMidiDurationDef as UniqueMidiChordDef;
             Debug.Assert(lmcd != null);
             string ID = lmcd.ID;
             Debug.Assert(ID != null && ID.StartsWith("localChord"));
@@ -580,8 +580,8 @@ namespace Moritz.Score
         public BeamBlock BeamBlock = null; // defaults
         public List<Head> HeadsTopDown = new List<Head>(); // Heads are in top-down order.
 
-        public LocalizedMidiDurationDef LocalizedMidiDurationDef { get { return _localizedMidiDurationDef; } }
-        protected LocalizedMidiDurationDef _localizedMidiDurationDef = null;
+        public LocalMidiDurationDef LocalMidiDurationDef { get { return _localizedMidiDurationDef; } }
+        protected LocalMidiDurationDef _localizedMidiDurationDef = null;
 
         public string GraphicSymbolID { get { return _graphicSymbolID; } }
         protected string _graphicSymbolID = null;

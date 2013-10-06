@@ -10,10 +10,10 @@ namespace Moritz.AssistantComposer
 {
     ///<summary>
     /// A PaletteMidiChordDef is a MidiChordDef which is saved in or retreived from a palette.
-    /// PaletteMidiChordDefs can be 'used' in SVG files, but are usually converted to LocalMidiChordDefs.
+    /// PaletteMidiChordDefs can be 'used' in SVG files, but are usually converted to UniqueMidiChordDefs.
     /// Related classes:
-    /// 1. A LocalMidiChordDef is a MidiChordDef which is saved locally in an SVG file.
-    /// 2. A LocalizedMidiChordDef is a LocalMidiChordDef with additional MsPositon and msDuration attributes.
+    /// 1. A UniqueMidiChordDef is a MidiChordDef which is saved locally in an SVG file.
+    /// 2. A LocalizedMidiChordDef is a UniqueMidiChordDef with additional MsPositon and msDuration attributes.
     //</summary>
     internal class PaletteMidiChordDef : MidiChordDef
     {

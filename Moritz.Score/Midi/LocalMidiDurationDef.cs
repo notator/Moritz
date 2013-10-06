@@ -4,43 +4,50 @@ using System.Diagnostics;
 namespace Moritz.Score.Midi
 {
     ///<summary>
-    /// A LocalizedMidiDurationDef is a LocalMidiChordDef or LocalMidirestDef with additional MsPositon and msDuration attributes.
-    /// Related classes:
-    /// 1. A LocalMidiChordDef is a MidiChordDef which is saved locally in an SVG file.
-    /// 2. A PaletteMidiChordDef is a MidiChordDef which is saved in or retreived from a palette.
-    /// PaletteMidiChordDefs can be 'used' in SVG files, but are usually converted to LocalMidiChordDefs.
-    //</summary>
-    public class LocalizedMidiDurationDef
+    /// A LocalMidiDurationDef contains a UniqueMidiChordDef or UniqueMidiRestDef with additional MsPositon and MsDuration attributes.
+    /// <para>Related classes:</para>
+    /// <para>1. A UniqueMidiChordDef is a unique MidiChordDef which is saved locally in an SVG file.</para>
+    /// <para>2. A PaletteMidiChordDef is a MidiChordDef which is saved in or retrieved from a palette.</para>
+    /// <para>PaletteMidiChordDefs can be 'used' in SVG files, but are usually converted to UniqueMidiChordDefs.</para>
+    ///</summary>
+    public class LocalMidiDurationDef
     {
-        public LocalizedMidiDurationDef(MidiDurationDef midiDurationDef)
-        { 
+        /// <summary>
+        /// this.UniqueMidiDurationDef is set to either a UniqueMidiChordDef or a UniqueMidiRestDef
+        /// <para>depending on the class of the argument (MidiChordDef or MidiRestDef).</para>
+        /// <para>this.MsPosition is set to 0;</para>
+        /// <para>this.MsDuration is set to the argument's MsDuration attribute.</para> 
+        /// </summary>
+        /// <param name="midiDurationDef">Either a MidiChordDef or a MidiRestDef</param>
+        public LocalMidiDurationDef(MidiDurationDef midiDurationDef)
+        {
+            Debug.Assert(midiDurationDef != null);
+
             MidiChordDef midiChordDef = midiDurationDef as MidiChordDef; // null if midiDurationDef is a midiRestDef or null
             if(midiChordDef != null)
             {
-                LocalMidiDurationDef = new LocalMidiChordDef(midiChordDef); // a deep clone with a special id string.
+                UniqueMidiDurationDef = new UniqueMidiChordDef(midiChordDef); // a deep clone with a special id string.
             }
             else
             {
                 MidiRestDef midiRestDef = midiDurationDef as MidiRestDef;
                 Debug.Assert(midiRestDef != null);
-                LocalMidiDurationDef = new LocalMidiRestDef(midiRestDef);
+                UniqueMidiDurationDef = new UniqueMidiRestDef(midiRestDef);
             }
-            // MsPosition and MsDuration default to 0.
-            if(midiDurationDef != null)
-            {
-                MsDuration = midiDurationDef.MsDuration;
-            }
+            
+            MsPosition = 0;
+            MsDuration = midiDurationDef.MsDuration;
         }
 
         /// <summary>
-        /// This constructor can be used to construct a restDef at MsPosition=0.
+        /// This constructor can be used to construct a UniqueMidiRestDef at MsPosition=0.
         /// The MsPosition and/or MsDuration can be changed later.
         /// </summary>
         /// <param name="msDuration"></param>
-        public LocalizedMidiDurationDef(int msDuration)
+        public LocalMidiDurationDef(int msDuration)
         {
             Debug.Assert(msDuration > 0);
-            LocalMidiDurationDef = new LocalMidiRestDef(new MidiRestDef("", msDuration));
+            UniqueMidiDurationDef = new UniqueMidiRestDef(new MidiRestDef("", msDuration));
             MsPosition = 0; // can be reset later
             MsDuration = msDuration;
         }
@@ -48,7 +55,7 @@ namespace Moritz.Score.Midi
         /// <summary>
         /// Used to create clones and instances of FinalLMDDInVoice.
         /// </summary>
-        public LocalizedMidiDurationDef(MidiDurationDef midiDurationDef, int msPosition, int msDuration)
+        public LocalMidiDurationDef(MidiDurationDef midiDurationDef, int msPosition, int msDuration)
             : this(midiDurationDef)
         {
             MsPosition = msPosition;
@@ -59,13 +66,13 @@ namespace Moritz.Score.Midi
         /// Transpose up by the number of semitones given in the argument.
         /// Negative interval values transpose down.
         /// If this is a MidiRestDef, nothing happens and the function returns silently.
-        /// It this is a LocalMidiChordDef, is not an error if Midi pitch values would exceed the range 0..127.
+        /// It this is a UniqueMidiChordDef, is not an error if Midi pitch values would exceed the range 0..127.
         /// In this case, they are silently coerced to 0 or 127 respectively.
         /// </summary>
         /// <param name="interval"></param>
         public void Transpose(int interval)
         {
-            LocalMidiChordDef lmcd = LocalMidiDurationDef as LocalMidiChordDef;
+            UniqueMidiChordDef lmcd = UniqueMidiDurationDef as UniqueMidiChordDef;
             if(lmcd != null)
             {
                 // this is not a rest.
@@ -74,9 +81,9 @@ namespace Moritz.Score.Midi
         }
 
         /// <summary>
-        /// A LocalMidiRestDef or a LocalMidiChordDef.
+        /// A UniqueMidiRestDef or a UniqueMidiChordDef.
         /// </summary>
-        public readonly MidiDurationDef LocalMidiDurationDef = null;
+        public readonly MidiDurationDef UniqueMidiDurationDef = null;
 
         /// <summary>
         /// This field is set if the chord crosses a barline. Rests never cross barlines, they are always split.
@@ -96,7 +103,7 @@ namespace Moritz.Score.Midi
     /// This class is created while splitting systems.
     /// It is used when notating them.
     /// </summary>
-    public class LocalizedCautionaryChordDef : LocalizedMidiDurationDef
+    public class LocalizedCautionaryChordDef : LocalMidiDurationDef
     {
         public LocalizedCautionaryChordDef(MidiChordDef cautionaryMidiChordDef, int msPosition, int msDuration)
             : base(cautionaryMidiChordDef, msPosition, msDuration)

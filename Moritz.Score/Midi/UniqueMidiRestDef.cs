@@ -8,14 +8,14 @@ using Moritz.Globals;
 namespace Moritz.Score.Midi
 {
     ///<summary>
-    /// A LocalMidiRestDef is a unique MidiRestDef which is saved locally in an SVG file.
+    /// A UniqueMidiRestDef is a unique MidiRestDef which is saved locally in an SVG file.
     /// (This class is necessary, because palettes can also contain rests - which should never be changed.)
     /// Related classes:
     /// 1. A PaletteMidiChordDef is a MidiChordDef which is saved in or retreived from a palette.
-    /// PaletteMidiChordDefs can be 'used' in SVG files, but are usually converted to LocalMidiChordDef.
-    /// 2. A LocalizedMidiChordDef is a LocalMidiChordDef with additional MsPositon and msDuration attributes.
+    /// PaletteMidiChordDefs can be 'used' in SVG files, but are usually converted to UniqueMidiChordDef.
+    /// 2. A LocalizedMidiChordDef is a UniqueMidiChordDef with additional MsPositon and msDuration attributes.
     ///<summary>
-    public class LocalMidiRestDef : MidiRestDef
+    public class UniqueMidiRestDef : MidiRestDef
     {
         /// <summary>
         /// Note that rest IDs in SVG files are of the form "rest"+uniqueNumber, and
@@ -23,7 +23,7 @@ namespace Moritz.Score.Midi
         /// The null id passed to the base class here should always be ignored.
         /// </summary>
         /// <param name="midiRestDef"></param>
-        public LocalMidiRestDef(MidiRestDef midiRestDef)
+        public UniqueMidiRestDef(MidiRestDef midiRestDef)
             :base(null, midiRestDef.MsDuration)
         {     
         }

@@ -144,11 +144,11 @@ namespace Moritz.Score.Notation
             return returnMetrics;
         }
 
-        public override DurationSymbol GetDurationSymbol(Voice voice, LocalizedMidiDurationDef lmdd, bool firstLmddInVoice,
+        public override DurationSymbol GetDurationSymbol(Voice voice, LocalMidiDurationDef lmdd, bool firstLmddInVoice,
             ref byte currentVelocity)
         {
             DurationSymbol durationSymbol = null;
-            MidiChordDef midiChordDef = lmdd.LocalMidiDurationDef as MidiChordDef;
+            MidiChordDef midiChordDef = lmdd.UniqueMidiDurationDef as MidiChordDef;
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
             float musicFontHeight = pageFormat.MusicFontHeight;
             int minimumCrotchetDuration = pageFormat.MinimumCrotchetDuration;
