@@ -18,7 +18,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         public Winds(List<Krystal> krystals, List<PaletteDef> paletteDefs)
         {
-            BaseWindKrystalStrandIndices = GetBaseWindStrandIndices(krystals[2]);
+            //BaseWindKrystalStrandIndices = GetBaseWindStrandIndices(krystals[2]);
             
             MidiPhrase wind5 = GetWind5(krystals[2], paletteDefs[0]);
             wind5.Transpose(-13);
@@ -42,47 +42,21 @@ namespace Moritz.AssistantComposer
 
             MidiPhrase wind5 = new MidiPhrase(paletteDef, values);
 
-            SetWind5LyricsToIndex(wind5);
-
             return wind5;
         }
 
-        private List<int> GetBaseWindStrandIndices(Krystal krystal)
-        {
-            List<int> strandIndices = new List<int>();
-            List<Strand> strands = krystal.Strands;
-            int index = 0;
-            foreach(Strand strand in strands)
-            {
-                strandIndices.Add(index);
-                index += strand.Values.Count;
-            }
-            return strandIndices;
-        }
-
-        /// <summary>
-        /// This function sets the lyrics in wind 5 to the index of the LocalMidiDurationDef,
-        /// and adds additional markers around each lyric which begin a strand in the krystal.
-        /// </summary>
-        /// <param name="wind5"></param>
-        private void SetWind5LyricsToIndex(MidiPhrase wind5)
-        {
-            for(int index = 0; index < wind5.Count; ++index)
-            {
-                UniqueMidiChordDef lmcd = wind5[index].UniqueMidiDurationDef as UniqueMidiChordDef;
-                if(lmcd != null)
-                {
-                    if(BaseWindKrystalStrandIndices.Contains(index))
-                    {
-                        lmcd.Lyric = ">>" + index.ToString() + "<<";
-                    }
-                    else
-                    {
-                        lmcd.Lyric = index.ToString();
-                    }
-                }
-            }
-        }
+        //private List<int> GetBaseWindStrandIndices(Krystal krystal)
+        //{
+        //    List<int> strandIndices = new List<int>();
+        //    List<Strand> strands = krystal.Strands;
+        //    int index = 0;
+        //    foreach(Strand strand in strands)
+        //    {
+        //        strandIndices.Add(index);
+        //        index += strand.Values.Count;
+        //    }
+        //    return strandIndices;
+        //}
 
         /// <summary>
         /// Each voice has the duration of the whole piece. Some voices begin with rest(s).
@@ -149,7 +123,6 @@ namespace Moritz.AssistantComposer
             int finalBarlineMsPosition = barMsPositions[barMsPositions.Count - 1];
             MidiPhrase wind1 = GetBasicUpperWind(wind5, startMsPosition, finalBarlineMsPosition);
             wind1.Transpose(24);
-            wind1.SetLyricsToIndex();
 
             int fromBarNumber = 83;
             int glissInterval = 48;
@@ -163,7 +136,6 @@ namespace Moritz.AssistantComposer
             int finalBarlineMsPosition = barMsPositions[barMsPositions.Count - 1];
             MidiPhrase wind2 = GetBasicUpperWind(wind5, startMsPosition, finalBarlineMsPosition);
             wind2.Transpose(19);
-            wind2.SetLyricsToIndex();
             wind2.AlignObjectAtIndex(1, 49, 57, barMsPositions[91]);
 
             int fromBarNumber = 83;
@@ -178,7 +150,6 @@ namespace Moritz.AssistantComposer
             int finalBarlineMsPosition = barMsPositions[barMsPositions.Count - 1];
             MidiPhrase wind3 = GetBasicUpperWind(wind5, startMsPosition, finalBarlineMsPosition);
             wind3.Transpose(12);
-            wind3.SetLyricsToIndex();
             wind3.AlignObjectAtIndex(1, 10, 67, barMsPositions[39]);
 
             int fromBarNumber = 83;
@@ -192,7 +163,6 @@ namespace Moritz.AssistantComposer
         private MidiPhrase GetWind4(MidiPhrase wind5, List<int> barMsPositions)
         {
             MidiPhrase wind4 = GetBasicWind4(wind5, barMsPositions);
-            wind4.SetLyricsToIndex();
             wind4.Transpose(7); // the basic pitch
             wind4.AlignObjectAtIndex(0, 10, 82, barMsPositions[6]);
             wind4.AlignObjectAtIndex(10, 16, 82, barMsPositions[20]);

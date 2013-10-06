@@ -80,11 +80,23 @@ namespace Moritz.AssistantComposer
             
             winds.CompleteTheWinds(barlineMsPositions);
 
+            #region test code
             //code for testing MidiPhrase.SetContour(...)
             //MidiPhrase contouredPhrase = winds.MidiPhrases[0];
-            //contouredPhrase.SetContour(11, new List<int>() { 1, 4, 1, 2 }, 1, 1, true);
+            //contouredPhrase.SetContour(11, new List<int>() { 1, 4, 1, 2 }, 1, 1);
+
+            //code for testing Translate
+            MidiPhrase translated = winds.MidiPhrases[0];
+            translated.Translate(15, 4, 16);
+            #endregion
 
             //Birds birds = new Birds(clytemnestra, winds, _krystals, _paletteDefs, blockMsDurations);
+
+            clytemnestra.AddIndexToLyrics();
+            foreach(MidiPhrase wind in winds.MidiPhrases)
+            {
+                wind.SetLyricsToIndex();
+            }
 
             // system contains one Voice per channel (not divided into bars)
             List<Voice> system = GetVoices(/*birds,*/ clytemnestra, winds);
@@ -105,11 +117,11 @@ namespace Moritz.AssistantComposer
             MidiPhrase wind5 = winds.MidiPhrases[0];
             List<int> baseWindChordIndexPerClytBlock = new List<int>();
 
-            baseWindChordIndexPerClytBlock.Add(winds.BaseWindKrystalStrandIndices[4]);  // strand 5
-            baseWindChordIndexPerClytBlock.Add(winds.BaseWindKrystalStrandIndices[7]);  // strand 8 (verse 1 has 3 strands
-            baseWindChordIndexPerClytBlock.Add(winds.BaseWindKrystalStrandIndices[10]); // strand 11 (verse 2 has 3 strands)
-            baseWindChordIndexPerClytBlock.Add(winds.BaseWindKrystalStrandIndices[13]); // strand 14 (verse 3 has 3 strands)
-            baseWindChordIndexPerClytBlock.Add(winds.BaseWindKrystalStrandIndices[18]); // strand 19 (verse 4 has 5 strands, verse 5 has 3 strands)
+            baseWindChordIndexPerClytBlock.Add(8);  // strand 5
+            baseWindChordIndexPerClytBlock.Add(20); // strand 8 (verse 1 has 3 strands
+            baseWindChordIndexPerClytBlock.Add(33); // strand 11 (verse 2 has 3 strands)
+            baseWindChordIndexPerClytBlock.Add(49); // strand 14 (verse 3 has 3 strands)
+            baseWindChordIndexPerClytBlock.Add(70); // strand 19 (verse 4 has 5 strands, verse 5 has 3 strands)
 
             foreach(int chordIndex in baseWindChordIndexPerClytBlock)
             {

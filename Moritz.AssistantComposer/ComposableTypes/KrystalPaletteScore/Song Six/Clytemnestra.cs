@@ -465,5 +465,19 @@ namespace Moritz.AssistantComposer
 
         public MidiPhrase MidiPhrase = null;
 
+        /// <summary>
+        /// A temporary measure while composing
+        /// </summary>
+        internal void AddIndexToLyrics()
+        {
+            for(int index = 0; index < MidiPhrase.Count; ++index)
+            {
+                UniqueMidiChordDef lmcd = MidiPhrase[index].UniqueMidiDurationDef as UniqueMidiChordDef;
+                if(lmcd != null)
+                {
+                    lmcd.Lyric = index.ToString() + lmcd.Lyric;
+                }
+            }
+        }
     }
 }

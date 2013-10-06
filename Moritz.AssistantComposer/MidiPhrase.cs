@@ -362,7 +362,7 @@ namespace Moritz.AssistantComposer
         /// </param>
         /// <param name="contourNumber">A value greater than or equal to 1, and less than or equal to 12. An exception is thrown if this is not the case.</param>
         /// <param name="axisNumber">A value greater than or equal to 1, and less than or equal to 12 An exception is thrown if this is not the case.</param>
-        internal void SetContour(int startAtIndex, List<int> partitionSizes, int contourNumber, int axisNumber, bool setLyricsToIndex)
+        internal void SetContour(int startAtIndex, List<int> partitionSizes, int contourNumber, int axisNumber)
         {
             CheckSetContourArgs(startAtIndex, partitionSizes, contourNumber, axisNumber);
 
@@ -388,11 +388,6 @@ namespace Moritz.AssistantComposer
             for(int i = 0; i < sortedLmdds.Count; ++i)
             {
                 _localMidiDurationDefs[startAtIndex + i] = sortedLmdds[i];
-            }
-
-            if(setLyricsToIndex)
-            {
-                SetLyricsToIndex();
             }            
         }
 
@@ -581,6 +576,20 @@ namespace Moritz.AssistantComposer
             }
         }
         #endregion
+
+        /// <summary>
+        /// Extracts nLocalMidiDurationDefs from the LocalMididurationDefs, and then inserts them again at the toIndex.
+        /// </summary>
+        internal void Translate(int fromIndex, int nLocalMidiDurationDefs, int toIndex)
+        {
+            Debug.Assert((fromIndex + nLocalMidiDurationDefs) <= _localMidiDurationDefs.Count);
+            Debug.Assert(toIndex <= (_localMidiDurationDefs.Count - nLocalMidiDurationDefs));
+            int msPosition = _localMidiDurationDefs[0].MsPosition; 
+            List<LocalMidiDurationDef> extractedLmdds = _localMidiDurationDefs.GetRange(fromIndex, nLocalMidiDurationDefs);
+            _localMidiDurationDefs.RemoveRange(fromIndex, nLocalMidiDurationDefs);
+            _localMidiDurationDefs.InsertRange(toIndex, extractedLmdds);
+            MsPosition = msPosition; // resets all the positions in this MidiPhrase.
+        }
 
         /// <summary>
         /// Returns 0 if msPosition is negative,
