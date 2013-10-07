@@ -70,7 +70,8 @@ namespace Moritz.AssistantComposer
 
             SetBlockMsDurations(blockMsDurations, winds);
 
-            clytemnestra.MidiPhrase = clytemnestra.GetMidiPhrase(blockMsDurations);
+            clytemnestra.VoiceDef
+                = clytemnestra.GetVoiceDef(blockMsDurations);
 
             List<int> barlineMsPositions = clytemnestra.GetBarlineMsPositions(blockMsDurations);
             // barlineMsPositions contains both the position of bar 1 (0ms) and the position of the final barline
@@ -81,19 +82,19 @@ namespace Moritz.AssistantComposer
             winds.CompleteTheWinds(barlineMsPositions);
 
             #region test code
-            //code for testing MidiPhrase.SetContour(...)
-            //MidiPhrase contouredPhrase = winds.MidiPhrases[0];
+            //code for testing VoiceDef.SetContour(...)
+            //VoiceDef contouredPhrase = winds.VoiceDefs[0];
             //contouredPhrase.SetContour(11, new List<int>() { 1, 4, 1, 2 }, 1, 1);
 
             //code for testing Translate
-            MidiPhrase translated = winds.MidiPhrases[0];
+            VoiceDef translated = winds.VoiceDefs[0];
             translated.Translate(15, 4, 16);
             #endregion
 
             //Birds birds = new Birds(clytemnestra, winds, _krystals, _paletteDefs, blockMsDurations);
 
             clytemnestra.AddIndexToLyrics();
-            foreach(MidiPhrase wind in winds.MidiPhrases)
+            foreach(VoiceDef wind in winds.VoiceDefs)
             {
                 wind.SetLyricsToIndex();
             }
@@ -114,7 +115,7 @@ namespace Moritz.AssistantComposer
         private void SetBlockMsDurations(List<int> blockMsDurations, Winds winds)
         {
             List<int> msPosPerClytBlock = new List<int>();
-            MidiPhrase wind5 = winds.MidiPhrases[0];
+            VoiceDef wind5 = winds.VoiceDefs[0];
             List<int> baseWindChordIndexPerClytBlock = new List<int>();
 
             baseWindChordIndexPerClytBlock.Add(8);  // strand 5
@@ -154,7 +155,7 @@ namespace Moritz.AssistantComposer
             //}
 
             Voice clytemnestrasVoice = new Voice(null, channelIndex++);
-            clytemnestrasVoice.LocalMidiDurationDefs = clytemnestra.MidiPhrase.LocalMidiDurationDefs;
+            clytemnestrasVoice.LocalMidiDurationDefs = clytemnestra.VoiceDef.LocalMidiDurationDefs;
             voices.Add(clytemnestrasVoice);
 
             List<Voice> windVoices = winds.GetVoices(channelIndex);

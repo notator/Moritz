@@ -106,35 +106,35 @@ namespace Moritz.AssistantComposer
 
         #region CreateBar2()
         /// <summary>
-        /// This function creates only one bar, but with MidiPhrase objects. 
+        /// This function creates only one bar, but with VoiceDef objects. 
         /// </summary>
         List<Voice> CreateBar2(int bar2StartMsPos)
         {
             List<Voice> bar = new List<Voice>();
 
             byte channel = 0;
-            List<MidiPhrase> midiPhrases = new List<MidiPhrase>();
+            List<VoiceDef> voiceDefs = new List<VoiceDef>();
             foreach(PaletteDef paletteDef in _paletteDefs)
             {
                 bar.Add(new Voice(null, channel));
-                MidiPhrase midiPhrase = new MidiPhrase(paletteDef);
-                midiPhrase.MsDuration = 6000;
-                midiPhrases.Add(midiPhrase);
+                VoiceDef voiceDef = new VoiceDef(paletteDef);
+                voiceDef.MsDuration = 6000;
+                voiceDefs.Add(voiceDef);
                 ++channel;
             }
             int msPosition = bar2StartMsPos;
             int maxBarMsPos = 0;
-            for(int i = 0; i < midiPhrases.Count; ++i)
+            for(int i = 0; i < voiceDefs.Count; ++i)
             {
-                int maxMsPos = WriteVoiceMidiDurationDefsInBar2(bar[i], midiPhrases[i], msPosition, bar2StartMsPos);
+                int maxMsPos = WriteVoiceMidiDurationDefsInBar2(bar[i], voiceDefs[i], msPosition, bar2StartMsPos);
                 maxBarMsPos = maxBarMsPos > maxMsPos ? maxBarMsPos : maxMsPos;
                 msPosition += 1500;
             }
 
             // now add the final rest in the bar
-            for(int i = 0; i < midiPhrases.Count; ++i)
+            for(int i = 0; i < voiceDefs.Count; ++i)
             {
-                int mdsdEndPos = midiPhrases[i].EndMsPosition;
+                int mdsdEndPos = voiceDefs[i].EndMsPosition;
                 if(maxBarMsPos > mdsdEndPos)
                 {
                     LocalMidiDurationDef rest2Def = new LocalMidiDurationDef(maxBarMsPos - mdsdEndPos);
@@ -146,10 +146,10 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// Writes the first rest (if any) and the MidiPhrase to the voice.
-        /// Returns the endMsPos of the MidiPhrase. 
+        /// Writes the first rest (if any) and the VoiceDef to the voice.
+        /// Returns the endMsPos of the VoiceDef. 
         /// </summary>
-        private int WriteVoiceMidiDurationDefsInBar2(Voice voice, MidiPhrase midiPhrase, int msPosition, int bar2StartMsPos)
+        private int WriteVoiceMidiDurationDefsInBar2(Voice voice, VoiceDef voiceDef, int msPosition, int bar2StartMsPos)
         {
             LocalMidiDurationDef rest1Def = null;
             if(msPosition > bar2StartMsPos)
@@ -159,20 +159,20 @@ namespace Moritz.AssistantComposer
                 voice.LocalMidiDurationDefs.Add(rest1Def);
             }
 
-            midiPhrase.MsPosition = msPosition;
-            foreach(LocalMidiDurationDef lmdd in midiPhrase)
+            voiceDef.MsPosition = msPosition;
+            foreach(LocalMidiDurationDef lmdd in voiceDef)
             {
                 voice.LocalMidiDurationDefs.Add(lmdd);
             }
 
-            return midiPhrase.EndMsPosition;
+            return voiceDef.EndMsPosition;
         }
         #endregion CreateBar2()
 
         #region CreateBars3to5()
         /// <summary>
         /// This function creates three bars, identical to bar2 with two internal barlines.
-        /// The MidiPhrase objects cross barlines. 
+        /// The VoiceDef objects cross barlines. 
         /// </summary>
         List<List<Voice>> CreateBars3to5(int bar3StartMsPos)
         {

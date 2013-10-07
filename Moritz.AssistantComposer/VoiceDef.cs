@@ -15,18 +15,18 @@ namespace Moritz.AssistantComposer
     /// <para></para>
     /// <para>This class is IEnumerable, so that foreach loops can be used.</para>
     /// <para>For example:</para>
-    /// <para>foreach(LocalMidiDurationDef lmd in midiPhrase) { ... }</para>
+    /// <para>foreach(LocalMidiDurationDef lmd in voiceDef) { ... }</para>
     /// <para>It is also indexable, as in:</para>
-    /// <para>LocalMidiDurationDef lmdd = midiPhrase[index];</para>
+    /// <para>LocalMidiDurationDef lmdd = voiceDef[index];</para>
     /// </summary>
-    public class MidiPhrase : IEnumerable
+    public class VoiceDef : IEnumerable
     {
         /// <summary>
         /// The argument may not be an empty list.
         /// <para>The MsPositions and MsDurations in the list are checked for consistency.</para>
-        /// <para>The new MidiPhrase's LocalMidiDurationDefs list is simply set to the argument (which is not cloned).</para>
+        /// <para>The new VoiceDef's LocalMidiDurationDefs list is simply set to the argument (which is not cloned).</para>
         /// </summary>
-        public MidiPhrase(List<LocalMidiDurationDef> lmdds)
+        public VoiceDef(List<LocalMidiDurationDef> lmdds)
         {
             Debug.Assert(lmdds.Count > 0);
             for(int i = 1; i < lmdds.Count; ++i)
@@ -39,7 +39,7 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// sequence contains a list of values in range 1..paletteDef.MidiDurationDefsCount.
         /// </summary>
-        public MidiPhrase(PaletteDef paletteDef, List<int> sequence)
+        public VoiceDef(PaletteDef paletteDef, List<int> sequence)
         {
             int msPosition = 0;
 
@@ -57,9 +57,9 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// Constructs a MidiPhrase at MsPosition=0, containing the localized sequence of MidiDurationDefs in the PaletteDef.
+        /// Constructs a VoiceDef at MsPosition=0, containing the localized sequence of MidiDurationDefs in the PaletteDef.
         /// </summary
-        public MidiPhrase(PaletteDef midiDurationDefs)
+        public VoiceDef(PaletteDef midiDurationDefs)
         {
             Debug.Assert(midiDurationDefs != null);
             foreach(MidiDurationDef midiDurationDef in midiDurationDefs)
@@ -71,9 +71,9 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// Returns a deep clone of this MidiPhrase.
+        /// Returns a deep clone of this VoiceDef.
         /// </summary>
-        public MidiPhrase Clone()
+        public VoiceDef Clone()
         {
             List<LocalMidiDurationDef> clonedLmdds = new List<LocalMidiDurationDef>();
             foreach(LocalMidiDurationDef lmdd in this.LocalMidiDurationDefs)
@@ -82,13 +82,13 @@ namespace Moritz.AssistantComposer
                 clonedLmdds.Add(clonedLmdd);
             }
 
-            return new MidiPhrase(clonedLmdds);
+            return new VoiceDef(clonedLmdds);
         }
 
         /// <summary>
-        /// Rests dont have lyrics, so their index in the MidiPhrase can't be shown as a lyric. 
+        /// Rests dont have lyrics, so their index in the VoiceDef can't be shown as a lyric. 
         /// </summary>
-        /// <param name="midiPhrase"></param>
+        /// <param name="voiceDef"></param>
         public void SetLyricsToIndex()
         {
             for(int index = 0; index < _localMidiDurationDefs.Count; ++index)
@@ -124,7 +124,7 @@ namespace Moritz.AssistantComposer
             MsPosition = _localMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rests 
         }
         /// <summary>
-        /// The total duration of this MidiPhrase in milliseconds.
+        /// The total duration of this VoiceDef in milliseconds.
         /// Setting this.MsDuration stretches or compresses all the durations in the list to fit the given total duration.
         /// It does not change this.MsPosition, but does affect this.EndMsPosition. 
         /// </summary>
@@ -193,8 +193,8 @@ namespace Moritz.AssistantComposer
         }
         public int Count { get { return _localMidiDurationDefs.Count; } }
         /// <summary>
-        /// Indexer. Allows individual lmdds to be accessed using array notation on the MidiPhrase.
-        /// e.g. lmdd = midiPhrase[3].
+        /// Indexer. Allows individual lmdds to be accessed using array notation on the VoiceDef.
+        /// e.g. lmdd = voiceDef[3].
         /// </summary>
         public LocalMidiDurationDef this[int i]
         {
@@ -216,7 +216,7 @@ namespace Moritz.AssistantComposer
             }
         }
         /// <summary>
-        /// Transpose all the lmdds in the MidiPhrase up by the number of semitones given in the argument.
+        /// Transpose all the lmdds in the VoiceDef up by the number of semitones given in the argument.
         /// Negative interval values transpose down.
         /// It is not an error if Midi pitch values would exceed the range 0..127.
         /// In this case, they are silently coerced to 0 or 127 respectively.
@@ -295,7 +295,7 @@ namespace Moritz.AssistantComposer
         {
             List<LocalMidiDurationDef> lmdds = _localMidiDurationDefs; 
             int count = lmdds.Count;
-            string msg = "\nError in MidiPhrase.cs,\nfunction AlignDefMsPosition()\n\n";
+            string msg = "\nError in VoiceDef.cs,\nfunction AlignDefMsPosition()\n\n";
             if(anchor1Index >= indexToAlign || anchor2Index <= indexToAlign)
             {
                 throw new Exception(msg + "Index out of order.\n" +
@@ -335,7 +335,7 @@ namespace Moritz.AssistantComposer
 
         #region SetContour()
         /// <summary>
-        /// Re-orders the LocalMidiDurationDefs in (part of) this MidiPhrase.
+        /// Re-orders the LocalMidiDurationDefs in (part of) this VoiceDef.
         /// <para>1. creates partitions (lists of LocalMidiDurationDefs) using the startAtIndex and partitionSizes in the first two</para>
         /// <para>-  arguments (see parameter info below).</para>   
         /// <para>2. Sorts the partitions into ascending order of their lowest pitches.
@@ -347,12 +347,12 @@ namespace Moritz.AssistantComposer
         /// <para>SpecialCases:</para>
         /// <para>If a partition contains a single LocalMidiRestDef, it stays where it is and the other LocalMidiDurationDefs are</para>
         /// <para>re-ordered around it.</para>
-        /// <para>If two sub-MidiPhrases have the same initial base pitch, they stay in the same order as they were (not necessarily</para>
+        /// <para>If two sub-VoiceDefs have the same initial base pitch, they stay in the same order as they were (not necessarily</para>
         /// <para>together, of course.)</para>
         /// </summary>
         /// <param name="startAtIndex">The index in LocalMidiDurationDefs at which to start the re-ordering.
         /// </param>
-        /// <param name="partitionSizes">The number of LocalMidiDurationDefs in each sub-midiPhrase to be re-ordered.
+        /// <param name="partitionSizes">The number of LocalMidiDurationDefs in each sub-voiceDef to be re-ordered.
         /// <para>This partitionSizes list must contain:</para>
         /// <para>    1..7 int sizes.</para>
         /// <para>    sizes which are all greater than 0.</para>
@@ -588,7 +588,7 @@ namespace Moritz.AssistantComposer
             List<LocalMidiDurationDef> extractedLmdds = _localMidiDurationDefs.GetRange(fromIndex, nLocalMidiDurationDefs);
             _localMidiDurationDefs.RemoveRange(fromIndex, nLocalMidiDurationDefs);
             _localMidiDurationDefs.InsertRange(toIndex, extractedLmdds);
-            MsPosition = msPosition; // resets all the positions in this MidiPhrase.
+            MsPosition = msPosition; // resets all the positions in this VoiceDef.
         }
 
         /// <summary>

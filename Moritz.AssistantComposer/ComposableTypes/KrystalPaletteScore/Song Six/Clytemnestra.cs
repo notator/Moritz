@@ -330,9 +330,9 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// returns Clytamnestra's MidiPhrase for the whole piece including rests (but no bars)
+        /// returns Clytamnestra's VoiceDef for the whole piece including rests (but no bars)
         /// </summary>
-        public MidiPhrase GetMidiPhrase(List<int> blockMsDurations)
+        public VoiceDef GetVoiceDef(List<int> blockMsDurations)
         {
             Debug.Assert(_momentDefsListPerVerse.Count == 5);
             Debug.Assert(blockMsDurations.Count == 11);
@@ -391,8 +391,8 @@ namespace Moritz.AssistantComposer
                 localizedMidiDurationDefs.Add(rmdd);
             }
 
-            MidiPhrase midiPhrase = new MidiPhrase(localizedMidiDurationDefs);
-            return midiPhrase;
+            VoiceDef voiceDef = new VoiceDef(localizedMidiDurationDefs);
+            return voiceDef;
         }
 
         private List<int> GetBlockPositions(List<int> blockMsDurations)
@@ -463,16 +463,16 @@ namespace Moritz.AssistantComposer
 
         private List<List<MomentDef>> _momentDefsListPerVerse;
 
-        public MidiPhrase MidiPhrase = null;
+        public VoiceDef VoiceDef = null;
 
         /// <summary>
         /// A temporary measure while composing
         /// </summary>
         internal void AddIndexToLyrics()
         {
-            for(int index = 0; index < MidiPhrase.Count; ++index)
+            for(int index = 0; index < VoiceDef.Count; ++index)
             {
-                UniqueMidiChordDef lmcd = MidiPhrase[index].UniqueMidiDurationDef as UniqueMidiChordDef;
+                UniqueMidiChordDef lmcd = VoiceDef[index].UniqueMidiDurationDef as UniqueMidiChordDef;
                 if(lmcd != null)
                 {
                     lmcd.Lyric = index.ToString() + lmcd.Lyric;
