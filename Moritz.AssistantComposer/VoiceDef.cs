@@ -22,16 +22,18 @@ namespace Moritz.AssistantComposer
     public class VoiceDef : IEnumerable
     {
         /// <summary>
-        /// The argument may not be an empty list.
-        /// <para>The MsPositions and MsDurations in the list are checked for consistency.</para>
+        /// <para>If the argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
         /// <para>The new VoiceDef's LocalMidiDurationDefs list is simply set to the argument (which is not cloned).</para>
         /// </summary>
-        public VoiceDef(List<LocalMidiDurationDef> lmdds)
+        protected VoiceDef(List<LocalMidiDurationDef> lmdds)
         {
-            Debug.Assert(lmdds.Count > 0);
-            for(int i = 1; i < lmdds.Count; ++i)
+            Debug.Assert(lmdds != null);
+            if(lmdds.Count > 0)
             {
-                Debug.Assert(lmdds[i - 1].MsPosition + lmdds[i - 1].MsDuration == lmdds[i].MsPosition);
+                for(int i = 1; i < lmdds.Count; ++i)
+                {
+                    Debug.Assert(lmdds[i - 1].MsPosition + lmdds[i - 1].MsDuration == lmdds[i].MsPosition);
+                }
             }
             _localMidiDurationDefs = lmdds;
         }
@@ -39,7 +41,7 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// sequence contains a list of values in range 1..paletteDef.MidiDurationDefsCount.
         /// </summary>
-        public VoiceDef(PaletteDef paletteDef, List<int> sequence)
+        protected VoiceDef(PaletteDef paletteDef, List<int> sequence)
         {
             int msPosition = 0;
 
@@ -54,6 +56,14 @@ namespace Moritz.AssistantComposer
                 msPosition += noteDef.MsDuration;
                 _localMidiDurationDefs.Add(noteDef);
             }
+        }
+ 
+        /// <summary>
+        /// Creates a VoiceDef using the flat sequence of values in the krystal.
+        /// </summary>
+        public VoiceDef (PaletteDef paletteDef, Krystal krystal)
+            : this(paletteDef,krystal.GetValues((uint)1)[0])
+        {
         }
 
         /// <summary>
@@ -76,7 +86,7 @@ namespace Moritz.AssistantComposer
         public VoiceDef Clone()
         {
             List<LocalMidiDurationDef> clonedLmdds = new List<LocalMidiDurationDef>();
-            foreach(LocalMidiDurationDef lmdd in this.LocalMidiDurationDefs)
+            foreach(LocalMidiDurationDef lmdd in this._localMidiDurationDefs)
             {
                 LocalMidiDurationDef clonedLmdd = new LocalMidiDurationDef(lmdd.UniqueMidiDurationDef, lmdd.MsPosition, lmdd.MsDuration);
                 clonedLmdds.Add(clonedLmdd);
@@ -633,8 +643,8 @@ namespace Moritz.AssistantComposer
         // TODO
         // public void AdjustVelocity(int interval) // like Transpose()
 
-        public List<LocalMidiDurationDef> LocalMidiDurationDefs { get { return _localMidiDurationDefs; } } 
-        private List<LocalMidiDurationDef> _localMidiDurationDefs = new List<LocalMidiDurationDef>();
+        public List<LocalMidiDurationDef> LocalMidiDurationDefs { get { return _localMidiDurationDefs; } }
+        protected List<LocalMidiDurationDef> _localMidiDurationDefs = new List<LocalMidiDurationDef>();
 
         #region Enumerator
         public IEnumerator GetEnumerator()

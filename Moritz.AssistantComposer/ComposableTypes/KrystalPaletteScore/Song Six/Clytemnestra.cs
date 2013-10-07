@@ -10,15 +10,14 @@ namespace Moritz.AssistantComposer
 {
     /// <summary>
     /// Encapsulates the composition of Clytemnestra's Voice
-    /// and the positions of barlines -- which are actually set in Song6SketchAlgorithm.DoAlgorithm().
     /// </summary>
-    public class Clytemnestra
+    public class Clytemnestra : VoiceDef
     {
-        public Clytemnestra(List<int> blockMsDurations)
+        public Clytemnestra(int tempInterludeMsDuration) 
+            : base(new List<LocalMidiDurationDef>())
         {
             SetMomentDefsListPerVerse();
-            SetBlockMsDurations(blockMsDurations);
-            GetBarLineMsPositionsPerBlock();
+            SetLocalMidiDurationDefs(tempInterludeMsDuration);
         }
 
         /// <summary>
@@ -90,66 +89,19 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// Sets the msDurations of blocks 2,4,6,8,10 to the durations of the Verses.
-        /// The durations of blocks 1,3,5,7,9,11 will be set by the birds and wind.
-        /// </summary>
-        /// <param name="blockMsDurations"></param>
-        private void SetBlockMsDurations(List<int> blockMsDurations)
-        {
-            Debug.Assert(blockMsDurations.Count == 11);
-            int blockIndex = 0;
-            for(int verseIndex = 0; verseIndex < 5; ++verseIndex)
-            {
-                blockIndex++;
-                List<MomentDef> mDefs = _momentDefsListPerVerse[verseIndex];
-                MomentDef lastMDef = mDefs[mDefs.Count-1];
-                blockMsDurations[blockIndex] = lastMDef.MsPosition + lastMDef.MaximumMsDuration;
-
-                blockIndex++; // do not change the blockMsDurations between the verses.
-            }
-        }
-
-        private List<List<int>> GetBarLineMsPositionsPerBlock()
-        {
-            List<List<int>> barlineIndicesPerVerse = BarlineIndicesPerVerse;
-            List<List<int>> barlineMsPositionsPerBlock = new List<List<int>>();
-            int blockIndex = 0;
-            barlineMsPositionsPerBlock.Add(new List<int>()); // no barlines for block 1
-
-            for(int vIndex = 0; vIndex < _momentDefsListPerVerse.Count; ++vIndex)
-            {
-                blockIndex++;
-                List<int> blockBarlinePoss = new List<int>();
-                
-                List<MomentDef> momentDefs = _momentDefsListPerVerse[vIndex];
-                List<int> indices = barlineIndicesPerVerse[vIndex];
-                foreach(int index in indices)
-                {
-                    blockBarlinePoss.Add(momentDefs[index].MsPosition);
-                }
-
-                barlineMsPositionsPerBlock.Add(blockBarlinePoss);
-
-                blockIndex++;
-                barlineMsPositionsPerBlock.Add(new List<int>()); // no barlines for odd numbered blocks
-            }
-
-            return barlineMsPositionsPerBlock;
-        }
-
-        /// <summary>
-        /// The indices of the momentDefs in Clytamnestra's  _momentDefsListPerVerse
+        /// The indices of the LocalMidiDurationDefs in Clytamnestra's  _localMidiDurationDefs
         /// that are at the start of bars. These are the positions in the original sketch.
+        /// These include both the barline at the start of each verse and the barline at its end.
         /// </summary>
         private List<List<int>> BarlineIndicesPerVerse
         {
             get
             {
-                List<int> v1BarlineIndices = new List<int>() { 0, 1, 5, 9, 11, 13, 17, 21, 27, 31, 33, 39, 40, 41, 45, 49 };
-                List<int> v2BarlineIndices = new List<int>() { 0, 1, 5, 9, 11, 15, 19, 23, 25, 29, 30, 33, 35, 39, 41, 45, 49 };
-                List<int> v3BarlineIndices = new List<int>() { 0, 1, 5, 7, 9, 11, 15, 19, 20, 25, 27, 30, 37, 41, 45, 49 };
-                List<int> v4BarlineIndices = new List<int>() { 0, 3, 9, 10, 17, 21, 29, 31, 39, 43, 45, 49, 51, 53, 57, 59, 65, 75, 79, 81, 85, 89 };
-                List<int> v5BarlineIndices = new List<int>() { 0, 1, 3, 7, 9, 13, 17 };
+                List<int> v1BarlineIndices = new List<int>() { 0, 2, 7, 11, 14, 17, 21, 26, 33, 37, 40, 46, 48, 49, 53, 57, 58 };
+                List<int> v2BarlineIndices = new List<int>() { 0, 2, 7, 11, 13, 17, 21, 26, 28, 32, 34, 37, 40, 44, 47, 51, 55, 56 };
+                List<int> v3BarlineIndices = new List<int>() { 0, 2, 7, 9, 11, 14, 18, 22, 24, 29, 31, 35, 42, 47, 51, 55, 56 };
+                List<int> v4BarlineIndices = new List<int>() { 0, 3, 9, 11, 18, 22, 30, 32, 40, 45, 47, 51, 53, 55, 59, 62, 68, 78, 83, 85, 89, 93, 94 };
+                List<int> v5BarlineIndices = new List<int>() { 0, 1, 3, 7, 10, 14, 19, 20 };
                 List<List<int>> returnList = new List<List<int>>();
                 returnList.Add(v1BarlineIndices);
                 returnList.Add(v2BarlineIndices);
@@ -330,154 +282,96 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// returns Clytamnestra's VoiceDef for the whole piece including rests (but no bars)
+        /// Sets Clytamnestra's _localMidiDurationDefs for the whole piece including rests (but no bars)
+        /// Adds a 10 second LocalMidiRestDef between verses, whose duration will be changed later.
+        /// Sets the private _verseIndices list.
         /// </summary>
-        public VoiceDef GetVoiceDef(List<int> blockMsDurations)
+        private void SetLocalMidiDurationDefs(int tempInterludeMsDuration)
         {
             Debug.Assert(_momentDefsListPerVerse.Count == 5);
-            Debug.Assert(blockMsDurations.Count == 11);
 
-            int blockIndex = 0;
-            List<int> blockMsPositions = GetBlockPositions(blockMsDurations); // for convenience...
-            Debug.Assert(blockMsPositions.Count == 11);
+            LocalMidiDurationDef localMidiRestDef = new LocalMidiDurationDef(tempInterludeMsDuration);
+            _localMidiDurationDefs.Add(localMidiRestDef);
 
-            List<LocalMidiDurationDef> localizedMidiDurationDefs = new List<LocalMidiDurationDef>();
-
-            LocalMidiDurationDef rmdd = new LocalMidiDurationDef(blockMsDurations[blockIndex]);
-            Debug.Assert(rmdd.MsDuration > 0);
-
-            rmdd.MsPosition = blockMsPositions[blockIndex];
-            localizedMidiDurationDefs.Add(rmdd);
+            int currentVersePosition = tempInterludeMsDuration;
 
             for(int verseIndex = 0; verseIndex < 5; ++verseIndex)
             {
-                blockIndex++;
+                _verseIndices.Add(_localMidiDurationDefs.Count);
 
                 List<MomentDef> momentDefs = _momentDefsListPerVerse[verseIndex];
 
                 for(int momentDefIndex = 0; momentDefIndex < momentDefs.Count; ++momentDefIndex)
                 {
                     MomentDef momentDef = momentDefs[momentDefIndex];
-                    momentDef.MsPosition += blockMsPositions[blockIndex];
+                    momentDef.MsPosition += currentVersePosition;
 
                     int restWidth = momentDef.MsWidth - momentDef.MaximumMsDuration;
-                    rmdd = null;
+                    LocalMidiDurationDef lmrd = null;
                     if(restWidth > 0)
                     {
                         momentDef.MsWidth -= restWidth;
-                        rmdd = new LocalMidiDurationDef(restWidth);
-                        Debug.Assert(rmdd.MsDuration > 0);
+                        lmrd = new LocalMidiDurationDef(restWidth);
+                        Debug.Assert(lmrd.MsDuration > 0);
 
-                        rmdd.MsPosition = momentDef.MsPosition + momentDef.MsWidth;
+                        lmrd.MsPosition = momentDef.MsPosition + momentDef.MsWidth;
                     }
 
                     MidiChordDef mcd = momentDef.MidiChordDefs[0];
-                    LocalMidiDurationDef lmdd = new LocalMidiDurationDef(mcd, momentDef.MsPosition, momentDef.MsWidth);
-                    Debug.Assert(lmdd.MsDuration > 0);
+                    LocalMidiDurationDef lmcd = new LocalMidiDurationDef(mcd, momentDef.MsPosition, momentDef.MsWidth);
+                    Debug.Assert(lmcd.MsDuration > 0);
 
-                    localizedMidiDurationDefs.Add(lmdd);
+                    _localMidiDurationDefs.Add(lmcd);
 
-                    if(rmdd != null)
+                    if(lmrd != null)
                     {
-                        localizedMidiDurationDefs.Add(rmdd);
+                        _localMidiDurationDefs.Add(lmrd);
                     }
                 }
 
-                blockIndex++;
-                rmdd = new LocalMidiDurationDef(blockMsDurations[blockIndex]);
-                Debug.Assert(rmdd.MsDuration > 0);
-
-                rmdd.MsPosition = blockMsPositions[blockIndex];
-                localizedMidiDurationDefs.Add(rmdd);
-            }
-
-            VoiceDef voiceDef = new VoiceDef(localizedMidiDurationDefs);
-            return voiceDef;
-        }
-
-        private List<int> GetBlockPositions(List<int> blockMsDurations)
-        {
-            List<int> poss = new List<int>() { 0 };
-            int prevPos = 0;
-            for(int i = 0; i < 10; ++i)
-            {
-                poss.Add(blockMsDurations[i] + prevPos);
-                prevPos = poss[i + 1];
-            }
-            return poss;
-        }
-
-        /// <summary>
-        /// Returns a sorted list of barline positions.
-        /// The list contains the positions of both the first barline (=0) and the last.
-        /// </summary>
-        public List<int> GetBarlineMsPositions(List<int> blockMsDurations)
-        {
-            List<int> barlineMsPoss = new List<int>() {0}; // the position of the first barline
-            List<List<int>> barlineMsPositionsPerBlock = GetBarLineMsPositionsPerBlock();
-
-            // Simply the position of each block. 11 values, 1 per block (starting with 0).
-            List<int> blockMsPoss = new List<int>() { 0 };
-
-            Debug.Assert(blockMsDurations.Count == 11);
-
-            int prevPos = 0;
-            for(int i = 0; i < 10; ++i)
-            {
-                int msPos = blockMsDurations[i] + prevPos;
-                barlineMsPoss.Add(msPos);
-                blockMsPoss.Add(msPos);
-                prevPos = msPos;
-            }
-
-            Debug.Assert(barlineMsPoss.Count == 11);
-            Debug.Assert(blockMsPoss.Count == 11);
-            Debug.Assert(barlineMsPositionsPerBlock.Count == 11);
-
-            for(int i = 0; i < 11; ++i)
-            {
-                AddBarlinePositions(barlineMsPoss, blockMsPoss[i], barlineMsPositionsPerBlock[i]);
-            }
-
-            int msPosLastBarline = blockMsPoss[10] + blockMsDurations[10];
-            barlineMsPoss.Add(msPosLastBarline);
-
-            barlineMsPoss.Sort();
-
-            return barlineMsPoss;
-        }
-
-        private void AddBarlinePositions(List<int> barlineMsPoss, int blockMsPos, List<int> blockBarlineMsPositions)
-        {
-            if(blockBarlineMsPositions != null && blockBarlineMsPositions.Count > 0)
-            {
-                foreach(int msPos in blockBarlineMsPositions)
-                {
-                    if(!barlineMsPoss.Contains(msPos))
-                    {
-                        barlineMsPoss.Add(msPos);
-                    }
-                }
+                localMidiRestDef = new LocalMidiDurationDef(tempInterludeMsDuration);
+                _localMidiDurationDefs.Add(localMidiRestDef);
+                currentVersePosition += tempInterludeMsDuration;
             }
         }
 
         private List<List<MomentDef>> _momentDefsListPerVerse;
-
-        public VoiceDef VoiceDef = null;
 
         /// <summary>
         /// A temporary measure while composing
         /// </summary>
         internal void AddIndexToLyrics()
         {
-            for(int index = 0; index < VoiceDef.Count; ++index)
+            for(int index = 0; index < _localMidiDurationDefs.Count; ++index)
             {
-                UniqueMidiChordDef lmcd = VoiceDef[index].UniqueMidiDurationDef as UniqueMidiChordDef;
+                UniqueMidiChordDef lmcd = _localMidiDurationDefs[index].UniqueMidiDurationDef as UniqueMidiChordDef;
                 if(lmcd != null)
                 {
                     lmcd.Lyric = index.ToString() + lmcd.Lyric;
                 }
             }
         }
+
+        public List<int> BarLineMsPositions
+        {
+            get
+            {
+                List<List<int>> barlineIndicesPerVerse = BarlineIndicesPerVerse;
+                List<int> barlineMsPositions = new List<int>();
+
+                for(int verse = 0; verse < 5; ++verse)
+                {
+                    int verseIndex = _verseIndices[verse];
+                    List<int> indicesReVerse = barlineIndicesPerVerse[verse];
+                    foreach(int indexReVerse in indicesReVerse)
+                    {
+                        barlineMsPositions.Add(_localMidiDurationDefs[verseIndex + indexReVerse].MsPosition);
+                    }
+                }
+                return barlineMsPositions;
+            }
+        }
+
+        private List<int> _verseIndices = new List<int>();
     }
 }

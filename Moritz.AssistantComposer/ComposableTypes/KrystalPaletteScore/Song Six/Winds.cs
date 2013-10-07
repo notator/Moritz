@@ -75,18 +75,7 @@ namespace Moritz.AssistantComposer
             return voices;
         }
 
-        internal List<int> AddInterludeBarlinePositions(List<int> barlineMsPositions)
-        {
-            List<int> newBarlineIndices = new List<int>() { 1, 3, 5, 15, 27, 40, 45, 63, 77 }; // by inspection of the score
-            VoiceDef bassWind = VoiceDefs[0];
-            foreach(int index in newBarlineIndices)
-            {
-                barlineMsPositions.Add(bassWind.LocalMidiDurationDefs[index].MsPosition);
-            }
-            barlineMsPositions.Sort();
 
-            return barlineMsPositions;
-        }
 
         /// <summary>
         /// wind4 starts at bar 1. It is a rotated clone of wind5. The previous beginning of the cycle is at bar 83. 

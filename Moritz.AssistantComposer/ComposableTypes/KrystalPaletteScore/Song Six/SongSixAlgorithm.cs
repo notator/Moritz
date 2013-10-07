@@ -24,7 +24,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         public override List<byte> MidiChannels()
         {
-            return new List<byte>() { 0, 1, 2, 3, 4, 5 };
+            return new List<byte>() { 0, 1 };
         }
 
         /// <summary>
@@ -48,38 +48,22 @@ namespace Moritz.AssistantComposer
         /// </returns>
         public override List<List<Voice>> DoAlgorithm()
         {
-            /// _krystals[0] is lk1(6)-1.krys containing the line {1, 2, 3, 4, 5, 6}
-            /// _krystals[1] is xk2(7.7.1)-9.krys, expanded using:
-            ///         expander: e(7.7.1).kexp
-            ///         density and points inputs: lk1(6)-1.krys 
-            /// _krystals[2] is xk3(7.7.1)-9.krys, expanded using:
-            ///         expander: e(7.7.1).kexp
-            ///         density and points inputs: xk2(7.7.1)-9.krys
-            ///
-            /// The bass wind is constructed from _krystals[2] as a flat sequence.
-            /// The tenor wind is the bass wind in reverse.
+            int tempInterludeMsDuration = int.MaxValue / 50;
+            Clytemnestra clytemnestra = new Clytemnestra(tempInterludeMsDuration); 
 
-            // Clytemnestra sets the durations of blocks 2,4,6,8,10 (see below).
-            // The blockMsDurations at positions 1,3,5,7,9,11 will be set by the Winds.
-            List<int> blockMsDurations = new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            List<VoiceDef> winds = new List<VoiceDef>();
 
-            Clytemnestra clytemnestra = new Clytemnestra(blockMsDurations);
-            // Clytemnestra has now set the durations of blocks 2,4,6,8,10
+            VoiceDef bassWind = new VoiceDef(_paletteDefs[0], _krystals[2]);
+            winds.Add(bassWind);
 
-            Winds winds = new Winds(_krystals, _paletteDefs); // only constructs wind 5 -- see ConstructUpperWinds() below.
+            AlignClytemnestraToBassWind(clytemnestra, bassWind, tempInterludeMsDuration);
 
-            SetBlockMsDurations(blockMsDurations, winds);
-
-            clytemnestra.VoiceDef
-                = clytemnestra.GetVoiceDef(blockMsDurations);
-
-            List<int> barlineMsPositions = clytemnestra.GetBarlineMsPositions(blockMsDurations);
+            List<int> barlineMsPositions = GetBarlineMsPositions(clytemnestra, bassWind);
             // barlineMsPositions contains both the position of bar 1 (0ms) and the position of the final barline
-            barlineMsPositions = winds.AddInterludeBarlinePositions(barlineMsPositions);
 
             Debug.Assert(barlineMsPositions.Count == NumberOfBars() + 1); // includes bar 1 (mPos=0) and the final barline.
             
-            winds.CompleteTheWinds(barlineMsPositions);
+            //winds.CompleteTheWinds(barlineMsPositions);
 
             #region test code
             //code for testing VoiceDef.SetContour(...)
@@ -87,19 +71,20 @@ namespace Moritz.AssistantComposer
             //contouredPhrase.SetContour(11, new List<int>() { 1, 4, 1, 2 }, 1, 1);
 
             //code for testing Translate
-            VoiceDef translated = winds.VoiceDefs[0];
-            translated.Translate(15, 4, 16);
+            //VoiceDef translated = winds.VoiceDefs[0];
+            //translated.Translate(15, 4, 16);
             #endregion
 
             //Birds birds = new Birds(clytemnestra, winds, _krystals, _paletteDefs, blockMsDurations);
 
             clytemnestra.AddIndexToLyrics();
-            foreach(VoiceDef wind in winds.VoiceDefs)
+            foreach(VoiceDef wind in winds)
             {
                 wind.SetLyricsToIndex();
             }
 
             // system contains one Voice per channel (not divided into bars)
+
             List<Voice> system = GetVoices(/*birds,*/ clytemnestra, winds);
 
             List<List<Voice>> bars = GetBars(system, barlineMsPositions);
@@ -107,42 +92,55 @@ namespace Moritz.AssistantComposer
             return bars;
         }
 
-        /// <summary>
-        /// There are 11 blocks. The durations of blocks 2, 4, 6, 8, 10 have been set by Clytemnestra.
-        /// </summary>
-        /// <param name="blockMsDurations"></param>
-        /// <param name="totalMsDuration"></param>
-        private void SetBlockMsDurations(List<int> blockMsDurations, Winds winds)
+        private void AlignClytemnestraToBassWind(Clytemnestra clytemnestra, VoiceDef bassWind, int tempInterludeMsDuration)
         {
-            List<int> msPosPerClytBlock = new List<int>();
-            VoiceDef wind5 = winds.VoiceDefs[0];
-            List<int> baseWindChordIndexPerClytBlock = new List<int>();
+            List<int> verseMsPositions = new List<int>();
+            verseMsPositions.Add(bassWind[8].MsPosition);
+            verseMsPositions.Add(bassWind[20].MsPosition);
+            verseMsPositions.Add(bassWind[33].MsPosition);
+            verseMsPositions.Add(bassWind[49].MsPosition);
+            verseMsPositions.Add(bassWind[70].MsPosition);
 
-            baseWindChordIndexPerClytBlock.Add(8);  // strand 5
-            baseWindChordIndexPerClytBlock.Add(20); // strand 8 (verse 1 has 3 strands
-            baseWindChordIndexPerClytBlock.Add(33); // strand 11 (verse 2 has 3 strands)
-            baseWindChordIndexPerClytBlock.Add(49); // strand 14 (verse 3 has 3 strands)
-            baseWindChordIndexPerClytBlock.Add(70); // strand 19 (verse 4 has 5 strands, verse 5 has 3 strands)
-
-            foreach(int chordIndex in baseWindChordIndexPerClytBlock)
+            List<LocalMidiDurationDef> clmdds = clytemnestra.LocalMidiDurationDefs;
+            clmdds[0].MsDuration = verseMsPositions[0];
+            clytemnestra.MsPosition = 0; // sets all the positions
+            for(int verse = 2; verse <= 5; ++verse)
             {
-                msPosPerClytBlock.Add(wind5[chordIndex].MsPosition);
+                int interludeIndex = clytemnestra.LocalMidiDurationDefs.FindIndex(
+                    x => (x.UniqueMidiDurationDef is UniqueMidiRestDef 
+                          && x.MsDuration == tempInterludeMsDuration));
+                clmdds[interludeIndex].MsDuration = verseMsPositions[verse - 1] - clmdds[interludeIndex].MsPosition;
+                clytemnestra.MsPosition = 0; // sets all the positions
             }
-
-            blockMsDurations[0] = msPosPerClytBlock[0];
-            blockMsDurations[2] = msPosPerClytBlock[1] - msPosPerClytBlock[0] - blockMsDurations[1];
-            blockMsDurations[4] = msPosPerClytBlock[2] - msPosPerClytBlock[1] - blockMsDurations[3];
-            blockMsDurations[6] = msPosPerClytBlock[3] - msPosPerClytBlock[2] - blockMsDurations[5];
-            blockMsDurations[8] = msPosPerClytBlock[4] - msPosPerClytBlock[3] - blockMsDurations[7];
-            blockMsDurations[10] = wind5.EndMsPosition - msPosPerClytBlock[4] - blockMsDurations[9];
-
-            for(int i = 0; i < blockMsDurations.Count; ++i)
-            {
-                Debug.Assert(blockMsDurations[i] > 0, "Block " + (i+1).ToString() + " would have negative duration.");
-            }
+            clmdds[clmdds.Count - 1].MsDuration = bassWind.EndMsPosition - clmdds[clmdds.Count - 1].MsPosition;
         }
 
-        private List<Voice> GetVoices(/*Birds birds,*/ Clytemnestra clytemnestra, Winds winds)
+        /// <summary>
+        /// The returned barlineMsPositions contain both the position of bar 1 (0ms) and the position of the final barline.
+        /// </summary>
+        private List<int> GetBarlineMsPositions(Clytemnestra clytemnestra, VoiceDef bassWind)
+        {
+            List<int> barlineMsPositions = clytemnestra.BarLineMsPositions;
+            barlineMsPositions = AddInterludeBarlinePositions(bassWind, barlineMsPositions);
+            barlineMsPositions.Add(0);
+            barlineMsPositions.Add(bassWind.EndMsPosition);
+            barlineMsPositions.Sort();
+            return barlineMsPositions;
+        }
+
+        private List<int> AddInterludeBarlinePositions(VoiceDef bassWind, List<int> barlineMsPositions)
+        {
+            List<int> newBarlineIndices = new List<int>() { 1, 3, 5, 15, 27, 40, 45, 63, 77 }; // by inspection of the score
+            foreach(int index in newBarlineIndices)
+            {
+                barlineMsPositions.Add(bassWind.LocalMidiDurationDefs[index].MsPosition);
+            }
+            barlineMsPositions.Sort();
+
+            return barlineMsPositions;
+        }
+
+        private List<Voice> GetVoices(/*Birds birds,*/ Clytemnestra clytemnestra, List<VoiceDef> winds)
         {
             byte channelIndex = 0;
             List<Voice> voices = new List<Voice>();
@@ -155,14 +153,14 @@ namespace Moritz.AssistantComposer
             //}
 
             Voice clytemnestrasVoice = new Voice(null, channelIndex++);
-            clytemnestrasVoice.LocalMidiDurationDefs = clytemnestra.VoiceDef.LocalMidiDurationDefs;
+            clytemnestrasVoice.LocalMidiDurationDefs = clytemnestra.LocalMidiDurationDefs;
             voices.Add(clytemnestrasVoice);
 
-            List<Voice> windVoices = winds.GetVoices(channelIndex);
-
-            foreach(Voice voice in windVoices)
+            foreach(VoiceDef windDef in winds)
             {
-                voices.Add(voice);
+                Voice windVoice = new Voice(null, channelIndex++);
+                windVoice.LocalMidiDurationDefs = windDef.LocalMidiDurationDefs;
+                voices.Add(windVoice);
             }
 
             return voices;
