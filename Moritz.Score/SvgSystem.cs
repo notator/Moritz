@@ -594,7 +594,15 @@ namespace Moritz.Score
             }
             else // ordinary ChordSymbol or RestSymbol
             {
-                finalBarlineMsPosition = lastDurationSymbol.MsPosition + lastDurationSymbol.MsDuration;
+                ChordSymbol chordSymbol = lastDurationSymbol as ChordSymbol;
+                if(chordSymbol != null && chordSymbol.LocalMidiDurationDef.MsDurationToNextBarline != null)
+                {
+                    finalBarlineMsPosition = chordSymbol.MsPosition + (int)(chordSymbol.LocalMidiDurationDef.MsDurationToNextBarline);
+                }
+                else
+                {
+                    finalBarlineMsPosition = lastDurationSymbol.MsPosition + lastDurationSymbol.MsDuration;
+                }
             }
 
             return finalBarlineMsPosition;
