@@ -60,6 +60,12 @@ namespace Moritz.Score.Midi
         {
             MsPosition = msPosition;
             MsDuration = msDuration;
+            UniqueMidiDurationDef.MsDuration = msDuration;
+        }
+
+        public override string ToString()
+        {
+            return("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString());
         }
 
         /// <summary>
@@ -103,9 +109,9 @@ namespace Moritz.Score.Midi
     /// This class is created while splitting systems.
     /// It is used when notating them.
     /// </summary>
-    public class LocalizedCautionaryChordDef : LocalMidiDurationDef
+    public class LocalCautionaryChordDef : LocalMidiDurationDef
     {
-        public LocalizedCautionaryChordDef(MidiChordDef cautionaryMidiChordDef, int msPosition, int msDuration)
+        public LocalCautionaryChordDef(MidiChordDef cautionaryMidiChordDef, int msPosition, int msDuration)
             : base(cautionaryMidiChordDef, msPosition, msDuration)
         {
         }

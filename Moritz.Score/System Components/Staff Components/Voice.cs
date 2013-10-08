@@ -207,7 +207,7 @@ namespace Moritz.Score
                 {
                     if(rest != null)
                     {
-                        if(rest.LocalizedCautionaryChordDef == null)
+                        if(rest.LocalCautionaryChordDef == null)
                             breakGroup = true;
                     }
 

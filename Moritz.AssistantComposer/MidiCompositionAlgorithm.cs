@@ -126,22 +126,32 @@ namespace Moritz.AssistantComposer
                         {
                             // This is a rest. Split it.
                             LocalMidiDurationDef firstLmdd = new LocalMidiDurationDef(lmdd.UniqueMidiDurationDef, lmdd.MsPosition, absoluteSplitPos - lmdd.MsPosition);
-                            firstLmdd.MsDurationToNextBarline = absoluteSplitPos - lmdd.MsPosition;
                             firstBarVoice.LocalMidiDurationDefs.Add(firstLmdd);
 
                             LocalMidiDurationDef secondLmdd = new LocalMidiDurationDef(lmdd.UniqueMidiDurationDef, absoluteSplitPos, durationAfterBarline);
                             secondBarVoice.LocalMidiDurationDefs.Add(secondLmdd);
                         }
+                        else if(lmdd is LocalCautionaryChordDef)
+                        {
+                            // This is a cautionary chord. Set the position of the following barline, and
+                            // Add an LocalizedCautionaryChordDef at the beginning of the following bar.
+                            lmdd.MsDuration = absoluteSplitPos - lmdd.MsPosition;
+                            firstBarVoice.LocalMidiDurationDefs.Add(lmdd);
+
+                            LocalCautionaryChordDef secondLmdd = new LocalCautionaryChordDef(lmdd.UniqueMidiDurationDef as MidiChordDef, absoluteSplitPos, durationAfterBarline);
+                            secondBarVoice.LocalMidiDurationDefs.Add(secondLmdd);
+                        }
                         else
                         {
-                            // This is a chord. Set the position of the following barline, and
+                            // This is a normal chord. Set the position of the following barline, and
                             // Add an LocalizedCautionaryChordDef at the beginning of the following bar.
                             lmdd.MsDurationToNextBarline = absoluteSplitPos - lmdd.MsPosition;
                             firstBarVoice.LocalMidiDurationDefs.Add(lmdd);
 
-                            LocalizedCautionaryChordDef secondLmdd = new LocalizedCautionaryChordDef( lmdd.UniqueMidiDurationDef as MidiChordDef, absoluteSplitPos, durationAfterBarline);
+                            LocalCautionaryChordDef secondLmdd = new LocalCautionaryChordDef( lmdd.UniqueMidiDurationDef as MidiChordDef, absoluteSplitPos, durationAfterBarline);
                             secondBarVoice.LocalMidiDurationDefs.Add(secondLmdd);
                         }
+
                     }
                     else
                     {

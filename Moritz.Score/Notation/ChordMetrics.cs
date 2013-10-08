@@ -1885,10 +1885,16 @@ namespace Moritz.Score.Notation
                     maxOverlapHeight = maxOverlapHeight > overlap ? maxOverlapHeight : overlap;
             }
             #endregion
-            #region NoteheadExtendersMetrics
-            // NoteheadExtenders should only be created after JustifyHorizontally(),
-            // so they should be null here.
-            Debug.Assert(NoteheadExtendersMetrics == null || NoteheadExtendersMetrics.Count == 0);
+            #region NoteheadExtendersMetricsBefore
+            if(NoteheadExtendersMetricsBefore != null)
+            {
+                foreach(NoteheadExtenderMetrics nem in NoteheadExtendersMetricsBefore)
+                {
+                    overlap = nem.OverlapHeight(metrics, padding);
+                    if(overlap != 0F)
+                        maxOverlapHeight = maxOverlapHeight > overlap ? maxOverlapHeight : overlap;
+                }
+            }
             #endregion
             return maxOverlapHeight;
 

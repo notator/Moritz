@@ -8,7 +8,7 @@ namespace Moritz.Score
 {
     internal class CautionaryChordSymbol : ChordSymbol
     {
-        public CautionaryChordSymbol(Voice voice, LocalizedCautionaryChordDef lccd, float fontSize)
+        public CautionaryChordSymbol(Voice voice, LocalCautionaryChordDef lccd, float fontSize)
             : base(voice, lccd, 600, fontSize)
         {
             _durationClass = DurationClass.cautionary;

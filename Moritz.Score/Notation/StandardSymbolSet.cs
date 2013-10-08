@@ -302,7 +302,7 @@ namespace Moritz.Score.Notation
             ref byte currentVelocity)
         {
             DurationSymbol durationSymbol = null;
-            LocalizedCautionaryChordDef lccd = lmdd as LocalizedCautionaryChordDef;  
+            LocalCautionaryChordDef lccd = lmdd as LocalCautionaryChordDef;  
             MidiChordDef midiChordDef = lmdd.UniqueMidiDurationDef as MidiChordDef;
 
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;

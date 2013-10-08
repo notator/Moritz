@@ -24,7 +24,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         public override List<byte> MidiChannels()
         {
-            return new List<byte>() { 0, 1 };
+            return new List<byte>() { 0, 1, 2 };
         }
 
         /// <summary>
@@ -54,6 +54,8 @@ namespace Moritz.AssistantComposer
 
             AlignClytemnestraToBassWind(clytemnestra, bassWind, tempInterludeMsDuration);
 
+            VoiceDef control = bassWind.Clone();
+
             // barlineMsPositions contains both the position of bar 1 (0ms) and the position of the final barline
             List<int> barlineMsPositions = GetBarlineMsPositions(clytemnestra, bassWind);
 
@@ -68,7 +70,8 @@ namespace Moritz.AssistantComposer
             #endregion
 
             // Add each voiceDef to voiceDefs here, in top to bottom (=channelIndex) order in the score.
-            List<VoiceDef> voiceDefs = new List<VoiceDef>() {clytemnestra, bassWind /* etc.*/};
+            List<VoiceDef> voiceDefs = new List<VoiceDef>() {control, clytemnestra, bassWind /* etc.*/};
+            Debug.Assert(voiceDefs.Count == MidiChannels().Count);
             foreach(VoiceDef voiceDef in voiceDefs)
             {
                 voiceDef.SetLyricsToIndex();
@@ -91,6 +94,7 @@ namespace Moritz.AssistantComposer
 
             List<LocalMidiDurationDef> clmdds = clytemnestra.LocalMidiDurationDefs;
             clmdds[0].MsDuration = verseMsPositions[0];
+            clmdds[0].UniqueMidiDurationDef.MsDuration = clmdds[0].MsDuration;
             clytemnestra.MsPosition = 0; // sets all the positions
             for(int verse = 2; verse <= 5; ++verse)
             {
@@ -98,9 +102,12 @@ namespace Moritz.AssistantComposer
                     x => (x.UniqueMidiDurationDef is UniqueMidiRestDef 
                           && x.MsDuration == tempInterludeMsDuration));
                 clmdds[interludeIndex].MsDuration = verseMsPositions[verse - 1] - clmdds[interludeIndex].MsPosition;
+                clmdds[interludeIndex].UniqueMidiDurationDef.MsDuration = clmdds[interludeIndex].MsDuration;
                 clytemnestra.MsPosition = 0; // sets all the positions
             }
-            clmdds[clmdds.Count - 1].MsDuration = bassWind.EndMsPosition - clmdds[clmdds.Count - 1].MsPosition;
+            int lastIndex = clmdds.Count - 1;
+            clmdds[lastIndex].MsDuration = bassWind.EndMsPosition - clmdds[lastIndex].MsPosition;
+            clmdds[lastIndex].UniqueMidiDurationDef.MsDuration = clmdds[lastIndex].MsDuration;
         }
 
         /// <summary>
