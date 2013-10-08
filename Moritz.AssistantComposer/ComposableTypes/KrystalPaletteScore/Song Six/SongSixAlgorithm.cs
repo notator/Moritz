@@ -38,8 +38,8 @@ namespace Moritz.AssistantComposer
 
         /// <summary>
         /// Sets the midi content of the score, independent of its notation.
-        /// This means adding MidiDurationDefs to each voice's MidiDurationDefs list.
-        /// The MidiDurations will later be transcribed into a particular notation by a Notator.
+        /// This means adding LocalMidiDurationDefs to each VoiceDef's LocalMidiDurationDefs list.
+        /// The LocalMidiDurationDefs will later be transcribed into a particular notation by a Notator.
         /// Notations are independent of the midi info.
         /// This DoAlgorithm() function is special to this composition.
         /// </summary>
@@ -49,44 +49,32 @@ namespace Moritz.AssistantComposer
         public override List<List<Voice>> DoAlgorithm()
         {
             int tempInterludeMsDuration = int.MaxValue / 50;
-            Clytemnestra clytemnestra = new Clytemnestra(tempInterludeMsDuration); 
-
-            List<VoiceDef> winds = new List<VoiceDef>();
-
+            Clytemnestra clytemnestra = new Clytemnestra(tempInterludeMsDuration);
             VoiceDef bassWind = new VoiceDef(_paletteDefs[0], _krystals[2]);
-            winds.Add(bassWind);
 
             AlignClytemnestraToBassWind(clytemnestra, bassWind, tempInterludeMsDuration);
 
-            List<int> barlineMsPositions = GetBarlineMsPositions(clytemnestra, bassWind);
             // barlineMsPositions contains both the position of bar 1 (0ms) and the position of the final barline
+            List<int> barlineMsPositions = GetBarlineMsPositions(clytemnestra, bassWind);
 
             Debug.Assert(barlineMsPositions.Count == NumberOfBars() + 1); // includes bar 1 (mPos=0) and the final barline.
             
-            //winds.CompleteTheWinds(barlineMsPositions);
-
-            #region test code
-            //code for testing VoiceDef.SetContour(...)
-            //VoiceDef contouredPhrase = winds.VoiceDefs[0];
-            //contouredPhrase.SetContour(11, new List<int>() { 1, 4, 1, 2 }, 1, 1);
-
-            //code for testing Translate
-            //VoiceDef translated = winds.VoiceDefs[0];
-            //translated.Translate(15, 4, 16);
+            // Complete the winds and birds.
+            #region code for testing VoiceDef functions
+            //bassWind.SetContour(11, new List<int>() { 1, 4, 1, 2 }, 1, 1);
+            //bassWind.Translate(15, 4, 16);
+            // TODO:
+            // Cut, Copy, PasteAt (List<LocalMididurationDefs>) !!
             #endregion
 
-            //Birds birds = new Birds(clytemnestra, winds, _krystals, _paletteDefs, blockMsDurations);
-
-            clytemnestra.AddIndexToLyrics();
-            foreach(VoiceDef wind in winds)
+            // Add each voiceDef to voiceDefs here, in top to bottom (=channelIndex) order in the score.
+            List<VoiceDef> voiceDefs = new List<VoiceDef>() {clytemnestra, bassWind /* etc.*/};
+            foreach(VoiceDef voiceDef in voiceDefs)
             {
-                wind.SetLyricsToIndex();
+                voiceDef.SetLyricsToIndex();
             }
-
-            // system contains one Voice per channel (not divided into bars)
-
-            List<Voice> system = GetVoices(/*birds,*/ clytemnestra, winds);
-
+            // this system contains one Voice per channel (not divided into bars)
+            List<Voice> system = GetVoices(voiceDefs);
             List<List<Voice>> bars = GetBars(system, barlineMsPositions);
 
             return bars;
@@ -128,6 +116,12 @@ namespace Moritz.AssistantComposer
             return barlineMsPositions;
         }
 
+        /// <summary>
+        /// These barlines do not include the barlines at the beginning, middle or end of Clytemnestra's verses.
+        /// </summary>
+        /// <param name="bassWind"></param>
+        /// <param name="barlineMsPositions"></param>
+        /// <returns></returns>
         private List<int> AddInterludeBarlinePositions(VoiceDef bassWind, List<int> barlineMsPositions)
         {
             List<int> newBarlineIndices = new List<int>() { 1, 3, 5, 15, 27, 40, 45, 63, 77 }; // by inspection of the score
@@ -140,27 +134,16 @@ namespace Moritz.AssistantComposer
             return barlineMsPositions;
         }
 
-        private List<Voice> GetVoices(/*Birds birds,*/ Clytemnestra clytemnestra, List<VoiceDef> winds)
+        private List<Voice> GetVoices(List<VoiceDef> voiceDefs)
         {
             byte channelIndex = 0;
             List<Voice> voices = new List<Voice>();
 
-            //List<Voice> birdVoices = birds.GetVoices(channelIndex);
-            //foreach(Voice voice in birdVoices)
-            //{
-            //    voices.Add(voice);
-            //    channelIndex++;
-            //}
-
-            Voice clytemnestrasVoice = new Voice(null, channelIndex++);
-            clytemnestrasVoice.LocalMidiDurationDefs = clytemnestra.LocalMidiDurationDefs;
-            voices.Add(clytemnestrasVoice);
-
-            foreach(VoiceDef windDef in winds)
+            foreach(VoiceDef voiceDef in voiceDefs)
             {
-                Voice windVoice = new Voice(null, channelIndex++);
-                windVoice.LocalMidiDurationDefs = windDef.LocalMidiDurationDefs;
-                voices.Add(windVoice);
+                Voice voice = new Voice(null, channelIndex++);
+                voice.LocalMidiDurationDefs = voiceDef.LocalMidiDurationDefs;
+                voices.Add(voice);
             }
 
             return voices;

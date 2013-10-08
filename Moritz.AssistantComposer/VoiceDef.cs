@@ -96,10 +96,11 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// Rests dont have lyrics, so their index in the VoiceDef can't be shown as a lyric. 
+        /// Rests dont have lyrics, so their index in the VoiceDef can't be shown as a lyric.
+        /// Overridden by Clytemnestra, where the index is inserted before her lyrics.
         /// </summary>
         /// <param name="voiceDef"></param>
-        public void SetLyricsToIndex()
+        public virtual void SetLyricsToIndex()
         {
             for(int index = 0; index < _localMidiDurationDefs.Count; ++index)
             {

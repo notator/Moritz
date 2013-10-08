@@ -340,7 +340,7 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// A temporary measure while composing
         /// </summary>
-        internal void AddIndexToLyrics()
+        public override void SetLyricsToIndex()
         {
             for(int index = 0; index < _localMidiDurationDefs.Count; ++index)
             {
@@ -351,7 +351,7 @@ namespace Moritz.AssistantComposer
                 }
             }
         }
-
+        
         public List<int> BarLineMsPositions
         {
             get
