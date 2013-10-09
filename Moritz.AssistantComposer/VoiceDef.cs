@@ -25,7 +25,7 @@ namespace Moritz.AssistantComposer
         /// <para>If the argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
         /// <para>The new VoiceDef's LocalMidiDurationDefs list is simply set to the argument (which is not cloned).</para>
         /// </summary>
-        protected VoiceDef(List<LocalMidiDurationDef> lmdds)
+        public VoiceDef(List<LocalMidiDurationDef> lmdds)
         {
             Debug.Assert(lmdds != null);
             if(lmdds.Count > 0)

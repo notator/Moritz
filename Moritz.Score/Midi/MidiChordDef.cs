@@ -22,7 +22,7 @@ namespace Moritz.Score.Midi
         /// <summary>
         /// Contains values retrieved from an SVG file score:midiChord element
         /// Note that MidiChordDefs do not have msPosition and msDuration attributes.
-        /// These attributes are provided by embedding a clone of the MidiChordDef in a LocalizedMidiChordDef.
+        /// These attributes are provided by embedding a clone of the MidiChordDef in a LocalMidiChordDef.
         /// </summary>
         public MidiChordDef(XmlReader r, string localID, Dictionary<string, MidiDurationDef> scoreMidiDurationDefs, int msDuration)
             : base(msDuration)

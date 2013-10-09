@@ -24,7 +24,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         public override List<byte> MidiChannels()
         {
-            return new List<byte>() { 0, 1, 2 };
+            return new List<byte>() { 0, 1, 2, 3 };
         }
 
         /// <summary>
@@ -50,18 +50,22 @@ namespace Moritz.AssistantComposer
         {
             int tempInterludeMsDuration = int.MaxValue / 50;
             Clytemnestra clytemnestra = new Clytemnestra(tempInterludeMsDuration);
-            VoiceDef bassWind = new VoiceDef(_paletteDefs[0], _krystals[2]);
+            // The rootWind is the lowest wind. The winds are numbered from top to bottom in the score.
+            VoiceDef rootWind = new VoiceDef(_paletteDefs[0], _krystals[2]);
 
-            AlignClytemnestraToBassWind(clytemnestra, bassWind, tempInterludeMsDuration);
-
-            VoiceDef control = bassWind.Clone();
+            AlignClytemnestraToRootWind(clytemnestra, rootWind, tempInterludeMsDuration);
 
             // barlineMsPositions contains both the position of bar 1 (0ms) and the position of the final barline
-            List<int> barlineMsPositions = GetBarlineMsPositions(clytemnestra, bassWind);
-
+            List<int> barlineMsPositions = GetBarlineMsPositions(clytemnestra, rootWind);
             Debug.Assert(barlineMsPositions.Count == NumberOfBars() + 1); // includes bar 1 (mPos=0) and the final barline.
+
+            // the penultimate wind. If rootWind is wind 2, then this is wind 1.
+            VoiceDef tenorWind = GetTenorWind(rootWind, barlineMsPositions);
             
             // Complete the winds and birds.
+
+            VoiceDef control = GetControlVoiceDef(clytemnestra, tenorWind, rootWind);
+
             #region code for testing VoiceDef functions
             //bassWind.SetContour(11, new List<int>() { 1, 4, 1, 2 }, 1, 1);
             //bassWind.Translate(15, 4, 16);
@@ -70,7 +74,7 @@ namespace Moritz.AssistantComposer
             #endregion
 
             // Add each voiceDef to voiceDefs here, in top to bottom (=channelIndex) order in the score.
-            List<VoiceDef> voiceDefs = new List<VoiceDef>() {control, clytemnestra, bassWind /* etc.*/};
+            List<VoiceDef> voiceDefs = new List<VoiceDef>() {control, clytemnestra, tenorWind, rootWind /* etc.*/};
             Debug.Assert(voiceDefs.Count == MidiChannels().Count);
             foreach(VoiceDef voiceDef in voiceDefs)
             {
@@ -83,14 +87,20 @@ namespace Moritz.AssistantComposer
             return bars;
         }
 
-        private void AlignClytemnestraToBassWind(Clytemnestra clytemnestra, VoiceDef bassWind, int tempInterludeMsDuration)
+        /// <summary>
+        /// Aligns Clytemnestra's verses to MsPositions in the rootWind (the lowest wind)
+        /// </summary>
+        /// <param name="clytemnestra"></param>
+        /// <param name="rootWind"></param>
+        /// <param name="tempInterludeMsDuration"></param>
+        private void AlignClytemnestraToRootWind(Clytemnestra clytemnestra, VoiceDef rootWind, int tempInterludeMsDuration)
         {
             List<int> verseMsPositions = new List<int>();
-            verseMsPositions.Add(bassWind[8].MsPosition);
-            verseMsPositions.Add(bassWind[20].MsPosition);
-            verseMsPositions.Add(bassWind[33].MsPosition);
-            verseMsPositions.Add(bassWind[49].MsPosition);
-            verseMsPositions.Add(bassWind[70].MsPosition);
+            verseMsPositions.Add(rootWind[8].MsPosition);
+            verseMsPositions.Add(rootWind[20].MsPosition);
+            verseMsPositions.Add(rootWind[33].MsPosition);
+            verseMsPositions.Add(rootWind[49].MsPosition);
+            verseMsPositions.Add(rootWind[70].MsPosition);
 
             List<LocalMidiDurationDef> clmdds = clytemnestra.LocalMidiDurationDefs;
             clmdds[0].MsDuration = verseMsPositions[0];
@@ -106,7 +116,7 @@ namespace Moritz.AssistantComposer
                 clytemnestra.MsPosition = 0; // sets all the positions
             }
             int lastIndex = clmdds.Count - 1;
-            clmdds[lastIndex].MsDuration = bassWind.EndMsPosition - clmdds[lastIndex].MsPosition;
+            clmdds[lastIndex].MsDuration = rootWind.EndMsPosition - clmdds[lastIndex].MsPosition;
             clmdds[lastIndex].UniqueMidiDurationDef.MsDuration = clmdds[lastIndex].MsDuration;
         }
 
@@ -139,6 +149,92 @@ namespace Moritz.AssistantComposer
             barlineMsPositions.Sort();
 
             return barlineMsPositions;
+        }
+
+        private VoiceDef GetTenorWind(VoiceDef bassWind, List<int> barMsPositions)
+        {
+            VoiceDef wind4 = GetBasicTenorWind(bassWind, barMsPositions);
+            wind4.Transpose(7); // the basic pitch
+            wind4.AlignObjectAtIndex(0, 10, 82, barMsPositions[6]);
+            wind4.AlignObjectAtIndex(10, 16, 82, barMsPositions[20]);
+            wind4.AlignObjectAtIndex(16, 57, 82, barMsPositions[82]);
+
+            //// now create a gliss from bar 61 to 83            
+            //int bar61MsPosition = barMsPositions[60];
+            //int startGlissIndex = wind4.FirstIndexAtOrAfterMsPos(bar61MsPosition);
+            //int bar83MsPosition = barMsPositions[82];
+            //int endGlissIndex = wind4.FirstIndexAtOrAfterMsPos(bar83MsPosition) - 1; // 57
+            //int glissInterval = 19;
+            //wind4.StepwiseGliss(startGlissIndex, endGlissIndex, glissInterval);
+
+            //// from bar 83 to the end is constant (19 semitones higher than before)
+
+            //for(int index = endGlissIndex + 1; index < wind4.Count; ++index)
+            //{
+            //    wind4[index].Transpose(19);
+            //}
+            return wind4;
+        }
+        /// <summary>
+        /// Returns a VoiceDef containing clones of the LocalMidiDurationDefs in the originalVoiceDef
+        /// argument, rotated so that the original first LocalMidiDurationDef is positioned at bar 83.
+        /// The LocalMidiDurationDefs before bar 83 are stretched to fit. 
+        /// The LocalMidiDurationDefs after bar 83 are compressed to fit. 
+        /// </summary>
+        /// <param name="originalVoiceDef"></param>
+        /// <returns></returns>
+        private VoiceDef GetBasicTenorWind(VoiceDef originalVoiceDef, List<int> barlineMsPositions)
+        {
+            VoiceDef tempWind = originalVoiceDef.Clone();
+            int finalBarlineMsPosition = barlineMsPositions[barlineMsPositions.Count - 1];
+            int msDurationAfterSynch = finalBarlineMsPosition - barlineMsPositions[82];
+
+            List<LocalMidiDurationDef> originalLmdds = tempWind.LocalMidiDurationDefs;
+            List<LocalMidiDurationDef> originalStartLmdds = new List<LocalMidiDurationDef>();
+            List<LocalMidiDurationDef> wind4Lmdds = new List<LocalMidiDurationDef>();
+            int accumulatingMsDuration = 0;
+            for(int i = 0; i < tempWind.Count; ++i)
+            {
+                if(accumulatingMsDuration <= msDurationAfterSynch)
+                {
+                    originalStartLmdds.Add(originalLmdds[i]);
+                    accumulatingMsDuration += originalLmdds[i].MsDuration;
+                }
+                else
+                {
+                    wind4Lmdds.Add(originalLmdds[i]);
+                }
+            }
+            wind4Lmdds.AddRange(originalStartLmdds);
+
+            int msPosition = 0;
+            foreach(LocalMidiDurationDef lmdd in wind4Lmdds)
+            {
+                lmdd.MsPosition = msPosition;
+                msPosition += lmdd.MsDuration;
+            }
+            VoiceDef wind4 = new VoiceDef(wind4Lmdds);
+
+            return wind4;
+        }
+
+        private VoiceDef GetControlVoiceDef(Clytemnestra clytemnestra, VoiceDef tenorWind, VoiceDef bassWind)
+        {
+            int finalRestMsDuration = 100;
+
+            UniqueMidiChordDef umcd = new UniqueMidiChordDef(new List<byte>() { (byte) 67 }, new List<byte>() { (byte) 0 }, bassWind.EndMsPosition, false, new List<MidiControl>());
+            LocalMidiDurationDef lmChordd = new LocalMidiDurationDef(umcd, 0, bassWind.EndMsPosition - finalRestMsDuration);
+
+            LocalMidiDurationDef lmRestd = new LocalMidiDurationDef(finalRestMsDuration);
+            lmRestd.MsPosition = lmChordd.MsDuration;
+
+            List<LocalMidiDurationDef> controlLmdds = new List<LocalMidiDurationDef>();
+            controlLmdds.Add(lmChordd);
+            controlLmdds.Add(lmRestd);
+            VoiceDef controlVoiceDef = new VoiceDef(controlLmdds);
+            // here, controlVoiceDef should contains a single note followed by a single rest having the duration of the piece.
+
+            return controlVoiceDef;
         }
 
         private List<Voice> GetVoices(List<VoiceDef> voiceDefs)

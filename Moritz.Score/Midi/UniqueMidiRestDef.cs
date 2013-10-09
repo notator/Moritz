@@ -13,7 +13,7 @@ namespace Moritz.Score.Midi
     /// Related classes:
     /// 1. A PaletteMidiChordDef is a MidiChordDef which is saved in or retreived from a palette.
     /// PaletteMidiChordDefs can be 'used' in SVG files, but are usually converted to UniqueMidiChordDef.
-    /// 2. A LocalizedMidiChordDef is a UniqueMidiChordDef with additional MsPositon and msDuration attributes.
+    /// 2. A LocalMidiChordDef is a UniqueMidiChordDef with additional MsPositon and msDuration attributes.
     ///<summary>
     public class UniqueMidiRestDef : MidiRestDef
     {
