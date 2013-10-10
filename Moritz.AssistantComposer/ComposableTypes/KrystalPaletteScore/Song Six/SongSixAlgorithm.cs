@@ -56,8 +56,8 @@ namespace Moritz.AssistantComposer
 
             AlignClytemnestraToRootWind(clytemnestra, wind3, tempInterludeMsDuration);
 
-            VoiceDef wind2 = GetTenorWind(wind3, clytemnestra.LocalMidiDurationDefs[59].MsPosition);
-            VoiceDef wind1 = GetAltoWind(wind3, clytemnestra.LocalMidiDurationDefs[116].MsPosition);
+            VoiceDef wind2 = GetWind2(wind3, clytemnestra.LocalMidiDurationDefs[59].MsPosition);
+            VoiceDef wind1 = GetWind1(wind3, clytemnestra.LocalMidiDurationDefs[116].MsPosition);
             
             // Complete the winds and birds.
 
@@ -275,22 +275,22 @@ namespace Moritz.AssistantComposer
             return barlineMsPositions;
         }
 
-        private VoiceDef GetTenorWind(VoiceDef bassWind, int rotationMsPosition)
+        private VoiceDef GetWind2(VoiceDef wind3, int rotationMsPosition)
         {
-            VoiceDef tenorWind = GetRotatedWind(bassWind, rotationMsPosition);
-            tenorWind.Transpose(19); // the basic pitch
-            tenorWind.AlignObjectAtIndex(0, 14, 82, rotationMsPosition);
+            VoiceDef wind2 = GetRotatedWind(wind3, rotationMsPosition);
+            wind2.Transpose(19); // the basic pitch
+            wind2.AlignObjectAtIndex(0, 14, 82, rotationMsPosition);
 
-            return tenorWind;
+            return wind2;
         }
 
-        private VoiceDef GetAltoWind(VoiceDef bassWind, int rotationMsPosition)
+        private VoiceDef GetWind1(VoiceDef bassWind, int rotationMsPosition)
         {
-            VoiceDef altoWind = GetRotatedWind(bassWind, rotationMsPosition);
-            altoWind.Transpose(31); // the basic pitch
-            altoWind.AlignObjectAtIndex(0, 24, 82, rotationMsPosition);
+            VoiceDef wind1 = GetRotatedWind(bassWind, rotationMsPosition);
+            wind1.Transpose(31); // the basic pitch
+            wind1.AlignObjectAtIndex(0, 24, 82, rotationMsPosition);
 
-            return altoWind;
+            return wind1;
         }
         /// <summary>
         /// Returns a VoiceDef containing clones of the LocalMidiDurationDefs in the originalVoiceDef argument,
@@ -334,111 +334,121 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// The control note and rest positions
+        /// The control VoiceDef consists of single note + rest pairs,
+        /// whose msPositions and msDurations are composed here.
         /// </summary>
-        /// <param name="clytemnestra"></param>
-        /// <param name="wind2"></param>
-        /// <param name="wind3"></param>
-        /// <returns></returns>
         private VoiceDef GetControlVoiceDef(Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
         {
-            VoiceDef bw = wind3;
+            VoiceDef w3 = wind3;
             VoiceDef c = clytemnestra;
-            List<int> controlNotePositions = new List<int>()
+            // The control note msPositions and following rest msDurations.
+            // The columns here are note MsPositions and rest MsDurations respectively.
+            // A rest's MsPosition is found by subtracting its MsDuration from the following note msPosition.
+            List<int> controlNoteAndRestInfo = new List<int>()
             {
                 #region positions (in temporal order)
                 #region introduction
-                bw[0].MsPosition,
-                bw[1].MsPosition,
-                bw[3].MsPosition,
-                bw[5].MsPosition,
+                0, 100,
+                w3[1].MsPosition, 100,
+                w3[3].MsPosition, 100,
+                w3[5].MsPosition, 100,
                 #endregion
                 #region verse 1
-                c[1].MsPosition,
-                c[3].MsPosition,
-                c[7].MsPosition,
-                c[14].MsPosition,
-                c[17].MsPosition,
-                c[24].MsPosition,
-                c[31].MsPosition,
-                c[40].MsPosition,
-                c[49].MsPosition,
+                c[1].MsPosition,  100,
+                c[3].MsPosition,  100,
+                c[7].MsPosition,  100,
+                c[14].MsPosition, 100,
+                c[17].MsPosition, 100,
+                c[24].MsPosition, 100,
+                c[31].MsPosition, 100,
+                c[40].MsPosition, 100,
+                c[49].MsPosition, 100,
                 #endregion
                 #region interlude after verse 1
-                c[59].MsPosition,
-                bw[15].MsPosition,
+                c[59].MsPosition,  100,
+                w3[15].MsPosition, 100,
                 #endregion
                 #region verse 2
-                c[60].MsPosition,
-                c[62].MsPosition,
-                c[66].MsPosition,
-                c[83].MsPosition,
-                c[94].MsPosition,
-                c[99].MsPosition,
+                c[60].MsPosition, 100,
+                c[62].MsPosition, 100,
+                c[66].MsPosition, 100,
+                c[83].MsPosition, 100,
+                c[94].MsPosition, 100,
+                c[99].MsPosition, 100,
                 #endregion
                 #region interlude after verse 2
-                c[106].MsPosition,
-                c[116].MsPosition,
-                bw[27].MsPosition,
+                c[106].MsPosition, 100,
+                c[116].MsPosition, 100,
+                w3[27].MsPosition, 100,
                 #endregion
                 #region verse 3
-                c[117].MsPosition,
-                c[119].MsPosition,
-                c[123].MsPosition,
-                c[130].MsPosition,
-                c[141].MsPosition,
-                c[152].MsPosition,
-                c[163].MsPosition,
+                c[117].MsPosition, 100,
+                c[119].MsPosition, 100,
+                c[123].MsPosition, 100,
+                c[130].MsPosition, 100,
+                c[141].MsPosition, 100,
+                c[152].MsPosition, 100,
+                c[163].MsPosition, 100,
                 #endregion
                 #region interlude after verse 3
-                c[173].MsPosition,
-                bw[40].MsPosition,
-                bw[45].MsPosition,
+                c[173].MsPosition, 100,
+                w3[40].MsPosition, 100,
+                w3[45].MsPosition, 100,
                 #endregion
                 #region verse 4
-                c[174].MsPosition,
-                c[185].MsPosition,
-                c[216].MsPosition,
-                c[235].MsPosition,
-                c[255].MsPosition,
+                c[174].MsPosition, 100,
+                c[185].MsPosition, 100,
+                c[216].MsPosition, 100,
+                c[235].MsPosition, 100,
+                c[255].MsPosition, 100,
                 #endregion
                 #region interlude after verse 4
-                c[268].MsPosition,
-                bw[63].MsPosition,
+                c[268].MsPosition, 100,
+                w3[63].MsPosition, 100,
                 #endregion
                 #region verse 5
-                c[269].MsPosition,
-                c[278].MsPosition,
-                c[288].MsPosition,
+                c[269].MsPosition, 100,
+                c[278].MsPosition, 100,
+                c[288].MsPosition, 100,
                 #endregion
                 #region finale
-                c[289].MsPosition,
-                bw[77].MsPosition,
+                c[289].MsPosition, 100,
+                w3[77].MsPosition, 400,
                 #endregion
-                bw.EndMsPosition // final barline position
+                w3.EndMsPosition // final barline position
                 #endregion
             };
 
-            #region check order of controlNotePositions
-            for(int i = 0; i < controlNotePositions.Count - 1; ++i)
+            #region check consistency of controlNoteAndRestInfo
+            for(int i = 0; i < controlNoteAndRestInfo.Count - 3; i += 2)
             {
-                Debug.Assert(controlNotePositions[i] < controlNotePositions[i+1]);
+                int noteMsPosition = controlNoteAndRestInfo[i];
+                int restMsDuration = controlNoteAndRestInfo[i + 1];
+                int nextNoteMsPosition = controlNoteAndRestInfo[i + 2];
+                int restMsPosition = nextNoteMsPosition - restMsDuration;
+                int noteMsDuration = restMsPosition - noteMsPosition;
+
+                Debug.Assert(nextNoteMsPosition > noteMsPosition);
+                Debug.Assert(restMsPosition > noteMsPosition);
+                Debug.Assert(noteMsDuration > 0 && restMsDuration > 0);
             }
             #endregion
 
             List<LocalMidiDurationDef> controlLmdds = new List<LocalMidiDurationDef>();
-            int restAtEndOfControlPhraseMsDuration = 100;
 
-            for(int controlNoteIndex = 0; controlNoteIndex < controlNotePositions.Count - 1; ++controlNoteIndex)
+            for(int i = 0; i < controlNoteAndRestInfo.Count - 2; i += 2)
             {
-                int msNoteDuration = controlNotePositions[controlNoteIndex + 1] - controlNotePositions[controlNoteIndex] - restAtEndOfControlPhraseMsDuration;
-                Console.WriteLine("controllNoteDuration=" + msNoteDuration.ToString());
+                int noteMsPosition = controlNoteAndRestInfo[i];
+                int restMsDuration = controlNoteAndRestInfo[i + 1]; 
+                int nextNoteMsPosition = controlNoteAndRestInfo[i + 2];
+                int restMsPosition = nextNoteMsPosition - restMsDuration;
+                int noteMsDuration = restMsPosition - noteMsPosition;
                 
-                UniqueMidiChordDef umcd = new UniqueMidiChordDef(new List<byte>() { (byte)67 }, new List<byte>() { (byte)0 }, msNoteDuration, false, new List<MidiControl>());
-                LocalMidiDurationDef lmChordd = new LocalMidiDurationDef(umcd, controlNotePositions[controlNoteIndex], msNoteDuration);
+                UniqueMidiChordDef umcd = new UniqueMidiChordDef(new List<byte>() { (byte)67 }, new List<byte>() { (byte)0 }, noteMsDuration, false, new List<MidiControl>());
+                LocalMidiDurationDef lmChordd = new LocalMidiDurationDef(umcd, noteMsPosition, noteMsDuration);
 
-                LocalMidiDurationDef lmRestd = new LocalMidiDurationDef(restAtEndOfControlPhraseMsDuration);
-                lmRestd.MsPosition = controlNotePositions[controlNoteIndex] + lmChordd.MsDuration;
+                LocalMidiDurationDef lmRestd = new LocalMidiDurationDef(restMsDuration);
+                lmRestd.MsPosition = restMsPosition;
 
                 controlLmdds.Add(lmChordd);
                 controlLmdds.Add(lmRestd);
