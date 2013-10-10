@@ -227,16 +227,18 @@ namespace Moritz.AssistantComposer
             }
         }
         /// <summary>
-        /// Transpose all the lmdds in the VoiceDef up by the number of semitones given in the argument.
+        /// Transpose all the lmdds from startIndex to (not including) endIndex
+        /// up by the number of semitones given in the inteval argument.
         /// Negative interval values transpose down.
         /// It is not an error if Midi pitch values would exceed the range 0..127.
         /// In this case, they are silently coerced to 0 or 127 respectively.
         /// </summary>
         /// <param name="interval"></param>
-        public void Transpose(int interval)
+        public void Transpose(int startIndex, int endIndex, int interval)
         {
-            foreach(LocalMidiDurationDef lmdd in _localMidiDurationDefs)
+            for(int i = startIndex; i < endIndex; ++i)
             {
+                LocalMidiDurationDef lmdd = _localMidiDurationDefs[i];
                 lmdd.Transpose(interval);
             }
         }
@@ -622,19 +624,19 @@ namespace Moritz.AssistantComposer
             return index;
         }
         /// <summary>
-        /// Transposes the LocalMidiDurationDefs from the firstGlissedIndex upto including the lastGlissedIndex
+        /// Transposes the LocalMidiDurationDefs from the startIndex upto (but not including) endIndex
         /// by an equally increasing amount, so that the final LocalMidiDurationDef is transposed by glissInterval.
-        /// firstGlissedIndex and lastGlissedIndex can be equal.
+        /// startIndex must be less than endIndex.
         /// glissInterval can be negative.
         /// </summary>
-        internal void StepwiseGliss(int firstGlissedIndex, int lastGlissedIndex, int glissInterval)
+        internal void StepwiseGliss(int startIndex, int endIndex, int glissInterval)
         {
-            Debug.Assert(firstGlissedIndex <= lastGlissedIndex);
+            Debug.Assert(startIndex < endIndex);
 
-            int nSteps = (lastGlissedIndex - firstGlissedIndex) + 1;
+            int nSteps = (endIndex - startIndex);
             double interval = ((double)glissInterval) / nSteps;
             double step = interval;
-            for(int index = firstGlissedIndex; index <= lastGlissedIndex; ++index)
+            for(int index = startIndex; index < endIndex; ++index)
             {
                 _localMidiDurationDefs[index].Transpose((int)Math.Round(interval));
                 interval += step;

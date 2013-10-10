@@ -33,7 +33,7 @@ namespace Moritz.AssistantComposer
         /// <returns></returns>
         public override int NumberOfBars()
         {
-            return 93;
+            return 96;
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Moritz.AssistantComposer
             Clytemnestra clytemnestra = new Clytemnestra(tempInterludeMsDuration);
             // The wind3 is the lowest wind. The winds are numbered from top to bottom in the score.
             VoiceDef wind3 = new VoiceDef(_paletteDefs[0], _krystals[2]);
-            wind3.Transpose(-13);
+            wind3.Transpose(0, wind3.Count, -13);
 
             AlignClytemnestraToRootWind(clytemnestra, wind3, tempInterludeMsDuration);
 
@@ -121,22 +121,22 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// The returned barlineMsPositions contain both the position of bar 1 (0ms) and the position of the final barline.
         /// </summary>
-        private List<int> GetBarlineMsPositions(VoiceDef control, Clytemnestra clytemnestra, VoiceDef altoWind, VoiceDef tenorWind, VoiceDef bassWind /* etc.*/)
+        private List<int> GetBarlineMsPositions(VoiceDef control, Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3 /* etc.*/)
         {
             VoiceDef ctl = control;
             Clytemnestra c = clytemnestra;
-            VoiceDef aw = altoWind;
-            VoiceDef tw = tenorWind;
-            VoiceDef bw = bassWind;
+            VoiceDef w1 = wind1;
+            VoiceDef w2 = wind2;
+            VoiceDef w3 = wind3;
 
             List<int> barlineMsPositions = new List<int>()
             {
                 #region msPositions
                 #region intro
                 0,
-                bw[1].MsPosition,
-                bw[3].MsPosition,
-                bw[5].MsPosition,
+                w3[1].MsPosition,
+                w3[3].MsPosition,
+                w3[5].MsPosition,
                 #endregion
                 #region verse 1
                 c[1].MsPosition,
@@ -158,7 +158,8 @@ namespace Moritz.AssistantComposer
                 #endregion
                 #region interlude after verse 1
                 c[59].MsPosition,
-                bw[15].MsPosition,
+                w2[16].MsPosition,
+                w2[18].MsPosition,
                 #endregion
                 #region verse 2
                 c[60].MsPosition,
@@ -181,7 +182,9 @@ namespace Moritz.AssistantComposer
                 #endregion
                 #region interlude after verse 2
                 c[116].MsPosition,
-                bw[27].MsPosition,
+                w1[26].MsPosition,
+                w1[28].MsPosition,
+                w1[30].MsPosition,
                 #endregion
                 #region verse 3
                 c[117].MsPosition,
@@ -203,8 +206,8 @@ namespace Moritz.AssistantComposer
                 #endregion
                 #region interlude after verse 3
                 c[173].MsPosition,
-                bw[40].MsPosition,
-                bw[45].MsPosition,
+                w3[40].MsPosition,
+                w3[45].MsPosition,
                 #endregion
                 #region verse 4, Oft have ye...
                 c[174].MsPosition,
@@ -232,7 +235,7 @@ namespace Moritz.AssistantComposer
                 #endregion
                 #region interlude after verse 4
                 c[268].MsPosition,
-                bw[63].MsPosition,
+                w3[63].MsPosition,
                 #endregion
                 #region verse 5
                 c[269].MsPosition,
@@ -243,12 +246,12 @@ namespace Moritz.AssistantComposer
                 c[283].MsPosition,
                 c[288].MsPosition,
                 #endregion
-                #region interlude after verse 5 (finale)
+                #region finale
                 c[289].MsPosition,
-                bw[77].MsPosition,
+                w3[77].MsPosition,
                 #endregion
                 // final barline
-                bw.EndMsPosition
+                w3.EndMsPosition
                 #endregion
             };
 
@@ -278,8 +281,11 @@ namespace Moritz.AssistantComposer
         private VoiceDef GetWind2(VoiceDef wind3, int rotationMsPosition)
         {
             VoiceDef wind2 = GetRotatedWind(wind3, rotationMsPosition);
-            wind2.Transpose(19); // the basic pitch
-            wind2.AlignObjectAtIndex(0, 14, 82, rotationMsPosition);
+            wind2.Transpose(0, wind2.Count, 12);
+            wind2.StepwiseGliss(0, 15, 7);
+            wind2.Transpose(15, wind2.Count, 7);
+
+            wind2.AlignObjectAtIndex(0, 15, 82, rotationMsPosition);
 
             return wind2;
         }
@@ -287,8 +293,11 @@ namespace Moritz.AssistantComposer
         private VoiceDef GetWind1(VoiceDef bassWind, int rotationMsPosition)
         {
             VoiceDef wind1 = GetRotatedWind(bassWind, rotationMsPosition);
-            wind1.Transpose(31); // the basic pitch
-            wind1.AlignObjectAtIndex(0, 24, 82, rotationMsPosition);
+            wind1.Transpose(0, wind1.Count, 19);
+            wind1.StepwiseGliss(0, 25, 12);
+            wind1.Transpose(25, wind1.Count, 12); 
+
+            wind1.AlignObjectAtIndex(0, 25, 82, rotationMsPosition);
 
             return wind1;
         }
@@ -339,6 +348,8 @@ namespace Moritz.AssistantComposer
         /// </summary>
         private VoiceDef GetControlVoiceDef(Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
         {
+            VoiceDef w1 = wind1;
+            VoiceDef w2 = wind2;
             VoiceDef w3 = wind3;
             VoiceDef c = clytemnestra;
             // The control note msPositions and following rest msDurations.
@@ -366,7 +377,8 @@ namespace Moritz.AssistantComposer
                 #endregion
                 #region interlude after verse 1
                 c[59].MsPosition,  100,
-                w3[15].MsPosition, 100,
+                w2[16].MsPosition, 100,
+                w2[18].MsPosition, 100,
                 #endregion
                 #region verse 2
                 c[60].MsPosition, 100,
@@ -379,7 +391,8 @@ namespace Moritz.AssistantComposer
                 #region interlude after verse 2
                 c[106].MsPosition, 100,
                 c[116].MsPosition, 100,
-                w3[27].MsPosition, 100,
+                w1[26].MsPosition, 100,
+                w1[28].MsPosition, 100,
                 #endregion
                 #region verse 3
                 c[117].MsPosition, 100,
@@ -413,7 +426,7 @@ namespace Moritz.AssistantComposer
                 #endregion
                 #region finale
                 c[289].MsPosition, 100,
-                w3[77].MsPosition, 400,
+                w3[77].MsPosition, 3000,
                 #endregion
                 w3.EndMsPosition // final barline position
                 #endregion
