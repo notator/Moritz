@@ -89,30 +89,6 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// The indices of the LocalMidiDurationDefs in Clytamnestra's  _localMidiDurationDefs
-        /// that are at the start of bars. These are the positions in the original sketch.
-        /// These include both the barline at the start of each verse and the barline at its end.
-        /// </summary>
-        private List<List<int>> BarlineIndicesPerVerse
-        {
-            get
-            {
-                List<int> v1BarlineIndices = new List<int>() { 0, 2, 7, 11, 14, 17, 21, 26, 33, 37, 40, 46, 48, 49, 53, 57, 58 };
-                List<int> v2BarlineIndices = new List<int>() { 0, 2, 7, 11, 13, 17, 21, 26, 28, 32, 34, 37, 40, 44, 47, 51, 55, 56 };
-                List<int> v3BarlineIndices = new List<int>() { 0, 2, 7, 9, 11, 14, 18, 22, 24, 29, 31, 35, 42, 47, 51, 55, 56 };
-                List<int> v4BarlineIndices = new List<int>() { 0, 3, 9, 11, 18, 22, 30, 32, 40, 45, 47, 51, 53, 55, 59, 62, 68, 78, 83, 85, 89, 93, 94 };
-                List<int> v5BarlineIndices = new List<int>() { 0, 1, 3, 7, 10, 14, 19, 20 };
-                List<List<int>> returnList = new List<List<int>>();
-                returnList.Add(v1BarlineIndices);
-                returnList.Add(v2BarlineIndices);
-                returnList.Add(v3BarlineIndices);
-                returnList.Add(v4BarlineIndices);
-                returnList.Add(v5BarlineIndices);
-                return returnList;
-            }
-        }
-
-        /// <summary>
         /// The msWidth of each momentDef (the msDuration between momentDefs).
         /// </summary>
         private List<List<int>> MomentDefMsWidthPerVerse
@@ -349,26 +325,6 @@ namespace Moritz.AssistantComposer
                 {
                     lmcd.Lyric = index.ToString() + lmcd.Lyric;
                 }
-            }
-        }
-        
-        public List<int> BarLineMsPositions
-        {
-            get
-            {
-                List<List<int>> barlineIndicesPerVerse = BarlineIndicesPerVerse;
-                List<int> barlineMsPositions = new List<int>();
-
-                for(int verse = 0; verse < 5; ++verse)
-                {
-                    int verseIndex = _verseIndices[verse];
-                    List<int> indicesReVerse = barlineIndicesPerVerse[verse];
-                    foreach(int indexReVerse in indicesReVerse)
-                    {
-                        barlineMsPositions.Add(_localMidiDurationDefs[verseIndex + indexReVerse].MsPosition);
-                    }
-                }
-                return barlineMsPositions;
             }
         }
 
