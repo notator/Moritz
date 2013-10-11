@@ -17,6 +17,7 @@ namespace Moritz.AssistantComposer
         {
             VoiceDef wind3 = new VoiceDef(palette, krystal);
             wind3.Transpose(0, wind3.Count, -13);
+            wind3.StepwiseGliss(74, wind3.Count, 19);
             return wind3;
         }
 
@@ -29,6 +30,7 @@ namespace Moritz.AssistantComposer
             wind2.Transpose(0, wind2.Count, 12);
             wind2.StepwiseGliss(0, 15, 7);
             wind2.Transpose(15, wind2.Count, 7);
+            wind2.StepwiseGliss(75, wind2.Count, 12);
 
             wind2.AlignObjectAtIndex(0, 15, 82, rotationMsPosition);
             wind2.AlignObjectAtIndex(15, 39, 82, clytLmdds[173].MsPosition);
