@@ -1,273 +1,97 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-
-using Krystals4ObjectLibrary;
+using System;
 
 using Moritz.Score;
 using Moritz.Score.Midi;
+using Krystals4ObjectLibrary;
 
 namespace Moritz.AssistantComposer
 {
-    class Winds
+    /// <summary>
+    /// The Wind "constructors" (part of the Song Six algorithm).
+    /// </summary>
+    internal partial class SongSixAlgorithm : MidiCompositionAlgorithm
     {
-        /// <summary>
-        /// Constructs the initial state of the lowest Wind (=Wind5), putting it in the public 
-        /// s list.
-        /// Wind channels are ordered bottom to top. i.e. VoiceDefs[0] is always Wind 5 (the lowest).
-        /// Also sets the public BaseWindKrystalStrandIndices attribute.
-        /// </summary>
-        public Winds(List<Krystal> krystals, List<PaletteDef> paletteDefs)
+        private VoiceDef GetWind3(PaletteDef palette, Krystal krystal)
         {
-            //BaseWindKrystalStrandIndices = GetBaseWindStrandIndices(krystals[2]);
-            
-            VoiceDef wind5 = GetWind5(krystals[2], paletteDefs[0]);
-            wind5.Transpose(-13);
-            VoiceDefs.Add(wind5);
-
-            // The other winds are created later, when the barline positions are known
+            VoiceDef wind3 = new VoiceDef(palette, krystal);
+            wind3.Transpose(0, wind3.Count, -13);
+            return wind3;
         }
 
-        /// <summary>
-        /// The krystal is xk3(7.7.1)-9.krys:
-        ///     expander: e(7.7.1).kexp
-        ///     density and points inputs: xk2(7.7.1)-9.krys
-        /// Ancestor krystal (xk2(7.7.1)-9.krys):
-        ///     expander: e(7.7.1).kexp
-        ///     density and points inputs: lk1(6)-1.krys containing the line {1, 2, 3, 4, 5, 6}
-        /// </summary>
-        private VoiceDef GetWind5(Krystal krystal, PaletteDef paletteDef)
+        private VoiceDef GetWind2(VoiceDef wind3, Clytemnestra clytemnestra)
         {
-            List<List<int>> kValues = krystal.GetValues((uint)1);
-            List<int> values = kValues[0]; // the flat list of values
+            List<LocalMidiDurationDef> clytLmdds = clytemnestra.LocalMidiDurationDefs;
+            int rotationMsPosition = clytLmdds[59].MsPosition;
 
-            VoiceDef wind5 = new VoiceDef(paletteDef, values);
+            VoiceDef wind2 = GetRotatedWind(wind3, rotationMsPosition);
+            wind2.Transpose(0, wind2.Count, 12);
+            wind2.StepwiseGliss(0, 15, 7);
+            wind2.Transpose(15, wind2.Count, 7);
 
-            return wind5;
-        }
-
-        //private List<int> GetBaseWindStrandIndices(Krystal krystal)
-        //{
-        //    List<int> strandIndices = new List<int>();
-        //    List<Strand> strands = krystal.Strands;
-        //    int index = 0;
-        //    foreach(Strand strand in strands)
-        //    {
-        //        strandIndices.Add(index);
-        //        index += strand.Values.Count;
-        //    }
-        //    return strandIndices;
-        //}
-
-        /// <summary>
-        /// Each voice has the duration of the whole piece. Some voices begin with rest(s).
-        /// </summary>
-        internal List<Voice> GetVoices(int topWindChannelIndex)
-        {
-            List<Voice> voices = new List<Voice>();
-            int windChannelIndex = topWindChannelIndex;
-            for(int i = VoiceDefs.Count - 1; i >= 0; --i)
-            {
-                Voice voice = new Voice(null, (byte)(windChannelIndex++));
-                voice.LocalMidiDurationDefs = VoiceDefs[i].LocalMidiDurationDefs;
-                voices.Add(voice);
-            }
-            return voices;
-        }
-
-
-
-        /// <summary>
-        /// wind4 starts at bar 1. It is a rotated clone of wind5. The previous beginning of the cycle is at bar 83. 
-        /// wind3 starts with a rest. Chords start at bar 21 (after verse 1)
-        /// wind2 starts with a rest. Chords start at bar 40 (after verse 2)
-        /// wind1 starts with a rest. Chords start at bar 58 (after verse 3)
-        /// </summary>
-        /// <param name="barMsPositions"></param>
-        internal void CompleteTheWinds(List<int> barMsPositions)
-        {
-            int startMsPosition;
-            int finalBarlineMsPosition = barMsPositions[barMsPositions.Count-1];
-            VoiceDef wind5 = VoiceDefs[0];
-
-            VoiceDef wind4 = GetWind4(wind5, barMsPositions);
-            VoiceDefs.Add(wind4);
-
-            startMsPosition = barMsPositions[20];
-            VoiceDef wind3 = GetWind3(wind5, startMsPosition, barMsPositions);
-            VoiceDefs.Add(wind3);
-
-            startMsPosition = barMsPositions[39];
-            VoiceDef wind2 = GetWind2(wind5, startMsPosition, barMsPositions);
-            VoiceDefs.Add(wind2);
-
-            startMsPosition = barMsPositions[57];
-            VoiceDef wind1 = GetWind1(wind5, startMsPosition, barMsPositions);
-            VoiceDefs.Add(wind1);
-
-            CompleteWind5(wind5, barMsPositions);
-        }
-
-        private VoiceDef GetWind1(VoiceDef wind5, int startMsPosition, List<int> barMsPositions)
-        {
-            int finalBarlineMsPosition = barMsPositions[barMsPositions.Count - 1];
-            VoiceDef wind1 = GetBasicUpperWind(wind5, startMsPosition, finalBarlineMsPosition);
-            wind1.Transpose(24);
-
-            int fromBarNumber = 83;
-            int glissInterval = 48;
-            GlissToTheEnd(wind1, barMsPositions[fromBarNumber - 1], glissInterval);
-
-            return wind1;
-        }
-
-        private VoiceDef GetWind2(VoiceDef wind5, int startMsPosition, List<int> barMsPositions)
-        {
-            int finalBarlineMsPosition = barMsPositions[barMsPositions.Count - 1];
-            VoiceDef wind2 = GetBasicUpperWind(wind5, startMsPosition, finalBarlineMsPosition);
-            wind2.Transpose(19);
-            wind2.AlignObjectAtIndex(1, 49, 57, barMsPositions[91]);
-
-            int fromBarNumber = 83;
-            int glissInterval = 36;
-            GlissToTheEnd(wind2, barMsPositions[fromBarNumber - 1], glissInterval);
+            wind2.AlignObjectAtIndex(0, 15, 82, rotationMsPosition);
+            wind2.AlignObjectAtIndex(15, 39, 82, clytLmdds[173].MsPosition);
+            wind2.AlignObjectAtIndex(39, 57, 82, clytLmdds[268].MsPosition);
 
             return wind2;
         }
 
-        private VoiceDef GetWind3(VoiceDef wind5, int startMsPosition, List<int> barMsPositions)
+        private VoiceDef GetWind1(VoiceDef wind3, Clytemnestra clytemnestra)
         {
-            int finalBarlineMsPosition = barMsPositions[barMsPositions.Count - 1];
-            VoiceDef wind3 = GetBasicUpperWind(wind5, startMsPosition, finalBarlineMsPosition);
-            wind3.Transpose(12);
-            wind3.AlignObjectAtIndex(1, 10, 67, barMsPositions[39]);
+            List<LocalMidiDurationDef> clytLmdds = clytemnestra.LocalMidiDurationDefs;
+            int rotationMsPosition = clytLmdds[116].MsPosition;
 
-            int fromBarNumber = 83;
-            //int glissInterval = 26;
-            int glissInterval = 24;
-            GlissToTheEnd(wind3, barMsPositions[fromBarNumber - 1], glissInterval); 
+            VoiceDef wind1 = GetRotatedWind(wind3, rotationMsPosition);
+            wind1.Transpose(0, wind1.Count, 19);
+            wind1.StepwiseGliss(0, 25, 12);
+            wind1.Transpose(25, wind1.Count, 12);
 
-            return wind3;
-        }
+            wind1.AlignObjectAtIndex(0, 25, 82, rotationMsPosition);
+            wind1.AlignObjectAtIndex(25, 74, 82, clytLmdds[289].MsPosition);
 
-        private VoiceDef GetWind4(VoiceDef wind5, List<int> barMsPositions)
-        {
-            VoiceDef wind4 = GetBasicWind4(wind5, barMsPositions);
-            wind4.Transpose(7); // the basic pitch
-            wind4.AlignObjectAtIndex(0, 10, 82, barMsPositions[6]);
-            wind4.AlignObjectAtIndex(10, 16, 82, barMsPositions[20]);
-            wind4.AlignObjectAtIndex(16, 57, 82, barMsPositions[82]);
-
-            // now create a gliss from bar 61 to 83            
-            int bar61MsPosition = barMsPositions[60];
-            int startGlissIndex = wind4.FirstIndexAtOrAfterMsPos(bar61MsPosition);
-            int bar83MsPosition = barMsPositions[82];
-            int endGlissIndex = wind4.FirstIndexAtOrAfterMsPos(bar83MsPosition) - 1; // 57
-            int glissInterval = 19;
-            wind4.StepwiseGliss(startGlissIndex, endGlissIndex, glissInterval);
-
-            // from bar 83 to the end is constant (19 semitones higher than before)
-
-            for(int index = endGlissIndex + 1; index < wind4.Count; ++index)
-            {
-                wind4[index].Transpose(19);
-            }
-            return wind4;
-        }
-
-        private void CompleteWind5(VoiceDef wind5, List<int> barMsPositions)
-        {
-            int fromBarNumber = 83;
-            int glissInterval = 26;
-            GlissToTheEnd(wind5, barMsPositions[fromBarNumber - 1], glissInterval);
-        }
-
-        private void GlissToTheEnd(VoiceDef wind, int fromMsPosition, int glissInterval)
-        {
-            int startGlissIndex = wind.FirstIndexAtOrAfterMsPos(fromMsPosition);
-            int endGlissIndex = wind.Count - 1;
-            wind.StepwiseGliss(startGlissIndex, endGlissIndex, glissInterval);
+            return wind1;
         }
 
         /// <summary>
-        /// Returns a VoiceDef containing clones of the LocalMidiDurationDefs in the originalVoiceDef
-        /// argument, rotated so that the original first LocalMidiDurationDef is positioned at bar 83.
-        /// The LocalMidiDurationDefs before bar 83 are stretched to fit. 
-        /// The LocalMidiDurationDefs after bar 83 are compressed to fit. 
+        /// Returns a VoiceDef containing clones of the LocalMidiDurationDefs in the originalVoiceDef argument,
+        /// rotated so that the original first LocalMidiDurationDef is positioned close to rotationMsPosition.
         /// </summary>
         /// <param name="originalVoiceDef"></param>
         /// <returns></returns>
-        private VoiceDef GetBasicWind4(VoiceDef originalVoiceDef, List<int> barlineMsPositions)
+        private VoiceDef GetRotatedWind(VoiceDef originalVoiceDef, int rotationMsPosition)
         {
             VoiceDef tempWind = originalVoiceDef.Clone();
-            int finalBarlineMsPosition = barlineMsPositions[barlineMsPositions.Count - 1];
-            int msDurationAfterSynch = finalBarlineMsPosition - barlineMsPositions[82]; 
+            int finalBarlineMsPosition = originalVoiceDef.EndMsPosition;
+            int msDurationAfterSynch = finalBarlineMsPosition - rotationMsPosition;
 
             List<LocalMidiDurationDef> originalLmdds = tempWind.LocalMidiDurationDefs;
             List<LocalMidiDurationDef> originalStartLmdds = new List<LocalMidiDurationDef>();
-            List<LocalMidiDurationDef> wind4Lmdds = new List<LocalMidiDurationDef>();
+            List<LocalMidiDurationDef> newWindLmdds = new List<LocalMidiDurationDef>();
             int accumulatingMsDuration = 0;
             for(int i = 0; i < tempWind.Count; ++i)
             {
-                if(accumulatingMsDuration <= msDurationAfterSynch)
+                if(accumulatingMsDuration < msDurationAfterSynch)
                 {
                     originalStartLmdds.Add(originalLmdds[i]);
                     accumulatingMsDuration += originalLmdds[i].MsDuration;
                 }
                 else
                 {
-                    wind4Lmdds.Add(originalLmdds[i]);
+                    newWindLmdds.Add(originalLmdds[i]);
                 }
             }
-            wind4Lmdds.AddRange(originalStartLmdds);
+            newWindLmdds.AddRange(originalStartLmdds);
 
             int msPosition = 0;
-            foreach(LocalMidiDurationDef lmdd in wind4Lmdds)
+            foreach(LocalMidiDurationDef lmdd in newWindLmdds)
             {
                 lmdd.MsPosition = msPosition;
                 msPosition += lmdd.MsDuration;
             }
-            VoiceDef wind4 = new VoiceDef(wind4Lmdds);
+            VoiceDef newRotatedWind = new VoiceDef(newWindLmdds);
 
-            return wind4;
+            return newRotatedWind;
         }
-
-        /// <summary>
-        /// Creates a new Wind, which begins with a rest of duration=startMsPosition,
-        /// followed by a clone of the beginning of the originalWind (=Wind 5).
-        /// As much of the originalWind is used as possible. The cloned LocalMidiDurationDefs are stretched to fit exactly.
-        /// </summary>
-        private VoiceDef GetBasicUpperWind(VoiceDef originalWind, int startMsPosition, int finalBarlineMsPosition)
-        {
-            VoiceDef newWind = originalWind.Clone();
-            int msDuration = finalBarlineMsPosition - startMsPosition;
-            int accumulatingDuration = 0;
-            int maxIndex = 0;
-            for(int i = 0; i < newWind.Count; ++i)
-            {
-                accumulatingDuration += newWind[i].MsDuration;
-                if(accumulatingDuration > msDuration)
-                {
-                    break;
-                }
-                maxIndex = i;
-            }
-            for(int i = newWind.Count - 1; i > maxIndex; --i)
-            {
-                newWind.LocalMidiDurationDefs.RemoveAt(i);
-            }
-            newWind.MsDuration = msDuration; // stretches or compresses newWind
-            LocalMidiDurationDef lmdd = new LocalMidiDurationDef(startMsPosition);
-            newWind.LocalMidiDurationDefs.Insert(0, lmdd);
-            newWind.MsPosition = 0;
-
-            return newWind;
-        }
-
-        #region attributes
-        // each VoiceDef has the duration of the whole piece
-        // The VoiceDefs are in bottom to top order. VoiceDefs[0] is the lowest Wind (Wind 5)
-        internal List<VoiceDef> VoiceDefs = new List<VoiceDef>();
-        #endregion
     }
 }
