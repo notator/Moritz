@@ -13,11 +13,11 @@ namespace Moritz.AssistantComposer
     /// </summary>
     public class Clytemnestra : VoiceDef
     {
-        public Clytemnestra(int tempInterludeMsDuration) 
+        public Clytemnestra(VoiceDef wind3) 
             : base(new List<LocalMidiDurationDef>())
         {
             SetMomentDefsListPerVerse();
-            SetLocalMidiDurationDefs(tempInterludeMsDuration);
+            SetLocalMidiDurationDefs(wind3);
         }
 
         /// <summary>
@@ -258,39 +258,46 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// Sets Clytamnestra's _localMidiDurationDefs for the whole piece including rests (but no bars)
-        /// Adds a 10 second LocalMidiRestDef between verses, whose duration will be changed later.
-        /// Sets the private _verseIndices list.
+        /// Sets Clytamnestra's _localMidiDurationDefs for the whole piece including rests.
+        /// Barline positions are set later.
         /// </summary>
-        private void SetLocalMidiDurationDefs(int tempInterludeMsDuration)
+        private void SetLocalMidiDurationDefs(VoiceDef wind3)
         {
             Debug.Assert(_momentDefsListPerVerse.Count == 5);
 
-            LocalMidiDurationDef localMidiRestDef = new LocalMidiDurationDef(tempInterludeMsDuration);
-            _localMidiDurationDefs.Add(localMidiRestDef);
+            List<int> verseMsPositions = new List<int>();
+            verseMsPositions.Add(wind3[8].MsPosition);
+            verseMsPositions.Add(wind3[20].MsPosition);
+            verseMsPositions.Add(wind3[33].MsPosition);
+            verseMsPositions.Add(wind3[49].MsPosition);
+            verseMsPositions.Add(wind3[70].MsPosition);
 
-            int currentVersePosition = tempInterludeMsDuration;
+            int currentVerseMsPosition = 0;
+            int currentEndMsPosition = 0;
+            LocalMidiDurationDef intervalRestDef = null;
 
             for(int verseIndex = 0; verseIndex < 5; ++verseIndex)
-            {
-                _verseIndices.Add(_localMidiDurationDefs.Count);
+            { 
+                currentVerseMsPosition = verseMsPositions[verseIndex];
+
+                intervalRestDef = new LocalMidiDurationDef(currentEndMsPosition, currentVerseMsPosition - currentEndMsPosition);
+
+                _localMidiDurationDefs.Add(intervalRestDef);
 
                 List<MomentDef> momentDefs = _momentDefsListPerVerse[verseIndex];
 
                 for(int momentDefIndex = 0; momentDefIndex < momentDefs.Count; ++momentDefIndex)
                 {
                     MomentDef momentDef = momentDefs[momentDefIndex];
-                    momentDef.MsPosition += currentVersePosition;
+                    momentDef.MsPosition += currentVerseMsPosition;
 
                     int restWidth = momentDef.MsWidth - momentDef.MaximumMsDuration;
                     LocalMidiDurationDef lmrd = null;
                     if(restWidth > 0)
                     {
                         momentDef.MsWidth -= restWidth;
-                        lmrd = new LocalMidiDurationDef(restWidth);
+                        lmrd = new LocalMidiDurationDef(momentDef.MsPosition + momentDef.MsWidth, restWidth);
                         Debug.Assert(lmrd.MsDuration > 0);
-
-                        lmrd.MsPosition = momentDef.MsPosition + momentDef.MsWidth;
                     }
 
                     MidiChordDef mcd = momentDef.MidiChordDefs[0];
@@ -303,12 +310,12 @@ namespace Moritz.AssistantComposer
                     {
                         _localMidiDurationDefs.Add(lmrd);
                     }
+                    currentEndMsPosition = _localMidiDurationDefs[_localMidiDurationDefs.Count - 1].MsPosition +
+                        _localMidiDurationDefs[_localMidiDurationDefs.Count - 1].MsDuration;
                 }
-
-                localMidiRestDef = new LocalMidiDurationDef(tempInterludeMsDuration);
-                _localMidiDurationDefs.Add(localMidiRestDef);
-                currentVersePosition += tempInterludeMsDuration;
             }
+            intervalRestDef = new LocalMidiDurationDef(currentEndMsPosition, wind3.EndMsPosition - currentEndMsPosition);
+            _localMidiDurationDefs.Add(intervalRestDef);
         }
 
         private List<List<MomentDef>> _momentDefsListPerVerse;
@@ -327,7 +334,5 @@ namespace Moritz.AssistantComposer
                 }
             }
         }
-
-        private List<int> _verseIndices = new List<int>();
     }
 }

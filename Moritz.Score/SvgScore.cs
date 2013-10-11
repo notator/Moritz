@@ -515,8 +515,7 @@ namespace Moritz.Score
                                 fontSize = rest.FontHeight;
                                 voice.NoteObjects.RemoveAt(indToReplace[j]);
                             }
-                            LocalMidiDurationDef lmdd = new LocalMidiDurationDef(msDuration);
-                            lmdd.MsPosition = msPos;
+                            LocalMidiDurationDef lmdd = new LocalMidiDurationDef(msPos, msDuration);
                             RestSymbol newRest = new RestSymbol(voice, lmdd, minimumCrotchetDuration, _pageFormat.MusicFontHeight);
                             newRest.MsPosition = msPos;
                             voice.NoteObjects.Insert(indToReplace[0], newRest);

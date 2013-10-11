@@ -40,16 +40,16 @@ namespace Moritz.Score.Midi
         }
 
         /// <summary>
-        /// This constructor can be used to construct a UniqueMidiRestDef at MsPosition=0.
+        /// This constructor can be used to construct a UniqueMidiRestDef.
         /// The MsPosition and/or MsDuration can be changed later.
         /// </summary>
         /// <param name="msDuration"></param>
-        public LocalMidiDurationDef(int msDuration)
+        public LocalMidiDurationDef(int msPosition, int msDuration)
         {
             Debug.Assert(msDuration > 0);
             UniqueMidiDurationDef = new UniqueMidiRestDef(new MidiRestDef("", msDuration));
-            MsPosition = 0; // can be reset later
-            MsDuration = msDuration;
+            MsPosition = msPosition; // can be reset later
+            MsDuration = msDuration; // can be reset later
         }
 
         /// <summary>

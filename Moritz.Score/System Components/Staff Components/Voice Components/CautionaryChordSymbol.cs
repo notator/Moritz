@@ -50,7 +50,6 @@ namespace Moritz.Score
             return sb.ToString();
         }
 
-        MidiChordDef CautionaryMidiChordDef = null;
         public float LeftBracketLeft = float.MaxValue;
         public float RightBracketRight = float.MinValue;
  

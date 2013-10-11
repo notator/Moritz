@@ -48,18 +48,16 @@ namespace Moritz.AssistantComposer
         /// </returns>
         public override List<List<Voice>> DoAlgorithm()
         {
-            int tempInterludeMsDuration = int.MaxValue / 50;
-            Clytemnestra clytemnestra = new Clytemnestra(tempInterludeMsDuration);
             // The wind3 is the lowest wind. The winds are numbered from top to bottom in the score.
             VoiceDef wind3 = new VoiceDef(_paletteDefs[0], _krystals[2]);
-            wind3.Transpose(0, wind3.Count, -13);
-
-            AlignClytemnestraToRootWind(clytemnestra, wind3, tempInterludeMsDuration);
-
+            wind3.Transpose(0, wind3.Count, -13); 
+            
+            Clytemnestra clytemnestra = new Clytemnestra(wind3);
+ 
             VoiceDef wind2 = GetWind2(wind3, clytemnestra.LocalMidiDurationDefs[59].MsPosition);
             VoiceDef wind1 = GetWind1(wind3, clytemnestra.LocalMidiDurationDefs[116].MsPosition);
             
-            // Complete the winds and birds.
+            // Construct the furies.
 
             VoiceDef control = GetControlVoiceDef(clytemnestra, wind1, wind2, wind3);
 
@@ -83,39 +81,6 @@ namespace Moritz.AssistantComposer
             List<List<Voice>> bars = GetBars(system, barlineMsPositions);
 
             return bars;
-        }
-
-        /// <summary>
-        /// Aligns Clytemnestra's verses to MsPositions in the rootWind (the lowest wind)
-        /// </summary>
-        /// <param name="clytemnestra"></param>
-        /// <param name="rootWind"></param>
-        /// <param name="tempInterludeMsDuration"></param>
-        private void AlignClytemnestraToRootWind(Clytemnestra clytemnestra, VoiceDef rootWind, int tempInterludeMsDuration)
-        {
-            List<int> verseMsPositions = new List<int>();
-            verseMsPositions.Add(rootWind[8].MsPosition);
-            verseMsPositions.Add(rootWind[20].MsPosition);
-            verseMsPositions.Add(rootWind[33].MsPosition);
-            verseMsPositions.Add(rootWind[49].MsPosition);
-            verseMsPositions.Add(rootWind[70].MsPosition);
-
-            List<LocalMidiDurationDef> clmdds = clytemnestra.LocalMidiDurationDefs;
-            clmdds[0].MsDuration = verseMsPositions[0];
-            clmdds[0].UniqueMidiDurationDef.MsDuration = clmdds[0].MsDuration;
-            clytemnestra.MsPosition = 0; // sets all the positions
-            for(int verse = 2; verse <= 5; ++verse)
-            {
-                int interludeIndex = clytemnestra.LocalMidiDurationDefs.FindIndex(
-                    x => (x.UniqueMidiDurationDef is UniqueMidiRestDef 
-                          && x.MsDuration == tempInterludeMsDuration));
-                clmdds[interludeIndex].MsDuration = verseMsPositions[verse - 1] - clmdds[interludeIndex].MsPosition;
-                clmdds[interludeIndex].UniqueMidiDurationDef.MsDuration = clmdds[interludeIndex].MsDuration;
-                clytemnestra.MsPosition = 0; // sets all the positions
-            }
-            int lastIndex = clmdds.Count - 1;
-            clmdds[lastIndex].MsDuration = rootWind.EndMsPosition - clmdds[lastIndex].MsPosition;
-            clmdds[lastIndex].UniqueMidiDurationDef.MsDuration = clmdds[lastIndex].MsDuration;
         }
 
         /// <summary>
@@ -460,8 +425,7 @@ namespace Moritz.AssistantComposer
                 UniqueMidiChordDef umcd = new UniqueMidiChordDef(new List<byte>() { (byte)67 }, new List<byte>() { (byte)0 }, noteMsDuration, false, new List<MidiControl>());
                 LocalMidiDurationDef lmChordd = new LocalMidiDurationDef(umcd, noteMsPosition, noteMsDuration);
 
-                LocalMidiDurationDef lmRestd = new LocalMidiDurationDef(restMsDuration);
-                lmRestd.MsPosition = restMsPosition;
+                LocalMidiDurationDef lmRestd = new LocalMidiDurationDef(restMsPosition, restMsDuration);
 
                 controlLmdds.Add(lmChordd);
                 controlLmdds.Add(lmRestd);

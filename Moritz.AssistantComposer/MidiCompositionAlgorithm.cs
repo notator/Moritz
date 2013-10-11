@@ -220,8 +220,7 @@ namespace Moritz.AssistantComposer
                                 msDuration += lmdd.MsDuration;
                                 voice.LocalMidiDurationDefs.RemoveAt(indToReplace[j]);
                             }
-                            LocalMidiDurationDef replacementLmdd = new LocalMidiDurationDef(msDuration);
-                            replacementLmdd.MsPosition = msPosition;
+                            LocalMidiDurationDef replacementLmdd = new LocalMidiDurationDef(msPosition, msDuration);
                             voice.LocalMidiDurationDefs.Insert(indToReplace[0], replacementLmdd);
                         }
                     }

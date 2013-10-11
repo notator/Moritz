@@ -91,12 +91,11 @@ namespace Moritz.AssistantComposer
             foreach(MidiDurationDef midiDurationDef in midiDurationDefs)
             {
                 LocalMidiDurationDef noteDef = new LocalMidiDurationDef(midiDurationDef);
-                LocalMidiDurationDef restDef = new LocalMidiDurationDef(1500 - midiDurationDef.MsDuration);
+                LocalMidiDurationDef restDef = new LocalMidiDurationDef(msPosition, 1500 - midiDurationDef.MsDuration);
                 Debug.Assert(midiDurationDef.MsDuration > 0);
                 Debug.Assert(noteDef.MsDuration == midiDurationDef.MsDuration);
                 noteDef.MsPosition = msPosition;
                 msPosition += noteDef.MsDuration; // for this test score
-                restDef.MsPosition = msPosition;
                 msPosition += restDef.MsDuration; // for this test score
                 voice.LocalMidiDurationDefs.Add(noteDef);
                 voice.LocalMidiDurationDefs.Add(restDef);
@@ -137,8 +136,7 @@ namespace Moritz.AssistantComposer
                 int mdsdEndPos = voiceDefs[i].EndMsPosition;
                 if(maxBarMsPos > mdsdEndPos)
                 {
-                    LocalMidiDurationDef rest2Def = new LocalMidiDurationDef(maxBarMsPos - mdsdEndPos);
-                    rest2Def.MsPosition = mdsdEndPos;
+                    LocalMidiDurationDef rest2Def = new LocalMidiDurationDef(mdsdEndPos, maxBarMsPos - mdsdEndPos);
                     bar[i].LocalMidiDurationDefs.Add(rest2Def);
                 }
             }
@@ -154,8 +152,7 @@ namespace Moritz.AssistantComposer
             LocalMidiDurationDef rest1Def = null;
             if(msPosition > bar2StartMsPos)
             {
-                rest1Def = new LocalMidiDurationDef(msPosition - bar2StartMsPos);
-                rest1Def.MsPosition = bar2StartMsPos;
+                rest1Def = new LocalMidiDurationDef(bar2StartMsPos, msPosition - bar2StartMsPos);
                 voice.LocalMidiDurationDefs.Add(rest1Def);
             }
 
