@@ -326,7 +326,7 @@ namespace Moritz.AssistantComposer
                 #endregion
                 #region finale
                 c[289].MsPosition, 100,
-                w3[77].MsPosition, 3000,
+                w3[77].MsPosition, w3[81].MsDuration / 2,
                 #endregion
                 w3.EndMsPosition // final barline position
                 #endregion

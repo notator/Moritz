@@ -292,7 +292,7 @@ namespace Moritz.AssistantComposer
             RootInversionTextBox.Enabled = true;
             RootInversionHelpLabel.Text = primeIntervalsCountString + integerString + valuesInRangeString + "[ 1..127 ]";
 
-            VerticalVelocityFactorsHelpLabel.Text = countString + floatString + valuesInRangeString + "[ 0.0..100.0 ]";
+            VerticalVelocityFactorsHelpLabel.Text = countString + floatString + valuesInRangeString + "[ 0.0..1.0 ]";
             VerticalVelocityFactorsLabel.Enabled = true;
             VerticalVelocityFactorsHelpLabel.Enabled = true;
             VerticalVelocityFactorsTextBox.Enabled = true;

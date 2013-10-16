@@ -135,9 +135,9 @@
             this.VerticalVelocityFactorsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
             this.VerticalVelocityFactorsHelpLabel.Location = new System.Drawing.Point(542, 198);
             this.VerticalVelocityFactorsHelpLabel.Name = "VerticalVelocityFactorsHelpLabel";
-            this.VerticalVelocityFactorsHelpLabel.Size = new System.Drawing.Size(174, 13);
+            this.VerticalVelocityFactorsHelpLabel.Size = new System.Drawing.Size(162, 13);
             this.VerticalVelocityFactorsHelpLabel.TabIndex = 128;
-            this.VerticalVelocityFactorsHelpLabel.Text = "7 float values in range [ 0.0..100.0 ]";
+            this.VerticalVelocityFactorsHelpLabel.Text = "7 float values in range [ 0.0..1.0 ]";
             // 
             // MidiPitchesTextBox
             // 
@@ -162,11 +162,11 @@
             // 
             this.VerticalVelocityFactorsLabel.AutoSize = true;
             this.VerticalVelocityFactorsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.VerticalVelocityFactorsLabel.Location = new System.Drawing.Point(30, 198);
+            this.VerticalVelocityFactorsLabel.Location = new System.Drawing.Point(22, 198);
             this.VerticalVelocityFactorsLabel.Name = "VerticalVelocityFactorsLabel";
-            this.VerticalVelocityFactorsLabel.Size = new System.Drawing.Size(139, 13);
+            this.VerticalVelocityFactorsLabel.Size = new System.Drawing.Size(154, 13);
             this.VerticalVelocityFactorsLabel.TabIndex = 121;
-            this.VerticalVelocityFactorsLabel.Text = "( vertical velocity factors (1))";
+            this.VerticalVelocityFactorsLabel.Text = "( vertical velocity factors ( 1.0 ))";
             // 
             // RootInversionHelpLabel
             // 
