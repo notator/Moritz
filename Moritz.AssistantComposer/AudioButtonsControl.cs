@@ -107,19 +107,35 @@ namespace Moritz.AssistantComposer
         }
         public void WriteAudioFiles(XmlWriter w)
         {
-            w.WriteStartElement("audioFiles");
+            bool audioFilesExist = false;
+
             foreach(Button button in _audioSampleButtons)
             {
                 MoritzMediaPlayer player = button.Tag as MoritzMediaPlayer;
                 Debug.Assert(player != null);
-                w.WriteStartElement("file");
-                if(String.IsNullOrEmpty(player.URL))
-                    w.WriteString("");
-                else
-                    w.WriteString(Path.GetFileName(player.URL));
-                w.WriteEndElement(); // "file"
+                if(!(String.IsNullOrEmpty(player.URL)))
+                {
+                    audioFilesExist = true;
+                    break;
+                }
+
             }
-            w.WriteEndElement(); // "audioFiles"
+            if(audioFilesExist)
+            {
+                w.WriteStartElement("audioFiles");
+                foreach(Button button in _audioSampleButtons)
+                {
+                    MoritzMediaPlayer player = button.Tag as MoritzMediaPlayer;
+                    Debug.Assert(player != null);
+                    w.WriteStartElement("file");
+                    if(String.IsNullOrEmpty(player.URL))
+                        w.WriteString("");
+                    else
+                        w.WriteString(Path.GetFileName(player.URL));
+                    w.WriteEndElement(); // "file"
+                }
+                w.WriteEndElement(); // "audioFiles"
+            }
         }
 
         private void AddAudioButtons(int domain)

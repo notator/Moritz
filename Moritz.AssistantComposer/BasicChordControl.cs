@@ -33,49 +33,52 @@ namespace Moritz.AssistantComposer
             VerticalVelocityFactorsTextBox.Text = "";
             #endregion
 
-            M.ReadToXmlElementTag(r, 
-                "durations", "velocities", "midiPitches",
-                "chordOffs", "chordDensities", "rootInversion", "inversionIndices", "verticalVelocityFactors");
-            while(r.Name == "durations" || r.Name == "velocities"|| r.Name == "midiPitches"
-                || r.Name == "chordOffs" 
-                || r.Name == "chordDensities" || r.Name == "rootInversion" 
-                || r.Name == "inversionIndices" || r.Name == "verticalVelocityFactors" )
+            if(!r.IsEmptyElement)
             {
-                if(r.NodeType != XmlNodeType.EndElement)
-                {
-                    switch(r.Name)
-                    {
-                        case "durations":
-                            DurationsTextBox.Text = r.ReadElementContentAsString();
-                            break;
-                        case "velocities":
-                            VelocitiesTextBox.Text = r.ReadElementContentAsString();
-                            break;
-                        case "midiPitches":
-                            MidiPitchesTextBox.Text = r.ReadElementContentAsString();
-                            break;
-                        case "chordOffs":
-                            ChordOffsTextBox.Text = r.ReadElementContentAsString();
-                            break;
-                        case "chordDensities":
-                            ChordDensitiesTextBox.Text = r.ReadElementContentAsString();
-                            break;
-                        case "rootInversion":
-                            RootInversionTextBox.Text = r.ReadElementContentAsString();
-                            break;
-                        case "inversionIndices":
-                            InversionIndicesTextBox.Text = r.ReadElementContentAsString();
-                            break;
-                        case "verticalVelocityFactors":
-                            VerticalVelocityFactorsTextBox.Text = r.ReadElementContentAsString();
-                            break;
-                    }
-                }
-                M.ReadToXmlElementTag(r, 
-                    "basicChord", "durations", "velocities", "midiPitches",
+                M.ReadToXmlElementTag(r,
+                    "durations", "velocities", "midiPitches",
                     "chordOffs", "chordDensities", "rootInversion", "inversionIndices", "verticalVelocityFactors");
+                while(r.Name == "durations" || r.Name == "velocities" || r.Name == "midiPitches"
+                    || r.Name == "chordOffs"
+                    || r.Name == "chordDensities" || r.Name == "rootInversion"
+                    || r.Name == "inversionIndices" || r.Name == "verticalVelocityFactors")
+                {
+                    if(r.NodeType != XmlNodeType.EndElement)
+                    {
+                        switch(r.Name)
+                        {
+                            case "durations":
+                                DurationsTextBox.Text = r.ReadElementContentAsString();
+                                break;
+                            case "velocities":
+                                VelocitiesTextBox.Text = r.ReadElementContentAsString();
+                                break;
+                            case "midiPitches":
+                                MidiPitchesTextBox.Text = r.ReadElementContentAsString();
+                                break;
+                            case "chordOffs":
+                                ChordOffsTextBox.Text = r.ReadElementContentAsString();
+                                break;
+                            case "chordDensities":
+                                ChordDensitiesTextBox.Text = r.ReadElementContentAsString();
+                                break;
+                            case "rootInversion":
+                                RootInversionTextBox.Text = r.ReadElementContentAsString();
+                                break;
+                            case "inversionIndices":
+                                InversionIndicesTextBox.Text = r.ReadElementContentAsString();
+                                break;
+                            case "verticalVelocityFactors":
+                                VerticalVelocityFactorsTextBox.Text = r.ReadElementContentAsString();
+                                break;
+                        }
+                    }
+                    M.ReadToXmlElementTag(r,
+                        "basicChord", "durations", "velocities", "midiPitches",
+                        "chordOffs", "chordDensities", "rootInversion", "inversionIndices", "verticalVelocityFactors");
+                }
+                Debug.Assert(r.Name == "basicChord"); // end element
             }
-            Debug.Assert(r.Name == "basicChord"); // end element
         }
 
         public void WriteBasicChordControl(XmlWriter w)
