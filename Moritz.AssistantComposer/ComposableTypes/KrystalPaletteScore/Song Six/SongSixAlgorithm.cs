@@ -24,7 +24,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         public override List<byte> MidiChannels()
         {
-            return new List<byte>() { 0, 1, 2, 3, 4 };
+            return new List<byte>() { 0, 1, 2, 3, 4, 5 };
         }
 
         /// <summary>
@@ -48,6 +48,13 @@ namespace Moritz.AssistantComposer
         /// </returns>
         public override List<List<Voice>> DoAlgorithm()
         {
+            // Palettes: projected contents:
+            // palette 1 (_paletteDefs[0]): wind definitions.
+            // palette 2 (_paletteDefs[1]): very high furies - models and definitions
+            // palette 3 (_paletteDefs[2]): high furies - models and definitions
+            // palette 4 (_paletteDefs[3]): low furies - models and definitions
+            // palette 5 (_paletteDefs[4]): very low furies - models and definitions
+
             // The wind3 is the lowest wind. The winds are numbered from top to bottom in the score.
             VoiceDef wind3 = GetWind3(_paletteDefs[0], _krystals[2]);
             
@@ -57,8 +64,9 @@ namespace Moritz.AssistantComposer
             VoiceDef wind1 = GetWind1(wind3, clytemnestra);
             
             // Construct the Furies.
+            VoiceDef fury1 = GetFury1(wind3, _paletteDefs[1]);
 
-            VoiceDef control = GetControlVoiceDef(clytemnestra, wind1, wind2, wind3);
+            VoiceDef control = GetControlVoiceDef(fury1, clytemnestra, wind1, wind2, wind3);
 
             #region code for testing VoiceDef functions
             //bassWind.SetContour(11, new List<int>() { 1, 4, 1, 2 }, 1, 1);
@@ -68,7 +76,7 @@ namespace Moritz.AssistantComposer
             #endregion
 
             // Add each voiceDef to voiceDefs here, in top to bottom (=channelIndex) order in the score.
-            List<VoiceDef> voiceDefs = new List<VoiceDef>() {control, clytemnestra, wind1, wind2, wind3 /* etc.*/};
+            List<VoiceDef> voiceDefs = new List<VoiceDef>() {control, fury1, clytemnestra, wind1, wind2, wind3 /* etc.*/};
             Debug.Assert(voiceDefs.Count == MidiChannels().Count);
             foreach(VoiceDef voiceDef in voiceDefs)
             {
@@ -246,8 +254,9 @@ namespace Moritz.AssistantComposer
         /// The control VoiceDef consists of single note + rest pairs,
         /// whose msPositions and msDurations are composed here.
         /// </summary>
-        private VoiceDef GetControlVoiceDef(Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
+        private VoiceDef GetControlVoiceDef(VoiceDef fury1, Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
         {
+            VoiceDef f1 = fury1;
             VoiceDef w1 = wind1;
             VoiceDef w2 = wind2;
             VoiceDef w3 = wind3;
@@ -259,8 +268,13 @@ namespace Moritz.AssistantComposer
             {
                 #region positions (in temporal order)
                 #region introduction
-                0, 100,
-                w3[1].MsPosition, 100,
+                0, 800,
+                f1[1].MsPosition, f1[2].MsDuration / 2,
+                f1[3].MsPosition, f1[4].MsDuration / 2,
+                f1[5].MsPosition, f1[6].MsDuration / 2,
+                f1[7].MsPosition, f1[8].MsDuration / 2,
+                f1[9].MsPosition, w3[3].MsPosition - w1[3].MsPosition,
+
                 w3[3].MsPosition, 100,
                 w3[5].MsPosition, 100,
                 #endregion

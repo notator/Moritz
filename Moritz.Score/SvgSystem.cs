@@ -55,7 +55,6 @@ namespace Moritz.Score
             Debug.Assert(barlineIsInsideStaffGroup.Count == Staves.Count);
             Debug.Assert(barlineIsInsideStaffGroup[Staves.Count - 1] == false);
             Barline barline = null;
-            float firstBarlineX = 0F;
             bool isFirstBarline = true;
 
             for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
@@ -87,12 +86,6 @@ namespace Moritz.Score
                     barline = voice.NoteObjects[i] as Barline;
                     if(barline != null)
                     {
-                        if(staffIndex == 0 && isFirstBarline)
-                        {
-                            firstBarlineX = barline.Metrics.OriginX;
-                            isFirstBarline = false;
-                        }
-
                         if(barline.Visible)
                         {
                             if(staff.NumberOfStafflines >= 5 && i == (voice.NoteObjects.Count - 1))
@@ -111,19 +104,21 @@ namespace Moritz.Score
                 {
                     BottomEdge bottomEdge = new BottomEdge(staff, 0F, pageRight, gap);
                     TopEdge topEdge = new TopEdge(Staves[staffIndex + 1], 0F, pageRight);
+                    isFirstBarline = true;
+
                     for(int i = 0; i < voice.NoteObjects.Count; ++i)
                     {
                         NoteObject noteObject = voice.NoteObjects[i];
                         barline = noteObject as Barline;
                         if(barline != null)
                         {
-                            float x = barline.Metrics.OriginX;
                             // draw grouping barlines between staves
-                            if(barlineIsInsideStaffGroup[staffIndex] || x == firstBarlineX)
+                            if(barlineIsInsideStaffGroup[staffIndex] || isFirstBarline)
                             {
-                                float top = bottomEdge.YatX(x);
-                                float bottom = topEdge.YatX(x);
+                                float top = bottomEdge.YatX(barline.Metrics.OriginX);
+                                float bottom = topEdge.YatX(barline.Metrics.OriginX);
                                 barline.WriteSVG(w, top, bottom, barlineStrokeWidth);
+                                isFirstBarline = false;
                             }
                         }
                     }
