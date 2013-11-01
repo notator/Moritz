@@ -311,7 +311,7 @@ namespace Moritz.Score
                 w.WriteAttributeString("x", left.ToString(M.En_USNumberFormat));
                 w.WriteAttributeString("y", titleBaseline.ToString(M.En_USNumberFormat));
                 w.WriteAttributeString("fill", "#1010C6");
-                w.WriteAttributeString("text-anchor", "left");
+                w.WriteAttributeString("text-anchor", "start");
                 w.WriteAttributeString("font-size", _pageFormat.Page1AuthorHeight.ToString(M.En_USNumberFormat));
                 w.WriteAttributeString("font-family", fontFamily);
 

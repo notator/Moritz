@@ -88,15 +88,14 @@ namespace Moritz.AssistantComposer
         private void WriteVoiceMidiDurationDefs1(Voice voice, PaletteDef midiDurationDefs)
         {
             int msPosition = 0;
+            int bar1ChordMsSeparation = 1500;
             foreach(MidiDurationDef midiDurationDef in midiDurationDefs)
             {
-                LocalMidiDurationDef noteDef = new LocalMidiDurationDef(midiDurationDef);
-                LocalMidiDurationDef restDef = new LocalMidiDurationDef(msPosition, 1500 - midiDurationDef.MsDuration);
                 Debug.Assert(midiDurationDef.MsDuration > 0);
-                Debug.Assert(noteDef.MsDuration == midiDurationDef.MsDuration);
+                LocalMidiDurationDef noteDef = new LocalMidiDurationDef(midiDurationDef);
                 noteDef.MsPosition = msPosition;
-                msPosition += noteDef.MsDuration; // for this test score
-                msPosition += restDef.MsDuration; // for this test score
+                LocalMidiDurationDef restDef = new LocalMidiDurationDef(msPosition + noteDef.MsDuration, bar1ChordMsSeparation - noteDef.MsDuration);
+                msPosition += bar1ChordMsSeparation;
                 voice.LocalMidiDurationDefs.Add(noteDef);
                 voice.LocalMidiDurationDefs.Add(restDef);
             }

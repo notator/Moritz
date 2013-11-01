@@ -135,17 +135,17 @@ namespace Moritz.Score
         private void WriteMarkers(SvgWriter w)
         {
             w.SvgStartGroup("startMarker");
-            w.SvgLine(null, 0, 0, 0, 0, "009900", 1, null, null);
-            w.SvgEllipse(null, 0, 0, 0, 0, null, 1, "009900", null);
+            w.SvgLine(null, 0, 0, 0, 0, "#009900", 1, null, null);
+            w.SvgEllipse(null, 0, 0, 0, 0, null, 1, "#009900", null);
             w.SvgEndGroup();
 
             w.SvgStartGroup("runningMarker");
-            w.SvgLine(null, 0, 0, 0, 0, "888888", 1, null, null);
+            w.SvgLine(null, 0, 0, 0, 0, "#888888", 1, null, null);
             w.SvgEndGroup();
 
             w.SvgStartGroup("endMarker");
-            w.SvgLine(null, 0, 0, 0, 0, "FF0000", 1, null, null);
-            w.SvgRect(null, 0, 0, 0, 0, null, 1, "FF0000", null);
+            w.SvgLine(null, 0, 0, 0, 0, "#FF0000", 1, null, null);
+            w.SvgRect(null, 0, 0, 0, 0, null, 1, "#FF0000", null);
             w.SvgEndGroup();
          }
 
