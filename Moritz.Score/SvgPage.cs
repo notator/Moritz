@@ -191,7 +191,8 @@ namespace Moritz.Score
         public void WriteSVG(SvgWriter w, Metadata metadata, int pageNumber)
         {
             w.WriteStartDocument(); // standalone="no"
-            w.WriteProcessingInstruction("xml-stylesheet", "href=\"http://james-ingram-act-two.de/fontsStyleSheet.css\" type=\"text/css\"");
+            //<?xml-stylesheet href="../../fontsStyleSheet.css" type="text/css"?>
+            w.WriteProcessingInstruction("xml-stylesheet", "href=\"../../fontsStyleSheet.css\" type=\"text/css\"");
             w.WriteStartElement("svg", "http://www.w3.org/2000/svg");
 
             WriteSvgHeader(w, pageNumber);
