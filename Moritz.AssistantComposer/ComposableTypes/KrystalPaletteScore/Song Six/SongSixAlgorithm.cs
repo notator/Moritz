@@ -62,6 +62,11 @@ namespace Moritz.AssistantComposer
 
             VoiceDef wind2 = GetWind2(wind3, clytemnestra);
             VoiceDef wind1 = GetWind1(wind3, clytemnestra);
+
+            // WindPitchWheelDeviations change per section in Song Six
+            AdjustWindPitchWheelDeviations(wind1);
+            AdjustWindPitchWheelDeviations(wind2);
+            AdjustWindPitchWheelDeviations(wind3);
             
             // Construct the Furies.
             VoiceDef fury1 = GetFury1(wind3, _paletteDefs[1]);
@@ -88,6 +93,65 @@ namespace Moritz.AssistantComposer
             List<List<Voice>> bars = GetBars(system, barlineMsPositions);
 
             return bars;
+        }
+
+        private void AdjustWindPitchWheelDeviations(VoiceDef wind)
+        {
+            byte? versePwdValue = 3;
+            double windStartPwdValue = 12, windEndPwdValue=28;
+            double pwdfactor = Math.Pow(windEndPwdValue/windStartPwdValue, (double)1/5); // 5th root of windEndPwdValue/windStartPwdValue -- the last pwd should be windEndPwdValue
+
+            for(int i = 0; i < wind.Count; ++i)
+            {
+                UniqueMidiChordDef umcd = wind[i].UniqueMidiDurationDef as UniqueMidiChordDef;
+                if(umcd != null)
+                {
+                    if(i < 8) //prelude
+                    {
+                        umcd.PitchWheelDeviation = (byte?) windStartPwdValue;
+                    }
+                    else if(i < 15) // verse 1
+                    {
+                        umcd.PitchWheelDeviation = versePwdValue;
+                    }
+                    else if(i < 20) // interlude 1
+                    {
+                        umcd.PitchWheelDeviation = (byte?)(windStartPwdValue * pwdfactor);
+                    }
+                    else if(i < 24) // verse 2
+                    {
+                        umcd.PitchWheelDeviation = versePwdValue;
+                    }
+                    else if(i < 33) // interlude 2
+                    {
+                        umcd.PitchWheelDeviation = (byte?)(windStartPwdValue * (Math.Pow(pwdfactor, 2)));
+                    }
+                    else if(i < 39) // verse 3
+                    {
+                        umcd.PitchWheelDeviation = versePwdValue;
+                    }
+                    else if(i < 49) // interlude 3
+                    {
+                        umcd.PitchWheelDeviation = (byte?)(windStartPwdValue * (Math.Pow(pwdfactor, 3)));
+                    }
+                    else if(i < 57) // verse 4
+                    {
+                        umcd.PitchWheelDeviation = versePwdValue;
+                    }
+                    else if(i < 70) // interlude 4
+                    {
+                        umcd.PitchWheelDeviation = (byte?)(windStartPwdValue * (Math.Pow(pwdfactor, 4)));
+                    }
+                    else if(i < 74) // verse 5
+                    {
+                        umcd.PitchWheelDeviation = versePwdValue;
+                    }
+                    else // postlude
+                    {
+                        umcd.PitchWheelDeviation = (byte?)(windStartPwdValue * (Math.Pow(pwdfactor, 5)));
+                    }
+                }                
+            }
         }
 
         /// <summary>

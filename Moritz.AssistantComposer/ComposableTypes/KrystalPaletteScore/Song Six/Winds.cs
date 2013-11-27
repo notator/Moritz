@@ -39,6 +39,22 @@ namespace Moritz.AssistantComposer
             return wind2;
         }
 
+        //private void RemovePitchBendCommands(LocalMidiDurationDef lmdd)
+        //{
+        //    UniqueMidiChordDef umcd = lmdd.UniqueMidiDurationDef as UniqueMidiChordDef;
+        //    if(umcd != null)
+        //    {
+        //        umcd.PitchWheelDeviation = 24;
+        //        umcd.MidiChordSliderDefs.PitchWheelMsbs.Clear();
+        //    }
+        //}
+
+        /// <summary>
+        /// Pitchwheel commands have been removed from Wind 1.
+        /// </summary>
+        /// <param name="wind3"></param>
+        /// <param name="clytemnestra"></param>
+        /// <returns></returns>
         private VoiceDef GetWind1(VoiceDef wind3, Clytemnestra clytemnestra)
         {
             List<LocalMidiDurationDef> clytLmdds = clytemnestra.LocalMidiDurationDefs;
@@ -51,6 +67,14 @@ namespace Moritz.AssistantComposer
 
             wind1.AlignObjectAtIndex(0, 25, 82, rotationMsPosition);
             wind1.AlignObjectAtIndex(25, 74, 82, clytLmdds[289].MsPosition);
+
+            //// Remove the PitchBend Commands before Verse 1
+            //for(int i = 0; i < 9; ++i)
+            //{
+            //    RemovePitchBendCommands(wind1[i]);
+            //}
+
+            //SetPitchWheelDeviation(wind1[9], 2);
 
             return wind1;
         }
