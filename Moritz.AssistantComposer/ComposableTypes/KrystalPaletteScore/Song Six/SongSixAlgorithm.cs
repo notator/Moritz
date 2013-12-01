@@ -24,7 +24,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         public override List<byte> MidiChannels()
         {
-            return new List<byte>() { 0, 1, 2, 3, 4, 5 };
+            return new List<byte>() { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
         }
 
         /// <summary>
@@ -48,12 +48,9 @@ namespace Moritz.AssistantComposer
         /// </returns>
         public override List<List<Voice>> DoAlgorithm()
         {
-            // Palettes: projected contents:
-            // palette 1 (_paletteDefs[0]): wind definitions.
-            // palette 2 (_paletteDefs[1]): very high furies - models and definitions
-            // palette 3 (_paletteDefs[2]): high furies - models and definitions
-            // palette 4 (_paletteDefs[3]): low furies - models and definitions
-            // palette 5 (_paletteDefs[4]): very low furies - models and definitions
+            // Palettes contain:
+            // palette 1 (_paletteDefs[0]): wind.
+            // palette 2 (_paletteDefs[1]): low furies (growls)
 
             // The wind3 is the lowest wind. The winds are numbered from top to bottom in the score.
             VoiceDef wind3 = GetWind3(_paletteDefs[0], _krystals[2]);
@@ -67,27 +64,29 @@ namespace Moritz.AssistantComposer
             AdjustWindPitchWheelDeviations(wind1);
             AdjustWindPitchWheelDeviations(wind2);
             AdjustWindPitchWheelDeviations(wind3);
+
+            // contouring test code
+            //wind1.SetContour(2, new List<int>() { 1, 1, 1 }, 12, 1);
             
             // Construct the Furies.
-            VoiceDef fury1 = GetFury1(wind3, _paletteDefs[1]);
+            VoiceDef fury4 = GetFury4(wind3, _paletteDefs[1]);
+            VoiceDef fury3 = GetEmptyVoiceDef(wind3.EndMsPosition);
+            VoiceDef fury2 = GetEmptyVoiceDef(wind3.EndMsPosition);
+            VoiceDef fury1 = GetEmptyVoiceDef(wind3.EndMsPosition);
 
-            VoiceDef control = GetControlVoiceDef(fury1, clytemnestra, wind1, wind2, wind3);
+            // contouring test code 
+            // fury1.SetContour(1, new List<int>(){2,2,2,2,2}, 1, 6);
 
-            #region code for testing VoiceDef functions
-            //bassWind.SetContour(11, new List<int>() { 1, 4, 1, 2 }, 1, 1);
-            //bassWind.Translate(15, 4, 16);
-            // TODO:
-            // Cut, Copy, PasteAt (List<LocalMididurationDefs>) !!
-            #endregion
+            VoiceDef control = GetControlVoiceDef(fury1, fury2, fury3, fury4, clytemnestra, wind1, wind2, wind3);
 
             // Add each voiceDef to voiceDefs here, in top to bottom (=channelIndex) order in the score.
-            List<VoiceDef> voiceDefs = new List<VoiceDef>() {control, fury1, clytemnestra, wind1, wind2, wind3 /* etc.*/};
+            List<VoiceDef> voiceDefs = new List<VoiceDef>() { fury1, fury2, fury3, fury4, control, clytemnestra, wind1, wind2, wind3 };
             Debug.Assert(voiceDefs.Count == MidiChannels().Count);
             foreach(VoiceDef voiceDef in voiceDefs)
             {
                 voiceDef.SetLyricsToIndex();
             }
-            List<int> barlineMsPositions = GetBarlineMsPositions(control, clytemnestra, wind1, wind2, wind3 /* etc.*/);
+            List<int> barlineMsPositions = GetBarlineMsPositions(control, fury1, fury2, fury3, fury4, clytemnestra, wind1, wind2, wind3);
             // this system contains one Voice per channel (not divided into bars)
             List<Voice> system = GetVoices(voiceDefs);
             List<List<Voice>> bars = GetBars(system, barlineMsPositions);
@@ -157,9 +156,13 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// The returned barlineMsPositions contain both the position of bar 1 (0ms) and the position of the final barline.
         /// </summary>
-        private List<int> GetBarlineMsPositions(VoiceDef control, Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3 /* etc.*/)
+        private List<int> GetBarlineMsPositions(VoiceDef control, VoiceDef fury1, VoiceDef fury2, VoiceDef fury3, VoiceDef fury4, Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
         {
             VoiceDef ctl = control;
+            VoiceDef f1 = fury1;
+            VoiceDef f2 = fury2;
+            VoiceDef f3 = fury3;
+            VoiceDef f4 = fury4;
             Clytemnestra c = clytemnestra;
             VoiceDef w1 = wind1;
             VoiceDef w2 = wind2;
@@ -315,126 +318,73 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// The control VoiceDef consists of single note + rest pairs,
-        /// whose msPositions and msDurations are composed here.
+        /// Returns a VoiceDef containing a single rest having msDuration
         /// </summary>
-        private VoiceDef GetControlVoiceDef(VoiceDef fury1, Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private VoiceDef GetEmptyVoiceDef(int msDuration)
+        {
+            List<LocalMidiDurationDef> lmdds = new List<LocalMidiDurationDef>();
+            LocalMidiDurationDef lmRestDef = new LocalMidiDurationDef(0, msDuration);
+            lmdds.Add(lmRestDef);
+            VoiceDef emptyVoiceDef = new VoiceDef(lmdds);
+            return emptyVoiceDef;
+        }
+
+        /// <summary>
+        /// The control VoiceDef consists of single note + rest pairs whose msPositions are composed here.
+        /// </summary>
+        private VoiceDef GetControlVoiceDef(VoiceDef fury1, VoiceDef fury2, VoiceDef fury3, VoiceDef fury4, Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
         {
             VoiceDef f1 = fury1;
+            VoiceDef f2 = fury2;
+            VoiceDef f3 = fury3;
+            VoiceDef f4 = fury4;
             VoiceDef w1 = wind1;
             VoiceDef w2 = wind2;
             VoiceDef w3 = wind3;
             VoiceDef c = clytemnestra;
             // The control note msPositions and following rest msDurations.
-            // The columns here are note MsPositions and rest MsDurations respectively.
-            // A rest's MsPosition is found by subtracting its MsDuration from the following note msPosition.
-            List<int> controlNoteAndRestInfo = new List<int>()
+            // The columns here are note MsPositions and rest MsPositions respectively.
+            List<int> controlNoteAndRestMsPositions = new List<int>()
             {
                 #region positions (in temporal order)
                 #region introduction
-                0, 800,
-                f1[1].MsPosition, f1[2].MsDuration / 2,
-                f1[3].MsPosition, f1[4].MsDuration / 2,
-                f1[5].MsPosition, f1[6].MsDuration / 2,
-                f1[7].MsPosition, f1[8].MsDuration / 2,
-                f1[9].MsPosition, w3[3].MsPosition - w1[3].MsPosition,
-
-                w3[3].MsPosition, 100,
-                w3[5].MsPosition, 100,
+                0, f4[1].MsPosition / 2, 
+                f4[1].MsPosition, f4[2].MsPosition, 
+                f4[3].MsPosition, f4[4].MsPosition, 
+                f4[5].MsPosition, f4[6].MsPosition,
+                f4[7].MsPosition, f4[8].MsPosition, 
+                f4[9].MsPosition, f4[9].MsPosition + f4[9].MsDuration,
                 #endregion
                 #region verse 1
-                c[1].MsPosition,  100,
-                c[3].MsPosition,  100,
-                c[7].MsPosition,  100,
-                c[14].MsPosition, 100,
-                c[17].MsPosition, 100,
-                c[24].MsPosition, 100,
-                c[31].MsPosition, 100,
-                c[40].MsPosition, 100,
-                c[49].MsPosition, 100,
-                #endregion
-                #region interlude after verse 1
-                c[59].MsPosition,  100,
-                w2[16].MsPosition, 100,
-                w2[18].MsPosition, 100,
-                #endregion
-                #region verse 2
-                c[60].MsPosition, 100,
-                c[62].MsPosition, 100,
-                c[66].MsPosition, 100,
-                c[83].MsPosition, 100,
-                c[94].MsPosition, 100,
-                c[99].MsPosition, 100,
-                #endregion
-                #region interlude after verse 2
-                c[106].MsPosition, 100,
-                c[116].MsPosition, 100,
-                w1[26].MsPosition, 100,
-                w1[28].MsPosition, 100,
-                #endregion
-                #region verse 3
-                c[117].MsPosition, 100,
-                c[119].MsPosition, 100,
-                c[123].MsPosition, 100,
-                c[130].MsPosition, 100,
-                c[141].MsPosition, 100,
-                c[152].MsPosition, 100,
-                c[163].MsPosition, 100,
-                #endregion
-                #region interlude after verse 3
-                c[173].MsPosition, 100,
-                w3[40].MsPosition, 100,
-                w3[45].MsPosition, 100,
-                #endregion
-                #region verse 4
-                c[174].MsPosition, 100,
-                c[185].MsPosition, 100,
-                c[216].MsPosition, 100,
-                c[235].MsPosition, 100,
-                c[255].MsPosition, 100,
-                #endregion
-                #region interlude after verse 4
-                c[268].MsPosition, 100,
-                w3[63].MsPosition, 100,
-                #endregion
-                #region verse 5
-                c[269].MsPosition, 100,
-                c[278].MsPosition, 100,
-                c[288].MsPosition, 100,
-                #endregion
-                #region finale
-                c[289].MsPosition, 100,
-                w3[77].MsPosition, w3[81].MsDuration / 2,
+                c[1].MsPosition,  c[1].MsPosition + c[1].MsDuration,
                 #endregion
                 w3.EndMsPosition // final barline position
                 #endregion
             };
 
-            #region check consistency of controlNoteAndRestInfo
-            for(int i = 0; i < controlNoteAndRestInfo.Count - 3; i += 2)
-            {
-                int noteMsPosition = controlNoteAndRestInfo[i];
-                int restMsDuration = controlNoteAndRestInfo[i + 1];
-                int nextNoteMsPosition = controlNoteAndRestInfo[i + 2];
-                int restMsPosition = nextNoteMsPosition - restMsDuration;
-                int noteMsDuration = restMsPosition - noteMsPosition;
+            VoiceDef controlVoiceDef = MakeControlVoiceDef(controlNoteAndRestMsPositions);
+            return controlVoiceDef;
+        }
 
-                Debug.Assert(nextNoteMsPosition > noteMsPosition);
-                Debug.Assert(restMsPosition > noteMsPosition);
-                Debug.Assert(noteMsDuration > 0 && restMsDuration > 0);
-            }
-            #endregion
-
+        // This code should not change while composing the ControlVoiceDef.
+        // It just makes the VoiceDef from the controlNoteAndRestMsPositions defined above.
+        private static VoiceDef MakeControlVoiceDef(List<int> controlNoteAndRestMsPositions)
+        {
             List<LocalMidiDurationDef> controlLmdds = new List<LocalMidiDurationDef>();
 
-            for(int i = 0; i < controlNoteAndRestInfo.Count - 2; i += 2)
+            for(int i = 0; i < controlNoteAndRestMsPositions.Count - 2; i += 2)
             {
-                int noteMsPosition = controlNoteAndRestInfo[i];
-                int restMsDuration = controlNoteAndRestInfo[i + 1]; 
-                int nextNoteMsPosition = controlNoteAndRestInfo[i + 2];
-                int restMsPosition = nextNoteMsPosition - restMsDuration;
+                int noteMsPosition = controlNoteAndRestMsPositions[i];
+                int restMsPosition = controlNoteAndRestMsPositions[i + 1];
+                int nextNoteMsPosition = controlNoteAndRestMsPositions[i + 2];
+
+                Debug.Assert(noteMsPosition < restMsPosition && restMsPosition < nextNoteMsPosition);
+
                 int noteMsDuration = restMsPosition - noteMsPosition;
-                
+                int restMsDuration = nextNoteMsPosition - restMsPosition;
+
                 UniqueMidiChordDef umcd = new UniqueMidiChordDef(new List<byte>() { (byte)67 }, new List<byte>() { (byte)0 }, noteMsDuration, false, new List<MidiControl>());
                 LocalMidiDurationDef lmChordd = new LocalMidiDurationDef(umcd, noteMsPosition, noteMsDuration);
 
@@ -444,7 +394,6 @@ namespace Moritz.AssistantComposer
                 controlLmdds.Add(lmRestd);
             }
             VoiceDef controlVoiceDef = new VoiceDef(controlLmdds);
-
             return controlVoiceDef;
         }
 

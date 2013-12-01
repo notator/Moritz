@@ -9,12 +9,12 @@ using Krystals4ObjectLibrary;
 namespace Moritz.AssistantComposer
 {
     /// <summary>
-    /// The Wind "constructors" (part of the Song Six algorithm).
+    /// The Furies "constructors" (part of the Song Six algorithm).
     /// </summary>
     internal partial class SongSixAlgorithm : MidiCompositionAlgorithm
     {
 
-        private VoiceDef GetFury1(VoiceDef wind3, PaletteDef palette)
+        private VoiceDef GetFury4(VoiceDef wind3, PaletteDef palette)
         {
             List<LocalMidiDurationDef> snores = new List<LocalMidiDurationDef>();
             int msPosition = 0;
@@ -40,11 +40,11 @@ namespace Moritz.AssistantComposer
             paddingRest = new LocalMidiDurationDef(msPosition, paddingRestMsDuration);
             snores.Add(paddingRest);
 
-            VoiceDef fury1 = new VoiceDef(snores);
+            VoiceDef fury4 = new VoiceDef(snores);
 
-            fury1.AlignObjectAtIndex(0, 5, fury1.Count-1, wind3[1].MsPosition);
+            //fury4.AlignObjectAtIndex(0, 5, fury1.Count-1, wind3[1].MsPosition);
 
-            return fury1;
+            return fury4;
         }
     }
 }

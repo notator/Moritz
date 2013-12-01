@@ -358,8 +358,9 @@ namespace Moritz.AssistantComposer
         /// <para>-  the original List with the result.</para>
         /// <para>5. If setLyricsToIndex is true, sets the lyrics to the new indices</para>
         /// <para>SpecialCases:</para>
-        /// <para>If a partition contains a single LocalMidiRestDef, it stays where it is and the other LocalMidiDurationDefs are</para>
-        /// <para>re-ordered around it.</para>
+        /// <para>If a partition contains a single LocalMidiRestDef (the partition is a *rest*, having no 'lowest pitch'), the other</para>
+        /// <para>partitions are re-ordered as if the rest-partition was not there, and the rest-partition is subsequently re-inserted</para>
+        /// <para>at its original partition position.</para>
         /// <para>If two sub-VoiceDefs have the same initial base pitch, they stay in the same order as they were (not necessarily</para>
         /// <para>together, of course.)</para>
         /// </summary>
@@ -375,9 +376,9 @@ namespace Moritz.AssistantComposer
         /// </param>
         /// <param name="contourNumber">A value greater than or equal to 1, and less than or equal to 12. An exception is thrown if this is not the case.</param>
         /// <param name="axisNumber">A value greater than or equal to 1, and less than or equal to 12 An exception is thrown if this is not the case.</param>
-        internal void SetContour(int startAtIndex, List<int> partitionSizes, int contourNumber, int axisNumber)
+        internal void SetContour(int startAtIndex, List<int> partitionSizes, int axisNumber, int contourNumber)
         {
-            CheckSetContourArgs(startAtIndex, partitionSizes, contourNumber, axisNumber);
+            CheckSetContourArgs(startAtIndex, partitionSizes, axisNumber, contourNumber);
 
             List<List<LocalMidiDurationDef>> partitions = GetPartitions(startAtIndex, partitionSizes);
 
@@ -391,7 +392,7 @@ namespace Moritz.AssistantComposer
                 // Sort into ascending order (part 2 of the above comment)
                 partitions = SortPartitions(partitions);
                 // re-order the partitions (part 3 of the above comment)
-                partitions = DoContouring(partitions, contourNumber, axisNumber);
+                partitions = DoContouring(partitions, axisNumber, contourNumber);
             }
 
             RestoreRestPartitions(partitions, restPartitions);
@@ -529,7 +530,7 @@ namespace Moritz.AssistantComposer
         /// <para>Does not change the inner contents of the partitions themselves.</para>
         /// </summary>
         /// <returns>A re-ordered list of partitions</returns>
-        private List<List<LocalMidiDurationDef>> DoContouring(List<List<LocalMidiDurationDef>> partitions, int contourNumber, int axisNumber)
+        private List<List<LocalMidiDurationDef>> DoContouring(List<List<LocalMidiDurationDef>> partitions, int axisNumber, int contourNumber)
         {
             List<List<LocalMidiDurationDef>> contouredPartitions = new List<List<LocalMidiDurationDef>>();
             int[] contour = K.Contour(partitions.Count, contourNumber, axisNumber);
@@ -553,7 +554,7 @@ namespace Moritz.AssistantComposer
         /// <para>contourNumber is in the range 1..12</para>
         /// <para>axisNumber is in the range 1..12</para>
         /// </summary>
-        private void CheckSetContourArgs(int startAtIndex, List<int> partitionSizes, int contourNumber, int axisNumber)
+        private void CheckSetContourArgs(int startAtIndex, List<int> partitionSizes, int axisNumber, int contourNumber)
         {
             List<LocalMidiDurationDef> lmdds = _localMidiDurationDefs;
             if(startAtIndex < 0 || startAtIndex > lmdds.Count - 1)
@@ -588,7 +589,7 @@ namespace Moritz.AssistantComposer
                 throw new ArgumentException("axisNumber out of range 1..12");
             }
         }
-        #endregion
+        #endregion SetContour()
 
         /// <summary>
         /// Extracts nLocalMidiDurationDefs from the LocalMididurationDefs, and then inserts them again at the toIndex.
