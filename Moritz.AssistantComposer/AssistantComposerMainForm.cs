@@ -200,9 +200,9 @@ namespace Moritz.AssistantComposer
 
             if(!error)
             {
-                foreach(PaletteForm paletteForm in AllIPalleteForms)
+                foreach(IPaletteForm iPaletteForm in AllIPalleteForms)
                 {
-                    if(paletteForm.HasError())
+                    if(iPaletteForm.HasError())
                     {
                         error = true;
                         break;

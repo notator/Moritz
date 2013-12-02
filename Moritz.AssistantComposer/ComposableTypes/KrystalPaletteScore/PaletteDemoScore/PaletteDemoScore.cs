@@ -23,7 +23,7 @@ namespace Moritz.AssistantComposer
             Debug.Assert(palette != null);
             Debug.Assert(pageFormat.ChordSymbolType == "none");
 
-            pageFormat.MidiChannelsPerVoicePerStaff = new List<List<byte>>() { new List<byte>() { midiChannel } };
+            pageFormat.MidiChannelsPerVoicePerStaff = new List<List<byte>>() { new List<byte>() { 0 } };
             pageFormat.ClefsList = new List<string> {"t"};
             pageFormat.StafflinesPerStaff = new List<int> { 1 };
             pageFormat.StaffGroups = new List<int> { 1 };
@@ -37,7 +37,11 @@ namespace Moritz.AssistantComposer
 
             CreateScore();
 
-            this.SetAllMsPositions();
+            if(midiChannel == 9) // percussion channel
+            {
+                pageFormat.MidiChannelsPerVoicePerStaff = new List<List<byte>>() { new List<byte>() { midiChannel } };
+                this.Systems[0].Staves[0].Voices[0].MidiChannel = midiChannel;
+            }
         }
 
         public override void WriteMidiChordDefinitions(SvgWriter w)

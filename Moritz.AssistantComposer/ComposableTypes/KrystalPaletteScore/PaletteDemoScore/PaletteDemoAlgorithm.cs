@@ -40,9 +40,12 @@ namespace Moritz.AssistantComposer
         public override List<List<Voice>> DoAlgorithm()
         {
             Voice voice = new Voice(null, 0);
+            int msPosition = 0;
             foreach(MidiDurationDef midiDurationDef in _paletteDefs[0])
             {
                 LocalMidiDurationDef lmdd = new LocalMidiDurationDef(midiDurationDef);
+                lmdd.MsPosition = msPosition;
+                msPosition += lmdd.MsDuration;
                 voice.LocalMidiDurationDefs.Add(lmdd);
             }
 
