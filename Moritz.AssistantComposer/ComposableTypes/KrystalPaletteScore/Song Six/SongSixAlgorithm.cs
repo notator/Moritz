@@ -60,7 +60,7 @@ namespace Moritz.AssistantComposer
             VoiceDef wind2 = GetWind2(wind3, clytemnestra);
             VoiceDef wind1 = GetWind1(wind3, clytemnestra);
 
-            // WindPitchWheelDeviations change per section in Song Six
+            // WindPitchWheelDeviations change approximately per section in Song Six
             AdjustWindPitchWheelDeviations(wind1);
             AdjustWindPitchWheelDeviations(wind2);
             AdjustWindPitchWheelDeviations(wind3);
@@ -69,7 +69,7 @@ namespace Moritz.AssistantComposer
             //wind1.SetContour(2, new List<int>() { 1, 1, 1 }, 12, 1);
             
             // Construct the Furies.
-            VoiceDef fury4 = GetFury4(wind3, _paletteDefs[1]);
+            VoiceDef fury4 = GetFury4(wind3[0].MsDuration / 2, clytemnestra, _paletteDefs[1]);
             VoiceDef fury3 = GetEmptyVoiceDef(wind3.EndMsPosition);
             VoiceDef fury2 = GetEmptyVoiceDef(wind3.EndMsPosition);
             VoiceDef fury1 = GetEmptyVoiceDef(wind3.EndMsPosition);
@@ -97,7 +97,7 @@ namespace Moritz.AssistantComposer
         private void AdjustWindPitchWheelDeviations(VoiceDef wind)
         {
             byte? versePwdValue = 3;
-            double windStartPwdValue = 12, windEndPwdValue=28;
+            double windStartPwdValue = 6, windEndPwdValue=28;
             double pwdfactor = Math.Pow(windEndPwdValue/windStartPwdValue, (double)1/5); // 5th root of windEndPwdValue/windStartPwdValue -- the last pwd should be windEndPwdValue
 
             for(int i = 0; i < wind.Count; ++i)
@@ -348,20 +348,16 @@ namespace Moritz.AssistantComposer
             // The columns here are note MsPositions and rest MsPositions respectively.
             List<int> controlNoteAndRestMsPositions = new List<int>()
             {
-                #region positions (in temporal order)
-                #region introduction
                 0, f4[1].MsPosition / 2, 
                 f4[1].MsPosition, f4[2].MsPosition, 
                 f4[3].MsPosition, f4[4].MsPosition, 
                 f4[5].MsPosition, f4[6].MsPosition,
-                f4[7].MsPosition, f4[8].MsPosition, 
-                f4[9].MsPosition, f4[9].MsPosition + f4[9].MsDuration,
-                #endregion
-                #region verse 1
-                c[1].MsPosition,  c[1].MsPosition + c[1].MsDuration,
-                #endregion
+                f4[7].MsPosition, f4[8].MsPosition, // verse 1 starts inside f4[7] 
+                f4[9].MsPosition, f4[10].MsPosition,
+                f4[11].MsPosition, f4[12].MsPosition,
+                c[49].MsPosition, (c[58].MsPosition + c[59].MsPosition) / 2,
+
                 w3.EndMsPosition // final barline position
-                #endregion
             };
 
             VoiceDef controlVoiceDef = MakeControlVoiceDef(controlNoteAndRestMsPositions);

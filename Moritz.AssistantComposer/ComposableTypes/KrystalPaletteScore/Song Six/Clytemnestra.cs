@@ -18,6 +18,7 @@ namespace Moritz.AssistantComposer
         {
             SetMomentDefsListPerVerse();
             SetLocalMidiDurationDefs(wind3);
+            SetPitchWheelDeviation(0, _localMidiDurationDefs.Count - 1, 1);
         }
 
         /// <summary>

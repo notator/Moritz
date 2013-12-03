@@ -14,35 +14,46 @@ namespace Moritz.AssistantComposer
     internal partial class SongSixAlgorithm : MidiCompositionAlgorithm
     {
 
-        private VoiceDef GetFury4(VoiceDef wind3, PaletteDef palette)
+        private VoiceDef GetFury4(int firstRestMsDuration, Clytemnestra clytemnestra, PaletteDef palette)
         {
             List<LocalMidiDurationDef> snores = new List<LocalMidiDurationDef>();
             int msPosition = 0;
 
-            int paddingRestMsDuration = 3000;
-            LocalMidiDurationDef paddingRest = new LocalMidiDurationDef(msPosition, paddingRestMsDuration);
-            snores.Add(paddingRest);
-            msPosition += paddingRestMsDuration;
+            LocalMidiDurationDef firstRest = new LocalMidiDurationDef(msPosition, firstRestMsDuration);
+            snores.Add(firstRest);
+            msPosition += firstRestMsDuration;
 
-            for(int i = 0; i < 5; ++i)
+            #region prelude + verse1
+            for(int i = 0; i < 7; ++i)
             {
                 LocalMidiDurationDef snore = new LocalMidiDurationDef(palette[i]);
                 snore.MsPosition = msPosition;
                 msPosition += snore.MsDuration;
                 snores.Add(snore);
 
-                LocalMidiDurationDef rest = new LocalMidiDurationDef(msPosition,1000);
+                LocalMidiDurationDef rest = new LocalMidiDurationDef(msPosition,2500);
                 msPosition += rest.MsDuration;
                 snores.Add(rest);
             }
+            #endregion
 
-            paddingRestMsDuration = wind3.EndMsPosition - msPosition;
-            paddingRest = new LocalMidiDurationDef(msPosition, paddingRestMsDuration);
-            snores.Add(paddingRest);
+            int finalRestMsDuration = clytemnestra.EndMsPosition - msPosition;
+            LocalMidiDurationDef finalRest = new LocalMidiDurationDef(msPosition, finalRestMsDuration);
+            snores.Add(finalRest);
 
             VoiceDef fury4 = new VoiceDef(snores);
 
-            //fury4.AlignObjectAtIndex(0, 5, fury1.Count-1, wind3[1].MsPosition);
+            #region alignments in Verse 1
+            fury4.AlignObjectAtIndex(7, 8, 9, clytemnestra[3].MsPosition);
+            fury4.AlignObjectAtIndex(8, 9, 10, clytemnestra[7].MsPosition);
+            fury4.AlignObjectAtIndex(9, 10, 11, clytemnestra[16].MsPosition);
+            fury4.AlignObjectAtIndex(10, 11, 12, clytemnestra[24].MsPosition);
+            fury4.AlignObjectAtIndex(11, 12, 13, clytemnestra[39].MsPosition);
+            fury4.AlignObjectAtIndex(12, 13, 14, clytemnestra[42].MsPosition);
+            fury4.AlignObjectAtIndex(13, 14, 15, (clytemnestra[56].MsPosition + clytemnestra[57].MsPosition) / 2);
+            #endregion
+
+            fury4.RemoveScorePitchWheelCommands(0, 11);
 
             return fury4;
         }

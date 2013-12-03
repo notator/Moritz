@@ -698,5 +698,48 @@ namespace Moritz.AssistantComposer
         }  //end nested class
         #endregion
 
+        /// <summary>
+        /// Sets the pitchwheelDeviation for chords in the range startIndex to endIndex (inclusive).
+        /// Rests in the range are not changed.
+        /// </summary>
+        internal void SetPitchWheelDeviation(int startIndex, int endIndex, int deviation)
+        {
+            Debug.Assert(startIndex >= 0 && startIndex <= endIndex && startIndex < this.Count);
+            Debug.Assert(endIndex >= 0 && endIndex < this.Count);
+            Debug.Assert(deviation >= 0 && deviation <= 127);
+
+            byte? bDeviation = (byte?)deviation;
+            for(int i = startIndex; i <= endIndex; ++i)
+            {
+                LocalMidiDurationDef lmdd = this[i];
+                UniqueMidiChordDef umcd = lmdd.UniqueMidiDurationDef as UniqueMidiChordDef;
+                if(umcd != null)
+                {
+                    umcd.PitchWheelDeviation = bDeviation;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes the pitchwheel commands (not the pitchwheelDeviations)
+        /// from chords in the range startIndex to endIndex (inclusive).
+        /// Rests in the range are not changed.
+        /// </summary>
+        internal void RemoveScorePitchWheelCommands(int startIndex, int endIndex)
+        {
+            Debug.Assert(startIndex >= 0 && startIndex <= endIndex && startIndex < this.Count);
+            Debug.Assert(endIndex >= 0 && endIndex < this.Count);
+
+            for(int i = startIndex; i <= endIndex; ++i)
+            {
+                LocalMidiDurationDef lmdd = this[i];
+                UniqueMidiChordDef umcd = lmdd.UniqueMidiDurationDef as UniqueMidiChordDef;
+                if(umcd != null)
+                {
+                    umcd.MidiChordSliderDefs.PitchWheelMsbs = new List<byte>();
+                }
+            }
+        }
+
     }
 }
