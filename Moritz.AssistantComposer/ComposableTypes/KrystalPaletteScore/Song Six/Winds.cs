@@ -24,7 +24,7 @@ namespace Moritz.AssistantComposer
         private VoiceDef GetWind2(VoiceDef wind3, Clytemnestra clytemnestra)
         {
             List<LocalMidiDurationDef> clytLmdds = clytemnestra.LocalMidiDurationDefs;
-            int rotationMsPosition = clytLmdds[59].MsPosition;
+            int rotationMsPosition = clytLmdds[59].MsPosition + 700;
 
             VoiceDef wind2 = GetRotatedWind(wind3, rotationMsPosition);
             wind2.Transpose(0, wind2.Count, 12);
@@ -39,42 +39,19 @@ namespace Moritz.AssistantComposer
             return wind2;
         }
 
-        //private void RemovePitchBendCommands(LocalMidiDurationDef lmdd)
-        //{
-        //    UniqueMidiChordDef umcd = lmdd.UniqueMidiDurationDef as UniqueMidiChordDef;
-        //    if(umcd != null)
-        //    {
-        //        umcd.PitchWheelDeviation = 24;
-        //        umcd.MidiChordSliderDefs.PitchWheelMsbs.Clear();
-        //    }
-        //}
-
-        /// <summary>
-        /// Pitchwheel commands have been removed from Wind 1.
-        /// </summary>
-        /// <param name="wind3"></param>
-        /// <param name="clytemnestra"></param>
-        /// <returns></returns>
-        private VoiceDef GetWind1(VoiceDef wind3, Clytemnestra clytemnestra)
+        private VoiceDef GetWind1(VoiceDef wind3, VoiceDef wind2, Clytemnestra clytemnestra)
         {
             List<LocalMidiDurationDef> clytLmdds = clytemnestra.LocalMidiDurationDefs;
-            int rotationMsPosition = clytLmdds[116].MsPosition;
+            int rotationMsPosition = clytLmdds[116].MsPosition + 700;
 
             VoiceDef wind1 = GetRotatedWind(wind3, rotationMsPosition);
             wind1.Transpose(0, wind1.Count, 19);
             wind1.StepwiseGliss(0, 25, 12);
             wind1.Transpose(25, wind1.Count, 12);
 
-            wind1.AlignObjectAtIndex(0, 25, 82, rotationMsPosition);
+            wind1.AlignObjectAtIndex(0, 15, 82, wind2[15].MsPosition);
+            wind1.AlignObjectAtIndex(15, 25, 82, rotationMsPosition);
             wind1.AlignObjectAtIndex(25, 74, 82, clytLmdds[289].MsPosition);
-
-            //// Remove the PitchBend Commands before Verse 1
-            //for(int i = 0; i < 9; ++i)
-            //{
-            //    RemovePitchBendCommands(wind1[i]);
-            //}
-
-            //SetPitchWheelDeviation(wind1[9], 2);
 
             return wind1;
         }

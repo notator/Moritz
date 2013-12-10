@@ -49,8 +49,16 @@ namespace Moritz.AssistantComposer
         public override List<List<Voice>> DoAlgorithm()
         {
             // Palettes contain:
-            // palette 1 (_paletteDefs[0]): wind.
-            // palette 2 (_paletteDefs[1]): low furies (growls)
+            // -- begin to be used in prelude (exposition in prelude)
+            // palette 1 : wind [final]
+            // palette 2 : low furies (snores) [final]
+            //
+            // -- can begin to be used in verse 1 (exposition in interlude 1)
+            // palette 3 : grouse feathers (accel.) [final]
+            // palette 4 : grackle bark [final]
+            // palette 5 : grackle feathers (ticky) [final]
+
+            // All palettes have domain 7 and can be accessed at _paletteDefs[ paletteNumber - 1 ].
 
             // The wind3 is the lowest wind. The winds are numbered from top to bottom in the score.
             VoiceDef wind3 = GetWind3(_paletteDefs[0], _krystals[2]);
@@ -58,7 +66,7 @@ namespace Moritz.AssistantComposer
             Clytemnestra clytemnestra = new Clytemnestra(wind3);
 
             VoiceDef wind2 = GetWind2(wind3, clytemnestra);
-            VoiceDef wind1 = GetWind1(wind3, clytemnestra);
+            VoiceDef wind1 = GetWind1(wind3, wind2, clytemnestra);
 
             // WindPitchWheelDeviations change approximately per section in Song Six
             AdjustWindPitchWheelDeviations(wind1);
@@ -69,24 +77,24 @@ namespace Moritz.AssistantComposer
             //wind1.SetContour(2, new List<int>() { 1, 1, 1 }, 12, 1);
             
             // Construct the Furies.
-            VoiceDef fury4 = GetFury4(wind3[0].MsDuration / 2, clytemnestra, _paletteDefs[1]);
-            VoiceDef fury3 = GetEmptyVoiceDef(wind3.EndMsPosition);
-            VoiceDef fury2 = GetEmptyVoiceDef(wind3.EndMsPosition);
-            VoiceDef fury1 = GetEmptyVoiceDef(wind3.EndMsPosition);
+            VoiceDef furies4 = GetFuries4(wind3[0].MsDuration / 2, clytemnestra, wind1, _paletteDefs[1]);
+            VoiceDef furies3 = GetFuries3(wind1[15].MsPosition, clytemnestra, wind1, _paletteDefs);
+            VoiceDef furies2 = GetEmptyVoiceDef(wind3.EndMsPosition);
+            VoiceDef furies1 = GetEmptyVoiceDef(wind3.EndMsPosition);
 
             // contouring test code 
             // fury1.SetContour(1, new List<int>(){2,2,2,2,2}, 1, 6);
 
-            VoiceDef control = GetControlVoiceDef(fury1, fury2, fury3, fury4, clytemnestra, wind1, wind2, wind3);
+            VoiceDef control = GetControlVoiceDef(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
 
             // Add each voiceDef to voiceDefs here, in top to bottom (=channelIndex) order in the score.
-            List<VoiceDef> voiceDefs = new List<VoiceDef>() { fury1, fury2, fury3, fury4, control, clytemnestra, wind1, wind2, wind3 };
+            List<VoiceDef> voiceDefs = new List<VoiceDef>() { furies1, furies2, furies3, furies4, control, clytemnestra, wind1, wind2, wind3 };
             Debug.Assert(voiceDefs.Count == MidiChannels().Count);
             foreach(VoiceDef voiceDef in voiceDefs)
             {
                 voiceDef.SetLyricsToIndex();
             }
-            List<int> barlineMsPositions = GetBarlineMsPositions(control, fury1, fury2, fury3, fury4, clytemnestra, wind1, wind2, wind3);
+            List<int> barlineMsPositions = GetBarlineMsPositions(control, furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
             // this system contains one Voice per channel (not divided into bars)
             List<Voice> system = GetVoices(voiceDefs);
             List<List<Voice>> bars = GetBars(system, barlineMsPositions);
@@ -196,7 +204,7 @@ namespace Moritz.AssistantComposer
                 c[58].MsPosition,
                 #endregion
                 #region interlude after verse 1
-                c[59].MsPosition,
+                w2[15].MsPosition,
                 w2[16].MsPosition,
                 w2[18].MsPosition,
                 #endregion
@@ -220,7 +228,7 @@ namespace Moritz.AssistantComposer
                 c[115].MsPosition,
                 #endregion
                 #region interlude after verse 2
-                c[116].MsPosition,
+                w1[25].MsPosition,
                 w1[26].MsPosition,
                 w1[28].MsPosition,
                 w1[30].MsPosition,
@@ -244,7 +252,7 @@ namespace Moritz.AssistantComposer
                 c[172].MsPosition,
                 #endregion
                 #region interlude after verse 3
-                c[173].MsPosition,
+                w1[38].MsPosition,
                 w3[40].MsPosition,
                 w3[45].MsPosition,
                 #endregion
@@ -273,7 +281,7 @@ namespace Moritz.AssistantComposer
                 c[267].MsPosition,
                 #endregion
                 #region interlude after verse 4
-                c[268].MsPosition,
+                w1[57].MsPosition,
                 w3[63].MsPosition,
                 #endregion
                 #region verse 5
@@ -285,8 +293,8 @@ namespace Moritz.AssistantComposer
                 c[283].MsPosition,
                 c[288].MsPosition,
                 #endregion
-                #region finale
-                c[289].MsPosition,
+                #region postlude
+                w3[74].MsPosition,
                 w3[77].MsPosition,
                 #endregion
                 // final barline
@@ -334,12 +342,12 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// The control VoiceDef consists of single note + rest pairs whose msPositions are composed here.
         /// </summary>
-        private VoiceDef GetControlVoiceDef(VoiceDef fury1, VoiceDef fury2, VoiceDef fury3, VoiceDef fury4, Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
+        private VoiceDef GetControlVoiceDef(VoiceDef furies1, VoiceDef furies2, VoiceDef furies3, VoiceDef furies4, Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
         {
-            VoiceDef f1 = fury1;
-            VoiceDef f2 = fury2;
-            VoiceDef f3 = fury3;
-            VoiceDef f4 = fury4;
+            VoiceDef f1 = furies1;
+            VoiceDef f2 = furies2;
+            VoiceDef f3 = furies3;
+            VoiceDef f4 = furies4;
             VoiceDef w1 = wind1;
             VoiceDef w2 = wind2;
             VoiceDef w3 = wind3;

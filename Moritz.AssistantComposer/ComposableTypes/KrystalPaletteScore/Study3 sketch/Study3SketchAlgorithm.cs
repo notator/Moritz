@@ -116,7 +116,7 @@ namespace Moritz.AssistantComposer
             {
                 bar.Add(new Voice(null, channel));
                 VoiceDef voiceDef = new VoiceDef(paletteDef);
-                voiceDef.MsDuration = 6000;
+                voiceDef.SetMsDuration(6000);
                 voiceDefs.Add(voiceDef);
                 ++channel;
             }
@@ -155,7 +155,7 @@ namespace Moritz.AssistantComposer
                 voice.LocalMidiDurationDefs.Add(rest1Def);
             }
 
-            voiceDef.MsPosition = msPosition;
+            voiceDef.StartMsPosition = msPosition;
             foreach(LocalMidiDurationDef lmdd in voiceDef)
             {
                 voice.LocalMidiDurationDefs.Add(lmdd);

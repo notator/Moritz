@@ -18,7 +18,7 @@ namespace Moritz.AssistantComposer
         {
             SetMomentDefsListPerVerse();
             SetLocalMidiDurationDefs(wind3);
-            SetPitchWheelDeviation(0, _localMidiDurationDefs.Count - 1, 1);
+            SetPitchWheelDeviation(0, _localMidiDurationDefs.Count, 1);
         }
 
         /// <summary>
@@ -32,6 +32,9 @@ namespace Moritz.AssistantComposer
 
             List<List<int>> momentDefMsWidthPerVerse = MomentDefMsWidthPerVerse;
             List<List<int>> midiChordDefMsDurPerVerse = MidiChordDefMsDurationsPerVerse;
+            
+            CheckWidths(momentDefMsWidthPerVerse, midiChordDefMsDurPerVerse);
+
             List<List<string>> lyricsPerVerse = LyricsPerVerse;
             List<byte> verseVelocities = new List<byte>() { (byte)64, (byte)75, (byte)90, (byte)105, (byte)120 };
             List<byte> verseVolumes = new List<byte>() { (byte)120, (byte)100, (byte)100, (byte)100, (byte)100 };
@@ -89,6 +92,20 @@ namespace Moritz.AssistantComposer
             }
         }
 
+        private void CheckWidths(List<List<int>> momentDefMsWidthPerVerse, List<List<int>> midiChordDefMsDurPerVerse)
+        {
+            for(int v = 0; v < momentDefMsWidthPerVerse.Count; ++v)
+            {
+                List<int> momentDefWidths = momentDefMsWidthPerVerse[v];
+                List<int> chordDefWidths =  midiChordDefMsDurPerVerse[v];
+                Debug.Assert(momentDefWidths.Count == chordDefWidths.Count);
+                for(int m = 0; m < momentDefWidths.Count; ++m)
+                {
+                    Debug.Assert(momentDefWidths[m] >= chordDefWidths[m]);
+                }
+            }
+        }
+
         /// <summary>
         /// The msWidth of each momentDef (the msDuration between momentDefs).
         /// </summary>
@@ -118,7 +135,7 @@ namespace Moritz.AssistantComposer
                  573,438,371,590,326,623,424,417,436,762};
 
                 List<int> verse4 = new List<int>()
-                {699,346,395,521,382,263,175,295,806,1799,
+                {720,346,395,521,382,263,175,295,806,1799,
                  616,434,416,213,1441,395,105,416,599,670,
                  380,501,318,218,490,259,287,501,280,1116,
                  446,921,318,401,355,156,354,216,321,4209,
@@ -173,7 +190,7 @@ namespace Moritz.AssistantComposer
                  573,438,371,590,326,623,424,417,436,762};
 
                 List<int> verse4 = new List<int>()
-                {699,346,395,521,382,263,175,295,806,918,
+                {720,346,395,521,382,263,175,295,806,918,
                  616,434,416,213,1441,395,105,416,599,670,
                  380,501,318,218,490,259,287,501,280,1116,
                  446,921,318,401,355,156,354,216,321,939,
@@ -324,7 +341,7 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// A temporary measure while composing
         /// </summary>
-        public override void SetLyricsToIndex()
+        internal override void SetLyricsToIndex()
         {
             for(int index = 0; index < _localMidiDurationDefs.Count; ++index)
             {

@@ -21,6 +21,7 @@ namespace Moritz.AssistantComposer
     /// </summary>
     public class VoiceDef : IEnumerable
     {
+        #region constructors
         /// <summary>
         /// <para>If the argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
         /// <para>The new VoiceDef's LocalMidiDurationDefs list is simply set to the argument (which is not cloned).</para>
@@ -77,7 +78,8 @@ namespace Moritz.AssistantComposer
                 LocalMidiDurationDef lmdd = new LocalMidiDurationDef(midiDurationDef);
                 _localMidiDurationDefs.Add(lmdd);
             }
-            MsPosition = _localMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rests
+            SetMsPositions();
+            //MsPosition = _localMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rests
         }
 
         /// <summary>
@@ -94,115 +96,9 @@ namespace Moritz.AssistantComposer
 
             return new VoiceDef(clonedLmdds);
         }
+        #endregion constructors
 
-        /// <summary>
-        /// Rests dont have lyrics, so their index in the VoiceDef can't be shown as a lyric.
-        /// Overridden by Clytemnestra, where the index is inserted before her lyrics.
-        /// </summary>
-        /// <param name="voiceDef"></param>
-        public virtual void SetLyricsToIndex()
-        {
-            for(int index = 0; index < _localMidiDurationDefs.Count; ++index)
-            {
-                UniqueMidiChordDef lmcd = _localMidiDurationDefs[index].UniqueMidiDurationDef as UniqueMidiChordDef;
-                if(lmcd != null)
-                {
-                    lmcd.Lyric = index.ToString();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Appends the new lmdd to the end of the list.
-        /// </summary>
-        /// <param name="lmdd"></param>
-        public void Add(LocalMidiDurationDef lmdd)
-        {
-            Debug.Assert(_localMidiDurationDefs.Count > 0);
-            LocalMidiDurationDef lastLmdd = _localMidiDurationDefs[_localMidiDurationDefs.Count - 1];
-            lmdd.MsPosition = lastLmdd.MsPosition + lastLmdd.MsDuration;
-            _localMidiDurationDefs.Add(lmdd);
-        }
-        /// <summary>
-        /// removes the lmdd from the list, and then resets the positions of all the lmdds in the list.
-        /// </summary>
-        /// <param name="lmdd"></param>
-        public void Remove(LocalMidiDurationDef lmdd)
-        {
-            Debug.Assert(_localMidiDurationDefs.Count > 0);
-            Debug.Assert(_localMidiDurationDefs.Contains(lmdd));
-            _localMidiDurationDefs.Remove(lmdd);
-            MsPosition = _localMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rests 
-        }
-        /// <summary>
-        /// The total duration of this VoiceDef in milliseconds.
-        /// Setting this.MsDuration stretches or compresses all the durations in the list to fit the given total duration.
-        /// It does not change this.MsPosition, but does affect this.EndMsPosition. 
-        /// </summary>
-        public int MsDuration
-        {
-            get
-            {
-                return this.EndMsPosition;
-            }
-            set
-            {
-                List<int> relativeDurations = new List<int>();
-                foreach(LocalMidiDurationDef lmdd in _localMidiDurationDefs)
-                {
-                    relativeDurations.Add(lmdd.MsDuration);
-                }
-
-                int newMsDuration = value;
-                Debug.Assert(newMsDuration > 0);
-                List<int> newDurations = MidiChordDef.GetIntDurations(newMsDuration, relativeDurations, relativeDurations.Count);
-
-                int i = 0;
-                foreach (LocalMidiDurationDef lmdd in _localMidiDurationDefs)
-                {
-                    lmdd.MsDuration = newDurations[i++];
-                }
-
-                MsPosition = _localMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rest definitions
-            }
-        }
-        /// <summary>
-        /// The absolute position of the first note or rest in the sequence.
-        /// Setting this value sets the absolute position of all the lmdds
-        /// in the sequence, without changing their durations.
-        /// </summary>
-        public int MsPosition 
-        { 
-            get 
-            { 
-                Debug.Assert(_localMidiDurationDefs.Count > 0);
-                return _localMidiDurationDefs[0].MsPosition;
-            } 
-            set 
-            {
-                Debug.Assert(_localMidiDurationDefs.Count > 0);
-                int absolutePosition = value;
-                Debug.Assert(absolutePosition >= 0);
-                foreach(LocalMidiDurationDef lmdd in _localMidiDurationDefs)
-                {
-                    lmdd.MsPosition = absolutePosition;
-                    absolutePosition += lmdd.MsDuration;
-                }
-            } 
-        }
-        /// <summary>
-        /// The absolute position of the end of the last note or rest in the sequence.
-        /// </summary>
-        public int EndMsPosition 
-        { 
-            get 
-            {
-                Debug.Assert(_localMidiDurationDefs.Count > 0);
-                LocalMidiDurationDef lastLmdd = _localMidiDurationDefs[_localMidiDurationDefs.Count - 1];
-                return lastLmdd.MsPosition + lastLmdd.MsDuration; 
-            }
-        }
-        public int Count { get { return _localMidiDurationDefs.Count; } }
+        #region public indexer & enumerator
         /// <summary>
         /// Indexer. Allows individual lmdds to be accessed using array notation on the VoiceDef.
         /// e.g. lmdd = voiceDef[3].
@@ -226,16 +122,408 @@ namespace Moritz.AssistantComposer
                 _localMidiDurationDefs[i] = value;
             }
         }
+
+        #region Enumerator
+        public IEnumerator GetEnumerator()
+        {
+            return new MyEnumerator(_localMidiDurationDefs);
+        }
+        // private enumerator class
+        // see http://support.microsoft.com/kb/322022/en-us
+        private class MyEnumerator : IEnumerator
+        {
+            public List<LocalMidiDurationDef> _localizedMidiDurationDefs;
+            int position = -1;
+            //constructor
+            public MyEnumerator(List<LocalMidiDurationDef> localizedMidiDurationDefs)
+            {
+                _localizedMidiDurationDefs = localizedMidiDurationDefs;
+            }
+            private IEnumerator getEnumerator()
+            {
+                return (IEnumerator)this;
+            }
+            //IEnumerator
+            public bool MoveNext()
+            {
+                position++;
+                return (position < _localizedMidiDurationDefs.Count);
+            }
+            //IEnumerator
+            public void Reset()
+            { position = -1; }
+            //IEnumerator
+            public object Current
+            {
+                get
+                {
+                    try
+                    {
+                        return _localizedMidiDurationDefs[position];
+                    }
+                    catch(IndexOutOfRangeException)
+                    {
+                        Debug.Assert(false);
+                        return null;
+                    }
+                }
+            }
+        }  //end nested class
+        #endregion
+        #endregion public indexer & enumerator
+
+        #region internal
+
+        #region internal Count changers
+        #region list functions
+        #region standard list functions
+        /// <summary>
+        /// Appends the new lmdd to the end of the list.
+        /// </summary>
+        /// <param name="lmdd"></param>
+        internal void Add(LocalMidiDurationDef lmdd)
+        {
+            Debug.Assert(_localMidiDurationDefs.Count > 0);
+            LocalMidiDurationDef lastLmdd = _localMidiDurationDefs[_localMidiDurationDefs.Count - 1];
+            lmdd.MsPosition = lastLmdd.MsPosition + lastLmdd.MsDuration;
+            _localMidiDurationDefs.Add(lmdd);
+        }
+        /// <summary>
+        /// Adds the argument to the end of this VoiceDef.
+        /// Sets the MsPositions of the appended LocalMidiDurationDefs.
+        /// </summary>
+        internal void AddRange(VoiceDef voiceDef)
+        {
+            _localMidiDurationDefs.AddRange(voiceDef.LocalMidiDurationDefs);
+            SetMsPositions();
+        }
+        /// <summary>
+        /// Inserts the lmdd in the list at the given index, and then
+        /// resets the positions of all the lmdds in the list.
+        /// </summary>
+        /// <param name="lmdd"></param>
+        internal void Insert(int index, LocalMidiDurationDef lmdd)
+        {
+            _localMidiDurationDefs.Insert(index, lmdd);
+            SetMsPositions();
+        }
+        /// <summary>
+        /// Inserts the lmdd in the list at the given index, and then
+        /// resets the positions of all the lmdds in the list.
+        /// </summary>
+        /// <param name="lmdd"></param>
+        internal void InsertRange(int index, VoiceDef voiceDef)
+        {
+            _localMidiDurationDefs.InsertRange(index, voiceDef.LocalMidiDurationDefs);
+            SetMsPositions();
+        }
+        /// <summary>
+        /// removes the lmdd from the list, and then resets the positions of all the lmdds in the list.
+        /// </summary>
+        /// <param name="lmdd"></param>
+        internal void Remove(LocalMidiDurationDef lmdd)
+        {
+            Debug.Assert(_localMidiDurationDefs.Count > 0);
+            Debug.Assert(_localMidiDurationDefs.Contains(lmdd));
+            _localMidiDurationDefs.Remove(lmdd);
+            SetMsPositions();
+        }
+        /// <summary>
+        /// Removes the lmdd at index from the list, and then resets the positions of all the lmdds in the list.
+        /// </summary>
+        /// <param name="lmdd"></param>
+        internal void RemoveAt(int index)
+        {
+            Debug.Assert(index >= 0 && index < _localMidiDurationDefs.Count);
+            _localMidiDurationDefs.RemoveAt(index);
+            SetMsPositions();
+        }
+        /// <summary>
+        /// Removes count lmdds from the list, startíng with the lmdd at index.
+        /// </summary>
+        /// <param name="lmdd"></param>
+        internal void RemoveRange(int index, int count)
+        {
+            Debug.Assert(index >= 0 && count >= 0 && ((index + count) <= _localMidiDurationDefs.Count));
+            _localMidiDurationDefs.RemoveRange(index, count);
+            SetMsPositions();
+        }
+        #endregion standard list functions
+        #region derivative list functions
+        /// <summary>
+        /// Removes the lmdd at index from the list, and then inserts the replacement at the same index.
+        /// </summary>
+        /// <param name="lmdd"></param>
+        internal void Replace(int index, LocalMidiDurationDef replacementLmdd)
+        {
+            Debug.Assert(index >= 0 && index < _localMidiDurationDefs.Count);
+            _localMidiDurationDefs.RemoveAt(index);
+            _localMidiDurationDefs.Insert(index, replacementLmdd);
+            SetMsPositions();
+        }
+
+        /// <summary>
+        /// Extracts nLocalMidiDurationDefs from the LocalMididurationDefs, and then inserts them again at the toIndex.
+        /// </summary>
+        internal void Translate(int fromIndex, int nLocalMidiDurationDefs, int toIndex)
+        {
+            Debug.Assert((fromIndex + nLocalMidiDurationDefs) <= _localMidiDurationDefs.Count);
+            Debug.Assert(toIndex <= (_localMidiDurationDefs.Count - nLocalMidiDurationDefs));
+            int msPosition = _localMidiDurationDefs[0].MsPosition;
+            List<LocalMidiDurationDef> extractedLmdds = _localMidiDurationDefs.GetRange(fromIndex, nLocalMidiDurationDefs);
+            _localMidiDurationDefs.RemoveRange(fromIndex, nLocalMidiDurationDefs);
+            _localMidiDurationDefs.InsertRange(toIndex, extractedLmdds);
+            SetMsPositions();
+        }
+        #endregion derivative list functions
+        #endregion list functions
+
+        #region VoiceDef duration changers
+        /// <summary>
+        /// Stretch or compress all the durations in the list to fit the given total duration.
+        /// This does not change the VoiceDef's MsPosition, but does affect its EndMsPosition.
+        /// </summary>
+        /// <param name="msDuration"></param>
+        internal void SetMsDuration(int msDuration)
+        {
+            Debug.Assert(msDuration > 0);
+
+            List<int> relativeDurations = new List<int>();
+            foreach(LocalMidiDurationDef lmdd in _localMidiDurationDefs)
+            {
+                relativeDurations.Add(lmdd.MsDuration);
+            }
+
+            List<int> newDurations = MidiChordDef.GetIntDurations(msDuration, relativeDurations, relativeDurations.Count);
+
+            int i = 0;
+            foreach(LocalMidiDurationDef lmdd in _localMidiDurationDefs)
+            {
+                lmdd.MsDuration = newDurations[i++];
+            }
+
+            SetMsPositions();
+        }
+        /// <summary>
+        /// Removes all the rests in this VoiceDef
+        /// </summary>
+        internal void RemoveRests()
+        {
+            AdjustMsDurations<UniqueMidiRestDef>(0, _localMidiDurationDefs.Count, 0);
+        }
+
+        /// <summary>
+        /// Multiplies the MsDuration of each chord and rest from startIndex to (not including) endIndex by factor.
+        /// If a chord or rest's MsDuration becomes less than minThreshold, it is removed.
+        /// The total duration of this VoiceDef changes accordingly.
+        /// </summary>
+        internal void AdjustMsDurations(int startIndex, int endIndex, double factor, int minThreshold = 100)
+        {
+            AdjustMsDurations<MidiDurationDef>(startIndex, endIndex, factor, minThreshold);
+        }
+        /// <summary>
+        /// Multiplies the MsDuration of each chord and rest in the LocalMidiDurationDefs list by factor.
+        /// If a chord or rest's MsDuration becomes less than minThreshold, it is removed.
+        /// The total duration of this VoiceDef changes accordingly.
+        /// </summary>
+        internal void AdjustMsDurations(double factor, int minThreshold = 100)
+        {
+            AdjustMsDurations<MidiDurationDef>(0, _localMidiDurationDefs.Count, factor, minThreshold);
+        }
+        /// <summary>
+        /// Multiplies the MsDuration of each chord from startIndex to (not including) endIndex by factor.
+        /// If a chord's MsDuration becomes less than minThreshold, it is removed.
+        /// The total duration of this VoiceDef changes accordingly.
+        /// </summary>
+        internal void AdjustChordMsDurations(int startIndex, int endIndex, double factor, int minThreshold = 100)
+        {
+            AdjustMsDurations<UniqueMidiChordDef>(startIndex, endIndex, factor, minThreshold);
+        }
+        /// <summary>
+        /// Multiplies the MsDuration of each chord in the LocalMidiDurationDefs list by factor.
+        /// If a chord's MsDuration becomes less than minThreshold, it is removed.
+        /// The total duration of this VoiceDef changes accordingly.
+        /// </summary>
+        internal void AdjustChordMsDurations(double factor, int minThreshold = 100)
+        {
+            AdjustMsDurations<UniqueMidiChordDef>(0, _localMidiDurationDefs.Count, factor, minThreshold);
+        }
+        /// <summary>
+        /// Multiplies the MsDuration of each rest from startIndex to (not including) endIndex by factor.
+        /// If a rest's MsDuration becomes less than minThreshold, it is removed.
+        /// The total duration of this VoiceDef changes accordingly.
+        /// </summary>
+        internal void AdjustRestMsDurations(int startIndex, int endIndex, double factor, int minThreshold = 100)
+        {
+            AdjustMsDurations<UniqueMidiRestDef>(startIndex, endIndex, factor, minThreshold);
+        }
+        /// <summary>
+        /// Multiplies the MsDuration of each rest in the LocalMidiDurationDefs list by factor.
+        /// If a rest's MsDuration becomes less than minThreshold, it is removed.
+        /// The total duration of this VoiceDef changes accordingly.
+        /// </summary>
+        internal void AdjustRestMsDurations(double factor, int minThreshold = 100)
+        {
+            AdjustMsDurations<UniqueMidiRestDef>(0, _localMidiDurationDefs.Count, factor, minThreshold);
+        }
+        
+        /// <summary>
+        /// Multiplies the MsDuration of each T from startIndex to (not including) endIndex by factor.
+        /// If a MsDuration becomes less than minThreshold, the T (chord or rest) is removed.
+        /// The total duration of this VoiceDef changes accordingly.
+        /// </summary>
+        private void AdjustMsDurations<T>(int startIndex, int endIndex, double factor, int minThreshold = 100)
+        {
+            CheckIndices(startIndex, endIndex);
+            Debug.Assert(factor >= 0);
+
+            for(int i = 0; i < _localMidiDurationDefs.Count; ++i)
+            {
+                LocalMidiDurationDef lmdd = _localMidiDurationDefs[i];
+                if(i >= startIndex && i < endIndex && lmdd.UniqueMidiDurationDef is T)
+                {
+                    lmdd.MsDuration = (int)((double)lmdd.MsDuration * factor);
+                }
+            }
+
+            for(int i = _localMidiDurationDefs.Count - 1; i >= 0; --i)
+            {
+                LocalMidiDurationDef lmdd = _localMidiDurationDefs[i];
+                if(lmdd.MsDuration < minThreshold)
+                {
+                    _localMidiDurationDefs.RemoveAt(i);
+                }
+            }
+
+            SetMsPositions();
+        }
+
+        #endregion VoiceDef duration changers
+
+        #endregion internal Count changers
+
+        #region internal properties
+        /// <summary>
+        /// The absolute position of the first note or rest in the sequence.
+        /// Setting this value resets all the MsPositions in this VoiceDef,
+        /// including the EndMsPosition.
+        /// </summary>
+        internal int StartMsPosition 
+        { 
+            get 
+            { 
+                Debug.Assert(_localMidiDurationDefs.Count > 0);
+                return _localMidiDurationDefs[0].MsPosition;
+            }
+            set
+            {
+                Debug.Assert(_localMidiDurationDefs.Count > 0);
+                _localMidiDurationDefs[0].MsPosition = value;
+                SetMsPositions();
+            } 
+        }
+        /// <summary>
+        /// The absolute position of the end of the last note or rest in the sequence.
+        /// Setting this value changes the msDuration of the final LocalMidiDurationDef.
+        /// (The EndMsPosition cannot be set if this VoiceDef is empty, or before the last LocalMidiDurationDef.) 
+        /// </summary>
+        internal int EndMsPosition 
+        { 
+            get 
+            {
+                int endPosition = 0;
+                if(_localMidiDurationDefs.Count > 0)
+                {
+                    LocalMidiDurationDef lastLmdd = _localMidiDurationDefs[_localMidiDurationDefs.Count - 1];
+                    endPosition = lastLmdd.MsPosition + lastLmdd.MsDuration;
+                }
+                return endPosition;
+            }
+            set
+            {
+                Debug.Assert(_localMidiDurationDefs.Count > 0);
+                LocalMidiDurationDef lastLmdd = _localMidiDurationDefs[_localMidiDurationDefs.Count - 1];
+                Debug.Assert(value > lastLmdd.MsPosition);
+                lastLmdd.MsDuration = value - lastLmdd.MsPosition;
+            }
+        }
+        internal int Count { get { return _localMidiDurationDefs.Count; } }
+
+        #endregion internal properties
+
+        #region internal attribute changers (Transpose etc.)
+        /// <summary>
+        /// Multiplies each expression value in the LocalMidiDurationDefs
+        /// from startIndex to (not including) endIndex by the argument factor.
+        /// </summary>
+        internal void AdjustExpression(int startIndex, int endIndex, double factor)
+        {
+            CheckIndices(startIndex, endIndex);
+
+            for(int i = startIndex; i < endIndex; ++i)
+            {
+                UniqueMidiChordDef umcd = _localMidiDurationDefs[i].UniqueMidiDurationDef as UniqueMidiChordDef;
+                if(umcd != null)
+                {
+                    umcd.AdjustExpression(factor);
+                }
+            }
+        }
+        /// <summary>
+        /// Multiplies each expression value in the LocalMidiDurationDefs by the argument factor.
+        /// </summary>
+        internal void AdjustExpression(double factor)
+        {
+            foreach(LocalMidiDurationDef lmdd in _localMidiDurationDefs)
+            {
+                UniqueMidiChordDef umcd = lmdd.UniqueMidiDurationDef as UniqueMidiChordDef;
+                if(umcd != null)
+                {
+                    umcd.AdjustExpression(factor);
+                }
+            }
+        }
+        /// <summary>
+        /// Multiplies each velocity value in the LocalMidiDurationDefs
+        /// from startIndex to (not including) endIndex by the argument factor.
+        /// </summary>
+        internal void AdjustVelocities(int startIndex, int endIndex, double factor)
+        {
+            CheckIndices(startIndex, endIndex);
+            for(int i = startIndex; i < endIndex; ++i)
+            {
+                UniqueMidiChordDef umcd = _localMidiDurationDefs[i].UniqueMidiDurationDef as UniqueMidiChordDef;
+                if(umcd != null)
+                {
+                    umcd.AdjustVelocities(factor);
+                }
+            }
+        }
+        /// <summary>
+        /// Multiplies each velocity value in the LocalMidiDurationDefs by the argument factor.
+        /// </summary>
+        internal void AdjustVelocities(double factor)
+        {
+            foreach(LocalMidiDurationDef lmdd in _localMidiDurationDefs)
+            {
+                UniqueMidiChordDef umcd = lmdd.UniqueMidiDurationDef as UniqueMidiChordDef;
+                if(umcd != null)
+                {
+                    umcd.AdjustVelocities(factor);
+                }
+            }
+        }
         /// <summary>
         /// Transpose all the lmdds from startIndex to (not including) endIndex
-        /// up by the number of semitones given in the inteval argument.
+        /// up by the number of semitones given in the interval argument.
         /// Negative interval values transpose down.
         /// It is not an error if Midi pitch values would exceed the range 0..127.
         /// In this case, they are silently coerced to 0 or 127 respectively.
         /// </summary>
         /// <param name="interval"></param>
-        public void Transpose(int startIndex, int endIndex, int interval)
+        internal void Transpose(int startIndex, int endIndex, int interval)
         {
+            CheckIndices(startIndex, endIndex);
             for(int i = startIndex; i < endIndex; ++i)
             {
                 LocalMidiDurationDef lmdd = _localMidiDurationDefs[i];
@@ -243,7 +531,84 @@ namespace Moritz.AssistantComposer
             }
         }
         /// <summary>
-        /// _localizedMidiDurationDefs[indexToAlign] (=lmddAlign) is moved to MsPosition, and the surrounding symbols are spread accordingly
+        /// Transpose the whole VoiceDef up by the number of semitones given in the argument.
+        /// </summary>
+        /// <param name="interval"></param>
+        internal void Transpose(int interval)
+        {
+            foreach(LocalMidiDurationDef lmdd in _localMidiDurationDefs)
+            {
+                lmdd.Transpose(interval);
+            }
+        }
+
+        /// <summary>
+        /// Transposes the LocalMidiDurationDefs from the startIndex upto (but not including) endIndex
+        /// by an equally increasing amount, so that the final LocalMidiDurationDef is transposed by glissInterval.
+        /// startIndex must be less than endIndex.
+        /// glissInterval can be negative.
+        /// </summary>
+        internal void StepwiseGliss(int startIndex, int endIndex, int glissInterval)
+        {
+            CheckIndices(startIndex, endIndex);
+            Debug.Assert(startIndex < endIndex);
+
+            int nSteps = (endIndex - startIndex);
+            double interval = ((double)glissInterval) / nSteps;
+            double step = interval;
+            for(int index = startIndex; index < endIndex; ++index)
+            {
+                _localMidiDurationDefs[index].Transpose((int)Math.Round(interval));
+                interval += step;
+            }
+        }
+
+        /// <summary>
+        /// Sets the pitchwheelDeviation for chords in the range startIndex to (not including) endindex.
+        /// Rests in the range are not changed.
+        /// </summary>
+        internal void SetPitchWheelDeviation(int startIndex, int endIndex, int deviation)
+        {
+            CheckIndices(startIndex, endIndex);
+            Debug.Assert(deviation >= 0 && deviation <= 127);
+
+            byte? bDeviation = (byte?)deviation;
+            for(int i = startIndex; i < endIndex; ++i)
+            {
+                LocalMidiDurationDef lmdd = this[i];
+                UniqueMidiChordDef umcd = lmdd.UniqueMidiDurationDef as UniqueMidiChordDef;
+                if(umcd != null)
+                {
+                    umcd.PitchWheelDeviation = bDeviation;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes the pitchwheel commands (not the pitchwheelDeviations)
+        /// from chords in the range startIndex to (not including) endIndex.
+        /// Rests in the range are not changed.
+        /// </summary>
+        internal void RemoveScorePitchWheelCommands(int startIndex, int endIndex)
+        {
+            CheckIndices(startIndex, endIndex);
+
+            for(int i = startIndex; i < endIndex; ++i)
+            {
+                LocalMidiDurationDef lmdd = this[i];
+                UniqueMidiChordDef umcd = lmdd.UniqueMidiDurationDef as UniqueMidiChordDef;
+                if(umcd != null)
+                {
+                    umcd.MidiChordSliderDefs.PitchWheelMsbs = new List<byte>();
+                }
+            }
+        }
+
+        #endregion  internal attribute changers (Transpose etc.)
+
+        #region alignment
+        /// <summary>
+        /// _localizedMidiDurationDefs[indexToAlign] (=lmddAlign) is moved to toMsPosition, and the surrounding symbols are spread accordingly
         /// between those at anchor1Index and anchor2Index. The symbols at anchor1Index (=lmddA1) and anchor2Index (=lmddA2)do not move.
         /// Note that indexToAlign cannot be 0, and that anchor2Index CAN be equal to _localizedMidiDurationDefs.Count (i.e.on the final barline).
         /// This function checks that 
@@ -345,8 +710,9 @@ namespace Moritz.AssistantComposer
                     "\ntoMsPosition=" + toMsPosition.ToString());  
             }
         }
+        #endregion alignment
 
-        #region SetContour()
+        #region internal Permute()
         /// <summary>
         /// Re-orders the LocalMidiDurationDefs in (part of) this VoiceDef.
         /// <para>1. creates partitions (lists of LocalMidiDurationDefs) using the startAtIndex and partitionSizes in the first two</para>
@@ -376,7 +742,7 @@ namespace Moritz.AssistantComposer
         /// </param>
         /// <param name="contourNumber">A value greater than or equal to 1, and less than or equal to 12. An exception is thrown if this is not the case.</param>
         /// <param name="axisNumber">A value greater than or equal to 1, and less than or equal to 12 An exception is thrown if this is not the case.</param>
-        internal void SetContour(int startAtIndex, List<int> partitionSizes, int axisNumber, int contourNumber)
+        internal void Permute(int startAtIndex, List<int> partitionSizes, int axisNumber, int contourNumber)
         {
             CheckSetContourArgs(startAtIndex, partitionSizes, axisNumber, contourNumber);
 
@@ -496,6 +862,7 @@ namespace Moritz.AssistantComposer
 
             return sortedPartitions;
         }
+
         /// <summary>
         /// Returns a list containing the lowest pitch in each partition
         /// </summary>
@@ -524,6 +891,7 @@ namespace Moritz.AssistantComposer
             }
             return lowestPitches;
         }
+
         /// <summary>
         /// Re-orders the partitions according to the contour retrieved (from the static K.Contour[] array)
         /// <para>using partitions.Count and the contourNumber and axisNumber arguments.</para>
@@ -545,6 +913,7 @@ namespace Moritz.AssistantComposer
 
             return contouredPartitions;
         }
+
         /// <summary>
         /// Throws an exception if one of the following conditions is not met.
         /// <para>startAtIndex is a valid index in the LocalMidiDurationDefs list</para>
@@ -589,157 +958,59 @@ namespace Moritz.AssistantComposer
                 throw new ArgumentException("axisNumber out of range 1..12");
             }
         }
-        #endregion SetContour()
+        #endregion internal SetContour()
+
+        #region  internal SetLyricsToIndex()
 
         /// <summary>
-        /// Extracts nLocalMidiDurationDefs from the LocalMididurationDefs, and then inserts them again at the toIndex.
+        /// Rests dont have lyrics, so their index in the VoiceDef can't be shown as a lyric.
+        /// Overridden by Clytemnestra, where the index is inserted before her lyrics.
         /// </summary>
-        internal void Translate(int fromIndex, int nLocalMidiDurationDefs, int toIndex)
+        /// <param name="voiceDef"></param>
+        internal virtual void SetLyricsToIndex()
         {
-            Debug.Assert((fromIndex + nLocalMidiDurationDefs) <= _localMidiDurationDefs.Count);
-            Debug.Assert(toIndex <= (_localMidiDurationDefs.Count - nLocalMidiDurationDefs));
-            int msPosition = _localMidiDurationDefs[0].MsPosition; 
-            List<LocalMidiDurationDef> extractedLmdds = _localMidiDurationDefs.GetRange(fromIndex, nLocalMidiDurationDefs);
-            _localMidiDurationDefs.RemoveRange(fromIndex, nLocalMidiDurationDefs);
-            _localMidiDurationDefs.InsertRange(toIndex, extractedLmdds);
-            MsPosition = msPosition; // resets all the positions in this VoiceDef.
-        }
-
-        /// <summary>
-        /// Returns 0 if msPosition is negative,
-        /// Returns the index of the last LocalMidiDurationDef if msPosition is beyond the end of the sequence.
-        /// </summary>
-        /// <param name="msPosition"></param>
-        /// <returns></returns>
-        internal int FirstIndexAtOrAfterMsPos(int msPosition)
-        {
-            int index = _localMidiDurationDefs.Count - 1; // the final index
-            for(int i = 0; i < _localMidiDurationDefs.Count; ++i)
+            for(int index = 0; index < _localMidiDurationDefs.Count; ++index)
             {
-                if(_localMidiDurationDefs[i].MsPosition >= msPosition)
+                UniqueMidiChordDef lmcd = _localMidiDurationDefs[index].UniqueMidiDurationDef as UniqueMidiChordDef;
+                if(lmcd != null)
                 {
-                    index = i;
-                    break;
+                    lmcd.Lyric = index.ToString();
                 }
             }
-            return index;
         }
-        /// <summary>
-        /// Transposes the LocalMidiDurationDefs from the startIndex upto (but not including) endIndex
-        /// by an equally increasing amount, so that the final LocalMidiDurationDef is transposed by glissInterval.
-        /// startIndex must be less than endIndex.
-        /// glissInterval can be negative.
-        /// </summary>
-        internal void StepwiseGliss(int startIndex, int endIndex, int glissInterval)
-        {
-            Debug.Assert(startIndex < endIndex);
+        #endregion internal SetLyricsToIndex()
 
-            int nSteps = (endIndex - startIndex);
-            double interval = ((double)glissInterval) / nSteps;
-            double step = interval;
-            for(int index = startIndex; index < endIndex; ++index)
-            {
-                _localMidiDurationDefs[index].Transpose((int)Math.Round(interval));
-                interval += step;
-            }
-        }
-
-        // TODO
-        // public void AdjustVelocity(int interval) // like Transpose()
-
-        public List<LocalMidiDurationDef> LocalMidiDurationDefs { get { return _localMidiDurationDefs; } }
+        internal List<LocalMidiDurationDef> LocalMidiDurationDefs { get { return _localMidiDurationDefs; } }
+        #endregion internal
+        
         protected List<LocalMidiDurationDef> _localMidiDurationDefs = new List<LocalMidiDurationDef>();
 
-        #region Enumerator
-        public IEnumerator GetEnumerator()
-        {
-            return new MyEnumerator(_localMidiDurationDefs);
-        }
-        // private enumerator class
-        // see http://support.microsoft.com/kb/322022/en-us
-        private class MyEnumerator : IEnumerator
-        {
-            public List<LocalMidiDurationDef> _localizedMidiDurationDefs;
-            int position = -1;
-            //constructor
-            public MyEnumerator(List<LocalMidiDurationDef> localizedMidiDurationDefs)
-            {
-                _localizedMidiDurationDefs = localizedMidiDurationDefs;
-            }
-            private IEnumerator getEnumerator()
-            {
-                return (IEnumerator)this;
-            }
-            //IEnumerator
-            public bool MoveNext()
-            {
-                position++;
-                return (position < _localizedMidiDurationDefs.Count);
-            }
-            //IEnumerator
-            public void Reset()
-            { position = -1; }
-            //IEnumerator
-            public object Current
-            {
-                get
-                {
-                    try
-                    {
-                        return _localizedMidiDurationDefs[position];
-                    }
-                    catch(IndexOutOfRangeException)
-                    {
-                        Debug.Assert(false);
-                        return null;
-                    }
-                }
-            }
-        }  //end nested class
-        #endregion
-
+        #region private
         /// <summary>
-        /// Sets the pitchwheelDeviation for chords in the range startIndex to endIndex (inclusive).
-        /// Rests in the range are not changed.
+        /// Sets the MsPosition attribute of each LocalMidiDurationDef in the _localMidiDurationDefs list.
+        /// Uses all the MsDuration attributes, and the MsPosition of the first LocalMidiDurationDef as origin.
+        /// This function must be called at the end of any function that changes the _localMidiDurationDefs list.
         /// </summary>
-        internal void SetPitchWheelDeviation(int startIndex, int endIndex, int deviation)
+        private void SetMsPositions()
         {
-            Debug.Assert(startIndex >= 0 && startIndex <= endIndex && startIndex < this.Count);
-            Debug.Assert(endIndex >= 0 && endIndex < this.Count);
-            Debug.Assert(deviation >= 0 && deviation <= 127);
-
-            byte? bDeviation = (byte?)deviation;
-            for(int i = startIndex; i <= endIndex; ++i)
+            if(_localMidiDurationDefs.Count > 0)
             {
-                LocalMidiDurationDef lmdd = this[i];
-                UniqueMidiChordDef umcd = lmdd.UniqueMidiDurationDef as UniqueMidiChordDef;
-                if(umcd != null)
+                int currentPosition = _localMidiDurationDefs[0].MsPosition;
+                Debug.Assert(currentPosition >= 0);
+                foreach(LocalMidiDurationDef lmdd in _localMidiDurationDefs)
                 {
-                    umcd.PitchWheelDeviation = bDeviation;
+                    lmdd.MsPosition = currentPosition;
+                    currentPosition += lmdd.MsDuration;
                 }
             }
         }
 
-        /// <summary>
-        /// Removes the pitchwheel commands (not the pitchwheelDeviations)
-        /// from chords in the range startIndex to endIndex (inclusive).
-        /// Rests in the range are not changed.
-        /// </summary>
-        internal void RemoveScorePitchWheelCommands(int startIndex, int endIndex)
+        private void CheckIndices(int startIndex, int endIndex)
         {
-            Debug.Assert(startIndex >= 0 && startIndex <= endIndex && startIndex < this.Count);
-            Debug.Assert(endIndex >= 0 && endIndex < this.Count);
-
-            for(int i = startIndex; i <= endIndex; ++i)
-            {
-                LocalMidiDurationDef lmdd = this[i];
-                UniqueMidiChordDef umcd = lmdd.UniqueMidiDurationDef as UniqueMidiChordDef;
-                if(umcd != null)
-                {
-                    umcd.MidiChordSliderDefs.PitchWheelMsbs = new List<byte>();
-                }
-            }
+            Debug.Assert(startIndex >= 0 && startIndex < _localMidiDurationDefs.Count);
+            Debug.Assert(endIndex >= 0 && endIndex <= _localMidiDurationDefs.Count);
         }
 
+        #endregion private
     }
 }

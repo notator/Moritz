@@ -376,24 +376,58 @@ namespace Moritz.Score.Midi
         {
             for(int i = 0; i < _midiHeadSymbols.Count; ++i)
             {
-                _midiHeadSymbols[i] = GetTrimmedValue(_midiHeadSymbols[i] + interval);
+                _midiHeadSymbols[i] = MidiValue(_midiHeadSymbols[i] + interval);
             }
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
                 List<byte> notes = bmcd.Notes;
                 for(int i = 0; i < notes.Count; ++i)
                 {
-                    notes[i] = GetTrimmedValue(notes[i] + interval);
+                    notes[i] = MidiValue(notes[i] + interval);
                 }
                 bmcd.Notes = ReduceList(notes);
             }
         }
 
-        private byte GetTrimmedValue(int value)
+
+        public void AdjustVelocities(double factor)
         {
-            value = (value > 127) ? 127 : value;
-            value = (value < 0) ? 0 : value;
-            return (byte)value;
+            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+            {
+                for(int i = 0; i < bmcd.Velocities.Count; ++i)
+                {
+                    bmcd.Velocities[i] = MidiValue((int)(bmcd.Velocities[i] * factor));
+                }
+            }
+            this._midiVelocity = BasicMidiChordDefs[0].Velocities[0];
+        }
+
+        public void AdjustExpression(double factor)
+        {
+            List<byte> exprs = this.MidiChordSliderDefs.ExpressionMsbs;
+            for(int i = 0; i < exprs.Count; ++i)
+            {
+                exprs[i] = MidiValue((int)(exprs[i] * factor));
+            }
+        }
+
+
+        public void AdjustModulationWheel(double factor)
+        {
+            List<byte> modWheels = this.MidiChordSliderDefs.ModulationWheelMsbs;
+            for(int i = 0; i < modWheels.Count; ++i)
+            {
+                modWheels[i] = MidiValue((int)(modWheels[i] * factor));
+            }
+        }
+
+        public void AdjustPitchWheel(double factor)
+        {
+            List<byte> pitchWheels = this.MidiChordSliderDefs.PitchWheelMsbs;
+            for(int i = 0; i < pitchWheels.Count; ++i)
+            {
+                pitchWheels[i] = MidiValue((int)(pitchWheels[i] * factor));
+            }
         }
 
         /// <summary>
@@ -437,14 +471,45 @@ namespace Moritz.Score.Midi
 
         // This class is saved as an individual chordDef in SVG files,
         // so it allows ALL its fields to be set, even after construction.
-        public new List<byte> MidiHeadSymbols { set { _midiHeadSymbols = value; } }
-        public new byte MidiVelocity { set { _midiVelocity = value; } }
-        public new int OrnamentNumberSymbol { set { _ornamentNumberSymbol = value; } }
-        public new byte? Bank { set { _bank = value; } }
-        public new byte? Patch { set { _patch = value; } }
-        public new byte? Volume { set { _volume = value; } }
-        public new byte? PitchWheelDeviation { set { _pitchWheelDeviation = value; } }
-        public new bool HasChordOff { set { _hasChordOff = value; } }
-        public new int MinimumBasicMidiChordMsDuration { set { _minimumBasicMidiChordMsDuration = value; } }
+        public new List<byte> MidiHeadSymbols { get { return _midiHeadSymbols; } set { _midiHeadSymbols = value; } }
+
+        /// <summary>
+        /// Gets basicMidichordDefs[0].Velocities[0].
+        /// Sets BasicMidiChordDefs[0].Velocities[0] to value, and the other velocities so that the original proportions are kept.
+        /// ( see also: AdjustVelocities(double factor) )
+        /// </summary>
+        public new byte MidiVelocity
+        { 
+            get { return _midiVelocity; }
+            set
+            {
+                _midiVelocity = value;
+                double factor = (((double)value) / ((double)BasicMidiChordDefs[0].Velocities[0]));
+                foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+                {
+                    for(int i = 0; i < bmcd.Velocities.Count; ++i )
+                    {
+                        bmcd.Velocities[i] = MidiValue((int)((double)bmcd.Velocities[i] * factor));
+                    }
+                }
+            }
+        }
+
+        private byte MidiValue(int value)
+        {
+            int rval;
+            rval = (value > 127) ? 127 : value;
+            rval = (value < 0) ? 0 : value;
+            return (byte) rval;
+        }
+
+        public new int OrnamentNumberSymbol { get { return _ornamentNumberSymbol; } set { _ornamentNumberSymbol = value; } }
+        public new byte? Bank { get { return _bank; } set { _bank = value; } }
+        public new byte? Patch { get { return _patch; } set { _patch = value; } }
+        public new byte? Volume { get { return _volume; } set { _volume = value; } }
+        public new byte? PitchWheelDeviation { get { return _pitchWheelDeviation; } set { _pitchWheelDeviation = value; } }
+        public new bool HasChordOff { get { return _hasChordOff; } set { _hasChordOff = value; } }
+        public new int MinimumBasicMidiChordMsDuration { get { return _minimumBasicMidiChordMsDuration; } set { _minimumBasicMidiChordMsDuration = value; } }
+
     }
 }

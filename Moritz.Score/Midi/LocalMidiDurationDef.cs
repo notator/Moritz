@@ -87,6 +87,16 @@ namespace Moritz.Score.Midi
         }
 
         /// <summary>
+        /// Multiplies the MsDuration by the given factor.
+        /// </summary>
+        /// <param name="factor"></param>
+        public void AdjustDuration(double factor)
+        {
+            _msDuration = (int)(_msDuration * factor);
+            UniqueMidiDurationDef.MsDuration = _msDuration;
+        }
+
+        /// <summary>
         /// A UniqueMidiRestDef or a UniqueMidiChordDef.
         /// </summary>
         public readonly MidiDurationDef UniqueMidiDurationDef = null;
