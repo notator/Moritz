@@ -15,8 +15,11 @@ namespace Moritz.AssistantComposer
 		{
 			if(disposing)
 			{
-				if(components != null)
-					components.Dispose();
+                _blackBrush.Dispose();
+                _whiteBrush.Dispose();
+                _systemHighlightBrush.Dispose();
+                if(components != null)
+                    components.Dispose();
 			}
 
 			base.Dispose(disposing);
