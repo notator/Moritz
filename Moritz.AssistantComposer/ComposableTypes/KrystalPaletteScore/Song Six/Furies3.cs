@@ -13,75 +13,6 @@ namespace Moritz.AssistantComposer
     /// </summary>
     internal partial class SongSixAlgorithm : MidiCompositionAlgorithm
     {
-
-        private VoiceDef GetFuries4(int firstRestMsDuration, Clytemnestra clytemnestra, VoiceDef wind1, PaletteDef palette)
-        {
-            List<LocalMidiDurationDef> snores = new List<LocalMidiDurationDef>();
-            int msPosition = 0;
-
-            LocalMidiDurationDef firstRest = new LocalMidiDurationDef(msPosition, firstRestMsDuration);
-            snores.Add(firstRest);
-            msPosition += firstRestMsDuration;
-
-            #region prelude + verse1
-            for(int i = 0; i < 7; ++i)
-            {
-                LocalMidiDurationDef snore = new LocalMidiDurationDef(palette[i]);
-                snore.MsPosition = msPosition;
-                msPosition += snore.MsDuration;
-                snores.Add(snore);
-
-                LocalMidiDurationDef rest = new LocalMidiDurationDef(msPosition,2500);
-                msPosition += rest.MsDuration;
-                snores.Add(rest);
-            }
-            #endregion
-
-            double factor;
-            double msDuration;
-            double restDuration;
-            for(int i = 10; i >= 0; --i)
-            {
-                LocalMidiDurationDef snore = new LocalMidiDurationDef(palette[i/2]);
-
-                snore.MsPosition = msPosition;
-                factor = Math.Pow(1.07, (double) i);
-                msDuration = snore.MsDuration * factor;
-                snore.MsDuration = (int)msDuration;
-                msPosition += snore.MsDuration;
-                snore.Transpose(i - 10);
-                UniqueMidiChordDef umcd = snore.UniqueMidiDurationDef as UniqueMidiChordDef;
-                umcd.MidiVelocity = (byte)((double)umcd.MidiVelocity / factor);
-                snores.Add(snore);
-
-                restDuration = 2500 * factor;
-                LocalMidiDurationDef rest = new LocalMidiDurationDef(msPosition, (int)restDuration);
-                msPosition += rest.MsDuration;
-                snores.Add(rest);
-
-            }
-
-            snores[snores.Count - 1].MsDuration = clytemnestra.EndMsPosition - snores[snores.Count - 1].MsPosition;
-
-            VoiceDef furies4 = new VoiceDef(snores);
-
-            #region alignments in Verse 1
-            furies4.AlignObjectAtIndex(7, 8, 9, clytemnestra[3].MsPosition);
-            furies4.AlignObjectAtIndex(8, 9, 10, clytemnestra[7].MsPosition);
-            furies4.AlignObjectAtIndex(9, 10, 11, clytemnestra[16].MsPosition);
-            furies4.AlignObjectAtIndex(10, 11, 12, clytemnestra[24].MsPosition);
-            furies4.AlignObjectAtIndex(11, 12, 13, clytemnestra[39].MsPosition);
-            furies4.AlignObjectAtIndex(12, 13, 14, clytemnestra[42].MsPosition);
-            furies4.AlignObjectAtIndex(13, 14, 15, (clytemnestra[56].MsPosition + clytemnestra[57].MsPosition) / 2);
-            furies4.AlignObjectAtIndex(15, 23, 37, wind1[28].MsPosition);
-            #endregion
-
-            furies4.RemoveScorePitchWheelCommands(0, 12);
-
-            return furies4;
-        }
-
-        #region furies 3
         private VoiceDef GetFuries3(int firstRestMsDuration, Clytemnestra clytemnestra, VoiceDef wind1, List<PaletteDef> paletteDefs)
         {
             VoiceDef furies3 = GetFlutters(firstRestMsDuration, paletteDefs[2]);
@@ -95,7 +26,8 @@ namespace Moritz.AssistantComposer
             furies3.AlignObjectAtIndex(25, 37, 49, clytemnestra[82].MsPosition);
             furies3.AlignObjectAtIndex(37, 49, 61, clytemnestra[98].MsPosition);
             furies3.AlignObjectAtIndex(49, 61, 106, wind1[25].MsPosition);
-            furies3.AlignObjectAtIndex(61, 106, 136, wind1[28].MsPosition);
+            furies3.AlignObjectAtIndex(61, 106, 134, wind1[28].MsPosition);
+            furies3.AlignObjectAtIndex(106, 134, 136, wind1[30].MsPosition);
             #endregion
 
             return furies3;
@@ -177,20 +109,27 @@ namespace Moritz.AssistantComposer
             return furies3FlutterSequence1;
         }
 
+        /// <summary>
+        /// These ticks are "stolen" by Furies2 later.
+        /// </summary>
+        /// <param name="furies3"></param>
+        /// <param name="ticksPalette"></param>
         private void AddTicks(VoiceDef furies3, PaletteDef ticksPalette)
         {
-            List<LocalMidiDurationDef> ticksList = GetFuries3TicksSequence(ticksPalette);
-            List<int> replacementIndices = new List<int>()
+            List<int> TickInsertionIndices = new List<int>()
             {
                 66,69,72,78,81,84,87,
                 89,92,95,99,102,105,109,
                 112,115,119,122,125,129,132
             };
-            Debug.Assert(replacementIndices.Count == ticksList.Count); // 21 objects
+
+            List<LocalMidiDurationDef> ticksList = GetFuries3TicksSequence(ticksPalette);
+
+            Debug.Assert(TickInsertionIndices.Count == ticksList.Count); // 21 objects
 
             for(int i = ticksList.Count-1; i >= 0; --i)
             {
-                furies3.Insert(replacementIndices[i], ticksList[i]);
+                furies3.Insert(TickInsertionIndices[i], ticksList[i]);
             }
         }
 
@@ -198,22 +137,24 @@ namespace Moritz.AssistantComposer
         {
             List<LocalMidiDurationDef> ticksSequence = new List<LocalMidiDurationDef>();
             int msPosition = 0;
-            int transposition = 0;
+            int transposition = 12;
 
             for(int i = 0; i < 3; ++i)
             {
+                int[] contour = K.Contour(7, 4, 10 - i);
                 for(int j = 6; j >= 0; --j)
                 {
-                    LocalMidiDurationDef ticks = new LocalMidiDurationDef(ticksPalette[j]);
-                    ticks.Transpose(transposition++);
+                    LocalMidiDurationDef ticks = new LocalMidiDurationDef(ticksPalette[contour[j]-1]);
+                    ticks.Transpose(transposition + contour[j]);
                     ticks.MsPosition = msPosition;
                     msPosition += ticks.MsDuration;
                     ticksSequence.Add(ticks);
                 }
+                transposition += 8;
             }
 
             return ticksSequence;
         }
-        #endregion furies3
+
     }
 }

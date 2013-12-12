@@ -263,6 +263,91 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
+        /// An attempt is made to place the (chord) lmdd in the VoiceDef using its MsPositon and MsDuration.
+        /// If the lmdd fits in(side) a rest, the attempt succeeds, otherwise it fails
+        /// (and an exception is thrown).
+        /// This function does not change the msPositions of any other lmdds in the VoiceDef.
+        /// The argument lmdd may end up at the beginning, middle or end of the previously
+        /// existing rest (which is split as necessary).
+        /// </summary>
+        internal void PutInsideRest(LocalMidiDurationDef chord)
+        {
+            Debug.Assert(chord.UniqueMidiDurationDef is UniqueMidiChordDef);
+
+            List<LocalMidiDurationDef> lmdds = _localMidiDurationDefs;
+            int chordStartMsPos = chord.MsPosition;
+            int chordEndMsPos = chord.MsPosition + chord.MsDuration;
+            int index = -1, restStartMsPos = -1, restEndMsPos = -1;
+
+            #region find the index of the rest in which to put the lmdd
+            for(int i = 0; i < lmdds.Count; ++i)
+            {
+                UniqueMidiRestDef umrd = lmdds[i].UniqueMidiDurationDef as UniqueMidiRestDef;
+                if(umrd != null)
+                {
+                    restStartMsPos = lmdds[i].MsPosition;
+                    restEndMsPos = lmdds[i].MsPosition + lmdds[i].MsDuration;
+
+                    if(chordStartMsPos >= restStartMsPos && chordEndMsPos <= restEndMsPos)
+                    {
+                        index = i;
+                        break;
+                    }
+                    if(chordStartMsPos < restStartMsPos)
+                    {
+                        break;
+                    }
+                }
+            }
+            #endregion
+            // if index >= 0, it is the index of a rest into which the chord will fit.
+            if(index >= 0)
+            {
+                List<LocalMidiDurationDef> replacement = GetReplacementList(lmdds[index], chord);
+                int replacementStart = replacement[0].MsPosition;
+                int replacementEnd = replacement[replacement.Count-1].MsPosition + replacement[replacement.Count-1].MsDuration;
+                Debug.Assert(restStartMsPos == replacementStart && restEndMsPos == replacementEnd);
+                lmdds.RemoveAt(index);
+                lmdds.InsertRange(index, replacement);
+            }
+            else
+            {
+                Debug.Assert(false, "Can't find a rest in which to put the new object!");
+            }
+
+        }
+
+        /// <summary>
+        /// returns a list having the position and duration of the originalRest.
+        /// The chord has been put in(side) the rest, either at the beginning, middle, or end. 
+        /// </summary>
+        /// <param name="localMidiDurationDef"></param>
+        /// <param name="lmdd"></param>
+        /// <returns></returns>
+        private List<LocalMidiDurationDef> GetReplacementList(LocalMidiDurationDef originalRest, LocalMidiDurationDef chord)
+        {
+            Debug.Assert(originalRest.UniqueMidiDurationDef is UniqueMidiRestDef);
+            Debug.Assert(chord.UniqueMidiDurationDef is UniqueMidiChordDef);
+
+            List<LocalMidiDurationDef> rList = new List<LocalMidiDurationDef>();
+            if(chord.MsPosition > originalRest.MsPosition)
+            {
+                LocalMidiDurationDef rest1 = new LocalMidiDurationDef(originalRest.MsPosition, chord.MsPosition - originalRest.MsPosition);
+                rList.Add(rest1);
+            }
+            rList.Add(chord);
+            int chordEndMsPos = chord.MsPosition + chord.MsDuration;
+            int restEndMsPos = originalRest.MsPosition + originalRest.MsDuration;
+            if(restEndMsPos > chordEndMsPos)
+            {
+                LocalMidiDurationDef rest2 = new LocalMidiDurationDef(chordEndMsPos, restEndMsPos - chordEndMsPos);
+                rList.Add(rest2);
+            }
+
+            return rList;
+        }
+
+        /// <summary>
         /// Extracts nLocalMidiDurationDefs from the LocalMididurationDefs, and then inserts them again at the toIndex.
         /// </summary>
         internal void Translate(int fromIndex, int nLocalMidiDurationDefs, int toIndex)
@@ -399,6 +484,26 @@ namespace Moritz.AssistantComposer
         }
 
         #endregion VoiceDef duration changers
+
+        /// <summary>
+        /// Combines consecutive rests.
+        /// </summary>
+        internal void AgglomerateRests()
+        {
+            if(_localMidiDurationDefs.Count > 1)
+            {
+                for(int i = _localMidiDurationDefs.Count - 1; i > 0; --i)
+                {
+                    LocalMidiDurationDef lmdd2 = _localMidiDurationDefs[i];
+                    LocalMidiDurationDef lmdd1 = _localMidiDurationDefs[i - 1];
+                    if(lmdd2.UniqueMidiDurationDef is UniqueMidiRestDef && lmdd1.UniqueMidiDurationDef is UniqueMidiRestDef)
+                    {
+                        lmdd1.MsDuration += lmdd2.MsDuration;
+                        _localMidiDurationDefs.RemoveAt(i);
+                    }
+                }
+            }
+        }
 
         #endregion internal Count changers
 
@@ -1012,5 +1117,6 @@ namespace Moritz.AssistantComposer
         }
 
         #endregion private
+
     }
 }

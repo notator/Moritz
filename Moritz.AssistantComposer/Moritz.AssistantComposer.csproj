@@ -56,7 +56,10 @@
     <Compile Include="AudioButtonsControl.Designer.cs">
       <DependentUpon>AudioButtonsControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Furies.cs" />
+    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Furies1.cs" />
+    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Furies2.cs" />
+    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Furies3.cs" />
+    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Furies4.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Winds.cs" />
     <Compile Include="ComposableTypes\PaletteMidiChordDef.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\PaletteDemoScore\PaletteDemoScore.cs" />

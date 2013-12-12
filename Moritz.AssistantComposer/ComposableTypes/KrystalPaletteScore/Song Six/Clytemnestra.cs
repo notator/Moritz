@@ -76,13 +76,15 @@ namespace Moritz.AssistantComposer
                     lmcd.Bank = (byte)(0);
                     lmcd.Patch = patch;
                     lmcd.Lyric = lyrics[syllableIndex];
-                    // these two attributes determine the symbols in the score.
-                    lmcd.MidiHeadSymbols = new List<byte>(){67}; // display middle G, even though "pitch" is different.
-                    lmcd.MidiVelocity = velocity[0]; // determines the visible dynamic symbol
+
                     // the following determine what is actually heard 
                     List<byte> expressionMsbs = new List<byte>() { (byte)65 };
                     lmcd.MidiChordSliderDefs = new MidiChordSliderDefs(null, null, null, expressionMsbs);
                     lmcd.BasicMidiChordDefs.Add(new BasicMidiChordDef(msDuration, 0, patch, true, pitch, velocity));
+
+                    // these two attributes determine the symbols in the score.
+                    lmcd.MidiHeadSymbols = new List<byte>() { 67 }; // display middle G, even though "pitch" is different.
+                    lmcd.MidiVelocity = velocity[0]; // determines the visible dynamic symbol
                     #endregion                    
 
                     momentDef.MidiChordDefs.Add(lmcd);

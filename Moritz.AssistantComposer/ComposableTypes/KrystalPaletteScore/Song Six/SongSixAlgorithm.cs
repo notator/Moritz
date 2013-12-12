@@ -79,13 +79,18 @@ namespace Moritz.AssistantComposer
             // Construct the Furies.
             VoiceDef furies4 = GetFuries4(wind3[0].MsDuration / 2, clytemnestra, wind1, _paletteDefs[1]);
             VoiceDef furies3 = GetFuries3(wind1[15].MsPosition, clytemnestra, wind1, _paletteDefs);
-            VoiceDef furies2 = GetEmptyVoiceDef(wind3.EndMsPosition);
-            VoiceDef furies1 = GetEmptyVoiceDef(wind3.EndMsPosition);
+            VoiceDef furies2 = GetFuries2(clytemnestra, wind1, furies3, _paletteDefs);
+            VoiceDef furies1 = GetFuries1(clytemnestra, wind1, furies3, furies2,_paletteDefs);
 
             // contouring test code 
             // fury1.SetContour(1, new List<int>(){2,2,2,2,2}, 1, 6);
 
             VoiceDef control = GetControlVoiceDef(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
+
+            //furies1.AgglomerateRests();
+            //furies2.AgglomerateRests();
+            //furies3.AgglomerateRests();
+            //furies4.AgglomerateRests();
 
             // Add each voiceDef to voiceDefs here, in top to bottom (=channelIndex) order in the score.
             List<VoiceDef> voiceDefs = new List<VoiceDef>() { furies1, furies2, furies3, furies4, control, clytemnestra, wind1, wind2, wind3 };
@@ -352,7 +357,7 @@ namespace Moritz.AssistantComposer
             VoiceDef w2 = wind2;
             VoiceDef w3 = wind3;
             VoiceDef c = clytemnestra;
-            // The control note msPositions and following rest msDurations.
+
             // The columns here are note MsPositions and rest MsPositions respectively.
             List<int> controlNoteAndRestMsPositions = new List<int>()
             {
