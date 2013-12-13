@@ -372,7 +372,7 @@ namespace Moritz.Score.Midi
         /// It is not an error if Midi values would exceed the range 0..127.
         /// In this case, they are silently coerced to 0 or 127 respectively.
         /// </summary>
-        public void Transpose(int interval)
+        public override void Transpose(int interval)
         {
             for(int i = 0; i < _midiHeadSymbols.Count; ++i)
             {
@@ -389,8 +389,7 @@ namespace Moritz.Score.Midi
             }
         }
 
-
-        public void AdjustVelocities(double factor)
+        public override void AdjustVelocities(double factor)
         {
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
@@ -402,7 +401,7 @@ namespace Moritz.Score.Midi
             this._midiVelocity = BasicMidiChordDefs[0].Velocities[0];
         }
 
-        public void AdjustExpression(double factor)
+        public override void AdjustExpression(double factor)
         {
             List<byte> exprs = this.MidiChordSliderDefs.ExpressionMsbs;
             for(int i = 0; i < exprs.Count; ++i)
@@ -411,8 +410,7 @@ namespace Moritz.Score.Midi
             }
         }
 
-
-        public void AdjustModulationWheel(double factor)
+        public override void AdjustModulationWheel(double factor)
         {
             List<byte> modWheels = this.MidiChordSliderDefs.ModulationWheelMsbs;
             for(int i = 0; i < modWheels.Count; ++i)
@@ -421,7 +419,7 @@ namespace Moritz.Score.Midi
             }
         }
 
-        public void AdjustPitchWheel(double factor)
+        public override void AdjustPitchWheel(double factor)
         {
             List<byte> pitchWheels = this.MidiChordSliderDefs.PitchWheelMsbs;
             for(int i = 0; i < pitchWheels.Count; ++i)
@@ -478,7 +476,7 @@ namespace Moritz.Score.Midi
         /// Sets BasicMidiChordDefs[0].Velocities[0] to value, and the other velocities so that the original proportions are kept.
         /// ( see also: AdjustVelocities(double factor) )
         /// </summary>
-        public new byte MidiVelocity
+        public override byte MidiVelocity
         { 
             get { return _midiVelocity; }
             set

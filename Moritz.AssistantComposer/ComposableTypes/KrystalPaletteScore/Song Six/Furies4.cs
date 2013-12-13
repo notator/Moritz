@@ -24,11 +24,13 @@ namespace Moritz.AssistantComposer
             msPosition += firstRestMsDuration;
 
             #region prelude + verse1
+            int[] transpositions1 = { 0,0,0,0,0,1,0 };
             for(int i = 0; i < 7; ++i)
             {
                 LocalMidiDurationDef snore = new LocalMidiDurationDef(palette[i]);
                 snore.MsPosition = msPosition;
                 msPosition += snore.MsDuration;
+                snore.Transpose(transpositions1[i]);
                 snores.Add(snore);
 
                 LocalMidiDurationDef rest = new LocalMidiDurationDef(msPosition,2500);
@@ -40,21 +42,22 @@ namespace Moritz.AssistantComposer
             double factor;
             double msDuration;
             double restDuration;
-            for(int i = 10; i >= 0; --i)
+            int[] transpositions2 = { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5 };
+            double[] factors = { 0.93, 0.865,0.804,0.748,0.696,0.647,0.602,0.56,0.52,0.484 };
+            for(int i = 0; i < 10; ++i )
             {
-                LocalMidiDurationDef snore = new LocalMidiDurationDef(palette[i/2]);
+                LocalMidiDurationDef snore = new LocalMidiDurationDef(palette[i / 2]);
 
                 snore.MsPosition = msPosition;
-                factor = Math.Pow(1.07, (double) i);
+                factor = factors[i];
                 msDuration = snore.MsDuration * factor;
                 snore.MsDuration = (int)msDuration;
                 msPosition += snore.MsDuration;
-                snore.Transpose(i - 10);
-                UniqueMidiChordDef umcd = snore.UniqueMidiDurationDef as UniqueMidiChordDef;
-                umcd.MidiVelocity = (byte)((double)umcd.MidiVelocity / factor);
+                snore.Transpose(transpositions2[i]);
+                //snore.UniqueMidiDurationDef.MidiVelocity = (byte)((double)snore.UniqueMidiDurationDef.MidiVelocity * factor * factor);
                 snores.Add(snore);
 
-                restDuration = 2500 * factor;
+                restDuration = 2500 / factor;
                 LocalMidiDurationDef rest = new LocalMidiDurationDef(msPosition, (int)restDuration);
                 msPosition += rest.MsDuration;
                 snores.Add(rest);
@@ -65,6 +68,8 @@ namespace Moritz.AssistantComposer
 
             VoiceDef furies4 = new VoiceDef(snores);
 
+            furies4.VelocitiesHairpin(13, furies4.Count, 0.3);
+
             #region alignments in Verse 1
             furies4.AlignObjectAtIndex(7, 8, 9, clytemnestra[3].MsPosition);
             furies4.AlignObjectAtIndex(8, 9, 10, clytemnestra[7].MsPosition);
@@ -72,8 +77,8 @@ namespace Moritz.AssistantComposer
             furies4.AlignObjectAtIndex(10, 11, 12, clytemnestra[24].MsPosition);
             furies4.AlignObjectAtIndex(11, 12, 13, clytemnestra[39].MsPosition);
             furies4.AlignObjectAtIndex(12, 13, 14, clytemnestra[42].MsPosition);
-            furies4.AlignObjectAtIndex(13, 14, 15, (clytemnestra[56].MsPosition + clytemnestra[57].MsPosition) / 2);
-            furies4.AlignObjectAtIndex(15, 23, 37, wind1[28].MsPosition);
+            furies4.AlignObjectAtIndex(14, 34, furies4.Count, wind1[38].MsPosition);
+            //furies4.AlignObjectAtIndex(15, 23, 37, wind1[28].MsPosition);
             #endregion
 
             furies4.RemoveScorePitchWheelCommands(0, 12);

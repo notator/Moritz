@@ -39,17 +39,29 @@ namespace Moritz.AssistantComposer
             VoiceDef furies3FlutterSequence1 = GetFuries3Flutter1(palette);
             furies3FlutterSequence1.AdjustVelocities(0.7);
 
+            //VoiceDef furies3FlutterSequence2 = GetNextFlutterSequence(furies3FlutterSequence1, 0.89, 1);
+            //VoiceDef furies3FlutterSequence3 = GetNextFlutterSequence(furies3FlutterSequence2, 0.89, 1);
+            //VoiceDef furies3FlutterSequence4 = GetNextFlutterSequence(furies3FlutterSequence3, 0.89, 2);
+            //VoiceDef furies3FlutterSequence5 = GetNextFlutterSequence(furies3FlutterSequence4, 0.89, 3);
+            //VoiceDef furies3FlutterSequence6 = GetNextFlutterSequence(furies3FlutterSequence5, 0.89, 5);
+            //VoiceDef furies3FlutterSequence7 = GetNextFlutterSequence(furies3FlutterSequence6, 0.89, 8);
+            //VoiceDef furies3FlutterSequence8 = GetNextFlutterSequence(furies3FlutterSequence7, 0.89, 5);
+            //VoiceDef furies3FlutterSequence9 = GetNextFlutterSequence(furies3FlutterSequence8, 0.89, 3);
+            //VoiceDef furies3FlutterSequence10 = GetNextFlutterSequence(furies3FlutterSequence9, 0.89, 2);
+            //VoiceDef furies3FlutterSequence11 = GetNextFlutterSequence(furies3FlutterSequence10, 0.89, 1);
+            //VoiceDef furies3FlutterSequence12 = GetNextFlutterSequence(furies3FlutterSequence11, 0.89, 1); 
+
             VoiceDef furies3FlutterSequence2 = GetNextFlutterSequence(furies3FlutterSequence1, 0.89, 1);
             VoiceDef furies3FlutterSequence3 = GetNextFlutterSequence(furies3FlutterSequence2, 0.89, 1);
-            VoiceDef furies3FlutterSequence4 = GetNextFlutterSequence(furies3FlutterSequence3, 0.89, 2);
-            VoiceDef furies3FlutterSequence5 = GetNextFlutterSequence(furies3FlutterSequence4, 0.89, 3);
-            VoiceDef furies3FlutterSequence6 = GetNextFlutterSequence(furies3FlutterSequence5, 0.89, 5);
-            VoiceDef furies3FlutterSequence7 = GetNextFlutterSequence(furies3FlutterSequence6, 0.89, 8);
-            VoiceDef furies3FlutterSequence8 = GetNextFlutterSequence(furies3FlutterSequence7, 0.89, 5);
+            VoiceDef furies3FlutterSequence4 = GetNextFlutterSequence(furies3FlutterSequence3, 0.89, 1);
+            VoiceDef furies3FlutterSequence5 = GetNextFlutterSequence(furies3FlutterSequence4, 0.89, 1);
+            VoiceDef furies3FlutterSequence6 = GetNextFlutterSequence(furies3FlutterSequence5, 0.89, 2);
+            VoiceDef furies3FlutterSequence7 = GetNextFlutterSequence(furies3FlutterSequence6, 0.89, 2);
+            VoiceDef furies3FlutterSequence8 = GetNextFlutterSequence(furies3FlutterSequence7, 0.89, 2);
             VoiceDef furies3FlutterSequence9 = GetNextFlutterSequence(furies3FlutterSequence8, 0.89, 3);
-            VoiceDef furies3FlutterSequence10 = GetNextFlutterSequence(furies3FlutterSequence9, 0.89, 2);
-            VoiceDef furies3FlutterSequence11 = GetNextFlutterSequence(furies3FlutterSequence10, 0.89, 1);
-            VoiceDef furies3FlutterSequence12 = GetNextFlutterSequence(furies3FlutterSequence11, 0.89, 1); 
+            VoiceDef furies3FlutterSequence10 = GetNextFlutterSequence(furies3FlutterSequence9, 0.89, 3);
+            VoiceDef furies3FlutterSequence11 = GetNextFlutterSequence(furies3FlutterSequence10, 0.89, 4);
+            VoiceDef furies3FlutterSequence12 = GetNextFlutterSequence(furies3FlutterSequence11, 0.89, 5); 
 
             //LocalMidiDurationDef finalRest = new LocalMidiDurationDef(0, 100);
             //furies3FlutterSequence9.Add(finalRest);
@@ -137,7 +149,7 @@ namespace Moritz.AssistantComposer
         {
             List<LocalMidiDurationDef> ticksSequence = new List<LocalMidiDurationDef>();
             int msPosition = 0;
-            int transposition = 12;
+            int[] transpositions = { 12, 14, 17 };
 
             for(int i = 0; i < 3; ++i)
             {
@@ -145,12 +157,12 @@ namespace Moritz.AssistantComposer
                 for(int j = 6; j >= 0; --j)
                 {
                     LocalMidiDurationDef ticks = new LocalMidiDurationDef(ticksPalette[contour[j]-1]);
-                    ticks.Transpose(transposition + contour[j]);
+                    ticks.Transpose(transpositions[i] + contour[j]);
+                    ticks.UniqueMidiDurationDef.AdjustVelocities(0.6);
                     ticks.MsPosition = msPosition;
                     msPosition += ticks.MsDuration;
                     ticksSequence.Add(ticks);
                 }
-                transposition += 8;
             }
 
             return ticksSequence;

@@ -50,15 +50,21 @@ namespace Moritz.AssistantComposer
         {
             // Palettes contain:
             // -- begin to be used in prelude (exposition in prelude)
-            // palette 1 : wind [final]
-            // palette 2 : low furies (snores) [final]
+            // palette 1 : winds [domain 7] (used, dont change!)
+            // palette 2 : snores [domain 7] (used, dont change!)
             //
             // -- can begin to be used in verse 1 (exposition in interlude 1)
-            // palette 3 : grouse feathers (accel.) [final]
-            // palette 4 : grackle bark [final]
-            // palette 5 : grackle feathers (ticky) [final]
+            // palette 3 : feathers [domain 7] (used, dont change!)
+            // palette 4 : growls [domain 7]
+            // palette 5 : ticks [domain 7] (used, dont change!)
+            //
+            // -- "bird sounds" from verse 3
+            // palette 6 : songs [domain 12] 
+            // palette 7 : chirps1 [domain 12] 
+            // palette 8 : chirps2 [domain 12] 
+            // palette 9 : cheeps [domain 12] (used, dont change!) 
 
-            // All palettes have domain 7 and can be accessed at _paletteDefs[ paletteNumber - 1 ].
+            // All palettes can be accessed here at _paletteDefs[ paletteNumber - 1 ].
 
             // The wind3 is the lowest wind. The winds are numbered from top to bottom in the score.
             VoiceDef wind3 = GetWind3(_paletteDefs[0], _krystals[2]);
@@ -68,10 +74,14 @@ namespace Moritz.AssistantComposer
             VoiceDef wind2 = GetWind2(wind3, clytemnestra);
             VoiceDef wind1 = GetWind1(wind3, wind2, clytemnestra);
 
+            AdjustFinalWindChordPosition(wind1, wind2, wind3); // "fermata"
+
             // WindPitchWheelDeviations change approximately per section in Song Six
             AdjustWindPitchWheelDeviations(wind1);
             AdjustWindPitchWheelDeviations(wind2);
             AdjustWindPitchWheelDeviations(wind3);
+
+            AdjustWindVelocities(wind1, wind2, wind3);
 
             // contouring test code
             //wind1.SetContour(2, new List<int>() { 1, 1, 1 }, 12, 1);
@@ -80,7 +90,7 @@ namespace Moritz.AssistantComposer
             VoiceDef furies4 = GetFuries4(wind3[0].MsDuration / 2, clytemnestra, wind1, _paletteDefs[1]);
             VoiceDef furies3 = GetFuries3(wind1[15].MsPosition, clytemnestra, wind1, _paletteDefs);
             VoiceDef furies2 = GetFuries2(clytemnestra, wind1, furies3, _paletteDefs);
-            VoiceDef furies1 = GetFuries1(clytemnestra, wind1, furies3, furies2,_paletteDefs);
+            VoiceDef furies1 = GetFuries1(clytemnestra, wind1, furies3, furies2, _paletteDefs);
 
             // contouring test code 
             // fury1.SetContour(1, new List<int>(){2,2,2,2,2}, 1, 6);
@@ -105,6 +115,33 @@ namespace Moritz.AssistantComposer
             List<List<Voice>> bars = GetBars(system, barlineMsPositions);
 
             return bars;
+        }
+
+        private void AdjustFinalWindChordPosition(VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
+        {
+            wind1.AlignObjectAtIndex(71, 81, 82, wind1[81].MsPosition - (wind1[81].MsDuration / 2));
+            wind2.AlignObjectAtIndex(71, 81, 82, wind2[81].MsPosition - (wind2[81].MsDuration / 2));
+            wind3.AlignObjectAtIndex(71, 81, 82, wind3[81].MsPosition - (wind3[81].MsDuration / 2));
+        }
+
+        private void AdjustWindVelocities(VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
+        {
+            int beginInterval2DimIndex = 25; // start of Interlude2
+            int beginVerse3DimIndex = 31; // non-inclusive
+            int beginVerse5CrescIndex = 70;
+            int beginPostludeIndex = 74;
+
+            wind1.VelocitiesHairpin(beginInterval2DimIndex, beginVerse3DimIndex, 0.5);
+            wind2.VelocitiesHairpin(beginInterval2DimIndex, beginVerse3DimIndex, 0.5);
+            wind3.VelocitiesHairpin(beginInterval2DimIndex, beginVerse3DimIndex, 0.5);
+
+            wind1.VelocitiesHairpin(beginVerse5CrescIndex, beginPostludeIndex, 2);
+            wind2.VelocitiesHairpin(beginVerse5CrescIndex, beginPostludeIndex, 2);
+            wind3.VelocitiesHairpin(beginVerse5CrescIndex, beginPostludeIndex, 2);
+
+            wind1.VelocitiesHairpin(beginPostludeIndex, wind1.Count, 2);
+            wind2.VelocitiesHairpin(beginPostludeIndex, wind2.Count, 2);
+            wind3.VelocitiesHairpin(beginPostludeIndex, wind3.Count, 2);
         }
 
         private void AdjustWindPitchWheelDeviations(VoiceDef wind)

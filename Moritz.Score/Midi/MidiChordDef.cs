@@ -327,7 +327,7 @@ namespace Moritz.Score.Midi
 
         public List<byte> MidiHeadSymbols { get { return _midiHeadSymbols; } }
         protected List<byte> _midiHeadSymbols = null;
-        public byte MidiVelocity { get { return _midiVelocity; } }
+        public override byte MidiVelocity { get { return _midiVelocity; } }
         protected byte _midiVelocity;
         public int OrnamentNumberSymbol { get { return _ornamentNumberSymbol; } }
         protected int _ornamentNumberSymbol = 0;

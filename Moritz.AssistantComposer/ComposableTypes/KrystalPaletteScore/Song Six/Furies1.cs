@@ -18,7 +18,33 @@ namespace Moritz.AssistantComposer
         {
             VoiceDef furies1 = GetEmptyVoiceDef(wind1.EndMsPosition);
 
+            Interlude2(furies1, furies2, _paletteDefs[8]);
+
             return furies1;
+        }
+
+        private void Interlude2(VoiceDef furies1, VoiceDef furies2, PaletteDef cheepsPalette)
+        {
+            int[] cheepIndices = { 4, 8, 2, 6, 10 };
+            int[] transpositions = { 2, 1, 3, 0, 4 };
+            double[] velocityfactors = { 0.3, 0.33, 0.37, 0.41, 0.45 };
+            int[] msPositions =
+            { 
+                furies2[8].MsPosition, 
+                furies2[12].MsPosition, 
+                furies2[24].MsPosition, 
+                furies2[30].MsPosition, 
+                furies2[40].MsPosition, 
+            };
+            for(int i = 0; i < 5; ++i)
+            {
+                LocalMidiDurationDef cheep = new LocalMidiDurationDef(cheepsPalette[cheepIndices[i]]);
+                cheep.MsPosition = msPositions[i];
+                cheep.MsDuration *= 2;
+                cheep.UniqueMidiDurationDef.AdjustVelocities(velocityfactors[i]);
+                cheep.UniqueMidiDurationDef.Transpose(transpositions[i]);
+                furies1.PutInsideRest(cheep);
+            }
         }
     }
 }

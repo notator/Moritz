@@ -486,7 +486,7 @@ namespace Moritz.AssistantComposer
         #endregion VoiceDef duration changers
 
         /// <summary>
-        /// Combines consecutive rests.
+        /// Combines all consecutive rests.
         /// </summary>
         internal void AgglomerateRests()
         {
@@ -503,6 +503,17 @@ namespace Moritz.AssistantComposer
                     }
                 }
             }
+        }
+        /// <summary>
+        /// Removes the rest or chord at index, and extends the previous rest or chord
+        /// by the removed duration, so that other msPositions don't change.
+        /// </summary>
+        /// <param name="p"></param>
+        internal void AgglomerateRestOrChordAt(int index)
+        {
+            Debug.Assert(index > 0 && index < Count);
+            _localMidiDurationDefs[index - 1].MsDuration += _localMidiDurationDefs[index].MsDuration;
+            _localMidiDurationDefs.RemoveAt(index);
         }
 
         #endregion internal Count changers
@@ -567,11 +578,7 @@ namespace Moritz.AssistantComposer
 
             for(int i = startIndex; i < endIndex; ++i)
             {
-                UniqueMidiChordDef umcd = _localMidiDurationDefs[i].UniqueMidiDurationDef as UniqueMidiChordDef;
-                if(umcd != null)
-                {
-                    umcd.AdjustExpression(factor);
-                }
+                _localMidiDurationDefs[i].UniqueMidiDurationDef.AdjustExpression(factor);
             }
         }
         /// <summary>
@@ -581,11 +588,7 @@ namespace Moritz.AssistantComposer
         {
             foreach(LocalMidiDurationDef lmdd in _localMidiDurationDefs)
             {
-                UniqueMidiChordDef umcd = lmdd.UniqueMidiDurationDef as UniqueMidiChordDef;
-                if(umcd != null)
-                {
-                    umcd.AdjustExpression(factor);
-                }
+                lmdd.UniqueMidiDurationDef.AdjustExpression(factor);
             }
         }
         /// <summary>
@@ -597,11 +600,7 @@ namespace Moritz.AssistantComposer
             CheckIndices(startIndex, endIndex);
             for(int i = startIndex; i < endIndex; ++i)
             {
-                UniqueMidiChordDef umcd = _localMidiDurationDefs[i].UniqueMidiDurationDef as UniqueMidiChordDef;
-                if(umcd != null)
-                {
-                    umcd.AdjustVelocities(factor);
-                }
+                _localMidiDurationDefs[i].UniqueMidiDurationDef.AdjustVelocities(factor);
             }
         }
         /// <summary>
@@ -611,13 +610,41 @@ namespace Moritz.AssistantComposer
         {
             foreach(LocalMidiDurationDef lmdd in _localMidiDurationDefs)
             {
-                UniqueMidiChordDef umcd = lmdd.UniqueMidiDurationDef as UniqueMidiChordDef;
-                if(umcd != null)
-                {
-                    umcd.AdjustVelocities(factor);
-                }
+                lmdd.UniqueMidiDurationDef.AdjustVelocities(factor);
             }
         }
+        /// <summary>
+        /// First creates a hairpin in the velocities from beginIndex to endIndex (non-inclusive),
+        /// then adjusts all the remaining velocities in this VoiceDef by the finalFactor.
+        /// endIndex must be greater than beginIndex + 1.
+        /// The factors by which the velocities are multiplied change arithmetically: The velocities
+        /// at beginIndex are multiplied by 1.0, and the velocities from endIndex to the end of the
+        /// VoiceDef by finalFactor.
+        /// Can be used to create a diminueno or crescendo.
+        /// </summary>
+        /// <param name="beginDimIndex"></param>
+        /// <param name="endDimIndex"></param>
+        /// <param name="p"></param>
+        internal void VelocitiesHairpin(int beginIndex, int endIndex, double finalFactor)
+        {
+            Debug.Assert(((beginIndex + 1) < endIndex) && (finalFactor >= 0) && (endIndex <= Count));
+
+            double factorIncrement = (finalFactor - 1.0) / (endIndex - beginIndex);
+            double factor = 1.0;
+            List<LocalMidiDurationDef> lmdds = _localMidiDurationDefs;
+
+            for(int i = beginIndex; i < endIndex; ++i)
+            {
+                lmdds[i].UniqueMidiDurationDef.AdjustVelocities(factor);
+                factor += factorIncrement;
+            }
+
+            for(int i = endIndex; i < lmdds.Count; ++i)
+            {
+                lmdds[i].UniqueMidiDurationDef.AdjustVelocities(factor);
+            }
+        }
+
         /// <summary>
         /// Transpose all the lmdds from startIndex to (not including) endIndex
         /// up by the number of semitones given in the interval argument.
