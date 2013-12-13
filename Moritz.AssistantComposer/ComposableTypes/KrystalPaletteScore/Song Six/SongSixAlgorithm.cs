@@ -87,7 +87,7 @@ namespace Moritz.AssistantComposer
             //wind1.SetContour(2, new List<int>() { 1, 1, 1 }, 12, 1);
             
             // Construct the Furies.
-            VoiceDef furies4 = GetFuries4(wind3[0].MsDuration / 2, clytemnestra, wind1, _paletteDefs[1]);
+            VoiceDef furies4 = GetFuries4(wind3[0].MsDuration / 2, clytemnestra, wind1, _paletteDefs);
             VoiceDef furies3 = GetFuries3(wind1[15].MsPosition, clytemnestra, wind1, _paletteDefs);
             VoiceDef furies2 = GetFuries2(clytemnestra, wind1, furies3, _paletteDefs);
             VoiceDef furies1 = GetFuries1(clytemnestra, wind1, furies3, furies2, _paletteDefs);
