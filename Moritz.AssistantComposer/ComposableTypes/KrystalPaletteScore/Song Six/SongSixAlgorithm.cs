@@ -51,18 +51,18 @@ namespace Moritz.AssistantComposer
             // Palettes contain:
             // -- begin to be used in prelude (exposition in prelude)
             // palette 1 : winds [domain 7] (used, dont change!)
-            // palette 2 : snores [domain 7] (used, dont change!)
+            // palette 2 : furies4 snores [domain 7] (used, dont change!)
             //
             // -- can begin to be used in verse 1 (exposition in interlude 1)
-            // palette 3 : feathers [domain 7] (used, dont change!)
-            // palette 4 : growls [domain 7]
-            // palette 5 : ticks [domain 7] (used, dont change!)
+            // palette 3 : furies3 feathers [domain 7] (used, dont change!)
+            // palette 4 : furies4 growls [domain 7] (index 0,2,5,1 used)
+            // palette 5 : furies2 ticks [domain 7] (used, dont change!)
             //
-            // -- "bird sounds" from verse 3
-            // palette 6 : songs [domain 12] 
-            // palette 7 : chirps1 [domain 12] 
-            // palette 8 : chirps2 [domain 12] 
-            // palette 9 : cheeps [domain 12] (used, dont change!) 
+            // -- "bird sounds" from interval2 and verse 3
+            // palette 6 : furies4 songs [domain 12] 
+            // palette 7 : furies3 chirps1 [domain 12] 
+            // palette 8 : furies2 chirps2 [domain 12] 
+            // palette 9 : furies1 cheeps [domain 12] (4,8,2,6,10 used, dont change!) 
 
             // All palettes can be accessed here at _paletteDefs[ paletteNumber - 1 ].
 
