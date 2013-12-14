@@ -49,7 +49,7 @@ namespace Moritz.AssistantComposer
                 growl.MsDuration = msDurations[i];
                 //growl.UniqueMidiDurationDef.AdjustVelocities(velocityfactors[i]);
                 //growl.UniqueMidiDurationDef.Transpose(transpositions[i]);
-                furies4.PutInsideRest(growl);
+                furies4.InsertInRest(growl);
             }
 
             furies4.AgglomerateRestOrChordAt(40);

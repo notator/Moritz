@@ -15,6 +15,13 @@ namespace Moritz.AssistantComposer
     {
         private VoiceDef GetFuries2(Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef furies3, List<PaletteDef> _paletteDefs)
         {
+            VoiceDef furies2 = GetFuries2Interlude2(clytemnestra, wind1, furies3, _paletteDefs[8]);
+
+            return furies2;
+        }
+
+        private VoiceDef GetFuries2Interlude2(Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef furies3, PaletteDef cheepsPalette)
+        {
             VoiceDef furies2 = GetEmptyVoiceDef(wind1.EndMsPosition);
 
             List<int> furies3TickIndices = new List<int>()
@@ -30,14 +37,15 @@ namespace Moritz.AssistantComposer
                 Debug.Assert(ticksChord.UniqueMidiDurationDef is UniqueMidiChordDef);
                 LocalMidiDurationDef ticksRest = new LocalMidiDurationDef(ticksChord.MsPosition, ticksChord.MsDuration);
                 furies3.Replace(f3Index, ticksRest);
-                furies2.PutInsideRest(ticksChord);
+                furies2.InsertInRest(ticksChord);
             }
 
             LocalMidiDurationDef lastTicksBeforeVerse3 = new LocalMidiDurationDef(furies2[39].UniqueMidiDurationDef);
             lastTicksBeforeVerse3.MsPosition = furies3[155].MsPosition + furies3[155].MsDuration;
             lastTicksBeforeVerse3.MsDuration = clytemnestra[117].MsPosition - lastTicksBeforeVerse3.MsPosition;
             lastTicksBeforeVerse3.Transpose(10);
-            furies2.PutInsideRest(lastTicksBeforeVerse3);
+            furies2.InsertInRest(lastTicksBeforeVerse3);
+
             return furies2;
         }
     }

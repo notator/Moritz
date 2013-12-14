@@ -218,6 +218,123 @@ namespace Moritz.AssistantComposer
             SetMsPositions();
         }
         /// <summary>
+        /// Creates a new list of LocalMidiDurationDefs containing just the argument chord,
+        /// then calls the other InsertInRest() function with the list as argument. 
+        /// </summary>
+        internal void InsertInRest(LocalMidiDurationDef chord)
+        {
+            Debug.Assert(chord.UniqueMidiDurationDef is UniqueMidiChordDef);
+            List<LocalMidiDurationDef> iLmdds = new List<LocalMidiDurationDef>() { chord };
+            InsertInRest(iLmdds);
+        }
+        /// <summary>
+        /// An attempt is made to insert the argument list (iLmdds) in a rest in the VoiceDef.
+        /// The rest is found using the iLmdds's MsPositon and MsDuration.
+        /// The first and last objects in the argument must be chords, not rests.
+        /// The argument may contain just one chord.
+        /// The inserted list may end up at the beginning, middle or end of the spanning rest (which will
+        /// be split as necessary).
+        /// If no rest is found spanning the iLmdds, the attempt fails and an exception is thrown.
+        /// This function does not change the msPositions of any other chords or rests in the VoiceDef,
+        /// It does, of course, change the indices of the inserted lmdds and the later chords and rests.
+        /// </summary>
+        internal void InsertInRest(List<LocalMidiDurationDef> iLmdds)
+        {
+            Debug.Assert(iLmdds[0].UniqueMidiDurationDef is UniqueMidiChordDef
+                && iLmdds[iLmdds.Count - 1].UniqueMidiDurationDef is UniqueMidiChordDef);
+
+            int iLmddsStartMsPos = iLmdds[0].MsPosition;
+            int iLmddsEndMsPos = iLmdds[iLmdds.Count - 1].MsPosition + iLmdds[iLmdds.Count - 1].MsDuration;
+
+            int restIndex = FindIndexOfSpanningRest(iLmddsStartMsPos, iLmddsEndMsPos);
+
+            // if index >= 0, it is the index of a rest into which the chord will fit.
+            if(restIndex >= 0)
+            {
+                InsertLmddsInRest(restIndex, iLmdds);
+            }
+            else
+            {
+                Debug.Assert(false, "Can't find a rest spanning the chord!");
+            }
+        }
+        #region InsertInRest() implementation
+        /// <summary>
+        /// Returns the index of a rest spanning startMsPos..endMsPos
+        /// If there is no such rest, -1 is returned.
+        /// </summary>
+        /// <param name="startMsPos"></param>
+        /// <param name="endMsPos"></param>
+        /// <returns></returns>
+        private int FindIndexOfSpanningRest(int startMsPos, int endMsPos)
+        {
+            List<LocalMidiDurationDef> lmdds = _localMidiDurationDefs;
+            int index = -1, restStartMsPos = -1, restEndMsPos = -1;
+
+            for(int i = 0; i < lmdds.Count; ++i)
+            {
+                UniqueMidiRestDef umrd = lmdds[i].UniqueMidiDurationDef as UniqueMidiRestDef;
+                if(umrd != null)
+                {
+                    restStartMsPos = lmdds[i].MsPosition;
+                    restEndMsPos = lmdds[i].MsPosition + lmdds[i].MsDuration;
+
+                    if(startMsPos >= restStartMsPos && endMsPos <= restEndMsPos)
+                    {
+                        index = i;
+                        break;
+                    }
+                    if(startMsPos < restStartMsPos)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            return index;
+        }
+        private void InsertLmddsInRest(int restIndex, List<LocalMidiDurationDef> iLmdds)
+        {
+            List<LocalMidiDurationDef> lmdds = _localMidiDurationDefs;
+            LocalMidiDurationDef rest = lmdds[restIndex];
+            List<LocalMidiDurationDef> replacement = GetReplacementList(rest, iLmdds);
+            int replacementStart = replacement[0].MsPosition;
+            int replacementEnd = replacement[replacement.Count - 1].MsPosition + replacement[replacement.Count - 1].MsDuration;
+            int restStart = rest.MsPosition;
+            int restEnd = rest.MsPosition + rest.MsDuration;
+            Debug.Assert(restStart == replacementStart && restEnd == replacementEnd);
+            lmdds.RemoveAt(restIndex);
+            lmdds.InsertRange(restIndex, replacement);
+        }
+        /// <summary>
+        /// Returns a list having the position and duration of the originalRest.
+        /// The iLmdds have been put in(side) the original rest, either at the beginning, middle, or end. 
+        /// </summary>
+        private List<LocalMidiDurationDef> GetReplacementList(LocalMidiDurationDef originalRest, List<LocalMidiDurationDef> iLmdds)
+        {
+            Debug.Assert(originalRest.UniqueMidiDurationDef is UniqueMidiRestDef);
+            Debug.Assert(iLmdds[0].UniqueMidiDurationDef is UniqueMidiChordDef);
+            Debug.Assert(iLmdds[iLmdds.Count - 1].UniqueMidiDurationDef is UniqueMidiChordDef);
+
+            List<LocalMidiDurationDef> rList = new List<LocalMidiDurationDef>();
+            if(iLmdds[0].MsPosition > originalRest.MsPosition)
+            {
+                LocalMidiDurationDef rest1 = new LocalMidiDurationDef(originalRest.MsPosition, iLmdds[0].MsPosition - originalRest.MsPosition);
+                rList.Add(rest1);
+            }
+            rList.AddRange(iLmdds);
+            int iLmddsEndMsPos = iLmdds[iLmdds.Count - 1].MsPosition + iLmdds[iLmdds.Count - 1].MsDuration;
+            int originalRestEndMsPos = originalRest.MsPosition + originalRest.MsDuration;
+            if(originalRestEndMsPos > iLmddsEndMsPos)
+            {
+                LocalMidiDurationDef rest2 = new LocalMidiDurationDef(iLmddsEndMsPos, originalRestEndMsPos - iLmddsEndMsPos);
+                rList.Add(rest2);
+            }
+
+            return rList;
+        }
+        #endregion InsertInRest() implementation
+        /// <summary>
         /// removes the lmdd from the list, and then resets the positions of all the lmdds in the list.
         /// </summary>
         /// <param name="lmdd"></param>
@@ -260,91 +377,6 @@ namespace Moritz.AssistantComposer
             _localMidiDurationDefs.RemoveAt(index);
             _localMidiDurationDefs.Insert(index, replacementLmdd);
             SetMsPositions();
-        }
-
-        /// <summary>
-        /// An attempt is made to place the (chord) lmdd in the VoiceDef using its MsPositon and MsDuration.
-        /// If the lmdd fits in(side) a rest, the attempt succeeds, otherwise it fails
-        /// (and an exception is thrown).
-        /// This function does not change the msPositions of any other lmdds in the VoiceDef.
-        /// The argument lmdd may end up at the beginning, middle or end of the previously
-        /// existing rest (which is split as necessary).
-        /// </summary>
-        internal void PutInsideRest(LocalMidiDurationDef chord)
-        {
-            Debug.Assert(chord.UniqueMidiDurationDef is UniqueMidiChordDef);
-
-            List<LocalMidiDurationDef> lmdds = _localMidiDurationDefs;
-            int chordStartMsPos = chord.MsPosition;
-            int chordEndMsPos = chord.MsPosition + chord.MsDuration;
-            int index = -1, restStartMsPos = -1, restEndMsPos = -1;
-
-            #region find the index of the rest in which to put the lmdd
-            for(int i = 0; i < lmdds.Count; ++i)
-            {
-                UniqueMidiRestDef umrd = lmdds[i].UniqueMidiDurationDef as UniqueMidiRestDef;
-                if(umrd != null)
-                {
-                    restStartMsPos = lmdds[i].MsPosition;
-                    restEndMsPos = lmdds[i].MsPosition + lmdds[i].MsDuration;
-
-                    if(chordStartMsPos >= restStartMsPos && chordEndMsPos <= restEndMsPos)
-                    {
-                        index = i;
-                        break;
-                    }
-                    if(chordStartMsPos < restStartMsPos)
-                    {
-                        break;
-                    }
-                }
-            }
-            #endregion
-            // if index >= 0, it is the index of a rest into which the chord will fit.
-            if(index >= 0)
-            {
-                List<LocalMidiDurationDef> replacement = GetReplacementList(lmdds[index], chord);
-                int replacementStart = replacement[0].MsPosition;
-                int replacementEnd = replacement[replacement.Count-1].MsPosition + replacement[replacement.Count-1].MsDuration;
-                Debug.Assert(restStartMsPos == replacementStart && restEndMsPos == replacementEnd);
-                lmdds.RemoveAt(index);
-                lmdds.InsertRange(index, replacement);
-            }
-            else
-            {
-                Debug.Assert(false, "Can't find a rest in which to put the new object!");
-            }
-
-        }
-
-        /// <summary>
-        /// returns a list having the position and duration of the originalRest.
-        /// The chord has been put in(side) the rest, either at the beginning, middle, or end. 
-        /// </summary>
-        /// <param name="localMidiDurationDef"></param>
-        /// <param name="lmdd"></param>
-        /// <returns></returns>
-        private List<LocalMidiDurationDef> GetReplacementList(LocalMidiDurationDef originalRest, LocalMidiDurationDef chord)
-        {
-            Debug.Assert(originalRest.UniqueMidiDurationDef is UniqueMidiRestDef);
-            Debug.Assert(chord.UniqueMidiDurationDef is UniqueMidiChordDef);
-
-            List<LocalMidiDurationDef> rList = new List<LocalMidiDurationDef>();
-            if(chord.MsPosition > originalRest.MsPosition)
-            {
-                LocalMidiDurationDef rest1 = new LocalMidiDurationDef(originalRest.MsPosition, chord.MsPosition - originalRest.MsPosition);
-                rList.Add(rest1);
-            }
-            rList.Add(chord);
-            int chordEndMsPos = chord.MsPosition + chord.MsDuration;
-            int restEndMsPos = originalRest.MsPosition + originalRest.MsDuration;
-            if(restEndMsPos > chordEndMsPos)
-            {
-                LocalMidiDurationDef rest2 = new LocalMidiDurationDef(chordEndMsPos, restEndMsPos - chordEndMsPos);
-                rList.Add(rest2);
-            }
-
-            return rList;
         }
 
         /// <summary>

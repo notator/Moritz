@@ -16,15 +16,15 @@ namespace Moritz.AssistantComposer
 
         private VoiceDef GetFuries1(Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef furies3, VoiceDef furies2, List<PaletteDef> _paletteDefs)
         {
-            VoiceDef furies1 = GetEmptyVoiceDef(wind1.EndMsPosition);
-
-            Interlude2(furies1, furies2, _paletteDefs[8]);
+            VoiceDef furies1 = GetFuries1Interlude2(wind1, furies2, _paletteDefs[8]);
 
             return furies1;
         }
 
-        private void Interlude2(VoiceDef furies1, VoiceDef furies2, PaletteDef cheepsPalette)
+        private VoiceDef GetFuries1Interlude2(VoiceDef wind1, VoiceDef furies2, PaletteDef cheepsPalette)
         {
+            VoiceDef furies1 = GetEmptyVoiceDef(wind1.EndMsPosition);
+
             int[] cheepIndices = { 4, 8, 2, 6, 10 };
             int[] transpositions = { 2, 1, 3, 0, 4 };
             double[] velocityfactors = { 0.3, 0.33, 0.37, 0.41, 0.45 };
@@ -43,8 +43,11 @@ namespace Moritz.AssistantComposer
                 cheep.MsDuration *= 2;
                 cheep.UniqueMidiDurationDef.AdjustVelocities(velocityfactors[i]);
                 cheep.UniqueMidiDurationDef.Transpose(transpositions[i]);
-                furies1.PutInsideRest(cheep);
+                furies1.InsertInRest(cheep);
             }
+
+            return furies1;
         }
+
     }
 }
