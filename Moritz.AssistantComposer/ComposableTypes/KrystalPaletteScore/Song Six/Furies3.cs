@@ -182,10 +182,13 @@ namespace Moritz.AssistantComposer
                 furies3.InsertInRest(cheep);
             }
 
+            furies3.AlignObjectAtIndex(25, 30, 31, clytemnestra[65].MsPosition);
             furies3.AlignObjectAtIndex(140, 141, 142, clytemnestra[119].MsPosition);
             furies3.AlignObjectAtIndex(142, 143, 144, clytemnestra[140].MsPosition);
             furies3.AlignObjectAtIndex(144, 145, 146, clytemnestra[152].MsPosition);
             furies3.AlignObjectAtIndex(146, 147, 148, furies1[23].MsPosition);
+
+            furies3.AgglomerateRestOrChordAt(114);
  
         }
 

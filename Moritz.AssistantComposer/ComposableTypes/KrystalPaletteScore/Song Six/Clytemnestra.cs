@@ -294,15 +294,15 @@ namespace Moritz.AssistantComposer
 
             int currentVerseMsPosition = 0;
             int currentEndMsPosition = 0;
-            LocalMidiDurationDef intervalRestDef = null;
+            LocalMidiDurationDef interludeRestDef = null;
 
             for(int verseIndex = 0; verseIndex < 5; ++verseIndex)
             { 
                 currentVerseMsPosition = verseMsPositions[verseIndex];
 
-                intervalRestDef = new LocalMidiDurationDef(currentEndMsPosition, currentVerseMsPosition - currentEndMsPosition);
+                interludeRestDef = new LocalMidiDurationDef(currentEndMsPosition, currentVerseMsPosition - currentEndMsPosition);
 
-                _localMidiDurationDefs.Add(intervalRestDef);
+                _localMidiDurationDefs.Add(interludeRestDef);
 
                 List<MomentDef> momentDefs = _momentDefsListPerVerse[verseIndex];
 
@@ -334,8 +334,8 @@ namespace Moritz.AssistantComposer
                         _localMidiDurationDefs[_localMidiDurationDefs.Count - 1].MsDuration;
                 }
             }
-            intervalRestDef = new LocalMidiDurationDef(currentEndMsPosition, wind3.EndMsPosition - currentEndMsPosition);
-            _localMidiDurationDefs.Add(intervalRestDef);
+            interludeRestDef = new LocalMidiDurationDef(currentEndMsPosition, wind3.EndMsPosition - currentEndMsPosition);
+            _localMidiDurationDefs.Add(interludeRestDef);
         }
 
         private List<List<MomentDef>> _momentDefsListPerVerse;

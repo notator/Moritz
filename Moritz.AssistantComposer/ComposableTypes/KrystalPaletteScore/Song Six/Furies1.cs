@@ -26,8 +26,7 @@ namespace Moritz.AssistantComposer
             VoiceDef furies1 = GetEmptyVoiceDef(wind1.EndMsPosition);
 
             int[] cheepIndices = { 4, 8, 2, 6, 10, 0, 1, 3, 5, 7, 9, 11 };
-            int[] transpositions = { 2, 1, 3, 0, 4, 6, 5, 10, 6, 9, 7, 8 };
-            //double[] velocityfactors = { 0.3, 0.31, 0.32, 0.34, 0.35, 0.36, 0.37, 0.39, 0.4, 0.42, 0.43, 0.45 };
+            int[] transpositions = { 2, 1, 3, 0, 4, -3, 5, 10, 6, 9, 7, 8 };
             double[] velocityfactors = { 0.32, 0.31, 0.34, 0.3, 0.35, 0.37, 0.36, 0.43, 0.37, 0.42, 0.39, 0.4 };
             int[] msPositions =
             { 

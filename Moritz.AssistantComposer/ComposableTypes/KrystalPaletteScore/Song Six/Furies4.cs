@@ -17,12 +17,12 @@ namespace Moritz.AssistantComposer
         private VoiceDef GetFuries4(int firstRestMsDuration, Clytemnestra clytemnestra, VoiceDef wind1, List<PaletteDef> palettes)
         {
             VoiceDef furies4 = GetSnores(firstRestMsDuration, clytemnestra, wind1, palettes[1]);
-            AddGrowlsToInterval2AndVerse3(furies4, clytemnestra, palettes[3]);
+            AddGrowlsToInterlude2AndVerse3(furies4, clytemnestra, palettes[3]);
 
             return furies4;
         }
 
-        private void AddGrowlsToInterval2AndVerse3(VoiceDef furies4, Clytemnestra clytemnestra, PaletteDef growlsPalette)
+        private void AddGrowlsToInterlude2AndVerse3(VoiceDef furies4, Clytemnestra clytemnestra, PaletteDef growlsPalette)
         {
             int[] growlIndices = { 0,2,5,1 };
             //int[] transpositions = { 0,0,0,0 };
@@ -60,7 +60,7 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// Creates the initial furies4 VoiceDef containing snores to the beginning of Interval3.
+        /// Creates the initial furies4 VoiceDef containing snores to the beginning of Interlude3.
         /// </summary>
         /// <param name="firstRestMsDuration"></param>
         private VoiceDef GetSnores(int firstRestMsDuration, Clytemnestra clytemnestra, VoiceDef wind1, PaletteDef snoresPalette)
@@ -80,6 +80,7 @@ namespace Moritz.AssistantComposer
                 snore.MsPosition = msPosition;
                 msPosition += snore.MsDuration;
                 snore.Transpose(transpositions1[i]);
+                snore.PitchWheelDeviation = 3;
                 snores.Add(snore);
 
                 LocalMidiDurationDef rest = new LocalMidiDurationDef(msPosition, 2500);
@@ -103,6 +104,7 @@ namespace Moritz.AssistantComposer
                 snore.MsDuration = (int)msDuration;
                 msPosition += snore.MsDuration;
                 snore.Transpose(transpositions2[i]);
+                snore.PitchWheelDeviation = 20;
                 //snore.UniqueMidiDurationDef.MidiVelocity = (byte)((double)snore.UniqueMidiDurationDef.MidiVelocity * factor * factor);
                 snores.Add(snore);
 
@@ -129,7 +131,9 @@ namespace Moritz.AssistantComposer
             furies4.AlignObjectAtIndex(14, 34, furies4.Count, wind1[38].MsPosition); // rest at start of Interlude3
             #endregion
 
-            furies4.RemoveScorePitchWheelCommands(0, 15);
+            furies4.RemoveScorePitchWheelCommands(0, 13); // pitchwheeldeviation is 20 for R2M
+
+
 
             return furies4;
 

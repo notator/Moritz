@@ -96,6 +96,33 @@ namespace Moritz.Score.Midi
             UniqueMidiDurationDef.MsDuration = _msDuration;
         }
 
+        public int PitchWheelDeviation
+        {
+            get
+            {
+                byte? pwd = null;
+                UniqueMidiChordDef umcd =  UniqueMidiDurationDef as UniqueMidiChordDef;
+                if(umcd != null)
+                {
+                    pwd = umcd.PitchWheelDeviation;
+                }
+                int rval = 2;
+                if(pwd != null)
+                    rval = (int) pwd;
+                return rval;
+            }
+            set
+            {
+                UniqueMidiChordDef umcd = UniqueMidiDurationDef as UniqueMidiChordDef;
+                if(umcd != null)
+                {
+                    byte pwd = (value > 127) ? (byte) 127 : (byte) value;
+                    pwd = (pwd < 0) ? (byte)0 : pwd; 
+                    umcd.PitchWheelDeviation = pwd;
+                }
+            }
+        }
+
         /// <summary>
         /// A UniqueMidiRestDef or a UniqueMidiChordDef.
         /// </summary>

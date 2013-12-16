@@ -58,7 +58,7 @@ namespace Moritz.AssistantComposer
             // palette 4 : furies4 growls [domain 7] (index 0,2,5,1 used)
             // palette 5 : furies2 ticks [domain 7] (used, dont change!)
             //
-            // -- "bird sounds" from interval2 and verse 3
+            // -- "bird sounds" from Interlude2 and verse 3
             // palette 6 : furies4 songs [domain 12] 
             // palette 7 : furies3 chirps1 [domain 12] 
             // palette 8 : furies2 chirps2 [domain 12] 
@@ -127,14 +127,14 @@ namespace Moritz.AssistantComposer
 
         private void AdjustWindVelocities(VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
         {
-            int beginInterval2DimIndex = 25; // start of Interlude2
+            int beginInterlude2DimIndex = 25; // start of Interlude2
             int beginVerse3DimIndex = 31; // non-inclusive
             int beginVerse5CrescIndex = 70;
             int beginPostludeIndex = 74;
 
-            wind1.VelocitiesHairpin(beginInterval2DimIndex, beginVerse3DimIndex, 0.5);
-            wind2.VelocitiesHairpin(beginInterval2DimIndex, beginVerse3DimIndex, 0.5);
-            wind3.VelocitiesHairpin(beginInterval2DimIndex, beginVerse3DimIndex, 0.5);
+            wind1.VelocitiesHairpin(beginInterlude2DimIndex, beginVerse3DimIndex, 0.5);
+            wind2.VelocitiesHairpin(beginInterlude2DimIndex, beginVerse3DimIndex, 0.5);
+            wind3.VelocitiesHairpin(beginInterlude2DimIndex, beginVerse3DimIndex, 0.5);
 
             wind1.VelocitiesHairpin(beginVerse5CrescIndex, beginPostludeIndex, 2);
             wind2.VelocitiesHairpin(beginVerse5CrescIndex, beginPostludeIndex, 2);
@@ -407,6 +407,39 @@ namespace Moritz.AssistantComposer
                 f4[9].MsPosition, f4[10].MsPosition,
                 f4[11].MsPosition, f4[12].MsPosition,
                 c[49].MsPosition, (c[58].MsPosition + c[59].MsPosition) / 2,
+
+                // Interlude 1
+                f3[1].MsPosition, f3[12].MsPosition,
+                f3[13].MsPosition, f3[24].MsPosition,
+
+                // Verse 2
+                c[60].MsPosition, c[61].MsPosition,
+                c[62].MsPosition, c[65].MsPosition,
+                c[66].MsPosition, c[82].MsPosition,
+                c[83].MsPosition, c[93].MsPosition,
+                c[94].MsPosition, c[98].MsPosition,
+                c[99].MsPosition, c[105].MsPosition,
+                c[106].MsPosition, c[116].MsPosition,
+
+                // Interlude 2
+                f3[61].MsPosition, f3[72].MsPosition,
+                f1[1].MsPosition, f1[2].MsPosition,
+                f1[3].MsPosition, f2[18].MsPosition,
+                f3[96].MsPosition, f1[5].MsPosition,
+                f2[29].MsPosition, f3[114].MsPosition,
+                f4[29].MsPosition, f1[10].MsPosition,
+                f3[131].MsPosition, f2[47].MsPosition,
+
+                // Verse 3
+                c[117].MsPosition, c[118].MsPosition,
+                c[119].MsPosition, c[122].MsPosition,
+                c[123].MsPosition, c[129].MsPosition,
+                c[130].MsPosition, c[140].MsPosition,
+                c[141].MsPosition, c[151].MsPosition,
+                c[152].MsPosition, c[162].MsPosition,
+                c[163].MsPosition, c[173].MsPosition,
+
+
 
                 w3.EndMsPosition // final barline position
             };
