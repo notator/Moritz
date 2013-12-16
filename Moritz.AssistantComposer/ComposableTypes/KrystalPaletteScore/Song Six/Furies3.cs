@@ -15,12 +15,11 @@ namespace Moritz.AssistantComposer
     {
         private VoiceDef GetFuries3(int firstRestMsDuration, Clytemnestra clytemnestra, VoiceDef wind1, List<PaletteDef> paletteDefs)
         {
-            VoiceDef furies3 = GetFuries3Interlude2AndVerse3(firstRestMsDuration, clytemnestra, wind1, paletteDefs);
-            
+            VoiceDef furies3 = GetFuries3FluttersAndTicks(firstRestMsDuration, clytemnestra, wind1, paletteDefs);           
             return furies3;
         }
 
-        private VoiceDef GetFuries3Interlude2AndVerse3(int firstRestMsDuration, Clytemnestra clytemnestra, VoiceDef wind1, List<PaletteDef> paletteDefs)
+        private VoiceDef GetFuries3FluttersAndTicks(int firstRestMsDuration, Clytemnestra clytemnestra, VoiceDef wind1, List<PaletteDef> paletteDefs)
         {
             VoiceDef furies3 = GetFlutters(firstRestMsDuration, paletteDefs[2]);
 
@@ -157,6 +156,37 @@ namespace Moritz.AssistantComposer
             }
 
             return ticksSequence;
+        }
+
+        private void GetFuries3ChirpsInInterlude2AndVerse3(VoiceDef furies1, VoiceDef furies2, VoiceDef furies3, Clytemnestra clytemnestra, VoiceDef wind1, PaletteDef chirpsPalette)
+        {
+            int[] chirpIndices = { 4, 8, 2, 6, 10, 0 };
+            int[] transpositions = { 2, 1, 3, 0, 4, 5 };
+            //double[] velocityfactors = { 0.3, 0.31, 0.32, 0.34, 0.35, 0.36, 0.37, 0.39, 0.4, 0.42, 0.43, 0.45 };
+            double[] velocityfactors = { 0.32, 0.34, 0.36, 0.38, 0.40, 0.42 };
+            int[] msPositions =
+            { 
+                furies3[112].MsPosition + 200, 
+                furies3[129].MsPosition + 500, 
+                clytemnestra[118].MsPosition,
+                clytemnestra[138].MsPosition + 250,
+                clytemnestra[151].MsPosition,
+                furies2[57].MsPosition
+            };
+            for(int i = 5; i >=0; --i)
+            {
+                LocalMidiDurationDef cheep = new LocalMidiDurationDef(chirpsPalette[chirpIndices[i]]);
+                cheep.MsPosition = msPositions[i];
+                cheep.UniqueMidiDurationDef.AdjustVelocities(velocityfactors[i]);
+                cheep.UniqueMidiDurationDef.Transpose(transpositions[i]);
+                furies3.InsertInRest(cheep);
+            }
+
+            furies3.AlignObjectAtIndex(140, 141, 142, clytemnestra[119].MsPosition);
+            furies3.AlignObjectAtIndex(142, 143, 144, clytemnestra[140].MsPosition);
+            furies3.AlignObjectAtIndex(144, 145, 146, clytemnestra[152].MsPosition);
+            furies3.AlignObjectAtIndex(146, 147, 148, furies1[23].MsPosition);
+ 
         }
 
     }

@@ -117,7 +117,7 @@ namespace Moritz.AssistantComposer
 
             VoiceDef furies4 = new VoiceDef(snores);
 
-            furies4.VelocitiesHairpin(13, furies4.Count, 0.3);
+            furies4.VelocitiesHairpin(13, furies4.Count, 0.25);
 
             #region alignments before Interlude3
             furies4.AlignObjectAtIndex(7, 8, 9, clytemnestra[3].MsPosition);

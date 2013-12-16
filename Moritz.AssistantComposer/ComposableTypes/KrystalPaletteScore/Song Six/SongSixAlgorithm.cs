@@ -89,8 +89,9 @@ namespace Moritz.AssistantComposer
             // Construct the Furies.
             VoiceDef furies4 = GetFuries4(wind3[0].MsDuration / 2, clytemnestra, wind1, _paletteDefs);
             VoiceDef furies3 = GetFuries3(wind1[15].MsPosition, clytemnestra, wind1, _paletteDefs);
-            VoiceDef furies2 = GetFuries2(clytemnestra, wind1, furies3, _paletteDefs);
+            VoiceDef furies2 = GetFuries2(clytemnestra, wind1, furies3, _paletteDefs);// steals ticks from furies3
             VoiceDef furies1 = GetFuries1(clytemnestra, wind1, furies3, furies2, _paletteDefs);
+            GetFuries3ChirpsInInterlude2AndVerse3(furies1, furies2, furies3, clytemnestra, wind1, _paletteDefs[6]);
 
             // contouring test code 
             // fury1.SetContour(1, new List<int>(){2,2,2,2,2}, 1, 6);
