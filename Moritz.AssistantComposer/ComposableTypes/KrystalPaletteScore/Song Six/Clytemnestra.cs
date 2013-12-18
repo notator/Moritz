@@ -17,7 +17,7 @@ namespace Moritz.AssistantComposer
             : base(new List<IUniqueMidiDurationDef>())
         {
             SetMomentDefsListPerVerse();
-            SetLocalMidiDurationDefs(wind3);
+            SetUniqueMidiDurationDefs(wind3);
             SetPitchWheelDeviation(0, _uniqueMidiDurationDefs.Count, 1);
         }
 
@@ -278,10 +278,10 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// Sets Clytamnestra's _localMidiDurationDefs for the whole piece including rests.
+        /// Sets Clytamnestra's _uniqueMidiDurationDefs for the whole piece including rests.
         /// Barline positions are set later.
         /// </summary>
-        private void SetLocalMidiDurationDefs(VoiceDef wind3)
+        private void SetUniqueMidiDurationDefs(VoiceDef wind3)
         {
             Debug.Assert(_momentDefsListPerVerse.Count == 5);
 

@@ -36,7 +36,7 @@ namespace Moritz.Score.Midi
         }
 
         #region IUniqueMidiDurationDef
-        public string ToString()
+        public override string ToString()
         {
             return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString());
         }

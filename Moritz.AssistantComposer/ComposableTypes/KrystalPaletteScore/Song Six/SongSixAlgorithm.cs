@@ -38,8 +38,8 @@ namespace Moritz.AssistantComposer
 
         /// <summary>
         /// Sets the midi content of the score, independent of its notation.
-        /// This means adding LocalMidiDurationDefs to each VoiceDef's LocalMidiDurationDefs list.
-        /// The LocalMidiDurationDefs will later be transcribed into a particular notation by a Notator.
+        /// This means adding UniqueMidiDurationDefs to each VoiceDef's UniqueMidiDurationDefs list.
+        /// The UniqueMidiDurationDefs will later be transcribed into a particular notation by a Notator.
         /// Notations are independent of the midi info.
         /// This DoAlgorithm() function is special to this composition.
         /// </summary>

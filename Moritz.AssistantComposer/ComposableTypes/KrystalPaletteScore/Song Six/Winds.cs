@@ -57,7 +57,7 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// Returns a VoiceDef containing clones of the LocalMidiDurationDefs in the originalVoiceDef argument,
+        /// Returns a VoiceDef containing clones of the UniqueMidiDurationDefs in the originalVoiceDef argument,
         /// rotated so that the original first IUniqueMidiDurationDef is positioned close to rotationMsPosition.
         /// </summary>
         /// <param name="originalVoiceDef"></param>

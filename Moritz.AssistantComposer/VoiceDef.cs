@@ -24,7 +24,7 @@ namespace Moritz.AssistantComposer
         #region constructors
         /// <summary>
         /// <para>If the argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
-        /// <para>The new VoiceDef's LocalMidiDurationDefs list is simply set to the argument (which is not cloned).</para>
+        /// <para>The new VoiceDef's UniqueMidiDurationDefs list is simply set to the argument (which is not cloned).</para>
         /// </summary>
         public VoiceDef(List<IUniqueMidiDurationDef> lmdds)
         {
@@ -76,7 +76,7 @@ namespace Moritz.AssistantComposer
                 _uniqueMidiDurationDefs.Add(iumdd);
             }
             SetMsPositions();
-            //MsPosition = _localMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rests
+            //MsPosition = _uniqueMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rests
         }
 
         /// <summary>
@@ -188,7 +188,7 @@ namespace Moritz.AssistantComposer
         }
         /// <summary>
         /// Adds the argument to the end of this VoiceDef.
-        /// Sets the MsPositions of the appended LocalMidiDurationDefs.
+        /// Sets the MsPositions of the appended UniqueMidiDurationDefs.
         /// </summary>
         internal void AddRange(VoiceDef voiceDef)
         {
@@ -377,15 +377,15 @@ namespace Moritz.AssistantComposer
             SetMsPositions();
         }
         /// <summary>
-        /// Extracts nLocalMidiDurationDefs from the LocalMididurationDefs, and then inserts them again at the toIndex.
+        /// Extracts nUniqueMidiDurationDefs from the UniqueMidiDurationDefs, and then inserts them again at the toIndex.
         /// </summary>
-        internal void Translate(int fromIndex, int nLocalMidiDurationDefs, int toIndex)
+        internal void Translate(int fromIndex, int nUniqueMidiDurationDefs, int toIndex)
         {
-            Debug.Assert((fromIndex + nLocalMidiDurationDefs) <= _uniqueMidiDurationDefs.Count);
-            Debug.Assert(toIndex <= (_uniqueMidiDurationDefs.Count - nLocalMidiDurationDefs));
+            Debug.Assert((fromIndex + nUniqueMidiDurationDefs) <= _uniqueMidiDurationDefs.Count);
+            Debug.Assert(toIndex <= (_uniqueMidiDurationDefs.Count - nUniqueMidiDurationDefs));
             int msPosition = _uniqueMidiDurationDefs[0].MsPosition;
-            List<IUniqueMidiDurationDef> extractedLmdds = _uniqueMidiDurationDefs.GetRange(fromIndex, nLocalMidiDurationDefs);
-            _uniqueMidiDurationDefs.RemoveRange(fromIndex, nLocalMidiDurationDefs);
+            List<IUniqueMidiDurationDef> extractedLmdds = _uniqueMidiDurationDefs.GetRange(fromIndex, nUniqueMidiDurationDefs);
+            _uniqueMidiDurationDefs.RemoveRange(fromIndex, nUniqueMidiDurationDefs);
             _uniqueMidiDurationDefs.InsertRange(toIndex, extractedLmdds);
             SetMsPositions();
         }
@@ -434,7 +434,7 @@ namespace Moritz.AssistantComposer
             AdjustMsDurations<MidiDurationDef>(startIndex, endIndex, factor, minThreshold);
         }
         /// <summary>
-        /// Multiplies the MsDuration of each chord and rest in the LocalMidiDurationDefs list by factor.
+        /// Multiplies the MsDuration of each chord and rest in the UniqueMidiDurationDefs list by factor.
         /// If a chord or rest's MsDuration becomes less than minThreshold, it is removed.
         /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
@@ -452,7 +452,7 @@ namespace Moritz.AssistantComposer
             AdjustMsDurations<UniqueMidiChordDef>(startIndex, endIndex, factor, minThreshold);
         }
         /// <summary>
-        /// Multiplies the MsDuration of each chord in the LocalMidiDurationDefs list by factor.
+        /// Multiplies the MsDuration of each chord in the UniqueMidiDurationDefs list by factor.
         /// If a chord's MsDuration becomes less than minThreshold, it is removed.
         /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
@@ -470,7 +470,7 @@ namespace Moritz.AssistantComposer
             AdjustMsDurations<UniqueMidiRestDef>(startIndex, endIndex, factor, minThreshold);
         }
         /// <summary>
-        /// Multiplies the MsDuration of each rest in the LocalMidiDurationDefs list by factor.
+        /// Multiplies the MsDuration of each rest in the UniqueMidiDurationDefs list by factor.
         /// If a rest's MsDuration becomes less than minThreshold, it is removed.
         /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
@@ -596,7 +596,7 @@ namespace Moritz.AssistantComposer
 
         #region internal attribute changers (Transpose etc.)
         /// <summary>
-        /// Multiplies each expression value in the LocalMidiDurationDefs
+        /// Multiplies each expression value in the UniqueMidiDurationDefs
         /// from startIndex to (not including) endIndex by the argument factor.
         /// </summary>
         internal void AdjustExpression(int startIndex, int endIndex, double factor)
@@ -609,7 +609,7 @@ namespace Moritz.AssistantComposer
             }
         }
         /// <summary>
-        /// Multiplies each expression value in the LocalMidiDurationDefs by the argument factor.
+        /// Multiplies each expression value in the UniqueMidiDurationDefs by the argument factor.
         /// </summary>
         internal void AdjustExpression(double factor)
         {
@@ -619,7 +619,7 @@ namespace Moritz.AssistantComposer
             }
         }
         /// <summary>
-        /// Multiplies each velocity value in the LocalMidiDurationDefs
+        /// Multiplies each velocity value in the UniqueMidiDurationDefs
         /// from startIndex to (not including) endIndex by the argument factor.
         /// </summary>
         internal void AdjustVelocities(int startIndex, int endIndex, double factor)
@@ -631,7 +631,7 @@ namespace Moritz.AssistantComposer
             }
         }
         /// <summary>
-        /// Multiplies each velocity value in the LocalMidiDurationDefs by the argument factor.
+        /// Multiplies each velocity value in the UniqueMidiDurationDefs by the argument factor.
         /// </summary>
         internal void AdjustVelocities(double factor)
         {
@@ -702,7 +702,7 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// Transposes the LocalMidiDurationDefs from the startIndex upto (but not including) endIndex
+        /// Transposes the UniqueMidiDurationDefs from the startIndex upto (but not including) endIndex
         /// by an equally increasing amount, so that the final IUniqueMidiDurationDef is transposed by glissInterval.
         /// startIndex must be less than endIndex.
         /// glissInterval can be negative.
@@ -868,13 +868,13 @@ namespace Moritz.AssistantComposer
 
         #region internal Permute()
         /// <summary>
-        /// Re-orders the LocalMidiDurationDefs in (part of) this VoiceDef.
-        /// <para>1. creates partitions (lists of LocalMidiDurationDefs) using the startAtIndex and partitionSizes in the first two</para>
+        /// Re-orders the UniqueMidiDurationDefs in (part of) this VoiceDef.
+        /// <para>1. creates partitions (lists of UniqueMidiDurationDefs) using the startAtIndex and partitionSizes in the first two</para>
         /// <para>-  arguments (see parameter info below).</para>   
         /// <para>2. Sorts the partitions into ascending order of their lowest pitches.
         /// <para>3. Re-orders the partitions according to the contour retrieved (from the static K.Contour[] array) using</para>
         /// <para>-  the contourNumber and axisNumber arguments.</para>
-        /// <para>4. Concatenates the re-ordered partitions, re-sets their MsPositions, and replaces the LocalMidiDurationDefs in</para>
+        /// <para>4. Concatenates the re-ordered partitions, re-sets their MsPositions, and replaces the UniqueMidiDurationDefs in</para>
         /// <para>-  the original List with the result.</para>
         /// <para>5. If setLyricsToIndex is true, sets the lyrics to the new indices</para>
         /// <para>SpecialCases:</para>
@@ -884,13 +884,13 @@ namespace Moritz.AssistantComposer
         /// <para>If two sub-VoiceDefs have the same initial base pitch, they stay in the same order as they were (not necessarily</para>
         /// <para>together, of course.)</para>
         /// </summary>
-        /// <param name="startAtIndex">The index in LocalMidiDurationDefs at which to start the re-ordering.
+        /// <param name="startAtIndex">The index in UniqueMidiDurationDefs at which to start the re-ordering.
         /// </param>
-        /// <param name="partitionSizes">The number of LocalMidiDurationDefs in each sub-voiceDef to be re-ordered.
+        /// <param name="partitionSizes">The number of UniqueMidiDurationDefs in each sub-voiceDef to be re-ordered.
         /// <para>This partitionSizes list must contain:</para>
         /// <para>    1..7 int sizes.</para>
         /// <para>    sizes which are all greater than 0.</para>
-        /// <para>    The sum of all the sizes + startAtIndex must be less than or equal to LocalMidiDurationDefs.Count.</para>
+        /// <para>    The sum of all the sizes + startAtIndex must be less than or equal to UniqueMidiDurationDefs.Count.</para>
         /// <para>An Exception is thrown if any of these conditions is not met.</para>
         /// <para>If the partitions list contains only one value, this function returns silently without doing anything.</para>
         /// </param>
@@ -1070,10 +1070,10 @@ namespace Moritz.AssistantComposer
 
         /// <summary>
         /// Throws an exception if one of the following conditions is not met.
-        /// <para>startAtIndex is a valid index in the LocalMidiDurationDefs list</para>
+        /// <para>startAtIndex is a valid index in the UniqueMidiDurationDefs list</para>
         /// <para>partitionSizes.Count is greater than 0, and less than 8.</para>
         /// <para>all sizes in partitionSizes are greater then 0.</para>
-        /// <para>the sum of startAtIndex plus all the partition sizes is not greater than LocalMidiDurationDefs.Count</para>
+        /// <para>the sum of startAtIndex plus all the partition sizes is not greater than UniqueMidiDurationDefs.Count</para>
         /// <para>contourNumber is in the range 1..12</para>
         /// <para>axisNumber is in the range 1..12</para>
         /// </summary>
@@ -1141,9 +1141,9 @@ namespace Moritz.AssistantComposer
 
         #region private
         /// <summary>
-        /// Sets the MsPosition attribute of each IUniqueMidiDurationDef in the _localMidiDurationDefs list.
+        /// Sets the MsPosition attribute of each IUniqueMidiDurationDef in the _uniqueMidiDurationDefs list.
         /// Uses all the MsDuration attributes, and the MsPosition of the first IUniqueMidiDurationDef as origin.
-        /// This function must be called at the end of any function that changes the _localMidiDurationDefs list.
+        /// This function must be called at the end of any function that changes the _uniqueMidiDurationDefs list.
         /// </summary>
         private void SetMsPositions()
         {

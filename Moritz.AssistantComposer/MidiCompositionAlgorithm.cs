@@ -68,8 +68,8 @@ namespace Moritz.AssistantComposer
         public abstract int NumberOfBars();
 
         /// <summary>
-        /// Returns the position of the end of the last LocalMidiDurationDef
-        /// in the bar's first voice's LocalMidiDurationDefs list.
+        /// Returns the position of the end of the last UniqueMidiDurationDef
+        /// in the bar's first voice's UniqueMidiDurationDefs list.
         /// </summary>
         protected int GetEndMsPosition(List<Voice> bar)
         {
@@ -83,10 +83,10 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// Returns two bars. The first is the beginning of the argument bar up to absoluteSplitPos,
         /// The second is the end of the argument bar beginning at absoluteSplitPos.
-        /// The final LocalMidiDurationDef in each voice.LocalMidiDurationDefs list is converted
+        /// The final UniqueMidiDurationDef in each voice.UniqueMidiDurationDefs list is converted
         /// to a FinalLMDDInVoice object containing an MsDurationToBarline property.
         /// If a chord or rest overlaps a barline, a LocalizedCautionaryChordDef object is created at the
-        /// start of the voice.LocalMidiDurationDefs in the second bar. A LocalizedCautionaryChordDef
+        /// start of the voice.UniqueMidiDurationDefs in the second bar. A LocalizedCautionaryChordDef
         /// object is a kind of chord which is used while justifying systems, but is not displayed and
         /// does not affect performance.
         /// </summary>
