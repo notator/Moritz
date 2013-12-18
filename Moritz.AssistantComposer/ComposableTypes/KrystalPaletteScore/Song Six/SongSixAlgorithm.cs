@@ -147,60 +147,56 @@ namespace Moritz.AssistantComposer
 
         private void AdjustWindPitchWheelDeviations(VoiceDef wind)
         {
-            byte? versePwdValue = 3;
+            int versePwdValue = 3;
             double windStartPwdValue = 6, windEndPwdValue=28;
             double pwdfactor = Math.Pow(windEndPwdValue/windStartPwdValue, (double)1/5); // 5th root of windEndPwdValue/windStartPwdValue -- the last pwd should be windEndPwdValue
 
             for(int i = 0; i < wind.Count; ++i)
             {
-                UniqueMidiChordDef umcd = wind[i].UniqueMidiDurationDef as UniqueMidiChordDef;
-                if(umcd != null)
+                if(i < 8) //prelude
                 {
-                    if(i < 8) //prelude
-                    {
-                        umcd.PitchWheelDeviation = (byte?) windStartPwdValue;
-                    }
-                    else if(i < 15) // verse 1
-                    {
-                        umcd.PitchWheelDeviation = versePwdValue;
-                    }
-                    else if(i < 20) // interlude 1
-                    {
-                        umcd.PitchWheelDeviation = (byte?)(windStartPwdValue * pwdfactor);
-                    }
-                    else if(i < 24) // verse 2
-                    {
-                        umcd.PitchWheelDeviation = versePwdValue;
-                    }
-                    else if(i < 33) // interlude 2
-                    {
-                        umcd.PitchWheelDeviation = (byte?)(windStartPwdValue * (Math.Pow(pwdfactor, 2)));
-                    }
-                    else if(i < 39) // verse 3
-                    {
-                        umcd.PitchWheelDeviation = versePwdValue;
-                    }
-                    else if(i < 49) // interlude 3
-                    {
-                        umcd.PitchWheelDeviation = (byte?)(windStartPwdValue * (Math.Pow(pwdfactor, 3)));
-                    }
-                    else if(i < 57) // verse 4
-                    {
-                        umcd.PitchWheelDeviation = versePwdValue;
-                    }
-                    else if(i < 70) // interlude 4
-                    {
-                        umcd.PitchWheelDeviation = (byte?)(windStartPwdValue * (Math.Pow(pwdfactor, 4)));
-                    }
-                    else if(i < 74) // verse 5
-                    {
-                        umcd.PitchWheelDeviation = versePwdValue;
-                    }
-                    else // postlude
-                    {
-                        umcd.PitchWheelDeviation = (byte?)(windStartPwdValue * (Math.Pow(pwdfactor, 5)));
-                    }
-                }                
+                    wind[i].PitchWheelDeviation = (int) windStartPwdValue;
+                }
+                else if(i < 15) // verse 1
+                {
+                    wind[i].PitchWheelDeviation = versePwdValue;
+                }
+                else if(i < 20) // interlude 1
+                {
+                    wind[i].PitchWheelDeviation = (int)(windStartPwdValue * pwdfactor);
+                }
+                else if(i < 24) // verse 2
+                {
+                    wind[i].PitchWheelDeviation = versePwdValue;
+                }
+                else if(i < 33) // interlude 2
+                {
+                    wind[i].PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 2)));
+                }
+                else if(i < 39) // verse 3
+                {
+                    wind[i].PitchWheelDeviation = versePwdValue;
+                }
+                else if(i < 49) // interlude 3
+                {
+                    wind[i].PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 3)));
+                }
+                else if(i < 57) // verse 4
+                {
+                    wind[i].PitchWheelDeviation = versePwdValue;
+                }
+                else if(i < 70) // interlude 4
+                {
+                    wind[i].PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 4)));
+                }
+                else if(i < 74) // verse 5
+                {
+                    wind[i].PitchWheelDeviation = versePwdValue;
+                }
+                else // postlude
+                {
+                    wind[i].PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 5)));
+                }            
             }
         }
 
@@ -361,7 +357,7 @@ namespace Moritz.AssistantComposer
             List<int> newBarlineIndices = new List<int>() { 1, 3, 5, 15, 27, 40, 45, 63, 77 }; // by inspection of the score
             foreach(int index in newBarlineIndices)
             {
-                barlineMsPositions.Add(wind3.LocalMidiDurationDefs[index].MsPosition);
+                barlineMsPositions.Add(wind3.UniqueMidiDurationDefs[index].MsPosition);
             }
             barlineMsPositions.Sort();
 
@@ -375,8 +371,8 @@ namespace Moritz.AssistantComposer
         /// <returns></returns>
         private VoiceDef GetEmptyVoiceDef(int msDuration)
         {
-            List<LocalMidiDurationDef> lmdds = new List<LocalMidiDurationDef>();
-            LocalMidiDurationDef lmRestDef = new LocalMidiDurationDef(0, msDuration);
+            List<IUniqueMidiDurationDef> lmdds = new List<IUniqueMidiDurationDef>();
+            IUniqueMidiDurationDef lmRestDef = new UniqueMidiRestDef(0, msDuration);
             lmdds.Add(lmRestDef);
             VoiceDef emptyVoiceDef = new VoiceDef(lmdds);
             return emptyVoiceDef;
@@ -452,7 +448,7 @@ namespace Moritz.AssistantComposer
         // It just makes the VoiceDef from the controlNoteAndRestMsPositions defined above.
         private static VoiceDef MakeControlVoiceDef(List<int> controlNoteAndRestMsPositions)
         {
-            List<LocalMidiDurationDef> controlLmdds = new List<LocalMidiDurationDef>();
+            List<IUniqueMidiDurationDef> controlLmdds = new List<IUniqueMidiDurationDef>();
 
             for(int i = 0; i < controlNoteAndRestMsPositions.Count - 2; i += 2)
             {
@@ -465,13 +461,12 @@ namespace Moritz.AssistantComposer
                 int noteMsDuration = restMsPosition - noteMsPosition;
                 int restMsDuration = nextNoteMsPosition - restMsPosition;
 
-                UniqueMidiChordDef umcd = new UniqueMidiChordDef(new List<byte>() { (byte)67 }, new List<byte>() { (byte)0 }, noteMsDuration, false, new List<MidiControl>());
-                LocalMidiDurationDef lmChordd = new LocalMidiDurationDef(umcd, noteMsPosition, noteMsDuration);
+                UniqueMidiChordDef umChordDef = new UniqueMidiChordDef(new List<byte>() { (byte)67 }, new List<byte>() { (byte)0 }, noteMsPosition, noteMsDuration, false, new List<MidiControl>());
 
-                LocalMidiDurationDef lmRestd = new LocalMidiDurationDef(restMsPosition, restMsDuration);
+                UniqueMidiRestDef umRestDef = new UniqueMidiRestDef(restMsPosition, restMsDuration);
 
-                controlLmdds.Add(lmChordd);
-                controlLmdds.Add(lmRestd);
+                controlLmdds.Add(umChordDef);
+                controlLmdds.Add(umRestDef);
             }
             VoiceDef controlVoiceDef = new VoiceDef(controlLmdds);
             return controlVoiceDef;
@@ -485,7 +480,7 @@ namespace Moritz.AssistantComposer
             foreach(VoiceDef voiceDef in voiceDefs)
             {
                 Voice voice = new Voice(null, channelIndex++);
-                voice.LocalMidiDurationDefs = voiceDef.LocalMidiDurationDefs;
+                voice.UniqueMidiDurationDefs = voiceDef.UniqueMidiDurationDefs;
                 voices.Add(voice);
             }
 

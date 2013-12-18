@@ -32,6 +32,14 @@ namespace Moritz.Score.Midi
             }
         }
 
+        public override IUniqueMidiDurationDef CreateUniqueMidiDurationDef()
+        {
+            UniqueMidiRestDef umrd = new UniqueMidiRestDef(this);
+            umrd.MsPosition = 0;
+            umrd.MsDuration = this.MsDuration;
+            return umrd;
+        }
+
         public readonly string ID;
     }
 }

@@ -301,93 +301,87 @@ namespace Moritz.AssistantComposer
             return returnDict;
         }
 
+        ///// <summary>
+        ///// In the returned Dictionary, the key is channel, value is [msPosition, MidiMoment]
+        ///// Entries are constructed for this dictionary only for the channels which actually contain Chords which
+        ///// will be played by the assistant or live performer.
+        ///// The smallest msPosition in the dictionary is always 0.
+        ///// (The performance always begins at the first sounding Moment, so all the midiMoment.msPositions
+        ///// are adjusted if necessary, so that the first moment has MsPosition=0). 
+        ///// </summary>
+        //public Dictionary<int, SortedDictionary<int, MidiMoment>> GetMidiChannelMoments(Multimedia.Midi.Sequence sequence, out List<int> midiChannels)
+        //{
+        //    Dictionary<int, SortedDictionary<int, MidiMoment>> midiChannelMoments = null;
+        //    if(sequence != null)
+        //    {
+        //        // WriteTrackNoteInfo(sequence); // (slow) test function for printing info to the Output window
+        //        midiChannelMoments = GetMidiChannelMomentsFromSequence(sequence);
+        //    }
 
+        //    midiChannels = new List<int>();
+        //    foreach(int channel in midiChannelMoments.Keys)
+        //    {
+        //        midiChannels.Add(channel);
+        //    }
 
+        //    if(midiChannelMoments == null)
+        //        Debug.Fail("Error converting midi sequence to List<MidiMoment>");
 
+        //    /// (The performance always begins at the first sounding Moment, so all the midiMoment.msPositions
+        //    /// are adjusted if necessary, so that the first moment has MsPosition=0).
+        //    int currentFirstPosition = GetFirstPosition(midiChannelMoments);
+        //    Dictionary<int, SortedDictionary<int, MidiMoment>> returnMidiChannelMoments =
+        //        AdjustToPositionZero(midiChannelMoments, currentFirstPosition);
 
+        //    return returnMidiChannelMoments;
+        //}
 
+        ///// <summary>
+        ///// In the returned Dictionary, the key is channel, value is [msPosition, MidiMoment]
+        ///// Entries are constructed for this dictionary only for the channels
+        ///// which actually contain Chords which will be played by the assistant or live performer.
+        ///// The smallest msPosition in the dictionary is always 0.
+        ///// </summary>
+        //private Dictionary<int, SortedDictionary<int, MidiMoment>> GetMidiChannelMomentsFromSequence(Multimedia.Midi.Sequence sequence)
+        //{
+        //    Dictionary<int, SortedDictionary<int, MidiMoment>> returnDict = new Dictionary<int, SortedDictionary<int, MidiMoment>>();
+        //    foreach(Track track in sequence)
+        //    {
+        //        SortedDictionary<int, MidiMoment> midiMomentsDict = new SortedDictionary<int, MidiMoment>();
 
-        /// <summary>
-        /// In the returned Dictionary, the key is channel, value is [msPosition, MidiMoment]
-        /// Entries are constructed for this dictionary only for the channels which actually contain Chords which
-        /// will be played by the assistant or live performer.
-        /// The smallest msPosition in the dictionary is always 0.
-        /// (The performance always begins at the first sounding Moment, so all the midiMoment.msPositions
-        /// are adjusted if necessary, so that the first moment has MsPosition=0). 
-        /// </summary>
-        public Dictionary<int, SortedDictionary<int, MidiMoment>> GetMidiChannelMoments(Multimedia.Midi.Sequence sequence, out List<int> midiChannels)
-        {
-            Dictionary<int, SortedDictionary<int, MidiMoment>> midiChannelMoments = null;
-            if(sequence != null)
-            {
-                // WriteTrackNoteInfo(sequence); // (slow) test function for printing info to the Output window
-                midiChannelMoments = GetMidiChannelMomentsFromSequence(sequence);
-            }
+        //        Dictionary<int, List<NoteOn>> timedNoteOns = GetTimedNoteOns(track);
+        //        Dictionary<int, List<NoteOff>> timedNoteOffs = GetTimedNoteOffs(track);
+        //        Dictionary<int, List<MidiControl>> timedMidiControls = GetTimedMidiControls(track);
 
-            midiChannels = new List<int>();
-            foreach(int channel in midiChannelMoments.Keys)
-            {
-                midiChannels.Add(channel);
-            }
+        //        if(timedNoteOns.Count > 0)
+        //        {
+        //            Dictionary<int, List<MidiChord>> timedMidiChords =
+        //                GetTimedMidiChords(timedNoteOns, timedNoteOffs, timedMidiControls);
 
-            if(midiChannelMoments == null)
-                Debug.Fail("Error converting midi sequence to List<MidiMoment>");
+        //            Debug.Assert(timedMidiChords.Count > 0);
 
-            /// (The performance always begins at the first sounding Moment, so all the midiMoment.msPositions
-            /// are adjusted if necessary, so that the first moment has MsPosition=0).
-            int currentFirstPosition = GetFirstPosition(midiChannelMoments);
-            Dictionary<int, SortedDictionary<int, MidiMoment>> returnMidiChannelMoments =
-                AdjustToPositionZero(midiChannelMoments, currentFirstPosition);
+        //            foreach(int key in timedMidiChords.Keys)
+        //            {
+        //                if(!midiMomentsDict.ContainsKey(key))
+        //                {
+        //                    midiMomentsDict.Add(key, new MidiMoment(key));
+        //                }
+        //                midiMomentsDict[key].MidiChords.AddRange(timedMidiChords[key]);
+        //            }
 
-            return returnMidiChannelMoments;
-        }
+        //            int channel = -1;
+        //            foreach(int pos in timedNoteOns.Keys)
+        //            {
+        //                channel = timedNoteOns[pos][0].Channel;
+        //                break;
+        //            }
+        //            Debug.Assert(!returnDict.ContainsKey(channel));
+        //            returnDict.Add(channel, midiMomentsDict);
+        //        }
+        //    }
 
-        /// <summary>
-        /// In the returned Dictionary, the key is channel, value is [msPosition, MidiMoment]
-        /// Entries are constructed for this dictionary only for the channels
-        /// which actually contain Chords which will be played by the assistant or live performer.
-        /// The smallest msPosition in the dictionary is always 0.
-        /// </summary>
-        private Dictionary<int, SortedDictionary<int, MidiMoment>> GetMidiChannelMomentsFromSequence(Multimedia.Midi.Sequence sequence)
-        {
-            Dictionary<int, SortedDictionary<int, MidiMoment>> returnDict = new Dictionary<int, SortedDictionary<int, MidiMoment>>();
-            foreach(Track track in sequence)
-            {
-                SortedDictionary<int, MidiMoment> midiMomentsDict = new SortedDictionary<int, MidiMoment>();
-
-                Dictionary<int, List<NoteOn>> timedNoteOns = GetTimedNoteOns(track);
-                Dictionary<int, List<NoteOff>> timedNoteOffs = GetTimedNoteOffs(track);
-                Dictionary<int, List<MidiControl>> timedMidiControls = GetTimedMidiControls(track);
-
-                if(timedNoteOns.Count > 0)
-                {
-                    Dictionary<int, List<MidiChord>> timedMidiChords =
-                        GetTimedMidiChords(timedNoteOns, timedNoteOffs, timedMidiControls);
-
-                    Debug.Assert(timedMidiChords.Count > 0);
-
-                    foreach(int key in timedMidiChords.Keys)
-                    {
-                        if(!midiMomentsDict.ContainsKey(key))
-                        {
-                            midiMomentsDict.Add(key, new MidiMoment(key));
-                        }
-                        midiMomentsDict[key].MidiChords.AddRange(timedMidiChords[key]);
-                    }
-
-                    int channel = -1;
-                    foreach(int pos in timedNoteOns.Keys)
-                    {
-                        channel = timedNoteOns[pos][0].Channel;
-                        break;
-                    }
-                    Debug.Assert(!returnDict.ContainsKey(channel));
-                    returnDict.Add(channel, midiMomentsDict);
-                }
-            }
-
-            return returnDict;
-        }
+        //    return returnDict;
+        //}
 
         private Dictionary<int, List<NoteOn>> GetTimedNoteOns(Track track)
         {
@@ -675,72 +669,73 @@ namespace Moritz.AssistantComposer
             }
             return argsHaveTheSameType;
         }
-        /// <summary>
-        /// None of the MidiChords returned by this function are ornaments.
-        /// In other words, this function returns a MidiChord for each ChordOn in the midi file.
-        /// A ChordOn contains a set of NoteOns having the same msPosition and a set of NoteOffs having the same position.
-        /// </summary>
-        /// <returns>
-        /// A dictionary whose key is the onMsPosition of the list of chords
-        /// </returns>
-        private Dictionary<int, List<MidiChord>> GetTimedMidiChords(
-            Dictionary<int, List<NoteOn>> timedNoteOns,
-            Dictionary<int, List<NoteOff>> timedNoteOffs,
-            Dictionary<int, List<MidiControl>> timedMidiControls)
-        {
-            Dictionary<int, List<MidiChord>> returnDict = new Dictionary<int, List<MidiChord>>();
-            ChannelState channelState = new ChannelState();
-            // All the notes in a MidiChord begin and end at the same time.
-            // this track can have several simultaneously beginning MidiChords which end at different times.
-            foreach(int onPos in timedNoteOns.Keys)
-            {
-                /// The noteOffsDict contains all the noteOffs corresponding to the input noteOns.
-                /// The number of keys in this dictionary is the number of MidiChords which have to be constructed.
-                /// If the key is int.MaxValue, the chord has no ChordOff.
-                Dictionary<int, List<NoteOff>> noteOffsDict = GetNoteOffsDict(onPos, timedNoteOns[onPos], timedNoteOffs);
+        ///// <summary>
+        ///// None of the MidiChords returned by this function are ornaments.
+        ///// In other words, this function returns a MidiChord for each ChordOn in the midi file.
+        ///// A ChordOn contains a set of NoteOns having the same msPosition and a set of NoteOffs having the same position.
+        ///// </summary>
+        ///// <returns>
+        ///// A dictionary whose key is the onMsPosition of the list of chords
+        ///// </returns>
+        //private Dictionary<int, List<MidiChord>> GetTimedMidiChords(
+        //    Dictionary<int, List<NoteOn>> timedNoteOns,
+        //    Dictionary<int, List<NoteOff>> timedNoteOffs,
+        //    Dictionary<int, List<MidiControl>> timedMidiControls)
+        //{
+        //    Dictionary<int, List<MidiChord>> returnDict = new Dictionary<int, List<MidiChord>>();
+        //    ChannelState channelState = new ChannelState();
+        //    // All the notes in a MidiChord begin and end at the same time.
+        //    // this track can have several simultaneously beginning MidiChords which end at different times.
+        //    foreach(int onPos in timedNoteOns.Keys)
+        //    {
+        //        /// The noteOffsDict contains all the noteOffs corresponding to the input noteOns.
+        //        /// The number of keys in this dictionary is the number of MidiChords which have to be constructed.
+        //        /// If the key is int.MaxValue, the chord has no ChordOff.
+        //        Dictionary<int, List<NoteOff>> noteOffsDict = GetNoteOffsDict(onPos, timedNoteOns[onPos], timedNoteOffs);
 
-                /// The midiControls List contains a list of unique midiControls which happen before or synchronously with the onPos.
-                /// MidiControls which happen before or synchronously with onPos are removed from the timedMidiControls dictionary,
-                /// so that they are not used twice.
+        //        /// The midiControls List contains a list of unique midiControls which happen before or synchronously with the onPos.
+        //        /// MidiControls which happen before or synchronously with onPos are removed from the timedMidiControls dictionary,
+        //        /// so that they are not used twice.
 
-                //List<MidiControl> midiControls = GetMidiControls(onPos, timedMidiControls);
-                List<MidiControl> midiControls = null;
-                if(timedMidiControls.ContainsKey(onPos))
-                    midiControls = timedMidiControls[onPos];
+        //        //List<MidiControl> midiControls = GetMidiControls(onPos, timedMidiControls);
+        //        List<MidiControl> midiControls = null;
+        //        if(timedMidiControls.ContainsKey(onPos))
+        //            midiControls = timedMidiControls[onPos];
 
-                foreach(int offPos in noteOffsDict.Keys)
-                {
-                    int channel = noteOffsDict[offPos][0].Channel;
-                    bool hasChordOff = (offPos != int.MaxValue);
-                    int msDuration = offPos - onPos;
-                    List<byte> pitches = new List<byte>();
-                    foreach(NoteOff noteOff in noteOffsDict[offPos])
-                    {
-                        pitches.Add((byte)noteOff.Pitch);
-                    }
-                    List<byte> velocities = new List<byte>();
-                    foreach(NoteOn noteOn in timedNoteOns[onPos])
-                    {
-                        foreach(byte pitch in pitches)
-                        {
-                            if(noteOn.Pitch == pitch)
-                            {
-                                velocities.Add((byte)noteOn.Velocity);
-                                break;
-                            }
-                        }
-                    }
-                    Debug.Assert(pitches.Count == velocities.Count);
-                    MidiChordDef midiChordDef = new UniqueMidiChordDef(pitches, velocities, msDuration, hasChordOff, midiControls);
-                    midiControls.Clear();
-                    MidiChord midiChord = new MidiChord(channel, midiChordDef, onPos, midiChordDef.MsDuration, channelState, M.DefaultMinimumBasicMidiChordMsDuration);
-                    if(!returnDict.ContainsKey(onPos))
-                        returnDict.Add(onPos, new List<MidiChord>());
-                    returnDict[onPos].Add(midiChord);
-                }
-            }
-            return returnDict;
-        }
+        //        foreach(int offPos in noteOffsDict.Keys)
+        //        {
+        //            int channel = noteOffsDict[offPos][0].Channel;
+        //            bool hasChordOff = (offPos != int.MaxValue);
+        //            int msDuration = offPos - onPos;
+        //            List<byte> pitches = new List<byte>();
+        //            foreach(NoteOff noteOff in noteOffsDict[offPos])
+        //            {
+        //                pitches.Add((byte)noteOff.Pitch);
+        //            }
+        //            List<byte> velocities = new List<byte>();
+        //            foreach(NoteOn noteOn in timedNoteOns[onPos])
+        //            {
+        //                foreach(byte pitch in pitches)
+        //                {
+        //                    if(noteOn.Pitch == pitch)
+        //                    {
+        //                        velocities.Add((byte)noteOn.Velocity);
+        //                        break;
+        //                    }
+        //                }
+        //            }
+        //            Debug.Assert(pitches.Count == velocities.Count);
+        //            MidiChordDef midiChordDef = new UniqueMidiChordDef(pitches, velocities, msDuration, hasChordOff, midiControls);
+        //            midiControls.Clear();
+        //            MidiChord midiChord = new MidiChord(channel, midiChordDef, onPos, midiChordDef.MsDuration, channelState, M.DefaultMinimumBasicMidiChordMsDuration);
+        //            if(!returnDict.ContainsKey(onPos))
+        //                returnDict.Add(onPos, new List<MidiChord>());
+        //            returnDict[onPos].Add(midiChord);
+        //        }
+        //    }
+        //    return returnDict;
+        //}
+
         /// <summary>
         /// Returns a dictionary containing all the noteOffs corresponding to the input noteOns.
         /// If there is no noteOff corresponding to a noteOn, a noteOff is added to the dictionary at key int.MaxValue.

@@ -42,11 +42,12 @@ namespace Moritz.AssistantComposer
             };
             for(int i = 9; i >=0 ; --i)
             {
-                LocalMidiDurationDef cheep = new LocalMidiDurationDef(chirpsPalette[chirpIndices[i]]);
+                IUniqueMidiDurationDef cheep = chirpsPalette[chirpIndices[i]].CreateUniqueMidiDurationDef();
+                Debug.Assert(cheep is UniqueMidiChordDef);
                 cheep.MsPosition = msPositions[i];
                 //cheep.MsDuration *= 2;
-                cheep.UniqueMidiDurationDef.AdjustVelocities(velocityfactors[i]);
-                cheep.UniqueMidiDurationDef.Transpose(transpositions[i]);
+                cheep.AdjustVelocities(velocityfactors[i]);
+                cheep.Transpose(transpositions[i]);
                 furies2.InsertInRest(cheep);
             }
 
@@ -74,14 +75,14 @@ namespace Moritz.AssistantComposer
             for(int i = 0; i < furies3TickIndices.Count; ++i)
             {
                 int f3Index = furies3TickIndices[i];
-                LocalMidiDurationDef ticksChord = furies3[f3Index];
-                Debug.Assert(ticksChord.UniqueMidiDurationDef is UniqueMidiChordDef);
-                LocalMidiDurationDef ticksRest = new LocalMidiDurationDef(ticksChord.MsPosition, ticksChord.MsDuration);
+                IUniqueMidiDurationDef ticksChord = furies3[f3Index];
+                Debug.Assert(ticksChord is UniqueMidiChordDef);
+                UniqueMidiRestDef ticksRest = new UniqueMidiRestDef(ticksChord.MsPosition, ticksChord.MsDuration);
                 furies3.Replace(f3Index, ticksRest);
                 furies2.InsertInRest(ticksChord);
             }
 
-            LocalMidiDurationDef lastTicksBeforeVerse3 = new LocalMidiDurationDef(furies2[39].UniqueMidiDurationDef);
+            UniqueMidiChordDef lastTicksBeforeVerse3 = new UniqueMidiChordDef(furies2[39] as MidiChordDef);
             lastTicksBeforeVerse3.MsPosition = furies3[155].MsPosition + furies3[155].MsDuration;
             lastTicksBeforeVerse3.MsDuration = clytemnestra[117].MsPosition - lastTicksBeforeVerse3.MsPosition;
             lastTicksBeforeVerse3.Transpose(10);

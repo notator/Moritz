@@ -13,7 +13,7 @@ namespace Moritz.Score.Notation
 
         public abstract void WriteSymbolDefinitions(SvgWriter w);
         public abstract Metrics NoteObjectMetrics(Graphics graphics, NoteObject noteObject, VerticalDir voiceStemDirection, float gap, float storkeWidth);
-        public abstract DurationSymbol GetDurationSymbol(Voice voice, LocalMidiDurationDef lmdd, bool firstLmddInVoice,
+        public abstract DurationSymbol GetDurationSymbol(Voice voice, IUniqueMidiDurationDef iumdd, bool firstLmddInVoice,
             ref byte currentVelocity);
 
         /// <summary>

@@ -92,12 +92,12 @@ namespace Moritz.AssistantComposer
             foreach(MidiDurationDef midiDurationDef in midiDurationDefs)
             {
                 Debug.Assert(midiDurationDef.MsDuration > 0);
-                LocalMidiDurationDef noteDef = new LocalMidiDurationDef(midiDurationDef);
+                IUniqueMidiDurationDef noteDef = midiDurationDef.CreateUniqueMidiDurationDef();
                 noteDef.MsPosition = msPosition;
-                LocalMidiDurationDef restDef = new LocalMidiDurationDef(msPosition + noteDef.MsDuration, bar1ChordMsSeparation - noteDef.MsDuration);
+                IUniqueMidiDurationDef restDef = new UniqueMidiRestDef(msPosition + noteDef.MsDuration, bar1ChordMsSeparation - noteDef.MsDuration);
                 msPosition += bar1ChordMsSeparation;
-                voice.LocalMidiDurationDefs.Add(noteDef);
-                voice.LocalMidiDurationDefs.Add(restDef);
+                voice.UniqueMidiDurationDefs.Add(noteDef);
+                voice.UniqueMidiDurationDefs.Add(restDef);
             }
         }
         #endregion CreateBar1()
@@ -135,8 +135,8 @@ namespace Moritz.AssistantComposer
                 int mdsdEndPos = voiceDefs[i].EndMsPosition;
                 if(maxBarMsPos > mdsdEndPos)
                 {
-                    LocalMidiDurationDef rest2Def = new LocalMidiDurationDef(mdsdEndPos, maxBarMsPos - mdsdEndPos);
-                    bar[i].LocalMidiDurationDefs.Add(rest2Def);
+                    IUniqueMidiDurationDef rest2Def = new UniqueMidiRestDef(mdsdEndPos, maxBarMsPos - mdsdEndPos);
+                    bar[i].UniqueMidiDurationDefs.Add(rest2Def);
                 }
             }
             return bar;
@@ -148,17 +148,17 @@ namespace Moritz.AssistantComposer
         /// </summary>
         private int WriteVoiceMidiDurationDefsInBar2(Voice voice, VoiceDef voiceDef, int msPosition, int bar2StartMsPos)
         {
-            LocalMidiDurationDef rest1Def = null;
+            IUniqueMidiDurationDef rest1Def = null;
             if(msPosition > bar2StartMsPos)
             {
-                rest1Def = new LocalMidiDurationDef(bar2StartMsPos, msPosition - bar2StartMsPos);
-                voice.LocalMidiDurationDefs.Add(rest1Def);
+                rest1Def = new UniqueMidiRestDef(bar2StartMsPos, msPosition - bar2StartMsPos);
+                voice.UniqueMidiDurationDefs.Add(rest1Def);
             }
 
             voiceDef.StartMsPosition = msPosition;
-            foreach(LocalMidiDurationDef lmdd in voiceDef)
+            foreach(IUniqueMidiDurationDef iumdd in voiceDef)
             {
-                voice.LocalMidiDurationDefs.Add(lmdd);
+                voice.UniqueMidiDurationDefs.Add(iumdd);
             }
 
             return voiceDef.EndMsPosition;

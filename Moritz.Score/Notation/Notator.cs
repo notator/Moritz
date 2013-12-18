@@ -99,10 +99,10 @@ namespace Moritz.Score.Notation
                     {
                         Voice voice = staff.Voices[voiceIndex];
                         bool firstLmdd = true;
-                        foreach(LocalMidiDurationDef lmdd in voice.LocalMidiDurationDefs)
+                        foreach(IUniqueMidiDurationDef iumdd in voice.UniqueMidiDurationDefs)
                         {
                             DurationSymbol durationSymbol =
-                                SymbolSet.GetDurationSymbol(voice, lmdd, firstLmdd, ref currentChannelVelocities[staffIndex]);
+                                SymbolSet.GetDurationSymbol(voice, iumdd, firstLmdd, ref currentChannelVelocities[staffIndex]);
 
                             voice.NoteObjects.Add(durationSymbol);
                             firstLmdd = false;

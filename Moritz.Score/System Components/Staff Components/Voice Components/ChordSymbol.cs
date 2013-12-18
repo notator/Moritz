@@ -11,11 +11,11 @@ namespace Moritz.Score
 {
     public class ChordSymbol : DurationSymbol
     {
-        public ChordSymbol(Voice voice, LocalMidiDurationDef lmdd, int minimumCrotchetDurationMS, float fontSize)
-            : base(voice, lmdd, minimumCrotchetDurationMS, fontSize)
+        public ChordSymbol(Voice voice, UniqueMidiChordDef umcd, int minimumCrotchetDurationMS, float fontSize)
+            : base(voice, umcd, minimumCrotchetDurationMS, fontSize)
         {
-            _localizedMidiDurationDef = lmdd;
-            MidiChordDef midiChordDef = lmdd.UniqueMidiDurationDef as MidiChordDef;
+            _localizedMidiDurationDef = umcd;
+            MidiChordDef midiChordDef = umcd as MidiChordDef;
             if(midiChordDef != null)
             {
                 SetHeads(midiChordDef.MidiHeadSymbols);
@@ -116,21 +116,20 @@ namespace Moritz.Score
         {
             w.WriteStartElement("score", "midiChord", null);
             w.WriteAttributeString("id", midiId);
-            UniqueMidiChordDef lmcd = LocalMidiDurationDef.UniqueMidiDurationDef as UniqueMidiChordDef;
-            Debug.Assert(lmcd != null);
-            string ID = lmcd.ID;
+            Debug.Assert(UniqueMidiChordDef != null);
+            string ID = UniqueMidiChordDef.ID;
             Debug.Assert(ID != null && ID.StartsWith("localChord"));
-            lmcd.WriteSvg(w);
+            UniqueMidiChordDef.WriteSvg(w);
             // The above two lines used to be:
             //if(ID != null && !(ID.StartsWith("localChord")))
             //{
             //    w.WriteStartElement("use");
-            //    w.WriteAttributeString("xlink", "href", null, "#" + lmcd.ID);
+            //    w.WriteAttributeString("xlink", "href", null, "#" + UniqueMidiChordDef.ID);
             //    w.WriteEndElement(); // use
             //}
             //else
             //{
-            //    lmcd.WriteSvg(w);
+            //    UniqueMidiChordDef.WriteSvg(w);
             //}
 
             w.WriteEndElement(); // midiChord
@@ -580,8 +579,8 @@ namespace Moritz.Score
         public BeamBlock BeamBlock = null; // defaults
         public List<Head> HeadsTopDown = new List<Head>(); // Heads are in top-down order.
 
-        public LocalMidiDurationDef LocalMidiDurationDef { get { return _localizedMidiDurationDef; } }
-        protected LocalMidiDurationDef _localizedMidiDurationDef = null;
+        public UniqueMidiChordDef UniqueMidiChordDef { get { return _localizedMidiDurationDef; } }
+        protected UniqueMidiChordDef _localizedMidiDurationDef = null;
 
         public string GraphicSymbolID { get { return _graphicSymbolID; } }
         protected string _graphicSymbolID = null;

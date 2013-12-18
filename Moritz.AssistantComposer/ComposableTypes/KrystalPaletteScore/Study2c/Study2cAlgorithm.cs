@@ -95,12 +95,12 @@ namespace Moritz.AssistantComposer
             {
                 int value = originalStrandValues[valueIndex];
                 MidiDurationDef midiDurationDef = paletteDef[value - 1];
-                LocalMidiDurationDef noteDef = new LocalMidiDurationDef(midiDurationDef);
+                IUniqueMidiDurationDef noteDef = midiDurationDef.CreateUniqueMidiDurationDef();
                 Debug.Assert(midiDurationDef.MsDuration > 0);
                 Debug.Assert(noteDef.MsDuration == midiDurationDef.MsDuration);
                 noteDef.MsPosition = msPosition;
                 msPosition += noteDef.MsDuration;
-                voice.LocalMidiDurationDefs.Add(noteDef);
+                voice.UniqueMidiDurationDefs.Add(noteDef);
             }
         }
 
@@ -116,7 +116,7 @@ namespace Moritz.AssistantComposer
             {
                 Voice topStaffVoice =  topStaffBars[barIndex];
                 Voice newVoice = new Voice(null, MidiChannels()[staffNumber - 1]);
-                int currentMsPosition = topStaffVoice.LocalMidiDurationDefs[0].MsPosition;
+                int currentMsPosition = topStaffVoice.UniqueMidiDurationDefs[0].MsPosition;
 
                 List<int> lowerStaffValueSequence = strandValuesList[barIndex];
                 List<int> lowerStaffMsDurations = LowerStaffMsDurations(topStaffVoice, lowerStaffValueSequence.Count);
@@ -125,10 +125,10 @@ namespace Moritz.AssistantComposer
                     int value = lowerStaffValueSequence[valueIndex];
                     MidiDurationDef midiDurationDef = paletteDef[value - 1];
                     midiDurationDef.MsDuration = lowerStaffMsDurations[valueIndex];
-                    LocalMidiDurationDef noteDef = new LocalMidiDurationDef(midiDurationDef);
+                    IUniqueMidiDurationDef noteDef = midiDurationDef.CreateUniqueMidiDurationDef();
                     noteDef.MsPosition = currentMsPosition;
                     currentMsPosition += midiDurationDef.MsDuration; 
-                    newVoice.LocalMidiDurationDefs.Add(noteDef);
+                    newVoice.UniqueMidiDurationDefs.Add(noteDef);
                 }
 
                 consecutiveBars.Add(newVoice);
@@ -141,9 +141,9 @@ namespace Moritz.AssistantComposer
             #region get topStaffVoice durations and positions
             int voiceMsDuration = 0;
             int numberOfTopDurations = 0;
-            foreach(LocalMidiDurationDef lmdd in topStaffVoice.LocalMidiDurationDefs)
+            foreach(IUniqueMidiDurationDef iumdd in topStaffVoice.UniqueMidiDurationDefs)
             {
-                voiceMsDuration += lmdd.MsDuration;
+                voiceMsDuration += iumdd.MsDuration;
                 numberOfTopDurations++;
             }
             Debug.Assert(numberOfTopDurations > 0);
@@ -153,13 +153,13 @@ namespace Moritz.AssistantComposer
             int equal1MsPosition = 0;
             List<int> actual1MsPositions = new List<int>();
             List<int> actual1MsDurations = new List<int>();
-            foreach(LocalMidiDurationDef lmdd in topStaffVoice.LocalMidiDurationDefs)
+            foreach(IUniqueMidiDurationDef iumdd in topStaffVoice.UniqueMidiDurationDefs)
             {
                 equal1MsPositions.Add(equal1MsPosition);
                 equal1MsPosition += equal1MsDuration;
 
-                actual1MsPositions.Add(lmdd.MsPosition);
-                actual1MsDurations.Add(lmdd.MsDuration);
+                actual1MsPositions.Add(iumdd.MsPosition);
+                actual1MsDurations.Add(iumdd.MsDuration);
             }
             for(int i = 0; i < equal1MsPositions.Count; i++)
             {

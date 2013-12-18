@@ -23,7 +23,7 @@ namespace Moritz.AssistantComposer
 
         private VoiceDef GetWind2(VoiceDef wind3, Clytemnestra clytemnestra)
         {
-            List<LocalMidiDurationDef> clytLmdds = clytemnestra.LocalMidiDurationDefs;
+            List<IUniqueMidiDurationDef> clytLmdds = clytemnestra.UniqueMidiDurationDefs;
             int rotationMsPosition = clytLmdds[59].MsPosition + 700;
 
             VoiceDef wind2 = GetRotatedWind(wind3, rotationMsPosition);
@@ -41,7 +41,7 @@ namespace Moritz.AssistantComposer
 
         private VoiceDef GetWind1(VoiceDef wind3, VoiceDef wind2, Clytemnestra clytemnestra)
         {
-            List<LocalMidiDurationDef> clytLmdds = clytemnestra.LocalMidiDurationDefs;
+            List<IUniqueMidiDurationDef> clytLmdds = clytemnestra.UniqueMidiDurationDefs;
             int rotationMsPosition = clytLmdds[116].MsPosition + 700;
 
             VoiceDef wind1 = GetRotatedWind(wind3, rotationMsPosition);
@@ -58,7 +58,7 @@ namespace Moritz.AssistantComposer
 
         /// <summary>
         /// Returns a VoiceDef containing clones of the LocalMidiDurationDefs in the originalVoiceDef argument,
-        /// rotated so that the original first LocalMidiDurationDef is positioned close to rotationMsPosition.
+        /// rotated so that the original first IUniqueMidiDurationDef is positioned close to rotationMsPosition.
         /// </summary>
         /// <param name="originalVoiceDef"></param>
         /// <returns></returns>
@@ -68,9 +68,9 @@ namespace Moritz.AssistantComposer
             int finalBarlineMsPosition = originalVoiceDef.EndMsPosition;
             int msDurationAfterSynch = finalBarlineMsPosition - rotationMsPosition;
 
-            List<LocalMidiDurationDef> originalLmdds = tempWind.LocalMidiDurationDefs;
-            List<LocalMidiDurationDef> originalStartLmdds = new List<LocalMidiDurationDef>();
-            List<LocalMidiDurationDef> newWindLmdds = new List<LocalMidiDurationDef>();
+            List<IUniqueMidiDurationDef> originalLmdds = tempWind.UniqueMidiDurationDefs;
+            List<IUniqueMidiDurationDef> originalStartLmdds = new List<IUniqueMidiDurationDef>();
+            List<IUniqueMidiDurationDef> newWindLmdds = new List<IUniqueMidiDurationDef>();
             int accumulatingMsDuration = 0;
             for(int i = 0; i < tempWind.Count; ++i)
             {
@@ -87,7 +87,7 @@ namespace Moritz.AssistantComposer
             newWindLmdds.AddRange(originalStartLmdds);
 
             int msPosition = 0;
-            foreach(LocalMidiDurationDef lmdd in newWindLmdds)
+            foreach(IUniqueMidiDurationDef lmdd in newWindLmdds)
             {
                 lmdd.MsPosition = msPosition;
                 msPosition += lmdd.MsDuration;

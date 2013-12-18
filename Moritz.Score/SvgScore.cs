@@ -116,10 +116,10 @@ namespace Moritz.Score
                     {
                         SvgSystem system = Systems[sysIndex];
                         Voice voice = system.Staves[staffIndex].Voices[voiceIndex];
-                        foreach(LocalMidiDurationDef lmdd in voice.LocalMidiDurationDefs)
+                        foreach(IUniqueMidiDurationDef iumdd in voice.UniqueMidiDurationDefs)
                         {
-                            lmdd.MsPosition = msPosition;
-                            msPosition += lmdd.MsDuration;
+                            iumdd.MsPosition = msPosition;
+                            msPosition += iumdd.MsDuration;
                         }
                     }
                 }
@@ -515,8 +515,8 @@ namespace Moritz.Score
                                 fontSize = rest.FontHeight;
                                 voice.NoteObjects.RemoveAt(indToReplace[j]);
                             }
-                            LocalMidiDurationDef lmdd = new LocalMidiDurationDef(msPos, msDuration);
-                            RestSymbol newRest = new RestSymbol(voice, lmdd, minimumCrotchetDuration, _pageFormat.MusicFontHeight);
+                            UniqueMidiRestDef umrd = new UniqueMidiRestDef(msPos, msDuration);
+                            RestSymbol newRest = new RestSymbol(voice, umrd, minimumCrotchetDuration, _pageFormat.MusicFontHeight);
                             newRest.MsPosition = msPos;
                             voice.NoteObjects.Insert(indToReplace[0], newRest);
                         }
@@ -925,8 +925,10 @@ namespace Moritz.Score
                 if(b != null)
                     lastBarline = b;
             }
-            LocalMidiDurationDef lmdd = lastChordSymbol.LocalMidiDurationDef;
-            LocalMidiDurationDef newlmdd = new LocalMidiDurationDef(lmdd.UniqueMidiDurationDef,lmdd.MsPosition,lmdd.MsDuration - durationToSubtract);
+            UniqueMidiChordDef umcd = lastChordSymbol.UniqueMidiChordDef;
+            UniqueMidiChordDef newlmdd = new UniqueMidiChordDef(umcd);
+            newlmdd.MsPosition = umcd.MsPosition;
+            newlmdd.MsDuration = umcd.MsDuration - durationToSubtract;
             ChordSymbol replacementChord = new ChordSymbol(voice, newlmdd, _pageFormat.MinimumCrotchetDuration, _pageFormat.MusicFontHeight);
 
             voice.NoteObjects.RemoveAt(lastChordIndex);

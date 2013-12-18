@@ -87,20 +87,20 @@ namespace Moritz.AssistantComposer
 
         private VoiceDef GetFuries3Flutter1(PaletteDef palette)
         {
-            List<LocalMidiDurationDef> flutter1 = new List<LocalMidiDurationDef>();
+            List<IUniqueMidiDurationDef> flutter1 = new List<IUniqueMidiDurationDef>();
             int msPosition = 0;
 
             for(int i = 0; i < 7; ++i)
             {
                 int[] contour = K.Contour(7, 11, 7);
-                LocalMidiDurationDef flutter = new LocalMidiDurationDef(palette[contour[i] - 1]);
+                IUniqueMidiDurationDef flutter = palette[contour[i] - 1].CreateUniqueMidiDurationDef();
                 flutter.MsPosition = msPosition;
                 msPosition += flutter.MsDuration;
                 flutter1.Add(flutter);
 
                 if(i != 3 && i != 5)
                 {
-                    LocalMidiDurationDef rest = new LocalMidiDurationDef(msPosition, flutter.MsDuration);
+                    IUniqueMidiDurationDef rest = new UniqueMidiRestDef(msPosition, flutter.MsDuration);
                     msPosition += rest.MsDuration;
                     flutter1.Add(rest);
                 }
@@ -125,7 +125,7 @@ namespace Moritz.AssistantComposer
                 112,115,119,122,125,129,132
             };
 
-            List<LocalMidiDurationDef> ticksList = GetFuries3TicksSequence(ticksPalette);
+            List<IUniqueMidiDurationDef> ticksList = GetFuries3TicksSequence(ticksPalette);
 
             Debug.Assert(TickInsertionIndices.Count == ticksList.Count); // 21 objects
 
@@ -135,9 +135,9 @@ namespace Moritz.AssistantComposer
             }
         }
 
-        private List<LocalMidiDurationDef> GetFuries3TicksSequence(PaletteDef ticksPalette)
+        private List<IUniqueMidiDurationDef> GetFuries3TicksSequence(PaletteDef ticksPalette)
         {
-            List<LocalMidiDurationDef> ticksSequence = new List<LocalMidiDurationDef>();
+            List<IUniqueMidiDurationDef> ticksSequence = new List<IUniqueMidiDurationDef>();
             int msPosition = 0;
             int[] transpositions = { 12, 14, 17 };
 
@@ -146,9 +146,9 @@ namespace Moritz.AssistantComposer
                 int[] contour = K.Contour(7, 4, 10 - i);
                 for(int j = 6; j >= 0; --j)
                 {
-                    LocalMidiDurationDef ticks = new LocalMidiDurationDef(ticksPalette[contour[j]-1]);
+                    IUniqueMidiDurationDef ticks = ticksPalette[contour[j]-1].CreateUniqueMidiDurationDef();
                     ticks.Transpose(transpositions[i] + contour[j]);
-                    ticks.UniqueMidiDurationDef.AdjustVelocities(0.6);
+                    ticks.AdjustVelocities(0.6);
                     ticks.MsPosition = msPosition;
                     msPosition += ticks.MsDuration;
                     ticksSequence.Add(ticks);
@@ -175,10 +175,10 @@ namespace Moritz.AssistantComposer
             };
             for(int i = 5; i >=0; --i)
             {
-                LocalMidiDurationDef cheep = new LocalMidiDurationDef(chirpsPalette[chirpIndices[i]]);
+                IUniqueMidiDurationDef cheep = chirpsPalette[chirpIndices[i]].CreateUniqueMidiDurationDef();
                 cheep.MsPosition = msPositions[i];
-                cheep.UniqueMidiDurationDef.AdjustVelocities(velocityfactors[i]);
-                cheep.UniqueMidiDurationDef.Transpose(transpositions[i]);
+                cheep.AdjustVelocities(velocityfactors[i]);
+                cheep.Transpose(transpositions[i]);
                 furies3.InsertInRest(cheep);
             }
 

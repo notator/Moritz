@@ -45,11 +45,11 @@ namespace Moritz.AssistantComposer
             };
             for(int i = 0; i < 12; ++i)
             {
-                LocalMidiDurationDef cheep = new LocalMidiDurationDef(cheepsPalette[cheepIndices[i]]);
+                IUniqueMidiDurationDef cheep = cheepsPalette[cheepIndices[i]].CreateUniqueMidiDurationDef();
                 cheep.MsPosition = msPositions[i];
                 cheep.MsDuration *= 2;
-                cheep.UniqueMidiDurationDef.AdjustVelocities(velocityfactors[i]);
-                cheep.UniqueMidiDurationDef.Transpose(transpositions[i]);
+                cheep.AdjustVelocities(velocityfactors[i]);
+                cheep.Transpose(transpositions[i]);
                 furies1.InsertInRest(cheep);
             }
 

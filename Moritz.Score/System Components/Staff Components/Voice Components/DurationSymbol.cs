@@ -12,11 +12,11 @@ namespace Moritz.Score
         /// <summary>
         /// Used by the Assistant Composer
         /// </summary>
-        public DurationSymbol(Voice voice, LocalMidiDurationDef lmdd, int minimumCrotchetDuration, float fontHeight)
+        public DurationSymbol(Voice voice, IUniqueMidiDurationDef iumdd, int minimumCrotchetDuration, float fontHeight)
             : base(voice, fontHeight)
         {
-            _msDuration = lmdd.MsDuration;
-            _msPosition = lmdd.MsPosition;
+            _msDuration = iumdd.MsDuration;
+            _msPosition = iumdd.MsPosition;
             this.SetDurationClass(MsDuration, minimumCrotchetDuration);
         }
 

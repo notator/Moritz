@@ -73,9 +73,9 @@ namespace Moritz.AssistantComposer
         /// </summary>
         protected int GetEndMsPosition(List<Voice> bar)
         {
-            Debug.Assert(bar != null && bar.Count > 0 && bar[0].LocalMidiDurationDefs.Count > 0);
-            List<LocalMidiDurationDef> lmdd = bar[0].LocalMidiDurationDefs;
-            LocalMidiDurationDef lastLmdd = lmdd[lmdd.Count - 1];
+            Debug.Assert(bar != null && bar.Count > 0 && bar[0].UniqueMidiDurationDefs.Count > 0);
+            List<IUniqueMidiDurationDef> lmdd = bar[0].UniqueMidiDurationDefs;
+            IUniqueMidiDurationDef lastLmdd = lmdd[lmdd.Count - 1];
             int endMsPosition = lastLmdd.MsPosition + lastLmdd.MsDuration;
             return endMsPosition;
         }
@@ -97,10 +97,10 @@ namespace Moritz.AssistantComposer
             List<Voice> secondBar = new List<Voice>();
             twoBars.Add(firstBar);
             twoBars.Add(secondBar);
-            int originalBarStartPos = originalBar[0].LocalMidiDurationDefs[0].MsPosition;
+            int originalBarStartPos = originalBar[0].UniqueMidiDurationDefs[0].MsPosition;
             int originalBarEndPos =
-                originalBar[0].LocalMidiDurationDefs[originalBar[0].LocalMidiDurationDefs.Count - 1].MsPosition +
-                originalBar[0].LocalMidiDurationDefs[originalBar[0].LocalMidiDurationDefs.Count - 1].MsDuration;
+                originalBar[0].UniqueMidiDurationDefs[originalBar[0].UniqueMidiDurationDefs.Count - 1].MsPosition +
+                originalBar[0].UniqueMidiDurationDefs[originalBar[0].UniqueMidiDurationDefs.Count - 1].MsDuration;
            
 
             foreach(Voice voice in originalBar)
@@ -109,54 +109,54 @@ namespace Moritz.AssistantComposer
                 firstBar.Add(firstBarVoice);
                 Voice secondBarVoice = new Voice(voice.Staff, voice.MidiChannel);
                 secondBar.Add(secondBarVoice);
-                foreach(LocalMidiDurationDef lmdd in voice.LocalMidiDurationDefs)
+                foreach(IUniqueMidiDurationDef iumdd in voice.UniqueMidiDurationDefs)
                 {
-                    int lmddMsDuration = (lmdd.MsDurationToNextBarline == null) ? lmdd.MsDuration : (int) lmdd.MsDurationToNextBarline;
-                    int lmddEndPos = lmdd.MsPosition + lmddMsDuration;
-                    if(lmdd.MsPosition >= absoluteSplitPos)
+                    int lmddMsDuration = (iumdd.MsDurationToNextBarline == null) ? iumdd.MsDuration : (int) iumdd.MsDurationToNextBarline;
+                    int lmddEndPos = iumdd.MsPosition + lmddMsDuration;
+                    if(iumdd.MsPosition >= absoluteSplitPos)
                     {
                         Debug.Assert(lmddEndPos <= originalBarEndPos);
-                        secondBarVoice.LocalMidiDurationDefs.Add(lmdd);
+                        secondBarVoice.UniqueMidiDurationDefs.Add(iumdd);
                     }
                     else
                     if(lmddEndPos > absoluteSplitPos)
                     {
                         int durationAfterBarline = lmddEndPos - absoluteSplitPos;
-                        if(lmdd.UniqueMidiDurationDef is MidiRestDef)
+                        if(iumdd is UniqueMidiRestDef)
                         {
                             // This is a rest. Split it.
-                            LocalMidiDurationDef firstLmdd = new LocalMidiDurationDef(lmdd.UniqueMidiDurationDef, lmdd.MsPosition, absoluteSplitPos - lmdd.MsPosition);
-                            firstBarVoice.LocalMidiDurationDefs.Add(firstLmdd);
+                            IUniqueMidiDurationDef firstRestHalf = new UniqueMidiRestDef(iumdd.MsPosition, absoluteSplitPos - iumdd.MsPosition);
+                            firstBarVoice.UniqueMidiDurationDefs.Add(firstRestHalf);
 
-                            LocalMidiDurationDef secondLmdd = new LocalMidiDurationDef(lmdd.UniqueMidiDurationDef, absoluteSplitPos, durationAfterBarline);
-                            secondBarVoice.LocalMidiDurationDefs.Add(secondLmdd);
+                            IUniqueMidiDurationDef secondRestHalf = new UniqueMidiRestDef(absoluteSplitPos, durationAfterBarline);
+                            secondBarVoice.UniqueMidiDurationDefs.Add(secondRestHalf);
                         }
-                        else if(lmdd is LocalCautionaryChordDef)
+                        else if(iumdd is UniqueCautionaryChordDef)
                         {
                             // This is a cautionary chord. Set the position of the following barline, and
                             // Add an LocalizedCautionaryChordDef at the beginning of the following bar.
-                            lmdd.MsDuration = absoluteSplitPos - lmdd.MsPosition;
-                            firstBarVoice.LocalMidiDurationDefs.Add(lmdd);
+                            iumdd.MsDuration = absoluteSplitPos - iumdd.MsPosition;
+                            firstBarVoice.UniqueMidiDurationDefs.Add(iumdd);
 
-                            LocalCautionaryChordDef secondLmdd = new LocalCautionaryChordDef(lmdd.UniqueMidiDurationDef as MidiChordDef, absoluteSplitPos, durationAfterBarline);
-                            secondBarVoice.LocalMidiDurationDefs.Add(secondLmdd);
+                            UniqueCautionaryChordDef secondLmdd = new UniqueCautionaryChordDef(iumdd as MidiChordDef, absoluteSplitPos, durationAfterBarline);
+                            secondBarVoice.UniqueMidiDurationDefs.Add(secondLmdd);
                         }
                         else
                         {
                             // This is a normal chord. Set the position of the following barline, and
                             // Add an LocalizedCautionaryChordDef at the beginning of the following bar.
-                            lmdd.MsDurationToNextBarline = absoluteSplitPos - lmdd.MsPosition;
-                            firstBarVoice.LocalMidiDurationDefs.Add(lmdd);
+                            iumdd.MsDurationToNextBarline = absoluteSplitPos - iumdd.MsPosition;
+                            firstBarVoice.UniqueMidiDurationDefs.Add(iumdd);
 
-                            LocalCautionaryChordDef secondLmdd = new LocalCautionaryChordDef( lmdd.UniqueMidiDurationDef as MidiChordDef, absoluteSplitPos, durationAfterBarline);
-                            secondBarVoice.LocalMidiDurationDefs.Add(secondLmdd);
+                            UniqueCautionaryChordDef secondLmdd = new UniqueCautionaryChordDef( iumdd as MidiChordDef, absoluteSplitPos, durationAfterBarline);
+                            secondBarVoice.UniqueMidiDurationDefs.Add(secondLmdd);
                         }
 
                     }
                     else
                     {
-                        Debug.Assert(lmddEndPos <= absoluteSplitPos && lmdd.MsPosition >= originalBarStartPos);
-                        firstBarVoice.LocalMidiDurationDefs.Add(lmdd);
+                        Debug.Assert(lmddEndPos <= absoluteSplitPos && iumdd.MsPosition >= originalBarStartPos);
+                        firstBarVoice.UniqueMidiDurationDefs.Add(iumdd);
                     }
                 }
             }
@@ -177,10 +177,10 @@ namespace Moritz.AssistantComposer
                     List<List<int>> restsToReplace = new List<List<int>>();
                     #region find the consecutive rests
                     List<int> consecRestIndices = new List<int>();
-                    for(int i = 0; i < voice.LocalMidiDurationDefs.Count - 1; i++)
+                    for(int i = 0; i < voice.UniqueMidiDurationDefs.Count - 1; i++)
                     {
-                        MidiChordDef mcd1 = voice.LocalMidiDurationDefs[i].UniqueMidiDurationDef as MidiChordDef;
-                        MidiChordDef mcd2 = voice.LocalMidiDurationDefs[i + 1].UniqueMidiDurationDef as MidiChordDef;
+                        MidiChordDef mcd1 = voice.UniqueMidiDurationDefs[i] as MidiChordDef;
+                        MidiChordDef mcd2 = voice.UniqueMidiDurationDefs[i + 1] as MidiChordDef;
                         if(mcd1 == null && mcd2 == null)
                         {
                             if(!consecRestIndices.Contains(i))
@@ -198,7 +198,7 @@ namespace Moritz.AssistantComposer
                             }
                         }
 
-                        if(i == voice.LocalMidiDurationDefs.Count - 2 && consecRestIndices.Count > 0)
+                        if(i == voice.UniqueMidiDurationDefs.Count - 2 && consecRestIndices.Count > 0)
                         {
                             restsToReplace.Add(consecRestIndices);
                         }
@@ -211,17 +211,16 @@ namespace Moritz.AssistantComposer
                         {
                             List<int> indToReplace = restsToReplace[i];
                             int msDuration = 0;
-                            int msPosition = voice.LocalMidiDurationDefs[indToReplace[0]].MsPosition;
+                            int msPosition = voice.UniqueMidiDurationDefs[indToReplace[0]].MsPosition;
                             for(int j = indToReplace.Count - 1; j >= 0; j--)
                             {
-                                LocalMidiDurationDef lmdd = voice.LocalMidiDurationDefs[indToReplace[j]];
-                                Debug.Assert(lmdd.UniqueMidiDurationDef == null);
-                                Debug.Assert(lmdd.MsDuration > 0);
-                                msDuration += lmdd.MsDuration;
-                                voice.LocalMidiDurationDefs.RemoveAt(indToReplace[j]);
+                                IUniqueMidiDurationDef iumdd = voice.UniqueMidiDurationDefs[indToReplace[j]];
+                                Debug.Assert(iumdd.MsDuration > 0);
+                                msDuration += iumdd.MsDuration;
+                                voice.UniqueMidiDurationDefs.RemoveAt(indToReplace[j]);
                             }
-                            LocalMidiDurationDef replacementLmdd = new LocalMidiDurationDef(msPosition, msDuration);
-                            voice.LocalMidiDurationDefs.Insert(indToReplace[0], replacementLmdd);
+                            IUniqueMidiDurationDef replacementLmdd = new UniqueMidiRestDef(msPosition, msDuration);
+                            voice.UniqueMidiDurationDefs.Insert(indToReplace[0], replacementLmdd);
                         }
                     }
                     #endregion

@@ -144,22 +144,22 @@ namespace Moritz.Score.Notation
             return returnMetrics;
         }
 
-        public override DurationSymbol GetDurationSymbol(Voice voice, LocalMidiDurationDef lmdd, bool firstLmddInVoice,
+        public override DurationSymbol GetDurationSymbol(Voice voice, IUniqueMidiDurationDef iumdd, bool firstLmddInVoice,
             ref byte currentVelocity)
         {
             DurationSymbol durationSymbol = null;
-            MidiChordDef midiChordDef = lmdd.UniqueMidiDurationDef as MidiChordDef;
+            UniqueMidiChordDef uniqueMidiChordDef = iumdd as UniqueMidiChordDef;
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
             float musicFontHeight = pageFormat.MusicFontHeight;
             int minimumCrotchetDuration = pageFormat.MinimumCrotchetDuration;
 
-            if(midiChordDef != null)
+            if(uniqueMidiChordDef != null)
             {
-                Study2b2ChordSymbol study2b2ChordSymbol = new Study2b2ChordSymbol(voice, lmdd, minimumCrotchetDuration, musicFontHeight);
+                Study2b2ChordSymbol study2b2ChordSymbol = new Study2b2ChordSymbol(voice, uniqueMidiChordDef, minimumCrotchetDuration, musicFontHeight);
 
-                if(midiChordDef.MidiVelocity != currentVelocity)
+                if(uniqueMidiChordDef.MidiVelocity != currentVelocity)
                 {
-                    currentVelocity = midiChordDef.MidiVelocity;
+                    currentVelocity = uniqueMidiChordDef.MidiVelocity;
                 }
 
                 study2b2ChordSymbol.FontHeight = study2b2ChordSymbol.FontHeight * (0.5F + (currentVelocity / 200F));
@@ -168,7 +168,7 @@ namespace Moritz.Score.Notation
             }
             else
             {
-                RestSymbol restSymbol = new RestSymbol(voice, lmdd, minimumCrotchetDuration, musicFontHeight);
+                RestSymbol restSymbol = new RestSymbol(voice, iumdd, minimumCrotchetDuration, musicFontHeight);
                 durationSymbol = restSymbol;
             }
 

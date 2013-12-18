@@ -7,8 +7,8 @@ namespace Moritz.Score.Notation
 {
     internal class Study2b2ChordSymbol : ChordSymbol
     {
-        public Study2b2ChordSymbol(Voice voice, LocalMidiDurationDef lmdd, int minimumCrotchetDurationMS, float fontSize)
-            : base(voice, lmdd, minimumCrotchetDurationMS, fontSize)
+        public Study2b2ChordSymbol(Voice voice, UniqueMidiChordDef umcd, int minimumCrotchetDurationMS, float fontSize)
+            : base(voice, umcd, minimumCrotchetDurationMS, fontSize)
         {
             SetGraphicSymbolID();
         }

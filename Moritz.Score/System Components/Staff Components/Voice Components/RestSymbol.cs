@@ -10,10 +10,10 @@ namespace Moritz.Score
 {
 	internal class RestSymbol : DurationSymbol
 	{
-        public RestSymbol(Voice voice, LocalMidiDurationDef lmdd, int minimumCrotchetDurationMS, float fontHeight)
-            : base(voice, lmdd, minimumCrotchetDurationMS, fontHeight)
+        public RestSymbol(Voice voice, IUniqueMidiDurationDef iumdd, int minimumCrotchetDurationMS, float fontHeight)
+            : base(voice, iumdd, minimumCrotchetDurationMS, fontHeight)
         {
-            LocalCautionaryChordDef = lmdd as LocalCautionaryChordDef;
+            LocalCautionaryChordDef = iumdd as UniqueCautionaryChordDef;
         }
 
         public override void WriteSVG(SvgWriter w)
@@ -50,7 +50,7 @@ namespace Moritz.Score
         /// a) this rest is used like any other rest when justifying systems, but
         /// b) it is not displayed, and does not affect the temporal positions or durations of any chords. 
         /// </summary>
-        public LocalCautionaryChordDef LocalCautionaryChordDef = null;
+        public UniqueCautionaryChordDef LocalCautionaryChordDef = null;
 		#endregion display attributes
 		#region verticalPos attributes
 		public bool Centered = false; // capella default

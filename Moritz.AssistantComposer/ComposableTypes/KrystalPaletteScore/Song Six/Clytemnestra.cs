@@ -14,11 +14,11 @@ namespace Moritz.AssistantComposer
     public class Clytemnestra : VoiceDef
     {
         public Clytemnestra(VoiceDef wind3) 
-            : base(new List<LocalMidiDurationDef>())
+            : base(new List<IUniqueMidiDurationDef>())
         {
             SetMomentDefsListPerVerse();
             SetLocalMidiDurationDefs(wind3);
-            SetPitchWheelDeviation(0, _localMidiDurationDefs.Count, 1);
+            SetPitchWheelDeviation(0, _uniqueMidiDurationDefs.Count, 1);
         }
 
         /// <summary>
@@ -294,15 +294,15 @@ namespace Moritz.AssistantComposer
 
             int currentVerseMsPosition = 0;
             int currentEndMsPosition = 0;
-            LocalMidiDurationDef interludeRestDef = null;
+            IUniqueMidiDurationDef interludeRestDef = null;
 
             for(int verseIndex = 0; verseIndex < 5; ++verseIndex)
             { 
                 currentVerseMsPosition = verseMsPositions[verseIndex];
 
-                interludeRestDef = new LocalMidiDurationDef(currentEndMsPosition, currentVerseMsPosition - currentEndMsPosition);
+                interludeRestDef = new UniqueMidiRestDef(currentEndMsPosition, currentVerseMsPosition - currentEndMsPosition);
 
-                _localMidiDurationDefs.Add(interludeRestDef);
+                _uniqueMidiDurationDefs.Add(interludeRestDef);
 
                 List<MomentDef> momentDefs = _momentDefsListPerVerse[verseIndex];
 
@@ -312,30 +312,32 @@ namespace Moritz.AssistantComposer
                     momentDef.MsPosition += currentVerseMsPosition;
 
                     int restWidth = momentDef.MsWidth - momentDef.MaximumMsDuration;
-                    LocalMidiDurationDef lmrd = null;
+                    IUniqueMidiDurationDef lmrd = null;
                     if(restWidth > 0)
                     {
                         momentDef.MsWidth -= restWidth;
-                        lmrd = new LocalMidiDurationDef(momentDef.MsPosition + momentDef.MsWidth, restWidth);
+                        lmrd = new UniqueMidiRestDef(momentDef.MsPosition + momentDef.MsWidth, restWidth);
                         Debug.Assert(lmrd.MsDuration > 0);
                     }
 
                     MidiChordDef mcd = momentDef.MidiChordDefs[0];
-                    LocalMidiDurationDef lmcd = new LocalMidiDurationDef(mcd, momentDef.MsPosition, momentDef.MsWidth);
+                    IUniqueMidiDurationDef lmcd = mcd.CreateUniqueMidiDurationDef();
+                    lmcd.MsPosition = momentDef.MsPosition;
+                    lmcd.MsDuration = momentDef.MsWidth;
                     Debug.Assert(lmcd.MsDuration > 0);
 
-                    _localMidiDurationDefs.Add(lmcd);
+                    _uniqueMidiDurationDefs.Add(lmcd);
 
                     if(lmrd != null)
                     {
-                        _localMidiDurationDefs.Add(lmrd);
+                        _uniqueMidiDurationDefs.Add(lmrd);
                     }
-                    currentEndMsPosition = _localMidiDurationDefs[_localMidiDurationDefs.Count - 1].MsPosition +
-                        _localMidiDurationDefs[_localMidiDurationDefs.Count - 1].MsDuration;
+                    currentEndMsPosition = _uniqueMidiDurationDefs[_uniqueMidiDurationDefs.Count - 1].MsPosition +
+                        _uniqueMidiDurationDefs[_uniqueMidiDurationDefs.Count - 1].MsDuration;
                 }
             }
-            interludeRestDef = new LocalMidiDurationDef(currentEndMsPosition, wind3.EndMsPosition - currentEndMsPosition);
-            _localMidiDurationDefs.Add(interludeRestDef);
+            interludeRestDef = new UniqueMidiRestDef(currentEndMsPosition, wind3.EndMsPosition - currentEndMsPosition);
+            _uniqueMidiDurationDefs.Add(interludeRestDef);
         }
 
         private List<List<MomentDef>> _momentDefsListPerVerse;
@@ -345,9 +347,9 @@ namespace Moritz.AssistantComposer
         /// </summary>
         internal override void SetLyricsToIndex()
         {
-            for(int index = 0; index < _localMidiDurationDefs.Count; ++index)
+            for(int index = 0; index < _uniqueMidiDurationDefs.Count; ++index)
             {
-                UniqueMidiChordDef lmcd = _localMidiDurationDefs[index].UniqueMidiDurationDef as UniqueMidiChordDef;
+                UniqueMidiChordDef lmcd = _uniqueMidiDurationDefs[index] as UniqueMidiChordDef;
                 if(lmcd != null)
                 {
                     lmcd.Lyric = index.ToString() + lmcd.Lyric;

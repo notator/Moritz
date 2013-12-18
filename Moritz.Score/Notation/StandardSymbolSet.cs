@@ -298,12 +298,12 @@ namespace Moritz.Score.Notation
             return returnMetrics;
         }
 
-        public override DurationSymbol GetDurationSymbol(Voice voice, LocalMidiDurationDef lmdd, bool firstLmddInVoice,
+        public override DurationSymbol GetDurationSymbol(Voice voice, IUniqueMidiDurationDef iumdd, bool firstLmddInVoice,
             ref byte currentVelocity)
         {
             DurationSymbol durationSymbol = null;
-            LocalCautionaryChordDef lccd = lmdd as LocalCautionaryChordDef;  
-            MidiChordDef midiChordDef = lmdd.UniqueMidiDurationDef as MidiChordDef;
+            UniqueCautionaryChordDef lccd = iumdd as UniqueCautionaryChordDef;
+            UniqueMidiChordDef uniqueMidiChordDef = iumdd as UniqueMidiChordDef;
 
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
             float musicFontHeight = pageFormat.MusicFontHeight;
@@ -315,20 +315,20 @@ namespace Moritz.Score.Notation
                 CautionaryChordSymbol cautionaryChordSymbol = new CautionaryChordSymbol(voice, lccd, cautionaryFontHeight);
                 durationSymbol = cautionaryChordSymbol;
             } 
-            else if(midiChordDef != null)
+            else if(uniqueMidiChordDef != null)
             {
-                ChordSymbol chordSymbol = new ChordSymbol(voice, lmdd, minimumCrotchetDuration, musicFontHeight);
+                ChordSymbol chordSymbol = new ChordSymbol(voice, uniqueMidiChordDef, minimumCrotchetDuration, musicFontHeight);
 
-                if(midiChordDef.MidiVelocity != currentVelocity)
+                if(uniqueMidiChordDef.MidiVelocity != currentVelocity)
                 {
-                    chordSymbol.AddDynamic(midiChordDef.MidiVelocity, currentVelocity);
-                    currentVelocity = midiChordDef.MidiVelocity;
+                    chordSymbol.AddDynamic(uniqueMidiChordDef.MidiVelocity, currentVelocity);
+                    currentVelocity = uniqueMidiChordDef.MidiVelocity;
                 }
                 durationSymbol = chordSymbol;
             }
             else
             {
-                RestSymbol restSymbol = new RestSymbol(voice, lmdd, minimumCrotchetDuration, musicFontHeight);
+                RestSymbol restSymbol = new RestSymbol(voice, iumdd, minimumCrotchetDuration, musicFontHeight);
                 durationSymbol = restSymbol;
             }
 
@@ -598,7 +598,7 @@ namespace Moritz.Score.Notation
                         List<float> x2s = null;
                         List<float> ys = null;
                         ++index;
-                        if(chord1.LocalMidiDurationDef.MsDurationToNextBarline != null)
+                        if(chord1.UniqueMidiChordDef.MsDurationToNextBarline != null)
                         {
                             while(index < noteObjects.Count)
                             {
@@ -684,7 +684,7 @@ namespace Moritz.Score.Notation
                             break;
                     }
 
-                    if(lastChord != null && lastChord.LocalMidiDurationDef.MsDurationToNextBarline != null)
+                    if(lastChord != null && lastChord.UniqueMidiChordDef.MsDurationToNextBarline != null)
                     {
                         List<float> x1s = GetX1sFromChord1(lastChord.ChordMetrics, hairlinePadding);
                         List<float> x2s;

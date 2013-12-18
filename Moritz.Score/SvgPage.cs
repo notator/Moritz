@@ -63,14 +63,14 @@ namespace Moritz.Score
                                     id = attributesDict["id"];
                                     msDuration = int.Parse(attributesDict["score:msDuration"]);
                                     MidiChordDef midiChordDef = GetNewMidiChordDef(r, id, msDuration);
-                                    currentVoice.LocalMidiDurationDefs.Add(new LocalMidiDurationDef(midiChordDef));
+                                    currentVoice.UniqueMidiDurationDefs.Add(midiChordDef.CreateUniqueMidiDurationDef());
                                     // msPositions are set later
                                     break;
                                 case "rest":
                                     id = attributesDict["id"];
                                     msDuration = int.Parse(attributesDict["score:msDuration"]);
                                     MidiRestDef midiRestDef = new MidiRestDef(id, msDuration);
-                                    currentVoice.LocalMidiDurationDefs.Add(new LocalMidiDurationDef(midiRestDef));
+                                    currentVoice.UniqueMidiDurationDefs.Add(midiRestDef.CreateUniqueMidiDurationDef());
                                     // msPositions are set later
                                 break;
                             }

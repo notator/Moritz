@@ -288,6 +288,14 @@ namespace Moritz.Score.Midi
                 MidiChordSliderDefs.WriteSVG(w); // writes score:sliders element
         }
 
+        public override IUniqueMidiDurationDef CreateUniqueMidiDurationDef()
+        {
+            UniqueMidiChordDef umcd = new UniqueMidiChordDef(this); // a deep clone with a special id string.
+            umcd.MsPosition = 0;
+            umcd.MsDuration = this.MsDuration;
+            return umcd;
+        }
+
         private static int _uniqueChordID = 0;
         public static int UniqueChordID { get { return ++_uniqueChordID; } }
 
@@ -327,7 +335,7 @@ namespace Moritz.Score.Midi
 
         public List<byte> MidiHeadSymbols { get { return _midiHeadSymbols; } }
         protected List<byte> _midiHeadSymbols = null;
-        public override byte MidiVelocity { get { return _midiVelocity; } }
+        public byte MidiVelocity { get { return _midiVelocity; } }
         protected byte _midiVelocity;
         public int OrnamentNumberSymbol { get { return _ornamentNumberSymbol; } }
         protected int _ornamentNumberSymbol = 0;
