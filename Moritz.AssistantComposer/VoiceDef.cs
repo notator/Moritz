@@ -363,6 +363,21 @@ namespace Moritz.AssistantComposer
             SetMsPositions();
         }
         /// <summary>
+        /// Remove the IUniqueMidiDurationDefs which start between startMsPos and (not including) endMsPos 
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        internal void RemoveBetweenMsPositions(int startMsPos, int endMsPos)
+        {
+            IUniqueMidiDurationDef iumdd = _uniqueMidiDurationDefs.Find(f => (f.MsPosition >= startMsPos) && (f.MsPosition < endMsPos));
+            while(iumdd != null)
+            {
+                _uniqueMidiDurationDefs.Remove(iumdd);
+                iumdd = _uniqueMidiDurationDefs.Find(f => (f.MsPosition >= startMsPos) && (f.MsPosition < endMsPos));
+            }
+            SetMsPositions();
+        }
+        /// <summary>
         /// Removes the iUniqueMidiDurationDef at index from the list, and then inserts the replacement at the same index.
         /// </summary>
         internal void Replace(int index, IUniqueMidiDurationDef replacementIumdd)
@@ -1162,6 +1177,5 @@ namespace Moritz.AssistantComposer
         }
 
         #endregion private
-
     }
 }
