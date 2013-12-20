@@ -33,7 +33,7 @@ namespace Moritz.AssistantComposer
         /// <returns></returns>
         public override int NumberOfBars()
         {
-            return 96;
+            return 103;
         }
 
         /// <summary>
@@ -48,23 +48,18 @@ namespace Moritz.AssistantComposer
         /// </returns>
         public override List<List<Voice>> DoAlgorithm()
         {
-            // Palettes contain:
-            // -- begin to be used in prelude (exposition in prelude)
-            // palette 1 : winds [domain 7] (used, dont change!)
-            // palette 2 : furies4 snores [domain 7] (used, dont change!)
-            //
-            // -- can begin to be used in verse 1 (exposition in interlude 1)
-            // palette 3 : furies3 feathers [domain 7] (used, dont change!)
-            // palette 4 : furies4 growls [domain 7] (index 0,2,5,1 used)
-            // palette 5 : furies2 ticks [domain 7] (used, dont change!)
-            //
-            // -- "bird sounds" from Interlude2 and verse 3
-            // palette 6 : furies4 songs [domain 12] 
-            // palette 7 : furies3 chirps1 [domain 12] 
-            // palette 8 : furies2 chirps2 [domain 12] 
-            // palette 9 : furies1 cheeps [domain 12] (4,8,2,6,10 used, dont change!) 
+            // Palette indices:
+            // Winds use palette 0.
+            // Furies use:
+            //                       Interlude
+            //         Prelude   1    2    3    4   Postlude
+            //         ------------------------------------------
+            // Furies1    -      -    8   12   16      20
+            // Furies2    -      4    7   11   15      19
+            // Furies3    -      2    6   10   14      18
+            // Furies4    1      3    5    9   13      17
 
-            // All palettes can be accessed here at _paletteDefs[ paletteNumber - 1 ].
+            // All palettes can be accessed here at _paletteDefs[ paletteIndex ].
 
             // The wind3 is the lowest wind. The winds are numbered from top to bottom in the score.
             VoiceDef wind3 = GetWind3(_paletteDefs[0], _krystals[2]);
@@ -92,6 +87,8 @@ namespace Moritz.AssistantComposer
             VoiceDef furies2 = GetFuries2(clytemnestra, wind1, furies3, _paletteDefs);// steals ticks from furies3
             VoiceDef furies1 = GetFuries1(clytemnestra, wind1, furies3, furies2, _paletteDefs);
             GetFuries3ChirpsInInterlude2AndVerse3(furies1, furies2, furies3, clytemnestra, wind1, _paletteDefs[6]);
+
+            GetFuriesInterlude3ToEnd(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3, _paletteDefs);
 
             // contouring test code 
             // fury1.SetContour(1, new List<int>(){2,2,2,2,2}, 1, 6);
@@ -293,7 +290,10 @@ namespace Moritz.AssistantComposer
                 #region interlude after verse 3
                 w1[38].MsPosition,
                 w3[40].MsPosition,
+                w3[42].MsPosition,
+                w3[44].MsPosition,
                 w3[45].MsPosition,
+                w3[47].MsPosition,
                 #endregion
                 #region verse 4, Oft have ye...
                 c[174].MsPosition,
@@ -321,7 +321,11 @@ namespace Moritz.AssistantComposer
                 #endregion
                 #region interlude after verse 4
                 w1[57].MsPosition,
+                w3[59].MsPosition,
+                w3[61].MsPosition,
                 w3[63].MsPosition,
+                w3[65].MsPosition,
+                w3[67].MsPosition,
                 #endregion
                 #region verse 5
                 c[269].MsPosition,
