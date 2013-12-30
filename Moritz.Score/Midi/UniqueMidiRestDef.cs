@@ -64,6 +64,8 @@ namespace Moritz.Score.Midi
         public byte MidiVelocity { get { return 0; } set {}}
         public int PitchWheelDeviation { get { return 0;} set {}}
 
+        public List<byte> PanMsbs { get { return new List<byte>(); } set { } }
+
         public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
         private int? _msDurationToNextBarline = null;
 

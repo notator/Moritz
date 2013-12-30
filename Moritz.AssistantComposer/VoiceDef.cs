@@ -292,6 +292,7 @@ namespace Moritz.AssistantComposer
 
             return index;
         }
+
         private void InsertVoiceDefInRest(int restIndex, VoiceDef iVoiceDef)
         {
             List<IUniqueMidiDurationDef> lmdds = _uniqueMidiDurationDefs;
@@ -400,6 +401,29 @@ namespace Moritz.AssistantComposer
             _uniqueMidiDurationDefs.InsertRange(toIndex, extractedLmdds);
             SetMsPositions();
         }
+
+        /// <summary>
+        /// Returns the index of the IUniqueMidiDurationDef which starts at or is otherwise current at msPosition.
+        /// If msPosition is the EndMsPosition, the index of the final IUniqueMidiDurationDef (Count-1) is returned.
+        /// If the VoiceDef does not span msPosition, -1 (=error) is returned.
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        internal int FindIndexAtMsPosition(int msPosition)
+        {
+            int returnedIndex = -1;
+            if(msPosition == EndMsPosition)
+            {
+                returnedIndex = this.Count - 1;
+            }
+            else if(msPosition >= _uniqueMidiDurationDefs[0].MsPosition && msPosition < EndMsPosition)
+            {
+                returnedIndex = _uniqueMidiDurationDefs.FindIndex(u => ((u.MsPosition <= msPosition) && ((u.MsPosition + u.MsDuration) > msPosition)));  
+            }
+            Debug.Assert(returnedIndex != -1);
+            return returnedIndex;
+        }
+
         #endregion list functions
 
         #region VoiceDef duration changers
@@ -652,6 +676,7 @@ namespace Moritz.AssistantComposer
             }
         }
         /// <summary>
+        /// ACHTUNG: This function is deprecated!! Use the other AdjustVelocitiesHairpin(...).
         /// First creates a hairpin in the velocities from beginIndex to endIndex (non-inclusive),
         /// then adjusts all the remaining velocities in this VoiceDef by the finalFactor.
         /// endIndex must be greater than beginIndex + 1.
@@ -683,6 +708,55 @@ namespace Moritz.AssistantComposer
             }
         }
 
+        /// Creates a hairpin in the velocities from startMsPosition to endMsPosition (non-inclusive).
+        /// This function does NOT change velocities outside the range given in its arguments.
+        /// There must be at least two IUniqueMidiDurationDefs in the msPosition range given in the arguments.
+        /// The factors by which the velocities are multiplied change arithmetically:
+        /// The velocity of the first IUniqueMidiDurationDefs is multiplied by startFactor, and the velocity
+        /// of the last IUniqueMidiDurationDef in range by endFactor.
+        /// Can be used to create a diminueno or crescendo.
+        internal void AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
+        {
+            int startIndex = FindIndexAtMsPosition(startMsPosition);
+            int endIndex = FindIndexAtMsPosition(endMsPosition);
+
+            Debug.Assert(((startIndex + 1) < endIndex) && (startFactor >= 0) && (endFactor >= 0) && (endIndex <= Count));
+
+            double factorIncrement = (endFactor - startFactor) / (endIndex - startIndex);
+            double factor = startFactor;
+            List<IUniqueMidiDurationDef> lmdds = _uniqueMidiDurationDefs;
+
+            for(int i = startIndex; i < endIndex; ++i)
+            {
+                lmdds[i].AdjustVelocities(factor);
+                factor += factorIncrement;
+            }
+        }
+
+        /// <summary>
+        /// Creates a moving pan from startPanValue at startMsPosition to endPanValue at endMsPosition.
+        /// Implemented using one pan value per IUniqueMidiDurationDef.
+        /// This function does NOT change pan values outside the position range given in its arguments.
+        /// </summary>
+        internal void SetPan(int startMsPosition, int endMsPosition, int startPanValue, int endPanValue)
+        {
+            int startIndex = FindIndexAtMsPosition(startMsPosition);
+            int endIndex = FindIndexAtMsPosition(endMsPosition);
+
+            Debug.Assert(((startIndex + 1) < endIndex) && (startPanValue >= 0) && (startPanValue <= 127)
+                && (endPanValue >= 0) && (endPanValue <=127) && (endIndex <= Count));
+
+            double increment = ((double)(endPanValue - startPanValue)) / (endIndex - startIndex);
+            int panValue = startPanValue;
+            List<IUniqueMidiDurationDef> lmdds = _uniqueMidiDurationDefs;
+
+            for(int i = startIndex; i < endIndex; ++i)
+            {
+                lmdds[i].PanMsbs = new List<byte>() { (byte)panValue };
+                panValue += (int)increment;
+            }
+        }
+
         /// <summary>
         /// Transpose all the lmdds from startIndex to (not including) endIndex
         /// up by the number of semitones given in the interval argument.
@@ -696,8 +770,7 @@ namespace Moritz.AssistantComposer
             CheckIndices(startIndex, endIndex);
             for(int i = startIndex; i < endIndex; ++i)
             {
-                IUniqueMidiDurationDef iumdd = _uniqueMidiDurationDefs[i];
-                iumdd.Transpose(interval);
+                _uniqueMidiDurationDefs[i].Transpose(interval);
             }
         }
         /// <summary>

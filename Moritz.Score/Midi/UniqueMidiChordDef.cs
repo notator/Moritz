@@ -195,6 +195,40 @@ namespace Moritz.Score.Midi
             }
         }
 
+        public List<byte> PanMsbs
+        { 
+            get
+            {
+                List<byte> rval;
+                if(this.MidiChordSliderDefs == null || this.MidiChordSliderDefs.PanMsbs == null)
+                {
+                    rval = new List<byte>();
+                }
+                else
+                {
+                    rval = this.MidiChordSliderDefs.PanMsbs;
+                }
+                return rval;
+            } 
+            set
+            {
+                if(this.MidiChordSliderDefs == null)
+                {
+                    this.MidiChordSliderDefs = new MidiChordSliderDefs(new List<byte>(), new List<byte>(), new List<byte>(), new List<byte>());
+                }
+                if(this.MidiChordSliderDefs.PanMsbs == null)
+                {
+                    this.MidiChordSliderDefs.PanMsbs = new List<byte>();
+                }
+                List<byte> pans = this.MidiChordSliderDefs.PanMsbs;
+                pans.Clear();
+                for(int i = 0; i < value.Count; ++i)
+                {
+                    pans.Add(MidiValue((int)(value[i])));
+                }
+            } 
+        }
+
         public void AdjustModulationWheel(double factor)
         {
             List<byte> modWheels = this.MidiChordSliderDefs.ModulationWheelMsbs;

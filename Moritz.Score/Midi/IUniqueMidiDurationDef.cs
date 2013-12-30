@@ -1,4 +1,4 @@
-
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Moritz.Score.Midi
@@ -80,7 +80,7 @@ namespace Moritz.Score.Midi
         //    }
         //}
 
-        int PitchWheelDeviation {get;set;}
+        int PitchWheelDeviation { get; set; }
         //{
         //    get
         //    {
@@ -123,6 +123,8 @@ namespace Moritz.Score.Midi
 
         //public int MsPosition { get { return _msPosition; } set { _msPosition = value; } }
         //private int _msPosition = 0;
+
+        List<byte> PanMsbs { get; set; }
     }
 
     ///// <summary>
