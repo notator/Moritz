@@ -129,17 +129,17 @@ namespace Moritz.AssistantComposer
             int beginVerse5CrescIndex = 70;
             int beginPostludeIndex = 74;
 
-            wind1.VelocitiesHairpin(beginInterlude2DimIndex, beginVerse3DimIndex, 0.5);
-            wind2.VelocitiesHairpin(beginInterlude2DimIndex, beginVerse3DimIndex, 0.5);
-            wind3.VelocitiesHairpin(beginInterlude2DimIndex, beginVerse3DimIndex, 0.5);
+            wind1.AdjustVelocitiesHairpin(beginInterlude2DimIndex, beginVerse3DimIndex, 0.5);
+            wind2.AdjustVelocitiesHairpin(beginInterlude2DimIndex, beginVerse3DimIndex, 0.5);
+            wind3.AdjustVelocitiesHairpin(beginInterlude2DimIndex, beginVerse3DimIndex, 0.5);
 
-            wind1.VelocitiesHairpin(beginVerse5CrescIndex, beginPostludeIndex, 2);
-            wind2.VelocitiesHairpin(beginVerse5CrescIndex, beginPostludeIndex, 2);
-            wind3.VelocitiesHairpin(beginVerse5CrescIndex, beginPostludeIndex, 2);
+            wind1.AdjustVelocitiesHairpin(beginVerse5CrescIndex, beginPostludeIndex, 2);
+            wind2.AdjustVelocitiesHairpin(beginVerse5CrescIndex, beginPostludeIndex, 2);
+            wind3.AdjustVelocitiesHairpin(beginVerse5CrescIndex, beginPostludeIndex, 2);
 
-            wind1.VelocitiesHairpin(beginPostludeIndex, wind1.Count, 2);
-            wind2.VelocitiesHairpin(beginPostludeIndex, wind2.Count, 2);
-            wind3.VelocitiesHairpin(beginPostludeIndex, wind3.Count, 2);
+            wind1.AdjustVelocitiesHairpin(beginPostludeIndex, wind1.Count, 2);
+            wind2.AdjustVelocitiesHairpin(beginPostludeIndex, wind2.Count, 2);
+            wind3.AdjustVelocitiesHairpin(beginPostludeIndex, wind3.Count, 2);
         }
 
         private void AdjustWindPitchWheelDeviations(VoiceDef wind)
@@ -337,7 +337,7 @@ namespace Moritz.AssistantComposer
                 c[288].MsPosition,
                 #endregion
                 #region postlude
-                w3[74].MsPosition,
+                c[289].MsPosition,
                 w3[77].MsPosition,
                 #endregion
                 // final barline

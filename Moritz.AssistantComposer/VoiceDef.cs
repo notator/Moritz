@@ -663,7 +663,7 @@ namespace Moritz.AssistantComposer
         /// <param name="beginDimIndex"></param>
         /// <param name="endDimIndex"></param>
         /// <param name="p"></param>
-        internal void VelocitiesHairpin(int beginIndex, int endIndex, double finalFactor)
+        internal void AdjustVelocitiesHairpin(int beginIndex, int endIndex, double finalFactor)
         {
             Debug.Assert(((beginIndex + 1) < endIndex) && (finalFactor >= 0) && (endIndex <= Count));
 
