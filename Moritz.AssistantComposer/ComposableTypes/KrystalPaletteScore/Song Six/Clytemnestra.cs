@@ -11,7 +11,7 @@ namespace Moritz.AssistantComposer
     /// <summary>
     /// Encapsulates the composition of Clytemnestra's Voice
     /// </summary>
-    public class Clytemnestra : VoiceDef
+    internal class Clytemnestra : VoiceDef
     {
         public Clytemnestra(VoiceDef wind3) 
             : base(new List<IUniqueMidiDurationDef>())
