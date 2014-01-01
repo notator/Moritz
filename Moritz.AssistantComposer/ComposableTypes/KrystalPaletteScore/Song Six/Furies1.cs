@@ -10,7 +10,7 @@ namespace Moritz.AssistantComposer
 {
     internal class Furies1 : VoiceDef
     {
-        #region before interlude3
+
 
         internal Furies1(int msDuration)
             : base(msDuration)
@@ -50,7 +50,7 @@ namespace Moritz.AssistantComposer
             AlignObjectAtIndex(11, 12, 13, clytemnestra[123].MsPosition);
             AlignObjectAtIndex(21, 22, 23, clytemnestra[168].MsPosition);
         }
-        #endregion before interlude3
+
 
         #region finale
         internal void GetFinale(List<PaletteDef> palettes, Dictionary<string, int> msPositions)
@@ -224,18 +224,10 @@ namespace Moritz.AssistantComposer
 
         internal void AdjustVelocities(Dictionary<string, int> msPositions)
         {
-            int indexAtVerse4 = FindIndexAtMsPosition(msPositions["verse4"]);
-            int indexAtInterval4 = FindIndexAtMsPosition(msPositions["interlude4"]);
-            int indexAtVerse5 = FindIndexAtMsPosition(msPositions["verse5"]);
-            int indexAtPostlude = FindIndexAtMsPosition(msPositions["postlude"]);
-
-            AdjustVelocities(indexAtVerse4, indexAtInterval4, 0.5);
-            AdjustVelocities(96, 106, 0.7);
-
+            AdjustVelocitiesHairpin(msPositions["interlude3"], this[102].MsPosition, 1.0, 0.5);
+            AdjustVelocitiesHairpin(this[102].MsPosition, msPositions["interlude4"], 0.5, 0.8);
             AdjustVelocitiesHairpin(msPositions["interlude4"], msPositions["verse5"], 0.8, 1.0);
-
-            AdjustVelocities(indexAtVerse5, indexAtPostlude, 0.5);
-
+            AdjustVelocitiesHairpin(msPositions["verse5"], msPositions["postlude"], 0.5, 0.5);
             AdjustVelocitiesHairpin(msPositions["postlude"], EndMsPosition, 0.8, 1.0);
         }
 
