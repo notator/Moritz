@@ -13,7 +13,7 @@ namespace Moritz.AssistantComposer
     /// </summary>
     internal class Clytemnestra : VoiceDef
     {
-        public Clytemnestra(VoiceDef wind3) 
+        internal Clytemnestra(VoiceDef wind3) 
             : base(new List<IUniqueMidiDurationDef>())
         {
             SetMomentDefsListPerVerse();

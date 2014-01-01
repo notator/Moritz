@@ -17,84 +17,72 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// The arguments are all complete to the end of Verse 3
         /// </summary>
-        private void GetFuriesInterlude3ToEnd(VoiceDef furies1, VoiceDef furies2, VoiceDef furies3, VoiceDef furies4,
+        private void GetFuriesInterlude3ToEnd(Furies1 furies1, Furies2 furies2, Furies3 furies3, Furies4 furies4,
             Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3, List<PaletteDef> palettes,
             Dictionary<string, int> msPositions)
         {
-            VoiceDef f1Finale = GetF1Finale(palettes, msPositions);
-            furies1.InsertInRest(f1Finale);
-            AdjustF1Alignments(furies1, clytemnestra, wind3);
-            AdjustF1Velocities(furies1, msPositions);
-            AdjustF1PostludePan(furies1, msPositions["postlude"]);
+            furies1.GetFinale(palettes, msPositions);
+            furies1.AdjustAlignments(clytemnestra, wind3);
+            furies1.AdjustVelocities(msPositions);
 
-            VoiceDef f2Finale = GetF2Finale(palettes, msPositions);
-            furies2.InsertInRest(f2Finale);
-            //AdjustF2Alignments(furies2, clytemnestra, wind3);
-            //AdjustF2Velocities(furies2, msPositions);
-            //AdjustF2PostludePan(furies2, msPositions["postlude"]);
+            //furies2.GetFinale(palettes, msPositions);
+            //furies2.AdjustAlignments(clytemnestra, wind3);
+            //furies2.AdjustVelocities(msPositions);
 
-            //VoiceDef f3Finale = GetF3Finale(palettes, msPositions);
-            //furies3.InsertInRest(f3Finale);
-            //AdjustF3Alignments(furies3, clytemnestra, wind3);
-            //AdjustF3Velocities(furies3, msPositions);
-            //AdjustF3PostludePan(furies3, msPositions["postlude"]);
+            //furies3.GetFinale(palettes, msPositions);
+            //furies3.AdjustAlignments(clytemnestra, wind3);
+            //furies3.AdjustVelocities(msPositions);
 
-            //VoiceDef f4Finale = GetF4Finale(palettes, msPositions);
-            //furies4.InsertInRest(f4Finale);
-            //AdjustF4Alignments(furies4, clytemnestra, wind3);
-            //AdjustF4Velocities(furies4, msPositions);
-            //AdjustF4PostludePan(furies4, msPositions["postlude"]);
+            //furies4.GetFinale(palettes, msPositions);
+            //furies4.AdjustAlignments(clytemnestra, wind3);
+            //furies4.AdjustVelocities(msPositions);
 
-            SetFuriesPitchesInterlude3ToEnd(furies1, furies2, furies3, furies4, msPositions);
+            AdjustPostludePans(furies1, furies2, furies3, furies4, msPositions["postlude"]);
+            SetFuriesFinalePitches(furies1, furies2, furies3, furies4, msPositions);
         }
 
-        private void SetFuriesPitchesInterlude3ToEnd(VoiceDef furies1, VoiceDef furies2, VoiceDef furies3, VoiceDef furies4, 
+        private void AdjustPostludePans(Furies1 furies1, Furies2 furies2, Furies3 furies3, Furies4 furies4, int postludeMsPosition)
+        {
+            double posDiff = ((double)(furies1.EndMsPosition - postludeMsPosition)) / 4;
+            int postludeMsPosition1 = postludeMsPosition + (int)posDiff;
+            int postludeMsPosition2 = postludeMsPosition + (int)(posDiff * 2);
+            int postludeMsPosition3 = postludeMsPosition + (int)(posDiff * 3);
+
+            AdjustFuries1PostludePan(furies1, postludeMsPosition, postludeMsPosition1, postludeMsPosition2, postludeMsPosition3);
+            //AdjustFuries2PostludePan(furies2, postludeMsPosition, postludeMsPosition1, postludeMsPosition2, postludeMsPosition3);
+            //AdjustFuries3PostludePan(furies3, postludeMsPosition);
+            // Furies 4 pans dont change
+        }
+
+        internal void AdjustFuries1PostludePan(Furies1 furies1, int postludeMsPosition, int postludeMsPosition1, int postludeMsPosition2, int postludeMsPosition3)
+        {
+            furies1.SetPanGliss(postludeMsPosition, postludeMsPosition1, 64, 32);
+            furies1.SetPanGliss(postludeMsPosition1, postludeMsPosition2, 32, 96);
+            furies1.SetPanGliss(postludeMsPosition2, postludeMsPosition3, 96, 0);
+            furies1.SetPanGliss(postludeMsPosition3, furies1.EndMsPosition, 0, 127);
+        }
+
+        /// <summary>
+        /// Motion is contrary to the pan gliss in furies 1
+        /// </summary>
+        internal void AdjustFuries2PostludePan(Furies2 furies2, int postludeMsPosition, int postludeMsPosition1, int postludeMsPosition2, int postludeMsPosition3)
+        {
+            furies2.SetPanGliss(postludeMsPosition, postludeMsPosition1, 20, 69);
+            furies2.SetPanGliss(postludeMsPosition1, postludeMsPosition2, 69, 35);
+            furies2.SetPanGliss(postludeMsPosition2, postludeMsPosition3, 35, 127);
+            furies2.SetPanGliss(postludeMsPosition3, furies2.EndMsPosition, 127, 0);
+        }
+
+        internal void AdjustFuries3PostludePan(Furies3 furies3, int postludeMsPosition)
+        {
+            furies3.SetPanGliss(postludeMsPosition, furies3.EndMsPosition, 107, 0);
+        }
+
+        private void SetFuriesFinalePitches(VoiceDef furies1, VoiceDef furies2, VoiceDef furies3, VoiceDef furies4, 
             Dictionary<string, int> msPositions)
         {
             
         }
 
-        /// <summary>
-        /// This should work for furies 1-3, and maybe even 4!
-        /// </summary>
-        /// <param name="f13"></param>
-        private void AdjustFuriesFinalePitchWheelDeviations(VoiceDef f13)
-        {
-            double furies1StartPwdValue = 5, furies1EndPwdValue = 28;
-            double pwdfactor = Math.Pow(furies1EndPwdValue / furies1StartPwdValue, (double)1 / f13.Count); // f13.Count'th root of furies1EndPwdValue/furies1StartPwdValue -- the last pwd should be furies1EndPwdValue
-
-            for(int i = 0; i < f13.Count; ++i)
-            {
-                f13[i].PitchWheelDeviation = (int)(furies1StartPwdValue * (Math.Pow(pwdfactor, i)));
-            }
-        }
-
-        /// <summary>
-        /// voiceDef contains the UniqueMidiChordDefs defined by a krystal, and nothing else.
-        /// </summary>
-        /// <param name="voiceDef"></param>
-        /// <param name="strandIndices"></param>
-        /// <returns></returns>
-        private List<int> GetStrandDurations(VoiceDef voiceDef, List<int> strandIndices)
-        {
-            List<int> strandDurations = new List<int>();
-            int duration;
-            for(int i = 1; i < strandIndices.Count; ++i)
-            {
-                duration = 0;
-                for(int j = strandIndices[i-1]; j < strandIndices[i]; ++j)
-                {
-                    duration += voiceDef[j].MsDuration;
-                }
-                strandDurations.Add(duration);
-            }
-            duration = 0;
-            for(int i = strandIndices[strandIndices.Count - 1]; i < voiceDef.Count; ++i)
-            {
-                duration += voiceDef[i].MsDuration;
-            }
-            strandDurations.Add(duration);
-            return strandDurations;
-        }
     }
 }

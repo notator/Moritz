@@ -8,39 +8,38 @@ using Krystals4ObjectLibrary;
 
 namespace Moritz.AssistantComposer
 {
-    /// <summary>
-    /// The Furies "constructors" (part of the Song Six algorithm).
-    /// </summary>
-    internal partial class SongSixAlgorithm : MidiCompositionAlgorithm
+    internal class Furies4 : VoiceDef
     {
-
-        private VoiceDef GetFuries4(int firstRestMsDuration, Clytemnestra clytemnestra, VoiceDef wind1, List<PaletteDef> palettes)
+        internal Furies4(int msDuration)
+            : base(msDuration)
         {
-            VoiceDef furies4 = GetSnores(firstRestMsDuration, clytemnestra, wind1, palettes[1]);
-            AddGrowlsToInterlude2AndVerse3(furies4, clytemnestra, palettes[3]);
+        }
 
-            return furies4;
+        internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, VoiceDef wind1, List<PaletteDef> palettes)
+        {
+            GetSnores(firstRestMsDuration, clytemnestra, wind1, palettes[1]);
+            AddGrowlsToInterlude2AndVerse3(clytemnestra, palettes[3]);
         }
 
         #region before Interlude3
-        private void AddGrowlsToInterlude2AndVerse3(VoiceDef furies4, Clytemnestra clytemnestra, PaletteDef growlsPalette)
+        private void AddGrowlsToInterlude2AndVerse3(Clytemnestra clytemnestra, PaletteDef growlsPalette)
         {
             int[] growlIndices = { 0,2,5,1 };
             //int[] transpositions = { 0,0,0,0 };
             //double[] velocityfactors = { 1,1,1,1 };
             int[] msPositions =
             { 
-                furies4[24].MsPosition + 200, 
-                furies4[26].MsPosition + 200, 
-                furies4[30].MsPosition + 200, 
-                furies4[32].MsPosition + 200, 
+                this[24].MsPosition + 200, 
+                this[26].MsPosition + 200, 
+                this[30].MsPosition + 200, 
+                this[32].MsPosition + 200, 
             };
             int[] msDurations =
             {
-                furies4[24].MsDuration / 2,
-                furies4[26].MsDuration / 2,
-                furies4[30].MsDuration / 2,
-                furies4[32].MsDuration / 2
+                this[24].MsDuration / 2,
+                this[26].MsDuration / 2,
+                this[30].MsDuration / 2,
+                this[32].MsDuration / 2
             };
 
             for(int i = 3; i >= 0; --i)
@@ -50,21 +49,17 @@ namespace Moritz.AssistantComposer
                 growl.MsDuration = msDurations[i];
                 //growl.AdjustVelocities(velocityfactors[i]);
                 //growl.Transpose(transpositions[i]);
-                furies4.InsertInRest(growl);
+                InsertInRest(growl);
             }
 
-            furies4.AgglomerateRestOrChordAt(40);
+            AgglomerateRestOrChordAt(40);
 
-            furies4.AlignObjectAtIndex(34, 35, 36, clytemnestra[140].MsPosition);
-            furies4.AlignObjectAtIndex(35, 36, 37, clytemnestra[141].MsPosition);
-            furies4.AlignObjectAtIndex(38, 39, 40, clytemnestra[162].MsPosition);
+            AlignObjectAtIndex(34, 35, 36, clytemnestra[140].MsPosition);
+            AlignObjectAtIndex(35, 36, 37, clytemnestra[141].MsPosition);
+            AlignObjectAtIndex(38, 39, 40, clytemnestra[162].MsPosition);
         }
 
-        /// <summary>
-        /// Creates the initial furies4 VoiceDef containing snores to the beginning of Interlude3.
-        /// </summary>
-        /// <param name="firstRestMsDuration"></param>
-        private VoiceDef GetSnores(int firstRestMsDuration, Clytemnestra clytemnestra, VoiceDef wind1, PaletteDef snoresPalette)
+        private void GetSnores(int firstRestMsDuration, Clytemnestra clytemnestra, VoiceDef wind1, PaletteDef snoresPalette)
         {
             List<IUniqueMidiDurationDef> snores = new List<IUniqueMidiDurationDef>();
             int msPosition = 0;
@@ -116,31 +111,26 @@ namespace Moritz.AssistantComposer
 
             snores[snores.Count - 1].MsDuration = clytemnestra.EndMsPosition - snores[snores.Count - 1].MsPosition;
 
-            VoiceDef furies4 = new VoiceDef(snores);
+            this._uniqueMidiDurationDefs = snores;
 
-            furies4.AdjustVelocitiesHairpin(13, furies4.Count, 0.25);
+            AdjustVelocitiesHairpin(13, Count, 0.25);
 
             #region alignments before Interlude3
-            furies4.AlignObjectAtIndex(7, 8, 9, clytemnestra[3].MsPosition);
-            furies4.AlignObjectAtIndex(8, 9, 10, clytemnestra[7].MsPosition);
-            furies4.AlignObjectAtIndex(9, 10, 11, clytemnestra[16].MsPosition);
-            furies4.AlignObjectAtIndex(10, 11, 12, clytemnestra[24].MsPosition);
-            furies4.AlignObjectAtIndex(11, 12, 13, clytemnestra[39].MsPosition);
-            furies4.AlignObjectAtIndex(12, 13, 14, clytemnestra[42].MsPosition);
-            furies4.AlignObjectAtIndex(14, 34, furies4.Count, wind1[38].MsPosition); // rest at start of Interlude3
+            AlignObjectAtIndex(7, 8, 9, clytemnestra[3].MsPosition);
+            AlignObjectAtIndex(8, 9, 10, clytemnestra[7].MsPosition);
+            AlignObjectAtIndex(9, 10, 11, clytemnestra[16].MsPosition);
+            AlignObjectAtIndex(10, 11, 12, clytemnestra[24].MsPosition);
+            AlignObjectAtIndex(11, 12, 13, clytemnestra[39].MsPosition);
+            AlignObjectAtIndex(12, 13, 14, clytemnestra[42].MsPosition);
+            AlignObjectAtIndex(14, 34, Count, wind1[38].MsPosition); // rest at start of Interlude3
             #endregion
 
-            furies4.RemoveScorePitchWheelCommands(0, 13); // pitchwheeldeviation is 20 for R2M
-
-
-
-            return furies4;
-
+            RemoveScorePitchWheelCommands(0, 13); // pitchwheeldeviation is 20 for R2M
         }
         #endregion before Interlude3
 
         #region finale
-        private VoiceDef GetF4Finale(List<PaletteDef> palettes, Dictionary<string, int> msPositions)
+        internal void GetFinale(List<PaletteDef> palettes, Dictionary<string, int> msPositions)
         {
             PaletteDef f4Interlude3Palette = palettes[9];
             PaletteDef f4Interlude4Palette = palettes[13];
@@ -175,37 +165,37 @@ namespace Moritz.AssistantComposer
                 furies4Finale.RemoveAt(furies4Finale.Count - 1);
             }
 
-            AdjustFuriesFinalePitchWheelDeviations(furies4Finale);
+            InsertInRest(furies4Finale);
 
-            return furies4Finale;
+            AdjustPitchWheelDeviations(msPositions["interlude3"], msPositions["endOfPiece"], 5, 28);
         }
 
         private VoiceDef GetF4Interlude3Verse4EsCaped(PaletteDef f4Int3Palette, ExpansionKrystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
         {
             VoiceDef f43 = new VoiceDef(f4Int3Palette, krystal);
 
-            List<int> f4eStrandDurations = GetStrandDurations(f43, strandIndices);
+            //List<int> f4eStrandDurations = GetStrandDurations(f43, strandIndices);
 
-            int extraTime = 1000;
-            int diff = extraTime / f43.Count;
-            for(int i = f43.Count - 1; i > 0; --i)
-            {
-                if(strandIndices.Contains(i))
-                {
-                    UniqueMidiRestDef umrd = new UniqueMidiRestDef(f43[i].MsPosition, f4eStrandDurations[strandIndices.IndexOf(i)] + extraTime);
-                    extraTime -= diff;
-                    f43.Insert(i, umrd);
-                }
-            }
+            //int extraTime = 1000;
+            //int diff = extraTime / f43.Count;
+            //for(int i = f43.Count - 1; i > 0; --i)
+            //{
+            //    if(strandIndices.Contains(i))
+            //    {
+            //        UniqueMidiRestDef umrd = new UniqueMidiRestDef(f43[i].MsPosition, f4eStrandDurations[strandIndices.IndexOf(i)] + extraTime);
+            //        extraTime -= diff;
+            //        f43.Insert(i, umrd);
+            //    }
+            //}
 
-            f43.StartMsPosition = msPositions["interlude3Bar2"];
+            //f43.StartMsPosition = msPositions["interlude3Bar2"];
 
-            f43.RemoveBetweenMsPositions(msPositions["verse4EsCaped"], int.MaxValue);
+            //f43.RemoveBetweenMsPositions(msPositions["verse4EsCaped"], int.MaxValue);
 
-            if(f43[f43.Count - 1] is UniqueMidiRestDef)
-            {
-                f43[f43.Count - 1].MsDuration = msPositions["verse4EsCaped"] - f43[f43.Count - 1].MsPosition;
-            }
+            //if(f43[f43.Count - 1] is UniqueMidiRestDef)
+            //{
+            //    f43[f43.Count - 1].MsDuration = msPositions["verse4EsCaped"] - f43[f43.Count - 1].MsPosition;
+            //}
 
             return f43;
         }
@@ -214,27 +204,27 @@ namespace Moritz.AssistantComposer
         {
             VoiceDef f44 = new VoiceDef(f4Int4Palette, krystal);
 
-            List<int> f4eStrandDurations = GetStrandDurations(f44, strandIndices);
+            //List<int> f4eStrandDurations = GetStrandDurations(f44, strandIndices);
 
-            int extraTime = 500;
-            int diff = extraTime / f44.Count;
-            for(int i = f44.Count - 1; i > 0; --i)
-            {
-                if(strandIndices.Contains(i))
-                {
-                    UniqueMidiRestDef umrd = new UniqueMidiRestDef(f44[i].MsPosition, f4eStrandDurations[strandIndices.IndexOf(i)] + extraTime);
-                    extraTime -= diff;
-                    f44.Insert(i, umrd);
-                }
-            }
+            //int extraTime = 500;
+            //int diff = extraTime / f44.Count;
+            //for(int i = f44.Count - 1; i > 0; --i)
+            //{
+            //    if(strandIndices.Contains(i))
+            //    {
+            //        UniqueMidiRestDef umrd = new UniqueMidiRestDef(f44[i].MsPosition, f4eStrandDurations[strandIndices.IndexOf(i)] + extraTime);
+            //        extraTime -= diff;
+            //        f44.Insert(i, umrd);
+            //    }
+            //}
 
-            f44.StartMsPosition = msPositions["verse4EsCaped"];
-            f44.RemoveBetweenMsPositions(msPositions["verse5Calls"], int.MaxValue);
+            //f44.StartMsPosition = msPositions["verse4EsCaped"];
+            //f44.RemoveBetweenMsPositions(msPositions["verse5Calls"], int.MaxValue);
 
-            if(f44[f44.Count - 1] is UniqueMidiRestDef)
-            {
-                f44[f44.Count - 1].MsDuration = msPositions["postlude"] - f44[f44.Count - 1].MsPosition;
-            }
+            //if(f44[f44.Count - 1] is UniqueMidiRestDef)
+            //{
+            //    f44[f44.Count - 1].MsDuration = msPositions["postlude"] - f44[f44.Count - 1].MsPosition;
+            //}
 
             return f44;
         }
@@ -243,75 +233,78 @@ namespace Moritz.AssistantComposer
         {
             VoiceDef f4p = new VoiceDef(f4PostludePalette, krystal);
 
-            List<int> f4eStrandDurations = GetStrandDurations(f4p, strandIndices);
+            //List<int> f4eStrandDurations = GetStrandDurations(f4p, strandIndices);
 
-            for(int i = f4p.Count - 1; i > 0; --i)
-            {
-                if(strandIndices.Contains(i))
-                {
-                    UniqueMidiRestDef umrd = new UniqueMidiRestDef(f4p[i].MsPosition, f4eStrandDurations[strandIndices.IndexOf(i)] / 4);
-                    f4p.Insert(i, umrd);
-                }
-            }
+            //for(int i = f4p.Count - 1; i > 0; --i)
+            //{
+            //    if(strandIndices.Contains(i))
+            //    {
+            //        UniqueMidiRestDef umrd = new UniqueMidiRestDef(f4p[i].MsPosition, f4eStrandDurations[strandIndices.IndexOf(i)] / 4);
+            //        f4p.Insert(i, umrd);
+            //    }
+            //}
 
-            f4p.StartMsPosition = msPositions["postlude"];
-            f4p.RemoveBetweenMsPositions(msPositions["endOfPiece"], int.MaxValue);
+            //f4p.StartMsPosition = msPositions["postlude"];
+            //f4p.RemoveBetweenMsPositions(msPositions["endOfPiece"], int.MaxValue);
 
             return f4p;
         }
 
-        private void AdjustF4Alignments(VoiceDef furies4, Clytemnestra clytemnestra, VoiceDef wind3)
+        internal void AdjustAlignments(Clytemnestra clytemnestra, VoiceDef wind3)
         {
-            Debug.Assert(furies4[213] is UniqueMidiRestDef);
-            furies4[213].MsDuration += furies4[212].MsDuration;
-            furies4.RemoveAt(212);
-            furies4.AgglomerateRests();
+            // example code from furies1
 
-            furies4.AlignObjectAtIndex(25, 84, 85, clytemnestra[196].MsPosition);
-            furies4.AlignObjectAtIndex(84, 85, 89, clytemnestra[204].MsPosition + 200);
-            furies4.AlignObjectAtIndex(85, 89, 96, clytemnestra[215].MsPosition);
-            furies4.AlignObjectAtIndex(89, 96, 102, clytemnestra[226].MsPosition);
-            furies4.AlignObjectAtIndex(102, 106, 117, clytemnestra[242].MsPosition);
-            furies4.AlignObjectAtIndex(106, 117, 140, clytemnestra[268].MsPosition);
-            furies4.AlignObjectAtIndex(117, 140, 163, wind3[61].MsPosition);
-            furies4.AlignObjectAtIndex(140, 163, 197, wind3[65].MsPosition);
-            furies4.AlignObjectAtIndex(163, 197, 206, clytemnestra[269].MsPosition - 200);
-            furies4.AlignObjectAtIndex(197, 206, 211, clytemnestra[283].MsPosition + 400);
-            furies4.AlignObjectAtIndex(206, 211, 212, clytemnestra[286].MsPosition);
-            furies4.AlignObjectAtIndex(211, 212, furies4.Count - 1, clytemnestra[289].MsPosition);
+            //Debug.Assert(this[213] is UniqueMidiRestDef);
+            //this[213].MsDuration += this[212].MsDuration;
+            //RemoveAt(212);
+            //AgglomerateRests();
+
+            //AlignObjectAtIndex(25, 84, 85, clytemnestra[196].MsPosition);
+            //AlignObjectAtIndex(84, 85, 89, clytemnestra[204].MsPosition + 200);
+            //AlignObjectAtIndex(85, 89, 96, clytemnestra[215].MsPosition);
+            //AlignObjectAtIndex(89, 96, 102, clytemnestra[226].MsPosition);
+            //AlignObjectAtIndex(102, 106, 117, clytemnestra[242].MsPosition);
+            //AlignObjectAtIndex(106, 117, 140, clytemnestra[268].MsPosition);
+            //AlignObjectAtIndex(117, 140, 163, wind3[61].MsPosition);
+            //AlignObjectAtIndex(140, 163, 197, wind3[65].MsPosition);
+            //AlignObjectAtIndex(163, 197, 206, clytemnestra[269].MsPosition - 200);
+            //AlignObjectAtIndex(197, 206, 211, clytemnestra[283].MsPosition + 400);
+            //AlignObjectAtIndex(206, 211, 212, clytemnestra[286].MsPosition);
+            //AlignObjectAtIndex(211, 212, Count - 1, clytemnestra[289].MsPosition);
         }
 
-        private void AdjustF4Velocities(VoiceDef furies4, Dictionary<string, int> msPositions)
+        internal void AdjustVelocities(Dictionary<string, int> msPositions)
         {
-            int indexAtVerse4 = furies4.FindIndexAtMsPosition(msPositions["verse4"]);
-            int indexAtInterval4 = furies4.FindIndexAtMsPosition(msPositions["interlude4"]);
-            int indexAtVerse5 = furies4.FindIndexAtMsPosition(msPositions["verse5"]);
-            int indexAtPostlude = furies4.FindIndexAtMsPosition(msPositions["postlude"]);
+            // example code from furies1
 
-            furies4.AdjustVelocities(indexAtVerse4, indexAtInterval4, 0.5);
-            furies4.AdjustVelocities(96, 106, 0.7);
+            //int indexAtVerse4 = FindIndexAtMsPosition(msPositions["verse4"]);
+            //int indexAtInterval4 = FindIndexAtMsPosition(msPositions["interlude4"]);
+            //int indexAtVerse5 = FindIndexAtMsPosition(msPositions["verse5"]);
+            //int indexAtPostlude = FindIndexAtMsPosition(msPositions["postlude"]);
 
-            furies4.AdjustVelocitiesHairpin(msPositions["interlude4"], msPositions["verse5"], 0.8, 1.0);
+            //AdjustVelocities(indexAtVerse4, indexAtInterval4, 0.5);
+            //AdjustVelocities(96, 106, 0.7);
 
-            furies4.AdjustVelocities(indexAtVerse5, indexAtPostlude, 0.5);
+            //AdjustVelocitiesHairpin(msPositions["interlude4"], msPositions["verse5"], 0.8, 1.0);
 
-            //furies4.AdjustVelocitiesHairpin(msPositions["postlude"], msPositions["finalWindChord"], 0.8, 1.0);
-            //furies4.AdjustVelocitiesHairpin(msPositions["finalWindChord"], furies4.EndMsPosition, 1.0, 0);
+            //AdjustVelocities(indexAtVerse5, indexAtPostlude, 0.5);
 
-            furies4.AdjustVelocitiesHairpin(msPositions["postlude"], furies4.EndMsPosition, 0.8, 1.0);
+            //AdjustVelocitiesHairpin(msPositions["postlude"], EndMsPosition, 0.8, 1.0);
         }
 
-        private void AdjustF4PostludePan(VoiceDef furies4, int postludeMsPosition)
+        internal void AdjustPostludePan(int postludeMsPosition)
         {
-            double posDiff = ((double)(furies4.EndMsPosition - postludeMsPosition)) / 4;
-            int postludeMsPosition1 = postludeMsPosition + (int)posDiff;
-            int postludeMsPosition2 = postludeMsPosition + (int)(posDiff * 2);
-            int postludeMsPosition3 = postludeMsPosition + (int)(posDiff * 3);
+            // example code from furies1
 
-            furies4.SetPan(postludeMsPosition, postludeMsPosition1, 64, 32);
-            furies4.SetPan(postludeMsPosition1, postludeMsPosition2, 32, 96);
-            furies4.SetPan(postludeMsPosition2, postludeMsPosition3, 96, 0);
-            furies4.SetPan(postludeMsPosition3, furies4.EndMsPosition, 0, 127);
+            //double posDiff = ((double)(EndMsPosition - postludeMsPosition)) / 4;
+            //int postludeMsPosition1 = postludeMsPosition + (int)posDiff;
+            //int postludeMsPosition2 = postludeMsPosition + (int)(posDiff * 2);
+            //int postludeMsPosition3 = postludeMsPosition + (int)(posDiff * 3);
+
+            //SetPanGliss(postludeMsPosition, postludeMsPosition1, 64, 32);
+            //SetPanGliss(postludeMsPosition1, postludeMsPosition2, 32, 96);
+            //SetPanGliss(postludeMsPosition2, postludeMsPosition3, 96, 0);
+            //SetPanGliss(postludeMsPosition3, EndMsPosition, 0, 127);
         }
         #endregion finale
     }

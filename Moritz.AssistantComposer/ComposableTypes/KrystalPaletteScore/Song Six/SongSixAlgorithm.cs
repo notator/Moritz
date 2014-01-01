@@ -80,16 +80,6 @@ namespace Moritz.AssistantComposer
 
             AdjustWindVelocities(wind1, wind2, wind3);
 
-            // contouring test code
-            //wind1.SetContour(2, new List<int>() { 1, 1, 1 }, 12, 1);
-            
-            // Construct the Furies.
-            VoiceDef furies4 = GetFuries4(wind3[0].MsDuration / 2, clytemnestra, wind1, _paletteDefs);
-            VoiceDef furies3 = GetFuries3(wind1[15].MsPosition, clytemnestra, wind1, _paletteDefs);
-            VoiceDef furies2 = GetFuries2(clytemnestra, wind1, furies3, _paletteDefs);// steals ticks from furies3
-            VoiceDef furies1 = GetFuries1(clytemnestra, wind1, furies3, furies2, _paletteDefs);
-            GetFuries3ChirpsInInterlude2AndVerse3(furies1, furies2, furies3, clytemnestra, wind1, _paletteDefs[6]);
-
             Dictionary<string, int> msPositions = new Dictionary<string, int>();
             msPositions.Add("verse1", clytemnestra[1].MsPosition);
             msPositions.Add("interlude1", wind1[15].MsPosition);
@@ -106,6 +96,24 @@ namespace Moritz.AssistantComposer
             msPositions.Add("postlude", clytemnestra[289].MsPosition);
             msPositions.Add("finalWindChord", wind1[81].MsPosition);
             msPositions.Add("endOfPiece", wind1.EndMsPosition);
+
+            // contouring test code
+            //wind1.SetContour(2, new List<int>() { 1, 1, 1 }, 12, 1);
+            
+            // Construct the Furies up to Interlude3.
+            Furies4 furies4 = new Furies4(msPositions["endOfPiece"]);
+            furies4.GetBeforeInterlude3(wind3[0].MsDuration / 2, clytemnestra, wind1, _paletteDefs);
+
+            Furies3 furies3 = new Furies3(msPositions["endOfPiece"]);
+            furies3.GetBeforeInterlude3(msPositions["interlude1"], clytemnestra, wind1, _paletteDefs);
+
+            Furies2 furies2 = new Furies2(msPositions["endOfPiece"]);
+            furies2.GetBeforeInterlude3(clytemnestra, wind1, furies3, _paletteDefs);
+
+            Furies1 furies1 = new Furies1(msPositions["endOfPiece"]);
+            furies1.GetBeforeInterlude3(clytemnestra, wind1, furies2, _paletteDefs[8]);
+
+            furies3.GetChirpsInInterlude2AndVerse3(furies1, furies2, clytemnestra, wind1, _paletteDefs[6]);
 
             GetFuriesInterlude3ToEnd(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3, _paletteDefs, msPositions);
 
@@ -382,20 +390,6 @@ namespace Moritz.AssistantComposer
             barlineMsPositions.Sort();
 
             return barlineMsPositions;
-        }
-
-        /// <summary>
-        /// Returns a VoiceDef containing a single rest having msDuration
-        /// </summary>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        private VoiceDef GetEmptyVoiceDef(int msDuration)
-        {
-            List<IUniqueMidiDurationDef> lmdds = new List<IUniqueMidiDurationDef>();
-            IUniqueMidiDurationDef lmRestDef = new UniqueMidiRestDef(0, msDuration);
-            lmdds.Add(lmRestDef);
-            VoiceDef emptyVoiceDef = new VoiceDef(lmdds);
-            return emptyVoiceDef;
         }
 
         /// <summary>

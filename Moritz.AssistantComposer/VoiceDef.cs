@@ -23,6 +23,16 @@ namespace Moritz.AssistantComposer
     {
         #region constructors
         /// <summary>
+        /// A VoiceDef beginning at MsPosition = 0, and containing a single UniqueMidiRestDef having msDuration
+        /// </summary>
+        /// <param name="msDuration"></param>
+        public VoiceDef(int msDuration)
+        {
+            IUniqueMidiDurationDef lmRestDef = new UniqueMidiRestDef(0, msDuration);
+            _uniqueMidiDurationDefs.Add(lmRestDef);
+        }
+
+        /// <summary>
         /// <para>If the argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
         /// <para>The new VoiceDef's UniqueMidiDurationDefs list is simply set to the argument (which is not cloned).</para>
         /// </summary>
@@ -571,7 +581,7 @@ namespace Moritz.AssistantComposer
         /// by the removed duration, so that other msPositions don't change.
         /// </summary>
         /// <param name="p"></param>
-        internal void AgglomerateRestOrChordAt(int index)
+        protected void AgglomerateRestOrChordAt(int index)
         {
             Debug.Assert(index > 0 && index < Count);
             _uniqueMidiDurationDefs[index - 1].MsDuration += _uniqueMidiDurationDefs[index].MsDuration;
@@ -738,7 +748,7 @@ namespace Moritz.AssistantComposer
         /// Implemented using one pan value per IUniqueMidiDurationDef.
         /// This function does NOT change pan values outside the position range given in its arguments.
         /// </summary>
-        internal void SetPan(int startMsPosition, int endMsPosition, int startPanValue, int endPanValue)
+        internal void SetPanGliss(int startMsPosition, int endMsPosition, int startPanValue, int endPanValue)
         {
             int startIndex = FindIndexAtMsPosition(startMsPosition);
             int endIndex = FindIndexAtMsPosition(endMsPosition);
@@ -1220,7 +1230,25 @@ namespace Moritz.AssistantComposer
 
         internal List<IUniqueMidiDurationDef> UniqueMidiDurationDefs { get { return _uniqueMidiDurationDefs; } }
         #endregion internal
-        
+
+        /// <summary>
+        /// Creates an exponential change (per index) of pitchwheelDeviation from startMsPosition to endMsPosition,
+        /// </summary>
+        /// <param name="finale"></param>
+        protected void AdjustPitchWheelDeviations(int startMsPosition, int endMsPosition, int startPwd, int endPwd)
+        {
+            double furies1StartPwdValue = startPwd, furies1EndPwdValue = endPwd;
+            int startIndex = FindIndexAtMsPosition(startMsPosition);
+            int endIndex = FindIndexAtMsPosition(endMsPosition);
+ 
+            double pwdfactor = Math.Pow(furies1EndPwdValue / furies1StartPwdValue, (double)1 / this.Count); // f13.Count'th root of furies1EndPwdValue/furies1StartPwdValue -- the last pwd should be furies1EndPwdValue
+
+            for(int i = startIndex; i < endIndex; ++i)
+            {
+                this[i].PitchWheelDeviation = (int)(furies1StartPwdValue * (Math.Pow(pwdfactor, i)));
+            }
+        }
+
         protected List<IUniqueMidiDurationDef> _uniqueMidiDurationDefs = new List<IUniqueMidiDurationDef>();
 
         #region private
