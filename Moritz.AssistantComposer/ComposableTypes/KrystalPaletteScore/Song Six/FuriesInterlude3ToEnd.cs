@@ -25,6 +25,10 @@ namespace Moritz.AssistantComposer
             furies1.AdjustAlignments(clytemnestra, wind3);
             furies1.AdjustVelocities(msPositions);
 
+            furies4.GetFinale(palettes, msPositions);
+            furies4.AdjustAlignments(furies1, clytemnestra, wind3);
+            furies4.AdjustVelocities(msPositions);
+
             //furies2.GetFinale(palettes, msPositions);
             //furies2.AdjustAlignments(clytemnestra, wind3);
             //furies2.AdjustVelocities(msPositions);
@@ -33,15 +37,11 @@ namespace Moritz.AssistantComposer
             //furies3.AdjustAlignments(clytemnestra, wind3);
             //furies3.AdjustVelocities(msPositions);
 
-            //furies4.GetFinale(palettes, msPositions);
-            //furies4.AdjustAlignments(clytemnestra, wind3);
-            //furies4.AdjustVelocities(msPositions);
-
-            AdjustPostludePans(furies1, furies2, furies3, furies4, msPositions["postlude"]);
+            AdjustPostludePans(furies1, furies2, furies3, msPositions["postlude"]);
             SetFuriesFinalePitches(furies1, furies2, furies3, furies4, msPositions);
         }
 
-        private void AdjustPostludePans(Furies1 furies1, Furies2 furies2, Furies3 furies3, Furies4 furies4, int postludeMsPosition)
+        private void AdjustPostludePans(Furies1 furies1, Furies2 furies2, Furies3 furies3, int postludeMsPosition)
         {
             double posDiff = ((double)(furies1.EndMsPosition - postludeMsPosition)) / 4;
             int postludeMsPosition1 = postludeMsPosition + (int)posDiff;

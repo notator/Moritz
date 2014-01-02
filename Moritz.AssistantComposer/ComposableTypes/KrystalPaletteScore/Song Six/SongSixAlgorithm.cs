@@ -91,6 +91,7 @@ namespace Moritz.AssistantComposer
             msPositions.Add("verse4", clytemnestra[174].MsPosition);
             msPositions.Add("verse4EsCaped", clytemnestra[236].MsPosition);
             msPositions.Add("interlude4", wind1[57].MsPosition);
+            msPositions.Add("interlude4End", wind3[65].MsPosition);
             msPositions.Add("verse5", clytemnestra[269].MsPosition);
             msPositions.Add("verse5Calls", clytemnestra[288].MsPosition);
             msPositions.Add("postlude", clytemnestra[289].MsPosition);

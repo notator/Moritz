@@ -578,6 +578,28 @@ namespace Moritz.AssistantComposer
             SetMsPositions();
         }
 
+        /// <summary>
+        /// Creates an exponential accelerando or decelerando from startIndex to (not including) endIndex.
+        /// This function changes the msDuration in the given index range.
+        /// endIndex can be equal to this.Count.
+        /// </summary>
+        internal void CreateAccel(int startIndex, int endIndex, double startEndRatio)
+        {
+            Debug.Assert(((startIndex + 1) < endIndex) && (startEndRatio >= 0) && (endIndex <= Count));
+
+            double basicIncrement = (startEndRatio - 1) / (endIndex - startIndex);
+            double factor = 1.0;
+            List<IUniqueMidiDurationDef> lmdds = _uniqueMidiDurationDefs;
+
+            for(int i = startIndex; i < endIndex; ++i)
+            {
+                lmdds[i].AdjustDuration(factor);
+                factor += basicIncrement;
+            }
+
+            SetMsPositions();
+        }
+
         #endregion VoiceDef duration changers
 
         /// <summary>

@@ -132,28 +132,11 @@ namespace Moritz.AssistantComposer
         #region finale
         internal void GetFinale(List<PaletteDef> palettes, Dictionary<string, int> msPositions)
         {
-            PaletteDef f4Interlude3Palette = palettes[9];
-            PaletteDef f4Interlude4Palette = palettes[13];
-            PaletteDef f4PostludePalette = palettes[17];
 
             //PermutationKrystal krystal = new PermutationKrystal("C://Moritz/krystals/krystals/pk4(12)-2.krys");
             ExpansionKrystal krystal = new ExpansionKrystal("C://Moritz/krystals/krystals/xk3(12.12.1)-1.krys");
-            List<int> strandIndices = new List<int>();
-            int index = 0;
-            for(int i = 0; i < krystal.Strands.Count; ++i)
-            {
-                strandIndices.Add(index);
-                index += krystal.Strands[i].Values.Count;
-            }
 
-            VoiceDef f4Interlude3Verse4e = GetF4Interlude3Verse4EsCaped(f4Interlude3Palette, krystal, strandIndices, msPositions);
-            VoiceDef f4Verse4eVerse5 = GetF4Verse4EscapedVerse5Calls(f4Interlude4Palette, krystal, strandIndices, msPositions);
-            VoiceDef f4Postlude = GetF4Postlude(f4PostludePalette, krystal, strandIndices, msPositions);
-
-            VoiceDef furies4Finale = f4Interlude3Verse4e;
-
-            furies4Finale.AddRange(f4Verse4eVerse5);
-            furies4Finale.AddRange(f4Postlude);
+            VoiceDef furies4Finale = GetInterlude4toEnd(palettes, krystal, msPositions);
 
             if(furies4Finale[furies4Finale.Count - 1] is UniqueMidiRestDef)
             {
@@ -167,91 +150,79 @@ namespace Moritz.AssistantComposer
 
             InsertInRest(furies4Finale);
 
-            AdjustPitchWheelDeviations(msPositions["interlude3"], msPositions["endOfPiece"], 5, 28);
+            RemoveScorePitchWheelCommands(42, 54); // interlude4 (to immediately before verse5)
+
+            AdjustPitchWheelDeviations(msPositions["verse5"], msPositions["endOfPiece"], 5, 28);
         }
 
-        private VoiceDef GetF4Interlude3Verse4EsCaped(PaletteDef f4Int3Palette, ExpansionKrystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
+        private VoiceDef GetInterlude4toEnd(List<PaletteDef> palettes , ExpansionKrystal krystal, Dictionary<string, int> msPositions)
         {
-            VoiceDef f43 = new VoiceDef(f4Int3Palette, krystal);
+            PaletteDef interlude4StartPalette = palettes[9];
+            PaletteDef interlude4EndVerse5Palette = palettes[13];
+            PaletteDef postludePalette = palettes[17];
 
-            //List<int> f4eStrandDurations = GetStrandDurations(f43, strandIndices);
+            VoiceDef interlude4Start = new VoiceDef(interlude4StartPalette, krystal);
+            Transform(interlude4Start, msPositions);
+            VoiceDef interlude4EndVerse5 = new VoiceDef(interlude4EndVerse5Palette, krystal);
+            Transform(interlude4EndVerse5, msPositions);
+            VoiceDef postlude = new VoiceDef(postludePalette, krystal);
+            Transform(postlude, msPositions);
 
-            //int extraTime = 1000;
-            //int diff = extraTime / f43.Count;
-            //for(int i = f43.Count - 1; i > 0; --i)
-            //{
-            //    if(strandIndices.Contains(i))
-            //    {
-            //        UniqueMidiRestDef umrd = new UniqueMidiRestDef(f43[i].MsPosition, f4eStrandDurations[strandIndices.IndexOf(i)] + extraTime);
-            //        extraTime -= diff;
-            //        f43.Insert(i, umrd);
-            //    }
-            //}
+            VoiceDef finale = GetSections(interlude4Start, interlude4EndVerse5, postlude);
 
-            //f43.StartMsPosition = msPositions["interlude3Bar2"];
-
-            //f43.RemoveBetweenMsPositions(msPositions["verse4EsCaped"], int.MaxValue);
-
-            //if(f43[f43.Count - 1] is UniqueMidiRestDef)
-            //{
-            //    f43[f43.Count - 1].MsDuration = msPositions["verse4EsCaped"] - f43[f43.Count - 1].MsPosition;
-            //}
-
-            return f43;
+            return finale;
         }
 
-        private VoiceDef GetF4Verse4EscapedVerse5Calls(PaletteDef f4Int4Palette, ExpansionKrystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
+        private VoiceDef GetSections(VoiceDef interlude4Start, VoiceDef interlude4EndVerse5, VoiceDef postlude)
         {
-            VoiceDef f44 = new VoiceDef(f4Int4Palette, krystal);
+            List<IUniqueMidiDurationDef> iumdds = new List<IUniqueMidiDurationDef>();
+            int end1Index = 7;
+            int end2Index = 17;
+            for(int i = 0; i < end1Index; ++i)
+            {
+                iumdds.Add(interlude4Start[i]);
+            }
+            for(int i = end1Index; i < end2Index; ++i)
+            {
+                iumdds.Add(interlude4EndVerse5[i]);
+            }
+            for(int i = end2Index; i < postlude.Count; ++i)
+            {
+                iumdds.Add(postlude[i]);
+            }
 
-            //List<int> f4eStrandDurations = GetStrandDurations(f44, strandIndices);
-
-            //int extraTime = 500;
-            //int diff = extraTime / f44.Count;
-            //for(int i = f44.Count - 1; i > 0; --i)
-            //{
-            //    if(strandIndices.Contains(i))
-            //    {
-            //        UniqueMidiRestDef umrd = new UniqueMidiRestDef(f44[i].MsPosition, f4eStrandDurations[strandIndices.IndexOf(i)] + extraTime);
-            //        extraTime -= diff;
-            //        f44.Insert(i, umrd);
-            //    }
-            //}
-
-            //f44.StartMsPosition = msPositions["verse4EsCaped"];
-            //f44.RemoveBetweenMsPositions(msPositions["verse5Calls"], int.MaxValue);
-
-            //if(f44[f44.Count - 1] is UniqueMidiRestDef)
-            //{
-            //    f44[f44.Count - 1].MsDuration = msPositions["postlude"] - f44[f44.Count - 1].MsPosition;
-            //}
-
-            return f44;
+            return new VoiceDef(iumdds);
         }
 
-        private VoiceDef GetF4Postlude(PaletteDef f4PostludePalette, ExpansionKrystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
+        private void Transform(VoiceDef section, Dictionary<string, int> msPositions)
         {
-            VoiceDef f4p = new VoiceDef(f4PostludePalette, krystal);
+            section.RemoveRange(40, section.Count - 40);
 
-            //List<int> f4eStrandDurations = GetStrandDurations(f4p, strandIndices);
+            section.StartMsPosition = msPositions["interlude4"];
 
-            //for(int i = f4p.Count - 1; i > 0; --i)
-            //{
-            //    if(strandIndices.Contains(i))
-            //    {
-            //        UniqueMidiRestDef umrd = new UniqueMidiRestDef(f4p[i].MsPosition, f4eStrandDurations[strandIndices.IndexOf(i)] / 4);
-            //        f4p.Insert(i, umrd);
-            //    }
-            //}
+            //double factor = 10;
 
-            //f4p.StartMsPosition = msPositions["postlude"];
-            //f4p.RemoveBetweenMsPositions(msPositions["endOfPiece"], int.MaxValue);
+            //section.AdjustMsDurations(factor);
 
-            return f4p;
+            section.CreateAccel(0, section.Count, 0.08);
+
+            //section.RemoveBetweenMsPositions(msPositions["interlude4End"], int.MaxValue);
+            section.RemoveBetweenMsPositions(msPositions["finalWindChord"], int.MaxValue);
+
+            if(section[section.Count - 1] is UniqueMidiRestDef)
+            {
+                //section[section.Count - 1].MsDuration = msPositions["interlude4End"] - section[section.Count - 1].MsPosition;
+                section[section.Count - 1].MsDuration = msPositions["endOfPiece"] - section[section.Count - 1].MsPosition;
+            }
         }
 
-        internal void AdjustAlignments(Clytemnestra clytemnestra, VoiceDef wind3)
+        internal void AdjustAlignments(Furies1 furies1, Clytemnestra clytemnestra, VoiceDef wind3)
         {
+            AlignObjectAtIndex(42, Count-1, Count, furies1[280].MsPosition);
+
+            AlignObjectAtIndex(42, 59, 69, furies1[212].MsPosition);
+            AlignObjectAtIndex(59, 69, Count-1, furies1[248].MsPosition);
+
             // example code from furies1
 
             //Debug.Assert(this[213] is UniqueMidiRestDef);
