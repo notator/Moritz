@@ -89,6 +89,8 @@ namespace Moritz.AssistantComposer
             }
 
             InsertInRest(furies1Finale);
+
+            Erase(this[282].MsPosition, msPositions["endOfPiece"]);
             
             AdjustPitchWheelDeviations(msPositions["interlude3"], msPositions["endOfPiece"], 5, 28 );
         }
@@ -197,7 +199,7 @@ namespace Moritz.AssistantComposer
 
             f1p.StartMsPosition = msPositions["postlude"];
             f1p.RemoveBetweenMsPositions(msPositions["endOfPiece"], int.MaxValue);
-
+            
             return f1p;
         }
 

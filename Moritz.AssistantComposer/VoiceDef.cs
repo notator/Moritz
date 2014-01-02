@@ -398,6 +398,29 @@ namespace Moritz.AssistantComposer
             _uniqueMidiDurationDefs.Insert(index, replacementIumdd);
             SetMsPositions();
         }
+
+        /// <summary>
+        /// From startMsPosition to (not including) endMsPosition,
+        /// replace all UniqueMidiChordDefs by UniqueMidiRestDefs, then aglommerate the rests.
+        /// </summary>
+        internal void Erase(int startMsPosition, int endMsPosition)
+        {
+            int startIndex = FindIndexAtMsPosition(startMsPosition);
+            int endIndex = FindIndexAtMsPosition(endMsPosition);
+
+            for(int i = startIndex; i < endIndex; ++i)
+            {
+                UniqueMidiChordDef umcd = this[i] as UniqueMidiChordDef;
+                if(umcd != null)
+                {
+                    UniqueMidiRestDef umrd = new UniqueMidiRestDef(umcd.MsPosition, umcd.MsDuration);
+                    RemoveAt(i);
+                    Insert(i, umrd);
+                }
+            }
+
+            AgglomerateRests();
+        }
         /// <summary>
         /// Extracts nUniqueMidiDurationDefs from the UniqueMidiDurationDefs, and then inserts them again at the toIndex.
         /// </summary>
