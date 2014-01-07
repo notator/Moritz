@@ -81,6 +81,14 @@ namespace Moritz.AssistantComposer
         private void SetFuriesFinalePitches(VoiceDef furies1, VoiceDef furies2, VoiceDef furies3, VoiceDef furies4, 
             Dictionary<string, int> msPositions)
         {
+            PermutationKrystal pk = new PermutationKrystal("C://Moritz/krystals/krystals/pk4(12)-2.krys");
+            ExpansionKrystal xk = new ExpansionKrystal("C://Moritz/krystals/krystals/xk3(12.12.1)-1.krys");
+            ExpansionKrystal pInputToxk = new ExpansionKrystal("C://Moritz/krystals/krystals/xk2(1.12.10)-1.krys");
+
+            List<List<int>> pkValues = pk.GetValues(4);
+            List<List<int>> xkValues = xk.GetValues(3);
+            List<List<int>> pInputToxkValues = pInputToxk.GetValues(2);
+
             
         }
 

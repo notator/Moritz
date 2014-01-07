@@ -150,9 +150,18 @@ namespace Moritz.AssistantComposer
 
             InsertInRest(furies4Finale);
 
-            RemoveScorePitchWheelCommands(42, 54); // interlude4 (to immediately before verse5)
+            RemoveScorePitchWheelCommandsFromControlledChords(); // interlude4 (to immediately before verse5)
 
             AdjustPitchWheelDeviations(msPositions["verse5"], msPositions["endOfPiece"], 5, 28);
+        }
+
+        private void RemoveScorePitchWheelCommandsFromControlledChords()
+        {
+            RemoveScorePitchWheelCommands(42, 43);
+            RemoveScorePitchWheelCommands(45, 46);
+            RemoveScorePitchWheelCommands(47, 48);
+            RemoveScorePitchWheelCommands(49, 50);
+            RemoveScorePitchWheelCommands(52, 53);
         }
 
         private VoiceDef GetInterlude4toEnd(List<PaletteDef> palettes , ExpansionKrystal krystal, Dictionary<string, int> msPositions)
@@ -246,6 +255,20 @@ namespace Moritz.AssistantComposer
 
         internal void AdjustVelocities(Dictionary<string, int> msPositions)
         {
+            int indexAtInterval4 = FindIndexAtMsPosition(msPositions["interlude4"]);       // 42
+            int indexAtInterval4End = FindIndexAtMsPosition(msPositions["interlude4End"]); // 48
+            int indexAtVerse5 = FindIndexAtMsPosition(msPositions["verse5"]);              // 54
+            int indexAtPostlude = FindIndexAtMsPosition(msPositions["postlude"]);          // 59
+
+            //AdjustVelocitiesHairpin(indexAtInterval4, indexAtInterval4End, 0.35, 0.);
+            //AdjustVelocities(96, 106, 0.7);
+
+            AdjustVelocitiesHairpin(msPositions["interlude4"], msPositions["verse5"], 0.3, 0.5);
+
+            AdjustVelocities(indexAtVerse5, indexAtPostlude, 0.4);
+
+            AdjustVelocitiesHairpin(msPositions["postlude"], EndMsPosition, 0.4, 1.0);
+
             // example code from furies1
 
             //int indexAtVerse4 = FindIndexAtMsPosition(msPositions["verse4"]);
