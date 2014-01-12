@@ -191,8 +191,8 @@ namespace Moritz.AssistantComposer
         #region finale
         internal void GetFinale(List<PaletteDef> palettes, Dictionary<string, int> msPositions)
         {
-            PaletteDef f3Interlude3Palette = palettes[10]; // correct 1.1.2014
-            PaletteDef f3Interlude4Palette = palettes[14];
+            PaletteDef f3FinalePalette1 = palettes[10]; // correct 1.1.2014
+            PaletteDef f3FinalePalette2 = palettes[14];
             PaletteDef f3PostludePalette = palettes[18];
 
             //PermutationKrystal krystal = new PermutationKrystal("C://Moritz/krystals/krystals/pk4(12)-2.krys");
@@ -205,8 +205,8 @@ namespace Moritz.AssistantComposer
                 index += krystal.Strands[i].Values.Count;
             }
 
-            VoiceDef f3Interlude3Verse4e = GetF3Interlude3Verse4EsCaped(f3Interlude3Palette, krystal, strandIndices, msPositions);
-            VoiceDef f3Verse4eVerse5 = GetF3Verse4EscapedVerse5Calls(f3Interlude4Palette, krystal, strandIndices, msPositions);
+            VoiceDef f3Interlude3Verse4e = GetF3Interlude3Verse4EsCaped(f3FinalePalette1, krystal, strandIndices, msPositions);
+            VoiceDef f3Verse4eVerse5 = GetF3Verse4EscapedVerse5Calls(f3FinalePalette2, krystal, strandIndices, msPositions);
             VoiceDef f3Postlude = GetF3Postlude(f3PostludePalette, krystal, strandIndices, msPositions);
 
             VoiceDef furies3Finale = f3Interlude3Verse4e;

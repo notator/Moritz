@@ -22,7 +22,7 @@ namespace Moritz.AssistantComposer
             Dictionary<string, int> msPositions)
         {
             furies1.GetFinale(palettes, msPositions);
-            furies1.AdjustAlignments(clytemnestra, wind3);
+            furies1.AdjustAlignments(clytemnestra, wind2, wind3);
             furies1.AdjustVelocities(msPositions);
 
             furies4.GetFinale(palettes, msPositions);

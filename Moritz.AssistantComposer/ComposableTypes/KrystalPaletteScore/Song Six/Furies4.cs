@@ -166,15 +166,15 @@ namespace Moritz.AssistantComposer
 
         private VoiceDef GetInterlude4toEnd(List<PaletteDef> palettes , ExpansionKrystal krystal, Dictionary<string, int> msPositions)
         {
-            PaletteDef interlude4StartPalette = palettes[9];
-            PaletteDef interlude4EndVerse5Palette = palettes[13];
-            PaletteDef postludePalette = palettes[17];
+            PaletteDef f4FinalePalette1 = palettes[9];
+            PaletteDef f4FinalePalette2 = palettes[13];
+            PaletteDef f4PostludePalette = palettes[17];
 
-            VoiceDef interlude4Start = new VoiceDef(interlude4StartPalette, krystal);
+            VoiceDef interlude4Start = new VoiceDef(f4FinalePalette1, krystal);
             Transform(interlude4Start, msPositions);
-            VoiceDef interlude4EndVerse5 = new VoiceDef(interlude4EndVerse5Palette, krystal);
+            VoiceDef interlude4EndVerse5 = new VoiceDef(f4FinalePalette2, krystal);
             Transform(interlude4EndVerse5, msPositions);
-            VoiceDef postlude = new VoiceDef(postludePalette, krystal);
+            VoiceDef postlude = new VoiceDef(f4PostludePalette, krystal);
             Transform(postlude, msPositions);
 
             VoiceDef finale = GetSections(interlude4Start, interlude4EndVerse5, postlude);
@@ -229,7 +229,10 @@ namespace Moritz.AssistantComposer
         {
             AlignObjectAtIndex(42, Count-1, Count, furies1[280].MsPosition);
 
-            AlignObjectAtIndex(42, 59, 69, furies1[212].MsPosition);
+            AlignObjectAtIndex(44, 45, 49, furies1[138].MsPosition);
+            AlignObjectAtIndex(45, 49, 59, furies1[165].MsPosition);
+            AlignObjectAtIndex(49, 59, 69, furies1[212].MsPosition);
+
             AlignObjectAtIndex(59, 69, Count-1, furies1[248].MsPosition);
 
             // example code from furies1

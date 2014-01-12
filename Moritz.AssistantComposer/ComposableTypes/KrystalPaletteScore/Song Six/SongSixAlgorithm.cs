@@ -33,7 +33,7 @@ namespace Moritz.AssistantComposer
         /// <returns></returns>
         public override int NumberOfBars()
         {
-            return 103;
+            return 105;
         }
 
         /// <summary>
@@ -343,13 +343,14 @@ namespace Moritz.AssistantComposer
                 c[259].MsPosition,
                 c[263].MsPosition,
                 c[267].MsPosition,
+                c[268].MsPosition, // new bar 89
                 #endregion
                 #region interlude after verse 4
                 w1[57].MsPosition,
                 w3[59].MsPosition,
-                w3[61].MsPosition,
+                f4[45].MsPosition, // was w3[61].MsPosition,
                 w3[63].MsPosition,
-                w3[65].MsPosition,
+                w2[65].MsPosition, // was w3[65].MsPosition,
                 w3[67].MsPosition,
                 #endregion
                 #region verse 5
@@ -364,6 +365,7 @@ namespace Moritz.AssistantComposer
                 #region postlude
                 c[289].MsPosition,
                 f1[248].MsPosition,
+                f1[280].MsPosition, // new bar 105
                 #endregion
                 // final barline
                 w3.EndMsPosition
