@@ -132,11 +132,10 @@ namespace Moritz.AssistantComposer
         #region finale
         internal void GetFinale(List<PaletteDef> palettes, Dictionary<string, int> msPositions)
         {
-
             //PermutationKrystal krystal = new PermutationKrystal("C://Moritz/krystals/krystals/pk4(12)-2.krys");
             ExpansionKrystal krystal = new ExpansionKrystal("C://Moritz/krystals/krystals/xk3(12.12.1)-1.krys");
 
-            VoiceDef furies4Finale = GetInterlude4toEnd(palettes, krystal, msPositions);
+            VoiceDef furies4Finale = GetF4Finale(palettes, krystal, msPositions);
 
             if(furies4Finale[furies4Finale.Count - 1] is UniqueMidiRestDef)
             {
@@ -164,7 +163,7 @@ namespace Moritz.AssistantComposer
             RemoveScorePitchWheelCommands(52, 53);
         }
 
-        private VoiceDef GetInterlude4toEnd(List<PaletteDef> palettes , ExpansionKrystal krystal, Dictionary<string, int> msPositions)
+        private VoiceDef GetF4Finale(List<PaletteDef> palettes , ExpansionKrystal krystal, Dictionary<string, int> msPositions)
         {
             PaletteDef f4FinalePalette1 = palettes[9];
             PaletteDef f4FinalePalette2 = palettes[13];
@@ -177,25 +176,30 @@ namespace Moritz.AssistantComposer
             VoiceDef postlude = new VoiceDef(f4PostludePalette, krystal);
             Transform(postlude, msPositions);
 
-            VoiceDef finale = GetSections(interlude4Start, interlude4EndVerse5, postlude);
+            VoiceDef finale = GetFinaleSections(interlude4Start, interlude4EndVerse5, postlude, 7, 17);
 
             return finale;
         }
 
-        private VoiceDef GetSections(VoiceDef interlude4Start, VoiceDef interlude4EndVerse5, VoiceDef postlude)
+        /// <summary>
+        /// ACHTUNG: this function should be in a furies class. It is used by furies 2 and furies 4 (probably furies 3 too!)
+        /// The three VoiceDefs are parallel. They have the same number of DurationDefs, each having the same MsPosition and
+        /// MsDuration. The DurationDefs come from different palettes, so use different pitches etc.
+        /// This function simply creates a new VoiceDef by selecting the apropriate DurationDefs from each VoiceDef argument.
+        /// </summary>
+        private VoiceDef GetFinaleSections(VoiceDef finalePart1, VoiceDef finalePart2, VoiceDef postlude, int part2Index, int postludeIndex)
         {
             List<IUniqueMidiDurationDef> iumdds = new List<IUniqueMidiDurationDef>();
-            int end1Index = 7;
-            int end2Index = 17;
-            for(int i = 0; i < end1Index; ++i)
+
+            for(int i = 0; i < part2Index; ++i)
             {
-                iumdds.Add(interlude4Start[i]);
+                iumdds.Add(finalePart1[i]);
             }
-            for(int i = end1Index; i < end2Index; ++i)
+            for(int i = part2Index; i < postludeIndex; ++i)
             {
-                iumdds.Add(interlude4EndVerse5[i]);
+                iumdds.Add(finalePart2[i]);
             }
-            for(int i = end2Index; i < postlude.Count; ++i)
+            for(int i = postludeIndex; i < postlude.Count; ++i)
             {
                 iumdds.Add(postlude[i]);
             }
@@ -234,26 +238,6 @@ namespace Moritz.AssistantComposer
             AlignObjectAtIndex(49, 59, 69, furies1[212].MsPosition);
 
             AlignObjectAtIndex(59, 69, Count-1, furies1[248].MsPosition);
-
-            // example code from furies1
-
-            //Debug.Assert(this[213] is UniqueMidiRestDef);
-            //this[213].MsDuration += this[212].MsDuration;
-            //RemoveAt(212);
-            //AgglomerateRests();
-
-            //AlignObjectAtIndex(25, 84, 85, clytemnestra[196].MsPosition);
-            //AlignObjectAtIndex(84, 85, 89, clytemnestra[204].MsPosition + 200);
-            //AlignObjectAtIndex(85, 89, 96, clytemnestra[215].MsPosition);
-            //AlignObjectAtIndex(89, 96, 102, clytemnestra[226].MsPosition);
-            //AlignObjectAtIndex(102, 106, 117, clytemnestra[242].MsPosition);
-            //AlignObjectAtIndex(106, 117, 140, clytemnestra[268].MsPosition);
-            //AlignObjectAtIndex(117, 140, 163, wind3[61].MsPosition);
-            //AlignObjectAtIndex(140, 163, 197, wind3[65].MsPosition);
-            //AlignObjectAtIndex(163, 197, 206, clytemnestra[269].MsPosition - 200);
-            //AlignObjectAtIndex(197, 206, 211, clytemnestra[283].MsPosition + 400);
-            //AlignObjectAtIndex(206, 211, 212, clytemnestra[286].MsPosition);
-            //AlignObjectAtIndex(211, 212, Count - 1, clytemnestra[289].MsPosition);
         }
 
         internal void AdjustVelocities(Dictionary<string, int> msPositions)

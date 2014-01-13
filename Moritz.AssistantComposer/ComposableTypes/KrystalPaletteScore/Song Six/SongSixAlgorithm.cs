@@ -97,6 +97,7 @@ namespace Moritz.AssistantComposer
             msPositions.Add("postlude", clytemnestra[289].MsPosition);
             msPositions.Add("finalWindChord", wind1[81].MsPosition);
             msPositions.Add("endOfPiece", wind1.EndMsPosition);
+            // other positions are added as the voices are completed (see GetFuriesInterlude3ToEnd() )
 
             // contouring test code
             //wind1.SetContour(2, new List<int>() { 1, 1, 1 }, 12, 1);

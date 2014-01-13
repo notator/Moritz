@@ -25,13 +25,17 @@ namespace Moritz.AssistantComposer
             furies1.AdjustAlignments(clytemnestra, wind2, wind3);
             furies1.AdjustVelocities(msPositions);
 
+            msPositions.Add("furies2FinaleStart", furies1[47].MsPosition);
+            msPositions.Add("furies2FinalePart2Start", wind1[54].MsPosition);
+            msPositions.Add("finalBar", furies1[280].MsPosition);
+
             furies4.GetFinale(palettes, msPositions);
             furies4.AdjustAlignments(furies1, clytemnestra, wind3);
             furies4.AdjustVelocities(msPositions);
 
-            //furies2.GetFinale(palettes, msPositions);
-            //furies2.AdjustAlignments(clytemnestra, wind3);
-            //furies2.AdjustVelocities(msPositions);
+            furies2.GetFinale(palettes, msPositions);
+            furies2.AdjustAlignments(furies1, furies4, clytemnestra);
+            furies2.AdjustVelocities(msPositions);
 
             //furies3.GetFinale(palettes, msPositions);
             //furies3.AdjustAlignments(clytemnestra, wind3);

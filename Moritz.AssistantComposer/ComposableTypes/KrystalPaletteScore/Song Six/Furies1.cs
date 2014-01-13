@@ -95,9 +95,9 @@ namespace Moritz.AssistantComposer
             AdjustPitchWheelDeviations(msPositions["interlude3"], msPositions["endOfPiece"], 5, 28 );
         }
 
-        private VoiceDef GetF1Interlude3Verse4EsCaped(PaletteDef f1Int3Palette, ExpansionKrystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
+        private VoiceDef GetF1Interlude3Verse4EsCaped(PaletteDef f1FinalePalette1, ExpansionKrystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
         {
-            VoiceDef f13 = new VoiceDef(f1Int3Palette, krystal);
+            VoiceDef f13 = new VoiceDef(f1FinalePalette1, krystal);
 
             List<int> f1eStrandDurations = GetStrandDurations(f13, strandIndices);
 
@@ -153,9 +153,9 @@ namespace Moritz.AssistantComposer
             return strandDurations;
         }
 
-        private VoiceDef GetF1Verse4EscapedVerse5Calls(PaletteDef f1Int4Palette, ExpansionKrystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
+        private VoiceDef GetF1Verse4EscapedVerse5Calls(PaletteDef f1FinalePalette2, ExpansionKrystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
         {
-            VoiceDef f14 = new VoiceDef(f1Int4Palette, krystal);
+            VoiceDef f14 = new VoiceDef(f1FinalePalette2, krystal);
 
             List<int> f1eStrandDurations = GetStrandDurations(f14, strandIndices);
 
