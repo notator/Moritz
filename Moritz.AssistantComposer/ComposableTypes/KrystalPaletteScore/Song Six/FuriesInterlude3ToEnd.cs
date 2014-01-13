@@ -37,9 +37,9 @@ namespace Moritz.AssistantComposer
             furies2.AdjustAlignments(furies1, furies4, clytemnestra);
             furies2.AdjustVelocities(msPositions);
 
-            //furies3.GetFinale(palettes, msPositions);
-            //furies3.AdjustAlignments(clytemnestra, wind3);
-            //furies3.AdjustVelocities(msPositions);
+            furies3.GetFinale(palettes, msPositions);
+            furies3.AdjustAlignments(furies1, furies2, furies4, clytemnestra);
+            furies3.AdjustVelocities(msPositions);
 
             AdjustPostludePans(furies1, furies2, furies3, msPositions["postlude"]);
             SetFuriesFinalePitches(furies1, furies2, furies3, furies4, msPositions);
@@ -52,34 +52,10 @@ namespace Moritz.AssistantComposer
             int postludeMsPosition2 = postludeMsPosition + (int)(posDiff * 2);
             int postludeMsPosition3 = postludeMsPosition + (int)(posDiff * 3);
 
-            AdjustFuries1PostludePan(furies1, postludeMsPosition, postludeMsPosition1, postludeMsPosition2, postludeMsPosition3);
-            //AdjustFuries2PostludePan(furies2, postludeMsPosition, postludeMsPosition1, postludeMsPosition2, postludeMsPosition3);
-            //AdjustFuries3PostludePan(furies3, postludeMsPosition);
+            furies1.AdjustPostludePan(postludeMsPosition, postludeMsPosition1, postludeMsPosition2, postludeMsPosition3);
+            furies2.AdjustPostludePan(postludeMsPosition, postludeMsPosition1, postludeMsPosition2, postludeMsPosition3);
+            furies3.AdjustPostludePan(postludeMsPosition, postludeMsPosition1, postludeMsPosition2, postludeMsPosition3);
             // Furies 4 pans dont change
-        }
-
-        internal void AdjustFuries1PostludePan(Furies1 furies1, int postludeMsPosition, int postludeMsPosition1, int postludeMsPosition2, int postludeMsPosition3)
-        {
-            furies1.SetPanGliss(postludeMsPosition, postludeMsPosition1, 64, 32);
-            furies1.SetPanGliss(postludeMsPosition1, postludeMsPosition2, 32, 96);
-            furies1.SetPanGliss(postludeMsPosition2, postludeMsPosition3, 96, 0);
-            furies1.SetPanGliss(postludeMsPosition3, furies1.EndMsPosition, 0, 127);
-        }
-
-        /// <summary>
-        /// Motion is contrary to the pan gliss in furies 1
-        /// </summary>
-        internal void AdjustFuries2PostludePan(Furies2 furies2, int postludeMsPosition, int postludeMsPosition1, int postludeMsPosition2, int postludeMsPosition3)
-        {
-            furies2.SetPanGliss(postludeMsPosition, postludeMsPosition1, 20, 69);
-            furies2.SetPanGliss(postludeMsPosition1, postludeMsPosition2, 69, 35);
-            furies2.SetPanGliss(postludeMsPosition2, postludeMsPosition3, 35, 127);
-            furies2.SetPanGliss(postludeMsPosition3, furies2.EndMsPosition, 127, 0);
-        }
-
-        internal void AdjustFuries3PostludePan(Furies3 furies3, int postludeMsPosition)
-        {
-            furies3.SetPanGliss(postludeMsPosition, furies3.EndMsPosition, 107, 0);
         }
 
         private void SetFuriesFinalePitches(VoiceDef furies1, VoiceDef furies2, VoiceDef furies3, VoiceDef furies4, 
@@ -91,9 +67,7 @@ namespace Moritz.AssistantComposer
 
             List<List<int>> pkValues = pk.GetValues(4);
             List<List<int>> xkValues = xk.GetValues(3);
-            List<List<int>> pInputToxkValues = pInputToxk.GetValues(2);
-
-            
+            List<List<int>> pInputToxkValues = pInputToxk.GetValues(2);            
         }
 
     }

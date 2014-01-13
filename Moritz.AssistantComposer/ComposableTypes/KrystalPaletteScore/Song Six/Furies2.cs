@@ -197,18 +197,13 @@ namespace Moritz.AssistantComposer
 
             int extraTime = 750;
             int diff = extraTime / section.Count;
-            //bool rest = false;
             for(int i = section.Count - 1; i > 0; --i)
             {
                 if(strandIndices.Contains(i))
                 {
-                    //if(rest)
-                    //{
                     UniqueMidiRestDef umrd = new UniqueMidiRestDef(section[i].MsPosition, strandDurations[strandIndices.IndexOf(i)] + extraTime);
                     extraTime -= diff;
                     section.Insert(i, umrd);
-                    //}
-                    //rest = !rest;
                 }
             }
 
@@ -258,65 +253,11 @@ namespace Moritz.AssistantComposer
             return strandDurations;
         }
 
-        #region old
-        //private VoiceDef GetF2FinalePart2(PaletteDef f2FinalePalette2, ExpansionKrystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
-        //{
-        //    VoiceDef f2FinalePart2 = new VoiceDef(f2FinalePalette2, krystal);
-
-        //    List<int> f2eStrandDurations = GetStrandDurations(f2FinalePart2, strandIndices);
-
-        //    int extraTime = 500;
-        //    int diff = extraTime / f2FinalePart2.Count;
-        //    for(int i = f2FinalePart2.Count - 1; i > 0; --i)
-        //    {
-        //        if(strandIndices.Contains(i))
-        //        {
-        //            UniqueMidiRestDef umrd = new UniqueMidiRestDef(f2FinalePart2[i].MsPosition, f2eStrandDurations[strandIndices.IndexOf(i)] + extraTime);
-        //            extraTime -= diff;
-        //            f2FinalePart2.Insert(i, umrd);
-        //        }
-        //    }
-
-        //    f2FinalePart2.StartMsPosition = msPositions["furies2FinalePart2Start"];
-        //    f2FinalePart2.RemoveBetweenMsPositions(msPositions["postlude"], int.MaxValue);
-
-        //    if(f2FinalePart2[f2FinalePart2.Count - 1] is UniqueMidiRestDef)
-        //    {
-        //        f2FinalePart2[f2FinalePart2.Count - 1].MsDuration = msPositions["postlude"] - f2FinalePart2[f2FinalePart2.Count - 1].MsPosition;
-        //    }
-
-        //    return f2FinalePart2;
-        //}
-
-        //private VoiceDef GetF2Postlude(PaletteDef f2PostludePalette, ExpansionKrystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
-        //{
-        //    VoiceDef f2p = new VoiceDef(100);
-        //    //VoiceDef f2p = new VoiceDef(f2PostludePalette, krystal);
-
-        //    //List<int> f2eStrandDurations = GetStrandDurations(f2p, strandIndices);
-
-        //    //for(int i = f2p.Count - 1; i > 0; --i)
-        //    //{
-        //    //    if(strandIndices.Contains(i))
-        //    //    {
-        //    //        UniqueMidiRestDef umrd = new UniqueMidiRestDef(f2p[i].MsPosition, f2eStrandDurations[strandIndices.IndexOf(i)] / 4);
-        //    //        f2p.Insert(i, umrd);
-        //    //    }
-        //    //}
-
-        //    //f2p.StartMsPosition = msPositions["postlude"];
-        //    //f2p.RemoveBetweenMsPositions(msPositions["endOfPiece"], int.MaxValue);
-
-        //    return f2p;
-        //}
-        #endregion
-
         internal void AdjustAlignments(Furies1 f1, Furies4 f4, Clytemnestra c)
         {
             AlignObjectAtIndex(58, 85, 100, f1[73].MsPosition);
             AlignObjectAtIndex(85, 100, 106, c[204].MsPosition);
             AlignObjectAtIndex(100, 106, 125, c[216].MsPosition);
-
             AlignObjectAtIndex(106, 125, 129, c[255].MsPosition);
             AlignObjectAtIndex(125, 129, 131, f1[115].MsPosition);
             AlignObjectAtIndex(129, 131, 135, c[268].MsPosition);
@@ -325,12 +266,10 @@ namespace Moritz.AssistantComposer
             AlignObjectAtIndex(141, 157, 164, f1[138].MsPosition);
             AlignObjectAtIndex(157, 164, 169, f4[46].MsPosition);
             AlignObjectAtIndex(164, 169, 214, f4[47].MsPosition);
-
             AlignObjectAtIndex(169, 214, 217, c[269].MsPosition);
             AlignObjectAtIndex(214, 217, 219, c[277].MsPosition);
             AlignObjectAtIndex(217, 219, 229, c[278].MsPosition);
             AlignObjectAtIndex(219, 229, 232, c[287].MsPosition);
-
             AlignObjectAtIndex(229, 232, 233, c[288].MsPosition);
             AlignObjectAtIndex(232, 233, 256, c[289].MsPosition);
             AlignObjectAtIndex(233, 256, this.Count - 2, f1[248].MsPosition);
@@ -342,13 +281,11 @@ namespace Moritz.AssistantComposer
             AdjustVelocitiesHairpin(this[82].MsPosition, msPositions["verse4"], 0.6, 0.2);
             AdjustVelocitiesHairpin(msPositions["verse4"], msPositions["furies2FinalePart2Start"], 0.2, 0.2);
             AdjustVelocitiesHairpin(msPositions["furies2FinalePart2Start"], msPositions["interlude4"], 0.2, 0.4);
-
             AdjustVelocitiesHairpin(msPositions["interlude4"], msPositions["verse5"], 0.5, 1.0);
             AdjustVelocitiesHairpin(msPositions["verse5"], msPositions["postlude"], 0.5, 0.5);
             AdjustVelocitiesHairpin(msPositions["postlude"], EndMsPosition, 0.5, 0.85);
 
             // example code from furies1
-
             //AdjustVelocitiesHairpin(msPositions["interlude3"], this[102].MsPosition, 1.0, 0.35);
             //AdjustVelocitiesHairpin(this[102].MsPosition, msPositions["interlude4"], 0.35, 0.7);
             //AdjustVelocitiesHairpin(msPositions["interlude4"], msPositions["verse5"], 0.7, 1.0);
@@ -356,29 +293,15 @@ namespace Moritz.AssistantComposer
             //AdjustVelocitiesHairpin(msPositions["postlude"], EndMsPosition, 0.8, 1.0);
         }
 
-        internal void AdjustPostludePan(int postludeMsPosition)
+        /// <summary>
+        /// Motion is approximately contrary to the pan gliss in furies 1
+        /// </summary>
+        internal void AdjustPostludePan(int postludeMsPosition, int postludeMsPosition1, int postludeMsPosition2, int postludeMsPosition3)
         {
-            double posDiff = ((double)(EndMsPosition - postludeMsPosition)) / 4;
-            int postludeMsPosition1 = postludeMsPosition + (int)posDiff;
-            int postludeMsPosition2 = postludeMsPosition + (int)(posDiff * 2);
-            int postludeMsPosition3 = postludeMsPosition + (int)(posDiff * 3);
-
-            SetPanGliss(postludeMsPosition, postludeMsPosition1, 15, 96);
-            SetPanGliss(postludeMsPosition1, postludeMsPosition2, 96, 64);
-            SetPanGliss(postludeMsPosition2, postludeMsPosition3, 64, 127);
+            SetPanGliss(postludeMsPosition, postludeMsPosition1, 20, 69);
+            SetPanGliss(postludeMsPosition1, postludeMsPosition2, 69, 35);
+            SetPanGliss(postludeMsPosition2, postludeMsPosition3, 35, 127);
             SetPanGliss(postludeMsPosition3, EndMsPosition, 127, 0);
-
-            // example code from furies1
-
-            //double posDiff = ((double)(EndMsPosition - postludeMsPosition)) / 4;
-            //int postludeMsPosition1 = postludeMsPosition + (int)posDiff;
-            //int postludeMsPosition2 = postludeMsPosition + (int)(posDiff * 2);
-            //int postludeMsPosition3 = postludeMsPosition + (int)(posDiff * 3);
-
-            //SetPanGliss(postludeMsPosition, postludeMsPosition1, 64, 32);
-            //SetPanGliss(postludeMsPosition1, postludeMsPosition2, 32, 96);
-            //SetPanGliss(postludeMsPosition2, postludeMsPosition3, 96, 0);
-            //SetPanGliss(postludeMsPosition3, EndMsPosition, 0, 127);
         }
 
         #endregion finale

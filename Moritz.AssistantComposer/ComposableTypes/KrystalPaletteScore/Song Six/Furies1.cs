@@ -10,8 +10,6 @@ namespace Moritz.AssistantComposer
 {
     internal class Furies1 : VoiceDef
     {
-
-
         internal Furies1(int msDuration)
             : base(msDuration)
         {
@@ -51,7 +49,6 @@ namespace Moritz.AssistantComposer
             AlignObjectAtIndex(21, 22, 23, clytemnestra[168].MsPosition);
         }
 
-
         #region finale
         internal void GetFinale(List<PaletteDef> palettes, Dictionary<string, int> msPositions)
         {
@@ -69,8 +66,8 @@ namespace Moritz.AssistantComposer
                 index += krystal.Strands[i].Values.Count;
             }
 
-            VoiceDef f1Interlude3Verse4e = GetF1Interlude3Verse4EsCaped(f1FinalePalette1, krystal, strandIndices, msPositions);
-            VoiceDef f1Verse4eVerse5 = GetF1Verse4EscapedVerse5Calls(f1FinalePalette2, krystal, strandIndices, msPositions);
+            VoiceDef f1Interlude3Verse4e = GetF1FinalePart1(f1FinalePalette1, krystal, strandIndices, msPositions);
+            VoiceDef f1Verse4eVerse5 = GetF1FinalePart2(f1FinalePalette2, krystal, strandIndices, msPositions);
             VoiceDef f1Postlude = GetF1Postlude(f1PostludePalette, krystal, strandIndices, msPositions);
 
             VoiceDef furies1Finale = f1Interlude3Verse4e;
@@ -95,34 +92,34 @@ namespace Moritz.AssistantComposer
             AdjustPitchWheelDeviations(msPositions["interlude3"], msPositions["endOfPiece"], 5, 28 );
         }
 
-        private VoiceDef GetF1Interlude3Verse4EsCaped(PaletteDef f1FinalePalette1, ExpansionKrystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
+        private VoiceDef GetF1FinalePart1(PaletteDef f1FinalePalette1, ExpansionKrystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
         {
-            VoiceDef f13 = new VoiceDef(f1FinalePalette1, krystal);
+            VoiceDef f1FinalePart1 = new VoiceDef(f1FinalePalette1, krystal);
 
-            List<int> f1eStrandDurations = GetStrandDurations(f13, strandIndices);
+            List<int> f1eStrandDurations = GetStrandDurations(f1FinalePart1, strandIndices);
 
             int extraTime = 1000;
-            int diff = extraTime / f13.Count;
-            for(int i = f13.Count - 1; i > 0; --i)
+            int diff = extraTime / f1FinalePart1.Count;
+            for(int i = f1FinalePart1.Count - 1; i > 0; --i)
             {
                 if(strandIndices.Contains(i))
                 {
-                    UniqueMidiRestDef umrd = new UniqueMidiRestDef(f13[i].MsPosition, f1eStrandDurations[strandIndices.IndexOf(i)] + extraTime);
+                    UniqueMidiRestDef umrd = new UniqueMidiRestDef(f1FinalePart1[i].MsPosition, f1eStrandDurations[strandIndices.IndexOf(i)] + extraTime);
                     extraTime -= diff;
-                    f13.Insert(i, umrd);
+                    f1FinalePart1.Insert(i, umrd);
                 }
             }
 
-            f13.StartMsPosition = msPositions["interlude3Bar2"];
+            f1FinalePart1.StartMsPosition = msPositions["interlude3Bar2"];
 
-            f13.RemoveBetweenMsPositions(msPositions["verse4EsCaped"], int.MaxValue);
+            f1FinalePart1.RemoveBetweenMsPositions(msPositions["verse4EsCaped"], int.MaxValue);
 
-            if(f13[f13.Count - 1] is UniqueMidiRestDef)
+            if(f1FinalePart1[f1FinalePart1.Count - 1] is UniqueMidiRestDef)
             {
-                f13[f13.Count - 1].MsDuration = msPositions["verse4EsCaped"] - f13[f13.Count - 1].MsPosition;
+                f1FinalePart1[f1FinalePart1.Count - 1].MsDuration = msPositions["verse4EsCaped"] - f1FinalePart1[f1FinalePart1.Count - 1].MsPosition;
             }
 
-            return f13;
+            return f1FinalePart1;
         }
 
         /// <summary>
@@ -153,33 +150,33 @@ namespace Moritz.AssistantComposer
             return strandDurations;
         }
 
-        private VoiceDef GetF1Verse4EscapedVerse5Calls(PaletteDef f1FinalePalette2, ExpansionKrystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
+        private VoiceDef GetF1FinalePart2(PaletteDef f1FinalePalette2, ExpansionKrystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
         {
-            VoiceDef f14 = new VoiceDef(f1FinalePalette2, krystal);
+            VoiceDef f1FinalePart2 = new VoiceDef(f1FinalePalette2, krystal);
 
-            List<int> f1eStrandDurations = GetStrandDurations(f14, strandIndices);
+            List<int> f1eStrandDurations = GetStrandDurations(f1FinalePart2, strandIndices);
 
             int extraTime = 500;
-            int diff = extraTime / f14.Count;
-            for(int i = f14.Count - 1; i > 0; --i)
+            int diff = extraTime / f1FinalePart2.Count;
+            for(int i = f1FinalePart2.Count - 1; i > 0; --i)
             {
                 if(strandIndices.Contains(i))
                 {
-                    UniqueMidiRestDef umrd = new UniqueMidiRestDef(f14[i].MsPosition, f1eStrandDurations[strandIndices.IndexOf(i)] + extraTime);
+                    UniqueMidiRestDef umrd = new UniqueMidiRestDef(f1FinalePart2[i].MsPosition, f1eStrandDurations[strandIndices.IndexOf(i)] + extraTime);
                     extraTime -= diff;
-                    f14.Insert(i, umrd);
+                    f1FinalePart2.Insert(i, umrd);
                 }
             }
 
-            f14.StartMsPosition = msPositions["verse4EsCaped"];
-            f14.RemoveBetweenMsPositions(msPositions["verse5Calls"], int.MaxValue);
+            f1FinalePart2.StartMsPosition = msPositions["verse4EsCaped"];
+            f1FinalePart2.RemoveBetweenMsPositions(msPositions["verse5Calls"], int.MaxValue);
 
-            if(f14[f14.Count - 1] is UniqueMidiRestDef)
+            if(f1FinalePart2[f1FinalePart2.Count - 1] is UniqueMidiRestDef)
             {
-                f14[f14.Count - 1].MsDuration = msPositions["postlude"] - f14[f14.Count - 1].MsPosition;
+                f1FinalePart2[f1FinalePart2.Count - 1].MsDuration = msPositions["postlude"] - f1FinalePart2[f1FinalePart2.Count - 1].MsPosition;
             }
 
-            return f14;
+            return f1FinalePart2;
         }
 
         private VoiceDef GetF1Postlude(PaletteDef f1PostludePalette, ExpansionKrystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
@@ -233,6 +230,13 @@ namespace Moritz.AssistantComposer
             AdjustVelocitiesHairpin(msPositions["postlude"], EndMsPosition, 0.8, 1.0);
         }
 
+        internal void AdjustPostludePan(int postludeMsPosition, int postludeMsPosition1, int postludeMsPosition2, int postludeMsPosition3)
+        {
+            SetPanGliss(postludeMsPosition, postludeMsPosition1, 64, 32);
+            SetPanGliss(postludeMsPosition1, postludeMsPosition2, 32, 96);
+            SetPanGliss(postludeMsPosition2, postludeMsPosition3, 96, 0);
+            SetPanGliss(postludeMsPosition3, EndMsPosition, 0, 127);
+        }
         #endregion finale
     }
 }
