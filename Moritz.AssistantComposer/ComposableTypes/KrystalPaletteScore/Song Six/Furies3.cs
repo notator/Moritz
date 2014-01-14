@@ -201,13 +201,14 @@ namespace Moritz.AssistantComposer
 
             InsertInRest(furies3Finale);
 
-            AdjustPitchWheelDeviations(msPositions["interlude3"], msPositions["endOfPiece"], 5, 28);
+            AdjustPitchWheelDeviations(msPositions["interlude4"], msPositions["endOfPiece"], 1, 28);
         }
 
         private VoiceDef GetF3Finale(List<PaletteDef> palettes, ExpansionKrystal krystal, Dictionary<string, int> msPositions)
         {
             PaletteDef f3FinalePalette1 = palettes[10]; // correct 1.1.2014
             PaletteDef f3FinalePalette2 = palettes[14];
+            PaletteDef f3FinalePalette3 = palettes[21];
             PaletteDef f3PostludePalette = palettes[18];
 
             List<int> strandIndices = GetStrandIndices(krystal);
@@ -216,10 +217,14 @@ namespace Moritz.AssistantComposer
             Transform(finalePart1, msPositions, strandIndices);
             VoiceDef finalePart2 = new VoiceDef(f3FinalePalette2, krystal);
             Transform(finalePart2, msPositions, strandIndices);
+            VoiceDef finalePart3 = new VoiceDef(f3FinalePalette3, krystal);
+            Transform(finalePart3, msPositions, strandIndices);
             VoiceDef postlude = new VoiceDef(f3PostludePalette, krystal);
             Transform(postlude, msPositions, strandIndices);
 
-            VoiceDef finale = GetFinaleSections(finalePart1, finalePart2, postlude, 93, 94); // temporary indices
+            VoiceDef finale = GetFinaleSections(finalePart1, finalePart2, finalePart3, postlude, 27, 37, 85);
+
+            finale.TransposeNotation(-36);
 
             Cleanup(finale, msPositions["endOfPiece"]);
 
@@ -247,11 +252,13 @@ namespace Moritz.AssistantComposer
 
             section.StartMsPosition = msPositions["furies3FinaleStart"];
 
+            #region old
             //double factor = 10;
-
             //section.AdjustMsDurations(factor);
+            #endregion
 
-            section.CreateAccel(0, section.Count, 0.25);
+            //section.CreateAccel(0, section.Count, 0.25);
+            section.CreateAccel(0, section.Count, 0.13);
 
             //section.RemoveBetweenMsPositions(msPositions["interlude4End"], int.MaxValue);
             section.RemoveBetweenMsPositions(msPositions["finalWindChord"], int.MaxValue);
@@ -303,7 +310,8 @@ namespace Moritz.AssistantComposer
         /// and MsDuration. The DurationDefs come from different palettes, so can otherwise have different parameters.
         /// This function simply creates a new VoiceDef by selecting the apropriate DurationDefs from each VoiceDef argument.
         /// </summary>
-        private VoiceDef GetFinaleSections(VoiceDef finalePart1, VoiceDef finalePart2, VoiceDef postlude, int part2Index, int postludeIndex)
+        private VoiceDef GetFinaleSections(VoiceDef finalePart1, VoiceDef finalePart2, VoiceDef finalePart3, VoiceDef postlude,
+            int part2Index, int part3Index, int postludeIndex)
         {
             List<IUniqueMidiDurationDef> iumdds = new List<IUniqueMidiDurationDef>();
 
@@ -311,9 +319,13 @@ namespace Moritz.AssistantComposer
             {
                 iumdds.Add(finalePart1[i]);
             }
-            for(int i = part2Index; i < postludeIndex; ++i)
+            for(int i = part2Index; i < part3Index; ++i)
             {
                 iumdds.Add(finalePart2[i]);
+            }
+            for(int i = part3Index; i < postludeIndex; ++i)
+            {
+                iumdds.Add(finalePart3[i]);
             }
             for(int i = postludeIndex; i < postlude.Count; ++i)
             {

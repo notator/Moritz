@@ -570,7 +570,7 @@ namespace Moritz.Score.Midi
         // so it allows ALL its fields to be set, even after construction.
         public new List<byte> MidiHeadSymbols { get { return _midiHeadSymbols; } set { _midiHeadSymbols = value; } }
 
-        private byte MidiValue(int value)
+        public byte MidiValue(int value)
         {
             int rval;
             rval = (value > 127) ? 127 : value;

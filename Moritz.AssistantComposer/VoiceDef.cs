@@ -1323,5 +1323,28 @@ namespace Moritz.AssistantComposer
         }
 
         #endregion private
+
+        /// <summary>
+        /// Transposes all the MidiHeadSymbols in this VoiceDef by the number of semitones in the argument
+        /// without changing the sound. Negative arguments transpose downwards.
+        /// If the resulting midiHeadSymbol would be less than 0 or greater than 127,
+        /// it is silently coerced to 0 or 127 respectively.
+        /// </summary>
+        /// <param name="p"></param>
+        internal void TransposeNotation(int semitonesToTranspose)
+        {
+            foreach(IUniqueMidiDurationDef iumdd in _uniqueMidiDurationDefs)
+            {
+                UniqueMidiChordDef umcd = iumdd as UniqueMidiChordDef;
+                if(umcd != null)
+                {
+                    List<byte> midiHeadSymbols = umcd.MidiHeadSymbols;
+                    for(int i = 0; i < midiHeadSymbols.Count; ++i)
+                    {
+                        midiHeadSymbols[i] = umcd.MidiValue(midiHeadSymbols[i] + semitonesToTranspose);
+                    }
+                }
+            }
+        }
     }
 }

@@ -142,6 +142,8 @@ namespace Moritz.AssistantComposer
 
             VoiceDef finale = GetFinaleSections(finalePart1, finalePart2, postlude, 59, 175);
 
+            finale.TransposeNotation(-12);
+
             return finale;
 
             #region old

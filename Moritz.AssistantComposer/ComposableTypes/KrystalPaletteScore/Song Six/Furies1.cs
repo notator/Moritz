@@ -75,6 +75,8 @@ namespace Moritz.AssistantComposer
             furies1Finale.AddRange(f1Verse4eVerse5);
             furies1Finale.AddRange(f1Postlude);
 
+            //furies1Finale.TransposeNotation(-12);
+
             if(furies1Finale[furies1Finale.Count - 1] is UniqueMidiRestDef)
             {
                 furies1Finale.RemoveAt(furies1Finale.Count - 1);
