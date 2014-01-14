@@ -219,7 +219,7 @@ namespace Moritz.AssistantComposer
             VoiceDef postlude = new VoiceDef(f3PostludePalette, krystal);
             Transform(postlude, msPositions, strandIndices);
 
-            VoiceDef finale = GetFinaleSections(finalePart1, finalePart2, postlude, 10, 20); // temporary indices
+            VoiceDef finale = GetFinaleSections(finalePart1, finalePart2, postlude, 93, 94); // temporary indices
 
             Cleanup(finale, msPositions["endOfPiece"]);
 
@@ -245,7 +245,7 @@ namespace Moritz.AssistantComposer
                 }
             }
 
-            section.StartMsPosition = msPositions["furies2FinaleStart"];
+            section.StartMsPosition = msPositions["furies3FinaleStart"];
 
             //double factor = 10;
 
@@ -498,6 +498,14 @@ namespace Moritz.AssistantComposer
         }
         internal void AdjustVelocities(Dictionary<string, int> msPositions)
         {
+            AdjustVelocitiesHairpin(msPositions["furies3FinaleStart"], this[156].MsPosition, 0.8, 1.2);
+            AdjustVelocitiesHairpin(this[154].MsPosition, msPositions["verse4"], 1.2, 1.0);
+            AdjustVelocitiesHairpin(msPositions["verse4"], msPositions["furies2FinalePart2Start"],1.0,1.0);
+            AdjustVelocitiesHairpin(msPositions["furies2FinalePart2Start"], msPositions["interlude4"], 1.0, 1.2);
+            AdjustVelocitiesHairpin(msPositions["interlude4"], msPositions["verse5"], 1.2, 1.5);
+            AdjustVelocitiesHairpin(msPositions["verse5"], msPositions["postlude"], 1.0, 1.0);
+            AdjustVelocitiesHairpin(msPositions["postlude"], EndMsPosition, 1.0, 1.8);
+
             // example code from furies2
             //AdjustVelocitiesHairpin(msPositions["furies2FinaleStart"], this[82].MsPosition, 0.2, 0.6);
             //AdjustVelocitiesHairpin(this[82].MsPosition, msPositions["verse4"], 0.6, 0.2);

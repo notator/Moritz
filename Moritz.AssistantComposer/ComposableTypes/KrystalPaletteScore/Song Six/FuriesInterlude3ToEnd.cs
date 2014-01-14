@@ -37,6 +37,8 @@ namespace Moritz.AssistantComposer
             furies2.AdjustAlignments(furies1, furies4, clytemnestra);
             furies2.AdjustVelocities(msPositions);
 
+            msPositions.Add("furies3FinaleStart", furies2[66].MsPosition);
+
             furies3.GetFinale(palettes, msPositions);
             furies3.AdjustAlignments(furies1, furies2, furies4, clytemnestra);
             furies3.AdjustVelocities(msPositions);
