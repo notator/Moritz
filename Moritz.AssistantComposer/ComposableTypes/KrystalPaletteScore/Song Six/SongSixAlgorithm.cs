@@ -33,7 +33,7 @@ namespace Moritz.AssistantComposer
         /// <returns></returns>
         public override int NumberOfBars()
         {
-            return 105;
+            return 106;
         }
 
         /// <summary>
@@ -95,6 +95,7 @@ namespace Moritz.AssistantComposer
             msPositions.Add("verse5", clytemnestra[269].MsPosition);
             msPositions.Add("verse5Calls", clytemnestra[288].MsPosition);
             msPositions.Add("postlude", clytemnestra[289].MsPosition);
+            msPositions.Add("postludeDiminuendo", wind1[80].MsPosition);
             msPositions.Add("finalWindChord", wind1[81].MsPosition);
             msPositions.Add("endOfPiece", wind1.EndMsPosition);
             // other positions are added as the voices are completed (see GetFuriesInterlude3ToEnd() )
@@ -352,7 +353,8 @@ namespace Moritz.AssistantComposer
                 f4[45].MsPosition, // was w3[61].MsPosition,
                 w3[63].MsPosition,
                 w2[65].MsPosition, // was w3[65].MsPosition,
-                w3[67].MsPosition,
+                w1[66].MsPosition, // w3[67].MsPosition,
+                w1[68].MsPosition,
                 #endregion
                 #region verse 5
                 c[269].MsPosition,

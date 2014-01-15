@@ -140,7 +140,7 @@ namespace Moritz.AssistantComposer
             VoiceDef postlude = new VoiceDef(f2PostludePalette, krystal);
             Transform(postlude, msPositions, strandIndices);
 
-            VoiceDef finale = GetFinaleSections(finalePart1, finalePart2, postlude, 59, 175);
+            VoiceDef finale = GetFinaleSections(finalePart1, finalePart2, postlude, 71, 175);
 
             finale.TransposeNotation(-12);
 
@@ -257,8 +257,13 @@ namespace Moritz.AssistantComposer
 
         internal void AdjustAlignments(Furies1 f1, Furies4 f4, Clytemnestra c)
         {
-            AlignObjectAtIndex(58, 85, 100, f1[73].MsPosition);
-            AlignObjectAtIndex(85, 100, 106, c[204].MsPosition);
+            AlignObjectAtIndex(58, 67, 74, f1[56].MsPosition);
+            AlignObjectAtIndex(67, 74, 85, f1[61].MsPosition);
+            AlignObjectAtIndex(74, 85, 87, f1[73].MsPosition);
+            AlignObjectAtIndex(85, 87, 90, c[174].MsPosition);
+            AlignObjectAtIndex(87, 90, 91, c[184].MsPosition);
+            AlignObjectAtIndex(90, 91, 100, c[185].MsPosition);
+            AlignObjectAtIndex(91, 100, 106, c[204].MsPosition);
             AlignObjectAtIndex(100, 106, 125, c[216].MsPosition);
             AlignObjectAtIndex(106, 125, 129, c[255].MsPosition);
             AlignObjectAtIndex(125, 129, 131, f1[115].MsPosition);
@@ -272,7 +277,7 @@ namespace Moritz.AssistantComposer
             AlignObjectAtIndex(214, 217, 219, c[277].MsPosition);
             AlignObjectAtIndex(217, 219, 229, c[278].MsPosition);
             AlignObjectAtIndex(219, 229, 232, c[287].MsPosition);
-            AlignObjectAtIndex(229, 232, 233, c[288].MsPosition);
+            AlignObjectAtIndex(229, 232, 233, c[288].MsPosition - 200);
             AlignObjectAtIndex(232, 233, 256, c[289].MsPosition);
             AlignObjectAtIndex(233, 256, this.Count - 2, f1[248].MsPosition);
         }
@@ -285,7 +290,9 @@ namespace Moritz.AssistantComposer
             AdjustVelocitiesHairpin(msPositions["furies2FinalePart2Start"], msPositions["interlude4"], 0.2, 0.4);
             AdjustVelocitiesHairpin(msPositions["interlude4"], msPositions["verse5"], 0.5, 1.0);
             AdjustVelocitiesHairpin(msPositions["verse5"], msPositions["postlude"], 0.5, 0.5);
-            AdjustVelocitiesHairpin(msPositions["postlude"], EndMsPosition, 0.5, 0.85);
+            //AdjustVelocitiesHairpin(msPositions["postlude"], EndMsPosition, 0.5, 0.85);
+            AdjustVelocitiesHairpin(msPositions["postlude"], msPositions["postludeDiminuendo"], 0.5, 0.85);
+            AdjustVelocitiesHairpin(msPositions["postludeDiminuendo"], EndMsPosition, 0.5, 0.2);
 
             // example code from furies1
             //AdjustVelocitiesHairpin(msPositions["interlude3"], this[102].MsPosition, 1.0, 0.35);

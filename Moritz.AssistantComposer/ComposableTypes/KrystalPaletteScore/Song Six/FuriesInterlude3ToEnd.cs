@@ -40,7 +40,7 @@ namespace Moritz.AssistantComposer
             msPositions.Add("furies3FinaleStart", furies2[66].MsPosition);
 
             furies3.GetFinale(palettes, msPositions);
-            furies3.AdjustAlignments(furies1, furies2, furies4, clytemnestra);
+            furies3.AdjustAlignments(furies1, furies2, furies4, clytemnestra, wind1);
             furies3.AdjustVelocities(msPositions);
 
             AdjustPostludePans(furies1, furies2, furies3, msPositions["postlude"]);
