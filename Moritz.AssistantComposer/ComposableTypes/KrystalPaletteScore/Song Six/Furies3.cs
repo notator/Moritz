@@ -219,7 +219,7 @@ namespace Moritz.AssistantComposer
             VoiceDef postlude = new VoiceDef(f3PostludePalette, krystal);
             Transform(postlude, msPositions, strandIndices);
 
-            VoiceDef finale = GetFinaleSections(finalePart1, finalePart2, postlude, 77, 198);
+            VoiceDef finale = GetFinaleSections(finalePart1, finalePart2, postlude, 77, 206);
 
             finale.TransposeNotation(-36);
 
@@ -374,7 +374,29 @@ namespace Moritz.AssistantComposer
             AlignObjectAtIndex(318, 344, 350, c[283].MsPosition);
             AlignObjectAtIndex(344, 350, 353, c[287].MsPosition);
             AlignObjectAtIndex(350, 353, 354, c[288].MsPosition - 200);
-            AlignObjectAtIndex(353, 354, this.Count - 2, c[289].MsPosition);
+            AlignObjectAtIndex(353, 354, 390, f4[59].MsPosition);
+            AlignObjectAtIndex(354, 390, 401, f4[69].MsPosition);
+
+            // final adjustments for R2M
+            AlignObjectAtIndex(139, 140, 141, c[119].MsPosition - 200);
+
+            AlignObjectAtIndex(141, 142, 143, c[140].MsPosition - 100);
+
+
+            AlignObjectAtIndex(143, 144, 145, c[152].MsPosition - 200);
+            AlignObjectAtIndex(145, 146, 147, c[173].MsPosition - 200);
+            AlignObjectAtIndex(146, 147, 152, f2[64].MsPosition);
+
+            AlignObjectAtIndex(147, 151, 152, f1[56].MsPosition - 100);
+
+            AlignObjectAtIndex(152, 159, 160, f1[61].MsPosition - 100);
+
+            AlignObjectAtIndex(160, 171, 172, c[174].MsPosition - 600);
+            AlignObjectAtIndex(172, 176, 177, c[184].MsPosition - 200);
+            AlignObjectAtIndex(212, 217, 218, c[254].MsPosition - 200);
+            AlignObjectAtIndex(275, 291, 292, f4[49].MsPosition - 200);
+
+
 
             // example code from furies2
             //AlignObjectAtIndex(58, 85, 100, f1[73].MsPosition);
@@ -398,8 +420,8 @@ namespace Moritz.AssistantComposer
         }
         internal void AdjustVelocities(Dictionary<string, int> msPositions)
         {
-            AdjustVelocitiesHairpin(msPositions["furies3FinaleStart"], this[165].MsPosition, 0.2, 0.6);
-            AdjustVelocitiesHairpin(this[165].MsPosition, msPositions["verse4"], 0.6, 0.2);
+            AdjustVelocitiesHairpin(msPositions["furies3FinaleStart"], this[165].MsPosition, 0.4, 0.6);
+            AdjustVelocitiesHairpin(this[165].MsPosition, msPositions["verse4"], 0.6, 0.3);
             AdjustVelocitiesHairpin(msPositions["verse4"], msPositions["furies2FinalePart2Start"], 0.2, 0.2);
             AdjustVelocitiesHairpin(msPositions["furies2FinalePart2Start"], msPositions["interlude4"], 0.2, 0.4);
             AdjustVelocitiesHairpin(msPositions["interlude4"], msPositions["verse5"], 0.5, 1.0);

@@ -202,37 +202,41 @@ namespace Moritz.AssistantComposer
             return f1p;
         }
 
-        internal void AdjustAlignments(Clytemnestra clytemnestra, VoiceDef wind2, VoiceDef wind3)
+        internal void AdjustAlignments(Clytemnestra c, VoiceDef w2, VoiceDef w3)
         {
             Debug.Assert(this[213] is UniqueMidiRestDef);
             this[213].MsDuration += this[212].MsDuration;
             RemoveAt(212);
             AgglomerateRests();
 
-            AlignObjectAtIndex(25, 84, 85, clytemnestra[196].MsPosition);
-            AlignObjectAtIndex(84, 85, 89, clytemnestra[204].MsPosition + 200);
-            AlignObjectAtIndex(85, 89, 96, clytemnestra[215].MsPosition);
-            AlignObjectAtIndex(89, 96, 102, clytemnestra[226].MsPosition);
-            AlignObjectAtIndex(102, 106, 117, clytemnestra[242].MsPosition);
-            AlignObjectAtIndex(106, 117, 140, clytemnestra[268].MsPosition);
-            AlignObjectAtIndex(117, 140, 165, wind3[61].MsPosition);
-            AlignObjectAtIndex(140, 165, 197, wind2[65].MsPosition); // was AlignObjectAtIndex(140, 163, 197, wind3[65].MsPosition);
-            AlignObjectAtIndex(165, 197, 200, clytemnestra[269].MsPosition - 200);
-            AlignObjectAtIndex(197, 200, 206, clytemnestra[277].MsPosition);
-            AlignObjectAtIndex(200, 206, 211, clytemnestra[283].MsPosition + 400);
-            AlignObjectAtIndex(206, 211, 212, clytemnestra[286].MsPosition);
-            AlignObjectAtIndex(211, 212, Count - 1, clytemnestra[289].MsPosition);
+            AlignObjectAtIndex(25, 84, 85, c[196].MsPosition);
+            AlignObjectAtIndex(84, 85, 89, c[204].MsPosition + 200);
+            AlignObjectAtIndex(85, 89, 96, c[215].MsPosition);
+            AlignObjectAtIndex(89, 96, 102, c[226].MsPosition);
+            AlignObjectAtIndex(102, 106, 117, c[242].MsPosition);
+            AlignObjectAtIndex(106, 117, 140, c[268].MsPosition);
+            AlignObjectAtIndex(117, 140, 165, w3[61].MsPosition);
+            AlignObjectAtIndex(140, 165, 197, w2[65].MsPosition); // was AlignObjectAtIndex(140, 163, 197, wind3[65].MsPosition);
+            AlignObjectAtIndex(165, 197, 200, c[269].MsPosition - 200);
+            AlignObjectAtIndex(197, 200, 206, c[277].MsPosition);
+            AlignObjectAtIndex(200, 206, 211, c[283].MsPosition + 400);
+            AlignObjectAtIndex(206, 211, 212, c[286].MsPosition);
+            AlignObjectAtIndex(211, 212, Count - 1, c[289].MsPosition);
+
+            // final adjustments for R2M
+            AlignObjectAtIndex(11, 12, 13, c[123].MsPosition - 200);
+            AlignObjectAtIndex(106, 111, 112, c[254].MsPosition - 100);
         }
 
         internal void AdjustVelocities(Dictionary<string, int> msPositions)
         {
-            AdjustVelocitiesHairpin(msPositions["interlude3"], this[102].MsPosition, 1.0, 0.35);
-            AdjustVelocitiesHairpin(this[102].MsPosition, msPositions["interlude4"], 0.35, 0.7);
+            AdjustVelocitiesHairpin(msPositions["interlude3"], this[102].MsPosition, 1.0, 0.2);
+            AdjustVelocitiesHairpin(this[102].MsPosition, msPositions["interlude4"], 0.2, 0.7);
             AdjustVelocitiesHairpin(msPositions["interlude4"], msPositions["verse5"], 0.7, 1.0);
             AdjustVelocitiesHairpin(msPositions["verse5"], msPositions["postlude"], 0.5, 0.5);
             //AdjustVelocitiesHairpin(msPositions["postlude"], EndMsPosition, 0.8, 1.0);
 
-            AdjustVelocitiesHairpin(msPositions["postlude"], msPositions["postludeDiminuendo"], 0.8, 1.0);
+            AdjustVelocitiesHairpin(msPositions["postlude"], msPositions["postludeDiminuendo"], 0.5, 1.0);
             AdjustVelocitiesHairpin(msPositions["postludeDiminuendo"], EndMsPosition, 1.0, 0.4);
         }
 
@@ -243,6 +247,7 @@ namespace Moritz.AssistantComposer
             SetPanGliss(postludeMsPosition2, postludeMsPosition3, 96, 0);
             SetPanGliss(postludeMsPosition3, EndMsPosition, 0, 127);
         }
+
         #endregion finale
     }
 }

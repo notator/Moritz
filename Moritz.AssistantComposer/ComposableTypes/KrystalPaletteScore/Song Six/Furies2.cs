@@ -280,12 +280,23 @@ namespace Moritz.AssistantComposer
             AlignObjectAtIndex(229, 232, 233, c[288].MsPosition - 200);
             AlignObjectAtIndex(232, 233, 256, c[289].MsPosition);
             AlignObjectAtIndex(233, 256, this.Count - 2, f1[248].MsPosition);
+
+            // final adjustments for R2M
+            AlignObjectAtIndex(49,50,51, c[130].MsPosition - 100);
+
+            AlignObjectAtIndex(78, 92, 93, c[184].MsPosition - 200);
+            AlignObjectAtIndex(88, 89, 90, c[177].MsPosition);
+
+            AlignObjectAtIndex(123, 124, 129, c[255].MsPosition);
+
+            AlignObjectAtIndex(131, 158, 159, f1[138].MsPosition - 200);
+            AlignObjectAtIndex(166, 168, 181, f4[47].MsPosition);
         }
 
         internal void AdjustVelocities(Dictionary<string, int> msPositions)
         {
-            AdjustVelocitiesHairpin(msPositions["furies2FinaleStart"], this[82].MsPosition, 0.2, 0.6);
-            AdjustVelocitiesHairpin(this[82].MsPosition, msPositions["verse4"], 0.6, 0.2);
+            AdjustVelocitiesHairpin(msPositions["furies2FinaleStart"], this[82].MsPosition, 0.4, 0.6);
+            AdjustVelocitiesHairpin(this[82].MsPosition, msPositions["verse4"], 0.6, 0.3);
             AdjustVelocitiesHairpin(msPositions["verse4"], msPositions["furies2FinalePart2Start"], 0.2, 0.2);
             AdjustVelocitiesHairpin(msPositions["furies2FinalePart2Start"], msPositions["interlude4"], 0.2, 0.4);
             AdjustVelocitiesHairpin(msPositions["interlude4"], msPositions["verse5"], 0.5, 1.0);

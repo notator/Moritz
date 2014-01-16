@@ -127,11 +127,16 @@ namespace Moritz.AssistantComposer
 
             // Add each voiceDef to voiceDefs here, in top to bottom (=channelIndex) order in the score.
             List<VoiceDef> voiceDefs = new List<VoiceDef>() { furies1, furies2, furies3, furies4, control, clytemnestra, wind1, wind2, wind3 };
+            
             Debug.Assert(voiceDefs.Count == MidiChannels().Count);
-            foreach(VoiceDef voiceDef in voiceDefs)
-            {
-                voiceDef.SetLyricsToIndex();
-            }
+
+            //********************************************************
+            //foreach(VoiceDef voiceDef in voiceDefs)
+            //{
+            //    voiceDef.SetLyricsToIndex();
+            //}
+            //********************************************************
+
             List<int> barlineMsPositions = GetBarlineMsPositions(control, furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
             // this system contains one Voice per channel (not divided into bars)
             List<Voice> system = GetVoices(voiceDefs);
@@ -442,7 +447,7 @@ namespace Moritz.AssistantComposer
                 f1[1].MsPosition, f1[2].MsPosition,
                 f1[3].MsPosition, f2[18].MsPosition,
                 f3[96].MsPosition, f1[5].MsPosition,
-                f2[29].MsPosition, f3[114].MsPosition,
+                f2[29].MsPosition, f3[116].MsPosition,
                 f4[29].MsPosition, f1[10].MsPosition,
                 f3[131].MsPosition, f2[47].MsPosition,
 
@@ -457,32 +462,40 @@ namespace Moritz.AssistantComposer
 
                 // Interlude 3 (=beginning of Finale)
                 f1[25].MsPosition, f1[29].MsPosition, 
-                f1[30].MsPosition, f1[34].MsPosition, 
+                f1[30].MsPosition, f1[34].MsPosition + 100, 
                 f1[35].MsPosition, f1[40].MsPosition,
                 f1[41].MsPosition, f1[45].MsPosition,
                 f1[46].MsPosition, f1[51].MsPosition,
-                f1[52].MsPosition, f1[55].MsPosition,
-                f1[56].MsPosition, f1[60].MsPosition,
-                f1[61].MsPosition, f1[67].MsPosition,
-                f1[68].MsPosition, f1[73].MsPosition,
+                f1[52].MsPosition, f2[66].MsPosition + 100,
+                f1[56].MsPosition, f1[60].MsPosition + 100,
+                f1[61].MsPosition, f1[67].MsPosition + 100,
+                f1[68].MsPosition, f1[73].MsPosition + 100,
 
                 // Verse 4
                 c[174].MsPosition, c[184].MsPosition,
                 c[185].MsPosition, c[215].MsPosition,
                 c[216].MsPosition, c[234].MsPosition,
                 c[235].MsPosition, c[254].MsPosition,
-                c[255].MsPosition, c[268].MsPosition,
+                //c[255].MsPosition, c[268].MsPosition,
+                c[255].MsPosition, f2[134].MsPosition + 100,
 
                 // Interlude 4
-                f4[42].MsPosition, f4[43].MsPosition,
-                f4[45].MsPosition, f4[46].MsPosition,
-                f4[47].MsPosition, f4[48].MsPosition,
-                f4[49].MsPosition, f4[50].MsPosition,
-                f4[52].MsPosition, f4[53].MsPosition,
+                //f4[42].MsPosition, f4[43].MsPosition,
+                f4[42].MsPosition, f1[132].MsPosition + 100,
+                //f4[45].MsPosition, f4[46].MsPosition,
+                f4[45].MsPosition, f1[145].MsPosition - 100,
+                //f4[47].MsPosition, f4[48].MsPosition,
+                w3[63].MsPosition, f2[177].MsPosition,
+
+                //f4[49].MsPosition, f4[50].MsPosition,
+                f4[49].MsPosition, f1[170].MsPosition + 100,
+                //f4[52].MsPosition, f4[53].MsPosition,
+                f4[52].MsPosition, f1[189].MsPosition,
 
                 // Verse 5
                 c[269].MsPosition, c[277].MsPosition,
-                c[278].MsPosition, c[287].MsPosition,
+                //c[278].MsPosition, c[287].MsPosition,
+                c[278].MsPosition, f2[232].MsPosition + 50,
                 c[288].MsPosition, c[289].MsPosition,
 
                 // Postlude off

@@ -1346,5 +1346,36 @@ namespace Moritz.AssistantComposer
                 }
             }
         }
+
+        /// <summary>
+        /// Each UniqueMidiChordDef is transposed by the interval current at its position.
+        /// The argument contains a dictionary[msPosition, transposition].
+        /// </summary>
+        /// <param name="msPosTranspositionDict"></param>
+        internal void TransposeToDict(Dictionary<int, int> msPosTranspositionDict)
+        {
+            List<int> dictPositions = new List<int>(msPosTranspositionDict.Keys);
+
+            int currentMsPos = dictPositions[0];
+            int j = 0;
+            for(int i = 1; i < msPosTranspositionDict.Count; ++i)
+            {
+                int transposition = msPosTranspositionDict[currentMsPos];
+                int nextMsPos = dictPositions[i];
+                while(j < _uniqueMidiDurationDefs.Count && _uniqueMidiDurationDefs[j].MsPosition < nextMsPos)
+                {
+                    if(_uniqueMidiDurationDefs[j].MsPosition >= currentMsPos)
+                    {
+                        UniqueMidiChordDef umcd = _uniqueMidiDurationDefs[j] as UniqueMidiChordDef;
+                        if(umcd != null)
+                        {
+                            umcd.Transpose(transposition);
+                        }
+                    }
+                    ++j;
+                }
+                currentMsPos = nextMsPos;
+            }
+        }
     }
 }

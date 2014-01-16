@@ -151,7 +151,8 @@ namespace Moritz.AssistantComposer
 
             RemoveScorePitchWheelCommandsFromControlledChords(); // interlude4 (to immediately before verse5)
 
-            AdjustPitchWheelDeviations(msPositions["verse5"], msPositions["endOfPiece"], 5, 28);
+            AdjustPitchWheelDeviations(msPositions["verse5"], msPositions["postlude"], 5, 1);
+            RemoveScorePitchWheelCommands(59, this.Count); // postlude           
         }
 
         private void RemoveScorePitchWheelCommandsFromControlledChords()
@@ -243,24 +244,91 @@ namespace Moritz.AssistantComposer
 
         internal void AdjustVelocities(Dictionary<string, int> msPositions)
         {
-            AdjustVelocitiesHairpin(msPositions["interlude4"], msPositions["verse5"], 0.3, 0.5);
-            AdjustVelocitiesHairpin(msPositions["verse5"], msPositions["postlude"], 0.4, 0.4);
+            AdjustVelocitiesHairpin(msPositions["interlude4"], msPositions["verse5"], 0.5, 0.8);
+            AdjustVelocitiesHairpin(msPositions["verse5"], msPositions["postlude"], 0.5, 0.5);
 
             //AdjustVelocitiesHairpin(msPositions["postlude"], EndMsPosition, 0.4, 1.0);
 
-            AdjustVelocitiesHairpin(msPositions["postlude"], msPositions["postludeDiminuendo"], 0.4, 1.0);
-            AdjustVelocitiesHairpin(msPositions["postludeDiminuendo"], EndMsPosition, 1.0, 0.2);
+            AdjustVelocitiesHairpin(msPositions["postlude"], msPositions["postludeDiminuendo"], 0.3, 0.8);
+            AdjustVelocitiesHairpin(msPositions["postludeDiminuendo"], EndMsPosition, 0.8, 0.4);
         }
 
-        internal void AdjustPostludePan(int postludeMsPosition)
+        /// <summary>
+        /// Returns a dictionary containing the current transposition per msPosition
+        /// ( Dictionary[msPositon, transposition] )
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<int, int> SetFinalMelody()
         {
-            // example code from furies1
+            int f4Interlude4Index = 42;
+            int f4PostludeIndex = 59;
+            int f4finalPhaseIndex = 73;
 
-            //double posDiff = ((double)(EndMsPosition - postludeMsPosition)) / 4;
-            //int postludeMsPosition1 = postludeMsPosition + (int)posDiff;
-            //int postludeMsPosition2 = postludeMsPosition + (int)(posDiff * 2);
-            //int postludeMsPosition3 = postludeMsPosition + (int)(posDiff * 3);
+            PermutationKrystal mod7krys = new PermutationKrystal("C://Moritz/krystals/krystals/pk3(7)-1.krys");
+            PermutationKrystal mod12krys = new PermutationKrystal("C://Moritz/krystals/krystals/pk3(12)-1.krys");
 
+            List<int> mod7Values = mod7krys.GetValues(1)[0];
+            List<int> mod12Values = mod12krys.GetValues(1)[0];
+
+            // circle of fifths hierarchy (mod 12): 0 7 4 2 10 9 3 4 8 11 1 6
+            // rearranged for mod7krys hierarchy (4536271)
+            int[] transpositionArray1 = { 3, -2, 4, 0, 4, 2, -3 }; // 7 changed to 4 (was too high!)
+            // circle of fifths hierarchy centred on 0:
+            int[] transpositionArray2 = { 0, 4, 4, 2, -2, -3, 3, 4, -4, -1, 1, 6 }; // 7 changed to 4 (was too high!)
+            // widened
+            int[] transpositionArray3 = { 0, 9, 4, 4, -2, -5, 6, 8, -7, -2, 2, 11 };
+
+            Dictionary<int, int> msPosTranspositionDict = new Dictionary<int, int>();
+
+            int transposition;
+            int valueIndex = 0;
+            for(int i = f4Interlude4Index; i < f4PostludeIndex; ++i)
+            {
+                UniqueMidiChordDef umcd = this[i] as UniqueMidiChordDef;
+                if(umcd != null)
+                {
+                    transposition = transpositionArray1[mod7Values[valueIndex++] - 1];
+                    umcd.Transpose(transposition);
+                    msPosTranspositionDict.Add(umcd.MsPosition, transposition);
+                }
+            }
+            valueIndex = 0;
+            for(int i = f4PostludeIndex; i < f4finalPhaseIndex; ++i)
+            {
+                UniqueMidiChordDef umcd = this[i] as UniqueMidiChordDef;
+                if(umcd != null)
+                {
+                    transposition = transpositionArray2[mod12Values[valueIndex++] - 1];
+                    umcd.Transpose(transposition);
+                    msPosTranspositionDict.Add(umcd.MsPosition, transposition);
+                }
+            }
+            valueIndex = 0;
+            for(int i = f4finalPhaseIndex; i < this.Count; ++i)
+            {
+                UniqueMidiChordDef umcd = this[i] as UniqueMidiChordDef;
+                if(umcd != null)
+                {
+                    transposition = transpositionArray3[mod12Values[valueIndex++] - 1];
+                    umcd.Transpose(transposition);
+                    msPosTranspositionDict.Add(umcd.MsPosition, transposition);
+                }
+            }
+
+            return msPosTranspositionDict;
+        }
+
+        /// <summary>
+        /// Motion is contrary to the pan gliss in furies 1
+        /// </summary>
+        internal void AdjustPostludePan(int postludeMsPosition, int postludeMsPosition1, int postludeMsPosition2, int postludeMsPosition3)
+        {
+            SetPanGliss(postludeMsPosition, postludeMsPosition1, 64, 96);
+            SetPanGliss(postludeMsPosition1, postludeMsPosition2, 96, 32);
+            SetPanGliss(postludeMsPosition2, postludeMsPosition3, 32, 127);
+            SetPanGliss(postludeMsPosition3, EndMsPosition, 127, 0);
+
+            // furies1
             //SetPanGliss(postludeMsPosition, postludeMsPosition1, 64, 32);
             //SetPanGliss(postludeMsPosition1, postludeMsPosition2, 32, 96);
             //SetPanGliss(postludeMsPosition2, postludeMsPosition3, 96, 0);

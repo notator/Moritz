@@ -18,7 +18,13 @@ namespace Moritz.AssistantComposer
         {
             SetMomentDefsListPerVerse();
             SetUniqueMidiDurationDefs(wind3);
-            SetPitchWheelDeviation(0, _uniqueMidiDurationDefs.Count, 1);
+            // There are no pitchWheel commands in the score.
+            // They can be created by a live performer
+            SetPitchWheelDeviation(1, 60, 1);    // verse 1
+            SetPitchWheelDeviation(60, 117, 2);  // verse 2
+            SetPitchWheelDeviation(117, 174, 4); // verse 3
+            SetPitchWheelDeviation(174, 269, 5); // verse 4
+            SetPitchWheelDeviation(269, _uniqueMidiDurationDefs.Count, 6); // verse 5
         }
 
         /// <summary>

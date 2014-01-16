@@ -43,11 +43,11 @@ namespace Moritz.AssistantComposer
             furies3.AdjustAlignments(furies1, furies2, furies4, clytemnestra, wind1);
             furies3.AdjustVelocities(msPositions);
 
-            AdjustPostludePans(furies1, furies2, furies3, msPositions["postlude"]);
+            AdjustPostludePans(furies1, furies2, furies3, furies4, msPositions["postlude"]);
             SetFuriesFinalePitches(furies1, furies2, furies3, furies4, msPositions);
         }
 
-        private void AdjustPostludePans(Furies1 furies1, Furies2 furies2, Furies3 furies3, int postludeMsPosition)
+        private void AdjustPostludePans(Furies1 furies1, Furies2 furies2, Furies3 furies3, Furies4 furies4, int postludeMsPosition)
         {
             double posDiff = ((double)(furies1.EndMsPosition - postludeMsPosition)) / 4;
             int postludeMsPosition1 = postludeMsPosition + (int)posDiff;
@@ -57,19 +57,17 @@ namespace Moritz.AssistantComposer
             furies1.AdjustPostludePan(postludeMsPosition, postludeMsPosition1, postludeMsPosition2, postludeMsPosition3);
             furies2.AdjustPostludePan(postludeMsPosition, postludeMsPosition1, postludeMsPosition2, postludeMsPosition3);
             furies3.AdjustPostludePan(postludeMsPosition, postludeMsPosition1, postludeMsPosition2, postludeMsPosition3);
-            // Furies 4 pans dont change
+            furies4.AdjustPostludePan(postludeMsPosition, postludeMsPosition1, postludeMsPosition2, postludeMsPosition3);
         }
 
-        private void SetFuriesFinalePitches(VoiceDef furies1, VoiceDef furies2, VoiceDef furies3, VoiceDef furies4, 
+        private void SetFuriesFinalePitches(Furies1 furies1, Furies2 furies2, Furies3 furies3, Furies4 furies4, 
             Dictionary<string, int> msPositions)
         {
-            PermutationKrystal pk = new PermutationKrystal("C://Moritz/krystals/krystals/pk4(12)-2.krys");
-            ExpansionKrystal xk = new ExpansionKrystal("C://Moritz/krystals/krystals/xk3(12.12.1)-1.krys");
-            ExpansionKrystal pInputToxk = new ExpansionKrystal("C://Moritz/krystals/krystals/xk2(1.12.10)-1.krys");
+            Dictionary<int, int> msPosTranspositionDict = furies4.SetFinalMelody();
 
-            List<List<int>> pkValues = pk.GetValues(4);
-            List<List<int>> xkValues = xk.GetValues(3);
-            List<List<int>> pInputToxkValues = pInputToxk.GetValues(2);            
+            furies1.TransposeToDict(msPosTranspositionDict);
+            furies2.TransposeToDict(msPosTranspositionDict);
+            furies3.TransposeToDict(msPosTranspositionDict);
         }
 
     }
