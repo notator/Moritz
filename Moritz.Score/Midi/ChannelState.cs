@@ -47,8 +47,8 @@ namespace Moritz.Score.Midi
         #endregion commands
 
         #region switches
-        public byte Patch = 0;
-        public byte Bank = M.DefaultBankIndex;
+        public byte Patch = M.DefaultBankAndPatchIndex;
+        public byte Bank = M.DefaultBankAndPatchIndex;
         public byte PitchWheelDeviation = M.DefaultPitchWheelDeviation;
         #endregion switches
 

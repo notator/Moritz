@@ -62,7 +62,7 @@ namespace Moritz.AssistantComposer
             // All palettes can be accessed here at _paletteDefs[ paletteIndex ].
 
             // The wind3 is the lowest wind. The winds are numbered from top to bottom in the score.
-            VoiceDef wind3 = GetWind3(_paletteDefs[0], _krystals[2]);
+            VoiceDef wind3 = GetWind3(_paletteDefs[0], _krystals[8]);
             
             Clytemnestra clytemnestra = new Clytemnestra(wind3);
 

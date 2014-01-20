@@ -77,7 +77,7 @@ namespace Moritz.Score.Midi
             //if(writeMsPosition) // positions are not written to the midiDefs section of an SVG-MIDI file
             //    w.WriteAttributeString("msPosition", MsPosition.ToString());
             w.WriteAttributeString("msDuration", _msDuration.ToString());
-            if(BankIndex != null && BankIndex != M.DefaultBankIndex)
+            if(BankIndex != null && BankIndex != M.DefaultBankAndPatchIndex)
                 w.WriteAttributeString("bank", BankIndex.ToString());
             if(PatchIndex != null)
                 w.WriteAttributeString("patch", PatchIndex.ToString());

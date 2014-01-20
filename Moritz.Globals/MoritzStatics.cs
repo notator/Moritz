@@ -685,7 +685,7 @@ namespace Moritz.Globals
         /// The following values are (supposed to be) set by AllControllersOff.
         /// These values are omitted from SVG-MIDI files since they are set by default when reading the files.
         /// </summary>
-        public static readonly byte DefaultBankIndex = 0;
+        public static readonly byte DefaultBankAndPatchIndex = 0;
         public static readonly byte DefaultVolume = 100;
         public static readonly byte DefaultExpression = 127;
         public static readonly byte DefaultPitchWheelDeviation = 2;
