@@ -255,47 +255,6 @@ namespace Moritz.Score.Midi
             BasicMidiChordDefs = FitToDuration(BasicMidiChordDefs, MsDuration, _minimumBasicMidiChordMsDuration);
         }
 
-        /// <summary>
-        /// Note that, unlike MidiRestDefs, MidiChordDefs do not have a msDuration attribute.
-        /// Their msDuration is deduced from the contained BasicMidiChords.
-        /// Note too that a Patch index will always be written if set in either the main MidiChordDef or its BasicMidiChordDef[0].
-        /// Whether a Patch change message is actually contructed and sent may depend on the current patch in the voice.
-        /// The Patch index will only be written here in the MidiChordDef if BasicMidiChordDef[0].PatchIndex is not set.
-        /// The same is true for Bank indices.
-        /// </summary>
-        public void WriteSvg(SvgWriter w)
-        {
-            Debug.Assert(BasicMidiChordDefs != null && BasicMidiChordDefs.Count > 0);
-
-            if(!String.IsNullOrEmpty(ID) && !ID.Contains("localChord"))
-                w.WriteAttributeString("id", ID); // the definition ID, not the local ID of a midiChord
-
-            if(Bank != null && BasicMidiChordDefs[0].BankIndex == null)
-            {
-                w.WriteAttributeString("bank", Bank.ToString());
-            }
-            if(Patch != null && BasicMidiChordDefs[0].PatchIndex == null)
-            {
-                w.WriteAttributeString("patch", Patch.ToString());
-            }
-            if(Volume != null && Volume != M.DefaultVolume)
-                w.WriteAttributeString("volume", Volume.ToString());
-            if(HasChordOff == false)
-                w.WriteAttributeString("hasChordOff", "0");
-            if(PitchWheelDeviation != null && PitchWheelDeviation != M.DefaultPitchWheelDeviation)
-                w.WriteAttributeString("pitchWheelDeviation", PitchWheelDeviation.ToString());
-            if(MinimumBasicMidiChordMsDuration != M.DefaultMinimumBasicMidiChordMsDuration)
-                w.WriteAttributeString("minBasicChordMsDuration", MinimumBasicMidiChordMsDuration.ToString());
-
-            w.WriteStartElement("score", "basicChords", null);
-            foreach(BasicMidiChordDef basicMidiChord in BasicMidiChordDefs) // containing basic <midiChord> elements
-                basicMidiChord.WriteSVG(w);
-            w.WriteEndElement();
-
-            if(MidiChordSliderDefs != null)
-                MidiChordSliderDefs.WriteSVG(w); // writes score:sliders element
-        }
-
         public override IUniqueMidiDurationDef CreateUniqueMidiDurationDef()
         {
             UniqueMidiChordDef umcd = new UniqueMidiChordDef(this); // a deep clone with a special id string.

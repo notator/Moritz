@@ -43,11 +43,6 @@ namespace Moritz.AssistantComposer
                 this.Systems[0].Staves[0].Voices[0].MidiChannel = midiChannel;
             }
         }
-
-        //public override void WriteMidiChordDefinitions(SvgWriter w)
-        //{
-        //    throw new NotImplementedException();
-        //}
     }
 }
 
