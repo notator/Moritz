@@ -73,7 +73,6 @@ namespace Moritz.AssistantComposer
 
                     #region 
                     UniqueMidiChordDef lmcd = new UniqueMidiChordDef();
-                    lmcd.MsDuration = msDuration;
                     //lmcd.Volume = (byte)100; // 100 is the default, and is not written into the score. Other values ARE added to each chord.
                     lmcd.Volume = volume;
                     lmcd.HasChordOff = true;
@@ -87,6 +86,8 @@ namespace Moritz.AssistantComposer
                     List<byte> expressionMsbs = new List<byte>() { (byte)65 };
                     lmcd.MidiChordSliderDefs = new MidiChordSliderDefs(null, null, null, expressionMsbs);
                     lmcd.BasicMidiChordDefs.Add(new BasicMidiChordDef(msDuration, 0, patch, true, pitch, velocity));
+
+                    lmcd.MsDuration = msDuration;
 
                     // these two attributes determine the symbols in the score.
                     lmcd.MidiHeadSymbols = new List<byte>() { 67 }; // display middle G, even though "pitch" is different.

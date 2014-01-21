@@ -171,7 +171,7 @@ namespace Moritz.Score.Midi
         /// <param name="factor"></param>
         public void AdjustDuration(double factor)
         {
-            _msDuration = (int)(_msDuration * factor);
+            MsDuration = (int)(_msDuration * factor);
         }
 
         public void AdjustVelocities(double factor)
@@ -288,7 +288,17 @@ namespace Moritz.Score.Midi
         public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
         private int? _msDurationToNextBarline = null;
 
-        public new int MsDuration { get { return _msDuration; } set { _msDuration = value; } }
+        public new int MsDuration 
+        { 
+            get 
+            { 
+                return _msDuration; 
+            } 
+            set 
+            {
+                SetDuration(value);
+            }
+        }
 
         public int MsPosition { get { return _msPosition; } set { _msPosition = value; } }
         private int _msPosition = 0;

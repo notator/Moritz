@@ -91,8 +91,7 @@ namespace Moritz.Score.Midi
             w.WriteEndElement();
         }
 
-        // MsDuration is read-only!
-        public int MsDuration { get { return _msDuration; } }
+        public int MsDuration { get { return _msDuration; } set { _msDuration = value; } }
         protected int _msDuration = 0;
 
         public List<byte> Notes = new List<byte>(); // A string of midiPitch numbers separated by spaces.

@@ -14,7 +14,7 @@ namespace Moritz.Score
         public ChordSymbol(Voice voice, UniqueMidiChordDef umcd, int minimumCrotchetDurationMS, float fontSize)
             : base(voice, umcd, minimumCrotchetDurationMS, fontSize)
         {
-            _localizedMidiDurationDef = umcd;
+            _uniqueMidiChordDef = umcd;
             MidiChordDef midiChordDef = umcd as MidiChordDef;
             if(midiChordDef != null)
             {
@@ -101,11 +101,7 @@ namespace Moritz.Score
         protected virtual void WriteChordAttributes(SvgWriter w)
         {
             w.WriteAttributeString("score", "object", null, "chord");
-
             w.WriteAttributeString("score", "alignmentX", null, this.Metrics.OriginX.ToString(M.En_USNumberFormat));
-
-            Debug.Assert(_msDuration > 0);
-            w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
         }
 
         /// <summary>
@@ -115,22 +111,12 @@ namespace Moritz.Score
         protected void WriteMidiInfo(SvgWriter w, string midiId)
         {
             w.WriteStartElement("score", "midiChord", null);
+
             w.WriteAttributeString("id", midiId);
             Debug.Assert(UniqueMidiChordDef != null);
             string ID = UniqueMidiChordDef.ID;
             Debug.Assert(ID != null && ID.StartsWith("localChord"));
             UniqueMidiChordDef.WriteSvg(w);
-            // The above two lines used to be:
-            //if(ID != null && !(ID.StartsWith("localChord")))
-            //{
-            //    w.WriteStartElement("use");
-            //    w.WriteAttributeString("xlink", "href", null, "#" + UniqueMidiChordDef.ID);
-            //    w.WriteEndElement(); // use
-            //}
-            //else
-            //{
-            //    UniqueMidiChordDef.WriteSvg(w);
-            //}
 
             w.WriteEndElement(); // midiChord
         }
@@ -579,8 +565,8 @@ namespace Moritz.Score
         public BeamBlock BeamBlock = null; // defaults
         public List<Head> HeadsTopDown = new List<Head>(); // Heads are in top-down order.
 
-        public UniqueMidiChordDef UniqueMidiChordDef { get { return _localizedMidiDurationDef; } }
-        protected UniqueMidiChordDef _localizedMidiDurationDef = null;
+        public UniqueMidiChordDef UniqueMidiChordDef { get { return _uniqueMidiChordDef; } }
+        protected UniqueMidiChordDef _uniqueMidiChordDef = null;
 
         public string GraphicSymbolID { get { return _graphicSymbolID; } }
         protected string _graphicSymbolID = null;

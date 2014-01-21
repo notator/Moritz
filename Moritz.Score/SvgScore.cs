@@ -902,33 +902,6 @@ namespace Moritz.Score
         }
 
         #endregion protected functions
-        private ChordSymbol ConvertLastChordSymbol(Voice voice, int durationToSubtract)
-        {
-            ChordSymbol lastChordSymbol = null;
-            int lastChordIndex = 0;
-            Barline lastBarline = null;
-            for(int i = 0; i < voice.NoteObjects.Count; ++i)
-            {
-                ChordSymbol cs = voice.NoteObjects[i] as ChordSymbol;
-                if(cs != null)
-                {
-                    lastChordSymbol = cs;
-                    lastChordIndex = i;
-                }
-                Barline b = voice.NoteObjects[i] as Barline;
-                if(b != null)
-                    lastBarline = b;
-            }
-            UniqueMidiChordDef umcd = lastChordSymbol.UniqueMidiChordDef;
-            UniqueMidiChordDef newlmdd = new UniqueMidiChordDef(umcd);
-            newlmdd.MsPosition = umcd.MsPosition;
-            newlmdd.MsDuration = umcd.MsDuration - durationToSubtract;
-            ChordSymbol replacementChord = new ChordSymbol(voice, newlmdd, _pageFormat.MinimumCrotchetDuration, _pageFormat.MusicFontHeight);
-
-            voice.NoteObjects.RemoveAt(lastChordIndex);
-            voice.NoteObjects.Insert(lastChordIndex, replacementChord);
-            return replacementChord;
-        }
 
         private void FinalizeAccidentals()
         {
