@@ -44,10 +44,10 @@ namespace Moritz.AssistantComposer
             }
         }
 
-        public override void WriteMidiChordDefinitions(SvgWriter w)
-        {
-            throw new NotImplementedException();
-        }
+        //public override void WriteMidiChordDefinitions(SvgWriter w)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }
 

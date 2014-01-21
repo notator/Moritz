@@ -200,7 +200,7 @@ namespace Moritz.Score
             metadata.WriteSVG(w);
 
             _score.WriteSymbolDefinitions(w);
-            _score.WriteMidiChordDefinitions(w);
+            //_score.WriteMidiChordDefinitions(w);
 
             #region pageObjects
             w.SvgRect("frame", 0, 0, _pageFormat.Right, _pageFormat.Bottom, "#CCCCCC", 1, "white", null);

@@ -31,11 +31,12 @@ namespace Moritz.Score
             }
         }
 
-
-        public virtual void WriteMidiChordDefinitions(SvgWriter w)
-        {
-            throw new NotImplementedException("This function should be overridden by derived classes, and only called while composing.");
-        }
+        //// MidiChordDefinitions are no longer written into SVG files.
+        //// UniqueMidiChordDefs are written to each voice instead.
+        //public virtual void WriteMidiChordDefinitions(SvgWriter w)
+        //{
+        //    throw new NotImplementedException("This function should be overridden by derived classes, and only called while composing.");
+        //}
 
         private void SetScoreMetadata(string scoreTitleName, string keywords, string comment)
         {

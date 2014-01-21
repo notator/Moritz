@@ -29,36 +29,36 @@ namespace Moritz.AssistantComposer
             CreateScore();
         }
 
-        public override void WriteMidiChordDefinitions(SvgWriter w)
-        {
-            if(_paletteDefs != null && _paletteDefs.Count > 1)
-            {
-                w.WriteStartElement("score", "midiDefs", null);
-                foreach(PaletteDef paletteDef in _paletteDefs)
-                {
-                    foreach(MidiDurationDef midiDurationDef in paletteDef)
-                    {
-                        MidiChordDef midiChordDef = midiDurationDef as MidiChordDef;
-                        MidiRestDef midiRestDef = midiDurationDef as MidiRestDef;
-                        if(midiChordDef != null)
-                        {
-                            w.WriteStartElement("score", "midiChord", null);
-                            midiChordDef.WriteSvg(w);
-                            w.WriteEndElement();
-                        }
-                        else if(midiRestDef != null)
-                        {
-                            w.WriteStartElement("score", "midiRest", null);
-                            if(!String.IsNullOrEmpty(midiRestDef.ID) && !midiRestDef.ID.Contains("localRest"))
-                                w.WriteAttributeString("id", midiRestDef.ID); // the definition ID, not the local ID of a midiRest
-                            w.WriteAttributeString("msDuration", midiRestDef.MsDuration.ToString());
-                            w.WriteEndElement();
-                        }
-                    }
-                }
-                w.WriteEndElement(); // score:midiDefs
-            }
-        }
+        //public override void WriteMidiChordDefinitions(SvgWriter w)
+        //{
+        //    if(_paletteDefs != null && _paletteDefs.Count > 1)
+        //    {
+        //        w.WriteStartElement("score", "midiDefs", null);
+        //        foreach(PaletteDef paletteDef in _paletteDefs)
+        //        {
+        //            foreach(MidiDurationDef midiDurationDef in paletteDef)
+        //            {
+        //                MidiChordDef midiChordDef = midiDurationDef as MidiChordDef;
+        //                MidiRestDef midiRestDef = midiDurationDef as MidiRestDef;
+        //                if(midiChordDef != null)
+        //                {
+        //                    w.WriteStartElement("score", "midiChord", null);
+        //                    midiChordDef.WriteSvg(w);
+        //                    w.WriteEndElement();
+        //                }
+        //                else if(midiRestDef != null)
+        //                {
+        //                    w.WriteStartElement("score", "midiRest", null);
+        //                    if(!String.IsNullOrEmpty(midiRestDef.ID) && !midiRestDef.ID.Contains("localRest"))
+        //                        w.WriteAttributeString("id", midiRestDef.ID); // the definition ID, not the local ID of a midiRest
+        //                    w.WriteAttributeString("msDuration", midiRestDef.MsDuration.ToString());
+        //                    w.WriteEndElement();
+        //                }
+        //            }
+        //        }
+        //        w.WriteEndElement(); // score:midiDefs
+        //    }
+        //}
 
         private List<Krystal> _krystals = null;
     }
