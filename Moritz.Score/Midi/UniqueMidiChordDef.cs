@@ -269,19 +269,17 @@ namespace Moritz.Score.Midi
             }
         }
 
-        public new int PitchWheelDeviation
+        public new int? PitchWheelDeviation
         {
             get
             {
-                int rval = -1;
-                if(_pitchWheelDeviation != null)
-                    rval = (int)_pitchWheelDeviation;
-
-                return rval;
+                return (int?)_pitchWheelDeviation;
             }
             set
             {
-                int val = (value < 127) ? value : 127;
+                Debug.Assert(value != null);
+                int val = (int) value;
+                val = (val < 127) ? val : 127;
                 val = (val > 0) ? val : 0;
 
                 _pitchWheelDeviation = (byte?)val;

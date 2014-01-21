@@ -62,7 +62,7 @@ namespace Moritz.Score.Midi
         public void AdjustModulationWheel(double factor){}
         public void AdjustPitchWheel(double factor){}
         public byte MidiVelocity { get { return 0; } set {}}
-        public int PitchWheelDeviation { get { return 0;} set {}}
+        public int? PitchWheelDeviation { get { return null;} set {}}
 
         public List<byte> PanMsbs { get { return new List<byte>(); } set { } }
 
