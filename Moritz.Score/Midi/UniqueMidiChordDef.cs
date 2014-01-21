@@ -573,10 +573,12 @@ namespace Moritz.Score.Midi
         /// <summary>
         /// Note that, unlike MidiRestDefs, MidiChordDefs do not have a msDuration attribute.
         /// Their msDuration is deduced from the contained BasicMidiChords.
-        /// Note too that a Patch index will always be written if set in either the main MidiChordDef or its BasicMidiChordDef[0].
-        /// Whether a Patch change message is actually contructed and sent may depend on the current patch in the voice.
-        /// The Patch index will only be written here in the MidiChordDef if BasicMidiChordDef[0].PatchIndex is not set.
-        /// The same is true for Bank indices.
+        /// Patch indices already set in the BasicMidiChordDefs take priority over those set in the main UniqueMidiChordDef.
+        /// However, if BasicMidiChordDefs[0].PatchIndex is null, and this.Patch is set, BasicMidiChordDefs[0].PatchIndex is set to Patch.
+        /// The same is true for Bank settings.  
+        /// The AssistantPerformer therefore only needs to look at BasicMidiChordDefs to find Bank and Patch changes.
+        /// While constructing Tracks, the AssistantPerformer should monitor the current Bank and/or Patch, so that it can decide
+        /// whether or not to actually construct and send bank and/or patch change messages.
         /// </summary>
         public void WriteSvg(SvgWriter w)
         {
@@ -585,13 +587,13 @@ namespace Moritz.Score.Midi
             if(!String.IsNullOrEmpty(ID) && !ID.Contains("localChord"))
                 w.WriteAttributeString("id", ID); // the definition ID, not the local ID of a midiChord
 
-            if(Bank != null && BasicMidiChordDefs[0].BankIndex == null)
+            if(BasicMidiChordDefs[0].BankIndex == null && Bank != null)
             {
-                w.WriteAttributeString("bank", Bank.ToString());
+                BasicMidiChordDefs[0].BankIndex = Bank;
             }
-            if(Patch != null && BasicMidiChordDefs[0].PatchIndex == null)
+            if(BasicMidiChordDefs[0].PatchIndex == null && Patch != null)
             {
-                w.WriteAttributeString("patch", Patch.ToString());
+                BasicMidiChordDefs[0].PatchIndex = Patch;
             }
             if(Volume != null && Volume != M.DefaultVolume)
                 w.WriteAttributeString("volume", Volume.ToString());
