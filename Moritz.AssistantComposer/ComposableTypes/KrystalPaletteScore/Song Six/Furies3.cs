@@ -190,13 +190,8 @@ namespace Moritz.AssistantComposer
 
         #region finale
 
-        internal void GetFinale(List<PaletteDef> palettes, Dictionary<string, int> msPositions)
+        internal void GetFinale(List<PaletteDef> palettes, Dictionary<string, int> msPositions, Krystal krystal)
         {
-            //PermutationKrystal krystal = new PermutationKrystal("C://Moritz/krystals/krystals/pk4(12)-2.krys");
-
-            // This krystal was used by furies 2
-            ExpansionKrystal krystal = new ExpansionKrystal("C://Moritz/krystals/krystals/xk4(12.12.1)-1.krys");
-
             VoiceDef furies3Finale = GetF3Finale(palettes, krystal, msPositions);
 
             InsertInRest(furies3Finale);
@@ -204,7 +199,7 @@ namespace Moritz.AssistantComposer
             AdjustPitchWheelDeviations(msPositions["interlude4"], msPositions["endOfPiece"], 5, 28);
         }
 
-        private VoiceDef GetF3Finale(List<PaletteDef> palettes, ExpansionKrystal krystal, Dictionary<string, int> msPositions)
+        private VoiceDef GetF3Finale(List<PaletteDef> palettes, Krystal krystal, Dictionary<string, int> msPositions)
         {
             PaletteDef f3FinalePalette1 = palettes[10]; // correct 1.1.2014
             PaletteDef f3FinalePalette2 = palettes[14];
@@ -288,7 +283,7 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// Could be a protected function in a furies class
         /// </summary>
-        private List<int> GetStrandIndices(ExpansionKrystal krystal)
+        private List<int> GetStrandIndices(Krystal krystal)
         {
             List<int> strandIndices = new List<int>();
             int index = 0;

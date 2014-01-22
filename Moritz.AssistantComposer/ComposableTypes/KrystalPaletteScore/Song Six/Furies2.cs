@@ -90,11 +90,8 @@ namespace Moritz.AssistantComposer
 
         #region finale
 
-        internal void GetFinale(List<PaletteDef> palettes, Dictionary<string, int> msPositions)
+        internal void GetFinale(List<PaletteDef> palettes, Dictionary<string, int> msPositions, Krystal krystal)
         {
-            //PermutationKrystal krystal = new PermutationKrystal("C://Moritz/krystals/krystals/pk4(12)-2.krys");
-            ExpansionKrystal krystal = new ExpansionKrystal("C://Moritz/krystals/krystals/xk4(12.12.1)-1.krys");
-
             VoiceDef furies2Finale = GetF2Finale(palettes, krystal, msPositions);
 
             if(furies2Finale[furies2Finale.Count - 1] is UniqueMidiRestDef)
@@ -112,7 +109,7 @@ namespace Moritz.AssistantComposer
             AdjustPitchWheelDeviations(msPositions["interlude3"], msPositions["endOfPiece"], 5, 28);
         }
 
-        private List<int> GetStrandIndices(ExpansionKrystal krystal)
+        private List<int> GetStrandIndices(Krystal krystal)
         {
  	        List<int> strandIndices = new List<int>();
             int index = 0;
@@ -125,7 +122,7 @@ namespace Moritz.AssistantComposer
             return strandIndices;
         }
 
-        private VoiceDef GetF2Finale(List<PaletteDef> palettes, ExpansionKrystal krystal, Dictionary<string, int> msPositions)
+        private VoiceDef GetF2Finale(List<PaletteDef> palettes, Krystal krystal, Dictionary<string, int> msPositions)
         {
             PaletteDef f2FinalePalette1 = palettes[11];
             PaletteDef f2FinalePalette2 = palettes[15];

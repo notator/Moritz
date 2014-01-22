@@ -21,7 +21,7 @@ namespace Moritz.AssistantComposer
             Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3, List<PaletteDef> palettes,
             Dictionary<string, int> msPositions)
         {
-            furies1.GetFinale(palettes, msPositions);
+            furies1.GetFinale(palettes, msPositions, _krystals[9]); // _krystals[9] is xk3(12.12.1)-1.krys
             furies1.AdjustAlignments(clytemnestra, wind2, wind3);
             furies1.AdjustVelocities(msPositions);
 
@@ -29,17 +29,17 @@ namespace Moritz.AssistantComposer
             msPositions.Add("furies2FinalePart2Start", wind1[54].MsPosition);
             msPositions.Add("finalBar", furies1[280].MsPosition);
 
-            furies4.GetFinale(palettes, msPositions);
+            furies4.GetFinale(palettes, msPositions, _krystals[9]); // _krystals[9] is xk3(12.12.1)-1.krys
             furies4.AdjustAlignments(furies1, clytemnestra, wind3);
             furies4.AdjustVelocities(msPositions);
 
-            furies2.GetFinale(palettes, msPositions);
+            furies2.GetFinale(palettes, msPositions, _krystals[10]); // _krystals[10] is xk4(12.12.1)-1.krys 
             furies2.AdjustAlignments(furies1, furies4, clytemnestra);
             furies2.AdjustVelocities(msPositions);
 
             msPositions.Add("furies3FinaleStart", furies2[66].MsPosition);
 
-            furies3.GetFinale(palettes, msPositions);
+            furies3.GetFinale(palettes, msPositions, _krystals[10]); // _krystals[10] is xk4(12.12.1)-1.krys
             furies3.AdjustAlignments(furies1, furies2, furies4, clytemnestra, wind1);
             furies3.AdjustVelocities(msPositions);
 
@@ -62,8 +62,10 @@ namespace Moritz.AssistantComposer
 
         private void SetFuriesFinalePitches(Furies1 furies1, Furies2 furies2, Furies3 furies3, Furies4 furies4, 
             Dictionary<string, int> msPositions)
-        {
-            Dictionary<int, int> msPosTranspositionDict = furies4.SetFinalMelody();
+        { 
+            Dictionary<int, int> msPosTranspositionDict = furies4.SetFinalMelody(_krystals[11], _krystals[12]);
+            // _krystals[11] is pk3(7)-1.krys
+            // _krystals[12] is pk3(12)-1.krys
 
             furies1.TransposeToDict(msPosTranspositionDict);
             furies2.TransposeToDict(msPosTranspositionDict);

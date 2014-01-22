@@ -130,11 +130,8 @@ namespace Moritz.AssistantComposer
         #endregion before Interlude3
 
         #region finale
-        internal void GetFinale(List<PaletteDef> palettes, Dictionary<string, int> msPositions)
+        internal void GetFinale(List<PaletteDef> palettes, Dictionary<string, int> msPositions, Krystal krystal)
         {
-            //PermutationKrystal krystal = new PermutationKrystal("C://Moritz/krystals/krystals/pk4(12)-2.krys");
-            ExpansionKrystal krystal = new ExpansionKrystal("C://Moritz/krystals/krystals/xk3(12.12.1)-1.krys");
-
             VoiceDef furies4Finale = GetF4Finale(palettes, krystal, msPositions);
 
             if(furies4Finale[furies4Finale.Count - 1] is UniqueMidiRestDef)
@@ -164,7 +161,7 @@ namespace Moritz.AssistantComposer
             RemoveScorePitchWheelCommands(52, 53);
         }
 
-        private VoiceDef GetF4Finale(List<PaletteDef> palettes , ExpansionKrystal krystal, Dictionary<string, int> msPositions)
+        private VoiceDef GetF4Finale(List<PaletteDef> palettes , Krystal krystal, Dictionary<string, int> msPositions)
         {
             PaletteDef f4FinalePalette1 = palettes[9];
             PaletteDef f4FinalePalette2 = palettes[13];
@@ -258,14 +255,11 @@ namespace Moritz.AssistantComposer
         /// ( Dictionary[msPositon, transposition] )
         /// </summary>
         /// <returns></returns>
-        public Dictionary<int, int> SetFinalMelody()
+        public Dictionary<int, int> SetFinalMelody(Krystal mod7krys, Krystal mod12krys)
         {
             int f4Interlude4Index = 42;
             int f4PostludeIndex = 59;
             int f4finalPhaseIndex = 73;
-
-            PermutationKrystal mod7krys = new PermutationKrystal("C://Moritz/krystals/krystals/pk3(7)-1.krys");
-            PermutationKrystal mod12krys = new PermutationKrystal("C://Moritz/krystals/krystals/pk3(12)-1.krys");
 
             List<int> mod7Values = mod7krys.GetValues(1)[0];
             List<int> mod12Values = mod12krys.GetValues(1)[0];

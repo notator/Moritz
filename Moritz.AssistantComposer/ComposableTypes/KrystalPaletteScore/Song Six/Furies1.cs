@@ -50,14 +50,12 @@ namespace Moritz.AssistantComposer
         }
 
         #region finale
-        internal void GetFinale(List<PaletteDef> palettes, Dictionary<string, int> msPositions)
+        internal void GetFinale(List<PaletteDef> palettes, Dictionary<string, int> msPositions, Krystal krystal)
         {
             PaletteDef f1FinalePalette1 = palettes[12];
             PaletteDef f1FinalePalette2 = palettes[16];
             PaletteDef f1PostludePalette = palettes[20];
 
-            //PermutationKrystal krystal = new PermutationKrystal("C://Moritz/krystals/krystals/pk4(12)-2.krys");
-            ExpansionKrystal krystal = new ExpansionKrystal("C://Moritz/krystals/krystals/xk3(12.12.1)-1.krys");
             List<int> strandIndices = new List<int>();
             int index = 0;
             for(int i = 0; i < krystal.Strands.Count; ++i)
@@ -94,7 +92,7 @@ namespace Moritz.AssistantComposer
             AdjustPitchWheelDeviations(msPositions["interlude3"], msPositions["endOfPiece"], 5, 28 );
         }
 
-        private VoiceDef GetF1FinalePart1(PaletteDef f1FinalePalette1, ExpansionKrystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
+        private VoiceDef GetF1FinalePart1(PaletteDef f1FinalePalette1, Krystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
         {
             VoiceDef f1FinalePart1 = new VoiceDef(f1FinalePalette1, krystal);
 
@@ -152,7 +150,7 @@ namespace Moritz.AssistantComposer
             return strandDurations;
         }
 
-        private VoiceDef GetF1FinalePart2(PaletteDef f1FinalePalette2, ExpansionKrystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
+        private VoiceDef GetF1FinalePart2(PaletteDef f1FinalePalette2, Krystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
         {
             VoiceDef f1FinalePart2 = new VoiceDef(f1FinalePalette2, krystal);
 
@@ -181,7 +179,7 @@ namespace Moritz.AssistantComposer
             return f1FinalePart2;
         }
 
-        private VoiceDef GetF1Postlude(PaletteDef f1PostludePalette, ExpansionKrystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
+        private VoiceDef GetF1Postlude(PaletteDef f1PostludePalette, Krystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
         {
             VoiceDef f1p = new VoiceDef(f1PostludePalette, krystal);
 
