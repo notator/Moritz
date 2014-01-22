@@ -15,6 +15,11 @@
         {
             if(disposing && (components != null))
             {
+                _borderPen.Dispose();
+                _selectedBorderPen.Dispose();
+                _unselectedBorderPen.Dispose();
+                _backBuffer.Dispose();
+
                 components.Dispose();
             }
             base.Dispose(disposing);

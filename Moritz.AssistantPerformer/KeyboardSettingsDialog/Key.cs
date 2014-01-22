@@ -34,7 +34,20 @@ namespace Moritz.AssistantPerformer
         {
             if(disposing && (components != null))
             {
+                _silentBlackKeyBrush.Dispose();
+                _solo_AssistantDeaf_BlackKeyBrush.Dispose();
+                _solo_AssistantHearsFirst_BlackKeyBrush.Dispose();
+                _unselectedBorderPen.Dispose();
+                _solo_AssistantHearsFirst_WhiteKeyBrush.Dispose();
+                _solo_AssistantDeaf_WhiteKeyBrush.Dispose();
+                _silentWhiteKeyBrush.Dispose();
+                _selectedBorderPen.Dispose();
+                _assistedWhiteKeyBrush.Dispose();
+                _assistedBlackKeyBrush.Dispose();
+
                 components.Dispose();
+
+
             }
             base.Dispose(disposing);
         }
