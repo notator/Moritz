@@ -47,8 +47,6 @@ namespace Moritz.AssistantComposer
 
             AlignObjectAtIndex(11, 12, 13, clytemnestra[123].MsPosition);
             AlignObjectAtIndex(21, 22, 23, clytemnestra[168].MsPosition);
-
-            TransposeNotation(24);
         }
 
         #region finale

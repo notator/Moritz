@@ -216,8 +216,6 @@ namespace Moritz.AssistantComposer
 
             VoiceDef finale = GetFinaleSections(finalePart1, finalePart2, postlude, 77, 206);
 
-            finale.TransposeNotation(-36);
-
             Cleanup(finale, msPositions["endOfPiece"]);
 
             return finale;

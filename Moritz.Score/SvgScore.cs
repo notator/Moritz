@@ -808,11 +808,60 @@ namespace Moritz.Score
 
             ReplaceConsecutiveRestsInBars(_pageFormat.MinimumCrotchetDuration);
             SetSystemsToBeginAtBars(_pageFormat.SystemStartBars);
+            MoveRestClefChangesToEndsOfSystems();
 
             FinalizeAccidentals();
             AddBarlineAtStartOfEachSystem();
             AddBarNumbers();
             SetStaffNames();
+        }
+
+        /// <summary>
+        /// If small ClefSigns have no following chord in their voice, they are moved before the final barline.
+        /// </summary>
+        private void MoveRestClefChangesToEndsOfSystems()
+        {
+            foreach(SvgSystem system in Systems)
+            {
+                foreach(Voice voice in system.Voices)
+                {
+                    MoveRestClefChangesToEndOfVoice(voice);
+                }
+            }
+        }
+
+        /// <summary>
+        /// If a small ClefSign has no following chord in the voice, it is moved before the final barline.
+        /// </summary>
+        private void MoveRestClefChangesToEndOfVoice(Voice voice)
+        {
+            bool restFound = false;
+            ClefSign smallClef = null;
+            int smallClefIndex = -1;
+            for(int i = voice.NoteObjects.Count - 1; i >= 0; --i)
+            {
+                if(voice.NoteObjects[i] is ChordSymbol)
+                {
+                    break;
+                }
+                if(voice.NoteObjects[i] is RestSymbol)
+                {
+                    restFound = true;
+                }
+                ClefSign clef = voice.NoteObjects[i] as ClefSign;
+                if(clef != null && clef.FontHeight == _pageFormat.CautionaryNoteheadsFontHeight)
+                {
+                    smallClef = clef;
+                    smallClefIndex = i;
+                    break;
+                }
+            }
+            if(restFound && (smallClef != null))
+            {
+                voice.NoteObjects.RemoveAt(smallClefIndex);
+                Debug.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline);
+                voice.NoteObjects.Insert(voice.NoteObjects.Count - 1, smallClef);
+            }
         }
 
         protected void CreatePages()

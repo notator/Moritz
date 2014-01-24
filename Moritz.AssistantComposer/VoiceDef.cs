@@ -1325,6 +1325,36 @@ namespace Moritz.AssistantComposer
         #endregion private
 
         /// <summary>
+        /// For an example of using this function, see SongSixAlgorithm.cs
+        /// Note that clef changes must be inserted backwards per voiceDef, so that the IUniqueMidiDurationDef
+        /// indices are correct. Inserting a clef change changes the subsequent indices.
+        /// Note also that if a ClefChange is defined on a UniqueMidiRestDef which has no UniqueMidiChordDef
+        /// to its right on the staff, the resulting ClefSign will be moved to the left of the final barline
+        /// on the staff.
+        /// The clefType must be one of the following strings "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"
+        /// </summary>
+        internal void InsertClefChange(int index, string clefType)
+        {
+            #region check args
+            Debug.Assert(index < _uniqueMidiDurationDefs.Count); 
+            if(String.Equals(clefType, "t") == false
+            && String.Equals(clefType, "t1") == false
+            && String.Equals(clefType, "t2") == false
+            && String.Equals(clefType, "t3") == false
+            && String.Equals(clefType, "b") == false
+            && String.Equals(clefType, "b1") == false
+            && String.Equals(clefType, "b2") == false
+            && String.Equals(clefType, "b3") == false)
+            {
+                Debug.Assert(false, "Unknown clef type.");
+            }
+            #endregion
+
+            UniqueClefChangeDef clefChangeDef = new UniqueClefChangeDef(clefType, _uniqueMidiDurationDefs[index]);
+            _uniqueMidiDurationDefs.Insert(index, clefChangeDef);
+        }
+
+        /// <summary>
         /// Transposes all the MidiHeadSymbols in this VoiceDef by the number of semitones in the argument
         /// without changing the sound. Negative arguments transpose downwards.
         /// If the resulting midiHeadSymbol would be less than 0 or greater than 127,

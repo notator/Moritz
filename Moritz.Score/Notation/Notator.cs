@@ -101,10 +101,24 @@ namespace Moritz.Score.Notation
                         bool firstLmdd = true;
                         foreach(IUniqueMidiDurationDef iumdd in voice.UniqueMidiDurationDefs)
                         {
-                            DurationSymbol durationSymbol =
-                                SymbolSet.GetDurationSymbol(voice, iumdd, firstLmdd, ref currentChannelVelocities[staffIndex]);
+                            UniqueClefChangeDef uClefChangeDef = iumdd as UniqueClefChangeDef;
+                            if(uClefChangeDef != null)
+                            {
+                                // Note that a clef change CAN be the same as the existing clef,
+                                // since an earlier clef change may be inserted later.
+                                //Debug.Assert(!(String.Equals(_pageFormat.ClefsList[staffIndex], uClefChangeDef.Type)));
+                                Debug.Assert(!firstLmdd);
+                                _pageFormat.ClefsList[staffIndex] = uClefChangeDef.Type;
+                                ClefSign smallClefSign = new ClefSign(voice, uClefChangeDef.Type, _pageFormat.CautionaryNoteheadsFontHeight);
+                                voice.NoteObjects.Add(smallClefSign);
+                            }
+                            else
+                            {
+                                DurationSymbol durationSymbol =
+                                    SymbolSet.GetDurationSymbol(voice, iumdd, firstLmdd, ref currentChannelVelocities[staffIndex]);
 
-                            voice.NoteObjects.Add(durationSymbol);
+                                voice.NoteObjects.Add(durationSymbol);
+                            }
                             firstLmdd = false;
                         }
                     }

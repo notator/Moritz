@@ -66,8 +66,17 @@ namespace Moritz.Score.Midi
 
         public List<byte> PanMsbs { get { return new List<byte>(); } set { } }
 
-        public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
-        private int? _msDurationToNextBarline = null;
+        /// <summary>
+        /// This field is set if a chord crosses a barline. Rests never cross barlines, they are always split.
+        /// </summary>
+        public int? MsDurationToNextBarline 
+        { 
+            get { return null; } 
+            set 
+            {
+                Debug.Assert(false, "rests never cross barlines, so this field should never be set.");
+            } 
+        }
 
         public new int MsDuration { get { return _msDuration; } set { _msDuration = value; } }
 

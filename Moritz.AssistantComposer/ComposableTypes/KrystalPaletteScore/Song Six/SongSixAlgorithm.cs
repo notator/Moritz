@@ -10,7 +10,7 @@ namespace Moritz.AssistantComposer
 {
     /// <summary>
     /// The Algorithm for Song 6.
-    /// This will develope as composition progresses...
+    /// This will develop as composition progresses...
     /// </summary>
     internal partial class SongSixAlgorithm : MidiCompositionAlgorithm
     {
@@ -138,11 +138,35 @@ namespace Moritz.AssistantComposer
             //********************************************************
 
             List<int> barlineMsPositions = GetBarlineMsPositions(control, furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
+            InsertClefChanges(furies1, furies2, furies3, furies4);
             // this system contains one Voice per channel (not divided into bars)
             List<Voice> system = GetVoices(voiceDefs);
+
             List<List<Voice>> bars = GetBars(system, barlineMsPositions);
 
             return bars;
+        }
+
+        private void InsertClefChanges(Furies1 furies1, Furies2 furies2, Furies3 furies3, Furies4 furies4)
+        {
+            // Note that clef changes must be inserted backwards per voiceDef,
+            // so that IUniqueMidiDurationDef indices are correct.
+            // Inserting a clef change changes the indices.
+
+            // Note also that if a ClefChange is defined here on a UniqueMidiRestDef which has no
+            // UniqueMidiChordDef to its right on the staff, the resulting ClefSign will be
+            // placed immediately before the final barline on the staff.
+
+            furies1.InsertClefChange(24, "t1"); // bar 60
+
+            furies2.InsertClefChange(57, "t1"); // bar 60
+
+            furies3.InsertClefChange(146, "t1"); // bar 60 
+            furies3.InsertClefChange(131, "b");  // bar 44 
+            furies3.InsertClefChange(114, "b1"); // bar 43
+            furies3.InsertClefChange(112, "b");  // bar 43
+
+            furies4.InsertClefChange(59, "b1"); // bar 104
         }
 
         private void AdjustFinalWindChordPosition(VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
@@ -171,8 +195,6 @@ namespace Moritz.AssistantComposer
             wind2.AdjustVelocitiesHairpin(beginPostludeIndex, wind2.Count, 2.3);
             wind3.AdjustVelocitiesHairpin(beginPostludeIndex, wind3.Count, 2.3);
         }
-
-
 
         private void AdjustWindPitchWheelDeviations(VoiceDef wind)
         {

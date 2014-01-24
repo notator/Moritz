@@ -89,6 +89,7 @@ namespace Moritz.AssistantComposer
         /// start of the voice.UniqueMidiDurationDefs in the second bar. A LocalizedCautionaryChordDef
         /// object is a kind of chord which is used while justifying systems, but is not displayed and
         /// does not affect performance.
+        /// ClefChangeDefs are placed at the end of the first bar, not at the start of the second bar.
         /// </summary>
         protected List<List<Voice>> SplitBar(List<Voice> originalBar, int absoluteSplitPos)
         {
@@ -111,15 +112,21 @@ namespace Moritz.AssistantComposer
                 secondBar.Add(secondBarVoice);
                 foreach(IUniqueMidiDurationDef iumdd in voice.UniqueMidiDurationDefs)
                 {
-                    int lmddMsDuration = (iumdd.MsDurationToNextBarline == null) ? iumdd.MsDuration : (int) iumdd.MsDurationToNextBarline;
+                    int lmddMsDuration = (iumdd.MsDurationToNextBarline == null) ? iumdd.MsDuration : (int)iumdd.MsDurationToNextBarline;
                     int lmddEndPos = iumdd.MsPosition + lmddMsDuration;
                     if(iumdd.MsPosition >= absoluteSplitPos)
                     {
-                        Debug.Assert(lmddEndPos <= originalBarEndPos);
-                        secondBarVoice.UniqueMidiDurationDefs.Add(iumdd);
+                        if(iumdd.MsPosition == absoluteSplitPos && iumdd is UniqueClefChangeDef)
+                        {
+                            firstBarVoice.UniqueMidiDurationDefs.Add(iumdd);
+                        }
+                        else
+                        {
+                            Debug.Assert(lmddEndPos <= originalBarEndPos);
+                            secondBarVoice.UniqueMidiDurationDefs.Add(iumdd);
+                        }
                     }
-                    else
-                    if(lmddEndPos > absoluteSplitPos)
+                    else if(lmddEndPos > absoluteSplitPos)
                     {
                         int durationAfterBarline = lmddEndPos - absoluteSplitPos;
                         if(iumdd is UniqueMidiRestDef)
@@ -148,7 +155,7 @@ namespace Moritz.AssistantComposer
                             iumdd.MsDurationToNextBarline = absoluteSplitPos - iumdd.MsPosition;
                             firstBarVoice.UniqueMidiDurationDefs.Add(iumdd);
 
-                            UniqueCautionaryChordDef secondLmdd = new UniqueCautionaryChordDef( iumdd as MidiChordDef, absoluteSplitPos, durationAfterBarline);
+                            UniqueCautionaryChordDef secondLmdd = new UniqueCautionaryChordDef(iumdd as MidiChordDef, absoluteSplitPos, durationAfterBarline);
                             secondBarVoice.UniqueMidiDurationDefs.Add(secondLmdd);
                         }
 
@@ -162,7 +169,6 @@ namespace Moritz.AssistantComposer
             }
             return twoBars;
         }
-
 
         /// <summary>
         /// There is currently still one bar per system.

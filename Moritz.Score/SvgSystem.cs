@@ -494,7 +494,7 @@ namespace Moritz.Score
         /// <typeparam name="Type">DurationSymbol, ChordSymbol, RestSymbol</typeparam>
         private List<NoteObjectMoment> MomentSymbols()
         {
-            int finalBarlineMsPosition = FinalBarlineMsPosition(this.Staves[0].Voices[0]);
+            int finalBarlineMsPosition = FinalBarlineMsPosition();
 
             SortedDictionary<int, NoteObjectMoment> dict = new SortedDictionary<int, NoteObjectMoment>();
             Barline barline = null;
@@ -572,33 +572,49 @@ namespace Moritz.Score
             return momentSymbols;
         }
 
-        private int FinalBarlineMsPosition(Voice voice)
+        private int FinalBarlineMsPosition()
         {
-            Debug.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline);
-            
-            int finalBarlineMsPosition = 0;
-            DurationSymbol lastDurationSymbol = voice.NoteObjects[voice.NoteObjects.Count -2] as DurationSymbol;
+            int finalBarlineMsPosition = -1;
+            SvgScore score = this.Score;
+            int thisSystemIndex = -1;
+            for(int i = 0; i < score.Systems.Count; ++i)
+            {
+                if(score.Systems[i] == this)
+                {
+                    thisSystemIndex = i;
+                }
+            }
 
-            Debug.Assert(lastDurationSymbol != null);
- 
-            CautionaryChordSymbol cautionaryChordSymbol = lastDurationSymbol as CautionaryChordSymbol;
-            if(cautionaryChordSymbol != null)
+            Debug.Assert(thisSystemIndex >= 0);
+            if(thisSystemIndex < (score.Systems.Count - 1))
             {
-                finalBarlineMsPosition =
-                        cautionaryChordSymbol.MsPosition + (int)cautionaryChordSymbol.UniqueMidiChordDef.MsDuration;
-            }
-            else // ordinary ChordSymbol or RestSymbol
-            {
-                ChordSymbol chordSymbol = lastDurationSymbol as ChordSymbol;
-                if(chordSymbol != null && chordSymbol.UniqueMidiChordDef.MsDurationToNextBarline != null)
+                int nextSystemIndex = thisSystemIndex + 1;
+                Voice topVoiceInNextSystem = Score.Systems[nextSystemIndex].Staves[0].Voices[0];
+                foreach(NoteObject noteObject in topVoiceInNextSystem.NoteObjects)
                 {
-                    finalBarlineMsPosition = chordSymbol.MsPosition + (int)(chordSymbol.UniqueMidiChordDef.MsDurationToNextBarline);
-                }
-                else
-                {
-                    finalBarlineMsPosition = lastDurationSymbol.MsPosition + lastDurationSymbol.MsDuration;
+                    DurationSymbol durationSymbol = noteObject as DurationSymbol;
+                    if(durationSymbol != null)
+                    {
+                        finalBarlineMsPosition = durationSymbol.MsPosition;
+                        break;
+                    }
                 }
             }
+            else
+            {   // the final system
+                List<NoteObject> noteObjects = this.Staves[0].Voices[0].NoteObjects;
+                for(int i = noteObjects.Count - 1; i >= 0; --i)
+                {
+                    DurationSymbol durationSymbol = noteObjects[i] as DurationSymbol;
+                    if(durationSymbol != null)
+                    {
+                        finalBarlineMsPosition = durationSymbol.MsPosition + durationSymbol.MsDuration;
+                        break;
+                    }
+                }
+            }
+
+            Debug.Assert(finalBarlineMsPosition > 0);
 
             return finalBarlineMsPosition;
         }
@@ -638,7 +654,13 @@ namespace Moritz.Score
                         }
                         clef = null;
                         barline = null;
+                        durationSymbol = null;
                     }
+                    else if(barline != null && clef != null)
+                    {
+                        clef.Metrics.Move(barline.Metrics.OriginX - clef.Metrics.Right - hairline, 0F); // clefs have a space on the right
+                    }
+
                 }
             }
         }

@@ -20,7 +20,6 @@ namespace Moritz.AssistantComposer
         {
             GetFuries2Interlude2(clytemnestra, wind1, furies3);
             AddFuries2ChirpsForInterlude2AndVerse3(clytemnestra, wind1, _paletteDefs[7]);
-            TransposeNotation(12);
         }
         /// <summary>
         /// Steals the ticks from furies 3, then agglommerates the remaining rests in furies3...
@@ -139,8 +138,6 @@ namespace Moritz.AssistantComposer
             Transform(postlude, msPositions, strandIndices);
 
             VoiceDef finale = GetFinaleSections(finalePart1, finalePart2, postlude, 71, 175);
-
-            finale.TransposeNotation(-12);
 
             return finale;
 
