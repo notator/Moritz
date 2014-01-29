@@ -1326,11 +1326,15 @@ namespace Moritz.AssistantComposer
 
         /// <summary>
         /// For an example of using this function, see SongSixAlgorithm.cs
-        /// Note that clef changes must be inserted backwards per voiceDef, so that the IUniqueMidiDurationDef
+        /// Note that clef changes must be inserted backwards per voiceDef, so that IUniqueMidiDurationDef
         /// indices are correct. Inserting a clef change changes the subsequent indices.
-        /// Note also that if a ClefChange is defined on a UniqueMidiRestDef which has no UniqueMidiChordDef
-        /// to its right on the staff, the resulting ClefSign will be moved to the left of the final barline
+        /// Note also that if a ClefChange is defined here on a UniqueMidiRestDef which has no UniqueMidiChordDef
+        /// to its right on the staff, the resulting ClefSymbol will be placed immediately before the final barline
         /// on the staff.
+        /// ClefChanges which would happen at the beginning of a staff are moved to the end of the equivalent staff
+        /// in the previous system.
+        /// A ClefChange defined here on a UniqueMidiChordDef or UniqueMidiRestDef which is eventually preceded
+        /// by a barline, are placed to the left of the barline.  
         /// The clefType must be one of the following strings "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"
         /// </summary>
         internal void InsertClefChange(int index, string clefType)

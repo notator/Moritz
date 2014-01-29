@@ -48,7 +48,7 @@ namespace Moritz.Score
             DrawObjects.Add(controlText);
         }
 
-        public VerticalDir DefaultStemDirection(ClefSign clef)
+        public VerticalDir DefaultStemDirection(ClefSymbol clef)
         {
             Debug.Assert(this.HeadsTopDown.Count > 0);
             float gap = 32F; // dummy value

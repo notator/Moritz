@@ -612,35 +612,18 @@ namespace Moritz.Score
 
             for(int staffIndex = 0; staffIndex < system2.Staves.Count; staffIndex++)
             {
+                // If a staff has two voices, both contain the same clefTypes (some clefs may be invisible).
+                string clefTypeAtEndOfStaff1 = FindClefTypeAtEndOfStaff1(system1.Staves[staffIndex].Voices[0]);
+
                 for(int voiceIndex = 0; voiceIndex < system2.Staves[staffIndex].Voices.Count; voiceIndex++)
                 {
-                    ClefSign currentSys1Clef = null;
-                    ClefSign previousSys1Clef = null;
-                    ClefSign firstSys2Clef = null;
                     Voice voice1 = system1.Staves[staffIndex].Voices[voiceIndex];
                     Voice voice2 = system2.Staves[staffIndex].Voices[voiceIndex];
-                    #region find currentSys1Clef
-                    foreach(NoteObject noteObject in voice1.NoteObjects)
-                    {
-                        ClefSign clef = noteObject as ClefSign;
-                        if(clef != null)
-                        {
-                            previousSys1Clef = currentSys1Clef;
-                            currentSys1Clef = clef;
-                        }
-                    }
-                    if(currentSys1Clef != null && currentSys1Clef == voice1.NoteObjects[voice1.NoteObjects.Count - 1])
-                    {
-                        voice1.NoteObjects.Remove(currentSys1Clef);
-                        currentSys1Clef = previousSys1Clef;
-                    }
-                    #endregion
-                    firstSys2Clef = voice2.NoteObjects[0] as ClefSign;
-                    if(currentSys1Clef != null && firstSys2Clef != null
-                        && currentSys1Clef.ClefName == firstSys2Clef.ClefName)
-                    {
-                        voice2.NoteObjects.Remove(firstSys2Clef);
-                    }
+                    ClefSymbol voice2FirstClef = voice2.NoteObjects[0] as ClefSymbol;
+
+                    Debug.Assert(voice2FirstClef != null && clefTypeAtEndOfStaff1 == voice2FirstClef.ClefType);
+
+                    voice2.NoteObjects.Remove(voice2FirstClef);
 
                     try
                     {
@@ -653,9 +636,27 @@ namespace Moritz.Score
                 }
             }
             Systems.Remove(system2);
-            // system2.Dispose() would be a good idea here...
             system2 = null;
         }
+
+        private string FindClefTypeAtEndOfStaff1(Voice staff1voice0)
+        {
+            ClefSymbol mainStaff1Clef = staff1voice0.NoteObjects[0] as ClefSymbol;
+            Debug.Assert(mainStaff1Clef != null);
+
+            string clefTypeAtEndOfStaff1 = mainStaff1Clef.ClefType;
+            foreach(NoteObject noteObject in staff1voice0.NoteObjects)
+            {
+                ClefChangeSymbol ccs = noteObject as ClefChangeSymbol;
+                if(ccs != null)
+                {
+                    clefTypeAtEndOfStaff1 = ccs.ClefType;
+                }
+
+            }
+            return clefTypeAtEndOfStaff1;
+        }
+
         private void DoJoinSystems(List<int> systemIndices)
         {
             for(int i = 0; i < systemIndices.Count; i++)
@@ -808,6 +809,7 @@ namespace Moritz.Score
 
             ReplaceConsecutiveRestsInBars(_pageFormat.MinimumCrotchetDuration);
             SetSystemsToBeginAtBars(_pageFormat.SystemStartBars);
+
             MoveRestClefChangesToEndsOfSystems();
 
             FinalizeAccidentals();
@@ -831,12 +833,12 @@ namespace Moritz.Score
         }
 
         /// <summary>
-        /// If a small ClefSign has no following chord in the voice, it is moved before the final barline.
+        /// If a small ClefSymbol has no following chord in the voice, it is moved before the final barline.
         /// </summary>
         private void MoveRestClefChangesToEndOfVoice(Voice voice)
         {
             bool restFound = false;
-            ClefSign smallClef = null;
+            ClefSymbol smallClef = null;
             int smallClefIndex = -1;
             for(int i = voice.NoteObjects.Count - 1; i >= 0; --i)
             {
@@ -848,7 +850,7 @@ namespace Moritz.Score
                 {
                     restFound = true;
                 }
-                ClefSign clef = voice.NoteObjects[i] as ClefSign;
+                ClefSymbol clef = voice.NoteObjects[i] as ClefSymbol;
                 if(clef != null && clef.FontHeight == _pageFormat.CautionaryNoteheadsFontHeight)
                 {
                     smallClef = clef;
@@ -1014,7 +1016,7 @@ namespace Moritz.Score
                 {
                     foreach(Voice voice in staff.Voices)
                     {
-                        if(voice.NoteObjects[0] is ClefSign)
+                        if(voice.NoteObjects[0] is ClefSymbol)
                         {
                             voice.NoteObjects.Insert(1, new Barline(voice));
                         }

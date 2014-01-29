@@ -144,7 +144,7 @@ namespace Moritz.Score.Notation
             return returnMetrics;
         }
 
-        public override DurationSymbol GetDurationSymbol(Voice voice, IUniqueMidiDurationDef iumdd, bool firstLmddInVoice,
+        public override NoteObject GetNoteObject(Voice voice, IUniqueMidiDurationDef iumdd, bool firstLmddInVoice,
             ref byte currentVelocity)
         {
             DurationSymbol durationSymbol = null;

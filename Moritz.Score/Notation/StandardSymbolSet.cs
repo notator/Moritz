@@ -266,7 +266,7 @@ namespace Moritz.Score.Notation
         public override Metrics NoteObjectMetrics(Graphics graphics, NoteObject noteObject, VerticalDir voiceStemDirection, float gap, float strokeWidth)
         {
             Metrics returnMetrics = null;
-            ClefSign clef = noteObject as ClefSign;
+            ClefSymbol clef = noteObject as ClefSymbol;
             Barline barline = noteObject as Barline;
             CautionaryChordSymbol cautionaryChordSymbol = noteObject as CautionaryChordSymbol;
             ChordSymbol chord = noteObject as ChordSymbol;
@@ -277,8 +277,8 @@ namespace Moritz.Score.Notation
             }
             else if(clef != null)
             {
-                if(clef.ClefName != "n")
-                    returnMetrics = new ClefMetrics(clef, gap);
+                if(clef.ClefType != "n")
+                    returnMetrics = new ClefMetrics(clef, gap);                    
             }
             else if(cautionaryChordSymbol != null)
             {
@@ -298,12 +298,14 @@ namespace Moritz.Score.Notation
             return returnMetrics;
         }
 
-        public override DurationSymbol GetDurationSymbol(Voice voice, IUniqueMidiDurationDef iumdd, bool firstLmddInVoice,
+        public override NoteObject GetNoteObject(Voice voice, IUniqueMidiDurationDef iumdd, bool firstLmddInVoice,
             ref byte currentVelocity)
         {
-            DurationSymbol durationSymbol = null;
+            NoteObject noteObject = null;
             UniqueCautionaryChordDef lccd = iumdd as UniqueCautionaryChordDef;
             UniqueMidiChordDef uniqueMidiChordDef = iumdd as UniqueMidiChordDef;
+            UniqueMidiRestDef uniqueMidiRestDef = iumdd as UniqueMidiRestDef;
+            UniqueClefChangeDef uniqueClefChangeDef = iumdd as UniqueClefChangeDef;
 
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
             float musicFontHeight = pageFormat.MusicFontHeight;
@@ -313,7 +315,7 @@ namespace Moritz.Score.Notation
             if(lccd != null && firstLmddInVoice)
             {
                 CautionaryChordSymbol cautionaryChordSymbol = new CautionaryChordSymbol(voice, lccd, cautionaryFontHeight);
-                durationSymbol = cautionaryChordSymbol;
+                noteObject = cautionaryChordSymbol;
             } 
             else if(uniqueMidiChordDef != null)
             {
@@ -324,15 +326,20 @@ namespace Moritz.Score.Notation
                     chordSymbol.AddDynamic(uniqueMidiChordDef.MidiVelocity, currentVelocity);
                     currentVelocity = uniqueMidiChordDef.MidiVelocity;
                 }
-                durationSymbol = chordSymbol;
+                noteObject = chordSymbol;
             }
-            else
+            else if(uniqueMidiRestDef != null)
             {
                 RestSymbol restSymbol = new RestSymbol(voice, iumdd, minimumCrotchetDuration, musicFontHeight);
-                durationSymbol = restSymbol;
+                noteObject = restSymbol;
+            }
+            else if(uniqueClefChangeDef != null)
+            {
+                ClefChangeSymbol clefChangeSymbol = new ClefChangeSymbol(voice, uniqueClefChangeDef.ClefType, cautionaryFontHeight, iumdd.MsPosition);
+                noteObject = clefChangeSymbol;
             }
 
-            return durationSymbol;
+            return noteObject;
         }
 
         public void ForceNaturalsInSynchronousChords(Staff staff)
@@ -449,14 +456,14 @@ namespace Moritz.Score.Notation
             foreach(Voice voice in staff.Voices)
             {
                 List<NoteObject> noteObjects = voice.NoteObjects;
-                ClefSign firstClef = null;
+                ClefSymbol firstClef = null;
                 CautionaryChordSymbol cautionaryChordSymbol = null;
                 ChordSymbol firstChord = null;
                 RestSymbol firstRest = null;
                 for(int index = 0; index < noteObjects.Count; ++index)
                 {
                     if(firstClef == null)
-                        firstClef = noteObjects[index] as ClefSign;
+                        firstClef = noteObjects[index] as ClefSymbol;
                     if(cautionaryChordSymbol == null)
                         cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
                     if(firstChord == null)

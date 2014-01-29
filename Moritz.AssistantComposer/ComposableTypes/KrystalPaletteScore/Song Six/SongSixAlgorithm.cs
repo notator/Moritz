@@ -131,14 +131,16 @@ namespace Moritz.AssistantComposer
             Debug.Assert(voiceDefs.Count == MidiChannels().Count);
 
             //********************************************************
-            //foreach(VoiceDef voiceDef in voiceDefs)
-            //{
-            //    voiceDef.SetLyricsToIndex();
-            //}
+            foreach(VoiceDef voiceDef in voiceDefs)
+            {
+                voiceDef.SetLyricsToIndex();
+            }
             //********************************************************
 
             List<int> barlineMsPositions = GetBarlineMsPositions(control, furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
+
             InsertClefChanges(furies1, furies2, furies3, furies4);
+            
             // this system contains one Voice per channel (not divided into bars)
             List<Voice> system = GetVoices(voiceDefs);
 
@@ -147,16 +149,19 @@ namespace Moritz.AssistantComposer
             return bars;
         }
 
+        /// <summary>
+        /// Note that clef changes must be inserted backwards per voiceDef, so that IUniqueMidiDurationDef
+        /// indices are correct. Inserting a clef change changes the indices.
+        /// Note also that if a ClefChange is defined here on a UniqueMidiRestDef which has no UniqueMidiChordDef
+        /// to its right on the staff, the resulting ClefSymbol will be placed immediately before the final barline
+        /// on the staff.
+        /// ClefChanges which would happen at the beginning of a staff are written as cautionary clefs on the
+        /// equivalent staff in the previous system.
+        /// A ClefChange defined here on a UniqueMidiChordDef or UniqueMidiRestDef which is eventually preceded
+        /// by a barline, are placed to the left of the barline. 
+        /// </summary>
         private void InsertClefChanges(Furies1 furies1, Furies2 furies2, Furies3 furies3, Furies4 furies4)
         {
-            // Note that clef changes must be inserted backwards per voiceDef,
-            // so that IUniqueMidiDurationDef indices are correct.
-            // Inserting a clef change changes the indices.
-
-            // Note also that if a ClefChange is defined here on a UniqueMidiRestDef which has no
-            // UniqueMidiChordDef to its right on the staff, the resulting ClefSign will be
-            // placed immediately before the final barline on the staff.
-
             furies1.InsertClefChange(24, "t1"); // bar 60
 
             furies2.InsertClefChange(57, "t1"); // bar 60

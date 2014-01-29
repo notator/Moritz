@@ -498,14 +498,14 @@ namespace Moritz.Score
 
             SortedDictionary<int, NoteObjectMoment> dict = new SortedDictionary<int, NoteObjectMoment>();
             Barline barline = null;
-            ClefSign clef = null;
+            ClefSymbol clef = null;
             foreach(Voice voice in this.Voices)
             {
                 #region foreach noteObject
                 foreach(NoteObject noteObject in voice.NoteObjects)
                 {
-                    if(noteObject is ClefSign)
-                        clef = noteObject as ClefSign;
+                    if(noteObject is ClefSymbol)
+                        clef = noteObject as ClefSymbol;
                     if(noteObject is Barline)
                         barline = noteObject as Barline;
                     DurationSymbol durationSymbol = noteObject as DurationSymbol;
@@ -624,15 +624,15 @@ namespace Moritz.Score
         /// </summary>
         private void MoveClefsAndBarlines(float hairline)
         {
-            ClefSign clef = null;
+            ClefSymbol clef = null;
             Barline barline = null;
 
             foreach(Voice voice in Voices)
             {
                 foreach(NoteObject noteObject in voice.NoteObjects)
                 {
-                    if(noteObject is ClefSign)
-                        clef = noteObject as ClefSign;
+                    if(noteObject is ClefSymbol)
+                        clef = noteObject as ClefSymbol;
                     if(noteObject is Barline)
                         barline = noteObject as Barline;
                     DurationSymbol durationSymbol = noteObject as DurationSymbol;

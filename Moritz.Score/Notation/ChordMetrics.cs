@@ -68,13 +68,17 @@ namespace Moritz.Score.Notation
 
         private void GetStaffParameters(NoteObject rootObject)
         {
-            Voice voice0 = rootObject.Voice.Staff.Voices[0];
-            _staffOriginY = voice0.Staff.Metrics.StafflinesTop;
+            // If a staff has two voices, both should contain the same clefs.
+            // The clefs are, however, different objects in the two voices:
+            // clef.IsVisible may be true in one voice and false in the other one.
 
-            _nStafflines = voice0.Staff.NumberOfStafflines;
-            foreach(NoteObject noteObject in voice0.NoteObjects)
+            Voice voice = rootObject.Voice;
+            _staffOriginY = voice.Staff.Metrics.StafflinesTop;
+
+            _nStafflines = voice.Staff.NumberOfStafflines;
+            foreach(NoteObject noteObject in voice.NoteObjects)
             {
-                ClefSign cs = noteObject as ClefSign;
+                ClefSymbol cs = noteObject as ClefSymbol; 
                 if(cs != null)
                     _clef = cs;
                 if(noteObject == rootObject)
@@ -2103,7 +2107,7 @@ namespace Moritz.Score.Notation
         private readonly float _gap = 0F;
         private int _nStafflines = 0;
         private float _staffOriginY = 0;
-        private ClefSign _clef = null;
+        private ClefSymbol _clef = null;
 
         private StemMetrics _stemMetrics = null;
         private FlagsBlockMetrics _flagsBlockMetrics = null;

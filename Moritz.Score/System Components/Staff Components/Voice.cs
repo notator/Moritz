@@ -159,7 +159,7 @@ namespace Moritz.Score
         public void SetChordStemDirectionsAndCreateBeamBlocks(float beamThickness, float beamStrokeThickness, bool beamsCrossBarlines)
         {
             List<ChordSymbol> chordsBeamedTogether = new List<ChordSymbol>();
-            ClefSign currentClef = null;
+            ClefSymbol currentClef = null;
             bool breakGroup = false;
             ChordSymbol lastChord = null;
             foreach(ChordSymbol cs in ChordSymbols)
@@ -170,7 +170,7 @@ namespace Moritz.Score
                 CautionaryChordSymbol cautionaryChord = noteObject as CautionaryChordSymbol;
                 ChordSymbol chord = noteObject as ChordSymbol;
                 RestSymbol rest = noteObject as RestSymbol;
-                ClefSign clef = noteObject as ClefSign;
+                ClefSymbol clef = noteObject as ClefSymbol;
                 Barline barline = noteObject as Barline;
 
                 if(cautionaryChord != null)

@@ -959,7 +959,7 @@ namespace Moritz.Score.Notation
 
     internal class ClefMetrics : Metrics // defined objects in SVG
     {
-        public ClefMetrics(ClefSign clef, float gap)
+        public ClefMetrics(ClefSymbol clef, float gap)
             : base()
         {
             float trebleTop = -4.35F * gap;
@@ -967,7 +967,7 @@ namespace Moritz.Score.Notation
             float highTrebleTop = -5.9F * gap;
             float trebleBottom = 2.7F * gap;
             #region treble clefs
-            switch(clef.ClefName)
+            switch(clef.ClefType)
             {
                 case "t":
                     _ID_Type = "trebleClef";
@@ -1010,7 +1010,7 @@ namespace Moritz.Score.Notation
                 float bassBottom = gap * 3F;
                 float lowBassBottom = gap * 4.5F;
                 #region bass clefs
-                switch(clef.ClefName)
+                switch(clef.ClefType)
                 {
                     case "b":
                         _ID_Type = "bassClef";

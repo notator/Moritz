@@ -147,7 +147,7 @@ namespace Moritz.Score.Notation
                 {
                     Study2b2ChordSymbol study2b2ChordSymbol = noteObject as Study2b2ChordSymbol;
                     ChordSymbol chordSymbol = noteObject as ChordSymbol;
-                    ClefSign clef = noteObject as ClefSign;
+                    ClefSymbol clef = noteObject as ClefSymbol;
                     if(study2b2ChordSymbol != null)
                     {
                         Add(study2b2ChordSymbol.Metrics);
@@ -156,7 +156,7 @@ namespace Moritz.Score.Notation
                     {
                         chordSymbol.ChordMetrics.AddToEdge(this);
                     }
-                    else if(clef != null && clef.ClefName != "n")
+                    else if(clef != null && clef.ClefType != "n")
                     {
                         Add(clef.Metrics);
                     }

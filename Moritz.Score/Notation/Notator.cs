@@ -81,54 +81,259 @@ namespace Moritz.Score.Notation
                 }
             }
         }
+
         public void AddSymbolsToSystems(List<SvgSystem> systems)
         {
             byte[] currentChannelVelocities = new byte[systems[0].Staves.Count];
-            int minimumQuaverDuration = _pageFormat.MinimumCrotchetDuration / 2; 
+
+            List<UniqueClefChangeDef> voice0ClefChangeDefs = new List<UniqueClefChangeDef>();
+            List<UniqueClefChangeDef> voice1ClefChangeDefs = new List<UniqueClefChangeDef>();
+
             for(int systemIndex = 0; systemIndex < systems.Count; ++systemIndex)
             {
                 SvgSystem system = systems[systemIndex];
                 for(int staffIndex = 0; staffIndex < system.Staves.Count; ++staffIndex)
                 {
                     Staff staff = system.Staves[staffIndex];
-                    foreach(Voice voice in staff.Voices)
-                    {
-                        voice.NoteObjects.Add(new ClefSign(voice, _pageFormat.ClefsList[staffIndex], _pageFormat.MusicFontHeight));
-                    }
+                    voice0ClefChangeDefs.Clear();
+                    voice1ClefChangeDefs.Clear();
                     for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                     {
+                        Debug.Assert(_pageFormat.ClefsList[staffIndex] != null);
                         Voice voice = staff.Voices[voiceIndex];
+                        voice.NoteObjects.Add(new ClefSymbol(voice, _pageFormat.ClefsList[staffIndex], _pageFormat.MusicFontHeight));
                         bool firstLmdd = true;
                         foreach(IUniqueMidiDurationDef iumdd in voice.UniqueMidiDurationDefs)
                         {
-                            UniqueClefChangeDef uClefChangeDef = iumdd as UniqueClefChangeDef;
-                            if(uClefChangeDef != null)
-                            {
-                                // Note that a clef change CAN be the same as the existing clef,
-                                // since an earlier clef change may be inserted later.
-                                //Debug.Assert(!(String.Equals(_pageFormat.ClefsList[staffIndex], uClefChangeDef.Type)));
-                                Debug.Assert(!firstLmdd);
-                                _pageFormat.ClefsList[staffIndex] = uClefChangeDef.Type;
-                                ClefSign smallClefSign = new ClefSign(voice, uClefChangeDef.Type, _pageFormat.CautionaryNoteheadsFontHeight);
-                                voice.NoteObjects.Add(smallClefSign);
-                            }
-                            else
-                            {
-                                DurationSymbol durationSymbol =
-                                    SymbolSet.GetDurationSymbol(voice, iumdd, firstLmdd, ref currentChannelVelocities[staffIndex]);
+                            NoteObject noteObject =
+                                SymbolSet.GetNoteObject(voice, iumdd, firstLmdd, ref currentChannelVelocities[staffIndex]);
 
-                                voice.NoteObjects.Add(durationSymbol);
+                            ClefChangeSymbol clefChangeSymbol = noteObject as ClefChangeSymbol;
+                            if(clefChangeSymbol != null)
+                            {
+                                if(staff.Voices.Count == 2)
+                                {
+                                    if(voiceIndex == 0)
+                                        voice0ClefChangeDefs.Add(iumdd as UniqueClefChangeDef);
+                                    else
+                                        voice1ClefChangeDefs.Add(iumdd as UniqueClefChangeDef);
+                                }
+                                
+                                _pageFormat.ClefsList[staffIndex] = clefChangeSymbol.ClefType;
                             }
+
+                            voice.NoteObjects.Add(noteObject);
+
                             firstLmdd = false;
                         }
                     }
+
                     if(staff.Voices.Count == 2)
                     {
+                        InsertInvisibleClefChangeSymbols(staff.Voices, voice0ClefChangeDefs, voice1ClefChangeDefs);
+
+                        CheckClefTypes(staff.Voices);
+
                         StandardSymbolSet standardSymbolSet = SymbolSet as StandardSymbolSet;
                         if(standardSymbolSet != null)
                             standardSymbolSet.ForceNaturalsInSynchronousChords(staff);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Insert invisible clefChangeSymbols into the other voice.
+        /// ClefChangeSymbols are used by the Notator when deciding how to notate chords.
+        /// </summary>
+        private void InsertInvisibleClefChangeSymbols(List<Voice> voices, List<UniqueClefChangeDef> voice0ClefChangeDefs, List<UniqueClefChangeDef> voice1ClefChangeDefs)
+        {
+            Debug.Assert(voices.Count == 2);
+            if(voice1ClefChangeDefs.Count > 0)
+                InsertInvisibleClefChanges(voices[0], voice1ClefChangeDefs);
+            if(voice0ClefChangeDefs.Count > 0)
+                InsertInvisibleClefChanges(voices[1], voice0ClefChangeDefs);
+        }
+
+        /// <summary>
+        /// Check that both voices really do contain the same clefsTypes.
+        /// This becomes very important later on. It is assumed (e.g.) in
+        ///     SvgScore.JoinToPreviousSystem(int systemIndex)
+        /// and
+        ///     ChordMetrics.GetStaffParameters(NoteObject rootObject) 
+        /// </summary>
+        private void CheckClefTypes(List<Voice> voices)
+        {
+            Debug.Assert(voices.Count == 2);
+            List<ClefSymbol> voice0Clefs = GetClefs(voices[0]);
+            List<ClefSymbol> voice1Clefs = GetClefs(voices[1]);
+            Debug.Assert(voice0Clefs.Count == voice1Clefs.Count);
+            for(int i = 0; i < voice0Clefs.Count; ++i)
+            {
+                Debug.Assert(voice0Clefs[i].ClefType == voice1Clefs[i].ClefType);
+            }
+        }
+
+        private List<ClefSymbol> GetClefs(Voice voice)
+        {
+            List<ClefSymbol> clefs = new List<ClefSymbol>();
+            foreach(NoteObject noteObject in voice.NoteObjects)
+            {
+                ClefSymbol clef = noteObject as ClefSymbol;
+                if(clef != null)
+                    clefs.Add(clef);
+            }
+            return clefs;
+        }
+
+        private void InsertInvisibleClefChanges(Voice voice, List<UniqueClefChangeDef> clefChangeDefs)
+        {
+            foreach(UniqueClefChangeDef ccd in clefChangeDefs)
+            {
+                ClefChangeSymbol invisibleClefChangeSymbol = new ClefChangeSymbol(voice, ccd.ClefType, _pageFormat.CautionaryNoteheadsFontHeight, ccd.MsPosition);
+                invisibleClefChangeSymbol.IsVisible = false;
+                InsertInvisibleClefChangeInNoteObjects(voice, invisibleClefChangeSymbol);
+            }
+        }
+
+        private void InsertInvisibleClefChangeInNoteObjects(Voice voice, ClefChangeSymbol invisibleClefChangeSymbol)
+        {
+            Debug.Assert(!(voice.NoteObjects[voice.NoteObjects.Count-1] is Barline));
+
+            int msPos = invisibleClefChangeSymbol.MsPosition;
+            List<DurationSymbol> durationSymbols = new List<DurationSymbol>();
+            foreach(DurationSymbol durationSymbol in voice.DurationSymbols)
+            {
+                durationSymbols.Add(durationSymbol);
+            }
+
+            Debug.Assert(durationSymbols.Count > 0);
+
+            if(msPos <= durationSymbols[0].MsPosition)
+            {
+                InsertBeforeDS(voice.NoteObjects, durationSymbols[0], invisibleClefChangeSymbol);
+            }
+            else if(msPos > durationSymbols[durationSymbols.Count-1].MsPosition)
+            {
+                // the noteObjects do not yet have a final barline (see Debug.Assert() above)
+                voice.NoteObjects.Add(invisibleClefChangeSymbol);
+            }
+            else
+            {
+                Debug.Assert(durationSymbols.Count > 1);
+                for(int i = 1; i < durationSymbols.Count; ++i)
+                {
+                    if(durationSymbols[i - 1].MsPosition < msPos && durationSymbols[i].MsPosition >= msPos)
+                    {
+                        InsertBeforeDS(voice.NoteObjects, durationSymbols[i], invisibleClefChangeSymbol);
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void InsertBeforeDS(List<NoteObject> noteObjects, DurationSymbol insertBeforeDS, ClefChangeSymbol invisibleClefChangeSymbol)
+        {
+            for(int i = 0; i < noteObjects.Count; ++i)
+            {
+                DurationSymbol durationSymbol = noteObjects[i] as DurationSymbol;
+                if(durationSymbol != null && durationSymbol == insertBeforeDS)
+                {
+                    noteObjects.Insert(i, invisibleClefChangeSymbol);
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The current msPosition of a voice will be retrievable as currentMsPositionPerVoicePerStaff[staffIndex][voiceIndex].
+        /// </summary>
+        /// <param name="system"></param>
+        /// <returns></returns>
+        private List<List<int>> InitializeCurrentMsPositionPerVoicePerStaff(SvgSystem system)
+        {
+            List<List<int>> currentMsPositionPerVoicePerStaff = new List<List<int>>();
+            foreach(Staff staff in system.Staves)
+            {
+                List<int> currentVoiceMsPositions = new List<int>();
+                currentMsPositionPerVoicePerStaff.Add(currentVoiceMsPositions);
+                foreach(Voice voice in staff.Voices)
+                {
+                    currentVoiceMsPositions.Add(0);
+                }
+            }
+            return currentMsPositionPerVoicePerStaff;
+        }
+
+        /// <summary>
+        /// Returns the clefType current at msPosition.
+        /// </summary>
+        private string GetClefType(int msPosition, SortedDictionary<int, string> clefTypesPerMsPos)
+        {
+            Debug.Assert(clefTypesPerMsPos.Count > 0 && clefTypesPerMsPos.ContainsKey(0));
+
+            string clefType = null;
+            if(clefTypesPerMsPos.Count == 1)
+            {
+                clefType = clefTypesPerMsPos[0]; 
+            }
+            else
+            {
+                List<int> keys = new List<int>(clefTypesPerMsPos.Keys);
+                if(msPosition >= keys[keys.Count - 1])
+                {
+                    clefType = clefTypesPerMsPos[keys[keys.Count - 1]];
+                }
+                else
+                {
+                    for(int i = 1; i < clefTypesPerMsPos.Count; ++i)
+                    {
+                        if(msPosition >= keys[i - 1] && msPosition < keys[i])
+                        {
+                            clefType = clefTypesPerMsPos[keys[i - 1]];
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            return clefType;
+        }
+
+        private void InsertInUniqueMidiDurationDefs(List<UniqueClefChangeDef> uClefChangeDefs, List<IUniqueMidiDurationDef> uniqueMidiDurationDefs)
+        {
+            Debug.Assert(uniqueMidiDurationDefs.Count > 1);
+            foreach(UniqueClefChangeDef uClefChangeDef in uClefChangeDefs)
+            {
+                int msPosition = uClefChangeDef.MsPosition;
+                int count = uniqueMidiDurationDefs.Count;
+
+                if(msPosition > uniqueMidiDurationDefs[count - 1].MsPosition)
+                {
+                    uniqueMidiDurationDefs.Add(uClefChangeDef);
+                }
+                else if(msPosition <= uniqueMidiDurationDefs[0].MsPosition)
+                {
+                    uniqueMidiDurationDefs.Insert(0, uClefChangeDef);
+                }
+                else if(count > 1)
+                {
+                    for(int i = 1; i < count; ++i)
+                    {
+                        if((msPosition > uniqueMidiDurationDefs[i - 1].MsPosition)
+                            && msPosition <= uniqueMidiDurationDefs[i].MsPosition)
+                        {
+                            uniqueMidiDurationDefs.Insert(i, uClefChangeDef);
+                            break;
+                        }
+                    }
+                }
+            }
+            for(int i = 1; i < uniqueMidiDurationDefs.Count; ++i)
+            {
+                UniqueClefChangeDef uccd1 = uniqueMidiDurationDefs[i - 1] as UniqueClefChangeDef;
+                UniqueClefChangeDef uccd2 = uniqueMidiDurationDefs[i] as UniqueClefChangeDef;
+                Debug.Assert((uccd1 == null || uccd2 == null) || uccd1.MsPosition < uccd2.MsPosition);
             }
         }
 

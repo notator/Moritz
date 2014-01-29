@@ -117,7 +117,7 @@ namespace Moritz.Score
                     Debug.Assert(AlignmentX == 0F);
                     if(index > 0)
                     {
-                        ClefSign clef = _noteObjects[index-1] as ClefSign;
+                        ClefSymbol clef = _noteObjects[index-1] as ClefSymbol;
                         if(clef != null)
                             clef.Metrics.Move(minBarlineOriginX - barline.Metrics.OriginX, 0);
                     }

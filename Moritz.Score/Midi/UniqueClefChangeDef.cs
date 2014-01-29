@@ -11,10 +11,9 @@ namespace Moritz.Score.Midi
     /// A UniqueClefChangeDef is a IUniqueMidiDurationDef which can be created while programming a score.
     /// It must be added to a voice.UniqueMidiDurationDefs list immediately before a UniqueMidiChordDef or
     /// UniqueMidiRestDef. It shares the same MsPosition.
-    /// When a Notator encounters this object, it creates the corresponding ClefSign in the staff and
-    /// changes the corresponding clef in the _pageFormat.ClefsList (i.e. at _pageFormat.ClefsList[staffIndex]).
-    /// 
-    /// Further comments should be added here later...
+    /// When converting definitions to symbols, the Notator uses this class to ensure that both voices in
+    /// a two-voice staff contain the same ClefSigns (see Notator.AddSymbolsToSystems(List<SvgSystem> systems)).
+    /// (The ClefSigns may have different visibility in the two voices.)
     ///</summary>
     public class UniqueClefChangeDef : IUniqueMidiDurationDef
     {
@@ -45,14 +44,14 @@ namespace Moritz.Score.Midi
             #endregion
 
             _id = "clefChange" + UniqueClefChangeIDNumber.ToString();
-            _type = clefType;
+            _clefType = clefType;
             _followingUniqueMidiChordOrRestDef = followingUniqueMidiChordOrRestDef;
         }
 
         #region IUniqueMidiDurationDef
         public override string ToString()
         {
-            return ("MsPosition=" + MsPosition.ToString() + " clefChange: type=" + _type);
+            return ("MsPosition=" + MsPosition.ToString() + " clefChange: type=" + _clefType);
         }
         public void Transpose(int interval) { }
         public void AdjustDuration(double factor){ }
@@ -92,8 +91,11 @@ namespace Moritz.Score.Midi
         public string ID { get { return _id; } }
         private string _id;
 
-        public string Type { get { return _type; } }
-        private string _type;
+        /// <summary>
+        /// One of the following strings "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"
+        /// </summary>
+        public string ClefType { get { return _clefType; } }
+        private string _clefType;
 
         private int UniqueClefChangeIDNumber { get { return ++_uniqueClefChangeIDNumber; } }
         private static int _uniqueClefChangeIDNumber = 0;

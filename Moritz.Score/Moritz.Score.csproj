@@ -105,7 +105,7 @@
     <Compile Include="System Components\Staff Components\Voice Components\Chord Components\Head.cs" />
     <Compile Include="System Components\Staff Components\Voice Components\Chord Components\Stem.cs" />
     <Compile Include="System Components\Staff Components\Voice Components\ChordSymbol.cs" />
-    <Compile Include="System Components\Staff Components\Voice Components\ClefSign.cs" />
+    <Compile Include="System Components\Staff Components\Voice Components\ClefSymbol.cs" />
     <Compile Include="System Components\Staff Components\Voice Components\DurationSymbol.cs" />
     <Compile Include="System Components\Staff Components\Voice Components\NoteObject.cs" />
     <Compile Include="System Components\Staff Components\Voice Components\RestSymbol.cs" />

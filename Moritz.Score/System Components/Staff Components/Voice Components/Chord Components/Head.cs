@@ -59,12 +59,12 @@ namespace Moritz.Score
         /// Uses the following protected variables (in Metrics) which have been set by GetStaffParameters()
         ///     protected float _gapVBPX = 0F; 
         ///     protected int _nStafflines = 0;
-        ///     protected ClefSign _clef = null;
+        ///     protected ClefSymbol _clef = null;
         /// </summary>
         /// <param name="headIndex"></param>
         /// <param name="?"></param>
         /// <param name="?"></param>
-        public float GetOriginY(ClefSign clef, float gap)
+        public float GetOriginY(ClefSymbol clef, float gap)
         {
             string[] alphabet = { "C", "D", "E", "F", "G", "A", "B" };
             float shiftFactor = 0F;
@@ -111,7 +111,7 @@ namespace Moritz.Score
             float octaveShift = octave - 5F;
             shiftFactor -= (octaveShift * 3.5F); // 3.5 spaces is one octave
             // shiftFactor is currently correct for all octaves on a normal treble clef
-            switch(clef.ClefName)
+            switch(clef.ClefType)
             {
                 case "t":
                     break;
