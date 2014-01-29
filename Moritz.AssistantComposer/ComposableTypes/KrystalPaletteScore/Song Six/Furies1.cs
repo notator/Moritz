@@ -228,7 +228,7 @@ namespace Moritz.AssistantComposer
 
         internal void AdjustVelocities(Dictionary<string, int> msPositions)
         {
-            AdjustVelocitiesHairpin(msPositions["interlude3"], this[102].MsPosition, 1.0, 0.2);
+            AdjustVelocitiesHairpin(msPositions["interlude3"], this[102].MsPosition, 0.65, 0.2);
             AdjustVelocitiesHairpin(this[102].MsPosition, msPositions["interlude4"], 0.2, 0.7);
             AdjustVelocitiesHairpin(msPositions["interlude4"], msPositions["verse5"], 0.7, 1.0);
             AdjustVelocitiesHairpin(msPositions["verse5"], msPositions["postlude"], 0.5, 0.5);
