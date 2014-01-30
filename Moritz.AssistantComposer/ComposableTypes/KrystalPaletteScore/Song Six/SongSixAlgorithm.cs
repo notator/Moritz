@@ -131,10 +131,10 @@ namespace Moritz.AssistantComposer
             Debug.Assert(voiceDefs.Count == MidiChannels().Count);
 
             //********************************************************
-            foreach(VoiceDef voiceDef in voiceDefs)
-            {
-                voiceDef.SetLyricsToIndex();
-            }
+            //foreach(VoiceDef voiceDef in voiceDefs)
+            //{
+            //    voiceDef.SetLyricsToIndex();
+            //}
             //********************************************************
 
             List<int> barlineMsPositions = GetBarlineMsPositions(control, furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
