@@ -111,21 +111,22 @@ namespace Moritz.Score.Notation
                             ClefChangeSymbol clefChangeSymbol = noteObject as ClefChangeSymbol;
                             if(clefChangeSymbol != null)
                             {
-                                if(staff.Voices.Count == 2)
-                                {
-                                    if(voiceIndex == 0)
-                                        voice0ClefChangeDefs.Add(iumdd as UniqueClefChangeDef);
-                                    else
-                                        voice1ClefChangeDefs.Add(iumdd as UniqueClefChangeDef);
-                                }
-                                
-                                _pageFormat.ClefsList[staffIndex] = clefChangeSymbol.ClefType;
+                                if(voiceIndex == 0)
+                                    voice0ClefChangeDefs.Add(iumdd as UniqueClefChangeDef);
+                                else
+                                    voice1ClefChangeDefs.Add(iumdd as UniqueClefChangeDef);
                             }
 
                             voice.NoteObjects.Add(noteObject);
 
                             firstLmdd = false;
                         }
+                    }
+
+                    if(voice0ClefChangeDefs.Count > 0 || voice1ClefChangeDefs.Count > 0)
+                    { 
+                        // the main clef on this staff in the next system
+                        SetNextSystemClefType(staffIndex, voice0ClefChangeDefs, voice1ClefChangeDefs);
                     }
 
                     if(staff.Voices.Count == 2)
@@ -140,6 +141,40 @@ namespace Moritz.Score.Notation
                     }
                 }
             }
+        }
+
+        private void SetNextSystemClefType(int staffIndex, List<UniqueClefChangeDef> voice0ClefChangeDefs, List<UniqueClefChangeDef> voice1ClefChangeDefs)
+        {
+            Debug.Assert(voice0ClefChangeDefs.Count > 0 || voice1ClefChangeDefs.Count > 0);
+
+            UniqueClefChangeDef lastVoice0Def = null;
+            if(voice0ClefChangeDefs.Count > 0)
+            {
+                lastVoice0Def = voice0ClefChangeDefs[voice0ClefChangeDefs.Count - 1];
+            }
+            UniqueClefChangeDef lastVoice1Def = null;
+            if(voice1ClefChangeDefs.Count > 0)
+            {
+                lastVoice1Def = voice1ClefChangeDefs[voice1ClefChangeDefs.Count - 1];
+            }
+            string lastClefType = null;
+            if(lastVoice0Def != null)
+            {
+                if((lastVoice1Def == null) || (lastVoice0Def.MsPosition > lastVoice1Def.MsPosition))
+                {
+                    lastClefType = lastVoice0Def.ClefType;
+                }
+            }
+
+            if(lastVoice1Def != null)
+            {
+                if((lastVoice0Def == null) || (lastVoice1Def.MsPosition >= lastVoice0Def.MsPosition))
+                {
+                    lastClefType = lastVoice1Def.ClefType;
+                }
+            }
+
+            _pageFormat.ClefsList[staffIndex] = lastClefType;           
         }
 
         /// <summary>
