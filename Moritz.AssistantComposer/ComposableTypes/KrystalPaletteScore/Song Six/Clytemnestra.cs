@@ -271,7 +271,7 @@ namespace Moritz.AssistantComposer
                 List<string> verse5 = new List<string>()
                 {
                     "Give", "ear", "ye", "God-", "dess-", "es", "of", "Hell!",
-                    "A", "dream", "that", "once", "was", "Cly-", "tam-", "nes-", "tra", "calls!"
+                    "A", "dream", "that", "once", "was", "Cly-", "tem-", "nes-", "tra", "calls!"
                 };
 
                 List<List<string>> lyrics = new List<List<string>>();
