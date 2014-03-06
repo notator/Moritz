@@ -413,24 +413,6 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// These barlines do not include the barlines at the beginning, middle or end of Clytemnestra's verses.
-        /// </summary>
-        /// <param name="wind3"></param>
-        /// <param name="barlineMsPositions"></param>
-        /// <returns></returns>
-        private List<int> AddInterludeBarlinePositions(VoiceDef wind3, List<int> barlineMsPositions)
-        {
-            List<int> newBarlineIndices = new List<int>() { 1, 3, 5, 15, 27, 40, 45, 63, 77 }; // by inspection of the score
-            foreach(int index in newBarlineIndices)
-            {
-                barlineMsPositions.Add(wind3.UniqueMidiDurationDefs[index].MsPosition);
-            }
-            barlineMsPositions.Sort();
-
-            return barlineMsPositions;
-        }
-
-        /// <summary>
         /// The control VoiceDef consists of single note + rest pairs whose msPositions are composed here.
         /// </summary>
         private VoiceDef GetControlVoiceDef(VoiceDef furies1, VoiceDef furies2, VoiceDef furies3, VoiceDef furies4, Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
