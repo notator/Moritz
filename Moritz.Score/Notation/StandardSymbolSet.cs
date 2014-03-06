@@ -32,6 +32,12 @@ namespace Moritz.Score.Notation
             WriteBassClef8SymbolDef(w);
             WriteBassClefMulti8SymbolDef(w, 2);
             WriteBassClefMulti8SymbolDef(w, 3);
+            WriteLeftTieHookOver(w);
+            WriteLeftTieHookUnder(w);
+            WriteRightTieHookOver(w);
+            WriteRightTieHookUnder(w);
+            WriteShortTieOver(w);
+            WriteShortTieUnder(w);
             for(int i = 1; i < 6; i++)
             {
                 WriteRightFlagBlock(w, i);
@@ -252,7 +258,119 @@ namespace Moritz.Score.Notation
 
             svgw.WriteEndElement(); // g
         }
+        /// <summary>
+        /// [g id="LeftTieHookOver"]
+        ///     [path d="m0.64651,-0.43084c-0.24522,0 -0.51606,0.11803 -0.54627,0.27246c0.08952,-0.13732 0.34437,-0.1768 0.54627,-0.1768c0.02957,0 0.02957,-0.09566 0,-0.09566" fill="black" stroke="none"/]
+        /// [/g]
+        /// </summary>
+        /// <param name="svgw"></param>
+        private void WriteLeftTieHookOver(SvgWriter svgw)
+        {
+            svgw.WriteStartElement("g");
+            svgw.WriteAttributeString("id", "LeftTieHookOver");
 
+            svgw.WriteStartElement("path");
+            svgw.WriteAttributeString("d", "m0.64651,-0.43084c-0.24522,0 -0.51606,0.11803 -0.54627,0.27246c0.08952,-0.13732 0.34437,-0.1768 0.54627,-0.1768c0.02957,0 0.02957,-0.09566 0,-0.09566");
+            svgw.WriteAttributeString("fill", "black");
+            svgw.WriteAttributeString("stroke", "none");
+            svgw.WriteEndElement(); // path
+
+            svgw.WriteEndElement(); // g
+        }
+        /// <summary>
+        /// [g id="LeftTieHookUnder"]
+        ///    [path d="m0.64651,0.43084c-0.24522,0 -0.51606,-0.11803 -0.54627,-0.27246c0.08952,0.13732 0.34437,0.17680 0.54627,0.17680c0.02957,0 0.02957,0.09566 0,0.09566" fill="black" stroke="none"/]
+        /// [/g]
+        /// </summary>
+        private void WriteLeftTieHookUnder(SvgWriter svgw)
+        {
+            svgw.WriteStartElement("g");
+            svgw.WriteAttributeString("id", "LeftTieHookUnder");
+
+            svgw.WriteStartElement("path");
+            svgw.WriteAttributeString("d", "m0.64651,0.43084c-0.24522,0 -0.51606,-0.11803 -0.54627,-0.27246c0.08952,0.13732 0.34437,0.17680 0.54627,0.17680c0.02957,0 0.02957,0.09566 0,0.09566");
+            svgw.WriteAttributeString("fill", "black");
+            svgw.WriteAttributeString("stroke", "none");
+            svgw.WriteEndElement(); // path
+
+            svgw.WriteEndElement(); // g
+        }
+        /// <summary>
+        /// [g id="RightTieHookOver"]
+        ///     [path d="m-0.64651,-0.43084c-0.02957,0 -0.02957,0.09566 0,0.09566c0.1993,0 0.45674,0.03948 0.54627,0.17680c-0.03021,-0.15443 -0.30105,-0.27246 -0.54627,-0.27246" fill="black" stroke="none"/]
+        /// [/g]
+        /// </summary>
+        /// <param name="svgw"></param>
+        private void WriteRightTieHookOver(SvgWriter svgw)
+        {
+            svgw.WriteStartElement("g");
+            svgw.WriteAttributeString("id", "RightTieHookOver");
+
+            svgw.WriteStartElement("path");
+            svgw.WriteAttributeString("d", "m-0.64651,-0.43084c-0.02957,0 -0.02957,0.09566 0,0.09566c0.1993,0 0.45674,0.03948 0.54627,0.17680c-0.03021,-0.15443 -0.30105,-0.27246 -0.54627,-0.27246");
+            svgw.WriteAttributeString("fill", "black");
+            svgw.WriteAttributeString("stroke", "none");
+            svgw.WriteEndElement(); // path
+
+            svgw.WriteEndElement(); // g
+        }
+        /// <summary>
+        /// [g id="RightTieHookUnder"]
+        ///    [path d="m-0.64651,0.43084c-0.02956,0 -0.02957,-0.09566 0,-0.09566c0.2019,0 0.4544,-0.03948 0.54627,-0.17680c-0.03021,0.15443 -0.30105,0.27246 -0.54627,0.27246" fill="black" stroke="none"/]
+        /// [/g]
+        /// </summary>
+        /// <param name="svgw"></param>
+        private void WriteRightTieHookUnder(SvgWriter svgw)
+        {
+            svgw.WriteStartElement("g");
+            svgw.WriteAttributeString("id", "RightTieHookUnder");
+
+            svgw.WriteStartElement("path");
+            svgw.WriteAttributeString("d", "m-0.64651,0.43084c-0.02956,0 -0.02957,-0.09566 0,-0.09566c0.2019,0 0.4544,-0.03948 0.54627,-0.17680c-0.03021,0.15443 -0.30105,0.27246 -0.54627,0.27246");
+            svgw.WriteAttributeString("fill", "black");
+            svgw.WriteAttributeString("stroke", "none");
+            svgw.WriteEndElement(); // path
+
+            svgw.WriteEndElement(); // g
+        }
+        /// <summary>
+        /// [g id="ShortTieOver"]
+        ///     [path d="m0,-0.43084c-0.24522,0 -0.51606,0.11803 -0.54627,0.27246c0.08952,-0.13732 0.34437,-0.1768 0.54627,-0.1768c0.1993,0 0.45674,0.03948 0.54627,0.17680c-0.03021,-0.15443 -0.30105,-0.27246 -0.54627,-0.27246" fill="black" stroke="none"/]
+        /// [/g]
+        /// </summary>
+        /// <param name="svgw"></param>
+        private void WriteShortTieOver(SvgWriter svgw)
+        {
+            svgw.WriteStartElement("g");
+            svgw.WriteAttributeString("id", "ShortTieOver");
+
+            svgw.WriteStartElement("path");
+            svgw.WriteAttributeString("d", "m0,-0.43084c-0.24522,0 -0.51606,0.11803 -0.54627,0.27246c0.08952,-0.13732 0.34437,-0.1768 0.54627,-0.1768c0.1993,0 0.45674,0.03948 0.54627,0.17680c-0.03021,-0.15443 -0.30105,-0.27246 -0.54627,-0.27246");
+            svgw.WriteAttributeString("fill", "black");
+            svgw.WriteAttributeString("stroke", "none");
+            svgw.WriteEndElement(); // path
+
+            svgw.WriteEndElement(); // g
+        }
+        /// <summary>
+        /// [g id="ShortTieUnder"]
+        ///     [path d="m0,0.43084c-0.24522,0 -0.51606,-0.11803 -0.54627,-0.27246c0.08952,0.13732 0.34437,0.17680 0.54627,0.17680c0.2019,0 0.4544,-0.03948 0.54627,-0.17680c-0.03021,0.15443 -0.30105,0.27246 -0.54627,0.27246" fill="black" stroke="none"/]
+        /// [/g]
+        /// </summary>
+        /// <param name="svgw"></param>
+        private void WriteShortTieUnder(SvgWriter svgw)
+        {
+            svgw.WriteStartElement("g");
+            svgw.WriteAttributeString("id", "ShortTieUnder");
+
+            svgw.WriteStartElement("path");
+            svgw.WriteAttributeString("d", "m0,0.43084c-0.24522,0 -0.51606,-0.11803 -0.54627,-0.27246c0.08952,0.13732 0.34437,0.17680 0.54627,0.17680c0.2019,0 0.4544,-0.03948 0.54627,-0.17680c-0.03021,0.15443 -0.30105,0.27246 -0.54627,0.27246");
+            svgw.WriteAttributeString("fill", "black");
+            svgw.WriteAttributeString("stroke", "none");
+            svgw.WriteEndElement(); // path
+
+            svgw.WriteEndElement(); // g
+        }
         private void WriteRightFlagBlock(SvgWriter svgw, int nFlags)
         {
             svgw.WriteFlagBlock(nFlags, true);
