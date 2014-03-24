@@ -533,7 +533,7 @@ namespace Moritz.AssistantComposer
                 int noteMsDuration = restMsPosition - noteMsPosition;
                 int restMsDuration = nextNoteMsPosition - restMsPosition;
 
-                UniqueMidiChordDef umChordDef = new UniqueMidiChordDef(new List<byte>() { (byte)67 }, new List<byte>() { (byte)0 }, noteMsPosition, noteMsDuration, false, new List<MidiControl>());
+                UniqueMidiChordDef umChordDef = new UniqueMidiChordDef(new List<byte>() { (byte)67 }, new List<byte>() { (byte)0 }, noteMsPosition, noteMsDuration, false, false, new List<MidiControl>());
 
                 UniqueMidiRestDef umRestDef = new UniqueMidiRestDef(restMsPosition, restMsDuration);
 

@@ -41,10 +41,18 @@ namespace Moritz.Score.Midi
                         else
                             ID = r.Value; // this is the id in the palleteDefs
                         break;
+                    case "repeatMoments":
+                        // repeatMoments is true if this attribute is not present
+                        byte rmVal = byte.Parse(r.Value);
+                        if(rmVal == 0)
+                            _repeatMoments = false;
+                        else
+                            _repeatMoments = true;
+                        break;
                     case "hasChordOff":
                         // hasChordOff is true if this attribute is not present
-                        byte val = byte.Parse(r.Value);
-                        if(val == 0)
+                        byte hcoVal = byte.Parse(r.Value);
+                        if(hcoVal == 0)
                             _hasChordOff = false;
                         else
                             _hasChordOff = true;
@@ -297,6 +305,7 @@ namespace Moritz.Score.Midi
         protected byte? _patch = null;
         protected byte? _volume = null;
         protected byte? _pitchWheelDeviation = null;
+        protected bool _repeatMoments = true;
         protected bool _hasChordOff = true;
         protected int _minimumBasicMidiChordMsDuration = 1;
 
@@ -313,6 +322,7 @@ namespace Moritz.Score.Midi
         public byte? Patch { get { return _patch; } }
         public byte? Volume { get { return _volume; } }
         public byte? PitchWheelDeviation { get { return _pitchWheelDeviation; } }
+        public bool RepeatMoments { get { return _repeatMoments; } }
         public bool HasChordOff { get { return _hasChordOff; } }
         public int MinimumBasicMidiChordMsDuration { get { return _minimumBasicMidiChordMsDuration; } }
         public List<int> BasicChordDurations

@@ -124,7 +124,6 @@
     <Compile Include="MIDIPercussionHelpForm.Designer.cs">
       <DependentUpon>MIDIPercussionHelpForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MidiUtilities.cs" />
     <Compile Include="OrnamentSettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>

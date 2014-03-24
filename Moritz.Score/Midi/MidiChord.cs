@@ -35,6 +35,8 @@ namespace Moritz.Score.Midi
                 }
             }
 
+            RepeatMoments = midiChordDef.RepeatMoments;
+
             if(midiChordDef.HasChordOff && notesToStop.Count > 0)
                 SetChordOff(channel, notesToStop);
 
@@ -315,6 +317,8 @@ namespace Moritz.Score.Midi
         public Volume Volume = null;
         public PitchWheelDeviation PitchWheelDeviation = null;
         public List<BasicMidiChord> BasicMidiChords = new List<BasicMidiChord>();
+
+        public bool RepeatMoments;
 
         // Each Slider has its own BackgroundWorker, and is sent in its own thread
         public MidiChordSlider PitchWheelSlider = null;
