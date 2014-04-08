@@ -152,7 +152,7 @@ namespace Moritz.AssistantComposer
                 DurationsHelpLabel.Text = _numberOfChordValues.ToString() + " integer values (greater than 0)";
                 MidiPitchesHelpLabel.Text = _numberOfChordValues.ToString() + " integer values in range [ 0..127 ]";
                 VelocitiesHelpLabel.Text = _numberOfChordValues.ToString() + " integer values in range [ 0..127 ]";
-                ChordOffsHelpLabel.Text = _numberOfChordValues.ToString() + " bool arguments ( 1=yes 0=no )";
+                ChordOffsHelpLabel.Text = _numberOfChordValues.ToString() + " boolean values ( 1=true, 0=false )";
                 ChordDensitiesHelpLabel.Text = _numberOfChordValues.ToString() + " integer values in range [ 0..128 ]";
             }
         }

@@ -38,7 +38,7 @@ namespace Moritz.Score.Midi
             _volume = mcd.Volume;
             _lyric = mcd.Lyric; // this is currently not set in palettes (19.09.2013)
             _pitchWheelDeviation = mcd.PitchWheelDeviation;
-            _repeatMoments = mcd.RepeatMoments;
+            _repeat = mcd.Repeat;
             _hasChordOff = mcd.HasChordOff;
             _minimumBasicMidiChordMsDuration = mcd.MinimumBasicMidiChordMsDuration;
 
@@ -88,7 +88,7 @@ namespace Moritz.Score.Midi
         /// <summary>
         /// This constructor creates a UniqueMidiChordDef containing a single BasicMidiChordDef and no sliders.
         /// </summary>
-        public UniqueMidiChordDef(List<byte> pitches, List<byte> velocities, int msPosition, int msDuration, bool repeatMoments, bool hasChordOff,
+        public UniqueMidiChordDef(List<byte> pitches, List<byte> velocities, int msPosition, int msDuration, bool repeat, bool hasChordOff,
             List<MidiControl> midiControls)
             : this()
         {
@@ -96,7 +96,7 @@ namespace Moritz.Score.Midi
             _msDuration = msDuration;
             _volume = GetControlHiValue(ControllerType.Volume, midiControls);
             _pitchWheelDeviation = GetControlValue(ControllerType.RegisteredParameterCoarse, midiControls);
-            _repeatMoments = repeatMoments;
+            _repeat = repeat;
             _hasChordOff = hasChordOff;
             _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 
@@ -608,7 +608,7 @@ namespace Moritz.Score.Midi
             if(Volume != null && Volume != M.DefaultVolume)
                 w.WriteAttributeString("volume", Volume.ToString());
             if(RepeatMoments == false)
-                w.WriteAttributeString("repeatMoments", "0");
+                w.WriteAttributeString("repeat", "0");
             if(HasChordOff == false)
                 w.WriteAttributeString("hasChordOff", "0");
             if(PitchWheelDeviation != null && PitchWheelDeviation != M.DefaultPitchWheelDeviation)
@@ -638,7 +638,7 @@ namespace Moritz.Score.Midi
         public new byte? Patch { get { return _patch; } set { _patch = value; } }
         public new byte? Volume { get { return _volume; } set { _volume = value; } }
 
-        public new bool RepeatMoments { get { return _repeatMoments; } set { _repeatMoments = value; } }
+        public new bool RepeatMoments { get { return _repeat; } set { _repeat = value; } }
         public new bool HasChordOff { get { return _hasChordOff; } set { _hasChordOff = value; } }
 
         public new int MinimumBasicMidiChordMsDuration { get { return _minimumBasicMidiChordMsDuration; } set { _minimumBasicMidiChordMsDuration = value; } }

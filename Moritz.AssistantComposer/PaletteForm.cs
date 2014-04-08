@@ -260,6 +260,7 @@ namespace Moritz.AssistantComposer
             BankIndicesTextBox_Leave(BankIndicesTextBox, null);
             PatchIndicesTextBox_Leave(PatchIndicesTextBox, null);
             VolumesTextBox_Leave(VolumesTextBox, null);
+            RepeatsTextBox_Leave(RepeatsTextBox, null);
             PitchwheelDeviationsTextBox_Leave(PitchwheelDeviationsTextBox, null);
             PitchwheelEnvelopesTextBox_Leave(PitchwheelEnvelopesTextBox, null);
             PanEnvelopesTextBox_Leave(PanEnvelopesTextBox, null);
@@ -396,6 +397,7 @@ namespace Moritz.AssistantComposer
             BankIndicesHelpLabel.Text = countString + "integer values in range [ 0..127 ]";
             PatchIndicesHelpLabel.Text = countString + "integer values in range [ 0..127 ]";
             VolumesHelpLabel.Text = countString + integerString + valuesInRangeString + "[ 0..127 ]";
+            RepeatsHelpLabel.Text = countString + "boolean values ( 1=true, 0=false )";
             PitchwheelDeviationsHelpLabel.Text = countString + integerString + valuesInRangeString + "[ 0..127 ]";
             PitchwheelEnvelopesHelpLabel.Text = envelopesHelpString;
             PanEnvelopesHelpLabel.Text = envelopesHelpString;
@@ -428,6 +430,7 @@ namespace Moritz.AssistantComposer
             mainTextBoxes.Add(BankIndicesTextBox);
             mainTextBoxes.Add(PatchIndicesTextBox);
             mainTextBoxes.Add(VolumesTextBox);
+            mainTextBoxes.Add(RepeatsTextBox);
             mainTextBoxes.Add(PitchwheelDeviationsTextBox);
             mainTextBoxes.Add(ModulationWheelEnvelopesTextBox);
             mainTextBoxes.Add(PitchwheelEnvelopesTextBox);
@@ -479,6 +482,10 @@ namespace Moritz.AssistantComposer
             VolumesLabel.Enabled = true;
             VolumesTextBox.Enabled = true;
             VolumesHelpLabel.Enabled = true;
+
+            RepeatsLabel.Enabled = true;
+            RepeatsTextBox.Enabled = true;
+            RepeatsHelpLabel.Enabled = true;
 
             PitchwheelDeviationsLabel.Enabled = true;
             PitchwheelDeviationsTextBox.Enabled = true;
@@ -573,6 +580,11 @@ namespace Moritz.AssistantComposer
             M.SetToWhite(sender as TextBox);
         }
 
+        private void RepeatsTextBox_TextChanged(object sender, EventArgs e)
+        {
+            M.SetToWhite(sender as TextBox);
+        }
+
         private void PitchwheelDeviationsTextBox_TextChanged(object sender, EventArgs e)
         {
             M.SetToWhite(sender as TextBox);
@@ -623,6 +635,11 @@ namespace Moritz.AssistantComposer
         private void VolumesTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveIntRangeTextBox(sender as TextBox, true, (uint)_bcc.NumberOfChordValues, 0, 127, SetDialogState);
+        }
+
+        private void RepeatsTextBox_Leave(object sender, EventArgs e)
+        {
+            M.LeaveIntRangeTextBox(sender as TextBox, true, (uint)_bcc.NumberOfChordValues, 0, 1, SetDialogState);
         }
 
         private void PitchwheelDeviationsTextBox_Leave(object sender, EventArgs e)
@@ -1017,6 +1034,12 @@ namespace Moritz.AssistantComposer
                 w.WriteString(VolumesTextBox.Text.Replace(" ", ""));
                 w.WriteEndElement();
             }
+            if(!string.IsNullOrEmpty(RepeatsTextBox.Text))
+            {
+                w.WriteStartElement("repeats");
+                w.WriteString(RepeatsTextBox.Text.Replace(" ", ""));
+                w.WriteEndElement();
+            }
             if(!string.IsNullOrEmpty(PitchwheelDeviationsTextBox.Text))
             {
                 w.WriteStartElement("pitchwheelDeviations");
@@ -1080,6 +1103,7 @@ namespace Moritz.AssistantComposer
             BankIndicesTextBox.Text = "";
             PatchIndicesTextBox.Text = "";
             VolumesTextBox.Text = "";
+            RepeatsTextBox.Text = "";
             PitchwheelDeviationsTextBox.Text = "";
             PitchwheelEnvelopesTextBox.Text = "";
             PanEnvelopesTextBox.Text = "";
@@ -1090,8 +1114,8 @@ namespace Moritz.AssistantComposer
             #endregion
 
             M.ReadToXmlElementTag(r, "basicChord");
-            while(r.Name == "basicChord" || r.Name == "bankIndices" || r.Name == "patchIndices" || r.Name == "volumes" 
-                || r.Name == "pitchwheelDeviations"
+            while(r.Name == "basicChord" || r.Name == "bankIndices" || r.Name == "patchIndices" || r.Name == "volumes"
+                || r.Name == "repeats" || r.Name == "pitchwheelDeviations"
                 || r.Name == "pitchwheelEnvelopes" || r.Name == "panEnvelopes"
                 || r.Name == "modulationWheelEnvelopes" || r.Name == "expressionEnvelopes"
                 || r.Name == "audioFiles"
@@ -1113,6 +1137,9 @@ namespace Moritz.AssistantComposer
                             break;
                         case "volumes":
                             VolumesTextBox.Text = r.ReadElementContentAsString();
+                            break;
+                        case "repeats":
+                            RepeatsTextBox.Text = r.ReadElementContentAsString();
                             break;
                         case "pitchwheelDeviations":
                             PitchwheelDeviationsTextBox.Text = r.ReadElementContentAsString();
@@ -1145,7 +1172,7 @@ namespace Moritz.AssistantComposer
                             break;
                     }
                 }
-                M.ReadToXmlElementTag(r, "palette", "basicChord", "bankIndices", "patchIndices", "volumes",
+                M.ReadToXmlElementTag(r, "palette", "basicChord", "bankIndices", "patchIndices", "volumes", "repeats",
                     "pitchwheelDeviations", "pitchwheelEnvelopes", "panEnvelopes", "modulationWheelEnvelopes",
                     "expressionEnvelopes", "audioFiles", "ornamentNumbers", "ornamentMinMsDurations", "ornamentSettings");
             }

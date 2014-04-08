@@ -35,7 +35,7 @@ namespace Moritz.Score.Midi
                 }
             }
 
-            RepeatMoments = midiChordDef.RepeatMoments;
+            Repeat = midiChordDef.Repeat;
 
             if(midiChordDef.HasChordOff && notesToStop.Count > 0)
                 SetChordOff(channel, notesToStop);
@@ -315,10 +315,12 @@ namespace Moritz.Score.Midi
         public BankControl Bank = null;
         public PatchControl Patch = null;
         public Volume Volume = null;
+        // If Repeat is true, this MidiChord repeats in assisted performances if the
+        // performed duration is longer than the default duration.
+        public bool Repeat; 
+        
         public PitchWheelDeviation PitchWheelDeviation = null;
         public List<BasicMidiChord> BasicMidiChords = new List<BasicMidiChord>();
-
-        public bool RepeatMoments;
 
         // Each Slider has its own BackgroundWorker, and is sent in its own thread
         public MidiChordSlider PitchWheelSlider = null;

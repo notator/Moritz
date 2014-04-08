@@ -46,6 +46,9 @@ namespace Moritz.AssistantComposer
             if(krystalPalette.Volumes != null && krystalPalette.Volumes.Count > 0)
                 _volume = krystalPalette.Volumes[valueIndex];
 
+            if(krystalPalette.Repeats != null && krystalPalette.Repeats.Count > 0)
+                _repeat = krystalPalette.Repeats[valueIndex]; // default is true
+
             if(krystalPalette.PitchwheelDeviations != null && krystalPalette.PitchwheelDeviations.Count > 0)
                 _pitchWheelDeviation = krystalPalette.PitchwheelDeviations[valueIndex];
 

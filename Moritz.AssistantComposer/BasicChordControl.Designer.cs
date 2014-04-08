@@ -162,7 +162,7 @@
             // 
             this.VerticalVelocityFactorsLabel.AutoSize = true;
             this.VerticalVelocityFactorsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.VerticalVelocityFactorsLabel.Location = new System.Drawing.Point(22, 198);
+            this.VerticalVelocityFactorsLabel.Location = new System.Drawing.Point(16, 198);
             this.VerticalVelocityFactorsLabel.Name = "VerticalVelocityFactorsLabel";
             this.VerticalVelocityFactorsLabel.Size = new System.Drawing.Size(154, 13);
             this.VerticalVelocityFactorsLabel.TabIndex = 121;
@@ -232,7 +232,7 @@
             // 
             this.ChordOffsLabel.AutoSize = true;
             this.ChordOffsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.ChordOffsLabel.Location = new System.Drawing.Point(61, 91);
+            this.ChordOffsLabel.Location = new System.Drawing.Point(62, 91);
             this.ChordOffsLabel.Name = "ChordOffsLabel";
             this.ChordOffsLabel.Size = new System.Drawing.Size(78, 13);
             this.ChordOffsLabel.TabIndex = 134;
@@ -273,9 +273,9 @@
             this.ChordOffsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
             this.ChordOffsHelpLabel.Location = new System.Drawing.Point(605, 91);
             this.ChordOffsHelpLabel.Name = "ChordOffsHelpLabel";
-            this.ChordOffsHelpLabel.Size = new System.Drawing.Size(170, 13);
+            this.ChordOffsHelpLabel.Size = new System.Drawing.Size(173, 13);
             this.ChordOffsHelpLabel.TabIndex = 135;
-            this.ChordOffsHelpLabel.Text = "7 bool arguments ( 1=yes or 0=no )";
+            this.ChordOffsHelpLabel.Text = "7 boolean values ( 1=true, 0=false )";
             // 
             // DurationsTextBox
             // 

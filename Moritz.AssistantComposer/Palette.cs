@@ -28,6 +28,7 @@ namespace Moritz.AssistantComposer
             BankIndices = M.StringToByteList(paletteForm.BankIndicesTextBox.Text, ',');
             PatchIndices = M.StringToByteList(paletteForm.PatchIndicesTextBox.Text, ',');
             Volumes = M.StringToByteList(paletteForm.VolumesTextBox.Text, ',');
+            Repeats = M.StringToBoolList(paletteForm.RepeatsTextBox.Text, ',');
             PitchwheelDeviations = M.StringToByteList(paletteForm.PitchwheelDeviationsTextBox.Text, ',');
             PitchwheelEnvelopes = M.StringToByteLists(paletteForm.PitchwheelEnvelopesTextBox.Text);
             PanEnvelopes = M.StringToByteLists(paletteForm.PanEnvelopesTextBox.Text);
@@ -103,6 +104,7 @@ namespace Moritz.AssistantComposer
         public List<byte> BankIndices;
         public List<byte> PatchIndices;
         public List<byte> Volumes;
+        public List<bool> Repeats;
         public List<byte> PitchwheelDeviations;
         public List<List<byte>> PitchwheelEnvelopes;
         public List<List<byte>> PanEnvelopes;

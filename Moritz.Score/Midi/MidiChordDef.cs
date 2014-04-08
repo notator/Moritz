@@ -41,13 +41,13 @@ namespace Moritz.Score.Midi
                         else
                             ID = r.Value; // this is the id in the palleteDefs
                         break;
-                    case "repeatMoments":
-                        // repeatMoments is true if this attribute is not present
+                    case "repeat":
+                        // repeat is true if this attribute is not present
                         byte rmVal = byte.Parse(r.Value);
                         if(rmVal == 0)
-                            _repeatMoments = false;
+                            _repeat = false;
                         else
-                            _repeatMoments = true;
+                            _repeat = true;
                         break;
                     case "hasChordOff":
                         // hasChordOff is true if this attribute is not present
@@ -304,8 +304,8 @@ namespace Moritz.Score.Midi
         protected byte? _bank = null;
         protected byte? _patch = null;
         protected byte? _volume = null;
+        protected bool _repeat = true;
         protected byte? _pitchWheelDeviation = null;
-        protected bool _repeatMoments = true;
         protected bool _hasChordOff = true;
         protected int _minimumBasicMidiChordMsDuration = 1;
 
@@ -321,8 +321,10 @@ namespace Moritz.Score.Midi
         public byte? Bank { get { return _bank; } }
         public byte? Patch { get { return _patch; } }
         public byte? Volume { get { return _volume; } }
+        // If Repeat is true, the MidiChord will repeat in assisted performances
+        // if the performed duration is longer than the default duration.
+        public bool Repeat { get { return _repeat; } } 
         public byte? PitchWheelDeviation { get { return _pitchWheelDeviation; } }
-        public bool RepeatMoments { get { return _repeatMoments; } }
         public bool HasChordOff { get { return _hasChordOff; } }
         public int MinimumBasicMidiChordMsDuration { get { return _minimumBasicMidiChordMsDuration; } }
         public List<int> BasicChordDurations
