@@ -37,6 +37,9 @@ namespace Moritz.AssistantComposer
                 case "Study 3 sketch":
                     midiAlgorithm = new Study3SketchAlgorithm(krystals, paletteDefs);
                     break;
+                case "Study 4":
+                    midiAlgorithm = new Study4Algorithm(krystals, paletteDefs);
+                    break;
                 case "paletteDemo":
                     midiAlgorithm = new PaletteDemoAlgorithm(paletteDefs);
                     break;

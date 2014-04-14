@@ -8,14 +8,14 @@ using Krystals4ObjectLibrary;
 
 namespace Moritz.AssistantComposer
 {
-    internal class Furies4 : VoiceDef
+    internal class Furies4 : SongSixVoiceDef
     {
         internal Furies4(int msDuration)
             : base(msDuration)
         {
         }
 
-        internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, VoiceDef wind1, List<PaletteDef> palettes)
+        internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, SongSixVoiceDef wind1, List<PaletteDef> palettes)
         {
             GetSnores(firstRestMsDuration, clytemnestra, wind1, palettes[1]);
             AddGrowlsToInterlude2AndVerse3(clytemnestra, palettes[3]);
@@ -59,7 +59,7 @@ namespace Moritz.AssistantComposer
             AlignObjectAtIndex(38, 39, 40, clytemnestra[162].MsPosition);
         }
 
-        private void GetSnores(int firstRestMsDuration, Clytemnestra clytemnestra, VoiceDef wind1, PaletteDef snoresPalette)
+        private void GetSnores(int firstRestMsDuration, Clytemnestra clytemnestra, SongSixVoiceDef wind1, PaletteDef snoresPalette)
         {
             List<IUniqueMidiDurationDef> snores = new List<IUniqueMidiDurationDef>();
             int msPosition = 0;
@@ -132,7 +132,7 @@ namespace Moritz.AssistantComposer
         #region finale
         internal void GetFinale(List<PaletteDef> palettes, Dictionary<string, int> msPositions, Krystal krystal)
         {
-            VoiceDef furies4Finale = GetF4Finale(palettes, krystal, msPositions);
+            SongSixVoiceDef furies4Finale = GetF4Finale(palettes, krystal, msPositions);
 
             if(furies4Finale[furies4Finale.Count - 1] is UniqueMidiRestDef)
             {
@@ -161,20 +161,20 @@ namespace Moritz.AssistantComposer
             RemoveScorePitchWheelCommands(52, 53);
         }
 
-        private VoiceDef GetF4Finale(List<PaletteDef> palettes , Krystal krystal, Dictionary<string, int> msPositions)
+        private SongSixVoiceDef GetF4Finale(List<PaletteDef> palettes , Krystal krystal, Dictionary<string, int> msPositions)
         {
             PaletteDef f4FinalePalette1 = palettes[9];
             PaletteDef f4FinalePalette2 = palettes[13];
             PaletteDef f4PostludePalette = palettes[17];
 
-            VoiceDef interlude4Start = new VoiceDef(f4FinalePalette1, krystal);
+            SongSixVoiceDef interlude4Start = new SongSixVoiceDef(f4FinalePalette1, krystal);
             Transform(interlude4Start, msPositions);
-            VoiceDef interlude4EndVerse5 = new VoiceDef(f4FinalePalette2, krystal);
+            SongSixVoiceDef interlude4EndVerse5 = new SongSixVoiceDef(f4FinalePalette2, krystal);
             Transform(interlude4EndVerse5, msPositions);
-            VoiceDef postlude = new VoiceDef(f4PostludePalette, krystal);
+            SongSixVoiceDef postlude = new SongSixVoiceDef(f4PostludePalette, krystal);
             Transform(postlude, msPositions);
 
-            VoiceDef finale = GetFinaleSections(interlude4Start, interlude4EndVerse5, postlude, 7, 17);
+            SongSixVoiceDef finale = GetFinaleSections(interlude4Start, interlude4EndVerse5, postlude, 7, 17);
 
             return finale;
         }
@@ -183,9 +183,9 @@ namespace Moritz.AssistantComposer
         /// ACHTUNG: this function should be in a furies class. It is used by furies 2 and furies 4 (probably furies 3 too!)
         /// The three VoiceDefs are parallel. They have the same number of DurationDefs, each having the same MsPosition and
         /// MsDuration. The DurationDefs come from different palettes, so use different pitches etc.
-        /// This function simply creates a new VoiceDef by selecting the apropriate DurationDefs from each VoiceDef argument.
+        /// This function simply creates a new SongSixVoiceDef by selecting the apropriate DurationDefs from each SongSixVoiceDef argument.
         /// </summary>
-        private VoiceDef GetFinaleSections(VoiceDef finalePart1, VoiceDef finalePart2, VoiceDef postlude, int part2Index, int postludeIndex)
+        private SongSixVoiceDef GetFinaleSections(SongSixVoiceDef finalePart1, SongSixVoiceDef finalePart2, SongSixVoiceDef postlude, int part2Index, int postludeIndex)
         {
             List<IUniqueMidiDurationDef> iumdds = new List<IUniqueMidiDurationDef>();
 
@@ -202,10 +202,10 @@ namespace Moritz.AssistantComposer
                 iumdds.Add(postlude[i]);
             }
 
-            return new VoiceDef(iumdds);
+            return new SongSixVoiceDef(iumdds);
         }
 
-        private void Transform(VoiceDef section, Dictionary<string, int> msPositions)
+        private void Transform(SongSixVoiceDef section, Dictionary<string, int> msPositions)
         {
             section.RemoveRange(40, section.Count - 40);
 
@@ -227,7 +227,7 @@ namespace Moritz.AssistantComposer
             }
         }
 
-        internal void AdjustAlignments(Furies1 furies1, Clytemnestra clytemnestra, VoiceDef wind3)
+        internal void AdjustAlignments(Furies1 furies1, Clytemnestra clytemnestra, SongSixVoiceDef wind3)
         {
             AlignObjectAtIndex(42, Count-1, Count, furies1[280].MsPosition);
 

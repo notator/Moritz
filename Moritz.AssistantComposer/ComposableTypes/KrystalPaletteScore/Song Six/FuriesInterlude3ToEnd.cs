@@ -18,7 +18,7 @@ namespace Moritz.AssistantComposer
         /// The arguments are all complete to the end of Verse 3
         /// </summary>
         private void GetFuriesInterlude3ToEnd(Furies1 furies1, Furies2 furies2, Furies3 furies3, Furies4 furies4,
-            Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3, List<PaletteDef> palettes,
+            Clytemnestra clytemnestra, SongSixVoiceDef wind1, SongSixVoiceDef wind2, SongSixVoiceDef wind3, List<PaletteDef> palettes,
             Dictionary<string, int> msPositions)
         {
             furies1.GetFinale(palettes, msPositions, _krystals[9]); // _krystals[9] is xk3(12.12.1)-1.krys

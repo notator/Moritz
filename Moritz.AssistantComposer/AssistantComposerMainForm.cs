@@ -1635,6 +1635,9 @@ namespace Moritz.AssistantComposer
                 case "Study 3 sketch":
                     midiAlgorithm = new Study3SketchAlgorithm(null, null);
                     break;
+                case "Study 4":
+                    midiAlgorithm = new Study4Algorithm(null, null);
+                    break;
                 default:
                     throw new ApplicationException("unknown algorithm");
             }

@@ -9,12 +9,12 @@ using Krystals4ObjectLibrary;
 namespace Moritz.AssistantComposer
 {
     /// <summary>
-    /// The Algorithm for Song 6.
+    /// The Algorithm for Study 4.
     /// This will develop as composition progresses...
     /// </summary>
-    internal partial class SongSixAlgorithm : MidiCompositionAlgorithm
+    internal partial class Study4Algorithm : MidiCompositionAlgorithm
     {
-        public SongSixAlgorithm(List<Krystal> krystals, List<PaletteDef> paletteDefs)
+        public Study4Algorithm(List<Krystal> krystals, List<PaletteDef> paletteDefs)
             : base(krystals, paletteDefs)
         {
         }
@@ -38,7 +38,7 @@ namespace Moritz.AssistantComposer
 
         /// <summary>
         /// Sets the midi content of the score, independent of its notation.
-        /// This means adding UniqueMidiDurationDefs to each SongSixVoiceDef's UniqueMidiDurationDefs list.
+        /// This means adding UniqueMidiDurationDefs to each VoiceDef's UniqueMidiDurationDefs list.
         /// The UniqueMidiDurationDefs will later be transcribed into a particular notation by a Notator.
         /// Notations are independent of the midi info.
         /// This DoAlgorithm() function is special to this composition.
@@ -48,6 +48,8 @@ namespace Moritz.AssistantComposer
         /// </returns>
         public override List<List<Voice>> DoAlgorithm()
         {
+            #region old (Song Six)
+            /*******************************************
             // Palette indices:
             // Winds use palette 0.
             // Furies use:
@@ -62,14 +64,14 @@ namespace Moritz.AssistantComposer
             // All palettes can be accessed here at _paletteDefs[ paletteIndex ].
 
             // The wind3 is the lowest wind. The winds are numbered from top to bottom in the score.
-            SongSixVoiceDef wind3 = GetWind3(_paletteDefs[0], _krystals[8]);
-            
+            VoiceDef wind3 = GetWind3(_paletteDefs[0], _krystals[8]);
+
             Clytemnestra clytemnestra = new Clytemnestra(wind3);
 
             clytemnestra.AdjustVelocities(49, 59, 1.4);
 
-            SongSixVoiceDef wind2 = GetWind2(wind3, clytemnestra);
-            SongSixVoiceDef wind1 = GetWind1(wind3, wind2, clytemnestra);
+            VoiceDef wind2 = GetWind2(wind3, clytemnestra);
+            VoiceDef wind1 = GetWind1(wind3, wind2, clytemnestra);
 
             AdjustFinalWindChordPosition(wind1, wind2, wind3); // "fermata"
 
@@ -102,7 +104,7 @@ namespace Moritz.AssistantComposer
 
             // contouring test code
             //wind1.SetContour(2, new List<int>() { 1, 1, 1 }, 12, 1);
-            
+
             // Construct the Furies up to Interlude3.
             Furies4 furies4 = new Furies4(msPositions["endOfPiece"]);
             furies4.GetBeforeInterlude3(wind3[0].MsDuration / 2, clytemnestra, wind1, _paletteDefs);
@@ -123,15 +125,15 @@ namespace Moritz.AssistantComposer
             // contouring test code 
             // fury1.SetContour(1, new List<int>(){2,2,2,2,2}, 1, 6);
 
-            SongSixVoiceDef control = GetControlVoiceDef(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
+            VoiceDef control = GetControlVoiceDef(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
 
             // Add each voiceDef to voiceDefs here, in top to bottom (=channelIndex) order in the score.
-            List<SongSixVoiceDef> voiceDefs = new List<SongSixVoiceDef>() { furies1, furies2, furies3, furies4, control, clytemnestra, wind1, wind2, wind3 };
-            
+            List<VoiceDef> voiceDefs = new List<VoiceDef>() { furies1, furies2, furies3, furies4, control, clytemnestra, wind1, wind2, wind3 };
+
             Debug.Assert(voiceDefs.Count == MidiChannels().Count);
 
             //********************************************************
-            //foreach(SongSixVoiceDef voiceDef in voiceDefs)
+            //foreach(VoiceDef voiceDef in voiceDefs)
             //{
             //    voiceDef.SetLyricsToIndex();
             //}
@@ -140,13 +142,16 @@ namespace Moritz.AssistantComposer
             List<int> barlineMsPositions = GetBarlineMsPositions(control, furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
 
             InsertClefChanges(furies1, furies2, furies3, furies4);
-            
+
             // this system contains one Voice per channel (not divided into bars)
             List<Voice> system = GetVoices(voiceDefs);
 
             List<List<Voice>> bars = GetBars(system, barlineMsPositions);
 
             return bars;
+            ****************************************************/
+            #endregion old (Song Six)
+            return null; // temp
         }
 
         /// <summary>
@@ -174,14 +179,14 @@ namespace Moritz.AssistantComposer
             furies4.InsertClefChange(59, "b1"); // bar 104
         }
 
-        private void AdjustFinalWindChordPosition(SongSixVoiceDef wind1, SongSixVoiceDef wind2, SongSixVoiceDef wind3)
+        private void AdjustFinalWindChordPosition(VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
         {
             wind1.AlignObjectAtIndex(71, 81, 82, wind1[81].MsPosition - (wind1[81].MsDuration / 2));
             wind2.AlignObjectAtIndex(71, 81, 82, wind2[81].MsPosition - (wind2[81].MsDuration / 2));
             wind3.AlignObjectAtIndex(71, 81, 82, wind3[81].MsPosition - (wind3[81].MsDuration / 2));
         }
 
-        private void AdjustWindVelocities(SongSixVoiceDef wind1, SongSixVoiceDef wind2, SongSixVoiceDef wind3)
+        private void AdjustWindVelocities(VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
         {
             int beginInterlude2DimIndex = 25; // start of Interlude2
             int beginVerse3DimIndex = 31; // non-inclusive
@@ -201,17 +206,17 @@ namespace Moritz.AssistantComposer
             wind3.AdjustVelocitiesHairpin(beginPostludeIndex, wind3.Count, 2.3);
         }
 
-        private void AdjustWindPitchWheelDeviations(SongSixVoiceDef wind)
+        private void AdjustWindPitchWheelDeviations(VoiceDef wind)
         {
             int versePwdValue = 3;
-            double windStartPwdValue = 6, windEndPwdValue=28;
-            double pwdfactor = Math.Pow(windEndPwdValue/windStartPwdValue, (double)1/5); // 5th root of windEndPwdValue/windStartPwdValue -- the last pwd should be windEndPwdValue
+            double windStartPwdValue = 6, windEndPwdValue = 28;
+            double pwdfactor = Math.Pow(windEndPwdValue / windStartPwdValue, (double)1 / 5); // 5th root of windEndPwdValue/windStartPwdValue -- the last pwd should be windEndPwdValue
 
             for(int i = 0; i < wind.Count; ++i)
             {
                 if(i < 8) //prelude
                 {
-                    wind[i].PitchWheelDeviation = (int) windStartPwdValue;
+                    wind[i].PitchWheelDeviation = (int)windStartPwdValue;
                 }
                 else if(i < 15) // verse 1
                 {
@@ -252,24 +257,24 @@ namespace Moritz.AssistantComposer
                 else // postlude
                 {
                     wind[i].PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 5)));
-                }            
+                }
             }
         }
 
         /// <summary>
         /// The returned barlineMsPositions contain both the position of bar 1 (0ms) and the position of the final barline.
         /// </summary>
-        private List<int> GetBarlineMsPositions(SongSixVoiceDef control, SongSixVoiceDef fury1, SongSixVoiceDef fury2, SongSixVoiceDef fury3, SongSixVoiceDef fury4, Clytemnestra clytemnestra, SongSixVoiceDef wind1, SongSixVoiceDef wind2, SongSixVoiceDef wind3)
+        private List<int> GetBarlineMsPositions(VoiceDef control, VoiceDef fury1, VoiceDef fury2, VoiceDef fury3, VoiceDef fury4, Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
         {
-            SongSixVoiceDef ctl = control;
-            SongSixVoiceDef f1 = fury1;
-            SongSixVoiceDef f2 = fury2;
-            SongSixVoiceDef f3 = fury3;
-            SongSixVoiceDef f4 = fury4;
+            VoiceDef ctl = control;
+            VoiceDef f1 = fury1;
+            VoiceDef f2 = fury2;
+            VoiceDef f3 = fury3;
+            VoiceDef f4 = fury4;
             Clytemnestra c = clytemnestra;
-            SongSixVoiceDef w1 = wind1;
-            SongSixVoiceDef w2 = wind2;
-            SongSixVoiceDef w3 = wind3;
+            VoiceDef w1 = wind1;
+            VoiceDef w2 = wind2;
+            VoiceDef w3 = wind3;
 
             List<int> barlineMsPositions = new List<int>()
             {
@@ -412,113 +417,115 @@ namespace Moritz.AssistantComposer
             return barlineMsPositions;
         }
 
+        #region old (Song Six)
         /// <summary>
-        /// The control SongSixVoiceDef consists of single note + rest pairs whose msPositions are composed here.
+        /// The control VoiceDef consists of single note + rest pairs whose msPositions are composed here.
         /// </summary>
-        private SongSixVoiceDef GetControlVoiceDef(SongSixVoiceDef furies1, SongSixVoiceDef furies2, SongSixVoiceDef furies3, SongSixVoiceDef furies4, Clytemnestra clytemnestra, SongSixVoiceDef wind1, SongSixVoiceDef wind2, SongSixVoiceDef wind3)
-        {
-            SongSixVoiceDef f1 = furies1;
-            SongSixVoiceDef f2 = furies2;
-            SongSixVoiceDef f3 = furies3;
-            SongSixVoiceDef f4 = furies4;
-            SongSixVoiceDef w1 = wind1;
-            SongSixVoiceDef w2 = wind2;
-            SongSixVoiceDef w3 = wind3;
-            SongSixVoiceDef c = clytemnestra;
+        //private VoiceDef GetControlVoiceDef(VoiceDef furies1, VoiceDef furies2, VoiceDef furies3, VoiceDef furies4, Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
+        //{
+        //    VoiceDef f1 = furies1;
+        //    VoiceDef f2 = furies2;
+        //    VoiceDef f3 = furies3;
+        //    VoiceDef f4 = furies4;
+        //    VoiceDef w1 = wind1;
+        //    VoiceDef w2 = wind2;
+        //    VoiceDef w3 = wind3;
+        //    VoiceDef c = clytemnestra;
 
-            // The columns here are note MsPositions and rest MsPositions respectively.
-            List<int> controlNoteAndRestMsPositions = new List<int>()
-            {
-                0, f4[1].MsPosition / 2, 
-                f4[1].MsPosition, f4[2].MsPosition, 
-                f4[3].MsPosition, f4[4].MsPosition, 
-                f4[5].MsPosition, f4[6].MsPosition,
-                f4[7].MsPosition, f4[8].MsPosition, // verse 1 starts inside f4[7] 
-                f4[9].MsPosition, f4[10].MsPosition,
-                f4[11].MsPosition, f4[12].MsPosition,
-                c[49].MsPosition, (c[58].MsPosition + c[59].MsPosition) / 2,
+        //    // The columns here are note MsPositions and rest MsPositions respectively.
+        //    List<int> controlNoteAndRestMsPositions = new List<int>()
+        //    {
+        //        0, f4[1].MsPosition / 2, 
+        //        f4[1].MsPosition, f4[2].MsPosition, 
+        //        f4[3].MsPosition, f4[4].MsPosition, 
+        //        f4[5].MsPosition, f4[6].MsPosition,
+        //        f4[7].MsPosition, f4[8].MsPosition, // verse 1 starts inside f4[7] 
+        //        f4[9].MsPosition, f4[10].MsPosition,
+        //        f4[11].MsPosition, f4[12].MsPosition,
+        //        c[49].MsPosition, (c[58].MsPosition + c[59].MsPosition) / 2,
 
-                // Interlude 1
-                f3[1].MsPosition, f3[12].MsPosition,
-                f3[13].MsPosition, f3[24].MsPosition,
+        //        // Interlude 1
+        //        f3[1].MsPosition, f3[12].MsPosition,
+        //        f3[13].MsPosition, f3[24].MsPosition,
 
-                // Verse 2
-                c[60].MsPosition, c[61].MsPosition,
-                c[62].MsPosition, c[65].MsPosition,
-                c[66].MsPosition, c[82].MsPosition,
-                c[83].MsPosition, c[93].MsPosition,
-                c[94].MsPosition, c[98].MsPosition,
-                c[99].MsPosition, c[105].MsPosition,
-                c[106].MsPosition, c[116].MsPosition,
+        //        // Verse 2
+        //        c[60].MsPosition, c[61].MsPosition,
+        //        c[62].MsPosition, c[65].MsPosition,
+        //        c[66].MsPosition, c[82].MsPosition,
+        //        c[83].MsPosition, c[93].MsPosition,
+        //        c[94].MsPosition, c[98].MsPosition,
+        //        c[99].MsPosition, c[105].MsPosition,
+        //        c[106].MsPosition, c[116].MsPosition,
 
-                // Interlude 2
-                f3[61].MsPosition, f3[72].MsPosition,
-                f1[1].MsPosition, f1[2].MsPosition,
-                f1[3].MsPosition, f2[18].MsPosition,
-                f3[96].MsPosition, f1[5].MsPosition,
-                f2[29].MsPosition, f3[116].MsPosition,
-                f4[29].MsPosition, f1[10].MsPosition,
-                f3[131].MsPosition, f2[47].MsPosition,
+        //        // Interlude 2
+        //        f3[61].MsPosition, f3[72].MsPosition,
+        //        f1[1].MsPosition, f1[2].MsPosition,
+        //        f1[3].MsPosition, f2[18].MsPosition,
+        //        f3[96].MsPosition, f1[5].MsPosition,
+        //        f2[29].MsPosition, f3[116].MsPosition,
+        //        f4[29].MsPosition, f1[10].MsPosition,
+        //        f3[131].MsPosition, f2[47].MsPosition,
 
-                // Verse 3
-                c[117].MsPosition, c[118].MsPosition,
-                c[119].MsPosition, c[122].MsPosition,
-                c[123].MsPosition, c[129].MsPosition,
-                c[130].MsPosition, c[140].MsPosition,
-                c[141].MsPosition, c[151].MsPosition,
-                c[152].MsPosition, c[162].MsPosition,
-                c[163].MsPosition, c[173].MsPosition,
+        //        // Verse 3
+        //        c[117].MsPosition, c[118].MsPosition,
+        //        c[119].MsPosition, c[122].MsPosition,
+        //        c[123].MsPosition, c[129].MsPosition,
+        //        c[130].MsPosition, c[140].MsPosition,
+        //        c[141].MsPosition, c[151].MsPosition,
+        //        c[152].MsPosition, c[162].MsPosition,
+        //        c[163].MsPosition, c[173].MsPosition,
 
-                // Interlude 3 (=beginning of Finale)
-                f1[25].MsPosition, f1[29].MsPosition, 
-                f1[30].MsPosition, f1[34].MsPosition + 100, 
-                f1[35].MsPosition, f1[40].MsPosition,
-                f1[41].MsPosition, f1[45].MsPosition,
-                f1[46].MsPosition, f1[51].MsPosition,
-                f1[52].MsPosition, f2[66].MsPosition + 100,
-                f1[56].MsPosition, f1[60].MsPosition + 100,
-                f1[61].MsPosition, f1[67].MsPosition + 100,
-                f1[68].MsPosition, f1[73].MsPosition + 100,
+        //        // Interlude 3 (=beginning of Finale)
+        //        f1[25].MsPosition, f1[29].MsPosition, 
+        //        f1[30].MsPosition, f1[34].MsPosition + 100, 
+        //        f1[35].MsPosition, f1[40].MsPosition,
+        //        f1[41].MsPosition, f1[45].MsPosition,
+        //        f1[46].MsPosition, f1[51].MsPosition,
+        //        f1[52].MsPosition, f2[66].MsPosition + 100,
+        //        f1[56].MsPosition, f1[60].MsPosition + 100,
+        //        f1[61].MsPosition, f1[67].MsPosition + 100,
+        //        f1[68].MsPosition, f1[73].MsPosition + 100,
 
-                // Verse 4
-                c[174].MsPosition, c[184].MsPosition,
-                c[185].MsPosition, c[215].MsPosition,
-                c[216].MsPosition, c[234].MsPosition,
-                c[235].MsPosition, c[254].MsPosition,
-                //c[255].MsPosition, c[268].MsPosition,
-                c[255].MsPosition, f2[134].MsPosition + 100,
+        //        // Verse 4
+        //        c[174].MsPosition, c[184].MsPosition,
+        //        c[185].MsPosition, c[215].MsPosition,
+        //        c[216].MsPosition, c[234].MsPosition,
+        //        c[235].MsPosition, c[254].MsPosition,
+        //        //c[255].MsPosition, c[268].MsPosition,
+        //        c[255].MsPosition, f2[134].MsPosition + 100,
 
-                // Interlude 4
-                //f4[42].MsPosition, f4[43].MsPosition,
-                f4[42].MsPosition, f1[132].MsPosition + 100,
-                //f4[45].MsPosition, f4[46].MsPosition,
-                f4[45].MsPosition, f1[145].MsPosition - 100,
-                //f4[47].MsPosition, f4[48].MsPosition,
-                w3[63].MsPosition, f2[177].MsPosition,
+        //        // Interlude 4
+        //        //f4[42].MsPosition, f4[43].MsPosition,
+        //        f4[42].MsPosition, f1[132].MsPosition + 100,
+        //        //f4[45].MsPosition, f4[46].MsPosition,
+        //        f4[45].MsPosition, f1[145].MsPosition - 100,
+        //        //f4[47].MsPosition, f4[48].MsPosition,
+        //        w3[63].MsPosition, f2[177].MsPosition,
 
-                //f4[49].MsPosition, f4[50].MsPosition,
-                f4[49].MsPosition, f1[170].MsPosition + 100,
-                //f4[52].MsPosition, f4[53].MsPosition,
-                f4[52].MsPosition, f1[189].MsPosition,
+        //        //f4[49].MsPosition, f4[50].MsPosition,
+        //        f4[49].MsPosition, f1[170].MsPosition + 100,
+        //        //f4[52].MsPosition, f4[53].MsPosition,
+        //        f4[52].MsPosition, f1[189].MsPosition,
 
-                // Verse 5
-                c[269].MsPosition, c[277].MsPosition,
-                //c[278].MsPosition, c[287].MsPosition,
-                c[278].MsPosition, f2[232].MsPosition + 50,
-                c[288].MsPosition, c[289].MsPosition,
+        //        // Verse 5
+        //        c[269].MsPosition, c[277].MsPosition,
+        //        //c[278].MsPosition, c[287].MsPosition,
+        //        c[278].MsPosition, f2[232].MsPosition + 50,
+        //        c[288].MsPosition, c[289].MsPosition,
 
-                // Postlude off
+        //        // Postlude off
 
-                w3.EndMsPosition // final barline position
-            };
+        //        w3.EndMsPosition // final barline position
+        //    };
 
-            SongSixVoiceDef controlVoiceDef = MakeControlVoiceDef(controlNoteAndRestMsPositions);
-            return controlVoiceDef;
-        }
+        //    VoiceDef controlVoiceDef = MakeControlVoiceDef(controlNoteAndRestMsPositions);
+        //    return controlVoiceDef;
+        //}
+        #endregion old (Song Six)
 
         // This code should not change while composing the ControlVoiceDef.
-        // It just makes the SongSixVoiceDef from the controlNoteAndRestMsPositions defined above.
-        private static SongSixVoiceDef MakeControlVoiceDef(List<int> controlNoteAndRestMsPositions)
+        // It just makes the VoiceDef from the controlNoteAndRestMsPositions defined above.
+        private static VoiceDef MakeControlVoiceDef(List<int> controlNoteAndRestMsPositions)
         {
             List<IUniqueMidiDurationDef> controlLmdds = new List<IUniqueMidiDurationDef>();
 
@@ -540,16 +547,16 @@ namespace Moritz.AssistantComposer
                 controlLmdds.Add(umChordDef);
                 controlLmdds.Add(umRestDef);
             }
-            SongSixVoiceDef controlVoiceDef = new SongSixVoiceDef(controlLmdds);
+            VoiceDef controlVoiceDef = new VoiceDef(controlLmdds);
             return controlVoiceDef;
         }
 
-        private List<Voice> GetVoices(List<SongSixVoiceDef> voiceDefs)
+        private List<Voice> GetVoices(List<VoiceDef> voiceDefs)
         {
             byte channelIndex = 0;
             List<Voice> voices = new List<Voice>();
 
-            foreach(SongSixVoiceDef voiceDef in voiceDefs)
+            foreach(VoiceDef voiceDef in voiceDefs)
             {
                 Voice voice = new Voice(null, channelIndex++);
                 voice.UniqueMidiDurationDefs = voiceDef.UniqueMidiDurationDefs;
