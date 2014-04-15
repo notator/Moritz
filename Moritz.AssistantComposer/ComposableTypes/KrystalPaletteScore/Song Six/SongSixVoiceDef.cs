@@ -129,6 +129,7 @@ namespace Moritz.AssistantComposer
                     throw new IndexOutOfRangeException();
                 }
                 _uniqueMidiDurationDefs[i] = value;
+                SetMsPositions();
             }
         }
 
