@@ -4,6 +4,7 @@ using System.Xml;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Text;
 
 using Moritz.Globals;
 
@@ -15,7 +16,7 @@ namespace Moritz.AssistantComposer
         /// Creates a new, empty PerformerOptionsForm for setting the following options.
         /// These are all defaults, that will be adjustable (as before) in the AP:
         /// </summary>
-        public PerformerOptionsForm(AssistantComposerMainForm assistantComposerMainForm)
+        public PerformerOptionsForm(AssistantComposerMainForm assistantComposerMainForm, int nTracks)
         {
             InitializeComponent();
 
@@ -27,19 +28,16 @@ namespace Moritz.AssistantComposer
             _modWheelCheckBoxes = GetModWheelCheckBoxes();
 
             _assistantComposerMainForm = assistantComposerMainForm;
-        }
-
-        public void Read(XmlReader r)
-        {
-            Debug.Assert(r.Name == "performerOptions");
 
             #region set default values
-            this._nTracks = -1;
-            //this.PerformersTrackNumberComboBox.Text = "1";
+            this._nTracks = nTracks;
+            SetPerformersTrackNumberComboBoxItems();
+            this.PerformersTrackNumberComboBox.Text = "1";
+
             this.NoteOnPitchTracksComboBox.Text = "none";
             this.NoteOnVelocityTracksComboBox.Text = "none";
 
-            this.PressureControllerComboBox.Text = "volume (7)";
+            this.PressureControllerComboBox.Text = "aftertouch";
             this.PressureTracksComboBox.Text = "none";
             this.PitchWheelControllerComboBox.Text = "pitch wheel";
             this.PitchWheelTracksComboBox.Text = "none";
@@ -53,6 +51,23 @@ namespace Moritz.AssistantComposer
             this.OptionalMinimumVolumePanel.Enabled = false;
             this.MinimumVolumeTextBox.Text = "50";
             #endregion
+
+            DisableUnusedTrackPanels(_nTracks);
+        }
+
+        private void SetPerformersTrackNumberComboBoxItems()
+        {
+            PerformersTrackNumberComboBox.Items.Clear();
+            for(int j = 0; j < _nTracks; ++j)
+            {
+                PerformersTrackNumberComboBox.Items.Add((j + 1).ToString());
+            }
+        }
+
+        public void Read(XmlReader r)
+        {
+            Debug.Assert(r.Name == "performerOptions");
+
             #region get attributes
             int count = r.AttributeCount;
             for(int i = 0; i < count; i++)
@@ -101,11 +116,6 @@ namespace Moritz.AssistantComposer
                     case "trackIndex":
                         _performersTrackIndex = int.Parse(r.Value);
                         Debug.Assert(_performersTrackIndex < this._nTracks);
-                        PerformersTrackNumberComboBox.Items.Clear();
-                        for(int j = 0; j < _nTracks; ++j)
-                        {
-                            PerformersTrackNumberComboBox.Items.Add((j + 1).ToString());
-                        }
                         PerformersTrackNumberComboBox.SelectedIndex = _performersTrackIndex;
                         break;
                 }
@@ -115,8 +125,6 @@ namespace Moritz.AssistantComposer
             SetAllTrackComboBoxesFromCheckBoxes(_nTracks);
 
             SetPerformersTrackPanelDisplay(_performersTrackIndex);
-
-            DisableUnusedTrackPanels(_nTracks);
 
             OptionalMaximumSpeedPanel.Enabled = (SpeedControllerComboBox.SelectedIndex > 0);
             SetMinimumVolumePanelEnabledStatus();
@@ -203,14 +211,46 @@ namespace Moritz.AssistantComposer
 
         public void Write(XmlWriter w)
         {
+            StringBuilder sb;
+
             w.WriteStartElement("performerOptions");
 
-            //if(!String.IsNullOrEmpty(MetadataKeywordsTextBox.Text))
-            //    w.WriteAttributeString("keywords", this.MetadataKeywordsTextBox.Text);
-            //if(!String.IsNullOrEmpty(MetadataCommentTextBox.Text))
-            //    w.WriteAttributeString("comment", this.MetadataCommentTextBox.Text);
+            sb = GetBoolString(_noteOnPitchCheckBoxes);
+            w.WriteAttributeString("noteOnPitchTracks", sb.ToString());
+
+            sb = GetBoolString(_noteOnVelocityCheckBoxes);
+            w.WriteAttributeString("noteOnVelocityTracks", sb.ToString());
+
+            w.WriteAttributeString("pressureController", this.PressureControllerComboBox.Text);
+            sb = GetBoolString(_pressureCheckBoxes);
+            w.WriteAttributeString("pressureTracks", sb.ToString());
+
+            w.WriteAttributeString("pitchWheelController", this.PitchWheelControllerComboBox.Text);
+            sb = GetBoolString(_pitchWheelCheckBoxes);
+            w.WriteAttributeString("pitchWheelTracks", sb.ToString());
+
+            w.WriteAttributeString("modWheelController", this.ModWheelControllerComboBox.Text);
+            sb = GetBoolString(_modWheelCheckBoxes);
+            w.WriteAttributeString("modWheelTracks", sb.ToString());
+
+            w.WriteAttributeString("speedController", this.SpeedControllerComboBox.Text);
+            w.WriteAttributeString("speedMaxPercent", this.MaximumSpeedPercentTextBox.Text);
+
+            w.WriteAttributeString("minVolume", this.MinimumVolumeTextBox.Text);
+
+            w.WriteAttributeString("trackIndex", this._performersTrackIndex.ToString());
 
             w.WriteEndElement(); // performerOptions
+        }
+
+        private StringBuilder GetBoolString(List<CheckBox> checkBoxes)
+        {
+            StringBuilder sb = new StringBuilder();
+            for(int i = 0; i < _nTracks; ++i)
+            {
+                sb.Append((checkBoxes[i].Checked) ? '1' : '0');
+            }
+            return sb;
         }
 
         public bool HasError()

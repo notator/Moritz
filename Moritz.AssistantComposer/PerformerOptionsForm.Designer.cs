@@ -1726,7 +1726,7 @@
             this.OptionalMaximumSpeedPanel.Controls.Add(this.MaximumSpeedPercentTextBox);
             this.OptionalMaximumSpeedPanel.Controls.Add(this.label3);
             this.OptionalMaximumSpeedPanel.Controls.Add(this.label4);
-            this.OptionalMaximumSpeedPanel.Location = new System.Drawing.Point(233, 226);
+            this.OptionalMaximumSpeedPanel.Location = new System.Drawing.Point(234, 226);
             this.OptionalMaximumSpeedPanel.Name = "OptionalMaximumSpeedPanel";
             this.OptionalMaximumSpeedPanel.Size = new System.Drawing.Size(394, 72);
             this.OptionalMaximumSpeedPanel.TabIndex = 175;

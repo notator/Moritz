@@ -23,7 +23,6 @@ namespace Moritz.AssistantComposer
             InitializeComponent();
             _moritzForm1 = moritzForm1;
             _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this);
-            _performerOptionsForm = new PerformerOptionsForm(this);
 
             M.PopulateComboBox(ChordTypeComboBox, M.ChordTypes);
         
@@ -37,6 +36,8 @@ namespace Moritz.AssistantComposer
             _scoreFolderPath = Path.GetDirectoryName(settingsPath);
             _algorithmName = AlgorithmName(settingsPath);
             _algorithm = Algorithm(_algorithmName);
+
+            _performerOptionsForm = new PerformerOptionsForm(this, _algorithm.MidiChannels().Count);
 
             Debug.Assert(settingsPath.Contains(M.Preferences.LocalScoresRootFolder));
             _algorithmFolderPath = M.Preferences.LocalScoresRootFolder + @"\" + _algorithmName;
@@ -548,6 +549,7 @@ namespace Moritz.AssistantComposer
                 WriteNotation(w);
                 WriteKrystals(w);
                 WritePalettes(w);
+                WritePerformerOptions(w);
                 w.WriteEndElement(); // closes the moritzKrystalScore element
                 w.Close(); // close unnecessary because of the using statement?
             }
@@ -616,6 +618,11 @@ namespace Moritz.AssistantComposer
                 }
                 w.WriteEndElement(); // palettes
             }
+        }
+
+        private void WritePerformerOptions(XmlWriter w)
+        {
+            _performerOptionsForm.Write(w);
         }
 
         /// <summary>
