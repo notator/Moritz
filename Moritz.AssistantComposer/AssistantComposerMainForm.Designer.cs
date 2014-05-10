@@ -90,6 +90,7 @@ namespace Moritz.AssistantComposer
             this.DimensionsAndMetadataButton = new System.Windows.Forms.Button();
             this.KrystalsGroupBox = new System.Windows.Forms.GroupBox();
             this.PalettesGroupBox = new System.Windows.Forms.GroupBox();
+            this.PerformerOptionsButton = new System.Windows.Forms.Button();
             this.NotationGroupBox.SuspendLayout();
             this.StandardChordsOptionsPanel.SuspendLayout();
             this.KrystalsGroupBox.SuspendLayout();
@@ -764,6 +765,18 @@ namespace Moritz.AssistantComposer
             this.PalettesGroupBox.TabStop = false;
             this.PalettesGroupBox.Text = "palettes";
             // 
+            // PerformerOptionsButton
+            // 
+            this.PerformerOptionsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
+            this.PerformerOptionsButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.PerformerOptionsButton.Location = new System.Drawing.Point(361, 507);
+            this.PerformerOptionsButton.Name = "PerformerOptionsButton";
+            this.PerformerOptionsButton.Size = new System.Drawing.Size(183, 26);
+            this.PerformerOptionsButton.TabIndex = 150;
+            this.PerformerOptionsButton.Text = "Performer Options";
+            this.PerformerOptionsButton.UseVisualStyleBackColor = false;
+            this.PerformerOptionsButton.Click += new System.EventHandler(this.PerformerOptionsButton_Click);
+            // 
             // AssistantComposerMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
@@ -771,6 +784,7 @@ namespace Moritz.AssistantComposer
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
             this.ClientSize = new System.Drawing.Size(732, 578);
             this.ControlBox = false;
+            this.Controls.Add(this.PerformerOptionsButton);
             this.Controls.Add(this.PalettesGroupBox);
             this.Controls.Add(this.KrystalsGroupBox);
             this.Controls.Add(this.DimensionsAndMetadataButton);
@@ -859,6 +873,7 @@ namespace Moritz.AssistantComposer
         private System.Windows.Forms.Panel StandardChordsOptionsPanel;
         private System.Windows.Forms.Label ChordTypeComboBoxLabel;
         private System.Windows.Forms.ComboBox ChordTypeComboBox;
+        private System.Windows.Forms.Button PerformerOptionsButton;
 
     }
 }

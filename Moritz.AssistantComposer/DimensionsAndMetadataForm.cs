@@ -12,7 +12,7 @@ namespace Moritz.AssistantComposer
     public partial class DimensionsAndMetadataForm : Form
     {
         /// <summary>
-        /// Creates a new, empty PalettesForm with help texts adjusted for the given krystal.
+        /// Creates a new, empty AssistantComposerMainForm.
         /// </summary>
         /// <param name="assistantComposer"></param>
         /// <param name="krystal"></param>
@@ -97,7 +97,7 @@ namespace Moritz.AssistantComposer
                             break;
                     }
                 }
-                M.ReadToXmlElementTag(r, "metadata", "dimensions", "notation", "names", "krystals", "palettes");
+                M.ReadToXmlElementTag(r, "metadata", "dimensions", "performerOptions", "notation", "names", "krystals", "palettes");
             }
             SetSettingsHaveBeenSaved();
             DeselectAll();

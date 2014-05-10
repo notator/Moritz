@@ -69,6 +69,12 @@
     <Compile Include="ComposableTypes\KrystalPaletteScore\Study2c\Study2cAlgorithm.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Clytemnestra.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\SongSixAlgorithm.cs" />
+    <Compile Include="PerformerOptionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PerformerOptionsForm.Designer.cs">
+      <DependentUpon>PerformerOptionsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="DimensionsAndMetadataForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -159,6 +165,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="BasicPercussionControl.resx">
       <DependentUpon>BasicPercussionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PerformerOptionsForm.resx">
+      <DependentUpon>PerformerOptionsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DimensionsAndMetadataForm.resx">
       <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>

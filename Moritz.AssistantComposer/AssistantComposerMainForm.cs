@@ -23,6 +23,7 @@ namespace Moritz.AssistantComposer
             InitializeComponent();
             _moritzForm1 = moritzForm1;
             _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this);
+            _performerOptionsForm = new PerformerOptionsForm(this);
 
             M.PopulateComboBox(ChordTypeComboBox, M.ChordTypes);
         
@@ -199,6 +200,9 @@ namespace Moritz.AssistantComposer
                 error = _dimensionsAndMetadataForm.HasError();
 
             if(!error)
+                error = _performerOptionsForm.HasError();
+
+            if(!error)
             {
                 foreach(IPaletteForm iPaletteForm in AllIPalleteForms)
                 {
@@ -281,9 +285,9 @@ namespace Moritz.AssistantComposer
 
                     _dimensionsAndMetadataForm.Read(r);
 
-                    Debug.Assert(r.Name == "notation" || r.Name == "krystals" || r.Name == "palettes");
+                    Debug.Assert(r.Name == "notation" || r.Name == "krystals" || r.Name == "palettes" || r.Name == "performerOptions");
 
-                    while(r.Name == "notation" || r.Name == "krystals" || r.Name == "palettes")
+                    while(r.Name == "notation" || r.Name == "krystals" || r.Name == "palettes" || r.Name == "performerOptions")
                     {
                         if(r.NodeType != XmlNodeType.EndElement)
                         {
@@ -298,9 +302,12 @@ namespace Moritz.AssistantComposer
                                 case "palettes":
                                     GetPalettes(r);
                                     break;
+                                case "performerOptions":
+                                    GetPerformerOptions(r);
+                                    break;
                             }
                         }
-                        M.ReadToXmlElementTag(r, "notation", "krystals", "palettes", "moritzKrystalScore");
+                        M.ReadToXmlElementTag(r, "notation", "krystals", "palettes", "performerOptions", "moritzKrystalScore");
                     }
                     Debug.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
                 }
@@ -486,6 +493,11 @@ namespace Moritz.AssistantComposer
                 }
             }
             Debug.Assert(r.Name == "palettes");
+        }
+
+        private void GetPerformerOptions(XmlReader r)
+        {
+            _performerOptionsForm.Read(r);
         }
 
         public void SaveSettingsButton_Click(object sender, EventArgs e)
@@ -759,6 +771,12 @@ namespace Moritz.AssistantComposer
         {
             _dimensionsAndMetadataForm.Show();
             _dimensionsAndMetadataForm.BringToFront();
+        }
+
+        private void PerformerOptionsButton_Click(object sender, EventArgs e)
+        {
+            _performerOptionsForm.Show();
+            _performerOptionsForm.BringToFront();
         }
 
         private void QuitMoritzButton_Click(object sender, EventArgs e)
@@ -1694,6 +1712,7 @@ namespace Moritz.AssistantComposer
         private IMoritzForm1 _moritzForm1;
         private Moritz.Krystals.KrystalBrowser _krystalBrowser = null;
         private DimensionsAndMetadataForm _dimensionsAndMetadataForm;
+        private PerformerOptionsForm _performerOptionsForm;
         private int _numberOfStaves = 0;
 
         public PageFormat PageFormat = null;
