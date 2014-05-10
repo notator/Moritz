@@ -162,18 +162,18 @@
             this.OverrideTrackLabel = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.OptionalMinimumVolumePanel = new System.Windows.Forms.Panel();
-            this.label8 = new System.Windows.Forms.Label();
-            this.MinimumVolumeTextBox = new System.Windows.Forms.TextBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.SpeedControllerComboBox = new System.Windows.Forms.ComboBox();
-            this.OptionalMaximumSpeedPanel = new System.Windows.Forms.Panel();
+            this.OptionalMaximumSpeedGroupBox = new System.Windows.Forms.GroupBox();
             this.label5 = new System.Windows.Forms.Label();
             this.MaximumSpeedPercentTextBox = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.OptionalMinimumVolumeGroupBox = new System.Windows.Forms.GroupBox();
+            this.MinimumVolumeTextBox = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
             this.TrackPanel16.SuspendLayout();
             this.TrackPanel15.SuspendLayout();
             this.TrackPanel14.SuspendLayout();
@@ -190,16 +190,16 @@
             this.TrackPanel3.SuspendLayout();
             this.TrackPanel2.SuspendLayout();
             this.TrackPanel1.SuspendLayout();
-            this.OptionalMinimumVolumePanel.SuspendLayout();
-            this.OptionalMaximumSpeedPanel.SuspendLayout();
+            this.OptionalMaximumSpeedGroupBox.SuspendLayout();
+            this.OptionalMinimumVolumeGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // SaveSettingsButton
             // 
-            this.SaveSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.SaveSettingsButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.SaveSettingsButton.Enabled = false;
             this.SaveSettingsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.SaveSettingsButton.Location = new System.Drawing.Point(488, 309);
+            this.SaveSettingsButton.Location = new System.Drawing.Point(513, 305);
             this.SaveSettingsButton.Name = "SaveSettingsButton";
             this.SaveSettingsButton.Size = new System.Drawing.Size(106, 26);
             this.SaveSettingsButton.TabIndex = 7;
@@ -209,9 +209,9 @@
             // 
             // ShowMainScoreFormButton
             // 
-            this.ShowMainScoreFormButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.ShowMainScoreFormButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.ShowMainScoreFormButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.ShowMainScoreFormButton.Location = new System.Drawing.Point(335, 309);
+            this.ShowMainScoreFormButton.Location = new System.Drawing.Point(350, 305);
             this.ShowMainScoreFormButton.Name = "ShowMainScoreFormButton";
             this.ShowMainScoreFormButton.Size = new System.Drawing.Size(137, 26);
             this.ShowMainScoreFormButton.TabIndex = 8;
@@ -1647,58 +1647,11 @@
             this.label1.TabIndex = 157;
             this.label1.Text = "channel pressure";
             // 
-            // OptionalMinimumVolumePanel
-            // 
-            this.OptionalMinimumVolumePanel.Controls.Add(this.label8);
-            this.OptionalMinimumVolumePanel.Controls.Add(this.MinimumVolumeTextBox);
-            this.OptionalMinimumVolumePanel.Controls.Add(this.label7);
-            this.OptionalMinimumVolumePanel.Controls.Add(this.label6);
-            this.OptionalMinimumVolumePanel.Location = new System.Drawing.Point(17, 206);
-            this.OptionalMinimumVolumePanel.Name = "OptionalMinimumVolumePanel";
-            this.OptionalMinimumVolumePanel.Size = new System.Drawing.Size(202, 67);
-            this.OptionalMinimumVolumePanel.TabIndex = 172;
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.label8.Location = new System.Drawing.Point(3, 33);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(199, 28);
-            this.label8.TabIndex = 176;
-            this.label8.Text = "The minimum volume needs to be set\r\nif the performer is contolling the volume.";
-            // 
-            // MinimumVolumeTextBox
-            // 
-            this.MinimumVolumeTextBox.Location = new System.Drawing.Point(106, 8);
-            this.MinimumVolumeTextBox.Name = "MinimumVolumeTextBox";
-            this.MinimumVolumeTextBox.Size = new System.Drawing.Size(42, 20);
-            this.MinimumVolumeTextBox.TabIndex = 174;
-            this.MinimumVolumeTextBox.TextChanged += new System.EventHandler(this.MinimumVolumeTextBox_TextChanged);
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(150, 11);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(51, 14);
-            this.label7.TabIndex = 175;
-            this.label7.Text = "( 0..127 )";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(19, 11);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(84, 14);
-            this.label6.TabIndex = 173;
-            this.label6.Text = "minimum volume";
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.ForeColor = System.Drawing.Color.Blue;
-            this.label2.Location = new System.Drawing.Point(237, 220);
+            this.label2.Location = new System.Drawing.Point(18, 218);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(132, 14);
             this.label2.TabIndex = 174;
@@ -1714,71 +1667,127 @@
             "pressure",
             "pitch wheel",
             "modulation wheel"});
-            this.SpeedControllerComboBox.Location = new System.Drawing.Point(240, 237);
+            this.SpeedControllerComboBox.Location = new System.Drawing.Point(21, 240);
             this.SpeedControllerComboBox.Name = "SpeedControllerComboBox";
             this.SpeedControllerComboBox.Size = new System.Drawing.Size(109, 22);
             this.SpeedControllerComboBox.TabIndex = 173;
             this.SpeedControllerComboBox.SelectedIndexChanged += new System.EventHandler(this.SpeedControllComboBox_SelectedIndexChanged);
             // 
-            // OptionalMaximumSpeedPanel
+            // OptionalMaximumSpeedGroupBox
             // 
-            this.OptionalMaximumSpeedPanel.Controls.Add(this.label5);
-            this.OptionalMaximumSpeedPanel.Controls.Add(this.MaximumSpeedPercentTextBox);
-            this.OptionalMaximumSpeedPanel.Controls.Add(this.label3);
-            this.OptionalMaximumSpeedPanel.Controls.Add(this.label4);
-            this.OptionalMaximumSpeedPanel.Location = new System.Drawing.Point(234, 226);
-            this.OptionalMaximumSpeedPanel.Name = "OptionalMaximumSpeedPanel";
-            this.OptionalMaximumSpeedPanel.Size = new System.Drawing.Size(394, 72);
-            this.OptionalMaximumSpeedPanel.TabIndex = 175;
+            this.OptionalMaximumSpeedGroupBox.Controls.Add(this.label5);
+            this.OptionalMaximumSpeedGroupBox.Controls.Add(this.MaximumSpeedPercentTextBox);
+            this.OptionalMaximumSpeedGroupBox.Controls.Add(this.label3);
+            this.OptionalMaximumSpeedGroupBox.Controls.Add(this.label4);
+            this.OptionalMaximumSpeedGroupBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.OptionalMaximumSpeedGroupBox.ForeColor = System.Drawing.Color.Blue;
+            this.OptionalMaximumSpeedGroupBox.Location = new System.Drawing.Point(12, 220);
+            this.OptionalMaximumSpeedGroupBox.Name = "OptionalMaximumSpeedGroupBox";
+            this.OptionalMaximumSpeedGroupBox.Size = new System.Drawing.Size(617, 62);
+            this.OptionalMaximumSpeedGroupBox.TabIndex = 176;
+            this.OptionalMaximumSpeedGroupBox.TabStop = false;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
             this.label5.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.label5.Location = new System.Drawing.Point(159, 10);
+            this.label5.Location = new System.Drawing.Point(300, 12);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(228, 56);
-            this.label5.TabIndex = 170;
-            this.label5.Text = "The maximum speed occurs when the con-\r\ntroller sends an MSB value of 127. The mi" +
-    "ni-\r\nmum speed (the reciprocal factor) occurs\r\nwhen the controller sends an MSB " +
-    "value of 0.";
+            this.label5.Size = new System.Drawing.Size(313, 42);
+            this.label5.TabIndex = 174;
+            this.label5.Text = "The maximum speed occurs when the controller sends an MSB\r\nvalue of 127. The mini" +
+    "mum speed (the reciprocal factor) occurs\r\nwhen the controller sends an MSB value" +
+    " of 0.";
             // 
             // MaximumSpeedPercentTextBox
             // 
-            this.MaximumSpeedPercentTextBox.Location = new System.Drawing.Point(88, 41);
+            this.MaximumSpeedPercentTextBox.Location = new System.Drawing.Point(218, 20);
             this.MaximumSpeedPercentTextBox.Name = "MaximumSpeedPercentTextBox";
             this.MaximumSpeedPercentTextBox.Size = new System.Drawing.Size(51, 20);
-            this.MaximumSpeedPercentTextBox.TabIndex = 169;
+            this.MaximumSpeedPercentTextBox.TabIndex = 173;
             this.MaximumSpeedPercentTextBox.TextChanged += new System.EventHandler(this.MaximumSpeedTextBox_TextChanged);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(3, 44);
+            this.label3.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.label3.Location = new System.Drawing.Point(131, 23);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(84, 14);
-            this.label3.TabIndex = 167;
+            this.label3.TabIndex = 171;
             this.label3.Text = "maximum speed";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(140, 44);
+            this.label4.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.label4.Location = new System.Drawing.Point(270, 23);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(17, 14);
-            this.label4.TabIndex = 168;
+            this.label4.TabIndex = 172;
             this.label4.Text = "%";
+            // 
+            // OptionalMinimumVolumeGroupBox
+            // 
+            this.OptionalMinimumVolumeGroupBox.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.OptionalMinimumVolumeGroupBox.Controls.Add(this.MinimumVolumeTextBox);
+            this.OptionalMinimumVolumeGroupBox.Controls.Add(this.label8);
+            this.OptionalMinimumVolumeGroupBox.Controls.Add(this.label7);
+            this.OptionalMinimumVolumeGroupBox.Location = new System.Drawing.Point(12, 292);
+            this.OptionalMinimumVolumeGroupBox.Name = "OptionalMinimumVolumeGroupBox";
+            this.OptionalMinimumVolumeGroupBox.Size = new System.Drawing.Size(312, 52);
+            this.OptionalMinimumVolumeGroupBox.TabIndex = 178;
+            this.OptionalMinimumVolumeGroupBox.TabStop = false;
+            // 
+            // MinimumVolumeTextBox
+            // 
+            this.MinimumVolumeTextBox.Location = new System.Drawing.Point(9, 19);
+            this.MinimumVolumeTextBox.Name = "MinimumVolumeTextBox";
+            this.MinimumVolumeTextBox.Size = new System.Drawing.Size(42, 20);
+            this.MinimumVolumeTextBox.TabIndex = 177;
+            this.MinimumVolumeTextBox.TextChanged += new System.EventHandler(this.MinimumVolumeTextBox_TextChanged);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.label8.Location = new System.Drawing.Point(109, 14);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(196, 28);
+            this.label8.TabIndex = 179;
+            this.label8.Text = "The minimum volume needs to be set if\r\nthe performer is controllling the volume.";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(55, 22);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(51, 14);
+            this.label7.TabIndex = 178;
+            this.label7.Text = "( 0..127 )";
+            // 
+            // label6
+            // 
+            this.label6.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.label6.AutoSize = true;
+            this.label6.ForeColor = System.Drawing.Color.Blue;
+            this.label6.Location = new System.Drawing.Point(18, 289);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(84, 14);
+            this.label6.TabIndex = 180;
+            this.label6.Text = "minimum volume";
             // 
             // PerformerOptionsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
-            this.ClientSize = new System.Drawing.Size(641, 355);
+            this.ClientSize = new System.Drawing.Size(641, 359);
             this.ControlBox = false;
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.OptionalMinimumVolumeGroupBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.SpeedControllerComboBox);
-            this.Controls.Add(this.OptionalMaximumSpeedPanel);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label16);
             this.Controls.Add(this.PerformersTrackNumberComboBox);
@@ -1817,7 +1826,7 @@
             this.Controls.Add(this.TrackPanel12);
             this.Controls.Add(this.TrackPanel13);
             this.Controls.Add(this.TrackPanel4);
-            this.Controls.Add(this.OptionalMinimumVolumePanel);
+            this.Controls.Add(this.OptionalMaximumSpeedGroupBox);
             this.Font = new System.Drawing.Font("Arial", 8F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Location = new System.Drawing.Point(250, 100);
@@ -1856,10 +1865,10 @@
             this.TrackPanel2.PerformLayout();
             this.TrackPanel1.ResumeLayout(false);
             this.TrackPanel1.PerformLayout();
-            this.OptionalMinimumVolumePanel.ResumeLayout(false);
-            this.OptionalMinimumVolumePanel.PerformLayout();
-            this.OptionalMaximumSpeedPanel.ResumeLayout(false);
-            this.OptionalMaximumSpeedPanel.PerformLayout();
+            this.OptionalMaximumSpeedGroupBox.ResumeLayout(false);
+            this.OptionalMaximumSpeedGroupBox.PerformLayout();
+            this.OptionalMinimumVolumeGroupBox.ResumeLayout(false);
+            this.OptionalMinimumVolumeGroupBox.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -2001,17 +2010,17 @@
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label TrackLabel14;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Panel OptionalMinimumVolumePanel;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.TextBox MinimumVolumeTextBox;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox SpeedControllerComboBox;
-        private System.Windows.Forms.Panel OptionalMaximumSpeedPanel;
+        private System.Windows.Forms.GroupBox OptionalMaximumSpeedGroupBox;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox MaximumSpeedPercentTextBox;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.GroupBox OptionalMinimumVolumeGroupBox;
+        private System.Windows.Forms.TextBox MinimumVolumeTextBox;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label7;
     }
 }
