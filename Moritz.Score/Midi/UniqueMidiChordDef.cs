@@ -607,7 +607,7 @@ namespace Moritz.Score.Midi
             }
             if(Volume != null && Volume != M.DefaultVolume)
                 w.WriteAttributeString("volume", Volume.ToString());
-            if(RepeatMoments == false)
+            if(Repeat == false)
                 w.WriteAttributeString("repeat", "0");
             if(HasChordOff == false)
                 w.WriteAttributeString("hasChordOff", "0");
@@ -638,7 +638,7 @@ namespace Moritz.Score.Midi
         public new byte? Patch { get { return _patch; } set { _patch = value; } }
         public new byte? Volume { get { return _volume; } set { _volume = value; } }
 
-        public new bool RepeatMoments { get { return _repeat; } set { _repeat = value; } }
+        public new bool Repeat { get { return _repeat; } set { _repeat = value; } }
         public new bool HasChordOff { get { return _hasChordOff; } set { _hasChordOff = value; } }
 
         public new int MinimumBasicMidiChordMsDuration { get { return _minimumBasicMidiChordMsDuration; } set { _minimumBasicMidiChordMsDuration = value; } }

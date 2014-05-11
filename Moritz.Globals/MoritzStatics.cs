@@ -314,13 +314,20 @@ namespace Moritz.Globals
                 }
                 if(okay)
                 {
-                    List<int> ints = new List<int>();
-                    ints = StringToIntList(textBox.Text, ',');
-
-                    if(CheckIntList(ints, count, minVal, maxVal))
+                    try
                     {
-                        foreach(int i in ints)
-                            strings.Add(i.ToString(M.En_USNumberFormat));
+                        List<int> ints = StringToIntList(textBox.Text, ',');
+
+                        if(CheckIntList(ints, count, minVal, maxVal))
+                        {
+                            foreach(int i in ints)
+                                strings.Add(i.ToString(M.En_USNumberFormat));
+                        }
+                    }
+                    catch
+                    {
+                        // This can happen if StringToIntList(...) throws an exception
+                        // -- which can happen if two numbers are separated by whitespace but no comma!)
                     }
                 }
             }

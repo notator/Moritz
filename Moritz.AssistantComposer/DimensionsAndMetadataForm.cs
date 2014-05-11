@@ -457,7 +457,7 @@ namespace Moritz.AssistantComposer
 
         private void SaveSettingsButton_Click(object sender, EventArgs e)
         {
-            this._assistantComposerMainForm.SaveSettings();
+            this._assistantComposerMainForm.SaveSettings(0);
             SetSettingsHaveBeenSaved();
         }
 

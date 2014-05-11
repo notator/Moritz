@@ -22,11 +22,11 @@ namespace Moritz.AssistantComposer
         {
             InitializeComponent();
             _moritzForm1 = moritzForm1;
+            _allTextBoxes = GetAllTextBoxes();
             _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this);
 
             M.PopulateComboBox(ChordTypeComboBox, M.ChordTypes);
-        
-            this._allTextBoxes = GetAllTextBoxes();
+                   
             SetDefaultValues();
             DeselectAll();
 
@@ -36,8 +36,9 @@ namespace Moritz.AssistantComposer
             _scoreFolderPath = Path.GetDirectoryName(settingsPath);
             _algorithmName = AlgorithmName(settingsPath);
             _algorithm = Algorithm(_algorithmName);
+            _numberOfChannels = _algorithm.MidiChannels().Count;
 
-            _performerOptionsForm = new PerformerOptionsForm(this, _algorithm.MidiChannels().Count);
+            _performerOptionsForm = new PerformerOptionsForm(this, _numberOfChannels);
 
             Debug.Assert(settingsPath.Contains(M.Preferences.LocalScoresRootFolder));
             _algorithmFolderPath = M.Preferences.LocalScoresRootFolder + @"\" + _algorithmName;
@@ -57,6 +58,11 @@ namespace Moritz.AssistantComposer
             {
                 SetDefaultMidiChannelsPerVoicePerStaff(_algorithm.MidiChannels());
             }
+
+            SaveSettingsButton.Enabled = false;
+            CreateScoreButton.Enabled = false;
+
+            _constructing = false;
         }
 
         private void SetDefaultMidiChannelsPerVoicePerStaff(List<byte> algorithmMidiChannels)
@@ -141,6 +147,8 @@ namespace Moritz.AssistantComposer
             textBoxes.Add(this.MidiChannelsPerVoicePerStaffTextBox);
             textBoxes.Add(this.ClefsPerStaffTextBox);
             textBoxes.Add(this.StafflinesPerStaffTextBox);
+            textBoxes.Add(this.VolumePerChannelTextBox);
+            textBoxes.Add(this.PitchWheelDeviationPerChannelTextBox);
             textBoxes.Add(this.StaffGroupsTextBox);
             textBoxes.Add(this.LongStaffNamesTextBox);
             textBoxes.Add(this.ShortStaffNamesTextBox);
@@ -162,27 +170,30 @@ namespace Moritz.AssistantComposer
 
         public void SetSettingsHaveNotBeenSaved()
         {
-            if(SettingsHaveBeenSaved())
+            this.Text = _algorithmName + " algorithm*";
+            if(!_constructing)
             {
-                this.Text = _algorithmName + " algorithm*";
-                SetSaveAndCreateButtons(true);
+                if(InputValueErrors())
+                {
+                    SaveSettingsButton.Enabled = false;
+                }
+                else
+                {
+                    SaveSettingsButton.Enabled = true;
+                }
             }
+            CreateScoreButton.Enabled = false;
         }
+
         public void SetSettingsHaveBeenSaved()
         {
-            if(!SettingsHaveBeenSaved())
-            {
-                this.Text = _algorithmName + " algorithm";
-                SetSaveAndCreateButtons(false);
+            this.Text = _algorithmName + " algorithm";
+            SaveSettingsButton.Enabled = false;
+            CreateScoreButton.Enabled = true;
 
-                List<IPaletteForm> kpForms = AllIPalleteForms;
-                foreach(IPaletteForm kpf in kpForms)
-                    kpf.SetSettingsHaveBeenSaved();
-            }
-        }
-        private bool SettingsHaveBeenSaved()
-        {
-            return SaveSettingsButton.Enabled == false;
+            List<IPaletteForm> kpForms = AllIPalleteForms;
+            foreach(IPaletteForm kpf in kpForms)
+                kpf.SetSettingsHaveBeenSaved();
         }
 
         private bool InputValueErrors()
@@ -215,18 +226,14 @@ namespace Moritz.AssistantComposer
                 }
             }
 
-            if(error)
-                MessageBox.Show("Cannot create a score because there are illegal (pink) input values.", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
             return error;
         }
 
         public void SetSaveAndCreateButtons(bool saveButtonEnabled)
         {
             this.SaveSettingsButton.Enabled = saveButtonEnabled;
-            CreateScoreButton.Enabled = !saveButtonEnabled;
-        }
-
+            CreateScoreButton.Enabled = false;
+        }   
         #region form events
         private void DeselectAll()
         {
@@ -286,9 +293,9 @@ namespace Moritz.AssistantComposer
 
                     _dimensionsAndMetadataForm.Read(r);
 
-                    Debug.Assert(r.Name == "notation" || r.Name == "krystals" || r.Name == "palettes" || r.Name == "performerOptions");
+                    Debug.Assert(r.Name == "notation" || r.Name == "krystals" || r.Name == "palettes" || r.Name == "runtimeInfo");
 
-                    while(r.Name == "notation" || r.Name == "krystals" || r.Name == "palettes" || r.Name == "performerOptions")
+                    while(r.Name == "notation" || r.Name == "krystals" || r.Name == "palettes" || r.Name == "runtimeInfo")
                     {
                         if(r.NodeType != XmlNodeType.EndElement)
                         {
@@ -303,12 +310,12 @@ namespace Moritz.AssistantComposer
                                 case "palettes":
                                     GetPalettes(r);
                                     break;
-                                case "performerOptions":
-                                    GetPerformerOptions(r);
+                                case "runtimeInfo":
+                                    GetRuntimeInfo(r);
                                     break;
                             }
                         }
-                        M.ReadToXmlElementTag(r, "notation", "krystals", "palettes", "performerOptions", "moritzKrystalScore");
+                        M.ReadToXmlElementTag(r, "notation", "krystals", "palettes", "runtimeInfo", "moritzKrystalScore");
                     }
                     Debug.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
                 }
@@ -496,8 +503,29 @@ namespace Moritz.AssistantComposer
             Debug.Assert(r.Name == "palettes");
         }
 
-        private void GetPerformerOptions(XmlReader r)
+        private void GetRuntimeInfo(XmlReader r)
         {
+            Debug.Assert(r.Name == "runtimeInfo");
+            // The runtimeInfo.nPages and runtimeInfo.nTracks attributes are not read here
+            // (They are only used by the Assistant Performer.)
+
+            M.ReadToXmlElementTag(r, "trackInit");
+            int count = r.AttributeCount;
+            for(int i = 0; i < count; i++)
+            {
+                r.MoveToAttribute(i);
+                switch(r.Name)
+                {
+                    case "volumes":
+                        VolumePerChannelTextBox.Text = r.Value;
+                        break;
+                    case "pitchWheelDeviations":
+                        PitchWheelDeviationPerChannelTextBox.Text = r.Value;
+                        break;
+                }
+            }
+
+            M.ReadToXmlElementTag(r, "performerOptions");
             _performerOptionsForm.Read(r);
         }
 
@@ -505,11 +533,18 @@ namespace Moritz.AssistantComposer
         {
             try
             {
-                SaveSettings();
+                if(!InputValueErrors())
+                {
+                    SaveSettings(0);
+                }
+                else
+                {
+                    MessageBox.Show("Cannot save the settings because there are illegal (pink) input values.", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
             catch(Exception ex)
             {
-                string msg = "Failed to save score.\r\n\r\n"
+                string msg = "Failed to save score settings.\r\n\r\n"
                     + "Exception message: " + ex.Message;
                 MessageBox.Show(msg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
@@ -520,10 +555,15 @@ namespace Moritz.AssistantComposer
             if(!InputValueErrors())
             {
                 CreateSVGScore();
+                CreateScoreButton.Enabled = false;
+            }
+            else
+            {
+                MessageBox.Show("Cannot create a score because there are illegal (pink) input values.", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
-        public void SaveSettings()
+        public void SaveSettings(int numberOfPages)
         {
             Debug.Assert(!string.IsNullOrEmpty(_settingsPath));
 
@@ -549,7 +589,7 @@ namespace Moritz.AssistantComposer
                 WriteNotation(w);
                 WriteKrystals(w);
                 WritePalettes(w);
-                WritePerformerOptions(w);
+                WriteRuntimeInfo(w, numberOfPages);
                 w.WriteEndElement(); // closes the moritzKrystalScore element
                 w.Close(); // close unnecessary because of the using statement?
             }
@@ -620,9 +660,26 @@ namespace Moritz.AssistantComposer
             }
         }
 
-        private void WritePerformerOptions(XmlWriter w)
+        private void WriteRuntimeInfo(XmlWriter w, int numberOfPages)
         {
+            w.WriteStartElement("runtimeInfo");
+            if(numberOfPages > 0)
+            {
+                // numberOfPages is set > 0 when the SVG pages have been created -- see CreateSVGScore().
+                w.WriteAttributeString("nPages", numberOfPages.ToString());
+                w.WriteAttributeString("nTracks", _numberOfChannels.ToString());
+            }
+
+            w.WriteStartElement("trackInit");
+
+            w.WriteAttributeString("volumes", VolumePerChannelTextBox.Text.Replace(" ", ""));
+            w.WriteAttributeString("pitchWheelDeviations", PitchWheelDeviationPerChannelTextBox.Text.Replace(" ", ""));
+            w.WriteEndElement(); // trackInit
+
             _performerOptionsForm.Write(w);
+
+            w.WriteEndElement(); // runtimeInfo
+
         }
 
         /// <summary>
@@ -648,7 +705,8 @@ namespace Moritz.AssistantComposer
                                             _dimensionsAndMetadataForm.Comment);
                 if(score != null)
                 {
-                    score.SaveSVGScore();
+                    int numberOfPages = score.SaveSVGScore();
+                    SaveSettings(numberOfPages); // saves numberOfPages in runtimeInfo:nPages
                     score.OpenSVGScore();
                 }
             }
@@ -804,7 +862,7 @@ namespace Moritz.AssistantComposer
                 DialogResult result = MessageBox.Show("Save settings?", "Save?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if(result == DialogResult.Yes)
                 {
-                    SaveSettings();
+                    SaveSettings(0);
                 }
             }
         }
@@ -815,7 +873,6 @@ namespace Moritz.AssistantComposer
             foreach(IPaletteForm ipf in ipfs)
                 ipf.Close();
         }
-
 
         #endregion buttons
         #region text box events
@@ -1465,18 +1522,24 @@ namespace Moritz.AssistantComposer
                 SetHelpTexts();
                 ClefsPerStaffLabel.Enabled = true;
                 StafflinesPerStaffLabel.Enabled = true;
+                VolumePerChannelLabel.Enabled = true;
+                PitchWheelDeviationPerChannelLabel.Enabled = true;
                 StaffGroupsLabel.Enabled = true;
                 LongStaffNamesLabel.Enabled = true;
                 ShortStaffNamesLabel.Enabled = true;
 
                 ClefsPerStaffTextBox.Enabled = true;
                 StafflinesPerStaffTextBox.Enabled = true;
+                VolumePerChannelTextBox.Enabled = true;
+                PitchWheelDeviationPerChannelTextBox.Enabled = true;
                 StaffGroupsTextBox.Enabled = true;
                 LongStaffNamesTextBox.Enabled = true;
                 ShortStaffNamesTextBox.Enabled = true;
 
                 ClefsPerStaffTextBox_Leave(null, null);
                 StafflinesPerStaffTextBox_Leave(null, null);
+                VolumePerChannelTextBox_Leave(null, null);
+                PitchWheelDeviationPerChannelTextBox_Leave(null, null);
                 StaffGroupsTextBox_Leave(null, null);
                 LongStaffNamesTextBox_Leave(null, null);
                 ShortStaffNamesTextBox_Leave(null, null);
@@ -1486,12 +1549,16 @@ namespace Moritz.AssistantComposer
                 ClearHelpTexts();
                 ClefsPerStaffLabel.Enabled = false;
                 StafflinesPerStaffLabel.Enabled = false;
+                VolumePerChannelLabel.Enabled = false;
+                PitchWheelDeviationPerChannelLabel.Enabled = false;
                 StaffGroupsLabel.Enabled = false;
                 LongStaffNamesLabel.Enabled = false;
                 ShortStaffNamesLabel.Enabled = false;
 
                 ClefsPerStaffTextBox.Enabled = false;
                 StafflinesPerStaffTextBox.Enabled = false;
+                VolumePerChannelTextBox.Enabled = false;
+                PitchWheelDeviationPerChannelTextBox.Enabled = false;
                 StaffGroupsTextBox.Enabled = false;
                 LongStaffNamesTextBox.Enabled = false;
                 ShortStaffNamesTextBox.Enabled = false;
@@ -1527,11 +1594,22 @@ namespace Moritz.AssistantComposer
                 this.LongStaffNamesHelpLabel.Text = _numberOfStaves.ToString() + " names (for first system)";
                 this.ShortStaffNamesHelpLabel.Text = _numberOfStaves.ToString() + " names (for other systems)";
             }
+
+            string helpText;
+            if(_numberOfChannels == 1)
+                helpText = "1 integer value in range 0..127\nseparated by commas";
+            else
+                helpText = _numberOfChannels.ToString() + " integer values in range 0..127\nseparated by commas";
+
+            this.VolumePerChannelHelpLabel.Text = helpText;
+            this.PitchWheelDeviationPerChannelHelpLabel.Text = helpText;
         }
         private void ClearHelpTexts()
         {
             this.ClefsPerStaffHelpLabel.Text = "";
             this.StafflinesPerStaffHelpLabel.Text = "";
+            this.VolumePerChannelHelpLabel.Text = "";
+            this.PitchWheelDeviationPerChannelHelpLabel.Text = "";
             this.StaffGroupsHelpLabel.Text = "";
             this.LongStaffNamesHelpLabel.Text = "";
             this.ShortStaffNamesHelpLabel.Text = "";
@@ -1603,6 +1681,16 @@ namespace Moritz.AssistantComposer
             }
             sb.Remove(0, 2);
             return sb.ToString();
+        }
+
+
+        private void VolumePerChannelTextBox_Leave(object sender, EventArgs e)
+        {
+            M.LeaveIntRangeTextBox(VolumePerChannelTextBox, false, (uint)_numberOfChannels, 0, 127, SetTextBoxState);
+        }
+        private void PitchWheelDeviationPerChannelTextBox_Leave(object sender, EventArgs e)
+        {
+            M.LeaveIntRangeTextBox(PitchWheelDeviationPerChannelTextBox, false, (uint)_numberOfChannels, 0, 127, SetTextBoxState);
         }
 
         private void StaffGroupsTextBox_Leave(object sender, EventArgs e)
@@ -1690,6 +1778,18 @@ namespace Moritz.AssistantComposer
             M.SetToWhite(StafflinesPerStaffTextBox);
         }
 
+        private void VolumePerChannelTextBox_TextChanged(object sender, EventArgs e)
+        {
+            SetSettingsHaveNotBeenSaved();
+            M.SetToWhite(VolumePerChannelTextBox);
+        }
+
+        private void PitchWheelDeviationPerChannelTextBox_TextChanged(object sender, EventArgs e)
+        {
+            SetSettingsHaveNotBeenSaved();
+            M.SetToWhite(PitchWheelDeviationPerChannelTextBox);
+        }
+
         private void StaffGroupsTextBox_TextChanged(object sender, EventArgs e)
         {
             SetSettingsHaveNotBeenSaved();
@@ -1720,8 +1820,12 @@ namespace Moritz.AssistantComposer
         private Moritz.Krystals.KrystalBrowser _krystalBrowser = null;
         private DimensionsAndMetadataForm _dimensionsAndMetadataForm;
         private PerformerOptionsForm _performerOptionsForm;
+        private int _numberOfChannels = 0;
         private int _numberOfStaves = 0;
 
+        private bool _constructing = true;
+
         public PageFormat PageFormat = null;
-    }
+
+     }
 }
