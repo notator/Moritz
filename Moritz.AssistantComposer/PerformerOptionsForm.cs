@@ -211,36 +211,75 @@ namespace Moritz.AssistantComposer
 
         public void Write(XmlWriter w)
         {
-            StringBuilder sb;
+            if(!DefaultSettings())
+            {
+                StringBuilder sb;
 
-            w.WriteStartElement("performerOptions");
+                w.WriteStartElement("performerOptions");
 
-            sb = GetBoolString(_noteOnPitchCheckBoxes);
-            w.WriteAttributeString("noteOnPitchTracks", sb.ToString());
+                if(NoteOnPitchTracksComboBox.Text != "none")
+                {
+                    sb = GetBoolString(_noteOnPitchCheckBoxes);
+                    w.WriteAttributeString("noteOnPitchTracks", sb.ToString());
+                }
 
-            sb = GetBoolString(_noteOnVelocityCheckBoxes);
-            w.WriteAttributeString("noteOnVelocityTracks", sb.ToString());
+                if(NoteOnVelocityTracksComboBox.Text != "none")
+                {
+                    sb = GetBoolString(_noteOnVelocityCheckBoxes);
+                    w.WriteAttributeString("noteOnVelocityTracks", sb.ToString());
+                }
 
-            w.WriteAttributeString("pressureController", this.PressureControllerComboBox.Text);
-            sb = GetBoolString(_pressureCheckBoxes);
-            w.WriteAttributeString("pressureTracks", sb.ToString());
+                if(PressureTracksComboBox.Text != "none")
+                {
+                    w.WriteAttributeString("pressureController", this.PressureControllerComboBox.Text);
+                    sb = GetBoolString(_pressureCheckBoxes);
+                    w.WriteAttributeString("pressureTracks", sb.ToString());
+                }
 
-            w.WriteAttributeString("pitchWheelController", this.PitchWheelControllerComboBox.Text);
-            sb = GetBoolString(_pitchWheelCheckBoxes);
-            w.WriteAttributeString("pitchWheelTracks", sb.ToString());
+                if(PitchWheelTracksComboBox.Text != "none")
+                {
+                    w.WriteAttributeString("pitchWheelController", this.PitchWheelControllerComboBox.Text);
+                    sb = GetBoolString(_pitchWheelCheckBoxes);
+                    w.WriteAttributeString("pitchWheelTracks", sb.ToString());
+                }
 
-            w.WriteAttributeString("modWheelController", this.ModWheelControllerComboBox.Text);
-            sb = GetBoolString(_modWheelCheckBoxes);
-            w.WriteAttributeString("modWheelTracks", sb.ToString());
+                if(ModWheelTracksComboBox.Text != "none")
+                {
+                    w.WriteAttributeString("modWheelController", this.ModWheelControllerComboBox.Text);
+                    sb = GetBoolString(_modWheelCheckBoxes);
+                    w.WriteAttributeString("modWheelTracks", sb.ToString());
+                }
 
-            w.WriteAttributeString("speedController", this.SpeedControllerComboBox.Text);
-            w.WriteAttributeString("speedMaxPercent", this.MaximumSpeedPercentTextBox.Text);
+                if(SpeedControllerComboBox.Text != "none")
+                {
+                    w.WriteAttributeString("speedController", this.SpeedControllerComboBox.Text);
+                    w.WriteAttributeString("speedMaxPercent", this.MaximumSpeedPercentTextBox.Text);
+                }
 
-            w.WriteAttributeString("minVolume", this.MinimumVolumeTextBox.Text);
+                if(this.MinimumVolumeTextBox.Enabled)
+                {
+                    w.WriteAttributeString("minVolume", this.MinimumVolumeTextBox.Text);
+                }
 
-            w.WriteAttributeString("trackIndex", this._performersTrackIndex.ToString());
+                w.WriteAttributeString("trackIndex", this._performersTrackIndex.ToString());
 
-            w.WriteEndElement(); // performerOptions
+                w.WriteEndElement(); // performerOptions
+            }
+        }
+
+        private bool DefaultSettings()
+        {
+            bool rval = true;
+
+            if((NoteOnPitchTracksComboBox.Text != "none")
+            || (NoteOnVelocityTracksComboBox.Text != "none")
+            || (PressureTracksComboBox.Text != "none")
+            || (PitchWheelTracksComboBox.Text != "none")
+            || (ModWheelTracksComboBox.Text != "none")
+            || (SpeedControllerComboBox.Text != "none"))
+                rval = false;
+
+            return rval;
         }
 
         private StringBuilder GetBoolString(List<CheckBox> checkBoxes)

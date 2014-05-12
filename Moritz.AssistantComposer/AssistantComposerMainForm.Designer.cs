@@ -60,11 +60,14 @@ namespace Moritz.AssistantComposer
             this.LongStaffNamesTextBox = new System.Windows.Forms.TextBox();
             this.SystemStartBarsHelpLabel = new System.Windows.Forms.Label();
             this.ShortStaffNamesTextBox = new System.Windows.Forms.TextBox();
+            this.StafflinesPerStaffHelpLabel = new System.Windows.Forms.Label();
+            this.StafflinesPerStaffLabel = new System.Windows.Forms.Label();
             this.LongStaffNamesLabel = new System.Windows.Forms.Label();
             this.ClefsPerStaffLabel = new System.Windows.Forms.Label();
             this.ClefsPerStaffHelpLabel = new System.Windows.Forms.Label();
             this.StaffGroupsHelpLabel = new System.Windows.Forms.Label();
             this.StaffGroupsLabel = new System.Windows.Forms.Label();
+            this.StafflinesPerStaffTextBox = new System.Windows.Forms.TextBox();
             this.SystemStartBarsLabel = new System.Windows.Forms.Label();
             this.SystemStartBarsTextBox = new System.Windows.Forms.TextBox();
             this.ClefsPerStaffTextBox = new System.Windows.Forms.TextBox();
@@ -88,15 +91,6 @@ namespace Moritz.AssistantComposer
             this.KrystalsGroupBox = new System.Windows.Forms.GroupBox();
             this.PalettesGroupBox = new System.Windows.Forms.GroupBox();
             this.PerformerOptionsButton = new System.Windows.Forms.Button();
-            this.StafflinesPerStaffTextBox = new System.Windows.Forms.TextBox();
-            this.StafflinesPerStaffLabel = new System.Windows.Forms.Label();
-            this.StafflinesPerStaffHelpLabel = new System.Windows.Forms.Label();
-            this.VolumePerChannelHelpLabel = new System.Windows.Forms.Label();
-            this.VolumePerChannelLabel = new System.Windows.Forms.Label();
-            this.VolumePerChannelTextBox = new System.Windows.Forms.TextBox();
-            this.PitchWheelDeviationPerChannelHelpLabel = new System.Windows.Forms.Label();
-            this.PitchWheelDeviationPerChannelLabel = new System.Windows.Forms.Label();
-            this.PitchWheelDeviationPerChannelTextBox = new System.Windows.Forms.TextBox();
             this.NotationGroupBox.SuspendLayout();
             this.StandardChordsOptionsPanel.SuspendLayout();
             this.KrystalsGroupBox.SuspendLayout();
@@ -105,9 +99,8 @@ namespace Moritz.AssistantComposer
             // 
             // CreateScoreButton
             // 
-            this.CreateScoreButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.CreateScoreButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.CreateScoreButton.Location = new System.Drawing.Point(607, 626);
+            this.CreateScoreButton.Location = new System.Drawing.Point(607, 537);
             this.CreateScoreButton.Name = "CreateScoreButton";
             this.CreateScoreButton.Size = new System.Drawing.Size(106, 26);
             this.CreateScoreButton.TabIndex = 5;
@@ -117,9 +110,8 @@ namespace Moritz.AssistantComposer
             // 
             // QuitAlgorithmButton
             // 
-            this.QuitAlgorithmButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.QuitAlgorithmButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.QuitAlgorithmButton.Location = new System.Drawing.Point(19, 596);
+            this.QuitAlgorithmButton.Location = new System.Drawing.Point(19, 507);
             this.QuitAlgorithmButton.Name = "QuitAlgorithmButton";
             this.QuitAlgorithmButton.Size = new System.Drawing.Size(127, 26);
             this.QuitAlgorithmButton.TabIndex = 8;
@@ -229,12 +221,6 @@ namespace Moritz.AssistantComposer
             // 
             // NotationGroupBox
             // 
-            this.NotationGroupBox.Controls.Add(this.PitchWheelDeviationPerChannelHelpLabel);
-            this.NotationGroupBox.Controls.Add(this.PitchWheelDeviationPerChannelLabel);
-            this.NotationGroupBox.Controls.Add(this.PitchWheelDeviationPerChannelTextBox);
-            this.NotationGroupBox.Controls.Add(this.VolumePerChannelHelpLabel);
-            this.NotationGroupBox.Controls.Add(this.VolumePerChannelLabel);
-            this.NotationGroupBox.Controls.Add(this.VolumePerChannelTextBox);
             this.NotationGroupBox.Controls.Add(this.ChordTypeComboBoxLabel);
             this.NotationGroupBox.Controls.Add(this.ChordTypeComboBox);
             this.NotationGroupBox.Controls.Add(this.ShortStaffNamesHelpLabel);
@@ -272,7 +258,7 @@ namespace Moritz.AssistantComposer
             this.NotationGroupBox.ForeColor = System.Drawing.Color.Brown;
             this.NotationGroupBox.Location = new System.Drawing.Point(23, 39);
             this.NotationGroupBox.Name = "NotationGroupBox";
-            this.NotationGroupBox.Size = new System.Drawing.Size(466, 543);
+            this.NotationGroupBox.Size = new System.Drawing.Size(466, 456);
             this.NotationGroupBox.TabIndex = 1;
             this.NotationGroupBox.TabStop = false;
             this.NotationGroupBox.Text = "notation";
@@ -299,10 +285,9 @@ namespace Moritz.AssistantComposer
             // 
             // ShortStaffNamesHelpLabel
             // 
-            this.ShortStaffNamesHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShortStaffNamesHelpLabel.AutoSize = true;
             this.ShortStaffNamesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.ShortStaffNamesHelpLabel.Location = new System.Drawing.Point(100, 436);
+            this.ShortStaffNamesHelpLabel.Location = new System.Drawing.Point(100, 349);
             this.ShortStaffNamesHelpLabel.Name = "ShortStaffNamesHelpLabel";
             this.ShortStaffNamesHelpLabel.Size = new System.Drawing.Size(125, 14);
             this.ShortStaffNamesHelpLabel.TabIndex = 176;
@@ -354,10 +339,9 @@ namespace Moritz.AssistantComposer
             // 
             // LongStaffNamesHelpLabel
             // 
-            this.LongStaffNamesHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.LongStaffNamesHelpLabel.AutoSize = true;
             this.LongStaffNamesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.LongStaffNamesHelpLabel.Location = new System.Drawing.Point(97, 394);
+            this.LongStaffNamesHelpLabel.Location = new System.Drawing.Point(97, 307);
             this.LongStaffNamesHelpLabel.Name = "LongStaffNamesHelpLabel";
             this.LongStaffNamesHelpLabel.Size = new System.Drawing.Size(125, 14);
             this.LongStaffNamesHelpLabel.TabIndex = 174;
@@ -386,10 +370,9 @@ namespace Moritz.AssistantComposer
             // 
             // ShortStaffNamesLabel
             // 
-            this.ShortStaffNamesLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShortStaffNamesLabel.AutoSize = true;
             this.ShortStaffNamesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.ShortStaffNamesLabel.Location = new System.Drawing.Point(10, 436);
+            this.ShortStaffNamesLabel.Location = new System.Drawing.Point(10, 349);
             this.ShortStaffNamesLabel.Margin = new System.Windows.Forms.Padding(0);
             this.ShortStaffNamesLabel.Name = "ShortStaffNamesLabel";
             this.ShortStaffNamesLabel.Size = new System.Drawing.Size(93, 14);
@@ -419,8 +402,7 @@ namespace Moritz.AssistantComposer
             // 
             // LongStaffNamesTextBox
             // 
-            this.LongStaffNamesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.LongStaffNamesTextBox.Location = new System.Drawing.Point(10, 411);
+            this.LongStaffNamesTextBox.Location = new System.Drawing.Point(10, 324);
             this.LongStaffNamesTextBox.Name = "LongStaffNamesTextBox";
             this.LongStaffNamesTextBox.Size = new System.Drawing.Size(440, 20);
             this.LongStaffNamesTextBox.TabIndex = 5;
@@ -429,10 +411,9 @@ namespace Moritz.AssistantComposer
             // 
             // SystemStartBarsHelpLabel
             // 
-            this.SystemStartBarsHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.SystemStartBarsHelpLabel.AutoSize = true;
             this.SystemStartBarsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.SystemStartBarsHelpLabel.Location = new System.Drawing.Point(139, 489);
+            this.SystemStartBarsHelpLabel.Location = new System.Drawing.Point(139, 402);
             this.SystemStartBarsHelpLabel.Name = "SystemStartBarsHelpLabel";
             this.SystemStartBarsHelpLabel.Size = new System.Drawing.Size(150, 14);
             this.SystemStartBarsHelpLabel.TabIndex = 179;
@@ -440,20 +421,39 @@ namespace Moritz.AssistantComposer
             // 
             // ShortStaffNamesTextBox
             // 
-            this.ShortStaffNamesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ShortStaffNamesTextBox.Location = new System.Drawing.Point(10, 452);
+            this.ShortStaffNamesTextBox.Location = new System.Drawing.Point(10, 365);
             this.ShortStaffNamesTextBox.Name = "ShortStaffNamesTextBox";
             this.ShortStaffNamesTextBox.Size = new System.Drawing.Size(438, 20);
             this.ShortStaffNamesTextBox.TabIndex = 6;
             this.ShortStaffNamesTextBox.TextChanged += new System.EventHandler(this.ShortStaffNamesTextBox_TextChanged);
             this.ShortStaffNamesTextBox.Leave += new System.EventHandler(this.ShortStaffNamesTextBox_Leave);
             // 
+            // StafflinesPerStaffHelpLabel
+            // 
+            this.StafflinesPerStaffHelpLabel.AutoSize = true;
+            this.StafflinesPerStaffHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.StafflinesPerStaffHelpLabel.Location = new System.Drawing.Point(245, 231);
+            this.StafflinesPerStaffHelpLabel.Name = "StafflinesPerStaffHelpLabel";
+            this.StafflinesPerStaffHelpLabel.Size = new System.Drawing.Size(194, 28);
+            this.StafflinesPerStaffHelpLabel.TabIndex = 178;
+            this.StafflinesPerStaffHelpLabel.Text = "x integer values separated by commas\r\nstandard clefs must have 5 lines.";
+            // 
+            // StafflinesPerStaffLabel
+            // 
+            this.StafflinesPerStaffLabel.AutoSize = true;
+            this.StafflinesPerStaffLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+            this.StafflinesPerStaffLabel.Location = new System.Drawing.Point(7, 238);
+            this.StafflinesPerStaffLabel.Margin = new System.Windows.Forms.Padding(0);
+            this.StafflinesPerStaffLabel.Name = "StafflinesPerStaffLabel";
+            this.StafflinesPerStaffLabel.Size = new System.Drawing.Size(97, 14);
+            this.StafflinesPerStaffLabel.TabIndex = 177;
+            this.StafflinesPerStaffLabel.Text = "stafflines per staff";
+            // 
             // LongStaffNamesLabel
             // 
-            this.LongStaffNamesLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.LongStaffNamesLabel.AutoSize = true;
             this.LongStaffNamesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.LongStaffNamesLabel.Location = new System.Drawing.Point(10, 394);
+            this.LongStaffNamesLabel.Location = new System.Drawing.Point(10, 307);
             this.LongStaffNamesLabel.Margin = new System.Windows.Forms.Padding(0);
             this.LongStaffNamesLabel.Name = "LongStaffNamesLabel";
             this.LongStaffNamesLabel.Size = new System.Drawing.Size(88, 14);
@@ -483,10 +483,9 @@ namespace Moritz.AssistantComposer
             // 
             // StaffGroupsHelpLabel
             // 
-            this.StaffGroupsHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.StaffGroupsHelpLabel.AutoSize = true;
             this.StaffGroupsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.StaffGroupsHelpLabel.Location = new System.Drawing.Point(245, 358);
+            this.StaffGroupsHelpLabel.Location = new System.Drawing.Point(245, 271);
             this.StaffGroupsHelpLabel.Name = "StaffGroupsHelpLabel";
             this.StaffGroupsHelpLabel.Size = new System.Drawing.Size(124, 14);
             this.StaffGroupsHelpLabel.TabIndex = 167;
@@ -494,22 +493,29 @@ namespace Moritz.AssistantComposer
             // 
             // StaffGroupsLabel
             // 
-            this.StaffGroupsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.StaffGroupsLabel.AutoSize = true;
             this.StaffGroupsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.StaffGroupsLabel.Location = new System.Drawing.Point(37, 358);
+            this.StaffGroupsLabel.Location = new System.Drawing.Point(37, 271);
             this.StaffGroupsLabel.Margin = new System.Windows.Forms.Padding(0);
             this.StaffGroupsLabel.Name = "StaffGroupsLabel";
             this.StaffGroupsLabel.Size = new System.Drawing.Size(67, 14);
             this.StaffGroupsLabel.TabIndex = 166;
             this.StaffGroupsLabel.Text = "staff groups";
             // 
+            // StafflinesPerStaffTextBox
+            // 
+            this.StafflinesPerStaffTextBox.Location = new System.Drawing.Point(106, 235);
+            this.StafflinesPerStaffTextBox.Name = "StafflinesPerStaffTextBox";
+            this.StafflinesPerStaffTextBox.Size = new System.Drawing.Size(136, 20);
+            this.StafflinesPerStaffTextBox.TabIndex = 3;
+            this.StafflinesPerStaffTextBox.TextChanged += new System.EventHandler(this.StafflinesPerStaffTextBox_TextChanged);
+            this.StafflinesPerStaffTextBox.Leave += new System.EventHandler(this.StafflinesPerStaffTextBox_Leave);
+            // 
             // SystemStartBarsLabel
             // 
-            this.SystemStartBarsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.SystemStartBarsLabel.AutoSize = true;
             this.SystemStartBarsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.SystemStartBarsLabel.Location = new System.Drawing.Point(10, 489);
+            this.SystemStartBarsLabel.Location = new System.Drawing.Point(10, 402);
             this.SystemStartBarsLabel.Margin = new System.Windows.Forms.Padding(0);
             this.SystemStartBarsLabel.Name = "SystemStartBarsLabel";
             this.SystemStartBarsLabel.Size = new System.Drawing.Size(131, 14);
@@ -519,8 +525,7 @@ namespace Moritz.AssistantComposer
             // 
             // SystemStartBarsTextBox
             // 
-            this.SystemStartBarsTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.SystemStartBarsTextBox.Location = new System.Drawing.Point(10, 506);
+            this.SystemStartBarsTextBox.Location = new System.Drawing.Point(10, 419);
             this.SystemStartBarsTextBox.Name = "SystemStartBarsTextBox";
             this.SystemStartBarsTextBox.Size = new System.Drawing.Size(442, 20);
             this.SystemStartBarsTextBox.TabIndex = 7;
@@ -538,8 +543,7 @@ namespace Moritz.AssistantComposer
             // 
             // StaffGroupsTextBox
             // 
-            this.StaffGroupsTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.StaffGroupsTextBox.Location = new System.Drawing.Point(106, 355);
+            this.StaffGroupsTextBox.Location = new System.Drawing.Point(106, 268);
             this.StaffGroupsTextBox.Name = "StaffGroupsTextBox";
             this.StaffGroupsTextBox.Size = new System.Drawing.Size(136, 20);
             this.StaffGroupsTextBox.TabIndex = 4;
@@ -673,10 +677,9 @@ namespace Moritz.AssistantComposer
             // 
             // SaveSettingsButton
             // 
-            this.SaveSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.SaveSettingsButton.Enabled = false;
             this.SaveSettingsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.SaveSettingsButton.Location = new System.Drawing.Point(607, 596);
+            this.SaveSettingsButton.Location = new System.Drawing.Point(607, 507);
             this.SaveSettingsButton.Name = "SaveSettingsButton";
             this.SaveSettingsButton.Size = new System.Drawing.Size(106, 26);
             this.SaveSettingsButton.TabIndex = 4;
@@ -686,9 +689,8 @@ namespace Moritz.AssistantComposer
             // 
             // QuitMoritzButton
             // 
-            this.QuitMoritzButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.QuitMoritzButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.QuitMoritzButton.Location = new System.Drawing.Point(19, 626);
+            this.QuitMoritzButton.Location = new System.Drawing.Point(19, 537);
             this.QuitMoritzButton.Name = "QuitMoritzButton";
             this.QuitMoritzButton.Size = new System.Drawing.Size(127, 26);
             this.QuitMoritzButton.TabIndex = 9;
@@ -698,10 +700,9 @@ namespace Moritz.AssistantComposer
             // 
             // ShowMoritzButton
             // 
-            this.ShowMoritzButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShowMoritzButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.ShowMoritzButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.ShowMoritzButton.Location = new System.Drawing.Point(163, 626);
+            this.ShowMoritzButton.Location = new System.Drawing.Point(163, 537);
             this.ShowMoritzButton.Name = "ShowMoritzButton";
             this.ShowMoritzButton.Size = new System.Drawing.Size(183, 26);
             this.ShowMoritzButton.TabIndex = 6;
@@ -725,10 +726,9 @@ namespace Moritz.AssistantComposer
             // 
             // DimensionsAndMetadataButton
             // 
-            this.DimensionsAndMetadataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.DimensionsAndMetadataButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.DimensionsAndMetadataButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.DimensionsAndMetadataButton.Location = new System.Drawing.Point(163, 596);
+            this.DimensionsAndMetadataButton.Location = new System.Drawing.Point(163, 507);
             this.DimensionsAndMetadataButton.Name = "DimensionsAndMetadataButton";
             this.DimensionsAndMetadataButton.Size = new System.Drawing.Size(183, 26);
             this.DimensionsAndMetadataButton.TabIndex = 7;
@@ -767,10 +767,9 @@ namespace Moritz.AssistantComposer
             // 
             // PerformerOptionsButton
             // 
-            this.PerformerOptionsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.PerformerOptionsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.PerformerOptionsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.PerformerOptionsButton.Location = new System.Drawing.Point(361, 596);
+            this.PerformerOptionsButton.Location = new System.Drawing.Point(361, 507);
             this.PerformerOptionsButton.Name = "PerformerOptionsButton";
             this.PerformerOptionsButton.Size = new System.Drawing.Size(183, 26);
             this.PerformerOptionsButton.TabIndex = 150;
@@ -778,104 +777,12 @@ namespace Moritz.AssistantComposer
             this.PerformerOptionsButton.UseVisualStyleBackColor = false;
             this.PerformerOptionsButton.Click += new System.EventHandler(this.PerformerOptionsButton_Click);
             // 
-            // StafflinesPerStaffTextBox
-            // 
-            this.StafflinesPerStaffTextBox.Location = new System.Drawing.Point(106, 235);
-            this.StafflinesPerStaffTextBox.Name = "StafflinesPerStaffTextBox";
-            this.StafflinesPerStaffTextBox.Size = new System.Drawing.Size(136, 20);
-            this.StafflinesPerStaffTextBox.TabIndex = 3;
-            this.StafflinesPerStaffTextBox.TextChanged += new System.EventHandler(this.StafflinesPerStaffTextBox_TextChanged);
-            this.StafflinesPerStaffTextBox.Leave += new System.EventHandler(this.StafflinesPerStaffTextBox_Leave);
-            // 
-            // StafflinesPerStaffLabel
-            // 
-            this.StafflinesPerStaffLabel.AutoSize = true;
-            this.StafflinesPerStaffLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.StafflinesPerStaffLabel.Location = new System.Drawing.Point(7, 238);
-            this.StafflinesPerStaffLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.StafflinesPerStaffLabel.Name = "StafflinesPerStaffLabel";
-            this.StafflinesPerStaffLabel.Size = new System.Drawing.Size(97, 14);
-            this.StafflinesPerStaffLabel.TabIndex = 177;
-            this.StafflinesPerStaffLabel.Text = "stafflines per staff";
-            // 
-            // StafflinesPerStaffHelpLabel
-            // 
-            this.StafflinesPerStaffHelpLabel.AutoSize = true;
-            this.StafflinesPerStaffHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.StafflinesPerStaffHelpLabel.Location = new System.Drawing.Point(245, 231);
-            this.StafflinesPerStaffHelpLabel.Name = "StafflinesPerStaffHelpLabel";
-            this.StafflinesPerStaffHelpLabel.Size = new System.Drawing.Size(194, 28);
-            this.StafflinesPerStaffHelpLabel.TabIndex = 178;
-            this.StafflinesPerStaffHelpLabel.Text = "x integer values separated by commas\r\nstandard clefs must have 5 lines.";
-            // 
-            // MaxVolumePerChannelHelpLabel
-            // 
-            this.VolumePerChannelHelpLabel.AutoSize = true;
-            this.VolumePerChannelHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.VolumePerChannelHelpLabel.Location = new System.Drawing.Point(245, 271);
-            this.VolumePerChannelHelpLabel.Name = "MaxVolumePerChannelHelpLabel";
-            this.VolumePerChannelHelpLabel.Size = new System.Drawing.Size(159, 28);
-            this.VolumePerChannelHelpLabel.TabIndex = 189;
-            this.VolumePerChannelHelpLabel.Text = "y integer values in range 0..127\r\nseparated by commas\r\n";
-            // 
-            // MaxVolumePerChannelLabel
-            // 
-            this.VolumePerChannelLabel.AutoSize = true;
-            this.VolumePerChannelLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.VolumePerChannelLabel.Location = new System.Drawing.Point(40, 271);
-            this.VolumePerChannelLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.VolumePerChannelLabel.Name = "MaxVolumePerChannelLabel";
-            this.VolumePerChannelLabel.Size = new System.Drawing.Size(64, 28);
-            this.VolumePerChannelLabel.TabIndex = 188;
-            this.VolumePerChannelLabel.Text = "volume\r\nper channel";
-            this.VolumePerChannelLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // MaxVolumePerChannelTextBox
-            // 
-            this.VolumePerChannelTextBox.Location = new System.Drawing.Point(106, 275);
-            this.VolumePerChannelTextBox.Name = "MaxVolumePerChannelTextBox";
-            this.VolumePerChannelTextBox.Size = new System.Drawing.Size(136, 20);
-            this.VolumePerChannelTextBox.TabIndex = 187;
-            this.VolumePerChannelTextBox.TextChanged += new System.EventHandler(this.VolumePerChannelTextBox_TextChanged);
-            this.VolumePerChannelTextBox.Leave += new System.EventHandler(this.VolumePerChannelTextBox_Leave);
-            // 
-            // PitchWheelDeviationsPerChannelHelpLabel
-            // 
-            this.PitchWheelDeviationPerChannelHelpLabel.AutoSize = true;
-            this.PitchWheelDeviationPerChannelHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.PitchWheelDeviationPerChannelHelpLabel.Location = new System.Drawing.Point(245, 311);
-            this.PitchWheelDeviationPerChannelHelpLabel.Name = "PitchWheelDeviationsPerChannelHelpLabel";
-            this.PitchWheelDeviationPerChannelHelpLabel.Size = new System.Drawing.Size(159, 28);
-            this.PitchWheelDeviationPerChannelHelpLabel.TabIndex = 192;
-            this.PitchWheelDeviationPerChannelHelpLabel.Text = "y integer values in range 0..127\r\nseparated by commas";
-            // 
-            // PitchWheelDeviationsPerChannelLabel
-            // 
-            this.PitchWheelDeviationPerChannelLabel.AutoSize = true;
-            this.PitchWheelDeviationPerChannelLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.PitchWheelDeviationPerChannelLabel.Location = new System.Drawing.Point(8, 311);
-            this.PitchWheelDeviationPerChannelLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.PitchWheelDeviationPerChannelLabel.Name = "PitchWheelDeviationsPerChannelLabel";
-            this.PitchWheelDeviationPerChannelLabel.Size = new System.Drawing.Size(96, 28);
-            this.PitchWheelDeviationPerChannelLabel.TabIndex = 191;
-            this.PitchWheelDeviationPerChannelLabel.Text = "pitch wheel devia-\r\ntions per channel";
-            this.PitchWheelDeviationPerChannelLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // PitchWheelDeviationsPerChannelTextBox
-            // 
-            this.PitchWheelDeviationPerChannelTextBox.Location = new System.Drawing.Point(106, 315);
-            this.PitchWheelDeviationPerChannelTextBox.Name = "PitchWheelDeviationsPerChannelTextBox";
-            this.PitchWheelDeviationPerChannelTextBox.Size = new System.Drawing.Size(136, 20);
-            this.PitchWheelDeviationPerChannelTextBox.TabIndex = 190;
-            this.PitchWheelDeviationPerChannelTextBox.TextChanged += new System.EventHandler(this.PitchWheelDeviationPerChannelTextBox_TextChanged);
-            this.PitchWheelDeviationPerChannelTextBox.Leave += new System.EventHandler(this.PitchWheelDeviationPerChannelTextBox_Leave);
-            // 
             // AssistantComposerMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
-            this.ClientSize = new System.Drawing.Size(732, 667);
+            this.ClientSize = new System.Drawing.Size(732, 578);
             this.ControlBox = false;
             this.Controls.Add(this.PerformerOptionsButton);
             this.Controls.Add(this.PalettesGroupBox);
@@ -950,10 +857,13 @@ namespace Moritz.AssistantComposer
         private System.Windows.Forms.Label LongStaffNamesHelpLabel;
         private System.Windows.Forms.Label LongStaffNamesLabel;
         private System.Windows.Forms.Label SystemStartBarsHelpLabel;
+        private System.Windows.Forms.Label StafflinesPerStaffHelpLabel;
+        private System.Windows.Forms.Label StafflinesPerStaffLabel;
         private System.Windows.Forms.Label ClefsPerStaffLabel;
         private System.Windows.Forms.Label ClefsPerStaffHelpLabel;
         private System.Windows.Forms.Label StaffGroupsHelpLabel;
         private System.Windows.Forms.Label StaffGroupsLabel;
+        private System.Windows.Forms.TextBox StafflinesPerStaffTextBox;
         private System.Windows.Forms.TextBox ClefsPerStaffTextBox;
         private System.Windows.Forms.TextBox StaffGroupsTextBox;
         private System.Windows.Forms.Label MidiChannelsPerVoicePerStaffHelpLabel;
@@ -964,15 +874,6 @@ namespace Moritz.AssistantComposer
         private System.Windows.Forms.Label ChordTypeComboBoxLabel;
         private System.Windows.Forms.ComboBox ChordTypeComboBox;
         private System.Windows.Forms.Button PerformerOptionsButton;
-        private System.Windows.Forms.Label PitchWheelDeviationPerChannelHelpLabel;
-        private System.Windows.Forms.Label PitchWheelDeviationPerChannelLabel;
-        private System.Windows.Forms.TextBox PitchWheelDeviationPerChannelTextBox;
-        private System.Windows.Forms.Label VolumePerChannelHelpLabel;
-        private System.Windows.Forms.Label VolumePerChannelLabel;
-        private System.Windows.Forms.TextBox VolumePerChannelTextBox;
-        private System.Windows.Forms.Label StafflinesPerStaffHelpLabel;
-        private System.Windows.Forms.Label StafflinesPerStaffLabel;
-        private System.Windows.Forms.TextBox StafflinesPerStaffTextBox;
 
     }
 }

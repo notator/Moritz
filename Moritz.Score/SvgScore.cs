@@ -266,7 +266,7 @@ namespace Moritz.Score
         #region save SVG score
         /// <summary>
         /// Silently overwrites the .html and all .svg pages.
-        /// An SVGScore consists of an .html file which references one .svg file per page of the score.
+        /// An SVGScore consists of an .html file which references one .svg file per page of the score. 
         /// Returns the number of SVG pages saved.
         /// </summary>
         public int SaveSVGScore()
@@ -329,7 +329,7 @@ namespace Moritz.Score
 
                 w.Close(); // close actually unnecessary because of the using statement.
             }
-
+            
             return svgPagenames.Count;
         }
 
