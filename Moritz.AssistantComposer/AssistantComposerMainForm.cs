@@ -502,25 +502,29 @@ namespace Moritz.AssistantComposer
         private void GetRuntimeInfo(XmlReader r)
         {
             Debug.Assert(r.Name == "runtimeInfo");
+
             // The runtimeInfo.nPages and runtimeInfo.nTracks attributes are not read here
             // (They are only used by the Assistant Performer.)
 
-            M.ReadToXmlElementTag(r, "trackInit", "performerOptions", "runtimeInfo");
-            while(r.Name == "trackInit" || r.Name == "performerOptions")
+            if(!r.IsEmptyElement)
             {
-                if(r.NodeType != XmlNodeType.EndElement)
-                {
-                    switch(r.Name)
-                    {
-                        case "trackInit":
-                            _trackInitForm.Read(r);
-                            break;
-                        case "performerOptions":
-                            _performerOptionsForm.Read(r);
-                            break;
-                    }
-                }
                 M.ReadToXmlElementTag(r, "trackInit", "performerOptions", "runtimeInfo");
+                while(r.Name == "trackInit" || r.Name == "performerOptions")
+                {
+                    if(r.NodeType != XmlNodeType.EndElement)
+                    {
+                        switch(r.Name)
+                        {
+                            case "trackInit":
+                                _trackInitForm.Read(r);
+                                break;
+                            case "performerOptions":
+                                _performerOptionsForm.Read(r);
+                                break;
+                        }
+                    }
+                    M.ReadToXmlElementTag(r, "trackInit", "performerOptions", "runtimeInfo");
+                }
             }
 
             Debug.Assert(r.Name == "runtimeInfo");
@@ -647,21 +651,29 @@ namespace Moritz.AssistantComposer
 
         private void WriteRuntimeInfo(XmlWriter w, int numberOfPages)
         {
-            w.WriteStartElement("runtimeInfo");
-            if(numberOfPages > 0)
+            if(numberOfPages > 0 || !_trackInitForm.IsEmpty() || !_performerOptionsForm.IsEmpty())
             {
-                // numberOfPages is set > 0 when the SVG pages have been created -- see CreateSVGScore().
-                w.WriteAttributeString("nPages", numberOfPages.ToString());
-                w.WriteAttributeString("nTracks", _numberOfChannels.ToString());
+                w.WriteStartElement("runtimeInfo");
+                if(numberOfPages > 0)
+                {
+                    // numberOfPages is set > 0 when the SVG pages have been created -- see CreateSVGScore().
+                    w.WriteAttributeString("nPages", numberOfPages.ToString());
+                    w.WriteAttributeString("nTracks", _numberOfChannels.ToString());
+                }
+
+                // only write the trackInit element if it is not empty.
+                if(!_trackInitForm.IsEmpty())
+                {
+                    _trackInitForm.Write(w);
+                }
+                // only write the _performerOptions element if it is not empty.
+                if(!_performerOptionsForm.IsEmpty())
+                {
+                    _performerOptionsForm.Write(w);
+                }
+
+                w.WriteEndElement(); // runtimeInfo
             }
-            
-            // only writes the trackInit element if it is not the default.
-            _trackInitForm.Write(w);
-            // only writes the _performerOptions element if it is not the default.
-            _performerOptionsForm.Write(w);
-
-            w.WriteEndElement(); // runtimeInfo
-
         }
 
         /// <summary>
@@ -862,6 +874,21 @@ namespace Moritz.AssistantComposer
             List<IPaletteForm> ipfs = AllIPalleteForms;
             foreach(IPaletteForm ipf in ipfs)
                 ipf.Close();
+
+            if(_dimensionsAndMetadataForm != null)
+            {
+                _dimensionsAndMetadataForm.Close();
+            }
+            
+            if(_performerOptionsForm != null)
+            {
+                _performerOptionsForm.Close();
+            }
+            
+            if(_trackInitForm != null)
+            {
+                _trackInitForm.Close();
+            }
         }
 
         #endregion buttons

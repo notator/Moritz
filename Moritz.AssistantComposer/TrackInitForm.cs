@@ -150,55 +150,52 @@ namespace Moritz.AssistantComposer
         /// <param name="w"></param>
         public void Write(XmlWriter w)
         {
-            if(!EmptySettings())
+            w.WriteStartElement("trackInit");
+
+            if(!_ilcMaxVolume.IsEmpty())
             {
-                w.WriteStartElement("trackInit");
-
-                if(!_ilcMaxVolume.IsEmpty())
-                {
-                    w.WriteAttributeString("maxVolume", _ilcMaxVolume.ValuesAsString());
-                }
-                if(!_ilcVolume.IsEmpty())
-                {
-                    w.WriteAttributeString("volume", _ilcVolume.ValuesAsString());
-                }
-                if(!_ilcPWDeviation.IsEmpty())
-                {
-                    w.WriteAttributeString("pwDeviation", _ilcPWDeviation.ValuesAsString());
-                }
-                if(!_ilcPitchWheel.IsEmpty())
-                {
-                    w.WriteAttributeString("pitchWheel", _ilcPitchWheel.ValuesAsString());
-                }
-                if(!_ilcPan.IsEmpty())
-                {
-                    w.WriteAttributeString("pan", _ilcPan.ValuesAsString());
-                }
-                if(!_ilcExpression.IsEmpty())
-                {
-                    w.WriteAttributeString("expression", _ilcExpression.ValuesAsString());
-                }
-                if(!_ilcModulation.IsEmpty())
-                {
-                    w.WriteAttributeString("modulation", _ilcModulation.ValuesAsString());
-                }
-
-                w.WriteEndElement(); // trackInit
+                w.WriteAttributeString("maxVolume", _ilcMaxVolume.ValuesAsString());
             }
+            if(!_ilcVolume.IsEmpty())
+            {
+                w.WriteAttributeString("volume", _ilcVolume.ValuesAsString());
+            }
+            if(!_ilcPWDeviation.IsEmpty())
+            {
+                w.WriteAttributeString("pwDeviation", _ilcPWDeviation.ValuesAsString());
+            }
+            if(!_ilcPitchWheel.IsEmpty())
+            {
+                w.WriteAttributeString("pitchWheel", _ilcPitchWheel.ValuesAsString());
+            }
+            if(!_ilcPan.IsEmpty())
+            {
+                w.WriteAttributeString("pan", _ilcPan.ValuesAsString());
+            }
+            if(!_ilcExpression.IsEmpty())
+            {
+                w.WriteAttributeString("expression", _ilcExpression.ValuesAsString());
+            }
+            if(!_ilcModulation.IsEmpty())
+            {
+                w.WriteAttributeString("modulation", _ilcModulation.ValuesAsString());
+            }
+
+            w.WriteEndElement(); // trackInit
         }
 
-        private bool EmptySettings()
+        public bool IsEmpty()
         {
-            bool isDefault = true;
+            bool isEmpty = true;
             foreach(IntListControl ilc in _intListControls)
             {
                 if(!ilc.IsEmpty())
                 {
-                    isDefault = false;
+                    isEmpty = false;
                     break;
                 }
             }
-            return isDefault;
+            return isEmpty;
         }
 
         /// <summary>

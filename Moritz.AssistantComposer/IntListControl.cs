@@ -32,7 +32,7 @@ namespace Moritz.AssistantComposer
         public bool HasError()
         {
             bool rval = false;
-            for(int i = 0; i < 5; ++i)
+            for(int i = 0; i < _boxes.Count; ++i)
             {
                 if(_boxes[i].BackColor == M.TextBoxErrorColor)
                 {

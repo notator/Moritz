@@ -211,63 +211,60 @@ namespace Moritz.AssistantComposer
 
         public void Write(XmlWriter w)
         {
-            if(!DefaultSettings())
+            StringBuilder sb;
+
+            w.WriteStartElement("performerOptions");
+
+            if(NoteOnPitchTracksComboBox.Text != "none")
             {
-                StringBuilder sb;
-
-                w.WriteStartElement("performerOptions");
-
-                if(NoteOnPitchTracksComboBox.Text != "none")
-                {
-                    sb = GetBoolString(_noteOnPitchCheckBoxes);
-                    w.WriteAttributeString("noteOnPitchTracks", sb.ToString());
-                }
-
-                if(NoteOnVelocityTracksComboBox.Text != "none")
-                {
-                    sb = GetBoolString(_noteOnVelocityCheckBoxes);
-                    w.WriteAttributeString("noteOnVelocityTracks", sb.ToString());
-                }
-
-                if(PressureTracksComboBox.Text != "none")
-                {
-                    w.WriteAttributeString("pressureController", this.PressureControllerComboBox.Text);
-                    sb = GetBoolString(_pressureCheckBoxes);
-                    w.WriteAttributeString("pressureTracks", sb.ToString());
-                }
-
-                if(PitchWheelTracksComboBox.Text != "none")
-                {
-                    w.WriteAttributeString("pitchWheelController", this.PitchWheelControllerComboBox.Text);
-                    sb = GetBoolString(_pitchWheelCheckBoxes);
-                    w.WriteAttributeString("pitchWheelTracks", sb.ToString());
-                }
-
-                if(ModWheelTracksComboBox.Text != "none")
-                {
-                    w.WriteAttributeString("modWheelController", this.ModWheelControllerComboBox.Text);
-                    sb = GetBoolString(_modWheelCheckBoxes);
-                    w.WriteAttributeString("modWheelTracks", sb.ToString());
-                }
-
-                if(SpeedControllerComboBox.Text != "none")
-                {
-                    w.WriteAttributeString("speedController", this.SpeedControllerComboBox.Text);
-                    w.WriteAttributeString("speedMaxPercent", this.MaximumSpeedPercentTextBox.Text);
-                }
-
-                if(this.MinimumVolumeTextBox.Enabled)
-                {
-                    w.WriteAttributeString("minVolume", this.MinimumVolumeTextBox.Text);
-                }
-
-                w.WriteAttributeString("trackIndex", this._performersTrackIndex.ToString());
-
-                w.WriteEndElement(); // performerOptions
+                sb = GetBoolString(_noteOnPitchCheckBoxes);
+                w.WriteAttributeString("noteOnPitchTracks", sb.ToString());
             }
+
+            if(NoteOnVelocityTracksComboBox.Text != "none")
+            {
+                sb = GetBoolString(_noteOnVelocityCheckBoxes);
+                w.WriteAttributeString("noteOnVelocityTracks", sb.ToString());
+            }
+
+            if(PressureTracksComboBox.Text != "none")
+            {
+                w.WriteAttributeString("pressureController", this.PressureControllerComboBox.Text);
+                sb = GetBoolString(_pressureCheckBoxes);
+                w.WriteAttributeString("pressureTracks", sb.ToString());
+            }
+
+            if(PitchWheelTracksComboBox.Text != "none")
+            {
+                w.WriteAttributeString("pitchWheelController", this.PitchWheelControllerComboBox.Text);
+                sb = GetBoolString(_pitchWheelCheckBoxes);
+                w.WriteAttributeString("pitchWheelTracks", sb.ToString());
+            }
+
+            if(ModWheelTracksComboBox.Text != "none")
+            {
+                w.WriteAttributeString("modWheelController", this.ModWheelControllerComboBox.Text);
+                sb = GetBoolString(_modWheelCheckBoxes);
+                w.WriteAttributeString("modWheelTracks", sb.ToString());
+            }
+
+            if(SpeedControllerComboBox.Text != "none")
+            {
+                w.WriteAttributeString("speedController", this.SpeedControllerComboBox.Text);
+                w.WriteAttributeString("speedMaxPercent", this.MaximumSpeedPercentTextBox.Text);
+            }
+
+            if(this.MinimumVolumeTextBox.Enabled)
+            {
+                w.WriteAttributeString("minVolume", this.MinimumVolumeTextBox.Text);
+            }
+
+            w.WriteAttributeString("trackIndex", this._performersTrackIndex.ToString());
+
+            w.WriteEndElement(); // performerOptions
         }
 
-        private bool DefaultSettings()
+        public bool IsEmpty()
         {
             bool rval = true;
 
