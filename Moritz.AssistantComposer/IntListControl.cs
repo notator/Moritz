@@ -12,7 +12,7 @@ namespace Moritz.AssistantComposer
 {
     public partial class IntListControl : UserControl
     {
-        public IntListControl(int x, int y, int minInt, int maxInt, int specialValue, Color specialValueColor, int nBoxes, ControlHasChangedDelegate controlHasChanged)
+        public IntListControl(int x, int y, int textBoxWidth, int minInt, int maxInt, int specialValue, Color specialValueColor, int nBoxes, ControlHasChangedDelegate controlHasChanged)
         {
             InitializeComponent();
 
@@ -26,7 +26,7 @@ namespace Moritz.AssistantComposer
 
             _ControlHasChanged = controlHasChanged;
 
-            Init(nBoxes);
+            Init(nBoxes, textBoxWidth);
         }
 
         public bool HasError()
@@ -76,16 +76,16 @@ namespace Moritz.AssistantComposer
             return sb.ToString();
         }
 
-        private void Init(int nBoxes)
+        private void Init(int nBoxes, int textBoxWidth)
         {
             int x = 0;
             for(int i = 0; i < nBoxes; ++i)
             {
                 TextBox textBox = new TextBox();
-                textBox.Size = new Size(30, 20);
+                textBox.Size = new Size(textBoxWidth, 20);
                 textBox.Location = new Point(x, 0);
                 textBox.TabIndex = i;
-                x += 31;
+                x += (textBoxWidth + 1);
                 textBox.Enter += TextBox_Enter;
                 textBox.Leave += TextBox_Leave;
                 _boxes.Add(textBox);
