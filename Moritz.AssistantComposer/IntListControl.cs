@@ -79,11 +79,13 @@ namespace Moritz.AssistantComposer
         private void Init(int nBoxes, int textBoxWidth)
         {
             int x = 0;
+            this.SuspendLayout();
             for(int i = 0; i < nBoxes; ++i)
             {
                 TextBox textBox = new TextBox();
                 textBox.Size = new Size(textBoxWidth, 20);
                 textBox.Location = new Point(x, 0);
+                textBox.Visible = true;
                 textBox.TabIndex = i;
                 x += (textBoxWidth + 1);
                 textBox.Enter += TextBox_Enter;
@@ -92,6 +94,11 @@ namespace Moritz.AssistantComposer
                 this.Controls.Add(textBox);
             }
             this.Size = new Size(x, 20);
+            this.ResumeLayout();
+            for(int i = 0; i < nBoxes; ++i)
+            {
+                _boxes[i].Show();
+            }
         }
 
         private void SetTextBoxState(TextBox textBox, bool okay)

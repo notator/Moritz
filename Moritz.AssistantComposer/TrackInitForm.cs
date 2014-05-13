@@ -35,19 +35,21 @@ namespace Moritz.AssistantComposer
 
         private void AddIntListControls(int x, int y, int nTracks, int heightDiff)
         {
-            _ilcMaxVolume = new IntListControl(x, y, 30, 0, 127, 127, Color.Green, nTracks, ContainedControlHasChanged);
+            int textBoxWidth = 30;
+
+            _ilcMaxVolume = new IntListControl(x, y, textBoxWidth, 0, 127, 127, Color.Green, nTracks, ContainedControlHasChanged);
             y += heightDiff;
-            _ilcVolume = new IntListControl(x, y, 30, 0, 127, 100, Color.Green, nTracks, ContainedControlHasChanged);
+            _ilcVolume = new IntListControl(x, y, textBoxWidth, 0, 127, 100, Color.Green, nTracks, ContainedControlHasChanged);
             y += heightDiff;
-            _ilcPWDeviation = new IntListControl(x, y, 30, 0, 127, 2, Color.Green, nTracks, ContainedControlHasChanged);
+            _ilcPWDeviation = new IntListControl(x, y, textBoxWidth, 0, 127, 2, Color.Green, nTracks, ContainedControlHasChanged);
             y += heightDiff;
-            _ilcPitchWheel = new IntListControl(x, y, 30, 0, 127, 64, Color.Green, nTracks, ContainedControlHasChanged);
+            _ilcPitchWheel = new IntListControl(x, y, textBoxWidth, 0, 127, 64, Color.Green, nTracks, ContainedControlHasChanged);
             y += heightDiff;
-            _ilcPan = new IntListControl(x, y, 0, 30, 127, 64, Color.Green, nTracks, ContainedControlHasChanged);
+            _ilcPan = new IntListControl(x, y, textBoxWidth, 0, 127, 64, Color.Green, nTracks, ContainedControlHasChanged);
             y += heightDiff;
-            _ilcExpression = new IntListControl(x, y, 30, 0, 127, 127, Color.Green, nTracks, ContainedControlHasChanged);
+            _ilcExpression = new IntListControl(x, y, textBoxWidth, 0, 127, 127, Color.Green, nTracks, ContainedControlHasChanged);
             y += heightDiff;
-            _ilcModulation = new IntListControl(x, y, 30, 0, 127, 0, Color.Green, nTracks, ContainedControlHasChanged);
+            _ilcModulation = new IntListControl(x, y, textBoxWidth, 0, 127, 0, Color.Green, nTracks, ContainedControlHasChanged);
             y += heightDiff;
 
             _intListControls.Add(_ilcMaxVolume);
@@ -58,6 +60,7 @@ namespace Moritz.AssistantComposer
             _intListControls.Add(_ilcExpression);
             _intListControls.Add(_ilcModulation);
 
+            this.SuspendLayout();
             this.Controls.Add(_ilcMaxVolume);
             this.Controls.Add(_ilcVolume);
             this.Controls.Add(_ilcPWDeviation);
@@ -65,6 +68,13 @@ namespace Moritz.AssistantComposer
             this.Controls.Add(_ilcPan);
             this.Controls.Add(_ilcExpression);
             this.Controls.Add(_ilcModulation);
+            this.ResumeLayout();
+
+            foreach(IntListControl ilc in _intListControls)
+            {
+                ilc.Visible = true;
+                ilc.Show();
+            }
 
             SetTrackLabelsVisibility(nTracks);
         }
