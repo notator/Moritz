@@ -38,6 +38,7 @@ namespace Moritz.AssistantComposer
             _algorithm = Algorithm(_algorithmName);
             _numberOfChannels = _algorithm.MidiChannels().Count;
 
+            _trackInitForm = new TrackInitForm(this, _numberOfChannels);
             _performerOptionsForm = new PerformerOptionsForm(this, _numberOfChannels);
 
             Debug.Assert(settingsPath.Contains(M.Preferences.LocalScoresRootFolder));
@@ -200,7 +201,8 @@ namespace Moritz.AssistantComposer
 
             if(!error)
                 error = _dimensionsAndMetadataForm.HasError();
-
+            if(!error)
+                error = _trackInitForm.HasError();
             if(!error)
                 error = _performerOptionsForm.HasError();
 
@@ -511,6 +513,7 @@ namespace Moritz.AssistantComposer
                     switch(r.Name)
                     {
                         case "trackInit":
+                            _trackInitForm.Read(r);
                             break;
                         case "performerOptions":
                             _performerOptionsForm.Read(r);
@@ -651,14 +654,9 @@ namespace Moritz.AssistantComposer
                 w.WriteAttributeString("nPages", numberOfPages.ToString());
                 w.WriteAttributeString("nTracks", _numberOfChannels.ToString());
             }
-
-            //w.WriteStartElement("trackInit");
-            //w.WriteAttributeString("volumes", VolumePerChannelTextBox.Text.Replace(" ", ""));
-            //w.WriteAttributeString("pitchWheelDeviations", PitchWheelDeviationPerChannelTextBox.Text.Replace(" ", ""));
-            //w.WriteEndElement(); // trackInit
             
             // only writes the trackInit element if it is not the default.
-            //_trackInitializationValuesForm.Write(w);
+            _trackInitForm.Write(w);
             // only writes the _performerOptions element if it is not the default.
             _performerOptionsForm.Write(w);
 
@@ -822,6 +820,12 @@ namespace Moritz.AssistantComposer
         {
             _dimensionsAndMetadataForm.Show();
             _dimensionsAndMetadataForm.BringToFront();
+        }
+
+        private void TrackInitButton_Click(object sender, EventArgs e)
+        {
+            _trackInitForm.Show();
+            _trackInitForm.BringToFront();
         }
 
         private void PerformerOptionsButton_Click(object sender, EventArgs e)
@@ -1763,7 +1767,7 @@ namespace Moritz.AssistantComposer
         private Moritz.Krystals.KrystalBrowser _krystalBrowser = null;
         private DimensionsAndMetadataForm _dimensionsAndMetadataForm;
         private PerformerOptionsForm _performerOptionsForm;
-        //private TrackInitializationValuesForm _trackInitializationValuesForm
+        private TrackInitForm _trackInitForm;
         private int _numberOfChannels = 0;
         private int _numberOfStaves = 0;
 

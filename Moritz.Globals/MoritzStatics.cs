@@ -298,7 +298,7 @@ namespace Moritz.Globals
         /// Returns null if
         ///     textBox.Text is empty, or
         ///     textBox.Text contains anything other than numbers, commas and whitespace or
-        ///     count != uint.MaxValue && there are not count values or
+        ///     count is not equal to uint.MaxValue and there are not count values or
         ///     the values are outside the given range.
         /// </summary>
         private static List<string> GetCheckedIntStrings(TextBox textBox, uint count, int minVal, int maxVal)
