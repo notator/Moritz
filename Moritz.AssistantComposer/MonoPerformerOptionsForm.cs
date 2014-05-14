@@ -10,13 +10,13 @@ using Moritz.Globals;
 
 namespace Moritz.AssistantComposer
 {
-    public partial class PerformerOptionsForm : Form
+    public partial class MonoPerformerOptionsForm : Form
     {
         /// <summary>
-        /// Creates a new, empty PerformerOptionsForm for setting the following options.
+        /// Creates a new, empty MonoPerformerOptionsForm.
         /// These are all defaults, that will be adjustable (as before) in the AP:
         /// </summary>
-        public PerformerOptionsForm(AssistantComposerMainForm assistantComposerMainForm, int nTracks)
+        public MonoPerformerOptionsForm(AssistantComposerMainForm assistantComposerMainForm, int nTracks)
         {
             InitializeComponent();
 
@@ -66,7 +66,7 @@ namespace Moritz.AssistantComposer
 
         public void Read(XmlReader r)
         {
-            Debug.Assert(r.Name == "performerOptions");
+            Debug.Assert(r.Name == "monoPerformerOptions");
 
             #region get attributes
             int count = r.AttributeCount;
@@ -213,7 +213,7 @@ namespace Moritz.AssistantComposer
         {
             StringBuilder sb;
 
-            w.WriteStartElement("performerOptions");
+            w.WriteStartElement("monoPerformerOptions");
 
             if(NoteOnPitchTracksComboBox.Text != "none")
             {
@@ -785,7 +785,6 @@ namespace Moritz.AssistantComposer
             this._assistantComposerMainForm.SaveSettings(0);
             SetSettingsHaveBeenSaved();
         }
-
         #endregion
 
         private int _nTracks;

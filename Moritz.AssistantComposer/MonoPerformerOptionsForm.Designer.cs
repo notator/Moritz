@@ -1,6 +1,6 @@
 ﻿namespace Moritz.AssistantComposer
 {
-    partial class PerformerOptionsForm
+    partial class MonoPerformerOptionsForm
     {
         /// <summary>
         /// Required designer variable.
@@ -1777,7 +1777,7 @@
             this.label6.TabIndex = 180;
             this.label6.Text = "minimum volume";
             // 
-            // PerformerOptionsForm
+            // MonoPerformerOptionsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -1830,9 +1830,9 @@
             this.Font = new System.Drawing.Font("Arial", 8F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Location = new System.Drawing.Point(250, 100);
-            this.Name = "PerformerOptionsForm";
+            this.Name = "MonoPerformerOptionsForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Assistant Composer: Performer Options";
+            this.Text = "Assistant Composer: Mono Performer Options";
             this.TrackPanel16.ResumeLayout(false);
             this.TrackPanel16.PerformLayout();
             this.TrackPanel15.ResumeLayout(false);

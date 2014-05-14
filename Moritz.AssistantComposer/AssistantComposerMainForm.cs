@@ -39,7 +39,8 @@ namespace Moritz.AssistantComposer
             _numberOfChannels = _algorithm.MidiChannels().Count;
 
             _trackInitForm = new TrackInitForm(this, _numberOfChannels);
-            _performerOptionsForm = new PerformerOptionsForm(this, _numberOfChannels);
+            _monoPerformerOptionsForm = new MonoPerformerOptionsForm(this, _numberOfChannels);
+            _polyPerformerOptionsForm = new PolyPerformerOptionsForm(this, _numberOfChannels);
 
             Debug.Assert(settingsPath.Contains(M.Preferences.LocalScoresRootFolder));
             _algorithmFolderPath = M.Preferences.LocalScoresRootFolder + @"\" + _algorithmName;
@@ -160,6 +161,8 @@ namespace Moritz.AssistantComposer
 
             KrystalsListBox.Items.Clear();
             PalettesListBox.Items.Clear();
+
+            PerformersEventHandlerComboBox.Text = "none";
         }
 
         public void SetSettingsHaveNotBeenSaved()
@@ -204,7 +207,7 @@ namespace Moritz.AssistantComposer
             if(!error)
                 error = _trackInitForm.HasError();
             if(!error)
-                error = _performerOptionsForm.HasError();
+                error = _monoPerformerOptionsForm.HasError();
 
             if(!error)
             {
@@ -506,10 +509,12 @@ namespace Moritz.AssistantComposer
             // The runtimeInfo.nPages and runtimeInfo.nTracks attributes are not read here
             // (They are only used by the Assistant Performer.)
 
+            this.PerformersEventHandlerComboBox.Text = "none"; // default
+
             if(!r.IsEmptyElement)
             {
-                M.ReadToXmlElementTag(r, "trackInit", "performerOptions", "runtimeInfo");
-                while(r.Name == "trackInit" || r.Name == "performerOptions")
+                M.ReadToXmlElementTag(r, "trackInit", "monoPerformerOptions", "polyPerformerOptions", "runtimeInfo");
+                while(r.Name == "trackInit" || r.Name == "monoPerformerOptions" || r.Name == "polyPerformerOptions")
                 {
                     if(r.NodeType != XmlNodeType.EndElement)
                     {
@@ -518,12 +523,17 @@ namespace Moritz.AssistantComposer
                             case "trackInit":
                                 _trackInitForm.Read(r);
                                 break;
-                            case "performerOptions":
-                                _performerOptionsForm.Read(r);
+                            case "monoPerformerOptions":
+                                this.PerformersEventHandlerComboBox.Text = "mono";
+                                _monoPerformerOptionsForm.Read(r);
+                                break;
+                            case "polyPerformerOptions":
+                                this.PerformersEventHandlerComboBox.Text = "poly";
+                                _polyPerformerOptionsForm.Read(r);
                                 break;
                         }
                     }
-                    M.ReadToXmlElementTag(r, "trackInit", "performerOptions", "runtimeInfo");
+                    M.ReadToXmlElementTag(r, "trackInit", "monoPerformerOptions", "polyPerformerOptions", "runtimeInfo");
                 }
             }
 
@@ -651,7 +661,7 @@ namespace Moritz.AssistantComposer
 
         private void WriteRuntimeInfo(XmlWriter w, int numberOfPages)
         {
-            if(numberOfPages > 0 || !_trackInitForm.IsEmpty() || !_performerOptionsForm.IsEmpty())
+            if(numberOfPages > 0 || !_trackInitForm.IsEmpty() || !_monoPerformerOptionsForm.IsEmpty())
             {
                 w.WriteStartElement("runtimeInfo");
                 if(numberOfPages > 0)
@@ -666,10 +676,14 @@ namespace Moritz.AssistantComposer
                 {
                     _trackInitForm.Write(w);
                 }
-                // only write the _performerOptions element if it is not empty.
-                if(!_performerOptionsForm.IsEmpty())
+                // only write the _monoPerformerOptions element if it is not empty.
+                if(this.PerformersEventHandlerComboBox.Text == "mono" && !_monoPerformerOptionsForm.IsEmpty())
                 {
-                    _performerOptionsForm.Write(w);
+                    _monoPerformerOptionsForm.Write(w);
+                }
+                else if(this.PerformersEventHandlerComboBox.Text == "poly" && !_polyPerformerOptionsForm.IsEmpty()) // IsEmpty() is currently always true
+                {
+                    _polyPerformerOptionsForm.Write(w);
                 }
 
                 w.WriteEndElement(); // runtimeInfo
@@ -840,10 +854,10 @@ namespace Moritz.AssistantComposer
             _trackInitForm.BringToFront();
         }
 
-        private void PerformerOptionsButton_Click(object sender, EventArgs e)
+        private void MonoPerformerOptionsButton_Click(object sender, EventArgs e)
         {
-            _performerOptionsForm.Show();
-            _performerOptionsForm.BringToFront();
+            _monoPerformerOptionsForm.Show();
+            _monoPerformerOptionsForm.BringToFront();
         }
 
         private void QuitMoritzButton_Click(object sender, EventArgs e)
@@ -880,9 +894,9 @@ namespace Moritz.AssistantComposer
                 _dimensionsAndMetadataForm.Close();
             }
             
-            if(_performerOptionsForm != null)
+            if(_monoPerformerOptionsForm != null)
             {
-                _performerOptionsForm.Close();
+                _monoPerformerOptionsForm.Close();
             }
             
             if(_trackInitForm != null)
@@ -1344,6 +1358,30 @@ namespace Moritz.AssistantComposer
 
             GetSelectedSettings(_settingsPath, _algorithm);
         }
+
+        private void PerformersEventHandlerComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ComboBox cb = sender as ComboBox;
+            if(cb != null)
+            {
+                if(cb.Text == "none")
+                {
+                    MonoPerformerOptionsButton.Visible = false;
+                    PolyPerformerOptionsButton.Visible = false;
+                }
+                else if(cb.Text == "mono")
+                {
+                    MonoPerformerOptionsButton.Visible = true;
+                    MonoPerformerOptionsButton.BringToFront();
+                }
+                else if(cb.Text == "poly")
+                {
+                    PolyPerformerOptionsButton.Visible = true;
+                    PolyPerformerOptionsButton.BringToFront();
+                }
+            }
+        }
+
         private void GetSelectedSettings(string settingsPath, MidiCompositionAlgorithm algorithm)
         {
             LoadSettings(settingsPath);
@@ -1793,11 +1831,13 @@ namespace Moritz.AssistantComposer
         private IMoritzForm1 _moritzForm1;
         private Moritz.Krystals.KrystalBrowser _krystalBrowser = null;
         private DimensionsAndMetadataForm _dimensionsAndMetadataForm;
-        private PerformerOptionsForm _performerOptionsForm;
+        private MonoPerformerOptionsForm _monoPerformerOptionsForm;
+        private PolyPerformerOptionsForm _polyPerformerOptionsForm;
         private TrackInitForm _trackInitForm;
         private int _numberOfChannels = 0;
         private int _numberOfStaves = 0;
 
         public PageFormat PageFormat = null;
+
     }
 }

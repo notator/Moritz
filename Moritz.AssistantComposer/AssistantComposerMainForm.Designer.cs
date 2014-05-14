@@ -90,8 +90,11 @@ namespace Moritz.AssistantComposer
             this.DimensionsAndMetadataButton = new System.Windows.Forms.Button();
             this.KrystalsGroupBox = new System.Windows.Forms.GroupBox();
             this.PalettesGroupBox = new System.Windows.Forms.GroupBox();
-            this.PerformerOptionsButton = new System.Windows.Forms.Button();
+            this.MonoPerformerOptionsButton = new System.Windows.Forms.Button();
             this.TrackInitValuesButton = new System.Windows.Forms.Button();
+            this.PolyPerformerOptionsButton = new System.Windows.Forms.Button();
+            this.PerformersEventHandlerComboBox = new System.Windows.Forms.ComboBox();
+            this.PerformersEventHandlerLabel = new System.Windows.Forms.Label();
             this.NotationGroupBox.SuspendLayout();
             this.StandardChordsOptionsPanel.SuspendLayout();
             this.KrystalsGroupBox.SuspendLayout();
@@ -766,29 +769,64 @@ namespace Moritz.AssistantComposer
             this.PalettesGroupBox.TabStop = false;
             this.PalettesGroupBox.Text = "palettes";
             // 
-            // PerformerOptionsButton
+            // MonoPerformerOptionsButton
             // 
-            this.PerformerOptionsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.PerformerOptionsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.PerformerOptionsButton.Location = new System.Drawing.Point(362, 537);
-            this.PerformerOptionsButton.Name = "PerformerOptionsButton";
-            this.PerformerOptionsButton.Size = new System.Drawing.Size(183, 26);
-            this.PerformerOptionsButton.TabIndex = 150;
-            this.PerformerOptionsButton.Text = "Performer Options";
-            this.PerformerOptionsButton.UseVisualStyleBackColor = false;
-            this.PerformerOptionsButton.Click += new System.EventHandler(this.PerformerOptionsButton_Click);
+            this.MonoPerformerOptionsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
+            this.MonoPerformerOptionsButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.MonoPerformerOptionsButton.Location = new System.Drawing.Point(352, 537);
+            this.MonoPerformerOptionsButton.Name = "MonoPerformerOptionsButton";
+            this.MonoPerformerOptionsButton.Size = new System.Drawing.Size(183, 26);
+            this.MonoPerformerOptionsButton.TabIndex = 150;
+            this.MonoPerformerOptionsButton.Text = "Mono Performer Options";
+            this.MonoPerformerOptionsButton.UseVisualStyleBackColor = false;
+            this.MonoPerformerOptionsButton.Click += new System.EventHandler(this.MonoPerformerOptionsButton_Click);
             // 
             // TrackInitValuesButton
             // 
             this.TrackInitValuesButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.TrackInitValuesButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.TrackInitValuesButton.Location = new System.Drawing.Point(362, 507);
+            this.TrackInitValuesButton.Location = new System.Drawing.Point(352, 507);
             this.TrackInitValuesButton.Name = "TrackInitValuesButton";
             this.TrackInitValuesButton.Size = new System.Drawing.Size(183, 26);
             this.TrackInitValuesButton.TabIndex = 151;
             this.TrackInitValuesButton.Text = "Track Initialization Values";
             this.TrackInitValuesButton.UseVisualStyleBackColor = false;
             this.TrackInitValuesButton.Click += new System.EventHandler(this.TrackInitButton_Click);
+            // 
+            // PolyPerformerOptionsButton
+            // 
+            this.PolyPerformerOptionsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
+            this.PolyPerformerOptionsButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.PolyPerformerOptionsButton.Location = new System.Drawing.Point(352, 537);
+            this.PolyPerformerOptionsButton.Name = "PolyPerformerOptionsButton";
+            this.PolyPerformerOptionsButton.Size = new System.Drawing.Size(183, 26);
+            this.PolyPerformerOptionsButton.TabIndex = 152;
+            this.PolyPerformerOptionsButton.Text = "Poly Performer Options";
+            this.PolyPerformerOptionsButton.UseVisualStyleBackColor = false;
+            // 
+            // PerformersEventHandlerComboBox
+            // 
+            this.PerformersEventHandlerComboBox.FormattingEnabled = true;
+            this.PerformersEventHandlerComboBox.Items.AddRange(new object[] {
+            "none",
+            "mono",
+            "poly"});
+            this.PerformersEventHandlerComboBox.Location = new System.Drawing.Point(371, 11);
+            this.PerformersEventHandlerComboBox.Name = "PerformersEventHandlerComboBox";
+            this.PerformersEventHandlerComboBox.Size = new System.Drawing.Size(58, 22);
+            this.PerformersEventHandlerComboBox.TabIndex = 153;
+            this.PerformersEventHandlerComboBox.SelectedIndexChanged += new System.EventHandler(this.PerformersEventHandlerComboBox_SelectedIndexChanged);
+            // 
+            // PerformersEventHandlerLabel
+            // 
+            this.PerformersEventHandlerLabel.AutoSize = true;
+            this.PerformersEventHandlerLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+            this.PerformersEventHandlerLabel.Location = new System.Drawing.Point(238, 14);
+            this.PerformersEventHandlerLabel.Margin = new System.Windows.Forms.Padding(0);
+            this.PerformersEventHandlerLabel.Name = "PerformersEventHandlerLabel";
+            this.PerformersEventHandlerLabel.Size = new System.Drawing.Size(130, 14);
+            this.PerformersEventHandlerLabel.TabIndex = 154;
+            this.PerformersEventHandlerLabel.Text = "performers event handler";
             // 
             // AssistantComposerMainForm
             // 
@@ -797,8 +835,10 @@ namespace Moritz.AssistantComposer
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
             this.ClientSize = new System.Drawing.Size(732, 578);
             this.ControlBox = false;
+            this.Controls.Add(this.PerformersEventHandlerLabel);
+            this.Controls.Add(this.PerformersEventHandlerComboBox);
             this.Controls.Add(this.TrackInitValuesButton);
-            this.Controls.Add(this.PerformerOptionsButton);
+            this.Controls.Add(this.MonoPerformerOptionsButton);
             this.Controls.Add(this.PalettesGroupBox);
             this.Controls.Add(this.KrystalsGroupBox);
             this.Controls.Add(this.DimensionsAndMetadataButton);
@@ -810,6 +850,7 @@ namespace Moritz.AssistantComposer
             this.Controls.Add(this.NotationGroupBox);
             this.Controls.Add(this.ScoreComboBox);
             this.Controls.Add(this.ScoreComboBoxLabel);
+            this.Controls.Add(this.PolyPerformerOptionsButton);
             this.Font = new System.Drawing.Font("Arial", 8F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Location = new System.Drawing.Point(250, 100);
@@ -887,8 +928,11 @@ namespace Moritz.AssistantComposer
         private System.Windows.Forms.Panel StandardChordsOptionsPanel;
         private System.Windows.Forms.Label ChordTypeComboBoxLabel;
         private System.Windows.Forms.ComboBox ChordTypeComboBox;
-        private System.Windows.Forms.Button PerformerOptionsButton;
+        private System.Windows.Forms.Button MonoPerformerOptionsButton;
         private System.Windows.Forms.Button TrackInitValuesButton;
+        private System.Windows.Forms.Button PolyPerformerOptionsButton;
+        private System.Windows.Forms.ComboBox PerformersEventHandlerComboBox;
+        private System.Windows.Forms.Label PerformersEventHandlerLabel;
 
     }
 }
