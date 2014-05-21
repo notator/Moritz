@@ -20,7 +20,11 @@ namespace Moritz.AssistantComposer
         {
             InitializeComponent();
 
+            SetMasterVolumeControls(nTracks);
+
             _trackPanels = GetAllTrackPanels();
+            _topTrackLabels = GetAllTopTrackLabels();
+            _masterVolumeTrackLabels = GetAllMasterVolumeTrackLabels();
             _noteOnPitchCheckBoxes = GetNoteOnPitchCheckBoxes();
             _noteOnVelocityCheckBoxes = GetNoteOnVelocityCheckBoxes();
             _pressureCheckBoxes = GetPressureCheckBoxes();
@@ -53,6 +57,47 @@ namespace Moritz.AssistantComposer
             #endregion
 
             DisableUnusedTrackPanels(_nTracks);
+        }
+
+        private void SetMasterVolumeControls(int nTracks)
+        {
+            int textBoxWidth = 30;
+            int width = this.masterVolumeLabel.Size.Width + 3 + (nTracks * (textBoxWidth + 1));
+            int deltaX = ((this.masterVolumeGroupBox.Size.Width - width) / 2);
+
+            _ilcMasterVolumes = new IntListControl(111, 26, 30, 0, 127, nTracks, ContainedControlHasChanged);
+            this.masterVolumeGroupBox.Controls.Add(_ilcMasterVolumes);
+
+            foreach(Control c in this.masterVolumeGroupBox.Controls)
+            {
+                if(c.Name.CompareTo(MVCommentLabel.Name) != 0)
+                {
+                    c.Location = new Point(c.Location.X + deltaX, c.Location.Y);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called by a contained IntListControl when it changes
+        /// </summary>
+        public void ContainedControlHasChanged(IntListControl sender)
+        {
+            _intListControlHasError = false;
+
+            if(sender == _ilcMasterVolumes)
+            {
+                if(_ilcMasterVolumes.HasError())
+                {
+                    _intListControlHasError = true;
+                }
+
+                if(!_intListControlHasError)
+                {
+                    _ilcMasterVolumes.EmptyFieldsWithValue(127);
+                }
+            }
+
+            SaveSettingsButton.Enabled = !_intListControlHasError;
         }
 
         private void SetPerformersTrackNumberComboBoxItems()
@@ -102,6 +147,10 @@ namespace Moritz.AssistantComposer
                         SetTrackCheckBoxes(r.Value, this._modWheelCheckBoxes);
                         break;
 
+                    case "masterVolumes":
+                        this._ilcMasterVolumes.Set(r.Value);
+                        break;
+
                     case "speedController":
                         this.SpeedControllerComboBox.Text = r.Value;
                         break;
@@ -124,7 +173,7 @@ namespace Moritz.AssistantComposer
 
             SetAllTrackComboBoxesFromCheckBoxes(_nTracks);
 
-            SetPerformersTrackPanelDisplay(_performersTrackIndex);
+            SetDisplay(_nTracks, _performersTrackIndex);
 
             OptionalMaximumSpeedGroupBox.Enabled = (SpeedControllerComboBox.SelectedIndex > 0);
             SetMinimumVolumePanelEnabledStatus();
@@ -169,7 +218,7 @@ namespace Moritz.AssistantComposer
             }
         }
 
-        private void SetPerformersTrackPanelDisplay(int performersTrackIndex)
+        private void SetDisplay(int nTracks, int performersTrackIndex)
         {
             // set standard trackPanel locations (as in Designer)
             int x = 315, y = 22;
@@ -180,16 +229,31 @@ namespace Moritz.AssistantComposer
 
             for(int i = 0; i < 16; ++i)
             {
-                if(i == performersTrackIndex)
+                if(i < nTracks)
                 {
-                    _trackPanels[i].BorderStyle = BorderStyle.FixedSingle;
-                    // correct for width of border
-                    _trackPanels[i].Location = new Point(_trackPanels[i].Location.X - 1, _trackPanels[i].Location.Y - 1);
-                    _trackPanels[i].BringToFront();
+                    _trackPanels[i].Show();
+                    _masterVolumeTrackLabels[i].Show();
+
+                    if(i == performersTrackIndex)
+                    {
+                        _topTrackLabels[i].ForeColor = Color.Blue;
+                        _masterVolumeTrackLabels[i].ForeColor = Color.Blue;
+                        _trackPanels[i].BorderStyle = BorderStyle.FixedSingle;
+                        // correct for width of border
+                        _trackPanels[i].Location = new Point(_trackPanels[i].Location.X - 1, _trackPanels[i].Location.Y - 1);
+                        _trackPanels[i].BringToFront();
+                    }
+                    else
+                    {
+                        _topTrackLabels[i].ForeColor = Color.Black;
+                        _masterVolumeTrackLabels[i].ForeColor = Color.Black;
+                        _trackPanels[i].BorderStyle = BorderStyle.None;
+                    }
                 }
                 else
                 {
-                    _trackPanels[i].BorderStyle = BorderStyle.None;
+                    _trackPanels[i].Hide();
+                    _masterVolumeTrackLabels[i].Hide();
                 }
             }
         }
@@ -248,6 +312,11 @@ namespace Moritz.AssistantComposer
                 w.WriteAttributeString("modWheelTracks", sb.ToString());
             }
 
+            if(!this._ilcMasterVolumes.IsEmpty())
+            {
+                w.WriteAttributeString("masterVolumes", _ilcMasterVolumes.ValuesAsString());
+            }
+
             if(SpeedControllerComboBox.Text != "none")
             {
                 w.WriteAttributeString("speedController", this.SpeedControllerComboBox.Text);
@@ -301,6 +370,9 @@ namespace Moritz.AssistantComposer
                     break;
                 }
             }
+
+            error = error || _intListControlHasError;
+
             return error;
         }
 
@@ -327,6 +399,55 @@ namespace Moritz.AssistantComposer
 
             return trackPanels;
         }
+
+        private List<Label> GetAllTopTrackLabels()
+        {
+            List<Label> trackLabels = new List<Label>();
+
+            trackLabels.Add(TrackLabel1);
+            trackLabels.Add(TrackLabel2);
+            trackLabels.Add(TrackLabel3);
+            trackLabels.Add(TrackLabel4);
+            trackLabels.Add(TrackLabel5);
+            trackLabels.Add(TrackLabel6);
+            trackLabels.Add(TrackLabel7);
+            trackLabels.Add(TrackLabel8);
+            trackLabels.Add(TrackLabel9);
+            trackLabels.Add(TrackLabel10);
+            trackLabels.Add(TrackLabel11);
+            trackLabels.Add(TrackLabel12);
+            trackLabels.Add(TrackLabel13);
+            trackLabels.Add(TrackLabel14);
+            trackLabels.Add(TrackLabel15);
+            trackLabels.Add(TrackLabel16);
+
+            return trackLabels;
+        }
+
+        private List<Label> GetAllMasterVolumeTrackLabels()
+        {
+            List<Label> trackLabels = new List<Label>();
+
+            trackLabels.Add(MVTrackLabel1);
+            trackLabels.Add(MVTrackLabel2);
+            trackLabels.Add(MVTrackLabel3);
+            trackLabels.Add(MVTrackLabel4);
+            trackLabels.Add(MVTrackLabel5);
+            trackLabels.Add(MVTrackLabel6);
+            trackLabels.Add(MVTrackLabel7);
+            trackLabels.Add(MVTrackLabel8);
+            trackLabels.Add(MVTrackLabel9);
+            trackLabels.Add(MVTrackLabel10);
+            trackLabels.Add(MVTrackLabel11);
+            trackLabels.Add(MVTrackLabel12);
+            trackLabels.Add(MVTrackLabel13);
+            trackLabels.Add(MVTrackLabel14);
+            trackLabels.Add(MVTrackLabel15);
+            trackLabels.Add(MVTrackLabel16);
+
+            return trackLabels;
+        }
+
         private List<CheckBox> GetNoteOnPitchCheckBoxes()
         {
             List<CheckBox> checkBoxes = new List<CheckBox>();
@@ -668,7 +789,7 @@ namespace Moritz.AssistantComposer
             _performersTrackIndex = PerformersTrackNumberComboBox.SelectedIndex;
 
             SetAllTrackComboBoxesFromCheckBoxes(_nTracks);
-            SetPerformersTrackPanelDisplay(_performersTrackIndex);
+            SetDisplay(_nTracks, _performersTrackIndex);
             SetSettingsNotSaved();
         }
 
@@ -789,13 +910,18 @@ namespace Moritz.AssistantComposer
 
         private int _nTracks;
         private List<Panel> _trackPanels;
-
         private int _performersTrackIndex = 0;
         private List<CheckBox> _noteOnPitchCheckBoxes;
         private List<CheckBox> _noteOnVelocityCheckBoxes;
         private List<CheckBox> _pressureCheckBoxes;
         private List<CheckBox> _pitchWheelCheckBoxes;
         private List<CheckBox> _modWheelCheckBoxes;
+
+        private List<Label> _topTrackLabels;
+        private List<Label> _masterVolumeTrackLabels;
+
+        static private bool _intListControlHasError = false;
+        private IntListControl _ilcMasterVolumes;
 
         private AssistantComposerMainForm _assistantComposerMainForm = null;
     }

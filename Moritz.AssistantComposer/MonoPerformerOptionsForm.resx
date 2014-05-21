@@ -117,4 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="MVCommentLabel.Text" xml:space="preserve">
+    <value>A track's master volume value scales its volume so that the maximum value is the value given here (range 0..127).
+Each track's master volume is set when the score is first displayed. Additionally, if the volume is being controlled live,
+(i.e. one of the above controls is set to control volume), the control's value is scaled to fit each track's master value.
+If a field is empty here, the default value 127 is used. The default value is never displayed.</value>
+  </data>
 </root>

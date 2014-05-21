@@ -10,7 +10,7 @@ using Moritz.Globals;
 
 namespace Moritz.AssistantComposer
 {
-    public delegate void ControlHasChangedDelegate();
+    public delegate void ControlHasChangedDelegate(IntListControl sender);
 
     public partial class TrackInitForm : Form
     {
@@ -23,7 +23,7 @@ namespace Moritz.AssistantComposer
             InitializeComponent();
             this._nTracks = nTracks;
 
-            int x = 98;
+            int x = 118;
             int y = 35;
             int heightDiff = 24;
             AddIntListControls(x, y, nTracks, heightDiff);
@@ -37,22 +37,19 @@ namespace Moritz.AssistantComposer
         {
             int textBoxWidth = 30;
 
-            _ilcMaxVolume = new IntListControl(x, y, textBoxWidth, 0, 127, 127, Color.Green, nTracks, ContainedControlHasChanged);
+            _ilcVolume = new IntListControl(x, y, textBoxWidth, 0, 127, nTracks, ContainedControlHasChanged);
             y += heightDiff;
-            _ilcVolume = new IntListControl(x, y, textBoxWidth, 0, 127, 100, Color.Green, nTracks, ContainedControlHasChanged);
+            _ilcPWDeviation = new IntListControl(x, y, textBoxWidth, 0, 127, nTracks, ContainedControlHasChanged);
             y += heightDiff;
-            _ilcPWDeviation = new IntListControl(x, y, textBoxWidth, 0, 127, 2, Color.Green, nTracks, ContainedControlHasChanged);
+            _ilcPitchWheel = new IntListControl(x, y, textBoxWidth, 0, 127, nTracks, ContainedControlHasChanged);
             y += heightDiff;
-            _ilcPitchWheel = new IntListControl(x, y, textBoxWidth, 0, 127, 64, Color.Green, nTracks, ContainedControlHasChanged);
+            _ilcPan = new IntListControl(x, y, textBoxWidth, 0, 127, nTracks, ContainedControlHasChanged);
             y += heightDiff;
-            _ilcPan = new IntListControl(x, y, textBoxWidth, 0, 127, 64, Color.Green, nTracks, ContainedControlHasChanged);
+            _ilcExpression = new IntListControl(x, y, textBoxWidth, 0, 127, nTracks, ContainedControlHasChanged);
             y += heightDiff;
-            _ilcExpression = new IntListControl(x, y, textBoxWidth, 0, 127, 127, Color.Green, nTracks, ContainedControlHasChanged);
-            y += heightDiff;
-            _ilcModulation = new IntListControl(x, y, textBoxWidth, 0, 127, 0, Color.Green, nTracks, ContainedControlHasChanged);
+            _ilcModulation = new IntListControl(x, y, textBoxWidth, 0, 127, nTracks, ContainedControlHasChanged);
             y += heightDiff;
 
-            _intListControls.Add(_ilcMaxVolume);
             _intListControls.Add(_ilcVolume);
             _intListControls.Add(_ilcPWDeviation);
             _intListControls.Add(_ilcPitchWheel);
@@ -61,7 +58,6 @@ namespace Moritz.AssistantComposer
             _intListControls.Add(_ilcModulation);
 
             this.SuspendLayout();
-            this.Controls.Add(_ilcMaxVolume);
             this.Controls.Add(_ilcVolume);
             this.Controls.Add(_ilcPWDeviation);
             this.Controls.Add(_ilcPitchWheel);
@@ -118,9 +114,6 @@ namespace Moritz.AssistantComposer
                 r.MoveToAttribute(i);
                 switch(r.Name)
                 {
-                    case "maxVolume":
-                        _ilcMaxVolume.Set(r.Value);
-                        break;
                     case "volume":
                         _ilcVolume.Set(r.Value);
                         break;
@@ -152,10 +145,6 @@ namespace Moritz.AssistantComposer
         {
             w.WriteStartElement("trackInit");
 
-            if(!_ilcMaxVolume.IsEmpty())
-            {
-                w.WriteAttributeString("maxVolume", _ilcMaxVolume.ValuesAsString());
-            }
             if(!_ilcVolume.IsEmpty())
             {
                 w.WriteAttributeString("volume", _ilcVolume.ValuesAsString());
@@ -230,7 +219,7 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// Called by a contained IntListControl when it changes
         /// </summary>
-        public void ContainedControlHasChanged()
+        public void ContainedControlHasChanged(IntListControl sender)
         {
             _hasError = false;
             foreach(IntListControl ilc in _intListControls)
@@ -239,6 +228,34 @@ namespace Moritz.AssistantComposer
                 {
                     _hasError = true;
                     break;
+                }
+            }
+
+            if(!_hasError)
+            {
+                if(sender == _ilcVolume)
+                {
+                    _ilcVolume.EmptyFieldsWithValue(100);
+                }
+                else if(sender == _ilcPWDeviation)
+                {
+                    _ilcPWDeviation.EmptyFieldsWithValue(2);
+                }
+                else if(sender == _ilcPitchWheel)
+                {
+                    _ilcPitchWheel.EmptyFieldsWithValue(64);
+                }
+                else if(sender == _ilcPan)
+                {
+                    _ilcPan.EmptyFieldsWithValue(64);
+                }
+                else if(sender == _ilcExpression)
+                {
+                    _ilcExpression.EmptyFieldsWithValue(127);
+                }
+                else if(sender == _ilcModulation)
+                {
+                    _ilcModulation.EmptyFieldsWithValue(0);
                 }
             }
 
@@ -252,8 +269,7 @@ namespace Moritz.AssistantComposer
         }
 
         private int _nTracks;
-        static private bool _hasError = false;
-        IntListControl _ilcMaxVolume;        
+        static private bool _hasError = false;      
         IntListControl _ilcVolume;        
         IntListControl _ilcPWDeviation;        
         IntListControl _ilcPitchWheel;        

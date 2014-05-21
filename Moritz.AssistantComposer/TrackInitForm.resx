@@ -118,10 +118,8 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="label2.Text" xml:space="preserve">
-    <value>The maxVolume pseudo-controller (default 127) sets the maximum volume for the track (Ordinary MIDI volume values
-are scaled accordingly by the Assistant Performer.) pwDeviation is the MIDI pitchWheel deviation control value.
-A MIDI "All Controllers Off" command is sent to each channel at the beginning of a performance, setting all controllers
-to their default settings. The default settings for the above controllers (displayed in green in this dialog) are:
-</value>
+    <value>The Assistant Performer always sets these controllers explicitly at the beginning of a performance.
+It never sends an "All Controllers Off" command. If a field is empty here, the default value is sent.
+If a default value is entered here, the field is emptied. All values are integers in range 0..127.</value>
   </data>
 </root>

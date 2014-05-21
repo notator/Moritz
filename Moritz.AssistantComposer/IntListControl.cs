@@ -12,17 +12,13 @@ namespace Moritz.AssistantComposer
 {
     public partial class IntListControl : UserControl
     {
-        public IntListControl(int x, int y, int textBoxWidth, int minInt, int maxInt, int specialValue, Color specialValueColor, int nBoxes, ControlHasChangedDelegate controlHasChanged)
+        public IntListControl(int x, int y, int textBoxWidth, int minInt, int maxInt, int nBoxes, ControlHasChangedDelegate controlHasChanged)
         {
             InitializeComponent();
 
             this.Location = new Point(x, y);
             _minInt = minInt;
             _maxInt = maxInt;
-
-            // If a textBox's Text has this value, its ForeColor is set to specialValueColor.
-            _specialValue = specialValue; 
-            _specialValueColor = specialValueColor;
 
             _ControlHasChanged = controlHasChanged;
 
@@ -41,6 +37,24 @@ namespace Moritz.AssistantComposer
                 }
             }
             return rval;
+        }
+
+        /// <summary>
+        /// If any box has a Text equal to intVal.ToString(),
+        /// its Text is set to an empty string.
+        /// </summary>
+        /// <param name="intVal"></param>
+        public void EmptyFieldsWithValue(int intVal)
+        {
+            string intStr = intVal.ToString();
+
+            foreach(TextBox box in _boxes)
+            {
+                if(box.Text.CompareTo(intStr) == 0)
+                {
+                    box.Text = "";
+                }
+            }
         }
 
         /// <summary>
@@ -117,18 +131,9 @@ namespace Moritz.AssistantComposer
                 textBox.Text = textBox.Text.Trim();
                 M.LeaveIntRangeTextBox(textBox, true, 1, _minInt, _maxInt, SetTextBoxState);
 
-                if(textBox.Text == _specialValue.ToString())
+                if(textBox.BackColor == Color.White && _ControlHasChanged != null)
                 {
-                    textBox.ForeColor = _specialValueColor;
-                }
-                else
-                {
-                    textBox.ForeColor = Color.Black;
-                }
-
-                if(_ControlHasChanged != null)
-                {
-                    _ControlHasChanged(); // delegate
+                    _ControlHasChanged(this); // delegate
                 }
             }
         }
@@ -157,8 +162,6 @@ namespace Moritz.AssistantComposer
 
         private int _minInt;
         private int _maxInt;
-        private int _specialValue;
-        private Color _specialValueColor;
         private ControlHasChangedDelegate _ControlHasChanged = null;
         private List<TextBox> _boxes = new List<TextBox>();
     }

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MonoPerformerOptionsForm));
             this.SaveSettingsButton = new System.Windows.Forms.Button();
             this.ShowMainScoreFormButton = new System.Windows.Forms.Button();
             this.NoteOnPitchLabel = new System.Windows.Forms.Label();
@@ -174,6 +175,25 @@
             this.label8 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
+            this.MVCommentLabel = new System.Windows.Forms.Label();
+            this.MVTrackLabel15 = new System.Windows.Forms.Label();
+            this.MVTrackLabel14 = new System.Windows.Forms.Label();
+            this.MVTrackLabel13 = new System.Windows.Forms.Label();
+            this.MVTrackLabel12 = new System.Windows.Forms.Label();
+            this.MVTrackLabel11 = new System.Windows.Forms.Label();
+            this.MVTrackLabel10 = new System.Windows.Forms.Label();
+            this.MVTrackLabel9 = new System.Windows.Forms.Label();
+            this.MVTrackLabel8 = new System.Windows.Forms.Label();
+            this.MVTrackLabel7 = new System.Windows.Forms.Label();
+            this.MVTrackLabel6 = new System.Windows.Forms.Label();
+            this.MVTrackLabel16 = new System.Windows.Forms.Label();
+            this.MVTrackLabel5 = new System.Windows.Forms.Label();
+            this.MVTrackLabel4 = new System.Windows.Forms.Label();
+            this.MVTrackLabel3 = new System.Windows.Forms.Label();
+            this.MVTrackLabel2 = new System.Windows.Forms.Label();
+            this.MVTrackLabel1 = new System.Windows.Forms.Label();
+            this.masterVolumeGroupBox = new System.Windows.Forms.GroupBox();
+            this.masterVolumeLabel = new System.Windows.Forms.Label();
             this.TrackPanel16.SuspendLayout();
             this.TrackPanel15.SuspendLayout();
             this.TrackPanel14.SuspendLayout();
@@ -192,6 +212,7 @@
             this.TrackPanel1.SuspendLayout();
             this.OptionalMaximumSpeedGroupBox.SuspendLayout();
             this.OptionalMinimumVolumeGroupBox.SuspendLayout();
+            this.masterVolumeGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // SaveSettingsButton
@@ -199,7 +220,7 @@
             this.SaveSettingsButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.SaveSettingsButton.Enabled = false;
             this.SaveSettingsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.SaveSettingsButton.Location = new System.Drawing.Point(513, 305);
+            this.SaveSettingsButton.Location = new System.Drawing.Point(520, 433);
             this.SaveSettingsButton.Name = "SaveSettingsButton";
             this.SaveSettingsButton.Size = new System.Drawing.Size(106, 26);
             this.SaveSettingsButton.TabIndex = 7;
@@ -211,7 +232,7 @@
             // 
             this.ShowMainScoreFormButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.ShowMainScoreFormButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.ShowMainScoreFormButton.Location = new System.Drawing.Point(350, 305);
+            this.ShowMainScoreFormButton.Location = new System.Drawing.Point(357, 433);
             this.ShowMainScoreFormButton.Name = "ShowMainScoreFormButton";
             this.ShowMainScoreFormButton.Size = new System.Drawing.Size(137, 26);
             this.ShowMainScoreFormButton.TabIndex = 8;
@@ -222,7 +243,7 @@
             // NoteOnPitchLabel
             // 
             this.NoteOnPitchLabel.AutoSize = true;
-            this.NoteOnPitchLabel.Location = new System.Drawing.Point(163, 45);
+            this.NoteOnPitchLabel.Location = new System.Drawing.Point(171, 47);
             this.NoteOnPitchLabel.Name = "NoteOnPitchLabel";
             this.NoteOnPitchLabel.Size = new System.Drawing.Size(71, 14);
             this.NoteOnPitchLabel.TabIndex = 14;
@@ -231,7 +252,7 @@
             // NoteOnVelocityLabel
             // 
             this.NoteOnVelocityLabel.AutoSize = true;
-            this.NoteOnVelocityLabel.Location = new System.Drawing.Point(149, 73);
+            this.NoteOnVelocityLabel.Location = new System.Drawing.Point(157, 75);
             this.NoteOnVelocityLabel.Name = "NoteOnVelocityLabel";
             this.NoteOnVelocityLabel.Size = new System.Drawing.Size(85, 14);
             this.NoteOnVelocityLabel.TabIndex = 15;
@@ -240,7 +261,7 @@
             // PressureLabel
             // 
             this.PressureLabel.AutoSize = true;
-            this.PressureLabel.Location = new System.Drawing.Point(26, 119);
+            this.PressureLabel.Location = new System.Drawing.Point(34, 121);
             this.PressureLabel.Name = "PressureLabel";
             this.PressureLabel.Size = new System.Drawing.Size(91, 14);
             this.PressureLabel.TabIndex = 16;
@@ -249,7 +270,7 @@
             // PitchWheelLabel
             // 
             this.PitchWheelLabel.AutoSize = true;
-            this.PitchWheelLabel.Location = new System.Drawing.Point(54, 153);
+            this.PitchWheelLabel.Location = new System.Drawing.Point(62, 155);
             this.PitchWheelLabel.Name = "PitchWheelLabel";
             this.PitchWheelLabel.Size = new System.Drawing.Size(63, 14);
             this.PitchWheelLabel.TabIndex = 17;
@@ -258,7 +279,7 @@
             // ModWheelLabel
             // 
             this.ModWheelLabel.AutoSize = true;
-            this.ModWheelLabel.Location = new System.Drawing.Point(26, 181);
+            this.ModWheelLabel.Location = new System.Drawing.Point(34, 183);
             this.ModWheelLabel.Name = "ModWheelLabel";
             this.ModWheelLabel.Size = new System.Drawing.Size(91, 14);
             this.ModWheelLabel.TabIndex = 18;
@@ -282,7 +303,7 @@
             "chorus (93)",
             "celeste (94)",
             "phaser (95)   "});
-            this.PressureControllerComboBox.Location = new System.Drawing.Point(123, 122);
+            this.PressureControllerComboBox.Location = new System.Drawing.Point(131, 124);
             this.PressureControllerComboBox.Name = "PressureControllerComboBox";
             this.PressureControllerComboBox.Size = new System.Drawing.Size(109, 22);
             this.PressureControllerComboBox.TabIndex = 20;
@@ -306,7 +327,7 @@
             "chorus (93)",
             "celeste (94)",
             "phaser (95)   "});
-            this.PitchWheelControllerComboBox.Location = new System.Drawing.Point(123, 150);
+            this.PitchWheelControllerComboBox.Location = new System.Drawing.Point(131, 152);
             this.PitchWheelControllerComboBox.Name = "PitchWheelControllerComboBox";
             this.PitchWheelControllerComboBox.Size = new System.Drawing.Size(109, 22);
             this.PitchWheelControllerComboBox.TabIndex = 21;
@@ -330,7 +351,7 @@
             "chorus (93)",
             "celeste (94)",
             "phaser (95)   "});
-            this.ModWheelControllerComboBox.Location = new System.Drawing.Point(123, 178);
+            this.ModWheelControllerComboBox.Location = new System.Drawing.Point(131, 180);
             this.ModWheelControllerComboBox.Name = "ModWheelControllerComboBox";
             this.ModWheelControllerComboBox.Size = new System.Drawing.Size(109, 22);
             this.ModWheelControllerComboBox.TabIndex = 22;
@@ -340,7 +361,7 @@
             // 
             this.PerformersControlLabel.AutoSize = true;
             this.PerformersControlLabel.ForeColor = System.Drawing.Color.Blue;
-            this.PerformersControlLabel.Location = new System.Drawing.Point(18, 103);
+            this.PerformersControlLabel.Location = new System.Drawing.Point(26, 105);
             this.PerformersControlLabel.Name = "PerformersControlLabel";
             this.PerformersControlLabel.Size = new System.Drawing.Size(99, 14);
             this.PerformersControlLabel.TabIndex = 24;
@@ -350,7 +371,7 @@
             // 
             this.MIDIControllerLabel.AutoSize = true;
             this.MIDIControllerLabel.ForeColor = System.Drawing.Color.Blue;
-            this.MIDIControllerLabel.Location = new System.Drawing.Point(140, 103);
+            this.MIDIControllerLabel.Location = new System.Drawing.Point(148, 105);
             this.MIDIControllerLabel.Name = "MIDIControllerLabel";
             this.MIDIControllerLabel.Size = new System.Drawing.Size(74, 14);
             this.MIDIControllerLabel.TabIndex = 25;
@@ -360,7 +381,7 @@
             // 
             this.PerformersTrackLabel.AutoSize = true;
             this.PerformersTrackLabel.ForeColor = System.Drawing.Color.Blue;
-            this.PerformersTrackLabel.Location = new System.Drawing.Point(22, 25);
+            this.PerformersTrackLabel.Location = new System.Drawing.Point(30, 27);
             this.PerformersTrackLabel.Name = "PerformersTrackLabel";
             this.PerformersTrackLabel.Size = new System.Drawing.Size(90, 14);
             this.PerformersTrackLabel.TabIndex = 28;
@@ -369,7 +390,7 @@
             // PerformersTrackNumberComboBox
             // 
             this.PerformersTrackNumberComboBox.FormattingEnabled = true;
-            this.PerformersTrackNumberComboBox.Location = new System.Drawing.Point(48, 42);
+            this.PerformersTrackNumberComboBox.Location = new System.Drawing.Point(56, 44);
             this.PerformersTrackNumberComboBox.Name = "PerformersTrackNumberComboBox";
             this.PerformersTrackNumberComboBox.Size = new System.Drawing.Size(38, 22);
             this.PerformersTrackNumberComboBox.TabIndex = 29;
@@ -510,7 +531,7 @@
             "performer",
             "other",
             "custom"});
-            this.NoteOnPitchTracksComboBox.Location = new System.Drawing.Point(240, 41);
+            this.NoteOnPitchTracksComboBox.Location = new System.Drawing.Point(248, 43);
             this.NoteOnPitchTracksComboBox.Name = "NoteOnPitchTracksComboBox";
             this.NoteOnPitchTracksComboBox.Size = new System.Drawing.Size(71, 22);
             this.NoteOnPitchTracksComboBox.TabIndex = 85;
@@ -525,7 +546,7 @@
             this.TrackPanel16.Controls.Add(this.ModWheelCheckBox16);
             this.TrackPanel16.Controls.Add(this.PressureCheckBox16);
             this.TrackPanel16.Controls.Add(this.PitchWheelCheckBox16);
-            this.TrackPanel16.Location = new System.Drawing.Point(600, 22);
+            this.TrackPanel16.Location = new System.Drawing.Point(608, 24);
             this.TrackPanel16.Name = "TrackPanel16";
             this.TrackPanel16.Size = new System.Drawing.Size(19, 187);
             this.TrackPanel16.TabIndex = 134;
@@ -589,7 +610,7 @@
             this.TrackPanel15.Controls.Add(this.ModWheelCheckBox15);
             this.TrackPanel15.Controls.Add(this.PressureCheckBox15);
             this.TrackPanel15.Controls.Add(this.PitchWheelCheckBox15);
-            this.TrackPanel15.Location = new System.Drawing.Point(581, 22);
+            this.TrackPanel15.Location = new System.Drawing.Point(589, 24);
             this.TrackPanel15.Name = "TrackPanel15";
             this.TrackPanel15.Size = new System.Drawing.Size(19, 187);
             this.TrackPanel15.TabIndex = 135;
@@ -662,7 +683,7 @@
             this.TrackPanel14.Controls.Add(this.ModWheelCheckBox14);
             this.TrackPanel14.Controls.Add(this.PressureCheckBox14);
             this.TrackPanel14.Controls.Add(this.PitchWheelCheckBox14);
-            this.TrackPanel14.Location = new System.Drawing.Point(562, 22);
+            this.TrackPanel14.Location = new System.Drawing.Point(570, 24);
             this.TrackPanel14.Name = "TrackPanel14";
             this.TrackPanel14.Size = new System.Drawing.Size(19, 187);
             this.TrackPanel14.TabIndex = 136;
@@ -735,7 +756,7 @@
             this.TrackPanel13.Controls.Add(this.ModWheelCheckBox13);
             this.TrackPanel13.Controls.Add(this.PressureCheckBox13);
             this.TrackPanel13.Controls.Add(this.PitchWheelCheckBox13);
-            this.TrackPanel13.Location = new System.Drawing.Point(543, 22);
+            this.TrackPanel13.Location = new System.Drawing.Point(551, 24);
             this.TrackPanel13.Name = "TrackPanel13";
             this.TrackPanel13.Size = new System.Drawing.Size(19, 187);
             this.TrackPanel13.TabIndex = 137;
@@ -799,7 +820,7 @@
             this.TrackPanel12.Controls.Add(this.ModWheelCheckBox12);
             this.TrackPanel12.Controls.Add(this.PressureCheckBox12);
             this.TrackPanel12.Controls.Add(this.PitchWheelCheckBox12);
-            this.TrackPanel12.Location = new System.Drawing.Point(524, 22);
+            this.TrackPanel12.Location = new System.Drawing.Point(532, 24);
             this.TrackPanel12.Name = "TrackPanel12";
             this.TrackPanel12.Size = new System.Drawing.Size(19, 187);
             this.TrackPanel12.TabIndex = 138;
@@ -863,7 +884,7 @@
             this.TrackPanel11.Controls.Add(this.ModWheelCheckBox11);
             this.TrackPanel11.Controls.Add(this.PressureCheckBox11);
             this.TrackPanel11.Controls.Add(this.PitchWheelCheckBox11);
-            this.TrackPanel11.Location = new System.Drawing.Point(505, 22);
+            this.TrackPanel11.Location = new System.Drawing.Point(513, 24);
             this.TrackPanel11.Name = "TrackPanel11";
             this.TrackPanel11.Size = new System.Drawing.Size(19, 187);
             this.TrackPanel11.TabIndex = 139;
@@ -927,7 +948,7 @@
             this.TrackPanel10.Controls.Add(this.ModWheelCheckBox10);
             this.TrackPanel10.Controls.Add(this.PressureCheckBox10);
             this.TrackPanel10.Controls.Add(this.PitchWheelCheckBox10);
-            this.TrackPanel10.Location = new System.Drawing.Point(486, 22);
+            this.TrackPanel10.Location = new System.Drawing.Point(494, 24);
             this.TrackPanel10.Name = "TrackPanel10";
             this.TrackPanel10.Size = new System.Drawing.Size(19, 187);
             this.TrackPanel10.TabIndex = 140;
@@ -991,7 +1012,7 @@
             this.TrackPanel9.Controls.Add(this.ModWheelCheckBox9);
             this.TrackPanel9.Controls.Add(this.PressureCheckBox9);
             this.TrackPanel9.Controls.Add(this.PitchWheelCheckBox9);
-            this.TrackPanel9.Location = new System.Drawing.Point(467, 22);
+            this.TrackPanel9.Location = new System.Drawing.Point(475, 24);
             this.TrackPanel9.Name = "TrackPanel9";
             this.TrackPanel9.Size = new System.Drawing.Size(19, 187);
             this.TrackPanel9.TabIndex = 141;
@@ -1055,7 +1076,7 @@
             this.TrackPanel8.Controls.Add(this.ModWheelCheckBox8);
             this.TrackPanel8.Controls.Add(this.PressureCheckBox8);
             this.TrackPanel8.Controls.Add(this.PitchWheelCheckBox8);
-            this.TrackPanel8.Location = new System.Drawing.Point(448, 22);
+            this.TrackPanel8.Location = new System.Drawing.Point(456, 24);
             this.TrackPanel8.Name = "TrackPanel8";
             this.TrackPanel8.Size = new System.Drawing.Size(19, 187);
             this.TrackPanel8.TabIndex = 142;
@@ -1119,7 +1140,7 @@
             this.TrackPanel7.Controls.Add(this.ModWheelCheckBox7);
             this.TrackPanel7.Controls.Add(this.PressureCheckBox7);
             this.TrackPanel7.Controls.Add(this.PitchWheelCheckBox7);
-            this.TrackPanel7.Location = new System.Drawing.Point(429, 22);
+            this.TrackPanel7.Location = new System.Drawing.Point(437, 24);
             this.TrackPanel7.Name = "TrackPanel7";
             this.TrackPanel7.Size = new System.Drawing.Size(19, 187);
             this.TrackPanel7.TabIndex = 143;
@@ -1183,7 +1204,7 @@
             this.TrackPanel6.Controls.Add(this.ModWheelCheckBox6);
             this.TrackPanel6.Controls.Add(this.PressureCheckBox6);
             this.TrackPanel6.Controls.Add(this.PitchWheelCheckBox6);
-            this.TrackPanel6.Location = new System.Drawing.Point(410, 22);
+            this.TrackPanel6.Location = new System.Drawing.Point(418, 24);
             this.TrackPanel6.Name = "TrackPanel6";
             this.TrackPanel6.Size = new System.Drawing.Size(19, 187);
             this.TrackPanel6.TabIndex = 144;
@@ -1247,7 +1268,7 @@
             this.TrackPanel5.Controls.Add(this.ModWheelCheckBox5);
             this.TrackPanel5.Controls.Add(this.PressureCheckBox5);
             this.TrackPanel5.Controls.Add(this.PitchWheelCheckBox5);
-            this.TrackPanel5.Location = new System.Drawing.Point(391, 22);
+            this.TrackPanel5.Location = new System.Drawing.Point(399, 24);
             this.TrackPanel5.Name = "TrackPanel5";
             this.TrackPanel5.Size = new System.Drawing.Size(19, 187);
             this.TrackPanel5.TabIndex = 145;
@@ -1311,7 +1332,7 @@
             this.TrackPanel4.Controls.Add(this.ModWheelCheckBox4);
             this.TrackPanel4.Controls.Add(this.PressureCheckBox4);
             this.TrackPanel4.Controls.Add(this.PitchWheelCheckBox4);
-            this.TrackPanel4.Location = new System.Drawing.Point(372, 22);
+            this.TrackPanel4.Location = new System.Drawing.Point(380, 24);
             this.TrackPanel4.Name = "TrackPanel4";
             this.TrackPanel4.Size = new System.Drawing.Size(19, 187);
             this.TrackPanel4.TabIndex = 146;
@@ -1375,7 +1396,7 @@
             this.TrackPanel3.Controls.Add(this.ModWheelCheckBox3);
             this.TrackPanel3.Controls.Add(this.PressureCheckBox3);
             this.TrackPanel3.Controls.Add(this.PitchWheelCheckBox3);
-            this.TrackPanel3.Location = new System.Drawing.Point(353, 22);
+            this.TrackPanel3.Location = new System.Drawing.Point(361, 24);
             this.TrackPanel3.Name = "TrackPanel3";
             this.TrackPanel3.Size = new System.Drawing.Size(19, 187);
             this.TrackPanel3.TabIndex = 147;
@@ -1439,7 +1460,7 @@
             this.TrackPanel2.Controls.Add(this.ModWheelCheckBox2);
             this.TrackPanel2.Controls.Add(this.PressureCheckBox2);
             this.TrackPanel2.Controls.Add(this.PitchWheelCheckBox2);
-            this.TrackPanel2.Location = new System.Drawing.Point(334, 22);
+            this.TrackPanel2.Location = new System.Drawing.Point(342, 24);
             this.TrackPanel2.Name = "TrackPanel2";
             this.TrackPanel2.Size = new System.Drawing.Size(19, 187);
             this.TrackPanel2.TabIndex = 148;
@@ -1503,7 +1524,7 @@
             this.TrackPanel1.Controls.Add(this.ModWheelCheckBox1);
             this.TrackPanel1.Controls.Add(this.PressureCheckBox1);
             this.TrackPanel1.Controls.Add(this.PitchWheelCheckBox1);
-            this.TrackPanel1.Location = new System.Drawing.Point(315, 22);
+            this.TrackPanel1.Location = new System.Drawing.Point(323, 24);
             this.TrackPanel1.Name = "TrackPanel1";
             this.TrackPanel1.Size = new System.Drawing.Size(19, 187);
             this.TrackPanel1.TabIndex = 133;
@@ -1567,7 +1588,7 @@
             "performer",
             "other",
             "custom"});
-            this.NoteOnVelocityTracksComboBox.Location = new System.Drawing.Point(240, 69);
+            this.NoteOnVelocityTracksComboBox.Location = new System.Drawing.Point(248, 71);
             this.NoteOnVelocityTracksComboBox.Name = "NoteOnVelocityTracksComboBox";
             this.NoteOnVelocityTracksComboBox.Size = new System.Drawing.Size(71, 22);
             this.NoteOnVelocityTracksComboBox.TabIndex = 149;
@@ -1582,7 +1603,7 @@
             "performer",
             "other",
             "custom"});
-            this.PressureTracksComboBox.Location = new System.Drawing.Point(240, 121);
+            this.PressureTracksComboBox.Location = new System.Drawing.Point(248, 123);
             this.PressureTracksComboBox.Name = "PressureTracksComboBox";
             this.PressureTracksComboBox.Size = new System.Drawing.Size(71, 22);
             this.PressureTracksComboBox.TabIndex = 150;
@@ -1597,7 +1618,7 @@
             "performer",
             "other",
             "custom"});
-            this.PitchWheelTracksComboBox.Location = new System.Drawing.Point(240, 149);
+            this.PitchWheelTracksComboBox.Location = new System.Drawing.Point(248, 151);
             this.PitchWheelTracksComboBox.Name = "PitchWheelTracksComboBox";
             this.PitchWheelTracksComboBox.Size = new System.Drawing.Size(71, 22);
             this.PitchWheelTracksComboBox.TabIndex = 151;
@@ -1612,7 +1633,7 @@
             "performer",
             "other",
             "custom"});
-            this.ModWheelTracksComboBox.Location = new System.Drawing.Point(240, 177);
+            this.ModWheelTracksComboBox.Location = new System.Drawing.Point(248, 179);
             this.ModWheelTracksComboBox.Name = "ModWheelTracksComboBox";
             this.ModWheelTracksComboBox.Size = new System.Drawing.Size(71, 22);
             this.ModWheelTracksComboBox.TabIndex = 152;
@@ -1622,7 +1643,7 @@
             // 
             this.OverrideTrackLabel.AutoSize = true;
             this.OverrideTrackLabel.ForeColor = System.Drawing.Color.Blue;
-            this.OverrideTrackLabel.Location = new System.Drawing.Point(252, 25);
+            this.OverrideTrackLabel.Location = new System.Drawing.Point(260, 27);
             this.OverrideTrackLabel.Name = "OverrideTrackLabel";
             this.OverrideTrackLabel.Size = new System.Drawing.Size(47, 14);
             this.OverrideTrackLabel.TabIndex = 153;
@@ -1632,7 +1653,7 @@
             // 
             this.label16.AutoSize = true;
             this.label16.ForeColor = System.Drawing.Color.Blue;
-            this.label16.Location = new System.Drawing.Point(251, 103);
+            this.label16.Location = new System.Drawing.Point(259, 105);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(49, 14);
             this.label16.TabIndex = 156;
@@ -1641,7 +1662,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(25, 133);
+            this.label1.Location = new System.Drawing.Point(33, 135);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(92, 14);
             this.label1.TabIndex = 157;
@@ -1649,9 +1670,10 @@
             // 
             // label2
             // 
+            this.label2.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.label2.AutoSize = true;
             this.label2.ForeColor = System.Drawing.Color.Blue;
-            this.label2.Location = new System.Drawing.Point(18, 218);
+            this.label2.Location = new System.Drawing.Point(25, 346);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(132, 14);
             this.label2.TabIndex = 174;
@@ -1659,6 +1681,7 @@
             // 
             // SpeedControllerComboBox
             // 
+            this.SpeedControllerComboBox.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.SpeedControllerComboBox.FormattingEnabled = true;
             this.SpeedControllerComboBox.Items.AddRange(new object[] {
             "none",
@@ -1667,7 +1690,7 @@
             "pressure",
             "pitch wheel",
             "modulation wheel"});
-            this.SpeedControllerComboBox.Location = new System.Drawing.Point(21, 240);
+            this.SpeedControllerComboBox.Location = new System.Drawing.Point(28, 368);
             this.SpeedControllerComboBox.Name = "SpeedControllerComboBox";
             this.SpeedControllerComboBox.Size = new System.Drawing.Size(109, 22);
             this.SpeedControllerComboBox.TabIndex = 173;
@@ -1675,13 +1698,14 @@
             // 
             // OptionalMaximumSpeedGroupBox
             // 
+            this.OptionalMaximumSpeedGroupBox.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.OptionalMaximumSpeedGroupBox.Controls.Add(this.label5);
             this.OptionalMaximumSpeedGroupBox.Controls.Add(this.MaximumSpeedPercentTextBox);
             this.OptionalMaximumSpeedGroupBox.Controls.Add(this.label3);
             this.OptionalMaximumSpeedGroupBox.Controls.Add(this.label4);
             this.OptionalMaximumSpeedGroupBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.OptionalMaximumSpeedGroupBox.ForeColor = System.Drawing.Color.Blue;
-            this.OptionalMaximumSpeedGroupBox.Location = new System.Drawing.Point(12, 220);
+            this.OptionalMaximumSpeedGroupBox.Location = new System.Drawing.Point(19, 348);
             this.OptionalMaximumSpeedGroupBox.Name = "OptionalMaximumSpeedGroupBox";
             this.OptionalMaximumSpeedGroupBox.Size = new System.Drawing.Size(617, 62);
             this.OptionalMaximumSpeedGroupBox.TabIndex = 176;
@@ -1733,7 +1757,7 @@
             this.OptionalMinimumVolumeGroupBox.Controls.Add(this.MinimumVolumeTextBox);
             this.OptionalMinimumVolumeGroupBox.Controls.Add(this.label8);
             this.OptionalMinimumVolumeGroupBox.Controls.Add(this.label7);
-            this.OptionalMinimumVolumeGroupBox.Location = new System.Drawing.Point(12, 292);
+            this.OptionalMinimumVolumeGroupBox.Location = new System.Drawing.Point(19, 420);
             this.OptionalMinimumVolumeGroupBox.Name = "OptionalMinimumVolumeGroupBox";
             this.OptionalMinimumVolumeGroupBox.Size = new System.Drawing.Size(312, 52);
             this.OptionalMinimumVolumeGroupBox.TabIndex = 178;
@@ -1771,19 +1795,242 @@
             this.label6.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.label6.AutoSize = true;
             this.label6.ForeColor = System.Drawing.Color.Blue;
-            this.label6.Location = new System.Drawing.Point(18, 289);
+            this.label6.Location = new System.Drawing.Point(25, 417);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(84, 14);
             this.label6.TabIndex = 180;
             this.label6.Text = "minimum volume";
+            // 
+            // MVCommentLabel
+            // 
+            this.MVCommentLabel.AutoSize = true;
+            this.MVCommentLabel.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.MVCommentLabel.Location = new System.Drawing.Point(20, 55);
+            this.MVCommentLabel.Name = "MVCommentLabel";
+            this.MVCommentLabel.Size = new System.Drawing.Size(568, 56);
+            this.MVCommentLabel.TabIndex = 181;
+            this.MVCommentLabel.Text = resources.GetString("MVCommentLabel.Text");
+            // 
+            // MVTrackLabel15
+            // 
+            this.MVTrackLabel15.AutoSize = true;
+            this.MVTrackLabel15.ForeColor = System.Drawing.Color.Black;
+            this.MVTrackLabel15.Location = new System.Drawing.Point(550, 12);
+            this.MVTrackLabel15.Name = "MVTrackLabel15";
+            this.MVTrackLabel15.Size = new System.Drawing.Size(19, 14);
+            this.MVTrackLabel15.TabIndex = 197;
+            this.MVTrackLabel15.Text = "15";
+            this.MVTrackLabel15.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // MVTrackLabel14
+            // 
+            this.MVTrackLabel14.AutoSize = true;
+            this.MVTrackLabel14.ForeColor = System.Drawing.Color.Black;
+            this.MVTrackLabel14.Location = new System.Drawing.Point(519, 12);
+            this.MVTrackLabel14.Name = "MVTrackLabel14";
+            this.MVTrackLabel14.Size = new System.Drawing.Size(19, 14);
+            this.MVTrackLabel14.TabIndex = 196;
+            this.MVTrackLabel14.Text = "14";
+            this.MVTrackLabel14.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // MVTrackLabel13
+            // 
+            this.MVTrackLabel13.AutoSize = true;
+            this.MVTrackLabel13.ForeColor = System.Drawing.Color.Black;
+            this.MVTrackLabel13.Location = new System.Drawing.Point(489, 12);
+            this.MVTrackLabel13.Name = "MVTrackLabel13";
+            this.MVTrackLabel13.Size = new System.Drawing.Size(19, 14);
+            this.MVTrackLabel13.TabIndex = 195;
+            this.MVTrackLabel13.Text = "13";
+            this.MVTrackLabel13.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // MVTrackLabel12
+            // 
+            this.MVTrackLabel12.AutoSize = true;
+            this.MVTrackLabel12.ForeColor = System.Drawing.Color.Black;
+            this.MVTrackLabel12.Location = new System.Drawing.Point(458, 12);
+            this.MVTrackLabel12.Name = "MVTrackLabel12";
+            this.MVTrackLabel12.Size = new System.Drawing.Size(19, 14);
+            this.MVTrackLabel12.TabIndex = 194;
+            this.MVTrackLabel12.Text = "12";
+            this.MVTrackLabel12.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // MVTrackLabel11
+            // 
+            this.MVTrackLabel11.AutoSize = true;
+            this.MVTrackLabel11.ForeColor = System.Drawing.Color.Black;
+            this.MVTrackLabel11.Location = new System.Drawing.Point(427, 12);
+            this.MVTrackLabel11.Name = "MVTrackLabel11";
+            this.MVTrackLabel11.Size = new System.Drawing.Size(18, 14);
+            this.MVTrackLabel11.TabIndex = 193;
+            this.MVTrackLabel11.Text = "11";
+            this.MVTrackLabel11.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // MVTrackLabel10
+            // 
+            this.MVTrackLabel10.AutoSize = true;
+            this.MVTrackLabel10.ForeColor = System.Drawing.Color.Black;
+            this.MVTrackLabel10.Location = new System.Drawing.Point(396, 12);
+            this.MVTrackLabel10.Name = "MVTrackLabel10";
+            this.MVTrackLabel10.Size = new System.Drawing.Size(19, 14);
+            this.MVTrackLabel10.TabIndex = 192;
+            this.MVTrackLabel10.Text = "10";
+            this.MVTrackLabel10.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // MVTrackLabel9
+            // 
+            this.MVTrackLabel9.AutoSize = true;
+            this.MVTrackLabel9.ForeColor = System.Drawing.Color.Black;
+            this.MVTrackLabel9.Location = new System.Drawing.Point(368, 12);
+            this.MVTrackLabel9.Name = "MVTrackLabel9";
+            this.MVTrackLabel9.Size = new System.Drawing.Size(13, 14);
+            this.MVTrackLabel9.TabIndex = 191;
+            this.MVTrackLabel9.Text = "9";
+            this.MVTrackLabel9.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // MVTrackLabel8
+            // 
+            this.MVTrackLabel8.AutoSize = true;
+            this.MVTrackLabel8.ForeColor = System.Drawing.Color.Black;
+            this.MVTrackLabel8.Location = new System.Drawing.Point(337, 12);
+            this.MVTrackLabel8.Name = "MVTrackLabel8";
+            this.MVTrackLabel8.Size = new System.Drawing.Size(13, 14);
+            this.MVTrackLabel8.TabIndex = 190;
+            this.MVTrackLabel8.Text = "8";
+            this.MVTrackLabel8.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // MVTrackLabel7
+            // 
+            this.MVTrackLabel7.AutoSize = true;
+            this.MVTrackLabel7.ForeColor = System.Drawing.Color.Black;
+            this.MVTrackLabel7.Location = new System.Drawing.Point(306, 12);
+            this.MVTrackLabel7.Name = "MVTrackLabel7";
+            this.MVTrackLabel7.Size = new System.Drawing.Size(13, 14);
+            this.MVTrackLabel7.TabIndex = 189;
+            this.MVTrackLabel7.Text = "7";
+            this.MVTrackLabel7.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // MVTrackLabel6
+            // 
+            this.MVTrackLabel6.AutoSize = true;
+            this.MVTrackLabel6.ForeColor = System.Drawing.Color.Black;
+            this.MVTrackLabel6.Location = new System.Drawing.Point(275, 12);
+            this.MVTrackLabel6.Name = "MVTrackLabel6";
+            this.MVTrackLabel6.Size = new System.Drawing.Size(13, 14);
+            this.MVTrackLabel6.TabIndex = 188;
+            this.MVTrackLabel6.Text = "6";
+            this.MVTrackLabel6.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // MVTrackLabel16
+            // 
+            this.MVTrackLabel16.AutoSize = true;
+            this.MVTrackLabel16.ForeColor = System.Drawing.Color.Black;
+            this.MVTrackLabel16.Location = new System.Drawing.Point(580, 12);
+            this.MVTrackLabel16.Name = "MVTrackLabel16";
+            this.MVTrackLabel16.Size = new System.Drawing.Size(19, 14);
+            this.MVTrackLabel16.TabIndex = 187;
+            this.MVTrackLabel16.Text = "16";
+            this.MVTrackLabel16.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // MVTrackLabel5
+            // 
+            this.MVTrackLabel5.AutoSize = true;
+            this.MVTrackLabel5.ForeColor = System.Drawing.Color.Black;
+            this.MVTrackLabel5.Location = new System.Drawing.Point(244, 12);
+            this.MVTrackLabel5.Name = "MVTrackLabel5";
+            this.MVTrackLabel5.Size = new System.Drawing.Size(13, 14);
+            this.MVTrackLabel5.TabIndex = 186;
+            this.MVTrackLabel5.Text = "5";
+            this.MVTrackLabel5.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // MVTrackLabel4
+            // 
+            this.MVTrackLabel4.AutoSize = true;
+            this.MVTrackLabel4.ForeColor = System.Drawing.Color.Black;
+            this.MVTrackLabel4.Location = new System.Drawing.Point(213, 12);
+            this.MVTrackLabel4.Name = "MVTrackLabel4";
+            this.MVTrackLabel4.Size = new System.Drawing.Size(13, 14);
+            this.MVTrackLabel4.TabIndex = 185;
+            this.MVTrackLabel4.Text = "4";
+            this.MVTrackLabel4.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // MVTrackLabel3
+            // 
+            this.MVTrackLabel3.AutoSize = true;
+            this.MVTrackLabel3.ForeColor = System.Drawing.Color.Black;
+            this.MVTrackLabel3.Location = new System.Drawing.Point(182, 12);
+            this.MVTrackLabel3.Name = "MVTrackLabel3";
+            this.MVTrackLabel3.Size = new System.Drawing.Size(13, 14);
+            this.MVTrackLabel3.TabIndex = 184;
+            this.MVTrackLabel3.Text = "3";
+            this.MVTrackLabel3.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // MVTrackLabel2
+            // 
+            this.MVTrackLabel2.AutoSize = true;
+            this.MVTrackLabel2.ForeColor = System.Drawing.Color.Black;
+            this.MVTrackLabel2.Location = new System.Drawing.Point(151, 12);
+            this.MVTrackLabel2.Name = "MVTrackLabel2";
+            this.MVTrackLabel2.Size = new System.Drawing.Size(13, 14);
+            this.MVTrackLabel2.TabIndex = 183;
+            this.MVTrackLabel2.Text = "2";
+            this.MVTrackLabel2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // MVTrackLabel1
+            // 
+            this.MVTrackLabel1.AutoSize = true;
+            this.MVTrackLabel1.ForeColor = System.Drawing.Color.Black;
+            this.MVTrackLabel1.Location = new System.Drawing.Point(120, 12);
+            this.MVTrackLabel1.Name = "MVTrackLabel1";
+            this.MVTrackLabel1.Size = new System.Drawing.Size(13, 14);
+            this.MVTrackLabel1.TabIndex = 182;
+            this.MVTrackLabel1.Text = "1";
+            this.MVTrackLabel1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // masterVolumeGroupBox
+            // 
+            this.masterVolumeGroupBox.Controls.Add(this.MVCommentLabel);
+            this.masterVolumeGroupBox.Controls.Add(this.masterVolumeLabel);
+            this.masterVolumeGroupBox.Controls.Add(this.MVTrackLabel15);
+            this.masterVolumeGroupBox.Controls.Add(this.MVTrackLabel16);
+            this.masterVolumeGroupBox.Controls.Add(this.MVTrackLabel14);
+            this.masterVolumeGroupBox.Controls.Add(this.MVTrackLabel1);
+            this.masterVolumeGroupBox.Controls.Add(this.MVTrackLabel13);
+            this.masterVolumeGroupBox.Controls.Add(this.MVTrackLabel2);
+            this.masterVolumeGroupBox.Controls.Add(this.MVTrackLabel12);
+            this.masterVolumeGroupBox.Controls.Add(this.MVTrackLabel3);
+            this.masterVolumeGroupBox.Controls.Add(this.MVTrackLabel11);
+            this.masterVolumeGroupBox.Controls.Add(this.MVTrackLabel4);
+            this.masterVolumeGroupBox.Controls.Add(this.MVTrackLabel10);
+            this.masterVolumeGroupBox.Controls.Add(this.MVTrackLabel5);
+            this.masterVolumeGroupBox.Controls.Add(this.MVTrackLabel9);
+            this.masterVolumeGroupBox.Controls.Add(this.MVTrackLabel6);
+            this.masterVolumeGroupBox.Controls.Add(this.MVTrackLabel8);
+            this.masterVolumeGroupBox.Controls.Add(this.MVTrackLabel7);
+            this.masterVolumeGroupBox.Location = new System.Drawing.Point(19, 216);
+            this.masterVolumeGroupBox.Name = "masterVolumeGroupBox";
+            this.masterVolumeGroupBox.Size = new System.Drawing.Size(617, 121);
+            this.masterVolumeGroupBox.TabIndex = 198;
+            this.masterVolumeGroupBox.TabStop = false;
+            // 
+            // masterVolumeLabel
+            // 
+            this.masterVolumeLabel.AutoSize = true;
+            this.masterVolumeLabel.ForeColor = System.Drawing.Color.Blue;
+            this.masterVolumeLabel.Location = new System.Drawing.Point(5, 31);
+            this.masterVolumeLabel.Name = "masterVolumeLabel";
+            this.masterVolumeLabel.Size = new System.Drawing.Size(106, 14);
+            this.masterVolumeLabel.TabIndex = 199;
+            this.masterVolumeLabel.Text = "master volume (127)";
             // 
             // MonoPerformerOptionsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
-            this.ClientSize = new System.Drawing.Size(641, 359);
+            this.ClientSize = new System.Drawing.Size(654, 487);
             this.ControlBox = false;
+            this.Controls.Add(this.masterVolumeGroupBox);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.OptionalMinimumVolumeGroupBox);
             this.Controls.Add(this.label2);
@@ -1869,6 +2116,8 @@
             this.OptionalMaximumSpeedGroupBox.PerformLayout();
             this.OptionalMinimumVolumeGroupBox.ResumeLayout(false);
             this.OptionalMinimumVolumeGroupBox.PerformLayout();
+            this.masterVolumeGroupBox.ResumeLayout(false);
+            this.masterVolumeGroupBox.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -2022,5 +2271,24 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label MVCommentLabel;
+        private System.Windows.Forms.Label MVTrackLabel15;
+        private System.Windows.Forms.Label MVTrackLabel14;
+        private System.Windows.Forms.Label MVTrackLabel13;
+        private System.Windows.Forms.Label MVTrackLabel12;
+        private System.Windows.Forms.Label MVTrackLabel11;
+        private System.Windows.Forms.Label MVTrackLabel10;
+        private System.Windows.Forms.Label MVTrackLabel9;
+        private System.Windows.Forms.Label MVTrackLabel8;
+        private System.Windows.Forms.Label MVTrackLabel7;
+        private System.Windows.Forms.Label MVTrackLabel6;
+        private System.Windows.Forms.Label MVTrackLabel16;
+        private System.Windows.Forms.Label MVTrackLabel5;
+        private System.Windows.Forms.Label MVTrackLabel4;
+        private System.Windows.Forms.Label MVTrackLabel3;
+        private System.Windows.Forms.Label MVTrackLabel2;
+        private System.Windows.Forms.Label MVTrackLabel1;
+        private System.Windows.Forms.GroupBox masterVolumeGroupBox;
+        private System.Windows.Forms.Label masterVolumeLabel;
     }
 }
