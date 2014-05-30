@@ -90,6 +90,31 @@ namespace Moritz.AssistantComposer
             return sb.ToString();
         }
 
+        /// <summary>
+        /// The comma-separated list of values, that can be used as an attribute.
+        /// This version of ValuesAsString() replaces empty values with the
+        /// argument defaultValue (e.g. "100,,120" becomes "100,127,120").
+        /// </summary>
+        /// <returns></returns>
+        public string ValuesAsString(int defaultValue)
+        {
+            StringBuilder sb = new StringBuilder();
+            for(int i = 0; i < _boxes.Count; ++i)
+            {
+                if(_boxes[i].Text.Length == 0)
+                {
+                    sb.Append(defaultValue.ToString());
+                }
+                else
+                {
+                    sb.Append(_boxes[i].Text);
+                }
+                sb.Append(',');
+            }
+            sb.Remove(sb.Length - 1, 1);
+            return sb.ToString();
+        }
+
         private void Init(int nBoxes, int textBoxWidth)
         {
             int x = 0;

@@ -137,7 +137,7 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// Note that IntListControl.ValuesAsString() can return
+        /// Note that IntListControl.ValuesAsString(int) replaces empty field values by its argument default value.
         /// a string containing empty values (e.g. "100,,120").
         /// </summary>
         /// <param name="w"></param>
@@ -147,27 +147,27 @@ namespace Moritz.AssistantComposer
 
             if(!_ilcVolume.IsEmpty())
             {
-                w.WriteAttributeString("volume", _ilcVolume.ValuesAsString());
+                w.WriteAttributeString("volume", _ilcVolume.ValuesAsString(100));
             }
             if(!_ilcPWDeviation.IsEmpty())
             {
-                w.WriteAttributeString("pwDeviation", _ilcPWDeviation.ValuesAsString());
+                w.WriteAttributeString("pwDeviation", _ilcPWDeviation.ValuesAsString(2));
             }
             if(!_ilcPitchWheel.IsEmpty())
             {
-                w.WriteAttributeString("pitchWheel", _ilcPitchWheel.ValuesAsString());
+                w.WriteAttributeString("pitchWheel", _ilcPitchWheel.ValuesAsString(64));
             }
             if(!_ilcPan.IsEmpty())
             {
-                w.WriteAttributeString("pan", _ilcPan.ValuesAsString());
+                w.WriteAttributeString("pan", _ilcPan.ValuesAsString(64));
             }
             if(!_ilcExpression.IsEmpty())
             {
-                w.WriteAttributeString("expression", _ilcExpression.ValuesAsString());
+                w.WriteAttributeString("expression", _ilcExpression.ValuesAsString(127));
             }
             if(!_ilcModulation.IsEmpty())
             {
-                w.WriteAttributeString("modulation", _ilcModulation.ValuesAsString());
+                w.WriteAttributeString("modulation", _ilcModulation.ValuesAsString(0));
             }
 
             w.WriteEndElement(); // trackInit

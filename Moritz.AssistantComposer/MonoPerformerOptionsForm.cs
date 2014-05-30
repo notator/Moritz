@@ -314,7 +314,7 @@ namespace Moritz.AssistantComposer
 
             if(!this._ilcMasterVolumes.IsEmpty())
             {
-                w.WriteAttributeString("masterVolumes", _ilcMasterVolumes.ValuesAsString());
+                w.WriteAttributeString("masterVolumes", _ilcMasterVolumes.ValuesAsString(127));
             }
 
             if(SpeedControllerComboBox.Text != "none")
