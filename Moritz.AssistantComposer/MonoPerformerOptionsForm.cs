@@ -93,7 +93,7 @@ namespace Moritz.AssistantComposer
 
                 if(!_intListControlHasError)
                 {
-                    _ilcMasterVolumes.EmptyFieldsWithValue(127);
+                    _ilcMasterVolumes.SetColoredDefaultTexts(127);
                 }
             }
 
@@ -148,7 +148,8 @@ namespace Moritz.AssistantComposer
                         break;
 
                     case "masterVolumes":
-                        this._ilcMasterVolumes.Set(r.Value);
+                        _ilcMasterVolumes.Set(r.Value);
+                        _ilcMasterVolumes.SetColoredDefaultTexts(127);
                         break;
 
                     case "speedController":
@@ -314,7 +315,7 @@ namespace Moritz.AssistantComposer
 
             if(!this._ilcMasterVolumes.IsEmpty())
             {
-                w.WriteAttributeString("masterVolumes", _ilcMasterVolumes.ValuesAsString(127));
+                w.WriteAttributeString("masterVolumes", _ilcMasterVolumes.ValuesAsString());
             }
 
             if(SpeedControllerComboBox.Text != "none")

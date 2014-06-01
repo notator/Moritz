@@ -116,58 +116,59 @@ namespace Moritz.AssistantComposer
                 {
                     case "volume":
                         _ilcVolume.Set(r.Value);
+                        _ilcVolume.SetColoredDefaultTexts(100);
                         break;
                     case "pwDeviation":
                         _ilcPWDeviation.Set(r.Value);
+                        _ilcPWDeviation.SetColoredDefaultTexts(2);
                         break;
                     case "pitchWheel":
                         _ilcPitchWheel.Set(r.Value);
+                        _ilcPitchWheel.SetColoredDefaultTexts(64);
                         break;
                     case "pan":
                         _ilcPan.Set(r.Value);
+                        _ilcPan.SetColoredDefaultTexts(64);
                         break;
                     case "expression":
                         _ilcExpression.Set(r.Value);
+                        _ilcExpression.SetColoredDefaultTexts(127);
                         break;
                     case "modulation":
                         _ilcModulation.Set(r.Value);
+                        _ilcModulation.SetColoredDefaultTexts(0);
                         break;
                 }
             }
         }
 
-        /// <summary>
-        /// Note that IntListControl.ValuesAsString(int) replaces empty field values by its argument default value.
-        /// a string containing empty values (e.g. "100,,120").
-        /// </summary>
-        /// <param name="w"></param>
         public void Write(XmlWriter w)
         {
             w.WriteStartElement("trackInit");
 
             if(!_ilcVolume.IsEmpty())
             {
-                w.WriteAttributeString("volume", _ilcVolume.ValuesAsString(100));
+                w.WriteAttributeString("volume", _ilcVolume.ValuesAsString());
             }
             if(!_ilcPWDeviation.IsEmpty())
             {
-                w.WriteAttributeString("pwDeviation", _ilcPWDeviation.ValuesAsString(2));
+                w.WriteAttributeString("pwDeviation", _ilcPWDeviation.ValuesAsString());
             }
             if(!_ilcPitchWheel.IsEmpty())
             {
-                w.WriteAttributeString("pitchWheel", _ilcPitchWheel.ValuesAsString(64));
+                w.WriteAttributeString("pitchWheel", _ilcPitchWheel.ValuesAsString());
             }
             if(!_ilcPan.IsEmpty())
             {
-                w.WriteAttributeString("pan", _ilcPan.ValuesAsString(64));
+                w.WriteAttributeString("pan", _ilcPan.ValuesAsString());
             }
             if(!_ilcExpression.IsEmpty())
             {
-                w.WriteAttributeString("expression", _ilcExpression.ValuesAsString(127));
+                w.WriteAttributeString("expression", _ilcExpression.ValuesAsString());
             }
             if(!_ilcModulation.IsEmpty())
             {
-                w.WriteAttributeString("modulation", _ilcModulation.ValuesAsString(0));
+                w.WriteAttributeString("modulation", _ilcModulation.ValuesAsString());
             }
 
             w.WriteEndElement(); // trackInit
@@ -235,27 +236,27 @@ namespace Moritz.AssistantComposer
             {
                 if(sender == _ilcVolume)
                 {
-                    _ilcVolume.EmptyFieldsWithValue(100);
+                    _ilcVolume.SetColoredDefaultTexts(100);
                 }
                 else if(sender == _ilcPWDeviation)
                 {
-                    _ilcPWDeviation.EmptyFieldsWithValue(2);
+                    _ilcPWDeviation.SetColoredDefaultTexts(2);
                 }
                 else if(sender == _ilcPitchWheel)
                 {
-                    _ilcPitchWheel.EmptyFieldsWithValue(64);
+                    _ilcPitchWheel.SetColoredDefaultTexts(64);
                 }
                 else if(sender == _ilcPan)
                 {
-                    _ilcPan.EmptyFieldsWithValue(64);
+                    _ilcPan.SetColoredDefaultTexts(64);
                 }
                 else if(sender == _ilcExpression)
                 {
-                    _ilcExpression.EmptyFieldsWithValue(127);
+                    _ilcExpression.SetColoredDefaultTexts(127);
                 }
                 else if(sender == _ilcModulation)
                 {
-                    _ilcModulation.EmptyFieldsWithValue(0);
+                    _ilcModulation.SetColoredDefaultTexts(0);
                 }
             }
 

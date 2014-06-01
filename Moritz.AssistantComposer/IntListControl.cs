@@ -40,19 +40,51 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// If any box has a Text equal to intVal.ToString(),
-        /// its Text is set to an empty string.
+        /// If all boxes have the default intValue, they are emptied.
+        /// Otherwise, all empty boxes are set to the default intValue.
+        /// The text of boxes having the default value is coloured RoyalBlue,
+        /// other boxes' text is coloured Black.
         /// </summary>
         /// <param name="intVal"></param>
-        public void EmptyFieldsWithValue(int intVal)
+        public void SetColoredDefaultTexts(int intVal)
         {
             string intStr = intVal.ToString();
 
+            bool allDefaults = true;
+
             foreach(TextBox box in _boxes)
             {
-                if(box.Text.CompareTo(intStr) == 0)
+                if(box.Text.CompareTo(intStr) != 0 && box.Text.CompareTo("") != 0)
+                {
+                    allDefaults = false;
+                    break;
+                }
+            }
+
+            if(allDefaults)
+            {
+                foreach(TextBox box in _boxes)
                 {
                     box.Text = "";
+                }
+            }
+            else
+            {
+                foreach(TextBox box in _boxes)
+                {
+                    if(box.Text.Length == 0)
+                    {
+                        box.Text = intStr;
+                    }
+
+                    if(box.Text.CompareTo(intStr) == 0)
+                    {
+                        box.ForeColor = Color.RoyalBlue;
+                    }
+                    else
+                    {
+                        box.ForeColor = Color.Black;
+                    }
                 }
             }
         }
@@ -60,7 +92,6 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// The attributeString contains a comma-delimited list of values.
         /// There must be the same number of values as there are boxes in this control.
-        /// Note that some values can be empty (e.g. "100,,120")!
         /// </summary>
         /// <param name="attributeString"></param>
         public void Set(string attributeString)
@@ -75,7 +106,6 @@ namespace Moritz.AssistantComposer
 
         /// <summary>
         /// The comma-separated list of values, that can be used as an attribute.
-        /// Note that this function can return a string containing empty values (e.g. "100,,120").
         /// </summary>
         /// <returns></returns>
         public string ValuesAsString()
@@ -84,31 +114,6 @@ namespace Moritz.AssistantComposer
             for(int i = 0; i < _boxes.Count; ++i)
             {
                 sb.Append(_boxes[i].Text);
-                sb.Append(',');
-            }
-            sb.Remove(sb.Length - 1, 1);
-            return sb.ToString();
-        }
-
-        /// <summary>
-        /// The comma-separated list of values, that can be used as an attribute.
-        /// This version of ValuesAsString() replaces empty values with the
-        /// argument defaultValue (e.g. "100,,120" becomes "100,127,120").
-        /// </summary>
-        /// <returns></returns>
-        public string ValuesAsString(int defaultValue)
-        {
-            StringBuilder sb = new StringBuilder();
-            for(int i = 0; i < _boxes.Count; ++i)
-            {
-                if(_boxes[i].Text.Length == 0)
-                {
-                    sb.Append(defaultValue.ToString());
-                }
-                else
-                {
-                    sb.Append(_boxes[i].Text);
-                }
                 sb.Append(',');
             }
             sb.Remove(sb.Length - 1, 1);

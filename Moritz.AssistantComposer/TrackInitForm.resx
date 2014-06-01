@@ -120,6 +120,6 @@
   <data name="label2.Text" xml:space="preserve">
     <value>The Assistant Performer always sets these controllers explicitly at the beginning of a performance.
 It never sends an "All Controllers Off" command. If a field is empty here, the default value is sent.
-If a default value is entered here, the field is emptied. All values are integers in range 0..127.</value>
+All values are integers in range 0..127. Values that differ from the default are displayed in black.</value>
   </data>
 </root>

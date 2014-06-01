@@ -1805,7 +1805,7 @@
             // 
             this.MVCommentLabel.AutoSize = true;
             this.MVCommentLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.MVCommentLabel.Location = new System.Drawing.Point(20, 55);
+            this.MVCommentLabel.Location = new System.Drawing.Point(25, 55);
             this.MVCommentLabel.Name = "MVCommentLabel";
             this.MVCommentLabel.Size = new System.Drawing.Size(568, 56);
             this.MVCommentLabel.TabIndex = 181;
