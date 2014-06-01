@@ -220,7 +220,7 @@
             this.SaveSettingsButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.SaveSettingsButton.Enabled = false;
             this.SaveSettingsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.SaveSettingsButton.Location = new System.Drawing.Point(520, 433);
+            this.SaveSettingsButton.Location = new System.Drawing.Point(520, 447);
             this.SaveSettingsButton.Name = "SaveSettingsButton";
             this.SaveSettingsButton.Size = new System.Drawing.Size(106, 26);
             this.SaveSettingsButton.TabIndex = 7;
@@ -232,7 +232,7 @@
             // 
             this.ShowMainScoreFormButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.ShowMainScoreFormButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.ShowMainScoreFormButton.Location = new System.Drawing.Point(357, 433);
+            this.ShowMainScoreFormButton.Location = new System.Drawing.Point(357, 447);
             this.ShowMainScoreFormButton.Name = "ShowMainScoreFormButton";
             this.ShowMainScoreFormButton.Size = new System.Drawing.Size(137, 26);
             this.ShowMainScoreFormButton.TabIndex = 8;
@@ -1673,7 +1673,7 @@
             this.label2.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.label2.AutoSize = true;
             this.label2.ForeColor = System.Drawing.Color.Blue;
-            this.label2.Location = new System.Drawing.Point(25, 346);
+            this.label2.Location = new System.Drawing.Point(25, 360);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(132, 14);
             this.label2.TabIndex = 174;
@@ -1690,7 +1690,7 @@
             "pressure",
             "pitch wheel",
             "modulation wheel"});
-            this.SpeedControllerComboBox.Location = new System.Drawing.Point(28, 368);
+            this.SpeedControllerComboBox.Location = new System.Drawing.Point(28, 382);
             this.SpeedControllerComboBox.Name = "SpeedControllerComboBox";
             this.SpeedControllerComboBox.Size = new System.Drawing.Size(109, 22);
             this.SpeedControllerComboBox.TabIndex = 173;
@@ -1705,7 +1705,7 @@
             this.OptionalMaximumSpeedGroupBox.Controls.Add(this.label4);
             this.OptionalMaximumSpeedGroupBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.OptionalMaximumSpeedGroupBox.ForeColor = System.Drawing.Color.Blue;
-            this.OptionalMaximumSpeedGroupBox.Location = new System.Drawing.Point(19, 348);
+            this.OptionalMaximumSpeedGroupBox.Location = new System.Drawing.Point(19, 362);
             this.OptionalMaximumSpeedGroupBox.Name = "OptionalMaximumSpeedGroupBox";
             this.OptionalMaximumSpeedGroupBox.Size = new System.Drawing.Size(617, 62);
             this.OptionalMaximumSpeedGroupBox.TabIndex = 176;
@@ -1757,7 +1757,7 @@
             this.OptionalMinimumVolumeGroupBox.Controls.Add(this.MinimumVolumeTextBox);
             this.OptionalMinimumVolumeGroupBox.Controls.Add(this.label8);
             this.OptionalMinimumVolumeGroupBox.Controls.Add(this.label7);
-            this.OptionalMinimumVolumeGroupBox.Location = new System.Drawing.Point(19, 420);
+            this.OptionalMinimumVolumeGroupBox.Location = new System.Drawing.Point(19, 434);
             this.OptionalMinimumVolumeGroupBox.Name = "OptionalMinimumVolumeGroupBox";
             this.OptionalMinimumVolumeGroupBox.Size = new System.Drawing.Size(312, 52);
             this.OptionalMinimumVolumeGroupBox.TabIndex = 178;
@@ -1795,7 +1795,7 @@
             this.label6.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.label6.AutoSize = true;
             this.label6.ForeColor = System.Drawing.Color.Blue;
-            this.label6.Location = new System.Drawing.Point(25, 417);
+            this.label6.Location = new System.Drawing.Point(25, 431);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(84, 14);
             this.label6.TabIndex = 180;
@@ -1807,7 +1807,7 @@
             this.MVCommentLabel.ForeColor = System.Drawing.Color.RoyalBlue;
             this.MVCommentLabel.Location = new System.Drawing.Point(25, 55);
             this.MVCommentLabel.Name = "MVCommentLabel";
-            this.MVCommentLabel.Size = new System.Drawing.Size(568, 56);
+            this.MVCommentLabel.Size = new System.Drawing.Size(554, 70);
             this.MVCommentLabel.TabIndex = 181;
             this.MVCommentLabel.Text = resources.GetString("MVCommentLabel.Text");
             // 
@@ -2009,7 +2009,7 @@
             this.masterVolumeGroupBox.Controls.Add(this.MVTrackLabel7);
             this.masterVolumeGroupBox.Location = new System.Drawing.Point(19, 216);
             this.masterVolumeGroupBox.Name = "masterVolumeGroupBox";
-            this.masterVolumeGroupBox.Size = new System.Drawing.Size(617, 121);
+            this.masterVolumeGroupBox.Size = new System.Drawing.Size(617, 135);
             this.masterVolumeGroupBox.TabIndex = 198;
             this.masterVolumeGroupBox.TabStop = false;
             // 
@@ -2028,7 +2028,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
-            this.ClientSize = new System.Drawing.Size(654, 487);
+            this.ClientSize = new System.Drawing.Size(654, 501);
             this.ControlBox = false;
             this.Controls.Add(this.masterVolumeGroupBox);
             this.Controls.Add(this.label6);
