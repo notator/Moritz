@@ -93,7 +93,7 @@ namespace Moritz.AssistantComposer
 
                 if(!_intListControlHasError)
                 {
-                    _ilcMasterVolumes.SetColoredDefaultTexts(127);
+                    _ilcMasterVolumes.SetColoredDefaultTexts(100);
                 }
             }
 
@@ -149,7 +149,7 @@ namespace Moritz.AssistantComposer
 
                     case "masterVolumes":
                         _ilcMasterVolumes.Set(r.Value);
-                        _ilcMasterVolumes.SetColoredDefaultTexts(127);
+                        _ilcMasterVolumes.SetColoredDefaultTexts(100);
                         break;
 
                     case "speedController":

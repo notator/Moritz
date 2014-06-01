@@ -2021,7 +2021,7 @@
             this.masterVolumeLabel.Name = "masterVolumeLabel";
             this.masterVolumeLabel.Size = new System.Drawing.Size(106, 14);
             this.masterVolumeLabel.TabIndex = 199;
-            this.masterVolumeLabel.Text = "master volume (127)";
+            this.masterVolumeLabel.Text = "master volume (100)";
             // 
             // MonoPerformerOptionsForm
             // 
