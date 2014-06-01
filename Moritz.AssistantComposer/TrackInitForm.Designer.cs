@@ -54,6 +54,7 @@
             this.TrackLabel13 = new System.Windows.Forms.Label();
             this.TrackLabel14 = new System.Windows.Forms.Label();
             this.TrackLabel15 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // SaveSettingsButton
@@ -115,11 +116,11 @@
             // 
             this.label4.AutoSize = true;
             this.label4.ForeColor = System.Drawing.Color.Blue;
-            this.label4.Location = new System.Drawing.Point(44, 41);
+            this.label4.Location = new System.Drawing.Point(40, 41);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(70, 14);
+            this.label4.Size = new System.Drawing.Size(74, 14);
             this.label4.TabIndex = 17;
-            this.label4.Text = "volume (100)";
+            this.label4.Text = "volume (100)*";
             // 
             // label7
             // 
@@ -327,6 +328,17 @@
             this.TrackLabel15.Text = "15";
             this.TrackLabel15.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.label5.Location = new System.Drawing.Point(46, 258);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(253, 28);
+            this.label5.TabIndex = 45;
+            this.label5.Text = "* The performer\'s master volume settings override\r\n   these values if/when the sc" +
+    "ore is performed live.";
+            // 
             // TrackInitForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
@@ -334,6 +346,7 @@
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
             this.ClientSize = new System.Drawing.Size(642, 308);
             this.ControlBox = false;
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.TrackLabel15);
             this.Controls.Add(this.TrackLabel14);
             this.Controls.Add(this.TrackLabel13);
@@ -397,5 +410,6 @@
         private System.Windows.Forms.Label TrackLabel13;
         private System.Windows.Forms.Label TrackLabel14;
         private System.Windows.Forms.Label TrackLabel15;
+        private System.Windows.Forms.Label label5;
     }
 }
