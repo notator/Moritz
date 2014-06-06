@@ -10,13 +10,13 @@ using Moritz.Globals;
 
 namespace Moritz.AssistantComposer
 {
-    public partial class MonoPerformerOptionsForm : Form
+    public partial class PerformersOptionsForm : Form
     {
         /// <summary>
         /// Creates a new, empty MonoPerformerOptionsForm.
         /// These are all defaults, that will be adjustable (as before) in the AP:
         /// </summary>
-        public MonoPerformerOptionsForm(AssistantComposerMainForm assistantComposerMainForm, int nTracks)
+        public PerformersOptionsForm(AssistantComposerMainForm assistantComposerMainForm, int nTracks)
         {
             InitializeComponent();
 
@@ -25,8 +25,6 @@ namespace Moritz.AssistantComposer
             _trackPanels = GetAllTrackPanels();
             _topTrackLabels = GetAllTopTrackLabels();
             _masterVolumeTrackLabels = GetAllMasterVolumeTrackLabels();
-            _noteOnPitchCheckBoxes = GetNoteOnPitchCheckBoxes();
-            _noteOnVelocityCheckBoxes = GetNoteOnVelocityCheckBoxes();
             _pressureCheckBoxes = GetPressureCheckBoxes();
             _pitchWheelCheckBoxes = GetPitchWheelCheckBoxes();
             _modWheelCheckBoxes = GetModWheelCheckBoxes();
@@ -37,9 +35,7 @@ namespace Moritz.AssistantComposer
             this._nTracks = nTracks;
             SetPerformersTrackNumberComboBoxItems();
             this.PerformersTrackNumberComboBox.Text = "1";
-
-            this.NoteOnPitchTracksComboBox.Text = "none";
-            this.NoteOnVelocityTracksComboBox.Text = "none";
+            this.PerformersEventHandlerComboBox.Text = "none";
 
             this.PressureControllerComboBox.Text = "aftertouch";
             this.PressureTracksComboBox.Text = "none";
@@ -48,15 +44,13 @@ namespace Moritz.AssistantComposer
             this.ModWheelControllerComboBox.Text = "modulation (1)";
             this.ModWheelTracksComboBox.Text = "none";
 
-            this.SpeedControllerComboBox.Text = "none";
-            this.OptionalMaximumSpeedGroupBox.Enabled = false;
-            this.MaximumSpeedPercentTextBox.Text = "400";
+            this.SpeedControllerComboBox.SelectedIndex = 0; // "none";
+            this.MaximumSpeedTextBox.Text = "400";
+            SpeedControllComboBox_SelectedIndexChanged(SpeedControllerComboBox, null);
 
-            this.OptionalMinimumVolumeGroupBox.Enabled = false;
+            this.MinimumVolumeTextBox.Enabled = false;
             this.MinimumVolumeTextBox.Text = "50";
             #endregion
-
-            DisableUnusedTrackPanels(_nTracks);
         }
 
         private void SetMasterVolumeControls(int nTracks)
@@ -111,7 +105,7 @@ namespace Moritz.AssistantComposer
 
         public void Read(XmlReader r)
         {
-            Debug.Assert(r.Name == "monoPerformerOptions");
+            Debug.Assert(r.Name == "performersOptions");
 
             #region get attributes
             int count = r.AttributeCount;
@@ -120,12 +114,16 @@ namespace Moritz.AssistantComposer
                 r.MoveToAttribute(i);
                 switch(r.Name)
                 {
-                    case "noteOnPitchTracks":
-                        SetTrackCheckBoxes(r.Value, this._noteOnPitchCheckBoxes);
+                    case "performersEventHandler":
+                        PerformersEventHandlerComboBox.Text = r.Value;
                         break;
-                    case "noteOnVelocityTracks":
-                        SetTrackCheckBoxes(r.Value, this._noteOnVelocityCheckBoxes);
+
+                    case "trackIndex":
+                        _performersTrackIndex = int.Parse(r.Value);
+                        Debug.Assert(_performersTrackIndex < this._nTracks);
+                        PerformersTrackNumberComboBox.SelectedIndex = _performersTrackIndex;
                         break;
+
                     case "pressureController":
                         PressureControllerComboBox.Text = r.Value;
                         break;
@@ -156,17 +154,11 @@ namespace Moritz.AssistantComposer
                         this.SpeedControllerComboBox.Text = r.Value;
                         break;
                     case "speedMaxPercent":
-                        this.MaximumSpeedPercentTextBox.Text = r.Value;
+                        this.MaximumSpeedTextBox.Text = r.Value;
                         break;
 
                     case "minVolume":
                         this.MinimumVolumeTextBox.Text = r.Value;
-                        break;
-
-                    case "trackIndex":
-                        _performersTrackIndex = int.Parse(r.Value);
-                        Debug.Assert(_performersTrackIndex < this._nTracks);
-                        PerformersTrackNumberComboBox.SelectedIndex = _performersTrackIndex;
                         break;
                 }
             }
@@ -176,7 +168,6 @@ namespace Moritz.AssistantComposer
 
             SetDisplay(_nTracks, _performersTrackIndex);
 
-            OptionalMaximumSpeedGroupBox.Enabled = (SpeedControllerComboBox.SelectedIndex > 0);
             SetMinimumVolumePanelEnabledStatus();
 
             SetSettingsHaveBeenSaved();
@@ -185,8 +176,6 @@ namespace Moritz.AssistantComposer
 
         private void SetAllTrackComboBoxesFromCheckBoxes(int nTracks)
         {
-            SetComboBoxFromCheckBoxes(null, NoteOnPitchTracksComboBox, nTracks, _performersTrackIndex, _noteOnPitchCheckBoxes);
-            SetComboBoxFromCheckBoxes(null, NoteOnVelocityTracksComboBox, nTracks,  _performersTrackIndex, _noteOnVelocityCheckBoxes);
             SetComboBoxFromCheckBoxes(PressureControllerComboBox, PressureTracksComboBox, nTracks, _performersTrackIndex, _pressureCheckBoxes);
             SetComboBoxFromCheckBoxes(PitchWheelControllerComboBox, PitchWheelTracksComboBox, nTracks, _performersTrackIndex, _pitchWheelCheckBoxes);
             SetComboBoxFromCheckBoxes(ModWheelControllerComboBox, ModWheelTracksComboBox, nTracks, _performersTrackIndex, _modWheelCheckBoxes);
@@ -222,7 +211,7 @@ namespace Moritz.AssistantComposer
         private void SetDisplay(int nTracks, int performersTrackIndex)
         {
             // set standard trackPanel locations (as in Designer)
-            int x = 315, y = 22;
+            int x = 313, y = 31;
             for(int i = 0; i < _trackPanels.Count; ++i)
             {
                 _trackPanels[i].Location = new Point(x + (i * 19), y);
@@ -259,38 +248,15 @@ namespace Moritz.AssistantComposer
             }
         }
 
-        private void DisableUnusedTrackPanels(int nTracks)
-        {
-            for(int i = 0; i < 16; ++i)
-            {
-                if(i < nTracks)
-                {
-                    _trackPanels[i].Enabled = true;
-                }
-                else
-                {
-                    _trackPanels[i].Enabled = false;
-                }
-            }
-        }
-
         public void Write(XmlWriter w)
         {
             StringBuilder sb;
 
-            w.WriteStartElement("monoPerformerOptions");
+            w.WriteStartElement("performersOptions");
 
-            if(NoteOnPitchTracksComboBox.Text != "none")
-            {
-                sb = GetBoolString(_noteOnPitchCheckBoxes);
-                w.WriteAttributeString("noteOnPitchTracks", sb.ToString());
-            }
+            w.WriteAttributeString("performersEventHandler", this.PerformersEventHandlerComboBox.Text);
 
-            if(NoteOnVelocityTracksComboBox.Text != "none")
-            {
-                sb = GetBoolString(_noteOnVelocityCheckBoxes);
-                w.WriteAttributeString("noteOnVelocityTracks", sb.ToString());
-            }
+            w.WriteAttributeString("trackIndex", this._performersTrackIndex.ToString());
 
             if(PressureTracksComboBox.Text != "none")
             {
@@ -321,7 +287,7 @@ namespace Moritz.AssistantComposer
             if(SpeedControllerComboBox.Text != "none")
             {
                 w.WriteAttributeString("speedController", this.SpeedControllerComboBox.Text);
-                w.WriteAttributeString("speedMaxPercent", this.MaximumSpeedPercentTextBox.Text);
+                w.WriteAttributeString("speedMaxPercent", this.MaximumSpeedTextBox.Text);
             }
 
             if(this.MinimumVolumeTextBox.Enabled)
@@ -329,24 +295,12 @@ namespace Moritz.AssistantComposer
                 w.WriteAttributeString("minVolume", this.MinimumVolumeTextBox.Text);
             }
 
-            w.WriteAttributeString("trackIndex", this._performersTrackIndex.ToString());
-
-            w.WriteEndElement(); // performerOptions
+            w.WriteEndElement(); // performersOptions
         }
 
-        public bool IsEmpty()
+        public bool HasEventHandler()
         {
-            bool rval = true;
-
-            if((NoteOnPitchTracksComboBox.Text != "none")
-            || (NoteOnVelocityTracksComboBox.Text != "none")
-            || (PressureTracksComboBox.Text != "none")
-            || (PitchWheelTracksComboBox.Text != "none")
-            || (ModWheelTracksComboBox.Text != "none")
-            || (SpeedControllerComboBox.Text != "none"))
-                rval = false;
-
-            return rval;
+            return (PerformersEventHandlerComboBox.Text != "none");
         }
 
         private StringBuilder GetBoolString(List<CheckBox> checkBoxes)
@@ -449,48 +403,6 @@ namespace Moritz.AssistantComposer
             return trackLabels;
         }
 
-        private List<CheckBox> GetNoteOnPitchCheckBoxes()
-        {
-            List<CheckBox> checkBoxes = new List<CheckBox>();
-            checkBoxes.Add(this.NoteOnPitchCheckBox1);
-            checkBoxes.Add(this.NoteOnPitchCheckBox2);
-            checkBoxes.Add(this.NoteOnPitchCheckBox3);
-            checkBoxes.Add(this.NoteOnPitchCheckBox4);
-            checkBoxes.Add(this.NoteOnPitchCheckBox5);
-            checkBoxes.Add(this.NoteOnPitchCheckBox6);
-            checkBoxes.Add(this.NoteOnPitchCheckBox7);
-            checkBoxes.Add(this.NoteOnPitchCheckBox8);
-            checkBoxes.Add(this.NoteOnPitchCheckBox9);
-            checkBoxes.Add(this.NoteOnPitchCheckBox10);
-            checkBoxes.Add(this.NoteOnPitchCheckBox11);
-            checkBoxes.Add(this.NoteOnPitchCheckBox12);
-            checkBoxes.Add(this.NoteOnPitchCheckBox13);
-            checkBoxes.Add(this.NoteOnPitchCheckBox14);
-            checkBoxes.Add(this.NoteOnPitchCheckBox15);
-            checkBoxes.Add(this.NoteOnPitchCheckBox16);
-            return checkBoxes;
-        }
-        private List<CheckBox> GetNoteOnVelocityCheckBoxes()
-        {
-            List<CheckBox> checkBoxes = new List<CheckBox>();
-            checkBoxes.Add(this.NoteOnVelocityCheckBox1);
-            checkBoxes.Add(this.NoteOnVelocityCheckBox2);
-            checkBoxes.Add(this.NoteOnVelocityCheckBox3);
-            checkBoxes.Add(this.NoteOnVelocityCheckBox4);
-            checkBoxes.Add(this.NoteOnVelocityCheckBox5);
-            checkBoxes.Add(this.NoteOnVelocityCheckBox6);
-            checkBoxes.Add(this.NoteOnVelocityCheckBox7);
-            checkBoxes.Add(this.NoteOnVelocityCheckBox8);
-            checkBoxes.Add(this.NoteOnVelocityCheckBox9);
-            checkBoxes.Add(this.NoteOnVelocityCheckBox10);
-            checkBoxes.Add(this.NoteOnVelocityCheckBox11);
-            checkBoxes.Add(this.NoteOnVelocityCheckBox12);
-            checkBoxes.Add(this.NoteOnVelocityCheckBox13);
-            checkBoxes.Add(this.NoteOnVelocityCheckBox14);
-            checkBoxes.Add(this.NoteOnVelocityCheckBox15);
-            checkBoxes.Add(this.NoteOnVelocityCheckBox16);
-            return checkBoxes;
-        }
         private List<CheckBox> GetPressureCheckBoxes()
         {
             List<CheckBox> checkBoxes = new List<CheckBox>();
@@ -559,7 +471,7 @@ namespace Moritz.AssistantComposer
         {
             List<TextBox> textBoxes = new List<TextBox>();
 
-            textBoxes.Add(MaximumSpeedPercentTextBox);
+            textBoxes.Add(MaximumSpeedTextBox);
             textBoxes.Add(MinimumVolumeTextBox);
 
             return textBoxes;
@@ -794,28 +706,17 @@ namespace Moritz.AssistantComposer
             SetSettingsNotSaved();
         }
 
-        private void NoteOnPitchTracksComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            SetCheckBoxesFromComboBox(null, NoteOnPitchTracksComboBox, _performersTrackIndex, _noteOnPitchCheckBoxes);
-            SetSettingsNotSaved();
-        }
 
-        private void NoteOnVelocityTracksComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        private void PerformersEventHandlerComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SetCheckBoxesFromComboBox(null, NoteOnVelocityTracksComboBox, _performersTrackIndex, _noteOnVelocityCheckBoxes);
-            SetSettingsNotSaved();
-        }
-
-        private void NoteOnPitchTrackCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            SetComboBoxFromCheckBoxes(null, NoteOnPitchTracksComboBox, _nTracks, _performersTrackIndex, _noteOnPitchCheckBoxes);
-            SetSettingsNotSaved();
-        }
-
-        private void NoteOnVelocityTrackCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            SetComboBoxFromCheckBoxes(null, NoteOnVelocityTracksComboBox, _nTracks, _performersTrackIndex, _noteOnVelocityCheckBoxes);
-            SetSettingsNotSaved();
+            if(PerformersEventHandlerComboBox.Text == "none")
+            {
+                SettingsPanel.Enabled = false;
+            }
+            else
+            {
+                SettingsPanel.Enabled = true;
+            }
         }
 
         private void PressureTrackCheckBox_CheckedChanged(object sender, EventArgs e)
@@ -843,10 +744,15 @@ namespace Moritz.AssistantComposer
 
         private void SetMinimumVolumePanelEnabledStatus()
         {
-            OptionalMinimumVolumeGroupBox.Enabled =
+            bool enabled =
                 ((PressureControllerComboBox.Text == "volume (7)" && PressureControllerComboBox.Enabled)
                 || (PitchWheelControllerComboBox.Text == "volume (7)" && PitchWheelControllerComboBox.Enabled)
                 || (ModWheelControllerComboBox.Text == "volume (7)" && ModWheelControllerComboBox.Enabled));
+
+            MinimumVolumeLabel.Enabled = enabled;
+            MinimumVolumeTextBox.Enabled = enabled;
+            MinimumVolumeRangeLabel.Enabled = enabled;
+            MinimumVolumeHelpLabel.Enabled = enabled;
         }
 
         private void PressureTracksComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -881,13 +787,22 @@ namespace Moritz.AssistantComposer
 
         private void SpeedControllComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            OptionalMaximumSpeedGroupBox.Enabled = (SpeedControllerComboBox.SelectedIndex > 0);
-            SetSettingsNotSaved();
+            ComboBox cb = sender as ComboBox;
+            if(cb != null)
+            {
+                bool enabled = (cb.SelectedIndex > 0);
+                MaximumSpeedLabel.Enabled = enabled;
+                MaximumSpeedTextBox.Enabled = enabled;
+                MaximumSpeedPercentLabel.Enabled = enabled;
+                MaximumSpeedHelpLabel.Enabled = enabled;
+
+                SetSettingsNotSaved();
+            }
         }
 
         private void MaximumSpeedTextBox_TextChanged(object sender, EventArgs e)
         {
-            if(this.CheckTextBoxIsFloat(this.MaximumSpeedPercentTextBox))
+            if(this.CheckTextBoxIsFloat(this.MaximumSpeedTextBox))
                 SetSettingsNotSaved();
         }
 
@@ -912,8 +827,6 @@ namespace Moritz.AssistantComposer
         private int _nTracks;
         private List<Panel> _trackPanels;
         private int _performersTrackIndex = 0;
-        private List<CheckBox> _noteOnPitchCheckBoxes;
-        private List<CheckBox> _noteOnVelocityCheckBoxes;
         private List<CheckBox> _pressureCheckBoxes;
         private List<CheckBox> _pitchWheelCheckBoxes;
         private List<CheckBox> _modWheelCheckBoxes;
@@ -925,5 +838,6 @@ namespace Moritz.AssistantComposer
         private IntListControl _ilcMasterVolumes;
 
         private AssistantComposerMainForm _assistantComposerMainForm = null;
+
     }
 }
