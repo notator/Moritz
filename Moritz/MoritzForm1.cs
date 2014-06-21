@@ -25,38 +25,45 @@ namespace Moritz
         {
             InputDeviceComboBox.SuspendLayout();
             InputDeviceComboBox.Items.Clear();
-            foreach(string name in M.Preferences.AvailableMultimediaMidiInputDeviceNames)
+            if(M.Preferences.AvailableMultimediaMidiInputDeviceNames.Count > 0)
             {
-                InputDeviceComboBox.Items.Add(name);
+                foreach(string name in M.Preferences.AvailableMultimediaMidiInputDeviceNames)
+                {
+                    InputDeviceComboBox.Items.Add(name);
+                }
+                if(M.Preferences.AvailableMultimediaMidiInputDeviceNames.Contains(M.Preferences.PreferredInputDevice))
+                {
+                    InputDeviceComboBox.SelectedItem = M.Preferences.PreferredInputDevice;
+                    this.BringToFront();
+                }
+                else
+                {
+                    InputDeviceComboBox.SelectedIndex = 0;
+                }
             }
             InputDeviceComboBox.ResumeLayout();
-            if(M.Preferences.AvailableMultimediaMidiInputDeviceNames.Contains(M.Preferences.PreferredInputDevice))
-            {
-                InputDeviceComboBox.SelectedItem = M.Preferences.PreferredInputDevice;
-                this.BringToFront();
-            }
-            else
-            {
-                InputDeviceComboBox.SelectedIndex = 0;
-            }
         }
         private void SetOutputDevicesComboBox()
         {
             OutputDeviceComboBox.SuspendLayout();
             OutputDeviceComboBox.Items.Clear();
-            foreach(string name in M.Preferences.AvailableMultimediaMidiOutputDeviceNames)
+            if(M.Preferences.AvailableMultimediaMidiOutputDeviceNames.Count > 0)
             {
-                OutputDeviceComboBox.Items.Add(name);
+                foreach(string name in M.Preferences.AvailableMultimediaMidiOutputDeviceNames)
+                {
+                    OutputDeviceComboBox.Items.Add(name);
+                }
+
+                if(M.Preferences.AvailableMultimediaMidiOutputDeviceNames.Contains(M.Preferences.PreferredOutputDevice))
+                {
+                    OutputDeviceComboBox.SelectedItem = M.Preferences.PreferredOutputDevice;
+                }
+                else
+                {
+                    OutputDeviceComboBox.SelectedIndex = 0;
+                }
             }
             OutputDeviceComboBox.ResumeLayout();
-            if(M.Preferences.AvailableMultimediaMidiOutputDeviceNames.Contains(M.Preferences.PreferredOutputDevice))
-            {
-                OutputDeviceComboBox.SelectedItem = M.Preferences.PreferredOutputDevice;
-            }
-            else
-            {
-                OutputDeviceComboBox.SelectedIndex = 0;
-            }
         }
 
         #region AssistantPerformer
