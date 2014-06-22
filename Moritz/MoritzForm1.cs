@@ -43,7 +43,7 @@ namespace Moritz
             }
             else
             {
-                InputDeviceComboBox.Enabled = false;
+                InputDeviceComboBox.Hide();
             }
             InputDeviceComboBox.ResumeLayout();
         }
@@ -69,7 +69,7 @@ namespace Moritz
             }
             else
             {
-                OutputDeviceComboBox.Enabled = false;
+                OutputDeviceComboBox.Hide();
             }
             OutputDeviceComboBox.ResumeLayout();
         }
