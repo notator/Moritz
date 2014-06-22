@@ -31,7 +31,7 @@ namespace Moritz.AssistantComposer
             DeselectAll();
 
             Debug.Assert(File.Exists(settingsPath));
-
+    
             _settingsPath = settingsPath;
             _scoreFolderPath = Path.GetDirectoryName(settingsPath);
             _algorithmName = AlgorithmName(settingsPath);

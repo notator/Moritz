@@ -41,6 +41,10 @@ namespace Moritz
                     InputDeviceComboBox.SelectedIndex = 0;
                 }
             }
+            else
+            {
+                InputDeviceComboBox.Enabled = false;
+            }
             InputDeviceComboBox.ResumeLayout();
         }
         private void SetOutputDevicesComboBox()
@@ -62,6 +66,10 @@ namespace Moritz
                 {
                     OutputDeviceComboBox.SelectedIndex = 0;
                 }
+            }
+            else
+            {
+                OutputDeviceComboBox.Enabled = false;
             }
             OutputDeviceComboBox.ResumeLayout();
         }
