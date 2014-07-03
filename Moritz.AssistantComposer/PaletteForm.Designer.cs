@@ -559,7 +559,7 @@ namespace Moritz.AssistantComposer
             this.RepeatsLabel.Name = "RepeatsLabel";
             this.RepeatsLabel.Size = new System.Drawing.Size(78, 13);
             this.RepeatsLabel.TabIndex = 146;
-            this.RepeatsLabel.Text = "( repeats (1))";
+            this.RepeatsLabel.Text = "( repeats (0))";
             // 
             // PaletteForm
             // 

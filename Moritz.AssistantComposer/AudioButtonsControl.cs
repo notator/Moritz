@@ -25,6 +25,9 @@ namespace Moritz.AssistantComposer
         {
             InitializeComponent();
             _midiOutputDevice = M.Preferences.CurrentMultimediaMidiOutputDevice;
+
+            Debug.Assert(_midiOutputDevice != null);
+
             _iPaletteForm = iPaletteForm;
             _audioFolder = audioFolder;
             this.SuspendLayout();

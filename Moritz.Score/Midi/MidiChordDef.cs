@@ -42,7 +42,7 @@ namespace Moritz.Score.Midi
                             ID = r.Value; // this is the id in the palleteDefs
                         break;
                     case "repeat":
-                        // repeat is true if this attribute is not present
+                        // repeat is false if this attribute is not present
                         byte rmVal = byte.Parse(r.Value);
                         if(rmVal == 0)
                             _repeat = false;
@@ -304,7 +304,7 @@ namespace Moritz.Score.Midi
         protected byte? _bank = null;
         protected byte? _patch = null;
         protected byte? _volume = null;
-        protected bool _repeat = true;
+        protected bool _repeat = false;
         protected byte? _pitchWheelDeviation = null;
         protected bool _hasChordOff = true;
         protected int _minimumBasicMidiChordMsDuration = 1;
@@ -322,7 +322,9 @@ namespace Moritz.Score.Midi
         public byte? Patch { get { return _patch; } }
         public byte? Volume { get { return _volume; } }
         // If Repeat is true, the MidiChord will repeat in assisted performances
-        // if the performed duration is longer than the default duration.
+        // if the performed duration is longer than the duration of the basicChords,
+        // and the performer continues to hold the key down.
+        // The duration in the score is always the sum of the durations of the basicChords.
         public bool Repeat { get { return _repeat; } } 
         public byte? PitchWheelDeviation { get { return _pitchWheelDeviation; } }
         public bool HasChordOff { get { return _hasChordOff; } }

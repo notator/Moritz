@@ -69,7 +69,7 @@ namespace Moritz
             // OKBtn
             // 
             this.OKBtn.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.OKBtn.Location = new System.Drawing.Point(663, 460);
+            this.OKBtn.Location = new System.Drawing.Point(820, 449);
             this.OKBtn.Name = "OKBtn";
             this.OKBtn.Size = new System.Drawing.Size(70, 23);
             this.OKBtn.TabIndex = 19;
@@ -125,7 +125,7 @@ namespace Moritz
             this.DevicesGroupBox.Controls.Add(this.PreferrredInputDeviceLabel);
             this.DevicesGroupBox.Controls.Add(this.label1);
             this.DevicesGroupBox.Controls.Add(this.label2);
-            this.DevicesGroupBox.Location = new System.Drawing.Point(165, 285);
+            this.DevicesGroupBox.Location = new System.Drawing.Point(257, 284);
             this.DevicesGroupBox.Name = "DevicesGroupBox";
             this.DevicesGroupBox.Size = new System.Drawing.Size(427, 198);
             this.DevicesGroupBox.TabIndex = 18;
@@ -216,7 +216,7 @@ namespace Moritz
             // 
             // LocalUserFolderButton
             // 
-            this.LocalUserFolderButton.Location = new System.Drawing.Point(706, 47);
+            this.LocalUserFolderButton.Location = new System.Drawing.Point(863, 47);
             this.LocalUserFolderButton.Name = "LocalUserFolderButton";
             this.LocalUserFolderButton.Size = new System.Drawing.Size(27, 23);
             this.LocalUserFolderButton.TabIndex = 29;
@@ -228,7 +228,7 @@ namespace Moritz
             // 
             this.LocalUserFolderTextBox.Location = new System.Drawing.Point(165, 49);
             this.LocalUserFolderTextBox.Name = "LocalUserFolderTextBox";
-            this.LocalUserFolderTextBox.Size = new System.Drawing.Size(535, 20);
+            this.LocalUserFolderTextBox.Size = new System.Drawing.Size(692, 20);
             this.LocalUserFolderTextBox.TabIndex = 28;
             this.LocalUserFolderTextBox.Leave += new System.EventHandler(this.LocalUserFolderTextBox_Leave);
             // 
@@ -311,7 +311,7 @@ namespace Moritz
             this.LocalUserFoldersGroupBox.Controls.Add(this.LocalExpansionFieldsFolderInfoLabel);
             this.LocalUserFoldersGroupBox.Location = new System.Drawing.Point(18, 73);
             this.LocalUserFoldersGroupBox.Name = "LocalUserFoldersGroupBox";
-            this.LocalUserFoldersGroupBox.Size = new System.Drawing.Size(715, 109);
+            this.LocalUserFoldersGroupBox.Size = new System.Drawing.Size(872, 109);
             this.LocalUserFoldersGroupBox.TabIndex = 38;
             this.LocalUserFoldersGroupBox.TabStop = false;
             this.LocalUserFoldersGroupBox.Text = "Local user folders ( info )";
@@ -320,7 +320,7 @@ namespace Moritz
             // 
             this.OnlineUserFolderTextBox.Location = new System.Drawing.Point(165, 197);
             this.OnlineUserFolderTextBox.Name = "OnlineUserFolderTextBox";
-            this.OnlineUserFolderTextBox.Size = new System.Drawing.Size(568, 20);
+            this.OnlineUserFolderTextBox.Size = new System.Drawing.Size(725, 20);
             this.OnlineUserFolderTextBox.TabIndex = 39;
             this.OnlineUserFolderTextBox.Leave += new System.EventHandler(this.OnlineUserFolderTextBox_Leave);
             // 
@@ -339,7 +339,7 @@ namespace Moritz
             this.OnlineUserFoldersGroupBox.Controls.Add(this.OnlineMoritzAudioFolderInfoLabel);
             this.OnlineUserFoldersGroupBox.Location = new System.Drawing.Point(18, 221);
             this.OnlineUserFoldersGroupBox.Name = "OnlineUserFoldersGroupBox";
-            this.OnlineUserFoldersGroupBox.Size = new System.Drawing.Size(715, 51);
+            this.OnlineUserFoldersGroupBox.Size = new System.Drawing.Size(872, 51);
             this.OnlineUserFoldersGroupBox.TabIndex = 39;
             this.OnlineUserFoldersGroupBox.TabStop = false;
             this.OnlineUserFoldersGroupBox.Text = "Online user folders ( info )";
@@ -368,7 +368,7 @@ namespace Moritz
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(248)))), ((int)(((byte)(248)))));
-            this.ClientSize = new System.Drawing.Size(753, 499);
+            this.ClientSize = new System.Drawing.Size(915, 499);
             this.ControlBox = false;
             this.Controls.Add(this.OnlineUserFoldersGroupBox);
             this.Controls.Add(this.OnlineUserFolderTextBox);

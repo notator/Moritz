@@ -11,13 +11,13 @@ namespace Moritz.AssistantComposer
     /// Algorithm for testing Song 6's palettes.
     /// This may develope as composition progresses...
     /// </summary>
-    public class Study2cAlgorithm : MidiCompositionAlgorithm
+    public class Study2c3_1Algorithm : MidiCompositionAlgorithm
     {
         /// <summary>
         /// This constructor can be called with both parameters null,
         /// just to get the overridden properties.
         /// </summary>
-        public Study2cAlgorithm(List<Krystal> krystals, List<PaletteDef> paletteDefs)
+        public Study2c3_1Algorithm(List<Krystal> krystals, List<PaletteDef> paletteDefs)
             : base(krystals, paletteDefs)
         {
         }

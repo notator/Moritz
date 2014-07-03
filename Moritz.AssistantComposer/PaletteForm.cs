@@ -19,7 +19,10 @@ namespace Moritz.AssistantComposer
             :this(name, domain, assistantComposerMainForm)
         {
             ReadPalette(r);
-            _audioButtonsControl.Enabled = true;
+            if(_audioButtonsControl != null)
+            {
+                _audioButtonsControl.Enabled = true;
+            }
             DeselectAll();
         }
         /// <summary>
@@ -37,8 +40,11 @@ namespace Moritz.AssistantComposer
             Text = name;
 
             ConnectBasicChordControl();
-            ConnectAudioButtonsControl(domain);
-            _audioButtonsControl.Enabled = false;
+            if(M.Preferences.CurrentMultimediaMidiOutputDevice != null)
+            {
+                ConnectAudioButtonsControl(domain);
+                _audioButtonsControl.Enabled = false;
+            }
 
             _allMainTextBoxes = GetAllMainTextBoxes();
             _allChordParameterTextBoxes = GetAllChordParameterTextBoxes();
@@ -57,6 +63,7 @@ namespace Moritz.AssistantComposer
             Point location = new Point(this.MinMsDurationsTextBox.Location.X, this.MinMsDurationsTextBox.Location.Y + 27);
             //Point location = new Point(this.MinMsDurationsTextBox.Location.X, this.MinMsDurationsTextBox.Location.Y);
             _audioButtonsControl = new AudioButtonsControl(domain, location, this, _assistantComposerMainForm.RootScoreFolder + @"\audio");
+            Debug.Assert(_audioButtonsControl != null);
             Controls.Add(_audioButtonsControl);
         }
 
@@ -174,7 +181,10 @@ namespace Moritz.AssistantComposer
 
         protected void PaletteForm_Click(object sender, EventArgs e)
         {
-            _audioButtonsControl.StopCurrentMediaPlayer();
+            if(_audioButtonsControl != null)
+            {
+                _audioButtonsControl.StopCurrentMediaPlayer();
+            }
         }
 
         #region buttons
@@ -838,10 +848,13 @@ namespace Moritz.AssistantComposer
                 textBox.BackColor = M.TextBoxErrorColor;
             }
 
-            if(HasError())
-                _audioButtonsControl.Enabled = false;
-            else
-                _audioButtonsControl.Enabled = true;
+            if(_audioButtonsControl != null)
+            {
+                if(HasError())
+                    _audioButtonsControl.Enabled = false;
+                else
+                    _audioButtonsControl.Enabled = true;
+            }
             
             this.SetSettingsNotSaved();
         }
@@ -1071,7 +1084,10 @@ namespace Moritz.AssistantComposer
                 w.WriteEndElement();
             }
 
-            _audioButtonsControl.WriteAudioFiles(w);
+            if(_audioButtonsControl != null)
+            {
+                _audioButtonsControl.WriteAudioFiles(w);
+            }
 
             if(!string.IsNullOrEmpty(OrnamentNumbersTextBox.Text))
             {
@@ -1157,7 +1173,10 @@ namespace Moritz.AssistantComposer
                             ExpressionEnvelopesTextBox.Text = r.ReadElementContentAsString();
                             break;
                         case "audioFiles":
-                            _audioButtonsControl.ReadAudioFiles(r);
+                            if(_audioButtonsControl != null)
+                            {
+                                _audioButtonsControl.ReadAudioFiles(r);
+                            }
                             break;
                         case "ornamentNumbers":
                             OrnamentNumbersTextBox.Text = r.ReadElementContentAsString();

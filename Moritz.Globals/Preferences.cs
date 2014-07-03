@@ -13,6 +13,7 @@ namespace Moritz.Globals
         public Preferences(string moritzFolder)
         {
             _preferencesPath = moritzFolder + @"\Preferences.mzpf";
+            _localAssistantPerformerDevelopmentFolder = @"C:\Dokumente\Visual Studio\Projects\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformer";
 
             #region read prefs
             if(!File.Exists(_preferencesPath))
@@ -232,7 +233,7 @@ namespace Moritz.Globals
         }
         public string LocalScoresRootFolder
         {
-            get { return _localUserFolder + @"\scores"; }
+            get { return _localAssistantPerformerDevelopmentFolder + @"\scores"; }
         }
 
         public string PreferencesPath
@@ -243,6 +244,7 @@ namespace Moritz.Globals
         // User files can be put anywhere the user likes (so not readonly).
         private string _onlineUserFolder;
         private string _localUserFolder;
+        private string _localAssistantPerformerDevelopmentFolder;
         private readonly string _preferencesPath;
         #endregion folders
 
@@ -294,7 +296,11 @@ namespace Moritz.Globals
         {
             get 
             {
-                if(MultimediaMidiOutputDevices.ContainsKey(CurrentOutputDeviceName))
+                if(MultimediaMidiOutputDevices.Count == 0 || String.IsNullOrEmpty(CurrentOutputDeviceName))
+                {
+                    return null;
+                }
+                else if(MultimediaMidiOutputDevices.ContainsKey(CurrentOutputDeviceName))
                 {
                     return MultimediaMidiOutputDevices[CurrentOutputDeviceName];
                 }

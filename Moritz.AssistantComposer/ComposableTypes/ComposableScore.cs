@@ -28,14 +28,14 @@ namespace Moritz.AssistantComposer
             MidiCompositionAlgorithm midiAlgorithm = null;
             switch(algorithmName)
             {
-                case "Study 2c":
-                    midiAlgorithm = new Study2cAlgorithm(krystals, paletteDefs);
+                case "Study 2c3.1":
+                    midiAlgorithm = new Study2c3_1Algorithm(krystals, paletteDefs);
                     break;
                 case "Song Six":
                     midiAlgorithm = new SongSixAlgorithm(krystals, paletteDefs);
                     break;
-                case "Study 3 sketch":
-                    midiAlgorithm = new Study3SketchAlgorithm(krystals, paletteDefs);
+                case "Study 3 sketch 1":
+                    midiAlgorithm = new Study3Sketch1Algorithm(krystals, paletteDefs);
                     break;
                 case "Study 4":
                     midiAlgorithm = new Study4Algorithm(krystals, paletteDefs);

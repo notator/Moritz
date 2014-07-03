@@ -607,8 +607,8 @@ namespace Moritz.Score.Midi
             }
             if(Volume != null && Volume != M.DefaultVolume)
                 w.WriteAttributeString("volume", Volume.ToString());
-            if(Repeat == false)
-                w.WriteAttributeString("repeat", "0");
+            if(Repeat == true)
+                w.WriteAttributeString("repeat", "1");
             if(HasChordOff == false)
                 w.WriteAttributeString("hasChordOff", "0");
             if(PitchWheelDeviation != null && PitchWheelDeviation != M.DefaultPitchWheelDeviation)

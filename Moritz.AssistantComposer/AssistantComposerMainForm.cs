@@ -96,9 +96,8 @@ namespace Moritz.AssistantComposer
         {
             DirectoryInfo settingsDirectoryInfo = new DirectoryInfo(settingsPath);
             DirectoryInfo scoreDirectoryInfo = settingsDirectoryInfo.Parent;
-            DirectoryInfo algorithmDirectoryInfo = scoreDirectoryInfo.Parent;
 
-            return algorithmDirectoryInfo.Name;
+            return scoreDirectoryInfo.Name;
         }
 
         private void LoadSettings(string settingsPathname)
@@ -1743,14 +1742,14 @@ namespace Moritz.AssistantComposer
             MidiCompositionAlgorithm midiAlgorithm = null;
             switch(algorithmName)
             {
-                case "Study 2c":
-                    midiAlgorithm = new Study2cAlgorithm(null, null);
+                case "Study 2c3.1":
+                    midiAlgorithm = new Study2c3_1Algorithm(null, null);
                     break;
                 case "Song Six":
                     midiAlgorithm = new SongSixAlgorithm(null, null);
                     break;
-                case "Study 3 sketch":
-                    midiAlgorithm = new Study3SketchAlgorithm(null, null);
+                case "Study 3 sketch 1":
+                    midiAlgorithm = new Study3Sketch1Algorithm(null, null);
                     break;
                 case "Study 4":
                     midiAlgorithm = new Study4Algorithm(null, null);
