@@ -16,7 +16,7 @@ namespace Moritz
     {
         public MoritzForm1()
         {
-            InitializeComponent();
+            InitializeComponent(); 
             SetInputDevicesComboBox();
             SetOutputDevicesComboBox();
         }
@@ -34,7 +34,6 @@ namespace Moritz
                 if(M.Preferences.AvailableMultimediaMidiInputDeviceNames.Contains(M.Preferences.PreferredInputDevice))
                 {
                     InputDeviceComboBox.SelectedItem = M.Preferences.PreferredInputDevice;
-                    this.BringToFront();
                 }
                 else
                 {

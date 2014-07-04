@@ -83,7 +83,7 @@ namespace Moritz
             this.PreferencesButton.Location = new System.Drawing.Point(14, 30);
             this.PreferencesButton.Name = "PreferencesButton";
             this.PreferencesButton.Size = new System.Drawing.Size(98, 31);
-            this.PreferencesButton.TabIndex = 3;
+            this.PreferencesButton.TabIndex = 0;
             this.PreferencesButton.Text = "preferences";
             this.PreferencesButton.UseVisualStyleBackColor = true;
             this.PreferencesButton.Click += new System.EventHandler(this.PreferencesButton_Click);
@@ -95,7 +95,7 @@ namespace Moritz
             this.CurrentOutputDeviceLabel.Location = new System.Drawing.Point(278, 11);
             this.CurrentOutputDeviceLabel.Name = "CurrentOutputDeviceLabel";
             this.CurrentOutputDeviceLabel.Size = new System.Drawing.Size(116, 13);
-            this.CurrentOutputDeviceLabel.TabIndex = 45;
+            this.CurrentOutputDeviceLabel.TabIndex = 5;
             this.CurrentOutputDeviceLabel.Text = "Current Output Device:";
             // 
             // CurrentInputDeviceLabel
@@ -105,7 +105,7 @@ namespace Moritz
             this.CurrentInputDeviceLabel.Location = new System.Drawing.Point(23, 11);
             this.CurrentInputDeviceLabel.Name = "CurrentInputDeviceLabel";
             this.CurrentInputDeviceLabel.Size = new System.Drawing.Size(108, 13);
-            this.CurrentInputDeviceLabel.TabIndex = 42;
+            this.CurrentInputDeviceLabel.TabIndex = 4;
             this.CurrentInputDeviceLabel.Text = "Current Input Device:";
             // 
             // OutputDeviceComboBox
@@ -115,7 +115,7 @@ namespace Moritz
             this.OutputDeviceComboBox.Location = new System.Drawing.Point(278, 27);
             this.OutputDeviceComboBox.Name = "OutputDeviceComboBox";
             this.OutputDeviceComboBox.Size = new System.Drawing.Size(237, 21);
-            this.OutputDeviceComboBox.TabIndex = 44;
+            this.OutputDeviceComboBox.TabIndex = 6;
             this.OutputDeviceComboBox.SelectedIndexChanged += new System.EventHandler(this.MidiOutputDevicesComboBox_SelectedIndexChanged);
             // 
             // InputDeviceComboBox
@@ -125,7 +125,7 @@ namespace Moritz
             this.InputDeviceComboBox.Location = new System.Drawing.Point(23, 27);
             this.InputDeviceComboBox.Name = "InputDeviceComboBox";
             this.InputDeviceComboBox.Size = new System.Drawing.Size(237, 21);
-            this.InputDeviceComboBox.TabIndex = 43;
+            this.InputDeviceComboBox.TabIndex = 7;
             this.InputDeviceComboBox.SelectedIndexChanged += new System.EventHandler(this.MidiInputDevicesComboBox_SelectedIndexChanged);
             // 
             // CloseAssistantPerformerButton
@@ -134,7 +134,7 @@ namespace Moritz
             this.CloseAssistantPerformerButton.Location = new System.Drawing.Point(16, 30);
             this.CloseAssistantPerformerButton.Name = "CloseAssistantPerformerButton";
             this.CloseAssistantPerformerButton.Size = new System.Drawing.Size(204, 31);
-            this.CloseAssistantPerformerButton.TabIndex = 46;
+            this.CloseAssistantPerformerButton.TabIndex = 1;
             this.CloseAssistantPerformerButton.Text = "close";
             this.CloseAssistantPerformerButton.UseVisualStyleBackColor = true;
             this.CloseAssistantPerformerButton.Click += new System.EventHandler(this.CloseAssistantPerformerButton_Click);
@@ -145,7 +145,7 @@ namespace Moritz
             this.NewScoreSettingsButton.Location = new System.Drawing.Point(17, 30);
             this.NewScoreSettingsButton.Name = "NewScoreSettingsButton";
             this.NewScoreSettingsButton.Size = new System.Drawing.Size(99, 31);
-            this.NewScoreSettingsButton.TabIndex = 47;
+            this.NewScoreSettingsButton.TabIndex = 1;
             this.NewScoreSettingsButton.Text = "new settings";
             this.NewScoreSettingsButton.UseVisualStyleBackColor = true;
             this.NewScoreSettingsButton.Click += new System.EventHandler(this.NewScoreSettingsButton_Click);
@@ -156,7 +156,7 @@ namespace Moritz
             this.LoadScoreSettingsButton.Location = new System.Drawing.Point(122, 30);
             this.LoadScoreSettingsButton.Name = "LoadScoreSettingsButton";
             this.LoadScoreSettingsButton.Size = new System.Drawing.Size(99, 31);
-            this.LoadScoreSettingsButton.TabIndex = 48;
+            this.LoadScoreSettingsButton.TabIndex = 0;
             this.LoadScoreSettingsButton.Text = "load settings";
             this.LoadScoreSettingsButton.UseVisualStyleBackColor = true;
             this.LoadScoreSettingsButton.Click += new System.EventHandler(this.LoadScoreSettingsButton_Click);
@@ -167,7 +167,7 @@ namespace Moritz
             this.CloseAssistantComposerButton.Location = new System.Drawing.Point(67, 30);
             this.CloseAssistantComposerButton.Name = "CloseAssistantComposerButton";
             this.CloseAssistantComposerButton.Size = new System.Drawing.Size(99, 31);
-            this.CloseAssistantComposerButton.TabIndex = 49;
+            this.CloseAssistantComposerButton.TabIndex = 2;
             this.CloseAssistantComposerButton.Text = "close";
             this.CloseAssistantComposerButton.UseVisualStyleBackColor = true;
             this.CloseAssistantComposerButton.Click += new System.EventHandler(this.CloseAssistantComposerButton_Click);
@@ -178,7 +178,7 @@ namespace Moritz
             this.KrystalsEditorButton.Location = new System.Drawing.Point(20, 30);
             this.KrystalsEditorButton.Name = "KrystalsEditorButton";
             this.KrystalsEditorButton.Size = new System.Drawing.Size(98, 31);
-            this.KrystalsEditorButton.TabIndex = 50;
+            this.KrystalsEditorButton.TabIndex = 0;
             this.KrystalsEditorButton.Text = "open";
             this.KrystalsEditorButton.UseVisualStyleBackColor = true;
             this.KrystalsEditorButton.Click += new System.EventHandler(this.KrystalsEditorButton_Click);
@@ -189,7 +189,7 @@ namespace Moritz
             this.AboutButton.Location = new System.Drawing.Point(119, 30);
             this.AboutButton.Name = "AboutButton";
             this.AboutButton.Size = new System.Drawing.Size(98, 31);
-            this.AboutButton.TabIndex = 51;
+            this.AboutButton.TabIndex = 1;
             this.AboutButton.Text = "about";
             this.AboutButton.UseVisualStyleBackColor = true;
             this.AboutButton.Click += new System.EventHandler(this.AboutButton_Click);
@@ -205,7 +205,7 @@ namespace Moritz
             this.AssistantComposerPanel.Location = new System.Drawing.Point(23, 64);
             this.AssistantComposerPanel.Name = "AssistantComposerPanel";
             this.AssistantComposerPanel.Size = new System.Drawing.Size(237, 80);
-            this.AssistantComposerPanel.TabIndex = 52;
+            this.AssistantComposerPanel.TabIndex = 0;
             // 
             // AssistantComposerLabel
             // 
@@ -228,7 +228,7 @@ namespace Moritz
             this.AssistantPerformerPanel.Location = new System.Drawing.Point(278, 64);
             this.AssistantPerformerPanel.Name = "AssistantPerformerPanel";
             this.AssistantPerformerPanel.Size = new System.Drawing.Size(237, 80);
-            this.AssistantPerformerPanel.TabIndex = 53;
+            this.AssistantPerformerPanel.TabIndex = 1;
             // 
             // AssistantPerformerLabel
             // 
@@ -250,7 +250,7 @@ namespace Moritz
             this.KrystalsEditorPanel.Location = new System.Drawing.Point(23, 161);
             this.KrystalsEditorPanel.Name = "KrystalsEditorPanel";
             this.KrystalsEditorPanel.Size = new System.Drawing.Size(137, 80);
-            this.KrystalsEditorPanel.TabIndex = 54;
+            this.KrystalsEditorPanel.TabIndex = 2;
             // 
             // KrystalsEditorLabel
             // 
@@ -274,7 +274,7 @@ namespace Moritz
             this.MoritzPanel.Location = new System.Drawing.Point(177, 161);
             this.MoritzPanel.Name = "MoritzPanel";
             this.MoritzPanel.Size = new System.Drawing.Size(338, 80);
-            this.MoritzPanel.TabIndex = 55;
+            this.MoritzPanel.TabIndex = 3;
             // 
             // MoritzLabel
             // 
