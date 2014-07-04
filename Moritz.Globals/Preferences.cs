@@ -58,58 +58,71 @@ namespace Moritz.Globals
             }
             #endregion
 
-            try
+            if(CaptureInputDevices() && CaptureOutputDevices())
             {
-                CaptureInputDevices();
-                CaptureOutputDevices();
-            }
-            catch
-            {
-                string msg = "Cannot capture MIDI devices.\n" +
-                             "One or more are probably being used by another program.";
-                MessageBox.Show(msg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+                if((!String.IsNullOrEmpty(PreferredInputDevice)) && MultimediaMidiInputDevices.ContainsKey(PreferredInputDevice) == false)
+                {
+                    string message = "Can't find the " + PreferredInputDevice + ".\n\n" +
+                        "To use it, quit, turn it on, and restart.";
+                    MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else
+                {
+                    CurrentInputDeviceName = PreferredInputDevice;
+                }
 
-            if((!String.IsNullOrEmpty(PreferredInputDevice)) && MultimediaMidiInputDevices.ContainsKey(PreferredInputDevice) == false)
-            {
-                string message = "Can't find the " + PreferredInputDevice + ".\n\n" +
-                    "To use it, quit, turn it on, and restart.";
-                MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            else
-            {
-                CurrentInputDeviceName = PreferredInputDevice;
-            }
-
-            if((!String.IsNullOrEmpty(PreferredOutputDevice)) && MultimediaMidiOutputDevices.ContainsKey(PreferredOutputDevice) == false)
-            {
-                string message = "Can't find the " + PreferredOutputDevice + ".\n\n" +
-                    "To use it, quit, turn it on, and restart.";
-                MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            else
-            {
-                CurrentOutputDeviceName = PreferredOutputDevice;
+                if((!String.IsNullOrEmpty(PreferredOutputDevice)) && MultimediaMidiOutputDevices.ContainsKey(PreferredOutputDevice) == false)
+                {
+                    string message = "Can't find the " + PreferredOutputDevice + ".\n\n" +
+                        "To use it, quit, turn it on, and restart.";
+                    MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else
+                {
+                    CurrentOutputDeviceName = PreferredOutputDevice;
+                }
             }
         }
 
-        private void CaptureInputDevices()
+        private bool CaptureInputDevices()
         {
+            bool success = true;
             foreach(Moritz.Globals.IODevices.InputDevice netInputDevice in DeviceCollections.InputDevices)
             {
-                Multimedia.Midi.InputDevice inputDevice = new Multimedia.Midi.InputDevice(netInputDevice.ID);
-                inputDevice.AddSysExBuffer(_sysExBufferSize);
-                inputDevice.AddSysExBuffer(_sysExBufferSize);
-                MultimediaMidiInputDevices.Add(netInputDevice.Name, inputDevice);
+                try
+                {
+                    Multimedia.Midi.InputDevice inputDevice = new Multimedia.Midi.InputDevice(netInputDevice.ID);
+                    inputDevice.AddSysExBuffer(_sysExBufferSize);
+                    inputDevice.AddSysExBuffer(_sysExBufferSize);
+                    MultimediaMidiInputDevices.Add(netInputDevice.Name, inputDevice);
+                }
+                catch
+                {
+                    MultimediaMidiInputDevices.Clear();
+                    success = false;
+                    break;
+                }
             }
+            return success;
         }
-        private void CaptureOutputDevices()
+        private bool CaptureOutputDevices()
         {
+            bool success = true;
             foreach(Moritz.Globals.IODevices.OutputDevice netOutputDevice in DeviceCollections.OutputDevices)
             {
-                Multimedia.Midi.OutputDevice outputDevice = new Multimedia.Midi.OutputDevice(netOutputDevice.ID);
-                MultimediaMidiOutputDevices.Add(netOutputDevice.Name, outputDevice);
+                try
+                {
+                    Multimedia.Midi.OutputDevice outputDevice = new Multimedia.Midi.OutputDevice(netOutputDevice.ID);
+                    MultimediaMidiOutputDevices.Add(netOutputDevice.Name, outputDevice);
+                }
+                catch
+                {
+                    MultimediaMidiOutputDevices.Clear();
+                    success = false;
+                    break;
+                }
             }
+            return success;
         }
 
 		public void Save()

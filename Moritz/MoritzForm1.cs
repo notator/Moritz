@@ -12,8 +12,8 @@ using Krystals4Application;
 
 namespace Moritz
 {
-	public partial class MoritzForm1 : Form, IMoritzForm1
-	{
+    public partial class MoritzForm1 : Form, IMoritzForm1
+    {
         public MoritzForm1()
         {
             InitializeComponent();
@@ -47,12 +47,14 @@ namespace Moritz
             }
             InputDeviceComboBox.ResumeLayout();
         }
+
         private void SetOutputDevicesComboBox()
         {
-            OutputDeviceComboBox.SuspendLayout();
-            OutputDeviceComboBox.Items.Clear();
             if(M.Preferences.AvailableMultimediaMidiOutputDeviceNames.Count > 0)
             {
+                OutputDeviceComboBox.SuspendLayout();
+                OutputDeviceComboBox.Items.Clear();
+
                 foreach(string name in M.Preferences.AvailableMultimediaMidiOutputDeviceNames)
                 {
                     OutputDeviceComboBox.Items.Add(name);
@@ -66,12 +68,13 @@ namespace Moritz
                 {
                     OutputDeviceComboBox.SelectedIndex = 0;
                 }
+
+                OutputDeviceComboBox.ResumeLayout();
             }
             else
             {
-                OutputDeviceComboBox.Hide();
+                this.Close();
             }
-            OutputDeviceComboBox.ResumeLayout();
         }
 
         #region AssistantPerformer
@@ -125,10 +128,10 @@ namespace Moritz
                     scoreName = dialog.ScoreNameTextBox.Text;
                     algorithmName = (string)dialog.AlgorithmComboBox.SelectedItem;
 
-                    string settingsPath = 
-                        M.Preferences.LocalScoresRootFolder + @"\" + algorithmName + @"\" + 
+                    string settingsPath =
+                        M.Preferences.LocalScoresRootFolder + @"\" + algorithmName + @"\" +
                             scoreName + @" score\" + scoreName + M.MoritzKrystalScoreSettingsExtension;
-                    
+
                     SaveDefaultSettings(settingsPath, algorithmName);
 
                     _assistantComposerMainForm = new AssistantComposerMainForm(settingsPath, (IMoritzForm1)this);
@@ -235,7 +238,7 @@ namespace Moritz
                 string filterString = @"Krystal Score Settings (*" + M.MoritzKrystalScoreSettingsExtension +
                     @")|*" + M.MoritzKrystalScoreSettingsExtension;
                 // "Krystal Score Settings (*.mkss)|*.mkss";
-                openFileDialog.Filter = filterString; 
+                openFileDialog.Filter = filterString;
                 openFileDialog.FilterIndex = (int)0;
                 openFileDialog.Title = "Load Krystal Score Settings";
                 openFileDialog.RestoreDirectory = true;
@@ -280,7 +283,7 @@ namespace Moritz
 
         private void QuitButton_Click(object sender, EventArgs e)
         {
-             this.Close();
+            this.Close();
         }
 
         private void MidiInputDevicesComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -345,6 +348,8 @@ namespace Moritz
         /// <param name="e"></param>
         private void MoritzForm1_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if(_assistantComposerMainForm != null && !_assistantComposerMainForm.Disposing)
+                _assistantComposerMainForm.Dispose();
             if(_assistantPerformerMainForm != null && !_assistantPerformerMainForm.Disposing)
                 _assistantPerformerMainForm.Dispose();
             M.Preferences.Dispose();
@@ -376,8 +381,5 @@ namespace Moritz
 
         private Form _assistantPerformerMainForm = null;
         private Form _assistantComposerMainForm = null;
-
-
-
-	}
+    }
 }

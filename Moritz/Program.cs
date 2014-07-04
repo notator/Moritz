@@ -13,7 +13,15 @@ namespace Moritz
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MoritzForm1());
+            try
+            {
+                Application.Run(new MoritzForm1());
+            }
+            catch 
+            {
+                MessageBox.Show("No available MIDI output devices.\nThey are probably being used by another program.",
+                    "Device Error", MessageBoxButtons.OK);
+            }
         }
     }
 }

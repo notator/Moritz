@@ -101,7 +101,7 @@ namespace Moritz.AssistantComposer
             // CreateScoreButton
             // 
             this.CreateScoreButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.CreateScoreButton.Location = new System.Drawing.Point(607, 537);
+            this.CreateScoreButton.Location = new System.Drawing.Point(440, 537);
             this.CreateScoreButton.Name = "CreateScoreButton";
             this.CreateScoreButton.Size = new System.Drawing.Size(106, 26);
             this.CreateScoreButton.TabIndex = 5;
@@ -112,7 +112,7 @@ namespace Moritz.AssistantComposer
             // QuitAlgorithmButton
             // 
             this.QuitAlgorithmButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.QuitAlgorithmButton.Location = new System.Drawing.Point(19, 507);
+            this.QuitAlgorithmButton.Location = new System.Drawing.Point(582, 507);
             this.QuitAlgorithmButton.Name = "QuitAlgorithmButton";
             this.QuitAlgorithmButton.Size = new System.Drawing.Size(127, 26);
             this.QuitAlgorithmButton.TabIndex = 8;
@@ -680,7 +680,7 @@ namespace Moritz.AssistantComposer
             // 
             this.SaveSettingsButton.Enabled = false;
             this.SaveSettingsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.SaveSettingsButton.Location = new System.Drawing.Point(607, 507);
+            this.SaveSettingsButton.Location = new System.Drawing.Point(440, 507);
             this.SaveSettingsButton.Name = "SaveSettingsButton";
             this.SaveSettingsButton.Size = new System.Drawing.Size(106, 26);
             this.SaveSettingsButton.TabIndex = 4;
@@ -691,7 +691,7 @@ namespace Moritz.AssistantComposer
             // QuitMoritzButton
             // 
             this.QuitMoritzButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.QuitMoritzButton.Location = new System.Drawing.Point(19, 537);
+            this.QuitMoritzButton.Location = new System.Drawing.Point(582, 537);
             this.QuitMoritzButton.Name = "QuitMoritzButton";
             this.QuitMoritzButton.Size = new System.Drawing.Size(127, 26);
             this.QuitMoritzButton.TabIndex = 9;
@@ -703,7 +703,7 @@ namespace Moritz.AssistantComposer
             // 
             this.ShowMoritzButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.ShowMoritzButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.ShowMoritzButton.Location = new System.Drawing.Point(163, 537);
+            this.ShowMoritzButton.Location = new System.Drawing.Point(212, 537);
             this.ShowMoritzButton.Name = "ShowMoritzButton";
             this.ShowMoritzButton.Size = new System.Drawing.Size(183, 26);
             this.ShowMoritzButton.TabIndex = 6;
@@ -729,7 +729,7 @@ namespace Moritz.AssistantComposer
             // 
             this.DimensionsAndMetadataButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.DimensionsAndMetadataButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.DimensionsAndMetadataButton.Location = new System.Drawing.Point(163, 507);
+            this.DimensionsAndMetadataButton.Location = new System.Drawing.Point(23, 537);
             this.DimensionsAndMetadataButton.Name = "DimensionsAndMetadataButton";
             this.DimensionsAndMetadataButton.Size = new System.Drawing.Size(183, 26);
             this.DimensionsAndMetadataButton.TabIndex = 7;
@@ -770,7 +770,7 @@ namespace Moritz.AssistantComposer
             // 
             this.PerformersOptionsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.PerformersOptionsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.PerformersOptionsButton.Location = new System.Drawing.Point(352, 537);
+            this.PerformersOptionsButton.Location = new System.Drawing.Point(212, 507);
             this.PerformersOptionsButton.Name = "PerformersOptionsButton";
             this.PerformersOptionsButton.Size = new System.Drawing.Size(183, 26);
             this.PerformersOptionsButton.TabIndex = 150;
@@ -782,7 +782,7 @@ namespace Moritz.AssistantComposer
             // 
             this.TrackInitValuesButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.TrackInitValuesButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.TrackInitValuesButton.Location = new System.Drawing.Point(352, 507);
+            this.TrackInitValuesButton.Location = new System.Drawing.Point(23, 507);
             this.TrackInitValuesButton.Name = "TrackInitValuesButton";
             this.TrackInitValuesButton.Size = new System.Drawing.Size(183, 26);
             this.TrackInitValuesButton.TabIndex = 151;
