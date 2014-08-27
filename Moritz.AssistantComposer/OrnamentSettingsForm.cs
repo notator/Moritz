@@ -38,7 +38,7 @@ namespace Moritz.AssistantComposer
                 numberOfChordValues = ReadOrnamentSettingsForm(r);
                 if(!String.IsNullOrEmpty(OrnamentKrystalNameLabel.Text))
                 {
-                    string ornamentsKrystalPath = M.Preferences.LocalKrystalsFolder + @"\" +
+                    string ornamentsKrystalPath = M.Preferences.LocalMoritzKrystalsFolder + @"\" +
                         OrnamentKrystalNameLabel.Text;
                     _ornamentsKrystal = K.LoadKrystal(ornamentsKrystalPath);
                 }
@@ -86,7 +86,7 @@ namespace Moritz.AssistantComposer
                     {
                         case "ornamentKrystalName":
                             OrnamentKrystalNameLabel.Text = r.ReadElementContentAsString();
-                            string ornamentsKrystalPath = M.Preferences.LocalKrystalsFolder + @"\" + OrnamentKrystalNameLabel.Text;
+                            string ornamentsKrystalPath = M.Preferences.LocalMoritzKrystalsFolder + @"\" + OrnamentKrystalNameLabel.Text;
                             _ornamentsKrystal = K.LoadKrystal(ornamentsKrystalPath);
                             numberOfChordValues = (int)_ornamentsKrystal.MaxValue;
                             break;
@@ -167,7 +167,7 @@ namespace Moritz.AssistantComposer
         private void GetOrnamentKrystalButton_Click(object sender, EventArgs e)
         {
             Moritz.Krystals.KrystalBrowser krystalBrowser =
-                new Moritz.Krystals.KrystalBrowser(M.Preferences.LocalKrystalsFolder, SetOrnamentKrystal);
+                new Moritz.Krystals.KrystalBrowser(M.Preferences.LocalMoritzKrystalsFolder, SetOrnamentKrystal);
             krystalBrowser.ShowDialog();
             // the krystalBrowser calls SetOrnamentKrystal() as a delegate just before it closes.
         }

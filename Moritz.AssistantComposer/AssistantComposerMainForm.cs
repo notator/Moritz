@@ -33,18 +33,16 @@ namespace Moritz.AssistantComposer
             Debug.Assert(File.Exists(settingsPath));
     
             _settingsPath = settingsPath;
-            _scoreFolderPath = Path.GetDirectoryName(settingsPath);
-            _algorithmName = AlgorithmName(settingsPath);
+            _settingsFolderPath = Path.GetDirectoryName(settingsPath);
+
+            _algorithmName = Path.GetFileNameWithoutExtension(settingsPath);
             _algorithm = Algorithm(_algorithmName);
             _numberOfChannels = _algorithm.MidiChannels().Count;
 
             _trackInitForm = new TrackInitForm(this, _numberOfChannels);
             _performersOptionsForm = new PerformersOptionsForm(this, _numberOfChannels);
 
-            Debug.Assert(settingsPath.Contains(M.Preferences.LocalScoresRootFolder));
-            _algorithmFolderPath = M.Preferences.LocalScoresRootFolder + @"\" + _algorithmName;
-
-            SetScoreComboBoxItems(_algorithmFolderPath);
+            SetScoreComboBoxItems(_settingsFolderPath);
             string scoreName = Path.GetFileNameWithoutExtension(_settingsPath);
 
             ScoreComboBox.SelectedIndexChanged -= ScoreComboBox_SelectedIndexChanged;
@@ -91,13 +89,6 @@ namespace Moritz.AssistantComposer
         private void SetSystemStartBarsHelpLabel(int numberOfBars)
         {
             SystemStartBarsHelpLabel.Text = "(" + numberOfBars.ToString() + " bars. Default is 5 bars per system)";
-        }
-        private string AlgorithmName(string settingsPath)
-        {
-            DirectoryInfo settingsDirectoryInfo = new DirectoryInfo(settingsPath);
-            DirectoryInfo scoreDirectoryInfo = settingsDirectoryInfo.Parent;
-
-            return scoreDirectoryInfo.Name;
         }
 
         private void LoadSettings(string settingsPathname)
@@ -442,7 +433,7 @@ namespace Moritz.AssistantComposer
             Krystal krystal = null;
             try
             {
-                string krystalPath = M.Preferences.LocalKrystalsFolder + @"\" + krystalFileName;
+                string krystalPath = M.Preferences.LocalMoritzKrystalsFolder + @"\" + krystalFileName;
                 krystal = K.LoadKrystal(krystalPath);
             }
             catch(Exception ex)
@@ -555,7 +546,7 @@ namespace Moritz.AssistantComposer
         {
             Debug.Assert(!string.IsNullOrEmpty(_settingsPath));
 
-            M.CreateDirectoryIfItDoesNotExist(this._scoreFolderPath);
+            M.CreateDirectoryIfItDoesNotExist(this._settingsFolderPath);
 
             #region do the save
             XmlWriterSettings settings = new XmlWriterSettings();
@@ -570,7 +561,7 @@ namespace Moritz.AssistantComposer
 
                 w.WriteStartElement("moritzKrystalScore");
                 w.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
-                w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.MoritzXMLSchemasFolder + "/moritzKrystalScore.xsd");
+                w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.OnlineXMLSchemasFolder + "/moritzKrystalScore.xsd");
 
                 _dimensionsAndMetadataForm.WriteMetadata(w);
                 _dimensionsAndMetadataForm.WriteDimensions(w);
@@ -693,7 +684,7 @@ namespace Moritz.AssistantComposer
                                             _algorithmName,
                                             pageFormat,
                                             krystals, palettes,
-                                            _scoreFolderPath,
+                                            _settingsFolderPath,
                                             _dimensionsAndMetadataForm.Keywords,
                                             _dimensionsAndMetadataForm.Comment);
                 if(score != null)
@@ -1004,7 +995,7 @@ namespace Moritz.AssistantComposer
             Krystal selectedKrystal = null;
             if(KrystalsListBox.SelectedIndex >= 0)
                 selectedKrystal = KrystalsListBox.SelectedItem as Krystal;
-            Moritz.Krystals.KrystalBrowser krystalBrowser = new Moritz.Krystals.KrystalBrowser(selectedKrystal, M.Preferences.LocalKrystalsFolder, SetKrystal);
+            Moritz.Krystals.KrystalBrowser krystalBrowser = new Moritz.Krystals.KrystalBrowser(selectedKrystal, M.Preferences.LocalMoritzKrystalsFolder, SetKrystal);
             krystalBrowser.Show();
             // the krystalBrowser calls SetKrystal() as a delegate just before it closes.
         }
@@ -1032,7 +1023,7 @@ namespace Moritz.AssistantComposer
             }
             else
             {
-                string staffKrystalPath = M.Preferences.LocalKrystalsFolder + @"\" + newKrystal.Name;
+                string staffKrystalPath = M.Preferences.LocalMoritzKrystalsFolder + @"\" + newKrystal.Name;
                 Krystal krystal = K.LoadKrystal(staffKrystalPath);
                 this.KrystalsListBox.Items.Add(krystal);
 
@@ -1051,7 +1042,7 @@ namespace Moritz.AssistantComposer
             if(krystal != null)
             {
                 _krystalBrowser =
-                    new Moritz.Krystals.KrystalBrowser(krystal, M.Preferences.LocalKrystalsFolder, null);
+                    new Moritz.Krystals.KrystalBrowser(krystal, M.Preferences.LocalMoritzKrystalsFolder, null);
                 _krystalBrowser.Show();
             }
         }
@@ -1287,20 +1278,16 @@ namespace Moritz.AssistantComposer
         string _algorithmName = null;
         MidiCompositionAlgorithm _algorithm = null;
         /// <summary>
-        /// The folder containing the performanceOptions file and other folders such as "audio", "midi" etc.
-        /// </summary>
-        string _algorithmFolderPath = null;
-        /// <summary>
         /// The folder in which the score and all its associated files is saved
         /// </summary>
-        string _scoreFolderPath = null;
+        string _settingsFolderPath = null;
         string _settingsPath = null;
         const int _minimumMsDuration = 5;
         #endregion private variables
 
-        public string RootScoreFolder { get { return _algorithmFolderPath; } }
+        public string SettingsFolderPath { get { return _settingsFolderPath; } }
 
-        public string ScoreFolder { get { return _scoreFolderPath; } }
+        public string ScoreFolder { get { return _settingsFolderPath; } }
 
         #region page format controls
 
@@ -1338,8 +1325,6 @@ namespace Moritz.AssistantComposer
             }
 
             string scoreName = ScoreComboBox.SelectedItem.ToString();
-            _settingsPath = _algorithmFolderPath + @"\" + scoreName + @" score\" + scoreName + M.MoritzKrystalScoreSettingsExtension;
-            _scoreFolderPath = Path.GetDirectoryName(_settingsPath);
             _dimensionsAndMetadataForm.Text = scoreName + ": Page Dimensions and Metadata";
 
             GetSelectedSettings(_settingsPath, _algorithm);

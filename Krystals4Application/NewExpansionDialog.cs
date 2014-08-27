@@ -13,7 +13,7 @@ namespace Krystals4Application
         public NewExpansionDialog()
         {
             InitializeComponent();
-            _krystalsFolder = M.Preferences.LocalKrystalsFolder;
+            _krystalsFolder = M.Preferences.LocalMoritzKrystalsFolder;
         }
         #region Events
         private void SetDensityInputButton_Click(object sender, EventArgs e)

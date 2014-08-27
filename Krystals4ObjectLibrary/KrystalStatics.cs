@@ -24,11 +24,11 @@ namespace Krystals4ObjectLibrary
             _numberFormat = ci.NumberFormat;
             _dateTimeFormat = ci.DateTimeFormat;
 
-            KrystalsFolder = M.Preferences.LocalKrystalsFolder;
-            ExpansionOperatorsFolder = M.Preferences.LocalExpansionFieldsFolder;
-            ModulationOperatorsFolder = M.Preferences.LocalModulationOperatorsFolder;
+            KrystalsFolder = M.Preferences.LocalMoritzKrystalsFolder;
+            ExpansionOperatorsFolder = M.Preferences.LocalMoritzExpansionFieldsFolder;
+            ModulationOperatorsFolder = M.Preferences.LocalMoritzModulationOperatorsFolder;
             // The Schemas location is a programmer's preference. The user need not bother with it.
-            MoritzXmlSchemasFolder = M.MoritzXMLSchemasFolder;
+            MoritzXmlSchemasFolder = M.OnlineXMLSchemasFolder;
         }
 
 		public static Krystal LoadKrystal(string pathname)

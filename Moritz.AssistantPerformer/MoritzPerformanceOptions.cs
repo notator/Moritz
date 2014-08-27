@@ -401,7 +401,7 @@ namespace Moritz.AssistantPerformer
 
                 w.WriteStartElement("MoritzPerformanceOptions");
                 w.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
-                w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.MoritzXMLSchemasFolder + "/moritzPerformanceOptions.xsd");
+                w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.OnlineXMLSchemasFolder + "/moritzPerformanceOptions.xsd");
 
                 #region voices
                 w.WriteStartElement("voices");

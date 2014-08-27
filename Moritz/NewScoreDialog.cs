@@ -19,7 +19,7 @@ namespace Moritz
             InitializeComponent();
 
             M.PopulateComboBox(AlgorithmComboBox, M.Algorithms);
-            _allScoreNames = M.ScoreNames(M.Preferences.LocalScoresRootFolder);
+            _allScoreNames = M.ScoreNames(M.Preferences.LocalMoritzScoresFolder);
             PopulateExistingScoresListBox();
             ScoreNameTextBox.BackColor = M.TextBoxErrorColor;
             OKButton.Enabled = false;

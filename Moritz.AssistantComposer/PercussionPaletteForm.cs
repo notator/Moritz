@@ -61,7 +61,7 @@ namespace Moritz.AssistantComposer
         private void ConnectAudioButtonsControl(int domain)
         {
             Point location = new Point(this.MinMsDurationsTextBox.Location.X, this.MinMsDurationsTextBox.Location.Y + 27);
-            _audioButtonsControl = new AudioButtonsControl(domain, location, this, _assistantComposerMainForm.RootScoreFolder + @"\audio");
+            _audioButtonsControl = new AudioButtonsControl(domain, location, this, _assistantComposerMainForm.SettingsFolderPath + @"\audio");
             Controls.Add(_audioButtonsControl);
         }
 
@@ -113,7 +113,7 @@ namespace Moritz.AssistantComposer
             Krystal krystal = null;
             try
             {
-                string krystalPath = M.Preferences.LocalKrystalsFolder + @"\" + krystalFileName;
+                string krystalPath = M.Preferences.LocalMoritzKrystalsFolder + @"\" + krystalFileName;
                 krystal = K.LoadKrystal(krystalPath);
             }
             catch(Exception ex)

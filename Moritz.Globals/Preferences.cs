@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Xml;
 using System.IO;
+using System.Text;
 
 using Moritz.Globals.IODevices;
 
@@ -10,23 +11,34 @@ namespace Moritz.Globals
 {
 	public sealed class Preferences : IDisposable
 	{
-        public Preferences(string moritzFolder)
+        public Preferences(StringBuilder localMoritzFolder, StringBuilder localMoritzPreferencesPath, StringBuilder localMoritzKrystalsFolder, 
+            StringBuilder localMoritzExpansionFieldsFolder, StringBuilder localMoritzModulationOperatorsFolder, 
+            StringBuilder localMoritzScoresFolder, StringBuilder onlineMoritzFolder, StringBuilder onlineMoritzAudioFolder,
+            StringBuilder onlineXMLSchemasFolder)
         {
-            _preferencesPath = moritzFolder + @"\Preferences.mzpf";
-            _localAssistantPerformerDevelopmentFolder = @"C:\Dokumente\Visual Studio\Projects\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformer";
+            #region constant files and folders
+            // These values are displayed as reminders in the preferences dialog.
+            LocalMoritzFolder = localMoritzFolder.ToString();
+            LocalMoritzPreferencesPath = localMoritzPreferencesPath.ToString();
+            LocalMoritzKrystalsFolder = localMoritzKrystalsFolder.ToString();
+            LocalMoritzExpansionFieldsFolder = localMoritzExpansionFieldsFolder.ToString();
+            LocalMoritzModulationOperatorsFolder = localMoritzModulationOperatorsFolder.ToString();
+            LocalMoritzScoresFolder = localMoritzScoresFolder.ToString();
+            OnlineMoritzFolder = onlineMoritzFolder.ToString();
+            OnlineMoritzAudioFolder = onlineMoritzAudioFolder.ToString();
+            OnlineXMLSchemasFolder = onlineXMLSchemasFolder.ToString();
+            #endregion
 
             #region read prefs
-            if(!File.Exists(_preferencesPath))
+            if(!File.Exists(LocalMoritzPreferencesPath))
             {
                 string msg = "A preferences file could not be found at\n" +
-                "\t" + _preferencesPath + ".\n\n" +
+                "\t" + LocalMoritzPreferencesPath + ".\n\n" +
                 "A new one has been created with default values.";
 
-                M.CreateDirectoryIfItDoesNotExist(moritzFolder);
+                M.CreateDirectoryIfItDoesNotExist(LocalMoritzFolder);
 
                 // default values.
-                _localUserFolder = moritzFolder;
-                _onlineUserFolder = "";
                 PreferredInputDevice = "";
                 PreferredOutputDevice = "";
 
@@ -35,15 +47,9 @@ namespace Moritz.Globals
   
 			try
 			{
-				using(XmlReader r = XmlReader.Create(_preferencesPath))
+				using(XmlReader r = XmlReader.Create(LocalMoritzPreferencesPath))
 				{
 					M.ReadToXmlElementTag(r, "moritzPreferences"); // check that this is a moritz preferences file
-
-                    M.ReadToXmlElementTag(r, "localUserFolder");
-                    LocalUserFolder = r.ReadElementContentAsString();
-
-                    M.ReadToXmlElementTag(r, "onlineUserFolder");
-                    OnlineUserFolder = r.ReadElementContentAsString();
 
                     M.ReadToXmlElementTag(r, "preferredInputDevice");
                     PreferredInputDevice = r.ReadElementContentAsString();
@@ -131,22 +137,14 @@ namespace Moritz.Globals
 			settings.Indent = true;
 			settings.IndentChars = ("\t");
 			settings.CloseOutput = true;
-			using(XmlWriter w = XmlWriter.Create(_preferencesPath, settings))
+			using(XmlWriter w = XmlWriter.Create(LocalMoritzPreferencesPath, settings))
 			{
 				w.WriteStartDocument();
 				w.WriteComment("file created: " + M.NowString);
 
 				w.WriteStartElement("moritzPreferences");
 				w.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
-				w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.MoritzXMLSchemasFolder + "/moritzPreferences.xsd");
-
-                w.WriteStartElement("localUserFolder");
-                w.WriteString(_localUserFolder);
-                w.WriteEndElement();
-
-                w.WriteStartElement("onlineUserFolder");
-                w.WriteString(_onlineUserFolder);
-                w.WriteEndElement();
+				w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.OnlineXMLSchemasFolder + "/moritzPreferences.xsd");
 
                 w.WriteStartElement("preferredInputDevice");
                 w.WriteString(PreferredInputDevice);
@@ -196,70 +194,19 @@ namespace Moritz.Globals
 
 		#endregion IDisposable pattern
 
-        #region folders and paths
-        public string OnlineUserFolder
-        {
-            set 
-            { 
-                _onlineUserFolder = value;
-                if(!String.IsNullOrEmpty(_onlineUserFolder) && _onlineUserFolder[_onlineUserFolder.Length - 1] == '/')
-                {
-                    _onlineUserFolder = _onlineUserFolder.Remove(_onlineUserFolder.Length - 1);
-                }
-            }
-            get 
-            {
-                if(String.IsNullOrEmpty(_onlineUserFolder))
-                    return "";
-                else
-                    return _onlineUserFolder; 
-            }
-        }
+        #region fixed folders and paths
 
-        public string OnlineUserAudioFolder
-        {
-            get 
-            {
-                if(String.IsNullOrEmpty(_onlineUserFolder))
-                    return "";
-                else
-                    return _onlineUserFolder + @"/audio"; 
-            }
-        }
+        public readonly string LocalMoritzFolder;
+        public readonly string LocalMoritzPreferencesPath;
+        public readonly string LocalMoritzKrystalsFolder;
+        public readonly string LocalMoritzExpansionFieldsFolder;
+        public readonly string LocalMoritzModulationOperatorsFolder;
+        public readonly string LocalMoritzScoresFolder;
+        public readonly string OnlineMoritzFolder;
+        public readonly string OnlineMoritzAudioFolder;
+        public readonly string OnlineXMLSchemasFolder;
 
-        public string LocalUserFolder
-        {
-            set { _localUserFolder = value; }
-            get { return _localUserFolder; }
-        }
-        public string LocalKrystalsFolder
-        {
-            get { return _localUserFolder + @"\krystals\krystals"; }
-        }
-        public string LocalExpansionFieldsFolder
-        {
-            get { return _localUserFolder + @"\krystals\expansion operators"; }
-        }
-        public string LocalModulationOperatorsFolder
-        {
-            get { return _localUserFolder + @"\krystals\modulation operators"; }
-        }
-        public string LocalScoresRootFolder
-        {
-            get { return _localAssistantPerformerDevelopmentFolder + @"\scores"; }
-        }
-
-        public string PreferencesPath
-        {
-            get { return _preferencesPath; }
-        }
-
-        // User files can be put anywhere the user likes (so not readonly).
-        private string _onlineUserFolder;
-        private string _localUserFolder;
-        private string _localAssistantPerformerDevelopmentFolder;
-        private readonly string _preferencesPath;
-        #endregion folders
+        #endregion fixed folders and paths
 
         #region devices
         public string PreferredInputDevice = null;

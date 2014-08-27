@@ -59,16 +59,15 @@ namespace Moritz
                     OutputDeviceComboBox.Items.Add(name);
                 }
 
-                if(M.Preferences.AvailableMultimediaMidiOutputDeviceNames.Contains(M.Preferences.PreferredOutputDevice))
+                OutputDeviceComboBox.SelectedIndex = 0;
+                for(int i = 0; i < OutputDeviceComboBox.Items.Count; i++)
                 {
-                    OutputDeviceComboBox.SelectedItem = M.Preferences.PreferredOutputDevice;
+                    if(OutputDeviceComboBox.Items[i].ToString() == M.Preferences.PreferredOutputDevice)
+                    {
+                        OutputDeviceComboBox.SelectedIndex = i;
+                        break;
+                    }
                 }
-                else
-                {
-                    OutputDeviceComboBox.SelectedIndex = 0;
-                }
-
-                OutputDeviceComboBox.ResumeLayout();
             }
             else
             {
@@ -83,7 +82,7 @@ namespace Moritz
             {
                 using(OpenFileDialog openFileDialog = new OpenFileDialog())
                 {
-                    openFileDialog.InitialDirectory = M.Preferences.LocalScoresRootFolder;
+                    openFileDialog.InitialDirectory = M.Preferences.LocalMoritzScoresFolder;
                     openFileDialog.Filter = "Scores (*.html *.htm *.svg)|*.html;*.htm;*.svg";
                     openFileDialog.Title = "Locate a score";
 
@@ -128,7 +127,7 @@ namespace Moritz
                     algorithmName = (string)dialog.AlgorithmComboBox.SelectedItem;
 
                     string settingsPath =
-                        M.Preferences.LocalScoresRootFolder + @"\" + algorithmName + @"\" +
+                        M.Preferences.LocalMoritzScoresFolder + @"\" + algorithmName + @"\" +
                             scoreName + @" score\" + scoreName + M.MoritzKrystalScoreSettingsExtension;
 
                     SaveDefaultSettings(settingsPath, algorithmName);
@@ -164,7 +163,7 @@ namespace Moritz
 
                 w.WriteStartElement("moritzKrystalScore");
                 w.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
-                w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.MoritzXMLSchemasFolder + "/moritzKrystalScore.xsd");
+                w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.OnlineXMLSchemasFolder + "/moritzKrystalScore.xsd");
 
                 WriteDefaultMetadata(w);
                 WriteDefaultDimensions(w);
@@ -233,7 +232,7 @@ namespace Moritz
         {
             using(OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.InitialDirectory = M.Preferences.LocalScoresRootFolder;
+                openFileDialog.InitialDirectory = M.Preferences.LocalMoritzScoresFolder;
                 string filterString = @"Krystal Score Settings (*" + M.MoritzKrystalScoreSettingsExtension +
                     @")|*" + M.MoritzKrystalScoreSettingsExtension;
                 // "Krystal Score Settings (*.mkss)|*.mkss";
