@@ -339,14 +339,6 @@ namespace Moritz.Score
             w.WriteStartElement("title");
             w.WriteString(title);
             w.WriteEndElement(); // title
-
-            w.WriteStartElement("link");
-            w.WriteAttributeString("href", "http://james-ingram-act-two.de/fontsStyleSheet.css");
-            w.WriteAttributeString("media", "all");
-            w.WriteAttributeString("rel", "stylesheet");
-            w.WriteAttributeString("type", "text/css");
-            w.WriteEndElement(); // link
-
             w.WriteEndElement(); // head
         }
 
