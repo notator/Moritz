@@ -581,7 +581,7 @@ namespace Moritz.Globals
         }
         /// <summary>
         /// Converts a string containing strings separated by whitespace and the character in arg2
-        /// to a list of strings.
+        /// to a list of trimmed strings.
         /// </summary>
         public static List<string> StringToStringList(string s, char separator)
         {

@@ -225,22 +225,35 @@ namespace Moritz.Score
             float stemStrokeWidth = pageFormat.StafflineStemStrokeWidth;
             this.Metrics = new SystemMetrics();
             List<NoteObject> NoteObjectsToRemove = new List<NoteObject>();
-            for(int i = 0; i < Staves.Count; ++i)
+            for(int staffIndex = 0; staffIndex < Staves.Count; ++staffIndex)
             {
-                Staff staff = Staves[i];
-                staff.Metrics = new StaffMetrics(leftMarginPos, pageFormat.RightMarginPos,
-                    pageFormat.Gap * (staff.NumberOfStafflines - 1));
+                Staff staff = Staves[staffIndex];
+                float staffHeight = pageFormat.Gap * (staff.NumberOfStafflines - 1);
+                if(staffIndex >= pageFormat.MidiChannelsPerStaff.Count)
+                {
+                    staffHeight *= pageFormat.InputStavesSizeFactor;
+                }
+                staff.Metrics = new StaffMetrics(leftMarginPos, pageFormat.RightMarginPos, staffHeight);
+
                 for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                 {
                     Voice voice = staff.Voices[voiceIndex];
 
-                    voice.SetChordStemDirectionsAndCreateBeamBlocks(pageFormat.BeamThickness, pageFormat.StafflineStemStrokeWidth, pageFormat.BeamsCrossBarlines);
+                    //voice.SetChordStemDirectionsAndCreateBeamBlocks(pageFormat.BeamThickness, pageFormat.StafflineStemStrokeWidth, pageFormat.BeamsCrossBarlines);
+
+                    voice.SetChordStemDirectionsAndCreateBeamBlocks(pageFormat);
 
                     for(int nIndex = 0; nIndex < staff.Voices[voiceIndex].NoteObjects.Count; nIndex++)
                     {
                         NoteObject noteObject = staff.Voices[voiceIndex].NoteObjects[nIndex];
-
-                        noteObject.Metrics = Score.Notator.SymbolSet.NoteObjectMetrics(graphics, noteObject, voice.StemDirection, pageFormat.Gap, pageFormat.StafflineStemStrokeWidth);
+                        float gap = pageFormat.Gap;
+                        float stafflineStemStrokeWidth = pageFormat.StafflineStemStrokeWidth;
+                        if(staff is InputStaff)
+                        {
+                            gap *= pageFormat.InputStavesSizeFactor;
+                            stafflineStemStrokeWidth *= pageFormat.InputStavesSizeFactor;
+                        }
+                        noteObject.Metrics = Score.Notator.SymbolSet.NoteObjectMetrics(graphics, noteObject, voice.StemDirection, gap, stafflineStemStrokeWidth);
 
                         if(noteObject.Metrics != null)
                             staff.Metrics.Add(noteObject.Metrics);
@@ -260,7 +273,7 @@ namespace Moritz.Score
                     staff.AdjustTwoPartChords();
                 }
 
-                staff.Metrics.Move(0f, pageFormat.DefaultDistanceBetweenStaves * i);
+                staff.Metrics.Move(0f, pageFormat.DefaultDistanceBetweenStaves * staffIndex);
                 this.Metrics.Add(staff.Metrics);
             }
             return (this.Metrics.Bottom - this.Metrics.Top);

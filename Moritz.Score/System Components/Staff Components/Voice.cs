@@ -7,6 +7,26 @@ using Moritz.Score.Midi;
 
 namespace Moritz.Score
 {
+    public class InputVoice : Voice
+    {
+        public InputVoice(InputStaff inputStaff)
+            : base(inputStaff, Byte.MaxValue)
+        {
+        }
+    }
+
+    public class OutputVoice : Voice
+    {
+        public OutputVoice(OutputStaff outputStaff, Voice voice)
+            : base(outputStaff, voice)
+        {
+        }
+
+        public OutputVoice(OutputStaff outputStaff, byte midiChannel)
+            : base(outputStaff, midiChannel)
+        {
+        }
+    }
     /// <summary>
     ///  A sequence of noteObjects.
     /// </summary>
@@ -34,7 +54,10 @@ namespace Moritz.Score
         {
             w.SvgStartGroup("voice" + SvgScore.UniqueID_Number);
             w.WriteAttributeString("score", "object", null, "voice");
-            w.WriteAttributeString("score", "midiChannel", null, MidiChannel.ToString());
+            if(this is OutputVoice)
+            {
+                w.WriteAttributeString("score", "midiChannel", null, MidiChannel.ToString());
+            }
 
             foreach(NoteObject noteObject in NoteObjects)
             {
@@ -156,7 +179,7 @@ namespace Moritz.Score
         /// If a barline intervenes, and beamsCrossBarlines is true, the chords are beamed together.
         /// If a barline intervenes, and beamsCrossBarlines is false, the beam is broken.
         /// </summary>
-        public void SetChordStemDirectionsAndCreateBeamBlocks(float beamThickness, float beamStrokeThickness, bool beamsCrossBarlines)
+        public void SetChordStemDirectionsAndCreateBeamBlocks(PageFormat pageFormat)
         {
             List<ChordSymbol> chordsBeamedTogether = new List<ChordSymbol>();
             ClefSymbol currentClef = null;
@@ -214,7 +237,7 @@ namespace Moritz.Score
                     if(clef != null)
                         breakGroup = true;
 
-                    if(barline != null && !beamsCrossBarlines)
+                    if(barline != null && !pageFormat.BeamsCrossBarlines)
                         breakGroup = true;
 
                     if(chord == lastChord)
@@ -235,6 +258,13 @@ namespace Moritz.Score
                         }
                         else if(chordsBeamedTogether.Count > 1)
                         {
+                            float beamThickness = pageFormat.BeamThickness;
+                            float beamStrokeThickness = pageFormat.BarlineStrokeWidth;
+                            if(this is InputVoice)
+                            {
+                                beamThickness *= pageFormat.InputStavesSizeFactor;
+                                beamStrokeThickness *= pageFormat.InputStavesSizeFactor;
+                            }
                             chordsBeamedTogether[0].BeamBlock =
                                 new BeamBlock(currentClef, chordsBeamedTogether, this.StemDirection, beamThickness, beamStrokeThickness);
                         }

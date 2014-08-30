@@ -80,7 +80,7 @@ namespace Moritz.AssistantComposer
             int msPosition = 0;
             for(int barIndex = 0; barIndex < dcValuesPerTopStaffBar.Count; barIndex++)
             {
-                Voice voice = new Voice(null, this.MidiChannels()[0]);
+                Voice voice = new OutputVoice(null, this.MidiChannels()[0]);
                 List<int> sequence = dcValuesPerTopStaffBar[barIndex];
                 WriteDurationSymbolsForStrandInTopStaff(voice, barIndex, sequence, ref msPosition);
                 consecutiveBars.Add(voice);
@@ -115,7 +115,7 @@ namespace Moritz.AssistantComposer
             for(int barIndex = 0; barIndex < strandValuesList.Count; barIndex++)
             {
                 Voice topStaffVoice =  topStaffBars[barIndex];
-                Voice newVoice = new Voice(null, MidiChannels()[staffNumber - 1]);
+                Voice newVoice = new OutputVoice(null, MidiChannels()[staffNumber - 1]);
                 int currentMsPosition = topStaffVoice.UniqueMidiDurationDefs[0].MsPosition;
 
                 List<int> lowerStaffValueSequence = strandValuesList[barIndex];

@@ -144,13 +144,13 @@ namespace Moritz.Score.Notation
             return returnMetrics;
         }
 
-        public override NoteObject GetNoteObject(Voice voice, IUniqueMidiDurationDef iumdd, bool firstLmddInVoice,
-            ref byte currentVelocity)
+        public override NoteObject GetNoteObject(Voice voice, IUniqueMidiDurationDef iumdd, bool firstLmddInVoice, ref byte currentVelocity,
+            float musicFontHeight)
         {
             DurationSymbol durationSymbol = null;
             UniqueMidiChordDef uniqueMidiChordDef = iumdd as UniqueMidiChordDef;
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
-            float musicFontHeight = pageFormat.MusicFontHeight;
+
             int minimumCrotchetDuration = pageFormat.MinimumCrotchetDuration;
 
             if(uniqueMidiChordDef != null)

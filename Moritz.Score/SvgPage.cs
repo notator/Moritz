@@ -51,27 +51,60 @@ namespace Moritz.Score
                                     _score.Systems.Add(currentSystem);
                                     break;
                                 case "staff":
-                                    currentStaff = GetStaff(r, currentSystem,
-                                            attributesDict["score:staffName"],attributesDict["score:stafflines"],attributesDict["score:gap"]);
+                                    if(attributesDict.ContainsKey("score:isInput"))
+                                    {
+                                        currentStaff = GetStaff(currentSystem, attributesDict["score:staffName"],
+                                            attributesDict["score:stafflines"], attributesDict["score:gap"], attributesDict["score:isInput"]);
+                                    }
+                                    else
+                                    {
+                                        currentStaff = GetStaff(currentSystem, attributesDict["score:staffName"],
+                                            attributesDict["score:stafflines"], attributesDict["score:gap"], "0");
+                                    }
                                     break;
                                 case "voice":
-                                    currentVoice = GetVoice(r, currentStaff, attributesDict["score:midiChannel"]);
-                                    //currentVoice = new Voice(currentStaff);
+                                    if(currentStaff is OutputStaff)
+                                    {
+                                        // creates an OutputVoice
+                                        currentVoice = GetVoice(r, currentStaff, attributesDict["score:midiChannel"]);
+                                    }
+                                    else
+                                    {
+                                        // creates an InputVoice
+                                        currentVoice = GetVoice(r, currentStaff, ""); 
+                                    }
+                                    //currentVoice = new OutputVoice(currentStaff);
                                     //currentStaff.Voices.Add(currentVoice);
                                     break;
                                 case "chord":
                                     id = attributesDict["id"];
-                                    msDuration = int.Parse(attributesDict["score:msDuration"]);
-                                    MidiChordDef midiChordDef = GetNewMidiChordDef(r, id, msDuration);
-                                    currentVoice.UniqueMidiDurationDefs.Add(midiChordDef.CreateUniqueMidiDurationDef());
-                                    // msPositions are set later
+                                    if(currentVoice is OutputVoice)
+                                    {
+                                        msDuration = int.Parse(attributesDict["score:msDuration"]);
+                                        MidiChordDef midiChordDef = GetNewMidiChordDef(r, id, msDuration);
+                                        currentVoice.UniqueMidiDurationDefs.Add(midiChordDef.CreateUniqueMidiDurationDef());
+                                        // msPositions are set later
+                                    }
+                                    else
+                                    {
+                                        //InputChordDef inputChordDef = new InputChordDef(id, ...);
+                                        //currentvoice.InputChordDefs.Add(inputChordDef);
+                                    }
                                     break;
                                 case "rest":
                                     id = attributesDict["id"];
-                                    msDuration = int.Parse(attributesDict["score:msDuration"]);
-                                    MidiRestDef midiRestDef = new MidiRestDef(id, msDuration);
-                                    currentVoice.UniqueMidiDurationDefs.Add(midiRestDef.CreateUniqueMidiDurationDef());
-                                    // msPositions are set later
+                                    if(currentVoice is OutputVoice)
+                                    {                                        
+                                        msDuration = int.Parse(attributesDict["score:msDuration"]);
+                                        MidiRestDef midiRestDef = new MidiRestDef(id, msDuration);
+                                        currentVoice.UniqueMidiDurationDefs.Add(midiRestDef.CreateUniqueMidiDurationDef());
+                                        // msPositions are set later
+                                    }
+                                    else
+                                    {
+                                        //InputRestDef inputRestDef = new InputRestDef(id, ...);
+                                        //currentvoice.InputRestDefs.Add(inputRestDef);
+                                    }
                                 break;
                             }
                         }
@@ -89,16 +122,32 @@ namespace Moritz.Score
             return midiChordDef;
         }
 
-        private Staff GetStaff(XmlReader r, SvgSystem system, string staffName, string stafflines, string gap)
+        private Staff GetStaff(SvgSystem system, string staffName, string stafflines, string gap, string isInput)
         {
-            Staff newStaff = new Staff(system, staffName, int.Parse(stafflines), float.Parse(gap, M.En_USNumberFormat));
+            Staff newStaff;
+            if(!String.IsNullOrEmpty(isInput) && isInput == "1")
+            {
+                newStaff = new InputStaff(system, staffName, int.Parse(stafflines), float.Parse(gap, M.En_USNumberFormat));
+            }
+            else
+            {
+                newStaff = new OutputStaff(system, staffName, int.Parse(stafflines), float.Parse(gap, M.En_USNumberFormat));
+            }
             system.Staves.Add(newStaff);
             return newStaff;
         }
 
         private Voice GetVoice(XmlReader r, Staff staff, string midiChannel)
         {
-            Voice newVoice = new Voice(staff, byte.Parse(midiChannel));
+            Voice newVoice;
+            if(string.IsNullOrEmpty(midiChannel))
+            {
+                newVoice = new InputVoice((InputStaff)staff);
+            }
+            else
+            {
+                newVoice = new OutputVoice((OutputStaff)staff, byte.Parse(midiChannel));
+            }
             staff.Voices.Add(newVoice);
             return newVoice;
         }

@@ -39,7 +39,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         public override List<List<Voice>> DoAlgorithm()
         {
-            Voice voice = new Voice(null, 0);
+            Voice voice = new OutputVoice(null, 0);
             int msPosition = 0;
             foreach(MidiDurationDef midiDurationDef in _paletteDefs[0])
             {

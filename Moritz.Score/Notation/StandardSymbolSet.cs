@@ -298,7 +298,7 @@ namespace Moritz.Score.Notation
         }
 
         public override NoteObject GetNoteObject(Voice voice, IUniqueMidiDurationDef iumdd, bool firstLmddInVoice,
-            ref byte currentVelocity)
+            ref byte currentVelocity, float musicFontHeight)
         {
             NoteObject noteObject = null;
             UniqueCautionaryChordDef lccd = iumdd as UniqueCautionaryChordDef;
@@ -307,7 +307,6 @@ namespace Moritz.Score.Notation
             UniqueClefChangeDef uniqueClefChangeDef = iumdd as UniqueClefChangeDef;
 
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
-            float musicFontHeight = pageFormat.MusicFontHeight;
             float cautionaryFontHeight = pageFormat.CautionaryNoteheadsFontHeight;
             int minimumCrotchetDuration = pageFormat.MinimumCrotchetDuration;
  

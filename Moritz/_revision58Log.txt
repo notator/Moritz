@@ -538,7 +538,7 @@ TODO:
 
 06.01.2012 rev58.126a-g
 Added the following fields to AssistantComposerMainForm.
-		MidiChannelsPerVoicePerStaff
+		MidiChannelsPerStaff
 		StafflinesPerStaff
 		ClefsPerStaff,
 		StaffGroups
@@ -547,15 +547,15 @@ Added the following fields to AssistantComposerMainForm.
 		ShortStaffnamesPerStaff
 When loading this form, it gets the available midi channels and the number of bars in the score from the score's 
 algorithm (error if no algorithm).
-The midi channels are displayed in the MidiChannelsPerVoicePerStaffHelpLabel. The number of bars is displayed in
+The midi channels are displayed in the MidiChannelsPerStaffHelpLabel. The number of bars is displayed in
 theSystemStartBarsHelpLabel. 
-An extended help text for MidiChannelsPerVoicePerStaff can be displayed by right-clicking its second HelpLabel.
-MidiChannelsPerVoicePerStaffTextBox_Leave() sets the number of staves in the HelpTexts of the input fields
+An extended help text for MidiChannelsPerStaff can be displayed by right-clicking its second HelpLabel.
+MidiChannelsPerStaffTextBox_Leave() sets the number of staves in the HelpTexts of the input fields
 which depend on that value.
 Removed the static ScoreXXInfo classes by adding an abstract List<NotatorInfo> field to MidiCompositionAlgorithm.
 New .mkss Schema.
 Loading and Saving .mkss files implemented. All demo score settings are loading/saving correctly.
-2-Voice staves can now be entered in the MidiChannelsPerVoicePerStaffTextBox, but they display a "not implemented"
+2-Voice staves can now be entered in the MidiChannelsPerStaffTextBox, but they display a "not implemented"
 warning and are treated as an error when exiting the field.
 Deleted the NotatorInfo class.
 The NotatorComboBox has been renamed ScoreComboBox. It has simple string items, which are the names

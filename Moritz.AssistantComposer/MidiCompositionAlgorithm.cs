@@ -66,6 +66,14 @@ namespace Moritz.AssistantComposer
         /// </summary>
         /// <returns></returns>
         public abstract int NumberOfBars();
+        /// <summary>
+        /// Returns the number of inputVoices created by the algorithm.
+        /// </summary>
+        /// <returns></returns>
+        public virtual int NumberOfInputVoices()
+        {
+            return 0;
+        }
 
         /// <summary>
         /// Returns the position of the end of the last UniqueMidiDurationDef
@@ -102,14 +110,25 @@ namespace Moritz.AssistantComposer
             int originalBarEndPos =
                 originalBar[0].UniqueMidiDurationDefs[originalBar[0].UniqueMidiDurationDefs.Count - 1].MsPosition +
                 originalBar[0].UniqueMidiDurationDefs[originalBar[0].UniqueMidiDurationDefs.Count - 1].MsDuration;
-           
 
+            Voice firstBarVoice;
+            Voice secondBarVoice;
             foreach(Voice voice in originalBar)
             {
-                Voice firstBarVoice = new Voice(voice.Staff, voice.MidiChannel);
-                firstBar.Add(firstBarVoice);
-                Voice secondBarVoice = new Voice(voice.Staff, voice.MidiChannel);
-                secondBar.Add(secondBarVoice);
+                if(voice is OutputVoice)
+                {
+                    firstBarVoice = new OutputVoice((OutputStaff)voice.Staff, voice.MidiChannel);
+                    firstBar.Add(firstBarVoice);
+                    secondBarVoice = new OutputVoice((OutputStaff)voice.Staff, voice.MidiChannel);
+                    secondBar.Add(secondBarVoice);
+                }
+                else
+                {
+                    firstBarVoice = new InputVoice((InputStaff)voice.Staff);
+                    firstBar.Add(firstBarVoice);
+                    secondBarVoice = new InputVoice((InputStaff)voice.Staff);
+                    secondBar.Add(secondBarVoice);
+                }
                 foreach(IUniqueMidiDurationDef iumdd in voice.UniqueMidiDurationDefs)
                 {
                     int lmddMsDuration = (iumdd.MsDurationToNextBarline == null) ? iumdd.MsDuration : (int)iumdd.MsDurationToNextBarline;

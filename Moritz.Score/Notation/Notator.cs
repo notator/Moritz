@@ -37,48 +37,68 @@ namespace Moritz.Score.Notation
         {             
             foreach(List<Voice> systemVoices in voicesPerSystemPerBar)
             {
+                int midiVoice_StaffIndex = 0;
+                int inputVoice_StaffIndex = 0;
+                int nOutputVoices = 0;
                 SvgSystem system = new SvgSystem(svgScore);
                 svgScore.Systems.Add(system);
-
-                for(int i = 0; i < _pageFormat.StafflinesPerStaff.Count; i++)
+                for(int staffIndex = 0; staffIndex < _pageFormat.StafflinesPerStaff.Count; staffIndex++)
                 {
                     string staffname = null;
                     if(svgScore.Systems.Count == 1)
                     {
-                        staffname = _pageFormat.LongStaffNames[i];
+                        staffname = _pageFormat.LongStaffNames[staffIndex];
                     }
                     else
                     {
-                        staffname = _pageFormat.ShortStaffNames[i];                        
+                        staffname = _pageFormat.ShortStaffNames[staffIndex];                        
                     }
-                    Staff staff = new Staff(system, staffname, _pageFormat.StafflinesPerStaff[i], gap);
+                    Staff staff;
+                    if(staffIndex >= _pageFormat.MidiChannelsPerStaff.Count)
+                    {
+                        staff = new InputStaff(system, staffname, _pageFormat.StafflinesPerStaff[staffIndex], gap * _pageFormat.InputStavesSizeFactor);
+                        
+                        List<byte> inputVoiceIndices = _pageFormat.InputVoiceIndicesPerStaff[inputVoice_StaffIndex];
+                        for(int i = 0; i < inputVoiceIndices.Count; ++i)
+                        {
+                            int systemVoiceIndex = nOutputVoices + inputVoiceIndices[i];
+                            staff.Voices.Add(systemVoices[systemVoiceIndex]);
+                            systemVoices[systemVoiceIndex].Staff = staff;
+                        }
+                        inputVoice_StaffIndex++;
+                        SetStemDirections(staff);
+                    }
+                    else
+                    {
+                        staff = new OutputStaff(system, staffname, _pageFormat.StafflinesPerStaff[staffIndex], gap);
+
+                        List<byte> midiChannels = _pageFormat.MidiChannelsPerStaff[midiVoice_StaffIndex];
+                        for(int i = 0; i < midiChannels.Count; ++i)
+                        {
+                            int systemVoiceIndex = midiChannels[i];
+                            staff.Voices.Add(systemVoices[systemVoiceIndex]);
+                            systemVoices[systemVoiceIndex].Staff = staff;
+                            nOutputVoices++;
+                        }
+                        midiVoice_StaffIndex++;
+                        SetStemDirections(staff);
+                    }
                     system.Staves.Add(staff);
                 }
+            }
+        }
 
-
-                for(int staffIndex = 0; staffIndex < system.Staves.Count; ++staffIndex)
-                {
-                    List<byte> midiChannels = _pageFormat.MidiChannelsPerVoicePerStaff[staffIndex];
-                    for(int mIndex = 0; mIndex < midiChannels.Count; ++mIndex )
-                    {
-                        foreach(Voice voice in systemVoices)
-                        {
-                            if(voice.MidiChannel == midiChannels[mIndex])
-                            {
-                                Debug.Assert(voice.Staff == null);
-                                voice.Staff = system.Staves[staffIndex];
-                                if(midiChannels.Count == 1)
-                                    voice.StemDirection = VerticalDir.none;
-                                else if(mIndex == 0)
-                                    voice.StemDirection = VerticalDir.up;
-                                else
-                                    voice.StemDirection = VerticalDir.down;
-                                system.Staves[staffIndex].Voices.Add(voice);
-                                break;
-                            }
-                        }
-                    }
-                }
+        private void SetStemDirections(Staff staff)
+        {
+            if(staff.Voices.Count == 1)
+            {
+                staff.Voices[0].StemDirection = VerticalDir.none;
+            }
+            else
+            {
+                Debug.Assert(staff.Voices.Count == 2);
+                staff.Voices[0].StemDirection = VerticalDir.up;
+                staff.Voices[1].StemDirection = VerticalDir.down;
             }
         }
 
@@ -100,13 +120,19 @@ namespace Moritz.Score.Notation
                     for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                     {
                         Debug.Assert(_pageFormat.ClefsList[staffIndex] != null);
-                        Voice voice = staff.Voices[voiceIndex];
-                        voice.NoteObjects.Add(new ClefSymbol(voice, _pageFormat.ClefsList[staffIndex], _pageFormat.MusicFontHeight));
+                        Voice voice = staff.Voices[voiceIndex];                        
+                        float musicFontHeight = (voice is OutputVoice) ? _pageFormat.MusicFontHeight : _pageFormat.MusicFontHeight * _pageFormat.InputStavesSizeFactor;
+                        voice.NoteObjects.Add(new ClefSymbol(voice, _pageFormat.ClefsList[staffIndex], musicFontHeight));
                         bool firstLmdd = true;
+
+                        // change voice.UniqueMidiDurationDefs to a new list voice.NoteObjectDefs.
+                        // continue to add existing UniqueMidiChordDefs anda UniqueMidiRestDef to this list.
+                        // A NoteObjectDef is either a IUniqueMidiDurationDef (a UniqueMidiChordDef or a UniqueMidiRestDef) or
+                        // a  
                         foreach(IUniqueMidiDurationDef iumdd in voice.UniqueMidiDurationDefs)
                         {
                             NoteObject noteObject =
-                                SymbolSet.GetNoteObject(voice, iumdd, firstLmdd, ref currentChannelVelocities[staffIndex]);
+                                SymbolSet.GetNoteObject(voice, iumdd, firstLmdd, ref currentChannelVelocities[staffIndex], musicFontHeight);
 
                             ClefChangeSymbol clefChangeSymbol = noteObject as ClefChangeSymbol;
                             if(clefChangeSymbol != null)

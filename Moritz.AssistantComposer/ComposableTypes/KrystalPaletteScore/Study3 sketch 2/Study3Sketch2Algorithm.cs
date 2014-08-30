@@ -11,13 +11,13 @@ namespace Moritz.AssistantComposer
     /// Algorithm for testing Song 6's palettes.
     /// This may develope as composition progresses...
     /// </summary>
-    public class Study3Sketch1Algorithm : MidiCompositionAlgorithm
+    public class Study3Sketch2Algorithm : MidiCompositionAlgorithm
     {
         /// <summary>
         /// This constructor can be called with both parameters null,
         /// just to get the overridden properties.
         /// </summary>
-        public Study3Sketch1Algorithm(List<Krystal> krystals, List<PaletteDef> paletteDefs)
+        public Study3Sketch2Algorithm(List<Krystal> krystals, List<PaletteDef> paletteDefs)
             : base(krystals, paletteDefs)
         {
         }
@@ -69,6 +69,15 @@ namespace Moritz.AssistantComposer
             return 5;
         }
 
+        /// <summary>
+        /// The number of inputVoices produced by DoAlgorithm().
+        /// </summary>
+        /// <returns></returns>
+        public override int NumberOfInputVoices()
+        {
+            return 1;
+        }
+
         #region CreateBar1()
         List<Voice> CreateBar1()
         {
@@ -77,15 +86,19 @@ namespace Moritz.AssistantComposer
             byte channel = 0;
             foreach(PaletteDef midiDurationDefs in _paletteDefs)
             {
-                Voice voice = new OutputVoice(null, channel);
-                bar.Add(voice);
-                WriteVoiceMidiDurationDefs1(voice, midiDurationDefs);
+                OutputVoice outputVoice = new OutputVoice(null, channel);
+                bar.Add(outputVoice);
+                WriteVoiceMidiDurationDefs1(outputVoice, midiDurationDefs);
                 ++channel;
             }
+
+            InputVoice inputVoice = new InputVoice(null);
+            bar.Add(inputVoice);
+
             return bar;
         }
 
-        private void WriteVoiceMidiDurationDefs1(Voice voice, PaletteDef midiDurationDefs)
+        private void WriteVoiceMidiDurationDefs1(OutputVoice outputVoice, PaletteDef midiDurationDefs)
         {
             int msPosition = 0;
             int bar1ChordMsSeparation = 1500;
@@ -96,8 +109,8 @@ namespace Moritz.AssistantComposer
                 noteDef.MsPosition = msPosition;
                 IUniqueMidiDurationDef restDef = new UniqueMidiRestDef(msPosition + noteDef.MsDuration, bar1ChordMsSeparation - noteDef.MsDuration);
                 msPosition += bar1ChordMsSeparation;
-                voice.UniqueMidiDurationDefs.Add(noteDef);
-                voice.UniqueMidiDurationDefs.Add(restDef);
+                outputVoice.UniqueMidiDurationDefs.Add(noteDef);
+                outputVoice.UniqueMidiDurationDefs.Add(restDef);
             }
         }
         #endregion CreateBar1()
@@ -120,6 +133,7 @@ namespace Moritz.AssistantComposer
                 voiceDefs.Add(voiceDef);
                 ++channel;
             }
+
             int msPosition = bar2StartMsPos;
             int maxBarMsPos = 0;
             for(int i = 0; i < voiceDefs.Count; ++i)
@@ -139,6 +153,10 @@ namespace Moritz.AssistantComposer
                     bar[i].UniqueMidiDurationDefs.Add(rest2Def);
                 }
             }
+
+            InputVoice inputVoice = new InputVoice(null);
+            bar.Add(inputVoice);
+
             return bar;
         }
 

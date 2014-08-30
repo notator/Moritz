@@ -89,7 +89,8 @@ namespace Moritz.Score
         /// The view box pixel distance between systems when they are not vertically justified.
         /// </summary>
         public float DefaultDistanceBetweenSystems;
-        public List<List<byte>> MidiChannelsPerVoicePerStaff = null;
+        public List<List<byte>> MidiChannelsPerStaff = null;
+        public List<List<byte>> InputVoiceIndicesPerStaff = null;        
         public List<string> ClefsList = null;
         public List<int> StafflinesPerStaff = null;
         public List<int> StaffGroups = null;
@@ -104,6 +105,7 @@ namespace Moritz.Score
         /// </summary>
         public float MusicFontHeight { get { return (Gap * 4) * 0.98F; } }
         public float CautionaryNoteheadsFontHeight { get { return MusicFontHeight * 0.8F; } }
+        public float InputStavesSizeFactor { get { return 1.5F; } }
         public float BarlineStrokeWidth { get { return StafflineStemStrokeWidth * 2F; } }
         public float NoteheadExtenderStrokeWidth { get { return StafflineStemStrokeWidth * 3.4F; } }
         public float BeamThickness { get { return Gap * 0.4F; } }

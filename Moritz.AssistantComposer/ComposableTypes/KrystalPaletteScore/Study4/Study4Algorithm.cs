@@ -558,7 +558,7 @@ namespace Moritz.AssistantComposer
 
             foreach(VoiceDef voiceDef in voiceDefs)
             {
-                Voice voice = new Voice(null, channelIndex++);
+                Voice voice = new OutputVoice(null, channelIndex++);
                 voice.UniqueMidiDurationDefs = voiceDef.UniqueMidiDurationDefs;
                 voices.Add(voice);
             }

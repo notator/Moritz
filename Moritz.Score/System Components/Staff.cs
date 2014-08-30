@@ -7,6 +7,22 @@ using Moritz.Score.Notation;
 
 namespace Moritz.Score
 {
+    public class InputStaff : Staff
+    {
+        public InputStaff(SvgSystem svgSystem, string staffName, int numberOfStafflines, float gap)
+            : base(svgSystem, staffName, numberOfStafflines, gap)
+        {
+        }
+    }
+
+    public class OutputStaff : Staff
+    {
+        public OutputStaff(SvgSystem svgSystem, string staffName, int numberOfStafflines, float gap)
+            : base(svgSystem, staffName, numberOfStafflines, gap)
+        {
+        }
+    }
+
     public class Staff
     {
         public Staff(SvgSystem svgSystem, string staffName, int numberOfStafflines, float gap)
@@ -24,10 +40,17 @@ namespace Moritz.Score
         /// </summary>
         public void WriteSVG(SvgWriter w, int pageNumber, int systemNumber, int staffNumber, PageFormat pageFormat)
         {
+            float stafflineStemStrokeWidth = pageFormat.StafflineStemStrokeWidth;
+
             w.SvgStartGroup("p" + pageNumber.ToString() + "_sys" + systemNumber.ToString() + "_staff" + staffNumber.ToString());
             w.WriteAttributeString("score", "object", null, "staff");
             w.WriteAttributeString("score", "staffName", null, this.Staffname);
             w.WriteAttributeString("score", "stafflines", null, this.NumberOfStafflines.ToString());
+            if(this is InputStaff)
+            {
+                w.WriteAttributeString("score", "isInput", null, "1");
+                stafflineStemStrokeWidth *= pageFormat.InputStavesSizeFactor;
+            }
             w.WriteAttributeString("score", "gap", null, this.Gap.ToString(M.En_USNumberFormat));
 
             w.SvgStartGroup("stafflines" + SvgScore.UniqueID_Number);
@@ -36,9 +59,9 @@ namespace Moritz.Score
             {
                 w.SvgLine(null, this.Metrics.StafflinesLeft, stafflineY,
                     pageFormat.RightMarginPos, stafflineY,
-                    "black", pageFormat.StafflineStemStrokeWidth, null, null);
+                    "black", stafflineStemStrokeWidth, null, null);
                 if(staffLineIndex < (NumberOfStafflines - 1))
-                    stafflineY += pageFormat.Gap;
+                    stafflineY += Gap;
             }
             w.SvgEndGroup();
 
