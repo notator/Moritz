@@ -259,7 +259,7 @@ namespace Moritz.Score
                         else if(chordsBeamedTogether.Count > 1)
                         {
                             float beamThickness = pageFormat.BeamThickness;
-                            float beamStrokeThickness = pageFormat.BarlineStrokeWidth;
+                            float beamStrokeThickness = pageFormat.StafflineStemStrokeWidth;
                             if(this is InputVoice)
                             {
                                 beamThickness *= pageFormat.InputStavesSizeFactor;
