@@ -108,7 +108,7 @@ namespace Moritz.Score
         public float InputStavesSizeFactor { get { return 1.5F; } }
         public float BarlineStrokeWidth { get { return StafflineStemStrokeWidth * 2F; } }
         public float NoteheadExtenderStrokeWidth { get { return StafflineStemStrokeWidth * 3.4F; } }
-        public float BeamThickness { get { return Gap * 0.4F; } }
+        public float BeamThickness { get { return Gap * 0.42F; } }
         #endregion
 
     }
