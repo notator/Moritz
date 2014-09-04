@@ -60,22 +60,8 @@ namespace Moritz.AssistantComposer
                 List<DurationDef> midiDurationDefs = new List<DurationDef>();
                 for(int valueIndex = 0; valueIndex < palette.Domain; ++valueIndex)
                 {
-                    DurationDef mdd;
-                    if(palette.BasicChordSettings.ChordDensities[valueIndex] == 0)
-                    {
-                        int msDuration = palette.BasicChordSettings.Durations[valueIndex];
-                        /// A RestDef is a definition retrieved from a palette.
-                        /// RestDefs are immutable, and have no MsPosition property.
-                        /// UniqueRestDefs are mutable RestDefs with both MsPositon and MsDuration properties.
-                        mdd = new RestDef(msDuration);
-                    }
-                    else
-                    {
-                        /// A MidiChordDef is a ChordDef which is retrieved from a palette.
-                        /// MidiChordDefs are immutable, and their MsPosition property is null.
-                        /// LocalMidiChordDefs are UniqueMidiChordDefs with MsPositon and MsDuration attributes.
-                        mdd = new MidiChordDef(palette, valueIndex);
-                    }
+                    DurationDef mdd = palette.GetUniqueDurationDef(valueIndex);
+                    
                     midiDurationDefs.Add(mdd);
                 }
                 paletteDefs.Add(new PaletteDef(midiDurationDefs));

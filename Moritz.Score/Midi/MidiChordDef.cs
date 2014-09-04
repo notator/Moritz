@@ -4,154 +4,54 @@ using System.Xml;
 using System.Diagnostics;
 
 using Moritz.Globals;
+using Moritz.Score.Notation;
 
 namespace Moritz.Score.Midi
 {
-    public class MidiChordDef : MidiDurationDef
+    public class MidiChordDef : DurationDef
     {
         /// <summary>
         /// Constructor used while constructing derived types.
         /// The derived types are responsible for initializing all the fields correctly.
         /// </summary>
         public MidiChordDef()
-            : base()
+            : base(0)
         {
         }
 
-        #region Constructors used when reading an SVG file
         /// <summary>
-        /// Contains values retrieved from an SVG file score:midiChord element
-        /// Note that MidiChordDefs do not have msPosition and msDuration attributes.
-        /// These attributes are provided by embedding a clone of the MidiChordDef in a LocalMidiChordDef.
+        /// Constructor used when retrieving a MidiChordDef from a palette.
+        /// (Lyric is set to null)
         /// </summary>
-        public MidiChordDef(XmlReader r, string localID, Dictionary<string, MidiDurationDef> scoreMidiDurationDefs, int msDuration)
-            : base(msDuration)
+        public MidiChordDef(
+            byte? bank,
+            byte? patch,
+            byte? volume,
+            bool repeat,
+            byte? pitchWheelDeviation,
+            bool hasChordOff,
+            int minimumBasicMidiChordMsDuration,
+            List<byte> midiPitches,
+            byte midiVelocity,
+            int ornamentNumberSymbol,
+            MidiChordSliderDefs midiChordSliderDefs,
+            List<BasicMidiChordDef> basicMidiChordDefs)
+            : base(0)
         {
-            // The reader is at the beginning of a "score:midiChord" element having an ID attribute
-            Debug.Assert(r.Name == "score:midiChord" && r.IsStartElement() && r.AttributeCount > 0);
-            int nAttributes = r.AttributeCount;
-            for(int i = 0; i < nAttributes; i++)
-            {
-                r.MoveToAttribute(i);
-                switch(r.Name)
-                {
-                    case "id":
-                        if(localID != null)
-                            ID = localID; // this is the local id in the score
-                        else
-                            ID = r.Value; // this is the id in the palleteDefs
-                        break;
-                    case "repeat":
-                        // repeat is false if this attribute is not present
-                        byte rmVal = byte.Parse(r.Value);
-                        if(rmVal == 0)
-                            _repeat = false;
-                        else
-                            _repeat = true;
-                        break;
-                    case "hasChordOff":
-                        // hasChordOff is true if this attribute is not present
-                        byte hcoVal = byte.Parse(r.Value);
-                        if(hcoVal == 0)
-                            _hasChordOff = false;
-                        else
-                            _hasChordOff = true;
-                        break;
-                    case "bank":
-                        _bank = byte.Parse(r.Value);
-                        break;
-                    case "patch":
-                        _patch = byte.Parse(r.Value);
-                        break;
-                    case "volume":
-                        _volume = byte.Parse(r.Value);
-                        break;
-                    case "pitchWheelDeviation":
-                        _pitchWheelDeviation = byte.Parse(r.Value);
-                        break;
-                    case "minBasicChordMsDuration":
-                        this._minimumBasicMidiChordMsDuration = int.Parse(r.Value);
-                        break;
-                }
-            }
-
-            M.ReadToXmlElementTag(r, "score:basicChords", "score:sliders", "use");
-            while(r.Name == "use" || r.Name == "score:basicChords" || r.Name == "score:sliders")
-            {
-                if(r.IsStartElement())
-                {
-                    switch(r.Name)
-                    {
-                        case "use":
-                            r.MoveToAttribute(0);
-                            Debug.Assert(r.Name == "xlink:href");
-                            string midiChordDefID = r.Value.Remove(0, 1);
-                            SetFromMidiChordDefs(scoreMidiDurationDefs, midiChordDefID);
-                            //midiChordDef = new MidiChordDef(this._score.MidiChordDefs[midiChordDefID], msDuration);
-                            break;
-                        case "score:basicChords":
-                            GetBasicChordDefs(r);
-                            break;
-                        case "score:sliders":
-                            MidiChordSliderDefs = new MidiChordSliderDefs(r);
-                            break;
-                    }
-
-                    M.ReadToXmlElementTag(r, "use", "score:basicChords", "score:sliders", "score:midiChord");
-                }
-            }
-            //bool isStartElement = r.IsStartElement();
-            //Debug.Assert(r.Name == "score.midiChord" && !(isStartElement));
+            _bank = bank;
+            _patch = patch;
+            _volume = volume;
+            _repeat = repeat;
+            _pitchWheelDeviation = pitchWheelDeviation;
+            _hasChordOff = hasChordOff;
+            _minimumBasicMidiChordMsDuration = minimumBasicMidiChordMsDuration;
+            _midiPitches = midiPitches;
+            _midiVelocity = midiVelocity;
+            _ornamentNumberSymbol = ornamentNumberSymbol;
+            _lyric = null;
+            midiChordSliderDefs = MidiChordSliderDefs;
+            basicMidiChordDefs = BasicMidiChordDefs;
         }
-
-        private void GetBasicChordDefs(XmlReader r)
-        {
-            // The reader is at the beginning of a "basicChords" element
-            Debug.Assert(r.Name == "score:basicChords" && r.IsStartElement());
-            M.ReadToXmlElementTag(r, "score:basicChord");
-            while(r.Name == "score:basicChord")
-            {
-                if(r.IsStartElement())
-                {
-                    BasicMidiChordDefs.Add(new BasicMidiChordDef(r));
-                }
-                M.ReadToXmlElementTag(r, "score:basicChord", "score:basicChords");
-            }
-        }
-
-        private void SetFromMidiChordDefs(Dictionary<string, MidiDurationDef> scoreMidiDurationDefs, string midiChordDefID)
-        {
-            MidiDurationDef originalMdd = scoreMidiDurationDefs[midiChordDefID];
-            MidiChordDef original = originalMdd as MidiChordDef;
-            Debug.Assert(original != null);
-
-            this._bank = original.Bank;
-            this._patch = original.Patch;
-            this._volume = original.Volume;
-            this._ornamentNumberSymbol = original.OrnamentNumberSymbol;
-            this._pitchWheelDeviation = original.PitchWheelDeviation;
-            this._midiPitches = original.MidiPitches;
-            this._midiVelocity = original.MidiVelocity;
-            this._minimumBasicMidiChordMsDuration = original.MinimumBasicMidiChordMsDuration;
-
-            BasicMidiChordDefs = original.BasicMidiChordDefs;
-            MidiChordSliderDefs = original.MidiChordSliderDefs;
-        }
-
-        private void FitToDuration(int msDuration)
-        {
-            int basicMidiChordsMsDuration = 0;
-            foreach(BasicMidiChordDef basicMidiChordDef in BasicMidiChordDefs)
-                basicMidiChordsMsDuration += basicMidiChordDef.MsDuration;
-
-            if(BasicMidiChordDefs.Count > 1 && basicMidiChordsMsDuration != MsDuration)
-            {
-                // Note that FitToDuration() may shorten the BasicMidiChordDefs list.
-                BasicMidiChordDefs = FitToDuration(BasicMidiChordDefs, MsDuration, MinimumBasicMidiChordMsDuration);
-            }
-        }
-
-        #endregion
 
         /// <summary>
         /// Returns a list of (millisecond) durations whose sum is msDuration.

@@ -102,7 +102,160 @@ namespace Moritz.AssistantComposer
             }
         }
 
-        public string Title = null;
+        /// <summary>
+        /// Returns either a new UniqueRestDef or a new UniqueMidiChordDef
+        /// In both cases, MsPosition is set to zero.
+        /// </summary>
+        public DurationDef GetUniqueDurationDef(int index)
+        {
+            DurationDef rval = null;
+
+            if(BasicChordSettings.ChordDensities[index] == 0)
+            {
+                /// RestDefs are immutable, and have no MsPosition property.
+                /// UniqueRestDefs are mutable RestDefs with both MsPositon and MsDuration properties.
+                int restMsDuration = BasicChordSettings.Durations[index];
+                rval = new UniqueRestDef(0, restMsDuration);
+            }
+            else
+            {
+                /// Create a new UniqueMidiChordDef
+                BasicChordSettings bcd = BasicChordSettings;
+                int msPosition = 0;
+                int msDuration = bcd.Durations[index];
+                byte? bank = BankIndices[index];
+                byte? patch = PatchIndices[index];
+                byte? volume = Volumes[index];
+                bool repeat = Repeats[index];
+                byte? pitchwheelDeviation = PitchwheelDeviations[index];
+                bool hasChordOff = bcd.ChordOffs[index];
+                string lyric = null;
+                int ornamentMinMsDuration = OrnamentMinMsDurations[index];
+                
+                List<byte> midiPitches = GetMidiPitches(bcd.MidiPitches[index], bcd.ChordDensities[index], bcd.Inversions, bcd.InversionIndices[index]);
+
+                byte midiVelocity = bcd.Velocities[index];
+                int ornamentNumberSymbol = OrnamentNumbers[index];
+
+                List<byte> pitchwheelEnvelope = PitchwheelEnvelopes[index];
+                List<byte> panEnvelope = PanEnvelopes[index];
+                List<byte> modulationWheelEnvelope = ModulationWheelEnvelopes[index];
+                List<byte> expressionEnvelope = ExpressionEnvelopes[index];
+                MidiChordSliderDefs midiChordSliderDefs = new MidiChordSliderDefs(pitchwheelEnvelope,
+                    panEnvelope,
+                    modulationWheelEnvelope,
+                    expressionEnvelope);
+
+                OrnamentSettings os = OrnamentSettings;
+                BasicChordSettings obcs = os.BasicChordSettings;
+                List<BasicMidiChordDef> basicMidiChordDefs = new List<BasicMidiChordDef>();
+                for(int oIndex = 0; oIndex < this.OrnamentNumbers.Count; ++oIndex)
+                {
+                    int oMsDuration = obcs.Durations[oIndex];
+                    byte? oBank = os.BankIndices[oIndex];
+                    byte? oPatch = os.PatchIndices[oIndex];
+                    bool oHasChordOff = obcs.ChordOffs[oIndex];
+
+                    byte bMidiPitch = obcs.MidiPitches[oIndex];
+                    int bDensity = obcs.ChordDensities[oIndex];
+                    List<List<byte>> bInversions = obcs.Inversions;
+                    int bInversionIndex = obcs.InversionIndices[oIndex];
+                    List<byte> oMidiPitches = GetMidiPitches(bMidiPitch, bDensity, bInversions, bInversionIndex);
+
+                    List<byte> oVelocities = GetMidiVelocities(os.BasicChordSettings, oIndex, OrnamentNumbers.Count);
+
+                    BasicMidiChordDef bmcd = new BasicMidiChordDef(oMsDuration, oBank, oPatch, oHasChordOff, oMidiPitches, oVelocities);
+                    basicMidiChordDefs.Add(bmcd);
+                }
+
+                rval = new UniqueMidiChordDef(
+                    msPosition, // 0
+                    msDuration,
+                    bank,
+                    patch,
+                    volume,
+                    repeat,
+                    pitchwheelDeviation,
+                    hasChordOff,
+                    lyric, // null
+                    ornamentMinMsDuration,
+                    midiPitches,
+                    midiVelocity,
+                    ornamentNumberSymbol,
+                    midiChordSliderDefs,
+                    basicMidiChordDefs);
+            }
+            return rval;
+        }
+
+        private List<byte> GetMidiPitches(byte basePitch, int density, List<List<byte>> inversions, int inversionIndex)
+        {
+            List<byte> midiPitches = new List<byte>();
+
+            List<byte> primeIntervals = new List<byte>();
+            Debug.Assert(inversions != null);
+            if(inversions.Count > 1)
+            {
+                Debug.Assert(inversions.Count > inversionIndex);
+                primeIntervals = inversions[inversionIndex];
+            }
+            else if(inversions.Count == 1)
+                primeIntervals.Add(inversions[0][0]);
+            // If krystalPalette.Inversions.Count == 0, primeIntervals is empty.
+
+            byte pitch = basePitch;
+            for(int p = 0; p < density; p++)
+            {
+                midiPitches.Add(pitch);
+                if(p < (density - 1))
+                {
+                    int newpitch = pitch + primeIntervals[p];
+                    pitch = (byte)((newpitch > 127) ? 127 : newpitch);
+                }
+            }
+            return midiPitches;
+        }
+
+        private List<byte> GetMidiVelocities(BasicChordSettings bcs, int valueIndex, int noteCount)
+        {
+            byte basicMidiVelocity = bcs.Velocities[valueIndex];
+            float verticalVelocityFactor = 1F;
+            if(bcs.VerticalVelocityFactors != null && bcs.VerticalVelocityFactors.Count > 0)
+            {
+                verticalVelocityFactor = bcs.VerticalVelocityFactors[valueIndex];
+            }
+
+            List<byte> midiVelocities = new List<byte>();
+
+            if(verticalVelocityFactor == 1F || noteCount == 1)
+            {
+                for(int i = 0; i < noteCount; ++i)
+                {
+                    midiVelocities.Add((byte)basicMidiVelocity);
+                }
+            }
+            else
+            {
+                float bottomVelocity = basicMidiVelocity;
+                if(verticalVelocityFactor > 1.0F)
+                    bottomVelocity = bottomVelocity / verticalVelocityFactor;
+                float topVelocity = bottomVelocity * verticalVelocityFactor;
+                float velocityDifference = (topVelocity - bottomVelocity) / ((float)(noteCount - 1));
+                float newVelocity = bottomVelocity;
+                for(int i = 0; i < noteCount; ++i)
+                {
+                    midiVelocities.Add((byte)newVelocity);
+
+                    newVelocity += velocityDifference;
+                    newVelocity = newVelocity < 0F ? 0F : newVelocity;
+                    newVelocity = newVelocity > 127F ? 127F : newVelocity;
+                }
+            }
+            return midiVelocities;
+        }
+
+        public string Title = null; // can be used while debugging
+
         public BasicChordSettings BasicChordSettings = new BasicChordSettings();
 
         public List<byte> BankIndices;

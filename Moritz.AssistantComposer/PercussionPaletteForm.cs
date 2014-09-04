@@ -22,14 +22,14 @@ namespace Moritz.AssistantComposer
 {
     public partial class PercussionPaletteForm : Form, IPaletteForm
     {
-        public PercussionPaletteForm(XmlReader r, string name, int domain, Form assistantComposerMainForm)
+        public PercussionPaletteForm(XmlReader r, string name, int domain, AssistantComposerMainForm assistantComposerMainForm)
             : this(name, domain, assistantComposerMainForm)
         {
             ReadPalette(r);
             _audioButtonsControl.Enabled = true;
         }
 
-        public PercussionPaletteForm(string name, int domain, Form assistantComposerMainForm)
+        public PercussionPaletteForm(string name, int domain, AssistantComposerMainForm assistantComposerMainForm)
         {
             InitializeComponent();
             _name = name;
@@ -939,7 +939,7 @@ namespace Moritz.AssistantComposer
         }
         private string _name = null;
         private int _domain = 0;
-        private Form _assistantComposerMainForm = null;
+        private AssistantComposerMainForm _assistantComposerMainForm = null;
         private List<TextBox> _allMainTextBoxes = new List<TextBox>();
         private AudioButtonsControl _audioButtonsControl = null;
         #endregion iPaletteForm

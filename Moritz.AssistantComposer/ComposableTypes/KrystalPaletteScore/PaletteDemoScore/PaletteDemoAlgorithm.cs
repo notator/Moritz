@@ -45,12 +45,12 @@ namespace Moritz.AssistantComposer
         {
             Voice voice = new OutputVoice(null, 0);
             int msPosition = 0;
-            foreach(MidiDurationDef midiDurationDef in _paletteDefs[0])
+            foreach(DurationDef durationDef in _paletteDefs[0])
             {
-                IUniqueMidiDurationDef iumdd = midiDurationDef.CreateUniqueMidiDurationDef();
+                IUniqueDef iumdd = durationDef.DeepClone();
                 iumdd.MsPosition = msPosition;
                 msPosition += iumdd.MsDuration;
-                voice.UniqueMidiDurationDefs.Add(iumdd);
+                voice.UniqueDefs.Add(iumdd);
             }
 
             List<List<Voice>> voicesPerSystem = new List<List<Voice>>();

@@ -19,7 +19,7 @@ namespace Moritz.AssistantComposer
 {
     public partial class PaletteForm : Form, IPaletteForm
     {
-        public PaletteForm(XmlReader r, string name, int domain, Form assistantComposerMainForm)
+        public PaletteForm(XmlReader r, string name, int domain, AssistantComposerMainForm assistantComposerMainForm)
             :this(name, domain, assistantComposerMainForm)
         {
             ReadPalette(r);
@@ -34,7 +34,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         /// <param name="assistantComposer"></param>
         /// <param name="krystal"></param>
-        public PaletteForm(string name, int domain, Form assistantComposerMainForm)
+        public PaletteForm(string name, int domain, AssistantComposerMainForm assistantComposerMainForm)
         {
             InitializeComponent();
             _name = name;
@@ -1205,7 +1205,7 @@ namespace Moritz.AssistantComposer
         }
         private string _name = null;
         private int _domain = 0;
-        private Form _assistantComposerMainForm = null;
+        private AssistantComposerMainForm _assistantComposerMainForm = null;
         private List<TextBox> _allMainTextBoxes = new List<TextBox>();
         private AudioButtonsControl _audioButtonsControl = null;
         #endregion iPaletteForm

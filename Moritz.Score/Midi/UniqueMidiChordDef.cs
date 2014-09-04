@@ -185,6 +185,81 @@ namespace Moritz.Score.Midi
         }
 
         /// <summary>
+        /// Constructor used when making a DeepClone, and when retrieving a UniqueMidiChordDef from a palette.
+        /// This constructor makes a deep clone of the values in its arguments.
+        /// When called by a palette, msPosition is set to 0, and lyric is set to null.
+        /// </summary>
+        public UniqueMidiChordDef(
+            int msPosition,
+            int msDuration,
+            byte? bank,
+            byte? patch,
+            byte? volume,
+            bool repeat,
+            byte? pitchWheelDeviation,
+            bool hasChordOff,
+            string lyric,
+            int minimumBasicMidiChordMsDuration,
+            List<byte> midiPitches,
+            byte midiVelocity,
+            int ornamentNumberSymbol,
+            MidiChordSliderDefs midiChordSliderDefs,
+            List<BasicMidiChordDef> basicMidiChordDefs)
+            : base()
+        {
+            _msPosition = msPosition;
+            _msDuration  = msDuration;
+            _bank = bank;
+            _patch = patch;
+            _volume = volume;
+            _repeat = repeat;
+            _pitchWheelDeviation = pitchWheelDeviation;
+            _hasChordOff = hasChordOff;
+            _lyric = lyric;
+            _minimumBasicMidiChordMsDuration = minimumBasicMidiChordMsDuration;
+            _midiPitches = new List<byte>(midiPitches);
+            _midiVelocity = midiVelocity;
+            _ornamentNumberSymbol = ornamentNumberSymbol;
+            _lyric = null;
+
+            MidiChordSliderDefs mcsd = midiChordSliderDefs;
+            if(mcsd != null)
+            {
+                List<byte> pwMsbs = null;
+                List<byte> panMsbs = null;
+                List<byte> mwMsbs = null;
+                List<byte> eMsbs = null;
+                if(mcsd.PitchWheelMsbs != null && mcsd.PitchWheelMsbs.Count > 0)
+                {
+                    pwMsbs = new List<byte>(mcsd.PitchWheelMsbs);
+                }
+                if(mcsd.PanMsbs != null && mcsd.PanMsbs.Count > 0)
+                {
+                    panMsbs = new List<byte>(mcsd.PanMsbs);
+                }
+                if(mcsd.ModulationWheelMsbs != null && mcsd.ModulationWheelMsbs.Count > 0)
+                {
+                    mwMsbs = new List<byte>(mcsd.ModulationWheelMsbs);
+                }
+                if(mcsd.ExpressionMsbs != null && mcsd.ExpressionMsbs.Count > 0)
+                {
+                    eMsbs = new List<byte>(mcsd.ExpressionMsbs);
+                }
+                if(pwMsbs != null || panMsbs != null || mwMsbs != null || eMsbs != null)
+                {
+                    MidiChordSliderDefs = new MidiChordSliderDefs(pwMsbs, panMsbs, mwMsbs, eMsbs);
+                }
+            }
+
+            BasicMidiChordDefs = new List<BasicMidiChordDef>();
+            foreach(BasicMidiChordDef bmcd in basicMidiChordDefs)
+            {
+                List<byte> pitches = new List<byte>(bmcd.Notes);
+                List<byte> velocities = new List<byte>(bmcd.Velocities);
+                BasicMidiChordDefs.Add(new BasicMidiChordDef(bmcd.MsDuration, bmcd.BankIndex, bmcd.PatchIndex, bmcd.HasChordOff, pitches, velocities));
+            }
+        }
+        /// <summary>
         /// This constructor creates a UniqueMidiChordDef containing a single BasicMidiChordDef and no sliders.
         /// </summary>
         public UniqueMidiChordDef(List<byte> pitches, List<byte> velocities, int msPosition, int msDuration, bool repeat, bool hasChordOff,
@@ -240,7 +315,7 @@ namespace Moritz.Score.Midi
         #region IUniqueCloneDef
         #region IUniqueSplittableChordDef
 
-        public IUniqueDef DeepClone()
+        public override IUniqueDef DeepClone()
         {
             return new UniqueMidiChordDef(this);
         }
