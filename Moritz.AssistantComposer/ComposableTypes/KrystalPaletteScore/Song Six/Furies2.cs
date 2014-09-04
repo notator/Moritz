@@ -46,7 +46,7 @@ namespace Moritz.AssistantComposer
                 InsertInRest(ticksChord);
             }
 
-            UniqueMidiChordDef lastTicksBeforeVerse3 = new UniqueMidiChordDef(this[39] as MidiChordDef);
+            UniqueMidiChordDef lastTicksBeforeVerse3 = (UniqueMidiChordDef)((UniqueMidiChordDef)this[39]).DeepClone();
             lastTicksBeforeVerse3.MsPosition = furies3[155].MsPosition + furies3[155].MsDuration;
             lastTicksBeforeVerse3.MsDuration = clytemnestra[117].MsPosition - lastTicksBeforeVerse3.MsPosition;
             lastTicksBeforeVerse3.Transpose(10);

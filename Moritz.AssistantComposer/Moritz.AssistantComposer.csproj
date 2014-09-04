@@ -76,7 +76,6 @@
     <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Furies4.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\SongSixVoiceDef.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Winds.cs" />
-    <Compile Include="ComposableTypes\PaletteMidiChordDef.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\PaletteDemoScore\PaletteDemoScore.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\Study2c3_1\Study2c3_1Algorithm.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Clytemnestra.cs" />

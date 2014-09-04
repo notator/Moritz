@@ -9,20 +9,21 @@ using Moritz.Globals;
 namespace Moritz.Score.Notation
 {
     ///<summary>
-    /// A UniqueInputChordDef is a deep clone of an InputChordDef.
-    //</summary>
-    public class UniqueInputChordDef : InputChordDef, IUniqueSplittableChordDef, IUniqueCloneDef
+    /// A UniqueInputChordDef can be saved and retrieved from voices in an SVG file.
+    /// Each inputChord in an SVG file will be given an ID of the form "inputChord"+uniqueNumber, but
+    /// Moritz does not actually use the ids, so they are not read into in UniqueInputChordDefs.
+    ///</summary>
+    public class UniqueInputChordDef : DurationDef, IUniqueSplittableChordDef, IUniqueCloneDef
     {
         public UniqueInputChordDef()
-            :base()
+            :base(0)
         {
-            ID = "localChord" + UniqueChordID.ToString();
         }
 
-        public UniqueInputChordDef(XmlReader r, string localID, int msDuration)
-            : base()
+        public UniqueInputChordDef(XmlReader r, int msDuration)
+            : base(msDuration)
         {
-            // The reader is at the beginning of a "score:inputChord" element having an ID attribute
+            // The reader is at the beginning of a "score:inputChord" element
             Debug.Assert(r.Name == "score:inputChord" && r.IsStartElement() && r.AttributeCount > 0);
             int nAttributes = r.AttributeCount;
             //for(int i = 0; i < nAttributes; i++)
@@ -30,6 +31,9 @@ namespace Moritz.Score.Notation
                 //r.MoveToAttribute(i);
                 //switch(r.Name)
                 //{
+                //    case "id": // ids are ignored!
+                //        break;
+                //
                 //    case "pitchWheelDeviation":
                 //        _pitchWheelDeviation = byte.Parse(r.Value);
                 //        break;
@@ -43,25 +47,6 @@ namespace Moritz.Score.Notation
         }
 
         /// <summary>
-        /// A deep clone of the argument. This class is saved as an individual chordDef in SVG files,
-        /// so it allows ALL its attributes to be set, even after construction.
-        /// The argument may not be null.
-        /// </summary>
-        /// <param name="midiChordDef"></param>
-        public UniqueInputChordDef(InputChordDef icd)
-            :this()
-        {
-            Debug.Assert(icd != null);
-            throw new NotImplementedException();
-        }
-
-        #region IUniqueSplittableChordDef
-
-        public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
-        private int? _msDurationToNextBarline = null;
-
-        #region IUniqueChordDef
-        /// <summary>
         /// Transpose by the number of semitones given in the argument.
         /// Negative interval values transpose down.
         /// It is not an error if Midi values would exceed the range 0..127.
@@ -69,21 +54,12 @@ namespace Moritz.Score.Notation
         /// </summary>
         public void Transpose(int interval)
         {
-            int value;
             for(int i = 0; i < _midiPitches.Count; ++i)
             {
-                value = _midiPitches[i] + interval;
-                value = (value > 127) ? 127 : value;
-                value = (value < 0) ? 0 : value;
-                _midiPitches[i] = (byte) value;
+                _midiPitches[i] = M.MidiValue(_midiPitches[i] + interval);
             }
         }
 
-        // MidiPitches is defined in InputChordDef
-        //public List<byte> MidiPitches { get { return _midiPitches; } set { _midiPitches = value; } }
-        //private List<byte> _midiPitches = null;
-
-        #region IUniqueDef
         public override string ToString()
         {
             return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString() + " UniqueInputChordDef");
@@ -114,14 +90,16 @@ namespace Moritz.Score.Notation
             w.WriteEndElement(); // score:midiChord
         }
 
-        public int MsDuration { get { return _msDuration; } set { _msDuration = value; } }
-        private int _msDuration = 0;
+        public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
+        private int? _msDurationToNextBarline = null;
+
         public int MsPosition { get { return _msPosition; } set { _msPosition = value; } }
         private int _msPosition = 0;
 
-        #endregion IUniqueDef
-        #endregion IUniqueChordDef
-        #endregion IUniqueSplittableChordDef
+        public List<byte> MidiPitches { get { return _midiPitches; } set { _midiPitches = value; } }
+        protected List<byte> _midiPitches = new List<byte>();
 
+        public string Lyric { get { return _lyric; } set { _lyric = value; } }
+        protected string _lyric = null;
     }
 }

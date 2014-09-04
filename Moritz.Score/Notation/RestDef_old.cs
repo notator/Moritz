@@ -4,12 +4,12 @@ using System.Diagnostics;
 
 namespace Moritz.Score.Notation
 {
-    /// A RestDef is a definition retrieved from a palette.
+    /// A RestDef_old is a definition retrieved from a palette.
     /// RestDefs are immutable, and have no MsPosition property.
     /// UniqueRestDefs are mutable RestDefs with both MsPositon and MsDuration properties.
-    public class RestDef : DurationDef
+    public class RestDef_old : DurationDef
     {
-        public RestDef(int msDuration)
+        public RestDef_old(int msDuration)
             : base(msDuration)
         {
         }

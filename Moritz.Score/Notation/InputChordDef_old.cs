@@ -7,13 +7,13 @@ using Moritz.Globals;
 
 namespace Moritz.Score.Notation
 {
-    public class InputChordDef : DurationDef
+    public class InputChordDef_old : DurationDef
     {
         /// <summary>
         /// Constructor used while constructing derived types.
         /// The derived types are responsible for initializing all the fields correctly.
         /// </summary>
-        public InputChordDef()
+        public InputChordDef_old()
             : base(0)
         {
         }
@@ -22,9 +22,9 @@ namespace Moritz.Score.Notation
         /// <summary>
         /// Contains values retrieved from an SVG file score:inputChord element
         /// Note that InputChordDefs do not have msPosition and msDuration attributes.
-        /// These attributes are provided by embedding a clone of the InputChordDef in a UniqueInputChordDef.
+        /// These attributes are provided by embedding a clone of the InputChordDef_old in a UniqueInputChordDef.
         /// </summary>
-        public InputChordDef(XmlReader r, string localID, int msDuration)
+        public InputChordDef_old(XmlReader r, int msDuration)
             : base(msDuration)
         {
             // The reader is at the beginning of a "score:inputChord" element having an ID attribute
@@ -36,10 +36,6 @@ namespace Moritz.Score.Notation
                 switch(r.Name)
                 {
                     case "id":
-                        if(localID != null)
-                            ID = localID; // this is the local id in the score
-                        else
-                            ID = r.Value; // this is the id in the palleteDefs
                         break;
                     //case "repeat":
                     //    // repeat is false if this attribute is not present
@@ -91,15 +87,6 @@ namespace Moritz.Score.Notation
             return uicd;
         }
 
-        private static int _uniqueChordID = 0;
-        public static int UniqueChordID { get { return ++_uniqueChordID; } }
 
-        public string ID;
-
-        public List<byte> MidiPitches { get { return _midiPitches; } set { _midiPitches = value; } }
-        protected List<byte> _midiPitches = new List<byte>();
-
-        public string Lyric { get { return _lyric; } set { _lyric = value; } }
-        protected string _lyric = null;
     }
 }

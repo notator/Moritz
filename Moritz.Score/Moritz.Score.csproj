@@ -60,7 +60,7 @@
     <Compile Include="Midi\ChordMessage.cs" />
     <Compile Include="Midi\IUniqueMidiDurationDef.cs" />
     <Compile Include="Midi\MidiChord.cs" />
-    <Compile Include="Midi\MidiChordDef.cs" />
+    <Compile Include="Midi\MidiChordDef_old.cs" />
     <Compile Include="Midi\MidiChordSlider.cs" />
     <Compile Include="Midi\MidiChordSliderDefs.cs" />
     <Compile Include="Midi\MidiCommand.cs" />
@@ -82,13 +82,13 @@
     <Compile Include="Notation\UniqueRestDef.cs" />
     <Compile Include="Midi\UniqueMidiChordDef.cs" />
     <Compile Include="Notation\IUniqueCloneDef.cs" />
-    <Compile Include="Notation\RestDef.cs" />
+    <Compile Include="Notation\RestDef_old.cs" />
     <Compile Include="Notation\ChordMetrics.cs" />
     <Compile Include="Notation\CLichtFontMetrics.cs" />
     <Compile Include="Notation\Edge.cs" />
     <Compile Include="Notation\IUniqueDef.cs" />
     <Compile Include="Notation\Metrics.cs" />
-    <Compile Include="Notation\InputChordDef.cs" />
+    <Compile Include="Notation\InputChordDef_old.cs" />
     <Compile Include="Notation\Notator.cs" />
     <Compile Include="Notation\StandardSymbolSet.cs" />
     <Compile Include="Notation\Study2b2ChordSymbol.cs" />

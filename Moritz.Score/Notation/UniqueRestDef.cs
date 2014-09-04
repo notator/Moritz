@@ -10,60 +10,39 @@ using Moritz.Score.Midi;
 namespace Moritz.Score.Notation
 {
     ///<summary>
-    /// A UniqueRestDef is a unique RestDef which is saved locally in an SVG file.
-    /// Each rest in an SVG file has an ID of the form "rest"+uniqueNumber.
-    /// UniqueRestDefs created programmatically have a null ID.
+    /// A UniqueRestDef is a unique rest definition which is saved locally in an SVG file.
+    /// Each rest in an SVG file will be given an ID of the form "rest"+uniqueNumber, but
+    /// Moritz does not actually use the ids, so they are not set in UniqueRestDefs.
     ///<summary>
-    public class UniqueRestDef : RestDef, IUniqueDef
+    public class UniqueRestDef : DurationDef, IUniqueDef
     {
-        public UniqueRestDef(RestDef midiRestDef)
-            :base(midiRestDef.MsDuration)
-        {
-            ID = null;
-            MsPosition = 0;
-        }
-
         public UniqueRestDef(int msPosition, int msDuration)
             : base(msDuration)
         {
-            ID = null;
             MsPosition = msPosition;
         }
 
         /// <summary>
-        /// Used while loading a score
+        /// Used when loading a score or getting a UniqueRestDef from a palette.
+        /// The MsPosition is initially 0. When loading a score, the MsPosition will
+        /// eventually be set by accumulating durations when the score has finished loading.
         /// </summary>
-        /// <param name="id"></param>
         /// <param name="msDuration"></param>
-        public UniqueRestDef(string id, int msDuration)
-            :base(0)
+        public UniqueRestDef(int msDuration)
+            : base(msDuration)
         {
-            ID = id;
-            MsDuration = msDuration;
-            MsPosition = 0; // This value will probably be set later.
-
-            //// The reader is at the beginning of a "score:rest" element having an ID attribute
-            //Debug.Assert(r.Name == "score:rest" && r.IsStartElement() && r.AttributeCount > 0);
-            //int nAttributes = r.AttributeCount;
-            //for(int i = 0; i < nAttributes; i++)
-            //{
-            //    r.MoveToAttribute(i);
-            //    switch(r.Name)
-            //    {
-            //        case "id":
-            //            ID = r.Value;
-            //            break;
-            //        case "msDuration":
-            //            _msDuration = int.Parse(r.Value);
-            //            break;
-            //    }
-            //}
+            MsPosition = 0; // Default. This value will be set later.
         }
 
-        #region IUniqueDef
         public override string ToString()
         {
             return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString() + " UniqueRestDef" );
+        }
+
+        public IUniqueDef DeepClone()
+        {
+            UniqueRestDef umrd = new UniqueRestDef(this.MsPosition, this.MsDuration);
+            return umrd;
         }
 
         /// <summary>
@@ -75,13 +54,7 @@ namespace Moritz.Score.Notation
             MsDuration = (int)(_msDuration * factor);
         }
 
-        public readonly string ID;
-
-        // MsDuration is inherited from RestDef whose _msDuration is immutable
-        public override int MsDuration { get { return _msDuration; } set { _msDuration = value; } }
-        private int _msDuration = 0;
         public int MsPosition { get { return _msPosition; } set { _msPosition = value; } }
         private int _msPosition = 0;
-        #endregion IUniqueDef
     }
 }

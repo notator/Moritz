@@ -8,13 +8,13 @@ using Moritz.Score.Notation;
 
 namespace Moritz.Score.Midi
 {
-    public class MidiChordDef : DurationDef
+    public class MidiChordDef_old : DurationDef
     {
         /// <summary>
         /// Constructor used while constructing derived types.
         /// The derived types are responsible for initializing all the fields correctly.
         /// </summary>
-        public MidiChordDef()
+        public MidiChordDef_old()
             : base(0)
         {
         }
@@ -23,7 +23,7 @@ namespace Moritz.Score.Midi
         /// Constructor used when retrieving a MidiChordDef from a palette.
         /// (Lyric is set to null)
         /// </summary>
-        public MidiChordDef(
+        public MidiChordDef_old(
             byte? bank,
             byte? patch,
             byte? volume,
@@ -185,7 +185,7 @@ namespace Moritz.Score.Midi
         {
             List<int> relativeDurations = GetBasicMidiChordDurations(bmcd);
             List<int> msDurations = GetDurations(msOuterDuration, relativeDurations, minimumMsDuration);
-            
+
             // msDurations.Count can be less than bmcd.Count
 
             List<BasicMidiChordDef> rList = new List<BasicMidiChordDef>();
@@ -225,7 +225,7 @@ namespace Moritz.Score.Midi
         // if the performed duration is longer than the duration of the basicChords,
         // and the performer continues to hold the key down.
         // The duration in the score is always the sum of the durations of the basicChords.
-        public bool Repeat { get { return _repeat; } } 
+        public bool Repeat { get { return _repeat; } }
         public byte? PitchWheelDeviation { get { return _pitchWheelDeviation; } }
         public bool HasChordOff { get { return _hasChordOff; } }
         public int MinimumBasicMidiChordMsDuration { get { return _minimumBasicMidiChordMsDuration; } }

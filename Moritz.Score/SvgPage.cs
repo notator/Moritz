@@ -78,25 +78,23 @@ namespace Moritz.Score
                                     //currentStaff.Voices.Add(currentVoice);
                                     break;
                                 case "chord":
-                                    id = attributesDict["id"];
                                     if(currentVoice is OutputVoice)
                                     {
                                         msDuration = int.Parse(attributesDict["score:msDuration"]);
                                         M.ReadToXmlElementTag(r, "score:midiChord");
-                                        currentVoice.UniqueDefs.Add(new UniqueMidiChordDef(r, id, msDuration));
+                                        currentVoice.UniqueDefs.Add(new UniqueMidiChordDef(r, msDuration));
                                         // msPositions are set later
                                     }
                                     else
                                     {
                                         msDuration = int.Parse(attributesDict["score:msDuration"]);
                                         M.ReadToXmlElementTag(r, "score:inputChord");
-                                        currentVoice.UniqueDefs.Add(new UniqueInputChordDef(r, id, msDuration));
+                                        currentVoice.UniqueDefs.Add(new UniqueInputChordDef(r, msDuration));
                                     }
                                     break;
-                                case "rest":
-                                    id = attributesDict["id"];                                        
+                                case "rest":                                       
                                     msDuration = int.Parse(attributesDict["score:msDuration"]);
-                                    currentVoice.UniqueDefs.Add(new UniqueRestDef(id, msDuration));
+                                    currentVoice.UniqueDefs.Add(new UniqueRestDef(msDuration));
                                     // msPositions are set later
                                 break;
                             }

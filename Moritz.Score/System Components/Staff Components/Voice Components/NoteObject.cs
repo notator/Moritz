@@ -23,10 +23,10 @@ namespace Moritz.Score
         /// </summary>
         public abstract void WriteSVG(SvgWriter w);
 
-        protected string GetID(int pageNumber, int systemNumber, int staffNumber, string symbolType, int symbolNumber)
-        {
-            return String.Format("{0}.{1}.{2} {3}{4}", pageNumber.ToString(), systemNumber.ToString(), staffNumber.ToString(), symbolType, symbolNumber.ToString());
-        }
+        //protected string GetID(int pageNumber, int systemNumber, int staffNumber, string symbolType, int symbolNumber)
+        //{
+        //    return String.Format("{0}.{1}.{2} {3}{4}", pageNumber.ToString(), systemNumber.ToString(), staffNumber.ToString(), symbolType, symbolNumber.ToString());
+        //}
 
         /// <summary>
         /// Contains the the object's absolute origin, boundary box and alignment positions (view box pixel units).

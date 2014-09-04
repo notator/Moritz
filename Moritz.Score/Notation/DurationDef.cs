@@ -12,7 +12,7 @@ namespace Moritz.Score.Notation
 
         public abstract IUniqueDef DeepClone();
 
+        public int MsDuration { get { return _msDuration; } set { _msDuration = value; } }
         protected int _msDuration = 0;
-        public virtual int MsDuration { get; set; }
     }
 }
