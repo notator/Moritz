@@ -71,7 +71,6 @@ namespace Moritz.Score
             }
 
             Metadata = new Metadata(page1Path);
-            ReadMidiDefs(page1Path);
 
             try
             {
@@ -110,10 +109,10 @@ namespace Moritz.Score
                     {
                         SvgSystem system = Systems[sysIndex];
                         Voice voice = system.Staves[staffIndex].Voices[voiceIndex];
-                        foreach(IUniqueMidiDurationDef iumdd in voice.UniqueMidiDurationDefs)
+                        foreach(IUniqueDef iu in voice.UniqueDefs)
                         {
-                            iumdd.MsPosition = msPosition;
-                            msPosition += iumdd.MsDuration;
+                            iu.MsPosition = msPosition;
+                            msPosition += iu.MsDuration;
                         }
                     }
                 }
@@ -169,63 +168,6 @@ namespace Moritz.Score
                 }
             }
             return page1Path;
-        }
-
-        private void ReadMidiDefs(string page1Path)
-        {
-            Debug.Assert(Path.GetExtension(page1Path) == ".svg");
-            try
-            {
-                Stream pageStream = File.OpenRead(page1Path);
-                using(XmlReader r = XmlReader.Create(pageStream))
-                {
-                    do
-                    {
-                        M.ReadToXmlElementTag(r, "score:midiDefs", "svg");
-                        if(r.Name == "score:midiDefs" && r.IsStartElement())
-                        {
-                            GetMidiChordAndRestDefs(r);
-                        }
-                    } while(!(r.Name == "svg" && !r.IsStartElement()));
-                }
-                pageStream.Close();
-            }
-            catch(Exception ex)
-            {
-                string msg = ex.Message + "\r\rException thrown in SvgScore.ReadMidiDefs().";
-                throw new ApplicationException(msg);
-            }
-        }
-
-        /// <summary>
-        /// Loads a dictionary of midiChords. In each case, the key is the object's id.
-        /// The value in the _midiChordDefs is a MidiChordDef containing the values in the SVG.
-        /// </summary>
-        /// <param name="r"></param>
-        private void GetMidiChordAndRestDefs(XmlReader r)
-        {
-            Debug.Assert(r.Name == "score:midiDefs" && r.IsStartElement());
-
-            _midiDurationDefs = new Dictionary<string, MidiDurationDef>();
-
-            M.ReadToXmlElementTag(r, "score:midiChord", "score:midiRest");
-            while(r.Name == "score:midiChord" || r.Name == "score:midiRest")
-            {
-                if(r.IsStartElement())
-                {
-                    if(r.Name == "score:midiChord")
-                    {
-                        MidiChordDef cDef = new MidiChordDef(r, null, null, 0);
-                        _midiDurationDefs.Add(cDef.ID, cDef);
-                    }
-                    else
-                    {
-                        MidiRestDef rDef = new MidiRestDef(r);
-                        _midiDurationDefs.Add(rDef.ID, rDef);
-                    }
-                }
-                M.ReadToXmlElementTag(r, "score:midiChord", "score:midiRest", "score:midiDefs");
-            }
         }
 
         private void LoadMultiplePages(string filepath)
@@ -504,7 +446,7 @@ namespace Moritz.Score
                                 fontSize = rest.FontHeight;
                                 voice.NoteObjects.RemoveAt(indToReplace[j]);
                             }
-                            UniqueMidiRestDef umrd = new UniqueMidiRestDef(msPos, msDuration);
+                            UniqueRestDef umrd = new UniqueRestDef(msPos, msDuration);
                             RestSymbol newRest = new RestSymbol(voice, umrd, minimumCrotchetDuration, _pageFormat.MusicFontHeight);
                             newRest.MsPosition = msPos;
                             voice.NoteObjects.Insert(indToReplace[0], newRest);
@@ -837,7 +779,7 @@ namespace Moritz.Score
             int smallClefIndex = -1;
             for(int i = voice.NoteObjects.Count - 1; i >= 0; --i)
             {
-                if(voice.NoteObjects[i] is ChordSymbol)
+                if(voice.NoteObjects[i] is OutputChordSymbol)
                 {
                     break;
                 }
@@ -1034,9 +976,6 @@ namespace Moritz.Score
 
         public PageFormat PageFormat { get { return _pageFormat; } } 
         protected PageFormat _pageFormat = null;
-
-        internal Dictionary<string, MidiDurationDef> MidiDurationDefs { get { return _midiDurationDefs; } } 
-        private Dictionary<string, MidiDurationDef> _midiDurationDefs;
 
         public Notator Notator = null;
 

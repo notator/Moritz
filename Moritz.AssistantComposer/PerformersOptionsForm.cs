@@ -6,7 +6,13 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 
+using Krystals4ObjectLibrary;
 using Moritz.Globals;
+using Moritz.Krystals;
+using Moritz.Score;
+using Moritz.Score.Midi;
+using Moritz.Score.Notation;
+using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {
@@ -16,7 +22,7 @@ namespace Moritz.AssistantComposer
         /// Creates a new, empty MonoPerformerOptionsForm.
         /// These are all defaults, that will be adjustable (as before) in the AP:
         /// </summary>
-        public PerformersOptionsForm(AssistantComposerMainForm assistantComposerMainForm, int nTracks)
+        public PerformersOptionsForm(Form assistantComposerMainForm, int nTracks)
         {
             InitializeComponent();
 
@@ -837,7 +843,7 @@ namespace Moritz.AssistantComposer
         static private bool _intListControlHasError = false;
         private IntListControl _ilcMasterVolumes;
 
-        private AssistantComposerMainForm _assistantComposerMainForm = null;
+        private Form _assistantComposerMainForm = null;
 
     }
 }

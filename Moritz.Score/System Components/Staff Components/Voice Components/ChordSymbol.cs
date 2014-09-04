@@ -9,30 +9,11 @@ using Moritz.Score.Notation;
 
 namespace Moritz.Score
 {
-    public class ChordSymbol : DurationSymbol
+    public abstract class ChordSymbol : DurationSymbol
     {
-        public ChordSymbol(Voice voice, UniqueMidiChordDef umcd, int minimumCrotchetDurationMS, float fontSize)
-            : base(voice, umcd, minimumCrotchetDurationMS, fontSize)
-        {
-            _uniqueMidiChordDef = umcd;
-            MidiChordDef midiChordDef = umcd as MidiChordDef;
-            if(midiChordDef != null)
-            {
-                SetHeads(midiChordDef.MidiHeadSymbols);
-
-                if(midiChordDef.OrnamentNumberSymbol != 0)
-                {
-                    AddOrnamentSymbol("~" + midiChordDef.OrnamentNumberSymbol.ToString());
-                }
-
-                if(midiChordDef.Lyric != null)
-                {
-                    TextInfo textInfo = new TextInfo(midiChordDef.Lyric, "Arial", (float)(FontHeight / 2F), TextHorizAlign.center);
-                    Lyric lyric = new Lyric(this, textInfo);
-                    DrawObjects.Add(lyric);
-                }
-            }
-            
+        public ChordSymbol(Voice voice, int msDuration, int msPosition, int minimumCrotchetDurationMS, float fontSize)
+            : base(voice,  msDuration, msPosition, minimumCrotchetDurationMS, fontSize)
+        {            
             // note that all chord symbols have a stem! 
             // Even cautionary, semibreves and breves need a stem direction in order to set chord Metrics correctly.
             Stem = new Stem(this);
@@ -73,6 +54,8 @@ namespace Moritz.Score
                 return VerticalDir.up;
         }
 
+        protected abstract void WriteContent(SvgWriter w, string idNumber);
+
         public override void WriteSVG(SvgWriter w)
         {
             if(ChordMetrics.BeamBlock != null)
@@ -81,52 +64,16 @@ namespace Moritz.Score
             string idNumber = SvgScore.UniqueID_Number;
 
             w.SvgStartGroup("chord" + idNumber);
-            WriteChordAttributes(w);
+            w.WriteAttributeString("score", "object", null, "chord");
+            w.WriteAttributeString("score", "alignmentX", null, this.Metrics.OriginX.ToString(M.En_USNumberFormat));
 
-            WriteMidiInfo(w, "midi" + idNumber);
+            WriteContent(w, idNumber);
 
             w.SvgStartGroup("graphics" + idNumber);
             ChordMetrics.WriteSVG(w);
             w.SvgEndGroup();
 
             w.SvgEndGroup();
-        }
-
-        /// <summary>
-        /// Used by all chord types (e.g. Study2b2ChordSymbol)
-        /// </summary>
-        /// <param name="w"></param>
-        /// <param name="msPos"></param>
-        /// <param name="msDuration"></param>
-        protected virtual void WriteChordAttributes(SvgWriter w)
-        {
-            w.WriteAttributeString("score", "object", null, "chord");
-            w.WriteAttributeString("score", "alignmentX", null, this.Metrics.OriginX.ToString(M.En_USNumberFormat));
-        }
-
-        /// <summary>
-        /// Writes the chord's Midi info - the same for all graphic notations
-        /// </summary>
-        /// <param name="w"></param>
-        protected void WriteMidiInfo(SvgWriter w, string midiId)
-        {
-            w.WriteStartElement("score", "midiChord", null);
-
-            w.WriteAttributeString("id", midiId);
-            Debug.Assert(UniqueMidiChordDef != null);
-            string ID = UniqueMidiChordDef.ID;
-            Debug.Assert(ID != null && ID.StartsWith("localChord"));
-            UniqueMidiChordDef.WriteSvg(w);
-
-            w.WriteEndElement(); // midiChord
-        }
-
-        public override string ToString()
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append("chord  ");
-            sb.Append(InfoString);
-            return sb.ToString();
         }
 
         /// <summary>
@@ -148,7 +95,7 @@ namespace Moritz.Score
         /// The midiPitches argument must be in order of size (ascending), but Heads are created in top-down order.
         /// </summary>
         /// <param name="midiPitches"></param>
-        public void SetHeads(List<byte> midiPitches)
+        public void SetNoteheadPitches(List<byte> midiPitches)
         {
             #region check inputs
             int pitch = -1;
@@ -507,7 +454,7 @@ namespace Moritz.Score
         /// Such accidentals are placed in the left-right order of the noteheads
         /// </summary>
         /// <param name="upperChord"></param>
-        public void AdjustAccidentalsX(ChordSymbol upperChord)
+        public void AdjustAccidentalsX(OutputChordSymbol upperChord)
         {
             float stafflineStemStrokeWidth = Voice.Staff.SVGSystem.Score.PageFormat.StafflineStemStrokeWidth;
 
@@ -564,9 +511,6 @@ namespace Moritz.Score
         public Stem Stem = null; // defaults
         public BeamBlock BeamBlock = null; // defaults
         public List<Head> HeadsTopDown = new List<Head>(); // Heads are in top-down order.
-
-        public UniqueMidiChordDef UniqueMidiChordDef { get { return _uniqueMidiChordDef; } }
-        protected UniqueMidiChordDef _uniqueMidiChordDef = null;
 
         public string GraphicSymbolID { get { return _graphicSymbolID; } }
         protected string _graphicSymbolID = null;

@@ -63,20 +63,17 @@
     <Compile Include="KeyboardSettingsDialog\Keyboard.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="KeyboardSettingsDialog\Keyboard.designer.cs">
-      <DependentUpon>Keyboard.cs</DependentUpon>
-    </Compile>
+    <Compile Include="KeyboardSettingsDialog\Keyboard.designer.cs" />
     <Compile Include="KeyboardSettingsDialog\KeyboardSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="KeyboardSettingsDialog\KeyboardSettingsDialog.designer.cs">
-      <DependentUpon>KeyboardSettingsDialog.cs</DependentUpon>
-    </Compile>
+    <Compile Include="KeyboardSettingsDialog\KeyboardSettingsDialog.designer.cs" />
     <Compile Include="MidiScore.cs" />
     <Compile Include="MoritzPerformanceOptions.cs" />
     <Compile Include="PanelRow.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\Assistant.cs" />
     <Compile Include="Runtime\AssistantPerformerRuntime.cs" />
     <Compile Include="Runtime\IMidiSink.cs" />
@@ -86,32 +83,29 @@
     <Compile Include="Runtime\MidiOutputDevice.cs" />
     <Compile Include="Runtime\PerformanceState.cs" />
     <Compile Include="Runtime\RuntimeDelegates.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="AssistantPerformerMainForm.resx">
-      <DependentUpon>AssistantPerformerMainForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="KeyboardSettingsDialog\Keyboard.resx">
-      <DependentUpon>Keyboard.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="KeyboardSettingsDialog\KeyboardSettingsDialog.resx">
-      <DependentUpon>KeyboardSettingsDialog.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
       <Project>{E68C2A79-CDAB-46F5-A6EE-534CE2D99577}</Project>
       <Name>Moritz.Globals</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Moritz.Krystals\Moritz.Krystals.csproj">
+      <Project>{df448bec-155b-4a56-82bd-8fd1978a85af}</Project>
+      <Name>Moritz.Krystals</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Moritz.Score\Moritz.Score.csproj">
-      <Project>{0507FAED-FF81-45A4-90AF-923D25DDA758}</Project>
+      <Project>{0507faed-ff81-45a4-90af-923d25dda758}</Project>
       <Name>Moritz.Score</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AssistantPerformerMainForm.resx">
+      <DependentUpon>AssistantPerformerMainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="KeyboardSettingsDialog\Keyboard.resx" />
+    <EmbeddedResource Include="KeyboardSettingsDialog\KeyboardSettingsDialog.resx" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

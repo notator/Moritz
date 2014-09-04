@@ -144,11 +144,11 @@ namespace Moritz.Score.Notation
             return returnMetrics;
         }
 
-        public override NoteObject GetNoteObject(Voice voice, IUniqueMidiDurationDef iumdd, bool firstLmddInVoice, ref byte currentVelocity,
+        public override NoteObject GetNoteObject(Voice voice, IUniqueDef iud, bool firstLmddInVoice, ref byte currentVelocity,
             float musicFontHeight)
         {
             DurationSymbol durationSymbol = null;
-            UniqueMidiChordDef uniqueMidiChordDef = iumdd as UniqueMidiChordDef;
+            UniqueMidiChordDef uniqueMidiChordDef = iud as UniqueMidiChordDef;
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
 
             int minimumCrotchetDuration = pageFormat.MinimumCrotchetDuration;
@@ -168,7 +168,7 @@ namespace Moritz.Score.Notation
             }
             else
             {
-                RestSymbol restSymbol = new RestSymbol(voice, iumdd, minimumCrotchetDuration, musicFontHeight);
+                RestSymbol restSymbol = new RestSymbol(voice, (IUniqueDef) iud, minimumCrotchetDuration, musicFontHeight);
                 durationSymbol = restSymbol;
             }
 

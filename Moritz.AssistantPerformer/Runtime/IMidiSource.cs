@@ -1,5 +1,5 @@
 
-namespace Moritz.AssistantPerformer.Runtime
+namespace Moritz.AssistantPerformer
 {
 	public interface IMidiSource
 	{

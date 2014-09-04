@@ -6,6 +6,7 @@ using System.IO;
 using System.Xml;
 
 using Moritz.Globals;
+using Moritz.Score.Notation;
 using Moritz.Score.Midi;
 
 namespace Moritz.Score
@@ -81,30 +82,22 @@ namespace Moritz.Score
                                     if(currentVoice is OutputVoice)
                                     {
                                         msDuration = int.Parse(attributesDict["score:msDuration"]);
-                                        MidiChordDef midiChordDef = GetNewMidiChordDef(r, id, msDuration);
-                                        currentVoice.UniqueMidiDurationDefs.Add(midiChordDef.CreateUniqueMidiDurationDef());
+                                        M.ReadToXmlElementTag(r, "score:midiChord");
+                                        currentVoice.UniqueDefs.Add(new UniqueMidiChordDef(r, id, msDuration));
                                         // msPositions are set later
                                     }
                                     else
                                     {
-                                        //InputChordDef inputChordDef = new InputChordDef(id, ...);
-                                        //currentvoice.InputChordDefs.Add(inputChordDef);
+                                        msDuration = int.Parse(attributesDict["score:msDuration"]);
+                                        M.ReadToXmlElementTag(r, "score:inputChord");
+                                        currentVoice.UniqueDefs.Add(new UniqueInputChordDef(r, id, msDuration));
                                     }
                                     break;
                                 case "rest":
-                                    id = attributesDict["id"];
-                                    if(currentVoice is OutputVoice)
-                                    {                                        
-                                        msDuration = int.Parse(attributesDict["score:msDuration"]);
-                                        MidiRestDef midiRestDef = new MidiRestDef(id, msDuration);
-                                        currentVoice.UniqueMidiDurationDefs.Add(midiRestDef.CreateUniqueMidiDurationDef());
-                                        // msPositions are set later
-                                    }
-                                    else
-                                    {
-                                        //InputRestDef inputRestDef = new InputRestDef(id, ...);
-                                        //currentvoice.InputRestDefs.Add(inputRestDef);
-                                    }
+                                    id = attributesDict["id"];                                        
+                                    msDuration = int.Parse(attributesDict["score:msDuration"]);
+                                    currentVoice.UniqueDefs.Add(new UniqueRestDef(id, msDuration));
+                                    // msPositions are set later
                                 break;
                             }
                         }
@@ -112,14 +105,6 @@ namespace Moritz.Score
                 } while(!(r.Name == "svg" && !r.IsStartElement()));
             }         
             pageStream.Close();
-        }
-
-        private MidiChordDef GetNewMidiChordDef(XmlReader r, string id, int msDuration)
-        {
-            MidiChordDef midiChordDef = null;
-            M.ReadToXmlElementTag(r, "score:midiChord");
-            midiChordDef = new MidiChordDef(r, id, this._score.MidiDurationDefs, msDuration);
-            return midiChordDef;
         }
 
         private Staff GetStaff(SvgSystem system, string staffName, string stafflines, string gap, string isInput)

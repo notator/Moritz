@@ -124,23 +124,19 @@ namespace Moritz.Score.Notation
                         float musicFontHeight = (voice is OutputVoice) ? _pageFormat.MusicFontHeight : _pageFormat.MusicFontHeight * _pageFormat.InputStavesSizeFactor;
                         voice.NoteObjects.Add(new ClefSymbol(voice, _pageFormat.ClefsList[staffIndex], musicFontHeight));
                         bool firstLmdd = true;
-
-                        // change voice.UniqueMidiDurationDefs to a new list voice.NoteObjectDefs.
-                        // continue to add existing UniqueMidiChordDefs anda UniqueMidiRestDef to this list.
-                        // A NoteObjectDef is either a IUniqueMidiDurationDef (a UniqueMidiChordDef or a UniqueMidiRestDef) or
-                        // a  
-                        foreach(IUniqueMidiDurationDef iumdd in voice.UniqueMidiDurationDefs)
+  
+                        foreach(IUniqueDef iud in voice.UniqueDefs)
                         {
                             NoteObject noteObject =
-                                SymbolSet.GetNoteObject(voice, iumdd, firstLmdd, ref currentChannelVelocities[staffIndex], musicFontHeight);
+                                SymbolSet.GetNoteObject(voice, iud, firstLmdd, ref currentChannelVelocities[staffIndex], musicFontHeight);
 
                             ClefChangeSymbol clefChangeSymbol = noteObject as ClefChangeSymbol;
                             if(clefChangeSymbol != null)
                             {
                                 if(voiceIndex == 0)
-                                    voice0ClefChangeDefs.Add(iumdd as UniqueClefChangeDef);
+                                    voice0ClefChangeDefs.Add(iud as UniqueClefChangeDef);
                                 else
-                                    voice1ClefChangeDefs.Add(iumdd as UniqueClefChangeDef);
+                                    voice1ClefChangeDefs.Add(iud as UniqueClefChangeDef);
                             }
 
                             voice.NoteObjects.Add(noteObject);
@@ -361,42 +357,42 @@ namespace Moritz.Score.Notation
             return clefType;
         }
 
-        private void InsertInUniqueMidiDurationDefs(List<UniqueClefChangeDef> uClefChangeDefs, List<IUniqueMidiDurationDef> uniqueMidiDurationDefs)
-        {
-            Debug.Assert(uniqueMidiDurationDefs.Count > 1);
-            foreach(UniqueClefChangeDef uClefChangeDef in uClefChangeDefs)
-            {
-                int msPosition = uClefChangeDef.MsPosition;
-                int count = uniqueMidiDurationDefs.Count;
+        //private void InsertInUniqueMidiDurationDefs(List<UniqueClefChangeDef> uClefChangeDefs, List<IUniqueDef> uniqueMidiDurationDefs)
+        //{
+        //    Debug.Assert(uniqueMidiDurationDefs.Count > 1);
+        //    foreach(UniqueClefChangeDef uClefChangeDef in uClefChangeDefs)
+        //    {
+        //        int msPosition = uClefChangeDef.MsPosition;
+        //        int count = uniqueMidiDurationDefs.Count;
 
-                if(msPosition > uniqueMidiDurationDefs[count - 1].MsPosition)
-                {
-                    uniqueMidiDurationDefs.Add(uClefChangeDef);
-                }
-                else if(msPosition <= uniqueMidiDurationDefs[0].MsPosition)
-                {
-                    uniqueMidiDurationDefs.Insert(0, uClefChangeDef);
-                }
-                else if(count > 1)
-                {
-                    for(int i = 1; i < count; ++i)
-                    {
-                        if((msPosition > uniqueMidiDurationDefs[i - 1].MsPosition)
-                            && msPosition <= uniqueMidiDurationDefs[i].MsPosition)
-                        {
-                            uniqueMidiDurationDefs.Insert(i, uClefChangeDef);
-                            break;
-                        }
-                    }
-                }
-            }
-            for(int i = 1; i < uniqueMidiDurationDefs.Count; ++i)
-            {
-                UniqueClefChangeDef uccd1 = uniqueMidiDurationDefs[i - 1] as UniqueClefChangeDef;
-                UniqueClefChangeDef uccd2 = uniqueMidiDurationDefs[i] as UniqueClefChangeDef;
-                Debug.Assert((uccd1 == null || uccd2 == null) || uccd1.MsPosition < uccd2.MsPosition);
-            }
-        }
+        //        if(msPosition > uniqueMidiDurationDefs[count - 1].MsPosition)
+        //        {
+        //            uniqueMidiDurationDefs.Add(uClefChangeDef);
+        //        }
+        //        else if(msPosition <= uniqueMidiDurationDefs[0].MsPosition)
+        //        {
+        //            uniqueMidiDurationDefs.Insert(0, uClefChangeDef);
+        //        }
+        //        else if(count > 1)
+        //        {
+        //            for(int i = 1; i < count; ++i)
+        //            {
+        //                if((msPosition > uniqueMidiDurationDefs[i - 1].MsPosition)
+        //                    && msPosition <= uniqueMidiDurationDefs[i].MsPosition)
+        //                {
+        //                    uniqueMidiDurationDefs.Insert(i, uClefChangeDef);
+        //                    break;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    for(int i = 1; i < uniqueMidiDurationDefs.Count; ++i)
+        //    {
+        //        UniqueClefChangeDef uccd1 = uniqueMidiDurationDefs[i - 1] as UniqueClefChangeDef;
+        //        UniqueClefChangeDef uccd2 = uniqueMidiDurationDefs[i] as UniqueClefChangeDef;
+        //        Debug.Assert((uccd1 == null || uccd2 == null) || uccd1.MsPosition < uccd2.MsPosition);
+        //    }
+        //}
 
         /// <summary>
         /// The systems do not yet contain Metrics info.

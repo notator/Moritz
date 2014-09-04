@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+using Moritz.Globals;
+using Moritz.Krystals;
 using Moritz.Score;
 using Moritz.Score.Midi;
+using Moritz.Score.Notation;
 
 namespace Moritz.AssistantPerformer
 {
@@ -50,22 +53,21 @@ namespace Moritz.AssistantPerformer
                     Voice voice = voices[i];
                     int channel = voice.MidiChannel;
                     ChannelState channelState = new ChannelState();
-                    foreach(IUniqueMidiDurationDef lmdd in voice.UniqueMidiDurationDefs)
+                    foreach(UniqueMidiChordDef uniqueMidiChordDef in voice.UniqueDefs)
                     {
-                        MidiChordDef midiChordDef = lmdd as MidiChordDef;
-                        if(midiChordDef != null) // not interested in rests here
+                        if(uniqueMidiChordDef != null) // not interested in rests here
                         {
-                            int msPosition = lmdd.MsPosition;
-                            int msDuration = lmdd.MsDuration;
+                            int msPosition = uniqueMidiChordDef.MsPosition;
+                            int msDuration = uniqueMidiChordDef.MsDuration;
                             if(_performanceOptions.SpeedFactor != 1F)
                             {
-                                msPosition = (int)(((float)lmdd.MsPosition) / _performanceOptions.SpeedFactor);
-                                msDuration = (int)(((float)lmdd.MsDuration) / _performanceOptions.SpeedFactor);
+                                msPosition = (int)(((float)uniqueMidiChordDef.MsPosition) / _performanceOptions.SpeedFactor);
+                                msDuration = (int)(((float)uniqueMidiChordDef.MsDuration) / _performanceOptions.SpeedFactor);
                             }
 
                             // The following constructor only creates Midi controls if the channel state has to be changed.
                             // (It updates the channel state accordingly.)
-                            MidiChord midiChord = new MidiChord(channel, midiChordDef, msPosition, msDuration, channelState,
+                            MidiChord midiChord = new MidiChord(channel, uniqueMidiChordDef, msPosition, msDuration, channelState,
                                 _performanceOptions.MinimumOrnamentChordMsDuration);
 
                             if(!channelMoments.ContainsKey(channel))

@@ -612,6 +612,14 @@ namespace Moritz.Globals
             return sb.ToString();
         }
 
+        public static byte MidiValue(int value)
+        {
+            int rval;
+            rval = (value > 127) ? 127 : value;
+            rval = (value < 0) ? 0 : value;
+            return (byte)rval;
+        }
+
         public static Color TextBoxErrorColor = Color.FromArgb(255, 220, 220);
 
         public struct PaperSize

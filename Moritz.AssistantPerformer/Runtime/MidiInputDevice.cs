@@ -8,9 +8,15 @@ using System.Diagnostics;
 
 using Multimedia;
 using Multimedia.Midi;
-using Moritz.Score.Midi;
 
-namespace Moritz.AssistantPerformer.Runtime
+using Moritz.Globals;
+using Moritz.Krystals;
+using Moritz.Score;
+using Moritz.Score.Midi;
+using Moritz.Score.Notation;
+
+
+namespace Moritz.AssistantPerformer
 {
     internal class MidiInputDevice : IMidiSource
     {

@@ -1,4 +1,6 @@
-﻿namespace Moritz.AssistantComposer
+﻿
+
+namespace Moritz.AssistantComposer
 {
     partial class MIDIPercussionHelpForm
     {

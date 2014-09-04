@@ -130,7 +130,7 @@ namespace Moritz.Score.Midi
             this._volume = original.Volume;
             this._ornamentNumberSymbol = original.OrnamentNumberSymbol;
             this._pitchWheelDeviation = original.PitchWheelDeviation;
-            this._midiHeadSymbols = original.MidiHeadSymbols;
+            this._midiPitches = original.MidiPitches;
             this._midiVelocity = original.MidiVelocity;
             this._minimumBasicMidiChordMsDuration = original.MinimumBasicMidiChordMsDuration;
 
@@ -265,7 +265,7 @@ namespace Moritz.Score.Midi
 
         public override IUniqueMidiDurationDef CreateUniqueMidiDurationDef()
         {
-            UniqueMidiChordDef umcd = new UniqueMidiChordDef(this); // a deep clone with a special id string.
+            IUniqueMidiDurationDef umcd = (IUniqueMidiDurationDef) new UniqueMidiChordDef(this); // a deep clone with a special id string.
             umcd.MsPosition = 0;
             umcd.MsDuration = this.MsDuration;
             return umcd;
@@ -309,8 +309,8 @@ namespace Moritz.Score.Midi
         protected bool _hasChordOff = true;
         protected int _minimumBasicMidiChordMsDuration = 1;
 
-        public List<byte> MidiHeadSymbols { get { return _midiHeadSymbols; } }
-        protected List<byte> _midiHeadSymbols = null;
+        public List<byte> MidiPitches { get { return _midiPitches; } }
+        protected List<byte> _midiPitches = null;
         public byte MidiVelocity { get { return _midiVelocity; } }
         protected byte _midiVelocity;
         public int OrnamentNumberSymbol { get { return _ornamentNumberSymbol; } }

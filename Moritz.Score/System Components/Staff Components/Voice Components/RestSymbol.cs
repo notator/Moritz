@@ -10,9 +10,13 @@ namespace Moritz.Score
 {
 	internal class RestSymbol : DurationSymbol
 	{
-        public RestSymbol(Voice voice, IUniqueMidiDurationDef iumdd, int minimumCrotchetDurationMS, float fontHeight)
-            : base(voice, iumdd, minimumCrotchetDurationMS, fontHeight)
+        public RestSymbol(Voice voice, IUniqueDef iumdd, int minimumCrotchetDurationMS, float fontHeight)
+            : base(voice, iumdd.MsDuration, iumdd.MsPosition, minimumCrotchetDurationMS, fontHeight)
         {
+            if(iumdd is UniqueCautionaryChordDef)
+            {
+                Console.WriteLine("rest is UniqueCautionaryChordDef!");
+            }
             LocalCautionaryChordDef = iumdd as UniqueCautionaryChordDef;
         }
 
@@ -71,8 +75,8 @@ namespace Moritz.Score
             }
         }
 
-        public MidiRestDef MidiRestDef { get { return _midiRestDef; } }
-        private MidiRestDef _midiRestDef = null;
+        public RestDef MidiRestDef { get { return _midiRestDef; } }
+        private RestDef _midiRestDef = null;
 
 
 	}

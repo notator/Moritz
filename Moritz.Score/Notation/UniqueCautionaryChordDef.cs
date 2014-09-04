@@ -1,0 +1,55 @@
+using System;
+using System.Diagnostics;
+using System.Collections.Generic;
+
+using Multimedia.Midi;
+using Moritz.Globals;
+using Moritz.Score.Midi;
+
+namespace Moritz.Score.Notation
+{
+    /// <summary>
+    /// Created when a note or rest straddles a barline.
+    /// This class is created while splitting systems.
+    /// It is used when notating them. this class has no content!
+    /// </summary>
+    public class UniqueCautionaryChordDef : IUniqueChordDef
+    {
+        public UniqueCautionaryChordDef(IUniqueChordDef chordDef, int msPosition, int msDuration)
+        {
+            _midiPitches = new List<byte>();
+            foreach(byte midiPitch in chordDef.MidiPitches)
+            {
+                _midiPitches.Add(midiPitch);
+            }
+            MsPosition = msPosition;
+            MsDuration = msDuration;
+        }
+
+        #region IUniqueChordDef
+        /// <summary>
+        /// Cautionary chords should never be transposed. They always have the same pitches as the chord from which they are constructed.
+        /// </summary>
+        public void Transpose(int interval) { }
+
+        public List<byte> MidiPitches { get { return _midiPitches; } set { _midiPitches = value; } }
+        private List<byte> _midiPitches = null;
+
+        #region IUniqueDef
+        public override string ToString()
+        {
+            return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString() + " UniqueCautionaryChordDef");
+        }
+
+        public void AdjustDuration(double factor) { }
+
+        // ????? public int MsDuration { get { return 0; } set { } }
+        public int MsDuration { get { return _msDuration; } set { _msDuration = value; } }
+        private int _msDuration = 0;
+        public int MsPosition { get { return _msPosition; } set { _msPosition = value; } }
+        private int _msPosition = 0;
+        #endregion IUniqueDef
+        #endregion IUniqueChordDef
+
+    }
+}

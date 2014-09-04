@@ -1,9 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 
+using Krystals4ObjectLibrary;
+using Moritz.Globals;
+using Moritz.Krystals;
 using Moritz.Score;
 using Moritz.Score.Midi;
-using Krystals4ObjectLibrary;
+using Moritz.Score.Notation;
+using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {
@@ -29,17 +33,27 @@ namespace Moritz.AssistantComposer
         {
             return new List<byte>() { 0, 1, 2, 3, 4, 5, 6, 7 };
         }
-        
+
         /// <summary>
-        /// Sets the midi content of the score, independent of its notation.
-        /// This means adding MidiDurationDefs to each voice's MidiDurationDefs list.
-        /// The MidiDurations will later be transcribed into a particular notation by a Notator.
-        /// Notations are independent of the midi info.
-        /// This DoAlgorithm() function is special to this composition.
+        /// The DoAlgorithm() function is special to a particular composition.
+        /// The function returns a sequence of bar definitions. Each bar is a list of Voices (conceptually from top to bottom
+        /// in a system, though the actual order can be changed in the Assistant Composer's options).
+        /// Each bar in the sequence has the same number of Voices. Voices at the same position in each bar are continuations
+        /// of the same overall voice, and may be concatenated later. OutputVoices at the same position in each bar have the
+        /// same midi channel.
+        /// Midi channels:
+        /// By convention, algorithms use midi channels having indices which increase from top to bottom in the
+        /// system, starting at 0. Midi channels may not occur twice in the same system. Each algorithm declares which midi
+        /// channels it uses in the MidiChannels() function (see above). For an example, see Study2bAlgorithm.
+        /// Each 'bar definition' is actually contained in the UniqueDefs list in each Voice (i.e. Voice.UniqueDefs).
+        /// The Voice.NoteObjects lists are still empty when DoAlgorithm() returns.
+        /// The Voice.UniqueDefs will be converted to NoteObjects having a specific notation later (in Notator.AddSymbolsToSystems()).
+        /// ACHTUNG:
+        /// The top (=first) Voice in each bar must be an OutputVoice.
+        /// This can be followed by zero or more OutputVoices, followed by zero or more InputVoices.
+        /// The chord definitions in OutputVoice.UniqueDefs must be UniqueMidiChordDefs.
+        /// The chord definitions in InputVoice.UniqueDefs must be UniqueInputChordDefs.
         /// </summary>
-        /// <returns>
-        /// A list of sequential bars. Each bar contains all the voices in the bar, from top to bottom.
-        /// </returns>
         public override List<List<Voice>> DoAlgorithm()
         {
             List<List<Voice>> bars = new List<List<Voice>>();
@@ -89,15 +103,15 @@ namespace Moritz.AssistantComposer
         {
             int msPosition = 0;
             int bar1ChordMsSeparation = 1500;
-            foreach(MidiDurationDef midiDurationDef in midiDurationDefs)
+            foreach(DurationDef midiDurationDef in midiDurationDefs)
             {
                 Debug.Assert(midiDurationDef.MsDuration > 0);
-                IUniqueMidiDurationDef noteDef = midiDurationDef.CreateUniqueMidiDurationDef();
+                IUniqueDef noteDef = midiDurationDef.DeepClone();
                 noteDef.MsPosition = msPosition;
-                IUniqueMidiDurationDef restDef = new UniqueMidiRestDef(msPosition + noteDef.MsDuration, bar1ChordMsSeparation - noteDef.MsDuration);
+                UniqueRestDef restDef = new UniqueRestDef(msPosition + noteDef.MsDuration, bar1ChordMsSeparation - noteDef.MsDuration);
                 msPosition += bar1ChordMsSeparation;
-                voice.UniqueMidiDurationDefs.Add(noteDef);
-                voice.UniqueMidiDurationDefs.Add(restDef);
+                voice.UniqueDefs.Add(noteDef);
+                voice.UniqueDefs.Add(restDef);
             }
         }
         #endregion CreateBar1()
@@ -135,8 +149,8 @@ namespace Moritz.AssistantComposer
                 int mdsdEndPos = voiceDefs[i].EndMsPosition;
                 if(maxBarMsPos > mdsdEndPos)
                 {
-                    IUniqueMidiDurationDef rest2Def = new UniqueMidiRestDef(mdsdEndPos, maxBarMsPos - mdsdEndPos);
-                    bar[i].UniqueMidiDurationDefs.Add(rest2Def);
+                    UniqueRestDef rest2Def = new UniqueRestDef(mdsdEndPos, maxBarMsPos - mdsdEndPos);
+                    bar[i].UniqueDefs.Add(rest2Def);
                 }
             }
             return bar;
@@ -148,17 +162,17 @@ namespace Moritz.AssistantComposer
         /// </summary>
         private int WriteVoiceMidiDurationDefsInBar2(Voice voice, VoiceDef voiceDef, int msPosition, int bar2StartMsPos)
         {
-            IUniqueMidiDurationDef rest1Def = null;
+            UniqueRestDef rest1Def = null;
             if(msPosition > bar2StartMsPos)
             {
-                rest1Def = new UniqueMidiRestDef(bar2StartMsPos, msPosition - bar2StartMsPos);
-                voice.UniqueMidiDurationDefs.Add(rest1Def);
+                rest1Def = new UniqueRestDef(bar2StartMsPos, msPosition - bar2StartMsPos);
+                voice.UniqueDefs.Add(rest1Def);
             }
 
             voiceDef.StartMsPosition = msPosition;
-            foreach(IUniqueMidiDurationDef iumdd in voiceDef)
+            foreach(IUniqueDef iumdd in voiceDef)
             {
-                voice.UniqueMidiDurationDefs.Add(iumdd);
+                voice.UniqueDefs.Add(iumdd);
             }
 
             return voiceDef.EndMsPosition;

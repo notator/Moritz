@@ -1,7 +1,7 @@
 
 using Multimedia.Midi;
 
-namespace Moritz.AssistantPerformer.Runtime
+namespace Moritz.AssistantPerformer
 {
     /// <summary>
     /// Called by the AssistantPerformerRuntime to report the performer's position to 

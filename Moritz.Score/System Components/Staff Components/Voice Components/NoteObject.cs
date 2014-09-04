@@ -4,15 +4,7 @@ using Moritz.Score.Notation;
 
 namespace Moritz.Score
 {
-    internal interface IWritesForegroundSVG
-    {
-        /// <summary>
-        /// Writes an object to the end of an SVG file (after/in front of the stafflines).
-        /// </summary>
-        void WriteSVG(SvgWriter w);
-    }
-
-    public abstract class NoteObject : IWritesForegroundSVG
+    public abstract class NoteObject
 	{
         public NoteObject(Voice voice)
         {

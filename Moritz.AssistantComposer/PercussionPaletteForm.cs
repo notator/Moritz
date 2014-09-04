@@ -15,21 +15,21 @@ using Moritz.Globals;
 using Moritz.Krystals;
 using Moritz.Score;
 using Moritz.Score.Midi;
+using Moritz.Score.Notation;
 using Moritz.AssistantPerformer;
-using Moritz.AssistantPerformer.Runtime;
 
 namespace Moritz.AssistantComposer
 {
     public partial class PercussionPaletteForm : Form, IPaletteForm
     {
-        public PercussionPaletteForm(XmlReader r, string name, int domain, AssistantComposerMainForm assistantComposerMainForm)
+        public PercussionPaletteForm(XmlReader r, string name, int domain, Form assistantComposerMainForm)
             : this(name, domain, assistantComposerMainForm)
         {
             ReadPalette(r);
             _audioButtonsControl.Enabled = true;
         }
 
-        public PercussionPaletteForm(string name, int domain, AssistantComposerMainForm assistantComposerMainForm)
+        public PercussionPaletteForm(string name, int domain, Form assistantComposerMainForm)
         {
             InitializeComponent();
             _name = name;
@@ -939,14 +939,14 @@ namespace Moritz.AssistantComposer
         }
         private string _name = null;
         private int _domain = 0;
-        private AssistantComposerMainForm _assistantComposerMainForm = null;
+        private Form _assistantComposerMainForm = null;
         private List<TextBox> _allMainTextBoxes = new List<TextBox>();
         private AudioButtonsControl _audioButtonsControl = null;
         #endregion iPaletteForm
 
         #region public variables
         public int Domain { get { return _domain; } }
-        public AssistantComposerMainForm AssistantComposerMainForm { get { return _assistantComposerMainForm; } }
+        public Form AssistantComposerMainForm { get { return _assistantComposerMainForm; } }
         public BasicPercussionControl BasicChordControl { get { return _bpc; } }
         public PercussionOrnamentsForm PercussionOrnamentsForm { get { return _percussionOrnamentsForm; } }
         #endregion public variables

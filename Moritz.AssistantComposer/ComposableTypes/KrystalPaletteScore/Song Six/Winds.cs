@@ -2,9 +2,13 @@
 using System.Diagnostics;
 using System;
 
+using Krystals4ObjectLibrary;
+using Moritz.Globals;
+using Moritz.Krystals;
 using Moritz.Score;
 using Moritz.Score.Midi;
-using Krystals4ObjectLibrary;
+using Moritz.Score.Notation;
+using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {
@@ -23,7 +27,7 @@ namespace Moritz.AssistantComposer
 
         private SongSixVoiceDef GetWind2(SongSixVoiceDef wind3, Clytemnestra clytemnestra)
         {
-            List<IUniqueMidiDurationDef> clytLmdds = clytemnestra.UniqueMidiDurationDefs;
+            List<IUniqueDef> clytLmdds = clytemnestra.UniqueDefs;
             int rotationMsPosition = clytLmdds[59].MsPosition + 700;
 
             SongSixVoiceDef wind2 = GetRotatedWind(wind3, rotationMsPosition);
@@ -41,7 +45,7 @@ namespace Moritz.AssistantComposer
 
         private SongSixVoiceDef GetWind1(SongSixVoiceDef wind3, SongSixVoiceDef wind2, Clytemnestra clytemnestra)
         {
-            List<IUniqueMidiDurationDef> clytLmdds = clytemnestra.UniqueMidiDurationDefs;
+            List<IUniqueDef> clytLmdds = clytemnestra.UniqueDefs;
             int rotationMsPosition = clytLmdds[116].MsPosition + 700;
 
             SongSixVoiceDef wind1 = GetRotatedWind(wind3, rotationMsPosition);
@@ -68,9 +72,9 @@ namespace Moritz.AssistantComposer
             int finalBarlineMsPosition = originalVoiceDef.EndMsPosition;
             int msDurationAfterSynch = finalBarlineMsPosition - rotationMsPosition;
 
-            List<IUniqueMidiDurationDef> originalLmdds = tempWind.UniqueMidiDurationDefs;
-            List<IUniqueMidiDurationDef> originalStartLmdds = new List<IUniqueMidiDurationDef>();
-            List<IUniqueMidiDurationDef> newWindLmdds = new List<IUniqueMidiDurationDef>();
+            List<IUniqueDef> originalLmdds = tempWind.UniqueDefs;
+            List<IUniqueDef> originalStartLmdds = new List<IUniqueDef>();
+            List<IUniqueDef> newWindLmdds = new List<IUniqueDef>();
             int accumulatingMsDuration = 0;
             for(int i = 0; i < tempWind.Count; ++i)
             {
@@ -87,10 +91,10 @@ namespace Moritz.AssistantComposer
             newWindLmdds.AddRange(originalStartLmdds);
 
             int msPosition = 0;
-            foreach(IUniqueMidiDurationDef lmdd in newWindLmdds)
+            foreach(IUniqueDef iu in newWindLmdds)
             {
-                lmdd.MsPosition = msPosition;
-                msPosition += lmdd.MsDuration;
+                iu.MsPosition = msPosition;
+                msPosition += iu.MsDuration;
             }
             SongSixVoiceDef newRotatedWind = new SongSixVoiceDef(newWindLmdds);
 

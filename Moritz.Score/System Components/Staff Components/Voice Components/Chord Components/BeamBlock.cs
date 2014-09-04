@@ -8,12 +8,12 @@ namespace Moritz.Score
 {
 	public class BeamBlock : Metrics
 	{
-        public BeamBlock(ClefSymbol clef, List<ChordSymbol> chordsBeamedTogether, VerticalDir voiceStemDirection, float beamThickness, float strokeThickness)
+        public BeamBlock(ClefSymbol clef, List<OutputChordSymbol> chordsBeamedTogether, VerticalDir voiceStemDirection, float beamThickness, float strokeThickness)
             : base(null, null, 0, 0)
         {
-            Chords = new List<ChordSymbol>(chordsBeamedTogether);
+            Chords = new List<OutputChordSymbol>(chordsBeamedTogether);
             SetBeamedGroupStemDirection(clef, chordsBeamedTogether, voiceStemDirection);
-            foreach(ChordSymbol chord in chordsBeamedTogether)
+            foreach(OutputChordSymbol chord in chordsBeamedTogether)
                 chord.BeamBlock = this; // prevents an isolated flag from being created
 
             _gap = Chords[0].Voice.Staff.Gap;
@@ -38,7 +38,7 @@ namespace Moritz.Score
         /// </summary>
         /// <param name="currentClef"></param>
         /// <param name="chordsBeamedTogether"></param>
-        private void SetBeamedGroupStemDirection(ClefSymbol currentClef, List<ChordSymbol> chordsBeamedTogether, VerticalDir voiceStemDirection)
+        private void SetBeamedGroupStemDirection(ClefSymbol currentClef, List<OutputChordSymbol> chordsBeamedTogether, VerticalDir voiceStemDirection)
         {
             Debug.Assert(chordsBeamedTogether.Count > 1);
             VerticalDir groupStemDirection = voiceStemDirection;
@@ -46,7 +46,7 @@ namespace Moritz.Score
             {   // here, there is only one voice in the staff, so the direction depends on the height of the noteheads.
                 int upStems = 0;
                 int downStems = 0;
-                foreach(ChordSymbol chord in chordsBeamedTogether)
+                foreach(OutputChordSymbol chord in chordsBeamedTogether)
                 {
                     VerticalDir direction = chord.DefaultStemDirection(currentClef);
                     if(direction == VerticalDir.up)
@@ -62,20 +62,20 @@ namespace Moritz.Score
                 else
                     groupStemDirection = VerticalDir.down;
             }
-            foreach(ChordSymbol chord in chordsBeamedTogether)
+            foreach(OutputChordSymbol chord in chordsBeamedTogether)
             {
                 chord.Stem.Direction = groupStemDirection;
             }
         }
 
-        private VerticalDir GetDirectionFromExtremes(ClefSymbol currentClef, List<ChordSymbol> chordsBeamedTogether)
+        private VerticalDir GetDirectionFromExtremes(ClefSymbol currentClef, List<OutputChordSymbol> chordsBeamedTogether)
         {
             float headMinTop = float.MaxValue;
             float headMaxBottom = float.MinValue;
             float gap = chordsBeamedTogether[0].Voice.Staff.Gap;
             int numberOfStafflines = chordsBeamedTogether[0].Voice.Staff.NumberOfStafflines;
 
-            foreach(ChordSymbol chord in chordsBeamedTogether)
+            foreach(OutputChordSymbol chord in chordsBeamedTogether)
             {
                 foreach(Head head in chord.HeadsTopDown)
                 {
@@ -92,7 +92,7 @@ namespace Moritz.Score
                 return VerticalDir.down;
         }
 
-        private float GetDefaultStemTipY(ClefSymbol currentClef, List<ChordSymbol> chordsBeamedTogether)
+        private float GetDefaultStemTipY(ClefSymbol currentClef, List<OutputChordSymbol> chordsBeamedTogether)
         {
             float headMinTop = float.MaxValue;
             float headMaxBottom = float.MinValue;
@@ -100,7 +100,7 @@ namespace Moritz.Score
             int numberOfStafflines = chordsBeamedTogether[0].Voice.Staff.NumberOfStafflines;
             VerticalDir direction = chordsBeamedTogether[0].Stem.Direction;
 
-            foreach(ChordSymbol chord in chordsBeamedTogether)
+            foreach(OutputChordSymbol chord in chordsBeamedTogether)
             {
                 foreach(Head head in chord.HeadsTopDown)
                 {
@@ -122,13 +122,13 @@ namespace Moritz.Score
         /// is greater than or equal to the msPosition at the start of this beamBlock,
         /// and less than or equal to the msPosition at the end of this beamBlock. 
         /// </summary>
-        public List<ChordSymbol> EnclosedChords(Voice otherVoice)
+        public List<OutputChordSymbol> EnclosedChords(Voice otherVoice)
         {
             Debug.Assert(Chords.Count > 1);
             int startMsPos = Chords[0].MsPosition;
             int endMsPos = Chords[Chords.Count-1].MsPosition;
-            List<ChordSymbol> enclosedChordSymbols = new List<ChordSymbol>();
-            foreach(ChordSymbol otherChord in otherVoice.ChordSymbols)
+            List<OutputChordSymbol> enclosedChordSymbols = new List<OutputChordSymbol>();
+            foreach(OutputChordSymbol otherChord in otherVoice.ChordSymbols)
             {
                 if(otherChord.MsPosition >= startMsPos && otherChord.MsPosition <= endMsPos)
                     enclosedChordSymbols.Add(otherChord);
@@ -185,7 +185,7 @@ namespace Moritz.Score
         List<ChordMetrics> GetChordsMetrics()
         {
             List<ChordMetrics> chordsMetrics = new List<ChordMetrics>();
-            foreach(ChordSymbol chord in Chords)
+            foreach(OutputChordSymbol chord in Chords)
             {
                 chordsMetrics.Add((ChordMetrics)chord.Metrics);
             }
@@ -218,7 +218,7 @@ namespace Moritz.Score
             float rightMostStemX = rightMostChordMetrics.StemMetrics.OriginX;
 
             int stemNumber = 1;
-            foreach(ChordSymbol chord in Chords)
+            foreach(OutputChordSymbol chord in Chords)
             {
                 ChordMetrics chordMetrics = (ChordMetrics)chord.Metrics;
                 float stemX = chordMetrics.StemMetrics.OriginX;
@@ -621,7 +621,7 @@ namespace Moritz.Score
             Debug.Assert(quaverBeam != null);
             float tanAlpha = (quaverBeam.RightTopY - quaverBeam.LeftTopY) / (quaverBeam.RightX - quaverBeam.LeftX);
 
-            foreach(ChordSymbol chord in Chords)
+            foreach(OutputChordSymbol chord in Chords)
             {
                 ChordMetrics chordMetrics = ((ChordMetrics)chord.Metrics);
                 StemMetrics stemMetrics = chordMetrics.StemMetrics; // a clone
@@ -701,8 +701,8 @@ namespace Moritz.Score
         {
             float minMsPosition = Chords[0].MsPosition;
             float maxMsPosition = Chords[Chords.Count - 1].MsPosition;
-            List<ChordSymbol> otherChords = new List<ChordSymbol>();
-            foreach(ChordSymbol otherChordSymbol in otherVoice.ChordSymbols)
+            List<OutputChordSymbol> otherChords = new List<OutputChordSymbol>();
+            foreach(OutputChordSymbol otherChordSymbol in otherVoice.ChordSymbols)
             {
                 if(otherChordSymbol.MsPosition >= minMsPosition && otherChordSymbol.MsPosition <= maxMsPosition)
                     otherChords.Add(otherChordSymbol);
@@ -719,7 +719,7 @@ namespace Moritz.Score
                     {
                         float deltaY = -(minimumDistanceToChords - distanceToChords);
                         this.Move(deltaY);
-                        foreach(ChordSymbol chord in Chords)
+                        foreach(OutputChordSymbol chord in Chords)
                         {
                             float newStemTipY = chord.ChordMetrics.StemMetrics.Top + deltaY;
                             chord.ChordMetrics.MoveOuterStemTip(newStemTipY, VerticalDir.up);
@@ -732,7 +732,7 @@ namespace Moritz.Score
                     {
                         float deltaY = minimumDistanceToChords - distanceToChords;
                         this.Move(deltaY);
-                        foreach(ChordSymbol chord in Chords)
+                        foreach(OutputChordSymbol chord in Chords)
                         {
                             float newStemTipY = chord.ChordMetrics.StemMetrics.Bottom + deltaY;
                             chord.ChordMetrics.MoveOuterStemTip(newStemTipY, VerticalDir.down);
@@ -746,10 +746,10 @@ namespace Moritz.Score
         /// Returns the smallest distance between the inner edge of this beam and the noteheads
         /// in the other chords. The other chords are in a second voice on this staff.
         /// </summary>
-        private float DistanceToChords(List<ChordSymbol> otherChords)
+        private float DistanceToChords(List<OutputChordSymbol> otherChords)
         {
             float minimumDistanceToChords = float.MaxValue;
-            foreach(ChordSymbol chord in otherChords)
+            foreach(OutputChordSymbol chord in otherChords)
             {
                 float distanceToChord = float.MaxValue;
                 if(_stemDirection == VerticalDir.up)
@@ -812,7 +812,7 @@ namespace Moritz.Score
         {
             Debug.Assert(this.Beams.Contains(beam));
             float beamBeginMsPosition = float.MinValue;
-            foreach(ChordSymbol chord in Chords)
+            foreach(OutputChordSymbol chord in Chords)
             {
                 float stemX = chord.ChordMetrics.StemMetrics.OriginX;
                 if(stemX == beam.LeftX || stemX == beam.RightX) // rightX can be a beam stub
@@ -831,7 +831,7 @@ namespace Moritz.Score
             float beamEndMsPosition = float.MinValue;
             for(int i = Chords.Count - 1; i >= 0; --i)
             {
-                ChordSymbol chord = Chords[i];
+                OutputChordSymbol chord = Chords[i];
                 float stemX = chord.ChordMetrics.StemMetrics.OriginX;
                 if(stemX == beam.LeftX || stemX == beam.RightX) // rightX can be a beam stub
                 {
@@ -869,7 +869,7 @@ namespace Moritz.Score
             w.SvgEndGroup();
         }
 
-		public readonly List<ChordSymbol> Chords = null;
+		public readonly List<OutputChordSymbol> Chords = null;
         public float DefaultStemTipY { get { return _defaultStemTipY; } }
         private readonly float _defaultStemTipY;
         private readonly float _gap;

@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 using Krystals4ObjectLibrary;
-
+using Moritz.Globals;
+using Moritz.Krystals;
 using Moritz.Score;
 using Moritz.Score.Midi;
 using Moritz.Score.Notation;
@@ -40,9 +42,6 @@ namespace Moritz.AssistantComposer
                 case "Study 3 sketch 2":
                     midiAlgorithm = new Study3Sketch2Algorithm(krystals, paletteDefs);
                     break;
-                case "Study 4":
-                    midiAlgorithm = new Study4Algorithm(krystals, paletteDefs);
-                    break;
                 case "paletteDemo":
                     midiAlgorithm = new PaletteDemoAlgorithm(paletteDefs);
                     break;
@@ -58,26 +57,24 @@ namespace Moritz.AssistantComposer
             for(int paletteIndex = 0; paletteIndex < palettes.Count; ++paletteIndex)
             {
                 Palette palette = palettes[paletteIndex];
-                List<MidiDurationDef> midiDurationDefs = new List<MidiDurationDef>();
+                List<DurationDef> midiDurationDefs = new List<DurationDef>();
                 for(int valueIndex = 0; valueIndex < palette.Domain; ++valueIndex)
                 {
-                    MidiDurationDef mdd;
+                    DurationDef mdd;
                     if(palette.BasicChordSettings.ChordDensities[valueIndex] == 0)
                     {
                         int msDuration = palette.BasicChordSettings.Durations[valueIndex];
-                        string id = "palette" + (paletteIndex + 1).ToString() +
-                            "_rest" + (valueIndex + 1).ToString();
-                        mdd = new MidiRestDef(id, msDuration);
+                        /// A RestDef is a definition retrieved from a palette.
+                        /// RestDefs are immutable, and have no MsPosition property.
+                        /// UniqueRestDefs are mutable RestDefs with both MsPositon and MsDuration properties.
+                        mdd = new RestDef(msDuration);
                     }
                     else
                     {
-                        string id = "palette" + (paletteIndex + 1).ToString() +
-                            "_chord" + (valueIndex + 1).ToString();
-                        /// A PaletteMidiChordDef is a MidiChordDef which is saved in or retreived from a palette.
-                        /// It can be 'used' in SVG files, but is usually converted to a UniqueMidiChordDef
-                        /// (which is saved locally in an SVG file).
-                        /// LocalMidiChordDefs are UniqueMidiChordDefs with MsPositon and msDuration attributes.
-                        mdd = new PaletteMidiChordDef(id, palette, valueIndex);
+                        /// A MidiChordDef is a ChordDef which is retrieved from a palette.
+                        /// MidiChordDefs are immutable, and their MsPosition property is null.
+                        /// LocalMidiChordDefs are UniqueMidiChordDefs with MsPositon and MsDuration attributes.
+                        mdd = new MidiChordDef(palette, valueIndex);
                     }
                     midiDurationDefs.Add(mdd);
                 }
@@ -86,12 +83,55 @@ namespace Moritz.AssistantComposer
             return paletteDefs;
         }
 
+        private void CheckBars(List<List<Voice>> voicesPerSystemPerBar)
+        {
+            int error = 0;
+            if(voicesPerSystemPerBar.Count == 0)
+                error = 1;
+            else
+            {
+                foreach(List<Voice> bar in voicesPerSystemPerBar)
+                {
+                    if(bar.Count == 0)
+                    {
+                        error = 2;
+                        break;
+                    }
+                    if(!(bar[0] is OutputVoice))
+                    {
+                        error = 3;
+                        break;
+                    }
+                    foreach(Voice voice in bar)
+                    {
+                        if(voice.UniqueDefs.Count == 0)
+                        {
+                            error = 4;
+                            break;
+                        }
+                        if(voice.NoteObjects.Count != 0)
+                        {
+                            error = 5;
+                            break;
+                        }
+                    }
+                    if(error > 0)
+                        break;
+                }
+            }
+            if(error > 0)
+            {
+                throw new ApplicationException("ComposableScore.CheckBars(): Algorithm error: " + error.ToString());
+            }
+        }
         /// <summary>
         /// Called by the derived class after setting _midiAlgorithm and Notator
         /// </summary>
         protected void CreateScore()
         {
             List<List<Voice>> voicesPerSystemPerBar = _midiAlgorithm.DoAlgorithm();
+
+            CheckBars(voicesPerSystemPerBar);
 
             Notator.CreateSystems(this, voicesPerSystemPerBar, _pageFormat.Gap);
 

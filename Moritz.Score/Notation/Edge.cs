@@ -146,7 +146,7 @@ namespace Moritz.Score.Notation
                 foreach(NoteObject noteObject in voice.NoteObjects)
                 {
                     Study2b2ChordSymbol study2b2ChordSymbol = noteObject as Study2b2ChordSymbol;
-                    ChordSymbol chordSymbol = noteObject as ChordSymbol;
+                    OutputChordSymbol chordSymbol = noteObject as OutputChordSymbol;
                     ClefSymbol clef = noteObject as ClefSymbol;
                     if(study2b2ChordSymbol != null)
                     {

@@ -1,3 +1,5 @@
+
+
 namespace Moritz.AssistantComposer
 {
 	partial class PaletteForm

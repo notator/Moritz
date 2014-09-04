@@ -1,26 +1,125 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Xml;
 
 using Multimedia.Midi;
 using Moritz.Globals;
 
+using Moritz.Score.Notation;
+
 namespace Moritz.Score.Midi
 {
     ///<summary>
-    /// A UniqueMidiChordDef is a MidiChordDef which is saved locally in an SVG file.
+    /// A UniqueMidiChordDef is a MidiChordDef which is saved and retrieved from voices in an SVG file.
     /// Related classes:
-    /// 1. A PaletteMidiChordDef is a MidiChordDef which is saved in or retreived from a palette.
-    /// PaletteMidiChordDefs can be 'used' in SVG files, but are usually converted to UniqueMidiChordDef.
-    /// 2. A LocalMidiChordDef is a UniqueMidiChordDef with additional MsPositon and msDuration attributes.
+    /// 1. A PaletteMidiChordDef is a MidiChordDef retrieved from a palette.
+    /// PaletteMidiChordDefs are immutable, and have a null MsPosition attribute.
+    /// 2. A UniqueMidiChordDef is a MidiChordDef with both MsPositon and MsDuration attributes.
     //</summary>
-    public class UniqueMidiChordDef : MidiChordDef , IUniqueMidiDurationDef
+    public class UniqueMidiChordDef : MidiChordDef, IUniqueSplittableChordDef, IUniqueCloneDef
     {
         public UniqueMidiChordDef()
-            :base()
+            : base()
         {
             ID = "localChord" + UniqueChordID.ToString();
         }
+
+        #region Constructor used when reading an SVG file
+        public UniqueMidiChordDef(XmlReader r, string localID, int msDuration)
+            : base()
+        {
+            // The reader is at the beginning of a "score:midiChord" element having an ID attribute
+            Debug.Assert(r.Name == "score:midiChord" && r.IsStartElement() && r.AttributeCount > 0);
+            int nAttributes = r.AttributeCount;
+            for(int i = 0; i < nAttributes; i++)
+            {
+                r.MoveToAttribute(i);
+                switch(r.Name)
+                {
+                    case "id":
+                        ID = localID; // this is the local id in the score
+                        break;
+                    case "repeat":
+                        // repeat is false if this attribute is not present
+                        byte rmVal = byte.Parse(r.Value);
+                        if(rmVal == 0)
+                            _repeat = false;
+                        else
+                            _repeat = true;
+                        break;
+                    case "hasChordOff":
+                        // hasChordOff is true if this attribute is not present
+                        byte hcoVal = byte.Parse(r.Value);
+                        if(hcoVal == 0)
+                            _hasChordOff = false;
+                        else
+                            _hasChordOff = true;
+                        break;
+                    case "bank":
+                        _bank = byte.Parse(r.Value);
+                        break;
+                    case "patch":
+                        _patch = byte.Parse(r.Value);
+                        break;
+                    case "volume":
+                        _volume = byte.Parse(r.Value);
+                        break;
+                    case "pitchWheelDeviation":
+                        _pitchWheelDeviation = byte.Parse(r.Value);
+                        break;
+                    case "minBasicChordMsDuration":
+                        this._minimumBasicMidiChordMsDuration = int.Parse(r.Value);
+                        break;
+                }
+            }
+
+            M.ReadToXmlElementTag(r, "score:basicChords", "score:sliders");
+            while(r.Name == "score:basicChords" || r.Name == "score:sliders")
+            {
+                if(r.IsStartElement())
+                {
+                    switch(r.Name)
+                    {
+                        case "score:basicChords":
+                            GetBasicChordDefs(r);
+                            break;
+                        case "score:sliders":
+                            MidiChordSliderDefs = new MidiChordSliderDefs(r);
+                            break;
+                    }
+
+                    M.ReadToXmlElementTag(r, "score:basicChords", "score:sliders", "score:midiChord");
+                }
+            }
+
+            #region check total duration
+            List<int> basicChordDurations = BasicChordDurations;
+            int sumDurations = 0;
+            foreach(int bcd in basicChordDurations)
+                sumDurations += bcd;
+            Debug.Assert(_msDuration == sumDurations);
+            #endregion
+
+            //bool isStartElement = r.IsStartElement();
+            //Debug.Assert(r.Name == "score.inputChord" && !(isStartElement));
+        }
+
+        private void GetBasicChordDefs(XmlReader r)
+        {
+            // The reader is at the beginning of a "basicChords" element
+            Debug.Assert(r.Name == "score:basicChords" && r.IsStartElement());
+            M.ReadToXmlElementTag(r, "score:basicChord");
+            while(r.Name == "score:basicChord")
+            {
+                if(r.IsStartElement())
+                {
+                    BasicMidiChordDefs.Add(new BasicMidiChordDef(r));
+                }
+                M.ReadToXmlElementTag(r, "score:basicChord", "score:basicChords");
+            }
+        }
+        #endregion
 
         /// <summary>
         /// A deep clone of the argument. This class is saved as an individual chordDef in SVG files,
@@ -29,7 +128,7 @@ namespace Moritz.Score.Midi
         /// </summary>
         /// <param name="midiChordDef"></param>
         public UniqueMidiChordDef(MidiChordDef mcd)
-            :this()
+            : this()
         {
             Debug.Assert(mcd != null);
 
@@ -47,7 +146,7 @@ namespace Moritz.Score.Midi
 
             _midiVelocity = mcd.MidiVelocity;
             _ornamentNumberSymbol = mcd.OrnamentNumberSymbol;
-            _midiHeadSymbols = new List<byte>(mcd.MidiHeadSymbols);
+            _midiPitches = new List<byte>(mcd.MidiPitches);
 
             MidiChordSliderDefs mcsd = mcd.MidiChordSliderDefs;
             if(mcsd != null)
@@ -100,7 +199,7 @@ namespace Moritz.Score.Midi
             _hasChordOff = hasChordOff;
             _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 
-            _midiHeadSymbols = pitches;
+            _midiPitches = pitches;
             _midiVelocity = velocities[0];
             _ornamentNumberSymbol = 0;
 
@@ -125,7 +224,7 @@ namespace Moritz.Score.Midi
             _hasChordOff = hasChordOff;
             _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 
-            _midiHeadSymbols = pitches;
+            _midiPitches = pitches;
             _midiVelocity = velocities[0];
             _ornamentNumberSymbol = 0;
 
@@ -138,12 +237,24 @@ namespace Moritz.Score.Midi
 
         }
 
-        #region IUniqueMidiDurationDef
-        public override string ToString()
+        #region IUniqueCloneDef
+        #region IUniqueSplittableChordDef
+
+        public IUniqueDef DeepClone()
         {
-            return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString());
+            return new UniqueMidiChordDef(this);
         }
 
+        public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
+        private int? _msDurationToNextBarline = null;
+
+        #region IUniqueChordDef
+        /// <summary>
+        /// Transpose (both notation and sound) by the number of semitones given in the argument.
+        /// Negative interval values transpose down.
+        /// It is not an error if Midi values would exceed the range 0..127.
+        /// In this case, they are silently coerced to 0 or 127 respectively.
+        /// </summary>
         /// <summary>
         /// Transpose (both notation and sound) by the number of semitones given in the argument.
         /// Negative interval values transpose down.
@@ -152,19 +263,28 @@ namespace Moritz.Score.Midi
         /// </summary>
         public void Transpose(int interval)
         {
-            for(int i = 0; i < _midiHeadSymbols.Count; ++i)
+            for(int i = 0; i < _midiPitches.Count; ++i)
             {
-                _midiHeadSymbols[i] = MidiValue(_midiHeadSymbols[i] + interval);
+                _midiPitches[i] = M.MidiValue(_midiPitches[i] + interval);
             }
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
                 List<byte> notes = bmcd.Notes;
                 for(int i = 0; i < notes.Count; ++i)
                 {
-                    notes[i] = MidiValue(notes[i] + interval);
+                    notes[i] = M.MidiValue(notes[i] + interval);
                 }
                 bmcd.Notes = ReduceList(notes);
             }
+        }
+
+        public new List<byte> MidiPitches { get { return _midiPitches; } set { _midiPitches = value; } }
+        private new List<byte> _midiPitches = null;
+
+        #region IUniqueDef
+        public override string ToString()
+        {
+            return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString() + " UniqueMidiChordDef");
         }
 
         /// <summary>
@@ -176,13 +296,34 @@ namespace Moritz.Score.Midi
             MsDuration = (int)(_msDuration * factor);
         }
 
+        public new int MsDuration
+        {
+            get
+            {
+                return _msDuration;
+            }
+            set
+            {
+                _msDuration = value;
+                BasicMidiChordDefs = FitToDuration(BasicMidiChordDefs, MsDuration, _minimumBasicMidiChordMsDuration);
+            }
+        }
+
+        public int MsPosition { get { return _msPosition; } set { _msPosition = value; } }
+        private int _msPosition = 0;
+
+        #endregion IUniqueDef
+        #endregion IUniqueChordDef
+        #endregion IUniqueSplittableChordDef
+        #endregion
+
         public void AdjustVelocities(double factor)
         {
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
                 for(int i = 0; i < bmcd.Velocities.Count; ++i)
                 {
-                    bmcd.Velocities[i] = MidiValue((int)(bmcd.Velocities[i] * factor));
+                    bmcd.Velocities[i] = M.MidiValue((int)(bmcd.Velocities[i] * factor));
                 }
             }
             this._midiVelocity = BasicMidiChordDefs[0].Velocities[0];
@@ -193,12 +334,12 @@ namespace Moritz.Score.Midi
             List<byte> exprs = this.MidiChordSliderDefs.ExpressionMsbs;
             for(int i = 0; i < exprs.Count; ++i)
             {
-                exprs[i] = MidiValue((int)(exprs[i] * factor));
+                exprs[i] = M.MidiValue((int)(exprs[i] * factor));
             }
         }
 
         public List<byte> PanMsbs
-        { 
+        {
             get
             {
                 List<byte> rval;
@@ -211,7 +352,7 @@ namespace Moritz.Score.Midi
                     rval = this.MidiChordSliderDefs.PanMsbs;
                 }
                 return rval;
-            } 
+            }
             set
             {
                 if(this.MidiChordSliderDefs == null)
@@ -226,9 +367,9 @@ namespace Moritz.Score.Midi
                 pans.Clear();
                 for(int i = 0; i < value.Count; ++i)
                 {
-                    pans.Add(MidiValue((int)(value[i])));
+                    pans.Add(M.MidiValue((int)(value[i])));
                 }
-            } 
+            }
         }
 
         public void AdjustModulationWheel(double factor)
@@ -236,7 +377,7 @@ namespace Moritz.Score.Midi
             List<byte> modWheels = this.MidiChordSliderDefs.ModulationWheelMsbs;
             for(int i = 0; i < modWheels.Count; ++i)
             {
-                modWheels[i] = MidiValue((int)(modWheels[i] * factor));
+                modWheels[i] = M.MidiValue((int)(modWheels[i] * factor));
             }
         }
 
@@ -245,7 +386,7 @@ namespace Moritz.Score.Midi
             List<byte> pitchWheels = this.MidiChordSliderDefs.PitchWheelMsbs;
             for(int i = 0; i < pitchWheels.Count; ++i)
             {
-                pitchWheels[i] = MidiValue((int)(pitchWheels[i] * factor));
+                pitchWheels[i] = M.MidiValue((int)(pitchWheels[i] * factor));
             }
         }
 
@@ -265,7 +406,7 @@ namespace Moritz.Score.Midi
                 {
                     for(int i = 0; i < bmcd.Velocities.Count; ++i)
                     {
-                        bmcd.Velocities[i] = MidiValue((int)((double)bmcd.Velocities[i] * factor));
+                        bmcd.Velocities[i] = M.MidiValue((int)((double)bmcd.Velocities[i] * factor));
                     }
                 }
             }
@@ -280,31 +421,13 @@ namespace Moritz.Score.Midi
             set
             {
                 Debug.Assert(value != null);
-                int val = (int) value;
+                int val = (int)value;
                 val = (val < 127) ? val : 127;
                 val = (val > 0) ? val : 0;
 
                 _pitchWheelDeviation = (byte?)val;
             }
         }
-        public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
-        private int? _msDurationToNextBarline = null;
-
-        public new int MsDuration 
-        { 
-            get 
-            { 
-                return _msDuration; 
-            } 
-            set 
-            {
-                SetDuration(value);
-            }
-        }
-
-        public int MsPosition { get { return _msPosition; } set { _msPosition = value; } }
-        private int _msPosition = 0;
-        #endregion
 
         private byte? GetControlHiValue(ControllerType controllerType, List<MidiControl> midiControls)
         {
@@ -576,10 +699,6 @@ namespace Moritz.Score.Midi
                 return reducedList;
         }
 
-        // This class is saved as an individual chordDef in SVG files,
-        // so it allows ALL its fields to be set, even after construction.
-        public new List<byte> MidiHeadSymbols { get { return _midiHeadSymbols; } set { _midiHeadSymbols = value; } }
-
         /// <summary>
         /// Note that, unlike MidiRestDefs, MidiChordDefs do not have a msDuration attribute.
         /// Their msDuration is deduced from the contained BasicMidiChords.
@@ -590,12 +709,14 @@ namespace Moritz.Score.Midi
         /// While constructing Tracks, the AssistantPerformer should monitor the current Bank and/or Patch, so that it can decide
         /// whether or not to actually construct and send bank and/or patch change messages.
         /// </summary>
-        public void WriteSvg(SvgWriter w)
+        public void WriteSvg(SvgWriter w, string idNumber)
         {
+            w.WriteStartElement("score", "midiChord", null);
+
             Debug.Assert(BasicMidiChordDefs != null && BasicMidiChordDefs.Count > 0);
 
-            if(!String.IsNullOrEmpty(ID) && !ID.Contains("localChord"))
-                w.WriteAttributeString("id", ID); // the definition ID, not the local ID of a midiChord
+            if(!String.IsNullOrEmpty(idNumber))
+                w.WriteAttributeString("id", "midiChord" + idNumber);
 
             if(BasicMidiChordDefs[0].BankIndex == null && Bank != null)
             {
@@ -623,14 +744,8 @@ namespace Moritz.Score.Midi
 
             if(MidiChordSliderDefs != null)
                 MidiChordSliderDefs.WriteSVG(w); // writes score:sliders element
-        }
 
-        public byte MidiValue(int value)
-        {
-            int rval;
-            rval = (value > 127) ? 127 : value;
-            rval = (value < 0) ? 0 : value;
-            return (byte) rval;
+            w.WriteEndElement(); // score:midiChord
         }
 
         public new int OrnamentNumberSymbol { get { return _ornamentNumberSymbol; } set { _ornamentNumberSymbol = value; } }
@@ -642,21 +757,5 @@ namespace Moritz.Score.Midi
         public new bool HasChordOff { get { return _hasChordOff; } set { _hasChordOff = value; } }
 
         public new int MinimumBasicMidiChordMsDuration { get { return _minimumBasicMidiChordMsDuration; } set { _minimumBasicMidiChordMsDuration = value; } }
-
-    }
-
-    /// <summary>
-    /// Created when a note or rest straddles a barline.
-    /// This class is created while splitting systems.
-    /// It is used when notating them.
-    /// </summary>
-    public class UniqueCautionaryChordDef : UniqueMidiChordDef
-    {
-        public UniqueCautionaryChordDef(MidiChordDef cautionaryMidiChordDef, int msPosition, int msDuration)
-            : base(cautionaryMidiChordDef)
-        {
-            MsPosition = msPosition;
-            MsDuration = msDuration;
-        }
     }
 }

@@ -6,10 +6,18 @@ using System.Xml;
 using System.Diagnostics;
 using System.Text;
 
+using Krystals4ObjectLibrary;
 using Moritz.Globals;
+using Moritz.Krystals;
+using Moritz.Score;
+using Moritz.Score.Midi;
+using Moritz.Score.Notation;
+using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {
+    public delegate void ControlHasChangedDelegate(IntListControl sender);
+
     public partial class IntListControl : UserControl
     {
         public IntListControl(int x, int y, int textBoxWidth, int minInt, int maxInt, int nBoxes, ControlHasChangedDelegate controlHasChanged)

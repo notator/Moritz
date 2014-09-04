@@ -1,11 +1,12 @@
 using System.Text;
 using System.Diagnostics;
 
+using Moritz.Globals;
 using Moritz.Score.Midi;
 
 namespace Moritz.Score.Notation
 {
-    internal class Study2b2ChordSymbol : ChordSymbol
+    internal class Study2b2ChordSymbol : OutputChordSymbol
     {
         public Study2b2ChordSymbol(Voice voice, UniqueMidiChordDef umcd, int minimumCrotchetDurationMS, float fontSize)
             : base(voice, umcd, minimumCrotchetDurationMS, fontSize)
@@ -82,9 +83,10 @@ namespace Moritz.Score.Notation
         {
             string idNumber = SvgScore.UniqueID_Number;
             w.SvgStartGroup("study2b2ChordSymbol" + idNumber);
-            WriteChordAttributes(w);
+            w.WriteAttributeString("score", "object", null, "chord");
+            w.WriteAttributeString("score", "alignmentX", null, this.Metrics.OriginX.ToString(M.En_USNumberFormat));
 
-            WriteMidiInfo(w, "midi" + idNumber);
+            WriteContent(w, idNumber);
 
             if(this.Metrics != null)
                 this.Metrics.WriteSVG(w);

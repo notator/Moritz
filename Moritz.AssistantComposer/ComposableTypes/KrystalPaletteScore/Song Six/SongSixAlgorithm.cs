@@ -2,9 +2,13 @@
 using System.Diagnostics;
 using System;
 
+using Krystals4ObjectLibrary;
+using Moritz.Globals;
+using Moritz.Krystals;
 using Moritz.Score;
 using Moritz.Score.Midi;
-using Krystals4ObjectLibrary;
+using Moritz.Score.Notation;
+using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {
@@ -37,15 +41,25 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// Sets the midi content of the score, independent of its notation.
-        /// This means adding UniqueMidiDurationDefs to each SongSixVoiceDef's UniqueMidiDurationDefs list.
-        /// The UniqueMidiDurationDefs will later be transcribed into a particular notation by a Notator.
-        /// Notations are independent of the midi info.
-        /// This DoAlgorithm() function is special to this composition.
+        /// The DoAlgorithm() function is special to a particular composition.
+        /// The function returns a sequence of bar definitions. Each bar is a list of Voices (conceptually from top to bottom
+        /// in a system, though the actual order can be changed in the Assistant Composer's options).
+        /// Each bar in the sequence has the same number of Voices. Voices at the same position in each bar are continuations
+        /// of the same overall voice, and may be concatenated later. OutputVoices at the same position in each bar have the
+        /// same midi channel.
+        /// Midi channels:
+        /// By convention, algorithms use midi channels having indices which increase from top to bottom in the
+        /// system, starting at 0. Midi channels may not occur twice in the same system. Each algorithm declares which midi
+        /// channels it uses in the MidiChannels() function (see above). For an example, see Study2bAlgorithm.
+        /// Each 'bar definition' is actually contained in the UniqueDefs list in each Voice (i.e. Voice.UniqueDefs).
+        /// The Voice.NoteObjects lists are still empty when DoAlgorithm() returns.
+        /// The Voice.UniqueDefs will be converted to NoteObjects having a specific notation later (in Notator.AddSymbolsToSystems()).
+        /// ACHTUNG:
+        /// The top (=first) Voice in each bar must be an OutputVoice.
+        /// This can be followed by zero or more OutputVoices, followed by zero or more InputVoices.
+        /// The chord definitions in OutputVoice.UniqueDefs must be UniqueMidiChordDefs.
+        /// The chord definitions in InputVoice.UniqueDefs must be UniqueInputChordDefs.
         /// </summary>
-        /// <returns>
-        /// A list of sequential bars. Each bar contains all the voices in the bar, from top to bottom.
-        /// </returns>
         public override List<List<Voice>> DoAlgorithm()
         {
             // Palette indices:
@@ -206,52 +220,74 @@ namespace Moritz.AssistantComposer
             int versePwdValue = 3;
             double windStartPwdValue = 6, windEndPwdValue=28;
             double pwdfactor = Math.Pow(windEndPwdValue/windStartPwdValue, (double)1/5); // 5th root of windEndPwdValue/windStartPwdValue -- the last pwd should be windEndPwdValue
-
+            UniqueMidiChordDef umcd = null;
             for(int i = 0; i < wind.Count; ++i)
             {
                 if(i < 8) //prelude
                 {
-                    wind[i].PitchWheelDeviation = (int) windStartPwdValue;
+                    umcd = wind[i] as UniqueMidiChordDef;
+                    if(umcd != null)
+                        umcd.PitchWheelDeviation = (int) windStartPwdValue;
                 }
                 else if(i < 15) // verse 1
                 {
-                    wind[i].PitchWheelDeviation = versePwdValue;
+                    umcd = wind[i] as UniqueMidiChordDef;
+                    if(umcd != null)
+                        umcd.PitchWheelDeviation = versePwdValue;
                 }
                 else if(i < 20) // interlude 1
                 {
-                    wind[i].PitchWheelDeviation = (int)(windStartPwdValue * pwdfactor);
+                    umcd = wind[i] as UniqueMidiChordDef;
+                    if(umcd != null)
+                        umcd.PitchWheelDeviation = (int)(windStartPwdValue * pwdfactor);
                 }
                 else if(i < 24) // verse 2
                 {
-                    wind[i].PitchWheelDeviation = versePwdValue;
+                    umcd = wind[i] as UniqueMidiChordDef;
+                    if(umcd != null)
+                        umcd.PitchWheelDeviation = versePwdValue;
                 }
                 else if(i < 33) // interlude 2
                 {
-                    wind[i].PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 2)));
+                    umcd = wind[i] as UniqueMidiChordDef;
+                    if(umcd != null)
+                        umcd.PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 2)));
                 }
                 else if(i < 39) // verse 3
                 {
-                    wind[i].PitchWheelDeviation = versePwdValue;
+                    umcd = wind[i] as UniqueMidiChordDef;
+                    if(umcd != null)
+                        umcd.PitchWheelDeviation = versePwdValue;
                 }
                 else if(i < 49) // interlude 3
                 {
-                    wind[i].PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 3)));
+                    umcd = wind[i] as UniqueMidiChordDef;
+                    if(umcd != null)
+                        umcd.PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 3)));
                 }
                 else if(i < 57) // verse 4
                 {
-                    wind[i].PitchWheelDeviation = versePwdValue;
+                    umcd = wind[i] as UniqueMidiChordDef;
+                    if(umcd != null)
+                        umcd.PitchWheelDeviation = versePwdValue;
                 }
                 else if(i < 70) // interlude 4
                 {
-                    wind[i].PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 4)));
+                    umcd = wind[i] as UniqueMidiChordDef;
+                    if(umcd != null)
+                        umcd.PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 4)));
                 }
                 else if(i < 74) // verse 5
                 {
-                    wind[i].PitchWheelDeviation = versePwdValue;
+                    umcd = wind[i] as UniqueMidiChordDef;
+                    if(umcd != null)
+                        umcd.PitchWheelDeviation = versePwdValue;
                 }
                 else // postlude
                 {
-                    wind[i].PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 5)));
+                    umcd = wind[i] as UniqueMidiChordDef;
+                    if(umcd != null)
+                        umcd.PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 5)));
                 }            
             }
         }
@@ -520,7 +556,7 @@ namespace Moritz.AssistantComposer
         // It just makes the SongSixVoiceDef from the controlNoteAndRestMsPositions defined above.
         private static SongSixVoiceDef MakeControlVoiceDef(List<int> controlNoteAndRestMsPositions)
         {
-            List<IUniqueMidiDurationDef> controlLmdds = new List<IUniqueMidiDurationDef>();
+            List<IUniqueDef> controlLmdds = new List<IUniqueDef>();
 
             for(int i = 0; i < controlNoteAndRestMsPositions.Count - 2; i += 2)
             {
@@ -535,7 +571,7 @@ namespace Moritz.AssistantComposer
 
                 UniqueMidiChordDef umChordDef = new UniqueMidiChordDef(new List<byte>() { (byte)67 }, new List<byte>() { (byte)0 }, noteMsPosition, noteMsDuration, false, false, new List<MidiControl>());
 
-                UniqueMidiRestDef umRestDef = new UniqueMidiRestDef(restMsPosition, restMsDuration);
+                UniqueRestDef umRestDef = new UniqueRestDef(restMsPosition, restMsDuration);
 
                 controlLmdds.Add(umChordDef);
                 controlLmdds.Add(umRestDef);
@@ -552,7 +588,7 @@ namespace Moritz.AssistantComposer
             foreach(SongSixVoiceDef voiceDef in voiceDefs)
             {
                 Voice voice = new OutputVoice(null, channelIndex++);
-                voice.UniqueMidiDurationDefs = voiceDef.UniqueMidiDurationDefs;
+                voice.UniqueDefs = voiceDef.UniqueDefs;
                 voices.Add(voice);
             }
 

@@ -130,10 +130,6 @@
       <Project>{E68C2A79-CDAB-46F5-A6EE-534CE2D99577}</Project>
       <Name>Moritz.Globals</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Moritz.Score\Moritz.Score.csproj">
-      <Project>{0507FAED-FF81-45A4-90AF-923D25DDA758}</Project>
-      <Name>Moritz.Score</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="_revision58Log.txt" />

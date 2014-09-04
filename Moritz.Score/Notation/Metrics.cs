@@ -8,7 +8,7 @@ using Moritz.Globals;
 
 namespace Moritz.Score.Notation
 {
-    public abstract class Metrics : IWritesForegroundSVG
+    public abstract class Metrics
     {
         protected Metrics()
             : this(null, null, 0F, 0F)
@@ -112,7 +112,7 @@ namespace Moritz.Score.Notation
             float overlap = float.MinValue;
 
             Study2b2ChordSymbol study2b2ChordSymbol = previousAS as Study2b2ChordSymbol;
-            ChordSymbol chord = previousAS as ChordSymbol;
+            OutputChordSymbol chord = previousAS as OutputChordSymbol;
             if(study2b2ChordSymbol != null)
             {
                 overlap = this.OverlapWidth(study2b2ChordSymbol.Metrics);

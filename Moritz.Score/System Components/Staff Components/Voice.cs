@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+using Moritz.Score.Notation;
 using Moritz.Score.Midi;
 
 namespace Moritz.Score
@@ -181,17 +182,17 @@ namespace Moritz.Score
         /// </summary>
         public void SetChordStemDirectionsAndCreateBeamBlocks(PageFormat pageFormat)
         {
-            List<ChordSymbol> chordsBeamedTogether = new List<ChordSymbol>();
+            List<OutputChordSymbol> chordsBeamedTogether = new List<OutputChordSymbol>();
             ClefSymbol currentClef = null;
             bool breakGroup = false;
-            ChordSymbol lastChord = null;
-            foreach(ChordSymbol cs in ChordSymbols)
+            OutputChordSymbol lastChord = null;
+            foreach(OutputChordSymbol cs in ChordSymbols)
                 lastChord = cs;
 
             foreach(NoteObject noteObject in NoteObjects)
             {
                 CautionaryChordSymbol cautionaryChord = noteObject as CautionaryChordSymbol;
-                ChordSymbol chord = noteObject as ChordSymbol;
+                OutputChordSymbol chord = noteObject as OutputChordSymbol;
                 RestSymbol rest = noteObject as RestSymbol;
                 ClefSymbol clef = noteObject as ClefSymbol;
                 Barline barline = noteObject as Barline;
@@ -306,7 +307,7 @@ namespace Moritz.Score
         private HashSet<BeamBlock> FindBeamBlocks()
         {
             HashSet<BeamBlock> beamBlocks = new HashSet<BeamBlock>();
-            foreach(ChordSymbol chord in ChordSymbols)
+            foreach(OutputChordSymbol chord in ChordSymbols)
             {
                 if(chord.BeamBlock != null)
                     beamBlocks.Add(chord.BeamBlock);
@@ -345,7 +346,7 @@ namespace Moritz.Score
             {
                 foreach(NoteObject noteObject in NoteObjects)
                 {
-                    ChordSymbol chordSymbol = noteObject as ChordSymbol;
+                    OutputChordSymbol chordSymbol = noteObject as OutputChordSymbol;
                     if(chordSymbol != null)
                         yield return chordSymbol;
                 }
@@ -366,7 +367,7 @@ namespace Moritz.Score
 
         #endregion Enumerators
 
-        public List<IUniqueMidiDurationDef> UniqueMidiDurationDefs = new List<IUniqueMidiDurationDef>();
+        public List<IUniqueDef> UniqueDefs = new List<IUniqueDef>();
 
         /// <summary>
         /// This field is set by composition algorithms.

@@ -1,9 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 
+using Krystals4ObjectLibrary;
+using Moritz.Globals;
+using Moritz.Krystals;
 using Moritz.Score;
 using Moritz.Score.Midi;
-using Krystals4ObjectLibrary;
+using Moritz.Score.Notation;
+using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {
@@ -29,17 +33,27 @@ namespace Moritz.AssistantComposer
         {
             return new List<byte>() { 0, 1, 2 };
         }
-        
+
         /// <summary>
-        /// Sets the midi content of the score, independent of its notation.
-        /// This means adding MidiDurationDefs to each voice's MidiDurationDefs list.
-        /// The MidiDurations will later be transcribed into a particular notation by a Notator.
-        /// Notations are independent of the midi info.
-        /// This DoAlgorithm() function is special to this composition.
+        /// The DoAlgorithm() function is special to a particular composition.
+        /// The function returns a sequence of bar definitions. Each bar is a list of Voices (conceptually from top to bottom
+        /// in a system, though the actual order can be changed in the Assistant Composer's options).
+        /// Each bar in the sequence has the same number of Voices. Voices at the same position in each bar are continuations
+        /// of the same overall voice, and may be concatenated later. OutputVoices at the same position in each bar have the
+        /// same midi channel.
+        /// Midi channels:
+        /// By convention, algorithms use midi channels having indices which increase from top to bottom in the
+        /// system, starting at 0. Midi channels may not occur twice in the same system. Each algorithm declares which midi
+        /// channels it uses in the MidiChannels() function (see above). For an example, see Study2bAlgorithm.
+        /// Each 'bar definition' is actually contained in the UniqueDefs list in each Voice (i.e. Voice.UniqueDefs).
+        /// The Voice.NoteObjects lists are still empty when DoAlgorithm() returns.
+        /// The Voice.UniqueDefs will be converted to NoteObjects having a specific notation later (in Notator.AddSymbolsToSystems()).
+        /// ACHTUNG:
+        /// The top (=first) Voice in each bar must be an OutputVoice.
+        /// This can be followed by zero or more OutputVoices, followed by zero or more InputVoices.
+        /// The chord definitions in OutputVoice.UniqueDefs must be UniqueMidiChordDefs.
+        /// The chord definitions in InputVoice.UniqueDefs must be UniqueInputChordDefs.
         /// </summary>
-        /// <returns>
-        /// A list of sequential bars. Each bar contains all the voices in the bar, from top to bottom.
-        /// </returns>
         public override List<List<Voice>> DoAlgorithm()
         {
             List<Voice> sequentialStaff1Bars = WriteTopStaff();
@@ -94,13 +108,13 @@ namespace Moritz.AssistantComposer
             for(int valueIndex = 0; valueIndex < originalStrandValues.Count; valueIndex++)
             {
                 int value = originalStrandValues[valueIndex];
-                MidiDurationDef midiDurationDef = paletteDef[value - 1];
-                IUniqueMidiDurationDef noteDef = midiDurationDef.CreateUniqueMidiDurationDef();
+                DurationDef midiDurationDef = paletteDef[value - 1];
+                IUniqueDef noteDef = midiDurationDef.DeepClone();
                 Debug.Assert(midiDurationDef.MsDuration > 0);
                 Debug.Assert(noteDef.MsDuration == midiDurationDef.MsDuration);
                 noteDef.MsPosition = msPosition;
                 msPosition += noteDef.MsDuration;
-                voice.UniqueMidiDurationDefs.Add(noteDef);
+                voice.UniqueDefs.Add(noteDef);
             }
         }
 
@@ -116,19 +130,19 @@ namespace Moritz.AssistantComposer
             {
                 Voice topStaffVoice =  topStaffBars[barIndex];
                 Voice newVoice = new OutputVoice(null, MidiChannels()[staffNumber - 1]);
-                int currentMsPosition = topStaffVoice.UniqueMidiDurationDefs[0].MsPosition;
+                int currentMsPosition = topStaffVoice.UniqueDefs[0].MsPosition;
 
                 List<int> lowerStaffValueSequence = strandValuesList[barIndex];
                 List<int> lowerStaffMsDurations = LowerStaffMsDurations(topStaffVoice, lowerStaffValueSequence.Count);
                 for(int valueIndex = 0; valueIndex < lowerStaffValueSequence.Count; valueIndex++)
                 {
                     int value = lowerStaffValueSequence[valueIndex];
-                    MidiDurationDef midiDurationDef = paletteDef[value - 1];
+                    DurationDef midiDurationDef = paletteDef[value - 1];
                     midiDurationDef.MsDuration = lowerStaffMsDurations[valueIndex];
-                    IUniqueMidiDurationDef noteDef = midiDurationDef.CreateUniqueMidiDurationDef();
+                    IUniqueDef noteDef = midiDurationDef.DeepClone();
                     noteDef.MsPosition = currentMsPosition;
                     currentMsPosition += midiDurationDef.MsDuration; 
-                    newVoice.UniqueMidiDurationDefs.Add(noteDef);
+                    newVoice.UniqueDefs.Add(noteDef);
                 }
 
                 consecutiveBars.Add(newVoice);
@@ -141,7 +155,7 @@ namespace Moritz.AssistantComposer
             #region get topStaffVoice durations and positions
             int voiceMsDuration = 0;
             int numberOfTopDurations = 0;
-            foreach(IUniqueMidiDurationDef iumdd in topStaffVoice.UniqueMidiDurationDefs)
+            foreach(IUniqueDef iumdd in topStaffVoice.UniqueDefs)
             {
                 voiceMsDuration += iumdd.MsDuration;
                 numberOfTopDurations++;
@@ -153,7 +167,7 @@ namespace Moritz.AssistantComposer
             int equal1MsPosition = 0;
             List<int> actual1MsPositions = new List<int>();
             List<int> actual1MsDurations = new List<int>();
-            foreach(IUniqueMidiDurationDef iumdd in topStaffVoice.UniqueMidiDurationDefs)
+            foreach(IUniqueDef iumdd in topStaffVoice.UniqueDefs)
             {
                 equal1MsPositions.Add(equal1MsPosition);
                 equal1MsPosition += equal1MsDuration;

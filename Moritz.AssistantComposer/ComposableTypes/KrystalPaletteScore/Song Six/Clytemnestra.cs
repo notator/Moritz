@@ -3,8 +3,14 @@ using System.Diagnostics;
 using System.IO;
 using System;
 
+
+using Krystals4ObjectLibrary;
+using Moritz.Globals;
+using Moritz.Krystals;
 using Moritz.Score;
 using Moritz.Score.Midi;
+using Moritz.Score.Notation;
+using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {
@@ -14,7 +20,7 @@ namespace Moritz.AssistantComposer
     internal class Clytemnestra : SongSixVoiceDef
     {
         internal Clytemnestra(SongSixVoiceDef wind3) 
-            : base(new List<IUniqueMidiDurationDef>())
+            : base(new List<IUniqueDef>())
         {
             SetMomentDefsListPerVerse();
             SetUniqueMidiDurationDefs(wind3);
@@ -24,7 +30,7 @@ namespace Moritz.AssistantComposer
             SetPitchWheelDeviation(60, 117, 2);  // verse 2
             SetPitchWheelDeviation(117, 174, 4); // verse 3
             SetPitchWheelDeviation(174, 269, 5); // verse 4
-            SetPitchWheelDeviation(269, _uniqueMidiDurationDefs.Count, 6); // verse 5
+            SetPitchWheelDeviation(269, _uniqueDefs.Count, 6); // verse 5
         }
 
         /// <summary>
@@ -90,11 +96,11 @@ namespace Moritz.AssistantComposer
                     lmcd.MsDuration = msDuration;
 
                     // these two attributes determine the symbols in the score.
-                    lmcd.MidiHeadSymbols = new List<byte>() { 67 }; // display middle G, even though "pitch" is different.
+                    lmcd.MidiPitches = new List<byte>() { 67 }; // display middle G, even though "pitch" is different.
                     lmcd.MidiVelocity = velocity[0]; // determines the visible dynamic symbol
                     #endregion                    
 
-                    momentDef.MidiChordDefs.Add(lmcd);
+                    momentDef.UniqueMidiChordDefs.Add(lmcd);
 
                     momentMsPos += momentDef.MsWidth;
                 }
@@ -301,15 +307,15 @@ namespace Moritz.AssistantComposer
 
             int currentVerseMsPosition = 0;
             int currentEndMsPosition = 0;
-            IUniqueMidiDurationDef interludeRestDef = null;
+            IUniqueDef interludeRestDef = null;
 
             for(int verseIndex = 0; verseIndex < 5; ++verseIndex)
             { 
                 currentVerseMsPosition = verseMsPositions[verseIndex];
 
-                interludeRestDef = new UniqueMidiRestDef(currentEndMsPosition, currentVerseMsPosition - currentEndMsPosition);
+                interludeRestDef = new UniqueRestDef(currentEndMsPosition, currentVerseMsPosition - currentEndMsPosition);
 
-                _uniqueMidiDurationDefs.Add(interludeRestDef);
+                _uniqueDefs.Add(interludeRestDef);
 
                 List<MomentDef> momentDefs = _momentDefsListPerVerse[verseIndex];
 
@@ -319,32 +325,32 @@ namespace Moritz.AssistantComposer
                     momentDef.MsPosition += currentVerseMsPosition;
 
                     int restWidth = momentDef.MsWidth - momentDef.MaximumMsDuration;
-                    IUniqueMidiDurationDef lmrd = null;
+                    IUniqueDef lmrd = null;
                     if(restWidth > 0)
                     {
                         momentDef.MsWidth -= restWidth;
-                        lmrd = new UniqueMidiRestDef(momentDef.MsPosition + momentDef.MsWidth, restWidth);
+                        lmrd = new UniqueRestDef(momentDef.MsPosition + momentDef.MsWidth, restWidth);
                         Debug.Assert(lmrd.MsDuration > 0);
                     }
 
-                    MidiChordDef mcd = momentDef.MidiChordDefs[0];
-                    IUniqueMidiDurationDef lmcd = mcd.CreateUniqueMidiDurationDef();
+                    UniqueMidiChordDef mcd = momentDef.UniqueMidiChordDefs[0];
+                    IUniqueDef lmcd = mcd.DeepClone();
                     lmcd.MsPosition = momentDef.MsPosition;
                     lmcd.MsDuration = momentDef.MsWidth;
                     Debug.Assert(lmcd.MsDuration > 0);
 
-                    _uniqueMidiDurationDefs.Add(lmcd);
+                    _uniqueDefs.Add(lmcd);
 
                     if(lmrd != null)
                     {
-                        _uniqueMidiDurationDefs.Add(lmrd);
+                        _uniqueDefs.Add(lmrd);
                     }
-                    currentEndMsPosition = _uniqueMidiDurationDefs[_uniqueMidiDurationDefs.Count - 1].MsPosition +
-                        _uniqueMidiDurationDefs[_uniqueMidiDurationDefs.Count - 1].MsDuration;
+                    currentEndMsPosition = _uniqueDefs[_uniqueDefs.Count - 1].MsPosition +
+                        _uniqueDefs[_uniqueDefs.Count - 1].MsDuration;
                 }
             }
-            interludeRestDef = new UniqueMidiRestDef(currentEndMsPosition, wind3.EndMsPosition - currentEndMsPosition);
-            _uniqueMidiDurationDefs.Add(interludeRestDef);
+            interludeRestDef = new UniqueRestDef(currentEndMsPosition, wind3.EndMsPosition - currentEndMsPosition);
+            _uniqueDefs.Add(interludeRestDef);
         }
 
         private List<List<MomentDef>> _momentDefsListPerVerse;
@@ -354,9 +360,9 @@ namespace Moritz.AssistantComposer
         /// </summary>
         internal override void SetLyricsToIndex()
         {
-            for(int index = 0; index < _uniqueMidiDurationDefs.Count; ++index)
+            for(int index = 0; index < _uniqueDefs.Count; ++index)
             {
-                UniqueMidiChordDef lmcd = _uniqueMidiDurationDefs[index] as UniqueMidiChordDef;
+                UniqueMidiChordDef lmcd = _uniqueDefs[index] as UniqueMidiChordDef;
                 if(lmcd != null)
                 {
                     lmcd.Lyric = index.ToString() + lmcd.Lyric;

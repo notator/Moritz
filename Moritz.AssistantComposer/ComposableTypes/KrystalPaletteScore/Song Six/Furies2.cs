@@ -2,9 +2,13 @@
 using System.Diagnostics;
 using System;
 
+using Krystals4ObjectLibrary;
+using Moritz.Globals;
+using Moritz.Krystals;
 using Moritz.Score;
 using Moritz.Score.Midi;
-using Krystals4ObjectLibrary;
+using Moritz.Score.Notation;
+using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {
@@ -35,9 +39,9 @@ namespace Moritz.AssistantComposer
             for(int i = 0; i < furies3TickIndices.Count; ++i)
             {
                 int f3Index = furies3TickIndices[i];
-                IUniqueMidiDurationDef ticksChord = furies3[f3Index];
+                IUniqueDef ticksChord = furies3[f3Index];
                 Debug.Assert(ticksChord is UniqueMidiChordDef);
-                UniqueMidiRestDef ticksRest = new UniqueMidiRestDef(ticksChord.MsPosition, ticksChord.MsDuration);
+                UniqueRestDef ticksRest = new UniqueRestDef(ticksChord.MsPosition, ticksChord.MsDuration);
                 furies3.Replace(f3Index, ticksRest);
                 InsertInRest(ticksChord);
             }
@@ -72,12 +76,13 @@ namespace Moritz.AssistantComposer
             };
             for(int i = 9; i >=0 ; --i)
             {
-                IUniqueMidiDurationDef cheep = chirpsPalette[chirpIndices[i]].CreateUniqueMidiDurationDef();
-                Debug.Assert(cheep is UniqueMidiChordDef);
+                IUniqueDef cheep = chirpsPalette[chirpIndices[i]].DeepClone();
                 cheep.MsPosition = msPositions[i];
                 //cheep.MsDuration *= 2;
-                cheep.AdjustVelocities(velocityfactors[i]);
-                cheep.Transpose(transpositions[i]);
+                UniqueMidiChordDef umcd = cheep as UniqueMidiChordDef;
+                Debug.Assert(umcd is UniqueMidiChordDef);
+                umcd.AdjustVelocities(velocityfactors[i]);
+                umcd.Transpose(transpositions[i]);
                 InsertInRest(cheep);
             }
 
@@ -94,7 +99,7 @@ namespace Moritz.AssistantComposer
         {
             SongSixVoiceDef furies2Finale = GetF2Finale(palettes, krystal, msPositions);
 
-            if(furies2Finale[furies2Finale.Count - 1] is UniqueMidiRestDef)
+            if(furies2Finale[furies2Finale.Count - 1] is UniqueRestDef)
             {
                 furies2Finale.RemoveAt(furies2Finale.Count - 1);
             }
@@ -170,7 +175,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         private SongSixVoiceDef GetFinaleSections(SongSixVoiceDef finalePart1, SongSixVoiceDef finalePart2, SongSixVoiceDef postlude, int part2Index, int postludeIndex)
         {
-            List<IUniqueMidiDurationDef> iumdds = new List<IUniqueMidiDurationDef>();
+            List<IUniqueDef> iumdds = new List<IUniqueDef>();
 
             for(int i = 0; i < part2Index; ++i)
             {
@@ -198,7 +203,7 @@ namespace Moritz.AssistantComposer
             {
                 if(strandIndices.Contains(i))
                 {
-                    UniqueMidiRestDef umrd = new UniqueMidiRestDef(section[i].MsPosition, strandDurations[strandIndices.IndexOf(i)] + extraTime);
+                    UniqueRestDef umrd = new UniqueRestDef(section[i].MsPosition, strandDurations[strandIndices.IndexOf(i)] + extraTime);
                     extraTime -= diff;
                     section.Insert(i, umrd);
                 }
@@ -215,7 +220,7 @@ namespace Moritz.AssistantComposer
             //section.RemoveBetweenMsPositions(msPositions["interlude4End"], int.MaxValue);
             section.RemoveBetweenMsPositions(msPositions["finalWindChord"], int.MaxValue);
 
-            if(section[section.Count - 1] is UniqueMidiRestDef)
+            if(section[section.Count - 1] is UniqueRestDef)
             {
                 //section[section.Count - 1].MsDuration = msPositions["interlude4End"] - section[section.Count - 1].MsPosition;
                 section[section.Count - 1].MsDuration = msPositions["endOfPiece"] - section[section.Count - 1].MsPosition;

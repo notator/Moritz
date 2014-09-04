@@ -2,9 +2,13 @@
 using System.Diagnostics;
 using System;
 
+using Krystals4ObjectLibrary;
+using Moritz.Globals;
+using Moritz.Krystals;
 using Moritz.Score;
 using Moritz.Score.Midi;
-using Krystals4ObjectLibrary;
+using Moritz.Score.Notation;
+using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {
@@ -44,7 +48,7 @@ namespace Moritz.AssistantComposer
 
             for(int i = 3; i >= 0; --i)
             {
-                IUniqueMidiDurationDef growl = growlsPalette[growlIndices[i]].CreateUniqueMidiDurationDef();
+                IUniqueDef growl = growlsPalette[growlIndices[i]].DeepClone();
                 growl.MsPosition = msPositions[i];
                 growl.MsDuration = msDurations[i];
                 //growl.AdjustVelocities(velocityfactors[i]);
@@ -61,10 +65,10 @@ namespace Moritz.AssistantComposer
 
         private void GetSnores(int firstRestMsDuration, Clytemnestra clytemnestra, SongSixVoiceDef wind1, PaletteDef snoresPalette)
         {
-            List<IUniqueMidiDurationDef> snores = new List<IUniqueMidiDurationDef>();
+            List<IUniqueDef> snores = new List<IUniqueDef>();
             int msPosition = 0;
 
-            IUniqueMidiDurationDef firstRest = new UniqueMidiRestDef(msPosition, firstRestMsDuration);
+            IUniqueDef firstRest = new UniqueRestDef(msPosition, firstRestMsDuration);
             snores.Add(firstRest);
             msPosition += firstRestMsDuration;
 
@@ -72,14 +76,18 @@ namespace Moritz.AssistantComposer
             int[] transpositions1 = { 0, 0, 0, 0, 0, 1, 0 };
             for(int i = 0; i < 7; ++i)
             {
-                IUniqueMidiDurationDef snore = snoresPalette[i].CreateUniqueMidiDurationDef();
+                IUniqueDef snore = snoresPalette[i].DeepClone();
                 snore.MsPosition = msPosition;
                 msPosition += snore.MsDuration;
-                snore.Transpose(transpositions1[i]);
-                snore.PitchWheelDeviation = 3;
+                UniqueMidiChordDef iumdd = snore as UniqueMidiChordDef;
+                if(iumdd != null)
+                {
+                    iumdd.Transpose(transpositions1[i]);
+                    iumdd.PitchWheelDeviation = 3;
+                }
                 snores.Add(snore);
 
-                UniqueMidiRestDef rest = new UniqueMidiRestDef(msPosition, 2500);
+                UniqueRestDef rest = new UniqueRestDef(msPosition, 2500);
                 msPosition += rest.MsDuration;
                 snores.Add(rest);
             }
@@ -92,26 +100,30 @@ namespace Moritz.AssistantComposer
             double[] factors = { 0.93, 0.865, 0.804, 0.748, 0.696, 0.647, 0.602, 0.56, 0.52, 0.484 };
             for(int i = 0; i < 10; ++i)
             {
-                IUniqueMidiDurationDef snore = snoresPalette[i / 2].CreateUniqueMidiDurationDef();
+                IUniqueDef snore = snoresPalette[i / 2].DeepClone();
                 snore.MsPosition = msPosition;
                 factor = factors[i];
                 msDuration = snore.MsDuration * factor;
                 snore.MsDuration = (int)msDuration;
                 msPosition += snore.MsDuration;
-                snore.Transpose(transpositions2[i]);
-                snore.PitchWheelDeviation = 20;
-                //snore.MidiVelocity = (byte)((double)snore.MidiVelocity * factor * factor);
+                UniqueMidiChordDef iumdd = snore as UniqueMidiChordDef;
+                if(iumdd != null)
+                {
+                    iumdd.Transpose(transpositions2[i]);
+                    iumdd.PitchWheelDeviation = 20;
+                }
+                //iumdd.MidiVelocity = (byte)((double)snore.MidiVelocity * factor * factor);
                 snores.Add(snore);
 
                 restDuration = 2500 / factor;
-                UniqueMidiRestDef rest = new UniqueMidiRestDef(msPosition, (int)restDuration);
+                UniqueRestDef rest = new UniqueRestDef(msPosition, (int)restDuration);
                 msPosition += rest.MsDuration;
                 snores.Add(rest);
             }
 
             snores[snores.Count - 1].MsDuration = clytemnestra.EndMsPosition - snores[snores.Count - 1].MsPosition;
 
-            this._uniqueMidiDurationDefs = snores;
+            this._uniqueDefs = snores;
 
             AdjustVelocitiesHairpin(13, Count, 0.25);
 
@@ -134,7 +146,7 @@ namespace Moritz.AssistantComposer
         {
             SongSixVoiceDef furies4Finale = GetF4Finale(palettes, krystal, msPositions);
 
-            if(furies4Finale[furies4Finale.Count - 1] is UniqueMidiRestDef)
+            if(furies4Finale[furies4Finale.Count - 1] is UniqueRestDef)
             {
                 furies4Finale.RemoveAt(furies4Finale.Count - 1);
             }
@@ -187,7 +199,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         private SongSixVoiceDef GetFinaleSections(SongSixVoiceDef finalePart1, SongSixVoiceDef finalePart2, SongSixVoiceDef postlude, int part2Index, int postludeIndex)
         {
-            List<IUniqueMidiDurationDef> iumdds = new List<IUniqueMidiDurationDef>();
+            List<IUniqueDef> iumdds = new List<IUniqueDef>();
 
             for(int i = 0; i < part2Index; ++i)
             {
@@ -220,7 +232,7 @@ namespace Moritz.AssistantComposer
             //section.RemoveBetweenMsPositions(msPositions["interlude4End"], int.MaxValue);
             section.RemoveBetweenMsPositions(msPositions["finalWindChord"], int.MaxValue);
 
-            if(section[section.Count - 1] is UniqueMidiRestDef)
+            if(section[section.Count - 1] is UniqueRestDef)
             {
                 //section[section.Count - 1].MsDuration = msPositions["interlude4End"] - section[section.Count - 1].MsPosition;
                 section[section.Count - 1].MsDuration = msPositions["endOfPiece"] - section[section.Count - 1].MsPosition;

@@ -4,6 +4,12 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Diagnostics;
 
+using Moritz.Globals;
+using Moritz.Krystals;
+using Moritz.Score;
+using Moritz.Score.Midi;
+using Moritz.Score.Notation;
+
 namespace Moritz.AssistantPerformer
 {
     internal partial class Keyboard : UserControl

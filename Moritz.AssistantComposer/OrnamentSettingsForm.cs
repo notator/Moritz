@@ -8,6 +8,11 @@ using System.Xml;
 
 using Krystals4ObjectLibrary;
 using Moritz.Globals;
+using Moritz.Krystals;
+using Moritz.Score;
+using Moritz.Score.Midi;
+using Moritz.Score.Notation;
+using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {

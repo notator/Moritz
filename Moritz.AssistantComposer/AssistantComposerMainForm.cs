@@ -9,10 +9,12 @@ using System.Xml;
 using System.Text.RegularExpressions;
 
 using Krystals4ObjectLibrary;
-
 using Moritz.Globals;
+using Moritz.Krystals;
 using Moritz.Score;
+using Moritz.Score.Midi;
 using Moritz.Score.Notation;
+using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {
@@ -1858,9 +1860,6 @@ namespace Moritz.AssistantComposer
                     break;
                 case "Study 3 sketch 2":
                     midiAlgorithm = new Study3Sketch2Algorithm(null, null);
-                    break;
-                case "Study 4":
-                    midiAlgorithm = new Study4Algorithm(null, null);
                     break;
                 default:
                     throw new ApplicationException("unknown algorithm");

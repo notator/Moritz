@@ -2,23 +2,29 @@
 using System.Collections;
 using System;
 
+using Krystals4ObjectLibrary;
+using Moritz.Globals;
+using Moritz.Krystals;
+using Moritz.Score;
 using Moritz.Score.Midi;
+using Moritz.Score.Notation;
+using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {
     public class PaletteDef : IEnumerable
     {
-        public PaletteDef(List<MidiDurationDef> midiDurationDefs)
+        public PaletteDef(List<DurationDef> midiDurationDefs)
         {
-            _midiDurationDefs = new List<MidiDurationDef>();
+            _midiDurationDefs = new List<DurationDef>();
 
-            foreach(MidiDurationDef midiDurationDef in midiDurationDefs)
+            foreach(DurationDef midiDurationDef in midiDurationDefs)
             {
                 _midiDurationDefs.Add(midiDurationDef);
             }
         }
 
-        public MidiDurationDef this[int i] { get { return _midiDurationDefs[i]; } }
+        public DurationDef this[int i] { get { return _midiDurationDefs[i]; } }
         public int MidiDurationDefsCount { get { return _midiDurationDefs.Count; } }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -31,18 +37,18 @@ namespace Moritz.AssistantComposer
             return new PaletteEnum(_midiDurationDefs);
         }
 
-        private List<MidiDurationDef> _midiDurationDefs = null;
+        private List<DurationDef> _midiDurationDefs = null;
     }
 
     public class PaletteEnum : IEnumerator
     {
-        public List<MidiDurationDef> MidiDurationDefs;
+        public List<DurationDef> MidiDurationDefs;
 
         // Enumerators are positioned before the first element
         // until the first MoveNext() call.
         int position = -1;
 
-        public PaletteEnum(List<MidiDurationDef> midiDurationDefs)
+        public PaletteEnum(List<DurationDef> midiDurationDefs)
         {
             MidiDurationDefs = midiDurationDefs;
         }
@@ -66,7 +72,7 @@ namespace Moritz.AssistantComposer
             }
         }
 
-        public MidiDurationDef Current
+        public DurationDef Current
         {
             get
             {

@@ -7,8 +7,10 @@ using System.IO;
 using System.Text.RegularExpressions;
 
 using Moritz.Globals;
+using Moritz.Krystals;
 using Moritz.Score;
-using Moritz.AssistantPerformer.Runtime;
+using Moritz.Score.Midi;
+using Moritz.Score.Notation;
 
 namespace Moritz.AssistantPerformer
 {

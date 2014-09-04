@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using System.Diagnostics;
 
@@ -9,22 +10,22 @@ namespace Moritz.Score
     internal class CautionaryChordSymbol : ChordSymbol
     {
         public CautionaryChordSymbol(Voice voice, UniqueCautionaryChordDef lccd, float fontSize)
-            : base(voice, lccd, 600, fontSize)
+            : base(voice, lccd.MsDuration, lccd.MsPosition, 600, fontSize)
         {
+            SetNoteheadPitches(lccd.MidiPitches);
+
             _durationClass = DurationClass.cautionary;
             _msDuration = 0;
             Stem.Draw = false;
- 
-            //MidiChordDef mcd = lccd.UniqueMidiDurationDef as MidiChordDef;
-            //if(mcd != null)
-            //{
-            //    SetHeads(mcd.MidiHeadSymbols);
+        }
 
-            //    if(mcd.OrnamentNumberSymbol != 0)
-            //    {
-            //        AddOrnamentSymbol("~" + mcd.OrnamentNumberSymbol.ToString());
-            //    }
-            //}
+        /// <summary>
+        /// Writes this inputChord's content
+        /// </summary>
+        /// <param name="w"></param>
+        protected override void WriteContent(SvgWriter w, string idNumber)
+        {
+            throw new ApplicationException("This function should never be called, because WriteSVG() is overridden.");
         }
 
         public override void WriteSVG(SvgWriter w)

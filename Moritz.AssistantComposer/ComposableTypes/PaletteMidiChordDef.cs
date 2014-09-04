@@ -3,17 +3,21 @@ using System.Diagnostics;
 
 using Multimedia.Midi;
 
+using Krystals4ObjectLibrary;
 using Moritz.Globals;
+using Moritz.Krystals;
+using Moritz.Score;
 using Moritz.Score.Midi;
+using Moritz.Score.Notation;
+using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {
     ///<summary>
-    /// A PaletteMidiChordDef is a MidiChordDef which is saved in or retreived from a palette.
-    /// PaletteMidiChordDefs can be 'used' in SVG files, but are usually converted to UniqueMidiChordDefs.
-    /// Related classes:
-    /// 1. A UniqueMidiChordDef is a MidiChordDef which is saved locally in an SVG file.
-    /// 2. A LocalMidiChordDef is a UniqueMidiChordDef with additional MsPositon and msDuration attributes.
+    /// A MidiChordDef is a definition retrieved from a palette.
+    /// (Palettes are saved in score options files (.mkss), not in the scores themselves.)
+    /// MidiChordDefs are immutable, and have no MsPosition property. 
+    /// A UniqueMidiChordDef is a mutable MidiChordDef having both MsPositon and msDuration attributes.
     //</summary>
     internal class PaletteMidiChordDef : MidiChordDef
     {
@@ -21,81 +25,7 @@ namespace Moritz.AssistantComposer
         /// A PaletteMidiChordDef is a component of a PaletteDef.
         /// PaletteMidiChordDefs are saved in score:midiChord in score:midiDefs in SVG files. 
         /// </summary>
-        public PaletteMidiChordDef(string chordID, Palette krystalPalette, int valueIndex)
-            : base()
-        {
-            ID = chordID;
 
-            _msDuration = krystalPalette.BasicChordSettings.Durations[valueIndex];
-
-            BasicChordSettings bcs = krystalPalette.BasicChordSettings;
-            BasicMidiChordDef rootChord = new ComposableBasicMidiChordDef(krystalPalette, valueIndex);
-            _midiHeadSymbols = rootChord.Notes;
-            _midiVelocity = bcs.Velocities[valueIndex];
-            if(krystalPalette.OrnamentNumbers != null && krystalPalette.OrnamentNumbers.Count > 0)
-                _ornamentNumberSymbol = krystalPalette.OrnamentNumbers[valueIndex];
-
-            Debug.Assert(bcs.Durations != null && bcs.Durations.Count > 0);
-
-            if(krystalPalette.BankIndices != null && krystalPalette.BankIndices.Count > 0)
-                _bank = krystalPalette.BankIndices[valueIndex];
-
-            if(krystalPalette.PatchIndices != null && krystalPalette.PatchIndices.Count > 0)
-                _patch = krystalPalette.PatchIndices[valueIndex];
-
-            if(krystalPalette.Volumes != null && krystalPalette.Volumes.Count > 0)
-                _volume = krystalPalette.Volumes[valueIndex];
-
-            if(krystalPalette.Repeats != null && krystalPalette.Repeats.Count > 0)
-                _repeat = krystalPalette.Repeats[valueIndex]; // default is false
-
-            if(krystalPalette.PitchwheelDeviations != null && krystalPalette.PitchwheelDeviations.Count > 0)
-                _pitchWheelDeviation = krystalPalette.PitchwheelDeviations[valueIndex];
-
-            if(bcs.ChordOffs != null && bcs.ChordOffs.Count > 0)
-                _hasChordOff = bcs.ChordOffs[valueIndex];
-
-            int ornamentNumber = 0;
-            if(krystalPalette.OrnamentNumbers != null & krystalPalette.OrnamentNumbers.Count > 0)
-            {
-                ornamentNumber = krystalPalette.OrnamentNumbers[valueIndex];
-            }
-
-            this._minimumBasicMidiChordMsDuration = M.DefaultMinimumBasicMidiChordMsDuration;
-            if(krystalPalette.OrnamentMinMsDurations != null && krystalPalette.OrnamentMinMsDurations.Count > 0)
-                this._minimumBasicMidiChordMsDuration = krystalPalette.OrnamentMinMsDurations[valueIndex];
-
-            if(krystalPalette.OrnamentSettings == null || ornamentNumber == 0)
-            {
-                BasicMidiChordDefs.Add(rootChord);
-                BasicMidiChordDefs[0] = new BasicMidiChordDef(BasicMidiChordDefs[0], bcs.Durations[valueIndex]); 
-            }
-            else
-            {
-                BasicMidiChordDefs = GetOrnamentChords(krystalPalette, rootChord, valueIndex);
-            }
-
-            List<byte> pitchWheelEnvelopeMsbs = null;
-            if(krystalPalette.PitchwheelEnvelopes != null && krystalPalette.PitchwheelEnvelopes.Count > 0)
-                pitchWheelEnvelopeMsbs = krystalPalette.PitchwheelEnvelopes[valueIndex];
-
-            List<byte> panEnvelopeMsbs = null;
-            if(krystalPalette.PanEnvelopes != null && krystalPalette.PanEnvelopes.Count > 0)
-                panEnvelopeMsbs = krystalPalette.PanEnvelopes[valueIndex];
-
-            List<byte> modulationWheelEnvelopeMsbs = null;
-            if(krystalPalette.ModulationWheelEnvelopes != null && krystalPalette.ModulationWheelEnvelopes.Count > 0)
-                modulationWheelEnvelopeMsbs = krystalPalette.ModulationWheelEnvelopes[valueIndex];
-
-            List<byte> expressionEnvelopeMsbs = null;
-            if(krystalPalette.ExpressionEnvelopes != null && krystalPalette.ExpressionEnvelopes.Count > 0)
-                expressionEnvelopeMsbs = krystalPalette.ExpressionEnvelopes[valueIndex];
-
-            if(pitchWheelEnvelopeMsbs != null || panEnvelopeMsbs != null || modulationWheelEnvelopeMsbs != null || expressionEnvelopeMsbs != null)
-            {
-                MidiChordSliderDefs = new MidiChordSliderDefs(pitchWheelEnvelopeMsbs, panEnvelopeMsbs, modulationWheelEnvelopeMsbs, expressionEnvelopeMsbs);
-            }
-        }
 
         /// <summary>
         /// Returns a list of ornament chords.

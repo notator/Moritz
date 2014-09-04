@@ -8,14 +8,18 @@ using System.Xml;
 using System.IO;
 
 using Krystals4ObjectLibrary;
-
 using Moritz.Globals;
+using Moritz.Krystals;
+using Moritz.Score;
+using Moritz.Score.Midi;
+using Moritz.Score.Notation;
+using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {
     public partial class PaletteForm : Form, IPaletteForm
     {
-        public PaletteForm(XmlReader r, string name, int domain, AssistantComposerMainForm assistantComposerMainForm)
+        public PaletteForm(XmlReader r, string name, int domain, Form assistantComposerMainForm)
             :this(name, domain, assistantComposerMainForm)
         {
             ReadPalette(r);
@@ -30,7 +34,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         /// <param name="assistantComposer"></param>
         /// <param name="krystal"></param>
-        public PaletteForm(string name, int domain, AssistantComposerMainForm assistantComposerMainForm)
+        public PaletteForm(string name, int domain, Form assistantComposerMainForm)
         {
             InitializeComponent();
             _name = name;
@@ -1201,14 +1205,14 @@ namespace Moritz.AssistantComposer
         }
         private string _name = null;
         private int _domain = 0;
-        private AssistantComposerMainForm _assistantComposerMainForm = null;
+        private Form _assistantComposerMainForm = null;
         private List<TextBox> _allMainTextBoxes = new List<TextBox>();
         private AudioButtonsControl _audioButtonsControl = null;
         #endregion iPaletteForm
 
         #region public variables
         public int Domain { get { return _domain; } }
-        public AssistantComposerMainForm AssistantComposerMainForm { get { return _assistantComposerMainForm; } }
+        public Form AssistantComposerMainForm { get { return _assistantComposerMainForm; } }
         public BasicChordControl BasicChordControl { get { return _bcc; } }
         public OrnamentSettingsForm OrnamentSettingsForm { get { return _ornamentSettingsForm; } }
         #endregion public variables

@@ -56,55 +56,6 @@
     <Compile Include="AudioButtonsControl.Designer.cs">
       <DependentUpon>AudioButtonsControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="ComposableTypes\KrystalPaletteScore\Study3 sketch 2\Study3Sketch2Algorithm.cs" />
-    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\FuriesInterlude3ToEnd.cs" />
-    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Furies1.cs" />
-    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Furies2.cs" />
-    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Furies3.cs" />
-    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Furies4.cs" />
-    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\SongSixVoiceDef.cs" />
-    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Winds.cs" />
-    <Compile Include="ComposableTypes\KrystalPaletteScore\Study4\Study4Algorithm.cs" />
-    <Compile Include="ComposableTypes\PaletteMidiChordDef.cs" />
-    <Compile Include="ComposableTypes\KrystalPaletteScore\PaletteDemoScore\PaletteDemoScore.cs" />
-    <Compile Include="ComposableTypes\KrystalPaletteScore\Study2c3_1\Study2c3_1Algorithm.cs" />
-    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Clytemnestra.cs" />
-    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\SongSixAlgorithm.cs" />
-    <Compile Include="IntListControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="IntListControl.Designer.cs">
-      <DependentUpon>IntListControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TrackInitForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TrackInitForm.Designer.cs">
-      <DependentUpon>TrackInitForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="PerformersOptionsForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="PerformersOptionsForm.Designer.cs">
-      <DependentUpon>PerformersOptionsForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DimensionsAndMetadataForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DimensionsAndMetadataForm.Designer.cs">
-      <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="IPaletteForm.cs" />
-    <Compile Include="VoiceDef.cs" />
-    <Compile Include="PaletteDef.cs" />
-    <Compile Include="MidiCompositionAlgorithm.cs" />
-    <Compile Include="ComposableTypes\KrystalPaletteScore\PaletteDemoScore\PaletteDemoAlgorithm.cs" />
-    <Compile Include="AssistantComposerMainForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="AssistantComposerMainForm.Designer.cs">
-      <DependentUpon>AssistantComposerMainForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="BasicChordControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -117,22 +68,26 @@
     <Compile Include="BasicPercussionControl.Designer.cs">
       <DependentUpon>BasicPercussionControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="ComposableTypes\ComposableBasicMidiChordDef.cs" />
-    <Compile Include="ComposableTypes\ComposableScore.cs" />
-    <Compile Include="PaletteForm.cs">
-      <SubType>Form</SubType>
+    <Compile Include="ComposableTypes\KrystalPaletteScore\Study3 sketch 2\Study3Sketch2Algorithm.cs" />
+    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\FuriesInterlude3ToEnd.cs" />
+    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Furies1.cs" />
+    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Furies2.cs" />
+    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Furies3.cs" />
+    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Furies4.cs" />
+    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\SongSixVoiceDef.cs" />
+    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Winds.cs" />
+    <Compile Include="ComposableTypes\PaletteMidiChordDef.cs" />
+    <Compile Include="ComposableTypes\KrystalPaletteScore\PaletteDemoScore\PaletteDemoScore.cs" />
+    <Compile Include="ComposableTypes\KrystalPaletteScore\Study2c3_1\Study2c3_1Algorithm.cs" />
+    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Clytemnestra.cs" />
+    <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\SongSixAlgorithm.cs" />
+    <Compile Include="IntListControl.cs">
+      <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="PaletteForm.Designer.cs">
-      <DependentUpon>PaletteForm.cs</DependentUpon>
+    <Compile Include="IntListControl.Designer.cs">
+      <DependentUpon>IntListControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="MidiPitchesHelpForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MidiPitchesHelpForm.Designer.cs">
-      <DependentUpon>MidiPitchesHelpForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Palette.cs" />
-    <Compile Include="ComposableTypes\KrystalPaletteScore\KrystalPaletteScore.cs" />
+    <Compile Include="IPaletteForm.cs" />
     <Compile Include="MIDIInstrumentsHelpForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -145,11 +100,25 @@
     <Compile Include="MIDIPercussionHelpForm.Designer.cs">
       <DependentUpon>MIDIPercussionHelpForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="MidiPitchesHelpForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MidiPitchesHelpForm.Designer.cs">
+      <DependentUpon>MidiPitchesHelpForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="OrnamentSettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="OrnamentSettingsForm.Designer.cs">
       <DependentUpon>OrnamentSettingsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Palette.cs" />
+    <Compile Include="PaletteDef.cs" />
+    <Compile Include="PaletteForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PaletteForm.Designer.cs">
+      <DependentUpon>PaletteForm.cs</DependentUpon>
     </Compile>
     <Compile Include="PercussionOrnamentsForm.cs">
       <SubType>Form</SubType>
@@ -163,6 +132,36 @@
     <Compile Include="PercussionPaletteForm.Designer.cs">
       <DependentUpon>PercussionPaletteForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="PerformersOptionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PerformersOptionsForm.Designer.cs">
+      <DependentUpon>PerformersOptionsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TrackInitForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TrackInitForm.Designer.cs">
+      <DependentUpon>TrackInitForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DimensionsAndMetadataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DimensionsAndMetadataForm.Designer.cs">
+      <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VoiceDef.cs" />
+    <Compile Include="MidiCompositionAlgorithm.cs" />
+    <Compile Include="ComposableTypes\KrystalPaletteScore\PaletteDemoScore\PaletteDemoAlgorithm.cs" />
+    <Compile Include="AssistantComposerMainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AssistantComposerMainForm.Designer.cs">
+      <DependentUpon>AssistantComposerMainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ComposableTypes\ComposableBasicMidiChordDef.cs" />
+    <Compile Include="ComposableTypes\ComposableScore.cs" />
+    <Compile Include="ComposableTypes\KrystalPaletteScore\KrystalPaletteScore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\Study3 sketch 1\Study3Sketch1Algorithm.cs" />
   </ItemGroup>
@@ -182,35 +181,35 @@
     <EmbeddedResource Include="IntListControl.resx">
       <DependentUpon>IntListControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TrackInitForm.resx">
-      <DependentUpon>TrackInitForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="PerformersOptionsForm.resx">
-      <DependentUpon>PerformersOptionsForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DimensionsAndMetadataForm.resx">
-      <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="PaletteForm.resx">
-      <DependentUpon>PaletteForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="MidiPitchesHelpForm.resx">
-      <DependentUpon>MidiPitchesHelpForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="MIDIInstrumentsHelpForm.resx">
       <DependentUpon>MIDIInstrumentsHelpForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MIDIPercussionHelpForm.resx">
       <DependentUpon>MIDIPercussionHelpForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="MidiPitchesHelpForm.resx">
+      <DependentUpon>MidiPitchesHelpForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="OrnamentSettingsForm.resx">
       <DependentUpon>OrnamentSettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PaletteForm.resx">
+      <DependentUpon>PaletteForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PercussionOrnamentsForm.resx">
       <DependentUpon>PercussionOrnamentsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PercussionPaletteForm.resx">
       <DependentUpon>PercussionPaletteForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PerformersOptionsForm.resx">
+      <DependentUpon>PerformersOptionsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TrackInitForm.resx">
+      <DependentUpon>TrackInitForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DimensionsAndMetadataForm.resx">
+      <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -231,7 +230,7 @@
       <Name>Moritz.Krystals</Name>
     </ProjectReference>
     <ProjectReference Include="..\Moritz.Score\Moritz.Score.csproj">
-      <Project>{0507FAED-FF81-45A4-90AF-923D25DDA758}</Project>
+      <Project>{0507faed-ff81-45a4-90af-923d25dda758}</Project>
       <Name>Moritz.Score</Name>
     </ProjectReference>
   </ItemGroup>

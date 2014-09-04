@@ -1,9 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 
+
+using Krystals4ObjectLibrary;
+using Moritz.Globals;
+using Moritz.Krystals;
 using Moritz.Score;
 using Moritz.Score.Midi;
-using Krystals4ObjectLibrary;
+using Moritz.Score.Notation;
+using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {
@@ -47,19 +52,25 @@ namespace Moritz.AssistantComposer
         public abstract List<byte> MidiChannels();
 
         /// <summary>
-        /// All midi algorithms create a sequence of bars, each of which consists of a list of
-        /// voices, in top to bottom order of a conceptual 'system'. Each bar has the same number of voices.
-        /// Each voice in the 'system' has its own unique midi channel, so that voices at the same vertical
-        /// position in consecutive bars contain the continuation of a particular midi channel.
-        /// By convention, algorithms use midi channels having indices which increase from top to bottom in
-        /// the 'system', with the top voice usually having midi channel index = 0. Midi channels may not
-        /// occur twice in the same 'system'. The midi channels do not have to be contiguous.
-        /// Each algorithm declares which midi channels it uses in the MidiChannels() function (see above).
-        /// For an example, see Study2bAlgorithm.
+        /// The DoAlgorithm() function is special to a particular composition.
+        /// The function returns a sequence of bar definitions. Each bar is a list of Voices (conceptually from top to bottom
+        /// in a system, though the actual order can be changed in the Assistant Composer's options).
+        /// Each bar in the sequence has the same number of Voices. Voices at the same position in each bar are continuations
+        /// of the same overall voice, and may be concatenated later. OutputVoices at the same position in each bar have the
+        /// same midi channel.
+        /// Midi channels:
+        /// By convention, algorithms use midi channels having indices which increase from top to bottom in the
+        /// system, starting at 0. Midi channels may not occur twice in the same system. Each algorithm declares which midi
+        /// channels it uses in the MidiChannels() function (see above). For an example, see Study2bAlgorithm.
+        /// Each 'bar definition' is actually contained in the UniqueDefs list in each Voice (i.e. Voice.UniqueDefs).
+        /// The Voice.NoteObjects lists are still empty when DoAlgorithm() returns.
+        /// The Voice.UniqueDefs will be converted to NoteObjects having a specific notation later (in Notator.AddSymbolsToSystems()).
+        /// ACHTUNG:
+        /// The top (=first) Voice in each bar must be an OutputVoice.
+        /// This can be followed by zero or more OutputVoices, followed by zero or more InputVoices.
+        /// The chord definitions in OutputVoice.UniqueDefs must be UniqueMidiChordDefs.
+        /// The chord definitions in InputVoice.UniqueDefs must be UniqueInputChordDefs.
         /// </summary>
-        /// <returns>
-        /// A list of sequential bars. Each bar contains all the voices in the bar, from top to bottom.
-        /// </returns>
         public abstract List<List<Voice>> DoAlgorithm();
         /// <summary>
         /// Returns the number of bars created by the algorithm.
@@ -81,9 +92,9 @@ namespace Moritz.AssistantComposer
         /// </summary>
         protected int GetEndMsPosition(List<Voice> bar)
         {
-            Debug.Assert(bar != null && bar.Count > 0 && bar[0].UniqueMidiDurationDefs.Count > 0);
-            List<IUniqueMidiDurationDef> lmdd = bar[0].UniqueMidiDurationDefs;
-            IUniqueMidiDurationDef lastLmdd = lmdd[lmdd.Count - 1];
+            Debug.Assert(bar != null && bar.Count > 0 && bar[0].UniqueDefs.Count > 0);
+            List<IUniqueDef> lmdd = bar[0].UniqueDefs;
+            IUniqueDef lastLmdd = lmdd[lmdd.Count - 1];
             int endMsPosition = lastLmdd.MsPosition + lastLmdd.MsDuration;
             return endMsPosition;
         }
@@ -106,10 +117,10 @@ namespace Moritz.AssistantComposer
             List<Voice> secondBar = new List<Voice>();
             twoBars.Add(firstBar);
             twoBars.Add(secondBar);
-            int originalBarStartPos = originalBar[0].UniqueMidiDurationDefs[0].MsPosition;
+            int originalBarStartPos = originalBar[0].UniqueDefs[0].MsPosition;
             int originalBarEndPos =
-                originalBar[0].UniqueMidiDurationDefs[originalBar[0].UniqueMidiDurationDefs.Count - 1].MsPosition +
-                originalBar[0].UniqueMidiDurationDefs[originalBar[0].UniqueMidiDurationDefs.Count - 1].MsDuration;
+                originalBar[0].UniqueDefs[originalBar[0].UniqueDefs.Count - 1].MsPosition +
+                originalBar[0].UniqueDefs[originalBar[0].UniqueDefs.Count - 1].MsDuration;
 
             Voice firstBarVoice;
             Voice secondBarVoice;
@@ -129,60 +140,72 @@ namespace Moritz.AssistantComposer
                     secondBarVoice = new InputVoice((InputStaff)voice.Staff);
                     secondBar.Add(secondBarVoice);
                 }
-                foreach(IUniqueMidiDurationDef iumdd in voice.UniqueMidiDurationDefs)
+                foreach(IUniqueDef iUnique in voice.UniqueDefs)
                 {
-                    int lmddMsDuration = (iumdd.MsDurationToNextBarline == null) ? iumdd.MsDuration : (int)iumdd.MsDurationToNextBarline;
-                    int lmddEndPos = iumdd.MsPosition + lmddMsDuration;
-                    if(iumdd.MsPosition >= absoluteSplitPos)
+                    int udMsDuration = iUnique.MsDuration;
+                    IUniqueSplittableChordDef uniqueChordDef = iUnique as IUniqueSplittableChordDef;
+                    if(uniqueChordDef != null)
                     {
-                        if(iumdd.MsPosition == absoluteSplitPos && iumdd is UniqueClefChangeDef)
+                        udMsDuration = (uniqueChordDef.MsDurationToNextBarline == null) ? iUnique.MsDuration : (int)uniqueChordDef.MsDurationToNextBarline;
+                    }
+
+                    int udEndPos = iUnique.MsPosition + udMsDuration;
+                    
+                    if(iUnique.MsPosition >= absoluteSplitPos)
+                    {
+                        if(iUnique.MsPosition == absoluteSplitPos && iUnique is UniqueClefChangeDef)
                         {
-                            firstBarVoice.UniqueMidiDurationDefs.Add(iumdd);
+                            firstBarVoice.UniqueDefs.Add(iUnique);
                         }
                         else
                         {
-                            Debug.Assert(lmddEndPos <= originalBarEndPos);
-                            secondBarVoice.UniqueMidiDurationDefs.Add(iumdd);
+                            Debug.Assert(udEndPos <= originalBarEndPos);
+                            secondBarVoice.UniqueDefs.Add(iUnique);
                         }
                     }
-                    else if(lmddEndPos > absoluteSplitPos)
+                    else if(udEndPos > absoluteSplitPos)
                     {
-                        int durationAfterBarline = lmddEndPos - absoluteSplitPos;
-                        if(iumdd is UniqueMidiRestDef)
+                        int durationAfterBarline = udEndPos - absoluteSplitPos;
+                        if(iUnique is UniqueRestDef)
                         {
                             // This is a rest. Split it.
-                            IUniqueMidiDurationDef firstRestHalf = new UniqueMidiRestDef(iumdd.MsPosition, absoluteSplitPos - iumdd.MsPosition);
-                            firstBarVoice.UniqueMidiDurationDefs.Add(firstRestHalf);
+                            UniqueRestDef firstRestHalf = new UniqueRestDef(iUnique.MsPosition, absoluteSplitPos - iUnique.MsPosition);
+                            firstBarVoice.UniqueDefs.Add(firstRestHalf);
 
-                            IUniqueMidiDurationDef secondRestHalf = new UniqueMidiRestDef(absoluteSplitPos, durationAfterBarline);
-                            secondBarVoice.UniqueMidiDurationDefs.Add(secondRestHalf);
+                            UniqueRestDef secondRestHalf = new UniqueRestDef(absoluteSplitPos, durationAfterBarline);
+                            secondBarVoice.UniqueDefs.Add(secondRestHalf);
                         }
-                        else if(iumdd is UniqueCautionaryChordDef)
+                        else if(iUnique is UniqueCautionaryChordDef)
                         {
                             // This is a cautionary chord. Set the position of the following barline, and
                             // Add an LocalizedCautionaryChordDef at the beginning of the following bar.
-                            iumdd.MsDuration = absoluteSplitPos - iumdd.MsPosition;
-                            firstBarVoice.UniqueMidiDurationDefs.Add(iumdd);
+                            iUnique.MsDuration = absoluteSplitPos - iUnique.MsPosition;
+                            firstBarVoice.UniqueDefs.Add(iUnique);
 
-                            UniqueCautionaryChordDef secondLmdd = new UniqueCautionaryChordDef(iumdd as MidiChordDef, absoluteSplitPos, durationAfterBarline);
-                            secondBarVoice.UniqueMidiDurationDefs.Add(secondLmdd);
+                            UniqueCautionaryChordDef secondLmdd = new UniqueCautionaryChordDef((IUniqueChordDef)iUnique, absoluteSplitPos, durationAfterBarline);
+                            secondBarVoice.UniqueDefs.Add(secondLmdd);
                         }
                         else
                         {
-                            // This is a normal chord. Set the position of the following barline, and
-                            // Add an LocalizedCautionaryChordDef at the beginning of the following bar.
-                            iumdd.MsDurationToNextBarline = absoluteSplitPos - iumdd.MsPosition;
-                            firstBarVoice.UniqueMidiDurationDefs.Add(iumdd);
+                            // This is a UniqueMidiChordDef or a UniqueInputChordDef. 
+                            // Set the position of the following barline, and add a UniqueCautionaryChordDef at the beginning
+                            // of the following bar.
+                            if(uniqueChordDef != null)
+                            {
+                                uniqueChordDef.MsDurationToNextBarline = absoluteSplitPos - iUnique.MsPosition;
+                            }
 
-                            UniqueCautionaryChordDef secondLmdd = new UniqueCautionaryChordDef(iumdd as MidiChordDef, absoluteSplitPos, durationAfterBarline);
-                            secondBarVoice.UniqueMidiDurationDefs.Add(secondLmdd);
+                            firstBarVoice.UniqueDefs.Add((IUniqueDef) uniqueChordDef);
+
+                            UniqueCautionaryChordDef secondLmdd = new UniqueCautionaryChordDef((IUniqueChordDef) uniqueChordDef, 
+                                absoluteSplitPos, durationAfterBarline);
+                            secondBarVoice.UniqueDefs.Add(secondLmdd);
                         }
-
                     }
                     else
                     {
-                        Debug.Assert(lmddEndPos <= absoluteSplitPos && iumdd.MsPosition >= originalBarStartPos);
-                        firstBarVoice.UniqueMidiDurationDefs.Add(iumdd);
+                        Debug.Assert(udEndPos <= absoluteSplitPos && iUnique.MsPosition >= originalBarStartPos);
+                        firstBarVoice.UniqueDefs.Add(iUnique);
                     }
                 }
             }
@@ -202,10 +225,10 @@ namespace Moritz.AssistantComposer
                     List<List<int>> restsToReplace = new List<List<int>>();
                     #region find the consecutive rests
                     List<int> consecRestIndices = new List<int>();
-                    for(int i = 0; i < voice.UniqueMidiDurationDefs.Count - 1; i++)
+                    for(int i = 0; i < voice.UniqueDefs.Count - 1; i++)
                     {
-                        MidiChordDef mcd1 = voice.UniqueMidiDurationDefs[i] as MidiChordDef;
-                        MidiChordDef mcd2 = voice.UniqueMidiDurationDefs[i + 1] as MidiChordDef;
+                        MidiChordDef mcd1 = voice.UniqueDefs[i] as MidiChordDef;
+                        MidiChordDef mcd2 = voice.UniqueDefs[i + 1] as MidiChordDef;
                         if(mcd1 == null && mcd2 == null)
                         {
                             if(!consecRestIndices.Contains(i))
@@ -223,7 +246,7 @@ namespace Moritz.AssistantComposer
                             }
                         }
 
-                        if(i == voice.UniqueMidiDurationDefs.Count - 2 && consecRestIndices.Count > 0)
+                        if(i == voice.UniqueDefs.Count - 2 && consecRestIndices.Count > 0)
                         {
                             restsToReplace.Add(consecRestIndices);
                         }
@@ -236,16 +259,16 @@ namespace Moritz.AssistantComposer
                         {
                             List<int> indToReplace = restsToReplace[i];
                             int msDuration = 0;
-                            int msPosition = voice.UniqueMidiDurationDefs[indToReplace[0]].MsPosition;
+                            int msPosition = voice.UniqueDefs[indToReplace[0]].MsPosition;
                             for(int j = indToReplace.Count - 1; j >= 0; j--)
                             {
-                                IUniqueMidiDurationDef iumdd = voice.UniqueMidiDurationDefs[indToReplace[j]];
+                                IUniqueDef iumdd = voice.UniqueDefs[indToReplace[j]];
                                 Debug.Assert(iumdd.MsDuration > 0);
                                 msDuration += iumdd.MsDuration;
-                                voice.UniqueMidiDurationDefs.RemoveAt(indToReplace[j]);
+                                voice.UniqueDefs.RemoveAt(indToReplace[j]);
                             }
-                            IUniqueMidiDurationDef replacementLmdd = new UniqueMidiRestDef(msPosition, msDuration);
-                            voice.UniqueMidiDurationDefs.Insert(indToReplace[0], replacementLmdd);
+                            UniqueRestDef replacementLmdd = new UniqueRestDef(msPosition, msDuration);
+                            voice.UniqueDefs.Insert(indToReplace[0], replacementLmdd);
                         }
                     }
                     #endregion

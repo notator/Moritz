@@ -268,7 +268,7 @@ namespace Moritz.Score.Notation
             ClefSymbol clef = noteObject as ClefSymbol;
             Barline barline = noteObject as Barline;
             CautionaryChordSymbol cautionaryChordSymbol = noteObject as CautionaryChordSymbol;
-            ChordSymbol chord = noteObject as ChordSymbol;
+            OutputChordSymbol chord = noteObject as OutputChordSymbol;
             RestSymbol rest = noteObject as RestSymbol;
             if(barline != null)
             {
@@ -297,43 +297,49 @@ namespace Moritz.Score.Notation
             return returnMetrics;
         }
 
-        public override NoteObject GetNoteObject(Voice voice, IUniqueMidiDurationDef iumdd, bool firstLmddInVoice,
+        public override NoteObject GetNoteObject(Voice voice, IUniqueDef iud, bool firstDefInVoice,
             ref byte currentVelocity, float musicFontHeight)
         {
             NoteObject noteObject = null;
-            UniqueCautionaryChordDef lccd = iumdd as UniqueCautionaryChordDef;
-            UniqueMidiChordDef uniqueMidiChordDef = iumdd as UniqueMidiChordDef;
-            UniqueMidiRestDef uniqueMidiRestDef = iumdd as UniqueMidiRestDef;
-            UniqueClefChangeDef uniqueClefChangeDef = iumdd as UniqueClefChangeDef;
+            UniqueCautionaryChordDef uniqueCautionaryChordDef = iud as UniqueCautionaryChordDef;
+            UniqueMidiChordDef uniqueMidiChordDef = iud as UniqueMidiChordDef;
+            UniqueInputChordDef uniqueInputChordDef = iud as UniqueInputChordDef;
+            UniqueRestDef uniqueRestDef = iud as UniqueRestDef;
+            UniqueClefChangeDef uniqueClefChangeDef = iud as UniqueClefChangeDef;
 
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
             float cautionaryFontHeight = pageFormat.CautionaryNoteheadsFontHeight;
             int minimumCrotchetDuration = pageFormat.MinimumCrotchetDuration;
  
-            if(lccd != null && firstLmddInVoice)
+            if(uniqueCautionaryChordDef != null && firstDefInVoice)
             {
-                CautionaryChordSymbol cautionaryChordSymbol = new CautionaryChordSymbol(voice, lccd, cautionaryFontHeight);
+                CautionaryChordSymbol cautionaryChordSymbol = new CautionaryChordSymbol(voice, uniqueCautionaryChordDef, cautionaryFontHeight);
                 noteObject = cautionaryChordSymbol;
-            } 
+            }                
             else if(uniqueMidiChordDef != null)
             {
-                ChordSymbol chordSymbol = new ChordSymbol(voice, uniqueMidiChordDef, minimumCrotchetDuration, musicFontHeight);
+                OutputChordSymbol outputChordSymbol = new OutputChordSymbol(voice, uniqueMidiChordDef, minimumCrotchetDuration, musicFontHeight);
 
                 if(uniqueMidiChordDef.MidiVelocity != currentVelocity)
                 {
-                    chordSymbol.AddDynamic(uniqueMidiChordDef.MidiVelocity, currentVelocity);
+                    outputChordSymbol.AddDynamic(uniqueMidiChordDef.MidiVelocity, currentVelocity);
                     currentVelocity = uniqueMidiChordDef.MidiVelocity;
                 }
-                noteObject = chordSymbol;
+                noteObject = outputChordSymbol;
             }
-            else if(uniqueMidiRestDef != null)
+            else if(uniqueInputChordDef != null)
             {
-                RestSymbol restSymbol = new RestSymbol(voice, iumdd, minimumCrotchetDuration, musicFontHeight);
+                InputChordSymbol inputChordSymbol = new InputChordSymbol(voice, uniqueInputChordDef, minimumCrotchetDuration, musicFontHeight);
+                noteObject = inputChordSymbol;
+            }
+            else if(uniqueRestDef != null) 
+            {
+                RestSymbol restSymbol = new RestSymbol(voice, iud, minimumCrotchetDuration, musicFontHeight);
                 noteObject = restSymbol;
             }
             else if(uniqueClefChangeDef != null)
             {
-                ClefChangeSymbol clefChangeSymbol = new ClefChangeSymbol(voice, uniqueClefChangeDef.ClefType, cautionaryFontHeight, iumdd.MsPosition);
+                ClefChangeSymbol clefChangeSymbol = new ClefChangeSymbol(voice, uniqueClefChangeDef.ClefType, cautionaryFontHeight, ((IUniqueDef)iud).MsPosition);
                 noteObject = clefChangeSymbol;
             }
 
@@ -343,9 +349,9 @@ namespace Moritz.Score.Notation
         public void ForceNaturalsInSynchronousChords(Staff staff)
         {
             Debug.Assert(staff.Voices.Count == 2);
-            foreach(ChordSymbol voice0chord in staff.Voices[0].ChordSymbols)
+            foreach(OutputChordSymbol voice0chord in staff.Voices[0].ChordSymbols)
             {
-                foreach(ChordSymbol voice1chord in staff.Voices[1].ChordSymbols)
+                foreach(OutputChordSymbol voice1chord in staff.Voices[1].ChordSymbols)
                 {
                     if(voice0chord.MsPosition == voice1chord.MsPosition)
                     {
@@ -362,7 +368,7 @@ namespace Moritz.Score.Notation
         /// Force the display of naturals where the synchronous chords share a diatonic pitch,
         /// and one of them is not natural.
         /// </summary>
-        private void ForceNaturals(ChordSymbol synchChord1, ChordSymbol synchChord2)
+        private void ForceNaturals(OutputChordSymbol synchChord1, OutputChordSymbol synchChord2)
         {
             Debug.Assert(synchChord1.MsPosition == synchChord2.MsPosition);
             foreach(Head head1 in synchChord1.HeadsTopDown)
@@ -415,7 +421,7 @@ namespace Moritz.Score.Notation
 
                     float lyricMaxTop = float.MinValue;
                     float lyricMinBottom = float.MaxValue;
-                    foreach(ChordSymbol chordSymbol in staff.Voices[voiceIndex].ChordSymbols)
+                    foreach(OutputChordSymbol chordSymbol in staff.Voices[voiceIndex].ChordSymbols)
                     {
                         Metrics lyricMetrics = chordSymbol.ChordMetrics.LyricMetrics;
                         if(lyricMetrics != null)
@@ -432,7 +438,7 @@ namespace Moritz.Score.Notation
                             float lyricMinTop = staff.Metrics.StafflinesBottom + (staff.SVGSystem.Score.PageFormat.Gap * 1.5F);
                             lyricMaxTop = lyricMaxTop > lyricMinTop ? lyricMaxTop : lyricMinTop;
                         }
-                        foreach(ChordSymbol chordSymbol in staff.Voices[voiceIndex].ChordSymbols)
+                        foreach(OutputChordSymbol chordSymbol in staff.Voices[voiceIndex].ChordSymbols)
                         {
                             chordSymbol.ChordMetrics.MoveAuxilliariesToLyricHeight(voiceStemDirection, lyricMaxTop, lyricMinBottom);
                         }
@@ -456,7 +462,7 @@ namespace Moritz.Score.Notation
                 List<NoteObject> noteObjects = voice.NoteObjects;
                 ClefSymbol firstClef = null;
                 CautionaryChordSymbol cautionaryChordSymbol = null;
-                ChordSymbol firstChord = null;
+                OutputChordSymbol firstChord = null;
                 RestSymbol firstRest = null;
                 for(int index = 0; index < noteObjects.Count; ++index)
                 {
@@ -465,7 +471,7 @@ namespace Moritz.Score.Notation
                     if(cautionaryChordSymbol == null)
                         cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
                     if(firstChord == null)
-                        firstChord = noteObjects[index] as ChordSymbol;
+                        firstChord = noteObjects[index] as OutputChordSymbol;
                     if(firstRest == null)
                         firstRest = noteObjects[index] as RestSymbol;
 
@@ -509,7 +515,7 @@ namespace Moritz.Score.Notation
             List<float> x2s = new List<float>();
             NoteObject no2 = GetFollowingChordRestOrBarlineSymbol(noteObjects);
             Barline barline = no2 as Barline;
-            ChordSymbol chord2 = no2 as ChordSymbol;
+            OutputChordSymbol chord2 = no2 as OutputChordSymbol;
             RestSymbol rest2 = no2 as RestSymbol;
             if(barline != null)
             {
@@ -568,7 +574,7 @@ namespace Moritz.Score.Notation
                         continue;
                     }
 
-                    if(noteObject is ChordSymbol)
+                    if(noteObject is OutputChordSymbol)
                         noteObjectToReturn = noteObject;
 
                     if(noteObject is RestSymbol)
@@ -596,7 +602,7 @@ namespace Moritz.Score.Notation
                 {
                     // noteObjects.Count - 1 because index is immediately incremented when a continuing 
                     // chord or rest is found, and it should always be less than noteObjects.Count.
-                    ChordSymbol chord1 = noteObjects[index] as ChordSymbol;
+                    OutputChordSymbol chord1 = noteObjects[index] as OutputChordSymbol;
                     if(chord1 != null)
                     {
                         List<float> x1s = GetX1sFromChord1(chord1.ChordMetrics, hairlinePadding);
@@ -608,7 +614,7 @@ namespace Moritz.Score.Notation
                             while(index < noteObjects.Count)
                             {
                                 CautionaryChordSymbol cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
-                                ChordSymbol chord2 = noteObjects[index] as ChordSymbol;
+                                OutputChordSymbol chord2 = noteObjects[index] as OutputChordSymbol;
                                 RestSymbol rest2 = noteObjects[index] as RestSymbol;
                                 if(cautionaryChordSymbol != null)
                                 {
@@ -672,12 +678,12 @@ namespace Moritz.Score.Notation
                 {
                     Voice voice = staff.Voices[voiceIndex];
                     List<NoteObject> noteObjects = voice.NoteObjects;
-                    ChordSymbol lastChord = null;
+                    OutputChordSymbol lastChord = null;
                     RestSymbol lastRest = null;
                     CautionaryChordSymbol cautionary = null;
                     for(int index = noteObjects.Count - 1; index >= 0; --index)
                     {
-                        lastChord = noteObjects[index] as ChordSymbol;
+                        lastChord = noteObjects[index] as OutputChordSymbol;
                         lastRest = noteObjects[index] as RestSymbol;
                         cautionary = noteObjects[index] as CautionaryChordSymbol;
                         if(cautionary != null)
@@ -719,7 +725,7 @@ namespace Moritz.Score.Notation
                     firstDurationSymbolIsCautionary = true;
                     break;
                 }
-                else if(noteObject is ChordSymbol || noteObject is RestSymbol)
+                else if(noteObject is OutputChordSymbol || noteObject is RestSymbol)
                 {
                     break;
                 }  

@@ -455,7 +455,7 @@ namespace Moritz.Score.Notation
             }
         }
 
-        private bool NextNoteObjectIsABarline(ChordSymbol chord)
+        private bool NextNoteObjectIsABarline(OutputChordSymbol chord)
         {
             bool nextNoteObjectIsABarline = false;
             List<NoteObject> noteObjects = chord.Voice.NoteObjects;

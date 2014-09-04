@@ -106,7 +106,7 @@ namespace Moritz.Score
         /// </summary>
         private void ForceNaturals(NoteObjectMoment previousStaffMoment, NoteObjectMoment thisStaffMoment)
         {
-            foreach(ChordSymbol chordSymbol in thisStaffMoment.ChordSymbols)
+            foreach(OutputChordSymbol chordSymbol in thisStaffMoment.ChordSymbols)
             {
                 foreach(Head head in chordSymbol.HeadsTopDown)
                 {
@@ -114,7 +114,7 @@ namespace Moritz.Score
                     {
                         bool found = false;
                         head.DisplayAccidental = DisplayAccidental.suppress; // naturals are suppressed by default
-                        foreach(ChordSymbol previousChordSymbol in previousStaffMoment.ChordSymbols)
+                        foreach(OutputChordSymbol previousChordSymbol in previousStaffMoment.ChordSymbols)
                         {
                             foreach(Head previousHead in previousChordSymbol.HeadsTopDown)
                             {
@@ -139,8 +139,8 @@ namespace Moritz.Score
         /// </summary>
         private void ForceNaturals(NoteObjectMoment thisStaffMoment)
         {
-            List<ChordSymbol> momentChordSymbols = new List<ChordSymbol>(2);
-            foreach(ChordSymbol chordSymbol in thisStaffMoment.ChordSymbols)
+            List<OutputChordSymbol> momentChordSymbols = new List<OutputChordSymbol>(2);
+            foreach(OutputChordSymbol chordSymbol in thisStaffMoment.ChordSymbols)
             {
                 momentChordSymbols.Add(chordSymbol);
             }
@@ -311,7 +311,7 @@ namespace Moritz.Score
                 {
                     foreach(NoteObject chordObject in chordObjects)
                     {
-                        ChordSymbol chordSymbol = chordObject as ChordSymbol;
+                        OutputChordSymbol chordSymbol = chordObject as OutputChordSymbol;
                         if(chordSymbol != null)
                         {
                             if(chordSymbol.MsPosition > restSymbol.MsPosition)
@@ -428,9 +428,9 @@ namespace Moritz.Score
             Debug.Assert(Voices.Count == 2);
             Debug.Assert(Voices[0].StemDirection == VerticalDir.up);
             Debug.Assert(Voices[1].StemDirection == VerticalDir.down);
-            foreach(ChordSymbol upperChord in Voices[0].ChordSymbols)
+            foreach(OutputChordSymbol upperChord in Voices[0].ChordSymbols)
             {
-                foreach(ChordSymbol lowerChord in Voices[1].ChordSymbols)
+                foreach(OutputChordSymbol lowerChord in Voices[1].ChordSymbols)
                 {
                     if(upperChord.MsPosition == lowerChord.MsPosition)
                     {
@@ -447,7 +447,7 @@ namespace Moritz.Score
         }
 
 
-        private void AdjustStemLengths(ChordSymbol upperChord, ChordSymbol lowerChord)
+        private void AdjustStemLengths(OutputChordSymbol upperChord, OutputChordSymbol lowerChord)
         {
             upperChord.ChordMetrics.AdjustStemLengthAndFlagBlock(upperChord.DurationClass, upperChord.FontHeight, lowerChord.ChordMetrics.HeadsMetrics);
             lowerChord.ChordMetrics.AdjustStemLengthAndFlagBlock(lowerChord.DurationClass, lowerChord.FontHeight, upperChord.ChordMetrics.HeadsMetrics);
@@ -474,15 +474,15 @@ namespace Moritz.Score
                 adjustVoiceIndex = 1;
                 otherVoiceIndex = 0;
             }
-            foreach(ChordSymbol chordSymbol in Voices[adjustVoiceIndex].ChordSymbols)
+            foreach(OutputChordSymbol chordSymbol in Voices[adjustVoiceIndex].ChordSymbols)
             {
                 if(chordSymbol.BeamBlock != null)
                 {
                     BeamBlock beamBlock = chordSymbol.BeamBlock;
-                    List<ChordSymbol> enclosedChords = beamBlock.EnclosedChords(Voices[otherVoiceIndex]);
-                    foreach(ChordSymbol chord in beamBlock.Chords)
+                    List<OutputChordSymbol> enclosedChords = beamBlock.EnclosedChords(Voices[otherVoiceIndex]);
+                    foreach(OutputChordSymbol chord in beamBlock.Chords)
                     {
-                        foreach(ChordSymbol otherChord in enclosedChords)
+                        foreach(OutputChordSymbol otherChord in enclosedChords)
                         {
                             chord.ChordMetrics.AdjustStemLengthAndFlagBlock(chord.DurationClass, chord.FontHeight, otherChord.ChordMetrics.HeadsMetrics);
                         }
@@ -490,11 +490,11 @@ namespace Moritz.Score
                     if(adjustVoiceIndex == 0)
                     {
                         float minStemTip = float.MaxValue;
-                        foreach(ChordSymbol beamedChord in beamBlock.Chords)
+                        foreach(OutputChordSymbol beamedChord in beamBlock.Chords)
                         {
                             minStemTip = minStemTip < beamedChord.ChordMetrics.StemMetrics.Top ? minStemTip : beamedChord.ChordMetrics.StemMetrics.Top;
                         }
-                        foreach(ChordSymbol beamedChord in beamBlock.Chords)
+                        foreach(OutputChordSymbol beamedChord in beamBlock.Chords)
                         {
                             beamedChord.ChordMetrics.MoveOuterStemTip(minStemTip, VerticalDir.up);
                         }
@@ -502,11 +502,11 @@ namespace Moritz.Score
                     else
                     {
                         float maxStemTip = float.MinValue;
-                        foreach(ChordSymbol beamedChord in beamBlock.Chords)
+                        foreach(OutputChordSymbol beamedChord in beamBlock.Chords)
                         {
                             maxStemTip = maxStemTip > beamedChord.ChordMetrics.StemMetrics.Bottom ? maxStemTip : beamedChord.ChordMetrics.StemMetrics.Bottom;
                         }
-                        foreach(ChordSymbol beamedChord in beamBlock.Chords)
+                        foreach(OutputChordSymbol beamedChord in beamBlock.Chords)
                         {
                             beamedChord.ChordMetrics.MoveOuterStemTip(maxStemTip, VerticalDir.down);
                         }
@@ -533,7 +533,7 @@ namespace Moritz.Score
                 adjustVoiceIndex = 1;
                 otherVoiceIndex = 0;
             }
-            foreach(ChordSymbol chordSymbol in Voices[adjustVoiceIndex].ChordSymbols)
+            foreach(OutputChordSymbol chordSymbol in Voices[adjustVoiceIndex].ChordSymbols)
             {
                 DurationClass durationClass = chordSymbol.DurationClass;
                 if(durationClass == DurationClass.quaver
@@ -577,7 +577,7 @@ namespace Moritz.Score
         /// Accidentals are rearranged (top to bottom, to the left of the combined chord) once the
         /// noteheads and ledgerlines have been given their final positions.
         /// </summary>
-        private void AdjustLowerChordXPosition(ChordSymbol upperChord, ChordSymbol lowerChord)
+        private void AdjustLowerChordXPosition(OutputChordSymbol upperChord, OutputChordSymbol lowerChord)
         {
             Debug.Assert(upperChord.MsPosition == lowerChord.MsPosition);
             if(!(upperChord is CautionaryChordSymbol))
@@ -760,7 +760,7 @@ namespace Moritz.Score
         {
             get
             {
-                List<NoteObjectMoment> momentSymbols = MomentSymbols<ChordSymbol>();
+                List<NoteObjectMoment> momentSymbols = MomentSymbols<OutputChordSymbol>();
                 foreach(NoteObjectMoment momentSymbol in momentSymbols)
                     yield return momentSymbol;
             }
