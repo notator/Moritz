@@ -68,7 +68,7 @@ namespace Moritz.AssistantComposer
         /// ACHTUNG:
         /// The top (=first) Voice in each bar must be an OutputVoice.
         /// This can be followed by zero or more OutputVoices, followed by zero or more InputVoices.
-        /// The chord definitions in OutputVoice.UniqueDefs must be UniqueMidiChordDefs.
+        /// The chord definitions in OutputVoice.UniqueDefs must be MidiChordDefs.
         /// The chord definitions in InputVoice.UniqueDefs must be UniqueInputChordDefs.
         /// </summary>
         public abstract List<List<Voice>> DoAlgorithm();
@@ -166,13 +166,13 @@ namespace Moritz.AssistantComposer
                     else if(udEndPos > absoluteSplitPos)
                     {
                         int durationAfterBarline = udEndPos - absoluteSplitPos;
-                        if(iUnique is UniqueRestDef)
+                        if(iUnique is RestDef)
                         {
                             // This is a rest. Split it.
-                            UniqueRestDef firstRestHalf = new UniqueRestDef(iUnique.MsPosition, absoluteSplitPos - iUnique.MsPosition);
+                            RestDef firstRestHalf = new RestDef(iUnique.MsPosition, absoluteSplitPos - iUnique.MsPosition);
                             firstBarVoice.UniqueDefs.Add(firstRestHalf);
 
-                            UniqueRestDef secondRestHalf = new UniqueRestDef(absoluteSplitPos, durationAfterBarline);
+                            RestDef secondRestHalf = new RestDef(absoluteSplitPos, durationAfterBarline);
                             secondBarVoice.UniqueDefs.Add(secondRestHalf);
                         }
                         else if(iUnique is UniqueCautionaryChordDef)
@@ -187,7 +187,7 @@ namespace Moritz.AssistantComposer
                         }
                         else
                         {
-                            // This is a UniqueMidiChordDef or a UniqueInputChordDef. 
+                            // This is a MidiChordDef or a InputChordDef. 
                             // Set the position of the following barline, and add a UniqueCautionaryChordDef at the beginning
                             // of the following bar.
                             if(uniqueChordDef != null)
@@ -267,7 +267,7 @@ namespace Moritz.AssistantComposer
                                 msDuration += iumdd.MsDuration;
                                 voice.UniqueDefs.RemoveAt(indToReplace[j]);
                             }
-                            UniqueRestDef replacementLmdd = new UniqueRestDef(msPosition, msDuration);
+                            RestDef replacementLmdd = new RestDef(msPosition, msDuration);
                             voice.UniqueDefs.Insert(indToReplace[0], replacementLmdd);
                         }
                     }

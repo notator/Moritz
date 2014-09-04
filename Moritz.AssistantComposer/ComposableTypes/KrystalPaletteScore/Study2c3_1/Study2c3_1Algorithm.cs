@@ -51,7 +51,7 @@ namespace Moritz.AssistantComposer
         /// ACHTUNG:
         /// The top (=first) Voice in each bar must be an OutputVoice.
         /// This can be followed by zero or more OutputVoices, followed by zero or more InputVoices.
-        /// The chord definitions in OutputVoice.UniqueDefs must be UniqueMidiChordDefs.
+        /// The chord definitions in OutputVoice.UniqueDefs must be MidiChordDefs.
         /// The chord definitions in InputVoice.UniqueDefs must be UniqueInputChordDefs.
         /// </summary>
         public override List<List<Voice>> DoAlgorithm()

@@ -148,7 +148,7 @@ namespace Moritz.Score.Notation
             float musicFontHeight)
         {
             DurationSymbol durationSymbol = null;
-            UniqueMidiChordDef uniqueMidiChordDef = iud as UniqueMidiChordDef;
+            MidiChordDef uniqueMidiChordDef = iud as MidiChordDef;
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
 
             int minimumCrotchetDuration = pageFormat.MinimumCrotchetDuration;

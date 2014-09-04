@@ -10,7 +10,7 @@ namespace Moritz.Score.Notation
 {
     ///<summary>
     /// A UniqueClefChangeDef is a IUniqueMidiDurationDef which can be created while programming a score.
-    /// It must be added to a voice.UniqueMidiDurationDefs list immediately before a UniqueMidiChordDef or
+    /// It must be added to a voice.UniqueMidiDurationDefs list immediately before a MidiChordDef or
     /// UniqueMidiRestDef. It shares the same MsPosition.
     /// When converting definitions to symbols, the Notator uses this class to ensure that both voices in
     /// a two-voice staff contain the same ClefSigns (see Notator.AddSymbolsToSystems(List<SvgSystem> systems)).
@@ -20,7 +20,7 @@ namespace Moritz.Score.Notation
     {
         /// <summary>
         /// The clefType must be one of the following strings "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"
-        /// The followingUniqueMidiChordOrRestDef must be a UniqueMidiChordDef or UniqueMidiRestDef.
+        /// The followingUniqueMidiChordOrRestDef must be a MidiChordDef or UniqueMidiRestDef.
         /// </summary>
         public UniqueClefChangeDef(string clefType, IUniqueDef followingUniqueChordOrRestDef)
             :base()
@@ -38,9 +38,9 @@ namespace Moritz.Score.Notation
                 Debug.Assert(false, "Unknown clef type.");
             }
 
-            if(!(followingUniqueChordOrRestDef is UniqueMidiChordDef) 
-            && !(followingUniqueChordOrRestDef is UniqueInputChordDef)
-            && !(followingUniqueChordOrRestDef is UniqueRestDef))
+            if(!(followingUniqueChordOrRestDef is MidiChordDef) 
+            && !(followingUniqueChordOrRestDef is InputChordDef)
+            && !(followingUniqueChordOrRestDef is RestDef))
             {
                 Debug.Assert(false, "Clef change must be followed by a chord or rest.");
             }

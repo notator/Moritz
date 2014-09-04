@@ -302,9 +302,9 @@ namespace Moritz.Score.Notation
         {
             NoteObject noteObject = null;
             UniqueCautionaryChordDef uniqueCautionaryChordDef = iud as UniqueCautionaryChordDef;
-            UniqueMidiChordDef uniqueMidiChordDef = iud as UniqueMidiChordDef;
-            UniqueInputChordDef uniqueInputChordDef = iud as UniqueInputChordDef;
-            UniqueRestDef uniqueRestDef = iud as UniqueRestDef;
+            MidiChordDef uniqueMidiChordDef = iud as MidiChordDef;
+            InputChordDef uniqueInputChordDef = iud as InputChordDef;
+            RestDef uniqueRestDef = iud as RestDef;
             UniqueClefChangeDef uniqueClefChangeDef = iud as UniqueClefChangeDef;
 
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
@@ -609,7 +609,7 @@ namespace Moritz.Score.Notation
                         List<float> x2s = null;
                         List<float> ys = null;
                         ++index;
-                        if(chord1.UniqueMidiChordDef.MsDurationToNextBarline != null)
+                        if(chord1.MidiChordDef.MsDurationToNextBarline != null)
                         {
                             while(index < noteObjects.Count)
                             {
@@ -695,7 +695,7 @@ namespace Moritz.Score.Notation
                             break;
                     }
 
-                    if(lastChord != null && lastChord.UniqueMidiChordDef.MsDurationToNextBarline != null)
+                    if(lastChord != null && lastChord.MidiChordDef.MsDurationToNextBarline != null)
                     {
                         List<float> x1s = GetX1sFromChord1(lastChord.ChordMetrics, hairlinePadding);
                         List<float> x2s;

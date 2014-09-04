@@ -68,7 +68,7 @@ namespace Moritz.AssistantComposer
             List<IUniqueDef> snores = new List<IUniqueDef>();
             int msPosition = 0;
 
-            IUniqueDef firstRest = new UniqueRestDef(msPosition, firstRestMsDuration);
+            IUniqueDef firstRest = new RestDef(msPosition, firstRestMsDuration);
             snores.Add(firstRest);
             msPosition += firstRestMsDuration;
 
@@ -79,7 +79,7 @@ namespace Moritz.AssistantComposer
                 IUniqueDef snore = snoresPalette[i].DeepClone();
                 snore.MsPosition = msPosition;
                 msPosition += snore.MsDuration;
-                UniqueMidiChordDef iumdd = snore as UniqueMidiChordDef;
+                MidiChordDef iumdd = snore as MidiChordDef;
                 if(iumdd != null)
                 {
                     iumdd.Transpose(transpositions1[i]);
@@ -87,7 +87,7 @@ namespace Moritz.AssistantComposer
                 }
                 snores.Add(snore);
 
-                UniqueRestDef rest = new UniqueRestDef(msPosition, 2500);
+                RestDef rest = new RestDef(msPosition, 2500);
                 msPosition += rest.MsDuration;
                 snores.Add(rest);
             }
@@ -106,7 +106,7 @@ namespace Moritz.AssistantComposer
                 msDuration = snore.MsDuration * factor;
                 snore.MsDuration = (int)msDuration;
                 msPosition += snore.MsDuration;
-                UniqueMidiChordDef iumdd = snore as UniqueMidiChordDef;
+                MidiChordDef iumdd = snore as MidiChordDef;
                 if(iumdd != null)
                 {
                     iumdd.Transpose(transpositions2[i]);
@@ -116,7 +116,7 @@ namespace Moritz.AssistantComposer
                 snores.Add(snore);
 
                 restDuration = 2500 / factor;
-                UniqueRestDef rest = new UniqueRestDef(msPosition, (int)restDuration);
+                RestDef rest = new RestDef(msPosition, (int)restDuration);
                 msPosition += rest.MsDuration;
                 snores.Add(rest);
             }
@@ -146,7 +146,7 @@ namespace Moritz.AssistantComposer
         {
             SongSixVoiceDef furies4Finale = GetF4Finale(palettes, krystal, msPositions);
 
-            if(furies4Finale[furies4Finale.Count - 1] is UniqueRestDef)
+            if(furies4Finale[furies4Finale.Count - 1] is RestDef)
             {
                 furies4Finale.RemoveAt(furies4Finale.Count - 1);
             }
@@ -232,7 +232,7 @@ namespace Moritz.AssistantComposer
             //section.RemoveBetweenMsPositions(msPositions["interlude4End"], int.MaxValue);
             section.RemoveBetweenMsPositions(msPositions["finalWindChord"], int.MaxValue);
 
-            if(section[section.Count - 1] is UniqueRestDef)
+            if(section[section.Count - 1] is RestDef)
             {
                 //section[section.Count - 1].MsDuration = msPositions["interlude4End"] - section[section.Count - 1].MsPosition;
                 section[section.Count - 1].MsDuration = msPositions["endOfPiece"] - section[section.Count - 1].MsPosition;
@@ -290,7 +290,7 @@ namespace Moritz.AssistantComposer
             int valueIndex = 0;
             for(int i = f4Interlude4Index; i < f4PostludeIndex; ++i)
             {
-                UniqueMidiChordDef umcd = this[i] as UniqueMidiChordDef;
+                MidiChordDef umcd = this[i] as MidiChordDef;
                 if(umcd != null)
                 {
                     transposition = transpositionArray1[mod7Values[valueIndex++] - 1];
@@ -301,7 +301,7 @@ namespace Moritz.AssistantComposer
             valueIndex = 0;
             for(int i = f4PostludeIndex; i < f4finalPhaseIndex; ++i)
             {
-                UniqueMidiChordDef umcd = this[i] as UniqueMidiChordDef;
+                MidiChordDef umcd = this[i] as MidiChordDef;
                 if(umcd != null)
                 {
                     transposition = transpositionArray2[mod12Values[valueIndex++] - 1];
@@ -312,7 +312,7 @@ namespace Moritz.AssistantComposer
             valueIndex = 0;
             for(int i = f4finalPhaseIndex; i < this.Count; ++i)
             {
-                UniqueMidiChordDef umcd = this[i] as UniqueMidiChordDef;
+                MidiChordDef umcd = this[i] as MidiChordDef;
                 if(umcd != null)
                 {
                     transposition = transpositionArray3[mod12Values[valueIndex++] - 1];

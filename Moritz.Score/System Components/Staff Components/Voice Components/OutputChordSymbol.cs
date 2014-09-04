@@ -11,7 +11,7 @@ namespace Moritz.Score
 {
     public class OutputChordSymbol : ChordSymbol
     {
-        public OutputChordSymbol(Voice voice, UniqueMidiChordDef umcd, int minimumCrotchetDurationMS, float fontSize)
+        public OutputChordSymbol(Voice voice, MidiChordDef umcd, int minimumCrotchetDurationMS, float fontSize)
             : base(voice, umcd.MsDuration, umcd.MsPosition, minimumCrotchetDurationMS, fontSize)
         {
             _uniqueMidiChordDef = umcd;
@@ -48,7 +48,7 @@ namespace Moritz.Score
             return sb.ToString();
         }
 
-        public UniqueMidiChordDef UniqueMidiChordDef { get { return _uniqueMidiChordDef; } }
-        protected UniqueMidiChordDef _uniqueMidiChordDef = null;
+        public MidiChordDef MidiChordDef { get { return _uniqueMidiChordDef; } }
+        protected MidiChordDef _uniqueMidiChordDef = null;
     }
 }

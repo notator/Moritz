@@ -446,7 +446,7 @@ namespace Moritz.Score
                                 fontSize = rest.FontHeight;
                                 voice.NoteObjects.RemoveAt(indToReplace[j]);
                             }
-                            UniqueRestDef umrd = new UniqueRestDef(msPos, msDuration);
+                            RestDef umrd = new RestDef(msPos, msDuration);
                             RestSymbol newRest = new RestSymbol(voice, umrd, minimumCrotchetDuration, _pageFormat.MusicFontHeight);
                             newRest.MsPosition = msPos;
                             voice.NoteObjects.Insert(indToReplace[0], newRest);

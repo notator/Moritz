@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Moritz.Score.Notation
 {
     ///<summary>
-    /// IUniqueSplittableChordDef is implemented by UniqueInputChordDef and UniqueMidiChordDef.
+    /// IUniqueSplittableChordDef is implemented by InputChordDef and MidiChordDef.
     ///</summary>
     public interface IUniqueSplittableChordDef : IUniqueChordDef
     {

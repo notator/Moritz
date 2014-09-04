@@ -51,7 +51,7 @@ namespace Moritz.AssistantComposer
         /// ACHTUNG:
         /// The top (=first) Voice in each bar must be an OutputVoice.
         /// This can be followed by zero or more OutputVoices, followed by zero or more InputVoices.
-        /// The chord definitions in OutputVoice.UniqueDefs must be UniqueMidiChordDefs.
+        /// The chord definitions in OutputVoice.UniqueDefs must be MidiChordDefs.
         /// The chord definitions in InputVoice.UniqueDefs must be UniqueInputChordDefs.
         /// </summary>
         public override List<List<Voice>> DoAlgorithm()
@@ -121,7 +121,7 @@ namespace Moritz.AssistantComposer
                 Debug.Assert(midiDurationDef.MsDuration > 0);
                 IUniqueDef noteDef = midiDurationDef.DeepClone();
                 noteDef.MsPosition = msPosition;
-                UniqueRestDef restDef = new UniqueRestDef(msPosition + noteDef.MsDuration, bar1ChordMsSeparation - noteDef.MsDuration);
+                RestDef restDef = new RestDef(msPosition + noteDef.MsDuration, bar1ChordMsSeparation - noteDef.MsDuration);
                 msPosition += bar1ChordMsSeparation;
                 outputVoice.UniqueDefs.Add(noteDef);
                 outputVoice.UniqueDefs.Add(restDef);
@@ -163,7 +163,7 @@ namespace Moritz.AssistantComposer
                 int mdsdEndPos = voiceDefs[i].EndMsPosition;
                 if(maxBarMsPos > mdsdEndPos)
                 {
-                    UniqueRestDef rest2Def = new UniqueRestDef(mdsdEndPos, maxBarMsPos - mdsdEndPos);
+                    RestDef rest2Def = new RestDef(mdsdEndPos, maxBarMsPos - mdsdEndPos);
                     bar[i].UniqueDefs.Add(rest2Def);
                 }
             }
@@ -182,7 +182,7 @@ namespace Moritz.AssistantComposer
         {
             if(msPosition > bar2StartMsPos)
             {
-                UniqueRestDef rest1Def = new UniqueRestDef(bar2StartMsPos, msPosition - bar2StartMsPos);
+                RestDef rest1Def = new RestDef(bar2StartMsPos, msPosition - bar2StartMsPos);
                 voice.UniqueDefs.Add(rest1Def);
             }
 

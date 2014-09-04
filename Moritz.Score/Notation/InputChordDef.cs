@@ -9,18 +9,18 @@ using Moritz.Globals;
 namespace Moritz.Score.Notation
 {
     ///<summary>
-    /// A UniqueInputChordDef can be saved and retrieved from voices in an SVG file.
+    /// A InputChordDef can be saved and retrieved from voices in an SVG file.
     /// Each inputChord in an SVG file will be given an ID of the form "inputChord"+uniqueNumber, but
     /// Moritz does not actually use the ids, so they are not read into in UniqueInputChordDefs.
     ///</summary>
-    public class UniqueInputChordDef : DurationDef, IUniqueSplittableChordDef, IUniqueCloneDef
+    public class InputChordDef : DurationDef, IUniqueSplittableChordDef, IUniqueCloneDef
     {
-        public UniqueInputChordDef()
+        public InputChordDef()
             :base(0)
         {
         }
 
-        public UniqueInputChordDef(XmlReader r, int msDuration)
+        public InputChordDef(XmlReader r, int msDuration)
             : base(msDuration)
         {
             // The reader is at the beginning of a "score:inputChord" element
@@ -62,7 +62,7 @@ namespace Moritz.Score.Notation
 
         public override string ToString()
         {
-            return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString() + " UniqueInputChordDef");
+            return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString() + " InputChordDef");
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Moritz.Score.Notation
         }
 
         /// <summary>
-        /// Writes the logical content of this UniqueInputChordDef (see ChordSymbol and UniqueMidiChordDef)
+        /// Writes the logical content of this InputChordDef (see ChordSymbol and MidiChordDef)
         /// </summary>
         /// <param name="w"></param>
         public void WriteSvg(SvgWriter w, string idNumber)
@@ -88,6 +88,11 @@ namespace Moritz.Score.Notation
             // etc.
 
             w.WriteEndElement(); // score:midiChord
+        }
+
+        public override IUniqueDef DeepClone()
+        {
+            throw new NotImplementedException("InputChordDef.DeepClone()");
         }
 
         public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }

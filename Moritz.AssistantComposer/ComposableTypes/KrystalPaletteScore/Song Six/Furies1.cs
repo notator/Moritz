@@ -44,7 +44,7 @@ namespace Moritz.AssistantComposer
                 IUniqueDef cheep = cheepsPalette[cheepIndices[i]].DeepClone();
                 cheep.MsPosition = msPositions[i];
                 cheep.MsDuration *= 2;
-                UniqueMidiChordDef iumd = cheep as UniqueMidiChordDef;
+                MidiChordDef iumd = cheep as MidiChordDef;
                 Debug.Assert(iumd != null);
                 iumd.AdjustVelocities(velocityfactors[i]);
                 iumd.Transpose(transpositions[i]);
@@ -81,7 +81,7 @@ namespace Moritz.AssistantComposer
 
             //furies1Finale.TransposeNotation(-12);
 
-            if(furies1Finale[furies1Finale.Count - 1] is UniqueRestDef)
+            if(furies1Finale[furies1Finale.Count - 1] is RestDef)
             {
                 furies1Finale.RemoveAt(furies1Finale.Count - 1);
             }
@@ -110,7 +110,7 @@ namespace Moritz.AssistantComposer
             {
                 if(strandIndices.Contains(i))
                 {
-                    UniqueRestDef umrd = new UniqueRestDef(f1FinalePart1[i].MsPosition, f1eStrandDurations[strandIndices.IndexOf(i)] + extraTime);
+                    RestDef umrd = new RestDef(f1FinalePart1[i].MsPosition, f1eStrandDurations[strandIndices.IndexOf(i)] + extraTime);
                     extraTime -= diff;
                     f1FinalePart1.Insert(i, umrd);
                 }
@@ -120,7 +120,7 @@ namespace Moritz.AssistantComposer
 
             f1FinalePart1.RemoveBetweenMsPositions(msPositions["verse4EsCaped"], int.MaxValue);
 
-            if(f1FinalePart1[f1FinalePart1.Count - 1] is UniqueRestDef)
+            if(f1FinalePart1[f1FinalePart1.Count - 1] is RestDef)
             {
                 f1FinalePart1[f1FinalePart1.Count - 1].MsDuration = msPositions["verse4EsCaped"] - f1FinalePart1[f1FinalePart1.Count - 1].MsPosition;
             }
@@ -129,7 +129,7 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// voiceDef contains the UniqueMidiChordDefs defined by a krystal, and nothing else.
+        /// voiceDef contains the MidiChordDefs defined by a krystal, and nothing else.
         /// </summary>
         /// <param name="voiceDef"></param>
         /// <param name="strandIndices"></param>
@@ -168,7 +168,7 @@ namespace Moritz.AssistantComposer
             {
                 if(strandIndices.Contains(i))
                 {
-                    UniqueRestDef umrd = new UniqueRestDef(f1FinalePart2[i].MsPosition, f1eStrandDurations[strandIndices.IndexOf(i)] + extraTime);
+                    RestDef umrd = new RestDef(f1FinalePart2[i].MsPosition, f1eStrandDurations[strandIndices.IndexOf(i)] + extraTime);
                     extraTime -= diff;
                     f1FinalePart2.Insert(i, umrd);
                 }
@@ -177,7 +177,7 @@ namespace Moritz.AssistantComposer
             f1FinalePart2.StartMsPosition = msPositions["verse4EsCaped"];
             f1FinalePart2.RemoveBetweenMsPositions(msPositions["verse5Calls"], int.MaxValue);
 
-            if(f1FinalePart2[f1FinalePart2.Count - 1] is UniqueRestDef)
+            if(f1FinalePart2[f1FinalePart2.Count - 1] is RestDef)
             {
                 f1FinalePart2[f1FinalePart2.Count - 1].MsDuration = msPositions["postlude"] - f1FinalePart2[f1FinalePart2.Count - 1].MsPosition;
             }
@@ -195,7 +195,7 @@ namespace Moritz.AssistantComposer
             {
                 if(strandIndices.Contains(i))
                 {
-                    UniqueRestDef umrd = new UniqueRestDef(f1p[i].MsPosition, f1eStrandDurations[strandIndices.IndexOf(i)] / 4);
+                    RestDef umrd = new RestDef(f1p[i].MsPosition, f1eStrandDurations[strandIndices.IndexOf(i)] / 4);
                     f1p.Insert(i, umrd);
                 }
             }
@@ -208,7 +208,7 @@ namespace Moritz.AssistantComposer
 
         internal void AdjustAlignments(Clytemnestra c, SongSixVoiceDef w2, SongSixVoiceDef w3)
         {
-            Debug.Assert(this[213] is UniqueRestDef);
+            Debug.Assert(this[213] is RestDef);
             this[213].MsDuration += this[212].MsDuration;
             RemoveAt(212);
             AgglomerateRests();

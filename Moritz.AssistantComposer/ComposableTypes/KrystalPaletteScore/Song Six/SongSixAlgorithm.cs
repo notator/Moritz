@@ -57,7 +57,7 @@ namespace Moritz.AssistantComposer
         /// ACHTUNG:
         /// The top (=first) Voice in each bar must be an OutputVoice.
         /// This can be followed by zero or more OutputVoices, followed by zero or more InputVoices.
-        /// The chord definitions in OutputVoice.UniqueDefs must be UniqueMidiChordDefs.
+        /// The chord definitions in OutputVoice.UniqueDefs must be MidiChordDefs.
         /// The chord definitions in InputVoice.UniqueDefs must be UniqueInputChordDefs.
         /// </summary>
         public override List<List<Voice>> DoAlgorithm()
@@ -166,12 +166,12 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// Note that clef changes must be inserted backwards per voiceDef, so that IUniqueMidiDurationDef
         /// indices are correct. Inserting a clef change changes the indices.
-        /// Note also that if a ClefChange is defined here on a UniqueMidiRestDef which has no UniqueMidiChordDef
+        /// Note also that if a ClefChange is defined here on a UniqueMidiRestDef which has no MidiChordDef
         /// to its right on the staff, the resulting ClefSymbol will be placed immediately before the final barline
         /// on the staff.
         /// ClefChanges which would happen at the beginning of a staff are written as cautionary clefs on the
         /// equivalent staff in the previous system.
-        /// A ClefChange defined here on a UniqueMidiChordDef or UniqueMidiRestDef which is eventually preceded
+        /// A ClefChange defined here on a MidiChordDef or UniqueMidiRestDef which is eventually preceded
         /// by a barline, are placed to the left of the barline. 
         /// </summary>
         private void InsertClefChanges(Furies1 furies1, Furies2 furies2, Furies3 furies3, Furies4 furies4)
@@ -220,72 +220,72 @@ namespace Moritz.AssistantComposer
             int versePwdValue = 3;
             double windStartPwdValue = 6, windEndPwdValue=28;
             double pwdfactor = Math.Pow(windEndPwdValue/windStartPwdValue, (double)1/5); // 5th root of windEndPwdValue/windStartPwdValue -- the last pwd should be windEndPwdValue
-            UniqueMidiChordDef umcd = null;
+            MidiChordDef umcd = null;
             for(int i = 0; i < wind.Count; ++i)
             {
                 if(i < 8) //prelude
                 {
-                    umcd = wind[i] as UniqueMidiChordDef;
+                    umcd = wind[i] as MidiChordDef;
                     if(umcd != null)
                         umcd.PitchWheelDeviation = (int) windStartPwdValue;
                 }
                 else if(i < 15) // verse 1
                 {
-                    umcd = wind[i] as UniqueMidiChordDef;
+                    umcd = wind[i] as MidiChordDef;
                     if(umcd != null)
                         umcd.PitchWheelDeviation = versePwdValue;
                 }
                 else if(i < 20) // interlude 1
                 {
-                    umcd = wind[i] as UniqueMidiChordDef;
+                    umcd = wind[i] as MidiChordDef;
                     if(umcd != null)
                         umcd.PitchWheelDeviation = (int)(windStartPwdValue * pwdfactor);
                 }
                 else if(i < 24) // verse 2
                 {
-                    umcd = wind[i] as UniqueMidiChordDef;
+                    umcd = wind[i] as MidiChordDef;
                     if(umcd != null)
                         umcd.PitchWheelDeviation = versePwdValue;
                 }
                 else if(i < 33) // interlude 2
                 {
-                    umcd = wind[i] as UniqueMidiChordDef;
+                    umcd = wind[i] as MidiChordDef;
                     if(umcd != null)
                         umcd.PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 2)));
                 }
                 else if(i < 39) // verse 3
                 {
-                    umcd = wind[i] as UniqueMidiChordDef;
+                    umcd = wind[i] as MidiChordDef;
                     if(umcd != null)
                         umcd.PitchWheelDeviation = versePwdValue;
                 }
                 else if(i < 49) // interlude 3
                 {
-                    umcd = wind[i] as UniqueMidiChordDef;
+                    umcd = wind[i] as MidiChordDef;
                     if(umcd != null)
                         umcd.PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 3)));
                 }
                 else if(i < 57) // verse 4
                 {
-                    umcd = wind[i] as UniqueMidiChordDef;
+                    umcd = wind[i] as MidiChordDef;
                     if(umcd != null)
                         umcd.PitchWheelDeviation = versePwdValue;
                 }
                 else if(i < 70) // interlude 4
                 {
-                    umcd = wind[i] as UniqueMidiChordDef;
+                    umcd = wind[i] as MidiChordDef;
                     if(umcd != null)
                         umcd.PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 4)));
                 }
                 else if(i < 74) // verse 5
                 {
-                    umcd = wind[i] as UniqueMidiChordDef;
+                    umcd = wind[i] as MidiChordDef;
                     if(umcd != null)
                         umcd.PitchWheelDeviation = versePwdValue;
                 }
                 else // postlude
                 {
-                    umcd = wind[i] as UniqueMidiChordDef;
+                    umcd = wind[i] as MidiChordDef;
                     if(umcd != null)
                         umcd.PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 5)));
                 }            
@@ -569,9 +569,9 @@ namespace Moritz.AssistantComposer
                 int noteMsDuration = restMsPosition - noteMsPosition;
                 int restMsDuration = nextNoteMsPosition - restMsPosition;
 
-                UniqueMidiChordDef umChordDef = new UniqueMidiChordDef(new List<byte>() { (byte)67 }, new List<byte>() { (byte)0 }, noteMsPosition, noteMsDuration, false, false, new List<MidiControl>());
+                MidiChordDef umChordDef = new MidiChordDef(new List<byte>() { (byte)67 }, new List<byte>() { (byte)0 }, noteMsPosition, noteMsDuration, false, false, new List<MidiControl>());
 
-                UniqueRestDef umRestDef = new UniqueRestDef(restMsPosition, restMsDuration);
+                RestDef umRestDef = new RestDef(restMsPosition, restMsDuration);
 
                 controlLmdds.Add(umChordDef);
                 controlLmdds.Add(umRestDef);

@@ -103,7 +103,7 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// Returns either a new UniqueRestDef or a new UniqueMidiChordDef
+        /// Returns either a new RestDef or a new MidiChordDef
         /// In both cases, MsPosition is set to zero.
         /// </summary>
         public DurationDef GetUniqueDurationDef(int index)
@@ -115,11 +115,11 @@ namespace Moritz.AssistantComposer
                 /// RestDefs are immutable, and have no MsPosition property.
                 /// UniqueRestDefs are mutable RestDefs with both MsPositon and MsDuration properties.
                 int restMsDuration = BasicChordSettings.Durations[index];
-                rval = new UniqueRestDef(0, restMsDuration);
+                rval = new RestDef(0, restMsDuration);
             }
             else
             {
-                /// Create a new UniqueMidiChordDef
+                /// Create a new MidiChordDef
                 BasicChordSettings bcd = BasicChordSettings;
                 int msPosition = 0;
                 int msDuration = bcd.Durations[index];
@@ -168,7 +168,7 @@ namespace Moritz.AssistantComposer
                     basicMidiChordDefs.Add(bmcd);
                 }
 
-                rval = new UniqueMidiChordDef(
+                rval = new MidiChordDef(
                     msPosition, // 0
                     msDuration,
                     bank,

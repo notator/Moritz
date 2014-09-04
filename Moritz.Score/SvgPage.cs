@@ -82,19 +82,19 @@ namespace Moritz.Score
                                     {
                                         msDuration = int.Parse(attributesDict["score:msDuration"]);
                                         M.ReadToXmlElementTag(r, "score:midiChord");
-                                        currentVoice.UniqueDefs.Add(new UniqueMidiChordDef(r, msDuration));
+                                        currentVoice.UniqueDefs.Add(new MidiChordDef(r, msDuration));
                                         // msPositions are set later
                                     }
                                     else
                                     {
                                         msDuration = int.Parse(attributesDict["score:msDuration"]);
                                         M.ReadToXmlElementTag(r, "score:inputChord");
-                                        currentVoice.UniqueDefs.Add(new UniqueInputChordDef(r, msDuration));
+                                        currentVoice.UniqueDefs.Add(new InputChordDef(r, msDuration));
                                     }
                                     break;
                                 case "rest":                                       
                                     msDuration = int.Parse(attributesDict["score:msDuration"]);
-                                    currentVoice.UniqueDefs.Add(new UniqueRestDef(msDuration));
+                                    currentVoice.UniqueDefs.Add(new RestDef(msDuration));
                                     // msPositions are set later
                                 break;
                             }

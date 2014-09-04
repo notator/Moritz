@@ -10,25 +10,25 @@ using Moritz.Score.Midi;
 namespace Moritz.Score.Notation
 {
     ///<summary>
-    /// A UniqueRestDef is a unique rest definition which is saved locally in an SVG file.
+    /// A RestDef is a unique rest definition which is saved locally in an SVG file.
     /// Each rest in an SVG file will be given an ID of the form "rest"+uniqueNumber, but
     /// Moritz does not actually use the ids, so they are not set in UniqueRestDefs.
     ///<summary>
-    public class UniqueRestDef : DurationDef, IUniqueDef
+    public class RestDef : DurationDef, IUniqueDef
     {
-        public UniqueRestDef(int msPosition, int msDuration)
+        public RestDef(int msPosition, int msDuration)
             : base(msDuration)
         {
             MsPosition = msPosition;
         }
 
         /// <summary>
-        /// Used when loading a score or getting a UniqueRestDef from a palette.
+        /// Used when loading a score or getting a RestDef from a palette.
         /// The MsPosition is initially 0. When loading a score, the MsPosition will
         /// eventually be set by accumulating durations when the score has finished loading.
         /// </summary>
         /// <param name="msDuration"></param>
-        public UniqueRestDef(int msDuration)
+        public RestDef(int msDuration)
             : base(msDuration)
         {
             MsPosition = 0; // Default. This value will be set later.
@@ -36,12 +36,12 @@ namespace Moritz.Score.Notation
 
         public override string ToString()
         {
-            return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString() + " UniqueRestDef" );
+            return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString() + " RestDef" );
         }
 
-        public IUniqueDef DeepClone()
+        public override IUniqueDef DeepClone()
         {
-            UniqueRestDef umrd = new UniqueRestDef(this.MsPosition, this.MsDuration);
+            RestDef umrd = new RestDef(this.MsPosition, this.MsDuration);
             return umrd;
         }
 

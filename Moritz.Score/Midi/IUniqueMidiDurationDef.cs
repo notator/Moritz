@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Moritz.Score.Midi
 {
     ///<summary>
-    /// IUniqueMidiDurationDef defines an interface implemented by both UniqueMidiChordDef and UniqueMidiRestDef.
+    /// IUniqueMidiDurationDef defines an interface implemented by both MidiChordDef and UniqueMidiRestDef.
     ///</summary>
     public interface IUniqueMidiDurationDef
     {
@@ -14,7 +14,7 @@ namespace Moritz.Score.Midi
         /// Transpose up by the number of semitones given in the argument.
         /// Negative interval values transpose down.
         /// If this is a MidiRestDef, nothing happens and the function returns silently.
-        /// It this is a UniqueMidiChordDef, is not an error if Midi pitch values would exceed the range 0..127.
+        /// It this is a MidiChordDef, is not an error if Midi pitch values would exceed the range 0..127.
         /// In this case, they are silently coerced to 0 or 127 respectively.
         /// </summary>
         /// <param name="interval"></param>

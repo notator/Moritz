@@ -11,20 +11,20 @@ using Moritz.Score.Notation;
 namespace Moritz.Score.Midi
 {
     ///<summary>
-    /// A UniqueMidiChordDef can either be saved and retrieved from voices in an SVG file, or
+    /// A MidiChordDef can either be saved and retrieved from voices in an SVG file, or
     /// retrieved from a palette (whereby the pallete makes a deep clone of its contained values).
     /// Each midiChord in an SVG file will be given an ID of the form "midiChord"+uniqueNumber, but
-    /// Moritz does not actually use the ids, so they are not read into in UniqueMidiChordDefs.
+    /// Moritz does not actually use the ids, so they are not read into in MidiChordDefs.
     ///</summary>
-    public class UniqueMidiChordDef : DurationDef, IUniqueSplittableChordDef, IUniqueCloneDef
+    public class MidiChordDef : DurationDef, IUniqueSplittableChordDef, IUniqueCloneDef
     {
-        public UniqueMidiChordDef()
+        public MidiChordDef()
             : base(0)
         {
         }
 
         #region Constructor used when reading an SVG file
-        public UniqueMidiChordDef(XmlReader r, int msDuration)
+        public MidiChordDef(XmlReader r, int msDuration)
             : base(msDuration)
         {
             // The reader is at the beginning of a "score:midiChord" element
@@ -114,11 +114,11 @@ namespace Moritz.Score.Midi
 
         #region Constructor for making a deep clone
         /// <summary>
-        /// Constructor used when making a deep clone, and when retrieving a UniqueMidiChordDef from a palette.
+        /// Constructor used when making a deep clone, and when retrieving a MidiChordDef from a palette.
         /// This constructor makes a deep clone of the values in its arguments.
         /// When called by a palette, msPosition is set to 0, and lyric is set to null.
         /// </summary>
-        public UniqueMidiChordDef(
+        public MidiChordDef(
             int msPosition,
             int msDuration,
             byte? bank,
@@ -193,9 +193,9 @@ namespace Moritz.Score.Midi
 
         #region No sliders constructor
         /// <summary>
-        /// This constructor creates a UniqueMidiChordDef at msPosition 0, lyric = null, containing a single BasicMidiChordDef and no sliders.
+        /// This constructor creates a MidiChordDef at msPosition 0, lyric = null, containing a single BasicMidiChordDef and no sliders.
         /// </summary>
-        public UniqueMidiChordDef(List<byte> pitches, List<byte> velocities, int msPosition, int msDuration, bool repeat, bool hasChordOff,
+        public MidiChordDef(List<byte> pitches, List<byte> velocities, int msPosition, int msDuration, bool repeat, bool hasChordOff,
             List<MidiControl> midiControls)
             : base(msDuration)
         {
@@ -223,9 +223,9 @@ namespace Moritz.Score.Midi
 
         #region Another no sliders constructor
         /// <summary>
-        /// This constructor creates a UniqueMidiChordDef at MsPosition 0, lyric = null, containing a single BasicMidiChordDef and no sliders.
+        /// This constructor creates a MidiChordDef at MsPosition 0, lyric = null, containing a single BasicMidiChordDef and no sliders.
         /// </summary>
-        public UniqueMidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff,
+        public MidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff,
             List<MidiControlDef> midiControlDefs)
             : base(msDuration)
         {
@@ -262,9 +262,9 @@ namespace Moritz.Score.Midi
         #region IUniqueCloneDef
         #region IUniqueSplittableChordDef
 
-        public IUniqueDef DeepClone()
+        public override IUniqueDef DeepClone()
         {
-            return new UniqueMidiChordDef(
+            return new MidiChordDef(
                 this.MsPosition,
                 this.MsDuration,
                 this.Bank,
@@ -318,7 +318,7 @@ namespace Moritz.Score.Midi
         #region IUniqueDef
         public override string ToString()
         {
-            return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString() + " UniqueMidiChordDef");
+            return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString() + " MidiChordDef");
         }
 
         /// <summary>
@@ -681,7 +681,7 @@ namespace Moritz.Score.Midi
         /// <summary>
         /// Note that, unlike MidiRestDefs, MidiChordDefs do not have a msDuration attribute.
         /// Their msDuration is deduced from the contained BasicMidiChords.
-        /// Patch indices already set in the BasicMidiChordDefs take priority over those set in the main UniqueMidiChordDef.
+        /// Patch indices already set in the BasicMidiChordDefs take priority over those set in the main MidiChordDef.
         /// However, if BasicMidiChordDefs[0].PatchIndex is null, and this.Patch is set, BasicMidiChordDefs[0].PatchIndex is set to Patch.
         /// The same is true for Bank settings.  
         /// The AssistantPerformer therefore only needs to look at BasicMidiChordDefs to find Bank and Patch changes.
@@ -887,7 +887,6 @@ namespace Moritz.Score.Midi
                 BasicMidiChordDefs = FitToDuration(BasicMidiChordDefs, MsDuration, _minimumBasicMidiChordMsDuration);
             }
         }
-        private int _msDuration;
 
         public byte? Bank { get { return _bank; } set { _bank = value; } }
         private byte? _bank = null;

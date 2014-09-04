@@ -22,7 +22,7 @@ namespace Moritz.AssistantComposer
         /// Creates a new, empty MonoPerformerOptionsForm.
         /// These are all defaults, that will be adjustable (as before) in the AP:
         /// </summary>
-        public PerformersOptionsForm(Form assistantComposerMainForm, int nTracks)
+        public PerformersOptionsForm(AssistantComposerMainForm assistantComposerMainForm, int nTracks)
         {
             InitializeComponent();
 
@@ -843,7 +843,7 @@ namespace Moritz.AssistantComposer
         static private bool _intListControlHasError = false;
         private IntListControl _ilcMasterVolumes;
 
-        private Form _assistantComposerMainForm = null;
+        private AssistantComposerMainForm _assistantComposerMainForm = null;
 
     }
 }

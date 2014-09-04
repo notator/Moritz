@@ -53,7 +53,7 @@ namespace Moritz.AssistantPerformer
                     Voice voice = voices[i];
                     int channel = voice.MidiChannel;
                     ChannelState channelState = new ChannelState();
-                    foreach(UniqueMidiChordDef uniqueMidiChordDef in voice.UniqueDefs)
+                    foreach(MidiChordDef uniqueMidiChordDef in voice.UniqueDefs)
                     {
                         if(uniqueMidiChordDef != null) // not interested in rests here
                         {
