@@ -14,7 +14,7 @@ namespace Moritz.AssistantComposer
     public class KrystalPaletteScore : ComposableSvgScore
     {
         public KrystalPaletteScore(string scoreTitleName, string algorithmName, PageFormat pageFormat,
-            List<Krystal> krystals, List<Palette> palettes, string folder,
+            List<Krystal> krystals, List<PaletteFormContent> palettes, string folder,
             string keywords, string comment)
             : base(folder, scoreTitleName, keywords, comment, pageFormat)
         {

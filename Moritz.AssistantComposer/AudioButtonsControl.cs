@@ -53,7 +53,7 @@ namespace Moritz.AssistantComposer
             }
             _performingButton = null;
         }
-        public void GetPaletteAndAssistant(out Palette palette, out Assistant assistant)
+        public void GetPaletteAndAssistant(out PaletteFormContent palette, out Assistant assistant)
         {
             PageFormat pageFormat = new PageFormat(); 
             
@@ -62,12 +62,12 @@ namespace Moritz.AssistantComposer
             PaletteDemoScore paletteDemoScore = null;
             if(paletteForm != null)
             {
-                palette = new Palette(paletteForm);
+                palette = new PaletteFormContent(paletteForm);
                 paletteDemoScore = new PaletteDemoScore(palette, pageFormat, 0);
             }
             else
             {
-                palette = new Palette(percussionPaletteForm);
+                palette = new PaletteFormContent(percussionPaletteForm);
                 paletteDemoScore = new PaletteDemoScore(palette, pageFormat, 9);
             }
 
@@ -211,7 +211,7 @@ namespace Moritz.AssistantComposer
 
         private void PlayMidiEvent(int index)
         {
-            Palette krystalPalette = null;
+            PaletteFormContent krystalPalette = null;
             Assistant assistant = null;
 
             GetPaletteAndAssistant(out krystalPalette, out assistant);

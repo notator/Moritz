@@ -20,7 +20,7 @@ namespace Moritz.AssistantComposer
         }
 
         #region before Interlude3
-        internal void GetBeforeInterlude3(Clytemnestra clytemnestra, SongSixVoiceDef wind1, SongSixVoiceDef furies3, List<PaletteDef> _paletteDefs)
+        internal void GetBeforeInterlude3(Clytemnestra clytemnestra, SongSixVoiceDef wind1, SongSixVoiceDef furies3, List<List<DurationDef>> _paletteDefs)
         {
             GetFuries2Interlude2(clytemnestra, wind1, furies3);
             AddFuries2ChirpsForInterlude2AndVerse3(clytemnestra, wind1, _paletteDefs[7]);
@@ -55,7 +55,7 @@ namespace Moritz.AssistantComposer
             furies3.AgglomerateRests();
         }
 
-        private void AddFuries2ChirpsForInterlude2AndVerse3(Clytemnestra clytemnestra, SongSixVoiceDef wind1, PaletteDef chirpsPalette)
+        private void AddFuries2ChirpsForInterlude2AndVerse3(Clytemnestra clytemnestra, SongSixVoiceDef wind1, List<DurationDef> chirpsPalette)
         {
             int[] chirpIndices = { 4, 6, 10, 0, 1, 3, 5, 7, 9, 11 };
             int[] transpositions = { 2, 0, 4, 11, 5, 10, 6, 9, 7, 8 };
@@ -95,7 +95,7 @@ namespace Moritz.AssistantComposer
 
         #region finale
 
-        internal void GetFinale(List<PaletteDef> palettes, Dictionary<string, int> msPositions, Krystal krystal)
+        internal void GetFinale(List<List<DurationDef>> palettes, Dictionary<string, int> msPositions, Krystal krystal)
         {
             SongSixVoiceDef furies2Finale = GetF2Finale(palettes, krystal, msPositions);
 
@@ -127,11 +127,11 @@ namespace Moritz.AssistantComposer
             return strandIndices;
         }
 
-        private SongSixVoiceDef GetF2Finale(List<PaletteDef> palettes, Krystal krystal, Dictionary<string, int> msPositions)
+        private SongSixVoiceDef GetF2Finale(List<List<DurationDef>> palettes, Krystal krystal, Dictionary<string, int> msPositions)
         {
-            PaletteDef f2FinalePalette1 = palettes[11];
-            PaletteDef f2FinalePalette2 = palettes[15];
-            PaletteDef f2PostludePalette = palettes[19];
+            List<DurationDef> f2FinalePalette1 = palettes[11];
+            List<DurationDef> f2FinalePalette2 = palettes[15];
+            List<DurationDef> f2PostludePalette = palettes[19];
 
             List<int> strandIndices = GetStrandIndices(krystal);
 

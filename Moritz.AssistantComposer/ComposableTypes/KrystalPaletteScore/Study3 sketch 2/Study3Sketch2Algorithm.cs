@@ -21,7 +21,7 @@ namespace Moritz.AssistantComposer
         /// This constructor can be called with both parameters null,
         /// just to get the overridden properties.
         /// </summary>
-        public Study3Sketch2Algorithm(List<Krystal> krystals, List<PaletteDef> paletteDefs)
+        public Study3Sketch2Algorithm(List<Krystal> krystals, List<List<DurationDef>> paletteDefs)
             : base(krystals, paletteDefs)
         {
         }
@@ -98,7 +98,7 @@ namespace Moritz.AssistantComposer
             List<Voice> bar = new List<Voice>();
 
             byte channel = 0;
-            foreach(PaletteDef midiDurationDefs in _paletteDefs)
+            foreach(List<DurationDef> midiDurationDefs in _palettes)
             {
                 OutputVoice outputVoice = new OutputVoice(null, channel);
                 bar.Add(outputVoice);
@@ -112,7 +112,7 @@ namespace Moritz.AssistantComposer
             return bar;
         }
 
-        private void WriteVoiceMidiDurationDefs1(OutputVoice outputVoice, PaletteDef midiDurationDefs)
+        private void WriteVoiceMidiDurationDefs1(OutputVoice outputVoice, List<DurationDef> midiDurationDefs)
         {
             int msPosition = 0;
             int bar1ChordMsSeparation = 1500;
@@ -139,10 +139,10 @@ namespace Moritz.AssistantComposer
 
             byte channel = 0;
             List<VoiceDef> voiceDefs = new List<VoiceDef>();
-            foreach(PaletteDef paletteDef in _paletteDefs)
+            foreach(List<DurationDef> templateDefs in _palettes)
             {
                 bar.Add(new OutputVoice(null, channel));
-                VoiceDef voiceDef = new VoiceDef(paletteDef);
+                VoiceDef voiceDef = new VoiceDef(templateDefs);
                 voiceDef.SetMsDuration(6000);
                 voiceDefs.Add(voiceDef);
                 ++channel;

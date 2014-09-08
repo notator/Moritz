@@ -18,7 +18,7 @@ namespace Moritz.AssistantComposer
         /// MidiDurationDefs list is set to each of the krystal's values in turn.
         /// This score is never saved, so scoresRootFolder is not used. 
         /// </summary>
-        public PaletteDemoAlgorithm(List<PaletteDef> paletteDefs)
+        public PaletteDemoAlgorithm(List<List<DurationDef>> paletteDefs)
             : base(null, paletteDefs)
         {
         }
@@ -45,7 +45,7 @@ namespace Moritz.AssistantComposer
         {
             Voice voice = new OutputVoice(null, 0);
             int msPosition = 0;
-            foreach(DurationDef durationDef in _paletteDefs[0])
+            foreach(DurationDef durationDef in _palettes[0])
             {
                 IUniqueDef iumdd = durationDef.DeepClone();
                 iumdd.MsPosition = msPosition;

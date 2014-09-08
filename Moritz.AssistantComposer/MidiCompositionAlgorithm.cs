@@ -20,10 +20,10 @@ namespace Moritz.AssistantComposer
     /// </summary>
     public abstract class MidiCompositionAlgorithm
     {
-        protected MidiCompositionAlgorithm(List<Krystal> krystals, List<PaletteDef> paletteDefs)
+        protected MidiCompositionAlgorithm(List<Krystal> krystals, List<List<DurationDef>> paletteDefs)
         {
             _krystals = krystals;
-            _paletteDefs = paletteDefs;
+            _palettes = paletteDefs;
             CheckMidiChannels();
         }
 
@@ -277,6 +277,6 @@ namespace Moritz.AssistantComposer
         }
 
         protected List<Krystal> _krystals;
-        protected List<PaletteDef> _paletteDefs;
+        protected List<List<DurationDef>> _palettes;
     }
 }

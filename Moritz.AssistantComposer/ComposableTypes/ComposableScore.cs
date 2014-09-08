@@ -25,7 +25,7 @@ namespace Moritz.AssistantComposer
         /// <param name="krystals"></param>
         /// <param name="paletteDefs"></param>
         /// <returns></returns>
-        protected MidiCompositionAlgorithm Algorithm(string algorithmName, List<Krystal> krystals, List<PaletteDef> paletteDefs)
+        protected MidiCompositionAlgorithm Algorithm(string algorithmName, List<Krystal> krystals, List<List<DurationDef>> paletteDefs)
         {
             MidiCompositionAlgorithm midiAlgorithm = null;
             switch(algorithmName)
@@ -51,22 +51,22 @@ namespace Moritz.AssistantComposer
             return midiAlgorithm;
         }
 
-        protected List<PaletteDef> GetPaletteDefs(List<Palette> palettes)
+        protected List<List<DurationDef>> GetPaletteDefs(List<PaletteFormContent> palettes)
         {
-            List<PaletteDef> paletteDefs = new List<PaletteDef>();
-            for(int paletteIndex = 0; paletteIndex < palettes.Count; ++paletteIndex)
+            List<List<DurationDef>> rval = new List<List<DurationDef>>();
+
+            foreach(PaletteFormContent palette in palettes)
             {
-                Palette palette = palettes[paletteIndex];
-                List<DurationDef> midiDurationDefs = new List<DurationDef>();
-                for(int valueIndex = 0; valueIndex < palette.Domain; ++valueIndex)
+                List<DurationDef> paletteDefs = new List<DurationDef>();
+                for(int index = 0; index < palette.Domain; ++index)
                 {
-                    DurationDef mdd = palette.GetUniqueDurationDef(valueIndex);
-                    
-                    midiDurationDefs.Add(mdd);
+                    DurationDef mdd = palette.GetDurationDef(index);
+                    paletteDefs.Add(mdd);
                 }
-                paletteDefs.Add(new PaletteDef(midiDurationDefs));
+                rval.Add(paletteDefs);
             }
-            return paletteDefs;
+
+            return rval;
         }
 
         private void CheckBars(List<List<Voice>> voicesPerSystemPerBar)
@@ -136,7 +136,7 @@ namespace Moritz.AssistantComposer
             }
         }
 
-        protected List<PaletteDef> _paletteDefs = null;
+        protected List<List<DurationDef>> _paletteDefs = null;
         protected MidiCompositionAlgorithm _midiAlgorithm = null;
     }
 }

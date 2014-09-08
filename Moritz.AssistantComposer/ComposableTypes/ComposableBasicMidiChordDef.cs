@@ -18,7 +18,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         /// <param name="krystalPalette"></param>
         /// <param name="valueIndex"></param>
-        public ComposableBasicMidiChordDef(Palette krystalPalette, int valueIndex)
+        public ComposableBasicMidiChordDef(PaletteFormContent krystalPalette, int valueIndex)
             : this(krystalPalette.BasicChordSettings, krystalPalette.BankIndices, krystalPalette.PatchIndices, valueIndex)
         {
         }

@@ -21,7 +21,7 @@ namespace Moritz.AssistantComposer
         /// This constructor can be called with both parameters null,
         /// just to get the overridden properties.
         /// </summary>
-        public Study2c3_1Algorithm(List<Krystal> krystals, List<PaletteDef> paletteDefs)
+        public Study2c3_1Algorithm(List<Krystal> krystals, List<List<DurationDef>> paletteDefs)
             : base(krystals, paletteDefs)
         {
         }
@@ -104,11 +104,11 @@ namespace Moritz.AssistantComposer
 
         private void WriteDurationSymbolsForStrandInTopStaff(Voice voice, int barIndex, List<int> originalStrandValues, ref int msPosition)
         {
-            PaletteDef paletteDef = this._paletteDefs[0]; // top paletteDef
+            List<DurationDef> templateDefs = this._palettes[0]; // top templateDefs
             for(int valueIndex = 0; valueIndex < originalStrandValues.Count; valueIndex++)
             {
                 int value = originalStrandValues[valueIndex];
-                DurationDef midiDurationDef = paletteDef[value - 1];
+                DurationDef midiDurationDef = templateDefs[value - 1];
                 IUniqueDef noteDef = midiDurationDef.DeepClone();
                 Debug.Assert(midiDurationDef.MsDuration > 0);
                 Debug.Assert(noteDef.MsDuration == midiDurationDef.MsDuration);
@@ -122,7 +122,7 @@ namespace Moritz.AssistantComposer
         {
             List<Voice> consecutiveBars = new List<Voice>();
             Krystal krystal = _krystals[staffNumber - 1];
-            PaletteDef paletteDef = _paletteDefs[staffNumber - 1];
+            List<DurationDef> templateDefs = _palettes[staffNumber - 1];
             List<List<int>> strandValuesList = krystal.GetValues(krystal.Level);
             Debug.Assert(topStaffBars.Count == strandValuesList.Count);
 
@@ -137,7 +137,7 @@ namespace Moritz.AssistantComposer
                 for(int valueIndex = 0; valueIndex < lowerStaffValueSequence.Count; valueIndex++)
                 {
                     int value = lowerStaffValueSequence[valueIndex];
-                    DurationDef midiDurationDef = paletteDef[value - 1];
+                    DurationDef midiDurationDef = templateDefs[value - 1];
                     midiDurationDef.MsDuration = lowerStaffMsDurations[valueIndex];
                     IUniqueDef noteDef = midiDurationDef.DeepClone();
                     noteDef.MsPosition = currentMsPosition;

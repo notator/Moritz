@@ -19,14 +19,14 @@ namespace Moritz.AssistantComposer
         {
         }
 
-        internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, SongSixVoiceDef wind1, List<PaletteDef> palettes)
+        internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, SongSixVoiceDef wind1, List<List<DurationDef>> palettes)
         {
             GetSnores(firstRestMsDuration, clytemnestra, wind1, palettes[1]);
             AddGrowlsToInterlude2AndVerse3(clytemnestra, palettes[3]);
         }
 
         #region before Interlude3
-        private void AddGrowlsToInterlude2AndVerse3(Clytemnestra clytemnestra, PaletteDef growlsPalette)
+        private void AddGrowlsToInterlude2AndVerse3(Clytemnestra clytemnestra, List<DurationDef> growlsPalette)
         {
             int[] growlIndices = { 0,2,5,1 };
             //int[] transpositions = { 0,0,0,0 };
@@ -63,7 +63,7 @@ namespace Moritz.AssistantComposer
             AlignObjectAtIndex(38, 39, 40, clytemnestra[162].MsPosition);
         }
 
-        private void GetSnores(int firstRestMsDuration, Clytemnestra clytemnestra, SongSixVoiceDef wind1, PaletteDef snoresPalette)
+        private void GetSnores(int firstRestMsDuration, Clytemnestra clytemnestra, SongSixVoiceDef wind1, List<DurationDef> snoresPalette)
         {
             List<IUniqueDef> snores = new List<IUniqueDef>();
             int msPosition = 0;
@@ -142,7 +142,7 @@ namespace Moritz.AssistantComposer
         #endregion before Interlude3
 
         #region finale
-        internal void GetFinale(List<PaletteDef> palettes, Dictionary<string, int> msPositions, Krystal krystal)
+        internal void GetFinale(List<List<DurationDef>> palettes, Dictionary<string, int> msPositions, Krystal krystal)
         {
             SongSixVoiceDef furies4Finale = GetF4Finale(palettes, krystal, msPositions);
 
@@ -173,11 +173,11 @@ namespace Moritz.AssistantComposer
             RemoveScorePitchWheelCommands(52, 53);
         }
 
-        private SongSixVoiceDef GetF4Finale(List<PaletteDef> palettes , Krystal krystal, Dictionary<string, int> msPositions)
+        private SongSixVoiceDef GetF4Finale(List<List<DurationDef>> palettes , Krystal krystal, Dictionary<string, int> msPositions)
         {
-            PaletteDef f4FinalePalette1 = palettes[9];
-            PaletteDef f4FinalePalette2 = palettes[13];
-            PaletteDef f4PostludePalette = palettes[17];
+            List<DurationDef> f4FinalePalette1 = palettes[9];
+            List<DurationDef> f4FinalePalette2 = palettes[13];
+            List<DurationDef> f4PostludePalette = palettes[17];
 
             SongSixVoiceDef interlude4Start = new SongSixVoiceDef(f4FinalePalette1, krystal);
             Transform(interlude4Start, msPositions);

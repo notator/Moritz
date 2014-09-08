@@ -18,7 +18,7 @@ namespace Moritz.AssistantComposer
     /// </summary>
     internal partial class SongSixAlgorithm : MidiCompositionAlgorithm
     {
-        public SongSixAlgorithm(List<Krystal> krystals, List<PaletteDef> paletteDefs)
+        public SongSixAlgorithm(List<Krystal> krystals, List<List<DurationDef>> paletteDefs)
             : base(krystals, paletteDefs)
         {
         }
@@ -76,7 +76,7 @@ namespace Moritz.AssistantComposer
             // All palettes can be accessed here at _paletteDefs[ paletteIndex ].
 
             // The wind3 is the lowest wind. The winds are numbered from top to bottom in the score.
-            SongSixVoiceDef wind3 = GetWind3(_paletteDefs[0], _krystals[8]);
+            SongSixVoiceDef wind3 = GetWind3(_palettes[0], _krystals[8]);
             
             Clytemnestra clytemnestra = new Clytemnestra(wind3);
 
@@ -119,20 +119,20 @@ namespace Moritz.AssistantComposer
             
             // Construct the Furies up to Interlude3.
             Furies4 furies4 = new Furies4(msPositions["endOfPiece"]);
-            furies4.GetBeforeInterlude3(wind3[0].MsDuration / 2, clytemnestra, wind1, _paletteDefs);
+            furies4.GetBeforeInterlude3(wind3[0].MsDuration / 2, clytemnestra, wind1, _palettes);
 
             Furies3 furies3 = new Furies3(msPositions["endOfPiece"]);
-            furies3.GetBeforeInterlude3(msPositions["interlude1"], clytemnestra, wind1, _paletteDefs);
+            furies3.GetBeforeInterlude3(msPositions["interlude1"], clytemnestra, wind1, _palettes);
 
             Furies2 furies2 = new Furies2(msPositions["endOfPiece"]);
-            furies2.GetBeforeInterlude3(clytemnestra, wind1, furies3, _paletteDefs);
+            furies2.GetBeforeInterlude3(clytemnestra, wind1, furies3, _palettes);
 
             Furies1 furies1 = new Furies1(msPositions["endOfPiece"]);
-            furies1.GetBeforeInterlude3(clytemnestra, wind1, furies2, _paletteDefs[8]);
+            furies1.GetBeforeInterlude3(clytemnestra, wind1, furies2, _palettes[8]);
 
-            furies3.GetChirpsInInterlude2AndVerse3(furies1, furies2, clytemnestra, wind1, _paletteDefs[6]);
+            furies3.GetChirpsInInterlude2AndVerse3(furies1, furies2, clytemnestra, wind1, _palettes[6]);
 
-            GetFuriesInterlude3ToEnd(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3, _paletteDefs, msPositions);
+            GetFuriesInterlude3ToEnd(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3, _palettes, msPositions);
 
             // contouring test code 
             // fury1.SetContour(1, new List<int>(){2,2,2,2,2}, 1, 6);
@@ -217,7 +217,7 @@ namespace Moritz.AssistantComposer
 
         private void AdjustWindPitchWheelDeviations(SongSixVoiceDef wind)
         {
-            int versePwdValue = 3;
+            byte versePwdValue = 3;
             double windStartPwdValue = 6, windEndPwdValue=28;
             double pwdfactor = Math.Pow(windEndPwdValue/windStartPwdValue, (double)1/5); // 5th root of windEndPwdValue/windStartPwdValue -- the last pwd should be windEndPwdValue
             MidiChordDef umcd = null;
@@ -227,7 +227,7 @@ namespace Moritz.AssistantComposer
                 {
                     umcd = wind[i] as MidiChordDef;
                     if(umcd != null)
-                        umcd.PitchWheelDeviation = (int) windStartPwdValue;
+                        umcd.PitchWheelDeviation = M.MidiValue((int) windStartPwdValue);
                 }
                 else if(i < 15) // verse 1
                 {
@@ -239,7 +239,7 @@ namespace Moritz.AssistantComposer
                 {
                     umcd = wind[i] as MidiChordDef;
                     if(umcd != null)
-                        umcd.PitchWheelDeviation = (int)(windStartPwdValue * pwdfactor);
+                        umcd.PitchWheelDeviation = M.MidiValue((int)(windStartPwdValue * pwdfactor));
                 }
                 else if(i < 24) // verse 2
                 {
@@ -251,7 +251,7 @@ namespace Moritz.AssistantComposer
                 {
                     umcd = wind[i] as MidiChordDef;
                     if(umcd != null)
-                        umcd.PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 2)));
+                        umcd.PitchWheelDeviation = M.MidiValue((int)(windStartPwdValue * (Math.Pow(pwdfactor, 2))));
                 }
                 else if(i < 39) // verse 3
                 {
@@ -263,7 +263,7 @@ namespace Moritz.AssistantComposer
                 {
                     umcd = wind[i] as MidiChordDef;
                     if(umcd != null)
-                        umcd.PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 3)));
+                        umcd.PitchWheelDeviation = M.MidiValue((int)(windStartPwdValue * (Math.Pow(pwdfactor, 3))));
                 }
                 else if(i < 57) // verse 4
                 {
@@ -275,7 +275,7 @@ namespace Moritz.AssistantComposer
                 {
                     umcd = wind[i] as MidiChordDef;
                     if(umcd != null)
-                        umcd.PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 4)));
+                        umcd.PitchWheelDeviation = M.MidiValue((int)(windStartPwdValue * (Math.Pow(pwdfactor, 4))));
                 }
                 else if(i < 74) // verse 5
                 {
@@ -287,7 +287,7 @@ namespace Moritz.AssistantComposer
                 {
                     umcd = wind[i] as MidiChordDef;
                     if(umcd != null)
-                        umcd.PitchWheelDeviation = (int)(windStartPwdValue * (Math.Pow(pwdfactor, 5)));
+                        umcd.PitchWheelDeviation = M.MidiValue((int)(windStartPwdValue * (Math.Pow(pwdfactor, 5))));
                 }            
             }
         }

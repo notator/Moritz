@@ -11,9 +11,9 @@ using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {
-    public class Palette
+    public class PaletteFormContent
     {
-        public Palette(PaletteForm paletteForm)
+        public PaletteFormContent(PaletteForm paletteForm)
         {
             Title = paletteForm.Text;
             _domain = paletteForm.Domain;
@@ -49,7 +49,7 @@ namespace Moritz.AssistantComposer
 
         }
 
-        public Palette(PercussionPaletteForm ppf)
+        public PaletteFormContent(PercussionPaletteForm ppf)
         {
             Title = ppf.Text;
             _domain = ppf.Domain;
@@ -104,9 +104,9 @@ namespace Moritz.AssistantComposer
 
         /// <summary>
         /// Returns either a new RestDef or a new MidiChordDef
-        /// In both cases, MsPosition is set to zero.
+        /// In both cases, MsPosition is set to zero, Lyric is set to null.
         /// </summary>
-        public DurationDef GetUniqueDurationDef(int index)
+        public DurationDef GetDurationDef(int index)
         {
             DurationDef rval = null;
 
@@ -229,6 +229,8 @@ namespace Moritz.AssistantComposer
                     repeat,
                     pitchwheelDeviation,
                     hasChordOff,
+                    midiPitches,
+                    midiVelocities,
                     ornamentNumberSymbol,
                     midiChordSliderDefs,
                     basicMidiChordDefs);

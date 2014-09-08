@@ -19,7 +19,7 @@ namespace Moritz.AssistantComposer
         {
         }
 
-        internal void GetBeforeInterlude3(Clytemnestra clytemnestra, SongSixVoiceDef wind1, SongSixVoiceDef furies2, PaletteDef cheepsPalette)
+        internal void GetBeforeInterlude3(Clytemnestra clytemnestra, SongSixVoiceDef wind1, SongSixVoiceDef furies2, List<DurationDef> cheepsPalette)
         {
             int[] cheepIndices = { 4, 8, 2, 6, 10, 0, 1, 3, 5, 7, 9, 11 };
             int[] transpositions = { 2, 1, 3, 0, 4, -3, 5, 10, 6, 9, 7, 8 };
@@ -56,11 +56,11 @@ namespace Moritz.AssistantComposer
         }
 
         #region finale
-        internal void GetFinale(List<PaletteDef> palettes, Dictionary<string, int> msPositions, Krystal krystal)
+        internal void GetFinale(List<List<DurationDef>> palettes, Dictionary<string, int> msPositions, Krystal krystal)
         {
-            PaletteDef f1FinalePalette1 = palettes[12];
-            PaletteDef f1FinalePalette2 = palettes[16];
-            PaletteDef f1PostludePalette = palettes[20];
+            List<DurationDef> f1FinalePalette1 = palettes[12];
+            List<DurationDef> f1FinalePalette2 = palettes[16];
+            List<DurationDef> f1PostludePalette = palettes[20];
 
             List<int> strandIndices = new List<int>();
             int index = 0;
@@ -98,7 +98,7 @@ namespace Moritz.AssistantComposer
             AdjustPitchWheelDeviations(msPositions["interlude3"], msPositions["endOfPiece"], 5, 28 );
         }
 
-        private SongSixVoiceDef GetF1FinalePart1(PaletteDef f1FinalePalette1, Krystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
+        private SongSixVoiceDef GetF1FinalePart1(List<DurationDef> f1FinalePalette1, Krystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
         {
             SongSixVoiceDef f1FinalePart1 = new SongSixVoiceDef(f1FinalePalette1, krystal);
 
@@ -156,7 +156,7 @@ namespace Moritz.AssistantComposer
             return strandDurations;
         }
 
-        private SongSixVoiceDef GetF1FinalePart2(PaletteDef f1FinalePalette2, Krystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
+        private SongSixVoiceDef GetF1FinalePart2(List<DurationDef> f1FinalePalette2, Krystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
         {
             SongSixVoiceDef f1FinalePart2 = new SongSixVoiceDef(f1FinalePalette2, krystal);
 
@@ -185,7 +185,7 @@ namespace Moritz.AssistantComposer
             return f1FinalePart2;
         }
 
-        private SongSixVoiceDef GetF1Postlude(PaletteDef f1PostludePalette, Krystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
+        private SongSixVoiceDef GetF1Postlude(List<DurationDef> f1PostludePalette, Krystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
         {
             SongSixVoiceDef f1p = new SongSixVoiceDef(f1PostludePalette, krystal);
 

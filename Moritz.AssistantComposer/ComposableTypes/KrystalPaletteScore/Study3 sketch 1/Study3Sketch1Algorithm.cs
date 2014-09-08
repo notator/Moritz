@@ -21,7 +21,7 @@ namespace Moritz.AssistantComposer
         /// This constructor can be called with both parameters null,
         /// just to get the overridden properties.
         /// </summary>
-        public Study3Sketch1Algorithm(List<Krystal> krystals, List<PaletteDef> paletteDefs)
+        public Study3Sketch1Algorithm(List<Krystal> krystals, List<List<DurationDef>> paletteDefs)
             : base(krystals, paletteDefs)
         {
         }
@@ -89,28 +89,28 @@ namespace Moritz.AssistantComposer
             List<Voice> bar = new List<Voice>();
 
             byte channel = 0;
-            foreach(PaletteDef midiDurationDefs in _paletteDefs)
+            foreach(List<DurationDef> templateDefs in _palettes)
             {
                 Voice voice = new OutputVoice(null, channel);
                 bar.Add(voice);
-                WriteVoiceMidiDurationDefs1(voice, midiDurationDefs);
+                WriteVoiceMidiDurationDefs1(voice, templateDefs);
                 ++channel;
             }
             return bar;
         }
 
-        private void WriteVoiceMidiDurationDefs1(Voice voice, PaletteDef midiDurationDefs)
+        private void WriteVoiceMidiDurationDefs1(Voice voice, List<DurationDef> templateDefs)
         {
             int msPosition = 0;
             int bar1ChordMsSeparation = 1500;
-            foreach(DurationDef midiDurationDef in midiDurationDefs)
+            foreach(DurationDef templateDurationDef in templateDefs)
             {
-                Debug.Assert(midiDurationDef.MsDuration > 0);
-                IUniqueDef noteDef = midiDurationDef.DeepClone();
-                noteDef.MsPosition = msPosition;
-                RestDef restDef = new RestDef(msPosition + noteDef.MsDuration, bar1ChordMsSeparation - noteDef.MsDuration);
+                Debug.Assert(templateDurationDef.MsDuration > 0);
+                IUniqueDef durationDef = templateDurationDef.DeepClone();
+                durationDef.MsPosition = msPosition;
+                RestDef restDef = new RestDef(msPosition + durationDef.MsDuration, bar1ChordMsSeparation - durationDef.MsDuration);
                 msPosition += bar1ChordMsSeparation;
-                voice.UniqueDefs.Add(noteDef);
+                voice.UniqueDefs.Add(durationDef);
                 voice.UniqueDefs.Add(restDef);
             }
         }
@@ -126,10 +126,10 @@ namespace Moritz.AssistantComposer
 
             byte channel = 0;
             List<VoiceDef> voiceDefs = new List<VoiceDef>();
-            foreach(PaletteDef paletteDef in _paletteDefs)
+            foreach(List<DurationDef> templateDefs in _palettes)
             {
                 bar.Add(new OutputVoice(null, channel));
-                VoiceDef voiceDef = new VoiceDef(paletteDef);
+                VoiceDef voiceDef = new VoiceDef(templateDefs);
                 voiceDef.SetMsDuration(6000);
                 voiceDefs.Add(voiceDef);
                 ++channel;

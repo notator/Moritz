@@ -112,7 +112,7 @@ namespace Moritz.Score.Midi
         }
         #endregion
 
-        #region Constructor used when creating a new MidiChordDef from a palette.
+        #region Constructor used when creating a list of DurationDef templates from a Palette.
         /// <summary>
         /// The palette creates new values for all the arguments, so this 
         /// constructor simply transfers those values to the new MidiChordDef.
@@ -126,18 +126,23 @@ namespace Moritz.Score.Midi
             bool repeat,
             byte? pitchWheelDeviation,
             bool hasChordOff,
+            List<byte> midiPitches,
+            List<byte> midiVelocities,
             int ornamentNumberSymbol,
             MidiChordSliderDefs midiChordSliderDefs,
             List<BasicMidiChordDef> basicMidiChordDefs)
             : base(msDuration)
         {
             _msPosition = 0;
+            _msDuration = msDuration;
             _bank = bank;
             _patch = patch;
             _volume = volume;
             _repeat = repeat;
             _pitchWheelDeviation = pitchWheelDeviation;
             _hasChordOff = hasChordOff;
+            _midiPitches = midiPitches;
+            // midiVelocities are handled via the basicMidiChordDefs
             _lyric = null;
             _ornamentNumberSymbol = ornamentNumberSymbol;
             _lyric = null;
@@ -195,7 +200,7 @@ namespace Moritz.Score.Midi
             _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 
             _midiPitches = pitches;
-            _midiVelocity = velocities[0];
+            // midiVelocity is handled via the BasicMidiChordDefs
             _ornamentNumberSymbol = 0;
 
             MidiChordSliderDefs = null;
@@ -224,7 +229,8 @@ namespace Moritz.Score.Midi
             _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 
             _midiPitches = pitches;
-            _midiVelocity = velocities[0];
+            // midiVelocity is handled via the basicMidiChordDefs;
+
             _ornamentNumberSymbol = 0;
 
             MidiChordSliderDefs = null;
@@ -255,7 +261,7 @@ namespace Moritz.Score.Midi
             MidiChordDef rval = new MidiChordDef();
 
             rval.MsPosition = this.MsPosition;
-            rval.MsDuration = this.MsDuration;
+            // rval.MsDuration must be set after setting BasicMidiChordDefs See below.
             rval.Bank = this.Bank;
             rval.Patch = this.Patch;
             rval.Volume = this.Volume;
@@ -265,7 +271,7 @@ namespace Moritz.Score.Midi
             rval.Lyric = this.Lyric;
             rval.MinimumBasicMidiChordMsDuration = this.MinimumBasicMidiChordMsDuration; // required when changing a midiChord's duration
             rval.MidiPitches = this.MidiPitches; // the displayed noteheads
-            // rval.MidiVelocity must be set after setting BasicMidiChordDefs.Count See below.
+            // rval.MidiVelocity must be set after setting BasicMidiChordDefs See below.
             rval.OrnamentNumberSymbol = this.OrnamentNumberSymbol; // the displayed ornament number
 
             MidiChordSliderDefs m = this.MidiChordSliderDefs;
@@ -281,6 +287,7 @@ namespace Moritz.Score.Midi
             }
             rval.BasicMidiChordDefs = newBs;
 
+            rval.MsDuration = this.MsDuration;
             rval.MidiVelocity = this.MidiVelocity; // needed for displaying dynamics (must be set *after* setting BasicMidiChordDefs)
 
            return rval;
@@ -341,14 +348,8 @@ namespace Moritz.Score.Midi
 
         public void AdjustVelocities(double factor)
         {
-            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
-            {
-                for(int i = 0; i < bmcd.Velocities.Count; ++i)
-                {
-                    bmcd.Velocities[i] = M.MidiValue((int)(bmcd.Velocities[i] * factor));
-                }
-            }
-            this._midiVelocity = BasicMidiChordDefs[0].Velocities[0];
+            byte newVelocity = M.MidiValue((int)(MidiVelocity * factor));
+            MidiVelocity = newVelocity;
         }
 
         public void AdjustExpression(double factor)
@@ -887,8 +888,15 @@ namespace Moritz.Score.Midi
             }
             set
             {
+                Debug.Assert(BasicMidiChordDefs != null && BasicMidiChordDefs.Count > 0);
                 _msDuration = value;
-                BasicMidiChordDefs = FitToDuration(BasicMidiChordDefs, MsDuration, _minimumBasicMidiChordMsDuration);
+                int sumDurations = 0;
+                foreach(int bcd in BasicChordDurations)
+                    sumDurations += bcd;
+                if(_msDuration != sumDurations)
+                {
+                    BasicMidiChordDefs = FitToDuration(BasicMidiChordDefs, _msDuration, _minimumBasicMidiChordMsDuration);
+                }
             }
         }
 
@@ -904,17 +912,21 @@ namespace Moritz.Score.Midi
         // The duration in the score is always the sum of the durations of the basicChords.
         public bool Repeat { get { return _repeat; } set { _repeat = value; } }
         private bool _repeat = false;
-        public int? PitchWheelDeviation
+        public byte? PitchWheelDeviation
         {
             get
             {
-                return (int?)_pitchWheelDeviation;
+                return _pitchWheelDeviation;
             }
             set
             {
-                Debug.Assert(value != null);
-                int val = (int)value;
-                _pitchWheelDeviation = (byte?) M.MidiValue(val);
+                if(value == null)
+                    _pitchWheelDeviation = null;
+                else
+                {
+                    int val = (int)value;
+                    _pitchWheelDeviation = M.MidiValue(val);
+                }
             }
         }
         public byte? _pitchWheelDeviation = null;
@@ -938,24 +950,26 @@ namespace Moritz.Score.Midi
         /// </summary>
         public byte MidiVelocity
         {
-            get { return _midiVelocity; }
+            get { return BasicMidiChordDefs[0].Velocities[0]; }
             set
             {
                 Debug.Assert(BasicMidiChordDefs != null && BasicMidiChordDefs.Count > 0
                     && BasicMidiChordDefs[0].Velocities != null && BasicMidiChordDefs[0].Velocities.Count > 0);
 
-                _midiVelocity = value;
-                double factor = (((double)value) / ((double)BasicMidiChordDefs[0].Velocities[0]));
-                foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+                if(value != BasicMidiChordDefs[0].Velocities[0])
                 {
-                    for(int i = 0; i < bmcd.Velocities.Count; ++i)
+                    double factor = (((double)value) / ((double)BasicMidiChordDefs[0].Velocities[0]));
+                    foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
                     {
-                        bmcd.Velocities[i] = M.MidiValue((int)((double)bmcd.Velocities[i] * factor));
+                        for(int i = 0; i < bmcd.Velocities.Count; ++i)
+                        {
+                            bmcd.Velocities[i] = M.MidiValue((int)((double)bmcd.Velocities[i] * factor));
+                        }
                     }
                 }
             }
         }
-        private byte _midiVelocity = 0;
+
         public int OrnamentNumberSymbol { get { return _ornamentNumberSymbol; } set { _ornamentNumberSymbol = value; } }
         private int _ornamentNumberSymbol = 0;
 

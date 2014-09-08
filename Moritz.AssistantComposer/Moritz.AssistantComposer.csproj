@@ -111,8 +111,7 @@
     <Compile Include="OrnamentSettingsForm.Designer.cs">
       <DependentUpon>OrnamentSettingsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Palette.cs" />
-    <Compile Include="PaletteDef.cs" />
+    <Compile Include="PaletteFormContent.cs" />
     <Compile Include="PaletteForm.cs">
       <SubType>Form</SubType>
     </Compile>

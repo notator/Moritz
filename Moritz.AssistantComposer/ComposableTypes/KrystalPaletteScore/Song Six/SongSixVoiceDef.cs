@@ -55,15 +55,15 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// sequence contains a list of values in range 1..paletteDef.MidiDurationDefsCount.
+        /// sequence contains a list of values in range 1..templateDefs.MidiDurationDefsCount.
         /// </summary>
-        protected SongSixVoiceDef(PaletteDef paletteDef, List<int> sequence)
+        protected SongSixVoiceDef(List<DurationDef> templateDefs, List<int> sequence)
         {
             int msPosition = 0;
             foreach(int value in sequence)
             {
-                Debug.Assert((value >= 1 && value <= paletteDef.MidiDurationDefsCount), "Illegal argument: value out of range in sequence");
-                IUniqueDef iumdd = paletteDef[value - 1].DeepClone();
+                Debug.Assert((value >= 1 && value <= templateDefs.Count), "Illegal argument: value out of range in sequence");
+                IUniqueDef iumdd = templateDefs[value - 1].DeepClone();
                 Debug.Assert(iumdd.MsDuration > 0);
                 iumdd.MsPosition = msPosition;
                 msPosition += iumdd.MsDuration;
@@ -74,15 +74,15 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// Creates a SongSixVoiceDef using the flat sequence of values in the krystal.
         /// </summary>
-        public SongSixVoiceDef (PaletteDef paletteDef, Krystal krystal)
-            : this(paletteDef,krystal.GetValues((uint)1)[0])
+        public SongSixVoiceDef (List<DurationDef> templateDefs, Krystal krystal)
+            : this(templateDefs,krystal.GetValues((uint)1)[0])
         {
         }
 
         /// <summary>
         /// Constructs a SongSixVoiceDef at MsPosition=0, containing the localized sequence of MidiDurationDefs in the PaletteDef.
         /// </summary
-        public SongSixVoiceDef(PaletteDef midiDurationDefs)
+        public SongSixVoiceDef(List<DurationDef> midiDurationDefs)
         {
             Debug.Assert(midiDurationDefs != null);
             foreach(IUniqueCloneDef midiDurationDef in midiDurationDefs)
@@ -934,14 +934,13 @@ namespace Moritz.AssistantComposer
         internal void SetPitchWheelDeviation(int beginIndex, int endIndex, int deviation)
         {
             CheckIndices(beginIndex, endIndex);
-            Debug.Assert(deviation >= 0 && deviation <= 127);
 
             for(int i = beginIndex; i < endIndex; ++i)
             {
                 MidiChordDef iumdd = this[i] as MidiChordDef;
                 if(iumdd != null)
                 {
-                    iumdd.PitchWheelDeviation = deviation;
+                    iumdd.PitchWheelDeviation = M.MidiValue(deviation);
                 }
             }
         }
@@ -1379,7 +1378,7 @@ namespace Moritz.AssistantComposer
                 MidiChordDef umcd = this[i] as MidiChordDef;
                 if(umcd != null)
                 {
-                    umcd.PitchWheelDeviation = (int)(furies1StartPwdValue * (Math.Pow(pwdfactor, i)));
+                    umcd.PitchWheelDeviation = M.MidiValue((int)(furies1StartPwdValue * (Math.Pow(pwdfactor, i))));
                 }
             }
         }
