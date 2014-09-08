@@ -11,10 +11,6 @@ namespace Moritz.Score.Midi
         /// <summary>
         /// Used by Assistant Composer
         /// </summary>
-        /// <param name="pitchWheelMsbs"></param>
-        /// <param name="panMsbs"></param>
-        /// <param name="modulationWheelMsbs"></param>
-        /// <param name="expressionMsbs"></param>
         public MidiChordSliderDefs(List<byte> pitchWheelMsbs, List<byte> panMsbs, List<byte> modulationWheelMsbs, List<byte> expressionMsbs)
         {
             PitchWheelMsbs = pitchWheelMsbs;

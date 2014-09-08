@@ -33,13 +33,6 @@ namespace Moritz.Score.Notation
                 //{
                 //    case "id": // ids are ignored!
                 //        break;
-                //
-                //    case "pitchWheelDeviation":
-                //        _pitchWheelDeviation = byte.Parse(r.Value);
-                //        break;
-                //    case "minBasicChordMsDuration":
-                //        this._minimumBasicMidiChordMsDuration = int.Parse(r.Value);
-                //        break;
                 //}
             //}
             //bool isStartElement = r.IsStartElement();

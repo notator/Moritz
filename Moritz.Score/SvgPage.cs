@@ -26,7 +26,6 @@ namespace Moritz.Score
             _infoTextInfo = null;
 
             int msDuration;
-            string id;
             Stream pageStream = File.OpenRead(pagePath);
             Dictionary<string, string> attributesDict = null;
             SvgSystem currentSystem = null;

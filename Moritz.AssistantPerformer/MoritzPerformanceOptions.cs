@@ -285,30 +285,6 @@ namespace Moritz.AssistantPerformer
             }
             // r.Name is "keyboardSettings" here
         }
-
-        private List<byte> ReadMidiPitches(XmlReader r)
-        {
-            // r.Name is "notes" here
-            List<byte> midiPitches = new List<byte>();
-            M.ReadToXmlElementTag(r, "note");
-            while(r.Name == "note")
-            {
-                int noteAttributesCount = r.AttributeCount;
-                for(int i = 0; i < noteAttributesCount; i++)
-                {
-                    r.MoveToAttribute(i);
-                    switch(r.Name)
-                    {
-                        case "midiPitch":
-                            midiPitches.Add(byte.Parse(r.Value));
-                            break;
-                    }
-                }
-                M.ReadToXmlElementTag(r, "note", "notes");
-            }
-            // r.Name is "notes" here
-            return midiPitches;
-        }
         private PerformersPitchesType GetPerformersPitchesType(string strVal)
         {
             PerformersPitchesType performersPitchesType = PerformersPitchesType.AsNotated;

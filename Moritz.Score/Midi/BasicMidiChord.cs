@@ -24,11 +24,11 @@ namespace Moritz.Score.Midi
             }
 
             ChordOn = new ChordOn(this);  
-            SetChordOn(channel, bmcd.Notes, bmcd.Velocities);
+            SetChordOn(channel, bmcd.Pitches, bmcd.Velocities);
             if(bmcd.HasChordOff)
             {
                 ChordOff = new ChordOff(this);
-                SetChordOff(channel, bmcd.Notes);
+                SetChordOff(channel, bmcd.Pitches);
             }
         }
 

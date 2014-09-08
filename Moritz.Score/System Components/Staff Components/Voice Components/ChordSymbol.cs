@@ -454,7 +454,7 @@ namespace Moritz.Score
         /// Such accidentals are placed in the left-right order of the noteheads
         /// </summary>
         /// <param name="upperChord"></param>
-        public void AdjustAccidentalsX(OutputChordSymbol upperChord)
+        public void AdjustAccidentalsX(ChordSymbol upperChord)
         {
             float stafflineStemStrokeWidth = Voice.Staff.SVGSystem.Score.PageFormat.StafflineStemStrokeWidth;
 

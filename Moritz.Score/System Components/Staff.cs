@@ -577,7 +577,7 @@ namespace Moritz.Score
         /// Accidentals are rearranged (top to bottom, to the left of the combined chord) once the
         /// noteheads and ledgerlines have been given their final positions.
         /// </summary>
-        private void AdjustLowerChordXPosition(OutputChordSymbol upperChord, OutputChordSymbol lowerChord)
+        private void AdjustLowerChordXPosition(ChordSymbol upperChord, ChordSymbol lowerChord)
         {
             Debug.Assert(upperChord.MsPosition == lowerChord.MsPosition);
             if(!(upperChord is CautionaryChordSymbol))

@@ -19,7 +19,7 @@ namespace Moritz.Score.Midi
             Debug.Assert(basicMidiChordDefs.Count > 0);
             List<int> realBasicMidiChordDurations = MidiChordDef.GetIntDurations(msDuration, midiChordDef.BasicChordDurations, basicMidiChordDefs.Count);
 
-            _firstChordNotes = new List<byte>(midiChordDef.BasicMidiChordDefs[0].Notes);
+            _firstChordNotes = new List<byte>(midiChordDef.BasicMidiChordDefs[0].Pitches);
             var notesToStop = new SortedSet<byte>();
             int i = 0;
             foreach(BasicMidiChordDef basicMidiChordDef in midiChordDef.BasicMidiChordDefs)
@@ -27,7 +27,7 @@ namespace Moritz.Score.Midi
                 this.BasicMidiChords.Add(new BasicMidiChord(channel, this, basicMidiChordDef, realBasicMidiChordDurations[i++]));
                 if(basicMidiChordDef.HasChordOff)
                 {
-                    foreach(byte note in basicMidiChordDef.Notes)
+                    foreach(byte note in basicMidiChordDef.Pitches)
                     {
                         if(!notesToStop.Contains(note))
                             notesToStop.Add(note);
@@ -206,7 +206,7 @@ namespace Moritz.Score.Midi
             BasicMidiChordDef bmcd = new BasicMidiChordDef();
             foreach(ChannelMessage channelmessage in chordOnMessages)
             {
-                bmcd.Notes.Add((byte)channelmessage.Data1);
+                bmcd.Pitches.Add((byte)channelmessage.Data1);
                 bmcd.Velocities.Add((byte)channelmessage.Data2);
             }
             bmcd.HasChordOff = true;

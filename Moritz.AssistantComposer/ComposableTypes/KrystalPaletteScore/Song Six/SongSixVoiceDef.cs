@@ -1241,7 +1241,7 @@ namespace Moritz.AssistantComposer
                     {
                         foreach(BasicMidiChordDef bmcd in umcd.BasicMidiChordDefs)
                         {
-                            foreach(byte note in bmcd.Notes)
+                            foreach(byte note in bmcd.Pitches)
                             {
                                 lowestPitch = (lowestPitch < note) ? lowestPitch : note;
                             }

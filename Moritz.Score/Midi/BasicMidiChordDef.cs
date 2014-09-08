@@ -18,7 +18,7 @@ namespace Moritz.Score.Midi
             BankIndex = bank;
             PatchIndex = patch;
             HasChordOff = hasChordOff;
-            Notes = pitches;
+            Pitches = pitches;
             Velocities = velocities;
         }
 
@@ -28,7 +28,7 @@ namespace Moritz.Score.Midi
             BankIndex = original.BankIndex;
             PatchIndex = original.PatchIndex;
             HasChordOff = original.HasChordOff;
-            Notes = original.Notes;
+            Pitches = original.Pitches;
             Velocities = original.Velocities;
         }
 
@@ -60,8 +60,8 @@ namespace Moritz.Score.Midi
                         else
                             HasChordOff = true;
                         break;
-                    case "notes":
-                        Notes = M.StringToByteList(r.Value, ' ');
+                    case "pitches":
+                        Pitches = M.StringToByteList(r.Value, ' ');
                         break;
                     case "velocities":
                         Velocities = M.StringToByteList(r.Value, ' ');
@@ -83,8 +83,8 @@ namespace Moritz.Score.Midi
                 w.WriteAttributeString("patch", PatchIndex.ToString());
             if(HasChordOff == false)
                 w.WriteAttributeString("hasChordOff", "0");
-            if(Notes != null)
-                w.WriteAttributeString("notes", M.ByteListToString(Notes));
+            if(Pitches != null)
+                w.WriteAttributeString("pitches", M.ByteListToString(Pitches));
             if(Velocities != null)
                 w.WriteAttributeString("velocities", M.ByteListToString(Velocities));
 
@@ -94,7 +94,7 @@ namespace Moritz.Score.Midi
         public int MsDuration { get { return _msDuration; } set { _msDuration = value; } }
         protected int _msDuration = 0;
 
-        public List<byte> Notes = new List<byte>(); // A string of midiPitch numbers separated by spaces.
+        public List<byte> Pitches = new List<byte>(); // A string of midiPitch numbers separated by spaces.
         public List<byte> Velocities = new List<byte>(); // A string of midi velocity values separated by spaces.
         public byte? BankIndex = null; // optional. If null, bank commands are not sent
         public byte? PatchIndex = null; // optional. If null, patch commands are not sent

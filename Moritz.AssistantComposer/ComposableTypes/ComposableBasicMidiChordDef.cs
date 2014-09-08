@@ -45,7 +45,7 @@ namespace Moritz.AssistantComposer
             _msDuration = bcs.Durations[index]; // recalculated later, if this is an ornament chord
 
             byte density = bcs.ChordDensities[index];
-            Notes = GetMidiNotes(bcs, index, density);
+            Pitches = GetMidiNotes(bcs, index, density);
             Velocities = GetMidiVelocities(bcs, index, density);
 
             BankIndex = null;
