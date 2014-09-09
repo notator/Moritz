@@ -18,8 +18,8 @@ namespace Moritz.AssistantComposer
     /// </summary>
     internal partial class SongSixAlgorithm : MidiCompositionAlgorithm
     {
-        public SongSixAlgorithm(List<Krystal> krystals, List<List<DurationDef>> paletteDefs)
-            : base(krystals, paletteDefs)
+        public SongSixAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+            : base(krystals, palettes)
         {
         }
 
@@ -128,9 +128,9 @@ namespace Moritz.AssistantComposer
             furies2.GetBeforeInterlude3(clytemnestra, wind1, furies3, _palettes);
 
             Furies1 furies1 = new Furies1(msPositions["endOfPiece"]);
-            furies1.GetBeforeInterlude3(clytemnestra, wind1, furies2, _palettes[8]);
+            furies1.GetBeforeInterlude3(clytemnestra, wind1, furies2, _palettes[8].DurationDefs);
 
-            furies3.GetChirpsInInterlude2AndVerse3(furies1, furies2, clytemnestra, wind1, _palettes[6]);
+            furies3.GetChirpsInInterlude2AndVerse3(furies1, furies2, clytemnestra, wind1, _palettes[6].DurationDefs);
 
             GetFuriesInterlude3ToEnd(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3, _palettes, msPositions);
 

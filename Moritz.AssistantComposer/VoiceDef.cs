@@ -82,12 +82,12 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// Constructs a VoiceDef at MsPosition=0, containing the localized sequence of MidiDurationDefs in the PaletteDef.
         /// </summary
-        public VoiceDef(List<DurationDef> midiDurationDefs)
+        public VoiceDef(List<DurationDef> paletteDurationDefs)
         {
-            Debug.Assert(midiDurationDefs != null);
-            foreach(DurationDef midiDurationDef in midiDurationDefs)
+            Debug.Assert(paletteDurationDefs != null);
+            foreach(DurationDef durationDef in paletteDurationDefs)
             {
-                IUniqueDef iumdd = midiDurationDef.DeepClone();
+                IUniqueDef iumdd = durationDef.DeepClone();
                 _uniqueDefs.Add(iumdd);
             }
             SetMsPositions();

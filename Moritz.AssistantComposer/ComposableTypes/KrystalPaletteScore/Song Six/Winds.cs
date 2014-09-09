@@ -17,7 +17,7 @@ namespace Moritz.AssistantComposer
     /// </summary>
     internal partial class SongSixAlgorithm : MidiCompositionAlgorithm
     {
-        private SongSixVoiceDef GetWind3(List<DurationDef> palette, Krystal krystal)
+        private SongSixVoiceDef GetWind3(Palette palette, Krystal krystal)
         {
             SongSixVoiceDef wind3 = new SongSixVoiceDef(palette, krystal);
             wind3.Transpose(0, wind3.Count, -13);

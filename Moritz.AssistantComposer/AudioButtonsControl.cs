@@ -53,7 +53,7 @@ namespace Moritz.AssistantComposer
             }
             _performingButton = null;
         }
-        public void GetPaletteAndAssistant(out PaletteFormContent palette, out Assistant assistant)
+        public void GetPaletteAndAssistant(out Palette palette, out Assistant assistant)
         {
             PageFormat pageFormat = new PageFormat(); 
             
@@ -62,12 +62,12 @@ namespace Moritz.AssistantComposer
             PaletteDemoScore paletteDemoScore = null;
             if(paletteForm != null)
             {
-                palette = new PaletteFormContent(paletteForm);
+                palette = new Palette(paletteForm);
                 paletteDemoScore = new PaletteDemoScore(palette, pageFormat, 0);
             }
             else
             {
-                palette = new PaletteFormContent(percussionPaletteForm);
+                palette = new Palette(percussionPaletteForm);
                 paletteDemoScore = new PaletteDemoScore(palette, pageFormat, 9);
             }
 
@@ -211,19 +211,19 @@ namespace Moritz.AssistantComposer
 
         private void PlayMidiEvent(int index)
         {
-            PaletteFormContent krystalPalette = null;
+            Palette krystalPalette = null;
             Assistant assistant = null;
 
             GetPaletteAndAssistant(out krystalPalette, out assistant);
 
             assistant.ResetChannels(); // sends allSoundsOff and AllControllersOff, Sleeps 5 milliseconds to avoid click.
 
-            if(krystalPalette.BasicChordSettings.ChordDensities[index] == 0)
+            if(krystalPalette.DurationDefs[index] is RestDef)
             {
                 _midiEventDemoButtons[index].Hide();
                 this._restLabels[0].Select(); // just to deselect everything
                 Refresh(); // shows "rest" behind button
-                Thread.Sleep(krystalPalette.BasicChordSettings.Durations[index]);
+                Thread.Sleep(krystalPalette.DurationDefs[index].MsDuration);
                 _midiEventDemoButtons[index].Show();
                 Refresh();
             }
@@ -232,7 +232,7 @@ namespace Moritz.AssistantComposer
                 int numberOfRests = 0;
                 for(int i = 0; i < index; ++i)
                 {
-                    if(krystalPalette.BasicChordSettings.ChordDensities[i] == 0)
+                    if(krystalPalette.DurationDefs[i] is RestDef)
                         ++numberOfRests;
                 }
 
@@ -245,7 +245,7 @@ namespace Moritz.AssistantComposer
                 {
                     // This blocks the current thread (keeps the button selected)
                     // If index == 0, it is blocked by the assistant.
-                    Thread.Sleep(krystalPalette.BasicChordSettings.Durations[index]);
+                    Thread.Sleep(krystalPalette.DurationDefs[index].MsDuration);
                 }
                 // end new
             }

@@ -19,10 +19,10 @@ namespace Moritz.AssistantComposer
         {
         }
 
-        internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, SongSixVoiceDef wind1, List<List<DurationDef>> palettes)
+        internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, SongSixVoiceDef wind1, List<Palette> palettes)
         {
-            GetSnores(firstRestMsDuration, clytemnestra, wind1, palettes[1]);
-            AddGrowlsToInterlude2AndVerse3(clytemnestra, palettes[3]);
+            GetSnores(firstRestMsDuration, clytemnestra, wind1, palettes[1].DurationDefs);
+            AddGrowlsToInterlude2AndVerse3(clytemnestra, palettes[3].DurationDefs);
         }
 
         #region before Interlude3
@@ -142,7 +142,7 @@ namespace Moritz.AssistantComposer
         #endregion before Interlude3
 
         #region finale
-        internal void GetFinale(List<List<DurationDef>> palettes, Dictionary<string, int> msPositions, Krystal krystal)
+        internal void GetFinale(List<Palette> palettes, Dictionary<string, int> msPositions, Krystal krystal)
         {
             SongSixVoiceDef furies4Finale = GetF4Finale(palettes, krystal, msPositions);
 
@@ -173,11 +173,11 @@ namespace Moritz.AssistantComposer
             RemoveScorePitchWheelCommands(52, 53);
         }
 
-        private SongSixVoiceDef GetF4Finale(List<List<DurationDef>> palettes , Krystal krystal, Dictionary<string, int> msPositions)
+        private SongSixVoiceDef GetF4Finale(List<Palette> palettes , Krystal krystal, Dictionary<string, int> msPositions)
         {
-            List<DurationDef> f4FinalePalette1 = palettes[9];
-            List<DurationDef> f4FinalePalette2 = palettes[13];
-            List<DurationDef> f4PostludePalette = palettes[17];
+            Palette f4FinalePalette1 = palettes[9];
+            Palette f4FinalePalette2 = palettes[13];
+            Palette f4PostludePalette = palettes[17];
 
             SongSixVoiceDef interlude4Start = new SongSixVoiceDef(f4FinalePalette1, krystal);
             Transform(interlude4Start, msPositions);

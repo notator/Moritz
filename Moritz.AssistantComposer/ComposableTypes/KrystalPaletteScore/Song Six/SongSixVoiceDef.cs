@@ -57,13 +57,13 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// sequence contains a list of values in range 1..templateDefs.MidiDurationDefsCount.
         /// </summary>
-        protected SongSixVoiceDef(List<DurationDef> templateDefs, List<int> sequence)
+        protected SongSixVoiceDef(Palette palette, List<int> sequence)
         {
             int msPosition = 0;
             foreach(int value in sequence)
             {
-                Debug.Assert((value >= 1 && value <= templateDefs.Count), "Illegal argument: value out of range in sequence");
-                IUniqueDef iumdd = templateDefs[value - 1].DeepClone();
+                Debug.Assert((value >= 1 && value <= palette.DurationDefs.Count), "Illegal argument: value out of range in sequence");
+                IUniqueDef iumdd = palette.DurationDefs[value - 1].DeepClone();
                 Debug.Assert(iumdd.MsDuration > 0);
                 iumdd.MsPosition = msPosition;
                 msPosition += iumdd.MsDuration;
@@ -74,8 +74,8 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// Creates a SongSixVoiceDef using the flat sequence of values in the krystal.
         /// </summary>
-        public SongSixVoiceDef (List<DurationDef> templateDefs, Krystal krystal)
-            : this(templateDefs,krystal.GetValues((uint)1)[0])
+        public SongSixVoiceDef (Palette palette, Krystal krystal)
+            : this(palette, krystal.GetValues((uint)1)[0])
         {
         }
 

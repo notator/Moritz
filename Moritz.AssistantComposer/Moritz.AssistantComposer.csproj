@@ -111,7 +111,7 @@
     <Compile Include="OrnamentSettingsForm.Designer.cs">
       <DependentUpon>OrnamentSettingsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="PaletteFormContent.cs" />
+    <Compile Include="Palette.cs" />
     <Compile Include="PaletteForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -157,7 +157,6 @@
     <Compile Include="AssistantComposerMainForm.Designer.cs">
       <DependentUpon>AssistantComposerMainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ComposableTypes\ComposableBasicMidiChordDef.cs" />
     <Compile Include="ComposableTypes\ComposableScore.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\KrystalPaletteScore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

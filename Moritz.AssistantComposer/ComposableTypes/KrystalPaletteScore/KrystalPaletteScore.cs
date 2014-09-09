@@ -14,16 +14,13 @@ namespace Moritz.AssistantComposer
     public class KrystalPaletteScore : ComposableSvgScore
     {
         public KrystalPaletteScore(string scoreTitleName, string algorithmName, PageFormat pageFormat,
-            List<Krystal> krystals, List<PaletteFormContent> palettes, string folder,
+            List<Krystal> krystals, List<Palette> palettes, string folder,
             string keywords, string comment)
             : base(folder, scoreTitleName, keywords, comment, pageFormat)
         {
             _krystals = krystals;
-            _paletteDefs = null;
-            if(palettes != null)
-                _paletteDefs = GetPaletteDefs(palettes);
             
-            _midiAlgorithm = Algorithm(algorithmName, krystals, _paletteDefs);
+            _midiAlgorithm = Algorithm(algorithmName, krystals, palettes);
 
             Notator = new Notator(pageFormat);
 

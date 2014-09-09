@@ -25,48 +25,30 @@ namespace Moritz.AssistantComposer
         /// <param name="krystals"></param>
         /// <param name="paletteDefs"></param>
         /// <returns></returns>
-        protected MidiCompositionAlgorithm Algorithm(string algorithmName, List<Krystal> krystals, List<List<DurationDef>> paletteDefs)
+        protected MidiCompositionAlgorithm Algorithm(string algorithmName, List<Krystal> krystals, List<Palette> palettes)
         {
             MidiCompositionAlgorithm midiAlgorithm = null;
             switch(algorithmName)
             {
                 case "Study 2c3.1":
-                    midiAlgorithm = new Study2c3_1Algorithm(krystals, paletteDefs);
+                    midiAlgorithm = new Study2c3_1Algorithm(krystals, palettes);
                     break;
                 case "Song Six":
-                    midiAlgorithm = new SongSixAlgorithm(krystals, paletteDefs);
+                    midiAlgorithm = new SongSixAlgorithm(krystals, palettes);
                     break;
                 case "Study 3 sketch 1":
-                    midiAlgorithm = new Study3Sketch1Algorithm(krystals, paletteDefs);
+                    midiAlgorithm = new Study3Sketch1Algorithm(krystals, palettes);
                     break;
                 case "Study 3 sketch 2":
-                    midiAlgorithm = new Study3Sketch2Algorithm(krystals, paletteDefs);
+                    midiAlgorithm = new Study3Sketch2Algorithm(krystals, palettes);
                     break;
                 case "paletteDemo":
-                    midiAlgorithm = new PaletteDemoAlgorithm(paletteDefs);
+                    midiAlgorithm = new PaletteDemoAlgorithm(palettes);
                     break;
                 default:
                     throw new ApplicationException("unknown algorithm");
             }
             return midiAlgorithm;
-        }
-
-        protected List<List<DurationDef>> GetPaletteDefs(List<PaletteFormContent> palettes)
-        {
-            List<List<DurationDef>> rval = new List<List<DurationDef>>();
-
-            foreach(PaletteFormContent palette in palettes)
-            {
-                List<DurationDef> paletteDefs = new List<DurationDef>();
-                for(int index = 0; index < palette.Domain; ++index)
-                {
-                    DurationDef mdd = palette.GetDurationDef(index);
-                    paletteDefs.Add(mdd);
-                }
-                rval.Add(paletteDefs);
-            }
-
-            return rval;
         }
 
         private void CheckBars(List<List<Voice>> voicesPerSystemPerBar)
@@ -136,7 +118,6 @@ namespace Moritz.AssistantComposer
             }
         }
 
-        protected List<List<DurationDef>> _paletteDefs = null;
         protected MidiCompositionAlgorithm _midiAlgorithm = null;
     }
 }

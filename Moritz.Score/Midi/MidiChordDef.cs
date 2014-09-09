@@ -114,20 +114,17 @@ namespace Moritz.Score.Midi
 
         #region Constructor used when creating a list of DurationDef templates from a Palette.
         /// <summary>
-        /// The palette creates new values for all the arguments, so this 
+        /// The palette has created new values for all the arguments, so this 
         /// constructor simply transfers those values to the new MidiChordDef.
         /// msPosition is set to 0, lyric is set to null.
         /// </summary>
         public MidiChordDef(
             int msDuration,
-            byte? bank,
-            byte? patch,
             byte? volume,
             bool repeat,
             byte? pitchWheelDeviation,
             bool hasChordOff,
             List<byte> midiPitches,
-            List<byte> midiVelocities,
             int ornamentNumberSymbol,
             MidiChordSliderDefs midiChordSliderDefs,
             List<BasicMidiChordDef> basicMidiChordDefs)
@@ -135,13 +132,11 @@ namespace Moritz.Score.Midi
         {
             _msPosition = 0;
             _msDuration = msDuration;
-            _bank = bank;
-            _patch = patch;
             _volume = volume;
             _repeat = repeat;
             _pitchWheelDeviation = pitchWheelDeviation;
             _hasChordOff = hasChordOff;
-            _midiPitches = midiPitches;
+            _displayedMidiPitches = midiPitches;
             // midiVelocities are handled via the basicMidiChordDefs
             _lyric = null;
             _ornamentNumberSymbol = ornamentNumberSymbol;
@@ -199,7 +194,7 @@ namespace Moritz.Score.Midi
             _hasChordOff = hasChordOff;
             _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 
-            _midiPitches = pitches;
+            _displayedMidiPitches = pitches;
             // midiVelocity is handled via the BasicMidiChordDefs
             _ornamentNumberSymbol = 0;
 
@@ -228,7 +223,7 @@ namespace Moritz.Score.Midi
             _hasChordOff = hasChordOff;
             _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 
-            _midiPitches = pitches;
+            _displayedMidiPitches = pitches;
             // midiVelocity is handled via the basicMidiChordDefs;
 
             _ornamentNumberSymbol = 0;
@@ -311,9 +306,9 @@ namespace Moritz.Score.Midi
         /// </summary>
         public void Transpose(int interval)
         {
-            for(int i = 0; i < _midiPitches.Count; ++i)
+            for(int i = 0; i < _displayedMidiPitches.Count; ++i)
             {
-                _midiPitches[i] = M.MidiValue(_midiPitches[i] + interval);
+                _displayedMidiPitches[i] = M.MidiValue(_displayedMidiPitches[i] + interval);
             }
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
@@ -940,8 +935,8 @@ namespace Moritz.Score.Midi
         /// This MidiPitches field is used when displaying the chord's noteheads.
         /// The performed pitches are set in the BasicMidiChordDefs.
         /// </summary>
-        public List<byte> MidiPitches { get { return _midiPitches; } set { _midiPitches = value; } }
-        private List<byte> _midiPitches = null;
+        public List<byte> MidiPitches { get { return _displayedMidiPitches; } set { _displayedMidiPitches = value; } }
+        private List<byte> _displayedMidiPitches = null;
         /// <summary>
         /// The MidiVelocity field is used when displaying dynamics in the score.
         /// Gets basicMidichordDefs[0].Velocities[0].

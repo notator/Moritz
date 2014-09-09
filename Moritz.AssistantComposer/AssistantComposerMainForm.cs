@@ -720,7 +720,7 @@ namespace Moritz.AssistantComposer
             try
             {
                 List<Krystal> krystals = null;
-                List<PaletteFormContent> palettes = null;
+                List<Palette> palettes = null;
                 GetKrystalsAndPalettes(out krystals, out palettes);
                 PageFormat pageFormat = GetPageFormat();
                 ComposableSvgScore score =
@@ -831,10 +831,10 @@ namespace Moritz.AssistantComposer
         #endregion
 
 
-        private void GetKrystalsAndPalettes(out List<Krystal> krystals, out List<PaletteFormContent> palettes)
+        private void GetKrystalsAndPalettes(out List<Krystal> krystals, out List<Palette> palettes)
         {
             krystals = new List<Krystal>();
-            palettes = new List<PaletteFormContent>();
+            palettes = new List<Palette>();
             foreach(object o in KrystalsListBox.Items)
             {
                 Krystal krystal = o as Krystal;
@@ -848,12 +848,12 @@ namespace Moritz.AssistantComposer
                 PaletteForm paletteForm = o as PaletteForm;
                 if(paletteForm != null)
                 {
-                    palettes.Add(new PaletteFormContent(paletteForm));
+                    palettes.Add(new Palette(paletteForm));
                 }
                 PercussionPaletteForm percussionPaletteForm = o as PercussionPaletteForm;
                 if(percussionPaletteForm != null)
                 {
-                    palettes.Add(new PaletteFormContent(percussionPaletteForm));
+                    palettes.Add(new Palette(percussionPaletteForm));
                 }
             }
         }

@@ -19,7 +19,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         /// <param name="palette"></param>
         /// <param name="pageFormat"></param>
-        public PaletteDemoScore(PaletteFormContent palette, PageFormat pageFormat, byte midiChannel)
+        public PaletteDemoScore(Palette palette, PageFormat pageFormat, byte midiChannel)
             : base(null, null, null, null, pageFormat)
         {
             Debug.Assert(palette != null);
@@ -34,8 +34,9 @@ namespace Moritz.AssistantComposer
             
             Notator = new Notator(pageFormat);
 
-            _paletteDefs = GetPaletteDefs(new List<PaletteFormContent>() { palette });
-            _midiAlgorithm = Algorithm("paletteDemo", null, _paletteDefs);
+            List<Palette> palettes = new List<Palette>();
+            palettes.Add(palette);
+            _midiAlgorithm = Algorithm("paletteDemo", null, palettes);
 
             CreateScore();
 

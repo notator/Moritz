@@ -20,10 +20,10 @@ namespace Moritz.AssistantComposer
         }
 
         #region before Interlude3
-        internal void GetBeforeInterlude3(Clytemnestra clytemnestra, SongSixVoiceDef wind1, SongSixVoiceDef furies3, List<List<DurationDef>> _paletteDefs)
+        internal void GetBeforeInterlude3(Clytemnestra clytemnestra, SongSixVoiceDef wind1, SongSixVoiceDef furies3, List<Palette> _palettes)
         {
             GetFuries2Interlude2(clytemnestra, wind1, furies3);
-            AddFuries2ChirpsForInterlude2AndVerse3(clytemnestra, wind1, _paletteDefs[7]);
+            AddFuries2ChirpsForInterlude2AndVerse3(clytemnestra, wind1, _palettes[7].DurationDefs);
         }
         /// <summary>
         /// Steals the ticks from furies 3, then agglommerates the remaining rests in furies3...
@@ -95,7 +95,7 @@ namespace Moritz.AssistantComposer
 
         #region finale
 
-        internal void GetFinale(List<List<DurationDef>> palettes, Dictionary<string, int> msPositions, Krystal krystal)
+        internal void GetFinale(List<Palette> palettes, Dictionary<string, int> msPositions, Krystal krystal)
         {
             SongSixVoiceDef furies2Finale = GetF2Finale(palettes, krystal, msPositions);
 
@@ -127,11 +127,11 @@ namespace Moritz.AssistantComposer
             return strandIndices;
         }
 
-        private SongSixVoiceDef GetF2Finale(List<List<DurationDef>> palettes, Krystal krystal, Dictionary<string, int> msPositions)
+        private SongSixVoiceDef GetF2Finale(List<Palette> palettes, Krystal krystal, Dictionary<string, int> msPositions)
         {
-            List<DurationDef> f2FinalePalette1 = palettes[11];
-            List<DurationDef> f2FinalePalette2 = palettes[15];
-            List<DurationDef> f2PostludePalette = palettes[19];
+            Palette f2FinalePalette1 = palettes[11];
+            Palette f2FinalePalette2 = palettes[15];
+            Palette f2PostludePalette = palettes[19];
 
             List<int> strandIndices = GetStrandIndices(krystal);
 

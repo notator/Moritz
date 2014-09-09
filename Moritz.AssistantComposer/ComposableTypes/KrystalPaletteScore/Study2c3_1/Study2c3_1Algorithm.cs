@@ -21,8 +21,8 @@ namespace Moritz.AssistantComposer
         /// This constructor can be called with both parameters null,
         /// just to get the overridden properties.
         /// </summary>
-        public Study2c3_1Algorithm(List<Krystal> krystals, List<List<DurationDef>> paletteDefs)
-            : base(krystals, paletteDefs)
+        public Study2c3_1Algorithm(List<Krystal> krystals, List<Palette> palettes)
+            : base(krystals, palettes)
         {
         }
 
@@ -104,7 +104,7 @@ namespace Moritz.AssistantComposer
 
         private void WriteDurationSymbolsForStrandInTopStaff(Voice voice, int barIndex, List<int> originalStrandValues, ref int msPosition)
         {
-            List<DurationDef> templateDefs = this._palettes[0]; // top templateDefs
+            List<DurationDef> templateDefs = _palettes[0].DurationDefs; // top templateDefs
             for(int valueIndex = 0; valueIndex < originalStrandValues.Count; valueIndex++)
             {
                 int value = originalStrandValues[valueIndex];
@@ -122,7 +122,7 @@ namespace Moritz.AssistantComposer
         {
             List<Voice> consecutiveBars = new List<Voice>();
             Krystal krystal = _krystals[staffNumber - 1];
-            List<DurationDef> templateDefs = _palettes[staffNumber - 1];
+            List<DurationDef> templateDefs = _palettes[staffNumber - 1].DurationDefs;
             List<List<int>> strandValuesList = krystal.GetValues(krystal.Level);
             Debug.Assert(topStaffBars.Count == strandValuesList.Count);
 

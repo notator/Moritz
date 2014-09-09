@@ -18,8 +18,8 @@ namespace Moritz.AssistantComposer
         /// </summary>
         /// <param name="krystalPalette"></param>
         /// <param name="valueIndex"></param>
-        public ComposableBasicMidiChordDef(PaletteFormContent krystalPalette, int valueIndex)
-            : this(krystalPalette.BasicChordSettings, krystalPalette.BankIndices, krystalPalette.PatchIndices, valueIndex)
+        public ComposableBasicMidiChordDef(Palette krystalPalette, int valueIndex)
+            : this(krystalPalette.BasicChordSettings, krystalPalette._bankIndices, krystalPalette._patchIndices, valueIndex)
         {
         }
 
@@ -33,7 +33,7 @@ namespace Moritz.AssistantComposer
         {
         }
 
-        public ComposableBasicMidiChordDef(BasicChordSettings bcs, List<byte> bankIndices, List<byte> patchIndices, int index)
+        public ComposableBasicMidiChordDef(BasicChordFormSettings bcs, List<byte> bankIndices, List<byte> patchIndices, int index)
         {
             // MsPosition is set when all the MsDurations of all chords and ornamentChords have been finally set.
 
@@ -73,7 +73,7 @@ namespace Moritz.AssistantComposer
         /// <param name="palette"></param>
         /// <param name="valueIndex"></param>
         /// <returns></returns>
-        private List<byte> GetMidiNotes(BasicChordSettings bcs, int valueIndex, byte chordDensity)
+        private List<byte> GetMidiNotes(BasicChordFormSettings bcs, int valueIndex, byte chordDensity)
         {
             List<byte> primeIntervals = new List<byte>();
             Debug.Assert(bcs.Inversions != null);
@@ -100,7 +100,7 @@ namespace Moritz.AssistantComposer
             return midiPitches;
         }
 
-        private List<byte> GetMidiVelocities(BasicChordSettings bcs, int valueIndex, int noteCount)
+        private List<byte> GetMidiVelocities(BasicChordFormSettings bcs, int valueIndex, int noteCount)
         {
             byte basicMidiVelocity = bcs.Velocities[valueIndex];
             float verticalVelocityFactor = 1F;
