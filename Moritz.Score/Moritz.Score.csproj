@@ -80,7 +80,6 @@
     <Compile Include="Notation\IUniqueChordDef.cs" />
     <Compile Include="Notation\RestDef.cs" />
     <Compile Include="Midi\MidiChordDef.cs" />
-    <Compile Include="Notation\IUniqueCloneDef.cs" />
     <Compile Include="Notation\ChordMetrics.cs" />
     <Compile Include="Notation\CLichtFontMetrics.cs" />
     <Compile Include="Notation\Edge.cs" />

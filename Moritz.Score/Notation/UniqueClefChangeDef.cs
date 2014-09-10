@@ -59,6 +59,18 @@ namespace Moritz.Score.Notation
 
         public void AdjustDuration(double factor) {}
 
+        /// <summary>
+        /// ACHTUNG: The clone points at the same _followingChordOrRestDef as the original.
+        /// This is not usually what is wanted. After cloning a VoiceDef, the cloned
+        /// UniqueClefChangeDefs should be replaced. See VoiceDef.Clone().
+        /// </summary>
+        /// <returns></returns>
+        public IUniqueDef DeepClone()
+        {
+            UniqueClefChangeDef deepClone = new UniqueClefChangeDef(this._clefType, this._followingChordOrRestDef);
+            return deepClone;
+        }
+
         public int MsDuration { get { return 0; } set { } }
         public int MsPosition
         {

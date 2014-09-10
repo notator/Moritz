@@ -101,19 +101,21 @@ namespace Moritz.AssistantComposer
             List<IUniqueDef> clonedLmdds = new List<IUniqueDef>();
             foreach(IUniqueDef iu in this._uniqueDefs)
             {
-                MidiChordDef mcd = iu as MidiChordDef;
-                RestDef rd = iu as RestDef;
-                IUniqueDef clone = null;
-                if(mcd != null)
-                {
-                    clone = mcd.DeepClone();
-                }
-                else if(rd != null)
-                {
-                    clone = rd.DeepClone();
-                }
-                clone.MsPosition = iu.MsPosition;
+                IUniqueDef clone = iu.DeepClone();
                 clonedLmdds.Add(clone);
+            }
+
+            // Clefchange symbols must point at the following object in their own VoiceDef
+            for(int i = 0; i < clonedLmdds.Count; ++i)
+            {
+                UniqueClefChangeDef clone = clonedLmdds[i] as UniqueClefChangeDef;
+                if(clone != null)
+                {
+                    Debug.Assert(i < (clonedLmdds.Count - 1));
+                    UniqueClefChangeDef replacement = new UniqueClefChangeDef(clone.ClefType, clonedLmdds[i + 1]);
+                    clonedLmdds.RemoveAt(i);
+                    clonedLmdds.Insert(i, replacement);
+                }
             }
 
             return new VoiceDef(clonedLmdds);
@@ -522,7 +524,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         internal void AdjustMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
         {
-            AdjustMsDurations<IUniqueCloneDef>(beginIndex, endIndex, factor, minThreshold);
+            AdjustMsDurations<IUniqueDef>(beginIndex, endIndex, factor, minThreshold);
         }
         /// <summary>
         /// Multiplies the MsDuration of each chord and rest in the UniqueMidiDurationDefs list by factor.
@@ -531,7 +533,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         internal void AdjustMsDurations(double factor, int minThreshold = 100)
         {
-            AdjustMsDurations<IUniqueCloneDef>(0, _uniqueDefs.Count, factor, minThreshold);
+            AdjustMsDurations<IUniqueDef>(0, _uniqueDefs.Count, factor, minThreshold);
         }
         /// <summary>
         /// Multiplies the MsDuration of each chord from beginIndex to (not including) endIndex by factor.
@@ -602,7 +604,7 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// An object is a NonDurationDef if it is not a IUniqueCloneDef.
+        /// An object is a NonDurationDef if it has MsDuration == 0.
         /// For example: a cautionary clef.
         /// IUniqueCloneDefs are InputChordDef, MidiChordDef and RestDef.
         /// </summary>
@@ -611,7 +613,7 @@ namespace Moritz.AssistantComposer
             int nNonDurationDefs = 0;
             for(int i = beginIndex; i < endIndex; ++i)
             {
-                if(!(_uniqueDefs[i] is IUniqueCloneDef))
+                if(_uniqueDefs[i].MsDuration == 0)
                     nNonDurationDefs++;
             }
             return nNonDurationDefs;

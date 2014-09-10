@@ -13,7 +13,7 @@ namespace Moritz.Score.Notation
     /// Each inputChord in an SVG file will be given an ID of the form "inputChord"+uniqueNumber, but
     /// Moritz does not actually use the ids, so they are not read into in UniqueInputChordDefs.
     ///</summary>
-    public class InputChordDef : DurationDef, IUniqueSplittableChordDef, IUniqueCloneDef
+    public class InputChordDef : DurationDef, IUniqueSplittableChordDef, IUniqueDef
     {
         public InputChordDef()
             :base(0)

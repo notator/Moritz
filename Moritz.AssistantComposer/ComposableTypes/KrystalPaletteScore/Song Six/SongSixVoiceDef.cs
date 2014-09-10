@@ -80,18 +80,16 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// Constructs a SongSixVoiceDef at MsPosition=0, containing the localized sequence of MidiDurationDefs in the PaletteDef.
+        /// Constructs a SongSixVoiceDef at MsPosition=0, containing the cloned sequence of MidiDurationDefs in the PaletteDef.
         /// </summary
-        public SongSixVoiceDef(List<DurationDef> midiDurationDefs)
+        public SongSixVoiceDef(Palette palette)
         {
-            Debug.Assert(midiDurationDefs != null);
-            foreach(IUniqueCloneDef midiDurationDef in midiDurationDefs)
+            for(int i = 0; i < palette.Count; ++i)
             {
-                IUniqueDef iumdd = midiDurationDef.DeepClone();
+                IUniqueDef iumdd = palette.UniqueDurationDef(i);
                 _uniqueDefs.Add(iumdd);
             }
             SetMsPositions();
-            //MsPosition = _uniqueMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rests
         }
 
         /// <summary>
@@ -100,12 +98,23 @@ namespace Moritz.AssistantComposer
         public SongSixVoiceDef Clone()
         {
             List<IUniqueDef> clonedLmdds = new List<IUniqueDef>();
-            foreach(IUniqueDef iumdd in this._uniqueDefs)
+            foreach(IUniqueDef iu in this._uniqueDefs)
             {
-                IUniqueCloneDef mdd = iumdd as IUniqueCloneDef;
-                IUniqueDef clonedLmdd = mdd.DeepClone();
-                clonedLmdd.MsPosition = iumdd.MsPosition;
-                clonedLmdds.Add(clonedLmdd);
+                IUniqueDef clone = iu.DeepClone();
+                clonedLmdds.Add(clone);
+            }
+
+            // Clefchange symbols must point at the following object in their own VoiceDef
+            for(int i = 0; i < clonedLmdds.Count; ++i)
+            {
+                UniqueClefChangeDef clone = clonedLmdds[i] as UniqueClefChangeDef;
+                if(clone != null)
+                {
+                    Debug.Assert(i < (clonedLmdds.Count - 1));
+                    UniqueClefChangeDef replacement = new UniqueClefChangeDef(clone.ClefType, clonedLmdds[i + 1]);
+                    clonedLmdds.RemoveAt(i);
+                    clonedLmdds.Insert(i, replacement);
+                }
             }
 
             return new SongSixVoiceDef(clonedLmdds);
@@ -505,7 +514,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         internal void AdjustMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
         {
-            AdjustMsDurations<IUniqueCloneDef>(beginIndex, endIndex, factor, minThreshold);
+            AdjustMsDurations<IUniqueDef>(beginIndex, endIndex, factor, minThreshold);
         }
         /// <summary>
         /// Multiplies the MsDuration of each chord and rest in the UniqueMidiDurationDefs list by factor.
@@ -514,7 +523,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         internal void AdjustMsDurations(double factor, int minThreshold = 100)
         {
-            AdjustMsDurations<IUniqueCloneDef>(0, _uniqueDefs.Count, factor, minThreshold);
+            AdjustMsDurations<IUniqueDef>(0, _uniqueDefs.Count, factor, minThreshold);
         }
         /// <summary>
         /// Multiplies the MsDuration of each chord from beginIndex to (not including) endIndex by factor.
@@ -585,16 +594,15 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// An object is a NonDurationDef if it is not a IUniqueCloneDef.
+        /// An object is a NonDurationDef if it has MsDuration == 0.
         /// For example: a cautionary clef.
-        /// IUniqueCloneDefs are InputChordDef, MidiChordDef and RestDef.
         /// </summary>
         private int GetNumberOfNonDurationDefs(int beginIndex, int endIndex)
         {
             int nNonDurationDefs = 0;
             for(int i = beginIndex; i < endIndex; ++i)
             {
-                if(!(_uniqueDefs[i] is IUniqueCloneDef))
+                if(_uniqueDefs[i].MsDuration == 0)
                     nNonDurationDefs++;
             }
             return nNonDurationDefs;

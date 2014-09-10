@@ -16,7 +16,7 @@ namespace Moritz.Score.Midi
     /// Each midiChord in an SVG file will be given an ID of the form "midiChord"+uniqueNumber, but
     /// Moritz does not actually use the ids, so they are not read into in MidiChordDefs.
     ///</summary>
-    public class MidiChordDef : DurationDef, IUniqueSplittableChordDef, IUniqueCloneDef
+    public class MidiChordDef : DurationDef, IUniqueSplittableChordDef, IUniqueDef
     {
         public MidiChordDef()
             : base(0)

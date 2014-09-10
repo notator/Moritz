@@ -43,6 +43,12 @@ namespace Moritz.Score.Notation
 
         public void AdjustDuration(double factor) { }
 
+        public IUniqueDef DeepClone()
+        {
+            UniqueCautionaryChordDef deepClone = new UniqueCautionaryChordDef(this, this._msPosition, this._msDuration);
+            return deepClone;
+        }
+
         // ????? public int MsDuration { get { return 0; } set { } }
         public int MsDuration { get { return _msDuration; } set { _msDuration = value; } }
         private int _msDuration = 0;

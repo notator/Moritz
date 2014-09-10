@@ -10,6 +10,11 @@ namespace Moritz.Score.Notation
     {
         string ToString();
 
+        /// <summary>
+        /// Returns a deep clone (a unique object)
+        /// </summary>
+        IUniqueDef DeepClone();
+
         void AdjustDuration(double factor);
 
         int MsDuration { get; set; }
