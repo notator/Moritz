@@ -4,25 +4,22 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Collections;
 
-using Moritz.Globals;
-using Moritz.Score.Notation;
-using Moritz.Score.Midi;
-
-
 using Krystals4ObjectLibrary;
+using Moritz.Globals;
+using Moritz.Score.Midi;
+using Moritz.Score.Notation;
 
 namespace Moritz.AssistantComposer
 {
     /// <summary>
     /// A temporal sequence of IUniqueDef objects.
-    /// <para>The objects can define either notes or rests.</para>
-    /// <para>(IUniqueDef is either a MidiChordDef or a UniqueMidiRestDef.)</para>
+    /// <para>(IUniqueDef is implemented by all Unique...Defs that will eventually be converted to NoteObjects.)</para>
     /// <para></para>
     /// <para>This class is IEnumerable, so that foreach loops can be used.</para>
     /// <para>For example:</para>
-    /// <para>foreach(IUniqueDef iumdd in SongSixVoiceDef) { ... }</para>
+    /// <para>foreach(MidiChordDef iumdd in voiceDef) { ... }</para>
     /// <para>It is also indexable, as in:</para>
-    /// <para>IUniqueDef iumdd = SongSixVoiceDef[index];</para>
+    /// <para>IUniqueDef iu = this[index];</para>
     /// </summary>
     public class SongSixVoiceDef : IEnumerable
     {
@@ -33,8 +30,8 @@ namespace Moritz.AssistantComposer
         /// <param name="msDuration"></param>
         public SongSixVoiceDef(int msDuration)
         {
-            IUniqueDef lmRestDef = new RestDef(0, msDuration);
-            _uniqueDefs.Add(lmRestDef);
+            RestDef lmRestDef = new RestDef(0, msDuration);
+            _uniqueDefs.Add(lmRestDef as IUniqueDef);
         }
 
         /// <summary>
@@ -64,23 +61,22 @@ namespace Moritz.AssistantComposer
             {
                 Debug.Assert((value >= 1 && value <= palette.Count), "Illegal argument: value out of range in sequence");
                 IUniqueDef iumdd = palette.UniqueDurationDef(value - 1);
-                Debug.Assert(iumdd.MsDuration > 0);
                 iumdd.MsPosition = msPosition;
                 msPosition += iumdd.MsDuration;
                 _uniqueDefs.Add(iumdd);
             }
         }
- 
+
         /// <summary>
         /// Creates a SongSixVoiceDef using the flat sequence of values in the krystal.
         /// </summary>
-        public SongSixVoiceDef (Palette palette, Krystal krystal)
+        public SongSixVoiceDef(Palette palette, Krystal krystal)
             : this(palette, krystal.GetValues((uint)1)[0])
         {
         }
 
         /// <summary>
-        /// Constructs a SongSixVoiceDef at MsPosition=0, containing the cloned sequence of MidiDurationDefs in the PaletteDef.
+        /// Constructs a SongSixVoiceDef at MsPosition=0, containing the localized sequence of DurationDefs in the PaletteDef.
         /// </summary
         public SongSixVoiceDef(Palette palette)
         {
@@ -90,6 +86,7 @@ namespace Moritz.AssistantComposer
                 _uniqueDefs.Add(iumdd);
             }
             SetMsPositions();
+            //MsPosition = _uniqueMidiDurationDefs[0].MsPosition; // sets the absolute position of all notes and rests
         }
 
         /// <summary>
@@ -104,7 +101,7 @@ namespace Moritz.AssistantComposer
                 clonedLmdds.Add(clone);
             }
 
-            // Clefchange symbols must point at the following object in their own VoiceDef
+            // Clefchange symbols must point at the following object in their own SongSixVoiceDef
             for(int i = 0; i < clonedLmdds.Count; ++i)
             {
                 UniqueClefChangeDef clone = clonedLmdds[i] as UniqueClefChangeDef;
@@ -124,7 +121,7 @@ namespace Moritz.AssistantComposer
         #region public indexer & enumerator
         /// <summary>
         /// Indexer. Allows individual lmdds to be accessed using array notation on the SongSixVoiceDef.
-        /// e.g. iumdd = SongSixVoiceDef[3].
+        /// e.g. iumdd = voiceDef[3].
         /// </summary>
         public IUniqueDef this[int i]
         {
@@ -201,51 +198,50 @@ namespace Moritz.AssistantComposer
         #region internal Count changers
         #region list functions
         /// <summary>
-        /// Appends the new iUniqueMidiDurationDef to the end of the list.
+        /// Appends the new iUnique to the end of the list.
         /// </summary>
-        /// <param name="iUniqueMidiDurationDef"></param>
-        internal void Add(IUniqueDef iUniqueMidiDurationDef)
+        /// <param name="iUnique"></param>
+        internal void Add(IUniqueDef iUnique)
         {
             Debug.Assert(_uniqueDefs.Count > 0);
             IUniqueDef lastLmdd = _uniqueDefs[_uniqueDefs.Count - 1];
-            iUniqueMidiDurationDef.MsPosition = lastLmdd.MsPosition + lastLmdd.MsDuration;
-            _uniqueDefs.Add(iUniqueMidiDurationDef);
+            iUnique.MsPosition = lastLmdd.MsPosition + lastLmdd.MsDuration;
+            _uniqueDefs.Add(iUnique);
         }
         /// <summary>
         /// Adds the argument to the end of this SongSixVoiceDef.
         /// Sets the MsPositions of the appended UniqueMidiDurationDefs.
         /// </summary>
-        internal void AddRange(SongSixVoiceDef SongSixVoiceDef)
+        internal void AddRange(SongSixVoiceDef voiceDef)
         {
-            _uniqueDefs.AddRange(SongSixVoiceDef.UniqueDefs);
+            _uniqueDefs.AddRange(voiceDef.UniqueMidiDurationDefs);
             SetMsPositions();
         }
         /// <summary>
         /// Inserts the iUniqueMidiDurationDef in the list at the given index, and then
         /// resets the positions of all the lmdds in the list.
         /// </summary>
-        /// <param name="iUniqueMidiDurationDef"></param>
-        internal void Insert(int index, IUniqueDef iUniqueMidiDurationDef)
+        internal void Insert(int index, IUniqueDef iUnique)
         {
-            _uniqueDefs.Insert(index, iUniqueMidiDurationDef);
+            _uniqueDefs.Insert(index, iUnique);
             SetMsPositions();
         }
         /// <summary>
-        /// Inserts the SongSixVoiceDef in the list at the given index, and then
+        /// Inserts the voiceDef in the list at the given index, and then
         /// resets the positions of all the lmdds in the list.
         /// </summary>
-        internal void InsertRange(int index, SongSixVoiceDef SongSixVoiceDef)
+        internal void InsertRange(int index, SongSixVoiceDef voiceDef)
         {
-            _uniqueDefs.InsertRange(index, SongSixVoiceDef.UniqueDefs);
+            _uniqueDefs.InsertRange(index, voiceDef.UniqueMidiDurationDefs);
             SetMsPositions();
         }
         /// <summary>
-        /// Creates a new SongSixVoiceDef containing just the argument chord,
-        /// then calls the other InsertInRest() function with the SongSixVoiceDef as argument. 
+        /// Creates a new SongSixVoiceDef containing just the argument midi chord or input chord,
+        /// then calls the other InsertInRest() function with the voiceDef as argument. 
         /// </summary>
         internal void InsertInRest(IUniqueDef chord)
         {
-            Debug.Assert(chord is MidiChordDef);
+            Debug.Assert(chord is MidiChordDef || chord is InputChordDef);
             List<IUniqueDef> iLmdds = new List<IUniqueDef>() { chord };
             SongSixVoiceDef iVoiceDef = new SongSixVoiceDef(iLmdds);
             InsertInRest(iVoiceDef);
@@ -338,21 +334,21 @@ namespace Moritz.AssistantComposer
         private List<IUniqueDef> GetReplacementList(IUniqueDef originalRest, SongSixVoiceDef iVoiceDef)
         {
             Debug.Assert(originalRest is RestDef);
-            Debug.Assert(iVoiceDef[0] is MidiChordDef);
-            Debug.Assert(iVoiceDef[iVoiceDef.Count - 1] is MidiChordDef);
+            Debug.Assert(iVoiceDef[0] is MidiChordDef || iVoiceDef[0] is InputChordDef);
+            Debug.Assert(iVoiceDef[iVoiceDef.Count - 1] is MidiChordDef || iVoiceDef[iVoiceDef.Count - 1] is InputChordDef);
 
             List<IUniqueDef> rList = new List<IUniqueDef>();
             if(iVoiceDef[0].MsPosition > originalRest.MsPosition)
             {
-                IUniqueDef rest1 = new RestDef(originalRest.MsPosition, iVoiceDef[0].MsPosition - originalRest.MsPosition);
+                RestDef rest1 = new RestDef(originalRest.MsPosition, iVoiceDef[0].MsPosition - originalRest.MsPosition);
                 rList.Add(rest1);
             }
-            rList.AddRange(iVoiceDef.UniqueDefs);
+            rList.AddRange(iVoiceDef.UniqueMidiDurationDefs);
             int iLmddsEndMsPos = iVoiceDef[iVoiceDef.Count - 1].MsPosition + iVoiceDef[iVoiceDef.Count - 1].MsDuration;
             int originalRestEndMsPos = originalRest.MsPosition + originalRest.MsDuration;
             if(originalRestEndMsPos > iLmddsEndMsPos)
             {
-                IUniqueDef rest2 = new RestDef(iLmddsEndMsPos, originalRestEndMsPos - iLmddsEndMsPos);
+                RestDef rest2 = new RestDef(iLmddsEndMsPos, originalRestEndMsPos - iLmddsEndMsPos);
                 rList.Add(rest2);
             }
 
@@ -360,14 +356,14 @@ namespace Moritz.AssistantComposer
         }
         #endregion InsertInRest() implementation
         /// <summary>
-        /// removes the iUniqueMidiDurationDef from the list, and then resets the positions of all the lmdds in the list.
+        /// removes the iUnique from the list, and then resets the positions of all the iUniques in the list.
         /// </summary>
-        /// <param name="iUniqueMidiDurationDef"></param>
-        internal void Remove(IUniqueDef iUniqueMidiDurationDef)
+        /// <param name="iUnique"></param>
+        internal void Remove(IUniqueDef iUnique)
         {
             Debug.Assert(_uniqueDefs.Count > 0);
-            Debug.Assert(_uniqueDefs.Contains(iUniqueMidiDurationDef));
-            _uniqueDefs.Remove(iUniqueMidiDurationDef);
+            Debug.Assert(_uniqueDefs.Contains(iUnique));
+            _uniqueDefs.Remove(iUnique);
             SetMsPositions();
         }
         /// <summary>
@@ -389,7 +385,7 @@ namespace Moritz.AssistantComposer
             SetMsPositions();
         }
         /// <summary>
-        /// Remove the IUniqueMidiDurationDefs which start between startMsPos and (not including) endMsPos 
+        /// Remove the IUniques which start between startMsPos and (not including) endMsPos 
         /// </summary>
         /// <param name="p1"></param>
         /// <param name="p2"></param>
@@ -406,11 +402,11 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// Removes the iUniqueMidiDurationDef at index from the list, and then inserts the replacement at the same index.
         /// </summary>
-        internal void Replace(int index, IUniqueDef replacementIumdd)
+        internal void Replace(int index, IUniqueDef replacementIUnique)
         {
             Debug.Assert(index >= 0 && index < _uniqueDefs.Count);
             _uniqueDefs.RemoveAt(index);
-            _uniqueDefs.Insert(index, replacementIumdd);
+            _uniqueDefs.Insert(index, replacementIUnique);
             SetMsPositions();
         }
 
@@ -451,8 +447,8 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// Returns the index of the IUniqueDef which starts at or is otherwise current at msPosition.
-        /// If msPosition is the EndMsPosition, the index of the final IUniqueDef (Count-1) is returned.
+        /// Returns the index of the IUniqueMidiDurationDef which starts at or is otherwise current at msPosition.
+        /// If msPosition is the EndMsPosition, the index of the final IUniqueMidiDurationDef (Count-1) is returned.
         /// If the SongSixVoiceDef does not span msPosition, -1 (=error) is returned.
         /// </summary>
         /// <param name="p"></param>
@@ -466,7 +462,7 @@ namespace Moritz.AssistantComposer
             }
             else if(msPosition >= _uniqueDefs[0].MsPosition && msPosition < EndMsPosition)
             {
-                returnedIndex = _uniqueDefs.FindIndex(u => ((u.MsPosition <= msPosition) && ((u.MsPosition + u.MsDuration) > msPosition)));  
+                returnedIndex = _uniqueDefs.FindIndex(u => ((u.MsPosition <= msPosition) && ((u.MsPosition + u.MsDuration) > msPosition)));
             }
             Debug.Assert(returnedIndex != -1);
             return returnedIndex;
@@ -487,16 +483,26 @@ namespace Moritz.AssistantComposer
             List<int> relativeDurations = new List<int>();
             foreach(IUniqueDef iumdd in _uniqueDefs)
             {
-                relativeDurations.Add(iumdd.MsDuration);
+                if(iumdd.MsDuration > 0)
+                    relativeDurations.Add(iumdd.MsDuration);
             }
 
             List<int> newDurations = MidiChordDef.GetIntDurations(msDuration, relativeDurations, relativeDurations.Count);
 
+            Debug.Assert(newDurations.Count == relativeDurations.Count);
             int i = 0;
+            int newTotal = 0;
             foreach(IUniqueDef iumdd in _uniqueDefs)
             {
-                iumdd.MsDuration = newDurations[i++];
+                if(iumdd.MsDuration > 0)
+                {
+                    iumdd.MsDuration = newDurations[i];
+                    newTotal += iumdd.MsDuration;
+                    ++i;
+                }
             }
+
+            Debug.Assert(msDuration == newTotal);
 
             SetMsPositions();
         }
@@ -561,7 +567,7 @@ namespace Moritz.AssistantComposer
         {
             AdjustMsDurations<RestDef>(0, _uniqueDefs.Count, factor, minThreshold);
         }
-        
+
         /// <summary>
         /// Multiplies the MsDuration of each T from beginIndex to (not including) endIndex by factor.
         /// If a MsDuration becomes less than minThreshold, the T (chord or rest) is removed.
@@ -596,6 +602,7 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// An object is a NonDurationDef if it has MsDuration == 0.
         /// For example: a cautionary clef.
+        /// IUniqueCloneDefs are InputChordDef, MidiChordDef and RestDef.
         /// </summary>
         private int GetNumberOfNonDurationDefs(int beginIndex, int endIndex)
         {
@@ -672,10 +679,10 @@ namespace Moritz.AssistantComposer
         /// Setting this value resets all the MsPositions in this SongSixVoiceDef,
         /// including the EndMsPosition.
         /// </summary>
-        internal int StartMsPosition 
-        { 
-            get 
-            { 
+        internal int StartMsPosition
+        {
+            get
+            {
                 Debug.Assert(_uniqueDefs.Count > 0);
                 return _uniqueDefs[0].MsPosition;
             }
@@ -684,16 +691,16 @@ namespace Moritz.AssistantComposer
                 Debug.Assert(_uniqueDefs.Count > 0);
                 _uniqueDefs[0].MsPosition = value;
                 SetMsPositions();
-            } 
+            }
         }
         /// <summary>
         /// The absolute position of the end of the last note or rest in the sequence.
-        /// Setting this value changes the msDuration of the final IUniqueDef.
-        /// (The EndMsPosition cannot be set if this SongSixVoiceDef is empty, or before the last IUniqueDef.) 
+        /// Setting this value changes the msDuration of the final IUniqueMidiDurationDef.
+        /// (The EndMsPosition cannot be set if this SongSixVoiceDef is empty, or before the last IUniqueMidiDurationDef.) 
         /// </summary>
-        internal int EndMsPosition 
-        { 
-            get 
+        internal int EndMsPosition
+        {
+            get
             {
                 int endPosition = 0;
                 if(_uniqueDefs.Count > 0)
@@ -738,13 +745,9 @@ namespace Moritz.AssistantComposer
         /// </summary>
         internal void AdjustExpression(double factor)
         {
-            foreach(IUniqueDef iu in _uniqueDefs)
+            foreach(MidiChordDef iumdd in _uniqueDefs)
             {
-                MidiChordDef iumdd = iu as MidiChordDef;
-                if(iumdd != null)
-                {
-                    iumdd.AdjustExpression(factor);
-                }
+                iumdd.AdjustExpression(factor);
             }
         }
         /// <summary>
@@ -768,15 +771,30 @@ namespace Moritz.AssistantComposer
         /// </summary>
         internal void AdjustVelocities(double factor)
         {
-            foreach(IUniqueDef iu in _uniqueDefs)
+            foreach(MidiChordDef iumdd in _uniqueDefs)
             {
-                MidiChordDef iumdd = iu as MidiChordDef;
-                if(iumdd != null)
-                {
-                    iumdd.AdjustVelocities(factor);
-                }
+                iumdd.AdjustVelocities(factor);
             }
         }
+
+        /// <summary>
+        /// An object is a NonMidiChordDef if it is not a MidiChordDef.
+        /// For example: a rest or cautionary clef.
+        /// </summary>
+        /// <param name="beginIndex"></param>
+        /// <param name="endIndex"></param>
+        /// <returns></returns>
+        private int GetNumberOfNonMidiChordDefs(int beginIndex, int endIndex)
+        {
+            int nNonMidiChordDefs = 0;
+            for(int i = beginIndex; i < endIndex; ++i)
+            {
+                if(!(_uniqueDefs[i] is MidiChordDef))
+                    nNonMidiChordDefs++;
+            }
+            return nNonMidiChordDefs;
+        }
+
         /// <summary>
         /// ACHTUNG: This function is deprecated!! Use the other AdjustVelocitiesHairpin(...).
         /// First creates a hairpin in the velocities from beginIndex to endIndex (non-inclusive),
@@ -794,7 +812,9 @@ namespace Moritz.AssistantComposer
         {
             Debug.Assert(((beginIndex + 1) < endIndex) && (finalFactor >= 0) && (endIndex <= Count));
 
-            double factorIncrement = (finalFactor - 1.0) / (endIndex - beginIndex);
+            int nNonMidiChordDefs = GetNumberOfNonMidiChordDefs(beginIndex, endIndex);
+
+            double factorIncrement = (finalFactor - 1.0) / (endIndex - beginIndex - nNonMidiChordDefs);
             double factor = 1.0;
 
             for(int i = beginIndex; i < endIndex; ++i)
@@ -822,7 +842,7 @@ namespace Moritz.AssistantComposer
         /// There must be at least two IUniqueMidiDurationDefs in the msPosition range given in the arguments.
         /// The factors by which the velocities are multiplied change arithmetically:
         /// The velocity of the first IUniqueMidiDurationDefs is multiplied by startFactor, and the velocity
-        /// of the last IUniqueDef in range by endFactor.
+        /// of the last MidiChordDef in range by endFactor.
         /// Can be used to create a diminueno or crescendo.
         internal void AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
         {
@@ -835,6 +855,7 @@ namespace Moritz.AssistantComposer
 
             double factorIncrement = (endFactor - startFactor) / (endIndex - beginIndex - nNonMidiChordDefs);
             double factor = startFactor;
+            List<IUniqueDef> lmdds = _uniqueDefs;
 
             for(int i = beginIndex; i < endIndex; ++i)
             {
@@ -849,7 +870,7 @@ namespace Moritz.AssistantComposer
 
         /// <summary>
         /// Creates a moving pan from startPanValue at startMsPosition to endPanValue at endMsPosition.
-        /// Implemented using one pan value per IUniqueDef.
+        /// Implemented using one pan value per MidiChordDef.
         /// This function does NOT change pan values outside the position range given in its arguments.
         /// </summary>
         internal void SetPanGliss(int startMsPosition, int endMsPosition, int startPanValue, int endPanValue)
@@ -858,10 +879,13 @@ namespace Moritz.AssistantComposer
             int endIndex = FindIndexAtMsPosition(endMsPosition);
 
             Debug.Assert(((beginIndex + 1) < endIndex) && (startPanValue >= 0) && (startPanValue <= 127)
-                && (endPanValue >= 0) && (endPanValue <=127) && (endIndex <= Count));
+                && (endPanValue >= 0) && (endPanValue <= 127) && (endIndex <= Count));
 
-            double increment = ((double)(endPanValue - startPanValue)) / (endIndex - beginIndex);
+            int nNonMidiChordDefs = GetNumberOfNonMidiChordDefs(beginIndex, endIndex);
+
+            double increment = ((double)(endPanValue - startPanValue)) / (endIndex - beginIndex - nNonMidiChordDefs);
             int panValue = startPanValue;
+            List<IUniqueDef> lmdds = _uniqueDefs;
 
             for(int i = beginIndex; i < endIndex; ++i)
             {
@@ -900,19 +924,15 @@ namespace Moritz.AssistantComposer
         /// <param name="interval"></param>
         internal void Transpose(int interval)
         {
-            foreach(IUniqueDef iu in _uniqueDefs)
+            foreach(MidiChordDef iumdd in _uniqueDefs)
             {
-                MidiChordDef iumdd = iu as MidiChordDef;
-                if(iumdd != null)
-                {
-                    iumdd.Transpose(interval);
-                }
+                iumdd.Transpose(interval);
             }
         }
 
         /// <summary>
-        /// Transposes the UniqueMidiDurationDefs from the beginIndex upto (but not including) endIndex
-        /// by an equally increasing amount, so that the final IUniqueDef is transposed by glissInterval.
+        /// Transposes the UniqueDefs from the beginIndex upto (but not including) endIndex
+        /// by an equally increasing amount, so that the final MidiChordDef is transposed by glissInterval.
         /// beginIndex must be less than endIndex.
         /// glissInterval can be negative.
         /// </summary>
@@ -921,12 +941,14 @@ namespace Moritz.AssistantComposer
             CheckIndices(beginIndex, endIndex);
             Debug.Assert(beginIndex < endIndex);
 
-            int nSteps = (endIndex - beginIndex);
+            int nNonMidiChordDefs = GetNumberOfNonMidiChordDefs(beginIndex, endIndex);
+
+            int nSteps = (endIndex - beginIndex - nNonMidiChordDefs);
             double interval = ((double)glissInterval) / nSteps;
             double step = interval;
-            for(int index = beginIndex; index < endIndex; ++index)
+            for(int i = beginIndex; i < endIndex; ++i)
             {
-                MidiChordDef iumdd = _uniqueDefs[index] as MidiChordDef;
+                MidiChordDef iumdd = _uniqueDefs[i] as MidiChordDef;
                 if(iumdd != null)
                 {
                     iumdd.Transpose((int)Math.Round(interval));
@@ -964,11 +986,14 @@ namespace Moritz.AssistantComposer
 
             for(int i = beginIndex; i < endIndex; ++i)
             {
-                IUniqueDef iumdd = this[i];
-                MidiChordDef umcd = iumdd as MidiChordDef;
-                if(umcd != null)
+                MidiChordDef iumdd = this[i] as MidiChordDef;
+                if(iumdd != null)
                 {
-                    umcd.MidiChordSliderDefs.PitchWheelMsbs = new List<byte>();
+                    MidiChordDef umcd = iumdd as MidiChordDef;
+                    if(umcd != null)
+                    {
+                        umcd.MidiChordSliderDefs.PitchWheelMsbs = new List<byte>();
+                    }
                 }
             }
         }
@@ -1004,10 +1029,10 @@ namespace Moritz.AssistantComposer
                 anchor2MsPosition = lmdds[anchor2Index].MsPosition;
             }
 
-            float leftFactor = (float)(((float)(toMsPosition - anchor1MsPosition))/((float)(fromMsPosition - anchor1MsPosition)));
+            float leftFactor = (float)(((float)(toMsPosition - anchor1MsPosition)) / ((float)(fromMsPosition - anchor1MsPosition)));
             for(int i = anchor1Index + 1; i < indexToAlign; ++i)
             {
-                lmdds[i].MsPosition = anchor1MsPosition + ((int)((lmdds[i].MsPosition - anchor1MsPosition) * leftFactor));           
+                lmdds[i].MsPosition = anchor1MsPosition + ((int)((lmdds[i].MsPosition - anchor1MsPosition) * leftFactor));
             }
 
             lmdds[indexToAlign].MsPosition = toMsPosition;
@@ -1040,7 +1065,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         private void CheckAlignDefArgs(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPosition)
         {
-            List<IUniqueDef> lmdds = _uniqueDefs; 
+            List<IUniqueDef> lmdds = _uniqueDefs;
             int count = lmdds.Count;
             string msg = "\nError in SongSixVoiceDef.cs,\nfunction AlignDefMsPosition()\n\n";
             if(anchor1Index >= indexToAlign || anchor2Index <= indexToAlign)
@@ -1049,7 +1074,7 @@ namespace Moritz.AssistantComposer
                     "\nanchor1Index=" + anchor1Index.ToString() +
                     "\nindexToAlign=" + indexToAlign.ToString() +
                     "\nanchor2Index=" + anchor2Index.ToString());
-            }            
+            }
             if((anchor1Index > (count - 2) || indexToAlign > (count - 1) || anchor2Index > count)// anchor2Index can be at the final barline (=count)!
                 || (anchor1Index < 0 || indexToAlign < 1 || anchor2Index < 2))
             {
@@ -1076,7 +1101,7 @@ namespace Moritz.AssistantComposer
                     "\nanchor1Index=" + anchor1Index.ToString() +
                     "\nindexToAlign=" + indexToAlign.ToString() +
                     "\nanchor2Index=" + anchor2Index.ToString() +
-                    "\ntoMsPosition=" + toMsPosition.ToString());  
+                    "\ntoMsPosition=" + toMsPosition.ToString());
             }
         }
         #endregion alignment
@@ -1101,7 +1126,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         /// <param name="startAtIndex">The index in UniqueMidiDurationDefs at which to start the re-ordering.
         /// </param>
-        /// <param name="partitionSizes">The number of UniqueMidiDurationDefs in each sub-SongSixVoiceDef to be re-ordered.
+        /// <param name="partitionSizes">The number of UniqueMidiDurationDefs in each sub-voiceDef to be re-ordered.
         /// <para>This partitionSizes list must contain:</para>
         /// <para>    1..7 int sizes.</para>
         /// <para>    sizes which are all greater than 0.</para>
@@ -1137,7 +1162,7 @@ namespace Moritz.AssistantComposer
             for(int i = 0; i < sortedLmdds.Count; ++i)
             {
                 _uniqueDefs[startAtIndex + i] = sortedLmdds[i];
-            }            
+            }
         }
 
         private List<IUniqueDef> ConvertPartitionsToFlatLmdds(int startAtIndex, List<List<IUniqueDef>> partitions)
@@ -1241,17 +1266,13 @@ namespace Moritz.AssistantComposer
             foreach(List<IUniqueDef> partition in partitions)
             {
                 byte lowestPitch = byte.MaxValue;
-                foreach(IUniqueDef iumdd in partition)
+                foreach(MidiChordDef iumdd in partition)
                 {
-                    MidiChordDef umcd = iumdd as MidiChordDef;
-                    if(umcd != null) // partitions can contain rests, which are however ignored here
+                    foreach(BasicMidiChordDef bmcd in iumdd.BasicMidiChordDefs)
                     {
-                        foreach(BasicMidiChordDef bmcd in umcd.BasicMidiChordDefs)
+                        foreach(byte note in bmcd.Pitches)
                         {
-                            foreach(byte note in bmcd.Pitches)
-                            {
-                                lowestPitch = (lowestPitch < note) ? lowestPitch : note;
-                            }
+                            lowestPitch = (lowestPitch < note) ? lowestPitch : note;
                         }
                     }
                 }
@@ -1275,7 +1296,7 @@ namespace Moritz.AssistantComposer
             {
                 // K.Contour() always returns an array containing 7 values.
                 // For densities less than 7, the final values are 0.
-                if(number == 0) 
+                if(number == 0)
                     break;
                 contouredPartitions.Add(partitions[number - 1]);
             }
@@ -1309,12 +1330,12 @@ namespace Moritz.AssistantComposer
             {
                 if(size < 1)
                 {
-                    throw new ArgumentException("partitions must contain at least one IUniqueDef");
+                    throw new ArgumentException("partitions must contain at least one IUniqueMidiDurationDef");
                 }
                 totalNumberOfLmdds += size;
                 if(totalNumberOfLmdds > lmdds.Count)
                 {
-                    throw new ArgumentException("partitions are too big or start too late"); 
+                    throw new ArgumentException("partitions are too big or start too late");
                 }
             }
 
@@ -1335,7 +1356,7 @@ namespace Moritz.AssistantComposer
         /// Rests dont have lyrics, so their index in the SongSixVoiceDef can't be shown as a lyric.
         /// Overridden by Clytemnestra, where the index is inserted before her lyrics.
         /// </summary>
-        /// <param name="SongSixVoiceDef"></param>
+        /// <param name="voiceDef"></param>
         internal virtual void SetLyricsToIndex()
         {
             for(int index = 0; index < _uniqueDefs.Count; ++index)
@@ -1349,26 +1370,11 @@ namespace Moritz.AssistantComposer
         }
         #endregion internal SetLyricsToIndex()
 
-        internal List<IUniqueDef> UniqueDefs { get { return _uniqueDefs; } }
+        internal List<IUniqueDef> UniqueMidiDurationDefs { get { return _uniqueDefs; } }
         #endregion internal
 
         /// <summary>
-        /// An object is a NonMidiChordDef if it is not a MidiChordDef.
-        /// For example: a rest or cautionary clef.
-        /// </summary>
-        private int GetNumberOfNonMidiChordDefs(int beginIndex, int endIndex)
-        {
-            int nNonMidiChordDefs = 0;
-            for(int i = beginIndex; i < endIndex; ++i)
-            {
-                if(!(_uniqueDefs[i] is MidiChordDef))
-                    nNonMidiChordDefs++;
-            }
-            return nNonMidiChordDefs;
-        }
-
-        /// <summary>
-        /// Creates an exponential change (per index) of pitchWheelDeviation from startMsPosition to endMsPosition,
+        /// Creates an exponential change (per index) of pitchwheelDeviation from startMsPosition to endMsPosition,
         /// </summary>
         /// <param name="finale"></param>
         protected void AdjustPitchWheelDeviations(int startMsPosition, int endMsPosition, int startPwd, int endPwd)
@@ -1379,14 +1385,14 @@ namespace Moritz.AssistantComposer
 
             int nNonMidiChordDefs = GetNumberOfNonMidiChordDefs(beginIndex, endIndex);
 
-            double pwdfactor = Math.Pow(furies1EndPwdValue / furies1StartPwdValue, (double)1 / endIndex - beginIndex - nNonMidiChordDefs); // f13.Count'th root of furies1EndPwdValue/furies1StartPwdValue -- the last pwd should be furies1EndPwdValue
+            double pwdfactor = Math.Pow(furies1EndPwdValue / furies1StartPwdValue, (double)1 / (endIndex - beginIndex - nNonMidiChordDefs)); // f13.Count'th root of furies1EndPwdValue/furies1StartPwdValue -- the last pwd should be furies1EndPwdValue
 
             for(int i = beginIndex; i < endIndex; ++i)
             {
-                MidiChordDef umcd = this[i] as MidiChordDef;
-                if(umcd != null)
+                MidiChordDef umc = _uniqueDefs[i] as MidiChordDef;
+                if(umc != null)
                 {
-                    umcd.PitchWheelDeviation = M.MidiValue((int)(furies1StartPwdValue * (Math.Pow(pwdfactor, i))));
+                    umc.PitchWheelDeviation = M.MidiValue((int)(furies1StartPwdValue * (Math.Pow(pwdfactor, i))));
                 }
             }
         }
@@ -1395,9 +1401,9 @@ namespace Moritz.AssistantComposer
 
         #region private
         /// <summary>
-        /// Sets the MsPosition attribute of each IUniqueDef in the _uniqueMidiDurationDefs list.
+        /// Sets the MsPosition attribute of each IUniqueDef in the _uniques list.
         /// Uses all the MsDuration attributes, and the MsPosition of the first IUniqueDef as origin.
-        /// This function must be called at the end of any function that changes the _uniqueMidiDurationDefs list.
+        /// This function must be called at the end of any function that changes the _uniques list.
         /// </summary>
         private void SetMsPositions()
         {
@@ -1405,10 +1411,10 @@ namespace Moritz.AssistantComposer
             {
                 int currentPosition = _uniqueDefs[0].MsPosition;
                 Debug.Assert(currentPosition >= 0);
-                foreach(IUniqueDef iumdd in _uniqueDefs)
+                foreach(IUniqueDef umcd in _uniqueDefs)
                 {
-                    iumdd.MsPosition = currentPosition;
-                    currentPosition += iumdd.MsDuration;
+                    umcd.MsPosition = currentPosition;
+                    currentPosition += umcd.MsDuration;
                 }
             }
         }
@@ -1423,8 +1429,8 @@ namespace Moritz.AssistantComposer
 
         /// <summary>
         /// For an example of using this function, see SongSixAlgorithm.cs
-        /// Note that clef changes must be inserted backwards per SongSixVoiceDef, so that IUniqueDef
-        /// indices are correct. Inserting a clef change changes the subsequent indices.
+        /// Note that clef changes must be inserted backwards per voiceDef, so that IUniqueDef indices are correct. 
+        /// Inserting a clef change changes the subsequent indices.
         /// Note also that if a ClefChange is defined here on a UniqueMidiRestDef which has no MidiChordDef
         /// to its right on the staff, the resulting ClefSymbol will be placed immediately before the final barline
         /// on the staff.
@@ -1437,7 +1443,7 @@ namespace Moritz.AssistantComposer
         internal void InsertClefChange(int index, string clefType)
         {
             #region check args
-            Debug.Assert(index < _uniqueDefs.Count); 
+            Debug.Assert(index < _uniqueDefs.Count);
             if(String.Equals(clefType, "t") == false
             && String.Equals(clefType, "t1") == false
             && String.Equals(clefType, "t2") == false
@@ -1464,16 +1470,12 @@ namespace Moritz.AssistantComposer
         /// <param name="p"></param>
         internal void TransposeNotation(int semitonesToTranspose)
         {
-            foreach(IUniqueDef iumdd in _uniqueDefs)
+            foreach(MidiChordDef iumdd in _uniqueDefs)
             {
-                MidiChordDef umcd = iumdd as MidiChordDef;
-                if(umcd != null)
+                List<byte> midiPitches = iumdd.MidiPitches;
+                for(int i = 0; i < midiPitches.Count; ++i)
                 {
-                    List<byte> midiHeadSymbols = umcd.MidiPitches;
-                    for(int i = 0; i < midiHeadSymbols.Count; ++i)
-                    {
-                        midiHeadSymbols[i] = M.MidiValue(midiHeadSymbols[i] + semitonesToTranspose);
-                    }
+                    midiPitches[i] = M.MidiValue(midiPitches[i] + semitonesToTranspose);
                 }
             }
         }

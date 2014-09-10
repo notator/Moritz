@@ -6,11 +6,8 @@ using System.Collections;
 
 using Krystals4ObjectLibrary;
 using Moritz.Globals;
-using Moritz.Krystals;
-using Moritz.Score;
 using Moritz.Score.Midi;
 using Moritz.Score.Notation;
-using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {
@@ -57,14 +54,13 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// sequence contains a list of values in range 1..templateDefs.MidiDurationDefsCount.
         /// </summary>
-        protected VoiceDef(List<DurationDef> templateDefs, List<int> sequence)
+        protected VoiceDef(Palette palette, List<int> sequence)
         {
             int msPosition = 0;
             foreach(int value in sequence)
             {
-                Debug.Assert((value >= 1 && value <= templateDefs.Count), "Illegal argument: value out of range in sequence");
-                IUniqueDef iumdd = templateDefs[value - 1].DeepClone();
-                Debug.Assert(iumdd.MsDuration > 0);
+                Debug.Assert((value >= 1 && value <= palette.Count), "Illegal argument: value out of range in sequence");
+                IUniqueDef iumdd = palette.UniqueDurationDef(value - 1);
                 iumdd.MsPosition = msPosition;
                 msPosition += iumdd.MsDuration;
                 _uniqueDefs.Add(iumdd);
@@ -72,10 +68,10 @@ namespace Moritz.AssistantComposer
         }
  
         /// <summary>
-        /// Creates a VoiceDef using the flat sequence of values in the krystal.
+        /// Creates a VoiceDef using the sequence of values in the krystal.
         /// </summary>
-        public VoiceDef (List<DurationDef> templateDefs, Krystal krystal)
-            : this(templateDefs,krystal.GetValues((uint)1)[0])
+        public VoiceDef (Palette palette, Krystal krystal)
+            : this(palette, krystal.GetValues((uint)1)[0])
         {
         }
 
@@ -218,7 +214,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         internal void AddRange(VoiceDef voiceDef)
         {
-            _uniqueDefs.AddRange(voiceDef.UniqueMidiDurationDefs);
+            _uniqueDefs.AddRange(voiceDef.UniqueDefs);
             SetMsPositions();
         }
         /// <summary>
@@ -236,7 +232,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         internal void InsertRange(int index, VoiceDef voiceDef)
         {
-            _uniqueDefs.InsertRange(index, voiceDef.UniqueMidiDurationDefs);
+            _uniqueDefs.InsertRange(index, voiceDef.UniqueDefs);
             SetMsPositions();
         }
         /// <summary>
@@ -347,7 +343,7 @@ namespace Moritz.AssistantComposer
                 RestDef rest1 = new RestDef(originalRest.MsPosition, iVoiceDef[0].MsPosition - originalRest.MsPosition);
                 rList.Add(rest1);
             }
-            rList.AddRange(iVoiceDef.UniqueMidiDurationDefs);
+            rList.AddRange(iVoiceDef.UniqueDefs);
             int iLmddsEndMsPos = iVoiceDef[iVoiceDef.Count - 1].MsPosition + iVoiceDef[iVoiceDef.Count - 1].MsDuration;
             int originalRestEndMsPos = originalRest.MsPosition + originalRest.MsDuration;
             if(originalRestEndMsPos > iLmddsEndMsPos)
@@ -775,9 +771,11 @@ namespace Moritz.AssistantComposer
         /// </summary>
         internal void AdjustVelocities(double factor)
         {
-            foreach(MidiChordDef iumdd in _uniqueDefs)
+            foreach(IUniqueDef iud in _uniqueDefs)
             {
-                iumdd.AdjustVelocities(factor);
+                MidiChordDef mcd = iud as MidiChordDef;
+                if(mcd != null)
+                    mcd.AdjustVelocities(factor);
             }
         }
 
@@ -928,9 +926,11 @@ namespace Moritz.AssistantComposer
         /// <param name="interval"></param>
         internal void Transpose(int interval)
         {
-            foreach(MidiChordDef iumdd in _uniqueDefs)
+            foreach(IUniqueDef iud in _uniqueDefs)
             {
-                iumdd.Transpose(interval);
+                MidiChordDef mcd = iud as MidiChordDef;
+                if(mcd != null)
+                    mcd.Transpose(interval);
             }
         }
 
@@ -1374,7 +1374,7 @@ namespace Moritz.AssistantComposer
         }
         #endregion internal SetLyricsToIndex()
 
-        internal List<IUniqueDef> UniqueMidiDurationDefs { get { return _uniqueDefs; } }
+        internal List<IUniqueDef> UniqueDefs { get { return _uniqueDefs; } }
         #endregion internal
 
         /// <summary>

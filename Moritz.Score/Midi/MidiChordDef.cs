@@ -130,6 +130,9 @@ namespace Moritz.Score.Midi
             List<BasicMidiChordDef> basicMidiChordDefs)
             : base(msDuration)
         {
+            foreach(byte pitch in midiPitches)
+                Debug.Assert(pitch == M.MidiValue((int)pitch), "Pitch out of range.");
+
             _msPosition = 0;
             _msDuration = msDuration;
             _volume = volume;
@@ -146,6 +149,7 @@ namespace Moritz.Score.Midi
             BasicMidiChordDefs = basicMidiChordDefs;
 
             CheckTotalDuration();
+
         }
         #endregion
 
@@ -157,6 +161,9 @@ namespace Moritz.Score.Midi
             List<MidiControl> midiControls)
             : base(msDuration)
         {
+            foreach(byte pitch in pitches)
+                Debug.Assert(pitch == M.MidiValue((int)pitch), "Pitch out of range.");
+
             _msPosition = msPosition;
             _volume = GetControlHiValue(ControllerType.Volume, midiControls);
             _pitchWheelDeviation = GetControlValue(ControllerType.RegisteredParameterCoarse, midiControls);
@@ -176,37 +183,38 @@ namespace Moritz.Score.Midi
             BasicMidiChordDefs.Add(new BasicMidiChordDef(msDuration, bank, patch, hasChordOff, pitches, velocities));
 
             CheckTotalDuration();
+
         }
         #endregion
 
         #region Another no sliders constructor
-        /// <summary>
-        /// This constructor creates a MidiChordDef at MsPosition 0, lyric = null, containing a single BasicMidiChordDef and no sliders.
-        /// </summary>
-        public MidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff,
-            List<MidiControlDef> midiControlDefs)
-            : base(msDuration)
-        {
-            _msPosition = 0;
-            _volume = GetControlDefHiValue(ControllerType.Volume, midiControlDefs);
-            _pitchWheelDeviation = GetControlDefValue(ControllerType.RegisteredParameterCoarse, midiControlDefs);
-            _hasChordOff = hasChordOff;
-            _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
+        ///// <summary>
+        ///// This constructor creates a MidiChordDef at MsPosition 0, lyric = null, containing a single BasicMidiChordDef and no sliders.
+        ///// </summary>
+        //public MidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff,
+        //    List<MidiControlDef> midiControlDefs)
+        //    : base(msDuration)
+        //{
+        //    _msPosition = 0;
+        //    _volume = GetControlDefHiValue(ControllerType.Volume, midiControlDefs);
+        //    _pitchWheelDeviation = GetControlDefValue(ControllerType.RegisteredParameterCoarse, midiControlDefs);
+        //    _hasChordOff = hasChordOff;
+        //    _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 
-            _displayedMidiPitches = pitches;
-            // midiVelocity is handled via the basicMidiChordDefs;
+        //    _displayedMidiPitches = pitches;
+        //    // midiVelocity is handled via the basicMidiChordDefs;
 
-            _ornamentNumberSymbol = 0;
+        //    _ornamentNumberSymbol = 0;
 
-            MidiChordSliderDefs = null;
+        //    MidiChordSliderDefs = null;
 
-            byte? bank = GetControlDefValue(ControllerType.BankSelect, midiControlDefs);
-            byte? patch = GetCommandDefValue(ChannelCommand.ProgramChange, midiControlDefs);
+        //    byte? bank = GetControlDefValue(ControllerType.BankSelect, midiControlDefs);
+        //    byte? patch = GetCommandDefValue(ChannelCommand.ProgramChange, midiControlDefs);
 
-            BasicMidiChordDefs.Add(new BasicMidiChordDef(msDuration, bank, patch, hasChordOff, pitches, velocities));
+        //    BasicMidiChordDefs.Add(new BasicMidiChordDef(msDuration, bank, patch, hasChordOff, pitches, velocities));
 
-            CheckTotalDuration();
-        }
+        //    CheckTotalDuration();
+        //}
         #endregion
 
         private void CheckTotalDuration()
@@ -278,8 +286,11 @@ namespace Moritz.Score.Midi
         {
             for(int i = 0; i < _displayedMidiPitches.Count; ++i)
             {
+                int newValue = _displayedMidiPitches[i] + interval;
                 _displayedMidiPitches[i] = M.MidiValue(_displayedMidiPitches[i] + interval);
             }
+            _displayedMidiPitches = ReduceList(_displayedMidiPitches);
+
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
                 List<byte> notes = bmcd.Pitches;
@@ -290,6 +301,8 @@ namespace Moritz.Score.Midi
                 bmcd.Pitches = ReduceList(notes);
             }
         }
+
+
 
         #region IUniqueDef
         public override string ToString()
@@ -610,10 +623,8 @@ namespace Moritz.Score.Midi
         }
 
         /// <summary>
-        /// Returns a list in which duplicate 0 and 127 values have been removed.
+        /// Returns a list which is ascending order, and in which duplicate 0 and 127 values have been removed,
         /// </summary>
-        /// <param name="list"></param>
-        /// <returns></returns>
         private List<byte> ReduceList(List<byte> list)
         {
             List<byte> reducedList = new List<byte>();
@@ -642,10 +653,10 @@ namespace Moritz.Score.Midi
                     reducedList.Add(list[i]);
                 }
             }
-            if(list.Count == reducedList.Count)
-                return list;
-            else
-                return reducedList;
+
+            reducedList.Sort();
+
+            return reducedList;
         }
 
         /// <summary>
@@ -905,7 +916,16 @@ namespace Moritz.Score.Midi
         /// This MidiPitches field is used when displaying the chord's noteheads.
         /// The performed pitches are set in the BasicMidiChordDefs.
         /// </summary>
-        public List<byte> MidiPitches { get { return _displayedMidiPitches; } set { _displayedMidiPitches = value; } }
+        public List<byte> MidiPitches
+        { 
+            get { return _displayedMidiPitches; } 
+            set 
+            {
+                foreach(byte pitch in value)
+                    Debug.Assert(pitch == M.MidiValue((int)pitch));
+                _displayedMidiPitches = value; 
+            } 
+        }
         private List<byte> _displayedMidiPitches = null;
         /// <summary>
         /// The MidiVelocity field is used when displaying dynamics in the score.

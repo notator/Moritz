@@ -76,14 +76,14 @@ namespace Moritz.AssistantComposer
             // All palettes can be accessed here at _paletteDefs[ paletteIndex ].
 
             // The wind3 is the lowest wind. The winds are numbered from top to bottom in the score.
-            SongSixVoiceDef wind3 = GetWind3(_palettes[0], _krystals[8]);
-            
+            VoiceDef wind3 = GetWind3(_palettes[0], _krystals[8]);
+
             Clytemnestra clytemnestra = new Clytemnestra(wind3);
 
             clytemnestra.AdjustVelocities(49, 59, 1.4);
 
-            SongSixVoiceDef wind2 = GetWind2(wind3, clytemnestra);
-            SongSixVoiceDef wind1 = GetWind1(wind3, wind2, clytemnestra);
+            VoiceDef wind2 = GetWind2(wind3, clytemnestra);
+            VoiceDef wind1 = GetWind1(wind3, wind2, clytemnestra);
 
             AdjustFinalWindChordPosition(wind1, wind2, wind3); // "fermata"
 
@@ -137,15 +137,15 @@ namespace Moritz.AssistantComposer
             // contouring test code 
             // fury1.SetContour(1, new List<int>(){2,2,2,2,2}, 1, 6);
 
-            SongSixVoiceDef control = GetControlVoiceDef(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
+            VoiceDef control = GetControlVoiceDef(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
 
             // Add each voiceDef to voiceDefs here, in top to bottom (=channelIndex) order in the score.
-            List<SongSixVoiceDef> voiceDefs = new List<SongSixVoiceDef>() { furies1, furies2, furies3, furies4, control, clytemnestra, wind1, wind2, wind3 };
+            List<VoiceDef> voiceDefs = new List<VoiceDef>() { furies1, furies2, furies3, furies4, control, clytemnestra, wind1, wind2, wind3 };
             
             Debug.Assert(voiceDefs.Count == MidiChannels().Count);
 
             //********************************************************
-            //foreach(SongSixVoiceDef voiceDef in voiceDefs)
+            //foreach(VoiceDef voiceDef in voiceDefs)
             //{
             //    voiceDef.SetLyricsToIndex();
             //}
@@ -188,14 +188,14 @@ namespace Moritz.AssistantComposer
             furies4.InsertClefChange(59, "b1"); // bar 104
         }
 
-        private void AdjustFinalWindChordPosition(SongSixVoiceDef wind1, SongSixVoiceDef wind2, SongSixVoiceDef wind3)
+        private void AdjustFinalWindChordPosition(VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
         {
             wind1.AlignObjectAtIndex(71, 81, 82, wind1[81].MsPosition - (wind1[81].MsDuration / 2));
             wind2.AlignObjectAtIndex(71, 81, 82, wind2[81].MsPosition - (wind2[81].MsDuration / 2));
             wind3.AlignObjectAtIndex(71, 81, 82, wind3[81].MsPosition - (wind3[81].MsDuration / 2));
         }
 
-        private void AdjustWindVelocities(SongSixVoiceDef wind1, SongSixVoiceDef wind2, SongSixVoiceDef wind3)
+        private void AdjustWindVelocities(VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
         {
             int beginInterlude2DimIndex = 25; // start of Interlude2
             int beginVerse3DimIndex = 31; // non-inclusive
@@ -215,7 +215,7 @@ namespace Moritz.AssistantComposer
             wind3.AdjustVelocitiesHairpin(beginPostludeIndex, wind3.Count, 2.3);
         }
 
-        private void AdjustWindPitchWheelDeviations(SongSixVoiceDef wind)
+        private void AdjustWindPitchWheelDeviations(VoiceDef wind)
         {
             byte versePwdValue = 3;
             double windStartPwdValue = 6, windEndPwdValue=28;
@@ -295,17 +295,17 @@ namespace Moritz.AssistantComposer
         /// <summary>
         /// The returned barlineMsPositions contain both the position of bar 1 (0ms) and the position of the final barline.
         /// </summary>
-        private List<int> GetBarlineMsPositions(SongSixVoiceDef control, SongSixVoiceDef fury1, SongSixVoiceDef fury2, SongSixVoiceDef fury3, SongSixVoiceDef fury4, Clytemnestra clytemnestra, SongSixVoiceDef wind1, SongSixVoiceDef wind2, SongSixVoiceDef wind3)
+        private List<int> GetBarlineMsPositions(VoiceDef control, VoiceDef fury1, VoiceDef fury2, VoiceDef fury3, VoiceDef fury4, Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
         {
-            SongSixVoiceDef ctl = control;
-            SongSixVoiceDef f1 = fury1;
-            SongSixVoiceDef f2 = fury2;
-            SongSixVoiceDef f3 = fury3;
-            SongSixVoiceDef f4 = fury4;
+            VoiceDef ctl = control;
+            VoiceDef f1 = fury1;
+            VoiceDef f2 = fury2;
+            VoiceDef f3 = fury3;
+            VoiceDef f4 = fury4;
             Clytemnestra c = clytemnestra;
-            SongSixVoiceDef w1 = wind1;
-            SongSixVoiceDef w2 = wind2;
-            SongSixVoiceDef w3 = wind3;
+            VoiceDef w1 = wind1;
+            VoiceDef w2 = wind2;
+            VoiceDef w3 = wind3;
 
             List<int> barlineMsPositions = new List<int>()
             {
@@ -449,18 +449,18 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// The control SongSixVoiceDef consists of single note + rest pairs whose msPositions are composed here.
+        /// The control VoiceDef consists of single note + rest pairs whose msPositions are composed here.
         /// </summary>
-        private SongSixVoiceDef GetControlVoiceDef(SongSixVoiceDef furies1, SongSixVoiceDef furies2, SongSixVoiceDef furies3, SongSixVoiceDef furies4, Clytemnestra clytemnestra, SongSixVoiceDef wind1, SongSixVoiceDef wind2, SongSixVoiceDef wind3)
+        private VoiceDef GetControlVoiceDef(VoiceDef furies1, VoiceDef furies2, VoiceDef furies3, VoiceDef furies4, Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef wind2, VoiceDef wind3)
         {
-            SongSixVoiceDef f1 = furies1;
-            SongSixVoiceDef f2 = furies2;
-            SongSixVoiceDef f3 = furies3;
-            SongSixVoiceDef f4 = furies4;
-            SongSixVoiceDef w1 = wind1;
-            SongSixVoiceDef w2 = wind2;
-            SongSixVoiceDef w3 = wind3;
-            SongSixVoiceDef c = clytemnestra;
+            VoiceDef f1 = furies1;
+            VoiceDef f2 = furies2;
+            VoiceDef f3 = furies3;
+            VoiceDef f4 = furies4;
+            VoiceDef w1 = wind1;
+            VoiceDef w2 = wind2;
+            VoiceDef w3 = wind3;
+            VoiceDef c = clytemnestra;
 
             // The columns here are note MsPositions and rest MsPositions respectively.
             List<int> controlNoteAndRestMsPositions = new List<int>()
@@ -548,13 +548,13 @@ namespace Moritz.AssistantComposer
                 w3.EndMsPosition // final barline position
             };
 
-            SongSixVoiceDef controlVoiceDef = MakeControlVoiceDef(controlNoteAndRestMsPositions);
+            VoiceDef controlVoiceDef = MakeControlVoiceDef(controlNoteAndRestMsPositions);
             return controlVoiceDef;
         }
 
         // This code should not change while composing the ControlVoiceDef.
-        // It just makes the SongSixVoiceDef from the controlNoteAndRestMsPositions defined above.
-        private static SongSixVoiceDef MakeControlVoiceDef(List<int> controlNoteAndRestMsPositions)
+        // It just makes the VoiceDef from the controlNoteAndRestMsPositions defined above.
+        private static VoiceDef MakeControlVoiceDef(List<int> controlNoteAndRestMsPositions)
         {
             List<IUniqueDef> controlLmdds = new List<IUniqueDef>();
 
@@ -576,16 +576,16 @@ namespace Moritz.AssistantComposer
                 controlLmdds.Add(umChordDef);
                 controlLmdds.Add(umRestDef);
             }
-            SongSixVoiceDef controlVoiceDef = new SongSixVoiceDef(controlLmdds);
+            VoiceDef controlVoiceDef = new VoiceDef(controlLmdds);
             return controlVoiceDef;
         }
 
-        private List<Voice> GetVoices(List<SongSixVoiceDef> voiceDefs)
+        private List<Voice> GetVoices(List<VoiceDef> voiceDefs)
         {
             byte channelIndex = 0;
             List<Voice> voices = new List<Voice>();
 
-            foreach(SongSixVoiceDef voiceDef in voiceDefs)
+            foreach(VoiceDef voiceDef in voiceDefs)
             {
                 Voice voice = new OutputVoice(null, channelIndex++);
                 voice.UniqueDefs = voiceDef.UniqueDefs;

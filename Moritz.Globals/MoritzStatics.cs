@@ -615,8 +615,14 @@ namespace Moritz.Globals
         public static byte MidiValue(int value)
         {
             int rval;
-            rval = (value > 127) ? 127 : value;
-            rval = (value < 0) ? 0 : value;
+
+            if(value > 127)
+                rval = 127;
+            else if(value < 0)
+                rval = 0;
+            else
+                rval = value;
+
             return (byte)rval;
         }
 

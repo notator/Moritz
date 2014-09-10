@@ -17,9 +17,9 @@ namespace Moritz.AssistantComposer
     /// <summary>
     /// Encapsulates the composition of Clytemnestra's Voice
     /// </summary>
-    internal class Clytemnestra : SongSixVoiceDef
+    internal class Clytemnestra : VoiceDef
     {
-        internal Clytemnestra(SongSixVoiceDef wind3) 
+        internal Clytemnestra(VoiceDef wind3) 
             : base(new List<IUniqueDef>())
         {
             SetMomentDefsListPerVerse();
@@ -294,7 +294,7 @@ namespace Moritz.AssistantComposer
         /// Sets Clytamnestra's _uniqueMidiDurationDefs for the whole piece including rests.
         /// Barline positions are set later.
         /// </summary>
-        private void SetUniqueMidiDurationDefs(SongSixVoiceDef wind3)
+        private void SetUniqueMidiDurationDefs(VoiceDef wind3)
         {
             Debug.Assert(_momentDefsListPerVerse.Count == 5);
 
