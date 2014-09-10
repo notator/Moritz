@@ -147,28 +147,28 @@ namespace Moritz.AssistantComposer
                 OrnamentSettings os = _ornamentSettings;
                 int ornamentNumber;
                 List<BasicMidiChordDef> basicMidiChordDefs = new List<BasicMidiChordDef>();
-                if(os == null)
+                if(os == null || _ornamentNumbers[index] == 0)
                 {
                     ornamentNumber = 0;
                     BasicMidiChordDef bmcd = new BasicMidiChordDef(duration, bankIndex, patchIndex, hasChordOff, rootMidiPitches, rootMidiVelocities);
                     basicMidiChordDefs.Add(bmcd);
-
                 }
                 else
                 {
                     ornamentNumber = _ornamentNumbers[index];
                     int ornamentMinMsDuration = IntOrDefaultValue(_ornamentMinMsDurations, index, M.DefaultOrnamentMinimumDuration); // 1
 
-                    List<int> ornamentValues = os.OrnamentValues[((int)ornamentNumber) - 1];
+                    List<int> ornamentValues = os.OrnamentValues[ornamentNumber - 1];
 
                     for(int i = 0; i < ornamentValues.Count; ++i)
                     {
-                        bool oHasChordOff = BoolOrDefaultValue(os.BasicChordMidiSettings.ChordOffs, i, M.DefaultHasChordOff);
-                        int oDuration = os.BasicChordMidiSettings.Durations[i];
-                        List<byte> oMidiPitches = os.BasicChordMidiSettings.MidiPitches[i];
-                        List<byte> oVelocities = os.BasicChordMidiSettings.Velocities[i];
-                        byte? oBank = ByteOrNull(os.BankIndices, i);
-                        byte? oPatch = ByteOrNull(os.PatchIndices, i);
+                        int oIndex = ornamentValues[i] - 1;
+                        bool oHasChordOff = BoolOrDefaultValue(os.BasicChordMidiSettings.ChordOffs, oIndex, M.DefaultHasChordOff);
+                        int oDuration = os.BasicChordMidiSettings.Durations[oIndex];
+                        List<byte> oMidiPitches = os.BasicChordMidiSettings.MidiPitches[oIndex];
+                        List<byte> oVelocities = os.BasicChordMidiSettings.Velocities[oIndex];
+                        byte? oBank = ByteOrNull(os.BankIndices, oIndex);
+                        byte? oPatch = ByteOrNull(os.PatchIndices, oIndex);
 
                         BasicMidiChordDef bmcd = new BasicMidiChordDef(oDuration, oBank, oPatch, oHasChordOff, oMidiPitches, oVelocities);
                         basicMidiChordDefs.Add(bmcd);
@@ -393,26 +393,34 @@ namespace Moritz.AssistantComposer
             {
                 List<byte> midiPitches = new List<byte>();
                 List<byte> midiVelocities = new List<byte>();
-                if(bcfs.ChordDensities[chordIndex] == 1)
-                {  
-                    midiPitches.Add(bcfs.MidiPitches[chordIndex]);
-                    midiVelocities.Add(bcfs.Velocities[chordIndex]);
-                }
-                else if(bcfs.ChordDensities[chordIndex] == 2)
+                float verticalVelocityFactor = 1.0F;
+                if(bcfs.VerticalVelocityFactors.Count > chordIndex)
+                    verticalVelocityFactor = bcfs.VerticalVelocityFactors[chordIndex];
+
+                if(bcfs.ChordDensities[chordIndex] > 0)
                 {
-                    midiPitches.Add(bcfs.MidiPitches[chordIndex]);
-                    midiPitches.Add(M.MidiValue(bcfs.MidiPitches[chordIndex] + bcfs.Inversions[chordIndex][0]));
-                    midiVelocities.Add(bcfs.Velocities[chordIndex]);
-                    midiVelocities.Add(M.MidiValue((int)(bcfs.Velocities[chordIndex] * bcfs.VerticalVelocityFactors[chordIndex])));
-                }
-                else
-                {
-                    midiPitches = GetMidiPitches(bcfs.MidiPitches[chordIndex], bcfs.ChordDensities[chordIndex], bcfs.Inversions, bcfs.InversionIndices[chordIndex]);
-                    midiVelocities = GetVerticalVelocities(bcfs.Velocities[chordIndex], bcfs.ChordDensities[chordIndex], bcfs.VerticalVelocityFactors[chordIndex]);
+                    if(bcfs.ChordDensities[chordIndex] == 1)
+                    {
+                        midiPitches.Add(bcfs.MidiPitches[chordIndex]);
+                        midiVelocities.Add(bcfs.Velocities[chordIndex]);
+                    }
+                    else if(bcfs.ChordDensities[chordIndex] == 2)
+                    {
+                        midiPitches.Add(bcfs.MidiPitches[chordIndex]);
+                        midiPitches.Add(M.MidiValue(bcfs.MidiPitches[chordIndex] + bcfs.Inversions[0][0]));
+                        midiVelocities.Add(bcfs.Velocities[chordIndex]);
+
+                        midiVelocities.Add(M.MidiValue((int)(bcfs.Velocities[chordIndex] * verticalVelocityFactor)));
+                    }
+                    else
+                    {
+                        midiPitches = GetMidiPitches(bcfs.MidiPitches[chordIndex], bcfs.ChordDensities[chordIndex], bcfs.Inversions, bcfs.InversionIndices[chordIndex]);
+                        midiVelocities = GetVerticalVelocities(bcfs.Velocities[chordIndex], bcfs.ChordDensities[chordIndex], verticalVelocityFactor);
+                    }
+
                 }
                 MidiPitches.Add(midiPitches);
-                Velocities.Add(midiVelocities);
-            }
+                Velocities.Add(midiVelocities);            }
         }
 
         private List<byte> GetMidiPitches(byte basePitch, int density, List<List<byte>> inversions, int inversionIndex)
@@ -437,7 +445,7 @@ namespace Moritz.AssistantComposer
                 if(p < (density - 1))
                 {
                     int newpitch = pitch + primeIntervals[p];
-                    pitch = (byte)((newpitch > 127) ? 127 : newpitch);
+                    pitch = M.MidiValue(newpitch);
                 }
             }
             return midiPitches;
