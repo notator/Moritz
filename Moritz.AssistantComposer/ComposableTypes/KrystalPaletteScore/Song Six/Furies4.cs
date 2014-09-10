@@ -21,12 +21,12 @@ namespace Moritz.AssistantComposer
 
         internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, SongSixVoiceDef wind1, List<Palette> palettes)
         {
-            GetSnores(firstRestMsDuration, clytemnestra, wind1, palettes[1].DurationDefs);
-            AddGrowlsToInterlude2AndVerse3(clytemnestra, palettes[3].DurationDefs);
+            GetSnores(firstRestMsDuration, clytemnestra, wind1, palettes[1]);
+            AddGrowlsToInterlude2AndVerse3(clytemnestra, palettes[3]);
         }
 
         #region before Interlude3
-        private void AddGrowlsToInterlude2AndVerse3(Clytemnestra clytemnestra, List<DurationDef> growlsPalette)
+        private void AddGrowlsToInterlude2AndVerse3(Clytemnestra clytemnestra, Palette growlsPalette)
         {
             int[] growlIndices = { 0,2,5,1 };
             //int[] transpositions = { 0,0,0,0 };
@@ -48,7 +48,7 @@ namespace Moritz.AssistantComposer
 
             for(int i = 3; i >= 0; --i)
             {
-                IUniqueDef growl = growlsPalette[growlIndices[i]].DeepClone();
+                IUniqueDef growl = growlsPalette.UniqueDurationDef(growlIndices[i]);
                 growl.MsPosition = msPositions[i];
                 growl.MsDuration = msDurations[i];
                 //growl.AdjustVelocities(velocityfactors[i]);
@@ -63,7 +63,7 @@ namespace Moritz.AssistantComposer
             AlignObjectAtIndex(38, 39, 40, clytemnestra[162].MsPosition);
         }
 
-        private void GetSnores(int firstRestMsDuration, Clytemnestra clytemnestra, SongSixVoiceDef wind1, List<DurationDef> snoresPalette)
+        private void GetSnores(int firstRestMsDuration, Clytemnestra clytemnestra, SongSixVoiceDef wind1, Palette snoresPalette)
         {
             List<IUniqueDef> snores = new List<IUniqueDef>();
             int msPosition = 0;
@@ -76,7 +76,7 @@ namespace Moritz.AssistantComposer
             int[] transpositions1 = { 0, 0, 0, 0, 0, 1, 0 };
             for(int i = 0; i < 7; ++i)
             {
-                IUniqueDef snore = snoresPalette[i].DeepClone();
+                IUniqueDef snore = snoresPalette.UniqueDurationDef(i);
                 snore.MsPosition = msPosition;
                 msPosition += snore.MsDuration;
                 MidiChordDef iumdd = snore as MidiChordDef;
@@ -100,7 +100,7 @@ namespace Moritz.AssistantComposer
             double[] factors = { 0.93, 0.865, 0.804, 0.748, 0.696, 0.647, 0.602, 0.56, 0.52, 0.484 };
             for(int i = 0; i < 10; ++i)
             {
-                IUniqueDef snore = snoresPalette[i / 2].DeepClone();
+                IUniqueDef snore = snoresPalette.UniqueDurationDef(i / 2);
                 snore.MsPosition = msPosition;
                 factor = factors[i];
                 msDuration = snore.MsDuration * factor;

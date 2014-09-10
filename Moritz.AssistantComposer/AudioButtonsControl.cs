@@ -218,12 +218,13 @@ namespace Moritz.AssistantComposer
 
             assistant.ResetChannels(); // sends allSoundsOff and AllControllersOff, Sleeps 5 milliseconds to avoid click.
 
-            if(krystalPalette.DurationDefs[index] is RestDef)
+            IUniqueDef iud = krystalPalette.UniqueDurationDef(index);
+            if(iud is RestDef)
             {
                 _midiEventDemoButtons[index].Hide();
                 this._restLabels[0].Select(); // just to deselect everything
                 Refresh(); // shows "rest" behind button
-                Thread.Sleep(krystalPalette.DurationDefs[index].MsDuration);
+                Thread.Sleep(iud.MsDuration);
                 _midiEventDemoButtons[index].Show();
                 Refresh();
             }
@@ -232,22 +233,20 @@ namespace Moritz.AssistantComposer
                 int numberOfRests = 0;
                 for(int i = 0; i < index; ++i)
                 {
-                    if(krystalPalette.DurationDefs[i] is RestDef)
+                    IUniqueDef def = krystalPalette.UniqueDurationDef(i);
+                    if(def is RestDef)
                         ++numberOfRests;
                 }
 
                 _midiEventDemoButtons[index].Select();
                 Refresh();
                 assistant.PerformOneMoment(index - numberOfRests);
-                // old: Thread.Sleep(krystalPalette.BasicChordSettings.Durations[index]);
-                // begin new:
                 if(index > 0)
                 {
                     // This blocks the current thread (keeps the button selected)
                     // If index == 0, it is blocked by the assistant.
-                    Thread.Sleep(krystalPalette.DurationDefs[index].MsDuration);
+                    Thread.Sleep(iud.MsDuration);
                 }
-                // end new
             }
             this._restLabels[0].Select(); // just to deselect everything
             Refresh();

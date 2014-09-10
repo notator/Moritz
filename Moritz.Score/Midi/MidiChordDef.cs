@@ -119,14 +119,14 @@ namespace Moritz.Score.Midi
         /// msPosition is set to 0, lyric is set to null.
         /// </summary>
         public MidiChordDef(
-            int msDuration,
-            byte? volume,
-            bool repeat,
-            byte? pitchWheelDeviation,
-            bool hasChordOff,
-            List<byte> midiPitches,
-            int ornamentNumberSymbol,
-            MidiChordSliderDefs midiChordSliderDefs,
+            int msDuration, // the total duration (this should be the sum of the durations of the basicMidiChordDefs)
+            byte volume, // default is M.DefaultVolume (=100) 
+            bool repeat, // default is M.DefaultChordRepeats (=false)
+            byte pitchWheelDeviation, // default is M.DefaultPitchWheelDeviation (=2)
+            bool hasChordOff, // default is M.DefaultHasChordOff (=true)
+            List<byte> midiPitches, // the pitches that are displayed in the score
+            int ornamentNumberSymbol, // is 0 when there is no ornament
+            MidiChordSliderDefs midiChordSliderDefs, // can contain empty lists
             List<BasicMidiChordDef> basicMidiChordDefs)
             : base(msDuration)
         {
@@ -142,37 +142,7 @@ namespace Moritz.Score.Midi
             _ornamentNumberSymbol = ornamentNumberSymbol;
             _lyric = null;
 
-            MidiChordSliderDefs mcsd = midiChordSliderDefs;
-            if(mcsd != null)
-            {
-                List<byte> pwMsbs = null;
-                List<byte> panMsbs = null;
-                List<byte> mwMsbs = null;
-                List<byte> eMsbs = null;
-                if(mcsd.PitchWheelMsbs != null && mcsd.PitchWheelMsbs.Count > 0)
-                {
-                    pwMsbs = new List<byte>(mcsd.PitchWheelMsbs);
-                }
-                if(mcsd.PanMsbs != null && mcsd.PanMsbs.Count > 0)
-                {
-                    panMsbs = new List<byte>(mcsd.PanMsbs);
-                }
-                if(mcsd.ModulationWheelMsbs != null && mcsd.ModulationWheelMsbs.Count > 0)
-                {
-                    mwMsbs = new List<byte>(mcsd.ModulationWheelMsbs);
-                }
-                if(mcsd.ExpressionMsbs != null && mcsd.ExpressionMsbs.Count > 0)
-                {
-                    eMsbs = new List<byte>(mcsd.ExpressionMsbs);
-                }
-                if(pwMsbs != null || panMsbs != null || mwMsbs != null || eMsbs != null)
-                {
-                    MidiChordSliderDefs = new MidiChordSliderDefs(pwMsbs, panMsbs, mwMsbs, eMsbs);
-                }
-            }
-
-            Debug.Assert(basicMidiChordDefs != null);
-
+            MidiChordSliderDefs = midiChordSliderDefs;
             BasicMidiChordDefs = basicMidiChordDefs;
 
             CheckTotalDuration();

@@ -22,9 +22,9 @@ namespace Moritz.AssistantComposer
         #region before Interlude3
         internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, SongSixVoiceDef wind1, List<Palette> palettes)
         {
-            GetFlutters(firstRestMsDuration, palettes[2].DurationDefs);
+            GetFlutters(firstRestMsDuration, palettes[2]);
 
-            AddTicks(palettes[4].DurationDefs);
+            AddTicks(palettes[4]);
 
             EndMsPosition = clytemnestra.EndMsPosition;
 
@@ -38,7 +38,7 @@ namespace Moritz.AssistantComposer
             #endregion
         }
 
-        private void GetFlutters(int firstRestMsDuration, List<DurationDef> palette)
+        private void GetFlutters(int firstRestMsDuration, Palette palette)
         {
             // each flutter begins with a chord, and ends with a rest.
             SongSixVoiceDef furies3FlutterSequence1 = GetFlutter1(palette);
@@ -84,7 +84,7 @@ namespace Moritz.AssistantComposer
             return nextFlutter;
         }
 
-        private SongSixVoiceDef GetFlutter1(List<DurationDef> palette)
+        private SongSixVoiceDef GetFlutter1(Palette palette)
         {
             List<IUniqueDef> flutter1 = new List<IUniqueDef>();
             int msPosition = 0;
@@ -92,7 +92,7 @@ namespace Moritz.AssistantComposer
             for(int i = 0; i < 7; ++i)
             {
                 int[] contour = K.Contour(7, 11, 7);
-                IUniqueDef flutter = palette[contour[i] - 1].DeepClone();
+                IUniqueDef flutter = palette.UniqueDurationDef(contour[i] - 1);
                 flutter.MsPosition = msPosition;
                 msPosition += flutter.MsDuration;
                 flutter1.Add(flutter);
@@ -115,7 +115,7 @@ namespace Moritz.AssistantComposer
         /// </summary>
         /// <param name="furies3"></param>
         /// <param name="ticksPalette"></param>
-        private void AddTicks(List<DurationDef> ticksPalette)
+        private void AddTicks(Palette ticksPalette)
         {
             List<int> TickInsertionIndices = new List<int>()
             {
@@ -134,7 +134,7 @@ namespace Moritz.AssistantComposer
             }
         }
 
-        private List<IUniqueDef> GetTicksSequence(List<DurationDef> ticksPalette)
+        private List<IUniqueDef> GetTicksSequence(Palette ticksPalette)
         {
             List<IUniqueDef> ticksSequence = new List<IUniqueDef>();
             int msPosition = 0;
@@ -145,7 +145,7 @@ namespace Moritz.AssistantComposer
                 int[] contour = K.Contour(7, 4, 10 - i);
                 for(int j = 6; j >= 0; --j)
                 {
-                    IUniqueDef ticks = ticksPalette[contour[j]-1].DeepClone();
+                    IUniqueDef ticks = ticksPalette.UniqueDurationDef(contour[j] - 1);
                     ticks.MsPosition = msPosition;
                     msPosition += ticks.MsDuration;
                     MidiChordDef iumdd = ticks as MidiChordDef;
@@ -162,7 +162,7 @@ namespace Moritz.AssistantComposer
             return ticksSequence;
         }
 
-        internal void GetChirpsInInterlude2AndVerse3(SongSixVoiceDef furies1, SongSixVoiceDef furies2, Clytemnestra clytemnestra, SongSixVoiceDef wind1, List<DurationDef> chirpsPalette)
+        internal void GetChirpsInInterlude2AndVerse3(SongSixVoiceDef furies1, SongSixVoiceDef furies2, Clytemnestra clytemnestra, SongSixVoiceDef wind1, Palette chirpsPalette)
         {
             int[] chirpIndices = { 4, 8, 2, 6, 10, 0 };
             int[] transpositions = { 2, 1, 3, 0, 4, 5 };
@@ -179,7 +179,7 @@ namespace Moritz.AssistantComposer
             };
             for(int i = 5; i >=0; --i)
             {
-                IUniqueDef cheep = chirpsPalette[chirpIndices[i]].DeepClone();
+                IUniqueDef cheep = chirpsPalette.UniqueDurationDef(chirpIndices[i]);
                 cheep.MsPosition = msPositions[i];
                 MidiChordDef iumdd = cheep as MidiChordDef;
                 if(iumdd != null)

@@ -104,14 +104,11 @@ namespace Moritz.AssistantComposer
 
         private void WriteDurationSymbolsForStrandInTopStaff(Voice voice, int barIndex, List<int> originalStrandValues, ref int msPosition)
         {
-            List<DurationDef> templateDefs = _palettes[0].DurationDefs; // top templateDefs
+            Palette palette = _palettes[0]; // top templateDefs
             for(int valueIndex = 0; valueIndex < originalStrandValues.Count; valueIndex++)
             {
                 int value = originalStrandValues[valueIndex];
-                DurationDef midiDurationDef = templateDefs[value - 1];
-                IUniqueDef noteDef = midiDurationDef.DeepClone();
-                Debug.Assert(midiDurationDef.MsDuration > 0);
-                Debug.Assert(noteDef.MsDuration == midiDurationDef.MsDuration);
+                IUniqueDef noteDef = palette.UniqueDurationDef(value - 1);
                 noteDef.MsPosition = msPosition;
                 msPosition += noteDef.MsDuration;
                 voice.UniqueDefs.Add(noteDef);
@@ -122,7 +119,7 @@ namespace Moritz.AssistantComposer
         {
             List<Voice> consecutiveBars = new List<Voice>();
             Krystal krystal = _krystals[staffNumber - 1];
-            List<DurationDef> templateDefs = _palettes[staffNumber - 1].DurationDefs;
+            Palette palette = _palettes[staffNumber - 1];
             List<List<int>> strandValuesList = krystal.GetValues(krystal.Level);
             Debug.Assert(topStaffBars.Count == strandValuesList.Count);
 
@@ -137,11 +134,10 @@ namespace Moritz.AssistantComposer
                 for(int valueIndex = 0; valueIndex < lowerStaffValueSequence.Count; valueIndex++)
                 {
                     int value = lowerStaffValueSequence[valueIndex];
-                    DurationDef midiDurationDef = templateDefs[value - 1];
-                    midiDurationDef.MsDuration = lowerStaffMsDurations[valueIndex];
-                    IUniqueDef noteDef = midiDurationDef.DeepClone();
+                    IUniqueDef noteDef = palette.UniqueDurationDef(value - 1);
+                    noteDef.MsDuration = lowerStaffMsDurations[valueIndex];
                     noteDef.MsPosition = currentMsPosition;
-                    currentMsPosition += midiDurationDef.MsDuration; 
+                    currentMsPosition += noteDef.MsDuration; 
                     newVoice.UniqueDefs.Add(noteDef);
                 }
 

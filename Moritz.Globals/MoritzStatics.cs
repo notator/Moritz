@@ -746,6 +746,12 @@ namespace Moritz.Globals
         public static readonly byte DefaultPitchWheel = 64;
         public static readonly byte DefaultPan = 64;
         public static readonly byte DefaultModulationWheel = 0;
+        /// <summary>
+        /// Constants that are set when palette fields are empty
+        /// </summary>
+        public static readonly bool DefaultHasChordOff = true;
+        public static readonly bool DefaultChordRepeats = false;
+        public static readonly int DefaultOrnamentMinimumDuration = 1;
         #endregion MIDI
     }
 

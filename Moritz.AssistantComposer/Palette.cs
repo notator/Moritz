@@ -49,7 +49,7 @@ namespace Moritz.AssistantComposer
             for(int chordIndex = 0; chordIndex < _basicChordMidiSettings.Durations.Count; ++chordIndex)
             {
                 DurationDef dd = GetDurationDef(chordIndex);
-                DurationDefs.Add(dd);
+                _durationDefs.Add(dd);
             }
 
         }
@@ -123,52 +123,52 @@ namespace Moritz.AssistantComposer
             else
             {
                 /// Create a new MidiChordDef (with msPosition=0, lyric=null) 
-                bool hasChordOff = bcms.ChordOffs[index];
+                bool hasChordOff = BoolOrDefaultValue(bcms.ChordOffs, index, M.DefaultHasChordOff); // true
                 int duration = bcms.Durations[index];
                 List<byte> rootMidiPitches = bcms.MidiPitches[index];
                 List<byte> rootMidiVelocities = bcms.Velocities[index];
 
-                byte bankIndex = _bankIndices[index];
-                byte patchIndex = _patchIndices[index];
-                byte volume = _volumes[index];
-                bool repeat = _repeats[index];
-                byte pitchwheelDeviation = _pitchwheelDeviations[index];
-                List<byte> pitchwheelEnvelope = _pitchwheelEnvelopes[index];
-                List<byte> panEnvelope = _panEnvelopes[index];
-                List<byte> modulationWheelEnvelope = _modulationWheelEnvelopes[index];
-                List<byte> expressionEnvelope = _expressionEnvelopes[index];
-                int ornamentNumber = _ornamentNumbers[index];
-                int ornamentMinMsDuration = _ornamentMinMsDurations[index];
+                byte? bankIndex = ByteOrNull(_bankIndices, index);
+                byte? patchIndex = ByteOrNull(_patchIndices, index);
+                byte volume = ByteOrDefaultValue(_volumes, index, M.DefaultVolume); // 100
+                bool repeat = BoolOrDefaultValue(_repeats, index, M.DefaultChordRepeats); // false
+                byte pitchwheelDeviation = ByteOrDefaultValue(_pitchwheelDeviations, index, M.DefaultPitchWheelDeviation); // 2
+                List<byte> pitchwheelEnvelope = ListByte(_pitchwheelEnvelopes, index);
+                List<byte> panEnvelope = ListByte(_panEnvelopes, index);
+                List<byte> modulationWheelEnvelope = ListByte(_modulationWheelEnvelopes, index);
+                List<byte> expressionEnvelope = ListByte(_expressionEnvelopes, index);
 
-                MidiChordSliderDefs midiChordSliderDefs = null;
-                if(pitchwheelEnvelope != null || panEnvelope != null || modulationWheelEnvelope != null || expressionEnvelope != null)
-                {
-                    midiChordSliderDefs = new MidiChordSliderDefs(pitchwheelEnvelope,
-                        panEnvelope,
-                        modulationWheelEnvelope,
-                        expressionEnvelope);
-                }
+                MidiChordSliderDefs midiChordSliderDefs = 
+                    new MidiChordSliderDefs(pitchwheelEnvelope,
+                                            panEnvelope,
+                                            modulationWheelEnvelope,
+                                            expressionEnvelope);
 
                 OrnamentSettings os = _ornamentSettings;
+                int ornamentNumber;
                 List<BasicMidiChordDef> basicMidiChordDefs = new List<BasicMidiChordDef>();
                 if(os == null)
                 {
+                    ornamentNumber = 0;
                     BasicMidiChordDef bmcd = new BasicMidiChordDef(duration, bankIndex, patchIndex, hasChordOff, rootMidiPitches, rootMidiVelocities);
                     basicMidiChordDefs.Add(bmcd);
 
                 }
                 else
                 {
-                    List<int> ornamentValues = os.OrnamentValues[ornamentNumber - 1];
+                    ornamentNumber = _ornamentNumbers[index];
+                    int ornamentMinMsDuration = IntOrDefaultValue(_ornamentMinMsDurations, index, M.DefaultOrnamentMinimumDuration); // 1
+
+                    List<int> ornamentValues = os.OrnamentValues[((int)ornamentNumber) - 1];
 
                     for(int i = 0; i < ornamentValues.Count; ++i)
                     {
-                        bool oHasChordOff = os.BasicChordMidiSettings.ChordOffs[i];
+                        bool oHasChordOff = BoolOrDefaultValue(os.BasicChordMidiSettings.ChordOffs, i, M.DefaultHasChordOff);
                         int oDuration = os.BasicChordMidiSettings.Durations[i];
                         List<byte> oMidiPitches = os.BasicChordMidiSettings.MidiPitches[i];
                         List<byte> oVelocities = os.BasicChordMidiSettings.Velocities[i];
-                        byte oBank = os.BankIndices[i];
-                        byte oPatch = os.PatchIndices[i];
+                        byte? oBank = ByteOrNull(os.BankIndices, i);
+                        byte? oPatch = ByteOrNull(os.PatchIndices, i);
 
                         BasicMidiChordDef bmcd = new BasicMidiChordDef(oDuration, oBank, oPatch, oHasChordOff, oMidiPitches, oVelocities);
                         basicMidiChordDefs.Add(bmcd);
@@ -217,32 +217,50 @@ namespace Moritz.AssistantComposer
             return rval;
         }
 
-        ///// <summary>
-        ///// Returns defaultValue if values is null or empty.
-        ///// Otherwise throws an exception if index is out of range.
-        ///// </summary>
-        //private bool BoolOrDefaultValue(List<bool> values, int index, bool defaultValue)
-        //{
-        //    return (values != null && index < values.Count) ? values[index] : defaultValue;
-        //}
+        /// <summary>
+        /// Returns defaultValue if values is null or empty.
+        /// Otherwise throws an exception if index is out of range.
+        /// </summary>
+        private bool BoolOrDefaultValue(List<bool> values, int index, bool defaultValue)
+        {
+            return (values != null && values.Count > 0) ? values[index] : defaultValue;
+        }
 
-        ///// <summary>
-        ///// Returns defaultValue if values is null or empty.
-        ///// Otherwise throws an exception if index is out of range.
-        ///// </summary>
-        //private byte ByteOrDefaultValue(List<byte> values, int index, int defaultValue)
-        //{
-        //    return (values != null && index < values.Count) ? values[index] : M.MidiValue(defaultValue);
-        //}
+        /// <summary>
+        /// Returns null if values is empty.
+        /// Otherwise throws an exception if index is out of range.
+        /// </summary>
+        private byte? ByteOrNull(List<byte> values, int index)
+        {
+            return (values.Count > 0) ? values[index] : (byte?) null;
+        }
 
-        ///// <summary>
-        ///// Returns an empty list if values is null or empty.
-        ///// Otherwise throws an exception if index is out of range.
-        ///// </summary>
-        //private List<byte> ListByte(List<List<byte>> values, int index)
-        //{
-        //    return (values != null && values.Count > 0) ? values[index] : new List<byte>();
-        //}
+        /// <summary>
+        /// Returns defaultValue if values is empty.
+        /// Otherwise throws an exception if index is out of range.
+        /// </summary>
+        private byte ByteOrDefaultValue(List<byte> values, int index, int defaultValue)
+        {
+            return (values.Count > 0) ? values[index] : M.MidiValue(defaultValue);
+        }
+
+        /// <summary>
+        /// Returns defaultValue if values is empty.
+        /// Otherwise throws an exception if index is out of range.
+        /// </summary>
+        private int IntOrDefaultValue(List<int> values, int index, int defaultValue)
+        {
+            return (values.Count > 0) ? values[index] : defaultValue;
+        }
+
+        /// <summary>
+        /// Returns an empty list if values is empty.
+        /// Otherwise throws an exception if index is out of range.
+        /// </summary>
+        private List<byte> ListByte(List<List<byte>> values, int index)
+        {
+            return (values.Count > 0) ? values[index] : new List<byte>();
+        }
 
         private BasicChordMidiSettings _basicChordMidiSettings;
         private List<byte> _bankIndices;
@@ -259,7 +277,13 @@ namespace Moritz.AssistantComposer
         private List<int> _ornamentMinMsDurations;
         private OrnamentSettings _ornamentSettings;
 
-        public List<DurationDef> DurationDefs = new List<DurationDef>();
+        private List<DurationDef> _durationDefs = new List<DurationDef>();
+
+        public int Count { get { return _durationDefs.Count; } }
+        public IUniqueDef UniqueDurationDef(int index)
+        {
+            return _durationDefs[index].DeepClone();
+        }
     }
 
     public class OrnamentSettings

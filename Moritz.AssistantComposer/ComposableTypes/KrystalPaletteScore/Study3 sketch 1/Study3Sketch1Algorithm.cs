@@ -93,20 +93,19 @@ namespace Moritz.AssistantComposer
             {
                 Voice voice = new OutputVoice(null, channel);
                 bar.Add(voice);
-                WriteVoiceMidiDurationDefs1(voice, palette.DurationDefs);
+                WriteVoiceMidiDurationDefs1(voice, palette);
                 ++channel;
             }
             return bar;
         }
 
-        private void WriteVoiceMidiDurationDefs1(Voice voice, List<DurationDef> templateDefs)
+        private void WriteVoiceMidiDurationDefs1(Voice voice, Palette palette)
         {
             int msPosition = 0;
             int bar1ChordMsSeparation = 1500;
-            foreach(DurationDef templateDurationDef in templateDefs)
+            for(int i = 0; i < palette.Count;++i)
             {
-                Debug.Assert(templateDurationDef.MsDuration > 0);
-                IUniqueDef durationDef = templateDurationDef.DeepClone();
+                IUniqueDef durationDef = palette.UniqueDurationDef(i);
                 durationDef.MsPosition = msPosition;
                 RestDef restDef = new RestDef(msPosition + durationDef.MsDuration, bar1ChordMsSeparation - durationDef.MsDuration);
                 msPosition += bar1ChordMsSeparation;
@@ -129,7 +128,7 @@ namespace Moritz.AssistantComposer
             foreach(Palette palette in _palettes)
             {
                 bar.Add(new OutputVoice(null, channel));
-                VoiceDef voiceDef = new VoiceDef(palette.DurationDefs);
+                VoiceDef voiceDef = new VoiceDef(palette);
                 voiceDef.SetMsDuration(6000);
                 voiceDefs.Add(voiceDef);
                 ++channel;

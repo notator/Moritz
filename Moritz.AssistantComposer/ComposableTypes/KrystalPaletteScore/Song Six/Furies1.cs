@@ -19,7 +19,7 @@ namespace Moritz.AssistantComposer
         {
         }
 
-        internal void GetBeforeInterlude3(Clytemnestra clytemnestra, SongSixVoiceDef wind1, SongSixVoiceDef furies2, List<DurationDef> cheepsPalette)
+        internal void GetBeforeInterlude3(Clytemnestra clytemnestra, SongSixVoiceDef wind1, SongSixVoiceDef furies2, Palette cheepsPalette)
         {
             int[] cheepIndices = { 4, 8, 2, 6, 10, 0, 1, 3, 5, 7, 9, 11 };
             int[] transpositions = { 2, 1, 3, 0, 4, -3, 5, 10, 6, 9, 7, 8 };
@@ -39,9 +39,9 @@ namespace Moritz.AssistantComposer
                 clytemnestra[164].MsPosition + 550,
                 clytemnestra[173].MsPosition,
             };
-            for(int i = 0; i < 12; ++i)
+            for(int i = 0; i < cheepsPalette.Count; ++i)
             {
-                IUniqueDef cheep = cheepsPalette[cheepIndices[i]].DeepClone();
+                IUniqueDef cheep = cheepsPalette.UniqueDurationDef(cheepIndices[i]);
                 cheep.MsPosition = msPositions[i];
                 cheep.MsDuration *= 2;
                 MidiChordDef iumd = cheep as MidiChordDef;

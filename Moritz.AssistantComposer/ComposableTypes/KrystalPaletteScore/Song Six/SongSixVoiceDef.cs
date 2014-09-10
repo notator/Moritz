@@ -62,8 +62,8 @@ namespace Moritz.AssistantComposer
             int msPosition = 0;
             foreach(int value in sequence)
             {
-                Debug.Assert((value >= 1 && value <= palette.DurationDefs.Count), "Illegal argument: value out of range in sequence");
-                IUniqueDef iumdd = palette.DurationDefs[value - 1].DeepClone();
+                Debug.Assert((value >= 1 && value <= palette.Count), "Illegal argument: value out of range in sequence");
+                IUniqueDef iumdd = palette.UniqueDurationDef(value - 1);
                 Debug.Assert(iumdd.MsDuration > 0);
                 iumdd.MsPosition = msPosition;
                 msPosition += iumdd.MsDuration;

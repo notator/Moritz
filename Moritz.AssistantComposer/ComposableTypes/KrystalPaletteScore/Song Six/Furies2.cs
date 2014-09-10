@@ -23,7 +23,7 @@ namespace Moritz.AssistantComposer
         internal void GetBeforeInterlude3(Clytemnestra clytemnestra, SongSixVoiceDef wind1, SongSixVoiceDef furies3, List<Palette> _palettes)
         {
             GetFuries2Interlude2(clytemnestra, wind1, furies3);
-            AddFuries2ChirpsForInterlude2AndVerse3(clytemnestra, wind1, _palettes[7].DurationDefs);
+            AddFuries2ChirpsForInterlude2AndVerse3(clytemnestra, wind1, _palettes[7]);
         }
         /// <summary>
         /// Steals the ticks from furies 3, then agglommerates the remaining rests in furies3...
@@ -55,28 +55,29 @@ namespace Moritz.AssistantComposer
             furies3.AgglomerateRests();
         }
 
-        private void AddFuries2ChirpsForInterlude2AndVerse3(Clytemnestra clytemnestra, SongSixVoiceDef wind1, List<DurationDef> chirpsPalette)
+        private void AddFuries2ChirpsForInterlude2AndVerse3(Clytemnestra clytemnestra, SongSixVoiceDef wind1, Palette chirpsPalette)
         {
             int[] chirpIndices = { 4, 6, 10, 0, 1, 3, 5, 7, 9, 11 };
             int[] transpositions = { 2, 0, 4, 11, 5, 10, 6, 9, 7, 8 };
-            //double[] velocityfactors = { 0.3, 0.31, 0.32, 0.34, 0.35, 0.36, 0.37, 0.39, 0.4, 0.42, 0.43, 0.45 };
             double[] velocityfactors = { 0.32, 0.3, 0.35, 0.45, 0.36, 0.43, 0.37, 0.42, 0.39, 0.4 };
+            IUniqueDef c3 = chirpsPalette.UniqueDurationDef(chirpIndices[3]);
+            IUniqueDef c7 = chirpsPalette.UniqueDurationDef(chirpIndices[7]);
             int[] msPositions =
             { 
                 this[2].MsPosition, 
                 this[6].MsPosition, 
                 this[16].MsPosition, 
                 this[26].MsPosition,
-                this[26].MsPosition + chirpsPalette[chirpIndices[3]].MsDuration,
+                this[26].MsPosition + c3.MsDuration,
                 clytemnestra[129].MsPosition,
                 clytemnestra[143].MsPosition + 110,
                 clytemnestra[156].MsPosition + 220,
-                clytemnestra[156].MsPosition + 220 + chirpsPalette[chirpIndices[7]].MsDuration,
+                clytemnestra[156].MsPosition + 220 + c7.MsDuration,
                 clytemnestra[168].MsPosition + 330,
             };
             for(int i = 9; i >=0 ; --i)
             {
-                IUniqueDef cheep = chirpsPalette[chirpIndices[i]].DeepClone();
+                IUniqueDef cheep = chirpsPalette.UniqueDurationDef(chirpIndices[i]);
                 cheep.MsPosition = msPositions[i];
                 //cheep.MsDuration *= 2;
                 MidiChordDef umcd = cheep as MidiChordDef;
