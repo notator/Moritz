@@ -103,8 +103,8 @@ namespace Moritz.Score.Notation
         {
             byte[] currentChannelVelocities = new byte[systems[0].Staves.Count];
 
-            List<UniqueClefChangeDef> voice0ClefChangeDefs = new List<UniqueClefChangeDef>();
-            List<UniqueClefChangeDef> voice1ClefChangeDefs = new List<UniqueClefChangeDef>();
+            List<ClefChangeDef> voice0ClefChangeDefs = new List<ClefChangeDef>();
+            List<ClefChangeDef> voice1ClefChangeDefs = new List<ClefChangeDef>();
 
             for(int systemIndex = 0; systemIndex < systems.Count; ++systemIndex)
             {
@@ -131,9 +131,9 @@ namespace Moritz.Score.Notation
                             if(clefChangeSymbol != null)
                             {
                                 if(voiceIndex == 0)
-                                    voice0ClefChangeDefs.Add(iud as UniqueClefChangeDef);
+                                    voice0ClefChangeDefs.Add(iud as ClefChangeDef);
                                 else
-                                    voice1ClefChangeDefs.Add(iud as UniqueClefChangeDef);
+                                    voice1ClefChangeDefs.Add(iud as ClefChangeDef);
                             }
 
                             voice.NoteObjects.Add(noteObject);
@@ -162,16 +162,16 @@ namespace Moritz.Score.Notation
             }
         }
 
-        private void SetNextSystemClefType(int staffIndex, List<UniqueClefChangeDef> voice0ClefChangeDefs, List<UniqueClefChangeDef> voice1ClefChangeDefs)
+        private void SetNextSystemClefType(int staffIndex, List<ClefChangeDef> voice0ClefChangeDefs, List<ClefChangeDef> voice1ClefChangeDefs)
         {
             Debug.Assert(voice0ClefChangeDefs.Count > 0 || voice1ClefChangeDefs.Count > 0);
 
-            UniqueClefChangeDef lastVoice0Def = null;
+            ClefChangeDef lastVoice0Def = null;
             if(voice0ClefChangeDefs.Count > 0)
             {
                 lastVoice0Def = voice0ClefChangeDefs[voice0ClefChangeDefs.Count - 1];
             }
-            UniqueClefChangeDef lastVoice1Def = null;
+            ClefChangeDef lastVoice1Def = null;
             if(voice1ClefChangeDefs.Count > 0)
             {
                 lastVoice1Def = voice1ClefChangeDefs[voice1ClefChangeDefs.Count - 1];
@@ -200,7 +200,7 @@ namespace Moritz.Score.Notation
         /// Insert invisible clefChangeSymbols into the other voice.
         /// ClefChangeSymbols are used by the Notator when deciding how to notate chords.
         /// </summary>
-        private void InsertInvisibleClefChangeSymbols(List<Voice> voices, List<UniqueClefChangeDef> voice0ClefChangeDefs, List<UniqueClefChangeDef> voice1ClefChangeDefs)
+        private void InsertInvisibleClefChangeSymbols(List<Voice> voices, List<ClefChangeDef> voice0ClefChangeDefs, List<ClefChangeDef> voice1ClefChangeDefs)
         {
             Debug.Assert(voices.Count == 2);
             if(voice1ClefChangeDefs.Count > 0)
@@ -240,9 +240,9 @@ namespace Moritz.Score.Notation
             return clefs;
         }
 
-        private void InsertInvisibleClefChanges(Voice voice, List<UniqueClefChangeDef> clefChangeDefs)
+        private void InsertInvisibleClefChanges(Voice voice, List<ClefChangeDef> clefChangeDefs)
         {
-            foreach(UniqueClefChangeDef ccd in clefChangeDefs)
+            foreach(ClefChangeDef ccd in clefChangeDefs)
             {
                 ClefChangeSymbol invisibleClefChangeSymbol = new ClefChangeSymbol(voice, ccd.ClefType, _pageFormat.CautionaryNoteheadsFontHeight, ccd.MsPosition);
                 invisibleClefChangeSymbol.IsVisible = false;
@@ -354,10 +354,10 @@ namespace Moritz.Score.Notation
             return clefType;
         }
 
-        //private void InsertInUniqueMidiDurationDefs(List<UniqueClefChangeDef> uClefChangeDefs, List<IUniqueDef> uniqueMidiDurationDefs)
+        //private void InsertInUniqueMidiDurationDefs(List<ClefChangeDef> uClefChangeDefs, List<IUniqueDef> uniqueMidiDurationDefs)
         //{
         //    Debug.Assert(uniqueMidiDurationDefs.Count > 1);
-        //    foreach(UniqueClefChangeDef uClefChangeDef in uClefChangeDefs)
+        //    foreach(ClefChangeDef uClefChangeDef in uClefChangeDefs)
         //    {
         //        int msPosition = uClefChangeDef.MsPosition;
         //        int count = uniqueMidiDurationDefs.Count;
@@ -385,8 +385,8 @@ namespace Moritz.Score.Notation
         //    }
         //    for(int i = 1; i < uniqueMidiDurationDefs.Count; ++i)
         //    {
-        //        UniqueClefChangeDef uccd1 = uniqueMidiDurationDefs[i - 1] as UniqueClefChangeDef;
-        //        UniqueClefChangeDef uccd2 = uniqueMidiDurationDefs[i] as UniqueClefChangeDef;
+        //        ClefChangeDef uccd1 = uniqueMidiDurationDefs[i - 1] as ClefChangeDef;
+        //        ClefChangeDef uccd2 = uniqueMidiDurationDefs[i] as ClefChangeDef;
         //        Debug.Assert((uccd1 == null || uccd2 == null) || uccd1.MsPosition < uccd2.MsPosition);
         //    }
         //}

@@ -104,11 +104,11 @@ namespace Moritz.AssistantComposer
             // Clefchange symbols must point at the following object in their own VoiceDef
             for(int i = 0; i < clonedLmdds.Count; ++i)
             {
-                UniqueClefChangeDef clone = clonedLmdds[i] as UniqueClefChangeDef;
+                ClefChangeDef clone = clonedLmdds[i] as ClefChangeDef;
                 if(clone != null)
                 {
                     Debug.Assert(i < (clonedLmdds.Count - 1));
-                    UniqueClefChangeDef replacement = new UniqueClefChangeDef(clone.ClefType, clonedLmdds[i + 1]);
+                    ClefChangeDef replacement = new ClefChangeDef(clone.ClefType, clonedLmdds[i + 1]);
                     clonedLmdds.RemoveAt(i);
                     clonedLmdds.Insert(i, replacement);
                 }
@@ -631,7 +631,7 @@ namespace Moritz.AssistantComposer
 
             for(int i = beginIndex; i < endIndex; ++i)
             {
-                _uniqueDefs[i].AdjustDuration(factor);
+                _uniqueDefs[i].AdjustMsDuration(factor);
                 factor += basicIncrement;
             }
 
@@ -1461,7 +1461,7 @@ namespace Moritz.AssistantComposer
             }
             #endregion
 
-            UniqueClefChangeDef clefChangeDef = new UniqueClefChangeDef(clefType, _uniqueDefs[index]);
+            ClefChangeDef clefChangeDef = new ClefChangeDef(clefType, _uniqueDefs[index]);
             _uniqueDefs.Insert(index, clefChangeDef);
         }
 

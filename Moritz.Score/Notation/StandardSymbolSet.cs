@@ -301,11 +301,11 @@ namespace Moritz.Score.Notation
             ref byte currentVelocity, float musicFontHeight)
         {
             NoteObject noteObject = null;
-            UniqueCautionaryChordDef uniqueCautionaryChordDef = iud as UniqueCautionaryChordDef;
+            CautionaryChordDef uniqueCautionaryChordDef = iud as CautionaryChordDef;
             MidiChordDef uniqueMidiChordDef = iud as MidiChordDef;
             InputChordDef uniqueInputChordDef = iud as InputChordDef;
             RestDef uniqueRestDef = iud as RestDef;
-            UniqueClefChangeDef uniqueClefChangeDef = iud as UniqueClefChangeDef;
+            ClefChangeDef uniqueClefChangeDef = iud as ClefChangeDef;
 
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
             float cautionaryFontHeight = pageFormat.CautionaryNoteheadsFontHeight;

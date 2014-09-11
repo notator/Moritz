@@ -74,8 +74,8 @@
     <Compile Include="Midi\TimeControl.cs" />
     <Compile Include="Notation\DurationDef.cs" />
     <Compile Include="Notation\IUniqueSplittableChordDef.cs" />
-    <Compile Include="Notation\UniqueCautionaryChordDef.cs" />
-    <Compile Include="Notation\UniqueClefChangeDef.cs" />
+    <Compile Include="Notation\CautionaryChordDef.cs" />
+    <Compile Include="Notation\ClefChangeDef.cs" />
     <Compile Include="Notation\IUniqueChordDef.cs" />
     <Compile Include="Notation\RestDef.cs" />
     <Compile Include="Midi\MidiChordDef.cs" />

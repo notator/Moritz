@@ -6,20 +6,20 @@ using Moritz.Score.Midi;
 namespace Moritz.Score.Notation
 {
     ///<summary>
-    /// A UniqueClefChangeDef is a IUniqueMidiDurationDef which can be created while programming a score.
+    /// A ClefChangeDef is a IUniqueMidiDurationDef which can be created while programming a score.
     /// It must be added to a voice.UniqueMidiDurationDefs list immediately before a MidiChordDef or
     /// UniqueMidiRestDef. It shares the same MsPosition.
     /// When converting definitions to symbols, the Notator uses this class to ensure that both voices in
     /// a two-voice staff contain the same ClefSigns (see Notator.AddSymbolsToSystems(List<SvgSystem> systems)).
     /// (The ClefSigns may have different visibility in the two voices.)
     ///</summary>
-    public class UniqueClefChangeDef : IUniqueDef
+    public class ClefChangeDef : IUniqueDef
     {
         /// <summary>
         /// The clefType must be one of the following strings "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"
         /// The followingUniqueMidiChordOrRestDef must be a MidiChordDef or UniqueMidiRestDef.
         /// </summary>
-        public UniqueClefChangeDef(string clefType, IUniqueDef followingUniqueChordOrRestDef)
+        public ClefChangeDef(string clefType, IUniqueDef followingUniqueChordOrRestDef)
             :base()
         {
             #region check args
@@ -51,20 +51,20 @@ namespace Moritz.Score.Notation
         #region IUniqueDef
         public override string ToString()
         {
-            return ("MsPosition=" + MsPosition.ToString() + " clefChange: type=" + _clefType + " UniqueClefChangeDef");
+            return ("MsPosition=" + MsPosition.ToString() + " clefChange: type=" + _clefType + " ClefChangeDef");
         }
 
-        public void AdjustDuration(double factor) {}
+        public void AdjustMsDuration(double factor) {}
 
         /// <summary>
         /// ACHTUNG: The clone points at the same _followingChordOrRestDef as the original.
         /// This is not usually what is wanted. After cloning a VoiceDef, the cloned
-        /// UniqueClefChangeDefs should be replaced. See VoiceDef.Clone().
+        /// ClefChangeDefs should be replaced. See VoiceDef.Clone().
         /// </summary>
         /// <returns></returns>
         public IUniqueDef DeepClone()
         {
-            UniqueClefChangeDef deepClone = new UniqueClefChangeDef(this._clefType, this._followingChordOrRestDef);
+            ClefChangeDef deepClone = new ClefChangeDef(this._clefType, this._followingChordOrRestDef);
             return deepClone;
         }
 

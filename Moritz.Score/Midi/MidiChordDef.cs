@@ -16,7 +16,7 @@ namespace Moritz.Score.Midi
     /// Each midiChord in an SVG file will be given an ID of the form "midiChord"+uniqueNumber, but
     /// Moritz does not actually use the ids, so they are not read into in MidiChordDefs.
     ///</summary>
-    public class MidiChordDef : DurationDef, IUniqueSplittableChordDef, IUniqueDef
+    public class MidiChordDef : DurationDef, IUniqueSplittableChordDef
     {
         public MidiChordDef()
             : base(0)
@@ -333,7 +333,7 @@ namespace Moritz.Score.Midi
         /// Multiplies the MsDuration by the given factor.
         /// </summary>
         /// <param name="factor"></param>
-        public void AdjustDuration(double factor)
+        public void AdjustMsDuration(double factor)
         {
             MsDuration = (int)(_msDuration * factor);
         }

@@ -12,7 +12,7 @@ namespace Moritz.Score.Notation
     /// Each inputChord in an SVG file will be given an ID of the form "inputChord"+uniqueNumber, but
     /// Moritz does not actually use the ids, so they are not read into in UniqueInputChordDefs.
     ///</summary>
-    public class InputChordDef : DurationDef, IUniqueSplittableChordDef, IUniqueDef
+    public class InputChordDef : DurationDef, IUniqueSplittableChordDef
     {
         public InputChordDef()
             :base(0)
@@ -61,7 +61,7 @@ namespace Moritz.Score.Notation
         /// Multiplies the MsDuration by the given factor.
         /// </summary>
         /// <param name="factor"></param>
-        public void AdjustDuration(double factor)
+        public void AdjustMsDuration(double factor)
         {
             MsDuration = (int)(_msDuration * factor);
         }

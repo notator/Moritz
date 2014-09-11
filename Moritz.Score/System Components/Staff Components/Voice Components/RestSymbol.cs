@@ -12,11 +12,11 @@ namespace Moritz.Score
         public RestSymbol(Voice voice, IUniqueDef iumdd, int minimumCrotchetDurationMS, float fontHeight)
             : base(voice, iumdd.MsDuration, iumdd.MsPosition, minimumCrotchetDurationMS, fontHeight)
         {
-            if(iumdd is UniqueCautionaryChordDef)
+            if(iumdd is CautionaryChordDef)
             {
-                Console.WriteLine("rest is UniqueCautionaryChordDef!");
+                Console.WriteLine("rest is CautionaryChordDef!");
             }
-            LocalCautionaryChordDef = iumdd as UniqueCautionaryChordDef;
+            LocalCautionaryChordDef = iumdd as CautionaryChordDef;
         }
 
         public override void WriteSVG(SvgWriter w)
@@ -53,7 +53,7 @@ namespace Moritz.Score
         /// a) this rest is used like any other rest when justifying systems, but
         /// b) it is not displayed, and does not affect the temporal positions or durations of any chords. 
         /// </summary>
-        public UniqueCautionaryChordDef LocalCautionaryChordDef = null;
+        public CautionaryChordDef LocalCautionaryChordDef = null;
 		#endregion display attributes
 		#region verticalPos attributes
 		public bool Centered = false; // capella default

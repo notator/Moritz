@@ -2,7 +2,16 @@
 namespace Moritz.Score.Notation
 {
     ///<summary>
-    /// IUniqueDef is implemented by all Unique...Def objects.
+    /// IUniqueDef is implemented by all objects that can be added to a VoiceDefs.UniqueDefs list.
+    /// Currently (11.9.2014) these are:
+    ///     MidiChordDef
+    ///     InputChordDef
+    ///     RestDef
+    ///     CautionaryChordDef
+    ///     ClefChangeDef
+    /// These objects must implement DeepClone() so that VoiceDefs.DeepClone() can be implemented.
+    /// VoiceDefs is used for composition. When complete, the UniqueDefs list is transferred to
+    /// Voice before the definitions are converted to the objects themselves.
     ///</summary>
     public interface IUniqueDef
     {
@@ -13,7 +22,7 @@ namespace Moritz.Score.Notation
         /// </summary>
         IUniqueDef DeepClone();
 
-        void AdjustDuration(double factor);
+        void AdjustMsDuration(double factor);
 
         int MsDuration { get; set; }
         int MsPosition { get; set; }

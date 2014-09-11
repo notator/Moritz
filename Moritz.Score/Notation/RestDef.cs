@@ -41,7 +41,7 @@ namespace Moritz.Score.Notation
         /// Multiplies the MsDuration by the given factor.
         /// </summary>
         /// <param name="factor"></param>
-        public void AdjustDuration(double factor)
+        public void AdjustMsDuration(double factor)
         {
             MsDuration = (int)(_msDuration * factor);
         }

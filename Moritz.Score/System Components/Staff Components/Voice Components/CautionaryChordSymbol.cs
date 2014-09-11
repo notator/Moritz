@@ -7,7 +7,7 @@ namespace Moritz.Score
 {
     internal class CautionaryChordSymbol : ChordSymbol
     {
-        public CautionaryChordSymbol(Voice voice, UniqueCautionaryChordDef lccd, float fontSize)
+        public CautionaryChordSymbol(Voice voice, CautionaryChordDef lccd, float fontSize)
             : base(voice, lccd.MsDuration, lccd.MsPosition, 600, fontSize)
         {
             SetNoteheadPitches(lccd.MidiPitches);

@@ -7,9 +7,9 @@ namespace Moritz.Score.Notation
     /// This class is created while splitting systems.
     /// It is used when notating them. this class has no content!
     /// </summary>
-    public class UniqueCautionaryChordDef : IUniqueChordDef
+    public class CautionaryChordDef : IUniqueChordDef
     {
-        public UniqueCautionaryChordDef(IUniqueChordDef chordDef, int msPosition, int msDuration)
+        public CautionaryChordDef(IUniqueChordDef chordDef, int msPosition, int msDuration)
         {
             _midiPitches = new List<byte>();
             foreach(byte midiPitch in chordDef.MidiPitches)
@@ -32,14 +32,14 @@ namespace Moritz.Score.Notation
         #region IUniqueDef
         public override string ToString()
         {
-            return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString() + " UniqueCautionaryChordDef");
+            return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString() + " CautionaryChordDef");
         }
 
-        public void AdjustDuration(double factor) { }
+        public void AdjustMsDuration(double factor) { }
 
         public IUniqueDef DeepClone()
         {
-            UniqueCautionaryChordDef deepClone = new UniqueCautionaryChordDef(this, this._msPosition, this._msDuration);
+            CautionaryChordDef deepClone = new CautionaryChordDef(this, this._msPosition, this._msDuration);
             return deepClone;
         }
 

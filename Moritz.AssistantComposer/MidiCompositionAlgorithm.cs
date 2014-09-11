@@ -149,7 +149,7 @@ namespace Moritz.AssistantComposer
                     
                     if(iUnique.MsPosition >= absoluteSplitPos)
                     {
-                        if(iUnique.MsPosition == absoluteSplitPos && iUnique is UniqueClefChangeDef)
+                        if(iUnique.MsPosition == absoluteSplitPos && iUnique is ClefChangeDef)
                         {
                             firstBarVoice.UniqueDefs.Add(iUnique);
                         }
@@ -171,20 +171,20 @@ namespace Moritz.AssistantComposer
                             RestDef secondRestHalf = new RestDef(absoluteSplitPos, durationAfterBarline);
                             secondBarVoice.UniqueDefs.Add(secondRestHalf);
                         }
-                        else if(iUnique is UniqueCautionaryChordDef)
+                        else if(iUnique is CautionaryChordDef)
                         {
                             // This is a cautionary chord. Set the position of the following barline, and
                             // Add an LocalizedCautionaryChordDef at the beginning of the following bar.
                             iUnique.MsDuration = absoluteSplitPos - iUnique.MsPosition;
                             firstBarVoice.UniqueDefs.Add(iUnique);
 
-                            UniqueCautionaryChordDef secondLmdd = new UniqueCautionaryChordDef((IUniqueChordDef)iUnique, absoluteSplitPos, durationAfterBarline);
+                            CautionaryChordDef secondLmdd = new CautionaryChordDef((IUniqueChordDef)iUnique, absoluteSplitPos, durationAfterBarline);
                             secondBarVoice.UniqueDefs.Add(secondLmdd);
                         }
                         else
                         {
                             // This is a MidiChordDef or a InputChordDef. 
-                            // Set the position of the following barline, and add a UniqueCautionaryChordDef at the beginning
+                            // Set the position of the following barline, and add a CautionaryChordDef at the beginning
                             // of the following bar.
                             if(uniqueChordDef != null)
                             {
@@ -193,7 +193,7 @@ namespace Moritz.AssistantComposer
 
                             firstBarVoice.UniqueDefs.Add((IUniqueDef) uniqueChordDef);
 
-                            UniqueCautionaryChordDef secondLmdd = new UniqueCautionaryChordDef((IUniqueChordDef) uniqueChordDef, 
+                            CautionaryChordDef secondLmdd = new CautionaryChordDef((IUniqueChordDef) uniqueChordDef, 
                                 absoluteSplitPos, durationAfterBarline);
                             secondBarVoice.UniqueDefs.Add(secondLmdd);
                         }
