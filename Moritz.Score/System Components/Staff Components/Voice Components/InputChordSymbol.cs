@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Text;
-using System.Diagnostics;
 
-using Moritz.Globals;
-using Moritz.Score.Midi;
 using Moritz.Score.Notation;
 
 namespace Moritz.Score

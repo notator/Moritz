@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 
 using Moritz.Score.Notation;
-using Moritz.Score.Midi;
 
 namespace Moritz.Score
 {

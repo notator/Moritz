@@ -1,4 +1,3 @@
-
 using Multimedia.Midi;
 
 namespace Moritz.AssistantPerformer

@@ -1,8 +1,6 @@
 ﻿using System.Drawing;
 using System.Collections.Generic;
 
-using Moritz.Score.Midi;
-
 namespace Moritz.Score.Notation
 {
     public abstract class SymbolSet

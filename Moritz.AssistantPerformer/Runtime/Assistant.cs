@@ -6,11 +6,7 @@ using System.Threading;
 using System.Diagnostics;
 
 using Moritz.Globals;
-using Moritz.Krystals;
-using Moritz.Score;
 using Moritz.Score.Midi;
-using Moritz.Score.Notation;
-
 
 namespace Moritz.AssistantPerformer
 {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 
-
 namespace Moritz.Score.Notation
 {
     internal class ChordMetrics : Metrics

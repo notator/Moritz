@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Diagnostics;
-using System.Linq;
 using System;
-
-using Moritz.Score.Midi;
 
 namespace Moritz.Score.Notation
 {

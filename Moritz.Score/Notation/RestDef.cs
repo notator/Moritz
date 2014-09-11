@@ -1,11 +1,3 @@
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Xml;
-
-using Multimedia.Midi;
-
-using Moritz.Globals;
-using Moritz.Score.Midi;
 
 namespace Moritz.Score.Notation
 {

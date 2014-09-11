@@ -1,7 +1,5 @@
 using System.Text;
 
-using Moritz.Score.Midi;
-
 namespace Moritz.Score
 {
     /// <summary>

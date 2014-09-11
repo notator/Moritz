@@ -1,6 +1,4 @@
 
-using System.Diagnostics;
-
 namespace Moritz.Score.Notation
 {
     public abstract class DurationDef

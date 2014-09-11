@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 
 using Moritz.Score.Notation;
 

@@ -1,9 +1,6 @@
 using System;
 using System.Diagnostics;
-using System.Collections.Generic;
 
-using Multimedia.Midi;
-using Moritz.Globals;
 using Moritz.Score.Midi;
 
 namespace Moritz.Score.Notation

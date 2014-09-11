@@ -1,5 +1,4 @@
 ﻿
-
 namespace Moritz.Score.Notation
 {
     internal class SystemMetrics : GroupMetrics

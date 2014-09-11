@@ -2,8 +2,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Collections.Generic;
 
-using Moritz.Globals;
-
 namespace Moritz.Score.Midi
 {
     /// <summary>

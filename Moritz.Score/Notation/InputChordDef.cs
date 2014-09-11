@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Xml;
 
-using Multimedia.Midi;
 using Moritz.Globals;
 
 namespace Moritz.Score.Notation

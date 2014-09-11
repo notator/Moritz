@@ -1,6 +1,4 @@
-
 using Multimedia.Midi;
-
 
 namespace Moritz.Score.Midi
 {

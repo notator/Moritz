@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Moritz.Score.Notation
 {

@@ -7,7 +7,6 @@ using System.IO;
 using System.Windows.Forms;
 
 using Moritz.Globals;
-using Moritz.Score.Midi;
 using Moritz.Score.Notation;
 
 namespace Moritz.Score
