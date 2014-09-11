@@ -5,18 +5,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Xml;
-using System.Threading;
-using System.IO;
 
 using Krystals4ObjectLibrary;
-using Multimedia.Midi;
-
 using Moritz.Globals;
-using Moritz.Krystals;
-using Moritz.Score;
-using Moritz.Score.Midi;
-using Moritz.Score.Notation;
-using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {

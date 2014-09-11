@@ -2,17 +2,10 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Xml;
 using System.Diagnostics;
 using System.Text;
 
-using Krystals4ObjectLibrary;
 using Moritz.Globals;
-using Moritz.Krystals;
-using Moritz.Score;
-using Moritz.Score.Midi;
-using Moritz.Score.Notation;
-using Moritz.AssistantPerformer;
 
 namespace Moritz.AssistantComposer
 {

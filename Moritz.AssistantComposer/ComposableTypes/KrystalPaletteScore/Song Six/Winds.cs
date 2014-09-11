@@ -1,16 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System;
 
 using Krystals4ObjectLibrary;
-using Moritz.Globals;
-using Moritz.Krystals;
-using Moritz.Score;
-using Moritz.Score.Midi;
 using Moritz.Score.Notation;
-using Moritz.AssistantPerformer;
+using Moritz.AssistantComposer;
 
-namespace Moritz.AssistantComposer
+namespace Moritz.AssistantComposer.SongSix
 {
     /// <summary>
     /// The Wind "constructors" (part of the Song Six algorithm).
