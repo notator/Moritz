@@ -18,8 +18,8 @@ namespace Moritz.Score.Midi
             BankIndex = bank;
             PatchIndex = patch;
             HasChordOff = hasChordOff;
-            Pitches = pitches;
-            Velocities = velocities;
+            Pitches = new List<byte>(pitches);
+            Velocities = new List<byte>(velocities);
 
             #region check values
             Debug.Assert(_msDuration > 0, "msDuration out of range");
@@ -38,8 +38,8 @@ namespace Moritz.Score.Midi
             BankIndex = original.BankIndex;
             PatchIndex = original.PatchIndex;
             HasChordOff = original.HasChordOff;
-            Pitches = original.Pitches;
-            Velocities = original.Velocities;
+            Pitches = new List<byte>(original.Pitches);
+            Velocities = new List<byte>(original.Velocities);
         }
 
         public BasicMidiChordDef(XmlReader r)

@@ -243,16 +243,22 @@ namespace Moritz.Score.Midi
             rval.HasChordOff = this.HasChordOff;
             rval.Lyric = this.Lyric;
             rval.MinimumBasicMidiChordMsDuration = this.MinimumBasicMidiChordMsDuration; // required when changing a midiChord's duration
-            rval.MidiPitches = this.MidiPitches; // the displayed noteheads
+            rval.MidiPitches = new List<byte>(this.MidiPitches); // the displayed noteheads
             // rval.MidiVelocity must be set after setting BasicMidiChordDefs See below.
             rval.OrnamentNumberSymbol = this.OrnamentNumberSymbol; // the displayed ornament number
 
             MidiChordSliderDefs m = this.MidiChordSliderDefs;
-            rval.MidiChordSliderDefs = new MidiChordSliderDefs(m.PitchWheelMsbs, m.PanMsbs, m.ModulationWheelMsbs, m.ExpressionMsbs);
+            List<byte> pitchWheelMsbs = NewListByteOrNull(m.PitchWheelMsbs);
+            List<byte> panMsbs = NewListByteOrNull(m.PanMsbs);
+            List<byte> modulationWheelMsbs = NewListByteOrNull(m.ModulationWheelMsbs);
+            List<byte> expressionMsbs = NewListByteOrNull(m.ExpressionMsbs);
+            if(pitchWheelMsbs != null || panMsbs != null || modulationWheelMsbs != null || expressionMsbs != null)
+                rval.MidiChordSliderDefs = new MidiChordSliderDefs(pitchWheelMsbs, panMsbs, modulationWheelMsbs, expressionMsbs);
+            else
+                rval.MidiChordSliderDefs = null;
 
-            List<BasicMidiChordDef> bs = this.BasicMidiChordDefs;
             List<BasicMidiChordDef> newBs = new List<BasicMidiChordDef>();
-            foreach(BasicMidiChordDef b in bs)
+            foreach(BasicMidiChordDef b in this.BasicMidiChordDefs)
             {
                 List<byte> pitches = new List<byte>(b.Pitches);
                 List<byte> velocities = new List<byte>(b.Velocities);
@@ -264,6 +270,19 @@ namespace Moritz.Score.Midi
             rval.MidiVelocity = this.MidiVelocity; // needed for displaying dynamics (must be set *after* setting BasicMidiChordDefs)
 
            return rval;
+        }
+
+        /// <summary>
+        /// Returns null if listToClone is null, otherwise returns a clone of the listToClone.
+        /// </summary>
+        /// <param name="listToClone"></param>
+        /// <returns></returns>
+        private List<byte> NewListByteOrNull(List<byte> listToClone)
+        {
+            List<byte> newListByte = null;
+            if(listToClone != null)
+                newListByte = new List<byte>(listToClone);
+            return newListByte;
         }
 
         public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
