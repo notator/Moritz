@@ -404,17 +404,9 @@ namespace Moritz.AssistantComposer
                         midiPitches.Add(bcfs.MidiPitches[chordIndex]);
                         midiVelocities.Add(bcfs.Velocities[chordIndex]);
                     }
-                    else if(bcfs.ChordDensities[chordIndex] == 2)
-                    {
-                        midiPitches.Add(bcfs.MidiPitches[chordIndex]);
-                        midiPitches.Add(M.MidiValue(bcfs.MidiPitches[chordIndex] + bcfs.Inversions[0][0]));
-                        midiVelocities.Add(bcfs.Velocities[chordIndex]);
-
-                        midiVelocities.Add(M.MidiValue((int)(bcfs.Velocities[chordIndex] * verticalVelocityFactor)));
-                    }
                     else
                     {
-                        midiPitches = GetMidiPitches(bcfs.MidiPitches[chordIndex], bcfs.ChordDensities[chordIndex], bcfs.Inversions, bcfs.InversionIndices[chordIndex]);
+                        midiPitches = GetMidiPitches(chordIndex, bcfs.MidiPitches, bcfs.ChordDensities, bcfs.Inversions, bcfs.InversionIndices);
                         midiVelocities = GetVerticalVelocities(bcfs.Velocities[chordIndex], bcfs.ChordDensities[chordIndex], verticalVelocityFactor);
                     }
 
@@ -423,30 +415,30 @@ namespace Moritz.AssistantComposer
                 Velocities.Add(midiVelocities);            }
         }
 
-        private List<byte> GetMidiPitches(byte basePitch, int density, List<List<byte>> inversions, int inversionIndex)
+        private List<byte> GetMidiPitches(int chordIndex, List<byte> rootPitches, List<byte> densities, List<List<byte>> inversions, List<int> inversionIndices)
         {
-            List<byte> midiPitches = new List<byte>();
-
-            List<byte> primeIntervals = new List<byte>();
+            List<byte> primeIntervals = null;
             Debug.Assert(inversions != null);
             if(inversions.Count > 1)
             {
+                int inversionIndex = inversionIndices[chordIndex];
                 Debug.Assert(inversions.Count > inversionIndex);
                 primeIntervals = inversions[inversionIndex];
             }
             else if(inversions.Count == 1)
-                primeIntervals.Add(inversions[0][0]);
+            {
+                primeIntervals = inversions[0];
+            }
             // If krystalPalette.Inversions.Count == 0, primeIntervals is empty.
 
-            byte pitch = basePitch;
-            for(int p = 0; p < density; p++)
+            byte rootPitch = rootPitches[chordIndex];
+            int nUpperPitches = densities[chordIndex] - 1;
+            List<byte> midiPitches = new List<byte>();
+            midiPitches.Add(rootPitch);
+            for(int p = 0; p < nUpperPitches; p++)
             {
-                midiPitches.Add(pitch);
-                if(p < (density - 1))
-                {
-                    int newpitch = pitch + primeIntervals[p];
-                    pitch = M.MidiValue(newpitch);
-                }
+                byte newpitch = M.MidiValue(midiPitches[p] + primeIntervals[p]);
+                midiPitches.Add(newpitch);
             }
             return midiPitches;
         }
