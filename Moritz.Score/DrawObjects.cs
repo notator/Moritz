@@ -80,7 +80,7 @@ namespace Moritz.Score
                     case TextFrameType.none:
                     break;
                     case TextFrameType.rectangle:
-                    w.SvgRect(null, Metrics.Left, Metrics.Top, Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top,
+                    w.SvgRect(null, null, Metrics.Left, Metrics.Top, Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top,
                         _frameInfo.ColorString.String, _frameInfo.StrokeWidth, "none", null);
                     break;
                     case TextFrameType.ellipse:
@@ -156,7 +156,7 @@ namespace Moritz.Score
 
         public override void WriteSVG(SvgWriter w)
         {
-            w.SvgStartGroup(Metrics.UniqueSvgID);
+            w.SvgStartGroup(Metrics.ObjectType, null);
             foreach(DrawObject drawObject in DrawObjects)
                 drawObject.WriteSVG(w);
             w.SvgEndGroup();

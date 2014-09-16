@@ -7,26 +7,6 @@ using Moritz.Score.Notation;
 
 namespace Moritz.Score
 {
-    public class InputVoice : Voice
-    {
-        public InputVoice(InputStaff inputStaff)
-            : base(inputStaff, Byte.MaxValue)
-        {
-        }
-    }
-
-    public class OutputVoice : Voice
-    {
-        public OutputVoice(OutputStaff outputStaff, Voice voice)
-            : base(outputStaff, voice)
-        {
-        }
-
-        public OutputVoice(OutputStaff outputStaff, byte midiChannel)
-            : base(outputStaff, midiChannel)
-        {
-        }
-    }
     /// <summary>
     ///  A sequence of noteObjects.
     /// </summary>
@@ -50,15 +30,8 @@ namespace Moritz.Score
         /// Writes out an SVG Voice
         /// </summary>
         /// <param name="w"></param>
-        public void WriteSVG(SvgWriter w)
+        public virtual void WriteSVG(SvgWriter w)
         {
-            w.SvgStartGroup("voice" + SvgScore.UniqueID_Number);
-            w.WriteAttributeString("score", "object", null, "voice");
-            if(this is OutputVoice)
-            {
-                w.WriteAttributeString("score", "midiChannel", null, MidiChannel.ToString());
-            }
-
             foreach(NoteObject noteObject in NoteObjects)
             {
                 ChordSymbol chordSymbol = noteObject as ChordSymbol;
@@ -69,7 +42,6 @@ namespace Moritz.Score
                 else
                     noteObject.WriteSVG(w);
             }
-            w.SvgEndGroup(); // voice
         }
 
         /// <summary>

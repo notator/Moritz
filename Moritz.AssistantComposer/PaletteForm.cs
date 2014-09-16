@@ -132,12 +132,7 @@ namespace Moritz.AssistantComposer
         {
             if(this.OrnamentSettingsForm != null)
             {
-                Krystal ornamentsKrystal = OrnamentSettingsForm.OrnamentsKrystal;
-
-                string shape = ornamentsKrystal.Shape;
-                string[] sizes = shape.Split(':');
-                int ornamentLevel = int.Parse(OrnamentSettingsForm.OrnamentsLevelTextBox.Text.Trim());
-                _numberOfOrnaments = int.Parse(sizes[ornamentLevel - 1].Trim());
+                _numberOfOrnaments = this.OrnamentSettingsForm.NumberOfOrnaments;
 
                 OrnamentNumbersLabel.Enabled = true;
                 OrnamentNumbersTextBox.Enabled = true;

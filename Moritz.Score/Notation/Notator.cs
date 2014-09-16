@@ -354,43 +354,6 @@ namespace Moritz.Score.Notation
             return clefType;
         }
 
-        //private void InsertInUniqueMidiDurationDefs(List<ClefChangeDef> uClefChangeDefs, List<IUniqueDef> uniqueMidiDurationDefs)
-        //{
-        //    Debug.Assert(uniqueMidiDurationDefs.Count > 1);
-        //    foreach(ClefChangeDef uClefChangeDef in uClefChangeDefs)
-        //    {
-        //        int msPosition = uClefChangeDef.MsPosition;
-        //        int count = uniqueMidiDurationDefs.Count;
-
-        //        if(msPosition > uniqueMidiDurationDefs[count - 1].MsPosition)
-        //        {
-        //            uniqueMidiDurationDefs.Add(uClefChangeDef);
-        //        }
-        //        else if(msPosition <= uniqueMidiDurationDefs[0].MsPosition)
-        //        {
-        //            uniqueMidiDurationDefs.Insert(0, uClefChangeDef);
-        //        }
-        //        else if(count > 1)
-        //        {
-        //            for(int i = 1; i < count; ++i)
-        //            {
-        //                if((msPosition > uniqueMidiDurationDefs[i - 1].MsPosition)
-        //                    && msPosition <= uniqueMidiDurationDefs[i].MsPosition)
-        //                {
-        //                    uniqueMidiDurationDefs.Insert(i, uClefChangeDef);
-        //                    break;
-        //                }
-        //            }
-        //        }
-        //    }
-        //    for(int i = 1; i < uniqueMidiDurationDefs.Count; ++i)
-        //    {
-        //        ClefChangeDef uccd1 = uniqueMidiDurationDefs[i - 1] as ClefChangeDef;
-        //        ClefChangeDef uccd2 = uniqueMidiDurationDefs[i] as ClefChangeDef;
-        //        Debug.Assert((uccd1 == null || uccd2 == null) || uccd1.MsPosition < uccd2.MsPosition);
-        //    }
-        //}
-
         /// <summary>
         /// The systems do not yet contain Metrics info.
         /// They are given Metrics and justified horizontally and vertically (internally) 

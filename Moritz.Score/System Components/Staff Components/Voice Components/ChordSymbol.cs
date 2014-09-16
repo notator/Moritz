@@ -52,28 +52,6 @@ namespace Moritz.Score
                 return VerticalDir.up;
         }
 
-        protected abstract void WriteContent(SvgWriter w, string idNumber);
-
-        public override void WriteSVG(SvgWriter w)
-        {
-            if(ChordMetrics.BeamBlock != null)
-                ChordMetrics.BeamBlock.WriteSVG(w);
-
-            string idNumber = SvgScore.UniqueID_Number;
-
-            w.SvgStartGroup("chord" + idNumber);
-            w.WriteAttributeString("score", "object", null, "chord");
-            w.WriteAttributeString("score", "alignmentX", null, this.Metrics.OriginX.ToString(M.En_USNumberFormat));
-
-            WriteContent(w, idNumber);
-
-            w.SvgStartGroup("graphics" + idNumber);
-            ChordMetrics.WriteSVG(w);
-            w.SvgEndGroup();
-
-            w.SvgEndGroup();
-        }
-
         /// <summary>
         /// In capella 2008, only single articulation or "staccato tenuto" are supported.
         /// </summary>

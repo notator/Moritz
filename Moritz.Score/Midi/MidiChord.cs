@@ -179,13 +179,13 @@ namespace Moritz.Score.Midi
 
         private void CreateSliders(int channel, MidiChordSliderDefs sliderDefs, int msDuration, ChannelState channelState)
         {
-            if(sliderDefs.ModulationWheelMsbs != null)
+            if(sliderDefs.ModulationWheelMsbs != null && sliderDefs.ModulationWheelMsbs.Count > 0)
                 this.ModulationWheelSlider = new MidiModulationWheelSlider(sliderDefs.ModulationWheelMsbs, channel, msDuration);
-            if(sliderDefs.PanMsbs != null)
+            if(sliderDefs.PanMsbs != null && sliderDefs.PanMsbs.Count > 0)
                 this.PanSlider = new MidiPanSlider(sliderDefs.PanMsbs, channel, msDuration);
-            if(sliderDefs.PitchWheelMsbs != null)
+            if(sliderDefs.PitchWheelMsbs != null && sliderDefs.PitchWheelMsbs.Count > 0)
                 this.PitchWheelSlider = new MidiPitchWheelSlider(sliderDefs.PitchWheelMsbs, channel, msDuration);
-            if(sliderDefs.ExpressionMsbs != null)
+            if(sliderDefs.ExpressionMsbs != null && sliderDefs.ExpressionMsbs.Count > 0)
                 this.ExpressionSlider = new MidiExpressionSlider(sliderDefs.ExpressionMsbs, channel, msDuration);
         }
 

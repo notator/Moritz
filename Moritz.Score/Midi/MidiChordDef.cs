@@ -679,7 +679,7 @@ namespace Moritz.Score.Midi
         }
 
         /// <summary>
-        /// Note that, unlike MidiRestDefs, MidiChordDefs do not have a msDuration attribute.
+        /// Note that, unlike Rests, MidiChordDefs do not have a msDuration attribute.
         /// Their msDuration is deduced from the contained BasicMidiChords.
         /// Patch indices already set in the BasicMidiChordDefs take priority over those set in the main MidiChordDef.
         /// However, if BasicMidiChordDefs[0].PatchIndex is null, and this.Patch is set, BasicMidiChordDefs[0].PatchIndex is set to Patch.
@@ -688,15 +688,12 @@ namespace Moritz.Score.Midi
         /// While constructing Tracks, the AssistantPerformer should monitor the current Bank and/or Patch, so that it can decide
         /// whether or not to actually construct and send bank and/or patch change messages.
         /// </summary>
-        public void WriteSvg(SvgWriter w, string idNumber)
+        public void WriteSvg(SvgWriter w)
         {
             w.WriteStartElement("score", "midiChord", null);
 
             Debug.Assert(BasicMidiChordDefs != null && BasicMidiChordDefs.Count > 0);
-
-            if(!String.IsNullOrEmpty(idNumber))
-                w.WriteAttributeString("id", "midiChord" + idNumber);
-
+            
             if(BasicMidiChordDefs[0].BankIndex == null && Bank != null)
             {
                 BasicMidiChordDefs[0].BankIndex = Bank;

@@ -43,6 +43,7 @@ namespace Moritz.Score
         /// <param name="w"></param>
         public void WriteSVG(SvgWriter w, float topY, float bottomY, float strokeWidth)
         {
+            w.SvgStartGroup("barline", null);
             if(BarlineType == BarlineType.end)
             {
                 w.SvgLine(null,
@@ -58,6 +59,7 @@ namespace Moritz.Score
             {
                 w.SvgLine(null, this.Metrics.OriginX, topY, this.Metrics.OriginX, bottomY, this.ColorString.String, strokeWidth, null, null);
             }
+            w.SvgEndGroup();
         }
 
         internal Text SetFramedText(string text, string fontFace, float textFontHeight, float paddingX, float paddingY, float strokeWidth)

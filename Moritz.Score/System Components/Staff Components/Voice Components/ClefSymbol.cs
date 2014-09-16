@@ -76,7 +76,9 @@ namespace Moritz.Score
         {
             if(_isVisible)
             {
+                w.SvgStartGroup("clefChange", null);
                 base.WriteSVG(w);
+                w.SvgEndGroup();
             }
         }
 

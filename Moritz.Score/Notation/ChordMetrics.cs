@@ -18,11 +18,11 @@ namespace Moritz.Score.Notation
 
             _gap = gap;
 
-            // The _ID_Type is written to the SVG file as a group name, but is otherwise not used.
+            // The _objectType is written to the SVG file as a group name, but is otherwise not used.
             if(chord is CautionaryChordSymbol)
-                _ID_Type = "cautionary chord";
+                _objectType = "cautionary chord";
             else
-                _ID_Type = "chord";
+                _objectType = "chord";
 
             GetStaffParameters(chord); // sets _clef to the most recent clef, and _nStafflines.
 

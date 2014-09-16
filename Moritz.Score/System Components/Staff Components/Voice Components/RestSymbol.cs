@@ -23,8 +23,7 @@ namespace Moritz.Score
         {
             if(LocalCautionaryChordDef == null)
             {
-                w.SvgStartGroup("rest" + SvgScore.UniqueID_Number);
-                w.WriteAttributeString("score", "object", null, "rest");
+                w.SvgStartGroup("rest", null);
 
                 float alignmentX = (this.Metrics.Left + this.Metrics.Right) / 2;
                 w.WriteAttributeString("score", "alignmentX", null, alignmentX.ToString(M.En_USNumberFormat));

@@ -82,11 +82,11 @@ namespace Moritz.Score.Notation
         public override void WriteSVG(SvgWriter w)
         {
             string idNumber = SvgScore.UniqueID_Number;
-            w.SvgStartGroup("study2b2ChordSymbol" + idNumber);
-            w.WriteAttributeString("score", "object", null, "chord");
+            w.SvgStartGroup("study2b2ChordSymbol", null);
+            w.WriteAttributeString("score", "object", null, "outputChord");
             w.WriteAttributeString("score", "alignmentX", null, this.Metrics.OriginX.ToString(M.En_USNumberFormat));
 
-            WriteContent(w, idNumber);
+            _midiChordDef.WriteSvg(w);
 
             if(this.Metrics != null)
                 this.Metrics.WriteSVG(w);

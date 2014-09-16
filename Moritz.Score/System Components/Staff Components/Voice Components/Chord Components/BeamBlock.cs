@@ -8,7 +8,7 @@ namespace Moritz.Score
 	public class BeamBlock : Metrics
 	{
         public BeamBlock(ClefSymbol clef, List<OutputChordSymbol> chordsBeamedTogether, VerticalDir voiceStemDirection, float beamThickness, float strokeThickness)
-            : base(null, null, 0, 0)
+            : base(null, 0, 0)
         {
             Chords = new List<OutputChordSymbol>(chordsBeamedTogether);
             SetBeamedGroupStemDirection(clef, chordsBeamedTogether, voiceStemDirection);
@@ -844,7 +844,7 @@ namespace Moritz.Score
 
         public override void WriteSVG(SvgWriter w)
         {
-            w.SvgStartGroup("beamBlock" + SvgScore.UniqueID_Number);
+            w.SvgStartGroup("beamBlock", null);
             foreach(Beam beam in Beams)
             {
                 if(!(beam is QuaverBeam))

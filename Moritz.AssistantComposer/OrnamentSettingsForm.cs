@@ -67,7 +67,7 @@ namespace Moritz.AssistantComposer
 
         private int ReadOrnamentSettingsForm(XmlReader r)
         {
-            int numberOfChordValues = -1;
+            int numberOfOrnamentValues = -1;
 
             #region default values
             OrnamentsLevelTextBox.Text = "";
@@ -88,14 +88,14 @@ namespace Moritz.AssistantComposer
                             OrnamentKrystalNameLabel.Text = r.ReadElementContentAsString();
                             string ornamentsKrystalPath = M.Preferences.LocalMoritzKrystalsFolder + @"\" + OrnamentKrystalNameLabel.Text;
                             _ornamentsKrystal = K.LoadKrystal(ornamentsKrystalPath);
-                            numberOfChordValues = (int)_ornamentsKrystal.MaxValue;
                             break;
                         case "ornamentsLevel":
                             Debug.Assert(_ornamentsKrystal != null);
                             this.OrnamentsLevelTextBox.Text = r.ReadElementContentAsString();
+                            numberOfOrnamentValues = this.NumberOfOrnaments;
                             break;
                         case "basicChord":
-                            Debug.Assert(numberOfChordValues != -1);
+                            Debug.Assert(numberOfOrnamentValues != -1);
                             _bcc.ReadBasicChordControl(r);
                             break;
                         case "bankIndices":
@@ -110,7 +110,19 @@ namespace Moritz.AssistantComposer
                     "ornamentKrystalName", "ornamentsLevel", "basicChord", "bankIndices", "patchIndices");
             }
             Debug.Assert(r.Name == "ornamentSettings");
-            return numberOfChordValues;
+            return numberOfOrnamentValues;
+        }
+
+        public int NumberOfOrnaments
+        {
+            get
+            {
+                string shape = this._ornamentsKrystal.Shape;
+                string[] sizes = shape.Split(':');
+                int ornamentLevel = int.Parse(this.OrnamentsLevelTextBox.Text.Trim());
+                int numberOfOrnaments = int.Parse(sizes[ornamentLevel - 1].Trim());
+                return numberOfOrnaments;
+            }
         }
 
         private void ConnectBasicChordControl()

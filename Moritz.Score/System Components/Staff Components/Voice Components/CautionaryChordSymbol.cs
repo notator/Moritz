@@ -17,22 +17,12 @@ namespace Moritz.Score
             Stem.Draw = false;
         }
 
-        /// <summary>
-        /// Writes this inputChord's content
-        /// </summary>
-        /// <param name="w"></param>
-        protected override void WriteContent(SvgWriter w, string idNumber)
-        {
-            throw new ApplicationException("This function should never be called, because WriteSVG() is overridden.");
-        }
-
         public override void WriteSVG(SvgWriter w)
         {
             if(Visible)
             {
-                string idNumber = SvgScore.UniqueID_Number;
-                w.SvgStartGroup("cautionaryChord" + idNumber);
-                w.SvgStartGroup("graphics" + idNumber);
+                w.SvgStartGroup("cautionaryChord", null);
+                w.SvgStartGroup(null, null);
 
                 this.ChordMetrics.WriteSvg(w);
 

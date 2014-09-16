@@ -1,6 +1,7 @@
 using System.Text;
 
 using Moritz.Score.Midi;
+using Moritz.Globals;
 
 namespace Moritz.Score
 {
@@ -9,7 +10,7 @@ namespace Moritz.Score
         public OutputChordSymbol(Voice voice, MidiChordDef umcd, int minimumCrotchetDurationMS, float fontSize)
             : base(voice, umcd.MsDuration, umcd.MsPosition, minimumCrotchetDurationMS, fontSize)
         {
-            _uniqueMidiChordDef = umcd;
+            _midiChordDef = umcd;
 
             SetNoteheadPitches(umcd.MidiPitches);
 
@@ -26,14 +27,26 @@ namespace Moritz.Score
             }
         }
 
-        /// <summary>
-        /// Writes this outputChord's midi info
-        /// </summary>
-        /// <param name="w"></param>
-        protected override void WriteContent(SvgWriter w, string idNumber)
+        public override void WriteSVG(SvgWriter w)
         {
-            _uniqueMidiChordDef.WriteSvg(w, idNumber);
+            if(ChordMetrics.BeamBlock != null)
+                ChordMetrics.BeamBlock.WriteSVG(w);
+
+            string idNumber = SvgScore.UniqueID_Number;
+
+            w.SvgStartGroup("outputChord", null);
+            //w.WriteAttributeString("score", "object", null, "outputChord");
+            w.WriteAttributeString("score", "alignmentX", null, this.Metrics.OriginX.ToString(M.En_USNumberFormat));
+
+            _midiChordDef.WriteSvg(w);
+
+            w.SvgStartGroup("graphics", null);
+            ChordMetrics.WriteSVG(w);
+            w.SvgEndGroup();
+
+            w.SvgEndGroup();
         }
+
 
         public override string ToString()
         {
@@ -43,7 +56,7 @@ namespace Moritz.Score
             return sb.ToString();
         }
 
-        public MidiChordDef MidiChordDef { get { return _uniqueMidiChordDef; } }
-        protected MidiChordDef _uniqueMidiChordDef = null;
+        public MidiChordDef MidiChordDef { get { return _midiChordDef; } }
+        protected MidiChordDef _midiChordDef = null;
     }
 }

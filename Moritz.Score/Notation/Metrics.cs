@@ -11,27 +11,15 @@ namespace Moritz.Score.Notation
     public abstract class Metrics
     {
         protected Metrics()
-            : this(null, null, 0F, 0F)
+            : this(null, 0F, 0F)
         {
         }
 
-        /// <summary>
-        /// If the ID_type is null or "" the Metrics.ID will be null.
-        /// If the ID_Number is null, The ID will not be written to the SVG file.
-        /// </summary>
-        /// <param name="ID_Type"></param>
-        /// <param name="ID_Number"></param>
-        /// <param name="originX"></param>
-        /// <param name="originY"></param>
-        protected Metrics(string ID_Type, int? ID_Number, float originX, float originY)
+        protected Metrics(string type, float originX, float originY)
         {
-            if(!String.IsNullOrEmpty(ID_Type))
-                _ID_Type = ID_Type;
+            if(!String.IsNullOrEmpty(type))
+                _objectType = type;
 
-            if(ID_Number != null)
-            {
-                _ID_Number = ((int)ID_Number).ToString();
-            }
             _originX = originX;
             _originY = originY;
         }
@@ -85,7 +73,7 @@ namespace Moritz.Score.Notation
             if(verticalOverlap && previousMetrics.Right > Left)
             {
                 overlap = previousMetrics.Right - this.Left;
-                if(this._ID_Type == "b" || this._ID_Type == "n")
+                if(this._objectType == "b" || this._objectType == "n")
                 {
                     overlap -= ((this.Right - this.Left) * 0.15F);
                     overlap = overlap > 0F ? overlap : 0F;
@@ -199,26 +187,20 @@ namespace Moritz.Score.Notation
         public float Left { get { return _left; } }
         protected float _left = 0F;
         /// <summary>
-        /// The object's unique ID (which will be used when writing it to the SVG file).
+        /// The object's type (which will be used when writing it to the SVG file).
         /// </summary>
-        public string UniqueSvgID
+        public string ObjectType
         {
             get
             {
-                if(_ID_Type == null || _ID_Number == null)
-                    return null;
-                else return _ID_Type + _ID_Number.ToString();
+                return _objectType;
             }
         }
         /// <summary>
         /// The object's unicode value or type (used when writing cLicht characters to the SVG file).
         /// </summary>
-        public string ID_Type { get { return _ID_Type; } }
-        protected string _ID_Type = null;
-        /// <summary>
-        /// The object's unique ID_Number (which will be used when writing it to the SVG file).
-        /// </summary>
-        protected string _ID_Number = null;
+        public string ID_Type { get { return _objectType; } }
+        protected string _objectType = null;
         /// <summary>
         /// The actual position of the object's x-origin in the score.
         /// This is the value written into the SvgScore.
@@ -282,7 +264,7 @@ namespace Moritz.Score.Notation
         public LedgerlineBlockMetrics(float left, float right, float strokeWidth)
             : base()
         {
-            _ID_Type = "ledgerlineBlock";
+            _objectType = "ledgerlineBlock";
             _left = left;
             _right = right;
             _strokeWidth = strokeWidth;
@@ -330,7 +312,7 @@ namespace Moritz.Score.Notation
         public CautionaryBracketMetrics(bool isLeftBracket, float top, float right, float bottom, float left, float strokeWidth)
             : base()
         {
-            _ID_Type = "cautionaryBracket";
+            _objectType = "cautionaryBracket";
             _isLeftBracket = isLeftBracket;
             _top = top;
             _left = left;
@@ -421,36 +403,36 @@ namespace Moritz.Score.Notation
             {
                 case DurationClass.quaver:
                     if(_stemDirection == VerticalDir.up)
-                        _ID_Type = "Right1Flag";
+                        _objectType = "Right1Flag";
                     else
-                        _ID_Type = "Left1Flag";
+                        _objectType = "Left1Flag";
                     break;
                 case DurationClass.semiquaver:
                     if(_stemDirection == VerticalDir.up)
-                        _ID_Type = "Right2Flags";
+                        _objectType = "Right2Flags";
                     else
-                        _ID_Type = "Left2Flags";
+                        _objectType = "Left2Flags";
                     offset = 0.25F;
                     break;
                 case DurationClass.threeFlags:
                     if(_stemDirection == VerticalDir.up)
-                        _ID_Type = "Right3Flags";
+                        _objectType = "Right3Flags";
                     else
-                        _ID_Type = "Left3Flags";
+                        _objectType = "Left3Flags";
                     offset = 0.5F;
                     break;
                 case DurationClass.fourFlags:
                     if(_stemDirection == VerticalDir.up)
-                        _ID_Type = "Right4Flags";
+                        _objectType = "Right4Flags";
                     else
-                        _ID_Type = "Left4Flags";
+                        _objectType = "Left4Flags";
                     offset = 0.75F;
                     break;
                 case DurationClass.fiveFlags:
                     if(_stemDirection == VerticalDir.up)
-                        _ID_Type = "Right5Flags";
+                        _objectType = "Right5Flags";
                     else
-                        _ID_Type = "Left5Flags";
+                        _objectType = "Left5Flags";
                     offset = 1F;
                     break;
                 default:
@@ -472,9 +454,9 @@ namespace Moritz.Score.Notation
         public override void WriteSVG(SvgWriter w)
         {
             if(_stemDirection == VerticalDir.up)
-                w.SvgUseXY(null, _ID_Type, _left, _top, _fontHeight);
+                w.SvgUseXY(null, _objectType, _left, _top, _fontHeight);
             else
-                w.SvgUseXY(null, _ID_Type, _left, _bottom, _fontHeight);
+                w.SvgUseXY(null, _objectType, _left, _bottom, _fontHeight);
         }
 
         private readonly float _fontHeight;
@@ -486,7 +468,7 @@ namespace Moritz.Score.Notation
         public BarlineMetrics(Graphics graphics, Barline barline, float gap)
             : base()
         {
-            _ID_Type = "barline";
+            _objectType = "barline";
             if(barline.BarlineType == BarlineType.end)
                 _left = -gap * 1.7F;
             else
@@ -583,31 +565,15 @@ namespace Moritz.Score.Notation
 
     internal class TextMetrics : Metrics
     {
-        /// <summary>
-        /// TextMetrics(graphics, ID_Type, uniqueID_Number, textInfo)
-        /// </summary>
-        /// <param name="uniqueID_number"></param>
-        /// <param name="fontPixelHeight"></param>
-        public TextMetrics(Graphics graphics, string ID_Type, int uniqueID_number, TextInfo textInfo)
-            : base(ID_Type, uniqueID_number, 0F, 0F)
-        {
-            SetDefaultMetrics(graphics, textInfo);
-            _textInfo = textInfo;
-        }
-        /// <summary>
-        /// TextMetrics(graphics, ID_Type, uniqueID_Number, textInfo)
-        /// </summary>
-        /// <param name="uniqueID_number"></param>
-        /// <param name="fontPixelHeight"></param>
-        public TextMetrics(Graphics graphics, int uniqueID_number, TextInfo textInfo)
-            : base("Text", uniqueID_number, 0F, 0F)
+        public TextMetrics(Graphics graphics, string type, TextInfo textInfo)
+            : base(type, 0F, 0F)
         {
             SetDefaultMetrics(graphics, textInfo);
             _textInfo = textInfo;
         }
 
-        public TextMetrics(Graphics graphics, string ID_Type, TextInfo textInfo)
-            : base(ID_Type, null, 0F, 0F)
+        public TextMetrics(Graphics graphics, TextInfo textInfo)
+            : base("text", 0F, 0F)
         {
             SetDefaultMetrics(graphics, textInfo);
             _textInfo = textInfo;
@@ -615,7 +581,7 @@ namespace Moritz.Score.Notation
 
         public override void WriteSVG(SvgWriter w)
         {
-            w.SvgText(_textInfo, _ID_Number, _originX, _originY);
+            w.SvgText(_textInfo, _originX, _originY);
         }
 
         /// <summary>
@@ -740,7 +706,7 @@ namespace Moritz.Score.Notation
         public override void WriteSVG(SvgWriter w)
         {
             base.WriteSVG(w);
-            w.SvgRect(null, _left, _top, _right - _left, _bottom - _top, "black", _strokeWidth, "none", null);
+            w.SvgRect(null, null, _left, _top, _right - _left, _bottom - _top, "black", _strokeWidth, "none", null);
         }
 
         float _strokeWidth = 0;
@@ -752,12 +718,12 @@ namespace Moritz.Score.Notation
             : base()
         {
             if(isDynamic)
-                _ID_Type = name;
+                _objectType = name;
             else // clefs
-                _ID_Type = GetClichtCharacterString(name);
+                _objectType = GetClichtCharacterString(name);
 
-            Debug.Assert(_ID_Type != null);
-            Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_ID_Type];
+            Debug.Assert(_objectType != null);
+            Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_objectType];
 
             _originY = 0;
             _top = m.Top * fontHeight;
@@ -775,10 +741,10 @@ namespace Moritz.Score.Notation
         public CLichtCharacterMetrics(DurationClass durationClass, bool isRest, float fontHeight)
             : base()
         {
-            _ID_Type = GetClichtCharacterString(durationClass, isRest);
+            _objectType = GetClichtCharacterString(durationClass, isRest);
 
-            Debug.Assert(_ID_Type != null);
-            Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_ID_Type];
+            Debug.Assert(_objectType != null);
+            Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_objectType];
 
             _originY = 0;
             _top = m.Top * fontHeight;
@@ -795,10 +761,10 @@ namespace Moritz.Score.Notation
         public CLichtCharacterMetrics(Head head, float fontHeight)
             : base()
         {
-            _ID_Type = GetClichtCharacterString(head);
+            _objectType = GetClichtCharacterString(head);
 
-            Debug.Assert(_ID_Type != null);
-            Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_ID_Type];
+            Debug.Assert(_objectType != null);
+            Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_objectType];
 
             _originY = 0;
             _top = m.Top * fontHeight;
@@ -830,7 +796,7 @@ namespace Moritz.Score.Notation
                     w.WriteAttributeString("text-anchor", "end");
                     break;
             }
-            w.WriteString(_ID_Type); // e.g. Unicode character
+            w.WriteString(_objectType); // e.g. Unicode character
             w.WriteEndElement();
         }
 
@@ -970,25 +936,25 @@ namespace Moritz.Score.Notation
             switch(clef.ClefType)
             {
                 case "t":
-                    _ID_Type = "trebleClef";
+                    _objectType = "trebleClef";
                     _top = trebleTop;
                     _right = trebleRight;
                     _bottom = trebleBottom;
                     break;
                 case "t1": // trebleClef8
-                    _ID_Type = "trebleClef8";
+                    _objectType = "trebleClef8";
                     _top = highTrebleTop;
                     _right = trebleRight;
                     _bottom = trebleBottom;
                     break;
                 case "t2": // trebleClef2x8
-                    _ID_Type = "trebleClef2x8";
+                    _objectType = "trebleClef2x8";
                     _top = highTrebleTop;
                     _right = trebleRight;
                     _bottom = trebleBottom;
                     break;
                 case "t3": // trebleClef3x8
-                    _ID_Type = "trebleClef3x8";
+                    _objectType = "trebleClef3x8";
                     _top = highTrebleTop;
                     _right = trebleRight;
                     _bottom = trebleBottom;
@@ -1013,25 +979,25 @@ namespace Moritz.Score.Notation
                 switch(clef.ClefType)
                 {
                     case "b":
-                        _ID_Type = "bassClef";
+                        _objectType = "bassClef";
                         _top = bassTop;
                         _right = bassRight;
                         _bottom = bassBottom;
                         break;
                     case "b1": // bassClef8
-                        _ID_Type = "bassClef8";
+                        _objectType = "bassClef8";
                         _top = bassTop;
                         _right = bassRight;
                         _bottom = lowBassBottom;
                         break;
                     case "b2": // bassClef2x8
-                        _ID_Type = "bassClef2x8";
+                        _objectType = "bassClef2x8";
                         _top = bassTop;
                         _right = bassRight;
                         _bottom = lowBassBottom;
                         break;
                     case "b3": // bassClef3x8
-                        _ID_Type = "bassClef3x8";
+                        _objectType = "bassClef3x8";
                         _top = bassTop;
                         _right = bassRight;
                         _bottom = lowBassBottom;
@@ -1251,7 +1217,7 @@ namespace Moritz.Score.Notation
             _top -= verticalPadding;
             _bottom += verticalPadding;
 
-            switch(_ID_Type)
+            switch(_objectType)
             {
                 case "b":
                     _left -= gap * 0.2F;
@@ -1323,7 +1289,7 @@ namespace Moritz.Score.Notation
         public Study2b2ChordMetrics(Study2b2ChordSymbol s2b2c)
             : base("2b2Symbol")
         {
-             _ID_Type = s2b2c.GraphicSymbolID;
+             _objectType = s2b2c.GraphicSymbolID;
              float onePixelFontHeight = 0.015F;
              _fontHeight = s2b2c.FontHeight * onePixelFontHeight;
             SetBasicMetrics(s2b2c);
@@ -1390,8 +1356,8 @@ namespace Moritz.Score.Notation
             //float delta = 180F / 11F;
             float delta = 100F / 11F;
             float dy = 0;
-            int index = _ID_Type.LastIndexOf('_');
-            string symbolNumberString = _ID_Type.Substring(index+1);
+            int index = _objectType.LastIndexOf('_');
+            string symbolNumberString = _objectType.Substring(index+1);
             int symbolNumber = 0;
             try
             {
@@ -1421,7 +1387,7 @@ namespace Moritz.Score.Notation
 
         public override void WriteSVG(SvgWriter w)
         {
-            w.SvgUseXY(null, _ID_Type, _originX, _originY, _fontHeight);
+            w.SvgUseXY(_objectType, _objectType, _originX, _originY, _fontHeight);
         }
 
         private float _fontHeight = 0F;
@@ -1432,7 +1398,7 @@ namespace Moritz.Score.Notation
         public GroupMetrics(string ID_Type)
             : base()
         {
-            _ID_Type = ID_Type;
+            _objectType = ID_Type;
         }
 
         public GroupMetrics(string ID_Type, Metrics metrics)
@@ -1440,7 +1406,7 @@ namespace Moritz.Score.Notation
         {
             MetricsList.Add(metrics);
 
-            _ID_Type = ID_Type;
+            _objectType = ID_Type;
             _originX = metrics.OriginX;
             _originY = metrics.OriginY;
             _top = metrics.Top;
@@ -1492,7 +1458,7 @@ namespace Moritz.Score.Notation
 
         public void WriteSVG(SvgWriter w, string id)
         {
-            w.SvgStartGroup(id);
+            w.SvgStartGroup(null, null);
             foreach(Metrics metrics in MetricsList)
             {
                 metrics.WriteSVG(w);

@@ -24,7 +24,7 @@ namespace Moritz.Score.Notation
         {
             w.SvgStartDefs(null);
             #region staff1Rect
-            w.SvgRect("staff1Rect", 0, 0, 56, 64, "grey", 2, null, null);
+            w.SvgRect(null, "staff1Rect", 0, 0, 56, 64, "grey", 2, null, null);
             #endregion
 
 

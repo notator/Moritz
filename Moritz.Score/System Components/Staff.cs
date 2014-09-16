@@ -6,22 +6,6 @@ using Moritz.Score.Notation;
 
 namespace Moritz.Score
 {
-    public class InputStaff : Staff
-    {
-        public InputStaff(SvgSystem svgSystem, string staffName, int numberOfStafflines, float gap)
-            : base(svgSystem, staffName, numberOfStafflines, gap)
-        {
-        }
-    }
-
-    public class OutputStaff : Staff
-    {
-        public OutputStaff(SvgSystem svgSystem, string staffName, int numberOfStafflines, float gap)
-            : base(svgSystem, staffName, numberOfStafflines, gap)
-        {
-        }
-    }
-
     public class Staff
     {
         public Staff(SvgSystem svgSystem, string staffName, int numberOfStafflines, float gap)
@@ -33,32 +17,19 @@ namespace Moritz.Score
             Gap = gap;
         }
 
-        #region Write
-        /// <summary>
-        /// Writes out the stafflines and noteObjects of an SVG Staff.
-        /// </summary>
-        public void WriteSVG(SvgWriter w, int pageNumber, int systemNumber, int staffNumber, PageFormat pageFormat)
+        public virtual void WriteSVG(SvgWriter w, int pageNumber, int systemNumber, int staffNumber, PageFormat pageFormat)
         {
-            float stafflineStemStrokeWidth = pageFormat.StafflineStemStrokeWidth;
-
-            w.SvgStartGroup("p" + pageNumber.ToString() + "_sys" + systemNumber.ToString() + "_staff" + staffNumber.ToString());
-            w.WriteAttributeString("score", "object", null, "staff");
             w.WriteAttributeString("score", "staffName", null, this.Staffname);
             w.WriteAttributeString("score", "stafflines", null, this.NumberOfStafflines.ToString());
-            if(this is InputStaff)
-            {
-                w.WriteAttributeString("score", "isInput", null, "1");
-                stafflineStemStrokeWidth *= pageFormat.InputStavesSizeFactor;
-            }
             w.WriteAttributeString("score", "gap", null, this.Gap.ToString(M.En_USNumberFormat));
 
-            w.SvgStartGroup("stafflines" + SvgScore.UniqueID_Number);
+            w.SvgStartGroup("stafflines", null);
             float stafflineY = this.Metrics.StafflinesTop;
             for(int staffLineIndex = 0; staffLineIndex < NumberOfStafflines; staffLineIndex++)
             {
                 w.SvgLine(null, this.Metrics.StafflinesLeft, stafflineY,
                     pageFormat.RightMarginPos, stafflineY,
-                    "black", stafflineStemStrokeWidth, null, null);
+                    "black", pageFormat.StafflineStemStrokeWidth, null, null);
                 if(staffLineIndex < (NumberOfStafflines - 1))
                     stafflineY += Gap;
             }
@@ -68,11 +39,7 @@ namespace Moritz.Score
             {
                 voice.WriteSVG(w);
             }
-
-            w.SvgEndGroup(); // staff
         }
-
-        #endregion
 
         #region composition
         /// <summary>

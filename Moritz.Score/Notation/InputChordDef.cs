@@ -70,16 +70,13 @@ namespace Moritz.Score.Notation
         /// Writes the logical content of this InputChordDef (see ChordSymbol and MidiChordDef)
         /// </summary>
         /// <param name="w"></param>
-        public void WriteSvg(SvgWriter w, string idNumber)
+        public void WriteSvg(SvgWriter w)
         {
             w.WriteStartElement("score", "inputChord", null);
 
-            if(!String.IsNullOrEmpty(idNumber))
-                w.WriteAttributeString("id", "inputChord" + idNumber);
-
             // etc.
 
-            w.WriteEndElement(); // score:midiChord
+            w.WriteEndElement(); // score:inputChord
         }
 
         public override IUniqueDef DeepClone()

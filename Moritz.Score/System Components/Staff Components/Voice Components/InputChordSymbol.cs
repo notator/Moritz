@@ -1,6 +1,7 @@
 using System.Text;
 
 using Moritz.Score.Notation;
+using Moritz.Globals;
 
 namespace Moritz.Score
 {
@@ -29,13 +30,22 @@ namespace Moritz.Score
             //}
         }
 
-        /// <summary>
-        /// Writes this inputChord's content
-        /// </summary>
-        /// <param name="w"></param>
-        protected override void WriteContent(SvgWriter w, string idNumber)
+        public override void WriteSVG(SvgWriter w)
         {
-            _uniqueInputChordDef.WriteSvg(w, idNumber);
+            if(ChordMetrics.BeamBlock != null)
+                ChordMetrics.BeamBlock.WriteSVG(w);
+
+            w.SvgStartGroup("inputChord", null);
+            //w.WriteAttributeString("score", "object", null, "inputChord");
+            w.WriteAttributeString("score", "alignmentX", null, this.Metrics.OriginX.ToString(M.En_USNumberFormat));
+
+            _inputChordDef.WriteSvg(w);
+
+            w.SvgStartGroup("graphics", null);
+            ChordMetrics.WriteSVG(w);
+            w.SvgEndGroup();
+
+            w.SvgEndGroup();
         }
 
         public override string ToString()
@@ -46,7 +56,7 @@ namespace Moritz.Score
             return sb.ToString();
         }
 
-        public InputChordDef InputChordDef { get { return _uniqueInputChordDef; } }
-        protected InputChordDef _uniqueInputChordDef = null;
+        public InputChordDef InputChordDef { get { return _inputChordDef; } }
+        protected InputChordDef _inputChordDef = null;
     }
 }

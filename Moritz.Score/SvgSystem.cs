@@ -25,11 +25,11 @@ namespace Moritz.Score
         /// <param name="w"></param>
         public void WriteSVG(SvgWriter w, int pageNumber, int systemNumber, PageFormat pageFormat)
         {
-            w.SvgStartGroup("page" + pageNumber.ToString() + "_system" + systemNumber.ToString());
-            w.WriteAttributeString("score", "object", null, "system");
+            w.SvgStartGroup("system", "page" + pageNumber.ToString() + "_system" + systemNumber.ToString());
+            //w.WriteAttributeString("score", "object", null, "system");
 
             // the markers are behind the notes.
-            w.SvgStartGroup("markers" + SvgScore.UniqueID_Number);
+            w.SvgStartGroup("markers", null);
 
             WriteMarkers(w);
 
@@ -40,7 +40,7 @@ namespace Moritz.Score
                 Staves[staffIndex].WriteSVG(w, pageNumber, systemNumber, staffIndex + 1, pageFormat);
             }
 
-            w.SvgStartGroup("barlines" + SvgScore.UniqueID_Number);
+            w.SvgStartGroup("barlines", null);
 
             WriteBarlines(w, pageFormat.BarlineStrokeWidth, pageFormat.StafflineStemStrokeWidth, pageFormat.Gap, pageFormat.Right);
 
@@ -134,18 +134,18 @@ namespace Moritz.Score
         /// </summary>
         private void WriteMarkers(SvgWriter w)
         {
-            w.SvgStartGroup("startMarker");
+            w.SvgStartGroup("startMarker", null);
             w.SvgLine(null, 0, 0, 0, 0, "#009900", 1, null, null);
             w.SvgEllipse(null, 0, 0, 0, 0, null, 1, "#009900", null);
             w.SvgEndGroup();
 
-            w.SvgStartGroup("runningMarker");
+            w.SvgStartGroup("runningMarker", null);
             w.SvgLine(null, 0, 0, 0, 0, "#888888", 1, null, null);
             w.SvgEndGroup();
 
-            w.SvgStartGroup("endMarker");
+            w.SvgStartGroup("endMarker", null);
             w.SvgLine(null, 0, 0, 0, 0, "#FF0000", 1, null, null);
-            w.SvgRect(null, 0, 0, 0, 0, null, 1, "#FF0000", null);
+            w.SvgRect(null, null, 0, 0, 0, 0, null, 1, "#FF0000", null);
             w.SvgEndGroup();
          }
 

@@ -142,8 +142,8 @@ namespace Moritz.AssistantComposer
                                             expressionEnvelope);
 
                 OrnamentSettings os = _ornamentSettings;
-                int ornamentNumber;
                 List<BasicMidiChordDef> basicMidiChordDefs = new List<BasicMidiChordDef>();
+                int ornamentNumber;
                 if(os == null || _ornamentNumbers[index] == 0)
                 {
                     ornamentNumber = 0;
@@ -155,7 +155,7 @@ namespace Moritz.AssistantComposer
                     ornamentNumber = _ornamentNumbers[index];
                     int ornamentMinMsDuration = IntOrDefaultValue(_ornamentMinMsDurations, index, M.DefaultOrnamentMinimumDuration); // 1
 
-                    List<int> ornamentValues = os.OrnamentValues[ornamentNumber - 1];
+                    List<int> ornamentValues = os.OrnamentValues[_ornamentNumbers[index] - 1];
 
                     for(int i = 0; i < ornamentValues.Count; ++i)
                     {
@@ -171,8 +171,18 @@ namespace Moritz.AssistantComposer
                         basicMidiChordDefs.Add(bmcd);
                     }
 
-                    // The basicMidiChordDefs in the ornament currently contain chords having the correct bank, patch and chordOff values,
-                    // but relative durations, relative piches and relative velocities.
+                    // The basicMidiChordDefs currently contain the values from the ornaments form.
+                    // All oBank and oPatch values will be null if the corresponding field in the ornament form was empty.
+                    // The durations, pitches and velocities are relative to the main palette's values.
+
+                    RemoveDuplicateBankAndPatchValues(basicMidiChordDefs);
+
+                    if(basicMidiChordDefs[0].BankIndex == null)
+                        basicMidiChordDefs[0].BankIndex = bankIndex; // can be null
+                    if(basicMidiChordDefs[0].PatchIndex == null)
+                        basicMidiChordDefs[0].PatchIndex = patchIndex;
+
+                    Debug.Assert(basicMidiChordDefs[0].PatchIndex != null);
 
                     basicMidiChordDefs = MidiChordDef.FitToDuration(basicMidiChordDefs, duration, ornamentMinMsDuration);
 
@@ -215,6 +225,27 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
+        /// Removes superfluous bank and patch values (setting them to null) so that duplicate messages will not be constructed.
+        /// </summary>
+        /// <param name="bmcds"></param>
+        private void RemoveDuplicateBankAndPatchValues(List<BasicMidiChordDef> bmcds)
+        {
+            if(bmcds.Count > 1)
+            {
+                byte? prevBank = bmcds[0].BankIndex;
+                byte? prevPatch = bmcds[0].PatchIndex;  
+                for(int i = 1; i < bmcds.Count; ++i)
+                {
+                    bmcds[i].BankIndex = (bmcds[i].BankIndex == null || bmcds[i].BankIndex == prevBank) ? null : bmcds[i].BankIndex;
+                    prevBank = (bmcds[i].BankIndex == null) ? prevBank : bmcds[i].BankIndex;
+
+                    bmcds[i].PatchIndex = (bmcds[i].PatchIndex == null || bmcds[i].PatchIndex == prevPatch) ? null : bmcds[i].PatchIndex;
+                    prevPatch = (bmcds[i].PatchIndex == null) ? prevPatch : bmcds[i].PatchIndex;
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns defaultValue if values is null or empty.
         /// Otherwise throws an exception if index is out of range.
         /// </summary>
@@ -224,12 +255,12 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// Returns null if values is empty.
+        /// Returns null if values is null or empty.
         /// Otherwise throws an exception if index is out of range.
         /// </summary>
         private byte? ByteOrNull(List<byte> values, int index)
         {
-            return (values.Count > 0) ? values[index] : (byte?) null;
+            return (values == null || values.Count == 0) ? (byte?) null : values[index];
         }
 
         /// <summary>
@@ -304,8 +335,23 @@ namespace Moritz.AssistantComposer
             bcs.VerticalVelocityFactors = M.StringToFloatList(osf.BasicChordControl.VerticalVelocityFactorsTextBox.Text, ',');
 
             BasicChordMidiSettings = new BasicChordMidiSettings(bcs);
-            BankIndices = M.StringToByteList(osf.BankIndicesTextBox.Text, ',');
-            PatchIndices = M.StringToByteList(osf.PatchIndicesTextBox.Text, ',');
+            // if BankIndices or PatchIndices != null, their values override the values in the upper BasicMidiChord
+            if(osf.BankIndicesTextBox.Text == "")
+            {
+                BankIndices = null;
+            }
+            else
+            {
+                BankIndices = M.StringToByteList(osf.BankIndicesTextBox.Text, ',');
+            }
+            if(osf.PatchIndicesTextBox.Text == "")
+            {
+                PatchIndices = null;
+            }
+            else
+            {
+                PatchIndices = M.StringToByteList(osf.PatchIndicesTextBox.Text, ',');
+            }
 
             Krystal ornamentsKrystal = osf.OrnamentsKrystal;
             uint ornamentLevel = uint.Parse(osf.OrnamentsLevelTextBox.Text);
@@ -340,8 +386,8 @@ namespace Moritz.AssistantComposer
             }
 
             BasicChordMidiSettings = new BasicChordMidiSettings(bcs);
-            BankIndices = new List<byte>();
-            PatchIndices = new List<byte>(); 
+            BankIndices = null;
+            PatchIndices = null; 
 
             Krystal ornamentsKrystal = pof.OrnamentsKrystal;
             uint ornamentLevel = uint.Parse(pof.OrnamentsLevelTextBox.Text);

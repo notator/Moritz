@@ -19,13 +19,19 @@ namespace Moritz.Score
         /// <summary>
         /// Starts an SVG "g" element. End the group with WriteEndGroup().
         /// </summary>
-        /// <param name="id">Can be null or empty or an id-string</param>
-        public void SvgStartGroup(string id)
+        /// <param name="type">Can be null or empty or a class attribute</param>
+        /// <param name="id">Can be null or empty or an id attribute</param>
+        public void SvgStartGroup(string type, string id)
         {
             _w.WriteStartElement("g");
+
+            if(!String.IsNullOrEmpty(type))
+                _w.WriteAttributeString("class", type);
+
             if(!String.IsNullOrEmpty(id))
                 _w.WriteAttributeString("id", id);
         }
+
         public void SvgEndGroup()
         {
             _w.WriteEndElement();
@@ -82,21 +88,21 @@ namespace Moritz.Score
         /// <summary>
         /// Writes an SVG "line" element.
         /// </summary>
-        /// <param name="id">Not written if null or empty</param>
+        /// <param name="type">Not written if null or empty</param>
         /// <param name="x1"></param>
         /// <param name="y1"></param>
         /// <param name="x2"></param>
         /// <param name="y2"></param>
         /// <param name="strokeColor">Not written if null or empty</param>
         /// <param name="strokeWidth">Not written if null</param>
-        public void SvgLine(string id, float x1, float y1, float x2, float y2,
+        public void SvgLine(string type, float x1, float y1, float x2, float y2,
             string strokeColor, float strokeWidth,
             string transformString,
             string stroke_linecapString)
         {
             _w.WriteStartElement("line");
-            if(!String.IsNullOrEmpty(id))
-                _w.WriteAttributeString("id", id);
+            if(!String.IsNullOrEmpty(type))
+                _w.WriteAttributeString("class", type);
             _w.WriteAttributeString("x1", x1.ToString(M.En_USNumberFormat));
             _w.WriteAttributeString("y1", y1.ToString(M.En_USNumberFormat));
             _w.WriteAttributeString("x2", x2.ToString(M.En_USNumberFormat));
@@ -208,12 +214,14 @@ namespace Moritz.Score
         /// <param name="strokeColour">Not written if null or empty</param>
         /// <param name="strokeWidth">Not written if null</param>
         /// <param name="fillColour">Not written if null or empty</param>
-        public void SvgRect(string id, float left, float top, float width, float height, 
+        public void SvgRect(string typeString, string id, float left, float top, float width, float height, 
             string strokeColour, float strokeWidth, string fillColour,
             string transformString)
         {
             Debug.Assert(strokeWidth > 0F);
             _w.WriteStartElement("rect");
+            if(!String.IsNullOrEmpty(typeString))
+                _w.WriteAttributeString("class", typeString);
             if(!String.IsNullOrEmpty(id))
                 _w.WriteAttributeString("id", id);
             _w.WriteAttributeString("x", left.ToString(M.En_USNumberFormat));
@@ -230,19 +238,9 @@ namespace Moritz.Score
             _w.WriteEndElement(); // rect
         }
 
-         /// <summary>
-        /// Writes a Text without an ID at a particular coordinate
-        /// </summary>
         public void SvgText(TextInfo textInfo, float x, float y)
         {
-            SvgText(textInfo, null, x, y);
-        }
-
-        public void SvgText(TextInfo textInfo, string ID, float x, float y)
-        {
             _w.WriteStartElement("text");
-            if(!String.IsNullOrEmpty(ID))
-                _w.WriteAttributeString("id", ID);
             _w.WriteAttributeString("x", x.ToString(M.En_USNumberFormat));
             _w.WriteAttributeString("y", y.ToString(M.En_USNumberFormat));
             switch(textInfo.TextHorizAlign)
@@ -269,18 +267,18 @@ namespace Moritz.Score
         /// <summary>
         /// Writes an SVG "use" element, overriding its y-coordinate.
         /// </summary>
-        /// <param name="id">Can be null or empty or an id-string</param>
+        /// <param name="type">Can be null or empty or a class typeString</param>
         /// <param name="y">This element's y-coordinate.</param>
         /// <param name="objectToUse">(Do not include the leading '#'. It will be inserted automatically.)</param>
-        public void SvgUseXY(string id, string objectToUse, float x, float y, float fontSize)
+        public void SvgUseXY(string type, string objectToUse, float x, float y, float fontSize)
         {
             string transformString =
                 "translate(" + x.ToString(M.En_USNumberFormat) + ","  + y.ToString(M.En_USNumberFormat) +") " +
                 "scale(" + fontSize.ToString(M.En_USNumberFormat) + ")";
  
             _w.WriteStartElement("use");
-            if(!String.IsNullOrEmpty(id))
-                _w.WriteAttributeString("id", id);
+            if(!String.IsNullOrEmpty(type))
+                _w.WriteAttributeString("class", type);
             _w.WriteAttributeString("xlink", "href", null, "#" + objectToUse);
             _w.WriteAttributeString("x", "0");
             _w.WriteAttributeString("y", "0");
@@ -301,18 +299,18 @@ namespace Moritz.Score
         /// </summary>
         public void WriteFlagBlock(int nFlags, bool rightFlag)
         {
-            StringBuilder ID = new StringBuilder();
+            StringBuilder type = new StringBuilder();
             if(rightFlag)
-                ID.Append("Right");
+                type.Append("Right");
             else
-                ID.Append("Left");
-            ID.Append(nFlags);
+                type.Append("Left");
+            type.Append(nFlags);
             if(nFlags == 1)
-                ID.Append("Flag");
+                type.Append("Flag");
             else
-                ID.Append("Flags");
+                type.Append("Flags");
 
-            SvgStartGroup(ID.ToString());
+            SvgStartGroup(null, type.ToString());
 
             string x1 = "0";
             string x2 = "0";
