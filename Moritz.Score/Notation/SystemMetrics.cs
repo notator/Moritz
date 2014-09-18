@@ -67,6 +67,7 @@ namespace Moritz.Score.Notation
             _stafflinesTop = _top;
             _stafflinesBottom = _bottom;
             _stafflinesLeft = _left;
+            _stafflinesRight = _right;
         }
 
         public override void Move(float dx, float dy)
@@ -89,5 +90,8 @@ namespace Moritz.Score.Notation
 
         public float StafflinesLeft { get { return _stafflinesLeft; } }
         private float _stafflinesLeft = 0F;
+
+        public float StafflinesRight { get { return _stafflinesRight; } }
+        private float _stafflinesRight = 0F;
     }
 }

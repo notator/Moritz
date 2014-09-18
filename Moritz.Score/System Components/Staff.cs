@@ -6,30 +6,40 @@ using Moritz.Score.Notation;
 
 namespace Moritz.Score
 {
-    public class Staff
+    public abstract class Staff
     {
-        public Staff(SvgSystem svgSystem, string staffName, int numberOfStafflines, float gap)
+        public Staff(SvgSystem svgSystem, string staffName, int numberOfStafflines, float gap, float stafflineStemStrokeWidth)
         {
             SVGSystem = svgSystem;
             Staffname = staffName;
             Debug.Assert(numberOfStafflines > 0);
             NumberOfStafflines = numberOfStafflines; 
             Gap = gap;
+            StafflineStemStrokeWidth = stafflineStemStrokeWidth;
         }
 
-        public virtual void WriteSVG(SvgWriter w, int pageNumber, int systemNumber, int staffNumber, PageFormat pageFormat)
+        public abstract void WriteSVG(SvgWriter w, int pageNumber, int systemNumber, int staffNumber);
+
+        public virtual void WriteSVG(SvgWriter w)
         {
             w.WriteAttributeString("score", "staffName", null, this.Staffname);
-            w.WriteAttributeString("score", "stafflines", null, this.NumberOfStafflines.ToString());
-            w.WriteAttributeString("score", "gap", null, this.Gap.ToString(M.En_USNumberFormat));
+
+            // The following are no longer written, since they are not needed/read by the Assistant Performer.
+            //w.WriteAttributeString("score", "stafflines", null, this.NumberOfStafflines.ToString());
+            //w.WriteAttributeString("score", "gap", null, this.Gap.ToString(M.En_USNumberFormat));
+            //w.WriteAttributeString("score", "strokeWidth", null, this.StafflineStemStrokeWidth.ToString(M.En_USNumberFormat));
 
             w.SvgStartGroup("stafflines", null);
             float stafflineY = this.Metrics.StafflinesTop;
             for(int staffLineIndex = 0; staffLineIndex < NumberOfStafflines; staffLineIndex++)
             {
-                w.SvgLine(null, this.Metrics.StafflinesLeft, stafflineY,
-                    pageFormat.RightMarginPos, stafflineY,
-                    "black", pageFormat.StafflineStemStrokeWidth, null, null);
+                w.SvgLine(null, this.Metrics.StafflinesLeft, stafflineY, 
+                                this.Metrics.StafflinesRight, stafflineY, 
+                                "black", StafflineStemStrokeWidth, null, null);
+
+                //w.SvgLine(null, this.Metrics.StafflinesLeft, stafflineY, pageFormat.RightMarginPos, stafflineY,
+                //    "black", StafflineStemStrokeWidth, null, null);
+
                 if(staffLineIndex < (NumberOfStafflines - 1))
                     stafflineY += Gap;
             }
@@ -72,7 +82,7 @@ namespace Moritz.Score
         /// </summary>
         private void ForceNaturals(NoteObjectMoment previousStaffMoment, NoteObjectMoment thisStaffMoment)
         {
-            foreach(OutputChordSymbol chordSymbol in thisStaffMoment.ChordSymbols)
+            foreach(ChordSymbol chordSymbol in thisStaffMoment.ChordSymbols)
             {
                 foreach(Head head in chordSymbol.HeadsTopDown)
                 {
@@ -80,7 +90,7 @@ namespace Moritz.Score
                     {
                         bool found = false;
                         head.DisplayAccidental = DisplayAccidental.suppress; // naturals are suppressed by default
-                        foreach(OutputChordSymbol previousChordSymbol in previousStaffMoment.ChordSymbols)
+                        foreach(ChordSymbol previousChordSymbol in previousStaffMoment.ChordSymbols)
                         {
                             foreach(Head previousHead in previousChordSymbol.HeadsTopDown)
                             {
@@ -105,8 +115,8 @@ namespace Moritz.Score
         /// </summary>
         private void ForceNaturals(NoteObjectMoment thisStaffMoment)
         {
-            List<OutputChordSymbol> momentChordSymbols = new List<OutputChordSymbol>(2);
-            foreach(OutputChordSymbol chordSymbol in thisStaffMoment.ChordSymbols)
+            List<ChordSymbol> momentChordSymbols = new List<ChordSymbol>(2);
+            foreach(ChordSymbol chordSymbol in thisStaffMoment.ChordSymbols)
             {
                 momentChordSymbols.Add(chordSymbol);
             }
@@ -394,9 +404,9 @@ namespace Moritz.Score
             Debug.Assert(Voices.Count == 2);
             Debug.Assert(Voices[0].StemDirection == VerticalDir.up);
             Debug.Assert(Voices[1].StemDirection == VerticalDir.down);
-            foreach(OutputChordSymbol upperChord in Voices[0].ChordSymbols)
+            foreach(ChordSymbol upperChord in Voices[0].ChordSymbols)
             {
-                foreach(OutputChordSymbol lowerChord in Voices[1].ChordSymbols)
+                foreach(ChordSymbol lowerChord in Voices[1].ChordSymbols)
                 {
                     if(upperChord.MsPosition == lowerChord.MsPosition)
                     {
@@ -413,7 +423,7 @@ namespace Moritz.Score
         }
 
 
-        private void AdjustStemLengths(OutputChordSymbol upperChord, OutputChordSymbol lowerChord)
+        private void AdjustStemLengths(ChordSymbol upperChord, ChordSymbol lowerChord)
         {
             upperChord.ChordMetrics.AdjustStemLengthAndFlagBlock(upperChord.DurationClass, upperChord.FontHeight, lowerChord.ChordMetrics.HeadsMetrics);
             lowerChord.ChordMetrics.AdjustStemLengthAndFlagBlock(lowerChord.DurationClass, lowerChord.FontHeight, upperChord.ChordMetrics.HeadsMetrics);
@@ -440,15 +450,15 @@ namespace Moritz.Score
                 adjustVoiceIndex = 1;
                 otherVoiceIndex = 0;
             }
-            foreach(OutputChordSymbol chordSymbol in Voices[adjustVoiceIndex].ChordSymbols)
+            foreach(ChordSymbol chordSymbol in Voices[adjustVoiceIndex].ChordSymbols)
             {
                 if(chordSymbol.BeamBlock != null)
                 {
                     BeamBlock beamBlock = chordSymbol.BeamBlock;
-                    List<OutputChordSymbol> enclosedChords = beamBlock.EnclosedChords(Voices[otherVoiceIndex]);
-                    foreach(OutputChordSymbol chord in beamBlock.Chords)
+                    List<ChordSymbol> enclosedChords = beamBlock.EnclosedChords(Voices[otherVoiceIndex]);
+                    foreach(ChordSymbol chord in beamBlock.Chords)
                     {
-                        foreach(OutputChordSymbol otherChord in enclosedChords)
+                        foreach(ChordSymbol otherChord in enclosedChords)
                         {
                             chord.ChordMetrics.AdjustStemLengthAndFlagBlock(chord.DurationClass, chord.FontHeight, otherChord.ChordMetrics.HeadsMetrics);
                         }
@@ -456,11 +466,11 @@ namespace Moritz.Score
                     if(adjustVoiceIndex == 0)
                     {
                         float minStemTip = float.MaxValue;
-                        foreach(OutputChordSymbol beamedChord in beamBlock.Chords)
+                        foreach(ChordSymbol beamedChord in beamBlock.Chords)
                         {
                             minStemTip = minStemTip < beamedChord.ChordMetrics.StemMetrics.Top ? minStemTip : beamedChord.ChordMetrics.StemMetrics.Top;
                         }
-                        foreach(OutputChordSymbol beamedChord in beamBlock.Chords)
+                        foreach(ChordSymbol beamedChord in beamBlock.Chords)
                         {
                             beamedChord.ChordMetrics.MoveOuterStemTip(minStemTip, VerticalDir.up);
                         }
@@ -468,11 +478,11 @@ namespace Moritz.Score
                     else
                     {
                         float maxStemTip = float.MinValue;
-                        foreach(OutputChordSymbol beamedChord in beamBlock.Chords)
+                        foreach(ChordSymbol beamedChord in beamBlock.Chords)
                         {
                             maxStemTip = maxStemTip > beamedChord.ChordMetrics.StemMetrics.Bottom ? maxStemTip : beamedChord.ChordMetrics.StemMetrics.Bottom;
                         }
-                        foreach(OutputChordSymbol beamedChord in beamBlock.Chords)
+                        foreach(ChordSymbol beamedChord in beamBlock.Chords)
                         {
                             beamedChord.ChordMetrics.MoveOuterStemTip(maxStemTip, VerticalDir.down);
                         }
@@ -499,7 +509,7 @@ namespace Moritz.Score
                 adjustVoiceIndex = 1;
                 otherVoiceIndex = 0;
             }
-            foreach(OutputChordSymbol chordSymbol in Voices[adjustVoiceIndex].ChordSymbols)
+            foreach(ChordSymbol chordSymbol in Voices[adjustVoiceIndex].ChordSymbols)
             {
                 DurationClass durationClass = chordSymbol.DurationClass;
                 if(durationClass == DurationClass.quaver
@@ -791,6 +801,7 @@ namespace Moritz.Score
         internal readonly SvgSystem SVGSystem;
         internal readonly int NumberOfStafflines = 0;
         internal readonly float Gap = 0;
+        internal readonly float StafflineStemStrokeWidth = 0;
         internal StaffMetrics Metrics = null;
         #endregion
     }

@@ -50,43 +50,44 @@ namespace Moritz.AssistantComposer
 
         private void CheckBars(List<List<Voice>> voicesPerSystemPerBar)
         {
-            int error = 0;
+            string errorString = null;
             if(voicesPerSystemPerBar.Count == 0)
-                error = 1;
+                errorString = "The algorithm has not created any bars!";
             else
             {
                 foreach(List<Voice> bar in voicesPerSystemPerBar)
                 {
                     if(bar.Count == 0)
                     {
-                        error = 2;
+                        errorString = "One bar (at least) contains no voices.";
                         break;
                     }
                     if(!(bar[0] is OutputVoice))
                     {
-                        error = 3;
+                        errorString = "The top (first) voice in every bar must be an output voice.";
                         break;
                     }
-                    foreach(Voice voice in bar)
+                    for(int voiceIndex = 0; voiceIndex < bar.Count; ++voiceIndex)
                     {
+                        Voice voice = bar[voiceIndex]; 
                         if(voice.UniqueDefs.Count == 0)
                         {
-                            error = 4;
+                            errorString = "A voice (voiceIndex=" + voiceIndex.ToString() + ") has an empty UniqueDefs list.";
                             break;
                         }
                         if(voice.NoteObjects.Count != 0)
                         {
-                            error = 5;
+                            errorString = "A voice (voiceIndex=" + voiceIndex.ToString() + ") has an empty NoteObjects list.";
                             break;
                         }
                     }
-                    if(error > 0)
+                    if(! string.IsNullOrEmpty(errorString))
                         break;
                 }
             }
-            if(error > 0)
+            if(!string.IsNullOrEmpty(errorString))
             {
-                throw new ApplicationException("ComposableScore.CheckBars(): Algorithm error: " + error.ToString());
+                throw new ApplicationException("\nComposableScore.CheckBars(): Algorithm error:\n" + errorString);
             }
         }
         /// <summary>
@@ -98,7 +99,7 @@ namespace Moritz.AssistantComposer
 
             CheckBars(voicesPerSystemPerBar);
 
-            Notator.CreateSystems(this, voicesPerSystemPerBar, _pageFormat.Gap);
+            Notator.CreateSystems(this, voicesPerSystemPerBar);
 
             if(_pageFormat.ChordSymbolType != "none") // set by AudioButtonsControl
             {

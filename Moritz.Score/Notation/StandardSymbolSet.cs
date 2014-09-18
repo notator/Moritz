@@ -268,7 +268,7 @@ namespace Moritz.Score.Notation
             ClefSymbol clef = noteObject as ClefSymbol;
             Barline barline = noteObject as Barline;
             CautionaryChordSymbol cautionaryChordSymbol = noteObject as CautionaryChordSymbol;
-            OutputChordSymbol chord = noteObject as OutputChordSymbol;
+            ChordSymbol chord = noteObject as ChordSymbol;
             RestSymbol rest = noteObject as RestSymbol;
             if(barline != null)
             {
@@ -301,45 +301,45 @@ namespace Moritz.Score.Notation
             ref byte currentVelocity, float musicFontHeight)
         {
             NoteObject noteObject = null;
-            CautionaryChordDef uniqueCautionaryChordDef = iud as CautionaryChordDef;
-            MidiChordDef uniqueMidiChordDef = iud as MidiChordDef;
-            InputChordDef uniqueInputChordDef = iud as InputChordDef;
-            RestDef uniqueRestDef = iud as RestDef;
-            ClefChangeDef uniqueClefChangeDef = iud as ClefChangeDef;
+            CautionaryChordDef cautionaryChordDef = iud as CautionaryChordDef;
+            MidiChordDef midiChordDef = iud as MidiChordDef;
+            InputChordDef inputChordDef = iud as InputChordDef;
+            RestDef restDef = iud as RestDef;
+            ClefChangeDef clefChangeDef = iud as ClefChangeDef;
 
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
             float cautionaryFontHeight = pageFormat.CautionaryNoteheadsFontHeight;
             int minimumCrotchetDuration = pageFormat.MinimumCrotchetDuration;
  
-            if(uniqueCautionaryChordDef != null && firstDefInVoice)
+            if(cautionaryChordDef != null && firstDefInVoice)
             {
-                CautionaryChordSymbol cautionaryChordSymbol = new CautionaryChordSymbol(voice, uniqueCautionaryChordDef, cautionaryFontHeight);
+                CautionaryChordSymbol cautionaryChordSymbol = new CautionaryChordSymbol(voice, cautionaryChordDef, cautionaryFontHeight);
                 noteObject = cautionaryChordSymbol;
             }                
-            else if(uniqueMidiChordDef != null)
+            else if(midiChordDef != null)
             {
-                OutputChordSymbol outputChordSymbol = new OutputChordSymbol(voice, uniqueMidiChordDef, minimumCrotchetDuration, musicFontHeight);
+                OutputChordSymbol outputChordSymbol = new OutputChordSymbol(voice, midiChordDef, minimumCrotchetDuration, musicFontHeight);
 
-                if(uniqueMidiChordDef.MidiVelocity != currentVelocity)
+                if(midiChordDef.MidiVelocity != currentVelocity)
                 {
-                    outputChordSymbol.AddDynamic(uniqueMidiChordDef.MidiVelocity, currentVelocity);
-                    currentVelocity = uniqueMidiChordDef.MidiVelocity;
+                    outputChordSymbol.AddDynamic(midiChordDef.MidiVelocity, currentVelocity);
+                    currentVelocity = midiChordDef.MidiVelocity;
                 }
                 noteObject = outputChordSymbol;
             }
-            else if(uniqueInputChordDef != null)
+            else if(inputChordDef != null)
             {
-                InputChordSymbol inputChordSymbol = new InputChordSymbol(voice, uniqueInputChordDef, minimumCrotchetDuration, musicFontHeight);
+                InputChordSymbol inputChordSymbol = new InputChordSymbol(voice, inputChordDef, minimumCrotchetDuration, musicFontHeight);
                 noteObject = inputChordSymbol;
             }
-            else if(uniqueRestDef != null) 
+            else if(restDef != null) 
             {
                 RestSymbol restSymbol = new RestSymbol(voice, iud, minimumCrotchetDuration, musicFontHeight);
                 noteObject = restSymbol;
             }
-            else if(uniqueClefChangeDef != null)
+            else if(clefChangeDef != null)
             {
-                ClefChangeSymbol clefChangeSymbol = new ClefChangeSymbol(voice, uniqueClefChangeDef.ClefType, cautionaryFontHeight, ((IUniqueDef)iud).MsPosition);
+                ClefChangeSymbol clefChangeSymbol = new ClefChangeSymbol(voice, clefChangeDef.ClefType, cautionaryFontHeight, ((IUniqueDef)iud).MsPosition);
                 noteObject = clefChangeSymbol;
             }
 
@@ -349,9 +349,9 @@ namespace Moritz.Score.Notation
         public void ForceNaturalsInSynchronousChords(Staff staff)
         {
             Debug.Assert(staff.Voices.Count == 2);
-            foreach(OutputChordSymbol voice0chord in staff.Voices[0].ChordSymbols)
+            foreach(ChordSymbol voice0chord in staff.Voices[0].ChordSymbols)
             {
-                foreach(OutputChordSymbol voice1chord in staff.Voices[1].ChordSymbols)
+                foreach(ChordSymbol voice1chord in staff.Voices[1].ChordSymbols)
                 {
                     if(voice0chord.MsPosition == voice1chord.MsPosition)
                     {
@@ -368,7 +368,7 @@ namespace Moritz.Score.Notation
         /// Force the display of naturals where the synchronous chords share a diatonic pitch,
         /// and one of them is not natural.
         /// </summary>
-        private void ForceNaturals(OutputChordSymbol synchChord1, OutputChordSymbol synchChord2)
+        private void ForceNaturals(ChordSymbol synchChord1, ChordSymbol synchChord2)
         {
             Debug.Assert(synchChord1.MsPosition == synchChord2.MsPosition);
             foreach(Head head1 in synchChord1.HeadsTopDown)
@@ -421,7 +421,7 @@ namespace Moritz.Score.Notation
 
                     float lyricMaxTop = float.MinValue;
                     float lyricMinBottom = float.MaxValue;
-                    foreach(OutputChordSymbol chordSymbol in staff.Voices[voiceIndex].ChordSymbols)
+                    foreach(ChordSymbol chordSymbol in staff.Voices[voiceIndex].ChordSymbols)
                     {
                         Metrics lyricMetrics = chordSymbol.ChordMetrics.LyricMetrics;
                         if(lyricMetrics != null)
@@ -438,7 +438,7 @@ namespace Moritz.Score.Notation
                             float lyricMinTop = staff.Metrics.StafflinesBottom + (staff.SVGSystem.Score.PageFormat.Gap * 1.5F);
                             lyricMaxTop = lyricMaxTop > lyricMinTop ? lyricMaxTop : lyricMinTop;
                         }
-                        foreach(OutputChordSymbol chordSymbol in staff.Voices[voiceIndex].ChordSymbols)
+                        foreach(ChordSymbol chordSymbol in staff.Voices[voiceIndex].ChordSymbols)
                         {
                             chordSymbol.ChordMetrics.MoveAuxilliariesToLyricHeight(voiceStemDirection, lyricMaxTop, lyricMinBottom);
                         }

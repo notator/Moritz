@@ -32,8 +32,6 @@ namespace Moritz.Score
             if(ChordMetrics.BeamBlock != null)
                 ChordMetrics.BeamBlock.WriteSVG(w);
 
-            string idNumber = SvgScore.UniqueID_Number;
-
             w.SvgStartGroup("outputChord", null);
             //w.WriteAttributeString("score", "object", null, "outputChord");
             w.WriteAttributeString("score", "alignmentX", null, this.Metrics.OriginX.ToString(M.En_USNumberFormat));

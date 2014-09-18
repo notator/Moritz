@@ -153,11 +153,11 @@ namespace Moritz.Score
         /// </summary>
         public void SetChordStemDirectionsAndCreateBeamBlocks(PageFormat pageFormat)
         {
-            List<OutputChordSymbol> chordsBeamedTogether = new List<OutputChordSymbol>();
+            List<ChordSymbol> chordsBeamedTogether = new List<ChordSymbol>();
             ClefSymbol currentClef = null;
             bool breakGroup = false;
-            OutputChordSymbol lastChord = null;
-            foreach(OutputChordSymbol cs in ChordSymbols)
+            ChordSymbol lastChord = null;
+            foreach(ChordSymbol cs in ChordSymbols)
                 lastChord = cs;
 
             foreach(NoteObject noteObject in NoteObjects)
@@ -278,7 +278,7 @@ namespace Moritz.Score
         private HashSet<BeamBlock> FindBeamBlocks()
         {
             HashSet<BeamBlock> beamBlocks = new HashSet<BeamBlock>();
-            foreach(OutputChordSymbol chord in ChordSymbols)
+            foreach(ChordSymbol chord in ChordSymbols)
             {
                 if(chord.BeamBlock != null)
                     beamBlocks.Add(chord.BeamBlock);
@@ -317,7 +317,7 @@ namespace Moritz.Score
             {
                 foreach(NoteObject noteObject in NoteObjects)
                 {
-                    OutputChordSymbol chordSymbol = noteObject as OutputChordSymbol;
+                    ChordSymbol chordSymbol = noteObject as ChordSymbol;
                     if(chordSymbol != null)
                         yield return chordSymbol;
                 }

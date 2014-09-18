@@ -259,8 +259,8 @@ namespace Moritz.AssistantComposer
         /// </summary>
         internal void InsertInRest(VoiceDef iVoiceDef)
         {
-            Debug.Assert(iVoiceDef[0] is MidiChordDef
-                && iVoiceDef[iVoiceDef.Count - 1] is MidiChordDef);
+            Debug.Assert((iVoiceDef[0] is MidiChordDef && iVoiceDef[iVoiceDef.Count - 1] is MidiChordDef)
+                || (iVoiceDef[0] is InputChordDef && iVoiceDef[iVoiceDef.Count - 1] is InputChordDef));
 
             int iLmddsStartMsPos = iVoiceDef[0].MsPosition;
             int iLmddsEndMsPos = iVoiceDef[iVoiceDef.Count - 1].MsPosition + iVoiceDef[iVoiceDef.Count - 1].MsDuration;

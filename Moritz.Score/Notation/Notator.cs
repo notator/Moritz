@@ -30,7 +30,7 @@ namespace Moritz.Score.Notation
                 throw new ApplicationException("Cannot construct Notator!");
         }
 
-        public void CreateSystems(SvgScore svgScore, List<List<Voice>> voicesPerSystemPerBar, float gap)
+        public void CreateSystems(SvgScore svgScore, List<List<Voice>> voicesPerSystemPerBar)
         {             
             foreach(List<Voice> systemVoices in voicesPerSystemPerBar)
             {
@@ -53,7 +53,9 @@ namespace Moritz.Score.Notation
                     Staff staff;
                     if(staffIndex >= _pageFormat.MidiChannelsPerStaff.Count)
                     {
-                        staff = new InputStaff(system, staffname, _pageFormat.StafflinesPerStaff[staffIndex], gap * _pageFormat.InputStavesSizeFactor);
+                        float gap = _pageFormat.Gap * _pageFormat.InputStavesSizeFactor;
+                        float stafflineStemStrokeWidth = _pageFormat.StafflineStemStrokeWidth * _pageFormat.InputStavesSizeFactor;
+                        staff = new InputStaff(system, staffname, _pageFormat.StafflinesPerStaff[staffIndex], gap, stafflineStemStrokeWidth);
                         
                         List<byte> inputVoiceIndices = _pageFormat.InputVoiceIndicesPerStaff[inputVoice_StaffIndex];
                         for(int i = 0; i < inputVoiceIndices.Count; ++i)
@@ -67,7 +69,7 @@ namespace Moritz.Score.Notation
                     }
                     else
                     {
-                        staff = new OutputStaff(system, staffname, _pageFormat.StafflinesPerStaff[staffIndex], gap);
+                        staff = new OutputStaff(system, staffname, _pageFormat.StafflinesPerStaff[staffIndex], _pageFormat.Gap, _pageFormat.StafflineStemStrokeWidth);
 
                         List<byte> midiChannels = _pageFormat.MidiChannelsPerStaff[midiVoice_StaffIndex];
                         for(int i = 0; i < midiChannels.Count; ++i)

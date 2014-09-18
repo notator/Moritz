@@ -208,7 +208,7 @@ namespace Moritz.Score
         {
             get
             {
-                foreach(OutputChordSymbol chordSymbol in _noteObjects)
+                foreach(ChordSymbol chordSymbol in _noteObjects)
                     yield return chordSymbol;
             }
         }

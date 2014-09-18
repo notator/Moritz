@@ -54,12 +54,14 @@ namespace Moritz.Score
                                     if(attributesDict.ContainsKey("score:isInput"))
                                     {
                                         currentStaff = GetStaff(currentSystem, attributesDict["score:staffName"],
-                                            attributesDict["score:stafflines"], attributesDict["score:gap"], attributesDict["score:isInput"]);
+                                            attributesDict["score:stafflines"], attributesDict["score:gap"],
+                                            attributesDict["score:strokeWidth"], attributesDict["score:isInput"]);
                                     }
                                     else
                                     {
                                         currentStaff = GetStaff(currentSystem, attributesDict["score:staffName"],
-                                            attributesDict["score:stafflines"], attributesDict["score:gap"], "0");
+                                            attributesDict["score:stafflines"], attributesDict["score:gap"], 
+                                            attributesDict["score:strokeWidth"], "0");
                                     }
                                     break;
                                 case "voice":
@@ -104,16 +106,19 @@ namespace Moritz.Score
             pageStream.Close();
         }
 
-        private Staff GetStaff(SvgSystem system, string staffName, string stafflines, string gap, string isInput)
+        private Staff GetStaff(SvgSystem system, string staffName, string nStaffLinesStr, string gapStr, string stafflineStemStrokeWidthStr, string isInput)
         {
             Staff newStaff;
+            float gap = float.Parse(gapStr, M.En_USNumberFormat);
+            float stafflineStemStrokeWidth = float.Parse(stafflineStemStrokeWidthStr, M.En_USNumberFormat);
+            int nStaffLines = int.Parse(nStaffLinesStr);
             if(!String.IsNullOrEmpty(isInput) && isInput == "1")
             {
-                newStaff = new InputStaff(system, staffName, int.Parse(stafflines), float.Parse(gap, M.En_USNumberFormat));
+                newStaff = new InputStaff(system, staffName, nStaffLines, gap, stafflineStemStrokeWidth);
             }
             else
             {
-                newStaff = new OutputStaff(system, staffName, int.Parse(stafflines), float.Parse(gap, M.En_USNumberFormat));
+                newStaff = new OutputStaff(system, staffName, nStaffLines, gap, stafflineStemStrokeWidth);
             }
             system.Staves.Add(newStaff);
             return newStaff;

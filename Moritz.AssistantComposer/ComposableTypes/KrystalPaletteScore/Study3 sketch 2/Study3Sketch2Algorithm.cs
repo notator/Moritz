@@ -3,12 +3,13 @@ using System.Diagnostics;
 
 using Krystals4ObjectLibrary;
 using Moritz.Score;
+using Moritz.Score.Midi;
 using Moritz.Score.Notation;
 
 namespace Moritz.AssistantComposer
 {
     /// <summary>
-    /// Algorithm for testing Song 6's palettes.
+    /// Algorithm for testing the new input staves.
     /// This may develope as composition progresses...
     /// </summary>
     public class Study3Sketch2Algorithm : MidiCompositionAlgorithm
@@ -103,6 +104,22 @@ namespace Moritz.AssistantComposer
             }
 
             InputVoice inputVoice = new InputVoice(null);
+            Voice topVoice = bar[0];
+            foreach(IUniqueDef iud in topVoice.UniqueDefs)
+            {
+                MidiChordDef mcd = iud as MidiChordDef;
+                RestDef rd = iud as RestDef;
+                if(mcd != null)
+                {
+                    InputChordDef icd = new InputChordDef(mcd.MsPosition, mcd.MsDuration, mcd.MidiPitches, null);
+                    inputVoice.UniqueDefs.Add(icd);
+                }
+                else if(rd != null)
+                {
+                    RestDef newRest = new RestDef(rd.MsPosition, rd.MsDuration);
+                    inputVoice.UniqueDefs.Add(newRest);
+                }
+            }
             bar.Add(inputVoice);
 
             return bar;
@@ -110,8 +127,9 @@ namespace Moritz.AssistantComposer
 
         private void WriteVoiceMidiDurationDefs1(OutputVoice outputVoice, Palette palette)
         {
-            int msPosition = 0;
             int bar1ChordMsSeparation = 1500;
+            int msPosition = 0;
+
             for(int i = 0; i < palette.Count;++i)
             {
                 IUniqueDef noteDef = palette.UniqueDurationDef(i);
@@ -145,11 +163,12 @@ namespace Moritz.AssistantComposer
 
             int msPosition = bar2StartMsPos;
             int maxBarMsPos = 0;
+            int startMsDifference = 1500;
             for(int i = 0; i < voiceDefs.Count; ++i)
             {
                 int maxMsPos = WriteVoiceMidiDurationDefsInBar2(bar[i], voiceDefs[i], msPosition, bar2StartMsPos);
                 maxBarMsPos = maxBarMsPos > maxMsPos ? maxBarMsPos : maxMsPos;
-                msPosition += 1500;
+                msPosition += startMsDifference;
             }
 
             // now add the final rest in the bar
@@ -163,7 +182,19 @@ namespace Moritz.AssistantComposer
                 }
             }
 
+            VoiceDef iVoiceDef = new VoiceDef(maxBarMsPos - bar2StartMsPos);
+            iVoiceDef.StartMsPosition = bar2StartMsPos; 
+            int msPos = bar2StartMsPos;
+            for(int i = 0; i < bar.Count; ++i)
+            {
+                InputChordDef icd = new InputChordDef(msPos, startMsDifference, new List<byte>() { 64 }, null);
+                iVoiceDef.InsertInRest(icd);
+                msPos += startMsDifference;
+            }
+
             InputVoice inputVoice = new InputVoice(null);
+            inputVoice.UniqueDefs = iVoiceDef.UniqueDefs;
+
             bar.Add(inputVoice);
 
             return bar;

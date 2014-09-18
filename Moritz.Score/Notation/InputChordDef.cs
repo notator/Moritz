@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Xml;
 
 using Moritz.Globals;
+using Moritz.Score.Midi;
 
 namespace Moritz.Score.Notation
 {
@@ -18,6 +19,19 @@ namespace Moritz.Score.Notation
             :base(0)
         {
         }
+
+        /// <summary>
+        /// This constructor makes its own copy of the midiPitches
+        /// </summary>
+        public InputChordDef(int msPosition, int msDuration, List<byte> midiPitches, string lyric)
+            : base(msDuration)
+        {
+            _msPosition = msPosition;
+            _midiPitches = new List<byte>(midiPitches);
+            _lyric = lyric;
+            _msDurationToNextBarline = null;
+        }
+
 
         public InputChordDef(XmlReader r, int msDuration)
             : base(msDuration)
@@ -84,9 +98,6 @@ namespace Moritz.Score.Notation
             throw new NotImplementedException("InputChordDef.DeepClone()");
         }
 
-        public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
-        private int? _msDurationToNextBarline = null;
-
         public int MsPosition { get { return _msPosition; } set { _msPosition = value; } }
         private int _msPosition = 0;
 
@@ -95,5 +106,8 @@ namespace Moritz.Score.Notation
 
         public string Lyric { get { return _lyric; } set { _lyric = value; } }
         protected string _lyric = null;
+
+        public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
+        private int? _msDurationToNextBarline = null;
     }
 }

@@ -37,7 +37,7 @@ namespace Moritz.Score
 
             for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
             {
-                Staves[staffIndex].WriteSVG(w, pageNumber, systemNumber, staffIndex + 1, pageFormat);
+                Staves[staffIndex].WriteSVG(w, pageNumber, systemNumber, staffIndex + 1);
             }
 
             w.SvgStartGroup("barlines", null);
@@ -222,38 +222,25 @@ namespace Moritz.Score
 
         private float CreateMetrics(Graphics graphics, PageFormat pageFormat, float leftMarginPos)
         {
-            float stemStrokeWidth = pageFormat.StafflineStemStrokeWidth;
+            
             this.Metrics = new SystemMetrics();
             List<NoteObject> NoteObjectsToRemove = new List<NoteObject>();
             for(int staffIndex = 0; staffIndex < Staves.Count; ++staffIndex)
             {
                 Staff staff = Staves[staffIndex];
-                float staffHeight = pageFormat.Gap * (staff.NumberOfStafflines - 1);
-                if(staffIndex >= pageFormat.MidiChannelsPerStaff.Count)
-                {
-                    staffHeight *= pageFormat.InputStavesSizeFactor;
-                }
+                float staffHeight = staff.Gap * (staff.NumberOfStafflines - 1);
                 staff.Metrics = new StaffMetrics(leftMarginPos, pageFormat.RightMarginPos, staffHeight);
 
                 for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                 {
                     Voice voice = staff.Voices[voiceIndex];
 
-                    //voice.SetChordStemDirectionsAndCreateBeamBlocks(pageFormat.BeamThickness, pageFormat.StafflineStemStrokeWidth, pageFormat.BeamsCrossBarlines);
-
                     voice.SetChordStemDirectionsAndCreateBeamBlocks(pageFormat);
 
                     for(int nIndex = 0; nIndex < staff.Voices[voiceIndex].NoteObjects.Count; nIndex++)
                     {
                         NoteObject noteObject = staff.Voices[voiceIndex].NoteObjects[nIndex];
-                        float gap = pageFormat.Gap;
-                        float stafflineStemStrokeWidth = pageFormat.StafflineStemStrokeWidth;
-                        if(staff is InputStaff)
-                        {
-                            gap *= pageFormat.InputStavesSizeFactor;
-                            stafflineStemStrokeWidth *= pageFormat.InputStavesSizeFactor;
-                        }
-                        noteObject.Metrics = Score.Notator.SymbolSet.NoteObjectMetrics(graphics, noteObject, voice.StemDirection, gap, stafflineStemStrokeWidth);
+                        noteObject.Metrics = Score.Notator.SymbolSet.NoteObjectMetrics(graphics, noteObject, voice.StemDirection, staff.Gap, staff.StafflineStemStrokeWidth);
 
                         if(noteObject.Metrics != null)
                             staff.Metrics.Add(noteObject.Metrics);
