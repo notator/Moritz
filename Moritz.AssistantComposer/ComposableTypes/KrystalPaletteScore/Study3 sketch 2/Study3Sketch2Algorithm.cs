@@ -112,19 +112,10 @@ namespace Moritz.AssistantComposer
             {
                 MidiChordDef mcd = iud as MidiChordDef;
                 RestDef rd = iud as RestDef;
-                List<byte> seqChannels = new List<byte>(){0};
-                List<byte> seqlengths = new List<byte>(){1};
                 if(mcd != null)
                 {
-                    List<byte> pitches = new List<byte>(mcd.MidiPitches);
-                    for(int i = 0; i <pitches.Count; ++i)
-                    {
-                        pitches[i] += 36;
-                    }
-                    InputChordDef icd = new InputChordDef(mcd.MsPosition, mcd.MsDuration, pitches,
-                        new List<List<byte>>() { seqChannels },
-                        new List<List<byte>>() { seqlengths },
-                        null);
+                    byte pitch = (byte)(mcd.MidiPitches[0] + 36);
+                    InputChordDef icd = new InputChordDef(mcd.MsPosition, mcd.MsDuration, pitch, 0, 1, null);
                     inputVoice.UniqueDefs.Add(icd);
                 }
                 else if(rd != null)
@@ -200,12 +191,7 @@ namespace Moritz.AssistantComposer
             int msPos = bar2StartMsPos;
             for(int i = 0; i < bar.Count; ++i)
             {
-                List<byte> seqChannels = new List<byte>() { (byte)i };
-                List<byte> seqLengths = new List<byte>() { 12 };
-                InputChordDef icd = new InputChordDef(msPos, startMsDifference, new List<byte>() { 64 },
-                    new List<List<byte>>() { seqChannels },
-                    new List<List<byte>>() { seqLengths },
-                    null);
+                InputChordDef icd = new InputChordDef(msPos, startMsDifference, 64, (byte)i, (byte)12, null);
                 iVoiceDef.InsertInRest(icd);
                 msPos += startMsDifference;
             }

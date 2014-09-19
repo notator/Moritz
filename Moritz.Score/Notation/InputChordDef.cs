@@ -22,6 +22,23 @@ namespace Moritz.Score.Notation
         }
 
         /// <summary>
+        /// constructs a 1-pitch chord pointing at a single sequence
+        /// </summary>
+        public InputChordDef(int msPosition, int msDuration, byte midiPitch, byte seqChannelIndex, byte seqLength, string lyric)
+            : base(msDuration)
+        {
+            _msPosition = msPosition;
+            _midiPitches = new List<byte>(){midiPitch};
+            List<byte> seqChannelIndices = new List<byte>(){seqChannelIndex};
+            List<byte> seqLengths = new List<byte>(){seqLength};
+            SeqChannelIndicesPerMidiPitch.Add(midiPitch, seqChannelIndices);
+            SeqLengthsPerMidiPitch.Add(midiPitch, seqLengths);
+            _lyric = lyric;
+            _msDurationToNextBarline = null;
+        }
+
+        /// <summary>
+        /// Constructs a multi-pitch chord, each pitch pitch pointing at several sequences.
         /// This constructor makes its own copy of the midiPitches
         /// </summary>
         public InputChordDef(int msPosition, int msDuration, List<byte> midiPitches,
@@ -30,6 +47,9 @@ namespace Moritz.Score.Notation
             string lyric)
             : base(msDuration)
         {
+            Debug.Assert(midiPitches.Count == seqChannelIndicesPerMidiPitch.Count);
+            Debug.Assert(midiPitches.Count == seqLengthsPerMidiPitch.Count);
+
             _msPosition = msPosition;
             _midiPitches = new List<byte>(midiPitches);
             for(int pitchIndex = 0; pitchIndex < midiPitches.Count; ++pitchIndex)
