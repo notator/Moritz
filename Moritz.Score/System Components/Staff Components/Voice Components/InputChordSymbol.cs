@@ -12,6 +12,8 @@ namespace Moritz.Score
         {
             _inputChordDef = umcd;
 
+            _msDurationToNextBarline = umcd.MsDurationToNextBarline;
+
             SetNoteheadPitches(umcd.MidiPitches);
 
             if(umcd.Lyric != null)

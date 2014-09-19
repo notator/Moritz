@@ -462,7 +462,7 @@ namespace Moritz.Score.Notation
                 List<NoteObject> noteObjects = voice.NoteObjects;
                 ClefSymbol firstClef = null;
                 CautionaryChordSymbol cautionaryChordSymbol = null;
-                OutputChordSymbol firstChord = null;
+                ChordSymbol firstChord = null;
                 RestSymbol firstRest = null;
                 for(int index = 0; index < noteObjects.Count; ++index)
                 {
@@ -471,7 +471,7 @@ namespace Moritz.Score.Notation
                     if(cautionaryChordSymbol == null)
                         cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
                     if(firstChord == null)
-                        firstChord = noteObjects[index] as OutputChordSymbol;
+                        firstChord = noteObjects[index] as ChordSymbol;
                     if(firstRest == null)
                         firstRest = noteObjects[index] as RestSymbol;
 
@@ -515,7 +515,7 @@ namespace Moritz.Score.Notation
             List<float> x2s = new List<float>();
             NoteObject no2 = GetFollowingChordRestOrBarlineSymbol(noteObjects);
             Barline barline = no2 as Barline;
-            OutputChordSymbol chord2 = no2 as OutputChordSymbol;
+            ChordSymbol chord2 = no2 as ChordSymbol;
             RestSymbol rest2 = no2 as RestSymbol;
             if(barline != null)
             {
@@ -574,7 +574,7 @@ namespace Moritz.Score.Notation
                         continue;
                     }
 
-                    if(noteObject is OutputChordSymbol)
+                    if(noteObject is ChordSymbol)
                         noteObjectToReturn = noteObject;
 
                     if(noteObject is RestSymbol)
@@ -602,19 +602,19 @@ namespace Moritz.Score.Notation
                 {
                     // noteObjects.Count - 1 because index is immediately incremented when a continuing 
                     // chord or rest is found, and it should always be less than noteObjects.Count.
-                    OutputChordSymbol chord1 = noteObjects[index] as OutputChordSymbol;
+                    ChordSymbol chord1 = noteObjects[index] as ChordSymbol;
                     if(chord1 != null)
                     {
                         List<float> x1s = GetX1sFromChord1(chord1.ChordMetrics, hairlinePadding);
                         List<float> x2s = null;
                         List<float> ys = null;
                         ++index;
-                        if(chord1.MidiChordDef.MsDurationToNextBarline != null)
+                        if(chord1.MsDurationToNextBarline != null)
                         {
                             while(index < noteObjects.Count)
                             {
                                 CautionaryChordSymbol cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
-                                OutputChordSymbol chord2 = noteObjects[index] as OutputChordSymbol;
+                                ChordSymbol chord2 = noteObjects[index] as ChordSymbol;
                                 RestSymbol rest2 = noteObjects[index] as RestSymbol;
                                 if(cautionaryChordSymbol != null)
                                 {
@@ -657,7 +657,6 @@ namespace Moritz.Score.Notation
 
                                 chord1.ChordMetrics.NoteheadExtendersMetrics =
                                     CreateExtenders(x1s, x2s, ys, extenderStrokeWidth, gap, drawExtender);
-                                //break;
                             }
                         }
                     }
@@ -678,12 +677,12 @@ namespace Moritz.Score.Notation
                 {
                     Voice voice = staff.Voices[voiceIndex];
                     List<NoteObject> noteObjects = voice.NoteObjects;
-                    OutputChordSymbol lastChord = null;
+                    ChordSymbol lastChord = null;
                     RestSymbol lastRest = null;
                     CautionaryChordSymbol cautionary = null;
                     for(int index = noteObjects.Count - 1; index >= 0; --index)
                     {
-                        lastChord = noteObjects[index] as OutputChordSymbol;
+                        lastChord = noteObjects[index] as ChordSymbol;
                         lastRest = noteObjects[index] as RestSymbol;
                         cautionary = noteObjects[index] as CautionaryChordSymbol;
                         if(cautionary != null)
@@ -695,7 +694,7 @@ namespace Moritz.Score.Notation
                             break;
                     }
 
-                    if(lastChord != null && lastChord.MidiChordDef.MsDurationToNextBarline != null)
+                    if(lastChord != null && lastChord.MsDurationToNextBarline != null)
                     {
                         List<float> x1s = GetX1sFromChord1(lastChord.ChordMetrics, hairlinePadding);
                         List<float> x2s;
@@ -725,7 +724,7 @@ namespace Moritz.Score.Notation
                     firstDurationSymbolIsCautionary = true;
                     break;
                 }
-                else if(noteObject is OutputChordSymbol || noteObject is RestSymbol)
+                else if(noteObject is ChordSymbol || noteObject is RestSymbol)
                 {
                     break;
                 }  

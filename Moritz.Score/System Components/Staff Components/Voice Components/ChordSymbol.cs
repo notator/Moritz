@@ -490,5 +490,8 @@ namespace Moritz.Score
 
         public string GraphicSymbolID { get { return _graphicSymbolID; } }
         protected string _graphicSymbolID = null;
+
+        public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } }
+        protected int? _msDurationToNextBarline = null;
     }
 }
