@@ -30,7 +30,6 @@ namespace Moritz.Score
                 ChordMetrics.BeamBlock.WriteSVG(w);
 
             w.SvgStartGroup("inputChord", null);
-            //w.WriteAttributeString("score", "object", null, "inputChord");
             w.WriteAttributeString("score", "alignmentX", null, this.Metrics.OriginX.ToString(M.En_USNumberFormat));
 
             _inputChordDef.WriteSvg(w);

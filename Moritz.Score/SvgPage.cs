@@ -224,7 +224,7 @@ namespace Moritz.Score
         /// Writes this page.
         /// </summary>
         /// <param name="w"></param>
-        public void WriteSVG(SvgWriter w, Metadata metadata, int pageNumber)
+        public void WriteSVG(SvgWriter w, Metadata metadata, PerformanceControlDef scorePerfCtlDef, int pageNumber)
         {
             w.WriteStartDocument(); // standalone="no"
             //<?xml-stylesheet href="../../fontsStyleSheet.css" type="text/css"?>
@@ -247,6 +247,8 @@ namespace Moritz.Score
             if(_pageNumber == 1)
             {
                 WritePage1LinkTitleAndAuthor(w, metadata);
+                if(scorePerfCtlDef != null)
+                    scorePerfCtlDef.WriteSvg(w);
             }
             #endregion
 

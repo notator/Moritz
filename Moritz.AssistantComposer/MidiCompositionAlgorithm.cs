@@ -65,7 +65,10 @@ namespace Moritz.AssistantComposer
         /// The top (=first) Voice in each bar must be an OutputVoice.
         /// This can be followed by zero or more OutputVoices, followed by zero or more InputVoices.
         /// The chord definitions in OutputVoice.UniqueDefs must be MidiChordDefs.
-        /// The chord definitions in InputVoice.UniqueDefs must be UniqueInputChordDefs.
+        /// The chord definitions in InputVoice.UniqueDefs must be InputChordDefs.
+        /// 
+        /// If one or more InputVoices are defined, then a PerformanceControlDef object must be created, given
+        /// default values, and assigned to this.PerformanceControlDef (see below).
         /// </summary>
         public abstract List<List<Voice>> DoAlgorithm();
         /// <summary>
@@ -274,5 +277,7 @@ namespace Moritz.AssistantComposer
 
         protected List<Krystal> _krystals;
         protected List<Palette> _palettes;
+
+        public PerformanceControlDef PerformanceControlDef = null;
     }
 }

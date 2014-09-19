@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Xml;
+using System.Text;
 
 using Moritz.Globals;
 using Moritz.Score.Midi;
@@ -23,11 +24,19 @@ namespace Moritz.Score.Notation
         /// <summary>
         /// This constructor makes its own copy of the midiPitches
         /// </summary>
-        public InputChordDef(int msPosition, int msDuration, List<byte> midiPitches, string lyric)
+        public InputChordDef(int msPosition, int msDuration, List<byte> midiPitches,
+            List<List<byte>> seqChannelIndicesPerMidiPitch,
+            List<List<byte>> seqLengthsPerMidiPitch,
+            string lyric)
             : base(msDuration)
         {
             _msPosition = msPosition;
             _midiPitches = new List<byte>(midiPitches);
+            for(int pitchIndex = 0; pitchIndex < midiPitches.Count; ++pitchIndex)
+            {
+                SeqChannelIndicesPerMidiPitch.Add(midiPitches[pitchIndex], seqChannelIndicesPerMidiPitch[pitchIndex]);
+                SeqLengthsPerMidiPitch.Add(midiPitches[pitchIndex], seqLengthsPerMidiPitch[pitchIndex]);
+            }
             _lyric = lyric;
             _msDurationToNextBarline = null;
         }
@@ -86,11 +95,23 @@ namespace Moritz.Score.Notation
         /// <param name="w"></param>
         public void WriteSvg(SvgWriter w)
         {
-            w.WriteStartElement("score", "inputChord", null);
+            w.WriteStartElement("score", "inputNotes", null);
 
-            // etc.
+            foreach(byte pitch in _midiPitches)
+            {
+                w.WriteStartElement("score", "inputNote", null);
+                w.WriteAttributeString("midiPitch", pitch.ToString());
+                List<byte> seqChannelIndices = SeqChannelIndicesPerMidiPitch[pitch];
+                w.WriteAttributeString("seqChannels", M.ByteListToString(seqChannelIndices));
+                List<byte> seqLengths = SeqLengthsPerMidiPitch[pitch];
+                w.WriteAttributeString("seqLengths", M.ByteListToString(seqLengths));
+                w.WriteEndElement(); // score:inputNote
+            }
 
-            w.WriteEndElement(); // score:inputChord
+            w.WriteEndElement(); // score:inputNotes
+
+            if(PerformanceControlDef != null)
+                PerformanceControlDef.WriteSvg(w);
         }
 
         public override IUniqueDef DeepClone()
@@ -109,5 +130,10 @@ namespace Moritz.Score.Notation
 
         public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
         private int? _msDurationToNextBarline = null;
+
+        public Dictionary<byte, List<byte>> SeqChannelIndicesPerMidiPitch = new Dictionary<byte, List<byte>>();
+        public Dictionary<byte, List<byte>> SeqLengthsPerMidiPitch = new Dictionary<byte, List<byte>>();
+
+        public PerformanceControlDef PerformanceControlDef = null;
     }
 }

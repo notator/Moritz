@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using Krystals4ObjectLibrary;
 using Moritz.Globals;
 using Moritz.Score;
+using Moritz.Score.Notation;
 
 using Moritz.AssistantComposer.SongSix;
 
@@ -1320,6 +1321,9 @@ namespace Moritz.AssistantComposer
         /// </summary>
         string _algorithmName = null;
         MidiCompositionAlgorithm _algorithm = null;
+
+        PerformanceControlDef _scorePerformanceControlDef;
+
         /// <summary>
         /// The folder in which the score and all its associated files is saved
         /// </summary>

@@ -296,7 +296,7 @@ namespace Moritz.Score
 
                 pageFilenames.Add(pageFilename);
 
-                SaveSVGPage(pagePath, page, this.Metadata, pageNumber);
+                SaveSVGPage(pagePath, page, this.Metadata, this._performanceControlDef, pageNumber);
                 pageNumber++;
             }
 
@@ -304,11 +304,9 @@ namespace Moritz.Score
         }
         /// <summary>
         /// Writes an SVG file containing one page of the score.
+        /// The metadata and scorePerformanceControlDef are only written to page 1.
         /// </summary>
-        /// <param name="pagePath"></param>
-        /// <param name="firstSystemIndex"></param>
-        /// <param name="nSystemsPerPage"></param>
-        public void SaveSVGPage(string pagePath, SvgPage page, Metadata metadata, int pageNumber)
+        public void SaveSVGPage(string pagePath, SvgPage page, Metadata metadata, PerformanceControlDef scorePerfCtlDef, int pageNumber)
         {
             if(File.Exists(pagePath))
             {
@@ -325,7 +323,7 @@ namespace Moritz.Score
 
             using(SvgWriter w = new SvgWriter(pagePath, settings))
             {
-                page.WriteSVG(w, metadata, pageNumber);
+                page.WriteSVG(w, metadata, scorePerfCtlDef, pageNumber);
             }
         }
 
@@ -802,10 +800,12 @@ namespace Moritz.Score
             }
         }
 
-        protected void CreatePages()
+        protected void CreatePages(PerformanceControlDef globalPerformanceControlDef)
         {
             int pageNumber = 1;
             int systemIndex = 0;
+            this._performanceControlDef = globalPerformanceControlDef;
+
             while(systemIndex < Systems.Count)
             {
                 _pages.Add(NewSvgPage(pageNumber++, ref systemIndex));
@@ -975,6 +975,8 @@ namespace Moritz.Score
 
         public PageFormat PageFormat { get { return _pageFormat; } } 
         protected PageFormat _pageFormat = null;
+
+        private PerformanceControlDef _performanceControlDef;
 
         public Notator Notator = null;
 

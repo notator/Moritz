@@ -11,7 +11,7 @@ namespace Moritz.AssistantComposer
     public class ComposableSvgScore : SvgScore
     {
         public ComposableSvgScore(string folder, string scoreTitleName, string keywords, string comment, PageFormat pageFormat)
-            :base(folder, scoreTitleName, keywords, comment, pageFormat)
+            : base(folder, scoreTitleName, keywords, comment, pageFormat)
         {
         }
 
@@ -97,6 +97,8 @@ namespace Moritz.AssistantComposer
         {
             List<List<Voice>> voicesPerSystemPerBar = _midiAlgorithm.DoAlgorithm();
 
+            CheckPerformanceOptions(_midiAlgorithm, voicesPerSystemPerBar);
+
             CheckBars(voicesPerSystemPerBar);
 
             Notator.CreateSystems(this, voicesPerSystemPerBar);
@@ -112,9 +114,48 @@ namespace Moritz.AssistantComposer
                 /// both horizontally and vertically.
                 Notator.CreateMetricsAndJustifySystems(this.Systems);
 
-                CreatePages();
+                CreatePages(_midiAlgorithm.PerformanceControlDef);
             }
         }
+
+        /// <summary>
+        /// Throw an exception if _midiAlgorithm.PerformanceOptionsDef is null and there is an InputVoice. 
+        /// </summary>
+        /// <param name="_midiAlgorithm"></param>
+        /// <param name="voicesPerSystemPerBar"></param>
+        private void CheckPerformanceOptions(MidiCompositionAlgorithm midiAlgorithm, List<List<Voice>> voicesPerSystemPerBar)
+        {
+            bool hasAnInputVoice = HasAnInputVoice(voicesPerSystemPerBar);
+
+            if(midiAlgorithm.PerformanceControlDef == null && hasAnInputVoice == true)
+            {
+                throw new ApplicationException("\nComposableScore:CheckPerformanceOptions(...)" +
+                                               "\nIf the algorithm defines an InputVoice, then it must" +
+                                               "\nalso define global PerformanceControl options.");
+            }
+            else if(midiAlgorithm.PerformanceControlDef != null && hasAnInputVoice == false)
+            {
+                throw new ApplicationException("\nComposableScore:CheckPerformanceOptions(...)" + 
+                                               "\nThis algorithm does not define any InputVoices, so it does" +
+                                               "\nnot need to define global PerformanceControl options.");
+            }
+        }
+        #region private to CheckPerformanceOptions(...)
+        private bool HasAnInputVoice(List<List<Voice>> voicesPerSystemPerBar)
+        {
+            bool rval = false;
+            List<Voice> voices = voicesPerSystemPerBar[0];
+            foreach(Voice voice in voices)
+            {
+                if(voice is InputVoice)
+                {
+                    rval = true;
+                    break;
+                }
+            }
+            return rval;
+        }
+        #endregion
 
         protected MidiCompositionAlgorithm _midiAlgorithm = null;
     }
