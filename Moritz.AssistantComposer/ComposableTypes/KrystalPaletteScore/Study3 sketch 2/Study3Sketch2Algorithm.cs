@@ -111,7 +111,12 @@ namespace Moritz.AssistantComposer
                 RestDef rd = iud as RestDef;
                 if(mcd != null)
                 {
-                    InputChordDef icd = new InputChordDef(mcd.MsPosition, mcd.MsDuration, mcd.MidiPitches, null);
+                    List<byte> pitches = new List<byte>(mcd.MidiPitches);
+                    for(int i = 0; i <pitches.Count; ++i)
+                    {
+                        pitches[i] += 36;
+                    }
+                    InputChordDef icd = new InputChordDef(mcd.MsPosition, mcd.MsDuration, pitches, null);
                     inputVoice.UniqueDefs.Add(icd);
                 }
                 else if(rd != null)

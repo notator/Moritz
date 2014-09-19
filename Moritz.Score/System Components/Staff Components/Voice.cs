@@ -163,7 +163,7 @@ namespace Moritz.Score
             foreach(NoteObject noteObject in NoteObjects)
             {
                 CautionaryChordSymbol cautionaryChord = noteObject as CautionaryChordSymbol;
-                OutputChordSymbol chord = noteObject as OutputChordSymbol;
+                ChordSymbol chord = noteObject as ChordSymbol;
                 RestSymbol rest = noteObject as RestSymbol;
                 ClefSymbol clef = noteObject as ClefSymbol;
                 Barline barline = noteObject as Barline;
