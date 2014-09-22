@@ -130,8 +130,6 @@ namespace Moritz.Score.Notation
 
             w.WriteEndElement(); // score:inputNotes
 
-            if(PerformanceControlDef != null)
-                PerformanceControlDef.WriteSvg(w);
         }
 
         public override IUniqueDef DeepClone()
@@ -153,7 +151,5 @@ namespace Moritz.Score.Notation
 
         public Dictionary<byte, List<byte>> SeqChannelIndicesPerMidiPitch = new Dictionary<byte, List<byte>>();
         public Dictionary<byte, List<byte>> SeqLengthsPerMidiPitch = new Dictionary<byte, List<byte>>();
-
-        public PerformanceControlDef PerformanceControlDef = null;
     }
 }

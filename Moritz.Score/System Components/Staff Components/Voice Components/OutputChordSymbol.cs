@@ -2,6 +2,7 @@ using System.Text;
 
 using Moritz.Score.Midi;
 using Moritz.Globals;
+using Moritz.Score.Notation;
 
 namespace Moritz.Score
 {
@@ -38,6 +39,9 @@ namespace Moritz.Score
             //w.WriteAttributeString("score", "object", null, "outputChord");
             w.WriteAttributeString("score", "alignmentX", null, this.Metrics.OriginX.ToString(M.En_USNumberFormat));
 
+            if(_midiChordDef.PerformanceControlDef != null)
+                _midiChordDef.PerformanceControlDef.WriteSvg(w);  
+            
             _midiChordDef.WriteSvg(w);
 
             w.SvgStartGroup("graphics", null);

@@ -17,13 +17,11 @@ namespace Moritz.Score
             Staff = staff;
             StemDirection = voice.StemDirection;
             this.AppendNoteObjects(voice.NoteObjects);
-            MidiChannel = voice.MidiChannel;
         }
 
-        public Voice(Staff staff, byte midiChannel)
+        public Voice(Staff staff)
         {
             Staff = staff;
-            MidiChannel = midiChannel;
         }
  
         /// <summary>
@@ -339,12 +337,6 @@ namespace Moritz.Score
         #endregion Enumerators
 
         public List<IUniqueDef> UniqueDefs = new List<IUniqueDef>();
-
-        /// <summary>
-        /// This field is set by composition algorithms.
-        /// It is stored in and retrieved from SVG files. 
-        /// </summary>
-        public byte MidiChannel = 0;
 
         #endregion composition
 

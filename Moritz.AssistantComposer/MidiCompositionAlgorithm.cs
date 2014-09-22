@@ -125,11 +125,12 @@ namespace Moritz.AssistantComposer
             Voice secondBarVoice;
             foreach(Voice voice in originalBar)
             {
-                if(voice is OutputVoice)
+                OutputVoice outputVoice = voice as OutputVoice;
+                if(outputVoice != null)
                 {
-                    firstBarVoice = new OutputVoice((OutputStaff)voice.Staff, voice.MidiChannel);
+                    firstBarVoice = new OutputVoice((OutputStaff)voice.Staff, outputVoice.MidiChannel);
                     firstBar.Add(firstBarVoice);
-                    secondBarVoice = new OutputVoice((OutputStaff)voice.Staff, voice.MidiChannel);
+                    secondBarVoice = new OutputVoice((OutputStaff)voice.Staff, outputVoice.MidiChannel);
                     secondBar.Add(secondBarVoice);
                 }
                 else
@@ -275,9 +276,26 @@ namespace Moritz.AssistantComposer
             }
         }
 
+        /// <summary>
+        /// This function should be called, for a score containing InputVoices, when the bars are complete.
+        /// </summary>
+        protected void SetOutputVoicePerformanceOptions(List<List<Voice>> bars, List<byte> masterVolumes, List<PerformanceControlDef> performanceControls)
+        {
+            List<Voice> firstBar = bars[0];
+            Debug.Assert(firstBar.Count > masterVolumes.Count); // firstBar includes both OutputVoices and InputVoices.
+            Debug.Assert(performanceControls.Count == masterVolumes.Count); // == number of OutputVoices.
+            for(int i = 0; i < masterVolumes.Count; ++i)
+            {
+                OutputVoice oVoice = firstBar[i] as OutputVoice;
+                Debug.Assert(oVoice != null);
+                Debug.Assert(masterVolumes[i] != 0);
+                Debug.Assert(performanceControls[i] != null);
+                oVoice.MasterVolume = masterVolumes[i];
+                oVoice.PerformanceControlDef = performanceControls[i];
+            }
+        }
+
         protected List<Krystal> _krystals;
         protected List<Palette> _palettes;
-
-        public PerformanceControlDef PerformanceControlDef = null;
     }
 }

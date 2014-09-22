@@ -37,7 +37,9 @@ namespace Moritz.AssistantComposer
             if(midiChannel == 9) // percussion channel
             {
                 pageFormat.MidiChannelsPerStaff = new List<List<byte>>() { new List<byte>() { midiChannel } };
-                this.Systems[0].Staves[0].Voices[0].MidiChannel = midiChannel;
+                OutputVoice outputVoice = this.Systems[0].Staves[0].Voices[0] as OutputVoice;
+                Debug.Assert(outputVoice != null);
+                outputVoice.MidiChannel = midiChannel;
             }
         }
     }

@@ -11,16 +11,16 @@ using Moritz.Score.Midi;
 namespace Moritz.Score.Notation
 {
     /// <summary>
-    /// Cascading performance options.
-    /// Values in this class that are not null, override the current setting.
     /// The following classes contain a PerformanceControlDef field.
-    ///     Score (options that affect all InputVoices and their InputChords). This PerformanceControlDef defines the defaults for the score, and may not be null.
-    ///     InputVoice (options that affect all the InputChords in the InputVoice). This PerformanceControlDef may be null. 
-    ///     InputChord (options that affect just this InputChord). This PerformanceControlDef may be null. 
+    ///     OutputVoice (OutputVoice.PerformanceControlDef may not be null.)
+    ///         Options that affect current OutputChords in this OutputVoice. 
+    ///     OutputChord (OutputChord.PerformanceControlDef may be null.)
+    ///         if non-null, non-null options in this PerformanceControlDef change the
+    ///         current values in the containing OutputVoice.PerformanceControlDef.  
     /// </summary>
     public class PerformanceControlDef
     {
-        public PerformanceControlDef(bool nullDefaults, int nOutputChannels)
+        public PerformanceControlDef(bool nullDefaults)
         {
             if(!nullDefaults)
             {
@@ -30,11 +30,6 @@ namespace Moritz.Score.Notation
                 this.PressureOption = ControllerOption.ignore;
                 this.PitchWheelOption = ControllerOption.ignore;
                 this.ModWheelOption = ControllerOption.ignore;
-                MasterVolumes = new List<byte>();
-                for(int i = 0; i < nOutputChannels; ++i)
-                {
-                    MasterVolumes.Add(100);
-                }
             }
         }
 
@@ -89,9 +84,9 @@ namespace Moritz.Score.Notation
                 }
             }
 
-            if(MasterVolumes != null)
+            if(MasterVolume != null)
             {
-                w.WriteAttributeString("masterVolumes", M.ByteListToString(MasterVolumes));
+                w.WriteAttributeString("masterVolume", MasterVolume.ToString());
             }
            
             w.WriteEndElement(); // score:perfCtl
@@ -105,10 +100,10 @@ namespace Moritz.Score.Notation
         public ControllerOption? PitchWheelOption = null; // default will be ControllerOption.ignore;
         public ControllerOption? ModWheelOption = null; // default will be ControllerOption.ignore; 
 
-        public List<byte> MasterVolumes = null; // one value per channel
-
         public int? NumberOfObjectsInFade = null; // default will be 0; // only used in conjunction with NoteOffOption.limitedFade
-        public byte? MinimumVolume = null; // default will be 50; // only used if the performer is controlling the volume
+
+        public byte? MasterVolume = null; // default is the channel masterVolume; // only used if the performer is controlling the volume
+        public byte? MinimumVolume = null; // only used if the performer is controlling the volume
     }
 
     public enum NoteOnKeyOption

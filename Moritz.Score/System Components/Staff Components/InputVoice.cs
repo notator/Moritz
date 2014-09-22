@@ -3,14 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-using Moritz.Score.Notation;
-
 namespace Moritz.Score
 {
     public class InputVoice : Voice
     {
         public InputVoice(InputStaff inputStaff)
-            : base(inputStaff, Byte.MaxValue)
+            : base(inputStaff)
         {
         }
 
@@ -23,14 +21,8 @@ namespace Moritz.Score
 
             base.WriteSVG(w);
 
-            if(PerformanceControlDef != null)
-            {
-                PerformanceControlDef.WriteSvg(w);
-            }
-
             w.SvgEndGroup(); // inputVoice
         }
 
-        public PerformanceControlDef PerformanceControlDef = null;
     }
 }

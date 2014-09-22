@@ -55,49 +55,111 @@ namespace Moritz.AssistantComposer
                 errorString = "The algorithm has not created any bars!";
             else
             {
-                foreach(List<Voice> bar in voicesPerSystemPerBar)
-                {
-                    if(bar.Count == 0)
-                    {
-                        errorString = "One bar (at least) contains no voices.";
-                        break;
-                    }
-                    if(!(bar[0] is OutputVoice))
-                    {
-                        errorString = "The top (first) voice in every bar must be an output voice.";
-                        break;
-                    }
-                    for(int voiceIndex = 0; voiceIndex < bar.Count; ++voiceIndex)
-                    {
-                        Voice voice = bar[voiceIndex]; 
-                        if(voice.UniqueDefs.Count == 0)
-                        {
-                            errorString = "A voice (voiceIndex=" + voiceIndex.ToString() + ") has an empty UniqueDefs list.";
-                            break;
-                        }
-                        if(voice.NoteObjects.Count != 0)
-                        {
-                            errorString = "A voice (voiceIndex=" + voiceIndex.ToString() + ") has an empty NoteObjects list.";
-                            break;
-                        }
-                    }
-                    if(! string.IsNullOrEmpty(errorString))
-                        break;
-                }
+                errorString = BasicCheck(voicesPerSystemPerBar);
+            }
+            if(string.IsNullOrEmpty(errorString))
+            {
+                errorString = CheckPerformanceControlDef(voicesPerSystemPerBar);
             }
             if(!string.IsNullOrEmpty(errorString))
             {
                 throw new ApplicationException("\nComposableScore.CheckBars(): Algorithm error:\n" + errorString);
             }
         }
+        #region private to CheckBars(...)
+        private string BasicCheck(List<List<Voice>> voicesPerSystemPerBar)
+        {
+            string errorString = null;
+            foreach(List<Voice> bar in voicesPerSystemPerBar)
+            {
+                if(bar.Count == 0)
+                {
+                    errorString = "One bar (at least) contains no voices.";
+                    break;
+                }
+                if(!(bar[0] is OutputVoice))
+                {
+                    errorString = "The top (first) voice in every bar must be an output voice.";
+                    break;
+                }
+                for(int voiceIndex = 0; voiceIndex < bar.Count; ++voiceIndex)
+                {
+                    Voice voice = bar[voiceIndex];
+                    if(voice.UniqueDefs.Count == 0)
+                    {
+                        errorString = "A voice (voiceIndex=" + voiceIndex.ToString() + ") has an empty UniqueDefs list.";
+                        break;
+                    }
+                    if(voice.NoteObjects.Count != 0)
+                    {
+                        errorString = "A voice (voiceIndex=" + voiceIndex.ToString() + ") has an empty NoteObjects list.";
+                        break;
+                    }
+                }
+                if(!string.IsNullOrEmpty(errorString))
+                    break;
+            }
+            return errorString;
+        }
+        private string CheckPerformanceControlDef(List<List<Voice>> voicesPerSystemPerBar)
+        {
+            string errorString = null;
+            List<OutputVoice> oVoices = new List<OutputVoice>();
+            foreach(Voice voice in voicesPerSystemPerBar[0])
+            {
+                OutputVoice ov = voice as OutputVoice;
+                if(ov != null)
+                {
+                    if(ov.MasterVolume == 0)
+                    {
+                        errorString = "\nEvery OutputVoice in the first bar of a score\n" +
+                                      "must have a MasterVolume value greater than 0.";
+                    }
+                    oVoices.Add(ov);
+                }
+                else // voice is an InputVoice
+                {
+                    foreach(OutputVoice ov1 in oVoices)
+                    {
+                        if(ov1.PerformanceControlDef == null)
+                        {
+                            errorString = "\nThis score contains InputVoice(s),\n" +
+                                          "so every OutputVoice in the first bar must have a PerformanceControlDef.";
+                        }
+                    }
+                }
+            }
+            if(string.IsNullOrEmpty(errorString) && voicesPerSystemPerBar.Count > 1)
+            {
+                for(int bar = 1; bar < voicesPerSystemPerBar.Count; ++bar)
+                {
+                    foreach(Voice voice in voicesPerSystemPerBar[bar])
+                    {
+                        OutputVoice ov = voice as OutputVoice;
+                        if(ov != null)
+                        {
+                            if(ov.MasterVolume != 0)
+                            {
+                                errorString = "\nNo OutputVoice except the first may ever have a MasterVolume.";
+                            }
+                            if(ov.PerformanceControlDef != null)
+                            {
+                                errorString = "\nNo OutputVoice except the first may ever have a PerformanceControlDef.";
+                            }
+                        }
+                    }
+                }
+            }
+            return errorString;
+        }
+        #endregion
+
         /// <summary>
         /// Called by the derived class after setting _midiAlgorithm and Notator
         /// </summary>
         protected void CreateScore()
         {
             List<List<Voice>> voicesPerSystemPerBar = _midiAlgorithm.DoAlgorithm();
-
-            CheckPerformanceOptions(_midiAlgorithm, voicesPerSystemPerBar);
 
             CheckBars(voicesPerSystemPerBar);
 
@@ -114,48 +176,9 @@ namespace Moritz.AssistantComposer
                 /// both horizontally and vertically.
                 Notator.CreateMetricsAndJustifySystems(this.Systems);
 
-                CreatePages(_midiAlgorithm.PerformanceControlDef);
+                CreatePages();
             }
         }
-
-        /// <summary>
-        /// Throw an exception if _midiAlgorithm.PerformanceOptionsDef is null and there is an InputVoice. 
-        /// </summary>
-        /// <param name="_midiAlgorithm"></param>
-        /// <param name="voicesPerSystemPerBar"></param>
-        private void CheckPerformanceOptions(MidiCompositionAlgorithm midiAlgorithm, List<List<Voice>> voicesPerSystemPerBar)
-        {
-            bool hasAnInputVoice = HasAnInputVoice(voicesPerSystemPerBar);
-
-            if(midiAlgorithm.PerformanceControlDef == null && hasAnInputVoice == true)
-            {
-                throw new ApplicationException("\nComposableScore:CheckPerformanceOptions(...)" +
-                                               "\nIf the algorithm defines an InputVoice, then it must" +
-                                               "\nalso define global PerformanceControl options.");
-            }
-            else if(midiAlgorithm.PerformanceControlDef != null && hasAnInputVoice == false)
-            {
-                throw new ApplicationException("\nComposableScore:CheckPerformanceOptions(...)" + 
-                                               "\nThis algorithm does not define any InputVoices, so it does" +
-                                               "\nnot need to define global PerformanceControl options.");
-            }
-        }
-        #region private to CheckPerformanceOptions(...)
-        private bool HasAnInputVoice(List<List<Voice>> voicesPerSystemPerBar)
-        {
-            bool rval = false;
-            List<Voice> voices = voicesPerSystemPerBar[0];
-            foreach(Voice voice in voices)
-            {
-                if(voice is InputVoice)
-                {
-                    rval = true;
-                    break;
-                }
-            }
-            return rval;
-        }
-        #endregion
 
         protected MidiCompositionAlgorithm _midiAlgorithm = null;
     }

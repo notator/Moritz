@@ -977,6 +977,9 @@ namespace Moritz.Score.Midi
         public MidiChordSliderDefs MidiChordSliderDefs = null;
         public List<BasicMidiChordDef> BasicMidiChordDefs = new List<BasicMidiChordDef>();
         /****************************************************************************/
+
+        public PerformanceControlDef PerformanceControlDef = null;
+
         #endregion properties
     }
 }

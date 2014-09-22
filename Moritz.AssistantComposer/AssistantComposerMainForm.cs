@@ -1322,8 +1322,6 @@ namespace Moritz.AssistantComposer
         string _algorithmName = null;
         MidiCompositionAlgorithm _algorithm = null;
 
-        PerformanceControlDef _scorePerformanceControlDef;
-
         /// <summary>
         /// The folder in which the score and all its associated files is saved
         /// </summary>

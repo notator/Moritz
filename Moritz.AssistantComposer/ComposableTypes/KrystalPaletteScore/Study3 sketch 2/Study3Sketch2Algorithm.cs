@@ -68,10 +68,51 @@ namespace Moritz.AssistantComposer
 
             Debug.Assert(bars.Count == NumberOfBars());
 
-            PerformanceControlDef = new PerformanceControlDef(false, MidiChannels().Count);
-            PerformanceControlDef.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
+            List<byte> masterVolumes = new List<byte>(){ 100, 100, 100, 100, 100, 100, 100, 100, };
+            List<PerformanceControlDef> performanceControls = new List<PerformanceControlDef>();
+            for(int i = 0; i < masterVolumes.Count; ++i)
+            {
+                PerformanceControlDef pcd = new PerformanceControlDef(false);
+                pcd.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
+                performanceControls.Add(pcd);
+            }
+            
+            base.SetOutputVoicePerformanceOptions(bars, masterVolumes, performanceControls);
+
+            SetBar2PerformanceOptions(bars[1]);
 
             return bars;
+        }
+
+        /// <summary>
+        /// This function sets the PerformanceControlDef.NoteOffOption
+        /// of the first MidiChordDef in each OutputVoice in Bar 2 to
+        /// to NoteOffOption.fade. At performance time, each
+        /// OutputVoice.PerformanceControlDef.NoteOffOption will be
+        /// given this value at this point in the score, and be valid
+        /// until further notice. 
+        /// </summary>
+        /// <param name="bar"></param>
+        private void SetBar2PerformanceOptions(List<Voice> bar)
+        {
+            foreach(Voice v in bar)
+            {
+                OutputVoice ov = v as OutputVoice;
+                if(ov != null)
+                {
+                    foreach(IUniqueDef iud in ov.UniqueDefs)
+                    {
+                        MidiChordDef mcd = iud as MidiChordDef;
+                        if(mcd != null)
+                        {
+                            PerformanceControlDef pcd = new PerformanceControlDef(true); // all options are null
+                            pcd.NoteOffOption = NoteOffOption.fade;
+                            mcd.PerformanceControlDef = pcd;
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
