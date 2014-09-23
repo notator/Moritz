@@ -140,7 +140,7 @@ namespace Moritz.AssistantComposer
                         {
                             if(ov.MasterVolume != 0)
                             {
-                                errorString = "\nNo OutputVoice except the first may ever have a MasterVolume.";
+                                errorString = "\nNo OutputVoice except the first may have a MasterVolume.";
                             }
                             if(ov.InputControls != null)
                             {

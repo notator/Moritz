@@ -72,7 +72,7 @@ namespace Moritz.AssistantComposer
             List<InputControls> inputControlsList = new List<InputControls>();
             for(int i = 0; i < masterVolumes.Count; ++i)
             {
-                InputControls ics = new InputControls(false);
+                InputControls ics = new InputControls();
                 ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
                 inputControlsList.Add(ics);
             }
@@ -80,6 +80,10 @@ namespace Moritz.AssistantComposer
             base.SetOutputVoiceControls(bars, masterVolumes, inputControlsList);
 
             SetBar2InputControls(bars[1]);
+
+            SetBar3PitchWheelToVolumeControls(bars[2], masterVolumes);
+
+            SetBar4LimitedFadeControls(bars[3]);
 
             return bars;
         }
@@ -92,10 +96,10 @@ namespace Moritz.AssistantComposer
         /// given this value at this point in the score, and be valid
         /// until further notice. 
         /// </summary>
-        /// <param name="bar"></param>
-        private void SetBar2InputControls(List<Voice> bar)
+        /// <param name="bar2"></param>
+        private void SetBar2InputControls(List<Voice> bar2)
         {
-            foreach(Voice v in bar)
+            foreach(Voice v in bar2)
             {
                 OutputVoice ov = v as OutputVoice;
                 if(ov != null)
@@ -105,8 +109,58 @@ namespace Moritz.AssistantComposer
                         MidiChordDef mcd = iud as MidiChordDef;
                         if(mcd != null)
                         {
-                            InputControls ics = new InputControls(true); // all options are null
+                            InputControls ics = new InputControls(); // all options are ignore
+                            ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
                             ics.NoteOffOption = NoteOffOption.fade;
+                            mcd.InputControls = ics;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void SetBar3PitchWheelToVolumeControls(List<Voice> bar3, List<byte> masterVolumes)
+        {
+            for(int ovIndex = 0; ovIndex < masterVolumes.Count; ++ovIndex)
+            {
+                byte masterVolume = masterVolumes[ovIndex];
+                OutputVoice ov = bar3[ovIndex]as OutputVoice;
+                foreach(IUniqueDef iud in ov.UniqueDefs)
+                {
+                    MidiChordDef mcd = iud as MidiChordDef;
+                    if(mcd != null)
+                    {
+                        InputControls ics = new InputControls(); // created with all options set to ignore
+                        ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
+                        ics.NoteOffOption = NoteOffOption.fade;
+                        ics.PitchWheelOption = ControllerOption.volume;
+                        ics.MaximumVolume = masterVolume;
+                        ics.MinimumVolume = 50;
+                        mcd.InputControls = ics;
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void SetBar4LimitedFadeControls(List<Voice> bar4)
+        {
+            int numberOfObjectsInFade = 4;
+            foreach(Voice v in bar4)
+            {
+                OutputVoice ov = v as OutputVoice;
+                if(ov != null)
+                {
+                    foreach(IUniqueDef iud in ov.UniqueDefs)
+                    {
+                        MidiChordDef mcd = iud as MidiChordDef;
+                        if(mcd != null)
+                        {
+                            InputControls ics = new InputControls(); // created with all options set to ignore
+                            ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
+                            ics.NoteOffOption = NoteOffOption.limitedFade;
+                            ics.NumberOfObjectsInFade = numberOfObjectsInFade++;
                             mcd.InputControls = ics;
                             break;
                         }

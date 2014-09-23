@@ -20,160 +20,120 @@ namespace Moritz.Score.Midi
     /// </summary>
     public class InputControls
     {
-        public InputControls(bool nullDefaults)
+        /// <summary>
+        /// All options are set to "ignore" by default
+        /// </summary>
+        public InputControls()
         {
-            if(!nullDefaults)
-            {
-                this.NoteOnKeyOption = Moritz.Score.Midi.NoteOnKeyOption.ignore;
-                this.NoteOnVelocityOption = Moritz.Score.Midi.NoteOnVelocityOption.ignore;
-                this.NoteOffOption = Moritz.Score.Midi.NoteOffOption.ignore;
-                this.PressureOption = ControllerOption.ignore;
-                this.PitchWheelOption = ControllerOption.ignore;
-                this.ModWheelOption = ControllerOption.ignore;
-            }
         }
 
         public void WriteSvg(SvgWriter w)
         {
             w.WriteStartElement("score", "inputControls", null);
 
-            if(NoteOnKeyOption != null)
-                w.WriteAttributeString("noteOnKey", this.NoteOnKeyOption.ToString());
-            if(NoteOnVelocityOption != null)
-                w.WriteAttributeString("noteOnVel", this.NoteOnVelocityOption.ToString());
-            if(NoteOffOption != null)
+            w.WriteAttributeString("noteOnKey", this.NoteOnKeyOption.ToString());
+            w.WriteAttributeString("noteOnVel", this.NoteOnVelocityOption.ToString());
+            w.WriteAttributeString("noteOff", this.NoteOffOption.ToString());
+            if(this.NoteOffOption == Moritz.Score.Midi.NoteOffOption.limitedFade)
             {
-                w.WriteAttributeString("noteOff", this.NoteOffOption.ToString());
-                if(this.NoteOffOption == Moritz.Score.Midi.NoteOffOption.limitedFade)
-                {
-                    Debug.Assert(NumberOfObjectsInFade != null);
-                    w.WriteAttributeString("fixedFade", NumberOfObjectsInFade.ToString());
-                }
+                Debug.Assert(NumberOfObjectsInFade != null,
+                            "\nInputControls Error:\n" +
+                            "If the NoteOffOption is set to 'limitedFade',\n" +
+                            "then the NumberOfObjectsInFade must also be set.");
+                w.WriteAttributeString("limitedFade", NumberOfObjectsInFade.ToString());
             }
 
             bool isControllingVolume = false;
-            if(PressureOption != null)
+            w.WriteAttributeString("pressure", this.PressureOption.ToString());
+            if(this.PressureOption == Moritz.Score.Midi.ControllerOption.volume)
             {
-                w.WriteAttributeString("pressure", this.PressureOption.ToString());
-                if(this.PressureOption == Moritz.Score.Midi.ControllerOption.volume)
-                {
-                    Debug.Assert(MaximumVolume != null);
-                    Debug.Assert(MinimumVolume != null);
-                    w.WriteAttributeString("maxVolume", MaximumVolume.ToString());
-                    w.WriteAttributeString("minVolume", MinimumVolume.ToString());
-                    isControllingVolume = true;
-                }
+                WriteMaxMinVolume(w);
+                isControllingVolume = true;
             }
-            if(PitchWheelOption != null)
+            w.WriteAttributeString("pitchWheel", this.PitchWheelOption.ToString());
+            if(this.PitchWheelOption == Moritz.Score.Midi.ControllerOption.volume)
             {
-                w.WriteAttributeString("pitchWheel", this.PitchWheelOption.ToString());
-                if(this.PitchWheelOption == Moritz.Score.Midi.ControllerOption.volume)
-                {
-                    Debug.Assert(isControllingVolume == false);
-                    Debug.Assert(MaximumVolume != null);
-                    Debug.Assert(MinimumVolume != null);
-                    w.WriteAttributeString("maxVolume", MaximumVolume.ToString());
-                    w.WriteAttributeString("minVolume", MinimumVolume.ToString());
-                    isControllingVolume = true;
-                }
+                Debug.Assert(isControllingVolume == false);
+                WriteMaxMinVolume(w);
+                isControllingVolume = true;
             }
-            if(ModWheelOption != null)
+            w.WriteAttributeString("modulation", this.ModWheelOption.ToString());
+            if(this.ModWheelOption == Moritz.Score.Midi.ControllerOption.volume)
             {
-                w.WriteAttributeString("modulation", this.ModWheelOption.ToString());
-                if(this.ModWheelOption == Moritz.Score.Midi.ControllerOption.volume)
-                {
-                    Debug.Assert(isControllingVolume == false);
-                    Debug.Assert(MaximumVolume != null);
-                    Debug.Assert(MinimumVolume != null);
-                    w.WriteAttributeString("maxVolume", MaximumVolume.ToString());
-                    w.WriteAttributeString("minVolume", MinimumVolume.ToString());
-                }
+                Debug.Assert(isControllingVolume == false);
+                WriteMaxMinVolume(w);
             }
            
             w.WriteEndElement(); // score:inputControls
         }
 
-        public NoteOnKeyOption? NoteOnKeyOption = null; // default will be NoteOnKeyOption.matchExactly;
-        public NoteOnVelocityOption? NoteOnVelocityOption = null; // default will be NoteOnVelocityOption.ignore;
-        public NoteOffOption? NoteOffOption = null; // default will be NoteOffOption.ignore;
+        private void WriteMaxMinVolume(SvgWriter w)
+        {
+            Debug.Assert(MaximumVolume != null && MinimumVolume != null,
+                "\nInputControls Error:\n" +
+                "If any of the continuous controllers is set to control the *volume*,\n" +
+                "then both MaximumVolume and MinimumVolume must also be set.");
+            w.WriteAttributeString("maxVolume", MaximumVolume.ToString());
+            w.WriteAttributeString("minVolume", MinimumVolume.ToString());
+        }
 
-        public ControllerOption? PressureOption = null; // default will be ControllerOption.ignore;
-        public ControllerOption? PitchWheelOption = null; // default will be ControllerOption.ignore;
-        public ControllerOption? ModWheelOption = null; // default will be ControllerOption.ignore; 
+        public NoteOnKeyOption NoteOnKeyOption = Moritz.Score.Midi.NoteOnKeyOption.ignore;
+        public NoteOnVelocityOption NoteOnVelocityOption = Moritz.Score.Midi.NoteOnVelocityOption.ignore;
+        public NoteOffOption NoteOffOption = Moritz.Score.Midi.NoteOffOption.ignore;
 
-        public int? NumberOfObjectsInFade = null; // default will be 0; // only used in conjunction with NoteOffOption.limitedFade
+        public ControllerOption PressureOption = ControllerOption.ignore;
+        public ControllerOption PitchWheelOption = ControllerOption.ignore;
+        public ControllerOption ModWheelOption = ControllerOption.ignore; 
 
-        public byte? MaximumVolume = null; // only used if the performer is controlling the volume (often set to the channel masterVolume)
-        public byte? MinimumVolume = null; // only used if the performer is controlling the volume (often set to about 50)
+        public int? NumberOfObjectsInFade = null; // must be set if the NoteOffOption is "limitedFade".
+
+        public byte? MaximumVolume = null; // must be set if the performer is controlling the volume (often set to the channel masterVolume)
+        public byte? MinimumVolume = null; // must be set if the performer is controlling the volume (often set to about 50)
     }
 
     public enum NoteOnKeyOption
     {
-        [Description("ignore")]
-        ignore = 0,
-        [Description("transpose")]
-        transpose = 1,
-        [Description("matchExactly")]
-        matchExactly = 2
+        ignore, // any key will start the Seq.
+        transpose,
+        matchExactly // the Seq. will not start if the key does not match any of the notated pitchesd.
     };
 
     public enum NoteOnVelocityOption
     {
-        [Description("ignore")]
-        ignore = 0,
-        [Description("scale")]
-        scale = 1
+        ignore,
+        scale
     };
 
     public enum NoteOffOption
     {
-        [Description("ignore")]
-        ignore = 0,
-        [Description("stop")]
-        stop = 1,
-        [Description("stopNow")]
-        stopNow = 2,
-        [Description("fade")]
-        fade = 3,
-        [Description("limitedFade")]
-        limitedFade = 4
+        ignore,
+        stop,
+        stopNow,
+        fade,
+        limitedFade
     };
 
     /// <summary>
     /// These values are in the order of the controlOptions list defined in
-    /// Assistant Performer:PerformersOptionsDialog.js
+    /// Assistant Performer:PerformersOptionsDialog.js.
+    /// The int values may be used to index in a menu list. 
     /// </summary>
     public enum ControllerOption
     {
-        [Description("ignore")]
         ignore = 0,
-        [Description("aftertouch")]
         aftertouch = 1,
-        [Description("channelPressure")]
         channelPressure = 2,
-        [Description("pitchWheel")]
         pitchWheel = 3,
-        [Description("modulation")]
         modulation = 4,
-        [Description("volume")]
         volume = 5,
-        [Description("pan")]
         pan = 6,
-        [Description("expression")]
         expression = 7,
-        [Description("timbre")]
         timbre = 8,
-        [Description("brightness")]
         brightness = 9,
-        [Description("effects")]
         effects = 10,
-        [Description("tremolo")]
         tremolo = 11,
-        [Description("chorus")]
         chorus = 12,
-        [Description("celeste")]
         celeste = 13,
-        [Description("phaser")]
         phaser = 14
     };
 }
