@@ -57,7 +57,9 @@ namespace Moritz.Score.Midi
                 w.WriteAttributeString("pressure", this.PressureOption.ToString());
                 if(this.PressureOption == Moritz.Score.Midi.ControllerOption.volume)
                 {
+                    Debug.Assert(MaximumVolume != null);
                     Debug.Assert(MinimumVolume != null);
+                    w.WriteAttributeString("maxVolume", MaximumVolume.ToString());
                     w.WriteAttributeString("minVolume", MinimumVolume.ToString());
                     isControllingVolume = true;
                 }
@@ -68,7 +70,9 @@ namespace Moritz.Score.Midi
                 if(this.PitchWheelOption == Moritz.Score.Midi.ControllerOption.volume)
                 {
                     Debug.Assert(isControllingVolume == false);
+                    Debug.Assert(MaximumVolume != null);
                     Debug.Assert(MinimumVolume != null);
+                    w.WriteAttributeString("maxVolume", MaximumVolume.ToString());
                     w.WriteAttributeString("minVolume", MinimumVolume.ToString());
                     isControllingVolume = true;
                 }
@@ -79,14 +83,11 @@ namespace Moritz.Score.Midi
                 if(this.ModWheelOption == Moritz.Score.Midi.ControllerOption.volume)
                 {
                     Debug.Assert(isControllingVolume == false);
+                    Debug.Assert(MaximumVolume != null);
                     Debug.Assert(MinimumVolume != null);
+                    w.WriteAttributeString("maxVolume", MaximumVolume.ToString());
                     w.WriteAttributeString("minVolume", MinimumVolume.ToString());
                 }
-            }
-
-            if(MasterVolume != null)
-            {
-                w.WriteAttributeString("masterVolume", MasterVolume.ToString());
             }
            
             w.WriteEndElement(); // score:inputControls
@@ -102,8 +103,8 @@ namespace Moritz.Score.Midi
 
         public int? NumberOfObjectsInFade = null; // default will be 0; // only used in conjunction with NoteOffOption.limitedFade
 
-        public byte? MasterVolume = null; // default is the channel masterVolume; // only used if the performer is controlling the volume
-        public byte? MinimumVolume = null; // only used if the performer is controlling the volume
+        public byte? MaximumVolume = null; // only used if the performer is controlling the volume (often set to the channel masterVolume)
+        public byte? MinimumVolume = null; // only used if the performer is controlling the volume (often set to about 50)
     }
 
     public enum NoteOnKeyOption
