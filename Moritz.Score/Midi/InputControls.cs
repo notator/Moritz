@@ -8,25 +8,25 @@ using System.ComponentModel;
 using Moritz.Globals;
 using Moritz.Score.Midi;
 
-namespace Moritz.Score.Notation
+namespace Moritz.Score.Midi
 {
     /// <summary>
-    /// The following classes contain a PerformanceControlDef field.
-    ///     OutputVoice (OutputVoice.PerformanceControlDef may not be null.)
+    /// The following classes contain an InputControls field:
+    ///     OutputVoice (If the score contains an InputVoice, OutputVoice.InputControls may not be null.)
     ///         Options that affect current OutputChords in this OutputVoice. 
-    ///     OutputChord (OutputChord.PerformanceControlDef may be null.)
-    ///         if non-null, non-null options in this PerformanceControlDef change the
-    ///         current values in the containing OutputVoice.PerformanceControlDef.  
+    ///     MidiChordDef (MidiChordDef.InputControls may be null.)
+    ///         if non-null, non-null options change the current values in
+    ///         the containing OutputVoice.InputControls.  
     /// </summary>
-    public class PerformanceControlDef
+    public class InputControls
     {
-        public PerformanceControlDef(bool nullDefaults)
+        public InputControls(bool nullDefaults)
         {
             if(!nullDefaults)
             {
-                this.NoteOnKeyOption = Moritz.Score.Notation.NoteOnKeyOption.ignore;
-                this.NoteOnVelocityOption = Moritz.Score.Notation.NoteOnVelocityOption.ignore;
-                this.NoteOffOption = Moritz.Score.Notation.NoteOffOption.ignore;
+                this.NoteOnKeyOption = Moritz.Score.Midi.NoteOnKeyOption.ignore;
+                this.NoteOnVelocityOption = Moritz.Score.Midi.NoteOnVelocityOption.ignore;
+                this.NoteOffOption = Moritz.Score.Midi.NoteOffOption.ignore;
                 this.PressureOption = ControllerOption.ignore;
                 this.PitchWheelOption = ControllerOption.ignore;
                 this.ModWheelOption = ControllerOption.ignore;
@@ -35,7 +35,7 @@ namespace Moritz.Score.Notation
 
         public void WriteSvg(SvgWriter w)
         {
-            w.WriteStartElement("score", "performanceControl", null);
+            w.WriteStartElement("score", "inputControls", null);
 
             if(NoteOnKeyOption != null)
                 w.WriteAttributeString("noteOnKey", this.NoteOnKeyOption.ToString());
@@ -44,7 +44,7 @@ namespace Moritz.Score.Notation
             if(NoteOffOption != null)
             {
                 w.WriteAttributeString("noteOff", this.NoteOffOption.ToString());
-                if(this.NoteOffOption == Moritz.Score.Notation.NoteOffOption.limitedFade)
+                if(this.NoteOffOption == Moritz.Score.Midi.NoteOffOption.limitedFade)
                 {
                     Debug.Assert(NumberOfObjectsInFade != null);
                     w.WriteAttributeString("fixedFade", NumberOfObjectsInFade.ToString());
@@ -55,7 +55,7 @@ namespace Moritz.Score.Notation
             if(PressureOption != null)
             {
                 w.WriteAttributeString("pressure", this.PressureOption.ToString());
-                if(this.PressureOption == Moritz.Score.Notation.ControllerOption.volume)
+                if(this.PressureOption == Moritz.Score.Midi.ControllerOption.volume)
                 {
                     Debug.Assert(MinimumVolume != null);
                     w.WriteAttributeString("minVolume", MinimumVolume.ToString());
@@ -65,7 +65,7 @@ namespace Moritz.Score.Notation
             if(PitchWheelOption != null)
             {
                 w.WriteAttributeString("pitchWheel", this.PitchWheelOption.ToString());
-                if(this.PitchWheelOption == Moritz.Score.Notation.ControllerOption.volume)
+                if(this.PitchWheelOption == Moritz.Score.Midi.ControllerOption.volume)
                 {
                     Debug.Assert(isControllingVolume == false);
                     Debug.Assert(MinimumVolume != null);
@@ -76,7 +76,7 @@ namespace Moritz.Score.Notation
             if(ModWheelOption != null)
             {
                 w.WriteAttributeString("modulation", this.ModWheelOption.ToString());
-                if(this.ModWheelOption == Moritz.Score.Notation.ControllerOption.volume)
+                if(this.ModWheelOption == Moritz.Score.Midi.ControllerOption.volume)
                 {
                     Debug.Assert(isControllingVolume == false);
                     Debug.Assert(MinimumVolume != null);
@@ -89,7 +89,7 @@ namespace Moritz.Score.Notation
                 w.WriteAttributeString("masterVolume", MasterVolume.ToString());
             }
            
-            w.WriteEndElement(); // score:perfCtl
+            w.WriteEndElement(); // score:inputControls
         }
 
         public NoteOnKeyOption? NoteOnKeyOption = null; // default will be NoteOnKeyOption.matchExactly;

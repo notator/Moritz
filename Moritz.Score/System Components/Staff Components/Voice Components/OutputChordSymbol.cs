@@ -38,9 +38,6 @@ namespace Moritz.Score
             w.SvgStartGroup("outputChord", null);
             //w.WriteAttributeString("score", "object", null, "outputChord");
             w.WriteAttributeString("score", "alignmentX", null, this.Metrics.OriginX.ToString(M.En_USNumberFormat));
-
-            if(_midiChordDef.PerformanceControlDef != null)
-                _midiChordDef.PerformanceControlDef.WriteSvg(w);  
             
             _midiChordDef.WriteSvg(w);
 

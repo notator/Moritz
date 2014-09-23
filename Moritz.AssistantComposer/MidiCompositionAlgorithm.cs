@@ -67,8 +67,8 @@ namespace Moritz.AssistantComposer
         /// The chord definitions in OutputVoice.UniqueDefs must be MidiChordDefs.
         /// The chord definitions in InputVoice.UniqueDefs must be InputChordDefs.
         /// 
-        /// If one or more InputVoices are defined, then a PerformanceControlDef object must be created, given
-        /// default values, and assigned to this.PerformanceControlDef (see below).
+        /// If one or more InputVoices are defined, then an InputControls object must be created, given
+        /// default values, and assigned to this.InputControls (see below).
         /// </summary>
         public abstract List<List<Voice>> DoAlgorithm();
         /// <summary>
@@ -277,21 +277,22 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// This function should be called, for a score containing InputVoices, when the bars are complete.
+        /// If the score contains InputVoices, this function should be called when the bars are complete.
         /// </summary>
-        protected void SetOutputVoicePerformanceOptions(List<List<Voice>> bars, List<byte> masterVolumes, List<PerformanceControlDef> performanceControls)
+        protected void SetOutputVoiceControls(List<List<Voice>> bars, List<byte> masterVolumes, List<InputControls> inputControlsList)
         {
             List<Voice> firstBar = bars[0];
             Debug.Assert(firstBar.Count > masterVolumes.Count); // firstBar includes both OutputVoices and InputVoices.
-            Debug.Assert(performanceControls.Count == masterVolumes.Count); // == number of OutputVoices.
+            Debug.Assert(inputControlsList.Count == MidiChannels().Count); // == number of OutputVoices.
+            Debug.Assert(inputControlsList.Count == masterVolumes.Count);
             for(int i = 0; i < masterVolumes.Count; ++i)
             {
                 OutputVoice oVoice = firstBar[i] as OutputVoice;
                 Debug.Assert(oVoice != null);
                 Debug.Assert(masterVolumes[i] != 0);
-                Debug.Assert(performanceControls[i] != null);
+                Debug.Assert(inputControlsList[i] != null);
                 oVoice.MasterVolume = masterVolumes[i];
-                oVoice.PerformanceControlDef = performanceControls[i];
+                oVoice.InputControls = inputControlsList[i];
             }
         }
 

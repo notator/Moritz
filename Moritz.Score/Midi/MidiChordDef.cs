@@ -690,7 +690,7 @@ namespace Moritz.Score.Midi
         /// </summary>
         public void WriteSvg(SvgWriter w)
         {
-            w.WriteStartElement("score", "midiChord", null);
+            w.WriteStartElement("score", "midiChord", null);  
 
             Debug.Assert(BasicMidiChordDefs != null && BasicMidiChordDefs.Count > 0);
             
@@ -712,6 +712,9 @@ namespace Moritz.Score.Midi
                 w.WriteAttributeString("pitchWheelDeviation", PitchWheelDeviation.ToString());
             if(MinimumBasicMidiChordMsDuration != M.DefaultMinimumBasicMidiChordMsDuration)
                 w.WriteAttributeString("minBasicChordMsDuration", MinimumBasicMidiChordMsDuration.ToString());
+
+            if(InputControls != null)
+                InputControls.WriteSvg(w);
 
             w.WriteStartElement("score", "basicChords", null);
             foreach(BasicMidiChordDef basicMidiChord in BasicMidiChordDefs) // containing basic <midiChord> elements
@@ -978,7 +981,7 @@ namespace Moritz.Score.Midi
         public List<BasicMidiChordDef> BasicMidiChordDefs = new List<BasicMidiChordDef>();
         /****************************************************************************/
 
-        public PerformanceControlDef PerformanceControlDef = null;
+        public InputControls InputControls = null;
 
         #endregion properties
     }

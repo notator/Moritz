@@ -72,7 +72,7 @@
     <Compile Include="Midi\MoritzControl.cs" />
     <Compile Include="Midi\NoteMessage.cs" />
     <Compile Include="Midi\TimeControl.cs" />
-    <Compile Include="Notation\PerformanceControlDef.cs" />
+    <Compile Include="Midi\InputControls.cs" />
     <Compile Include="Notation\DurationDef.cs" />
     <Compile Include="Notation\IUniqueSplittableChordDef.cs" />
     <Compile Include="Notation\CautionaryChordDef.cs" />

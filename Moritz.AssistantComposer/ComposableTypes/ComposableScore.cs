@@ -59,7 +59,7 @@ namespace Moritz.AssistantComposer
             }
             if(string.IsNullOrEmpty(errorString))
             {
-                errorString = CheckPerformanceControlDef(voicesPerSystemPerBar);
+                errorString = CheckInputControlsDef(voicesPerSystemPerBar);
             }
             if(!string.IsNullOrEmpty(errorString))
             {
@@ -101,7 +101,7 @@ namespace Moritz.AssistantComposer
             }
             return errorString;
         }
-        private string CheckPerformanceControlDef(List<List<Voice>> voicesPerSystemPerBar)
+        private string CheckInputControlsDef(List<List<Voice>> voicesPerSystemPerBar)
         {
             string errorString = null;
             List<OutputVoice> oVoices = new List<OutputVoice>();
@@ -121,10 +121,10 @@ namespace Moritz.AssistantComposer
                 {
                     foreach(OutputVoice ov1 in oVoices)
                     {
-                        if(ov1.PerformanceControlDef == null)
+                        if(ov1.InputControls == null)
                         {
                             errorString = "\nThis score contains InputVoice(s),\n" +
-                                          "so every OutputVoice in the first bar must have a PerformanceControlDef.";
+                                          "so every OutputVoice in the first bar must have an InputControls definition.";
                         }
                     }
                 }
@@ -142,9 +142,9 @@ namespace Moritz.AssistantComposer
                             {
                                 errorString = "\nNo OutputVoice except the first may ever have a MasterVolume.";
                             }
-                            if(ov.PerformanceControlDef != null)
+                            if(ov.InputControls != null)
                             {
-                                errorString = "\nNo OutputVoice except the first may ever have a PerformanceControlDef.";
+                                errorString = "\nNo OutputVoice except the first may ever have an InputControls definition.";
                             }
                         }
                     }

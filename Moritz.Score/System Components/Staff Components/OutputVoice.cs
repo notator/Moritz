@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-using Moritz.Score.Notation;
+using Moritz.Score.Midi;
 
 namespace Moritz.Score
 {
@@ -21,9 +21,9 @@ namespace Moritz.Score
             w.WriteAttributeString("score", "midiChannel", null, MidiChannel.ToString());
             w.WriteAttributeString("score", "masterVolume", null, MasterVolume.ToString());
 
-            if(PerformanceControlDef != null)
+            if(InputControls != null)
             {
-                PerformanceControlDef.WriteSvg(w);
+                InputControls.WriteSvg(w);
             }
 
             base.WriteSVG(w);
@@ -46,6 +46,6 @@ namespace Moritz.Score
         /// This field is set by composition algorithms.
         /// It is stored in and retrieved from SVG files. 
         /// </summary>
-        public PerformanceControlDef PerformanceControlDef = null;
+        public InputControls InputControls = null;
     }
 }

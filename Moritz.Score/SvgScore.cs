@@ -304,7 +304,7 @@ namespace Moritz.Score
         }
         /// <summary>
         /// Writes an SVG file containing one page of the score.
-        /// The metadata and scorePerformanceControlDef are only written to page 1.
+        /// The metadata is only written to page 1.
         /// </summary>
         public void SaveSVGPage(string pagePath, SvgPage page, Metadata metadata, int pageNumber)
         {

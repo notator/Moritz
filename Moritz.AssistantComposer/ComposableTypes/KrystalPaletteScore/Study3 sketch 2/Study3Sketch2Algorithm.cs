@@ -69,31 +69,31 @@ namespace Moritz.AssistantComposer
             Debug.Assert(bars.Count == NumberOfBars());
 
             List<byte> masterVolumes = new List<byte>(){ 100, 100, 100, 100, 100, 100, 100, 100, };
-            List<PerformanceControlDef> performanceControls = new List<PerformanceControlDef>();
+            List<InputControls> inputControlsList = new List<InputControls>();
             for(int i = 0; i < masterVolumes.Count; ++i)
             {
-                PerformanceControlDef pcd = new PerformanceControlDef(false);
-                pcd.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
-                performanceControls.Add(pcd);
+                InputControls ics = new InputControls(false);
+                ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
+                inputControlsList.Add(ics);
             }
             
-            base.SetOutputVoicePerformanceOptions(bars, masterVolumes, performanceControls);
+            base.SetOutputVoiceControls(bars, masterVolumes, inputControlsList);
 
-            SetBar2PerformanceOptions(bars[1]);
+            SetBar2InputControls(bars[1]);
 
             return bars;
         }
 
         /// <summary>
-        /// This function sets the PerformanceControlDef.NoteOffOption
+        /// This function sets the InputControls.NoteOffOption
         /// of the first MidiChordDef in each OutputVoice in Bar 2 to
         /// to NoteOffOption.fade. At performance time, each
-        /// OutputVoice.PerformanceControlDef.NoteOffOption will be
+        /// OutputVoice.InputControls.NoteOffOption will be
         /// given this value at this point in the score, and be valid
         /// until further notice. 
         /// </summary>
         /// <param name="bar"></param>
-        private void SetBar2PerformanceOptions(List<Voice> bar)
+        private void SetBar2InputControls(List<Voice> bar)
         {
             foreach(Voice v in bar)
             {
@@ -105,9 +105,9 @@ namespace Moritz.AssistantComposer
                         MidiChordDef mcd = iud as MidiChordDef;
                         if(mcd != null)
                         {
-                            PerformanceControlDef pcd = new PerformanceControlDef(true); // all options are null
-                            pcd.NoteOffOption = NoteOffOption.fade;
-                            mcd.PerformanceControlDef = pcd;
+                            InputControls ics = new InputControls(true); // all options are null
+                            ics.NoteOffOption = NoteOffOption.fade;
+                            mcd.InputControls = ics;
                             break;
                         }
                     }
