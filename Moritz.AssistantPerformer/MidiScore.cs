@@ -48,40 +48,36 @@ namespace Moritz.AssistantPerformer
                 int playerIndex = i % _performanceOptions.MoritzPlayers.Count; 
                 if(_performanceOptions.MoritzPlayers[playerIndex] != MoritzPlayer.None)
                 {
-                    OutputVoice voice = voices[i] as OutputVoice;
-                    if(voice != null)
+                    OutputVoice outputVoice = voices[i] as OutputVoice;
+                    if(outputVoice != null)
                     {
-                        int channel = voice.MidiChannel;
+                        int channel = outputVoice.MidiChannel;
                         ChannelState channelState = new ChannelState();
-                        foreach(IUniqueDef uniqueDef in voice.UniqueDefs)
+                        foreach(MidiChordDef midiChordDef in outputVoice.MidiChordDefs) // not interested in rests here
                         {
-                            MidiChordDef midiChordDef = uniqueDef as MidiChordDef;
-                            if(midiChordDef != null) // not interested in rests here
+                            int msPosition = midiChordDef.MsPosition;
+                            int msDuration = midiChordDef.MsDuration;
+                            if(_performanceOptions.SpeedFactor != 1F)
                             {
-                                int msPosition = midiChordDef.MsPosition;
-                                int msDuration = midiChordDef.MsDuration;
-                                if(_performanceOptions.SpeedFactor != 1F)
-                                {
-                                    msPosition = (int)(((float)midiChordDef.MsPosition) / _performanceOptions.SpeedFactor);
-                                    msDuration = (int)(((float)midiChordDef.MsDuration) / _performanceOptions.SpeedFactor);
-                                }
-
-                                // The following constructor only creates Midi controls if the channel state has to be changed.
-                                // (It updates the channel state accordingly.)
-                                MidiChord midiChord = new MidiChord(channel, midiChordDef, msPosition, msDuration, channelState,
-                                    _performanceOptions.MinimumOrnamentChordMsDuration);
-
-                                if(!channelMoments.ContainsKey(channel))
-                                {
-                                    channelMoments.Add(channel, new SortedDictionary<int, MidiMoment>());
-                                }
-                                if(!channelMoments[channel].ContainsKey(midiChord.MsPosition))
-                                {
-                                    channelMoments[channel].Add(midiChord.MsPosition, new MidiMoment(midiChord.MsPosition));
-                                }
-
-                                channelMoments[channel][midiChord.MsPosition].MidiChords.Add(midiChord);
+                                msPosition = (int)(((float)midiChordDef.MsPosition) / _performanceOptions.SpeedFactor);
+                                msDuration = (int)(((float)midiChordDef.MsDuration) / _performanceOptions.SpeedFactor);
                             }
+
+                            // The following constructor only creates Midi controls if the channel state has to be changed.
+                            // (It updates the channel state accordingly.)
+                            MidiChord midiChord = new MidiChord(channel, midiChordDef, msPosition, msDuration, channelState,
+                                _performanceOptions.MinimumOrnamentChordMsDuration);
+
+                            if(!channelMoments.ContainsKey(channel))
+                            {
+                                channelMoments.Add(channel, new SortedDictionary<int, MidiMoment>());
+                            }
+                            if(!channelMoments[channel].ContainsKey(midiChord.MsPosition))
+                            {
+                                channelMoments[channel].Add(midiChord.MsPosition, new MidiMoment(midiChord.MsPosition));
+                            }
+
+                            channelMoments[channel][midiChord.MsPosition].MidiChords.Add(midiChord);
                         }
                     }
                 }

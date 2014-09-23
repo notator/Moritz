@@ -771,11 +771,22 @@ namespace Moritz.AssistantComposer
         /// </summary>
         internal void AdjustVelocities(double factor)
         {
-            foreach(IUniqueDef iud in _uniqueDefs)
+            foreach(MidiChordDef mcd in MidiChordDefs)
             {
-                MidiChordDef mcd = iud as MidiChordDef;
-                if(mcd != null)
-                    mcd.AdjustVelocities(factor);
+                mcd.AdjustVelocities(factor);
+            }
+        }
+
+        public IEnumerable<MidiChordDef> MidiChordDefs
+        {
+            get
+            {
+                foreach(IUniqueDef iud in _uniqueDefs)
+                {
+                    MidiChordDef midiChordDef = iud as MidiChordDef;
+                    if(midiChordDef != null)
+                        yield return midiChordDef;
+                }
             }
         }
 
@@ -926,11 +937,9 @@ namespace Moritz.AssistantComposer
         /// <param name="interval"></param>
         internal void Transpose(int interval)
         {
-            foreach(IUniqueDef iud in _uniqueDefs)
+            foreach(MidiChordDef mcd in MidiChordDefs)
             {
-                MidiChordDef mcd = iud as MidiChordDef;
-                if(mcd != null)
-                    mcd.Transpose(interval);
+                mcd.Transpose(interval);
             }
         }
 

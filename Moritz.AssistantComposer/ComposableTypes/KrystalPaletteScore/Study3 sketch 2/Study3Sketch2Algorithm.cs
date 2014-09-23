@@ -122,13 +122,9 @@ namespace Moritz.AssistantComposer
                 InputVoice iv = v as InputVoice;
                 if(iv != null)
                 {
-                    foreach(IUniqueDef iud in iv.UniqueDefs)
+                    foreach(InputChordDef inputChordDef in iv.InputChordDefs)
                     {
-                        InputChordDef inputChordDef = iud as InputChordDef;
-                        if(inputChordDef != null)
-                        {
-                            rval.Add(inputChordDef);
-                        }
+                        rval.Add(inputChordDef);
                     }
                 }
             }

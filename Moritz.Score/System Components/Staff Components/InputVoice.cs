@@ -26,6 +26,19 @@ namespace Moritz.Score
             w.SvgEndGroup(); // inputVoice
         }
 
+        public IEnumerable<InputChordDef> InputChordDefs
+        {
+            get
+            {
+                foreach(IUniqueDef iud in this.UniqueDefs)
+                {
+                    InputChordDef inputChordDef = iud as InputChordDef;
+                    if(inputChordDef != null)
+                        yield return inputChordDef;
+                }
+            }
+        }
+
         /// <summary>
         /// returns true if this inputVoice contains inputChordDef, otherwise false.
         /// </summary>
@@ -34,10 +47,9 @@ namespace Moritz.Score
         internal bool Contains(InputChordDef inputChordDef)
         {
             bool contains = false;
-            foreach(IUniqueDef iud in this.UniqueDefs)
+            foreach(InputChordDef localChordDef in InputChordDefs)
             {
-                InputChordDef localICD = iud as InputChordDef;
-                if(localICD != null && localICD == inputChordDef)
+                if(localChordDef == inputChordDef)
                 {
                     contains = true;
                     break;

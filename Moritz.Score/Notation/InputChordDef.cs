@@ -195,10 +195,9 @@ namespace Moritz.Score.Notation
             {
                 OutputVoice ov = bar[outputVoiceIndex] as OutputVoice;
                 Debug.Assert(ov != null);
-                foreach(IUniqueDef oviud in ov.UniqueDefs)
+                foreach(MidiChordDef mcd in ov.MidiChordDefs)
                 {
-                    MidiChordDef mcd = oviud as MidiChordDef;
-                    if(mcd != null && mcd.MsPosition == this.MsPosition)
+                    if(mcd.MsPosition == this.MsPosition)
                     {
                         rval.Add(mcd);
                     }

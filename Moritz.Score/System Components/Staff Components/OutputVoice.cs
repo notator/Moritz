@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 
 using Moritz.Score.Midi;
+using Moritz.Score.Notation;
 
 namespace Moritz.Score
 {
@@ -29,6 +30,19 @@ namespace Moritz.Score
             base.WriteSVG(w);
 
             w.SvgEndGroup(); // outputVoice
+        }
+
+        public IEnumerable<MidiChordDef> MidiChordDefs
+        {
+            get
+            {
+                foreach(IUniqueDef iud in UniqueDefs)
+                {
+                    MidiChordDef midiChordDef = iud as MidiChordDef;
+                    if(midiChordDef != null)
+                        yield return midiChordDef;
+                }
+            }
         }
 
         /// <summary>
