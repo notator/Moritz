@@ -36,7 +36,8 @@ namespace Moritz.Score.Midi
             w.WriteAttributeString("noteOff", this.NoteOffOption.ToString());
             if(this.NoteOffOption == Moritz.Score.Midi.NoteOffOption.limitedFade)
             {
-                Debug.Assert(NumberOfObjectsInFade != null,
+                if(NumberOfObjectsInFade == null)
+                    throw new ApplicationException(
                             "\nInputControls Error:\n" +
                             "If the NoteOffOption is set to 'limitedFade',\n" +
                             "then the NumberOfObjectsInFade must also be set.");
@@ -63,16 +64,38 @@ namespace Moritz.Score.Midi
                 Debug.Assert(isControllingVolume == false);
                 WriteMaxMinVolume(w);
             }
+
+            w.WriteAttributeString("speedOption", this.SpeedOption.ToString());
+            if(this.SpeedOption != Moritz.Score.Midi.SpeedOption.none)
+            {
+                if(MaxSpeedPercent == null || MaxSpeedPercent < 100)
+                {
+                    throw new ApplicationException(
+                        "\nInputControls Error:\n" +
+                        "If the SpeedOption is set, then MaxSpeedPercent must be set\n" +
+                        "to a value >= 100.");
+                }
+                w.WriteAttributeString("maxSpeedPercent", this.MaxSpeedPercent.ToString());
+            }
            
             w.WriteEndElement(); // score:inputControls
         }
 
         private void WriteMaxMinVolume(SvgWriter w)
         {
-            Debug.Assert(MaximumVolume != null && MinimumVolume != null,
-                "\nInputControls Error:\n" +
-                "If any of the continuous controllers is set to control the *volume*,\n" +
-                "then both MaximumVolume and MinimumVolume must also be set.");
+            if(MaximumVolume == null || MinimumVolume == null)
+            {
+                throw new ApplicationException(
+                    "\nInputControls Error:\n" +
+                    "If any of the continuous controllers is set to control the *volume*,\n" +
+                    "then both MaximumVolume and MinimumVolume must also be set.");
+            }
+            if(MaximumVolume <= MinimumVolume)
+            {
+                throw new ApplicationException(
+                    "\nInputControls Error:\n" +
+                    "MaximumVolume must be greater than MinimumVolume.");
+            }
             w.WriteAttributeString("maxVolume", MaximumVolume.ToString());
             w.WriteAttributeString("minVolume", MinimumVolume.ToString());
         }
@@ -83,17 +106,21 @@ namespace Moritz.Score.Midi
 
         public ControllerOption PressureOption = ControllerOption.ignore;
         public ControllerOption PitchWheelOption = ControllerOption.ignore;
-        public ControllerOption ModWheelOption = ControllerOption.ignore; 
+        public ControllerOption ModWheelOption = ControllerOption.ignore;
+
+        public SpeedOption SpeedOption = SpeedOption.none;
 
         public int? NumberOfObjectsInFade = null; // must be set if the NoteOffOption is "limitedFade".
 
         public byte? MaximumVolume = null; // must be set if the performer is controlling the volume (often set to the channel masterVolume)
         public byte? MinimumVolume = null; // must be set if the performer is controlling the volume (often set to about 50)
+
+        public int? MaxSpeedPercent = null; // must be set to a value > 100 if the performer is controlling the speed (often set to about 400)
     }
 
     public enum NoteOnKeyOption
     {
-        ignore, // any key will start the Seq.
+        ignore, // any key will start the Seq. It will play using the notated pitches.
         transpose,
         matchExactly // the Seq. will not start if the key does not match any of the notated pitchesd.
     };
@@ -135,5 +162,15 @@ namespace Moritz.Score.Midi
         chorus = 12,
         celeste = 13,
         phaser = 14
+    };
+
+    public enum SpeedOption
+    {
+        none,
+        noteOnKey,
+        noteOnVel,
+        pressure,
+        pitchWheel,
+        modulation
     };
 }

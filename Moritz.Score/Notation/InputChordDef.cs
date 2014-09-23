@@ -137,6 +137,96 @@ namespace Moritz.Score.Notation
             throw new NotImplementedException("InputChordDef.DeepClone()");
         }
 
+        /// <summary>
+        /// All the channel indices of Seqs that can be started by this InputChordDef.
+        /// The returned list is never null, but can be empty.
+        /// </summary>
+        public List<byte> SeqChannelIndices
+        {
+            get
+            {
+                List<byte> rval = new List<byte>();
+                foreach(byte pitch in MidiPitches)
+                {
+                    List<byte> pitchOutputVoiceIndices = SeqChannelIndicesPerMidiPitch[pitch];
+                    foreach(byte ovIndex in pitchOutputVoiceIndices)
+                    {
+                        rval.Add(ovIndex);
+                    }
+                }
+                return rval;
+            }
+        }
+
+        /// <summary>
+        /// All the Seq lengths of Seqs that can be started by this InputChordDef.
+        /// The returned list is never null, but can be empty.
+        /// </summary>
+        public List<byte> SeqLengths
+        {
+            get
+            {
+                List<byte> rval = new List<byte>();
+                foreach(byte pitch in MidiPitches)
+                {
+                    List<byte> pitchSeqLengths = this.SeqLengthsPerMidiPitch[pitch];
+                    foreach(byte len in pitchSeqLengths)
+                    {
+                        rval.Add(len);
+                    }
+                }
+                return rval;
+            }
+        }
+
+        /// <summary>
+        /// Returns all the MidiChordDefs that are the beginnings of Seqs associated with this inputChordDef.
+        /// An exception is thrown if this InputChordDef is not in the given bar.
+        /// The list will be empty if there are no such MidiChordDefs.
+        /// </summary>
+        public List<MidiChordDef> SeqStarts(List<Voice> bar)
+        {
+            CheckThisIsInBar(bar);
+
+            List<MidiChordDef> rval = new List<MidiChordDef>();
+            List<byte> outputVoiceIndices = this.SeqChannelIndices;
+
+            foreach(byte outputVoiceIndex in outputVoiceIndices)
+            {
+                OutputVoice ov = bar[outputVoiceIndex] as OutputVoice;
+                Debug.Assert(ov != null);
+                foreach(IUniqueDef oviud in ov.UniqueDefs)
+                {
+                    MidiChordDef mcd = oviud as MidiChordDef;
+                    if(mcd != null && mcd.MsPosition == this.MsPosition)
+                    {
+                        rval.Add(mcd);
+                    }
+                }
+            }
+
+            return rval;
+        }
+
+        private void CheckThisIsInBar(List<Voice> bar)
+        {
+            bool found = false;
+            foreach(Voice v in bar)
+            {
+                InputVoice iv = v as InputVoice;
+                if(iv != null)
+                {
+                    found = iv.Contains(this);
+                }
+                if(found)
+                    break;
+            }
+            if(!found)
+            {
+                throw new ApplicationException("InputChordDef Error: inputChordDef not found in inputVoice.");
+            }
+        }
+
         public int MsPosition { get { return _msPosition; } set { _msPosition = value; } }
         private int _msPosition = 0;
 
