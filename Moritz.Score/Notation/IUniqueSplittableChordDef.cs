@@ -14,5 +14,6 @@ namespace Moritz.Score.Notation
         /// This field is set if the IUniqueSplittableChordDef crosses a barline.
         /// </summary>
         int? MsDurationToNextBarline { get; set; }
+        string Lyric { get; set; }
     }
 }

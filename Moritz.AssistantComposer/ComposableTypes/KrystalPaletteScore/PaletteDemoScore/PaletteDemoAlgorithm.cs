@@ -53,6 +53,9 @@ namespace Moritz.AssistantComposer
             systemVoices.Add(voice);
             voicesPerSystem.Add(systemVoices);
 
+            List<byte> masterVolumes = new List<byte>() {127};
+            SetOutputVoiceMasterVolumes(voicesPerSystem[0], masterVolumes);
+
             Debug.Assert(voicesPerSystem.Count == NumberOfBars());
 
             return voicesPerSystem;

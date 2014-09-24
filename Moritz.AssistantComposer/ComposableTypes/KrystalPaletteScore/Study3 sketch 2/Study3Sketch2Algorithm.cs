@@ -68,8 +68,9 @@ namespace Moritz.AssistantComposer
 
             Debug.Assert(bars.Count == NumberOfBars());
 
-            List<byte> masterVolumes = new List<byte>(){ 100, 100, 100, 100, 100, 100, 100, 100, };
-            
+            List<byte> masterVolumes = new List<byte>(){ 100, 100, 100, 100, 100, 100, 100, 100 }; // 8 OutputVoices
+            base.SetOutputVoiceMasterVolumes(bars[0], masterVolumes);
+
             #region initialize the OutputVoice InputControls
             List<InputControls> inputControlsList = new List<InputControls>();
             for(int i = 0; i < masterVolumes.Count; ++i)
@@ -78,7 +79,7 @@ namespace Moritz.AssistantComposer
                 ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
                 inputControlsList.Add(ics);
             }           
-            base.SetOutputVoiceControls(bars, masterVolumes, inputControlsList);
+            base.SetOutputVoiceInputControls(bars[0], inputControlsList);
             #endregion
 
             List<MidiChordDef> seqStartsInBar2 = SeqStartsInBar(bars[1]);
@@ -263,11 +264,11 @@ namespace Moritz.AssistantComposer
             List<Voice> bar = new List<Voice>();
 
             byte channel = 0;
-            List<VoiceDef> voiceDefs = new List<VoiceDef>();
+            List<OutputVoiceDef> voiceDefs = new List<OutputVoiceDef>();
             foreach(Palette palette in _palettes)
             {
                 bar.Add(new OutputVoice(null, channel));
-                VoiceDef voiceDef = new VoiceDef(palette);
+                OutputVoiceDef voiceDef = new OutputVoiceDef(palette);
                 voiceDef.SetMsDuration(6000);
                 voiceDefs.Add(voiceDef);
                 ++channel;
@@ -294,13 +295,13 @@ namespace Moritz.AssistantComposer
                 }
             }
 
-            VoiceDef iVoiceDef = new VoiceDef(maxBarMsPos - bar2StartMsPos);
+            InputVoiceDef iVoiceDef = new InputVoiceDef(maxBarMsPos - bar2StartMsPos);
             iVoiceDef.StartMsPosition = bar2StartMsPos; 
             int msPos = bar2StartMsPos;
             for(int i = 0; i < bar.Count; ++i)
             {
-                InputChordDef icd = new InputChordDef(msPos, startMsDifference, 64, (byte)i, (byte)12, null);
-                iVoiceDef.InsertInRest(icd);
+                InputChordDef inputChordDef = new InputChordDef(msPos, startMsDifference, 64, (byte)i, (byte)12, null);
+                iVoiceDef.InsertInRest(inputChordDef);
                 msPos += startMsDifference;
             }
 
@@ -316,7 +317,7 @@ namespace Moritz.AssistantComposer
         /// Writes the first rest (if any) and the VoiceDef to the voice.
         /// Returns the endMsPos of the VoiceDef. 
         /// </summary>
-        private int WriteVoiceMidiDurationDefsInBar2(Voice voice, VoiceDef voiceDef, int msPosition, int bar2StartMsPos)
+        private int WriteVoiceMidiDurationDefsInBar2(Voice voice, OutputVoiceDef voiceDef, int msPosition, int bar2StartMsPos)
         {
             if(msPosition > bar2StartMsPos)
             {

@@ -8,7 +8,7 @@ using Moritz.AssistantComposer;
 
 namespace Moritz.AssistantComposer.SongSix
 {
-    internal class Furies2 : VoiceDef
+    internal class Furies2 : OutputVoiceDef
     {
         internal Furies2(int msDuration)
             : base(msDuration)
@@ -16,7 +16,7 @@ namespace Moritz.AssistantComposer.SongSix
         }
 
         #region before Interlude3
-        internal void GetBeforeInterlude3(Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef furies3, List<Palette> _palettes)
+        internal void GetBeforeInterlude3(Clytemnestra clytemnestra, OutputVoiceDef wind1, OutputVoiceDef furies3, List<Palette> _palettes)
         {
             GetFuries2Interlude2(clytemnestra, wind1, furies3);
             AddFuries2ChirpsForInterlude2AndVerse3(clytemnestra, wind1, _palettes[7]);
@@ -24,7 +24,7 @@ namespace Moritz.AssistantComposer.SongSix
         /// <summary>
         /// Steals the ticks from furies 3, then agglommerates the remaining rests in furies3...
         /// </summary>
-        private void GetFuries2Interlude2(Clytemnestra clytemnestra, VoiceDef wind1, VoiceDef furies3)
+        private void GetFuries2Interlude2(Clytemnestra clytemnestra, OutputVoiceDef wind1, OutputVoiceDef furies3)
         {
             List<int> furies3TickIndices = new List<int>()
             {
@@ -35,8 +35,8 @@ namespace Moritz.AssistantComposer.SongSix
             for(int i = 0; i < furies3TickIndices.Count; ++i)
             {
                 int f3Index = furies3TickIndices[i];
-                IUniqueDef ticksChord = furies3[f3Index];
-                Debug.Assert(ticksChord is MidiChordDef);
+                MidiChordDef ticksChord = furies3[f3Index] as MidiChordDef;
+                Debug.Assert(ticksChord != null);
                 RestDef ticksRest = new RestDef(ticksChord.MsPosition, ticksChord.MsDuration);
                 furies3.Replace(f3Index, ticksRest);
                 InsertInRest(ticksChord);
@@ -51,7 +51,7 @@ namespace Moritz.AssistantComposer.SongSix
             furies3.AgglomerateRests();
         }
 
-        private void AddFuries2ChirpsForInterlude2AndVerse3(Clytemnestra clytemnestra, VoiceDef wind1, Palette chirpsPalette)
+        private void AddFuries2ChirpsForInterlude2AndVerse3(Clytemnestra clytemnestra, OutputVoiceDef wind1, Palette chirpsPalette)
         {
             int[] chirpIndices = { 4, 6, 10, 0, 1, 3, 5, 7, 9, 11 };
             int[] transpositions = { 2, 0, 4, 11, 5, 10, 6, 9, 7, 8 };
@@ -73,13 +73,11 @@ namespace Moritz.AssistantComposer.SongSix
             };
             for(int i = 9; i >=0 ; --i)
             {
-                IUniqueDef cheep = chirpsPalette.UniqueDurationDef(chirpIndices[i]);
+                MidiChordDef cheep = chirpsPalette.MidiChordDef(chirpIndices[i]);
                 cheep.MsPosition = msPositions[i];
                 //cheep.MsDuration *= 2;
-                MidiChordDef umcd = cheep as MidiChordDef;
-                Debug.Assert(umcd is MidiChordDef);
-                umcd.AdjustVelocities(velocityfactors[i]);
-                umcd.Transpose(transpositions[i]);
+                cheep.AdjustVelocities(velocityfactors[i]);
+                cheep.Transpose(transpositions[i]);
                 InsertInRest(cheep);
             }
 
@@ -94,7 +92,7 @@ namespace Moritz.AssistantComposer.SongSix
 
         internal void GetFinale(List<Palette> palettes, Dictionary<string, int> msPositions, Krystal krystal)
         {
-            VoiceDef furies2Finale = GetF2Finale(palettes, krystal, msPositions);
+            OutputVoiceDef furies2Finale = GetF2Finale(palettes, krystal, msPositions);
 
             if(furies2Finale[furies2Finale.Count - 1] is RestDef)
             {
@@ -124,7 +122,7 @@ namespace Moritz.AssistantComposer.SongSix
             return strandIndices;
         }
 
-        private VoiceDef GetF2Finale(List<Palette> palettes, Krystal krystal, Dictionary<string, int> msPositions)
+        private OutputVoiceDef GetF2Finale(List<Palette> palettes, Krystal krystal, Dictionary<string, int> msPositions)
         {
             Palette f2FinalePalette1 = palettes[11];
             Palette f2FinalePalette2 = palettes[15];
@@ -132,14 +130,14 @@ namespace Moritz.AssistantComposer.SongSix
 
             List<int> strandIndices = GetStrandIndices(krystal);
 
-            VoiceDef finalePart1 = new VoiceDef(f2FinalePalette1, krystal);
+            OutputVoiceDef finalePart1 = new OutputVoiceDef(f2FinalePalette1, krystal);
             Transform(finalePart1, msPositions, strandIndices);
-            VoiceDef finalePart2 = new VoiceDef(f2FinalePalette2, krystal);
+            OutputVoiceDef finalePart2 = new OutputVoiceDef(f2FinalePalette2, krystal);
             Transform(finalePart2, msPositions, strandIndices);
-            VoiceDef postlude = new VoiceDef(f2PostludePalette, krystal);
+            OutputVoiceDef postlude = new OutputVoiceDef(f2PostludePalette, krystal);
             Transform(postlude, msPositions, strandIndices);
 
-            VoiceDef finale = GetFinaleSections(finalePart1, finalePart2, postlude, 71, 175);
+            OutputVoiceDef finale = GetFinaleSections(finalePart1, finalePart2, postlude, 71, 175);
 
             return finale;
 
@@ -170,7 +168,7 @@ namespace Moritz.AssistantComposer.SongSix
         /// and MsDuration. The DurationDefs come from different palettes, so can otherwise have different parameters.
         /// This function simply creates a new VoiceDef by selecting the apropriate DurationDefs from each VoiceDef argument.
         /// </summary>
-        private VoiceDef GetFinaleSections(VoiceDef finalePart1, VoiceDef finalePart2, VoiceDef postlude, int part2Index, int postludeIndex)
+        private OutputVoiceDef GetFinaleSections(OutputVoiceDef finalePart1, OutputVoiceDef finalePart2, OutputVoiceDef postlude, int part2Index, int postludeIndex)
         {
             List<IUniqueDef> iumdds = new List<IUniqueDef>();
 
@@ -187,10 +185,10 @@ namespace Moritz.AssistantComposer.SongSix
                 iumdds.Add(postlude[i]);
             }
 
-            return new VoiceDef(iumdds);
+            return new OutputVoiceDef(iumdds);
         }
 
-        private void Transform(VoiceDef section, Dictionary<string, int> msPositions, List<int> strandIndices)
+        private void Transform(OutputVoiceDef section, Dictionary<string, int> msPositions, List<int> strandIndices)
         {
             List<int> strandDurations = GetStrandDurations(section, strandIndices);
 
@@ -230,7 +228,7 @@ namespace Moritz.AssistantComposer.SongSix
         /// <param name="voiceDef"></param>
         /// <param name="strandIndices"></param>
         /// <returns></returns>
-        private List<int> GetStrandDurations(VoiceDef voiceDef, List<int> strandIndices)
+        private List<int> GetStrandDurations(OutputVoiceDef voiceDef, List<int> strandIndices)
         {
             List<int> strandDurations = new List<int>();
             int duration;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 using Krystals4ObjectLibrary;
@@ -184,7 +185,7 @@ namespace Moritz.AssistantComposer
 
                     Debug.Assert(basicMidiChordDefs[0].PatchIndex != null);
 
-                    basicMidiChordDefs = MidiChordDef.FitToDuration(basicMidiChordDefs, duration, ornamentMinMsDuration);
+                    basicMidiChordDefs = Moritz.Score.Midi.MidiChordDef.FitToDuration(basicMidiChordDefs, duration, ornamentMinMsDuration);
 
                     foreach(BasicMidiChordDef b in basicMidiChordDefs)
                     {
@@ -311,6 +312,20 @@ namespace Moritz.AssistantComposer
         public IUniqueDef UniqueDurationDef(int index)
         {
             return _durationDefs[index].DeepClone();
+        }
+        /// <summary>
+        /// Returns a MidiChordDef if the object at index is a MidiChordDef,
+        /// otherwise throws an exception.
+        /// </summary>
+        public MidiChordDef MidiChordDef(int index)
+        {
+            MidiChordDef midiChordDef = _durationDefs[index].DeepClone() as MidiChordDef;
+            if(midiChordDef == null)
+            {
+                throw new ApplicationException("The indexed object was not a MidiChordDef.");
+            }
+            
+            return midiChordDef;
         }
     }
 

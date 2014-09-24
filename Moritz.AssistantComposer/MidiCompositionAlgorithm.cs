@@ -277,21 +277,36 @@ namespace Moritz.AssistantComposer
         }
 
         /// <summary>
-        /// If the score contains InputVoices, this function should be called when the bars are complete.
+        /// This function should be called for all scores when the bars are complete.
         /// </summary>
-        protected void SetOutputVoiceControls(List<List<Voice>> bars, List<byte> masterVolumes, List<InputControls> inputControlsList)
+        /// <param name="firstBar"></param>
+        /// <param name="masterVolumes">A list with one value per OutputVoice</param>
+        protected void SetOutputVoiceMasterVolumes(List<Voice> firstBar, List<byte> masterVolumes)
         {
-            List<Voice> firstBar = bars[0];
-            Debug.Assert(firstBar.Count > masterVolumes.Count); // firstBar includes both OutputVoices and InputVoices.
-            Debug.Assert(inputControlsList.Count == MidiChannels().Count); // == number of OutputVoices.
-            Debug.Assert(inputControlsList.Count == masterVolumes.Count);
+            Debug.Assert(masterVolumes.Count == MidiChannels().Count); // == number of OutputVoices.
             for(int i = 0; i < masterVolumes.Count; ++i)
             {
                 OutputVoice oVoice = firstBar[i] as OutputVoice;
                 Debug.Assert(oVoice != null);
                 Debug.Assert(masterVolumes[i] != 0);
-                Debug.Assert(inputControlsList[i] != null);
                 oVoice.MasterVolume = masterVolumes[i];
+            }
+        }
+
+        /// <summary>
+        /// This function should be called when the bars are complete, if the score contains InputVoices.
+        /// </summary>
+        /// <param name="firstBar"></param>
+        /// <param name="inputControlsList">A list with one value per OutputVoice</param>
+        protected void SetOutputVoiceInputControls(List<Voice> bar1, List<InputControls> inputControlsList)
+        {
+            int nOutputVoices = MidiChannels().Count;
+            Debug.Assert(inputControlsList.Count == nOutputVoices); // == number of OutputVoices.
+            for(int i = 0; i < nOutputVoices; ++i)
+            {
+                OutputVoice oVoice = bar1[i] as OutputVoice;
+                Debug.Assert(oVoice != null);
+                Debug.Assert(inputControlsList[i] != null);
                 oVoice.InputControls = inputControlsList[i];
             }
         }

@@ -70,6 +70,9 @@ namespace Moritz.AssistantComposer
 
             Debug.Assert(bars.Count == NumberOfBars());
 
+            List<byte> masterVolumes = new List<byte>() { 100, 100, 100 };
+            base.SetOutputVoiceMasterVolumes(bars[0], masterVolumes);
+
             return bars;
         }
 

@@ -11,20 +11,20 @@ namespace Moritz.AssistantComposer.SongSix
     /// </summary>
     internal partial class SongSixAlgorithm : MidiCompositionAlgorithm
     {
-        private VoiceDef GetWind3(Palette palette, Krystal krystal)
+        private OutputVoiceDef GetWind3(Palette palette, Krystal krystal)
         {
-            VoiceDef wind3 = new VoiceDef(palette, krystal);
+            OutputVoiceDef wind3 = new OutputVoiceDef(palette, krystal);
             wind3.Transpose(0, wind3.Count, -13);
             wind3.StepwiseGliss(74, wind3.Count, 19);
             return wind3;
         }
 
-        private VoiceDef GetWind2(VoiceDef wind3, Clytemnestra clytemnestra)
+        private OutputVoiceDef GetWind2(OutputVoiceDef wind3, Clytemnestra clytemnestra)
         {
             List<IUniqueDef> clytLmdds = clytemnestra.UniqueDefs;
             int rotationMsPosition = clytLmdds[59].MsPosition + 700;
 
-            VoiceDef wind2 = GetRotatedWind(wind3, rotationMsPosition);
+            OutputVoiceDef wind2 = GetRotatedWind(wind3, rotationMsPosition);
             wind2.Transpose(0, wind2.Count, 12);
 
             wind2.StepwiseGliss(0, 15, 7);
@@ -39,12 +39,12 @@ namespace Moritz.AssistantComposer.SongSix
             return wind2;
         }
 
-        private VoiceDef GetWind1(VoiceDef wind3, VoiceDef wind2, Clytemnestra clytemnestra)
+        private OutputVoiceDef GetWind1(OutputVoiceDef wind3, OutputVoiceDef wind2, Clytemnestra clytemnestra)
         {
             List<IUniqueDef> clytLmdds = clytemnestra.UniqueDefs;
             int rotationMsPosition = clytLmdds[116].MsPosition + 700;
 
-            VoiceDef wind1 = GetRotatedWind(wind3, rotationMsPosition);
+            OutputVoiceDef wind1 = GetRotatedWind(wind3, rotationMsPosition);
             wind1.Transpose(0, wind1.Count, 19);
             wind1.StepwiseGliss(0, 25, 12);
             wind1.Transpose(25, wind1.Count, 12);
@@ -62,9 +62,9 @@ namespace Moritz.AssistantComposer.SongSix
         /// </summary>
         /// <param name="originalVoiceDef"></param>
         /// <returns></returns>
-        private VoiceDef GetRotatedWind(VoiceDef originalVoiceDef, int rotationMsPosition)
+        private OutputVoiceDef GetRotatedWind(OutputVoiceDef originalVoiceDef, int rotationMsPosition)
         {
-            VoiceDef tempWind = originalVoiceDef.Clone();
+            OutputVoiceDef tempWind = originalVoiceDef.DeepClone();
             int finalBarlineMsPosition = originalVoiceDef.EndMsPosition;
             int msDurationAfterSynch = finalBarlineMsPosition - rotationMsPosition;
 
@@ -92,7 +92,7 @@ namespace Moritz.AssistantComposer.SongSix
                 iu.MsPosition = msPosition;
                 msPosition += iu.MsDuration;
             }
-            VoiceDef newRotatedWind = new VoiceDef(newWindLmdds);
+            OutputVoiceDef newRotatedWind = new OutputVoiceDef(newWindLmdds);
 
             return newRotatedWind;
         }

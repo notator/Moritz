@@ -110,10 +110,10 @@ namespace Moritz.AssistantComposer
                 OutputVoice ov = voice as OutputVoice;
                 if(ov != null)
                 {
-                    if(ov.MasterVolume == 0)
+                    if(ov.MasterVolume == null)
                     {
                         errorString = "\nEvery OutputVoice in the first bar of a score\n" +
-                                      "must have a MasterVolume value greater than 0.";
+                                      "must have a MasterVolume value.";
                     }
                     oVoices.Add(ov);
                 }
@@ -138,7 +138,7 @@ namespace Moritz.AssistantComposer
                         OutputVoice ov = voice as OutputVoice;
                         if(ov != null)
                         {
-                            if(ov.MasterVolume != 0)
+                            if(ov.MasterVolume != null)
                             {
                                 errorString = "\nNo OutputVoice except the first may have a MasterVolume.";
                             }

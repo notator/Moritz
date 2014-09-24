@@ -67,6 +67,9 @@ namespace Moritz.AssistantComposer
 
             Debug.Assert(bars.Count == NumberOfBars());
 
+            List<byte> masterVolumes = new List<byte>() { 100, 100, 100, 100, 100, 100, 100, 100 };
+            base.SetOutputVoiceMasterVolumes(bars[0], masterVolumes);
+
             return bars;
         }
 
@@ -120,11 +123,11 @@ namespace Moritz.AssistantComposer
             List<Voice> bar = new List<Voice>();
 
             byte channel = 0;
-            List<VoiceDef> voiceDefs = new List<VoiceDef>();
+            List<OutputVoiceDef> voiceDefs = new List<OutputVoiceDef>();
             foreach(Palette palette in _palettes)
             {
                 bar.Add(new OutputVoice(null, channel));
-                VoiceDef voiceDef = new VoiceDef(palette);
+                OutputVoiceDef voiceDef = new OutputVoiceDef(palette);
                 voiceDef.SetMsDuration(6000);
                 voiceDefs.Add(voiceDef);
                 ++channel;
@@ -155,7 +158,7 @@ namespace Moritz.AssistantComposer
         /// Writes the first rest (if any) and the VoiceDef to the voice.
         /// Returns the endMsPos of the VoiceDef. 
         /// </summary>
-        private int WriteVoiceMidiDurationDefsInBar2(Voice voice, VoiceDef voiceDef, int msPosition, int bar2StartMsPos)
+        private int WriteVoiceMidiDurationDefsInBar2(Voice voice, OutputVoiceDef voiceDef, int msPosition, int bar2StartMsPos)
         {
             RestDef rest1Def = null;
             if(msPosition > bar2StartMsPos)

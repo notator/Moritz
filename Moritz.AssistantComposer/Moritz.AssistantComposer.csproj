@@ -68,7 +68,6 @@
     <Compile Include="BasicPercussionControl.Designer.cs">
       <DependentUpon>BasicPercussionControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="ComposableTypes\KrystalPaletteScore\Study3 sketch 2\Study3Sketch2Algorithm.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\FuriesInterlude3ToEnd.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Furies1.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Furies2.cs" />
@@ -79,6 +78,11 @@
     <Compile Include="ComposableTypes\KrystalPaletteScore\Study2c3_1\Study2c3_1Algorithm.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\Clytemnestra.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\SongSixAlgorithm.cs" />
+    <Compile Include="ComposableTypes\KrystalPaletteScore\Study3 sketch 2\Study3Sketch2Algorithm.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="InputVoiceDef.cs" />
+    <Compile Include="VoiceDef.cs" />
     <Compile Include="IntListControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -135,7 +139,7 @@
     <Compile Include="DimensionsAndMetadataForm.Designer.cs">
       <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="VoiceDef.cs" />
+    <Compile Include="OutputVoiceDef.cs" />
     <Compile Include="MidiCompositionAlgorithm.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\PaletteDemoScore\PaletteDemoAlgorithm.cs" />
     <Compile Include="AssistantComposerMainForm.cs">
@@ -212,6 +216,7 @@
       <Name>Moritz.Score</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
