@@ -129,18 +129,6 @@
     <Compile Include="PercussionPaletteForm.Designer.cs">
       <DependentUpon>PercussionPaletteForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="PerformersOptionsForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="PerformersOptionsForm.Designer.cs">
-      <DependentUpon>PerformersOptionsForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TrackInitForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TrackInitForm.Designer.cs">
-      <DependentUpon>TrackInitForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="DimensionsAndMetadataForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -197,12 +185,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="PercussionPaletteForm.resx">
       <DependentUpon>PercussionPaletteForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="PerformersOptionsForm.resx">
-      <DependentUpon>PerformersOptionsForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TrackInitForm.resx">
-      <DependentUpon>TrackInitForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DimensionsAndMetadataForm.resx">
       <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>

@@ -94,8 +94,6 @@ namespace Moritz.AssistantComposer
             this.DimensionsAndMetadataButton = new System.Windows.Forms.Button();
             this.KrystalsGroupBox = new System.Windows.Forms.GroupBox();
             this.PalettesGroupBox = new System.Windows.Forms.GroupBox();
-            this.PerformersOptionsButton = new System.Windows.Forms.Button();
-            this.TrackInitValuesButton = new System.Windows.Forms.Button();
             this.NotationGroupBox.SuspendLayout();
             this.StandardChordsOptionsPanel.SuspendLayout();
             this.KrystalsGroupBox.SuspendLayout();
@@ -108,7 +106,7 @@ namespace Moritz.AssistantComposer
             this.CreateScoreButton.Font = new System.Drawing.Font("Arial", 8F);
             this.CreateScoreButton.Location = new System.Drawing.Point(440, 578);
             this.CreateScoreButton.Name = "CreateScoreButton";
-            this.CreateScoreButton.Size = new System.Drawing.Size(106, 26);
+            this.CreateScoreButton.Size = new System.Drawing.Size(127, 26);
             this.CreateScoreButton.TabIndex = 5;
             this.CreateScoreButton.Text = "create score";
             this.CreateScoreButton.UseVisualStyleBackColor = true;
@@ -753,7 +751,7 @@ namespace Moritz.AssistantComposer
             this.SaveSettingsButton.Font = new System.Drawing.Font("Arial", 8F);
             this.SaveSettingsButton.Location = new System.Drawing.Point(440, 548);
             this.SaveSettingsButton.Name = "SaveSettingsButton";
-            this.SaveSettingsButton.Size = new System.Drawing.Size(106, 26);
+            this.SaveSettingsButton.Size = new System.Drawing.Size(127, 26);
             this.SaveSettingsButton.TabIndex = 4;
             this.SaveSettingsButton.Text = "save settings";
             this.SaveSettingsButton.UseVisualStyleBackColor = true;
@@ -776,7 +774,7 @@ namespace Moritz.AssistantComposer
             this.ShowMoritzButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShowMoritzButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.ShowMoritzButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.ShowMoritzButton.Location = new System.Drawing.Point(212, 578);
+            this.ShowMoritzButton.Location = new System.Drawing.Point(23, 578);
             this.ShowMoritzButton.Name = "ShowMoritzButton";
             this.ShowMoritzButton.Size = new System.Drawing.Size(183, 26);
             this.ShowMoritzButton.TabIndex = 6;
@@ -803,7 +801,7 @@ namespace Moritz.AssistantComposer
             this.DimensionsAndMetadataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.DimensionsAndMetadataButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.DimensionsAndMetadataButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.DimensionsAndMetadataButton.Location = new System.Drawing.Point(23, 578);
+            this.DimensionsAndMetadataButton.Location = new System.Drawing.Point(23, 548);
             this.DimensionsAndMetadataButton.Name = "DimensionsAndMetadataButton";
             this.DimensionsAndMetadataButton.Size = new System.Drawing.Size(183, 26);
             this.DimensionsAndMetadataButton.TabIndex = 7;
@@ -840,32 +838,6 @@ namespace Moritz.AssistantComposer
             this.PalettesGroupBox.TabStop = false;
             this.PalettesGroupBox.Text = "palettes";
             // 
-            // PerformersOptionsButton
-            // 
-            this.PerformersOptionsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.PerformersOptionsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.PerformersOptionsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.PerformersOptionsButton.Location = new System.Drawing.Point(212, 548);
-            this.PerformersOptionsButton.Name = "PerformersOptionsButton";
-            this.PerformersOptionsButton.Size = new System.Drawing.Size(183, 26);
-            this.PerformersOptionsButton.TabIndex = 150;
-            this.PerformersOptionsButton.Text = "Performers Options";
-            this.PerformersOptionsButton.UseVisualStyleBackColor = false;
-            this.PerformersOptionsButton.Click += new System.EventHandler(this.PerformersOptionsButton_Click);
-            // 
-            // TrackInitValuesButton
-            // 
-            this.TrackInitValuesButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.TrackInitValuesButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.TrackInitValuesButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.TrackInitValuesButton.Location = new System.Drawing.Point(23, 548);
-            this.TrackInitValuesButton.Name = "TrackInitValuesButton";
-            this.TrackInitValuesButton.Size = new System.Drawing.Size(183, 26);
-            this.TrackInitValuesButton.TabIndex = 151;
-            this.TrackInitValuesButton.Text = "Track Initialization Values";
-            this.TrackInitValuesButton.UseVisualStyleBackColor = false;
-            this.TrackInitValuesButton.Click += new System.EventHandler(this.TrackInitButton_Click);
-            // 
             // AssistantComposerMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
@@ -873,8 +845,6 @@ namespace Moritz.AssistantComposer
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
             this.ClientSize = new System.Drawing.Size(732, 619);
             this.ControlBox = false;
-            this.Controls.Add(this.TrackInitValuesButton);
-            this.Controls.Add(this.PerformersOptionsButton);
             this.Controls.Add(this.PalettesGroupBox);
             this.Controls.Add(this.KrystalsGroupBox);
             this.Controls.Add(this.DimensionsAndMetadataButton);
@@ -963,8 +933,6 @@ namespace Moritz.AssistantComposer
         private System.Windows.Forms.Panel StandardChordsOptionsPanel;
         private System.Windows.Forms.Label ChordTypeComboBoxLabel;
         private System.Windows.Forms.ComboBox ChordTypeComboBox;
-        private System.Windows.Forms.Button PerformersOptionsButton;
-        private System.Windows.Forms.Button TrackInitValuesButton;
         private System.Windows.Forms.Label InputVoiceIndicesPerStaffHelpLabel2;
         private System.Windows.Forms.Label InputVoiceIndicesPerStaffHelpLabel;
         private System.Windows.Forms.Label InputVoiceIndicesPerStaffLabel;

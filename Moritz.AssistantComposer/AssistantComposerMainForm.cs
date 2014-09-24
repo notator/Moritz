@@ -40,9 +40,6 @@ namespace Moritz.AssistantComposer
             _algorithm = Algorithm(_algorithmName);
             _numberOfChannels = _algorithm.MidiChannels().Count;
 
-            _trackInitForm = new TrackInitForm(this, _numberOfChannels);
-            _performersOptionsForm = new PerformersOptionsForm(this, _numberOfChannels);
-
             SetScoreComboBoxItems(_settingsFolderPath);
             string scoreName = Path.GetFileNameWithoutExtension(_settingsPath);
 
@@ -230,10 +227,6 @@ namespace Moritz.AssistantComposer
 
             if(!error)
                 error = _dimensionsAndMetadataForm.HasError();
-            if(!error)
-                error = _trackInitForm.HasError();
-            if(!error)
-                error = _performersOptionsForm.HasError();
 
             if(!error)
             {
@@ -318,9 +311,9 @@ namespace Moritz.AssistantComposer
 
                     _dimensionsAndMetadataForm.Read(r);
 
-                    Debug.Assert(r.Name == "notation" || r.Name == "krystals" || r.Name == "palettes" || r.Name == "runtimeInfo");
+                    Debug.Assert(r.Name == "notation" || r.Name == "krystals" || r.Name == "palettes");
 
-                    while(r.Name == "notation" || r.Name == "krystals" || r.Name == "palettes" || r.Name == "runtimeInfo")
+                    while(r.Name == "notation" || r.Name == "krystals" || r.Name == "palettes")
                     {
                         if(r.NodeType != XmlNodeType.EndElement)
                         {
@@ -335,12 +328,9 @@ namespace Moritz.AssistantComposer
                                 case "palettes":
                                     GetPalettes(r);
                                     break;
-                                case "runtimeInfo":
-                                    GetRuntimeInfo(r);
-                                    break;
                             }
                         }
-                        M.ReadToXmlElementTag(r, "notation", "krystals", "palettes", "runtimeInfo", "moritzKrystalScore");
+                        M.ReadToXmlElementTag(r, "notation", "krystals", "palettes", "moritzKrystalScore");
                     }
                     Debug.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
                 }
@@ -531,37 +521,6 @@ namespace Moritz.AssistantComposer
             Debug.Assert(r.Name == "palettes");
         }
 
-        private void GetRuntimeInfo(XmlReader r)
-        {
-            Debug.Assert(r.Name == "runtimeInfo");
-
-            // The runtimeInfo.nPages and runtimeInfo.nTracks attributes are not read here
-            // (They are only used by the Assistant Performer.)
-
-            if(!r.IsEmptyElement)
-            {
-                M.ReadToXmlElementTag(r, "trackInit", "performersOptions", "runtimeInfo");
-                while(r.Name == "trackInit" || r.Name == "performersOptions")
-                {
-                    if(r.NodeType != XmlNodeType.EndElement)
-                    {
-                        switch(r.Name)
-                        {
-                            case "trackInit":
-                                _trackInitForm.Read(r);
-                                break;
-                            case "performersOptions":
-                                _performersOptionsForm.Read(r);
-                                break;
-                        }
-                    }
-                    M.ReadToXmlElementTag(r, "trackInit", "performersOptions", "runtimeInfo");
-                }
-            }
-
-            Debug.Assert(r.Name == "runtimeInfo");
-        }
-
         public void SaveSettingsButton_Click(object sender, EventArgs e)
         {
             try
@@ -610,7 +569,6 @@ namespace Moritz.AssistantComposer
                 WriteNotation(w);
                 WriteKrystals(w);
                 WritePalettes(w);
-                WriteRuntimeInfo(w, numberOfPages);
                 w.WriteEndElement(); // closes the moritzKrystalScore element
                 w.Close(); // close unnecessary because of the using statement?
             }
@@ -679,33 +637,6 @@ namespace Moritz.AssistantComposer
                     }
                 }
                 w.WriteEndElement(); // palettes
-            }
-        }
-
-        private void WriteRuntimeInfo(XmlWriter w, int numberOfPages)
-        {
-            if(numberOfPages > 0 || !_trackInitForm.IsEmpty() || !_performersOptionsForm.HasEventHandler())
-            {
-                w.WriteStartElement("runtimeInfo");
-                if(numberOfPages > 0)
-                {
-                    // numberOfPages is set > 0 when the SVG pages have been created -- see CreateSVGScore().
-                    w.WriteAttributeString("nPages", numberOfPages.ToString());
-                    w.WriteAttributeString("nTracks", _numberOfChannels.ToString());
-                }
-
-                // only write the trackInit element if it is not empty.
-                if(!_trackInitForm.IsEmpty())
-                {
-                    _trackInitForm.Write(w);
-                }
-
-                if(_performersOptionsForm.HasEventHandler())
-                {
-                    _performersOptionsForm.Write(w);
-                }
-
-                w.WriteEndElement(); // runtimeInfo
             }
         }
 
@@ -868,19 +799,6 @@ namespace Moritz.AssistantComposer
             _dimensionsAndMetadataForm.BringToFront();
         }
 
-        private void TrackInitButton_Click(object sender, EventArgs e)
-        {
-            _trackInitForm.Show();
-            _trackInitForm.BringToFront();
-        }
-
-        private void PerformersOptionsButton_Click(object sender, EventArgs e)
-        {
-
-            _performersOptionsForm.Show();
-            _performersOptionsForm.BringToFront();
-        }
-
         private void QuitMoritzButton_Click(object sender, EventArgs e)
         {
             CheckSaved();
@@ -913,16 +831,6 @@ namespace Moritz.AssistantComposer
             if(_dimensionsAndMetadataForm != null)
             {
                 _dimensionsAndMetadataForm.Close();
-            }
-
-            if(_performersOptionsForm != null)
-            {
-                _performersOptionsForm.Close();
-            }
-
-            if(_trackInitForm != null)
-            {
-                _trackInitForm.Close();
             }
         }
 
@@ -1375,22 +1283,6 @@ namespace Moritz.AssistantComposer
             GetSelectedSettings(_settingsPath, _algorithm);
         }
 
-        private void PerformersEventHandlerComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            ComboBox cb = sender as ComboBox;
-            if(cb != null)
-            {
-                if(cb.Text == "none")
-                {
-                    PerformersOptionsButton.Visible = false;
-                }
-                else
-                {
-                    PerformersOptionsButton.Visible = true;
-                }
-            }
-        }
-
         private void GetSelectedSettings(string settingsPath, MidiCompositionAlgorithm algorithm)
         {
             LoadSettings(settingsPath);
@@ -1451,57 +1343,76 @@ namespace Moritz.AssistantComposer
         private void ShowMidiChannelsPerStaffHelp()
         {
             StringBuilder midiChannelsSB = MidiChannelsSB();
-            string message = "Input fields 'midi channels per voice per staff' and 'input voices per voice per staff'.\n\n" +
-
-            "All algorithms create voices in staves in systems. Output voices are always created, but input voices " +
-            "are optional.\n\n" +
-
-            "Each output voice contains information that is to be sent to a midi output device under control of the performer's input. " +
-            "So each output voice is associated with a unique midi output channel.\n" +
-            "Each input voice contains information describing how a performer's input affects the assistant performer's output. An input " +
-            "voice can be indexed here (as if it had a midi channel), but the Assistant Performer actually ignores the channel on which midi " +
-            "information arrives.\n\n" +
-
-            "By convention, algorithms create both midi channel indices and input voice indices allocated in increasing " +
-            "order beginning with 0. Neither midi channels nor input voice indices may occur twice in the same system. " +
-            "Each algorithm declares which midi channels (and input voice indices, if any) it provides, and these appear in the help " +
-            "text above these input fields. (Not all the midi channels or input voices need to be notated in a particular score. But " +
-            "scores must contain at least one output voice.)\n\n" +
-
-            "The number of staves in the score is the sum of the number of staves defined in these two input fields.\n\n" +
-
-            "The two input fields work in the same way: The numbers must be selected from those given in the " +
-            "help text above the field, and determine the top to bottom order in the score. Staves are separated by commas, " +
-            "voices are separated by colons. Input staves (if they exist) are always notated below the output staves.\n\n" +
-
-            "For example, if the algorithm uses midi channels 0 1 2 3 4 5, and these are to be notated using standard " +
-            "chord symbols, they can be notated on 3 staves by entering '3:1, 0:2, 4:5' into the field. Midi channels 2 " +
-            "and 3 can be notated on separate staves, omitting the other channels, by entering '2, 3'.";
-
-            MessageBox.Show(message, "Help for 'midi channels per voice per staff'", MessageBoxButtons.OK);
+            MessageBox.Show(midiChannelsSB.ToString(), "Help for 'midi channels per voice per staff'", MessageBoxButtons.OK);
         }
 
         private StringBuilder MidiChannelsSB()
         {
+            string mainText = "Input fields 'midi channels per voice per staff' and 'input voices per voice per staff'.\n\n" +
+
+                "All algorithms create voices in staves in systems. Output voices are always created, but input voices " +
+                "are optional.\n\n" +
+
+                "Each output voice contains information that is to be sent to a midi output device under control of the performer's input. " +
+                "So each output voice is associated with a unique midi output channel.\n" +
+                "Each input voice contains information describing how a performer's input affects the assistant performer's output. An input " +
+                "voice can be indexed here (as if it had a midi channel), but the Assistant Performer actually ignores the channel on which midi " +
+                "information arrives.\n\n" +
+
+                "By convention, algorithms create both midi channel indices and input voice indices allocated in increasing " +
+                "order beginning with 0. Neither midi channels nor input voice indices may occur twice in the same system. " +
+                "Each algorithm declares which midi channels (and input voice indices, if any) it provides, and these appear in the help " +
+                "text above these input fields. (Not all the midi channels or input voices need to be notated in a particular score. But " +
+                "scores must contain at least one output voice.)\n\n" +
+
+                "The number of staves and voices in the score is the sum of the number of staves and voices defined in these two input fields.\n\n" +
+
+                "The two input fields work in the same way: The numbers must be selected from those given in the " +
+                "help text above the field, and determine the top to bottom order in the score. Staves are separated by commas, " +
+                "voices are separated by colons. Input staves (if they exist) are always notated below the output staves.\n\n" +
+
+                "For example, if the algorithm uses midi channels 0 1 2 3 4 5, and these are to be notated using standard " +
+                "chord symbols, they can be notated on 3 staves by entering '3:1, 0:2, 4:5' into the field. Midi channels 2 " +
+                "and 3 can be notated on separate staves, omitting the other channels, by entering '2, 3'.";
+
             List<byte> midiChannelBytes = _algorithm.MidiChannels();
             StringBuilder midiChannelsSB = new StringBuilder();
+            midiChannelsSB.Append(mainText);
+            midiChannelsSB.Append("\n\nThe current algorithm ");
             if(midiChannelBytes.Count == 1)
-                midiChannelsSB.Append("only uses channel index " + midiChannelBytes[0].ToString());
+                midiChannelsSB.Append("only uses\noutput channel index " + midiChannelBytes[0].ToString());
+            else
+                midiChannelsSB.Append("uses\noutput channel indices ");
+
+            for(int i = 0; i < midiChannelBytes.Count; ++i)
+            {
+                if(i > 0)
+                {
+                    if(i == (midiChannelBytes.Count - 1))
+                        midiChannelsSB.Append(" and ");
+                    else
+                        midiChannelsSB.Append(", ");
+                }
+                midiChannelsSB.Append(midiChannelBytes[i].ToString());
+            }
+            int nInputVoices = _algorithm.NumberOfInputVoices();
+            if(nInputVoices == 0)
+                midiChannelsSB.Append(",\nand has no input voices.\n\n");
+            else if(nInputVoices == 1)
+            {
+                midiChannelsSB.Append(",\nand input voice index 0\n\n");
+            }
             else
             {
-                for(int i = 0; i < midiChannelBytes.Count; ++i)
+                midiChannelsSB.Append(",\nand input voice indices " );
+                for(int i = 0; i < nInputVoices; ++i)
                 {
-                    if(i > 0)
-                    {
-                        if(i == (midiChannelBytes.Count - 1))
-                            midiChannelsSB.Append(" and ");
-                        else
-                            midiChannelsSB.Append(", ");
-                    }
-                    midiChannelsSB.Append(midiChannelBytes[i].ToString());
+                    midiChannelsSB.Append(i.ToString());
+                    midiChannelsSB.Append(", ");
                 }
-                midiChannelsSB.Insert(0, "uses channels ");
+                midiChannelsSB.Replace(", ", ".", midiChannelsSB.Length - 2, 2);
             }
+
             return midiChannelsSB;
         }
 
@@ -1924,8 +1835,6 @@ namespace Moritz.AssistantComposer
         private IMoritzForm1 _moritzForm1;
         private Moritz.Krystals.KrystalBrowser _krystalBrowser = null;
         private DimensionsAndMetadataForm _dimensionsAndMetadataForm;
-        private PerformersOptionsForm _performersOptionsForm;
-        private TrackInitForm _trackInitForm;
         private int _numberOfChannels = 0;
 
         
