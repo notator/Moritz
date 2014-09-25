@@ -15,7 +15,7 @@ namespace Moritz.AssistantComposer
         {
             _krystals = krystals;
             
-            _midiAlgorithm = Algorithm(algorithmName, krystals, palettes);
+            _algorithm = Algorithm(algorithmName, krystals, palettes);
 
             Notator = new Notator(pageFormat);
 

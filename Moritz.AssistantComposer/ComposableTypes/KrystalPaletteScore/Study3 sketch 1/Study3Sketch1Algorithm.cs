@@ -11,7 +11,7 @@ namespace Moritz.AssistantComposer
     /// Algorithm for testing Song 6's palettes.
     /// This may develope as composition progresses...
     /// </summary>
-    public class Study3Sketch1Algorithm : MidiCompositionAlgorithm
+    public class Study3Sketch1Algorithm : CompositionAlgorithm
     {
         /// <summary>
         /// This constructor can be called with both parameters null,

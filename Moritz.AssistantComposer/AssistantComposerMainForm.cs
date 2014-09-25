@@ -1228,7 +1228,7 @@ namespace Moritz.AssistantComposer
         /// _scoreBaseName is the name of the score without any folder or extension. For example "Study 2b2".
         /// </summary>
         string _algorithmName = null;
-        MidiCompositionAlgorithm _algorithm = null;
+        CompositionAlgorithm _algorithm = null;
 
         /// <summary>
         /// The folder in which the score and all its associated files is saved
@@ -1283,7 +1283,7 @@ namespace Moritz.AssistantComposer
             GetSelectedSettings(_settingsPath, _algorithm);
         }
 
-        private void GetSelectedSettings(string settingsPath, MidiCompositionAlgorithm algorithm)
+        private void GetSelectedSettings(string settingsPath, CompositionAlgorithm algorithm)
         {
             LoadSettings(settingsPath);
 
@@ -1755,27 +1755,27 @@ namespace Moritz.AssistantComposer
             }
         }
 
-        private MidiCompositionAlgorithm Algorithm(string algorithmName)
+        private CompositionAlgorithm Algorithm(string algorithmName)
         {
-            MidiCompositionAlgorithm midiAlgorithm = null;
+            CompositionAlgorithm algorithm = null;
             switch(algorithmName)
             {
                 case "Study 2c3.1":
-                    midiAlgorithm = new Study2c3_1Algorithm(null, null);
+                    algorithm = new Study2c3_1Algorithm(null, null);
                     break;
                 case "Song Six":
-                    midiAlgorithm = new SongSixAlgorithm(null, null);
+                    algorithm = new SongSixAlgorithm(null, null);
                     break;
                 case "Study 3 sketch 1":
-                    midiAlgorithm = new Study3Sketch1Algorithm(null, null);
+                    algorithm = new Study3Sketch1Algorithm(null, null);
                     break;
                 case "Study 3 sketch 2":
-                    midiAlgorithm = new Study3Sketch2Algorithm(null, null);
+                    algorithm = new Study3Sketch2Algorithm(null, null);
                     break;
                 default:
                     throw new ApplicationException("unknown algorithm");
             }
-            return midiAlgorithm;
+            return algorithm;
         }
 
         #endregion page format controls

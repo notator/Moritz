@@ -7,7 +7,7 @@ namespace Moritz.AssistantComposer.SongSix
     /// The Algorithm for Song 6.
     /// This will develope as composition progresses...
     /// </summary>
-    internal partial class SongSixAlgorithm : MidiCompositionAlgorithm
+    internal partial class SongSixAlgorithm : CompositionAlgorithm
     {
         /// <summary>
         /// The arguments are all complete to the end of Verse 3

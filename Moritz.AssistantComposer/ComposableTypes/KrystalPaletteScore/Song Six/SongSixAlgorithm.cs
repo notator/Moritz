@@ -15,7 +15,7 @@ namespace Moritz.AssistantComposer.SongSix
     /// The Algorithm for Song 6.
     /// This will develop as composition progresses...
     /// </summary>
-    internal partial class SongSixAlgorithm : MidiCompositionAlgorithm
+    internal partial class SongSixAlgorithm : CompositionAlgorithm
     {
         public SongSixAlgorithm(List<Krystal> krystals, List<Palette> palettes)
             : base(krystals, palettes)

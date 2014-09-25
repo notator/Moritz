@@ -12,7 +12,7 @@ namespace Moritz.AssistantComposer
     /// Algorithm for testing the new input staves.
     /// This may develope as composition progresses...
     /// </summary>
-    public class Study3Sketch2Algorithm : MidiCompositionAlgorithm
+    public class Study3Sketch2Algorithm : CompositionAlgorithm
     {
         /// <summary>
         /// This constructor can be called with both parameters null,

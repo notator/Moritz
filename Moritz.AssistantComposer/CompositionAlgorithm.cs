@@ -9,14 +9,16 @@ using Moritz.Score.Notation;
 namespace Moritz.AssistantComposer
 {
     /// <summary>
-    /// A CompositionAlgorithm adds the correct number of Systems, Staves and Voices to the score, whereby
-    /// ONE BAR PER SYSTEM is created. (Algorithms are independent of the page format.)
-    /// The Voices' MidiDurationDefs lists are set, but not the (graphic) NoteObjects.
-    /// NoteObjects are created later, using a specialized Notator object. 
+    /// A CompositionAlgorithm is special to a particular composition.
+    /// When called, the DoAlgorithm() function returns a list of VoiceDef lists, whereby
+    /// each contained VoiceDef list is the definition of a bar (i.e. a place where a system
+    /// can be broken). Algorithms are independent of the notation and page format.
+    /// The VoiceDefs are converted to real Voices (containing real NoteObjects) later,
+    /// using options set for the score in the Assistant Composer (using the score's .mkss file). 
     /// </summary>
-    public abstract class MidiCompositionAlgorithm
+    public abstract class CompositionAlgorithm
     {
-        protected MidiCompositionAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+        protected CompositionAlgorithm(List<Krystal> krystals, List<Palette> palettes)
         {
             _krystals = krystals;
             _palettes = palettes;

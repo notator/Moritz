@@ -140,7 +140,7 @@
       <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
     </Compile>
     <Compile Include="OutputVoiceDef.cs" />
-    <Compile Include="MidiCompositionAlgorithm.cs" />
+    <Compile Include="CompositionAlgorithm.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\PaletteDemoScore\PaletteDemoAlgorithm.cs" />
     <Compile Include="AssistantComposerMainForm.cs">
       <SubType>Form</SubType>

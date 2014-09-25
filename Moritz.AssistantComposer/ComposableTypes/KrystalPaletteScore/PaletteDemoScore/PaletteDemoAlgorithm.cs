@@ -6,7 +6,7 @@ using Moritz.Score.Notation;
 
 namespace Moritz.AssistantComposer
 {
-    internal class PaletteDemoAlgorithm : MidiCompositionAlgorithm
+    internal class PaletteDemoAlgorithm : CompositionAlgorithm
     {
         /// <summary>
         /// This file contains a composition algorithm which creates a score having a single Voice, whose

@@ -30,7 +30,7 @@ namespace Moritz.AssistantComposer
 
             List<Palette> palettes = new List<Palette>();
             palettes.Add(palette);
-            _midiAlgorithm = Algorithm("paletteDemo", null, palettes);
+            _algorithm = Algorithm("paletteDemo", null, palettes);
 
             CreateScore();
 
