@@ -22,13 +22,9 @@ namespace Moritz.AssistantComposer
         {
         }
 
-        /// <summary>
-        /// The values are checked for consistency in the base constructor.
-        /// </summary>
-        public override List<byte> MidiChannels()
-        {
-            return new List<byte>() { 0, 1, 2, 3, 4, 5, 6, 7 };
-        }
+        public override int NumberOfInputVoices { get { return 0; } }
+        public override int NumberOfOutputVoices { get { return 8; } }
+        public override int NumberOfBars { get { return 5; } }
 
         /// <summary>
         /// The DoAlgorithm() function is special to a particular composition.
@@ -65,21 +61,12 @@ namespace Moritz.AssistantComposer
                 bars.Add(bar);
             }
 
-            Debug.Assert(bars.Count == NumberOfBars());
+            Debug.Assert(bars.Count == NumberOfBars);
 
             List<byte> masterVolumes = new List<byte>() { 100, 100, 100, 100, 100, 100, 100, 100 };
             base.SetOutputVoiceMasterVolumes(bars[0], masterVolumes);
 
             return bars;
-        }
-
-        /// <summary>
-        /// The number of bars produced by DoAlgorithm().
-        /// </summary>
-        /// <returns></returns>
-        public override int NumberOfBars()
-        {
-            return 5;
         }
 
         #region CreateBar1()

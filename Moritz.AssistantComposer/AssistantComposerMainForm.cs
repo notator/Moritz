@@ -38,7 +38,7 @@ namespace Moritz.AssistantComposer
 
             _algorithmName = Path.GetFileNameWithoutExtension(settingsPath);
             _algorithm = Algorithm(_algorithmName);
-            _numberOfChannels = _algorithm.MidiChannels().Count;
+            _outputChannels = GetOutputChannels(_algorithm.NumberOfOutputVoices);
 
             SetScoreComboBoxItems(_settingsFolderPath);
             string scoreName = Path.GetFileNameWithoutExtension(_settingsPath);
@@ -53,31 +53,36 @@ namespace Moritz.AssistantComposer
 
             if(MidiChannelsPerStaffTextBox.Text == "")
             {
-                SetDefaultMidiChannelsPerStaff(_algorithm.MidiChannels());
+                SetDefaultMidiChannelsPerStaff(_algorithm.NumberOfOutputVoices);
             }
         }
 
-        private void SetDefaultMidiChannelsPerStaff(List<byte> algorithmMidiChannels)
+        private void SetDefaultMidiChannelsPerStaff(int nMidiChannels)
         {
-            string byteList = M.ByteListToString(algorithmMidiChannels);
-            byteList = byteList.Replace(" ", ", ");
-            MidiChannelsPerStaffTextBox.Text = byteList;
+            StringBuilder channelList = new StringBuilder();
+            for(int i = 0; i < nMidiChannels; ++i)
+            {
+                channelList.Append(i.ToString());
+                channelList.Append(", ");
+            }
+            channelList.Remove(channelList.Length - 2, 2);
+            MidiChannelsPerStaffTextBox.Text = channelList.ToString();
             MidiChannelsPerStaffTextBox_Leave(null, null);
         }
 
-        private void InitMidiChannelsPerStaffFields(List<byte> midiChannels)
+        private void InitMidiChannelsPerStaffFields(int nMidiChannels)
         {
-            if(midiChannels.Count == 1)
+            if(nMidiChannels == 1)
             {
-                MidiChannelsPerStaffHelpLabel.Text = "channel: " + midiChannels[0].ToString();
+                MidiChannelsPerStaffHelpLabel.Text = "channel: 0";
             }
             else
             {
                 StringBuilder sb = new StringBuilder();
-                foreach(byte channel in midiChannels)
+                for(int i = 0; i < nMidiChannels; ++i)
                 {
                     sb.Append(", ");
-                    sb.Append(channel.ToString());
+                    sb.Append(i.ToString());
                 }
                 sb.Remove(0, 2);
                 sb.Insert(0, "channels: ");
@@ -868,7 +873,7 @@ namespace Moritz.AssistantComposer
                     else
                         currentStartBar = startBars[i];
                 }
-                if(startBars[0] != 1 || startBars[startBars.Count - 1] > _algorithm.NumberOfBars())
+                if(startBars[0] != 1 || startBars[startBars.Count - 1] > _algorithm.NumberOfBars)
                     SetTextBoxState(SystemStartBarsTextBox, false);
                 else
                     SetTextBoxState(SystemStartBarsTextBox, true);
@@ -1287,10 +1292,10 @@ namespace Moritz.AssistantComposer
         {
             LoadSettings(settingsPath);
 
-            InitMidiChannelsPerStaffFields(algorithm.MidiChannels());
-            InitInputVoiceIndicesPerStaffFields(algorithm.NumberOfInputVoices());
+            InitMidiChannelsPerStaffFields(algorithm.NumberOfOutputVoices);
+            InitInputVoiceIndicesPerStaffFields(algorithm.NumberOfInputVoices);
 
-            SetSystemStartBarsHelpLabel(algorithm.NumberOfBars());
+            SetSystemStartBarsHelpLabel(algorithm.NumberOfBars);
             MidiChannelsPerStaffTextBox_Leave(null, null); // sets _numberOfOutputStaves _numberOfStaves
             InputVoiceIndicesPerStaffTextBox_Leave(null, null); // sets _numberOfInputStaves, _numberOfStaves
             SetSettingsHaveBeenSaved();
@@ -1375,27 +1380,26 @@ namespace Moritz.AssistantComposer
                 "chord symbols, they can be notated on 3 staves by entering '3:1, 0:2, 4:5' into the field. Midi channels 2 " +
                 "and 3 can be notated on separate staves, omitting the other channels, by entering '2, 3'.";
 
-            List<byte> midiChannelBytes = _algorithm.MidiChannels();
             StringBuilder midiChannelsSB = new StringBuilder();
             midiChannelsSB.Append(mainText);
             midiChannelsSB.Append("\n\nThe current algorithm ");
-            if(midiChannelBytes.Count == 1)
-                midiChannelsSB.Append("only uses\noutput channel index " + midiChannelBytes[0].ToString());
+            if(_outputChannels.Count == 1)
+                midiChannelsSB.Append("only uses\noutput channel index 0");
             else
                 midiChannelsSB.Append("uses\noutput channel indices ");
 
-            for(int i = 0; i < midiChannelBytes.Count; ++i)
+            for(int i = 0; i < _outputChannels.Count; ++i)
             {
                 if(i > 0)
                 {
-                    if(i == (midiChannelBytes.Count - 1))
+                    if(i == (_outputChannels.Count - 1))
                         midiChannelsSB.Append(" and ");
                     else
                         midiChannelsSB.Append(", ");
                 }
-                midiChannelsSB.Append(midiChannelBytes[i].ToString());
+                midiChannelsSB.Append(_outputChannels[i].ToString());
             }
-            int nInputVoices = _algorithm.NumberOfInputVoices();
+            int nInputVoices = _algorithm.NumberOfInputVoices;
             if(nInputVoices == 0)
                 midiChannelsSB.Append(",\nand has no input voices.\n\n");
             else if(nInputVoices == 1)
@@ -1414,6 +1418,16 @@ namespace Moritz.AssistantComposer
             }
 
             return midiChannelsSB;
+        }
+
+        private List<byte> GetOutputChannels(int nOutputChannels)
+        {
+            List<byte> rval = new List<byte>();
+            for(byte i = 0; i < nOutputChannels; ++i)
+            {
+                rval.Add(i);
+            }
+            return rval;
         }
 
         #region helper functions
@@ -1557,7 +1571,7 @@ namespace Moritz.AssistantComposer
                     }
                     foreach(byte channel in channels)
                     {
-                        if(!_algorithm.MidiChannels().Contains(channel))
+                        if(!_outputChannels.Contains(channel))
                         {
                             error = true;
                             break;
@@ -1614,7 +1628,7 @@ namespace Moritz.AssistantComposer
                     }
                     foreach(byte channel in outputVoiceIndices)
                     {
-                        if(channel < 0 || channel >= _algorithm.NumberOfInputVoices())
+                        if(channel < 0 || channel >= _algorithm.NumberOfInputVoices)
                         {
                             error = true;
                             break;
@@ -1835,8 +1849,7 @@ namespace Moritz.AssistantComposer
         private IMoritzForm1 _moritzForm1;
         private Moritz.Krystals.KrystalBrowser _krystalBrowser = null;
         private DimensionsAndMetadataForm _dimensionsAndMetadataForm;
-        private int _numberOfChannels = 0;
-
+        private List<byte> _outputChannels = null;
         
         private List<List<byte>> _midiChannelsPerStaff; // set in MidiChannelsPerStaffTextBox_Leave
         private List<List<byte>> _inputVoiceIndicesPerStaff; // set in InputVoiceIndicesPerStaffTextBox_Leave

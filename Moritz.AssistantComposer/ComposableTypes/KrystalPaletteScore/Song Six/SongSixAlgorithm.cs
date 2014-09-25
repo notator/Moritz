@@ -22,22 +22,9 @@ namespace Moritz.AssistantComposer.SongSix
         {
         }
 
-        /// <summary>
-        /// The values are then checked for consistency in the base constructor.
-        /// </summary>
-        public override List<byte> MidiChannels()
-        {
-            return new List<byte>() { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
-        }
-
-        /// <summary>
-        /// The number of bars produced by DoAlgorithm().
-        /// </summary>
-        /// <returns></returns>
-        public override int NumberOfBars()
-        {
-            return 106;
-        }
+        public override int NumberOfInputVoices { get { return 0; } }
+        public override int NumberOfOutputVoices { get { return 9; } }
+        public override int NumberOfBars { get { return 106; } }
 
         /// <summary>
         /// The DoAlgorithm() function is special to a particular composition.
@@ -141,7 +128,7 @@ namespace Moritz.AssistantComposer.SongSix
             // Add each voiceDef to voiceDefs here, in top to bottom (=channelIndex) order in the score.
             List<OutputVoiceDef> voiceDefs = new List<OutputVoiceDef>() { furies1, furies2, furies3, furies4, control, clytemnestra, wind1, wind2, wind3 };
             
-            Debug.Assert(voiceDefs.Count == MidiChannels().Count);
+            Debug.Assert(voiceDefs.Count == NumberOfOutputVoices);
 
             //********************************************************
             //foreach(VoiceDef voiceDef in voiceDefs)
@@ -445,7 +432,7 @@ namespace Moritz.AssistantComposer.SongSix
                 #endregion
             };
 
-            Debug.Assert(barlineMsPositions.Count == NumberOfBars() + 1); // includes bar 1 (mPos=0) and the final barline.
+            Debug.Assert(barlineMsPositions.Count == NumberOfBars + 1); // includes bar 1 (mPos=0) and the final barline.
 
             return barlineMsPositions;
         }
@@ -602,7 +589,7 @@ namespace Moritz.AssistantComposer.SongSix
             // barlineMsPositions contains both msPos=0 and the position of the final barline
             List<List<Voice>> bars = new List<List<Voice>>();
             bars = GetBarsFromBarlineMsPositions(system, barlineMsPositions);
-            Debug.Assert(bars.Count == NumberOfBars());
+            Debug.Assert(bars.Count == NumberOfBars);
             return bars;
         }
 

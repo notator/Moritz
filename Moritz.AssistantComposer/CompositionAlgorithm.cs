@@ -10,11 +10,14 @@ namespace Moritz.AssistantComposer
 {
     /// <summary>
     /// A CompositionAlgorithm is special to a particular composition.
-    /// When called, the DoAlgorithm() function returns a list of VoiceDef lists, whereby
-    /// each contained VoiceDef list is the definition of a bar (i.e. a place where a system
-    /// can be broken). Algorithms are independent of the notation and page format.
-    /// The VoiceDefs are converted to real Voices (containing real NoteObjects) later,
-    /// using options set for the score in the Assistant Composer (using the score's .mkss file). 
+    /// When called, the DoAlgorithm() function returns a list of VoiceDef lists,
+    /// whereby each contained VoiceDef list is the definition of a bar (a bar is
+    /// a place where a system can be broken).
+    /// Algorithms don't control the page format, how many bars per system there
+    /// are, or the shapes of the symbols. Those things are set for a particular
+    /// score in an .mkss file using the Assistant Composer's main form.
+    /// The VoiceDefs returned from DoAlgorithm() are converted to real Voices
+    /// (containing real NoteObjects) later, using the options set an .mkss file. 
     /// </summary>
     public abstract class CompositionAlgorithm
     {
@@ -22,32 +25,38 @@ namespace Moritz.AssistantComposer
         {
             _krystals = krystals;
             _palettes = palettes;
-            CheckMidiChannels();
+            CheckParameters();
         }
 
-        protected void CheckMidiChannels()
+        protected void CheckParameters()
         {
-            List<byte> midiChannels = MidiChannels();
-            Debug.Assert(midiChannels != null && midiChannels.Count > 0, "MidiCompositionAlgorithm: No midi channels!");
-            for(int i = 0; i < midiChannels.Count; ++i)
-            {
-                Debug.Assert(midiChannels[i] >= 0, "MidiCompositionAlgorithm: Midi channel index must be >= 0!");
-                if(i > 0)
-                {
-                    Debug.Assert(midiChannels[i] > midiChannels[i - 1], "MidiCompositionAlgorithm: Midi channels must be unique, and in ascending order.");
-                }
-            }
+            Debug.Assert(NumberOfOutputVoices > 0, "CompositionAlgorithm: There must be at least one output voice!");
+            Debug.Assert(NumberOfOutputVoices <= 16, "CompositionAlgorithm: There can not be more than 16 output voices.");
+
+            Debug.Assert(NumberOfInputVoices >= 0, "CompositionAlgorithm: There can not be a negative number of input voices!");
+            // I assume that a single performer will never need more than three staves @ two voices...
+            // As far as I know, this restriction is not really necessary as far as the software is concerned, but it may help
+            // reduce errors.
+            Debug.Assert(NumberOfInputVoices <= 6, "CompositionAlgorithm: There should not be more than six input voices!");
+
+            Debug.Assert(NumberOfBars > 0, "CompositionAlgorithm: There must be at least one bar!");            
         }
 
         /// <summary>
-        /// This function returns the list of midi channels used by the algorithm.
-        /// The returned list must contain at least one channel, and all channel indices must be greater
-        /// than 0. The midi channels do not have to be contiguous.
-        /// The user decides the number of staves and the order of the midi channels
-        /// from top to bottom in the notated score. A maximum of two voices per staff is possible.
-        /// See also the DoAlgorithm() comment (below).
+        /// Returns the number of outputVoices created by the algorithm.
         /// </summary>
-        public abstract List<byte> MidiChannels();
+        public abstract int NumberOfOutputVoices {get;}
+
+        /// <summary>
+        /// Returns the number of inputVoices created by the algorithm.
+        /// </summary>
+        public abstract int NumberOfInputVoices { get; }
+
+        /// <summary>
+        /// Returns the number of bars created by the algorithm.
+        /// </summary>
+        /// <returns></returns>
+        public abstract int NumberOfBars { get; }
 
         /// <summary>
         /// The DoAlgorithm() function is special to a particular composition.
@@ -73,19 +82,6 @@ namespace Moritz.AssistantComposer
         /// default values, and assigned to this.InputControls (see below).
         /// </summary>
         public abstract List<List<Voice>> DoAlgorithm();
-        /// <summary>
-        /// Returns the number of bars created by the algorithm.
-        /// </summary>
-        /// <returns></returns>
-        public abstract int NumberOfBars();
-        /// <summary>
-        /// Returns the number of inputVoices created by the algorithm.
-        /// </summary>
-        /// <returns></returns>
-        public virtual int NumberOfInputVoices()
-        {
-            return 0;
-        }
 
         /// <summary>
         /// Returns the position of the end of the last UniqueMidiDurationDef
@@ -285,7 +281,7 @@ namespace Moritz.AssistantComposer
         /// <param name="masterVolumes">A list with one value per OutputVoice</param>
         protected void SetOutputVoiceMasterVolumes(List<Voice> firstBar, List<byte> masterVolumes)
         {
-            Debug.Assert(masterVolumes.Count == MidiChannels().Count); // == number of OutputVoices.
+            Debug.Assert(masterVolumes.Count == NumberOfOutputVoices);
             for(int i = 0; i < masterVolumes.Count; ++i)
             {
                 OutputVoice oVoice = firstBar[i] as OutputVoice;
@@ -302,9 +298,8 @@ namespace Moritz.AssistantComposer
         /// <param name="inputControlsList">A list with one value per OutputVoice</param>
         protected void SetOutputVoiceInputControls(List<Voice> bar1, List<InputControls> inputControlsList)
         {
-            int nOutputVoices = MidiChannels().Count;
-            Debug.Assert(inputControlsList.Count == nOutputVoices); // == number of OutputVoices.
-            for(int i = 0; i < nOutputVoices; ++i)
+            Debug.Assert(inputControlsList.Count == NumberOfOutputVoices); // == number of OutputVoices.
+            for(int i = 0; i < NumberOfOutputVoices; ++i)
             {
                 OutputVoice oVoice = bar1[i] as OutputVoice;
                 Debug.Assert(oVoice != null);

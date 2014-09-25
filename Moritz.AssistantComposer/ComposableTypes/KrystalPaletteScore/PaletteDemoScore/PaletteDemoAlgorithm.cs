@@ -18,13 +18,9 @@ namespace Moritz.AssistantComposer
         {
         }
 
-        /// <summary>
-        /// The values are then checked for consistency in the base constructor.
-        /// </summary>
-        public override List<byte> MidiChannels()
-        {
-            return new List<byte>() { 0 };
-        }
+        public override int NumberOfInputVoices { get { return 0; } }
+        public override int NumberOfOutputVoices { get { return 1; } }
+        public override int NumberOfBars { get { return 1; } }
 
         /// <summary>
         /// Sets the midi content of the score, independent of its notation.
@@ -56,18 +52,9 @@ namespace Moritz.AssistantComposer
             List<byte> masterVolumes = new List<byte>() {127};
             SetOutputVoiceMasterVolumes(voicesPerSystem[0], masterVolumes);
 
-            Debug.Assert(voicesPerSystem.Count == NumberOfBars());
+            Debug.Assert(voicesPerSystem.Count == NumberOfBars);
 
             return voicesPerSystem;
-        }
-
-        /// <summary>
-        /// The number of bars produced by DoAlgorithm().
-        /// </summary>
-        /// <returns></returns>
-        public override int NumberOfBars()
-        {
-            return 1;
         }
     }
 }

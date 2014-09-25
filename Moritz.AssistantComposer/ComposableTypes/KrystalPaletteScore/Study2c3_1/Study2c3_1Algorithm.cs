@@ -22,13 +22,9 @@ namespace Moritz.AssistantComposer
         {
         }
 
-        /// <summary>
-        /// The values are then checked for consistency in the base constructor.
-        /// </summary>
-        public override List<byte> MidiChannels()
-        {
-            return new List<byte>() { 0, 1, 2 };
-        }
+        public override int NumberOfInputVoices { get { return 0; } }
+        public override int NumberOfOutputVoices { get { return 3; } }
+        public override int NumberOfBars { get { return 74; } }
 
         /// <summary>
         /// The DoAlgorithm() function is special to a particular composition.
@@ -68,22 +64,12 @@ namespace Moritz.AssistantComposer
                 bars.Add(bar);
             }
 
-            Debug.Assert(bars.Count == NumberOfBars());
+            Debug.Assert(bars.Count == NumberOfBars);
 
             List<byte> masterVolumes = new List<byte>() { 100, 100, 100 };
             base.SetOutputVoiceMasterVolumes(bars[0], masterVolumes);
 
             return bars;
-        }
-
-        /// <summary>
-        /// The number of bars produced by DoAlgorithm().
-        /// </summary>
-        /// <returns></returns>
-        public override int NumberOfBars()
-        {
-            // this value was determined experimentally when running the algorithm 
-            return 74;
         }
 
         private List<Voice> WriteTopStaff()
@@ -93,7 +79,7 @@ namespace Moritz.AssistantComposer
             int msPosition = 0;
             for(int barIndex = 0; barIndex < dcValuesPerTopStaffBar.Count; barIndex++)
             {
-                Voice voice = new OutputVoice(null, this.MidiChannels()[0]);
+                Voice voice = new OutputVoice(null, 0);
                 List<int> sequence = dcValuesPerTopStaffBar[barIndex];
                 WriteDurationSymbolsForStrandInTopStaff(voice, barIndex, sequence, ref msPosition);
                 consecutiveBars.Add(voice);
@@ -125,7 +111,7 @@ namespace Moritz.AssistantComposer
             for(int barIndex = 0; barIndex < strandValuesList.Count; barIndex++)
             {
                 Voice topStaffVoice =  topStaffBars[barIndex];
-                Voice newVoice = new OutputVoice(null, MidiChannels()[staffNumber - 1]);
+                Voice newVoice = new OutputVoice(null, (byte) (staffNumber - 1));
                 int currentMsPosition = topStaffVoice.UniqueDefs[0].MsPosition;
 
                 List<int> lowerStaffValueSequence = strandValuesList[barIndex];
