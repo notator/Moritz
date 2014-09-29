@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System;
 
 using Moritz.Xml;
-using Moritz.VoiceDef;
+using Moritz.Spec;
 
 namespace Moritz.Symbols
 {

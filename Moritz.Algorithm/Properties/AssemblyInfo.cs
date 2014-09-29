@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Moritz.VoiceDefs")]
+[assembly: AssemblyTitle("Moritz.Algorithm")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Moritz.VoiceDefs")]
+[assembly: AssemblyProduct("Moritz.Algorithm")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("00579d6e-e498-4a1f-ae11-4934a6c2a3b6")]
+[assembly: Guid("8e91cc90-1fa7-4412-a55f-e1dff12184c2")]
 
 // Version information for an assembly consists of the following four values:
 //

@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 using Moritz.Xml;
 
-namespace Moritz.VoiceDef
+namespace Moritz.Spec
 {
     /// <summary>
     /// The following classes contain an InputControls field:

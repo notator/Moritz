@@ -2,9 +2,10 @@ using System.Collections.Generic;
 using System.Xml;
 using System.Diagnostics;
 
+using Krystals4ObjectLibrary;
 using Moritz.Globals;
 
-namespace Moritz.VoiceDef
+namespace Moritz.Spec
 {
     public class BasicMidiChordDef
     {

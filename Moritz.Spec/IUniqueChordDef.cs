@@ -1,6 +1,10 @@
+
 using System.Collections.Generic;
 
-namespace Moritz.VoiceDef
+using Krystals4ObjectLibrary;
+using Moritz.Globals;
+
+namespace Moritz.Spec
 {
     ///<summary>
     /// IUniqueChordDef is implemented by all IUniqueDef objects that have pitches.

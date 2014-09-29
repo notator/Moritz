@@ -1,5 +1,8 @@
 
-namespace Moritz.VoiceDef
+using Krystals4ObjectLibrary;
+using Moritz.Globals;
+
+namespace Moritz.Spec
 {
     public abstract class DurationDef
     {

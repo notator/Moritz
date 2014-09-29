@@ -2,11 +2,13 @@ using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Xml;
+using System.Text;
 
+using Krystals4ObjectLibrary;
 using Moritz.Globals;
 using Moritz.Xml;
 
-namespace Moritz.VoiceDef
+namespace Moritz.Spec
 {
     ///<summary>
     /// A InputChordDef can be saved and retrieved from voices in an SVG file.
@@ -209,9 +211,9 @@ namespace Moritz.VoiceDef
         private void CheckThisIsInBar(List<VoiceDef> bar)
         {
             bool found = false;
-            foreach(VoiceDef v in bar)
+            foreach(VoiceDef voiceDef in bar)
             {
-                InputVoiceDef iv = v as InputVoiceDef;
+                InputVoiceDef iv = voiceDef as InputVoiceDef;
                 if(iv != null)
                 {
                     foreach(InputChordDef icd in iv.InputChordDefs)

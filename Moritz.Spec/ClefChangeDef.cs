@@ -1,7 +1,10 @@
 using System;
 using System.Diagnostics;
 
-namespace Moritz.VoiceDef
+using Krystals4ObjectLibrary;
+using Moritz.Globals;
+
+namespace Moritz.Spec
 {
     ///<summary>
     /// A ClefChangeDef is a IUniqueMidiDurationDef which can be created while programming a score.

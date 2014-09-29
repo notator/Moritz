@@ -1,6 +1,8 @@
 
+using Krystals4ObjectLibrary;
+using Moritz.Globals;
 
-namespace Moritz.VoiceDef
+namespace Moritz.Spec
 {
     ///<summary>
     /// IUniqueDef is implemented by all objects that can be added to a VoiceDefs.UniqueDefs list.

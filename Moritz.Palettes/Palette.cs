@@ -6,7 +6,7 @@ using Krystals4ObjectLibrary;
 using Moritz.Globals;
 using Moritz.Midi;
 using Moritz.Symbols;
-using Moritz.VoiceDef;
+using Moritz.Spec;
 
 namespace Moritz.Palettes
 {
@@ -186,7 +186,7 @@ namespace Moritz.Palettes
 
                     Debug.Assert(basicMidiChordDefs[0].PatchIndex != null);
 
-                    basicMidiChordDefs = Moritz.VoiceDef.MidiChordDef.FitToDuration(basicMidiChordDefs, duration, ornamentMinMsDuration);
+                    basicMidiChordDefs = Moritz.Spec.MidiChordDef.FitToDuration(basicMidiChordDefs, duration, ornamentMinMsDuration);
 
                     foreach(BasicMidiChordDef b in basicMidiChordDefs)
                     {

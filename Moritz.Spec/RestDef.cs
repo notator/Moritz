@@ -1,6 +1,8 @@
 
+using Krystals4ObjectLibrary;
+using Moritz.Globals;
 
-namespace Moritz.VoiceDef
+namespace Moritz.Spec
 {
     ///<summary>
     /// A RestDef is a unique rest definition which is saved locally in an SVG file.

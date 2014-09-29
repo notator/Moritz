@@ -2,6 +2,7 @@ using System;
 using System.Text;
 
 using Moritz.Xml;
+using Moritz.Spec;
 
 namespace Moritz.Symbols
 {

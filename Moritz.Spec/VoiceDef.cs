@@ -7,7 +7,7 @@ using System.Collections;
 using Krystals4ObjectLibrary;
 using Moritz.Globals;
 
-namespace Moritz.VoiceDef
+namespace Moritz.Spec
 {
     /// <summary>
     /// A temporal sequence of IUniqueDef objects.
@@ -133,11 +133,11 @@ namespace Moritz.VoiceDef
         #endregion
         #endregion public indexer & enumerators
 
-        #region internal
+        #region public
 
         #region Count changers
         #region list functions
-        internal abstract void Add(IUniqueDef iUniqueDef);
+        public abstract void Add(IUniqueDef iUniqueDef);
         protected void _Add(IUniqueDef iUniqueDef)
         {
             Debug.Assert(_uniqueDefs.Count > 0);
@@ -150,7 +150,7 @@ namespace Moritz.VoiceDef
             _uniqueDefs.AddRange(voiceDef.UniqueDefs);
             SetMsPositions();
         }
-        internal abstract void Insert(int index, IUniqueDef iUniqueDef);
+        public abstract void Insert(int index, IUniqueDef iUniqueDef);
         protected void _Insert(int index, IUniqueDef iUniqueDef)
         {
             _uniqueDefs.Insert(index, iUniqueDef);
@@ -259,7 +259,7 @@ namespace Moritz.VoiceDef
         /// <summary>
         /// removes the iUniqueDef from the list, and then resets the positions of all the iUniques in the list.
         /// </summary>
-        internal void Remove(IUniqueDef iUniqueDef)
+        public void Remove(IUniqueDef iUniqueDef)
         {
             Debug.Assert(_uniqueDefs.Count > 0);
             Debug.Assert(_uniqueDefs.Contains(iUniqueDef));
@@ -269,7 +269,7 @@ namespace Moritz.VoiceDef
         /// <summary>
         /// Removes the iUniqueMidiDurationDef at index from the list, and then resets the positions of all the lmdds in the list.
         /// </summary>
-        internal void RemoveAt(int index)
+        public void RemoveAt(int index)
         {
             Debug.Assert(index >= 0 && index < _uniqueDefs.Count);
             _uniqueDefs.RemoveAt(index);
@@ -278,7 +278,7 @@ namespace Moritz.VoiceDef
         /// <summary>
         /// Removes count iUniqueDefs from the list, startíng with the iUniqueDef at index.
         /// </summary>
-        internal void RemoveRange(int index, int count)
+        public void RemoveRange(int index, int count)
         {
             Debug.Assert(index >= 0 && count >= 0 && ((index + count) <= _uniqueDefs.Count));
             _uniqueDefs.RemoveRange(index, count);
@@ -289,7 +289,7 @@ namespace Moritz.VoiceDef
         /// </summary>
         /// <param name="p1"></param>
         /// <param name="p2"></param>
-        internal void RemoveBetweenMsPositions(int startMsPos, int endMsPos)
+        public void RemoveBetweenMsPositions(int startMsPos, int endMsPos)
         {
             IUniqueDef iumdd = _uniqueDefs.Find(f => (f.MsPosition >= startMsPos) && (f.MsPosition < endMsPos));
             while(iumdd != null)
@@ -313,7 +313,7 @@ namespace Moritz.VoiceDef
         /// From startMsPosition to (not including) endMsPosition,
         /// replace all MidiChordDefs or InputChordDefs by UniqueMidiRestDefs, then aglommerate the rests.
         /// </summary>
-        internal void Erase(int startMsPosition, int endMsPosition)
+        public void Erase(int startMsPosition, int endMsPosition)
         {
             int beginIndex = FindIndexAtMsPosition(startMsPosition);
             int endIndex = FindIndexAtMsPosition(endMsPosition);
@@ -336,7 +336,7 @@ namespace Moritz.VoiceDef
         /// <summary>
         /// Extracts nUniqueDefs from the uniqueDefs, and then inserts them again at the toIndex.
         /// </summary>
-        internal void Translate(int fromIndex, int nUniqueDefs, int toIndex)
+        public void Translate(int fromIndex, int nUniqueDefs, int toIndex)
         {
             Debug.Assert((fromIndex + nUniqueDefs) <= _uniqueDefs.Count);
             Debug.Assert(toIndex <= (_uniqueDefs.Count - nUniqueDefs));
@@ -353,7 +353,7 @@ namespace Moritz.VoiceDef
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        internal int FindIndexAtMsPosition(int msPosition)
+        public int FindIndexAtMsPosition(int msPosition)
         {
             int returnedIndex = -1;
             if(msPosition == EndMsPosition)
@@ -375,7 +375,7 @@ namespace Moritz.VoiceDef
         /// This does not change the VoiceDef's MsPosition, but does affect its EndMsPosition.
         /// </summary>
         /// <param name="msDuration"></param>
-        internal void SetMsDuration(int msDuration)
+        public void SetMsDuration(int msDuration)
         {
             Debug.Assert(msDuration > 0);
 
@@ -408,7 +408,7 @@ namespace Moritz.VoiceDef
         /// <summary>
         /// Removes all the rests in this VoiceDef
         /// </summary>
-        internal void RemoveRests()
+        public void RemoveRests()
         {
             AdjustMsDurations<RestDef>(0, _uniqueDefs.Count, 0);
         }
@@ -417,7 +417,7 @@ namespace Moritz.VoiceDef
         /// If a chord or rest's MsDuration becomes less than minThreshold, it is removed.
         /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
-        internal void AdjustMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
+        public void AdjustMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
         {
             AdjustMsDurations<DurationDef>(beginIndex, endIndex, factor, minThreshold);
         }
@@ -426,7 +426,7 @@ namespace Moritz.VoiceDef
         /// If a chord or rest's MsDuration becomes less than minThreshold, it is removed.
         /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
-        internal void AdjustMsDurations(double factor, int minThreshold = 100)
+        public void AdjustMsDurations(double factor, int minThreshold = 100)
         {
             AdjustMsDurations<DurationDef>(0, _uniqueDefs.Count, factor, minThreshold);
         }
@@ -435,7 +435,7 @@ namespace Moritz.VoiceDef
         /// If a rest's MsDuration becomes less than minThreshold, it is removed.
         /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
-        internal void AdjustRestMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
+        public void AdjustRestMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
         {
             AdjustMsDurations<RestDef>(beginIndex, endIndex, factor, minThreshold);
         }
@@ -444,7 +444,7 @@ namespace Moritz.VoiceDef
         /// If a rest's MsDuration becomes less than minThreshold, it is removed.
         /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
-        internal void AdjustRestMsDurations(double factor, int minThreshold = 100)
+        public void AdjustRestMsDurations(double factor, int minThreshold = 100)
         {
             AdjustMsDurations<RestDef>(0, _uniqueDefs.Count, factor, minThreshold);
         }
@@ -500,7 +500,7 @@ namespace Moritz.VoiceDef
         /// This function changes the msDuration in the given index range.
         /// endIndex can be equal to this.Count.
         /// </summary>
-        internal void CreateAccel(int beginIndex, int endIndex, double startEndRatio)
+        public void CreateAccel(int beginIndex, int endIndex, double startEndRatio)
         {
             Debug.Assert(((beginIndex + 1) < endIndex) && (startEndRatio >= 0) && (endIndex <= Count));
 
@@ -523,7 +523,7 @@ namespace Moritz.VoiceDef
         /// <summary>
         /// Combines all consecutive rests.
         /// </summary>
-        internal void AgglomerateRests()
+        public void AgglomerateRests()
         {
             if(_uniqueDefs.Count > 1)
             {
@@ -553,13 +553,13 @@ namespace Moritz.VoiceDef
 
         #endregion Count changers
 
-        #region internal properties
+        #region public properties
         /// <summary>
         /// The absolute position of the first note or rest in the sequence.
         /// Setting this value resets all the MsPositions in this VoiceDef,
         /// including the EndMsPosition.
         /// </summary>
-        internal int StartMsPosition 
+        public int StartMsPosition 
         { 
             get 
             { 
@@ -578,7 +578,7 @@ namespace Moritz.VoiceDef
         /// Setting this value changes the msDuration of the final IUniqueMidiDurationDef.
         /// (The EndMsPosition cannot be set if this VoiceDef is empty, or before the last IUniqueMidiDurationDef.) 
         /// </summary>
-        internal int EndMsPosition 
+        public int EndMsPosition 
         { 
             get 
             {
@@ -598,11 +598,11 @@ namespace Moritz.VoiceDef
                 lastLmdd.MsDuration = value - lastLmdd.MsPosition;
             }
         }
-        internal int Count { get { return _uniqueDefs.Count; } }
+        public int Count { get { return _uniqueDefs.Count; } }
 
-        #endregion internal properties
+        #endregion public properties
 
-        #region internal attribute changers (Transpose etc.)
+        #region public attribute changers (Transpose etc.)
 
         /// <summary>
         /// An object is a NonMidiOrInputChordDef if it is not a MidiChordDef and it is not an InputChordDef.
@@ -631,7 +631,7 @@ namespace Moritz.VoiceDef
         /// In this case, they are silently coerced to 0 or 127 respectively.
         /// </summary>
         /// <param name="interval"></param>
-        internal void Transpose(int beginIndex, int endIndex, int interval)
+        public void Transpose(int beginIndex, int endIndex, int interval)
         {
             CheckIndices(beginIndex, endIndex);
             for(int i = beginIndex; i < endIndex; ++i)
@@ -647,7 +647,7 @@ namespace Moritz.VoiceDef
         /// Transpose the whole VoiceDef up by the number of semitones given in the argument.
         /// </summary>
         /// <param name="interval"></param>
-        internal void Transpose(int interval)
+        public void Transpose(int interval)
         {
             Transpose(0, _uniqueDefs.Count, interval);
         }
@@ -658,7 +658,7 @@ namespace Moritz.VoiceDef
         /// it is silently coerced to 0 or 127 respectively.
         /// </summary>
         /// <param name="p"></param>
-        internal void TransposeNotation(int semitonesToTranspose)
+        public void TransposeNotation(int semitonesToTranspose)
         {
             foreach(IUniqueDef iud in _uniqueDefs)
             {
@@ -678,7 +678,7 @@ namespace Moritz.VoiceDef
         /// The argument contains a dictionary[msPosition, transposition].
         /// </summary>
         /// <param name="msPosTranspositionDict"></param>
-        internal void TransposeToDict(Dictionary<int, int> msPosTranspositionDict)
+        public void TransposeToDict(Dictionary<int, int> msPosTranspositionDict)
         {
             List<int> dictPositions = new List<int>(msPosTranspositionDict.Keys);
 
@@ -710,7 +710,7 @@ namespace Moritz.VoiceDef
         /// beginIndex must be less than endIndex.
         /// glissInterval can be negative.
         /// </summary>
-        internal void StepwiseGliss(int beginIndex, int endIndex, int glissInterval)
+        public void StepwiseGliss(int beginIndex, int endIndex, int glissInterval)
         {
             CheckIndices(beginIndex, endIndex);
             Debug.Assert(beginIndex < endIndex);
@@ -733,7 +733,7 @@ namespace Moritz.VoiceDef
             }
         }
 
-        #endregion  internal attribute changers (Transpose etc.)
+        #endregion  public attribute changers (Transpose etc.)
 
         #region alignment
         /// <summary>
@@ -746,7 +746,7 @@ namespace Moritz.VoiceDef
         ///     3. toPosition is greater than the msPosition at anchor1Index and less than the msPosition at anchor2Index.
         /// and throws an appropriate exception if there is a problem.
         /// </summary>
-        internal void AlignObjectAtIndex(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPosition)
+        public void AlignObjectAtIndex(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPosition)
         {
             // throws an exception if there's a problem.
             CheckAlignDefArgs(anchor1Index, indexToAlign, anchor2Index, toMsPosition);
@@ -841,7 +841,7 @@ namespace Moritz.VoiceDef
         }
         #endregion alignment
 
-        #region internal Permute()
+        #region public Permute()
         /// <summary>
         /// Re-orders the UniqueMidiDurationDefs in (part of) this VoiceDef.
         /// <para>1. creates partitions (lists of UniqueMidiDurationDefs) using the startAtIndex and partitionSizes in the first two</para>
@@ -871,7 +871,7 @@ namespace Moritz.VoiceDef
         /// </param>
         /// <param name="contourNumber">A value greater than or equal to 1, and less than or equal to 12. An exception is thrown if this is not the case.</param>
         /// <param name="axisNumber">A value greater than or equal to 1, and less than or equal to 12 An exception is thrown if this is not the case.</param>
-        internal void Permute(int startAtIndex, List<int> partitionSizes, int axisNumber, int contourNumber)
+        public void Permute(int startAtIndex, List<int> partitionSizes, int axisNumber, int contourNumber)
         {
             CheckSetContourArgs(startAtIndex, partitionSizes, axisNumber, contourNumber);
 
@@ -1083,16 +1083,16 @@ namespace Moritz.VoiceDef
                 throw new ArgumentException("axisNumber out of range 1..12");
             }
         }
-        #endregion internal Permute
+        #endregion public Permute
 
-        #region  internal SetLyricsToIndex()
+        #region  public SetLyricsToIndex()
 
         /// <summary>
         /// Rests dont have lyrics, so their index in the VoiceDef can't be shown as a lyric.
         /// Overridden by Clytemnestra, where the index is inserted before her lyrics.
         /// </summary>
         /// <param name="voiceDef"></param>
-        internal virtual void SetLyricsToIndex()
+        public virtual void SetLyricsToIndex()
         {
             for(int index = 0; index < _uniqueDefs.Count; ++index)
             {
@@ -1103,10 +1103,10 @@ namespace Moritz.VoiceDef
                 }
             }
         }
-        #endregion internal SetLyricsToIndex()
+        #endregion public SetLyricsToIndex()
 
-        internal List<IUniqueDef> UniqueDefs { get { return _uniqueDefs; } }
-        #endregion internal
+        public List<IUniqueDef> UniqueDefs { get { return _uniqueDefs; } }
+        #endregion public
 
         protected List<IUniqueDef> _uniqueDefs = new List<IUniqueDef>();
 
@@ -1151,7 +1151,7 @@ namespace Moritz.VoiceDef
         /// by a barline, are placed to the left of the barline.  
         /// The clefType must be one of the following strings "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"
         /// </summary>
-        internal void InsertClefChange(int index, string clefType)
+        public void InsertClefChange(int index, string clefType)
         {
             #region check args
             Debug.Assert(index < _uniqueDefs.Count); 

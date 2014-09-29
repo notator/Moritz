@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 using Multimedia.Midi;
 
-namespace Moritz.VoiceDef
+namespace Moritz.Spec
 {
     /// <summary>
     /// A list of synchronous MidiChordDefs.

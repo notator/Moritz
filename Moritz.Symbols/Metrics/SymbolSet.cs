@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 using Moritz.Xml;
-using Moritz.VoiceDef;
+using Moritz.Spec;
 
 namespace Moritz.Symbols
 {

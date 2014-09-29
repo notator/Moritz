@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 
 using Moritz.Midi;
-using Moritz.VoiceDef;
+using Moritz.Spec;
 using Moritz.Symbols;
 
 namespace Moritz.Performer

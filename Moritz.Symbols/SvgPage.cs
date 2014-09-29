@@ -8,7 +8,7 @@ using System.Xml;
 using Moritz.Globals;
 using Moritz.Midi;
 using Moritz.Xml;
-using Moritz.VoiceDef;
+using Moritz.Spec;
 
 namespace Moritz.Symbols
 {

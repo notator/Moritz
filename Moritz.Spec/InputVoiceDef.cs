@@ -1,8 +1,13 @@
 
+using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Collections;
 
-namespace Moritz.VoiceDef
+using Krystals4ObjectLibrary;
+using Moritz.Globals;
+
+namespace Moritz.Spec
 {
     /// <summary>
     /// A temporal sequence of IUniqueDef objects.
@@ -20,11 +25,20 @@ namespace Moritz.VoiceDef
     {
         #region constructors
         /// <summary>
+        /// An empty InputVoiceDef
+        /// </summary>
+        /// <param name="msDuration"></param>
+        public InputVoiceDef()
+            : base()
+        {
+        }
+
+        /// <summary>
         /// A VoiceDef beginning at MsPosition = 0, and containing a single RestDef having msDuration
         /// </summary>
         /// <param name="msDuration"></param>
-        public InputVoiceDef(int msDuration) 
-            :base(msDuration)
+        public InputVoiceDef(int msDuration)
+            : base(msDuration)
         {
         }
 
@@ -86,7 +100,7 @@ namespace Moritz.VoiceDef
         /// Appends the new iUniqueDef to the end of the list.
         /// </summary>
         /// <param name="iUniqueDef"></param>
-        internal override void Add(IUniqueDef iUniqueDef)
+        public override void Add(IUniqueDef iUniqueDef)
         {
             Debug.Assert(!(iUniqueDef is MidiChordDef));
             _Add(iUniqueDef);
@@ -95,7 +109,7 @@ namespace Moritz.VoiceDef
         /// Adds the argument to the end of this VoiceDef.
         /// Sets the MsPositions of the appended UniqueDefs.
         /// </summary>
-        internal void AddRange(InputVoiceDef voiceDef)
+        public void AddRange(InputVoiceDef voiceDef)
         {
             _AddRange((VoiceDef)voiceDef);
         }
@@ -103,7 +117,7 @@ namespace Moritz.VoiceDef
         /// Inserts the iUniqueDef in the list at the given index, and then
         /// resets the positions of all the uniqueDefs in the list.
         /// </summary>
-        internal override void Insert(int index, IUniqueDef iUniqueDef)
+        public override void Insert(int index, IUniqueDef iUniqueDef)
         {
             Debug.Assert(!(iUniqueDef is MidiChordDef));
             _Insert(index, iUniqueDef);
@@ -112,7 +126,7 @@ namespace Moritz.VoiceDef
         /// Inserts the voiceDef in the list at the given index, and then
         /// resets the positions of all the uniqueDefs in the list.
         /// </summary>
-        internal void InsertRange(int index, InputVoiceDef voiceDef)
+        public void InsertRange(int index, InputVoiceDef voiceDef)
         {
             _InsertRange(index, (VoiceDef) voiceDef);
         }
@@ -120,7 +134,7 @@ namespace Moritz.VoiceDef
         /// Creates a new InputVoiceDef containing just the argument inputChordDef,
         /// then calls the other InsertInRest() function with the voiceDef as argument. 
         /// </summary>
-        internal void InsertInRest(InputChordDef inputChordDef)
+        public void InsertInRest(InputChordDef inputChordDef)
         {
             List<IUniqueDef> iuds = new List<IUniqueDef>() { inputChordDef };
             InputVoiceDef iVoiceDef = new InputVoiceDef(iuds);
@@ -137,7 +151,7 @@ namespace Moritz.VoiceDef
         /// This function does not change the msPositions of any other chords or rests in the containing VoiceDef,
         /// It does, of course, change the indices of the inserted lmdds and the later chords and rests.
         /// </summary>
-        internal void InsertInRest(InputVoiceDef inputVoiceDef)
+        public void InsertInRest(InputVoiceDef inputVoiceDef)
         {
             Debug.Assert(inputVoiceDef[0] is InputChordDef && inputVoiceDef[inputVoiceDef.Count - 1] is InputChordDef);
             _InsertInRest((VoiceDef)inputVoiceDef);
@@ -145,7 +159,7 @@ namespace Moritz.VoiceDef
         /// <summary>
         /// Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
         /// </summary>
-        internal void Replace(int index, IUniqueDef replacementIUnique)
+        public void Replace(int index, IUniqueDef replacementIUnique)
         {
             Debug.Assert(!(replacementIUnique is MidiChordDef));
             _Replace(index, replacementIUnique);
@@ -158,7 +172,7 @@ namespace Moritz.VoiceDef
         /// If a inputChordDef's MsDuration becomes less than minThreshold, it is removed.
         /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
-        internal void AdjustChordMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
+        public void AdjustChordMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
         {
             AdjustMsDurations<InputChordDef>(beginIndex, endIndex, factor, minThreshold);
         }
@@ -167,7 +181,7 @@ namespace Moritz.VoiceDef
         /// If a inputChordDef's MsDuration becomes less than minThreshold, it is removed.
         /// The total duration of this InputVoiceDef changes accordingly.
         /// </summary>
-        internal void AdjustChordMsDurations(double factor, int minThreshold = 100)
+        public void AdjustChordMsDurations(double factor, int minThreshold = 100)
         {
             AdjustMsDurations<InputChordDef>(0, _uniqueDefs.Count, factor, minThreshold);
         }

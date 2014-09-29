@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 
 using Multimedia.Midi;
-using Moritz.VoiceDef;
+using Moritz.Spec;
 
 namespace Moritz.Midi
 {

@@ -1,5 +1,8 @@
 
-namespace Moritz.VoiceDef
+using Krystals4ObjectLibrary;
+using Moritz.Globals;
+
+namespace Moritz.Spec
 {
     ///<summary>
     /// IUniqueSplittableChordDef is implemented by all IUniqueChordDef objects that can be split across barlines.

@@ -2,10 +2,11 @@ using System.Collections.Generic;
 using System.Xml;
 using System.Diagnostics;
 
+using Krystals4ObjectLibrary;
 using Moritz.Globals;
 using Moritz.Xml;
 
-namespace Moritz.VoiceDef
+namespace Moritz.Spec
 {
     public class MidiChordSliderDefs
     {

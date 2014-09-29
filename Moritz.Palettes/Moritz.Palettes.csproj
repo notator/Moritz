@@ -174,13 +174,13 @@
       <Project>{d7b15444-16b2-4476-8a78-acf825494f6a}</Project>
       <Name>Moritz.Performer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Moritz.Spec\Moritz.Spec.csproj">
+      <Project>{c84026d4-800e-4590-8127-97e78b471921}</Project>
+      <Name>Moritz.Spec</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Moritz.Symbols\Moritz.Symbols.csproj">
       <Project>{df59888c-f935-4e4f-ba31-664daf79f7d6}</Project>
       <Name>Moritz.Symbols</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Moritz.VoiceDefs\Moritz.VoiceDef.csproj">
-      <Project>{de1875d2-7d34-4f78-ab41-298d7929b6f6}</Project>
-      <Name>Moritz.VoiceDef</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

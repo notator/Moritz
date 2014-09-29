@@ -44,9 +44,7 @@
     <Compile Include="DrawObjects.cs" />
     <Compile Include="FrameInfo.cs" />
     <Compile Include="Metadata.cs" />
-    <Compile Include="Metrics\CautionaryChordDef.cs" />
     <Compile Include="Metrics\ChordMetrics.cs" />
-    <Compile Include="Metrics\ClefChangeDef.cs" />
     <Compile Include="Metrics\CLichtFontMetrics.cs" />
     <Compile Include="Metrics\Edge.cs" />
     <Compile Include="Metrics\Metrics.cs" />
@@ -92,9 +90,9 @@
       <Project>{82e776e6-c819-42e6-9986-7ebdc3dffa06}</Project>
       <Name>Moritz.Midi</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Moritz.VoiceDefs\Moritz.VoiceDef.csproj">
-      <Project>{de1875d2-7d34-4f78-ab41-298d7929b6f6}</Project>
-      <Name>Moritz.VoiceDef</Name>
+    <ProjectReference Include="..\Moritz.Spec\Moritz.Spec.csproj">
+      <Project>{c84026d4-800e-4590-8127-97e78b471921}</Project>
+      <Name>Moritz.Spec</Name>
     </ProjectReference>
     <ProjectReference Include="..\Moritz.Xml\Moritz.Xml.csproj">
       <Project>{b239c302-a15d-4397-9f3c-ee6cc85440f3}</Project>

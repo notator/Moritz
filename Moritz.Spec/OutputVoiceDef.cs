@@ -2,10 +2,12 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Collections;
 
+using Krystals4ObjectLibrary;
 using Moritz.Globals;
 
-namespace Moritz.VoiceDef
+namespace Moritz.Spec
 {
     /// <summary>
     /// A temporal sequence of IUniqueDef objects.
@@ -24,11 +26,20 @@ namespace Moritz.VoiceDef
     {
         #region constructors
         /// <summary>
+        /// An empty VoiceDef
+        /// </summary>
+        /// <param name="msDuration"></param>
+        public OutputVoiceDef()
+            : base()
+        {
+        }
+
+        /// <summary>
         /// A VoiceDef beginning at MsPosition = 0, and containing a single RestDef having msDuration
         /// </summary>
         /// <param name="msDuration"></param>
-        public OutputVoiceDef(int msDuration) 
-            :base(msDuration)
+        public OutputVoiceDef(int msDuration)
+            : base(msDuration)
         {
         }
 
@@ -90,7 +101,7 @@ namespace Moritz.VoiceDef
         /// Appends the new iUniqueDef to the end of the list.
         /// </summary>
         /// <param name="iUniqueDef"></param>
-        internal override void Add(IUniqueDef iUniqueDef)
+        public override void Add(IUniqueDef iUniqueDef)
         {
             Debug.Assert(!(iUniqueDef is InputChordDef));
             _Add(iUniqueDef);
@@ -99,7 +110,7 @@ namespace Moritz.VoiceDef
         /// Adds the argument to the end of this VoiceDef.
         /// Sets the MsPositions of the appended UniqueDefs.
         /// </summary>
-        internal void AddRange(OutputVoiceDef voiceDef)
+        public void AddRange(OutputVoiceDef voiceDef)
         {
             _AddRange((VoiceDef)voiceDef);
         }
@@ -107,7 +118,7 @@ namespace Moritz.VoiceDef
         /// Inserts the iUniqueDef in the list at the given index, and then
         /// resets the positions of all the uniqueDefs in the list.
         /// </summary>
-        internal override void Insert(int index, IUniqueDef iUniqueDef)
+        public override void Insert(int index, IUniqueDef iUniqueDef)
         {
             Debug.Assert(!(iUniqueDef is InputChordDef));
             _Insert(index, iUniqueDef);
@@ -116,7 +127,7 @@ namespace Moritz.VoiceDef
         /// Inserts the voiceDef in the list at the given index, and then
         /// resets the positions of all the uniqueDefs in the list.
         /// </summary>
-        internal void InsertRange(int index, OutputVoiceDef voiceDef)
+        public void InsertRange(int index, OutputVoiceDef voiceDef)
         {
             _InsertRange(index, (VoiceDef)voiceDef);
         }
@@ -124,7 +135,7 @@ namespace Moritz.VoiceDef
         /// Creates a new OutputVoiceDef containing just the argument midiChordDef,
         /// then calls the other InsertInRest() function with the voiceDef as argument. 
         /// </summary>
-        internal void InsertInRest(MidiChordDef midiChordDef)
+        public void InsertInRest(MidiChordDef midiChordDef)
         {
             List<IUniqueDef> iuds = new List<IUniqueDef>() { midiChordDef };
             OutputVoiceDef iVoiceDef = new OutputVoiceDef(iuds);
@@ -141,7 +152,7 @@ namespace Moritz.VoiceDef
         /// This function does not change the msPositions of any other chords or rests in the containing VoiceDef,
         /// It does, of course, change the indices of the inserted lmdds and the later chords and rests.
         /// </summary>
-        internal void InsertInRest(OutputVoiceDef outputVoiceDef)
+        public void InsertInRest(OutputVoiceDef outputVoiceDef)
         {
             Debug.Assert(outputVoiceDef[0] is MidiChordDef && outputVoiceDef[outputVoiceDef.Count - 1] is MidiChordDef);
             _InsertInRest((VoiceDef)outputVoiceDef);
@@ -149,7 +160,7 @@ namespace Moritz.VoiceDef
         /// <summary>
         /// Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
         /// </summary>
-        internal void Replace(int index, IUniqueDef replacementIUnique)
+        public void Replace(int index, IUniqueDef replacementIUnique)
         {
             Debug.Assert(!(replacementIUnique is InputChordDef));
             _Replace(index, replacementIUnique);
@@ -162,7 +173,7 @@ namespace Moritz.VoiceDef
         /// If a midiChordDef's MsDuration becomes less than minThreshold, it is removed.
         /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
-        internal void AdjustChordMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
+        public void AdjustChordMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
         {
             AdjustMsDurations<MidiChordDef>(beginIndex, endIndex, factor, minThreshold);
         }
@@ -171,7 +182,7 @@ namespace Moritz.VoiceDef
         /// If a midiChordDef's MsDuration becomes less than minThreshold, it is removed.
         /// The total duration of this OutputVoiceDef changes accordingly.
         /// </summary>
-        internal void AdjustChordMsDurations(double factor, int minThreshold = 100)
+        public void AdjustChordMsDurations(double factor, int minThreshold = 100)
         {
             AdjustMsDurations<MidiChordDef>(0, _uniqueDefs.Count, factor, minThreshold);
         }
@@ -182,7 +193,7 @@ namespace Moritz.VoiceDef
         /// Multiplies each expression value in the MidiChordDefs
         /// from beginIndex to (not including) endIndex by the argument factor.
         /// </summary>
-        internal void AdjustExpression(int beginIndex, int endIndex, double factor)
+        public void AdjustExpression(int beginIndex, int endIndex, double factor)
         {
             CheckIndices(beginIndex, endIndex);
 
@@ -198,7 +209,7 @@ namespace Moritz.VoiceDef
         /// <summary>
         /// Multiplies each expression value in the UniqueMidiDurationDefs by the argument factor.
         /// </summary>
-        internal void AdjustExpression(double factor)
+        public void AdjustExpression(double factor)
         {
             foreach(MidiChordDef mcd in MidiChordDefs)
             {
@@ -209,7 +220,7 @@ namespace Moritz.VoiceDef
         /// Multiplies each velocity value in the MidiChordDefs
         /// from beginIndex to (not including) endIndex by the argument factor.
         /// </summary>
-        internal void AdjustVelocities(int beginIndex, int endIndex, double factor)
+        public void AdjustVelocities(int beginIndex, int endIndex, double factor)
         {
             CheckIndices(beginIndex, endIndex);
             for(int i = beginIndex; i < endIndex; ++i)
@@ -224,7 +235,7 @@ namespace Moritz.VoiceDef
         /// <summary>
         /// Multiplies each velocity value in the MidiChordDefs by the argument factor.
         /// </summary>
-        internal void AdjustVelocities(double factor)
+        public void AdjustVelocities(double factor)
         {
             foreach(MidiChordDef mcd in MidiChordDefs)
             {
@@ -245,7 +256,7 @@ namespace Moritz.VoiceDef
         /// <param name="beginDimIndex"></param>
         /// <param name="endDimIndex"></param>
         /// <param name="p"></param>
-        internal void AdjustVelocitiesHairpin(int beginIndex, int endIndex, double finalFactor)
+        public void AdjustVelocitiesHairpin(int beginIndex, int endIndex, double finalFactor)
         {
             Debug.Assert(((beginIndex + 1) < endIndex) && (finalFactor >= 0) && (endIndex <= Count));
 
@@ -281,7 +292,7 @@ namespace Moritz.VoiceDef
         /// The velocity of the first IUniqueMidiDurationDefs is multiplied by startFactor, and the velocity
         /// of the last MidiChordDef in range by endFactor.
         /// Can be used to create a diminueno or crescendo.
-        internal void AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
+        public void AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
         {
             int beginIndex = FindIndexAtMsPosition(startMsPosition);
             int endIndex = FindIndexAtMsPosition(endMsPosition);
@@ -309,7 +320,7 @@ namespace Moritz.VoiceDef
         /// Implemented using one pan value per MidiChordDef.
         /// This function does NOT change pan values outside the position range given in its arguments.
         /// </summary>
-        internal void SetPanGliss(int startMsPosition, int endMsPosition, int startPanValue, int endPanValue)
+        public void SetPanGliss(int startMsPosition, int endMsPosition, int startPanValue, int endPanValue)
         {
             int beginIndex = FindIndexAtMsPosition(startMsPosition);
             int endIndex = FindIndexAtMsPosition(endMsPosition);
@@ -337,7 +348,7 @@ namespace Moritz.VoiceDef
         /// Sets the pitchwheelDeviation for MidichordDefs in the range beginIndex to (not including) endindex.
         /// Rests in the range dont change.
         /// </summary>
-        internal void SetPitchWheelDeviation(int beginIndex, int endIndex, int deviation)
+        public void SetPitchWheelDeviation(int beginIndex, int endIndex, int deviation)
         {
             CheckIndices(beginIndex, endIndex);
 
@@ -355,7 +366,7 @@ namespace Moritz.VoiceDef
         /// from chords in the range beginIndex to (not including) endIndex.
         /// Rests in the range are not changed.
         /// </summary>
-        internal void RemoveScorePitchWheelCommands(int beginIndex, int endIndex)
+        public void RemoveScorePitchWheelCommands(int beginIndex, int endIndex)
         {
             CheckIndices(beginIndex, endIndex);
 
@@ -396,5 +407,17 @@ namespace Moritz.VoiceDef
             }
         }
         #endregion MidiChordDef attribute changers)
+
+        /// <summary>
+        /// The composition algorithm must set the MasterVolume (to a value != null)
+        /// in every OutputVoiceDef in the first bar of the score.
+        /// All other OutputVoiceDefs retain the default value 0. 
+        /// </summary>
+        public byte? MasterVolume = null; // default value
+        /// <summary>
+        /// This field is set by composition algorithms.
+        /// It is stored in and retrieved from SVG files. 
+        /// </summary>
+        public InputControls InputControls = null;
     }
 }

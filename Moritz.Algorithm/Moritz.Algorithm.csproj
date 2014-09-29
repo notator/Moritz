@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DE1875D2-7D34-4F78-AB41-298D7929B6F6}</ProjectGuid>
+    <ProjectGuid>{539A2302-1DB3-4EDA-879C-81A1624A24A0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Moritz.VoiceDefs</RootNamespace>
-    <AssemblyName>Moritz.VoiceDefs</AssemblyName>
+    <RootNamespace>Moritz.Algorithm</RootNamespace>
+    <AssemblyName>Moritz.Algorithm</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,12 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Multimedia">
-      <HintPath>..\Sanford Libraries\Multimedia.dll</HintPath>
-    </Reference>
-    <Reference Include="Multimedia.Midi">
-      <HintPath>..\Sanford Libraries\Multimedia.Midi.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -45,36 +39,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BasicMidiChordDef.cs" />
-    <Compile Include="CautionaryChordDef.cs" />
-    <Compile Include="ClefChangeDef.cs" />
-    <Compile Include="DurationDef.cs" />
-    <Compile Include="InputChordDef.cs" />
-    <Compile Include="InputControls.cs" />
-    <Compile Include="InputVoiceDef.cs" />
-    <Compile Include="IUniqueChordDef.cs" />
-    <Compile Include="IUniqueDef.cs" />
-    <Compile Include="IUniqueSplittableChordDef.cs" />
-    <Compile Include="MidiChordDef.cs" />
-    <Compile Include="MidiChordSliderDefs.cs" />
-    <Compile Include="MomentDef.cs" />
-    <Compile Include="OutputVoiceDef.cs" />
+    <Compile Include="CompositionAlgorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RestDef.cs" />
-    <Compile Include="VoiceDef.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Krystals4ObjectLibrary\Krystals4ObjectLibrary.csproj">
       <Project>{383e2844-41a4-488f-a683-d3eae9af4af5}</Project>
       <Name>Krystals4ObjectLibrary</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
-      <Project>{e68c2a79-cdab-46f5-a6ee-534ce2d99577}</Project>
-      <Name>Moritz.Globals</Name>
+    <ProjectReference Include="..\Moritz.Midi\Moritz.Midi.csproj">
+      <Project>{82e776e6-c819-42e6-9986-7ebdc3dffa06}</Project>
+      <Name>Moritz.Midi</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Moritz.Xml\Moritz.Xml.csproj">
-      <Project>{b239c302-a15d-4397-9f3c-ee6cc85440f3}</Project>
-      <Name>Moritz.Xml</Name>
+    <ProjectReference Include="..\Moritz.Palettes\Moritz.Palettes.csproj">
+      <Project>{a240ecd4-6ec2-4a0e-99e4-70cec7b603ca}</Project>
+      <Name>Moritz.Palettes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Spec\Moritz.Spec.csproj">
+      <Project>{c84026d4-800e-4590-8127-97e78b471921}</Project>
+      <Name>Moritz.Spec</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
