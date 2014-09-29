@@ -50,22 +50,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AudioButtonsControl.cs">
+    <Compile Include="Palettes\AudioButtonsControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="AudioButtonsControl.Designer.cs">
+    <Compile Include="Palettes\AudioButtonsControl.Designer.cs">
       <DependentUpon>AudioButtonsControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="BasicChordControl.cs">
+    <Compile Include="Palettes\BasicChordControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="BasicChordControl.Designer.cs">
+    <Compile Include="Palettes\BasicChordControl.Designer.cs">
       <DependentUpon>BasicChordControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="BasicPercussionControl.cs">
+    <Compile Include="Palettes\BasicPercussionControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="BasicPercussionControl.Designer.cs">
+    <Compile Include="Palettes\BasicPercussionControl.Designer.cs">
       <DependentUpon>BasicPercussionControl.cs</DependentUpon>
     </Compile>
     <Compile Include="ComposableTypes\KrystalPaletteScore\Song Six\FuriesInterlude3ToEnd.cs" />
@@ -83,54 +83,54 @@
     </Compile>
     <Compile Include="InputVoiceDef.cs" />
     <Compile Include="VoiceDef.cs" />
-    <Compile Include="IntListControl.cs">
+    <Compile Include="Palettes\IntListControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="IntListControl.Designer.cs">
+    <Compile Include="Palettes\IntListControl.Designer.cs">
       <DependentUpon>IntListControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="IPaletteForm.cs" />
-    <Compile Include="MIDIInstrumentsHelpForm.cs">
+    <Compile Include="Palettes\IPaletteForm.cs" />
+    <Compile Include="Palettes\MIDIInstrumentsHelpForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MIDIInstrumentsHelpForm.Designer.cs">
+    <Compile Include="Palettes\MIDIInstrumentsHelpForm.Designer.cs">
       <DependentUpon>MIDIInstrumentsHelpForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MIDIPercussionHelpForm.cs">
+    <Compile Include="Palettes\MIDIPercussionHelpForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MIDIPercussionHelpForm.Designer.cs">
+    <Compile Include="Palettes\MIDIPercussionHelpForm.Designer.cs">
       <DependentUpon>MIDIPercussionHelpForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MidiPitchesHelpForm.cs">
+    <Compile Include="Palettes\MidiPitchesHelpForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MidiPitchesHelpForm.Designer.cs">
+    <Compile Include="Palettes\MidiPitchesHelpForm.Designer.cs">
       <DependentUpon>MidiPitchesHelpForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="OrnamentSettingsForm.cs">
+    <Compile Include="Palettes\OrnamentSettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OrnamentSettingsForm.Designer.cs">
+    <Compile Include="Palettes\OrnamentSettingsForm.Designer.cs">
       <DependentUpon>OrnamentSettingsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Palette.cs" />
-    <Compile Include="PaletteForm.cs">
+    <Compile Include="Palettes\Palette.cs" />
+    <Compile Include="Palettes\PaletteForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PaletteForm.Designer.cs">
+    <Compile Include="Palettes\PaletteForm.Designer.cs">
       <DependentUpon>PaletteForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="PercussionOrnamentsForm.cs">
+    <Compile Include="Palettes\PercussionOrnamentsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PercussionOrnamentsForm.Designer.cs">
+    <Compile Include="Palettes\PercussionOrnamentsForm.Designer.cs">
       <DependentUpon>PercussionOrnamentsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="PercussionPaletteForm.cs">
+    <Compile Include="Palettes\PercussionPaletteForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PercussionPaletteForm.Designer.cs">
+    <Compile Include="Palettes\PercussionPaletteForm.Designer.cs">
       <DependentUpon>PercussionPaletteForm.cs</DependentUpon>
     </Compile>
     <Compile Include="DimensionsAndMetadataForm.cs">
@@ -157,37 +157,37 @@
     <EmbeddedResource Include="AssistantComposerMainForm.resx">
       <DependentUpon>AssistantComposerMainForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="AudioButtonsControl.resx">
+    <EmbeddedResource Include="Palettes\AudioButtonsControl.resx">
       <DependentUpon>AudioButtonsControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="BasicChordControl.resx">
+    <EmbeddedResource Include="Palettes\BasicChordControl.resx">
       <DependentUpon>BasicChordControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="BasicPercussionControl.resx">
+    <EmbeddedResource Include="Palettes\BasicPercussionControl.resx">
       <DependentUpon>BasicPercussionControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="IntListControl.resx">
+    <EmbeddedResource Include="Palettes\IntListControl.resx">
       <DependentUpon>IntListControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MIDIInstrumentsHelpForm.resx">
+    <EmbeddedResource Include="Palettes\MIDIInstrumentsHelpForm.resx">
       <DependentUpon>MIDIInstrumentsHelpForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MIDIPercussionHelpForm.resx">
+    <EmbeddedResource Include="Palettes\MIDIPercussionHelpForm.resx">
       <DependentUpon>MIDIPercussionHelpForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MidiPitchesHelpForm.resx">
+    <EmbeddedResource Include="Palettes\MidiPitchesHelpForm.resx">
       <DependentUpon>MidiPitchesHelpForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="OrnamentSettingsForm.resx">
+    <EmbeddedResource Include="Palettes\OrnamentSettingsForm.resx">
       <DependentUpon>OrnamentSettingsForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PaletteForm.resx">
+    <EmbeddedResource Include="Palettes\PaletteForm.resx">
       <DependentUpon>PaletteForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PercussionOrnamentsForm.resx">
+    <EmbeddedResource Include="Palettes\PercussionOrnamentsForm.resx">
       <DependentUpon>PercussionOrnamentsForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PercussionPaletteForm.resx">
+    <EmbeddedResource Include="Palettes\PercussionPaletteForm.resx">
       <DependentUpon>PercussionPaletteForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DimensionsAndMetadataForm.resx">

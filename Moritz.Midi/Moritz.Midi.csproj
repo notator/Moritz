@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B239C302-A15D-4397-9F3C-EE6CC85440F3}</ProjectGuid>
+    <ProjectGuid>{82E776E6-C819-42E6-9986-7EBDC3DFFA06}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Moritz.Xml</RootNamespace>
-    <AssemblyName>Moritz.Xml</AssemblyName>
+    <RootNamespace>Moritz.Midi</RootNamespace>
+    <AssemblyName>Moritz.Midi</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,26 +30,46 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Multimedia">
+      <HintPath>..\Sanford Libraries\Multimedia.dll</HintPath>
+    </Reference>
+    <Reference Include="Multimedia.Midi">
+      <HintPath>..\Sanford Libraries\Multimedia.Midi.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ColorString.cs" />
-    <Compile Include="Enums.cs" />
+    <Compile Include="BasicMidiChord.cs" />
+    <Compile Include="ChannelState.cs" />
+    <Compile Include="ChordMessage.cs" />
+    <Compile Include="MidiChord.cs" />
+    <Compile Include="MidiChordSlider.cs" />
+    <Compile Include="MidiCommand.cs" />
+    <Compile Include="MidiControl.cs" />
+    <Compile Include="MidiDurationSymbol.cs" />
+    <Compile Include="MidiMessageDelegates.cs" />
+    <Compile Include="MidiMoment.cs" />
+    <Compile Include="MidiSlider.cs" />
+    <Compile Include="MidiSwitch.cs" />
+    <Compile Include="MoritzControl.cs" />
+    <Compile Include="NoteMessage.cs" />
+    <Compile Include="TimeControl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SvgWriter.cs" />
-    <Compile Include="TextInfo.cs" />
-    <Compile Include="XmlWriterWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
       <Project>{e68c2a79-cdab-46f5-a6ee-534ce2d99577}</Project>
       <Name>Moritz.Globals</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.VoiceDefs\Moritz.VoiceDef.csproj">
+      <Project>{de1875d2-7d34-4f78-ab41-298d7929b6f6}</Project>
+      <Name>Moritz.VoiceDef</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

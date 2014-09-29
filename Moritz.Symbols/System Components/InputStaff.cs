@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Moritz.Score
+using Moritz.Xml;
+
+namespace Moritz.Symbols
 {
     public class InputStaff : Staff
     {
@@ -11,7 +13,7 @@ namespace Moritz.Score
         }
 
         /// <summary>
-        /// Writes out the stafflines, noteObjects, and possibly the performanceOptions for an InputStaff.
+        /// Writes out the stafflines, and noteObjects for an InputStaff.
         /// </summary>
         public override void WriteSVG(SvgWriter w, int pageNumber, int systemNumber, int staffNumber)
         {

@@ -1,0 +1,1204 @@
+using System.Drawing;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
+using System.Diagnostics;
+using System.Windows.Forms;
+
+using Moritz.Xml;
+
+namespace Moritz.Symbols
+{
+    public class SvgSystem
+    {
+        /// <summary>
+        /// Moritz defaults: tempo=30, InstrNotation=long, left indent=0, right indent = 0;
+        /// </summary>
+        /// <param name="score"></param>
+        public SvgSystem(SvgScore score)
+        {
+            Score = score;
+        }
+        /// <summary>
+        /// Writes out all the SVGSystem's staves. 
+        /// </summary>
+        /// <param name="w"></param>
+        public void WriteSVG(SvgWriter w, int pageNumber, int systemNumber, PageFormat pageFormat)
+        {
+            w.SvgStartGroup("system", "page" + pageNumber.ToString() + "_system" + systemNumber.ToString());
+            //w.WriteAttributeString("score", "object", null, "system");
+
+            // the markers are behind the notes.
+            w.SvgStartGroup("markers", null);
+
+            WriteMarkers(w);
+
+            w.SvgEndGroup(); // markers
+
+            for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
+            {
+                Staves[staffIndex].WriteSVG(w, pageNumber, systemNumber, staffIndex + 1);
+            }
+
+            w.SvgStartGroup("barlines", null);
+
+            WriteBarlines(w, pageFormat.BarlineStrokeWidth, pageFormat.StafflineStemStrokeWidth, pageFormat.Gap, pageFormat.Right);
+
+            w.SvgEndGroup(); // barlines
+
+            w.SvgEndGroup(); // system
+        }
+
+        private void WriteBarlines(SvgWriter w, float barlineStrokeWidth, float stafflineStrokeWidth, float gap, float pageRight)
+        {
+            List<bool> barlineIsInsideStaffGroup = this.Score.Notator.BarlineContinuesDownList;
+            Debug.Assert(barlineIsInsideStaffGroup.Count == Staves.Count);
+            Debug.Assert(barlineIsInsideStaffGroup[Staves.Count - 1] == false);
+            Barline barline = null;
+            bool isFirstBarline = true;
+
+            for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
+            {
+                Staff staff = Staves[staffIndex];
+                Voice voice = staff.Voices[0];
+                float barlinesTop = staff.Metrics.StafflinesTop;
+                float barlinesBottom = staff.Metrics.StafflinesBottom;
+
+                switch(staff.NumberOfStafflines)
+                {
+                    case 1:
+                        barlinesTop -= (staff.Gap * 1.5F);
+                        barlinesBottom += (staff.Gap * 1.5F);
+                        break;
+                    case 2:
+                    case 3:
+                    case 4:
+                        barlinesTop -= staff.Gap;
+                        barlinesBottom += staff.Gap;
+                        break;
+                    default:
+                        break;
+                }
+
+                #region draw barlines through stafflines
+                for(int i = 0; i < voice.NoteObjects.Count; ++i)
+                {
+                    barline = voice.NoteObjects[i] as Barline;
+                    if(barline != null)
+                    {
+                        if(barline.Visible)
+                        {
+                            if(staff.NumberOfStafflines >= 5 && i == (voice.NoteObjects.Count - 1))
+                            {
+                                barlinesTop -= (stafflineStrokeWidth / 2);
+                                barlinesBottom += (stafflineStrokeWidth / 2);
+                            }
+                            barline.WriteSVG(w, barlinesTop, barlinesBottom, barlineStrokeWidth);
+                        }
+                    }
+                }
+                #endregion
+
+                #region draw barlines down from staves
+                if(staffIndex < Staves.Count - 1)
+                {
+                    BottomEdge bottomEdge = new BottomEdge(staff, 0F, pageRight, gap);
+                    TopEdge topEdge = new TopEdge(Staves[staffIndex + 1], 0F, pageRight);
+                    isFirstBarline = true;
+
+                    for(int i = 0; i < voice.NoteObjects.Count; ++i)
+                    {
+                        NoteObject noteObject = voice.NoteObjects[i];
+                        barline = noteObject as Barline;
+                        if(barline != null)
+                        {
+                            // draw grouping barlines between staves
+                            if(barlineIsInsideStaffGroup[staffIndex] || isFirstBarline)
+                            {
+                                float top = bottomEdge.YatX(barline.Metrics.OriginX);
+                                float bottom = topEdge.YatX(barline.Metrics.OriginX);
+                                barline.WriteSVG(w, top, bottom, barlineStrokeWidth);
+                                isFirstBarline = false;
+                            }
+                        }
+                    }
+                }
+                #endregion
+            }
+        }
+
+        /// <summary>
+        /// There are three markers per system: startMarker, runningMarker and endMarker.
+        /// They initially have parameters which make them invisible. 
+        /// The parameters are set in Javascript when performing the score (MIDIPlayer).
+        /// </summary>
+        private void WriteMarkers(SvgWriter w)
+        {
+            w.SvgStartGroup("startMarker", null);
+            w.SvgLine(null, 0, 0, 0, 0, "#009900", 1, null, null);
+            w.SvgEllipse(null, 0, 0, 0, 0, null, 1, "#009900", null);
+            w.SvgEndGroup();
+
+            w.SvgStartGroup("runningMarker", null);
+            w.SvgLine(null, 0, 0, 0, 0, "#888888", 1, null, null);
+            w.SvgEndGroup();
+
+            w.SvgStartGroup("endMarker", null);
+            w.SvgLine(null, 0, 0, 0, 0, "#FF0000", 1, null, null);
+            w.SvgRect(null, null, 0, 0, 0, 0, null, 1, "#FF0000", null);
+            w.SvgEndGroup();
+         }
+
+        #region make graphics
+        /// <summary>
+        /// All the objects in this SvgSystem are given Metrics which are then moved to their
+        /// final positions within the SvgSystem.
+        /// When this function returns, all the contained, drawable objects have their correct
+        /// relative positions. They are actually drawn when the SvgSystem has been moved to 
+        /// its final position on the page.
+        /// </summary>
+        public void MakeGraphics(Graphics graphics, int systemNumber, PageFormat pageFormat, float leftMargin)
+        {
+            if(Metrics == null)
+                CreateMetrics(graphics, pageFormat, leftMargin);
+
+            // All noteObject metrics are now on the left edge of the page.
+            // Chords are aligned on the left edge of the page, with accidentals etc further to 
+            // the left. If two standard chords are synchronous in two voices of the same staff,
+            // and the noteheads would overlap, the lower chord will have been been moved slightly
+            // left or right. The two chords are at their final positions relative to each other.
+
+            MoveClefsAndBarlines(pageFormat.StafflineStemStrokeWidth);
+
+            List<NoteObjectMoment> moments = this.MomentSymbols();
+
+            // barlineWidths:  Key is a moment's msPosition. Value is the distance between the left edge 
+            // of the barline and the AlignmentX of the moment which immediately follows it.
+            Dictionary<int, float> barlineWidths = GetBarlineWidths(moments, pageFormat.Gap);
+
+            DistributeProportionally(moments, barlineWidths, pageFormat, leftMargin);
+
+            // The moments have now been distributed proportionally within each bar, but no checking has
+            // been done for overlapping noteObject Metrics.
+
+            SymbolSet symbolSet = Score.Notator.SymbolSet;
+            // SymbolSet is an abstract root class, and the functions called on symbolSet are virtual.
+            // Usually they only do something when symbolSet is a StandardSymbolSet.
+            symbolSet.AdjustRestsVertically(Staves);
+            symbolSet.SetBeamedStemLengths(Staves); // see the comment next to the function
+
+            Dictionary<int, float> overlaps = JustifyHorizontally(moments, barlineWidths, pageFormat.StafflineStemStrokeWidth);
+            if(overlaps.Count > 0)
+            {
+                StringBuilder msPositions = GetMsPositions(moments, overlaps);
+                string msg = "Could not remove all overlaps.\n" +
+                    "    System: " + systemNumber.ToString() + "\n" +
+                    "    Milliseconds from start of system:\n" + msPositions.ToString() + "\n" +
+                    "Either there should not be so many bars in the system,\n" +
+                    "Or the score's gap size should be set smaller.";
+                MessageBox.Show(msg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+
+            symbolSet.FinalizeBeamBlocks(Staves);
+            symbolSet.AlignLyrics(Staves);
+            SvgSystem nextSystem = null;
+            if(systemNumber < this.Score.Systems.Count)
+            {
+                nextSystem = this.Score.Systems[systemNumber];
+            } 
+            symbolSet.AddNoteheadExtenderLines(Staves, pageFormat.RightMarginPos, pageFormat.Gap, 
+                pageFormat.NoteheadExtenderStrokeWidth, pageFormat.StafflineStemStrokeWidth, nextSystem);
+
+            AlignStaffnamesInLeftMargin(leftMargin, pageFormat.Gap);
+
+            ResetStaffMetricsBoundaries();
+
+            SetBarlineVisibility();
+
+            JustifyVertically(pageFormat.Right, pageFormat.Gap);
+
+            AdjustBarnumberVertically(pageFormat.Gap);
+        }
+
+        private float CreateMetrics(Graphics graphics, PageFormat pageFormat, float leftMarginPos)
+        {
+            
+            this.Metrics = new SystemMetrics();
+            List<NoteObject> NoteObjectsToRemove = new List<NoteObject>();
+            for(int staffIndex = 0; staffIndex < Staves.Count; ++staffIndex)
+            {
+                Staff staff = Staves[staffIndex];
+                float staffHeight = staff.Gap * (staff.NumberOfStafflines - 1);
+                staff.Metrics = new StaffMetrics(leftMarginPos, pageFormat.RightMarginPos, staffHeight);
+
+                for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
+                {
+                    Voice voice = staff.Voices[voiceIndex];
+
+                    voice.SetChordStemDirectionsAndCreateBeamBlocks(pageFormat);
+
+                    for(int nIndex = 0; nIndex < staff.Voices[voiceIndex].NoteObjects.Count; nIndex++)
+                    {
+                        NoteObject noteObject = staff.Voices[voiceIndex].NoteObjects[nIndex];
+                        noteObject.Metrics = Score.Notator.SymbolSet.NoteObjectMetrics(graphics, noteObject, voice.StemDirection, staff.Gap, staff.StafflineStemStrokeWidth);
+
+                        if(noteObject.Metrics != null)
+                            staff.Metrics.Add(noteObject.Metrics);
+                        else
+                            NoteObjectsToRemove.Add(noteObject);
+                    }
+
+                    foreach(NoteObject noteObject in NoteObjectsToRemove)
+                        staff.Voices[voiceIndex].NoteObjects.Remove(noteObject);
+                    NoteObjectsToRemove.Clear();
+                }
+
+                if(staff.Voices.Count > 1)
+                {
+                    Debug.Assert(Score.Notator.SymbolSet is StandardSymbolSet);
+                    // Other symbol sets do not support multi voice staves.
+                    staff.AdjustTwoPartChords();
+                }
+
+                staff.Metrics.Move(0f, pageFormat.DefaultDistanceBetweenStaves * staffIndex);
+                this.Metrics.Add(staff.Metrics);
+            }
+            return (this.Metrics.Bottom - this.Metrics.Top);
+        }
+
+        /// <summary>
+        /// When this function completes, all NoteObjects have their horizontal Metrics set to
+        /// their final display positions.
+        /// If successful, the returned dictionary will be empty, otherwise there were too many
+        /// symbols to fit in the system, and it contains the unresolved overlaps
+        /// </summary>
+        /// <param name="pageFormat"></param>
+        private Dictionary<int, float> JustifyHorizontally(List<NoteObjectMoment> systemMoments, Dictionary<int, float> barlineWidths, float hairline)
+        {
+            HashSet<int> nonCompressibleSystemMomentPositions = new HashSet<int>();
+            Dictionary<int, float> overlaps = null; // msPos, overlap with following msPos in staff
+            bool lowerVoiceMoved = false;
+            do
+            {
+                overlaps = JustifyTopVoicesHorizontally(systemMoments, barlineWidths, nonCompressibleSystemMomentPositions, hairline);
+
+                if(overlaps.Count == 0 && LowerVoicesExist)
+                {
+                    lowerVoiceMoved = false;
+                    overlaps = JustifyLowerVoicesHorizontally(ref lowerVoiceMoved, systemMoments, barlineWidths, nonCompressibleSystemMomentPositions, hairline); 
+                }
+
+            } while(lowerVoiceMoved);
+
+            return overlaps;
+        }
+
+        private Dictionary<int, float> JustifyTopVoicesHorizontally(List<NoteObjectMoment> systemMoments, Dictionary<int, float> barlineWidths, 
+            HashSet<int> nonCompressibleSystemMomentPositions, float hairline)
+        {
+            Dictionary<int, float> overlaps = new Dictionary<int, float>(); ;
+            List<NoteObjectMoment> moments = null;
+            bool success = true;
+            do
+            {
+                foreach(Staff staff in this.Staves)
+                {
+                    moments = GetVoiceMoments(staff.Voices[0], systemMoments);
+                    if(moments.Count > 1)
+                        overlaps = GetOverlaps(moments, hairline);
+                    if(overlaps.Count == 0)
+                        continue;
+
+                    success = RedistributeMoments(systemMoments, barlineWidths, nonCompressibleSystemMomentPositions,
+                        moments, overlaps);
+                    // success is false if there was not enough horizontal space available to remove the overlaps.
+                    if(!success)
+                        break;
+                }
+
+            } while(overlaps.Count > 0 && success);
+
+            return overlaps;
+        }
+
+        private bool LowerVoicesExist
+        {
+            get
+            {
+                bool lowerVoicesExist = false;
+                foreach(Staff staff in this.Staves)
+                {
+                    if(staff.Voices.Count > 1)
+                    {
+                        lowerVoicesExist = true;
+                        break;
+                    }
+                }
+                return lowerVoicesExist;
+            }
+        }
+
+        private Dictionary<int, float> JustifyLowerVoicesHorizontally(ref bool lowerVoiceMoved, 
+            List<NoteObjectMoment> systemMoments, Dictionary<int, float> barlineWidths,
+            HashSet<int> nonCompressibleSystemMomentPositions, float hairline)
+        {
+            Dictionary<int, float> overlaps = new Dictionary<int, float>(); ;
+            List<NoteObjectMoment> moments = null;
+            bool success = true;
+            do
+            {
+                foreach(Staff staff in this.Staves)
+                {
+                    if(staff.Voices.Count > 1)
+                    {
+                        moments = GetVoiceMoments(staff.Voices[1], systemMoments);
+                        if(moments.Count > 1)
+                            overlaps = GetOverlaps(moments, hairline);
+                        if(overlaps.Count == 0)
+                        {
+                            moments = GetStaffMoments(staff, systemMoments);
+                            if(moments.Count > 1)
+                                overlaps = GetOverlaps(moments, hairline);
+                        }
+
+                        if(overlaps.Count == 0)
+                            continue;
+
+                        lowerVoiceMoved = true;
+                        success = RedistributeMoments(systemMoments, barlineWidths, nonCompressibleSystemMomentPositions,
+                            moments, overlaps);
+                        // success is false if there was not enough horizontal space available to remove the overlaps.
+                        if(!success)
+                            break;
+                    }
+                }
+
+            } while(overlaps.Count > 0 && success);
+
+            return overlaps;
+        }
+
+        private List<NoteObjectMoment> GetVoiceMoments(Voice voice, List<NoteObjectMoment> systemMoments)
+        {
+            List<NoteObjectMoment> voiceMoments = new List<NoteObjectMoment>();
+            NoteObjectMoment voiceNOM = null;
+            foreach(NoteObjectMoment systemNOM in systemMoments)
+            {
+                voiceNOM = null;
+                foreach(NoteObject noteObject in systemNOM.NoteObjects)
+                {
+                    if(noteObject.Voice == voice)
+                    {
+                        if(voiceNOM == null)
+                        {
+                            // noteObject in voice 1
+                            voiceNOM = new NoteObjectMoment(noteObject, systemNOM.MsPosition);
+                            voiceNOM.AlignmentX = systemNOM.AlignmentX;
+                        }
+                        else // noteObject in voice 2
+                        {
+                            voiceNOM.Add(noteObject);
+                        }
+                    }
+                }
+                if(voiceNOM != null)
+                    voiceMoments.Add(voiceNOM);
+            }
+            return voiceMoments;
+        }
+
+        private List<NoteObjectMoment> GetStaffMoments(Staff staff, List<NoteObjectMoment> systemMoments)
+        {
+            List<NoteObjectMoment> staffMoments = new List<NoteObjectMoment>();
+            NoteObjectMoment staffNOM = null;
+            foreach(NoteObjectMoment systemNOM in systemMoments)
+            {
+                staffNOM = null;
+                foreach(NoteObject noteObject in systemNOM.NoteObjects)
+                {
+                    if(noteObject.Voice.Staff == staff)
+                    {
+                        if(staffNOM == null)
+                        {
+                            // noteObject in voice 1
+                            staffNOM = new NoteObjectMoment(noteObject, systemNOM.MsPosition);
+                            staffNOM.AlignmentX = systemNOM.AlignmentX;
+                        }
+                        else // noteObject in voice 2
+                        {
+                            staffNOM.Add(noteObject);
+                        }
+                    }
+                }
+                if(staffNOM != null)
+                    staffMoments.Add(staffNOM);
+            }
+            return staffMoments;
+        }
+
+        private StringBuilder GetMsPositions(List<NoteObjectMoment> moments, Dictionary<int, float> overlaps)
+        {
+            StringBuilder rval = new StringBuilder();
+            int start = moments[0].MsPosition;
+            foreach(int mPos in overlaps.Keys)
+            {
+                rval.Append("        ");
+                rval.Append((mPos - start));
+                rval.Append("\n");
+            }
+            return rval;
+        }
+
+        /// <summary>
+        /// the returned barlineWidths dictionary contains
+        ///     key: the msPosition of a system moment
+        ///     value: the distance between the left edge of the barline and the moment's AlignmentX.
+        /// </summary>
+        /// <param name="moments"></param>
+        /// <param name="gap"></param>
+        /// <returns></returns>
+        private Dictionary<int, float> GetBarlineWidths(List<NoteObjectMoment> moments, float gap)
+        {
+            Dictionary<int, float> barlineWidths = new Dictionary<int, float>();
+
+            BarlineMetrics singleBarline = new BarlineMetrics(null, new Barline(Staves[0].Voices[0], BarlineType.single), gap);
+            float singleBarlineLeftMargin = singleBarline.OriginX - singleBarline.Left;
+            BarlineMetrics endBarline = new BarlineMetrics(null, new Barline(Staves[0].Voices[0], BarlineType.end), gap);
+            float endBarlineLeftMargin = endBarline.OriginX - endBarline.Left;
+
+            Barline barline = null;
+            int msPos = 0;
+            for(int i = 1; i < moments.Count; i++)
+            {
+                msPos = moments[i].MsPosition;
+                float barlineWidth = 0F;
+                Debug.Assert(moments.Count > 1);
+
+                barline = moments[i].Barline;
+                if(barline != null)
+                {
+                    barlineWidth = moments[i].AlignmentX - barline.Metrics.Left;
+                    barlineWidths.Add(msPos, barlineWidth);
+                }
+            }
+            return barlineWidths;
+        }
+        /// <summary>
+        /// The MomentSymbols are in order of msPosition.
+        /// The contained symbols are in order of voice (top-bottom of this system).
+        /// Barlines and ClefSigns have been added to the NoteObjectMomentSymbol containing the following
+        /// DurationSymbol.
+        /// When this function returns, moments are in order of msPosition,
+        /// and aligned internally at AlignmentX = 0;
+        /// </summary>
+        /// <typeparam name="Type">DurationSymbol, ChordSymbol, RestSymbol</typeparam>
+        private List<NoteObjectMoment> MomentSymbols()
+        {
+            int finalBarlineMsPosition = FinalBarlineMsPosition();
+
+            SortedDictionary<int, NoteObjectMoment> dict = new SortedDictionary<int, NoteObjectMoment>();
+            Barline barline = null;
+            ClefSymbol clef = null;
+            foreach(Voice voice in this.Voices)
+            {
+                #region foreach noteObject
+                foreach(NoteObject noteObject in voice.NoteObjects)
+                {
+                    if(noteObject is ClefSymbol)
+                        clef = noteObject as ClefSymbol;
+                    if(noteObject is Barline)
+                        barline = noteObject as Barline;
+                    DurationSymbol durationSymbol = noteObject as DurationSymbol;
+                    if(durationSymbol != null)
+                    {
+                        if(!dict.ContainsKey(durationSymbol.MsPosition))
+                        {
+                            dict.Add(durationSymbol.MsPosition, new NoteObjectMoment(durationSymbol));
+                        }
+                        else
+                        {
+                            dict[durationSymbol.MsPosition].Add(durationSymbol);
+                        }
+                        if(clef != null)
+                        {
+                            dict[durationSymbol.MsPosition].Add(clef);
+                            clef = null;
+                        }
+                        if(barline != null)
+                        {
+                            dict[durationSymbol.MsPosition].Add(barline);
+                            barline = null;
+                        }
+                    }
+                }
+                #endregion
+
+                if(clef != null) // final clef
+                {
+                    if(dict.ContainsKey(finalBarlineMsPosition))
+                        dict[finalBarlineMsPosition].Add(clef);
+                    else
+                        dict.Add(finalBarlineMsPosition, new NoteObjectMoment(clef, finalBarlineMsPosition));
+                }
+                if(barline != null) // final barline
+                {
+                    if(dict.ContainsKey(finalBarlineMsPosition))
+                        dict[finalBarlineMsPosition].Add(barline);
+                    else
+                        dict.Add(finalBarlineMsPosition, new NoteObjectMoment(barline, finalBarlineMsPosition));
+                }
+            }
+
+            List<NoteObjectMoment> momentSymbols = new List<NoteObjectMoment>();
+            Debug.Assert(dict.Count > 0);
+            foreach(int key in dict.Keys)
+                momentSymbols.Add(dict[key]);
+
+            foreach(NoteObjectMoment momentSymbol in momentSymbols)
+            {
+                momentSymbol.AlignBarlineGlyphs();
+            }
+
+            #region debug
+            // moments are currently in order of msPosition.
+            float prevMsPos = -1;
+            foreach(NoteObjectMoment moment in momentSymbols)
+            {
+                Debug.Assert(moment.MsPosition > prevMsPos);
+                prevMsPos = moment.MsPosition;
+            }
+            #endregion
+
+            return momentSymbols;
+        }
+
+        private int FinalBarlineMsPosition()
+        {
+            int finalBarlineMsPosition = -1;
+            SvgScore score = this.Score;
+            int thisSystemIndex = -1;
+            for(int i = 0; i < score.Systems.Count; ++i)
+            {
+                if(score.Systems[i] == this)
+                {
+                    thisSystemIndex = i;
+                }
+            }
+
+            Debug.Assert(thisSystemIndex >= 0);
+            if(thisSystemIndex < (score.Systems.Count - 1))
+            {
+                int nextSystemIndex = thisSystemIndex + 1;
+                Voice topVoiceInNextSystem = Score.Systems[nextSystemIndex].Staves[0].Voices[0];
+                foreach(NoteObject noteObject in topVoiceInNextSystem.NoteObjects)
+                {
+                    DurationSymbol durationSymbol = noteObject as DurationSymbol;
+                    if(durationSymbol != null)
+                    {
+                        finalBarlineMsPosition = durationSymbol.MsPosition;
+                        break;
+                    }
+                }
+            }
+            else
+            {   // the final system
+                List<NoteObject> noteObjects = this.Staves[0].Voices[0].NoteObjects;
+                for(int i = noteObjects.Count - 1; i >= 0; --i)
+                {
+                    DurationSymbol durationSymbol = noteObjects[i] as DurationSymbol;
+                    if(durationSymbol != null)
+                    {
+                        finalBarlineMsPosition = durationSymbol.MsPosition + durationSymbol.MsDuration;
+                        break;
+                    }
+                }
+            }
+
+            Debug.Assert(finalBarlineMsPosition > 0);
+
+            return finalBarlineMsPosition;
+        }
+        /// <summary>
+        /// Moves clefs and barlines to the left of the following duration symbols, leaving a hairline gap between the symbols.
+        /// If the first durationSymbol at the start of the staff is a cautionary, the distance from the clef to the barline is gap.
+        /// </summary>
+        private void MoveClefsAndBarlines(float hairline)
+        {
+            ClefSymbol clef = null;
+            Barline barline = null;
+
+            foreach(Voice voice in Voices)
+            {
+                foreach(NoteObject noteObject in voice.NoteObjects)
+                {
+                    if(noteObject is ClefSymbol)
+                        clef = noteObject as ClefSymbol;
+                    if(noteObject is Barline)
+                        barline = noteObject as Barline;
+                    DurationSymbol durationSymbol = noteObject as DurationSymbol;
+
+                    if(durationSymbol != null)
+                    {
+                        if(barline != null)
+                        {
+                            barline.Metrics.Move(durationSymbol.Metrics.Left - barline.Metrics.Right - hairline, 0F);
+
+                            if(clef != null)
+                            {
+                                clef.Metrics.Move(barline.Metrics.OriginX - clef.Metrics.Right - hairline, 0F); // clefs have a space on the right
+                            }
+                        }
+                        else if(clef != null)
+                        {
+                            clef.Metrics.Move(durationSymbol.Metrics.Left - clef.Metrics.Right - hairline, 0F);
+                        }
+                        clef = null;
+                        barline = null;
+                        durationSymbol = null;
+                    }
+                    else if(barline != null && clef != null)
+                    {
+                        clef.Metrics.Move(barline.Metrics.OriginX - clef.Metrics.Right - hairline, 0F); // clefs have a space on the right
+                    }
+
+                }
+            }
+        }
+        /// <summary>
+        /// When this function returns, the moments have been distributed proportionally within each bar.
+        /// Symbols are at their correct positions, except that no checking has been done for overlapping noteObject Metrics.
+        /// </summary>
+        private void DistributeProportionally(List<NoteObjectMoment> moments, Dictionary<int, float> barlineWidths, PageFormat pageFormat,
+            float leftMarginPos)
+        {
+            List<float> momentWidths = new List<float>();
+
+            float momentWidth = 0;
+            for(int i = 1; i < moments.Count; i++)
+            {
+                momentWidth = (moments[i].MsPosition - moments[i - 1].MsPosition) * 10000F;
+                momentWidths.Add(momentWidth);
+            }
+            momentWidths.Add(0F); // final barline
+
+            float totalMomentWidths = 0F;
+            foreach(float width in momentWidths)
+                totalMomentWidths += width;
+
+            float totalBarlineWidths = 0F;
+            foreach(float width in barlineWidths.Values)
+            {
+                totalBarlineWidths += width;
+            }
+
+            float leftEdgeToFirstAlignment = moments[0].LeftEdgeToAlignment();
+
+            float spreadWidth = pageFormat.RightMarginPos - leftMarginPos - leftEdgeToFirstAlignment - totalBarlineWidths;
+
+            float factor = spreadWidth / totalMomentWidths;
+
+            float currentPosition = leftMarginPos + leftEdgeToFirstAlignment;
+            for(int i = 0; i < momentWidths.Count; i++)
+            {
+                if(barlineWidths.ContainsKey(moments[i].MsPosition))
+                {
+                    currentPosition += barlineWidths[moments[i].MsPosition];
+                }
+                moments[i].MoveToAlignmentX(currentPosition);
+                currentPosition += momentWidths[i] * factor;
+            }
+        }
+        /// <summary>
+        /// Returns a dictionary containing moment msPositions and the overlapWidth they contain.
+        /// The msPositions are of the moments whose width will have to be increased because they contain one or more
+        /// anchorage symbols which overlap the next symbol on the same staff.
+        /// </summary>
+        private Dictionary<int, float> GetOverlaps(List<NoteObjectMoment> staffMoments, float hairline)
+        {
+            Dictionary<int, float> overlaps = new Dictionary<int, float>();
+
+            NoteObjectMoment previousNOM = null;
+            float overlapWidth = 0;
+            int msPos = 0;
+            int previousMsPos = 0;
+
+            foreach(NoteObjectMoment nom in staffMoments)
+            {
+                if(previousNOM != null)
+                {
+                    foreach(AnchorageSymbol aS in nom.AnchorageSymbols)
+                    {
+                        overlapWidth = aS.OverlapWidth(previousNOM);
+                        if(overlapWidth >= 0)
+                        {
+                            msPos = nom.MsPosition;
+                            previousMsPos = previousNOM.MsPosition;
+
+                            overlapWidth += hairline;
+                            if(overlaps.ContainsKey(previousMsPos))
+                                overlaps[previousMsPos] = overlaps[previousMsPos] > overlapWidth ? overlaps[previousMsPos] : overlapWidth;
+                            else
+                                overlaps.Add(previousMsPos, overlapWidth);
+                        }
+                    }
+                }
+                previousNOM = nom;
+            }
+
+            return overlaps;
+        }
+
+        /// <summary>
+        /// Returns true if the redistribution was successful, otherwise false.
+        /// The redistribution will be unsuccessful if there is not enough horizontal 
+        /// space available to remove the overlaps in the current staff.
+        /// </summary>
+        private bool RedistributeMoments(List<NoteObjectMoment> systemMoments, Dictionary<int, float> barlineWidths,
+            HashSet<int> nonCompressibleSystemMomentPositions,
+            List<NoteObjectMoment> staffMoments, // the NoteObjectMoments used by the current staff (contains their msPositions)
+            Dictionary<int, float> staffOverlaps) // msPosition, overlap.
+        {
+            Debug.Assert(systemMoments.Count > 1 && staffMoments.Count > 1);
+
+            SetNonCompressible(nonCompressibleSystemMomentPositions, systemMoments, staffMoments, staffOverlaps);
+
+            Dictionary<int, float> systemMomentWidthsWithoutBarlines = GetExistingWidthsWithoutBarlines(systemMoments, barlineWidths);
+
+            /// The factor by which to compress all those moment widths which are to be compressed.
+            float compressionFactor = CompressionFactor(systemMomentWidthsWithoutBarlines, nonCompressibleSystemMomentPositions, staffOverlaps);
+
+            bool hasBeenRedistributed = false;
+            if(compressionFactor > 0)
+            {
+                /// widthFactors contains the factor by which to multiply the existing width of each system moment.
+                Dictionary<int, float> widthFactors =
+                    WidthFactors(systemMoments, staffMoments, staffOverlaps, barlineWidths, nonCompressibleSystemMomentPositions, compressionFactor);
+
+                for(int i = 1; i < systemMoments.Count; ++i)
+                {
+                    int sysMomentMsPos = systemMoments[i - 1].MsPosition;
+                    float existingWidth = systemMomentWidthsWithoutBarlines[sysMomentMsPos];
+                    float alignmentX = systemMoments[i - 1].AlignmentX + (existingWidth * widthFactors[sysMomentMsPos]);
+
+                    if(barlineWidths.ContainsKey(systemMoments[i].MsPosition))
+                        alignmentX += barlineWidths[systemMoments[i].MsPosition];
+
+                    systemMoments[i].MoveToAlignmentX(alignmentX);
+                }
+
+                hasBeenRedistributed = true; 
+            }
+
+            return hasBeenRedistributed;
+        }
+
+        private Dictionary<int, float> GetExistingWidthsWithoutBarlines(
+            List<NoteObjectMoment> moments,
+            Dictionary<int, float> barlineWidths)
+        {
+            float originalWidth = 0;
+            Dictionary<int, float> originalWidthsWithoutBarlines = new Dictionary<int, float>();
+
+            for(int i = 1; i < moments.Count; i++)
+            {
+                originalWidth = moments[i].AlignmentX - moments[i - 1].AlignmentX;
+                if(barlineWidths.ContainsKey(moments[i].MsPosition))
+                {
+                    originalWidth -= barlineWidths[moments[i].MsPosition];
+                }
+
+                originalWidthsWithoutBarlines.Add(moments[i - 1].MsPosition, originalWidth);
+            }
+
+            return originalWidthsWithoutBarlines;
+        }
+
+        /// <summary>
+        /// systemMoments which are about to be widened, are set to be non-compressible.
+        /// In other words, this function adds the MsPositions of all systemMoments in range of
+        /// the staffMoments having staffOverlaps to the nonCompressibleSystemMomentPositions hash set.
+        /// </summary>
+        private void SetNonCompressible(HashSet<int> nonCompressibleSystemMomentPositions, 
+            List<NoteObjectMoment> systemMoments,
+            List<NoteObjectMoment> staffMoments, 
+            Dictionary<int, float> staffOverlaps)
+        {
+            Debug.Assert(staffMoments.Count > 1);
+            for(int stmIndex = 1; stmIndex < staffMoments.Count; ++stmIndex)
+            {
+                int prevMPos = staffMoments[stmIndex - 1].MsPosition;
+                int mPos = staffMoments[stmIndex].MsPosition;
+                if(staffOverlaps.ContainsKey(prevMPos))
+                {
+                    int startIndex = 0;
+                    int endIndex = 0;
+                    for(int i = 0; i < systemMoments.Count; ++i)
+                    {
+                        if(systemMoments[i].MsPosition == prevMPos)
+                        {
+                            startIndex = i;
+                        }
+                        if(systemMoments[i].MsPosition == mPos)
+                        {
+                            endIndex = i;
+                            break;
+                        }
+                    }
+                    for(int i = startIndex; i < endIndex; ++i)
+                    {
+                        nonCompressibleSystemMomentPositions.Add(systemMoments[i].MsPosition);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// The factor by which to compress those moment widths which are to be compressed.
+        /// </summary>
+        private float CompressionFactor(Dictionary<int, float> systemMomentWidthsWithoutBarlines, HashSet<int> nonCompressibleSystemMomentPositions, Dictionary<int, float> staffOverlaps)
+        {
+            float totalCompressibleWidth = TotalCompressibleWidth(systemMomentWidthsWithoutBarlines, nonCompressibleSystemMomentPositions);
+            float totalOverlaps = TotalOverlaps(staffOverlaps);
+            float compressionFactor = (totalCompressibleWidth - totalOverlaps) / totalCompressibleWidth;
+
+            return compressionFactor;
+        }
+
+        private float TotalCompressibleWidth(Dictionary<int, float> originalSystemMomentWidths,
+                                            HashSet<int> nonCompressibleSystemMomentPositions)
+        {
+            float totalCompressibleWidth = 0F;
+            foreach(int msPos in originalSystemMomentWidths.Keys)
+            {
+                if(!nonCompressibleSystemMomentPositions.Contains(msPos))
+                    totalCompressibleWidth += originalSystemMomentWidths[msPos];
+            }
+            return totalCompressibleWidth;
+        }
+
+        private float TotalOverlaps(Dictionary<int, float> staffOverlaps)
+        {
+            float total = 0;
+            foreach(float overlap in staffOverlaps.Values)
+            {
+                total += overlap;
+            }
+            return total;
+        }
+
+        /// <summary>
+        /// Returns a dictionary having an entry for each staff moment, whose key/value pairs are
+        ///     key: the msPosition of a staffMoment
+        ///     value: the factor by which the staffMoment will be expanded in order to remove a staffOverlap.
+        /// Staff moments can span more than one systemMoment...
+        /// </summary>
+        private Dictionary<int, float> GetStaffExpansionFactors(
+            Dictionary<int, float> staffMomentWidthsWithoutBarlines,
+            Dictionary<int, float> staffOverlaps)
+        {
+            Dictionary<int, float> staffExpansionFactors = new Dictionary<int, float>();
+            float originalWidth;
+            float factor;
+            foreach(int msPosition in staffMomentWidthsWithoutBarlines.Keys)
+            {
+                if(staffOverlaps.ContainsKey(msPosition))
+                {
+                    originalWidth = staffMomentWidthsWithoutBarlines[msPosition];
+                    factor = (originalWidth + staffOverlaps[msPosition]) / originalWidth;
+                    staffExpansionFactors.Add(msPosition, factor);
+                }
+            }
+
+            return staffExpansionFactors;
+        }
+
+        /// <summary>
+        /// Returns an [msPos, changeFactor] pair for each moment in the system.
+        /// The change factor can be 1, compressionFactor, or taken from the staffExpansionFactors.
+        /// </summary>
+        private Dictionary<int, float> WidthFactors(
+            List<NoteObjectMoment> systemMoments, 
+            List<NoteObjectMoment> staffMoments,
+            Dictionary<int, float> staffOverlaps,
+            Dictionary<int, float> barlineWidths,
+            HashSet<int> nonCompressibleSystemMomentPositions,
+            float compressionFactor)
+        {
+            Dictionary<int, float> staffMomentWidthsWithoutBarlines =
+                            GetExistingWidthsWithoutBarlines(staffMoments, barlineWidths);
+
+            // contains an <msPos, expansionFactor> pair for each staffMoment that will be expanded.
+            Dictionary<int, float> staffExpansionFactors =
+                            GetStaffExpansionFactors(staffMomentWidthsWithoutBarlines, staffOverlaps);
+
+            List<int> systemMomentKeys = new List<int>();
+            foreach(NoteObjectMoment nom in systemMoments)
+            {
+                systemMomentKeys.Add(nom.MsPosition);
+            }
+
+            Dictionary<int, float> widthFactors = new Dictionary<int, float>();
+            foreach(int msPos in systemMomentKeys)
+            {
+                if(nonCompressibleSystemMomentPositions.Contains(msPos))
+                    widthFactors.Add(msPos, 1F); // default factor is 1 (moments which are nonCompressible)
+                else
+                    widthFactors.Add(msPos, compressionFactor);
+            }
+            // widthFactors now contains an entry for each system Moment
+            // Now set the expansionFactors from the staff.
+
+            float expFactor = 0;
+            for(int i = 1; i < staffMoments.Count; ++i)
+            {
+                int startMsPos = staffMoments[i - 1].MsPosition;
+                int endMsPos = staffMoments[i].MsPosition;
+                if(staffExpansionFactors.ContainsKey(startMsPos))
+                {
+                    expFactor = staffExpansionFactors[startMsPos];
+                    foreach(int msPos in systemMomentKeys)
+                    {
+                        if(msPos >= startMsPos && msPos < endMsPos)
+                        {
+                            widthFactors[msPos] = expFactor;
+                        }
+                        if(msPos >= endMsPos)
+                            break;
+                    }
+                }
+            }
+            return widthFactors;
+        }
+
+
+
+        /// <summary>
+        /// The barnumber is currently at its default position.
+        /// Now, if it currently collides with part of the following chord,
+        /// (or, if the first duration symbol is a rest, the chord after that)
+        /// move it vertically away from the system until it does not.
+        /// </summary>
+        private void AdjustBarnumberVertically(float gap)
+        {
+            Staff staff = Staves[0];
+            Barline barline = null;
+            DurationSymbol firstDSInVoice0 = null;
+            DurationSymbol secondDSInVoice0 = null;
+            foreach(NoteObject noteObject in staff.Voices[0].NoteObjects)
+            {
+                if(barline == null)
+                    barline = noteObject as Barline;
+                if(firstDSInVoice0 == null)
+                    firstDSInVoice0 = noteObject as DurationSymbol;
+                else if(firstDSInVoice0 != null && secondDSInVoice0 == null)
+                    secondDSInVoice0 = noteObject as DurationSymbol;
+                if(barline != null && firstDSInVoice0 != null && secondDSInVoice0 != null)
+                    break;
+            }
+            Debug.Assert(barline != null && firstDSInVoice0 != null); // secondDSInVoice0 can be null if there is only one DS!
+
+            DurationSymbol firstDSInVoice1 = null;
+            DurationSymbol secondDSInVoice1 = null;
+            if(staff.Voices.Count == 2)
+            {
+                foreach(NoteObject noteObject in staff.Voices[1].NoteObjects)
+                {
+                    if(firstDSInVoice1 == null)
+                        firstDSInVoice1 = noteObject as DurationSymbol;
+                    else if(firstDSInVoice1 != null && secondDSInVoice1 == null)
+                        secondDSInVoice1 = noteObject as DurationSymbol;
+
+                    if(firstDSInVoice1 != null && secondDSInVoice1 != null)
+                        break;
+                }
+                Debug.Assert(firstDSInVoice1 != null); // secondDSInVoice0 can be null if there is only one DS!
+            }
+
+            BarlineMetrics barlineMetrics = barline.Metrics as BarlineMetrics;
+            FramedTextMetrics barnumberMetrics = barlineMetrics.BarnumberMetrics;
+
+            if(barnumberMetrics != null)
+            {
+                RemoveCollision(barnumberMetrics, firstDSInVoice0, gap);
+                if(firstDSInVoice0 is RestSymbol && secondDSInVoice0 != null)
+                    RemoveCollision(barnumberMetrics, secondDSInVoice0, gap);
+
+                if(staff.Voices.Count == 2)
+                {
+                    RemoveCollision(barnumberMetrics, firstDSInVoice1, gap);
+                    if(firstDSInVoice1 is RestSymbol && secondDSInVoice1 != null)
+                        RemoveCollision(barnumberMetrics, secondDSInVoice1, gap);
+                    // the barnumber may now collide with the first DurationSymbol in Voice0...
+                    RemoveCollision(barnumberMetrics, firstDSInVoice0, gap);
+                    if(firstDSInVoice0 is RestSymbol && secondDSInVoice0 != null)
+                        RemoveCollision(barnumberMetrics, secondDSInVoice0, gap);
+                }
+            }
+        }
+
+        /// <summary>
+        /// If there is a collision between them, move the barnumber above the first duration symbol in the voice.
+        /// </summary>
+        /// <param name="barnumberMetrics"></param>
+        /// <param name="durationSymbolMetrics"></param>
+        /// <param name="gap"></param>
+        private void RemoveCollision(FramedTextMetrics barnumberMetrics, DurationSymbol durationSymbol, float gap)
+        {
+            ChordMetrics chordMetrics = durationSymbol.Metrics as ChordMetrics;
+            float verticalOverlap = 0F;
+            if(chordMetrics != null)
+            {
+                verticalOverlap = chordMetrics.OverlapHeight(barnumberMetrics, gap);
+            }
+            RestMetrics restMetrics = durationSymbol.Metrics as RestMetrics;
+            if(restMetrics != null)
+            {
+                verticalOverlap = restMetrics.OverlapHeight(barnumberMetrics, gap);
+                if(verticalOverlap > 0)
+                {
+                    // fine tuning
+                    // compare with the extra padding given to these symbols in the RestMetrics constructor.
+                    switch(durationSymbol.DurationClass)
+                    {
+                        case DurationClass.breve:
+                        case DurationClass.semibreve:
+                        case DurationClass.minim:
+                        case DurationClass.crotchet:
+                        case DurationClass.quaver:
+                        case DurationClass.semiquaver:
+                            break;
+                        case DurationClass.threeFlags:
+                            verticalOverlap -= gap;
+                            break;
+                        case DurationClass.fourFlags:
+                            verticalOverlap -= gap * 2F;
+                            break;
+                        case DurationClass.fiveFlags:
+                            verticalOverlap -= gap * 2.5F;
+                            break;
+                    }
+                }
+            }
+            if(verticalOverlap > 0)
+                barnumberMetrics.Move(0F, -(verticalOverlap + gap));
+        }
+
+        private void AlignStaffnamesInLeftMargin(float leftMarginPos, float gap)
+        {
+            foreach(Staff staff in Staves)
+            {
+                foreach(NoteObject noteObject in staff.Voices[0].NoteObjects)
+                {
+                    Barline firstBarline = noteObject as Barline;
+                    if(firstBarline != null)
+                    {
+                        BarlineMetrics barlineMetrics = firstBarline.Metrics as BarlineMetrics;
+                        if(barlineMetrics != null)
+                        {
+                            TextMetrics staffNameMetrics = barlineMetrics.StaffNameMetrics;
+                            // The staffName is currently centred on the barline.
+                            // Now move it into the centre of the left margin.
+                            float alignX = leftMarginPos / 2F;
+                            float deltaX = alignX - barlineMetrics.OriginX + gap;
+                            staffNameMetrics.Move(deltaX, 0F);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void ResetStaffMetricsBoundaries()
+        {
+            foreach(Staff staff in Staves)
+                staff.Metrics.ResetBoundary();
+        }
+
+        private void SetBarlineVisibility()
+        {
+            // set the visibility of all but the last barline
+            foreach(Staff staff in Staves)
+            {
+                Voice voice = staff.Voices[0];
+                List<NoteObject> noteObjects = voice.NoteObjects;
+                for(int i = 0; i < noteObjects.Count; ++i)
+                {
+                    if(noteObjects[i] is CautionaryChordSymbol)
+                    {
+                        Barline barline = noteObjects[i - 1] as Barline;
+                        Debug.Assert(barline != null);
+                        barline.Visible = false;
+                    }
+                }
+            }
+            // set the visibility of the last barline on this system
+            SvgScore score = this.Score;
+            SvgSystem nextSystem = null;
+            for(int sysindex = 0; sysindex < this.Score.Systems.Count - 1; ++sysindex)
+            {
+                if(this == this.Score.Systems[sysindex])
+                {
+                    nextSystem = this.Score.Systems[sysindex + 1];
+                    break;
+                }
+            }
+            if(nextSystem != null)
+            {
+                for(int staffIndex = 0; staffIndex < Staves.Count; ++staffIndex)
+                {
+                    List<NoteObject> noteObjects = Staves[staffIndex].Voices[0].NoteObjects;
+                    Barline barline = noteObjects[noteObjects.Count - 1] as Barline;
+                    if(barline != null && nextSystem.Staves[staffIndex].Voices[0].FirstDurationSymbol is CautionaryChordSymbol)
+                    {
+                        barline.Visible = false;
+                    }
+                }
+            }
+        }
+        private void JustifyVertically(float pageWidth, float gap)
+        {
+            for(int i = 1; i < Staves.Count; ++i)
+            {
+                BottomEdge bottomEdge = new BottomEdge(Staves[i - 1], 0F, pageWidth, gap);
+                TopEdge topEdge = new TopEdge(Staves[i], 0F, pageWidth);
+                float separation = topEdge.DistanceToEdgeAbove(bottomEdge);
+                float dy = gap - separation;
+                // limit stafflineHeight to multiples of pageFormat.Gap so that stafflines
+                // are not displayed as thick grey lines.
+                dy = dy - (dy % gap) + gap; // the minimum space bewteen stafflines is gap pixels.
+                if(dy > 0F)
+                {
+                    for(int j = i; j < Staves.Count; ++j)
+                    {
+                        Staves[j].Metrics.Move(0F, dy);
+                    }
+                    this.Metrics.StafflinesBottom += dy;
+                }
+            }
+            this.Metrics = new SystemMetrics();
+            foreach(Staff staff in Staves)
+            {
+                this.Metrics.Add(staff.Metrics);
+            }
+        }
+
+        #endregion
+
+        #region Enumerators
+        public IEnumerable Voices
+        {
+            get
+            {
+                foreach(Staff staff in this.Staves)
+                    foreach(Voice voice in staff.Voices)
+                        yield return voice;
+            }
+        }
+        #endregion Enumerators
+
+        public List<Staff> Staves = new List<Staff>();
+        internal SystemMetrics Metrics = null;
+
+        public SvgScore Score; // containing score
+    }
+}
