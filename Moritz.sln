@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Midi", "Moritz.Midi\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Symbols", "Moritz.Symbols\Moritz.Symbols.csproj", "{DF59888C-F935-4E4F-BA31-664DAF79F7D6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Performer", "Moritz.Performer\Moritz.Performer.csproj", "{D7B15444-16B2-4476-8A78-ACF825494F6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -161,6 +163,16 @@ Global
 		{DF59888C-F935-4E4F-BA31-664DAF79F7D6}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{DF59888C-F935-4E4F-BA31-664DAF79F7D6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{DF59888C-F935-4E4F-BA31-664DAF79F7D6}.Release|x86.ActiveCfg = Release|Any CPU
+		{D7B15444-16B2-4476-8A78-ACF825494F6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7B15444-16B2-4476-8A78-ACF825494F6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7B15444-16B2-4476-8A78-ACF825494F6A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D7B15444-16B2-4476-8A78-ACF825494F6A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D7B15444-16B2-4476-8A78-ACF825494F6A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D7B15444-16B2-4476-8A78-ACF825494F6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7B15444-16B2-4476-8A78-ACF825494F6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7B15444-16B2-4476-8A78-ACF825494F6A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D7B15444-16B2-4476-8A78-ACF825494F6A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D7B15444-16B2-4476-8A78-ACF825494F6A}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
