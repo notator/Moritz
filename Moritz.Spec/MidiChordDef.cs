@@ -154,41 +154,33 @@ namespace Moritz.Spec
         #endregion
 
         #region No sliders constructor
-        ///// <summary>
-        ///// This constructor creates a MidiChordDef at msPosition 0, lyric = null, containing a single BasicMidiChordDef and no sliders.
-        ///// </summary>
-        //public MidiChordDef(List<byte> pitches, List<byte> velocities, int msPosition, int msDuration, bool repeat, bool hasChordOff,
-        //    List<MidiControl> midiControls)
-        //    : base(msDuration)
-        //{
-        //    foreach(byte pitch in pitches)
-        //        Debug.Assert(pitch == M.MidiValue((int)pitch), "Pitch out of range.");
+        /// <summary>
+        /// This constructor creates a MidiChordDef at msPosition 0, lyric = null, containing a single BasicMidiChordDef and no sliders.
+        /// </summary>
+        public MidiChordDef(List<byte> pitches, List<byte> velocities, int msPosition, int msDuration, bool repeat, bool hasChordOff)
+            : base(msDuration)
+        {
+            foreach(byte pitch in pitches)
+                Debug.Assert(pitch == M.MidiValue((int)pitch), "Pitch out of range.");
 
-        //    _msPosition = msPosition;
-        //    _repeat = repeat;
-        //    _hasChordOff = hasChordOff;
-        //    _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
+            _msPosition = msPosition;
+            _repeat = repeat;
+            _hasChordOff = hasChordOff;
+            _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 
-        //    _displayedMidiPitches = pitches;
-        //    // midiVelocity is handled via the BasicMidiChordDefs
-        //    _ornamentNumberSymbol = 0;
+            _displayedMidiPitches = pitches;
+            // midiVelocity is handled via the BasicMidiChordDefs
+            _ornamentNumberSymbol = 0;
 
-        //    MidiChordSliderDefs = null;
+            MidiChordSliderDefs = null;
 
-        //    byte? bank = null;
-        //    byte? patch = null;
-        //    if(midiControls != null && midiControls.Count > 0)
-        //    {
-        //        _volume = GetControlHiValue(ControllerType.Volume, midiControls);
-        //        _pitchWheelDeviation = GetControlValue(ControllerType.RegisteredParameterCoarse, midiControls);
-        //        bank = GetControlValue(ControllerType.BankSelect, midiControls);
-        //        patch = GetCommandValue(ChannelCommand.ProgramChange, midiControls);
-        //    }
+            byte? bank = null;
+            byte? patch = null;
 
-        //    BasicMidiChordDefs.Add(new BasicMidiChordDef(msDuration, bank, patch, hasChordOff, pitches, velocities));
+            BasicMidiChordDefs.Add(new BasicMidiChordDef(msDuration, bank, patch, hasChordOff, pitches, velocities));
 
-        //    CheckTotalDuration();
-        //}
+            CheckTotalDuration();
+        }
         #endregion
 
         #region Another no sliders constructor

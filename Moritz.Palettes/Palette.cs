@@ -38,7 +38,7 @@ namespace Moritz.Palettes
 
             _ornamentNumbers = M.StringToIntList(paletteForm.OrnamentNumbersTextBox.Text, ',');
             _ornamentMinMsDurations = M.StringToIntList(paletteForm.MinMsDurationsTextBox.Text, ',');
-            
+
             _ornamentSettings = null;
             if(paletteForm.OrnamentSettingsForm != null)
             {
@@ -79,14 +79,14 @@ namespace Moritz.Palettes
             _pitchwheelDeviations = new List<byte>();
             _pitchwheelEnvelopes = new List<List<byte>>();
             _modulationWheelEnvelopes = new List<List<byte>>();
- 
+
             _volumes = M.StringToByteList(ppf.VolumesTextBox.Text, ',');
             _panEnvelopes = ppf.GetEnvelopesAsByteLists(ppf.PanEnvelopesTextBox);
             _expressionEnvelopes = ppf.GetEnvelopesAsByteLists(ppf.ExpressionEnvelopesTextBox);
 
             _ornamentNumbers = M.StringToIntList(ppf.OrnamentNumbersTextBox.Text, ',');
             _ornamentMinMsDurations = M.StringToIntList(ppf.MinMsDurationsTextBox.Text, ',');
- 
+
             // instruments in ornaments palette are absolute, not relative, so 'ignore' the
             // basic instrument index by setting it to 0.
             for(int i = 0; i < _ornamentNumbers.Count; ++i)
@@ -137,7 +137,7 @@ namespace Moritz.Palettes
                 List<byte> modulationWheelEnvelope = ListByte(_modulationWheelEnvelopes, index);
                 List<byte> expressionEnvelope = ListByte(_expressionEnvelopes, index);
 
-                MidiChordSliderDefs midiChordSliderDefs = 
+                MidiChordSliderDefs midiChordSliderDefs =
                     new MidiChordSliderDefs(pitchwheelEnvelope,
                                             panEnvelope,
                                             modulationWheelEnvelope,
@@ -235,7 +235,7 @@ namespace Moritz.Palettes
             if(bmcds.Count > 1)
             {
                 byte? prevBank = bmcds[0].BankIndex;
-                byte? prevPatch = bmcds[0].PatchIndex;  
+                byte? prevPatch = bmcds[0].PatchIndex;
                 for(int i = 1; i < bmcds.Count; ++i)
                 {
                     bmcds[i].BankIndex = (bmcds[i].BankIndex == null || bmcds[i].BankIndex == prevBank) ? null : bmcds[i].BankIndex;
@@ -262,7 +262,7 @@ namespace Moritz.Palettes
         /// </summary>
         private byte? ByteOrNull(List<byte> values, int index)
         {
-            return (values == null || values.Count == 0) ? (byte?) null : values[index];
+            return (values == null || values.Count == 0) ? (byte?)null : values[index];
         }
 
         /// <summary>
@@ -325,8 +325,44 @@ namespace Moritz.Palettes
             {
                 throw new ApplicationException("The indexed object was not a MidiChordDef.");
             }
-            
+
             return midiChordDef;
+        }
+
+        public OutputVoiceDef NewOutputVoiceDef(List<int> sequence)
+        {
+            List<IUniqueDef> iuds = new List<IUniqueDef>();
+            int msPosition = 0;
+            foreach(int value in sequence)
+            {
+                Debug.Assert((value >= 1 && value <= this.Count), "Illegal argument: value out of range in sequence");
+
+                IUniqueDef iumdd = this.UniqueDurationDef(value - 1);
+                iumdd.MsPosition = msPosition;
+                msPosition += iumdd.MsDuration;
+                iuds.Add(iumdd);
+            }
+            OutputVoiceDef ovd = new OutputVoiceDef(iuds);
+            return ovd;
+        }
+
+        public OutputVoiceDef NewOutputVoiceDef(Krystal krystal)
+        {
+            List<int> sequence = krystal.GetValues((uint)1)[0];
+            return NewOutputVoiceDef(sequence);
+        }
+
+        /// <summary>
+        /// Constructs an OutputVoiceDef at MsPosition=0, containing a clone of the sequence of DurationDefs in the PaletteDef.
+        /// </summary
+        public OutputVoiceDef NewOutputVoiceDef()
+        {
+            List<int> sequence = new List<int>();
+            for(int i = 0; i < Count; ++i)
+            {
+                sequence.Add(i);
+            }
+            return NewOutputVoiceDef(sequence);
         }
     }
 
@@ -403,7 +439,7 @@ namespace Moritz.Palettes
 
             BasicChordMidiSettings = new BasicChordMidiSettings(bcs);
             BankIndices = null;
-            PatchIndices = null; 
+            PatchIndices = null;
 
             Krystal ornamentsKrystal = pof.OrnamentsKrystal;
             uint ornamentLevel = uint.Parse(pof.OrnamentsLevelTextBox.Text);
@@ -471,7 +507,8 @@ namespace Moritz.Palettes
 
                 }
                 MidiPitches.Add(midiPitches);
-                Velocities.Add(midiVelocities);            }
+                Velocities.Add(midiVelocities);
+            }
         }
 
         private List<byte> GetMidiPitches(int chordIndex, List<byte> rootPitches, List<byte> densities, List<List<byte>> inversions, List<int> inversionIndices)

@@ -40,12 +40,28 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompositionAlgorithm.cs" />
+    <Compile Include="PaletteDemoScore\PaletteDemoAlgorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Song Six\Clytemnestra.cs" />
+    <Compile Include="Song Six\Furies1.cs" />
+    <Compile Include="Song Six\Furies2.cs" />
+    <Compile Include="Song Six\Furies3.cs" />
+    <Compile Include="Song Six\Furies4.cs" />
+    <Compile Include="Song Six\FuriesInterlude3ToEnd.cs" />
+    <Compile Include="Song Six\SongSixAlgorithm.cs" />
+    <Compile Include="Song Six\Winds.cs" />
+    <Compile Include="Study2c3_1\Study2c3_1Algorithm.cs" />
+    <Compile Include="Study3 sketch 1\Study3Sketch1Algorithm.cs" />
+    <Compile Include="Study3 sketch 2\Study3Sketch2Algorithm.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Krystals4ObjectLibrary\Krystals4ObjectLibrary.csproj">
       <Project>{383e2844-41a4-488f-a683-d3eae9af4af5}</Project>
       <Name>Krystals4ObjectLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
+      <Project>{e68c2a79-cdab-46f5-a6ee-534ce2d99577}</Project>
+      <Name>Moritz.Globals</Name>
     </ProjectReference>
     <ProjectReference Include="..\Moritz.Midi\Moritz.Midi.csproj">
       <Project>{82e776e6-c819-42e6-9986-7ebdc3dffa06}</Project>
