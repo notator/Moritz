@@ -23,6 +23,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Globals", "Moritz.Gl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz", "Moritz\Moritz.csproj", "{9B5FE3BA-F992-4064-9563-6C4A5616195C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.VoiceDefs", "Moritz.VoiceDefs\Moritz.VoiceDefs.csproj", "{DE1875D2-7D34-4F78-AB41-298D7929B6F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Xml", "Moritz.Xml\Moritz.Xml.csproj", "{B239C302-A15D-4397-9F3C-EE6CC85440F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -113,6 +117,26 @@ Global
 		{9B5FE3BA-F992-4064-9563-6C4A5616195C}.Release|Mixed Platforms.Build.0 = Release|x86
 		{9B5FE3BA-F992-4064-9563-6C4A5616195C}.Release|x86.ActiveCfg = Release|x86
 		{9B5FE3BA-F992-4064-9563-6C4A5616195C}.Release|x86.Build.0 = Release|x86
+		{DE1875D2-7D34-4F78-AB41-298D7929B6F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE1875D2-7D34-4F78-AB41-298D7929B6F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE1875D2-7D34-4F78-AB41-298D7929B6F6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{DE1875D2-7D34-4F78-AB41-298D7929B6F6}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{DE1875D2-7D34-4F78-AB41-298D7929B6F6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DE1875D2-7D34-4F78-AB41-298D7929B6F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE1875D2-7D34-4F78-AB41-298D7929B6F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE1875D2-7D34-4F78-AB41-298D7929B6F6}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{DE1875D2-7D34-4F78-AB41-298D7929B6F6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{DE1875D2-7D34-4F78-AB41-298D7929B6F6}.Release|x86.ActiveCfg = Release|Any CPU
+		{B239C302-A15D-4397-9F3C-EE6CC85440F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B239C302-A15D-4397-9F3C-EE6CC85440F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B239C302-A15D-4397-9F3C-EE6CC85440F3}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B239C302-A15D-4397-9F3C-EE6CC85440F3}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B239C302-A15D-4397-9F3C-EE6CC85440F3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B239C302-A15D-4397-9F3C-EE6CC85440F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B239C302-A15D-4397-9F3C-EE6CC85440F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B239C302-A15D-4397-9F3C-EE6CC85440F3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B239C302-A15D-4397-9F3C-EE6CC85440F3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B239C302-A15D-4397-9F3C-EE6CC85440F3}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
