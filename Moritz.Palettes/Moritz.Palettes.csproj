@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A240ECD4-6EC2-4A0E-99E4-70CEC7B603CA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Moritz.Palettes</RootNamespace>
+    <AssemblyName>Moritz.Palettes</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Multimedia">
+      <HintPath>..\Sanford Libraries\Multimedia.dll</HintPath>
+    </Reference>
+    <Reference Include="Multimedia.Midi">
+      <HintPath>..\Sanford Libraries\Multimedia.Midi.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AudioButtonsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AudioButtonsControl.Designer.cs">
+      <DependentUpon>AudioButtonsControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BasicChordControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="BasicChordControl.Designer.cs">
+      <DependentUpon>BasicChordControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BasicPercussionControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="BasicPercussionControl.Designer.cs">
+      <DependentUpon>BasicPercussionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MainFormCallbacks.cs" />
+    <Compile Include="IntListControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="IntListControl.Designer.cs">
+      <DependentUpon>IntListControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IPaletteForm.cs" />
+    <Compile Include="MIDIInstrumentsHelpForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MIDIInstrumentsHelpForm.Designer.cs">
+      <DependentUpon>MIDIInstrumentsHelpForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MIDIPercussionHelpForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MIDIPercussionHelpForm.Designer.cs">
+      <DependentUpon>MIDIPercussionHelpForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MidiPitchesHelpForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MidiPitchesHelpForm.Designer.cs">
+      <DependentUpon>MidiPitchesHelpForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OrnamentSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OrnamentSettingsForm.Designer.cs">
+      <DependentUpon>OrnamentSettingsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Palette.cs" />
+    <Compile Include="PaletteForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PaletteForm.Designer.cs">
+      <DependentUpon>PaletteForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PercussionOrnamentsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PercussionOrnamentsForm.Designer.cs">
+      <DependentUpon>PercussionOrnamentsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PercussionPaletteForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PercussionPaletteForm.Designer.cs">
+      <DependentUpon>PercussionPaletteForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AudioButtonsControl.resx">
+      <DependentUpon>AudioButtonsControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BasicChordControl.resx">
+      <DependentUpon>BasicChordControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BasicPercussionControl.resx">
+      <DependentUpon>BasicPercussionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IntListControl.resx">
+      <DependentUpon>IntListControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MIDIInstrumentsHelpForm.resx">
+      <DependentUpon>MIDIInstrumentsHelpForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MIDIPercussionHelpForm.resx">
+      <DependentUpon>MIDIPercussionHelpForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MidiPitchesHelpForm.resx">
+      <DependentUpon>MidiPitchesHelpForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OrnamentSettingsForm.resx">
+      <DependentUpon>OrnamentSettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PaletteForm.resx">
+      <DependentUpon>PaletteForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PercussionOrnamentsForm.resx">
+      <DependentUpon>PercussionOrnamentsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PercussionPaletteForm.resx">
+      <DependentUpon>PercussionPaletteForm.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Krystals4ObjectLibrary\Krystals4ObjectLibrary.csproj">
+      <Project>{383e2844-41a4-488f-a683-d3eae9af4af5}</Project>
+      <Name>Krystals4ObjectLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
+      <Project>{e68c2a79-cdab-46f5-a6ee-534ce2d99577}</Project>
+      <Name>Moritz.Globals</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Krystals\Moritz.Krystals.csproj">
+      <Project>{df448bec-155b-4a56-82bd-8fd1978a85af}</Project>
+      <Name>Moritz.Krystals</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Midi\Moritz.Midi.csproj">
+      <Project>{82e776e6-c819-42e6-9986-7ebdc3dffa06}</Project>
+      <Name>Moritz.Midi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Performer\Moritz.Performer.csproj">
+      <Project>{d7b15444-16b2-4476-8a78-acf825494f6a}</Project>
+      <Name>Moritz.Performer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Symbols\Moritz.Symbols.csproj">
+      <Project>{df59888c-f935-4e4f-ba31-664daf79f7d6}</Project>
+      <Name>Moritz.Symbols</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.VoiceDefs\Moritz.VoiceDef.csproj">
+      <Project>{de1875d2-7d34-4f78-ab41-298d7929b6f6}</Project>
+      <Name>Moritz.VoiceDef</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
