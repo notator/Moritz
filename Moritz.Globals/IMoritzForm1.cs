@@ -5,7 +5,6 @@ namespace Moritz.Globals
     {
         void Close();
         void Show();
-        void CloseAssistantPerformer();
         void CloseAssistantComposer();
     }
 }

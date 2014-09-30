@@ -53,9 +53,9 @@ namespace Moritz
             // QuitButton
             // 
             this.QuitButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.QuitButton.Location = new System.Drawing.Point(224, 30);
+            this.QuitButton.Location = new System.Drawing.Point(329, 30);
             this.QuitButton.Name = "QuitButton";
-            this.QuitButton.Size = new System.Drawing.Size(98, 31);
+            this.QuitButton.Size = new System.Drawing.Size(147, 31);
             this.QuitButton.TabIndex = 2;
             this.QuitButton.Text = "quit";
             this.QuitButton.UseVisualStyleBackColor = true;
@@ -66,7 +66,7 @@ namespace Moritz
             this.PreferencesButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
             this.PreferencesButton.Location = new System.Drawing.Point(14, 30);
             this.PreferencesButton.Name = "PreferencesButton";
-            this.PreferencesButton.Size = new System.Drawing.Size(98, 31);
+            this.PreferencesButton.Size = new System.Drawing.Size(147, 31);
             this.PreferencesButton.TabIndex = 0;
             this.PreferencesButton.Text = "preferences";
             this.PreferencesButton.UseVisualStyleBackColor = true;
@@ -148,9 +148,9 @@ namespace Moritz
             // KrystalsEditorButton
             // 
             this.KrystalsEditorButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.KrystalsEditorButton.Location = new System.Drawing.Point(20, 30);
+            this.KrystalsEditorButton.Location = new System.Drawing.Point(18, 30);
             this.KrystalsEditorButton.Name = "KrystalsEditorButton";
-            this.KrystalsEditorButton.Size = new System.Drawing.Size(98, 31);
+            this.KrystalsEditorButton.Size = new System.Drawing.Size(203, 31);
             this.KrystalsEditorButton.TabIndex = 0;
             this.KrystalsEditorButton.Text = "open";
             this.KrystalsEditorButton.UseVisualStyleBackColor = true;
@@ -159,9 +159,9 @@ namespace Moritz
             // AboutButton
             // 
             this.AboutButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.AboutButton.Location = new System.Drawing.Point(119, 30);
+            this.AboutButton.Location = new System.Drawing.Point(171, 30);
             this.AboutButton.Name = "AboutButton";
-            this.AboutButton.Size = new System.Drawing.Size(98, 31);
+            this.AboutButton.Size = new System.Drawing.Size(147, 31);
             this.AboutButton.TabIndex = 1;
             this.AboutButton.Text = "about";
             this.AboutButton.UseVisualStyleBackColor = true;
@@ -197,9 +197,9 @@ namespace Moritz
             this.KrystalsEditorPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.KrystalsEditorPanel.Controls.Add(this.KrystalsEditorLabel);
             this.KrystalsEditorPanel.Controls.Add(this.KrystalsEditorButton);
-            this.KrystalsEditorPanel.Location = new System.Drawing.Point(23, 161);
+            this.KrystalsEditorPanel.Location = new System.Drawing.Point(278, 64);
             this.KrystalsEditorPanel.Name = "KrystalsEditorPanel";
-            this.KrystalsEditorPanel.Size = new System.Drawing.Size(137, 80);
+            this.KrystalsEditorPanel.Size = new System.Drawing.Size(237, 80);
             this.KrystalsEditorPanel.TabIndex = 2;
             // 
             // KrystalsEditorLabel
@@ -221,9 +221,9 @@ namespace Moritz
             this.MoritzPanel.Controls.Add(this.AboutButton);
             this.MoritzPanel.Controls.Add(this.PreferencesButton);
             this.MoritzPanel.Controls.Add(this.QuitButton);
-            this.MoritzPanel.Location = new System.Drawing.Point(177, 161);
+            this.MoritzPanel.Location = new System.Drawing.Point(23, 161);
             this.MoritzPanel.Name = "MoritzPanel";
-            this.MoritzPanel.Size = new System.Drawing.Size(338, 80);
+            this.MoritzPanel.Size = new System.Drawing.Size(492, 80);
             this.MoritzPanel.TabIndex = 3;
             // 
             // MoritzLabel

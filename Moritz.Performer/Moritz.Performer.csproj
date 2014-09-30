@@ -47,12 +47,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssistantPerformerMainForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="AssistantPerformerMainForm.designer.cs">
-      <DependentUpon>AssistantPerformerMainForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Enums.cs" />
     <Compile Include="KeyboardSettingsDialog\Key.cs">
       <SubType>UserControl</SubType>
@@ -86,9 +80,6 @@
     <Compile Include="Runtime\RuntimeDelegates.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="AssistantPerformerMainForm.resx">
-      <DependentUpon>AssistantPerformerMainForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="KeyboardSettingsDialog\Keyboard.resx">
       <DependentUpon>Keyboard.cs</DependentUpon>
     </EmbeddedResource>

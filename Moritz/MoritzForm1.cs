@@ -226,10 +226,6 @@ namespace Moritz
             }
         }
 
-        private void CloseAssistantPerformerButton_Click(object sender, EventArgs e)
-        {
-            CloseAssistantPerformer();
-        }
         private void CloseAssistantComposerButton_Click(object sender, EventArgs e)
         {
             CloseAssistantComposer();
@@ -268,24 +264,13 @@ namespace Moritz
         }
         private void MoritzForm1_VisibleChanged(object sender, EventArgs e)
         {
-            if(_assistantPerformerMainForm != null || _assistantComposerMainForm != null)
+            if( _assistantComposerMainForm != null)
             {
                 EnableDeviceComboBoxesAndPreferences(false);
             }
             else
             {
                 EnableDeviceComboBoxesAndPreferences(true);
-            }
-
-            if(_assistantPerformerMainForm != null)
-            {
-                CloseAssistantPerformerButton.Show();
-                PerformScoreButton.Hide();
-            }
-            else
-            {
-                PerformScoreButton.Show();
-                CloseAssistantPerformerButton.Hide();
             }
 
             if(_assistantComposerMainForm != null)
@@ -311,8 +296,8 @@ namespace Moritz
         }
 
         /// <summary>
-        /// MoritzForm1 could be closed by a subsidiary Form, for example when
-        /// quitting from the AssistantPerformer.
+        /// MoritzForm1 can be closed by a subsidiary Form, for example when
+        /// quitting from the AssistantComposer.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
