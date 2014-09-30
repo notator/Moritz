@@ -10,7 +10,7 @@ namespace Moritz.Algorithm.SongSix
     /// <summary>
     /// The Wind "constructors" (part of the Song Six algorithm).
     /// </summary>
-    internal partial class SongSixAlgorithm : CompositionAlgorithm
+    public partial class SongSixAlgorithm : CompositionAlgorithm
     {
         private OutputVoiceDef GetWind3(Palette palette, Krystal krystal)
         {

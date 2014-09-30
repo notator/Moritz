@@ -7,7 +7,7 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.PaletteDemo
 {
-    internal class PaletteDemoAlgorithm : CompositionAlgorithm
+    public class PaletteDemoAlgorithm : CompositionAlgorithm
     {
         /// <summary>
         /// This file contains a composition algorithm which creates a score having a single VoiceDef, whose

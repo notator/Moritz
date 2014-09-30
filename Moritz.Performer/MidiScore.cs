@@ -53,7 +53,7 @@ namespace Moritz.Performer
                     {
                         int channel = outputVoice.MidiChannel;
                         ChannelState channelState = new ChannelState();
-                        foreach(MidiChordDef midiChordDef in outputVoice.MidiChordDefs) // not interested in rests here
+                        foreach(MidiChordDef midiChordDef in outputVoice.VoiceDef.MidiChordDefs) // not interested in rests here
                         {
                             int msPosition = midiChordDef.MsPosition;
                             int msDuration = midiChordDef.MsDuration;

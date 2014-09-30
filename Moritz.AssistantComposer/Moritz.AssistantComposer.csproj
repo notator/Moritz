@@ -50,6 +50,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DimensionsAndMetadataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DimensionsAndMetadataForm.Designer.cs">
+      <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Palettes\AudioButtonsControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -133,12 +139,6 @@
     <Compile Include="Palettes\PercussionPaletteForm.Designer.cs">
       <DependentUpon>PercussionPaletteForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="DimensionsAndMetadataForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DimensionsAndMetadataForm.Designer.cs">
-      <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="OutputVoiceDef.cs" />
     <Compile Include="CompositionAlgorithm.cs" />
     <Compile Include="ComposableTypes\KrystalPaletteScore\PaletteDemoScore\PaletteDemoAlgorithm.cs" />
@@ -156,6 +156,9 @@
   <ItemGroup>
     <EmbeddedResource Include="AssistantComposerMainForm.resx">
       <DependentUpon>AssistantComposerMainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DimensionsAndMetadataForm.resx">
+      <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Palettes\AudioButtonsControl.resx">
       <DependentUpon>AudioButtonsControl.cs</DependentUpon>
@@ -189,9 +192,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Palettes\PercussionPaletteForm.resx">
       <DependentUpon>PercussionPaletteForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DimensionsAndMetadataForm.resx">
-      <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

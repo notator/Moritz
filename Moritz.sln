@@ -37,6 +37,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Algorithm", "Moritz.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Spec", "Moritz.Spec\Moritz.Spec.csproj", "{C84026D4-800E-4590-8127-97E78B471921}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Composer", "Moritz.Composer\Moritz.Composer.csproj", "{1EC1C34A-FE5F-4BD0-AC99-CDDE4172B7CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -197,6 +199,16 @@ Global
 		{C84026D4-800E-4590-8127-97E78B471921}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{C84026D4-800E-4590-8127-97E78B471921}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{C84026D4-800E-4590-8127-97E78B471921}.Release|x86.ActiveCfg = Release|Any CPU
+		{1EC1C34A-FE5F-4BD0-AC99-CDDE4172B7CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EC1C34A-FE5F-4BD0-AC99-CDDE4172B7CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EC1C34A-FE5F-4BD0-AC99-CDDE4172B7CA}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{1EC1C34A-FE5F-4BD0-AC99-CDDE4172B7CA}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{1EC1C34A-FE5F-4BD0-AC99-CDDE4172B7CA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1EC1C34A-FE5F-4BD0-AC99-CDDE4172B7CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EC1C34A-FE5F-4BD0-AC99-CDDE4172B7CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EC1C34A-FE5F-4BD0-AC99-CDDE4172B7CA}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{1EC1C34A-FE5F-4BD0-AC99-CDDE4172B7CA}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{1EC1C34A-FE5F-4BD0-AC99-CDDE4172B7CA}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

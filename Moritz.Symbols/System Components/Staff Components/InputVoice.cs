@@ -27,30 +27,30 @@ namespace Moritz.Symbols
             w.SvgEndGroup(); // inputVoice
         }
 
-        public IEnumerable<InputChordDef> InputChordDefs
+        public IEnumerable<InputChordSymbol> InputChordSymbols
         {
             get
             {
-                foreach(IUniqueDef iud in this.UniqueDefs)
+                foreach(NoteObject no in this.NoteObjects)
                 {
-                    InputChordDef inputChordDef = iud as InputChordDef;
-                    if(inputChordDef != null)
-                        yield return inputChordDef;
+                    InputChordSymbol inputChordSymbol = no as InputChordSymbol;
+                    if(inputChordSymbol != null)
+                        yield return inputChordSymbol;
                 }
             }
         }
 
         /// <summary>
-        /// returns true if this inputVoice contains inputChordDef, otherwise false.
+        /// returns true if this inputVoice contains inputChord, otherwise false.
         /// </summary>
         /// <param name="inputChordDef"></param>
         /// <returns></returns>
-        internal bool Contains(InputChordDef inputChordDef)
+        internal bool Contains(InputChordSymbol inputChord)
         {
             bool contains = false;
-            foreach(InputChordDef localChordDef in InputChordDefs)
+            foreach(InputChordSymbol localChord in InputChordSymbols)
             {
-                if(localChordDef == inputChordDef)
+                if(localChord == inputChord)
                 {
                     contains = true;
                     break;

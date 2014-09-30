@@ -24,7 +24,7 @@ namespace Moritz.Symbols
         {
             Staff = staff;
         }
- 
+
         /// <summary>
         /// Writes out an SVG Voice
         /// </summary>
@@ -215,7 +215,7 @@ namespace Moritz.Symbols
                         breakGroup = true;
                 }
 
-                if( chordsBeamedTogether.Count > 0 && breakGroup)
+                if(chordsBeamedTogether.Count > 0 && breakGroup)
                 {
                     if(currentClef != null)
                     {
@@ -337,8 +337,6 @@ namespace Moritz.Symbols
 
         #endregion Enumerators
 
-        public List<IUniqueDef> UniqueDefs = new List<IUniqueDef>();
-
         #endregion composition
 
         #region fields loaded from .capx files
@@ -376,6 +374,9 @@ namespace Moritz.Symbols
             }
         }
         #endregion
+
+
+        public VoiceDef VoiceDef = null;
 
         private DurationSymbol _firstDurationSymbol;
     }

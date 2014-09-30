@@ -2,7 +2,7 @@
 
 namespace Moritz.Palettes
 {
-    internal interface IPaletteForm
+    public interface IPaletteForm
     {
         void Close();
         void Show();

@@ -135,6 +135,21 @@ namespace Moritz.Spec
 
         #region public
 
+        #region Enumerators
+        public IEnumerable<MidiChordDef> MidiChordDefs
+        {
+            get
+            {
+                foreach(IUniqueDef iud in _uniqueDefs)
+                {
+                    MidiChordDef midiChordDef = iud as MidiChordDef;
+                    if(midiChordDef != null)
+                        yield return midiChordDef;
+                }
+            }
+        }
+        #endregion
+
         #region Count changers
         #region list functions
         public abstract void Add(IUniqueDef iUniqueDef);

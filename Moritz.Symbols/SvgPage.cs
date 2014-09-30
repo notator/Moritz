@@ -84,19 +84,19 @@ namespace Moritz.Symbols
                                     {
                                         msDuration = int.Parse(attributesDict["score:msDuration"]);
                                         M.ReadToXmlElementTag(r, "score:midiChord");
-                                        currentVoice.UniqueDefs.Add(new MidiChordDef(r, msDuration));
+                                        currentVoice.VoiceDef.UniqueDefs.Add(new MidiChordDef(r, msDuration));
                                         // msPositions are set later
                                     }
                                     else
                                     {
                                         msDuration = int.Parse(attributesDict["score:msDuration"]);
                                         M.ReadToXmlElementTag(r, "score:inputChord");
-                                        currentVoice.UniqueDefs.Add(new InputChordDef(r, msDuration));
+                                        currentVoice.VoiceDef.UniqueDefs.Add(new InputChordDef(r, msDuration));
                                     }
                                     break;
                                 case "rest":                                       
                                     msDuration = int.Parse(attributesDict["score:msDuration"]);
-                                    currentVoice.UniqueDefs.Add(new RestDef(msDuration));
+                                    currentVoice.VoiceDef.UniqueDefs.Add(new RestDef(msDuration));
                                     // msPositions are set later
                                 break;
                             }

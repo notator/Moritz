@@ -33,78 +33,11 @@ namespace Moritz.Symbols
                 throw new ApplicationException("Cannot construct Notator!");
         }
 
-        public void CreateSystems(SvgScore svgScore, List<List<Voice>> voicesPerSystemPerBar)
-        {             
-            foreach(List<Voice> systemVoices in voicesPerSystemPerBar)
-            {
-                int midiVoice_StaffIndex = 0;
-                int inputVoice_StaffIndex = 0;
-                int nOutputVoices = 0;
-                SvgSystem system = new SvgSystem(svgScore);
-                svgScore.Systems.Add(system);
-                for(int staffIndex = 0; staffIndex < _pageFormat.StafflinesPerStaff.Count; staffIndex++)
-                {
-                    string staffname = null;
-                    if(svgScore.Systems.Count == 1)
-                    {
-                        staffname = _pageFormat.LongStaffNames[staffIndex];
-                    }
-                    else
-                    {
-                        staffname = _pageFormat.ShortStaffNames[staffIndex];                        
-                    }
-                    Staff staff;
-                    if(staffIndex >= _pageFormat.MidiChannelsPerStaff.Count)
-                    {
-                        float gap = _pageFormat.Gap * _pageFormat.InputStavesSizeFactor;
-                        float stafflineStemStrokeWidth = _pageFormat.StafflineStemStrokeWidth * _pageFormat.InputStavesSizeFactor;
-                        staff = new InputStaff(system, staffname, _pageFormat.StafflinesPerStaff[staffIndex], gap, stafflineStemStrokeWidth);
-                        
-                        List<byte> inputVoiceIndices = _pageFormat.InputVoiceIndicesPerStaff[inputVoice_StaffIndex];
-                        for(int i = 0; i < inputVoiceIndices.Count; ++i)
-                        {
-                            int systemVoiceIndex = nOutputVoices + inputVoiceIndices[i];
-                            staff.Voices.Add(systemVoices[systemVoiceIndex]);
-                            systemVoices[systemVoiceIndex].Staff = staff;
-                        }
-                        inputVoice_StaffIndex++;
-                        SetStemDirections(staff);
-                    }
-                    else
-                    {
-                        staff = new OutputStaff(system, staffname, _pageFormat.StafflinesPerStaff[staffIndex], _pageFormat.Gap, _pageFormat.StafflineStemStrokeWidth);
-
-                        List<byte> midiChannels = _pageFormat.MidiChannelsPerStaff[midiVoice_StaffIndex];
-                        for(int i = 0; i < midiChannels.Count; ++i)
-                        {
-                            int systemVoiceIndex = midiChannels[i];
-                            staff.Voices.Add(systemVoices[systemVoiceIndex]);
-                            systemVoices[systemVoiceIndex].Staff = staff;
-                            nOutputVoices++;
-                        }
-                        midiVoice_StaffIndex++;
-                        SetStemDirections(staff);
-                    }
-                    system.Staves.Add(staff);
-                }
-            }
-        }
-
-        private void SetStemDirections(Staff staff)
-        {
-            if(staff.Voices.Count == 1)
-            {
-                staff.Voices[0].StemDirection = VerticalDir.none;
-            }
-            else
-            {
-                Debug.Assert(staff.Voices.Count == 2);
-                staff.Voices[0].StemDirection = VerticalDir.up;
-                staff.Voices[1].StemDirection = VerticalDir.down;
-            }
-        }
-
-        public void AddSymbolsToSystems(List<SvgSystem> systems)
+        /// <summary>
+        /// There is still one system per bar.
+        /// </summary>
+        /// <param name="systems"></param>
+        public void ConvertVoiceDefsToNoteObjects(List<SvgSystem> systems)
         {
             byte[] currentChannelVelocities = new byte[systems[0].Staves.Count];
 
@@ -122,12 +55,12 @@ namespace Moritz.Symbols
                     for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                     {
                         Debug.Assert(_pageFormat.ClefsList[staffIndex] != null);
-                        Voice voice = staff.Voices[voiceIndex];                        
+                        Voice voice = staff.Voices[voiceIndex];
                         float musicFontHeight = (voice is OutputVoice) ? _pageFormat.MusicFontHeight : _pageFormat.MusicFontHeight * _pageFormat.InputStavesSizeFactor;
                         voice.NoteObjects.Add(new ClefSymbol(voice, _pageFormat.ClefsList[staffIndex], musicFontHeight));
                         bool firstLmdd = true;
-  
-                        foreach(IUniqueDef iud in voice.UniqueDefs)
+
+                        foreach(IUniqueDef iud in voice.VoiceDef.UniqueDefs)
                         {
                             NoteObject noteObject =
                                 SymbolSet.GetNoteObject(voice, iud, firstLmdd, ref currentChannelVelocities[staffIndex], musicFontHeight);
@@ -148,7 +81,7 @@ namespace Moritz.Symbols
                     }
 
                     if(voice0ClefChangeDefs.Count > 0 || voice1ClefChangeDefs.Count > 0)
-                    { 
+                    {
                         // the main clef on this staff in the next system
                         SetNextSystemClefType(staffIndex, voice0ClefChangeDefs, voice1ClefChangeDefs);
                     }
@@ -198,7 +131,7 @@ namespace Moritz.Symbols
                 }
             }
 
-            _pageFormat.ClefsList[staffIndex] = lastClefType;           
+            _pageFormat.ClefsList[staffIndex] = lastClefType;
         }
 
         /// <summary>
@@ -257,7 +190,7 @@ namespace Moritz.Symbols
 
         private void InsertInvisibleClefChangeInNoteObjects(Voice voice, ClefChangeSymbol invisibleClefChangeSymbol)
         {
-            Debug.Assert(!(voice.NoteObjects[voice.NoteObjects.Count-1] is Barline));
+            Debug.Assert(!(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline));
 
             int msPos = invisibleClefChangeSymbol.MsPosition;
             List<DurationSymbol> durationSymbols = new List<DurationSymbol>();
@@ -272,7 +205,7 @@ namespace Moritz.Symbols
             {
                 InsertBeforeDS(voice.NoteObjects, durationSymbols[0], invisibleClefChangeSymbol);
             }
-            else if(msPos > durationSymbols[durationSymbols.Count-1].MsPosition)
+            else if(msPos > durationSymbols[durationSymbols.Count - 1].MsPosition)
             {
                 // the noteObjects do not yet have a final barline (see Debug.Assert() above)
                 voice.NoteObjects.Add(invisibleClefChangeSymbol);
@@ -334,7 +267,7 @@ namespace Moritz.Symbols
             string clefType = null;
             if(clefTypesPerMsPos.Count == 1)
             {
-                clefType = clefTypesPerMsPos[0]; 
+                clefType = clefTypesPerMsPos[0];
             }
             else
             {
@@ -355,7 +288,7 @@ namespace Moritz.Symbols
                     }
                 }
             }
-            
+
             return clefType;
         }
 
@@ -374,7 +307,7 @@ namespace Moritz.Symbols
                     float otherSystemsLeftMarginPos = 0F;
                     if(systems.Count > 1)
                         otherSystemsLeftMarginPos = GetLeftMarginPos(systems[1], graphics, _pageFormat);
- 
+
                     for(int sysIndex = 0; sysIndex < systems.Count; ++sysIndex)
                     {
                         float leftMargin = (sysIndex == 0) ? system1LeftMarginPos : otherSystemsLeftMarginPos;
@@ -393,7 +326,7 @@ namespace Moritz.Symbols
                 groupTopStaffIndices.Add(0);
                 for(int index = 1; index < barlineContinuesDownList.Count; ++index)
                 {
-                    if(barlineContinuesDownList[index-1] == false)
+                    if(barlineContinuesDownList[index - 1] == false)
                         groupTopStaffIndices.Add(index);
                 }
                 return groupTopStaffIndices;
@@ -468,7 +401,7 @@ namespace Moritz.Symbols
             }
             leftMarginPos = maxNameWidth + (pageFormat.Gap * 2.0F);
             leftMarginPos = (leftMarginPos > pageFormat.LeftMarginPos) ? leftMarginPos : pageFormat.LeftMarginPos;
- 
+
             return leftMarginPos;
         }
 

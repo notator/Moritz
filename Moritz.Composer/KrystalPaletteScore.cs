@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 
 using Krystals4ObjectLibrary;
+using Moritz.Palettes;
 using Moritz.Symbols;
 
-namespace Moritz.AssistantComposer
+namespace Moritz.Composer
 {
     public class KrystalPaletteScore : ComposableSvgScore
     {

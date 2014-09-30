@@ -37,19 +37,6 @@ namespace Moritz.Symbols
             w.SvgEndGroup(); // outputVoice
         }
 
-        public IEnumerable<MidiChordDef> MidiChordDefs
-        {
-            get
-            {
-                foreach(IUniqueDef iud in UniqueDefs)
-                {
-                    MidiChordDef midiChordDef = iud as MidiChordDef;
-                    if(midiChordDef != null)
-                        yield return midiChordDef;
-                }
-            }
-        }
-
         /// <summary>
         /// This field is set by composition algorithms.
         /// It is stored in and retrieved from SVG files. 

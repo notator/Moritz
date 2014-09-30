@@ -109,7 +109,8 @@ namespace Moritz.Symbols
                     {
                         SvgSystem system = Systems[sysIndex];
                         Voice voice = system.Staves[staffIndex].Voices[voiceIndex];
-                        foreach(IUniqueDef iu in voice.UniqueDefs)
+                        VoiceDef voiceDef = voice.VoiceDef;
+                        foreach(IUniqueDef iu in voiceDef.UniqueDefs)
                         {
                             iu.MsPosition = msPosition;
                             msPosition += iu.MsDuration;

@@ -81,21 +81,6 @@ namespace Moritz.Spec
         }
         #endregion constructors
 
-        #region Enumerators
-        public IEnumerable<MidiChordDef> MidiChordDefs
-        {
-            get
-            {
-                foreach(IUniqueDef iud in _uniqueDefs)
-                {
-                    MidiChordDef midiChordDef = iud as MidiChordDef;
-                    if(midiChordDef != null)
-                        yield return midiChordDef;
-                }
-            }
-        }
-        #endregion
-
         #region Count changers
         /// <summary>
         /// Appends the new iUniqueDef to the end of the list.
