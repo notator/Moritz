@@ -81,9 +81,10 @@ namespace Moritz
             this.DateText.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DateText.Location = new System.Drawing.Point(80, 89);
             this.DateText.Name = "DateText";
-            this.DateText.Size = new System.Drawing.Size(215, 28);
+            this.DateText.Size = new System.Drawing.Size(193, 42);
             this.DateText.TabIndex = 5;
-            this.DateText.Text = "version 1: 2008- May 2011\r\nversion 2: work in progress from May 2011";
+            this.DateText.Text = "version 1: 2008- May 2011\r\nversion 2: May 2011 - September 2014\r\nversion 3: work " +
+    "in progress";
             this.DateText.Click += new System.EventHandler(this.Anything_Click);
             // 
             // label1
@@ -94,7 +95,7 @@ namespace Moritz
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(97, 15);
             this.label1.TabIndex = 10;
-            this.label1.Text = "Moritz version 2";
+            this.label1.Text = "Moritz version 3";
             this.label1.Click += new System.EventHandler(this.Anything_Click);
             // 
             // WebsiteLinkLabel
@@ -115,7 +116,7 @@ namespace Moritz
             // 
             this.ThanksLabel.AutoSize = true;
             this.ThanksLabel.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ThanksLabel.Location = new System.Drawing.Point(25, 249);
+            this.ThanksLabel.Location = new System.Drawing.Point(25, 256);
             this.ThanksLabel.Name = "ThanksLabel";
             this.ThanksLabel.Size = new System.Drawing.Size(222, 28);
             this.ThanksLabel.TabIndex = 32;
@@ -127,7 +128,7 @@ namespace Moritz
             // 
             this.AcknowledgmentsLabel.AutoSize = true;
             this.AcknowledgmentsLabel.Font = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.AcknowledgmentsLabel.Location = new System.Drawing.Point(25, 135);
+            this.AcknowledgmentsLabel.Location = new System.Drawing.Point(25, 142);
             this.AcknowledgmentsLabel.Name = "AcknowledgmentsLabel";
             this.AcknowledgmentsLabel.Size = new System.Drawing.Size(106, 14);
             this.AcknowledgmentsLabel.TabIndex = 33;
@@ -138,7 +139,7 @@ namespace Moritz
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Arial", 7F);
-            this.label6.Location = new System.Drawing.Point(25, 226);
+            this.label6.Location = new System.Drawing.Point(25, 233);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(220, 13);
             this.label6.TabIndex = 36;
@@ -149,7 +150,7 @@ namespace Moritz
             // 
             this.MaxUndMoritzLinkLabel.AutoSize = true;
             this.MaxUndMoritzLinkLabel.Font = new System.Drawing.Font("Arial", 7F);
-            this.MaxUndMoritzLinkLabel.Location = new System.Drawing.Point(25, 212);
+            this.MaxUndMoritzLinkLabel.Location = new System.Drawing.Point(25, 219);
             this.MaxUndMoritzLinkLabel.Name = "MaxUndMoritzLinkLabel";
             this.MaxUndMoritzLinkLabel.Size = new System.Drawing.Size(80, 13);
             this.MaxUndMoritzLinkLabel.TabIndex = 37;
@@ -161,7 +162,7 @@ namespace Moritz
             // 
             this.LeslieSanfordLinkLabel.AutoSize = true;
             this.LeslieSanfordLinkLabel.Font = new System.Drawing.Font("Arial", 7F);
-            this.LeslieSanfordLinkLabel.Location = new System.Drawing.Point(25, 152);
+            this.LeslieSanfordLinkLabel.Location = new System.Drawing.Point(25, 159);
             this.LeslieSanfordLinkLabel.Name = "LeslieSanfordLinkLabel";
             this.LeslieSanfordLinkLabel.Size = new System.Drawing.Size(156, 13);
             this.LeslieSanfordLinkLabel.TabIndex = 39;
@@ -173,7 +174,7 @@ namespace Moritz
             // 
             this.label8.AutoSize = true;
             this.label8.Font = new System.Drawing.Font("Arial", 7F);
-            this.label8.Location = new System.Drawing.Point(25, 166);
+            this.label8.Location = new System.Drawing.Point(25, 173);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(169, 13);
             this.label8.TabIndex = 38;
@@ -184,7 +185,7 @@ namespace Moritz
             // 
             this.JeffGlattsMidiSiteLinkLable.AutoSize = true;
             this.JeffGlattsMidiSiteLinkLable.Font = new System.Drawing.Font("Arial", 7F);
-            this.JeffGlattsMidiSiteLinkLable.Location = new System.Drawing.Point(25, 182);
+            this.JeffGlattsMidiSiteLinkLable.Location = new System.Drawing.Point(25, 189);
             this.JeffGlattsMidiSiteLinkLable.Name = "JeffGlattsMidiSiteLinkLable";
             this.JeffGlattsMidiSiteLinkLable.Size = new System.Drawing.Size(103, 13);
             this.JeffGlattsMidiSiteLinkLable.TabIndex = 47;
@@ -196,7 +197,7 @@ namespace Moritz
             // 
             this.label14.AutoSize = true;
             this.label14.Font = new System.Drawing.Font("Arial", 7F);
-            this.label14.Location = new System.Drawing.Point(25, 196);
+            this.label14.Location = new System.Drawing.Point(25, 203);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(244, 13);
             this.label14.TabIndex = 46;
@@ -227,7 +228,7 @@ namespace Moritz
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Honeydew;
-            this.ClientSize = new System.Drawing.Size(318, 303);
+            this.ClientSize = new System.Drawing.Size(295, 305);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.WebsiteLabel);
             this.Controls.Add(this.JeffGlattsMidiSiteLinkLable);

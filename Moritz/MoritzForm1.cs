@@ -75,33 +75,6 @@ namespace Moritz
             }
         }
 
-        #region AssistantPerformer
-        private void PerformScoreButton_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                using(OpenFileDialog openFileDialog = new OpenFileDialog())
-                {
-                    openFileDialog.InitialDirectory = M.Preferences.LocalMoritzScoresFolder;
-                    openFileDialog.Filter = "Scores (*.html *.htm *.svg)|*.html;*.htm;*.svg";
-                    openFileDialog.Title = "Locate a score";
-
-                    if(openFileDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        string scorePath = openFileDialog.FileName;
-                        _assistantPerformerMainForm = new AssistantPerformerMainForm(scorePath, (IMoritzForm1)this);
-                        _assistantPerformerMainForm.Show();
-                        this.Hide(); // calls MoritzForm1_VisibleChanged() 
-                    }
-                }
-            }
-            catch(ApplicationException ae)
-            {
-                MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-        }
-        #endregion
-
         #region Krystals Editor
         private void KrystalsEditorButton_Click(object sender, EventArgs e)
         {
@@ -111,7 +84,6 @@ namespace Moritz
             }
         }
         #endregion
-
 
         #region new score settings
         private void NewScoreSettingsButton_Click(object sender, EventArgs e)
@@ -348,24 +320,9 @@ namespace Moritz
         {
             if(_assistantComposerMainForm != null && !_assistantComposerMainForm.Disposing)
                 _assistantComposerMainForm.Dispose();
-            if(_assistantPerformerMainForm != null && !_assistantPerformerMainForm.Disposing)
-                _assistantPerformerMainForm.Dispose();
             M.Preferences.Dispose();
         }
 
-        /// <summary>
-        /// Can be called by AssistantPerformerMainForm
-        /// </summary>
-        public void CloseAssistantPerformer()
-        {
-            if(_assistantPerformerMainForm != null)
-            {
-                _assistantPerformerMainForm.Close();
-                _assistantPerformerMainForm = null;
-            }
-            MoritzForm1_VisibleChanged(null, null);
-            this.Show();
-        }
         public void CloseAssistantComposer()
         {
             if(_assistantComposerMainForm != null)
@@ -377,7 +334,6 @@ namespace Moritz
             this.Show();
         }
 
-        private Form _assistantPerformerMainForm = null;
         private Form _assistantComposerMainForm = null;
     }
 }

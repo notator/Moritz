@@ -28,14 +28,12 @@ namespace Moritz
 		/// </summary>
 		private void InitializeComponent()
 		{
-            this.PerformScoreButton = new System.Windows.Forms.Button();
             this.QuitButton = new System.Windows.Forms.Button();
             this.PreferencesButton = new System.Windows.Forms.Button();
             this.CurrentOutputDeviceLabel = new System.Windows.Forms.Label();
             this.CurrentInputDeviceLabel = new System.Windows.Forms.Label();
             this.OutputDeviceComboBox = new System.Windows.Forms.ComboBox();
             this.InputDeviceComboBox = new System.Windows.Forms.ComboBox();
-            this.CloseAssistantPerformerButton = new System.Windows.Forms.Button();
             this.NewScoreSettingsButton = new System.Windows.Forms.Button();
             this.LoadScoreSettingsButton = new System.Windows.Forms.Button();
             this.CloseAssistantComposerButton = new System.Windows.Forms.Button();
@@ -43,28 +41,14 @@ namespace Moritz
             this.AboutButton = new System.Windows.Forms.Button();
             this.AssistantComposerPanel = new System.Windows.Forms.Panel();
             this.AssistantComposerLabel = new System.Windows.Forms.Label();
-            this.AssistantPerformerPanel = new System.Windows.Forms.Panel();
-            this.AssistantPerformerLabel = new System.Windows.Forms.Label();
             this.KrystalsEditorPanel = new System.Windows.Forms.Panel();
             this.KrystalsEditorLabel = new System.Windows.Forms.Label();
             this.MoritzPanel = new System.Windows.Forms.Panel();
             this.MoritzLabel = new System.Windows.Forms.Label();
             this.AssistantComposerPanel.SuspendLayout();
-            this.AssistantPerformerPanel.SuspendLayout();
             this.KrystalsEditorPanel.SuspendLayout();
             this.MoritzPanel.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // PerformScoreButton
-            // 
-            this.PerformScoreButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.PerformScoreButton.Location = new System.Drawing.Point(16, 30);
-            this.PerformScoreButton.Name = "PerformScoreButton";
-            this.PerformScoreButton.Size = new System.Drawing.Size(204, 31);
-            this.PerformScoreButton.TabIndex = 0;
-            this.PerformScoreButton.Text = "perform .html or .svg score";
-            this.PerformScoreButton.UseVisualStyleBackColor = true;
-            this.PerformScoreButton.Click += new System.EventHandler(this.PerformScoreButton_Click);
             // 
             // QuitButton
             // 
@@ -127,17 +111,6 @@ namespace Moritz
             this.InputDeviceComboBox.Size = new System.Drawing.Size(237, 21);
             this.InputDeviceComboBox.TabIndex = 7;
             this.InputDeviceComboBox.SelectedIndexChanged += new System.EventHandler(this.MidiInputDevicesComboBox_SelectedIndexChanged);
-            // 
-            // CloseAssistantPerformerButton
-            // 
-            this.CloseAssistantPerformerButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.CloseAssistantPerformerButton.Location = new System.Drawing.Point(16, 30);
-            this.CloseAssistantPerformerButton.Name = "CloseAssistantPerformerButton";
-            this.CloseAssistantPerformerButton.Size = new System.Drawing.Size(204, 31);
-            this.CloseAssistantPerformerButton.TabIndex = 1;
-            this.CloseAssistantPerformerButton.Text = "close";
-            this.CloseAssistantPerformerButton.UseVisualStyleBackColor = true;
-            this.CloseAssistantPerformerButton.Click += new System.EventHandler(this.CloseAssistantPerformerButton_Click);
             // 
             // NewScoreSettingsButton
             // 
@@ -218,29 +191,6 @@ namespace Moritz
             this.AssistantComposerLabel.TabIndex = 0;
             this.AssistantComposerLabel.Text = "Assistant Composer";
             // 
-            // AssistantPerformerPanel
-            // 
-            this.AssistantPerformerPanel.BackColor = System.Drawing.Color.Honeydew;
-            this.AssistantPerformerPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.AssistantPerformerPanel.Controls.Add(this.AssistantPerformerLabel);
-            this.AssistantPerformerPanel.Controls.Add(this.PerformScoreButton);
-            this.AssistantPerformerPanel.Controls.Add(this.CloseAssistantPerformerButton);
-            this.AssistantPerformerPanel.Location = new System.Drawing.Point(278, 64);
-            this.AssistantPerformerPanel.Name = "AssistantPerformerPanel";
-            this.AssistantPerformerPanel.Size = new System.Drawing.Size(237, 80);
-            this.AssistantPerformerPanel.TabIndex = 1;
-            // 
-            // AssistantPerformerLabel
-            // 
-            this.AssistantPerformerLabel.AutoSize = true;
-            this.AssistantPerformerLabel.Font = new System.Drawing.Font("Verdana", 9F);
-            this.AssistantPerformerLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.AssistantPerformerLabel.Location = new System.Drawing.Point(7, 6);
-            this.AssistantPerformerLabel.Name = "AssistantPerformerLabel";
-            this.AssistantPerformerLabel.Size = new System.Drawing.Size(131, 14);
-            this.AssistantPerformerLabel.TabIndex = 0;
-            this.AssistantPerformerLabel.Text = "Assistant Performer";
-            // 
             // KrystalsEditorPanel
             // 
             this.KrystalsEditorPanel.BackColor = System.Drawing.Color.Honeydew;
@@ -294,7 +244,6 @@ namespace Moritz
             this.ClientSize = new System.Drawing.Size(539, 265);
             this.ControlBox = false;
             this.Controls.Add(this.KrystalsEditorPanel);
-            this.Controls.Add(this.AssistantPerformerPanel);
             this.Controls.Add(this.CurrentOutputDeviceLabel);
             this.Controls.Add(this.CurrentInputDeviceLabel);
             this.Controls.Add(this.OutputDeviceComboBox);
@@ -305,13 +254,11 @@ namespace Moritz
             this.Name = "MoritzForm1";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Moritz v2";
+            this.Text = "Moritz v3";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MoritzForm1_FormClosing);
             this.VisibleChanged += new System.EventHandler(this.MoritzForm1_VisibleChanged);
             this.AssistantComposerPanel.ResumeLayout(false);
             this.AssistantComposerPanel.PerformLayout();
-            this.AssistantPerformerPanel.ResumeLayout(false);
-            this.AssistantPerformerPanel.PerformLayout();
             this.KrystalsEditorPanel.ResumeLayout(false);
             this.KrystalsEditorPanel.PerformLayout();
             this.MoritzPanel.ResumeLayout(false);
@@ -323,14 +270,12 @@ namespace Moritz
 
 		#endregion
 
-        private System.Windows.Forms.Button PerformScoreButton;
         private System.Windows.Forms.Button QuitButton;
         private System.Windows.Forms.Button PreferencesButton;
         private System.Windows.Forms.Label CurrentOutputDeviceLabel;
         private System.Windows.Forms.Label CurrentInputDeviceLabel;
         private System.Windows.Forms.ComboBox OutputDeviceComboBox;
         private System.Windows.Forms.ComboBox InputDeviceComboBox;
-        private System.Windows.Forms.Button CloseAssistantPerformerButton;
         private System.Windows.Forms.Button NewScoreSettingsButton;
         private System.Windows.Forms.Button LoadScoreSettingsButton;
         private System.Windows.Forms.Button CloseAssistantComposerButton;
@@ -338,8 +283,6 @@ namespace Moritz
         private System.Windows.Forms.Button AboutButton;
         private System.Windows.Forms.Panel AssistantComposerPanel;
         private System.Windows.Forms.Label AssistantComposerLabel;
-        private System.Windows.Forms.Panel AssistantPerformerPanel;
-        private System.Windows.Forms.Label AssistantPerformerLabel;
         private System.Windows.Forms.Panel KrystalsEditorPanel;
         private System.Windows.Forms.Label KrystalsEditorLabel;
         private System.Windows.Forms.Panel MoritzPanel;
