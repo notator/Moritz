@@ -19,8 +19,8 @@ namespace Moritz
             }
             catch 
             {
-                MessageBox.Show("No available MIDI output devices.\nThey are probably being used by another program.",
-                    "Device Error", MessageBoxButtons.OK);
+                MessageBox.Show("Moritz threw an unhandled exception.",
+                    "Error", MessageBoxButtons.OK);
             }
         }
     }

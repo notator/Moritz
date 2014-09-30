@@ -13,7 +13,7 @@ namespace Moritz.Palettes
 {
     public partial class PaletteForm : Form, IPaletteForm
     {
-        public PaletteForm(XmlReader r, string name, int domain, MainFormCallbacks mainFormCallbacks)
+        public PaletteForm(XmlReader r, string name, int domain, ComposerFormCallbacks mainFormCallbacks)
             : this(name, domain, mainFormCallbacks)
         {
             ReadPalette(r);
@@ -28,7 +28,7 @@ namespace Moritz.Palettes
         /// </summary>
         /// <param name="assistantComposer"></param>
         /// <param name="krystal"></param>
-        public PaletteForm(string name, int domain, MainFormCallbacks mainFormCallbacks)
+        public PaletteForm(string name, int domain, ComposerFormCallbacks mainFormCallbacks)
         {
             InitializeComponent();
             _name = name;
@@ -1193,14 +1193,14 @@ namespace Moritz.Palettes
         }
         private string _name = null;
         private int _domain = 0;
-        private MainFormCallbacks _callbacks = null;
+        private ComposerFormCallbacks _callbacks = null;
         private List<TextBox> _allMainTextBoxes = new List<TextBox>();
         private AudioButtonsControl _audioButtonsControl = null;
         #endregion iPaletteForm
 
         #region public variables
         public int Domain { get { return _domain; } }
-        public MainFormCallbacks Callbacks { get { return _callbacks; } }
+        public ComposerFormCallbacks Callbacks { get { return _callbacks; } }
         public BasicChordControl BasicChordControl { get { return _bcc; } }
         public OrnamentSettingsForm OrnamentSettingsForm { get { return _ornamentSettingsForm; } }
         #endregion public variables

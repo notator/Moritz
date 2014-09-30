@@ -30,6 +30,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Multimedia, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Sanford Libraries\Multimedia.dll</HintPath>
+    </Reference>
+    <Reference Include="Multimedia.Midi, Version=4.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Sanford Libraries\Multimedia.Midi.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -81,6 +89,10 @@
     <ProjectReference Include="..\Moritz.Krystals\Moritz.Krystals.csproj">
       <Project>{df448bec-155b-4a56-82bd-8fd1978a85af}</Project>
       <Name>Moritz.Krystals</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Midi\Moritz.Midi.csproj">
+      <Project>{82e776e6-c819-42e6-9986-7ebdc3dffa06}</Project>
+      <Name>Moritz.Midi</Name>
     </ProjectReference>
     <ProjectReference Include="..\Moritz.Palettes\Moritz.Palettes.csproj">
       <Project>{a240ecd4-6ec2-4a0e-99e4-70cec7b603ca}</Project>

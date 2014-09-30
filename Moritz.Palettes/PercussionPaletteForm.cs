@@ -13,14 +13,14 @@ namespace Moritz.Palettes
 {
     public partial class PercussionPaletteForm : Form, IPaletteForm
     {
-        public PercussionPaletteForm(XmlReader r, string name, int domain, MainFormCallbacks mainFormCallbacks)
+        public PercussionPaletteForm(XmlReader r, string name, int domain, ComposerFormCallbacks mainFormCallbacks)
             : this(name, domain, mainFormCallbacks)
         {
             ReadPalette(r);
             _audioButtonsControl.Enabled = true;
         }
 
-        public PercussionPaletteForm(string name, int domain, MainFormCallbacks mainFormCallbacks)
+        public PercussionPaletteForm(string name, int domain, ComposerFormCallbacks mainFormCallbacks)
         {
             InitializeComponent();
             _name = name;
@@ -930,14 +930,14 @@ namespace Moritz.Palettes
         }
         private string _name = null;
         private int _domain = 0;
-        private MainFormCallbacks _callbacks = null;
+        private ComposerFormCallbacks _callbacks = null;
         private List<TextBox> _allMainTextBoxes = new List<TextBox>();
         private AudioButtonsControl _audioButtonsControl = null;
         #endregion iPaletteForm
 
         #region public variables
         public int Domain { get { return _domain; } }
-        public MainFormCallbacks Callbacks { get { return _callbacks; } }
+        public ComposerFormCallbacks Callbacks { get { return _callbacks; } }
         public BasicPercussionControl BasicChordControl { get { return _bpc; } }
         public PercussionOrnamentsForm PercussionOrnamentsForm { get { return _percussionOrnamentsForm; } }
         #endregion public variables

@@ -18,7 +18,7 @@ namespace Moritz.Palettes
     public delegate bool MainFormHasBeenSaved();
     public delegate string SettingsFolderPath();
 
-    public class MainFormCallbacks
+    public class ComposerFormCallbacks
     {
         public SetSettingsHaveBeenSaved SetSettingsHaveBeenSaved;
         public SetSettingsHaveNotBeenSaved SetSettingsHaveNotBeenSaved;

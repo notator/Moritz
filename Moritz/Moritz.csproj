@@ -126,10 +126,6 @@
       <Project>{e68c2a79-cdab-46f5-a6ee-534ce2d99577}</Project>
       <Name>Moritz.Globals</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Moritz.Performer\Moritz.Performer.csproj">
-      <Project>{d7b15444-16b2-4476-8a78-acf825494f6a}</Project>
-      <Name>Moritz.Performer</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Moritz.Symbols\Moritz.Symbols.csproj">
       <Project>{df59888c-f935-4e4f-ba31-664daf79f7d6}</Project>
       <Name>Moritz.Symbols</Name>

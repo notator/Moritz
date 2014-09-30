@@ -6,7 +6,6 @@ using System.IO;
 
 using Moritz.Globals;
 using Moritz.Composer;
-using Moritz.Performer;
 
 using Krystals4Application;
 
@@ -319,6 +318,6 @@ namespace Moritz
             this.Show();
         }
 
-        private Form _assistantComposerMainForm = null;
+        private AssistantComposerMainForm _assistantComposerMainForm = null;
     }
 }

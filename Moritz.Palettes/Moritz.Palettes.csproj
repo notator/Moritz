@@ -65,7 +65,7 @@
     <Compile Include="BasicPercussionControl.Designer.cs">
       <DependentUpon>BasicPercussionControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="MainFormCallbacks.cs" />
+    <Compile Include="ComposerFormCallbacks.cs" />
     <Compile Include="IntListControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -169,10 +169,6 @@
     <ProjectReference Include="..\Moritz.Midi\Moritz.Midi.csproj">
       <Project>{82e776e6-c819-42e6-9986-7ebdc3dffa06}</Project>
       <Name>Moritz.Midi</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Moritz.Performer\Moritz.Performer.csproj">
-      <Project>{d7b15444-16b2-4476-8a78-acf825494f6a}</Project>
-      <Name>Moritz.Performer</Name>
     </ProjectReference>
     <ProjectReference Include="..\Moritz.Spec\Moritz.Spec.csproj">
       <Project>{c84026d4-800e-4590-8127-97e78b471921}</Project>

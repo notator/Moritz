@@ -11,8 +11,8 @@ using Multimedia.Midi;
 
 using Moritz.Globals;
 using Moritz.Midi;
+using Moritz.Spec;
 using Moritz.Symbols;
-using Moritz.Performer;
 
 namespace Moritz.Palettes
 {
@@ -21,9 +21,6 @@ namespace Moritz.Palettes
         internal AudioButtonsControl(int domain, Point location, IPaletteForm iPaletteForm, string audioFolder)
         {
             InitializeComponent();
-            _midiOutputDevice = M.Preferences.CurrentMultimediaMidiOutputDevice;
-
-            Debug.Assert(_midiOutputDevice != null);
 
             _iPaletteForm = iPaletteForm;
             _audioFolder = audioFolder;
@@ -163,111 +160,45 @@ namespace Moritz.Palettes
             b.BringToFront();
         }
 
-        #region playMidievent
+        #region playMidiEvent
         private void MidiEventDemoButton_Click(object sender, EventArgs e)
         {
-            //Button button = sender as Button;
-            //if(button != null)
-            //{
-            //    int index = int.Parse(button.Text) - 1;
-            //    if(index >= 0 && index < _midiEventDemoButtons.Count)
-            //    {
-            //        PlayMidiEvent(index);
-            //    }
-            //}
+            Button button = sender as Button;
+            if(button != null)
+            {
+                int index = int.Parse(button.Text) - 1;
+                if(index >= 0 && index < _midiEventDemoButtons.Count)
+                {
+                    PaletteForm paletteForm = this._iPaletteForm as PaletteForm;
+                    Palette palette = new Palette(paletteForm);
+                    IUniqueDef iud = palette.UniqueDurationDef(index);
+
+                    if(iud is RestDef)
+                    {
+                        _midiEventDemoButtons[index].Hide();
+                        this._restLabels[0].Select(); // just to deselect everything
+                        Refresh(); // shows "rest" behind button
+                        Thread.Sleep(iud.MsDuration);
+                        _midiEventDemoButtons[index].Show();
+                        Refresh();
+                    }
+                    else
+                    {
+                        int midiChannel = 0;
+                        if(_iPaletteForm is PercussionPaletteForm)
+                            midiChannel = 9;
+                        _midiEventDemoButtons[index].Select();
+                        Refresh();
+                        MidiChordDef midiChordDef = iud as MidiChordDef;
+                        Debug.Assert(midiChordDef != null);
+                        MidiChord midiChord = new MidiChord(midiChannel, midiChordDef);
+                        midiChord.Send(); //sends in this thread
+                        //// This blocks the current thread (keeps the button selected)
+                        //Thread.Sleep(iud.MsDuration);
+                    }
+                }
+            }
         }
-
- 
-        //public void GetPaletteAndAssistant(out Palette palette, out Assistant assistant)
-        //{
-        //    PageFormat pageFormat = new PageFormat();
-
-        //    PaletteForm paletteForm = _iPaletteForm as PaletteForm;
-        //    PercussionPaletteForm percussionPaletteForm = _iPaletteForm as PercussionPaletteForm;
-        //    PaletteDemoScore paletteDemoScore = null;
-        //    if(paletteForm != null)
-        //    {
-        //        palette = new Palette(paletteForm);
-        //        paletteDemoScore = new PaletteDemoScore(palette, pageFormat, 0);
-        //    }
-        //    else
-        //    {
-        //        palette = new Palette(percussionPaletteForm);
-        //        paletteDemoScore = new PaletteDemoScore(palette, pageFormat, 9);
-        //    }
-
-        //    MoritzPerformanceOptions performanceOptions = new MoritzPerformanceOptions(M.Preferences, "", null);
-        //    MidiScore midiScore = new MidiScore(paletteDemoScore, performanceOptions, true);
-
-        //    PerformanceState performanceState = new PerformanceState(
-        //        _midiOutputDevice.Send, SendChordMessage, performanceOptions, midiScore.MsPosTimeControlsDict, new List<int>() { 9 });
-
-        //    assistant = new Assistant(midiScore.AssistantsMoments, performanceState,
-        //                midiScore.MsPosTimeControlsDict, CheckRepeat);
-
-        //    assistant.ResetChannels();
-        //}
-
-        //private void PlayMidiEvent(int index)
-        //{
-        //    Palette krystalPalette = null;
-        //    Assistant assistant = null;
-
-        //    GetPaletteAndAssistant(out krystalPalette, out assistant);
-
-        //    assistant.ResetChannels(); // sends allSoundsOff and AllControllersOff, Sleeps 5 milliseconds to avoid click.
-
-        //    IUniqueDef iud = krystalPalette.UniqueDurationDef(index);
-        //    if(iud is RestDef)
-        //    {
-        //        _midiEventDemoButtons[index].Hide();
-        //        this._restLabels[0].Select(); // just to deselect everything
-        //        Refresh(); // shows "rest" behind button
-        //        Thread.Sleep(iud.MsDuration);
-        //        _midiEventDemoButtons[index].Show();
-        //        Refresh();
-        //    }
-        //    else
-        //    {
-        //        int numberOfRests = 0;
-        //        for(int i = 0; i < index; ++i)
-        //        {
-        //            IUniqueDef def = krystalPalette.UniqueDurationDef(i);
-        //            if(def is RestDef)
-        //                ++numberOfRests;
-        //        }
-
-        //        _midiEventDemoButtons[index].Select();
-        //        Refresh();
-        //        assistant.PerformOneMoment(index - numberOfRests);
-        //        if(index > 0)
-        //        {
-        //            // This blocks the current thread (keeps the button selected)
-        //            // If index == 0, it is blocked by the assistant.
-        //            Thread.Sleep(iud.MsDuration);
-        //        }
-        //    }
-        //    this._restLabels[0].Select(); // just to deselect everything
-        //    Refresh();
-        //}
-
-        //private void SendChordMessage(ChordMessage chord)
-        //{
-        //    foreach(ChannelMessage message in chord.ChannelMessages)
-        //    {
-        //        _midiOutputDevice.Send(message);
-        //    }
-        //}
-
-        //private void CheckRepeat(PerformanceState performanceState)
-        //{
-        //    // does nothing here
-        //}
-
-        //private void UpdateIndexDisplay(int assistantsIndex)
-        //{
-        //    // does nothing here
-        //}
         #endregion
 
         private void AudioSampleButton_MouseDown(object sender, MouseEventArgs e)
@@ -400,7 +331,6 @@ namespace Moritz.Palettes
             }
         }
 
-        private readonly Multimedia.Midi.OutputDevice _midiOutputDevice = null;
         private readonly IPaletteForm _iPaletteForm;
         private readonly string _audioFolder;
 

@@ -8,9 +8,14 @@ using System.Text;
 using System.Xml;
 using System.Text.RegularExpressions;
 
+//using Multimedia;
+using Multimedia.Midi;
+
 using Krystals4ObjectLibrary;
 using Moritz.Globals;
 using Moritz.Symbols;
+using Moritz.Midi;
+using Moritz.Spec;
 using Moritz.Palettes;
 using Moritz.Algorithm;
 using Moritz.Algorithm.PaletteDemo;
@@ -27,6 +32,7 @@ namespace Moritz.Composer
         {
             InitializeComponent();
             _moritzForm1 = moritzForm1;
+
             _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this);
 
             M.PopulateComboBox(ChordTypeComboBox, M.ChordTypes);
@@ -487,7 +493,7 @@ namespace Moritz.Composer
 
         private void GetPalettes(XmlReader r)
         {
-            MainFormCallbacks callbacks = GetCallbacks();
+            ComposerFormCallbacks callbacks = GetCallbacks();
             Debug.Assert(r.Name == "palettes");
             M.ReadToXmlElementTag(r, "palette");
             while(r.Name == "palette")
@@ -531,9 +537,9 @@ namespace Moritz.Composer
             Debug.Assert(r.Name == "palettes");
         }
 
-        private MainFormCallbacks GetCallbacks()
+        private ComposerFormCallbacks GetCallbacks()
         {
-            MainFormCallbacks callbacks = new MainFormCallbacks();
+            ComposerFormCallbacks callbacks = new ComposerFormCallbacks();
             callbacks.MainFormBringToFront = this.BringToFront;
             callbacks.MainFormHasBeenSaved = ThisHasBeenSaved;
             callbacks.SaveSettings = SaveSettings;
@@ -1167,7 +1173,7 @@ namespace Moritz.Composer
 
             // Palette domains are limited by the width of the palette forms.
             // There has to be enough space for the demo buttons.
-            MainFormCallbacks callbacks = GetCallbacks();
+            ComposerFormCallbacks callbacks = GetCallbacks();
             GetStringDialog getStringDialog = new GetStringDialog("Get Domain", message);
             if(getStringDialog.ShowDialog() == DialogResult.OK)
             {
@@ -1879,6 +1885,7 @@ namespace Moritz.Composer
         private IMoritzForm1 _moritzForm1;
         private Moritz.Krystals.KrystalBrowser _krystalBrowser = null;
         private DimensionsAndMetadataForm _dimensionsAndMetadataForm;
+
         private List<byte> _outputChannels = null;
         
         private List<List<byte>> _midiChannelsPerStaff; // set in MidiChannelsPerStaffTextBox_Leave
