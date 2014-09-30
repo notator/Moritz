@@ -13,15 +13,7 @@ namespace Moritz
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            try
-            {
-                Application.Run(new MoritzForm1());
-            }
-            catch 
-            {
-                MessageBox.Show("Moritz threw an unhandled exception.",
-                    "Error", MessageBoxButtons.OK);
-            }
+            Application.Run(new MoritzForm1());
         }
     }
 }

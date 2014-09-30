@@ -61,18 +61,12 @@ namespace Moritz.Midi
         /// </summary>
         public List<MidiControl> MidiControls = new List<MidiControl>();
         /// <summary>
-        /// Currently, the only MoritzControl types are MoritzOrnament and MoritzKeyboardNumberControl.
-        /// </summary>
-        public List<MoritzControl> MoritzControls = new List<MoritzControl>();
-        /// <summary>
         /// Messages to be sent when this durationSymbol ends (e.g. PedOff)
         /// </summary>
         public List<ChannelMessage> OffMessages = new List<ChannelMessage>();
         protected int _msPosition = 0;
         protected int _msDuration = 0;
         protected int _channelIndex = -1;
-
-        public MidiMoment Container = null;
         private int _startTimeMilliseconds = -1; // error value
     }
 }

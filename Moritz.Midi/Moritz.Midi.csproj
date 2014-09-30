@@ -46,20 +46,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicMidiChord.cs" />
-    <Compile Include="ChannelState.cs" />
     <Compile Include="ChordMessage.cs" />
     <Compile Include="MidiChord.cs" />
     <Compile Include="MidiChordSlider.cs" />
     <Compile Include="MidiCommand.cs" />
     <Compile Include="MidiControl.cs" />
     <Compile Include="MidiDurationSymbol.cs" />
-    <Compile Include="MidiMessageDelegates.cs" />
-    <Compile Include="MidiMoment.cs" />
     <Compile Include="MidiSlider.cs" />
     <Compile Include="MidiSwitch.cs" />
-    <Compile Include="MoritzControl.cs" />
     <Compile Include="NoteMessage.cs" />
-    <Compile Include="TimeControl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

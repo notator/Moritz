@@ -50,6 +50,12 @@ namespace Moritz.Midi
             {
                 _volume = new Volume(channel, (byte)midiChordDef.Volume, ControlContinuation.NoChange);
             }
+
+            // Moritz currently never repeats MidiChords, so the _repeat field is unnecessary.
+            // However: the value of midiChordDef.Repeat is saved in SVG-MIDI files,
+            // and may be used by the web AssistantPerformer.
+            //_repeat = midiChordDef.Repeat;
+
             if(midiChordDef.PitchWheelDeviation != null)
             {
                 _pitchWheelDeviation = new PitchWheelDeviation(channel, (byte)midiChordDef.PitchWheelDeviation);
@@ -121,11 +127,6 @@ namespace Moritz.Midi
                 AddSliderMessages(_pitchWheelSlider, totalMsDuration);
             if(_expressionSlider != null)
                 AddSliderMessages(_expressionSlider, totalMsDuration);
-
-            if(!_messagesDict.ContainsKey(totalMsDuration))
-                _messagesDict.Add(totalMsDuration, new List<ChannelMessage>());
-            AllControllersOff aco = new AllControllersOff(_channelIndex);
-            _messagesDict[totalMsDuration].AddRange(aco.ChannelMessages);
         }
 
         private void AddSliderMessages(MidiChordSlider slider, int msDuration)
@@ -163,10 +164,9 @@ namespace Moritz.Midi
             }
         }
 
-        // Volume, PitchWheelDeviation and BasicMidiChords are sent in their own thread.
         private BankControl _bank = null;
         private PatchControl _patch = null;
-        private Volume _volume = null; 
+        private Volume _volume = null;
         private PitchWheelDeviation _pitchWheelDeviation = null;
         private List<BasicMidiChord> _basicMidiChords = new List<BasicMidiChord>();     
         private MidiChordSlider _pitchWheelSlider = null;

@@ -335,7 +335,7 @@ namespace Moritz.Palettes
             int msPosition = 0;
             foreach(int value in sequence)
             {
-                Debug.Assert((value >= 1 && value <= this.Count), "Illegal argument: value out of range in sequence");
+                Debug.Assert((value > 0 && value <= this.Count), "Illegal argument: value out of range in sequence");
 
                 IUniqueDef iumdd = this.UniqueDurationDef(value - 1);
                 iumdd.MsPosition = msPosition;
@@ -358,7 +358,7 @@ namespace Moritz.Palettes
         public OutputVoiceDef NewOutputVoiceDef()
         {
             List<int> sequence = new List<int>();
-            for(int i = 0; i < Count; ++i)
+            for(int i = 1; i <= Count; ++i)
             {
                 sequence.Add(i);
             }

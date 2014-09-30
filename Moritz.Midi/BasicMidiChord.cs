@@ -93,32 +93,6 @@ namespace Moritz.Midi
         /// </summary>
         public readonly ChordOff ChordOff = null;
 
-        public void SendBankAndPatch(ChannelMessageDelegate SendChannelMessage)
-        {
-            if(BankControl != null)
-            {
-                foreach(ChannelMessage bankMessage in BankControl.ChannelMessages)
-                    SendChannelMessage(bankMessage);
-            }
-            if(PatchControl != null)
-            {
-                foreach(ChannelMessage patchMessage in PatchControl.ChannelMessages)
-                    SendChannelMessage(patchMessage);
-            }
-        }
-
-        /// <summary>
-        /// Sends the BasicMidiChord in the current thread, sleeping for the duration
-        /// of the chord, then sending a chord off (if one exists).
-        /// </summary>
-        /// <param name="SendChordMessage"></param>
-        public void Send(ChordMessageDelegate SendChordMessage)
-        {
-            SendChordMessage(ChordOn);
-            Thread.Sleep(MsDuration);
-            if(ChordOff != null)
-                SendChordMessage(ChordOff);
-        }
 
         public readonly MidiChord MidiChord;
         //public int MsPosition = 0;

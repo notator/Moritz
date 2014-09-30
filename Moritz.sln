@@ -29,8 +29,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Spec", "Moritz.Spec\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Composer", "Moritz.Composer\Moritz.Composer.csproj", "{1EC1C34A-FE5F-4BD0-AC99-CDDE4172B7CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "newMoritz", "newMoritz\newMoritz.csproj", "{884B35E7-3400-4B4A-BDBF-56E736B913D9}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz", "Moritz\Moritz.csproj", "{EBE4F5D3-5F81-40BF-B0FD-997A771CF655}"
 EndProject
 Global
@@ -153,16 +151,6 @@ Global
 		{1EC1C34A-FE5F-4BD0-AC99-CDDE4172B7CA}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{1EC1C34A-FE5F-4BD0-AC99-CDDE4172B7CA}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{1EC1C34A-FE5F-4BD0-AC99-CDDE4172B7CA}.Release|x86.ActiveCfg = Release|Any CPU
-		{884B35E7-3400-4B4A-BDBF-56E736B913D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{884B35E7-3400-4B4A-BDBF-56E736B913D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{884B35E7-3400-4B4A-BDBF-56E736B913D9}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{884B35E7-3400-4B4A-BDBF-56E736B913D9}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{884B35E7-3400-4B4A-BDBF-56E736B913D9}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{884B35E7-3400-4B4A-BDBF-56E736B913D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{884B35E7-3400-4B4A-BDBF-56E736B913D9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{884B35E7-3400-4B4A-BDBF-56E736B913D9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{884B35E7-3400-4B4A-BDBF-56E736B913D9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{884B35E7-3400-4B4A-BDBF-56E736B913D9}.Release|x86.ActiveCfg = Release|Any CPU
 		{EBE4F5D3-5F81-40BF-B0FD-997A771CF655}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EBE4F5D3-5F81-40BF-B0FD-997A771CF655}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBE4F5D3-5F81-40BF-B0FD-997A771CF655}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

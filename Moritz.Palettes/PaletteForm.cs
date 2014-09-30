@@ -60,7 +60,7 @@ namespace Moritz.Palettes
         {
             Point location = new Point(this.MinMsDurationsTextBox.Location.X, this.MinMsDurationsTextBox.Location.Y + 27);
             //Point location = new Point(this.MinMsDurationsTextBox.Location.X, this.MinMsDurationsTextBox.Location.Y);
-            _audioButtonsControl = new AudioButtonsControl(domain, location, this, _callbacks.SettingsFolderPath + @"\audio");
+            _audioButtonsControl = new AudioButtonsControl(domain, location, this, _callbacks.SettingsFolderPath() + @"\audio");
             Debug.Assert(_audioButtonsControl != null);
             Controls.Add(_audioButtonsControl);
         }
