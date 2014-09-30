@@ -1,21 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{9B5FE3BA-F992-4064-9563-6C4A5616195C}</ProjectGuid>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{EBE4F5D3-5F81-40BF-B0FD-997A771CF655}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Moritz</RootNamespace>
     <AssemblyName>Moritz</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,17 +22,14 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>Moritz.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -52,7 +47,7 @@
     <Compile Include="AboutMoritz.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AboutMoritz.designer.cs">
+    <Compile Include="AboutMoritz.Designer.cs">
       <DependentUpon>AboutMoritz.cs</DependentUpon>
     </Compile>
     <Compile Include="MoritzForm1.cs">
@@ -97,7 +92,6 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -110,31 +104,37 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Krystals4Application\Krystals4Application.csproj">
-      <Project>{93791484-2CA8-427A-9D19-3232D3753983}</Project>
-      <Name>Krystals4Application</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Krystals4ObjectLibrary\Krystals4ObjectLibrary.csproj">
-      <Project>{383E2844-41A4-488F-A683-D3EAE9AF4AF5}</Project>
-      <Name>Krystals4ObjectLibrary</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Moritz.AssistantComposer\Moritz.AssistantComposer.csproj">
-      <Project>{AE8A988A-2F63-4377-8630-DF9020877362}</Project>
-      <Name>Moritz.AssistantComposer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Moritz.AssistantPerformer\Moritz.AssistantPerformer.csproj">
-      <Project>{C42FEC1B-4FBD-472A-A866-9B5A08984A63}</Project>
-      <Name>Moritz.AssistantPerformer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
-      <Project>{E68C2A79-CDAB-46F5-A6EE-534CE2D99577}</Project>
-      <Name>Moritz.Globals</Name>
-    </ProjectReference>
+    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="_revision58Log.txt" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Krystals4Application\Krystals4Application.csproj">
+      <Project>{93791484-2ca8-427a-9d19-3232d3753983}</Project>
+      <Name>Krystals4Application</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Krystals4ObjectLibrary\Krystals4ObjectLibrary.csproj">
+      <Project>{383e2844-41a4-488f-a683-d3eae9af4af5}</Project>
+      <Name>Krystals4ObjectLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Composer\Moritz.Composer.csproj">
+      <Project>{1ec1c34a-fe5f-4bd0-ac99-cdde4172b7ca}</Project>
+      <Name>Moritz.Composer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
+      <Project>{e68c2a79-cdab-46f5-a6ee-534ce2d99577}</Project>
+      <Name>Moritz.Globals</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Performer\Moritz.Performer.csproj">
+      <Project>{d7b15444-16b2-4476-8a78-acf825494f6a}</Project>
+      <Name>Moritz.Performer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Symbols\Moritz.Symbols.csproj">
+      <Project>{df59888c-f935-4e4f-ba31-664daf79f7d6}</Project>
+      <Name>Moritz.Symbols</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

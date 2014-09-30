@@ -5,8 +5,8 @@ using System.Diagnostics;
 using System.IO;
 
 using Moritz.Globals;
-using Moritz.AssistantComposer;
-using Moritz.AssistantPerformer;
+using Moritz.Composer;
+using Moritz.Performer;
 
 using Krystals4Application;
 
