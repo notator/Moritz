@@ -188,7 +188,7 @@ namespace Moritz
             w.WriteAttributeString("gap", "4");
             w.WriteAttributeString("minGapsBetweenStaves", "8");
             w.WriteAttributeString("minGapsBetweenSystems", "11");
-            w.WriteAttributeString("midiChannelsPerVoicePerStaff", "");
+            w.WriteAttributeString("outputVoicesPerVoicePerStaff", "");
             w.WriteAttributeString("clefsPerStaff", "");
             w.WriteAttributeString("stafflinesPerStaff", "");
             w.WriteAttributeString("staffGroups", "");

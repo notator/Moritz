@@ -56,17 +56,17 @@ namespace Moritz.Composer
             this.MinimumCrotchetDurationTextBox = new System.Windows.Forms.TextBox();
             this.MinimumCrotchetDurationLabel = new System.Windows.Forms.Label();
             this.LongStaffNamesHelpLabel = new System.Windows.Forms.Label();
-            this.MidiChannelsPerStaffHelpLabel2 = new System.Windows.Forms.Label();
+            this.OutputVoiceIndicesPerStaffHelpLabel2 = new System.Windows.Forms.Label();
             this.ShortStaffNamesLabel = new System.Windows.Forms.Label();
             this.LongStaffNamesTextBox = new System.Windows.Forms.TextBox();
-            this.MidiChannelsPerStaffHelpLabel = new System.Windows.Forms.Label();
+            this.OutputVoiceIndicesPerStaffHelpLabel = new System.Windows.Forms.Label();
             this.SystemStartBarsHelpLabel = new System.Windows.Forms.Label();
             this.ShortStaffNamesTextBox = new System.Windows.Forms.TextBox();
             this.StafflinesPerStaffHelpLabel = new System.Windows.Forms.Label();
-            this.MidiChannelsPerStaffLabel = new System.Windows.Forms.Label();
+            this.OutputVoiceIndicesPerStaffLabel = new System.Windows.Forms.Label();
             this.StafflinesPerStaffLabel = new System.Windows.Forms.Label();
             this.LongStaffNamesLabel = new System.Windows.Forms.Label();
-            this.MidiChannelsPerStaffTextBox = new System.Windows.Forms.TextBox();
+            this.OutputVoiceIndicesStaffTextBox = new System.Windows.Forms.TextBox();
             this.ClefsPerStaffLabel = new System.Windows.Forms.Label();
             this.ClefsPerStaffHelpLabel = new System.Windows.Forms.Label();
             this.StaffGroupsHelpLabel = new System.Windows.Forms.Label();
@@ -235,17 +235,17 @@ namespace Moritz.Composer
             this.NotationGroupBox.Controls.Add(this.ShortStaffNamesHelpLabel);
             this.NotationGroupBox.Controls.Add(this.StandardChordsOptionsPanel);
             this.NotationGroupBox.Controls.Add(this.LongStaffNamesHelpLabel);
-            this.NotationGroupBox.Controls.Add(this.MidiChannelsPerStaffHelpLabel2);
+            this.NotationGroupBox.Controls.Add(this.OutputVoiceIndicesPerStaffHelpLabel2);
             this.NotationGroupBox.Controls.Add(this.ShortStaffNamesLabel);
             this.NotationGroupBox.Controls.Add(this.LongStaffNamesTextBox);
-            this.NotationGroupBox.Controls.Add(this.MidiChannelsPerStaffHelpLabel);
+            this.NotationGroupBox.Controls.Add(this.OutputVoiceIndicesPerStaffHelpLabel);
             this.NotationGroupBox.Controls.Add(this.SystemStartBarsHelpLabel);
             this.NotationGroupBox.Controls.Add(this.ShortStaffNamesTextBox);
             this.NotationGroupBox.Controls.Add(this.StafflinesPerStaffHelpLabel);
-            this.NotationGroupBox.Controls.Add(this.MidiChannelsPerStaffLabel);
+            this.NotationGroupBox.Controls.Add(this.OutputVoiceIndicesPerStaffLabel);
             this.NotationGroupBox.Controls.Add(this.StafflinesPerStaffLabel);
             this.NotationGroupBox.Controls.Add(this.LongStaffNamesLabel);
-            this.NotationGroupBox.Controls.Add(this.MidiChannelsPerStaffTextBox);
+            this.NotationGroupBox.Controls.Add(this.OutputVoiceIndicesStaffTextBox);
             this.NotationGroupBox.Controls.Add(this.ClefsPerStaffLabel);
             this.NotationGroupBox.Controls.Add(this.ClefsPerStaffHelpLabel);
             this.NotationGroupBox.Controls.Add(this.StaffGroupsHelpLabel);
@@ -281,7 +281,7 @@ namespace Moritz.Composer
             this.InputVoiceIndicesPerStaffHelpLabel2.Size = new System.Drawing.Size(141, 14);
             this.InputVoiceIndicesPerStaffHelpLabel2.TabIndex = 190;
             this.InputVoiceIndicesPerStaffHelpLabel2.Text = "(right click this text for help)";
-            this.InputVoiceIndicesPerStaffHelpLabel2.MouseClick += new System.Windows.Forms.MouseEventHandler(this.MidiChannelsPerStaffHelp_MouseClick);
+            this.InputVoiceIndicesPerStaffHelpLabel2.MouseClick += new System.Windows.Forms.MouseEventHandler(this.VoiceIndicesPerStaffHelp_MouseClick);
             // 
             // InputVoiceIndicesPerStaffHelpLabel
             // 
@@ -400,16 +400,16 @@ namespace Moritz.Composer
             this.LongStaffNamesHelpLabel.TabIndex = 174;
             this.LongStaffNamesHelpLabel.Text = "(x names, one per staff)";
             // 
-            // MidiChannelsPerStaffHelpLabel2
+            // OutputVoiceIndicesPerStaffHelpLabel2
             // 
-            this.MidiChannelsPerStaffHelpLabel2.AutoSize = true;
-            this.MidiChannelsPerStaffHelpLabel2.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.MidiChannelsPerStaffHelpLabel2.Location = new System.Drawing.Point(262, 157);
-            this.MidiChannelsPerStaffHelpLabel2.Name = "MidiChannelsPerStaffHelpLabel2";
-            this.MidiChannelsPerStaffHelpLabel2.Size = new System.Drawing.Size(141, 14);
-            this.MidiChannelsPerStaffHelpLabel2.TabIndex = 183;
-            this.MidiChannelsPerStaffHelpLabel2.Text = "(right click this text for help)";
-            this.MidiChannelsPerStaffHelpLabel2.MouseClick += new System.Windows.Forms.MouseEventHandler(this.MidiChannelsPerStaffHelp_MouseClick);
+            this.OutputVoiceIndicesPerStaffHelpLabel2.AutoSize = true;
+            this.OutputVoiceIndicesPerStaffHelpLabel2.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.OutputVoiceIndicesPerStaffHelpLabel2.Location = new System.Drawing.Point(262, 157);
+            this.OutputVoiceIndicesPerStaffHelpLabel2.Name = "OutputVoiceIndicesPerStaffHelpLabel2";
+            this.OutputVoiceIndicesPerStaffHelpLabel2.Size = new System.Drawing.Size(141, 14);
+            this.OutputVoiceIndicesPerStaffHelpLabel2.TabIndex = 183;
+            this.OutputVoiceIndicesPerStaffHelpLabel2.Text = "(right click this text for help)";
+            this.OutputVoiceIndicesPerStaffHelpLabel2.MouseClick += new System.Windows.Forms.MouseEventHandler(this.VoiceIndicesPerStaffHelp_MouseClick);
             // 
             // ShortStaffNamesLabel
             // 
@@ -433,15 +433,15 @@ namespace Moritz.Composer
             this.LongStaffNamesTextBox.TextChanged += new System.EventHandler(this.LongStaffNamesTextBox_TextChanged);
             this.LongStaffNamesTextBox.Leave += new System.EventHandler(this.LongStaffNamesTextBox_Leave);
             // 
-            // MidiChannelsPerStaffHelpLabel
+            // OutputVoiceIndicesPerStaffHelpLabel
             // 
-            this.MidiChannelsPerStaffHelpLabel.AutoSize = true;
-            this.MidiChannelsPerStaffHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.MidiChannelsPerStaffHelpLabel.Location = new System.Drawing.Point(121, 137);
-            this.MidiChannelsPerStaffHelpLabel.Name = "MidiChannelsPerStaffHelpLabel";
-            this.MidiChannelsPerStaffHelpLabel.Size = new System.Drawing.Size(93, 14);
-            this.MidiChannelsPerStaffHelpLabel.TabIndex = 182;
-            this.MidiChannelsPerStaffHelpLabel.Text = "channels:  x y z...";
+            this.OutputVoiceIndicesPerStaffHelpLabel.AutoSize = true;
+            this.OutputVoiceIndicesPerStaffHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.OutputVoiceIndicesPerStaffHelpLabel.Location = new System.Drawing.Point(121, 137);
+            this.OutputVoiceIndicesPerStaffHelpLabel.Name = "OutputVoiceIndicesPerStaffHelpLabel";
+            this.OutputVoiceIndicesPerStaffHelpLabel.Size = new System.Drawing.Size(93, 14);
+            this.OutputVoiceIndicesPerStaffHelpLabel.TabIndex = 182;
+            this.OutputVoiceIndicesPerStaffHelpLabel.Text = "channels:  x y z...";
             // 
             // SystemStartBarsHelpLabel
             // 
@@ -475,17 +475,17 @@ namespace Moritz.Composer
             this.StafflinesPerStaffHelpLabel.TabIndex = 178;
             this.StafflinesPerStaffHelpLabel.Text = "x integer values separated by commas\r\nstandard clefs must have 5 lines.";
             // 
-            // MidiChannelsPerStaffLabel
+            // OutputVoiceIndicesPerStaffLabel
             // 
-            this.MidiChannelsPerStaffLabel.AutoSize = true;
-            this.MidiChannelsPerStaffLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.MidiChannelsPerStaffLabel.Location = new System.Drawing.Point(16, 150);
-            this.MidiChannelsPerStaffLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.MidiChannelsPerStaffLabel.Name = "MidiChannelsPerStaffLabel";
-            this.MidiChannelsPerStaffLabel.Size = new System.Drawing.Size(105, 28);
-            this.MidiChannelsPerStaffLabel.TabIndex = 181;
-            this.MidiChannelsPerStaffLabel.Text = "midi output channels\r\nper voice per staff";
-            this.MidiChannelsPerStaffLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.OutputVoiceIndicesPerStaffLabel.AutoSize = true;
+            this.OutputVoiceIndicesPerStaffLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+            this.OutputVoiceIndicesPerStaffLabel.Location = new System.Drawing.Point(24, 150);
+            this.OutputVoiceIndicesPerStaffLabel.Margin = new System.Windows.Forms.Padding(0);
+            this.OutputVoiceIndicesPerStaffLabel.Name = "OutputVoiceIndicesPerStaffLabel";
+            this.OutputVoiceIndicesPerStaffLabel.Size = new System.Drawing.Size(97, 28);
+            this.OutputVoiceIndicesPerStaffLabel.TabIndex = 181;
+            this.OutputVoiceIndicesPerStaffLabel.Text = "output voices\r\nper voice per staff";
+            this.OutputVoiceIndicesPerStaffLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // StafflinesPerStaffLabel
             // 
@@ -511,14 +511,14 @@ namespace Moritz.Composer
             this.LongStaffNamesLabel.TabIndex = 173;
             this.LongStaffNamesLabel.Text = "long staff names";
             // 
-            // MidiChannelsPerStaffTextBox
+            // OutputVoiceIndicesStaffTextBox
             // 
-            this.MidiChannelsPerStaffTextBox.Location = new System.Drawing.Point(123, 154);
-            this.MidiChannelsPerStaffTextBox.Name = "MidiChannelsPerStaffTextBox";
-            this.MidiChannelsPerStaffTextBox.Size = new System.Drawing.Size(136, 20);
-            this.MidiChannelsPerStaffTextBox.TabIndex = 1;
-            this.MidiChannelsPerStaffTextBox.TextChanged += new System.EventHandler(this.MidiChannelsPerStaffTextBox_TextChanged);
-            this.MidiChannelsPerStaffTextBox.Leave += new System.EventHandler(this.MidiChannelsPerStaffTextBox_Leave);
+            this.OutputVoiceIndicesStaffTextBox.Location = new System.Drawing.Point(123, 154);
+            this.OutputVoiceIndicesStaffTextBox.Name = "OutputVoiceIndicesStaffTextBox";
+            this.OutputVoiceIndicesStaffTextBox.Size = new System.Drawing.Size(136, 20);
+            this.OutputVoiceIndicesStaffTextBox.TabIndex = 1;
+            this.OutputVoiceIndicesStaffTextBox.TextChanged += new System.EventHandler(this.OutputVoiceIndicesStaffTextBox_TextChanged);
+            this.OutputVoiceIndicesStaffTextBox.Leave += new System.EventHandler(this.OutputVoiceIndicesStaffTextBox_Leave);
             // 
             // ClefsPerStaffLabel
             // 
@@ -926,10 +926,10 @@ namespace Moritz.Composer
         private System.Windows.Forms.TextBox StafflinesPerStaffTextBox;
         private System.Windows.Forms.TextBox ClefsPerStaffTextBox;
         private System.Windows.Forms.TextBox StaffGroupsTextBox;
-        private System.Windows.Forms.Label MidiChannelsPerStaffHelpLabel;
-        private System.Windows.Forms.Label MidiChannelsPerStaffLabel;
-        private System.Windows.Forms.TextBox MidiChannelsPerStaffTextBox;
-        private System.Windows.Forms.Label MidiChannelsPerStaffHelpLabel2;
+        private System.Windows.Forms.Label OutputVoiceIndicesPerStaffHelpLabel;
+        private System.Windows.Forms.Label OutputVoiceIndicesPerStaffLabel;
+        private System.Windows.Forms.TextBox OutputVoiceIndicesStaffTextBox;
+        private System.Windows.Forms.Label OutputVoiceIndicesPerStaffHelpLabel2;
         private System.Windows.Forms.Panel StandardChordsOptionsPanel;
         private System.Windows.Forms.Label ChordTypeComboBoxLabel;
         private System.Windows.Forms.ComboBox ChordTypeComboBox;
