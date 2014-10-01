@@ -201,6 +201,7 @@ namespace Moritz.Composer
                 byte midiChannel = 0;
                 int inputVoice_StaffIndex = 0;
                 int outputVoice_StaffIndex = 0;
+                int nOutputVoices = _pageFormat.OutputVoiceIndicesPerStaff.Count;
                 SvgSystem system = new SvgSystem(this);
                 this.Systems.Add(system);
                 for(int staffIndex = 0; staffIndex < _pageFormat.StafflinesPerStaff.Count; staffIndex++)
@@ -215,7 +216,7 @@ namespace Moritz.Composer
                         staffname = _pageFormat.ShortStaffNames[staffIndex];
                     }
                     Staff staff;
-                    if(staffIndex >= _pageFormat.OutputVoiceIndicesPerStaff.Count)
+                    if(staffIndex >= nOutputVoices)
                     {
                         float gap = _pageFormat.Gap * _pageFormat.InputStavesSizeFactor;
                         float stafflineStemStrokeWidth = _pageFormat.StafflineStemStrokeWidth * _pageFormat.InputStavesSizeFactor;
@@ -225,7 +226,8 @@ namespace Moritz.Composer
                         for(int i = 0; i < inputVoiceIndices.Count; ++i)
                         {
                             InputVoice inputVoice = new InputVoice(staff as InputStaff);
-                            inputVoice.VoiceDef = barVoiceDefs[inputVoiceIndices[i]];
+                            inputVoice.VoiceDef = barVoiceDefs[nOutputVoices + inputVoiceIndices[i]];
+                            Debug.Assert(inputVoice.VoiceDef is InputVoiceDef);
                             staff.Voices.Add(inputVoice);
                         }
                     }
@@ -238,6 +240,7 @@ namespace Moritz.Composer
                         {
                             OutputVoice outputVoice = new OutputVoice(staff as OutputStaff, midiChannel++);
                             outputVoice.VoiceDef = barVoiceDefs[outputVoiceIndices[i]];
+                            Debug.Assert(outputVoice.VoiceDef is OutputVoiceDef);
                             staff.Voices.Add(outputVoice);
                         }
                     }
