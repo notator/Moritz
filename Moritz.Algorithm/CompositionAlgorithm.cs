@@ -52,33 +52,47 @@ namespace Moritz.Algorithm
         public abstract int NumberOfInputVoices { get; }
 
         /// <summary>
-        /// Returns the number of bars created by the algorithm.
+        /// Returns the number of bars (=bar definitions) created by the algorithm.
         /// </summary>
         /// <returns></returns>
         public abstract int NumberOfBars { get; }
 
         /// <summary>
         /// The DoAlgorithm() function is special to a particular composition.
-        /// The function returns a sequence of bar definitions. Each bar is a list of Voices (conceptually from top to bottom
-        /// in a system, though the actual order can be changed in the Assistant Composer's options).
-        /// Each bar in the sequence has the same number of Voices. Voices at the same position in each bar are continuations
-        /// of the same overall voice, and may be concatenated later. OutputVoices at the same position in each bar have the
-        /// same midi channel.
-        /// Midi channels:
-        /// By convention, algorithms use midi channels having indices which increase from top to bottom in the
-        /// system, starting at 0. Midi channels may not occur twice in the same system. Each algorithm declares which midi
-        /// channels it uses in the MidiChannels() function (see above). For an example, see Study2bAlgorithm.
-        /// Each 'bar definition' is actually contained in the UniqueDefs list in each VoiceDef (i.e. VoiceDef.UniqueDefs).
-        /// The VoiceDef.NoteObjects lists are still empty when DoAlgorithm() returns.
-        /// The VoiceDef.UniqueDefs will be converted to NoteObjects having a specific notation later (in Notator.AddSymbolsToSystems()).
+        /// This function returns a sequence of abstract bar definitions, devoid of layout information.
+        /// Each bar definition is a list of voice definitions (VoiceDefs), The VoiceDefs are conceptually
+        /// in the default top to bottom order of the voices in a final score. The actual order in which
+        /// the voices are eventually printed is controlled using the Assistant Composer's layout options,
+        /// Each bar definition in the sequence returned by this function contains the same number of
+        /// VoiceDefs. VoiceDefs at the same index in each bar are continuations of the same overall voice
+        /// definition, and may be concatenated to create multiple bars on a staff.
+        /// Each VoiceDef returned by this function contains a list of UniqueDef objects (VoiceDef.UniqueDefs).
+        /// When the Assistant Composer creates a real score, each of these UniqueDef objects is converted to
+        /// a real NoteObject containing layout information (by a Notator), and the NoteObject then added to a
+        /// concrete Voice.NoteObjects list. See Notator.AddSymbolsToSystems().
         /// ACHTUNG:
-        /// The top (=first) VoiceDef in each bar must be an OutputVoiceDef.
+        /// The top (=first) VoiceDef in each bar definition must be an OutputVoiceDef.
         /// This can be followed by zero or more OutputVoices, followed by zero or more InputVoices.
         /// The chord definitions in OutputVoiceDef.UniqueDefs must be MidiChordDefs.
         /// The chord definitions in InputVoice.UniqueDefs must be InputChordDefs.
-        /// 
+        /// Algorithms declare the number of output and input voices they construct in the
+        /// NumberOfOutputVoices and NumberOfInputVoices properties (see above).
+        /// For convenience in the Assistant Composer, the number of bars is also returned (in the
+        /// NumberOfBars property).
         /// If one or more InputVoices are defined, then an InputControls object must be created, given
         /// default values, and assigned to this.InputControls (see below).
+        /// 
+        /// A note about midi channels and voiceIDs in scores:
+        /// Algorithms do not have to concern themselves with midi channels or voiceIDs. These are allocated
+        /// automatically, when the score is created.
+        /// Midi channels are always allocated to OutputVoices in ascending order, from top to bottom in a
+        /// score. The top voice in a score always has channel 0, even if the voices are not displayed in the
+        /// order produced by the algorithm.
+        /// An OutputVoice's voiceID is written to the score only if the score contains InputVoices.
+        /// The voiceID is simply the index of the OutputVoice's VoiceDef in the original bar definition
+        /// created by the algorithm. This value is saved as the score:outputVoice's voiceID attribute so
+        /// that input voices can refer to the voice wherevever it might be printed in the score.
+        /// Algorithms simply refer to output voices by using their index in the default bar layout being created.
         /// </summary>
         public abstract List<List<VoiceDef>> DoAlgorithm();
 

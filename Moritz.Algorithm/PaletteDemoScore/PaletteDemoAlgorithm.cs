@@ -24,14 +24,7 @@ namespace Moritz.Algorithm.PaletteDemo
         public override int NumberOfBars { get { return 1; } }
 
         /// <summary>
-        /// Sets the midi content of the score, independent of its notation.
-        /// This means adding MidiDurationDefs to each voice's MidiDurationDefs list.
-        /// This particular score has no notation, but the MidiDurations constructed
-        /// here are usually transcribed into a particular notation by a Notator.
-        /// Notations are independent of the midi info.
-        /// This DoAlgorithm() function is special to this composition.
-        /// It creates a single bar=system containing one event for each of the events
-        /// defined in a single palette.
+        /// See CompositionAlgorithm.DoAlgorithm()
         /// </summary>
         public override List<List<VoiceDef>> DoAlgorithm()
         {

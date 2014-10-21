@@ -69,12 +69,20 @@ namespace Moritz.Symbols
                                     if(currentStaff is OutputStaff)
                                     {
                                         // creates an OutputVoice
-                                        currentVoice = GetVoice(r, currentStaff, attributesDict["score:midiChannel"]);
+                                        if (attributesDict.ContainsKey("score:voiceID"))
+                                        {
+                                            currentVoice = GetVoice(r, currentStaff, attributesDict["score:voiceID"], attributesDict["score:midiChannel"]);
+                                        }
+                                        else
+                                        {
+                                            currentVoice = GetVoice(r, currentStaff, "", attributesDict["score:midiChannel"]);
+
+                                        }
                                     }
                                     else
                                     {
                                         // creates an InputVoice
-                                        currentVoice = GetVoice(r, currentStaff, ""); 
+                                        currentVoice = GetVoice(r, currentStaff, "", ""); 
                                     }
                                     //currentVoice = new OutputVoice(currentStaff);
                                     //currentStaff.Voices.Add(currentVoice);
@@ -125,7 +133,7 @@ namespace Moritz.Symbols
             return newStaff;
         }
 
-        private Voice GetVoice(XmlReader r, Staff staff, string midiChannel)
+        private Voice GetVoice(XmlReader r, Staff staff, string voiceID, string midiChannel)
         {
             Voice newVoice;
             if(string.IsNullOrEmpty(midiChannel))
@@ -134,7 +142,14 @@ namespace Moritz.Symbols
             }
             else
             {
-                newVoice = new OutputVoice((OutputStaff)staff, byte.Parse(midiChannel));
+                if (string.IsNullOrEmpty(voiceID))
+                {
+                    newVoice = new OutputVoice((OutputStaff)staff, null, byte.Parse(midiChannel));
+                }
+                else
+                {
+                    newVoice = new OutputVoice((OutputStaff)staff, int.Parse(voiceID), byte.Parse(midiChannel));
+                }
             }
             staff.Voices.Add(newVoice);
             return newVoice;

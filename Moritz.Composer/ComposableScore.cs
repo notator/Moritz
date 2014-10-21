@@ -238,7 +238,12 @@ namespace Moritz.Composer
                         List<byte> outputVoiceIndices = _pageFormat.OutputVoiceIndicesPerStaff[outputVoice_StaffIndex++];
                         for(int i = 0; i < outputVoiceIndices.Count; ++i)
                         {
-                            OutputVoice outputVoice = new OutputVoice(staff as OutputStaff, midiChannel++);
+                            int? voiceID = null;
+                            if (_pageFormat.InputVoiceIndicesPerStaff.Count > 0)
+                            {
+                                voiceID = (int?)outputVoiceIndices[i];
+                            }
+                            OutputVoice outputVoice = new OutputVoice(staff as OutputStaff, voiceID, midiChannel++);
                             outputVoice.VoiceDef = barVoiceDefs[outputVoiceIndices[i]];
                             Debug.Assert(outputVoice.VoiceDef is OutputVoiceDef);
                             staff.Voices.Add(outputVoice);

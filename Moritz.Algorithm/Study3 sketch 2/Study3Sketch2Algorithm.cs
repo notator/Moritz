@@ -28,24 +28,7 @@ namespace Moritz.Algorithm.Study3Sketch2
         public override int NumberOfBars { get { return 5; } }
 
         /// <summary>
-        /// The DoAlgorithm() function is special to a particular composition.
-        /// The function returns a sequence of bar definitions. Each bar is a list of Voices (conceptually from top to bottom
-        /// in a system, though the actual order can be changed in the Assistant Composer's options).
-        /// Each bar in the sequence has the same number of Voices. Voices at the same position in each bar are continuations
-        /// of the same overall voice, and may be concatenated later. OutputVoices at the same position in each bar have the
-        /// same midi channel.
-        /// Midi channels:
-        /// By convention, algorithms use midi channels having indices which increase from top to bottom in the
-        /// system, starting at 0. Midi channels may not occur twice in the same system. Each algorithm declares which midi
-        /// channels it uses in the MidiChannels() function (see above). For an example, see Study2bAlgorithm.
-        /// Each 'bar definition' is actually contained in the UniqueDefs list in each VoiceDef (i.e. VoiceDef.UniqueDefs).
-        /// The VoiceDef.NoteObjects lists are still empty when DoAlgorithm() returns.
-        /// The VoiceDef.UniqueDefs will be converted to NoteObjects having a specific notation later (in Notator.AddSymbolsToSystems()).
-        /// ACHTUNG:
-        /// The top (=first) VoiceDef in each bar must be an OutputVoiceDef.
-        /// This can be followed by zero or more OutputVoices, followed by zero or more InputVoices.
-        /// The chord definitions in OutputVoiceDef.UniqueDefs must be MidiChordDefs.
-        /// The chord definitions in InputVoice.UniqueDefs must be UniqueInputChordDefs.
+        /// See CompositionAlgorithm.DoAlgorithm()
         /// </summary>
         public override List<List<VoiceDef>> DoAlgorithm()
         {
