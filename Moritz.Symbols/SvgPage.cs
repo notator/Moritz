@@ -69,20 +69,24 @@ namespace Moritz.Symbols
                                     if(currentStaff is OutputStaff)
                                     {
                                         // creates an OutputVoice
-                                        if (attributesDict.ContainsKey("score:voiceID"))
+                                        string midiChannel = attributesDict["score:midiChannel"];
+                                        string voiceID = null;
+                                        if(attributesDict.ContainsKey("score:voiceID"))
                                         {
-                                            currentVoice = GetVoice(r, currentStaff, attributesDict["score:voiceID"], attributesDict["score:midiChannel"]);
+                                            voiceID = attributesDict["score:voiceID"];
                                         }
-                                        else
+                                        string masterVolume = null;
+                                        if(attributesDict.ContainsKey("score:masterVolume"))
                                         {
-                                            currentVoice = GetVoice(r, currentStaff, "", attributesDict["score:midiChannel"]);
-
+                                            masterVolume = attributesDict["score:masterVolume"];
                                         }
+                                         
+                                        currentVoice = GetVoice(currentStaff, midiChannel, voiceID, masterVolume);
                                     }
                                     else
                                     {
                                         // creates an InputVoice
-                                        currentVoice = GetVoice(r, currentStaff, "", ""); 
+                                        currentVoice = GetVoice(currentStaff, null, null, null); 
                                     }
                                     //currentVoice = new OutputVoice(currentStaff);
                                     //currentStaff.Voices.Add(currentVoice);
@@ -133,7 +137,7 @@ namespace Moritz.Symbols
             return newStaff;
         }
 
-        private Voice GetVoice(XmlReader r, Staff staff, string voiceID, string midiChannel)
+        private Voice GetVoice(Staff staff, string midiChannel, string voiceID, string masterVolume)
         {
             Voice newVoice;
             if(string.IsNullOrEmpty(midiChannel))
@@ -142,14 +146,7 @@ namespace Moritz.Symbols
             }
             else
             {
-                if (string.IsNullOrEmpty(voiceID))
-                {
-                    newVoice = new OutputVoice((OutputStaff)staff, null, byte.Parse(midiChannel));
-                }
-                else
-                {
-                    newVoice = new OutputVoice((OutputStaff)staff, int.Parse(voiceID), byte.Parse(midiChannel));
-                }
+                newVoice = new OutputVoice((OutputStaff)staff, midiChannel, voiceID, masterVolume);
             }
             staff.Voices.Add(newVoice);
             return newVoice;

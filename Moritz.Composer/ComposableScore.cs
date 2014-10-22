@@ -64,7 +64,7 @@ namespace Moritz.Composer
                 errorString = "The algorithm has not created any bars!";
             else
             {
-                errorString = BasicCheck(voiceDefsPerSystemPerBar);
+                errorString = BasicChecks(voiceDefsPerSystemPerBar);
             }
             if(string.IsNullOrEmpty(errorString))
             {
@@ -76,9 +76,19 @@ namespace Moritz.Composer
             }
         }
         #region private to CheckBars(...)
-        private string BasicCheck(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
+        private string BasicChecks(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
         {
             string errorString = null;
+
+            List<VoiceDef> bar1 = voiceDefsPerSystemPerBar[0];
+            if(NOutputVoices(bar1) != _algorithm.NumberOfOutputVoices)
+            {
+                return "The algorithm does not declare the correct number of output voices.";
+            }
+            if(NInputVoices(bar1) != _algorithm.NumberOfInputVoices)
+            {
+                return "The algorithm does not declare the correct number of input voices.";
+            }
             foreach(List<VoiceDef> bar in voiceDefsPerSystemPerBar)
             {
                 if(bar.Count == 0)
@@ -104,6 +114,31 @@ namespace Moritz.Composer
                     break;
             }
             return errorString;
+        }
+
+        private int NOutputVoices(List<VoiceDef> bar1)
+        {
+            int nOutputVoices = 0;
+            foreach(VoiceDef voiceDef in bar1)
+            {
+                if(voiceDef is OutputVoiceDef)
+                {
+                    nOutputVoices++;
+                }
+            }
+            return nOutputVoices;
+        }
+        private int NInputVoices(List<VoiceDef> bar1)
+        {
+            int nInputVoices = 0;
+            foreach(VoiceDef voiceDef in bar1)
+            {
+                if(voiceDef is InputVoiceDef)
+                {
+                    nInputVoices++;
+                }
+            }
+            return nInputVoices;
         }
         private string CheckInputControlsDef(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
         {
@@ -161,8 +196,9 @@ namespace Moritz.Composer
         /// <summary>
         /// Called by the derived class after setting _midiAlgorithm and Notator
         /// </summary>
-        protected void CreateScore()
+        protected bool CreateScore()
         {
+            bool success = true;
             List<List<VoiceDef>> barDefsInOneSystem = _algorithm.DoAlgorithm();
 
             CheckBars(barDefsInOneSystem);
@@ -186,10 +222,11 @@ namespace Moritz.Composer
                 }
                 else
                 {
-                    MessageBox.Show("Can't create score. All output voices that are referenced by an input voice must be printed.");
+                    MessageBox.Show("Score error:\n\nAll output voices that are referenced by an input voice must be printed.");
+                    success = false;
                 }
-
             }
+            return success;
         }
 
         #region ReferencedOutputVoicesAreBeingPrinted
@@ -287,60 +324,94 @@ namespace Moritz.Composer
         {
             foreach(List<VoiceDef> barVoiceDefs in barDefsInOneSystem)
             {
-                byte midiChannel = 0;
-                int inputVoice_StaffIndex = 0;
-                int outputVoice_StaffIndex = 0;
-                int nOutputVoices = _pageFormat.OutputVoiceIndicesPerStaff.Count;
                 SvgSystem system = new SvgSystem(this);
                 this.Systems.Add(system);
-                for(int staffIndex = 0; staffIndex < _pageFormat.StafflinesPerStaff.Count; staffIndex++)
+            }
+
+            CreateEmptyOutputStaves(barDefsInOneSystem);
+            CreateEmptyInputStaves(barDefsInOneSystem);
+        }
+
+        private void CreateEmptyOutputStaves(List<List<VoiceDef>> barDefsInOneSystem)
+        {
+            int nPrintedOutputStaves = _pageFormat.OutputVoiceIndicesPerStaff.Count;
+
+            for(int i = 0; i < Systems.Count; i++)
+            {
+                SvgSystem system = Systems[i];
+                List<VoiceDef> barDef = barDefsInOneSystem[i];
+
+                byte midiChannel = 0;
+                for(int printedStaffIndex = 0; printedStaffIndex < nPrintedOutputStaves; printedStaffIndex++)
                 {
-                    string staffname = null;
-                    if(this.Systems.Count == 1)
-                    {
-                        staffname = _pageFormat.LongStaffNames[staffIndex];
-                    }
-                    else
-                    {
-                        staffname = _pageFormat.ShortStaffNames[staffIndex];
-                    }
-                    Staff staff;
-                    if(staffIndex >= nOutputVoices)
-                    {
-                        float gap = _pageFormat.Gap * _pageFormat.InputStavesSizeFactor;
-                        float stafflineStemStrokeWidth = _pageFormat.StafflineStemStrokeWidth * _pageFormat.InputStavesSizeFactor;
-                        staff = new InputStaff(system, staffname, _pageFormat.StafflinesPerStaff[staffIndex], gap, stafflineStemStrokeWidth);
+                    string staffname = StaffName(i, printedStaffIndex);
+                    OutputStaff outputStaff = new OutputStaff(system, staffname, _pageFormat.StafflinesPerStaff[printedStaffIndex], _pageFormat.Gap, _pageFormat.StafflineStemStrokeWidth);
 
-                        List<byte> inputVoiceIndices = _pageFormat.InputVoiceIndicesPerStaff[inputVoice_StaffIndex++];
-                        for(int i = 0; i < inputVoiceIndices.Count; ++i)
-                        {
-                            InputVoice inputVoice = new InputVoice(staff as InputStaff);
-                            inputVoice.VoiceDef = barVoiceDefs[nOutputVoices + inputVoiceIndices[i]];
-                            Debug.Assert(inputVoice.VoiceDef is InputVoiceDef);
-                            staff.Voices.Add(inputVoice);
-                        }
-                    }
-                    else
+                    List<byte> outputVoiceIndices = _pageFormat.OutputVoiceIndicesPerStaff[printedStaffIndex];
+                    for(int ovIndex = 0; ovIndex < outputVoiceIndices.Count; ++ovIndex)
                     {
-                        staff = new OutputStaff(system, staffname, _pageFormat.StafflinesPerStaff[staffIndex], _pageFormat.Gap, _pageFormat.StafflineStemStrokeWidth);
-
-                        List<byte> outputVoiceIndices = _pageFormat.OutputVoiceIndicesPerStaff[outputVoice_StaffIndex++];
-                        for(int i = 0; i < outputVoiceIndices.Count; ++i)
+                        byte? voiceID = null;
+                        if(_pageFormat.InputVoiceIndicesPerStaff.Count > 0)
                         {
-                            int? voiceID = null;
-                            if (_pageFormat.InputVoiceIndicesPerStaff.Count > 0)
-                            {
-                                voiceID = (int?)outputVoiceIndices[i];
-                            }
-                            OutputVoice outputVoice = new OutputVoice(staff as OutputStaff, voiceID, midiChannel++);
-                            outputVoice.VoiceDef = barVoiceDefs[outputVoiceIndices[i]];
-                            Debug.Assert(outputVoice.VoiceDef is OutputVoiceDef);
-                            staff.Voices.Add(outputVoice);
+                            voiceID = (byte?)outputVoiceIndices[ovIndex];
                         }
+
+                        OutputVoiceDef outputVoiceDef = barDef[outputVoiceIndices[ovIndex]] as OutputVoiceDef;
+                        Debug.Assert(outputVoiceDef != null);
+                        OutputVoice outputVoice = new OutputVoice(outputStaff, midiChannel++, voiceID, outputVoiceDef.MasterVolume);
+                        outputVoice.VoiceDef = outputVoiceDef;
+                        outputStaff.Voices.Add(outputVoice);
                     }
-                    SetStemDirections(staff);
-                    system.Staves.Add(staff);
+                    SetStemDirections(outputStaff);
+                    system.Staves.Add(outputStaff);
                 }
+            }
+        }
+
+        private void CreateEmptyInputStaves(List<List<VoiceDef>> barDefsInOneSystem)
+        {
+            int nPrintedOutputStaves = _pageFormat.OutputVoiceIndicesPerStaff.Count;
+            int nPrintedInputStaves = _pageFormat.InputVoiceIndicesPerStaff.Count;
+            int nStaffNames = _pageFormat.ShortStaffNames.Count;
+
+            for(int i = 0; i < Systems.Count; i++)
+            {
+                SvgSystem system = Systems[i];
+                List<VoiceDef> barDef = barDefsInOneSystem[i];
+
+                for(int staffIndex = 0; staffIndex < nPrintedInputStaves; staffIndex++)
+                {
+                    int staffNameIndex = nPrintedOutputStaves + staffIndex;
+                    string staffname = StaffName(i, staffNameIndex);
+
+                    float gap = _pageFormat.Gap * _pageFormat.InputStavesSizeFactor;
+                    float stafflineStemStrokeWidth = _pageFormat.StafflineStemStrokeWidth * _pageFormat.InputStavesSizeFactor;
+                    InputStaff inputStaff = new InputStaff(system, staffname, _pageFormat.StafflinesPerStaff[staffIndex], gap, stafflineStemStrokeWidth);
+
+                    List<byte> inputVoiceIndices = _pageFormat.InputVoiceIndicesPerStaff[staffIndex];
+                    for(int ivIndex = 0; ivIndex < inputVoiceIndices.Count; ++ivIndex)
+                    {
+                        InputVoiceDef inputVoiceDef = barDef[inputVoiceIndices[ivIndex] + _algorithm.NumberOfOutputVoices] as InputVoiceDef;
+                        Debug.Assert(inputVoiceDef != null);
+                        InputVoice inputVoice = new InputVoice(inputStaff);
+                        inputVoice.VoiceDef = inputVoiceDef;
+                        inputStaff.Voices.Add(inputVoice);
+                    }
+                    SetStemDirections(inputStaff);
+                    system.Staves.Add(inputStaff);
+                }
+            }
+        }
+
+        private string StaffName(int systemIndex, int staffIndex)
+        {
+            if(systemIndex == 0)
+            {
+                return _pageFormat.LongStaffNames[staffIndex];
+            }
+            else
+            {
+                return _pageFormat.ShortStaffNames[staffIndex];
             }
         }
 

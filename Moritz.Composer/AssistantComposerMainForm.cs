@@ -702,7 +702,8 @@ namespace Moritz.Composer
                                             _settingsFolderPath,
                                             _dimensionsAndMetadataForm.Keywords,
                                             _dimensionsAndMetadataForm.Comment);
-                if(score != null)
+
+                if(score != null && score.Systems.Count > 0)
                 {
                     int numberOfPages = score.SaveSVGScore();
                     score.OpenSVGScore();

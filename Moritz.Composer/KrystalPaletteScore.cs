@@ -19,7 +19,12 @@ namespace Moritz.Composer
 
             Notator = new Notator(pageFormat);
 
-            CreateScore();
+            bool success = CreateScore();
+
+            if(success == false)
+            {
+                this.Systems.Clear();
+            }
         }
 
         private List<Krystal> _krystals = null;
