@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Windows.Forms;
 using System.Collections.Generic;
 
 using Krystals4ObjectLibrary;
@@ -172,16 +173,104 @@ namespace Moritz.Composer
             {
                 Notator.ConvertVoiceDefsToNoteObjects(this.Systems);
 
-                FinalizeSystemStructure(); // adds barlines, joins bars to create systems, etc.
+                if(ReferencedOutputVoicesAreBeingPrinted())
+                {
+                    FinalizeSystemStructure(); // adds barlines, joins bars to create systems, etc.
 
-                /// The systems do not yet contain Metrics info.
-                /// The systems are given Metrics inside the following function then justified internally,
-                /// both horizontally and vertically.
-                Notator.CreateMetricsAndJustifySystems(this.Systems);
+                    /// The systems do not yet contain Metrics info.
+                    /// The systems are given Metrics inside the following function then justified internally,
+                    /// both horizontally and vertically.
+                    Notator.CreateMetricsAndJustifySystems(this.Systems);
 
-                CreatePages();
+                    CreatePages();
+                }
+                else
+                {
+                    MessageBox.Show("Can't create score. All output voices that are referenced by an input voice must be printed.");
+                }
+
             }
         }
+
+        #region ReferencedOutputVoicesAreBeingPrinted
+
+        private bool ReferencedOutputVoicesAreBeingPrinted()
+        {
+            bool rval = true;
+            List<byte> printedOutputVoiceIDs = PrintedOutputVoiceIDs();
+            List<byte> referencedOutputVoiceIDs = ReferencedOutputVoiceIDs();
+            foreach(byte outputVoiceID in referencedOutputVoiceIDs)
+            {
+                if(!printedOutputVoiceIDs.Contains(outputVoiceID))
+                {
+                    rval = false;
+                }
+            }
+            return rval;
+        }
+
+        private List<byte> PrintedOutputVoiceIDs()
+        {
+            List<byte> printedOutputVoiceIDs = new List<byte>();
+            foreach(SvgSystem system in this.Systems)
+            {
+                foreach(Staff staff in system.Staves)
+                {
+                    OutputStaff oStaff = staff as OutputStaff;
+                    if(oStaff != null)
+                    {
+                        foreach(Voice voice in oStaff.Voices)
+                        {
+                            OutputVoice oVoice = voice as OutputVoice;
+                            Debug.Assert(oVoice != null && oVoice.VoiceID != null);
+                            byte voiceID = (byte) oVoice.VoiceID;
+                            if(!printedOutputVoiceIDs.Contains(voiceID))
+                            {
+                                printedOutputVoiceIDs.Add(voiceID);
+                            }
+                        }
+                    }
+                }
+            }
+            return printedOutputVoiceIDs;
+        }
+
+        private List<byte> ReferencedOutputVoiceIDs()
+        {
+            List<byte> referencedOutputVoiceIDs = new List<byte>();
+            foreach(SvgSystem system in this.Systems)
+            {
+                foreach(Staff staff in system.Staves)
+                {
+                    InputStaff iStaff = staff as InputStaff;
+                    if(iStaff != null)
+                    {
+                        foreach(Voice voice in iStaff.Voices)
+                        {
+                            InputVoice iVoice = voice as InputVoice;
+                            Debug.Assert(iVoice != null);
+                            foreach(NoteObject noteObject in iVoice.NoteObjects)
+                            {
+                                InputChordSymbol ics = noteObject as InputChordSymbol;
+                                if(ics != null)
+                                {
+                                    List<byte> seqVoiceIDs = ics.InputChordDef.SeqVoiceIDs;
+                                    foreach(byte voiceID in seqVoiceIDs)
+                                    {  
+                                        if(!referencedOutputVoiceIDs.Contains(voiceID))
+                                        {
+                                            referencedOutputVoiceIDs.Add(voiceID);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return referencedOutputVoiceIDs;
+        }
+        #endregion CheckThatReferencedOutputVoicesAreBeingPrinted
 
         /// <summary>
         /// Creates one System per bar (=list of VoiceDefs) in the argument.
@@ -254,6 +343,7 @@ namespace Moritz.Composer
                 }
             }
         }
+
         private void SetStemDirections(Staff staff)
         {
             if(staff.Voices.Count == 1)

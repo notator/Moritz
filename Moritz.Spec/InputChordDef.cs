@@ -25,14 +25,14 @@ namespace Moritz.Spec
         /// <summary>
         /// constructs a 1-pitch chord pointing at a single sequence
         /// </summary>
-        public InputChordDef(int msPosition, int msDuration, byte midiPitch, byte seqChannelIndex, byte seqLength, string lyric)
+        public InputChordDef(int msPosition, int msDuration, byte midiPitch, byte seqVoiceID, byte seqLength, string lyric)
             : base(msDuration)
         {
             _msPosition = msPosition;
             _midiPitches = new List<byte>(){midiPitch};
-            List<byte> seqChannelIndices = new List<byte>(){seqChannelIndex};
+            List<byte> seqVoiceIDs = new List<byte>(){seqVoiceID};
             List<byte> seqLengths = new List<byte>(){seqLength};
-            SeqChannelIndicesPerMidiPitch.Add(midiPitch, seqChannelIndices);
+            SeqVoiceIDsPerMidiPitch.Add(midiPitch, seqVoiceIDs);
             SeqLengthsPerMidiPitch.Add(midiPitch, seqLengths);
             _lyric = lyric;
             _msDurationToNextBarline = null;
@@ -43,19 +43,19 @@ namespace Moritz.Spec
         /// This constructor makes its own copy of the midiPitches
         /// </summary>
         public InputChordDef(int msPosition, int msDuration, List<byte> midiPitches,
-            List<List<byte>> seqChannelIndicesPerMidiPitch,
+            List<List<byte>> seqVoiceIDsPerMidiPitch,
             List<List<byte>> seqLengthsPerMidiPitch,
             string lyric)
             : base(msDuration)
         {
-            Debug.Assert(midiPitches.Count == seqChannelIndicesPerMidiPitch.Count);
+            Debug.Assert(midiPitches.Count == seqVoiceIDsPerMidiPitch.Count);
             Debug.Assert(midiPitches.Count == seqLengthsPerMidiPitch.Count);
 
             _msPosition = msPosition;
             _midiPitches = new List<byte>(midiPitches);
             for(int pitchIndex = 0; pitchIndex < midiPitches.Count; ++pitchIndex)
             {
-                SeqChannelIndicesPerMidiPitch.Add(midiPitches[pitchIndex], seqChannelIndicesPerMidiPitch[pitchIndex]);
+                SeqVoiceIDsPerMidiPitch.Add(midiPitches[pitchIndex], seqVoiceIDsPerMidiPitch[pitchIndex]);
                 SeqLengthsPerMidiPitch.Add(midiPitches[pitchIndex], seqLengthsPerMidiPitch[pitchIndex]);
             }
             _lyric = lyric;
@@ -122,8 +122,8 @@ namespace Moritz.Spec
             {
                 w.WriteStartElement("score", "inputNote", null);
                 w.WriteAttributeString("midiPitch", pitch.ToString());
-                List<byte> seqChannelIndices = SeqChannelIndicesPerMidiPitch[pitch];
-                w.WriteAttributeString("seqChannels", M.ByteListToString(seqChannelIndices));
+                List<byte> seqVoiceIDs = SeqVoiceIDsPerMidiPitch[pitch];
+                w.WriteAttributeString("seqVoiceIDs", M.ByteListToString(seqVoiceIDs));
                 List<byte> seqLengths = SeqLengthsPerMidiPitch[pitch];
                 w.WriteAttributeString("seqLengths", M.ByteListToString(seqLengths));
                 w.WriteEndElement(); // score:inputNote
@@ -139,17 +139,17 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// All the channel indices of Seqs that can be started by this InputChordDef.
+        /// All the voiceIDs of Seqs that can be started by this InputChordDef.
         /// The returned list is never null, but can be empty.
         /// </summary>
-        public List<byte> SeqChannelIndices
+        public List<byte> SeqVoiceIDs
         {
             get
             {
                 List<byte> rval = new List<byte>();
                 foreach(byte pitch in MidiPitches)
                 {
-                    List<byte> pitchOutputVoiceIndices = SeqChannelIndicesPerMidiPitch[pitch];
+                    List<byte> pitchOutputVoiceIndices = SeqVoiceIDsPerMidiPitch[pitch];
                     foreach(byte ovIndex in pitchOutputVoiceIndices)
                     {
                         rval.Add(ovIndex);
@@ -190,11 +190,11 @@ namespace Moritz.Spec
             CheckThisIsInBar(bar);
 
             List<MidiChordDef> rval = new List<MidiChordDef>();
-            List<byte> outputVoiceIndices = this.SeqChannelIndices;
+            List<byte> seqVoiceIDs = this.SeqVoiceIDs;
 
-            foreach(byte outputVoiceIndex in outputVoiceIndices)
+            foreach(byte voiceID in seqVoiceIDs)
             {
-                OutputVoiceDef ov = bar[outputVoiceIndex] as OutputVoiceDef;
+                OutputVoiceDef ov = bar[voiceID] as OutputVoiceDef;
                 Debug.Assert(ov != null);
                 foreach(MidiChordDef mcd in ov.MidiChordDefs)
                 {
@@ -246,7 +246,7 @@ namespace Moritz.Spec
         public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
         private int? _msDurationToNextBarline = null;
 
-        public Dictionary<byte, List<byte>> SeqChannelIndicesPerMidiPitch = new Dictionary<byte, List<byte>>();
+        public Dictionary<byte, List<byte>> SeqVoiceIDsPerMidiPitch = new Dictionary<byte, List<byte>>();
         public Dictionary<byte, List<byte>> SeqLengthsPerMidiPitch = new Dictionary<byte, List<byte>>();
     }
 }
