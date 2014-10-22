@@ -56,6 +56,7 @@
       <DependentUpon>AssistantComposerMainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ComposableScore.cs" />
+    <Compile Include="ComposableScoreAlgorithm.cs" />
     <Compile Include="DimensionsAndMetadataForm.cs">
       <SubType>Form</SubType>
     </Compile>

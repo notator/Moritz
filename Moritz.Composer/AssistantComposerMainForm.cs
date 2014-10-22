@@ -46,24 +46,30 @@ namespace Moritz.Composer
             _settingsPath = settingsPath;
             _settingsFolderPath = Path.GetDirectoryName(settingsPath);
 
-            _algorithmName = Path.GetFileNameWithoutExtension(settingsPath);
-            _algorithm = Algorithm(_algorithmName);
-            _outputVoiceIndices = GetOutputVoiceIndices(_algorithm.NumberOfOutputVoices);
+            _scoreTitle = Path.GetFileNameWithoutExtension(settingsPath);
+            this.QuitAlgorithmButton.Text = "Quit " + _scoreTitle;
+            _dimensionsAndMetadataForm.Text = _scoreTitle + ": Page Dimensions and Metadata";
 
-            SetScoreComboBoxItems(_settingsFolderPath);
-            string scoreName = Path.GetFileNameWithoutExtension(_settingsPath);
-
-            ScoreComboBox.SelectedIndexChanged -= ScoreComboBox_SelectedIndexChanged;
-            ScoreComboBox.SelectedIndex = ScoreComboBox.Items.IndexOf(scoreName);
-            GetSelectedSettings(_settingsPath, _algorithm);
-            ScoreComboBox.SelectedIndexChanged += ScoreComboBox_SelectedIndexChanged;
-            _dimensionsAndMetadataForm.Text = scoreName + ": Page Dimensions and Metadata";
-
-            this.QuitAlgorithmButton.Text = "Quit " + _algorithmName;
-
-            if(OutputVoiceIndicesStaffTextBox.Text == "")
+            _algorithm = ComposableSvgScore.Algorithm(_scoreTitle, null, null);
+            if(_algorithm != null)
             {
-                SetDefaultVoiceIndicesPerStaff(_algorithm.NumberOfOutputVoices);
+                _outputVoiceIndices = GetOutputVoiceIndices(_algorithm.NumberOfOutputVoices);
+
+                SetScoreComboBoxItems(_settingsFolderPath);
+
+                ScoreComboBox.SelectedIndexChanged -= ScoreComboBox_SelectedIndexChanged;
+                ScoreComboBox.SelectedIndex = ScoreComboBox.Items.IndexOf(_scoreTitle);
+                GetSelectedSettings(_settingsPath, _algorithm);
+                ScoreComboBox.SelectedIndexChanged += ScoreComboBox_SelectedIndexChanged;
+
+                if(OutputVoiceIndicesStaffTextBox.Text == "")
+                {
+                    SetDefaultVoiceIndicesPerStaff(_algorithm.NumberOfOutputVoices);
+                }
+            }
+            else
+            {
+                SetSettingsHaveBeenSaved();
             }
         }
 
@@ -207,7 +213,7 @@ namespace Moritz.Composer
         {
             if(SettingsHaveBeenSaved())
             {
-                this.Text = _algorithmName + " algorithm*";
+                this.Text = _scoreTitle + " algorithm*";
                 SetSaveAndCreateButtons(true);
             }
         }
@@ -215,7 +221,7 @@ namespace Moritz.Composer
         {
             if(!SettingsHaveBeenSaved())
             {
-                this.Text = _algorithmName + " algorithm";
+                this.Text = _scoreTitle + " algorithm";
                 SetSaveAndCreateButtons(false);
 
                 List<IPaletteForm> kpForms = AllIPalleteForms;
@@ -223,6 +229,7 @@ namespace Moritz.Composer
                     kpf.SetSettingsHaveBeenSaved();
             }
         }
+
         private bool SettingsHaveBeenSaved()
         {
             return SaveSettingsButton.Enabled == false;
@@ -696,7 +703,7 @@ namespace Moritz.Composer
                 PageFormat pageFormat = GetPageFormat();
                 ComposableSvgScore score =
                     new KrystalPaletteScore(this.ScoreComboBox.Text,
-                                            _algorithmName,
+                                            _scoreTitle,
                                             pageFormat,
                                             krystals, palettes,
                                             _settingsFolderPath,
@@ -1269,7 +1276,7 @@ namespace Moritz.Composer
         /// <summary>
         /// _scoreBaseName is the name of the score without any folder or extension. For example "Study 2b2".
         /// </summary>
-        string _algorithmName = null;
+        string _scoreTitle = null;
         CompositionAlgorithm _algorithm = null;
 
         /// <summary>
@@ -1802,30 +1809,6 @@ namespace Moritz.Composer
                 SetTextBoxState(textBox, false);
             }
         }
-
-        private CompositionAlgorithm Algorithm(string algorithmName)
-        {
-            CompositionAlgorithm algorithm = null;
-            switch(algorithmName)
-            {
-                case "Study 2c3.1":
-                    algorithm = new Study2c3_1Algorithm(null, null);
-                    break;
-                case "Song Six":
-                    algorithm = new SongSixAlgorithm(null, null);
-                    break;
-                case "Study 3 sketch 1":
-                    algorithm = new Study3Sketch1Algorithm(null, null);
-                    break;
-                case "Study 3 sketch 2":
-                    algorithm = new Study3Sketch2Algorithm(null, null);
-                    break;
-                default:
-                    throw new ApplicationException("unknown algorithm");
-            }
-            return algorithm;
-        }
-
         #endregion page format controls
 
         #region set text boxes to white, and unsaved settings

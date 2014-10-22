@@ -15,7 +15,7 @@ namespace Moritz.Composer
         {
             _krystals = krystals;
             
-            _algorithm = Algorithm(algorithmName, krystals, palettes);
+            _algorithm = ComposableSvgScore.Algorithm(algorithmName, krystals, palettes);
 
             Notator = new Notator(pageFormat);
 

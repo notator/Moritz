@@ -17,44 +17,11 @@ using Moritz.Xml;
 
 namespace Moritz.Composer
 {
-    public class ComposableSvgScore : SvgScore
+    public partial class ComposableSvgScore : SvgScore
     {
         public ComposableSvgScore(string folder, string scoreTitleName, string keywords, string comment, PageFormat pageFormat)
             : base(folder, scoreTitleName, keywords, comment, pageFormat)
         {
-        }
-
-        /// <summary>
-        /// The krystals and paletteDefs arguments can be null if the algorithm whose name is algorithmName does not use them.
-        /// </summary>
-        /// <param name="algorithmName"></param>
-        /// <param name="krystals"></param>
-        /// <param name="paletteDefs"></param>
-        /// <returns></returns>
-        protected CompositionAlgorithm Algorithm(string algorithmName, List<Krystal> krystals, List<Palette> palettes)
-        {
-            CompositionAlgorithm algorithm = null;
-            switch(algorithmName)
-            {
-                case "Study 2c3.1":
-                    algorithm = new Study2c3_1Algorithm(krystals, palettes);
-                    break;
-                case "Song Six":
-                    algorithm = new SongSixAlgorithm(krystals, palettes);
-                    break;
-                case "Study 3 sketch 1":
-                    algorithm = new Study3Sketch1Algorithm(krystals, palettes);
-                    break;
-                case "Study 3 sketch 2":
-                    algorithm = new Study3Sketch2Algorithm(krystals, palettes);
-                    break;
-                case "paletteDemo":
-                    algorithm = new PaletteDemoAlgorithm(palettes);
-                    break;
-                default:
-                    throw new ApplicationException("unknown algorithm");
-            }
-            return algorithm;
         }
 
         private void CheckBars(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
@@ -259,11 +226,10 @@ namespace Moritz.Composer
                         foreach(Voice voice in oStaff.Voices)
                         {
                             OutputVoice oVoice = voice as OutputVoice;
-                            Debug.Assert(oVoice != null && oVoice.VoiceID != null);
-                            byte voiceID = (byte) oVoice.VoiceID;
-                            if(!printedOutputVoiceIDs.Contains(voiceID))
+                            Debug.Assert(oVoice != null);
+                            if(oVoice.VoiceID != null && !printedOutputVoiceIDs.Contains((byte)oVoice.VoiceID))
                             {
-                                printedOutputVoiceIDs.Add(voiceID);
+                                printedOutputVoiceIDs.Add((byte)oVoice.VoiceID);
                             }
                         }
                     }

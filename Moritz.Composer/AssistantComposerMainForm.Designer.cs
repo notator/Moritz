@@ -104,7 +104,7 @@ namespace Moritz.Composer
             // 
             this.CreateScoreButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.CreateScoreButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.CreateScoreButton.Location = new System.Drawing.Point(440, 578);
+            this.CreateScoreButton.Location = new System.Drawing.Point(569, 578);
             this.CreateScoreButton.Name = "CreateScoreButton";
             this.CreateScoreButton.Size = new System.Drawing.Size(127, 26);
             this.CreateScoreButton.TabIndex = 5;
@@ -116,9 +116,9 @@ namespace Moritz.Composer
             // 
             this.QuitAlgorithmButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.QuitAlgorithmButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.QuitAlgorithmButton.Location = new System.Drawing.Point(582, 548);
+            this.QuitAlgorithmButton.Location = new System.Drawing.Point(274, 548);
             this.QuitAlgorithmButton.Name = "QuitAlgorithmButton";
-            this.QuitAlgorithmButton.Size = new System.Drawing.Size(127, 26);
+            this.QuitAlgorithmButton.Size = new System.Drawing.Size(227, 26);
             this.QuitAlgorithmButton.TabIndex = 8;
             this.QuitAlgorithmButton.Text = "Quit algorithm";
             this.QuitAlgorithmButton.UseVisualStyleBackColor = true;
@@ -727,9 +727,9 @@ namespace Moritz.Composer
             // ScoreComboBox
             // 
             this.ScoreComboBox.FormattingEnabled = true;
-            this.ScoreComboBox.Location = new System.Drawing.Point(91, 12);
+            this.ScoreComboBox.Location = new System.Drawing.Point(159, 12);
             this.ScoreComboBox.Name = "ScoreComboBox";
-            this.ScoreComboBox.Size = new System.Drawing.Size(133, 22);
+            this.ScoreComboBox.Size = new System.Drawing.Size(221, 22);
             this.ScoreComboBox.TabIndex = 0;
             this.ScoreComboBox.SelectedIndexChanged += new System.EventHandler(this.ScoreComboBox_SelectedIndexChanged);
             // 
@@ -737,7 +737,7 @@ namespace Moritz.Composer
             // 
             this.ScoreComboBoxLabel.AutoSize = true;
             this.ScoreComboBoxLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.ScoreComboBoxLabel.Location = new System.Drawing.Point(53, 16);
+            this.ScoreComboBoxLabel.Location = new System.Drawing.Point(121, 16);
             this.ScoreComboBoxLabel.Margin = new System.Windows.Forms.Padding(0);
             this.ScoreComboBoxLabel.Name = "ScoreComboBoxLabel";
             this.ScoreComboBoxLabel.Size = new System.Drawing.Size(35, 14);
@@ -749,7 +749,7 @@ namespace Moritz.Composer
             this.SaveSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.SaveSettingsButton.Enabled = false;
             this.SaveSettingsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.SaveSettingsButton.Location = new System.Drawing.Point(440, 548);
+            this.SaveSettingsButton.Location = new System.Drawing.Point(569, 548);
             this.SaveSettingsButton.Name = "SaveSettingsButton";
             this.SaveSettingsButton.Size = new System.Drawing.Size(127, 26);
             this.SaveSettingsButton.TabIndex = 4;
@@ -761,9 +761,9 @@ namespace Moritz.Composer
             // 
             this.QuitMoritzButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.QuitMoritzButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.QuitMoritzButton.Location = new System.Drawing.Point(582, 578);
+            this.QuitMoritzButton.Location = new System.Drawing.Point(274, 578);
             this.QuitMoritzButton.Name = "QuitMoritzButton";
-            this.QuitMoritzButton.Size = new System.Drawing.Size(127, 26);
+            this.QuitMoritzButton.Size = new System.Drawing.Size(227, 26);
             this.QuitMoritzButton.TabIndex = 9;
             this.QuitMoritzButton.Text = "Quit Moritz";
             this.QuitMoritzButton.UseVisualStyleBackColor = true;
@@ -818,7 +818,7 @@ namespace Moritz.Composer
             this.KrystalsGroupBox.ForeColor = System.Drawing.Color.Brown;
             this.KrystalsGroupBox.Location = new System.Drawing.Point(495, 12);
             this.KrystalsGroupBox.Name = "KrystalsGroupBox";
-            this.KrystalsGroupBox.Size = new System.Drawing.Size(218, 222);
+            this.KrystalsGroupBox.Size = new System.Drawing.Size(214, 222);
             this.KrystalsGroupBox.TabIndex = 2;
             this.KrystalsGroupBox.TabStop = false;
             this.KrystalsGroupBox.Text = "krystals";
@@ -833,7 +833,7 @@ namespace Moritz.Composer
             this.PalettesGroupBox.ForeColor = System.Drawing.Color.Brown;
             this.PalettesGroupBox.Location = new System.Drawing.Point(495, 238);
             this.PalettesGroupBox.Name = "PalettesGroupBox";
-            this.PalettesGroupBox.Size = new System.Drawing.Size(218, 257);
+            this.PalettesGroupBox.Size = new System.Drawing.Size(214, 257);
             this.PalettesGroupBox.TabIndex = 3;
             this.PalettesGroupBox.TabStop = false;
             this.PalettesGroupBox.Text = "palettes";
@@ -843,7 +843,7 @@ namespace Moritz.Composer
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
-            this.ClientSize = new System.Drawing.Size(732, 619);
+            this.ClientSize = new System.Drawing.Size(726, 619);
             this.ControlBox = false;
             this.Controls.Add(this.PalettesGroupBox);
             this.Controls.Add(this.KrystalsGroupBox);
