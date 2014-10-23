@@ -20,10 +20,8 @@ namespace Moritz.Algorithm
     /// </summary>
     public abstract class CompositionAlgorithm
     {
-        protected CompositionAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+        protected CompositionAlgorithm()
         {
-            _krystals = krystals;
-            _palettes = palettes;
             CheckParameters();
         }
 
@@ -94,7 +92,7 @@ namespace Moritz.Algorithm
         /// that input voices can refer to the voice wherevever it might be printed in the score.
         /// Algorithms simply refer to output voices by using their index in the default bar layout being created.
         /// </summary>
-        public abstract List<List<VoiceDef>> DoAlgorithm();
+        public abstract List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes);
 
         /// <summary>
         /// Returns the position of the end of the last UniqueMidiDurationDef

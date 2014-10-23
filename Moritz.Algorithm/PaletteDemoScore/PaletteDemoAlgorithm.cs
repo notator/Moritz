@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 
+using Krystals4ObjectLibrary;
 using Moritz.Algorithm;
 using Moritz.Palettes;
 using Moritz.Spec;
@@ -14,8 +15,8 @@ namespace Moritz.Algorithm.PaletteDemo
         /// MidiDurationDefs list is set to each of the krystal's values in turn.
         /// This score is never saved, so scoresRootFolder is not used. 
         /// </summary>
-        public PaletteDemoAlgorithm(List<Palette> palettes)
-            : base(null, palettes)
+        public PaletteDemoAlgorithm()
+            : base()
         {
         }
 
@@ -26,13 +27,13 @@ namespace Moritz.Algorithm.PaletteDemo
         /// <summary>
         /// See CompositionAlgorithm.DoAlgorithm()
         /// </summary>
-        public override List<List<VoiceDef>> DoAlgorithm()
+        public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
         {
             VoiceDef voice = new OutputVoiceDef();
             int msPosition = 0;
-            for(int i = 0; i < _palettes[0].Count; ++i)
+            for(int i = 0; i < palettes[0].Count; ++i)
             {
-                IUniqueDef iumdd = _palettes[0].UniqueDurationDef(i);
+                IUniqueDef iumdd = palettes[0].UniqueDurationDef(i);
                 iumdd.MsPosition = msPosition;
                 msPosition += iumdd.MsDuration;
                 voice.UniqueDefs.Add(iumdd);

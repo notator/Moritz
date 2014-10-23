@@ -50,7 +50,7 @@ namespace Moritz.Composer
             this.QuitAlgorithmButton.Text = "Quit " + _scoreTitle;
             _dimensionsAndMetadataForm.Text = _scoreTitle + ": Page Dimensions and Metadata";
 
-            _algorithm = ComposableSvgScore.Algorithm(_scoreTitle, null, null);
+            _algorithm = ComposableSvgScore.Algorithm(_scoreTitle);
             if(_algorithm != null)
             {
                 _outputVoiceIndices = GetOutputVoiceIndices(_algorithm.NumberOfOutputVoices);
@@ -702,8 +702,8 @@ namespace Moritz.Composer
                 GetKrystalsAndPalettes(out krystals, out palettes);
                 PageFormat pageFormat = GetPageFormat();
                 ComposableSvgScore score =
-                    new KrystalPaletteScore(this.ScoreComboBox.Text,
-                                            _scoreTitle,
+                    new KrystalPaletteScore(_scoreTitle,
+                                            _algorithm,
                                             pageFormat,
                                             krystals, palettes,
                                             _settingsFolderPath,

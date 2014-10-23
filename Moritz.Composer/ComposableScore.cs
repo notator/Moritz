@@ -19,9 +19,10 @@ namespace Moritz.Composer
 {
     public partial class ComposableSvgScore : SvgScore
     {
-        public ComposableSvgScore(string folder, string scoreTitleName, string keywords, string comment, PageFormat pageFormat)
+        public ComposableSvgScore(string folder, string scoreTitleName, CompositionAlgorithm algorithm, string keywords, string comment, PageFormat pageFormat)
             : base(folder, scoreTitleName, keywords, comment, pageFormat)
         {
+            _algorithm = algorithm;
         }
 
         private void CheckBars(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
@@ -163,10 +164,10 @@ namespace Moritz.Composer
         /// <summary>
         /// Called by the derived class after setting _midiAlgorithm and Notator
         /// </summary>
-        protected bool CreateScore()
+        protected bool CreateScore(List<Krystal> krystals, List<Palette> palettes)
         {
             bool success = true;
-            List<List<VoiceDef>> barDefsInOneSystem = _algorithm.DoAlgorithm();
+            List<List<VoiceDef>> barDefsInOneSystem = _algorithm.DoAlgorithm(krystals, palettes);
 
             CheckBars(barDefsInOneSystem);
 

@@ -18,8 +18,8 @@ namespace Moritz.Algorithm.Study2c3_1
         /// This constructor can be called with both parameters null,
         /// just to get the overridden properties.
         /// </summary>
-        public Study2c3_1Algorithm(List<Krystal> krystals, List<Palette> palettes)
-            : base(krystals, palettes)
+        public Study2c3_1Algorithm()
+            : base()
         {
         }
 
@@ -30,8 +30,11 @@ namespace Moritz.Algorithm.Study2c3_1
         /// <summary>
         /// See CompositionAlgorithm.DoAlgorithm()
         /// </summary>
-        public override List<List<VoiceDef>> DoAlgorithm()
+        public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
         {
+            _krystals = krystals;
+            _palettes = palettes;
+
             List<VoiceDef> sequentialStaff1Bars = WriteTopStaff();
             List<VoiceDef> sequentialStaff2Bars = WriteLowerStaff(2, sequentialStaff1Bars);
             List<VoiceDef> sequentialStaff3Bars = WriteLowerStaff(3, sequentialStaff1Bars);

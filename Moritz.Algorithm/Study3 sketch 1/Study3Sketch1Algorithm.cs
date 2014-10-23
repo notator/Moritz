@@ -18,8 +18,8 @@ namespace Moritz.Algorithm.Study3Sketch1
         /// This constructor can be called with both parameters null,
         /// just to get the overridden properties.
         /// </summary>
-        public Study3Sketch1Algorithm(List<Krystal> krystals, List<Palette> palettes)
-            : base(krystals, palettes)
+        public Study3Sketch1Algorithm()
+            : base()
         {
         }
 
@@ -30,8 +30,11 @@ namespace Moritz.Algorithm.Study3Sketch1
         /// <summary>
         /// See CompositionAlgorithm.DoAlgorithm()
         /// </summary>
-        public override List<List<VoiceDef>> DoAlgorithm()
+        public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
         {
+            _krystals = krystals;
+            _palettes = palettes;
+
             List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
             List<VoiceDef> bar1 = CreateBar1();
             bars.Add(bar1);

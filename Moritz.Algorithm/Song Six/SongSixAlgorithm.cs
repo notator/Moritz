@@ -16,8 +16,8 @@ namespace Moritz.Algorithm.SongSix
     /// </summary>
     public partial class SongSixAlgorithm : CompositionAlgorithm
     {
-        public SongSixAlgorithm(List<Krystal> krystals, List<Palette> palettes)
-            : base(krystals, palettes)
+        public SongSixAlgorithm()
+            : base()
         {
         }
 
@@ -28,7 +28,7 @@ namespace Moritz.Algorithm.SongSix
         /// <summary>
         /// See CompositionAlgorithm.DoAlgorithm()
         /// </summary>
-        public override List<List<VoiceDef>> DoAlgorithm()
+        public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
         {
             // Palette indices:
             // Winds use palette 0.
@@ -44,6 +44,10 @@ namespace Moritz.Algorithm.SongSix
             // All palettes can be accessed here at _paletteDefs[ paletteIndex ].
 
             // The wind3 is the lowest wind. The winds are numbered from top to bottom in the score.
+
+            _krystals = krystals;
+            _palettes = palettes;
+
             OutputVoiceDef wind3 = GetWind3(_palettes[0], _krystals[8]);
 
             Clytemnestra clytemnestra = new Clytemnestra(wind3);
