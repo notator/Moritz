@@ -24,11 +24,6 @@ namespace Moritz.Symbols
         {
             w.WriteAttributeString("score", "staffName", null, this.Staffname);
 
-            // The following are no longer written, since they are not needed/read by the Assistant Performer.
-            //w.WriteAttributeString("score", "stafflines", null, this.NumberOfStafflines.ToString());
-            //w.WriteAttributeString("score", "gap", null, this.Gap.ToString(M.En_USNumberFormat));
-            //w.WriteAttributeString("score", "strokeWidth", null, this.StafflineStemStrokeWidth.ToString(M.En_USNumberFormat));
-
             w.SvgStartGroup("stafflines", null);
             float stafflineY = this.Metrics.StafflinesTop;
             for(int staffLineIndex = 0; staffLineIndex < NumberOfStafflines; staffLineIndex++)
@@ -36,9 +31,6 @@ namespace Moritz.Symbols
                 w.SvgLine(null, this.Metrics.StafflinesLeft, stafflineY, 
                                 this.Metrics.StafflinesRight, stafflineY, 
                                 "black", StafflineStemStrokeWidth, null, null);
-
-                //w.SvgLine(null, this.Metrics.StafflinesLeft, stafflineY, pageFormat.RightMarginPos, stafflineY,
-                //    "black", StafflineStemStrokeWidth, null, null);
 
                 if(staffLineIndex < (NumberOfStafflines - 1))
                     stafflineY += Gap;

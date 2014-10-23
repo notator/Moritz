@@ -369,16 +369,20 @@ namespace Moritz.Symbols
         {
             foreach(SvgSystem system in Systems)
             {
-                for(int staffNumber = 1; staffNumber <= system.Staves.Count; staffNumber++)
+                for(int staffIndex = 0; staffIndex < system.Staves.Count; staffIndex++)
                 {
-                    foreach(NoteObject noteObject in system.Staves[staffNumber - 1].Voices[0].NoteObjects)
+                    Staff staff = system.Staves[staffIndex];
+                    foreach(NoteObject noteObject in staff.Voices[0].NoteObjects)
                     {
-                        Barline firstBarline = noteObject as Barline;
+                        Barline firstBarline = noteObject as Barline;        
                         if(firstBarline != null)
-                        {
-                            //string staffName = staffNumber.ToString();
-                            string staffName = system.Staves[staffNumber - 1].Staffname;
-                            TextInfo textInfo = new TextInfo(staffName, "Times New Roman", _pageFormat.StaffNameFontHeight, TextHorizAlign.center);
+                        {                             
+                            float fontHeight = _pageFormat.StaffNameFontHeight;
+                            if(staff is InputStaff)
+                            {
+                                fontHeight *= _pageFormat.InputStavesSizeFactor;
+                            }
+                            TextInfo textInfo = new TextInfo(staff.Staffname, "Times New Roman", fontHeight, TextHorizAlign.center);
                             Text staffNameText = new Text(firstBarline, textInfo);
                             firstBarline.DrawObjects.Add(staffNameText);
                             break;

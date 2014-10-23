@@ -104,7 +104,7 @@ namespace Moritz.Composer
             // 
             this.CreateScoreButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.CreateScoreButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.CreateScoreButton.Location = new System.Drawing.Point(569, 578);
+            this.CreateScoreButton.Location = new System.Drawing.Point(299, 578);
             this.CreateScoreButton.Name = "CreateScoreButton";
             this.CreateScoreButton.Size = new System.Drawing.Size(127, 26);
             this.CreateScoreButton.TabIndex = 5;
@@ -116,9 +116,9 @@ namespace Moritz.Composer
             // 
             this.QuitAlgorithmButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.QuitAlgorithmButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.QuitAlgorithmButton.Location = new System.Drawing.Point(274, 548);
+            this.QuitAlgorithmButton.Location = new System.Drawing.Point(510, 551);
             this.QuitAlgorithmButton.Name = "QuitAlgorithmButton";
-            this.QuitAlgorithmButton.Size = new System.Drawing.Size(227, 26);
+            this.QuitAlgorithmButton.Size = new System.Drawing.Size(183, 26);
             this.QuitAlgorithmButton.TabIndex = 8;
             this.QuitAlgorithmButton.Text = "Quit algorithm";
             this.QuitAlgorithmButton.UseVisualStyleBackColor = true;
@@ -727,9 +727,9 @@ namespace Moritz.Composer
             // ScoreComboBox
             // 
             this.ScoreComboBox.FormattingEnabled = true;
-            this.ScoreComboBox.Location = new System.Drawing.Point(159, 12);
+            this.ScoreComboBox.Location = new System.Drawing.Point(173, 12);
             this.ScoreComboBox.Name = "ScoreComboBox";
-            this.ScoreComboBox.Size = new System.Drawing.Size(221, 22);
+            this.ScoreComboBox.Size = new System.Drawing.Size(183, 22);
             this.ScoreComboBox.TabIndex = 0;
             this.ScoreComboBox.SelectedIndexChanged += new System.EventHandler(this.ScoreComboBox_SelectedIndexChanged);
             // 
@@ -737,7 +737,7 @@ namespace Moritz.Composer
             // 
             this.ScoreComboBoxLabel.AutoSize = true;
             this.ScoreComboBoxLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.ScoreComboBoxLabel.Location = new System.Drawing.Point(121, 16);
+            this.ScoreComboBoxLabel.Location = new System.Drawing.Point(135, 16);
             this.ScoreComboBoxLabel.Margin = new System.Windows.Forms.Padding(0);
             this.ScoreComboBoxLabel.Name = "ScoreComboBoxLabel";
             this.ScoreComboBoxLabel.Size = new System.Drawing.Size(35, 14);
@@ -749,7 +749,7 @@ namespace Moritz.Composer
             this.SaveSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.SaveSettingsButton.Enabled = false;
             this.SaveSettingsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.SaveSettingsButton.Location = new System.Drawing.Point(569, 548);
+            this.SaveSettingsButton.Location = new System.Drawing.Point(299, 548);
             this.SaveSettingsButton.Name = "SaveSettingsButton";
             this.SaveSettingsButton.Size = new System.Drawing.Size(127, 26);
             this.SaveSettingsButton.TabIndex = 4;
@@ -761,9 +761,9 @@ namespace Moritz.Composer
             // 
             this.QuitMoritzButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.QuitMoritzButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.QuitMoritzButton.Location = new System.Drawing.Point(274, 578);
+            this.QuitMoritzButton.Location = new System.Drawing.Point(510, 581);
             this.QuitMoritzButton.Name = "QuitMoritzButton";
-            this.QuitMoritzButton.Size = new System.Drawing.Size(227, 26);
+            this.QuitMoritzButton.Size = new System.Drawing.Size(183, 26);
             this.QuitMoritzButton.TabIndex = 9;
             this.QuitMoritzButton.Text = "Quit Moritz";
             this.QuitMoritzButton.UseVisualStyleBackColor = true;
@@ -774,7 +774,7 @@ namespace Moritz.Composer
             this.ShowMoritzButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShowMoritzButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.ShowMoritzButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.ShowMoritzButton.Location = new System.Drawing.Point(23, 578);
+            this.ShowMoritzButton.Location = new System.Drawing.Point(32, 578);
             this.ShowMoritzButton.Name = "ShowMoritzButton";
             this.ShowMoritzButton.Size = new System.Drawing.Size(183, 26);
             this.ShowMoritzButton.TabIndex = 6;
@@ -801,7 +801,7 @@ namespace Moritz.Composer
             this.DimensionsAndMetadataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.DimensionsAndMetadataButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.DimensionsAndMetadataButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.DimensionsAndMetadataButton.Location = new System.Drawing.Point(23, 548);
+            this.DimensionsAndMetadataButton.Location = new System.Drawing.Point(32, 548);
             this.DimensionsAndMetadataButton.Name = "DimensionsAndMetadataButton";
             this.DimensionsAndMetadataButton.Size = new System.Drawing.Size(183, 26);
             this.DimensionsAndMetadataButton.TabIndex = 7;
