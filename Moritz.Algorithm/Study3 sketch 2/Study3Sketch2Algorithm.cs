@@ -146,7 +146,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             {
                 InputControls ics = new InputControls(); // created with all options set to ignore
                 ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
-                ics.NoteOffOption = NoteOffOption.limitedFade;
+                ics.NoteOffOption = NoteOffOption.shortFade;
                 ics.NumberOfObjectsInFade = numberOfObjectsInFade++;
                 ics.PitchWheelOption = ControllerOption.pitchWheel;
                 mcd.InputControls = ics;

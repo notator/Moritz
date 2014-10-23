@@ -26,43 +26,70 @@ namespace Moritz.Spec
         {
             w.WriteStartElement("score", "inputControls", null);
 
-            w.WriteAttributeString("noteOnKey", this.NoteOnKeyOption.ToString());
-            w.WriteAttributeString("noteOnVel", this.NoteOnVelocityOption.ToString());
-            w.WriteAttributeString("noteOff", this.NoteOffOption.ToString());
-            if(this.NoteOffOption == NoteOffOption.limitedFade)
+            if(this.OnlySeq == true)
+            {
+                w.WriteAttributeString("onlySeq", "1");
+            }
+
+            if(this.NoteOnKeyOption != Spec.NoteOnKeyOption.matchExactly)
+            {
+                w.WriteAttributeString("noteOnKey", this.NoteOnKeyOption.ToString());
+            }
+            if(this.NoteOnVelocityOption != Spec.NoteOnVelocityOption.ignore)
+            {
+                w.WriteAttributeString("noteOnVel", this.NoteOnVelocityOption.ToString());
+            }
+            if(this.NoteOffOption != Spec.NoteOffOption.stop)
+            {
+                w.WriteAttributeString("noteOff", this.NoteOffOption.ToString());
+            }
+
+            if(this.NoteOffOption == NoteOffOption.shortFade)
             {
                 if(NumberOfObjectsInFade == null)
                     throw new ApplicationException(
                             "\nInputControls Error:\n" +
-                            "If the NoteOffOption is set to 'limitedFade',\n" +
+                            "If the NoteOffOption is set to 'shortFade',\n" +
                             "then the NumberOfObjectsInFade must also be set.");
-                w.WriteAttributeString("limitedFade", NumberOfObjectsInFade.ToString());
+                w.WriteAttributeString("shortFade", NumberOfObjectsInFade.ToString());
             }
 
             bool isControllingVolume = false;
-            w.WriteAttributeString("pressure", this.PressureOption.ToString());
-            if(this.PressureOption == ControllerOption.volume)
+            if(this.PressureOption != ControllerOption.ignore)
             {
-                WriteMaxMinVolume(w);
-                isControllingVolume = true;
-            }
-            w.WriteAttributeString("pitchWheel", this.PitchWheelOption.ToString());
-            if(this.PitchWheelOption == ControllerOption.volume)
-            {
-                Debug.Assert(isControllingVolume == false);
-                WriteMaxMinVolume(w);
-                isControllingVolume = true;
-            }
-            w.WriteAttributeString("modulation", this.ModWheelOption.ToString());
-            if(this.ModWheelOption == ControllerOption.volume)
-            {
-                Debug.Assert(isControllingVolume == false);
-                WriteMaxMinVolume(w);
+                w.WriteAttributeString("pressure", this.PressureOption.ToString());
+                if(this.PressureOption == ControllerOption.volume)
+                {
+                    WriteMaxMinVolume(w);
+                    isControllingVolume = true;
+                }
             }
 
-            w.WriteAttributeString("speedOption", this.SpeedOption.ToString());
-            if(this.SpeedOption != SpeedOption.none)
+            if(this.PitchWheelOption != ControllerOption.ignore)
             {
+                w.WriteAttributeString("pitchWheel", this.PitchWheelOption.ToString());
+                if(this.PitchWheelOption == ControllerOption.volume)
+                {
+                    Debug.Assert(isControllingVolume == false);
+                    WriteMaxMinVolume(w);
+                    isControllingVolume = true;
+                }
+            }
+
+            if(this.ModWheelOption != ControllerOption.ignore)
+            {
+                w.WriteAttributeString("modulation", this.ModWheelOption.ToString());
+                if(this.ModWheelOption == ControllerOption.volume)
+                {
+                    Debug.Assert(isControllingVolume == false);
+                    WriteMaxMinVolume(w);
+                    isControllingVolume = true;
+                }
+            }
+
+            if(this.SpeedOption != Spec.SpeedOption.none)
+            {
+                w.WriteAttributeString("speedOption", this.SpeedOption.ToString());
                 if(MaxSpeedPercent == null || MaxSpeedPercent < 100)
                 {
                     throw new ApplicationException(
@@ -94,6 +121,8 @@ namespace Moritz.Spec
             w.WriteAttributeString("maxVolume", MaximumVolume.ToString());
             w.WriteAttributeString("minVolume", MinimumVolume.ToString());
         }
+
+        public bool OnlySeq = false;
 
         public NoteOnKeyOption NoteOnKeyOption = NoteOnKeyOption.ignore;
         public NoteOnVelocityOption NoteOnVelocityOption = NoteOnVelocityOption.ignore;
@@ -132,7 +161,7 @@ namespace Moritz.Spec
         stop,
         stopNow,
         fade,
-        limitedFade
+        shortFade
     };
 
     /// <summary>

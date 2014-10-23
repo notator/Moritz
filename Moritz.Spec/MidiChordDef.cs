@@ -709,9 +709,6 @@ namespace Moritz.Spec
             if(MinimumBasicMidiChordMsDuration != M.DefaultMinimumBasicMidiChordMsDuration)
                 w.WriteAttributeString("minBasicChordMsDuration", MinimumBasicMidiChordMsDuration.ToString());
 
-            if(InputControls != null)
-                InputControls.WriteSvg(w);
-
             w.WriteStartElement("score", "basicChords", null);
             foreach(BasicMidiChordDef basicMidiChord in BasicMidiChordDefs) // containing basic <midiChord> elements
                 basicMidiChord.WriteSVG(w);
@@ -719,6 +716,9 @@ namespace Moritz.Spec
 
             if(MidiChordSliderDefs != null)
                 MidiChordSliderDefs.WriteSVG(w); // writes score:sliders element
+
+            if(InputControls != null)
+                InputControls.WriteSvg(w);
 
             w.WriteEndElement(); // score:midiChord
         }
