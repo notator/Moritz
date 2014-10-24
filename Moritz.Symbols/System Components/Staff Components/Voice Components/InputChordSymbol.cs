@@ -1,4 +1,5 @@
 using System.Text;
+using System.Diagnostics;
 
 using Moritz.Globals;
 using Moritz.Xml;
@@ -31,7 +32,9 @@ namespace Moritz.Symbols
                 ChordMetrics.BeamBlock.WriteSVG(w);
 
             w.SvgStartGroup("inputChord", null);
-            w.WriteAttributeString("score", "alignmentX", null, this.Metrics.OriginX.ToString(M.En_USNumberFormat));
+
+            Debug.Assert(_msDuration > 0);
+            w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
 
             _inputChordDef.WriteSvg(w);
 

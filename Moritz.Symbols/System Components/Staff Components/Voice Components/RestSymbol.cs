@@ -26,9 +26,6 @@ namespace Moritz.Symbols
             {
                 w.SvgStartGroup("rest", null);
 
-                float alignmentX = (this.Metrics.Left + this.Metrics.Right) / 2;
-                w.WriteAttributeString("score", "alignmentX", null, alignmentX.ToString(M.En_USNumberFormat));
-
                 Debug.Assert(_msDuration > 0);
                 w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
 
