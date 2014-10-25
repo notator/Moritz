@@ -8,19 +8,22 @@ namespace Moritz.Spec
     /// <summary>
     /// This object defines how Seqs react to incoming performed information.
     /// An InputControls object can be attached to a SeqRef in an InputChordDef.SeqRefs list.
-    /// The values these options can take are defined in enums in this namespace.
+    /// The values these options can take in the InputControls are defined in enums in this namespace.
+    /// (See below, and in the svgScoreExtensions documentation for details.)
+    /// Each of these enums has a "dontOverride" member.
+    /// The option value applicable to a Seq is the current value of that option stored in the OutputVoice, unless
+    /// the SeqRef has an InputControls member, and the InputControls value of that option is something other than
+    /// "dontOverride". In this case, the InputControls option value overrides the OutputVoice's option value.
+    /// Whether the result of the overriding is temporary or is transferred to the OutputVoice is set using the
+    /// InputControls.onlySeq option. The onlySeq option itself is not maintained in the OutputVoice.
     /// The default options for an Output Voice are:
-    ///     onlySeq="0" (=false) -- the options become the default options for the Output Voice, when this seq ends.
-    ///     noteOnKey="matchExactly" -- wrong midi pitches in the input are ignored
+    ///     noteOnKey="ignore" -- input midi pitches are ignored (the score uses its own, default pitches)
     ///     noteOnVel="ignore" -- input midi velocities are ignored (the score uses its own, default velocities) 
     ///     noteOff="ignore" -- input noteOffs are ignored.
     ///     pressure="ignore" -- input channelPressure/aftertouch information is ignored.
     ///     pitchWheel="ignore" -- input pitchWheel information is ignored.
     ///     modulation="ignore" -- input modulation wheel information is ignored.
-    ///     speedOption="none" -- the default durations (set in the score) are used.
-    /// These values are inidivdually overridden by InputControls objects during a performance if the new value is
-    /// not "dontOverride". Whether the result of the overriding is temporary or permanent in the OutputVoice is set
-    /// using the onlySeq option. 
+    ///     speedOption="none" -- the default durations (set in the score) are used. 
     /// </summary>
     public class InputControls
     {
@@ -145,8 +148,8 @@ namespace Moritz.Spec
 
         public int? NumberOfObjectsInFade = null; // must be set if the NoteOffOption is "limitedFade".
 
-        public byte? MaximumVolume = null; // must be set if the performer is controlling the volume (often set to the channel masterVolume)
-        public byte? MinimumVolume = null; // must be set if the performer is controlling the volume (often set to about 50)
+        public byte? MaximumVolume = null; // must be set if the performer is controlling the volume
+        public byte? MinimumVolume = null; // must be set if the performer is controlling the volume
 
         public int? MaxSpeedPercent = null; // must be set to a value > 100 if the performer is controlling the speed (often set to about 400)
     }
