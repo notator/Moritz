@@ -57,7 +57,8 @@ namespace Moritz.Palettes
             // 
             // DeleteOrnamentSettingsButton
             // 
-            this.DeleteOrnamentSettingsButton.Location = new System.Drawing.Point(531, 429);
+            this.DeleteOrnamentSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.DeleteOrnamentSettingsButton.Location = new System.Drawing.Point(531, 402);
             this.DeleteOrnamentSettingsButton.Name = "DeleteOrnamentSettingsButton";
             this.DeleteOrnamentSettingsButton.Size = new System.Drawing.Size(137, 31);
             this.DeleteOrnamentSettingsButton.TabIndex = 14;
@@ -67,7 +68,8 @@ namespace Moritz.Palettes
             // 
             // NewOrnamentSettingsButton
             // 
-            this.NewOrnamentSettingsButton.Location = new System.Drawing.Point(531, 392);
+            this.NewOrnamentSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.NewOrnamentSettingsButton.Location = new System.Drawing.Point(531, 365);
             this.NewOrnamentSettingsButton.Name = "NewOrnamentSettingsButton";
             this.NewOrnamentSettingsButton.Size = new System.Drawing.Size(137, 31);
             this.NewOrnamentSettingsButton.TabIndex = 13;
@@ -77,9 +79,10 @@ namespace Moritz.Palettes
             // 
             // OrnamentNumbersLabel
             // 
+            this.OrnamentNumbersLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.OrnamentNumbersLabel.AutoSize = true;
             this.OrnamentNumbersLabel.ForeColor = System.Drawing.Color.Brown;
-            this.OrnamentNumbersLabel.Location = new System.Drawing.Point(77, 286);
+            this.OrnamentNumbersLabel.Location = new System.Drawing.Point(77, 259);
             this.OrnamentNumbersLabel.Name = "OrnamentNumbersLabel";
             this.OrnamentNumbersLabel.Size = new System.Drawing.Size(97, 14);
             this.OrnamentNumbersLabel.TabIndex = 36;
@@ -87,7 +90,8 @@ namespace Moritz.Palettes
             // 
             // OrnamentNumbersTextBox
             // 
-            this.OrnamentNumbersTextBox.Location = new System.Drawing.Point(173, 283);
+            this.OrnamentNumbersTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.OrnamentNumbersTextBox.Location = new System.Drawing.Point(173, 256);
             this.OrnamentNumbersTextBox.Name = "OrnamentNumbersTextBox";
             this.OrnamentNumbersTextBox.Size = new System.Drawing.Size(454, 20);
             this.OrnamentNumbersTextBox.TabIndex = 6;
@@ -96,9 +100,10 @@ namespace Moritz.Palettes
             // 
             // OrnamentNumbersHelpLabel
             // 
+            this.OrnamentNumbersHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.OrnamentNumbersHelpLabel.AutoSize = true;
             this.OrnamentNumbersHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.OrnamentNumbersHelpLabel.Location = new System.Drawing.Point(630, 279);
+            this.OrnamentNumbersHelpLabel.Location = new System.Drawing.Point(630, 252);
             this.OrnamentNumbersHelpLabel.Name = "OrnamentNumbersHelpLabel";
             this.OrnamentNumbersHelpLabel.Size = new System.Drawing.Size(171, 28);
             this.OrnamentNumbersHelpLabel.TabIndex = 57;
@@ -106,8 +111,9 @@ namespace Moritz.Palettes
             // 
             // ShowOrnamentSettingsButton
             // 
+            this.ShowOrnamentSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShowOrnamentSettingsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.ShowOrnamentSettingsButton.Location = new System.Drawing.Point(677, 392);
+            this.ShowOrnamentSettingsButton.Location = new System.Drawing.Point(677, 365);
             this.ShowOrnamentSettingsButton.Name = "ShowOrnamentSettingsButton";
             this.ShowOrnamentSettingsButton.Size = new System.Drawing.Size(137, 31);
             this.ShowOrnamentSettingsButton.TabIndex = 11;
@@ -117,9 +123,10 @@ namespace Moritz.Palettes
             // 
             // PanEnvelopesLabel
             // 
+            this.PanEnvelopesLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.PanEnvelopesLabel.AutoSize = true;
             this.PanEnvelopesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.PanEnvelopesLabel.Location = new System.Drawing.Point(62, 249);
+            this.PanEnvelopesLabel.Location = new System.Drawing.Point(62, 222);
             this.PanEnvelopesLabel.Name = "PanEnvelopesLabel";
             this.PanEnvelopesLabel.Size = new System.Drawing.Size(112, 14);
             this.PanEnvelopesLabel.TabIndex = 35;
@@ -127,7 +134,8 @@ namespace Moritz.Palettes
             // 
             // PanEnvelopesTextBox
             // 
-            this.PanEnvelopesTextBox.Location = new System.Drawing.Point(173, 246);
+            this.PanEnvelopesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.PanEnvelopesTextBox.Location = new System.Drawing.Point(173, 219);
             this.PanEnvelopesTextBox.Name = "PanEnvelopesTextBox";
             this.PanEnvelopesTextBox.Size = new System.Drawing.Size(554, 20);
             this.PanEnvelopesTextBox.TabIndex = 3;
@@ -136,10 +144,11 @@ namespace Moritz.Palettes
             // 
             // PanEnvelopesHelpLabel
             // 
+            this.PanEnvelopesHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.PanEnvelopesHelpLabel.AutoSize = true;
             this.PanEnvelopesHelpLabel.Enabled = false;
             this.PanEnvelopesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.PanEnvelopesHelpLabel.Location = new System.Drawing.Point(728, 249);
+            this.PanEnvelopesHelpLabel.Location = new System.Drawing.Point(728, 222);
             this.PanEnvelopesHelpLabel.Name = "PanEnvelopesHelpLabel";
             this.PanEnvelopesHelpLabel.Size = new System.Drawing.Size(70, 14);
             this.PanEnvelopesHelpLabel.TabIndex = 56;
@@ -147,7 +156,8 @@ namespace Moritz.Palettes
             // 
             // ExpressionEnvelopesTextBox
             // 
-            this.ExpressionEnvelopesTextBox.Location = new System.Drawing.Point(173, 172);
+            this.ExpressionEnvelopesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ExpressionEnvelopesTextBox.Location = new System.Drawing.Point(173, 145);
             this.ExpressionEnvelopesTextBox.Name = "ExpressionEnvelopesTextBox";
             this.ExpressionEnvelopesTextBox.Size = new System.Drawing.Size(554, 20);
             this.ExpressionEnvelopesTextBox.TabIndex = 5;
@@ -156,9 +166,10 @@ namespace Moritz.Palettes
             // 
             // VelocityEnvelopesLabel
             // 
+            this.VelocityEnvelopesLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.VelocityEnvelopesLabel.AutoSize = true;
             this.VelocityEnvelopesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.VelocityEnvelopesLabel.Location = new System.Drawing.Point(20, 175);
+            this.VelocityEnvelopesLabel.Location = new System.Drawing.Point(20, 148);
             this.VelocityEnvelopesLabel.Name = "VelocityEnvelopesLabel";
             this.VelocityEnvelopesLabel.Size = new System.Drawing.Size(154, 14);
             this.VelocityEnvelopesLabel.TabIndex = 63;
@@ -166,10 +177,11 @@ namespace Moritz.Palettes
             // 
             // VelocityEnvelopesHelpLabel
             // 
+            this.VelocityEnvelopesHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.VelocityEnvelopesHelpLabel.AutoSize = true;
             this.VelocityEnvelopesHelpLabel.Enabled = false;
             this.VelocityEnvelopesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.VelocityEnvelopesHelpLabel.Location = new System.Drawing.Point(728, 175);
+            this.VelocityEnvelopesHelpLabel.Location = new System.Drawing.Point(728, 148);
             this.VelocityEnvelopesHelpLabel.Name = "VelocityEnvelopesHelpLabel";
             this.VelocityEnvelopesHelpLabel.Size = new System.Drawing.Size(70, 14);
             this.VelocityEnvelopesHelpLabel.TabIndex = 65;
@@ -177,9 +189,10 @@ namespace Moritz.Palettes
             // 
             // HelpTextLabel
             // 
+            this.HelpTextLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.HelpTextLabel.AutoSize = true;
             this.HelpTextLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.HelpTextLabel.Location = new System.Drawing.Point(170, 390);
+            this.HelpTextLabel.Location = new System.Drawing.Point(170, 363);
             this.HelpTextLabel.Name = "HelpTextLabel";
             this.HelpTextLabel.Size = new System.Drawing.Size(352, 70);
             this.HelpTextLabel.TabIndex = 94;
@@ -187,8 +200,9 @@ namespace Moritz.Palettes
             // 
             // MidiInstrumentsHelpButton
             // 
+            this.MidiInstrumentsHelpButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.MidiInstrumentsHelpButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.MidiInstrumentsHelpButton.Location = new System.Drawing.Point(30, 336);
+            this.MidiInstrumentsHelpButton.Location = new System.Drawing.Point(30, 309);
             this.MidiInstrumentsHelpButton.Name = "MidiInstrumentsHelpButton";
             this.MidiInstrumentsHelpButton.Size = new System.Drawing.Size(95, 24);
             this.MidiInstrumentsHelpButton.TabIndex = 16;
@@ -198,9 +212,10 @@ namespace Moritz.Palettes
             // 
             // MinMsDurationsHelpLabel
             // 
+            this.MinMsDurationsHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.MinMsDurationsHelpLabel.AutoSize = true;
             this.MinMsDurationsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.MinMsDurationsHelpLabel.Location = new System.Drawing.Point(630, 312);
+            this.MinMsDurationsHelpLabel.Location = new System.Drawing.Point(630, 285);
             this.MinMsDurationsHelpLabel.Name = "MinMsDurationsHelpLabel";
             this.MinMsDurationsHelpLabel.Size = new System.Drawing.Size(122, 14);
             this.MinMsDurationsHelpLabel.TabIndex = 100;
@@ -208,9 +223,10 @@ namespace Moritz.Palettes
             // 
             // MinMsDurationsLabel
             // 
+            this.MinMsDurationsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.MinMsDurationsLabel.AutoSize = true;
             this.MinMsDurationsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.MinMsDurationsLabel.Location = new System.Drawing.Point(20, 312);
+            this.MinMsDurationsLabel.Location = new System.Drawing.Point(20, 285);
             this.MinMsDurationsLabel.Name = "MinMsDurationsLabel";
             this.MinMsDurationsLabel.Size = new System.Drawing.Size(154, 14);
             this.MinMsDurationsLabel.TabIndex = 101;
@@ -218,7 +234,8 @@ namespace Moritz.Palettes
             // 
             // MinMsDurationsTextBox
             // 
-            this.MinMsDurationsTextBox.Location = new System.Drawing.Point(173, 309);
+            this.MinMsDurationsTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.MinMsDurationsTextBox.Location = new System.Drawing.Point(173, 282);
             this.MinMsDurationsTextBox.Name = "MinMsDurationsTextBox";
             this.MinMsDurationsTextBox.Size = new System.Drawing.Size(454, 20);
             this.MinMsDurationsTextBox.TabIndex = 7;
@@ -227,9 +244,10 @@ namespace Moritz.Palettes
             // 
             // EnvelopesExtraHelpLabel
             // 
+            this.EnvelopesExtraHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.EnvelopesExtraHelpLabel.AutoSize = true;
             this.EnvelopesExtraHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.EnvelopesExtraHelpLabel.Location = new System.Drawing.Point(170, 193);
+            this.EnvelopesExtraHelpLabel.Location = new System.Drawing.Point(170, 166);
             this.EnvelopesExtraHelpLabel.Name = "EnvelopesExtraHelpLabel";
             this.EnvelopesExtraHelpLabel.Size = new System.Drawing.Size(640, 42);
             this.EnvelopesExtraHelpLabel.TabIndex = 102;
@@ -237,8 +255,9 @@ namespace Moritz.Palettes
             // 
             // ShowMainScoreFormButton
             // 
+            this.ShowMainScoreFormButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShowMainScoreFormButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.ShowMainScoreFormButton.Location = new System.Drawing.Point(677, 429);
+            this.ShowMainScoreFormButton.Location = new System.Drawing.Point(677, 402);
             this.ShowMainScoreFormButton.Name = "ShowMainScoreFormButton";
             this.ShowMainScoreFormButton.Size = new System.Drawing.Size(137, 31);
             this.ShowMainScoreFormButton.TabIndex = 103;
@@ -248,9 +267,10 @@ namespace Moritz.Palettes
             // 
             // midiLabel
             // 
+            this.midiLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.midiLabel.AutoSize = true;
             this.midiLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.midiLabel.Location = new System.Drawing.Point(146, 341);
+            this.midiLabel.Location = new System.Drawing.Point(146, 314);
             this.midiLabel.Name = "midiLabel";
             this.midiLabel.Size = new System.Drawing.Size(25, 14);
             this.midiLabel.TabIndex = 108;
@@ -258,9 +278,10 @@ namespace Moritz.Palettes
             // 
             // label1
             // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
             this.label1.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.label1.Location = new System.Drawing.Point(138, 366);
+            this.label1.Location = new System.Drawing.Point(138, 339);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(33, 14);
             this.label1.TabIndex = 109;
@@ -268,9 +289,10 @@ namespace Moritz.Palettes
             // 
             // AudioHelpLabel
             // 
+            this.AudioHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.AudioHelpLabel.AutoSize = true;
             this.AudioHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.AudioHelpLabel.Location = new System.Drawing.Point(20, 390);
+            this.AudioHelpLabel.Location = new System.Drawing.Point(20, 363);
             this.AudioHelpLabel.Name = "AudioHelpLabel";
             this.AudioHelpLabel.Size = new System.Drawing.Size(133, 56);
             this.AudioHelpLabel.TabIndex = 110;
@@ -282,7 +304,7 @@ namespace Moritz.Palettes
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
-            this.ClientSize = new System.Drawing.Size(836, 478);
+            this.ClientSize = new System.Drawing.Size(836, 451);
             this.ControlBox = false;
             this.Controls.Add(this.AudioHelpLabel);
             this.Controls.Add(this.label1);
