@@ -239,7 +239,7 @@ namespace Moritz.Spec
             rval.HasChordOff = this.HasChordOff;
             rval.Lyric = this.Lyric;
             rval.MinimumBasicMidiChordMsDuration = this.MinimumBasicMidiChordMsDuration; // required when changing a midiChord's duration
-            rval.MidiPitches = new List<byte>(this.MidiPitches); // the displayed noteheads
+            rval.NotatedMidiPitches = new List<byte>(this.NotatedMidiPitches); // the displayed noteheads
             // rval.MidiVelocity must be set after setting BasicMidiChordDefs See below.
             rval.OrnamentNumberSymbol = this.OrnamentNumberSymbol; // the displayed ornament number
 
@@ -709,16 +709,13 @@ namespace Moritz.Spec
             if(MinimumBasicMidiChordMsDuration != M.DefaultMinimumBasicMidiChordMsDuration)
                 w.WriteAttributeString("minBasicChordMsDuration", MinimumBasicMidiChordMsDuration.ToString());
 
-            w.WriteStartElement("score", "basicChords", null);
+            w.WriteStartElement("basicChords");
             foreach(BasicMidiChordDef basicMidiChord in BasicMidiChordDefs) // containing basic <midiChord> elements
                 basicMidiChord.WriteSVG(w);
             w.WriteEndElement();
 
             if(MidiChordSliderDefs != null)
-                MidiChordSliderDefs.WriteSVG(w); // writes score:sliders element
-
-            if(InputControls != null)
-                InputControls.WriteSvg(w);
+                MidiChordSliderDefs.WriteSVG(w); // writes sliders element
 
             w.WriteEndElement(); // score:midiChord
         }
@@ -931,7 +928,7 @@ namespace Moritz.Spec
         /// This MidiPitches field is used when displaying the chord's noteheads.
         /// The performed pitches are set in the BasicMidiChordDefs.
         /// </summary>
-        public List<byte> MidiPitches
+        public List<byte> NotatedMidiPitches
         { 
             get { return _displayedMidiPitches; } 
             set 
@@ -975,9 +972,6 @@ namespace Moritz.Spec
 
         public MidiChordSliderDefs MidiChordSliderDefs = null;
         public List<BasicMidiChordDef> BasicMidiChordDefs = new List<BasicMidiChordDef>();
-        /****************************************************************************/
-
-        public InputControls InputControls = null;
 
         #endregion properties
     }

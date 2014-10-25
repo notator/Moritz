@@ -399,10 +399,5 @@ namespace Moritz.Spec
         /// All other OutputVoiceDefs retain the default value 0. 
         /// </summary>
         public byte? MasterVolume = null; // default value
-        /// <summary>
-        /// This field is set by composition algorithms.
-        /// It is stored in and retrieved from SVG files. 
-        /// </summary>
-        public InputControls InputControls = null;
     }
 }

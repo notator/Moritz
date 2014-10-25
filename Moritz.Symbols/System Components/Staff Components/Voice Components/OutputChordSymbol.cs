@@ -16,7 +16,7 @@ namespace Moritz.Symbols
 
             _msDurationToNextBarline = umcd.MsDurationToNextBarline;
 
-            SetNoteheadPitches(umcd.MidiPitches);
+            SetNoteheadPitches(umcd.NotatedMidiPitches);
 
             if(umcd.OrnamentNumberSymbol != 0)
             {

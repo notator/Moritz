@@ -89,7 +89,7 @@ namespace Moritz.Algorithm.SongSix
                     lmcd.MsDuration = msDuration;
 
                     // these two attributes determine the symbols in the score.
-                    lmcd.MidiPitches = new List<byte>() { 67 }; // display middle G, even though "pitch" is different.
+                    lmcd.NotatedMidiPitches = new List<byte>() { 67 }; // display middle G, even though "pitch" is different.
                     lmcd.MidiVelocity = velocity[0]; // determines the visible dynamic symbol
                     #endregion                    
 

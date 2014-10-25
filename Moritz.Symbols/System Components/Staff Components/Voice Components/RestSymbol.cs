@@ -73,7 +73,5 @@ namespace Moritz.Symbols
 
         public RestDef MidiRestDef { get { return _midiRestDef; } }
         private RestDef _midiRestDef = null;
-
-
 	}
 }

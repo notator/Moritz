@@ -83,7 +83,7 @@ namespace Moritz.Spec
 
         public void WriteSVG(XmlWriter w)
         {
-            w.WriteStartElement("score", "basicChord", null);
+            w.WriteStartElement("basicChord");
 
             //if(writeMsPosition) // positions are not written to the midiDefs section of an SVG-MIDI file
             //    w.WriteAttributeString("msPosition", MsPosition.ToString());

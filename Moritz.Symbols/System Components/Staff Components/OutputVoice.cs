@@ -51,11 +51,6 @@ namespace Moritz.Symbols
                 w.WriteAttributeString("score", "masterVolume", null, MasterVolume.ToString());
             }
 
-            if(InputControls != null)
-            {
-                InputControls.WriteSvg(w);
-            }
-
             base.WriteSVG(w);
 
             w.SvgEndGroup(); // outputVoice
@@ -76,10 +71,5 @@ namespace Moritz.Symbols
         /// </summary>
         public byte? MasterVolume { get { return _masterVolume; } }
         private byte? _masterVolume = null;
-        /// <summary>
-        /// This field is set by composition algorithms.
-        /// It is stored in and retrieved from SVG files. 
-        /// </summary>
-        public InputControls InputControls = null;
     }
 }

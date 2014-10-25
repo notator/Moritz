@@ -11,7 +11,7 @@ namespace Moritz.Symbols
         public CautionaryChordSymbol(Voice voice, CautionaryChordDef lccd, float fontSize)
             : base(voice, lccd.MsDuration, lccd.MsPosition, 600, fontSize)
         {
-            SetNoteheadPitches(lccd.MidiPitches);
+            SetNoteheadPitches(lccd.NotatedMidiPitches);
 
             _durationClass = DurationClass.cautionary;
             _msDuration = 0;

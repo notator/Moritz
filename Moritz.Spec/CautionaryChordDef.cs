@@ -15,7 +15,7 @@ namespace Moritz.Spec
         public CautionaryChordDef(IUniqueChordDef chordDef, int msPosition, int msDuration)
         {
             _midiPitches = new List<byte>();
-            foreach(byte midiPitch in chordDef.MidiPitches)
+            foreach(byte midiPitch in chordDef.NotatedMidiPitches)
             {
                 _midiPitches.Add(midiPitch);
             }
@@ -29,7 +29,7 @@ namespace Moritz.Spec
         /// </summary>
         public void Transpose(int interval) { }
 
-        public List<byte> MidiPitches { get { return _midiPitches; } set { _midiPitches = value; } }
+        public List<byte> NotatedMidiPitches { get { return _midiPitches; } set { _midiPitches = value; } }
         private List<byte> _midiPitches = null;
 
         #region IUniqueDef

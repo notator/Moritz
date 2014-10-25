@@ -48,6 +48,7 @@
     <Compile Include="BasicMidiChordDef.cs" />
     <Compile Include="CautionaryChordDef.cs" />
     <Compile Include="ClefChangeDef.cs" />
+    <Compile Include="SeqRef.cs" />
     <Compile Include="DurationDef.cs" />
     <Compile Include="InputChordDef.cs" />
     <Compile Include="InputControls.cs" />

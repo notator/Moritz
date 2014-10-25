@@ -302,23 +302,6 @@ namespace Moritz.Algorithm
             }
         }
 
-        /// <summary>
-        /// This function should be called when the bars are complete, if the score contains InputVoices.
-        /// </summary>
-        /// <param name="firstBar"></param>
-        /// <param name="inputControlsList">A list with one value per OutputVoiceDef</param>
-        protected void SetOutputVoiceInputControls(List<VoiceDef> bar1, List<InputControls> inputControlsList)
-        {
-            Debug.Assert(inputControlsList.Count == NumberOfOutputVoices); // == number of OutputVoices.
-            for(int i = 0; i < NumberOfOutputVoices; ++i)
-            {
-                OutputVoiceDef oVoice = bar1[i] as OutputVoiceDef;
-                Debug.Assert(oVoice != null);
-                Debug.Assert(inputControlsList[i] != null);
-                oVoice.InputControls = inputControlsList[i];
-            }
-        }
-
         protected List<Krystal> _krystals;
         protected List<Palette> _palettes;
     }

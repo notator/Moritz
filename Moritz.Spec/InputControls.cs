@@ -6,17 +6,26 @@ using Moritz.Xml;
 namespace Moritz.Spec
 {
     /// <summary>
-    /// The following classes contain an InputControls field:
-    ///     OutputVoice (If the score contains an InputVoice, OutputVoice.InputControls may not be null.)
-    ///         Options that affect current OutputChords in this OutputVoice. 
-    ///     MidiChordDef (MidiChordDef.InputControls may be null.)
-    ///         if non-null, non-null options change the current values in
-    ///         the containing OutputVoice.InputControls.  
+    /// This object defines how Seqs react to incoming performed information.
+    /// An InputControls object can be attached to a SeqRef in an InputChordDef.SeqRefs list.
+    /// The values these options can take are defined in enums in this namespace.
+    /// The default options for an Output Voice are:
+    ///     onlySeq="0" (=false) -- the options become the default options for the Output Voice, when this seq ends.
+    ///     noteOnKey="matchExactly" -- wrong midi pitches in the input are ignored
+    ///     noteOnVel="ignore" -- input midi velocities are ignored (the score uses its own, default velocities) 
+    ///     noteOff="ignore" -- input noteOffs are ignored.
+    ///     pressure="ignore" -- input channelPressure/aftertouch information is ignored.
+    ///     pitchWheel="ignore" -- input pitchWheel information is ignored.
+    ///     modulation="ignore" -- input modulation wheel information is ignored.
+    ///     speedOption="none" -- the default durations (set in the score) are used.
+    /// These values are inidivdually overridden by InputControls objects during a performance if the new value is
+    /// not "dontOverride". Whether the result of the overriding is temporary or permanent in the OutputVoice is set
+    /// using the onlySeq option. 
     /// </summary>
     public class InputControls
     {
         /// <summary>
-        /// All options are set to "ignore" by default
+        /// All options are set to null by default
         /// </summary>
         public InputControls()
         {
@@ -24,22 +33,22 @@ namespace Moritz.Spec
 
         public void WriteSvg(SvgWriter w)
         {
-            w.WriteStartElement("score", "inputControls", null);
+            w.WriteStartElement("inputControls");
 
             if(this.OnlySeq == true)
             {
                 w.WriteAttributeString("onlySeq", "1");
             }
 
-            if(this.NoteOnKeyOption != Spec.NoteOnKeyOption.matchExactly)
+            if(this.NoteOnKeyOption != Spec.NoteOnKeyOption.dontOverride)
             {
                 w.WriteAttributeString("noteOnKey", this.NoteOnKeyOption.ToString());
             }
-            if(this.NoteOnVelocityOption != Spec.NoteOnVelocityOption.ignore)
+            if(this.NoteOnVelocityOption != Spec.NoteOnVelocityOption.dontOverride)
             {
                 w.WriteAttributeString("noteOnVel", this.NoteOnVelocityOption.ToString());
             }
-            if(this.NoteOffOption != Spec.NoteOffOption.stop)
+            if(this.NoteOffOption != Spec.NoteOffOption.dontOverride)
             {
                 w.WriteAttributeString("noteOff", this.NoteOffOption.ToString());
             }
@@ -55,7 +64,7 @@ namespace Moritz.Spec
             }
 
             bool isControllingVolume = false;
-            if(this.PressureOption != ControllerOption.ignore)
+            if(this.PressureOption != ControllerOption.dontOverride)
             {
                 w.WriteAttributeString("pressure", this.PressureOption.ToString());
                 if(this.PressureOption == ControllerOption.volume)
@@ -65,7 +74,7 @@ namespace Moritz.Spec
                 }
             }
 
-            if(this.PitchWheelOption != ControllerOption.ignore)
+            if(this.PitchWheelOption != ControllerOption.dontOverride)
             {
                 w.WriteAttributeString("pitchWheel", this.PitchWheelOption.ToString());
                 if(this.PitchWheelOption == ControllerOption.volume)
@@ -76,7 +85,7 @@ namespace Moritz.Spec
                 }
             }
 
-            if(this.ModWheelOption != ControllerOption.ignore)
+            if(this.ModWheelOption != ControllerOption.dontOverride)
             {
                 w.WriteAttributeString("modulation", this.ModWheelOption.ToString());
                 if(this.ModWheelOption == ControllerOption.volume)
@@ -87,7 +96,7 @@ namespace Moritz.Spec
                 }
             }
 
-            if(this.SpeedOption != Spec.SpeedOption.none)
+            if(this.SpeedOption != Spec.SpeedOption.dontOverride)
             {
                 w.WriteAttributeString("speedOption", this.SpeedOption.ToString());
                 if(MaxSpeedPercent == null || MaxSpeedPercent < 100)
@@ -124,15 +133,15 @@ namespace Moritz.Spec
 
         public bool OnlySeq = false;
 
-        public NoteOnKeyOption NoteOnKeyOption = NoteOnKeyOption.ignore;
-        public NoteOnVelocityOption NoteOnVelocityOption = NoteOnVelocityOption.ignore;
-        public NoteOffOption NoteOffOption = NoteOffOption.ignore;
+        public NoteOnKeyOption NoteOnKeyOption = NoteOnKeyOption.dontOverride;
+        public NoteOnVelocityOption NoteOnVelocityOption = NoteOnVelocityOption.dontOverride;
+        public NoteOffOption NoteOffOption = NoteOffOption.dontOverride;
 
-        public ControllerOption PressureOption = ControllerOption.ignore;
-        public ControllerOption PitchWheelOption = ControllerOption.ignore;
-        public ControllerOption ModWheelOption = ControllerOption.ignore;
+        public ControllerOption PressureOption = ControllerOption.dontOverride;
+        public ControllerOption PitchWheelOption = ControllerOption.dontOverride;
+        public ControllerOption ModWheelOption = ControllerOption.dontOverride;
 
-        public SpeedOption SpeedOption = SpeedOption.none;
+        public SpeedOption SpeedOption = SpeedOption.dontOverride;
 
         public int? NumberOfObjectsInFade = null; // must be set if the NoteOffOption is "limitedFade".
 
@@ -144,6 +153,7 @@ namespace Moritz.Spec
 
     public enum NoteOnKeyOption
     {
+        dontOverride, // Dont write the option to the score file. Use the current voice setting.
         ignore, // any key will start the Seq. It will play using the notated pitches.
         transpose,
         matchExactly // the Seq. will not start if the key does not match any of the notated pitchesd.
@@ -151,12 +161,14 @@ namespace Moritz.Spec
 
     public enum NoteOnVelocityOption
     {
+        dontOverride, // Dont write the option to the score file. Use the current voice setting.
         ignore,
         scale
     };
 
     public enum NoteOffOption
     {
+        dontOverride, // Dont write the option to the score file. Use the current voice setting.
         ignore,
         stop,
         stopNow,
@@ -171,6 +183,7 @@ namespace Moritz.Spec
     /// </summary>
     public enum ControllerOption
     {
+        dontOverride, // Dont write the option to the score file. Use the current voice setting.
         ignore = 0,
         aftertouch = 1,
         channelPressure = 2,
@@ -190,7 +203,8 @@ namespace Moritz.Spec
 
     public enum SpeedOption
     {
-        none,
+        dontOverride, // Dont write the option to the score file. Use the current voice setting.
+        none, // use the default durations in the score
         noteOnKey,
         noteOnVel,
         pressure,

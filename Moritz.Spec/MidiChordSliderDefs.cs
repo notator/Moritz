@@ -52,7 +52,7 @@ namespace Moritz.Spec
 
         public void WriteSVG(SvgWriter w)
         {
-            w.WriteStartElement("score", "sliders", null);
+            w.WriteStartElement("sliders");
 
             if(PitchWheelMsbs != null && PitchWheelMsbs.Count > 0 
                 && !(PitchWheelMsbs.Count == 1 && PitchWheelMsbs[0] == M.DefaultPitchWheel))

@@ -124,17 +124,6 @@ namespace Moritz.Composer
                     }
                     oVoices.Add(ov);
                 }
-                else // voice is an InputVoice
-                {
-                    foreach(OutputVoiceDef ov1 in oVoices)
-                    {
-                        if(ov1.InputControls == null)
-                        {
-                            errorString = "\nThis score contains InputVoice(s),\n" +
-                                          "so every OutputVoice in the first bar must have an InputControls definition.";
-                        }
-                    }
-                }
             }
             if(string.IsNullOrEmpty(errorString) && voiceDefsPerSystemPerBar.Count > 1)
             {
@@ -148,10 +137,6 @@ namespace Moritz.Composer
                             if(ov.MasterVolume != null)
                             {
                                 errorString = "\nNo OutputVoice except the first may have a MasterVolume.";
-                            }
-                            if(ov.InputControls != null)
-                            {
-                                errorString = "\nNo OutputVoice except the first may ever have an InputControls definition.";
                             }
                         }
                     }

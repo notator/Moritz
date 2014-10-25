@@ -680,7 +680,7 @@ namespace Moritz.Spec
                 IUniqueChordDef iucd = iud as IUniqueChordDef;
                 if(iucd != null)
                 {
-                    List<byte> midiPitches = iucd.MidiPitches;
+                    List<byte> midiPitches = iucd.NotatedMidiPitches;
                     for(int i = 0; i < midiPitches.Count; ++i)
                     {
                         midiPitches[i] = M.MidiValue(midiPitches[i] + semitonesToTranspose);

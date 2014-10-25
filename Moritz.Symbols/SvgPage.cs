@@ -103,7 +103,7 @@ namespace Moritz.Symbols
                                     {
                                         msDuration = int.Parse(attributesDict["score:msDuration"]);
                                         M.ReadToXmlElementTag(r, "score:inputChord");
-                                        currentVoice.VoiceDef.UniqueDefs.Add(new InputChordDef(r, msDuration));
+                                        //currentVoice.VoiceDef.UniqueDefs.Add(new InputChordDef(r, msDuration));
                                     }
                                     break;
                                 case "rest":                                       

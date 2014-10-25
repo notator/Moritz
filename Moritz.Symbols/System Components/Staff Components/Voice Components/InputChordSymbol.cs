@@ -16,13 +16,14 @@ namespace Moritz.Symbols
 
             _msDurationToNextBarline = umcd.MsDurationToNextBarline;
 
-            SetNoteheadPitches(umcd.MidiPitches);
+            SetNoteheadPitches(umcd.NotatedMidiPitches);
 
             if(umcd.Lyric != null)
             {
+       
                 TextInfo textInfo = new TextInfo(umcd.Lyric, "Arial", (float)(FontHeight / 2F), TextHorizAlign.center);
-                Lyric lyric = new Lyric(this, textInfo);
-                DrawObjects.Add(lyric);
+                Lyric lyricText = new Lyric(this, textInfo);
+                DrawObjects.Add(lyricText);
             }
         }
 
@@ -35,6 +36,10 @@ namespace Moritz.Symbols
 
             Debug.Assert(_msDuration > 0);
             w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
+            if(_inputChordDef.Lyric != null)
+            {
+                w.WriteAttributeString("score", "lyric", null, _inputChordDef.Lyric);
+            }
 
             _inputChordDef.WriteSvg(w);
 
