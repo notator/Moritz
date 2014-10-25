@@ -246,7 +246,6 @@ namespace Moritz.Palettes
         private void TouchAllTextBoxes()
         {
             _bpc.TouchAllTextBoxes();
-            VolumesTextBox_Leave(VolumesTextBox, null);
             PanEnvelopesTextBox_Leave(PanEnvelopesTextBox, null);
             ExpressionEnvelopesTextBox_Leave(ExpressionEnvelopesTextBox, null);
             if(this.PercussionOrnamentsForm != null)
@@ -339,7 +338,6 @@ namespace Moritz.Palettes
 
             #region HelpLabels
             _bpc.SetHelpLabels(_domain);
-            VolumesHelpLabel.Text = countString + integerString + valuesInRangeString + "[ 0..127 ]";
             PanEnvelopesHelpLabel.Text = envelopesHelpString;
             VelocityEnvelopesHelpLabel.Text = envelopesHelpString;
             OrnamentNumbersHelpLabel.Text = countString + integerString + valuesInRangeString + "[ 0..128 ]\r\n(0 means no ornament)";
@@ -353,7 +351,6 @@ namespace Moritz.Palettes
             mainTextBoxes.Add(_bpc.DurationsTextBox);
             mainTextBoxes.Add(_bpc.MidiPitchesTextBox);
             mainTextBoxes.Add(_bpc.VelocitiesTextBox);
-            mainTextBoxes.Add(VolumesTextBox);
             mainTextBoxes.Add(PanEnvelopesTextBox);
             mainTextBoxes.Add(ExpressionEnvelopesTextBox);
             return mainTextBoxes;
@@ -372,10 +369,6 @@ namespace Moritz.Palettes
             _bpc.VelocitiesLabel.Enabled = true;
             _bpc.VelocitiesTextBox.Enabled = true;
             _bpc.VelocitiesHelpLabel.Enabled = true;
-
-            VolumesLabel.Enabled = true;
-            VolumesTextBox.Enabled = true;
-            VolumesHelpLabel.Enabled = true;
 
             PanEnvelopesLabel.Enabled = true;
             PanEnvelopesTextBox.Enabled = true;
@@ -457,10 +450,6 @@ namespace Moritz.Palettes
 
         #region text box events
         #region text changed event handlers
-        private void VolumesTextBox_TextChanged(object sender, EventArgs e)
-        {
-            _bpc.SetToWhite(sender as TextBox);
-        }
 
         private void PitchwheelDeviationsTextBox_TextChanged(object sender, EventArgs e)
         {
@@ -498,11 +487,6 @@ namespace Moritz.Palettes
         }
 
         #endregion text changed event handlers
-
-        private void VolumesTextBox_Leave(object sender, EventArgs e)
-        {
-            M.LeaveIntRangeTextBox(sender as TextBox, true, (uint)_bpc.NumberOfChordValues, 0, 127, SetDialogState);
-        }
 
         private void PanEnvelopesTextBox_Leave(object sender, EventArgs e)
         {
@@ -833,12 +817,6 @@ namespace Moritz.Palettes
 
             _bpc.WriteBasicPercussionControl(w);
 
-            if(!string.IsNullOrEmpty(VolumesTextBox.Text))
-            {
-                w.WriteStartElement("volumes");
-                w.WriteString(VolumesTextBox.Text.Replace(" ", ""));
-                w.WriteEndElement();
-            }
             if(!string.IsNullOrEmpty(PanEnvelopesTextBox.Text))
             {
                 w.WriteStartElement("panEnvelopes");
@@ -882,7 +860,8 @@ namespace Moritz.Palettes
             Debug.Assert(_bpc != null);
 
             M.ReadToXmlElementTag(r, "basicChord");
-            while(r.Name == "basicChord" || r.Name == "volumes" || r.Name == "panEnvelopes"
+            while(r.Name == "basicChord"
+                || r.Name == "panEnvelopes"
                 || r.Name == "expressionEnvelopes"
                 || r.Name == "audioFiles"
                 || r.Name == "ornamentNumbers" || r.Name == "ornamentMinMsDurations"
@@ -894,9 +873,6 @@ namespace Moritz.Palettes
                     {
                         case "basicChord":
                             _bpc.ReadBasicChordControl(r);
-                            break;
-                        case "volumes":
-                            VolumesTextBox.Text = r.ReadElementContentAsString();
                             break;
                         case "panEnvelopes":
                             PanEnvelopesTextBox.Text = r.ReadElementContentAsString();
@@ -920,7 +896,7 @@ namespace Moritz.Palettes
                             break;
                     }
                 }
-                M.ReadToXmlElementTag(r, "palette", "basicChord", "volumes",
+                M.ReadToXmlElementTag(r, "palette", "basicChord",
                     "panEnvelopes", "expressionEnvelopes", "audioFiles", "ornamentNumbers",
                     "ornamentMinMsDurations", "ornamentSettings");
             }

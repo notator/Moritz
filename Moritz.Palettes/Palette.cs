@@ -28,7 +28,6 @@ namespace Moritz.Palettes
 
             _bankIndices = M.StringToByteList(paletteForm.BankIndicesTextBox.Text, ',');
             _patchIndices = M.StringToByteList(paletteForm.PatchIndicesTextBox.Text, ',');
-            _volumes = M.StringToByteList(paletteForm.VolumesTextBox.Text, ',');
             _repeats = M.StringToBoolList(paletteForm.RepeatsTextBox.Text, ',');
             _pitchwheelDeviations = M.StringToByteList(paletteForm.PitchwheelDeviationsTextBox.Text, ',');
             _pitchwheelEnvelopes = M.StringToByteLists(paletteForm.PitchwheelEnvelopesTextBox.Text);
@@ -80,7 +79,6 @@ namespace Moritz.Palettes
             _pitchwheelEnvelopes = new List<List<byte>>();
             _modulationWheelEnvelopes = new List<List<byte>>();
 
-            _volumes = M.StringToByteList(ppf.VolumesTextBox.Text, ',');
             _panEnvelopes = ppf.GetEnvelopesAsByteLists(ppf.PanEnvelopesTextBox);
             _expressionEnvelopes = ppf.GetEnvelopesAsByteLists(ppf.ExpressionEnvelopesTextBox);
 
@@ -129,7 +127,6 @@ namespace Moritz.Palettes
 
                 byte? bankIndex = ByteOrNull(_bankIndices, index);
                 byte? patchIndex = ByteOrNull(_patchIndices, index);
-                byte volume = ByteOrDefaultValue(_volumes, index, M.DefaultVolume); // 100
                 bool repeat = BoolOrDefaultValue(_repeats, index, M.DefaultChordRepeats); // false
                 byte pitchwheelDeviation = ByteOrDefaultValue(_pitchwheelDeviations, index, M.DefaultPitchWheelDeviation); // 2
                 List<byte> pitchwheelEnvelope = ListByte(_pitchwheelEnvelopes, index);
@@ -214,7 +211,6 @@ namespace Moritz.Palettes
 
                 rval = new MidiChordDef(
                     duration,
-                    volume,
                     repeat,
                     pitchwheelDeviation,
                     hasChordOff,
@@ -295,7 +291,6 @@ namespace Moritz.Palettes
         private BasicChordMidiSettings _basicChordMidiSettings;
         private List<byte> _bankIndices;
         private List<byte> _patchIndices;
-        private List<byte> _volumes;
         private List<bool> _repeats;
         private List<byte> _pitchwheelDeviations;
         private List<List<byte>> _pitchwheelEnvelopes;

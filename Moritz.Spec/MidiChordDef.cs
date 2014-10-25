@@ -59,9 +59,6 @@ namespace Moritz.Spec
                     case "patch":
                         _patch = byte.Parse(r.Value);
                         break;
-                    case "volume":
-                        _volume = byte.Parse(r.Value);
-                        break;
                     case "pitchWheelDeviation":
                         _pitchWheelDeviation = byte.Parse(r.Value);
                         break;
@@ -120,7 +117,6 @@ namespace Moritz.Spec
         /// </summary>
         public MidiChordDef(
             int msDuration, // the total duration (this should be the sum of the durations of the basicMidiChordDefs)
-            byte volume, // default is M.DefaultVolume (=100) 
             bool repeat, // default is M.DefaultChordRepeats (=false)
             byte pitchWheelDeviation, // default is M.DefaultPitchWheelDeviation (=2)
             bool hasChordOff, // default is M.DefaultHasChordOff (=true)
@@ -135,7 +131,6 @@ namespace Moritz.Spec
 
             _msPosition = 0;
             _msDuration = msDuration;
-            _volume = volume;
             _repeat = repeat;
             _pitchWheelDeviation = pitchWheelDeviation;
             _hasChordOff = hasChordOff;
@@ -183,36 +178,6 @@ namespace Moritz.Spec
         }
         #endregion
 
-        #region Another no sliders constructor
-        ///// <summary>
-        ///// This constructor creates a MidiChordDef at MsPosition 0, lyric = null, containing a single BasicMidiChordDef and no sliders.
-        ///// </summary>
-        //public MidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff,
-        //    List<MidiControlDef> midiControlDefs)
-        //    : base(msDuration)
-        //{
-        //    _msPosition = 0;
-        //    _volume = GetControlDefHiValue(ControllerType.Volume, midiControlDefs);
-        //    _pitchWheelDeviation = GetControlDefValue(ControllerType.RegisteredParameterCoarse, midiControlDefs);
-        //    _hasChordOff = hasChordOff;
-        //    _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
-
-        //    _displayedMidiPitches = pitches;
-        //    // midiVelocity is handled via the basicMidiChordDefs;
-
-        //    _ornamentNumberSymbol = 0;
-
-        //    MidiChordSliderDefs = null;
-
-        //    byte? bank = GetControlDefValue(ControllerType.BankSelect, midiControlDefs);
-        //    byte? patch = GetCommandDefValue(ChannelCommand.ProgramChange, midiControlDefs);
-
-        //    BasicMidiChordDefs.Add(new BasicMidiChordDef(msDuration, bank, patch, hasChordOff, pitches, velocities));
-
-        //    CheckTotalDuration();
-        //}
-        #endregion
-
         private void CheckTotalDuration()
         {
             List<int> basicChordDurations = BasicChordDurations;
@@ -233,7 +198,6 @@ namespace Moritz.Spec
             // rval.MsDuration must be set after setting BasicMidiChordDefs See below.
             rval.Bank = this.Bank;
             rval.Patch = this.Patch;
-            rval.Volume = this.Volume;
             rval.Repeat = this.Repeat;
             rval.PitchWheelDeviation = this.PitchWheelDeviation;
             rval.HasChordOff = this.HasChordOff;
@@ -406,237 +370,6 @@ namespace Moritz.Spec
             }
         }
 
-        //private byte? GetControlHiValue(ControllerType controllerType, List<MidiControl> midiControls)
-        //{
-        //    byte? returnValue = GetControlValue(controllerType, midiControls);
-        //    if(returnValue != null)
-        //    {
-        //        byte value = (byte)(((byte)returnValue) * 16);
-        //        returnValue = value;
-        //    }
-        //    return returnValue;
-        //}
-        //private byte? GetControlDefHiValue(ControllerType controllerType, List<MidiControlDef> midiControlDefs)
-        //{
-        //    byte? returnValue = GetControlDefValue(controllerType, midiControlDefs);
-        //    if(returnValue != null)
-        //    {
-        //        byte value = (byte)(((byte)returnValue) * 16);
-        //        returnValue = value;
-        //    }
-        //    return returnValue;
-        //}
-        ///// <summary>
-        ///// Returns the value of a MidiControl of the given type at the given msPosition in the controls dictionary.
-        ///// If there are more than one MidiControl of the given type at that position, the value of the last one is returned.
-        ///// </summary>
-        ///// <returns></returns>
-        //private byte? GetControlValue(ControllerType controllerType, List<MidiControl> midiControls)
-        //{
-        //    MidiControl returnMidiControl = null;
-        //    foreach(MidiControl midiControl in midiControls)
-        //    {
-        //        switch(controllerType)
-        //        {
-        //            case ControllerType.AllSoundOff:
-        //                {
-        //                    if(midiControl is AllSoundOff)
-        //                        returnMidiControl = midiControl;
-        //                    break;
-        //                }
-        //            case ControllerType.AllNotesOff:
-        //                {
-        //                    if(midiControl is AllNotesOff)
-        //                        returnMidiControl = midiControl;
-        //                    break;
-        //                }
-        //            case ControllerType.AllControllersOff:
-        //                {
-        //                    if(midiControl is AllControllersOff)
-        //                        returnMidiControl = midiControl;
-        //                    break;
-        //                }
-        //            case ControllerType.Balance:
-        //                {
-        //                    if(midiControl is Balance)
-        //                        returnMidiControl = midiControl;
-        //                    break;
-        //                }
-        //            case ControllerType.BankSelect:
-        //                {
-        //                    if(midiControl is BankControl)
-        //                        returnMidiControl = midiControl;
-        //                    break;
-        //                }
-        //            case ControllerType.RegisteredParameterCoarse: // standard Midi for pitchwheel deviation...
-        //                {
-        //                    if(midiControl is PitchWheelDeviation)
-        //                        returnMidiControl = midiControl;
-        //                    break;
-        //                }
-        //            case ControllerType.Expression:
-        //                {
-        //                    if(midiControl is Expression)
-        //                        returnMidiControl = midiControl;
-        //                    break;
-        //                }
-        //            case ControllerType.ModulationWheel:
-        //                {
-        //                    if(midiControl is ModulationWheel)
-        //                        returnMidiControl = midiControl;
-        //                    break;
-        //                }
-        //            case ControllerType.Pan:
-        //                {
-        //                    if(midiControl is Pan)
-        //                        returnMidiControl = midiControl;
-        //                    break;
-        //                }
-        //            case ControllerType.Volume:
-        //                {
-        //                    if(midiControl is Volume)
-        //                        returnMidiControl = midiControl;
-        //                    break;
-        //                }
-        //        }
-        //        if(returnMidiControl != null)
-        //            break;
-        //    }
-        //    if(returnMidiControl == null)
-        //        return null;
-        //    else
-        //        return (byte)returnMidiControl.ChannelMessages[0].Data1;
-        //}
-        /// <summary>
-        /// Returns the value of a MidiControl of the given type at the given msPosition in the controls dictionary.
-        /// If there are more than one MidiControl of the given type at that position, the value of the last one is returned.
-        /// </summary>
-        /// <returns></returns>
-        private byte? GetControlDefValue(ControllerType controllerType, List<MidiControlDef> midiControlDefs)
-        {
-            byte? returnValue = null;
-            foreach(MidiControlDef midiControlDef in midiControlDefs)
-            {
-                switch(controllerType)
-                {
-                    case ControllerType.AllSoundOff:
-                        {
-                            returnValue = midiControlDef.Value;
-                            break;
-                        }
-                    case ControllerType.AllNotesOff:
-                        {
-                            returnValue = midiControlDef.Value;
-                            break;
-                        }
-                    case ControllerType.AllControllersOff:
-                        {
-                            returnValue = midiControlDef.Value;
-                            break;
-                        }
-                    case ControllerType.Balance:
-                        {
-                            returnValue = midiControlDef.Value;
-                            break;
-                        }
-                    case ControllerType.BankSelect:
-                        {
-                            returnValue = midiControlDef.Value;
-                            break;
-                        }
-                    case ControllerType.RegisteredParameterCoarse: // standard Midi for pitchwheel deviation...
-                        {
-                            returnValue = midiControlDef.Value;
-                            break;
-                        }
-                    case ControllerType.Expression:
-                        {
-                            returnValue = midiControlDef.Value;
-                            break;
-                        }
-                    case ControllerType.ModulationWheel:
-                        {
-                            returnValue = midiControlDef.Value;
-                            break;
-                        }
-                    case ControllerType.Pan:
-                        {
-                            returnValue = midiControlDef.Value;
-                            break;
-                        }
-                    case ControllerType.Volume:
-                        {
-                            returnValue = midiControlDef.Value;
-                            break;
-                        }
-                }
-                if(returnValue != null)
-                    break;
-            }
-            return returnValue;
-        }
-        ///// <summary>
-        ///// Returns the value of a MidiControl of the given type at the given msPosition in the controls dictionary.
-        ///// If there are more than one MidiControl of the given type at that position, the value of the last one is returned.
-        ///// </summary>
-        ///// <returns></returns>
-        //private byte? GetCommandValue(ChannelCommand channelCommand, List<MidiControl> midiControls)
-        //{
-        //    MidiControl returnMidiControl = null;
-        //    foreach(MidiControl midiControl in midiControls)
-        //    {
-        //        switch(channelCommand)
-        //        {
-        //            case ChannelCommand.ProgramChange:
-        //                {
-        //                    if(midiControl is PatchControl)
-        //                        returnMidiControl = midiControl;
-        //                    break;
-        //                }
-        //            case ChannelCommand.PitchWheel:
-        //                {
-        //                    if(midiControl is PitchWheel)
-        //                        returnMidiControl = midiControl;
-        //                    break;
-        //                }
-        //        }
-        //        if(returnMidiControl != null)
-        //            break;
-        //    }
-        //    if(returnMidiControl == null)
-        //        return null;
-        //    else
-        //        return (byte)returnMidiControl.ChannelMessages[0].Data1;
-        //}
-        /// <summary>
-        /// Returns the value of a MidiControl of the given type at the given msPosition in the controls dictionary.
-        /// If there are more than one MidiControl of the given type at that position, the value of the last one is returned.
-        /// </summary>
-        /// <returns></returns>
-        private byte? GetCommandDefValue(ChannelCommand channelCommand, List<MidiControlDef> midiControlDefs)
-        {
-            byte? returnValue = null;
-            foreach(MidiControlDef midiControlDef in midiControlDefs)
-            {
-                switch(channelCommand)
-                {
-                    case ChannelCommand.ProgramChange:
-                        {
-                            returnValue = midiControlDef.Value;
-                            break;
-                        }
-                    case ChannelCommand.PitchWheel:
-                        {
-                            returnValue = midiControlDef.Value;
-                            break;
-                        }
-                }
-                if(returnValue != null)
-                    break;
-            }
-            return returnValue;
-        }
-
         /// <summary>
         /// Returns a list which is ascending order, and in which duplicate 0 and 127 values have been removed,
         /// </summary>
@@ -698,8 +431,6 @@ namespace Moritz.Spec
             {
                 BasicMidiChordDefs[0].PatchIndex = Patch;
             }
-            if(Volume != null && Volume != M.DefaultVolume)
-                w.WriteAttributeString("volume", Volume.ToString());
             if(Repeat == true)
                 w.WriteAttributeString("repeat", "1");
             if(HasChordOff == false)
@@ -892,8 +623,6 @@ namespace Moritz.Spec
         private byte? _bank = null;
         public byte? Patch { get { return _patch; } set { _patch = value; } }
         private byte? _patch = null;
-        public byte? Volume { get { return _volume; } set { _volume = value; } }
-        private byte? _volume = null;
         // If Repeat is true, the MidiChord will repeat in assisted performances
         // if the performed duration is longer than the duration of the basicChords,
         // and the performer continues to hold the key down.

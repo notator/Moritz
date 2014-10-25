@@ -262,7 +262,6 @@ namespace Moritz.Palettes
             _bcc.TouchAllTextBoxes();
             BankIndicesTextBox_Leave(BankIndicesTextBox, null);
             PatchIndicesTextBox_Leave(PatchIndicesTextBox, null);
-            VolumesTextBox_Leave(VolumesTextBox, null);
             RepeatsTextBox_Leave(RepeatsTextBox, null);
             PitchwheelDeviationsTextBox_Leave(PitchwheelDeviationsTextBox, null);
             PitchwheelEnvelopesTextBox_Leave(PitchwheelEnvelopesTextBox, null);
@@ -399,7 +398,6 @@ namespace Moritz.Palettes
             _bcc.SetHelpLabels();
             BankIndicesHelpLabel.Text = countString + "integer values in range [ 0..127 ]";
             PatchIndicesHelpLabel.Text = countString + "integer values in range [ 0..127 ]";
-            VolumesHelpLabel.Text = countString + integerString + valuesInRangeString + "[ 0..127 ]";
             RepeatsHelpLabel.Text = countString + "boolean values ( 1=true, 0=false )";
             PitchwheelDeviationsHelpLabel.Text = countString + integerString + valuesInRangeString + "[ 0..127 ]";
             PitchwheelEnvelopesHelpLabel.Text = envelopesHelpString;
@@ -432,7 +430,6 @@ namespace Moritz.Palettes
             mainTextBoxes.Add(_bcc.ChordDensitiesTextBox);
             mainTextBoxes.Add(BankIndicesTextBox);
             mainTextBoxes.Add(PatchIndicesTextBox);
-            mainTextBoxes.Add(VolumesTextBox);
             mainTextBoxes.Add(RepeatsTextBox);
             mainTextBoxes.Add(PitchwheelDeviationsTextBox);
             mainTextBoxes.Add(ModulationWheelEnvelopesTextBox);
@@ -481,10 +478,6 @@ namespace Moritz.Palettes
             ModulationWheelEnvelopesLabel.Enabled = true;
             ModulationWheelEnvelopesTextBox.Enabled = true;
             ModulationWheelEnvelopesHelpLabel.Enabled = true;
-
-            VolumesLabel.Enabled = true;
-            VolumesTextBox.Enabled = true;
-            VolumesHelpLabel.Enabled = true;
 
             RepeatsLabel.Enabled = true;
             RepeatsTextBox.Enabled = true;
@@ -578,10 +571,6 @@ namespace Moritz.Palettes
 
         #region text box events
         #region text changed event handlers
-        private void VolumesTextBox_TextChanged(object sender, EventArgs e)
-        {
-            M.SetToWhite(sender as TextBox);
-        }
 
         private void RepeatsTextBox_TextChanged(object sender, EventArgs e)
         {
@@ -633,11 +622,6 @@ namespace Moritz.Palettes
         private void PatchIndicesTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveIntRangeTextBox(sender as TextBox, false, (uint)_bcc.NumberOfChordValues, 0, 127, SetDialogState);
-        }
-
-        private void VolumesTextBox_Leave(object sender, EventArgs e)
-        {
-            M.LeaveIntRangeTextBox(sender as TextBox, true, (uint)_bcc.NumberOfChordValues, 0, 127, SetDialogState);
         }
 
         private void RepeatsTextBox_Leave(object sender, EventArgs e)
@@ -1033,12 +1017,6 @@ namespace Moritz.Palettes
                 w.WriteString(PatchIndicesTextBox.Text.Replace(" ", ""));
                 w.WriteEndElement();
             }
-            if(!string.IsNullOrEmpty(VolumesTextBox.Text))
-            {
-                w.WriteStartElement("volumes");
-                w.WriteString(VolumesTextBox.Text.Replace(" ", ""));
-                w.WriteEndElement();
-            }
             if(!string.IsNullOrEmpty(RepeatsTextBox.Text))
             {
                 w.WriteStartElement("repeats");
@@ -1110,7 +1088,6 @@ namespace Moritz.Palettes
             #region
             BankIndicesTextBox.Text = "";
             PatchIndicesTextBox.Text = "";
-            VolumesTextBox.Text = "";
             RepeatsTextBox.Text = "";
             PitchwheelDeviationsTextBox.Text = "";
             PitchwheelEnvelopesTextBox.Text = "";
@@ -1122,7 +1099,7 @@ namespace Moritz.Palettes
             #endregion
 
             M.ReadToXmlElementTag(r, "basicChord");
-            while(r.Name == "basicChord" || r.Name == "bankIndices" || r.Name == "patchIndices" || r.Name == "volumes"
+            while(r.Name == "basicChord" || r.Name == "bankIndices" || r.Name == "patchIndices" 
                 || r.Name == "repeats" || r.Name == "pitchwheelDeviations"
                 || r.Name == "pitchwheelEnvelopes" || r.Name == "panEnvelopes"
                 || r.Name == "modulationWheelEnvelopes" || r.Name == "expressionEnvelopes"
@@ -1142,9 +1119,6 @@ namespace Moritz.Palettes
                             break;
                         case "patchIndices":
                             PatchIndicesTextBox.Text = r.ReadElementContentAsString();
-                            break;
-                        case "volumes":
-                            VolumesTextBox.Text = r.ReadElementContentAsString();
                             break;
                         case "repeats":
                             RepeatsTextBox.Text = r.ReadElementContentAsString();
@@ -1183,7 +1157,7 @@ namespace Moritz.Palettes
                             break;
                     }
                 }
-                M.ReadToXmlElementTag(r, "palette", "basicChord", "bankIndices", "patchIndices", "volumes", "repeats",
+                M.ReadToXmlElementTag(r, "palette", "basicChord", "bankIndices", "patchIndices", "repeats",
                     "pitchwheelDeviations", "pitchwheelEnvelopes", "panEnvelopes", "modulationWheelEnvelopes",
                     "expressionEnvelopes", "audioFiles", "ornamentNumbers", "ornamentMinMsDurations", "ornamentSettings");
             }

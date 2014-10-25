@@ -50,9 +50,6 @@ namespace Moritz.Palettes
             this.MinMsDurationsTextBox = new System.Windows.Forms.TextBox();
             this.EnvelopesExtraHelpLabel = new System.Windows.Forms.Label();
             this.ShowMainScoreFormButton = new System.Windows.Forms.Button();
-            this.VolumesHelpLabel = new System.Windows.Forms.Label();
-            this.VolumesTextBox = new System.Windows.Forms.TextBox();
-            this.VolumesLabel = new System.Windows.Forms.Label();
             this.midiLabel = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.AudioHelpLabel = new System.Windows.Forms.Label();
@@ -249,35 +246,6 @@ namespace Moritz.Palettes
             this.ShowMainScoreFormButton.UseVisualStyleBackColor = false;
             this.ShowMainScoreFormButton.Click += new System.EventHandler(this.ShowMainScoreFormButton_Click);
             // 
-            // VolumesHelpLabel
-            // 
-            this.VolumesHelpLabel.AutoSize = true;
-            this.VolumesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.VolumesHelpLabel.Location = new System.Drawing.Point(630, 147);
-            this.VolumesHelpLabel.Name = "VolumesHelpLabel";
-            this.VolumesHelpLabel.Size = new System.Drawing.Size(171, 14);
-            this.VolumesHelpLabel.TabIndex = 106;
-            this.VolumesHelpLabel.Text = "7 integer values in range [ 0..127 ]";
-            // 
-            // VolumesTextBox
-            // 
-            this.VolumesTextBox.Location = new System.Drawing.Point(173, 144);
-            this.VolumesTextBox.Name = "VolumesTextBox";
-            this.VolumesTextBox.Size = new System.Drawing.Size(454, 20);
-            this.VolumesTextBox.TabIndex = 104;
-            this.VolumesTextBox.TextChanged += new System.EventHandler(this.VolumesTextBox_TextChanged);
-            this.VolumesTextBox.Leave += new System.EventHandler(this.VolumesTextBox_Leave);
-            // 
-            // VolumesLabel
-            // 
-            this.VolumesLabel.AutoSize = true;
-            this.VolumesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.VolumesLabel.Location = new System.Drawing.Point(87, 147);
-            this.VolumesLabel.Name = "VolumesLabel";
-            this.VolumesLabel.Size = new System.Drawing.Size(87, 14);
-            this.VolumesLabel.TabIndex = 105;
-            this.VolumesLabel.Text = "( volumes (100))";
-            // 
             // midiLabel
             // 
             this.midiLabel.AutoSize = true;
@@ -319,8 +287,6 @@ namespace Moritz.Palettes
             this.Controls.Add(this.AudioHelpLabel);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.midiLabel);
-            this.Controls.Add(this.VolumesHelpLabel);
-            this.Controls.Add(this.VolumesTextBox);
             this.Controls.Add(this.ShowMainScoreFormButton);
             this.Controls.Add(this.EnvelopesExtraHelpLabel);
             this.Controls.Add(this.MinMsDurationsTextBox);
@@ -336,7 +302,6 @@ namespace Moritz.Palettes
             this.Controls.Add(this.PanEnvelopesTextBox);
             this.Controls.Add(this.VelocityEnvelopesHelpLabel);
             this.Controls.Add(this.PanEnvelopesHelpLabel);
-            this.Controls.Add(this.VolumesLabel);
             this.Controls.Add(this.MinMsDurationsLabel);
             this.Controls.Add(this.VelocityEnvelopesLabel);
             this.Controls.Add(this.OrnamentNumbersLabel);
@@ -375,9 +340,6 @@ namespace Moritz.Palettes
         public System.Windows.Forms.TextBox MinMsDurationsTextBox;
         private System.Windows.Forms.Label EnvelopesExtraHelpLabel;
         private System.Windows.Forms.Button ShowMainScoreFormButton;
-        private System.Windows.Forms.Label VolumesHelpLabel;
-        public System.Windows.Forms.TextBox VolumesTextBox;
-        private System.Windows.Forms.Label VolumesLabel;
         private System.Windows.Forms.Label midiLabel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label AudioHelpLabel;

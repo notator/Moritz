@@ -42,7 +42,6 @@ namespace Moritz.Algorithm.SongSix
 
             List<List<string>> lyricsPerVerse = LyricsPerVerse;
             List<byte> verseVelocities = new List<byte>() { (byte)64, (byte)75, (byte)90, (byte)105, (byte)120 };
-            List<byte> verseVolumes = new List<byte>() { (byte)120, (byte)100, (byte)100, (byte)100, (byte)100 };
 
             for(int verseIndex = 0; verseIndex < 5; ++verseIndex)
             {
@@ -57,7 +56,6 @@ namespace Moritz.Algorithm.SongSix
 
                 byte patch = (byte)(123 + verseIndex); // top 5 patches in bank 0
                 List<byte> velocity = new List<byte>() { verseVelocities[verseIndex] };
-                byte volume = verseVolumes[verseIndex];
  
                 for(int syllableIndex = 0; syllableIndex < momentMsWidth.Count; ++syllableIndex)
                 {
@@ -72,11 +70,9 @@ namespace Moritz.Algorithm.SongSix
 
                     #region 
                     MidiChordDef lmcd = new MidiChordDef();
-                    //lmcd.Volume = (byte)100; // 100 is the default, and is not written into the score. Other values ARE added to each chord.
-                    lmcd.Volume = volume;
                     lmcd.HasChordOff = true;
-                    // Bank, Patch and Volume are added to *every* chord so that performances can start anywhere.
-                    // If the interpreter is clever enough, repeated controls are not actually sent.
+                    // Bank, and Patch are added to *every* chord so that performances can start anywhere.
+                    // If the Assistant Performer is clever enough, repeated controls are not actually sent.
                     lmcd.Bank = (byte)(0);
                     lmcd.Patch = patch;
                     lmcd.Lyric = lyrics[syllableIndex];

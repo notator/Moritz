@@ -46,10 +46,6 @@ namespace Moritz.Midi
             {
                 _patch = new PatchControl(channel, (byte)midiChordDef.Patch);
             }
-            if(midiChordDef.Volume != null)
-            {
-                _volume = new Volume(channel, (byte)midiChordDef.Volume, ControlContinuation.NoChange);
-            }
 
             // Moritz currently never repeats MidiChords, so the _repeat field is unnecessary.
             // However: the value of midiChordDef.Repeat is saved in SVG-MIDI files,
@@ -88,8 +84,6 @@ namespace Moritz.Midi
                 startMessages.AddRange(_bank.ChannelMessages);
             if(_patch != null)
                 startMessages.AddRange(_patch.ChannelMessages);
-            if(_volume != null)
-                startMessages.AddRange(_volume.ChannelMessages);
             if(_pitchWheelDeviation != null)
                 startMessages.AddRange(_pitchWheelDeviation.ChannelMessages);
 
@@ -166,7 +160,6 @@ namespace Moritz.Midi
 
         private BankControl _bank = null;
         private PatchControl _patch = null;
-        private Volume _volume = null;
         private PitchWheelDeviation _pitchWheelDeviation = null;
         private List<BasicMidiChord> _basicMidiChords = new List<BasicMidiChord>();     
         private MidiChordSlider _pitchWheelSlider = null;
