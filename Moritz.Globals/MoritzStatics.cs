@@ -176,27 +176,7 @@ namespace Moritz.Globals
                 throw new ApplicationException(msg.ToString());
             }
         }
-        /// <summary>
-        /// If r.AttributeCount > 0, this function returns
-        /// a dictionary containing all the attribute name-value pairs.
-        /// Otherwise it does not move the reader, and returns null.
-        /// </summary>
-        /// <param name="r"></param>
-        public static Dictionary<string, string> AttributesDict(XmlReader r)
-        {
-            Dictionary<string, string> rDict = null;
-            int nAttributes = r.AttributeCount;
-            if(nAttributes > 0)
-            {
-                rDict = new Dictionary<string, string>();
-                for(int i = 0; i < nAttributes; i++)
-                {
-                    r.MoveToAttribute(i);
-                    rDict.Add(r.Name, r.Value);
-                }
-            }
-            return rDict;
-        }
+
         /// <summary>
         /// The current date. (Written to XML files.)
         /// </summary>

@@ -43,44 +43,6 @@ namespace Moritz.Spec
             Velocities = new List<byte>(original.Velocities);
         }
 
-        public BasicMidiChordDef(XmlReader r)
-        {
-            // The reader is at the beginning of a "score:basicChord" element
-            // inside a "score:basicChords" element inside a "score:midiChord" element.
-            Debug.Assert(r.Name == "score:basicChord" && r.IsStartElement() && r.AttributeCount > 0);
-            int nAttributes = r.AttributeCount;
-            for(int i = 0; i < nAttributes; i++)
-            {
-                r.MoveToAttribute(i);
-                switch(r.Name)
-                {
-                    case "msDuration":
-                        _msDuration = int.Parse(r.Value); // read-only!
-                        break;
-                    case "bank":
-                        BankIndex = byte.Parse(r.Value);
-                        break;
-                    case "patch":
-                        PatchIndex = byte.Parse(r.Value);
-                        break;
-                    case "hasChordOff":
-                        // HasChordOff is true if this attribute is not present
-                        byte val = byte.Parse(r.Value);
-                        if(val == 0)
-                            HasChordOff = false;
-                        else
-                            HasChordOff = true;
-                        break;
-                    case "pitches":
-                        Pitches = M.StringToByteList(r.Value, ' ');
-                        break;
-                    case "velocities":
-                        Velocities = M.StringToByteList(r.Value, ' ');
-                        break;
-                }
-            }
-        }
-
         public void WriteSVG(XmlWriter w)
         {
             w.WriteStartElement("basicChord");

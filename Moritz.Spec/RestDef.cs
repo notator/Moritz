@@ -17,18 +17,6 @@ namespace Moritz.Spec
             MsPosition = msPosition;
         }
 
-        /// <summary>
-        /// Used when loading a score or getting a RestDef from a palette.
-        /// The MsPosition is initially 0. When loading a score, the MsPosition will
-        /// eventually be set by accumulating durations when the score has finished loading.
-        /// </summary>
-        /// <param name="msDuration"></param>
-        public RestDef(int msDuration)
-            : base(msDuration)
-        {
-            MsPosition = 0; // Default. This value will be set later.
-        }
-
         public override string ToString()
         {
             return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString() + " RestDef" );

@@ -20,35 +20,6 @@ namespace Moritz.Spec
             ModulationWheelMsbs = modulationWheelMsbs;
             ExpressionMsbs = expressionMsbs;
         }
-        /// <summary>
-        /// Contains values retrieved from an SVG file midiSliders element
-        /// </summary>
-        /// <param name="score"></param>
-        public MidiChordSliderDefs(XmlReader r)
-        {
-            // The reader is at the beginning of a "score:sliders" element having attributes
-            Debug.Assert((r.Name == "score:sliders") && r.IsStartElement() && r.AttributeCount > 0);
-            int nAttributes = r.AttributeCount;
-            for(int i = 0; i < nAttributes; i++)
-            {
-                r.MoveToAttribute(i);
-                switch(r.Name)
-                {
-                     case "pitchWheel":
-                        PitchWheelMsbs = M.StringToByteList(r.Value, ' ');
-                        break;
-                     case "pan":
-                        PanMsbs = M.StringToByteList(r.Value, ' ');
-                        break;
-                     case "modulationWheel":
-                        ModulationWheelMsbs = M.StringToByteList(r.Value, ' ');
-                        break;
-                     case "expressionSlider":
-                        ExpressionMsbs = M.StringToByteList(r.Value, ' ');
-                        break;
-                }
-            }
-        }
 
         public void WriteSVG(SvgWriter w)
         {
