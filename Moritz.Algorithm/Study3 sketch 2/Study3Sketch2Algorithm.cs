@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 using Krystals4ObjectLibrary;
 using Moritz.Algorithm;
-using Moritz.Palettes;
+using Moritz.Palettes;
 using Moritz.Symbols;
 using Moritz.Spec;
 
@@ -26,14 +26,14 @@ namespace Moritz.Algorithm.Study3Sketch2
 
         public override int NumberOfInputVoices { get { return 1; } }
         public override int NumberOfOutputVoices { get { return 8; } }
-        public override int NumberOfBars { get { return 5; } }
-
-        /// <summary>
-        /// See CompositionAlgorithm.DoAlgorithm()
-        /// </summary>
+        public override int NumberOfBars { get { return 5; } }
+
+        /// <summary>
+        /// See CompositionAlgorithm.DoAlgorithm()
+        /// </summary>
         public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
-        {
-            _krystals = krystals;
+        {
+            _krystals = krystals;
             _palettes = palettes;
 
             List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
@@ -52,100 +52,100 @@ namespace Moritz.Algorithm.Study3Sketch2
             Debug.Assert(bars.Count == NumberOfBars);
 
             List<byte> masterVolumes = new List<byte>(){ 100, 100, 100, 100, 100, 100, 100, 100 }; // 8 OutputVoices
-            base.SetOutputVoiceMasterVolumes(bars[0], masterVolumes);
-
-            List<InputChordDef> inputChordSymbolsInBar2 = GetInputChordDefsInBar(bars[1]);
-            SetBar2NoteOnNoteOffControls(inputChordSymbolsInBar2);
-            List<InputChordDef> inputChordSymbolsInBar3 = GetInputChordDefsInBar(bars[2]);
-            SetBar3PitchWheelToVolumeControls(inputChordSymbolsInBar3);
-            List<InputChordDef> inputChordSymbolsInBar4 = GetInputChordDefsInBar(bars[3]);
-            SetBar4LimitedFadeControls(inputChordSymbolsInBar4);
-            List<InputChordDef> inputChordSymbolsInBar5 = GetInputChordDefsInBar(bars[4]);
+            base.SetOutputVoiceMasterVolumes(bars[0], masterVolumes);
+
+            List<InputChordDef> inputChordSymbolsInBar2 = GetInputChordDefsInBar(bars[1]);
+            SetBar2NoteOnNoteOffControls(inputChordSymbolsInBar2);
+            List<InputChordDef> inputChordSymbolsInBar3 = GetInputChordDefsInBar(bars[2]);
+            SetBar3PitchWheelToVolumeControls(inputChordSymbolsInBar3);
+            List<InputChordDef> inputChordSymbolsInBar4 = GetInputChordDefsInBar(bars[3]);
+            SetBar4LimitedFadeControls(inputChordSymbolsInBar4);
+            List<InputChordDef> inputChordSymbolsInBar5 = GetInputChordDefsInBar(bars[4]);
             SetBar5SpeedControls(inputChordSymbolsInBar5);
 
             return bars;
-        }
-
-        /// <summary>
-        /// Returns all the InputChordDefs in the bar.
-        /// </summary>
-        private List<InputChordDef> GetInputChordDefsInBar(List<VoiceDef> bar)
-        {
-            List<InputChordDef> inputChordDefs = new List<InputChordDef>();
-
-            foreach(VoiceDef voiceDef in bar)
-            {
-                InputVoiceDef inputVoiceDef = voiceDef as InputVoiceDef;
-                if(inputVoiceDef != null)
-                {
-                    foreach(IUniqueDef uniqueDef in inputVoiceDef.UniqueDefs)
-                    {
-                        InputChordDef icd = uniqueDef as InputChordDef;
-                        if(icd != null)
-                        {
-                            inputChordDefs.Add(icd);
-                        }
-                    }
-                }
-            }
-            return inputChordDefs;
-        }
-
-        private void SetBar2NoteOnNoteOffControls(List<InputChordDef> bar2InputChordDefs)
-        {
-            foreach(InputChordDef inputChordDef in bar2InputChordDefs)
-            {
-                InputControls ics = new InputControls(); // all options are currently ignore
-                ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
-                ics.NoteOffOption = NoteOffOption.fade;
-                inputChordDef.SeqRefsPerMidiPitch[0][0].InputControls = ics;
-            }
-        }
-
-        private void SetBar3PitchWheelToVolumeControls(List<InputChordDef> bar3InputChordDefs)
-        {
-            foreach(InputChordDef inputChordDef in bar3InputChordDefs)
-            {
-                InputControls ics = new InputControls(); // all options are currently ignore
-                ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly; // this is the current value in the voice (has no effect)
-                ics.NoteOffOption = NoteOffOption.fade; // this is the current value in the voice (has no effect)
-                ics.PitchWheelOption = ControllerOption.volume;
-                ics.MaximumVolume = 100;
-                ics.MinimumVolume = 50;
-                inputChordDef.SeqRefsPerMidiPitch[0][0].InputControls = ics;
-            }
-        }
-
-        private void SetBar4LimitedFadeControls(List<InputChordDef> bar4InputChordDefs)
-        {
-            int numberOfObjectsInFade = 4;
-            foreach(InputChordDef inputChordDef in bar4InputChordDefs)
-            {
-                InputControls ics = new InputControls(); // all options are currently ignore
-                ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly; // this is the current value in the voice (has no effect)
-                ics.NoteOffOption = NoteOffOption.shortFade;
-                ics.NumberOfObjectsInFade = numberOfObjectsInFade++;
-                ics.PitchWheelOption = ControllerOption.pitchWheel;
-                inputChordDef.SeqRefsPerMidiPitch[0][0].InputControls = ics;
-            }
-        }
-
-        private void SetBar5SpeedControls(List<InputChordDef> bar5InputChordDefs)
-        {
-            foreach(InputChordDef inputChordDef in bar5InputChordDefs)
-            {
-                //ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly; // this is the current value in the voice (has no effect)
-                //ics.NoteOffOption = NoteOffOption.shortFade;
-                //ics.NumberOfObjectsInFade = numberOfObjectsInFade++;
-                //ics.PitchWheelOption = ControllerOption.pitchWheel;
-                InputControls ics = new InputControls(); // all options are currently null
-
-                ics.PitchWheelOption = ControllerOption.pitchWheel; // this is the current value in the voice (has no effect)
-                ics.SpeedOption = SpeedOption.noteOnKey;
-                ics.MaxSpeedPercent = 500;
-
-                inputChordDef.SeqRefsPerMidiPitch[0][0].InputControls = ics;
-            }
+        }
+
+        /// <summary>
+        /// Returns all the InputChordDefs in the bar.
+        /// </summary>
+        private List<InputChordDef> GetInputChordDefsInBar(List<VoiceDef> bar)
+        {
+            List<InputChordDef> inputChordDefs = new List<InputChordDef>();
+
+            foreach(VoiceDef voiceDef in bar)
+            {
+                InputVoiceDef inputVoiceDef = voiceDef as InputVoiceDef;
+                if(inputVoiceDef != null)
+                {
+                    foreach(IUniqueDef uniqueDef in inputVoiceDef.UniqueDefs)
+                    {
+                        InputChordDef icd = uniqueDef as InputChordDef;
+                        if(icd != null)
+                        {
+                            inputChordDefs.Add(icd);
+                        }
+                    }
+                }
+            }
+            return inputChordDefs;
+        }
+
+        private void SetBar2NoteOnNoteOffControls(List<InputChordDef> bar2InputChordDefs)
+        {
+            foreach(InputChordDef inputChordDef in bar2InputChordDefs)
+            {
+                InputControls ics = new InputControls(); // all options are currently ignore
+                ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
+                ics.NoteOffOption = NoteOffOption.fade;
+                inputChordDef.SeqRefsPerMidiPitch[0][0].InputControls = ics;
+            }
+        }
+
+        private void SetBar3PitchWheelToVolumeControls(List<InputChordDef> bar3InputChordDefs)
+        {
+            foreach(InputChordDef inputChordDef in bar3InputChordDefs)
+            {
+                InputControls ics = new InputControls(); // all options are currently ignore
+                ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly; // this is the current value in the voice (has no effect)
+                ics.NoteOffOption = NoteOffOption.fade; // this is the current value in the voice (has no effect)
+                ics.PitchWheelOption = ControllerOption.volume;
+                ics.MaximumVolume = 100;
+                ics.MinimumVolume = 50;
+                inputChordDef.SeqRefsPerMidiPitch[0][0].InputControls = ics;
+            }
+        }
+
+        private void SetBar4LimitedFadeControls(List<InputChordDef> bar4InputChordDefs)
+        {
+            int numberOfObjectsInFade = 4;
+            foreach(InputChordDef inputChordDef in bar4InputChordDefs)
+            {
+                InputControls ics = new InputControls(); // all options are currently ignore
+                ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly; // this is the current value in the voice (has no effect)
+                ics.NoteOffOption = NoteOffOption.shortFade;
+                ics.NumberOfObjectsInFade = numberOfObjectsInFade++;
+                ics.PitchWheelOption = ControllerOption.pitchWheel;
+                inputChordDef.SeqRefsPerMidiPitch[0][0].InputControls = ics;
+            }
+        }
+
+        private void SetBar5SpeedControls(List<InputChordDef> bar5InputChordDefs)
+        {
+            foreach(InputChordDef inputChordDef in bar5InputChordDefs)
+            {
+                //ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly; // this is the current value in the voice (has no effect)
+                //ics.NoteOffOption = NoteOffOption.shortFade;
+                //ics.NumberOfObjectsInFade = numberOfObjectsInFade++;
+                //ics.PitchWheelOption = ControllerOption.pitchWheel;
+                InputControls ics = new InputControls(); // all options are currently null
+
+                ics.PitchWheelOption = ControllerOption.pitchWheel; // this is the current value in the voice (has no effect)
+                ics.SpeedOption = SpeedOption.noteOnKey;
+                ics.MaxSpeedPercent = 500;
+
+                inputChordDef.SeqRefsPerMidiPitch[0][0].InputControls = ics;
+            }
         }
 
         #region CreateBar1()

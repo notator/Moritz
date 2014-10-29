@@ -23,11 +23,11 @@ namespace Moritz.Algorithm.SongSix
 
         public override int NumberOfInputVoices { get { return 0; } }
         public override int NumberOfOutputVoices { get { return 9; } }
-        public override int NumberOfBars { get { return 106; } }
-
-        /// <summary>
-        /// See CompositionAlgorithm.DoAlgorithm()
-        /// </summary>
+        public override int NumberOfBars { get { return 106; } }
+
+        /// <summary>
+        /// See CompositionAlgorithm.DoAlgorithm()
+        /// </summary>
         public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
         {
             // Palette indices:
@@ -43,9 +43,9 @@ namespace Moritz.Algorithm.SongSix
 
             // All palettes can be accessed here at _paletteDefs[ paletteIndex ].
 
-            // The wind3 is the lowest wind. The winds are numbered from top to bottom in the score.
-
-            _krystals = krystals;
+            // The wind3 is the lowest wind. The winds are numbered from top to bottom in the score.
+
+            _krystals = krystals;
             _palettes = palettes;
 
             OutputVoiceDef wind3 = GetWind3(_palettes[0], _krystals[8]);

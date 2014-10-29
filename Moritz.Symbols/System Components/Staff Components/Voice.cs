@@ -373,9 +373,9 @@ namespace Moritz.Symbols
                 _firstDurationSymbol = value;
             }
         }
-        #endregion
-
-
+        #endregion
+
+
         public VoiceDef VoiceDef = null;
 
         private DurationSymbol _firstDurationSymbol;

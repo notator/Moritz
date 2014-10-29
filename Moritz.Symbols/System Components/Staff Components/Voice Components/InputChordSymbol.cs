@@ -1,4 +1,4 @@
-using System.Text;
+using System.Text;
 using System.Diagnostics;
 
 using Moritz.Globals;
@@ -16,11 +16,11 @@ namespace Moritz.Symbols
 
             _msDurationToNextBarline = umcd.MsDurationToNextBarline;
 
-            SetNoteheadPitches(umcd.NotatedMidiPitches);
-
+            SetNoteheadPitches(umcd.NotatedMidiPitches);
+
             if(umcd.Lyric != null)
-            {
-       
+            {
+       
                 TextInfo textInfo = new TextInfo(umcd.Lyric, "Arial", (float)(FontHeight / 2F), TextHorizAlign.center);
                 Lyric lyricText = new Lyric(this, textInfo);
                 DrawObjects.Add(lyricText);
@@ -32,13 +32,13 @@ namespace Moritz.Symbols
             if(ChordMetrics.BeamBlock != null)
                 ChordMetrics.BeamBlock.WriteSVG(w);
 
-            w.SvgStartGroup("inputChord", null);
-
-            Debug.Assert(_msDuration > 0);
-            w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
-            if(_inputChordDef.Lyric != null)
-            {
-                w.WriteAttributeString("score", "lyric", null, _inputChordDef.Lyric);
+            w.SvgStartGroup("inputChord", null);
+
+            Debug.Assert(_msDuration > 0);
+            w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
+            if(_inputChordDef.Lyric != null)
+            {
+                w.WriteAttributeString("score", "lyric", null, _inputChordDef.Lyric);
             }
 
             _inputChordDef.WriteSvg(w);
@@ -59,6 +59,6 @@ namespace Moritz.Symbols
         }
 
         public InputChordDef InputChordDef { get { return _inputChordDef; } }
-        protected InputChordDef _inputChordDef = null;
+        protected InputChordDef _inputChordDef = null;
     }
 }

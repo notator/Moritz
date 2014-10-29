@@ -46,30 +46,30 @@ namespace Moritz.Composer
             _settingsPath = settingsPath;
             _settingsFolderPath = Path.GetDirectoryName(settingsPath);
 
-            _scoreTitle = Path.GetFileNameWithoutExtension(settingsPath);
-            this.QuitAlgorithmButton.Text = "Quit " + _scoreTitle;
+            _scoreTitle = Path.GetFileNameWithoutExtension(settingsPath);
+            this.QuitAlgorithmButton.Text = "Quit " + _scoreTitle;
             _dimensionsAndMetadataForm.Text = _scoreTitle + ": Page Dimensions and Metadata";
 
-            _algorithm = ComposableSvgScore.Algorithm(_scoreTitle);
-            if(_algorithm != null)
-            {
-                _outputVoiceIndices = GetOutputVoiceIndices(_algorithm.NumberOfOutputVoices);
-
-                SetScoreComboBoxItems(_settingsFolderPath);
-
-                ScoreComboBox.SelectedIndexChanged -= ScoreComboBox_SelectedIndexChanged;
-                ScoreComboBox.SelectedIndex = ScoreComboBox.Items.IndexOf(_scoreTitle);
-                GetSelectedSettings(_settingsPath, _algorithm);
-                ScoreComboBox.SelectedIndexChanged += ScoreComboBox_SelectedIndexChanged;
-
-                if(OutputVoiceIndicesStaffTextBox.Text == "")
-                {
-                    SetDefaultVoiceIndicesPerStaff(_algorithm.NumberOfOutputVoices);
-                }
-            }
-            else
-            {
-                SetSettingsHaveBeenSaved();
+            _algorithm = ComposableSvgScore.Algorithm(_scoreTitle);
+            if(_algorithm != null)
+            {
+                _outputVoiceIndices = GetOutputVoiceIndices(_algorithm.NumberOfOutputVoices);
+
+                SetScoreComboBoxItems(_settingsFolderPath);
+
+                ScoreComboBox.SelectedIndexChanged -= ScoreComboBox_SelectedIndexChanged;
+                ScoreComboBox.SelectedIndex = ScoreComboBox.Items.IndexOf(_scoreTitle);
+                GetSelectedSettings(_settingsPath, _algorithm);
+                ScoreComboBox.SelectedIndexChanged += ScoreComboBox_SelectedIndexChanged;
+
+                if(OutputVoiceIndicesStaffTextBox.Text == "")
+                {
+                    SetDefaultVoiceIndicesPerStaff(_algorithm.NumberOfOutputVoices);
+                }
+            }
+            else
+            {
+                SetSettingsHaveBeenSaved();
             }
         }
 
@@ -707,7 +707,7 @@ namespace Moritz.Composer
                                             pageFormat,
                                             krystals, palettes,
                                             _settingsFolderPath,
-                                            _dimensionsAndMetadataForm.Keywords,
+                                            _dimensionsAndMetadataForm.Keywords,
                                             _dimensionsAndMetadataForm.Comment);
 
                 if(score != null && score.Systems.Count > 0)
