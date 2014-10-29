@@ -1,110 +1,110 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DF59888C-F935-4E4F-BA31-664DAF79F7D6}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Moritz.Symbols</RootNamespace>
-    <AssemblyName>Moritz.Symbols</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="DrawObjects.cs" />
-    <Compile Include="FrameInfo.cs" />
-    <Compile Include="Metadata.cs" />
-    <Compile Include="Metrics\ChordMetrics.cs" />
-    <Compile Include="Metrics\CLichtFontMetrics.cs" />
-    <Compile Include="Metrics\Edge.cs" />
-    <Compile Include="Metrics\Metrics.cs" />
-    <Compile Include="Metrics\Notator.cs" />
-    <Compile Include="Metrics\StandardSymbolSet.cs" />
-    <Compile Include="Metrics\Study2b2ChordSymbol.cs" />
-    <Compile Include="Metrics\Study2b2SymbolSet.cs" />
-    <Compile Include="Metrics\SymbolSet.cs" />
-    <Compile Include="Metrics\SystemMetrics.cs" />
-    <Compile Include="PageFormat.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SvgPage.cs" />
-    <Compile Include="SvgScore.cs" />
-    <Compile Include="SvgSystem.cs" />
-    <Compile Include="System Components\InputStaff.cs" />
-    <Compile Include="System Components\NoteObjectMoment.cs" />
-    <Compile Include="System Components\OutputStaff.cs" />
-    <Compile Include="System Components\Staff Components\InputVoice.cs" />
-    <Compile Include="System Components\Staff Components\OutputVoice.cs" />
-    <Compile Include="System Components\Staff Components\Voice Components\AnchorageSymbol.cs" />
-    <Compile Include="System Components\Staff Components\Voice Components\Barline.cs" />
-    <Compile Include="System Components\Staff Components\Voice Components\CautionaryChordSymbol.cs" />
-    <Compile Include="System Components\Staff Components\Voice Components\Chord Components\Beam.cs" />
-    <Compile Include="System Components\Staff Components\Voice Components\Chord Components\BeamBlock.cs" />
-    <Compile Include="System Components\Staff Components\Voice Components\Chord Components\Head.cs" />
-    <Compile Include="System Components\Staff Components\Voice Components\Chord Components\Stem.cs" />
-    <Compile Include="System Components\Staff Components\Voice Components\ChordSymbol.cs" />
-    <Compile Include="System Components\Staff Components\Voice Components\ClefSymbol.cs" />
-    <Compile Include="System Components\Staff Components\Voice Components\DurationSymbol.cs" />
-    <Compile Include="System Components\Staff Components\Voice Components\InputChordSymbol.cs" />
-    <Compile Include="System Components\Staff Components\Voice Components\NoteObject.cs" />
-    <Compile Include="System Components\Staff Components\Voice Components\OutputChordSymbol.cs" />
-    <Compile Include="System Components\Staff Components\Voice Components\RestSymbol.cs" />
-    <Compile Include="System Components\Staff Components\Voice.cs" />
-    <Compile Include="System Components\Staff.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
-      <Project>{e68c2a79-cdab-46f5-a6ee-534ce2d99577}</Project>
-      <Name>Moritz.Globals</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Moritz.Midi\Moritz.Midi.csproj">
-      <Project>{82e776e6-c819-42e6-9986-7ebdc3dffa06}</Project>
-      <Name>Moritz.Midi</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Moritz.Spec\Moritz.Spec.csproj">
-      <Project>{c84026d4-800e-4590-8127-97e78b471921}</Project>
-      <Name>Moritz.Spec</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Moritz.Xml\Moritz.Xml.csproj">
-      <Project>{b239c302-a15d-4397-9f3c-ee6cc85440f3}</Project>
-      <Name>Moritz.Xml</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{DF59888C-F935-4E4F-BA31-664DAF79F7D6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Moritz.Symbols</RootNamespace>
+    <AssemblyName>Moritz.Symbols</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DrawObjects.cs" />
+    <Compile Include="FrameInfo.cs" />
+    <Compile Include="Metadata.cs" />
+    <Compile Include="Metrics\ChordMetrics.cs" />
+    <Compile Include="Metrics\CLichtFontMetrics.cs" />
+    <Compile Include="Metrics\Edge.cs" />
+    <Compile Include="Metrics\Metrics.cs" />
+    <Compile Include="Metrics\Notator.cs" />
+    <Compile Include="Metrics\StandardSymbolSet.cs" />
+    <Compile Include="Metrics\Study2b2ChordSymbol.cs" />
+    <Compile Include="Metrics\Study2b2SymbolSet.cs" />
+    <Compile Include="Metrics\SymbolSet.cs" />
+    <Compile Include="Metrics\SystemMetrics.cs" />
+    <Compile Include="PageFormat.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SvgPage.cs" />
+    <Compile Include="SvgScore.cs" />
+    <Compile Include="SvgSystem.cs" />
+    <Compile Include="System Components\InputStaff.cs" />
+    <Compile Include="System Components\NoteObjectMoment.cs" />
+    <Compile Include="System Components\OutputStaff.cs" />
+    <Compile Include="System Components\Staff Components\InputVoice.cs" />
+    <Compile Include="System Components\Staff Components\OutputVoice.cs" />
+    <Compile Include="System Components\Staff Components\Voice Components\AnchorageSymbol.cs" />
+    <Compile Include="System Components\Staff Components\Voice Components\Barline.cs" />
+    <Compile Include="System Components\Staff Components\Voice Components\CautionaryChordSymbol.cs" />
+    <Compile Include="System Components\Staff Components\Voice Components\Chord Components\Beam.cs" />
+    <Compile Include="System Components\Staff Components\Voice Components\Chord Components\BeamBlock.cs" />
+    <Compile Include="System Components\Staff Components\Voice Components\Chord Components\Head.cs" />
+    <Compile Include="System Components\Staff Components\Voice Components\Chord Components\Stem.cs" />
+    <Compile Include="System Components\Staff Components\Voice Components\ChordSymbol.cs" />
+    <Compile Include="System Components\Staff Components\Voice Components\ClefSymbol.cs" />
+    <Compile Include="System Components\Staff Components\Voice Components\DurationSymbol.cs" />
+    <Compile Include="System Components\Staff Components\Voice Components\InputChordSymbol.cs" />
+    <Compile Include="System Components\Staff Components\Voice Components\NoteObject.cs" />
+    <Compile Include="System Components\Staff Components\Voice Components\OutputChordSymbol.cs" />
+    <Compile Include="System Components\Staff Components\Voice Components\RestSymbol.cs" />
+    <Compile Include="System Components\Staff Components\Voice.cs" />
+    <Compile Include="System Components\Staff.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
+      <Project>{e68c2a79-cdab-46f5-a6ee-534ce2d99577}</Project>
+      <Name>Moritz.Globals</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Midi\Moritz.Midi.csproj">
+      <Project>{82e776e6-c819-42e6-9986-7ebdc3dffa06}</Project>
+      <Name>Moritz.Midi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Spec\Moritz.Spec.csproj">
+      <Project>{c84026d4-800e-4590-8127-97e78b471921}</Project>
+      <Name>Moritz.Spec</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Xml\Moritz.Xml.csproj">
+      <Project>{b239c302-a15d-4397-9f3c-ee6cc85440f3}</Project>
+      <Name>Moritz.Xml</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
   </Target>
-  -->
+  -->
 </Project>

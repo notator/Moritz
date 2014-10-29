@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
-
+using System.Diagnostics;
+
 using Krystals4ObjectLibrary;
 using Moritz.Algorithm;
 using Moritz.Palettes;
@@ -24,9 +24,9 @@ namespace Moritz.Algorithm.PaletteDemo
         public override int NumberOfOutputVoices { get { return 1; } }
         public override int NumberOfBars { get { return 1; } }
 
-        /// <summary>
+        /// <summary>
         /// See CompositionAlgorithm.DoAlgorithm()
-        /// </summary>
+        /// </summary>
         public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
         {
             VoiceDef voice = new OutputVoiceDef();

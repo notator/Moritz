@@ -1,123 +1,123 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1EC1C34A-FE5F-4BD0-AC99-CDDE4172B7CA}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Moritz.Composer</RootNamespace>
-    <AssemblyName>Moritz.Composer</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Multimedia, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Sanford Libraries\Multimedia.dll</HintPath>
-    </Reference>
-    <Reference Include="Multimedia.Midi, Version=4.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Sanford Libraries\Multimedia.Midi.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AssistantComposerMainForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="AssistantComposerMainForm.Designer.cs">
-      <DependentUpon>AssistantComposerMainForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ComposableScore.cs" />
-    <Compile Include="ComposableScoreAlgorithm.cs" />
-    <Compile Include="DimensionsAndMetadataForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DimensionsAndMetadataForm.Designer.cs">
-      <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="KrystalPaletteScore.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="AssistantComposerMainForm.resx">
-      <DependentUpon>AssistantComposerMainForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DimensionsAndMetadataForm.resx">
-      <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Krystals4ObjectLibrary\Krystals4ObjectLibrary.csproj">
-      <Project>{383e2844-41a4-488f-a683-d3eae9af4af5}</Project>
-      <Name>Krystals4ObjectLibrary</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Moritz.Algorithm\Moritz.Algorithm.csproj">
-      <Project>{539a2302-1db3-4eda-879c-81a1624a24a0}</Project>
-      <Name>Moritz.Algorithm</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
-      <Project>{e68c2a79-cdab-46f5-a6ee-534ce2d99577}</Project>
-      <Name>Moritz.Globals</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Moritz.Krystals\Moritz.Krystals.csproj">
-      <Project>{df448bec-155b-4a56-82bd-8fd1978a85af}</Project>
-      <Name>Moritz.Krystals</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Moritz.Midi\Moritz.Midi.csproj">
-      <Project>{82e776e6-c819-42e6-9986-7ebdc3dffa06}</Project>
-      <Name>Moritz.Midi</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Moritz.Palettes\Moritz.Palettes.csproj">
-      <Project>{a240ecd4-6ec2-4a0e-99e4-70cec7b603ca}</Project>
-      <Name>Moritz.Palettes</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Moritz.Spec\Moritz.Spec.csproj">
-      <Project>{c84026d4-800e-4590-8127-97e78b471921}</Project>
-      <Name>Moritz.Spec</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Moritz.Symbols\Moritz.Symbols.csproj">
-      <Project>{df59888c-f935-4e4f-ba31-664daf79f7d6}</Project>
-      <Name>Moritz.Symbols</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Moritz.Xml\Moritz.Xml.csproj">
-      <Project>{b239c302-a15d-4397-9f3c-ee6cc85440f3}</Project>
-      <Name>Moritz.Xml</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1EC1C34A-FE5F-4BD0-AC99-CDDE4172B7CA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Moritz.Composer</RootNamespace>
+    <AssemblyName>Moritz.Composer</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Multimedia, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Sanford Libraries\Multimedia.dll</HintPath>
+    </Reference>
+    <Reference Include="Multimedia.Midi, Version=4.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Sanford Libraries\Multimedia.Midi.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssistantComposerMainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AssistantComposerMainForm.Designer.cs">
+      <DependentUpon>AssistantComposerMainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ComposableScore.cs" />
+    <Compile Include="ComposableScoreAlgorithm.cs" />
+    <Compile Include="DimensionsAndMetadataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DimensionsAndMetadataForm.Designer.cs">
+      <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="KrystalPaletteScore.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AssistantComposerMainForm.resx">
+      <DependentUpon>AssistantComposerMainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DimensionsAndMetadataForm.resx">
+      <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Krystals4ObjectLibrary\Krystals4ObjectLibrary.csproj">
+      <Project>{383e2844-41a4-488f-a683-d3eae9af4af5}</Project>
+      <Name>Krystals4ObjectLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Algorithm\Moritz.Algorithm.csproj">
+      <Project>{539a2302-1db3-4eda-879c-81a1624a24a0}</Project>
+      <Name>Moritz.Algorithm</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Globals\Moritz.Globals.csproj">
+      <Project>{e68c2a79-cdab-46f5-a6ee-534ce2d99577}</Project>
+      <Name>Moritz.Globals</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Krystals\Moritz.Krystals.csproj">
+      <Project>{df448bec-155b-4a56-82bd-8fd1978a85af}</Project>
+      <Name>Moritz.Krystals</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Midi\Moritz.Midi.csproj">
+      <Project>{82e776e6-c819-42e6-9986-7ebdc3dffa06}</Project>
+      <Name>Moritz.Midi</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Palettes\Moritz.Palettes.csproj">
+      <Project>{a240ecd4-6ec2-4a0e-99e4-70cec7b603ca}</Project>
+      <Name>Moritz.Palettes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Spec\Moritz.Spec.csproj">
+      <Project>{c84026d4-800e-4590-8127-97e78b471921}</Project>
+      <Name>Moritz.Spec</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Symbols\Moritz.Symbols.csproj">
+      <Project>{df59888c-f935-4e4f-ba31-664daf79f7d6}</Project>
+      <Name>Moritz.Symbols</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Moritz.Xml\Moritz.Xml.csproj">
+      <Project>{b239c302-a15d-4397-9f3c-ee6cc85440f3}</Project>
+      <Name>Moritz.Xml</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
   </Target>
-  -->
+  -->
 </Project>
