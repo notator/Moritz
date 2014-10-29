@@ -17,9 +17,9 @@ namespace Moritz.Palettes
             : this(name, domain, mainFormCallbacks)
         {
             ReadPalette(r);
-            if(_audioButtonsControl != null)
+            if(_paletteButtonsControl != null)
             {
-                _audioButtonsControl.Enabled = true;
+                _paletteButtonsControl.Enabled = true;
             }
             DeselectAll();
         }
@@ -40,8 +40,8 @@ namespace Moritz.Palettes
             ConnectBasicChordControl();
             if(M.Preferences.CurrentMultimediaMidiOutputDevice != null)
             {
-                ConnectAudioButtonsControl(domain);
-                _audioButtonsControl.Enabled = false;
+                ConnectPaletteButtonsControl(domain);
+                _paletteButtonsControl.Enabled = false;
             }
 
             _allMainTextBoxes = GetAllMainTextBoxes();
@@ -50,19 +50,25 @@ namespace Moritz.Palettes
             SetDialogForDomain(domain);
         }
 
+        public void ShowPaletteChordForm(int midiChordIndex)
+        {
+            PaletteChordForm f = new PaletteChordForm(this, _bcc, midiChordIndex, SetDialogState);
+            f.Show();
+        }
+
+
         private void ConnectBasicChordControl()
         {
             _bcc = new BasicChordControl(SetDialogState);
             _bcc.Location = new Point(22, 14);
             Controls.Add(_bcc);
         }
-        private void ConnectAudioButtonsControl(int domain)
+        private void ConnectPaletteButtonsControl(int domain)
         {
             Point location = new Point(this.MinMsDurationsTextBox.Location.X, this.MinMsDurationsTextBox.Location.Y + 27);
-            //Point location = new Point(this.MinMsDurationsTextBox.Location.X, this.MinMsDurationsTextBox.Location.Y);
-            _audioButtonsControl = new AudioButtonsControl(domain, location, this, _callbacks.SettingsFolderPath() + @"\audio");
-            Debug.Assert(_audioButtonsControl != null);
-            Controls.Add(_audioButtonsControl);
+            _paletteButtonsControl = new PaletteButtonsControl(domain, location, this, _callbacks.SettingsFolderPath() + @"\audio");
+            Debug.Assert(_paletteButtonsControl != null);
+            Controls.Add(_paletteButtonsControl);
         }
 
         public static string NewPaletteName(int paletteNumber, int domain)
@@ -174,9 +180,9 @@ namespace Moritz.Palettes
 
         protected void PaletteForm_Click(object sender, EventArgs e)
         {
-            if(_audioButtonsControl != null)
+            if(_paletteButtonsControl != null)
             {
-                _audioButtonsControl.StopCurrentMediaPlayer();
+                _paletteButtonsControl.StopCurrentMediaPlayer();
             }
         }
 
@@ -292,7 +298,7 @@ namespace Moritz.Palettes
         {
             this._callbacks.MainFormBringToFront();
         }
-        private void ShowOrnamentSettingsButton_Click(object sender, EventArgs e)
+        public void ShowOrnamentSettingsButton_Click(object sender, EventArgs e)
         {
             if(_ornamentSettingsForm != null)
             {
@@ -336,7 +342,7 @@ namespace Moritz.Palettes
             }
         }
 
-        private void MidiPitchesHelpButton_Click(object sender, EventArgs e)
+        public void MidiPitchesHelpButton_Click(object sender, EventArgs e)
         {
             if(_midiPitchesHelpForm == null)
             {
@@ -356,7 +362,7 @@ namespace Moritz.Palettes
             }
         }
 
-        private void MidiInstrumentsHelpButton_Click(object sender, EventArgs e)
+        public void MidiInstrumentsHelpButton_Click(object sender, EventArgs e)
         {
             if(_midiInstrumentsHelpForm == null)
             {
@@ -809,7 +815,7 @@ namespace Moritz.Palettes
         }
 
         /// <summary>
-        /// Also used by ornaments dialog
+        /// Also used by paletteChordForm and ornaments dialogs
         /// </summary>
         /// <param name="textBox"></param>
         /// <param name="okay"></param>
@@ -825,12 +831,12 @@ namespace Moritz.Palettes
                 textBox.BackColor = M.TextBoxErrorColor;
             }
 
-            if(_audioButtonsControl != null)
+            if(_paletteButtonsControl != null)
             {
                 if(HasError())
-                    _audioButtonsControl.Enabled = false;
+                    _paletteButtonsControl.Enabled = false;
                 else
-                    _audioButtonsControl.Enabled = true;
+                    _paletteButtonsControl.Enabled = true;
             }
             
             this.SetSettingsNotSaved();
@@ -1054,9 +1060,9 @@ namespace Moritz.Palettes
                 w.WriteEndElement();
             }
 
-            if(_audioButtonsControl != null)
+            if(_paletteButtonsControl != null)
             {
-                _audioButtonsControl.WriteAudioFiles(w);
+                _paletteButtonsControl.WriteAudioFiles(w);
             }
 
             if(!string.IsNullOrEmpty(OrnamentNumbersTextBox.Text))
@@ -1139,9 +1145,9 @@ namespace Moritz.Palettes
                             ExpressionEnvelopesTextBox.Text = r.ReadElementContentAsString();
                             break;
                         case "audioFiles":
-                            if(_audioButtonsControl != null)
+                            if(_paletteButtonsControl != null)
                             {
-                                _audioButtonsControl.ReadAudioFiles(r);
+                                _paletteButtonsControl.ReadAudioFiles(r);
                             }
                             break;
                         case "ornamentNumbers":
@@ -1169,7 +1175,7 @@ namespace Moritz.Palettes
         private int _domain = 0;
         private ComposerFormCallbacks _callbacks = null;
         private List<TextBox> _allMainTextBoxes = new List<TextBox>();
-        private AudioButtonsControl _audioButtonsControl = null;
+        private PaletteButtonsControl _paletteButtonsControl = null;
         #endregion iPaletteForm
 
         #region public variables
@@ -1177,6 +1183,7 @@ namespace Moritz.Palettes
         public ComposerFormCallbacks Callbacks { get { return _callbacks; } }
         public BasicChordControl BasicChordControl { get { return _bcc; } }
         public OrnamentSettingsForm OrnamentSettingsForm { get { return _ornamentSettingsForm; } }
+        public PaletteButtonsControl PaletteButtonsControl { get { return _paletteButtonsControl; } }
         #endregion public variables
 
         #region private variables
@@ -1188,6 +1195,7 @@ namespace Moritz.Palettes
         private MIDIInstrumentsHelpForm _midiInstrumentsHelpForm = null;
         private BasicChordControl _bcc = null;
         #endregion private variables
+
     }
 
     internal delegate void CloseMidiPitchesHelpFormDelegate();

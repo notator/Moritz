@@ -38,6 +38,11 @@ namespace Moritz.Palettes
             SetDialogForDomain(Domain);
         }
 
+        public void ShowPaletteChordForm(int midiChordIndex)
+        {
+            throw new NotImplementedException();
+        }
+
         private void PercussionPaletteForm_Click(object sender, EventArgs e)
         {
             _audioButtonsControl.StopCurrentMediaPlayer();
@@ -52,7 +57,7 @@ namespace Moritz.Palettes
         private void ConnectAudioButtonsControl(int domain)
         {
             Point location = new Point(this.MinMsDurationsTextBox.Location.X, this.MinMsDurationsTextBox.Location.Y + 27);
-            _audioButtonsControl = new AudioButtonsControl(domain, location, this, _callbacks.SettingsFolderPath + @"\audio");
+            _audioButtonsControl = new PaletteButtonsControl(domain, location, this, _callbacks.SettingsFolderPath + @"\audio");
             Controls.Add(_audioButtonsControl);
         }
 
@@ -908,7 +913,7 @@ namespace Moritz.Palettes
         private int _domain = 0;
         private ComposerFormCallbacks _callbacks = null;
         private List<TextBox> _allMainTextBoxes = new List<TextBox>();
-        private AudioButtonsControl _audioButtonsControl = null;
+        private PaletteButtonsControl _audioButtonsControl = null;
         #endregion iPaletteForm
 
         #region public variables

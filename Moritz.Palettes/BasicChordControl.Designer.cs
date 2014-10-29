@@ -95,7 +95,7 @@
             // 
             this.VelocitiesHelpLabel.AutoSize = true;
             this.VelocitiesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.VelocitiesHelpLabel.Location = new System.Drawing.Point(605, 37);
+            this.VelocitiesHelpLabel.Location = new System.Drawing.Point(605, 91);
             this.VelocitiesHelpLabel.Name = "VelocitiesHelpLabel";
             this.VelocitiesHelpLabel.Size = new System.Drawing.Size(168, 13);
             this.VelocitiesHelpLabel.TabIndex = 124;
@@ -103,7 +103,7 @@
             // 
             // ChordDensitiesTextBox
             // 
-            this.ChordDensitiesTextBox.Location = new System.Drawing.Point(148, 115);
+            this.ChordDensitiesTextBox.Location = new System.Drawing.Point(148, 7);
             this.ChordDensitiesTextBox.Name = "ChordDensitiesTextBox";
             this.ChordDensitiesTextBox.Size = new System.Drawing.Size(454, 20);
             this.ChordDensitiesTextBox.TabIndex = 6;
@@ -114,15 +114,15 @@
             // 
             this.ChordDensitiesHelpLabel.AutoSize = true;
             this.ChordDensitiesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.ChordDensitiesHelpLabel.Location = new System.Drawing.Point(605, 118);
+            this.ChordDensitiesHelpLabel.Location = new System.Drawing.Point(605, 10);
             this.ChordDensitiesHelpLabel.Name = "ChordDensitiesHelpLabel";
             this.ChordDensitiesHelpLabel.Size = new System.Drawing.Size(168, 13);
             this.ChordDensitiesHelpLabel.TabIndex = 125;
-            this.ChordDensitiesHelpLabel.Text = "7 integer values in range [ 1..128 ]";
+            this.ChordDensitiesHelpLabel.Text = "7 integer values in range [ 0..127 ]";
             // 
             // VelocitiesTextBox
             // 
-            this.VelocitiesTextBox.Location = new System.Drawing.Point(148, 34);
+            this.VelocitiesTextBox.Location = new System.Drawing.Point(148, 88);
             this.VelocitiesTextBox.Name = "VelocitiesTextBox";
             this.VelocitiesTextBox.Size = new System.Drawing.Size(454, 20);
             this.VelocitiesTextBox.TabIndex = 1;
@@ -135,9 +135,9 @@
             this.VerticalVelocityFactorsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
             this.VerticalVelocityFactorsHelpLabel.Location = new System.Drawing.Point(542, 198);
             this.VerticalVelocityFactorsHelpLabel.Name = "VerticalVelocityFactorsHelpLabel";
-            this.VerticalVelocityFactorsHelpLabel.Size = new System.Drawing.Size(162, 13);
+            this.VerticalVelocityFactorsHelpLabel.Size = new System.Drawing.Size(100, 13);
             this.VerticalVelocityFactorsHelpLabel.TabIndex = 128;
-            this.VerticalVelocityFactorsHelpLabel.Text = "7 float values in range [ 0.0..1.0 ]";
+            this.VerticalVelocityFactorsHelpLabel.Text = "7 float values ( > 0 )";
             // 
             // MidiPitchesTextBox
             // 
@@ -192,7 +192,7 @@
             // 
             this.DurationsLabel.AutoSize = true;
             this.DurationsLabel.ForeColor = System.Drawing.Color.Brown;
-            this.DurationsLabel.Location = new System.Drawing.Point(94, 10);
+            this.DurationsLabel.Location = new System.Drawing.Point(94, 37);
             this.DurationsLabel.Name = "DurationsLabel";
             this.DurationsLabel.Size = new System.Drawing.Size(50, 13);
             this.DurationsLabel.TabIndex = 131;
@@ -212,7 +212,7 @@
             // 
             this.ChordDensitiesLabel.AutoSize = true;
             this.ChordDensitiesLabel.ForeColor = System.Drawing.Color.Brown;
-            this.ChordDensitiesLabel.Location = new System.Drawing.Point(40, 118);
+            this.ChordDensitiesLabel.Location = new System.Drawing.Point(40, 10);
             this.ChordDensitiesLabel.Name = "ChordDensitiesLabel";
             this.ChordDensitiesLabel.Size = new System.Drawing.Size(104, 13);
             this.ChordDensitiesLabel.TabIndex = 118;
@@ -222,7 +222,7 @@
             // 
             this.DurationsHelpLabel.AutoSize = true;
             this.DurationsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.DurationsHelpLabel.Location = new System.Drawing.Point(605, 10);
+            this.DurationsHelpLabel.Location = new System.Drawing.Point(605, 37);
             this.DurationsHelpLabel.Name = "DurationsHelpLabel";
             this.DurationsHelpLabel.Size = new System.Drawing.Size(112, 13);
             this.DurationsHelpLabel.TabIndex = 132;
@@ -232,7 +232,7 @@
             // 
             this.ChordOffsLabel.AutoSize = true;
             this.ChordOffsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.ChordOffsLabel.Location = new System.Drawing.Point(62, 91);
+            this.ChordOffsLabel.Location = new System.Drawing.Point(62, 118);
             this.ChordOffsLabel.Name = "ChordOffsLabel";
             this.ChordOffsLabel.Size = new System.Drawing.Size(78, 13);
             this.ChordOffsLabel.TabIndex = 134;
@@ -242,7 +242,7 @@
             // 
             this.VelocitiesLabel.AutoSize = true;
             this.VelocitiesLabel.ForeColor = System.Drawing.Color.Brown;
-            this.VelocitiesLabel.Location = new System.Drawing.Point(67, 37);
+            this.VelocitiesLabel.Location = new System.Drawing.Point(67, 91);
             this.VelocitiesLabel.Name = "VelocitiesLabel";
             this.VelocitiesLabel.Size = new System.Drawing.Size(77, 13);
             this.VelocitiesLabel.TabIndex = 117;
@@ -250,7 +250,7 @@
             // 
             // ChordOffsTextBox
             // 
-            this.ChordOffsTextBox.Location = new System.Drawing.Point(148, 88);
+            this.ChordOffsTextBox.Location = new System.Drawing.Point(148, 115);
             this.ChordOffsTextBox.Name = "ChordOffsTextBox";
             this.ChordOffsTextBox.Size = new System.Drawing.Size(454, 20);
             this.ChordOffsTextBox.TabIndex = 5;
@@ -271,7 +271,7 @@
             // 
             this.ChordOffsHelpLabel.AutoSize = true;
             this.ChordOffsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.ChordOffsHelpLabel.Location = new System.Drawing.Point(605, 91);
+            this.ChordOffsHelpLabel.Location = new System.Drawing.Point(605, 118);
             this.ChordOffsHelpLabel.Name = "ChordOffsHelpLabel";
             this.ChordOffsHelpLabel.Size = new System.Drawing.Size(173, 13);
             this.ChordOffsHelpLabel.TabIndex = 135;
@@ -279,7 +279,7 @@
             // 
             // DurationsTextBox
             // 
-            this.DurationsTextBox.Location = new System.Drawing.Point(148, 7);
+            this.DurationsTextBox.Location = new System.Drawing.Point(148, 34);
             this.DurationsTextBox.Name = "DurationsTextBox";
             this.DurationsTextBox.Size = new System.Drawing.Size(454, 20);
             this.DurationsTextBox.TabIndex = 0;

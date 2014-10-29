@@ -1,6 +1,6 @@
 ﻿namespace Moritz.Palettes
 {
-    partial class AudioButtonsControl
+    partial class PaletteButtonsControl
     {
         /// <summary> 
         /// Required designer variable.

@@ -47,11 +47,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AudioButtonsControl.cs">
+    <Compile Include="PaletteButtonsControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="AudioButtonsControl.Designer.cs">
-      <DependentUpon>AudioButtonsControl.cs</DependentUpon>
+    <Compile Include="PaletteButtonsControl.Designer.cs">
+      <DependentUpon>PaletteButtonsControl.cs</DependentUpon>
     </Compile>
     <Compile Include="BasicChordControl.cs">
       <SubType>UserControl</SubType>
@@ -73,6 +73,12 @@
       <DependentUpon>IntListControl.cs</DependentUpon>
     </Compile>
     <Compile Include="IPaletteForm.cs" />
+    <Compile Include="PaletteChordForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PaletteChordForm.Designer.cs">
+      <DependentUpon>PaletteChordForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="MIDIInstrumentsHelpForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -119,8 +125,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="AudioButtonsControl.resx">
-      <DependentUpon>AudioButtonsControl.cs</DependentUpon>
+    <EmbeddedResource Include="PaletteChordForm.resx">
+      <DependentUpon>PaletteChordForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PaletteButtonsControl.resx">
+      <DependentUpon>PaletteButtonsControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="BasicChordControl.resx">
       <DependentUpon>BasicChordControl.cs</DependentUpon>

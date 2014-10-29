@@ -16,9 +16,9 @@ using Moritz.Symbols;
 
 namespace Moritz.Palettes
 {
-    public partial class AudioButtonsControl : UserControl
+    public partial class PaletteButtonsControl : UserControl
     {
-        internal AudioButtonsControl(int domain, Point location, IPaletteForm iPaletteForm, string audioFolder)
+        internal PaletteButtonsControl(int domain, Point location, IPaletteForm iPaletteForm, string audioFolder)
         {
             InitializeComponent();
 
@@ -26,7 +26,7 @@ namespace Moritz.Palettes
             _audioFolder = audioFolder;
             this.SuspendLayout();
             this.Location = location;
-            this.Size = new Size(domain * 33, 50);
+            this.Size = new Size(domain * 33, 75);
             AddAudioButtons(domain);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -114,10 +114,26 @@ namespace Moritz.Palettes
             int y = 0;
             for(int i = 0; i < domain; ++i)
             {
-                CreateMidiEventDemoButton(x, y, i);
-                CreateAudioSampleButton(x, y + 25, i);
+                CreateMidiChordFormButton(x, y, i);
+                CreateMidiEventDemoButton(x, y + 25, i);
+                CreateAudioSampleButton(x, y + 50, i);
                 x += 33;
             }
+        }
+        private void CreateMidiChordFormButton(int x, int y, int i)
+        {
+            Button b = new Button();
+            b.Location = new System.Drawing.Point(x, y);
+            b.Size = new System.Drawing.Size(27, 24);
+            b.Tag = i;
+            //b.UseVisualStyleBackColor = false;
+            b.Text = (i + 1).ToString();
+
+            b.MouseDown += new MouseEventHandler(PaletteChordFormButton_MouseDown);
+
+            this.Controls.Add(b);
+            _paletteChordFormButtons.Add(b);
+            b.BringToFront();
         }
         private void CreateMidiEventDemoButton(int x, int y, int i)
         {
@@ -192,14 +208,23 @@ namespace Moritz.Palettes
                         MidiChordDef midiChordDef = iud as MidiChordDef;
                         Debug.Assert(midiChordDef != null);
                         MidiChord midiChord = new MidiChord(midiChannel, midiChordDef);
-                        midiChord.Send(); //sends in this thread
-                        //// This blocks the current thread (keeps the button selected)
-                        //Thread.Sleep(iud.MsDuration);
+                        midiChord.Send(); //sends in this thread (blocks the current thread -- keeping the button selected)
                     }
                 }
             }
         }
         #endregion
+
+        private void PaletteChordFormButton_MouseDown(object sender, MouseEventArgs e)
+        {
+            Button button = sender as Button;
+            Debug.Assert(button != null);
+
+            if(button != null)
+            {
+                _iPaletteForm.ShowPaletteChordForm((int) button.Tag);
+            }
+        }
 
         private void AudioSampleButton_MouseDown(object sender, MouseEventArgs e)
         {
@@ -335,6 +360,7 @@ namespace Moritz.Palettes
         private readonly string _audioFolder;
 
         private Button[] _audioSampleButtons = null;
+        private List<Button> _paletteChordFormButtons = new List<Button>();
         private List<Button> _midiEventDemoButtons = new List<Button>();
         private List<Label> _restLabels = new List<Label>();
     }
