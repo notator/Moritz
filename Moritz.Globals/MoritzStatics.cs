@@ -33,7 +33,7 @@ namespace Moritz.Globals
             string myDocuments;
             if(computerName == "AUDIOPC")
             {
-                myDocuments = @"F:";
+                myDocuments = @"D:";
             }
             else
             {
