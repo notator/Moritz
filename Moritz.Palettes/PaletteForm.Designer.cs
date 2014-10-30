@@ -617,8 +617,6 @@ namespace Moritz.Palettes
         public System.Windows.Forms.TextBox RepeatsTextBox;
         private System.Windows.Forms.Label MidiChordLabel;
         public System.Windows.Forms.Label RepeatsLabel;
-
-
     }
 }
 

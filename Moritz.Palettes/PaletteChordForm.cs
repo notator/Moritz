@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -12,8 +9,6 @@ using System.Diagnostics;
 using Moritz.Spec;
 using Moritz.Globals;
 using Moritz.Midi;
-using Moritz.Spec;
-using Moritz.Symbols;
 
 namespace Moritz.Palettes
 {
@@ -26,7 +21,6 @@ namespace Moritz.Palettes
             _paletteForm = paletteForm;
             _bcc = bcc;
             _setDialogState = SetDialogState; // delegate
-
             _paletteForm.Enabled = false;
 
             Text = "midi chord " + (midiChordIndex + 1).ToString();
@@ -69,7 +63,6 @@ namespace Moritz.Palettes
             List<StringBuilder> rval = new List<StringBuilder>() { new StringBuilder(), new StringBuilder(), new StringBuilder() };
 
             string[] substrings = text.Split(new char[] { ',' });
-
             for(int i = 0; i < substrings.Length; ++i)
             {
                 substrings[i] = substrings[i].Trim();
@@ -103,11 +96,12 @@ namespace Moritz.Palettes
             this.ChordOffTextBox.Text = chordOffSBs[1].ToString();
             chordDensitySBs = GetSubStrings(bcc.ChordDensitiesTextBox.Text, midiChordIndex);
             this.ChordDensityTextBox.Text = chordDensitySBs[1].ToString();
- 
+
             inversionIndexSBs = GetSubStrings(bcc.InversionIndicesTextBox.Text, midiChordIndex);
             this.InversionIndexTextBox.Text = inversionIndexSBs[1].ToString();
             verticalVelocityFactorSBs = GetSubStrings(bcc.VerticalVelocityFactorsTextBox.Text, midiChordIndex);
             this.VerticalVelocityFactorTextBox.Text = verticalVelocityFactorSBs[1].ToString();
+
             bankIndexSBs = GetSubStrings(paletteForm.BankIndicesTextBox.Text, midiChordIndex);
             this.BankIndexTextBox.Text = bankIndexSBs[1].ToString();
             patchIndexSBs = GetSubStrings(paletteForm.PatchIndicesTextBox.Text, midiChordIndex);
@@ -129,6 +123,7 @@ namespace Moritz.Palettes
             minMsDurationsSBs = GetSubStrings(paletteForm.MinMsDurationsTextBox.Text, midiChordIndex);
             this.MinMsDurationsTextBox.Text = minMsDurationsSBs[1].ToString();
         }
+
         private void EnableChordParameters(int maximumChordDensity)
         {
             Debug.Assert(maximumChordDensity > 1);
@@ -143,6 +138,7 @@ namespace Moritz.Palettes
 
             VerticalVelocityFactorTextBox.Enabled = true;
         }
+
         private void DisableChordParameters()
         {
             ChordDensityTextBox.Enabled = false;
@@ -156,6 +152,7 @@ namespace Moritz.Palettes
             VerticalVelocityFactorTextBox.Enabled = false;
             VerticalVelocityFactorHelpLabel.Text = "";
         }
+
         private void EnableOrnamentParameters(int numberOfOrnaments)
         {
             Debug.Assert(numberOfOrnaments > 0);
@@ -164,6 +161,7 @@ namespace Moritz.Palettes
 
             ShowOrnamentSettingsButton.Enabled = true;
         }
+
         private void DisableOrnamentParameters()
         {
             OrnamentNumberTextBox.Enabled = false;
@@ -210,6 +208,7 @@ namespace Moritz.Palettes
 
             return allTextBoxes;
         }
+
         private bool HasError()
         {
             bool hasError = false;
@@ -225,6 +224,7 @@ namespace Moritz.Palettes
 
             return hasError;
         }
+
         private void SaveAndCloseButton_Click(object sender, EventArgs e)
         {
             if(HasError())
@@ -258,7 +258,7 @@ namespace Moritz.Palettes
                 _paletteForm.PanEnvelopesTextBox.Text = panEnvelopeSBs[0].ToString() + this.PanEnvelopeTextBox.Text + panEnvelopeSBs[2].ToString();
                 _paletteForm.ModulationWheelEnvelopesTextBox.Text = modulationWheelEnvelopeSBs[0].ToString() + this.ModulationWheelEnvelopeTextBox.Text + modulationWheelEnvelopeSBs[2].ToString();
                 _paletteForm.ExpressionEnvelopesTextBox.Text = expressionEnvelopeSBs[0].ToString() + this.ExpressionEnvelopeTextBox.Text + expressionEnvelopeSBs[2].ToString();
-                
+
                 if(_paletteForm.OrnamentNumbersTextBox.Enabled)
                 {
                     _paletteForm.OrnamentNumbersTextBox.Text = ornamentNumberSBs[0].ToString() + this.OrnamentNumberTextBox.Text + ornamentNumberSBs[2].ToString();
@@ -334,6 +334,7 @@ namespace Moritz.Palettes
                 this.ChordDensityTextBox.Enabled = true;
             }
         }
+
         private void InversionIndexTextBox_Leave(object sender, EventArgs e)
         {
             TextBox textBox = sender as TextBox;
@@ -382,7 +383,7 @@ namespace Moritz.Palettes
                 textBox.Text = envelopeSB.ToString();
                 textBox.BackColor = Color.White;
             }
-            else
+            else if(!string.IsNullOrEmpty(textBox.Text)) // it is not an error if the textBox is empty
             {
                 textBox.BackColor = M.TextBoxErrorColor;
             }
@@ -429,7 +430,6 @@ namespace Moritz.Palettes
             {
                 Button midiEventDemoButton = sender as Button;
                 DurationDef durationDef = GetDurationDef();
-
                 MidiChordDef midiChordDef = durationDef as MidiChordDef;
                 RestDef restDef = durationDef as RestDef;
 
@@ -477,52 +477,8 @@ namespace Moritz.Palettes
                 Palette palette = new Palette(this);
                 rval = palette.MidiChordDef(0);
             }
-            
+
             return rval;
-        }
-
-        private List<byte> GetMidiPitches(byte rootPitch, byte density, List<byte> primeIntervals)
-        {
-            int nUpperPitches = density - 1;
-            List<byte> midiPitches = new List<byte>();
-            midiPitches.Add(rootPitch);
-            for(int p = 0; p < nUpperPitches; p++)
-            {
-                byte newpitch = M.MidiValue(midiPitches[p] + primeIntervals[p]);
-                midiPitches.Add(newpitch);
-            }
-            return midiPitches;
-        }
-
-        private List<byte> GetVerticalVelocities(byte rootVelocity, int vDensity, float vvFactor)
-        {
-            List<byte> midiVelocities = new List<byte>();
-
-            if(vvFactor == 1F || vDensity == 1)
-            {
-                for(int i = 0; i < vDensity; ++i)
-                {
-                    midiVelocities.Add((byte)rootVelocity);
-                }
-            }
-            else
-            {
-                float bottomVelocity = rootVelocity;
-                if(vvFactor > 1.0F)
-                    bottomVelocity = bottomVelocity / vvFactor;
-                float topVelocity = bottomVelocity * vvFactor;
-                float velocityDifference = (topVelocity - bottomVelocity) / ((float)(vDensity - 1));
-                float newVelocity = bottomVelocity;
-                for(int i = 0; i < vDensity; ++i)
-                {
-                    midiVelocities.Add((byte)newVelocity);
-
-                    newVelocity += velocityDifference;
-                    newVelocity = newVelocity < 0F ? 0F : newVelocity;
-                    newVelocity = newVelocity > 127F ? 127F : newVelocity;
-                }
-            }
-            return midiVelocities;
         }
 
         #endregion
@@ -550,10 +506,8 @@ namespace Moritz.Palettes
         public PaletteForm PaletteForm { get { return _paletteForm; } }
         PaletteForm _paletteForm;
         BasicChordControl _bcc;
-
-        MIDIInstrumentsHelpForm _midiInstrumentsHelpForm;
-        MidiPitchesHelpForm _midiPitchesHelpForm;
         #endregion  private variables
+
     }
-    
 }
+

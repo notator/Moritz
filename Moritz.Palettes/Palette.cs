@@ -22,10 +22,8 @@ namespace Moritz.Palettes
             bcfs.ChordDensities = M.StringToByteList(paletteForm.BasicChordControl.ChordDensitiesTextBox.Text, ',');
             bcfs.Inversions = paletteForm.GetLinearInversions(paletteForm.BasicChordControl.RootInversionTextBox.Text);
             bcfs.InversionIndices = M.StringToIntList(paletteForm.BasicChordControl.InversionIndicesTextBox.Text, ',');
-            bcfs.VerticalVelocityFactors = M.StringToFloatList(paletteForm.BasicChordControl.VerticalVelocityFactorsTextBox.Text, ',');
-
-            _basicChordMidiSettings = new BasicChordMidiSettings(bcfs);
-
+            bcfs.VerticalVelocityFactors = M.StringToFloatList(paletteForm.BasicChordControl.VerticalVelocityFactorsTextBox.Text, ',');
+            _basicChordMidiSettings = new BasicChordMidiSettings(bcfs);
             _bankIndices = M.StringToByteList(paletteForm.BankIndicesTextBox.Text, ',');
             _patchIndices = M.StringToByteList(paletteForm.PatchIndicesTextBox.Text, ',');
             _repeats = M.StringToBoolList(paletteForm.RepeatsTextBox.Text, ',');
@@ -33,24 +31,20 @@ namespace Moritz.Palettes
             _pitchwheelEnvelopes = M.StringToByteLists(paletteForm.PitchwheelEnvelopesTextBox.Text);
             _panEnvelopes = M.StringToByteLists(paletteForm.PanEnvelopesTextBox.Text);
             _modulationWheelEnvelopes = M.StringToByteLists(paletteForm.ModulationWheelEnvelopesTextBox.Text);
-            _expressionEnvelopes = M.StringToByteLists(paletteForm.ExpressionEnvelopesTextBox.Text);
-
+            _expressionEnvelopes = M.StringToByteLists(paletteForm.ExpressionEnvelopesTextBox.Text);
             _ornamentNumbers = M.StringToIntList(paletteForm.OrnamentNumbersTextBox.Text, ',');
-            _ornamentMinMsDurations = M.StringToIntList(paletteForm.MinMsDurationsTextBox.Text, ',');
-
+            _ornamentMinMsDurations = M.StringToIntList(paletteForm.MinMsDurationsTextBox.Text, ',');
             _ornamentSettings = null;
             if(paletteForm.OrnamentSettingsForm != null)
             {
                 _ornamentSettings = new OrnamentSettings(paletteForm);
-            }
-
+            }
             for(int chordIndex = 0; chordIndex < _basicChordMidiSettings.Durations.Count; ++chordIndex)
             {
                 DurationDef dd = GetDurationDef(chordIndex);
                 _durationDefs.Add(dd);
             }
-        }
-
+        }
         /// <summary>
         /// A temporary palette containing a single DurationDef.
         /// Used just to construct the single DurationDef with the existing code.
@@ -66,37 +60,29 @@ namespace Moritz.Palettes
             bcfs.ChordDensities = M.StringToByteList(paletteChordForm.ChordDensityTextBox.Text, ',');
             bcfs.Inversions = paletteChordForm.PaletteForm.GetLinearInversions(paletteChordForm.PaletteForm.BasicChordControl.RootInversionTextBox.Text);
             bcfs.InversionIndices = M.StringToIntList(paletteChordForm.InversionIndexTextBox.Text, ',');
-            bcfs.VerticalVelocityFactors = M.StringToFloatList(paletteChordForm.VerticalVelocityFactorTextBox.Text, ',');
-
-            _basicChordMidiSettings = new BasicChordMidiSettings(bcfs);
-
+            bcfs.VerticalVelocityFactors = M.StringToFloatList(paletteChordForm.VerticalVelocityFactorTextBox.Text, ',');
+            _basicChordMidiSettings = new BasicChordMidiSettings(bcfs);
             _bankIndices = M.StringToByteList(paletteChordForm.BankIndexTextBox.Text, ',');
             _patchIndices = M.StringToByteList(paletteChordForm.PatchIndexTextBox.Text, ',');
             _repeats = M.StringToBoolList(paletteChordForm.RepeatsTextBox.Text, ',');
-            _pitchwheelDeviations = M.StringToByteList(paletteChordForm.PitchwheelDeviationTextBox.Text, ',');
-
+            _pitchwheelDeviations = M.StringToByteList(paletteChordForm.PitchwheelDeviationTextBox.Text, ',');
             _pitchwheelEnvelopes = M.StringToByteLists(paletteChordForm.PitchwheelEnvelopeTextBox.Text);
             _panEnvelopes = M.StringToByteLists(paletteChordForm.PanEnvelopeTextBox.Text);
             _modulationWheelEnvelopes = M.StringToByteLists(paletteChordForm.ModulationWheelEnvelopeTextBox.Text);
-            _expressionEnvelopes = M.StringToByteLists(paletteChordForm.ExpressionEnvelopeTextBox.Text);
-
+            _expressionEnvelopes = M.StringToByteLists(paletteChordForm.ExpressionEnvelopeTextBox.Text);
             _ornamentNumbers = M.StringToIntList(paletteChordForm.OrnamentNumberTextBox.Text, ',');
-            _ornamentMinMsDurations = M.StringToIntList(paletteChordForm.MinMsDurationsTextBox.Text, ',');
-
+            _ornamentMinMsDurations = M.StringToIntList(paletteChordForm.MinMsDurationsTextBox.Text, ',');
             _ornamentSettings = null;
             if(paletteChordForm.PaletteForm.OrnamentSettingsForm != null)
             {
                 _ornamentSettings = new OrnamentSettings(paletteChordForm.PaletteForm);
-            }
-
+            }
             DurationDef dd = GetDurationDef(0);
             _durationDefs.Add(dd);
-        }
-
+        }
         public Palette(PercussionPaletteForm ppf)
         {
-            BasicChordFormSettings bcfs = new BasicChordFormSettings();
-
+            BasicChordFormSettings bcfs = new BasicChordFormSettings();
             bcfs.Durations = M.StringToIntList(ppf.BasicChordControl.DurationsTextBox.Text, ',');
             bcfs.Velocities = M.StringToByteList(ppf.BasicChordControl.VelocitiesTextBox.Text, ',');
             bcfs.MidiPitches = M.StringToByteList(ppf.BasicChordControl.MidiPitchesTextBox.Text, ',');
@@ -110,22 +96,17 @@ namespace Moritz.Palettes
             {
                 bcfs.ChordOffs.Add(false); // Moritz never sends ChordOffs to channel 9
                 bcfs.ChordDensities.Add((byte)1); // Moritz only ever uses 1 percussion instrument per chord.
-            }
-
-            _basicChordMidiSettings = new BasicChordMidiSettings(bcfs);
-
+            }
+            _basicChordMidiSettings = new BasicChordMidiSettings(bcfs);
             _bankIndices = new List<byte>();
             _patchIndices = new List<byte>();
             _pitchwheelDeviations = new List<byte>();
             _pitchwheelEnvelopes = new List<List<byte>>();
-            _modulationWheelEnvelopes = new List<List<byte>>();
-
+            _modulationWheelEnvelopes = new List<List<byte>>();
             _panEnvelopes = ppf.GetEnvelopesAsByteLists(ppf.PanEnvelopesTextBox);
-            _expressionEnvelopes = ppf.GetEnvelopesAsByteLists(ppf.ExpressionEnvelopesTextBox);
-
+            _expressionEnvelopes = ppf.GetEnvelopesAsByteLists(ppf.ExpressionEnvelopesTextBox);
             _ornamentNumbers = M.StringToIntList(ppf.OrnamentNumbersTextBox.Text, ',');
-            _ornamentMinMsDurations = M.StringToIntList(ppf.MinMsDurationsTextBox.Text, ',');
-
+            _ornamentMinMsDurations = M.StringToIntList(ppf.MinMsDurationsTextBox.Text, ',');
             // instruments in ornaments palette are absolute, not relative, so 'ignore' the
             // basic instrument index by setting it to 0.
             for(int i = 0; i < _ornamentNumbers.Count; ++i)
@@ -134,20 +115,17 @@ namespace Moritz.Palettes
                 {
                     bcfs.MidiPitches[i] = 0;
                 }
-            }
-
+            }
             if(ppf.PercussionOrnamentsForm != null)
             {
                 _ornamentSettings = new OrnamentSettings(ppf);
-            }
-
+            }
             for(int chordIndex = 0; chordIndex < _basicChordMidiSettings.Durations.Count; ++chordIndex)
             {
                 DurationDef dd = GetDurationDef(chordIndex);
                 _durationDefs.Add(dd);
             }
-        }
-
+        }
         /// <summary>
         /// Returns either a new RestDef or a new MidiChordDef
         /// In both cases, MsPosition is set to zero, Lyric is set to null.

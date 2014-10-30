@@ -252,7 +252,7 @@
             this.MidiInstrumentsHelpButton.Location = new System.Drawing.Point(37, 552);
             this.MidiInstrumentsHelpButton.Name = "MidiInstrumentsHelpButton";
             this.MidiInstrumentsHelpButton.Size = new System.Drawing.Size(95, 26);
-            this.MidiInstrumentsHelpButton.TabIndex = 12;
+            this.MidiInstrumentsHelpButton.TabIndex = 20;
             this.MidiInstrumentsHelpButton.Text = "MIDI Instruments";
             this.MidiInstrumentsHelpButton.UseVisualStyleBackColor = false;
             this.MidiInstrumentsHelpButton.Click += new System.EventHandler(this.MidiInstrumentsHelpButton_Click);
@@ -263,7 +263,7 @@
             this.MidiPitchesHelpButton.Location = new System.Drawing.Point(37, 582);
             this.MidiPitchesHelpButton.Name = "MidiPitchesHelpButton";
             this.MidiPitchesHelpButton.Size = new System.Drawing.Size(95, 26);
-            this.MidiPitchesHelpButton.TabIndex = 13;
+            this.MidiPitchesHelpButton.TabIndex = 21;
             this.MidiPitchesHelpButton.Text = "MIDI Pitches";
             this.MidiPitchesHelpButton.UseVisualStyleBackColor = false;
             this.MidiPitchesHelpButton.Click += new System.EventHandler(this.MidiPitchesHelpButton_Click);
@@ -313,7 +313,7 @@
             this.ShowOrnamentSettingsButton.Location = new System.Drawing.Point(491, 494);
             this.ShowOrnamentSettingsButton.Name = "ShowOrnamentSettingsButton";
             this.ShowOrnamentSettingsButton.Size = new System.Drawing.Size(137, 28);
-            this.ShowOrnamentSettingsButton.TabIndex = 14;
+            this.ShowOrnamentSettingsButton.TabIndex = 22;
             this.ShowOrnamentSettingsButton.Text = "show ornament settings";
             this.ShowOrnamentSettingsButton.UseVisualStyleBackColor = false;
             this.ShowOrnamentSettingsButton.Click += new System.EventHandler(this.ShowOrnamentSettingsButton_Click);
@@ -486,7 +486,7 @@
             this.SaveAndCloseButton.Location = new System.Drawing.Point(662, 581);
             this.SaveAndCloseButton.Name = "SaveAndCloseButton";
             this.SaveAndCloseButton.Size = new System.Drawing.Size(137, 28);
-            this.SaveAndCloseButton.TabIndex = 15;
+            this.SaveAndCloseButton.TabIndex = 24;
             this.SaveAndCloseButton.Text = "save to palette and close";
             this.SaveAndCloseButton.UseVisualStyleBackColor = false;
             this.SaveAndCloseButton.Click += new System.EventHandler(this.SaveAndCloseButton_Click);
@@ -497,7 +497,7 @@
             this.CloseWithoutSavingButton.Location = new System.Drawing.Point(662, 546);
             this.CloseWithoutSavingButton.Name = "CloseWithoutSavingButton";
             this.CloseWithoutSavingButton.Size = new System.Drawing.Size(137, 28);
-            this.CloseWithoutSavingButton.TabIndex = 11;
+            this.CloseWithoutSavingButton.TabIndex = 23;
             this.CloseWithoutSavingButton.Text = "close without saving";
             this.CloseWithoutSavingButton.UseVisualStyleBackColor = false;
             this.CloseWithoutSavingButton.Click += new System.EventHandler(this.CloseWithoutSavingButton_Click);
@@ -540,7 +540,7 @@
             this.DurationTextBox.Location = new System.Drawing.Point(158, 34);
             this.DurationTextBox.Name = "DurationTextBox";
             this.DurationTextBox.Size = new System.Drawing.Size(69, 20);
-            this.DurationTextBox.TabIndex = 2;
+            this.DurationTextBox.TabIndex = 1;
             this.DurationTextBox.Leave += new System.EventHandler(this.DurationTextBox_Leave);
             // 
             // ChordOffHelpLabel
@@ -560,7 +560,7 @@
             this.ChordOffTextBox.Location = new System.Drawing.Point(158, 115);
             this.ChordOffTextBox.Name = "ChordOffTextBox";
             this.ChordOffTextBox.Size = new System.Drawing.Size(29, 20);
-            this.ChordOffTextBox.TabIndex = 5;
+            this.ChordOffTextBox.TabIndex = 4;
             this.ChordOffTextBox.Leave += new System.EventHandler(this.ChordOffTextBox_Leave);
             // 
             // DurationHelpLabel
@@ -601,7 +601,7 @@
             this.BaseMidiPitchTextBox.Location = new System.Drawing.Point(158, 61);
             this.BaseMidiPitchTextBox.Name = "BaseMidiPitchTextBox";
             this.BaseMidiPitchTextBox.Size = new System.Drawing.Size(29, 20);
-            this.BaseMidiPitchTextBox.TabIndex = 4;
+            this.BaseMidiPitchTextBox.TabIndex = 2;
             this.BaseMidiPitchTextBox.Leave += new System.EventHandler(this.BaseMidiPitchTextBox_Leave);
             // 
             // VerticalVelocityFactorHelpLabel
@@ -641,7 +641,7 @@
             this.ChordDensityTextBox.Location = new System.Drawing.Point(158, 7);
             this.ChordDensityTextBox.Name = "ChordDensityTextBox";
             this.ChordDensityTextBox.Size = new System.Drawing.Size(29, 20);
-            this.ChordDensityTextBox.TabIndex = 6;
+            this.ChordDensityTextBox.TabIndex = 0;
             this.ChordDensityTextBox.Leave += new System.EventHandler(this.ChordDensityTextBox_Leave);
             // 
             // VelocityHelpLabel
@@ -672,7 +672,7 @@
             this.InversionIndexTextBox.Location = new System.Drawing.Point(188, 167);
             this.InversionIndexTextBox.Name = "InversionIndexTextBox";
             this.InversionIndexTextBox.Size = new System.Drawing.Size(29, 20);
-            this.InversionIndexTextBox.TabIndex = 7;
+            this.InversionIndexTextBox.TabIndex = 5;
             this.InversionIndexTextBox.Leave += new System.EventHandler(this.InversionIndexTextBox_Leave);
             // 
             // VerticalVelocityFactorTextBox
@@ -681,7 +681,7 @@
             this.VerticalVelocityFactorTextBox.Location = new System.Drawing.Point(188, 193);
             this.VerticalVelocityFactorTextBox.Name = "VerticalVelocityFactorTextBox";
             this.VerticalVelocityFactorTextBox.Size = new System.Drawing.Size(29, 20);
-            this.VerticalVelocityFactorTextBox.TabIndex = 8;
+            this.VerticalVelocityFactorTextBox.TabIndex = 6;
             this.VerticalVelocityFactorTextBox.Leave += new System.EventHandler(this.VerticalVelocityFactorTextBox_Leave);
             // 
             // BaseMidiPitchLabel
