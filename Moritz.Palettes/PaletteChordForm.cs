@@ -39,6 +39,8 @@ namespace Moritz.Palettes
 
             InitializeMidiEventButton(midiChordIndex);
 
+            AddAudioSampleButtons(_paletteForm.Domain);
+
             ChordDensityTextBox_Leave(ChordDensityTextBox, null);
         }
 
@@ -47,6 +49,44 @@ namespace Moritz.Palettes
             this.MidiEventButton.Text = (midiChordIndex + 1).ToString();
             this.MidiEventButton.UseVisualStyleBackColor = true;
             this.MidiEventButton.Click += new EventHandler(MidiEventDemoButton_Click);
+        }
+
+        private void AddAudioSampleButtons(int domain)
+        {
+            AudioSampleButtons = new List<Button>();
+            int x = 181;
+            int y = 582;
+            for(int i = 0; i < domain; ++i)
+            {
+                CreateAudioSampleButton(x, y, i);
+                x += 33;
+            }
+        }
+
+        private void CreateAudioSampleButton(int x, int y, int i)
+        {
+            Button b = new Button();
+            b.Location = new System.Drawing.Point(x, y);
+            b.Size = new System.Drawing.Size(27, 24);
+            b.Image = _paletteForm.PaletteButtonsControl.AudioSampleButtons[i].Image;
+            b.UseVisualStyleBackColor = false;
+
+            b.MouseDown += new MouseEventHandler(AudioSampleButton_MouseDown);
+
+            this.Controls.Add(b);
+            AudioSampleButtons.Add(b);
+            b.BringToFront();
+        }
+
+        private void AudioSampleButton_MouseDown(object sender, MouseEventArgs e)
+        {
+            Button chordFormButton = sender as Button;
+            int index = AudioSampleButtons.IndexOf(chordFormButton);
+            Button paletteButtonsControlButton = _paletteForm.PaletteButtonsControl.AudioSampleButtons[index];
+
+            _paletteForm.PaletteButtonsControl.SetLinkedButton(chordFormButton);
+
+            _paletteForm.PaletteButtonsControl.AudioSampleButton_MouseDown(paletteButtonsControlButton, e);
         }
 
         #region initialization
@@ -349,7 +389,7 @@ namespace Moritz.Palettes
             TextBox textBox = sender as TextBox;
             if(textBox != null)
             {
-                M.LeaveFloatRangeTextBox(sender as TextBox, false, 1, 0F, float.MaxValue, _setDialogState);
+                M.LeaveFloatRangeTextBox(sender as TextBox, true, 1, 0F, float.MaxValue, _setDialogState);
             }
         }
         private void BankIndexTextBox_Leave(object sender, EventArgs e)
@@ -406,7 +446,7 @@ namespace Moritz.Palettes
         }
         private void OrnamentNumberTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, true, 1, 0, _paletteForm.OrnamentSettingsForm.NumberOfOrnaments, _setDialogState);
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, _paletteForm.OrnamentSettingsForm.NumberOfOrnaments, _setDialogState);
         }
         private void MinMsDurationsTextBox_Leave(object sender, EventArgs e)
         {
@@ -417,6 +457,11 @@ namespace Moritz.Palettes
         private static void DoErrorMessage(string message)
         {
             MessageBox.Show(message, "Error");
+        }
+
+        private void PaletteChordForm_MouseClick(object sender, MouseEventArgs e)
+        {
+            _paletteForm.PaletteButtonsControl.AudioSampleButton_MouseDown(this, e); // stops a playing audio sample
         }
 
         #region play midi event
@@ -506,8 +551,8 @@ namespace Moritz.Palettes
         public PaletteForm PaletteForm { get { return _paletteForm; } }
         PaletteForm _paletteForm;
         BasicChordControl _bcc;
+        public List<Button> AudioSampleButtons;
         #endregion  private variables
-
     }
 }
 

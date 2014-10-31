@@ -27,7 +27,7 @@ namespace Moritz.Palettes
             this.SuspendLayout();
             this.Location = location;
             this.Size = new Size(domain * 33, 75);
-            AddAudioButtons(domain);
+            AddPaletteButtons(domain);
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -48,7 +48,7 @@ namespace Moritz.Palettes
 
         public void ReadAudioFiles(XmlReader r)
         {
-            Debug.Assert(_audioSampleButtons != null && _audioSampleButtons.Length > 0);
+            Debug.Assert(_audioSampleButtons != null && _audioSampleButtons.Count > 0);
             Debug.Assert(r.Name == "audioFiles");
 
             int buttonIndex = 0;
@@ -65,9 +65,7 @@ namespace Moritz.Palettes
                     if(!String.IsNullOrEmpty(fileName))
                     {
                         player.URL = _audioFolder + @"\" + fileName;
-                        button.SuspendLayout();
-                        button.Image = global::Moritz.Globals.Properties.Resources.start23x20;
-                        button.ResumeLayout();
+                        SetLinkedButtonsImage(button, global::Moritz.Globals.Properties.Resources.start23x20);
                     }
                     ++buttonIndex;
                 }
@@ -107,9 +105,9 @@ namespace Moritz.Palettes
             }
         }
 
-        private void AddAudioButtons(int domain)
+        private void AddPaletteButtons(int domain)
         {
-            _audioSampleButtons = new Button[domain];
+            _audioSampleButtons = new List<Button>();
             int x = 0;
             int y = 0;
             for(int i = 0; i < domain; ++i)
@@ -172,7 +170,7 @@ namespace Moritz.Palettes
             b.MouseDown += new MouseEventHandler(AudioSampleButton_MouseDown);
 
             this.Controls.Add(b);
-            _audioSampleButtons[i] = b;
+            _audioSampleButtons.Add(b);
             b.BringToFront();
         }
 
@@ -226,12 +224,12 @@ namespace Moritz.Palettes
             }
         }
 
-        private void AudioSampleButton_MouseDown(object sender, MouseEventArgs e)
+        internal void AudioSampleButton_MouseDown(object sender, MouseEventArgs e)
         {
             Form thisForm = sender as Form;
             if(thisForm != null)
             {
-                StopCurrentMediaPlayer();
+                StopCurrentMediaPlayer(); // a click on either the paletteForm or the paletteChordForm stops the performance
                 return;
             }
 
@@ -244,7 +242,7 @@ namespace Moritz.Palettes
             {
                 // Don't call StopMediaPlayer yet: It sets the value of _performingButton.
                 if(e.Button == MouseButtons.Right
-                    || e.Button == MouseButtons.Left && String.IsNullOrEmpty(player.URL))
+                || e.Button == MouseButtons.Left && String.IsNullOrEmpty(player.URL))
                 {
                     StopCurrentMediaPlayer();
                     GetAudioFileName(button);
@@ -295,9 +293,7 @@ namespace Moritz.Palettes
             {
                 MoritzMediaPlayer player = button.Tag as MoritzMediaPlayer;
                 player.Play();
-                _performingButton.SuspendLayout();
-                _performingButton.Image = global::Moritz.Globals.Properties.Resources.loudspeaker23x20;
-                _performingButton.ResumeLayout();
+                SetLinkedButtonsImage(_performingButton, global::Moritz.Globals.Properties.Resources.loudspeaker23x20);
             }
         }
 
@@ -310,10 +306,9 @@ namespace Moritz.Palettes
         {
             if(_performingButton != null)
             {
-                _performingButton.SuspendLayout();
-                _performingButton.Image = global::Moritz.Globals.Properties.Resources.start23x20;
-                _performingButton.ResumeLayout();
+                SetLinkedButtonsImage(_performingButton, global::Moritz.Globals.Properties.Resources.start23x20);
                 _performingButton = null;
+                _chordFormButton = null;
             }
         }
 
@@ -344,9 +339,7 @@ namespace Moritz.Palettes
                     if(openFileDialog.ShowDialog() == DialogResult.OK)
                     {
                         ((MoritzMediaPlayer)button.Tag).URL = openFileDialog.FileName;
-                        button.SuspendLayout();
-                        button.Image = global::Moritz.Globals.Properties.Resources.start23x20;
-                        button.ResumeLayout();
+                        SetLinkedButtonsImage(button, global::Moritz.Globals.Properties.Resources.start23x20);
                     }
                 }
             }
@@ -356,12 +349,44 @@ namespace Moritz.Palettes
             }
         }
 
+        /// <summary>
+        /// Called from an open PaletteChordForm, when a Button linked to an AudioSampleButton in
+        /// this PaletteButtonsControl is clicked to start the audio playing.
+        /// The _chordFormButton is set to null again when the audio stops.
+        /// </summary>
+        internal void SetLinkedButton(Button chordFormButton)
+        {
+            _chordFormButton = chordFormButton;
+        }
+
+        private void SetLinkedButtonsImage(Button localButton, Bitmap image)
+        {
+            localButton.SuspendLayout();
+            localButton.Image = image;
+            localButton.ResumeLayout();
+            if(_chordFormButton != null)
+            {
+                _chordFormButton.SuspendLayout();
+                _chordFormButton.Image = image;
+                _chordFormButton.ResumeLayout();
+            }
+        }
+
         private readonly IPaletteForm _iPaletteForm;
         private readonly string _audioFolder;
 
-        private Button[] _audioSampleButtons = null;
+        public List<Button> AudioSampleButtons { get { return _audioSampleButtons; } }
+        private List<Button> _audioSampleButtons = null;
         private List<Button> _paletteChordFormButtons = new List<Button>();
         private List<Button> _midiEventDemoButtons = new List<Button>();
         private List<Label> _restLabels = new List<Label>();
+
+        /// <summary>
+        /// If _chordFormButton is non-null, its value is used while performing audio samples,
+        /// to change the appearance of the corresponding button in the PaletteChordForm.
+        /// </summary>
+        private Button _chordFormButton = null;
+
+
     }
 }

@@ -835,6 +835,7 @@
             this.Name = "PaletteChordForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "MidiChordForm";
+            this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.PaletteChordForm_MouseClick);
             this.BasicChordControlsPanel.ResumeLayout(false);
             this.BasicChordControlsPanel.PerformLayout();
             this.ResumeLayout(false);

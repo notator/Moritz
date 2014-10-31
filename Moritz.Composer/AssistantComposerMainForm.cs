@@ -52,25 +52,9 @@ namespace Moritz.Composer
 
             _algorithm = ComposableSvgScore.Algorithm(_scoreTitle);
             if(_algorithm != null)
-            {
-                _outputVoiceIndices = GetOutputVoiceIndices(_algorithm.NumberOfOutputVoices);
-
-                SetScoreComboBoxItems(_settingsFolderPath);
-
-                ScoreComboBox.SelectedIndexChanged -= ScoreComboBox_SelectedIndexChanged;
-                ScoreComboBox.SelectedIndex = ScoreComboBox.Items.IndexOf(_scoreTitle);
-                GetSelectedSettings(_settingsPath, _algorithm);
-                ScoreComboBox.SelectedIndexChanged += ScoreComboBox_SelectedIndexChanged;
-
-                if(OutputVoiceIndicesStaffTextBox.Text == "")
-                {
-                    SetDefaultVoiceIndicesPerStaff(_algorithm.NumberOfOutputVoices);
-                }
-            }
-            else
-            {
-                SetSettingsHaveBeenSaved();
-            }
+            {                _outputVoiceIndices = GetOutputVoiceIndices(_algorithm.NumberOfOutputVoices);                
+                SetScoreComboBoxItems(_settingsFolderPath);                ScoreComboBox.SelectedIndexChanged -= ScoreComboBox_SelectedIndexChanged;                ScoreComboBox.SelectedIndex = ScoreComboBox.Items.IndexOf(_scoreTitle);                GetSelectedSettings(_settingsPath, _algorithm);
+                ScoreComboBox.SelectedIndexChanged += ScoreComboBox_SelectedIndexChanged;                if(OutputVoiceIndicesStaffTextBox.Text == "")                {                    SetDefaultVoiceIndicesPerStaff(_algorithm.NumberOfOutputVoices);                }            }            else            {                SetSettingsHaveBeenSaved();            }
         }
 
         private void SetDefaultVoiceIndicesPerStaff(int nVoices)
