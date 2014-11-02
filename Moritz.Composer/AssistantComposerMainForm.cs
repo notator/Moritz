@@ -46,15 +46,34 @@ namespace Moritz.Composer
             _settingsPath = settingsPath;
             _settingsFolderPath = Path.GetDirectoryName(settingsPath);
 
-            _scoreTitle = Path.GetFileNameWithoutExtension(settingsPath);
-            this.QuitAlgorithmButton.Text = "Quit " + _scoreTitle;
+            _scoreTitle = Path.GetFileNameWithoutExtension(settingsPath);
+
+            this.QuitAlgorithmButton.Text = "Quit " + _scoreTitle;
+
             _dimensionsAndMetadataForm.Text = _scoreTitle + ": Page Dimensions and Metadata";
 
-            _algorithm = ComposableSvgScore.Algorithm(_scoreTitle);
-            if(_algorithm != null)
-            {                _outputVoiceIndices = GetOutputVoiceIndices(_algorithm.NumberOfOutputVoices);                
-                SetScoreComboBoxItems(_settingsFolderPath);                ScoreComboBox.SelectedIndexChanged -= ScoreComboBox_SelectedIndexChanged;                ScoreComboBox.SelectedIndex = ScoreComboBox.Items.IndexOf(_scoreTitle);                GetSelectedSettings(_settingsPath, _algorithm);
-                ScoreComboBox.SelectedIndexChanged += ScoreComboBox_SelectedIndexChanged;                if(OutputVoiceIndicesStaffTextBox.Text == "")                {                    SetDefaultVoiceIndicesPerStaff(_algorithm.NumberOfOutputVoices);                }            }            else            {                SetSettingsHaveBeenSaved();            }
+            _algorithm = ComposableSvgScore.Algorithm(_scoreTitle);
+
+            if(_algorithm != null)
+
+            {
+                _outputVoiceIndices = GetOutputVoiceIndices(_algorithm.MidiChannelIndexPerOutputVoice.Count);
+                
+                SetScoreComboBoxItems(_settingsFolderPath);
+                ScoreComboBox.SelectedIndexChanged -= ScoreComboBox_SelectedIndexChanged;
+                ScoreComboBox.SelectedIndex = ScoreComboBox.Items.IndexOf(_scoreTitle);
+                GetSelectedSettings(_settingsPath, _algorithm);
+
+                ScoreComboBox.SelectedIndexChanged += ScoreComboBox_SelectedIndexChanged;
+                if(OutputVoiceIndicesStaffTextBox.Text == "")
+                {
+                    SetDefaultVoiceIndicesPerStaff(_algorithm.MidiChannelIndexPerOutputVoice.Count);
+                }
+            }
+            else
+            {
+                SetSettingsHaveBeenSaved();
+            }
         }
 
         private void SetDefaultVoiceIndicesPerStaff(int nVoices)
@@ -691,7 +710,8 @@ namespace Moritz.Composer
                                             pageFormat,
                                             krystals, palettes,
                                             _settingsFolderPath,
-                                            _dimensionsAndMetadataForm.Keywords,
+                                            _dimensionsAndMetadataForm.Keywords,
+
                                             _dimensionsAndMetadataForm.Comment);
 
                 if(score != null && score.Systems.Count > 0)
@@ -1320,7 +1340,7 @@ namespace Moritz.Composer
         {
             LoadSettings(settingsPath);
 
-            InitOutputVoiceIndicesPerStaffFields(algorithm.NumberOfOutputVoices);
+            InitOutputVoiceIndicesPerStaffFields(algorithm.MidiChannelIndexPerOutputVoice.Count);
             InitInputVoiceIndicesPerStaffFields(algorithm.NumberOfInputVoices);
 
             SetSystemStartBarsHelpLabel(algorithm.NumberOfBars);
@@ -1390,20 +1410,21 @@ namespace Moritz.Composer
                 "are optional.) The staves and voices created by an algorithm are conceptually in top to bottom order, but " +
                 "the order in which the voices actually appear in a score is controlled by these two fields.\n\n" +
 
-                "Output voices are always printed above input voices, and midi channels are always allocated to output voices in " +
-                "ascending order from top to bottom in the printed score (i.e. the top voice always has midi channel 0).\n" +
-                "Algorithms do not allocate midi channels.\n\n" +
-
-                "These two input fields work in the same way:\n" +
-                "Each algorithm declares how many output and input voices it creates, and their indices appear in the help " +
-                "texts above the fields.\n" +
+                "Output voices are always printed above input voices, and these two input fields work in the same way:\n" +
+                "Each algorithm declares how many output and input voices it creates. Their indices (voiceIDs) appear in the " +
+                "help texts above the fields.\n" +
                 "The numbers entered in the fields must be selected from those given in the help texts, and determine the " +
                 "top to bottom order of the voices in the printed score:\n" +
                 "Staves are separated by commas, voices are separated by colons.\n" +
                 "For example, if the algorithm creates six output voices, and these are to be notated using standard " +
                 "chord symbols, their indices (0, 1, 2, 3, 4, 5) appear in the help text. These voices " +
                 "can be notated on 3 staves by entering '3:1, 0:2, 4:5' in the field. Voices with indices 2 and 3 " +
-                "could be notated on separate staves, omitting the other voices, by entering '2, 3'.";
+                "could be notated on separate staves, omitting the other voices, by entering '2, 3'.\n\n" +
+
+                "Algorithms compose output voices complete with their midi channel (and master volume initialization value). " +
+                "This allows them to stipulate the standard midi percussion channel (channel index 9).\n" +
+                "The midi channel and master volume values are therefore fixed to their respective voiceIDs, and move with " +
+                "them when the voices are re-ordered.\n\n";
 
             StringBuilder voiceIndicesSB = new StringBuilder();
             voiceIndicesSB.Append(mainText);

@@ -399,5 +399,9 @@ namespace Moritz.Spec
         /// All other OutputVoiceDefs retain the default value 0. 
         /// </summary>
         public byte? MasterVolume = null; // default value
+        /// <summary>
+        /// Is set at the same time as the MasterVolume.
+        /// </summary>
+        public byte MidiChannel = 0;
     }
 }

@@ -1,0 +1,18 @@
+﻿
+To remove extra newlines created by incorrectly normalising line endings:
+In the find/replace dialog;
+Deselect "whole strings"
+Select Regex in the replace tool, and replace
+
+\r?\n
+
+by nothing.
+
+Or maybe:
+To remove empty single lines in Visual Studio:
+Deselect "whole strings"
+Select Regex in the replace tool, and replace
+
+^(?([^\r\n])\s)*\r?$\r?\n
+
+by nothing.

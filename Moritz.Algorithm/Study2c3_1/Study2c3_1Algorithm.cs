@@ -23,16 +23,17 @@ namespace Moritz.Algorithm.Study2c3_1
         {
         }
 
+        public override List<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2 }; } }
+        public override List<int> MasterVolumePerOutputVoice { get { return new List<int>() { 100, 100, 100 }; } }
         public override int NumberOfInputVoices { get { return 0; } }
-        public override int NumberOfOutputVoices { get { return 3; } }
-        public override int NumberOfBars { get { return 74; } }
-
-        /// <summary>
-        /// See CompositionAlgorithm.DoAlgorithm()
-        /// </summary>
+        public override int NumberOfBars { get { return 74; } }
+
+        /// <summary>
+        /// See CompositionAlgorithm.DoAlgorithm()
+        /// </summary>
         public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
-        {
-            _krystals = krystals;
+        {
+            _krystals = krystals;
             _palettes = palettes;
 
             List<VoiceDef> sequentialStaff1Bars = WriteTopStaff();
@@ -52,10 +53,7 @@ namespace Moritz.Algorithm.Study2c3_1
             }
 
             Debug.Assert(bars.Count == NumberOfBars);
-
-            List<byte> masterVolumes = new List<byte>() { 100, 100, 100 };
-            base.SetOutputVoiceMasterVolumes(bars[0], masterVolumes);
-
+            base.SetOutputVoiceChannelsAndMasterVolumes(bars[0]);
             return bars;
         }
 
@@ -207,6 +205,5 @@ namespace Moritz.Algorithm.Study2c3_1
             #endregion
             return lowerStaffMsDurations;
         }
-
     }
 }

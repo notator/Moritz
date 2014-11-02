@@ -2,13 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms; // MessageBox
 using System.Diagnostics;
-using System.IO;
 using System.Xml;
 
 using Moritz.Globals;
-using Moritz.Midi;
 using Moritz.Xml;
-using Moritz.Spec;
 
 namespace Moritz.Symbols
 {

@@ -217,11 +217,16 @@ namespace Moritz.Symbols
                     {
                         Barline firstBarline = noteObject as Barline;        
                         if(firstBarline != null)
-                        {                             
-                            float fontHeight = _pageFormat.StaffNameFontHeight;
-                            if(staff is InputStaff)
-                            {
-                                fontHeight *= _pageFormat.InputStavesSizeFactor;
+                        {                             
+
+                            float fontHeight = _pageFormat.StaffNameFontHeight;
+
+                            if(staff is InputStaff)
+
+                            {
+
+                                fontHeight *= _pageFormat.InputStavesSizeFactor;
+
                             }
                             TextInfo textInfo = new TextInfo(staff.Staffname, "Times New Roman", fontHeight, TextHorizAlign.center);
                             Text staffNameText = new Text(firstBarline, textInfo);

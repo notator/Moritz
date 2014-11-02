@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
-
+using System.Diagnostics;
+
 using Krystals4ObjectLibrary;
 using Moritz.Algorithm;
 using Moritz.Palettes;
@@ -20,13 +20,14 @@ namespace Moritz.Algorithm.PaletteDemo
         {
         }
 
+        public override List<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0 }; } }
+        public override List<int> MasterVolumePerOutputVoice { get { return new List<int>() { 127 }; } }
         public override int NumberOfInputVoices { get { return 0; } }
-        public override int NumberOfOutputVoices { get { return 1; } }
         public override int NumberOfBars { get { return 1; } }
 
-        /// <summary>
+        /// <summary>
         /// See CompositionAlgorithm.DoAlgorithm()
-        /// </summary>
+        /// </summary>
         public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
         {
             VoiceDef voice = new OutputVoiceDef();
@@ -38,17 +39,12 @@ namespace Moritz.Algorithm.PaletteDemo
                 msPosition += iumdd.MsDuration;
                 voice.UniqueDefs.Add(iumdd);
             }
-
             List<List<VoiceDef>> voicesPerSystem = new List<List<VoiceDef>>();
             List<VoiceDef> systemVoices = new List<VoiceDef>();
             systemVoices.Add(voice);
             voicesPerSystem.Add(systemVoices);
-
-            List<byte> masterVolumes = new List<byte>() {127};
-            SetOutputVoiceMasterVolumes(voicesPerSystem[0], masterVolumes);
-
+            SetOutputVoiceChannelsAndMasterVolumes(voicesPerSystem[0]);
             Debug.Assert(voicesPerSystem.Count == NumberOfBars);
-
             return voicesPerSystem;
         }
     }

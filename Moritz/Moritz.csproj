@@ -107,6 +107,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="_RemovingEmptyLines.txt" />
     <Content Include="_revision58Log.txt" />
   </ItemGroup>
   <ItemGroup>
