@@ -74,14 +74,14 @@ namespace Moritz.Palettes
             if(numberOfChordValues == -1)
             {
                 DurationsHelpLabel.Text = "";
-                MidiPitchesHelpLabel.Text = "";
                 VelocitiesHelpLabel.Text = "";
+                MidiPitchesHelpLabel.Text = "";
             }
             else
             {
                 DurationsHelpLabel.Text = numberOfChordValues.ToString() + " integer values (greater than 0)";
-                MidiPitchesHelpLabel.Text = numberOfChordValues.ToString() + " integer values in range [ 0..127 ]";
                 VelocitiesHelpLabel.Text = numberOfChordValues.ToString() + " integer values in range [ 0..127 ]";
+                MidiPitchesHelpLabel.Text = numberOfChordValues.ToString() + " integer values in range [ 35..81 ]";
             }
         }
 

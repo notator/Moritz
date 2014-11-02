@@ -24,7 +24,7 @@ namespace Moritz.Palettes
             DeselectAll();
         }
         /// <summary>
-        /// Creates a new, empty PalettesForm with help texts adjusted for the given krystal.
+        /// Creates a new, empty PalettesForm with help texts adjusted for the given domain.
         /// </summary>
         /// <param name="assistantComposer"></param>
         /// <param name="krystal"></param>

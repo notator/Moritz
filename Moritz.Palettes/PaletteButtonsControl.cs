@@ -178,14 +178,30 @@ namespace Moritz.Palettes
         private void MidiEventDemoButton_Click(object sender, EventArgs e)
         {
             Button button = sender as Button;
+
             if(button != null)
             {
+
+                PaletteForm paletteForm = this._iPaletteForm as PaletteForm;
+                PercussionPaletteForm percussionPaletteForm = this._iPaletteForm as PercussionPaletteForm;
+                Palette palette = null;
+                IUniqueDef iud = null;
+                int midiChannel = 0;
+
                 int index = int.Parse(button.Text) - 1;
                 if(index >= 0 && index < _midiEventDemoButtons.Count)
                 {
-                    PaletteForm paletteForm = this._iPaletteForm as PaletteForm;
-                    Palette palette = new Palette(paletteForm);
-                    IUniqueDef iud = palette.UniqueDurationDef(index);
+                    if(paletteForm != null)
+                    {
+                        palette = new Palette(paletteForm);
+                    }
+                    else if(percussionPaletteForm != null)
+                    {
+                        palette = new Palette(percussionPaletteForm);
+                        midiChannel = 9;          
+                    }
+
+                    iud = palette.UniqueDurationDef(index);
 
                     if(iud is RestDef)
                     {
@@ -198,9 +214,6 @@ namespace Moritz.Palettes
                     }
                     else
                     {
-                        int midiChannel = 0;
-                        if(_iPaletteForm is PercussionPaletteForm)
-                            midiChannel = 9;
                         _midiEventDemoButtons[index].Select();
                         Refresh();
                         MidiChordDef midiChordDef = iud as MidiChordDef;

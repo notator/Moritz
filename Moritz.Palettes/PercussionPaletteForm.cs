@@ -52,6 +52,7 @@ namespace Moritz.Palettes
         {
             _bpc = new BasicPercussionControl(SetDialogState);
             _bpc.Location = new Point(22, 14);
+            _bpc.TabIndex = 0;
             Controls.Add(_bpc);
         }
         private void ConnectAudioButtonsControl(int domain)
