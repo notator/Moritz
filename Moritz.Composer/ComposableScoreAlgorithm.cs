@@ -1,4 +1,5 @@
 using System.Windows.Forms;
+
 using Moritz.Symbols;
 using Moritz.Algorithm;
 using Moritz.Algorithm.PaletteDemo;
@@ -6,10 +7,9 @@ using Moritz.Algorithm.Study2c3_1;
 using Moritz.Algorithm.SongSix;
 using Moritz.Algorithm.Study3Sketch1;
 using Moritz.Algorithm.Study3Sketch2;
+
 namespace Moritz.Composer
 {
-
-
     public partial class ComposableSvgScore : SvgScore
     {
         /// <summary>
