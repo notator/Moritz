@@ -1,20 +1,15 @@
-using System;
-using System.Diagnostics;
 using System.Windows.Forms;
-using System.Collections.Generic;
-using Krystals4ObjectLibrary;
-using Moritz.Spec;
 using Moritz.Symbols;
-using Moritz.Palettes;
 using Moritz.Algorithm;
 using Moritz.Algorithm.PaletteDemo;
 using Moritz.Algorithm.Study2c3_1;
 using Moritz.Algorithm.SongSix;
 using Moritz.Algorithm.Study3Sketch1;
 using Moritz.Algorithm.Study3Sketch2;
-using Moritz.Xml;
 namespace Moritz.Composer
 {
+
+
     public partial class ComposableSvgScore : SvgScore
     {
         /// <summary>
