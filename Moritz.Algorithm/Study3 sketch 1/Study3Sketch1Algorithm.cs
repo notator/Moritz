@@ -23,7 +23,6 @@ namespace Moritz.Algorithm.Study3Sketch1
         {
         }
 
-
         public override List<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
         public override List<int> MasterVolumePerOutputVoice { get { return new List<int>() { 100, 100, 100, 100, 100, 100, 100, 100, 100 }; } }
         public override int NumberOfInputVoices { get { return 0; } }
@@ -86,8 +85,8 @@ namespace Moritz.Algorithm.Study3Sketch1
             }
         }
         #endregion CreateBar1()
-
         #region CreateBar2()
+
         /// <summary>
         /// This function creates only one bar, but with VoiceDef objects. 
         /// </summary>
@@ -149,8 +148,8 @@ namespace Moritz.Algorithm.Study3Sketch1
             return voiceDef.EndMsPosition;
         }
         #endregion CreateBar2()
-
         #region CreateBars3to5()
+
         /// <summary>
         /// This function creates three bars, identical to bar2 with two internal barlines.
         /// The VoiceDef objects cross barlines. 
