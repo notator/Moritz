@@ -415,10 +415,10 @@ namespace Moritz.Palettes
 
     public class OrnamentSettings
     {
-        public OrnamentSettings(PaletteForm kpf)
+        public OrnamentSettings(PaletteForm paletteform)
         {
-            OrnamentSettingsForm osf = kpf.OrnamentSettingsForm;
-            Debug.Assert(osf != null);
+            OrnamentSettingsForm osf = paletteform.OrnamentSettingsForm;
+            Debug.Assert(osf != null && osf.Ornaments != null);
 
             BasicChordFormSettings bcs = new BasicChordFormSettings();
             /// relative durations
@@ -429,7 +429,7 @@ namespace Moritz.Palettes
             bcs.MidiPitches = M.StringToByteList(osf.BasicChordControl.MidiPitchesTextBox.Text, ',');
             bcs.ChordOffs = M.StringToBoolList(osf.BasicChordControl.ChordOffsTextBox.Text, ',');
             bcs.ChordDensities = M.StringToByteList(osf.BasicChordControl.ChordDensitiesTextBox.Text, ',');
-            bcs.Inversions = kpf.GetLinearInversions(osf.BasicChordControl.RootInversionTextBox.Text);
+            bcs.Inversions = paletteform.GetLinearInversions(osf.BasicChordControl.RootInversionTextBox.Text);
             bcs.InversionIndices = M.StringToIntList(osf.BasicChordControl.InversionIndicesTextBox.Text, ',');
             bcs.VerticalVelocityFactors = M.StringToFloatList(osf.BasicChordControl.VerticalVelocityFactorsTextBox.Text, ',');
 
@@ -452,10 +452,7 @@ namespace Moritz.Palettes
                 PatchIndices = M.StringToByteList(osf.PatchIndicesTextBox.Text, ',');
             }
 
-            Krystal ornamentsKrystal = osf.OrnamentsKrystal;
-            uint ornamentLevel = uint.Parse(osf.OrnamentsLevelTextBox.Text);
-            OrnamentValues = ornamentsKrystal.GetValues(ornamentLevel);
-
+            OrnamentValues = osf.Ornaments;
         }
 
         public OrnamentSettings(PercussionPaletteForm ppf)
@@ -488,9 +485,7 @@ namespace Moritz.Palettes
             BankIndices = null;
             PatchIndices = null;
 
-            Krystal ornamentsKrystal = pof.OrnamentsKrystal;
-            uint ornamentLevel = uint.Parse(pof.OrnamentsLevelTextBox.Text);
-            OrnamentValues = ornamentsKrystal.GetValues(ornamentLevel);
+            //OrnamentValues = pof.Ornaments;
         }
 
         /// <summary>

@@ -143,7 +143,6 @@ namespace Moritz.Palettes
                 VelocitiesHelpLabel.Text = "";
                 ChordOffsHelpLabel.Text = "";
                 ChordDensitiesHelpLabel.Text = "";
-
             }
             else
             {
