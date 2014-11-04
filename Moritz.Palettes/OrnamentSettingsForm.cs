@@ -28,8 +28,6 @@ namespace Moritz.Palettes
             _paletteForm = paletteForm;
             ConnectBasicChordControl();
 
-            ReplaceLabels(_bcc.DurationsLabel.Location.X + _bcc.DurationsLabel.Size.Width);
-
             //int numberOfChordValues = -1;
             int numberOfBasicChordDefs = 12;
             if(r != null)
@@ -40,7 +38,6 @@ namespace Moritz.Palettes
             }
             else
             {
-                //numberOfChordValues = LoadNewOrnamentKrystal();
                 _paletteForm.SetSettingsHaveBeenSaved(); // removes the '*'
                 this.Text = _paletteForm.Text + ": ornaments";
                 _paletteForm.SetSettingsNotSaved();
@@ -51,7 +48,28 @@ namespace Moritz.Palettes
 
             NumBasicChordDefsTextBox_Leave(NumBasicChordDefsTextBox, null);
         }
-       
+
+        private void ConnectBasicChordControl()
+        {
+            _bcc = new BasicChordControl(SetDialogState);
+            _bcc.Location = new Point(0, 25);
+            _bcc.BorderStyle = BorderStyle.None;
+            this.TopPanel.Controls.Add(_bcc);
+
+            int rightMargin = _bcc.DurationsLabel.Location.X + _bcc.DurationsLabel.Size.Width;
+            ReplaceLabel(_bcc.DurationsLabel, "relative durations", rightMargin);
+            ReplaceLabel(_bcc.VelocitiesLabel, "velocity increments", rightMargin);
+            ReplaceLabel(_bcc.MidiPitchesLabel, "transpositions", rightMargin);
+            ReplaceLabel(_bcc.ChordDensitiesLabel, "note density factors", rightMargin);
+        }
+
+        private void ReplaceLabel(Label label, string newText, int rightMargin)
+        {
+            label.Text = newText;
+            label.Location = new Point(rightMargin - label.Size.Width, label.Location.Y);
+        }
+
+        /************/
 
         private int ReadOrnamentSettingsForm(XmlReader r)
         {
@@ -103,9 +121,9 @@ namespace Moritz.Palettes
         {
             int numberOfOrnaments = 0;
             Debug.Assert(r.Name == "ornaments");
- 	        M.ReadToXmlElementTag(r, "ornament");
+            M.ReadToXmlElementTag(r, "ornament");
             while(r.Name == "ornament")
-            {   
+            {
                 ++numberOfOrnaments;
                 #region read each ornament
                 switch(numberOfOrnaments)
@@ -154,32 +172,7 @@ namespace Moritz.Palettes
             return numberOfOrnaments;
         }
 
-        private void ConnectBasicChordControl()
-        {
-            //_bcc = new BasicChordControl(SetDialogState);
-            //_bcc.Location = new Point(20, 72);
-            //this.Controls.Add(_bcc);
-
-            _bcc = new BasicChordControl(SetDialogState);
-            _bcc.Location = new Point(0,25);
-            _bcc.BorderStyle = BorderStyle.None;
-            this.TopPanel.Controls.Add(_bcc);
-        }
-
-        private void ReplaceLabels(int rightMargin)
-        {
-            ReplaceLabel(_bcc.DurationsLabel, "relative durations", rightMargin);
-            ReplaceLabel(_bcc.VelocitiesLabel, "velocity increments", rightMargin);
-            ReplaceLabel(_bcc.MidiPitchesLabel, "transpositions", rightMargin);
-            //ReplaceLabel(_bcc.ChordOffsLabel, "( chord offs )", rightMargin);
-            ReplaceLabel(_bcc.ChordDensitiesLabel, "note density factors", rightMargin);
-        }
-
-        private void ReplaceLabel(Label label, string newText, int rightMargin)
-        {
-            label.Text = newText;
-            label.Location = new Point(rightMargin - label.Size.Width, label.Location.Y);
-        }
+        /************/
 
         private List<TextBox> GetNonOrnamentTextBoxes()
         {
@@ -201,6 +194,7 @@ namespace Moritz.Palettes
             return textBoxes;
         }
 
+        /************/
 
         private List<TextBox> Get12OrnamentTextBoxes()
         {
@@ -222,34 +216,49 @@ namespace Moritz.Palettes
             return textBoxes;
         }
 
-        #region buttons
-        private void ShowContainingPaletteButton_Click(object sender, EventArgs e)
-        {
-            _paletteForm.BringToFront();
-        }
-        private void ShowMainScoreFormButton_Click(object sender, EventArgs e)
-        {
-            _paletteForm.Callbacks.MainFormBringToFront();
-        }
-        
-        /// <summary>
-        /// This function enables the parameter inputs and sets this dialog's help texts accordingly.
-        /// The contents of the Parameter TextBoxes are not changed.
-        /// </summary>
-        protected void SetDialogForNumBasicChordDefs(int numBasicChordDefs)
-        {
-            _bcc.NumberOfChordValues = numBasicChordDefs;
-            string countString = numBasicChordDefs.ToString() + " ";
+        /************/
 
-            EnableMainParameters();
+        #region TextBox_Leave handlers
+        /************/
+        private void NumBasicChordDefsTextBox_Leave(object sender, EventArgs e)
+        {
+            TextBox numBasicChordDefsTextBox = sender as TextBox;
+            M.LeaveIntRangeTextBox(numBasicChordDefsTextBox, false, 1, 0, 12, SetDialogState);
+            if(numBasicChordDefsTextBox.BackColor == M.TextBoxErrorColor)
+            {
+                DisableMainParameters();
+            }
+            else
+            {
+                _numberOfBasicChordDefs = int.Parse(numBasicChordDefsTextBox.Text);
+                _bcc.NumberOfChordValues = _numberOfBasicChordDefs;
+                _bcc.SetHelpLabels();
 
-            #region HelpLabels
-            _bcc.SetHelpLabels();
-            BankIndicesHelpLabel.Text = countString + "integer values in range [ 0..127 ]";
-            PatchIndicesHelpLabel.Text = countString + "integer values in range [ 0..127 ]";
-            #endregion HelpLabels
+                BankIndicesHelpLabel.Text = _numberOfBasicChordDefs.ToString() + " values in range [ 0..127 ]";
+                PatchIndicesHelpLabel.Text = _numberOfBasicChordDefs.ToString() + " values in range [ 0..127 ]";
+
+                OrnamentDefRangeLabel.Text = "Each value in these ornament sequences must be in the range [ 1.." +
+                    _numberOfBasicChordDefs.ToString() + " ].";
+
+                TouchAllTextBoxes();
+            }
         }
+        private void DisableMainParameters()
+        {
+            _bcc.Enabled = false;
 
+            _bcc.SetChordControls();
+
+            BankIndicesTextBox.Enabled = false;
+            BankIndicesTextBox.Enabled = false;
+            BankIndicesTextBox.Enabled = false;
+
+            PatchIndicesTextBox.Enabled = false;
+            PatchIndicesTextBox.Enabled = false;
+            PatchIndicesTextBox.Enabled = false;
+
+            OrnamentsGroupBox.Enabled = false;
+        }
         public void TouchAllTextBoxes()
         {
             _bcc.NumberOfChordValues = _numberOfBasicChordDefs;
@@ -267,10 +276,24 @@ namespace Moritz.Palettes
                 EnableOrnamentTextBoxes();
             }
         }
-
+        private void DisableOrnamentTextBoxes()
+        {
+            foreach(TextBox textBox in _12OrnamentTextBoxes)
+            {
+                textBox.Enabled = false;
+            }
+        }
+        private void EnableOrnamentTextBoxes()
+        {
+            foreach(TextBox textBox in _12OrnamentTextBoxes)
+            {
+                textBox.Enabled = true;
+            }
+            TouchOrnamentTextBoxes();
+        }
         private void TouchOrnamentTextBoxes()
         {
-            for(int i = 1; i <= _numberOfOrnaments; ++i)
+            for(int i = 1; i <= _ornaments.Count; ++i)
             {
                 switch(i)
                 {
@@ -313,62 +336,35 @@ namespace Moritz.Palettes
                 }
             }
         }
-
-        private void EnableMainParameters()
+        /************/
+        private void BankIndicesTextBox_Leave(object sender, EventArgs e)
         {
-            NumBasicChordDefsLabel.Enabled = true;
-            NumBasicChordDefsTextBox.Enabled = true;
-            NumBasicChordDefsHelpLabel.Enabled = true;
-
-            _bcc.Enabled = true;
-
-            _bcc.SetChordControls();
-
-            BankIndicesTextBox.Enabled = true;
-            BankIndicesTextBox.Enabled = true;
-            BankIndicesTextBox.Enabled = true;
- 
-            PatchIndicesTextBox.Enabled = true;
-            PatchIndicesTextBox.Enabled = true;
-            PatchIndicesTextBox.Enabled = true;
-
-            OrnamentsGroupBox.Enabled = true;
+            M.LeaveIntRangeTextBox(sender as TextBox, true, (uint)_bcc.NumberOfChordValues, 0, 127, SetDialogState);
         }
-
-        private void DisableMainParameters()
+        /************/
+        private void PatchIndicesTextBox_Leave(object sender, EventArgs e)
         {
-            _bcc.Enabled = false;
-
-            _bcc.SetChordControls();
-
-            BankIndicesTextBox.Enabled = false;
-            BankIndicesTextBox.Enabled = false;
-            BankIndicesTextBox.Enabled = false;
-
-            PatchIndicesTextBox.Enabled = false;
-            PatchIndicesTextBox.Enabled = false;
-            PatchIndicesTextBox.Enabled = false;
-
-            OrnamentsGroupBox.Enabled = false;
+            M.LeaveIntRangeTextBox(sender as TextBox, true, (uint)_bcc.NumberOfChordValues, 0, 127, SetDialogState);
         }
-
-        private void DisableOrnamentTextBoxes()
+        /************/
+        private void NumberOfOrnamentsTextBox_Leave(object sender, EventArgs e)
         {
-            foreach(TextBox textBox in _12OrnamentTextBoxes)
+            TextBox textBox = sender as TextBox;
+            M.LeaveIntRangeTextBox(textBox, false, (uint)1, 1, 12, SetDialogState);
+            _ornaments = new List<List<int>>();
+            if(textBox.BackColor != M.TextBoxErrorColor)
             {
-                textBox.Enabled = false;
-            }
-        }
+                int numberOfOrnaments = int.Parse(textBox.Text);
 
-        private void EnableOrnamentTextBoxes()
-        {
-            foreach(TextBox textBox in _12OrnamentTextBoxes)
-            {
-                textBox.Enabled = true;
+                for(int i = 0; i < numberOfOrnaments; ++i)
+                {
+                    _ornaments.Add(null);
+                }
+                TouchOrnamentTextBoxes();
+                SetDialogSize(numberOfOrnaments);
             }
-            TouchOrnamentTextBoxes();
+            _paletteForm.SetOrnamentControls();
         }
-
         private void SetDialogSize(int numberOfOrnaments)
         {
             OrnamentsGroupBox.Size = new Size(OrnamentsGroupBox.Size.Width, (46 + (numberOfOrnaments * 26)));
@@ -424,187 +420,156 @@ namespace Moritz.Palettes
             BottomPanel.Location = new Point(BottomPanel.Location.X,
                 OrnamentsGroupBox.Location.Y + OrnamentsGroupBox.Size.Height + 2);
         }
-
-        private string DefaultText(int count, string valueString)
+        /************/
+        private void Ornament1TextBox_Leave(object sender, EventArgs e)
         {
-            StringBuilder defaultTextSB = new StringBuilder();
-            for(int i = 0; i < count; i++)
+            TextBox textBox = sender as TextBox;
+            M.LeaveIntRangeTextBox(textBox, false, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
+            SetOrnaments(textBox, 1);
+        }
+        private void Ornament2TextBox_Leave(object sender, EventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            M.LeaveIntRangeTextBox(textBox, false, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
+            SetOrnaments(textBox, 2);
+        }
+        private void Ornament3TextBox_Leave(object sender, EventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            M.LeaveIntRangeTextBox(textBox, false, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
+            SetOrnaments(textBox, 3);
+        }
+        private void Ornament4TextBox_Leave(object sender, EventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            M.LeaveIntRangeTextBox(textBox, false, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
+            SetOrnaments(textBox, 4);
+        }
+        private void Ornament5TextBox_Leave(object sender, EventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            M.LeaveIntRangeTextBox(textBox, false, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
+            SetOrnaments(textBox, 5);
+        }
+        private void Ornament6TextBox_Leave(object sender, EventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            M.LeaveIntRangeTextBox(textBox, false, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
+            SetOrnaments(textBox, 6);
+        }
+        private void Ornament7TextBox_Leave(object sender, EventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            M.LeaveIntRangeTextBox(textBox, false, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
+            SetOrnaments(textBox, 7);
+        }
+        private void Ornament8TextBox_Leave(object sender, EventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            M.LeaveIntRangeTextBox(textBox, false, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
+            SetOrnaments(textBox, 8);
+        }
+        private void Ornament9TextBox_Leave(object sender, EventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            M.LeaveIntRangeTextBox(textBox, false, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
+            SetOrnaments(textBox, 9);
+        }
+        private void Ornament10TextBox_Leave(object sender, EventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            M.LeaveIntRangeTextBox(textBox, false, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
+            SetOrnaments(textBox, 10);
+        }
+        private void Ornament11TextBox_Leave(object sender, EventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            M.LeaveIntRangeTextBox(textBox, false, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
+            SetOrnaments(textBox, 11);
+        }
+        private void Ornament12TextBox_Leave(object sender, EventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            M.LeaveIntRangeTextBox(textBox, false, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
+            SetOrnaments(textBox, 12);
+        }
+        private void SetOrnaments(TextBox textBox, int ornamentNumber)
+        {
+            if(textBox.BackColor != M.TextBoxErrorColor)
             {
-                defaultTextSB.Append(",  ");
-                defaultTextSB.Append(valueString);
-            }
-            defaultTextSB.Remove(0, 3);
-            return defaultTextSB.ToString();
-        }
-
-        private string DefaultEnvelopesText(int count)
-        {
-            StringBuilder defaultTextSB = new StringBuilder();
-            for(int i = 0; i < count; i++)
-            {
-                defaultTextSB.Append("  :  ");
-                defaultTextSB.Append("1, 1");
-            }
-            defaultTextSB.Remove(0, 5);
-            return defaultTextSB.ToString();
-        }
-
-        private string DefaultRootInversionString(int count)
-        {
-            StringBuilder sb = new StringBuilder();
-            for(int i = 0; i < count; i++)
-            {
-                switch(i)
-                {
-                    case 0:
-                        sb.Append("12,");
-                        break;
-                    case 1:
-                        sb.Append("7,");
-                        break;
-                    case 2:
-                        sb.Append("5,");
-                        break;
-                    case 3:
-                        sb.Append("4,");
-                        break;
-                    case 4:
-                        sb.Append("3,");
-                        break;
-                    case 5:
-                        sb.Append("2,");
-                        break;
-                    default:
-                        sb.Append("1,");
-                        break;
-                }
-            }
-            sb.Remove(sb.Length - 1, 1); // final comma
-            return sb.ToString();
-        }
-
-        private List<int> DefaultRootInversionIntList(int count)
-        {
-            List<int> intList = new List<int>();
-            for(int i = 0; i < count; i++)
-            {
-                switch(i)
-                {
-                    case 0:
-                        intList.Add(12);
-                        break;
-                    case 1:
-                        intList.Add(7);
-                        break;
-                    case 2:
-                        intList.Add(5);
-                        break;
-                    case 3:
-                        intList.Add(4);
-                        break;
-                    case 4:
-                        intList.Add(3);
-                        break;
-                    case 5:
-                        intList.Add(2);
-                        break;
-                    default:
-                        intList.Add(1);
-                        break;
-                }
-            }
-            return intList;
-        }
-
-        #endregion buttons
-        #region text box events
- 
-        private void SetSettingsNotSaved()
-        {
-            if(!this.Text.EndsWith("*"))
-                this.Text = this.Text + "*";
-            _paletteForm.SetSettingsNotSaved();
-        }
-
-        /// <summary>
-        /// Called only by _paletteForm.SetSettingsHaveBeenSaved().
-        /// </summary>
-        public void SetSettingsHaveBeenSaved()
-        {
-            if(this.Text.EndsWith("*"))
-                this.Text = this.Text.Remove(this.Text.Length - 1);
-        }
-
-        public bool HasError
-        {
-            get
-            {
-                bool anyTextBoxHasErrorColour = false;
-                foreach(TextBox textBox in _allNonOrnamentTextBoxes)
-                {
-                    if(textBox.Enabled && textBox.BackColor == M.TextBoxErrorColor)
-                    {
-                        anyTextBoxHasErrorColour = true;
-                        break;
-                    }
-                }
-                for(int i = 0; i < _numberOfOrnaments; ++i)
-                {
-                    if(_12OrnamentTextBoxes[i].BackColor == M.TextBoxErrorColor)
-                    {
-                        anyTextBoxHasErrorColour = true;
-                        break;
-                    }
-                }
-                return anyTextBoxHasErrorColour;
+                Debug.Assert(_ornaments.Count >= ornamentNumber);
+                _ornaments[ornamentNumber - 1] = M.StringToIntList(textBox.Text, ',');
             }
         }
-
-        #region helper functions
- 
-        public void SetDialogState(TextBox textBox, bool okay)
+        private void SetDialogState(TextBox textBox, bool okay)
         {
             SetSettingsNotSaved();
 
             if(okay)
             {
                 textBox.BackColor = Color.White;
-             }
+            }
             else
             {
                 textBox.BackColor = M.TextBoxErrorColor;
             }
         }
+        private void SetSettingsNotSaved()
+        {
+            if(!this.Text.EndsWith("*"))
+                this.Text = this.Text + "*";
+            _paletteForm.SetSettingsNotSaved();
+        }
+        #endregion
 
-        private bool AnySettingHasErrorColor
+        /************/
+
+        #region buttons
+        private void ShowContainingPaletteButton_Click(object sender, EventArgs e)
+        {
+            _paletteForm.BringToFront();
+        }
+        private void ShowMainScoreFormButton_Click(object sender, EventArgs e)
+        {
+            _paletteForm.Callbacks.MainFormBringToFront();
+        }
+        #endregion buttons
+
+        /************/
+
+        #region public interface
+        public void SetSettingsHaveBeenSaved()
+        {
+            if(this.Text.EndsWith("*"))
+                this.Text = this.Text.Remove(this.Text.Length - 1);
+        }
+        public bool HasError
         {
             get
             {
-                bool anySettingHasErrorColor = false;
+                bool hasError = false;
                 foreach(TextBox textBox in _allNonOrnamentTextBoxes)
                 {
                     if(textBox.Enabled && textBox.BackColor == M.TextBoxErrorColor)
                     {
-                        anySettingHasErrorColor = true;
+                        hasError = true;
                         break;
                     }
                 }
-
-                return anySettingHasErrorColor;
+                if(!hasError)
+                {
+                    for(int i = 0; i < _ornaments.Count; ++i)
+                    {
+                        if(_12OrnamentTextBoxes[i].BackColor == M.TextBoxErrorColor)
+                        {
+                            hasError = true;
+                            break;
+                        }
+                    }
+                }
+                return hasError;
             }
         }
-
-        #endregion helper functions
-        #endregion text box events
-
-        #region other events
-        private void OrnamentSettingsForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            TouchAllTextBoxes();
-        }
-
-        #endregion other events
-
         public void WriteOrnamentSettingsForm(XmlWriter w)
         {
             w.WriteStartElement("ornamentSettings");
@@ -632,9 +597,8 @@ namespace Moritz.Palettes
             w.WriteStartElement("numOrnaments");
             w.WriteString(NumberOfOrnamentsTextBox.Text);
             w.WriteEndElement();
-            Debug.Assert(_numberOfOrnaments > 0 && _numberOfOrnaments <= 12);
             w.WriteStartElement("ornaments");
-            for(int i = 1; i <= _numberOfOrnaments; ++i)
+            for(int i = 1; i <= _ornaments.Count; ++i)
             {
                 #region write ornament elements
                 w.WriteStartElement("ornament");
@@ -684,195 +648,17 @@ namespace Moritz.Palettes
 
             w.WriteEndElement(); // end of ornamentSettings
         }
-
-        #region public properties
-        public int NumberOfOrnaments { get { return _numberOfOrnaments; } }
-        //public int NumberOfOrnaments { get { return int.Parse(this.NumberOfOrnamentsTextBox.Text.Trim()); } }
         public BasicChordControl BasicChordControl { get { return _bcc; } }
-        #endregion public properties
+        public List<List<int>> Ornaments { get { return _ornaments; } }
+        #endregion
 
         #region private variables
-        //private int OrnamentsDomain { get { return int.Parse(this.OrnamentsDomainTextBox.Text.Trim()); } }
-
-        private int OrnamentsDomain { get { return 12; } }
         private BasicChordControl _bcc = null;
         private PaletteForm _paletteForm = null;
         private int _numberOfBasicChordDefs = -1;
-        private int _numberOfOrnaments = -1;
-
-
-        #endregion private variables
-
-        #region private readonly values
         private List<TextBox> _allNonOrnamentTextBoxes;
         private List<TextBox> _12OrnamentTextBoxes;
-        #endregion private readonly values
-
-
-        private void NumBasicChordDefsTextBox_Leave(object sender, EventArgs e)
-        {
-            TextBox numBasicChordDefsTextBox = sender as TextBox;
-            M.LeaveIntRangeTextBox(numBasicChordDefsTextBox, false, 1, 0, 12, SetDialogState);
-            if(numBasicChordDefsTextBox.BackColor == M.TextBoxErrorColor)
-            {
-                DisableMainParameters();
-            }
-            else
-            {
-                _numberOfBasicChordDefs = int.Parse(numBasicChordDefsTextBox.Text);
-                _bcc.NumberOfChordValues = _numberOfBasicChordDefs;
-                _bcc.SetHelpLabels();
-
-                BankIndicesHelpLabel.Text = _numberOfBasicChordDefs.ToString() + " values in range [ 0..127 ]";
-                PatchIndicesHelpLabel.Text = _numberOfBasicChordDefs.ToString() + " values in range [ 0..127 ]";
-
-                OrnamentDefRangeLabel.Text = "Each value in these ornament sequences must be in the range [ 1.." +
-                    _numberOfBasicChordDefs.ToString() + " ].";
-
-                TouchAllTextBoxes();
-            }
-        }
-
-        private void BankIndicesTextBox_Leave(object sender, EventArgs e)
-        {
-            M.LeaveIntRangeTextBox(sender as TextBox, true, (uint)_bcc.NumberOfChordValues, 0, 127, SetDialogState);
-        }
-
-        private void PatchIndicesTextBox_Leave(object sender, EventArgs e)
-        {
-            M.LeaveIntRangeTextBox(sender as TextBox, true, (uint)_bcc.NumberOfChordValues, 0, 127, SetDialogState);
-        }
-
-        private void NumberOfOrnamentsTextBox_Leave(object sender, EventArgs e)
-        {
-            TextBox textBox = sender as TextBox;
-            M.LeaveIntRangeTextBox(textBox, false, (uint) 1, 1, 12, SetDialogState);
-            if(textBox.BackColor != M.TextBoxErrorColor)
-            {
-                _numberOfOrnaments = int.Parse(textBox.Text);
-                _ornaments = new List<List<int>>();
-                for(int i = 0; i < _numberOfOrnaments; ++i)
-                {
-                    _ornaments.Add(null);
-                }
-                TouchOrnamentTextBoxes();
-                SetDialogSize(_numberOfOrnaments);
-            }
-            else
-            {
-                _numberOfOrnaments = -1; //signals error to containing palette
-                _ornaments = null;
-            }
-        }
-
-        private void Ornament1TextBox_Leave(object sender, EventArgs e)
-        {
-            TextBox textBox = sender as TextBox;
-            M.LeaveIntRangeTextBox(textBox, true, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
-            SetOrnaments(textBox, 1);
-        }
-
-        private void Ornament2TextBox_Leave(object sender, EventArgs e)
-        {
-            TextBox textBox = sender as TextBox;
-            M.LeaveIntRangeTextBox(textBox, true, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
-            SetOrnaments(textBox, 2);
-        }
-
-        private void Ornament3TextBox_Leave(object sender, EventArgs e)
-        {
-            TextBox textBox = sender as TextBox;
-            M.LeaveIntRangeTextBox(textBox, true, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
-            SetOrnaments(textBox, 3);
-        }
-
-        private void Ornament4TextBox_Leave(object sender, EventArgs e)
-        {
-            TextBox textBox = sender as TextBox;
-            M.LeaveIntRangeTextBox(textBox, true, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
-            SetOrnaments(textBox, 4);
-        }
-
-        private void Ornament5TextBox_Leave(object sender, EventArgs e)
-        {
-            TextBox textBox = sender as TextBox;
-            M.LeaveIntRangeTextBox(textBox, true, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
-            SetOrnaments(textBox, 5);
-        }
-
-        private void Ornament6TextBox_Leave(object sender, EventArgs e)
-        {
-            TextBox textBox = sender as TextBox;
-            M.LeaveIntRangeTextBox(textBox, true, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
-            SetOrnaments(textBox, 6);
-        }
-
-        private void Ornament7TextBox_Leave(object sender, EventArgs e)
-        {
-            TextBox textBox = sender as TextBox;
-            M.LeaveIntRangeTextBox(textBox, true, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
-            SetOrnaments(textBox, 7);
-        }
-
-        private void Ornament8TextBox_Leave(object sender, EventArgs e)
-        {
-            TextBox textBox = sender as TextBox;
-            M.LeaveIntRangeTextBox(textBox, true, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
-            SetOrnaments(textBox, 8);
-        }
-
-        private void Ornament9TextBox_Leave(object sender, EventArgs e)
-        {
-            TextBox textBox = sender as TextBox;
-            M.LeaveIntRangeTextBox(textBox, true, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
-            SetOrnaments(textBox, 9);
-        }
-
-        private void Ornament10TextBox_Leave(object sender, EventArgs e)
-        {
-            TextBox textBox = sender as TextBox;
-            M.LeaveIntRangeTextBox(textBox, true, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
-            SetOrnaments(textBox, 10);
-        }
-
-        private void Ornament11TextBox_Leave(object sender, EventArgs e)
-        {
-            TextBox textBox = sender as TextBox;
-            M.LeaveIntRangeTextBox(textBox, true, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
-            SetOrnaments(textBox, 11);
-        }
-
-        private void Ornament12TextBox_Leave(object sender, EventArgs e)
-        {
-            TextBox textBox = sender as TextBox;
-            M.LeaveIntRangeTextBox(textBox, true, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
-            SetOrnaments(textBox, 12);
-        }
-
-        private void SetOrnaments(TextBox textBox, int ornamentNumber)
-        {
-            if(textBox.BackColor != M.TextBoxErrorColor)
-            {
-                Debug.Assert(_ornaments.Count >= ornamentNumber);
-                _ornaments[ornamentNumber - 1] = M.StringToIntList(textBox.Text, ',');
-            }
-        }
-
-        public List<List<int>> Ornaments 
-        {
-            get
-            {
-                if(_numberOfOrnaments <= 0)
-                {
-                    return null;
-                }
-                else
-                {
-                    return _ornaments;
-                }
-            }
-        }
-
-        List<List<int>> _ornaments = null;
+        private List<List<int>> _ornaments = null;
+        #endregion private variables
     }
 }

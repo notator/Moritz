@@ -32,8 +32,8 @@ namespace Moritz.Palettes
             else // _bcc.MaximumChordDensity = 0 or 1
                 DisableChordParameters();
 
-            if(paletteForm.OrnamentSettingsForm != null)
-                EnableOrnamentParameters(paletteForm.OrnamentSettingsForm.NumberOfOrnaments);
+            if(paletteForm.OrnamentSettingsForm != null && paletteForm.OrnamentSettingsForm.Ornaments != null)
+                EnableOrnamentParameters(paletteForm.OrnamentSettingsForm.Ornaments.Count);
             else
                 DisableOrnamentParameters();
 
@@ -446,7 +446,10 @@ namespace Moritz.Palettes
         }
         private void OrnamentNumberTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, _paletteForm.OrnamentSettingsForm.NumberOfOrnaments, _setDialogState);
+            if(_paletteForm.OrnamentSettingsForm != null && _paletteForm.OrnamentSettingsForm.Ornaments != null)
+            {
+                M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, _paletteForm.OrnamentSettingsForm.Ornaments.Count, _setDialogState);
+            }
         }
         private void MinMsDurationsTextBox_Leave(object sender, EventArgs e)
         {

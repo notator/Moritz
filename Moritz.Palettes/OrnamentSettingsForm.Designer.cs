@@ -47,6 +47,7 @@ namespace Moritz.Palettes
             this.NumBasicChordDefsLabel = new System.Windows.Forms.Label();
             this.OrnamentsGroupBox = new System.Windows.Forms.GroupBox();
             this.Ornament12TextBox = new System.Windows.Forms.TextBox();
+            this.OrnamentDefRangeLabel = new System.Windows.Forms.Label();
             this.OLabel12 = new System.Windows.Forms.Label();
             this.Ornament11TextBox = new System.Windows.Forms.TextBox();
             this.OLabel11 = new System.Windows.Forms.Label();
@@ -70,7 +71,6 @@ namespace Moritz.Palettes
             this.OLabel2 = new System.Windows.Forms.Label();
             this.Ornament1TextBox = new System.Windows.Forms.TextBox();
             this.OLabel1 = new System.Windows.Forms.Label();
-            this.OrnamentDefRangeLabel = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -283,6 +283,16 @@ namespace Moritz.Palettes
             this.Ornament12TextBox.TabIndex = 178;
             this.Ornament12TextBox.Leave += new System.EventHandler(this.Ornament12TextBox_Leave);
             // 
+            // OrnamentDefRangeLabel
+            // 
+            this.OrnamentDefRangeLabel.AutoSize = true;
+            this.OrnamentDefRangeLabel.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.OrnamentDefRangeLabel.Location = new System.Drawing.Point(330, 22);
+            this.OrnamentDefRangeLabel.Name = "OrnamentDefRangeLabel";
+            this.OrnamentDefRangeLabel.Size = new System.Drawing.Size(338, 14);
+            this.OrnamentDefRangeLabel.TabIndex = 179;
+            this.OrnamentDefRangeLabel.Text = "Each value in these ornament sequences must be in the range [1..X].";
+            // 
             // OLabel12
             // 
             this.OLabel12.AutoSize = true;
@@ -491,16 +501,6 @@ namespace Moritz.Palettes
             this.OLabel1.TabIndex = 155;
             this.OLabel1.Text = "1";
             // 
-            // OrnamentDefRangeLabel
-            // 
-            this.OrnamentDefRangeLabel.AutoSize = true;
-            this.OrnamentDefRangeLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.OrnamentDefRangeLabel.Location = new System.Drawing.Point(330, 22);
-            this.OrnamentDefRangeLabel.Name = "OrnamentDefRangeLabel";
-            this.OrnamentDefRangeLabel.Size = new System.Drawing.Size(338, 14);
-            this.OrnamentDefRangeLabel.TabIndex = 179;
-            this.OrnamentDefRangeLabel.Text = "Each value in these ornament sequences must be in the range [1..X].";
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -684,7 +684,6 @@ namespace Moritz.Palettes
             this.Name = "OrnamentSettingsForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "  ";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OrnamentSettingsForm_FormClosing);
             this.OrnamentsGroupBox.ResumeLayout(false);
             this.OrnamentsGroupBox.PerformLayout();
             this.BottomPanel.ResumeLayout(false);

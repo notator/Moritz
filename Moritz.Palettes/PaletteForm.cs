@@ -136,9 +136,9 @@ namespace Moritz.Palettes
 
         public void SetOrnamentControls()
         {
-            if(this.OrnamentSettingsForm != null)
+            if(this.OrnamentSettingsForm != null && this.OrnamentSettingsForm.Ornaments != null)
             {
-                _numberOfOrnaments = this.OrnamentSettingsForm.NumberOfOrnaments;
+                _numberOfOrnaments = this.OrnamentSettingsForm.Ornaments.Count;
 
                 OrnamentNumbersLabel.Enabled = true;
                 OrnamentNumbersTextBox.Enabled = true;
@@ -664,8 +664,11 @@ namespace Moritz.Palettes
 
         private void OrnamentNumbersTextBox_Leave(object sender, EventArgs e)
         {
-            bool optional = (OrnamentSettingsForm == null);
-            M.LeaveIntRangeTextBox(sender as TextBox, optional, (uint)_bcc.NumberOfChordValues, 0, int.MaxValue, SetDialogState);
+            if(OrnamentSettingsForm != null && OrnamentSettingsForm.Ornaments != null)
+            {
+                int nOrnaments = OrnamentSettingsForm.Ornaments.Count;
+                M.LeaveIntRangeTextBox(sender as TextBox, false, (uint)_bcc.NumberOfChordValues, 0, nOrnaments, SetDialogState);
+            }
         }
 
         private void MinMsDurationsTextBox_Leave(object sender, EventArgs e)
@@ -954,21 +957,22 @@ namespace Moritz.Palettes
         }
         public bool HasError()
         {
-            bool anyTextBoxHasErrorColour = ErrorInMainTextBoxes();
-            if(!anyTextBoxHasErrorColour)
+            bool hasError = ErrorInMainTextBoxes();
+            if(!hasError)
             {
                 foreach(TextBox textBox in _allChordParameterTextBoxes)
                 {
                     if(textBox.Enabled && textBox.BackColor == M.TextBoxErrorColor)
                     {
-                        anyTextBoxHasErrorColour = true;
+                        hasError = true;
                         break;
                     }
                 }
             }
-            //bool hasError = (anyTextBoxHasErrorColour || String.IsNullOrEmpty(_bcc.DurationsTextBox.Text)); 
-            //return hasError;
-            return anyTextBoxHasErrorColour;
+            if(!hasError && OrnamentSettingsForm != null)
+                hasError = OrnamentSettingsForm.HasError;
+
+            return hasError;
         }
         private bool ErrorInMainTextBoxes()
         {
