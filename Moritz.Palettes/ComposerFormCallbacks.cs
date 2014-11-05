@@ -16,7 +16,7 @@ namespace Moritz.Palettes
     public delegate void MainFormBringToFront();
     public delegate void SaveSettings();
     public delegate bool MainFormHasBeenSaved();
-    public delegate string SettingsFolderPath();
+    public delegate string LocalAudioFolderPath();
 
     public class ComposerFormCallbacks
     {
@@ -26,6 +26,6 @@ namespace Moritz.Palettes
         public MainFormBringToFront MainFormBringToFront;
         public SaveSettings SaveSettings;
         public MainFormHasBeenSaved MainFormHasBeenSaved;
-        public SettingsFolderPath SettingsFolderPath;
+        public LocalAudioFolderPath LocalScoreAudioPath;
     }
 }

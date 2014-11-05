@@ -556,13 +556,16 @@ namespace Moritz.Composer
             callbacks.SetSaveAndCreateButtons = SetSaveAndCreateButtons;
             callbacks.SetSettingsHaveBeenSaved = SetSettingsHaveBeenSaved;
             callbacks.SetSettingsHaveNotBeenSaved = SetSettingsHaveNotBeenSaved;
-            callbacks.SettingsFolderPath = GetSettingsFolderPath;
+            callbacks.LocalScoreAudioPath = GetLocalScoreAudioPath;
             return callbacks;
         }
-        private string GetSettingsFolderPath()
+
+        private string GetLocalScoreAudioPath()
         {
-            return SettingsFolderPath;
+            string path = M.Preferences.LocalMoritzAudioFolder + @"\" + _scoreTitle;
+            return path;
         }
+
         private void SaveSettings()
         {
             SaveSettingsButton_Click(null, null);
@@ -1278,22 +1281,19 @@ namespace Moritz.Composer
         SolidBrush _blackBrush = new SolidBrush(Color.Black);
 
         /// <summary>
-        /// _scoreBaseName is the name of the score without any folder or extension. For example "Study 2b2".
+        /// _scoreTitle is the name of the score without any folder or extension. For example "Study 2b2".
         /// </summary>
         string _scoreTitle = null;
         CompositionAlgorithm _algorithm = null;
 
         /// <summary>
-        /// The folder in which the score and all its associated files is saved
+        /// The folder (in the AssistantPerformer's folder)
+        /// in which the score and all its associated files is saved
         /// </summary>
         string _settingsFolderPath = null;
         string _settingsPath = null;
         const int _minimumMsDuration = 5;
         #endregion private variables
-
-        public string SettingsFolderPath { get { return _settingsFolderPath; } }
-
-        public string ScoreFolder { get { return _settingsFolderPath; } }
 
         #region page format controls
 

@@ -24,6 +24,7 @@ namespace Moritz
         {
             LocalMoritzFolderInfoLabel.Text = Preferences.LocalMoritzFolder;
             PreferencesFilePathLabel.Text = Preferences.LocalMoritzPreferencesPath;
+            LocalAudioFolderInfoLabel.Text = Preferences.LocalMoritzAudioFolder;
             LocalKrystalsFolderInfoLabel.Text = Preferences.LocalMoritzKrystalsFolder;
             LocalExpansionFieldsFolderInfoLabel.Text = Preferences.LocalMoritzExpansionFieldsFolder;
             LocalModulationOperatorsFolderInfoLabel.Text = Preferences.LocalMoritzModulationOperatorsFolder;

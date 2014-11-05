@@ -58,7 +58,7 @@ namespace Moritz.Palettes
         private void ConnectAudioButtonsControl(int domain)
         {
             Point location = new Point(this.MinMsDurationsTextBox.Location.X, this.MinMsDurationsTextBox.Location.Y + 27);
-            _audioButtonsControl = new PaletteButtonsControl(domain, location, this, _callbacks.SettingsFolderPath + @"\audio");
+            _audioButtonsControl = new PaletteButtonsControl(domain, location, this, _callbacks.LocalScoreAudioPath());
             Controls.Add(_audioButtonsControl);
         }
 

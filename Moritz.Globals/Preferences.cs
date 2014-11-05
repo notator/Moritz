@@ -11,7 +11,8 @@ namespace Moritz.Globals
 {
 	public sealed class Preferences : IDisposable
 	{
-        public Preferences(StringBuilder localMoritzFolder, StringBuilder localMoritzPreferencesPath, StringBuilder localMoritzKrystalsFolder, 
+        public Preferences(StringBuilder localMoritzFolder, StringBuilder localMoritzPreferencesPath,
+            StringBuilder localMoritzAudioFolder, StringBuilder localMoritzKrystalsFolder, 
             StringBuilder localMoritzExpansionFieldsFolder, StringBuilder localMoritzModulationOperatorsFolder, 
             StringBuilder localMoritzScoresFolder, StringBuilder onlineMoritzFolder, StringBuilder onlineMoritzAudioFolder,
             StringBuilder onlineXMLSchemasFolder)
@@ -20,6 +21,7 @@ namespace Moritz.Globals
             // These values are displayed as reminders in the preferences dialog.
             LocalMoritzFolder = localMoritzFolder.ToString();
             LocalMoritzPreferencesPath = localMoritzPreferencesPath.ToString();
+            LocalMoritzAudioFolder = localMoritzAudioFolder.ToString();
             LocalMoritzKrystalsFolder = localMoritzKrystalsFolder.ToString();
             LocalMoritzExpansionFieldsFolder = localMoritzExpansionFieldsFolder.ToString();
             LocalMoritzModulationOperatorsFolder = localMoritzModulationOperatorsFolder.ToString();
@@ -198,6 +200,7 @@ namespace Moritz.Globals
 
         public readonly string LocalMoritzFolder;
         public readonly string LocalMoritzPreferencesPath;
+        public readonly string LocalMoritzAudioFolder;
         public readonly string LocalMoritzKrystalsFolder;
         public readonly string LocalMoritzExpansionFieldsFolder;
         public readonly string LocalMoritzModulationOperatorsFolder;

@@ -40,7 +40,7 @@ namespace Moritz.Palettes
             ConnectBasicChordControl();
             if(M.Preferences.CurrentMultimediaMidiOutputDevice != null)
             {
-                ConnectPaletteButtonsControl(domain);
+                ConnectPaletteButtonsControl(domain, _callbacks.LocalScoreAudioPath());
                 _paletteButtonsControl.Enabled = false;
             }
 
@@ -63,10 +63,10 @@ namespace Moritz.Palettes
             _bcc.Location = new Point(22, 14);
             Controls.Add(_bcc);
         }
-        private void ConnectPaletteButtonsControl(int domain)
+        private void ConnectPaletteButtonsControl(int domain, string audioFolder)
         {
             Point location = new Point(this.MinMsDurationsTextBox.Location.X, this.MinMsDurationsTextBox.Location.Y + 27);
-            _paletteButtonsControl = new PaletteButtonsControl(domain, location, this, _callbacks.SettingsFolderPath() + @"\audio");
+            _paletteButtonsControl = new PaletteButtonsControl(domain, location, this, audioFolder);
             Debug.Assert(_paletteButtonsControl != null);
             Controls.Add(_paletteButtonsControl);
         }
