@@ -527,7 +527,14 @@ namespace Moritz.Palettes
         #region buttons
         private void ShowContainingPaletteButton_Click(object sender, EventArgs e)
         {
-            _paletteForm.BringToFront();
+            if(_paletteForm.Enabled)
+            {
+                _paletteForm.BringToFront();
+            }
+            else
+            {
+                _paletteForm.BringPaletteChordFormToFront();
+            }
         }
         private void ShowMainScoreFormButton_Click(object sender, EventArgs e)
         {

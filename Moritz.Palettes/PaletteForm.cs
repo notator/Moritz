@@ -52,10 +52,33 @@ namespace Moritz.Palettes
 
         public void ShowPaletteChordForm(int midiChordIndex)
         {
-            PaletteChordForm f = new PaletteChordForm(this, _bcc, midiChordIndex, SetDialogState);
-            f.Show();
+            _paletteChordForm = new PaletteChordForm(this, _bcc, midiChordIndex, SetDialogState);
+            _paletteChordForm.Show();
+            _paletteChordForm.BringToFront();
+            this.Enabled = false;
         }
 
+        /// <summary>
+        /// Can be called by OrnamentSettingsForm.
+        /// </summary>
+        internal void BringPaletteChordFormToFront()
+        {
+            Debug.Assert(this.Enabled == false && _paletteChordForm != null);
+            _paletteChordForm.BringToFront();
+        }
+
+        internal void ClosePaletteChordForm()
+        {
+            _paletteChordForm.Close();
+            _paletteChordForm = null;
+            
+            // The following line has no effect if the form is not visible.
+            // Otherwise it brings the form in front of Visual Studio.
+            _ornamentSettingsForm.BringToFront(); 
+
+            this.Enabled = true;
+            this.BringToFront();
+        }
 
         private void ConnectBasicChordControl()
         {
@@ -1198,8 +1221,8 @@ namespace Moritz.Palettes
         private MidiPitchesHelpForm _midiPitchesHelpForm = null;
         private MIDIInstrumentsHelpForm _midiInstrumentsHelpForm = null;
         private BasicChordControl _bcc = null;
+        PaletteChordForm _paletteChordForm = null;
         #endregion private variables
-
     }
 
     internal delegate void CloseMidiPitchesHelpFormDelegate();

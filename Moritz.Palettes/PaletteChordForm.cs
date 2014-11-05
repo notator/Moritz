@@ -21,7 +21,6 @@ namespace Moritz.Palettes
             _paletteForm = paletteForm;
             _bcc = bcc;
             _setDialogState = SetDialogState; // delegate
-            _paletteForm.Enabled = false;
 
             Text = "midi chord " + (midiChordIndex + 1).ToString();
 
@@ -308,17 +307,14 @@ namespace Moritz.Palettes
             }
 
             _bcc.SetChordControls();
-            _paletteForm.Enabled = true;
-            _paletteForm.BringToFront();
 
-            this.Close();
+            _paletteForm.ClosePaletteChordForm();
+
         }
 
         private void CloseWithoutSavingButton_Click(object sender, EventArgs e)
         {
-            _paletteForm.Enabled = true;
-            _paletteForm.BringToFront();
-            this.Close();
+            _paletteForm.ClosePaletteChordForm();
         }
         #endregion buttons
 
