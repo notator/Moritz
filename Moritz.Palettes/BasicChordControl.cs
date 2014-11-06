@@ -292,7 +292,7 @@ namespace Moritz.Palettes
             RootInversionTextBox.Enabled = true;
             RootInversionHelpLabel.Text = primeIntervalsCountString + integerString + valuesInRangeString + "[ 1..127 ]";
 
-            VerticalVelocityFactorsHelpLabel.Text = countString + floatString + "( > 0.0 )";
+            VerticalVelocityFactorsHelpLabel.Text = countString + floatString + "values greater than 0.0";
             VerticalVelocityFactorsLabel.Enabled = true;
             VerticalVelocityFactorsHelpLabel.Enabled = true;
             VerticalVelocityFactorsTextBox.Enabled = true;

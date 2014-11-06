@@ -390,6 +390,7 @@ namespace Moritz.Palettes
 
         public List<Button> AudioSampleButtons { get { return _audioSampleButtons; } }
         private List<Button> _audioSampleButtons = null;
+        public List<Button> PaletteChordFormButtons { get { return _paletteChordFormButtons; } }
         private List<Button> _paletteChordFormButtons = new List<Button>();
         private List<Button> _midiEventDemoButtons = new List<Button>();
         private List<Label> _restLabels = new List<Label>();

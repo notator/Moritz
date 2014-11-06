@@ -242,9 +242,9 @@
             this.MinMsDurationsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
             this.MinMsDurationsHelpLabel.Location = new System.Drawing.Point(211, 528);
             this.MinMsDurationsHelpLabel.Name = "MinMsDurationsHelpLabel";
-            this.MinMsDurationsHelpLabel.Size = new System.Drawing.Size(122, 14);
+            this.MinMsDurationsHelpLabel.Size = new System.Drawing.Size(149, 14);
             this.MinMsDurationsHelpLabel.TabIndex = 174;
-            this.MinMsDurationsHelpLabel.Text = "1 integer values ( >= 0 )";
+            this.MinMsDurationsHelpLabel.Text = "1 integer value greater than 0";
             // 
             // MidiInstrumentsHelpButton
             // 

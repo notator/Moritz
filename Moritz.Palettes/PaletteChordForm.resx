@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="EnvelopesExtraHelpLabel.Text" xml:space="preserve">
-    <value>* Envelpoes are one or more integers in range 0..127 separated by colons. These are the control's midi (msb) values.
+    <value>* Envelopes are one or more integers in range 0..127 separated by colons. These are the control's midi (msb) values.
 The values are spread evenly in time across the chord, with the first value at the very beginning and the final value at the very end.
 Intermediate, sliding values are interpolated automatically.</value>
   </data>

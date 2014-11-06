@@ -52,10 +52,17 @@ namespace Moritz.Palettes
 
         public void ShowPaletteChordForm(int midiChordIndex)
         {
-            _paletteChordForm = new PaletteChordForm(this, _bcc, midiChordIndex, SetDialogState);
-            _paletteChordForm.Show();
-            _paletteChordForm.BringToFront();
-            this.Enabled = false;
+            if(!this.HasError())
+            {
+                _paletteChordForm = new PaletteChordForm(this, _bcc, midiChordIndex, SetDialogState);
+                _paletteChordForm.Show();
+                _paletteChordForm.BringToFront();
+                this.Enabled = false;
+            }
+            else
+            {
+                MessageBox.Show("Can't create a palette chord form because this palette contains errors.");
+            }
         }
 
         /// <summary>
@@ -67,17 +74,21 @@ namespace Moritz.Palettes
             _paletteChordForm.BringToFront();
         }
 
-        internal void ClosePaletteChordForm()
+        internal void ClosePaletteChordForm(int chordIndex)
         {
             _paletteChordForm.Close();
             _paletteChordForm = null;
             
-            // The following line has no effect if the form is not visible.
-            // Otherwise it brings the form in front of Visual Studio.
-            _ornamentSettingsForm.BringToFront(); 
+            // If an OrnamentSettingsForm exists, it is brought in front of Visual Studio.
+            if(_ornamentSettingsForm != null)
+            {
+                _ornamentSettingsForm.BringToFront();
+            }
 
             this.Enabled = true;
             this.BringToFront();
+
+            this.PaletteButtonsControl.PaletteChordFormButtons[chordIndex].Select();
         }
 
         private void ConnectBasicChordControl()

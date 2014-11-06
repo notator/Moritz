@@ -21,26 +21,23 @@ namespace Moritz.Palettes
             _paletteForm = paletteForm;
             _bcc = bcc;
             _setDialogState = SetDialogState; // delegate
+            _midiChordIndex = midiChordIndex;
 
             Text = "midi chord " + (midiChordIndex + 1).ToString();
+            ChordDensityHelpLabel.Text = "1 integer value in range [ 0.." + _bcc.MaximumChordDensity.ToString() + " ] ( 0 creates a rest. )";
+            RootInversionHelpLabel.Text = "root inversion: " + _bcc.RootInversionTextBox.Text;
+            if(string.IsNullOrEmpty(_bcc.VerticalVelocityFactorsTextBox.Text))
+            {
+                this.VerticalVelocityFactorHelpLabel.Text = "( Edit this value in the main palette. )";
+            }
 
             InitializeTextBoxes(paletteForm, bcc, midiChordIndex);
 
-            if(_bcc.MaximumChordDensity > 1)
-                EnableChordParameters(bcc.MaximumChordDensity);
-            else // _bcc.MaximumChordDensity = 0 or 1
-                DisableChordParameters();
-
-            if(paletteForm.OrnamentSettingsForm != null && paletteForm.OrnamentSettingsForm.Ornaments != null)
-                EnableOrnamentParameters(paletteForm.OrnamentSettingsForm.Ornaments.Count);
-            else
-                DisableOrnamentParameters();
+            ChordDensityTextBox_Leave(ChordDensityTextBox, null);
 
             InitializeMidiEventButton(midiChordIndex);
 
             AddAudioSampleButtons(_paletteForm.Domain);
-
-            ChordDensityTextBox_Leave(ChordDensityTextBox, null);
         }
 
         private void InitializeMidiEventButton(int midiChordIndex)
@@ -163,40 +160,13 @@ namespace Moritz.Palettes
             this.MinMsDurationsTextBox.Text = minMsDurationsSBs[1].ToString();
         }
 
-        private void EnableChordParameters(int maximumChordDensity)
-        {
-            Debug.Assert(maximumChordDensity > 1);
-            ChordDensityTextBox.Enabled = true;
-            ChordDensityHelpLabel.Text = "1 integer value in range [ 0.." + maximumChordDensity.ToString() + " ] ( 0 creates a rest. )";
-
-            RootInversionHelpLabel.Text = "root inversion: " + _bcc.RootInversionTextBox.Text;
-
-            InversionIndexTextBox.Enabled = true; 
-            int inversionsMaxIndex = ((2 * (maximumChordDensity - 2)) - 1);
-            InversionIndexHelpLabel.Text = "1 integer value in range [ 0.." + inversionsMaxIndex.ToString() + " ]";
-
-            VerticalVelocityFactorTextBox.Enabled = true;
-        }
-
-        private void DisableChordParameters()
-        {
-            ChordDensityTextBox.Enabled = false;
-            ChordDensityHelpLabel.Text = "";
-
-            RootInversionHelpLabel.Text = "root inversion: " + _bcc.RootInversionTextBox.Text;
-
-            InversionIndexTextBox.Enabled = false;
-            InversionIndexHelpLabel.Text = "";
-
-            VerticalVelocityFactorTextBox.Enabled = false;
-            VerticalVelocityFactorHelpLabel.Text = "";
-        }
-
         private void EnableOrnamentParameters(int numberOfOrnaments)
         {
             Debug.Assert(numberOfOrnaments > 0);
             OrnamentNumberTextBox.Enabled = true;
             OrnamentNumberHelpLabel.Text = "1 integer value in range [ 0.." + numberOfOrnaments.ToString() + " ] (0 means no ornament)";
+            MinMsDurationsTextBox.Enabled = true;
+            MinMsDurationsHelpLabel.Text = "1 integer value greater than 0";
 
             ShowOrnamentSettingsButton.Enabled = true;
         }
@@ -205,6 +175,8 @@ namespace Moritz.Palettes
         {
             OrnamentNumberTextBox.Enabled = false;
             OrnamentNumberHelpLabel.Text = "";
+            MinMsDurationsTextBox.Enabled = false;
+            MinMsDurationsHelpLabel.Text = "";
 
             ShowOrnamentSettingsButton.Enabled = false;
         }
@@ -274,6 +246,7 @@ namespace Moritz.Palettes
             {
                 _bcc.DurationsTextBox.Text = durationSBs[0].ToString() + this.DurationTextBox.Text + durationSBs[2].ToString();
                 _bcc.ChordDensitiesTextBox.Text = chordDensitySBs[0].ToString() + this.ChordDensityTextBox.Text + chordDensitySBs[2].ToString();
+                _paletteForm.ClosePaletteChordForm(_midiChordIndex);
             }
             else
             {
@@ -304,17 +277,15 @@ namespace Moritz.Palettes
                 }
                 
                 _paletteForm.MinMsDurationsTextBox.Text = minMsDurationsSBs[0].ToString() + this.MinMsDurationsTextBox.Text + minMsDurationsSBs[2].ToString();
+
+                _paletteForm.ClosePaletteChordForm(_midiChordIndex);
             }
-
-            _bcc.SetChordControls();
-
-            _paletteForm.ClosePaletteChordForm();
 
         }
 
         private void CloseWithoutSavingButton_Click(object sender, EventArgs e)
         {
-            _paletteForm.ClosePaletteChordForm();
+            _paletteForm.ClosePaletteChordForm(_midiChordIndex);
         }
         #endregion buttons
 
@@ -335,39 +306,76 @@ namespace Moritz.Palettes
         {
             M.LeaveIntRangeTextBox(sender as TextBox, true, 1, 0, 1, _setDialogState);
         }
-        private void ChordDensityTextBox_Leave(object sender, EventArgs e)
+
+        private void EnableAllTextBoxesAndMidiButton()
         {
-            TextBox chordDensityTextBox = sender as TextBox;
             List<TextBox> allTextBoxes = AllTextBoxes();
-
-            M.LeaveIntRangeTextBox(chordDensityTextBox, false, 1, 0, _bcc.MaximumChordDensity, _setDialogState);
-
             foreach(TextBox textBox in allTextBoxes)
             {
                 textBox.Enabled = true;
             }
+            this.MidiEventButton.Enabled = true;
+        }
+        private void DisableAllTextBoxesAndMidiButton()
+        {
+            List<TextBox> allTextBoxes = AllTextBoxes();
+            foreach(TextBox textBox in allTextBoxes)
+            {
+                textBox.Enabled = false;
+            }
+            this.MidiEventButton.Enabled = false;
+        }
+        private void ChordDensityTextBox_Leave(object sender, EventArgs e)
+        {
+            TextBox chordDensityTextBox = sender as TextBox;
+
+            M.LeaveIntRangeTextBox(chordDensityTextBox, false, 1, 0, _bcc.MaximumChordDensity, _setDialogState);
 
             if(chordDensityTextBox.BackColor == M.TextBoxErrorColor)
             {
-                foreach(TextBox textBox in allTextBoxes)
-                {
-                    textBox.Enabled = false;
-                }
+                DisableAllTextBoxesAndMidiButton();
                 this.ChordDensityTextBox.Enabled = true;
             }
-            else if(chordDensityTextBox.Text == "1")
+            else
             {
-                InversionIndexTextBox.Enabled = false;
-                VerticalVelocityFactorTextBox.Enabled = false;
-            }
-            else if(chordDensityTextBox.Text == "0") // a rest
-            {
-                foreach(TextBox textBox in allTextBoxes)
+                EnableAllTextBoxesAndMidiButton();
+
+                if(string.IsNullOrEmpty(_bcc.InversionIndicesTextBox.Text))
                 {
-                    textBox.Enabled = false;
+                    this.InversionIndexTextBox.Enabled = false;
                 }
-                this.DurationTextBox.Enabled = true;
-                this.ChordDensityTextBox.Enabled = true;
+                if(string.IsNullOrEmpty(_bcc.VerticalVelocityFactorsTextBox.Text))
+                {
+                    this.VerticalVelocityFactorTextBox.Enabled = false;
+                }
+
+                int thisChordDensity = int.Parse(chordDensityTextBox.Text);
+                if(thisChordDensity == 0) // a rest
+                {
+                    DisableAllTextBoxesAndMidiButton();
+                    this.DurationTextBox.Enabled = true;
+                    this.ChordDensityTextBox.Enabled = true;
+                }
+                else if(thisChordDensity == 1)
+                {
+                    InversionIndexTextBox.Enabled = false;
+                    VerticalVelocityFactorTextBox.Enabled = false;
+                }
+
+                if(InversionIndexTextBox.Enabled)
+                {
+                    int inversionsMaxIndex = ((2 * (_bcc.MaximumChordDensity - 2)) - 1);
+                    InversionIndexHelpLabel.Text = "1 integer value in range [ 0.." + inversionsMaxIndex.ToString() + " ]";
+                }
+                else
+                {
+                    InversionIndexHelpLabel.Text = "";
+                }
+
+                if(_paletteForm.OrnamentSettingsForm != null && _paletteForm.OrnamentSettingsForm.Ornaments != null)
+                    EnableOrnamentParameters(_paletteForm.OrnamentSettingsForm.Ornaments.Count);
+                else
+                    DisableOrnamentParameters();
             }
         }
 
@@ -550,6 +558,7 @@ namespace Moritz.Palettes
         public PaletteForm PaletteForm { get { return _paletteForm; } }
         PaletteForm _paletteForm;
         BasicChordControl _bcc;
+        int _midiChordIndex;
         public List<Button> AudioSampleButtons;
         #endregion  private variables
     }

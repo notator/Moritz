@@ -40,7 +40,14 @@ namespace Moritz.Palettes
 
         public void ShowPaletteChordForm(int midiChordIndex)
         {
-            throw new NotImplementedException();
+            if(!this.HasError())
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                MessageBox.Show("Can't create a palette chord form because this palette contains errors.");
+            }
         }
 
         private void PercussionPaletteForm_Click(object sender, EventArgs e)
