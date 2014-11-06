@@ -8,21 +8,21 @@ namespace Moritz.Spec
     /// <summary>
     /// This object defines how Seqs react to incoming performed information.
     /// An InputControls object can be attached to a SeqRef in an InputChordDef.SeqRefs list.
-    /// The values these options can take in the InputControls are defined in enums in this namespace.
-    /// (See below, and in the svgScoreExtensions documentation for details.)
-    /// Each of these enums has a "dontOverride" member.
-    /// The option value applicable to a Seq is the current value of that option stored in the OutputVoice, unless
-    /// the SeqRef has an InputControls member, and the InputControls value of that option is something other than
-    /// "dontOverride". In this case, the InputControls option value overrides the OutputVoice's option value.
-    /// Whether the result of the overriding is temporary or is transferred to the OutputVoice is set using the
-    /// InputControls.onlySeq option. The onlySeq option itself is not maintained in the OutputVoice.
-    /// The default options for an Output Voice are:
-    ///     noteOnKey="ignore" -- input midi pitches are ignored (the score uses its own, default pitches)
-    ///     noteOnVel="ignore" -- input midi velocities are ignored (the score uses its own, default velocities) 
-    ///     noteOff="ignore" -- input noteOffs are ignored.
-    ///     pressure="ignore" -- input channelPressure/aftertouch information is ignored.
-    ///     pitchWheel="ignore" -- input pitchWheel information is ignored.
-    ///     modulation="ignore" -- input modulation wheel information is ignored.
+    /// The values these options can take in the InputControls are defined in enums in this namespace.
+    /// (See below, and in the svgScoreExtensions documentation for details.)
+    /// Each of these enums has a "dontOverride" member.
+    /// The option value applicable to a Seq is the current value of that option stored in the OutputVoice, unless
+    /// the SeqRef has an InputControls member, and the InputControls value of that option is something other than
+    /// "dontOverride". In this case, the InputControls option value overrides the OutputVoice's option value.
+    /// Whether the result of the overriding is temporary or is transferred to the OutputVoice is set using the
+    /// InputControls.onlySeq option. The onlySeq option itself is not maintained in the OutputVoice.
+    /// The default options for an Output Voice are:
+    ///     noteOnKey="ignore" -- input midi pitches are ignored (the score uses its own, default pitches)
+    ///     noteOnVel="ignore" -- input midi velocities are ignored (the score uses its own, default velocities) 
+    ///     noteOff="ignore" -- input noteOffs are ignored.
+    ///     pressure="ignore" -- input channelPressure/aftertouch information is ignored.
+    ///     pitchWheel="ignore" -- input pitchWheel information is ignored.
+    ///     modulation="ignore" -- input modulation wheel information is ignored.
     ///     speedOption="none" -- the default durations (set in the score) are used. 
     /// </summary>
     public class InputControls
@@ -36,26 +36,25 @@ namespace Moritz.Spec
 
         public void WriteSvg(SvgWriter w)
         {
-            w.WriteStartElement("inputControls");
-
-            if(this.OnlySeq == true)
-            {
-                w.WriteAttributeString("onlySeq", "1");
-            }
-
-            if(this.NoteOnKeyOption != Spec.NoteOnKeyOption.dontOverride)
-            {
-                w.WriteAttributeString("noteOnKey", this.NoteOnKeyOption.ToString());
-            }
-            if(this.NoteOnVelocityOption != Spec.NoteOnVelocityOption.dontOverride)
-            {
-                w.WriteAttributeString("noteOnVel", this.NoteOnVelocityOption.ToString());
-            }
-            if(this.NoteOffOption != Spec.NoteOffOption.dontOverride)
-            {
-                w.WriteAttributeString("noteOff", this.NoteOffOption.ToString());
+            w.WriteStartElement("inputControls");
+
+            if(this.OnlySeq == true)
+            {
+                w.WriteAttributeString("onlySeq", "1");
             }
 
+            if(this.NoteOnKeyOption != Spec.NoteOnKeyOption.dontOverride)
+            {
+                w.WriteAttributeString("noteOnKey", this.NoteOnKeyOption.ToString());
+            }
+            if(this.NoteOnVelocityOption != Spec.NoteOnVelocityOption.dontOverride)
+            {
+                w.WriteAttributeString("noteOnVel", this.NoteOnVelocityOption.ToString());
+            }
+            if(this.NoteOffOption != Spec.NoteOffOption.dontOverride)
+            {
+                w.WriteAttributeString("noteOff", this.NoteOffOption.ToString());
+            }
             if(this.NoteOffOption == NoteOffOption.shortFade)
             {
                 if(NumberOfObjectsInFade == null)
@@ -65,56 +64,53 @@ namespace Moritz.Spec
                             "then the NumberOfObjectsInFade must also be set.");
                 w.WriteAttributeString("shortFade", NumberOfObjectsInFade.ToString());
             }
-
-            bool isControllingVolume = false;
-            if(this.PressureOption != ControllerOption.dontOverride)
-            {
+            bool isControllingVolume = false;
+            if(this.PressureOption != ControllerOption.dontOverride)
+            {
                 w.WriteAttributeString("pressure", this.PressureOption.ToString());
                 if(this.PressureOption == ControllerOption.volume)
                 {
                     WriteMaxMinVolume(w);
                     isControllingVolume = true;
-                }
-            }
-
-            if(this.PitchWheelOption != ControllerOption.dontOverride)
-            {
-                w.WriteAttributeString("pitchWheel", this.PitchWheelOption.ToString());
-                if(this.PitchWheelOption == ControllerOption.volume)
-                {
-                    Debug.Assert(isControllingVolume == false);
-                    WriteMaxMinVolume(w);
-                    isControllingVolume = true;
-                }
-            }
-
-            if(this.ModWheelOption != ControllerOption.dontOverride)
-            {
-                w.WriteAttributeString("modulation", this.ModWheelOption.ToString());
-                if(this.ModWheelOption == ControllerOption.volume)
-                {
-                    Debug.Assert(isControllingVolume == false);
-                    WriteMaxMinVolume(w);
-                    isControllingVolume = true;
-                }
-            }
-
-            if(this.SpeedOption != Spec.SpeedOption.dontOverride)
-            {
-                w.WriteAttributeString("speedOption", this.SpeedOption.ToString());
-                if(MaxSpeedPercent == null || MaxSpeedPercent < 100)
-                {
-                    throw new ApplicationException(
-                        "\nInputControls Error:\n" +
-                        "If the SpeedOption is set, then MaxSpeedPercent must be set\n" +
-                        "to a value >= 100.");
-                }
-                w.WriteAttributeString("maxSpeedPercent", this.MaxSpeedPercent.ToString());
+                }
             }
-           
+
+            if(this.PitchWheelOption != ControllerOption.dontOverride)
+            {
+                w.WriteAttributeString("pitchWheel", this.PitchWheelOption.ToString());
+                if(this.PitchWheelOption == ControllerOption.volume)
+                {
+                    Debug.Assert(isControllingVolume == false);
+                    WriteMaxMinVolume(w);
+                    isControllingVolume = true;
+                }
+            }
+
+            if(this.ModWheelOption != ControllerOption.dontOverride)
+            {
+                w.WriteAttributeString("modulation", this.ModWheelOption.ToString());
+                if(this.ModWheelOption == ControllerOption.volume)
+                {
+                    Debug.Assert(isControllingVolume == false);
+                    WriteMaxMinVolume(w);
+                    isControllingVolume = true;
+                }
+            }
+
+            if(this.SpeedOption != Spec.SpeedOption.dontOverride)
+            {
+                w.WriteAttributeString("speedOption", this.SpeedOption.ToString());
+                if(MaxSpeedPercent == null || MaxSpeedPercent < 100)
+                {
+                    throw new ApplicationException(
+                        "\nInputControls Error:\n" +
+                        "If the SpeedOption is set, then MaxSpeedPercent must be set\n" +
+                        "to a value >= 100.");
+                }
+                w.WriteAttributeString("maxSpeedPercent", this.MaxSpeedPercent.ToString());
+            }
             w.WriteEndElement(); // score:inputControls
         }
-
         private void WriteMaxMinVolume(SvgWriter w)
         {
             if(MaximumVolume == null || MinimumVolume == null)
@@ -132,25 +128,19 @@ namespace Moritz.Spec
             }
             w.WriteAttributeString("maxVolume", MaximumVolume.ToString());
             w.WriteAttributeString("minVolume", MinimumVolume.ToString());
-        }
-
-        public bool OnlySeq = false;
+        }
 
+        public bool OnlySeq = false;
         public NoteOnKeyOption NoteOnKeyOption = NoteOnKeyOption.dontOverride;
         public NoteOnVelocityOption NoteOnVelocityOption = NoteOnVelocityOption.dontOverride;
         public NoteOffOption NoteOffOption = NoteOffOption.dontOverride;
-
         public ControllerOption PressureOption = ControllerOption.dontOverride;
         public ControllerOption PitchWheelOption = ControllerOption.dontOverride;
         public ControllerOption ModWheelOption = ControllerOption.dontOverride;
-
-        public SpeedOption SpeedOption = SpeedOption.dontOverride;
-
+        public SpeedOption SpeedOption = SpeedOption.dontOverride;
         public int? NumberOfObjectsInFade = null; // must be set if the NoteOffOption is "limitedFade".
-
         public byte? MaximumVolume = null; // must be set if the performer is controlling the volume
         public byte? MinimumVolume = null; // must be set if the performer is controlling the volume
-
         public int? MaxSpeedPercent = null; // must be set to a value > 100 if the performer is controlling the speed (often set to about 400)
     }
 
@@ -163,14 +153,14 @@ namespace Moritz.Spec
     };
 
     public enum NoteOnVelocityOption
-    {
+    {
         dontOverride, // Dont write the option to the score file. Use the current voice setting.
         ignore,
         scale
     };
 
     public enum NoteOffOption
-    {
+    {
         dontOverride, // Dont write the option to the score file. Use the current voice setting.
         ignore,
         stop,
@@ -185,7 +175,7 @@ namespace Moritz.Spec
     /// The int values may be used to index in a menu list. 
     /// </summary>
     public enum ControllerOption
-    {
+    {
         dontOverride, // Dont write the option to the score file. Use the current voice setting.
         ignore = 0,
         aftertouch = 1,
@@ -205,7 +195,7 @@ namespace Moritz.Spec
     };
 
     public enum SpeedOption
-    {
+    {
         dontOverride, // Dont write the option to the score file. Use the current voice setting.
         none, // use the default durations in the score
         noteOnKey,

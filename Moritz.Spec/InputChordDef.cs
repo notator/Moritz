@@ -23,15 +23,15 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// constructs a 1-pitch chord pointing at a single sequence
+        /// constructs a 1-pitch chord pointing directly at a single sequence (msOffset = 0)
         /// </summary>
         public InputChordDef(int msPosition, int msDuration, byte midiPitch, string lyric, byte seqVoiceID, byte seqLength, InputControls inputControls)
             : base(msDuration)
-        {
+        {
             _msPosition = msPosition;
-            _notatedMidiPitches = new List<byte>(){midiPitch};
+            _notatedMidiPitches = new List<byte>(){midiPitch};
             _lyric = lyric;
-            List<SeqRef> seqRefs = new List<SeqRef>(){new SeqRef(midiPitch, seqVoiceID, seqLength, inputControls)}; // inputControls can be null
+            List<SeqRef> seqRefs = new List<SeqRef>(){new SeqRef(midiPitch, seqVoiceID, seqLength, 0, inputControls)}; // inputControls can be null
             _seqRefsPerMidiPitch.Add(seqRefs);
             _msDurationToNextBarline = null;
         }
@@ -42,11 +42,11 @@ namespace Moritz.Spec
         /// </summary>
         public InputChordDef(int msPosition, int msDuration, List<byte> notatedMidiPitches, List<List<SeqRef>> seqRefsPerMidiPitch, string lyric)
             : base(msDuration)
-        {
-            Debug.Assert(notatedMidiPitches.Count == seqRefsPerMidiPitch.Count);
+        {
+            Debug.Assert(notatedMidiPitches.Count == seqRefsPerMidiPitch.Count);
             _msPosition = msPosition;
-            _notatedMidiPitches = new List<byte>(notatedMidiPitches);
-            _seqRefsPerMidiPitch = seqRefsPerMidiPitch;
+            _notatedMidiPitches = new List<byte>(notatedMidiPitches);
+            _seqRefsPerMidiPitch = seqRefsPerMidiPitch;
             _lyric = lyric;
             _msDurationToNextBarline = null;
         }
@@ -87,59 +87,55 @@ namespace Moritz.Spec
         {
             w.WriteStartElement("score", "inputNotes", null);
             // N.B.: the lyric has been written as an attribute of the containing InputChordSymbol.
-
-            for(int i = 0; i < _notatedMidiPitches.Count; ++i)
-            {
+            for(int i = 0; i < _notatedMidiPitches.Count; ++i)
+            {
                 byte pitch = _notatedMidiPitches[i];
-                w.WriteStartElement("inputNote");
-                w.WriteAttributeString("notatedKey", pitch.ToString());
-                
-                List<SeqRef> seqRefs = this.SeqRefsPerMidiPitch[i];
-                w.WriteStartElement("seqRefs");
-                foreach(SeqRef seqRef in seqRefs)
-                {
-                    seqRef.WriteSvg(w);
-                }
+                w.WriteStartElement("inputNote");
+                w.WriteAttributeString("notatedKey", pitch.ToString());
+                List<SeqRef> seqRefs = this.SeqRefsPerMidiPitch[i];
+                w.WriteStartElement("seqRefs");
+                foreach(SeqRef seqRef in seqRefs)
+                {
+                    seqRef.WriteSvg(w);
+                }
                 w.WriteEndElement(); // score:seqRefs
-
                 w.WriteEndElement(); // score:inputNote
             }
-
             w.WriteEndElement(); // score:inputNotes
-
         }
 
         public override IUniqueDef DeepClone()
         {
             throw new NotImplementedException("InputChordDef.DeepClone()");
-        }
-
-        public List<byte> SeqVoiceIDs
-        {
-            get
-            {
-                List<byte> seqVoiceIDs = new List<byte>();
-                foreach(List<SeqRef> seqRefList in _seqRefsPerMidiPitch)
-                {
-                    foreach(SeqRef seqRef in seqRefList)
-                    {
-                        seqVoiceIDs.Add(seqRef.VoiceID);
-                    }
-                }
-                return seqVoiceIDs;
-            }
+        }
+
+        public List<byte> SeqVoiceIDs
+        {
+            get
+            {
+                List<byte> seqVoiceIDs = new List<byte>();
+                foreach(List<SeqRef> seqRefList in _seqRefsPerMidiPitch)
+                {
+                    foreach(SeqRef seqRef in seqRefList)
+                    {
+                        seqVoiceIDs.Add(seqRef.VoiceID);
+                    }
+                }
+
+                return seqVoiceIDs;
+            }
         }
 
         public int MsPosition { get { return _msPosition; } set { _msPosition = value; } }
         private int _msPosition = 0;
 
         public List<byte> NotatedMidiPitches { get { return _notatedMidiPitches; } set { _notatedMidiPitches = value; } }
-        protected List<byte> _notatedMidiPitches = new List<byte>();
-
-        public List<List<SeqRef>> SeqRefsPerMidiPitch { get { return _seqRefsPerMidiPitch; } }
-        private List<List<SeqRef>> _seqRefsPerMidiPitch = new List<List<SeqRef>>();
-
-        public string Lyric { get { return _lyric; } set { _lyric = value; } }
+        protected List<byte> _notatedMidiPitches = new List<byte>();
+
+        public List<List<SeqRef>> SeqRefsPerMidiPitch { get { return _seqRefsPerMidiPitch; } }
+        private List<List<SeqRef>> _seqRefsPerMidiPitch = new List<List<SeqRef>>();
+
+        public string Lyric { get { return _lyric; } set { _lyric = value; } }
         private string _lyric;
 
         public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
