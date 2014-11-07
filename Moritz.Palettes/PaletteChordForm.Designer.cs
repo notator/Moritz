@@ -34,7 +34,7 @@
             this.RepeatsLabel = new System.Windows.Forms.Label();
             this.BankIndexTextBox = new System.Windows.Forms.TextBox();
             this.BankIndexHelpLabel = new System.Windows.Forms.Label();
-            this.BankIndicesLabel = new System.Windows.Forms.Label();
+            this.BankIndexLabel = new System.Windows.Forms.Label();
             this.PatchIndexTextBox = new System.Windows.Forms.TextBox();
             this.PatchIndexHelpLabel = new System.Windows.Forms.Label();
             this.PatchIndicesLabel = new System.Windows.Forms.Label();
@@ -42,8 +42,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.midiLabel = new System.Windows.Forms.Label();
             this.EnvelopesExtraHelpLabel = new System.Windows.Forms.Label();
-            this.MinMsDurationsTextBox = new System.Windows.Forms.TextBox();
-            this.MinMsDurationsHelpLabel = new System.Windows.Forms.Label();
+            this.MinMsDurationTextBox = new System.Windows.Forms.TextBox();
+            this.MinMsDurationHelpLabel = new System.Windows.Forms.Label();
             this.MidiInstrumentsHelpButton = new System.Windows.Forms.Button();
             this.MidiPitchesHelpButton = new System.Windows.Forms.Button();
             this.HelpTextLabel = new System.Windows.Forms.Label();
@@ -56,17 +56,17 @@
             this.PitchwheelEnvelopeTextBox = new System.Windows.Forms.TextBox();
             this.PitchwheelDeviationTextBox = new System.Windows.Forms.TextBox();
             this.ModulationWheelEnvelopeTextBox = new System.Windows.Forms.TextBox();
-            this.VelocityEnvelopeHelpLabel = new System.Windows.Forms.Label();
+            this.ExpressionEnvelopeHelpLabel = new System.Windows.Forms.Label();
             this.PanEnvelopeHelpLabel = new System.Windows.Forms.Label();
             this.ModulationWheelEnvelopeHelpLabel = new System.Windows.Forms.Label();
-            this.MinMsDurationsLabel = new System.Windows.Forms.Label();
-            this.VelocityEnvelopesLabel = new System.Windows.Forms.Label();
+            this.MinMsDurationLabel = new System.Windows.Forms.Label();
+            this.ExpressionEnvelopeLabel = new System.Windows.Forms.Label();
             this.OrnamentNumberLabel = new System.Windows.Forms.Label();
-            this.PanEnvelopesLabel = new System.Windows.Forms.Label();
-            this.PitchwheelEnvelopesLabel = new System.Windows.Forms.Label();
-            this.PitchwheelDeviationsLabel = new System.Windows.Forms.Label();
-            this.ModulationWheelEnvelopesLabel = new System.Windows.Forms.Label();
-            this.PitchWheelEnvelopeHelpLabel = new System.Windows.Forms.Label();
+            this.PanEnvelopeLabel = new System.Windows.Forms.Label();
+            this.PitchwheelEnvelopeLabel = new System.Windows.Forms.Label();
+            this.PitchwheelDeviationLabel = new System.Windows.Forms.Label();
+            this.ModulationWheelEnvelopeLabel = new System.Windows.Forms.Label();
+            this.PitchwheelEnvelopeHelpLabel = new System.Windows.Forms.Label();
             this.SaveAndCloseButton = new System.Windows.Forms.Button();
             this.CloseWithoutSavingButton = new System.Windows.Forms.Button();
             this.BasicChordControlsPanel = new System.Windows.Forms.Panel();
@@ -118,12 +118,12 @@
             // 
             // RepeatsLabel
             // 
-            this.RepeatsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+            this.RepeatsLabel.ForeColor = System.Drawing.Color.Brown;
             this.RepeatsLabel.Location = new System.Drawing.Point(101, 298);
             this.RepeatsLabel.Name = "RepeatsLabel";
             this.RepeatsLabel.Size = new System.Drawing.Size(78, 14);
             this.RepeatsLabel.TabIndex = 189;
-            this.RepeatsLabel.Text = "( repeats (0))";
+            this.RepeatsLabel.Text = "repeats";
             this.RepeatsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // BankIndexTextBox
@@ -145,15 +145,15 @@
             this.BankIndexHelpLabel.TabIndex = 187;
             this.BankIndexHelpLabel.Text = "1 integer value in range [ 0..127 ]";
             // 
-            // BankIndicesLabel
+            // BankIndexLabel
             // 
-            this.BankIndicesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.BankIndicesLabel.Location = new System.Drawing.Point(84, 244);
-            this.BankIndicesLabel.Name = "BankIndicesLabel";
-            this.BankIndicesLabel.Size = new System.Drawing.Size(95, 15);
-            this.BankIndicesLabel.TabIndex = 186;
-            this.BankIndicesLabel.Text = "( bank index (0))";
-            this.BankIndicesLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.BankIndexLabel.ForeColor = System.Drawing.Color.Brown;
+            this.BankIndexLabel.Location = new System.Drawing.Point(84, 244);
+            this.BankIndexLabel.Name = "BankIndexLabel";
+            this.BankIndexLabel.Size = new System.Drawing.Size(95, 15);
+            this.BankIndexLabel.TabIndex = 186;
+            this.BankIndexLabel.Text = "bank index";
+            this.BankIndexLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // PatchIndexTextBox
             // 
@@ -227,24 +227,24 @@
             this.EnvelopesExtraHelpLabel.TabIndex = 176;
             this.EnvelopesExtraHelpLabel.Text = resources.GetString("EnvelopesExtraHelpLabel.Text");
             // 
-            // MinMsDurationsTextBox
+            // MinMsDurationTextBox
             // 
-            this.MinMsDurationsTextBox.Font = new System.Drawing.Font("Arial", 8F);
-            this.MinMsDurationsTextBox.Location = new System.Drawing.Point(180, 525);
-            this.MinMsDurationsTextBox.Name = "MinMsDurationsTextBox";
-            this.MinMsDurationsTextBox.Size = new System.Drawing.Size(29, 20);
-            this.MinMsDurationsTextBox.TabIndex = 10;
-            this.MinMsDurationsTextBox.Leave += new System.EventHandler(this.MinMsDurationsTextBox_Leave);
+            this.MinMsDurationTextBox.Font = new System.Drawing.Font("Arial", 8F);
+            this.MinMsDurationTextBox.Location = new System.Drawing.Point(180, 525);
+            this.MinMsDurationTextBox.Name = "MinMsDurationTextBox";
+            this.MinMsDurationTextBox.Size = new System.Drawing.Size(29, 20);
+            this.MinMsDurationTextBox.TabIndex = 10;
+            this.MinMsDurationTextBox.Leave += new System.EventHandler(this.MinMsDurationsTextBox_Leave);
             // 
-            // MinMsDurationsHelpLabel
+            // MinMsDurationHelpLabel
             // 
-            this.MinMsDurationsHelpLabel.AutoSize = true;
-            this.MinMsDurationsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.MinMsDurationsHelpLabel.Location = new System.Drawing.Point(211, 528);
-            this.MinMsDurationsHelpLabel.Name = "MinMsDurationsHelpLabel";
-            this.MinMsDurationsHelpLabel.Size = new System.Drawing.Size(149, 14);
-            this.MinMsDurationsHelpLabel.TabIndex = 174;
-            this.MinMsDurationsHelpLabel.Text = "1 integer value greater than 0";
+            this.MinMsDurationHelpLabel.AutoSize = true;
+            this.MinMsDurationHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.MinMsDurationHelpLabel.Location = new System.Drawing.Point(211, 528);
+            this.MinMsDurationHelpLabel.Name = "MinMsDurationHelpLabel";
+            this.MinMsDurationHelpLabel.Size = new System.Drawing.Size(149, 14);
+            this.MinMsDurationHelpLabel.TabIndex = 174;
+            this.MinMsDurationHelpLabel.Text = "1 integer value greater than 0";
             // 
             // MidiInstrumentsHelpButton
             // 
@@ -364,16 +364,16 @@
             this.ModulationWheelEnvelopeTextBox.TabIndex = 7;
             this.ModulationWheelEnvelopeTextBox.Leave += new System.EventHandler(this.ModulationWheelEnvelopeTextBox_Leave);
             // 
-            // VelocityEnvelopeHelpLabel
+            // ExpressionEnvelopeHelpLabel
             // 
-            this.VelocityEnvelopeHelpLabel.AutoSize = true;
-            this.VelocityEnvelopeHelpLabel.Enabled = false;
-            this.VelocityEnvelopeHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.VelocityEnvelopeHelpLabel.Location = new System.Drawing.Point(735, 433);
-            this.VelocityEnvelopeHelpLabel.Name = "VelocityEnvelopeHelpLabel";
-            this.VelocityEnvelopeHelpLabel.Size = new System.Drawing.Size(64, 14);
-            this.VelocityEnvelopeHelpLabel.TabIndex = 172;
-            this.VelocityEnvelopeHelpLabel.Text = "1 envelope*";
+            this.ExpressionEnvelopeHelpLabel.AutoSize = true;
+            this.ExpressionEnvelopeHelpLabel.Enabled = false;
+            this.ExpressionEnvelopeHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.ExpressionEnvelopeHelpLabel.Location = new System.Drawing.Point(735, 433);
+            this.ExpressionEnvelopeHelpLabel.Name = "ExpressionEnvelopeHelpLabel";
+            this.ExpressionEnvelopeHelpLabel.Size = new System.Drawing.Size(64, 14);
+            this.ExpressionEnvelopeHelpLabel.TabIndex = 172;
+            this.ExpressionEnvelopeHelpLabel.Text = "1 envelope*";
             // 
             // PanEnvelopeHelpLabel
             // 
@@ -397,26 +397,26 @@
             this.ModulationWheelEnvelopeHelpLabel.TabIndex = 167;
             this.ModulationWheelEnvelopeHelpLabel.Text = "1 envelope*";
             // 
-            // MinMsDurationsLabel
+            // MinMsDurationLabel
             // 
-            this.MinMsDurationsLabel.AutoSize = true;
-            this.MinMsDurationsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.MinMsDurationsLabel.Location = new System.Drawing.Point(31, 528);
-            this.MinMsDurationsLabel.Name = "MinMsDurationsLabel";
-            this.MinMsDurationsLabel.Size = new System.Drawing.Size(148, 14);
-            this.MinMsDurationsLabel.TabIndex = 175;
-            this.MinMsDurationsLabel.Text = "( minimum chord duration (1))";
-            this.MinMsDurationsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.MinMsDurationLabel.AutoSize = true;
+            this.MinMsDurationLabel.ForeColor = System.Drawing.Color.Brown;
+            this.MinMsDurationLabel.Location = new System.Drawing.Point(59, 528);
+            this.MinMsDurationLabel.Name = "MinMsDurationLabel";
+            this.MinMsDurationLabel.Size = new System.Drawing.Size(120, 14);
+            this.MinMsDurationLabel.TabIndex = 175;
+            this.MinMsDurationLabel.Text = "minimum chord duration";
+            this.MinMsDurationLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // VelocityEnvelopesLabel
+            // ExpressionEnvelopeLabel
             // 
-            this.VelocityEnvelopesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.VelocityEnvelopesLabel.Location = new System.Drawing.Point(25, 433);
-            this.VelocityEnvelopesLabel.Name = "VelocityEnvelopesLabel";
-            this.VelocityEnvelopesLabel.Size = new System.Drawing.Size(154, 15);
-            this.VelocityEnvelopesLabel.TabIndex = 171;
-            this.VelocityEnvelopesLabel.Text = "( expression envelope (127))";
-            this.VelocityEnvelopesLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.ExpressionEnvelopeLabel.ForeColor = System.Drawing.Color.Brown;
+            this.ExpressionEnvelopeLabel.Location = new System.Drawing.Point(25, 433);
+            this.ExpressionEnvelopeLabel.Name = "ExpressionEnvelopeLabel";
+            this.ExpressionEnvelopeLabel.Size = new System.Drawing.Size(154, 15);
+            this.ExpressionEnvelopeLabel.TabIndex = 171;
+            this.ExpressionEnvelopeLabel.Text = "expression envelope";
+            this.ExpressionEnvelopeLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // OrnamentNumberLabel
             // 
@@ -429,56 +429,56 @@
             this.OrnamentNumberLabel.Text = "ornament number";
             this.OrnamentNumberLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // PanEnvelopesLabel
+            // PanEnvelopeLabel
             // 
-            this.PanEnvelopesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.PanEnvelopesLabel.Location = new System.Drawing.Point(67, 379);
-            this.PanEnvelopesLabel.Name = "PanEnvelopesLabel";
-            this.PanEnvelopesLabel.Size = new System.Drawing.Size(112, 15);
-            this.PanEnvelopesLabel.TabIndex = 164;
-            this.PanEnvelopesLabel.Text = "( pan envelope (64))";
-            this.PanEnvelopesLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.PanEnvelopeLabel.ForeColor = System.Drawing.Color.Brown;
+            this.PanEnvelopeLabel.Location = new System.Drawing.Point(67, 379);
+            this.PanEnvelopeLabel.Name = "PanEnvelopeLabel";
+            this.PanEnvelopeLabel.Size = new System.Drawing.Size(112, 15);
+            this.PanEnvelopeLabel.TabIndex = 164;
+            this.PanEnvelopeLabel.Text = "pan envelope";
+            this.PanEnvelopeLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // PitchwheelEnvelopesLabel
+            // PitchwheelEnvelopeLabel
             // 
-            this.PitchwheelEnvelopesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.PitchwheelEnvelopesLabel.Location = new System.Drawing.Point(32, 352);
-            this.PitchwheelEnvelopesLabel.Name = "PitchwheelEnvelopesLabel";
-            this.PitchwheelEnvelopesLabel.Size = new System.Drawing.Size(147, 15);
-            this.PitchwheelEnvelopesLabel.TabIndex = 163;
-            this.PitchwheelEnvelopesLabel.Text = "( pitchwheel envelope (64))";
-            this.PitchwheelEnvelopesLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.PitchwheelEnvelopeLabel.ForeColor = System.Drawing.Color.Brown;
+            this.PitchwheelEnvelopeLabel.Location = new System.Drawing.Point(32, 352);
+            this.PitchwheelEnvelopeLabel.Name = "PitchwheelEnvelopeLabel";
+            this.PitchwheelEnvelopeLabel.Size = new System.Drawing.Size(147, 15);
+            this.PitchwheelEnvelopeLabel.TabIndex = 163;
+            this.PitchwheelEnvelopeLabel.Text = "pitchwheel envelope";
+            this.PitchwheelEnvelopeLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // PitchwheelDeviationsLabel
+            // PitchwheelDeviationLabel
             // 
-            this.PitchwheelDeviationsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.PitchwheelDeviationsLabel.Location = new System.Drawing.Point(39, 325);
-            this.PitchwheelDeviationsLabel.Name = "PitchwheelDeviationsLabel";
-            this.PitchwheelDeviationsLabel.Size = new System.Drawing.Size(140, 15);
-            this.PitchwheelDeviationsLabel.TabIndex = 162;
-            this.PitchwheelDeviationsLabel.Text = "( pitchwheel deviation (2))";
-            this.PitchwheelDeviationsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.PitchwheelDeviationLabel.ForeColor = System.Drawing.Color.Brown;
+            this.PitchwheelDeviationLabel.Location = new System.Drawing.Point(39, 325);
+            this.PitchwheelDeviationLabel.Name = "PitchwheelDeviationLabel";
+            this.PitchwheelDeviationLabel.Size = new System.Drawing.Size(140, 15);
+            this.PitchwheelDeviationLabel.TabIndex = 162;
+            this.PitchwheelDeviationLabel.Text = "pitchwheel deviation";
+            this.PitchwheelDeviationLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // ModulationWheelEnvelopesLabel
+            // ModulationWheelEnvelopeLabel
             // 
-            this.ModulationWheelEnvelopesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.ModulationWheelEnvelopesLabel.Location = new System.Drawing.Point(7, 406);
-            this.ModulationWheelEnvelopesLabel.Name = "ModulationWheelEnvelopesLabel";
-            this.ModulationWheelEnvelopesLabel.Size = new System.Drawing.Size(172, 15);
-            this.ModulationWheelEnvelopesLabel.TabIndex = 161;
-            this.ModulationWheelEnvelopesLabel.Text = "( modulation wheel envelope (0))";
-            this.ModulationWheelEnvelopesLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.ModulationWheelEnvelopeLabel.ForeColor = System.Drawing.Color.Brown;
+            this.ModulationWheelEnvelopeLabel.Location = new System.Drawing.Point(7, 406);
+            this.ModulationWheelEnvelopeLabel.Name = "ModulationWheelEnvelopeLabel";
+            this.ModulationWheelEnvelopeLabel.Size = new System.Drawing.Size(172, 15);
+            this.ModulationWheelEnvelopeLabel.TabIndex = 161;
+            this.ModulationWheelEnvelopeLabel.Text = "modulation wheel envelope";
+            this.ModulationWheelEnvelopeLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // PitchWheelEnvelopeHelpLabel
+            // PitchwheelEnvelopeHelpLabel
             // 
-            this.PitchWheelEnvelopeHelpLabel.AutoSize = true;
-            this.PitchWheelEnvelopeHelpLabel.Enabled = false;
-            this.PitchWheelEnvelopeHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.PitchWheelEnvelopeHelpLabel.Location = new System.Drawing.Point(735, 352);
-            this.PitchWheelEnvelopeHelpLabel.Name = "PitchWheelEnvelopeHelpLabel";
-            this.PitchWheelEnvelopeHelpLabel.Size = new System.Drawing.Size(64, 14);
-            this.PitchWheelEnvelopeHelpLabel.TabIndex = 191;
-            this.PitchWheelEnvelopeHelpLabel.Text = "1 envelope*";
+            this.PitchwheelEnvelopeHelpLabel.AutoSize = true;
+            this.PitchwheelEnvelopeHelpLabel.Enabled = false;
+            this.PitchwheelEnvelopeHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.PitchwheelEnvelopeHelpLabel.Location = new System.Drawing.Point(735, 352);
+            this.PitchwheelEnvelopeHelpLabel.Name = "PitchwheelEnvelopeHelpLabel";
+            this.PitchwheelEnvelopeHelpLabel.Size = new System.Drawing.Size(64, 14);
+            this.PitchwheelEnvelopeHelpLabel.TabIndex = 191;
+            this.PitchwheelEnvelopeHelpLabel.Text = "1 envelope*";
             // 
             // SaveAndCloseButton
             // 
@@ -709,12 +709,12 @@
             // ChordOffLabel
             // 
             this.ChordOffLabel.AutoSize = true;
-            this.ChordOffLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.ChordOffLabel.Location = new System.Drawing.Point(76, 118);
+            this.ChordOffLabel.ForeColor = System.Drawing.Color.Brown;
+            this.ChordOffLabel.Location = new System.Drawing.Point(104, 118);
             this.ChordOffLabel.Name = "ChordOffLabel";
-            this.ChordOffLabel.Size = new System.Drawing.Size(80, 14);
+            this.ChordOffLabel.Size = new System.Drawing.Size(52, 14);
             this.ChordOffLabel.TabIndex = 158;
-            this.ChordOffLabel.Text = "( chord off (1))";
+            this.ChordOffLabel.Text = "chord off";
             this.ChordOffLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // ChordDensityLabel
@@ -753,12 +753,12 @@
             // VerticalVelocityFactorLabel
             // 
             this.VerticalVelocityFactorLabel.AutoSize = true;
-            this.VerticalVelocityFactorLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.VerticalVelocityFactorLabel.Location = new System.Drawing.Point(29, 196);
+            this.VerticalVelocityFactorLabel.ForeColor = System.Drawing.Color.Brown;
+            this.VerticalVelocityFactorLabel.Location = new System.Drawing.Point(72, 196);
             this.VerticalVelocityFactorLabel.Name = "VerticalVelocityFactorLabel";
-            this.VerticalVelocityFactorLabel.Size = new System.Drawing.Size(157, 14);
+            this.VerticalVelocityFactorLabel.Size = new System.Drawing.Size(114, 14);
             this.VerticalVelocityFactorLabel.TabIndex = 149;
-            this.VerticalVelocityFactorLabel.Text = "( vertical velocity factor ( 1.0 ))";
+            this.VerticalVelocityFactorLabel.Text = "vertical velocity factor";
             this.VerticalVelocityFactorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // MidiEventButton
@@ -791,13 +791,13 @@
             this.Controls.Add(this.BasicChordControlsPanel);
             this.Controls.Add(this.CloseWithoutSavingButton);
             this.Controls.Add(this.SaveAndCloseButton);
-            this.Controls.Add(this.PitchWheelEnvelopeHelpLabel);
+            this.Controls.Add(this.PitchwheelEnvelopeHelpLabel);
             this.Controls.Add(this.RepeatsHelpLabel);
             this.Controls.Add(this.RepeatsTextBox);
             this.Controls.Add(this.RepeatsLabel);
             this.Controls.Add(this.BankIndexTextBox);
             this.Controls.Add(this.BankIndexHelpLabel);
-            this.Controls.Add(this.BankIndicesLabel);
+            this.Controls.Add(this.BankIndexLabel);
             this.Controls.Add(this.PatchIndexTextBox);
             this.Controls.Add(this.PatchIndexHelpLabel);
             this.Controls.Add(this.PatchIndicesLabel);
@@ -805,8 +805,8 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.midiLabel);
             this.Controls.Add(this.EnvelopesExtraHelpLabel);
-            this.Controls.Add(this.MinMsDurationsTextBox);
-            this.Controls.Add(this.MinMsDurationsHelpLabel);
+            this.Controls.Add(this.MinMsDurationTextBox);
+            this.Controls.Add(this.MinMsDurationHelpLabel);
             this.Controls.Add(this.MidiInstrumentsHelpButton);
             this.Controls.Add(this.MidiPitchesHelpButton);
             this.Controls.Add(this.HelpTextLabel);
@@ -819,16 +819,16 @@
             this.Controls.Add(this.PitchwheelEnvelopeTextBox);
             this.Controls.Add(this.PitchwheelDeviationTextBox);
             this.Controls.Add(this.ModulationWheelEnvelopeTextBox);
-            this.Controls.Add(this.VelocityEnvelopeHelpLabel);
+            this.Controls.Add(this.ExpressionEnvelopeHelpLabel);
             this.Controls.Add(this.PanEnvelopeHelpLabel);
             this.Controls.Add(this.ModulationWheelEnvelopeHelpLabel);
-            this.Controls.Add(this.MinMsDurationsLabel);
-            this.Controls.Add(this.VelocityEnvelopesLabel);
+            this.Controls.Add(this.MinMsDurationLabel);
+            this.Controls.Add(this.ExpressionEnvelopeLabel);
             this.Controls.Add(this.OrnamentNumberLabel);
-            this.Controls.Add(this.PanEnvelopesLabel);
-            this.Controls.Add(this.PitchwheelEnvelopesLabel);
-            this.Controls.Add(this.PitchwheelDeviationsLabel);
-            this.Controls.Add(this.ModulationWheelEnvelopesLabel);
+            this.Controls.Add(this.PanEnvelopeLabel);
+            this.Controls.Add(this.PitchwheelEnvelopeLabel);
+            this.Controls.Add(this.PitchwheelDeviationLabel);
+            this.Controls.Add(this.ModulationWheelEnvelopeLabel);
             this.Controls.Add(this.label2);
             this.Font = new System.Drawing.Font("Arial", 8F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -850,7 +850,7 @@
         public System.Windows.Forms.Label RepeatsLabel;
         public System.Windows.Forms.TextBox BankIndexTextBox;
         public System.Windows.Forms.Label BankIndexHelpLabel;
-        public System.Windows.Forms.Label BankIndicesLabel;
+        public System.Windows.Forms.Label BankIndexLabel;
         public System.Windows.Forms.TextBox PatchIndexTextBox;
         public System.Windows.Forms.Label PatchIndexHelpLabel;
         public System.Windows.Forms.Label PatchIndicesLabel;
@@ -858,8 +858,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label midiLabel;
         private System.Windows.Forms.Label EnvelopesExtraHelpLabel;
-        public System.Windows.Forms.TextBox MinMsDurationsTextBox;
-        private System.Windows.Forms.Label MinMsDurationsHelpLabel;
+        public System.Windows.Forms.TextBox MinMsDurationTextBox;
+        private System.Windows.Forms.Label MinMsDurationHelpLabel;
         private System.Windows.Forms.Button MidiInstrumentsHelpButton;
         private System.Windows.Forms.Button MidiPitchesHelpButton;
         private System.Windows.Forms.Label HelpTextLabel;
@@ -872,17 +872,17 @@
         public System.Windows.Forms.TextBox PitchwheelEnvelopeTextBox;
         public System.Windows.Forms.TextBox PitchwheelDeviationTextBox;
         public System.Windows.Forms.TextBox ModulationWheelEnvelopeTextBox;
-        private System.Windows.Forms.Label VelocityEnvelopeHelpLabel;
+        private System.Windows.Forms.Label ExpressionEnvelopeHelpLabel;
         private System.Windows.Forms.Label PanEnvelopeHelpLabel;
         private System.Windows.Forms.Label ModulationWheelEnvelopeHelpLabel;
-        private System.Windows.Forms.Label MinMsDurationsLabel;
-        private System.Windows.Forms.Label VelocityEnvelopesLabel;
+        private System.Windows.Forms.Label MinMsDurationLabel;
+        private System.Windows.Forms.Label ExpressionEnvelopeLabel;
         private System.Windows.Forms.Label OrnamentNumberLabel;
-        private System.Windows.Forms.Label PanEnvelopesLabel;
-        private System.Windows.Forms.Label PitchwheelEnvelopesLabel;
-        private System.Windows.Forms.Label PitchwheelDeviationsLabel;
-        private System.Windows.Forms.Label ModulationWheelEnvelopesLabel;
-        private System.Windows.Forms.Label PitchWheelEnvelopeHelpLabel;
+        private System.Windows.Forms.Label PanEnvelopeLabel;
+        private System.Windows.Forms.Label PitchwheelEnvelopeLabel;
+        private System.Windows.Forms.Label PitchwheelDeviationLabel;
+        private System.Windows.Forms.Label ModulationWheelEnvelopeLabel;
+        private System.Windows.Forms.Label PitchwheelEnvelopeHelpLabel;
         private System.Windows.Forms.Button SaveAndCloseButton;
         private System.Windows.Forms.Button CloseWithoutSavingButton;
         private System.Windows.Forms.Panel BasicChordControlsPanel;

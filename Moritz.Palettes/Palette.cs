@@ -81,7 +81,7 @@ namespace Moritz.Palettes
             _expressionEnvelopes = M.StringToByteLists(paletteChordForm.ExpressionEnvelopeTextBox.Text);
 
             _ornamentNumbers = M.StringToIntList(paletteChordForm.OrnamentNumberTextBox.Text, ',');
-            _ornamentMinMsDurations = M.StringToIntList(paletteChordForm.MinMsDurationsTextBox.Text, ',');
+            _ornamentMinMsDurations = M.StringToIntList(paletteChordForm.MinMsDurationTextBox.Text, ',');
 
             _ornamentSettings = null;
             if(paletteChordForm.PaletteForm.OrnamentSettingsForm != null)

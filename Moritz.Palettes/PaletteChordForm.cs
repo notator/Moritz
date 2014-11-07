@@ -18,18 +18,14 @@ namespace Moritz.Palettes
         {
             InitializeComponent();
 
+            Text = paletteForm.Text + ": midi chord " + (midiChordIndex + 1).ToString();
+
             _paletteForm = paletteForm;
             _bcc = bcc;
             _setDialogState = SetDialogState; // delegate
             _midiChordIndex = midiChordIndex;
 
-            Text = "midi chord " + (midiChordIndex + 1).ToString();
-            ChordDensityHelpLabel.Text = "1 integer value in range [ 0.." + _bcc.MaximumChordDensity.ToString() + " ] ( 0 creates a rest. )";
-            RootInversionHelpLabel.Text = "root inversion: " + _bcc.RootInversionTextBox.Text;
-            if(string.IsNullOrEmpty(_bcc.VerticalVelocityFactorsTextBox.Text))
-            {
-                this.VerticalVelocityFactorHelpLabel.Text = "( Edit this value in the main palette. )";
-            }
+            FindEmptyDefaultControls();
 
             InitializeTextBoxes(paletteForm, bcc, midiChordIndex);
 
@@ -38,6 +34,92 @@ namespace Moritz.Palettes
             InitializeMidiEventButton(midiChordIndex);
 
             AddAudioSampleButtons(_paletteForm.Domain);
+        }
+
+        private void FindEmptyDefaultControls()
+        {
+            _emptyDefaultLabels = new List<Label>();
+            _emptyDefaultTextBoxes = new List<TextBox>();
+            _emptyDefaultHelpLabels = new List<Label>();
+
+            if(string.IsNullOrEmpty(_bcc.ChordOffsTextBox.Text))
+            {
+                _emptyDefaultLabels.Add(this.ChordOffLabel);
+                _emptyDefaultTextBoxes.Add(this.ChordOffTextBox);
+                _emptyDefaultHelpLabels.Add(this.ChordOffHelpLabel);
+            }
+
+            if(string.IsNullOrEmpty(_bcc.InversionIndicesTextBox.Text))
+            {
+                _emptyDefaultLabels.Add(this.InversionIndexLabel);
+                _emptyDefaultTextBoxes.Add(this.InversionIndexTextBox);
+                _emptyDefaultHelpLabels.Add(this.InversionIndexHelpLabel);
+            }
+
+            if(string.IsNullOrEmpty(_bcc.VerticalVelocityFactorsTextBox.Text))
+            {
+                _emptyDefaultLabels.Add(this.VerticalVelocityFactorLabel);
+                _emptyDefaultTextBoxes.Add(this.VerticalVelocityFactorTextBox);
+                _emptyDefaultHelpLabels.Add(this.VerticalVelocityFactorHelpLabel);
+            }
+
+            PaletteForm pf = _paletteForm;
+            if(string.IsNullOrEmpty(pf.BankIndicesTextBox.Text))
+            {
+                _emptyDefaultLabels.Add(this.BankIndexLabel);
+                _emptyDefaultTextBoxes.Add(this.BankIndexTextBox);
+                _emptyDefaultHelpLabels.Add(this.BankIndexHelpLabel);
+            }
+
+            if(string.IsNullOrEmpty(pf.RepeatsTextBox.Text))
+            {
+                _emptyDefaultLabels.Add(this.RepeatsLabel);
+                _emptyDefaultTextBoxes.Add(this.RepeatsTextBox);
+                _emptyDefaultHelpLabels.Add(this.RepeatsHelpLabel);
+            }
+
+            if(string.IsNullOrEmpty(pf.PitchwheelDeviationsTextBox.Text))
+            {
+                _emptyDefaultLabels.Add(this.PitchwheelDeviationLabel);
+                _emptyDefaultTextBoxes.Add(this.PitchwheelDeviationTextBox);
+                _emptyDefaultHelpLabels.Add(this.PitchwheelDeviationHelpLabel);
+            }
+
+            if(string.IsNullOrEmpty(pf.PitchwheelEnvelopesTextBox.Text))
+            {
+                _emptyDefaultLabels.Add(this.PitchwheelEnvelopeLabel);
+                _emptyDefaultTextBoxes.Add(this.PitchwheelEnvelopeTextBox);
+                _emptyDefaultHelpLabels.Add(this.PitchwheelEnvelopeHelpLabel);
+            }
+
+            if(string.IsNullOrEmpty(pf.PanEnvelopesTextBox.Text))
+            {
+                _emptyDefaultLabels.Add(this.PanEnvelopeLabel);
+                _emptyDefaultTextBoxes.Add(this.PanEnvelopeTextBox);
+                _emptyDefaultHelpLabels.Add(this.PanEnvelopeHelpLabel);
+            }
+
+            if(string.IsNullOrEmpty(pf.ModulationWheelEnvelopesTextBox.Text))
+            {
+                _emptyDefaultLabels.Add(this.ModulationWheelEnvelopeLabel);
+                _emptyDefaultTextBoxes.Add(this.ModulationWheelEnvelopeTextBox);
+                _emptyDefaultHelpLabels.Add(this.ModulationWheelEnvelopeHelpLabel);
+            }
+
+            if(string.IsNullOrEmpty(pf.ExpressionEnvelopesTextBox.Text))
+            {
+                _emptyDefaultLabels.Add(this.ExpressionEnvelopeLabel);
+                _emptyDefaultTextBoxes.Add(this.ExpressionEnvelopeTextBox);
+                _emptyDefaultHelpLabels.Add(this.ExpressionEnvelopeHelpLabel);
+            }
+
+            if(string.IsNullOrEmpty(pf.MinMsDurationsTextBox.Text))
+            {
+                _emptyDefaultLabels.Add(this.MinMsDurationLabel);
+                _emptyDefaultTextBoxes.Add(this.MinMsDurationTextBox);
+                _emptyDefaultHelpLabels.Add(this.MinMsDurationHelpLabel);
+            }
+
         }
 
         private void InitializeMidiEventButton(int midiChordIndex)
@@ -157,26 +239,34 @@ namespace Moritz.Palettes
             ornamentNumberSBs = GetSubStrings(paletteForm.OrnamentNumbersTextBox.Text, midiChordIndex);
             this.OrnamentNumberTextBox.Text = ornamentNumberSBs[1].ToString();
             minMsDurationsSBs = GetSubStrings(paletteForm.MinMsDurationsTextBox.Text, midiChordIndex);
-            this.MinMsDurationsTextBox.Text = minMsDurationsSBs[1].ToString();
+            this.MinMsDurationTextBox.Text = minMsDurationsSBs[1].ToString();
         }
 
-        private void EnableOrnamentParameters(int numberOfOrnaments)
+        private void SetEnabledOrnamentControls(int numberOfOrnaments)
         {
             Debug.Assert(numberOfOrnaments > 0);
-            OrnamentNumberTextBox.Enabled = true;
-            OrnamentNumberHelpLabel.Text = "1 integer value in range [ 0.." + numberOfOrnaments.ToString() + " ] (0 means no ornament)";
-            MinMsDurationsTextBox.Enabled = true;
-            MinMsDurationsHelpLabel.Text = "1 integer value greater than 0";
+            if(OrnamentNumberHelpLabel.Enabled)
+            {
+                OrnamentNumberHelpLabel.Text = "1 integer value in range [ 0.." + numberOfOrnaments.ToString() + " ] (0 means no ornament)";
+            }
+            if(MinMsDurationHelpLabel.Enabled)
+            {
+                MinMsDurationHelpLabel.Text = "1 integer value greater than 0";
+            }
 
             ShowOrnamentSettingsButton.Enabled = true;
         }
 
-        private void DisableOrnamentParameters()
+        private void DisableOrnamentControls()
         {
+            OrnamentNumberLabel.Enabled = false;
             OrnamentNumberTextBox.Enabled = false;
-            OrnamentNumberHelpLabel.Text = "";
-            MinMsDurationsTextBox.Enabled = false;
-            MinMsDurationsHelpLabel.Text = "";
+            OrnamentNumberHelpLabel.Enabled = false;
+            OrnamentNumberHelpLabel.Text = "(edit palette)";
+            MinMsDurationLabel.Enabled = false;
+            MinMsDurationTextBox.Enabled = false;
+            MinMsDurationHelpLabel.Enabled = false;
+            MinMsDurationHelpLabel.Text = "(edit palette)";
 
             ShowOrnamentSettingsButton.Enabled = false;
         }
@@ -215,7 +305,7 @@ namespace Moritz.Palettes
             allTextBoxes.Add(this.ModulationWheelEnvelopeTextBox);
             allTextBoxes.Add(this.ExpressionEnvelopeTextBox);
             allTextBoxes.Add(this.OrnamentNumberTextBox);
-            allTextBoxes.Add(this.MinMsDurationsTextBox);
+            allTextBoxes.Add(this.MinMsDurationTextBox);
 
             return allTextBoxes;
         }
@@ -276,7 +366,7 @@ namespace Moritz.Palettes
                     _paletteForm.OrnamentNumbersTextBox.Text = ornamentNumberSBs[0].ToString() + this.OrnamentNumberTextBox.Text + ornamentNumberSBs[2].ToString();
                 }
                 
-                _paletteForm.MinMsDurationsTextBox.Text = minMsDurationsSBs[0].ToString() + this.MinMsDurationsTextBox.Text + minMsDurationsSBs[2].ToString();
+                _paletteForm.MinMsDurationsTextBox.Text = minMsDurationsSBs[0].ToString() + this.MinMsDurationTextBox.Text + minMsDurationsSBs[2].ToString();
 
                 _paletteForm.ClosePaletteChordForm(_midiChordIndex);
             }
@@ -304,7 +394,7 @@ namespace Moritz.Palettes
         }
         private void ChordOffTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, true, 1, 0, 1, _setDialogState);
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 1, _setDialogState);
         }
 
         private void EnableAllTextBoxesAndMidiButton()
@@ -325,6 +415,31 @@ namespace Moritz.Palettes
             }
             this.MidiEventButton.Enabled = false;
         }
+        private void DisableEmptyDefaultControls()
+        {
+            foreach(Label label in _emptyDefaultLabels)
+            {
+                label.Enabled = false;
+            }
+            foreach(TextBox textBox in _emptyDefaultTextBoxes)
+            {
+                textBox.Enabled = false;
+            }
+            foreach(Label label in _emptyDefaultHelpLabels)
+            {
+                label.Enabled = false;
+            }
+        }
+        private void SetHelpTexts()
+        {
+            ChordDensityHelpLabel.Text = "1 integer value in range [ 0.." + _bcc.MaximumChordDensity.ToString() + " ] ( 0 creates a rest. )";
+            RootInversionHelpLabel.Text = "root inversion: " + _bcc.RootInversionTextBox.Text;
+
+            foreach(Label label in _emptyDefaultHelpLabels)
+            {
+                label.Text = "(edit palette)";
+            }
+        }
         private void ChordDensityTextBox_Leave(object sender, EventArgs e)
         {
             TextBox chordDensityTextBox = sender as TextBox;
@@ -340,14 +455,8 @@ namespace Moritz.Palettes
             {
                 EnableAllTextBoxesAndMidiButton();
 
-                if(string.IsNullOrEmpty(_bcc.InversionIndicesTextBox.Text))
-                {
-                    this.InversionIndexTextBox.Enabled = false;
-                }
-                if(string.IsNullOrEmpty(_bcc.VerticalVelocityFactorsTextBox.Text))
-                {
-                    this.VerticalVelocityFactorTextBox.Enabled = false;
-                }
+                DisableEmptyDefaultControls();
+                SetHelpTexts();
 
                 int thisChordDensity = int.Parse(chordDensityTextBox.Text);
                 if(thisChordDensity == 0) // a rest
@@ -367,17 +476,15 @@ namespace Moritz.Palettes
                     int inversionsMaxIndex = ((2 * (_bcc.MaximumChordDensity - 2)) - 1);
                     InversionIndexHelpLabel.Text = "1 integer value in range [ 0.." + inversionsMaxIndex.ToString() + " ]";
                 }
-                else
-                {
-                    InversionIndexHelpLabel.Text = "";
-                }
 
                 if(_paletteForm.OrnamentSettingsForm != null && _paletteForm.OrnamentSettingsForm.Ornaments != null)
-                    EnableOrnamentParameters(_paletteForm.OrnamentSettingsForm.Ornaments.Count);
+                    SetEnabledOrnamentControls(_paletteForm.OrnamentSettingsForm.Ornaments.Count);
                 else
-                    DisableOrnamentParameters();
+                    DisableOrnamentControls();
             }
         }
+
+
 
         private void InversionIndexTextBox_Leave(object sender, EventArgs e)
         {
@@ -390,15 +497,11 @@ namespace Moritz.Palettes
         }
         private void VerticalVelocityFactorTextBox_Leave(object sender, EventArgs e)
         {
-            TextBox textBox = sender as TextBox;
-            if(textBox != null)
-            {
-                M.LeaveFloatRangeTextBox(sender as TextBox, true, 1, 0F, float.MaxValue, _setDialogState);
-            }
+            M.LeaveFloatRangeTextBox(sender as TextBox, false, 1, 0F, float.MaxValue, _setDialogState);
         }
         private void BankIndexTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, true, 1, 0, 127, _setDialogState);
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, _setDialogState);
         }
         private void PatchIndexTextBox_Leave(object sender, EventArgs e)
         {
@@ -406,11 +509,11 @@ namespace Moritz.Palettes
         }
         private void RepeatsTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, true, 1, 0, 1, _setDialogState);
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 1, _setDialogState);
         }
         private void PitchwheelDeviationTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, true, 1, 0, 127, _setDialogState);
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, _setDialogState);
         }
         private void CheckEnvelope(TextBox textBox)
         {
@@ -450,14 +553,11 @@ namespace Moritz.Palettes
         }
         private void OrnamentNumberTextBox_Leave(object sender, EventArgs e)
         {
-            if(_paletteForm.OrnamentSettingsForm != null && _paletteForm.OrnamentSettingsForm.Ornaments != null)
-            {
-                M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, _paletteForm.OrnamentSettingsForm.Ornaments.Count, _setDialogState);
-            }
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, _paletteForm.OrnamentSettingsForm.Ornaments.Count, _setDialogState);
         }
         private void MinMsDurationsTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, true, 1, 0, int.MaxValue, _setDialogState);
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, int.MaxValue, _setDialogState);
         }
         #endregion TextBox_Leave handlers
 
@@ -559,6 +659,9 @@ namespace Moritz.Palettes
         PaletteForm _paletteForm;
         BasicChordControl _bcc;
         int _midiChordIndex;
+        List<Label> _emptyDefaultLabels;
+        List<TextBox> _emptyDefaultTextBoxes;
+        List<Label> _emptyDefaultHelpLabels;
         public List<Button> AudioSampleButtons;
         #endregion  private variables
     }

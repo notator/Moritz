@@ -443,7 +443,7 @@ namespace Moritz.Palettes
             PitchwheelEnvelopesHelpLabel.Text = envelopesHelpString;
             PanEnvelopesHelpLabel.Text = envelopesHelpString;
             ModulationWheelEnvelopesHelpLabel.Text = envelopesHelpString;
-            VelocityEnvelopesHelpLabel.Text = envelopesHelpString;
+            ExpressionEnvelopesHelpLabel.Text = envelopesHelpString;
             #endregion HelpLabels
         }
 
@@ -535,9 +535,9 @@ namespace Moritz.Palettes
             PanEnvelopesTextBox.Enabled = true;
             PanEnvelopesHelpLabel.Enabled = true;
 
-            VelocityEnvelopesLabel.Enabled = true;
+            ExpressionEnvelopesLabel.Enabled = true;
             ExpressionEnvelopesTextBox.Enabled = true;
-            VelocityEnvelopesHelpLabel.Enabled = true;
+            ExpressionEnvelopesHelpLabel.Enabled = true;
         }
 
         private string DefaultRootInversionString(int count)

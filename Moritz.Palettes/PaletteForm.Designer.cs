@@ -50,8 +50,8 @@ namespace Moritz.Palettes
             this.PitchwheelDeviationsLabel = new System.Windows.Forms.Label();
             this.ModulationWheelEnvelopesLabel = new System.Windows.Forms.Label();
             this.ExpressionEnvelopesTextBox = new System.Windows.Forms.TextBox();
-            this.VelocityEnvelopesLabel = new System.Windows.Forms.Label();
-            this.VelocityEnvelopesHelpLabel = new System.Windows.Forms.Label();
+            this.ExpressionEnvelopesLabel = new System.Windows.Forms.Label();
+            this.ExpressionEnvelopesHelpLabel = new System.Windows.Forms.Label();
             this.HelpTextLabel = new System.Windows.Forms.Label();
             this.MidiPitchesHelpButton = new System.Windows.Forms.Button();
             this.MidiInstrumentsHelpButton = new System.Windows.Forms.Button();
@@ -263,25 +263,25 @@ namespace Moritz.Palettes
             this.ExpressionEnvelopesTextBox.TextChanged += new System.EventHandler(this.ExpressionEnvelopesTextBox_TextChanged);
             this.ExpressionEnvelopesTextBox.Leave += new System.EventHandler(this.ExpressionEnvelopesTextBox_Leave);
             // 
-            // VelocityEnvelopesLabel
+            // ExpressionEnvelopesLabel
             // 
-            this.VelocityEnvelopesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.VelocityEnvelopesLabel.Location = new System.Drawing.Point(19, 460);
-            this.VelocityEnvelopesLabel.Name = "VelocityEnvelopesLabel";
-            this.VelocityEnvelopesLabel.Size = new System.Drawing.Size(154, 14);
-            this.VelocityEnvelopesLabel.TabIndex = 63;
-            this.VelocityEnvelopesLabel.Text = "( expression envelopes (127))";
+            this.ExpressionEnvelopesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+            this.ExpressionEnvelopesLabel.Location = new System.Drawing.Point(19, 460);
+            this.ExpressionEnvelopesLabel.Name = "ExpressionEnvelopesLabel";
+            this.ExpressionEnvelopesLabel.Size = new System.Drawing.Size(154, 14);
+            this.ExpressionEnvelopesLabel.TabIndex = 63;
+            this.ExpressionEnvelopesLabel.Text = "( expression envelopes (127))";
             // 
-            // VelocityEnvelopesHelpLabel
+            // ExpressionEnvelopesHelpLabel
             // 
-            this.VelocityEnvelopesHelpLabel.AutoSize = true;
-            this.VelocityEnvelopesHelpLabel.Enabled = false;
-            this.VelocityEnvelopesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.VelocityEnvelopesHelpLabel.Location = new System.Drawing.Point(728, 460);
-            this.VelocityEnvelopesHelpLabel.Name = "VelocityEnvelopesHelpLabel";
-            this.VelocityEnvelopesHelpLabel.Size = new System.Drawing.Size(70, 14);
-            this.VelocityEnvelopesHelpLabel.TabIndex = 65;
-            this.VelocityEnvelopesHelpLabel.Text = "7 envelopes*";
+            this.ExpressionEnvelopesHelpLabel.AutoSize = true;
+            this.ExpressionEnvelopesHelpLabel.Enabled = false;
+            this.ExpressionEnvelopesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.ExpressionEnvelopesHelpLabel.Location = new System.Drawing.Point(728, 460);
+            this.ExpressionEnvelopesHelpLabel.Name = "ExpressionEnvelopesHelpLabel";
+            this.ExpressionEnvelopesHelpLabel.Size = new System.Drawing.Size(70, 14);
+            this.ExpressionEnvelopesHelpLabel.TabIndex = 65;
+            this.ExpressionEnvelopesHelpLabel.Text = "7 envelopes*";
             // 
             // HelpTextLabel
             // 
@@ -547,12 +547,12 @@ namespace Moritz.Palettes
             this.Controls.Add(this.PitchwheelEnvelopesTextBox);
             this.Controls.Add(this.PitchwheelDeviationsTextBox);
             this.Controls.Add(this.ModulationWheelEnvelopesTextBox);
-            this.Controls.Add(this.VelocityEnvelopesHelpLabel);
+            this.Controls.Add(this.ExpressionEnvelopesHelpLabel);
             this.Controls.Add(this.PanEnvelopesHelpLabel);
             this.Controls.Add(this.PitchwheelEnvelopesHelpLabel);
             this.Controls.Add(this.ModulationWheelEnvelopesHelpLabel);
             this.Controls.Add(this.MinMsDurationsLabel);
-            this.Controls.Add(this.VelocityEnvelopesLabel);
+            this.Controls.Add(this.ExpressionEnvelopesLabel);
             this.Controls.Add(this.OrnamentNumbersLabel);
             this.Controls.Add(this.PanEnvelopesLabel);
             this.Controls.Add(this.PitchwheelEnvelopesLabel);
@@ -581,14 +581,13 @@ namespace Moritz.Palettes
         private System.Windows.Forms.Button ShowOrnamentSettingsButton;
         private System.Windows.Forms.Label PanEnvelopesLabel;
         private System.Windows.Forms.Label PanEnvelopesHelpLabel;
-        private System.Windows.Forms.Label PitchwheelDeviationsHelpLabel;
         private System.Windows.Forms.Label PitchwheelEnvelopesHelpLabel;
         private System.Windows.Forms.Label ModulationWheelEnvelopesHelpLabel;
         private System.Windows.Forms.Label PitchwheelEnvelopesLabel;
         private System.Windows.Forms.Label PitchwheelDeviationsLabel;
         private System.Windows.Forms.Label ModulationWheelEnvelopesLabel;
-        private System.Windows.Forms.Label VelocityEnvelopesLabel;
-        private System.Windows.Forms.Label VelocityEnvelopesHelpLabel;
+        private System.Windows.Forms.Label ExpressionEnvelopesLabel;
+        private System.Windows.Forms.Label ExpressionEnvelopesHelpLabel;
         private System.Windows.Forms.Label HelpTextLabel;
         private System.Windows.Forms.Button MidiPitchesHelpButton;
         private System.Windows.Forms.Button MidiInstrumentsHelpButton;
@@ -608,15 +607,16 @@ namespace Moritz.Palettes
         private System.Windows.Forms.Label AudioHelpLabel;
         private System.Windows.Forms.Button SaveSettingsButton;
         public System.Windows.Forms.TextBox BankIndicesTextBox;
-        public System.Windows.Forms.Label BankIndicesHelpLabel;
         public System.Windows.Forms.Label BankIndicesLabel;
         public System.Windows.Forms.TextBox PatchIndicesTextBox;
-        public System.Windows.Forms.Label PatchIndicesHelpLabel;
         public System.Windows.Forms.Label PatchIndicesLabel;
-        public System.Windows.Forms.Label RepeatsHelpLabel;
         public System.Windows.Forms.TextBox RepeatsTextBox;
         private System.Windows.Forms.Label MidiChordLabel;
         public System.Windows.Forms.Label RepeatsLabel;
+        private System.Windows.Forms.Label PitchwheelDeviationsHelpLabel;
+        private System.Windows.Forms.Label BankIndicesHelpLabel;
+        private System.Windows.Forms.Label PatchIndicesHelpLabel;
+        private System.Windows.Forms.Label RepeatsHelpLabel;
     }
 }
 
