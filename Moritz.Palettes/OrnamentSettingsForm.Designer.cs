@@ -36,12 +36,6 @@ namespace Moritz.Palettes
             this.ShowContainingPalletButton = new System.Windows.Forms.Button();
             this.ShowMainScoreFormButton = new System.Windows.Forms.Button();
             this.OrnamentValueValuesHelpLabel2 = new System.Windows.Forms.Label();
-            this.BankIndicesTextBox = new System.Windows.Forms.TextBox();
-            this.BankIndicesHelpLabel = new System.Windows.Forms.Label();
-            this.BankIndicesLabel = new System.Windows.Forms.Label();
-            this.PatchIndicesTextBox = new System.Windows.Forms.TextBox();
-            this.PatchIndicesHelpLabel = new System.Windows.Forms.Label();
-            this.PatchIndicesLabel = new System.Windows.Forms.Label();
             this.NumBasicChordDefsHelpLabel = new System.Windows.Forms.Label();
             this.NumBasicChordDefsTextBox = new System.Windows.Forms.TextBox();
             this.NumBasicChordDefsLabel = new System.Windows.Forms.Label();
@@ -85,6 +79,12 @@ namespace Moritz.Palettes
             this.label12 = new System.Windows.Forms.Label();
             this.BottomPanel = new System.Windows.Forms.Panel();
             this.TopPanel = new System.Windows.Forms.Panel();
+            this.BankIndicesTextBox = new System.Windows.Forms.TextBox();
+            this.PatchIndicesHelpLabel = new System.Windows.Forms.Label();
+            this.PatchIndicesLabel = new System.Windows.Forms.Label();
+            this.BankIndicesHelpLabel = new System.Windows.Forms.Label();
+            this.PatchIndicesTextBox = new System.Windows.Forms.TextBox();
+            this.BankIndicesLabel = new System.Windows.Forms.Label();
             this.OrnamentsGroupBox.SuspendLayout();
             this.BottomPanel.SuspendLayout();
             this.TopPanel.SuspendLayout();
@@ -95,7 +95,7 @@ namespace Moritz.Palettes
             this.NumberOfOrnamentsTextBox.Location = new System.Drawing.Point(128, 19);
             this.NumberOfOrnamentsTextBox.Name = "NumberOfOrnamentsTextBox";
             this.NumberOfOrnamentsTextBox.Size = new System.Drawing.Size(26, 20);
-            this.NumberOfOrnamentsTextBox.TabIndex = 2;
+            this.NumberOfOrnamentsTextBox.TabIndex = 0;
             this.NumberOfOrnamentsTextBox.Leave += new System.EventHandler(this.NumberOfOrnamentsTextBox_Leave);
             // 
             // NumberOfOrnamentsLabel
@@ -125,7 +125,7 @@ namespace Moritz.Palettes
             this.ShowContainingPalletButton.Location = new System.Drawing.Point(634, 27);
             this.ShowContainingPalletButton.Name = "ShowContainingPalletButton";
             this.ShowContainingPalletButton.Size = new System.Drawing.Size(157, 36);
-            this.ShowContainingPalletButton.TabIndex = 3;
+            this.ShowContainingPalletButton.TabIndex = 0;
             this.ShowContainingPalletButton.Text = "show containing palette";
             this.ShowContainingPalletButton.UseVisualStyleBackColor = false;
             this.ShowContainingPalletButton.Click += new System.EventHandler(this.ShowContainingPaletteButton_Click);
@@ -137,7 +137,7 @@ namespace Moritz.Palettes
             this.ShowMainScoreFormButton.Location = new System.Drawing.Point(634, 80);
             this.ShowMainScoreFormButton.Name = "ShowMainScoreFormButton";
             this.ShowMainScoreFormButton.Size = new System.Drawing.Size(157, 36);
-            this.ShowMainScoreFormButton.TabIndex = 4;
+            this.ShowMainScoreFormButton.TabIndex = 1;
             this.ShowMainScoreFormButton.Text = "show main score form";
             this.ShowMainScoreFormButton.UseVisualStyleBackColor = false;
             this.ShowMainScoreFormButton.Click += new System.EventHandler(this.ShowMainScoreFormButton_Click);
@@ -152,62 +152,6 @@ namespace Moritz.Palettes
             this.OrnamentValueValuesHelpLabel2.Size = new System.Drawing.Size(309, 14);
             this.OrnamentValueValuesHelpLabel2.TabIndex = 46;
             this.OrnamentValueValuesHelpLabel2.Text = "These values override the root chord\'s bank and patch values.";
-            // 
-            // BankIndicesTextBox
-            // 
-            this.BankIndicesTextBox.Location = new System.Drawing.Point(165, 280);
-            this.BankIndicesTextBox.Name = "BankIndicesTextBox";
-            this.BankIndicesTextBox.Size = new System.Drawing.Size(454, 20);
-            this.BankIndicesTextBox.TabIndex = 145;
-            this.BankIndicesTextBox.Leave += new System.EventHandler(this.BankIndicesTextBox_Leave);
-            // 
-            // BankIndicesHelpLabel
-            // 
-            this.BankIndicesHelpLabel.AutoSize = true;
-            this.BankIndicesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.BankIndicesHelpLabel.Location = new System.Drawing.Point(626, 284);
-            this.BankIndicesHelpLabel.Name = "BankIndicesHelpLabel";
-            this.BankIndicesHelpLabel.Size = new System.Drawing.Size(171, 14);
-            this.BankIndicesHelpLabel.TabIndex = 150;
-            this.BankIndicesHelpLabel.Text = "7 integer values in range [ 0..127 ]";
-            // 
-            // BankIndicesLabel
-            // 
-            this.BankIndicesLabel.AutoSize = true;
-            this.BankIndicesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.BankIndicesLabel.Location = new System.Drawing.Point(83, 284);
-            this.BankIndicesLabel.Name = "BankIndicesLabel";
-            this.BankIndicesLabel.Size = new System.Drawing.Size(81, 14);
-            this.BankIndicesLabel.TabIndex = 149;
-            this.BankIndicesLabel.Text = "( bank indices )";
-            // 
-            // PatchIndicesTextBox
-            // 
-            this.PatchIndicesTextBox.Location = new System.Drawing.Point(165, 307);
-            this.PatchIndicesTextBox.Name = "PatchIndicesTextBox";
-            this.PatchIndicesTextBox.Size = new System.Drawing.Size(454, 20);
-            this.PatchIndicesTextBox.TabIndex = 146;
-            this.PatchIndicesTextBox.Leave += new System.EventHandler(this.PatchIndicesTextBox_Leave);
-            // 
-            // PatchIndicesHelpLabel
-            // 
-            this.PatchIndicesHelpLabel.AutoSize = true;
-            this.PatchIndicesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.PatchIndicesHelpLabel.Location = new System.Drawing.Point(626, 309);
-            this.PatchIndicesHelpLabel.Name = "PatchIndicesHelpLabel";
-            this.PatchIndicesHelpLabel.Size = new System.Drawing.Size(171, 14);
-            this.PatchIndicesHelpLabel.TabIndex = 148;
-            this.PatchIndicesHelpLabel.Text = "7 integer values in range [ 0..127 ]";
-            // 
-            // PatchIndicesLabel
-            // 
-            this.PatchIndicesLabel.AutoSize = true;
-            this.PatchIndicesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.PatchIndicesLabel.Location = new System.Drawing.Point(79, 309);
-            this.PatchIndicesLabel.Name = "PatchIndicesLabel";
-            this.PatchIndicesLabel.Size = new System.Drawing.Size(85, 14);
-            this.PatchIndicesLabel.TabIndex = 147;
-            this.PatchIndicesLabel.Text = "( patch indices )";
             // 
             // NumBasicChordDefsHelpLabel
             // 
@@ -225,7 +169,7 @@ namespace Moritz.Palettes
             this.NumBasicChordDefsTextBox.Location = new System.Drawing.Point(148, 7);
             this.NumBasicChordDefsTextBox.Name = "NumBasicChordDefsTextBox";
             this.NumBasicChordDefsTextBox.Size = new System.Drawing.Size(26, 20);
-            this.NumBasicChordDefsTextBox.TabIndex = 151;
+            this.NumBasicChordDefsTextBox.TabIndex = 0;
             this.NumBasicChordDefsTextBox.Leave += new System.EventHandler(this.NumBasicChordDefsTextBox_Leave);
             // 
             // NumBasicChordDefsLabel
@@ -271,7 +215,7 @@ namespace Moritz.Palettes
             this.OrnamentsGroupBox.Location = new System.Drawing.Point(20, 340);
             this.OrnamentsGroupBox.Name = "OrnamentsGroupBox";
             this.OrnamentsGroupBox.Size = new System.Drawing.Size(795, 358);
-            this.OrnamentsGroupBox.TabIndex = 155;
+            this.OrnamentsGroupBox.TabIndex = 1;
             this.OrnamentsGroupBox.TabStop = false;
             this.OrnamentsGroupBox.Text = "ornament definitions";
             // 
@@ -280,7 +224,7 @@ namespace Moritz.Palettes
             this.Ornament12TextBox.Location = new System.Drawing.Point(128, 331);
             this.Ornament12TextBox.Name = "Ornament12TextBox";
             this.Ornament12TextBox.Size = new System.Drawing.Size(561, 20);
-            this.Ornament12TextBox.TabIndex = 178;
+            this.Ornament12TextBox.TabIndex = 12;
             this.Ornament12TextBox.Leave += new System.EventHandler(this.Ornament12TextBox_Leave);
             // 
             // OrnamentDefRangeLabel
@@ -308,7 +252,7 @@ namespace Moritz.Palettes
             this.Ornament11TextBox.Location = new System.Drawing.Point(128, 305);
             this.Ornament11TextBox.Name = "Ornament11TextBox";
             this.Ornament11TextBox.Size = new System.Drawing.Size(561, 20);
-            this.Ornament11TextBox.TabIndex = 176;
+            this.Ornament11TextBox.TabIndex = 11;
             this.Ornament11TextBox.Leave += new System.EventHandler(this.Ornament11TextBox_Leave);
             // 
             // OLabel11
@@ -326,7 +270,7 @@ namespace Moritz.Palettes
             this.Ornament10TextBox.Location = new System.Drawing.Point(128, 279);
             this.Ornament10TextBox.Name = "Ornament10TextBox";
             this.Ornament10TextBox.Size = new System.Drawing.Size(561, 20);
-            this.Ornament10TextBox.TabIndex = 174;
+            this.Ornament10TextBox.TabIndex = 10;
             this.Ornament10TextBox.Leave += new System.EventHandler(this.Ornament10TextBox_Leave);
             // 
             // OLabel10
@@ -344,7 +288,7 @@ namespace Moritz.Palettes
             this.Ornament9TextBox.Location = new System.Drawing.Point(128, 253);
             this.Ornament9TextBox.Name = "Ornament9TextBox";
             this.Ornament9TextBox.Size = new System.Drawing.Size(561, 20);
-            this.Ornament9TextBox.TabIndex = 172;
+            this.Ornament9TextBox.TabIndex = 9;
             this.Ornament9TextBox.Leave += new System.EventHandler(this.Ornament9TextBox_Leave);
             // 
             // OLabel9
@@ -362,7 +306,7 @@ namespace Moritz.Palettes
             this.Ornament8TextBox.Location = new System.Drawing.Point(128, 227);
             this.Ornament8TextBox.Name = "Ornament8TextBox";
             this.Ornament8TextBox.Size = new System.Drawing.Size(561, 20);
-            this.Ornament8TextBox.TabIndex = 170;
+            this.Ornament8TextBox.TabIndex = 8;
             this.Ornament8TextBox.Leave += new System.EventHandler(this.Ornament8TextBox_Leave);
             // 
             // OLabel8
@@ -380,7 +324,7 @@ namespace Moritz.Palettes
             this.Ornament7TextBox.Location = new System.Drawing.Point(128, 201);
             this.Ornament7TextBox.Name = "Ornament7TextBox";
             this.Ornament7TextBox.Size = new System.Drawing.Size(561, 20);
-            this.Ornament7TextBox.TabIndex = 168;
+            this.Ornament7TextBox.TabIndex = 7;
             this.Ornament7TextBox.Leave += new System.EventHandler(this.Ornament7TextBox_Leave);
             // 
             // OLabel7
@@ -398,7 +342,7 @@ namespace Moritz.Palettes
             this.Ornament6TextBox.Location = new System.Drawing.Point(128, 175);
             this.Ornament6TextBox.Name = "Ornament6TextBox";
             this.Ornament6TextBox.Size = new System.Drawing.Size(561, 20);
-            this.Ornament6TextBox.TabIndex = 166;
+            this.Ornament6TextBox.TabIndex = 6;
             this.Ornament6TextBox.Leave += new System.EventHandler(this.Ornament6TextBox_Leave);
             // 
             // OLabel6
@@ -416,7 +360,7 @@ namespace Moritz.Palettes
             this.Ornament5TextBox.Location = new System.Drawing.Point(128, 149);
             this.Ornament5TextBox.Name = "Ornament5TextBox";
             this.Ornament5TextBox.Size = new System.Drawing.Size(561, 20);
-            this.Ornament5TextBox.TabIndex = 164;
+            this.Ornament5TextBox.TabIndex = 5;
             this.Ornament5TextBox.Leave += new System.EventHandler(this.Ornament5TextBox_Leave);
             // 
             // OLabel5
@@ -434,7 +378,7 @@ namespace Moritz.Palettes
             this.Ornament4TextBox.Location = new System.Drawing.Point(128, 123);
             this.Ornament4TextBox.Name = "Ornament4TextBox";
             this.Ornament4TextBox.Size = new System.Drawing.Size(561, 20);
-            this.Ornament4TextBox.TabIndex = 162;
+            this.Ornament4TextBox.TabIndex = 4;
             this.Ornament4TextBox.Leave += new System.EventHandler(this.Ornament4TextBox_Leave);
             // 
             // OLabel4
@@ -452,7 +396,7 @@ namespace Moritz.Palettes
             this.Ornament3TextBox.Location = new System.Drawing.Point(128, 97);
             this.Ornament3TextBox.Name = "Ornament3TextBox";
             this.Ornament3TextBox.Size = new System.Drawing.Size(561, 20);
-            this.Ornament3TextBox.TabIndex = 160;
+            this.Ornament3TextBox.TabIndex = 3;
             this.Ornament3TextBox.Leave += new System.EventHandler(this.Ornament3TextBox_Leave);
             // 
             // OLabel3
@@ -470,7 +414,7 @@ namespace Moritz.Palettes
             this.Ornament2TextBox.Location = new System.Drawing.Point(128, 71);
             this.Ornament2TextBox.Name = "Ornament2TextBox";
             this.Ornament2TextBox.Size = new System.Drawing.Size(561, 20);
-            this.Ornament2TextBox.TabIndex = 158;
+            this.Ornament2TextBox.TabIndex = 2;
             this.Ornament2TextBox.Leave += new System.EventHandler(this.Ornament2TextBox_Leave);
             // 
             // OLabel2
@@ -488,7 +432,7 @@ namespace Moritz.Palettes
             this.Ornament1TextBox.Location = new System.Drawing.Point(128, 45);
             this.Ornament1TextBox.Name = "Ornament1TextBox";
             this.Ornament1TextBox.Size = new System.Drawing.Size(561, 20);
-            this.Ornament1TextBox.TabIndex = 156;
+            this.Ornament1TextBox.TabIndex = 1;
             this.Ornament1TextBox.Leave += new System.EventHandler(this.Ornament1TextBox_Leave);
             // 
             // OLabel1
@@ -648,19 +592,79 @@ namespace Moritz.Palettes
             this.BottomPanel.Location = new System.Drawing.Point(16, 699);
             this.BottomPanel.Name = "BottomPanel";
             this.BottomPanel.Size = new System.Drawing.Size(803, 120);
-            this.BottomPanel.TabIndex = 189;
+            this.BottomPanel.TabIndex = 2;
             // 
             // TopPanel
             // 
             this.TopPanel.BackColor = System.Drawing.Color.Honeydew;
             this.TopPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.TopPanel.Controls.Add(this.BankIndicesTextBox);
+            this.TopPanel.Controls.Add(this.PatchIndicesHelpLabel);
+            this.TopPanel.Controls.Add(this.PatchIndicesLabel);
+            this.TopPanel.Controls.Add(this.BankIndicesHelpLabel);
+            this.TopPanel.Controls.Add(this.PatchIndicesTextBox);
+            this.TopPanel.Controls.Add(this.BankIndicesLabel);
             this.TopPanel.Controls.Add(this.NumBasicChordDefsHelpLabel);
             this.TopPanel.Controls.Add(this.NumBasicChordDefsLabel);
             this.TopPanel.Controls.Add(this.NumBasicChordDefsTextBox);
             this.TopPanel.Location = new System.Drawing.Point(16, 12);
             this.TopPanel.Name = "TopPanel";
             this.TopPanel.Size = new System.Drawing.Size(803, 323);
-            this.TopPanel.TabIndex = 190;
+            this.TopPanel.TabIndex = 0;
+            // 
+            // BankIndicesTextBox
+            // 
+            this.BankIndicesTextBox.Location = new System.Drawing.Point(148, 268);
+            this.BankIndicesTextBox.Name = "BankIndicesTextBox";
+            this.BankIndicesTextBox.Size = new System.Drawing.Size(454, 20);
+            this.BankIndicesTextBox.TabIndex = 7;
+            // 
+            // PatchIndicesHelpLabel
+            // 
+            this.PatchIndicesHelpLabel.AutoSize = true;
+            this.PatchIndicesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.PatchIndicesHelpLabel.Location = new System.Drawing.Point(609, 297);
+            this.PatchIndicesHelpLabel.Name = "PatchIndicesHelpLabel";
+            this.PatchIndicesHelpLabel.Size = new System.Drawing.Size(171, 14);
+            this.PatchIndicesHelpLabel.TabIndex = 157;
+            this.PatchIndicesHelpLabel.Text = "7 integer values in range [ 0..127 ]";
+            // 
+            // PatchIndicesLabel
+            // 
+            this.PatchIndicesLabel.AutoSize = true;
+            this.PatchIndicesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+            this.PatchIndicesLabel.Location = new System.Drawing.Point(62, 297);
+            this.PatchIndicesLabel.Name = "PatchIndicesLabel";
+            this.PatchIndicesLabel.Size = new System.Drawing.Size(85, 14);
+            this.PatchIndicesLabel.TabIndex = 156;
+            this.PatchIndicesLabel.Text = "( patch indices )";
+            // 
+            // BankIndicesHelpLabel
+            // 
+            this.BankIndicesHelpLabel.AutoSize = true;
+            this.BankIndicesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.BankIndicesHelpLabel.Location = new System.Drawing.Point(609, 272);
+            this.BankIndicesHelpLabel.Name = "BankIndicesHelpLabel";
+            this.BankIndicesHelpLabel.Size = new System.Drawing.Size(171, 14);
+            this.BankIndicesHelpLabel.TabIndex = 159;
+            this.BankIndicesHelpLabel.Text = "7 integer values in range [ 0..127 ]";
+            // 
+            // PatchIndicesTextBox
+            // 
+            this.PatchIndicesTextBox.Location = new System.Drawing.Point(148, 295);
+            this.PatchIndicesTextBox.Name = "PatchIndicesTextBox";
+            this.PatchIndicesTextBox.Size = new System.Drawing.Size(454, 20);
+            this.PatchIndicesTextBox.TabIndex = 8;
+            // 
+            // BankIndicesLabel
+            // 
+            this.BankIndicesLabel.AutoSize = true;
+            this.BankIndicesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+            this.BankIndicesLabel.Location = new System.Drawing.Point(66, 272);
+            this.BankIndicesLabel.Name = "BankIndicesLabel";
+            this.BankIndicesLabel.Size = new System.Drawing.Size(81, 14);
+            this.BankIndicesLabel.TabIndex = 158;
+            this.BankIndicesLabel.Text = "( bank indices )";
             // 
             // OrnamentSettingsForm
             // 
@@ -670,12 +674,6 @@ namespace Moritz.Palettes
             this.ClientSize = new System.Drawing.Size(835, 827);
             this.ControlBox = false;
             this.Controls.Add(this.OrnamentsGroupBox);
-            this.Controls.Add(this.BankIndicesTextBox);
-            this.Controls.Add(this.PatchIndicesHelpLabel);
-            this.Controls.Add(this.PatchIndicesLabel);
-            this.Controls.Add(this.BankIndicesHelpLabel);
-            this.Controls.Add(this.PatchIndicesTextBox);
-            this.Controls.Add(this.BankIndicesLabel);
             this.Controls.Add(this.BottomPanel);
             this.Controls.Add(this.TopPanel);
             this.Font = new System.Drawing.Font("Arial", 8F);
@@ -691,7 +689,6 @@ namespace Moritz.Palettes
             this.TopPanel.ResumeLayout(false);
             this.TopPanel.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
 		}
 
@@ -704,12 +701,6 @@ namespace Moritz.Palettes
         private System.Windows.Forms.Button ShowMainScoreFormButton;
         private System.Windows.Forms.Label OrnamentValueValuesHelpLabel2;
         public System.Windows.Forms.TextBox NumberOfOrnamentsTextBox;
-        public System.Windows.Forms.TextBox BankIndicesTextBox;
-        public System.Windows.Forms.Label BankIndicesHelpLabel;
-        public System.Windows.Forms.Label BankIndicesLabel;
-        public System.Windows.Forms.TextBox PatchIndicesTextBox;
-        public System.Windows.Forms.Label PatchIndicesHelpLabel;
-        public System.Windows.Forms.Label PatchIndicesLabel;
         private System.Windows.Forms.Label NumBasicChordDefsHelpLabel;
         public System.Windows.Forms.TextBox NumBasicChordDefsTextBox;
         private System.Windows.Forms.Label NumBasicChordDefsLabel;
@@ -753,6 +744,12 @@ namespace Moritz.Palettes
         private System.Windows.Forms.Panel BottomPanel;
         private System.Windows.Forms.Label OrnamentDefRangeLabel;
         private System.Windows.Forms.Panel TopPanel;
+        public System.Windows.Forms.TextBox BankIndicesTextBox;
+        public System.Windows.Forms.Label PatchIndicesHelpLabel;
+        public System.Windows.Forms.Label PatchIndicesLabel;
+        public System.Windows.Forms.Label BankIndicesHelpLabel;
+        public System.Windows.Forms.TextBox PatchIndicesTextBox;
+        public System.Windows.Forms.Label BankIndicesLabel;
 
     }
 }

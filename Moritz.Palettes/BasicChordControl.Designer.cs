@@ -59,7 +59,7 @@
             this.VerticalVelocityFactorsTextBox.Location = new System.Drawing.Point(178, 195);
             this.VerticalVelocityFactorsTextBox.Name = "VerticalVelocityFactorsTextBox";
             this.VerticalVelocityFactorsTextBox.Size = new System.Drawing.Size(361, 20);
-            this.VerticalVelocityFactorsTextBox.TabIndex = 9;
+            this.VerticalVelocityFactorsTextBox.TabIndex = 7;
             this.VerticalVelocityFactorsTextBox.TextChanged += new System.EventHandler(this.ParameterTextBox_TextChanged);
             this.VerticalVelocityFactorsTextBox.Leave += new System.EventHandler(this.VerticalVelocityFactorsTextBox_Leave);
             // 
@@ -68,7 +68,7 @@
             this.InversionIndicesTextBox.Location = new System.Drawing.Point(178, 169);
             this.InversionIndicesTextBox.Name = "InversionIndicesTextBox";
             this.InversionIndicesTextBox.Size = new System.Drawing.Size(361, 20);
-            this.InversionIndicesTextBox.TabIndex = 8;
+            this.InversionIndicesTextBox.TabIndex = 6;
             this.InversionIndicesTextBox.TextChanged += new System.EventHandler(this.ParameterTextBox_TextChanged);
             this.InversionIndicesTextBox.Leave += new System.EventHandler(this.InversionIndicesTextBox_Leave);
             // 
@@ -87,7 +87,7 @@
             this.RootInversionTextBox.Location = new System.Drawing.Point(178, 143);
             this.RootInversionTextBox.Name = "RootInversionTextBox";
             this.RootInversionTextBox.Size = new System.Drawing.Size(361, 20);
-            this.RootInversionTextBox.TabIndex = 7;
+            this.RootInversionTextBox.TabIndex = 5;
             this.RootInversionTextBox.TextChanged += new System.EventHandler(this.ParameterTextBox_TextChanged);
             this.RootInversionTextBox.Leave += new System.EventHandler(this.RootInversionTextBox_Leave);
             // 
@@ -106,7 +106,7 @@
             this.ChordDensitiesTextBox.Location = new System.Drawing.Point(148, 7);
             this.ChordDensitiesTextBox.Name = "ChordDensitiesTextBox";
             this.ChordDensitiesTextBox.Size = new System.Drawing.Size(454, 20);
-            this.ChordDensitiesTextBox.TabIndex = 6;
+            this.ChordDensitiesTextBox.TabIndex = 0;
             this.ChordDensitiesTextBox.TextChanged += new System.EventHandler(this.ParameterTextBox_TextChanged);
             this.ChordDensitiesTextBox.Leave += new System.EventHandler(this.ChordDensitiesTextBox_Leave);
             // 
@@ -125,7 +125,7 @@
             this.VelocitiesTextBox.Location = new System.Drawing.Point(148, 88);
             this.VelocitiesTextBox.Name = "VelocitiesTextBox";
             this.VelocitiesTextBox.Size = new System.Drawing.Size(454, 20);
-            this.VelocitiesTextBox.TabIndex = 1;
+            this.VelocitiesTextBox.TabIndex = 3;
             this.VelocitiesTextBox.TextChanged += new System.EventHandler(this.ParameterTextBox_TextChanged);
             this.VelocitiesTextBox.Leave += new System.EventHandler(this.VelocitiesTextBox_Leave);
             // 
@@ -253,7 +253,7 @@
             this.ChordOffsTextBox.Location = new System.Drawing.Point(148, 115);
             this.ChordOffsTextBox.Name = "ChordOffsTextBox";
             this.ChordOffsTextBox.Size = new System.Drawing.Size(454, 20);
-            this.ChordOffsTextBox.TabIndex = 5;
+            this.ChordOffsTextBox.TabIndex = 4;
             this.ChordOffsTextBox.TextChanged += new System.EventHandler(this.ParameterTextBox_TextChanged);
             this.ChordOffsTextBox.Leave += new System.EventHandler(this.ChordOffsTextBox_Leave);
             // 
@@ -282,7 +282,7 @@
             this.DurationsTextBox.Location = new System.Drawing.Point(148, 34);
             this.DurationsTextBox.Name = "DurationsTextBox";
             this.DurationsTextBox.Size = new System.Drawing.Size(454, 20);
-            this.DurationsTextBox.TabIndex = 0;
+            this.DurationsTextBox.TabIndex = 1;
             this.DurationsTextBox.TextChanged += new System.EventHandler(this.ParameterTextBox_TextChanged);
             this.DurationsTextBox.Leave += new System.EventHandler(this.DurationsTextBox_Leave);
             // 

@@ -383,7 +383,8 @@ namespace Moritz.Palettes
         public System.Windows.Forms.TextBox PanEnvelopesTextBox;
         public System.Windows.Forms.TextBox ExpressionEnvelopesTextBox;
         public System.Windows.Forms.TextBox MinMsDurationsTextBox;
-        private System.Windows.Forms.Label EnvelopesExtraHelpLabel;
+        private System.Windows.Forms.Label EnvelopesExtraHelpLabel;
+
         private System.Windows.Forms.Button ShowMainScoreFormButton;
         private System.Windows.Forms.Label midiLabel;
         private System.Windows.Forms.Label label1;

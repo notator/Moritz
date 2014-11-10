@@ -102,6 +102,7 @@ namespace Moritz.Palettes
             _bcc = new BasicChordControl(SetDialogState);
             _bcc.Location = new Point(22, 14);
             Controls.Add(_bcc);
+            _bcc.TabIndex = 0;
         }
         private void ConnectPaletteButtonsControl(int domain, string audioFolder)
         {
@@ -109,6 +110,7 @@ namespace Moritz.Palettes
             _paletteButtonsControl = new PaletteButtonsControl(domain, location, this, audioFolder);
             Debug.Assert(_paletteButtonsControl != null);
             Controls.Add(_paletteButtonsControl);
+            _paletteButtonsControl.TabIndex = 18;
         }
 
         public static string NewPaletteName(int paletteNumber, int domain)
@@ -187,7 +189,9 @@ namespace Moritz.Palettes
                 MinMsDurationsTextBox.Enabled = true;
                 MinMsDurationsHelpLabel.Enabled = true;
 
-                string ornamentNumbersHelpString = String.Format("{0} integer values in range [0..{1}]\n(0 means no ornament)",
+                string valStr = (_domain == 1) ? "value" : "values";
+
+                string ornamentNumbersHelpString = String.Format("{0} integer " + valStr + " in range [0..{1}]\n(0 means no ornament)",
                     _domain.ToString(), _numberOfOrnaments.ToString());
                 OrnamentNumbersHelpLabel.Text = ornamentNumbersHelpString;
 

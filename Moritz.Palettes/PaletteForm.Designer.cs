@@ -113,7 +113,7 @@ namespace Moritz.Palettes
             this.OrnamentNumbersTextBox.Location = new System.Drawing.Point(173, 534);
             this.OrnamentNumbersTextBox.Name = "OrnamentNumbersTextBox";
             this.OrnamentNumbersTextBox.Size = new System.Drawing.Size(454, 20);
-            this.OrnamentNumbersTextBox.TabIndex = 6;
+            this.OrnamentNumbersTextBox.TabIndex = 16;
             this.OrnamentNumbersTextBox.TextChanged += new System.EventHandler(this.OrnamentNumbersTextBox_TextChanged);
             this.OrnamentNumbersTextBox.Leave += new System.EventHandler(this.OrnamentNumbersTextBox_Leave);
             // 
@@ -153,7 +153,7 @@ namespace Moritz.Palettes
             this.PanEnvelopesTextBox.Location = new System.Drawing.Point(173, 403);
             this.PanEnvelopesTextBox.Name = "PanEnvelopesTextBox";
             this.PanEnvelopesTextBox.Size = new System.Drawing.Size(554, 20);
-            this.PanEnvelopesTextBox.TabIndex = 3;
+            this.PanEnvelopesTextBox.TabIndex = 13;
             this.PanEnvelopesTextBox.TextChanged += new System.EventHandler(this.PanEnvelopesTextBox_TextChanged);
             this.PanEnvelopesTextBox.Leave += new System.EventHandler(this.PanEnvelopesTextBox_Leave);
             // 
@@ -205,7 +205,7 @@ namespace Moritz.Palettes
             this.PitchwheelEnvelopesTextBox.Location = new System.Drawing.Point(173, 376);
             this.PitchwheelEnvelopesTextBox.Name = "PitchwheelEnvelopesTextBox";
             this.PitchwheelEnvelopesTextBox.Size = new System.Drawing.Size(554, 20);
-            this.PitchwheelEnvelopesTextBox.TabIndex = 2;
+            this.PitchwheelEnvelopesTextBox.TabIndex = 12;
             this.PitchwheelEnvelopesTextBox.TextChanged += new System.EventHandler(this.PitchwheelEnvelopesTextBox_TextChanged);
             this.PitchwheelEnvelopesTextBox.Leave += new System.EventHandler(this.PitchwheelEnvelopesTextBox_Leave);
             // 
@@ -214,7 +214,7 @@ namespace Moritz.Palettes
             this.PitchwheelDeviationsTextBox.Location = new System.Drawing.Point(173, 346);
             this.PitchwheelDeviationsTextBox.Name = "PitchwheelDeviationsTextBox";
             this.PitchwheelDeviationsTextBox.Size = new System.Drawing.Size(454, 20);
-            this.PitchwheelDeviationsTextBox.TabIndex = 1;
+            this.PitchwheelDeviationsTextBox.TabIndex = 11;
             this.PitchwheelDeviationsTextBox.TextChanged += new System.EventHandler(this.PitchwheelDeviationsTextBox_TextChanged);
             this.PitchwheelDeviationsTextBox.Leave += new System.EventHandler(this.PitchwheelDeviationsTextBox_Leave);
             // 
@@ -223,7 +223,7 @@ namespace Moritz.Palettes
             this.ModulationWheelEnvelopesTextBox.Location = new System.Drawing.Point(173, 430);
             this.ModulationWheelEnvelopesTextBox.Name = "ModulationWheelEnvelopesTextBox";
             this.ModulationWheelEnvelopesTextBox.Size = new System.Drawing.Size(554, 20);
-            this.ModulationWheelEnvelopesTextBox.TabIndex = 4;
+            this.ModulationWheelEnvelopesTextBox.TabIndex = 14;
             this.ModulationWheelEnvelopesTextBox.TextChanged += new System.EventHandler(this.ModulationWheelEnvelopesTextBox_TextChanged);
             this.ModulationWheelEnvelopesTextBox.Leave += new System.EventHandler(this.ModulationWheelEnvelopesTextBox_Leave);
             // 
@@ -259,7 +259,7 @@ namespace Moritz.Palettes
             this.ExpressionEnvelopesTextBox.Location = new System.Drawing.Point(173, 457);
             this.ExpressionEnvelopesTextBox.Name = "ExpressionEnvelopesTextBox";
             this.ExpressionEnvelopesTextBox.Size = new System.Drawing.Size(554, 20);
-            this.ExpressionEnvelopesTextBox.TabIndex = 5;
+            this.ExpressionEnvelopesTextBox.TabIndex = 15;
             this.ExpressionEnvelopesTextBox.TextChanged += new System.EventHandler(this.ExpressionEnvelopesTextBox_TextChanged);
             this.ExpressionEnvelopesTextBox.Leave += new System.EventHandler(this.ExpressionEnvelopesTextBox_Leave);
             // 
@@ -343,7 +343,7 @@ namespace Moritz.Palettes
             this.MinMsDurationsTextBox.Location = new System.Drawing.Point(173, 561);
             this.MinMsDurationsTextBox.Name = "MinMsDurationsTextBox";
             this.MinMsDurationsTextBox.Size = new System.Drawing.Size(454, 20);
-            this.MinMsDurationsTextBox.TabIndex = 7;
+            this.MinMsDurationsTextBox.TabIndex = 17;
             this.MinMsDurationsTextBox.TextChanged += new System.EventHandler(this.MinMsDurationsTextBox_TextChanged);
             this.MinMsDurationsTextBox.Leave += new System.EventHandler(this.MinMsDurationsTextBox_Leave);
             // 
@@ -420,7 +420,7 @@ namespace Moritz.Palettes
             this.BankIndicesTextBox.Location = new System.Drawing.Point(173, 265);
             this.BankIndicesTextBox.Name = "BankIndicesTextBox";
             this.BankIndicesTextBox.Size = new System.Drawing.Size(454, 20);
-            this.BankIndicesTextBox.TabIndex = 139;
+            this.BankIndicesTextBox.TabIndex = 8;
             this.BankIndicesTextBox.Leave += new System.EventHandler(this.BankIndicesTextBox_Leave);
             // 
             // BankIndicesHelpLabel
@@ -447,7 +447,7 @@ namespace Moritz.Palettes
             this.PatchIndicesTextBox.Location = new System.Drawing.Point(173, 292);
             this.PatchIndicesTextBox.Name = "PatchIndicesTextBox";
             this.PatchIndicesTextBox.Size = new System.Drawing.Size(454, 20);
-            this.PatchIndicesTextBox.TabIndex = 140;
+            this.PatchIndicesTextBox.TabIndex = 9;
             this.PatchIndicesTextBox.Leave += new System.EventHandler(this.PatchIndicesTextBox_Leave);
             // 
             // PatchIndicesHelpLabel
@@ -484,7 +484,7 @@ namespace Moritz.Palettes
             this.RepeatsTextBox.Location = new System.Drawing.Point(173, 319);
             this.RepeatsTextBox.Name = "RepeatsTextBox";
             this.RepeatsTextBox.Size = new System.Drawing.Size(454, 20);
-            this.RepeatsTextBox.TabIndex = 145;
+            this.RepeatsTextBox.TabIndex = 10;
             this.RepeatsTextBox.TextChanged += new System.EventHandler(this.RepeatsTextBox_TextChanged);
             this.RepeatsTextBox.Leave += new System.EventHandler(this.RepeatsTextBox_Leave);
             // 

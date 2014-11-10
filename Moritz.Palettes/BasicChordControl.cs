@@ -146,11 +146,12 @@ namespace Moritz.Palettes
             }
             else
             {
-                DurationsHelpLabel.Text = _numberOfChordValues.ToString() + " integer values (greater than 0)";
-                MidiPitchesHelpLabel.Text = _numberOfChordValues.ToString() + " integer values in range [ 0..127 ]";
-                VelocitiesHelpLabel.Text = _numberOfChordValues.ToString() + " integer values in range [ 0..127 ]";
-                ChordOffsHelpLabel.Text = _numberOfChordValues.ToString() + " boolean values ( 1=true, 0=false )";
-                ChordDensitiesHelpLabel.Text = _numberOfChordValues.ToString() + " integer values in range [ 0..128 ]";
+                string valStr = (_numberOfChordValues == 1) ? " value " : " values ";
+                DurationsHelpLabel.Text = _numberOfChordValues.ToString() + " integer" + valStr + "(greater than 0)";
+                MidiPitchesHelpLabel.Text = _numberOfChordValues.ToString() + " integer" + valStr + "in range [ 0..127 ]";
+                VelocitiesHelpLabel.Text = _numberOfChordValues.ToString() + " integer" + valStr + "in range [ 0..127 ]";
+                ChordOffsHelpLabel.Text = _numberOfChordValues.ToString() + " boolean" + valStr + "( 1=true, 0=false )";
+                ChordDensitiesHelpLabel.Text = _numberOfChordValues.ToString() + " integer" + valStr + "in range [ 0..128 ]";
             }
         }
 
@@ -282,7 +283,8 @@ namespace Moritz.Palettes
             string countString = _numberOfChordValues.ToString() + " ";
             string integerString = "integer ";
             string floatString = "float ";
-            string valuesInRangeString = "values in range ";
+            string valStr = (_numberOfChordValues == 1) ? "value " : "values ";
+            string rootInvValString = (_maximumChordDensity < 3) ? "value " : "values ";
 
             string primeIntervalsCountString = (_maximumChordDensity - 1).ToString() + " ";
 
@@ -290,9 +292,9 @@ namespace Moritz.Palettes
             RootInversionLabel.Enabled = true;
             RootInversionHelpLabel.Enabled = true;
             RootInversionTextBox.Enabled = true;
-            RootInversionHelpLabel.Text = primeIntervalsCountString + integerString + valuesInRangeString + "[ 1..127 ]";
+            RootInversionHelpLabel.Text = primeIntervalsCountString + integerString + rootInvValString + "in range [ 1..127 ]";
 
-            VerticalVelocityFactorsHelpLabel.Text = countString + floatString + "values greater than 0.0";
+            VerticalVelocityFactorsHelpLabel.Text = countString + floatString + valStr + "greater than 0.0";
             VerticalVelocityFactorsLabel.Enabled = true;
             VerticalVelocityFactorsHelpLabel.Enabled = true;
             VerticalVelocityFactorsTextBox.Enabled = true;
@@ -303,7 +305,7 @@ namespace Moritz.Palettes
                 InversionIndicesLabel.Enabled = true;
                 InversionIndicesHelpLabel.Enabled = true;
                 InversionIndicesTextBox.Enabled = true;
-                InversionIndicesHelpLabel.Text = countString + integerString + valuesInRangeString + "[ 0.." + inversionsMaxIndexString + " ]";
+                InversionIndicesHelpLabel.Text = countString + integerString + valStr + "in range [ 0.." + inversionsMaxIndexString + " ]";
             }
             else
             {

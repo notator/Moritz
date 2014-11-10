@@ -55,6 +55,8 @@ namespace Moritz.Palettes
             _bcc.Location = new Point(0, 25);
             _bcc.BorderStyle = BorderStyle.None;
             this.TopPanel.Controls.Add(_bcc);
+            TopPanel.TabIndex = 0;
+            _bcc.TabIndex = 1;
 
             int rightMargin = _bcc.DurationsLabel.Location.X + _bcc.DurationsLabel.Size.Width;
             ReplaceLabel(_bcc.DurationsLabel, "relative durations", rightMargin);
@@ -230,12 +232,16 @@ namespace Moritz.Palettes
             }
             else
             {
+                this.EnableMainParameters();
+
                 _numberOfBasicChordDefs = int.Parse(numBasicChordDefsTextBox.Text);
                 _bcc.NumberOfChordValues = _numberOfBasicChordDefs;
                 _bcc.SetHelpLabels();
 
-                BankIndicesHelpLabel.Text = _numberOfBasicChordDefs.ToString() + " values in range [ 0..127 ]";
-                PatchIndicesHelpLabel.Text = _numberOfBasicChordDefs.ToString() + " values in range [ 0..127 ]";
+                string valStr = (_numberOfBasicChordDefs == 1) ? " value" : " values";
+                string inRangeStr = " in range [ 0..127 ]";
+                BankIndicesHelpLabel.Text = _numberOfBasicChordDefs.ToString() + valStr + inRangeStr;
+                PatchIndicesHelpLabel.Text = _numberOfBasicChordDefs.ToString() + valStr + inRangeStr;
 
                 OrnamentDefRangeLabel.Text = "Each value in these ornament sequences must be in the range [ 1.." +
                     _numberOfBasicChordDefs.ToString() + " ].";
@@ -258,6 +264,22 @@ namespace Moritz.Palettes
             PatchIndicesTextBox.Enabled = false;
 
             OrnamentsGroupBox.Enabled = false;
+        }
+        private void EnableMainParameters()
+        {
+            _bcc.Enabled = true;
+
+            _bcc.SetChordControls();
+
+            BankIndicesTextBox.Enabled = true;
+            BankIndicesTextBox.Enabled = true;
+            BankIndicesTextBox.Enabled = true;
+
+            PatchIndicesTextBox.Enabled = true;
+            PatchIndicesTextBox.Enabled = true;
+            PatchIndicesTextBox.Enabled = true;
+
+            OrnamentsGroupBox.Enabled = true;
         }
         public void TouchAllTextBoxes()
         {

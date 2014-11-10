@@ -146,7 +146,9 @@ namespace Moritz.Palettes
                 MinMsDurationsTextBox.Enabled = true;
                 MinMsDurationsHelpLabel.Enabled = true;
 
-                string ornamentNumbersHelpString = String.Format("{0} integer values in range [0..{1}]\n(0 means no ornament)",
+                string valStr = (_domain == 1) ? "value" : "values";
+
+                string ornamentNumbersHelpString = String.Format("{0} integer " + valStr + " in range [0..{1}]\n(0 means no ornament)",
                     _domain.ToString(), _numberOfOrnaments.ToString());
                 OrnamentNumbersHelpLabel.Text = ornamentNumbersHelpString;
 
