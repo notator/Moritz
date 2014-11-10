@@ -931,6 +931,8 @@ namespace Moritz.Palettes
         public PercussionOrnamentsForm PercussionOrnamentsForm { get { return _percussionOrnamentsForm; } }
         #endregion public variables
 
+        public bool HasOpenChordForm { get { return true; /*return this._paletteChordForm != null; */} }
+
         #region private variables
         private int _numberOfOrnaments;
         private Moritz.Krystals.StrandsBrowser _strandsBrowser = null;

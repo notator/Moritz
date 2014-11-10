@@ -557,7 +557,25 @@ namespace Moritz.Composer
             callbacks.SetSettingsHaveBeenSaved = SetSettingsHaveBeenSaved;
             callbacks.SetSettingsHaveNotBeenSaved = SetSettingsHaveNotBeenSaved;
             callbacks.LocalScoreAudioPath = GetLocalScoreAudioPath;
+            callbacks.APaletteChordFormIsOpen = APaletteChordFormIsOpen;
             return callbacks;
+        }
+
+        private bool APaletteChordFormIsOpen()
+        {
+            bool aPaletteChordFormIsOpen = false;
+
+            foreach(object o in PalettesListBox.Items)
+            {
+                IPaletteForm paletteForm = o as IPaletteForm;
+                if(paletteForm != null && paletteForm.HasOpenChordForm)
+                {
+                    aPaletteChordFormIsOpen = true;
+                    break;
+                }
+            }
+
+            return aPaletteChordFormIsOpen;
         }
 
         private string GetLocalScoreAudioPath()

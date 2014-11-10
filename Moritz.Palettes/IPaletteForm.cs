@@ -15,5 +15,6 @@ namespace Moritz.Palettes
         void WritePalette(XmlWriter w);
         void ReadPalette(XmlReader r);
         void ShowPaletteChordForm(int midiChordIndex);
+        bool HasOpenChordForm { get; }
     }
 }

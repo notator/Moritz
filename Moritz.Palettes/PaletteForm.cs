@@ -52,16 +52,20 @@ namespace Moritz.Palettes
 
         public void ShowPaletteChordForm(int midiChordIndex)
         {
-            if(!this.HasError())
+            if(_callbacks.APaletteChordFormIsOpen())
+            {
+                MessageBox.Show("Can't create a palette chord form because another one is already open.");
+            }
+            else if(this.HasError())
+            {
+                MessageBox.Show("Can't create a palette chord form because this palette contains errors.");
+            }
+            else
             {
                 _paletteChordForm = new PaletteChordForm(this, _bcc, midiChordIndex, SetDialogState);
                 _paletteChordForm.Show();
                 _paletteChordForm.BringToFront();
                 this.Enabled = false;
-            }
-            else
-            {
-                MessageBox.Show("Can't create a palette chord form because this palette contains errors.");
             }
         }
 
@@ -90,6 +94,8 @@ namespace Moritz.Palettes
 
             this.PaletteButtonsControl.PaletteChordFormButtons[chordIndex].Select();
         }
+
+        public bool HasOpenChordForm { get { return this._paletteChordForm != null; } }
 
         private void ConnectBasicChordControl()
         {
