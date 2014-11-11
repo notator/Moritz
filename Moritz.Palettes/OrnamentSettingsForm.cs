@@ -30,23 +30,24 @@ namespace Moritz.Palettes
 
             //int numberOfChordValues = -1;
             int numberOfBasicChordDefs = 12;
+            this.Text = _paletteForm.Text + ": ornaments";
             if(r != null)
             {
                 numberOfBasicChordDefs = ReadOrnamentSettingsForm(r);
-                _paletteForm.SetSettingsHaveBeenSaved();
-                this.Text = _paletteForm.Text + ": ornaments";
             }
             else
             {
-                _paletteForm.SetSettingsHaveBeenSaved(); // removes the '*'
                 this.Text = _paletteForm.Text + ": ornaments";
-                _paletteForm.SetSettingsNotSaved();
+                _paletteForm.SetOrnamentSettingsHaveChanged(); // simply adds a '*' to the AC's Text
             }
 
             _allNonOrnamentTextBoxes = GetNonOrnamentTextBoxes();
             _12OrnamentTextBoxes = Get12OrnamentTextBoxes();
 
             NumBasicChordDefsTextBox_Leave(NumBasicChordDefsTextBox, null);
+
+            this.RevertToSavedButton.Enabled = false;
+            this.OkayToSaveButton.Enabled = false;
         }
 
         private void ConnectBasicChordControl()
@@ -92,19 +93,24 @@ namespace Moritz.Palettes
                     switch(r.Name)
                     {
                         case "numBasicChordDefs":
-                            this.NumBasicChordDefsTextBox.Text = r.ReadElementContentAsString();
+                            NumBasicChordDefsTextBox.Text = r.ReadElementContentAsString();
+                            SavedNumBasicChordDefsTextBoxText = NumBasicChordDefsTextBox.Text;
                             break;
                         case "basicChord":
                             _bcc.ReadBasicChordControl(r);
+                            SaveBCCSettings();
                             break;
                         case "bankIndices":
                             BankIndicesTextBox.Text = r.ReadElementContentAsString();
+                            SavedBankIndicesTextBoxText = BankIndicesTextBox.Text;
                             break;
                         case "patchIndices":
                             PatchIndicesTextBox.Text = r.ReadElementContentAsString();
+                            SavedPatchIndicesTextBoxText = PatchIndicesTextBox.Text;
                             break;
                         case "numOrnaments":
-                            this.NumberOfOrnamentsTextBox.Text = r.ReadElementContentAsString();
+                            NumberOfOrnamentsTextBox.Text = r.ReadElementContentAsString();
+                            SavedNumberOfOrnamentsTextBoxText = NumberOfOrnamentsTextBox.Text;
                             break;
                         case "ornaments":
                             GetOrnaments(r);
@@ -117,6 +123,18 @@ namespace Moritz.Palettes
             }
             Debug.Assert(r.Name == "ornamentSettings");
             return int.Parse(NumBasicChordDefsTextBox.Text);
+        }
+
+        private void SaveBCCSettings()
+        {
+            SavedBCCDurationsTextBoxText = _bcc.DurationsTextBox.Text;
+            SavedBCCVelocitiesTextBoxText = _bcc.VelocitiesTextBox.Text;
+            SavedBCCMidiPitchesTextBoxText = _bcc.MidiPitchesTextBox.Text;
+            SavedBCCChordOffsTextBoxText = _bcc.ChordOffsTextBox.Text;
+            SavedBCCChordDensitiesTextBoxText = _bcc.ChordDensitiesTextBox.Text;
+            SavedBCCRootInversionTextBoxText = _bcc.RootInversionTextBox.Text;
+            SavedBCCInversionIndicesTextBoxText = _bcc.InversionIndicesTextBox.Text;
+            SavedBCCVerticalVelocityFactorsTextBoxText = _bcc.VerticalVelocityFactorsTextBox.Text;
         }
 
         private int GetOrnaments(XmlReader r)
@@ -132,39 +150,51 @@ namespace Moritz.Palettes
                 {
                     case 1:
                         Ornament1TextBox.Text = r.ReadElementContentAsString();
+                        SavedOrnament1TextBoxText = Ornament1TextBox.Text;
                         break;
                     case 2:
                         Ornament2TextBox.Text = r.ReadElementContentAsString();
+                        SavedOrnament2TextBoxText = Ornament2TextBox.Text;
                         break;
                     case 3:
                         Ornament3TextBox.Text = r.ReadElementContentAsString();
+                        SavedOrnament3TextBoxText = Ornament3TextBox.Text;
                         break;
                     case 4:
                         Ornament4TextBox.Text = r.ReadElementContentAsString();
+                        SavedOrnament4TextBoxText = Ornament4TextBox.Text;
                         break;
                     case 5:
                         Ornament5TextBox.Text = r.ReadElementContentAsString();
+                        SavedOrnament5TextBoxText = Ornament5TextBox.Text;
                         break;
                     case 6:
                         Ornament6TextBox.Text = r.ReadElementContentAsString();
+                        SavedOrnament6TextBoxText = Ornament6TextBox.Text;
                         break;
                     case 7:
                         Ornament7TextBox.Text = r.ReadElementContentAsString();
+                        SavedOrnament7TextBoxText = Ornament7TextBox.Text;
                         break;
                     case 8:
                         Ornament8TextBox.Text = r.ReadElementContentAsString();
+                        SavedOrnament8TextBoxText = Ornament8TextBox.Text;
                         break;
                     case 9:
                         Ornament9TextBox.Text = r.ReadElementContentAsString();
+                        SavedOrnament9TextBoxText = Ornament9TextBox.Text;
                         break;
                     case 10:
                         Ornament10TextBox.Text = r.ReadElementContentAsString();
+                        SavedOrnament10TextBoxText = Ornament10TextBox.Text;
                         break;
                     case 11:
                         Ornament11TextBox.Text = r.ReadElementContentAsString();
+                        SavedOrnament11TextBoxText = Ornament11TextBox.Text;
                         break;
                     case 12:
                         Ornament12TextBox.Text = r.ReadElementContentAsString();
+                        SavedOrnament12TextBoxText = Ornament12TextBox.Text;
                         break;
                 }
                 #endregion read each ornament
@@ -173,6 +203,35 @@ namespace Moritz.Palettes
             Debug.Assert(r.Name == "ornaments");
             return numberOfOrnaments;
         }
+
+        #region revertToSaved strings
+        private string SavedNumBasicChordDefsTextBoxText;
+
+        private string SavedBCCDurationsTextBoxText;
+        private string SavedBCCVelocitiesTextBoxText;
+        private string SavedBCCMidiPitchesTextBoxText;
+        private string SavedBCCChordOffsTextBoxText;
+        private string SavedBCCChordDensitiesTextBoxText;
+        private string SavedBCCRootInversionTextBoxText;
+        private string SavedBCCInversionIndicesTextBoxText;
+        private string SavedBCCVerticalVelocityFactorsTextBoxText;
+
+        private string SavedBankIndicesTextBoxText;
+        private string SavedPatchIndicesTextBoxText;
+        private string SavedNumberOfOrnamentsTextBoxText;
+        private string SavedOrnament1TextBoxText;
+        private string SavedOrnament2TextBoxText;
+        private string SavedOrnament3TextBoxText;
+        private string SavedOrnament4TextBoxText;
+        private string SavedOrnament5TextBoxText;
+        private string SavedOrnament6TextBoxText;
+        private string SavedOrnament7TextBoxText;
+        private string SavedOrnament8TextBoxText;
+        private string SavedOrnament9TextBoxText;
+        private string SavedOrnament10TextBoxText;
+        private string SavedOrnament11TextBoxText;
+        private string SavedOrnament12TextBoxText;
+        #endregion revertToSaved strings
 
         /************/
 
@@ -515,6 +574,7 @@ namespace Moritz.Palettes
             M.LeaveIntRangeTextBox(textBox, false, uint.MaxValue, 1, _numberOfBasicChordDefs, SetDialogState);
             SetOrnaments(textBox, 12);
         }
+
         private void SetOrnaments(TextBox textBox, int ornamentNumber)
         {
             if(textBox.BackColor != M.TextBoxErrorColor)
@@ -525,8 +585,6 @@ namespace Moritz.Palettes
         }
         private void SetDialogState(TextBox textBox, bool okay)
         {
-            SetSettingsNotSaved();
-
             if(okay)
             {
                 textBox.BackColor = Color.White;
@@ -535,14 +593,25 @@ namespace Moritz.Palettes
             {
                 textBox.BackColor = M.TextBoxErrorColor;
             }
+
+            SetSettingsHaveChanged();
+
+            if(this.HasError)
+            {
+                this.OkayToSaveButton.Enabled = false;
+            }
         }
-        private void SetSettingsNotSaved()
+        private void SetSettingsHaveChanged()
         {
             if(!this.Text.EndsWith("*"))
                 this.Text = this.Text + "*";
-            _paletteForm.SetSettingsNotSaved();
+
+            this.OkayToSaveButton.Enabled = true;
+            this.RevertToSavedButton.Enabled = true;
+            _paletteForm.SetOrnamentSettingsHaveChanged();
         }
-        #endregion
+
+       #endregion
 
         /************/
 
@@ -561,6 +630,84 @@ namespace Moritz.Palettes
         private void ShowMainScoreFormButton_Click(object sender, EventArgs e)
         {
             _paletteForm.Callbacks.MainFormBringToFront();
+        }
+        
+        /// <summary>
+        /// When the main Assistant Composer Form tries to save, it first checks
+        /// that none of its subsidiary forms' Texts ends with a "*".
+        /// If they do, then they must be reviewed, and either the OkayToSaveButton
+        /// or RevertToSavedButton must be clicked.
+        /// </summary>
+        private void OkayToSaveButton_Click(object sender, EventArgs e)
+        {
+            Debug.Assert(!this.HasError);
+            Debug.Assert(this.Text.EndsWith("*"));
+
+            this.Text = this.Text.Remove(this.Text.Length - 1);
+            if(!this.Text.EndsWith("(changed)"))
+            {
+                this.Text = this.Text + " (changed)";
+            }
+            this.OkayToSaveButton.Enabled = false;
+        }
+
+        /// <summary>
+        /// When the main Assistant Composer Form tries to save, it first checks
+        /// that none of its subsidiary forms' Texts ends with a "*".
+        /// If they do, then they must be reviewed, and either the OkayToSaveButton
+        /// or RevertToSavedButton must be clicked.
+        /// </summary>
+        private void RevertToSavedButton_Click(object sender, EventArgs e)
+        {
+            Debug.Assert(this.Text.EndsWith("*") || this.Text.EndsWith(" (changed)"));
+            DialogResult result = 
+                MessageBox.Show("Are you sure you want to revert this dialog to the saved version?", "Revert?", 
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
+
+            if(result == System.Windows.Forms.DialogResult.Yes)
+            {
+                NumBasicChordDefsTextBox.Text = SavedNumBasicChordDefsTextBoxText;
+
+                _bcc.DurationsTextBox.Text = SavedBCCDurationsTextBoxText;
+                _bcc.VelocitiesTextBox.Text = SavedBCCVelocitiesTextBoxText;
+                _bcc.MidiPitchesTextBox.Text = SavedBCCMidiPitchesTextBoxText;
+                _bcc.ChordOffsTextBox.Text = SavedBCCChordOffsTextBoxText;
+                _bcc.ChordDensitiesTextBox.Text = SavedBCCChordDensitiesTextBoxText;
+                _bcc.RootInversionTextBox.Text = SavedBCCRootInversionTextBoxText;
+                _bcc.InversionIndicesTextBox.Text = SavedBCCInversionIndicesTextBoxText;
+                _bcc.VerticalVelocityFactorsTextBox.Text = SavedBCCVerticalVelocityFactorsTextBoxText;
+
+                BankIndicesTextBox.Text = SavedBankIndicesTextBoxText;
+                PatchIndicesTextBox.Text = SavedPatchIndicesTextBoxText;
+                NumberOfOrnamentsTextBox.Text = SavedNumberOfOrnamentsTextBoxText;
+                Ornament1TextBox.Text = SavedOrnament1TextBoxText;
+                Ornament2TextBox.Text = SavedOrnament2TextBoxText;
+                Ornament3TextBox.Text = SavedOrnament3TextBoxText;
+                Ornament4TextBox.Text = SavedOrnament4TextBoxText;
+                Ornament5TextBox.Text = SavedOrnament5TextBoxText;
+                Ornament6TextBox.Text = SavedOrnament6TextBoxText;
+                Ornament7TextBox.Text = SavedOrnament7TextBoxText;
+                Ornament8TextBox.Text = SavedOrnament8TextBoxText;
+                Ornament9TextBox.Text = SavedOrnament9TextBoxText;
+                Ornament10TextBox.Text = SavedOrnament10TextBoxText;
+                Ornament11TextBox.Text = SavedOrnament11TextBoxText;
+                Ornament12TextBox.Text = SavedOrnament12TextBoxText;
+
+                NumBasicChordDefsTextBox_Leave(NumBasicChordDefsTextBox, null);
+                
+                if(this.Text.EndsWith("*"))
+                {
+                    this.Text = this.Text.Remove(this.Text.Length - 1);
+                }
+                
+                if(this.Text.EndsWith(" (changed)"))
+                {
+                    this.Text = this.Text.Remove(this.Text.Length - " (changed)".Length);
+                }
+
+                this.RevertToSavedButton.Enabled = false;
+                this.OkayToSaveButton.Enabled = false;
+            }
         }
         #endregion buttons
 
@@ -587,7 +734,9 @@ namespace Moritz.Palettes
                 }
                 if(!hasError)
                 {
-                    for(int i = 0; i < _ornaments.Count; ++i)
+                    // can't use _ornaments.Count here because this function is called by SetDialogState()
+                    int numberOfOrnaments = int.Parse(NumberOfOrnamentsTextBox.Text);
+                    for(int i = 0; i < numberOfOrnaments; ++i)
                     {
                         if(_12OrnamentTextBoxes[i].BackColor == M.TextBoxErrorColor)
                         {

@@ -312,15 +312,6 @@ namespace Moritz.Composer
                 SetSettingsNotSaved();
         }
 
-        private void DimensionsAndMetadataForm_Activated(object sender, EventArgs e)
-        {
-            bool mainFormHasBeenSaved = !this._assistantComposerMainForm.Text.EndsWith("*");
-            this.DeselectAll();
-            if(mainFormHasBeenSaved)
-                _assistantComposerMainForm.SetSettingsHaveBeenSaved();
-            else
-                _assistantComposerMainForm.SetSettingsHaveNotBeenSaved();
-        }
         /// <summary>
         /// Removes the '*' in Text, disables the SaveButton and informs _ornamentSettingsForm
         /// </summary>
@@ -342,7 +333,7 @@ namespace Moritz.Composer
                 this.Text = this.Text + "*";
                 if(this._assistantComposerMainForm != null)
                 {
-                    _assistantComposerMainForm.SetSettingsHaveNotBeenSaved();
+                    _assistantComposerMainForm.SetSettingsHaveChanged();
                 }
             }
             this.SaveSettingsButton.Enabled = true;

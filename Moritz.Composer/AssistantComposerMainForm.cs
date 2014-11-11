@@ -212,7 +212,13 @@ namespace Moritz.Composer
             PalettesListBox.Items.Clear();
         }
 
-        public void SetSettingsHaveNotBeenSaved()
+        private void SetSaveAndCreateButtons(bool saveButtonEnabled)
+        {
+            this.SaveSettingsButton.Enabled = saveButtonEnabled;
+            CreateScoreButton.Enabled = !saveButtonEnabled;
+        }
+
+        public void SetSettingsHaveChanged()
         {
             if(SettingsHaveBeenSaved())
             {
@@ -271,12 +277,6 @@ namespace Moritz.Composer
             return error;
         }
 
-        public void SetSaveAndCreateButtons(bool saveButtonEnabled)
-        {
-            this.SaveSettingsButton.Enabled = saveButtonEnabled;
-            CreateScoreButton.Enabled = !saveButtonEnabled;
-        }
-
         #region form events
         private void DeselectAll()
         {
@@ -289,7 +289,7 @@ namespace Moritz.Composer
             if(settingsHaveBeenSaved)
                 SetSettingsHaveBeenSaved();
             else
-                SetSettingsHaveNotBeenSaved();
+                SetSettingsHaveChanged();
         }
 
         private void DeselectAllKrystalListBoxItems()
@@ -551,13 +551,9 @@ namespace Moritz.Composer
         {
             ComposerFormCallbacks callbacks = new ComposerFormCallbacks();
             callbacks.MainFormBringToFront = this.BringToFront;
-            callbacks.MainFormHasBeenSaved = ThisHasBeenSaved;
-            callbacks.SaveSettings = SaveSettings;
-            callbacks.SetSaveAndCreateButtons = SetSaveAndCreateButtons;
-            callbacks.SetSettingsHaveBeenSaved = SetSettingsHaveBeenSaved;
-            callbacks.SetSettingsHaveNotBeenSaved = SetSettingsHaveNotBeenSaved;
-            callbacks.LocalScoreAudioPath = GetLocalScoreAudioPath;
-            callbacks.APaletteChordFormIsOpen = APaletteChordFormIsOpen;
+            callbacks.LocalScoreAudioPath = this.GetLocalScoreAudioPath;
+            callbacks.APaletteChordFormIsOpen = this.APaletteChordFormIsOpen;
+            callbacks.SetSettingsHaveChanged = this.SetSettingsHaveChanged;
             return callbacks;
         }
 
@@ -587,10 +583,6 @@ namespace Moritz.Composer
         private void SaveSettings()
         {
             SaveSettingsButton_Click(null, null);
-        }
-        private bool ThisHasBeenSaved()
-        {
-            return (!(this.Text.EndsWith("*")));
         }
 
         public void SaveSettingsButton_Click(object sender, EventArgs e)
@@ -912,7 +904,7 @@ namespace Moritz.Composer
         #region text box events
         private void SystemStartBarsTextBox_Leave(object sender, EventArgs e)
         {
-            SetSettingsHaveNotBeenSaved();
+            SetSettingsHaveChanged();
             // Passing uint.MaxValue means that the list can have any number of values (including none).
             M.LeaveIntRangeTextBox(SystemStartBarsTextBox, true, uint.MaxValue, 1, int.MaxValue, SetTextBoxState);
             if((SystemStartBarsTextBox.BackColor != M.TextBoxErrorColor)
@@ -967,7 +959,7 @@ namespace Moritz.Composer
         #endregion text box events
         private void BeamsCrossBarlinesCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveNotBeenSaved();
+            SetSettingsHaveChanged();
         }
         #region list box events and functions
         private void KrystalsListBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -1053,7 +1045,7 @@ namespace Moritz.Composer
                 Krystal krystal = K.LoadKrystal(staffKrystalPath);
                 this.KrystalsListBox.Items.Add(krystal);
 
-                SetSettingsHaveNotBeenSaved();
+                SetSettingsHaveChanged();
 
                 KrystalsListBox.SetSelected(KrystalsListBox.Items.Count - 1, true); // triggers KrystalsListBox_SelectedIndexChanged()
             }
@@ -1089,7 +1081,7 @@ namespace Moritz.Composer
 
                     if(AllKrystals.Count > 0)
                     {
-                        SetSettingsHaveNotBeenSaved();
+                        SetSettingsHaveChanged();
                     }
                     else
                     {
@@ -1228,7 +1220,7 @@ namespace Moritz.Composer
                     currentPaletteForms.Add(iPaletteForm);
                     CurrentIPaletteForms = currentPaletteForms;
                     PalettesListBox.SelectedIndex = PalettesListBox.Items.Count - 1;
-                    this.SetSettingsHaveNotBeenSaved();
+                    this.SetSettingsHaveChanged();
                 }
                 else
                 {
@@ -1255,7 +1247,7 @@ namespace Moritz.Composer
                     currentPaletteForms[selectedIndex].Close();
                     currentPaletteForms.RemoveAt(selectedIndex);
                     CurrentIPaletteForms = currentPaletteForms;
-                    this.SetSettingsHaveNotBeenSaved();
+                    this.SetSettingsHaveChanged();
                     UpdateForChangedPaletteList();
                 }
             }
@@ -1318,21 +1310,21 @@ namespace Moritz.Composer
 
         private void StafflineStemStrokeWidthComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveNotBeenSaved();
+            SetSettingsHaveChanged();
         }
         private void GapPixelsComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveNotBeenSaved();
+            SetSettingsHaveChanged();
         }
         private void MinimumGapsBetweenStavesTextBox_TextChanged(object sender, EventArgs e)
         {
             CheckTextBoxIsUInt(this.MinimumGapsBetweenStavesTextBox);
-            SetSettingsHaveNotBeenSaved();
+            SetSettingsHaveChanged();
         }
         private void MinimumGapsBetweenSystemsTextBox_TextChanged(object sender, EventArgs e)
         {
             CheckTextBoxIsUInt(this.MinimumGapsBetweenSystemsTextBox);
-            SetSettingsHaveNotBeenSaved();
+            SetSettingsHaveChanged();
         }
 
         private void ScoreComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -1374,13 +1366,13 @@ namespace Moritz.Composer
                 this.StandardChordsOptionsPanel.Visible = true;
 
             this.OutputVoiceIndicesStaffTextBox_Leave(null, null);
-            SetSettingsHaveNotBeenSaved();
+            SetSettingsHaveChanged();
         }
 
         private void MinimumCrotchetDurationTextBox_TextChanged(object sender, EventArgs e)
         {
             CheckTextBoxIsUInt(this.MinimumCrotchetDurationTextBox);
-            SetSettingsHaveNotBeenSaved();
+            SetSettingsHaveChanged();
         }
         private void CheckTextBoxIsUInt(TextBox textBox)
         {
@@ -1604,7 +1596,7 @@ namespace Moritz.Composer
         /// </summary>
         private void OutputVoiceIndicesStaffTextBox_Leave(object sender, EventArgs e)
         {
-            SetSettingsHaveNotBeenSaved();
+            SetSettingsHaveChanged();
             EnableStaffDependentControls(false);
 
             bool error = false;
@@ -1665,7 +1657,7 @@ namespace Moritz.Composer
         /// </summary>
         private void InputVoiceIndicesPerStaffTextBox_Leave(object sender, EventArgs e)
         {
-            SetSettingsHaveNotBeenSaved();
+            SetSettingsHaveChanged();
             EnableStaffDependentControls(false);
 
             bool error = false;
@@ -1837,50 +1829,50 @@ namespace Moritz.Composer
         #region set text boxes to white, and unsaved settings
         private void OutputVoiceIndicesStaffTextBox_TextChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveNotBeenSaved();
+            SetSettingsHaveChanged();
             M.SetToWhite(OutputVoiceIndicesStaffTextBox);
         }
 
         private void InputVoiceIndicesPerStaffTextBox_TextChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveNotBeenSaved();
+            SetSettingsHaveChanged();
             M.SetToWhite(InputVoiceIndicesPerStaffTextBox);
         }
 
 
         private void ClefsPerStaffTextBox_TextChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveNotBeenSaved();
+            SetSettingsHaveChanged();
             M.SetToWhite(ClefsPerStaffTextBox);
         }
 
         private void StafflinesPerStaffTextBox_TextChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveNotBeenSaved();
+            SetSettingsHaveChanged();
             M.SetToWhite(StafflinesPerStaffTextBox);
         }
 
         private void StaffGroupsTextBox_TextChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveNotBeenSaved();
+            SetSettingsHaveChanged();
             M.SetToWhite(StaffGroupsTextBox);
         }
 
         private void LongStaffNamesTextBox_TextChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveNotBeenSaved();
+            SetSettingsHaveChanged();
             M.SetToWhite(LongStaffNamesTextBox);
         }
 
         private void ShortStaffNamesTextBox_TextChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveNotBeenSaved();
+            SetSettingsHaveChanged();
             M.SetToWhite(ShortStaffNamesTextBox);
         }
 
         private void SystemStartBarsTextBox_TextChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveNotBeenSaved();
+            SetSettingsHaveChanged();
             M.SetToWhite(SystemStartBarsTextBox);
         }
         #endregion

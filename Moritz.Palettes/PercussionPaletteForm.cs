@@ -108,7 +108,7 @@ namespace Moritz.Palettes
             if(!this.Text.EndsWith("*"))
                 this.Text = this.Text + "*";
             if(this._callbacks != null)
-                _callbacks.SetSettingsHaveNotBeenSaved();
+                _callbacks.SetSettingsHaveChanged();
         }
 
 
@@ -694,15 +694,6 @@ namespace Moritz.Palettes
                 _audioButtonsControl.Enabled = true;
 
             this.SetSettingsNotSaved();
-        }
-
-        /// <summary>
-        /// Used by ornaments dialog.
-        /// </summary>
-        /// <param name="enabled"></param>
-        public void SetSaveButton(bool enabled)
-        {
-            _callbacks.SetSaveAndCreateButtons(enabled);
         }
 
         /// <summary>

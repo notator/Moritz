@@ -34,6 +34,8 @@ namespace Moritz.Palettes
             InitializeMidiEventButton(midiChordIndex);
 
             AddAudioSampleButtons(_paletteForm.Domain);
+
+            SetSettingsUnchanged();
         }
 
         private void FindEmptyDefaultControls()
@@ -368,6 +370,7 @@ namespace Moritz.Palettes
                 
                 _paletteForm.MinMsDurationsTextBox.Text = minMsDurationsSBs[0].ToString() + this.MinMsDurationTextBox.Text + minMsDurationsSBs[2].ToString();
 
+                _paletteForm.SetSettingsNotSaved();
                 _paletteForm.ClosePaletteChordForm(_midiChordIndex);
             }
 
@@ -380,21 +383,37 @@ namespace Moritz.Palettes
         #endregion buttons
 
         #region TextBox_Leave handlers
+        private void SetSettingsUnchanged()
+        {
+            if(this.Text.EndsWith("*"))
+                this.Text = this.Text.Remove(this.Text.Length - 1);
+            this.SaveAndCloseButton.Enabled = false;
+        }
+        private void SetSettingsChanged()
+        {
+            if(!this.Text.EndsWith("*"))
+                this.Text = this.Text + "*";
+            this.SaveAndCloseButton.Enabled = true;
+        }
         private void DurationTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 1, int.MaxValue, _setDialogState);
+            SetSettingsChanged();
         }
         private void VelocityTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, _setDialogState);  
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, _setDialogState);
+            SetSettingsChanged();
         }
         private void BaseMidiPitchTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, _setDialogState);
+            SetSettingsChanged();
         }
         private void ChordOffTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 1, _setDialogState);
+            SetSettingsChanged();
         }
 
         private void EnableAllTextBoxesAndMidiButton()
@@ -453,6 +472,7 @@ namespace Moritz.Palettes
             }
             else
             {
+                SetSettingsChanged();
                 EnableAllTextBoxesAndMidiButton();
 
                 DisableEmptyDefaultControls();
@@ -484,36 +504,36 @@ namespace Moritz.Palettes
             }
         }
 
-
-
         private void InversionIndexTextBox_Leave(object sender, EventArgs e)
         {
-            TextBox textBox = sender as TextBox;
-            if(textBox != null)
-            {
-                int inversionsMaxIndex = ((2 * (_bcc.MaximumChordDensity - 2)) - 1);
-                M.LeaveIntRangeTextBox(textBox, false, 1, 0, inversionsMaxIndex, _setDialogState);
-            }
+            int inversionsMaxIndex = ((2 * (_bcc.MaximumChordDensity - 2)) - 1);
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, inversionsMaxIndex, _setDialogState);
+            SetSettingsChanged();
         }
         private void VerticalVelocityFactorTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveFloatRangeTextBox(sender as TextBox, false, 1, 0F, float.MaxValue, _setDialogState);
+            SetSettingsChanged();
         }
         private void BankIndexTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, _setDialogState);
+            SetSettingsChanged();
         }
         private void PatchIndexTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, _setDialogState);
+            SetSettingsChanged();
         }
         private void RepeatsTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 1, _setDialogState);
+            SetSettingsChanged();
         }
         private void PitchwheelDeviationTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, _setDialogState);
+            SetSettingsChanged();
         }
         private void CheckEnvelope(TextBox textBox)
         {
@@ -538,26 +558,32 @@ namespace Moritz.Palettes
         private void PitchwheelEnvelopeTextBox_Leave(object sender, EventArgs e)
         {
             CheckEnvelope(sender as TextBox);
+            SetSettingsChanged();
         }
         private void PanEnvelopeTextBox_Leave(object sender, EventArgs e)
         {
             CheckEnvelope(sender as TextBox);
+            SetSettingsChanged();
         }
         private void ModulationWheelEnvelopeTextBox_Leave(object sender, EventArgs e)
         {
             CheckEnvelope(sender as TextBox);
+            SetSettingsChanged();
         }
         private void ExpressionEnvelopeTextBox_Leave(object sender, EventArgs e)
         {
             CheckEnvelope(sender as TextBox);
+            SetSettingsChanged();
         }
         private void OrnamentNumberTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, _paletteForm.OrnamentSettingsForm.Ornaments.Count, _setDialogState);
+            SetSettingsChanged();
         }
         private void MinMsDurationsTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, int.MaxValue, _setDialogState);
+            SetSettingsChanged();
         }
         #endregion TextBox_Leave handlers
 

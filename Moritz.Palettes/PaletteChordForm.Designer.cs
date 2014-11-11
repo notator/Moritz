@@ -483,6 +483,7 @@
             // SaveAndCloseButton
             // 
             this.SaveAndCloseButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
+            this.SaveAndCloseButton.Enabled = false;
             this.SaveAndCloseButton.Location = new System.Drawing.Point(662, 581);
             this.SaveAndCloseButton.Name = "SaveAndCloseButton";
             this.SaveAndCloseButton.Size = new System.Drawing.Size(137, 28);
@@ -834,7 +835,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "PaletteChordForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "MidiChordForm";
+            this.Text = "PaletteChordForm";
             this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.PaletteChordForm_MouseClick);
             this.BasicChordControlsPanel.ResumeLayout(false);
             this.BasicChordControlsPanel.PerformLayout();

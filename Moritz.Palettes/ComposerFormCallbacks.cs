@@ -10,24 +10,16 @@ using Moritz.Spec;
 
 namespace Moritz.Palettes
 {
-    public delegate void SetSettingsHaveBeenSaved();
-    public delegate void SetSettingsHaveNotBeenSaved();
-    public delegate void SetSaveAndCreateButtons(bool enabled);
     public delegate void MainFormBringToFront();
-    public delegate void SaveSettings();
-    public delegate bool MainFormHasBeenSaved();
     public delegate string LocalAudioFolderPath();
     public delegate bool APaletteChordFormIsOpen();
+    public delegate void SetSettingsHaveChanged();
 
     public class ComposerFormCallbacks
     {
-        public SetSettingsHaveBeenSaved SetSettingsHaveBeenSaved;
-        public SetSettingsHaveNotBeenSaved SetSettingsHaveNotBeenSaved;
-        public SetSaveAndCreateButtons SetSaveAndCreateButtons;
         public MainFormBringToFront MainFormBringToFront;
-        public SaveSettings SaveSettings;
-        public MainFormHasBeenSaved MainFormHasBeenSaved;
         public LocalAudioFolderPath LocalScoreAudioPath;
         public APaletteChordFormIsOpen APaletteChordFormIsOpen;
+        public SetSettingsHaveChanged SetSettingsHaveChanged;
     }
 }

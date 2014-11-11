@@ -82,7 +82,7 @@ namespace Moritz.Palettes
             this.DeleteOrnamentSettingsButton.Location = new System.Drawing.Point(531, 703);
             this.DeleteOrnamentSettingsButton.Name = "DeleteOrnamentSettingsButton";
             this.DeleteOrnamentSettingsButton.Size = new System.Drawing.Size(137, 26);
-            this.DeleteOrnamentSettingsButton.TabIndex = 14;
+            this.DeleteOrnamentSettingsButton.TabIndex = 3;
             this.DeleteOrnamentSettingsButton.Text = "delete ornament settings";
             this.DeleteOrnamentSettingsButton.UseVisualStyleBackColor = true;
             this.DeleteOrnamentSettingsButton.Click += new System.EventHandler(this.DeleteOrnamentSettingsButton_Click);
@@ -93,7 +93,7 @@ namespace Moritz.Palettes
             this.NewOrnamentSettingsButton.Location = new System.Drawing.Point(531, 669);
             this.NewOrnamentSettingsButton.Name = "NewOrnamentSettingsButton";
             this.NewOrnamentSettingsButton.Size = new System.Drawing.Size(137, 26);
-            this.NewOrnamentSettingsButton.TabIndex = 13;
+            this.NewOrnamentSettingsButton.TabIndex = 0;
             this.NewOrnamentSettingsButton.Text = "new ornament settings";
             this.NewOrnamentSettingsButton.UseVisualStyleBackColor = true;
             this.NewOrnamentSettingsButton.Click += new System.EventHandler(this.NewOrnamentSettingsButton_Click);
@@ -113,7 +113,7 @@ namespace Moritz.Palettes
             this.OrnamentNumbersTextBox.Location = new System.Drawing.Point(173, 534);
             this.OrnamentNumbersTextBox.Name = "OrnamentNumbersTextBox";
             this.OrnamentNumbersTextBox.Size = new System.Drawing.Size(454, 20);
-            this.OrnamentNumbersTextBox.TabIndex = 16;
+            this.OrnamentNumbersTextBox.TabIndex = 14;
             this.OrnamentNumbersTextBox.TextChanged += new System.EventHandler(this.OrnamentNumbersTextBox_TextChanged);
             this.OrnamentNumbersTextBox.Leave += new System.EventHandler(this.OrnamentNumbersTextBox_Leave);
             // 
@@ -134,7 +134,7 @@ namespace Moritz.Palettes
             this.ShowOrnamentSettingsButton.Location = new System.Drawing.Point(677, 669);
             this.ShowOrnamentSettingsButton.Name = "ShowOrnamentSettingsButton";
             this.ShowOrnamentSettingsButton.Size = new System.Drawing.Size(137, 26);
-            this.ShowOrnamentSettingsButton.TabIndex = 11;
+            this.ShowOrnamentSettingsButton.TabIndex = 1;
             this.ShowOrnamentSettingsButton.Text = "show ornament settings";
             this.ShowOrnamentSettingsButton.UseVisualStyleBackColor = false;
             this.ShowOrnamentSettingsButton.Click += new System.EventHandler(this.ShowOrnamentSettingsButton_Click);
@@ -153,7 +153,7 @@ namespace Moritz.Palettes
             this.PanEnvelopesTextBox.Location = new System.Drawing.Point(173, 403);
             this.PanEnvelopesTextBox.Name = "PanEnvelopesTextBox";
             this.PanEnvelopesTextBox.Size = new System.Drawing.Size(554, 20);
-            this.PanEnvelopesTextBox.TabIndex = 13;
+            this.PanEnvelopesTextBox.TabIndex = 11;
             this.PanEnvelopesTextBox.TextChanged += new System.EventHandler(this.PanEnvelopesTextBox_TextChanged);
             this.PanEnvelopesTextBox.Leave += new System.EventHandler(this.PanEnvelopesTextBox_Leave);
             // 
@@ -205,7 +205,7 @@ namespace Moritz.Palettes
             this.PitchwheelEnvelopesTextBox.Location = new System.Drawing.Point(173, 376);
             this.PitchwheelEnvelopesTextBox.Name = "PitchwheelEnvelopesTextBox";
             this.PitchwheelEnvelopesTextBox.Size = new System.Drawing.Size(554, 20);
-            this.PitchwheelEnvelopesTextBox.TabIndex = 12;
+            this.PitchwheelEnvelopesTextBox.TabIndex = 10;
             this.PitchwheelEnvelopesTextBox.TextChanged += new System.EventHandler(this.PitchwheelEnvelopesTextBox_TextChanged);
             this.PitchwheelEnvelopesTextBox.Leave += new System.EventHandler(this.PitchwheelEnvelopesTextBox_Leave);
             // 
@@ -214,7 +214,7 @@ namespace Moritz.Palettes
             this.PitchwheelDeviationsTextBox.Location = new System.Drawing.Point(173, 346);
             this.PitchwheelDeviationsTextBox.Name = "PitchwheelDeviationsTextBox";
             this.PitchwheelDeviationsTextBox.Size = new System.Drawing.Size(454, 20);
-            this.PitchwheelDeviationsTextBox.TabIndex = 11;
+            this.PitchwheelDeviationsTextBox.TabIndex = 9;
             this.PitchwheelDeviationsTextBox.TextChanged += new System.EventHandler(this.PitchwheelDeviationsTextBox_TextChanged);
             this.PitchwheelDeviationsTextBox.Leave += new System.EventHandler(this.PitchwheelDeviationsTextBox_Leave);
             // 
@@ -223,7 +223,7 @@ namespace Moritz.Palettes
             this.ModulationWheelEnvelopesTextBox.Location = new System.Drawing.Point(173, 430);
             this.ModulationWheelEnvelopesTextBox.Name = "ModulationWheelEnvelopesTextBox";
             this.ModulationWheelEnvelopesTextBox.Size = new System.Drawing.Size(554, 20);
-            this.ModulationWheelEnvelopesTextBox.TabIndex = 14;
+            this.ModulationWheelEnvelopesTextBox.TabIndex = 12;
             this.ModulationWheelEnvelopesTextBox.TextChanged += new System.EventHandler(this.ModulationWheelEnvelopesTextBox_TextChanged);
             this.ModulationWheelEnvelopesTextBox.Leave += new System.EventHandler(this.ModulationWheelEnvelopesTextBox_Leave);
             // 
@@ -259,7 +259,7 @@ namespace Moritz.Palettes
             this.ExpressionEnvelopesTextBox.Location = new System.Drawing.Point(173, 457);
             this.ExpressionEnvelopesTextBox.Name = "ExpressionEnvelopesTextBox";
             this.ExpressionEnvelopesTextBox.Size = new System.Drawing.Size(554, 20);
-            this.ExpressionEnvelopesTextBox.TabIndex = 15;
+            this.ExpressionEnvelopesTextBox.TabIndex = 13;
             this.ExpressionEnvelopesTextBox.TextChanged += new System.EventHandler(this.ExpressionEnvelopesTextBox_TextChanged);
             this.ExpressionEnvelopesTextBox.Leave += new System.EventHandler(this.ExpressionEnvelopesTextBox_Leave);
             // 
@@ -301,7 +301,7 @@ namespace Moritz.Palettes
             this.MidiPitchesHelpButton.Location = new System.Drawing.Point(30, 638);
             this.MidiPitchesHelpButton.Name = "MidiPitchesHelpButton";
             this.MidiPitchesHelpButton.Size = new System.Drawing.Size(95, 24);
-            this.MidiPitchesHelpButton.TabIndex = 15;
+            this.MidiPitchesHelpButton.TabIndex = 17;
             this.MidiPitchesHelpButton.Text = "MIDI Pitches";
             this.MidiPitchesHelpButton.UseVisualStyleBackColor = false;
             this.MidiPitchesHelpButton.Click += new System.EventHandler(this.MidiPitchesHelpButton_Click);
@@ -343,7 +343,7 @@ namespace Moritz.Palettes
             this.MinMsDurationsTextBox.Location = new System.Drawing.Point(173, 561);
             this.MinMsDurationsTextBox.Name = "MinMsDurationsTextBox";
             this.MinMsDurationsTextBox.Size = new System.Drawing.Size(454, 20);
-            this.MinMsDurationsTextBox.TabIndex = 17;
+            this.MinMsDurationsTextBox.TabIndex = 15;
             this.MinMsDurationsTextBox.TextChanged += new System.EventHandler(this.MinMsDurationsTextBox_TextChanged);
             this.MinMsDurationsTextBox.Leave += new System.EventHandler(this.MinMsDurationsTextBox_Leave);
             // 
@@ -364,7 +364,7 @@ namespace Moritz.Palettes
             this.ShowMainScoreFormButton.Location = new System.Drawing.Point(677, 703);
             this.ShowMainScoreFormButton.Name = "ShowMainScoreFormButton";
             this.ShowMainScoreFormButton.Size = new System.Drawing.Size(137, 26);
-            this.ShowMainScoreFormButton.TabIndex = 103;
+            this.ShowMainScoreFormButton.TabIndex = 4;
             this.ShowMainScoreFormButton.Text = "show main score form";
             this.ShowMainScoreFormButton.UseVisualStyleBackColor = false;
             this.ShowMainScoreFormButton.Click += new System.EventHandler(this.ShowMainScoreFormButton_Click);
@@ -407,10 +407,10 @@ namespace Moritz.Palettes
             // 
             this.SaveSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.SaveSettingsButton.Enabled = false;
-            this.SaveSettingsButton.Location = new System.Drawing.Point(415, 704);
+            this.SaveSettingsButton.Location = new System.Drawing.Point(415, 703);
             this.SaveSettingsButton.Name = "SaveSettingsButton";
             this.SaveSettingsButton.Size = new System.Drawing.Size(107, 26);
-            this.SaveSettingsButton.TabIndex = 111;
+            this.SaveSettingsButton.TabIndex = 2;
             this.SaveSettingsButton.Text = "save settings";
             this.SaveSettingsButton.UseVisualStyleBackColor = true;
             this.SaveSettingsButton.Click += new System.EventHandler(this.SaveSettingsButton_Click);
@@ -420,7 +420,7 @@ namespace Moritz.Palettes
             this.BankIndicesTextBox.Location = new System.Drawing.Point(173, 265);
             this.BankIndicesTextBox.Name = "BankIndicesTextBox";
             this.BankIndicesTextBox.Size = new System.Drawing.Size(454, 20);
-            this.BankIndicesTextBox.TabIndex = 8;
+            this.BankIndicesTextBox.TabIndex = 6;
             this.BankIndicesTextBox.Leave += new System.EventHandler(this.BankIndicesTextBox_Leave);
             // 
             // BankIndicesHelpLabel
@@ -447,7 +447,7 @@ namespace Moritz.Palettes
             this.PatchIndicesTextBox.Location = new System.Drawing.Point(173, 292);
             this.PatchIndicesTextBox.Name = "PatchIndicesTextBox";
             this.PatchIndicesTextBox.Size = new System.Drawing.Size(454, 20);
-            this.PatchIndicesTextBox.TabIndex = 9;
+            this.PatchIndicesTextBox.TabIndex = 7;
             this.PatchIndicesTextBox.Leave += new System.EventHandler(this.PatchIndicesTextBox_Leave);
             // 
             // PatchIndicesHelpLabel
@@ -484,7 +484,7 @@ namespace Moritz.Palettes
             this.RepeatsTextBox.Location = new System.Drawing.Point(173, 319);
             this.RepeatsTextBox.Name = "RepeatsTextBox";
             this.RepeatsTextBox.Size = new System.Drawing.Size(454, 20);
-            this.RepeatsTextBox.TabIndex = 10;
+            this.RepeatsTextBox.TabIndex = 8;
             this.RepeatsTextBox.TextChanged += new System.EventHandler(this.RepeatsTextBox_TextChanged);
             this.RepeatsTextBox.Leave += new System.EventHandler(this.RepeatsTextBox_Leave);
             // 
@@ -563,8 +563,7 @@ namespace Moritz.Palettes
             this.Location = new System.Drawing.Point(250, 100);
             this.Name = "PaletteForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "krystal palette";
-            this.Activated += new System.EventHandler(this.PaletteForm_Activated);
+            this.Text = "palette";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.PaletteForm_FormClosing);
             this.Click += new System.EventHandler(this.PaletteForm_Click);
             this.ResumeLayout(false);

@@ -85,6 +85,8 @@ namespace Moritz.Palettes
             this.BankIndicesHelpLabel = new System.Windows.Forms.Label();
             this.PatchIndicesTextBox = new System.Windows.Forms.TextBox();
             this.BankIndicesLabel = new System.Windows.Forms.Label();
+            this.OkayToSaveButton = new System.Windows.Forms.Button();
+            this.RevertToSavedButton = new System.Windows.Forms.Button();
             this.OrnamentsGroupBox.SuspendLayout();
             this.BottomPanel.SuspendLayout();
             this.TopPanel.SuspendLayout();
@@ -122,10 +124,10 @@ namespace Moritz.Palettes
             // 
             this.ShowContainingPalletButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.ShowContainingPalletButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.ShowContainingPalletButton.Location = new System.Drawing.Point(634, 27);
+            this.ShowContainingPalletButton.Location = new System.Drawing.Point(508, 85);
             this.ShowContainingPalletButton.Name = "ShowContainingPalletButton";
-            this.ShowContainingPalletButton.Size = new System.Drawing.Size(157, 36);
-            this.ShowContainingPalletButton.TabIndex = 0;
+            this.ShowContainingPalletButton.Size = new System.Drawing.Size(142, 26);
+            this.ShowContainingPalletButton.TabIndex = 2;
             this.ShowContainingPalletButton.Text = "show containing palette";
             this.ShowContainingPalletButton.UseVisualStyleBackColor = false;
             this.ShowContainingPalletButton.Click += new System.EventHandler(this.ShowContainingPaletteButton_Click);
@@ -134,10 +136,10 @@ namespace Moritz.Palettes
             // 
             this.ShowMainScoreFormButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.ShowMainScoreFormButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.ShowMainScoreFormButton.Location = new System.Drawing.Point(634, 80);
+            this.ShowMainScoreFormButton.Location = new System.Drawing.Point(657, 85);
             this.ShowMainScoreFormButton.Name = "ShowMainScoreFormButton";
-            this.ShowMainScoreFormButton.Size = new System.Drawing.Size(157, 36);
-            this.ShowMainScoreFormButton.TabIndex = 1;
+            this.ShowMainScoreFormButton.Size = new System.Drawing.Size(142, 26);
+            this.ShowMainScoreFormButton.TabIndex = 3;
             this.ShowMainScoreFormButton.Text = "show main score form";
             this.ShowMainScoreFormButton.UseVisualStyleBackColor = false;
             this.ShowMainScoreFormButton.Click += new System.EventHandler(this.ShowMainScoreFormButton_Click);
@@ -215,7 +217,7 @@ namespace Moritz.Palettes
             this.OrnamentsGroupBox.Location = new System.Drawing.Point(20, 340);
             this.OrnamentsGroupBox.Name = "OrnamentsGroupBox";
             this.OrnamentsGroupBox.Size = new System.Drawing.Size(795, 358);
-            this.OrnamentsGroupBox.TabIndex = 1;
+            this.OrnamentsGroupBox.TabIndex = 2;
             this.OrnamentsGroupBox.TabStop = false;
             this.OrnamentsGroupBox.Text = "ornament definitions";
             // 
@@ -574,6 +576,8 @@ namespace Moritz.Palettes
             // 
             // BottomPanel
             // 
+            this.BottomPanel.Controls.Add(this.RevertToSavedButton);
+            this.BottomPanel.Controls.Add(this.OkayToSaveButton);
             this.BottomPanel.Controls.Add(this.ShowContainingPalletButton);
             this.BottomPanel.Controls.Add(this.ShowMainScoreFormButton);
             this.BottomPanel.Controls.Add(this.label1);
@@ -592,7 +596,7 @@ namespace Moritz.Palettes
             this.BottomPanel.Location = new System.Drawing.Point(16, 699);
             this.BottomPanel.Name = "BottomPanel";
             this.BottomPanel.Size = new System.Drawing.Size(803, 120);
-            this.BottomPanel.TabIndex = 2;
+            this.BottomPanel.TabIndex = 0;
             // 
             // TopPanel
             // 
@@ -610,7 +614,7 @@ namespace Moritz.Palettes
             this.TopPanel.Location = new System.Drawing.Point(16, 12);
             this.TopPanel.Name = "TopPanel";
             this.TopPanel.Size = new System.Drawing.Size(803, 323);
-            this.TopPanel.TabIndex = 0;
+            this.TopPanel.TabIndex = 1;
             // 
             // BankIndicesTextBox
             // 
@@ -618,12 +622,13 @@ namespace Moritz.Palettes
             this.BankIndicesTextBox.Name = "BankIndicesTextBox";
             this.BankIndicesTextBox.Size = new System.Drawing.Size(454, 20);
             this.BankIndicesTextBox.TabIndex = 7;
+            this.BankIndicesTextBox.Leave += new System.EventHandler(this.BankIndicesTextBox_Leave);
             // 
             // PatchIndicesHelpLabel
             // 
             this.PatchIndicesHelpLabel.AutoSize = true;
             this.PatchIndicesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.PatchIndicesHelpLabel.Location = new System.Drawing.Point(609, 297);
+            this.PatchIndicesHelpLabel.Location = new System.Drawing.Point(605, 297);
             this.PatchIndicesHelpLabel.Name = "PatchIndicesHelpLabel";
             this.PatchIndicesHelpLabel.Size = new System.Drawing.Size(171, 14);
             this.PatchIndicesHelpLabel.TabIndex = 157;
@@ -643,7 +648,7 @@ namespace Moritz.Palettes
             // 
             this.BankIndicesHelpLabel.AutoSize = true;
             this.BankIndicesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.BankIndicesHelpLabel.Location = new System.Drawing.Point(609, 272);
+            this.BankIndicesHelpLabel.Location = new System.Drawing.Point(605, 271);
             this.BankIndicesHelpLabel.Name = "BankIndicesHelpLabel";
             this.BankIndicesHelpLabel.Size = new System.Drawing.Size(171, 14);
             this.BankIndicesHelpLabel.TabIndex = 159;
@@ -655,6 +660,7 @@ namespace Moritz.Palettes
             this.PatchIndicesTextBox.Name = "PatchIndicesTextBox";
             this.PatchIndicesTextBox.Size = new System.Drawing.Size(454, 20);
             this.PatchIndicesTextBox.TabIndex = 8;
+            this.PatchIndicesTextBox.Leave += new System.EventHandler(this.PatchIndicesTextBox_Leave);
             // 
             // BankIndicesLabel
             // 
@@ -665,6 +671,32 @@ namespace Moritz.Palettes
             this.BankIndicesLabel.Size = new System.Drawing.Size(81, 14);
             this.BankIndicesLabel.TabIndex = 158;
             this.BankIndicesLabel.Text = "( bank indices )";
+            // 
+            // OkayToSaveButton
+            // 
+            this.OkayToSaveButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
+            this.OkayToSaveButton.Enabled = false;
+            this.OkayToSaveButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.OkayToSaveButton.Location = new System.Drawing.Point(657, 55);
+            this.OkayToSaveButton.Name = "OkayToSaveButton";
+            this.OkayToSaveButton.Size = new System.Drawing.Size(142, 26);
+            this.OkayToSaveButton.TabIndex = 1;
+            this.OkayToSaveButton.Text = "okay to save";
+            this.OkayToSaveButton.UseVisualStyleBackColor = false;
+            this.OkayToSaveButton.Click += new System.EventHandler(this.OkayToSaveButton_Click);
+            // 
+            // RevertToSavedButton
+            // 
+            this.RevertToSavedButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
+            this.RevertToSavedButton.Enabled = false;
+            this.RevertToSavedButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.RevertToSavedButton.Location = new System.Drawing.Point(508, 55);
+            this.RevertToSavedButton.Name = "RevertToSavedButton";
+            this.RevertToSavedButton.Size = new System.Drawing.Size(142, 26);
+            this.RevertToSavedButton.TabIndex = 0;
+            this.RevertToSavedButton.Text = "revert to saved";
+            this.RevertToSavedButton.UseVisualStyleBackColor = false;
+            this.RevertToSavedButton.Click += new System.EventHandler(this.RevertToSavedButton_Click);
             // 
             // OrnamentSettingsForm
             // 
@@ -750,6 +782,8 @@ namespace Moritz.Palettes
         public System.Windows.Forms.Label BankIndicesHelpLabel;
         public System.Windows.Forms.TextBox PatchIndicesTextBox;
         public System.Windows.Forms.Label BankIndicesLabel;
+        private System.Windows.Forms.Button RevertToSavedButton;
+        private System.Windows.Forms.Button OkayToSaveButton;
 
     }
 }

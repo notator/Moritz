@@ -91,7 +91,6 @@ namespace Moritz.Palettes
 
             this.Enabled = true;
             this.BringToFront();
-
             this.PaletteButtonsControl.PaletteChordFormButtons[chordIndex].Select();
         }
 
@@ -102,7 +101,7 @@ namespace Moritz.Palettes
             _bcc = new BasicChordControl(SetDialogState);
             _bcc.Location = new Point(22, 14);
             Controls.Add(_bcc);
-            _bcc.TabIndex = 0;
+            _bcc.TabIndex = 5;
         }
         private void ConnectPaletteButtonsControl(int domain, string audioFolder)
         {
@@ -152,11 +151,21 @@ namespace Moritz.Palettes
             if(!this.Text.EndsWith("*"))
             {
                 this.Text = this.Text + "*";
-                if(this._callbacks != null)
-                {
-                    _callbacks.SetSettingsHaveNotBeenSaved();
-                    this.SaveSettingsButton.Enabled = true;
-                }
+            }
+            if(this._callbacks != null)
+            {
+                _callbacks.SetSettingsHaveChanged();
+                this.SaveSettingsButton.Enabled = true;
+            }
+        }
+        /// <summary>
+        /// Informs _assistantComposerMainForm that the OrnamentsForm has changed.
+        /// </summary>
+        public void SetOrnamentSettingsHaveChanged()
+        {
+            if(this._callbacks != null)
+            {
+                _callbacks.SetSettingsHaveChanged();
             }
         }
 
@@ -324,7 +333,7 @@ namespace Moritz.Palettes
 
         private void SaveSettingsButton_Click(object sender, EventArgs e)
         {
-            _callbacks.SaveSettings();
+            //_callbacks.SaveSettings();
             DeselectAll();
         }
 
@@ -890,17 +899,6 @@ namespace Moritz.Palettes
         }
 
         /// <summary>
-        /// Used by ornaments dialog.
-        /// </summary>
-        /// <param name="enabled"></param>
-        public void SetSaveButton(bool enabled)
-        {
-            _callbacks.SetSaveAndCreateButtons(enabled);
-        }
-
-
-
-        /// <summary>
         /// Returne false if
         ///     (count != -1 && intList.Count != count)
         ///     or any value is less than minVal, 
@@ -952,16 +950,6 @@ namespace Moritz.Palettes
         }
         #endregion helper functions
         #endregion text box events
-
-        private void PaletteForm_Activated(object sender, EventArgs e)
-        {
-            this.DeselectAll();
-            if(_callbacks.MainFormHasBeenSaved())
-                _callbacks.SetSettingsHaveBeenSaved();
-            else
-                _callbacks.SetSettingsHaveNotBeenSaved();
-        }
-
         /// <summary>
         /// This form is closed only by the AssistantComposer form
         /// </summary>
@@ -969,12 +957,6 @@ namespace Moritz.Palettes
         /// <param name="e"></param>
         private void PaletteForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if(_strandsBrowser != null)
-            {
-                _strandsBrowser.Close();
-                _strandsBrowser = null;
-            }
-
             if(_ornamentSettingsForm != null)
             {
                 _ornamentSettingsForm.Close();

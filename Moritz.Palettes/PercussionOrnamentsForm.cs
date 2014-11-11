@@ -170,7 +170,7 @@ namespace Moritz.Palettes
                 this.OrnamentsLevelTextBox.Text = ornamentKrystal.Level.ToString();
                 _bpc.NumberOfChordValues = (int) ornamentKrystal.MaxValue;
     
-                this._percPaletteForm.SetSaveButton(true);
+                //this._percPaletteForm.SetSaveButton(true);
 
                 this.ShowOrnamentKrystalStrandsButton.Enabled = true;
 
