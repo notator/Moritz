@@ -78,6 +78,8 @@ namespace Moritz.Palettes
             this.label11 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
             this.BottomPanel = new System.Windows.Forms.Panel();
+            this.RevertToSavedButton = new System.Windows.Forms.Button();
+            this.OkayToSaveButton = new System.Windows.Forms.Button();
             this.TopPanel = new System.Windows.Forms.Panel();
             this.BankIndicesTextBox = new System.Windows.Forms.TextBox();
             this.PatchIndicesHelpLabel = new System.Windows.Forms.Label();
@@ -85,8 +87,6 @@ namespace Moritz.Palettes
             this.BankIndicesHelpLabel = new System.Windows.Forms.Label();
             this.PatchIndicesTextBox = new System.Windows.Forms.TextBox();
             this.BankIndicesLabel = new System.Windows.Forms.Label();
-            this.OkayToSaveButton = new System.Windows.Forms.Button();
-            this.RevertToSavedButton = new System.Windows.Forms.Button();
             this.OrnamentsGroupBox.SuspendLayout();
             this.BottomPanel.SuspendLayout();
             this.TopPanel.SuspendLayout();
@@ -124,7 +124,7 @@ namespace Moritz.Palettes
             // 
             this.ShowContainingPalletButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.ShowContainingPalletButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.ShowContainingPalletButton.Location = new System.Drawing.Point(508, 85);
+            this.ShowContainingPalletButton.Location = new System.Drawing.Point(508, 88);
             this.ShowContainingPalletButton.Name = "ShowContainingPalletButton";
             this.ShowContainingPalletButton.Size = new System.Drawing.Size(142, 26);
             this.ShowContainingPalletButton.TabIndex = 2;
@@ -136,7 +136,7 @@ namespace Moritz.Palettes
             // 
             this.ShowMainScoreFormButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.ShowMainScoreFormButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.ShowMainScoreFormButton.Location = new System.Drawing.Point(657, 85);
+            this.ShowMainScoreFormButton.Location = new System.Drawing.Point(657, 88);
             this.ShowMainScoreFormButton.Name = "ShowMainScoreFormButton";
             this.ShowMainScoreFormButton.Size = new System.Drawing.Size(142, 26);
             this.ShowMainScoreFormButton.TabIndex = 3;
@@ -598,6 +598,32 @@ namespace Moritz.Palettes
             this.BottomPanel.Size = new System.Drawing.Size(803, 120);
             this.BottomPanel.TabIndex = 0;
             // 
+            // RevertToSavedButton
+            // 
+            this.RevertToSavedButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
+            this.RevertToSavedButton.Enabled = false;
+            this.RevertToSavedButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.RevertToSavedButton.Location = new System.Drawing.Point(657, 56);
+            this.RevertToSavedButton.Name = "RevertToSavedButton";
+            this.RevertToSavedButton.Size = new System.Drawing.Size(142, 26);
+            this.RevertToSavedButton.TabIndex = 0;
+            this.RevertToSavedButton.Text = "revert to saved";
+            this.RevertToSavedButton.UseVisualStyleBackColor = false;
+            this.RevertToSavedButton.Click += new System.EventHandler(this.RevertToSavedButton_Click);
+            // 
+            // OkayToSaveButton
+            // 
+            this.OkayToSaveButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
+            this.OkayToSaveButton.Enabled = false;
+            this.OkayToSaveButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.OkayToSaveButton.Location = new System.Drawing.Point(657, 24);
+            this.OkayToSaveButton.Name = "OkayToSaveButton";
+            this.OkayToSaveButton.Size = new System.Drawing.Size(142, 26);
+            this.OkayToSaveButton.TabIndex = 1;
+            this.OkayToSaveButton.Text = "okay to save";
+            this.OkayToSaveButton.UseVisualStyleBackColor = false;
+            this.OkayToSaveButton.Click += new System.EventHandler(this.OkayToSaveButton_Click);
+            // 
             // TopPanel
             // 
             this.TopPanel.BackColor = System.Drawing.Color.Honeydew;
@@ -671,32 +697,6 @@ namespace Moritz.Palettes
             this.BankIndicesLabel.Size = new System.Drawing.Size(81, 14);
             this.BankIndicesLabel.TabIndex = 158;
             this.BankIndicesLabel.Text = "( bank indices )";
-            // 
-            // OkayToSaveButton
-            // 
-            this.OkayToSaveButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.OkayToSaveButton.Enabled = false;
-            this.OkayToSaveButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.OkayToSaveButton.Location = new System.Drawing.Point(657, 55);
-            this.OkayToSaveButton.Name = "OkayToSaveButton";
-            this.OkayToSaveButton.Size = new System.Drawing.Size(142, 26);
-            this.OkayToSaveButton.TabIndex = 1;
-            this.OkayToSaveButton.Text = "okay to save";
-            this.OkayToSaveButton.UseVisualStyleBackColor = false;
-            this.OkayToSaveButton.Click += new System.EventHandler(this.OkayToSaveButton_Click);
-            // 
-            // RevertToSavedButton
-            // 
-            this.RevertToSavedButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.RevertToSavedButton.Enabled = false;
-            this.RevertToSavedButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.RevertToSavedButton.Location = new System.Drawing.Point(508, 55);
-            this.RevertToSavedButton.Name = "RevertToSavedButton";
-            this.RevertToSavedButton.Size = new System.Drawing.Size(142, 26);
-            this.RevertToSavedButton.TabIndex = 0;
-            this.RevertToSavedButton.Text = "revert to saved";
-            this.RevertToSavedButton.UseVisualStyleBackColor = false;
-            this.RevertToSavedButton.Click += new System.EventHandler(this.RevertToSavedButton_Click);
             // 
             // OrnamentSettingsForm
             // 

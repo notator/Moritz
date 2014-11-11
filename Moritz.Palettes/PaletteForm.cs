@@ -22,6 +22,9 @@ namespace Moritz.Palettes
                 _paletteButtonsControl.Enabled = true;
             }
             DeselectAll();
+
+            this.RevertToSavedButton.Enabled = false;
+            this.OkayToSaveButton.Enabled = false;
         }
         /// <summary>
         /// Creates a new, empty PalettesForm with help texts adjusted for the given domain.
@@ -44,7 +47,7 @@ namespace Moritz.Palettes
                 _paletteButtonsControl.Enabled = false;
             }
 
-            _allMainTextBoxes = GetAllMainTextBoxes();
+            _allMainTextBoxes = GetAllTextBoxes();
             _allChordParameterTextBoxes = GetAllChordParameterTextBoxes();
 
             SetDialogForDomain(domain);
@@ -56,7 +59,7 @@ namespace Moritz.Palettes
             {
                 MessageBox.Show("Can't create a palette chord form because another one is already open.");
             }
-            else if(this.HasError())
+            else if(this.HasError)
             {
                 MessageBox.Show("Can't create a palette chord form because this palette contains errors.");
             }
@@ -146,17 +149,18 @@ namespace Moritz.Palettes
         /// <summary>
         /// Sets the '*' in Text, enables the SaveButton and informs _assistantComposerMainForm
         /// </summary>
-        public void SetSettingsNotSaved()
+        public void SetSettingsHaveChanged()
         {
             if(!this.Text.EndsWith("*"))
-            {
                 this.Text = this.Text + "*";
-            }
+
             if(this._callbacks != null)
             {
                 _callbacks.SetSettingsHaveChanged();
-                this.SaveSettingsButton.Enabled = true;
             }
+
+            this.OkayToSaveButton.Enabled = true;
+            this.RevertToSavedButton.Enabled = true;
         }
         /// <summary>
         /// Informs _assistantComposerMainForm that the OrnamentsForm has changed.
@@ -331,12 +335,6 @@ namespace Moritz.Palettes
                 OrnamentNumbersTextBox_Leave(OrnamentNumbersTextBox, null);
         }
 
-        private void SaveSettingsButton_Click(object sender, EventArgs e)
-        {
-            //_callbacks.SaveSettings();
-            DeselectAll();
-        }
-
         private void DeselectAll()
         {
             bool settingsHaveBeenSaved = Text[Text.Length - 1] != '*';
@@ -344,7 +342,73 @@ namespace Moritz.Palettes
             if(settingsHaveBeenSaved)
                 SetSettingsHaveBeenSaved();
             else
-                SetSettingsNotSaved();
+                SetSettingsHaveChanged();
+        }
+
+        /// <summary>
+        /// When the main Assistant Composer Form tries to save, it first checks
+        /// that none of its subsidiary forms' Texts ends with a "*".
+        /// If they do, then they must be reviewed, and either the OkayToSaveButton
+        /// or RevertToSavedButton must be clicked.
+        /// </summary>
+        private void OkayToSaveButton_Click(object sender, EventArgs e)
+        {
+            Debug.Assert(!this.HasError);
+            Debug.Assert(this.Text.EndsWith("*"));
+
+            this.Text = this.Text.Remove(this.Text.Length - 1);
+            if(!this.Text.EndsWith("(changed)"))
+            {
+                this.Text = this.Text + " (changed)";
+            }
+            this.OkayToSaveButton.Enabled = false;
+        }
+
+        /// <summary>
+        /// When the main Assistant Composer Form tries to save, it first checks
+        /// that none of its subsidiary forms' Texts ends with a "*".
+        /// If they do, then they must be reviewed, and either the OkayToSaveButton
+        /// or RevertToSavedButton must be clicked.
+        /// </summary>
+        private void RevertToSavedButton_Click(object sender, EventArgs e)
+        {
+            Debug.Assert(this.Text.EndsWith("*") || this.Text.EndsWith(" (changed)"));
+            DialogResult result = 
+                MessageBox.Show("Are you sure you want to revert this dialog to the saved version?", "Revert?", 
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
+
+            if(result == System.Windows.Forms.DialogResult.Yes)
+            {
+                _bcc.RevertToSaved();
+                BankIndicesTextBox.Text = SavedBankIndicesTextBoxText;
+                PatchIndicesTextBox.Text = SavedPatchIndicesTextBoxText;
+                RepeatsTextBox.Text = SavedRepeatsTextBoxText;
+                PitchwheelDeviationsTextBox.Text = SavedPitchwheelDeviationsTextBoxText;
+                PitchwheelEnvelopesTextBox.Text = SavedPitchwheelEnvelopesTextBoxText;
+                PanEnvelopesTextBox.Text = SavedPanEnvelopesTextBoxText;
+                ModulationWheelEnvelopesTextBox.Text = SavedModulationWheelEnvelopesTextBoxText;
+                ExpressionEnvelopesTextBox.Text = SavedExpressionEnvelopesTextBoxText;
+                _paletteButtonsControl.RevertAudioButtonsToSaved();
+                OrnamentNumbersTextBox.Text = SavedOrnamentNumbersTextBoxText;
+                MinMsDurationsTextBox.Text = SavedMinMsDurationsTextBoxText;
+
+                TouchAllTextBoxes();
+
+                #region identical to OrnamentSettingsForm.RevertToSavedButton_Click()
+                if(this.Text.EndsWith("*"))
+                {
+                    this.Text = this.Text.Remove(this.Text.Length - 1);
+                }
+
+                if(this.Text.EndsWith(" (changed)"))
+                {
+                    this.Text = this.Text.Remove(this.Text.Length - " (changed)".Length);
+                }
+
+                this.RevertToSavedButton.Enabled = false;
+                this.OkayToSaveButton.Enabled = false;
+                #endregion
+            }
         }
 
         private void ShowMainScoreFormButton_Click(object sender, EventArgs e)
@@ -391,7 +455,7 @@ namespace Moritz.Palettes
                 MinMsDurationsTextBox.Enabled = false;
                 MinMsDurationsHelpLabel.Enabled = false;
 
-                SetSettingsNotSaved();
+                SetSettingsHaveChanged();
             }
         }
 
@@ -479,23 +543,29 @@ namespace Moritz.Palettes
             _bcc.VerticalVelocityFactorsTextBox.Text = "";
         }
 
-        private List<TextBox> GetAllMainTextBoxes()
+        private List<TextBox> GetAllTextBoxes()
         {
-            List<TextBox> mainTextBoxes = new List<TextBox>();
-            mainTextBoxes.Add(_bcc.DurationsTextBox);
-            mainTextBoxes.Add(_bcc.MidiPitchesTextBox);
-            mainTextBoxes.Add(_bcc.VelocitiesTextBox);
-            mainTextBoxes.Add(_bcc.ChordOffsTextBox);
-            mainTextBoxes.Add(_bcc.ChordDensitiesTextBox);
-            mainTextBoxes.Add(BankIndicesTextBox);
-            mainTextBoxes.Add(PatchIndicesTextBox);
-            mainTextBoxes.Add(RepeatsTextBox);
-            mainTextBoxes.Add(PitchwheelDeviationsTextBox);
-            mainTextBoxes.Add(ModulationWheelEnvelopesTextBox);
-            mainTextBoxes.Add(PitchwheelEnvelopesTextBox);
-            mainTextBoxes.Add(PanEnvelopesTextBox);
-            mainTextBoxes.Add(ExpressionEnvelopesTextBox);
-            return mainTextBoxes;
+            List<TextBox> allTextBoxes = new List<TextBox>();
+            allTextBoxes.Add(_bcc.ChordDensitiesTextBox);
+            allTextBoxes.Add(_bcc.DurationsTextBox);
+            allTextBoxes.Add(_bcc.MidiPitchesTextBox);
+            allTextBoxes.Add(_bcc.VelocitiesTextBox);
+            allTextBoxes.Add(_bcc.ChordOffsTextBox);
+            allTextBoxes.Add(_bcc.RootInversionTextBox);
+            allTextBoxes.Add(_bcc.InversionIndicesTextBox);
+            allTextBoxes.Add(_bcc.VerticalVelocityFactorsTextBox);
+            
+            allTextBoxes.Add(BankIndicesTextBox);
+            allTextBoxes.Add(PatchIndicesTextBox);
+            allTextBoxes.Add(RepeatsTextBox);
+            allTextBoxes.Add(PitchwheelDeviationsTextBox);
+            allTextBoxes.Add(PitchwheelEnvelopesTextBox);
+            allTextBoxes.Add(PanEnvelopesTextBox);           
+            allTextBoxes.Add(ModulationWheelEnvelopesTextBox);
+            allTextBoxes.Add(ExpressionEnvelopesTextBox);
+            allTextBoxes.Add(OrnamentNumbersTextBox);
+            allTextBoxes.Add(MinMsDurationsTextBox);
+            return allTextBoxes;
         }
 
 
@@ -887,15 +957,21 @@ namespace Moritz.Palettes
                 textBox.BackColor = M.TextBoxErrorColor;
             }
 
+            bool hasError = this.HasError;
             if(_paletteButtonsControl != null)
             {
-                if(HasError())
+                if(hasError)
                     _paletteButtonsControl.Enabled = false;
                 else
                     _paletteButtonsControl.Enabled = true;
             }
             
-            this.SetSettingsNotSaved();
+            this.SetSettingsHaveChanged();
+
+            if(hasError)
+            {
+                this.OkayToSaveButton.Enabled = false;
+            }
         }
 
         /// <summary>
@@ -981,24 +1057,25 @@ namespace Moritz.Palettes
         {
             return this._name;
         }
-        public bool HasError()
+        public bool HasError
         {
-            bool hasError = ErrorInMainTextBoxes();
-            if(!hasError)
+            get
             {
-                foreach(TextBox textBox in _allChordParameterTextBoxes)
+                bool hasError = ErrorInMainTextBoxes();
+                if(!hasError)
                 {
-                    if(textBox.Enabled && textBox.BackColor == M.TextBoxErrorColor)
+                    foreach(TextBox textBox in _allChordParameterTextBoxes)
                     {
-                        hasError = true;
-                        break;
+                        if(textBox.Enabled && textBox.BackColor == M.TextBoxErrorColor)
+                        {
+                            hasError = true;
+                            break;
+                        }
                     }
                 }
-            }
-            if(!hasError && OrnamentSettingsForm != null)
-                hasError = OrnamentSettingsForm.HasError;
 
-            return hasError;
+                return hasError;
+            }
         }
         private bool ErrorInMainTextBoxes()
         {
@@ -1026,7 +1103,7 @@ namespace Moritz.Palettes
                     _ornamentSettingsForm.SetSettingsHaveBeenSaved();
                 }
             }
-            this.SaveSettingsButton.Enabled = false;
+            this.OkayToSaveButton.Enabled = false;
             //DeselectAll();
         }
         /// <summary>
@@ -1152,27 +1229,35 @@ namespace Moritz.Palettes
                             break;
                         case "bankIndices":
                             BankIndicesTextBox.Text = r.ReadElementContentAsString();
+                            SavedBankIndicesTextBoxText = BankIndicesTextBox.Text;
                             break;
                         case "patchIndices":
                             PatchIndicesTextBox.Text = r.ReadElementContentAsString();
+                            SavedPatchIndicesTextBoxText = PatchIndicesTextBox.Text;
                             break;
                         case "repeats":
                             RepeatsTextBox.Text = r.ReadElementContentAsString();
+                            SavedRepeatsTextBoxText = RepeatsTextBox.Text;
                             break;
                         case "pitchwheelDeviations":
                             PitchwheelDeviationsTextBox.Text = r.ReadElementContentAsString();
+                            SavedPitchwheelDeviationsTextBoxText = PitchwheelDeviationsTextBox.Text;
                             break;
                         case "pitchwheelEnvelopes":
                             PitchwheelEnvelopesTextBox.Text = r.ReadElementContentAsString();
+                            SavedPitchwheelEnvelopesTextBoxText = PitchwheelEnvelopesTextBox.Text;
                             break;
                         case "panEnvelopes":
                             PanEnvelopesTextBox.Text = r.ReadElementContentAsString();
+                            SavedPanEnvelopesTextBoxText = PanEnvelopesTextBox.Text;
                             break;
                         case "modulationWheelEnvelopes":
                             ModulationWheelEnvelopesTextBox.Text = r.ReadElementContentAsString();
+                            SavedModulationWheelEnvelopesTextBoxText = ModulationWheelEnvelopesTextBox.Text;
                             break;
                         case "expressionEnvelopes":
                             ExpressionEnvelopesTextBox.Text = r.ReadElementContentAsString();
+                            SavedExpressionEnvelopesTextBoxText = ExpressionEnvelopesTextBox.Text;
                             break;
                         case "audioFiles":
                             if(_paletteButtonsControl != null)
@@ -1182,9 +1267,11 @@ namespace Moritz.Palettes
                             break;
                         case "ornamentNumbers":
                             OrnamentNumbersTextBox.Text = r.ReadElementContentAsString();
+                            SavedOrnamentNumbersTextBoxText = OrnamentNumbersTextBox.Text;
                             break;
                         case "ornamentMinMsDurations":
-                            this.MinMsDurationsTextBox.Text = r.ReadElementContentAsString();
+                            MinMsDurationsTextBox.Text = r.ReadElementContentAsString();
+                            SavedMinMsDurationsTextBoxText = MinMsDurationsTextBox.Text;
                             break;
                         case "ornamentSettings":
                             _ornamentSettingsForm = new OrnamentSettingsForm(r, this);
@@ -1201,6 +1288,20 @@ namespace Moritz.Palettes
             SetOrnamentControls();
             TouchAllTextBoxes();
         }
+
+        #region revertToSaved strings
+        private string SavedBankIndicesTextBoxText;
+        private string SavedPatchIndicesTextBoxText;
+        private string SavedRepeatsTextBoxText;
+        private string SavedPitchwheelDeviationsTextBoxText;
+        private string SavedPitchwheelEnvelopesTextBoxText;
+        private string SavedPanEnvelopesTextBoxText;
+        private string SavedModulationWheelEnvelopesTextBoxText;
+        private string SavedExpressionEnvelopesTextBoxText;
+        private string SavedOrnamentNumbersTextBoxText;
+        private string SavedMinMsDurationsTextBoxText;
+        #endregion revertToSaved strings
+
         private string _name = null;
         private int _domain = 0;
         private ComposerFormCallbacks _callbacks = null;
@@ -1219,7 +1320,6 @@ namespace Moritz.Palettes
         #region private variables
         private readonly List<TextBox> _allChordParameterTextBoxes = new List<TextBox>();
         private int _numberOfOrnaments;
-        private Moritz.Krystals.StrandsBrowser _strandsBrowser = null;
         private OrnamentSettingsForm _ornamentSettingsForm = null;
         private MidiPitchesHelpForm _midiPitchesHelpForm = null;
         private MIDIInstrumentsHelpForm _midiInstrumentsHelpForm = null;

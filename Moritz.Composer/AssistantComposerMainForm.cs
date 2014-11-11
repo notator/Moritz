@@ -263,7 +263,7 @@ namespace Moritz.Composer
             {
                 foreach(IPaletteForm iPaletteForm in AllIPalleteForms)
                 {
-                    if(iPaletteForm.HasError())
+                    if(iPaletteForm.HasError)
                     {
                         error = true;
                         break;

@@ -98,7 +98,6 @@ namespace Moritz.Palettes
                             break;
                         case "basicChord":
                             _bcc.ReadBasicChordControl(r);
-                            SaveBCCSettings();
                             break;
                         case "bankIndices":
                             BankIndicesTextBox.Text = r.ReadElementContentAsString();
@@ -125,17 +124,7 @@ namespace Moritz.Palettes
             return int.Parse(NumBasicChordDefsTextBox.Text);
         }
 
-        private void SaveBCCSettings()
-        {
-            SavedBCCDurationsTextBoxText = _bcc.DurationsTextBox.Text;
-            SavedBCCVelocitiesTextBoxText = _bcc.VelocitiesTextBox.Text;
-            SavedBCCMidiPitchesTextBoxText = _bcc.MidiPitchesTextBox.Text;
-            SavedBCCChordOffsTextBoxText = _bcc.ChordOffsTextBox.Text;
-            SavedBCCChordDensitiesTextBoxText = _bcc.ChordDensitiesTextBox.Text;
-            SavedBCCRootInversionTextBoxText = _bcc.RootInversionTextBox.Text;
-            SavedBCCInversionIndicesTextBoxText = _bcc.InversionIndicesTextBox.Text;
-            SavedBCCVerticalVelocityFactorsTextBoxText = _bcc.VerticalVelocityFactorsTextBox.Text;
-        }
+
 
         private int GetOrnaments(XmlReader r)
         {
@@ -206,15 +195,6 @@ namespace Moritz.Palettes
 
         #region revertToSaved strings
         private string SavedNumBasicChordDefsTextBoxText;
-
-        private string SavedBCCDurationsTextBoxText;
-        private string SavedBCCVelocitiesTextBoxText;
-        private string SavedBCCMidiPitchesTextBoxText;
-        private string SavedBCCChordOffsTextBoxText;
-        private string SavedBCCChordDensitiesTextBoxText;
-        private string SavedBCCRootInversionTextBoxText;
-        private string SavedBCCInversionIndicesTextBoxText;
-        private string SavedBCCVerticalVelocityFactorsTextBoxText;
 
         private string SavedBankIndicesTextBoxText;
         private string SavedPatchIndicesTextBoxText;
@@ -667,16 +647,7 @@ namespace Moritz.Palettes
             if(result == System.Windows.Forms.DialogResult.Yes)
             {
                 NumBasicChordDefsTextBox.Text = SavedNumBasicChordDefsTextBoxText;
-
-                _bcc.DurationsTextBox.Text = SavedBCCDurationsTextBoxText;
-                _bcc.VelocitiesTextBox.Text = SavedBCCVelocitiesTextBoxText;
-                _bcc.MidiPitchesTextBox.Text = SavedBCCMidiPitchesTextBoxText;
-                _bcc.ChordOffsTextBox.Text = SavedBCCChordOffsTextBoxText;
-                _bcc.ChordDensitiesTextBox.Text = SavedBCCChordDensitiesTextBoxText;
-                _bcc.RootInversionTextBox.Text = SavedBCCRootInversionTextBoxText;
-                _bcc.InversionIndicesTextBox.Text = SavedBCCInversionIndicesTextBoxText;
-                _bcc.VerticalVelocityFactorsTextBox.Text = SavedBCCVerticalVelocityFactorsTextBoxText;
-
+                _bcc.RevertToSaved();
                 BankIndicesTextBox.Text = SavedBankIndicesTextBoxText;
                 PatchIndicesTextBox.Text = SavedPatchIndicesTextBoxText;
                 NumberOfOrnamentsTextBox.Text = SavedNumberOfOrnamentsTextBoxText;

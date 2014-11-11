@@ -38,9 +38,26 @@ namespace Moritz.Palettes
             SetDialogForDomain(Domain);
         }
 
+        /// <summary>
+        /// Sets the '*' in Text, enables the SaveButton and informs _assistantComposerMainForm
+        /// </summary>
+        public void SetSettingsHaveChanged()
+        {
+            if(!this.Text.EndsWith("*"))
+                this.Text = this.Text + "*";
+
+            if(this._callbacks != null)
+            {
+                _callbacks.SetSettingsHaveChanged();
+            }
+
+            //this.OkayToSaveButton.Enabled = true;
+            //this.RevertToSavedButton.Enabled = true;
+        }
+
         public void ShowPaletteChordForm(int midiChordIndex)
         {
-            if(!this.HasError())
+            if(!this.HasError)
             {
                 throw new NotImplementedException();
             }
@@ -688,7 +705,7 @@ namespace Moritz.Palettes
                 textBox.BackColor = M.TextBoxErrorColor;
             }
 
-            if(HasError())
+            if(HasError)
                 _audioButtonsControl.Enabled = false;
             else
                 _audioButtonsControl.Enabled = true;
@@ -786,19 +803,22 @@ namespace Moritz.Palettes
         {
             return this._name;
         }
-        public bool HasError()
+        public bool HasError
         {
-            bool anyTextBoxHasErrorColour = false;
-            foreach(TextBox textBox in _allMainTextBoxes)
+            get
             {
-                if(textBox.Enabled && textBox.BackColor == M.TextBoxErrorColor)
+                bool anyTextBoxHasErrorColour = false;
+                foreach(TextBox textBox in _allMainTextBoxes)
                 {
-                    anyTextBoxHasErrorColour = true;
-                    break;
+                    if(textBox.Enabled && textBox.BackColor == M.TextBoxErrorColor)
+                    {
+                        anyTextBoxHasErrorColour = true;
+                        break;
+                    }
                 }
+                bool hasError = (anyTextBoxHasErrorColour || String.IsNullOrEmpty(_bpc.DurationsTextBox.Text));
+                return hasError;
             }
-            bool hasError = (anyTextBoxHasErrorColour || String.IsNullOrEmpty(_bpc.DurationsTextBox.Text));
-            return hasError;
         }
         /// <summary>
         /// Removes the '*' in Text and informs _ornamentSettingsForm

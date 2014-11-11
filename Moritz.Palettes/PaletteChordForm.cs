@@ -370,7 +370,7 @@ namespace Moritz.Palettes
                 
                 _paletteForm.MinMsDurationsTextBox.Text = minMsDurationsSBs[0].ToString() + this.MinMsDurationTextBox.Text + minMsDurationsSBs[2].ToString();
 
-                _paletteForm.SetSettingsNotSaved();
+                _paletteForm.SetSettingsHaveChanged();
                 _paletteForm.ClosePaletteChordForm(_midiChordIndex);
             }
 

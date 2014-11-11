@@ -63,7 +63,7 @@ namespace Moritz.Palettes
             this.midiLabel = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.AudioHelpLabel = new System.Windows.Forms.Label();
-            this.SaveSettingsButton = new System.Windows.Forms.Button();
+            this.OkayToSaveButton = new System.Windows.Forms.Button();
             this.BankIndicesTextBox = new System.Windows.Forms.TextBox();
             this.BankIndicesHelpLabel = new System.Windows.Forms.Label();
             this.BankIndicesLabel = new System.Windows.Forms.Label();
@@ -74,12 +74,13 @@ namespace Moritz.Palettes
             this.RepeatsTextBox = new System.Windows.Forms.TextBox();
             this.MidiChordLabel = new System.Windows.Forms.Label();
             this.RepeatsLabel = new System.Windows.Forms.Label();
+            this.RevertToSavedButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // DeleteOrnamentSettingsButton
             // 
             this.DeleteOrnamentSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.DeleteOrnamentSettingsButton.Location = new System.Drawing.Point(531, 703);
+            this.DeleteOrnamentSettingsButton.Location = new System.Drawing.Point(531, 711);
             this.DeleteOrnamentSettingsButton.Name = "DeleteOrnamentSettingsButton";
             this.DeleteOrnamentSettingsButton.Size = new System.Drawing.Size(137, 26);
             this.DeleteOrnamentSettingsButton.TabIndex = 3;
@@ -90,7 +91,7 @@ namespace Moritz.Palettes
             // NewOrnamentSettingsButton
             // 
             this.NewOrnamentSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.NewOrnamentSettingsButton.Location = new System.Drawing.Point(531, 669);
+            this.NewOrnamentSettingsButton.Location = new System.Drawing.Point(531, 679);
             this.NewOrnamentSettingsButton.Name = "NewOrnamentSettingsButton";
             this.NewOrnamentSettingsButton.Size = new System.Drawing.Size(137, 26);
             this.NewOrnamentSettingsButton.TabIndex = 0;
@@ -131,7 +132,7 @@ namespace Moritz.Palettes
             // 
             this.ShowOrnamentSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShowOrnamentSettingsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.ShowOrnamentSettingsButton.Location = new System.Drawing.Point(677, 669);
+            this.ShowOrnamentSettingsButton.Location = new System.Drawing.Point(677, 679);
             this.ShowOrnamentSettingsButton.Name = "ShowOrnamentSettingsButton";
             this.ShowOrnamentSettingsButton.Size = new System.Drawing.Size(137, 26);
             this.ShowOrnamentSettingsButton.TabIndex = 1;
@@ -361,7 +362,7 @@ namespace Moritz.Palettes
             // 
             this.ShowMainScoreFormButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShowMainScoreFormButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.ShowMainScoreFormButton.Location = new System.Drawing.Point(677, 703);
+            this.ShowMainScoreFormButton.Location = new System.Drawing.Point(677, 711);
             this.ShowMainScoreFormButton.Name = "ShowMainScoreFormButton";
             this.ShowMainScoreFormButton.Size = new System.Drawing.Size(137, 26);
             this.ShowMainScoreFormButton.TabIndex = 4;
@@ -403,17 +404,17 @@ namespace Moritz.Palettes
             this.AudioHelpLabel.Text = "audio buttons:\r\n  left click: load, start, stop\r\n  right click: reload\r\n  middle " +
     "click: file info";
             // 
-            // SaveSettingsButton
+            // OkayToSaveButton
             // 
-            this.SaveSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.SaveSettingsButton.Enabled = false;
-            this.SaveSettingsButton.Location = new System.Drawing.Point(415, 703);
-            this.SaveSettingsButton.Name = "SaveSettingsButton";
-            this.SaveSettingsButton.Size = new System.Drawing.Size(107, 26);
-            this.SaveSettingsButton.TabIndex = 2;
-            this.SaveSettingsButton.Text = "save settings";
-            this.SaveSettingsButton.UseVisualStyleBackColor = true;
-            this.SaveSettingsButton.Click += new System.EventHandler(this.SaveSettingsButton_Click);
+            this.OkayToSaveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.OkayToSaveButton.Enabled = false;
+            this.OkayToSaveButton.Location = new System.Drawing.Point(677, 615);
+            this.OkayToSaveButton.Name = "OkayToSaveButton";
+            this.OkayToSaveButton.Size = new System.Drawing.Size(137, 26);
+            this.OkayToSaveButton.TabIndex = 2;
+            this.OkayToSaveButton.Text = "okay to save";
+            this.OkayToSaveButton.UseVisualStyleBackColor = true;
+            this.OkayToSaveButton.Click += new System.EventHandler(this.OkayToSaveButton_Click);
             // 
             // BankIndicesTextBox
             // 
@@ -508,6 +509,18 @@ namespace Moritz.Palettes
             this.RepeatsLabel.TabIndex = 146;
             this.RepeatsLabel.Text = "( repeats (0))";
             // 
+            // RevertToSavedButton
+            // 
+            this.RevertToSavedButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.RevertToSavedButton.Enabled = false;
+            this.RevertToSavedButton.Location = new System.Drawing.Point(677, 647);
+            this.RevertToSavedButton.Name = "RevertToSavedButton";
+            this.RevertToSavedButton.Size = new System.Drawing.Size(137, 26);
+            this.RevertToSavedButton.TabIndex = 149;
+            this.RevertToSavedButton.Text = "revert to saved";
+            this.RevertToSavedButton.UseVisualStyleBackColor = true;
+            this.RevertToSavedButton.Click += new System.EventHandler(this.RevertToSavedButton_Click);
+            // 
             // PaletteForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
@@ -515,6 +528,7 @@ namespace Moritz.Palettes
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
             this.ClientSize = new System.Drawing.Size(836, 750);
             this.ControlBox = false;
+            this.Controls.Add(this.RevertToSavedButton);
             this.Controls.Add(this.MidiChordLabel);
             this.Controls.Add(this.RepeatsHelpLabel);
             this.Controls.Add(this.RepeatsTextBox);
@@ -525,7 +539,7 @@ namespace Moritz.Palettes
             this.Controls.Add(this.PatchIndicesTextBox);
             this.Controls.Add(this.PatchIndicesHelpLabel);
             this.Controls.Add(this.PatchIndicesLabel);
-            this.Controls.Add(this.SaveSettingsButton);
+            this.Controls.Add(this.OkayToSaveButton);
             this.Controls.Add(this.AudioHelpLabel);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.midiLabel);
@@ -604,7 +618,7 @@ namespace Moritz.Palettes
         private System.Windows.Forms.Label midiLabel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label AudioHelpLabel;
-        private System.Windows.Forms.Button SaveSettingsButton;
+        private System.Windows.Forms.Button OkayToSaveButton;
         public System.Windows.Forms.TextBox BankIndicesTextBox;
         public System.Windows.Forms.Label BankIndicesLabel;
         public System.Windows.Forms.TextBox PatchIndicesTextBox;
@@ -616,6 +630,7 @@ namespace Moritz.Palettes
         private System.Windows.Forms.Label BankIndicesHelpLabel;
         private System.Windows.Forms.Label PatchIndicesHelpLabel;
         private System.Windows.Forms.Label RepeatsHelpLabel;
+        private System.Windows.Forms.Button RevertToSavedButton;
     }
 }
 

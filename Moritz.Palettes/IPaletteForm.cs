@@ -10,8 +10,9 @@ namespace Moritz.Palettes
         string GetName();
         void SetName(string title);
         string ToString();
-        bool HasError();
+        bool HasError { get; }
         void SetSettingsHaveBeenSaved();
+        void SetSettingsHaveChanged();
         void WritePalette(XmlWriter w);
         void ReadPalette(XmlReader r);
         void ShowPaletteChordForm(int midiChordIndex);

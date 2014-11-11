@@ -65,11 +65,46 @@ namespace Moritz.Palettes
                     if(!String.IsNullOrEmpty(fileName))
                     {
                         player.URL = _audioFolder + @"\" + fileName;
+                        _savedPlayerFilenames.Add(fileName);
                         SetLinkedButtonsImage(button, global::Moritz.Globals.Properties.Resources.start23x20);
+                    }
+                    else
+                    {
+                        _savedPlayerFilenames.Add("");
                     }
                     ++buttonIndex;
                 }
                 M.ReadToXmlElementTag(r, "audioFiles", "file");
+            }
+        }
+        List<string> _savedPlayerFilenames = new List<string>();
+        internal void RevertAudioButtonsToSaved()
+        {
+            for(int i = 0; i < _audioSampleButtons.Count; ++i)
+            {
+                Button button = _audioSampleButtons[i];
+                Debug.Assert(button != null);
+                MoritzMediaPlayer player = button.Tag as MoritzMediaPlayer;
+                Debug.Assert(player != null);
+                if(i < _savedPlayerFilenames.Count)
+                {
+                    string fileName = _savedPlayerFilenames[i];
+                    if(!String.IsNullOrEmpty(fileName))
+                    {
+                        player.URL = _audioFolder + @"\" + fileName;
+                        SetLinkedButtonsImage(button, global::Moritz.Globals.Properties.Resources.start23x20);
+                    }
+                    else
+                    {
+                        player.URL = "";
+                        SetLinkedButtonsImage(button, global::Moritz.Globals.Properties.Resources.noFile23x20);
+                    }
+                }
+                else
+                {
+                    player.URL = "";
+                    SetLinkedButtonsImage(button, global::Moritz.Globals.Properties.Resources.noFile23x20);
+                }
             }
         }
         public void WriteAudioFiles(XmlWriter w)
@@ -259,6 +294,7 @@ namespace Moritz.Palettes
                 {
                     StopCurrentMediaPlayer();
                     GetAudioFileName(button);
+                    _iPaletteForm.SetSettingsHaveChanged();
                 }
                 else if(e.Button == MouseButtons.Left)
                 {
@@ -400,7 +436,5 @@ namespace Moritz.Palettes
         /// to change the appearance of the corresponding button in the PaletteChordForm.
         /// </summary>
         private Button _chordFormButton = null;
-
-
     }
 }
