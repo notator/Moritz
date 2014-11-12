@@ -699,49 +699,12 @@ namespace Moritz.Palettes
         #endregion buttons
 
         #region text box events
-        #region text changed event handlers
-
-        private void RepeatsTextBox_TextChanged(object sender, EventArgs e)
+        #region text changed event handler
+        private void SetToWhiteTextBox_TextChanged(object sender, EventArgs e)
         {
             M.SetToWhite(sender as TextBox);
         }
-
-        private void PitchwheelDeviationsTextBox_TextChanged(object sender, EventArgs e)
-        {
-            M.SetToWhite(sender as TextBox);
-        }
-
-        private void PitchwheelEnvelopesTextBox_TextChanged(object sender, EventArgs e)
-        {
-            M.SetToWhite(sender as TextBox);
-        }
-
-        private void PanEnvelopesTextBox_TextChanged(object sender, EventArgs e)
-        {
-            M.SetToWhite(sender as TextBox);
-        }
-
-        private void ModulationWheelEnvelopesTextBox_TextChanged(object sender, EventArgs e)
-        {
-            M.SetToWhite(sender as TextBox);
-        }
-
-        private void ExpressionEnvelopesTextBox_TextChanged(object sender, EventArgs e)
-        {
-            M.SetToWhite(sender as TextBox);
-        }
-
-        private void OrnamentNumbersTextBox_TextChanged(object sender, EventArgs e)
-        {
-            M.SetToWhite(sender as TextBox);
-        }
-
-        private void MinMsDurationsTextBox_TextChanged(object sender, EventArgs e)
-        {
-            M.SetToWhite(sender as TextBox);
-        }
-
-        #endregion text changed event handlers
+        #endregion text changed event handler
 
         private void BankIndicesTextBox_Leave(object sender, EventArgs e)
         {

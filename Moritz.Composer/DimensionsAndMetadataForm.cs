@@ -22,23 +22,46 @@ namespace Moritz.Composer
             SetDefaultValues();
 
             _assistantComposerMainForm = assistantComposerMainForm;
+        }
+        private void SetDefaultValues()
+        {
+            this.PaperSizeComboBox.Text = "A3";
+            this.LandscapeCheckBox.Checked = false;
 
-            Text = _assistantComposerMainForm.Text + ": Dimensions and Metadata";
+            this.Page1TitleHeightTextBox.Text = "32";
+            this.Page1AuthorHeightTextBox.Text = "16";
+            this.Page1TitleYTextBox.Text = "50";
+
+            this.TopMarginPage1TextBox.Text = "90";
+            this.TopMarginOtherPagesTextBox.Text = "50";
+            this.RightMarginTextBox.Text = "50";
+            this.BottomMarginTextBox.Text = "50";
+            this.LeftMarginTextBox.Text = "50";
+
+            this.AboutLinkTextTextBox.Text = "";
+            this.AboutLinkURLTextBox.Text = "";
         }
 
-        public bool HasError()
+        #region HasError
+        public bool HasError
         {
-            bool error = false;
-            List<TextBox> textBoxes = GetAllTextBoxes();
-            foreach(TextBox textBox in textBoxes)
+            get
             {
-                if(textBox.BackColor == M.TextBoxErrorColor)
+                bool hasError = false;
+                if(_allTextBoxes == null || _allTextBoxes.Count == 0)
                 {
-                    error = true;
-                    break;
+                    _allTextBoxes = GetAllTextBoxes();
                 }
+                foreach(TextBox textBox in _allTextBoxes)
+                {
+                    if(textBox.BackColor == M.TextBoxErrorColor)
+                    {
+                        hasError = true;
+                        break;
+                    }
+                }
+                return hasError;
             }
-            return error;
         }
         private List<TextBox> GetAllTextBoxes()
         {
@@ -59,26 +82,9 @@ namespace Moritz.Composer
 
             return textBoxes;
         }
+        #endregion HasError
 
-        private void SetDefaultValues()
-        {
-            this.PaperSizeComboBox.Text = "A3";
-            this.LandscapeCheckBox.Checked = false;
-
-            this.Page1TitleHeightTextBox.Text = "32";
-            this.Page1AuthorHeightTextBox.Text = "16";
-            this.Page1TitleYTextBox.Text = "50";
-
-            this.TopMarginPage1TextBox.Text = "90";
-            this.TopMarginOtherPagesTextBox.Text = "50";
-            this.RightMarginTextBox.Text = "50";
-            this.BottomMarginTextBox.Text = "50";
-            this.LeftMarginTextBox.Text = "50";
-
-            this.AboutLinkTextTextBox.Text = "";
-            this.AboutLinkURLTextBox.Text = "";
-        }
-
+        #region Read
         public void Read(XmlReader r)
         {
             Debug.Assert(r.Name == "moritzKrystalScore");
@@ -100,7 +106,6 @@ namespace Moritz.Composer
                 M.ReadToXmlElementTag(r, "metadata", "dimensions", "performerOptions", "notation", "names", "krystals", "palettes");
             }
             SetSettingsHaveBeenSaved();
-            DeselectAll();
         }
         private void GetMetadata(XmlReader r)
         {
@@ -117,9 +122,11 @@ namespace Moritz.Composer
                 {
                     case "keywords":
                         this.MetadataKeywordsTextBox.Text = r.Value;
+                        SavedMetadataKeywordsTextBoxText = MetadataKeywordsTextBox.Text;
                         break;
                     case "comment":
                         this.MetadataCommentTextBox.Text = r.Value;
+                        SavedMetadataCommentTextBoxText = MetadataCommentTextBox.Text;
                         break;
                 }
             }
@@ -137,9 +144,11 @@ namespace Moritz.Composer
                 {
                     case "aboutLinkText":
                         this.AboutLinkTextTextBox.Text = r.Value;
+                        SavedAboutLinkTextTextBoxText = AboutLinkTextTextBox.Text;
                         break;
                     case "aboutLinkURL":
                         this.AboutLinkURLTextBox.Text = r.Value;
+                        SavedAboutLinkURLTextBoxText = AboutLinkURLTextBox.Text;
                         break;
                 }
             }
@@ -177,6 +186,7 @@ namespace Moritz.Composer
                 switch(r.Name)
                 {
                     case "size":
+                        SavedPaperSize = r.Value;
                         int item = 0;
                         do
                         {
@@ -184,6 +194,7 @@ namespace Moritz.Composer
                         } while(r.Value != PaperSizeComboBox.SelectedItem.ToString());
                         break;
                     case "landscape":
+                        SavedLandscapeCheckBoxChecked = r.Value;
                         if(r.Value == "1")
                             LandscapeCheckBox.Checked = true;
                         else
@@ -203,12 +214,15 @@ namespace Moritz.Composer
                 {
                     case "titleHeight":
                         Page1TitleHeightTextBox.Text = r.Value;
+                        SavedPage1TitleHeightTextBoxText = Page1TitleHeightTextBox.Text;
                         break;
                     case "authorHeight":
                         Page1AuthorHeightTextBox.Text = r.Value;
+                        SavedPage1AuthorHeightTextBoxText = Page1AuthorHeightTextBox.Text;
                         break;
                     case "titleY":
                         Page1TitleYTextBox.Text = r.Value;
+                        SavedPage1TitleYTextBoxText = Page1TitleYTextBox.Text;
                         break;
                 }
             }
@@ -224,23 +238,42 @@ namespace Moritz.Composer
                 {
                     case "topPage1":
                         TopMarginPage1TextBox.Text = r.Value;
+                        SavedTopMarginPage1TextBoxText = TopMarginPage1TextBox.Text;
                         break;
                     case "topOtherPages":
                         TopMarginOtherPagesTextBox.Text = r.Value;
+                        SavedTopMarginOtherPagesTextBoxText = TopMarginOtherPagesTextBox.Text;
                         break;
                     case "right":
                         RightMarginTextBox.Text = r.Value;
+                        SavedRightMarginTextBoxText = RightMarginTextBox.Text;
                         break;
                     case "bottom":
                         BottomMarginTextBox.Text = r.Value;
+                        SavedBottomMarginTextBoxText = BottomMarginTextBox.Text;
                         break;
                     case "left":
                         LeftMarginTextBox.Text = r.Value;
+                        SavedLeftMarginTextBoxText = LeftMarginTextBox.Text;
                         break;
                 }
             }
         }
+        /// <summary>
+        /// Removes the '*' in Text, disables the OkayToSave and RevertToSaved Buttons
+        /// </summary>
+        private void SetSettingsHaveBeenSaved()
+        {
+            if(this.Text.EndsWith("*"))
+            {
+                this.Text = this.Text.Remove(this.Text.Length - 1);
+            }
+            this.OkayToSaveButton.Enabled = false;
+            this.RevertToSavedButton.Enabled = false;
+        }
+        #endregion Read
 
+        #region Write
         public void WriteMetadata(XmlWriter w)
         {
             w.WriteStartElement("metadata");
@@ -283,50 +316,13 @@ namespace Moritz.Composer
             w.WriteEndElement(); // margins
             w.WriteEndElement(); // dimensions
         }
+        #endregion Write
 
-        public string Keywords { get { return MetadataKeywordsTextBox.Text; } }
-        public string Comment { get { return MetadataCommentTextBox.Text; } }
-        public string PaperSize { get { return PaperSizeComboBox.Text; } }
-        public bool Landscape { get { return LandscapeCheckBox.Checked; } }
-
-        public float TitleHeight { get { return float.Parse(Page1TitleHeightTextBox.Text, M.En_USNumberFormat); } }
-        public float AuthorHeight { get { return float.Parse(Page1AuthorHeightTextBox.Text, M.En_USNumberFormat); } }
-        public float TitleY { get { return float.Parse(Page1TitleYTextBox.Text, M.En_USNumberFormat); } }
-
-        public float TopMarginWidthPage1 { get { return float.Parse(TopMarginPage1TextBox.Text, M.En_USNumberFormat); } }
-        public float TopMarginWidthOtherPages { get { return float.Parse(TopMarginOtherPagesTextBox.Text, M.En_USNumberFormat); } }
-        public float RightMarginWidth { get { return float.Parse(RightMarginTextBox.Text, M.En_USNumberFormat); } }
-        public float BottomMarginWidth { get { return float.Parse(BottomMarginTextBox.Text, M.En_USNumberFormat); } }
-        public float LeftMarginWidth { get { return float.Parse(LeftMarginTextBox.Text, M.En_USNumberFormat); } }
-
-        public string AboutLinkText { get { return AboutLinkTextTextBox.Text; } }
-        public string AboutLinkURL { get { return AboutLinkURLTextBox.Text; } }
-
-        private void DeselectAll()
-        {
-            bool settingsHaveBeenSaved = Text[Text.Length - 1] != '*';
-            this.PaperSizeLabel.Focus();
-            if(settingsHaveBeenSaved)
-                SetSettingsHaveBeenSaved();
-            else
-                SetSettingsNotSaved();
-        }
-
-        /// <summary>
-        /// Removes the '*' in Text, disables the SaveButton and informs _ornamentSettingsForm
-        /// </summary>
-        public void SetSettingsHaveBeenSaved()
-        {
-            if(this.Text.EndsWith("*"))
-            {
-                this.Text = this.Text.Remove(this.Text.Length - 1);
-            }
-            this.SaveSettingsButton.Enabled = false;
-        }
+        #region Event Handlers
         /// <summary>
         /// Sets the '*' in Text, enables the SaveButton and informs _assistantComposerMainForm
         /// </summary>
-        public void SetSettingsNotSaved()
+        private void SetSettingsHaveChanged()
         {
             if(!this.Text.EndsWith("*"))
             {
@@ -336,64 +332,74 @@ namespace Moritz.Composer
                     _assistantComposerMainForm.SetSettingsHaveChanged();
                 }
             }
-            this.SaveSettingsButton.Enabled = true;
-        }
+            if(HasError)
+            {
+                this.OkayToSaveButton.Enabled = false;
+            }
+            else
+            {
+                this.OkayToSaveButton.Enabled = true;
+            }
 
-        #region control events
+            this.RevertToSavedButton.Enabled = true;
+        }
         private void PaperSizeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SetSettingsNotSaved();
+            SetSettingsHaveChanged();
             this.PaperSizeLabel.Focus();
         }
-
         private void LandscapeCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            SetSettingsNotSaved();
+            SetSettingsHaveChanged();
+        }
+        private void SetToWhiteTextBox_TextChanged(object sender, EventArgs e)
+        {
+            M.SetToWhite(sender as TextBox);
+        }
+        #region TextBox_Leave handlers
+        private void Page1TitleHeightTextBox_Leave(object sender, EventArgs e)
+        {
+            CheckTextBoxIsFloat(this.Page1TitleHeightTextBox);
+            SetSettingsHaveChanged();
+        }
+        private void Page1AuthorHeightTextBox_Leave(object sender, EventArgs e)
+        {
+            CheckTextBoxIsFloat(this.Page1AuthorHeightTextBox);
+            SetSettingsHaveChanged();
+        }
+        private void Page1TitleYTextBox_Leave(object sender, EventArgs e)
+        {
+            CheckTextBoxIsFloat(this.Page1TitleYTextBox);
+            SetSettingsHaveChanged();
         }
 
-        private void Page1TitleHeightTextBox_TextChanged(object sender, EventArgs e)
+        private void TopMarginPage1TextBox_Leave(object sender, EventArgs e)
         {
-            if(this.CheckTextBoxIsFloat(this.Page1TitleHeightTextBox))
-                SetSettingsNotSaved();
+            CheckTextBoxIsFloat(this.TopMarginPage1TextBox);
+            SetSettingsHaveChanged();
         }
-        private void Page1AuthorHeightTextBox_TextChanged(object sender, EventArgs e)
+        private void TopMarginOtherPagesTextBox_Leave(object sender, EventArgs e)
         {
-            if(CheckTextBoxIsFloat(this.Page1AuthorHeightTextBox))
-                SetSettingsNotSaved();
+            CheckTextBoxIsFloat(this.TopMarginOtherPagesTextBox);
+            SetSettingsHaveChanged();
         }
-        private void Page1TitleYTextBox_TextChanged(object sender, EventArgs e)
+        private void RightMarginTextBox_Leave(object sender, EventArgs e)
         {
-            if(CheckTextBoxIsFloat(this.Page1TitleYTextBox))
-                SetSettingsNotSaved();
+            CheckTextBoxIsFloat(this.RightMarginTextBox);
+            SetSettingsHaveChanged();
         }
-
-        private void TopMarginPage1TextBox_TextChanged(object sender, EventArgs e)
+        private void BottomMarginTextBox_Leave(object sender, EventArgs e)
         {
-            if(CheckTextBoxIsFloat(this.TopMarginPage1TextBox))
-                SetSettingsNotSaved();
+            CheckTextBoxIsFloat(this.BottomMarginTextBox);
+            SetSettingsHaveChanged();
         }
-        private void TopMarginOtherPagesTextBox_TextChanged(object sender, EventArgs e)
+        private void LeftMarginTextBox_Leave(object sender, EventArgs e)
         {
-            if(CheckTextBoxIsFloat(this.TopMarginOtherPagesTextBox))
-                SetSettingsNotSaved();
-        }
-        private void RightMarginTextBox_TextChanged(object sender, EventArgs e)
-        {
-            if(CheckTextBoxIsFloat(this.RightMarginTextBox))
-                SetSettingsNotSaved();
-        }
-        private void BottomMarginTextBox_TextChanged(object sender, EventArgs e)
-        {
-            if(CheckTextBoxIsFloat(this.BottomMarginTextBox))
-                SetSettingsNotSaved();
-        }
-        private void LeftMarginTextBox_TextChanged(object sender, EventArgs e)
-        {
-            if(CheckTextBoxIsFloat(this.LeftMarginTextBox))
-                SetSettingsNotSaved();
+            CheckTextBoxIsFloat(this.LeftMarginTextBox);
+            SetSettingsHaveChanged();
         }
 
-        private bool CheckTextBoxIsFloat(TextBox textBox)
+        private void CheckTextBoxIsFloat(TextBox textBox)
         {
             bool okay = true;
             textBox.Text.Trim();
@@ -414,44 +420,175 @@ namespace Moritz.Composer
             {
                 textBox.BackColor = M.TextBoxErrorColor;
             }
-            return okay;
         }
 
-        private void AboutLinkTextTextBox_TextChanged(object sender, EventArgs e)
+        private void AboutLinkTextTextBox_Leave(object sender, EventArgs e)
         {
-            SetSettingsNotSaved();
+            SetSettingsHaveChanged();
         }
-        private void AboutLinkURLTextBox_TextChanged(object sender, EventArgs e)
+        private void AboutLinkURLTextBox_Leave(object sender, EventArgs e)
         {
-            SetSettingsNotSaved();
+            SetSettingsHaveChanged();
         }
-        private void RecordingTextBox_TextChanged(object sender, EventArgs e)
+        private void RecordingTextBox_Leave(object sender, EventArgs e)
         {
-            SetSettingsNotSaved();
+            SetSettingsHaveChanged();
         }
-
-        private void MetadataKeywordsTextBox_TextChanged(object sender, EventArgs e)
+        private void MetadataKeywordsTextBox_Leave(object sender, EventArgs e)
         {
-            SetSettingsNotSaved();
+            SetSettingsHaveChanged();
         }
-
-        private void MetadataCommentTextBox_TextChanged(object sender, EventArgs e)
+        private void MetadataCommentTextBox_Leave(object sender, EventArgs e)
         {
-            SetSettingsNotSaved();
+            SetSettingsHaveChanged();
         }
-        #endregion
-
+        #endregion TextBox_Leave handlers
         private void ShowMainScoreFormButton_Click(object sender, EventArgs e)
         {
             this._assistantComposerMainForm.BringToFront();
         }
-
-        private void SaveSettingsButton_Click(object sender, EventArgs e)
+        /// <summary>
+        /// When the main Assistant Composer Form tries to save, it first checks
+        /// that none of its subsidiary forms' Texts ends with a "*".
+        /// If they do, then they must be reviewed, and either the OkayToSaveButton
+        /// or RevertToSavedButton must be clicked.
+        /// </summary>
+        private void OkayToSaveButton_Click(object sender, EventArgs e)
         {
-            this._assistantComposerMainForm.SaveSettings(0);
-            SetSettingsHaveBeenSaved();
-        }
+            Debug.Assert(!this.HasError);
+            Debug.Assert(this.Text.EndsWith("*"));
 
+            this.Text = this.Text.Remove(this.Text.Length - 1);
+            if(!this.Text.EndsWith("(changed)"))
+            {
+                this.Text = this.Text + " (changed)";
+            }
+            this.OkayToSaveButton.Enabled = false;
+        }
+        #region RevertToSaved
+        /// <summary>
+        /// When the main Assistant Composer Form tries to save, it first checks
+        /// that none of its subsidiary forms' Texts ends with a "*".
+        /// If they do, then they must be reviewed, and either the OkayToSaveButton
+        /// or RevertToSavedButton must be clicked.
+        /// </summary>
+        private void RevertToSavedButton_Click(object sender, EventArgs e)
+        {
+            Debug.Assert(this.Text.EndsWith("*") || this.Text.EndsWith(" (changed)"));
+            DialogResult result =
+                MessageBox.Show("Are you sure you want to revert this dialog to the saved version?", "Revert?",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
+
+            if(result == System.Windows.Forms.DialogResult.Yes)
+            {
+                MetadataKeywordsTextBox.Text = SavedMetadataKeywordsTextBoxText;
+                MetadataCommentTextBox.Text = SavedMetadataCommentTextBoxText;
+                AboutLinkTextTextBox.Text = SavedAboutLinkTextTextBoxText;
+                AboutLinkURLTextBox.Text = SavedAboutLinkURLTextBoxText;
+
+                ResetPaperSize(SavedPaperSize, SavedLandscapeCheckBoxChecked);
+
+                Page1TitleHeightTextBox.Text = SavedPage1TitleHeightTextBoxText;
+                Page1AuthorHeightTextBox.Text = SavedPage1AuthorHeightTextBoxText;
+                Page1TitleYTextBox.Text = SavedPage1TitleYTextBoxText;
+
+                TopMarginPage1TextBox.Text = SavedTopMarginPage1TextBoxText;
+                TopMarginOtherPagesTextBox.Text = SavedTopMarginOtherPagesTextBoxText;
+                RightMarginTextBox.Text = SavedRightMarginTextBoxText;
+                BottomMarginTextBox.Text = SavedBottomMarginTextBoxText;
+                LeftMarginTextBox.Text = SavedLeftMarginTextBoxText;
+
+                #region identical to OrnamentSettingsForm.RevertToSavedButton_Click()
+
+                SetAllTextBoxBackColorsToWhite();
+
+                if(this.Text.EndsWith("*"))
+                {
+                    this.Text = this.Text.Remove(this.Text.Length - 1);
+                }
+
+                if(this.Text.EndsWith(" (changed)"))
+                {
+                    this.Text = this.Text.Remove(this.Text.Length - " (changed)".Length);
+                }
+
+                this.RevertToSavedButton.Enabled = false;
+                this.OkayToSaveButton.Enabled = false;
+                #endregion
+            }
+        }
+        private void SetAllTextBoxBackColorsToWhite()
+        {
+            MetadataKeywordsTextBox.BackColor = Color.White;
+            MetadataCommentTextBox.BackColor = Color.White;
+            AboutLinkTextTextBox.BackColor = Color.White;
+            AboutLinkURLTextBox.BackColor = Color.White;
+
+            Page1TitleHeightTextBox.BackColor = Color.White;
+            Page1AuthorHeightTextBox.BackColor = Color.White;
+            Page1TitleYTextBox.BackColor = Color.White;
+
+            TopMarginPage1TextBox.BackColor = Color.White;
+            TopMarginOtherPagesTextBox.BackColor = Color.White;
+            RightMarginTextBox.BackColor = Color.White;
+            BottomMarginTextBox.BackColor = Color.White;
+            LeftMarginTextBox.BackColor = Color.White;
+        }
+        private void ResetPaperSize(string SavedPaperSize, string SavedLandscapeCheckBoxChecked)
+        {
+            int item = 0;
+            do
+            {
+                PaperSizeComboBox.SelectedIndex = item++;
+            } while(SavedPaperSize != PaperSizeComboBox.SelectedItem.ToString());
+
+            if(SavedLandscapeCheckBoxChecked == "1")
+                LandscapeCheckBox.Checked = true;
+            else
+                LandscapeCheckBox.Checked = false;
+        }
+        #endregion RevertToSaved
+        #endregion
+
+        #region public properties
+        public string Keywords { get { return MetadataKeywordsTextBox.Text; } }
+        public string Comment { get { return MetadataCommentTextBox.Text; } }
+        public string PaperSize { get { return PaperSizeComboBox.Text; } }
+        public bool Landscape { get { return LandscapeCheckBox.Checked; } }
+
+        public float TitleHeight { get { return float.Parse(Page1TitleHeightTextBox.Text, M.En_USNumberFormat); } }
+        public float AuthorHeight { get { return float.Parse(Page1AuthorHeightTextBox.Text, M.En_USNumberFormat); } }
+        public float TitleY { get { return float.Parse(Page1TitleYTextBox.Text, M.En_USNumberFormat); } }
+
+        public float TopMarginWidthPage1 { get { return float.Parse(TopMarginPage1TextBox.Text, M.En_USNumberFormat); } }
+        public float TopMarginWidthOtherPages { get { return float.Parse(TopMarginOtherPagesTextBox.Text, M.En_USNumberFormat); } }
+        public float RightMarginWidth { get { return float.Parse(RightMarginTextBox.Text, M.En_USNumberFormat); } }
+        public float BottomMarginWidth { get { return float.Parse(BottomMarginTextBox.Text, M.En_USNumberFormat); } }
+        public float LeftMarginWidth { get { return float.Parse(LeftMarginTextBox.Text, M.En_USNumberFormat); } }
+
+        public string AboutLinkText { get { return AboutLinkTextTextBox.Text; } }
+        public string AboutLinkURL { get { return AboutLinkURLTextBox.Text; } }
+        #endregion public properties
+
+        #region private variables
+        #region for reverting
+        private string SavedMetadataKeywordsTextBoxText;
+        private string SavedMetadataCommentTextBoxText;
+        private string SavedAboutLinkTextTextBoxText;
+        private string SavedAboutLinkURLTextBoxText;
+        private string SavedPaperSize;
+        private string SavedLandscapeCheckBoxChecked;
+        private string SavedPage1TitleHeightTextBoxText;
+        private string SavedPage1AuthorHeightTextBoxText;
+        private string SavedPage1TitleYTextBoxText;
+        private string SavedTopMarginPage1TextBoxText;
+        private string SavedTopMarginOtherPagesTextBoxText;
+        private string SavedRightMarginTextBoxText;
+        private string SavedBottomMarginTextBoxText;
+        private string SavedLeftMarginTextBoxText;
+        #endregion
         private AssistantComposerMainForm _assistantComposerMainForm = null;
+        private List<TextBox> _allTextBoxes;
+        #endregion private variables
     }
 }

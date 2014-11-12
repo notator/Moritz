@@ -98,6 +98,7 @@ namespace Moritz.Palettes
             this.NumberOfOrnamentsTextBox.Name = "NumberOfOrnamentsTextBox";
             this.NumberOfOrnamentsTextBox.Size = new System.Drawing.Size(26, 20);
             this.NumberOfOrnamentsTextBox.TabIndex = 0;
+            this.NumberOfOrnamentsTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.NumberOfOrnamentsTextBox.Leave += new System.EventHandler(this.NumberOfOrnamentsTextBox_Leave);
             // 
             // NumberOfOrnamentsLabel
@@ -172,6 +173,7 @@ namespace Moritz.Palettes
             this.NumBasicChordDefsTextBox.Name = "NumBasicChordDefsTextBox";
             this.NumBasicChordDefsTextBox.Size = new System.Drawing.Size(26, 20);
             this.NumBasicChordDefsTextBox.TabIndex = 0;
+            this.NumBasicChordDefsTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.NumBasicChordDefsTextBox.Leave += new System.EventHandler(this.NumBasicChordDefsTextBox_Leave);
             // 
             // NumBasicChordDefsLabel
@@ -227,6 +229,7 @@ namespace Moritz.Palettes
             this.Ornament12TextBox.Name = "Ornament12TextBox";
             this.Ornament12TextBox.Size = new System.Drawing.Size(561, 20);
             this.Ornament12TextBox.TabIndex = 12;
+            this.Ornament12TextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.Ornament12TextBox.Leave += new System.EventHandler(this.Ornament12TextBox_Leave);
             // 
             // OrnamentDefRangeLabel
@@ -255,6 +258,7 @@ namespace Moritz.Palettes
             this.Ornament11TextBox.Name = "Ornament11TextBox";
             this.Ornament11TextBox.Size = new System.Drawing.Size(561, 20);
             this.Ornament11TextBox.TabIndex = 11;
+            this.Ornament11TextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.Ornament11TextBox.Leave += new System.EventHandler(this.Ornament11TextBox_Leave);
             // 
             // OLabel11
@@ -273,6 +277,7 @@ namespace Moritz.Palettes
             this.Ornament10TextBox.Name = "Ornament10TextBox";
             this.Ornament10TextBox.Size = new System.Drawing.Size(561, 20);
             this.Ornament10TextBox.TabIndex = 10;
+            this.Ornament10TextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.Ornament10TextBox.Leave += new System.EventHandler(this.Ornament10TextBox_Leave);
             // 
             // OLabel10
@@ -291,6 +296,7 @@ namespace Moritz.Palettes
             this.Ornament9TextBox.Name = "Ornament9TextBox";
             this.Ornament9TextBox.Size = new System.Drawing.Size(561, 20);
             this.Ornament9TextBox.TabIndex = 9;
+            this.Ornament9TextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.Ornament9TextBox.Leave += new System.EventHandler(this.Ornament9TextBox_Leave);
             // 
             // OLabel9
@@ -309,6 +315,7 @@ namespace Moritz.Palettes
             this.Ornament8TextBox.Name = "Ornament8TextBox";
             this.Ornament8TextBox.Size = new System.Drawing.Size(561, 20);
             this.Ornament8TextBox.TabIndex = 8;
+            this.Ornament8TextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.Ornament8TextBox.Leave += new System.EventHandler(this.Ornament8TextBox_Leave);
             // 
             // OLabel8
@@ -327,6 +334,7 @@ namespace Moritz.Palettes
             this.Ornament7TextBox.Name = "Ornament7TextBox";
             this.Ornament7TextBox.Size = new System.Drawing.Size(561, 20);
             this.Ornament7TextBox.TabIndex = 7;
+            this.Ornament7TextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.Ornament7TextBox.Leave += new System.EventHandler(this.Ornament7TextBox_Leave);
             // 
             // OLabel7
@@ -345,6 +353,7 @@ namespace Moritz.Palettes
             this.Ornament6TextBox.Name = "Ornament6TextBox";
             this.Ornament6TextBox.Size = new System.Drawing.Size(561, 20);
             this.Ornament6TextBox.TabIndex = 6;
+            this.Ornament6TextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.Ornament6TextBox.Leave += new System.EventHandler(this.Ornament6TextBox_Leave);
             // 
             // OLabel6
@@ -363,6 +372,7 @@ namespace Moritz.Palettes
             this.Ornament5TextBox.Name = "Ornament5TextBox";
             this.Ornament5TextBox.Size = new System.Drawing.Size(561, 20);
             this.Ornament5TextBox.TabIndex = 5;
+            this.Ornament5TextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.Ornament5TextBox.Leave += new System.EventHandler(this.Ornament5TextBox_Leave);
             // 
             // OLabel5
@@ -381,6 +391,7 @@ namespace Moritz.Palettes
             this.Ornament4TextBox.Name = "Ornament4TextBox";
             this.Ornament4TextBox.Size = new System.Drawing.Size(561, 20);
             this.Ornament4TextBox.TabIndex = 4;
+            this.Ornament4TextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.Ornament4TextBox.Leave += new System.EventHandler(this.Ornament4TextBox_Leave);
             // 
             // OLabel4
@@ -399,6 +410,7 @@ namespace Moritz.Palettes
             this.Ornament3TextBox.Name = "Ornament3TextBox";
             this.Ornament3TextBox.Size = new System.Drawing.Size(561, 20);
             this.Ornament3TextBox.TabIndex = 3;
+            this.Ornament3TextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.Ornament3TextBox.Leave += new System.EventHandler(this.Ornament3TextBox_Leave);
             // 
             // OLabel3
@@ -417,6 +429,7 @@ namespace Moritz.Palettes
             this.Ornament2TextBox.Name = "Ornament2TextBox";
             this.Ornament2TextBox.Size = new System.Drawing.Size(561, 20);
             this.Ornament2TextBox.TabIndex = 2;
+            this.Ornament2TextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.Ornament2TextBox.Leave += new System.EventHandler(this.Ornament2TextBox_Leave);
             // 
             // OLabel2
@@ -435,6 +448,7 @@ namespace Moritz.Palettes
             this.Ornament1TextBox.Name = "Ornament1TextBox";
             this.Ornament1TextBox.Size = new System.Drawing.Size(561, 20);
             this.Ornament1TextBox.TabIndex = 1;
+            this.Ornament1TextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.Ornament1TextBox.Leave += new System.EventHandler(this.Ornament1TextBox_Leave);
             // 
             // OLabel1
@@ -648,6 +662,7 @@ namespace Moritz.Palettes
             this.BankIndicesTextBox.Name = "BankIndicesTextBox";
             this.BankIndicesTextBox.Size = new System.Drawing.Size(454, 20);
             this.BankIndicesTextBox.TabIndex = 7;
+            this.BankIndicesTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.BankIndicesTextBox.Leave += new System.EventHandler(this.BankIndicesTextBox_Leave);
             // 
             // PatchIndicesHelpLabel
@@ -686,6 +701,7 @@ namespace Moritz.Palettes
             this.PatchIndicesTextBox.Name = "PatchIndicesTextBox";
             this.PatchIndicesTextBox.Size = new System.Drawing.Size(454, 20);
             this.PatchIndicesTextBox.TabIndex = 8;
+            this.PatchIndicesTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.PatchIndicesTextBox.Leave += new System.EventHandler(this.PatchIndicesTextBox_Leave);
             // 
             // BankIndicesLabel

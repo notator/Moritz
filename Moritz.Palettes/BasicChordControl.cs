@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Xml;
 using System.Diagnostics;
+using System.Drawing;
 
 using Moritz.Globals;
 
@@ -98,7 +99,22 @@ namespace Moritz.Palettes
             RootInversionTextBox.Text = SavedRootInversionTextBoxText;
             InversionIndicesTextBox.Text = SavedInversionIndicesTextBoxText;
             VerticalVelocityFactorsTextBox.Text = SavedVerticalVelocityFactorsTextBoxText;
+
+            SetAllTextBoxBackColorsToWhite();
         }
+
+        private void SetAllTextBoxBackColorsToWhite()
+        {
+            M.SetToWhite(DurationsTextBox);
+            M.SetToWhite(VelocitiesTextBox);
+            M.SetToWhite(MidiPitchesTextBox);
+            M.SetToWhite(ChordOffsTextBox);
+            M.SetToWhite(ChordDensitiesTextBox);
+            M.SetToWhite(RootInversionTextBox);
+            M.SetToWhite(InversionIndicesTextBox);
+            M.SetToWhite(VerticalVelocityFactorsTextBox);
+        }
+
         private string SavedDurationsTextBoxText;
         private string SavedVelocitiesTextBoxText;
         private string SavedMidiPitchesTextBoxText;
@@ -187,42 +203,35 @@ namespace Moritz.Palettes
 
         #region Event handlers
         /// <summary>
-        /// Used by all parameter textBoxes (also the ones in the containing Form).
+        /// Used by all textBoxes.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ParameterTextBox_TextChanged(object sender, EventArgs e)
+        private void SetToWhiteTextBox_TextChanged(object sender, EventArgs e)
         {
             TextBox textBox = sender as TextBox;
             M.SetToWhite(textBox);
         }
-
+        #region Leave handlers
         private void DurationsTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveIntRangeTextBox(sender as TextBox, false, (uint)NumberOfChordValues, 0, int.MaxValue, SetDialogState);
         }
-
         private void VelocitiesTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveIntRangeTextBox(sender as TextBox, false, (uint)NumberOfChordValues, 0, 127, SetDialogState);
         }
-
         private void MidiPitchesTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveIntRangeTextBox(sender as TextBox, false, (uint)NumberOfChordValues, 0, 127, SetDialogState);
         }
-
         private void ChordOffsTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveIntRangeTextBox(sender as TextBox, true, (uint)NumberOfChordValues, 0, 1, SetDialogState);
         }
-
         private void ChordDensitiesTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveIntRangeTextBox(sender as TextBox, false, (uint)NumberOfChordValues, 0, 128, SetDialogState);
             SetChordControls();
         }
-
         private void RootInversionTextBox_Leave(object sender, EventArgs e)
         {
             bool canBeEmpty = true;
@@ -232,7 +241,6 @@ namespace Moritz.Palettes
 
             M.LeaveIntRangeTextBox(rootInversionTextBox, canBeEmpty, (uint)MaximumChordDensity - 1, 1, 127, SetDialogState);
         }
-
         private void InversionIndicesTextBox_Leave(object sender, EventArgs e)
         {
             TextBox inversionsTextBox = sender as TextBox;
@@ -244,12 +252,13 @@ namespace Moritz.Palettes
             int maxVal = (2 * (MaximumChordDensity - 2)) - 1;
             M.LeaveIntRangeTextBox(inversionsTextBox, canBeEmpty, (uint)NumberOfChordValues, 0, maxVal, SetDialogState);
         }
-
         private void VerticalVelocityFactorsTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveFloatRangeTextBox(sender as TextBox, true, (uint)NumberOfChordValues, 0F, float.MaxValue, SetDialogState);
         }
+        #endregion Leave handlers
         #endregion
+
         /// <summary>
         /// Sets the state of the RootInversion, Inversions and VerticalVelocities input fields,
         /// depending on the maximum density in the ChordDensities TextBox.
@@ -281,7 +290,7 @@ namespace Moritz.Palettes
             SetChordControls();
         }
 
-        public void GetMaximumChordDensity()
+        private void GetMaximumChordDensity()
         {
             List<int> densities = M.StringToIntList(ChordDensitiesTextBox.Text, ',');
 
@@ -292,7 +301,7 @@ namespace Moritz.Palettes
             }
         }
 
-        public void DisableChordParameters()
+        private void DisableChordParameters()
         {
             VerticalVelocityFactorsLabel.Enabled = false;
             VerticalVelocityFactorsTextBox.Enabled = false;

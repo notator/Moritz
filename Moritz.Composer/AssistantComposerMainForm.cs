@@ -257,7 +257,7 @@ namespace Moritz.Composer
             }
 
             if(!error)
-                error = _dimensionsAndMetadataForm.HasError();
+                error = _dimensionsAndMetadataForm.HasError;
 
             if(!error)
             {

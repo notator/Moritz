@@ -259,6 +259,13 @@ namespace Moritz.Palettes
 
         /************/
 
+        #region TextChanged event handler
+        private void SetToWhiteTextBox_TextChanged(object sender, EventArgs e)
+        {
+            M.SetToWhite(sender as TextBox);
+        }
+        #endregion TextChanged event handler
+
         #region TextBox_Leave handlers
         /************/
         private void NumBasicChordDefsTextBox_Leave(object sender, EventArgs e)

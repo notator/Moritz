@@ -33,7 +33,7 @@
             this.MetadataCommentLabel = new System.Windows.Forms.Label();
             this.MetadataKeywordsTextBox = new System.Windows.Forms.TextBox();
             this.MetadataKeywordsLabel = new System.Windows.Forms.Label();
-            this.SaveSettingsButton = new System.Windows.Forms.Button();
+            this.OkayToSaveButton = new System.Windows.Forms.Button();
             this.LandscapeCheckBox = new System.Windows.Forms.CheckBox();
             this.PaperSizeComboBox = new System.Windows.Forms.ComboBox();
             this.WebsiteLinksGroupBox = new System.Windows.Forms.GroupBox();
@@ -62,6 +62,7 @@
             this.PaperSizeLabel = new System.Windows.Forms.Label();
             this.ShowMainScoreFormButton = new System.Windows.Forms.Button();
             this.UnitsHelpLabel = new System.Windows.Forms.Label();
+            this.RevertToSavedButton = new System.Windows.Forms.Button();
             this.MetadataGroupBox.SuspendLayout();
             this.WebsiteLinksGroupBox.SuspendLayout();
             this.MarginsGroupBox.SuspendLayout();
@@ -78,7 +79,7 @@
             this.MetadataGroupBox.Location = new System.Drawing.Point(347, 13);
             this.MetadataGroupBox.Name = "MetadataGroupBox";
             this.MetadataGroupBox.Size = new System.Drawing.Size(293, 259);
-            this.MetadataGroupBox.TabIndex = 6;
+            this.MetadataGroupBox.TabIndex = 9;
             this.MetadataGroupBox.TabStop = false;
             this.MetadataGroupBox.Text = "metadata";
             // 
@@ -90,7 +91,8 @@
             this.MetadataCommentTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.MetadataCommentTextBox.Size = new System.Drawing.Size(268, 184);
             this.MetadataCommentTextBox.TabIndex = 1;
-            this.MetadataCommentTextBox.TextChanged += new System.EventHandler(this.MetadataCommentTextBox_TextChanged);
+            this.MetadataCommentTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
+            this.MetadataCommentTextBox.Leave += new System.EventHandler(this.MetadataCommentTextBox_Leave);
             // 
             // MetadataCommentLabel
             // 
@@ -109,7 +111,8 @@
             this.MetadataKeywordsTextBox.Name = "MetadataKeywordsTextBox";
             this.MetadataKeywordsTextBox.Size = new System.Drawing.Size(213, 20);
             this.MetadataKeywordsTextBox.TabIndex = 0;
-            this.MetadataKeywordsTextBox.TextChanged += new System.EventHandler(this.MetadataKeywordsTextBox_TextChanged);
+            this.MetadataKeywordsTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
+            this.MetadataKeywordsTextBox.Leave += new System.EventHandler(this.MetadataKeywordsTextBox_Leave);
             // 
             // MetadataKeywordsLabel
             // 
@@ -122,18 +125,18 @@
             this.MetadataKeywordsLabel.TabIndex = 135;
             this.MetadataKeywordsLabel.Text = "keywords";
             // 
-            // SaveSettingsButton
+            // OkayToSaveButton
             // 
-            this.SaveSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.SaveSettingsButton.Enabled = false;
-            this.SaveSettingsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.SaveSettingsButton.Location = new System.Drawing.Point(534, 355);
-            this.SaveSettingsButton.Name = "SaveSettingsButton";
-            this.SaveSettingsButton.Size = new System.Drawing.Size(106, 26);
-            this.SaveSettingsButton.TabIndex = 7;
-            this.SaveSettingsButton.Text = "save settings";
-            this.SaveSettingsButton.UseVisualStyleBackColor = true;
-            this.SaveSettingsButton.Click += new System.EventHandler(this.SaveSettingsButton_Click);
+            this.OkayToSaveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.OkayToSaveButton.Enabled = false;
+            this.OkayToSaveButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.OkayToSaveButton.Location = new System.Drawing.Point(413, 355);
+            this.OkayToSaveButton.Name = "OkayToSaveButton";
+            this.OkayToSaveButton.Size = new System.Drawing.Size(106, 26);
+            this.OkayToSaveButton.TabIndex = 1;
+            this.OkayToSaveButton.Text = "okay to save";
+            this.OkayToSaveButton.UseVisualStyleBackColor = true;
+            this.OkayToSaveButton.Click += new System.EventHandler(this.OkayToSaveButton_Click);
             // 
             // LandscapeCheckBox
             // 
@@ -143,7 +146,7 @@
             this.LandscapeCheckBox.Location = new System.Drawing.Point(209, 16);
             this.LandscapeCheckBox.Name = "LandscapeCheckBox";
             this.LandscapeCheckBox.Size = new System.Drawing.Size(76, 18);
-            this.LandscapeCheckBox.TabIndex = 2;
+            this.LandscapeCheckBox.TabIndex = 5;
             this.LandscapeCheckBox.Text = "landscape";
             this.LandscapeCheckBox.UseVisualStyleBackColor = true;
             this.LandscapeCheckBox.CheckedChanged += new System.EventHandler(this.LandscapeCheckBox_CheckedChanged);
@@ -163,7 +166,7 @@
             this.PaperSizeComboBox.Location = new System.Drawing.Point(122, 13);
             this.PaperSizeComboBox.Name = "PaperSizeComboBox";
             this.PaperSizeComboBox.Size = new System.Drawing.Size(56, 22);
-            this.PaperSizeComboBox.TabIndex = 1;
+            this.PaperSizeComboBox.TabIndex = 4;
             this.PaperSizeComboBox.SelectedIndexChanged += new System.EventHandler(this.PaperSizeComboBox_SelectedIndexChanged);
             // 
             // WebsiteLinksGroupBox
@@ -176,7 +179,7 @@
             this.WebsiteLinksGroupBox.Location = new System.Drawing.Point(19, 278);
             this.WebsiteLinksGroupBox.Name = "WebsiteLinksGroupBox";
             this.WebsiteLinksGroupBox.Size = new System.Drawing.Size(621, 67);
-            this.WebsiteLinksGroupBox.TabIndex = 5;
+            this.WebsiteLinksGroupBox.TabIndex = 8;
             this.WebsiteLinksGroupBox.TabStop = false;
             this.WebsiteLinksGroupBox.Text = "website links";
             // 
@@ -186,7 +189,8 @@
             this.AboutLinkTextTextBox.Name = "AboutLinkTextTextBox";
             this.AboutLinkTextTextBox.Size = new System.Drawing.Size(95, 20);
             this.AboutLinkTextTextBox.TabIndex = 0;
-            this.AboutLinkTextTextBox.TextChanged += new System.EventHandler(this.AboutLinkTextTextBox_TextChanged);
+            this.AboutLinkTextTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
+            this.AboutLinkTextTextBox.Leave += new System.EventHandler(this.AboutLinkTextTextBox_Leave);
             // 
             // AboutLinkURLTextBox
             // 
@@ -194,7 +198,8 @@
             this.AboutLinkURLTextBox.Name = "AboutLinkURLTextBox";
             this.AboutLinkURLTextBox.Size = new System.Drawing.Size(494, 20);
             this.AboutLinkURLTextBox.TabIndex = 1;
-            this.AboutLinkURLTextBox.TextChanged += new System.EventHandler(this.AboutLinkURLTextBox_TextChanged);
+            this.AboutLinkURLTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
+            this.AboutLinkURLTextBox.Leave += new System.EventHandler(this.AboutLinkURLTextBox_Leave);
             // 
             // AboutLinkTextLabel
             // 
@@ -234,7 +239,7 @@
             this.MarginsGroupBox.Location = new System.Drawing.Point(19, 156);
             this.MarginsGroupBox.Name = "MarginsGroupBox";
             this.MarginsGroupBox.Size = new System.Drawing.Size(315, 116);
-            this.MarginsGroupBox.TabIndex = 4;
+            this.MarginsGroupBox.TabIndex = 7;
             this.MarginsGroupBox.TabStop = false;
             this.MarginsGroupBox.Text = "margins";
             // 
@@ -244,7 +249,8 @@
             this.BottomMarginTextBox.Name = "BottomMarginTextBox";
             this.BottomMarginTextBox.Size = new System.Drawing.Size(34, 20);
             this.BottomMarginTextBox.TabIndex = 4;
-            this.BottomMarginTextBox.TextChanged += new System.EventHandler(this.BottomMarginTextBox_TextChanged);
+            this.BottomMarginTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
+            this.BottomMarginTextBox.Leave += new System.EventHandler(this.BottomMarginTextBox_Leave);
             // 
             // TopMarginPage1TextBox
             // 
@@ -252,7 +258,8 @@
             this.TopMarginPage1TextBox.Name = "TopMarginPage1TextBox";
             this.TopMarginPage1TextBox.Size = new System.Drawing.Size(34, 20);
             this.TopMarginPage1TextBox.TabIndex = 0;
-            this.TopMarginPage1TextBox.TextChanged += new System.EventHandler(this.TopMarginPage1TextBox_TextChanged);
+            this.TopMarginPage1TextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
+            this.TopMarginPage1TextBox.Leave += new System.EventHandler(this.TopMarginPage1TextBox_Leave);
             // 
             // TopMarginOtherPagesTextBox
             // 
@@ -260,7 +267,8 @@
             this.TopMarginOtherPagesTextBox.Name = "TopMarginOtherPagesTextBox";
             this.TopMarginOtherPagesTextBox.Size = new System.Drawing.Size(34, 20);
             this.TopMarginOtherPagesTextBox.TabIndex = 1;
-            this.TopMarginOtherPagesTextBox.TextChanged += new System.EventHandler(this.TopMarginOtherPagesTextBox_TextChanged);
+            this.TopMarginOtherPagesTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
+            this.TopMarginOtherPagesTextBox.Leave += new System.EventHandler(this.TopMarginOtherPagesTextBox_Leave);
             // 
             // RightMarginTextBox
             // 
@@ -268,7 +276,8 @@
             this.RightMarginTextBox.Name = "RightMarginTextBox";
             this.RightMarginTextBox.Size = new System.Drawing.Size(34, 20);
             this.RightMarginTextBox.TabIndex = 3;
-            this.RightMarginTextBox.TextChanged += new System.EventHandler(this.RightMarginTextBox_TextChanged);
+            this.RightMarginTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
+            this.RightMarginTextBox.Leave += new System.EventHandler(this.RightMarginTextBox_Leave);
             // 
             // LeftMarginTextBox
             // 
@@ -276,7 +285,8 @@
             this.LeftMarginTextBox.Name = "LeftMarginTextBox";
             this.LeftMarginTextBox.Size = new System.Drawing.Size(34, 20);
             this.LeftMarginTextBox.TabIndex = 2;
-            this.LeftMarginTextBox.TextChanged += new System.EventHandler(this.LeftMarginTextBox_TextChanged);
+            this.LeftMarginTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
+            this.LeftMarginTextBox.Leave += new System.EventHandler(this.LeftMarginTextBox_Leave);
             // 
             // Page1AboveTopSystemLabel
             // 
@@ -345,7 +355,7 @@
             this.Page1TitleGroupBox.Location = new System.Drawing.Point(19, 64);
             this.Page1TitleGroupBox.Name = "Page1TitleGroupBox";
             this.Page1TitleGroupBox.Size = new System.Drawing.Size(315, 86);
-            this.Page1TitleGroupBox.TabIndex = 3;
+            this.Page1TitleGroupBox.TabIndex = 6;
             this.Page1TitleGroupBox.TabStop = false;
             this.Page1TitleGroupBox.Text = "page 1 title";
             // 
@@ -355,7 +365,8 @@
             this.Page1TitleYTextBox.Name = "Page1TitleYTextBox";
             this.Page1TitleYTextBox.Size = new System.Drawing.Size(34, 20);
             this.Page1TitleYTextBox.TabIndex = 2;
-            this.Page1TitleYTextBox.TextChanged += new System.EventHandler(this.Page1TitleYTextBox_TextChanged);
+            this.Page1TitleYTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
+            this.Page1TitleYTextBox.Leave += new System.EventHandler(this.Page1TitleYTextBox_Leave);
             // 
             // Page1TitleHeightTextBox
             // 
@@ -363,7 +374,8 @@
             this.Page1TitleHeightTextBox.Name = "Page1TitleHeightTextBox";
             this.Page1TitleHeightTextBox.Size = new System.Drawing.Size(34, 20);
             this.Page1TitleHeightTextBox.TabIndex = 0;
-            this.Page1TitleHeightTextBox.TextChanged += new System.EventHandler(this.Page1TitleHeightTextBox_TextChanged);
+            this.Page1TitleHeightTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
+            this.Page1TitleHeightTextBox.Leave += new System.EventHandler(this.Page1TitleHeightTextBox_Leave);
             // 
             // Page1AuthorHeightTextBox
             // 
@@ -371,7 +383,8 @@
             this.Page1AuthorHeightTextBox.Name = "Page1AuthorHeightTextBox";
             this.Page1AuthorHeightTextBox.Size = new System.Drawing.Size(34, 20);
             this.Page1AuthorHeightTextBox.TabIndex = 1;
-            this.Page1AuthorHeightTextBox.TextChanged += new System.EventHandler(this.Page1AuthorHeightTextBox_TextChanged);
+            this.Page1AuthorHeightTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
+            this.Page1AuthorHeightTextBox.Leave += new System.EventHandler(this.Page1AuthorHeightTextBox_Leave);
             // 
             // Page1TitleYLabel
             // 
@@ -424,7 +437,7 @@
             this.ShowMainScoreFormButton.Location = new System.Drawing.Point(19, 355);
             this.ShowMainScoreFormButton.Name = "ShowMainScoreFormButton";
             this.ShowMainScoreFormButton.Size = new System.Drawing.Size(137, 26);
-            this.ShowMainScoreFormButton.TabIndex = 8;
+            this.ShowMainScoreFormButton.TabIndex = 3;
             this.ShowMainScoreFormButton.Text = "show main score form";
             this.ShowMainScoreFormButton.UseVisualStyleBackColor = false;
             this.ShowMainScoreFormButton.Click += new System.EventHandler(this.ShowMainScoreFormButton_Click);
@@ -439,6 +452,19 @@
             this.UnitsHelpLabel.TabIndex = 138;
             this.UnitsHelpLabel.Text = "Dimensions in screen pixels (100% display).";
             // 
+            // RevertToSavedButton
+            // 
+            this.RevertToSavedButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.RevertToSavedButton.Enabled = false;
+            this.RevertToSavedButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.RevertToSavedButton.Location = new System.Drawing.Point(534, 355);
+            this.RevertToSavedButton.Name = "RevertToSavedButton";
+            this.RevertToSavedButton.Size = new System.Drawing.Size(106, 26);
+            this.RevertToSavedButton.TabIndex = 2;
+            this.RevertToSavedButton.Text = "revert to saved";
+            this.RevertToSavedButton.UseVisualStyleBackColor = true;
+            this.RevertToSavedButton.Click += new System.EventHandler(this.RevertToSavedButton_Click);
+            // 
             // DimensionsAndMetadataForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
@@ -446,10 +472,11 @@
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
             this.ClientSize = new System.Drawing.Size(658, 396);
             this.ControlBox = false;
+            this.Controls.Add(this.RevertToSavedButton);
             this.Controls.Add(this.UnitsHelpLabel);
             this.Controls.Add(this.ShowMainScoreFormButton);
             this.Controls.Add(this.MetadataGroupBox);
-            this.Controls.Add(this.SaveSettingsButton);
+            this.Controls.Add(this.OkayToSaveButton);
             this.Controls.Add(this.LandscapeCheckBox);
             this.Controls.Add(this.PaperSizeComboBox);
             this.Controls.Add(this.WebsiteLinksGroupBox);
@@ -482,7 +509,7 @@
         private System.Windows.Forms.Label MetadataCommentLabel;
         private System.Windows.Forms.TextBox MetadataKeywordsTextBox;
         private System.Windows.Forms.Label MetadataKeywordsLabel;
-        private System.Windows.Forms.Button SaveSettingsButton;
+        private System.Windows.Forms.Button OkayToSaveButton;
         private System.Windows.Forms.CheckBox LandscapeCheckBox;
         private System.Windows.Forms.ComboBox PaperSizeComboBox;
         private System.Windows.Forms.GroupBox WebsiteLinksGroupBox;
@@ -511,5 +538,6 @@
         private System.Windows.Forms.Label PaperSizeLabel;
         private System.Windows.Forms.Button ShowMainScoreFormButton;
         private System.Windows.Forms.Label UnitsHelpLabel;
+        private System.Windows.Forms.Button RevertToSavedButton;
     }
 }

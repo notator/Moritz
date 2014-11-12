@@ -60,7 +60,7 @@
             this.VerticalVelocityFactorsTextBox.Name = "VerticalVelocityFactorsTextBox";
             this.VerticalVelocityFactorsTextBox.Size = new System.Drawing.Size(361, 20);
             this.VerticalVelocityFactorsTextBox.TabIndex = 7;
-            this.VerticalVelocityFactorsTextBox.TextChanged += new System.EventHandler(this.ParameterTextBox_TextChanged);
+            this.VerticalVelocityFactorsTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.VerticalVelocityFactorsTextBox.Leave += new System.EventHandler(this.VerticalVelocityFactorsTextBox_Leave);
             // 
             // InversionIndicesTextBox
@@ -69,7 +69,7 @@
             this.InversionIndicesTextBox.Name = "InversionIndicesTextBox";
             this.InversionIndicesTextBox.Size = new System.Drawing.Size(361, 20);
             this.InversionIndicesTextBox.TabIndex = 6;
-            this.InversionIndicesTextBox.TextChanged += new System.EventHandler(this.ParameterTextBox_TextChanged);
+            this.InversionIndicesTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.InversionIndicesTextBox.Leave += new System.EventHandler(this.InversionIndicesTextBox_Leave);
             // 
             // MidiPitchesHelpLabel
@@ -88,7 +88,7 @@
             this.RootInversionTextBox.Name = "RootInversionTextBox";
             this.RootInversionTextBox.Size = new System.Drawing.Size(361, 20);
             this.RootInversionTextBox.TabIndex = 5;
-            this.RootInversionTextBox.TextChanged += new System.EventHandler(this.ParameterTextBox_TextChanged);
+            this.RootInversionTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.RootInversionTextBox.Leave += new System.EventHandler(this.RootInversionTextBox_Leave);
             // 
             // VelocitiesHelpLabel
@@ -107,7 +107,7 @@
             this.ChordDensitiesTextBox.Name = "ChordDensitiesTextBox";
             this.ChordDensitiesTextBox.Size = new System.Drawing.Size(454, 20);
             this.ChordDensitiesTextBox.TabIndex = 0;
-            this.ChordDensitiesTextBox.TextChanged += new System.EventHandler(this.ParameterTextBox_TextChanged);
+            this.ChordDensitiesTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.ChordDensitiesTextBox.Leave += new System.EventHandler(this.ChordDensitiesTextBox_Leave);
             // 
             // ChordDensitiesHelpLabel
@@ -126,7 +126,7 @@
             this.VelocitiesTextBox.Name = "VelocitiesTextBox";
             this.VelocitiesTextBox.Size = new System.Drawing.Size(454, 20);
             this.VelocitiesTextBox.TabIndex = 3;
-            this.VelocitiesTextBox.TextChanged += new System.EventHandler(this.ParameterTextBox_TextChanged);
+            this.VelocitiesTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.VelocitiesTextBox.Leave += new System.EventHandler(this.VelocitiesTextBox_Leave);
             // 
             // VerticalVelocityFactorsHelpLabel
@@ -145,7 +145,7 @@
             this.MidiPitchesTextBox.Name = "MidiPitchesTextBox";
             this.MidiPitchesTextBox.Size = new System.Drawing.Size(454, 20);
             this.MidiPitchesTextBox.TabIndex = 2;
-            this.MidiPitchesTextBox.TextChanged += new System.EventHandler(this.ParameterTextBox_TextChanged);
+            this.MidiPitchesTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.MidiPitchesTextBox.Leave += new System.EventHandler(this.MidiPitchesTextBox_Leave);
             // 
             // InversionIndicesHelpLabel
@@ -254,7 +254,7 @@
             this.ChordOffsTextBox.Name = "ChordOffsTextBox";
             this.ChordOffsTextBox.Size = new System.Drawing.Size(454, 20);
             this.ChordOffsTextBox.TabIndex = 4;
-            this.ChordOffsTextBox.TextChanged += new System.EventHandler(this.ParameterTextBox_TextChanged);
+            this.ChordOffsTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.ChordOffsTextBox.Leave += new System.EventHandler(this.ChordOffsTextBox_Leave);
             // 
             // MidiPitchesLabel
@@ -283,7 +283,7 @@
             this.DurationsTextBox.Name = "DurationsTextBox";
             this.DurationsTextBox.Size = new System.Drawing.Size(454, 20);
             this.DurationsTextBox.TabIndex = 1;
-            this.DurationsTextBox.TextChanged += new System.EventHandler(this.ParameterTextBox_TextChanged);
+            this.DurationsTextBox.TextChanged += new System.EventHandler(this.SetToWhiteTextBox_TextChanged);
             this.DurationsTextBox.Leave += new System.EventHandler(this.DurationsTextBox_Leave);
             // 
             // BasicChordControl
