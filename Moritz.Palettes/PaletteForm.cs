@@ -11,7 +11,7 @@ using Moritz.Globals;
 
 namespace Moritz.Palettes
 {
-    public partial class PaletteForm : Form, IPaletteForm
+    public partial class PaletteForm : Form
     {
         public PaletteForm(XmlReader r, string name, int domain, bool isPercussionPalette, ComposerFormCallbacks mainFormCallbacks)
             : this(name, domain, mainFormCallbacks)
@@ -1053,7 +1053,7 @@ namespace Moritz.Palettes
             CloseMIDIInstrumentsHelpForm();
         }
 
-        #region iPaletteForm
+        #region paletteForm
         public string GetName() { return this._name; }
         public void SetName(string name)
         {
@@ -1321,7 +1321,7 @@ namespace Moritz.Palettes
         private ComposerFormCallbacks _callbacks = null;
         private List<TextBox> _allMainTextBoxes = new List<TextBox>();
         private PaletteButtonsControl _paletteButtonsControl = null;
-        #endregion iPaletteForm
+        #endregion paletteForm
 
         #region public variables
         public int Domain { get { return _domain; } }
@@ -1340,7 +1340,7 @@ namespace Moritz.Palettes
         private MIDIInstrumentsHelpForm _midiInstrumentsHelpForm = null;
         private MIDIPercussionHelpForm _percussionInstrHelpForm = null;
         private BasicChordControl _bcc = null;
-        PaletteChordForm _paletteChordForm = null;
+        private PaletteChordForm _paletteChordForm = null;
         #endregion private variables
 
     }

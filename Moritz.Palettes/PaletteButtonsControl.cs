@@ -18,11 +18,11 @@ namespace Moritz.Palettes
 {
     public partial class PaletteButtonsControl : UserControl
     {
-        internal PaletteButtonsControl(int domain, Point location, IPaletteForm iPaletteForm, string audioFolder)
+        internal PaletteButtonsControl(int domain, Point location, PaletteForm paletteForm, string audioFolder)
         {
             InitializeComponent();
 
-            _iPaletteForm = iPaletteForm;
+            _paletteForm = paletteForm;
             _audioFolder = audioFolder;
             this.SuspendLayout();
             this.Location = location;
@@ -217,7 +217,7 @@ namespace Moritz.Palettes
             if(button != null)
             {
 
-                PaletteForm paletteForm = this._iPaletteForm as PaletteForm;
+                PaletteForm paletteForm = this._paletteForm as PaletteForm;
                 Palette palette = null;
                 IUniqueDef iud = null;
                 OutputDevice outputDevice = M.Preferences.CurrentMultimediaMidiOutputDevice;
@@ -268,7 +268,7 @@ namespace Moritz.Palettes
 
             if(button != null)
             {
-                _iPaletteForm.ShowPaletteChordForm((int) button.Tag);
+                _paletteForm.ShowPaletteChordForm((int) button.Tag);
             }
         }
 
@@ -294,7 +294,7 @@ namespace Moritz.Palettes
                 {
                     StopCurrentMediaPlayer();
                     GetAudioFileName(button);
-                    _iPaletteForm.SetSettingsHaveChanged();
+                    _paletteForm.SetSettingsHaveChanged();
                 }
                 else if(e.Button == MouseButtons.Left)
                 {
@@ -421,7 +421,7 @@ namespace Moritz.Palettes
             }
         }
 
-        private readonly IPaletteForm _iPaletteForm;
+        private readonly PaletteForm _paletteForm;
         private readonly string _audioFolder;
 
         public List<Button> AudioSampleButtons { get { return _audioSampleButtons; } }

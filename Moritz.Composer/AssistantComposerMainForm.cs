@@ -233,8 +233,8 @@ namespace Moritz.Composer
                 this.Text = _scoreTitle + " algorithm";
                 SetSaveAndCreateButtons(false);
 
-                List<IPaletteForm> kpForms = AllIPalleteForms;
-                foreach(IPaletteForm kpf in kpForms)
+                List<PaletteForm> kpForms = AllPalleteForms;
+                foreach(PaletteForm kpf in kpForms)
                     kpf.SetSettingsHaveBeenSaved();
             }
         }
@@ -261,9 +261,9 @@ namespace Moritz.Composer
 
             if(!error)
             {
-                foreach(IPaletteForm iPaletteForm in AllIPalleteForms)
+                foreach(PaletteForm paletteForm in AllPalleteForms)
                 {
-                    if(iPaletteForm.HasError)
+                    if(paletteForm.HasError)
                     {
                         error = true;
                         break;
@@ -533,7 +533,7 @@ namespace Moritz.Composer
                         }
                     }
 
-                    IPaletteForm paletteForm = new PaletteForm(r, name, domain, isPercussionPalette, callbacks);
+                    PaletteForm paletteForm = new PaletteForm(r, name, domain, isPercussionPalette, callbacks);
 
                     PalettesListBox.Items.Add(paletteForm);
 
@@ -559,7 +559,7 @@ namespace Moritz.Composer
 
             foreach(object o in PalettesListBox.Items)
             {
-                IPaletteForm paletteForm = o as IPaletteForm;
+                PaletteForm paletteForm = o as PaletteForm;
                 if(paletteForm != null && paletteForm.HasOpenChordForm)
                 {
                     aPaletteChordFormIsOpen = true;
@@ -690,7 +690,7 @@ namespace Moritz.Composer
 
                 foreach(object o in PalettesListBox.Items)
                 {
-                    IPaletteForm paletteForm = o as IPaletteForm;
+                    PaletteForm paletteForm = o as PaletteForm;
                     if(paletteForm != null)
                     {
                         paletteForm.WritePalette(w);
@@ -881,8 +881,8 @@ namespace Moritz.Composer
 
         private void AssistantComposerMainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            List<IPaletteForm> ipfs = AllIPalleteForms;
-            foreach(IPaletteForm ipf in ipfs)
+            List<PaletteForm> ipfs = AllPalleteForms;
+            foreach(PaletteForm ipf in ipfs)
                 ipf.Close();
 
             if(_dimensionsAndMetadataForm != null)
@@ -1098,14 +1098,14 @@ namespace Moritz.Composer
                 return allKrystals;
             }
         }
-        private List<IPaletteForm> AllIPalleteForms
+        private List<PaletteForm> AllPalleteForms
         {
             get
             {
-                List<IPaletteForm> allIPalletForms = new List<IPaletteForm>();
+                List<PaletteForm> allIPalletForms = new List<PaletteForm>();
                 foreach(object o in PalettesListBox.Items)
                 {
-                    IPaletteForm ipf = o as IPaletteForm;
+                    PaletteForm ipf = o as PaletteForm;
                     if(ipf != null)
                     {
                         allIPalletForms.Add(ipf);
@@ -1115,15 +1115,15 @@ namespace Moritz.Composer
             }
         }
 
-        private List<IPaletteForm> CurrentIPaletteForms
+        private List<PaletteForm> CurrentPaletteForms
         {
             get
             {
-                List<IPaletteForm> currentPalletForms = new List<IPaletteForm>();
+                List<PaletteForm> currentPalletForms = new List<PaletteForm>();
 
                 foreach(object o in PalettesListBox.Items)
                 {
-                    IPaletteForm ipf = o as IPaletteForm;
+                    PaletteForm ipf = o as PaletteForm;
                     currentPalletForms.Add(ipf);
                 }
                 return currentPalletForms;
@@ -1132,7 +1132,7 @@ namespace Moritz.Composer
             {
                 PalettesListBox.SuspendLayout();
                 PalettesListBox.Items.Clear();
-                foreach(IPaletteForm ipf in value)
+                foreach(PaletteForm ipf in value)
                 {
                     PalettesListBox.Items.Add(ipf);
                 }
@@ -1166,7 +1166,7 @@ namespace Moritz.Composer
                 selectedIndex = PalettesListBox.SelectedIndices[0];
             if(selectedIndex >= 0)
             {
-                List<IPaletteForm> currentForms = CurrentIPaletteForms;
+                List<PaletteForm> currentForms = CurrentPaletteForms;
                 currentForms[selectedIndex].Show();
                 currentForms[selectedIndex].BringToFront();
             }
@@ -1183,12 +1183,12 @@ namespace Moritz.Composer
                 if(int.TryParse(getStringDialog.String, out domain) && domain > 0 && domain < 21)
                 {
                     ComposerFormCallbacks callbacks = GetCallbacks();
-                    IPaletteForm iPaletteForm = null;
+                    PaletteForm paletteForm = null;
                     string newname = PaletteForm.NewPaletteName(PalettesListBox.Items.Count + 2, domain);
-                    iPaletteForm = new PaletteForm(newname, domain, callbacks);
-                    List<IPaletteForm> currentPaletteForms = CurrentIPaletteForms;
-                    currentPaletteForms.Add(iPaletteForm);
-                    CurrentIPaletteForms = currentPaletteForms;
+                    paletteForm = new PaletteForm(newname, domain, callbacks);
+                    List<PaletteForm> currentPaletteForms = CurrentPaletteForms;
+                    currentPaletteForms.Add(paletteForm);
+                    CurrentPaletteForms = currentPaletteForms;
                     PalettesListBox.SelectedIndex = PalettesListBox.Items.Count - 1;
                     this.SetSettingsHaveChanged();
                 }
@@ -1213,10 +1213,10 @@ namespace Moritz.Composer
                 DialogResult proceed = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if(proceed == DialogResult.Yes)
                 {
-                    List<IPaletteForm> currentPaletteForms = CurrentIPaletteForms;
+                    List<PaletteForm> currentPaletteForms = CurrentPaletteForms;
                     currentPaletteForms[selectedIndex].Close();
                     currentPaletteForms.RemoveAt(selectedIndex);
-                    CurrentIPaletteForms = currentPaletteForms;
+                    CurrentPaletteForms = currentPaletteForms;
                     this.SetSettingsHaveChanged();
                     UpdateForChangedPaletteList();
                 }
@@ -1231,7 +1231,7 @@ namespace Moritz.Composer
         {
             PalettesListBox.SuspendLayout();
             int paletteNumber = 1;
-            foreach(IPaletteForm ipf in CurrentIPaletteForms)
+            foreach(PaletteForm ipf in CurrentPaletteForms)
             {
                 string name = null;
                 PaletteForm pf = ipf as PaletteForm;
@@ -1297,7 +1297,7 @@ namespace Moritz.Composer
         private void ScoreComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             _dimensionsAndMetadataForm.Hide();
-            foreach(IPaletteForm palette in CurrentIPaletteForms)
+            foreach(PaletteForm palette in CurrentPaletteForms)
             {
                 palette.Close();
             }
