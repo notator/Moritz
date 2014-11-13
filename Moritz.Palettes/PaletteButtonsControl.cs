@@ -218,9 +218,9 @@ namespace Moritz.Palettes
             {
 
                 PaletteForm paletteForm = this._iPaletteForm as PaletteForm;
-                PercussionPaletteForm percussionPaletteForm = this._iPaletteForm as PercussionPaletteForm;
                 Palette palette = null;
                 IUniqueDef iud = null;
+                OutputDevice outputDevice = M.Preferences.CurrentMultimediaMidiOutputDevice;
                 int midiChannel = 0;
 
                 int index = int.Parse(button.Text) - 1;
@@ -229,11 +229,11 @@ namespace Moritz.Palettes
                     if(paletteForm != null)
                     {
                         palette = new Palette(paletteForm);
-                    }
-                    else if(percussionPaletteForm != null)
-                    {
-                        palette = new Palette(percussionPaletteForm);
-                        midiChannel = 9;          
+                        if(palette.IsPercussionPalette)
+                        {
+                            outputDevice = M.Preferences.GetMidiOutputDevice("Microsoft GS Wavetable Synth");
+                            midiChannel = 9;
+                        }
                     }
 
                     iud = palette.UniqueDurationDef(index);
@@ -253,7 +253,7 @@ namespace Moritz.Palettes
                         Refresh();
                         MidiChordDef midiChordDef = iud as MidiChordDef;
                         Debug.Assert(midiChordDef != null);
-                        MidiChord midiChord = new MidiChord(midiChannel, midiChordDef);
+                        MidiChord midiChord = new MidiChord(midiChannel, midiChordDef, outputDevice);
                         midiChord.Send(); //sends in this thread (blocks the current thread -- keeping the button selected)
                     }
                 }

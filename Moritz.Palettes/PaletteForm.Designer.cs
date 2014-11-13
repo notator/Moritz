@@ -75,6 +75,7 @@ namespace Moritz.Palettes
             this.MidiChordLabel = new System.Windows.Forms.Label();
             this.RepeatsLabel = new System.Windows.Forms.Label();
             this.RevertToSavedButton = new System.Windows.Forms.Button();
+            this.PercussionCheckBox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // DeleteOrnamentSettingsButton
@@ -299,9 +300,9 @@ namespace Moritz.Palettes
             // 
             this.MidiPitchesHelpButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.MidiPitchesHelpButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.MidiPitchesHelpButton.Location = new System.Drawing.Point(30, 638);
+            this.MidiPitchesHelpButton.Location = new System.Drawing.Point(28, 657);
             this.MidiPitchesHelpButton.Name = "MidiPitchesHelpButton";
-            this.MidiPitchesHelpButton.Size = new System.Drawing.Size(95, 24);
+            this.MidiPitchesHelpButton.Size = new System.Drawing.Size(95, 21);
             this.MidiPitchesHelpButton.TabIndex = 17;
             this.MidiPitchesHelpButton.Text = "MIDI Pitches";
             this.MidiPitchesHelpButton.UseVisualStyleBackColor = false;
@@ -311,9 +312,9 @@ namespace Moritz.Palettes
             // 
             this.MidiInstrumentsHelpButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.MidiInstrumentsHelpButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.MidiInstrumentsHelpButton.Location = new System.Drawing.Point(30, 613);
+            this.MidiInstrumentsHelpButton.Location = new System.Drawing.Point(29, 632);
             this.MidiInstrumentsHelpButton.Name = "MidiInstrumentsHelpButton";
-            this.MidiInstrumentsHelpButton.Size = new System.Drawing.Size(95, 24);
+            this.MidiInstrumentsHelpButton.Size = new System.Drawing.Size(95, 21);
             this.MidiInstrumentsHelpButton.TabIndex = 16;
             this.MidiInstrumentsHelpButton.Text = "MIDI Instruments";
             this.MidiInstrumentsHelpButton.UseVisualStyleBackColor = false;
@@ -397,7 +398,7 @@ namespace Moritz.Palettes
             this.AudioHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.AudioHelpLabel.AutoSize = true;
             this.AudioHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.AudioHelpLabel.Location = new System.Drawing.Point(20, 667);
+            this.AudioHelpLabel.Location = new System.Drawing.Point(26, 681);
             this.AudioHelpLabel.Name = "AudioHelpLabel";
             this.AudioHelpLabel.Size = new System.Drawing.Size(133, 56);
             this.AudioHelpLabel.TabIndex = 110;
@@ -523,6 +524,17 @@ namespace Moritz.Palettes
             this.RevertToSavedButton.UseVisualStyleBackColor = true;
             this.RevertToSavedButton.Click += new System.EventHandler(this.RevertToSavedButton_Click);
             // 
+            // PercussionCheckBox
+            // 
+            this.PercussionCheckBox.AutoSize = true;
+            this.PercussionCheckBox.Location = new System.Drawing.Point(39, 612);
+            this.PercussionCheckBox.Name = "PercussionCheckBox";
+            this.PercussionCheckBox.Size = new System.Drawing.Size(80, 18);
+            this.PercussionCheckBox.TabIndex = 150;
+            this.PercussionCheckBox.Text = "percussion";
+            this.PercussionCheckBox.UseVisualStyleBackColor = true;
+            this.PercussionCheckBox.CheckedChanged += new System.EventHandler(this.PercussionCheckBox_CheckedChanged);
+            // 
             // PaletteForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
@@ -530,6 +542,7 @@ namespace Moritz.Palettes
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
             this.ClientSize = new System.Drawing.Size(836, 750);
             this.ControlBox = false;
+            this.Controls.Add(this.PercussionCheckBox);
             this.Controls.Add(this.RevertToSavedButton);
             this.Controls.Add(this.MidiChordLabel);
             this.Controls.Add(this.RepeatsHelpLabel);
@@ -633,6 +646,7 @@ namespace Moritz.Palettes
         private System.Windows.Forms.Label PatchIndicesHelpLabel;
         private System.Windows.Forms.Label RepeatsHelpLabel;
         private System.Windows.Forms.Button RevertToSavedButton;
+        private System.Windows.Forms.CheckBox PercussionCheckBox;
     }
 }
 

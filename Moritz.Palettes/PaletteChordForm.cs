@@ -10,6 +10,8 @@ using Moritz.Spec;
 using Moritz.Globals;
 using Moritz.Midi;
 
+using Multimedia.Midi;
+
 namespace Moritz.Palettes
 {
     public partial class PaletteChordForm : Form
@@ -24,6 +26,15 @@ namespace Moritz.Palettes
             _bcc = bcc;
             _setDialogState = SetDialogState; // delegate
             _midiChordIndex = midiChordIndex;
+
+            if(_paletteForm.IsPercussionPalette)
+            {
+                MidiInstrumentsHelpButton.Text = "Percussion Instr.";
+            }
+            else
+            {
+                MidiInstrumentsHelpButton.Text = "MIDI Instruments";
+            }
 
             FindEmptyDefaultControls();
 
@@ -165,7 +176,6 @@ namespace Moritz.Palettes
             Button paletteButtonsControlButton = _paletteForm.PaletteButtonsControl.AudioSampleButtons[index];
 
             _paletteForm.PaletteButtonsControl.SetLinkedButton(chordFormButton);
-
             _paletteForm.PaletteButtonsControl.AudioSampleButton_MouseDown(paletteButtonsControlButton, e);
         }
 
@@ -277,7 +287,14 @@ namespace Moritz.Palettes
         #region buttons
         private void MidiInstrumentsHelpButton_Click(object sender, EventArgs e)
         {
-            _paletteForm.MidiInstrumentsHelpButton_Click(sender, e);
+            if(_paletteForm.IsPercussionPalette)
+            {
+                _paletteForm.PercussionInstrHelpButton_Click(sender, e);
+            }
+            else
+            {
+                _paletteForm.MidiInstrumentsHelpButton_Click(sender, e);
+            }
         }
         private void MidiPitchesHelpButton_Click(object sender, EventArgs e)
         {
@@ -613,7 +630,14 @@ namespace Moritz.Palettes
 
                 if(midiChordDef != null)
                 {
-                    MidiChord midiChord = new MidiChord(0, midiChordDef);
+                    int midiChannel = 0;
+                    OutputDevice outputDevice = M.Preferences.CurrentMultimediaMidiOutputDevice;
+                    if(_paletteForm.IsPercussionPalette)
+                    {
+                        midiChannel = 9;
+                        outputDevice = M.Preferences.GetMidiOutputDevice("Microsoft GS Wavetable Synth");
+                    }
+                    MidiChord midiChord = new MidiChord(midiChannel, midiChordDef, outputDevice);
                     midiChord.Send(); //sends in this thread (blocks the current thread -- keeping the button selected)
                 }
                 else

@@ -527,17 +527,13 @@ namespace Moritz.Composer
                                 domain = int.Parse(r.Value);
                                 break;
                             case "percussion":
-                                if(r.Value == "true")
+                                if(r.Value == "1")
                                     isPercussionPalette = true;
                                 break;
                         }
                     }
 
-                    IPaletteForm paletteForm = null;
-                    if(isPercussionPalette)
-                        paletteForm = new PercussionPaletteForm(r, name, domain, callbacks);
-                    else
-                        paletteForm = new PaletteForm(r, name, domain, callbacks);
+                    IPaletteForm paletteForm = new PaletteForm(r, name, domain, isPercussionPalette, callbacks);
 
                     PalettesListBox.Items.Add(paletteForm);
 
@@ -845,11 +841,6 @@ namespace Moritz.Composer
                 if(paletteForm != null)
                 {
                     palettes.Add(new Palette(paletteForm));
-                }
-                PercussionPaletteForm percussionPaletteForm = o as PercussionPaletteForm;
-                if(percussionPaletteForm != null)
-                {
-                    palettes.Add(new Palette(percussionPaletteForm));
                 }
             }
         }
@@ -1181,41 +1172,20 @@ namespace Moritz.Composer
             }
         }
         private void AddPaletteButton_Click(object sender, EventArgs e)
-        {
-            GetNewPalette(false);
-        }
-        private void AddPercussionPaletteButton_Click(object sender, EventArgs e)
-        {
-            GetNewPalette(true);
-        }
-        private void GetNewPalette(bool isPercussionPalette)
-        {
-            string message = null;
-            if(isPercussionPalette)
-                message = "Domain of the new percussion palette [1..20]:";
-            else
-                message = "Domain of the new palette [1..20]:";
-
+        {            
             // Palette domains are limited by the width of the palette forms.
             // There has to be enough space for the demo buttons.
-            ComposerFormCallbacks callbacks = GetCallbacks();
+            string message = "Domain of the new palette [1..20]:"; 
             GetStringDialog getStringDialog = new GetStringDialog("Get Domain", message);
             if(getStringDialog.ShowDialog() == DialogResult.OK)
             {
                 int domain;
                 if(int.TryParse(getStringDialog.String, out domain) && domain > 0 && domain < 21)
                 {
+                    ComposerFormCallbacks callbacks = GetCallbacks();
                     IPaletteForm iPaletteForm = null;
-                    if(isPercussionPalette)
-                    {
-                        string name = PercussionPaletteForm.NewPaletteName(PalettesListBox.Items.Count + 2, domain);
-                        iPaletteForm = new PercussionPaletteForm(name, domain, callbacks);
-                    }
-                    else
-                    {
-                        string newname = PaletteForm.NewPaletteName(PalettesListBox.Items.Count + 2, domain);
-                        iPaletteForm = new PaletteForm(newname, domain, callbacks);
-                    }
+                    string newname = PaletteForm.NewPaletteName(PalettesListBox.Items.Count + 2, domain);
+                    iPaletteForm = new PaletteForm(newname, domain, callbacks);
                     List<IPaletteForm> currentPaletteForms = CurrentIPaletteForms;
                     currentPaletteForms.Add(iPaletteForm);
                     CurrentIPaletteForms = currentPaletteForms;
@@ -1264,9 +1234,6 @@ namespace Moritz.Composer
             foreach(IPaletteForm ipf in CurrentIPaletteForms)
             {
                 string name = null;
-                PercussionPaletteForm ppf = ipf as PercussionPaletteForm;
-                if(ppf != null)
-                    name = PercussionPaletteForm.NewPaletteName(paletteNumber, ppf.Domain);
                 PaletteForm pf = ipf as PaletteForm;
                 if(pf != null)
                     name = PaletteForm.NewPaletteName(paletteNumber, pf.Domain);

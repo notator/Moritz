@@ -14,10 +14,10 @@ namespace Moritz.Midi
     /// </summary>
     public class MidiChord : MidiDurationSymbol
     {
-        public MidiChord(int channel, MidiChordDef midiChordDef)
+        public MidiChord(int channel, MidiChordDef midiChordDef, OutputDevice midiOutputDevice)
             :base(channel, 0, midiChordDef.MsDuration)
         {
-            _midiOutputDevice = M.Preferences.CurrentMultimediaMidiOutputDevice;
+            _midiOutputDevice = midiOutputDevice;
 
             List<BasicMidiChordDef> basicMidiChordDefs = midiChordDef.BasicMidiChordDefs;
             Debug.Assert(basicMidiChordDefs.Count > 0);

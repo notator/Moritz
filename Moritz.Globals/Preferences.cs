@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Xml;
 using System.IO;
 using System.Text;
+using System.Diagnostics;
 
 using Moritz.Globals.IODevices;
 
@@ -272,6 +273,11 @@ namespace Moritz.Globals
                     throw new ApplicationException("Unknown Output Device: " + CurrentOutputDeviceName);
                 }
             }
+        }
+        public Multimedia.Midi.OutputDevice GetMidiOutputDevice(string deviceName)
+        {
+            Debug.Assert(MultimediaMidiOutputDevices.ContainsKey(deviceName));
+            return MultimediaMidiOutputDevices[deviceName];
         }
 
         private Dictionary<string, Multimedia.Midi.InputDevice> MultimediaMidiInputDevices = new Dictionary<string, Multimedia.Midi.InputDevice>();

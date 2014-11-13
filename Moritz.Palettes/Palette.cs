@@ -49,6 +49,8 @@ namespace Moritz.Palettes
                 DurationDef dd = GetDurationDef(chordIndex);
                 _durationDefs.Add(dd);
             }
+
+            _isPercussionPalette = paletteForm.IsPercussionPalette;
         }
 
         /// <summary>
@@ -91,66 +93,6 @@ namespace Moritz.Palettes
 
             DurationDef dd = GetDurationDef(0);
             _durationDefs.Add(dd);
-        }
-
-        public Palette(PercussionPaletteForm ppf)
-        {
-            BasicChordFormSettings bcfs = new BasicChordFormSettings();
-
-            bcfs.Durations = M.StringToIntList(ppf.BasicChordControl.DurationsTextBox.Text, ',');
-            bcfs.Velocities = M.StringToByteList(ppf.BasicChordControl.VelocitiesTextBox.Text, ',');
-            bcfs.MidiPitches = M.StringToByteList(ppf.BasicChordControl.MidiPitchesTextBox.Text, ',');
-            //percussion defaults
-            bcfs.ChordOffs = new List<bool>();
-            bcfs.ChordDensities = new List<byte>();
-            bcfs.Inversions = new List<List<byte>>();
-            bcfs.InversionIndices = new List<int>();
-            bcfs.VerticalVelocityFactors = new List<float>();
-            foreach(byte pitch in bcfs.MidiPitches)
-            {
-                bcfs.ChordOffs.Add(false); // Moritz never sends ChordOffs to channel 9
-                bcfs.ChordDensities.Add((byte)1); // Moritz only ever uses 1 percussion instrument per chord.
-            }
-
-            _basicChordMidiSettings = new BasicChordMidiSettings(bcfs);
-
-            _bankIndices = new List<byte>();
-            _patchIndices = new List<byte>();
-            for(int i = 0; i < bcfs.Durations.Count; ++i)
-            { 
-                // default for percussion palette (does not set a patch)
-                _patchIndices.Add((byte) 0 );
-            }
-            _pitchwheelDeviations = new List<byte>();
-            _pitchwheelEnvelopes = new List<List<byte>>();
-            _modulationWheelEnvelopes = new List<List<byte>>();
-
-            _panEnvelopes = ppf.GetEnvelopesAsByteLists(ppf.PanEnvelopesTextBox);
-            _expressionEnvelopes = ppf.GetEnvelopesAsByteLists(ppf.ExpressionEnvelopesTextBox);
-
-            _ornamentNumbers = M.StringToIntList(ppf.OrnamentNumbersTextBox.Text, ',');
-            _ornamentMinMsDurations = M.StringToIntList(ppf.MinMsDurationsTextBox.Text, ',');
-
-            // instruments in ornaments palette are absolute, not relative, so 'ignore' the
-            // basic instrument index by setting it to 0.
-            for(int i = 0; i < _ornamentNumbers.Count; ++i)
-            {
-                if(_ornamentNumbers[i] != 0) // is an ornament
-                {
-                    bcfs.MidiPitches[i] = 0;
-                }
-            }
-
-            if(ppf.PercussionOrnamentsForm != null)
-            {
-                _ornamentSettings = new OrnamentSettings(ppf);
-            }
-
-            for(int chordIndex = 0; chordIndex < _basicChordMidiSettings.Durations.Count; ++chordIndex)
-            {
-                DurationDef dd = GetDurationDef(chordIndex);
-                _durationDefs.Add(dd);
-            }
         }
 
         /// <summary>
@@ -356,6 +298,9 @@ namespace Moritz.Palettes
 
         private List<DurationDef> _durationDefs = new List<DurationDef>();
 
+        private bool _isPercussionPalette;
+        public bool IsPercussionPalette { get { return _isPercussionPalette; } }
+
         public int Count { get { return _durationDefs.Count; } }
         public IUniqueDef UniqueDurationDef(int index)
         {
@@ -453,39 +398,6 @@ namespace Moritz.Palettes
             }
 
             OrnamentValues = osf.Ornaments;
-        }
-
-        public OrnamentSettings(PercussionPaletteForm ppf)
-        {
-            PercussionOrnamentsForm pof = ppf.PercussionOrnamentsForm;
-            Debug.Assert(pof != null);
-
-            BasicChordFormSettings bcs = new BasicChordFormSettings();
-
-            //percussion defaults
-            bcs.ChordOffs = new List<bool>();
-            bcs.ChordDensities = new List<byte>();
-            bcs.Inversions = new List<List<byte>>();
-            bcs.InversionIndices = new List<int>();
-            bcs.VerticalVelocityFactors = new List<float>();
-
-            bcs.Durations = M.StringToIntList(pof.BasicPercussionControl.DurationsTextBox.Text, ',');
-            /// velocity increments
-            bcs.Velocities = M.StringToByteList(pof.BasicPercussionControl.VelocitiesTextBox.Text, ',');
-            /// transposition intervals (for percussion ornaments, the "base pitch=instrument" has been set to 0.
-            bcs.MidiPitches = M.StringToByteList(pof.BasicPercussionControl.MidiPitchesTextBox.Text, ',');
-
-            foreach(byte pitch in bcs.MidiPitches)
-            {
-                bcs.ChordOffs.Add(false); // Moritz never sends ChordOffs to channel 9
-                bcs.ChordDensities.Add((byte)1); // Moritz only ever uses 1 percussion instrument per chord.
-            }
-
-            BasicChordMidiSettings = new BasicChordMidiSettings(bcs);
-            BankIndices = null;
-            PatchIndices = null;
-
-            //OrnamentValues = pof.Ornaments;
         }
 
         /// <summary>

@@ -13,7 +13,7 @@ namespace Moritz.Palettes
 {
     public partial class PaletteForm : Form, IPaletteForm
     {
-        public PaletteForm(XmlReader r, string name, int domain, ComposerFormCallbacks mainFormCallbacks)
+        public PaletteForm(XmlReader r, string name, int domain, bool isPercussionPalette, ComposerFormCallbacks mainFormCallbacks)
             : this(name, domain, mainFormCallbacks)
         {
             ReadPalette(r);
@@ -22,6 +22,8 @@ namespace Moritz.Palettes
                 _paletteButtonsControl.Enabled = true;
             }
             DeselectAll();
+
+            this.PercussionCheckBox.Checked = isPercussionPalette;
 
             this.RevertToSavedButton.Enabled = false;
             this.OkayToSaveButton.Enabled = false;
@@ -479,14 +481,49 @@ namespace Moritz.Palettes
             }
         }
 
+        private void PercussionCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            CheckBox percussionCheckBox = sender as CheckBox;
+            if(percussionCheckBox.Checked)
+            {
+                MidiInstrumentsHelpButton.Text = "Percussion Instr.";
+                MidiInstrumentsHelpButton.Click -= MidiInstrumentsHelpButton_Click;
+                MidiInstrumentsHelpButton.Click += PercussionInstrHelpButton_Click;
+            }
+            else
+            {
+                MidiInstrumentsHelpButton.Text = "MIDI Instruments";
+                MidiInstrumentsHelpButton.Click -= PercussionInstrHelpButton_Click; 
+                MidiInstrumentsHelpButton.Click += MidiInstrumentsHelpButton_Click;
+            }
+
+            SetSettingsHaveChanged();
+        }
+
         public void MidiInstrumentsHelpButton_Click(object sender, EventArgs e)
         {
+            CloseMIDIInstrumentsHelpForm();
+            CloseMIDIPercussionHelpForm();
+
             if(_midiInstrumentsHelpForm == null)
             {
                 _midiInstrumentsHelpForm = new MIDIInstrumentsHelpForm(CloseMIDIInstrumentsHelpForm);
                 _midiInstrumentsHelpForm.Show();
             }
             _midiInstrumentsHelpForm.BringToFront();
+        }
+
+        public void PercussionInstrHelpButton_Click(object sender, EventArgs e)
+        {
+            CloseMIDIInstrumentsHelpForm();
+            CloseMIDIPercussionHelpForm();
+
+            if(_percussionInstrHelpForm  == null)
+            {
+                _percussionInstrHelpForm = new MIDIPercussionHelpForm(CloseMIDIPercussionHelpForm);
+                _percussionInstrHelpForm.Show();
+            }
+            _percussionInstrHelpForm.BringToFront();
         }
 
         private void CloseMIDIInstrumentsHelpForm()
@@ -496,6 +533,16 @@ namespace Moritz.Palettes
                 _midiInstrumentsHelpForm.Close();
                 _midiInstrumentsHelpForm.Dispose();
                 _midiInstrumentsHelpForm = null;
+            }
+        }
+
+        private void CloseMIDIPercussionHelpForm()
+        {
+            if(_percussionInstrHelpForm != null)
+            {
+                _percussionInstrHelpForm.Close();
+                _percussionInstrHelpForm.Dispose();
+                _percussionInstrHelpForm = null;
             }
         }
 
@@ -1078,6 +1125,10 @@ namespace Moritz.Palettes
             w.WriteStartElement("palette");
             w.WriteAttributeString("name", _name);
             w.WriteAttributeString("domain", _domain.ToString());
+            if(PercussionCheckBox.Checked)
+            {
+                w.WriteAttributeString("percussion", "1");
+            }
 
             _bcc.WriteBasicChordControl(w);
 
@@ -1278,6 +1329,7 @@ namespace Moritz.Palettes
         public BasicChordControl BasicChordControl { get { return _bcc; } }
         public OrnamentSettingsForm OrnamentSettingsForm { get { return _ornamentSettingsForm; } }
         public PaletteButtonsControl PaletteButtonsControl { get { return _paletteButtonsControl; } }
+        public bool IsPercussionPalette { get { return PercussionCheckBox.Checked; } }
         #endregion public variables
 
         #region private variables
@@ -1286,9 +1338,11 @@ namespace Moritz.Palettes
         private OrnamentSettingsForm _ornamentSettingsForm = null;
         private MidiPitchesHelpForm _midiPitchesHelpForm = null;
         private MIDIInstrumentsHelpForm _midiInstrumentsHelpForm = null;
+        private MIDIPercussionHelpForm _percussionInstrHelpForm = null;
         private BasicChordControl _bcc = null;
         PaletteChordForm _paletteChordForm = null;
         #endregion private variables
+
     }
 
     internal delegate void CloseMidiPitchesHelpFormDelegate();

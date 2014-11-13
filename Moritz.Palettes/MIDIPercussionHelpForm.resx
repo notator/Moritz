@@ -146,4 +146,18 @@
 57   Crash Cymbal 2
 58   Vibraslap</value>
   </data>
+  <data name="TopHelpLabel.Text" xml:space="preserve">
+    <value>MIDI Percussion instruments are defined as pitches in range [ 35..81 ] on channel 10 (channel index 9) of a standard MIDI device.
+
+If a palette's percussion check box is set, the midi demo buttons will automatically send messages to the percussion channel
+on the Microsoft GS Wavetable Synth, overriding the default output device set by Moritz.
+
+If these definitions are to work in a composition, they must be sent to a device that similarly implements percussion instruments
+on some known channel. It is the algorithm's responsibility to send these definitions to the right channel on a suitable device.
+
+Note that the palette patch field must contain values here, but that both the bank and patch fields will be ignored when
+using MIDI percussion.
+
+The following instruments are ordered roughly according to pitch ( top to bottom ) within each category.</value>
+  </data>
 </root>

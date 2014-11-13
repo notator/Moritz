@@ -33,45 +33,46 @@
             this.HighOtherGroupBox = new System.Windows.Forms.GroupBox();
             this.richTextBox2 = new System.Windows.Forms.RichTextBox();
             this.HighSkinGroupBox = new System.Windows.Forms.GroupBox();
+            this.groupBox7 = new System.Windows.Forms.GroupBox();
+            this.richTextBox10 = new System.Windows.Forms.RichTextBox();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.richTextBox9 = new System.Windows.Forms.RichTextBox();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.richTextBox8 = new System.Windows.Forms.RichTextBox();
             this.HighWoodGroupBox = new System.Windows.Forms.GroupBox();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.richTextBox7 = new System.Windows.Forms.RichTextBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.richTextBox6 = new System.Windows.Forms.RichTextBox();
             this.HighMetalGroupBox = new System.Windows.Forms.GroupBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.richTextBox5 = new System.Windows.Forms.RichTextBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.richTextBox4 = new System.Windows.Forms.RichTextBox();
             this.richTextBox3 = new System.Windows.Forms.RichTextBox();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.richTextBox11 = new System.Windows.Forms.RichTextBox();
             this.richTextBox12 = new System.Windows.Forms.RichTextBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.richTextBox4 = new System.Windows.Forms.RichTextBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.richTextBox5 = new System.Windows.Forms.RichTextBox();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.richTextBox6 = new System.Windows.Forms.RichTextBox();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.richTextBox7 = new System.Windows.Forms.RichTextBox();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.richTextBox8 = new System.Windows.Forms.RichTextBox();
-            this.groupBox6 = new System.Windows.Forms.GroupBox();
-            this.richTextBox9 = new System.Windows.Forms.RichTextBox();
-            this.groupBox7 = new System.Windows.Forms.GroupBox();
-            this.richTextBox10 = new System.Windows.Forms.RichTextBox();
-            this.richTextBox13 = new System.Windows.Forms.RichTextBox();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
+            this.TopHelpLabel = new System.Windows.Forms.Label();
             this.HighOtherGroupBox.SuspendLayout();
             this.HighSkinGroupBox.SuspendLayout();
-            this.HighWoodGroupBox.SuspendLayout();
-            this.HighMetalGroupBox.SuspendLayout();
-            this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
-            this.groupBox4.SuspendLayout();
-            this.groupBox5.SuspendLayout();
-            this.groupBox6.SuspendLayout();
             this.groupBox7.SuspendLayout();
+            this.groupBox6.SuspendLayout();
+            this.groupBox5.SuspendLayout();
+            this.HighWoodGroupBox.SuspendLayout();
+            this.groupBox4.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            this.HighMetalGroupBox.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.groupBox8.SuspendLayout();
             this.SuspendLayout();
             // 
             // CloseButton
             // 
-            this.CloseButton.Location = new System.Drawing.Point(510, 573);
+            this.CloseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.CloseButton.Location = new System.Drawing.Point(510, 719);
             this.CloseButton.Name = "CloseButton";
             this.CloseButton.Size = new System.Drawing.Size(119, 24);
             this.CloseButton.TabIndex = 84;
@@ -81,9 +82,10 @@
             // 
             // HighOtherGroupBox
             // 
+            this.HighOtherGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.HighOtherGroupBox.Controls.Add(this.richTextBox2);
             this.HighOtherGroupBox.ForeColor = System.Drawing.Color.Brown;
-            this.HighOtherGroupBox.Location = new System.Drawing.Point(498, 217);
+            this.HighOtherGroupBox.Location = new System.Drawing.Point(498, 363);
             this.HighOtherGroupBox.Name = "HighOtherGroupBox";
             this.HighOtherGroupBox.Size = new System.Drawing.Size(131, 153);
             this.HighOtherGroupBox.TabIndex = 94;
@@ -105,40 +107,202 @@
             // 
             // HighSkinGroupBox
             // 
+            this.HighSkinGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.HighSkinGroupBox.Controls.Add(this.groupBox7);
             this.HighSkinGroupBox.Controls.Add(this.groupBox6);
             this.HighSkinGroupBox.Controls.Add(this.groupBox5);
             this.HighSkinGroupBox.ForeColor = System.Drawing.Color.Brown;
-            this.HighSkinGroupBox.Location = new System.Drawing.Point(20, 217);
+            this.HighSkinGroupBox.Location = new System.Drawing.Point(20, 363);
             this.HighSkinGroupBox.Name = "HighSkinGroupBox";
             this.HighSkinGroupBox.Size = new System.Drawing.Size(462, 153);
             this.HighSkinGroupBox.TabIndex = 97;
             this.HighSkinGroupBox.TabStop = false;
             this.HighSkinGroupBox.Text = "skin";
             // 
+            // groupBox7
+            // 
+            this.groupBox7.Controls.Add(this.richTextBox10);
+            this.groupBox7.Location = new System.Drawing.Point(297, 17);
+            this.groupBox7.Name = "groupBox7";
+            this.groupBox7.Size = new System.Drawing.Size(153, 123);
+            this.groupBox7.TabIndex = 102;
+            this.groupBox7.TabStop = false;
+            this.groupBox7.Text = "dirty";
+            // 
+            // richTextBox10
+            // 
+            this.richTextBox10.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.richTextBox10.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.richTextBox10.Location = new System.Drawing.Point(13, 22);
+            this.richTextBox10.Name = "richTextBox10";
+            this.richTextBox10.ReadOnly = true;
+            this.richTextBox10.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
+            this.richTextBox10.Size = new System.Drawing.Size(127, 93);
+            this.richTextBox10.TabIndex = 99;
+            this.richTextBox10.Text = "35   Bass Drum (Acoustic)\n36   Bass Drum (1)\n";
+            // 
+            // groupBox6
+            // 
+            this.groupBox6.Controls.Add(this.richTextBox9);
+            this.groupBox6.Location = new System.Drawing.Point(156, 17);
+            this.groupBox6.Name = "groupBox6";
+            this.groupBox6.Size = new System.Drawing.Size(128, 123);
+            this.groupBox6.TabIndex = 101;
+            this.groupBox6.TabStop = false;
+            this.groupBox6.Text = "simple (stopped)";
+            // 
+            // richTextBox9
+            // 
+            this.richTextBox9.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.richTextBox9.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.richTextBox9.Location = new System.Drawing.Point(16, 22);
+            this.richTextBox9.Name = "richTextBox9";
+            this.richTextBox9.ReadOnly = true;
+            this.richTextBox9.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
+            this.richTextBox9.Size = new System.Drawing.Size(105, 93);
+            this.richTextBox9.TabIndex = 99;
+            this.richTextBox9.Text = "60   Bongo (Hi)\n61   Bongo (Low)\n63   Conga (Open Hi)\n65   Timbale (High)\n62   Co" +
+    "nga (Mute Hi)\n64   Conga (Low)\n66   Timbale (Low)";
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.richTextBox8);
+            this.groupBox5.Location = new System.Drawing.Point(16, 17);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(128, 123);
+            this.groupBox5.TabIndex = 100;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "clean ( l.v.)";
+            // 
+            // richTextBox8
+            // 
+            this.richTextBox8.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.richTextBox8.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.richTextBox8.Location = new System.Drawing.Point(16, 22);
+            this.richTextBox8.Name = "richTextBox8";
+            this.richTextBox8.ReadOnly = true;
+            this.richTextBox8.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
+            this.richTextBox8.Size = new System.Drawing.Size(105, 93);
+            this.richTextBox8.TabIndex = 99;
+            this.richTextBox8.Text = "50   Tom (High)\n48   Tom (Hi-Mid)\n47   Tom (Low-Mid)\n45   Tom (Low)\n43   Tom (Hig" +
+    "h Floor)\n41   Tom (Low Floor)\n";
+            // 
             // HighWoodGroupBox
             // 
+            this.HighWoodGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.HighWoodGroupBox.Controls.Add(this.groupBox4);
             this.HighWoodGroupBox.Controls.Add(this.groupBox3);
             this.HighWoodGroupBox.ForeColor = System.Drawing.Color.Brown;
-            this.HighWoodGroupBox.Location = new System.Drawing.Point(358, 29);
+            this.HighWoodGroupBox.Location = new System.Drawing.Point(358, 175);
             this.HighWoodGroupBox.Name = "HighWoodGroupBox";
             this.HighWoodGroupBox.Size = new System.Drawing.Size(271, 176);
             this.HighWoodGroupBox.TabIndex = 93;
             this.HighWoodGroupBox.TabStop = false;
             this.HighWoodGroupBox.Text = "wood";
             // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.richTextBox7);
+            this.groupBox4.Location = new System.Drawing.Point(154, 18);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(106, 145);
+            this.groupBox4.TabIndex = 100;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "multi";
+            // 
+            // richTextBox7
+            // 
+            this.richTextBox7.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.richTextBox7.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.richTextBox7.Location = new System.Drawing.Point(16, 22);
+            this.richTextBox7.Name = "richTextBox7";
+            this.richTextBox7.ReadOnly = true;
+            this.richTextBox7.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
+            this.richTextBox7.Size = new System.Drawing.Size(85, 59);
+            this.richTextBox7.TabIndex = 98;
+            this.richTextBox7.Text = "69   Cabasa\n73   Guiro (Short)\n58   Vibraslap\n74   Guiro (Long)\n";
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.richTextBox6);
+            this.groupBox3.Location = new System.Drawing.Point(7, 18);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(135, 145);
+            this.groupBox3.TabIndex = 99;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "simple";
+            // 
+            // richTextBox6
+            // 
+            this.richTextBox6.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.richTextBox6.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.richTextBox6.Location = new System.Drawing.Point(16, 22);
+            this.richTextBox6.Name = "richTextBox6";
+            this.richTextBox6.ReadOnly = true;
+            this.richTextBox6.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
+            this.richTextBox6.Size = new System.Drawing.Size(114, 59);
+            this.richTextBox6.TabIndex = 98;
+            this.richTextBox6.Text = "75   Claves\n76   Wood Block (Hi)\n77   Wood Block (Low)";
+            // 
             // HighMetalGroupBox
             // 
+            this.HighMetalGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.HighMetalGroupBox.Controls.Add(this.groupBox2);
             this.HighMetalGroupBox.Controls.Add(this.groupBox1);
             this.HighMetalGroupBox.ForeColor = System.Drawing.Color.Brown;
-            this.HighMetalGroupBox.Location = new System.Drawing.Point(20, 29);
+            this.HighMetalGroupBox.Location = new System.Drawing.Point(20, 175);
             this.HighMetalGroupBox.Name = "HighMetalGroupBox";
             this.HighMetalGroupBox.Size = new System.Drawing.Size(318, 176);
             this.HighMetalGroupBox.TabIndex = 91;
             this.HighMetalGroupBox.TabStop = false;
             this.HighMetalGroupBox.Text = "metal";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.richTextBox5);
+            this.groupBox2.Location = new System.Drawing.Point(167, 18);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(142, 145);
+            this.groupBox2.TabIndex = 93;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "long ( l.v.)";
+            // 
+            // richTextBox5
+            // 
+            this.richTextBox5.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.richTextBox5.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.richTextBox5.Location = new System.Drawing.Point(16, 18);
+            this.richTextBox5.Name = "richTextBox5";
+            this.richTextBox5.ReadOnly = true;
+            this.richTextBox5.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
+            this.richTextBox5.Size = new System.Drawing.Size(105, 125);
+            this.richTextBox5.TabIndex = 91;
+            this.richTextBox5.Text = "81   Open Triangle\n57   Cymbal (Crash 2)\n59   Cymbal (Ride 2)\n53   Bell (Ride)\n49" +
+    "   Cymbal (Crash 1)\n46   Hi-Hat (Open)\n55   Cymbal (Splash)\n52   Cymbal (Chinese" +
+    ")\n51   Cymbal (Ride 1)";
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.richTextBox4);
+            this.groupBox1.Location = new System.Drawing.Point(15, 18);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(142, 145);
+            this.groupBox1.TabIndex = 92;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "short";
+            // 
+            // richTextBox4
+            // 
+            this.richTextBox4.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.richTextBox4.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.richTextBox4.Location = new System.Drawing.Point(16, 18);
+            this.richTextBox4.Name = "richTextBox4";
+            this.richTextBox4.ReadOnly = true;
+            this.richTextBox4.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
+            this.richTextBox4.Size = new System.Drawing.Size(105, 125);
+            this.richTextBox4.TabIndex = 91;
+            this.richTextBox4.Text = "70   Maracas\n80   Triangle (Mute)\n54   Tambourine\n67   Agogo (High)\n44   Hi-Hat (" +
+    "Pedal)\n42   Hi-Hat (Closed)\n68   Agogo (Low)\n56   Cowbell";
             // 
             // richTextBox3
             // 
@@ -192,199 +356,38 @@
     "onga\n64   Low Conga\n65   High Timbale\n66   Low Timbale\n67   High Agogo\n68   Low " +
     "Agogo\n69   Cabasa\n70   Maracas";
             // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.richTextBox4);
-            this.groupBox1.Location = new System.Drawing.Point(15, 18);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(142, 145);
-            this.groupBox1.TabIndex = 92;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "short";
-            // 
-            // richTextBox4
-            // 
-            this.richTextBox4.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.richTextBox4.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.richTextBox4.Location = new System.Drawing.Point(16, 18);
-            this.richTextBox4.Name = "richTextBox4";
-            this.richTextBox4.ReadOnly = true;
-            this.richTextBox4.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-            this.richTextBox4.Size = new System.Drawing.Size(105, 125);
-            this.richTextBox4.TabIndex = 91;
-            this.richTextBox4.Text = "70   Maracas\n80   Triangle (Mute)\n54   Tambourine\n67   Agogo (High)\n44   Hi-Hat (" +
-    "Pedal)\n42   Hi-Hat (Closed)\n68   Agogo (Low)\n56   Cowbell";
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.richTextBox5);
-            this.groupBox2.Location = new System.Drawing.Point(167, 18);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(142, 145);
-            this.groupBox2.TabIndex = 93;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "long ( l.v.)";
-            // 
-            // richTextBox5
-            // 
-            this.richTextBox5.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.richTextBox5.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.richTextBox5.Location = new System.Drawing.Point(16, 18);
-            this.richTextBox5.Name = "richTextBox5";
-            this.richTextBox5.ReadOnly = true;
-            this.richTextBox5.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-            this.richTextBox5.Size = new System.Drawing.Size(105, 125);
-            this.richTextBox5.TabIndex = 91;
-            this.richTextBox5.Text = "81   Open Triangle\n57   Cymbal (Crash 2)\n59   Cymbal (Ride 2)\n53   Bell (Ride)\n49" +
-    "   Cymbal (Crash 1)\n46   Hi-Hat (Open)\n55   Cymbal (Splash)\n52   Cymbal (Chinese" +
-    ")\n51   Cymbal (Ride 1)";
-            // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this.richTextBox6);
-            this.groupBox3.Location = new System.Drawing.Point(7, 18);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(135, 145);
-            this.groupBox3.TabIndex = 99;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "simple";
-            // 
-            // richTextBox6
-            // 
-            this.richTextBox6.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.richTextBox6.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.richTextBox6.Location = new System.Drawing.Point(16, 22);
-            this.richTextBox6.Name = "richTextBox6";
-            this.richTextBox6.ReadOnly = true;
-            this.richTextBox6.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-            this.richTextBox6.Size = new System.Drawing.Size(114, 59);
-            this.richTextBox6.TabIndex = 98;
-            this.richTextBox6.Text = "75   Claves\n76   Wood Block (Hi)\n77   Wood Block (Low)";
-            // 
-            // groupBox4
-            // 
-            this.groupBox4.Controls.Add(this.richTextBox7);
-            this.groupBox4.Location = new System.Drawing.Point(154, 18);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(106, 145);
-            this.groupBox4.TabIndex = 100;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "multi";
-            // 
-            // richTextBox7
-            // 
-            this.richTextBox7.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.richTextBox7.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.richTextBox7.Location = new System.Drawing.Point(16, 22);
-            this.richTextBox7.Name = "richTextBox7";
-            this.richTextBox7.ReadOnly = true;
-            this.richTextBox7.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-            this.richTextBox7.Size = new System.Drawing.Size(85, 59);
-            this.richTextBox7.TabIndex = 98;
-            this.richTextBox7.Text = "69   Cabasa\n73   Guiro (Short)\n58   Vibraslap\n74   Guiro (Long)\n";
-            // 
-            // groupBox5
-            // 
-            this.groupBox5.Controls.Add(this.richTextBox8);
-            this.groupBox5.Location = new System.Drawing.Point(16, 17);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(128, 123);
-            this.groupBox5.TabIndex = 100;
-            this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "clean ( l.v.)";
-            // 
-            // richTextBox8
-            // 
-            this.richTextBox8.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.richTextBox8.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.richTextBox8.Location = new System.Drawing.Point(16, 22);
-            this.richTextBox8.Name = "richTextBox8";
-            this.richTextBox8.ReadOnly = true;
-            this.richTextBox8.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-            this.richTextBox8.Size = new System.Drawing.Size(105, 93);
-            this.richTextBox8.TabIndex = 99;
-            this.richTextBox8.Text = "50   Tom (High)\n48   Tom (Hi-Mid)\n47   Tom (Low-Mid)\n45   Tom (Low)\n43   Tom (Hig" +
-    "h Floor)\n41   Tom (Low Floor)\n";
-            // 
-            // groupBox6
-            // 
-            this.groupBox6.Controls.Add(this.richTextBox9);
-            this.groupBox6.Location = new System.Drawing.Point(156, 17);
-            this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(128, 123);
-            this.groupBox6.TabIndex = 101;
-            this.groupBox6.TabStop = false;
-            this.groupBox6.Text = "simple (stopped)";
-            // 
-            // richTextBox9
-            // 
-            this.richTextBox9.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.richTextBox9.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.richTextBox9.Location = new System.Drawing.Point(16, 22);
-            this.richTextBox9.Name = "richTextBox9";
-            this.richTextBox9.ReadOnly = true;
-            this.richTextBox9.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-            this.richTextBox9.Size = new System.Drawing.Size(105, 93);
-            this.richTextBox9.TabIndex = 99;
-            this.richTextBox9.Text = "60   Bongo (Hi)\n61   Bongo (Low)\n63   Conga (Open Hi)\n65   Timbale (High)\n62   Co" +
-    "nga (Mute Hi)\n64   Conga (Low)\n66   Timbale (Low)";
-            // 
-            // groupBox7
-            // 
-            this.groupBox7.Controls.Add(this.richTextBox10);
-            this.groupBox7.Location = new System.Drawing.Point(297, 17);
-            this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(153, 123);
-            this.groupBox7.TabIndex = 102;
-            this.groupBox7.TabStop = false;
-            this.groupBox7.Text = "dirty";
-            // 
-            // richTextBox10
-            // 
-            this.richTextBox10.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.richTextBox10.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.richTextBox10.Location = new System.Drawing.Point(13, 22);
-            this.richTextBox10.Name = "richTextBox10";
-            this.richTextBox10.ReadOnly = true;
-            this.richTextBox10.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-            this.richTextBox10.Size = new System.Drawing.Size(127, 93);
-            this.richTextBox10.TabIndex = 99;
-            this.richTextBox10.Text = "35   Bass Drum (Acoustic)\n36   Bass Drum (1)\n";
-            // 
-            // richTextBox13
-            // 
-            this.richTextBox13.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.richTextBox13.Location = new System.Drawing.Point(20, 12);
-            this.richTextBox13.Name = "richTextBox13";
-            this.richTextBox13.ReadOnly = true;
-            this.richTextBox13.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-            this.richTextBox13.Size = new System.Drawing.Size(450, 18);
-            this.richTextBox13.TabIndex = 100;
-            this.richTextBox13.Text = "The instruments are ordered roughly according to pitch ( top to bottom) within ea" +
-    "ch category.";
-            // 
             // groupBox8
             // 
+            this.groupBox8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.groupBox8.Controls.Add(this.richTextBox1);
             this.groupBox8.Controls.Add(this.richTextBox11);
             this.groupBox8.Controls.Add(this.richTextBox12);
             this.groupBox8.Controls.Add(this.richTextBox3);
             this.groupBox8.ForeColor = System.Drawing.Color.Brown;
-            this.groupBox8.Location = new System.Drawing.Point(20, 380);
+            this.groupBox8.Location = new System.Drawing.Point(20, 526);
             this.groupBox8.Name = "groupBox8";
             this.groupBox8.Size = new System.Drawing.Size(609, 187);
             this.groupBox8.TabIndex = 103;
             this.groupBox8.TabStop = false;
             this.groupBox8.Text = "all ( numerical order )";
             // 
+            // TopHelpLabel
+            // 
+            this.TopHelpLabel.AutoSize = true;
+            this.TopHelpLabel.Location = new System.Drawing.Point(17, 17);
+            this.TopHelpLabel.Name = "TopHelpLabel";
+            this.TopHelpLabel.Size = new System.Drawing.Size(618, 156);
+            this.TopHelpLabel.TabIndex = 104;
+            this.TopHelpLabel.Text = resources.GetString("TopHelpLabel.Text");
+            // 
             // MIDIPercussionHelpForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(650, 605);
+            this.ClientSize = new System.Drawing.Size(650, 751);
             this.ControlBox = false;
+            this.Controls.Add(this.TopHelpLabel);
             this.Controls.Add(this.groupBox8);
-            this.Controls.Add(this.richTextBox13);
             this.Controls.Add(this.HighOtherGroupBox);
             this.Controls.Add(this.HighSkinGroupBox);
             this.Controls.Add(this.HighWoodGroupBox);
@@ -395,17 +398,18 @@
             this.Text = "MIDI Percussion Pitch Indices";
             this.HighOtherGroupBox.ResumeLayout(false);
             this.HighSkinGroupBox.ResumeLayout(false);
-            this.HighWoodGroupBox.ResumeLayout(false);
-            this.HighMetalGroupBox.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox4.ResumeLayout(false);
-            this.groupBox5.ResumeLayout(false);
-            this.groupBox6.ResumeLayout(false);
             this.groupBox7.ResumeLayout(false);
+            this.groupBox6.ResumeLayout(false);
+            this.groupBox5.ResumeLayout(false);
+            this.HighWoodGroupBox.ResumeLayout(false);
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.HighMetalGroupBox.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
             this.groupBox8.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -435,7 +439,7 @@
         private System.Windows.Forms.RichTextBox richTextBox5;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RichTextBox richTextBox4;
-        private System.Windows.Forms.RichTextBox richTextBox13;
         private System.Windows.Forms.GroupBox groupBox8;
+        private System.Windows.Forms.Label TopHelpLabel;
     }
 }

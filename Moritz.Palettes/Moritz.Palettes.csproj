@@ -59,12 +59,6 @@
     <Compile Include="BasicChordControl.Designer.cs">
       <DependentUpon>BasicChordControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="BasicPercussionControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="BasicPercussionControl.Designer.cs">
-      <DependentUpon>BasicPercussionControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="ComposerFormCallbacks.cs" />
     <Compile Include="IntListControl.cs">
       <SubType>UserControl</SubType>
@@ -110,18 +104,6 @@
     <Compile Include="PaletteForm.Designer.cs">
       <DependentUpon>PaletteForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="PercussionOrnamentsForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="PercussionOrnamentsForm.Designer.cs">
-      <DependentUpon>PercussionOrnamentsForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="PercussionPaletteForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="PercussionPaletteForm.Designer.cs">
-      <DependentUpon>PercussionPaletteForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -133,9 +115,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="BasicChordControl.resx">
       <DependentUpon>BasicChordControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BasicPercussionControl.resx">
-      <DependentUpon>BasicPercussionControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="IntListControl.resx">
       <DependentUpon>IntListControl.cs</DependentUpon>
@@ -154,12 +133,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="PaletteForm.resx">
       <DependentUpon>PaletteForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="PercussionOrnamentsForm.resx">
-      <DependentUpon>PercussionOrnamentsForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="PercussionPaletteForm.resx">
-      <DependentUpon>PercussionPaletteForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
