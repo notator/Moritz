@@ -59,6 +59,7 @@ namespace Moritz.Algorithm
         /// These values are written once in the score (to each voice in the first system in the score).
         /// These values must be in range [ 0..127 ].
         /// A midi channel's voiceID (written into in the score, if there are input voices) is its position in this list.
+        /// According to Jeff Glatt, the Master Volume should be set to 90 by default.
         /// </summary>
         public abstract List<int> MasterVolumePerOutputVoice { get; }
 

@@ -11,22 +11,14 @@ using Moritz.Globals;
 
 namespace Moritz.Palettes
 {
-    public partial class PaletteForm : Form
+    public partial class PaletteForm : Form, IRevertableForm
     {
-        public PaletteForm(XmlReader r, string name, int domain, bool isPercussionPalette, ComposerFormCallbacks mainFormCallbacks)
+        public PaletteForm(XmlReader r, string name, int domain, ComposerFormCallbacks mainFormCallbacks, bool isPercussionPalette)
             : this(name, domain, mainFormCallbacks)
         {
             ReadPalette(r);
-            if(_paletteButtonsControl != null)
-            {
-                _paletteButtonsControl.Enabled = true;
-            }
-            DeselectAll();
-
             this.PercussionCheckBox.Checked = isPercussionPalette;
-
-            this.RevertToSavedButton.Enabled = false;
-            this.OkayToSaveButton.Enabled = false;
+            this.ModulationWheelEnvelopesLabel.Focus();
         }
         /// <summary>
         /// Creates a new, empty PalettesForm with help texts adjusted for the given domain.
@@ -46,11 +38,9 @@ namespace Moritz.Palettes
             if(M.Preferences.CurrentMultimediaMidiOutputDevice != null)
             {
                 ConnectPaletteButtonsControl(domain, _callbacks.LocalScoreAudioPath());
-                _paletteButtonsControl.Enabled = false;
             }
 
-            _allMainTextBoxes = GetAllTextBoxes();
-            _allChordParameterTextBoxes = GetAllChordParameterTextBoxes();
+            _allTextBoxes = GetAllTextBoxes();
 
             SetDialogForDomain(domain);
         }
@@ -67,7 +57,7 @@ namespace Moritz.Palettes
             }
             else
             {
-                _paletteChordForm = new PaletteChordForm(this, _bcc, midiChordIndex, SetDialogState);
+                _paletteChordForm = new PaletteChordForm(this, _bcc, midiChordIndex);
                 _paletteChordForm.Show();
                 _paletteChordForm.BringToFront();
                 this.Enabled = false;
@@ -148,33 +138,6 @@ namespace Moritz.Palettes
             }
         }
 
-        /// <summary>
-        /// Sets the '*' in Text, enables the SaveButton and informs _assistantComposerMainForm
-        /// </summary>
-        public void SetSettingsHaveChanged()
-        {
-            if(!this.Text.EndsWith("*"))
-                this.Text = this.Text + "*";
-
-            if(this._callbacks != null)
-            {
-                _callbacks.SetSettingsHaveChanged();
-            }
-
-            this.OkayToSaveButton.Enabled = true;
-            this.RevertToSavedButton.Enabled = true;
-        }
-        /// <summary>
-        /// Informs _assistantComposerMainForm that the OrnamentsForm has changed.
-        /// </summary>
-        public void SetOrnamentSettingsHaveChanged()
-        {
-            if(this._callbacks != null)
-            {
-                _callbacks.SetSettingsHaveChanged();
-            }
-        }
-
         private Krystal GetKrystal(string krystalFileName)
         {
             Krystal krystal = null;
@@ -193,6 +156,8 @@ namespace Moritz.Palettes
 
         public void SetOrnamentControls()
         {
+            int oldNumberOfOrnaments = _numberOfOrnaments;
+
             if(this.OrnamentSettingsForm != null && this.OrnamentSettingsForm.Ornaments != null)
             {
                 _numberOfOrnaments = this.OrnamentSettingsForm.Ornaments.Count;
@@ -233,8 +198,11 @@ namespace Moritz.Palettes
                 DeleteOrnamentSettingsButton.Enabled = false;
             }
 
-            OrnamentNumbersTextBox_Leave(OrnamentNumbersTextBox, null);
-            MinMsDurationsTextBox_Leave(MinMsDurationsTextBox, null);
+            if(oldNumberOfOrnaments != _numberOfOrnaments)
+            {
+                OrnamentNumbersTextBox_Leave(OrnamentNumbersTextBox, null);
+                MinMsDurationsTextBox_Leave(MinMsDurationsTextBox, null);
+            } 
         }
 
         protected void PaletteForm_Click(object sender, EventArgs e)
@@ -245,7 +213,6 @@ namespace Moritz.Palettes
             }
         }
 
-        #region buttons
         /// <summary>
         /// Used to populate the Inversions lists
         /// </summary>
@@ -334,47 +301,20 @@ namespace Moritz.Palettes
             ModulationWheelEnvelopesTextBox_Leave(ModulationWheelEnvelopesTextBox, null);
             ExpressionEnvelopesTextBox_Leave(ExpressionEnvelopesTextBox, null);
             if(this.OrnamentSettingsForm != null)
+            {
                 OrnamentNumbersTextBox_Leave(OrnamentNumbersTextBox, null);
+                MinMsDurationsTextBox_Leave(MinMsDurationsTextBox, null);
+            }
         }
 
-        private void DeselectAll()
-        {
-            bool settingsHaveBeenSaved = Text[Text.Length - 1] != '*';
-            this.ModulationWheelEnvelopesLabel.Focus();
-            if(settingsHaveBeenSaved)
-                SetSettingsHaveBeenSaved();
-            else
-                SetSettingsHaveChanged();
-        }
-
-        /// <summary>
-        /// When the main Assistant Composer Form tries to save, it first checks
-        /// that none of its subsidiary forms' Texts ends with a "*".
-        /// If they do, then they must be reviewed, and either the OkayToSaveButton
-        /// or RevertToSavedButton must be clicked.
-        /// </summary>
         private void OkayToSaveButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(!this.HasError);
-            Debug.Assert(this.Text.EndsWith("*"));
-
-            this.Text = this.Text.Remove(this.Text.Length - 1);
-            if(!this.Text.EndsWith("(changed)"))
-            {
-                this.Text = this.Text + " (changed)";
-            }
-            this.OkayToSaveButton.Enabled = false;
+            _rff.SetSettingsCanBeSaved(this, OkayToSaveButton); 
         }
 
-        /// <summary>
-        /// When the main Assistant Composer Form tries to save, it first checks
-        /// that none of its subsidiary forms' Texts ends with a "*".
-        /// If they do, then they must be reviewed, and either the OkayToSaveButton
-        /// or RevertToSavedButton must be clicked.
-        /// </summary>
         private void RevertToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(this.Text.EndsWith("*") || this.Text.EndsWith(" (changed)"));
+            Debug.Assert(this.Text.EndsWith(_rff.NeedsReviewStr) || this.Text.EndsWith(_rff.ChangedAndCheckedStr));
             DialogResult result = 
                 MessageBox.Show("Are you sure you want to revert this dialog to the saved version?", "Revert?", 
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -396,20 +336,7 @@ namespace Moritz.Palettes
 
                 TouchAllTextBoxes();
 
-                #region identical to OrnamentSettingsForm.RevertToSavedButton_Click()
-                if(this.Text.EndsWith("*"))
-                {
-                    this.Text = this.Text.Remove(this.Text.Length - 1);
-                }
-
-                if(this.Text.EndsWith(" (changed)"))
-                {
-                    this.Text = this.Text.Remove(this.Text.Length - " (changed)".Length);
-                }
-
-                this.RevertToSavedButton.Enabled = false;
-                this.OkayToSaveButton.Enabled = false;
-                #endregion
+                _rff.SetIsSaved(this, OkayToSaveButton, RevertToSavedButton);
             }
         }
 
@@ -615,16 +542,6 @@ namespace Moritz.Palettes
             return allTextBoxes;
         }
 
-
-        private List<TextBox> GetAllChordParameterTextBoxes()
-        {
-            List<TextBox> chordParameterTextBoxes = new List<TextBox>();
-            chordParameterTextBoxes.Add(_bcc.RootInversionTextBox);
-            chordParameterTextBoxes.Add(_bcc.VerticalVelocityFactorsTextBox);
-            chordParameterTextBoxes.Add(_bcc.InversionIndicesTextBox);
-            return chordParameterTextBoxes;
-        }
-
         private void EnableMainParameters()
         {
             _bcc.DurationsLabel.Enabled = true;
@@ -742,8 +659,6 @@ namespace Moritz.Palettes
             }
             return intList;
         }
-
-        #endregion buttons
 
         #region text box events
         #region text changed event handler
@@ -950,22 +865,9 @@ namespace Moritz.Palettes
             else return null;
         }
 
-        /// <summary>
-        /// Also used by paletteChordForm and ornaments dialogs
-        /// </summary>
-        /// <param name="textBox"></param>
-        /// <param name="okay"></param>
-        /// <param name="anyTextBoxHasErrorColor"></param>
         private void SetDialogState(TextBox textBox, bool okay)
         {
-            if(okay)
-            {
-                textBox.BackColor = Color.White;
-            }
-            else
-            {
-                textBox.BackColor = M.TextBoxErrorColor;
-            }
+            M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
 
             bool hasError = this.HasError;
             if(_paletteButtonsControl != null)
@@ -976,12 +878,7 @@ namespace Moritz.Palettes
                     _paletteButtonsControl.Enabled = true;
             }
             
-            this.SetSettingsHaveChanged();
-
-            if(hasError)
-            {
-                this.OkayToSaveButton.Enabled = false;
-            }
+            SetSettingsHaveChanged();
         }
 
         /// <summary>
@@ -1053,69 +950,24 @@ namespace Moritz.Palettes
             CloseMIDIInstrumentsHelpForm();
         }
 
-        #region paletteForm
-        public string GetName() { return this._name; }
-        public void SetName(string name)
+        #region IRevertableForm
+        public bool HasError { get { return M.HasError(_allTextBoxes); } }
+        public bool NeedsReview { get { return _rff.NeedsReview(this); } }
+        public bool HasBeenChecked { get { return _rff.HasBeenChecked(this); } }
+
+        public void SetSettingsHaveChanged()
         {
-            this._name = name;
-            if(this.Text.EndsWith("*"))
-                Text = name + "*";
-            else
-                Text = name;
+            _rff.SetSettingsNeedReview(this, OkayToSaveButton, RevertToSavedButton);
         }
+
+        #endregion IRevertableForm
+        #region paletteForm
         public override string ToString()
         {
             return this._name;
         }
-        public bool HasError
-        {
-            get
-            {
-                bool hasError = ErrorInMainTextBoxes();
-                if(!hasError)
-                {
-                    foreach(TextBox textBox in _allChordParameterTextBoxes)
-                    {
-                        if(textBox.Enabled && textBox.BackColor == M.TextBoxErrorColor)
-                        {
-                            hasError = true;
-                            break;
-                        }
-                    }
-                }
 
-                return hasError;
-            }
-        }
-        private bool ErrorInMainTextBoxes()
-        {
-            bool anyTextBoxHasErrorColour = false;
-            foreach(TextBox textBox in _allMainTextBoxes)
-            {
-                if(textBox.Enabled && textBox.BackColor == M.TextBoxErrorColor)
-                {
-                    anyTextBoxHasErrorColour = true;
-                    break;
-                }
-            }
-            return anyTextBoxHasErrorColour;
-        }
-        /// <summary>
-        /// Removes the '*' in Text, disables the SaveButton and informs _ornamentSettingsForm
-        /// </summary>
-        public void SetSettingsHaveBeenSaved()
-        {
-            if(this.Text.EndsWith("*"))
-            {
-                this.Text = this.Text.Remove(this.Text.Length - 1);
-                if(this._ornamentSettingsForm != null)
-                {
-                    _ornamentSettingsForm.SetSettingsHaveBeenSaved();
-                }
-            }
-            this.OkayToSaveButton.Enabled = false;
-            //DeselectAll();
-        }
+
         /// <summary>
         /// Returns false if the file already exists and the user cancels the save.
         /// </summary>
@@ -1205,7 +1057,7 @@ namespace Moritz.Palettes
 
             w.WriteEndElement(); // closes the palette element
 
-            SetSettingsHaveBeenSaved();
+            _rff.SetIsSaved(this, OkayToSaveButton, RevertToSavedButton);
         }
         public void ReadPalette(XmlReader r)
         {
@@ -1301,6 +1153,7 @@ namespace Moritz.Palettes
             Debug.Assert(r.Name == "palette"); // end element
             SetOrnamentControls();
             TouchAllTextBoxes();
+            _rff.SetIsSaved(this, OkayToSaveButton, RevertToSavedButton);
         }
 
         #region revertToSaved strings
@@ -1319,7 +1172,7 @@ namespace Moritz.Palettes
         private string _name = null;
         private int _domain = 0;
         private ComposerFormCallbacks _callbacks = null;
-        private List<TextBox> _allMainTextBoxes = new List<TextBox>();
+        private List<TextBox> _allTextBoxes = new List<TextBox>();
         private PaletteButtonsControl _paletteButtonsControl = null;
         #endregion paletteForm
 
@@ -1333,7 +1186,6 @@ namespace Moritz.Palettes
         #endregion public variables
 
         #region private variables
-        private readonly List<TextBox> _allChordParameterTextBoxes = new List<TextBox>();
         private int _numberOfOrnaments;
         private OrnamentSettingsForm _ornamentSettingsForm = null;
         private MidiPitchesHelpForm _midiPitchesHelpForm = null;
@@ -1341,8 +1193,8 @@ namespace Moritz.Palettes
         private MIDIPercussionHelpForm _percussionInstrHelpForm = null;
         private BasicChordControl _bcc = null;
         private PaletteChordForm _paletteChordForm = null;
+        private RevertableFormFunctions _rff = new RevertableFormFunctions();
         #endregion private variables
-
     }
 
     internal delegate void CloseMidiPitchesHelpFormDelegate();

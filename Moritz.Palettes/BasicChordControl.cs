@@ -100,19 +100,7 @@ namespace Moritz.Palettes
             InversionIndicesTextBox.Text = SavedInversionIndicesTextBoxText;
             VerticalVelocityFactorsTextBox.Text = SavedVerticalVelocityFactorsTextBoxText;
 
-            SetAllTextBoxBackColorsToWhite();
-        }
-
-        private void SetAllTextBoxBackColorsToWhite()
-        {
-            M.SetToWhite(DurationsTextBox);
-            M.SetToWhite(VelocitiesTextBox);
-            M.SetToWhite(MidiPitchesTextBox);
-            M.SetToWhite(ChordOffsTextBox);
-            M.SetToWhite(ChordDensitiesTextBox);
-            M.SetToWhite(RootInversionTextBox);
-            M.SetToWhite(InversionIndicesTextBox);
-            M.SetToWhite(VerticalVelocityFactorsTextBox);
+            TouchAllTextBoxes();
         }
 
         private string SavedDurationsTextBoxText;

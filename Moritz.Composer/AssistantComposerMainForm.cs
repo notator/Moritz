@@ -232,10 +232,6 @@ namespace Moritz.Composer
             {
                 this.Text = _scoreTitle + " algorithm";
                 SetSaveAndCreateButtons(false);
-
-                List<PaletteForm> kpForms = AllPalleteForms;
-                foreach(PaletteForm kpf in kpForms)
-                    kpf.SetSettingsHaveBeenSaved();
             }
         }
 
@@ -383,7 +379,6 @@ namespace Moritz.Composer
                         switch(r.Value)
                         {
                             case "standard":
-
                                 StandardChordsOptionsPanel.Visible = true;
                                 break;
                             case "study2b2":
@@ -533,7 +528,7 @@ namespace Moritz.Composer
                         }
                     }
 
-                    PaletteForm paletteForm = new PaletteForm(r, name, domain, isPercussionPalette, callbacks);
+                    PaletteForm paletteForm = new PaletteForm(r, name, domain, callbacks, isPercussionPalette);
 
                     PalettesListBox.Items.Add(paletteForm);
 
@@ -549,7 +544,6 @@ namespace Moritz.Composer
             callbacks.MainFormBringToFront = this.BringToFront;
             callbacks.LocalScoreAudioPath = this.GetLocalScoreAudioPath;
             callbacks.APaletteChordFormIsOpen = this.APaletteChordFormIsOpen;
-            callbacks.SetSettingsHaveChanged = this.SetSettingsHaveChanged;
             return callbacks;
         }
 
@@ -624,8 +618,8 @@ namespace Moritz.Composer
                 w.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
                 w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.OnlineXMLSchemasFolder + "/moritzKrystalScore.xsd");
 
-                _dimensionsAndMetadataForm.WriteMetadata(w);
-                _dimensionsAndMetadataForm.WriteDimensions(w);
+                _dimensionsAndMetadataForm.Write(w);
+
                 WriteNotation(w);
                 WriteKrystals(w);
                 WritePalettes(w);
@@ -720,7 +714,6 @@ namespace Moritz.Composer
                                             krystals, palettes,
                                             _settingsFolderPath,
                                             _dimensionsAndMetadataForm.Keywords,
-
                                             _dimensionsAndMetadataForm.Comment);
 
                 if(score != null && score.Systems.Count > 0)
@@ -1231,13 +1224,9 @@ namespace Moritz.Composer
         {
             PalettesListBox.SuspendLayout();
             int paletteNumber = 1;
-            foreach(PaletteForm ipf in CurrentPaletteForms)
+            foreach(PaletteForm paletteForm in CurrentPaletteForms)
             {
-                string name = null;
-                PaletteForm pf = ipf as PaletteForm;
-                if(pf != null)
-                    name = PaletteForm.NewPaletteName(paletteNumber, pf.Domain);
-                ipf.SetName(name);
+                paletteForm.Text = PaletteForm.NewPaletteName(paletteNumber, paletteForm.Domain);
                 paletteNumber++;
             }
             PalettesListBox.ResumeLayout();
@@ -1354,14 +1343,7 @@ namespace Moritz.Composer
                 okay = false;
             }
 
-            if(okay)
-            {
-                textBox.BackColor = Color.White;
-            }
-            else
-            {
-                textBox.BackColor = M.TextBoxErrorColor;
-            }
+            M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
         }
 
         private void VoiceIndicesPerStaffHelp_MouseClick(object sender, MouseEventArgs e)

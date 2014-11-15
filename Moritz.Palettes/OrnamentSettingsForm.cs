@@ -10,7 +10,7 @@ using Moritz.Globals;
 
 namespace Moritz.Palettes
 {
-    public partial class OrnamentSettingsForm : Form
+    public partial class OrnamentSettingsForm : Form, IRevertableForm
     {
         public OrnamentSettingsForm(PaletteForm paletteForm)
         {
@@ -28,26 +28,23 @@ namespace Moritz.Palettes
             _paletteForm = paletteForm;
             ConnectBasicChordControl();
 
-            //int numberOfChordValues = -1;
-            int numberOfBasicChordDefs = 12;
             this.Text = _paletteForm.Text + ": ornaments";
             if(r != null)
             {
-                numberOfBasicChordDefs = ReadOrnamentSettingsForm(r);
-            }
-            else
-            {
-                this.Text = _paletteForm.Text + ": ornaments";
-                _paletteForm.SetOrnamentSettingsHaveChanged(); // simply adds a '*' to the AC's Text
+                _numberOfBasicChordDefs = ReadOrnamentSettingsForm(r);
             }
 
             _allNonOrnamentTextBoxes = GetNonOrnamentTextBoxes();
             _12OrnamentTextBoxes = Get12OrnamentTextBoxes();
+            _allTextBoxes = new List<TextBox>();
+            _allTextBoxes.AddRange(_allNonOrnamentTextBoxes);
+            _allTextBoxes.AddRange(_12OrnamentTextBoxes);
 
-            NumBasicChordDefsTextBox_Leave(NumBasicChordDefsTextBox, null);
+            //NumberOfOrnamentsTextBox_Leave(NumberOfOrnamentsTextBox, null);
+            
+            TouchAllTextBoxes();
 
-            this.RevertToSavedButton.Enabled = false;
-            this.OkayToSaveButton.Enabled = false;
+            _rff.SetIsSaved(this, OkayToSaveButton, RevertToSavedButton);
         }
 
         private void ConnectBasicChordControl()
@@ -327,7 +324,7 @@ namespace Moritz.Palettes
 
             OrnamentsGroupBox.Enabled = true;
         }
-        public void TouchAllTextBoxes()
+        private void TouchAllTextBoxes()
         {
             _bcc.NumberOfChordValues = _numberOfBasicChordDefs;
             _bcc.TouchAllTextBoxes();
@@ -572,32 +569,9 @@ namespace Moritz.Palettes
         }
         private void SetDialogState(TextBox textBox, bool okay)
         {
-            if(okay)
-            {
-                textBox.BackColor = Color.White;
-            }
-            else
-            {
-                textBox.BackColor = M.TextBoxErrorColor;
-            }
-
-            SetSettingsHaveChanged();
-
-            if(this.HasError)
-            {
-                this.OkayToSaveButton.Enabled = false;
-            }
+            M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
+            _rff.SetSettingsNeedReview(this, OkayToSaveButton, RevertToSavedButton);
         }
-        private void SetSettingsHaveChanged()
-        {
-            if(!this.Text.EndsWith("*"))
-                this.Text = this.Text + "*";
-
-            this.OkayToSaveButton.Enabled = true;
-            this.RevertToSavedButton.Enabled = true;
-            _paletteForm.SetOrnamentSettingsHaveChanged();
-        }
-
        #endregion
 
         /************/
@@ -619,34 +593,14 @@ namespace Moritz.Palettes
             _paletteForm.Callbacks.MainFormBringToFront();
         }
         
-        /// <summary>
-        /// When the main Assistant Composer Form tries to save, it first checks
-        /// that none of its subsidiary forms' Texts ends with a "*".
-        /// If they do, then they must be reviewed, and either the OkayToSaveButton
-        /// or RevertToSavedButton must be clicked.
-        /// </summary>
         private void OkayToSaveButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(!this.HasError);
-            Debug.Assert(this.Text.EndsWith("*"));
-
-            this.Text = this.Text.Remove(this.Text.Length - 1);
-            if(!this.Text.EndsWith("(changed)"))
-            {
-                this.Text = this.Text + " (changed)";
-            }
-            this.OkayToSaveButton.Enabled = false;
+            _rff.SetSettingsCanBeSaved(this, OkayToSaveButton); 
         }
 
-        /// <summary>
-        /// When the main Assistant Composer Form tries to save, it first checks
-        /// that none of its subsidiary forms' Texts ends with a "*".
-        /// If they do, then they must be reviewed, and either the OkayToSaveButton
-        /// or RevertToSavedButton must be clicked.
-        /// </summary>
         private void RevertToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(this.Text.EndsWith("*") || this.Text.EndsWith(" (changed)"));
+            Debug.Assert(this.Text.EndsWith(_rff.NeedsReviewStr) || this.Text.EndsWith(_rff.ChangedAndCheckedStr));
             DialogResult result = 
                 MessageBox.Show("Are you sure you want to revert this dialog to the saved version?", "Revert?", 
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -671,61 +625,24 @@ namespace Moritz.Palettes
                 Ornament11TextBox.Text = SavedOrnament11TextBoxText;
                 Ornament12TextBox.Text = SavedOrnament12TextBoxText;
 
-                NumBasicChordDefsTextBox_Leave(NumBasicChordDefsTextBox, null);
-                
-                if(this.Text.EndsWith("*"))
-                {
-                    this.Text = this.Text.Remove(this.Text.Length - 1);
-                }
-                
-                if(this.Text.EndsWith(" (changed)"))
-                {
-                    this.Text = this.Text.Remove(this.Text.Length - " (changed)".Length);
-                }
+                TouchAllTextBoxes();
 
-                this.RevertToSavedButton.Enabled = false;
-                this.OkayToSaveButton.Enabled = false;
+                _rff.SetIsSaved(this, OkayToSaveButton, RevertToSavedButton);
             }
         }
         #endregion buttons
 
         /************/
 
+        #region IRevertableForm
+        public bool HasError { get { return M.HasError(_allTextBoxes); } }
+        public bool NeedsReview { get { return _rff.NeedsReview(this); } }
+        public bool HasBeenChecked { get { return _rff.HasBeenChecked(this); } }
+
+        #endregion IRevertableForm
+
         #region public interface
-        public void SetSettingsHaveBeenSaved()
-        {
-            if(this.Text.EndsWith("*"))
-                this.Text = this.Text.Remove(this.Text.Length - 1);
-        }
-        public bool HasError
-        {
-            get
-            {
-                bool hasError = false;
-                foreach(TextBox textBox in _allNonOrnamentTextBoxes)
-                {
-                    if(textBox.Enabled && textBox.BackColor == M.TextBoxErrorColor)
-                    {
-                        hasError = true;
-                        break;
-                    }
-                }
-                if(!hasError)
-                {
-                    // can't use _ornaments.Count here because this function is called by SetDialogState()
-                    int numberOfOrnaments = int.Parse(NumberOfOrnamentsTextBox.Text);
-                    for(int i = 0; i < numberOfOrnaments; ++i)
-                    {
-                        if(_12OrnamentTextBoxes[i].BackColor == M.TextBoxErrorColor)
-                        {
-                            hasError = true;
-                            break;
-                        }
-                    }
-                }
-                return hasError;
-            }
-        }
+
         public void WriteOrnamentSettingsForm(XmlWriter w)
         {
             w.WriteStartElement("ornamentSettings");
@@ -803,6 +720,8 @@ namespace Moritz.Palettes
             w.WriteEndElement(); // end of ornaments
 
             w.WriteEndElement(); // end of ornamentSettings
+
+            _rff.SetIsSaved(this, OkayToSaveButton, RevertToSavedButton);
         }
         public BasicChordControl BasicChordControl { get { return _bcc; } }
         public List<List<int>> Ornaments { get { return _ornaments; } }
@@ -814,7 +733,9 @@ namespace Moritz.Palettes
         private int _numberOfBasicChordDefs = -1;
         private List<TextBox> _allNonOrnamentTextBoxes;
         private List<TextBox> _12OrnamentTextBoxes;
+        private List<TextBox> _allTextBoxes;
         private List<List<int>> _ornaments = null;
+        private RevertableFormFunctions _rff = new RevertableFormFunctions();
         #endregion private variables
     }
 }

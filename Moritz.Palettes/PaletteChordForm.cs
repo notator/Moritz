@@ -14,9 +14,9 @@ using Multimedia.Midi;
 
 namespace Moritz.Palettes
 {
-    public partial class PaletteChordForm : Form
+    public partial class PaletteChordForm : Form, IRevertableForm
     {
-        public PaletteChordForm(PaletteForm paletteForm, BasicChordControl bcc, int midiChordIndex, SetDialogStateDelegate SetDialogState)
+        public PaletteChordForm(PaletteForm paletteForm, BasicChordControl bcc, int midiChordIndex)
         {
             InitializeComponent();
 
@@ -24,7 +24,6 @@ namespace Moritz.Palettes
 
             _paletteForm = paletteForm;
             _bcc = bcc;
-            _setDialogState = SetDialogState; // delegate
             _midiChordIndex = midiChordIndex;
 
             if(_paletteForm.IsPercussionPalette)
@@ -46,7 +45,7 @@ namespace Moritz.Palettes
 
             AddAudioSampleButtons(_paletteForm.Domain);
 
-            SetSettingsUnchanged();
+            SetDialogStateIsSaved();
         }
 
         private void FindEmptyDefaultControls()
@@ -144,7 +143,7 @@ namespace Moritz.Palettes
 
         private void AddAudioSampleButtons(int domain)
         {
-            AudioSampleButtons = new List<Button>();
+            _audioSampleButtons = new List<Button>();
             int x = 181;
             int y = 582;
             for(int i = 0; i < domain; ++i)
@@ -165,14 +164,14 @@ namespace Moritz.Palettes
             b.MouseDown += new MouseEventHandler(AudioSampleButton_MouseDown);
 
             this.Controls.Add(b);
-            AudioSampleButtons.Add(b);
+            _audioSampleButtons.Add(b);
             b.BringToFront();
         }
 
         private void AudioSampleButton_MouseDown(object sender, MouseEventArgs e)
         {
             Button chordFormButton = sender as Button;
-            int index = AudioSampleButtons.IndexOf(chordFormButton);
+            int index = _audioSampleButtons.IndexOf(chordFormButton);
             Button paletteButtonsControlButton = _paletteForm.PaletteButtonsControl.AudioSampleButtons[index];
 
             _paletteForm.PaletteButtonsControl.SetLinkedButton(chordFormButton);
@@ -218,40 +217,74 @@ namespace Moritz.Palettes
         {
             durationSBs = GetSubStrings(bcc.DurationsTextBox.Text, midiChordIndex);
             this.DurationTextBox.Text = durationSBs[1].ToString();
+            _savedDurationTextBoxText = DurationTextBox.Text;
+            _allTextBoxes.Add(DurationTextBox);
             velocitySBs = GetSubStrings(bcc.VelocitiesTextBox.Text, midiChordIndex);
             this.VelocityTextBox.Text = velocitySBs[1].ToString();
+            _savedVelocityTextBoxText = VelocityTextBox.Text;
+            _allTextBoxes.Add(VelocityTextBox);
             baseMidiPitchSBs = GetSubStrings(bcc.MidiPitchesTextBox.Text, midiChordIndex);
             this.BaseMidiPitchTextBox.Text = baseMidiPitchSBs[1].ToString();
+            _savedBaseMidiPitchTextBoxText = BaseMidiPitchTextBox.Text;
+            _allTextBoxes.Add(BaseMidiPitchTextBox);
             chordOffSBs = GetSubStrings(bcc.ChordOffsTextBox.Text, midiChordIndex);
             this.ChordOffTextBox.Text = chordOffSBs[1].ToString();
+            _savedChordOffTextBoxText = ChordOffTextBox.Text;
+            _allTextBoxes.Add(ChordOffTextBox);
             chordDensitySBs = GetSubStrings(bcc.ChordDensitiesTextBox.Text, midiChordIndex);
             this.ChordDensityTextBox.Text = chordDensitySBs[1].ToString();
+            _savedChordDensityTextBoxText = ChordDensityTextBox.Text;
+            _allTextBoxes.Add(ChordDensityTextBox);
 
             inversionIndexSBs = GetSubStrings(bcc.InversionIndicesTextBox.Text, midiChordIndex);
             this.InversionIndexTextBox.Text = inversionIndexSBs[1].ToString();
+            _savedInversionIndexTextBoxText = InversionIndexTextBox.Text;
+            _allTextBoxes.Add(InversionIndexTextBox);
             verticalVelocityFactorSBs = GetSubStrings(bcc.VerticalVelocityFactorsTextBox.Text, midiChordIndex);
             this.VerticalVelocityFactorTextBox.Text = verticalVelocityFactorSBs[1].ToString();
+            _savedVerticalVelocityFactorTextBoxText = VerticalVelocityFactorTextBox.Text;
+            _allTextBoxes.Add(VerticalVelocityFactorTextBox);
 
             bankIndexSBs = GetSubStrings(paletteForm.BankIndicesTextBox.Text, midiChordIndex);
             this.BankIndexTextBox.Text = bankIndexSBs[1].ToString();
+            _savedBankIndexTextBoxText = BankIndexTextBox.Text;
+            _allTextBoxes.Add(BankIndexTextBox);
             patchIndexSBs = GetSubStrings(paletteForm.PatchIndicesTextBox.Text, midiChordIndex);
             this.PatchIndexTextBox.Text = patchIndexSBs[1].ToString();
+            _savedPatchIndexTextBoxText = PatchIndexTextBox.Text;
+            _allTextBoxes.Add(PatchIndexTextBox);
             repeatsSBs = GetSubStrings(paletteForm.RepeatsTextBox.Text, midiChordIndex);
             this.RepeatsTextBox.Text = repeatsSBs[1].ToString();
+            _savedRepeatsTextBoxText = RepeatsTextBox.Text;
+            _allTextBoxes.Add(RepeatsTextBox);
             pitchwheelDeviationSBs = GetSubStrings(paletteForm.PitchwheelDeviationsTextBox.Text, midiChordIndex);
             this.PitchwheelDeviationTextBox.Text = pitchwheelDeviationSBs[1].ToString();
+            _savedPitchwheelDeviationTextBoxText = PitchwheelDeviationTextBox.Text;
+            _allTextBoxes.Add(PitchwheelDeviationTextBox);
             pitchwheelEnvelopeSBs = GetSubStrings(paletteForm.PitchwheelEnvelopesTextBox.Text, midiChordIndex);
             this.PitchwheelEnvelopeTextBox.Text = pitchwheelEnvelopeSBs[1].ToString();
+            _savedPitchwheelEnvelopeTextBoxText = PitchwheelEnvelopeTextBox.Text;
+            _allTextBoxes.Add(PitchwheelEnvelopeTextBox);
             panEnvelopeSBs = GetSubStrings(paletteForm.PanEnvelopesTextBox.Text, midiChordIndex);
             this.PanEnvelopeTextBox.Text = panEnvelopeSBs[1].ToString();
+            _savedPanEnvelopeTextBoxText = PanEnvelopeTextBox.Text;
+            _allTextBoxes.Add(PanEnvelopeTextBox);
             modulationWheelEnvelopeSBs = GetSubStrings(paletteForm.ModulationWheelEnvelopesTextBox.Text, midiChordIndex);
             this.ModulationWheelEnvelopeTextBox.Text = modulationWheelEnvelopeSBs[1].ToString();
+            _savedModulationWheelEnvelopeTextBoxText = ModulationWheelEnvelopeTextBox.Text;
+            _allTextBoxes.Add(ModulationWheelEnvelopeTextBox);
             expressionEnvelopeSBs = GetSubStrings(paletteForm.ExpressionEnvelopesTextBox.Text, midiChordIndex);
             this.ExpressionEnvelopeTextBox.Text = expressionEnvelopeSBs[1].ToString();
+            _savedExpressionEnvelopeTextBoxText = ExpressionEnvelopeTextBox.Text;
+            _allTextBoxes.Add(ExpressionEnvelopeTextBox);
             ornamentNumberSBs = GetSubStrings(paletteForm.OrnamentNumbersTextBox.Text, midiChordIndex);
             this.OrnamentNumberTextBox.Text = ornamentNumberSBs[1].ToString();
+            _savedOrnamentNumberTextBoxText = OrnamentNumberTextBox.Text;
+            _allTextBoxes.Add(OrnamentNumberTextBox);
             minMsDurationsSBs = GetSubStrings(paletteForm.MinMsDurationsTextBox.Text, midiChordIndex);
             this.MinMsDurationTextBox.Text = minMsDurationsSBs[1].ToString();
+            _savedMinMsDurationTextBoxText = MinMsDurationTextBox.Text;
+            _allTextBoxes.Add(MinMsDurationTextBox);
         }
 
         private void SetEnabledOrnamentControls(int numberOfOrnaments)
@@ -283,6 +316,79 @@ namespace Moritz.Palettes
             ShowOrnamentSettingsButton.Enabled = false;
         }
         #endregion initialization
+
+        #region IRevertableForm
+        public bool HasError { get { return M.HasError(_allTextBoxes); } }
+        public bool NeedsReview { get { return _rff.NeedsReview(this); } }
+        public bool HasBeenChecked { get { return _rff.HasBeenChecked(this); } }
+
+        private void OkayToSaveButton_Click(object sender, EventArgs e)
+        {
+            _rff.SetSettingsCanBeSaved(this, OkayToSaveButton);
+            this.SaveAndCloseButton.Enabled = true;
+            this.CloseWithoutSavingButton.Enabled = true;
+        }
+
+        private void RevertToSavedButton_Click(object sender, EventArgs e)
+        {
+            Debug.Assert(this.Text.EndsWith(_rff.NeedsReviewStr) || this.Text.EndsWith(_rff.ChangedAndCheckedStr));
+            DialogResult result =
+                MessageBox.Show("Are you sure you want to revert this dialog to the saved version?", "Revert?",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
+
+            if(result == System.Windows.Forms.DialogResult.Yes)
+            {
+                DurationTextBox.Text = _savedDurationTextBoxText;
+                VelocityTextBox.Text = _savedVelocityTextBoxText;
+                BaseMidiPitchTextBox.Text = _savedBaseMidiPitchTextBoxText;
+                ChordOffTextBox.Text = _savedChordOffTextBoxText;
+                ChordDensityTextBox.Text =_savedChordDensityTextBoxText;
+                InversionIndexTextBox.Text =_savedInversionIndexTextBoxText;
+                VerticalVelocityFactorTextBox.Text =_savedVerticalVelocityFactorTextBoxText;
+                BankIndexTextBox.Text =_savedBankIndexTextBoxText;
+                PatchIndexTextBox.Text =_savedPatchIndexTextBoxText;
+                RepeatsTextBox.Text =_savedRepeatsTextBoxText;
+                PitchwheelDeviationTextBox.Text =_savedPitchwheelDeviationTextBoxText;
+                PitchwheelEnvelopeTextBox.Text =_savedPitchwheelEnvelopeTextBoxText;
+                PanEnvelopeTextBox.Text =_savedPanEnvelopeTextBoxText;
+                ModulationWheelEnvelopeTextBox.Text =_savedModulationWheelEnvelopeTextBoxText;
+                ExpressionEnvelopeTextBox.Text =_savedExpressionEnvelopeTextBoxText;
+                OrnamentNumberTextBox.Text =_savedOrnamentNumberTextBoxText;
+                MinMsDurationTextBox.Text =_savedMinMsDurationTextBoxText;
+
+                TouchAllTextBoxesIfEnabled();
+
+                SetDialogStateIsSaved();
+            }
+        }
+
+        private void SetDialogStateIsSaved()
+        {
+            _rff.SetIsSaved(this, OkayToSaveButton, RevertToSavedButton);
+            this.SaveAndCloseButton.Enabled = false;
+            this.CloseWithoutSavingButton.Enabled = true;
+        }
+
+        #region reverting strings
+        private string _savedDurationTextBoxText;
+        private string _savedVelocityTextBoxText;
+        private string _savedBaseMidiPitchTextBoxText;
+        private string _savedChordOffTextBoxText;
+        private string _savedChordDensityTextBoxText;
+        private string _savedInversionIndexTextBoxText;
+        private string _savedVerticalVelocityFactorTextBoxText;
+        private string _savedBankIndexTextBoxText;
+        private string _savedPatchIndexTextBoxText;
+        private string _savedRepeatsTextBoxText;
+        private string _savedPitchwheelDeviationTextBoxText;
+        private string _savedPitchwheelEnvelopeTextBoxText;
+        private string _savedPanEnvelopeTextBoxText;
+        private string _savedModulationWheelEnvelopeTextBoxText;
+        private string _savedExpressionEnvelopeTextBoxText;
+        private string _savedOrnamentNumberTextBoxText;
+        private string _savedMinMsDurationTextBoxText;
+        #endregion reverting strings
+        #endregion IRevertableForm
 
         #region buttons
         private void MidiInstrumentsHelpButton_Click(object sender, EventArgs e)
@@ -329,25 +435,9 @@ namespace Moritz.Palettes
             return allTextBoxes;
         }
 
-        private bool HasError()
-        {
-            bool hasError = false;
-            List<TextBox> allTextBoxes = AllTextBoxes();
-            foreach(TextBox textBox in allTextBoxes)
-            {
-                if(textBox.Enabled && textBox.BackColor == M.TextBoxErrorColor)
-                {
-                    hasError = true;
-                    break;
-                }
-            }
-
-            return hasError;
-        }
-
         private void SaveAndCloseButton_Click(object sender, EventArgs e)
         {
-            if(HasError())
+            if(M.HasError(_allTextBoxes))
             {
                 DoErrorMessage("Can't save because there is an error in one or more of the fields.");
             }
@@ -400,37 +490,29 @@ namespace Moritz.Palettes
         #endregion buttons
 
         #region TextBox_Leave handlers
-        private void SetSettingsUnchanged()
+        private void SetDialogState(TextBox textBox, bool okay)
         {
-            if(this.Text.EndsWith("*"))
-                this.Text = this.Text.Remove(this.Text.Length - 1);
+            M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
+            _rff.SetSettingsNeedReview(this, OkayToSaveButton, RevertToSavedButton);
+            this.CloseWithoutSavingButton.Enabled = true;
             this.SaveAndCloseButton.Enabled = false;
         }
-        private void SetSettingsChanged()
-        {
-            if(!this.Text.EndsWith("*"))
-                this.Text = this.Text + "*";
-            this.SaveAndCloseButton.Enabled = true;
-        }
+
         private void DurationTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 1, int.MaxValue, _setDialogState);
-            SetSettingsChanged();
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 1, int.MaxValue, SetDialogState);
         }
         private void VelocityTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, _setDialogState);
-            SetSettingsChanged();
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, SetDialogState);
         }
         private void BaseMidiPitchTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, _setDialogState);
-            SetSettingsChanged();
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, SetDialogState);
         }
         private void ChordOffTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 1, _setDialogState);
-            SetSettingsChanged();
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 1, SetDialogState);
         }
 
         private void EnableAllTextBoxesAndMidiButton()
@@ -480,7 +562,7 @@ namespace Moritz.Palettes
         {
             TextBox chordDensityTextBox = sender as TextBox;
 
-            M.LeaveIntRangeTextBox(chordDensityTextBox, false, 1, 0, _bcc.MaximumChordDensity, _setDialogState);
+            M.LeaveIntRangeTextBox(chordDensityTextBox, false, 1, 0, _bcc.MaximumChordDensity, SetDialogState);
 
             if(chordDensityTextBox.BackColor == M.TextBoxErrorColor)
             {
@@ -489,7 +571,6 @@ namespace Moritz.Palettes
             }
             else
             {
-                SetSettingsChanged();
                 EnableAllTextBoxesAndMidiButton();
 
                 DisableEmptyDefaultControls();
@@ -524,85 +605,97 @@ namespace Moritz.Palettes
         private void InversionIndexTextBox_Leave(object sender, EventArgs e)
         {
             int inversionsMaxIndex = ((2 * (_bcc.MaximumChordDensity - 2)) - 1);
-            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, inversionsMaxIndex, _setDialogState);
-            SetSettingsChanged();
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, inversionsMaxIndex, SetDialogState);
         }
         private void VerticalVelocityFactorTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveFloatRangeTextBox(sender as TextBox, false, 1, 0F, float.MaxValue, _setDialogState);
-            SetSettingsChanged();
+            M.LeaveFloatRangeTextBox(sender as TextBox, false, 1, 0F, float.MaxValue, SetDialogState);
         }
         private void BankIndexTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, _setDialogState);
-            SetSettingsChanged();
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, SetDialogState);
         }
         private void PatchIndexTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, _setDialogState);
-            SetSettingsChanged();
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, SetDialogState);
         }
         private void RepeatsTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 1, _setDialogState);
-            SetSettingsChanged();
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 1, SetDialogState);
         }
         private void PitchwheelDeviationTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, _setDialogState);
-            SetSettingsChanged();
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, SetDialogState);
         }
+        /// <summary>
+        /// If the textBox is disabled, this function does nothing
+        /// </summary>
+        /// <param name="textBox"></param>
         private void CheckEnvelope(TextBox textBox)
         {
-            StringBuilder envelopeSB = new StringBuilder();
-            List<string> numbers = _paletteForm.GetCheckedIntStrings(textBox.Text, -1, 0, 127, ':');
-            if(numbers != null)
+            if(textBox.Enabled)
             {
-                foreach(string numberStr in numbers)
+                StringBuilder envelopeSB = new StringBuilder();
+                List<string> numbers = _paletteForm.GetCheckedIntStrings(textBox.Text, -1, 0, 127, ':');
+                if(numbers != null)
                 {
-                    envelopeSB.Append(":");
-                    envelopeSB.Append(numberStr);
+                    foreach(string numberStr in numbers)
+                    {
+                        envelopeSB.Append(":");
+                        envelopeSB.Append(numberStr);
+                    }
+                    envelopeSB.Remove(0, 1);
+                    textBox.Text = envelopeSB.ToString();
+                    textBox.BackColor = Color.White;
                 }
-                envelopeSB.Remove(0, 1);
-                textBox.Text = envelopeSB.ToString();
-                textBox.BackColor = Color.White;
-            }
-            else if(!string.IsNullOrEmpty(textBox.Text)) // it is not an error if the textBox is empty
-            {
-                textBox.BackColor = M.TextBoxErrorColor;
+                else if(!string.IsNullOrEmpty(textBox.Text)) // it is not an error if the textBox is empty
+                {
+                    textBox.BackColor = M.TextBoxErrorColor;
+                }
+                SetDialogState(textBox, textBox.BackColor == Color.White);
             }
         }
         private void PitchwheelEnvelopeTextBox_Leave(object sender, EventArgs e)
         {
             CheckEnvelope(sender as TextBox);
-            SetSettingsChanged();
         }
         private void PanEnvelopeTextBox_Leave(object sender, EventArgs e)
         {
             CheckEnvelope(sender as TextBox);
-            SetSettingsChanged();
         }
         private void ModulationWheelEnvelopeTextBox_Leave(object sender, EventArgs e)
         {
             CheckEnvelope(sender as TextBox);
-            SetSettingsChanged();
         }
         private void ExpressionEnvelopeTextBox_Leave(object sender, EventArgs e)
         {
             CheckEnvelope(sender as TextBox);
-            SetSettingsChanged();
         }
         private void OrnamentNumberTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, _paletteForm.OrnamentSettingsForm.Ornaments.Count, _setDialogState);
-            SetSettingsChanged();
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, _paletteForm.OrnamentSettingsForm.Ornaments.Count, SetDialogState);
         }
-        private void MinMsDurationsTextBox_Leave(object sender, EventArgs e)
+        private void MinMsDurationTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, int.MaxValue, _setDialogState);
-            SetSettingsChanged();
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, int.MaxValue, SetDialogState);
         }
         #endregion TextBox_Leave handlers
+
+        private void TouchAllTextBoxesIfEnabled()
+        {
+            ChordDensityTextBox_Leave(ChordDensityTextBox, null);
+            InversionIndexTextBox_Leave(InversionIndexTextBox, null);
+            VerticalVelocityFactorTextBox_Leave(VerticalVelocityFactorTextBox, null);
+            BankIndexTextBox_Leave(BankIndexTextBox, null);
+            PatchIndexTextBox_Leave(PatchIndexTextBox, null);
+            RepeatsTextBox_Leave(RepeatsTextBox, null);
+            PitchwheelDeviationTextBox_Leave(PitchwheelDeviationTextBox, null);
+            PitchwheelEnvelopeTextBox_Leave(PitchwheelEnvelopeTextBox, null);
+            ModulationWheelEnvelopeTextBox_Leave(ModulationWheelEnvelopeTextBox, null);
+            ExpressionEnvelopeTextBox_Leave(ExpressionEnvelopeTextBox, null);
+            OrnamentNumberTextBox_Leave(OrnamentNumberTextBox, null);
+            MinMsDurationTextBox_Leave(this.MinMsDurationTextBox, null);
+        }
 
         private static void DoErrorMessage(string message)
         {
@@ -617,7 +710,7 @@ namespace Moritz.Palettes
         #region play midi event
         private void MidiEventDemoButton_Click(object sender, EventArgs e)
         {
-            if(HasError())
+            if(M.HasError(_allTextBoxes))
             {
                 DoErrorMessage("Can't play because there is an error in one or more of the fields.");
             }
@@ -703,17 +796,19 @@ namespace Moritz.Palettes
         List<StringBuilder> expressionEnvelopeSBs;
         List<StringBuilder> ornamentNumberSBs;
         List<StringBuilder> minMsDurationsSBs;
-
-        SetDialogStateDelegate _setDialogState;
-        public PaletteForm PaletteForm { get { return _paletteForm; } }
+        
         PaletteForm _paletteForm;
         BasicChordControl _bcc;
         int _midiChordIndex;
         List<Label> _emptyDefaultLabels;
         List<TextBox> _emptyDefaultTextBoxes;
         List<Label> _emptyDefaultHelpLabels;
-        public List<Button> AudioSampleButtons;
+        List<Button> _audioSampleButtons;
+        RevertableFormFunctions _rff = new RevertableFormFunctions();
+        List<TextBox> _allTextBoxes = new List<TextBox>();
         #endregion  private variables
+
+        public PaletteForm PaletteForm { get { return _paletteForm; } }
     }
 }
 

@@ -13,6 +13,7 @@ using System.Xml;
 namespace Moritz.Globals
 {
     public delegate void SetDialogStateDelegate(TextBox textBox, bool success);
+
     /// <summary>
     /// The static class M contains solution-wide constants and generally useful functions.
     /// </summary>
@@ -259,9 +260,9 @@ namespace Moritz.Globals
             return envelopesAsByteLists;
         }
         #endregion
-
         #region int lists
         /// <summary>
+        /// If the textBox is disabled, this function does nothing.
         /// SetDialogState sets the text box to an error state (usually by setting its background colour to pink) if:
         ///     textBox.Text is empty, or
         ///     textBox.Text contains anything other than numbers, commas and whitespace or
@@ -270,31 +271,34 @@ namespace Moritz.Globals
         public static void LeaveIntRangeTextBox(TextBox textBox, bool canBeEmpty, uint count, int minVal, int maxVal,
                                                     SetDialogStateDelegate SetDialogState)
         {
-            if(textBox.Text.Length > 0)
+            if(textBox.Enabled)
             {
-                List<string> checkedIntStrings = GetCheckedIntStrings(textBox, count, minVal, maxVal);
-                if(checkedIntStrings != null)
+                if(textBox.Text.Length > 0)
                 {
-                    StringBuilder sb = new StringBuilder();
-                    foreach(string intString in checkedIntStrings)
+                    List<string> checkedIntStrings = GetCheckedIntStrings(textBox, count, minVal, maxVal);
+                    if(checkedIntStrings != null)
                     {
-                        sb.Append(",  " + intString);
+                        StringBuilder sb = new StringBuilder();
+                        foreach(string intString in checkedIntStrings)
+                        {
+                            sb.Append(",  " + intString);
+                        }
+                        sb.Remove(0, 3);
+                        textBox.Text = sb.ToString();
+                        SetDialogState(textBox, true);
                     }
-                    sb.Remove(0, 3);
-                    textBox.Text = sb.ToString();
-                    SetDialogState(textBox, true);
+                    else
+                    {
+                        SetDialogState(textBox, false);
+                    }
                 }
                 else
                 {
-                    SetDialogState(textBox, false);
+                    if(canBeEmpty)
+                        SetDialogState(textBox, true);
+                    else
+                        SetDialogState(textBox, false);
                 }
-            }
-            else
-            {
-                if(canBeEmpty)
-                    SetDialogState(textBox, true);
-                else
-                    SetDialogState(textBox, false);
             }
         }
         /// <summary>
@@ -397,6 +401,7 @@ namespace Moritz.Globals
 
         #region float lists
         /// <summary>
+        /// If the textBox is disabled, this function does nothing.
         /// SetDialogState sets the text box to an error state (usually by setting its background colour to pink) if:
         ///     textBox.Text is empty, or
         ///     textBox.Text contains anything other than numbers, commas and whitespace or
@@ -407,31 +412,34 @@ namespace Moritz.Globals
         public static void LeaveFloatRangeTextBox(TextBox textBox, bool canBeEmpty, uint count, float minVal, float maxVal,
                                                     SetDialogStateDelegate SetDialogState)
         {
-            if(textBox.Text.Length > 0)
+            if(textBox.Enabled)
             {
-                List<string> checkedFloatStrings = GetCheckedFloatStrings(textBox, count, minVal, maxVal);
-                if(checkedFloatStrings != null)
+                if(textBox.Text.Length > 0)
                 {
-                    StringBuilder sb = new StringBuilder();
-                    foreach(string floatString in checkedFloatStrings)
+                    List<string> checkedFloatStrings = GetCheckedFloatStrings(textBox, count, minVal, maxVal);
+                    if(checkedFloatStrings != null)
                     {
-                        sb.Append(",  " + floatString);
+                        StringBuilder sb = new StringBuilder();
+                        foreach(string floatString in checkedFloatStrings)
+                        {
+                            sb.Append(",  " + floatString);
+                        }
+                        sb.Remove(0, 3);
+                        textBox.Text = sb.ToString();
+                        SetDialogState(textBox, true);
                     }
-                    sb.Remove(0, 3);
-                    textBox.Text = sb.ToString();
-                    SetDialogState(textBox, true);
+                    else
+                    {
+                        SetDialogState(textBox, false);
+                    }
                 }
                 else
                 {
-                    SetDialogState(textBox, false);
+                    if(canBeEmpty)
+                        SetDialogState(textBox, true);
+                    else
+                        SetDialogState(textBox, false);
                 }
-            }
-            else
-            {
-                if(canBeEmpty)
-                    SetDialogState(textBox, true);
-                else
-                    SetDialogState(textBox, false);
             }
         }
         /// <summary>
@@ -607,6 +615,32 @@ namespace Moritz.Globals
         }
 
         public static Color TextBoxErrorColor = Color.FromArgb(255, 220, 220);
+
+        public static bool HasError(List<TextBox> allTextBoxes)
+        {
+            bool hasError = false;
+            foreach(TextBox textBox in allTextBoxes)
+            {
+                if(textBox.BackColor == M.TextBoxErrorColor)
+                {
+                    hasError = true;
+                    break;
+                }
+            }
+            return hasError;
+        }
+
+        public static void SetTextBoxErrorColorIfNotOkay(TextBox textBox, bool okay)
+        {
+            if(okay)
+            {
+                textBox.BackColor = Color.White;
+            }
+            else
+            {
+                textBox.BackColor = M.TextBoxErrorColor;
+            }
+        }
 
         public struct PaperSize
         {

@@ -13,13 +13,11 @@ namespace Moritz.Palettes
     public delegate void MainFormBringToFront();
     public delegate string LocalAudioFolderPath();
     public delegate bool APaletteChordFormIsOpen();
-    public delegate void SetSettingsHaveChanged();
 
     public class ComposerFormCallbacks
     {
         public MainFormBringToFront MainFormBringToFront;
         public LocalAudioFolderPath LocalScoreAudioPath;
-        public APaletteChordFormIsOpen APaletteChordFormIsOpen;
-        public SetSettingsHaveChanged SetSettingsHaveChanged;
+        public APaletteChordFormIsOpen APaletteChordFormIsOpen;    
     }
 }

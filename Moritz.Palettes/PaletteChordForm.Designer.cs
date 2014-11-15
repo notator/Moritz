@@ -94,6 +94,8 @@
             this.VerticalVelocityFactorLabel = new System.Windows.Forms.Label();
             this.MidiEventButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
+            this.RevertToSavedButton = new System.Windows.Forms.Button();
+            this.OkayToSaveButton = new System.Windows.Forms.Button();
             this.BasicChordControlsPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -113,7 +115,7 @@
             this.RepeatsTextBox.Location = new System.Drawing.Point(180, 295);
             this.RepeatsTextBox.Name = "RepeatsTextBox";
             this.RepeatsTextBox.Size = new System.Drawing.Size(29, 20);
-            this.RepeatsTextBox.TabIndex = 3;
+            this.RepeatsTextBox.TabIndex = 10;
             this.RepeatsTextBox.Leave += new System.EventHandler(this.RepeatsTextBox_Leave);
             // 
             // RepeatsLabel
@@ -132,7 +134,7 @@
             this.BankIndexTextBox.Location = new System.Drawing.Point(180, 241);
             this.BankIndexTextBox.Name = "BankIndexTextBox";
             this.BankIndexTextBox.Size = new System.Drawing.Size(29, 20);
-            this.BankIndexTextBox.TabIndex = 1;
+            this.BankIndexTextBox.TabIndex = 8;
             this.BankIndexTextBox.Leave += new System.EventHandler(this.BankIndexTextBox_Leave);
             // 
             // BankIndexHelpLabel
@@ -161,7 +163,7 @@
             this.PatchIndexTextBox.Location = new System.Drawing.Point(180, 268);
             this.PatchIndexTextBox.Name = "PatchIndexTextBox";
             this.PatchIndexTextBox.Size = new System.Drawing.Size(29, 20);
-            this.PatchIndexTextBox.TabIndex = 2;
+            this.PatchIndexTextBox.TabIndex = 9;
             this.PatchIndexTextBox.Leave += new System.EventHandler(this.PatchIndexTextBox_Leave);
             // 
             // PatchIndexHelpLabel
@@ -233,8 +235,8 @@
             this.MinMsDurationTextBox.Location = new System.Drawing.Point(180, 525);
             this.MinMsDurationTextBox.Name = "MinMsDurationTextBox";
             this.MinMsDurationTextBox.Size = new System.Drawing.Size(29, 20);
-            this.MinMsDurationTextBox.TabIndex = 10;
-            this.MinMsDurationTextBox.Leave += new System.EventHandler(this.MinMsDurationsTextBox_Leave);
+            this.MinMsDurationTextBox.TabIndex = 17;
+            this.MinMsDurationTextBox.Leave += new System.EventHandler(this.MinMsDurationTextBox_Leave);
             // 
             // MinMsDurationHelpLabel
             // 
@@ -252,7 +254,7 @@
             this.MidiInstrumentsHelpButton.Location = new System.Drawing.Point(37, 552);
             this.MidiInstrumentsHelpButton.Name = "MidiInstrumentsHelpButton";
             this.MidiInstrumentsHelpButton.Size = new System.Drawing.Size(95, 26);
-            this.MidiInstrumentsHelpButton.TabIndex = 20;
+            this.MidiInstrumentsHelpButton.TabIndex = 5;
             this.MidiInstrumentsHelpButton.Text = "MIDI Instruments";
             this.MidiInstrumentsHelpButton.UseVisualStyleBackColor = false;
             this.MidiInstrumentsHelpButton.Click += new System.EventHandler(this.MidiInstrumentsHelpButton_Click);
@@ -263,7 +265,7 @@
             this.MidiPitchesHelpButton.Location = new System.Drawing.Point(37, 582);
             this.MidiPitchesHelpButton.Name = "MidiPitchesHelpButton";
             this.MidiPitchesHelpButton.Size = new System.Drawing.Size(95, 26);
-            this.MidiPitchesHelpButton.TabIndex = 21;
+            this.MidiPitchesHelpButton.TabIndex = 6;
             this.MidiPitchesHelpButton.Text = "MIDI Pitches";
             this.MidiPitchesHelpButton.UseVisualStyleBackColor = false;
             this.MidiPitchesHelpButton.Click += new System.EventHandler(this.MidiPitchesHelpButton_Click);
@@ -285,7 +287,7 @@
             this.ExpressionEnvelopeTextBox.Location = new System.Drawing.Point(180, 430);
             this.ExpressionEnvelopeTextBox.Name = "ExpressionEnvelopeTextBox";
             this.ExpressionEnvelopeTextBox.Size = new System.Drawing.Size(554, 20);
-            this.ExpressionEnvelopeTextBox.TabIndex = 8;
+            this.ExpressionEnvelopeTextBox.TabIndex = 15;
             this.ExpressionEnvelopeTextBox.Leave += new System.EventHandler(this.ExpressionEnvelopeTextBox_Leave);
             // 
             // OrnamentNumberHelpLabel
@@ -304,7 +306,7 @@
             this.OrnamentNumberTextBox.Location = new System.Drawing.Point(180, 498);
             this.OrnamentNumberTextBox.Name = "OrnamentNumberTextBox";
             this.OrnamentNumberTextBox.Size = new System.Drawing.Size(29, 20);
-            this.OrnamentNumberTextBox.TabIndex = 9;
+            this.OrnamentNumberTextBox.TabIndex = 16;
             this.OrnamentNumberTextBox.Leave += new System.EventHandler(this.OrnamentNumberTextBox_Leave);
             // 
             // ShowOrnamentSettingsButton
@@ -313,7 +315,7 @@
             this.ShowOrnamentSettingsButton.Location = new System.Drawing.Point(491, 494);
             this.ShowOrnamentSettingsButton.Name = "ShowOrnamentSettingsButton";
             this.ShowOrnamentSettingsButton.Size = new System.Drawing.Size(137, 28);
-            this.ShowOrnamentSettingsButton.TabIndex = 22;
+            this.ShowOrnamentSettingsButton.TabIndex = 4;
             this.ShowOrnamentSettingsButton.Text = "show ornament settings";
             this.ShowOrnamentSettingsButton.UseVisualStyleBackColor = false;
             this.ShowOrnamentSettingsButton.Click += new System.EventHandler(this.ShowOrnamentSettingsButton_Click);
@@ -324,7 +326,7 @@
             this.PanEnvelopeTextBox.Location = new System.Drawing.Point(180, 376);
             this.PanEnvelopeTextBox.Name = "PanEnvelopeTextBox";
             this.PanEnvelopeTextBox.Size = new System.Drawing.Size(554, 20);
-            this.PanEnvelopeTextBox.TabIndex = 6;
+            this.PanEnvelopeTextBox.TabIndex = 13;
             this.PanEnvelopeTextBox.Leave += new System.EventHandler(this.PanEnvelopeTextBox_Leave);
             // 
             // PitchwheelDeviationHelpLabel
@@ -343,7 +345,7 @@
             this.PitchwheelEnvelopeTextBox.Location = new System.Drawing.Point(180, 349);
             this.PitchwheelEnvelopeTextBox.Name = "PitchwheelEnvelopeTextBox";
             this.PitchwheelEnvelopeTextBox.Size = new System.Drawing.Size(554, 20);
-            this.PitchwheelEnvelopeTextBox.TabIndex = 5;
+            this.PitchwheelEnvelopeTextBox.TabIndex = 12;
             this.PitchwheelEnvelopeTextBox.Leave += new System.EventHandler(this.PitchwheelEnvelopeTextBox_Leave);
             // 
             // PitchwheelDeviationTextBox
@@ -352,7 +354,7 @@
             this.PitchwheelDeviationTextBox.Location = new System.Drawing.Point(180, 322);
             this.PitchwheelDeviationTextBox.Name = "PitchwheelDeviationTextBox";
             this.PitchwheelDeviationTextBox.Size = new System.Drawing.Size(29, 20);
-            this.PitchwheelDeviationTextBox.TabIndex = 4;
+            this.PitchwheelDeviationTextBox.TabIndex = 11;
             this.PitchwheelDeviationTextBox.Leave += new System.EventHandler(this.PitchwheelDeviationTextBox_Leave);
             // 
             // ModulationWheelEnvelopeTextBox
@@ -361,7 +363,7 @@
             this.ModulationWheelEnvelopeTextBox.Location = new System.Drawing.Point(180, 403);
             this.ModulationWheelEnvelopeTextBox.Name = "ModulationWheelEnvelopeTextBox";
             this.ModulationWheelEnvelopeTextBox.Size = new System.Drawing.Size(554, 20);
-            this.ModulationWheelEnvelopeTextBox.TabIndex = 7;
+            this.ModulationWheelEnvelopeTextBox.TabIndex = 14;
             this.ModulationWheelEnvelopeTextBox.Leave += new System.EventHandler(this.ModulationWheelEnvelopeTextBox_Leave);
             // 
             // ExpressionEnvelopeHelpLabel
@@ -484,10 +486,10 @@
             // 
             this.SaveAndCloseButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.SaveAndCloseButton.Enabled = false;
-            this.SaveAndCloseButton.Location = new System.Drawing.Point(662, 581);
+            this.SaveAndCloseButton.Location = new System.Drawing.Point(662, 584);
             this.SaveAndCloseButton.Name = "SaveAndCloseButton";
-            this.SaveAndCloseButton.Size = new System.Drawing.Size(137, 28);
-            this.SaveAndCloseButton.TabIndex = 24;
+            this.SaveAndCloseButton.Size = new System.Drawing.Size(137, 25);
+            this.SaveAndCloseButton.TabIndex = 3;
             this.SaveAndCloseButton.Text = "save to palette and close";
             this.SaveAndCloseButton.UseVisualStyleBackColor = false;
             this.SaveAndCloseButton.Click += new System.EventHandler(this.SaveAndCloseButton_Click);
@@ -495,10 +497,10 @@
             // CloseWithoutSavingButton
             // 
             this.CloseWithoutSavingButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.CloseWithoutSavingButton.Location = new System.Drawing.Point(662, 546);
+            this.CloseWithoutSavingButton.Location = new System.Drawing.Point(662, 554);
             this.CloseWithoutSavingButton.Name = "CloseWithoutSavingButton";
-            this.CloseWithoutSavingButton.Size = new System.Drawing.Size(137, 28);
-            this.CloseWithoutSavingButton.TabIndex = 23;
+            this.CloseWithoutSavingButton.Size = new System.Drawing.Size(137, 25);
+            this.CloseWithoutSavingButton.TabIndex = 2;
             this.CloseWithoutSavingButton.Text = "close without saving";
             this.CloseWithoutSavingButton.UseVisualStyleBackColor = false;
             this.CloseWithoutSavingButton.Click += new System.EventHandler(this.CloseWithoutSavingButton_Click);
@@ -533,7 +535,7 @@
             this.BasicChordControlsPanel.Location = new System.Drawing.Point(21, 13);
             this.BasicChordControlsPanel.Name = "BasicChordControlsPanel";
             this.BasicChordControlsPanel.Size = new System.Drawing.Size(778, 221);
-            this.BasicChordControlsPanel.TabIndex = 0;
+            this.BasicChordControlsPanel.TabIndex = 7;
             // 
             // DurationTextBox
             // 
@@ -781,6 +783,32 @@
             this.label2.TabIndex = 193;
             this.label2.Text = "rest";
             // 
+            // RevertToSavedButton
+            // 
+            this.RevertToSavedButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.RevertToSavedButton.Enabled = false;
+            this.RevertToSavedButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.RevertToSavedButton.Location = new System.Drawing.Point(662, 518);
+            this.RevertToSavedButton.Name = "RevertToSavedButton";
+            this.RevertToSavedButton.Size = new System.Drawing.Size(137, 25);
+            this.RevertToSavedButton.TabIndex = 1;
+            this.RevertToSavedButton.Text = "revert to saved";
+            this.RevertToSavedButton.UseVisualStyleBackColor = true;
+            this.RevertToSavedButton.Click += new System.EventHandler(this.RevertToSavedButton_Click);
+            // 
+            // OkayToSaveButton
+            // 
+            this.OkayToSaveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.OkayToSaveButton.Enabled = false;
+            this.OkayToSaveButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.OkayToSaveButton.Location = new System.Drawing.Point(662, 488);
+            this.OkayToSaveButton.Name = "OkayToSaveButton";
+            this.OkayToSaveButton.Size = new System.Drawing.Size(137, 25);
+            this.OkayToSaveButton.TabIndex = 0;
+            this.OkayToSaveButton.Text = "okay to save";
+            this.OkayToSaveButton.UseVisualStyleBackColor = true;
+            this.OkayToSaveButton.Click += new System.EventHandler(this.OkayToSaveButton_Click);
+            // 
             // PaletteChordForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
@@ -788,6 +816,8 @@
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
             this.ClientSize = new System.Drawing.Size(820, 624);
             this.ControlBox = false;
+            this.Controls.Add(this.RevertToSavedButton);
+            this.Controls.Add(this.OkayToSaveButton);
             this.Controls.Add(this.MidiEventButton);
             this.Controls.Add(this.BasicChordControlsPanel);
             this.Controls.Add(this.CloseWithoutSavingButton);
@@ -911,6 +941,8 @@
         public System.Windows.Forms.Label VerticalVelocityFactorLabel;
         private System.Windows.Forms.Button MidiEventButton;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button RevertToSavedButton;
+        private System.Windows.Forms.Button OkayToSaveButton;
 
 
     }
