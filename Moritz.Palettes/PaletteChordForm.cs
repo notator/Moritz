@@ -356,7 +356,7 @@ namespace Moritz.Palettes
                 OrnamentNumberTextBox.Text =_savedOrnamentNumberTextBoxText;
                 MinMsDurationTextBox.Text =_savedMinMsDurationTextBoxText;
 
-                TouchAllTextBoxesIfEnabled();
+                TouchAllTextBoxes();
 
                 SetDialogStateIsSaved();
             }
@@ -681,7 +681,7 @@ namespace Moritz.Palettes
         }
         #endregion TextBox_Leave handlers
 
-        private void TouchAllTextBoxesIfEnabled()
+        private void TouchAllTextBoxes()
         {
             ChordDensityTextBox_Leave(ChordDensityTextBox, null);
             InversionIndexTextBox_Leave(InversionIndexTextBox, null);

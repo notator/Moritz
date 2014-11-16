@@ -26,18 +26,20 @@ using Moritz.Algorithm.Study3Sketch2;
 
 namespace Moritz.Composer
 {
-    public partial class AssistantComposerMainForm : Form
+    public partial class AssistantComposerMainForm : Form, IRevertableForm
     {
         public AssistantComposerMainForm(string settingsPath, IMoritzForm1 moritzForm1)
         {
             InitializeComponent();
-            _moritzForm1 = moritzForm1;
 
+            this._allTextBoxes = GetAllTextBoxes();
+
+            _moritzForm1 = moritzForm1;
             _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this);
 
             M.PopulateComboBox(ChordTypeComboBox, M.ChordTypes);
 
-            this._allTextBoxes = GetAllTextBoxes();
+
             SetDefaultValues();
             DeselectAll();
 
@@ -55,7 +57,6 @@ namespace Moritz.Composer
             _algorithm = ComposableSvgScore.Algorithm(_scoreTitle);
 
             if(_algorithm != null)
-
             {
                 _outputVoiceIndices = GetOutputVoiceIndices(_algorithm.MidiChannelIndexPerOutputVoice.Count);
                 
@@ -74,7 +75,101 @@ namespace Moritz.Composer
             {
                 SetSettingsHaveBeenSaved();
             }
+            this.Text = _scoreTitle + " algorithm";
         }
+        #region DeselectAll
+        private void DeselectAll()
+        {
+            DeselectAllKrystalListBoxItems();
+            DeselectAllKrystalPalettesListBoxItems();
+            this.Focus(); // deletes the dotted frame around the last selected item.
+        }
+        private void DeselectAllKrystalListBoxItems()
+        {
+            for(int i = 0; i < KrystalsListBox.Items.Count; i++)
+            {
+                KrystalsListBox.SetSelected(i, false);
+            }
+            RemoveSelectedKrystalButton.Enabled = false;
+        }
+        private void DeselectAllKrystalPalettesListBoxItems()
+        {
+            for(int i = 0; i < PalettesListBox.Items.Count; i++)
+            {
+                PalettesListBox.SetSelected(i, false);
+            }
+            DeleteSelectedPaletteButton.Enabled = false;
+            ShowSelectedPaletteButton.Enabled = false;
+        }
+        #endregion DeselectAll
+
+        #region IRevertableForm
+        public bool HasError { get { return M.HasError(_allTextBoxes); } }
+        public bool NeedsReview { get { return _rff.NeedsReview(this); } }
+        public bool HasBeenChecked { get { return _rff.HasBeenChecked(this); } }
+        public void SetSettingsNeedReview()
+        {
+            _rff.SetSettingsNeedReview(this, OkayToSaveButton, RevertToSavedButton);
+            SaveSettingsButton.Enabled = false;
+            CreateScoreButton.Enabled = false;
+        }    
+        private void OkayToSaveButton_Click(object sender, EventArgs e)
+        {
+            _rff.SetSettingsCanBeSaved(this, OkayToSaveButton);
+            SaveSettingsButton.Enabled = true;
+            CreateScoreButton.Enabled = false;
+        }
+        public void SetSettingsHaveBeenSaved()
+        {
+            _rff.SetIsSaved(this, OkayToSaveButton, RevertToSavedButton);
+            SaveSettingsButton.Enabled = false;
+            CreateScoreButton.Enabled = true;
+        }
+
+        private void RevertToSavedButton_Click(object sender, EventArgs e)
+        {
+            Debug.Assert(this.Text.EndsWith(_rff.NeedsReviewStr) || this.Text.EndsWith(_rff.ChangedAndCheckedStr));
+            DialogResult result =
+                MessageBox.Show("Are you sure you want to revert the notation and krystals to the saved version?\n\n" +
+                                "    Note that this does not revert the following forms:\n" +
+                                "        Page Dimensions and Metadata, Palettes, Ornament settings\n" +
+                                "    These must be reverted individually.",
+                                "Revert?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
+
+            if(result == System.Windows.Forms.DialogResult.Yes)
+            {
+                SetStandardChordsOptionsPanel(SavedChordSymbolType);
+
+                MinimumCrotchetDurationTextBox.Text = SavedMinimumCrotchetDurationTextBoxText;
+
+                SetBeamsCrossBarlinesCheckBoxChecked(SavedBeamsCrossBarlines);
+                SetStafflineStemStrokeWidth(SavedStafflineStemStrokeWidth);
+                SetGapPixelsComboBox(SavedGap);
+
+                MinimumGapsBetweenStavesTextBox.Text = SavedMinimumGapsBetweenStavesTextBoxText;
+                MinimumGapsBetweenSystemsTextBox.Text = SavedMinimumGapsBetweenSystemsTextBoxText;
+                OutputVoiceIndicesStaffTextBox.Text = SavedOutputVoiceIndicesStaffTextBoxText;
+                InputVoiceIndicesPerStaffTextBox.Text = SavedInputVoiceIndicesPerStaffTextBoxText;
+                ClefsPerStaffTextBox.Text = SavedClefsPerStaffTextBoxText;
+                StafflinesPerStaffTextBox.Text = SavedStafflinesPerStaffTextBoxText;
+                StaffGroupsTextBox.Text = SavedStaffGroupsTextBoxText;
+                LongStaffNamesTextBox.Text = SavedLongStaffNamesTextBoxText;
+                ShortStaffNamesTextBox.Text = SavedShortStaffNamesTextBoxText;
+                SystemStartBarsTextBox.Text = SavedSystemStartBarsTextBoxText;
+
+                TouchAllTextBoxes();
+
+                KrystalsListBox.Items.Clear();
+                foreach(string krystalName in SavedKrystalNames)
+                {
+                    Krystal krystal = GetKrystal(krystalName);
+                    this.KrystalsListBox.Items.Add(krystal);
+                }
+
+                SetSettingsHaveBeenSaved();
+            }
+        }
+        #endregion
 
         private void SetDefaultVoiceIndicesPerStaff(int nVoices)
         {
@@ -187,18 +282,32 @@ namespace Moritz.Composer
             textBoxes.Add(MinimumGapsBetweenSystemsTextBox);
             textBoxes.Add(MinimumCrotchetDurationTextBox);
  
-            textBoxes.Add(this.OutputVoiceIndicesStaffTextBox);
-            textBoxes.Add(this.InputVoiceIndicesPerStaffTextBox);  
-            textBoxes.Add(this.ClefsPerStaffTextBox);
-            textBoxes.Add(this.StafflinesPerStaffTextBox);
-            textBoxes.Add(this.StaffGroupsTextBox);
+            textBoxes.Add(OutputVoiceIndicesStaffTextBox);
+            textBoxes.Add(InputVoiceIndicesPerStaffTextBox);  
+            textBoxes.Add(ClefsPerStaffTextBox);
+            textBoxes.Add(StafflinesPerStaffTextBox);
+            textBoxes.Add(StaffGroupsTextBox);
 
        
-            textBoxes.Add(this.LongStaffNamesTextBox);
-            textBoxes.Add(this.ShortStaffNamesTextBox);
+            textBoxes.Add(LongStaffNamesTextBox);
+            textBoxes.Add(ShortStaffNamesTextBox);
 
             textBoxes.Add(SystemStartBarsTextBox);
             return textBoxes;
+        }
+        private void TouchAllTextBoxes()
+        {
+            MinimumGapsBetweenStavesTextBox_TextChanged(MinimumGapsBetweenStavesTextBox, null);
+            MinimumGapsBetweenSystemsTextBox_TextChanged(MinimumGapsBetweenSystemsTextBox, null);
+            MinimumCrotchetDurationTextBox_TextChanged(MinimumCrotchetDurationTextBox, null);
+            OutputVoiceIndicesStaffTextBox_TextChanged(OutputVoiceIndicesStaffTextBox, null);
+            InputVoiceIndicesPerStaffTextBox_TextChanged(InputVoiceIndicesPerStaffTextBox, null);
+            ClefsPerStaffTextBox_TextChanged(ClefsPerStaffTextBox, null);
+            StafflinesPerStaffTextBox_TextChanged(StafflinesPerStaffTextBox, null);
+            StaffGroupsTextBox_TextChanged(StaffGroupsTextBox, null);
+            LongStaffNamesTextBox_TextChanged(LongStaffNamesTextBox, null);
+            ShortStaffNamesTextBox_TextChanged(ShortStaffNamesTextBox, null);
+            SystemStartBarsTextBox_TextChanged(SystemStartBarsTextBox, null);
         }
         private void SetDefaultValues()
         {
@@ -210,34 +319,6 @@ namespace Moritz.Composer
 
             KrystalsListBox.Items.Clear();
             PalettesListBox.Items.Clear();
-        }
-
-        private void SetSaveAndCreateButtons(bool saveButtonEnabled)
-        {
-            this.SaveSettingsButton.Enabled = saveButtonEnabled;
-            CreateScoreButton.Enabled = !saveButtonEnabled;
-        }
-
-        public void SetSettingsHaveChanged()
-        {
-            if(SettingsHaveBeenSaved())
-            {
-                this.Text = _scoreTitle + " algorithm*";
-                SetSaveAndCreateButtons(true);
-            }
-        }
-        public void SetSettingsHaveBeenSaved()
-        {
-            if(!SettingsHaveBeenSaved())
-            {
-                this.Text = _scoreTitle + " algorithm";
-                SetSaveAndCreateButtons(false);
-            }
-        }
-
-        private bool SettingsHaveBeenSaved()
-        {
-            return SaveSettingsButton.Enabled == false;
         }
 
         private bool InputValueErrors()
@@ -273,42 +354,7 @@ namespace Moritz.Composer
             return error;
         }
 
-        #region form events
-        private void DeselectAll()
-        {
-            bool settingsHaveBeenSaved = Text[Text.Length - 1] != '*';
 
-            DeselectAllKrystalListBoxItems();
-            DeselectAllKrystalPalettesListBoxItems();
-            this.Focus(); // deletes the dotted frame around the last selected item.
-
-            if(settingsHaveBeenSaved)
-                SetSettingsHaveBeenSaved();
-            else
-                SetSettingsHaveChanged();
-        }
-
-        private void DeselectAllKrystalListBoxItems()
-        {
-            for(int i = 0; i < KrystalsListBox.Items.Count; i++)
-            {
-                KrystalsListBox.SetSelected(i, false);
-            }
-            RemoveSelectedKrystalButton.Enabled = false;
-        }
-
-        private void DeselectAllKrystalPalettesListBoxItems()
-        {
-            for(int i = 0; i < PalettesListBox.Items.Count; i++)
-            {
-                PalettesListBox.SetSelected(i, false);
-            }
-            DeleteSelectedPaletteButton.Enabled = false;
-            ShowSelectedPaletteButton.Enabled = false;
-        }
-
-
-        #endregion form events
         #region buttons
         private void EnableBasicControls()
         {
@@ -366,7 +412,6 @@ namespace Moritz.Composer
         private void GetNotation(XmlReader r)
         {
             Debug.Assert(r.Name == "notation");
-            int item = 0;
             int count = r.AttributeCount;
             for(int i = 0; i < count; i++)
             {
@@ -374,71 +419,125 @@ namespace Moritz.Composer
                 switch(r.Name)
                 {
                     case "chordSymbolType":
-                        this.ChordTypeComboBox.SelectedItem = r.Value;
-                        StandardChordsOptionsPanel.Visible = false;
-                        switch(r.Value)
-                        {
-                            case "standard":
-                                StandardChordsOptionsPanel.Visible = true;
-                                break;
-                            case "study2b2":
-                                break;
-                        }
+                        SavedChordSymbolType = r.Value;
+                        SetStandardChordsOptionsPanel(r.Value);
                         break;
                     case "minimumCrotchetDuration":
                         MinimumCrotchetDurationTextBox.Text = r.Value;
+                        SavedMinimumCrotchetDurationTextBoxText = MinimumCrotchetDurationTextBox.Text;
                         break;
                     case "beamsCrossBarlines":
-                        if(r.Value == "true")
-                            BeamsCrossBarlinesCheckBox.Checked = true;
-                        else
-                            BeamsCrossBarlinesCheckBox.Checked = false;
+                        SavedBeamsCrossBarlines = r.Value;
+                        SetBeamsCrossBarlinesCheckBoxChecked(r.Value);
                         break;
                     case "stafflineStemStrokeWidth":
-                        item = 0;
-                        do
-                        {
-                            StafflineStemStrokeWidthComboBox.SelectedIndex = item++;
-                        } while(r.Value != StafflineStemStrokeWidthComboBox.SelectedItem.ToString());
+                        SavedStafflineStemStrokeWidth = r.Value;
+                        SetStafflineStemStrokeWidth(r.Value);
                         break;
                     case "gap":
-                        item = 0;
-                        do
-                        {
-                            GapPixelsComboBox.SelectedIndex = item++;
-                        } while(r.Value != GapPixelsComboBox.SelectedItem.ToString());
+                        SavedGap = r.Value;
+                        SetGapPixelsComboBox(r.Value);
                         break;
                     case "minGapsBetweenStaves":
                         MinimumGapsBetweenStavesTextBox.Text = r.Value;
+                        SavedMinimumGapsBetweenStavesTextBoxText = MinimumGapsBetweenStavesTextBox.Text;
                         break;
                     case "minGapsBetweenSystems":
                         MinimumGapsBetweenSystemsTextBox.Text = r.Value;
+                        SavedMinimumGapsBetweenSystemsTextBoxText = MinimumGapsBetweenSystemsTextBox.Text;
                         break;
                     case "outputVoicesPerVoicePerStaff":
                         OutputVoiceIndicesStaffTextBox.Text = r.Value;
+                        SavedOutputVoiceIndicesStaffTextBoxText = OutputVoiceIndicesStaffTextBox.Text;
                         break;
                     case "inputVoicesPerVoicePerStaff":
                         InputVoiceIndicesPerStaffTextBox.Text = r.Value;
+                        SavedInputVoiceIndicesPerStaffTextBoxText = InputVoiceIndicesPerStaffTextBox.Text;
                         break;
                     case "clefsPerStaff":
                         ClefsPerStaffTextBox.Text = r.Value;
+                        SavedClefsPerStaffTextBoxText = ClefsPerStaffTextBox.Text;
                         break;
                     case "stafflinesPerStaff":
                         StafflinesPerStaffTextBox.Text = r.Value;
+                        SavedStafflinesPerStaffTextBoxText = StafflinesPerStaffTextBox.Text;
                         break;
                     case "staffGroups":
                         StaffGroupsTextBox.Text = r.Value;
+                        SavedStaffGroupsTextBoxText = StaffGroupsTextBox.Text;
                         break;
                     case "longStaffNames":
                         LongStaffNamesTextBox.Text = r.Value;
+                        SavedLongStaffNamesTextBoxText = LongStaffNamesTextBox.Text;
                         break;
                     case "shortStaffNames":
                         ShortStaffNamesTextBox.Text = r.Value;
+                        SavedShortStaffNamesTextBoxText = ShortStaffNamesTextBox.Text;
                         break;
                     case "systemStartBars":
                         SystemStartBarsTextBox.Text = r.Value;
+                        SavedSystemStartBarsTextBoxText = SystemStartBarsTextBox.Text;
                         break;
                 }
+            }
+        }
+
+        #region saved for reverting
+        private string SavedChordSymbolType;
+        private string SavedMinimumCrotchetDurationTextBoxText;
+        private string SavedBeamsCrossBarlines;
+        private string SavedStafflineStemStrokeWidth;
+        private string SavedGap;
+        private string SavedMinimumGapsBetweenStavesTextBoxText;
+        private string SavedMinimumGapsBetweenSystemsTextBoxText;
+        private string SavedOutputVoiceIndicesStaffTextBoxText;
+        private string SavedInputVoiceIndicesPerStaffTextBoxText;
+        private string SavedClefsPerStaffTextBoxText;
+        private string SavedStafflinesPerStaffTextBoxText;
+        private string SavedStaffGroupsTextBoxText;
+        private string SavedLongStaffNamesTextBoxText;
+        private string SavedShortStaffNamesTextBoxText;
+        private string SavedSystemStartBarsTextBoxText;
+        private List<string> SavedKrystalNames = new List<string>();
+        #endregion
+
+        private void SetGapPixelsComboBox(string value)
+        {
+            int item = 0;
+            do
+            {
+                GapPixelsComboBox.SelectedIndex = item++;
+            } while(value != GapPixelsComboBox.SelectedItem.ToString());
+        }
+
+        private void SetStafflineStemStrokeWidth(string value)
+        {
+            int item = 0;
+            do
+            {
+                StafflineStemStrokeWidthComboBox.SelectedIndex = item++;
+            } while(value != StafflineStemStrokeWidthComboBox.SelectedItem.ToString());
+        }
+
+        private void SetBeamsCrossBarlinesCheckBoxChecked(string value)
+        {
+            if(value == "true")
+                BeamsCrossBarlinesCheckBox.Checked = true;
+            else
+                BeamsCrossBarlinesCheckBox.Checked = false;
+        }
+
+        private void SetStandardChordsOptionsPanel(string value)
+        {
+            ChordTypeComboBox.SelectedItem = value;
+            StandardChordsOptionsPanel.Visible = false;
+            switch(value)
+            {
+                case "standard":
+                    StandardChordsOptionsPanel.Visible = true;
+                    break;
+                case "study2b2":
+                    break;
             }
         }
 
@@ -474,12 +573,14 @@ namespace Moritz.Composer
                 {
                     r.MoveToAttribute(0);
                     string krystalName = r.Value;
+                    SavedKrystalNames.Add(krystalName);
                     Krystal krystal = GetKrystal(krystalName);
                     this.KrystalsListBox.Items.Add(krystal);
                 }
                 M.ReadToXmlElementTag(r, "krystal", "krystals");
             }
         }
+
         private Krystal GetKrystal(string krystalFileName)
         {
             Krystal krystal = null;
@@ -885,65 +986,11 @@ namespace Moritz.Composer
         }
 
         #endregion buttons
-        #region text box events
-        private void SystemStartBarsTextBox_Leave(object sender, EventArgs e)
-        {
-            SetSettingsHaveChanged();
-            // Passing uint.MaxValue means that the list can have any number of values (including none).
-            M.LeaveIntRangeTextBox(SystemStartBarsTextBox, true, uint.MaxValue, 1, int.MaxValue, SetTextBoxState);
-            if((SystemStartBarsTextBox.BackColor != M.TextBoxErrorColor)
-            && (SystemStartBarsTextBox.Text.Length > 0))
-            {
-                SystemStartBarsTextBox.Text = NormalizedSystemStartBars();
-            }
-        }
-        /// <summary>
-        /// This function sorts the start bars into ascending order, and silently removes duplicates.
-        /// </summary>
-        /// <returns></returns>
-        private string NormalizedSystemStartBars()
-        {
-            Debug.Assert(SystemStartBarsTextBox.Text.Length > 0);
-            List<int> startBars = M.StringToIntList(SystemStartBarsTextBox.Text, ',');
-            StringBuilder sb = new StringBuilder();
-            startBars.Sort();
 
-            if(startBars.Count > 1)
-            {   // remove duplicates
-                int currentStartBar = startBars[startBars.Count - 1];
-                for(int i = startBars.Count - 2; i >= 0; --i)
-                {
-                    if(startBars[i] == currentStartBar)
-                        startBars.RemoveAt(i);
-                    else
-                        currentStartBar = startBars[i];
-                }
-                if(startBars[0] != 1 || startBars[startBars.Count - 1] > _algorithm.NumberOfBars)
-                    SetTextBoxState(SystemStartBarsTextBox, false);
-                else
-                    SetTextBoxState(SystemStartBarsTextBox, true);
-            }
 
-            foreach(int val in startBars)
-            {
-                sb.Append(", ");
-                sb.Append(val.ToString());
-            }
-            sb.Remove(0, 2);
-            return sb.ToString();
-        }
-
-        private void SetTextBoxState(TextBox textBox, bool okay)
-        {
-            if(okay)
-                textBox.BackColor = Color.White;
-            else
-                textBox.BackColor = M.TextBoxErrorColor;
-        }
-        #endregion text box events
         private void BeamsCrossBarlinesCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveChanged();
+            SetSettingsNeedReview();
         }
         #region list box events and functions
         private void KrystalsListBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -1028,8 +1075,7 @@ namespace Moritz.Composer
                 string staffKrystalPath = M.Preferences.LocalMoritzKrystalsFolder + @"\" + newKrystal.Name;
                 Krystal krystal = K.LoadKrystal(staffKrystalPath);
                 this.KrystalsListBox.Items.Add(krystal);
-
-                SetSettingsHaveChanged();
+                SetSettingsNeedReview();
 
                 KrystalsListBox.SetSelected(KrystalsListBox.Items.Count - 1, true); // triggers KrystalsListBox_SelectedIndexChanged()
             }
@@ -1062,15 +1108,7 @@ namespace Moritz.Composer
                 if(proceed == DialogResult.Yes)
                 {
                     KrystalsListBox.Items.RemoveAt(KrystalsListBox.SelectedIndex);
-
-                    if(AllKrystals.Count > 0)
-                    {
-                        SetSettingsHaveChanged();
-                    }
-                    else
-                    {
-                        SetSettingsHaveBeenSaved();
-                    }
+                    SetSettingsNeedReview();
                 }
             }
         }
@@ -1183,7 +1221,7 @@ namespace Moritz.Composer
                     currentPaletteForms.Add(paletteForm);
                     CurrentPaletteForms = currentPaletteForms;
                     PalettesListBox.SelectedIndex = PalettesListBox.Items.Count - 1;
-                    this.SetSettingsHaveChanged();
+                    this.SetSettingsNeedReview();
                 }
                 else
                 {
@@ -1210,7 +1248,7 @@ namespace Moritz.Composer
                     currentPaletteForms[selectedIndex].Close();
                     currentPaletteForms.RemoveAt(selectedIndex);
                     CurrentPaletteForms = currentPaletteForms;
-                    this.SetSettingsHaveChanged();
+                    this.SetSettingsNeedReview();
                     UpdateForChangedPaletteList();
                 }
             }
@@ -1261,28 +1299,7 @@ namespace Moritz.Composer
         const int _minimumMsDuration = 5;
         #endregion private variables
 
-        #region page format controls
-
-
-        private void StafflineStemStrokeWidthComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            SetSettingsHaveChanged();
-        }
-        private void GapPixelsComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            SetSettingsHaveChanged();
-        }
-        private void MinimumGapsBetweenStavesTextBox_TextChanged(object sender, EventArgs e)
-        {
-            CheckTextBoxIsUInt(this.MinimumGapsBetweenStavesTextBox);
-            SetSettingsHaveChanged();
-        }
-        private void MinimumGapsBetweenSystemsTextBox_TextChanged(object sender, EventArgs e)
-        {
-            CheckTextBoxIsUInt(this.MinimumGapsBetweenSystemsTextBox);
-            SetSettingsHaveChanged();
-        }
-
+        #region SelectedIndexChanged events
         private void ScoreComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             _dimensionsAndMetadataForm.Hide();
@@ -1301,6 +1318,23 @@ namespace Moritz.Composer
 
             GetSelectedSettings(_settingsPath, _algorithm);
         }
+        private void ChordTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            this.StandardChordsOptionsPanel.Visible = false;
+            if(((string)ChordTypeComboBox.SelectedItem) == "standard")
+                this.StandardChordsOptionsPanel.Visible = true;
+
+            this.OutputVoiceIndicesStaffTextBox_Leave(null, null);
+            SetSettingsNeedReview();
+        }
+        private void StafflineStemStrokeWidthComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SetSettingsNeedReview();
+        }
+        private void GapPixelsComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SetSettingsNeedReview();
+        }
 
         private void GetSelectedSettings(string settingsPath, CompositionAlgorithm algorithm)
         {
@@ -1313,37 +1347,6 @@ namespace Moritz.Composer
             OutputVoiceIndicesStaffTextBox_Leave(null, null); // sets _numberOfOutputStaves _numberOfStaves
             InputVoiceIndicesPerStaffTextBox_Leave(null, null); // sets _numberOfInputStaves, _numberOfStaves
             SetSettingsHaveBeenSaved();
-        }
-
-        private void ChordTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            this.StandardChordsOptionsPanel.Visible = false;
-            if(((string)ChordTypeComboBox.SelectedItem) == "standard")
-                this.StandardChordsOptionsPanel.Visible = true;
-
-            this.OutputVoiceIndicesStaffTextBox_Leave(null, null);
-            SetSettingsHaveChanged();
-        }
-
-        private void MinimumCrotchetDurationTextBox_TextChanged(object sender, EventArgs e)
-        {
-            CheckTextBoxIsUInt(this.MinimumCrotchetDurationTextBox);
-            SetSettingsHaveChanged();
-        }
-        private void CheckTextBoxIsUInt(TextBox textBox)
-        {
-            bool okay = true;
-            textBox.Text.Trim();
-            try
-            {
-                uint i = uint.Parse(textBox.Text);
-            }
-            catch
-            {
-                okay = false;
-            }
-
-            M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
         }
 
         private void VoiceIndicesPerStaffHelp_MouseClick(object sender, MouseEventArgs e)
@@ -1538,6 +1541,37 @@ namespace Moritz.Composer
         }
         #endregion
 
+
+        #endregion page format controls
+        #region TextBox Leave events
+        private void CheckTextBoxIsUInt(TextBox textBox)
+        {
+            bool okay = true;
+            textBox.Text.Trim();
+            try
+            {
+                uint i = uint.Parse(textBox.Text);
+            }
+            catch
+            {
+                okay = false;
+            }
+
+            M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
+            SetSettingsNeedReview();
+        }
+        private void MinimumCrotchetDurationTextBox_Leave(object sender, EventArgs e)
+        {
+            CheckTextBoxIsUInt(this.MinimumCrotchetDurationTextBox);
+        }
+        private void MinimumGapsBetweenStavesTextBox_Leave(object sender, EventArgs e)
+        {
+            CheckTextBoxIsUInt(this.MinimumGapsBetweenStavesTextBox);
+        }
+        private void MinimumGapsBetweenSystemsTextBox_Leave(object sender, EventArgs e)
+        {
+            CheckTextBoxIsUInt(this.MinimumGapsBetweenSystemsTextBox);
+        }
         /// <summary>
         /// This function sets _numberOfOutputStaves (and consequetially _numberOfStaves).
         /// It also sets _staffIsInput.
@@ -1545,12 +1579,10 @@ namespace Moritz.Composer
         /// </summary>
         private void OutputVoiceIndicesStaffTextBox_Leave(object sender, EventArgs e)
         {
-            SetSettingsHaveChanged();
             EnableStaffDependentControls(false);
 
             bool error = false;
             List<List<byte>> byteLists = new List<List<byte>>();
-
             try
             {
                 byteLists = M.StringToByteLists(OutputVoiceIndicesStaffTextBox.Text);
@@ -1561,7 +1593,7 @@ namespace Moritz.Composer
             }
 
             if(byteLists.Count == 0)
-                    error = true;
+                error = true;
 
             if(!error)
             {
@@ -1589,24 +1621,23 @@ namespace Moritz.Composer
 
             if(error)
             {
-                SetTextBoxState(OutputVoiceIndicesStaffTextBox, false);
+                M.SetTextBoxErrorColorIfNotOkay(OutputVoiceIndicesStaffTextBox, false);
             }
             else
             {
                 _outputVoiceIndicesPerStaff = byteLists;
                 EnableStaffDependentControls(true);
                 OutputVoiceIndicesStaffTextBox.Text = NormalizedByteListsString(byteLists);
-                SetTextBoxState(OutputVoiceIndicesStaffTextBox, true);
+                M.SetTextBoxErrorColorIfNotOkay(OutputVoiceIndicesStaffTextBox, true);
             }
+            SetSettingsNeedReview();
         }
-
         /// <summary>
         /// This function sets _numberOfinputStaves (and consequetially _numberOfStaves).
         /// It also sets the help texts on the dialog.
         /// </summary>
         private void InputVoiceIndicesPerStaffTextBox_Leave(object sender, EventArgs e)
         {
-            SetSettingsHaveChanged();
             EnableStaffDependentControls(false);
 
             bool error = false;
@@ -1620,7 +1651,7 @@ namespace Moritz.Composer
             {
                 error = true;
             }
-            
+
             // byteLists.Count==0 (number of staves == 0) is not an error for inputs
             if(byteLists.Count > 0 && !error)
             {
@@ -1646,17 +1677,28 @@ namespace Moritz.Composer
 
             if(error)
             {
-                SetTextBoxState(InputVoiceIndicesPerStaffTextBox, false);
+                M.SetTextBoxErrorColorIfNotOkay(InputVoiceIndicesPerStaffTextBox, false);
             }
             else
             {
                 _inputVoiceIndicesPerStaff = byteLists;
                 EnableStaffDependentControls(true);
                 InputVoiceIndicesPerStaffTextBox.Text = NormalizedByteListsString(byteLists);
-                SetTextBoxState(InputVoiceIndicesPerStaffTextBox, true);
+                M.SetTextBoxErrorColorIfNotOkay(InputVoiceIndicesPerStaffTextBox, true);
             }
+            SetSettingsNeedReview();
         }
-
+        private string NormalizedText(List<string> texts)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach(string text in texts)
+            {
+                sb.Append(", ");
+                sb.Append(text);
+            }
+            sb.Remove(0, 2);
+            return sb.ToString();
+        }
         /// <summary>
         /// This function _uses_ _numberOfStaves.
         /// </summary>
@@ -1677,39 +1719,14 @@ namespace Moritz.Composer
             if(okay && trimmedClefs.Count == _numberOfStaves)
             {
                 ClefsPerStaffTextBox.Text = NormalizedText(trimmedClefs);
-                SetTextBoxState(ClefsPerStaffTextBox, true);
+                M.SetTextBoxErrorColorIfNotOkay(ClefsPerStaffTextBox, true);
                 CheckClefsAndStafflineNumbers();
             }
             else
-                SetTextBoxState(ClefsPerStaffTextBox, false);
-        }
+                M.SetTextBoxErrorColorIfNotOkay(ClefsPerStaffTextBox, false);
 
-        /// <summary>
-        /// This function _uses_ _numberOfStaves.
-        /// </summary>
-        private void StafflinesPerStaffTextBox_Leave(object sender, EventArgs e)
-        {
-            M.LeaveIntRangeTextBox(StafflinesPerStaffTextBox, false, (uint)_numberOfStaves, 1, 127, SetTextBoxState);
-            CheckClefsAndStafflineNumbers();
+            SetSettingsNeedReview();
         }
-
-        /// <summary>
-        /// This function _uses_ _numberOfStaves.
-        /// </summary>
-        private void StaffGroupsTextBox_Leave(object sender, EventArgs e)
-        {
-            M.LeaveIntRangeTextBox(StaffGroupsTextBox, false, uint.MaxValue, 1, 127, SetTextBoxState);
-            if(StaffGroupsTextBox.ForeColor != M.TextBoxErrorColor)
-            {
-                List<byte> bytes = M.StringToByteList(StaffGroupsTextBox.Text, ',');
-                int sum = 0;
-                foreach(byte b in bytes)
-                    sum += (int)b;
-                if(sum != _numberOfStaves)
-                    SetTextBoxState(StaffGroupsTextBox, false);
-            }
-        }
-
         private void CheckClefsAndStafflineNumbers()
         {
             string[] clefs = ClefsPerStaffTextBox.Text.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
@@ -1721,39 +1738,42 @@ namespace Moritz.Composer
                     if(stafflinesArray[i].Trim() != "5")
                     {
                         if(clefs[i].Trim() == "n")
-                            SetTextBoxState(StafflinesPerStaffTextBox, true);
+                            M.SetTextBoxErrorColorIfNotOkay(StafflinesPerStaffTextBox, true);
                         else
-                            SetTextBoxState(StafflinesPerStaffTextBox, false);
+                            M.SetTextBoxErrorColorIfNotOkay(StafflinesPerStaffTextBox, false);
                     }
                 }
             }
             else
             {
-                SetTextBoxState(StafflinesPerStaffTextBox, false);
+                M.SetTextBoxErrorColorIfNotOkay(StafflinesPerStaffTextBox, false);
             }
+            SetSettingsNeedReview();
         }
-
-        private string NormalizedText(List<string> texts)
+        /// <summary>
+        /// This function _uses_ _numberOfStaves.
+        /// </summary>
+        private void StafflinesPerStaffTextBox_Leave(object sender, EventArgs e)
         {
-            StringBuilder sb = new StringBuilder();
-            foreach(string text in texts)
+            M.LeaveIntRangeTextBox(StafflinesPerStaffTextBox, false, (uint)_numberOfStaves, 1, 127, M.SetTextBoxErrorColorIfNotOkay);
+            CheckClefsAndStafflineNumbers();
+        }
+        /// <summary>
+        /// This function _uses_ _numberOfStaves.
+        /// </summary>
+        private void StaffGroupsTextBox_Leave(object sender, EventArgs e)
+        {
+            M.LeaveIntRangeTextBox(StaffGroupsTextBox, false, uint.MaxValue, 1, 127, M.SetTextBoxErrorColorIfNotOkay);
+            if(StaffGroupsTextBox.ForeColor != M.TextBoxErrorColor)
             {
-                sb.Append(", ");
-                sb.Append(text);
+                List<byte> bytes = M.StringToByteList(StaffGroupsTextBox.Text, ',');
+                int sum = 0;
+                foreach(byte b in bytes)
+                    sum += (int)b;
+                if(sum != _numberOfStaves)
+                    M.SetTextBoxErrorColorIfNotOkay(StaffGroupsTextBox, false);
             }
-            sb.Remove(0, 2);
-            return sb.ToString();
-        }
-
-
-
-        private void LongStaffNamesTextBox_Leave(object sender, EventArgs e)
-        {
-            CheckStaffNames(LongStaffNamesTextBox);
-        }
-        private void ShortStaffNamesTextBox_Leave(object sender, EventArgs e)
-        {
-            CheckStaffNames(ShortStaffNamesTextBox);
+            SetSettingsNeedReview();
         }
         private void CheckStaffNames(TextBox textBox)
         {
@@ -1766,67 +1786,118 @@ namespace Moritz.Composer
             if(trimmedNames.Count == _numberOfStaves)
             {
                 textBox.Text = NormalizedText(trimmedNames);
-                SetTextBoxState(textBox, true);
+                M.SetTextBoxErrorColorIfNotOkay(textBox, true);
             }
             else
             {
-                SetTextBoxState(textBox, false);
+                M.SetTextBoxErrorColorIfNotOkay(textBox, false);
             }
+            SetSettingsNeedReview();
         }
-        #endregion page format controls
+        private void LongStaffNamesTextBox_Leave(object sender, EventArgs e)
+        {
+            CheckStaffNames(LongStaffNamesTextBox);
+        }
+        private void ShortStaffNamesTextBox_Leave(object sender, EventArgs e)
+        {
+            CheckStaffNames(ShortStaffNamesTextBox);
+        }
+        /// <summary>
+        /// This function sorts the start bars into ascending order, and silently removes duplicates.
+        /// </summary>
+        /// <returns></returns>
+        private string NormalizedSystemStartBars()
+        {
+            Debug.Assert(SystemStartBarsTextBox.Text.Length > 0);
+            List<int> startBars = M.StringToIntList(SystemStartBarsTextBox.Text, ',');
+            StringBuilder sb = new StringBuilder();
+            startBars.Sort();
 
-        #region set text boxes to white, and unsaved settings
+            if(startBars.Count > 1)
+            {   // remove duplicates
+                int currentStartBar = startBars[startBars.Count - 1];
+                for(int i = startBars.Count - 2; i >= 0; --i)
+                {
+                    if(startBars[i] == currentStartBar)
+                        startBars.RemoveAt(i);
+                    else
+                        currentStartBar = startBars[i];
+                }
+                if(startBars[0] != 1 || startBars[startBars.Count - 1] > _algorithm.NumberOfBars)
+                    M.SetTextBoxErrorColorIfNotOkay(SystemStartBarsTextBox, false);
+                else
+                    M.SetTextBoxErrorColorIfNotOkay(SystemStartBarsTextBox, true);
+            }
+
+            foreach(int val in startBars)
+            {
+                sb.Append(", ");
+                sb.Append(val.ToString());
+            }
+            sb.Remove(0, 2);
+            return sb.ToString();
+        }
+        private void SystemStartBarsTextBox_Leave(object sender, EventArgs e)
+        {
+            // Passing uint.MaxValue means that the list can have any number of values (including none).
+            M.LeaveIntRangeTextBox(SystemStartBarsTextBox, true, uint.MaxValue, 1, int.MaxValue, M.SetTextBoxErrorColorIfNotOkay);
+            if((SystemStartBarsTextBox.BackColor != M.TextBoxErrorColor)
+            && (SystemStartBarsTextBox.Text.Length > 0))
+            {
+                SystemStartBarsTextBox.Text = NormalizedSystemStartBars();
+            }
+            SetSettingsNeedReview();
+        }
+        #endregion  TextBox Leave events
+        #region TextChanged events (just set text boxes to white)
+        private void MinimumCrotchetDurationTextBox_TextChanged(object sender, EventArgs e)
+        {
+            M.SetToWhite(sender as TextBox);
+        }
+        private void MinimumGapsBetweenStavesTextBox_TextChanged(object sender, EventArgs e)
+        {
+            M.SetToWhite(sender as TextBox);
+        }
+        private void MinimumGapsBetweenSystemsTextBox_TextChanged(object sender, EventArgs e)
+        {
+            M.SetToWhite(sender as TextBox);
+        }
         private void OutputVoiceIndicesStaffTextBox_TextChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveChanged();
             M.SetToWhite(OutputVoiceIndicesStaffTextBox);
         }
-
         private void InputVoiceIndicesPerStaffTextBox_TextChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveChanged();
             M.SetToWhite(InputVoiceIndicesPerStaffTextBox);
         }
-
-
         private void ClefsPerStaffTextBox_TextChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveChanged();
             M.SetToWhite(ClefsPerStaffTextBox);
         }
-
         private void StafflinesPerStaffTextBox_TextChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveChanged();
             M.SetToWhite(StafflinesPerStaffTextBox);
         }
-
         private void StaffGroupsTextBox_TextChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveChanged();
             M.SetToWhite(StaffGroupsTextBox);
         }
-
         private void LongStaffNamesTextBox_TextChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveChanged();
             M.SetToWhite(LongStaffNamesTextBox);
         }
-
         private void ShortStaffNamesTextBox_TextChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveChanged();
             M.SetToWhite(ShortStaffNamesTextBox);
         }
-
         private void SystemStartBarsTextBox_TextChanged(object sender, EventArgs e)
         {
-            SetSettingsHaveChanged();
             M.SetToWhite(SystemStartBarsTextBox);
         }
         #endregion
 
         private List<TextBox> _allTextBoxes = null;
+        private RevertableFormFunctions _rff = new RevertableFormFunctions();
         private IMoritzForm1 _moritzForm1;
         private Moritz.Krystals.KrystalBrowser _krystalBrowser = null;
         private DimensionsAndMetadataForm _dimensionsAndMetadataForm;

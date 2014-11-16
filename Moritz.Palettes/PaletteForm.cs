@@ -882,11 +882,11 @@ namespace Moritz.Palettes
         }
 
         /// <summary>
-        /// Returne false if
-        ///     (count != -1 && intList.Count != count)
+        /// Returns false if
+        ///     count is not -1 and intList.Count is not count
         ///     or any value is less than minVal, 
-        ///     or any value is greater than maxval.
-        /// Passing count=-1 to ignore the count parameter.
+        ///     or any value is greater than maxVal.
+        /// Use count=-1 to ignore the count parameter.
         /// </summary>
         private bool CheckIntList(List<int> intList, int count, int minVal, int maxVal)
         {
