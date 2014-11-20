@@ -20,14 +20,9 @@ namespace Moritz.Composer
 
             bool success = CreateScore(krystals, palettes);
 
-
-
             if(success == false)
-
             {
-
                 this.Systems.Clear();
-
             }
         }
     }
