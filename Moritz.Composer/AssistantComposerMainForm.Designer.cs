@@ -98,7 +98,7 @@ namespace Moritz.Composer
             this.PalettesGroupBox = new System.Windows.Forms.GroupBox();
             this.RevertPalettesButton = new System.Windows.Forms.Button();
             this.OkayToSavePalettesButton = new System.Windows.Forms.Button();
-            this.RevertCompletelyButton = new System.Windows.Forms.Button();
+            this.RevertEverythingButton = new System.Windows.Forms.Button();
             this.ShowUncheckedFormsButton = new System.Windows.Forms.Button();
             this.ShowCheckedFormsButton = new System.Windows.Forms.Button();
             this.NotationGroupBox.SuspendLayout();
@@ -928,18 +928,18 @@ namespace Moritz.Composer
             this.OkayToSavePalettesButton.UseVisualStyleBackColor = true;
             this.OkayToSavePalettesButton.Click += new System.EventHandler(this.OkayToSavePalettesButton_Click);
             // 
-            // RevertCompletelyButton
+            // RevertEverythingButton
             // 
-            this.RevertCompletelyButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.RevertCompletelyButton.Enabled = false;
-            this.RevertCompletelyButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.RevertCompletelyButton.Location = new System.Drawing.Point(371, 575);
-            this.RevertCompletelyButton.Name = "RevertCompletelyButton";
-            this.RevertCompletelyButton.Size = new System.Drawing.Size(143, 26);
-            this.RevertCompletelyButton.TabIndex = 152;
-            this.RevertCompletelyButton.Text = "revert completely";
-            this.RevertCompletelyButton.UseVisualStyleBackColor = true;
-            this.RevertCompletelyButton.Click += new System.EventHandler(this.RevertCompletelyButton_Click);
+            this.RevertEverythingButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.RevertEverythingButton.Enabled = false;
+            this.RevertEverythingButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.RevertEverythingButton.Location = new System.Drawing.Point(371, 575);
+            this.RevertEverythingButton.Name = "RevertCompletelyButton";
+            this.RevertEverythingButton.Size = new System.Drawing.Size(143, 26);
+            this.RevertEverythingButton.TabIndex = 152;
+            this.RevertEverythingButton.Text = "revert everything";
+            this.RevertEverythingButton.UseVisualStyleBackColor = true;
+            this.RevertEverythingButton.Click += new System.EventHandler(this.RevertEverythingButton_Click);
             // 
             // ShowUncheckedFormsButton
             // 
@@ -976,7 +976,7 @@ namespace Moritz.Composer
             this.ControlBox = false;
             this.Controls.Add(this.ShowCheckedFormsButton);
             this.Controls.Add(this.ShowUncheckedFormsButton);
-            this.Controls.Add(this.RevertCompletelyButton);
+            this.Controls.Add(this.RevertEverythingButton);
             this.Controls.Add(this.PalettesGroupBox);
             this.Controls.Add(this.KrystalsGroupBox);
             this.Controls.Add(this.DimensionsAndMetadataButton);
@@ -1067,7 +1067,7 @@ namespace Moritz.Composer
         private System.Windows.Forms.Label InputVoiceIndicesPerStaffHelpLabel;
         private System.Windows.Forms.Label InputVoiceIndicesPerStaffLabel;
         private System.Windows.Forms.TextBox InputVoiceIndicesPerStaffTextBox;
-        private System.Windows.Forms.Button RevertCompletelyButton;
+        private System.Windows.Forms.Button RevertEverythingButton;
         private System.Windows.Forms.Button ShowUncheckedFormsButton;
         private System.Windows.Forms.Button ShowCheckedFormsButton;
         private System.Windows.Forms.Button OkayToSaveKrystalsButton;

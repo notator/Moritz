@@ -113,18 +113,21 @@ namespace Moritz.Composer
             _rff.SetSettingsNeedReview(this, OkayToSaveNotationButton, RevertNotationToSavedButton);
             SaveSettingsCreateScoreButton.Enabled = false;
             notationPanelNeedsReview = true;
+            RevertEverythingButton.Enabled = true;
         }
         private void SetKrystalsNeedReview()
         {
             _rff.SetSettingsNeedReview(this, OkayToSaveKrystalsButton, RevertKrystalsToSavedButton);
             SaveSettingsCreateScoreButton.Enabled = false;
             krystalsPanelNeedsReview = true;
+            RevertEverythingButton.Enabled = true;
         }
         private void SetPalettesNeedReview()
         {
             _rff.SetSettingsNeedReview(this, OkayToSavePalettesButton, RevertPalettesButton);
             SaveSettingsCreateScoreButton.Enabled = false;
             palettesPanelNeedsReview = true;
+            RevertEverythingButton.Enabled = true;
         }
 
         private void SetThisTextToNeedsReview()
@@ -191,6 +194,7 @@ namespace Moritz.Composer
             SetNotationHasBeenReverted();
             SetKrystalsHaveBeenReverted();
             SetPalettesHaveBeenReverted();
+            RevertEverythingButton.Enabled = false;
         }
         private void SetNotationHasBeenReverted()
         {
@@ -304,14 +308,24 @@ namespace Moritz.Composer
                 MessageBox.Show(msg, "Error reading krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private void RevertCompletelyButton_Click(object sender, EventArgs e)
+        private void RevertEverythingButton_Click(object sender, EventArgs e)
         {
             DialogResult result =
             MessageBox.Show("Are you sure you want to close all dependent forms and revert their settings to the saved version?",
                     "Revert?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
 
-            throw new NotImplementedException();
+            if(result == System.Windows.Forms.DialogResult.Yes)
+            {
+                _dimensionsAndMetadataForm.Close();
+                _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this);
 
+                foreach(PaletteForm paletteForm in PalettesListBox.Items)
+                {
+                    paletteForm.Close();
+                }
+
+                LoadSettings(); // clears existing settings
+            }
         }
         #endregion
 
@@ -591,7 +605,7 @@ namespace Moritz.Composer
             }
         }
 
-        #region saved for reverting
+        #region saved for reverting notation panel
         private string SavedChordSymbolType;
         private string SavedMinimumCrotchetDurationTextBoxText;
         private string SavedBeamsCrossBarlines;
@@ -1511,7 +1525,7 @@ namespace Moritz.Composer
             OutputVoiceIndicesStaffTextBox_Leave(null, null); // sets _numberOfOutputStaves _numberOfStaves
             InputVoiceIndicesPerStaffTextBox_Leave(null, null); // sets _numberOfInputStaves, _numberOfStaves
 
-            SetNotationHasBeenReverted();
+            SetAllSettingsHaveBeenReverted();
         }
 
         private void VoiceIndicesPerStaffHelp_MouseClick(object sender, MouseEventArgs e)
