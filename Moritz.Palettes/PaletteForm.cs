@@ -19,6 +19,7 @@ namespace Moritz.Palettes
             ReadPalette(r);
             this.PercussionCheckBox.Checked = isPercussionPalette;
             this.ModulationWheelEnvelopesLabel.Focus();
+            _rff.SetSettingsAreSaved(this, false, ConfirmButton, RevertToSavedButton); // do this again!
         }
         /// <summary>
         /// Creates a new, empty PalettesForm with help texts adjusted for the given domain.
@@ -28,11 +29,9 @@ namespace Moritz.Palettes
         public PaletteForm(string name, int domain, ComposerFormCallbacks mainFormCallbacks)
         {
             InitializeComponent();
-            _name = name;
+            Text = name;
             _domain = domain;
             _callbacks = mainFormCallbacks;
-
-            Text = name;
 
             ConnectBasicChordControl();
             if(M.Preferences.CurrentMultimediaMidiOutputDevice != null)
@@ -44,8 +43,7 @@ namespace Moritz.Palettes
 
             SetDialogForDomain(domain);
 
-            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
-
+            _rff.SetSettingsAreSaved(this, false, ConfirmButton, RevertToSavedButton); // do this *again* in the above ctor!
         }
 
         public void ShowPaletteChordForm(int midiChordIndex)
@@ -111,11 +109,6 @@ namespace Moritz.Palettes
             _paletteButtonsControl.TabIndex = 18;
         }
 
-        public static string NewPaletteName(int paletteNumber, int domain)
-        {
-            return "palette " + paletteNumber.ToString() + "  [domain " + domain.ToString() + " ]";
-        }
-
         /// <summary>
         /// Can be called by OrnamentSettingsForm when clearing the ornament settings.
         /// </summary>
@@ -128,7 +121,7 @@ namespace Moritz.Palettes
             }
 
             _ornamentSettingsForm = new OrnamentSettingsForm(this);
-            _rff.SetSettingsNeedReview(_ornamentSettingsForm, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
+            _rff.SetSettingsNeedReview(_ornamentSettingsForm, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
 
             _ornamentSettingsForm.Show();
 
@@ -312,9 +305,9 @@ namespace Moritz.Palettes
             }
         }
 
-        private void OkayToSaveButton_Click(object sender, EventArgs e)
+        private void ConfirmButton_Click(object sender, EventArgs e)
         {
-            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton); 
+            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), ConfirmButton); 
         }
 
         private void RevertToSavedButton_Click(object sender, EventArgs e)
@@ -341,7 +334,7 @@ namespace Moritz.Palettes
 
                 TouchAllTextBoxes();
 
-                _rff.SetIsSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
+                _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
             }
         }
 
@@ -960,16 +953,15 @@ namespace Moritz.Palettes
 
         public void SetSettingsHaveChanged()
         {
-            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
+            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
 
         #endregion ReviewableForm
         #region paletteForm
         public override string ToString()
         {
-            return this._name;
+            return this.Text;
         }
-
 
         /// <summary>
         /// Returns false if the file already exists and the user cancels the save.
@@ -978,7 +970,7 @@ namespace Moritz.Palettes
         public void WritePalette(XmlWriter w)
         {
             w.WriteStartElement("palette");
-            w.WriteAttributeString("name", _name);
+            w.WriteAttributeString("name", Text);
             w.WriteAttributeString("domain", _domain.ToString());
             if(PercussionCheckBox.Checked)
             {
@@ -1060,7 +1052,7 @@ namespace Moritz.Palettes
 
             w.WriteEndElement(); // closes the palette element
 
-            _rff.SetIsSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
+            _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
         public void ReadPalette(XmlReader r)
         {
@@ -1156,7 +1148,7 @@ namespace Moritz.Palettes
             Debug.Assert(r.Name == "palette"); // end element
             SetOrnamentControls();
             TouchAllTextBoxes();
-            _rff.SetIsSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
+            _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
 
         #region revertToSaved strings
@@ -1172,7 +1164,6 @@ namespace Moritz.Palettes
         private string SavedMinMsDurationsTextBoxText;
         #endregion revertToSaved strings
 
-        private string _name = null;
         private int _domain = 0;
         private ComposerFormCallbacks _callbacks = null;
         private List<TextBox> _allTextBoxes = new List<TextBox>();

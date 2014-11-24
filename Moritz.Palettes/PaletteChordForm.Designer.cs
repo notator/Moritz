@@ -95,7 +95,7 @@
             this.MidiEventButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.RevertToSavedButton = new System.Windows.Forms.Button();
-            this.OkayToSaveButton = new System.Windows.Forms.Button();
+            this.ConfirmButton = new System.Windows.Forms.Button();
             this.BasicChordControlsPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -486,7 +486,7 @@
             // 
             this.SaveAndCloseButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.SaveAndCloseButton.Enabled = false;
-            this.SaveAndCloseButton.Location = new System.Drawing.Point(662, 584);
+            this.SaveAndCloseButton.Location = new System.Drawing.Point(662, 583);
             this.SaveAndCloseButton.Name = "SaveAndCloseButton";
             this.SaveAndCloseButton.Size = new System.Drawing.Size(137, 25);
             this.SaveAndCloseButton.TabIndex = 3;
@@ -497,7 +497,7 @@
             // CloseWithoutSavingButton
             // 
             this.CloseWithoutSavingButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.CloseWithoutSavingButton.Location = new System.Drawing.Point(662, 554);
+            this.CloseWithoutSavingButton.Location = new System.Drawing.Point(662, 552);
             this.CloseWithoutSavingButton.Name = "CloseWithoutSavingButton";
             this.CloseWithoutSavingButton.Size = new System.Drawing.Size(137, 25);
             this.CloseWithoutSavingButton.TabIndex = 2;
@@ -786,28 +786,32 @@
             // RevertToSavedButton
             // 
             this.RevertToSavedButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.RevertToSavedButton.BackColor = System.Drawing.Color.Transparent;
             this.RevertToSavedButton.Enabled = false;
             this.RevertToSavedButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.RevertToSavedButton.Location = new System.Drawing.Point(662, 518);
+            this.RevertToSavedButton.ForeColor = System.Drawing.Color.Red;
+            this.RevertToSavedButton.Location = new System.Drawing.Point(662, 490);
             this.RevertToSavedButton.Name = "RevertToSavedButton";
             this.RevertToSavedButton.Size = new System.Drawing.Size(137, 25);
             this.RevertToSavedButton.TabIndex = 1;
             this.RevertToSavedButton.Text = "revert to saved";
-            this.RevertToSavedButton.UseVisualStyleBackColor = true;
+            this.RevertToSavedButton.UseVisualStyleBackColor = false;
             this.RevertToSavedButton.Click += new System.EventHandler(this.RevertToSavedButton_Click);
             // 
-            // OkayToSaveButton
+            // ConfirmButton
             // 
-            this.OkayToSaveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.OkayToSaveButton.Enabled = false;
-            this.OkayToSaveButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.OkayToSaveButton.Location = new System.Drawing.Point(662, 488);
-            this.OkayToSaveButton.Name = "OkayToSaveButton";
-            this.OkayToSaveButton.Size = new System.Drawing.Size(137, 25);
-            this.OkayToSaveButton.TabIndex = 0;
-            this.OkayToSaveButton.Text = "okay to save";
-            this.OkayToSaveButton.UseVisualStyleBackColor = true;
-            this.OkayToSaveButton.Click += new System.EventHandler(this.OkayToSaveButton_Click);
+            this.ConfirmButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ConfirmButton.BackColor = System.Drawing.Color.Transparent;
+            this.ConfirmButton.Enabled = false;
+            this.ConfirmButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.ConfirmButton.ForeColor = System.Drawing.Color.Blue;
+            this.ConfirmButton.Location = new System.Drawing.Point(662, 521);
+            this.ConfirmButton.Name = "ConfirmButton";
+            this.ConfirmButton.Size = new System.Drawing.Size(137, 25);
+            this.ConfirmButton.TabIndex = 0;
+            this.ConfirmButton.Text = "confirm";
+            this.ConfirmButton.UseVisualStyleBackColor = false;
+            this.ConfirmButton.Click += new System.EventHandler(this.ConfirmButton_Click);
             // 
             // PaletteChordForm
             // 
@@ -817,7 +821,7 @@
             this.ClientSize = new System.Drawing.Size(820, 624);
             this.ControlBox = false;
             this.Controls.Add(this.RevertToSavedButton);
-            this.Controls.Add(this.OkayToSaveButton);
+            this.Controls.Add(this.ConfirmButton);
             this.Controls.Add(this.MidiEventButton);
             this.Controls.Add(this.BasicChordControlsPanel);
             this.Controls.Add(this.CloseWithoutSavingButton);
@@ -942,7 +946,7 @@
         private System.Windows.Forms.Button MidiEventButton;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button RevertToSavedButton;
-        private System.Windows.Forms.Button OkayToSaveButton;
+        private System.Windows.Forms.Button ConfirmButton;
 
 
     }

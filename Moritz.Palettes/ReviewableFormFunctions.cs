@@ -60,41 +60,41 @@ namespace Moritz.Palettes
         /// <summary>
         /// Called whenever one of the form's settings changes
         /// </summary>
-        public void SetSettingsNeedReview(Form form, bool hasError, Button okayToSaveButton, Button revertToSavedButton)
+        public void SetSettingsNeedReview(Form form, bool hasError, Button confirmButton, Button revertToSavedButton)
         {
             SetFormState(form, ReviewableState.needsReview);
             if(hasError)
             {
-                okayToSaveButton.Enabled = false;
+                confirmButton.Enabled = false;
             }
             else
             {
-                okayToSaveButton.Enabled = true;
+                confirmButton.Enabled = true;
             }
             revertToSavedButton.Enabled = true;
         }
 
         /// <summary>
-        /// Called when the okayToSaveButton is clicked.
+        /// Called when the confirmButton is clicked.
         /// </summary>
         /// <param name="Form"></param>
-        public void SetSettingsCanBeSaved(Form form, bool hasError, Button okayToSaveButton)
+        public void SetSettingsCanBeSaved(Form form, bool hasError, Button confirmButton)
         {
-            Debug.Assert(!hasError); // the okayToSaveButton should already be disabled if there is an error on the form
+            Debug.Assert(!hasError); // the confirmButton should already be disabled if there is an error on the form
 
             SetFormState(form, ReviewableState.hasChanged);
-            okayToSaveButton.Enabled = false;
+            confirmButton.Enabled = false;
         }
 
         /// <summary>
-        /// Called when the revertToSavedButton is clicked.
+        /// Called when the form is loaded or the revertToSavedButton has been clicked.
         /// </summary>
-        public void SetIsSaved(Form form, bool hasError, Button okayToSaveButton, Button revertToSavedButton)
+        public void SetSettingsAreSaved(Form form, bool hasError, Button confirmButton, Button revertToSavedButton)
         {
             Debug.Assert(!hasError); // the revertToSavedButton should already be disabled if there is an error on the form
 
             SetFormState(form, ReviewableState.saved);
-            okayToSaveButton.Enabled = false;
+            confirmButton.Enabled = false;
             revertToSavedButton.Enabled = false;
             form.Focus();
         }

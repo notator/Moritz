@@ -79,7 +79,7 @@ namespace Moritz.Palettes
             this.label12 = new System.Windows.Forms.Label();
             this.BottomPanel = new System.Windows.Forms.Panel();
             this.RevertToSavedButton = new System.Windows.Forms.Button();
-            this.OkayToSaveButton = new System.Windows.Forms.Button();
+            this.ConfirmButton = new System.Windows.Forms.Button();
             this.TopPanel = new System.Windows.Forms.Panel();
             this.BankIndicesTextBox = new System.Windows.Forms.TextBox();
             this.PatchIndicesHelpLabel = new System.Windows.Forms.Label();
@@ -591,7 +591,7 @@ namespace Moritz.Palettes
             // BottomPanel
             // 
             this.BottomPanel.Controls.Add(this.RevertToSavedButton);
-            this.BottomPanel.Controls.Add(this.OkayToSaveButton);
+            this.BottomPanel.Controls.Add(this.ConfirmButton);
             this.BottomPanel.Controls.Add(this.ShowContainingPalletButton);
             this.BottomPanel.Controls.Add(this.ShowMainScoreFormButton);
             this.BottomPanel.Controls.Add(this.label1);
@@ -614,10 +614,11 @@ namespace Moritz.Palettes
             // 
             // RevertToSavedButton
             // 
-            this.RevertToSavedButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
+            this.RevertToSavedButton.BackColor = System.Drawing.Color.Transparent;
             this.RevertToSavedButton.Enabled = false;
             this.RevertToSavedButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.RevertToSavedButton.Location = new System.Drawing.Point(657, 56);
+            this.RevertToSavedButton.ForeColor = System.Drawing.Color.Red;
+            this.RevertToSavedButton.Location = new System.Drawing.Point(657, 24);
             this.RevertToSavedButton.Name = "RevertToSavedButton";
             this.RevertToSavedButton.Size = new System.Drawing.Size(142, 26);
             this.RevertToSavedButton.TabIndex = 0;
@@ -625,18 +626,19 @@ namespace Moritz.Palettes
             this.RevertToSavedButton.UseVisualStyleBackColor = false;
             this.RevertToSavedButton.Click += new System.EventHandler(this.RevertToSavedButton_Click);
             // 
-            // OkayToSaveButton
+            // ConfirmButton
             // 
-            this.OkayToSaveButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.OkayToSaveButton.Enabled = false;
-            this.OkayToSaveButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.OkayToSaveButton.Location = new System.Drawing.Point(657, 24);
-            this.OkayToSaveButton.Name = "OkayToSaveButton";
-            this.OkayToSaveButton.Size = new System.Drawing.Size(142, 26);
-            this.OkayToSaveButton.TabIndex = 1;
-            this.OkayToSaveButton.Text = "okay to save";
-            this.OkayToSaveButton.UseVisualStyleBackColor = false;
-            this.OkayToSaveButton.Click += new System.EventHandler(this.OkayToSaveButton_Click);
+            this.ConfirmButton.BackColor = System.Drawing.Color.Transparent;
+            this.ConfirmButton.Enabled = false;
+            this.ConfirmButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.ConfirmButton.ForeColor = System.Drawing.Color.Blue;
+            this.ConfirmButton.Location = new System.Drawing.Point(657, 56);
+            this.ConfirmButton.Name = "ConfirmButton";
+            this.ConfirmButton.Size = new System.Drawing.Size(142, 26);
+            this.ConfirmButton.TabIndex = 1;
+            this.ConfirmButton.Text = "confirm";
+            this.ConfirmButton.UseVisualStyleBackColor = false;
+            this.ConfirmButton.Click += new System.EventHandler(this.ConfirmButton_Click);
             // 
             // TopPanel
             // 
@@ -799,7 +801,7 @@ namespace Moritz.Palettes
         public System.Windows.Forms.TextBox PatchIndicesTextBox;
         public System.Windows.Forms.Label BankIndicesLabel;
         private System.Windows.Forms.Button RevertToSavedButton;
-        private System.Windows.Forms.Button OkayToSaveButton;
+        private System.Windows.Forms.Button ConfirmButton;
 
     }
 }

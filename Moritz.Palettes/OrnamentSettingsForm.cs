@@ -28,7 +28,7 @@ namespace Moritz.Palettes
             _paletteForm = paletteForm;
             ConnectBasicChordControl();
 
-            this.Text = _paletteForm.Text + ": ornaments";
+            SetText(paletteForm);
             if(r != null)
             {
                 _numberOfBasicChordDefs = ReadOrnamentSettingsForm(r);
@@ -44,7 +44,13 @@ namespace Moritz.Palettes
             
             TouchAllTextBoxes();
 
-            _rff.SetIsSaved(this, false, OkayToSaveButton, RevertToSavedButton);
+            _rff.SetSettingsAreSaved(this, false, ConfirmButton, RevertToSavedButton);
+        }
+
+        public void SetText(PaletteForm paletteForm)
+        {
+            string[] components = paletteForm.Text.Split(' ');
+            this.Text = components[0] + " " + components[1] + ": ornaments";
         }
 
         private void ConnectBasicChordControl()
@@ -119,7 +125,7 @@ namespace Moritz.Palettes
             }
             Debug.Assert(r.Name == "ornamentSettings");
 
-            _rff.SetIsSaved(this, false, OkayToSaveButton, RevertToSavedButton);
+            _rff.SetSettingsAreSaved(this, false, ConfirmButton, RevertToSavedButton);
 
             return int.Parse(NumBasicChordDefsTextBox.Text);
         }
@@ -578,7 +584,7 @@ namespace Moritz.Palettes
         private void SetDialogState(TextBox textBox, bool okay)
         {
             M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
-            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
+            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
        #endregion
 
@@ -601,9 +607,9 @@ namespace Moritz.Palettes
             _paletteForm.Callbacks.MainFormBringToFront();
         }
         
-        private void OkayToSaveButton_Click(object sender, EventArgs e)
+        private void ConfirmButton_Click(object sender, EventArgs e)
         {
-            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton); 
+            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), ConfirmButton); 
         }
 
         private void RevertToSavedButton_Click(object sender, EventArgs e)
@@ -635,7 +641,7 @@ namespace Moritz.Palettes
 
                 TouchAllTextBoxes();
 
-                _rff.SetIsSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
+                _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
             }
         }
         #endregion buttons
@@ -726,7 +732,7 @@ namespace Moritz.Palettes
 
             w.WriteEndElement(); // end of ornamentSettings
 
-            _rff.SetIsSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
+            _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
         public BasicChordControl BasicChordControl { get { return _bcc; } }
         public List<List<int>> Ornaments { get { return _ornaments; } }

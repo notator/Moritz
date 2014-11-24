@@ -63,7 +63,7 @@ namespace Moritz.Palettes
             this.midiLabel = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.AudioHelpLabel = new System.Windows.Forms.Label();
-            this.OkayToSaveButton = new System.Windows.Forms.Button();
+            this.ConfirmButton = new System.Windows.Forms.Button();
             this.BankIndicesTextBox = new System.Windows.Forms.TextBox();
             this.BankIndicesHelpLabel = new System.Windows.Forms.Label();
             this.BankIndicesLabel = new System.Windows.Forms.Label();
@@ -405,17 +405,19 @@ namespace Moritz.Palettes
             this.AudioHelpLabel.Text = "audio buttons:\r\n  left click: load, start, stop\r\n  right click: reload\r\n  middle " +
     "click: file info";
             // 
-            // OkayToSaveButton
+            // ConfirmButton
             // 
-            this.OkayToSaveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.OkayToSaveButton.Enabled = false;
-            this.OkayToSaveButton.Location = new System.Drawing.Point(677, 615);
-            this.OkayToSaveButton.Name = "OkayToSaveButton";
-            this.OkayToSaveButton.Size = new System.Drawing.Size(137, 26);
-            this.OkayToSaveButton.TabIndex = 2;
-            this.OkayToSaveButton.Text = "okay to save";
-            this.OkayToSaveButton.UseVisualStyleBackColor = true;
-            this.OkayToSaveButton.Click += new System.EventHandler(this.OkayToSaveButton_Click);
+            this.ConfirmButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ConfirmButton.BackColor = System.Drawing.Color.Transparent;
+            this.ConfirmButton.Enabled = false;
+            this.ConfirmButton.ForeColor = System.Drawing.Color.Blue;
+            this.ConfirmButton.Location = new System.Drawing.Point(677, 647);
+            this.ConfirmButton.Name = "ConfirmButton";
+            this.ConfirmButton.Size = new System.Drawing.Size(137, 26);
+            this.ConfirmButton.TabIndex = 2;
+            this.ConfirmButton.Text = "confirm";
+            this.ConfirmButton.UseVisualStyleBackColor = false;
+            this.ConfirmButton.Click += new System.EventHandler(this.ConfirmButton_Click);
             // 
             // BankIndicesTextBox
             // 
@@ -515,13 +517,15 @@ namespace Moritz.Palettes
             // RevertToSavedButton
             // 
             this.RevertToSavedButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.RevertToSavedButton.BackColor = System.Drawing.Color.Transparent;
             this.RevertToSavedButton.Enabled = false;
-            this.RevertToSavedButton.Location = new System.Drawing.Point(677, 647);
+            this.RevertToSavedButton.ForeColor = System.Drawing.Color.Red;
+            this.RevertToSavedButton.Location = new System.Drawing.Point(677, 615);
             this.RevertToSavedButton.Name = "RevertToSavedButton";
             this.RevertToSavedButton.Size = new System.Drawing.Size(137, 26);
             this.RevertToSavedButton.TabIndex = 149;
             this.RevertToSavedButton.Text = "revert to saved";
-            this.RevertToSavedButton.UseVisualStyleBackColor = true;
+            this.RevertToSavedButton.UseVisualStyleBackColor = false;
             this.RevertToSavedButton.Click += new System.EventHandler(this.RevertToSavedButton_Click);
             // 
             // PercussionCheckBox
@@ -554,7 +558,7 @@ namespace Moritz.Palettes
             this.Controls.Add(this.PatchIndicesTextBox);
             this.Controls.Add(this.PatchIndicesHelpLabel);
             this.Controls.Add(this.PatchIndicesLabel);
-            this.Controls.Add(this.OkayToSaveButton);
+            this.Controls.Add(this.ConfirmButton);
             this.Controls.Add(this.AudioHelpLabel);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.midiLabel);
@@ -633,7 +637,7 @@ namespace Moritz.Palettes
         private System.Windows.Forms.Label midiLabel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label AudioHelpLabel;
-        private System.Windows.Forms.Button OkayToSaveButton;
+        private System.Windows.Forms.Button ConfirmButton;
         public System.Windows.Forms.TextBox BankIndicesTextBox;
         public System.Windows.Forms.Label BankIndicesLabel;
         public System.Windows.Forms.TextBox PatchIndicesTextBox;

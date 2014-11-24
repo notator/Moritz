@@ -82,7 +82,7 @@ namespace Moritz.Composer
                 }
                 M.ReadToXmlElementTag(r, "metadata", "dimensions", "performerOptions", "notation", "names", "krystals", "palettes");
             }
-            _rff.SetIsSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
+            _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
         private void GetMetadata(XmlReader r)
         {
@@ -244,7 +244,7 @@ namespace Moritz.Composer
             WriteMetadata(w);
             WriteDimensions(w);
 
-            _rff.SetIsSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
+            _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
         private void WriteMetadata(XmlWriter w)
         {
@@ -293,7 +293,7 @@ namespace Moritz.Composer
         #region Event Handlers
         private void SetSettingsNeedReview()
         {
-            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
+            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
         private void PaperSizeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -393,9 +393,9 @@ namespace Moritz.Composer
             this._assistantComposerMainForm.BringToFront();
         }
 
-        private void OkayToSaveButton_Click(object sender, EventArgs e)
+        private void ConfirmButton_Click(object sender, EventArgs e)
         {
-            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton); 
+            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), ConfirmButton); 
         }
         #region RevertToSaved
         private void RevertToSavedButton_Click(object sender, EventArgs e)
@@ -426,7 +426,7 @@ namespace Moritz.Composer
 
                 TouchAllTextBoxes();
 
-                _rff.SetIsSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
+                _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
             }
         }
 

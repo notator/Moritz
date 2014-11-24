@@ -319,9 +319,9 @@ namespace Moritz.Palettes
 
         #region ReviewableForm
 
-        private void OkayToSaveButton_Click(object sender, EventArgs e)
+        private void ConfirmButton_Click(object sender, EventArgs e)
         {
-            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton);
+            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), ConfirmButton);
             this.SaveAndCloseButton.Enabled = true;
             this.CloseWithoutSavingButton.Enabled = true;
         }
@@ -361,7 +361,7 @@ namespace Moritz.Palettes
 
         private void SetDialogStateIsSaved()
         {
-            _rff.SetIsSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
+            _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
             this.SaveAndCloseButton.Enabled = false;
             this.CloseWithoutSavingButton.Enabled = true;
         }
@@ -490,7 +490,7 @@ namespace Moritz.Palettes
         private void SetDialogState(TextBox textBox, bool okay)
         {
             M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
-            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
+            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
             this.CloseWithoutSavingButton.Enabled = true;
             this.SaveAndCloseButton.Enabled = false;
         }

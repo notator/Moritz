@@ -33,7 +33,7 @@
             this.MetadataCommentLabel = new System.Windows.Forms.Label();
             this.MetadataKeywordsTextBox = new System.Windows.Forms.TextBox();
             this.MetadataKeywordsLabel = new System.Windows.Forms.Label();
-            this.OkayToSaveButton = new System.Windows.Forms.Button();
+            this.ConfirmButton = new System.Windows.Forms.Button();
             this.LandscapeCheckBox = new System.Windows.Forms.CheckBox();
             this.PaperSizeComboBox = new System.Windows.Forms.ComboBox();
             this.WebsiteLinksGroupBox = new System.Windows.Forms.GroupBox();
@@ -125,18 +125,20 @@
             this.MetadataKeywordsLabel.TabIndex = 135;
             this.MetadataKeywordsLabel.Text = "keywords";
             // 
-            // OkayToSaveButton
+            // ConfirmButton
             // 
-            this.OkayToSaveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.OkayToSaveButton.Enabled = false;
-            this.OkayToSaveButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.OkayToSaveButton.Location = new System.Drawing.Point(413, 355);
-            this.OkayToSaveButton.Name = "OkayToSaveButton";
-            this.OkayToSaveButton.Size = new System.Drawing.Size(106, 26);
-            this.OkayToSaveButton.TabIndex = 1;
-            this.OkayToSaveButton.Text = "okay to save";
-            this.OkayToSaveButton.UseVisualStyleBackColor = true;
-            this.OkayToSaveButton.Click += new System.EventHandler(this.OkayToSaveButton_Click);
+            this.ConfirmButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ConfirmButton.BackColor = System.Drawing.Color.Transparent;
+            this.ConfirmButton.Enabled = false;
+            this.ConfirmButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.ConfirmButton.ForeColor = System.Drawing.Color.Blue;
+            this.ConfirmButton.Location = new System.Drawing.Point(534, 355);
+            this.ConfirmButton.Name = "ConfirmButton";
+            this.ConfirmButton.Size = new System.Drawing.Size(106, 26);
+            this.ConfirmButton.TabIndex = 1;
+            this.ConfirmButton.Text = "confirm";
+            this.ConfirmButton.UseVisualStyleBackColor = false;
+            this.ConfirmButton.Click += new System.EventHandler(this.ConfirmButton_Click);
             // 
             // LandscapeCheckBox
             // 
@@ -455,14 +457,16 @@
             // RevertToSavedButton
             // 
             this.RevertToSavedButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.RevertToSavedButton.BackColor = System.Drawing.Color.Transparent;
             this.RevertToSavedButton.Enabled = false;
             this.RevertToSavedButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.RevertToSavedButton.Location = new System.Drawing.Point(534, 355);
+            this.RevertToSavedButton.ForeColor = System.Drawing.Color.Red;
+            this.RevertToSavedButton.Location = new System.Drawing.Point(420, 355);
             this.RevertToSavedButton.Name = "RevertToSavedButton";
             this.RevertToSavedButton.Size = new System.Drawing.Size(106, 26);
             this.RevertToSavedButton.TabIndex = 2;
             this.RevertToSavedButton.Text = "revert to saved";
-            this.RevertToSavedButton.UseVisualStyleBackColor = true;
+            this.RevertToSavedButton.UseVisualStyleBackColor = false;
             this.RevertToSavedButton.Click += new System.EventHandler(this.RevertToSavedButton_Click);
             // 
             // DimensionsAndMetadataForm
@@ -476,7 +480,7 @@
             this.Controls.Add(this.UnitsHelpLabel);
             this.Controls.Add(this.ShowMainScoreFormButton);
             this.Controls.Add(this.MetadataGroupBox);
-            this.Controls.Add(this.OkayToSaveButton);
+            this.Controls.Add(this.ConfirmButton);
             this.Controls.Add(this.LandscapeCheckBox);
             this.Controls.Add(this.PaperSizeComboBox);
             this.Controls.Add(this.WebsiteLinksGroupBox);
@@ -509,7 +513,7 @@
         private System.Windows.Forms.Label MetadataCommentLabel;
         private System.Windows.Forms.TextBox MetadataKeywordsTextBox;
         private System.Windows.Forms.Label MetadataKeywordsLabel;
-        private System.Windows.Forms.Button OkayToSaveButton;
+        private System.Windows.Forms.Button ConfirmButton;
         private System.Windows.Forms.CheckBox LandscapeCheckBox;
         private System.Windows.Forms.ComboBox PaperSizeComboBox;
         private System.Windows.Forms.GroupBox WebsiteLinksGroupBox;

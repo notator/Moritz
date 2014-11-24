@@ -51,9 +51,8 @@ namespace Moritz.Symbols
         /// <summary>
         /// Silently overwrites the .html and all .svg pages.
         /// An SVGScore consists of an .html file which references one .svg file per page of the score. 
-        /// Returns the number of SVG pages saved.
         /// </summary>
-        public int SaveSVGScore()
+        public void SaveSVGScore()
         {
             List<string> svgPagenames = SaveSVGPages();
 
@@ -113,8 +112,6 @@ namespace Moritz.Symbols
 
                 w.Close(); // close actually unnecessary because of the using statement.
             }
-            
-            return svgPagenames.Count;
         }
 
         private void WriteHTMLScoreHead(XmlWriter w, string title)
@@ -484,23 +481,6 @@ namespace Moritz.Symbols
                         }
                     }
                 }
-            }
-        }
-
-        /// <summary>
-        /// Opens the score in the program which is set by the system to open .svg files.
-        /// This function was originally used to open capella files. See the comment. Maybe I'll have to
-        /// stipulate the current browser, and open a new browser window somehow...
-        /// </summary>
-        public void OpenSVGScore()
-        {
-            try
-            {
-                global::System.Diagnostics.Process.Start(FilePath);
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.Message);
             }
         }
 

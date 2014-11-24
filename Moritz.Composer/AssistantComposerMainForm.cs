@@ -105,12 +105,6 @@ namespace Moritz.Composer
         private void AssistantComposerMainForm_Activated(object sender, EventArgs e)
         {
             SetFormButtons();
-            //if(_rff.FormsThatNeedReview.Count > 0)
-            //    SetSettingsNeedReview();
-            //else if(_rff.CheckedForms.Count > 0)
-            //    SetSettingsHaveChanged();
-            //else
-            //    SetSettingsAreSaved();
         }
 
         private void SetFormButtons()
@@ -165,7 +159,7 @@ namespace Moritz.Composer
         private void SetNotationPanelNeedsReview()
         {
             // sets this form's text and the argument buttons
-            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), OkayToSaveNotationButton, RevertNotationButton);
+            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), ConfirmNotationButton, RevertNotationButton);
             NotationGroupBox.Tag = ReviewableState.needsReview;
             KrystalsGroupBox.Enabled = false;
             PalettesGroupBox.Enabled = false;
@@ -173,7 +167,7 @@ namespace Moritz.Composer
         }
         private void SetKrystalsPanelNeedsReview()
         {
-            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), OkayToSaveKrystalsButton, RevertKrystalsButton);
+            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), ConfirmKrystalsButton, RevertKrystalsButton);
             KrystalsGroupBox.Tag = ReviewableState.needsReview;
             NotationGroupBox.Enabled = false;
             PalettesGroupBox.Enabled = false;
@@ -181,7 +175,7 @@ namespace Moritz.Composer
         }
         private void SetPalettesPanelNeedsReview()
         {
-            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), OkayToSavePalettesButton, RevertPalettesButton);
+            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), ConfirmPalettesButton, RevertPalettesButton);
             PalettesGroupBox.Tag = ReviewableState.needsReview;
             SetSettingsNeedReview();
             NotationGroupBox.Enabled = false;
@@ -191,11 +185,11 @@ namespace Moritz.Composer
         /// <summary>
         /// Called when one of the groupBox OkaytoSaveButtons is clicked.
         /// </summary>
-        private void SetThisFormsState(GroupBox groupBox, Button groupBoxOkayToSaveButton, 
+        private void SetThisFormsState(GroupBox groupBox, Button groupBoxConfirmButton, 
             ReviewableState otherGroupBox1State, ReviewableState otherGroupBox2State)
         {
             groupBox.Tag = ReviewableState.hasChanged;
-            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), groupBoxOkayToSaveButton);
+            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), groupBoxConfirmButton);
 
             if(otherGroupBox1State == ReviewableState.needsReview 
             || otherGroupBox2State == ReviewableState.needsReview
@@ -205,21 +199,21 @@ namespace Moritz.Composer
                 SetSettingsHaveChanged();
         }
 
-        private void OkayToSaveNotationButton_Click(object sender, EventArgs e)
+        private void ConfirmNotationButton_Click(object sender, EventArgs e)
         {
-            SetThisFormsState(NotationGroupBox, OkayToSaveNotationButton, 
+            SetThisFormsState(NotationGroupBox, ConfirmNotationButton, 
                 (ReviewableState)KrystalsGroupBox.Tag, (ReviewableState)PalettesGroupBox.Tag);
 
         }
-        private void OkayToSaveKrystalsButton_Click(object sender, EventArgs e)
+        private void ConfirmKrystalsButton_Click(object sender, EventArgs e)
         {
-            SetThisFormsState(KrystalsGroupBox, OkayToSaveKrystalsButton, 
+            SetThisFormsState(KrystalsGroupBox, ConfirmKrystalsButton, 
                 (ReviewableState)NotationGroupBox.Tag, (ReviewableState)PalettesGroupBox.Tag);
 
         }
-        private void OkayToSavePalettesButton_Click(object sender, EventArgs e)
+        private void ConfirmPalettesButton_Click(object sender, EventArgs e)
         {
-            SetThisFormsState(PalettesGroupBox, OkayToSavePalettesButton, 
+            SetThisFormsState(PalettesGroupBox, ConfirmPalettesButton, 
                 (ReviewableState)NotationGroupBox.Tag, (ReviewableState)KrystalsGroupBox.Tag);
         }
 
@@ -246,11 +240,11 @@ namespace Moritz.Composer
         /// <summary>
         /// Called after the groupBox has been loaded or reverted, when one of the groupBox RevertToSavedButtons is clicked.
         /// </summary>
-        private void SetThisFormsState(GroupBox groupBox, Button okayToSaveButton, Button revertToSavedButton,
+        private void SetThisFormsState(GroupBox groupBox, Button confirmButton, Button revertToSavedButton,
                         ReviewableState otherGroupBox1State, ReviewableState otherGroupBox2State)
         {
             groupBox.Tag = ReviewableState.saved;
-            _rff.SetIsSaved(this, M.HasError(_allTextBoxes), okayToSaveButton, revertToSavedButton);
+            _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), confirmButton, revertToSavedButton);
 
             if(otherGroupBox1State == ReviewableState.needsReview || otherGroupBox2State == ReviewableState.needsReview
                 || OtherFormStateIs(ReviewableState.needsReview))
@@ -280,17 +274,17 @@ namespace Moritz.Composer
         }
         private void SetNotationPanelHasBeenReverted()
         {
-            SetThisFormsState(NotationGroupBox, OkayToSaveNotationButton, RevertNotationButton,
+            SetThisFormsState(NotationGroupBox, ConfirmNotationButton, RevertNotationButton,
                 (ReviewableState)KrystalsGroupBox.Tag, (ReviewableState)PalettesGroupBox.Tag);
         }
         private void SetKrystalsPanelHasBeenReverted()
         {
-            SetThisFormsState(KrystalsGroupBox, OkayToSaveKrystalsButton, RevertKrystalsButton,
+            SetThisFormsState(KrystalsGroupBox, ConfirmKrystalsButton, RevertKrystalsButton,
                 (ReviewableState)NotationGroupBox.Tag, (ReviewableState)PalettesGroupBox.Tag);
         }
         private void SetPalettesPanelHasBeenReverted()
         {
-            SetThisFormsState(PalettesGroupBox, OkayToSavePalettesButton, RevertPalettesButton,
+            SetThisFormsState(PalettesGroupBox, ConfirmPalettesButton, RevertPalettesButton,
                 (ReviewableState)NotationGroupBox.Tag, (ReviewableState)KrystalsGroupBox.Tag);
         }
 
@@ -316,7 +310,6 @@ namespace Moritz.Composer
 
             if(result == System.Windows.Forms.DialogResult.Yes)
             {
-                KrystalsListBox.Items.Clear();
                 ReadKrystals();
                 SetKrystalsPanelHasBeenReverted();
             }
@@ -334,7 +327,6 @@ namespace Moritz.Composer
                 {
                     paletteForm.Close();
                 }
-                PalettesListBox.Items.Clear();
                 ReadPalettes();
                 SetPalettesPanelHasBeenReverted();
             }
@@ -519,7 +511,7 @@ namespace Moritz.Composer
         {
             try
             {
-                ClearSettings();
+                ClearListBoxes();
                 ReadFile();
             }
             catch(Exception ae)
@@ -530,7 +522,7 @@ namespace Moritz.Composer
             SetAllSettingsHaveBeenReverted();
         }
 
-        private void ClearSettings()
+        private void ClearListBoxes()
         {
             KrystalsListBox.SuspendLayout();
             KrystalsListBox.Items.Clear();
@@ -539,11 +531,6 @@ namespace Moritz.Composer
             PalettesListBox.SuspendLayout();
             PalettesListBox.Items.Clear();
             PalettesListBox.ResumeLayout();
-
-            RemoveSelectedKrystalButton.Enabled = false;
-            ShowSelectedKrystalButton.Enabled = false;
-            DeleteSelectedPaletteButton.Enabled = false;
-            ShowSelectedPaletteButton.Enabled = false;
         }
 
         private List<TextBox> GetAllTextBoxes()
@@ -589,8 +576,7 @@ namespace Moritz.Composer
             this.MinimumGapsBetweenSystemsTextBox.Text = "11";
             this.MinimumCrotchetDurationTextBox.Text = "800";
 
-            KrystalsListBox.Items.Clear();
-            PalettesListBox.Items.Clear();
+            ClearListBoxes();
         }
 
         private void EnableBasicControls()
@@ -701,6 +687,7 @@ namespace Moritz.Composer
                         break;
                 }
             }
+            _rff.SetSettingsAreSaved(this, false, ConfirmNotationButton, RevertNotationButton);
             this.NotationGroupBox.Tag = ReviewableState.saved;
         }
 
@@ -770,6 +757,8 @@ namespace Moritz.Composer
             Debug.Assert(r.Name == "krystals");
 
             M.ReadToXmlElementTag(r, "krystal");
+            this.KrystalsListBox.SuspendLayout();
+            this.KrystalsListBox.Items.Clear();
             while(r.Name == "krystal")
             {
                 if(r.NodeType != XmlNodeType.EndElement)
@@ -781,6 +770,8 @@ namespace Moritz.Composer
                 }
                 M.ReadToXmlElementTag(r, "krystal", "krystals");
             }
+            this.KrystalsListBox.ResumeLayout();
+            _rff.SetSettingsAreSaved(this, false, ConfirmKrystalsButton, RevertKrystalsButton);
             this.KrystalsGroupBox.Tag = ReviewableState.saved;
         }
 
@@ -805,6 +796,8 @@ namespace Moritz.Composer
             ComposerFormCallbacks callbacks = GetCallbacks();
             Debug.Assert(r.Name == "palettes");
             M.ReadToXmlElementTag(r, "palette");
+            this.PalettesListBox.SuspendLayout();
+            this.PalettesListBox.Items.Clear();
             while(r.Name == "palette")
             {
                 if(r.NodeType != XmlNodeType.EndElement)
@@ -839,7 +832,9 @@ namespace Moritz.Composer
                     M.ReadToXmlElementTag(r, "palette", "palettes");
                 }
             }
+            this.PalettesListBox.ResumeLayout();
             Debug.Assert(r.Name == "palettes");
+            _rff.SetSettingsAreSaved(this, false, ConfirmPalettesButton, RevertPalettesButton);
             this.PalettesGroupBox.Tag = ReviewableState.saved;
         }
 
@@ -928,6 +923,7 @@ namespace Moritz.Composer
             }
         }
 
+        #region save settings
         public void SaveSettings()
         {
             Debug.Assert(!string.IsNullOrEmpty(_settingsPath));
@@ -963,7 +959,7 @@ namespace Moritz.Composer
             }
             #endregion do the save
 
-            Reload(); // reloads the saved values for reverting palettes, ornaments and dimensionsAndMetadata forms
+            Reload(); // important: reloads the values used for reverting palettes, ornaments and dimensionsAndMetadata forms
 
             ReshowForms(dimensionsAndMetadataFormLocation, visiblePaletteFormLocations, visibleOrnamentFormLocations);
         }
@@ -1076,7 +1072,6 @@ namespace Moritz.Composer
             w.WriteAttributeString("systemStartBars", SystemStartBarsTextBox.Text);
             w.WriteEndElement(); // notation
         }
-
         private void WriteKrystals(XmlWriter w)
         {
             if(this.KrystalsListBox.Items.Count > 0)
@@ -1113,6 +1108,7 @@ namespace Moritz.Composer
                 w.WriteEndElement(); // palettes
             }
         }
+        #endregion save settings
 
         /// <summary>
         /// This function
@@ -1138,8 +1134,9 @@ namespace Moritz.Composer
 
                 if(score != null && score.Systems.Count > 0)
                 {
-                    int numberOfPages = score.SaveSVGScore();
-                    score.OpenSVGScore();
+                    score.SaveSVGScore();
+                    // Opens the score in the program which is set by the system to open .svg files.
+                    global::System.Diagnostics.Process.Start(score.FilePath);
                 }
             }
             catch(Exception ex)
@@ -1149,6 +1146,7 @@ namespace Moritz.Composer
                 MessageBox.Show(msg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
+
         #region PageFormat
         private PageFormat GetPageFormat()
         {
@@ -1419,7 +1417,9 @@ namespace Moritz.Composer
             {
                 string staffKrystalPath = M.Preferences.LocalMoritzKrystalsFolder + @"\" + newKrystal.Name;
                 Krystal krystal = K.LoadKrystal(staffKrystalPath);
+                this.KrystalsListBox.SuspendLayout();
                 this.KrystalsListBox.Items.Add(krystal);
+                this.KrystalsListBox.ResumeLayout();
                 SetKrystalsPanelNeedsReview();
 
                 KrystalsListBox.SetSelected(KrystalsListBox.Items.Count - 1, true); // triggers KrystalsListBox_SelectedIndexChanged()
@@ -1497,7 +1497,6 @@ namespace Moritz.Composer
                     PalettesListBox.Items.Add(ipf);
                 }
                 PalettesListBox.ResumeLayout();
-                UpdateForChangedPaletteList();
             }
         }
         #endregion krystalButtons
@@ -1544,7 +1543,7 @@ namespace Moritz.Composer
                 {
                     ComposerFormCallbacks callbacks = GetCallbacks();
                     PaletteForm paletteForm = null;
-                    string newname = PaletteForm.NewPaletteName(PalettesListBox.Items.Count + 1, domain);
+                    string newname = NewPaletteName(PalettesListBox.Items.Count + 1);
                     paletteForm = new PaletteForm(newname, domain, callbacks);
                     List<PaletteForm> currentPaletteForms = CurrentPaletteForms;
                     currentPaletteForms.Add(paletteForm);
@@ -1559,6 +1558,12 @@ namespace Moritz.Composer
             }
 
         }
+
+        private string NewPaletteName(int paletteNumber)
+        {
+            return "palette " + paletteNumber.ToString();
+        }
+
         private void DeletePaletteButton_Click(object sender, EventArgs e)
         {
             int selectedIndex = -1;
@@ -1567,8 +1572,7 @@ namespace Moritz.Composer
             if(selectedIndex >= 0)
             {
                 string toDelete = PalettesListBox.Items[selectedIndex].ToString();
-                string msg = "The " + toDelete + " will be deleted completely.\n\n" +
-                    "Other palettes will be renumbered accordingly.\n\n" +
+                string msg = toDelete + " will be deleted completely.\n\n" +
                     "Proceed?\n\n";
                 DialogResult proceed = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if(proceed == DialogResult.Yes)
@@ -1579,25 +1583,8 @@ namespace Moritz.Composer
                     currentPaletteForms.RemoveAt(selectedIndex);
                     CurrentPaletteForms = currentPaletteForms;
                     this.SetPalettesPanelNeedsReview();
-                    UpdateForChangedPaletteList();
                 }
             }
-        }
-        /// <summary>
-        /// This function should be called after adding or removing a PaletteForm from the PaletteFormsList.
-        /// It changes the Titles of all the PaletteForms, and updates the items in the PalettesListBox.
-        /// Palettes should always be consecutively numbered, starting at 1.
-        /// </summary>
-        private void UpdateForChangedPaletteList()
-        {
-            PalettesListBox.SuspendLayout();
-            int paletteNumber = 1;
-            foreach(PaletteForm paletteForm in CurrentPaletteForms)
-            {
-                paletteForm.Text = PaletteForm.NewPaletteName(paletteNumber, paletteForm.Domain);
-                paletteNumber++;
-            }
-            PalettesListBox.ResumeLayout();
         }
 
         private void PalettesListBox_DrawItem(object sender, DrawItemEventArgs e)
