@@ -296,9 +296,14 @@ namespace Moritz.Symbols
         /// The systems do not yet contain Metrics info.
         /// They are given Metrics and justified horizontally and vertically (internally) 
         /// inside system.RealizeGraphics().
+        /// Returns false if the score can't be justified horizontally
+        /// or a single system will not fit vertially on a page.
+        /// In these cases, a MessageBox is displayed (explaining the reason for the failure)
+        /// by the inner function that discovers the error.
         /// </summary>
-        public void CreateMetricsAndJustifySystems(List<SvgSystem> systems)
+        public bool CreateMetricsAndJustifySystems(List<SvgSystem> systems)
         {
+            bool success = true;
             using(Image image = new Bitmap(1, 1))
             {
                 using(Graphics graphics = Graphics.FromImage(image)) // used for measuring strings
@@ -311,10 +316,13 @@ namespace Moritz.Symbols
                     for(int sysIndex = 0; sysIndex < systems.Count; ++sysIndex)
                     {
                         float leftMargin = (sysIndex == 0) ? system1LeftMarginPos : otherSystemsLeftMarginPos;
-                        systems[sysIndex].MakeGraphics(graphics, sysIndex + 1, _pageFormat, leftMargin);
+                        success = systems[sysIndex].MakeGraphics(graphics, sysIndex + 1, _pageFormat, leftMargin);
+                        if(!success)
+                            break;
                     }
                 }
             }
+            return success;
         }
 
         public List<int> GroupTopStaffIndices

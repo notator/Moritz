@@ -11,7 +11,7 @@ using Moritz.Globals;
 
 namespace Moritz.Palettes
 {
-    public partial class PaletteForm : Form, IRevertableForm
+    public partial class PaletteForm : Form
     {
         public PaletteForm(XmlReader r, string name, int domain, ComposerFormCallbacks mainFormCallbacks, bool isPercussionPalette)
             : this(name, domain, mainFormCallbacks)
@@ -43,6 +43,9 @@ namespace Moritz.Palettes
             _allTextBoxes = GetAllTextBoxes();
 
             SetDialogForDomain(domain);
+
+            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
+
         }
 
         public void ShowPaletteChordForm(int midiChordIndex)
@@ -51,7 +54,7 @@ namespace Moritz.Palettes
             {
                 MessageBox.Show("Can't create a palette chord form because another one is already open.");
             }
-            else if(this.HasError)
+            else if(M.HasError(_allTextBoxes))
             {
                 MessageBox.Show("Can't create a palette chord form because this palette contains errors.");
             }
@@ -60,7 +63,7 @@ namespace Moritz.Palettes
                 _paletteChordForm = new PaletteChordForm(this, _bcc, midiChordIndex);
                 _paletteChordForm.Show();
                 _paletteChordForm.BringToFront();
-                this.Enabled = false;
+                _callbacks.SetAllFormsExceptChordFormEnabled(false);
             }
         }
 
@@ -77,7 +80,7 @@ namespace Moritz.Palettes
         {
             _paletteChordForm.Close();
             _paletteChordForm = null;
-            
+
             // If an OrnamentSettingsForm exists, it is brought in front of Visual Studio.
             if(_ornamentSettingsForm != null)
             {
@@ -85,6 +88,7 @@ namespace Moritz.Palettes
             }
 
             this.Enabled = true;
+            _callbacks.SetAllFormsExceptChordFormEnabled(true);
             this.BringToFront();
             this.PaletteButtonsControl.PaletteChordFormButtons[chordIndex].Select();
         }
@@ -124,6 +128,7 @@ namespace Moritz.Palettes
             }
 
             _ornamentSettingsForm = new OrnamentSettingsForm(this);
+            _rff.SetSettingsNeedReview(_ornamentSettingsForm, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
 
             _ornamentSettingsForm.Show();
 
@@ -309,12 +314,12 @@ namespace Moritz.Palettes
 
         private void OkayToSaveButton_Click(object sender, EventArgs e)
         {
-            _rff.SetSettingsCanBeSaved(this, OkayToSaveButton); 
+            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton); 
         }
 
         private void RevertToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(this.Text.EndsWith(_rff.NeedsReviewStr) || this.Text.EndsWith(_rff.ChangedAndCheckedStr));
+            Debug.Assert(((ReviewableState)this.Tag) == ReviewableState.needsReview || ((ReviewableState)this.Tag) == ReviewableState.hasChanged);
             DialogResult result = 
                 MessageBox.Show("Are you sure you want to revert this dialog to the saved version?", "Revert?", 
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -336,7 +341,7 @@ namespace Moritz.Palettes
 
                 TouchAllTextBoxes();
 
-                _rff.SetIsSaved(this, OkayToSaveButton, RevertToSavedButton);
+                _rff.SetIsSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
             }
         }
 
@@ -869,10 +874,9 @@ namespace Moritz.Palettes
         {
             M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
 
-            bool hasError = this.HasError;
             if(_paletteButtonsControl != null)
             {
-                if(hasError)
+                if(M.HasError(_allTextBoxes))
                     _paletteButtonsControl.Enabled = false;
                 else
                     _paletteButtonsControl.Enabled = true;
@@ -942,25 +946,24 @@ namespace Moritz.Palettes
         {
             if(_ornamentSettingsForm != null)
             {
+                _rff.SetFormState(_ornamentSettingsForm, ReviewableState.saved);
                 _ornamentSettingsForm.Close();
                 _ornamentSettingsForm = null;
             }
 
+            _rff.SetFormState(this, ReviewableState.saved);
             CloseMidiPitchesHelpForm();
             CloseMIDIInstrumentsHelpForm();
         }
 
-        #region IRevertableForm
-        public bool HasError { get { return M.HasError(_allTextBoxes); } }
-        public bool NeedsReview { get { return _rff.NeedsReview(this); } }
-        public bool HasBeenChecked { get { return _rff.HasBeenChecked(this); } }
+        #region ReviewableForm
 
         public void SetSettingsHaveChanged()
         {
-            _rff.SetSettingsNeedReview(this, OkayToSaveButton, RevertToSavedButton);
+            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
         }
 
-        #endregion IRevertableForm
+        #endregion ReviewableForm
         #region paletteForm
         public override string ToString()
         {
@@ -1057,7 +1060,7 @@ namespace Moritz.Palettes
 
             w.WriteEndElement(); // closes the palette element
 
-            _rff.SetIsSaved(this, OkayToSaveButton, RevertToSavedButton);
+            _rff.SetIsSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
         }
         public void ReadPalette(XmlReader r)
         {
@@ -1153,7 +1156,7 @@ namespace Moritz.Palettes
             Debug.Assert(r.Name == "palette"); // end element
             SetOrnamentControls();
             TouchAllTextBoxes();
-            _rff.SetIsSaved(this, OkayToSaveButton, RevertToSavedButton);
+            _rff.SetIsSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
         }
 
         #region revertToSaved strings
@@ -1193,7 +1196,7 @@ namespace Moritz.Palettes
         private MIDIPercussionHelpForm _percussionInstrHelpForm = null;
         private BasicChordControl _bcc = null;
         private PaletteChordForm _paletteChordForm = null;
-        private RevertableFormFunctions _rff = new RevertableFormFunctions();
+        private ReviewableFormFunctions _rff = new ReviewableFormFunctions();
         #endregion private variables
     }
 

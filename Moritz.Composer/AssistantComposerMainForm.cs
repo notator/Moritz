@@ -26,7 +26,7 @@ using Moritz.Algorithm.Study3Sketch2;
 
 namespace Moritz.Composer
 {
-    public partial class AssistantComposerMainForm : Form, IRevertableForm
+    public partial class AssistantComposerMainForm : Form
     {
         public AssistantComposerMainForm(string settingsPath, IMoritzForm1 moritzForm1)
         {
@@ -64,8 +64,8 @@ namespace Moritz.Composer
             ScoreComboBox.SelectedIndexChanged -= ScoreComboBox_SelectedIndexChanged;
             ScoreComboBox.SelectedIndex = ScoreComboBox.Items.IndexOf(_scoreTitle);
             GetSelectedSettings();
-
             ScoreComboBox.SelectedIndexChanged += ScoreComboBox_SelectedIndexChanged;
+
             if(OutputVoiceIndicesStaffTextBox.Text == "")
             {
                 SetDefaultVoiceIndicesPerStaff(_algorithm.MidiChannelIndexPerOutputVoice.Count);
@@ -99,155 +99,217 @@ namespace Moritz.Composer
         }
         #endregion DeselectAll
 
-        #region IRevertableForm
-        private bool notationPanelNeedsReview;
-        private bool krystalsPanelNeedsReview;
-        private bool palettesPanelNeedsReview;
 
-        public bool HasError { get { return M.HasError(_allTextBoxes); } }
-        public bool NeedsReview { get { return _rff.NeedsReview(this); } }
-        public bool HasBeenChecked { get { return _rff.HasBeenChecked(this); } }
+        #region ReviewableForm
 
-        private void SetNotationNeedsReview()
+        private void AssistantComposerMainForm_Activated(object sender, EventArgs e)
         {
-            _rff.SetSettingsNeedReview(this, OkayToSaveNotationButton, RevertNotationToSavedButton);
-            SaveSettingsCreateScoreButton.Enabled = false;
-            notationPanelNeedsReview = true;
-            RevertEverythingButton.Enabled = true;
-        }
-        private void SetKrystalsNeedReview()
-        {
-            _rff.SetSettingsNeedReview(this, OkayToSaveKrystalsButton, RevertKrystalsToSavedButton);
-            SaveSettingsCreateScoreButton.Enabled = false;
-            krystalsPanelNeedsReview = true;
-            RevertEverythingButton.Enabled = true;
-        }
-        private void SetPalettesNeedReview()
-        {
-            _rff.SetSettingsNeedReview(this, OkayToSavePalettesButton, RevertPalettesButton);
-            SaveSettingsCreateScoreButton.Enabled = false;
-            palettesPanelNeedsReview = true;
-            RevertEverythingButton.Enabled = true;
+            SetFormButtons();
+            //if(_rff.FormsThatNeedReview.Count > 0)
+            //    SetSettingsNeedReview();
+            //else if(_rff.CheckedForms.Count > 0)
+            //    SetSettingsHaveChanged();
+            //else
+            //    SetSettingsAreSaved();
         }
 
-        private void SetThisTextToNeedsReview()
+        private void SetFormButtons()
         {
-            if(this.Text.EndsWith(_rff.ChangedAndCheckedStr))
-                this.Text = this.Text.Remove(this.Text.Length - _rff.ChangedAndCheckedStr.Length);
-            if(!this.Text.EndsWith(_rff.NeedsReviewStr))
-                this.Text = this.Text + _rff.NeedsReviewStr;
-        }
-        private void DoHasBeenReverted(Button okayToSaveButton, Button revertToSavedButton,
-                        bool otherPanel1NeedsReview, bool otherPanel2NeedsReview)
-        {
-            _rff.SetIsSaved(this, okayToSaveButton, revertToSavedButton);
-
-            bool thisFormNeedsReview = true;
-            if(!otherPanel1NeedsReview && !otherPanel2NeedsReview)
+            this.ShowUncheckedFormsButton.Enabled = (_rff.FormsThatNeedReview.Count > 0) ? true : false;
+            this.ShowCheckedFormsButton.Enabled = (_rff.CheckedForms.Count > 0) ? true : false;
+            this.SaveSettingsCreateScoreButton.Enabled = (_rff.FormsThatNeedReview.Count > 0) ? false : true;
+            this.SuspendLayout();
+            if(_rff.CheckedForms.Count > 0)
             {
-                thisFormNeedsReview = false;
-                SaveSettingsCreateScoreButton.Enabled = true;
-                SaveSettingsCreateScoreButton.Text = "save all settings";
+                if(! this.SaveSettingsCreateScoreButton.Text.StartsWith("save"))
+                    this.SaveSettingsCreateScoreButton.Text = "save all settings";
             }
-
-            if(thisFormNeedsReview)
+            else
             {
-                SetThisTextToNeedsReview();
+                if(! this.SaveSettingsCreateScoreButton.Text.StartsWith("create"))
+                    this.SaveSettingsCreateScoreButton.Text = "create score";
             }
+            this.ResumeLayout();
+            this.RevertEverythingButton.Enabled = (_rff.FormsThatNeedReview.Count > 0 || _rff.CheckedForms.Count > 0);
         }
-        private void DoOkayToSave(Button okayToSaveButton, bool otherPanel1NeedsReview, bool otherPanel2NeedsReview)
+        private void SetSettingsNeedReview()
         {
-            _rff.SetSettingsCanBeSaved(this, okayToSaveButton);
+            _rff.SetFormState(this, ReviewableState.needsReview);
+            SetFormButtons();
+            this.SaveSettingsCreateScoreButton.Enabled = false;
+        }
+        private void SetSettingsHaveChanged()
+        {
+            _rff.SetFormState(this, ReviewableState.hasChanged);
+            SetFormButtons();
+            if(!SaveSettingsCreateScoreButton.Text.StartsWith("save"))
+                this.SaveSettingsCreateScoreButton.Text = "save all settings";
+            this.SaveSettingsCreateScoreButton.Enabled = true;
+            NotationGroupBox.Enabled = true;
+            KrystalsGroupBox.Enabled = true;
+            PalettesGroupBox.Enabled = true;
+        }
 
-            bool thisFormNeedsReview = true;
-            if(!otherPanel1NeedsReview && !otherPanel2NeedsReview)
-            {
-                thisFormNeedsReview = false;
-                SaveSettingsCreateScoreButton.Enabled = true;
-                SaveSettingsCreateScoreButton.Text = "save all settings";
-            }
+        private void SetSettingsAreSaved()
+        {
+            _rff.SetFormState(this, ReviewableState.saved);
+            SetFormButtons();
+            if(!SaveSettingsCreateScoreButton.Text.StartsWith("create"))
+                this.SaveSettingsCreateScoreButton.Text = "create score";
+            this.SaveSettingsCreateScoreButton.Enabled = true;
+            NotationGroupBox.Enabled = true;
+            KrystalsGroupBox.Enabled = true;
+            PalettesGroupBox.Enabled = true;
+        }
 
-            if(thisFormNeedsReview)
-            {
-                SetThisTextToNeedsReview();
-            }
+        private void SetNotationPanelNeedsReview()
+        {
+            // sets this form's text and the argument buttons
+            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), OkayToSaveNotationButton, RevertNotationButton);
+            NotationGroupBox.Tag = ReviewableState.needsReview;
+            KrystalsGroupBox.Enabled = false;
+            PalettesGroupBox.Enabled = false;
+            SetSettingsNeedReview();
+        }
+        private void SetKrystalsPanelNeedsReview()
+        {
+            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), OkayToSaveKrystalsButton, RevertKrystalsButton);
+            KrystalsGroupBox.Tag = ReviewableState.needsReview;
+            NotationGroupBox.Enabled = false;
+            PalettesGroupBox.Enabled = false;
+            SetSettingsNeedReview();
+        }
+        private void SetPalettesPanelNeedsReview()
+        {
+            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), OkayToSavePalettesButton, RevertPalettesButton);
+            PalettesGroupBox.Tag = ReviewableState.needsReview;
+            SetSettingsNeedReview();
+            NotationGroupBox.Enabled = false;
+            KrystalsGroupBox.Enabled = false;
+        }
+
+        /// <summary>
+        /// Called when one of the groupBox OkaytoSaveButtons is clicked.
+        /// </summary>
+        private void SetThisFormsState(GroupBox groupBox, Button groupBoxOkayToSaveButton, 
+            ReviewableState otherGroupBox1State, ReviewableState otherGroupBox2State)
+        {
+            groupBox.Tag = ReviewableState.hasChanged;
+            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), groupBoxOkayToSaveButton);
+
+            if(otherGroupBox1State == ReviewableState.needsReview 
+            || otherGroupBox2State == ReviewableState.needsReview
+            || OtherFormStateIs(ReviewableState.needsReview))
+                SetSettingsNeedReview();
+            else
+                SetSettingsHaveChanged();
         }
 
         private void OkayToSaveNotationButton_Click(object sender, EventArgs e)
         {
-            DoOkayToSave(OkayToSaveNotationButton, krystalsPanelNeedsReview, palettesPanelNeedsReview);
-            notationPanelNeedsReview = false;
+            SetThisFormsState(NotationGroupBox, OkayToSaveNotationButton, 
+                (ReviewableState)KrystalsGroupBox.Tag, (ReviewableState)PalettesGroupBox.Tag);
+
         }
         private void OkayToSaveKrystalsButton_Click(object sender, EventArgs e)
         {
-            DoOkayToSave(OkayToSaveKrystalsButton, notationPanelNeedsReview, palettesPanelNeedsReview);
-            krystalsPanelNeedsReview = false;
+            SetThisFormsState(KrystalsGroupBox, OkayToSaveKrystalsButton, 
+                (ReviewableState)NotationGroupBox.Tag, (ReviewableState)PalettesGroupBox.Tag);
+
         }
         private void OkayToSavePalettesButton_Click(object sender, EventArgs e)
         {
-            DoOkayToSave(OkayToSavePalettesButton, notationPanelNeedsReview, krystalsPanelNeedsReview);
-            palettesPanelNeedsReview = false;
+            SetThisFormsState(PalettesGroupBox, OkayToSavePalettesButton, 
+                (ReviewableState)NotationGroupBox.Tag, (ReviewableState)KrystalsGroupBox.Tag);
+        }
+
+        private bool OtherFormStateIs(ReviewableState state)
+        {
+            bool rval = false;
+            if((ReviewableState)_dimensionsAndMetadataForm.Tag == state)
+                rval = true;
+            else
+            {
+                foreach(PaletteForm paletteForm in PalettesListBox.Items)
+                {
+                    if((paletteForm.OrnamentSettingsForm != null
+                    && (ReviewableState)paletteForm.OrnamentSettingsForm.Tag == state)
+                    || ((ReviewableState)paletteForm.Tag == state))
+                    {
+                        rval = true;
+                        break;
+                    }
+                }
+            }
+            return rval;
+        }
+        /// <summary>
+        /// Called after the groupBox has been loaded or reverted, when one of the groupBox RevertToSavedButtons is clicked.
+        /// </summary>
+        private void SetThisFormsState(GroupBox groupBox, Button okayToSaveButton, Button revertToSavedButton,
+                        ReviewableState otherGroupBox1State, ReviewableState otherGroupBox2State)
+        {
+            groupBox.Tag = ReviewableState.saved;
+            _rff.SetIsSaved(this, M.HasError(_allTextBoxes), okayToSaveButton, revertToSavedButton);
+
+            if(otherGroupBox1State == ReviewableState.needsReview || otherGroupBox2State == ReviewableState.needsReview
+                || OtherFormStateIs(ReviewableState.needsReview))
+                SetSettingsNeedReview();
+            else if(otherGroupBox1State == ReviewableState.hasChanged || otherGroupBox2State == ReviewableState.hasChanged
+                || OtherFormStateIs(ReviewableState.hasChanged))
+                SetSettingsHaveChanged();
+            else
+                SetSettingsAreSaved();
         }
 
         private void SetAllSettingsHaveBeenReverted()
         {
-            SetNotationHasBeenReverted();
-            SetKrystalsHaveBeenReverted();
-            SetPalettesHaveBeenReverted();
-            RevertEverythingButton.Enabled = false;
+            SetNotationPanelHasBeenReverted();
+            SetKrystalsPanelHasBeenReverted();
+            SetPalettesPanelHasBeenReverted();
+            _rff.SetFormState(_dimensionsAndMetadataForm, ReviewableState.saved);
+            foreach(PaletteForm paletteForm in PalettesListBox.Items)
+            {
+                if(paletteForm.OrnamentSettingsForm != null)
+                    _rff.SetFormState(paletteForm.OrnamentSettingsForm, ReviewableState.saved);
+                _rff.SetFormState(paletteForm, ReviewableState.saved);
+            }
+            this.SaveSettingsCreateScoreButton.Enabled = true;
+            this.SaveSettingsCreateScoreButton.Text = "create score";
+            this.RevertEverythingButton.Enabled = false;
         }
-        private void SetNotationHasBeenReverted()
+        private void SetNotationPanelHasBeenReverted()
         {
-            DoHasBeenReverted(OkayToSaveNotationButton, RevertNotationToSavedButton, krystalsPanelNeedsReview, palettesPanelNeedsReview);
-            notationPanelNeedsReview = false;
+            SetThisFormsState(NotationGroupBox, OkayToSaveNotationButton, RevertNotationButton,
+                (ReviewableState)KrystalsGroupBox.Tag, (ReviewableState)PalettesGroupBox.Tag);
         }
-        private void SetKrystalsHaveBeenReverted()
+        private void SetKrystalsPanelHasBeenReverted()
         {
-            DoHasBeenReverted(OkayToSaveKrystalsButton, RevertKrystalsToSavedButton, notationPanelNeedsReview, palettesPanelNeedsReview);
-            krystalsPanelNeedsReview = false;
+            SetThisFormsState(KrystalsGroupBox, OkayToSaveKrystalsButton, RevertKrystalsButton,
+                (ReviewableState)NotationGroupBox.Tag, (ReviewableState)PalettesGroupBox.Tag);
         }
-        private void SetPalettesHaveBeenReverted()
+        private void SetPalettesPanelHasBeenReverted()
         {
-            DoHasBeenReverted(OkayToSavePalettesButton, RevertPalettesButton, notationPanelNeedsReview, krystalsPanelNeedsReview);
-            palettesPanelNeedsReview = false;
+            SetThisFormsState(PalettesGroupBox, OkayToSavePalettesButton, RevertPalettesButton,
+                (ReviewableState)NotationGroupBox.Tag, (ReviewableState)KrystalsGroupBox.Tag);
         }
 
         private void RevertNotationToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(this.Text.EndsWith(_rff.NeedsReviewStr) || this.Text.EndsWith(_rff.ChangedAndCheckedStr));
+            Debug.Assert(((ReviewableState)NotationGroupBox.Tag) == ReviewableState.needsReview || ((ReviewableState)NotationGroupBox.Tag) == ReviewableState.hasChanged);
             DialogResult result =
                 MessageBox.Show("Are you sure you want to revert the notation panel to the saved version?",
                                 "Revert?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
 
             if(result == System.Windows.Forms.DialogResult.Yes)
             {
-                SetStandardChordsOptionsPanel(SavedChordSymbolType);
-
-                MinimumCrotchetDurationTextBox.Text = SavedMinimumCrotchetDurationTextBoxText;
-
-                SetBeamsCrossBarlinesCheckBoxChecked(SavedBeamsCrossBarlines);
-                SetStafflineStemStrokeWidth(SavedStafflineStemStrokeWidth);
-                SetGapPixelsComboBox(SavedGap);
-
-                MinimumGapsBetweenStavesTextBox.Text = SavedMinimumGapsBetweenStavesTextBoxText;
-                MinimumGapsBetweenSystemsTextBox.Text = SavedMinimumGapsBetweenSystemsTextBoxText;
-                OutputVoiceIndicesStaffTextBox.Text = SavedOutputVoiceIndicesStaffTextBoxText;
-                InputVoiceIndicesPerStaffTextBox.Text = SavedInputVoiceIndicesPerStaffTextBoxText;
-                ClefsPerStaffTextBox.Text = SavedClefsPerStaffTextBoxText;
-                StafflinesPerStaffTextBox.Text = SavedStafflinesPerStaffTextBoxText;
-                StaffGroupsTextBox.Text = SavedStaffGroupsTextBoxText;
-                LongStaffNamesTextBox.Text = SavedLongStaffNamesTextBoxText;
-                ShortStaffNamesTextBox.Text = SavedShortStaffNamesTextBoxText;
-                SystemStartBarsTextBox.Text = SavedSystemStartBarsTextBoxText;
-
-                TouchAllTextBoxes();
-
-                SetNotationHasBeenReverted();
+                ReadNotation();
+                SetNotationPanelHasBeenReverted();
             }
         }
         private void RevertKrystalsToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(this.Text.EndsWith(_rff.NeedsReviewStr) || this.Text.EndsWith(_rff.ChangedAndCheckedStr));
+            Debug.Assert(((ReviewableState)KrystalsGroupBox.Tag) == ReviewableState.needsReview || ((ReviewableState)KrystalsGroupBox.Tag) == ReviewableState.hasChanged);
             DialogResult result =
                 MessageBox.Show("Are you sure you want to revert the krystals panel to the saved version?",
                                 "Revert?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -255,20 +317,15 @@ namespace Moritz.Composer
             if(result == System.Windows.Forms.DialogResult.Yes)
             {
                 KrystalsListBox.Items.Clear();
-                foreach(string krystalName in SavedKrystalNames)
-                {
-                    Krystal krystal = GetKrystal(krystalName);
-                    this.KrystalsListBox.Items.Add(krystal);
-                }
-
-                SetKrystalsHaveBeenReverted();
+                ReadKrystals();
+                SetKrystalsPanelHasBeenReverted();
             }
         }
         private void RevertPalettesButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(this.Text.EndsWith(_rff.NeedsReviewStr) || this.Text.EndsWith(_rff.ChangedAndCheckedStr));
+            Debug.Assert(((ReviewableState)PalettesGroupBox.Tag) == ReviewableState.needsReview || ((ReviewableState)PalettesGroupBox.Tag) == ReviewableState.hasChanged);
             DialogResult result =
-                MessageBox.Show("Are you sure you want to revert all the palettes to their saved versions?",
+                MessageBox.Show("Are you sure you want to close all palettes and revert them to their saved versions?",
                                 "Revert?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
 
             if(result == System.Windows.Forms.DialogResult.Yes)
@@ -279,7 +336,59 @@ namespace Moritz.Composer
                 }
                 PalettesListBox.Items.Clear();
                 ReadPalettes();
-                SetPalettesHaveBeenReverted();
+                SetPalettesPanelHasBeenReverted();
+            }
+        }
+        private void ReadNotation()
+        {
+            try
+            {
+                using(XmlReader r = XmlReader.Create(_settingsPath))
+                {
+                    M.ReadToXmlElementTag(r, "moritzKrystalScore"); // check that this is a moritz preferences file
+                    M.ReadToXmlElementTag(r, "notation");
+
+                    while(r.Name == "notation")
+                    {
+                        if(r.NodeType != XmlNodeType.EndElement)
+                        {
+                            GetNotation(r);
+                        }
+                        M.ReadToXmlElementTag(r, "notation", "moritzKrystalScore");
+                    }
+                    Debug.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
+                }
+            }
+            catch(Exception ex)
+            {
+                string msg = "Exception message:\n\n" + ex.Message;
+                MessageBox.Show(msg, "Error reading krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private void ReadKrystals()
+        {
+            try
+            {
+                using(XmlReader r = XmlReader.Create(_settingsPath))
+                {
+                    M.ReadToXmlElementTag(r, "moritzKrystalScore"); // check that this is a moritz preferences file
+                    M.ReadToXmlElementTag(r, "krystals");
+
+                    while(r.Name == "krystals")
+                    {
+                        if(r.NodeType != XmlNodeType.EndElement)
+                        {
+                            GetKrystals(r);
+                        }
+                        M.ReadToXmlElementTag(r, "krystals", "moritzKrystalScore");
+                    }
+                    Debug.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
+                }
+            }
+            catch(Exception ex)
+            {
+                string msg = "Exception message:\n\n" + ex.Message;
+                MessageBox.Show(msg, "Error reading krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void ReadPalettes()
@@ -316,16 +425,21 @@ namespace Moritz.Composer
 
             if(result == System.Windows.Forms.DialogResult.Yes)
             {
-                _dimensionsAndMetadataForm.Close();
-                _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this);
-
-                foreach(PaletteForm paletteForm in PalettesListBox.Items)
-                {
-                    paletteForm.Close();
-                }
-
-                LoadSettings(); // clears existing settings
+                Reload();
             }
+        }
+
+        private void Reload()
+        {
+            _dimensionsAndMetadataForm.Close();
+            _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this);
+
+            foreach(PaletteForm paletteForm in PalettesListBox.Items)
+            {
+                paletteForm.Close(); // closes any OrnamentSettingsForm and/or PaletteChordform
+            }
+
+            LoadSettings(); // clears existing settings
         }
         #endregion
 
@@ -525,10 +639,9 @@ namespace Moritz.Composer
                     Debug.Assert(r.Name == "moritzKrystalScore"); // end of krystal score
                 }
             }
-            catch
+            catch(Exception ex)
             {
-                string msg = "The krystal score settings file\n\n" + _settingsPath + "\n\ncould not be found.";
-                MessageBox.Show(msg, "Error reading krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, "Error reading krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -542,87 +655,54 @@ namespace Moritz.Composer
                 switch(r.Name)
                 {
                     case "chordSymbolType":
-                        SavedChordSymbolType = r.Value;
                         SetStandardChordsOptionsPanel(r.Value);
                         break;
                     case "minimumCrotchetDuration":
                         MinimumCrotchetDurationTextBox.Text = r.Value;
-                        SavedMinimumCrotchetDurationTextBoxText = MinimumCrotchetDurationTextBox.Text;
                         break;
                     case "beamsCrossBarlines":
-                        SavedBeamsCrossBarlines = r.Value;
                         SetBeamsCrossBarlinesCheckBoxChecked(r.Value);
                         break;
                     case "stafflineStemStrokeWidth":
-                        SavedStafflineStemStrokeWidth = r.Value;
                         SetStafflineStemStrokeWidth(r.Value);
                         break;
                     case "gap":
-                        SavedGap = r.Value;
                         SetGapPixelsComboBox(r.Value);
                         break;
                     case "minGapsBetweenStaves":
                         MinimumGapsBetweenStavesTextBox.Text = r.Value;
-                        SavedMinimumGapsBetweenStavesTextBoxText = MinimumGapsBetweenStavesTextBox.Text;
                         break;
                     case "minGapsBetweenSystems":
                         MinimumGapsBetweenSystemsTextBox.Text = r.Value;
-                        SavedMinimumGapsBetweenSystemsTextBoxText = MinimumGapsBetweenSystemsTextBox.Text;
                         break;
                     case "outputVoicesPerVoicePerStaff":
                         OutputVoiceIndicesStaffTextBox.Text = r.Value;
-                        SavedOutputVoiceIndicesStaffTextBoxText = OutputVoiceIndicesStaffTextBox.Text;
                         break;
                     case "inputVoicesPerVoicePerStaff":
                         InputVoiceIndicesPerStaffTextBox.Text = r.Value;
-                        SavedInputVoiceIndicesPerStaffTextBoxText = InputVoiceIndicesPerStaffTextBox.Text;
                         break;
                     case "clefsPerStaff":
                         ClefsPerStaffTextBox.Text = r.Value;
-                        SavedClefsPerStaffTextBoxText = ClefsPerStaffTextBox.Text;
                         break;
                     case "stafflinesPerStaff":
                         StafflinesPerStaffTextBox.Text = r.Value;
-                        SavedStafflinesPerStaffTextBoxText = StafflinesPerStaffTextBox.Text;
                         break;
                     case "staffGroups":
                         StaffGroupsTextBox.Text = r.Value;
-                        SavedStaffGroupsTextBoxText = StaffGroupsTextBox.Text;
                         break;
                     case "longStaffNames":
                         LongStaffNamesTextBox.Text = r.Value;
-                        SavedLongStaffNamesTextBoxText = LongStaffNamesTextBox.Text;
                         break;
                     case "shortStaffNames":
                         ShortStaffNamesTextBox.Text = r.Value;
-                        SavedShortStaffNamesTextBoxText = ShortStaffNamesTextBox.Text;
                         break;
                     case "systemStartBars":
                         SystemStartBarsTextBox.Text = r.Value;
-                        SavedSystemStartBarsTextBoxText = SystemStartBarsTextBox.Text;
                         break;
                 }
             }
+            this.NotationGroupBox.Tag = ReviewableState.saved;
         }
-
-        #region saved for reverting notation panel
-        private string SavedChordSymbolType;
-        private string SavedMinimumCrotchetDurationTextBoxText;
-        private string SavedBeamsCrossBarlines;
-        private string SavedStafflineStemStrokeWidth;
-        private string SavedGap;
-        private string SavedMinimumGapsBetweenStavesTextBoxText;
-        private string SavedMinimumGapsBetweenSystemsTextBoxText;
-        private string SavedOutputVoiceIndicesStaffTextBoxText;
-        private string SavedInputVoiceIndicesPerStaffTextBoxText;
-        private string SavedClefsPerStaffTextBoxText;
-        private string SavedStafflinesPerStaffTextBoxText;
-        private string SavedStaffGroupsTextBoxText;
-        private string SavedLongStaffNamesTextBoxText;
-        private string SavedShortStaffNamesTextBoxText;
-        private string SavedSystemStartBarsTextBoxText;
-        private List<string> SavedKrystalNames = new List<string>();
-        #endregion
 
         private void SetGapPixelsComboBox(string value)
         {
@@ -696,12 +776,12 @@ namespace Moritz.Composer
                 {
                     r.MoveToAttribute(0);
                     string krystalName = r.Value;
-                    SavedKrystalNames.Add(krystalName);
                     Krystal krystal = GetKrystal(krystalName);
                     this.KrystalsListBox.Items.Add(krystal);
                 }
                 M.ReadToXmlElementTag(r, "krystal", "krystals");
             }
+            this.KrystalsGroupBox.Tag = ReviewableState.saved;
         }
 
         private Krystal GetKrystal(string krystalFileName)
@@ -760,15 +840,36 @@ namespace Moritz.Composer
                 }
             }
             Debug.Assert(r.Name == "palettes");
+            this.PalettesGroupBox.Tag = ReviewableState.saved;
         }
 
         private ComposerFormCallbacks GetCallbacks()
         {
             ComposerFormCallbacks callbacks = new ComposerFormCallbacks();
+            callbacks.SetAllFormsExceptChordFormEnabled = this.SetAllFormsExceptChordFormEnabled;
             callbacks.MainFormBringToFront = this.BringToFront;
             callbacks.LocalScoreAudioPath = this.GetLocalScoreAudioPath;
             callbacks.APaletteChordFormIsOpen = this.APaletteChordFormIsOpen;
             return callbacks;
+        }
+
+        /// <summary>
+        /// Called (as a delegate) when a PaletteChordForm is created or closed.
+        /// When a PaletteChordForm is open, all other forms are disabled.
+        /// </summary>
+        /// <param name="enabled"></param>
+        private void SetAllFormsExceptChordFormEnabled(bool enabled)
+        {
+            foreach(PaletteForm paletteForm in this.PalettesListBox.Items)
+            {
+                if(paletteForm.OrnamentSettingsForm != null)
+                {
+                    paletteForm.OrnamentSettingsForm.Enabled = enabled;
+                }
+                paletteForm.Enabled = enabled;
+            }
+            this._dimensionsAndMetadataForm.Enabled = enabled;
+            this.Enabled = enabled;
         }
 
         private bool APaletteChordFormIsOpen()
@@ -795,26 +896,13 @@ namespace Moritz.Composer
         }
 
         #region buttons
-
-
-        private void ShowUncheckedFormsButton_Click(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void ShowCheckedFormsButton_Click(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
         public void SaveSettingsCreateScoreButton_Click(object sender, EventArgs e)
         {
             if(SaveSettingsCreateScoreButton.Text.StartsWith("save"))
             {
                 try
                 {
-                    // The settings will automatically be saved again when the score has been created and displayed.
-                    // The settings are only saved here in case there is an error while creating the score.
+                    // The settings are only saved (and reloaded) here in case there is going to be an error while creating the score.
                     SaveSettings(); 
                 }
                 catch(Exception ex)
@@ -844,6 +932,10 @@ namespace Moritz.Composer
         {
             Debug.Assert(!string.IsNullOrEmpty(_settingsPath));
 
+            Point dimensionsAndMetadataFormLocation = GetDimensionsAndMetadataFormLocation();
+            Dictionary<int, Point> visiblePaletteFormLocations = GetVisiblePaletteFormLocations();
+            Dictionary<int, Point> visibleOrnamentFormLocations = GetVisibleOrnamentFormLocations();
+
             M.CreateDirectoryIfItDoesNotExist(this._settingsFolderPath);
 
             #region do the save
@@ -871,14 +963,97 @@ namespace Moritz.Composer
             }
             #endregion do the save
 
-            SetAllSettingsHaveBeenReverted();
-            this.SaveSettingsCreateScoreButton.Text = "create score";
+            Reload(); // reloads the saved values for reverting palettes, ornaments and dimensionsAndMetadata forms
+
+            ReshowForms(dimensionsAndMetadataFormLocation, visiblePaletteFormLocations, visibleOrnamentFormLocations);
+        }
+
+        /// <summary>
+        /// Returns Point(int.MinVal, int.MinVal) if the form is not visible
+        /// </summary>
+        /// <returns></returns>
+        private Point GetDimensionsAndMetadataFormLocation()
+        {
+            Point location;
+            if(_dimensionsAndMetadataForm.Visible)
+            {
+                location = new Point(_dimensionsAndMetadataForm.Location.X, _dimensionsAndMetadataForm.Location.Y);
+            }
+            else
+            {
+                location = new Point(int.MinValue, int.MinValue);
+            }
+            return location;
+        }
+        /// <summary>
+        /// Returns the index in PalettesListBox.Items and location of all visible ornamentForms
+        /// </summary>
+        private Dictionary<int, Point> GetVisibleOrnamentFormLocations()
+        {
+            Dictionary<int, Point> indexAndLocation = new Dictionary<int,Point>();
+            for(int i = 0; i < PalettesListBox.Items.Count; ++i)
+            {
+                PaletteForm paletteForm = PalettesListBox.Items[i] as PaletteForm;
+                if(paletteForm.OrnamentSettingsForm != null && paletteForm.OrnamentSettingsForm.Visible)
+                {
+                    indexAndLocation.Add(i, paletteForm.OrnamentSettingsForm.Location);
+                }
+            }
+            return indexAndLocation;
+        }
+        /// <summary>
+        /// Returns the index in PalettesListBox.Items and location of all visible paletteForms
+        /// </summary>
+        private Dictionary<int, Point> GetVisiblePaletteFormLocations()
+        {
+            Dictionary<int, Point> indexAndLocation = new Dictionary<int, Point>();
+            for(int i = 0; i < PalettesListBox.Items.Count; ++i)
+            {
+                PaletteForm paletteForm = PalettesListBox.Items[i] as PaletteForm;
+                if(paletteForm.Visible)
+                    indexAndLocation.Add(i, paletteForm.Location);
+            }
+            return indexAndLocation;
+        }
+        private void ReshowForms(Point dimensionsAndMetadataFormLocation, Dictionary<int, Point> visiblePaletteFormLocations, Dictionary<int, Point> visibleOrnamentFormLocations)
+        {
+            if(dimensionsAndMetadataFormLocation.X > int.MinValue)
+            {
+                _dimensionsAndMetadataForm.Show();
+                _dimensionsAndMetadataForm.Location = dimensionsAndMetadataFormLocation;
+            }
+            else
+                _dimensionsAndMetadataForm.Hide();
+
+            for(int i = 0; i < PalettesListBox.Items.Count; ++i)
+            {
+                PaletteForm paletteForm = PalettesListBox.Items[i] as PaletteForm;
+                if(visiblePaletteFormLocations.ContainsKey(i))
+                {
+                    paletteForm.Show();
+                    paletteForm.Location = visiblePaletteFormLocations[i];
+                }
+                else
+                {
+                    paletteForm.Hide();
+                }
+                if(visibleOrnamentFormLocations.ContainsKey(i))
+                {
+                    Debug.Assert(paletteForm.OrnamentSettingsForm != null);  
+                    paletteForm.OrnamentSettingsForm.Show();
+                    paletteForm.OrnamentSettingsForm.Location = visibleOrnamentFormLocations[i];
+                }
+                else if(paletteForm.OrnamentSettingsForm != null)
+                {
+                    paletteForm.OrnamentSettingsForm.Hide();
+                }
+            }
         }
 
         private void WriteNotation(XmlWriter w)
         {
             w.WriteStartElement("notation");
-            w.WriteAttributeString("chordSymbolType", ChordTypeComboBox.SelectedItem.ToString());
+            w.WriteAttributeString("chordSymbolType", ChordTypeComboBox.Text);
             if(StandardChordsOptionsPanel.Visible)
             {
                 w.WriteAttributeString("minimumCrotchetDuration", MinimumCrotchetDurationTextBox.Text);
@@ -887,8 +1062,8 @@ namespace Moritz.Composer
                 else
                     w.WriteAttributeString("beamsCrossBarlines", "false");
             }
-            w.WriteAttributeString("stafflineStemStrokeWidth", StafflineStemStrokeWidthComboBox.SelectedItem.ToString());
-            w.WriteAttributeString("gap", GapPixelsComboBox.SelectedItem.ToString());
+            w.WriteAttributeString("stafflineStemStrokeWidth", StafflineStemStrokeWidthComboBox.Text);
+            w.WriteAttributeString("gap", GapPixelsComboBox.Text);
             w.WriteAttributeString("minGapsBetweenStaves", this.MinimumGapsBetweenStavesTextBox.Text);
             w.WriteAttributeString("minGapsBetweenSystems", MinimumGapsBetweenSystemsTextBox.Text);
             w.WriteAttributeString("outputVoicesPerVoicePerStaff", OutputVoiceIndicesStaffTextBox.Text);
@@ -965,9 +1140,6 @@ namespace Moritz.Composer
                 {
                     int numberOfPages = score.SaveSVGScore();
                     score.OpenSVGScore();
-                    //// if SaveSettings is called before OpenSVGScore(), the score does not open.
-                    //// Maybe because threading is involved...
-                    //SaveSettings();
                 }
             }
             catch(Exception ex)
@@ -1044,7 +1216,7 @@ namespace Moritz.Composer
 
             float strokeWidth = float.Parse(StafflineStemStrokeWidthComboBox.Text, M.En_USNumberFormat) * pageFormat.ViewBoxMagnification;
             pageFormat.StafflineStemStrokeWidth = strokeWidth;
-            pageFormat.Gap = int.Parse(GapPixelsComboBox.Text) * pageFormat.ViewBoxMagnification;
+            pageFormat.Gap = float.Parse(GapPixelsComboBox.Text, M.En_USNumberFormat) * pageFormat.ViewBoxMagnification;
             pageFormat.DefaultDistanceBetweenStaves = int.Parse(MinimumGapsBetweenStavesTextBox.Text) * pageFormat.Gap;
             pageFormat.DefaultDistanceBetweenSystems = int.Parse(MinimumGapsBetweenSystemsTextBox.Text) * pageFormat.Gap;
 
@@ -1117,55 +1289,34 @@ namespace Moritz.Composer
             }
         }
 
-        /// <summary>
-        /// Called when the AssistantComposerMainForm is brought to the front of the z-order.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void AssistantComposerMainForm_Activated(object sender, EventArgs e)
+        #region AssistantComposerMainForm_Activated
+        private void ShowUncheckedFormsButton_Click(object sender, EventArgs e)
         {
-            //this.RevertCompletelyButton.Enabled = true;
-            //this.ShowUncheckedFormsButton.Enabled = false;
-            //this.ShowCheckedFormsButton.Enabled = false;
-            //this.SaveSettingsButton.Enabled = true;
-            //this.CreateScoreButton.Enabled = false;
+            Debug.Assert(_rff.FormsThatNeedReview.Count > 0);
 
-            //PaletteChordForm openPaletteChordForm = GetOpenPaletteChordForm();
-            //if(openPaletteChordForm != null)
-            //{
-            //    MessageBox.Show("Please close the open palette chord form.", "Open Palette Chord Form.");
-            //    openPaletteChordForm.Show();
-            //}
-            //else
-            //{
-            //    List<IRevertableForm> uncheckedIRevertableForms = GetUncheckedIRevertableForms(); // PalleteForms and OrnamentSettingsForms
-            //    int nUncheckedForms = uncheckedIRevertableForms.Count;
-            //    if(nUncheckedForms > 0)
-            //    {
-            //        StringBuilder sb = new StringBuilder("Please check the unchecked form");
-            //        if(nUncheckedForms > 1)
-            //            sb.Append("s:");
-            //        else
-            //            sb.Append(":");
-            //        foreach(IRevertableForm irForm in uncheckedIRevertableForms)
-            //        {
-            //            sb.Append("\n    ");
-            //            sb.Append(irForm.Name);
-            //        }
-            //        MessageBox.Show(sb.ToString(), "Warning");
-            //        this.ShowUncheckedFormsButton.Enabled = true;
-            //        this.SaveSettingsButton.Enabled = false;
-            //    }
-
-            //    List<IRevertableForm> checkedIRevertableForms = GetCheckedIRevertableForms(); // PaletteForms and OrnamentSettingsForms
-            //    int nCheckedForms = checkedIRevertableForms.Count;
-            //    if(nCheckedForms > 0)
-            //    {
-            //        this.ShowCheckedFormsButton.Enabled = true;
-            //        this.SaveSettingsButton.Enabled = true;
-            //    }
-            //}
+            Point location = new Point(200,75);
+            for(int i = 0; i < _rff.FormsThatNeedReview.Count; ++i )
+            {
+                Form form = _rff.FormsThatNeedReview[i] as Form;
+                form.Location = new Point(location.X + (i * 30), location.Y);
+                form.Show();
+                form.BringToFront();
+            }
         }
+
+        private void ShowCheckedFormsButton_Click(object sender, EventArgs e)
+        {
+            Debug.Assert(_rff.CheckedForms.Count > 0);
+            Point location = new Point(200,100);
+            for(int i = 0; i < _rff.CheckedForms.Count; ++i )
+            {
+                Form form = (_rff.CheckedForms[i] as Form);
+                form.Location = new Point(location.X + (i * 30), location.Y);
+                form.Show();
+                form.BringToFront();
+            }
+        }   
+        #endregion
 
         private void AssistantComposerMainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -1184,7 +1335,7 @@ namespace Moritz.Composer
 
         private void BeamsCrossBarlinesCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            SetNotationNeedsReview();
+            SetNotationPanelNeedsReview();
         }
         #region list box events and functions
         private void KrystalsListBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -1269,7 +1420,7 @@ namespace Moritz.Composer
                 string staffKrystalPath = M.Preferences.LocalMoritzKrystalsFolder + @"\" + newKrystal.Name;
                 Krystal krystal = K.LoadKrystal(staffKrystalPath);
                 this.KrystalsListBox.Items.Add(krystal);
-                SetKrystalsNeedReview();
+                SetKrystalsPanelNeedsReview();
 
                 KrystalsListBox.SetSelected(KrystalsListBox.Items.Count - 1, true); // triggers KrystalsListBox_SelectedIndexChanged()
             }
@@ -1302,7 +1453,7 @@ namespace Moritz.Composer
                 if(proceed == DialogResult.Yes)
                 {
                     KrystalsListBox.Items.RemoveAt(KrystalsListBox.SelectedIndex);
-                    SetKrystalsNeedReview();
+                    SetKrystalsPanelNeedsReview();
                 }
             }
         }
@@ -1399,7 +1550,7 @@ namespace Moritz.Composer
                     currentPaletteForms.Add(paletteForm);
                     CurrentPaletteForms = currentPaletteForms;
                     PalettesListBox.SelectedIndex = PalettesListBox.Items.Count - 1;
-                    this.SetPalettesNeedReview();
+                    this.SetPalettesPanelNeedsReview();
                 }
                 else
                 {
@@ -1423,10 +1574,11 @@ namespace Moritz.Composer
                 if(proceed == DialogResult.Yes)
                 {
                     List<PaletteForm> currentPaletteForms = CurrentPaletteForms;
-                    currentPaletteForms[selectedIndex].Close();
+                    PaletteForm paletteForm = currentPaletteForms[selectedIndex];
+                    paletteForm.Close();
                     currentPaletteForms.RemoveAt(selectedIndex);
                     CurrentPaletteForms = currentPaletteForms;
-                    this.SetPalettesNeedReview();
+                    this.SetPalettesPanelNeedsReview();
                     UpdateForChangedPaletteList();
                 }
             }
@@ -1477,7 +1629,60 @@ namespace Moritz.Composer
         const int _minimumMsDuration = 5;
         #endregion private variables
 
-        #region SelectedIndexChanged events
+        #region ComboBox events
+        #region handle the use of text in the ComboBox
+        /// <summary>
+        /// If comboBox.text is not in the comboBox.Items list, comboBox.SelectedIndex is set to 0.
+        /// Otherwise comboBox.SelectedIndex is set to the appropriate index.
+        /// </summary>
+        private void SetComboBoxSelectedIndexFromText(ComboBox comboBox)
+        {
+            if(comboBox.SelectedIndex == -1)
+            {
+                int index = comboBox.Items.IndexOf(comboBox.Text);
+                if(index == -1)
+                    comboBox.SelectedIndex = 0;
+                else
+                    comboBox.SelectedIndex = comboBox.Items.IndexOf(comboBox.Text);
+            }
+        }
+        /// <summary>
+        /// This function ensures that the user can only use values in the ScoreComboBox's item list.
+        /// Typing custom values won't work.
+        /// </summary>
+        private void ScoreComboBox_Leave(object sender, EventArgs e)
+        {
+            SetComboBoxSelectedIndexFromText(ScoreComboBox);
+            SetNotationPanelNeedsReview();
+        }
+        /// <summary>
+        /// This function ensures that the user can only use values in the ChordTypeComboBox's item list.
+        /// Typing custom values won't work.
+        /// </summary>
+        private void ChordTypeComboBox_Leave(object sender, EventArgs e)
+        {
+            SetComboBoxSelectedIndexFromText(ChordTypeComboBox);
+            SetNotationPanelNeedsReview();
+        }
+        /// <summary>
+        /// This function ensures that the user can only use values in the ChordTypeComboBox's item list.
+        /// Typing custom values won't work.
+        /// </summary>
+        private void StafflineStemStrokeWidthComboBox_Leave(object sender, EventArgs e)
+        {
+            SetComboBoxSelectedIndexFromText(StafflineStemStrokeWidthComboBox);
+            SetNotationPanelNeedsReview();
+        }
+        /// <summary>
+        /// This function ensures that the user can only use values in the ChordTypeComboBox's item list.
+        /// Typing custom values won't work.
+        /// </summary>
+        private void GapPixelsComboBox_Leave(object sender, EventArgs e)
+        {
+            SetComboBoxSelectedIndexFromText(GapPixelsComboBox);
+            SetNotationPanelNeedsReview();
+        }
+        #endregion
         private void ScoreComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             _dimensionsAndMetadataForm.Hide();
@@ -1503,15 +1708,15 @@ namespace Moritz.Composer
                 this.StandardChordsOptionsPanel.Visible = true;
 
             this.OutputVoiceIndicesStaffTextBox_Leave(null, null);
-            SetNotationNeedsReview();
+            SetNotationPanelNeedsReview();
         }
         private void StafflineStemStrokeWidthComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SetNotationNeedsReview();
+            SetNotationPanelNeedsReview();
         }
         private void GapPixelsComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SetNotationNeedsReview();
+            SetNotationPanelNeedsReview();
         }
 
         private void GetSelectedSettings()
@@ -1737,7 +1942,7 @@ namespace Moritz.Composer
             }
 
             M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
-            SetNotationNeedsReview();
+            SetNotationPanelNeedsReview();
         }
         private void MinimumCrotchetDurationTextBox_Leave(object sender, EventArgs e)
         {
@@ -1809,7 +2014,7 @@ namespace Moritz.Composer
                 OutputVoiceIndicesStaffTextBox.Text = NormalizedByteListsString(byteLists);
                 M.SetTextBoxErrorColorIfNotOkay(OutputVoiceIndicesStaffTextBox, true);
             }
-            SetNotationNeedsReview();
+            SetNotationPanelNeedsReview();
         }
         /// <summary>
         /// This function sets _numberOfinputStaves (and consequetially _numberOfStaves).
@@ -1865,7 +2070,7 @@ namespace Moritz.Composer
                 InputVoiceIndicesPerStaffTextBox.Text = NormalizedByteListsString(byteLists);
                 M.SetTextBoxErrorColorIfNotOkay(InputVoiceIndicesPerStaffTextBox, true);
             }
-            SetNotationNeedsReview();
+            SetNotationPanelNeedsReview();
         }
         private string NormalizedText(List<string> texts)
         {
@@ -1904,7 +2109,7 @@ namespace Moritz.Composer
             else
                 M.SetTextBoxErrorColorIfNotOkay(ClefsPerStaffTextBox, false);
 
-            SetNotationNeedsReview();
+            SetNotationPanelNeedsReview();
         }
         private void CheckClefsAndStafflineNumbers()
         {
@@ -1927,7 +2132,7 @@ namespace Moritz.Composer
             {
                 M.SetTextBoxErrorColorIfNotOkay(StafflinesPerStaffTextBox, false);
             }
-            SetNotationNeedsReview();
+            SetNotationPanelNeedsReview();
         }
         /// <summary>
         /// This function _uses_ _numberOfStaves.
@@ -1952,7 +2157,7 @@ namespace Moritz.Composer
                 if(sum != _numberOfStaves)
                     M.SetTextBoxErrorColorIfNotOkay(StaffGroupsTextBox, false);
             }
-            SetNotationNeedsReview();
+            SetNotationPanelNeedsReview();
         }
         private void CheckStaffNames(TextBox textBox)
         {
@@ -1971,7 +2176,7 @@ namespace Moritz.Composer
             {
                 M.SetTextBoxErrorColorIfNotOkay(textBox, false);
             }
-            SetNotationNeedsReview();
+            SetNotationPanelNeedsReview();
         }
         private void LongStaffNamesTextBox_Leave(object sender, EventArgs e)
         {
@@ -2025,7 +2230,7 @@ namespace Moritz.Composer
             {
                 SystemStartBarsTextBox.Text = NormalizedSystemStartBars();
             }
-            SetNotationNeedsReview();
+            SetNotationPanelNeedsReview();
         }
         #endregion  TextBox Leave events
         #region TextChanged events (just set text boxes to white)
@@ -2076,7 +2281,7 @@ namespace Moritz.Composer
         #endregion
 
         private List<TextBox> _allTextBoxes = null;
-        private RevertableFormFunctions _rff = new RevertableFormFunctions();
+        private ReviewableFormFunctions _rff = new ReviewableFormFunctions();
         private IMoritzForm1 _moritzForm1;
         private Moritz.Krystals.KrystalBrowser _krystalBrowser = null;
         private DimensionsAndMetadataForm _dimensionsAndMetadataForm;
@@ -2102,5 +2307,7 @@ namespace Moritz.Composer
         }
 
         public PageFormat PageFormat = null;
+
+
     }
 }

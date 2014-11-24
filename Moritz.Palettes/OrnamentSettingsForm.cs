@@ -10,7 +10,7 @@ using Moritz.Globals;
 
 namespace Moritz.Palettes
 {
-    public partial class OrnamentSettingsForm : Form, IRevertableForm
+    public partial class OrnamentSettingsForm : Form
     {
         public OrnamentSettingsForm(PaletteForm paletteForm)
         {
@@ -44,7 +44,7 @@ namespace Moritz.Palettes
             
             TouchAllTextBoxes();
 
-            _rff.SetIsSaved(this, OkayToSaveButton, RevertToSavedButton);
+            _rff.SetIsSaved(this, false, OkayToSaveButton, RevertToSavedButton);
         }
 
         private void ConnectBasicChordControl()
@@ -118,6 +118,9 @@ namespace Moritz.Palettes
                     "numOrnaments", "ornaments");
             }
             Debug.Assert(r.Name == "ornamentSettings");
+
+            _rff.SetIsSaved(this, false, OkayToSaveButton, RevertToSavedButton);
+
             return int.Parse(NumBasicChordDefsTextBox.Text);
         }
 
@@ -421,10 +424,15 @@ namespace Moritz.Palettes
             {
                 int numberOfOrnaments = int.Parse(textBox.Text);
 
-                for(int i = 0; i < numberOfOrnaments; ++i)
+                while(_ornaments.Count < numberOfOrnaments)
                 {
-                    _ornaments.Add(null);
+                    _ornaments.Add(new List<int>());
                 }
+                while(_ornaments.Count > numberOfOrnaments)
+                {
+                    _ornaments.RemoveAt(_ornaments.Count - 1);
+                }
+                EnableOrnamentTextBoxes();
                 TouchOrnamentTextBoxes();
                 SetDialogSize(numberOfOrnaments);
             }
@@ -570,7 +578,7 @@ namespace Moritz.Palettes
         private void SetDialogState(TextBox textBox, bool okay)
         {
             M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
-            _rff.SetSettingsNeedReview(this, OkayToSaveButton, RevertToSavedButton);
+            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
         }
        #endregion
 
@@ -595,12 +603,12 @@ namespace Moritz.Palettes
         
         private void OkayToSaveButton_Click(object sender, EventArgs e)
         {
-            _rff.SetSettingsCanBeSaved(this, OkayToSaveButton); 
+            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton); 
         }
 
         private void RevertToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(this.Text.EndsWith(_rff.NeedsReviewStr) || this.Text.EndsWith(_rff.ChangedAndCheckedStr));
+            Debug.Assert(((ReviewableState)this.Tag) == ReviewableState.needsReview || ((ReviewableState)this.Tag) == ReviewableState.hasChanged);
             DialogResult result = 
                 MessageBox.Show("Are you sure you want to revert this dialog to the saved version?", "Revert?", 
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -627,19 +635,16 @@ namespace Moritz.Palettes
 
                 TouchAllTextBoxes();
 
-                _rff.SetIsSaved(this, OkayToSaveButton, RevertToSavedButton);
+                _rff.SetIsSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
             }
         }
         #endregion buttons
 
         /************/
 
-        #region IRevertableForm
-        public bool HasError { get { return M.HasError(_allTextBoxes); } }
-        public bool NeedsReview { get { return _rff.NeedsReview(this); } }
-        public bool HasBeenChecked { get { return _rff.HasBeenChecked(this); } }
+        #region ReviewableForm
 
-        #endregion IRevertableForm
+        #endregion ReviewableForm
 
         #region public interface
 
@@ -721,7 +726,7 @@ namespace Moritz.Palettes
 
             w.WriteEndElement(); // end of ornamentSettings
 
-            _rff.SetIsSaved(this, OkayToSaveButton, RevertToSavedButton);
+            _rff.SetIsSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
         }
         public BasicChordControl BasicChordControl { get { return _bcc; } }
         public List<List<int>> Ornaments { get { return _ornaments; } }
@@ -735,7 +740,7 @@ namespace Moritz.Palettes
         private List<TextBox> _12OrnamentTextBoxes;
         private List<TextBox> _allTextBoxes;
         private List<List<int>> _ornaments = null;
-        private RevertableFormFunctions _rff = new RevertableFormFunctions();
+        private ReviewableFormFunctions _rff = new ReviewableFormFunctions();
         #endregion private variables
     }
 }

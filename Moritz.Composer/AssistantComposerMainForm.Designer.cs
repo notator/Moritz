@@ -43,7 +43,7 @@ namespace Moritz.Composer
             this.RemoveSelectedKrystalButton = new System.Windows.Forms.Button();
             this.NotationGroupBox = new System.Windows.Forms.GroupBox();
             this.OkayToSaveNotationButton = new System.Windows.Forms.Button();
-            this.RevertNotationToSavedButton = new System.Windows.Forms.Button();
+            this.RevertNotationButton = new System.Windows.Forms.Button();
             this.InputVoiceIndicesPerStaffHelpLabel2 = new System.Windows.Forms.Label();
             this.InputVoiceIndicesPerStaffHelpLabel = new System.Windows.Forms.Label();
             this.InputVoiceIndicesPerStaffLabel = new System.Windows.Forms.Label();
@@ -94,7 +94,7 @@ namespace Moritz.Composer
             this.DimensionsAndMetadataButton = new System.Windows.Forms.Button();
             this.KrystalsGroupBox = new System.Windows.Forms.GroupBox();
             this.OkayToSaveKrystalsButton = new System.Windows.Forms.Button();
-            this.RevertKrystalsToSavedButton = new System.Windows.Forms.Button();
+            this.RevertKrystalsButton = new System.Windows.Forms.Button();
             this.PalettesGroupBox = new System.Windows.Forms.GroupBox();
             this.RevertPalettesButton = new System.Windows.Forms.Button();
             this.OkayToSavePalettesButton = new System.Windows.Forms.Button();
@@ -109,12 +109,11 @@ namespace Moritz.Composer
             // 
             // QuitAlgorithmButton
             // 
-            this.QuitAlgorithmButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.QuitAlgorithmButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.QuitAlgorithmButton.Location = new System.Drawing.Point(525, 575);
+            this.QuitAlgorithmButton.Location = new System.Drawing.Point(607, 539);
             this.QuitAlgorithmButton.Name = "QuitAlgorithmButton";
-            this.QuitAlgorithmButton.Size = new System.Drawing.Size(183, 26);
-            this.QuitAlgorithmButton.TabIndex = 8;
+            this.QuitAlgorithmButton.Size = new System.Drawing.Size(204, 26);
+            this.QuitAlgorithmButton.TabIndex = 2;
             this.QuitAlgorithmButton.Text = "Quit algorithm";
             this.QuitAlgorithmButton.UseVisualStyleBackColor = true;
             this.QuitAlgorithmButton.Click += new System.EventHandler(this.QuitAssistantComposerButton_Click);
@@ -127,7 +126,7 @@ namespace Moritz.Composer
             this.PalettesListBox.Location = new System.Drawing.Point(16, 23);
             this.PalettesListBox.Name = "PalettesListBox";
             this.PalettesListBox.Size = new System.Drawing.Size(183, 130);
-            this.PalettesListBox.TabIndex = 0;
+            this.PalettesListBox.TabIndex = 4;
             this.PalettesListBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.PalettesListBox_DrawItem);
             this.PalettesListBox.SelectedIndexChanged += new System.EventHandler(this.PalettesListBox_SelectedIndexChanged);
             // 
@@ -152,20 +151,19 @@ namespace Moritz.Composer
             this.AddPaletteButton.Location = new System.Drawing.Point(16, 192);
             this.AddPaletteButton.Name = "AddPaletteButton";
             this.AddPaletteButton.Size = new System.Drawing.Size(183, 27);
-            this.AddPaletteButton.TabIndex = 1;
+            this.AddPaletteButton.TabIndex = 3;
             this.AddPaletteButton.Text = "add palette";
             this.AddPaletteButton.UseVisualStyleBackColor = true;
             this.AddPaletteButton.Click += new System.EventHandler(this.AddPaletteButton_Click);
             // 
             // AddKrystalButton
             // 
-            this.AddKrystalButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.AddKrystalButton.Font = new System.Drawing.Font("Arial", 8F);
             this.AddKrystalButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.AddKrystalButton.Location = new System.Drawing.Point(16, 149);
+            this.AddKrystalButton.Location = new System.Drawing.Point(16, 193);
             this.AddKrystalButton.Name = "AddKrystalButton";
             this.AddKrystalButton.Size = new System.Drawing.Size(183, 26);
-            this.AddKrystalButton.TabIndex = 1;
+            this.AddKrystalButton.TabIndex = 3;
             this.AddKrystalButton.Text = "add krystal";
             this.AddKrystalButton.UseVisualStyleBackColor = true;
             this.AddKrystalButton.Click += new System.EventHandler(this.AddKrystalButton_Click);
@@ -178,42 +176,38 @@ namespace Moritz.Composer
             this.DeleteSelectedPaletteButton.Location = new System.Drawing.Point(16, 225);
             this.DeleteSelectedPaletteButton.Name = "DeleteSelectedPaletteButton";
             this.DeleteSelectedPaletteButton.Size = new System.Drawing.Size(183, 27);
-            this.DeleteSelectedPaletteButton.TabIndex = 3;
+            this.DeleteSelectedPaletteButton.TabIndex = 5;
             this.DeleteSelectedPaletteButton.Text = "delete selected palette";
             this.DeleteSelectedPaletteButton.UseVisualStyleBackColor = true;
             this.DeleteSelectedPaletteButton.Click += new System.EventHandler(this.DeletePaletteButton_Click);
             // 
             // KrystalsListBox
             // 
-            this.KrystalsListBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.KrystalsListBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.KrystalsListBox.FormattingEnabled = true;
             this.KrystalsListBox.ItemHeight = 14;
             this.KrystalsListBox.Location = new System.Drawing.Point(16, 23);
             this.KrystalsListBox.Name = "KrystalsListBox";
-            this.KrystalsListBox.Size = new System.Drawing.Size(183, 88);
-            this.KrystalsListBox.TabIndex = 0;
+            this.KrystalsListBox.Size = new System.Drawing.Size(183, 130);
+            this.KrystalsListBox.TabIndex = 4;
             this.KrystalsListBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.KrystalsListBox_DrawItem);
             this.KrystalsListBox.SelectedIndexChanged += new System.EventHandler(this.KrystalsListBox_SelectedIndexChanged);
             // 
             // RemoveSelectedKrystalButton
             // 
-            this.RemoveSelectedKrystalButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.RemoveSelectedKrystalButton.Enabled = false;
             this.RemoveSelectedKrystalButton.Font = new System.Drawing.Font("Arial", 8F);
             this.RemoveSelectedKrystalButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.RemoveSelectedKrystalButton.Location = new System.Drawing.Point(16, 181);
+            this.RemoveSelectedKrystalButton.Location = new System.Drawing.Point(16, 225);
             this.RemoveSelectedKrystalButton.Name = "RemoveSelectedKrystalButton";
             this.RemoveSelectedKrystalButton.Size = new System.Drawing.Size(183, 26);
-            this.RemoveSelectedKrystalButton.TabIndex = 2;
+            this.RemoveSelectedKrystalButton.TabIndex = 5;
             this.RemoveSelectedKrystalButton.Text = "remove selected krystal";
             this.RemoveSelectedKrystalButton.UseVisualStyleBackColor = true;
             this.RemoveSelectedKrystalButton.Click += new System.EventHandler(this.RemoveSelectedKrystalButton_Click);
             // 
             // NotationGroupBox
             // 
-            this.NotationGroupBox.Controls.Add(this.OkayToSaveNotationButton);
-            this.NotationGroupBox.Controls.Add(this.RevertNotationToSavedButton);
             this.NotationGroupBox.Controls.Add(this.InputVoiceIndicesPerStaffHelpLabel2);
             this.NotationGroupBox.Controls.Add(this.InputVoiceIndicesPerStaffHelpLabel);
             this.NotationGroupBox.Controls.Add(this.InputVoiceIndicesPerStaffLabel);
@@ -253,41 +247,41 @@ namespace Moritz.Composer
             this.NotationGroupBox.Controls.Add(this.MinimumGapsBetweenStavesLabel);
             this.NotationGroupBox.Controls.Add(this.GapPixelsLabel);
             this.NotationGroupBox.ForeColor = System.Drawing.Color.Brown;
-            this.NotationGroupBox.Location = new System.Drawing.Point(23, 39);
+            this.NotationGroupBox.Location = new System.Drawing.Point(15, 43);
             this.NotationGroupBox.Name = "NotationGroupBox";
-            this.NotationGroupBox.Size = new System.Drawing.Size(466, 523);
-            this.NotationGroupBox.TabIndex = 1;
+            this.NotationGroupBox.Size = new System.Drawing.Size(466, 490);
+            this.NotationGroupBox.TabIndex = 9;
             this.NotationGroupBox.TabStop = false;
             this.NotationGroupBox.Text = "notation";
             // 
             // OkayToSaveNotationButton
             // 
-            this.OkayToSaveNotationButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.OkayToSaveNotationButton.Enabled = false;
             this.OkayToSaveNotationButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.OkayToSaveNotationButton.Location = new System.Drawing.Point(268, 488);
+            this.OkayToSaveNotationButton.ForeColor = System.Drawing.Color.Blue;
+            this.OkayToSaveNotationButton.Location = new System.Drawing.Point(282, 539);
             this.OkayToSaveNotationButton.Name = "OkayToSaveNotationButton";
-            this.OkayToSaveNotationButton.Size = new System.Drawing.Size(89, 26);
-            this.OkayToSaveNotationButton.TabIndex = 194;
-            this.OkayToSaveNotationButton.Text = "okay to save";
+            this.OkayToSaveNotationButton.Size = new System.Drawing.Size(183, 26);
+            this.OkayToSaveNotationButton.TabIndex = 1;
+            this.OkayToSaveNotationButton.Text = "okay to save notation";
             this.OkayToSaveNotationButton.UseVisualStyleBackColor = true;
             this.OkayToSaveNotationButton.Click += new System.EventHandler(this.OkayToSaveNotationButton_Click);
             // 
-            // RevertNotationToSavedButton
+            // RevertNotationButton
             // 
-            this.RevertNotationToSavedButton.Enabled = false;
-            this.RevertNotationToSavedButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.RevertNotationToSavedButton.Location = new System.Drawing.Point(363, 488);
-            this.RevertNotationToSavedButton.Name = "RevertNotationToSavedButton";
-            this.RevertNotationToSavedButton.Size = new System.Drawing.Size(89, 26);
-            this.RevertNotationToSavedButton.TabIndex = 193;
-            this.RevertNotationToSavedButton.Text = "revert notation";
-            this.RevertNotationToSavedButton.UseVisualStyleBackColor = true;
-            this.RevertNotationToSavedButton.Click += new System.EventHandler(this.RevertNotationToSavedButton_Click);
+            this.RevertNotationButton.Enabled = false;
+            this.RevertNotationButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.RevertNotationButton.ForeColor = System.Drawing.Color.Red;
+            this.RevertNotationButton.Location = new System.Drawing.Point(93, 539);
+            this.RevertNotationButton.Name = "RevertNotationButton";
+            this.RevertNotationButton.Size = new System.Drawing.Size(183, 26);
+            this.RevertNotationButton.TabIndex = 2;
+            this.RevertNotationButton.Text = "revert notation";
+            this.RevertNotationButton.UseVisualStyleBackColor = true;
+            this.RevertNotationButton.Click += new System.EventHandler(this.RevertNotationToSavedButton_Click);
             // 
             // InputVoiceIndicesPerStaffHelpLabel2
             // 
-            this.InputVoiceIndicesPerStaffHelpLabel2.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.InputVoiceIndicesPerStaffHelpLabel2.AutoSize = true;
             this.InputVoiceIndicesPerStaffHelpLabel2.ForeColor = System.Drawing.Color.RoyalBlue;
             this.InputVoiceIndicesPerStaffHelpLabel2.Location = new System.Drawing.Point(250, 200);
@@ -299,7 +293,6 @@ namespace Moritz.Composer
             // 
             // InputVoiceIndicesPerStaffHelpLabel
             // 
-            this.InputVoiceIndicesPerStaffHelpLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.InputVoiceIndicesPerStaffHelpLabel.AutoSize = true;
             this.InputVoiceIndicesPerStaffHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
             this.InputVoiceIndicesPerStaffHelpLabel.Location = new System.Drawing.Point(109, 180);
@@ -310,7 +303,6 @@ namespace Moritz.Composer
             // 
             // InputVoiceIndicesPerStaffLabel
             // 
-            this.InputVoiceIndicesPerStaffLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.InputVoiceIndicesPerStaffLabel.AutoSize = true;
             this.InputVoiceIndicesPerStaffLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
             this.InputVoiceIndicesPerStaffLabel.Location = new System.Drawing.Point(12, 193);
@@ -323,39 +315,36 @@ namespace Moritz.Composer
             // 
             // InputVoiceIndicesPerStaffTextBox
             // 
-            this.InputVoiceIndicesPerStaffTextBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.InputVoiceIndicesPerStaffTextBox.Location = new System.Drawing.Point(111, 197);
             this.InputVoiceIndicesPerStaffTextBox.Name = "InputVoiceIndicesPerStaffTextBox";
             this.InputVoiceIndicesPerStaffTextBox.Size = new System.Drawing.Size(136, 20);
-            this.InputVoiceIndicesPerStaffTextBox.TabIndex = 187;
+            this.InputVoiceIndicesPerStaffTextBox.TabIndex = 10;
             this.InputVoiceIndicesPerStaffTextBox.TextChanged += new System.EventHandler(this.InputVoiceIndicesPerStaffTextBox_TextChanged);
             this.InputVoiceIndicesPerStaffTextBox.Leave += new System.EventHandler(this.InputVoiceIndicesPerStaffTextBox_Leave);
             // 
             // ChordTypeComboBoxLabel
             // 
-            this.ChordTypeComboBoxLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.ChordTypeComboBoxLabel.AutoSize = true;
             this.ChordTypeComboBoxLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
             this.ChordTypeComboBoxLabel.Location = new System.Drawing.Point(6, 23);
             this.ChordTypeComboBoxLabel.Margin = new System.Windows.Forms.Padding(0);
             this.ChordTypeComboBoxLabel.Name = "ChordTypeComboBoxLabel";
             this.ChordTypeComboBoxLabel.Size = new System.Drawing.Size(59, 14);
-            this.ChordTypeComboBoxLabel.TabIndex = 186;
+            this.ChordTypeComboBoxLabel.TabIndex = 0;
             this.ChordTypeComboBoxLabel.Text = "chord type";
             // 
             // ChordTypeComboBox
             // 
-            this.ChordTypeComboBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.ChordTypeComboBox.FormattingEnabled = true;
             this.ChordTypeComboBox.Location = new System.Drawing.Point(68, 19);
             this.ChordTypeComboBox.Name = "ChordTypeComboBox";
             this.ChordTypeComboBox.Size = new System.Drawing.Size(133, 22);
-            this.ChordTypeComboBox.TabIndex = 12;
+            this.ChordTypeComboBox.TabIndex = 4;
             this.ChordTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.ChordTypeComboBox_SelectedIndexChanged);
+            this.ChordTypeComboBox.Leave += new System.EventHandler(this.ChordTypeComboBox_Leave);
             // 
             // ShortStaffNamesHelpLabel
             // 
-            this.ShortStaffNamesHelpLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.ShortStaffNamesHelpLabel.AutoSize = true;
             this.ShortStaffNamesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
             this.ShortStaffNamesHelpLabel.Location = new System.Drawing.Point(100, 389);
@@ -366,7 +355,6 @@ namespace Moritz.Composer
             // 
             // StandardChordsOptionsPanel
             // 
-            this.StandardChordsOptionsPanel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.StandardChordsOptionsPanel.Controls.Add(this.BeamsCrossBarlinesCheckBox);
             this.StandardChordsOptionsPanel.Controls.Add(this.MinimumCrotchetDurationTextBox);
             this.StandardChordsOptionsPanel.Controls.Add(this.MinimumCrotchetDurationLabel);
@@ -395,7 +383,7 @@ namespace Moritz.Composer
             this.MinimumCrotchetDurationTextBox.Size = new System.Drawing.Size(63, 20);
             this.MinimumCrotchetDurationTextBox.TabIndex = 0;
             this.MinimumCrotchetDurationTextBox.TextChanged += new System.EventHandler(this.MinimumCrotchetDurationTextBox_TextChanged);
-            this.MinimumCrotchetDurationTextBox.Leave += new System.EventHandler(this.MinimumCrotchetDurationTextBox_TextChanged);
+            this.MinimumCrotchetDurationTextBox.Leave += new System.EventHandler(this.MinimumCrotchetDurationTextBox_Leave);
             // 
             // MinimumCrotchetDurationLabel
             // 
@@ -411,7 +399,6 @@ namespace Moritz.Composer
             // 
             // LongStaffNamesHelpLabel
             // 
-            this.LongStaffNamesHelpLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.LongStaffNamesHelpLabel.AutoSize = true;
             this.LongStaffNamesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
             this.LongStaffNamesHelpLabel.Location = new System.Drawing.Point(97, 347);
@@ -422,7 +409,6 @@ namespace Moritz.Composer
             // 
             // OutputVoiceIndicesPerStaffHelpLabel2
             // 
-            this.OutputVoiceIndicesPerStaffHelpLabel2.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.OutputVoiceIndicesPerStaffHelpLabel2.AutoSize = true;
             this.OutputVoiceIndicesPerStaffHelpLabel2.ForeColor = System.Drawing.Color.RoyalBlue;
             this.OutputVoiceIndicesPerStaffHelpLabel2.Location = new System.Drawing.Point(250, 157);
@@ -434,7 +420,6 @@ namespace Moritz.Composer
             // 
             // ShortStaffNamesLabel
             // 
-            this.ShortStaffNamesLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.ShortStaffNamesLabel.AutoSize = true;
             this.ShortStaffNamesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
             this.ShortStaffNamesLabel.Location = new System.Drawing.Point(10, 389);
@@ -446,17 +431,15 @@ namespace Moritz.Composer
             // 
             // LongStaffNamesTextBox
             // 
-            this.LongStaffNamesTextBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.LongStaffNamesTextBox.Location = new System.Drawing.Point(10, 364);
             this.LongStaffNamesTextBox.Name = "LongStaffNamesTextBox";
             this.LongStaffNamesTextBox.Size = new System.Drawing.Size(440, 20);
-            this.LongStaffNamesTextBox.TabIndex = 5;
+            this.LongStaffNamesTextBox.TabIndex = 14;
             this.LongStaffNamesTextBox.TextChanged += new System.EventHandler(this.LongStaffNamesTextBox_TextChanged);
             this.LongStaffNamesTextBox.Leave += new System.EventHandler(this.LongStaffNamesTextBox_Leave);
             // 
             // OutputVoiceIndicesPerStaffHelpLabel
             // 
-            this.OutputVoiceIndicesPerStaffHelpLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.OutputVoiceIndicesPerStaffHelpLabel.AutoSize = true;
             this.OutputVoiceIndicesPerStaffHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
             this.OutputVoiceIndicesPerStaffHelpLabel.Location = new System.Drawing.Point(109, 137);
@@ -467,7 +450,6 @@ namespace Moritz.Composer
             // 
             // SystemStartBarsHelpLabel
             // 
-            this.SystemStartBarsHelpLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.SystemStartBarsHelpLabel.AutoSize = true;
             this.SystemStartBarsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
             this.SystemStartBarsHelpLabel.Location = new System.Drawing.Point(139, 442);
@@ -478,17 +460,15 @@ namespace Moritz.Composer
             // 
             // ShortStaffNamesTextBox
             // 
-            this.ShortStaffNamesTextBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.ShortStaffNamesTextBox.Location = new System.Drawing.Point(10, 405);
             this.ShortStaffNamesTextBox.Name = "ShortStaffNamesTextBox";
-            this.ShortStaffNamesTextBox.Size = new System.Drawing.Size(438, 20);
-            this.ShortStaffNamesTextBox.TabIndex = 6;
+            this.ShortStaffNamesTextBox.Size = new System.Drawing.Size(440, 20);
+            this.ShortStaffNamesTextBox.TabIndex = 15;
             this.ShortStaffNamesTextBox.TextChanged += new System.EventHandler(this.ShortStaffNamesTextBox_TextChanged);
             this.ShortStaffNamesTextBox.Leave += new System.EventHandler(this.ShortStaffNamesTextBox_Leave);
             // 
             // StafflinesPerStaffHelpLabel
             // 
-            this.StafflinesPerStaffHelpLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.StafflinesPerStaffHelpLabel.AutoSize = true;
             this.StafflinesPerStaffHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
             this.StafflinesPerStaffHelpLabel.Location = new System.Drawing.Point(250, 267);
@@ -499,20 +479,18 @@ namespace Moritz.Composer
             // 
             // OutputVoiceIndicesPerStaffLabel
             // 
-            this.OutputVoiceIndicesPerStaffLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.OutputVoiceIndicesPerStaffLabel.AutoSize = true;
             this.OutputVoiceIndicesPerStaffLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
             this.OutputVoiceIndicesPerStaffLabel.Location = new System.Drawing.Point(12, 150);
             this.OutputVoiceIndicesPerStaffLabel.Margin = new System.Windows.Forms.Padding(0);
             this.OutputVoiceIndicesPerStaffLabel.Name = "OutputVoiceIndicesPerStaffLabel";
             this.OutputVoiceIndicesPerStaffLabel.Size = new System.Drawing.Size(97, 28);
-            this.OutputVoiceIndicesPerStaffLabel.TabIndex = 181;
+            this.OutputVoiceIndicesPerStaffLabel.TabIndex = 3;
             this.OutputVoiceIndicesPerStaffLabel.Text = "output voices\r\nper voice per staff";
             this.OutputVoiceIndicesPerStaffLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // StafflinesPerStaffLabel
             // 
-            this.StafflinesPerStaffLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.StafflinesPerStaffLabel.AutoSize = true;
             this.StafflinesPerStaffLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
             this.StafflinesPerStaffLabel.Location = new System.Drawing.Point(12, 274);
@@ -524,7 +502,6 @@ namespace Moritz.Composer
             // 
             // LongStaffNamesLabel
             // 
-            this.LongStaffNamesLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.LongStaffNamesLabel.AutoSize = true;
             this.LongStaffNamesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
             this.LongStaffNamesLabel.Location = new System.Drawing.Point(10, 347);
@@ -536,17 +513,15 @@ namespace Moritz.Composer
             // 
             // OutputVoiceIndicesStaffTextBox
             // 
-            this.OutputVoiceIndicesStaffTextBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.OutputVoiceIndicesStaffTextBox.Location = new System.Drawing.Point(111, 154);
             this.OutputVoiceIndicesStaffTextBox.Name = "OutputVoiceIndicesStaffTextBox";
             this.OutputVoiceIndicesStaffTextBox.Size = new System.Drawing.Size(136, 20);
-            this.OutputVoiceIndicesStaffTextBox.TabIndex = 1;
+            this.OutputVoiceIndicesStaffTextBox.TabIndex = 9;
             this.OutputVoiceIndicesStaffTextBox.TextChanged += new System.EventHandler(this.OutputVoiceIndicesStaffTextBox_TextChanged);
             this.OutputVoiceIndicesStaffTextBox.Leave += new System.EventHandler(this.OutputVoiceIndicesStaffTextBox_Leave);
             // 
             // ClefsPerStaffLabel
             // 
-            this.ClefsPerStaffLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.ClefsPerStaffLabel.AutoSize = true;
             this.ClefsPerStaffLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
             this.ClefsPerStaffLabel.Location = new System.Drawing.Point(33, 237);
@@ -558,7 +533,6 @@ namespace Moritz.Composer
             // 
             // ClefsPerStaffHelpLabel
             // 
-            this.ClefsPerStaffHelpLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.ClefsPerStaffHelpLabel.AutoSize = true;
             this.ClefsPerStaffHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
             this.ClefsPerStaffHelpLabel.Location = new System.Drawing.Point(250, 230);
@@ -569,7 +543,6 @@ namespace Moritz.Composer
             // 
             // StaffGroupsHelpLabel
             // 
-            this.StaffGroupsHelpLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.StaffGroupsHelpLabel.AutoSize = true;
             this.StaffGroupsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
             this.StaffGroupsHelpLabel.Location = new System.Drawing.Point(250, 311);
@@ -580,7 +553,6 @@ namespace Moritz.Composer
             // 
             // StaffGroupsLabel
             // 
-            this.StaffGroupsLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.StaffGroupsLabel.AutoSize = true;
             this.StaffGroupsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
             this.StaffGroupsLabel.Location = new System.Drawing.Point(42, 311);
@@ -592,60 +564,54 @@ namespace Moritz.Composer
             // 
             // StafflinesPerStaffTextBox
             // 
-            this.StafflinesPerStaffTextBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.StafflinesPerStaffTextBox.Location = new System.Drawing.Point(111, 271);
             this.StafflinesPerStaffTextBox.Name = "StafflinesPerStaffTextBox";
             this.StafflinesPerStaffTextBox.Size = new System.Drawing.Size(136, 20);
-            this.StafflinesPerStaffTextBox.TabIndex = 3;
+            this.StafflinesPerStaffTextBox.TabIndex = 12;
             this.StafflinesPerStaffTextBox.TextChanged += new System.EventHandler(this.StafflinesPerStaffTextBox_TextChanged);
             this.StafflinesPerStaffTextBox.Leave += new System.EventHandler(this.StafflinesPerStaffTextBox_Leave);
             // 
             // SystemStartBarsLabel
             // 
-            this.SystemStartBarsLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.SystemStartBarsLabel.AutoSize = true;
             this.SystemStartBarsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
             this.SystemStartBarsLabel.Location = new System.Drawing.Point(10, 442);
             this.SystemStartBarsLabel.Margin = new System.Windows.Forms.Padding(0);
             this.SystemStartBarsLabel.Name = "SystemStartBarsLabel";
             this.SystemStartBarsLabel.Size = new System.Drawing.Size(131, 14);
-            this.SystemStartBarsLabel.TabIndex = 152;
+            this.SystemStartBarsLabel.TabIndex = 17;
             this.SystemStartBarsLabel.Text = "system start bar numbers";
             this.SystemStartBarsLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // SystemStartBarsTextBox
             // 
-            this.SystemStartBarsTextBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.SystemStartBarsTextBox.Location = new System.Drawing.Point(10, 459);
             this.SystemStartBarsTextBox.Name = "SystemStartBarsTextBox";
-            this.SystemStartBarsTextBox.Size = new System.Drawing.Size(442, 20);
-            this.SystemStartBarsTextBox.TabIndex = 7;
+            this.SystemStartBarsTextBox.Size = new System.Drawing.Size(440, 20);
+            this.SystemStartBarsTextBox.TabIndex = 16;
             this.SystemStartBarsTextBox.TextChanged += new System.EventHandler(this.SystemStartBarsTextBox_TextChanged);
             this.SystemStartBarsTextBox.Leave += new System.EventHandler(this.SystemStartBarsTextBox_Leave);
             // 
             // ClefsPerStaffTextBox
             // 
-            this.ClefsPerStaffTextBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.ClefsPerStaffTextBox.Location = new System.Drawing.Point(111, 234);
             this.ClefsPerStaffTextBox.Name = "ClefsPerStaffTextBox";
             this.ClefsPerStaffTextBox.Size = new System.Drawing.Size(136, 20);
-            this.ClefsPerStaffTextBox.TabIndex = 2;
+            this.ClefsPerStaffTextBox.TabIndex = 11;
             this.ClefsPerStaffTextBox.TextChanged += new System.EventHandler(this.ClefsPerStaffTextBox_TextChanged);
             this.ClefsPerStaffTextBox.Leave += new System.EventHandler(this.ClefsPerStaffTextBox_Leave);
             // 
             // StaffGroupsTextBox
             // 
-            this.StaffGroupsTextBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.StaffGroupsTextBox.Location = new System.Drawing.Point(111, 308);
             this.StaffGroupsTextBox.Name = "StaffGroupsTextBox";
             this.StaffGroupsTextBox.Size = new System.Drawing.Size(136, 20);
-            this.StaffGroupsTextBox.TabIndex = 4;
+            this.StaffGroupsTextBox.TabIndex = 13;
             this.StaffGroupsTextBox.TextChanged += new System.EventHandler(this.StaffGroupsTextBox_TextChanged);
             this.StaffGroupsTextBox.Leave += new System.EventHandler(this.StaffGroupsTextBox_Leave);
             // 
             // UnitsHelpLabel
             // 
-            this.UnitsHelpLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.UnitsHelpLabel.AutoSize = true;
             this.UnitsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
             this.UnitsHelpLabel.Location = new System.Drawing.Point(304, 131);
@@ -656,29 +622,27 @@ namespace Moritz.Composer
             // 
             // MinimumGapsBetweenSystemsTextBox
             // 
-            this.MinimumGapsBetweenSystemsTextBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.MinimumGapsBetweenSystemsTextBox.Location = new System.Drawing.Point(394, 107);
             this.MinimumGapsBetweenSystemsTextBox.Name = "MinimumGapsBetweenSystemsTextBox";
             this.MinimumGapsBetweenSystemsTextBox.Size = new System.Drawing.Size(58, 20);
-            this.MinimumGapsBetweenSystemsTextBox.TabIndex = 11;
+            this.MinimumGapsBetweenSystemsTextBox.TabIndex = 8;
             this.MinimumGapsBetweenSystemsTextBox.TextChanged += new System.EventHandler(this.MinimumGapsBetweenSystemsTextBox_TextChanged);
-            this.MinimumGapsBetweenSystemsTextBox.Leave += new System.EventHandler(this.MinimumGapsBetweenSystemsTextBox_TextChanged);
+            this.MinimumGapsBetweenSystemsTextBox.Leave += new System.EventHandler(this.MinimumGapsBetweenSystemsTextBox_Leave);
             // 
             // MinimumGapsBetweenStavesTextBox
             // 
-            this.MinimumGapsBetweenStavesTextBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.MinimumGapsBetweenStavesTextBox.Location = new System.Drawing.Point(394, 79);
             this.MinimumGapsBetweenStavesTextBox.Name = "MinimumGapsBetweenStavesTextBox";
             this.MinimumGapsBetweenStavesTextBox.Size = new System.Drawing.Size(58, 20);
-            this.MinimumGapsBetweenStavesTextBox.TabIndex = 10;
+            this.MinimumGapsBetweenStavesTextBox.TabIndex = 7;
             this.MinimumGapsBetweenStavesTextBox.TextChanged += new System.EventHandler(this.MinimumGapsBetweenStavesTextBox_TextChanged);
-            this.MinimumGapsBetweenStavesTextBox.Leave += new System.EventHandler(this.MinimumGapsBetweenStavesTextBox_TextChanged);
+            this.MinimumGapsBetweenStavesTextBox.Leave += new System.EventHandler(this.MinimumGapsBetweenStavesTextBox_Leave);
             // 
             // StafflineStemStrokeWidthComboBox
             // 
-            this.StafflineStemStrokeWidthComboBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.StafflineStemStrokeWidthComboBox.FormattingEnabled = true;
             this.StafflineStemStrokeWidthComboBox.Items.AddRange(new object[] {
+            "0.25",
             "0.5",
             "1.0",
             "1.5",
@@ -686,16 +650,23 @@ namespace Moritz.Composer
             this.StafflineStemStrokeWidthComboBox.Location = new System.Drawing.Point(394, 19);
             this.StafflineStemStrokeWidthComboBox.Name = "StafflineStemStrokeWidthComboBox";
             this.StafflineStemStrokeWidthComboBox.Size = new System.Drawing.Size(58, 22);
-            this.StafflineStemStrokeWidthComboBox.TabIndex = 8;
+            this.StafflineStemStrokeWidthComboBox.TabIndex = 5;
             this.StafflineStemStrokeWidthComboBox.SelectedIndexChanged += new System.EventHandler(this.StafflineStemStrokeWidthComboBox_SelectedIndexChanged);
+            this.StafflineStemStrokeWidthComboBox.Leave += new System.EventHandler(this.StafflineStemStrokeWidthComboBox_Leave);
             // 
             // GapPixelsComboBox
             // 
-            this.GapPixelsComboBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.GapPixelsComboBox.FormattingEnabled = true;
             this.GapPixelsComboBox.Items.AddRange(new object[] {
+            "1",
+            "2",
+            "2.5",
+            "3",
+            "3.5",
             "4",
+            "5",
             "6",
+            "7",
             "8",
             "10",
             "12",
@@ -708,12 +679,12 @@ namespace Moritz.Composer
             this.GapPixelsComboBox.Location = new System.Drawing.Point(394, 49);
             this.GapPixelsComboBox.Name = "GapPixelsComboBox";
             this.GapPixelsComboBox.Size = new System.Drawing.Size(58, 22);
-            this.GapPixelsComboBox.TabIndex = 9;
+            this.GapPixelsComboBox.TabIndex = 6;
             this.GapPixelsComboBox.SelectedIndexChanged += new System.EventHandler(this.GapPixelsComboBox_SelectedIndexChanged);
+            this.GapPixelsComboBox.Leave += new System.EventHandler(this.GapPixelsComboBox_Leave);
             // 
             // MinimumGapsBetweenSystemsLabel
             // 
-            this.MinimumGapsBetweenSystemsLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.MinimumGapsBetweenSystemsLabel.AutoSize = true;
             this.MinimumGapsBetweenSystemsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
             this.MinimumGapsBetweenSystemsLabel.Location = new System.Drawing.Point(217, 110);
@@ -725,7 +696,6 @@ namespace Moritz.Composer
             // 
             // StaffLineStemStrokeWidthLabel
             // 
-            this.StaffLineStemStrokeWidthLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.StaffLineStemStrokeWidthLabel.AutoSize = true;
             this.StaffLineStemStrokeWidthLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
             this.StaffLineStemStrokeWidthLabel.Location = new System.Drawing.Point(230, 23);
@@ -737,7 +707,6 @@ namespace Moritz.Composer
             // 
             // MinimumGapsBetweenStavesLabel
             // 
-            this.MinimumGapsBetweenStavesLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.MinimumGapsBetweenStavesLabel.AutoSize = true;
             this.MinimumGapsBetweenStavesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
             this.MinimumGapsBetweenStavesLabel.Location = new System.Drawing.Point(225, 82);
@@ -749,7 +718,6 @@ namespace Moritz.Composer
             // 
             // GapPixelsLabel
             // 
-            this.GapPixelsLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.GapPixelsLabel.AutoSize = true;
             this.GapPixelsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
             this.GapPixelsLabel.Location = new System.Drawing.Point(228, 53);
@@ -762,17 +730,18 @@ namespace Moritz.Composer
             // ScoreComboBox
             // 
             this.ScoreComboBox.FormattingEnabled = true;
-            this.ScoreComboBox.Location = new System.Drawing.Point(173, 12);
+            this.ScoreComboBox.Location = new System.Drawing.Point(78, 15);
             this.ScoreComboBox.Name = "ScoreComboBox";
-            this.ScoreComboBox.Size = new System.Drawing.Size(183, 22);
-            this.ScoreComboBox.TabIndex = 0;
+            this.ScoreComboBox.Size = new System.Drawing.Size(214, 22);
+            this.ScoreComboBox.TabIndex = 8;
             this.ScoreComboBox.SelectedIndexChanged += new System.EventHandler(this.ScoreComboBox_SelectedIndexChanged);
+            this.ScoreComboBox.Leave += new System.EventHandler(this.ScoreComboBox_Leave);
             // 
             // ScoreComboBoxLabel
             // 
             this.ScoreComboBoxLabel.AutoSize = true;
             this.ScoreComboBoxLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.ScoreComboBoxLabel.Location = new System.Drawing.Point(135, 16);
+            this.ScoreComboBoxLabel.Location = new System.Drawing.Point(40, 19);
             this.ScoreComboBoxLabel.Margin = new System.Windows.Forms.Padding(0);
             this.ScoreComboBoxLabel.Name = "ScoreComboBoxLabel";
             this.ScoreComboBoxLabel.Size = new System.Drawing.Size(35, 14);
@@ -781,50 +750,47 @@ namespace Moritz.Composer
             // 
             // SaveSettingsCreateScoreButton
             // 
-            this.SaveSettingsCreateScoreButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.SaveSettingsCreateScoreButton.Enabled = false;
             this.SaveSettingsCreateScoreButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.SaveSettingsCreateScoreButton.Location = new System.Drawing.Point(371, 609);
+            this.SaveSettingsCreateScoreButton.ForeColor = System.Drawing.Color.Blue;
+            this.SaveSettingsCreateScoreButton.Location = new System.Drawing.Point(718, 453);
             this.SaveSettingsCreateScoreButton.Name = "SaveSettingsCreateScoreButton";
-            this.SaveSettingsCreateScoreButton.Size = new System.Drawing.Size(143, 26);
-            this.SaveSettingsCreateScoreButton.TabIndex = 4;
+            this.SaveSettingsCreateScoreButton.Size = new System.Drawing.Size(194, 31);
+            this.SaveSettingsCreateScoreButton.TabIndex = 0;
             this.SaveSettingsCreateScoreButton.Text = "save all settings";
             this.SaveSettingsCreateScoreButton.UseVisualStyleBackColor = true;
             this.SaveSettingsCreateScoreButton.Click += new System.EventHandler(this.SaveSettingsCreateScoreButton_Click);
             // 
             // QuitMoritzButton
             // 
-            this.QuitMoritzButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.QuitMoritzButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.QuitMoritzButton.Location = new System.Drawing.Point(525, 609);
+            this.QuitMoritzButton.Location = new System.Drawing.Point(827, 539);
             this.QuitMoritzButton.Name = "QuitMoritzButton";
-            this.QuitMoritzButton.Size = new System.Drawing.Size(183, 26);
-            this.QuitMoritzButton.TabIndex = 9;
+            this.QuitMoritzButton.Size = new System.Drawing.Size(85, 26);
+            this.QuitMoritzButton.TabIndex = 3;
             this.QuitMoritzButton.Text = "Quit Moritz";
             this.QuitMoritzButton.UseVisualStyleBackColor = true;
             this.QuitMoritzButton.Click += new System.EventHandler(this.QuitMoritzButton_Click);
             // 
             // ShowMoritzButton
             // 
-            this.ShowMoritzButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShowMoritzButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.ShowMoritzButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.ShowMoritzButton.Location = new System.Drawing.Point(23, 609);
+            this.ShowMoritzButton.Location = new System.Drawing.Point(506, 539);
             this.ShowMoritzButton.Name = "ShowMoritzButton";
-            this.ShowMoritzButton.Size = new System.Drawing.Size(183, 26);
-            this.ShowMoritzButton.TabIndex = 6;
+            this.ShowMoritzButton.Size = new System.Drawing.Size(85, 26);
+            this.ShowMoritzButton.TabIndex = 7;
             this.ShowMoritzButton.Text = "Show Moritz";
             this.ShowMoritzButton.UseVisualStyleBackColor = false;
             this.ShowMoritzButton.Click += new System.EventHandler(this.ShowMoritzButton_Click);
             // 
             // ShowSelectedKrystalButton
             // 
-            this.ShowSelectedKrystalButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.ShowSelectedKrystalButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.ShowSelectedKrystalButton.Enabled = false;
             this.ShowSelectedKrystalButton.Font = new System.Drawing.Font("Arial", 8F);
             this.ShowSelectedKrystalButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.ShowSelectedKrystalButton.Location = new System.Drawing.Point(16, 117);
+            this.ShowSelectedKrystalButton.Location = new System.Drawing.Point(16, 159);
             this.ShowSelectedKrystalButton.Name = "ShowSelectedKrystalButton";
             this.ShowSelectedKrystalButton.Size = new System.Drawing.Size(183, 26);
             this.ShowSelectedKrystalButton.TabIndex = 0;
@@ -834,84 +800,79 @@ namespace Moritz.Composer
             // 
             // DimensionsAndMetadataButton
             // 
-            this.DimensionsAndMetadataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.DimensionsAndMetadataButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.DimensionsAndMetadataButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.DimensionsAndMetadataButton.Location = new System.Drawing.Point(23, 575);
+            this.DimensionsAndMetadataButton.Location = new System.Drawing.Point(308, 13);
             this.DimensionsAndMetadataButton.Name = "DimensionsAndMetadataButton";
-            this.DimensionsAndMetadataButton.Size = new System.Drawing.Size(183, 26);
-            this.DimensionsAndMetadataButton.TabIndex = 7;
-            this.DimensionsAndMetadataButton.Text = "Page Dimensions and Metadata";
+            this.DimensionsAndMetadataButton.Size = new System.Drawing.Size(214, 26);
+            this.DimensionsAndMetadataButton.TabIndex = 6;
+            this.DimensionsAndMetadataButton.Text = "Page Dimensions and Metadata...";
             this.DimensionsAndMetadataButton.UseVisualStyleBackColor = false;
             this.DimensionsAndMetadataButton.Click += new System.EventHandler(this.DimensionsAndMetadataButton_Click);
             // 
             // KrystalsGroupBox
             // 
-            this.KrystalsGroupBox.Controls.Add(this.OkayToSaveKrystalsButton);
-            this.KrystalsGroupBox.Controls.Add(this.RevertKrystalsToSavedButton);
             this.KrystalsGroupBox.Controls.Add(this.KrystalsListBox);
             this.KrystalsGroupBox.Controls.Add(this.ShowSelectedKrystalButton);
             this.KrystalsGroupBox.Controls.Add(this.AddKrystalButton);
             this.KrystalsGroupBox.Controls.Add(this.RemoveSelectedKrystalButton);
             this.KrystalsGroupBox.ForeColor = System.Drawing.Color.Brown;
-            this.KrystalsGroupBox.Location = new System.Drawing.Point(495, 12);
+            this.KrystalsGroupBox.Location = new System.Drawing.Point(490, 43);
             this.KrystalsGroupBox.Name = "KrystalsGroupBox";
-            this.KrystalsGroupBox.Size = new System.Drawing.Size(214, 250);
-            this.KrystalsGroupBox.TabIndex = 2;
+            this.KrystalsGroupBox.Size = new System.Drawing.Size(214, 262);
+            this.KrystalsGroupBox.TabIndex = 10;
             this.KrystalsGroupBox.TabStop = false;
             this.KrystalsGroupBox.Text = "krystals";
             // 
             // OkayToSaveKrystalsButton
             // 
-            this.OkayToSaveKrystalsButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.OkayToSaveKrystalsButton.Enabled = false;
             this.OkayToSaveKrystalsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.OkayToSaveKrystalsButton.Location = new System.Drawing.Point(16, 213);
+            this.OkayToSaveKrystalsButton.ForeColor = System.Drawing.Color.Blue;
+            this.OkayToSaveKrystalsButton.Location = new System.Drawing.Point(506, 343);
             this.OkayToSaveKrystalsButton.Name = "OkayToSaveKrystalsButton";
-            this.OkayToSaveKrystalsButton.Size = new System.Drawing.Size(89, 26);
-            this.OkayToSaveKrystalsButton.TabIndex = 193;
-            this.OkayToSaveKrystalsButton.Text = "okay to save";
+            this.OkayToSaveKrystalsButton.Size = new System.Drawing.Size(183, 26);
+            this.OkayToSaveKrystalsButton.TabIndex = 2;
+            this.OkayToSaveKrystalsButton.Text = "okay to save krystals";
             this.OkayToSaveKrystalsButton.UseVisualStyleBackColor = true;
             this.OkayToSaveKrystalsButton.Click += new System.EventHandler(this.OkayToSaveKrystalsButton_Click);
             // 
-            // RevertKrystalsToSavedButton
+            // RevertKrystalsButton
             // 
-            this.RevertKrystalsToSavedButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.RevertKrystalsToSavedButton.Enabled = false;
-            this.RevertKrystalsToSavedButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.RevertKrystalsToSavedButton.Location = new System.Drawing.Point(110, 213);
-            this.RevertKrystalsToSavedButton.Name = "RevertKrystalsToSavedButton";
-            this.RevertKrystalsToSavedButton.Size = new System.Drawing.Size(89, 26);
-            this.RevertKrystalsToSavedButton.TabIndex = 192;
-            this.RevertKrystalsToSavedButton.Text = "revert krystals";
-            this.RevertKrystalsToSavedButton.UseVisualStyleBackColor = true;
-            this.RevertKrystalsToSavedButton.Click += new System.EventHandler(this.RevertKrystalsToSavedButton_Click);
+            this.RevertKrystalsButton.Enabled = false;
+            this.RevertKrystalsButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.RevertKrystalsButton.ForeColor = System.Drawing.Color.Red;
+            this.RevertKrystalsButton.Location = new System.Drawing.Point(506, 311);
+            this.RevertKrystalsButton.Name = "RevertKrystalsButton";
+            this.RevertKrystalsButton.Size = new System.Drawing.Size(183, 26);
+            this.RevertKrystalsButton.TabIndex = 1;
+            this.RevertKrystalsButton.Text = "revert krystals";
+            this.RevertKrystalsButton.UseVisualStyleBackColor = true;
+            this.RevertKrystalsButton.Click += new System.EventHandler(this.RevertKrystalsToSavedButton_Click);
             // 
             // PalettesGroupBox
             // 
-            this.PalettesGroupBox.Controls.Add(this.RevertPalettesButton);
-            this.PalettesGroupBox.Controls.Add(this.OkayToSavePalettesButton);
             this.PalettesGroupBox.Controls.Add(this.DeleteSelectedPaletteButton);
             this.PalettesGroupBox.Controls.Add(this.PalettesListBox);
             this.PalettesGroupBox.Controls.Add(this.ShowSelectedPaletteButton);
             this.PalettesGroupBox.Controls.Add(this.AddPaletteButton);
             this.PalettesGroupBox.ForeColor = System.Drawing.Color.Brown;
-            this.PalettesGroupBox.Location = new System.Drawing.Point(495, 269);
+            this.PalettesGroupBox.Location = new System.Drawing.Point(713, 43);
             this.PalettesGroupBox.Name = "PalettesGroupBox";
-            this.PalettesGroupBox.Size = new System.Drawing.Size(214, 293);
-            this.PalettesGroupBox.TabIndex = 3;
+            this.PalettesGroupBox.Size = new System.Drawing.Size(214, 262);
+            this.PalettesGroupBox.TabIndex = 11;
             this.PalettesGroupBox.TabStop = false;
             this.PalettesGroupBox.Text = "palettes";
             // 
             // RevertPalettesButton
             // 
-            this.RevertPalettesButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.RevertPalettesButton.Enabled = false;
             this.RevertPalettesButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.RevertPalettesButton.Location = new System.Drawing.Point(110, 258);
+            this.RevertPalettesButton.ForeColor = System.Drawing.Color.Red;
+            this.RevertPalettesButton.Location = new System.Drawing.Point(729, 311);
             this.RevertPalettesButton.Name = "RevertPalettesButton";
-            this.RevertPalettesButton.Size = new System.Drawing.Size(89, 26);
-            this.RevertPalettesButton.TabIndex = 196;
+            this.RevertPalettesButton.Size = new System.Drawing.Size(183, 26);
+            this.RevertPalettesButton.TabIndex = 2;
             this.RevertPalettesButton.Text = "revert palettes";
             this.RevertPalettesButton.UseVisualStyleBackColor = true;
             this.RevertPalettesButton.Click += new System.EventHandler(this.RevertPalettesButton_Click);
@@ -920,51 +881,52 @@ namespace Moritz.Composer
             // 
             this.OkayToSavePalettesButton.Enabled = false;
             this.OkayToSavePalettesButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.OkayToSavePalettesButton.Location = new System.Drawing.Point(16, 258);
+            this.OkayToSavePalettesButton.ForeColor = System.Drawing.Color.Blue;
+            this.OkayToSavePalettesButton.Location = new System.Drawing.Point(729, 343);
             this.OkayToSavePalettesButton.Name = "OkayToSavePalettesButton";
-            this.OkayToSavePalettesButton.Size = new System.Drawing.Size(89, 26);
-            this.OkayToSavePalettesButton.TabIndex = 195;
-            this.OkayToSavePalettesButton.Text = "okay to save";
+            this.OkayToSavePalettesButton.Size = new System.Drawing.Size(183, 26);
+            this.OkayToSavePalettesButton.TabIndex = 1;
+            this.OkayToSavePalettesButton.Text = "okay to save palettes";
             this.OkayToSavePalettesButton.UseVisualStyleBackColor = true;
             this.OkayToSavePalettesButton.Click += new System.EventHandler(this.OkayToSavePalettesButton_Click);
             // 
             // RevertEverythingButton
             // 
-            this.RevertEverythingButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.RevertEverythingButton.Enabled = false;
             this.RevertEverythingButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.RevertEverythingButton.Location = new System.Drawing.Point(371, 575);
-            this.RevertEverythingButton.Name = "RevertCompletelyButton";
-            this.RevertEverythingButton.Size = new System.Drawing.Size(143, 26);
-            this.RevertEverythingButton.TabIndex = 152;
+            this.RevertEverythingButton.ForeColor = System.Drawing.Color.Red;
+            this.RevertEverythingButton.Location = new System.Drawing.Point(506, 453);
+            this.RevertEverythingButton.Name = "RevertEverythingButton";
+            this.RevertEverythingButton.Size = new System.Drawing.Size(194, 31);
+            this.RevertEverythingButton.TabIndex = 1;
             this.RevertEverythingButton.Text = "revert everything";
             this.RevertEverythingButton.UseVisualStyleBackColor = true;
             this.RevertEverythingButton.Click += new System.EventHandler(this.RevertEverythingButton_Click);
             // 
             // ShowUncheckedFormsButton
             // 
-            this.ShowUncheckedFormsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ShowUncheckedFormsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.ShowUncheckedFormsButton.Enabled = false;
             this.ShowUncheckedFormsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.ShowUncheckedFormsButton.Location = new System.Drawing.Point(217, 575);
+            this.ShowUncheckedFormsButton.Location = new System.Drawing.Point(506, 413);
             this.ShowUncheckedFormsButton.Name = "ShowUncheckedFormsButton";
-            this.ShowUncheckedFormsButton.Size = new System.Drawing.Size(143, 26);
-            this.ShowUncheckedFormsButton.TabIndex = 153;
+            this.ShowUncheckedFormsButton.Size = new System.Drawing.Size(194, 31);
+            this.ShowUncheckedFormsButton.TabIndex = 5;
             this.ShowUncheckedFormsButton.Text = "show unchecked forms";
-            this.ShowUncheckedFormsButton.UseVisualStyleBackColor = true;
+            this.ShowUncheckedFormsButton.UseVisualStyleBackColor = false;
             this.ShowUncheckedFormsButton.Click += new System.EventHandler(this.ShowUncheckedFormsButton_Click);
             // 
             // ShowCheckedFormsButton
             // 
-            this.ShowCheckedFormsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ShowCheckedFormsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.ShowCheckedFormsButton.Enabled = false;
             this.ShowCheckedFormsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.ShowCheckedFormsButton.Location = new System.Drawing.Point(217, 609);
+            this.ShowCheckedFormsButton.Location = new System.Drawing.Point(718, 413);
             this.ShowCheckedFormsButton.Name = "ShowCheckedFormsButton";
-            this.ShowCheckedFormsButton.Size = new System.Drawing.Size(143, 26);
-            this.ShowCheckedFormsButton.TabIndex = 154;
+            this.ShowCheckedFormsButton.Size = new System.Drawing.Size(194, 31);
+            this.ShowCheckedFormsButton.TabIndex = 4;
             this.ShowCheckedFormsButton.Text = "show checked forms";
-            this.ShowCheckedFormsButton.UseVisualStyleBackColor = true;
+            this.ShowCheckedFormsButton.UseVisualStyleBackColor = false;
             this.ShowCheckedFormsButton.Click += new System.EventHandler(this.ShowCheckedFormsButton_Click);
             // 
             // AssistantComposerMainForm
@@ -972,8 +934,14 @@ namespace Moritz.Composer
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
-            this.ClientSize = new System.Drawing.Size(726, 649);
+            this.ClientSize = new System.Drawing.Size(945, 585);
             this.ControlBox = false;
+            this.Controls.Add(this.RevertPalettesButton);
+            this.Controls.Add(this.RevertKrystalsButton);
+            this.Controls.Add(this.OkayToSavePalettesButton);
+            this.Controls.Add(this.OkayToSaveKrystalsButton);
+            this.Controls.Add(this.RevertNotationButton);
+            this.Controls.Add(this.OkayToSaveNotationButton);
             this.Controls.Add(this.ShowCheckedFormsButton);
             this.Controls.Add(this.ShowUncheckedFormsButton);
             this.Controls.Add(this.RevertEverythingButton);
@@ -1071,9 +1039,9 @@ namespace Moritz.Composer
         private System.Windows.Forms.Button ShowUncheckedFormsButton;
         private System.Windows.Forms.Button ShowCheckedFormsButton;
         private System.Windows.Forms.Button OkayToSaveKrystalsButton;
-        private System.Windows.Forms.Button RevertKrystalsToSavedButton;
+        private System.Windows.Forms.Button RevertKrystalsButton;
         private System.Windows.Forms.Button OkayToSaveNotationButton;
-        private System.Windows.Forms.Button RevertNotationToSavedButton;
+        private System.Windows.Forms.Button RevertNotationButton;
         private System.Windows.Forms.Button OkayToSavePalettesButton;
         private System.Windows.Forms.Button RevertPalettesButton;
 

@@ -621,7 +621,7 @@ namespace Moritz.Globals
             bool hasError = false;
             foreach(TextBox textBox in allTextBoxes)
             {
-                if(textBox.BackColor == M.TextBoxErrorColor)
+                if(textBox.Enabled && textBox.BackColor == M.TextBoxErrorColor)
                 {
                     hasError = true;
                     break;

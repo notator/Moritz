@@ -14,7 +14,7 @@ using Multimedia.Midi;
 
 namespace Moritz.Palettes
 {
-    public partial class PaletteChordForm : Form, IRevertableForm
+    public partial class PaletteChordForm : Form
     {
         public PaletteChordForm(PaletteForm paletteForm, BasicChordControl bcc, int midiChordIndex)
         {
@@ -317,21 +317,18 @@ namespace Moritz.Palettes
         }
         #endregion initialization
 
-        #region IRevertableForm
-        public bool HasError { get { return M.HasError(_allTextBoxes); } }
-        public bool NeedsReview { get { return _rff.NeedsReview(this); } }
-        public bool HasBeenChecked { get { return _rff.HasBeenChecked(this); } }
+        #region ReviewableForm
 
         private void OkayToSaveButton_Click(object sender, EventArgs e)
         {
-            _rff.SetSettingsCanBeSaved(this, OkayToSaveButton);
+            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton);
             this.SaveAndCloseButton.Enabled = true;
             this.CloseWithoutSavingButton.Enabled = true;
         }
 
         private void RevertToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(this.Text.EndsWith(_rff.NeedsReviewStr) || this.Text.EndsWith(_rff.ChangedAndCheckedStr));
+            Debug.Assert(((ReviewableState)this.Tag) == ReviewableState.needsReview || ((ReviewableState)this.Tag) == ReviewableState.hasChanged);
             DialogResult result =
                 MessageBox.Show("Are you sure you want to revert this dialog to the saved version?", "Revert?",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -364,7 +361,7 @@ namespace Moritz.Palettes
 
         private void SetDialogStateIsSaved()
         {
-            _rff.SetIsSaved(this, OkayToSaveButton, RevertToSavedButton);
+            _rff.SetIsSaved(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
             this.SaveAndCloseButton.Enabled = false;
             this.CloseWithoutSavingButton.Enabled = true;
         }
@@ -388,7 +385,7 @@ namespace Moritz.Palettes
         private string _savedOrnamentNumberTextBoxText;
         private string _savedMinMsDurationTextBoxText;
         #endregion reverting strings
-        #endregion IRevertableForm
+        #endregion ReviewableForm
 
         #region buttons
         private void MidiInstrumentsHelpButton_Click(object sender, EventArgs e)
@@ -493,7 +490,7 @@ namespace Moritz.Palettes
         private void SetDialogState(TextBox textBox, bool okay)
         {
             M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
-            _rff.SetSettingsNeedReview(this, OkayToSaveButton, RevertToSavedButton);
+            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), OkayToSaveButton, RevertToSavedButton);
             this.CloseWithoutSavingButton.Enabled = true;
             this.SaveAndCloseButton.Enabled = false;
         }
@@ -804,7 +801,7 @@ namespace Moritz.Palettes
         List<TextBox> _emptyDefaultTextBoxes;
         List<Label> _emptyDefaultHelpLabels;
         List<Button> _audioSampleButtons;
-        RevertableFormFunctions _rff = new RevertableFormFunctions();
+        ReviewableFormFunctions _rff = new ReviewableFormFunctions();
         List<TextBox> _allTextBoxes = new List<TextBox>();
         #endregion  private variables
 

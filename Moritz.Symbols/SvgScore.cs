@@ -652,15 +652,26 @@ namespace Moritz.Symbols
             }
         }
 
-        protected void CreatePages()
+        protected bool CreatePages()
         {
+            bool success = true;
             int pageNumber = 1;
             int systemIndex = 0;
-
             while(systemIndex < Systems.Count)
             {
-                _pages.Add(NewSvgPage(pageNumber++, ref systemIndex));
+                int oldSystemIndex = systemIndex;
+                SvgPage newPage = NewSvgPage(pageNumber++, ref systemIndex);
+                if(oldSystemIndex == systemIndex)
+                {
+                    MessageBox.Show("The systems are too high for the page height.\n\n" +
+                        "Reduce the height of the systems, or increase the page height.",
+                        "Problem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    success = false;
+                    break;
+                }
+                _pages.Add(newPage);
             }
+            return success;
         }
 
         protected SvgPage NewSvgPage(int pageNumber, ref int systemIndex)

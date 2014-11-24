@@ -143,7 +143,8 @@ namespace Moritz.Composer
         #endregion
 
         /// <summary>
-        /// Called by the derived class after setting _midiAlgorithm and Notator
+        /// Called by the derived class after setting _midiAlgorithm and Notator.
+        /// Returns false if it fails for some reason. Otherwise true.
         /// </summary>
         protected bool CreateScore(List<Krystal> krystals, List<Palette> palettes)
         {
@@ -155,21 +156,23 @@ namespace Moritz.Composer
             {
                 Notator.ConvertVoiceDefsToNoteObjects(this.Systems);
 
-                if(ReferencedOutputVoicesAreBeingPrinted())
+                success = ReferencedOutputVoicesAreBeingPrinted();
+                if(success)
                 {
                     FinalizeSystemStructure(); // adds barlines, joins bars to create systems, etc.
 
                     /// The systems do not yet contain Metrics info.
                     /// The systems are given Metrics inside the following function then justified internally,
                     /// both horizontally and vertically.
-                    Notator.CreateMetricsAndJustifySystems(this.Systems);
-
-                    CreatePages();
+                    success = Notator.CreateMetricsAndJustifySystems(this.Systems);
+                    if(success)
+                    {
+                        success = CreatePages();
+                    }
                 }
                 else
                 {
                     MessageBox.Show("Score error:\n\nAll output voices that are referenced by an input voice must be printed.");
-                    success = false;
                 }
             }
             return success;

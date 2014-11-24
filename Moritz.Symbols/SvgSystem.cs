@@ -156,8 +156,10 @@ namespace Moritz.Symbols
         /// When this function returns, all the contained, drawable objects have their correct
         /// relative positions. They are actually drawn when the SvgSystem has been moved to 
         /// its final position on the page.
+        /// If the function can't squash everything into the given width, it returns false.
+        /// Otherwise it returns true.
         /// </summary>
-        public void MakeGraphics(Graphics graphics, int systemNumber, PageFormat pageFormat, float leftMargin)
+        public bool MakeGraphics(Graphics graphics, int systemNumber, PageFormat pageFormat, float leftMargin)
         {
             if(Metrics == null)
                 CreateMetrics(graphics, pageFormat, leftMargin);
@@ -187,37 +189,37 @@ namespace Moritz.Symbols
             symbolSet.AdjustRestsVertically(Staves);
             symbolSet.SetBeamedStemLengths(Staves); // see the comment next to the function
 
-            Dictionary<int, float> overlaps = JustifyHorizontally(moments, barlineWidths, pageFormat.StafflineStemStrokeWidth);
-            if(overlaps.Count > 0)
+            bool success = JustifyHorizontally(moments, barlineWidths, pageFormat.StafflineStemStrokeWidth);
+            if(success)
             {
-                StringBuilder msPositions = GetMsPositions(moments, overlaps);
-                string msg = "Could not remove all overlaps.\n" +
-                    "    System: " + systemNumber.ToString() + "\n" +
-                    "    Milliseconds from start of system:\n" + msPositions.ToString() + "\n" +
-                    "Either there should not be so many bars in the system,\n" +
-                    "Or the score's gap size should be set smaller.";
-                MessageBox.Show(msg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                symbolSet.FinalizeBeamBlocks(Staves);
+                symbolSet.AlignLyrics(Staves);
+                SvgSystem nextSystem = null;
+                if(systemNumber < this.Score.Systems.Count)
+                {
+                    nextSystem = this.Score.Systems[systemNumber];
+                }
+                symbolSet.AddNoteheadExtenderLines(Staves, pageFormat.RightMarginPos, pageFormat.Gap,
+                    pageFormat.NoteheadExtenderStrokeWidth, pageFormat.StafflineStemStrokeWidth, nextSystem);
+
+                AlignStaffnamesInLeftMargin(leftMargin, pageFormat.Gap);
+
+                ResetStaffMetricsBoundaries();
+
+                SetBarlineVisibility();
+
+                JustifyVertically(pageFormat.Right, pageFormat.Gap);
+
+                AdjustBarnumberVertically(pageFormat.Gap);
             }
-
-            symbolSet.FinalizeBeamBlocks(Staves);
-            symbolSet.AlignLyrics(Staves);
-            SvgSystem nextSystem = null;
-            if(systemNumber < this.Score.Systems.Count)
+            else
             {
-                nextSystem = this.Score.Systems[systemNumber];
-            } 
-            symbolSet.AddNoteheadExtenderLines(Staves, pageFormat.RightMarginPos, pageFormat.Gap, 
-                pageFormat.NoteheadExtenderStrokeWidth, pageFormat.StafflineStemStrokeWidth, nextSystem);
-
-            AlignStaffnamesInLeftMargin(leftMargin, pageFormat.Gap);
-
-            ResetStaffMetricsBoundaries();
-
-            SetBarlineVisibility();
-
-            JustifyVertically(pageFormat.Right, pageFormat.Gap);
-
-            AdjustBarnumberVertically(pageFormat.Gap);
+                string msg = "Could not remove all overlaps.\n\n" +
+                    "Either reduce the number of bars in the critical systems,\n" +
+                    "or set a smaller gap size for the score.";
+                MessageBox.Show(msg, "Problem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+            return success;
         }
 
         private float CreateMetrics(Graphics graphics, PageFormat pageFormat, float leftMarginPos)
@@ -269,11 +271,11 @@ namespace Moritz.Symbols
         /// <summary>
         /// When this function completes, all NoteObjects have their horizontal Metrics set to
         /// their final display positions.
-        /// If successful, the returned dictionary will be empty, otherwise there were too many
-        /// symbols to fit in the system, and it contains the unresolved overlaps
+        /// If successful, no NoteObject will overlap, and the function returns true.
+        /// Otherwise there are overlaps, and the function returns false.
         /// </summary>
         /// <param name="pageFormat"></param>
-        private Dictionary<int, float> JustifyHorizontally(List<NoteObjectMoment> systemMoments, Dictionary<int, float> barlineWidths, float hairline)
+        private bool JustifyHorizontally(List<NoteObjectMoment> systemMoments, Dictionary<int, float> barlineWidths, float hairline)
         {
             HashSet<int> nonCompressibleSystemMomentPositions = new HashSet<int>();
             Dictionary<int, float> overlaps = null; // msPos, overlap with following msPos in staff
@@ -290,7 +292,7 @@ namespace Moritz.Symbols
 
             } while(lowerVoiceMoved);
 
-            return overlaps;
+            return overlaps.Count == 0;
         }
 
         private Dictionary<int, float> JustifyTopVoicesHorizontally(List<NoteObjectMoment> systemMoments, Dictionary<int, float> barlineWidths, 
@@ -434,19 +436,6 @@ namespace Moritz.Symbols
                     staffMoments.Add(staffNOM);
             }
             return staffMoments;
-        }
-
-        private StringBuilder GetMsPositions(List<NoteObjectMoment> moments, Dictionary<int, float> overlaps)
-        {
-            StringBuilder rval = new StringBuilder();
-            int start = moments[0].MsPosition;
-            foreach(int mPos in overlaps.Keys)
-            {
-                rval.Append("        ");
-                rval.Append((mPos - start));
-                rval.Append("\n");
-            }
-            return rval;
         }
 
         /// <summary>
