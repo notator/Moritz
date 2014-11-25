@@ -2,6 +2,7 @@
 
 namespace Moritz.Palettes
 {
+    public delegate void SetAllFormsExceptChordFormDisEnabled(bool enabled);
     public delegate void BringMainFormToFront();
     public delegate string SettingsPath();
     public delegate string LocalAudioFolderPath();
@@ -9,6 +10,7 @@ namespace Moritz.Palettes
 
     public class ComposerFormCallbacks
     {
+        public SetAllFormsExceptChordFormDisEnabled SetAllFormsExceptChordFormEnabledState;
         public BringMainFormToFront BringMainFormToFront;
         public SettingsPath SettingsPath;
         public LocalAudioFolderPath LocalScoreAudioPath;

@@ -61,7 +61,7 @@ namespace Moritz.Palettes
             {
                 _paletteChordForm = new PaletteChordForm(this, _bcc, midiChordIndex);
                 _paletteChordForm.Show();
-                this.Enabled = false;
+                _callbacks.SetAllFormsExceptChordFormEnabledState(false);
                 BringPaletteChordFormToFront();
             }
         }
@@ -80,6 +80,8 @@ namespace Moritz.Palettes
             Debug.Assert(this.Enabled);
             _paletteChordForm.Close();
             _paletteChordForm = null;
+
+            _callbacks.SetAllFormsExceptChordFormEnabledState(true);
 
             // If an OrnamentSettingsForm exists, it is brought in front of Visual Studio.
             if(_ornamentSettingsForm != null)

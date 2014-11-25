@@ -915,11 +915,32 @@ namespace Moritz.Composer
         private ComposerFormCallbacks GetCallbacks()
         {
             ComposerFormCallbacks callbacks = new ComposerFormCallbacks();
+            callbacks.SetAllFormsExceptChordFormEnabledState = SetAllFormsExceptChordFormEnabledState;
             callbacks.BringMainFormToFront = BringThisFormToFront;
             callbacks.SettingsPath = GetSettingsPath;
             callbacks.LocalScoreAudioPath = this.GetLocalScoreAudioPath;
             callbacks.APaletteChordFormIsOpen = this.APaletteChordFormIsOpen;
             return callbacks;
+        }
+
+        /// <summary>
+        /// Called (as a delegate) when a PaletteChordForm is created or closed.
+        /// When a PaletteChordForm is open, all other forms are disabled.
+        /// Otherwise, they are all enabled.
+        /// </summary>
+        /// <param name="enabledState"></param>
+        private void SetAllFormsExceptChordFormEnabledState(bool enabledState)
+        {
+            foreach(PaletteForm paletteForm in this.PalettesListBox.Items)
+            {
+                if(paletteForm.OrnamentSettingsForm != null)
+                {
+                    paletteForm.OrnamentSettingsForm.Enabled = enabledState;
+                }
+                paletteForm.Enabled = enabledState;
+            }
+            this._dimensionsAndMetadataForm.Enabled = enabledState;
+            this.Enabled = enabledState;
         }
 
         private void BringThisFormToFront()
