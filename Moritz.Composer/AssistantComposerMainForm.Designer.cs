@@ -42,8 +42,6 @@ namespace Moritz.Composer
             this.KrystalsListBox = new System.Windows.Forms.ListBox();
             this.RemoveSelectedKrystalButton = new System.Windows.Forms.Button();
             this.NotationGroupBox = new System.Windows.Forms.GroupBox();
-            this.ConfirmNotationButton = new System.Windows.Forms.Button();
-            this.RevertNotationButton = new System.Windows.Forms.Button();
             this.InputVoiceIndicesPerStaffHelpLabel2 = new System.Windows.Forms.Label();
             this.InputVoiceIndicesPerStaffHelpLabel = new System.Windows.Forms.Label();
             this.InputVoiceIndicesPerStaffLabel = new System.Windows.Forms.Label();
@@ -85,6 +83,8 @@ namespace Moritz.Composer
             this.StaffLineStemStrokeWidthLabel = new System.Windows.Forms.Label();
             this.MinimumGapsBetweenStavesLabel = new System.Windows.Forms.Label();
             this.GapPixelsLabel = new System.Windows.Forms.Label();
+            this.ConfirmNotationButton = new System.Windows.Forms.Button();
+            this.RevertNotationButton = new System.Windows.Forms.Button();
             this.ScoreComboBox = new System.Windows.Forms.ComboBox();
             this.ScoreComboBoxLabel = new System.Windows.Forms.Label();
             this.SaveSettingsCreateScoreButton = new System.Windows.Forms.Button();
@@ -100,7 +100,7 @@ namespace Moritz.Composer
             this.ConfirmPalettesButton = new System.Windows.Forms.Button();
             this.RevertEverythingButton = new System.Windows.Forms.Button();
             this.ShowUncheckedFormsButton = new System.Windows.Forms.Button();
-            this.ShowCheckedFormsButton = new System.Windows.Forms.Button();
+            this.ShowConfirmedFormsButton = new System.Windows.Forms.Button();
             this.NotationGroupBox.SuspendLayout();
             this.StandardChordsOptionsPanel.SuspendLayout();
             this.KrystalsGroupBox.SuspendLayout();
@@ -260,34 +260,6 @@ namespace Moritz.Composer
             this.NotationGroupBox.TabIndex = 9;
             this.NotationGroupBox.TabStop = false;
             this.NotationGroupBox.Text = "notation";
-            // 
-            // ConfirmNotationButton
-            // 
-            this.ConfirmNotationButton.BackColor = System.Drawing.Color.Transparent;
-            this.ConfirmNotationButton.Enabled = false;
-            this.ConfirmNotationButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.ConfirmNotationButton.ForeColor = System.Drawing.Color.Blue;
-            this.ConfirmNotationButton.Location = new System.Drawing.Point(282, 539);
-            this.ConfirmNotationButton.Name = "ConfirmNotationButton";
-            this.ConfirmNotationButton.Size = new System.Drawing.Size(183, 26);
-            this.ConfirmNotationButton.TabIndex = 1;
-            this.ConfirmNotationButton.Text = "confirm notation";
-            this.ConfirmNotationButton.UseVisualStyleBackColor = false;
-            this.ConfirmNotationButton.Click += new System.EventHandler(this.ConfirmNotationButton_Click);
-            // 
-            // RevertNotationButton
-            // 
-            this.RevertNotationButton.BackColor = System.Drawing.Color.Transparent;
-            this.RevertNotationButton.Enabled = false;
-            this.RevertNotationButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.RevertNotationButton.ForeColor = System.Drawing.Color.Red;
-            this.RevertNotationButton.Location = new System.Drawing.Point(93, 539);
-            this.RevertNotationButton.Name = "RevertNotationButton";
-            this.RevertNotationButton.Size = new System.Drawing.Size(183, 26);
-            this.RevertNotationButton.TabIndex = 2;
-            this.RevertNotationButton.Text = "revert notation";
-            this.RevertNotationButton.UseVisualStyleBackColor = false;
-            this.RevertNotationButton.Click += new System.EventHandler(this.RevertNotationToSavedButton_Click);
             // 
             // InputVoiceIndicesPerStaffHelpLabel2
             // 
@@ -736,6 +708,34 @@ namespace Moritz.Composer
             this.GapPixelsLabel.TabIndex = 79;
             this.GapPixelsLabel.Text = "gap between staff lines (pixels)*";
             // 
+            // ConfirmNotationButton
+            // 
+            this.ConfirmNotationButton.BackColor = System.Drawing.Color.Transparent;
+            this.ConfirmNotationButton.Enabled = false;
+            this.ConfirmNotationButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.ConfirmNotationButton.ForeColor = System.Drawing.Color.Blue;
+            this.ConfirmNotationButton.Location = new System.Drawing.Point(282, 539);
+            this.ConfirmNotationButton.Name = "ConfirmNotationButton";
+            this.ConfirmNotationButton.Size = new System.Drawing.Size(183, 26);
+            this.ConfirmNotationButton.TabIndex = 1;
+            this.ConfirmNotationButton.Text = "confirm notation";
+            this.ConfirmNotationButton.UseVisualStyleBackColor = false;
+            this.ConfirmNotationButton.Click += new System.EventHandler(this.ConfirmNotationButton_Click);
+            // 
+            // RevertNotationButton
+            // 
+            this.RevertNotationButton.BackColor = System.Drawing.Color.Transparent;
+            this.RevertNotationButton.Enabled = false;
+            this.RevertNotationButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.RevertNotationButton.ForeColor = System.Drawing.Color.Red;
+            this.RevertNotationButton.Location = new System.Drawing.Point(93, 539);
+            this.RevertNotationButton.Name = "RevertNotationButton";
+            this.RevertNotationButton.Size = new System.Drawing.Size(183, 26);
+            this.RevertNotationButton.TabIndex = 2;
+            this.RevertNotationButton.Text = "revert notation";
+            this.RevertNotationButton.UseVisualStyleBackColor = false;
+            this.RevertNotationButton.Click += new System.EventHandler(this.RevertNotationToSavedButton_Click);
+            // 
             // ScoreComboBox
             // 
             this.ScoreComboBox.FormattingEnabled = true;
@@ -932,18 +932,18 @@ namespace Moritz.Composer
             this.ShowUncheckedFormsButton.UseVisualStyleBackColor = false;
             this.ShowUncheckedFormsButton.Click += new System.EventHandler(this.ShowUncheckedFormsButton_Click);
             // 
-            // ShowCheckedFormsButton
+            // ShowConfirmedFormsButton
             // 
-            this.ShowCheckedFormsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.ShowCheckedFormsButton.Enabled = false;
-            this.ShowCheckedFormsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.ShowCheckedFormsButton.Location = new System.Drawing.Point(713, 455);
-            this.ShowCheckedFormsButton.Name = "ShowCheckedFormsButton";
-            this.ShowCheckedFormsButton.Size = new System.Drawing.Size(214, 31);
-            this.ShowCheckedFormsButton.TabIndex = 4;
-            this.ShowCheckedFormsButton.Text = "show checked forms";
-            this.ShowCheckedFormsButton.UseVisualStyleBackColor = false;
-            this.ShowCheckedFormsButton.Click += new System.EventHandler(this.ShowCheckedFormsButton_Click);
+            this.ShowConfirmedFormsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
+            this.ShowConfirmedFormsButton.Enabled = false;
+            this.ShowConfirmedFormsButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.ShowConfirmedFormsButton.Location = new System.Drawing.Point(713, 455);
+            this.ShowConfirmedFormsButton.Name = "ShowConfirmedFormsButton";
+            this.ShowConfirmedFormsButton.Size = new System.Drawing.Size(214, 31);
+            this.ShowConfirmedFormsButton.TabIndex = 4;
+            this.ShowConfirmedFormsButton.Text = "show confirmed forms";
+            this.ShowConfirmedFormsButton.UseVisualStyleBackColor = false;
+            this.ShowConfirmedFormsButton.Click += new System.EventHandler(this.ShowConfirmedFormsButton_Click);
             // 
             // AssistantComposerMainForm
             // 
@@ -958,7 +958,7 @@ namespace Moritz.Composer
             this.Controls.Add(this.ConfirmKrystalsButton);
             this.Controls.Add(this.RevertNotationButton);
             this.Controls.Add(this.ConfirmNotationButton);
-            this.Controls.Add(this.ShowCheckedFormsButton);
+            this.Controls.Add(this.ShowConfirmedFormsButton);
             this.Controls.Add(this.ShowUncheckedFormsButton);
             this.Controls.Add(this.RevertEverythingButton);
             this.Controls.Add(this.PalettesGroupBox);
@@ -1053,7 +1053,7 @@ namespace Moritz.Composer
         private System.Windows.Forms.TextBox InputVoiceIndicesPerStaffTextBox;
         private System.Windows.Forms.Button RevertEverythingButton;
         private System.Windows.Forms.Button ShowUncheckedFormsButton;
-        private System.Windows.Forms.Button ShowCheckedFormsButton;
+        private System.Windows.Forms.Button ShowConfirmedFormsButton;
         private System.Windows.Forms.Button ConfirmKrystalsButton;
         private System.Windows.Forms.Button RevertKrystalsButton;
         private System.Windows.Forms.Button ConfirmNotationButton;

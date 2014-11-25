@@ -20,7 +20,7 @@ namespace Moritz.Palettes
         {
             InitializeComponent();
 
-            Text = paletteForm.Text + ": midi chord " + (midiChordIndex + 1).ToString();
+            Text = paletteForm.SavedName + " : midi chord " + (midiChordIndex + 1).ToString();
 
             _paletteForm = paletteForm;
             _bcc = bcc;
@@ -434,6 +434,8 @@ namespace Moritz.Palettes
 
         private void SaveAndCloseButton_Click(object sender, EventArgs e)
         {
+            _paletteForm.Enabled = true; // must do this here, otherwise _paletteForm.OrnamentNumbersTextBox will not update below.
+
             if(M.HasError(_allTextBoxes))
             {
                 DoErrorMessage("Can't save because there is an error in one or more of the fields.");
@@ -482,6 +484,7 @@ namespace Moritz.Palettes
 
         private void CloseWithoutSavingButton_Click(object sender, EventArgs e)
         {
+            _paletteForm.Enabled = true;
             _paletteForm.ClosePaletteChordForm(_midiChordIndex);
         }
         #endregion buttons

@@ -15,10 +15,11 @@ namespace Moritz.Composer
         /// <summary>
         /// Creates a new, empty DimensionsAndMetadataForm.
         /// </summary>
-        public DimensionsAndMetadataForm(AssistantComposerMainForm assistantComposerMainForm)
+        public DimensionsAndMetadataForm(AssistantComposerMainForm assistantComposerMainForm, string settingsPath)
         {
             InitializeComponent();
             _assistantComposerMainForm = assistantComposerMainForm;
+            _settingsPath = settingsPath; // used when reverting
             _allTextBoxes = GetAllTextBoxes();
             SetDefaultValues();
         }
@@ -99,11 +100,9 @@ namespace Moritz.Composer
                 {
                     case "keywords":
                         this.MetadataKeywordsTextBox.Text = r.Value;
-                        SavedMetadataKeywordsTextBoxText = MetadataKeywordsTextBox.Text;
                         break;
                     case "comment":
                         this.MetadataCommentTextBox.Text = r.Value;
-                        SavedMetadataCommentTextBoxText = MetadataCommentTextBox.Text;
                         break;
                 }
             }
@@ -121,11 +120,9 @@ namespace Moritz.Composer
                 {
                     case "aboutLinkText":
                         this.AboutLinkTextTextBox.Text = r.Value;
-                        SavedAboutLinkTextTextBoxText = AboutLinkTextTextBox.Text;
                         break;
                     case "aboutLinkURL":
                         this.AboutLinkURLTextBox.Text = r.Value;
-                        SavedAboutLinkURLTextBoxText = AboutLinkURLTextBox.Text;
                         break;
                 }
             }
@@ -163,7 +160,6 @@ namespace Moritz.Composer
                 switch(r.Name)
                 {
                     case "size":
-                        SavedPaperSize = r.Value;
                         int item = 0;
                         do
                         {
@@ -171,7 +167,6 @@ namespace Moritz.Composer
                         } while(r.Value != PaperSizeComboBox.SelectedItem.ToString());
                         break;
                     case "landscape":
-                        SavedLandscapeCheckBoxChecked = r.Value;
                         if(r.Value == "1")
                             LandscapeCheckBox.Checked = true;
                         else
@@ -191,15 +186,12 @@ namespace Moritz.Composer
                 {
                     case "titleHeight":
                         Page1TitleHeightTextBox.Text = r.Value;
-                        SavedPage1TitleHeightTextBoxText = Page1TitleHeightTextBox.Text;
                         break;
                     case "authorHeight":
                         Page1AuthorHeightTextBox.Text = r.Value;
-                        SavedPage1AuthorHeightTextBoxText = Page1AuthorHeightTextBox.Text;
                         break;
                     case "titleY":
                         Page1TitleYTextBox.Text = r.Value;
-                        SavedPage1TitleYTextBoxText = Page1TitleYTextBox.Text;
                         break;
                 }
             }
@@ -215,23 +207,18 @@ namespace Moritz.Composer
                 {
                     case "topPage1":
                         TopMarginPage1TextBox.Text = r.Value;
-                        SavedTopMarginPage1TextBoxText = TopMarginPage1TextBox.Text;
                         break;
                     case "topOtherPages":
                         TopMarginOtherPagesTextBox.Text = r.Value;
-                        SavedTopMarginOtherPagesTextBoxText = TopMarginOtherPagesTextBox.Text;
                         break;
                     case "right":
                         RightMarginTextBox.Text = r.Value;
-                        SavedRightMarginTextBoxText = RightMarginTextBox.Text;
                         break;
                     case "bottom":
                         BottomMarginTextBox.Text = r.Value;
-                        SavedBottomMarginTextBoxText = BottomMarginTextBox.Text;
                         break;
                     case "left":
                         LeftMarginTextBox.Text = r.Value;
-                        SavedLeftMarginTextBoxText = LeftMarginTextBox.Text;
                         break;
                 }
             }
@@ -390,6 +377,7 @@ namespace Moritz.Composer
         #endregion TextBox_Leave handlers
         private void ShowMainScoreFormButton_Click(object sender, EventArgs e)
         {
+            this._assistantComposerMainForm.Enabled = true;
             this._assistantComposerMainForm.BringToFront();
         }
 
@@ -402,27 +390,24 @@ namespace Moritz.Composer
         {
             Debug.Assert(((ReviewableState)this.Tag) == ReviewableState.needsReview || ((ReviewableState)this.Tag) == ReviewableState.hasChanged);
             DialogResult result =
-                MessageBox.Show("Are you sure you want to revert this dialog to the saved version?", "Revert?",
+                MessageBox.Show("Are you sure you want to revert this form to the saved version?", "Revert?",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
 
-            if(result == System.Windows.Forms.DialogResult.Yes)
+            if(result == DialogResult.Yes)
             {
-                MetadataKeywordsTextBox.Text = SavedMetadataKeywordsTextBoxText;
-                MetadataCommentTextBox.Text = SavedMetadataCommentTextBoxText;
-                AboutLinkTextTextBox.Text = SavedAboutLinkTextTextBoxText;
-                AboutLinkURLTextBox.Text = SavedAboutLinkURLTextBoxText;
-
-                ResetPaperSize(SavedPaperSize, SavedLandscapeCheckBoxChecked);
-
-                Page1TitleHeightTextBox.Text = SavedPage1TitleHeightTextBoxText;
-                Page1AuthorHeightTextBox.Text = SavedPage1AuthorHeightTextBoxText;
-                Page1TitleYTextBox.Text = SavedPage1TitleYTextBoxText;
-
-                TopMarginPage1TextBox.Text = SavedTopMarginPage1TextBoxText;
-                TopMarginOtherPagesTextBox.Text = SavedTopMarginOtherPagesTextBoxText;
-                RightMarginTextBox.Text = SavedRightMarginTextBoxText;
-                BottomMarginTextBox.Text = SavedBottomMarginTextBoxText;
-                LeftMarginTextBox.Text = SavedLeftMarginTextBoxText;
+                try
+                {
+                    using(XmlReader r = XmlReader.Create(_settingsPath))
+                    {
+                        M.ReadToXmlElementTag(r, "moritzKrystalScore");
+                        Read(r);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    string msg = "Exception message:\n\n" + ex.Message;
+                    MessageBox.Show(msg, "Error reading moritz krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }               
 
                 TouchAllTextBoxes();
 
@@ -483,22 +468,7 @@ namespace Moritz.Composer
         #endregion public properties
 
         #region private variables
-        #region for reverting
-        private string SavedMetadataKeywordsTextBoxText;
-        private string SavedMetadataCommentTextBoxText;
-        private string SavedAboutLinkTextTextBoxText;
-        private string SavedAboutLinkURLTextBoxText;
-        private string SavedPaperSize;
-        private string SavedLandscapeCheckBoxChecked;
-        private string SavedPage1TitleHeightTextBoxText;
-        private string SavedPage1AuthorHeightTextBoxText;
-        private string SavedPage1TitleYTextBoxText;
-        private string SavedTopMarginPage1TextBoxText;
-        private string SavedTopMarginOtherPagesTextBoxText;
-        private string SavedRightMarginTextBoxText;
-        private string SavedBottomMarginTextBoxText;
-        private string SavedLeftMarginTextBoxText;
-        #endregion
+        private string _settingsPath;
         private AssistantComposerMainForm _assistantComposerMainForm = null;
         private List<TextBox> _allTextBoxes;
         private ReviewableFormFunctions _rff = new ReviewableFormFunctions();

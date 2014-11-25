@@ -48,35 +48,27 @@ namespace Moritz.Palettes
                         {
                             case "durations":
                                 DurationsTextBox.Text = r.ReadElementContentAsString();
-                                SavedDurationsTextBoxText = DurationsTextBox.Text;
                                 break;
                             case "velocities":
                                 VelocitiesTextBox.Text = r.ReadElementContentAsString();
-                                SavedVelocitiesTextBoxText = VelocitiesTextBox.Text;
                                 break;
                             case "midiPitches":
                                 MidiPitchesTextBox.Text = r.ReadElementContentAsString();
-                                SavedMidiPitchesTextBoxText = MidiPitchesTextBox.Text;
                                 break;
                             case "chordOffs":
                                 ChordOffsTextBox.Text = r.ReadElementContentAsString();
-                                SavedChordOffsTextBoxText = ChordOffsTextBox.Text;
                                 break;
                             case "chordDensities":
                                 ChordDensitiesTextBox.Text = r.ReadElementContentAsString();
-                                SavedChordDensitiesTextBoxText = ChordDensitiesTextBox.Text;
                                 break;
                             case "rootInversion":
                                 RootInversionTextBox.Text = r.ReadElementContentAsString();
-                                SavedRootInversionTextBoxText = RootInversionTextBox.Text;
                                 break;
                             case "inversionIndices":
                                 InversionIndicesTextBox.Text = r.ReadElementContentAsString();
-                                SavedInversionIndicesTextBoxText = InversionIndicesTextBox.Text;
                                 break;
                             case "verticalVelocityFactors":
                                 VerticalVelocityFactorsTextBox.Text = r.ReadElementContentAsString();
-                                SavedVerticalVelocityFactorsTextBoxText = VerticalVelocityFactorsTextBox.Text;
                                 break;
                         }
                     }
@@ -87,31 +79,6 @@ namespace Moritz.Palettes
                 Debug.Assert(r.Name == "basicChord"); // end element
             }
         }
-
-        #region RevertToSaved
-        public void RevertToSaved()
-        {
-            DurationsTextBox.Text = SavedDurationsTextBoxText;
-            VelocitiesTextBox.Text = SavedVelocitiesTextBoxText;
-            MidiPitchesTextBox.Text = SavedMidiPitchesTextBoxText;
-            ChordOffsTextBox.Text = SavedChordOffsTextBoxText;
-            ChordDensitiesTextBox.Text = SavedChordDensitiesTextBoxText;
-            RootInversionTextBox.Text = SavedRootInversionTextBoxText;
-            InversionIndicesTextBox.Text = SavedInversionIndicesTextBoxText;
-            VerticalVelocityFactorsTextBox.Text = SavedVerticalVelocityFactorsTextBoxText;
-
-            TouchAllTextBoxes();
-        }
-
-        private string SavedDurationsTextBoxText;
-        private string SavedVelocitiesTextBoxText;
-        private string SavedMidiPitchesTextBoxText;
-        private string SavedChordOffsTextBoxText;
-        private string SavedChordDensitiesTextBoxText;
-        private string SavedRootInversionTextBoxText;
-        private string SavedInversionIndicesTextBoxText;
-        private string SavedVerticalVelocityFactorsTextBoxText;
-        #endregion RevertToSaved
 
         public void WriteBasicChordControl(XmlWriter w)
         {

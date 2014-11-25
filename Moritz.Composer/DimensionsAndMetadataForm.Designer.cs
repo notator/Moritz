@@ -492,7 +492,7 @@
             this.Location = new System.Drawing.Point(250, 100);
             this.Name = "DimensionsAndMetadataForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Assistant Composer: Dimensions and Metadata";
+            this.Text = "Dimensions and Metadata";
             this.MetadataGroupBox.ResumeLayout(false);
             this.MetadataGroupBox.PerformLayout();
             this.WebsiteLinksGroupBox.ResumeLayout(false);

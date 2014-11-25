@@ -28,7 +28,7 @@ namespace Moritz.Palettes
             _paletteForm = paletteForm;
             ConnectBasicChordControl();
 
-            SetText(paletteForm);
+            Text = paletteForm.SavedName + " : ornaments";
             if(r != null)
             {
                 _numberOfBasicChordDefs = ReadOrnamentSettingsForm(r);
@@ -45,12 +45,6 @@ namespace Moritz.Palettes
             TouchAllTextBoxes();
 
             _rff.SetSettingsAreSaved(this, false, ConfirmButton, RevertToSavedButton);
-        }
-
-        public void SetText(PaletteForm paletteForm)
-        {
-            string[] components = paletteForm.Text.Split(' ');
-            this.Text = components[0] + " " + components[1] + ": ornaments";
         }
 
         private void ConnectBasicChordControl()
@@ -425,7 +419,7 @@ namespace Moritz.Palettes
         {
             TextBox textBox = sender as TextBox;
             M.LeaveIntRangeTextBox(textBox, false, (uint)1, 1, 12, SetDialogState);
-            _ornaments = new List<List<int>>();
+            _ornaments = (_ornaments == null) ? new List<List<int>>() : _ornaments;
             if(textBox.BackColor != M.TextBoxErrorColor)
             {
                 int numberOfOrnaments = int.Parse(textBox.Text);
@@ -604,7 +598,7 @@ namespace Moritz.Palettes
         }
         private void ShowMainScoreFormButton_Click(object sender, EventArgs e)
         {
-            _paletteForm.Callbacks.MainFormBringToFront();
+            _paletteForm.Callbacks.BringMainFormToFront();
         }
         
         private void ConfirmButton_Click(object sender, EventArgs e)
@@ -616,32 +610,41 @@ namespace Moritz.Palettes
         {
             Debug.Assert(((ReviewableState)this.Tag) == ReviewableState.needsReview || ((ReviewableState)this.Tag) == ReviewableState.hasChanged);
             DialogResult result = 
-                MessageBox.Show("Are you sure you want to revert this dialog to the saved version?", "Revert?", 
+                MessageBox.Show("Are you sure you want to revert these ornament settings to the saved version?", "Revert?", 
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
 
             if(result == System.Windows.Forms.DialogResult.Yes)
             {
-                NumBasicChordDefsTextBox.Text = SavedNumBasicChordDefsTextBoxText;
-                _bcc.RevertToSaved();
-                BankIndicesTextBox.Text = SavedBankIndicesTextBoxText;
-                PatchIndicesTextBox.Text = SavedPatchIndicesTextBoxText;
-                NumberOfOrnamentsTextBox.Text = SavedNumberOfOrnamentsTextBoxText;
-                Ornament1TextBox.Text = SavedOrnament1TextBoxText;
-                Ornament2TextBox.Text = SavedOrnament2TextBoxText;
-                Ornament3TextBox.Text = SavedOrnament3TextBoxText;
-                Ornament4TextBox.Text = SavedOrnament4TextBoxText;
-                Ornament5TextBox.Text = SavedOrnament5TextBoxText;
-                Ornament6TextBox.Text = SavedOrnament6TextBoxText;
-                Ornament7TextBox.Text = SavedOrnament7TextBoxText;
-                Ornament8TextBox.Text = SavedOrnament8TextBoxText;
-                Ornament9TextBox.Text = SavedOrnament9TextBoxText;
-                Ornament10TextBox.Text = SavedOrnament10TextBoxText;
-                Ornament11TextBox.Text = SavedOrnament11TextBoxText;
-                Ornament12TextBox.Text = SavedOrnament12TextBoxText;
+                try
+                {
+                    using(XmlReader r = XmlReader.Create(_paletteForm.Callbacks.SettingsPath()))
+                    {
+                        M.ReadToXmlElementTag(r, "moritzKrystalScore");
+                        M.ReadToXmlElementTag(r, "palette");
+                        while(r.Name == "palette")
+                        {
+                            if(r.NodeType != XmlNodeType.EndElement)
+                            {
+                                r.MoveToAttribute("name");
+                                if(r.Value == _paletteForm.SavedName)
+                                {
+                                    M.ReadToXmlElementTag(r, "ornamentSettings");
+                                    _numberOfBasicChordDefs = ReadOrnamentSettingsForm(r);
+                                }
+                            }
+                        }
+                    }
+                }
+                catch(Exception ex)
+                {
+                    string msg = "Exception message:\n\n" + ex.Message;
+                    MessageBox.Show(msg, "Error reading moritz krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
 
                 TouchAllTextBoxes();
-
                 _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+
+                _paletteForm.SetOrnamentControls();
             }
         }
         #endregion buttons

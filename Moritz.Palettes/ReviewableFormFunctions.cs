@@ -20,36 +20,36 @@ namespace Moritz.Palettes
                 {
                     if(_formsThatNeedReview.Contains(form))
                         _formsThatNeedReview.Remove(form);
-                    if(_checkedForms.Contains(form))
-                        _checkedForms.Remove(form);
+                    if(_confirmedForms.Contains(form))
+                        _confirmedForms.Remove(form);
 
                     if(form.Text.EndsWith(NeedsReviewStr))
                         form.Text = form.Text.Remove(form.Text.Length - NeedsReviewStr.Length);
-                    if(form.Text.EndsWith(ChangedAndCheckedStr))
-                        form.Text = form.Text.Remove(form.Text.Length - ChangedAndCheckedStr.Length);
+                    if(form.Text.EndsWith(ChangedAndConfirmedStr))
+                        form.Text = form.Text.Remove(form.Text.Length - ChangedAndConfirmedStr.Length);
                     break;
                 }
                 case ReviewableState.hasChanged:
                 {
                     if(_formsThatNeedReview.Contains(form))
                         _formsThatNeedReview.Remove(form);
-                    if(!_checkedForms.Contains(form))
-                        _checkedForms.Add(form);
+                    if(!_confirmedForms.Contains(form))
+                        _confirmedForms.Add(form);
 
                     if(form.Text.EndsWith(NeedsReviewStr))
                         form.Text = form.Text.Remove(form.Text.Length - NeedsReviewStr.Length);
-                    if(!form.Text.EndsWith(ChangedAndCheckedStr))
-                        form.Text = form.Text + ChangedAndCheckedStr;
+                    if(!form.Text.EndsWith(ChangedAndConfirmedStr))
+                        form.Text = form.Text + ChangedAndConfirmedStr;
                     break;
                 }
                 case ReviewableState.needsReview:
                 {
                     if(!_formsThatNeedReview.Contains(form))
                         _formsThatNeedReview.Add(form);
-                    if(_checkedForms.Contains(form))
-                        _checkedForms.Remove(form);
-                    if(form.Text.EndsWith(ChangedAndCheckedStr))
-                        form.Text = form.Text.Remove(form.Text.Length - ChangedAndCheckedStr.Length);
+                    if(_confirmedForms.Contains(form))
+                        _confirmedForms.Remove(form);
+                    if(form.Text.EndsWith(ChangedAndConfirmedStr))
+                        form.Text = form.Text.Remove(form.Text.Length - ChangedAndConfirmedStr.Length);
                     if(!form.Text.EndsWith(NeedsReviewStr))
                         form.Text = form.Text + NeedsReviewStr;
                     break;
@@ -100,12 +100,12 @@ namespace Moritz.Palettes
         }
 
         public List<Form> FormsThatNeedReview { get { return _formsThatNeedReview; } }
-        public List<Form> CheckedForms { get { return _checkedForms; } }
+        public List<Form> ConfirmedForms { get { return _confirmedForms; } }
 
         private readonly string NeedsReviewStr = " -- ?";
-        private readonly string ChangedAndCheckedStr = " -- checked";
+        private readonly string ChangedAndConfirmedStr = " -- confirmed";
 
         private static List<Form> _formsThatNeedReview = new List<Form>();
-        private static List<Form> _checkedForms = new List<Form>();
+        private static List<Form> _confirmedForms = new List<Form>();
     }
 }

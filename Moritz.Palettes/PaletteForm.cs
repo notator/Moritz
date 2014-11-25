@@ -30,6 +30,7 @@ namespace Moritz.Palettes
         {
             InitializeComponent();
             Text = name;
+            _savedName = name;
             _domain = domain;
             _callbacks = mainFormCallbacks;
 
@@ -60,8 +61,8 @@ namespace Moritz.Palettes
             {
                 _paletteChordForm = new PaletteChordForm(this, _bcc, midiChordIndex);
                 _paletteChordForm.Show();
-                _paletteChordForm.BringToFront();
-                _callbacks.SetAllFormsExceptChordFormEnabled(false);
+                this.Enabled = false;
+                BringPaletteChordFormToFront();
             }
         }
 
@@ -76,6 +77,7 @@ namespace Moritz.Palettes
 
         internal void ClosePaletteChordForm(int chordIndex)
         {
+            Debug.Assert(this.Enabled);
             _paletteChordForm.Close();
             _paletteChordForm = null;
 
@@ -85,8 +87,6 @@ namespace Moritz.Palettes
                 _ornamentSettingsForm.BringToFront();
             }
 
-            this.Enabled = true;
-            _callbacks.SetAllFormsExceptChordFormEnabled(true);
             this.BringToFront();
             this.PaletteButtonsControl.PaletteChordFormButtons[chordIndex].Select();
         }
@@ -116,16 +116,26 @@ namespace Moritz.Palettes
         {
             if(_ornamentSettingsForm != null)
             {
-                _ornamentSettingsForm.Close();
-                _ornamentSettingsForm = null;
+                DialogResult result = MessageBox.Show("Do you really want to replace the existing ornament settings?", "Warning", 
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2);
+                if(result == DialogResult.Yes)
+                {
+                    DeleteOrnamentsForm();
+                    //_ornamentSettingsForm.Close();
+                    //_ornamentSettingsForm = null;
+                }
             }
 
-            _ornamentSettingsForm = new OrnamentSettingsForm(this);
-            _rff.SetSettingsNeedReview(_ornamentSettingsForm, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+            if(_ornamentSettingsForm == null)
+            {
+                _ornamentSettingsForm = new OrnamentSettingsForm(this);
 
-            _ornamentSettingsForm.Show();
+                SetOrnamentControls();
+                _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
 
-            SetOrnamentControls();
+                _ornamentSettingsForm.Show();
+                _ornamentSettingsForm.BringToFront();
+            }
         }
 
         public void BringOrnamentSettingsFormToFront()
@@ -314,23 +324,64 @@ namespace Moritz.Palettes
         {
             Debug.Assert(((ReviewableState)this.Tag) == ReviewableState.needsReview || ((ReviewableState)this.Tag) == ReviewableState.hasChanged);
             DialogResult result = 
-                MessageBox.Show("Are you sure you want to revert this dialog to the saved version?", "Revert?", 
+                MessageBox.Show("Are you sure you want to revert this palette and its ornaments to the saved version?", "Revert?", 
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
 
             if(result == System.Windows.Forms.DialogResult.Yes)
             {
-                _bcc.RevertToSaved();
-                BankIndicesTextBox.Text = SavedBankIndicesTextBoxText;
-                PatchIndicesTextBox.Text = SavedPatchIndicesTextBoxText;
-                RepeatsTextBox.Text = SavedRepeatsTextBoxText;
-                PitchwheelDeviationsTextBox.Text = SavedPitchwheelDeviationsTextBoxText;
-                PitchwheelEnvelopesTextBox.Text = SavedPitchwheelEnvelopesTextBoxText;
-                PanEnvelopesTextBox.Text = SavedPanEnvelopesTextBoxText;
-                ModulationWheelEnvelopesTextBox.Text = SavedModulationWheelEnvelopesTextBoxText;
-                ExpressionEnvelopesTextBox.Text = SavedExpressionEnvelopesTextBoxText;
-                _paletteButtonsControl.RevertAudioButtonsToSaved();
-                OrnamentNumbersTextBox.Text = SavedOrnamentNumbersTextBoxText;
-                MinMsDurationsTextBox.Text = SavedMinMsDurationsTextBoxText;
+                DeleteOrnamentsForm();
+                try
+                {
+                    using(XmlReader r = XmlReader.Create(_callbacks.SettingsPath()))
+                    {
+                        M.ReadToXmlElementTag(r, "moritzKrystalScore");
+                        M.ReadToXmlElementTag(r, "palette");
+                        while(r.Name == "palette")
+                        {
+                            if(r.NodeType != XmlNodeType.EndElement)
+                            {
+                                string name = "";
+                                int domain = 1;
+                                bool isPercussionPalette = false;
+
+                                int count = r.AttributeCount;
+                                for(int i = 0; i < count; i++)
+                                {
+                                    r.MoveToAttribute(i);
+                                    switch(r.Name)
+                                    {
+                                        case "name":
+                                            name = r.Value;
+                                            break;
+                                        case "domain":
+                                            domain = int.Parse(r.Value);
+                                            break;
+                                        case "percussion":
+                                            if(r.Value == "1")
+                                                isPercussionPalette = true;
+                                            break;
+                                    }
+                                }
+                                if(name == _savedName)
+                                {
+                                    _domain = domain;
+                                    this.PercussionCheckBox.Checked = isPercussionPalette;
+
+                                    ReadPalette(r);
+
+                                    this.ModulationWheelEnvelopesLabel.Focus();
+                                    _rff.SetSettingsAreSaved(this, false, ConfirmButton, RevertToSavedButton);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch(Exception ex)
+                {
+                    string msg = "Exception message:\n\n" + ex.Message;
+                    MessageBox.Show(msg, "Error reading moritz krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                } 
 
                 TouchAllTextBoxes();
 
@@ -340,7 +391,7 @@ namespace Moritz.Palettes
 
         private void ShowMainScoreFormButton_Click(object sender, EventArgs e)
         {
-            this._callbacks.MainFormBringToFront();
+            this._callbacks.BringMainFormToFront();
         }
         public void ShowOrnamentSettingsButton_Click(object sender, EventArgs e)
         {
@@ -358,10 +409,15 @@ namespace Moritz.Palettes
         private void DeleteOrnamentSettingsButton_Click(object sender, EventArgs e)
         {
             string msg = "Do you really want to delete the ornament settings?";
-            DialogResult result = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+            DialogResult result = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2);
             if(result == DialogResult.No)
                 return;
+            
+            DeleteOrnamentsForm();
+        }
 
+        private void DeleteOrnamentsForm()
+        {
             if(_ornamentSettingsForm != null)
             {
                 _ornamentSettingsForm.Close();
@@ -1090,35 +1146,27 @@ namespace Moritz.Palettes
                             break;
                         case "bankIndices":
                             BankIndicesTextBox.Text = r.ReadElementContentAsString();
-                            SavedBankIndicesTextBoxText = BankIndicesTextBox.Text;
                             break;
                         case "patchIndices":
                             PatchIndicesTextBox.Text = r.ReadElementContentAsString();
-                            SavedPatchIndicesTextBoxText = PatchIndicesTextBox.Text;
                             break;
                         case "repeats":
                             RepeatsTextBox.Text = r.ReadElementContentAsString();
-                            SavedRepeatsTextBoxText = RepeatsTextBox.Text;
                             break;
                         case "pitchwheelDeviations":
                             PitchwheelDeviationsTextBox.Text = r.ReadElementContentAsString();
-                            SavedPitchwheelDeviationsTextBoxText = PitchwheelDeviationsTextBox.Text;
                             break;
                         case "pitchwheelEnvelopes":
                             PitchwheelEnvelopesTextBox.Text = r.ReadElementContentAsString();
-                            SavedPitchwheelEnvelopesTextBoxText = PitchwheelEnvelopesTextBox.Text;
                             break;
                         case "panEnvelopes":
                             PanEnvelopesTextBox.Text = r.ReadElementContentAsString();
-                            SavedPanEnvelopesTextBoxText = PanEnvelopesTextBox.Text;
                             break;
                         case "modulationWheelEnvelopes":
                             ModulationWheelEnvelopesTextBox.Text = r.ReadElementContentAsString();
-                            SavedModulationWheelEnvelopesTextBoxText = ModulationWheelEnvelopesTextBox.Text;
                             break;
                         case "expressionEnvelopes":
                             ExpressionEnvelopesTextBox.Text = r.ReadElementContentAsString();
-                            SavedExpressionEnvelopesTextBoxText = ExpressionEnvelopesTextBox.Text;
                             break;
                         case "audioFiles":
                             if(_paletteButtonsControl != null)
@@ -1128,11 +1176,9 @@ namespace Moritz.Palettes
                             break;
                         case "ornamentNumbers":
                             OrnamentNumbersTextBox.Text = r.ReadElementContentAsString();
-                            SavedOrnamentNumbersTextBoxText = OrnamentNumbersTextBox.Text;
                             break;
                         case "ornamentMinMsDurations":
                             MinMsDurationsTextBox.Text = r.ReadElementContentAsString();
-                            SavedMinMsDurationsTextBoxText = MinMsDurationsTextBox.Text;
                             break;
                         case "ornamentSettings":
                             _ornamentSettingsForm = new OrnamentSettingsForm(r, this);
@@ -1151,19 +1197,6 @@ namespace Moritz.Palettes
             _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
 
-        #region revertToSaved strings
-        private string SavedBankIndicesTextBoxText;
-        private string SavedPatchIndicesTextBoxText;
-        private string SavedRepeatsTextBoxText;
-        private string SavedPitchwheelDeviationsTextBoxText;
-        private string SavedPitchwheelEnvelopesTextBoxText;
-        private string SavedPanEnvelopesTextBoxText;
-        private string SavedModulationWheelEnvelopesTextBoxText;
-        private string SavedExpressionEnvelopesTextBoxText;
-        private string SavedOrnamentNumbersTextBoxText;
-        private string SavedMinMsDurationsTextBoxText;
-        #endregion revertToSaved strings
-
         private int _domain = 0;
         private ComposerFormCallbacks _callbacks = null;
         private List<TextBox> _allTextBoxes = new List<TextBox>();
@@ -1177,6 +1210,7 @@ namespace Moritz.Palettes
         public OrnamentSettingsForm OrnamentSettingsForm { get { return _ornamentSettingsForm; } }
         public PaletteButtonsControl PaletteButtonsControl { get { return _paletteButtonsControl; } }
         public bool IsPercussionPalette { get { return PercussionCheckBox.Checked; } }
+        public string SavedName { get { return _savedName; } }
         #endregion public variables
 
         #region private variables
@@ -1188,6 +1222,7 @@ namespace Moritz.Palettes
         private BasicChordControl _bcc = null;
         private PaletteChordForm _paletteChordForm = null;
         private ReviewableFormFunctions _rff = new ReviewableFormFunctions();
+        private string _savedName;
         #endregion private variables
     }
 
