@@ -182,10 +182,10 @@ namespace Moritz.Palettes
         /// <summary>
         /// returns a 3 element list containing:
         ///     [0]: the substring of text before the substring at midiChordIndex (can be empty, but not null)
-        ///          If not empty, [0] ends with ", ".
+        ///          If not empty, [0] ends with ",  ".
         ///     [1]: the trimmed substring of text at midiChordIndex (never empty, contains no commas or spaces)
         ///     [2]: the substring of text after the substring at  midiChordIndex (can be empty, but not null)
-        ///          If not empty, [2] begins with ", ".
+        ///          If not empty, [2] begins with ",  ".
         /// </summary>
         private List<StringBuilder> GetSubStrings(string text, int midiChordIndex)
         {
@@ -202,12 +202,12 @@ namespace Moritz.Palettes
                 for(int i = 0; i < midiChordIndex; ++i)
                 {
                     rval[0].Append(substrings[i]);
-                    rval[0].Append(", ");
+                    rval[0].Append(",  ");
                 }
                 rval[1].Append(substrings[midiChordIndex]);
                 for(int i = midiChordIndex + 1; i < substrings.Length; ++i)
                 {
-                    rval[2].Append(", ");
+                    rval[2].Append(",  ");
                     rval[2].Append(substrings[i]);
                 }
             }
