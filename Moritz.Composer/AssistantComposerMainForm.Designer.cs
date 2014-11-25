@@ -739,7 +739,7 @@ namespace Moritz.Composer
             // ScoreComboBox
             // 
             this.ScoreComboBox.FormattingEnabled = true;
-            this.ScoreComboBox.Location = new System.Drawing.Point(78, 15);
+            this.ScoreComboBox.Location = new System.Drawing.Point(143, 14);
             this.ScoreComboBox.Name = "ScoreComboBox";
             this.ScoreComboBox.Size = new System.Drawing.Size(214, 22);
             this.ScoreComboBox.TabIndex = 8;
@@ -750,7 +750,7 @@ namespace Moritz.Composer
             // 
             this.ScoreComboBoxLabel.AutoSize = true;
             this.ScoreComboBoxLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.ScoreComboBoxLabel.Location = new System.Drawing.Point(40, 19);
+            this.ScoreComboBoxLabel.Location = new System.Drawing.Point(105, 18);
             this.ScoreComboBoxLabel.Margin = new System.Windows.Forms.Padding(0);
             this.ScoreComboBoxLabel.Name = "ScoreComboBoxLabel";
             this.ScoreComboBoxLabel.Size = new System.Drawing.Size(35, 14);
@@ -813,7 +813,7 @@ namespace Moritz.Composer
             // 
             this.DimensionsAndMetadataButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.DimensionsAndMetadataButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.DimensionsAndMetadataButton.Location = new System.Drawing.Point(308, 13);
+            this.DimensionsAndMetadataButton.Location = new System.Drawing.Point(378, 12);
             this.DimensionsAndMetadataButton.Name = "DimensionsAndMetadataButton";
             this.DimensionsAndMetadataButton.Size = new System.Drawing.Size(214, 26);
             this.DimensionsAndMetadataButton.TabIndex = 6;

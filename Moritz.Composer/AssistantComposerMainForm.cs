@@ -256,6 +256,9 @@ namespace Moritz.Composer
 
         private void SetAllSettingsHaveBeenReverted()
         {
+            _rff.FormsThatNeedReview.Clear();
+            _rff.ConfirmedForms.Clear();
+
             SetNotationPanelHasBeenReverted();
             SetKrystalsPanelHasBeenReverted();
             SetPalettesPanelHasBeenReverted();
@@ -410,27 +413,115 @@ namespace Moritz.Composer
         private void RevertEverythingButton_Click(object sender, EventArgs e)
         {
             DialogResult result =
-            MessageBox.Show("Are you sure you want to close all dependent forms and revert their settings to the saved version?",
+            MessageBox.Show("Are you sure you want to revert all the settings to the saved version?",
                     "Revert?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
 
             if(result == System.Windows.Forms.DialogResult.Yes)
             {
-                Reload();
+                Point dimensionsAndMetadataFormLocation = GetDimensionsAndMetadataFormLocation();
+                Dictionary<int, Point> visiblePaletteFormLocations = GetVisiblePaletteFormLocations();
+                Dictionary<int, Point> visibleOrnamentFormLocations = GetVisibleOrnamentFormLocations();
+
+                _dimensionsAndMetadataForm.Close();
+                _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath);
+
+                foreach(PaletteForm paletteForm in PalettesListBox.Items)
+                {
+                    paletteForm.Close(); // closes any OrnamentSettingsForm and/or PaletteChordform
+                }
+
+                LoadSettings(); // clears existing settings
+
+                ReshowForms(dimensionsAndMetadataFormLocation, visiblePaletteFormLocations, visibleOrnamentFormLocations);
+
+                SetAllSettingsHaveBeenReverted();
             }
         }
 
-        private void Reload()
+        /// <summary>
+        /// Returns Point(int.MinVal, int.MinVal) if the form is not visible
+        /// </summary>
+        /// <returns></returns>
+        private Point GetDimensionsAndMetadataFormLocation()
         {
-            _dimensionsAndMetadataForm.Close();
-            _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath);
-
-            foreach(PaletteForm paletteForm in PalettesListBox.Items)
+            Point location;
+            if(_dimensionsAndMetadataForm.Visible)
             {
-                paletteForm.Close(); // closes any OrnamentSettingsForm and/or PaletteChordform
+                location = new Point(_dimensionsAndMetadataForm.Location.X, _dimensionsAndMetadataForm.Location.Y);
+            }
+            else
+            {
+                location = new Point(int.MinValue, int.MinValue);
+            }
+            return location;
+        }
+        /// <summary>
+        /// Returns the index (in PalettesListBox.Items) and location of all visible ornamentForms
+        /// </summary>
+        private Dictionary<int, Point> GetVisibleOrnamentFormLocations()
+        {
+            Dictionary<int, Point> indexAndLocation = new Dictionary<int, Point>();
+            for(int i = 0; i < PalettesListBox.Items.Count; ++i)
+            {
+                PaletteForm paletteForm = PalettesListBox.Items[i] as PaletteForm;
+                if(paletteForm.OrnamentSettingsForm != null && paletteForm.OrnamentSettingsForm.Visible)
+                {
+                    indexAndLocation.Add(i, paletteForm.OrnamentSettingsForm.Location);
+                }
+            }
+            return indexAndLocation;
+        }
+        /// <summary>
+        /// Returns the index in PalettesListBox.Items and location of all visible paletteForms
+        /// </summary>
+        private Dictionary<int, Point> GetVisiblePaletteFormLocations()
+        {
+            Dictionary<int, Point> indexAndLocation = new Dictionary<int, Point>();
+            for(int i = 0; i < PalettesListBox.Items.Count; ++i)
+            {
+                PaletteForm paletteForm = PalettesListBox.Items[i] as PaletteForm;
+                if(paletteForm.Visible)
+                    indexAndLocation.Add(i, paletteForm.Location);
+            }
+            return indexAndLocation;
+        }
+        private void ReshowForms(Point dimensionsAndMetadataFormLocation, Dictionary<int, Point> visiblePaletteFormLocations, Dictionary<int, Point> visibleOrnamentFormLocations)
+        {
+            if(dimensionsAndMetadataFormLocation.X > int.MinValue)
+            {
+                _dimensionsAndMetadataForm.Show();
+                _dimensionsAndMetadataForm.Location = dimensionsAndMetadataFormLocation;
+            }
+            else
+                _dimensionsAndMetadataForm.Hide();
+
+            for(int i = 0; i < PalettesListBox.Items.Count; ++i)
+            {
+                PaletteForm paletteForm = PalettesListBox.Items[i] as PaletteForm;
+                if(visiblePaletteFormLocations.ContainsKey(i))
+                {
+                    paletteForm.Show();
+                    paletteForm.Location = visiblePaletteFormLocations[i];
+                }
+                else
+                {
+                    paletteForm.Hide();
+                }
+                if(visibleOrnamentFormLocations.ContainsKey(i))
+                {
+                    Debug.Assert(paletteForm.OrnamentSettingsForm != null);
+                    paletteForm.OrnamentSettingsForm.Show();
+                    paletteForm.OrnamentSettingsForm.Location = visibleOrnamentFormLocations[i];
+                }
+                else if(paletteForm.OrnamentSettingsForm != null)
+                {
+                    paletteForm.OrnamentSettingsForm.Hide();
+                }
             }
 
-            LoadSettings(); // clears existing settings
+            this.BringToFront();
         }
+
         #endregion
 
         private void SetDefaultVoiceIndicesPerStaff(int nVoices)
@@ -516,7 +607,6 @@ namespace Moritz.Composer
             {
                 MessageBox.Show(ae.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
-            SetAllSettingsHaveBeenReverted();
         }
 
         private void ClearListBoxes()
@@ -899,10 +989,6 @@ namespace Moritz.Composer
         {
             Debug.Assert(!string.IsNullOrEmpty(_settingsPath));
 
-            Point dimensionsAndMetadataFormLocation = GetDimensionsAndMetadataFormLocation();
-            Dictionary<int, Point> visiblePaletteFormLocations = GetVisiblePaletteFormLocations();
-            Dictionary<int, Point> visibleOrnamentFormLocations = GetVisibleOrnamentFormLocations();
-
             M.CreateDirectoryIfItDoesNotExist(this._settingsFolderPath);
 
             #region do the save
@@ -929,92 +1015,6 @@ namespace Moritz.Composer
                 w.Close(); // close unnecessary because of the using statement?
             }
             #endregion do the save
-
-            Reload(); // important: reloads the values used for reverting palettes, ornaments and dimensionsAndMetadata forms
-
-            ReshowForms(dimensionsAndMetadataFormLocation, visiblePaletteFormLocations, visibleOrnamentFormLocations);
-        }
-
-        /// <summary>
-        /// Returns Point(int.MinVal, int.MinVal) if the form is not visible
-        /// </summary>
-        /// <returns></returns>
-        private Point GetDimensionsAndMetadataFormLocation()
-        {
-            Point location;
-            if(_dimensionsAndMetadataForm.Visible)
-            {
-                location = new Point(_dimensionsAndMetadataForm.Location.X, _dimensionsAndMetadataForm.Location.Y);
-            }
-            else
-            {
-                location = new Point(int.MinValue, int.MinValue);
-            }
-            return location;
-        }
-        /// <summary>
-        /// Returns the index (in PalettesListBox.Items) and location of all visible ornamentForms
-        /// </summary>
-        private Dictionary<int, Point> GetVisibleOrnamentFormLocations()
-        {
-            Dictionary<int, Point> indexAndLocation = new Dictionary<int,Point>();
-            for(int i = 0; i < PalettesListBox.Items.Count; ++i)
-            {
-                PaletteForm paletteForm = PalettesListBox.Items[i] as PaletteForm;
-                if(paletteForm.OrnamentSettingsForm != null && paletteForm.OrnamentSettingsForm.Visible)
-                {
-                    indexAndLocation.Add(i, paletteForm.OrnamentSettingsForm.Location);
-                }
-            }
-            return indexAndLocation;
-        }
-        /// <summary>
-        /// Returns the index in PalettesListBox.Items and location of all visible paletteForms
-        /// </summary>
-        private Dictionary<int, Point> GetVisiblePaletteFormLocations()
-        {
-            Dictionary<int, Point> indexAndLocation = new Dictionary<int, Point>();
-            for(int i = 0; i < PalettesListBox.Items.Count; ++i)
-            {
-                PaletteForm paletteForm = PalettesListBox.Items[i] as PaletteForm;
-                if(paletteForm.Visible)
-                    indexAndLocation.Add(i, paletteForm.Location);
-            }
-            return indexAndLocation;
-        }
-        private void ReshowForms(Point dimensionsAndMetadataFormLocation, Dictionary<int, Point> visiblePaletteFormLocations, Dictionary<int, Point> visibleOrnamentFormLocations)
-        {
-            if(dimensionsAndMetadataFormLocation.X > int.MinValue)
-            {
-                _dimensionsAndMetadataForm.Show();
-                _dimensionsAndMetadataForm.Location = dimensionsAndMetadataFormLocation;
-            }
-            else
-                _dimensionsAndMetadataForm.Hide();
-
-            for(int i = 0; i < PalettesListBox.Items.Count; ++i)
-            {
-                PaletteForm paletteForm = PalettesListBox.Items[i] as PaletteForm;
-                if(visiblePaletteFormLocations.ContainsKey(i))
-                {
-                    paletteForm.Show();
-                    paletteForm.Location = visiblePaletteFormLocations[i];
-                }
-                else
-                {
-                    paletteForm.Hide();
-                }
-                if(visibleOrnamentFormLocations.ContainsKey(i))
-                {
-                    Debug.Assert(paletteForm.OrnamentSettingsForm != null);  
-                    paletteForm.OrnamentSettingsForm.Show();
-                    paletteForm.OrnamentSettingsForm.Location = visibleOrnamentFormLocations[i];
-                }
-                else if(paletteForm.OrnamentSettingsForm != null)
-                {
-                    paletteForm.OrnamentSettingsForm.Hide();
-                }
-            }
         }
 
         private void WriteNotation(XmlWriter w)
