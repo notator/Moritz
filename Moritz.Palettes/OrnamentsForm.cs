@@ -12,20 +12,21 @@ namespace Moritz.Palettes
 {
     public partial class OrnamentsForm : Form
     {
-        public OrnamentsForm(PaletteForm paletteForm)
+        public OrnamentsForm(PaletteForm paletteForm, ReviewableFormFunctions rff)
         {
-            InitializeOrnamentSettingsForm(null, paletteForm);
+            InitializeOrnamentSettingsForm(null, paletteForm, rff);
         }
 
-        public OrnamentsForm(XmlReader r, PaletteForm paletteForm)
+        public OrnamentsForm(XmlReader r, PaletteForm paletteForm, ReviewableFormFunctions rff)
         {
-            InitializeOrnamentSettingsForm(r, paletteForm);
+            InitializeOrnamentSettingsForm(r, paletteForm, rff);
         }
 
-        private void InitializeOrnamentSettingsForm(XmlReader r, PaletteForm paletteForm)
+        private void InitializeOrnamentSettingsForm(XmlReader r, PaletteForm paletteForm, ReviewableFormFunctions rff)
         {
             InitializeComponent();
             _paletteForm = paletteForm;
+            _rff = rff;
             ConnectBasicChordControl();
 
             Text = paletteForm.SavedName + " : ornaments";
@@ -629,21 +630,21 @@ namespace Moritz.Palettes
                                 {
                                     M.ReadToXmlElementTag(r, "ornamentSettings");
                                     _numberOfBasicChordDefs = ReadOrnamentSettingsForm(r);
+                                    break;
                                 }
                             }
+                            M.ReadToXmlElementTag(r, "palette", "moritzKrystalScore");
                         }
                     }
+                    TouchAllTextBoxes();
+                    _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+                    _paletteForm.SetOrnamentControls();
                 }
                 catch(Exception ex)
                 {
                     string msg = "Exception message:\n\n" + ex.Message;
                     MessageBox.Show(msg, "Error reading moritz krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
-                TouchAllTextBoxes();
-                _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
-
-                _paletteForm.SetOrnamentControls();
             }
         }
         #endregion buttons
@@ -748,7 +749,7 @@ namespace Moritz.Palettes
         private List<TextBox> _12OrnamentTextBoxes;
         private List<TextBox> _allTextBoxes;
         private List<List<int>> _ornaments = null;
-        private ReviewableFormFunctions _rff = new ReviewableFormFunctions();
+        private ReviewableFormFunctions _rff;
         #endregion private variables
     }
 }

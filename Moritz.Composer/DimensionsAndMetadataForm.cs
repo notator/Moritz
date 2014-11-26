@@ -15,11 +15,12 @@ namespace Moritz.Composer
         /// <summary>
         /// Creates a new, empty DimensionsAndMetadataForm.
         /// </summary>
-        public DimensionsAndMetadataForm(AssistantComposerMainForm assistantComposerMainForm, string settingsPath)
+        public DimensionsAndMetadataForm(AssistantComposerMainForm assistantComposerMainForm, string settingsPath, ReviewableFormFunctions rff)
         {
             InitializeComponent();
             _assistantComposerMainForm = assistantComposerMainForm;
             _settingsPath = settingsPath; // used when reverting
+            _rff = rff;
             _allTextBoxes = GetAllTextBoxes();
             SetDefaultValues();
         }
@@ -402,16 +403,14 @@ namespace Moritz.Composer
                         M.ReadToXmlElementTag(r, "moritzKrystalScore");
                         Read(r);
                     }
+                    TouchAllTextBoxes();
+                    _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
                 }
                 catch(Exception ex)
                 {
                     string msg = "Exception message:\n\n" + ex.Message;
                     MessageBox.Show(msg, "Error reading moritz krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }               
-
-                TouchAllTextBoxes();
-
-                _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+                }
             }
         }
 
@@ -471,7 +470,7 @@ namespace Moritz.Composer
         private string _settingsPath;
         private AssistantComposerMainForm _assistantComposerMainForm = null;
         private List<TextBox> _allTextBoxes;
-        private ReviewableFormFunctions _rff = new ReviewableFormFunctions();
+        private ReviewableFormFunctions _rff;
         #endregion private variables
     }
 }

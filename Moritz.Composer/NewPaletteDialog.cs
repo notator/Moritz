@@ -10,7 +10,7 @@ namespace Moritz.Composer
         public NewPaletteDialog()
         {
             InitializeComponent();
-            OKButton.Enabled = false;
+            OK_Button.Enabled = false;
         }
 
         private void NameTextBox_Leave(object sender, EventArgs e)
@@ -20,8 +20,8 @@ namespace Moritz.Composer
             && DomainTextBox.BackColor != M.TextBoxErrorColor
             && !String.IsNullOrEmpty(DomainTextBox.Text))
             {
-                OKButton.Enabled = true;
-                OKButton.Focus();
+                OK_Button.Enabled = true;
+                OK_Button.Focus();
             }
         }
 
@@ -38,13 +38,13 @@ namespace Moritz.Composer
                 _domain = int.Parse(DomainTextBox.Text);
                 if(!String.IsNullOrEmpty(NameTextBox.Text))
                 {
-                    OKButton.Enabled = true;
-                    OKButton.Focus();
+                    OK_Button.Enabled = true;
+                    OK_Button.Focus();
                 }
             }
             else
             {
-                OKButton.Enabled = false;
+                OK_Button.Enabled = false;
             }
         }
 

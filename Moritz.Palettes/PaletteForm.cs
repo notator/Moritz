@@ -13,8 +13,9 @@ namespace Moritz.Palettes
 {
     public partial class PaletteForm : Form
     {
-        public PaletteForm(XmlReader r, string name, int domain, ComposerFormCallbacks mainFormCallbacks, bool isPercussionPalette)
-            : this(name, domain, mainFormCallbacks)
+        public PaletteForm(XmlReader r, string name, int domain, ComposerFormCallbacks mainFormCallbacks, 
+            bool isPercussionPalette, ReviewableFormFunctions rff)
+            : this(name, domain, mainFormCallbacks, rff)
         {
             ReadPalette(r);
             this.PercussionCheckBox.Checked = isPercussionPalette;
@@ -26,13 +27,14 @@ namespace Moritz.Palettes
         /// </summary>
         /// <param name="assistantComposer"></param>
         /// <param name="krystal"></param>
-        public PaletteForm(string name, int domain, ComposerFormCallbacks mainFormCallbacks)
+        public PaletteForm(string name, int domain, ComposerFormCallbacks mainFormCallbacks, ReviewableFormFunctions rff)
         {
             InitializeComponent();
             Text = name;
             _savedName = name;
             _domain = domain;
             _callbacks = mainFormCallbacks;
+            _rff = rff;
 
             ConnectBasicChordControl();
             if(M.Preferences.CurrentMultimediaMidiOutputDevice != null)
@@ -59,7 +61,7 @@ namespace Moritz.Palettes
             }
             else
             {
-                _paletteChordForm = new PaletteChordForm(this, _bcc, midiChordIndex);
+                _paletteChordForm = new PaletteChordForm(this, _bcc, midiChordIndex, _rff);
                 _paletteChordForm.Show();
                 _callbacks.SetAllFormsExceptChordFormEnabledState(false);
                 BringPaletteChordFormToFront();
@@ -130,7 +132,7 @@ namespace Moritz.Palettes
 
             if(_ornamentsForm == null)
             {
-                _ornamentsForm = new OrnamentsForm(this);
+                _ornamentsForm = new OrnamentsForm(this, _rff);
 
                 SetOrnamentControls();
                 _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
@@ -375,19 +377,19 @@ namespace Moritz.Palettes
                                     _rff.SetSettingsAreSaved(this, false, ConfirmButton, RevertToSavedButton);
                                     break;
                                 }
+                                
                             }
+                            M.ReadToXmlElementTag(r, "palette", "moritzKrystalScore");
                         }
                     }
+                    TouchAllTextBoxes();
+                    _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
                 }
                 catch(Exception ex)
                 {
                     string msg = "Exception message:\n\n" + ex.Message;
                     MessageBox.Show(msg, "Error reading moritz krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 } 
-
-                TouchAllTextBoxes();
-
-                _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
             }
         }
 
@@ -1026,11 +1028,11 @@ namespace Moritz.Palettes
             if(_ornamentsForm != null)
             {
                 sb.Append(" : ornaments");
-                if(_rff.FormsThatNeedReview.Contains(_ornamentsForm))
+                if(_rff.NeedsReview(_ornamentsForm))
                 {
                     sb.Append(" ??");
                 }
-                else if(_rff.ConfirmedForms.Contains(_ornamentsForm))
+                else if(_rff.IsConfirmed(_ornamentsForm))
                 {
                     sb.Append(" **");
                 }
@@ -1200,7 +1202,7 @@ namespace Moritz.Palettes
                             MinMsDurationsTextBox.Text = r.ReadElementContentAsString();
                             break;
                         case "ornamentSettings":
-                            _ornamentsForm = new OrnamentsForm(r, this);
+                            _ornamentsForm = new OrnamentsForm(r, this, _rff);
                             ShowOrnamentSettingsButton.Enabled = true;
                             DeleteOrnamentSettingsButton.Enabled = true;
                             break;
@@ -1240,7 +1242,7 @@ namespace Moritz.Palettes
         private MIDIPercussionHelpForm _percussionInstrHelpForm = null;
         private BasicChordControl _bcc = null;
         private PaletteChordForm _paletteChordForm = null;
-        private ReviewableFormFunctions _rff = new ReviewableFormFunctions();
+        private ReviewableFormFunctions _rff;
         private string _savedName;
         #endregion private variables
     }

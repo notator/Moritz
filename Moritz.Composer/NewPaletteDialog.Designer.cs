@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.OKButton = new System.Windows.Forms.Button();
+            this.OK_Button = new System.Windows.Forms.Button();
             this.NameTextBox = new System.Windows.Forms.TextBox();
             this.NameLabel = new System.Windows.Forms.Label();
-            this.CancelButton = new System.Windows.Forms.Button();
+            this.Cancel_Button = new System.Windows.Forms.Button();
             this.DomainLabel = new System.Windows.Forms.Label();
             this.DomainTextBox = new System.Windows.Forms.TextBox();
             this.DomainHelpLabel = new System.Windows.Forms.Label();
@@ -39,14 +39,14 @@
             // 
             // OKButton
             // 
-            this.OKButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.OKButton.Location = new System.Drawing.Point(176, 82);
-            this.OKButton.Name = "OKButton";
-            this.OKButton.Size = new System.Drawing.Size(75, 23);
-            this.OKButton.TabIndex = 2;
-            this.OKButton.Text = "OK";
-            this.OKButton.UseVisualStyleBackColor = true;
-            this.OKButton.Click += new System.EventHandler(this.OKButton_Click);
+            this.OK_Button.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.OK_Button.Location = new System.Drawing.Point(176, 82);
+            this.OK_Button.Name = "OKButton";
+            this.OK_Button.Size = new System.Drawing.Size(75, 23);
+            this.OK_Button.TabIndex = 2;
+            this.OK_Button.Text = "OK";
+            this.OK_Button.UseVisualStyleBackColor = true;
+            this.OK_Button.Click += new System.EventHandler(this.OKButton_Click);
             // 
             // NameTextBox
             // 
@@ -68,13 +68,13 @@
             // 
             // CancelButton
             // 
-            this.CancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.CancelButton.Location = new System.Drawing.Point(95, 82);
-            this.CancelButton.Name = "CancelButton";
-            this.CancelButton.Size = new System.Drawing.Size(75, 23);
-            this.CancelButton.TabIndex = 3;
-            this.CancelButton.Text = "Cancel";
-            this.CancelButton.UseVisualStyleBackColor = true;
+            this.Cancel_Button.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.Cancel_Button.Location = new System.Drawing.Point(95, 82);
+            this.Cancel_Button.Name = "CancelButton";
+            this.Cancel_Button.Size = new System.Drawing.Size(75, 23);
+            this.Cancel_Button.TabIndex = 3;
+            this.Cancel_Button.Text = "Cancel";
+            this.Cancel_Button.UseVisualStyleBackColor = true;
             // 
             // DomainLabel
             // 
@@ -114,10 +114,10 @@
             this.Controls.Add(this.DomainHelpLabel);
             this.Controls.Add(this.DomainLabel);
             this.Controls.Add(this.DomainTextBox);
-            this.Controls.Add(this.CancelButton);
+            this.Controls.Add(this.Cancel_Button);
             this.Controls.Add(this.NameLabel);
             this.Controls.Add(this.NameTextBox);
-            this.Controls.Add(this.OKButton);
+            this.Controls.Add(this.OK_Button);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "NewPaletteDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -129,10 +129,10 @@
 
         #endregion
 
-        private System.Windows.Forms.Button OKButton;
+        private System.Windows.Forms.Button OK_Button;
         private System.Windows.Forms.TextBox NameTextBox;
         private System.Windows.Forms.Label NameLabel;
-        private System.Windows.Forms.Button CancelButton;
+        private System.Windows.Forms.Button Cancel_Button;
         private System.Windows.Forms.Label DomainLabel;
         private System.Windows.Forms.TextBox DomainTextBox;
         public System.Windows.Forms.Label DomainHelpLabel;

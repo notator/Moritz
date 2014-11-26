@@ -132,9 +132,9 @@
             this.ConfirmButton.Enabled = false;
             this.ConfirmButton.Font = new System.Drawing.Font("Arial", 8F);
             this.ConfirmButton.ForeColor = System.Drawing.Color.Blue;
-            this.ConfirmButton.Location = new System.Drawing.Point(534, 355);
+            this.ConfirmButton.Location = new System.Drawing.Point(359, 357);
             this.ConfirmButton.Name = "ConfirmButton";
-            this.ConfirmButton.Size = new System.Drawing.Size(106, 26);
+            this.ConfirmButton.Size = new System.Drawing.Size(137, 26);
             this.ConfirmButton.TabIndex = 1;
             this.ConfirmButton.Text = "confirm";
             this.ConfirmButton.UseVisualStyleBackColor = false;
@@ -436,7 +436,7 @@
             // 
             this.ShowMainScoreFormButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShowMainScoreFormButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-            this.ShowMainScoreFormButton.Location = new System.Drawing.Point(19, 355);
+            this.ShowMainScoreFormButton.Location = new System.Drawing.Point(503, 357);
             this.ShowMainScoreFormButton.Name = "ShowMainScoreFormButton";
             this.ShowMainScoreFormButton.Size = new System.Drawing.Size(137, 26);
             this.ShowMainScoreFormButton.TabIndex = 3;
@@ -461,9 +461,9 @@
             this.RevertToSavedButton.Enabled = false;
             this.RevertToSavedButton.Font = new System.Drawing.Font("Arial", 8F);
             this.RevertToSavedButton.ForeColor = System.Drawing.Color.Red;
-            this.RevertToSavedButton.Location = new System.Drawing.Point(420, 355);
+            this.RevertToSavedButton.Location = new System.Drawing.Point(215, 357);
             this.RevertToSavedButton.Name = "RevertToSavedButton";
-            this.RevertToSavedButton.Size = new System.Drawing.Size(106, 26);
+            this.RevertToSavedButton.Size = new System.Drawing.Size(137, 26);
             this.RevertToSavedButton.TabIndex = 2;
             this.RevertToSavedButton.Text = "revert to saved";
             this.RevertToSavedButton.UseVisualStyleBackColor = false;

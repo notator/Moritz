@@ -16,7 +16,7 @@ namespace Moritz.Palettes
 {
     public partial class PaletteChordForm : Form
     {
-        public PaletteChordForm(PaletteForm paletteForm, BasicChordControl bcc, int midiChordIndex)
+        public PaletteChordForm(PaletteForm paletteForm, BasicChordControl bcc, int midiChordIndex, ReviewableFormFunctions rff)
         {
             InitializeComponent();
 
@@ -25,6 +25,7 @@ namespace Moritz.Palettes
             _paletteForm = paletteForm;
             _bcc = bcc;
             _midiChordIndex = midiChordIndex;
+            _rff = rff;
 
             if(_paletteForm.IsPercussionPalette)
             {
@@ -804,7 +805,7 @@ namespace Moritz.Palettes
         List<TextBox> _emptyDefaultTextBoxes;
         List<Label> _emptyDefaultHelpLabels;
         List<Button> _audioSampleButtons;
-        ReviewableFormFunctions _rff = new ReviewableFormFunctions();
+        ReviewableFormFunctions _rff;
         List<TextBox> _allTextBoxes = new List<TextBox>();
         #endregion  private variables
 

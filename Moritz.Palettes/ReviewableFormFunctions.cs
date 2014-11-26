@@ -99,7 +99,64 @@ namespace Moritz.Palettes
         }
 
         /// <summary>
-        /// Removes the form from the FormsThatNeedReview and ConfirmedForms lists.
+        /// Returns true if the _formsThatNeedReview list contains form, otherwise false.
+        /// </summary>
+        public bool NeedsReview(Form form)
+        {
+            return _formsThatNeedReview.Contains(form);
+        }
+
+        /// <summary>
+        /// Returns true if the _confirmedForms list contains form, otherwise false.
+        /// </summary>
+        public bool IsConfirmed(Form form)
+        {
+            return _confirmedForms.Contains(form);
+        }
+
+        /// <summary>
+        /// Returns true if the _formsThatNeedReview list is not empty.
+        /// </summary>
+        public bool FormsNeedReview()
+        {
+            return _formsThatNeedReview.Count > 0;
+        }
+
+        /// <summary>
+        /// Returns true if the _confirmedForms list is not empty.
+        /// </summary>
+        public bool ConfirmedFormsExist()
+        {
+            return _confirmedForms.Count > 0;
+        }
+
+        public void ShowFormsThatNeedReview()
+        {
+            Point location = new Point(200, 25);
+            for(int i = 0; i < _formsThatNeedReview.Count; ++i)
+            {
+                int offset = i * 25;
+                Form form = _formsThatNeedReview[i];
+                form.Location = new Point(location.X + offset, location.Y + offset);
+                form.Show();
+                form.BringToFront();
+            }
+        }
+
+        public void ShowConfirmedForms()
+        {
+            Point location = new Point(200, 200);
+            for(int i = 0; i < _confirmedForms.Count; ++i)
+            {
+                int offset = i * 25;
+                Form form = _confirmedForms[i];
+                form.Location = new Point(location.X + offset, location.Y + offset);
+                form.Show();
+                form.BringToFront();
+            }
+        }
+        /// <summary>
+        /// Removes the form from the _formsThatNeedReview and _confirmedForms lists.
         /// </summary>
         /// <param name="form"></param>
         public void Remove(Form form)
@@ -108,13 +165,10 @@ namespace Moritz.Palettes
             _confirmedForms.Remove(form);
         }
 
-        public List<Form> FormsThatNeedReview { get { return _formsThatNeedReview; } }
-        public List<Form> ConfirmedForms { get { return _confirmedForms; } }
-
         private readonly string NeedsReviewStr = " ??";
         private readonly string ChangedAndConfirmedStr = " **";
 
-        private static List<Form> _formsThatNeedReview = new List<Form>();
-        private static List<Form> _confirmedForms = new List<Form>();
+        private List<Form> _formsThatNeedReview = new List<Form>();
+        private List<Form> _confirmedForms = new List<Form>();
     }
 }
