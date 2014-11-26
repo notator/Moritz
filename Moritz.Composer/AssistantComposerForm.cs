@@ -26,9 +26,9 @@ using Moritz.Algorithm.Study3Sketch2;
 
 namespace Moritz.Composer
 {
-    public partial class AssistantComposerMainForm : Form
+    public partial class AssistantComposerForm : Form
     {
-        public AssistantComposerMainForm(string settingsPath, IMoritzForm1 moritzForm1)
+        public AssistantComposerForm(string settingsPath, IMoritzForm1 moritzForm1)
         {
             InitializeComponent();
 
@@ -101,7 +101,7 @@ namespace Moritz.Composer
 
         #region ReviewableForm
 
-        private void AssistantComposerMainForm_Activated(object sender, EventArgs e)
+        private void AssistantComposerForm_Activated(object sender, EventArgs e)
         {
             SetFormButtons();
         }
@@ -992,7 +992,8 @@ namespace Moritz.Composer
                 try
                 {
                     // The settings are only saved (and reloaded) here in case there is going to be an error while creating the score.
-                    SaveSettings(); 
+                    SaveSettings();
+                    SetSettingsAreSaved();
                 }
                 catch(Exception ex)
                 {
@@ -1259,16 +1260,23 @@ namespace Moritz.Composer
 
         private void QuitMoritzButton_Click(object sender, EventArgs e)
         {
-            if(DiscardChanges())
+            if(DiscardAnyChanges())
                 _moritzForm1.Close();
         }
         private void QuitAssistantComposerButton_Click(object sender, EventArgs e)
         {
-            if(DiscardChanges())
+            if(DiscardAnyChanges())
                 _moritzForm1.CloseAssistantComposer();
         }
 
-        private bool DiscardChanges()
+        /// <summary>
+        /// This function is also called by MoritzForm1.
+        /// If there are any unsaved changes, this function asks the user if they should be discarded.
+        /// If there are no changes, or the user answers yes, this function returns true.
+        /// Otherwise it returns false.
+        /// </summary>
+        /// <returns></returns>
+        public bool DiscardAnyChanges()
         {
             bool discard = true;
             if(_rff.FormsNeedReview() || _rff.ConfirmedFormsExist())
@@ -1294,7 +1302,7 @@ namespace Moritz.Composer
             _rff.ShowConfirmedForms();
         }   
 
-        private void AssistantComposerMainForm_FormClosing(object sender, FormClosingEventArgs e)
+        private void AssistantComposerForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             foreach(PaletteForm paletteForm in PalettesListBox.Items)
             {

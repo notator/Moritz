@@ -15,10 +15,10 @@ namespace Moritz.Composer
         /// <summary>
         /// Creates a new, empty DimensionsAndMetadataForm.
         /// </summary>
-        public DimensionsAndMetadataForm(AssistantComposerMainForm assistantComposerMainForm, string settingsPath, ReviewableFormFunctions rff)
+        public DimensionsAndMetadataForm(AssistantComposerForm assistantComposerForm, string settingsPath, ReviewableFormFunctions rff)
         {
             InitializeComponent();
-            _assistantComposerMainForm = assistantComposerMainForm;
+            _assistantComposerForm = assistantComposerForm;
             _settingsPath = settingsPath; // used when reverting
             _rff = rff;
             _allTextBoxes = GetAllTextBoxes();
@@ -378,8 +378,8 @@ namespace Moritz.Composer
         #endregion TextBox_Leave handlers
         private void ShowMainScoreFormButton_Click(object sender, EventArgs e)
         {
-            this._assistantComposerMainForm.Enabled = true;
-            this._assistantComposerMainForm.BringToFront();
+            this._assistantComposerForm.Enabled = true;
+            this._assistantComposerForm.BringToFront();
         }
 
         private void ConfirmButton_Click(object sender, EventArgs e)
@@ -468,7 +468,7 @@ namespace Moritz.Composer
 
         #region private variables
         private string _settingsPath;
-        private AssistantComposerMainForm _assistantComposerMainForm = null;
+        private AssistantComposerForm _assistantComposerForm = null;
         private List<TextBox> _allTextBoxes;
         private ReviewableFormFunctions _rff;
         #endregion private variables

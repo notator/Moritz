@@ -103,11 +103,11 @@ namespace Moritz
 
                     SaveDefaultSettings(settingsPath, algorithmName);
 
-                    _assistantComposerMainForm = new AssistantComposerMainForm(settingsPath, (IMoritzForm1)this);
-                    if(_assistantComposerMainForm != null
-                    && !(_assistantComposerMainForm.Disposing || _assistantComposerMainForm.IsDisposed))
+                    _assistantComposerForm = new AssistantComposerForm(settingsPath, (IMoritzForm1)this);
+                    if(_assistantComposerForm != null
+                    && !(_assistantComposerForm.Disposing || _assistantComposerForm.IsDisposed))
                     {
-                        _assistantComposerMainForm.Show();
+                        _assistantComposerForm.Show();
                         this.Hide();
                     }
                 }
@@ -217,8 +217,8 @@ namespace Moritz
                     string settingsPathname = openFileDialog.FileName;
                     if(!String.IsNullOrEmpty(settingsPathname))
                     {
-                        _assistantComposerMainForm = new AssistantComposerMainForm(settingsPathname, (IMoritzForm1)this);
-                        _assistantComposerMainForm.Show();
+                        _assistantComposerForm = new AssistantComposerForm(settingsPathname, (IMoritzForm1)this);
+                        _assistantComposerForm.Show();
                         this.Hide();
                     }
                 }
@@ -263,7 +263,7 @@ namespace Moritz
         }
         private void MoritzForm1_VisibleChanged(object sender, EventArgs e)
         {
-            if( _assistantComposerMainForm != null)
+            if( _assistantComposerForm != null)
             {
                 EnableDeviceComboBoxesAndPreferences(false);
             }
@@ -272,7 +272,7 @@ namespace Moritz
                 EnableDeviceComboBoxesAndPreferences(true);
             }
 
-            if(_assistantComposerMainForm != null)
+            if(_assistantComposerForm != null)
             {
                 NewScoreSettingsButton.Hide();
                 LoadScoreSettingsButton.Hide();
@@ -302,22 +302,22 @@ namespace Moritz
         /// <param name="e"></param>
         private void MoritzForm1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if(_assistantComposerMainForm != null && !_assistantComposerMainForm.Disposing)
-                _assistantComposerMainForm.Dispose();
+            if(_assistantComposerForm != null && !_assistantComposerForm.Disposing)
+                _assistantComposerForm.Dispose();
             M.Preferences.Dispose();
         }
 
         public void CloseAssistantComposer()
         {
-            if(_assistantComposerMainForm != null)
+            if(_assistantComposerForm != null && _assistantComposerForm.DiscardAnyChanges())
             {
-                _assistantComposerMainForm.Close();
-                _assistantComposerMainForm = null;
+                _assistantComposerForm.Close();
+                _assistantComposerForm = null;
             }
             MoritzForm1_VisibleChanged(null, null);
             this.Show();
         }
 
-        private AssistantComposerMainForm _assistantComposerMainForm = null;
+        private AssistantComposerForm _assistantComposerForm = null;
     }
 }

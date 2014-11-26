@@ -1,6 +1,6 @@
 namespace Moritz.Composer
 {
-	partial class AssistantComposerMainForm
+	partial class AssistantComposerForm
 	{
 		/// <summary>
 		/// Required designer variable.
@@ -946,7 +946,7 @@ namespace Moritz.Composer
             this.ShowConfirmedFormsButton.UseVisualStyleBackColor = false;
             this.ShowConfirmedFormsButton.Click += new System.EventHandler(this.ShowConfirmedFormsButton_Click);
             // 
-            // AssistantComposerMainForm
+            // AssistantComposerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -975,11 +975,11 @@ namespace Moritz.Composer
             this.Font = new System.Drawing.Font("Arial", 8F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Location = new System.Drawing.Point(250, 100);
-            this.Name = "AssistantComposerMainForm";
+            this.Name = "AssistantComposerForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = " ";
-            this.Activated += new System.EventHandler(this.AssistantComposerMainForm_Activated);
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AssistantComposerMainForm_FormClosing);
+            this.Activated += new System.EventHandler(this.AssistantComposerForm_Activated);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AssistantComposerForm_FormClosing);
             this.NotationGroupBox.ResumeLayout(false);
             this.NotationGroupBox.PerformLayout();
             this.StandardChordsOptionsPanel.ResumeLayout(false);

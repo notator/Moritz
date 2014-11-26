@@ -75,7 +75,7 @@ namespace Moritz.Globals
         };
 
         /// <summary>
-        /// These values are used to populate ComboBoxes (see AssistantComposerMainForm).
+        /// These values are used to populate ComboBoxes (see AssistantComposerForm).
         /// The value "none" is used to indicate that a score has no folder, no graphics and no (.mkss) settings file.
         /// "none" is used by the temporary PaletteDemoScore which is created by audio demo buttons in palettes.
         /// </summary>

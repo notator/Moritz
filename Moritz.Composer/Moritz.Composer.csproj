@@ -49,11 +49,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssistantComposerMainForm.cs">
+    <Compile Include="AssistantComposerForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AssistantComposerMainForm.Designer.cs">
-      <DependentUpon>AssistantComposerMainForm.cs</DependentUpon>
+    <Compile Include="AssistantComposerForm.Designer.cs">
+      <DependentUpon>AssistantComposerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ComposableScore.cs" />
     <Compile Include="ComposableScoreAlgorithm.cs" />
@@ -73,8 +73,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="AssistantComposerMainForm.resx">
-      <DependentUpon>AssistantComposerMainForm.cs</DependentUpon>
+    <EmbeddedResource Include="AssistantComposerForm.resx">
+      <DependentUpon>AssistantComposerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DimensionsAndMetadataForm.resx">
       <DependentUpon>DimensionsAndMetadataForm.cs</DependentUpon>
