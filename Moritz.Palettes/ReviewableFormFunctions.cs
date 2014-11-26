@@ -96,14 +96,23 @@ namespace Moritz.Palettes
             SetFormState(form, ReviewableState.saved);
             confirmButton.Enabled = false;
             revertToSavedButton.Enabled = false;
-            form.Focus();
+        }
+
+        /// <summary>
+        /// Removes the form from the FormsThatNeedReview and ConfirmedForms lists.
+        /// </summary>
+        /// <param name="form"></param>
+        public void Remove(Form form)
+        {
+            _formsThatNeedReview.Remove(form);
+            _confirmedForms.Remove(form);
         }
 
         public List<Form> FormsThatNeedReview { get { return _formsThatNeedReview; } }
         public List<Form> ConfirmedForms { get { return _confirmedForms; } }
 
-        private readonly string NeedsReviewStr = " -- ?";
-        private readonly string ChangedAndConfirmedStr = " -- confirmed";
+        private readonly string NeedsReviewStr = " ??";
+        private readonly string ChangedAndConfirmedStr = " **";
 
         private static List<Form> _formsThatNeedReview = new List<Form>();
         private static List<Form> _confirmedForms = new List<Form>();

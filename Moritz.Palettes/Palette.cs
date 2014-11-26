@@ -39,7 +39,7 @@ namespace Moritz.Palettes
             _ornamentMinMsDurations = M.StringToIntList(paletteForm.MinMsDurationsTextBox.Text, ',');
 
             _ornamentSettings = null;
-            if(paletteForm.OrnamentSettingsForm != null)
+            if(paletteForm.OrnamentsForm != null)
             {
                 _ornamentSettings = new OrnamentSettings(paletteForm);
             }
@@ -86,7 +86,7 @@ namespace Moritz.Palettes
             _ornamentMinMsDurations = M.StringToIntList(paletteChordForm.MinMsDurationTextBox.Text, ',');
 
             _ornamentSettings = null;
-            if(paletteChordForm.PaletteForm.OrnamentSettingsForm != null)
+            if(paletteChordForm.PaletteForm.OrnamentsForm != null)
             {
                 _ornamentSettings = new OrnamentSettings(paletteChordForm.PaletteForm);
             }
@@ -362,7 +362,7 @@ namespace Moritz.Palettes
     {
         public OrnamentSettings(PaletteForm paletteform)
         {
-            OrnamentSettingsForm osf = paletteform.OrnamentSettingsForm;
+            OrnamentsForm osf = paletteform.OrnamentsForm;
             Debug.Assert(osf != null && osf.Ornaments != null);
 
             BasicChordFormSettings bcs = new BasicChordFormSettings();

@@ -597,7 +597,6 @@ namespace Moritz.Palettes
             this.Name = "PaletteForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "palette";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.PaletteForm_FormClosing);
             this.Click += new System.EventHandler(this.PaletteForm_Click);
             this.ResumeLayout(false);
             this.PerformLayout();

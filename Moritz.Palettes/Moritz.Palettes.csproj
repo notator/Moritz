@@ -90,11 +90,11 @@
     <Compile Include="MidiPitchesHelpForm.Designer.cs">
       <DependentUpon>MidiPitchesHelpForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="OrnamentSettingsForm.cs">
+    <Compile Include="OrnamentsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OrnamentSettingsForm.Designer.cs">
-      <DependentUpon>OrnamentSettingsForm.cs</DependentUpon>
+    <Compile Include="OrnamentsForm.Designer.cs">
+      <DependentUpon>OrnamentsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Palette.cs" />
     <Compile Include="PaletteForm.cs">
@@ -128,8 +128,8 @@
     <EmbeddedResource Include="MidiPitchesHelpForm.resx">
       <DependentUpon>MidiPitchesHelpForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="OrnamentSettingsForm.resx">
-      <DependentUpon>OrnamentSettingsForm.cs</DependentUpon>
+    <EmbeddedResource Include="OrnamentsForm.resx">
+      <DependentUpon>OrnamentsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PaletteForm.resx">
       <DependentUpon>PaletteForm.cs</DependentUpon>

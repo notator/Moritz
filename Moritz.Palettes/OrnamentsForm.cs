@@ -10,14 +10,14 @@ using Moritz.Globals;
 
 namespace Moritz.Palettes
 {
-    public partial class OrnamentSettingsForm : Form
+    public partial class OrnamentsForm : Form
     {
-        public OrnamentSettingsForm(PaletteForm paletteForm)
+        public OrnamentsForm(PaletteForm paletteForm)
         {
             InitializeOrnamentSettingsForm(null, paletteForm);
         }
 
-        public OrnamentSettingsForm(XmlReader r, PaletteForm paletteForm)
+        public OrnamentsForm(XmlReader r, PaletteForm paletteForm)
         {
             InitializeOrnamentSettingsForm(r, paletteForm);
         }

@@ -595,8 +595,8 @@ namespace Moritz.Palettes
                     InversionIndexHelpLabel.Text = "1 integer value in range [ 0.." + inversionsMaxIndex.ToString() + " ]";
                 }
 
-                if(_paletteForm.OrnamentSettingsForm != null && _paletteForm.OrnamentSettingsForm.Ornaments != null)
-                    SetEnabledOrnamentControls(_paletteForm.OrnamentSettingsForm.Ornaments.Count);
+                if(_paletteForm.OrnamentsForm != null && _paletteForm.OrnamentsForm.Ornaments != null)
+                    SetEnabledOrnamentControls(_paletteForm.OrnamentsForm.Ornaments.Count);
                 else
                     DisableOrnamentControls();
             }
@@ -673,7 +673,7 @@ namespace Moritz.Palettes
         }
         private void OrnamentNumberTextBox_Leave(object sender, EventArgs e)
         {
-            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, _paletteForm.OrnamentSettingsForm.Ornaments.Count, SetDialogState);
+            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, _paletteForm.OrnamentsForm.Ornaments.Count, SetDialogState);
         }
         private void MinMsDurationTextBox_Leave(object sender, EventArgs e)
         {

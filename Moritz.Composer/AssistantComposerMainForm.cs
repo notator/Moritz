@@ -123,6 +123,7 @@ namespace Moritz.Composer
             }
             this.ResumeLayout();
             this.RevertEverythingButton.Enabled = (_rff.FormsThatNeedReview.Count > 0 || _rff.ConfirmedForms.Count > 0);
+            this.Refresh(); // important that the palettes list box is refreshed...
         }
         private void SetSettingsNeedReview()
         {
@@ -224,8 +225,8 @@ namespace Moritz.Composer
             {
                 foreach(PaletteForm paletteForm in PalettesListBox.Items)
                 {
-                    if((paletteForm.OrnamentSettingsForm != null
-                    && (ReviewableState)paletteForm.OrnamentSettingsForm.Tag == state)
+                    if((paletteForm.OrnamentsForm != null
+                    && (ReviewableState)paletteForm.OrnamentsForm.Tag == state)
                     || ((ReviewableState)paletteForm.Tag == state))
                     {
                         rval = true;
@@ -256,22 +257,22 @@ namespace Moritz.Composer
 
         private void SetAllSettingsHaveBeenReverted()
         {
-            _rff.FormsThatNeedReview.Clear();
-            _rff.ConfirmedForms.Clear();
-
             SetNotationPanelHasBeenReverted();
             SetKrystalsPanelHasBeenReverted();
             SetPalettesPanelHasBeenReverted();
             _rff.SetFormState(_dimensionsAndMetadataForm, ReviewableState.saved);
             foreach(PaletteForm paletteForm in PalettesListBox.Items)
             {
-                if(paletteForm.OrnamentSettingsForm != null)
-                    _rff.SetFormState(paletteForm.OrnamentSettingsForm, ReviewableState.saved);
+                if(paletteForm.OrnamentsForm != null)
+                    _rff.SetFormState(paletteForm.OrnamentsForm, ReviewableState.saved);
                 _rff.SetFormState(paletteForm, ReviewableState.saved);
             }
             this.SaveSettingsCreateScoreButton.Enabled = true;
             this.SaveSettingsCreateScoreButton.Text = "create score";
             this.RevertEverythingButton.Enabled = false;
+
+            Debug.Assert(_rff.FormsThatNeedReview.Count == 0);
+            Debug.Assert(_rff.ConfirmedForms.Count == 0);
         }
         private void SetNotationPanelHasBeenReverted()
         {
@@ -326,7 +327,7 @@ namespace Moritz.Composer
             {
                 foreach(PaletteForm paletteForm in PalettesListBox.Items)
                 {
-                    paletteForm.Close();
+                    paletteForm.Delete();
                 }
                 ReadPalettes();
                 SetPalettesPanelHasBeenReverted();
@@ -427,7 +428,7 @@ namespace Moritz.Composer
 
                 foreach(PaletteForm paletteForm in PalettesListBox.Items)
                 {
-                    paletteForm.Close(); // closes any OrnamentSettingsForm and/or PaletteChordform
+                    paletteForm.Delete(); // closes any OrnamentsForm and/or PaletteChordform
                 }
 
                 LoadSettings(); // clears existing settings
@@ -464,9 +465,9 @@ namespace Moritz.Composer
             for(int i = 0; i < PalettesListBox.Items.Count; ++i)
             {
                 PaletteForm paletteForm = PalettesListBox.Items[i] as PaletteForm;
-                if(paletteForm.OrnamentSettingsForm != null && paletteForm.OrnamentSettingsForm.Visible)
+                if(paletteForm.OrnamentsForm != null && paletteForm.OrnamentsForm.Visible)
                 {
-                    indexAndLocation.Add(i, paletteForm.OrnamentSettingsForm.Location);
+                    indexAndLocation.Add(i, paletteForm.OrnamentsForm.Location);
                 }
             }
             return indexAndLocation;
@@ -509,13 +510,13 @@ namespace Moritz.Composer
                 }
                 if(visibleOrnamentFormLocations.ContainsKey(i))
                 {
-                    Debug.Assert(paletteForm.OrnamentSettingsForm != null);
-                    paletteForm.OrnamentSettingsForm.Show();
-                    paletteForm.OrnamentSettingsForm.Location = visibleOrnamentFormLocations[i];
+                    Debug.Assert(paletteForm.OrnamentsForm != null);
+                    paletteForm.OrnamentsForm.Show();
+                    paletteForm.OrnamentsForm.Location = visibleOrnamentFormLocations[i];
                 }
-                else if(paletteForm.OrnamentSettingsForm != null)
+                else if(paletteForm.OrnamentsForm != null)
                 {
-                    paletteForm.OrnamentSettingsForm.Hide();
+                    paletteForm.OrnamentsForm.Hide();
                 }
             }
 
@@ -933,9 +934,9 @@ namespace Moritz.Composer
         {
             foreach(PaletteForm paletteForm in this.PalettesListBox.Items)
             {
-                if(paletteForm.OrnamentSettingsForm != null)
+                if(paletteForm.OrnamentsForm != null)
                 {
-                    paletteForm.OrnamentSettingsForm.Enabled = enabledState;
+                    paletteForm.OrnamentsForm.Enabled = enabledState;
                 }
                 paletteForm.Enabled = enabledState;
             }
@@ -1303,7 +1304,7 @@ namespace Moritz.Composer
         {
             foreach(PaletteForm paletteForm in PalettesListBox.Items)
             {
-                paletteForm.Close();
+                paletteForm.Delete();
             }
 
             if(_dimensionsAndMetadataForm != null)
@@ -1563,7 +1564,7 @@ namespace Moritz.Composer
                 {
                     List<PaletteForm> currentPaletteForms = CurrentPaletteForms;
                     PaletteForm paletteForm = currentPaletteForms[selectedIndex];
-                    paletteForm.Close();
+                    paletteForm.Delete();
                     currentPaletteForms.RemoveAt(selectedIndex);
                     CurrentPaletteForms = currentPaletteForms;
                     this.SetPalettesPanelNeedsReview();
