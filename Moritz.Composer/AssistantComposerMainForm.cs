@@ -1248,25 +1248,27 @@ namespace Moritz.Composer
 
         private void QuitMoritzButton_Click(object sender, EventArgs e)
         {
-            CheckSaved();
-            _moritzForm1.Close();
+            if(DiscardChanges())
+                _moritzForm1.Close();
         }
         private void QuitAssistantComposerButton_Click(object sender, EventArgs e)
         {
-            CheckSaved();
-            _moritzForm1.CloseAssistantComposer();
+            if(DiscardChanges())
+                _moritzForm1.CloseAssistantComposer();
         }
 
-        private void CheckSaved()
+        private bool DiscardChanges()
         {
-            if(SaveSettingsCreateScoreButton.Enabled && SaveSettingsCreateScoreButton.Text.StartsWith("save"))
+            bool discard = true;
+            if(_rff.FormsThatNeedReview.Count > 0 || _rff.ConfirmedForms.Count > 0)
             {
-                DialogResult result = MessageBox.Show("Save settings?", "Save?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if(result == DialogResult.Yes)
+                DialogResult result = MessageBox.Show("Discard changes?", "Discard changes?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if(result == DialogResult.No)
                 {
-                    SaveSettings();
+                    discard = false;
                 }
             }
+            return discard;
         }
 
         #region AssistantComposerMainForm_Activated
@@ -1517,36 +1519,37 @@ namespace Moritz.Composer
         }
         private void AddPaletteButton_Click(object sender, EventArgs e)
         {            
-            // Palette domains are limited by the width of the palette forms.
-            // There has to be enough space for the demo buttons.
-            string message = "Domain of the new palette [1..20]:"; 
-            GetStringDialog getStringDialog = new GetStringDialog("Get Domain", message);
-            if(getStringDialog.ShowDialog() == DialogResult.OK)
+            NewPaletteDialog dialog = new NewPaletteDialog();
+            if(dialog.ShowDialog() == DialogResult.OK)
             {
-                int domain;
-                if(int.TryParse(getStringDialog.String, out domain) && domain > 0 && domain < 21)
+                List<PaletteForm> currentPaletteForms = CurrentPaletteForms;
+                if(PaletteNameAlreadyExists(dialog, currentPaletteForms))
                 {
-                    
-                    PaletteForm paletteForm = null;
-                    string newname = NewPaletteName(PalettesListBox.Items.Count + 1);
-                    paletteForm = new PaletteForm(newname, domain, _callbacks);
-                    List<PaletteForm> currentPaletteForms = CurrentPaletteForms;
+                    MessageBox.Show("That name already exists!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    PaletteForm paletteForm = new PaletteForm(dialog.PaletteName, dialog.PaletteDomain, _callbacks);
                     currentPaletteForms.Add(paletteForm);
                     CurrentPaletteForms = currentPaletteForms;
                     PalettesListBox.SelectedIndex = PalettesListBox.Items.Count - 1;
                     this.SetPalettesPanelNeedsReview();
                 }
-                else
-                {
-                    MessageBox.Show("Illegal domain.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
             }
-
         }
 
-        private string NewPaletteName(int paletteNumber)
+        private bool PaletteNameAlreadyExists(NewPaletteDialog dialog, List<PaletteForm> currentPaletteForms)
         {
-            return "palette " + paletteNumber.ToString();
+            bool rval = false;
+            foreach(PaletteForm paletteForm in currentPaletteForms)
+            {
+                if(paletteForm.SavedName == dialog.PaletteName)
+                {
+                    rval = true;
+                    break;
+                }
+            }
+            return rval;
         }
 
         private void DeletePaletteButton_Click(object sender, EventArgs e)

@@ -195,7 +195,6 @@ namespace Moritz.Palettes
 
         #region revertToSaved strings
         private string SavedNumBasicChordDefsTextBoxText;
-
         private string SavedBankIndicesTextBoxText;
         private string SavedPatchIndicesTextBoxText;
         private string SavedNumberOfOrnamentsTextBoxText;

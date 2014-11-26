@@ -50,12 +50,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GetStringDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GetStringDialog.Designer.cs">
-      <DependentUpon>GetStringDialog.cs</DependentUpon>
-    </Compile>
     <Compile Include="IMoritzForm1.cs" />
     <Compile Include="IODevices\Constants.cs" />
     <Compile Include="IODevices\DeviceCollections.cs" />
@@ -93,9 +87,6 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="GetStringDialog.resx">
-      <DependentUpon>GetStringDialog.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
