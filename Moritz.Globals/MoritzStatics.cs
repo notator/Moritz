@@ -615,6 +615,8 @@ namespace Moritz.Globals
         }
 
         public static Color TextBoxErrorColor = Color.FromArgb(255, 220, 220);
+        public static Color GreenButtonColor = Color.FromArgb(215, 225, 215);
+        public static Color LightGreenButtonColor = Color.FromArgb(205, 240, 205);
 
         public static bool HasError(List<TextBox> allTextBoxes)
         {

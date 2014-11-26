@@ -109,7 +109,9 @@ namespace Moritz.Composer
         private void SetFormButtons()
         {
             this.ShowUncheckedFormsButton.Enabled = _rff.FormsNeedReview();
+            SetEnabledButtonToLightGreen(ShowUncheckedFormsButton);
             this.ShowConfirmedFormsButton.Enabled = _rff.ConfirmedFormsExist();
+            SetEnabledButtonToLightGreen(ShowConfirmedFormsButton);
             this.SaveSettingsCreateScoreButton.Enabled = !(this.ShowUncheckedFormsButton.Enabled);
             this.SuspendLayout();
             if(_rff.ConfirmedFormsExist())
@@ -125,6 +127,14 @@ namespace Moritz.Composer
             this.ResumeLayout();
             this.RevertEverythingButton.Enabled = (_rff.FormsNeedReview() || _rff.ConfirmedFormsExist());
             this.Refresh(); // important that the palettes list box is refreshed...
+        }
+
+        private void SetEnabledButtonToLightGreen(Button button)
+        {
+            if(button.Enabled)
+                button.BackColor = M.LightGreenButtonColor;
+            else
+                button.BackColor = Color.Transparent;
         }
         private void SetSettingsNeedReview()
         {

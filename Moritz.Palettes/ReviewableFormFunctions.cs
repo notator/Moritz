@@ -75,7 +75,7 @@ namespace Moritz.Palettes
         }
 
         /// <summary>
-        /// Called when the confirmButton is clicked.
+        /// Called when the form's confirmButton is clicked.
         /// </summary>
         /// <param name="Form"></param>
         public void SetSettingsCanBeSaved(Form form, bool hasError, Button confirmButton)

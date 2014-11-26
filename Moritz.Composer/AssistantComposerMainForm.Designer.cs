@@ -921,9 +921,10 @@ namespace Moritz.Composer
             // 
             // ShowUncheckedFormsButton
             // 
-            this.ShowUncheckedFormsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
+            this.ShowUncheckedFormsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(205)))), ((int)(((byte)(240)))), ((int)(((byte)(205)))));
             this.ShowUncheckedFormsButton.Enabled = false;
             this.ShowUncheckedFormsButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.ShowUncheckedFormsButton.ForeColor = System.Drawing.SystemColors.ControlText;
             this.ShowUncheckedFormsButton.Location = new System.Drawing.Point(490, 455);
             this.ShowUncheckedFormsButton.Name = "ShowUncheckedFormsButton";
             this.ShowUncheckedFormsButton.Size = new System.Drawing.Size(214, 31);
