@@ -12,21 +12,27 @@ namespace Moritz.Palettes
 {
     public partial class OrnamentsForm : Form
     {
-        public OrnamentsForm(PaletteForm paletteForm, ReviewableFormFunctions rff)
+        public OrnamentsForm(PaletteForm paletteForm, FormStateFunctions fsf)
         {
-            InitializeOrnamentSettingsForm(null, paletteForm, rff);
+            InitializeOrnamentSettingsForm(null, paletteForm, fsf);
+
+            _fsf.SetFormState(this, SavedState.unconfirmed);
+            ConfirmButton.Enabled = false;
+            RevertToSavedButton.Enabled = false;
+            RevertToSavedButton.Hide();
         }
 
-        public OrnamentsForm(XmlReader r, PaletteForm paletteForm, ReviewableFormFunctions rff)
+        public OrnamentsForm(XmlReader r, PaletteForm paletteForm, FormStateFunctions fsf)
         {
-            InitializeOrnamentSettingsForm(r, paletteForm, rff);
+            InitializeOrnamentSettingsForm(r, paletteForm, fsf);
+            _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
 
-        private void InitializeOrnamentSettingsForm(XmlReader r, PaletteForm paletteForm, ReviewableFormFunctions rff)
+        private void InitializeOrnamentSettingsForm(XmlReader r, PaletteForm paletteForm, FormStateFunctions fsf)
         {
             InitializeComponent();
             _paletteForm = paletteForm;
-            _rff = rff;
+            _fsf = fsf;
             ConnectBasicChordControl();
 
             Text = paletteForm.SavedName + " : ornaments";
@@ -40,12 +46,8 @@ namespace Moritz.Palettes
             _allTextBoxes = new List<TextBox>();
             _allTextBoxes.AddRange(_allNonOrnamentTextBoxes);
             _allTextBoxes.AddRange(_12OrnamentTextBoxes);
-
-            //NumberOfOrnamentsTextBox_Leave(NumberOfOrnamentsTextBox, null);
             
             TouchAllTextBoxes();
-
-            _rff.SetSettingsAreSaved(this, false, ConfirmButton, RevertToSavedButton);
         }
 
         private void ConnectBasicChordControl()
@@ -120,7 +122,7 @@ namespace Moritz.Palettes
             }
             Debug.Assert(r.Name == "ornamentSettings");
 
-            _rff.SetSettingsAreSaved(this, false, ConfirmButton, RevertToSavedButton);
+            _fsf.SetSettingsAreSaved(this, false, ConfirmButton, RevertToSavedButton);
 
             return int.Parse(NumBasicChordDefsTextBox.Text);
         }
@@ -578,7 +580,7 @@ namespace Moritz.Palettes
         private void SetDialogState(TextBox textBox, bool okay)
         {
             M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
-            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+            _fsf.SetSettingsAreUnconfirmed(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
        #endregion
 
@@ -603,12 +605,12 @@ namespace Moritz.Palettes
         
         private void ConfirmButton_Click(object sender, EventArgs e)
         {
-            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), ConfirmButton); 
+            _fsf.SetSettingsAreConfirmed(this, M.HasError(_allTextBoxes), ConfirmButton); 
         }
 
         private void RevertToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(((ReviewableState)this.Tag) == ReviewableState.needsReview || ((ReviewableState)this.Tag) == ReviewableState.hasChanged);
+            Debug.Assert(((SavedState)this.Tag) == SavedState.unconfirmed || ((SavedState)this.Tag) == SavedState.confirmed);
             DialogResult result = 
                 MessageBox.Show("Are you sure you want to revert these ornament settings to the saved version?", "Revert?", 
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -637,7 +639,7 @@ namespace Moritz.Palettes
                         }
                     }
                     TouchAllTextBoxes();
-                    _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+                    _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
                     _paletteForm.SetOrnamentControls();
                 }
                 catch(Exception ex)
@@ -735,7 +737,7 @@ namespace Moritz.Palettes
 
             w.WriteEndElement(); // end of ornamentSettings
 
-            _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+            _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
         public BasicChordControl BasicChordControl { get { return _bcc; } }
         public List<List<int>> Ornaments { get { return _ornaments; } }
@@ -749,7 +751,7 @@ namespace Moritz.Palettes
         private List<TextBox> _12OrnamentTextBoxes;
         private List<TextBox> _allTextBoxes;
         private List<List<int>> _ornaments = null;
-        private ReviewableFormFunctions _rff;
+        private FormStateFunctions _fsf;
         #endregion private variables
     }
 }

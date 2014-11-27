@@ -14,27 +14,34 @@ namespace Moritz.Palettes
     public partial class PaletteForm : Form
     {
         public PaletteForm(XmlReader r, string name, int domain, ComposerFormCallbacks mainFormCallbacks, 
-            bool isPercussionPalette, ReviewableFormFunctions rff)
-            : this(name, domain, mainFormCallbacks, rff)
+            bool isPercussionPalette, FormStateFunctions fsf)
+            : this(name, domain, mainFormCallbacks, fsf)
         {
             ReadPalette(r);
             this.PercussionCheckBox.Checked = isPercussionPalette;
             this.ModulationWheelEnvelopesLabel.Focus();
-            _rff.SetSettingsAreSaved(this, false, ConfirmButton, RevertToSavedButton); // do this again!
+
+            if(this._ornamentsForm != null)
+            {
+                ShowOrnamentSettingsButton.Enabled = true;
+                DeleteOrnamentSettingsButton.Enabled = true;
+            }
+
+            _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
         /// <summary>
         /// Creates a new, empty PalettesForm with help texts adjusted for the given domain.
         /// </summary>
         /// <param name="assistantComposer"></param>
         /// <param name="krystal"></param>
-        public PaletteForm(string name, int domain, ComposerFormCallbacks mainFormCallbacks, ReviewableFormFunctions rff)
+        public PaletteForm(string name, int domain, ComposerFormCallbacks mainFormCallbacks, FormStateFunctions fsf)
         {
             InitializeComponent();
             Text = name;
             _savedName = name;
             _domain = domain;
             _callbacks = mainFormCallbacks;
-            _rff = rff;
+            _fsf = fsf;
 
             ConnectBasicChordControl();
             if(M.Preferences.CurrentMultimediaMidiOutputDevice != null)
@@ -44,9 +51,18 @@ namespace Moritz.Palettes
 
             _allTextBoxes = GetAllTextBoxes();
 
+            TouchAllTextBoxes();
+
             SetDialogForDomain(domain);
 
-            _rff.SetSettingsAreSaved(this, false, ConfirmButton, RevertToSavedButton); // do this *again* in the above ctor!
+            ShowOrnamentSettingsButton.Enabled = false;
+            DeleteOrnamentSettingsButton.Enabled = false;
+
+            _fsf.SetFormState(this, SavedState.unconfirmed);
+
+            ConfirmButton.Enabled = false;
+            RevertToSavedButton.Enabled = false;
+            RevertToSavedButton.Hide();
         }
 
         public void ShowPaletteChordForm(int midiChordIndex)
@@ -61,7 +77,7 @@ namespace Moritz.Palettes
             }
             else
             {
-                _paletteChordForm = new PaletteChordForm(this, _bcc, midiChordIndex, _rff);
+                _paletteChordForm = new PaletteChordForm(this, _bcc, midiChordIndex, _fsf);
                 _paletteChordForm.Show();
                 _callbacks.SetAllFormsExceptChordFormEnabledState(false);
                 BringPaletteChordFormToFront();
@@ -132,10 +148,10 @@ namespace Moritz.Palettes
 
             if(_ornamentsForm == null)
             {
-                _ornamentsForm = new OrnamentsForm(this, _rff);
+                _ornamentsForm = new OrnamentsForm(this, _fsf);
 
                 SetOrnamentControls();
-                _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+                _fsf.SetSettingsAreUnconfirmed(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
 
                 _ornamentsForm.Show();
                 _ornamentsForm.BringToFront();
@@ -321,12 +337,12 @@ namespace Moritz.Palettes
 
         private void ConfirmButton_Click(object sender, EventArgs e)
         {
-            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), ConfirmButton); 
+            _fsf.SetSettingsAreConfirmed(this, M.HasError(_allTextBoxes), ConfirmButton); 
         }
 
         private void RevertToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(((ReviewableState)this.Tag) == ReviewableState.needsReview || ((ReviewableState)this.Tag) == ReviewableState.hasChanged);
+            Debug.Assert(((SavedState)this.Tag) == SavedState.unconfirmed || ((SavedState)this.Tag) == SavedState.confirmed);
             DialogResult result = 
                 MessageBox.Show("Are you sure you want to revert this palette and its ornaments to the saved version?", "Revert?", 
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -374,7 +390,7 @@ namespace Moritz.Palettes
                                     ReadPalette(r);
 
                                     this.ModulationWheelEnvelopesLabel.Focus();
-                                    _rff.SetSettingsAreSaved(this, false, ConfirmButton, RevertToSavedButton);
+                                    _fsf.SetSettingsAreSaved(this, false, ConfirmButton, RevertToSavedButton);
                                     break;
                                 }
                                 
@@ -383,7 +399,7 @@ namespace Moritz.Palettes
                         }
                     }
                     TouchAllTextBoxes();
-                    _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+                    _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
                 }
                 catch(Exception ex)
                 {
@@ -408,6 +424,8 @@ namespace Moritz.Palettes
         private void NewOrnamentSettingsButton_Click(object sender, EventArgs e)
         {
             NewOrnamentSettingsForm();
+            ShowOrnamentSettingsButton.Enabled = true;
+            DeleteOrnamentSettingsButton.Enabled = true;
         }
 
         private void DeleteOrnamentSettingsButton_Click(object sender, EventArgs e)
@@ -424,7 +442,7 @@ namespace Moritz.Palettes
         {
             if(_ornamentsForm != null)
             {
-                _rff.Remove(_ornamentsForm);
+                _fsf.Remove(_ornamentsForm);
 
                 _ornamentsForm.Close();
                 _ornamentsForm = null;
@@ -1001,12 +1019,12 @@ namespace Moritz.Palettes
         {
             if(_ornamentsForm != null)
             {
-                _rff.Remove(_ornamentsForm);
+                _fsf.Remove(_ornamentsForm);
                 _ornamentsForm.Close();
                 _ornamentsForm = null;
             }
 
-            _rff.Remove(this);
+            _fsf.Remove(this);
             CloseMidiPitchesHelpForm();
             CloseMIDIInstrumentsHelpForm();
 
@@ -1017,7 +1035,7 @@ namespace Moritz.Palettes
 
         public void SetSettingsHaveChanged()
         {
-            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+            _fsf.SetSettingsAreUnconfirmed(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
 
         #endregion ReviewableForm
@@ -1028,13 +1046,13 @@ namespace Moritz.Palettes
             if(_ornamentsForm != null)
             {
                 sb.Append(" : ornaments");
-                if(_rff.NeedsReview(_ornamentsForm))
+                if(_fsf.IsUnconfirmed(_ornamentsForm))
                 {
-                    sb.Append(" ??");
+                    sb.Append(_fsf.UnconfirmedStr);
                 }
-                else if(_rff.IsConfirmed(_ornamentsForm))
+                else if(_fsf.IsConfirmed(_ornamentsForm))
                 {
-                    sb.Append(" **");
+                    sb.Append(_fsf.ConfirmedStr);
                 }
             }
             return sb.ToString();
@@ -1047,7 +1065,7 @@ namespace Moritz.Palettes
         public void WritePalette(XmlWriter w)
         {
             w.WriteStartElement("palette");
-            w.WriteAttributeString("name", Text);
+            w.WriteAttributeString("name", SavedName);
             w.WriteAttributeString("domain", _domain.ToString());
             if(PercussionCheckBox.Checked)
             {
@@ -1129,7 +1147,7 @@ namespace Moritz.Palettes
 
             w.WriteEndElement(); // closes the palette element
 
-            _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+            _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
         public void ReadPalette(XmlReader r)
         {
@@ -1202,7 +1220,7 @@ namespace Moritz.Palettes
                             MinMsDurationsTextBox.Text = r.ReadElementContentAsString();
                             break;
                         case "ornamentSettings":
-                            _ornamentsForm = new OrnamentsForm(r, this, _rff);
+                            _ornamentsForm = new OrnamentsForm(r, this, _fsf);
                             ShowOrnamentSettingsButton.Enabled = true;
                             DeleteOrnamentSettingsButton.Enabled = true;
                             break;
@@ -1215,7 +1233,7 @@ namespace Moritz.Palettes
             Debug.Assert(r.Name == "palette"); // end element
             SetOrnamentControls();
             TouchAllTextBoxes();
-            _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+            _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
 
         private int _domain = 0;
@@ -1242,7 +1260,7 @@ namespace Moritz.Palettes
         private MIDIPercussionHelpForm _percussionInstrHelpForm = null;
         private BasicChordControl _bcc = null;
         private PaletteChordForm _paletteChordForm = null;
-        private ReviewableFormFunctions _rff;
+        private FormStateFunctions _fsf;
         private string _savedName;
         #endregion private variables
     }

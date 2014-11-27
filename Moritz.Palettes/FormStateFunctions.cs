@@ -7,51 +7,51 @@ using Moritz.Globals;
 
 namespace Moritz.Palettes
 {
-    public enum ReviewableState { saved, needsReview, hasChanged };
+    public enum SavedState {unconfirmed, confirmed, saved};
 
-    public class ReviewableFormFunctions
+    public class FormStateFunctions
     {
-        public void SetFormState(Form form, ReviewableState state)
+        public void SetFormState(Form form, SavedState state)
         {
             form.Tag = state;
             switch(state)
             {
-                case ReviewableState.saved:
+                case SavedState.saved:
                 {
-                    if(_formsThatNeedReview.Contains(form))
-                        _formsThatNeedReview.Remove(form);
+                    if(_unconfirmedForms.Contains(form))
+                        _unconfirmedForms.Remove(form);
                     if(_confirmedForms.Contains(form))
                         _confirmedForms.Remove(form);
 
-                    if(form.Text.EndsWith(NeedsReviewStr))
-                        form.Text = form.Text.Remove(form.Text.Length - NeedsReviewStr.Length);
-                    if(form.Text.EndsWith(ChangedAndConfirmedStr))
-                        form.Text = form.Text.Remove(form.Text.Length - ChangedAndConfirmedStr.Length);
+                    if(form.Text.EndsWith(UnconfirmedStr))
+                        form.Text = form.Text.Remove(form.Text.Length - UnconfirmedStr.Length);
+                    if(form.Text.EndsWith(ConfirmedStr))
+                        form.Text = form.Text.Remove(form.Text.Length - ConfirmedStr.Length);
                     break;
                 }
-                case ReviewableState.hasChanged:
+                case SavedState.confirmed:
                 {
-                    if(_formsThatNeedReview.Contains(form))
-                        _formsThatNeedReview.Remove(form);
+                    if(_unconfirmedForms.Contains(form))
+                        _unconfirmedForms.Remove(form);
                     if(!_confirmedForms.Contains(form))
                         _confirmedForms.Add(form);
 
-                    if(form.Text.EndsWith(NeedsReviewStr))
-                        form.Text = form.Text.Remove(form.Text.Length - NeedsReviewStr.Length);
-                    if(!form.Text.EndsWith(ChangedAndConfirmedStr))
-                        form.Text = form.Text + ChangedAndConfirmedStr;
+                    if(form.Text.EndsWith(UnconfirmedStr))
+                        form.Text = form.Text.Remove(form.Text.Length - UnconfirmedStr.Length);
+                    if(!form.Text.EndsWith(ConfirmedStr))
+                        form.Text = form.Text + ConfirmedStr;
                     break;
                 }
-                case ReviewableState.needsReview:
+                case SavedState.unconfirmed:
                 {
-                    if(!_formsThatNeedReview.Contains(form))
-                        _formsThatNeedReview.Add(form);
+                    if(!_unconfirmedForms.Contains(form))
+                        _unconfirmedForms.Add(form);
                     if(_confirmedForms.Contains(form))
                         _confirmedForms.Remove(form);
-                    if(form.Text.EndsWith(ChangedAndConfirmedStr))
-                        form.Text = form.Text.Remove(form.Text.Length - ChangedAndConfirmedStr.Length);
-                    if(!form.Text.EndsWith(NeedsReviewStr))
-                        form.Text = form.Text + NeedsReviewStr;
+                    if(form.Text.EndsWith(ConfirmedStr))
+                        form.Text = form.Text.Remove(form.Text.Length - ConfirmedStr.Length);
+                    if(!form.Text.EndsWith(UnconfirmedStr))
+                        form.Text = form.Text + UnconfirmedStr;
                     break;
                 }
             }
@@ -60,9 +60,9 @@ namespace Moritz.Palettes
         /// <summary>
         /// Called whenever one of the form's settings changes
         /// </summary>
-        public void SetSettingsNeedReview(Form form, bool hasError, Button confirmButton, Button revertToSavedButton)
+        public void SetSettingsAreUnconfirmed(Form form, bool hasError, Button confirmButton, Button revertToSavedButton)
         {
-            SetFormState(form, ReviewableState.needsReview);
+            SetFormState(form, SavedState.unconfirmed);
             if(hasError)
             {
                 confirmButton.Enabled = false;
@@ -78,11 +78,11 @@ namespace Moritz.Palettes
         /// Called when the form's confirmButton is clicked.
         /// </summary>
         /// <param name="Form"></param>
-        public void SetSettingsCanBeSaved(Form form, bool hasError, Button confirmButton)
+        public void SetSettingsAreConfirmed(Form form, bool hasError, Button confirmButton)
         {
-            Debug.Assert(!hasError); // the confirmButton should already be disabled if there is an error on the form
+            Debug.Assert(!hasError); // the confirmButton should have been disabled if there is an error on the form
 
-            SetFormState(form, ReviewableState.hasChanged);
+            SetFormState(form, SavedState.confirmed);
             confirmButton.Enabled = false;
         }
 
@@ -93,17 +93,18 @@ namespace Moritz.Palettes
         {
             Debug.Assert(!hasError); // the revertToSavedButton should already be disabled if there is an error on the form
 
-            SetFormState(form, ReviewableState.saved);
+            SetFormState(form, SavedState.saved);
             confirmButton.Enabled = false;
             revertToSavedButton.Enabled = false;
+            revertToSavedButton.Show();
         }
 
         /// <summary>
-        /// Returns true if the _formsThatNeedReview list contains form, otherwise false.
+        /// Returns true if the _unconfirmedForms list contains form, otherwise false.
         /// </summary>
-        public bool NeedsReview(Form form)
+        public bool IsUnconfirmed(Form form)
         {
-            return _formsThatNeedReview.Contains(form);
+            return _unconfirmedForms.Contains(form);
         }
 
         /// <summary>
@@ -115,11 +116,11 @@ namespace Moritz.Palettes
         }
 
         /// <summary>
-        /// Returns true if the _formsThatNeedReview list is not empty.
+        /// Returns true if the _unconfirmedForms list is not empty.
         /// </summary>
-        public bool FormsNeedReview()
+        public bool UnconfirmedFormsExist()
         {
-            return _formsThatNeedReview.Count > 0;
+            return _unconfirmedForms.Count > 0;
         }
 
         /// <summary>
@@ -130,13 +131,13 @@ namespace Moritz.Palettes
             return _confirmedForms.Count > 0;
         }
 
-        public void ShowFormsThatNeedReview()
+        public void ShowUnconfirmedForms()
         {
             Point location = new Point(200, 25);
-            for(int i = 0; i < _formsThatNeedReview.Count; ++i)
+            for(int i = 0; i < _unconfirmedForms.Count; ++i)
             {
                 int offset = i * 25;
-                Form form = _formsThatNeedReview[i];
+                Form form = _unconfirmedForms[i];
                 form.Location = new Point(location.X + offset, location.Y + offset);
                 form.Show();
                 form.BringToFront();
@@ -156,19 +157,19 @@ namespace Moritz.Palettes
             }
         }
         /// <summary>
-        /// Removes the form from the _formsThatNeedReview and _confirmedForms lists.
+        /// Removes the form from the _unconfirmedForms and _confirmedForms lists.
         /// </summary>
         /// <param name="form"></param>
         public void Remove(Form form)
         {
-            _formsThatNeedReview.Remove(form);
+            _unconfirmedForms.Remove(form);
             _confirmedForms.Remove(form);
         }
 
-        private readonly string NeedsReviewStr = " ??";
-        private readonly string ChangedAndConfirmedStr = " **";
+        public readonly string UnconfirmedStr = " ?";
+        public readonly string ConfirmedStr = " *";
 
-        private List<Form> _formsThatNeedReview = new List<Form>();
+        private List<Form> _unconfirmedForms = new List<Form>();
         private List<Form> _confirmedForms = new List<Form>();
     }
 }

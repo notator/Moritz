@@ -15,12 +15,12 @@ namespace Moritz.Composer
         /// <summary>
         /// Creates a new, empty DimensionsAndMetadataForm.
         /// </summary>
-        public DimensionsAndMetadataForm(AssistantComposerForm assistantComposerForm, string settingsPath, ReviewableFormFunctions rff)
+        public DimensionsAndMetadataForm(AssistantComposerForm assistantComposerForm, string settingsPath, FormStateFunctions fsf)
         {
             InitializeComponent();
             _assistantComposerForm = assistantComposerForm;
             _settingsPath = settingsPath; // used when reverting
-            _rff = rff;
+            _fsf = fsf;
             _allTextBoxes = GetAllTextBoxes();
             SetDefaultValues();
         }
@@ -84,7 +84,7 @@ namespace Moritz.Composer
                 }
                 M.ReadToXmlElementTag(r, "metadata", "dimensions", "performerOptions", "notation", "names", "krystals", "palettes");
             }
-            _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+            _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
         private void GetMetadata(XmlReader r)
         {
@@ -232,7 +232,7 @@ namespace Moritz.Composer
             WriteMetadata(w);
             WriteDimensions(w);
 
-            _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+            _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
         private void WriteMetadata(XmlWriter w)
         {
@@ -281,7 +281,7 @@ namespace Moritz.Composer
         #region Event Handlers
         private void SetSettingsNeedReview()
         {
-            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+            _fsf.SetSettingsAreUnconfirmed(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
         }
         private void PaperSizeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -384,12 +384,12 @@ namespace Moritz.Composer
 
         private void ConfirmButton_Click(object sender, EventArgs e)
         {
-            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), ConfirmButton); 
+            _fsf.SetSettingsAreConfirmed(this, M.HasError(_allTextBoxes), ConfirmButton); 
         }
         #region RevertToSaved
         private void RevertToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(((ReviewableState)this.Tag) == ReviewableState.needsReview || ((ReviewableState)this.Tag) == ReviewableState.hasChanged);
+            Debug.Assert(((SavedState)this.Tag) == SavedState.unconfirmed || ((SavedState)this.Tag) == SavedState.confirmed);
             DialogResult result =
                 MessageBox.Show("Are you sure you want to revert this form to the saved version?", "Revert?",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -404,7 +404,7 @@ namespace Moritz.Composer
                         Read(r);
                     }
                     TouchAllTextBoxes();
-                    _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+                    _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
                 }
                 catch(Exception ex)
                 {
@@ -470,7 +470,7 @@ namespace Moritz.Composer
         private string _settingsPath;
         private AssistantComposerForm _assistantComposerForm = null;
         private List<TextBox> _allTextBoxes;
-        private ReviewableFormFunctions _rff;
+        private FormStateFunctions _fsf;
         #endregion private variables
     }
 }

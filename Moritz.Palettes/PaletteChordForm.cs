@@ -16,7 +16,7 @@ namespace Moritz.Palettes
 {
     public partial class PaletteChordForm : Form
     {
-        public PaletteChordForm(PaletteForm paletteForm, BasicChordControl bcc, int midiChordIndex, ReviewableFormFunctions rff)
+        public PaletteChordForm(PaletteForm paletteForm, BasicChordControl bcc, int midiChordIndex, FormStateFunctions fsf)
         {
             InitializeComponent();
 
@@ -25,7 +25,7 @@ namespace Moritz.Palettes
             _paletteForm = paletteForm;
             _bcc = bcc;
             _midiChordIndex = midiChordIndex;
-            _rff = rff;
+            _fsf = fsf;
 
             if(_paletteForm.IsPercussionPalette)
             {
@@ -322,14 +322,14 @@ namespace Moritz.Palettes
 
         private void ConfirmButton_Click(object sender, EventArgs e)
         {
-            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), ConfirmButton);
+            _fsf.SetSettingsAreConfirmed(this, M.HasError(_allTextBoxes), ConfirmButton);
             this.SaveAndCloseButton.Enabled = true;
             this.CloseWithoutSavingButton.Enabled = true;
         }
 
         private void RevertToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(((ReviewableState)this.Tag) == ReviewableState.needsReview || ((ReviewableState)this.Tag) == ReviewableState.hasChanged);
+            Debug.Assert(((SavedState)this.Tag) == SavedState.unconfirmed || ((SavedState)this.Tag) == SavedState.confirmed);
             DialogResult result =
                 MessageBox.Show("Are you sure you want to revert this dialog to the saved version?", "Revert?",
                     MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -362,7 +362,7 @@ namespace Moritz.Palettes
 
         private void SetDialogStateIsSaved()
         {
-            _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+            _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
             this.SaveAndCloseButton.Enabled = false;
             this.CloseWithoutSavingButton.Enabled = true;
         }
@@ -494,7 +494,7 @@ namespace Moritz.Palettes
         private void SetDialogState(TextBox textBox, bool okay)
         {
             M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
-            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+            _fsf.SetSettingsAreUnconfirmed(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
             this.CloseWithoutSavingButton.Enabled = true;
             this.SaveAndCloseButton.Enabled = false;
         }
@@ -805,7 +805,7 @@ namespace Moritz.Palettes
         List<TextBox> _emptyDefaultTextBoxes;
         List<Label> _emptyDefaultHelpLabels;
         List<Button> _audioSampleButtons;
-        ReviewableFormFunctions _rff;
+        FormStateFunctions _fsf;
         List<TextBox> _allTextBoxes = new List<TextBox>();
         #endregion  private variables
 

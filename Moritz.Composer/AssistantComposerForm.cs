@@ -36,7 +36,7 @@ namespace Moritz.Composer
             _callbacks = GetCallbacks();
 
             _moritzForm1 = moritzForm1;
-            _rff = new ReviewableFormFunctions();
+            _fsf = new FormStateFunctions();
 
             M.PopulateComboBox(ChordTypeComboBox, M.ChordTypes);
             SetDefaultValues();
@@ -51,7 +51,7 @@ namespace Moritz.Composer
 
             this.QuitAlgorithmButton.Text = "Quit " + _scoreTitle;
 
-            _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _rff);
+            _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _fsf);
 
             _algorithm = ComposableSvgScore.Algorithm(_scoreTitle);
 
@@ -103,30 +103,70 @@ namespace Moritz.Composer
 
         private void AssistantComposerForm_Activated(object sender, EventArgs e)
         {
-            SetFormButtons();
+            SetShowFormButtons(_fsf.UnconfirmedFormsExist(), _fsf.ConfirmedFormsExist());
+
+            SavedState state = (SavedState)this.Tag;
+            SetFormSaveCreateRevertButtons(state);
+            if(state == SavedState.saved)
+            {
+                DisableGroupConfirmRevertButtons();
+            }
+            else if(!NotationGroupBox.Enabled && !KrystalsGroupBox.Enabled && PalettesGroupBox.Enabled)
+            {
+                this.ConfirmPalettesButton.Enabled = APaletteNeedsReview() ? false : true;
+            }
         }
 
-        private void SetFormButtons()
+        private void DisableGroupConfirmRevertButtons()
         {
-            this.ShowUncheckedFormsButton.Enabled = _rff.FormsNeedReview();
-            SetEnabledButtonToLightGreen(ShowUncheckedFormsButton);
-            this.ShowConfirmedFormsButton.Enabled = _rff.ConfirmedFormsExist();
-            SetEnabledButtonToLightGreen(ShowConfirmedFormsButton);
-            this.SaveSettingsCreateScoreButton.Enabled = !(this.ShowUncheckedFormsButton.Enabled);
-            this.SuspendLayout();
-            if(_rff.ConfirmedFormsExist())
+            RevertNotationButton.Enabled = false;
+            ConfirmNotationButton.Enabled = false;
+            RevertKrystalsButton.Enabled = false;
+            ConfirmKrystalsButton.Enabled = false;
+            RevertPalettesButton.Enabled = false;
+            ConfirmPalettesButton.Enabled = false;
+        }
+
+        private bool APaletteNeedsReview()
+        {
+            PalettesListBox.Refresh();
+            bool rval = false;
+            foreach(PaletteForm paletteForm in this.PalettesListBox.Items)
             {
-                if(! this.SaveSettingsCreateScoreButton.Text.StartsWith("save"))
+                if(((SavedState)paletteForm.Tag == SavedState.unconfirmed)
+                || (paletteForm.OrnamentsForm != null && ((SavedState)paletteForm.OrnamentsForm.Tag == SavedState.unconfirmed)))
+                {
+                    rval = true;
+                    break;
+                }
+            }
+            return rval;
+        }
+        private void SetShowFormButtons(bool formsNeedReview, bool confirmedFormsExist)
+        {
+            this.ShowUncheckedFormsButton.Enabled = formsNeedReview;
+            SetEnabledButtonToLightGreen(ShowUncheckedFormsButton);
+            this.ShowConfirmedFormsButton.Enabled = confirmedFormsExist;
+            SetEnabledButtonToLightGreen(ShowConfirmedFormsButton);
+        }
+
+        private void SetFormSaveCreateRevertButtons(SavedState state)
+        {
+            this.SuspendLayout();
+            if(state == SavedState.confirmed || state == SavedState.unconfirmed)
+            {
+                if(!this.SaveSettingsCreateScoreButton.Text.StartsWith("save"))
                     this.SaveSettingsCreateScoreButton.Text = "save all settings";
             }
-            else
+            else // if(state == ReviewableState.saved)
             {
-                if(! this.SaveSettingsCreateScoreButton.Text.StartsWith("create"))
+                if(!this.SaveSettingsCreateScoreButton.Text.StartsWith("create"))
                     this.SaveSettingsCreateScoreButton.Text = "create score";
             }
             this.ResumeLayout();
-            this.RevertEverythingButton.Enabled = (_rff.FormsNeedReview() || _rff.ConfirmedFormsExist());
-            this.Refresh(); // important that the palettes list box is refreshed...
+
+            SaveSettingsCreateScoreButton.Enabled = !(state == SavedState.unconfirmed);
+            RevertEverythingButton.Enabled = (_fsf.UnconfirmedFormsExist() || _fsf.ConfirmedFormsExist());
         }
 
         private void SetEnabledButtonToLightGreen(Button button)
@@ -136,19 +176,17 @@ namespace Moritz.Composer
             else
                 button.BackColor = Color.Transparent;
         }
-        private void SetSettingsNeedReview()
+        private void SetSettingsAreUnconfirmed()
         {
-            _rff.SetFormState(this, ReviewableState.needsReview);
-            SetFormButtons();
-            this.SaveSettingsCreateScoreButton.Enabled = false;
+            _fsf.SetFormState(this, SavedState.unconfirmed);
+            SetShowFormButtons(_fsf.UnconfirmedFormsExist(), _fsf.ConfirmedFormsExist());
+            SetFormSaveCreateRevertButtons(SavedState.unconfirmed);
         }
-        private void SetSettingsHaveChanged()
+        private void SetSettingsAreConfirmed()
         {
-            _rff.SetFormState(this, ReviewableState.hasChanged);
-            SetFormButtons();
-            if(!SaveSettingsCreateScoreButton.Text.StartsWith("save"))
-                this.SaveSettingsCreateScoreButton.Text = "save all settings";
-            this.SaveSettingsCreateScoreButton.Enabled = true;
+            _fsf.SetFormState(this, SavedState.confirmed);
+            SetShowFormButtons(_fsf.UnconfirmedFormsExist(), _fsf.ConfirmedFormsExist());
+            SetFormSaveCreateRevertButtons(SavedState.confirmed);
             NotationGroupBox.Enabled = true;
             KrystalsGroupBox.Enabled = true;
             PalettesGroupBox.Enabled = true;
@@ -156,89 +194,89 @@ namespace Moritz.Composer
 
         private void SetSettingsAreSaved()
         {
-            _rff.SetFormState(this, ReviewableState.saved);
-            SetFormButtons();
-            if(!SaveSettingsCreateScoreButton.Text.StartsWith("create"))
-                this.SaveSettingsCreateScoreButton.Text = "create score";
-            this.SaveSettingsCreateScoreButton.Enabled = true;
+            _fsf.SetFormState(this, SavedState.saved);
+            SetShowFormButtons(_fsf.UnconfirmedFormsExist(), _fsf.ConfirmedFormsExist());
+            SetFormSaveCreateRevertButtons(SavedState.saved);
             NotationGroupBox.Enabled = true;
             KrystalsGroupBox.Enabled = true;
             PalettesGroupBox.Enabled = true;
+            PalettesListBox.Refresh();
+            DisableGroupConfirmRevertButtons();            
         }
 
         private void SetNotationPanelNeedsReview()
         {
             // sets this form's text and the argument buttons
-            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), ConfirmNotationButton, RevertNotationButton);
-            NotationGroupBox.Tag = ReviewableState.needsReview;
+            _fsf.SetSettingsAreUnconfirmed(this, M.HasError(_allTextBoxes), ConfirmNotationButton, RevertNotationButton);
+            NotationGroupBox.Tag = SavedState.unconfirmed;
             KrystalsGroupBox.Enabled = false;
             PalettesGroupBox.Enabled = false;
-            SetSettingsNeedReview();
+            SetSettingsAreUnconfirmed();
         }
         private void SetKrystalsPanelNeedsReview()
         {
-            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), ConfirmKrystalsButton, RevertKrystalsButton);
-            KrystalsGroupBox.Tag = ReviewableState.needsReview;
+            _fsf.SetSettingsAreUnconfirmed(this, M.HasError(_allTextBoxes), ConfirmKrystalsButton, RevertKrystalsButton);
+            KrystalsGroupBox.Tag = SavedState.unconfirmed;
             NotationGroupBox.Enabled = false;
             PalettesGroupBox.Enabled = false;
-            SetSettingsNeedReview();
+            SetSettingsAreUnconfirmed();
         }
         private void SetPalettesPanelNeedsReview()
         {
-            _rff.SetSettingsNeedReview(this, M.HasError(_allTextBoxes), ConfirmPalettesButton, RevertPalettesButton);
-            PalettesGroupBox.Tag = ReviewableState.needsReview;
-            SetSettingsNeedReview();
+            _fsf.SetSettingsAreUnconfirmed(this, M.HasError(_allTextBoxes), ConfirmPalettesButton, RevertPalettesButton);
+            PalettesGroupBox.Tag = SavedState.unconfirmed;
             NotationGroupBox.Enabled = false;
             KrystalsGroupBox.Enabled = false;
+            SetSettingsAreUnconfirmed();
         }
 
         /// <summary>
         /// Called when one of the groupBox OkaytoSaveButtons is clicked.
         /// </summary>
         private void SetThisFormsState(GroupBox groupBox, Button groupBoxConfirmButton, 
-            ReviewableState otherGroupBox1State, ReviewableState otherGroupBox2State)
+            SavedState otherGroupBox1State, SavedState otherGroupBox2State)
         {
-            groupBox.Tag = ReviewableState.hasChanged;
-            _rff.SetSettingsCanBeSaved(this, M.HasError(_allTextBoxes), groupBoxConfirmButton);
+            groupBox.Tag = SavedState.confirmed;
+            _fsf.SetSettingsAreConfirmed(this, M.HasError(_allTextBoxes), groupBoxConfirmButton);
 
-            if(otherGroupBox1State == ReviewableState.needsReview 
-            || otherGroupBox2State == ReviewableState.needsReview
-            || OtherFormStateIs(ReviewableState.needsReview))
-                SetSettingsNeedReview();
+            if(otherGroupBox1State == SavedState.unconfirmed 
+            || otherGroupBox2State == SavedState.unconfirmed
+            || OtherFormStateIs(SavedState.unconfirmed))
+                SetSettingsAreUnconfirmed();
             else
-                SetSettingsHaveChanged();
+                SetSettingsAreConfirmed();
         }
 
         private void ConfirmNotationButton_Click(object sender, EventArgs e)
         {
             SetThisFormsState(NotationGroupBox, ConfirmNotationButton, 
-                (ReviewableState)KrystalsGroupBox.Tag, (ReviewableState)PalettesGroupBox.Tag);
+                (SavedState)KrystalsGroupBox.Tag, (SavedState)PalettesGroupBox.Tag);
 
         }
         private void ConfirmKrystalsButton_Click(object sender, EventArgs e)
         {
             SetThisFormsState(KrystalsGroupBox, ConfirmKrystalsButton, 
-                (ReviewableState)NotationGroupBox.Tag, (ReviewableState)PalettesGroupBox.Tag);
+                (SavedState)NotationGroupBox.Tag, (SavedState)PalettesGroupBox.Tag);
 
         }
         private void ConfirmPalettesButton_Click(object sender, EventArgs e)
         {
             SetThisFormsState(PalettesGroupBox, ConfirmPalettesButton, 
-                (ReviewableState)NotationGroupBox.Tag, (ReviewableState)KrystalsGroupBox.Tag);
+                (SavedState)NotationGroupBox.Tag, (SavedState)KrystalsGroupBox.Tag);
         }
 
-        private bool OtherFormStateIs(ReviewableState state)
+        private bool OtherFormStateIs(SavedState state)
         {
             bool rval = false;
-            if((ReviewableState)_dimensionsAndMetadataForm.Tag == state)
+            if((SavedState)_dimensionsAndMetadataForm.Tag == state)
                 rval = true;
             else
             {
                 foreach(PaletteForm paletteForm in PalettesListBox.Items)
                 {
                     if((paletteForm.OrnamentsForm != null
-                    && (ReviewableState)paletteForm.OrnamentsForm.Tag == state)
-                    || ((ReviewableState)paletteForm.Tag == state))
+                    && (SavedState)paletteForm.OrnamentsForm.Tag == state)
+                    || ((SavedState)paletteForm.Tag == state))
                     {
                         rval = true;
                         break;
@@ -251,17 +289,17 @@ namespace Moritz.Composer
         /// Called after the groupBox has been loaded or reverted, when one of the groupBox RevertToSavedButtons is clicked.
         /// </summary>
         private void SetThisFormsState(GroupBox groupBox, Button confirmButton, Button revertToSavedButton,
-                        ReviewableState otherGroupBox1State, ReviewableState otherGroupBox2State)
+                        SavedState otherGroupBox1State, SavedState otherGroupBox2State)
         {
-            groupBox.Tag = ReviewableState.saved;
-            _rff.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), confirmButton, revertToSavedButton);
+            groupBox.Tag = SavedState.saved;
+            _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), confirmButton, revertToSavedButton);
 
-            if(otherGroupBox1State == ReviewableState.needsReview || otherGroupBox2State == ReviewableState.needsReview
-                || OtherFormStateIs(ReviewableState.needsReview))
-                SetSettingsNeedReview();
-            else if(otherGroupBox1State == ReviewableState.hasChanged || otherGroupBox2State == ReviewableState.hasChanged
-                || OtherFormStateIs(ReviewableState.hasChanged))
-                SetSettingsHaveChanged();
+            if(otherGroupBox1State == SavedState.unconfirmed || otherGroupBox2State == SavedState.unconfirmed
+                || OtherFormStateIs(SavedState.unconfirmed))
+                SetSettingsAreUnconfirmed();
+            else if(otherGroupBox1State == SavedState.confirmed || otherGroupBox2State == SavedState.confirmed
+                || OtherFormStateIs(SavedState.confirmed))
+                SetSettingsAreConfirmed();
             else
                 SetSettingsAreSaved();
         }
@@ -271,39 +309,41 @@ namespace Moritz.Composer
             SetNotationPanelHasBeenReverted();
             SetKrystalsPanelHasBeenReverted();
             SetPalettesPanelHasBeenReverted();
-            _rff.SetFormState(_dimensionsAndMetadataForm, ReviewableState.saved);
+            _fsf.SetFormState(_dimensionsAndMetadataForm, SavedState.saved);
             foreach(PaletteForm paletteForm in PalettesListBox.Items)
             {
                 if(paletteForm.OrnamentsForm != null)
-                    _rff.SetFormState(paletteForm.OrnamentsForm, ReviewableState.saved);
-                _rff.SetFormState(paletteForm, ReviewableState.saved);
+                    _fsf.SetFormState(paletteForm.OrnamentsForm, SavedState.saved);
+                _fsf.SetFormState(paletteForm, SavedState.saved);
             }
             this.SaveSettingsCreateScoreButton.Enabled = true;
             this.SaveSettingsCreateScoreButton.Text = "create score";
             this.RevertEverythingButton.Enabled = false;
 
-            Debug.Assert(!_rff.FormsNeedReview());
-            Debug.Assert(!_rff.ConfirmedFormsExist());
+            Debug.Assert(!_fsf.UnconfirmedFormsExist());
+            Debug.Assert(!_fsf.ConfirmedFormsExist());
         }
         private void SetNotationPanelHasBeenReverted()
         {
             SetThisFormsState(NotationGroupBox, ConfirmNotationButton, RevertNotationButton,
-                (ReviewableState)KrystalsGroupBox.Tag, (ReviewableState)PalettesGroupBox.Tag);
+                (SavedState)KrystalsGroupBox.Tag, (SavedState)PalettesGroupBox.Tag);
         }
         private void SetKrystalsPanelHasBeenReverted()
         {
             SetThisFormsState(KrystalsGroupBox, ConfirmKrystalsButton, RevertKrystalsButton,
-                (ReviewableState)NotationGroupBox.Tag, (ReviewableState)PalettesGroupBox.Tag);
+                (SavedState)NotationGroupBox.Tag, (SavedState)PalettesGroupBox.Tag);
         }
         private void SetPalettesPanelHasBeenReverted()
         {
             SetThisFormsState(PalettesGroupBox, ConfirmPalettesButton, RevertPalettesButton,
-                (ReviewableState)NotationGroupBox.Tag, (ReviewableState)KrystalsGroupBox.Tag);
+                (SavedState)NotationGroupBox.Tag, (SavedState)KrystalsGroupBox.Tag);
+
+            PalettesListBox.Refresh();
         }
 
         private void RevertNotationToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(((ReviewableState)NotationGroupBox.Tag) == ReviewableState.needsReview || ((ReviewableState)NotationGroupBox.Tag) == ReviewableState.hasChanged);
+            Debug.Assert(((SavedState)NotationGroupBox.Tag) == SavedState.unconfirmed || ((SavedState)NotationGroupBox.Tag) == SavedState.confirmed);
             DialogResult result =
                 MessageBox.Show("Are you sure you want to revert the notation panel to the saved version?",
                                 "Revert?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -316,7 +356,7 @@ namespace Moritz.Composer
         }
         private void RevertKrystalsToSavedButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(((ReviewableState)KrystalsGroupBox.Tag) == ReviewableState.needsReview || ((ReviewableState)KrystalsGroupBox.Tag) == ReviewableState.hasChanged);
+            Debug.Assert(((SavedState)KrystalsGroupBox.Tag) == SavedState.unconfirmed || ((SavedState)KrystalsGroupBox.Tag) == SavedState.confirmed);
             DialogResult result =
                 MessageBox.Show("Are you sure you want to revert the krystals panel to the saved version?",
                                 "Revert?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -329,7 +369,7 @@ namespace Moritz.Composer
         }
         private void RevertPalettesButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(((ReviewableState)PalettesGroupBox.Tag) == ReviewableState.needsReview || ((ReviewableState)PalettesGroupBox.Tag) == ReviewableState.hasChanged);
+            Debug.Assert(((SavedState)PalettesGroupBox.Tag) == SavedState.unconfirmed || ((SavedState)PalettesGroupBox.Tag) == SavedState.confirmed);
             DialogResult result =
                 MessageBox.Show("Are you sure you want to close all palettes and revert them to their saved versions?",
                                 "Revert?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
@@ -435,7 +475,7 @@ namespace Moritz.Composer
                 Dictionary<int, Point> visibleOrnamentFormLocations = GetVisibleOrnamentFormLocations();
 
                 _dimensionsAndMetadataForm.Close();
-                _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _rff);
+                _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _fsf);
 
                 foreach(PaletteForm paletteForm in PalettesListBox.Items)
                 {
@@ -774,8 +814,8 @@ namespace Moritz.Composer
                         break;
                 }
             }
-            _rff.SetSettingsAreSaved(this, false, ConfirmNotationButton, RevertNotationButton);
-            this.NotationGroupBox.Tag = ReviewableState.saved;
+            _fsf.SetSettingsAreSaved(this, false, ConfirmNotationButton, RevertNotationButton);
+            this.NotationGroupBox.Tag = SavedState.saved;
         }
 
         private void SetGapPixelsComboBox(string value)
@@ -858,8 +898,8 @@ namespace Moritz.Composer
                 M.ReadToXmlElementTag(r, "krystal", "krystals");
             }
             this.KrystalsListBox.ResumeLayout();
-            _rff.SetSettingsAreSaved(this, false, ConfirmKrystalsButton, RevertKrystalsButton);
-            this.KrystalsGroupBox.Tag = ReviewableState.saved;
+            _fsf.SetSettingsAreSaved(this, false, ConfirmKrystalsButton, RevertKrystalsButton);
+            this.KrystalsGroupBox.Tag = SavedState.saved;
         }
 
         private Krystal GetKrystal(string krystalFileName)
@@ -911,7 +951,7 @@ namespace Moritz.Composer
                         }
                     }
 
-                    PaletteForm paletteForm = new PaletteForm(r, name, domain, _callbacks, isPercussionPalette, _rff);
+                    PaletteForm paletteForm = new PaletteForm(r, name, domain, _callbacks, isPercussionPalette, _fsf);
 
                     PalettesListBox.Items.Add(paletteForm);
 
@@ -920,8 +960,8 @@ namespace Moritz.Composer
             }
             this.PalettesListBox.ResumeLayout();
             Debug.Assert(r.Name == "palettes");
-            _rff.SetSettingsAreSaved(this, false, ConfirmPalettesButton, RevertPalettesButton);
-            this.PalettesGroupBox.Tag = ReviewableState.saved;
+            _fsf.SetSettingsAreSaved(this, false, ConfirmPalettesButton, RevertPalettesButton);
+            this.PalettesGroupBox.Tag = SavedState.saved;
         }
 
         private ComposerFormCallbacks GetCallbacks()
@@ -991,7 +1031,7 @@ namespace Moritz.Composer
             {
                 try
                 {
-                    // The settings are only saved (and reloaded) here in case there is going to be an error while creating the score.
+                    // The settings are saved here in case there is going to be an error while creating the score.
                     SaveSettings();
                     SetSettingsAreSaved();
                 }
@@ -1279,7 +1319,7 @@ namespace Moritz.Composer
         public bool DiscardAnyChanges()
         {
             bool discard = true;
-            if(_rff.FormsNeedReview() || _rff.ConfirmedFormsExist())
+            if(_fsf.UnconfirmedFormsExist() || _fsf.ConfirmedFormsExist())
             {
                 DialogResult result = MessageBox.Show("Discard changes?", "Discard changes?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if(result == DialogResult.No)
@@ -1292,14 +1332,24 @@ namespace Moritz.Composer
 
         private void ShowUncheckedFormsButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(_rff.FormsNeedReview());
-            _rff.ShowFormsThatNeedReview();
+            Debug.Assert(_fsf.UnconfirmedFormsExist());
+            _fsf.ShowUnconfirmedForms();
+            if(!NotationGroupBox.Enabled && !KrystalsGroupBox.Enabled && PalettesGroupBox.Enabled)
+            {
+                this.ConfirmPalettesButton.Enabled = APaletteNeedsReview() ? false : true;
+                this.SaveSettingsCreateScoreButton.Enabled = !ConfirmPalettesButton.Enabled;
+            }
         }
 
         private void ShowConfirmedFormsButton_Click(object sender, EventArgs e)
         {
-            Debug.Assert(_rff.ConfirmedFormsExist());
-            _rff.ShowConfirmedForms();
+            Debug.Assert(_fsf.ConfirmedFormsExist());
+            _fsf.ShowConfirmedForms();
+            if(!NotationGroupBox.Enabled && !KrystalsGroupBox.Enabled && PalettesGroupBox.Enabled)
+            {
+                this.ConfirmPalettesButton.Enabled = APaletteNeedsReview() ? false : true;
+                this.SaveSettingsCreateScoreButton.Enabled = !ConfirmPalettesButton.Enabled;
+            }
         }   
 
         private void AssistantComposerForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -1529,10 +1579,12 @@ namespace Moritz.Composer
                 }
                 else
                 {
-                    PaletteForm paletteForm = new PaletteForm(dialog.PaletteName, dialog.PaletteDomain, _callbacks, _rff);
+                    PaletteForm paletteForm = new PaletteForm(dialog.PaletteName, dialog.PaletteDomain, _callbacks, _fsf);
                     currentPaletteForms.Add(paletteForm);
                     CurrentPaletteForms = currentPaletteForms;
                     PalettesListBox.SelectedIndex = PalettesListBox.Items.Count - 1;
+                    paletteForm.Show();
+                    paletteForm.BringToFront();
                     this.SetPalettesPanelNeedsReview();
                 }
             }
@@ -2257,7 +2309,7 @@ namespace Moritz.Composer
 
         private ComposerFormCallbacks _callbacks;
         private List<TextBox> _allTextBoxes = null;
-        private ReviewableFormFunctions _rff;
+        private FormStateFunctions _fsf;
         private IMoritzForm1 _moritzForm1;
         private Moritz.Krystals.KrystalBrowser _krystalBrowser = null;
         private DimensionsAndMetadataForm _dimensionsAndMetadataForm;
