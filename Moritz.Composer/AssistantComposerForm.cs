@@ -13,6 +13,7 @@ using Moritz.Globals;
 using Moritz.Symbols;
 using Moritz.Palettes;
 using Moritz.Algorithm;
+using Moritz.Krystals;
 
 namespace Moritz.Composer
 {
@@ -41,7 +42,7 @@ namespace Moritz.Composer
 
             this.QuitAlgorithmButton.Text = "Quit " + _scoreTitle;
 
-            _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _fsf, SetMainFormState);
+            _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _fsf, DimensionsAndMetadataFormHasChanged);
 
             _algorithm = ComposableSvgScore.Algorithm(_scoreTitle);
 
@@ -276,8 +277,33 @@ namespace Moritz.Composer
                     comboBox.SelectedIndex = comboBox.Items.IndexOf(comboBox.Text);
             }
         }
+        private void DoSelectionColor(object sender, DrawItemEventArgs e)
+        {
+            ListBox listBox = sender as ListBox;
+            Graphics g = e.Graphics;
+
+            if(listBox != null && listBox.Items.Count > e.Index)
+            {
+                string text = listBox.Items[e.Index].ToString();
+                Point textOrigin = new Point(e.Bounds.Left, e.Bounds.Top);
+
+                e.DrawBackground();
+
+                if(listBox.SelectedIndex == e.Index)
+                {
+                    g.FillRectangle(_systemHighlightBrush, e.Bounds);
+                    g.DrawString(text, e.Font, _whiteBrush, textOrigin);
+                }
+                else
+                {
+                    g.FillRectangle(_whiteBrush, e.Bounds);
+                    g.DrawString(text, e.Font, _blackBrush, textOrigin);
+                }
+                e.DrawFocusRectangle();
+            }
+        }
         
-        #region program state
+        #region AssistantComposer form state
 
         #region callback definitions
         /// <summary>
@@ -322,7 +348,13 @@ namespace Moritz.Composer
             string path = M.Preferences.LocalMoritzAudioFolder + @"\" + _scoreTitle;
             return path;
         }
-
+        private void DimensionsAndMetadataFormHasChanged()
+        {
+            SetMainFormState();
+        }
+        /// <summary>
+        /// Called as a delegate by paletteForms and their subsidiary ornamentForms
+        /// </summary>
         private void APaletteHasChanged()
         {
             NotationGroupBox.Enabled = false;
@@ -352,7 +384,6 @@ namespace Moritz.Composer
         }
         private bool ThereArePalettesOfType(SavedState state)
         {
-            PalettesListBox.Refresh();
             bool rval = false;
             foreach(PaletteForm paletteForm in this.PalettesListBox.Items)
             {
@@ -404,6 +435,7 @@ namespace Moritz.Composer
 
         private void SetPalettesGroupBox()
         {
+            PalettesListBox.Refresh();
             if(ThereAreUnconfirmedPalettes())
             {
                 _fsf.SetGroupBoxState(PalettesGroupBox, SavedState.unconfirmed);
@@ -420,7 +452,6 @@ namespace Moritz.Composer
                 RevertPalettesListButton.Enabled = false;
             }
         }
-
 
         private void AssistantComposerForm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -670,7 +701,7 @@ namespace Moritz.Composer
                 Dictionary<int, Point> visibleOrnamentFormLocations = GetVisibleOrnamentFormLocations();
 
                 _dimensionsAndMetadataForm.Close();
-                _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _fsf, SetMainFormState);
+                _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _fsf, DimensionsAndMetadataFormHasChanged);
 
                 foreach(PaletteForm paletteForm in PalettesListBox.Items)
                 {
@@ -773,8 +804,6 @@ namespace Moritz.Composer
             _moritzForm1.Show();
 
         }
-
-
         private void QuitMoritzButton_Click(object sender, EventArgs e)
         {
             if(DiscardAnyChanges())
@@ -785,6 +814,28 @@ namespace Moritz.Composer
             if(DiscardAnyChanges())
                 _moritzForm1.CloseAssistantComposer();
         }
+        #region helper
+        /// <summary>
+        /// This function is also called by MoritzForm1.
+        /// If there are any unsaved changes, this function asks the user if they should be discarded.
+        /// If there are no changes, or the user answers yes, this function returns true.
+        /// Otherwise it returns false.
+        /// </summary>
+        /// <returns></returns>
+        public bool DiscardAnyChanges()
+        {
+            bool discard = true;
+            if(_fsf.UnconfirmedFormsExist() || _fsf.ConfirmedFormsExist())
+            {
+                DialogResult result = MessageBox.Show("Discard changes?", "Discard changes?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if(result == DialogResult.No)
+                {
+                    discard = false;
+                }
+            }
+            return discard;
+        }
+        #endregion helper
         #endregion main form event handlers
 
         #region state of main form
@@ -935,7 +986,7 @@ namespace Moritz.Composer
         #endregion helper
         #endregion state of group boxes in main form
 
-        #endregion program state
+        #endregion AssistantComposer form state
 
         #region notation groupBox
         #region comboBoxes
@@ -1520,8 +1571,6 @@ namespace Moritz.Composer
             return voiceIndicesSB;
         }
         #endregion helpers
-        
-
         #endregion notation groupBox
 
         #region krystals groupBox
@@ -1634,7 +1683,125 @@ namespace Moritz.Composer
         #endregion krystals groupBox
 
         #region palettes groupBox
+        private void PalettesListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(PalettesListBox.SelectedIndex >= 0)
+            {
+                DeleteSelectedPaletteButton.Enabled = true;
+                ShowSelectedPaletteButton.Enabled = true;
+            }
+            else
+            {
+                DeleteSelectedPaletteButton.Enabled = false;
+                ShowSelectedPaletteButton.Enabled = false;
+            }
 
+            ListBox listBox = sender as ListBox;
+            listBox.Refresh();
+        }
+        private void ShowSelectedPaletteButton_Click(object sender, EventArgs e)
+        {
+            int selectedIndex = -1;
+            if(PalettesListBox.SelectedIndices.Count > 0)
+                selectedIndex = PalettesListBox.SelectedIndices[0];
+            if(selectedIndex >= 0)
+            {
+                List<PaletteForm> currentForms = CurrentPaletteForms;
+                currentForms[selectedIndex].Enabled = true;
+                currentForms[selectedIndex].Show();
+                currentForms[selectedIndex].BringToFront();
+            }
+            //SetGroupBoxIsUnconfirmed(PalettesGroupBox, ConfirmPalettesListButton, RevertPalettesButton);
+        }
+        private void AddPaletteButton_Click(object sender, EventArgs e)
+        {
+            NewPaletteDialog dialog = new NewPaletteDialog();
+            if(dialog.ShowDialog() == DialogResult.OK)
+            {
+                List<PaletteForm> currentPaletteForms = CurrentPaletteForms;
+                if(PaletteNameAlreadyExists(dialog, currentPaletteForms))
+                {
+                    MessageBox.Show("That name already exists!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    PaletteForm paletteForm = new PaletteForm(dialog.PaletteName, dialog.PaletteDomain, _callbacks, _fsf);
+                    currentPaletteForms.Add(paletteForm);
+                    CurrentPaletteForms = currentPaletteForms;
+                    PalettesListBox.SelectedIndex = PalettesListBox.Items.Count - 1;
+                    paletteForm.Show();
+                    paletteForm.BringToFront();
+
+                    SetGroupBoxIsUnconfirmed(PalettesGroupBox, null, RevertPalettesListButton);
+                }
+            }
+        }
+        private bool PaletteNameAlreadyExists(NewPaletteDialog dialog, List<PaletteForm> currentPaletteForms)
+        {
+            bool rval = false;
+            foreach(PaletteForm paletteForm in currentPaletteForms)
+            {
+                if(paletteForm.SavedName == dialog.PaletteName)
+                {
+                    rval = true;
+                    break;
+                }
+            }
+            return rval;
+        }
+        private void DeletePaletteButton_Click(object sender, EventArgs e)
+        {
+            int selectedIndex = -1;
+            if(PalettesListBox.SelectedIndices.Count > 0)
+                selectedIndex = PalettesListBox.SelectedIndices[0];
+            if(selectedIndex >= 0)
+            {
+                string toDelete = PalettesListBox.Items[selectedIndex].ToString();
+                string msg = toDelete + " will be deleted completely.\n\n" +
+                    "Proceed?\n\n";
+                DialogResult proceed = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if(proceed == DialogResult.Yes)
+                {
+                    List<PaletteForm> currentPaletteForms = CurrentPaletteForms;
+                    PaletteForm paletteForm = currentPaletteForms[selectedIndex];
+                    paletteForm.Delete();
+                    currentPaletteForms.RemoveAt(selectedIndex);
+                    CurrentPaletteForms = currentPaletteForms;
+
+                    SetGroupBoxIsUnconfirmed(PalettesGroupBox, null, RevertPalettesListButton);
+                }
+            }
+            SetGroupBoxIsUnconfirmed(PalettesGroupBox, null, RevertPalettesListButton);
+
+        }
+        private void PalettesListBox_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            DoSelectionColor(sender, e);
+        }
+        private List<PaletteForm> CurrentPaletteForms
+        {
+            get
+            {
+                List<PaletteForm> currentPalletForms = new List<PaletteForm>();
+
+                foreach(object o in PalettesListBox.Items)
+                {
+                    PaletteForm ipf = o as PaletteForm;
+                    currentPalletForms.Add(ipf);
+                }
+                return currentPalletForms;
+            }
+            set
+            {
+                PalettesListBox.SuspendLayout();
+                PalettesListBox.Items.Clear();
+                foreach(PaletteForm ipf in value)
+                {
+                    PalettesListBox.Items.Add(ipf);
+                }
+                PalettesListBox.ResumeLayout();
+            }
+        }
         #endregion palettes groupBox
 
         #region load settings
@@ -1871,7 +2038,6 @@ namespace Moritz.Composer
                 (SavedState)NotationGroupBox.Tag, (SavedState)KrystalsGroupBox.Tag);
             PalettesListBox.Refresh();
         }
-
         #endregion load settings
 
         #region save settings
@@ -1974,13 +2140,7 @@ namespace Moritz.Composer
         }
         #endregion save settings
 
-
-
-
-
-
-        #region buttons
-
+        #region create score
         /// <summary>
         /// This function
         /// 1) creates the score, 
@@ -2035,17 +2195,13 @@ namespace Moritz.Composer
         {
             PageFormat pageFormat = new PageFormat();
             SetPaperSize(pageFormat);
-
             SetTitleSizeAndPosition(pageFormat);
-
             SetFrame(pageFormat);
-
             SetWebsiteLink(pageFormat);
-
             SetNotation(pageFormat);
-
             return pageFormat;
         }
+        #region helpers
         private void SetPaperSize(PageFormat pageFormat)
         {
             pageFormat.PaperSize = _dimensionsAndMetadataForm.PaperSize;
@@ -2088,7 +2244,6 @@ namespace Moritz.Composer
             pageFormat.AboutLinkText = damf.AboutLinkText;
             pageFormat.AboutLinkURL = damf.AboutLinkURL;
         }
-
         private void SetNotation(PageFormat pageFormat)
         {
             pageFormat.ChordSymbolType = this.ChordTypeComboBox.SelectedItem.ToString();
@@ -2111,252 +2266,48 @@ namespace Moritz.Composer
             pageFormat.ShortStaffNames = M.StringToStringList(this.ShortStaffNamesTextBox.Text, ',');
             pageFormat.SystemStartBars = M.StringToIntList(SystemStartBarsTextBox.Text, ',');
         }
+        #endregion helpers
         #endregion
-
-
-
-
-
-        /// <summary>
-        /// This function is also called by MoritzForm1.
-        /// If there are any unsaved changes, this function asks the user if they should be discarded.
-        /// If there are no changes, or the user answers yes, this function returns true.
-        /// Otherwise it returns false.
-        /// </summary>
-        /// <returns></returns>
-        public bool DiscardAnyChanges()
-        {
-            bool discard = true;
-            if(_fsf.UnconfirmedFormsExist() || _fsf.ConfirmedFormsExist())
-            {
-                DialogResult result = MessageBox.Show("Discard changes?", "Discard changes?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if(result == DialogResult.No)
-                {
-                    discard = false;
-                }
-            }
-            return discard;
-        }
-
-
-
-
-
-        #endregion buttons
-
-
-        #region list box events and functions
-        private void DoSelectionColor(object sender, DrawItemEventArgs e)
-        {
-            ListBox listBox = sender as ListBox;
-            Graphics g = e.Graphics;
-
-            if(listBox != null && listBox.Items.Count > e.Index)
-            {
-                string text = listBox.Items[e.Index].ToString();
-                Point textOrigin = new Point(e.Bounds.Left, e.Bounds.Top);
-
-                e.DrawBackground();
-
-                if(listBox.SelectedIndex == e.Index)
-                {
-                    g.FillRectangle(_systemHighlightBrush, e.Bounds);
-                    g.DrawString(text, e.Font, _whiteBrush, textOrigin);
-                }
-                else
-                {
-                    g.FillRectangle(_whiteBrush, e.Bounds);
-                    g.DrawString(text, e.Font, _blackBrush, textOrigin);
-                }
-                e.DrawFocusRectangle();
-            }
-        }
-
-
-
-        #region palette buttons
-        private void PalettesListBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if(PalettesListBox.SelectedIndex >= 0)
-            {
-                DeleteSelectedPaletteButton.Enabled = true;
-                ShowSelectedPaletteButton.Enabled = true;
-            }
-            else
-            {
-                DeleteSelectedPaletteButton.Enabled = false;
-                ShowSelectedPaletteButton.Enabled = false;
-            }
-
-            ListBox listBox = sender as ListBox;
-            listBox.Refresh();
-        }
-        private void ShowSelectedPaletteButton_Click(object sender, EventArgs e)
-        {
-            int selectedIndex = -1;
-            if(PalettesListBox.SelectedIndices.Count > 0)
-                selectedIndex = PalettesListBox.SelectedIndices[0];
-            if(selectedIndex >= 0)
-            {
-                List<PaletteForm> currentForms = CurrentPaletteForms;
-                currentForms[selectedIndex].Enabled = true;
-                currentForms[selectedIndex].Show();
-                currentForms[selectedIndex].BringToFront();
-            }
-            //SetGroupBoxIsUnconfirmed(PalettesGroupBox, ConfirmPalettesListButton, RevertPalettesButton);
-        }
-        private void AddPaletteButton_Click(object sender, EventArgs e)
-        {            
-            NewPaletteDialog dialog = new NewPaletteDialog();
-            if(dialog.ShowDialog() == DialogResult.OK)
-            {
-                List<PaletteForm> currentPaletteForms = CurrentPaletteForms;
-                if(PaletteNameAlreadyExists(dialog, currentPaletteForms))
-                {
-                    MessageBox.Show("That name already exists!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                else
-                {
-                    PaletteForm paletteForm = new PaletteForm(dialog.PaletteName, dialog.PaletteDomain, _callbacks, _fsf);
-                    currentPaletteForms.Add(paletteForm);
-                    CurrentPaletteForms = currentPaletteForms;
-                    PalettesListBox.SelectedIndex = PalettesListBox.Items.Count - 1;
-                    paletteForm.Show();
-                    paletteForm.BringToFront();
-
-                    SetGroupBoxIsUnconfirmed(PalettesGroupBox, null, RevertPalettesListButton);
-                }
-            }
-        }
-
-        private bool PaletteNameAlreadyExists(NewPaletteDialog dialog, List<PaletteForm> currentPaletteForms)
-        {
-            bool rval = false;
-            foreach(PaletteForm paletteForm in currentPaletteForms)
-            {
-                if(paletteForm.SavedName == dialog.PaletteName)
-                {
-                    rval = true;
-                    break;
-                }
-            }
-            return rval;
-        }
-
-        private void DeletePaletteButton_Click(object sender, EventArgs e)
-        {
-            int selectedIndex = -1;
-            if(PalettesListBox.SelectedIndices.Count > 0)
-                selectedIndex = PalettesListBox.SelectedIndices[0];
-            if(selectedIndex >= 0)
-            {
-                string toDelete = PalettesListBox.Items[selectedIndex].ToString();
-                string msg = toDelete + " will be deleted completely.\n\n" +
-                    "Proceed?\n\n";
-                DialogResult proceed = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                if(proceed == DialogResult.Yes)
-                {
-                    List<PaletteForm> currentPaletteForms = CurrentPaletteForms;
-                    PaletteForm paletteForm = currentPaletteForms[selectedIndex];
-                    paletteForm.Delete();
-                    currentPaletteForms.RemoveAt(selectedIndex);
-                    CurrentPaletteForms = currentPaletteForms;
-
-                    SetGroupBoxIsUnconfirmed(PalettesGroupBox, null, RevertPalettesListButton);
-                }
-            }
-            SetGroupBoxIsUnconfirmed(PalettesGroupBox, null, RevertPalettesListButton);
-
-        }
-
-        private void PalettesListBox_DrawItem(object sender, DrawItemEventArgs e)
-        {
-            DoSelectionColor(sender, e);
-        }
-
-        private List<PaletteForm> CurrentPaletteForms
-        {
-            get
-            {
-                List<PaletteForm> currentPalletForms = new List<PaletteForm>();
-
-                foreach(object o in PalettesListBox.Items)
-                {
-                    PaletteForm ipf = o as PaletteForm;
-                    currentPalletForms.Add(ipf);
-                }
-                return currentPalletForms;
-            }
-            set
-            {
-                PalettesListBox.SuspendLayout();
-                PalettesListBox.Items.Clear();
-                foreach(PaletteForm ipf in value)
-                {
-                    PalettesListBox.Items.Add(ipf);
-                }
-                PalettesListBox.ResumeLayout();
-            }
-        }
-        #endregion palette buttons
-
-
-        #endregion list box events
-
-
-
-        //private void TouchAllTextBoxes()
-        //{
-        //    MinimumGapsBetweenStavesTextBox_TextChanged(MinimumGapsBetweenStavesTextBox, null);
-        //    MinimumGapsBetweenSystemsTextBox_TextChanged(MinimumGapsBetweenSystemsTextBox, null);
-        //    MinimumCrotchetDurationTextBox_TextChanged(MinimumCrotchetDurationTextBox, null);
-        //    OutputVoiceIndicesStaffTextBox_TextChanged(OutputVoiceIndicesStaffTextBox, null);
-        //    InputVoiceIndicesPerStaffTextBox_TextChanged(InputVoiceIndicesPerStaffTextBox, null);
-        //    ClefsPerStaffTextBox_TextChanged(ClefsPerStaffTextBox, null);
-        //    StafflinesPerStaffTextBox_TextChanged(StafflinesPerStaffTextBox, null);
-        //    StaffGroupsTextBox_TextChanged(StaffGroupsTextBox, null);
-        //    LongStaffNamesTextBox_TextChanged(LongStaffNamesTextBox, null);
-        //    ShortStaffNamesTextBox_TextChanged(ShortStaffNamesTextBox, null);
-        //    SystemStartBarsTextBox_TextChanged(SystemStartBarsTextBox, null);
-        //}
+        #endregion create score
 
         #region private variables
+        #region Brushes
         SolidBrush _systemHighlightBrush = new SolidBrush(SystemColors.Highlight);
         SolidBrush _whiteBrush = new SolidBrush(Color.White);
         SolidBrush _blackBrush = new SolidBrush(Color.Black);
-
+        #endregion Brushes
+        #region names and paths
         /// <summary>
-        /// _scoreTitle is the name of the score without any folder or extension. For example "Study 2b2".
+        /// The complete path of the file containing the settings.
+        /// This is the _settingsFolderPath plus the scoreTitle plus the ".mkss" suffix.
         /// </summary>
-        string _scoreTitle = null;
-        CompositionAlgorithm _algorithm = null;
-
+        string _settingsPath = null;
         /// <summary>
         /// The folder (in the AssistantPerformer's folder)
         /// in which the score and all its associated files is saved
         /// </summary>
         string _settingsFolderPath = null;
-        string _settingsPath = null;
-        const int _minimumMsDuration = 5;
-        #endregion private variables
-
-
-
+        /// <summary>
+        /// _scoreTitle is the name of the score without any path or extension. For example "Study 2b2".
+        /// </summary>
+        string _scoreTitle = null;
+        #endregion names and paths
+        #region editing
+        private IMoritzForm1 _moritzForm1;
+        private KrystalBrowser _krystalBrowser = null;
+        private DimensionsAndMetadataForm _dimensionsAndMetadataForm;
+        private FormStateFunctions _fsf;
         private ComposerFormCallbacks _callbacks;
         private List<TextBox> _allTextBoxes = null;
-        private FormStateFunctions _fsf;
-        private IMoritzForm1 _moritzForm1;
-        private Moritz.Krystals.KrystalBrowser _krystalBrowser = null;
-        private DimensionsAndMetadataForm _dimensionsAndMetadataForm;
-
+        #endregion editing
+        #region score creation
+        CompositionAlgorithm _algorithm = null;
         private List<byte> _outputVoiceIndices = null;
-
         private List<List<byte>> _outputVoiceIndicesPerStaff; // set in OutputVoiceIndicesPerStaffTextBox_Leave
         private List<List<byte>> _inputVoiceIndicesPerStaff; // set in InputVoiceIndicesPerStaffTextBox_Leave
-
-        private int _numberOfStaves 
-        { 
-            get 
+        private int _numberOfStaves
+        {
+            get
             {
                 if(_outputVoiceIndicesPerStaff != null && _inputVoiceIndicesPerStaff != null)
                 {
@@ -2366,11 +2317,10 @@ namespace Moritz.Composer
                 {
                     return 0;
                 }
-            } 
+            }
         }
-
         public PageFormat PageFormat = null;
-
-
+        #endregion score creation
+        #endregion private variables
     }
 }
