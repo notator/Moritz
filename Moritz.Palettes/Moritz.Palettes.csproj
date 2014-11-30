@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IPaletteFormsHostForm.cs" />
     <Compile Include="PaletteButtonsControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -59,7 +60,6 @@
     <Compile Include="BasicChordControl.Designer.cs">
       <DependentUpon>BasicChordControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="ComposerFormCallbacks.cs" />
     <Compile Include="IntListControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

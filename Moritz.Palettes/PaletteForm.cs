@@ -13,9 +13,8 @@ namespace Moritz.Palettes
 {
     public partial class PaletteForm : Form
     {
-        public PaletteForm(XmlReader r, string name, int domain, ComposerFormCallbacks mainFormCallbacks, 
-            bool isPercussionPalette, FormStateFunctions fsf)
-            : this(name, domain, mainFormCallbacks, fsf)
+        public PaletteForm(XmlReader r, IPaletteFormsHostForm hostForm, string name, int domain, bool isPercussionPalette, FormStateFunctions fsf)
+            : this(hostForm, name, domain, fsf)
         {
             _isLoading = true;
             ReadPalette(r);
@@ -36,19 +35,19 @@ namespace Moritz.Palettes
         /// </summary>
         /// <param name="assistantComposer"></param>
         /// <param name="krystal"></param>
-        public PaletteForm(string name, int domain, ComposerFormCallbacks mainFormCallbacks, FormStateFunctions fsf)
+        public PaletteForm(IPaletteFormsHostForm hostForm, string name, int domain, FormStateFunctions fsf)
         {
             InitializeComponent();
+            _hostForm = hostForm;
             Text = name;
             _savedName = name;
             _domain = domain;
-            _callbacks = mainFormCallbacks;
             _fsf = fsf;
             _isLoading = true;
             ConnectBasicChordControl();
             if(M.Preferences.CurrentMultimediaMidiOutputDevice != null)
             {
-                ConnectPaletteButtonsControl(domain, _callbacks.LocalScoreAudioPath());
+                ConnectPaletteButtonsControl(domain, _hostForm.LocalScoreAudioPath);
             }
 
             _allTextBoxes = GetAllTextBoxes();
@@ -77,7 +76,7 @@ namespace Moritz.Palettes
             {
                 _paletteChordForm = new PaletteChordForm(this, _bcc, midiChordIndex, _fsf);
                 _paletteChordForm.Show();
-                _callbacks.SetAllFormsExceptChordFormEnabledState(false);
+                _hostForm.SetAllFormsExceptChordFormEnabledState(false);
                 BringPaletteChordFormToFront();
             }
         }
@@ -97,7 +96,7 @@ namespace Moritz.Palettes
             _paletteChordForm.Close();
             _paletteChordForm = null;
 
-            _callbacks.SetAllFormsExceptChordFormEnabledState(true);
+            _hostForm.SetAllFormsExceptChordFormEnabledState(true);
 
             // If an OrnamentSettingsForm exists, it is brought in front of Visual Studio.
             if(_ornamentsForm != null)
@@ -146,7 +145,7 @@ namespace Moritz.Palettes
 
             if(_ornamentsForm == null)
             {
-                _ornamentsForm = new OrnamentsForm(this, _fsf, _callbacks.UpdateMainForm);
+                _ornamentsForm = new OrnamentsForm(this, _hostForm, _fsf);
 
                 SetOrnamentControls();
                 _fsf.SetSettingsAreUnconfirmed(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
@@ -336,7 +335,7 @@ namespace Moritz.Palettes
         private void ConfirmButton_Click(object sender, EventArgs e)
         {
             _fsf.SetSettingsAreConfirmed(this, M.HasError(_allTextBoxes), ConfirmButton);
-            _callbacks.UpdateMainForm();
+            _hostForm.UpdateForChangedPaletteForm();
         }
 
         private void RevertToSavedButton_Click(object sender, EventArgs e)
@@ -351,7 +350,7 @@ namespace Moritz.Palettes
                 DeleteOrnamentsForm();
                 try
                 {
-                    using(XmlReader r = XmlReader.Create(_callbacks.SettingsPath()))
+                    using(XmlReader r = XmlReader.Create(_hostForm.SettingsPath))
                     {
                         M.ReadToXmlElementTag(r, "moritzKrystalScore");
                         M.ReadToXmlElementTag(r, "palette");
@@ -399,7 +398,7 @@ namespace Moritz.Palettes
                     }
                     TouchAllTextBoxes();
                     _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
-                    _callbacks.UpdateMainForm();
+                    _hostForm.UpdateForChangedPaletteForm();
                 }
                 catch(Exception ex)
                 {
@@ -411,7 +410,7 @@ namespace Moritz.Palettes
 
         private void ShowMainScoreFormButton_Click(object sender, EventArgs e)
         {
-            this._callbacks.BringMainFormToFront();
+            ((Form)_hostForm).BringToFront();
         }
         public void ShowOrnamentSettingsButton_Click(object sender, EventArgs e)
         {
@@ -1038,7 +1037,7 @@ namespace Moritz.Palettes
             _fsf.SetSettingsAreUnconfirmed(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
             if(!_isLoading)
             {
-                _callbacks.UpdateMainForm();
+                _hostForm.UpdateForChangedPaletteForm();
             }
         }
 
@@ -1224,7 +1223,7 @@ namespace Moritz.Palettes
                             MinMsDurationsTextBox.Text = r.ReadElementContentAsString();
                             break;
                         case "ornamentSettings":
-                            _ornamentsForm = new OrnamentsForm(r, this, _fsf, _callbacks.UpdateMainForm);
+                            _ornamentsForm = new OrnamentsForm(r, this, _hostForm, _fsf);
                             ShowOrnamentSettingsButton.Enabled = true;
                             DeleteOrnamentSettingsButton.Enabled = true;
                             break;
@@ -1241,14 +1240,12 @@ namespace Moritz.Palettes
         }
 
         private int _domain = 0;
-        private ComposerFormCallbacks _callbacks = null;
         private List<TextBox> _allTextBoxes = new List<TextBox>();
         private PaletteButtonsControl _paletteButtonsControl = null;
         #endregion paletteForm
 
         #region public variables
         public int Domain { get { return _domain; } }
-        public ComposerFormCallbacks Callbacks { get { return _callbacks; } }
         public BasicChordControl BasicChordControl { get { return _bcc; } }
         public OrnamentsForm OrnamentsForm { get { return _ornamentsForm; } }
         public PaletteButtonsControl PaletteButtonsControl { get { return _paletteButtonsControl; } }
@@ -1257,6 +1254,7 @@ namespace Moritz.Palettes
         #endregion public variables
 
         #region private variables
+        private IPaletteFormsHostForm _hostForm;
         private int _numberOfOrnaments;
         private OrnamentsForm _ornamentsForm = null;
         private MidiPitchesHelpForm _midiPitchesHelpForm = null;

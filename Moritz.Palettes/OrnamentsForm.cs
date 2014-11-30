@@ -12,9 +12,9 @@ namespace Moritz.Palettes
 {
     public partial class OrnamentsForm : Form
     {
-        public OrnamentsForm(PaletteForm paletteForm, FormStateFunctions fsf, SettingsHaveChangedDelegate updateMainForm)
+        public OrnamentsForm(PaletteForm paletteForm, IPaletteFormsHostForm acForm, FormStateFunctions fsf)
         {
-            InitializeOrnamentSettingsForm(null, paletteForm, fsf, updateMainForm);
+            InitializeOrnamentSettingsForm(null, paletteForm, acForm, fsf);
 
             _fsf.SetFormState(this, SavedState.unconfirmed);
             ConfirmButton.Enabled = false;
@@ -22,20 +22,20 @@ namespace Moritz.Palettes
             RevertToSavedButton.Hide();
         }
 
-        public OrnamentsForm(XmlReader r, PaletteForm paletteForm, FormStateFunctions fsf, SettingsHaveChangedDelegate updateMainForm)
+        public OrnamentsForm(XmlReader r, PaletteForm paletteForm, IPaletteFormsHostForm acForm, FormStateFunctions fsf)
         {
             _isLoading = true;
-            InitializeOrnamentSettingsForm(r, paletteForm, fsf, updateMainForm);
+            InitializeOrnamentSettingsForm(r, paletteForm, acForm, fsf);
             _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
             _isLoading = false;
         }
 
-        private void InitializeOrnamentSettingsForm(XmlReader r, PaletteForm paletteForm, FormStateFunctions fsf, SettingsHaveChangedDelegate updateMainForm)
+        private void InitializeOrnamentSettingsForm(XmlReader r, PaletteForm paletteForm, IPaletteFormsHostForm acForm, FormStateFunctions fsf)
         {
             InitializeComponent();
             _paletteForm = paletteForm;
             _fsf = fsf;
-            _UpdateMainForm = updateMainForm;
+            _assistantComposerForm = acForm;
             ConnectBasicChordControl();
 
             Text = paletteForm.SavedName + " : ornaments";
@@ -585,7 +585,7 @@ namespace Moritz.Palettes
             M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
             _fsf.SetSettingsAreUnconfirmed(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
             if(!_isLoading)
-                this._UpdateMainForm();
+                _assistantComposerForm.UpdateForChangedPaletteForm();
         }
        #endregion
 
@@ -605,13 +605,13 @@ namespace Moritz.Palettes
         }
         private void ShowMainScoreFormButton_Click(object sender, EventArgs e)
         {
-            _paletteForm.Callbacks.BringMainFormToFront();
+            ((Form)_assistantComposerForm).BringToFront();
         }
         
         private void ConfirmButton_Click(object sender, EventArgs e)
         {
             _fsf.SetSettingsAreConfirmed(this, M.HasError(_allTextBoxes), ConfirmButton);
-            this._UpdateMainForm();
+            _assistantComposerForm.UpdateForChangedPaletteForm();
         }
 
         private void RevertToSavedButton_Click(object sender, EventArgs e)
@@ -625,7 +625,7 @@ namespace Moritz.Palettes
             {
                 try
                 {
-                    using(XmlReader r = XmlReader.Create(_paletteForm.Callbacks.SettingsPath()))
+                    using(XmlReader r = XmlReader.Create(_assistantComposerForm.SettingsPath))
                     {
                         M.ReadToXmlElementTag(r, "moritzKrystalScore");
                         M.ReadToXmlElementTag(r, "palette");
@@ -653,7 +653,7 @@ namespace Moritz.Palettes
                     string msg = "Exception message:\n\n" + ex.Message;
                     MessageBox.Show(msg, "Error reading moritz krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-                this._UpdateMainForm();
+                _assistantComposerForm.UpdateForChangedPaletteForm();
             }
         }
         #endregion buttons
@@ -760,7 +760,7 @@ namespace Moritz.Palettes
         private List<List<int>> _ornaments = null;
         private FormStateFunctions _fsf;
         private bool _isLoading; // is true while the ornamentsForm is loading from a file, otherwise false
-        private SettingsHaveChangedDelegate _UpdateMainForm;
+        private IPaletteFormsHostForm _assistantComposerForm;
         #endregion private variables
     }
 }

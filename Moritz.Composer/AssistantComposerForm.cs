@@ -17,14 +17,13 @@ using Moritz.Krystals;
 
 namespace Moritz.Composer
 {
-    public partial class AssistantComposerForm : Form
+    public partial class AssistantComposerForm : Form, IPaletteFormsHostForm
     {
         public AssistantComposerForm(string settingsPath, IMoritzForm1 moritzForm1)
         {
             InitializeComponent();
 
             _allTextBoxes = GetAllTextBoxes();
-            _callbacks = GetCallbacks();
 
             _moritzForm1 = moritzForm1;
             _fsf = new FormStateFunctions();
@@ -42,7 +41,7 @@ namespace Moritz.Composer
 
             this.QuitAlgorithmButton.Text = "Quit " + _scoreTitle;
 
-            _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _fsf, DimensionsAndMetadataFormHasChanged);
+            _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _fsf);
 
             _algorithm = ComposableSvgScore.Algorithm(_scoreTitle);
 
@@ -84,16 +83,6 @@ namespace Moritz.Composer
 
             textBoxes.Add(SystemStartBarsTextBox);
             return textBoxes;
-        }
-        private ComposerFormCallbacks GetCallbacks()
-        {
-            ComposerFormCallbacks callbacks = new ComposerFormCallbacks();
-            callbacks.SetAllFormsExceptChordFormEnabledState = SetAllFormsExceptChordFormEnabledState;
-            callbacks.BringMainFormToFront = BringThisFormToFront;
-            callbacks.SettingsPath = GetSettingsPath;
-            callbacks.LocalScoreAudioPath = GetLocalScoreAudioPath;
-            callbacks.UpdateMainForm = APaletteHasChanged;
-            return callbacks;
         }
         private void ClearListBoxes()
         {
@@ -262,6 +251,69 @@ namespace Moritz.Composer
         }
         #endregion called from ctor
 
+        #region public interface
+        /// <summary>
+        /// Called when a PaletteChordForm is created or closed.
+        /// When a PaletteChordForm is open, all other forms are disabled.
+        /// Otherwise, they are all enabled.
+        /// </summary>
+        public void SetAllFormsExceptChordFormEnabledState(bool enabledState)
+        {
+            foreach(PaletteForm paletteForm in this.PalettesListBox.Items)
+            {
+                if(paletteForm.OrnamentsForm != null)
+                {
+                    paletteForm.OrnamentsForm.Enabled = enabledState;
+                }
+                paletteForm.Enabled = enabledState;
+            }
+            this._dimensionsAndMetadataForm.Enabled = enabledState;
+            this.Enabled = enabledState;
+        }
+        /// <summary>
+        /// Used when reverting other forms.
+        /// </summary>
+        public string SettingsPath { get { return _settingsPath; } }
+        public string LocalScoreAudioPath
+        {
+            get
+            {
+                string path = M.Preferences.LocalMoritzAudioFolder + @"\" + _scoreTitle;
+                return path;
+            }
+        }
+        /// <summary>
+        /// Called by paletteForms and their subsidiary ornamentForms
+        /// </summary>
+        public void UpdateForChangedPaletteForm()
+        {
+            NotationGroupBox.Enabled = false;
+            KrystalsGroupBox.Enabled = false;
+            SetPalettesGroupBox();
+            UpdateMainFormState();
+        }
+        public void UpdateMainFormState()
+        {
+            if(((SavedState)NotationGroupBox.Tag == SavedState.unconfirmed)
+                || ((SavedState)KrystalsGroupBox.Tag == SavedState.unconfirmed)
+                || ((SavedState)PalettesGroupBox.Tag == SavedState.unconfirmed)
+                || ((SavedState)_dimensionsAndMetadataForm.Tag == SavedState.unconfirmed))
+            {
+                SetMainFormIsUnconfirmed();
+            }
+            else if(((SavedState)NotationGroupBox.Tag == SavedState.confirmed)
+                 || ((SavedState)KrystalsGroupBox.Tag == SavedState.confirmed)
+                 || ((SavedState)PalettesGroupBox.Tag == SavedState.confirmed)
+                 || ((SavedState)_dimensionsAndMetadataForm.Tag == SavedState.confirmed))
+            {
+                SetMainFormIsConfirmed();
+            }
+            else
+                SetMainFormIsSaved();
+        }
+        #endregion public interface
+
+        #region control helpers
         /// <summary>
         /// If comboBox.text is not in the comboBox.Items list, comboBox.SelectedIndex is set to 0.
         /// Otherwise comboBox.SelectedIndex is set to the appropriate index.
@@ -302,67 +354,9 @@ namespace Moritz.Composer
                 e.DrawFocusRectangle();
             }
         }
-        
-        #region AssistantComposer form state
+        #endregion control helpers
 
-        #region callback definitions
-        /// <summary>
-        /// Called as a delegate when a PaletteChordForm is created or closed.
-        /// When a PaletteChordForm is open, all other forms are disabled.
-        /// Otherwise, they are all enabled.
-        /// </summary>
-        /// <param name="enabledState"></param>
-        private void SetAllFormsExceptChordFormEnabledState(bool enabledState)
-        {
-            foreach(PaletteForm paletteForm in this.PalettesListBox.Items)
-            {
-                if(paletteForm.OrnamentsForm != null)
-                {
-                    paletteForm.OrnamentsForm.Enabled = enabledState;
-                }
-                paletteForm.Enabled = enabledState;
-            }
-            this._dimensionsAndMetadataForm.Enabled = enabledState;
-            this.Enabled = enabledState;
-        }
-        /// <summary>
-        /// Called as delegate by "show main form" buttons in other forms.
-        /// Triggers the AssistantComposerForm_Activated event handler, which
-        /// is also triggered if the user clicks this form.
-        /// </summary>
-        private void BringThisFormToFront()
-        {
-            this.Enabled = true;
-            this.BringToFront();
-        }
-        /// <summary>
-        /// Called as a delegate when reverting other forms.
-        /// </summary>
-        /// <returns></returns>
-        private string GetSettingsPath()
-        {
-            return _settingsPath;
-        }
-        private string GetLocalScoreAudioPath()
-        {
-            string path = M.Preferences.LocalMoritzAudioFolder + @"\" + _scoreTitle;
-            return path;
-        }
-        private void DimensionsAndMetadataFormHasChanged()
-        {
-            SetMainFormState();
-        }
-        /// <summary>
-        /// Called as a delegate by paletteForms and their subsidiary ornamentForms
-        /// </summary>
-        private void APaletteHasChanged()
-        {
-            NotationGroupBox.Enabled = false;
-            KrystalsGroupBox.Enabled = false;
-            SetPalettesGroupBox();
-            SetMainFormState();
-        }
-        #endregion callback definitions
+        #region AssistantComposer form state
 
         #region main form event handlers
         #region helpers
@@ -397,25 +391,6 @@ namespace Moritz.Composer
             return rval;
         }
         #endregion helpers
-        private void SetMainFormState()
-        {
-            if(((SavedState)NotationGroupBox.Tag == SavedState.unconfirmed)
-                || ((SavedState)KrystalsGroupBox.Tag == SavedState.unconfirmed)
-                || ((SavedState)PalettesGroupBox.Tag == SavedState.unconfirmed)
-                || ((SavedState)_dimensionsAndMetadataForm.Tag == SavedState.unconfirmed))
-            {
-                SetMainFormIsUnconfirmed();
-            }
-            else if(((SavedState)NotationGroupBox.Tag == SavedState.confirmed)
-                 || ((SavedState)KrystalsGroupBox.Tag == SavedState.confirmed)
-                 || ((SavedState)PalettesGroupBox.Tag == SavedState.confirmed)
-                 || ((SavedState)_dimensionsAndMetadataForm.Tag == SavedState.confirmed))
-            {
-                SetMainFormIsConfirmed();
-            }
-            else
-                SetMainFormIsSaved();
-        }
 
         private void SetMainFormSaveCreateButtonText(bool thereAreTouchedForms)
         {
@@ -701,7 +676,7 @@ namespace Moritz.Composer
                 Dictionary<int, Point> visibleOrnamentFormLocations = GetVisibleOrnamentFormLocations();
 
                 _dimensionsAndMetadataForm.Close();
-                _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _fsf, DimensionsAndMetadataFormHasChanged);
+                _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _fsf);
 
                 foreach(PaletteForm paletteForm in PalettesListBox.Items)
                 {
@@ -1725,7 +1700,7 @@ namespace Moritz.Composer
                 }
                 else
                 {
-                    PaletteForm paletteForm = new PaletteForm(dialog.PaletteName, dialog.PaletteDomain, _callbacks, _fsf);
+                    PaletteForm paletteForm = new PaletteForm(this, dialog.PaletteName, dialog.PaletteDomain, _fsf);
                     currentPaletteForms.Add(paletteForm);
                     CurrentPaletteForms = currentPaletteForms;
                     PalettesListBox.SelectedIndex = PalettesListBox.Items.Count - 1;
@@ -2025,7 +2000,7 @@ namespace Moritz.Composer
                         }
                     }
 
-                    PaletteForm paletteForm = new PaletteForm(r, name, domain, _callbacks, isPercussionPalette, _fsf);
+                    PaletteForm paletteForm = new PaletteForm(r, this, name, domain, isPercussionPalette, _fsf);
 
                     PalettesListBox.Items.Add(paletteForm);
 
@@ -2297,7 +2272,6 @@ namespace Moritz.Composer
         private KrystalBrowser _krystalBrowser = null;
         private DimensionsAndMetadataForm _dimensionsAndMetadataForm;
         private FormStateFunctions _fsf;
-        private ComposerFormCallbacks _callbacks;
         private List<TextBox> _allTextBoxes = null;
         #endregion editing
         #region score creation

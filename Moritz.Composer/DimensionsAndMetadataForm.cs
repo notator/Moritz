@@ -16,14 +16,12 @@ namespace Moritz.Composer
         /// <summary>
         /// Creates a new, empty DimensionsAndMetadataForm.
         /// </summary>
-        internal DimensionsAndMetadataForm(AssistantComposerForm assistantComposerForm, string settingsPath, FormStateFunctions fsf,
-                SettingsHaveChangedDelegate updateMainForm)
+        internal DimensionsAndMetadataForm(AssistantComposerForm assistantComposerForm, string settingsPath, FormStateFunctions fsf)
         {
             InitializeComponent();
             _assistantComposerForm = assistantComposerForm;
             _settingsPath = settingsPath; // used when reverting
             _fsf = fsf;
-            _UpdateMainForm = updateMainForm;
             _allTextBoxes = GetAllTextBoxes();
             SetDefaultValues();
         }
@@ -289,7 +287,7 @@ namespace Moritz.Composer
             _fsf.SetSettingsAreUnconfirmed(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
             if(!_isLoading)
             {
-                _UpdateMainForm();
+                _assistantComposerForm.UpdateMainFormState();
             }
         }
         private void PaperSizeComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -387,7 +385,6 @@ namespace Moritz.Composer
         #endregion TextBox_Leave handlers
         private void ShowMainScoreFormButton_Click(object sender, EventArgs e)
         {
-            this._assistantComposerForm.Enabled = true;
             this._assistantComposerForm.BringToFront();
         }
 
@@ -483,7 +480,6 @@ namespace Moritz.Composer
         private AssistantComposerForm _assistantComposerForm = null;
         private List<TextBox> _allTextBoxes;
         private FormStateFunctions _fsf;
-        private SettingsHaveChangedDelegate _UpdateMainForm;
         private bool _isLoading;
         #endregion private variables
     }
