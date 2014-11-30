@@ -962,7 +962,6 @@ namespace Moritz.Composer
             this.Name = "AssistantComposerForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = " ";
-            this.Activated += new System.EventHandler(this.AssistantComposerForm_Activated);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AssistantComposerForm_FormClosing);
             this.NotationGroupBox.ResumeLayout(false);
             this.NotationGroupBox.PerformLayout();

@@ -6,7 +6,10 @@ namespace Moritz.Palettes
     public delegate void BringMainFormToFront();
     public delegate string SettingsPath();
     public delegate string LocalAudioFolderPath();
-    public delegate void APaletteHasBeenConfirmed();
+    /// <summary>
+    /// Called whenever a form changes. Updates the main AssistantComposerForm.
+    /// </summary>
+    public delegate void SettingsHaveChangedDelegate();
 
     public class ComposerFormCallbacks
     {
@@ -14,6 +17,6 @@ namespace Moritz.Palettes
         public BringMainFormToFront BringMainFormToFront;
         public SettingsPath SettingsPath;
         public LocalAudioFolderPath LocalScoreAudioPath;
-        public APaletteHasBeenConfirmed APaletteHasChanged;
+        public SettingsHaveChangedDelegate UpdateMainForm;
     }
 }

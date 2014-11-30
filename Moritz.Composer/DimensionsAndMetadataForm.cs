@@ -10,17 +10,20 @@ using Moritz.Palettes;
 
 namespace Moritz.Composer
 {
-    public partial class DimensionsAndMetadataForm : Form
+
+    internal partial class DimensionsAndMetadataForm : Form
     {
         /// <summary>
         /// Creates a new, empty DimensionsAndMetadataForm.
         /// </summary>
-        public DimensionsAndMetadataForm(AssistantComposerForm assistantComposerForm, string settingsPath, FormStateFunctions fsf)
+        internal DimensionsAndMetadataForm(AssistantComposerForm assistantComposerForm, string settingsPath, FormStateFunctions fsf,
+                SettingsHaveChangedDelegate updateMainForm)
         {
             InitializeComponent();
             _assistantComposerForm = assistantComposerForm;
             _settingsPath = settingsPath; // used when reverting
             _fsf = fsf;
+            _UpdateMainForm = updateMainForm;
             _allTextBoxes = GetAllTextBoxes();
             SetDefaultValues();
         }
@@ -66,6 +69,7 @@ namespace Moritz.Composer
         #region Read
         public void Read(XmlReader r)
         {
+            _isLoading = true;
             Debug.Assert(r.Name == "moritzKrystalScore");
             M.ReadToXmlElementTag(r, "metadata", "dimensions");
             while(r.Name == "metadata" || r.Name == "dimensions")
@@ -85,6 +89,7 @@ namespace Moritz.Composer
                 M.ReadToXmlElementTag(r, "metadata", "dimensions", "performerOptions", "notation", "names", "krystals", "palettes");
             }
             _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+            _isLoading = false;
         }
         private void GetMetadata(XmlReader r)
         {
@@ -279,18 +284,22 @@ namespace Moritz.Composer
         #endregion Write
 
         #region Event Handlers
-        private void SetSettingsNeedReview()
+        private void SetSettingsHaveChanged()
         {
             _fsf.SetSettingsAreUnconfirmed(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+            if(!_isLoading)
+            {
+                _UpdateMainForm();
+            }
         }
         private void PaperSizeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SetSettingsNeedReview();
+            SetSettingsHaveChanged();
             this.PaperSizeLabel.Focus();
         }
         private void LandscapeCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            SetSettingsNeedReview();
+            SetSettingsHaveChanged();
         }
         private void SetToWhiteTextBox_TextChanged(object sender, EventArgs e)
         {
@@ -300,43 +309,43 @@ namespace Moritz.Composer
         private void Page1TitleHeightTextBox_Leave(object sender, EventArgs e)
         {
             CheckTextBoxIsFloat(this.Page1TitleHeightTextBox);
-            SetSettingsNeedReview();
+            SetSettingsHaveChanged();
         }
         private void Page1AuthorHeightTextBox_Leave(object sender, EventArgs e)
         {
             CheckTextBoxIsFloat(this.Page1AuthorHeightTextBox);
-            SetSettingsNeedReview();
+            SetSettingsHaveChanged();
         }
         private void Page1TitleYTextBox_Leave(object sender, EventArgs e)
         {
             CheckTextBoxIsFloat(this.Page1TitleYTextBox);
-            SetSettingsNeedReview();
+            SetSettingsHaveChanged();
         }
 
         private void TopMarginPage1TextBox_Leave(object sender, EventArgs e)
         {
             CheckTextBoxIsFloat(this.TopMarginPage1TextBox);
-            SetSettingsNeedReview();
+            SetSettingsHaveChanged();
         }
         private void TopMarginOtherPagesTextBox_Leave(object sender, EventArgs e)
         {
             CheckTextBoxIsFloat(this.TopMarginOtherPagesTextBox);
-            SetSettingsNeedReview();
+            SetSettingsHaveChanged();
         }
         private void RightMarginTextBox_Leave(object sender, EventArgs e)
         {
             CheckTextBoxIsFloat(this.RightMarginTextBox);
-            SetSettingsNeedReview();
+            SetSettingsHaveChanged();
         }
         private void BottomMarginTextBox_Leave(object sender, EventArgs e)
         {
             CheckTextBoxIsFloat(this.BottomMarginTextBox);
-            SetSettingsNeedReview();
+            SetSettingsHaveChanged();
         }
         private void LeftMarginTextBox_Leave(object sender, EventArgs e)
         {
             CheckTextBoxIsFloat(this.LeftMarginTextBox);
-            SetSettingsNeedReview();
+            SetSettingsHaveChanged();
         }
 
         private void CheckTextBoxIsFloat(TextBox textBox)
@@ -357,23 +366,23 @@ namespace Moritz.Composer
 
         private void AboutLinkTextTextBox_Leave(object sender, EventArgs e)
         {
-            SetSettingsNeedReview();
+            SetSettingsHaveChanged();
         }
         private void AboutLinkURLTextBox_Leave(object sender, EventArgs e)
         {
-            SetSettingsNeedReview();
+            SetSettingsHaveChanged();
         }
         private void RecordingTextBox_Leave(object sender, EventArgs e)
         {
-            SetSettingsNeedReview();
+            SetSettingsHaveChanged();
         }
         private void MetadataKeywordsTextBox_Leave(object sender, EventArgs e)
         {
-            SetSettingsNeedReview();
+            SetSettingsHaveChanged();
         }
         private void MetadataCommentTextBox_Leave(object sender, EventArgs e)
         {
-            SetSettingsNeedReview();
+            SetSettingsHaveChanged();
         }
         #endregion TextBox_Leave handlers
         private void ShowMainScoreFormButton_Click(object sender, EventArgs e)
@@ -396,15 +405,18 @@ namespace Moritz.Composer
 
             if(result == DialogResult.Yes)
             {
+
                 try
                 {
                     using(XmlReader r = XmlReader.Create(_settingsPath))
                     {
                         M.ReadToXmlElementTag(r, "moritzKrystalScore");
-                        Read(r);
+                        Read(r); // _isLoading is true during read, but set to false at the end of the function.
                     }
+                    _isLoading = true;
                     TouchAllTextBoxes();
                     _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+                    _isLoading = false;
                 }
                 catch(Exception ex)
                 {
@@ -471,6 +483,8 @@ namespace Moritz.Composer
         private AssistantComposerForm _assistantComposerForm = null;
         private List<TextBox> _allTextBoxes;
         private FormStateFunctions _fsf;
+        private SettingsHaveChangedDelegate _UpdateMainForm;
+        private bool _isLoading;
         #endregion private variables
     }
 }

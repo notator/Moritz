@@ -41,7 +41,7 @@ namespace Moritz.Composer
 
             this.QuitAlgorithmButton.Text = "Quit " + _scoreTitle;
 
-            _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _fsf);
+            _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _fsf, SetMainFormState);
 
             _algorithm = ComposableSvgScore.Algorithm(_scoreTitle);
 
@@ -91,7 +91,7 @@ namespace Moritz.Composer
             callbacks.BringMainFormToFront = BringThisFormToFront;
             callbacks.SettingsPath = GetSettingsPath;
             callbacks.LocalScoreAudioPath = GetLocalScoreAudioPath;
-            callbacks.APaletteHasChanged = APaletteHasChanged;
+            callbacks.UpdateMainForm = APaletteHasChanged;
             return callbacks;
         }
         private void ClearListBoxes()
@@ -322,6 +322,7 @@ namespace Moritz.Composer
             string path = M.Preferences.LocalMoritzAudioFolder + @"\" + _scoreTitle;
             return path;
         }
+
         private void APaletteHasChanged()
         {
             NotationGroupBox.Enabled = false;
@@ -365,11 +366,6 @@ namespace Moritz.Composer
             return rval;
         }
         #endregion helpers
-        private void AssistantComposerForm_Activated(object sender, EventArgs e)
-        {
-            //SetMainFormState();
-        }
-
         private void SetMainFormState()
         {
             if(((SavedState)NotationGroupBox.Tag == SavedState.unconfirmed)
@@ -674,7 +670,7 @@ namespace Moritz.Composer
                 Dictionary<int, Point> visibleOrnamentFormLocations = GetVisibleOrnamentFormLocations();
 
                 _dimensionsAndMetadataForm.Close();
-                _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _fsf);
+                _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _fsf, SetMainFormState);
 
                 foreach(PaletteForm paletteForm in PalettesListBox.Items)
                 {

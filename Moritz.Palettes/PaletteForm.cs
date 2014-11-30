@@ -146,7 +146,7 @@ namespace Moritz.Palettes
 
             if(_ornamentsForm == null)
             {
-                _ornamentsForm = new OrnamentsForm(this, _fsf, _callbacks);
+                _ornamentsForm = new OrnamentsForm(this, _fsf, _callbacks.UpdateMainForm);
 
                 SetOrnamentControls();
                 _fsf.SetSettingsAreUnconfirmed(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
@@ -336,7 +336,7 @@ namespace Moritz.Palettes
         private void ConfirmButton_Click(object sender, EventArgs e)
         {
             _fsf.SetSettingsAreConfirmed(this, M.HasError(_allTextBoxes), ConfirmButton);
-            _callbacks.APaletteHasChanged();
+            _callbacks.UpdateMainForm();
         }
 
         private void RevertToSavedButton_Click(object sender, EventArgs e)
@@ -399,7 +399,7 @@ namespace Moritz.Palettes
                     }
                     TouchAllTextBoxes();
                     _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
-                    _callbacks.APaletteHasChanged();
+                    _callbacks.UpdateMainForm();
                 }
                 catch(Exception ex)
                 {
@@ -1038,7 +1038,7 @@ namespace Moritz.Palettes
             _fsf.SetSettingsAreUnconfirmed(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
             if(!_isLoading)
             {
-                _callbacks.APaletteHasChanged();
+                _callbacks.UpdateMainForm();
             }
         }
 
@@ -1224,7 +1224,7 @@ namespace Moritz.Palettes
                             MinMsDurationsTextBox.Text = r.ReadElementContentAsString();
                             break;
                         case "ornamentSettings":
-                            _ornamentsForm = new OrnamentsForm(r, this, _fsf, _callbacks);
+                            _ornamentsForm = new OrnamentsForm(r, this, _fsf, _callbacks.UpdateMainForm);
                             ShowOrnamentSettingsButton.Enabled = true;
                             DeleteOrnamentSettingsButton.Enabled = true;
                             break;
