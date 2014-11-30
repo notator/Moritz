@@ -11,9 +11,15 @@ namespace Moritz.Palettes
 
     public class FormStateFunctions
     {
+        public void SetGroupBoxState(GroupBox groupBox, SavedState state)
+        {
+            groupBox.Tag = state;
+            groupBox.Text = SetTextState(groupBox.Text, state);
+        }
         public void SetFormState(Form form, SavedState state)
         {
             form.Tag = state;
+            form.Text = SetTextState(form.Text, state);
             switch(state)
             {
                 case SavedState.saved:
@@ -22,11 +28,6 @@ namespace Moritz.Palettes
                         _unconfirmedForms.Remove(form);
                     if(_confirmedForms.Contains(form))
                         _confirmedForms.Remove(form);
-
-                    if(form.Text.EndsWith(UnconfirmedStr))
-                        form.Text = form.Text.Remove(form.Text.Length - UnconfirmedStr.Length);
-                    if(form.Text.EndsWith(ConfirmedStr))
-                        form.Text = form.Text.Remove(form.Text.Length - ConfirmedStr.Length);
                     break;
                 }
                 case SavedState.confirmed:
@@ -35,11 +36,6 @@ namespace Moritz.Palettes
                         _unconfirmedForms.Remove(form);
                     if(!_confirmedForms.Contains(form))
                         _confirmedForms.Add(form);
-
-                    if(form.Text.EndsWith(UnconfirmedStr))
-                        form.Text = form.Text.Remove(form.Text.Length - UnconfirmedStr.Length);
-                    if(!form.Text.EndsWith(ConfirmedStr))
-                        form.Text = form.Text + ConfirmedStr;
                     break;
                 }
                 case SavedState.unconfirmed:
@@ -48,13 +44,40 @@ namespace Moritz.Palettes
                         _unconfirmedForms.Add(form);
                     if(_confirmedForms.Contains(form))
                         _confirmedForms.Remove(form);
-                    if(form.Text.EndsWith(ConfirmedStr))
-                        form.Text = form.Text.Remove(form.Text.Length - ConfirmedStr.Length);
-                    if(!form.Text.EndsWith(UnconfirmedStr))
-                        form.Text = form.Text + UnconfirmedStr;
                     break;
                 }
             }
+        }
+        private string SetTextState(string text, SavedState state)
+        {
+            switch(state)
+            {
+                case SavedState.saved:
+                    {
+                        if(text.EndsWith(UnconfirmedStr))
+                            text = text.Remove(text.Length - UnconfirmedStr.Length);
+                        if(text.EndsWith(ConfirmedStr))
+                            text = text.Remove(text.Length - ConfirmedStr.Length);
+                        break;
+                    }
+                case SavedState.confirmed:
+                    {
+                        if(text.EndsWith(UnconfirmedStr))
+                            text = text.Remove(text.Length - UnconfirmedStr.Length);
+                        if(!text.EndsWith(ConfirmedStr))
+                            text = text + ConfirmedStr;
+                        break;
+                    }
+                case SavedState.unconfirmed:
+                    {
+                        if(text.EndsWith(ConfirmedStr))
+                            text = text.Remove(text.Length - ConfirmedStr.Length);
+                        if(!text.EndsWith(UnconfirmedStr))
+                            text = text + UnconfirmedStr;
+                        break;
+                    }
+            }
+            return text;
         }
 
         /// <summary>
@@ -63,13 +86,16 @@ namespace Moritz.Palettes
         public void SetSettingsAreUnconfirmed(Form form, bool hasError, Button confirmButton, Button revertToSavedButton)
         {
             SetFormState(form, SavedState.unconfirmed);
-            if(hasError)
+            if(confirmButton != null)
             {
-                confirmButton.Enabled = false;
-            }
-            else
-            {
-                confirmButton.Enabled = true;
+                if(hasError)
+                {
+                    confirmButton.Enabled = false;
+                }
+                else
+                {
+                    confirmButton.Enabled = true;
+                }
             }
             revertToSavedButton.Enabled = true;
         }
@@ -94,7 +120,7 @@ namespace Moritz.Palettes
             Debug.Assert(!hasError); // the revertToSavedButton should already be disabled if there is an error on the form
 
             SetFormState(form, SavedState.saved);
-            confirmButton.Enabled = false;
+            if(confirmButton != null) confirmButton.Enabled = false;
             revertToSavedButton.Enabled = false;
             revertToSavedButton.Show();
         }

@@ -17,6 +17,7 @@ namespace Moritz.Palettes
             bool isPercussionPalette, FormStateFunctions fsf)
             : this(name, domain, mainFormCallbacks, fsf)
         {
+            _isLoading = true;
             ReadPalette(r);
             this.PercussionCheckBox.Checked = isPercussionPalette;
             this.ModulationWheelEnvelopesLabel.Focus();
@@ -28,6 +29,7 @@ namespace Moritz.Palettes
             }
 
             _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+            _isLoading = false;
         }
         /// <summary>
         /// Creates a new, empty PalettesForm with help texts adjusted for the given domain.
@@ -42,7 +44,7 @@ namespace Moritz.Palettes
             _domain = domain;
             _callbacks = mainFormCallbacks;
             _fsf = fsf;
-
+            _isLoading = true;
             ConnectBasicChordControl();
             if(M.Preferences.CurrentMultimediaMidiOutputDevice != null)
             {
@@ -59,7 +61,7 @@ namespace Moritz.Palettes
             DeleteOrnamentSettingsButton.Enabled = false;
 
             _fsf.SetFormState(this, SavedState.unconfirmed);
-
+            _isLoading = false;
             ConfirmButton.Enabled = false;
             RevertToSavedButton.Enabled = false;
             RevertToSavedButton.Hide();
@@ -67,11 +69,7 @@ namespace Moritz.Palettes
 
         public void ShowPaletteChordForm(int midiChordIndex)
         {
-            if(_callbacks.APaletteChordFormIsOpen())
-            {
-                MessageBox.Show("Can't create a palette chord form because another one is already open.");
-            }
-            else if(M.HasError(_allTextBoxes))
+            if(M.HasError(_allTextBoxes))
             {
                 MessageBox.Show("Can't create a palette chord form because this palette contains errors.");
             }
@@ -148,7 +146,7 @@ namespace Moritz.Palettes
 
             if(_ornamentsForm == null)
             {
-                _ornamentsForm = new OrnamentsForm(this, _fsf);
+                _ornamentsForm = new OrnamentsForm(this, _fsf, _callbacks);
 
                 SetOrnamentControls();
                 _fsf.SetSettingsAreUnconfirmed(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
@@ -337,7 +335,8 @@ namespace Moritz.Palettes
 
         private void ConfirmButton_Click(object sender, EventArgs e)
         {
-            _fsf.SetSettingsAreConfirmed(this, M.HasError(_allTextBoxes), ConfirmButton); 
+            _fsf.SetSettingsAreConfirmed(this, M.HasError(_allTextBoxes), ConfirmButton);
+            _callbacks.APaletteHasChanged();
         }
 
         private void RevertToSavedButton_Click(object sender, EventArgs e)
@@ -400,6 +399,7 @@ namespace Moritz.Palettes
                     }
                     TouchAllTextBoxes();
                     _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+                    _callbacks.APaletteHasChanged();
                 }
                 catch(Exception ex)
                 {
@@ -1036,6 +1036,10 @@ namespace Moritz.Palettes
         public void SetSettingsHaveChanged()
         {
             _fsf.SetSettingsAreUnconfirmed(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+            if(!_isLoading)
+            {
+                _callbacks.APaletteHasChanged();
+            }
         }
 
         #endregion ReviewableForm
@@ -1220,7 +1224,7 @@ namespace Moritz.Palettes
                             MinMsDurationsTextBox.Text = r.ReadElementContentAsString();
                             break;
                         case "ornamentSettings":
-                            _ornamentsForm = new OrnamentsForm(r, this, _fsf);
+                            _ornamentsForm = new OrnamentsForm(r, this, _fsf, _callbacks);
                             ShowOrnamentSettingsButton.Enabled = true;
                             DeleteOrnamentSettingsButton.Enabled = true;
                             break;
@@ -1262,6 +1266,7 @@ namespace Moritz.Palettes
         private PaletteChordForm _paletteChordForm = null;
         private FormStateFunctions _fsf;
         private string _savedName;
+        private bool _isLoading; // is true while the palettesForm is loading from a file, otherwise false
         #endregion private variables
     }
 

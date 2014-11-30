@@ -93,11 +93,10 @@ namespace Moritz.Composer
             this.ShowSelectedKrystalButton = new System.Windows.Forms.Button();
             this.DimensionsAndMetadataButton = new System.Windows.Forms.Button();
             this.KrystalsGroupBox = new System.Windows.Forms.GroupBox();
-            this.ConfirmKrystalsButton = new System.Windows.Forms.Button();
-            this.RevertKrystalsButton = new System.Windows.Forms.Button();
+            this.ConfirmKrystalsListButton = new System.Windows.Forms.Button();
+            this.RevertKrystalsListButton = new System.Windows.Forms.Button();
             this.PalettesGroupBox = new System.Windows.Forms.GroupBox();
-            this.RevertPalettesButton = new System.Windows.Forms.Button();
-            this.ConfirmPalettesButton = new System.Windows.Forms.Button();
+            this.RevertPalettesListButton = new System.Windows.Forms.Button();
             this.RevertEverythingButton = new System.Windows.Forms.Button();
             this.ShowUncheckedFormsButton = new System.Windows.Forms.Button();
             this.ShowConfirmedFormsButton = new System.Windows.Forms.Button();
@@ -110,9 +109,9 @@ namespace Moritz.Composer
             // QuitAlgorithmButton
             // 
             this.QuitAlgorithmButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.QuitAlgorithmButton.Location = new System.Drawing.Point(597, 539);
+            this.QuitAlgorithmButton.Location = new System.Drawing.Point(600, 539);
             this.QuitAlgorithmButton.Name = "QuitAlgorithmButton";
-            this.QuitAlgorithmButton.Size = new System.Drawing.Size(222, 26);
+            this.QuitAlgorithmButton.Size = new System.Drawing.Size(216, 26);
             this.QuitAlgorithmButton.TabIndex = 2;
             this.QuitAlgorithmButton.Text = "Quit algorithm";
             this.QuitAlgorithmButton.UseVisualStyleBackColor = true;
@@ -126,19 +125,19 @@ namespace Moritz.Composer
             this.PalettesListBox.ItemHeight = 14;
             this.PalettesListBox.Location = new System.Drawing.Point(16, 23);
             this.PalettesListBox.Name = "PalettesListBox";
-            this.PalettesListBox.Size = new System.Drawing.Size(183, 200);
+            this.PalettesListBox.Size = new System.Drawing.Size(183, 242);
             this.PalettesListBox.TabIndex = 4;
             this.PalettesListBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.PalettesListBox_DrawItem);
             this.PalettesListBox.SelectedIndexChanged += new System.EventHandler(this.PalettesListBox_SelectedIndexChanged);
             // 
             // ShowSelectedPaletteButton
             // 
-            this.ShowSelectedPaletteButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.ShowSelectedPaletteButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.ShowSelectedPaletteButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.ShowSelectedPaletteButton.Enabled = false;
             this.ShowSelectedPaletteButton.Font = new System.Drawing.Font("Arial", 8F);
             this.ShowSelectedPaletteButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.ShowSelectedPaletteButton.Location = new System.Drawing.Point(16, 228);
+            this.ShowSelectedPaletteButton.Location = new System.Drawing.Point(16, 271);
             this.ShowSelectedPaletteButton.Name = "ShowSelectedPaletteButton";
             this.ShowSelectedPaletteButton.Size = new System.Drawing.Size(183, 27);
             this.ShowSelectedPaletteButton.TabIndex = 0;
@@ -148,10 +147,10 @@ namespace Moritz.Composer
             // 
             // AddPaletteButton
             // 
-            this.AddPaletteButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.AddPaletteButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.AddPaletteButton.Font = new System.Drawing.Font("Arial", 8F);
             this.AddPaletteButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.AddPaletteButton.Location = new System.Drawing.Point(16, 260);
+            this.AddPaletteButton.Location = new System.Drawing.Point(16, 303);
             this.AddPaletteButton.Name = "AddPaletteButton";
             this.AddPaletteButton.Size = new System.Drawing.Size(183, 27);
             this.AddPaletteButton.TabIndex = 3;
@@ -161,10 +160,10 @@ namespace Moritz.Composer
             // 
             // AddKrystalButton
             // 
-            this.AddKrystalButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.AddKrystalButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.AddKrystalButton.Font = new System.Drawing.Font("Arial", 8F);
             this.AddKrystalButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.AddKrystalButton.Location = new System.Drawing.Point(16, 261);
+            this.AddKrystalButton.Location = new System.Drawing.Point(16, 304);
             this.AddKrystalButton.Name = "AddKrystalButton";
             this.AddKrystalButton.Size = new System.Drawing.Size(183, 26);
             this.AddKrystalButton.TabIndex = 3;
@@ -174,11 +173,11 @@ namespace Moritz.Composer
             // 
             // DeleteSelectedPaletteButton
             // 
-            this.DeleteSelectedPaletteButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.DeleteSelectedPaletteButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.DeleteSelectedPaletteButton.Enabled = false;
             this.DeleteSelectedPaletteButton.Font = new System.Drawing.Font("Arial", 8F);
             this.DeleteSelectedPaletteButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.DeleteSelectedPaletteButton.Location = new System.Drawing.Point(16, 292);
+            this.DeleteSelectedPaletteButton.Location = new System.Drawing.Point(16, 335);
             this.DeleteSelectedPaletteButton.Name = "DeleteSelectedPaletteButton";
             this.DeleteSelectedPaletteButton.Size = new System.Drawing.Size(183, 27);
             this.DeleteSelectedPaletteButton.TabIndex = 5;
@@ -194,18 +193,18 @@ namespace Moritz.Composer
             this.KrystalsListBox.ItemHeight = 14;
             this.KrystalsListBox.Location = new System.Drawing.Point(16, 23);
             this.KrystalsListBox.Name = "KrystalsListBox";
-            this.KrystalsListBox.Size = new System.Drawing.Size(183, 200);
+            this.KrystalsListBox.Size = new System.Drawing.Size(183, 242);
             this.KrystalsListBox.TabIndex = 4;
             this.KrystalsListBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.KrystalsListBox_DrawItem);
             this.KrystalsListBox.SelectedIndexChanged += new System.EventHandler(this.KrystalsListBox_SelectedIndexChanged);
             // 
             // RemoveSelectedKrystalButton
             // 
-            this.RemoveSelectedKrystalButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.RemoveSelectedKrystalButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.RemoveSelectedKrystalButton.Enabled = false;
             this.RemoveSelectedKrystalButton.Font = new System.Drawing.Font("Arial", 8F);
             this.RemoveSelectedKrystalButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.RemoveSelectedKrystalButton.Location = new System.Drawing.Point(16, 293);
+            this.RemoveSelectedKrystalButton.Location = new System.Drawing.Point(16, 336);
             this.RemoveSelectedKrystalButton.Name = "RemoveSelectedKrystalButton";
             this.RemoveSelectedKrystalButton.Size = new System.Drawing.Size(183, 26);
             this.RemoveSelectedKrystalButton.TabIndex = 5;
@@ -714,9 +713,9 @@ namespace Moritz.Composer
             this.ConfirmNotationButton.Enabled = false;
             this.ConfirmNotationButton.Font = new System.Drawing.Font("Arial", 8F);
             this.ConfirmNotationButton.ForeColor = System.Drawing.Color.Blue;
-            this.ConfirmNotationButton.Location = new System.Drawing.Point(282, 539);
+            this.ConfirmNotationButton.Location = new System.Drawing.Point(362, 539);
             this.ConfirmNotationButton.Name = "ConfirmNotationButton";
-            this.ConfirmNotationButton.Size = new System.Drawing.Size(183, 26);
+            this.ConfirmNotationButton.Size = new System.Drawing.Size(103, 26);
             this.ConfirmNotationButton.TabIndex = 1;
             this.ConfirmNotationButton.Text = "confirm notation";
             this.ConfirmNotationButton.UseVisualStyleBackColor = false;
@@ -728,9 +727,9 @@ namespace Moritz.Composer
             this.RevertNotationButton.Enabled = false;
             this.RevertNotationButton.Font = new System.Drawing.Font("Arial", 8F);
             this.RevertNotationButton.ForeColor = System.Drawing.Color.Red;
-            this.RevertNotationButton.Location = new System.Drawing.Point(93, 539);
+            this.RevertNotationButton.Location = new System.Drawing.Point(251, 539);
             this.RevertNotationButton.Name = "RevertNotationButton";
-            this.RevertNotationButton.Size = new System.Drawing.Size(183, 26);
+            this.RevertNotationButton.Size = new System.Drawing.Size(103, 26);
             this.RevertNotationButton.TabIndex = 2;
             this.RevertNotationButton.Text = "revert notation";
             this.RevertNotationButton.UseVisualStyleBackColor = false;
@@ -763,7 +762,7 @@ namespace Moritz.Composer
             this.SaveSettingsCreateScoreButton.Enabled = false;
             this.SaveSettingsCreateScoreButton.Font = new System.Drawing.Font("Arial", 8F);
             this.SaveSettingsCreateScoreButton.ForeColor = System.Drawing.Color.Blue;
-            this.SaveSettingsCreateScoreButton.Location = new System.Drawing.Point(713, 495);
+            this.SaveSettingsCreateScoreButton.Location = new System.Drawing.Point(713, 496);
             this.SaveSettingsCreateScoreButton.Name = "SaveSettingsCreateScoreButton";
             this.SaveSettingsCreateScoreButton.Size = new System.Drawing.Size(214, 31);
             this.SaveSettingsCreateScoreButton.TabIndex = 0;
@@ -774,9 +773,9 @@ namespace Moritz.Composer
             // QuitMoritzButton
             // 
             this.QuitMoritzButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.QuitMoritzButton.Location = new System.Drawing.Point(834, 539);
+            this.QuitMoritzButton.Location = new System.Drawing.Point(823, 539);
             this.QuitMoritzButton.Name = "QuitMoritzButton";
-            this.QuitMoritzButton.Size = new System.Drawing.Size(92, 26);
+            this.QuitMoritzButton.Size = new System.Drawing.Size(103, 26);
             this.QuitMoritzButton.TabIndex = 3;
             this.QuitMoritzButton.Text = "Quit Moritz";
             this.QuitMoritzButton.UseVisualStyleBackColor = true;
@@ -788,7 +787,7 @@ namespace Moritz.Composer
             this.ShowMoritzButton.Font = new System.Drawing.Font("Arial", 8F);
             this.ShowMoritzButton.Location = new System.Drawing.Point(490, 539);
             this.ShowMoritzButton.Name = "ShowMoritzButton";
-            this.ShowMoritzButton.Size = new System.Drawing.Size(92, 26);
+            this.ShowMoritzButton.Size = new System.Drawing.Size(103, 26);
             this.ShowMoritzButton.TabIndex = 7;
             this.ShowMoritzButton.Text = "Show Moritz";
             this.ShowMoritzButton.UseVisualStyleBackColor = false;
@@ -796,12 +795,12 @@ namespace Moritz.Composer
             // 
             // ShowSelectedKrystalButton
             // 
-            this.ShowSelectedKrystalButton.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.ShowSelectedKrystalButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.ShowSelectedKrystalButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.ShowSelectedKrystalButton.Enabled = false;
             this.ShowSelectedKrystalButton.Font = new System.Drawing.Font("Arial", 8F);
             this.ShowSelectedKrystalButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.ShowSelectedKrystalButton.Location = new System.Drawing.Point(16, 229);
+            this.ShowSelectedKrystalButton.Location = new System.Drawing.Point(16, 272);
             this.ShowSelectedKrystalButton.Name = "ShowSelectedKrystalButton";
             this.ShowSelectedKrystalButton.Size = new System.Drawing.Size(183, 26);
             this.ShowSelectedKrystalButton.TabIndex = 0;
@@ -830,38 +829,38 @@ namespace Moritz.Composer
             this.KrystalsGroupBox.ForeColor = System.Drawing.Color.Brown;
             this.KrystalsGroupBox.Location = new System.Drawing.Point(490, 43);
             this.KrystalsGroupBox.Name = "KrystalsGroupBox";
-            this.KrystalsGroupBox.Size = new System.Drawing.Size(214, 329);
+            this.KrystalsGroupBox.Size = new System.Drawing.Size(214, 372);
             this.KrystalsGroupBox.TabIndex = 10;
             this.KrystalsGroupBox.TabStop = false;
             this.KrystalsGroupBox.Text = "krystals";
             // 
-            // ConfirmKrystalsButton
+            // ConfirmKrystalsListButton
             // 
-            this.ConfirmKrystalsButton.BackColor = System.Drawing.Color.Transparent;
-            this.ConfirmKrystalsButton.Enabled = false;
-            this.ConfirmKrystalsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.ConfirmKrystalsButton.ForeColor = System.Drawing.Color.Blue;
-            this.ConfirmKrystalsButton.Location = new System.Drawing.Point(506, 411);
-            this.ConfirmKrystalsButton.Name = "ConfirmKrystalsButton";
-            this.ConfirmKrystalsButton.Size = new System.Drawing.Size(183, 26);
-            this.ConfirmKrystalsButton.TabIndex = 2;
-            this.ConfirmKrystalsButton.Text = "confirm krystals";
-            this.ConfirmKrystalsButton.UseVisualStyleBackColor = false;
-            this.ConfirmKrystalsButton.Click += new System.EventHandler(this.ConfirmKrystalsButton_Click);
+            this.ConfirmKrystalsListButton.BackColor = System.Drawing.Color.Transparent;
+            this.ConfirmKrystalsListButton.Enabled = false;
+            this.ConfirmKrystalsListButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.ConfirmKrystalsListButton.ForeColor = System.Drawing.Color.Blue;
+            this.ConfirmKrystalsListButton.Location = new System.Drawing.Point(601, 419);
+            this.ConfirmKrystalsListButton.Name = "ConfirmKrystalsListButton";
+            this.ConfirmKrystalsListButton.Size = new System.Drawing.Size(103, 26);
+            this.ConfirmKrystalsListButton.TabIndex = 2;
+            this.ConfirmKrystalsListButton.Text = "confirm krystals";
+            this.ConfirmKrystalsListButton.UseVisualStyleBackColor = false;
+            this.ConfirmKrystalsListButton.Click += new System.EventHandler(this.ConfirmKrystalsButton_Click);
             // 
-            // RevertKrystalsButton
+            // RevertKrystalsListButton
             // 
-            this.RevertKrystalsButton.BackColor = System.Drawing.Color.Transparent;
-            this.RevertKrystalsButton.Enabled = false;
-            this.RevertKrystalsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.RevertKrystalsButton.ForeColor = System.Drawing.Color.Red;
-            this.RevertKrystalsButton.Location = new System.Drawing.Point(506, 379);
-            this.RevertKrystalsButton.Name = "RevertKrystalsButton";
-            this.RevertKrystalsButton.Size = new System.Drawing.Size(183, 26);
-            this.RevertKrystalsButton.TabIndex = 1;
-            this.RevertKrystalsButton.Text = "revert krystals";
-            this.RevertKrystalsButton.UseVisualStyleBackColor = false;
-            this.RevertKrystalsButton.Click += new System.EventHandler(this.RevertKrystalsToSavedButton_Click);
+            this.RevertKrystalsListButton.BackColor = System.Drawing.Color.Transparent;
+            this.RevertKrystalsListButton.Enabled = false;
+            this.RevertKrystalsListButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.RevertKrystalsListButton.ForeColor = System.Drawing.Color.Red;
+            this.RevertKrystalsListButton.Location = new System.Drawing.Point(490, 419);
+            this.RevertKrystalsListButton.Name = "RevertKrystalsListButton";
+            this.RevertKrystalsListButton.Size = new System.Drawing.Size(103, 26);
+            this.RevertKrystalsListButton.TabIndex = 1;
+            this.RevertKrystalsListButton.Text = "revert krystals";
+            this.RevertKrystalsListButton.UseVisualStyleBackColor = false;
+            this.RevertKrystalsListButton.Click += new System.EventHandler(this.RevertKrystalsToSavedButton_Click);
             // 
             // PalettesGroupBox
             // 
@@ -872,38 +871,24 @@ namespace Moritz.Composer
             this.PalettesGroupBox.ForeColor = System.Drawing.Color.Brown;
             this.PalettesGroupBox.Location = new System.Drawing.Point(713, 43);
             this.PalettesGroupBox.Name = "PalettesGroupBox";
-            this.PalettesGroupBox.Size = new System.Drawing.Size(214, 329);
+            this.PalettesGroupBox.Size = new System.Drawing.Size(214, 372);
             this.PalettesGroupBox.TabIndex = 11;
             this.PalettesGroupBox.TabStop = false;
             this.PalettesGroupBox.Text = "palettes";
             // 
-            // RevertPalettesButton
+            // RevertPalettesListButton
             // 
-            this.RevertPalettesButton.BackColor = System.Drawing.Color.Transparent;
-            this.RevertPalettesButton.Enabled = false;
-            this.RevertPalettesButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.RevertPalettesButton.ForeColor = System.Drawing.Color.Red;
-            this.RevertPalettesButton.Location = new System.Drawing.Point(729, 379);
-            this.RevertPalettesButton.Name = "RevertPalettesButton";
-            this.RevertPalettesButton.Size = new System.Drawing.Size(183, 26);
-            this.RevertPalettesButton.TabIndex = 2;
-            this.RevertPalettesButton.Text = "revert palettes";
-            this.RevertPalettesButton.UseVisualStyleBackColor = false;
-            this.RevertPalettesButton.Click += new System.EventHandler(this.RevertPalettesButton_Click);
-            // 
-            // ConfirmPalettesButton
-            // 
-            this.ConfirmPalettesButton.BackColor = System.Drawing.Color.Transparent;
-            this.ConfirmPalettesButton.Enabled = false;
-            this.ConfirmPalettesButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.ConfirmPalettesButton.ForeColor = System.Drawing.Color.Blue;
-            this.ConfirmPalettesButton.Location = new System.Drawing.Point(729, 411);
-            this.ConfirmPalettesButton.Name = "ConfirmPalettesButton";
-            this.ConfirmPalettesButton.Size = new System.Drawing.Size(183, 26);
-            this.ConfirmPalettesButton.TabIndex = 1;
-            this.ConfirmPalettesButton.Text = "confirm palettes";
-            this.ConfirmPalettesButton.UseVisualStyleBackColor = false;
-            this.ConfirmPalettesButton.Click += new System.EventHandler(this.ConfirmPalettesButton_Click);
+            this.RevertPalettesListButton.BackColor = System.Drawing.Color.Transparent;
+            this.RevertPalettesListButton.Enabled = false;
+            this.RevertPalettesListButton.Font = new System.Drawing.Font("Arial", 8F);
+            this.RevertPalettesListButton.ForeColor = System.Drawing.Color.Red;
+            this.RevertPalettesListButton.Location = new System.Drawing.Point(729, 419);
+            this.RevertPalettesListButton.Name = "RevertPalettesListButton";
+            this.RevertPalettesListButton.Size = new System.Drawing.Size(183, 26);
+            this.RevertPalettesListButton.TabIndex = 2;
+            this.RevertPalettesListButton.Text = "revert palettes";
+            this.RevertPalettesListButton.UseVisualStyleBackColor = false;
+            this.RevertPalettesListButton.Click += new System.EventHandler(this.RevertPalettesButton_Click);
             // 
             // RevertEverythingButton
             // 
@@ -911,7 +896,7 @@ namespace Moritz.Composer
             this.RevertEverythingButton.Enabled = false;
             this.RevertEverythingButton.Font = new System.Drawing.Font("Arial", 8F);
             this.RevertEverythingButton.ForeColor = System.Drawing.Color.Red;
-            this.RevertEverythingButton.Location = new System.Drawing.Point(490, 495);
+            this.RevertEverythingButton.Location = new System.Drawing.Point(490, 496);
             this.RevertEverythingButton.Name = "RevertEverythingButton";
             this.RevertEverythingButton.Size = new System.Drawing.Size(214, 31);
             this.RevertEverythingButton.TabIndex = 1;
@@ -925,20 +910,20 @@ namespace Moritz.Composer
             this.ShowUncheckedFormsButton.Enabled = false;
             this.ShowUncheckedFormsButton.Font = new System.Drawing.Font("Arial", 8F);
             this.ShowUncheckedFormsButton.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.ShowUncheckedFormsButton.Location = new System.Drawing.Point(490, 455);
+            this.ShowUncheckedFormsButton.Location = new System.Drawing.Point(490, 458);
             this.ShowUncheckedFormsButton.Name = "ShowUncheckedFormsButton";
             this.ShowUncheckedFormsButton.Size = new System.Drawing.Size(214, 31);
             this.ShowUncheckedFormsButton.TabIndex = 5;
             this.ShowUncheckedFormsButton.Text = "show unchecked forms";
             this.ShowUncheckedFormsButton.UseVisualStyleBackColor = false;
-            this.ShowUncheckedFormsButton.Click += new System.EventHandler(this.ShowUncheckedFormsButton_Click);
+            this.ShowUncheckedFormsButton.Click += new System.EventHandler(this.ShowUnconfirmedFormsButton_Click);
             // 
             // ShowConfirmedFormsButton
             // 
             this.ShowConfirmedFormsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
             this.ShowConfirmedFormsButton.Enabled = false;
             this.ShowConfirmedFormsButton.Font = new System.Drawing.Font("Arial", 8F);
-            this.ShowConfirmedFormsButton.Location = new System.Drawing.Point(713, 455);
+            this.ShowConfirmedFormsButton.Location = new System.Drawing.Point(713, 458);
             this.ShowConfirmedFormsButton.Name = "ShowConfirmedFormsButton";
             this.ShowConfirmedFormsButton.Size = new System.Drawing.Size(214, 31);
             this.ShowConfirmedFormsButton.TabIndex = 4;
@@ -953,10 +938,9 @@ namespace Moritz.Composer
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
             this.ClientSize = new System.Drawing.Size(945, 581);
             this.ControlBox = false;
-            this.Controls.Add(this.RevertPalettesButton);
-            this.Controls.Add(this.RevertKrystalsButton);
-            this.Controls.Add(this.ConfirmPalettesButton);
-            this.Controls.Add(this.ConfirmKrystalsButton);
+            this.Controls.Add(this.RevertPalettesListButton);
+            this.Controls.Add(this.RevertKrystalsListButton);
+            this.Controls.Add(this.ConfirmKrystalsListButton);
             this.Controls.Add(this.RevertNotationButton);
             this.Controls.Add(this.ConfirmNotationButton);
             this.Controls.Add(this.ShowConfirmedFormsButton);
@@ -1055,12 +1039,11 @@ namespace Moritz.Composer
         private System.Windows.Forms.Button RevertEverythingButton;
         private System.Windows.Forms.Button ShowUncheckedFormsButton;
         private System.Windows.Forms.Button ShowConfirmedFormsButton;
-        private System.Windows.Forms.Button ConfirmKrystalsButton;
-        private System.Windows.Forms.Button RevertKrystalsButton;
+        private System.Windows.Forms.Button ConfirmKrystalsListButton;
+        private System.Windows.Forms.Button RevertKrystalsListButton;
         private System.Windows.Forms.Button ConfirmNotationButton;
         private System.Windows.Forms.Button RevertNotationButton;
-        private System.Windows.Forms.Button ConfirmPalettesButton;
-        private System.Windows.Forms.Button RevertPalettesButton;
+        private System.Windows.Forms.Button RevertPalettesListButton;
 
     }
 }

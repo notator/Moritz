@@ -12,9 +12,9 @@ namespace Moritz.Palettes
 {
     public partial class OrnamentsForm : Form
     {
-        public OrnamentsForm(PaletteForm paletteForm, FormStateFunctions fsf)
+        public OrnamentsForm(PaletteForm paletteForm, FormStateFunctions fsf, ComposerFormCallbacks mainFormCallbacks)
         {
-            InitializeOrnamentSettingsForm(null, paletteForm, fsf);
+            InitializeOrnamentSettingsForm(null, paletteForm, fsf, mainFormCallbacks);
 
             _fsf.SetFormState(this, SavedState.unconfirmed);
             ConfirmButton.Enabled = false;
@@ -22,17 +22,20 @@ namespace Moritz.Palettes
             RevertToSavedButton.Hide();
         }
 
-        public OrnamentsForm(XmlReader r, PaletteForm paletteForm, FormStateFunctions fsf)
+        public OrnamentsForm(XmlReader r, PaletteForm paletteForm, FormStateFunctions fsf, ComposerFormCallbacks mainFormCallbacks)
         {
-            InitializeOrnamentSettingsForm(r, paletteForm, fsf);
+            _isLoading = true;
+            InitializeOrnamentSettingsForm(r, paletteForm, fsf, mainFormCallbacks);
             _fsf.SetSettingsAreSaved(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+            _isLoading = false;
         }
 
-        private void InitializeOrnamentSettingsForm(XmlReader r, PaletteForm paletteForm, FormStateFunctions fsf)
+        private void InitializeOrnamentSettingsForm(XmlReader r, PaletteForm paletteForm, FormStateFunctions fsf, ComposerFormCallbacks mainFormCallbacks)
         {
             InitializeComponent();
             _paletteForm = paletteForm;
             _fsf = fsf;
+            _callbacks = mainFormCallbacks;
             ConnectBasicChordControl();
 
             Text = paletteForm.SavedName + " : ornaments";
@@ -581,6 +584,8 @@ namespace Moritz.Palettes
         {
             M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
             _fsf.SetSettingsAreUnconfirmed(this, M.HasError(_allTextBoxes), ConfirmButton, RevertToSavedButton);
+            if(!_isLoading)
+                _callbacks.APaletteHasChanged();
         }
        #endregion
 
@@ -605,7 +610,8 @@ namespace Moritz.Palettes
         
         private void ConfirmButton_Click(object sender, EventArgs e)
         {
-            _fsf.SetSettingsAreConfirmed(this, M.HasError(_allTextBoxes), ConfirmButton); 
+            _fsf.SetSettingsAreConfirmed(this, M.HasError(_allTextBoxes), ConfirmButton);
+            _callbacks.APaletteHasChanged();
         }
 
         private void RevertToSavedButton_Click(object sender, EventArgs e)
@@ -647,6 +653,7 @@ namespace Moritz.Palettes
                     string msg = "Exception message:\n\n" + ex.Message;
                     MessageBox.Show(msg, "Error reading moritz krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+                _callbacks.APaletteHasChanged();
             }
         }
         #endregion buttons
@@ -752,6 +759,8 @@ namespace Moritz.Palettes
         private List<TextBox> _allTextBoxes;
         private List<List<int>> _ornaments = null;
         private FormStateFunctions _fsf;
+        private ComposerFormCallbacks _callbacks;
+        private bool _isLoading; // is true while the ornamentsForm is loading from a file, otherwise false
         #endregion private variables
     }
 }
