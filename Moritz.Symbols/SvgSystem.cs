@@ -214,9 +214,12 @@ namespace Moritz.Symbols
             }
             else
             {
-                string msg = "Could not remove all overlaps.\n\n" +
-                    "Either reduce the number of bars in the critical systems,\n" +
-                    "or set a smaller gap size for the score.";
+                string msg = 
+                    "There was not enough horizontal space for all the symbols in\n\n" +
+                    "                         system number " + systemNumber.ToString() + ".\n\n" +
+                    "Possible solutions:\n" +
+                    "    Reduce the number of bars in the system.\n" +
+                    "    Set a smaller gap size for the score.";
                 MessageBox.Show(msg, "Problem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
             return success;
