@@ -60,8 +60,7 @@ namespace Moritz.Symbols
                 systemSeparation = defaultSystemSeparation;
             }
             else
-            {
-                
+            {                
                 if(pageSystems.Count >= 1)
                 {
                     float totalSystemHeight = 0;

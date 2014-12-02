@@ -35,9 +35,12 @@ namespace Moritz.Symbols
             float maxLeftEdgeToAlignmentX = float.MinValue;
             foreach(NoteObject noteObject in _noteObjects)
             {
-                float leftEdgeToAlignmentX = AlignmentX - noteObject.Metrics.Left;
-                maxLeftEdgeToAlignmentX =
-                    maxLeftEdgeToAlignmentX > leftEdgeToAlignmentX ? maxLeftEdgeToAlignmentX : leftEdgeToAlignmentX; 
+                if(noteObject.Metrics != null) // is null if the noteobject is on an invisibleOutputStaff
+                {
+                    float leftEdgeToAlignmentX = AlignmentX - noteObject.Metrics.Left;
+                    maxLeftEdgeToAlignmentX =
+                        maxLeftEdgeToAlignmentX > leftEdgeToAlignmentX ? maxLeftEdgeToAlignmentX : leftEdgeToAlignmentX;
+                }
             }
             return maxLeftEdgeToAlignmentX;
         }
@@ -91,7 +94,8 @@ namespace Moritz.Symbols
             float deltaX = alignmentX - AlignmentX;
             foreach(NoteObject noteObject in _noteObjects)
             {
-                noteObject.Metrics.Move(deltaX, 0);
+                if(noteObject.Metrics != null)
+                    noteObject.Metrics.Move(deltaX, 0);
             }
             AlignmentX = alignmentX;
         }

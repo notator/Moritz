@@ -156,105 +156,20 @@ namespace Moritz.Composer
             {
                 Notator.ConvertVoiceDefsToNoteObjects(this.Systems);
 
-                success = ReferencedOutputVoicesAreBeingPrinted();
+                FinalizeSystemStructure(); // adds barlines, joins bars to create systems, etc.
+
+                /// The systems do not yet contain Metrics info.
+                /// The systems are given Metrics inside the following function then justified internally,
+                /// both horizontally and vertically.
+                success = Notator.CreateMetricsAndJustifySystems(this.Systems);
                 if(success)
                 {
-                    FinalizeSystemStructure(); // adds barlines, joins bars to create systems, etc.
-
-                    /// The systems do not yet contain Metrics info.
-                    /// The systems are given Metrics inside the following function then justified internally,
-                    /// both horizontally and vertically.
-                    success = Notator.CreateMetricsAndJustifySystems(this.Systems);
-                    if(success)
-                    {
-                        success = CreatePages();
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Score error:\n\nAll output voices that are referenced by an input voice must be printed.");
+                    success = CreatePages();
                 }
             }
             return success;
         }
-        #region ReferencedOutputVoicesAreBeingPrinted
 
-        private bool ReferencedOutputVoicesAreBeingPrinted()
-        {
-            bool rval = true;
-            List<byte> printedOutputVoiceIDs = PrintedOutputVoiceIDs();
-            List<byte> referencedOutputVoiceIDs = ReferencedOutputVoiceIDs();
-            foreach(byte outputVoiceID in referencedOutputVoiceIDs)
-            {
-                if(!printedOutputVoiceIDs.Contains(outputVoiceID))
-                {
-                    rval = false;
-                }
-            }
-            return rval;
-        }
-
-        private List<byte> PrintedOutputVoiceIDs()
-        {
-            List<byte> printedOutputVoiceIDs = new List<byte>();
-            foreach(SvgSystem system in this.Systems)
-            {
-                foreach(Staff staff in system.Staves)
-                {
-                    OutputStaff oStaff = staff as OutputStaff;
-                    if(oStaff != null)
-                    {
-                        foreach(Voice voice in oStaff.Voices)
-                        {
-                            OutputVoice oVoice = voice as OutputVoice;
-                            Debug.Assert(oVoice != null);
-                            if(oVoice.VoiceID != null && !printedOutputVoiceIDs.Contains((byte)oVoice.VoiceID))
-                            {
-                                printedOutputVoiceIDs.Add((byte)oVoice.VoiceID);
-                            }
-                        }
-                    }
-                }
-            }
-            return printedOutputVoiceIDs;
-        }
-
-        private List<byte> ReferencedOutputVoiceIDs()
-        {
-            List<byte> referencedOutputVoiceIDs = new List<byte>();
-            foreach(SvgSystem system in this.Systems)
-            {
-                foreach(Staff staff in system.Staves)
-                {
-                    InputStaff iStaff = staff as InputStaff;
-                    if(iStaff != null)
-                    {
-                        foreach(Voice voice in iStaff.Voices)
-                        {
-                            InputVoice iVoice = voice as InputVoice;
-                            Debug.Assert(iVoice != null);
-                            foreach(NoteObject noteObject in iVoice.NoteObjects)
-                            {
-                                InputChordSymbol ics = noteObject as InputChordSymbol;
-                                if(ics != null)
-                                {
-                                    List<byte> seqVoiceIDs = ics.InputChordDef.SeqVoiceIDs;
-                                    foreach(byte voiceID in seqVoiceIDs)
-                                    {  
-                                        if(!referencedOutputVoiceIDs.Contains(voiceID))
-                                        {
-                                            referencedOutputVoiceIDs.Add(voiceID);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return referencedOutputVoiceIDs;
-        }
-        #endregion CheckThatReferencedOutputVoicesAreBeingPrinted
         /// <summary>
         /// Creates one System per bar (=list of VoiceDefs) in the argument.
         /// The Systems are complete with staves and voices of the correct type:
@@ -280,19 +195,37 @@ namespace Moritz.Composer
 
         private void CreateEmptyOutputStaves(List<List<VoiceDef>> barDefsInOneSystem)
         {
-            int nPrintedOutputStaves = _pageFormat.OutputVoiceIndicesPerStaff.Count;
+            int nVisibleOutputStaves = _pageFormat.VisibleOutputVoiceIndicesPerStaff.Count;
+            List<byte> invisibleOutputVoiceIndices = InvisibleOutputVoiceIndices(_pageFormat.VisibleOutputVoiceIndicesPerStaff, barDefsInOneSystem[0]);
 
             for(int i = 0; i < Systems.Count; i++)
             {
                 SvgSystem system = Systems[i];
                 List<VoiceDef> barDef = barDefsInOneSystem[i];
 
-                for(int printedStaffIndex = 0; printedStaffIndex < nPrintedOutputStaves; printedStaffIndex++)
+                #region create invisible staves
+                foreach(byte invisibleOutputVoiceIndex in invisibleOutputVoiceIndices)
+                {
+                    byte? voiceID = null;
+                    if(_pageFormat.InputVoiceIndicesPerStaff.Count > 0)
+                    {
+                        voiceID = (byte?)invisibleOutputVoiceIndex;
+                    }
+                    OutputVoiceDef invisibleOutputVoiceDef = barDef[invisibleOutputVoiceIndex] as OutputVoiceDef;
+                    InvisibleOutputStaff invisibleOutputStaff = new InvisibleOutputStaff(system);
+                    OutputVoice outputVoice = new OutputVoice(invisibleOutputStaff, invisibleOutputVoiceDef.MidiChannel, voiceID, invisibleOutputVoiceDef.MasterVolume);
+                    outputVoice.VoiceDef = invisibleOutputVoiceDef;
+                    invisibleOutputStaff.Voices.Add(outputVoice);
+                    system.Staves.Add(invisibleOutputStaff);
+                }
+                #endregion create invisible staves
+
+                for(int printedStaffIndex = 0; printedStaffIndex < nVisibleOutputStaves; printedStaffIndex++)
                 {
                     string staffname = StaffName(i, printedStaffIndex);
                     OutputStaff outputStaff = new OutputStaff(system, staffname, _pageFormat.StafflinesPerStaff[printedStaffIndex], _pageFormat.Gap, _pageFormat.StafflineStemStrokeWidth);
 
-                    List<byte> outputVoiceIndices = _pageFormat.OutputVoiceIndicesPerStaff[printedStaffIndex];
+                    List<byte> outputVoiceIndices = _pageFormat.VisibleOutputVoiceIndicesPerStaff[printedStaffIndex];
                     for(int ovIndex = 0; ovIndex < outputVoiceIndices.Count; ++ovIndex)
                     {
                         byte? voiceID = null;
@@ -313,9 +246,31 @@ namespace Moritz.Composer
             }
         }
 
+        private List<byte> InvisibleOutputVoiceIndices(List<List<byte>> visibleOutputVoiceIndicesPerStaff, List<VoiceDef> voiceDefs)
+        {
+            List<byte> visibleOutputVoiceIndices = new List<byte>();
+            foreach(List<byte> voiceIndices in visibleOutputVoiceIndicesPerStaff)
+            {
+                visibleOutputVoiceIndices.AddRange(voiceIndices);
+            }
+            List<byte> invisibleOutputVoiceIndices = new List<byte>();
+            for(byte voiceIndex = 0; voiceIndex < voiceDefs.Count; ++voiceIndex)
+            {
+                if(voiceDefs[voiceIndex] is OutputVoiceDef)
+                {
+                    if(!visibleOutputVoiceIndices.Contains(voiceIndex))
+                    {
+                        invisibleOutputVoiceIndices.Add(voiceIndex);
+                    }
+                }
+                else break;
+            }
+            return invisibleOutputVoiceIndices;
+        }
+
         private void CreateEmptyInputStaves(List<List<VoiceDef>> barDefsInOneSystem)
         {
-            int nPrintedOutputStaves = _pageFormat.OutputVoiceIndicesPerStaff.Count;
+            int nPrintedOutputStaves = _pageFormat.VisibleOutputVoiceIndicesPerStaff.Count;
             int nPrintedInputStaves = _pageFormat.InputVoiceIndicesPerStaff.Count;
             int nStaffNames = _pageFormat.ShortStaffNames.Count;
 

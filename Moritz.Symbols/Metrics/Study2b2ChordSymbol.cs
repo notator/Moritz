@@ -82,7 +82,7 @@ namespace Moritz.Symbols
         /// The Study2b2ChordMetrics have been set in SvgSystem.Justify()
         /// </summary>
         /// <param name="w">The SvgWriter</param>
-        public override void WriteSVG(SvgWriter w)
+        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
         {
             string idNumber = SvgScore.UniqueID_Number;
             w.SvgStartGroup("study2b2ChordSymbol", null);
@@ -91,7 +91,7 @@ namespace Moritz.Symbols
 
             _midiChordDef.WriteSvg(w);
 
-            if(this.Metrics != null)
+            if(this.Metrics != null && staffIsVisible)
                 this.Metrics.WriteSVG(w);
 
             w.SvgEndGroup();

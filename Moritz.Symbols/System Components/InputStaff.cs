@@ -19,7 +19,7 @@ namespace Moritz.Symbols
         {
             w.SvgStartGroup("inputStaff", "p" + pageNumber.ToString() + "_sys" + systemNumber.ToString() + "_staff" + staffNumber.ToString());
 
-            base.WriteSVG(w);
+            base.WriteSVG(w, true);
 
             w.SvgEndGroup(); // InputStaff
         }

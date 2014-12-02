@@ -89,7 +89,7 @@ namespace Moritz.Symbols
         /// The view box pixel distance between systems when they are not vertically justified.
         /// </summary>
         public float DefaultDistanceBetweenSystems;
-        public List<List<byte>> OutputVoiceIndicesPerStaff = null;
+        public List<List<byte>> VisibleOutputVoiceIndicesPerStaff = null;
         public List<List<byte>> InputVoiceIndicesPerStaff = null;        
         public List<string> ClefsList = null;
         public List<int> StafflinesPerStaff = null;

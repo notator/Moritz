@@ -18,11 +18,11 @@ namespace Moritz.Symbols
         /// <summary>
         /// Writes out the noteObjects, and possibly the performanceOptions for an InputVoice.
         /// </summary>
-        public override void WriteSVG(SvgWriter w)
+        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
         {
             w.SvgStartGroup("inputVoice", null);
 
-            base.WriteSVG(w);
+            base.WriteSVG(w, true); // input voices are always visible
 
             w.SvgEndGroup(); // inputVoice
         }

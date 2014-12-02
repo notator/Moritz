@@ -47,6 +47,7 @@ namespace Moritz.Symbols
             for(int systemIndex = 0; systemIndex < systems.Count; ++systemIndex)
             {
                 SvgSystem system = systems[systemIndex];
+                int visibleStaffIndex = 0;
                 for(int staffIndex = 0; staffIndex < system.Staves.Count; ++staffIndex)
                 {
                     Staff staff = system.Staves[staffIndex];
@@ -54,10 +55,14 @@ namespace Moritz.Symbols
                     voice1ClefChangeDefs.Clear();
                     for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                     {
-                        Debug.Assert(_pageFormat.ClefsList[staffIndex] != null);
                         Voice voice = staff.Voices[voiceIndex];
                         float musicFontHeight = (voice is OutputVoice) ? _pageFormat.MusicFontHeight : _pageFormat.MusicFontHeight * _pageFormat.InputStavesSizeFactor;
-                        voice.NoteObjects.Add(new ClefSymbol(voice, _pageFormat.ClefsList[staffIndex], musicFontHeight));
+                        if(!(staff is InvisibleOutputStaff))
+                        {
+                            Debug.Assert(_pageFormat.ClefsList[visibleStaffIndex] != null);
+                            voice.NoteObjects.Add(new ClefSymbol(voice, _pageFormat.ClefsList[visibleStaffIndex], musicFontHeight));
+                            visibleStaffIndex++;
+                        }
                         bool firstLmdd = true;
 
                         foreach(IUniqueDef iud in voice.VoiceDef.UniqueDefs)

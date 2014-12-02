@@ -201,7 +201,7 @@ namespace Moritz.Symbols
 
 
         /// <summary>
-        /// Adds the staff name to the first barline of each staff in the score.
+        /// Adds the staff name to the first barline of each visible staff in the score.
         /// </summary>
         private void SetStaffNames()
         {
@@ -210,25 +210,27 @@ namespace Moritz.Symbols
                 for(int staffIndex = 0; staffIndex < system.Staves.Count; staffIndex++)
                 {
                     Staff staff = system.Staves[staffIndex];
-                    foreach(NoteObject noteObject in staff.Voices[0].NoteObjects)
+                    if(!(staff is InvisibleOutputStaff))
                     {
-                        Barline firstBarline = noteObject as Barline;        
-                        if(firstBarline != null)
-                        {                             
-
-                            float fontHeight = _pageFormat.StaffNameFontHeight;
-
-                            if(staff is InputStaff)
-
+                        foreach(NoteObject noteObject in staff.Voices[0].NoteObjects)
+                        {
+                            Barline firstBarline = noteObject as Barline;
+                            if(firstBarline != null)
                             {
 
-                                fontHeight *= _pageFormat.InputStavesSizeFactor;
+                                float fontHeight = _pageFormat.StaffNameFontHeight;
 
+                                if(staff is InputStaff)
+                                {
+
+                                    fontHeight *= _pageFormat.InputStavesSizeFactor;
+
+                                }
+                                TextInfo textInfo = new TextInfo(staff.Staffname, "Times New Roman", fontHeight, TextHorizAlign.center);
+                                Text staffNameText = new Text(firstBarline, textInfo);
+                                firstBarline.DrawObjects.Add(staffNameText);
+                                break;
                             }
-                            TextInfo textInfo = new TextInfo(staff.Staffname, "Times New Roman", fontHeight, TextHorizAlign.center);
-                            Text staffNameText = new Text(firstBarline, textInfo);
-                            firstBarline.DrawObjects.Add(staffNameText);
-                            break;
                         }
                     }
                 }
@@ -243,62 +245,68 @@ namespace Moritz.Symbols
         {
             foreach(SvgSystem system in Systems)
             {
-                foreach(Voice voice in system.Voices)
+                foreach(Staff staff in system.Staves)
                 {
-                    Debug.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline);
-                    // contains lists of consecutive rest indices
-                    List<List<int>> restsToReplace = new List<List<int>>();
-                    #region find the consecutive rests
-                    List<int> consecRestIndices = new List<int>();
-                    for(int i = 0; i < voice.NoteObjects.Count - 1; i++)
+                    if(!(staff is InvisibleOutputStaff))
                     {
-                        Debug.Assert(!(voice.NoteObjects[i] is Barline));
+                        foreach(Voice voice in staff.Voices)
+                        {
+                            Debug.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline);
+                            // contains lists of consecutive rest indices
+                            List<List<int>> restsToReplace = new List<List<int>>();
+                            #region find the consecutive rests
+                            List<int> consecRestIndices = new List<int>();
+                            for(int i = 0; i < voice.NoteObjects.Count - 1; i++)
+                            {
+                                Debug.Assert(!(voice.NoteObjects[i] is Barline));
 
-                        RestSymbol rest1 = voice.NoteObjects[i] as RestSymbol;
-                        RestSymbol rest2 = voice.NoteObjects[i + 1] as RestSymbol;
-                        if(rest1 != null && rest2 != null)
-                        {
-                            if(!consecRestIndices.Contains(i))
-                            {
-                                consecRestIndices.Add(i);
+                                RestSymbol rest1 = voice.NoteObjects[i] as RestSymbol;
+                                RestSymbol rest2 = voice.NoteObjects[i + 1] as RestSymbol;
+                                if(rest1 != null && rest2 != null)
+                                {
+                                    if(!consecRestIndices.Contains(i))
+                                    {
+                                        consecRestIndices.Add(i);
+                                    }
+                                    consecRestIndices.Add(i + 1);
+                                }
+                                else
+                                {
+                                    if(consecRestIndices != null && consecRestIndices.Count > 0)
+                                    {
+                                        restsToReplace.Add(consecRestIndices);
+                                        consecRestIndices = new List<int>();
+                                    }
+                                }
                             }
-                            consecRestIndices.Add(i + 1);
-                        }
-                        else
-                        {
-                            if(consecRestIndices != null && consecRestIndices.Count > 0)
+                            #endregion
+                            #region replace the consecutive rests
+                            if(restsToReplace.Count > 0)
                             {
-                                restsToReplace.Add(consecRestIndices);
-                                consecRestIndices = new List<int>();
+                                for(int i = restsToReplace.Count - 1; i >= 0; i--)
+                                {
+                                    List<int> indToReplace = restsToReplace[i];
+                                    int msDuration = 0;
+                                    int msPos = 0;
+                                    float fontSize = 0F;
+                                    for(int j = indToReplace.Count - 1; j >= 0; j--)
+                                    {
+                                        RestSymbol rest = voice.NoteObjects[indToReplace[j]] as RestSymbol;
+                                        Debug.Assert(rest != null);
+                                        msDuration += rest.MsDuration;
+                                        msPos = rest.MsPosition;
+                                        fontSize = rest.FontHeight;
+                                        voice.NoteObjects.RemoveAt(indToReplace[j]);
+                                    }
+                                    RestDef umrd = new RestDef(msPos, msDuration);
+                                    RestSymbol newRest = new RestSymbol(voice, umrd, minimumCrotchetDuration, _pageFormat.MusicFontHeight);
+                                    newRest.MsPosition = msPos;
+                                    voice.NoteObjects.Insert(indToReplace[0], newRest);
+                                }
                             }
+                            #endregion
                         }
                     }
-                    #endregion
-                    #region replace the consecutive rests
-                    if(restsToReplace.Count > 0)
-                    {
-                        for(int i = restsToReplace.Count - 1; i >= 0; i--)
-                        {
-                            List<int> indToReplace = restsToReplace[i];
-                            int msDuration = 0;
-                            int msPos = 0;
-                            float fontSize = 0F;
-                            for(int j = indToReplace.Count - 1; j >= 0; j--)
-                            {
-                                RestSymbol rest = voice.NoteObjects[indToReplace[j]] as RestSymbol;
-                                Debug.Assert(rest != null);
-                                msDuration += rest.MsDuration;
-                                msPos = rest.MsPosition;
-                                fontSize = rest.FontHeight;
-                                voice.NoteObjects.RemoveAt(indToReplace[j]);
-                            }
-                            RestDef umrd = new RestDef(msPos, msDuration);
-                            RestSymbol newRest = new RestSymbol(voice, umrd, minimumCrotchetDuration, _pageFormat.MusicFontHeight);
-                            newRest.MsPosition = msPos;
-                            voice.NoteObjects.Insert(indToReplace[0], newRest);
-                        }
-                    }
-                    #endregion
                 }
             }
         }
@@ -395,18 +403,24 @@ namespace Moritz.Symbols
 
             for(int staffIndex = 0; staffIndex < system2.Staves.Count; staffIndex++)
             {
-                // If a staff has two voices, both contain the same clefTypes (some clefs may be invisible).
-                string clefTypeAtEndOfStaff1 = FindClefTypeAtEndOfStaff1(system1.Staves[staffIndex].Voices[0]);
+                bool visibleStaff = !(system1.Staves[staffIndex] is InvisibleOutputStaff);
+                string clefTypeAtEndOfStaff1 = null;
+                if(visibleStaff)
+                {
+                    // If a staff has two voices, both contain the same clefTypes (some clefs may be invisible).
+                    clefTypeAtEndOfStaff1 = FindClefTypeAtEndOfStaff1(system1.Staves[staffIndex].Voices[0]);
+                }
 
                 for(int voiceIndex = 0; voiceIndex < system2.Staves[staffIndex].Voices.Count; voiceIndex++)
                 {
                     Voice voice1 = system1.Staves[staffIndex].Voices[voiceIndex];
                     Voice voice2 = system2.Staves[staffIndex].Voices[voiceIndex];
-                    ClefSymbol voice2FirstClef = voice2.NoteObjects[0] as ClefSymbol;
-
-                    Debug.Assert(voice2FirstClef != null && clefTypeAtEndOfStaff1 == voice2FirstClef.ClefType);
-
-                    voice2.NoteObjects.Remove(voice2FirstClef);
+                    if(visibleStaff)
+                    {
+                        ClefSymbol voice2FirstClef = voice2.NoteObjects[0] as ClefSymbol;
+                        Debug.Assert(voice2FirstClef != null && clefTypeAtEndOfStaff1 == voice2FirstClef.ClefType);
+                        voice2.NoteObjects.Remove(voice2FirstClef);
+                    }
 
                     try
                     {
@@ -500,18 +514,22 @@ namespace Moritz.Symbols
             {
                 foreach(Staff staff in Systems[systemIndex].Staves)
                 {
-                    foreach(Voice voice in staff.Voices)
+                    if(!(staff is InvisibleOutputStaff))
                     {
-                        Debug.Assert(voice.NoteObjects.Count > 0
-                            && !(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline));
+                        foreach(Voice voice in staff.Voices)
+                        {
 
-                        Barline barline = new Barline(voice);
-                        if(systemIndex == Systems.Count - 1)
-                            barline.BarlineType = BarlineType.end;
-                        else
-                            barline.BarlineType = BarlineType.single;
+                            Debug.Assert(voice.NoteObjects.Count > 0
+                                && !(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline));
 
-                        voice.NoteObjects.Add(barline);
+                            Barline barline = new Barline(voice);
+                            if(systemIndex == Systems.Count - 1)
+                                barline.BarlineType = BarlineType.end;
+                            else
+                                barline.BarlineType = BarlineType.single;
+
+                            voice.NoteObjects.Add(barline);
+                        }
                     }
                 }
             }
@@ -591,9 +609,15 @@ namespace Moritz.Symbols
         {
             foreach(SvgSystem system in Systems)
             {
-                foreach(Voice voice in system.Voices)
+                foreach(Staff staff in system.Staves)
                 {
-                    MoveRestClefChangesToEndOfVoice(voice);
+                    if(!(staff is InvisibleOutputStaff))
+                    {
+                        foreach(Voice voice in staff.Voices)
+                        {
+                            MoveRestClefChangesToEndOfVoice(voice);
+                        }
+                    }
                 }
             }
         }
@@ -670,19 +694,19 @@ namespace Moritz.Symbols
             float systemHeightsTotal = 0;
             while(systemIndex < Systems.Count)
             {
-                if(Systems[systemIndex].Metrics != null)
+                Debug.Assert(Systems[systemIndex].Metrics != null);
+                Debug.Assert(Systems[systemIndex].Metrics.StafflinesTop == 0);
+
+                systemHeight = Systems[systemIndex].Metrics.NotesBottom - Systems[systemIndex].Metrics.NotesTop;
+
+                systemHeightsTotal += systemHeight;
+                if(systemHeightsTotal > frameHeight)
                 {
-                    systemHeight = Systems[systemIndex].Metrics.NotesBottom - Systems[systemIndex].Metrics.NotesTop;
-
-                    systemHeightsTotal += systemHeight;
-                    if(systemHeightsTotal > frameHeight)
-                    {
-                        lastPage = false;
-                        break;
-                    }
-
-                    systemHeightsTotal += _pageFormat.DefaultDistanceBetweenSystems;
+                    lastPage = false;
+                    break;
                 }
+
+                systemHeightsTotal += _pageFormat.DefaultDistanceBetweenSystems;
 
                 systemsOnPage.Add(Systems[systemIndex]);
 
@@ -736,30 +760,33 @@ namespace Moritz.Symbols
         {
             for(int staffIndex = 0; staffIndex < Systems[0].Staves.Count; staffIndex++)
             {
-                NoteObjectMoment previousStaffMoment = null;
-                foreach(SvgSystem system in Systems)
+                if(!(Systems[0].Staves[staffIndex] is InvisibleOutputStaff))
                 {
-                    Staff staff = system.Staves[staffIndex];
+                    NoteObjectMoment previousStaffMoment = null;
+                    foreach(SvgSystem system in Systems)
                     {
-                        previousStaffMoment = staff.FinalizeAccidentals(previousStaffMoment);
+                        Staff staff = system.Staves[staffIndex];
+                        {
+                            previousStaffMoment = staff.FinalizeAccidentals(previousStaffMoment);
+                        }
                     }
                 }
             }
         }
 
         /// <summary>
-        /// Adds a bar number to the first Barline in the top voice of each system except the first.
+        /// Adds a bar number to the first Barline in the top visible voice of each system except the first.
         /// </summary>
         private void AddBarNumbers()
         {
             int barNumber = 1;
             foreach(SvgSystem system in Systems)
             {
-                Voice voice = system.Staves[0].Voices[0];
+                Voice topVisibleVoice = system.TopVisibleVoice();
                 bool isFirstBarline = true;
-                for(int i = 0; i < voice.NoteObjects.Count - 1; i++)
+                for(int i = 0; i < topVisibleVoice.NoteObjects.Count - 1; i++)
                 {
-                    Barline barline = voice.NoteObjects[i] as Barline;
+                    Barline barline = topVisibleVoice.NoteObjects[i] as Barline;
                     if(barline != null)
                     {
                         if(isFirstBarline && system != Systems[0])
@@ -792,15 +819,18 @@ namespace Moritz.Symbols
             {
                 foreach(Staff staff in system.Staves)
                 {
-                    foreach(Voice voice in staff.Voices)
+                    if(!(staff is InvisibleOutputStaff))
                     {
-                        if(voice.NoteObjects[0] is ClefSymbol)
+                        foreach(Voice voice in staff.Voices)
                         {
-                            voice.NoteObjects.Insert(1, new Barline(voice));
-                        }
-                        else
-                        {
-                            voice.NoteObjects.Insert(0, new Barline(voice));
+                            if(voice.NoteObjects[0] is ClefSymbol)
+                            {
+                                voice.NoteObjects.Insert(1, new Barline(voice));
+                            }
+                            else
+                            {
+                                voice.NoteObjects.Insert(0, new Barline(voice));
+                            }
                         }
                     }
                 }

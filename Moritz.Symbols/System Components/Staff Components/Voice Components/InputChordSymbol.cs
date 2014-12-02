@@ -27,7 +27,7 @@ namespace Moritz.Symbols
             }
         }
 
-        public override void WriteSVG(SvgWriter w)
+        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
         {
             if(ChordMetrics.BeamBlock != null)
                 ChordMetrics.BeamBlock.WriteSVG(w);

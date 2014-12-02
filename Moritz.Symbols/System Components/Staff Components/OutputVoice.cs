@@ -19,7 +19,7 @@ namespace Moritz.Symbols
             _masterVolume = masterVolume;
         }
 
-        public override void WriteSVG(SvgWriter w)
+        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
         {
             w.SvgStartGroup("outputVoice", null);
 
@@ -33,7 +33,7 @@ namespace Moritz.Symbols
                 w.WriteAttributeString("score", "masterVolume", null, MasterVolume.ToString());
             }
 
-            base.WriteSVG(w);
+            base.WriteSVG(w, staffIsVisible);
             w.SvgEndGroup(); // outputVoice
         }
 

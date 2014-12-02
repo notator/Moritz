@@ -20,7 +20,7 @@ namespace Moritz.Symbols
             LocalCautionaryChordDef = iumdd as CautionaryChordDef;
         }
 
-        public override void WriteSVG(SvgWriter w)
+        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
         {
             if(LocalCautionaryChordDef == null)
             {
@@ -29,7 +29,7 @@ namespace Moritz.Symbols
                 Debug.Assert(_msDuration > 0);
                 w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
 
-                if(this.Metrics != null)
+                if(this.Metrics != null && staffIsVisible)
                     this.Metrics.WriteSVG(w);
 
                 w.SvgEndGroup();

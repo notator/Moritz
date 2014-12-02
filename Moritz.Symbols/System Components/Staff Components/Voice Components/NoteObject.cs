@@ -19,7 +19,7 @@ namespace Moritz.Symbols
         /// Writes objects to the SVG file (in front of the stafflines).
         /// The CharacterMetrics have been set by calling CreateMetrics() in SvgSystem.Justify()
         /// </summary>
-        public abstract void WriteSVG(SvgWriter w);
+        public abstract void WriteSVG(SvgWriter w, bool staffIsVisible);
 
         /// <summary>
         /// Contains the the object's absolute origin, boundary box and alignment positions (view box pixel units).

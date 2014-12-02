@@ -31,18 +31,21 @@ namespace Moritz.Symbols
             }
         }
 
-        public override void WriteSVG(SvgWriter w)
+        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
         {
-            if(ChordMetrics.BeamBlock != null)
+            if(staffIsVisible && ChordMetrics.BeamBlock != null)
                 ChordMetrics.BeamBlock.WriteSVG(w);
 
             w.SvgStartGroup("outputChord", null);
             
             _midiChordDef.WriteSvg(w);
 
-            w.SvgStartGroup("graphics", null);
-            ChordMetrics.WriteSVG(w);
-            w.SvgEndGroup();
+            if(staffIsVisible)
+            {
+                w.SvgStartGroup("graphics", null);
+                ChordMetrics.WriteSVG(w);
+                w.SvgEndGroup();
+            }
 
             w.SvgEndGroup();
         }

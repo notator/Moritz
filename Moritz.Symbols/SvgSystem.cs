@@ -52,12 +52,13 @@ namespace Moritz.Symbols
         private void WriteBarlines(SvgWriter w, float barlineStrokeWidth, float stafflineStrokeWidth, float gap, float pageRight)
         {
             List<bool> barlineIsInsideStaffGroup = this.Score.Notator.BarlineContinuesDownList;
-            Debug.Assert(barlineIsInsideStaffGroup.Count == Staves.Count);
-            Debug.Assert(barlineIsInsideStaffGroup[Staves.Count - 1] == false);
+            int topVisibleStaffIndex = TopVisibleStaffIndex();
+            Debug.Assert(barlineIsInsideStaffGroup.Count == Staves.Count - topVisibleStaffIndex);
+            Debug.Assert(barlineIsInsideStaffGroup[barlineIsInsideStaffGroup.Count - 1] == false);
             Barline barline = null;
             bool isFirstBarline = true;
 
-            for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
+            for(int staffIndex = topVisibleStaffIndex; staffIndex < Staves.Count; staffIndex++)
             {
                 Staff staff = Staves[staffIndex];
                 Voice voice = staff.Voices[0];
@@ -113,7 +114,7 @@ namespace Moritz.Symbols
                         if(barline != null)
                         {
                             // draw grouping barlines between staves
-                            if(barlineIsInsideStaffGroup[staffIndex] || isFirstBarline)
+                            if(barlineIsInsideStaffGroup[staffIndex - topVisibleStaffIndex] || isFirstBarline)
                             {
                                 float top = bottomEdge.YatX(barline.Metrics.OriginX);
                                 float bottom = topEdge.YatX(barline.Metrics.OriginX);
@@ -125,6 +126,20 @@ namespace Moritz.Symbols
                 }
                 #endregion
             }
+        }
+
+        private int TopVisibleStaffIndex()
+        {
+            int rval = 0;
+            for(int i = 0; i < Staves.Count; ++i)
+            {
+                if(!(Staves[i] is InvisibleOutputStaff))
+                {
+                    rval = i;
+                    break;
+                }
+            }
+            return rval;
         }
 
         /// <summary>
@@ -230,9 +245,12 @@ namespace Moritz.Symbols
             
             this.Metrics = new SystemMetrics();
             List<NoteObject> NoteObjectsToRemove = new List<NoteObject>();
-            for(int staffIndex = 0; staffIndex < Staves.Count; ++staffIndex)
+            int topVisibleStaffIndex = TopVisibleStaffIndex();
+            for(int staffIndex = topVisibleStaffIndex; staffIndex < Staves.Count; ++staffIndex)
             {
                 Staff staff = Staves[staffIndex];
+                Debug.Assert(!(staff is InvisibleOutputStaff));
+
                 float staffHeight = staff.Gap * (staff.NumberOfStafflines - 1);
                 staff.Metrics = new StaffMetrics(leftMarginPos, pageFormat.RightMarginPos, staffHeight);
 
@@ -265,7 +283,7 @@ namespace Moritz.Symbols
                     staff.AdjustTwoPartChords();
                 }
 
-                staff.Metrics.Move(0f, pageFormat.DefaultDistanceBetweenStaves * staffIndex);
+                staff.Metrics.Move(0f, pageFormat.DefaultDistanceBetweenStaves * (staffIndex - topVisibleStaffIndex));
                 this.Metrics.Add(staff.Metrics);
             }
             return (this.Metrics.Bottom - this.Metrics.Top);
@@ -308,17 +326,20 @@ namespace Moritz.Symbols
             {
                 foreach(Staff staff in this.Staves)
                 {
-                    moments = GetVoiceMoments(staff.Voices[0], systemMoments);
-                    if(moments.Count > 1)
-                        overlaps = GetOverlaps(moments, hairline);
-                    if(overlaps.Count == 0)
-                        continue;
+                    if(!(staff is InvisibleOutputStaff))
+                    {
+                        moments = GetVoiceMoments(staff.Voices[0], systemMoments);
+                        if(moments.Count > 1)
+                            overlaps = GetOverlaps(moments, hairline);
+                        if(overlaps.Count == 0)
+                            continue;
 
-                    success = RedistributeMoments(systemMoments, barlineWidths, nonCompressibleSystemMomentPositions,
-                        moments, overlaps);
-                    // success is false if there was not enough horizontal space available to remove the overlaps.
-                    if(!success)
-                        break;
+                        success = RedistributeMoments(systemMoments, barlineWidths, nonCompressibleSystemMomentPositions,
+                            moments, overlaps);
+                        // success is false if there was not enough horizontal space available to remove the overlaps.
+                        if(!success)
+                            break;
+                    }
                 }
 
             } while(overlaps.Count > 0 && success);
@@ -491,53 +512,56 @@ namespace Moritz.Symbols
             SortedDictionary<int, NoteObjectMoment> dict = new SortedDictionary<int, NoteObjectMoment>();
             Barline barline = null;
             ClefSymbol clef = null;
-            foreach(Voice voice in this.Voices)
+            foreach(Staff staff in Staves)
             {
-                #region foreach noteObject
-                foreach(NoteObject noteObject in voice.NoteObjects)
+                foreach(Voice voice in staff.Voices)
                 {
-                    if(noteObject is ClefSymbol)
-                        clef = noteObject as ClefSymbol;
-                    if(noteObject is Barline)
-                        barline = noteObject as Barline;
-                    DurationSymbol durationSymbol = noteObject as DurationSymbol;
-                    if(durationSymbol != null)
+                    #region foreach noteObject
+                    foreach(NoteObject noteObject in voice.NoteObjects)
                     {
-                        if(!dict.ContainsKey(durationSymbol.MsPosition))
+                        if(noteObject is ClefSymbol)
+                            clef = noteObject as ClefSymbol;
+                        if(noteObject is Barline)
+                            barline = noteObject as Barline;
+                        DurationSymbol durationSymbol = noteObject as DurationSymbol;
+                        if(durationSymbol != null)
                         {
-                            dict.Add(durationSymbol.MsPosition, new NoteObjectMoment(durationSymbol));
-                        }
-                        else
-                        {
-                            dict[durationSymbol.MsPosition].Add(durationSymbol);
-                        }
-                        if(clef != null)
-                        {
-                            dict[durationSymbol.MsPosition].Add(clef);
-                            clef = null;
-                        }
-                        if(barline != null)
-                        {
-                            dict[durationSymbol.MsPosition].Add(barline);
-                            barline = null;
+                            if(!dict.ContainsKey(durationSymbol.MsPosition))
+                            {
+                                dict.Add(durationSymbol.MsPosition, new NoteObjectMoment(durationSymbol));
+                            }
+                            else
+                            {
+                                dict[durationSymbol.MsPosition].Add(durationSymbol);
+                            }
+                            if(clef != null)
+                            {
+                                dict[durationSymbol.MsPosition].Add(clef);
+                                clef = null;
+                            }
+                            if(barline != null)
+                            {
+                                dict[durationSymbol.MsPosition].Add(barline);
+                                barline = null;
+                            }
                         }
                     }
-                }
-                #endregion
+                    #endregion
 
-                if(clef != null) // final clef
-                {
-                    if(dict.ContainsKey(finalBarlineMsPosition))
-                        dict[finalBarlineMsPosition].Add(clef);
-                    else
-                        dict.Add(finalBarlineMsPosition, new NoteObjectMoment(clef, finalBarlineMsPosition));
-                }
-                if(barline != null) // final barline
-                {
-                    if(dict.ContainsKey(finalBarlineMsPosition))
-                        dict[finalBarlineMsPosition].Add(barline);
-                    else
-                        dict.Add(finalBarlineMsPosition, new NoteObjectMoment(barline, finalBarlineMsPosition));
+                    if(clef != null) // final clef
+                    {
+                        if(dict.ContainsKey(finalBarlineMsPosition))
+                            dict[finalBarlineMsPosition].Add(clef);
+                        else
+                            dict.Add(finalBarlineMsPosition, new NoteObjectMoment(clef, finalBarlineMsPosition));
+                    }
+                    if(barline != null) // final barline
+                    {
+                        if(dict.ContainsKey(finalBarlineMsPosition))
+                            dict[finalBarlineMsPosition].Add(barline);
+                        else
+                            dict.Add(finalBarlineMsPosition, new NoteObjectMoment(barline, finalBarlineMsPosition));
+                    }
                 }
             }
 
@@ -619,40 +643,45 @@ namespace Moritz.Symbols
             ClefSymbol clef = null;
             Barline barline = null;
 
-            foreach(Voice voice in Voices)
+            foreach(Staff staff in Staves)
             {
-                foreach(NoteObject noteObject in voice.NoteObjects)
+                if(!(staff is InvisibleOutputStaff))
                 {
-                    if(noteObject is ClefSymbol)
-                        clef = noteObject as ClefSymbol;
-                    if(noteObject is Barline)
-                        barline = noteObject as Barline;
-                    DurationSymbol durationSymbol = noteObject as DurationSymbol;
-
-                    if(durationSymbol != null)
+                    foreach(Voice voice in staff.Voices)
                     {
-                        if(barline != null)
+                        foreach(NoteObject noteObject in voice.NoteObjects)
                         {
-                            barline.Metrics.Move(durationSymbol.Metrics.Left - barline.Metrics.Right - hairline, 0F);
+                            if(noteObject is ClefSymbol)
+                                clef = noteObject as ClefSymbol;
+                            if(noteObject is Barline)
+                                barline = noteObject as Barline;
+                            DurationSymbol durationSymbol = noteObject as DurationSymbol;
 
-                            if(clef != null)
+                            if(durationSymbol != null)
+                            {
+                                if(barline != null)
+                                {
+                                    barline.Metrics.Move(durationSymbol.Metrics.Left - barline.Metrics.Right - hairline, 0F);
+
+                                    if(clef != null)
+                                    {
+                                        clef.Metrics.Move(barline.Metrics.OriginX - clef.Metrics.Right - hairline, 0F); // clefs have a space on the right
+                                    }
+                                }
+                                else if(clef != null)
+                                {
+                                    clef.Metrics.Move(durationSymbol.Metrics.Left - clef.Metrics.Right - hairline, 0F);
+                                }
+                                clef = null;
+                                barline = null;
+                                durationSymbol = null;
+                            }
+                            else if(barline != null && clef != null)
                             {
                                 clef.Metrics.Move(barline.Metrics.OriginX - clef.Metrics.Right - hairline, 0F); // clefs have a space on the right
                             }
                         }
-                        else if(clef != null)
-                        {
-                            clef.Metrics.Move(durationSymbol.Metrics.Left - clef.Metrics.Right - hairline, 0F);
-                        }
-                        clef = null;
-                        barline = null;
-                        durationSymbol = null;
                     }
-                    else if(barline != null && clef != null)
-                    {
-                        clef.Metrics.Move(barline.Metrics.OriginX - clef.Metrics.Right - hairline, 0F); // clefs have a space on the right
-                    }
-
                 }
             }
         }
@@ -972,11 +1001,11 @@ namespace Moritz.Symbols
         /// </summary>
         private void AdjustBarnumberVertically(float gap)
         {
-            Staff staff = Staves[0];
+            Voice topVisibleVoice = TopVisibleVoice();
             Barline barline = null;
             DurationSymbol firstDSInVoice0 = null;
             DurationSymbol secondDSInVoice0 = null;
-            foreach(NoteObject noteObject in staff.Voices[0].NoteObjects)
+            foreach(NoteObject noteObject in topVisibleVoice.NoteObjects)
             {
                 if(barline == null)
                     barline = noteObject as Barline;
@@ -991,9 +1020,10 @@ namespace Moritz.Symbols
 
             DurationSymbol firstDSInVoice1 = null;
             DurationSymbol secondDSInVoice1 = null;
-            if(staff.Voices.Count == 2)
+            Staff topVisibleStaff = topVisibleVoice.Staff;
+            if(topVisibleStaff.Voices.Count == 2)
             {
-                foreach(NoteObject noteObject in staff.Voices[1].NoteObjects)
+                foreach(NoteObject noteObject in topVisibleStaff.Voices[1].NoteObjects)
                 {
                     if(firstDSInVoice1 == null)
                         firstDSInVoice1 = noteObject as DurationSymbol;
@@ -1015,7 +1045,7 @@ namespace Moritz.Symbols
                 if(firstDSInVoice0 is RestSymbol && secondDSInVoice0 != null)
                     RemoveCollision(barnumberMetrics, secondDSInVoice0, gap);
 
-                if(staff.Voices.Count == 2)
+                if(topVisibleStaff.Voices.Count == 2)
                 {
                     RemoveCollision(barnumberMetrics, firstDSInVoice1, gap);
                     if(firstDSInVoice1 is RestSymbol && secondDSInVoice1 != null)
@@ -1103,7 +1133,10 @@ namespace Moritz.Symbols
         private void ResetStaffMetricsBoundaries()
         {
             foreach(Staff staff in Staves)
-                staff.Metrics.ResetBoundary();
+            {
+                if(!(staff is InvisibleOutputStaff))
+                    staff.Metrics.ResetBoundary();
+            }
         }
 
         private void SetBarlineVisibility()
@@ -1111,15 +1144,18 @@ namespace Moritz.Symbols
             // set the visibility of all but the last barline
             foreach(Staff staff in Staves)
             {
-                Voice voice = staff.Voices[0];
-                List<NoteObject> noteObjects = voice.NoteObjects;
-                for(int i = 0; i < noteObjects.Count; ++i)
+                if(!(staff is InvisibleOutputStaff))
                 {
-                    if(noteObjects[i] is CautionaryChordSymbol)
+                    Voice voice = staff.Voices[0];
+                    List<NoteObject> noteObjects = voice.NoteObjects;
+                    for(int i = 0; i < noteObjects.Count; ++i)
                     {
-                        Barline barline = noteObjects[i - 1] as Barline;
-                        Debug.Assert(barline != null);
-                        barline.Visible = false;
+                        if(noteObjects[i] is CautionaryChordSymbol)
+                        {
+                            Barline barline = noteObjects[i - 1] as Barline;
+                            Debug.Assert(barline != null);
+                            barline.Visible = false;
+                        }
                     }
                 }
             }
@@ -1138,18 +1174,24 @@ namespace Moritz.Symbols
             {
                 for(int staffIndex = 0; staffIndex < Staves.Count; ++staffIndex)
                 {
-                    List<NoteObject> noteObjects = Staves[staffIndex].Voices[0].NoteObjects;
-                    Barline barline = noteObjects[noteObjects.Count - 1] as Barline;
-                    if(barline != null && nextSystem.Staves[staffIndex].Voices[0].FirstDurationSymbol is CautionaryChordSymbol)
+                    if(!(Staves[staffIndex] is InvisibleOutputStaff))
                     {
-                        barline.Visible = false;
+                        List<NoteObject> noteObjects = Staves[staffIndex].Voices[0].NoteObjects;
+                        Barline barline = noteObjects[noteObjects.Count - 1] as Barline;
+                        if(barline != null && nextSystem.Staves[staffIndex].Voices[0].FirstDurationSymbol is CautionaryChordSymbol)
+                        {
+                            barline.Visible = false;
+                        }
                     }
                 }
             }
         }
         private void JustifyVertically(float pageWidth, float gap)
         {
-            for(int i = 1; i < Staves.Count; ++i)
+            int topVisibleStaffIndex = TopVisibleStaffIndex();
+            Debug.Assert((topVisibleStaffIndex + 1) < Staves.Count); // There must be at least one visible staff (an InputStaff).
+            Debug.Assert(Staves[topVisibleStaffIndex].Metrics.StafflinesTop == 0);
+            for(int i = (topVisibleStaffIndex + 1); i < Staves.Count; ++i)
             {
                 BottomEdge bottomEdge = new BottomEdge(Staves[i - 1], 0F, pageWidth, gap);
                 TopEdge topEdge = new TopEdge(Staves[i], 0F, pageWidth);
@@ -1170,23 +1212,27 @@ namespace Moritz.Symbols
             this.Metrics = new SystemMetrics();
             foreach(Staff staff in Staves)
             {
-                this.Metrics.Add(staff.Metrics);
+                if(!(staff is InvisibleOutputStaff))
+                    this.Metrics.Add(staff.Metrics);
             }
+            Debug.Assert(this.Metrics.StafflinesTop == 0);
         }
 
-        #endregion
-
-        #region Enumerators
-        public IEnumerable Voices
+        internal Voice TopVisibleVoice()
         {
-            get
+            Voice rval = null;
+            for(int i = 0; i < Staves.Count; ++i)
             {
-                foreach(Staff staff in this.Staves)
-                    foreach(Voice voice in staff.Voices)
-                        yield return voice;
+                Staff staff = Staves[i];
+                if(!(staff is InvisibleOutputStaff))
+                {
+                    rval = staff.Voices[0];
+                    break;
+                }
             }
+            return rval;
         }
-        #endregion Enumerators
+        #endregion
 
         public List<Staff> Staves = new List<Staff>();
         internal SystemMetrics Metrics = null;

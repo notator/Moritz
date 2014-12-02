@@ -29,17 +29,17 @@ namespace Moritz.Symbols
         /// Writes out an SVG Voice
         /// </summary>
         /// <param name="w"></param>
-        public virtual void WriteSVG(SvgWriter w)
+        public virtual void WriteSVG(SvgWriter w, bool staffIsVisible)
         {
             foreach(NoteObject noteObject in NoteObjects)
             {
                 ChordSymbol chordSymbol = noteObject as ChordSymbol;
                 if(chordSymbol != null)
                 {
-                    chordSymbol.WriteSVG(w);
+                    chordSymbol.WriteSVG(w, staffIsVisible);
                 }
                 else
-                    noteObject.WriteSVG(w);
+                    noteObject.WriteSVG(w, staffIsVisible);
             }
         }
 
