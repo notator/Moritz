@@ -1189,24 +1189,26 @@ namespace Moritz.Symbols
         private void JustifyVertically(float pageWidth, float gap)
         {
             int topVisibleStaffIndex = TopVisibleStaffIndex();
-            Debug.Assert((topVisibleStaffIndex + 1) < Staves.Count); // There must be at least one visible staff (an InputStaff).
             Debug.Assert(Staves[topVisibleStaffIndex].Metrics.StafflinesTop == 0);
-            for(int i = (topVisibleStaffIndex + 1); i < Staves.Count; ++i)
+            if((topVisibleStaffIndex + 1) < Staves.Count)// There must be at least one visible staff (an InputStaff).
             {
-                BottomEdge bottomEdge = new BottomEdge(Staves[i - 1], 0F, pageWidth, gap);
-                TopEdge topEdge = new TopEdge(Staves[i], 0F, pageWidth);
-                float separation = topEdge.DistanceToEdgeAbove(bottomEdge);
-                float dy = gap - separation;
-                // limit stafflineHeight to multiples of pageFormat.Gap so that stafflines
-                // are not displayed as thick grey lines.
-                dy = dy - (dy % gap) + gap; // the minimum space bewteen stafflines is gap pixels.
-                if(dy > 0F)
+                for(int i = (topVisibleStaffIndex + 1); i < Staves.Count; ++i)
                 {
-                    for(int j = i; j < Staves.Count; ++j)
+                    BottomEdge bottomEdge = new BottomEdge(Staves[i - 1], 0F, pageWidth, gap);
+                    TopEdge topEdge = new TopEdge(Staves[i], 0F, pageWidth);
+                    float separation = topEdge.DistanceToEdgeAbove(bottomEdge);
+                    float dy = gap - separation;
+                    // limit stafflineHeight to multiples of pageFormat.Gap so that stafflines
+                    // are not displayed as thick grey lines.
+                    dy = dy - (dy % gap) + gap; // the minimum space bewteen stafflines is gap pixels.
+                    if(dy > 0F)
                     {
-                        Staves[j].Metrics.Move(0F, dy);
+                        for(int j = i; j < Staves.Count; ++j)
+                        {
+                            Staves[j].Metrics.Move(0F, dy);
+                        }
+                        this.Metrics.StafflinesBottom += dy;
                     }
-                    this.Metrics.StafflinesBottom += dy;
                 }
             }
             this.Metrics = new SystemMetrics();

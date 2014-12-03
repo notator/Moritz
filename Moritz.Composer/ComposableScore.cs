@@ -151,7 +151,7 @@ namespace Moritz.Composer
             bool success = true;
             List<List<VoiceDef>> barDefsInOneSystem = _algorithm.DoAlgorithm(krystals, palettes);
             CheckBars(barDefsInOneSystem);
-            CreateEmptySystems(barDefsInOneSystem); // one system per bar
+            CreateEmptySystems(barDefsInOneSystem, _pageFormat.VisibleInputVoiceIndicesPerStaff.Count); // one system per bar
             if(_pageFormat.ChordSymbolType != "none") // set by AudioButtonsControl
             {
                 Notator.ConvertVoiceDefsToNoteObjects(this.Systems);
@@ -181,7 +181,7 @@ namespace Moritz.Composer
         /// The InputVoices are arranged according to _pageFormat.InputVoiceIndicesPerStaff.
         /// OutputVoices are given a midi channel allocated from top to bottom in the printed score.
         /// </summary>
-        public void CreateEmptySystems(List<List<VoiceDef>> barDefsInOneSystem)
+        public void CreateEmptySystems(List<List<VoiceDef>> barDefsInOneSystem, int numberOfVisibleInputStaves)
         {
             foreach(List<VoiceDef> barVoiceDefs in barDefsInOneSystem)
             {
@@ -189,14 +189,16 @@ namespace Moritz.Composer
                 this.Systems.Add(system);
             }
 
-            CreateEmptyOutputStaves(barDefsInOneSystem);
+            CreateEmptyOutputStaves(barDefsInOneSystem, numberOfVisibleInputStaves);
             CreateEmptyInputStaves(barDefsInOneSystem);
         }
 
-        private void CreateEmptyOutputStaves(List<List<VoiceDef>> barDefsInOneSystem)
+        private void CreateEmptyOutputStaves(List<List<VoiceDef>> barDefsInOneSystem, int numberOfVisibleInputStaves)
         {
             int nVisibleOutputStaves = _pageFormat.VisibleOutputVoiceIndicesPerStaff.Count;
-            List<byte> invisibleOutputVoiceIndices = InvisibleOutputVoiceIndices(_pageFormat.VisibleOutputVoiceIndicesPerStaff, barDefsInOneSystem[0]);
+            List<byte> invisibleOutputVoiceIndices = new List<byte>();
+            if(numberOfVisibleInputStaves > 0 )
+                invisibleOutputVoiceIndices = InvisibleOutputVoiceIndices(_pageFormat.VisibleOutputVoiceIndicesPerStaff, barDefsInOneSystem[0]);
 
             for(int i = 0; i < Systems.Count; i++)
             {
@@ -204,19 +206,22 @@ namespace Moritz.Composer
                 List<VoiceDef> barDef = barDefsInOneSystem[i];
 
                 #region create invisible staves
-                foreach(byte invisibleOutputVoiceIndex in invisibleOutputVoiceIndices)
+                if(invisibleOutputVoiceIndices.Count > 0)
                 {
-                    byte? voiceID = null;
-                    if(_pageFormat.InputVoiceIndicesPerStaff.Count > 0)
+                    foreach(byte invisibleOutputVoiceIndex in invisibleOutputVoiceIndices)
                     {
-                        voiceID = (byte?)invisibleOutputVoiceIndex;
+                        byte? voiceID = null;
+                        if(_pageFormat.VisibleInputVoiceIndicesPerStaff.Count > 0)
+                        {
+                            voiceID = (byte?)invisibleOutputVoiceIndex;
+                        }
+                        OutputVoiceDef invisibleOutputVoiceDef = barDef[invisibleOutputVoiceIndex] as OutputVoiceDef;
+                        InvisibleOutputStaff invisibleOutputStaff = new InvisibleOutputStaff(system);
+                        OutputVoice outputVoice = new OutputVoice(invisibleOutputStaff, invisibleOutputVoiceDef.MidiChannel, voiceID, invisibleOutputVoiceDef.MasterVolume);
+                        outputVoice.VoiceDef = invisibleOutputVoiceDef;
+                        invisibleOutputStaff.Voices.Add(outputVoice);
+                        system.Staves.Add(invisibleOutputStaff);
                     }
-                    OutputVoiceDef invisibleOutputVoiceDef = barDef[invisibleOutputVoiceIndex] as OutputVoiceDef;
-                    InvisibleOutputStaff invisibleOutputStaff = new InvisibleOutputStaff(system);
-                    OutputVoice outputVoice = new OutputVoice(invisibleOutputStaff, invisibleOutputVoiceDef.MidiChannel, voiceID, invisibleOutputVoiceDef.MasterVolume);
-                    outputVoice.VoiceDef = invisibleOutputVoiceDef;
-                    invisibleOutputStaff.Voices.Add(outputVoice);
-                    system.Staves.Add(invisibleOutputStaff);
                 }
                 #endregion create invisible staves
 
@@ -229,7 +234,7 @@ namespace Moritz.Composer
                     for(int ovIndex = 0; ovIndex < outputVoiceIndices.Count; ++ovIndex)
                     {
                         byte? voiceID = null;
-                        if(_pageFormat.InputVoiceIndicesPerStaff.Count > 0)
+                        if(_pageFormat.VisibleInputVoiceIndicesPerStaff.Count > 0)
                         {
                             voiceID = (byte?)outputVoiceIndices[ovIndex];
                         }
@@ -271,7 +276,7 @@ namespace Moritz.Composer
         private void CreateEmptyInputStaves(List<List<VoiceDef>> barDefsInOneSystem)
         {
             int nPrintedOutputStaves = _pageFormat.VisibleOutputVoiceIndicesPerStaff.Count;
-            int nPrintedInputStaves = _pageFormat.InputVoiceIndicesPerStaff.Count;
+            int nPrintedInputStaves = _pageFormat.VisibleInputVoiceIndicesPerStaff.Count;
             int nStaffNames = _pageFormat.ShortStaffNames.Count;
 
             for(int i = 0; i < Systems.Count; i++)
@@ -288,7 +293,7 @@ namespace Moritz.Composer
                     float stafflineStemStrokeWidth = _pageFormat.StafflineStemStrokeWidth * _pageFormat.InputStavesSizeFactor;
                     InputStaff inputStaff = new InputStaff(system, staffname, _pageFormat.StafflinesPerStaff[staffIndex], gap, stafflineStemStrokeWidth);
 
-                    List<byte> inputVoiceIndices = _pageFormat.InputVoiceIndicesPerStaff[staffIndex];
+                    List<byte> inputVoiceIndices = _pageFormat.VisibleInputVoiceIndicesPerStaff[staffIndex];
                     for(int ivIndex = 0; ivIndex < inputVoiceIndices.Count; ++ivIndex)
                     {
                         InputVoiceDef inputVoiceDef = barDef[inputVoiceIndices[ivIndex] + _algorithm.MidiChannelIndexPerOutputVoice.Count] as InputVoiceDef;

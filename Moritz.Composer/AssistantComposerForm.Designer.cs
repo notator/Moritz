@@ -42,10 +42,6 @@ namespace Moritz.Composer
             this.KrystalsListBox = new System.Windows.Forms.ListBox();
             this.RemoveSelectedKrystalButton = new System.Windows.Forms.Button();
             this.NotationGroupBox = new System.Windows.Forms.GroupBox();
-            this.InputVoiceIndicesPerStaffHelpLabel2 = new System.Windows.Forms.Label();
-            this.InputVoiceIndicesPerStaffHelpLabel = new System.Windows.Forms.Label();
-            this.InputVoiceIndicesPerStaffLabel = new System.Windows.Forms.Label();
-            this.InputVoiceIndicesPerStaffTextBox = new System.Windows.Forms.TextBox();
             this.ChordTypeComboBoxLabel = new System.Windows.Forms.Label();
             this.ChordTypeComboBox = new System.Windows.Forms.ComboBox();
             this.ShortStaffNamesHelpLabel = new System.Windows.Forms.Label();
@@ -54,17 +50,17 @@ namespace Moritz.Composer
             this.MinimumCrotchetDurationTextBox = new System.Windows.Forms.TextBox();
             this.MinimumCrotchetDurationLabel = new System.Windows.Forms.Label();
             this.LongStaffNamesHelpLabel = new System.Windows.Forms.Label();
-            this.VisibleOutputVoiceIndicesPerStaffHelpLabel2 = new System.Windows.Forms.Label();
+            this.VoiceIndicesPerStaffHelpLabel = new System.Windows.Forms.Label();
             this.ShortStaffNamesLabel = new System.Windows.Forms.Label();
             this.LongStaffNamesTextBox = new System.Windows.Forms.TextBox();
-            this.VisibleOutputVoiceIndicesPerStaffHelpLabel = new System.Windows.Forms.Label();
+            this.VoiceIndicesHelpLabel = new System.Windows.Forms.Label();
             this.SystemStartBarsHelpLabel = new System.Windows.Forms.Label();
             this.ShortStaffNamesTextBox = new System.Windows.Forms.TextBox();
             this.StafflinesPerStaffHelpLabel = new System.Windows.Forms.Label();
-            this.VisibleOutputVoiceIndicesPerStaffLabel = new System.Windows.Forms.Label();
+            this.VoiceIndicesPerStaffLabel = new System.Windows.Forms.Label();
             this.StafflinesPerStaffLabel = new System.Windows.Forms.Label();
             this.LongStaffNamesLabel = new System.Windows.Forms.Label();
-            this.VisibleOutputVoiceIndicesStaffTextBox = new System.Windows.Forms.TextBox();
+            this.VoiceIndicesPerStaffTextBox = new System.Windows.Forms.TextBox();
             this.ClefsPerStaffLabel = new System.Windows.Forms.Label();
             this.ClefsPerStaffHelpLabel = new System.Windows.Forms.Label();
             this.StaffGroupsHelpLabel = new System.Windows.Forms.Label();
@@ -100,6 +96,7 @@ namespace Moritz.Composer
             this.RevertEverythingButton = new System.Windows.Forms.Button();
             this.ShowUncheckedFormsButton = new System.Windows.Forms.Button();
             this.ShowConfirmedFormsButton = new System.Windows.Forms.Button();
+            this.VoiceIndicesHelpLabelLabel = new System.Windows.Forms.Label();
             this.NotationGroupBox.SuspendLayout();
             this.StandardChordsOptionsPanel.SuspendLayout();
             this.KrystalsGroupBox.SuspendLayout();
@@ -214,26 +211,23 @@ namespace Moritz.Composer
             // 
             // NotationGroupBox
             // 
-            this.NotationGroupBox.Controls.Add(this.InputVoiceIndicesPerStaffHelpLabel2);
-            this.NotationGroupBox.Controls.Add(this.InputVoiceIndicesPerStaffHelpLabel);
-            this.NotationGroupBox.Controls.Add(this.InputVoiceIndicesPerStaffLabel);
-            this.NotationGroupBox.Controls.Add(this.InputVoiceIndicesPerStaffTextBox);
+            this.NotationGroupBox.Controls.Add(this.VoiceIndicesHelpLabelLabel);
             this.NotationGroupBox.Controls.Add(this.ChordTypeComboBoxLabel);
             this.NotationGroupBox.Controls.Add(this.ChordTypeComboBox);
             this.NotationGroupBox.Controls.Add(this.ShortStaffNamesHelpLabel);
             this.NotationGroupBox.Controls.Add(this.StandardChordsOptionsPanel);
             this.NotationGroupBox.Controls.Add(this.LongStaffNamesHelpLabel);
-            this.NotationGroupBox.Controls.Add(this.VisibleOutputVoiceIndicesPerStaffHelpLabel2);
+            this.NotationGroupBox.Controls.Add(this.VoiceIndicesPerStaffHelpLabel);
             this.NotationGroupBox.Controls.Add(this.ShortStaffNamesLabel);
             this.NotationGroupBox.Controls.Add(this.LongStaffNamesTextBox);
-            this.NotationGroupBox.Controls.Add(this.VisibleOutputVoiceIndicesPerStaffHelpLabel);
+            this.NotationGroupBox.Controls.Add(this.VoiceIndicesHelpLabel);
             this.NotationGroupBox.Controls.Add(this.SystemStartBarsHelpLabel);
             this.NotationGroupBox.Controls.Add(this.ShortStaffNamesTextBox);
             this.NotationGroupBox.Controls.Add(this.StafflinesPerStaffHelpLabel);
-            this.NotationGroupBox.Controls.Add(this.VisibleOutputVoiceIndicesPerStaffLabel);
+            this.NotationGroupBox.Controls.Add(this.VoiceIndicesPerStaffLabel);
             this.NotationGroupBox.Controls.Add(this.StafflinesPerStaffLabel);
             this.NotationGroupBox.Controls.Add(this.LongStaffNamesLabel);
-            this.NotationGroupBox.Controls.Add(this.VisibleOutputVoiceIndicesStaffTextBox);
+            this.NotationGroupBox.Controls.Add(this.VoiceIndicesPerStaffTextBox);
             this.NotationGroupBox.Controls.Add(this.ClefsPerStaffLabel);
             this.NotationGroupBox.Controls.Add(this.ClefsPerStaffHelpLabel);
             this.NotationGroupBox.Controls.Add(this.StaffGroupsHelpLabel);
@@ -260,48 +254,6 @@ namespace Moritz.Composer
             this.NotationGroupBox.TabStop = false;
             this.NotationGroupBox.Text = "notation";
             // 
-            // InputVoiceIndicesPerStaffHelpLabel2
-            // 
-            this.InputVoiceIndicesPerStaffHelpLabel2.AutoSize = true;
-            this.InputVoiceIndicesPerStaffHelpLabel2.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.InputVoiceIndicesPerStaffHelpLabel2.Location = new System.Drawing.Point(250, 200);
-            this.InputVoiceIndicesPerStaffHelpLabel2.Name = "InputVoiceIndicesPerStaffHelpLabel2";
-            this.InputVoiceIndicesPerStaffHelpLabel2.Size = new System.Drawing.Size(141, 14);
-            this.InputVoiceIndicesPerStaffHelpLabel2.TabIndex = 190;
-            this.InputVoiceIndicesPerStaffHelpLabel2.Text = "(right click this text for help)";
-            this.InputVoiceIndicesPerStaffHelpLabel2.MouseClick += new System.Windows.Forms.MouseEventHandler(this.VoiceIndicesPerStaffHelp_MouseClick);
-            // 
-            // InputVoiceIndicesPerStaffHelpLabel
-            // 
-            this.InputVoiceIndicesPerStaffHelpLabel.AutoSize = true;
-            this.InputVoiceIndicesPerStaffHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.InputVoiceIndicesPerStaffHelpLabel.Location = new System.Drawing.Point(109, 180);
-            this.InputVoiceIndicesPerStaffHelpLabel.Name = "InputVoiceIndicesPerStaffHelpLabel";
-            this.InputVoiceIndicesPerStaffHelpLabel.Size = new System.Drawing.Size(104, 14);
-            this.InputVoiceIndicesPerStaffHelpLabel.TabIndex = 189;
-            this.InputVoiceIndicesPerStaffHelpLabel.Text = "input voices: x y z...";
-            // 
-            // InputVoiceIndicesPerStaffLabel
-            // 
-            this.InputVoiceIndicesPerStaffLabel.AutoSize = true;
-            this.InputVoiceIndicesPerStaffLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.InputVoiceIndicesPerStaffLabel.Location = new System.Drawing.Point(12, 193);
-            this.InputVoiceIndicesPerStaffLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.InputVoiceIndicesPerStaffLabel.Name = "InputVoiceIndicesPerStaffLabel";
-            this.InputVoiceIndicesPerStaffLabel.Size = new System.Drawing.Size(97, 28);
-            this.InputVoiceIndicesPerStaffLabel.TabIndex = 188;
-            this.InputVoiceIndicesPerStaffLabel.Text = "input voices\r\nper voice per staff";
-            this.InputVoiceIndicesPerStaffLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // InputVoiceIndicesPerStaffTextBox
-            // 
-            this.InputVoiceIndicesPerStaffTextBox.Location = new System.Drawing.Point(111, 197);
-            this.InputVoiceIndicesPerStaffTextBox.Name = "InputVoiceIndicesPerStaffTextBox";
-            this.InputVoiceIndicesPerStaffTextBox.Size = new System.Drawing.Size(136, 20);
-            this.InputVoiceIndicesPerStaffTextBox.TabIndex = 10;
-            this.InputVoiceIndicesPerStaffTextBox.TextChanged += new System.EventHandler(this.InputVoiceIndicesPerStaffTextBox_TextChanged);
-            this.InputVoiceIndicesPerStaffTextBox.Leave += new System.EventHandler(this.InputVoiceIndicesPerStaffTextBox_Leave);
-            // 
             // ChordTypeComboBoxLabel
             // 
             this.ChordTypeComboBoxLabel.AutoSize = true;
@@ -327,7 +279,7 @@ namespace Moritz.Composer
             // 
             this.ShortStaffNamesHelpLabel.AutoSize = true;
             this.ShortStaffNamesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.ShortStaffNamesHelpLabel.Location = new System.Drawing.Point(100, 389);
+            this.ShortStaffNamesHelpLabel.Location = new System.Drawing.Point(100, 387);
             this.ShortStaffNamesHelpLabel.Name = "ShortStaffNamesHelpLabel";
             this.ShortStaffNamesHelpLabel.Size = new System.Drawing.Size(125, 14);
             this.ShortStaffNamesHelpLabel.TabIndex = 176;
@@ -381,28 +333,28 @@ namespace Moritz.Composer
             // 
             this.LongStaffNamesHelpLabel.AutoSize = true;
             this.LongStaffNamesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.LongStaffNamesHelpLabel.Location = new System.Drawing.Point(97, 347);
+            this.LongStaffNamesHelpLabel.Location = new System.Drawing.Point(97, 344);
             this.LongStaffNamesHelpLabel.Name = "LongStaffNamesHelpLabel";
             this.LongStaffNamesHelpLabel.Size = new System.Drawing.Size(125, 14);
             this.LongStaffNamesHelpLabel.TabIndex = 174;
             this.LongStaffNamesHelpLabel.Text = "(x names, one per staff)";
             // 
-            // VisibleOutputVoiceIndicesPerStaffHelpLabel2
+            // VoiceIndicesPerStaffHelpLabel
             // 
-            this.VisibleOutputVoiceIndicesPerStaffHelpLabel2.AutoSize = true;
-            this.VisibleOutputVoiceIndicesPerStaffHelpLabel2.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.VisibleOutputVoiceIndicesPerStaffHelpLabel2.Location = new System.Drawing.Point(250, 157);
-            this.VisibleOutputVoiceIndicesPerStaffHelpLabel2.Name = "VisibleOutputVoiceIndicesPerStaffHelpLabel2";
-            this.VisibleOutputVoiceIndicesPerStaffHelpLabel2.Size = new System.Drawing.Size(141, 14);
-            this.VisibleOutputVoiceIndicesPerStaffHelpLabel2.TabIndex = 183;
-            this.VisibleOutputVoiceIndicesPerStaffHelpLabel2.Text = "(right click this text for help)";
-            this.VisibleOutputVoiceIndicesPerStaffHelpLabel2.MouseClick += new System.Windows.Forms.MouseEventHandler(this.VoiceIndicesPerStaffHelp_MouseClick);
+            this.VoiceIndicesPerStaffHelpLabel.AutoSize = true;
+            this.VoiceIndicesPerStaffHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.VoiceIndicesPerStaffHelpLabel.Location = new System.Drawing.Point(250, 180);
+            this.VoiceIndicesPerStaffHelpLabel.Name = "VoiceIndicesPerStaffHelpLabel";
+            this.VoiceIndicesPerStaffHelpLabel.Size = new System.Drawing.Size(141, 14);
+            this.VoiceIndicesPerStaffHelpLabel.TabIndex = 183;
+            this.VoiceIndicesPerStaffHelpLabel.Text = "(right click this text for help)";
+            this.VoiceIndicesPerStaffHelpLabel.MouseClick += new System.Windows.Forms.MouseEventHandler(this.VoiceIndicesPerStaffHelp_MouseClick);
             // 
             // ShortStaffNamesLabel
             // 
             this.ShortStaffNamesLabel.AutoSize = true;
             this.ShortStaffNamesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.ShortStaffNamesLabel.Location = new System.Drawing.Point(10, 389);
+            this.ShortStaffNamesLabel.Location = new System.Drawing.Point(10, 387);
             this.ShortStaffNamesLabel.Margin = new System.Windows.Forms.Padding(0);
             this.ShortStaffNamesLabel.Name = "ShortStaffNamesLabel";
             this.ShortStaffNamesLabel.Size = new System.Drawing.Size(93, 14);
@@ -411,22 +363,22 @@ namespace Moritz.Composer
             // 
             // LongStaffNamesTextBox
             // 
-            this.LongStaffNamesTextBox.Location = new System.Drawing.Point(10, 364);
+            this.LongStaffNamesTextBox.Location = new System.Drawing.Point(10, 361);
             this.LongStaffNamesTextBox.Name = "LongStaffNamesTextBox";
             this.LongStaffNamesTextBox.Size = new System.Drawing.Size(440, 20);
             this.LongStaffNamesTextBox.TabIndex = 14;
             this.LongStaffNamesTextBox.TextChanged += new System.EventHandler(this.LongStaffNamesTextBox_TextChanged);
             this.LongStaffNamesTextBox.Leave += new System.EventHandler(this.LongStaffNamesTextBox_Leave);
             // 
-            // VisibleOutputVoiceIndicesPerStaffHelpLabel
+            // VoiceIndicesHelpLabel
             // 
-            this.VisibleOutputVoiceIndicesPerStaffHelpLabel.AutoSize = true;
-            this.VisibleOutputVoiceIndicesPerStaffHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.VisibleOutputVoiceIndicesPerStaffHelpLabel.Location = new System.Drawing.Point(109, 137);
-            this.VisibleOutputVoiceIndicesPerStaffHelpLabel.Name = "VisibleOutputVoiceIndicesPerStaffHelpLabel";
-            this.VisibleOutputVoiceIndicesPerStaffHelpLabel.Size = new System.Drawing.Size(93, 14);
-            this.VisibleOutputVoiceIndicesPerStaffHelpLabel.TabIndex = 182;
-            this.VisibleOutputVoiceIndicesPerStaffHelpLabel.Text = "channels:  x y z...";
+            this.VoiceIndicesHelpLabel.AutoSize = true;
+            this.VoiceIndicesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
+            this.VoiceIndicesHelpLabel.Location = new System.Drawing.Point(111, 160);
+            this.VoiceIndicesHelpLabel.Name = "VoiceIndicesHelpLabel";
+            this.VoiceIndicesHelpLabel.Size = new System.Drawing.Size(45, 14);
+            this.VoiceIndicesHelpLabel.TabIndex = 182;
+            this.VoiceIndicesHelpLabel.Text = "0 1 2 | 0";
             // 
             // SystemStartBarsHelpLabel
             // 
@@ -440,7 +392,7 @@ namespace Moritz.Composer
             // 
             // ShortStaffNamesTextBox
             // 
-            this.ShortStaffNamesTextBox.Location = new System.Drawing.Point(10, 405);
+            this.ShortStaffNamesTextBox.Location = new System.Drawing.Point(10, 403);
             this.ShortStaffNamesTextBox.Name = "ShortStaffNamesTextBox";
             this.ShortStaffNamesTextBox.Size = new System.Drawing.Size(440, 20);
             this.ShortStaffNamesTextBox.TabIndex = 15;
@@ -451,29 +403,29 @@ namespace Moritz.Composer
             // 
             this.StafflinesPerStaffHelpLabel.AutoSize = true;
             this.StafflinesPerStaffHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.StafflinesPerStaffHelpLabel.Location = new System.Drawing.Point(250, 267);
+            this.StafflinesPerStaffHelpLabel.Location = new System.Drawing.Point(250, 255);
             this.StafflinesPerStaffHelpLabel.Name = "StafflinesPerStaffHelpLabel";
             this.StafflinesPerStaffHelpLabel.Size = new System.Drawing.Size(194, 28);
             this.StafflinesPerStaffHelpLabel.TabIndex = 178;
             this.StafflinesPerStaffHelpLabel.Text = "x integer values separated by commas\r\nstandard clefs must have 5 lines.";
             // 
-            // VisibleOutputVoiceIndicesPerStaffLabel
+            // VoiceIndicesPerStaffLabel
             // 
-            this.VisibleOutputVoiceIndicesPerStaffLabel.AutoSize = true;
-            this.VisibleOutputVoiceIndicesPerStaffLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.VisibleOutputVoiceIndicesPerStaffLabel.Location = new System.Drawing.Point(4, 150);
-            this.VisibleOutputVoiceIndicesPerStaffLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.VisibleOutputVoiceIndicesPerStaffLabel.Name = "VisibleOutputVoiceIndicesPerStaffLabel";
-            this.VisibleOutputVoiceIndicesPerStaffLabel.Size = new System.Drawing.Size(105, 28);
-            this.VisibleOutputVoiceIndicesPerStaffLabel.TabIndex = 3;
-            this.VisibleOutputVoiceIndicesPerStaffLabel.Text = "visible output voices\r\nper voice per staff";
-            this.VisibleOutputVoiceIndicesPerStaffLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.VoiceIndicesPerStaffLabel.AutoSize = true;
+            this.VoiceIndicesPerStaffLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+            this.VoiceIndicesPerStaffLabel.Location = new System.Drawing.Point(24, 180);
+            this.VoiceIndicesPerStaffLabel.Margin = new System.Windows.Forms.Padding(0);
+            this.VoiceIndicesPerStaffLabel.Name = "VoiceIndicesPerStaffLabel";
+            this.VoiceIndicesPerStaffLabel.Size = new System.Drawing.Size(84, 14);
+            this.VoiceIndicesPerStaffLabel.TabIndex = 3;
+            this.VoiceIndicesPerStaffLabel.Text = "voices per staff";
+            this.VoiceIndicesPerStaffLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // StafflinesPerStaffLabel
             // 
             this.StafflinesPerStaffLabel.AutoSize = true;
             this.StafflinesPerStaffLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.StafflinesPerStaffLabel.Location = new System.Drawing.Point(12, 274);
+            this.StafflinesPerStaffLabel.Location = new System.Drawing.Point(11, 264);
             this.StafflinesPerStaffLabel.Margin = new System.Windows.Forms.Padding(0);
             this.StafflinesPerStaffLabel.Name = "StafflinesPerStaffLabel";
             this.StafflinesPerStaffLabel.Size = new System.Drawing.Size(97, 14);
@@ -484,27 +436,27 @@ namespace Moritz.Composer
             // 
             this.LongStaffNamesLabel.AutoSize = true;
             this.LongStaffNamesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.LongStaffNamesLabel.Location = new System.Drawing.Point(10, 347);
+            this.LongStaffNamesLabel.Location = new System.Drawing.Point(10, 344);
             this.LongStaffNamesLabel.Margin = new System.Windows.Forms.Padding(0);
             this.LongStaffNamesLabel.Name = "LongStaffNamesLabel";
             this.LongStaffNamesLabel.Size = new System.Drawing.Size(88, 14);
             this.LongStaffNamesLabel.TabIndex = 173;
             this.LongStaffNamesLabel.Text = "long staff names";
             // 
-            // VisibleOutputVoiceIndicesStaffTextBox
+            // VoiceIndicesPerStaffTextBox
             // 
-            this.VisibleOutputVoiceIndicesStaffTextBox.Location = new System.Drawing.Point(111, 154);
-            this.VisibleOutputVoiceIndicesStaffTextBox.Name = "VisibleOutputVoiceIndicesStaffTextBox";
-            this.VisibleOutputVoiceIndicesStaffTextBox.Size = new System.Drawing.Size(136, 20);
-            this.VisibleOutputVoiceIndicesStaffTextBox.TabIndex = 9;
-            this.VisibleOutputVoiceIndicesStaffTextBox.TextChanged += new System.EventHandler(this.VisibleOutputVoiceIndicesPerStaffTextBox_TextChanged);
-            this.VisibleOutputVoiceIndicesStaffTextBox.Leave += new System.EventHandler(this.VisibleOutputVoiceIndicesPerStaffTextBox_Leave);
+            this.VoiceIndicesPerStaffTextBox.Location = new System.Drawing.Point(111, 177);
+            this.VoiceIndicesPerStaffTextBox.Name = "VoiceIndicesPerStaffTextBox";
+            this.VoiceIndicesPerStaffTextBox.Size = new System.Drawing.Size(136, 20);
+            this.VoiceIndicesPerStaffTextBox.TabIndex = 9;
+            this.VoiceIndicesPerStaffTextBox.TextChanged += new System.EventHandler(this.VoiceIndicesPerStaffTextBox_TextChanged);
+            this.VoiceIndicesPerStaffTextBox.Leave += new System.EventHandler(this.VoiceIndicesPerStaffTextBox_Leave);
             // 
             // ClefsPerStaffLabel
             // 
             this.ClefsPerStaffLabel.AutoSize = true;
             this.ClefsPerStaffLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.ClefsPerStaffLabel.Location = new System.Drawing.Point(33, 237);
+            this.ClefsPerStaffLabel.Location = new System.Drawing.Point(32, 222);
             this.ClefsPerStaffLabel.Margin = new System.Windows.Forms.Padding(0);
             this.ClefsPerStaffLabel.Name = "ClefsPerStaffLabel";
             this.ClefsPerStaffLabel.Size = new System.Drawing.Size(76, 14);
@@ -515,7 +467,7 @@ namespace Moritz.Composer
             // 
             this.ClefsPerStaffHelpLabel.AutoSize = true;
             this.ClefsPerStaffHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.ClefsPerStaffHelpLabel.Location = new System.Drawing.Point(250, 230);
+            this.ClefsPerStaffHelpLabel.Location = new System.Drawing.Point(250, 214);
             this.ClefsPerStaffHelpLabel.Name = "ClefsPerStaffHelpLabel";
             this.ClefsPerStaffHelpLabel.Size = new System.Drawing.Size(208, 28);
             this.ClefsPerStaffHelpLabel.TabIndex = 171;
@@ -525,7 +477,7 @@ namespace Moritz.Composer
             // 
             this.StaffGroupsHelpLabel.AutoSize = true;
             this.StaffGroupsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.StaffGroupsHelpLabel.Location = new System.Drawing.Point(250, 311);
+            this.StaffGroupsHelpLabel.Location = new System.Drawing.Point(250, 306);
             this.StaffGroupsHelpLabel.Name = "StaffGroupsHelpLabel";
             this.StaffGroupsHelpLabel.Size = new System.Drawing.Size(124, 14);
             this.StaffGroupsHelpLabel.TabIndex = 167;
@@ -535,7 +487,7 @@ namespace Moritz.Composer
             // 
             this.StaffGroupsLabel.AutoSize = true;
             this.StaffGroupsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.StaffGroupsLabel.Location = new System.Drawing.Point(42, 311);
+            this.StaffGroupsLabel.Location = new System.Drawing.Point(41, 306);
             this.StaffGroupsLabel.Margin = new System.Windows.Forms.Padding(0);
             this.StaffGroupsLabel.Name = "StaffGroupsLabel";
             this.StaffGroupsLabel.Size = new System.Drawing.Size(67, 14);
@@ -544,7 +496,7 @@ namespace Moritz.Composer
             // 
             // StafflinesPerStaffTextBox
             // 
-            this.StafflinesPerStaffTextBox.Location = new System.Drawing.Point(111, 271);
+            this.StafflinesPerStaffTextBox.Location = new System.Drawing.Point(111, 261);
             this.StafflinesPerStaffTextBox.Name = "StafflinesPerStaffTextBox";
             this.StafflinesPerStaffTextBox.Size = new System.Drawing.Size(136, 20);
             this.StafflinesPerStaffTextBox.TabIndex = 12;
@@ -574,7 +526,7 @@ namespace Moritz.Composer
             // 
             // ClefsPerStaffTextBox
             // 
-            this.ClefsPerStaffTextBox.Location = new System.Drawing.Point(111, 234);
+            this.ClefsPerStaffTextBox.Location = new System.Drawing.Point(111, 219);
             this.ClefsPerStaffTextBox.Name = "ClefsPerStaffTextBox";
             this.ClefsPerStaffTextBox.Size = new System.Drawing.Size(136, 20);
             this.ClefsPerStaffTextBox.TabIndex = 11;
@@ -583,7 +535,7 @@ namespace Moritz.Composer
             // 
             // StaffGroupsTextBox
             // 
-            this.StaffGroupsTextBox.Location = new System.Drawing.Point(111, 308);
+            this.StaffGroupsTextBox.Location = new System.Drawing.Point(111, 303);
             this.StaffGroupsTextBox.Name = "StaffGroupsTextBox";
             this.StaffGroupsTextBox.Size = new System.Drawing.Size(136, 20);
             this.StaffGroupsTextBox.TabIndex = 13;
@@ -931,6 +883,18 @@ namespace Moritz.Composer
             this.ShowConfirmedFormsButton.UseVisualStyleBackColor = false;
             this.ShowConfirmedFormsButton.Click += new System.EventHandler(this.ShowConfirmedFormsButton_Click);
             // 
+            // VoiceIndicesHelpLabelLabel
+            // 
+            this.VoiceIndicesHelpLabelLabel.AutoSize = true;
+            this.VoiceIndicesHelpLabelLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+            this.VoiceIndicesHelpLabelLabel.Location = new System.Drawing.Point(111, 145);
+            this.VoiceIndicesHelpLabelLabel.Margin = new System.Windows.Forms.Padding(0);
+            this.VoiceIndicesHelpLabelLabel.Name = "VoiceIndicesHelpLabelLabel";
+            this.VoiceIndicesHelpLabelLabel.Size = new System.Drawing.Size(115, 14);
+            this.VoiceIndicesHelpLabelLabel.TabIndex = 190;
+            this.VoiceIndicesHelpLabelLabel.Text = "available voice indices";
+            this.VoiceIndicesHelpLabelLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
             // AssistantComposerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
@@ -1024,17 +988,13 @@ namespace Moritz.Composer
         private System.Windows.Forms.TextBox StafflinesPerStaffTextBox;
         private System.Windows.Forms.TextBox ClefsPerStaffTextBox;
         private System.Windows.Forms.TextBox StaffGroupsTextBox;
-        private System.Windows.Forms.Label VisibleOutputVoiceIndicesPerStaffHelpLabel;
-        private System.Windows.Forms.Label VisibleOutputVoiceIndicesPerStaffLabel;
-        private System.Windows.Forms.TextBox VisibleOutputVoiceIndicesStaffTextBox;
-        private System.Windows.Forms.Label VisibleOutputVoiceIndicesPerStaffHelpLabel2;
+        private System.Windows.Forms.Label VoiceIndicesHelpLabel;
+        private System.Windows.Forms.Label VoiceIndicesPerStaffLabel;
+        private System.Windows.Forms.TextBox VoiceIndicesPerStaffTextBox;
+        private System.Windows.Forms.Label VoiceIndicesPerStaffHelpLabel;
         private System.Windows.Forms.Panel StandardChordsOptionsPanel;
         private System.Windows.Forms.Label ChordTypeComboBoxLabel;
         private System.Windows.Forms.ComboBox ChordTypeComboBox;
-        private System.Windows.Forms.Label InputVoiceIndicesPerStaffHelpLabel2;
-        private System.Windows.Forms.Label InputVoiceIndicesPerStaffHelpLabel;
-        private System.Windows.Forms.Label InputVoiceIndicesPerStaffLabel;
-        private System.Windows.Forms.TextBox InputVoiceIndicesPerStaffTextBox;
         private System.Windows.Forms.Button RevertEverythingButton;
         private System.Windows.Forms.Button ShowUncheckedFormsButton;
         private System.Windows.Forms.Button ShowConfirmedFormsButton;
@@ -1043,6 +1003,7 @@ namespace Moritz.Composer
         private System.Windows.Forms.Button ConfirmNotationButton;
         private System.Windows.Forms.Button RevertNotationButton;
         private System.Windows.Forms.Button RevertPalettesListButton;
+        private System.Windows.Forms.Label VoiceIndicesHelpLabelLabel;
 
     }
 }

@@ -55,7 +55,7 @@ namespace Moritz.Composer
             GetSelectedSettings();
             ScoreComboBox.SelectedIndexChanged += ScoreComboBox_SelectedIndexChanged;
 
-            if(VisibleOutputVoiceIndicesStaffTextBox.Text == "")
+            if(VoiceIndicesPerStaffTextBox.Text == "")
             {
                 SetDefaultVoiceIndicesPerStaff(_algorithm.MidiChannelIndexPerOutputVoice.Count);
             }
@@ -71,8 +71,7 @@ namespace Moritz.Composer
             textBoxes.Add(MinimumGapsBetweenSystemsTextBox);
             textBoxes.Add(MinimumCrotchetDurationTextBox);
 
-            textBoxes.Add(VisibleOutputVoiceIndicesStaffTextBox);
-            textBoxes.Add(InputVoiceIndicesPerStaffTextBox);
+            textBoxes.Add(VoiceIndicesPerStaffTextBox);
             textBoxes.Add(ClefsPerStaffTextBox);
             textBoxes.Add(StafflinesPerStaffTextBox);
             textBoxes.Add(StaffGroupsTextBox);
@@ -166,72 +165,40 @@ namespace Moritz.Composer
         {
             LoadSettings();
 
-            InitOutputVoiceIndicesPerStaffFields(_algorithm.MidiChannelIndexPerOutputVoice.Count);
-            InitInputVoiceIndicesPerStaffFields(_algorithm.NumberOfInputVoices);
-
+            SetVoiceIndicesHelpLabel(_algorithm.MidiChannelIndexPerOutputVoice.Count, _algorithm.NumberOfInputVoices);
             SetSystemStartBarsHelpLabel(_algorithm.NumberOfBars);
 
-            VisibleOutputVoiceIndicesPerStaffTextBox_Leave(null, null); // sets _numberOfOutputStaves _numberOfStaves
-            InputVoiceIndicesPerStaffTextBox_Leave(null, null); // sets _numberOfInputStaves, _numberOfStaves
+            VoiceIndicesPerStaffTextBox_Leave(null, null); // sets _numberOfOutputStaves _numberOfStaves
 
             SetGroupBoxIsSaved(NotationGroupBox, ConfirmNotationButton, RevertNotationButton,
                 (SavedState)KrystalsGroupBox.Tag, (SavedState)PalettesGroupBox.Tag);
         }
         #region helpers
-        private void InitOutputVoiceIndicesPerStaffFields(int nVoices)
+        private void SetVoiceIndicesHelpLabel(int nOutputVoices, int nInputVoices)
         {
-            if(nVoices == 1)
+            Debug.Assert(nOutputVoices > 0);
+            StringBuilder sb = new StringBuilder();
+            for(int i = 0; i < nOutputVoices; ++i)
             {
-                VisibleOutputVoiceIndicesPerStaffHelpLabel.Text = "index: 0";
+                sb.Append(", ");
+                sb.Append(i.ToString());
             }
-            else
+            sb.Remove(0, 2);
+            if(nInputVoices > 0)
             {
-                StringBuilder sb = new StringBuilder();
-                for(int i = 0; i < nVoices; ++i)
+                sb.Append(" | ");
+                StringBuilder ivsb = new StringBuilder();
+                for(int i = 0; i < nInputVoices; ++i)
                 {
-                    sb.Append(", ");
-                    sb.Append(i.ToString());
+                    ivsb.Append(", ");
+                    ivsb.Append(i.ToString());
                 }
-                sb.Remove(0, 2);
-                sb.Insert(0, "indices: ");
-                VisibleOutputVoiceIndicesPerStaffHelpLabel.Text = sb.ToString();
+                ivsb.Remove(0, 2);
+                sb.Append(ivsb);
             }
+            VoiceIndicesHelpLabel.Text = sb.ToString();
         }
-        private void InitInputVoiceIndicesPerStaffFields(int nInputVoices)
-        {
-            if(nInputVoices == 0)
-            {
-                InputVoiceIndicesPerStaffHelpLabel.Text = "This algorithm does not provide input voices.";
-                InputVoiceIndicesPerStaffHelpLabel.Enabled = false;
-                InputVoiceIndicesPerStaffLabel.Enabled = false;
-                InputVoiceIndicesPerStaffTextBox.Enabled = false;
-                InputVoiceIndicesPerStaffHelpLabel2.Enabled = false;
-            }
-            else
-            {
-                InputVoiceIndicesPerStaffHelpLabel.Enabled = true;
-                InputVoiceIndicesPerStaffLabel.Enabled = true;
-                InputVoiceIndicesPerStaffTextBox.Enabled = true;
-                InputVoiceIndicesPerStaffHelpLabel2.Enabled = true;
 
-                if(nInputVoices == 1)
-                {
-                    InputVoiceIndicesPerStaffHelpLabel.Text = "index: 0";
-                }
-                else
-                {
-                    StringBuilder sb = new StringBuilder();
-                    for(int i = 0; i < nInputVoices; ++i)
-                    {
-                        sb.Append(", ");
-                        sb.Append(i);
-                    }
-                    sb.Remove(0, 2);
-                    sb.Insert(0, "indices: ");
-                    InputVoiceIndicesPerStaffHelpLabel.Text = sb.ToString();
-                }
-            }
-        }
         private void SetSystemStartBarsHelpLabel(int numberOfBars)
         {
             SystemStartBarsHelpLabel.Text = "(" + numberOfBars.ToString() + " bars. Default is 5 bars per system)";
@@ -246,8 +213,8 @@ namespace Moritz.Composer
                 voiceIndexList.Append(", ");
             }
             voiceIndexList.Remove(voiceIndexList.Length - 2, 2);
-            VisibleOutputVoiceIndicesStaffTextBox.Text = voiceIndexList.ToString();
-            VisibleOutputVoiceIndicesPerStaffTextBox_Leave(null, null);
+            VoiceIndicesPerStaffTextBox.Text = voiceIndexList.ToString();
+            VoiceIndicesPerStaffTextBox_Leave(null, null);
         }
         #endregion called from ctor
 
@@ -980,7 +947,7 @@ namespace Moritz.Composer
             if(((string)ChordTypeComboBox.SelectedItem) == "standard")
                 this.StandardChordsOptionsPanel.Visible = true;
 
-            this.VisibleOutputVoiceIndicesPerStaffTextBox_Leave(null, null);
+            this.VoiceIndicesPerStaffTextBox_Leave(null, null);
             SetGroupBoxIsUnconfirmed(NotationGroupBox, ConfirmNotationButton, RevertNotationButton);
         }
         /// <summary>
@@ -1044,121 +1011,111 @@ namespace Moritz.Composer
             CheckTextBoxIsUInt(this.MinimumGapsBetweenSystemsTextBox);
         }
         /// <summary>
-        /// This function sets _numberOfOutputStaves (and consequetially _numberOfStaves).
-        /// It also sets _staffIsInput.
-        /// It also sets the help texts on the dialog.
+        /// This function sets both _visibleOutputVoiceIndicesPerStaff and _inputVoiceIndicesPerStaff
+        /// (and consequetially _numberOfStaves).
+        /// It also sets _staffIsInput and the help texts on the dialog.
         /// </summary>
-        private void VisibleOutputVoiceIndicesPerStaffTextBox_Leave(object sender, EventArgs e)
+        private void VoiceIndicesPerStaffTextBox_Leave(object sender, EventArgs e)
         {
             EnableStaffDependentControls(false);
 
             bool error = false;
-            List<List<byte>> byteLists = new List<List<byte>>();
-            try
-            {
-                byteLists = M.StringToByteLists(VisibleOutputVoiceIndicesStaffTextBox.Text);
-            }
-            catch
-            {
-                error = true;
-            }
 
-            if(byteLists.Count == 0)
-                error = true;
+            string[] outInStrings = VoiceIndicesPerStaffTextBox.Text.Split('|');
+            List<List<byte>> visibleOutputIndexLists = new List<List<byte>>();
+            List<List<byte>> inputIndexLists = new List<List<byte>>();
 
-            if(!error)
+            if(!string.IsNullOrEmpty(outInStrings[0]))
             {
-                foreach(List<byte> outputVoiceIndices in byteLists)
+                outInStrings[0].Trim();
+                try
                 {
-                    // outputVoiceIndices are output staff outputVoiceIndices here.
-                    if(outputVoiceIndices.Count == 0 || outputVoiceIndices.Count > 2
-                    || (outputVoiceIndices.Count > 1 && ((string)ChordTypeComboBox.SelectedItem) != "standard"))
-                    {
-                        error = true;
-                        break;
-                    }
-                    foreach(byte ovIndex in outputVoiceIndices)
-                    {
-                        if(!_outputVoiceIndices.Contains(ovIndex))
-                        {
-                            error = true;
-                            break;
-                        }
-                    }
-                    if(error)
-                        break;
+                    visibleOutputIndexLists = M.StringToByteLists(outInStrings[0]);
                 }
+                catch
+                {
+                    error = true;
+                }
+            }
+            if(!error && outInStrings.Length > 1 && !string.IsNullOrEmpty(outInStrings[1]))
+            {
+                outInStrings[1].Trim();
+                try
+                {
+                    inputIndexLists = M.StringToByteLists(outInStrings[1]);
+                }
+                catch
+                {
+                    error = true;
+                }
+            }
+
+            if(!error && ((visibleOutputIndexLists.Count + inputIndexLists.Count) < 1))
+            {
+                // there must be at least one visible voice in the score
+                error = true;
+            }
+
+
+            if(!error && visibleOutputIndexLists.Count > 0)
+            {
+                error = CheckVoiceIndices(visibleOutputIndexLists, _outputVoiceIndices);
+            }
+            if(!error && inputIndexLists.Count > 0)
+            {
+                List<byte> inputVoiceIndices = InputVoiceIndices(_algorithm.NumberOfInputVoices);
+                error = CheckVoiceIndices(inputIndexLists, inputVoiceIndices);
             }
 
             if(error)
             {
-                M.SetTextBoxErrorColorIfNotOkay(VisibleOutputVoiceIndicesStaffTextBox, false);
+                M.SetTextBoxErrorColorIfNotOkay(VoiceIndicesPerStaffTextBox, false);
+                VoiceIndicesPerStaffTextBox.Focus();
             }
             else
             {
-                _outputVoiceIndicesPerStaff = byteLists;
+                _visibleOutputVoiceIndicesPerStaff = visibleOutputIndexLists;
+                _visibleInputVoiceIndicesPerStaff = inputIndexLists;
                 EnableStaffDependentControls(true);
-                VisibleOutputVoiceIndicesStaffTextBox.Text = NormalizedByteListsString(byteLists);
-                M.SetTextBoxErrorColorIfNotOkay(VisibleOutputVoiceIndicesStaffTextBox, true);
+                VoiceIndicesPerStaffTextBox.Text = NormalizedVoiceIndicesString(visibleOutputIndexLists, inputIndexLists);
+                M.SetTextBoxErrorColorIfNotOkay(VoiceIndicesPerStaffTextBox, true);
             }
             SetGroupBoxIsUnconfirmed(NotationGroupBox, ConfirmNotationButton, RevertNotationButton);
         }
-        /// <summary>
-        /// This function sets _numberOfinputStaves (and consequetially _numberOfStaves).
-        /// It also sets the help texts on the dialog.
-        /// </summary>
-        private void InputVoiceIndicesPerStaffTextBox_Leave(object sender, EventArgs e)
+
+        private List<byte> InputVoiceIndices(int numberOfVoices)
         {
-            EnableStaffDependentControls(false);
+            List<byte> rval = new List<byte>();
+            for(byte i = 0; i < numberOfVoices; ++i)
+                rval.Add(i);
+            return rval;
+        }
 
+        private bool CheckVoiceIndices(List<List<byte>> voiceIndexLists, List<byte> availableIndices)
+        {
             bool error = false;
-            List<List<byte>> byteLists = new List<List<byte>>();
-
-            try
+            foreach(List<byte> voiceIndicesPerStaff in voiceIndexLists)
             {
-                byteLists = M.StringToByteLists(InputVoiceIndicesPerStaffTextBox.Text);
-            }
-            catch
-            {
-                error = true;
-            }
-
-            // byteLists.Count==0 (number of staves == 0) is not an error for inputs
-            if(byteLists.Count > 0 && !error)
-            {
-                foreach(List<byte> outputVoiceIndices in byteLists)
+                if(voiceIndicesPerStaff.Count == 0 || voiceIndicesPerStaff.Count > 2
+                || (voiceIndicesPerStaff.Count > 1 && ((string)ChordTypeComboBox.SelectedItem) != "standard"))
                 {
-                    if(outputVoiceIndices.Count == 0 || outputVoiceIndices.Count > 2)
+                    error = true;
+                    break;
+                }
+                foreach(byte ovIndex in voiceIndicesPerStaff)
+                {
+                    if(!availableIndices.Contains(ovIndex))
                     {
                         error = true;
                         break;
                     }
-                    foreach(byte ovIndex in outputVoiceIndices)
-                    {
-                        if(ovIndex < 0 || ovIndex >= _algorithm.NumberOfInputVoices)
-                        {
-                            error = true;
-                            break;
-                        }
-                    }
-                    if(error)
-                        break;
                 }
+                if(error)
+                    break;
             }
-
-            if(error)
-            {
-                M.SetTextBoxErrorColorIfNotOkay(InputVoiceIndicesPerStaffTextBox, false);
-            }
-            else
-            {
-                _inputVoiceIndicesPerStaff = byteLists;
-                EnableStaffDependentControls(true);
-                InputVoiceIndicesPerStaffTextBox.Text = NormalizedByteListsString(byteLists);
-                M.SetTextBoxErrorColorIfNotOkay(InputVoiceIndicesPerStaffTextBox, true);
-            }
-            SetGroupBoxIsUnconfirmed(NotationGroupBox, ConfirmNotationButton, RevertNotationButton);
+            return error;
         }
+
         private string NormalizedText(List<string> texts)
         {
             StringBuilder sb = new StringBuilder();
@@ -1187,7 +1144,7 @@ namespace Moritz.Composer
                 }
             }
 
-            if(okay && trimmedClefs.Count == _numberOfStaves)
+            if(okay && trimmedClefs.Count == _numberOfStaves  && _numberOfStaves > 0)
             {
                 ClefsPerStaffTextBox.Text = NormalizedText(trimmedClefs);
                 M.SetTextBoxErrorColorIfNotOkay(ClefsPerStaffTextBox, true);
@@ -1254,7 +1211,7 @@ namespace Moritz.Composer
             {
                 trimmedNames.Add(name.Trim());
             }
-            if(trimmedNames.Count == _numberOfStaves)
+            if(trimmedNames.Count == _numberOfStaves && _numberOfStaves > 0)
             {
                 textBox.Text = NormalizedText(trimmedNames);
                 M.SetTextBoxErrorColorIfNotOkay(textBox, true);
@@ -1333,13 +1290,9 @@ namespace Moritz.Composer
         {
             M.SetToWhite(sender as TextBox);
         }
-        private void VisibleOutputVoiceIndicesPerStaffTextBox_TextChanged(object sender, EventArgs e)
+        private void VoiceIndicesPerStaffTextBox_TextChanged(object sender, EventArgs e)
         {
-            M.SetToWhite(VisibleOutputVoiceIndicesStaffTextBox);
-        }
-        private void InputVoiceIndicesPerStaffTextBox_TextChanged(object sender, EventArgs e)
-        {
-            M.SetToWhite(InputVoiceIndicesPerStaffTextBox);
+            M.SetToWhite(VoiceIndicesPerStaffTextBox);
         }
         private void ClefsPerStaffTextBox_TextChanged(object sender, EventArgs e)
         {
@@ -1367,26 +1320,38 @@ namespace Moritz.Composer
         }
         #endregion
         #region helper functions
-        private string NormalizedByteListsString(List<List<byte>> byteLists)
+        private string NormalizedVoiceIndicesString(List<List<byte>> visibleOutputIndexLists, List<List<byte>> inputIndexLists)
         {
             StringBuilder sb = new StringBuilder();
-            if(byteLists.Count > 0)
+            if(visibleOutputIndexLists.Count > 0)
             {
-                foreach(List<byte> bytes in byteLists)
-                {
-                    sb.Append(", ");
-                    StringBuilder bytesListSB = new StringBuilder();
-                    foreach(byte b in bytes)
-                    {
-                        bytesListSB.Append(":");
-                        bytesListSB.Append(b.ToString());
-                    }
-                    bytesListSB.Remove(0, 1);
-                    sb.Append(bytesListSB.ToString());
-                }
-                sb.Remove(0, 2);
+                AppendOutInToSB(visibleOutputIndexLists, sb);
+            }
+            if(inputIndexLists.Count > 0)
+            {
+                sb.Append(" | ");
+                AppendOutInToSB(inputIndexLists, sb);
+
             }
             return sb.ToString();
+        }
+        private static void AppendOutInToSB(List<List<byte>> indexLists, StringBuilder sb)
+        {
+            StringBuilder appendage = new StringBuilder();
+            foreach(List<byte> bytes in indexLists)
+            {
+                appendage.Append(", ");
+                StringBuilder bytesListSB = new StringBuilder();
+                foreach(byte b in bytes)
+                {
+                    bytesListSB.Append(":");
+                    bytesListSB.Append(b.ToString());
+                }
+                bytesListSB.Remove(0, 1);
+                appendage.Append(bytesListSB.ToString());
+            }
+            appendage.Remove(0, 2);
+            sb.Append(appendage);
         }
         private void EnableStaffDependentControls(bool enabled)
         {
@@ -1471,81 +1436,55 @@ namespace Moritz.Composer
         private void VoiceIndicesPerStaffHelp_MouseClick(object sender, MouseEventArgs e)
         {
             if(e.Button == System.Windows.Forms.MouseButtons.Right)
-                ShowVoiceIndicesPerStaffHelp();
-        }
-        #region helpers
-        private void ShowVoiceIndicesPerStaffHelp()
-        {
-            StringBuilder voiceIndicesSB = VoiceIndicesSB();
-            MessageBox.Show(voiceIndicesSB.ToString(), "Help for 'voices per voice per staff'", MessageBoxButtons.OK);
-        }
-        private StringBuilder VoiceIndicesSB()
-        {
-            string mainText = "Input fields 'output voices per voice per staff' and 'input voices per voice per staff'.\n\n" +
-
-                "These fields control the top to bottom order in which voices appear in the score. Not all the output or " +
-                "input voices need to be notated in a particular score, but scores must contain at least one output voice.\n\n" +
-
-                "Composition algorithms create voices in staves in systems. (Output voices are always created, but input voices " +
-                "are optional.) The staves and voices created by an algorithm are conceptually in top to bottom order, but " +
-                "the order in which the voices actually appear in a score is controlled by these two fields.\n\n" +
-
-                "Output voices are always printed above input voices, and these two input fields work in the same way:\n" +
-                "Each algorithm declares how many output and input voices it creates. Their indices (voiceIDs) appear in the " +
-                "help texts above the fields.\n" +
-                "The numbers entered in the fields must be selected from those given in the help texts, and determine the " +
-                "top to bottom order of the voices in the printed score:\n" +
-                "Staves are separated by commas, voices are separated by colons.\n" +
-                "For example, if the algorithm creates six output voices, and these are to be notated using standard " +
-                "chord symbols, their indices (0, 1, 2, 3, 4, 5) appear in the help text. These voices " +
-                "can be notated on 3 staves by entering '3:1, 0:2, 4:5' in the field. Voices with indices 2 and 3 " +
-                "could be notated on separate staves, omitting the other voices, by entering '2, 3'.\n\n" +
-
-                "Algorithms compose output voices complete with their midi channel (and master volume initialization value). " +
-                "This allows them to stipulate the standard midi percussion channel (channel index 9).\n" +
-                "The midi channel and master volume values are therefore fixed to their respective voiceIDs, and move with " +
-                "them when the voices are re-ordered.\n\n";
-
-            StringBuilder voiceIndicesSB = new StringBuilder();
-            voiceIndicesSB.Append(mainText);
-            voiceIndicesSB.Append("\n\nThe current algorithm ");
-            if(_outputVoiceIndices.Count == 1)
-                voiceIndicesSB.Append("only uses\noutput voice index 0");
-            else
-                voiceIndicesSB.Append("uses\noutput voice indices ");
-
-            for(int i = 0; i < _outputVoiceIndices.Count; ++i)
             {
-                if(i > 0)
-                {
-                    if(i == (_outputVoiceIndices.Count - 1))
-                        voiceIndicesSB.Append(" and ");
-                    else
-                        voiceIndicesSB.Append(", ");
-                }
-                voiceIndicesSB.Append(_outputVoiceIndices[i].ToString());
-            }
-            int nInputVoices = _algorithm.NumberOfInputVoices;
-            if(nInputVoices == 0)
-                voiceIndicesSB.Append(",\nand has no input voices.\n\n");
-            else if(nInputVoices == 1)
-            {
-                voiceIndicesSB.Append(",\nand input voice index 0\n\n");
-            }
-            else
-            {
-                voiceIndicesSB.Append(",\nand input voice indices ");
-                for(int i = 0; i < nInputVoices; ++i)
-                {
-                    voiceIndicesSB.Append(i.ToString());
-                    voiceIndicesSB.Append(", ");
-                }
-                voiceIndicesSB.Replace(", ", ".", voiceIndicesSB.Length - 2, 2);
-            }
+                string mainText =
+                "Composition algorithms create output and input voices without deciding on the layout for a particular " +
+                "score. Many different layouts are possible using the same logical information. (Output voices are " +
+                "always created, but input voices do not necessarily exist.)\n\n" +
 
-            return voiceIndicesSB;
+                "Each algorithm presents the voices it creates in the top-bottom order of a default layout. Voices are " +
+                "therefore identified in this dialog using their default index.\n" +
+                "(The default top output voice has index 0, as does the default top input voice.)\n" +
+                "The available output and input voice indices are displayed in a help text above this input field. " +
+                "Entering the help string as it stands will therefore create a score showing all the composed voices, " +
+                "with one voice per staff, in the default order in which they were originally composed.\n\n" +
+
+                "The string entered in this input field controls both the number of staves per system, and the " +
+                "top-bottom order of the voices to be displayed.\n" +
+                "It can have either one or two parts. The first controls the output voices, the second controls the " +
+                "input voices. If present, the input voices are separated from the output voices by a '|' character. " +
+                "Either of these parts can be empty, but not both: there must be at least one visible output or input " +
+                "voice in the score.\n\n" +
+
+                "There can be either one or two voices per staff. Voices on the same staff are separated by a ':'. " +
+                "Staves are separated by a ','. White space is ignored.\n" +
+                "For example, if an algorithm creates four output and two input voices, the help text would be: '0, 1, " +
+                "2, 3 | 0, 1', and some possible score formatting strings are:\n" +
+                "     '2'      One output staff per system. The staff shows output voice index 2.\n" +
+                "     '|0'     One input staff per system. The staff shows input voice index 0.\n" +
+                "     '1, 3 , 2 | 0:1'  Three visible output staves and one input staff per system. The input staff " +
+                "has two input voices.\n" +
+                "The numbers can be in any order, but must be selected from those given in the help text. The order " +
+                "determines the top-bottom order of the visible voices in the final score.\n\n" +
+
+                "The score is always printed with output staves above any input staves. Output staves are smaller than " +
+                "input staves.\n\n" +
+
+                "If there are any visible input staves, then all the output voices that are not entered in this input " +
+                "field will automtically be included on invisible staves in the score's file. These invisible output " +
+                "staves contain midi information, referenced by notes in the input voices, but no graphics. They are " +
+                "currently written in a single block above the topmost visible staff in the file.\n\n" +
+                
+                "A note on midi channels:\n" +
+                "Algorithms compose output voices complete with their midi channel (and master volume initialization " +
+                "value). This allows them to stipulate the standard midi percussion channel (channel index 9) if they " +
+                "want to.\n" +
+                "The midi channel and master volume values are therefore fixed attributes of particular voices, and " +
+                "move with them when the voices are re-ordered.\n\n";
+
+                MessageBox.Show(mainText, "Help for the 'voices per staff' input field", MessageBoxButtons.OK);
+            }
         }
-        #endregion helpers
         #endregion notation groupBox
 
         #region krystals groupBox
@@ -1863,11 +1802,8 @@ namespace Moritz.Composer
                     case "minGapsBetweenSystems":
                         MinimumGapsBetweenSystemsTextBox.Text = r.Value;
                         break;
-                    case "outputVoicesPerVoicePerStaff":
-                        VisibleOutputVoiceIndicesStaffTextBox.Text = r.Value;
-                        break;
-                    case "inputVoicesPerVoicePerStaff":
-                        InputVoiceIndicesPerStaffTextBox.Text = r.Value;
+                    case "voiceIndicesPerStaff":
+                        VoiceIndicesPerStaffTextBox.Text = r.Value;
                         break;
                     case "clefsPerStaff":
                         ClefsPerStaffTextBox.Text = r.Value;
@@ -2063,8 +1999,7 @@ namespace Moritz.Composer
             w.WriteAttributeString("gap", GapPixelsComboBox.Text);
             w.WriteAttributeString("minGapsBetweenStaves", this.MinimumGapsBetweenStavesTextBox.Text);
             w.WriteAttributeString("minGapsBetweenSystems", MinimumGapsBetweenSystemsTextBox.Text);
-            w.WriteAttributeString("outputVoicesPerVoicePerStaff", VisibleOutputVoiceIndicesStaffTextBox.Text);
-            w.WriteAttributeString("inputVoicesPerVoicePerStaff", InputVoiceIndicesPerStaffTextBox.Text);
+            w.WriteAttributeString("voiceIndicesPerStaff", VoiceIndicesPerStaffTextBox.Text);
             w.WriteAttributeString("clefsPerStaff", ClefsPerStaffTextBox.Text);
             w.WriteAttributeString("stafflinesPerStaff", StafflinesPerStaffTextBox.Text);
             w.WriteAttributeString("staffGroups", StaffGroupsTextBox.Text);
@@ -2231,8 +2166,8 @@ namespace Moritz.Composer
             pageFormat.DefaultDistanceBetweenStaves = int.Parse(MinimumGapsBetweenStavesTextBox.Text) * pageFormat.Gap;
             pageFormat.DefaultDistanceBetweenSystems = int.Parse(MinimumGapsBetweenSystemsTextBox.Text) * pageFormat.Gap;
 
-            pageFormat.VisibleOutputVoiceIndicesPerStaff = _outputVoiceIndicesPerStaff; // one value per output staff
-            pageFormat.InputVoiceIndicesPerStaff = _inputVoiceIndicesPerStaff; // one value per input staff
+            pageFormat.VisibleOutputVoiceIndicesPerStaff = _visibleOutputVoiceIndicesPerStaff; // one value per output staff
+            pageFormat.VisibleInputVoiceIndicesPerStaff = _visibleInputVoiceIndicesPerStaff; // one value per input staff
             pageFormat.ClefsList = M.StringToStringList(this.ClefsPerStaffTextBox.Text, ',');
             pageFormat.StafflinesPerStaff = M.StringToIntList(this.StafflinesPerStaffTextBox.Text, ',');
             pageFormat.StaffGroups = M.StringToIntList(this.StaffGroupsTextBox.Text, ',');
@@ -2277,15 +2212,15 @@ namespace Moritz.Composer
         #region score creation
         CompositionAlgorithm _algorithm = null;
         private List<byte> _outputVoiceIndices = null;
-        private List<List<byte>> _outputVoiceIndicesPerStaff; // set in OutputVoiceIndicesPerStaffTextBox_Leave
-        private List<List<byte>> _inputVoiceIndicesPerStaff; // set in InputVoiceIndicesPerStaffTextBox_Leave
+        private List<List<byte>> _visibleOutputVoiceIndicesPerStaff; // set in OutputVoiceIndicesPerStaffTextBox_Leave
+        private List<List<byte>> _visibleInputVoiceIndicesPerStaff; // set in InputVoiceIndicesPerStaffTextBox_Leave
         private int _numberOfStaves
         {
             get
             {
-                if(_outputVoiceIndicesPerStaff != null && _inputVoiceIndicesPerStaff != null)
+                if(_visibleOutputVoiceIndicesPerStaff != null && _visibleInputVoiceIndicesPerStaff != null)
                 {
-                    return _outputVoiceIndicesPerStaff.Count + _inputVoiceIndicesPerStaff.Count;
+                    return _visibleOutputVoiceIndicesPerStaff.Count + _visibleInputVoiceIndicesPerStaff.Count;
                 }
                 else
                 {
