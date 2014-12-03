@@ -82,9 +82,7 @@ namespace Moritz.Symbols
                     // Limit stafflineHeight to multiples of _pageMetrics.Gap
                     // so that stafflines are not displayed as thick grey lines.
                     // The following works, because the top staffline of each system is currently at 0.
-                    // Found by experiment that adding (_pageMetrics.Gap / 3F) gives good results in both studies.
-                    // old version: deltaY -= (deltaY % _pageMetrics.Gap);
-                    deltaY = deltaY - (deltaY % _pageFormat.Gap) + (_pageFormat.Gap / 3F);
+                    deltaY -= (deltaY % _pageFormat.Gap);
                     system.Metrics.Move(0F, deltaY);
                     top = system.Metrics.NotesBottom + systemSeparation;
                 }
