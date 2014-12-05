@@ -117,7 +117,7 @@ namespace Moritz.Palettes
         /// </summary>
         public void SetSettingsAreSaved(Form form, bool hasError, Button confirmButton, Button revertToSavedButton)
         {
-            Debug.Assert(!hasError); // the revertToSavedButton should already be disabled if there is an error on the form
+            //Debug.Assert(!hasError); // the revertToSavedButton should already be disabled if there is an error on the form
 
             SetFormState(form, SavedState.saved);
             if(confirmButton != null) confirmButton.Enabled = false;

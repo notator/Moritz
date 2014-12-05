@@ -342,59 +342,6 @@ namespace Moritz.Symbols
             return success;
         }
 
-        public List<int> GroupTopStaffIndices
-        {
-            get
-            {
-                List<int> groupTopStaffIndices = new List<int>();
-                List<bool> barlineContinuesDownList = BarlineContinuesDownList;
-                groupTopStaffIndices.Add(0);
-                for(int index = 1; index < barlineContinuesDownList.Count; ++index)
-                {
-                    if(barlineContinuesDownList[index - 1] == false)
-                        groupTopStaffIndices.Add(index);
-                }
-                return groupTopStaffIndices;
-            }
-        }
-
-        public List<int> GroupBottomStaffIndices
-        {
-            get
-            {
-                List<int> groupBottomStaffIndices = new List<int>();
-                List<bool> barlineContinuesDownList = BarlineContinuesDownList;
-                for(int index = 0; index < barlineContinuesDownList.Count; ++index)
-                {
-                    if(barlineContinuesDownList[index] == false)
-                        groupBottomStaffIndices.Add(index);
-                }
-                return groupBottomStaffIndices;
-            }
-        }
-
-        /// <summary>
-        /// A list having one value per staff in the system
-        /// </summary>
-        public List<bool> BarlineContinuesDownList
-        {
-            get
-            {
-                List<bool> barlineContinuesDownPerStaff = new List<bool>();
-                foreach(int nStaves in _pageFormat.StaffGroups)
-                {
-                    int remainingStavesInGroup = nStaves - 1;
-                    while(remainingStavesInGroup > 0)
-                    {
-                        barlineContinuesDownPerStaff.Add(true);
-                        --remainingStavesInGroup;
-                    }
-                    barlineContinuesDownPerStaff.Add(false);
-                }
-                return barlineContinuesDownPerStaff;
-            }
-        }
-
         private float GetLeftMarginPos(SvgSystem system, Graphics graphics, PageFormat pageFormat)
         {
             float leftMarginPos = pageFormat.LeftMarginPos;

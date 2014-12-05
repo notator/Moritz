@@ -42,16 +42,16 @@ namespace Moritz.Symbols
 
             w.SvgStartGroup("barlines", null);
 
-            WriteBarlines(w, pageFormat.BarlineStrokeWidth, pageFormat.StafflineStemStrokeWidth, pageFormat.Gap, pageFormat.Right);
+            WriteBarlines(w, pageFormat.BarlineStrokeWidth, pageFormat.StafflineStemStrokeWidth, pageFormat.Gap, pageFormat);
 
             w.SvgEndGroup(); // barlines
 
             w.SvgEndGroup(); // system
         }
 
-        private void WriteBarlines(SvgWriter w, float barlineStrokeWidth, float stafflineStrokeWidth, float gap, float pageRight)
+        private void WriteBarlines(SvgWriter w, float barlineStrokeWidth, float stafflineStrokeWidth, float gap, PageFormat pageFormat)
         {
-            List<bool> barlineIsInsideStaffGroup = this.Score.Notator.BarlineContinuesDownList;
+            List<bool> barlineIsInsideStaffGroup = pageFormat.BarlineContinuesDownList;
             int topVisibleStaffIndex = TopVisibleStaffIndex();
             Debug.Assert(barlineIsInsideStaffGroup.Count == Staves.Count - topVisibleStaffIndex);
             Debug.Assert(barlineIsInsideStaffGroup[barlineIsInsideStaffGroup.Count - 1] == false);
@@ -65,6 +65,7 @@ namespace Moritz.Symbols
                 float barlinesTop = staff.Metrics.StafflinesTop;
                 float barlinesBottom = staff.Metrics.StafflinesBottom;
 
+                #region set barlinesTop, barlinesBottom
                 switch(staff.NumberOfStafflines)
                 {
                     case 1:
@@ -80,6 +81,7 @@ namespace Moritz.Symbols
                     default:
                         break;
                 }
+                #endregion set barlinesTop, barlinesBottom
 
                 #region draw barlines through stafflines
                 for(int i = 0; i < voice.NoteObjects.Count; ++i)
@@ -103,8 +105,8 @@ namespace Moritz.Symbols
                 #region draw barlines down from staves
                 if(staffIndex < Staves.Count - 1)
                 {
-                    BottomEdge bottomEdge = new BottomEdge(staff, 0F, pageRight, gap);
-                    TopEdge topEdge = new TopEdge(Staves[staffIndex + 1], 0F, pageRight);
+                    BottomEdge bottomEdge = new BottomEdge(staff, 0F, pageFormat.Right, gap);
+                    TopEdge topEdge = new TopEdge(Staves[staffIndex + 1], 0F, pageFormat.Right);
                     isFirstBarline = true;
 
                     for(int i = 0; i < voice.NoteObjects.Count; ++i)
@@ -221,7 +223,7 @@ namespace Moritz.Symbols
 
                 ResetStaffMetricsBoundaries();
 
-                SetBarlineVisibility();
+                SetBarlineVisibility(pageFormat.BarlineContinuesDownList);
 
                 JustifyVertically(pageFormat.Right, pageFormat.Gap);
 
@@ -1139,23 +1141,24 @@ namespace Moritz.Symbols
             }
         }
 
-        private void SetBarlineVisibility()
+        private void SetBarlineVisibility(List<bool> barlineContinuesDownList)
         {
             // set the visibility of all but the last barline
-            foreach(Staff staff in Staves)
+            int topVisibleStaffIndex = TopVisibleStaffIndex();
+            for(int staffIndex = topVisibleStaffIndex; staffIndex < Staves.Count; ++staffIndex)
             {
-                if(!(staff is InvisibleOutputStaff))
+                Staff staff = Staves[staffIndex];
+                Voice voice = staff.Voices[0];
+                List<NoteObject> noteObjects = voice.NoteObjects;
+                for(int i = 0; i < noteObjects.Count; ++i)
                 {
-                    Voice voice = staff.Voices[0];
-                    List<NoteObject> noteObjects = voice.NoteObjects;
-                    for(int i = 0; i < noteObjects.Count; ++i)
-                    {
-                        if(noteObjects[i] is CautionaryChordSymbol)
-                        {
-                            Barline barline = noteObjects[i - 1] as Barline;
-                            Debug.Assert(barline != null);
-                            barline.Visible = false;
-                        }
+                    bool isSingleStaffGroup = !barlineContinuesDownList[staffIndex - topVisibleStaffIndex] 
+                                            && ((staffIndex - topVisibleStaffIndex == 0) || !barlineContinuesDownList[staffIndex - topVisibleStaffIndex - 1]);
+                    if(noteObjects[i] is CautionaryChordSymbol && !isSingleStaffGroup)
+                    {                           
+                        Barline barline = noteObjects[i - 1] as Barline;
+                        Debug.Assert(barline != null);
+                        barline.Visible = false;
                     }
                 }
             }

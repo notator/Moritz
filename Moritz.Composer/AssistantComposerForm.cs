@@ -1024,10 +1024,12 @@ namespace Moritz.Composer
             string[] outInStrings = VoiceIndicesPerStaffTextBox.Text.Split('|');
             List<List<byte>> visibleOutputIndexLists = new List<List<byte>>();
             List<List<byte>> inputIndexLists = new List<List<byte>>();
+            outInStrings[0] = outInStrings[0].Trim();
+            if(outInStrings.Length > 1)
+                outInStrings[1] = outInStrings[1].Trim();
 
             if(!string.IsNullOrEmpty(outInStrings[0]))
             {
-                outInStrings[0].Trim();
                 try
                 {
                     visibleOutputIndexLists = M.StringToByteLists(outInStrings[0]);
@@ -1039,7 +1041,6 @@ namespace Moritz.Composer
             }
             if(!error && outInStrings.Length > 1 && !string.IsNullOrEmpty(outInStrings[1]))
             {
-                outInStrings[1].Trim();
                 try
                 {
                     inputIndexLists = M.StringToByteLists(outInStrings[1]);
@@ -1200,7 +1201,8 @@ namespace Moritz.Composer
                 foreach(byte b in bytes)
                 {
                     sum += (int)b;
-                    if(sum == _visibleOutputVoiceIndicesPerStaff.Count)
+                    if(sum == _visibleOutputVoiceIndicesPerStaff.Count
+                        || (_visibleOutputVoiceIndicesPerStaff.Count == 0 && sum == _visibleInputVoiceIndicesPerStaff.Count))
                         outputOK = true;
                 }
                     
@@ -1332,12 +1334,12 @@ namespace Moritz.Composer
             if(visibleOutputIndexLists.Count > 0)
             {
                 AppendOutInToSB(visibleOutputIndexLists, sb);
+                sb.Append(" ");
             }
             if(inputIndexLists.Count > 0)
             {
-                sb.Append(" | ");
+                sb.Append("| ");
                 AppendOutInToSB(inputIndexLists, sb);
-
             }
             return sb.ToString();
         }
