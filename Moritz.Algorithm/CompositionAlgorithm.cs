@@ -38,9 +38,10 @@ namespace Moritz.Algorithm
                 Debug.Assert(MasterVolumePerOutputVoice[i] < 128, "CompositionAlgorithm: master volume out of range!");
             }
             Debug.Assert(NumberOfInputVoices >= 0, "CompositionAlgorithm: There can not be a negative number of input voices!");
-            // I assume that a single performer will never need more than three staves @ two voices... As far as I know, this 
-            // restriction is not really necessary as far as the software is concerned, but it may help reduce errors in future.
-            Debug.Assert(NumberOfInputVoices <= 6, "CompositionAlgorithm: There should not be more than six input voices!");
+            // There is no upper limit to the number of InputVoices.
+            // In future, multiple input devices may be possible, each of which is related to one or more InputVoices.
+            // InputVoices would then react to input devices sending on their midi channel. 
+            // See the comment about InputVoice midi channels in the InputVoice constructor.
             Debug.Assert(NumberOfBars > 0, "CompositionAlgorithm: There must be at least one bar!");
         }
 

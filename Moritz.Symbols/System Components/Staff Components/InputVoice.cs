@@ -13,6 +13,7 @@ namespace Moritz.Symbols
         public InputVoice(InputStaff inputStaff)
             : base(inputStaff)
         {
+            _midiChannel = byte.MaxValue;
         }
 
         /// <summary>
@@ -22,9 +23,24 @@ namespace Moritz.Symbols
         {
             w.SvgStartGroup("inputVoice", null);
 
+            if(_midiChannel < byte.MaxValue)
+            {
+                // This can only happen on the first system in the score. See SetMidiChannel(...) below.
+                w.WriteAttributeString("score", "midiChannel", null, MidiChannel.ToString());
+            }
+
             base.WriteSVG(w, true); // input voices are always visible
 
             w.SvgEndGroup(); // inputVoice
+        }
+
+        internal void SetMidiChannel(byte midiChannel, int systemIndex)
+        {
+            Debug.Assert(systemIndex == 0);
+            if(midiChannel >= 0 && midiChannel < 16)
+            {
+                _midiChannel = midiChannel;
+            }
         }
 
         public IEnumerable<InputChordSymbol> InputChordSymbols

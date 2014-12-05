@@ -186,6 +186,5 @@ namespace Moritz.Spec
             AdjustMsDurations<InputChordDef>(0, _uniqueDefs.Count, factor, minThreshold);
         }
         #endregion InputVoiceDef duration changers
-
     }
 }

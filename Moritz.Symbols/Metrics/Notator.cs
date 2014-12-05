@@ -65,6 +65,15 @@ namespace Moritz.Symbols
                         }
                         bool firstLmdd = true;
 
+                        if (staff is InputStaff)
+                        {
+                            InputVoice inputVoice = staff.Voices[voiceIndex] as InputVoice;
+                            if (systemIndex == 0)
+                            {
+                                InputVoiceDef inputVoiceDef = inputVoice.VoiceDef as InputVoiceDef;
+                                inputVoice.SetMidiChannel(inputVoiceDef.MidiChannel, systemIndex);
+                            }
+                        }
                         foreach(IUniqueDef iud in voice.VoiceDef.UniqueDefs)
                         {
                             NoteObject noteObject =

@@ -1121,6 +1121,9 @@ namespace Moritz.Spec
         #endregion public SetLyricsToIndex()
 
         public List<IUniqueDef> UniqueDefs { get { return _uniqueDefs; } }
+
+        public byte MidiChannel = byte.MaxValue; // the MidiChannel will only be valid if set to a value in range [0..15]
+
         #endregion public
 
         protected List<IUniqueDef> _uniqueDefs = new List<IUniqueDef>();

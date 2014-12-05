@@ -373,9 +373,17 @@ namespace Moritz.Symbols
                 _firstDurationSymbol = value;
             }
         }
-        #endregion
-
-
+        #endregion
+
+        /// <summary>
+        /// A MidiChannel attribute is always written for every OutputVoice in the first system in a score.
+        /// No other OutputVoice MidiChannels are written.
+        /// InputVoice MidiChannel attributes are omitted altogether unless explicitly set (in an InputVoiceDef) by an algorithm.
+        /// If they are set, InputVoice MidiChannel attributes are also only written in the first system in the score.
+        /// </summary>
+        public byte MidiChannel { get { return _midiChannel; } }
+        protected byte _midiChannel;
+
         public VoiceDef VoiceDef = null;
 
         private DurationSymbol _firstDurationSymbol;

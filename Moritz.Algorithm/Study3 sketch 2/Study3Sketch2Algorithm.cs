@@ -158,7 +158,7 @@ namespace Moritz.Algorithm.Study3Sketch2
                 ++channel;
             }
 
-            InputVoiceDef inputVoice = new InputVoiceDef();
+            InputVoiceDef inputVoiceDef = new InputVoiceDef();
             VoiceDef topVoice = bar[0];
             foreach(IUniqueDef iud in topVoice.UniqueDefs)
             {
@@ -168,15 +168,15 @@ namespace Moritz.Algorithm.Study3Sketch2
                 {
                     byte pitch = (byte)(mcd.NotatedMidiPitches[0] + 36);
                     InputChordDef icd = new InputChordDef(mcd.MsPosition, mcd.MsDuration, pitch, null, 0, 1, null);
-                    inputVoice.UniqueDefs.Add(icd);
+                    inputVoiceDef.UniqueDefs.Add(icd);
                 }
                 else if(rd != null)
                 {
                     RestDef newRest = new RestDef(rd.MsPosition, rd.MsDuration);
-                    inputVoice.UniqueDefs.Add(newRest);
+                    inputVoiceDef.UniqueDefs.Add(newRest);
                 }
             }
-            bar.Add(inputVoice);
+            bar.Add(inputVoiceDef);
 
             return bar;
         }

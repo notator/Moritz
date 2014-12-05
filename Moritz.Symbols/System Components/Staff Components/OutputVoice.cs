@@ -46,13 +46,6 @@ namespace Moritz.Symbols
         private byte? _voiceID = null;
 
         /// <summary>
-        /// The Assistant Composer writes a midiChannel attribute for every OutputVoice in
-        /// the first system in the score. No other OutputVoice.midiChannels are written.
-        /// </summary>
-        public byte MidiChannel { get { return _midiChannel; } } 
-        private byte _midiChannel;
-
-        /// <summary>
         /// The Assistant Composer writes a masterVolume attribute for every OutputVoice in
         /// the first system in the score. No other OutputVoice.masterVolumes are written.
         /// </summary>
