@@ -42,6 +42,7 @@ namespace Moritz.Composer
             this.KrystalsListBox = new System.Windows.Forms.ListBox();
             this.RemoveSelectedKrystalButton = new System.Windows.Forms.Button();
             this.NotationGroupBox = new System.Windows.Forms.GroupBox();
+            this.VoiceIndicesHelpLabelLabel = new System.Windows.Forms.Label();
             this.ChordTypeComboBoxLabel = new System.Windows.Forms.Label();
             this.ChordTypeComboBox = new System.Windows.Forms.ComboBox();
             this.ShortStaffNamesHelpLabel = new System.Windows.Forms.Label();
@@ -96,7 +97,6 @@ namespace Moritz.Composer
             this.RevertEverythingButton = new System.Windows.Forms.Button();
             this.ShowUncheckedFormsButton = new System.Windows.Forms.Button();
             this.ShowConfirmedFormsButton = new System.Windows.Forms.Button();
-            this.VoiceIndicesHelpLabelLabel = new System.Windows.Forms.Label();
             this.NotationGroupBox.SuspendLayout();
             this.StandardChordsOptionsPanel.SuspendLayout();
             this.KrystalsGroupBox.SuspendLayout();
@@ -253,6 +253,18 @@ namespace Moritz.Composer
             this.NotationGroupBox.TabIndex = 9;
             this.NotationGroupBox.TabStop = false;
             this.NotationGroupBox.Text = "notation";
+            // 
+            // VoiceIndicesHelpLabelLabel
+            // 
+            this.VoiceIndicesHelpLabelLabel.AutoSize = true;
+            this.VoiceIndicesHelpLabelLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+            this.VoiceIndicesHelpLabelLabel.Location = new System.Drawing.Point(111, 145);
+            this.VoiceIndicesHelpLabelLabel.Margin = new System.Windows.Forms.Padding(0);
+            this.VoiceIndicesHelpLabelLabel.Name = "VoiceIndicesHelpLabelLabel";
+            this.VoiceIndicesHelpLabelLabel.Size = new System.Drawing.Size(115, 14);
+            this.VoiceIndicesHelpLabelLabel.TabIndex = 190;
+            this.VoiceIndicesHelpLabelLabel.Text = "available voice indices";
+            this.VoiceIndicesHelpLabelLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // ChordTypeComboBoxLabel
             // 
@@ -477,11 +489,12 @@ namespace Moritz.Composer
             // 
             this.StaffGroupsHelpLabel.AutoSize = true;
             this.StaffGroupsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-            this.StaffGroupsHelpLabel.Location = new System.Drawing.Point(250, 306);
+            this.StaffGroupsHelpLabel.Location = new System.Drawing.Point(250, 297);
             this.StaffGroupsHelpLabel.Name = "StaffGroupsHelpLabel";
-            this.StaffGroupsHelpLabel.Size = new System.Drawing.Size(124, 14);
+            this.StaffGroupsHelpLabel.Size = new System.Drawing.Size(147, 42);
             this.StaffGroupsHelpLabel.TabIndex = 167;
-            this.StaffGroupsHelpLabel.Text = "integer values (total = x)";
+            this.StaffGroupsHelpLabel.Text = "integer values (total = x).\r\nstaff groups cannot contain\r\nboth input and output s" +
+    "taves.";
             // 
             // StaffGroupsLabel
             // 
@@ -882,18 +895,6 @@ namespace Moritz.Composer
             this.ShowConfirmedFormsButton.Text = "show confirmed forms";
             this.ShowConfirmedFormsButton.UseVisualStyleBackColor = false;
             this.ShowConfirmedFormsButton.Click += new System.EventHandler(this.ShowConfirmedFormsButton_Click);
-            // 
-            // VoiceIndicesHelpLabelLabel
-            // 
-            this.VoiceIndicesHelpLabelLabel.AutoSize = true;
-            this.VoiceIndicesHelpLabelLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-            this.VoiceIndicesHelpLabelLabel.Location = new System.Drawing.Point(111, 145);
-            this.VoiceIndicesHelpLabelLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.VoiceIndicesHelpLabelLabel.Name = "VoiceIndicesHelpLabelLabel";
-            this.VoiceIndicesHelpLabelLabel.Size = new System.Drawing.Size(115, 14);
-            this.VoiceIndicesHelpLabelLabel.TabIndex = 190;
-            this.VoiceIndicesHelpLabelLabel.Text = "available voice indices";
-            this.VoiceIndicesHelpLabelLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // AssistantComposerForm
             // 

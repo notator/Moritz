@@ -1196,9 +1196,15 @@ namespace Moritz.Composer
             {
                 List<byte> bytes = M.StringToByteList(StaffGroupsTextBox.Text, ',');
                 int sum = 0;
+                bool outputOK = false;
                 foreach(byte b in bytes)
+                {
                     sum += (int)b;
-                if(sum != _numberOfStaves)
+                    if(sum == _visibleOutputVoiceIndicesPerStaff.Count)
+                        outputOK = true;
+                }
+                    
+                if(! outputOK || sum != _numberOfStaves)
                     M.SetTextBoxErrorColorIfNotOkay(StaffGroupsTextBox, false);
             }
             SetGroupBoxIsUnconfirmed(NotationGroupBox, ConfirmNotationButton, RevertNotationButton);
@@ -1419,7 +1425,8 @@ namespace Moritz.Composer
                                                     "available clefs: " + clefsSB.ToString();
                 this.StafflinesPerStaffHelpLabel.Text = _numberOfStaves.ToString() + " integers separated by commas.\n" +
                                                     "standard clefs must have 5 lines";
-                this.StaffGroupsHelpLabel.Text = "integers (whose total is " + _numberOfStaves.ToString() + ")";
+                this.StaffGroupsHelpLabel.Text = "integers (whose total is " + _numberOfStaves.ToString() + ")\n" +
+                                                "staff groups cannot contain both\ninput and output staves.";
                 this.LongStaffNamesHelpLabel.Text = _numberOfStaves.ToString() + " names (for first system)";
                 this.ShortStaffNamesHelpLabel.Text = _numberOfStaves.ToString() + " names (for other systems)";
             }
