@@ -1,0 +1,1154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>Score Attributes</title>
+    <base target="_top" />
+    <link href="../styleSheet.css" rel="stylesheet" type="text/css" />
+    <script src="../javascript.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        trap();
+    </script>
+    <style type="text/css">
+        .code {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            color: #1010C6;
+        }
+        .red {
+            color: #FF0000;
+        }
+    </style>
+</head>
+<body style="width: 780px">
+    <div>
+        <p class="header1">
+            SVG Score Extensions
+        </p>
+        <hr class="hrHeight1" />
+        <br />
+        <div>
+            December 2014: This is the latest version of the extensions to SVG used by my
+        <a href="../moritz/assistantComposer/assistantComposer.html">Assistant Composer</a>
+            and <a href="../moritz/moritzAssistantPerformer.html">Assistant Performer</a> software. 
+        <span style="color: #FF0000">It is subject to change without notice!</span>
+            
+            <p class="boldHeader2">Summary:</p>
+            This version introduces a new type of staff: The <em>Input Staff</em>. Staves in existing scores are all <em>Output Staves</em>.<br />
+            
+            
+            
+            <br />
+            <em>Output Staves</em> contain <em>Output Chord</em> elements (among other things). Each <em>Output Chord</em> contains a<span class="code"> midiChord</span> element containing midi information that is ultimately sent to a midi <em>output</em> device.<span class="code"> midiChord</span> elements have not changed since the previous version of these extensions.<br />
+            <br />
+            Correspondingly, <em>Input Staves</em> contain <em>Input Chord</em>s, and each <em>Input Chord</em> contains an <span class="code">inputChord</span> element. <span class="code">inputChord</span> elements handle midi information coming from a midi <em>input</em> device.<br />
+            <br />
+            Each <span class="code">inputChord</span> contains a list of<span class="code"> inputNote</span> elements, each of which contains a list of <span class="code">seqRef</span> elements, each of which refers to a contiguous, closed sequence of <em>Output Chord</em>s and <em>Rest</em>s defined in an <em>Output Voice</em>. Such contiguous, closed midi output sequences are called &quot;Seq&quot;s in my software. (The Assistant Composer can construct an <em>Output Voice</em> as a sequence of Seqs.)<br />
+            This format enables very complex output events to be triggered using single NoteOn input events, but single<span class="code"> inputNote</span>s in multi-note <span class="code">inputChord</span>s, can also trigger single one-note <em>Output Chord</em>s. This would feel like playing a &quot;prepared piano&quot; - except that the preparation can change during the performance.<br />
+            The format thus allows different scores to be created for performing the same output information at different levels of control.
+            Note that:<br />
+            <ul class="ulStandard">
+                <li>There may be more than one parallel <em>Input Voice</em>. The Assistant Composer can write any number of <em>Input Staves</em>, each of which
+                    can contain up to two <em>Input Voice</em>s. Two staves will probably be enough for the current Assistant Performer, which is designed to use just one midi input device (whose channel is always ignored).<br />
+                    The Assistant Composer can however write <em>Input Voice</em> midi channel attributes which would be used to enable the use of multiple input devices.</li>
+                <li>
+                    The performing software always listens, and reacts to, single midi NoteOn/NoteOff events, 
+                    and relates them to corresponding <em>single, notated noteheads</em>. Continuous incoming midi controller information is dealt with separately.
+                </li>
+                
+            </ul>
+            <br />
+        <hr class="hrHeight1" />
+
+            <p class="boldHeader2">File creation:</p>
+            The Assistant Composer creates scores containing output and input staves. The input staves are larger. Input chords are usually aligned to the output chords to which they refer (The output event may be delayed -- see the <span class="code">seqRef</span> definition below.)<br />
+            &nbsp;&nbsp;&nbsp; TODO: Check how the AC treats short durations in output staves.<br />
+            &nbsp;&nbsp;&nbsp; a) Is there a lower limit to the msDurationInScore of the shortest duration class?<br />
+            &nbsp;&nbsp;&nbsp; b) Is there a lower limit to the msDurationInScore between chords in different voices?<br />
+            &nbsp;&nbsp;&nbsp; I think the answer is NO in both cases, but that in b) there may be a minimum <em>horizontal distance</em> between the two chords...<br />
+            <br />
+            2. Load time: The Assistant Performer first reads the score, creating:<br />
+            &nbsp;&nbsp;&nbsp; a) A worker for each output channel. Each of these has a private list of <span class="code">outputSequence</span> objects, each of which is associated with an <span class="code">msPositionInScore</span>. 
+			If an <span class="code">outputSequence</span> overlaps the previous one in the 
+			same voice, an exception is thrown. The worker can also access (copies of) the (cascading) <span class="code">perfCtl</span> objects referenced by its <span class="code">outputSequence</span>s.<br />
+            &nbsp;&nbsp;&nbsp; b) a list of objects (in temporal sequence) to be accessed by the main browser thread: Each object in this list has an <span class="code">msPositionInScore</span> and a list of synchronous <span class="code">inputNote</span>s. (Multiple input chords at the same <span class="code">msPositionInScore</span> are treated as a single chord. This is possible, because noteOff handling is done at the note level.) Each <span class="code">inputNote</span> has a list of channels.<br />
+            <br />
+            3. Performance time:<br />
+            Input midi messages arrive in the browser&#39;s main thread. Each output channel has its own (single) worker thread.
+            <br />
+            The software knows the current <span class="code">msPositionInScore</span>, and the <span class="code">inputNote</span>s (noteOns) that can be expected to be played at that point in the main browser thread. There is a fixed msDuration (<span class="code">deltaTime</span>) within which noteOns are accepted for a particular <span class="code">msPositionInScore</span>.<br />
+            (I think <span class="code">deltaTime</span> should be the lower msDuration limit of the shortest duration class in the score &mdash; if 400ms &lt;= quaver &lt; 800ms, then 25ms &lt;= fourFlags &lt; 50ms and <span class="code">deltaTime</span> is &lt; 25ms. But <span class="code">deltaTime</span> could also be defined as an independent user option...)<br />
+            When an incoming noteOn is matched to one of the expected ones, a message is sent to each of its channels to start the sequence at that <span class="code">msPositionInScore</span>. What happens when no match is found (a &quot;wrong note&quot;) is determined by the sequence&#39;s noteOnKey option (see below). Excess performed pitches (within <span class="code">deltaTime</span>) will always be ignored (see below). If too few noteOns arrive, the unmatched notes will simply not be played.<br />
+            <br />
+            When the <span class="code">msPositionInScore</span> times out in the main thread, or the correct number of noteOns has arrived, noteOn handling is turned off for a time (see <span class="code">noteOnPauseTime</span> below) before the software starts listening for noteOns for the next <span class="code">msPositionInScore</span> in the sequence. NoteOff messages, however, continue to be handled and sent to the channels associated with their corresponding noteOn (the corresponding <span class="code">msPositionInScore</span> is also sent with the noteOff, to identify the target sequence), and the&nbsp;channel worker decides how to react.<br />
+            If a channel worker is currently running a sequence when told to start a new one, it simply stops (and cleans up) the currently running sequence before starting the new one. A noteOn arriving later for that sequence would simply be ignored. (Sequence handling is done inside the worker.)<br />
+            The duration of the <span class="code">noteOnPauseTime</span> between two <span class="code">msPositionInScore</span>s must be at least <span class="code">deltaTime</span> but could, for example, be half the difference between the two <span class="code">msPositionInScore</span>s (or some other value) if that value is larger. NoteOn handling will be switched on again <span class="code">noteOnPauseTime</span> milliseconds after the <em>first</em> noteOn to arrive for the first of the two <span class="code">msPositionInScore</span>s.
+            <br />
+                    <br />
+        </div>
+        <hr class="hrHeight1" />
+
+        <p class="boldHeader2">
+            The score namespace
+        </p>
+        The extensions are contained in the following namespace:<br />
+        <div class="code">
+            xmlns:score="http://www.james-ingram-act-two.de/open-source/svgScoreExtensions.html"
+        </div>
+        <br />
+        <div class="note">
+                Definition:
+        An <strong><em><span style="font-size:11px">msDuration</span></em></strong> is an absolute millisecond duration. msDurations are stored in the score as <span class="code">score:msDuration</span> values, and are are used as the durations in default performances (when there is no live performer).<br />
+        An <strong><em><span style="font-size:11px">msDuration</span></em></strong> is also used to calculate an object&#39;s <strong><em><span style="font-size:11px">msPosition</span></em></strong> (the position in absolute milliseconds from the beginning of the score). Objects in different voices that have the same <em>msPosition</em> are both vertically aligned in space and (usually) synchronous during performances.<br />
+            </div><br />
+        <hr class="hrHeight1" />
+        <p class="boldHeader2">
+            SVG &lt;g&gt; 
+			elements defining container types
+        </p>
+        These elements contain 
+		both graphics and special types defined in the <span style="color: #0000FF">score:</span> namespace (see below).<br />
+        <span class="red">These elements all have a class attribute that is used by the Assistant Performer to identify their type.<br />
+            The id attributes are just for convenience while debugging.</span>
+        <table>
+            <colgroup style="padding-top: 4px">
+                <col width="120" />
+                <col width="*" />
+            </colgroup>
+            <tr valign="top">
+                <td><em>System</em>
+                </td>
+                <td>
+                    <table>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Attributes</span>
+                            </td>
+                            <td valign="top"></td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">class</span>&nbsp;
+                            </td>
+                            <td valign="top"><span class="code">"system"</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">id</span>&nbsp;
+                            </td>
+                            <td valign="top">An id of the form: <span class="code">page[pageNumber]_system[sytemNumber]</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Content
+                            </td>
+                            <td valign="top">&nbsp;
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">&lt;g.../g&gt;</td>
+                            <td valign="top">A graphics group containing the beginning and end markers, and the 
+								running cursor.<br />
+                                (<span class="code">class=&quot;markers&quot;</span>)</td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">&lt;g.../g&gt;...</span>
+                            </td>
+                            <td valign="top">A list of one or more &lt;g.../g&gt; <em>Output Staff</em> elements&nbsp; 
+								(<span class="code">class=&quot;outputStaff&quot;</span>). </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">&lt;g.../g&gt;...</span>
+                            </td>
+                            <td valign="top">A list of zero or more &lt;g.../g&gt; <em>Input Staff</em> elements 
+								(<span class="code">class=&quot;inputStaff&quot;</span>). </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">&lt;g.../g&gt;</span>
+                            </td>
+                            <td valign="top">A list of barlines in a single group. (<span class="code">class=&quot;barlines&quot;</span>)</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td><em>Output Staff</em>
+                </td>
+                <td>
+                    <table>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Attributes</span>
+                            </td>
+                            <td valign="top"></td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">class</span>&nbsp;
+                            </td>
+                            <td valign="top"><span class="code">"outputStaff"</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">id</span>&nbsp;
+                            </td>
+                            <td valign="top">An id of the form:
+								<span class="code">p[pageNumber]_sys[systemNumber]_staff[staffNumber]</span>.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">score:invisible</span>
+                            </td>
+                            <td valign="top">This attribute can only be present if the staff is invisible (i.e. the staff contains no graphic information). This attribute is just a debugging convenience. It is not needed (and should not be used) by the client software. If present, its value is always &quot;1&quot;.&nbsp;<br />
+                                See the <span class="code">score:staffName</span> attribute.</td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">score:staffName</span>
+                            </td>
+                            <td valign="top">This attribute is only present when the staff is visible (i.e. contains graphic info).<br />
+                                If present, its value is the name of the staff (e.g. &quot;Flute&quot;). 
+                                If not present, the staff will be invisible (contain no graphic information). The 
+                                Assistant Performer uses this attribute when referring to the staff in its user
+								interface.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Content</span>
+                            </td>
+                            <td valign="top">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">&lt;g.../g&gt;</span>
+                            </td>
+                            <td valign="top">A list of stafflines in a single group. (<span class="code">class=&quot;stafflines&quot;</span>)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">&lt;g.../g&gt;</span>
+                            </td>
+                            <td valign="top">An<em> Output Voice</em> element (<span class="code">class=&quot;outputVoice&quot;</span>)
+								(see
+								below). There must be at least one <em>Output Voice</em>.<br />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">&lt;g.../g&gt;</span>
+                            </td>
+                            <td valign="top">An optional second <em>Output Voice</em> element (<span class="code">class=&quot;outputVoice&quot;</span>).<br />
+                                Moritz does not support more than two <em>Output Voice</em>s per <em>Output Staff</em>.
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td><em>Output Voice</em>
+                </td>
+                <td>
+                    <table>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Attributes</span>
+                            </td>
+                            <td valign="top"></td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">class</span>&nbsp;
+                            </td>
+                            <td valign="top"><span class="code">"outputVoice"</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">score:midiChannel</span>&nbsp;
+                            </td>
+                            <td valign="top">The (zero-based) MIDI channel index.<br />
+                                The <em>Output Voice</em>s in a score are always notated in <em>Output Staff</em>s above the <em>Input Staff</em>s. Each <em>Output Voice</em> has its own MIDI channel, and the MIDI channels are always in increasing order, from top to bottom of the <em>Output Voice</em>s in the score, starting at 0.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">score:voiceID</span>
+                            </td>
+                            <td valign="top">This value is used by <span class="code">inputNote</span> elements to identify the <em>Output Voice</em>s to which they refer. This attribute, which is only written to the file
+                                if there are <em>Input Voice</em>s in the score, is necessary because Output Voices can be printed in a top-bottom order that is different from the order in which they were composed.</td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">score:masterVolume</span>&nbsp;
+                            </td>
+                            <td valign="top">This value is used to initialize the 
+								volume of this <em>Output Voice</em>&#39;s MIDI channel at the beginning of a performance. This attribute is always 
+								written to <em>Output Voice</em>s in the first bar of the score, but nowhere else.</td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Content</span>
+                            </td>
+                            <td valign="top">
+                                <br />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">&lt;use.../&gt;</span>
+                            </td>
+                            <td valign="top">A clef.<br />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">&lt;text&gt;...&lt;/text&gt;</span>
+                            </td>
+                            <td valign="top">The voice&#39;s name (graphics, printed to the left of the voice.).<br />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">&lt;g.../g&gt;...</span>
+                            </td>
+                            <td valign="top">One or more SVG &lt;g&gt; elements in
+								left to right order in the score.<br />
+                                These objects can be<br />
+                                <em>Output Chord</em>s (<span class="code">class=&quot;outputChord&quot;</span>)<br />
+                                <em>Rest</em>s (<span class="code">class=&quot;rest&quot;</span>)<br />
+                                and<br />
+                                <em>Cautionary Chord</em>s (<span class="code">class=&quot;cautionaryChord&quot;</span>)<br />
+                                <em>ClefChangeSymbol</em>s (<span class="code">class=&quot;clefChange&quot;</span>)<br />
+                                <em>BeamBlock</em>s (<span class="code">class=&quot;beamBlock&quot;</span>)<br />
+                                (These last three objects contain no performance information, so are actually 
+								ignored by the Assistant Performer.)<br />
+                            </td>
+                        </tr>
+
+                    </table>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td><em>Output Chord</em>
+                </td>
+                <td>
+                    <table>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Attributes</span>&nbsp;
+                            </td>
+                            <td valign="top">&nbsp;
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">class</span>&nbsp;
+                            </td>
+                            <td valign="top"><span class="code">"outputChord"</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Content</span><br />
+                            </td>
+                            <td valign="top"></td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">score:midiChord</span></td>
+                            <td valign="top">One object of this type (see below).</td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">&lt;g&gt;...&lt;/g&gt;</span></td>
+                            <td valign="top">an SVG graphics
+								group (<span class="code">class=&quot;graphics&quot;</span>). </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td><em>Input Staff
+                </em>
+                </td>
+                <td>
+                    <table>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Attributes</span>
+                            </td>
+                            <td valign="top"></td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">class</span>&nbsp;
+                            </td>
+                            <td valign="top"><span class="code">"inputStaff"</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">id</span>&nbsp;
+                            </td>
+                            <td valign="top">An id of the form:<br />
+                                <span class="code">p[pageNumber]_sys[systemNumber]_staff[staffNumber]</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">score:staffName</span>
+                            </td>
+                            <td valign="top">A string (e.g. "Flute") which is the name of the staff. The
+                                Assistant Performer uses this attribute when referring to the staff in its user
+								interface.
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Content</span>
+                            </td>
+                            <td valign="top">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">&lt;g.../g&gt;</span>
+                            </td>
+                            <td valign="top">A list of stafflines in a single group. (<span class="code">class=&quot;stafflines&quot;</span>)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">&lt;g.../g&gt;</span>
+                            </td>
+                            <td valign="top">An <em>Input Voice</em> element (<span class="code">class=&quot;inputVoice&quot;</span>)
+								(see
+								below). There must be at least one <em>Input Voice</em> in an <em>Input Staff</em><br />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">&lt;g.../g&gt;</span>
+                            </td>
+                            <td valign="top">An optional second <em>Input Voice</em> element (<span class="code">class=&quot;inputVoice&quot;</span>).<br />
+                                Moritz does not support more than two <em>Input Voice</em>s per <em>Input Staff</em>.
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td><em>Input Voice</em>
+                </td>
+                <td>
+                    <table>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Attributes</span>
+                            </td>
+                            <td valign="top"></td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">class</span>&nbsp;
+                            </td>
+                            <td valign="top"><span class="code">"inputVoice"</span>
+                            </td>
+                        </tr>
+                                                                        <tr>
+                            <td valign="top" class="code">score:midiChannel</td>
+                            <td valign="top">Optional. The channel index of the midi input device that will trigger events in this <em>Input Voice</em>. If not present, the midi input device&#39;s channel is ignored, and all incoming midi events trigger events in this <em>Input Voice</em>.<br />
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Content</span>
+                            </td>
+                            <td valign="top">
+                                <br />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">&lt;use.../&gt;</span>
+                            </td>
+                            <td valign="top">A clef.<br />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">&lt;text&gt;...&lt;/text&gt;</span>
+                            </td>
+                            <td valign="top">The voice&#39;s name (graphics, printed to the left of the voice.).<br />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">&lt;g.../g&gt;...</span>
+                            </td>
+                            <td valign="top">A list of SVG &lt;g&gt; elements in
+								left to right order in the score.<br />
+                                These objects can be<br />
+                                <em>Input Chord</em>s (<span class="code">class=&quot;inputChord&quot;</span>)<br />
+                                <em>Rest</em>s (<span class="code">class=&quot;rest&quot;</span>)<br />
+                                and<br />
+                                <em>Cautionary Chord</em>s (<span class="code">class=&quot;cautionaryChord&quot;</span>)<br />
+                                <em>ClefChangeSymbol</em>s (<span class="code">class=&quot;clefChange&quot;</span>)<br />
+                                <em>BeamBlock</em>s (<span class="code">class=&quot;beamBlock&quot;</span>)<br />
+                                (These last three objects contain no performance information, so are actually 
+								ignored by the Assistant Performer.)<br />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <tr valign="top">
+                <td><em>Input Chord</em>
+                </td>
+                <td>
+                    <table>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Attributes</span>&nbsp;
+                            </td>
+                            <td valign="top">&nbsp;
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">class</span>&nbsp;
+                            </td>
+                            <td valign="top"><span class="code">&quot;inputChord"</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">score:msDuration &nbsp;
+                            </td>
+                            <td valign="top">Integer: The msDuration in the score of this <em>Input Chord</em>.<br />
+                                This value is used by the Assistant Performer to calculate the <em>Input Chord</em>&#39;s msPosition, which is the msPosition of the <em>Seq</em>s to which the <em>Input Chord</em> points.<br />
+                                Each <em>Input Chord</em> is has the same msPosition as (and is vertically aligned to) its related <em>Seq</em>s.<br />
+                                <strong>Remarks</strong>:<br />
+                                1. <em>Input Voice</em>s contain no output information, so they are ignored in default performances. This means that <em>Input Chord</em> msDurations are never converted to real milliseconds.<br />
+                                2. It would have been possible to have had an msPosition attribute here, but the Assistant Performer calculates the msPositions of all <em>Output Chord</em>s and <em>Rest</em>s anyway (so that it can send simultaneous <em>Output Chord</em>s in different voices simultaneously). The Assistant Performer software therefore becomes simpler if <em>Input Chord</em>s are not treated differently here.</td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">score:lyric</td>
+                            <td valign="top">Optional. A lyric string</td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Content</span><br />
+                            </td>
+                            <td valign="top"></td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">score:inputNotes</span></td>
+                            <td valign="top">One element of this type. A sequence of <span class="code">inputNote</span>.</td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">&lt;g&gt;...&lt;/g&gt;</span></td>
+                            <td valign="top">an SVG graphics
+								group (<span class="code">class=&quot;graphics&quot;</span>). </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td><em>Rest</em>
+                </td>
+                <td>
+                    <table>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Attributes</span>
+                            </td>
+                            <td valign="top"></td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">class</span>&nbsp;
+                            </td>
+                            <td valign="top"><span class="code">&quot;rest&quot;</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">score:msDuration
+                            </td>
+                            <td valign="top">Integer: the msDuration in the score of the <em>Rest</em> .<br />
+                                This is the millisecond duration of the <em>Rest</em> in default performances.</td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Content</span><br />
+                            </td>
+                            <td valign="top"></td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">&lt;text&gt;...&lt;/text&gt;</span></td>
+                            <td valign="top">The rest character (graphics).
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <br />
+        <hr class="hrHeight1" />
+        <p class="boldHeader2">
+            The <span style="color: #0000FF">score:</span> namespace
+        </p>
+        <br />
+        <table style="vertical-align: top;">
+            <colgroup>
+                <col width="180" />
+                <col width="*" />
+            </colgroup>
+            <tr>
+                <td valign="top">
+                    <span class="code">score:msDuration</span>&nbsp;
+                </td>
+                <td valign="top">Integer: The <em>msDuration</em> of a <em>Rest</em> or <em>Input Chord</em>.<br />
+                    <em>Output Chord</em> <em>msDuration</em>s are calculated from the <em>msDuration</em>s of their <span class="code">basicChords</span>.<br />
+                </td>
+            </tr>
+
+
+            <tr>
+                <td valign="top" class="code">score:midiChord
+                </td>
+                <td valign="top">Contained in <em>Output Chord</em> elements
+					<table>
+
+                        <tr style="vertical-align: top">
+                            <td>Attributes
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">hasChordOff
+                            </td>
+                            <td valign="top">Optional. 0 = false, 1 = true. Default is true.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">pitchWheelDeviation
+                            </td>
+                            <td valign="top">Optional. MIDI pitch wheel deviation. [0..127]<br />
+                                Coarse control byte only. Default is no change (i.e. the channel setting is 
+                                changed permanently).
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">minBasicChordMsDuration
+                            </td>
+                            <td valign="top">Optional. The minimum duration of a of a <span class="code">basicChord </span>in
+                                this <span class="code">score:midiChord</span>. Default is 1.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Content</span>:
+                            </td>
+                            <td valign="top"></td>
+                        </tr>
+
+                        <tr>
+                            <td valign="top" class="code">basicChords
+                            </td>
+                            <td valign="top">See below. This element must exist.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">sliders
+                            </td>
+                            <td valign="top">Optional. See below.
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td valign="top" class="code" style="padding-top: 4px">basicChords&nbsp;
+                </td>
+                <td>
+                    Contained in <span class="code">score:midiChord</span> elements
+                    <table>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Attributes</span>&nbsp;
+                            </td>
+                            <td valign="top">none
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Content</span>
+                            </td>
+                            <td valign="top">A sequence of <span class="code">basicChord </span>elements. The sequence must exist,
+                                and it must contain at least one <span class="code">basicChord</span>.
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td valign="top" class="code" style="padding-top: 4px">basicChord
+                </td>
+                <td>
+                    Contained in <span class="code">basicChords</span> elements
+                    <table>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Attributes</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">msDuration
+                            </td>
+                            <td valign="top">Obligatory. An integer.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">bank
+                            </td>
+                            <td valign="top">Optional. MIDI bank index. [0..127]. Default is no change.<br />
+                                Overrides <span class="code">score:midiChord.bank</span>.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">patch
+                            </td>
+                            <td valign="top">Optional. MIDI patch index. [0..127]. Default is no change.<br />
+                                Overrides <span class="code">score:midiChord.patch</span>.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">hasChordOff</td>
+                            <td>Optional. 0 = false, 1 = true. Default is true.</td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">pitches
+                            </td>
+                            <td valign="top">Obligatory. A series of one or more integers in range [0..127] separated by spaces.
+                                The numbers are MIDI note numbers in ascending order.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">velocities
+                            </td>
+                            <td valign="top">Obligatory. A series of integers in range [0..127] separated by spaces.<br />
+                                The numbers are MIDI velocities corresponding to the MIDI notes.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Content</span>
+                            </td>
+                            <td valign="top">none
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td valign="top" class="code" style="padding-top: 4px">sliders
+                </td>
+                <td>
+                    Contained in <span class="code">score:midiChord</span> elements
+                    <table>
+                        <tr>
+                            <td valign="top">Optional. If the <span class="code">sliders</span> element is present then it has one
+                                or more of the attributes below, each of which defines an envelope:<br />
+                                The first integer in each series is the value of the controller at the beginning
+                                of the envelope, the last integer is the value of the controller at the end of the
+                                envelope. Between these, there can be any number of values, which are distributed
+                                at equal intervals across the envelope.
+                            </td>
+                        </tr>
+                    </table>
+                    <table>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Attributes</span>
+                            </td>
+                            <td valign="top"></td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">pitchWheel
+                            </td>
+                            <td valign="top">Optional. A series of integers in range [0..127] separated by spaces.<br />
+                                The numbers are "coarse adjust" values for The MIDI pitchwheel control.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">pan
+                            </td>
+                            <td valign="top">Optional. A series of integers in range [0..127] separated by spaces.<br />
+                                The numbers are "coarse adjust" values for The MIDI pan position control.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">modulationWheel
+                            </td>
+                            <td valign="top">Optional. A series of integers in range [0..127] separated by spaces.<br />
+                                The numbers are "coarse adjust" values for The MIDI modulation wheel control.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">expressionSlider&nbsp;
+                            </td>
+                            <td valign="top">Optional. A series of integers in range [0..127] separated by spaces.<br />
+                                The numbers are "coarse adjust" values for The MIDI expression control.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Content</span>
+                            </td>
+                            <td valign="top">none
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+                        <tr>
+                <td valign="top" class="code" style="padding-top: 4px">score:inputNotes
+                </td>
+                <td>Contained in <em>Input Chord</em> elements
+					<table>
+                        <tr>
+                            <td valign="top" width="84px">
+                                <span class="attcon">Attributes</span>&nbsp;
+                            </td>
+                            <td valign="top">
+                                none</td>
+                        </tr>
+                        <tr>
+                            <td valign="top" width="84px">
+                                <span class="attcon">Content</span><br />
+                            </td>
+                            <td valign="top">A sequence of one or more
+								<span class="code">inputNote</span>
+                                elements.<br />
+                                This list may not be empty.</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td valign="top">
+                    <span class="code">inputNote</span></td>
+                <td valign="top">
+                    <span class="attcon">Contained in <span class="code">score:inputNotes</span> elements<br />
+                    Attributes</span>:<br />
+                    <table>
+                        <colgroup>
+                            <col width="100" />
+                            <col width="*" />
+                        </colgroup>
+                        <tr>
+                            <td valign="top" class="code">notatedKey </td>
+                            <td valign="top">Compulsory. The midi value of the <em>notated</em> key (the notehead). The midi value of the <em>performed</em> key is found at performance time.<br />
+                                The <span class="code">inputControls.noteOnKey</span> option determines what happens, if the notated and performed keys do not match.<br />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Content</span>:
+                            </td>
+                            <td valign="top"></td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="code">seqRefs</span>
+                            </td>
+                            <td valign="top">Compulsory. A list of <span class="code">seqRef</span> objects</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+                                   <tr>
+                            <td valign="top">
+                                <span class="code">seqRefs</span>
+                            </td>
+                            <td valign="top">Contained in <span class="code">inputNote</span> elements. A compulsory list of <span class="code">seqRef</span> objects</td>
+                        </tr>
+            <tr>
+                <td valign="top">
+                    <span class="code">seqRef</span>
+                </td>
+                <td valign="top">
+                    Contained in <span class="code">seqRefs</span> elements
+                        <table>
+                            <colgroup>
+                            <col width="*" />
+                        </colgroup>
+                            <tr>
+                            <td valign="top">
+                                <span class="attcon">Attributes</span>
+                            </td>
+                            <td valign="top">&nbsp;</td>
+                        </tr>
+
+                        <tr>
+                            <td valign="top" class="code">voiceID
+                            </td>
+                            <td valign="top">Compulsory. The voiceId of the voice containing the referenced Seq.
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">length </td>
+                            <td valign="top">Compulsory. The length of the referenced Seq.<br />
+                                The length is the 
+                                number of <em>Output Chord</em>s and <em>Rest</em>s in a <em>Seq</em>. The length does <em>not</em> include any other (durationless) objects in the <em>Output Voice</em> (beamBlocks, clefs etc).<br />
+                            </td>
+                        </tr>
+                                                    <tr>
+                            <td valign="top" class="code">msOffset </td>
+                            <td valign="top">Optional. An integer &gt;= 0. Default is 0. The msPositionInTheScore of the referenced <em>Seq</em> is the msPositionInTheScore of this <span class="code">inputNote</span> plus <span class="code">msOffset</span>.<br />
+                                The 
+                                referenced Seq will start playing <span class="code">msOffset</span> milliseconds after this <span class="code">inputNote</span> is triggered.<br />
+                            </td>
+                        </tr>
+                                                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Content</span>
+                            </td>
+                            <td valign="top">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">inputControls</td>
+                            <td valign="top">Optional. If present, applies to the Seq and/or the Seq&#39;s <em>Output Voice</em> from this moment onwards. (see below)</td>
+                        </tr>                      
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td valign="top">
+                    <span class="code">inputControls</span>
+                </td>
+                <td valign="top">Contained in <span class="code">seqRef</span> elements.<br />
+                    This element sets the performance options for a Seq, by individually overriding the current options in the Seq&#39;s <em>Output Voice</em>.<br />
+                                        Whether the result of the overriding is temporary 
+                    (just for the Seq) or permanent (set in the <em>Output Voice</em>) is set using the
+                     <span class="code">onlySeq</span> option. The options are described in detail below, but each <em>Output Voice</em> initially has the following set of default options:
+                        <table style="margin-left: 100px">                            
+                            <tr><td width="95px"><span class="code">noteOnKey</span></td><td>"ignore"</td></tr>
+                            <tr><td width="95px"><span class="code">noteOnVel</span></td><td>"ignore"</td></tr>
+                            <tr><td width="95px"><span class="code">noteOff</span></td><td>"ignore"</td></tr>
+                            <tr><td width="95px"><span class="code">pressure</span></td><td>"ignore"</td></tr>
+                            <tr><td width="95px"><span class="code">pitchWheel</span></td><td>"ignore"</td></tr>
+                            <tr><td width="95px"><span class="code">modulation</span></td><td>"ignore"</td></tr>
+                            <tr><td width="95px"><span class="code">speedOption</span></td><td>"none"</td></tr>
+                        </table>
+                        Attributes:<br />
+                        <table>
+                        <colgroup>
+                            <col width="100" />
+                            <col width="*" />
+                        </colgroup>
+                        <tr>
+                            <td valign="top"><span class="code">onlySeq</span></td>
+                            <td valign="top">
+                                Optional. A &#39;boolean&#39; integer 
+                                string. "0" or "1". Default is &quot;0&quot;.<br />
+                                <span>
+                                If this attribute&#39;s value is present (its value will be &quot;1&quot;), all the other options in this
+                                    <span class="code">inputControls</span> element will override the <em>Output Voice</em>&#39;s current settings only for this Seq. Otherwise, the <em>Output Voice</em>&#39;s settings are set to the result of the overriding.<br />
+                                The <span class="code">onlySeq</span> option is not itself maintained in the <em>Output Voice</em>.</span></td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">noteOnKey </td>
+                            <td valign="top">Optional. A string describing how the <em>key</em> value of a received
+								noteOn is to be used.
+								Default is the current value of this option in the <em>Output Voice</em>.<br />
+                                When a noteOn is received,
+								both its performed key value and its notated key value are sent to the related <em>Seq</em>s,
+								which then decide how to interpret the data.<br />
+                                Values can be:<br />
+                                &nbsp;&nbsp;&nbsp; &quot;ignore&quot; - 
+                                the Seq is performed, but the performed key value is ignored.
+								The key values (pitches) in 
+								the output sequence will be&nbsp;as defined in the score.<br />
+                                &nbsp;&nbsp;&nbsp; &quot;transpose&quot; - transpose the 
+                                Seq by the
+								difference between the performed and notated keys.<br />
+                                &nbsp;&nbsp;&nbsp; &quot;matchExactly&quot; - 
+                                only play the 
+                                Seq if the performed and notated keys match. If they don&#39;t match the performed key is ignored, and the Seq does not play.</td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">noteOnVel </td>
+                            <td valign="top">Optional. A string describing how the <em>velocity</em> value of a
+								received noteOn is to be used.
+								Default is the current value of this option in the <em>Output Voice</em>.<br />
+                                When a noteOn is received,
+								both its performed velocity value and its notated velocity value are sent to the
+								related <em>Seq</em>s,
+								which then decide how to interpret the data.<br />
+                                Values can be:<br />
+                                &nbsp;&nbsp;&nbsp; &quot;ignore&quot; - the Seq is performed, but the 
+                                performed velocity value is ignored.
+								The velocities in 
+								the output sequence will be&nbsp;as defined in the score.<br />
+                                &nbsp;&nbsp;&nbsp; &quot;scale&quot; - the velocities in the original output sequence
+								are scaled: If the performed velocity is less than 64, they are reduced. Otherwise
+								they are increased.<br />
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td valign="top" class="code">noteOff </td>
+                            <td valign="top">Optional. A string describing what happens when a noteOff is received
+								while the <em>Seq</em> is playing. Default is the current value of this option in the <em>Output Voice</em>.<br />
+                                Values can be:<br />
+                                &nbsp;&nbsp;&nbsp; &quot;ignore&quot; - allows the 
+								<em>Seq</em> to complete
+								(as
+								written in the score, subject to the noteOn options)<br />
+                                &nbsp;&nbsp;&nbsp; &quot;stop&quot; - stop after completing the current
+                                <em>Output Chord</em> or <em>Rest</em>.<br />
+                                &nbsp;&nbsp;&nbsp; 
+								&quot;stopNow&quot; - stop immediately (even while an
+                                <em>Output Chord</em> or <em>Rest</em>
+                                is playing). Both stop options send a midi allNotesOff
+								message to the channel when complete.<br />
+                                &nbsp;&nbsp;&nbsp; &quot;fade&quot; - fades (velocity) the 
+								<em>Seq</em> to
+								its end<br />
+                                &nbsp;&nbsp;&nbsp; 
+								&quot;shortFade&quot; 
+                                the <em>Seq</em> is faded (velocity) over a fixed number of chords, or to the end
+								of the <em>Seq</em>
+                                if that is sooner. The number of objects to fade is then provided in the shortFade attribute
+								(see below).</td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">shortFade </td>
+                            <td valign="top">An integer. This attribute does not exist unless <span class="code">noteOff </span>is set to &quot;shortFade&quot;. If it exists, it sets the number of objects to fade.<br />
+                                <span class="code">shortFade=0</span> means the same as <span class="code">noteOff="stop"</span>.&nbsp;&nbsp;&nbsp; </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">pressure </td>
+                            <td valign="top">Optional. A string that is the name of one of the following midi
+								controllers.<br />
+                                Default is the current value of this option in the <em>Output Voice</em>.<br />
+                                If present, the values of received <strong>aftertouch
+                                </strong>or<strong> channel pressure</strong>
+                                messages are converted to messages of the respective type, and sent to the 
+								<em>Seq</em>&#39;s channel.<br />
+                                Possible values are:<br />
+                                <div style="padding-left: 50px;">
+                                    "ignore"<br />
+                                    "aftertouch"<br />
+                                    "channelPressure"<br />
+                                    "pitchWheel"<br />
+                                    "modulation"<br />
+                                    "volume"<br />
+                                    "pan"<br />
+                                    "expression"<br />
+                                    "timbre"<br />
+                                    "brightness"<br />
+                                    "effects"<br />
+                                    "tremolo"<br />
+                                    "chorus"<br />
+                                    "celeste"<br />
+                                    "phaser"<br />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">pitchWheel </td>
+                            <td valign="top">Optional. A string that is the name of one of the above midi
+								controllers<br />
+                                (see <span class="code">pressure</span>). Default is the current value of this option in the <em>Output Voice</em>.<br />
+                                If present, the values of received <strong>pitchwheel</strong>
+                                messages are converted to messages of the respective type, and sent to the 
+								<em>Seq</em>&#39;s channel.<br />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">modulation </td>
+                            <td valign="top">Optional. A string that is the name of one of the above midi
+								controllers<br />
+                                (see <span class="code">pressure</span>). Default is the current value of this option in the <em>Output Voice</em>.<br />
+                                If present, the values of received 
+								<strong>modulationWheel</strong> messages are converted to messages of the respective type, and sent to the <em>Seq</em>&#39;s channel.<br />
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">maxVolume</td>
+                            <td valign="top">Present only if one of the above continuous controllers is set to 
+								send volume messages. This is then the maximum MIDI volume value that can be sent to the Output Voice&#39;s MIDI channel.<br />
+                                <strong>Seqs never send their own volume messages. The Assistant Performer always sends volume messages directly to the <em>Output Voice</em>&#39;s MIDI channel. </strong><br />
+                                <span class="code">maxVolume</span> is always greater than <span class="code">minVolume</span>.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">minVolume</td>
+                            <td valign="top">Present only if one of the above continuous controllers is set to 
+								send
+								volume messages.
+								This is then the minimum volume value that can be sent.<br />
+                                <span class="code">maxVolume</span> is always greater than <span class="code">minVolume</span>.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">speedOption</td>
+                            <td valign="top">Optional. A string having one of the following values:
+								<div style="padding-left: 50px;">
+                                    &quot;none&quot;<br />
+                                    "noteOnKey&quot;<br />
+                                    "noteOnVel&quot;<br />
+                                    &quot;pressure&quot;<br />
+                                    "pitchWheel"<br />
+                                    "modulation"
+                                </div>
+                                Default is the current value of this option in the <em>Output Voice</em>.<br />
+								If the value is not "none", the speed of the <em>Seq</em> will vary according to
+								the value of the named controller, using the value of maxSpeedPercent (see below). 
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" class="code">maxSpeedPercent</td>
+                            <td valign="top">Present only if the speedOption is not &quot;none&quot;.<br />
+                                An integer greater than 100 denoting the 
+								percentage factor by which to divide the notated durations (i.e. go faster) when the controller
+								has its maximum value (127).<br />
+                                The minimum speed (the reciprocal factor) happens when the controller sends a value of 0.</td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <span class="attcon">Content</span>:
+                            </td>
+                            <td valign="top">None.</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+        </table>
+
+    </div>
+    <br />
+    <div id="footnote" style="font-size: 11px; line-height: 16px;">
+        ji — www Autumn 2014<br />
+    </div>
+</body>
+</html>

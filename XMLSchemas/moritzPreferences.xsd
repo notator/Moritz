@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	>
+	<xs:annotation>
+		<!--xs:documentation xml:lang="en"-->
+		<xs:documentation>
+      ************************************************************************************************
+      *  MoritzPreferences Schema (.mzpf files)                                                      *
+      *  Version 2 copyright James Ingram 2012                                                       *
+      *                                                                                              *
+      *  On windows computers, Moritz' preferences are saved in MyDocuments/Moritz/Preferences.mzpf  *
+      *                                                                                              *
+      *  This schema defines the following elements:                                                 *
+      *  1	moritzPreferences: The root element of a moritzPreferences (.mzpf) file.                 *
+      *  2	localUserFolder: The folder on the user's computer where user-specific files are saved.  *
+      *  3	onlineUserFolder: The online folder (URL) where user-specific files are saved.           *
+      *  4	preferredInputDevice: The user's preferred midi input device.                            *
+      *  5	preferredOutputDevice:  The user's preferred midi output device.                         *
+      ************************************************************************************************
+    </xs:documentation>
+	</xs:annotation>
+
+	<!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+	<!-- moritzPatch: the root element of a Moritz patch (.mpch) file -->
+	<xs:element name="moritzPreferences">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="localUserFolder" type="xs:string" maxOccurs="1" minOccurs="1"/>
+                <xs:element name="onlineUserFolder" type="xs:string" maxOccurs="1" minOccurs="1"/>
+                <xs:element name="preferredInputDevice" type="xs:string" maxOccurs="1" minOccurs="1"/>
+                <xs:element name="preferredOutputDevice" type="xs:string" maxOccurs="1" minOccurs="1"/>
+			</xs:sequence>			
+		</xs:complexType>		
+	</xs:element>
+  <!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+  
+</xs:schema>

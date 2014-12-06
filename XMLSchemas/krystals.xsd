@@ -1,0 +1,584 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	>
+	<xs:annotation>
+		<!--xs:documentation xml:lang="en"-->
+		<xs:documentation>
+      ***************************************************************************************************
+      *  Krystals Schema                                                                                *
+      *  Version 1.1 copyright James Ingram 2008                                                        *
+      *                                                                                                 *
+      *  Defines the following elements and subtypes:                                                   *
+      *                                                                                                 *
+      *  Elements:                                                                                      *
+      *  1 krystal: The root element of a krystal (.krys) file.                                         *
+      *     Contains heredity info, and strands.                                                        *
+      *  2 expander: The root element of an expander (.kexp) file.                                      *
+      *     Contains input and output gametes, or the name(s) of the expander(s) where the definition   *
+      *     of each gamete can be found.                                                                *
+      *  3 modulator: The root element of a modulator (.kmod) file.                                     *
+      *     Contains a two dimensional array of unsigned integers.                                      *
+      *                                                                                                 *
+      *  Complex Types:                                                                                 *
+      *  1 strand: a krystal component.                                                                 *
+      *     has a level and a stringOfUnsignedInts                                                      *
+      *  2 gamete: an expander component.                                                               *
+      *     Contains lists of pointGroups (fixed points and planets).                                   *
+      *                                                                                                 *
+      *  Simple Types:                                                                                  *
+      *  1 stringOfUnsignedInts: a component of strands and modulators                                  *
+      *     Is a string of unsignedInts separated by whitespace                                         *
+      *  2 pointGroup: a gamete component                                                               *
+      *     Is a description of a group of points.                                                      *
+      *                                                                                                 *
+      *  File Name Types:                                                                               *
+      *  1	krystalName: A name meaning any type of krystal (.krys)                                     *
+      *  1.1 constantKrystalName: A name for a constant krystal (.c.krys)                               *
+      *  1.2 lineKrystalName: A name for a line krystal (.l.krys)                                       *
+      *  1.3 expansionKrystalName: A name for a krystal which is the result of an expansion (.x.krys)   *
+      *  1.4 modulationKrystalName: A name for a krystal which is the result of a modulation (.m.krys)  *
+      *  2.	expanderName: The name of an expander (.kexp) file                                          *
+      *  3.	modulatorName: The name of a modulator (.kmod) file                                         *
+      ***************************************************************************************************
+    </xs:documentation>
+	</xs:annotation>
+
+	<!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+	<!-- krystal: the root element of a krystal (.krys) file -->
+	<xs:element name="krystal">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:choice>
+						<xs:element name="constant">
+							<xs:annotation>
+								<xs:documentation>
+									<!-- e.g. <constant\>-->
+									A constant krystal's strand has level=0, and contains its (one) value.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="line">
+							<xs:annotation>
+								<xs:documentation>
+									<!-- e.g. <line\>-->
+									A line krystal's strand has level=1, and contains its value (stringOfUnsignedInt).
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="expansion">
+							<xs:annotation>
+								<xs:documentation>
+									<!-- e.g.
+								<expansion density="dddd.l.krys" inputPoints="eeee.c.krys" expander="fff.kexp">
+								-->
+                  density: the name of a krystal file containing the density of each strand
+                  (each moment) in this krystal. (A constant density produces a level 1
+                  krystal whose strand has the given constant number of values.)
+                  inputPoints: the name of a krystal file containing the name of the gamete
+                  input point for each strand in this krystal.
+                  For contoured expansions only, the following two input krystals define the contours.
+                  If one is present, then both must be present:
+                    axis: the name of a krystal file containing axis values in range 1..12
+                    contour: the name of a krystal file containing contour number values in range 1..12
+                  expander: the name of a .kexp file containing the expander (expansion
+                  field) for this krystal.
+                </xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:attribute name="density" type="krystalName" use="required" />
+                <xs:attribute name="inputPoints" type="krystalName" use="required" />
+                <xs:attribute name="axis" type="krystalName" use="optional" />
+                <xs:attribute name="contour" type="krystalName" use="optional" />
+                <xs:attribute name="expander" type="expanderName" use="required" />
+							</xs:complexType>
+						</xs:element>
+          <xs:element name="modulation">
+            <xs:annotation>
+              <xs:documentation>
+                <!-- e.g. <modulation x="xxxx.krys" y="yyy.x.krys" modulator="zzz.kmod">-->
+                x: The name of a krystal file containing the x-coordinate values for the
+                modulator.
+                y: The name of a krystal file containing the y-coordinate values for the
+                modulator.
+                modulator: The name of a modulator file.
+              </xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:attribute name="x" type="krystalName" use="required" />
+              <xs:attribute name="y" type="krystalName" use="required" />
+              <xs:attribute name="modulator" type="modulatorName" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="permutation">
+            <xs:annotation>
+              <xs:documentation>
+                <!-- e.g. <permutation source="xxxx.krys" axis="aaa.krys" contour="ccc.krys" level="2" sortFirst="true">-->
+                source: The name of a krystal file to be permuted.
+                axis: The name of a krystal file containing the axis coordinates for the permutation.
+                contour: The name of a krystal file containing the contour coordinates for the permutation.
+                pLevel: An integer which sets the level of the permutation.
+                sortFirst: true if the source values sorted into ascending order before applying the permutation.
+              </xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:attribute name="source" type="krystalName" use="required" />
+              <xs:attribute name="axis" type="krystalName" use="required" />
+              <xs:attribute name="contour" type="krystalName" use="required" />
+              <xs:attribute name="pLevel" type="xs:int" use="required" />
+              <xs:attribute name="sortFirst" type="xs:boolean" use="required" />
+            </xs:complexType>
+          </xs:element>
+          <!--<xs:element name="edited">
+			        <xs:annotation>
+				        <xs:documentation>
+					        e.g. <edit parent="parent.krys">
+					        The 'parent' attribute names the krystal file which was edited
+					        to produce this one.
+				        </xs:documentation>
+			        </xs:annotation>
+			        <xs:complexType>
+				        <xs:attribute name="parent" type="krystalName"  use="optional" />
+			        </xs:complexType>
+		        </xs:element>
+		        <xs:element name="extracted">
+			        <xs:annotation>
+				        <xs:documentation>
+					        e.g. <extracted parent="parent.krys" firstStrand="26" lastStrand="57"/>
+					        parent: the krystal from which this one has been extracted.
+					        firstStrand: the number (1-based) of the first strand to be extracted from
+					        the source
+					        lastStrand: the number (1-based) of the last strand to be extracted from
+					        the source
+					        Note that this constructor normalises the resulting krystal so that it
+					        begins at level 1.
+				        </xs:documentation>
+			        </xs:annotation>
+			        <xs:complexType>
+				        <xs:attribute name="parent" type="krystalName" use="required" />
+				        <xs:attribute name="firstStrand" type="xs:unsignedInt" use="required" />
+				        <xs:attribute name="lastStrand" type="xs:unsignedInt" use="required" />
+			        </xs:complexType>
+		        </xs:element>
+		        <xs:element name="grafted">
+			        <xs:annotation>
+				        <xs:documentation>
+					        For example:
+						        <grafted core="core.krys">
+							        <replace value="1" file="1111.krys"/>
+							        <replace value="2" file="2222.krys"/>
+							        etc. (one krystal for each value in the core krystal/
+						        </grafted>
+				        </xs:documentation>
+			        </xs:annotation>
+			        <xs:complexType>
+				        <xs:sequence>
+					        <xs:element name="replace" maxOccurs="unbounded">
+						        <xs:complexType>
+							        <xs:attribute name="value" type="xs:unsignedInt" use="required" />
+							        <xs:attribute name="file" type="krystalName" use="required" />
+						        </xs:complexType>
+					        </xs:element>
+				        </xs:sequence>
+				        <xs:attribute name="core" type="krystalName" use="required" />
+			        </xs:complexType>
+		        </xs:element>
+		        <xs:element name="justified">
+			        <xs:annotation>
+				        <xs:documentation>
+					        e.g. <justified parent="parent.krys"/>
+				        </xs:documentation>
+			        </xs:annotation>
+			        <xs:complexType>
+				        <xs:attribute name="parent" type="krystalName" use="required" />
+			        </xs:complexType>
+		        </xs:element>
+		        -->
+	        </xs:choice>
+        <xs:element name="strands">
+					<xs:annotation>
+						<xs:documentation>
+							<!-- e.g.
+								<strands>
+									<s l="1">1 2 3 4 5 6 7</s>
+									<s l="2">2 3 4 5</s>
+									<s l="3">7 6 5 4 3 2 1</s>
+									<s l="4">4 5 3 6</s>
+									<s l="4">1</s>
+								... etc: (an unlimited number of strands)
+								</strands>
+								-->
+						</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="s" type="strand" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>
+										Strand(s) values are unsigned integers separated by white-space. For example:
+										<!-- <s l="3">1 2 3 4 5 6 7</s>	-->
+										The level (l) attribute is 0 for constant krystals, but otherwise in the range
+										1..unlimited. A constant krystal has a single strand with level=0 containing a
+										single unsigned integer. Otherwise, the first strand must have level 1. This is
+										then the *only* level 1 strand in the krystal. The level values describe the
+										krystal's tree structure.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>			
+		</xs:complexType>		
+	</xs:element>
+	<!-- .............................................................. -->
+	<!-- strand: a type used in krystals -->
+	<xs:complexType name="strand">
+		<xs:annotation>
+			<xs:documentation>
+				A strand is a krystal component consisting of a stringOfUnsignedInts with a level attribute.
+				The level (l) attribute is 0 in constant krystals but otherwise in the range 1..unlimited.
+				A constant krystal has a single strand with level=0 containing a single integer value.
+				Otherwise, the first strand in a krystal must have level 1, and this is the *only* level 1 strand.
+				The level values describe the krystal's tree structure. To save space (there may be very many
+				strands), the krystal element defines strand names to be 's', so a strand looks something like:
+				<!--	
+					<s l="4">
+						3 4 5 6 7 8
+					</s>
+				-->
+			</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="stringOfUnsignedInts">
+				<xs:attribute name="l" type="xs:unsignedInt" use="required" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+	<!-- expander: the root element of an expander (.kexp) file -->
+	<xs:element name ="expander">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:choice>
+					<xs:element name="inputGamete" type="gamete"/>
+					<xs:element name="inputGameteFile">
+						<xs:complexType>
+							<xs:attribute name="name" type="expanderName" use="required"/>
+						</xs:complexType>
+					</xs:element>
+				</xs:choice>
+				<xs:choice>
+					<xs:element name="outputGamete" type="gamete"/>
+					<xs:element name ="outputGameteFile">
+						<xs:complexType>
+							<xs:attribute name="name" type="expanderName" use="required"/>
+						</xs:complexType>
+					</xs:element>
+				</xs:choice>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<!--................................................................-->
+	<!-- gamete: a type used in expanders -->
+	<xs:complexType name="gamete">
+		<xs:sequence>
+			<xs:element name="fixedPoints" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="pointGroup" type="pointGroup" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="planet" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="pointGroup" type="pointGroup" maxOccurs="unbounded" />
+					</xs:sequence>
+					<xs:attribute name="density" type="krystalName" use="required" />
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!--................................................................-->
+	<!-- pointGroup: a type used in gametes -->
+	<xs:complexType name="pointGroup">
+		<xs:annotation>
+			<xs:documentation>
+				pointGroups are used by both fixedPoints and planet elements in gametes.
+				In both fixed and planet circular pointGroups, the 'to' element is identical to the "from" element,
+				and the points are distributed evenly around the circle starting at the "from" coordinate.
+				Otherwise, all fixed (non-circular) pointGroups have points at both their 'from' and 'to'
+				coordinates.
+				However, planet pointGroups are contiguous. ONLY THE FINAL POINTGROUP of a planet has a point at its
+				'to' coordinate.
+				The 'value' of a fixedPoints pointGroup contains as many unsigned integers as there are points, while
+				planets have one value each. A planet's value is stored in each of its subpaths (pointGroups).
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="value" type="stringOfUnsignedInts" />
+			<xs:element name="from">
+				<xs:complexType>
+					<xs:attribute name="radius" type="xs:decimal" use="required" />
+					<xs:attribute name="angle" type="xs:decimal" use="required" />
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="to">
+				<xs:complexType>
+					<xs:attribute name="radius" type="xs:decimal" use="required" />
+					<xs:attribute name="angle" type="xs:decimal" use="required" />
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="rotate" minOccurs="0">
+				<xs:complexType>
+					<xs:attribute name="angle" type="xs:decimal" use="required" />
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="translate" minOccurs="0">
+				<xs:complexType>
+					<xs:attribute name="radius" type="xs:decimal" use="required" />
+					<xs:attribute name="angle" type="xs:decimal" use="required" />
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="shape" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="circle" />
+					<xs:enumeration value="spiral" />
+					<xs:enumeration value="straightLine" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="count" type="xs:unsignedInt" use="required" />
+		<xs:attribute name="color" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="black" />
+					<xs:enumeration value="red" />
+					<xs:enumeration value="green" />
+					<xs:enumeration value="blue" />
+					<xs:enumeration value="orange" />
+					<xs:enumeration value="purple" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<!-- I have decided not to store the pointGroup's visibility here. When loading and displaying krystals,
+			all pointGroups will be visible by default.-->
+	</xs:complexType>
+
+	<!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+	<!-- modulator: the root element of a modulator (.kmod) file -->
+	<xs:element name="modulator">
+		<xs:annotation>
+			<xs:documentation>
+				For example:
+				<!-- <modulator>
+						<array xdim="4" ydim="3" >
+							1  2  3  4
+							5  6  7  8
+							9 10 11 12
+						</array>
+					</modulator>
+				-->
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="array" type="modulatorArray" />				
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- .............................................................. -->
+	<!-- modulatorArray: a type used in modulators -->
+	<xs:complexType name="modulatorArray">
+		<xs:annotation>
+			<xs:documentation>
+				A modulatorArray is a modulator component consisting of a stringOfUnsignedInts with xdim and ydim
+				attributes.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="stringOfUnsignedInts">
+				<xs:attribute name="xdim" type="xs:unsignedInt" use="required" />
+				<xs:attribute name="ydim" type="xs:unsignedInt" use="required" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+
+	<!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+	<!-- stringOfUnsignedInts: a type used in strands and modulators    -->
+	<xs:simpleType name="stringOfUnsignedInts">
+		<xs:annotation>
+			<xs:documentation>
+				A stringOfUnsignedInts contains a string of 1 or more unsignedInts and whitespace.
+				The string may not be empty.
+				In XML files, the string can be formatted with any kinds of whitespace. For example:
+				<!--
+					<values>1 23 234 3456</values>
+					or
+					<values>
+						1 23 234 3456
+					</values>
+					or
+					<values>
+						1 23 234
+						3456
+					</values>
+					etc.
+				-->
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:token">
+			<xs:pattern value="(([0-9])*(\p{Z})*)*" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!--::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::-->
+	<!-- File name definitions: -->
+	<!-- krystalName: (.krys) a file name meaning 'any kind of krystal' -->
+	<xs:simpleType name="krystalName">
+		<xs:annotation>
+			<xs:documentation>
+				All names defined in this file have a prefix, base name and extension.
+				The base names may all contain utf8 alphanumeric, and the following
+				characters: '(', ')', '.', ';', '-', '_'
+				Current prefixes (defined below) are:
+					ck0	a constant krystal
+					lk1	a line krystal
+					xk	an expansion
+					mk	a modulation
+          pk  a permutation
+					e	an expander
+					m	a modulator
+				The extension meaning "any type of krystal" (this definition) is '.krys'.
+				Examples: xk1x(y)z.krys ck0xyz_12.x.krys, 1234.j.krys, abc-(12)d.m.krys etc."
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="(([c][k][0][\(]([0-9])+[\)])|((([l][k][1])|([m][k]([0-9])+))[\(]([0-9])+[\)][\-]([0-9])+)|([x][k]([0-9])+[\(]([0-9])+[.]([0-9])+[.]([0-9])+[\)][\-]([0-9])+)|([p][k]([0-9])+[(]([0-9])+[)][-]([0-9])+))[.][ k][r][y][s]" />
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- expanderName: (e....kexp) the name of an expander file -->
+	<xs:simpleType name="expanderName">
+		<xs:annotation>
+			<xs:documentation>
+				The characters used in the base of an expander name are the same as for all other file name types.
+				The prefix for an expander is 'e'
+				The numbers in brackets are the domains of the in- and output gametes followed by the expander ID.
+				The extension is '.kexp'.
+				Example: "e(7.7.1).kexp", "e(7.7.3).kexp"
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[e][(]([0-9])+[.]([0-9])+[.]([0-9])+[)][.][k][e][x][p]" />
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- modulatorName: (.kmod) the name of a modulator file -->
+	<xs:simpleType name="modulatorName">
+		<xs:annotation>
+			<xs:documentation>
+				The characters used in the base of a modulator name are the same as for all other file name types.
+				The prefix for a modulator is 'm'
+				The extension is '.kmod'.
+				Example: "m5x4(240)-1.kmod"
+				The first number after the prefix is the size of the x-dimension of the array
+				The number after the 'x' is the size of the y-dimension of the array
+				The number in brackets is the largest number in the array
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[m]([0-9])+[x]([0-9])+[(]([0-9])+[)][-]([0-9])+[.][k][m][o][d]" />
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- .................................................. -->
+	<!-- Subtypes of krystal name -->
+	<!-- constantKrystalName: (ck0....c.krys) for krystals which are constants -->
+	<xs:simpleType name="constantKrystalName">
+		<xs:annotation>
+			<xs:documentation>
+				The prefix for a constant krystal is 'ck0'.
+				The extension is '.c.krys'.
+				Example: "ck0(56).c.krys"
+				The number in brackets is the value of the constant.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[c][k][0][(]([0-9])+[)][.][k][r][y][s]" />
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- lineKrystalName: (lk1....l.krys) for krystals which are lines -->
+	<xs:simpleType name="lineKrystalName">
+		<xs:annotation>
+			<xs:documentation>
+				The prefix for a line krystal is 'lk1'.
+				The extension is '.l.krys'.
+				Examples: "lk1(7)-1.l.krys", "lk1(7)-2.l.krys", "lk1(14)-1.l.krys"
+				The number in brackets is the maximum value in the krystal
+				The number after the '-' is an index which differentiates files which
+				would otherwise have the same name.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[l][k][1][(]([0-9])+[)][-]([0-9])+[.][k][r][y][s]" />
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- expansionKrystalName: (xk....x.krys) for krystals which are the output of an expander -->
+	<xs:simpleType name="expansionKrystalName">
+		<xs:annotation>
+			<xs:documentation>
+				The prefix for an expansion krystal is 'xk'.
+				The extension is '.x.krys'.
+				Examples: "xk4(7.7.1)-1.x.krys", "xk3(7.12.3)-2.x.krys", "xk5(14.7.2)-1.x.krys"
+				The number following the prefix is the level of this krystal.
+				The brackets contain the expander identifier, consisting of:
+					the number of points in (the domain of) the input gamete + ',' +
+					the number of points in  (the domain of) the output gamete + ',' +
+					the expander ID - an index which differentiates between expanders which would otherwise have the same name
+				The number after the '-' is an index which differentiates between krystals which would otherwise have the same name.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[x][k]([0-9])+[(]([0-9])+[.]([0-9])+[.]([0-9])+[)][-]([0-9])+[.][k][r][y][s]" />
+		</xs:restriction>
+	</xs:simpleType>
+  <!-- modulationKrystalName: (mk....krys) for krystals which are the output of a modulator -->
+  <xs:simpleType name="modulationKrystalName">
+    <xs:annotation>
+      <xs:documentation>
+        The prefix for a modulation krystal is 'mk'.
+        The extension is '.krys'.
+        Examples: "mk4(7)-1.krys", "mk3(7)-2.krys", "mk5(14)-1.krys"
+        The number following the prefix is the level of this krystal.
+        The number in brackets is the maximum value in the krystal
+        The number after the '-' is an index which differentiates files which
+        would otherwise have the same name.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[m][k]([0-9])+[(]([0-9])+[)][-]([0-9])+[.][k][r][y][s]" />
+    </xs:restriction>
+  </xs:simpleType>
+  <!-- permutationKrystalName: (mk....krys) for krystals which are the output of a permutation -->
+  <xs:simpleType name="permutationKrystalName">
+    <xs:annotation>
+      <xs:documentation>
+        The prefix for a permutation krystal is 'pk'.
+        The extension is '.krys'.
+        Examples: "pk4(7)-5.krys", "pk3(5)-3.krys", "pk7(12)-2.m.krys"
+        The number following the prefix is the level of this krystal.
+        The number in brackets is the maximum value in the krystal
+        The number after the '-' is an index which differentiates files which
+        would otherwise have the same name.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[p][k]([0-9])+[(]([0-9])+[)][-]([0-9])+[.][k][r][y][s]" />
+    </xs:restriction>
+  </xs:simpleType>
+	<!--....................................................-->
+</xs:schema>

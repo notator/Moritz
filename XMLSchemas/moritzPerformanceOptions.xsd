@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:annotation>
+    <xs:documentation>
+      ********************************************************************************************************
+      *  XML Schema for Moritz Performance Options (.mpox files)                                             *
+      *  Version 2 copyright 2012 James Ingram                                                               *
+      *                                                                                                      *
+      *  This schema describes Moritz Performance Options which can be set in an Assistant Performer Form.   *
+      *  These Moritz Performance Options files are saved next to the associated score, as a file whose      *
+      *  name is the base name of the associated score concatenated with the suffix ".mpox".                 *
+      *  There can be more than one such .mpox file associated with a particular score.                      *                                               :
+      ********************************************************************************************************
+    </xs:documentation>
+  </xs:annotation>
+  <xs:element name="MoritzPerformanceOptions">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name ="voices" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="voice" minOccurs="1" maxOccurs="127">
+                <xs:annotation>
+                  <xs:documentation>
+                    name: this voice's name. 
+                    player: the (initial) type of player for this channel.
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:attribute name="name" type="xs:string" default="" />
+                  <xs:attribute name="player" type="MoritzPerformerType" default="assistant"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="global" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:attribute name="startAtMoment" type="xs:int" default="1"/>
+            <xs:attribute name="repeatPerformance" type="xs:int" default="0"/>
+            <xs:attribute name="saveMidiFile" type="xs:int" default="0"/>
+            <xs:attribute name="minimumOrnamentChordMsDuration" type="xs:int" default="1"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="local" minOccurs="1" maxOccurs="1">
+          <xs:complexType>
+            <xs:attribute name="performersDynamics" type="PerformersDynamicsType" default="asPerformed"/>
+            <xs:attribute name="performersPitches" type="PerformersPitchesType" default="asNotated"/>
+            <xs:attribute name="assistantsDurations" type="AssistantsDurationsType" default="symbolsAbsolute"/>
+            <xs:attribute name="assistantsSpeedFactor" type="xs:float" default="1.0"/>
+          </xs:complexType>
+         </xs:element>
+        <xs:element name ="keyboardSettings" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="keyboardSetting" minOccurs="1" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>
+                    Each keyboardSetting element sets a MidiPlayer type for each of the 128 MIDI keys of the
+                    user's keyboard. The keyboardSetting element has no attributes, but contains a string of 128
+                    characters, each of which is '0', '1', or '2' representing a MoritzPerformer (NotPlayed,
+                    Assistant or LivePerformer) for the corresponding key.
+                    There can be as many of these keyboardSetting elements as required. The settings are
+                    loaded into an array when the score is loaded for performance. Their position in that array
+                    is their position in this file.
+                    The default setting (the setting used when starting to perform) is the top setting in the
+                    list. 
+                    Other settings could be selected using special control texts in the score, but this feature
+                    is not currently implemented (December 2011).
+                  </xs:documentation>
+                </xs:annotation>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- Moritz Types -->
+  <xs:simpleType name="MoritzPerformerType">
+    <xs:annotation>
+      <xs:documentation>
+        attribute of a channel.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="assistant|livePerformer|notPlayed"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PerformersPitchesType">
+    <xs:annotation>
+      <xs:documentation>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="asNotated|asPerformed"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PerformersDynamicsType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="asNotated|asPerformed|silent"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="AssistantsDurationsType">
+    <xs:annotation>
+      <xs:documentation>
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="symbolsAbsolute|symbolsRelative|recordedRealTime"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
