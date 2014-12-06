@@ -112,37 +112,6 @@ namespace Moritz.Symbols
         #endregion
 
         #region derived properties
-        public List<int> GroupTopStaffIndices
-        {
-            get
-            {
-                List<int> groupTopStaffIndices = new List<int>();
-                List<bool> barlineContinuesDownList = BarlineContinuesDownList;
-                groupTopStaffIndices.Add(0);
-                for(int index = 1; index < barlineContinuesDownList.Count; ++index)
-                {
-                    if(barlineContinuesDownList[index - 1] == false)
-                        groupTopStaffIndices.Add(index);
-                }
-                return groupTopStaffIndices;
-            }
-        }
-
-        public List<int> GroupBottomStaffIndices
-        {
-            get
-            {
-                List<int> groupBottomStaffIndices = new List<int>();
-                List<bool> barlineContinuesDownList = BarlineContinuesDownList;
-                for(int index = 0; index < barlineContinuesDownList.Count; ++index)
-                {
-                    if(barlineContinuesDownList[index] == false)
-                        groupBottomStaffIndices.Add(index);
-                }
-                return groupBottomStaffIndices;
-            }
-        }
-
         /// <summary>
         /// A list having one value per staff in the system
         /// </summary>

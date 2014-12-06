@@ -51,10 +51,10 @@ namespace Moritz.Symbols
 
         private void WriteBarlines(SvgWriter w, float barlineStrokeWidth, float stafflineStrokeWidth, float gap, PageFormat pageFormat)
         {
-            List<bool> barlineIsInsideStaffGroup = pageFormat.BarlineContinuesDownList;
+            List<bool> barlineContinuesDownList = pageFormat.BarlineContinuesDownList;
             int topVisibleStaffIndex = TopVisibleStaffIndex();
-            Debug.Assert(barlineIsInsideStaffGroup.Count == Staves.Count - topVisibleStaffIndex);
-            Debug.Assert(barlineIsInsideStaffGroup[barlineIsInsideStaffGroup.Count - 1] == false);
+            Debug.Assert(barlineContinuesDownList.Count == Staves.Count - topVisibleStaffIndex);
+            Debug.Assert(barlineContinuesDownList[barlineContinuesDownList.Count - 1] == false);
             Barline barline = null;
             bool isFirstBarline = true;
 
@@ -116,7 +116,7 @@ namespace Moritz.Symbols
                         if(barline != null)
                         {
                             // draw grouping barlines between staves
-                            if(barlineIsInsideStaffGroup[staffIndex - topVisibleStaffIndex] || isFirstBarline)
+                            if(barlineContinuesDownList[staffIndex - topVisibleStaffIndex] || isFirstBarline)
                             {
                                 float top = bottomEdge.YatX(barline.Metrics.OriginX);
                                 float bottom = topEdge.YatX(barline.Metrics.OriginX);
@@ -1150,10 +1150,13 @@ namespace Moritz.Symbols
                 Staff staff = Staves[staffIndex];
                 Voice voice = staff.Voices[0];
                 List<NoteObject> noteObjects = voice.NoteObjects;
+                int visibleStaffIndex = staffIndex - topVisibleStaffIndex;
                 for(int i = 0; i < noteObjects.Count; ++i)
                 {
-                    bool isSingleStaffGroup = !barlineContinuesDownList[staffIndex - topVisibleStaffIndex] 
-                                            && ((staffIndex - topVisibleStaffIndex == 0) || !barlineContinuesDownList[staffIndex - topVisibleStaffIndex - 1]);
+                    bool isSingleStaffGroup =
+                        (((visibleStaffIndex == 0) || !barlineContinuesDownList[visibleStaffIndex - 1]) // there is no grouped staff above
+                            && (!barlineContinuesDownList[visibleStaffIndex])); // there is no grouped staff below 
+
                     if(noteObjects[i] is CautionaryChordSymbol && !isSingleStaffGroup)
                     {                           
                         Barline barline = noteObjects[i - 1] as Barline;
