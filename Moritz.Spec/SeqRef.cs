@@ -12,7 +12,7 @@ namespace Moritz.Spec
         /// <param name="notatedInputMidiPitch">The notated input midi pitch</param>
         /// <param name="voiceID">The index of the output voice in the algorithm's bar construction</param>
         /// <param name="length">The number of chords and rests in the Seq</param>
-        /// <param name="msOffset">The msPositionInScore of the Seq relative to this input chord. (must be >= 0)</param>
+        /// <param name="msOffset">The number of milliseconds between the postion of this input chord and the beginning of the Seq.</param>
         /// <param name="inputControls">An InputControls object or null</param>
         public SeqRef(byte notatedInputMidiPitch, byte voiceID, int length, int msOffset, InputControls inputControls)
         {

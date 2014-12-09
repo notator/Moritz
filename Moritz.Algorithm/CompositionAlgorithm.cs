@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 using Krystals4ObjectLibrary;
@@ -27,22 +28,45 @@ namespace Moritz.Algorithm
 
         protected void CheckParameters()
         {
-            Debug.Assert(MidiChannelIndexPerOutputVoice.Count > 0, "CompositionAlgorithm: There must be at least one output voice!");
-            Debug.Assert(MidiChannelIndexPerOutputVoice.Count <= 16, "CompositionAlgorithm: There can not be more than 16 output voices.");
-            Debug.Assert(MidiChannelIndexPerOutputVoice.Count == MasterVolumePerOutputVoice.Count);
-            for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
+            int channelCount = MidiChannelIndexPerOutputVoice.Count;
+            if(channelCount < 1)
+                throw new ApplicationException("CompositionAlgorithm: There must be at least one output voice!");
+            if(channelCount > 16)
+                throw new ApplicationException("CompositionAlgorithm: There can not be more than 16 output voices.");
+
+            if(channelCount != MasterVolumePerOutputVoice.Count)
+                throw new ApplicationException("CompositionAlgorithm: Wrong number of master volumes"); 
+
+            for(int i = 0; i < channelCount; ++i)
             {
-                Debug.Assert(MidiChannelIndexPerOutputVoice[i] >= 0, "CompositionAlgorithm: midi channel out of range!");
-                Debug.Assert(MidiChannelIndexPerOutputVoice[i] < 16, "CompositionAlgorithm: midi channel out of range!");
-                Debug.Assert(MasterVolumePerOutputVoice[i] >= 0, "CompositionAlgorithm: master volume out of range!");
-                Debug.Assert(MasterVolumePerOutputVoice[i] < 128, "CompositionAlgorithm: master volume out of range!");
+                int channelIndex = MidiChannelIndexPerOutputVoice[i];
+                if(channelIndex < 0 || channelIndex > 15)
+                    throw new ApplicationException("CompositionAlgorithm: midi channel out of range!");
+
+                int masterVolume = MasterVolumePerOutputVoice[i];
+                if(masterVolume < 0 || masterVolume > 127)
+                    throw new ApplicationException("CompositionAlgorithm: master volume out of range!");
+
+                if(i < channelCount - 1)
+                {
+                    for(int j = i + 1; j < channelCount; ++j)
+                    {
+                        if(channelIndex == MidiChannelIndexPerOutputVoice[j])
+                            throw new ApplicationException("Output midi channels must be unique per output voice.");
+                    }
+                }
             }
-            Debug.Assert(NumberOfInputVoices >= 0, "CompositionAlgorithm: There can not be a negative number of input voices!");
-            // There is no upper limit to the number of InputVoices.
-            // In future, multiple input devices may be possible, each of which is related to one or more InputVoices.
-            // InputVoices would then react to input devices sending on their midi channel. 
-            // See the comment about InputVoice midi channels in the InputVoice constructor.
-            Debug.Assert(NumberOfBars > 0, "CompositionAlgorithm: There must be at least one bar!");
+
+            // Midi input devices are identified by their midi channel, so there may not be more than 16 of them.
+            // InputVoices can share the same midi input channel (a device can play more than one voice), so there
+            // is no upper limit to the number of InputVoices.
+            // Input Voices having the same channel are agglomerated at load time by the Assistant Performer.
+            if(NumberOfInputVoices < 0)
+                throw new ApplicationException("CompositionAlgorithm: There can not be a negative number of input voices!");
+
+            if(NumberOfBars == 0)
+                throw new ApplicationException("CompositionAlgorithm: There must be at least one bar!");
+
         }
 
         /// <summary>
