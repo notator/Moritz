@@ -38,7 +38,11 @@
             </p>
             <hr class="hrHeight1" />
             <p class="boldHeader2">Summary (December 2014)</p>
-            The extensions are contained in the following namespace:<br />
+            The latest version of these extensions is kept on GitHub at<br />
+			<span class="code"><a href="https://github.com/notator/Moritz/blob/dev/HTML%20docs/svgScoreExtensions.htm">https://github.com/notator/Moritz/blob/dev/HTML%20docs/svgScoreExtensions.htm</a></span><br />
+			<br />
+            They 
+			can be more easily viewed on my website at the address that is their namespace:<br />
             <span class="code">xmlns:score="<a href="http://www.james-ingram-act-two.de/open-source/svgScoreExtensions.html">http://www.james-ingram-act-two.de/open-source/svgScoreExtensions.html</a></span>.<br />
             <br />
             These are the extensions written by the latest version of my
@@ -1290,7 +1294,7 @@
                             such list per input device (=midi input channel).
                             If more than one <em>Input Voice</em> has the same midi input channel, they are combined in the same list.
                         </li>
-                        <li>The <span class="code">threshTime</span> is set.
+                        <li>The <span class="code">chordMsLimit</span> is set.
             This is a fixed threshold (number of milliseconds) within which noteOns are accepted for a particular <span class="code">msPositionInScore</span>&nbsp;
                             (see below).</li>
                     </ul>
@@ -1330,25 +1334,33 @@
             <br />
             <b><span class="auto-style3">Updating the </span></b><span class="auto-style3"><span class="code">msPositionInScore</span>
                 </span><b><span
-                class="auto-style3">&nbsp;per device at runtime</span></b>:<br />
+                class="auto-style3">&nbsp;per input device at runtime</span></b>:<br />
             There 
-            will be a fixed threshold (number of milliseconds) within which noteOns are accepted for a particular
-            <span class="code">msPositionInScore</span>.
-            This limit (called <span class="code">threshTime</span> in deference to Max&#39;s
+            will be a fixed number of milliseconds (<span class="code">chordMsLimit</span>) per input device within which noteOns are accepted for a particular
+            <span class="code">msPositionInScore</span>.<br />
+            (Note that Max solves this problem with its
             <a href="https://cycling74.com/docs/max5/refpages/max-ref/thresh.html">thresh</a> and 
-            <a href="https://cycling74.com/docs/max5/refpages/max-ref/quickthresh.html">quickthresh</a> objects),
-            must be less than the lower msDuration limit
-                    of the shortest duration class in the score.<br />
-            If the score contains fourFlag symbols 
-            whose lower limit is 25ms (the standard value in my current scores), the <span class="code">threshTime</span> could
-        be set to, perhaps, 15ms. If the score only contains threeFlag symbols, then <span class="code">threshTime</span>
-            might be set to twice that (30ms). The performer could be given some choice here.<br />
+            <a href="https://cycling74.com/docs/max5/refpages/max-ref/quickthresh.html">quickthresh</a> objects. Interesting to see 
+            their default settings! :-) )<br />
+            Here, the <span class="code">chordMsLimit</span>
+            must be less than the difference between two <span class="code">msPositionInScore</span>s in the input device&#39;s {<span class="code">msPositionInScore</span>, List&lt;<span class="code">outputChannel</span>&gt;} list in the main thread 
+            (see above), and could be different for different input devices. A monophonic device could have a shorter <span class="code">chordMsLimit</span> 
+            than a polyphonic device. There could be room for a performer preference here.<br />
+            If the score contains 
+            threeFlag symbols 
+            whose lower limit is 50ms (the standard value in my current scores), the <span class="code">chordMsLimit</span> could
+        be set to, perhaps, 25ms. If the score only contains twoFlag symbols (lower limit 100ms), then <span class="code">chordMsLimit</span> 
+            might be set to as much as 60ms.<br />
+            Scores should be composed with these limits in mind: The 
+            <span class="code">score:msDuration</span> between two <em>Input Chord</em>s must always be large enough for the chords 
+            to be performable as clearly separate objects. <br />
             <br />
-            When the <span class="code">threshTime</span> expires for a particular input device in the main thread,
+            When the <span class="code">chordMsLimit</span> expires for a particular input device in the main thread,
                     or the correct number of noteOns has arrived, noteOn handling could be turned off for that device until the 
             score gets close to its next <span class="code">msPositionInScore</span>.<br />
-            NoteOff messages, however, would continue to be handled for NoteOns that have been sent, and sent to the channels 
-            associated with their corresponding noteOn.<br />
+            NoteOff messages, however, would continue to be 
+            sent to channels 
+            that have received NoteOn messages.<br />
             <br />
             <b><span class="auto-style3">Inside workers (at runtime):</span></b>
             <br />

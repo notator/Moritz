@@ -46,6 +46,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XMLSchemas", "XMLSchemas", 
 		XMLSchemas\moritzPreferences.xsd = XMLSchemas\moritzPreferences.xsd
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Website ScoreExtensions doc", "Website ScoreExtensions doc", "{2A69A6E5-7B95-4D24-9471-496D9BC7D349}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\svgScoreExtensions.htm = ..\..\..\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\svgScoreExtensions.htm
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
