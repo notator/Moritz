@@ -33,11 +33,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Composer", "Moritz.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz", "Moritz\Moritz.csproj", "{EBE4F5D3-5F81-40BF-B0FD-997A771CF655}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HTML docs", "HTML docs", "{088B81B7-23D7-4AAB-BC3A-9699230606AA}"
-	ProjectSection(SolutionItems) = preProject
-		HTML docs\svgScoreExtensions.htm = HTML docs\svgScoreExtensions.htm
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XMLSchemas", "XMLSchemas", "{CCE8B66C-F9FE-4E44-BCC4-E7FF59813D5C}"
 	ProjectSection(SolutionItems) = preProject
 		XMLSchemas\krystals.xsd = XMLSchemas\krystals.xsd
@@ -48,7 +43,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XMLSchemas", "XMLSchemas", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Website ScoreExtensions doc", "Website ScoreExtensions doc", "{2A69A6E5-7B95-4D24-9471-496D9BC7D349}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\..\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\svgScoreExtensions.htm = ..\..\..\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\svgScoreExtensions.htm
+		..\..\..\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\svgScoreExtensions.html = ..\..\..\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\svgScoreExtensions.html
 	EndProjectSection
 EndProject
 Global
