@@ -1480,7 +1480,7 @@ namespace Moritz.Composer
                 "input staves.\n\n" +
 
                 "If there are any visible input staves, then all the output voices that are not entered in this input " +
-                "field will automtically be included on invisible staves in the score's file. These invisible output " +
+                "field will automatically be included on invisible staves in the score's file. These invisible output " +
                 "staves contain midi information, referenced by notes in the input voices, but no graphics. They are " +
                 "currently written in a single block above the topmost visible staff in the file.\n\n" +
                 
