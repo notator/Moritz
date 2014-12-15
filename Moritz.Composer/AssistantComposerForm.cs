@@ -1980,7 +1980,7 @@ namespace Moritz.Composer
 
                 w.WriteStartElement("moritzKrystalScore");
                 w.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
-                w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.OnlineXMLSchemasFolder + "/moritzKrystalScore.xsd");
+                w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.Preferences.OnlineXMLSchemasFolder + "/moritzKrystalScore.xsd");
 
                 _dimensionsAndMetadataForm.Write(w);
 

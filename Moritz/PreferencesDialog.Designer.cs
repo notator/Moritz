@@ -61,6 +61,7 @@ namespace Moritz
 			this.OnlineMoritzFolderLabel = new System.Windows.Forms.Label();
 			this.OnlineMoritzFolderInfoLabel = new System.Windows.Forms.Label();
 			this.LocalMoritzFolderLabel = new System.Windows.Forms.Label();
+			this.LocalMoritzFolderHelpText = new System.Windows.Forms.Label();
 			this.DevicesGroupBox.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -153,12 +154,13 @@ namespace Moritz
 			this.PreferencesFilePathLabel.ForeColor = System.Drawing.Color.RoyalBlue;
 			this.PreferencesFilePathLabel.Location = new System.Drawing.Point(317, 23);
 			this.PreferencesFilePathLabel.Name = "PreferencesFilePathLabel";
-			this.PreferencesFilePathLabel.Size = new System.Drawing.Size(204, 13);
+			this.PreferencesFilePathLabel.Size = new System.Drawing.Size(293, 13);
 			this.PreferencesFilePathLabel.TabIndex = 0;
-			this.PreferencesFilePathLabel.Text = "C://User/James/Moritz/Preferences.mzpf";
+			this.PreferencesFilePathLabel.Text = "C:\\User\\James\\AppData\\Roaming\\Moritz\\Preferences.mzpf";
 			// 
 			// groupBox2
 			// 
+			this.groupBox2.Controls.Add(this.LocalMoritzFolderHelpText);
 			this.groupBox2.Controls.Add(this.LocalScoresRootFolderHelpLabel);
 			this.groupBox2.Controls.Add(this.LocalScoresRootFolderInfoLabel);
 			this.groupBox2.Controls.Add(this.label1);
@@ -229,7 +231,7 @@ namespace Moritz
 			this.LocalAudioFolderInfoLabel.Name = "LocalAudioFolderInfoLabel";
 			this.LocalAudioFolderInfoLabel.Size = new System.Drawing.Size(169, 13);
 			this.LocalAudioFolderInfoLabel.TabIndex = 2;
-			this.LocalAudioFolderInfoLabel.Text = "MoritzFolderLocation/Moritz/audio";
+			this.LocalAudioFolderInfoLabel.Text = "MoritzFolderLocation\\Moritz\\audio";
 			// 
 			// LocalKrystalsFolderLabel
 			// 
@@ -266,7 +268,7 @@ namespace Moritz
 			this.LocalModulationOperatorsFolderInfoLabel.Name = "LocalModulationOperatorsFolderInfoLabel";
 			this.LocalModulationOperatorsFolderInfoLabel.Size = new System.Drawing.Size(281, 13);
 			this.LocalModulationOperatorsFolderInfoLabel.TabIndex = 5;
-			this.LocalModulationOperatorsFolderInfoLabel.Text = "MoritzFolderLocation/Moritz/krystals/modulation operators";
+			this.LocalModulationOperatorsFolderInfoLabel.Text = "MoritzFolderLocation\\Moritz\\krystals\\modulation operators";
 			// 
 			// LocalKrystalsFolderInfoLabel
 			// 
@@ -276,7 +278,7 @@ namespace Moritz
 			this.LocalKrystalsFolderInfoLabel.Name = "LocalKrystalsFolderInfoLabel";
 			this.LocalKrystalsFolderInfoLabel.Size = new System.Drawing.Size(178, 13);
 			this.LocalKrystalsFolderInfoLabel.TabIndex = 3;
-			this.LocalKrystalsFolderInfoLabel.Text = "MoritzFolderLocation/Moritz/krystals";
+			this.LocalKrystalsFolderInfoLabel.Text = "MoritzFolderLocation\\Moritz\\krystals";
 			// 
 			// LocalExpansionFieldsFolderInfoLabel
 			// 
@@ -286,7 +288,7 @@ namespace Moritz
 			this.LocalExpansionFieldsFolderInfoLabel.Name = "LocalExpansionFieldsFolderInfoLabel";
 			this.LocalExpansionFieldsFolderInfoLabel.Size = new System.Drawing.Size(278, 13);
 			this.LocalExpansionFieldsFolderInfoLabel.TabIndex = 4;
-			this.LocalExpansionFieldsFolderInfoLabel.Text = "MoritzFolderLocation/Moritz/krystals/expansion operators";
+			this.LocalExpansionFieldsFolderInfoLabel.Text = "MoritzFolderLocation\\Moritz\\krystals\\expansion operators";
 			// 
 			// LocalMoritzFolderTextBox
 			// 
@@ -294,7 +296,7 @@ namespace Moritz
 			this.LocalMoritzFolderTextBox.Name = "LocalMoritzFolderTextBox";
 			this.LocalMoritzFolderTextBox.Size = new System.Drawing.Size(143, 20);
 			this.LocalMoritzFolderTextBox.TabIndex = 1;
-			this.LocalMoritzFolderTextBox.Text = "C://Documents";
+			this.LocalMoritzFolderTextBox.Text = "C:\\Documents";
 			this.LocalMoritzFolderTextBox.Enter += new System.EventHandler(this.LocalMoritzFolderTextBox_Enter);
 			this.LocalMoritzFolderTextBox.Leave += new System.EventHandler(this.LocalMoritzFolderTextBox_Leave);
 			// 
@@ -379,6 +381,16 @@ namespace Moritz
 			this.LocalMoritzFolderLabel.TabIndex = 41;
 			this.LocalMoritzFolderLabel.Text = "Local Moritz folder location:";
 			// 
+			// LocalMoritzFolderHelpText
+			// 
+			this.LocalMoritzFolderHelpText.AutoSize = true;
+			this.LocalMoritzFolderHelpText.ForeColor = System.Drawing.Color.RoyalBlue;
+			this.LocalMoritzFolderHelpText.Location = new System.Drawing.Point(462, 47);
+			this.LocalMoritzFolderHelpText.Name = "LocalMoritzFolderHelpText";
+			this.LocalMoritzFolderHelpText.Size = new System.Drawing.Size(150, 13);
+			this.LocalMoritzFolderHelpText.TabIndex = 53;
+			this.LocalMoritzFolderHelpText.Text = "(e.g. C:\\Documents or D: etc.)";
+			// 
 			// PreferencesDialog
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -435,5 +447,6 @@ namespace Moritz
 		private System.Windows.Forms.Label LocalKrystalsFolderInfoLabel;
 		private System.Windows.Forms.Label LocalExpansionFieldsFolderInfoLabel;
 		private System.Windows.Forms.Label LocalScoresRootFolderHelpLabel;
+		private System.Windows.Forms.Label LocalMoritzFolderHelpText;
 	}
 }

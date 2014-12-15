@@ -638,21 +638,6 @@ namespace Moritz.Globals
         public readonly static Preferences Preferences;
         public readonly static IFormatProvider En_USNumberFormat;
 
-        private static StringBuilder _localMoritzFolder;
-        private static StringBuilder _localMoritzPreferencesPath;
-        private static StringBuilder _localMoritzAudioFolder;
-        private static StringBuilder _localMoritzKrystalsFolder;
-        private static StringBuilder _localMoritzExpansionFieldsFolder;
-        private static StringBuilder _localMoritzModulationOperatorsFolder;
-
-        private static StringBuilder _localMoritzScoresFolder;
-
-        private static StringBuilder _onlineMoritzFolder;
-        private static StringBuilder _onlineMoritzAudioFolder;
-        private static StringBuilder _onlineXMLSchemasFolder;
-
-        public static string OnlineXMLSchemasFolder { get { return _onlineXMLSchemasFolder.ToString(); } }
-
         public readonly static string MoritzPerformanceOptionsExtension;
         public readonly static string MoritzKrystalScoreSettingsExtension;
 

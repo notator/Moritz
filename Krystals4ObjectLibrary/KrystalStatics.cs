@@ -28,7 +28,7 @@ namespace Krystals4ObjectLibrary
             ExpansionOperatorsFolder = M.Preferences.LocalMoritzExpansionFieldsFolder;
             ModulationOperatorsFolder = M.Preferences.LocalMoritzModulationOperatorsFolder;
             // The Schemas location is a programmer's preference. The user need not bother with it.
-            MoritzXmlSchemasFolder = M.OnlineXMLSchemasFolder;
+			MoritzXmlSchemasFolder = M.Preferences.OnlineXMLSchemasFolder;
         }
 
 		public static Krystal LoadKrystal(string pathname)
