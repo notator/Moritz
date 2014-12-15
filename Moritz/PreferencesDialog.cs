@@ -44,6 +44,10 @@ namespace Moritz
 			{
 				InputDevicesComboBox.Items.Add(activeInputDevice);
 			}
+			if(InputDevicesComboBox.Items.Count == 0)
+			{
+				InputDevicesComboBox.Items.Add("");
+			}
 			InputDevicesComboBox.ResumeLayout();
 			InputDevicesComboBox.SelectedIndex = 0;
 
@@ -52,6 +56,10 @@ namespace Moritz
 			foreach(string activeOutputDevice in Preferences.AvailableMultimediaMidiOutputDeviceNames)
 			{
 				OutputDevicesComboBox.Items.Add(activeOutputDevice);
+			}
+			if(OutputDevicesComboBox.Items.Count == 0)
+			{
+				OutputDevicesComboBox.Items.Add("");
 			}
 			OutputDevicesComboBox.ResumeLayout();
 			OutputDevicesComboBox.SelectedIndex = 0;
@@ -96,8 +104,8 @@ namespace Moritz
 			}
 			else
 			{
-				Preferences.PreferredInputDevice = InputDevicesComboBox.SelectedItem.ToString();
-				Preferences.PreferredOutputDevice = OutputDevicesComboBox.SelectedItem.ToString();
+				Preferences.PreferredInputDevice = InputDevicesComboBox.SelectedItem.ToString(); // can be "" if there are no midi input devices
+				Preferences.PreferredOutputDevice = OutputDevicesComboBox.SelectedItem.ToString(); // can be "" if there are no midi output devices
 				Preferences.Save();
 				Close();
 			}			
