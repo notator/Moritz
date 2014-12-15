@@ -12,40 +12,27 @@ namespace Moritz.Globals
 {
 	public sealed class Preferences : IDisposable
 	{
-        public Preferences(StringBuilder localMoritzFolder, StringBuilder localMoritzPreferencesPath,
-            StringBuilder localMoritzAudioFolder, StringBuilder localMoritzKrystalsFolder, 
-            StringBuilder localMoritzExpansionFieldsFolder, StringBuilder localMoritzModulationOperatorsFolder, 
-            StringBuilder localMoritzScoresFolder, StringBuilder onlineMoritzFolder, StringBuilder onlineMoritzAudioFolder,
-            StringBuilder onlineXMLSchemasFolder)
+        public Preferences()
         {
-            #region constant files and folders
-            // These values are displayed as reminders in the preferences dialog.
-            LocalMoritzFolder = localMoritzFolder.ToString();
-            LocalMoritzPreferencesPath = localMoritzPreferencesPath.ToString();
-            LocalMoritzAudioFolder = localMoritzAudioFolder.ToString();
-            LocalMoritzKrystalsFolder = localMoritzKrystalsFolder.ToString();
-            LocalMoritzExpansionFieldsFolder = localMoritzExpansionFieldsFolder.ToString();
-            LocalMoritzModulationOperatorsFolder = localMoritzModulationOperatorsFolder.ToString();
-            LocalMoritzScoresFolder = localMoritzScoresFolder.ToString();
-            OnlineMoritzFolder = onlineMoritzFolder.ToString();
-            OnlineMoritzAudioFolder = onlineMoritzAudioFolder.ToString();
-            OnlineXMLSchemasFolder = onlineXMLSchemasFolder.ToString();
-            #endregion
+			string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
+			string moritzAppDataFolder = appData + @"\Moritz";
+			M.CreateDirectoryIfItDoesNotExist(moritzAppDataFolder);
+
+			LocalMoritzPreferencesPath = moritzAppDataFolder + @"\Preferences.mzpf";
             #region read prefs
-            if(!File.Exists(LocalMoritzPreferencesPath))
+			if(!File.Exists(LocalMoritzPreferencesPath))
             {
-                string msg = "A preferences file could not be found at\n" +
-                "\t" + LocalMoritzPreferencesPath + ".\n\n" +
-                "A new one has been created with default values.";
-
-                M.CreateDirectoryIfItDoesNotExist(LocalMoritzFolder);
-
-                // default values.
+				LocalMoritzFolderLocation = "C://Documents";
                 PreferredInputDevice = "";
                 PreferredOutputDevice = "";
 
                 Save();
+
+				string msg = "A preferences file could not be found at\n" +
+							"\t" + LocalMoritzPreferencesPath + ".\n\n" +
+							"A new one has been created with default values.";
+				MessageBox.Show(msg, "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
   
 			try
@@ -54,7 +41,9 @@ namespace Moritz.Globals
 				{
 					M.ReadToXmlElementTag(r, "moritzPreferences"); // check that this is a moritz preferences file
 
-                    M.ReadToXmlElementTag(r, "preferredInputDevice");
+					M.ReadToXmlElementTag(r, "localMoritzFolderLocation");
+					LocalMoritzFolderLocation = r.ReadElementContentAsString();
+					M.ReadToXmlElementTag(r, "preferredInputDevice");
                     PreferredInputDevice = r.ReadElementContentAsString();
                     M.ReadToXmlElementTag(r, "preferredOutputDevice");
                     PreferredOutputDevice = r.ReadElementContentAsString();
@@ -147,11 +136,15 @@ namespace Moritz.Globals
 
 				w.WriteStartElement("moritzPreferences");
 				w.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
-				w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, M.OnlineXMLSchemasFolder + "/moritzPreferences.xsd");
+				w.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, OnlineXMLSchemasFolder + @"\moritzPreferences.xsd");
 
-                w.WriteStartElement("preferredInputDevice");
-                w.WriteString(PreferredInputDevice);
-                w.WriteEndElement();
+				w.WriteStartElement("localMoritzFolderLocation");
+				w.WriteString(LocalMoritzFolderLocation);
+				w.WriteEndElement();
+
+				w.WriteStartElement("preferredInputDevice");
+				w.WriteString(PreferredInputDevice);
+				w.WriteEndElement();
 
                 w.WriteStartElement("preferredOutputDevice");
                 w.WriteString(PreferredOutputDevice);
@@ -197,26 +190,26 @@ namespace Moritz.Globals
 
 		#endregion IDisposable pattern
 
-        #region fixed folders and paths
+		public readonly string LocalMoritzPreferencesPath;
+		
+		public string LocalMoritzFolderLocation = null;
+		public string PreferredInputDevice = null;
+		public string PreferredOutputDevice = null;
 
-        public readonly string LocalMoritzFolder;
-        public readonly string LocalMoritzPreferencesPath;
-        public readonly string LocalMoritzAudioFolder;
-        public readonly string LocalMoritzKrystalsFolder;
-        public readonly string LocalMoritzExpansionFieldsFolder;
-        public readonly string LocalMoritzModulationOperatorsFolder;
-        public readonly string LocalMoritzScoresFolder;
-        public readonly string OnlineMoritzFolder;
-        public readonly string OnlineMoritzAudioFolder;
-        public readonly string OnlineXMLSchemasFolder;
+		#region folders in the LocalMoritzFolder
+		public string LocalMoritzAudioFolder { get { return LocalMoritzFolderLocation + @"\Moritz\audio"; } }
+		public string LocalMoritzKrystalsFolder	{ get { return LocalMoritzFolderLocation + @"\Moritz\krystals\krystals"; } }
+		public string LocalMoritzExpansionFieldsFolder { get { return LocalMoritzFolderLocation + @"\Moritz\krystals\expansion operators"; } }
+		public string LocalMoritzModulationOperatorsFolder { get { return LocalMoritzFolderLocation + @"\Moritz\krystals\modulation operators"; } }
+		public string LocalMoritzScoresFolder { get { return LocalMoritzFolderLocation + @"\Visual Studio\Projects\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformer\scores"; } }
+		#endregion folders in the LocalMoritzFolder
+		#region online folders
+		public string OnlineMoritzFolder { get { return "http://james-ingram-act-two.de/moritz"; } }
+		public string OnlineMoritzAudioFolder {	get { return "http://james-ingram-act-two.de/moritz/audio"; } }
+		public string OnlineXMLSchemasFolder { get { return "http://james-ingram-act-two.de/open-source/XMLSchemas"; } }
+		#endregion online folders
 
-        #endregion fixed folders and paths
-
-        #region devices
-        public string PreferredInputDevice = null;
-        public string PreferredOutputDevice = null;
-
-        /// <summary>
+		/// <summary>
         /// The following fields are not saved in the preferences file
         /// </summary>
         public string CurrentInputDeviceName = null;
@@ -283,6 +276,5 @@ namespace Moritz.Globals
         private Dictionary<string, Multimedia.Midi.InputDevice> MultimediaMidiInputDevices = new Dictionary<string, Multimedia.Midi.InputDevice>();
         private Dictionary<string, Multimedia.Midi.OutputDevice> MultimediaMidiOutputDevices = new Dictionary<string, Multimedia.Midi.OutputDevice>();
         private const int _sysExBufferSize = 1024;
-        #endregion devices
     }
 }

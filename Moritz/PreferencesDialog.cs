@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using System.IO;
 
 using Moritz.Globals;
 
@@ -14,15 +15,15 @@ namespace Moritz
 			Preferences = M.Preferences;
 
             SetConstantUserFoldersInfo();
-            SetActiveDevicesListBoxes();
+            SetActiveDevicesComboBoxes();
 
-            this.PreferredInputDeviceNameTextBox.Text = Preferences.PreferredInputDevice;
-            this.PreferredOutputDeviceNameTextBox.Text = Preferences.PreferredOutputDevice;
+			this.InputDevicesComboBox.SelectedItem = Preferences.PreferredInputDevice;
+			this.OutputDevicesComboBox.SelectedItem = Preferences.PreferredOutputDevice;
         }
 
         private void SetConstantUserFoldersInfo()
         {
-            LocalMoritzFolderInfoLabel.Text = Preferences.LocalMoritzFolder;
+            LocalMoritzFolderTextBox.Text = Preferences.LocalMoritzFolderLocation;
             PreferencesFilePathLabel.Text = Preferences.LocalMoritzPreferencesPath;
             LocalAudioFolderInfoLabel.Text = Preferences.LocalMoritzAudioFolder;
             LocalKrystalsFolderInfoLabel.Text = Preferences.LocalMoritzKrystalsFolder;
@@ -35,35 +36,74 @@ namespace Moritz
             OnlineXMLSchemasFolderInfoLabel.Text = Preferences.OnlineXMLSchemasFolder;
         }
 
-        private void SetActiveDevicesListBoxes()
+        private void SetActiveDevicesComboBoxes()
         {
-            ActiveInputDevicesListBox.SuspendLayout();
-            foreach(string activeInputDevice in Preferences.AvailableMultimediaMidiInputDeviceNames)
-            {
-                ActiveInputDevicesListBox.Items.Add(activeInputDevice);
-            }
-            ActiveInputDevicesListBox.ResumeLayout();
+			InputDevicesComboBox.SuspendLayout();
+			InputDevicesComboBox.Items.Clear();
+			foreach(string activeInputDevice in Preferences.AvailableMultimediaMidiInputDeviceNames)
+			{
+				InputDevicesComboBox.Items.Add(activeInputDevice);
+			}
+			InputDevicesComboBox.ResumeLayout();
+			InputDevicesComboBox.SelectedIndex = 0;
 
-            ActiveOutputDevicesListBox.SuspendLayout();
-            foreach(string activeOutputDevice in Preferences.AvailableMultimediaMidiOutputDeviceNames)
-            {
-                ActiveOutputDevicesListBox.Items.Add(activeOutputDevice);
-            }
-            ActiveOutputDevicesListBox.ResumeLayout();
+			OutputDevicesComboBox.SuspendLayout();
+			OutputDevicesComboBox.Items.Clear();
+			foreach(string activeOutputDevice in Preferences.AvailableMultimediaMidiOutputDeviceNames)
+			{
+				OutputDevicesComboBox.Items.Add(activeOutputDevice);
+			}
+			OutputDevicesComboBox.ResumeLayout();
+			OutputDevicesComboBox.SelectedIndex = 0;
         }
+
+		private void LocalMoritzFolderTextBox_Leave(object sender, EventArgs e)
+		{
+			if(Directory.Exists(LocalMoritzFolderTextBox.Text))
+			{ 
+				Preferences.LocalMoritzFolderLocation = LocalMoritzFolderTextBox.Text;
+				M.SetTextBoxErrorColorIfNotOkay(LocalMoritzFolderTextBox, true);
+				OKBtn.Enabled = true;
+				SetConstantUserFoldersInfo();
+			}
+			else
+			{
+				M.SetTextBoxErrorColorIfNotOkay(LocalMoritzFolderTextBox, false);
+			}
+		}
+
+		private void LocalMoritzFolderTextBox_Enter(object sender, EventArgs e)
+		{
+			OKBtn.Enabled = false;
+		}
 
 		#region OK, Cancel
 		private void OKBtn_Click(object sender, EventArgs e)
 		{
-            Preferences.PreferredInputDevice = PreferredInputDeviceNameTextBox.Text;
-            Preferences.PreferredOutputDevice = PreferredOutputDeviceNameTextBox.Text;
-            Preferences.Save();
-			Close();
+			string inOut = "";
+			if(InputDevicesComboBox.SelectedItem == null)
+			{
+				inOut = "input";	
+			}
+			else if(OutputDevicesComboBox.SelectedItem == null)
+			{
+				inOut = "output";
+			}
+
+			if(!string.IsNullOrEmpty(inOut))
+			{
+				MessageBox.Show("The " + inOut + " device selector must be set to a valid value.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+			}
+			else
+			{
+				Preferences.PreferredInputDevice = InputDevicesComboBox.SelectedItem.ToString();
+				Preferences.PreferredOutputDevice = OutputDevicesComboBox.SelectedItem.ToString();
+				Preferences.Save();
+				Close();
+			}			
 		}
 		#endregion
 
         public Preferences Preferences = null;
-
-
 	}
 }

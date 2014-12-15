@@ -27,38 +27,7 @@ namespace Moritz.Globals
 
             SetMidiPitchDict();
 
-            #region environment files and folders
-            //string myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string computerName = Environment.GetEnvironmentVariable("COMPUTERNAME");
-
-            string myDocuments;
-            if(computerName == "AUDIOPC")
-            {
-                myDocuments = @"D:";
-            }
-            else
-            {
-                myDocuments = @"C:\Documents";
-            } 
-
-            _localMoritzFolder = new StringBuilder(myDocuments + @"\Moritz");
-            _localMoritzPreferencesPath = new StringBuilder(_localMoritzFolder + @"\Preferences.mzpf");
-            _localMoritzAudioFolder = new StringBuilder(_localMoritzFolder + @"\audio");
-            _localMoritzKrystalsFolder = new StringBuilder(_localMoritzFolder + @"\krystals\krystals");
-            _localMoritzExpansionFieldsFolder = new StringBuilder(_localMoritzFolder + @"\krystals\expansion operators");
-            _localMoritzModulationOperatorsFolder = new StringBuilder(_localMoritzFolder + @"\krystals\modulation operators");
-
-            _localMoritzScoresFolder = new StringBuilder(myDocuments + @"\Visual Studio\Projects\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformer\scores");
-
-            _onlineMoritzFolder = new StringBuilder("http://james-ingram-act-two.de/moritz");
-            _onlineXMLSchemasFolder = new StringBuilder("http://james-ingram-act-two.de/open-source/XMLSchemas");
-            _onlineMoritzAudioFolder = new StringBuilder("http://james-ingram-act-two.de/moritz/audio");
-            #endregion
-
-            Preferences = new Preferences(
-                        _localMoritzFolder, _localMoritzPreferencesPath, _localMoritzAudioFolder, _localMoritzKrystalsFolder, _localMoritzExpansionFieldsFolder,
-                        _localMoritzModulationOperatorsFolder, _localMoritzScoresFolder, _onlineMoritzFolder, _onlineMoritzAudioFolder,
-                        _onlineXMLSchemasFolder);
+			Preferences = new Preferences();
 
             MoritzPerformanceOptionsExtension = ".mpox";
             MoritzKrystalScoreSettingsExtension = ".mkss";
