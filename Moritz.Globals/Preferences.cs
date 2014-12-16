@@ -24,7 +24,6 @@ namespace Moritz.Globals
 			if(!File.Exists(LocalMoritzPreferencesPath))
             {
 				LocalMoritzFolderLocation = "C://Documents";
-                PreferredInputDevice = "";
                 PreferredOutputDevice = "";
 
                 Save();
@@ -43,8 +42,6 @@ namespace Moritz.Globals
 
 					M.ReadToXmlElementTag(r, "localMoritzFolderLocation");
 					LocalMoritzFolderLocation = r.ReadElementContentAsString();
-					M.ReadToXmlElementTag(r, "preferredInputDevice");
-                    PreferredInputDevice = r.ReadElementContentAsString();
                     M.ReadToXmlElementTag(r, "preferredOutputDevice");
                     PreferredOutputDevice = r.ReadElementContentAsString();
 				}
@@ -56,19 +53,8 @@ namespace Moritz.Globals
             }
             #endregion
 
-            if(CaptureInputDevices() && CaptureOutputDevices())
+            if(CaptureOutputDevices())
             {
-                if((!String.IsNullOrEmpty(PreferredInputDevice)) && MultimediaMidiInputDevices.ContainsKey(PreferredInputDevice) == false)
-                {
-                    string message = "Can't find the " + PreferredInputDevice + ".\n\n" +
-                        "To use it, quit, turn it on, and restart.";
-                    MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-                else
-                {
-                    CurrentInputDeviceName = PreferredInputDevice;
-                }
-
                 if((!String.IsNullOrEmpty(PreferredOutputDevice)) && MultimediaMidiOutputDevices.ContainsKey(PreferredOutputDevice) == false)
                 {
                     string message = "Can't find the " + PreferredOutputDevice + ".\n\n" +
@@ -82,27 +68,6 @@ namespace Moritz.Globals
             }
         }
 
-        private bool CaptureInputDevices()
-        {
-            bool success = true;
-            foreach(Moritz.Globals.IODevices.InputDevice netInputDevice in DeviceCollections.InputDevices)
-            {
-                try
-                {
-                    Multimedia.Midi.InputDevice inputDevice = new Multimedia.Midi.InputDevice(netInputDevice.ID);
-                    inputDevice.AddSysExBuffer(_sysExBufferSize);
-                    inputDevice.AddSysExBuffer(_sysExBufferSize);
-                    MultimediaMidiInputDevices.Add(netInputDevice.Name, inputDevice);
-                }
-                catch
-                {
-                    MultimediaMidiInputDevices.Clear();
-                    success = false;
-                    break;
-                }
-            }
-            return success;
-        }
         private bool CaptureOutputDevices()
         {
             bool success = true;
@@ -142,10 +107,6 @@ namespace Moritz.Globals
 				w.WriteString(LocalMoritzFolderLocation);
 				w.WriteEndElement();
 
-				w.WriteStartElement("preferredInputDevice");
-				w.WriteString(PreferredInputDevice);
-				w.WriteEndElement();
-
                 w.WriteStartElement("preferredOutputDevice");
                 w.WriteString(PreferredOutputDevice);
                 w.WriteEndElement();
@@ -166,12 +127,6 @@ namespace Moritz.Globals
 		{
 			if(!disposed)
 			{
-                foreach(string key in MultimediaMidiInputDevices.Keys)
-                {
-                    MultimediaMidiInputDevices[key].Dispose();
-                }
-                MultimediaMidiInputDevices.Clear();
-
                 foreach(string key in MultimediaMidiOutputDevices.Keys)
                 {
                     MultimediaMidiOutputDevices[key].Dispose();
@@ -193,7 +148,6 @@ namespace Moritz.Globals
 		public readonly string LocalMoritzPreferencesPath;
 		
 		public string LocalMoritzFolderLocation = null;
-		public string PreferredInputDevice = null;
 		public string PreferredOutputDevice = null;
 
 		#region folders in the LocalMoritzFolder
@@ -208,21 +162,10 @@ namespace Moritz.Globals
 		#endregion online folders
 
 		/// <summary>
-        /// The following fields are not saved in the preferences file
+        /// The following field is not saved in the preferences file
         /// </summary>
-        public string CurrentInputDeviceName = null;
         public string CurrentOutputDeviceName = null;
 
-        public List<string> AvailableMultimediaMidiInputDeviceNames
-        {
-            get
-            {
-                List<string> names = new List<string>();
-                foreach(string key in MultimediaMidiInputDevices.Keys)
-                    names.Add(key);
-                return names;
-            }
-        }
         public List<string> AvailableMultimediaMidiOutputDeviceNames
         {
             get
@@ -233,20 +176,7 @@ namespace Moritz.Globals
                 return names;
             }
         }
-        public Multimedia.Midi.InputDevice CurrentMultimediaMidiInputDevice
-        {
-            get 
-            {
-                if(MultimediaMidiInputDevices.ContainsKey(CurrentInputDeviceName))
-                {
-                    return MultimediaMidiInputDevices[CurrentInputDeviceName];
-                }
-                else
-                {
-                    throw new ApplicationException("Unknown Input Device: " + CurrentInputDeviceName);
-                }
-            }
-        }
+
         public Multimedia.Midi.OutputDevice CurrentMultimediaMidiOutputDevice
         {
             get 
@@ -271,7 +201,6 @@ namespace Moritz.Globals
             return MultimediaMidiOutputDevices[deviceName];
         }
 
-        private Dictionary<string, Multimedia.Midi.InputDevice> MultimediaMidiInputDevices = new Dictionary<string, Multimedia.Midi.InputDevice>();
         private Dictionary<string, Multimedia.Midi.OutputDevice> MultimediaMidiOutputDevices = new Dictionary<string, Multimedia.Midi.OutputDevice>();
         private const int _sysExBufferSize = 1024;
     }

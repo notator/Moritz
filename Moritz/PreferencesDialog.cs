@@ -12,17 +12,17 @@ namespace Moritz
 		{
 			InitializeComponent();
 
+			this.HiddenTextBox.Hide();
+
 			Preferences = M.Preferences;
 
-            SetConstantUserFoldersInfo();
-            SetActiveDevicesComboBoxes();
-
-			this.InputDevicesComboBox.SelectedItem = Preferences.PreferredInputDevice;
-			this.OutputDevicesComboBox.SelectedItem = Preferences.PreferredOutputDevice;
+            SetUserInfo();
         }
 
-        private void SetConstantUserFoldersInfo()
+        private void SetUserInfo()
         {
+			MidiOutputDeviceHelpLabel.Text = Preferences.PreferredOutputDevice + "  (change this in the Assistant Composer)";
+
             LocalMoritzFolderTextBox.Text = Preferences.LocalMoritzFolderLocation;
             PreferencesFilePathLabel.Text = Preferences.LocalMoritzPreferencesPath;
             LocalAudioFolderInfoLabel.Text = Preferences.LocalMoritzAudioFolder;
@@ -34,35 +34,6 @@ namespace Moritz
             OnlineXMLSchemasFolderInfoLabel.Text = Preferences.OnlineXMLSchemasFolder;
         }
 
-        private void SetActiveDevicesComboBoxes()
-        {
-			InputDevicesComboBox.SuspendLayout();
-			InputDevicesComboBox.Items.Clear();
-			foreach(string activeInputDevice in Preferences.AvailableMultimediaMidiInputDeviceNames)
-			{
-				InputDevicesComboBox.Items.Add(activeInputDevice);
-			}
-			if(InputDevicesComboBox.Items.Count == 0)
-			{
-				InputDevicesComboBox.Items.Add("");
-			}
-			InputDevicesComboBox.ResumeLayout();
-			InputDevicesComboBox.SelectedIndex = 0;
-
-			OutputDevicesComboBox.SuspendLayout();
-			OutputDevicesComboBox.Items.Clear();
-			foreach(string activeOutputDevice in Preferences.AvailableMultimediaMidiOutputDeviceNames)
-			{
-				OutputDevicesComboBox.Items.Add(activeOutputDevice);
-			}
-			if(OutputDevicesComboBox.Items.Count == 0)
-			{
-				OutputDevicesComboBox.Items.Add("");
-			}
-			OutputDevicesComboBox.ResumeLayout();
-			OutputDevicesComboBox.SelectedIndex = 0;
-        }
-
 		private void LocalMoritzFolderTextBox_Leave(object sender, EventArgs e)
 		{
 			if(Directory.Exists(LocalMoritzFolderTextBox.Text))
@@ -70,43 +41,26 @@ namespace Moritz
 				Preferences.LocalMoritzFolderLocation = LocalMoritzFolderTextBox.Text;
 				M.SetTextBoxErrorColorIfNotOkay(LocalMoritzFolderTextBox, true);
 				OKBtn.Enabled = true;
-				SetConstantUserFoldersInfo();
+				SetUserInfo();
 			}
 			else
 			{
 				M.SetTextBoxErrorColorIfNotOkay(LocalMoritzFolderTextBox, false);
+				OKBtn.Enabled = false;
 			}
 		}
 
 		private void LocalMoritzFolderTextBox_Enter(object sender, EventArgs e)
 		{
-			OKBtn.Enabled = false;
+			M.SetTextBoxErrorColorIfNotOkay(LocalMoritzFolderTextBox, true);
+			OKBtn.Enabled = true;
 		}
 
 		#region OK, Cancel
 		private void OKBtn_Click(object sender, EventArgs e)
 		{
-			string inOut = "";
-			if(InputDevicesComboBox.SelectedItem == null)
-			{
-				inOut = "input";	
-			}
-			else if(OutputDevicesComboBox.SelectedItem == null)
-			{
-				inOut = "output";
-			}
-
-			if(!string.IsNullOrEmpty(inOut))
-			{
-				MessageBox.Show("The " + inOut + " device selector must be set to a valid value.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
-			}
-			else
-			{
-				Preferences.PreferredInputDevice = InputDevicesComboBox.SelectedItem.ToString(); // can be "" if there are no midi input devices
-				Preferences.PreferredOutputDevice = OutputDevicesComboBox.SelectedItem.ToString(); // can be "" if there are no midi output devices
-				Preferences.Save();
-				Close();
-			}			
+			Preferences.Save();
+			Close();			
 		}
 		#endregion
 

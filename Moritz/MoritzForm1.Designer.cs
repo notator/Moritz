@@ -28,265 +28,212 @@ namespace Moritz
 		/// </summary>
 		private void InitializeComponent()
 		{
-            this.QuitButton = new System.Windows.Forms.Button();
-            this.PreferencesButton = new System.Windows.Forms.Button();
-            this.CurrentOutputDeviceLabel = new System.Windows.Forms.Label();
-            this.CurrentInputDeviceLabel = new System.Windows.Forms.Label();
-            this.OutputDeviceComboBox = new System.Windows.Forms.ComboBox();
-            this.InputDeviceComboBox = new System.Windows.Forms.ComboBox();
-            this.NewScoreSettingsButton = new System.Windows.Forms.Button();
-            this.LoadScoreSettingsButton = new System.Windows.Forms.Button();
-            this.CloseAssistantComposerButton = new System.Windows.Forms.Button();
-            this.KrystalsEditorButton = new System.Windows.Forms.Button();
-            this.AboutButton = new System.Windows.Forms.Button();
-            this.AssistantComposerPanel = new System.Windows.Forms.Panel();
-            this.AssistantComposerLabel = new System.Windows.Forms.Label();
-            this.KrystalsEditorPanel = new System.Windows.Forms.Panel();
-            this.KrystalsEditorLabel = new System.Windows.Forms.Label();
-            this.MoritzPanel = new System.Windows.Forms.Panel();
-            this.MoritzLabel = new System.Windows.Forms.Label();
-            this.AssistantComposerPanel.SuspendLayout();
-            this.KrystalsEditorPanel.SuspendLayout();
-            this.MoritzPanel.SuspendLayout();
-            this.SuspendLayout();
-            // 
-            // QuitButton
-            // 
-            this.QuitButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.QuitButton.Location = new System.Drawing.Point(329, 30);
-            this.QuitButton.Name = "QuitButton";
-            this.QuitButton.Size = new System.Drawing.Size(147, 31);
-            this.QuitButton.TabIndex = 2;
-            this.QuitButton.Text = "quit";
-            this.QuitButton.UseVisualStyleBackColor = true;
-            this.QuitButton.Click += new System.EventHandler(this.QuitButton_Click);
-            // 
-            // PreferencesButton
-            // 
-            this.PreferencesButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.PreferencesButton.Location = new System.Drawing.Point(14, 30);
-            this.PreferencesButton.Name = "PreferencesButton";
-            this.PreferencesButton.Size = new System.Drawing.Size(147, 31);
-            this.PreferencesButton.TabIndex = 0;
-            this.PreferencesButton.Text = "preferences";
-            this.PreferencesButton.UseVisualStyleBackColor = true;
-            this.PreferencesButton.Click += new System.EventHandler(this.PreferencesButton_Click);
-            // 
-            // CurrentOutputDeviceLabel
-            // 
-            this.CurrentOutputDeviceLabel.AutoSize = true;
-            this.CurrentOutputDeviceLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.CurrentOutputDeviceLabel.Location = new System.Drawing.Point(278, 11);
-            this.CurrentOutputDeviceLabel.Name = "CurrentOutputDeviceLabel";
-            this.CurrentOutputDeviceLabel.Size = new System.Drawing.Size(116, 13);
-            this.CurrentOutputDeviceLabel.TabIndex = 5;
-            this.CurrentOutputDeviceLabel.Text = "Current Output Device:";
-            // 
-            // CurrentInputDeviceLabel
-            // 
-            this.CurrentInputDeviceLabel.AutoSize = true;
-            this.CurrentInputDeviceLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.CurrentInputDeviceLabel.Location = new System.Drawing.Point(23, 11);
-            this.CurrentInputDeviceLabel.Name = "CurrentInputDeviceLabel";
-            this.CurrentInputDeviceLabel.Size = new System.Drawing.Size(108, 13);
-            this.CurrentInputDeviceLabel.TabIndex = 4;
-            this.CurrentInputDeviceLabel.Text = "Current Input Device:";
-            // 
-            // OutputDeviceComboBox
-            // 
-            this.OutputDeviceComboBox.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.OutputDeviceComboBox.FormattingEnabled = true;
-            this.OutputDeviceComboBox.Location = new System.Drawing.Point(278, 27);
-            this.OutputDeviceComboBox.Name = "OutputDeviceComboBox";
-            this.OutputDeviceComboBox.Size = new System.Drawing.Size(237, 21);
-            this.OutputDeviceComboBox.TabIndex = 6;
-            this.OutputDeviceComboBox.SelectedIndexChanged += new System.EventHandler(this.MidiOutputDevicesComboBox_SelectedIndexChanged);
-            // 
-            // InputDeviceComboBox
-            // 
-            this.InputDeviceComboBox.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.InputDeviceComboBox.FormattingEnabled = true;
-            this.InputDeviceComboBox.Location = new System.Drawing.Point(23, 27);
-            this.InputDeviceComboBox.Name = "InputDeviceComboBox";
-            this.InputDeviceComboBox.Size = new System.Drawing.Size(237, 21);
-            this.InputDeviceComboBox.TabIndex = 7;
-            this.InputDeviceComboBox.SelectedIndexChanged += new System.EventHandler(this.MidiInputDevicesComboBox_SelectedIndexChanged);
-            // 
-            // NewScoreSettingsButton
-            // 
-            this.NewScoreSettingsButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.NewScoreSettingsButton.Location = new System.Drawing.Point(17, 30);
-            this.NewScoreSettingsButton.Name = "NewScoreSettingsButton";
-            this.NewScoreSettingsButton.Size = new System.Drawing.Size(99, 31);
-            this.NewScoreSettingsButton.TabIndex = 1;
-            this.NewScoreSettingsButton.Text = "new settings";
-            this.NewScoreSettingsButton.UseVisualStyleBackColor = true;
-            this.NewScoreSettingsButton.Click += new System.EventHandler(this.NewScoreSettingsButton_Click);
-            // 
-            // LoadScoreSettingsButton
-            // 
-            this.LoadScoreSettingsButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.LoadScoreSettingsButton.Location = new System.Drawing.Point(122, 30);
-            this.LoadScoreSettingsButton.Name = "LoadScoreSettingsButton";
-            this.LoadScoreSettingsButton.Size = new System.Drawing.Size(99, 31);
-            this.LoadScoreSettingsButton.TabIndex = 0;
-            this.LoadScoreSettingsButton.Text = "load settings";
-            this.LoadScoreSettingsButton.UseVisualStyleBackColor = true;
-            this.LoadScoreSettingsButton.Click += new System.EventHandler(this.LoadScoreSettingsButton_Click);
-            // 
-            // CloseAssistantComposerButton
-            // 
-            this.CloseAssistantComposerButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.CloseAssistantComposerButton.Location = new System.Drawing.Point(67, 30);
-            this.CloseAssistantComposerButton.Name = "CloseAssistantComposerButton";
-            this.CloseAssistantComposerButton.Size = new System.Drawing.Size(99, 31);
-            this.CloseAssistantComposerButton.TabIndex = 2;
-            this.CloseAssistantComposerButton.Text = "close";
-            this.CloseAssistantComposerButton.UseVisualStyleBackColor = true;
-            this.CloseAssistantComposerButton.Click += new System.EventHandler(this.CloseAssistantComposerButton_Click);
-            // 
-            // KrystalsEditorButton
-            // 
-            this.KrystalsEditorButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.KrystalsEditorButton.Location = new System.Drawing.Point(18, 30);
-            this.KrystalsEditorButton.Name = "KrystalsEditorButton";
-            this.KrystalsEditorButton.Size = new System.Drawing.Size(203, 31);
-            this.KrystalsEditorButton.TabIndex = 0;
-            this.KrystalsEditorButton.Text = "open";
-            this.KrystalsEditorButton.UseVisualStyleBackColor = true;
-            this.KrystalsEditorButton.Click += new System.EventHandler(this.KrystalsEditorButton_Click);
-            // 
-            // AboutButton
-            // 
-            this.AboutButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.AboutButton.Location = new System.Drawing.Point(171, 30);
-            this.AboutButton.Name = "AboutButton";
-            this.AboutButton.Size = new System.Drawing.Size(147, 31);
-            this.AboutButton.TabIndex = 1;
-            this.AboutButton.Text = "about";
-            this.AboutButton.UseVisualStyleBackColor = true;
-            this.AboutButton.Click += new System.EventHandler(this.AboutButton_Click);
-            // 
-            // AssistantComposerPanel
-            // 
-            this.AssistantComposerPanel.BackColor = System.Drawing.Color.Honeydew;
-            this.AssistantComposerPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.AssistantComposerPanel.Controls.Add(this.AssistantComposerLabel);
-            this.AssistantComposerPanel.Controls.Add(this.CloseAssistantComposerButton);
-            this.AssistantComposerPanel.Controls.Add(this.NewScoreSettingsButton);
-            this.AssistantComposerPanel.Controls.Add(this.LoadScoreSettingsButton);
-            this.AssistantComposerPanel.Location = new System.Drawing.Point(23, 64);
-            this.AssistantComposerPanel.Name = "AssistantComposerPanel";
-            this.AssistantComposerPanel.Size = new System.Drawing.Size(237, 80);
-            this.AssistantComposerPanel.TabIndex = 0;
-            // 
-            // AssistantComposerLabel
-            // 
-            this.AssistantComposerLabel.AutoSize = true;
-            this.AssistantComposerLabel.Font = new System.Drawing.Font("Verdana", 9F);
-            this.AssistantComposerLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.AssistantComposerLabel.Location = new System.Drawing.Point(7, 6);
-            this.AssistantComposerLabel.Name = "AssistantComposerLabel";
-            this.AssistantComposerLabel.Size = new System.Drawing.Size(133, 14);
-            this.AssistantComposerLabel.TabIndex = 0;
-            this.AssistantComposerLabel.Text = "Assistant Composer";
-            // 
-            // KrystalsEditorPanel
-            // 
-            this.KrystalsEditorPanel.BackColor = System.Drawing.Color.Honeydew;
-            this.KrystalsEditorPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.KrystalsEditorPanel.Controls.Add(this.KrystalsEditorLabel);
-            this.KrystalsEditorPanel.Controls.Add(this.KrystalsEditorButton);
-            this.KrystalsEditorPanel.Location = new System.Drawing.Point(278, 64);
-            this.KrystalsEditorPanel.Name = "KrystalsEditorPanel";
-            this.KrystalsEditorPanel.Size = new System.Drawing.Size(237, 80);
-            this.KrystalsEditorPanel.TabIndex = 2;
-            // 
-            // KrystalsEditorLabel
-            // 
-            this.KrystalsEditorLabel.AutoSize = true;
-            this.KrystalsEditorLabel.Font = new System.Drawing.Font("Verdana", 9F);
-            this.KrystalsEditorLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.KrystalsEditorLabel.Location = new System.Drawing.Point(7, 6);
-            this.KrystalsEditorLabel.Name = "KrystalsEditorLabel";
-            this.KrystalsEditorLabel.Size = new System.Drawing.Size(98, 14);
-            this.KrystalsEditorLabel.TabIndex = 0;
-            this.KrystalsEditorLabel.Text = "Krystals Editor";
-            // 
-            // MoritzPanel
-            // 
-            this.MoritzPanel.BackColor = System.Drawing.Color.Honeydew;
-            this.MoritzPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.MoritzPanel.Controls.Add(this.MoritzLabel);
-            this.MoritzPanel.Controls.Add(this.AboutButton);
-            this.MoritzPanel.Controls.Add(this.PreferencesButton);
-            this.MoritzPanel.Controls.Add(this.QuitButton);
-            this.MoritzPanel.Location = new System.Drawing.Point(23, 161);
-            this.MoritzPanel.Name = "MoritzPanel";
-            this.MoritzPanel.Size = new System.Drawing.Size(492, 80);
-            this.MoritzPanel.TabIndex = 3;
-            // 
-            // MoritzLabel
-            // 
-            this.MoritzLabel.AutoSize = true;
-            this.MoritzLabel.Font = new System.Drawing.Font("Verdana", 9F);
-            this.MoritzLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-            this.MoritzLabel.Location = new System.Drawing.Point(7, 6);
-            this.MoritzLabel.Name = "MoritzLabel";
-            this.MoritzLabel.Size = new System.Drawing.Size(45, 14);
-            this.MoritzLabel.TabIndex = 0;
-            this.MoritzLabel.Text = "Moritz";
-            // 
-            // MoritzForm1
-            // 
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
-            this.ClientSize = new System.Drawing.Size(539, 265);
-            this.ControlBox = false;
-            this.Controls.Add(this.KrystalsEditorPanel);
-            this.Controls.Add(this.CurrentOutputDeviceLabel);
-            this.Controls.Add(this.CurrentInputDeviceLabel);
-            this.Controls.Add(this.OutputDeviceComboBox);
-            this.Controls.Add(this.InputDeviceComboBox);
-            this.Controls.Add(this.AssistantComposerPanel);
-            this.Controls.Add(this.MoritzPanel);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Name = "MoritzForm1";
-            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Moritz v3";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MoritzForm1_FormClosing);
-            this.VisibleChanged += new System.EventHandler(this.MoritzForm1_VisibleChanged);
-            this.AssistantComposerPanel.ResumeLayout(false);
-            this.AssistantComposerPanel.PerformLayout();
-            this.KrystalsEditorPanel.ResumeLayout(false);
-            this.KrystalsEditorPanel.PerformLayout();
-            this.MoritzPanel.ResumeLayout(false);
-            this.MoritzPanel.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+			this.QuitButton = new System.Windows.Forms.Button();
+			this.PreferencesButton = new System.Windows.Forms.Button();
+			this.NewScoreSettingsButton = new System.Windows.Forms.Button();
+			this.LoadScoreSettingsButton = new System.Windows.Forms.Button();
+			this.CloseAssistantComposerButton = new System.Windows.Forms.Button();
+			this.KrystalsEditorButton = new System.Windows.Forms.Button();
+			this.AssistantComposerPanel = new System.Windows.Forms.Panel();
+			this.AssistantComposerLabel = new System.Windows.Forms.Label();
+			this.KrystalsEditorPanel = new System.Windows.Forms.Panel();
+			this.KrystalsEditorLabel = new System.Windows.Forms.Label();
+			this.panel1 = new System.Windows.Forms.Panel();
+			this.label1 = new System.Windows.Forms.Label();
+			this.AboutButton = new System.Windows.Forms.Button();
+			this.AssistantComposerPanel.SuspendLayout();
+			this.KrystalsEditorPanel.SuspendLayout();
+			this.panel1.SuspendLayout();
+			this.SuspendLayout();
+			// 
+			// QuitButton
+			// 
+			this.QuitButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+			this.QuitButton.Location = new System.Drawing.Point(105, 281);
+			this.QuitButton.Name = "QuitButton";
+			this.QuitButton.Size = new System.Drawing.Size(113, 31);
+			this.QuitButton.TabIndex = 2;
+			this.QuitButton.Text = "quit";
+			this.QuitButton.UseVisualStyleBackColor = true;
+			this.QuitButton.Click += new System.EventHandler(this.QuitButton_Click);
+			// 
+			// PreferencesButton
+			// 
+			this.PreferencesButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+			this.PreferencesButton.Location = new System.Drawing.Point(31, 30);
+			this.PreferencesButton.Name = "PreferencesButton";
+			this.PreferencesButton.Size = new System.Drawing.Size(113, 31);
+			this.PreferencesButton.TabIndex = 0;
+			this.PreferencesButton.Text = "preferences";
+			this.PreferencesButton.UseVisualStyleBackColor = true;
+			this.PreferencesButton.Click += new System.EventHandler(this.PreferencesButton_Click);
+			// 
+			// NewScoreSettingsButton
+			// 
+			this.NewScoreSettingsButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+			this.NewScoreSettingsButton.Location = new System.Drawing.Point(154, 30);
+			this.NewScoreSettingsButton.Name = "NewScoreSettingsButton";
+			this.NewScoreSettingsButton.Size = new System.Drawing.Size(113, 31);
+			this.NewScoreSettingsButton.TabIndex = 1;
+			this.NewScoreSettingsButton.Text = "new settings";
+			this.NewScoreSettingsButton.UseVisualStyleBackColor = true;
+			this.NewScoreSettingsButton.Click += new System.EventHandler(this.NewScoreSettingsButton_Click);
+			// 
+			// LoadScoreSettingsButton
+			// 
+			this.LoadScoreSettingsButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+			this.LoadScoreSettingsButton.Location = new System.Drawing.Point(31, 30);
+			this.LoadScoreSettingsButton.Name = "LoadScoreSettingsButton";
+			this.LoadScoreSettingsButton.Size = new System.Drawing.Size(113, 31);
+			this.LoadScoreSettingsButton.TabIndex = 0;
+			this.LoadScoreSettingsButton.Text = "load settings";
+			this.LoadScoreSettingsButton.UseVisualStyleBackColor = true;
+			this.LoadScoreSettingsButton.Click += new System.EventHandler(this.LoadScoreSettingsButton_Click);
+			// 
+			// CloseAssistantComposerButton
+			// 
+			this.CloseAssistantComposerButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+			this.CloseAssistantComposerButton.Location = new System.Drawing.Point(92, 30);
+			this.CloseAssistantComposerButton.Name = "CloseAssistantComposerButton";
+			this.CloseAssistantComposerButton.Size = new System.Drawing.Size(113, 31);
+			this.CloseAssistantComposerButton.TabIndex = 2;
+			this.CloseAssistantComposerButton.Text = "close";
+			this.CloseAssistantComposerButton.UseVisualStyleBackColor = true;
+			this.CloseAssistantComposerButton.Click += new System.EventHandler(this.CloseAssistantComposerButton_Click);
+			// 
+			// KrystalsEditorButton
+			// 
+			this.KrystalsEditorButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+			this.KrystalsEditorButton.Location = new System.Drawing.Point(92, 30);
+			this.KrystalsEditorButton.Name = "KrystalsEditorButton";
+			this.KrystalsEditorButton.Size = new System.Drawing.Size(113, 31);
+			this.KrystalsEditorButton.TabIndex = 0;
+			this.KrystalsEditorButton.Text = "open";
+			this.KrystalsEditorButton.UseVisualStyleBackColor = true;
+			this.KrystalsEditorButton.Click += new System.EventHandler(this.KrystalsEditorButton_Click);
+			// 
+			// AssistantComposerPanel
+			// 
+			this.AssistantComposerPanel.BackColor = System.Drawing.Color.Honeydew;
+			this.AssistantComposerPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.AssistantComposerPanel.Controls.Add(this.AssistantComposerLabel);
+			this.AssistantComposerPanel.Controls.Add(this.CloseAssistantComposerButton);
+			this.AssistantComposerPanel.Controls.Add(this.NewScoreSettingsButton);
+			this.AssistantComposerPanel.Controls.Add(this.LoadScoreSettingsButton);
+			this.AssistantComposerPanel.Location = new System.Drawing.Point(12, 99);
+			this.AssistantComposerPanel.Name = "AssistantComposerPanel";
+			this.AssistantComposerPanel.Size = new System.Drawing.Size(294, 80);
+			this.AssistantComposerPanel.TabIndex = 0;
+			// 
+			// AssistantComposerLabel
+			// 
+			this.AssistantComposerLabel.AutoSize = true;
+			this.AssistantComposerLabel.Font = new System.Drawing.Font("Verdana", 9F);
+			this.AssistantComposerLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+			this.AssistantComposerLabel.Location = new System.Drawing.Point(82, 8);
+			this.AssistantComposerLabel.Name = "AssistantComposerLabel";
+			this.AssistantComposerLabel.Size = new System.Drawing.Size(133, 14);
+			this.AssistantComposerLabel.TabIndex = 0;
+			this.AssistantComposerLabel.Text = "Assistant Composer";
+			// 
+			// KrystalsEditorPanel
+			// 
+			this.KrystalsEditorPanel.BackColor = System.Drawing.Color.Honeydew;
+			this.KrystalsEditorPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.KrystalsEditorPanel.Controls.Add(this.KrystalsEditorLabel);
+			this.KrystalsEditorPanel.Controls.Add(this.KrystalsEditorButton);
+			this.KrystalsEditorPanel.Location = new System.Drawing.Point(12, 185);
+			this.KrystalsEditorPanel.Name = "KrystalsEditorPanel";
+			this.KrystalsEditorPanel.Size = new System.Drawing.Size(294, 80);
+			this.KrystalsEditorPanel.TabIndex = 2;
+			// 
+			// KrystalsEditorLabel
+			// 
+			this.KrystalsEditorLabel.AutoSize = true;
+			this.KrystalsEditorLabel.Font = new System.Drawing.Font("Verdana", 9F);
+			this.KrystalsEditorLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+			this.KrystalsEditorLabel.Location = new System.Drawing.Point(99, 8);
+			this.KrystalsEditorLabel.Name = "KrystalsEditorLabel";
+			this.KrystalsEditorLabel.Size = new System.Drawing.Size(98, 14);
+			this.KrystalsEditorLabel.TabIndex = 0;
+			this.KrystalsEditorLabel.Text = "Krystals Editor";
+			// 
+			// panel1
+			// 
+			this.panel1.BackColor = System.Drawing.Color.Honeydew;
+			this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.panel1.Controls.Add(this.AboutButton);
+			this.panel1.Controls.Add(this.label1);
+			this.panel1.Controls.Add(this.PreferencesButton);
+			this.panel1.Location = new System.Drawing.Point(12, 12);
+			this.panel1.Name = "panel1";
+			this.panel1.Size = new System.Drawing.Size(294, 80);
+			this.panel1.TabIndex = 3;
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Font = new System.Drawing.Font("Verdana", 9F);
+			this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+			this.label1.Location = new System.Drawing.Point(125, 8);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(45, 14);
+			this.label1.TabIndex = 0;
+			this.label1.Text = "Moritz";
+			// 
+			// AboutButton
+			// 
+			this.AboutButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+			this.AboutButton.Location = new System.Drawing.Point(154, 30);
+			this.AboutButton.Name = "AboutButton";
+			this.AboutButton.Size = new System.Drawing.Size(113, 31);
+			this.AboutButton.TabIndex = 2;
+			this.AboutButton.Text = "about Moritz";
+			this.AboutButton.UseVisualStyleBackColor = true;
+			this.AboutButton.Click += new System.EventHandler(this.AboutButton_Click);
+			// 
+			// MoritzForm1
+			// 
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+			this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
+			this.ClientSize = new System.Drawing.Size(319, 328);
+			this.ControlBox = false;
+			this.Controls.Add(this.panel1);
+			this.Controls.Add(this.KrystalsEditorPanel);
+			this.Controls.Add(this.QuitButton);
+			this.Controls.Add(this.AssistantComposerPanel);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+			this.Name = "MoritzForm1";
+			this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+			this.Text = "Moritz v3";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MoritzForm1_FormClosing);
+			this.VisibleChanged += new System.EventHandler(this.MoritzForm1_VisibleChanged);
+			this.AssistantComposerPanel.ResumeLayout(false);
+			this.AssistantComposerPanel.PerformLayout();
+			this.KrystalsEditorPanel.ResumeLayout(false);
+			this.KrystalsEditorPanel.PerformLayout();
+			this.panel1.ResumeLayout(false);
+			this.panel1.PerformLayout();
+			this.ResumeLayout(false);
 
 		}
 
 		#endregion
 
         private System.Windows.Forms.Button QuitButton;
-        private System.Windows.Forms.Button PreferencesButton;
-        private System.Windows.Forms.Label CurrentOutputDeviceLabel;
-        private System.Windows.Forms.Label CurrentInputDeviceLabel;
-        private System.Windows.Forms.ComboBox OutputDeviceComboBox;
-        private System.Windows.Forms.ComboBox InputDeviceComboBox;
+		private System.Windows.Forms.Button PreferencesButton;
         private System.Windows.Forms.Button NewScoreSettingsButton;
         private System.Windows.Forms.Button LoadScoreSettingsButton;
         private System.Windows.Forms.Button CloseAssistantComposerButton;
-        private System.Windows.Forms.Button KrystalsEditorButton;
-        private System.Windows.Forms.Button AboutButton;
+		private System.Windows.Forms.Button KrystalsEditorButton;
         private System.Windows.Forms.Panel AssistantComposerPanel;
         private System.Windows.Forms.Label AssistantComposerLabel;
         private System.Windows.Forms.Panel KrystalsEditorPanel;
-        private System.Windows.Forms.Label KrystalsEditorLabel;
-        private System.Windows.Forms.Panel MoritzPanel;
-        private System.Windows.Forms.Label MoritzLabel;
+		private System.Windows.Forms.Label KrystalsEditorLabel;
+		private System.Windows.Forms.Panel panel1;
+		private System.Windows.Forms.Button AboutButton;
+		private System.Windows.Forms.Label label1;
 
     }
 }

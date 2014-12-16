@@ -35,15 +35,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz", "Moritz\Moritz.csp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "local website files", "local website files", "{2A69A6E5-7B95-4D24-9471-496D9BC7D349}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\..\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\svgScoreExtensions.html = ..\..\..\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\svgScoreExtensions.html
+		..\MyWebsite\james-ingram-act-two\open-source\svgScoreExtensions.htm = ..\MyWebsite\james-ingram-act-two\open-source\svgScoreExtensions.htm
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "xml schemas", "xml schemas", "{A83268F2-0E3F-4A66-8B46-5713A4EC3469}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\..\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\krystals.xsd = ..\..\..\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\krystals.xsd
-		..\..\..\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\moritzKrystalScore.xsd = ..\..\..\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\moritzKrystalScore.xsd
-		..\..\..\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\moritzPerformanceOptions.xsd = ..\..\..\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\moritzPerformanceOptions.xsd
-		..\..\..\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\moritzPreferences.xsd = ..\..\..\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\moritzPreferences.xsd
+		..\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\krystals.xsd = ..\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\krystals.xsd
+		..\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\moritzKrystalScore.xsd = ..\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\moritzKrystalScore.xsd
+		..\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\moritzPerformanceOptions.xsd = ..\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\moritzPerformanceOptions.xsd
+		..\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\moritzPreferences.xsd = ..\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\moritzPreferences.xsd
 	EndProjectSection
 EndProject
 Global

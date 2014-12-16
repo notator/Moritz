@@ -16,63 +16,35 @@ namespace Moritz
         public MoritzForm1()
         {
             InitializeComponent(); 
-            SetInputDevicesComboBox();
-            SetOutputDevicesComboBox();
         }
+		
+		//private void SetOutputDevicesComboBox()
+		//{
+		//	if(M.Preferences.AvailableMultimediaMidiOutputDeviceNames.Count > 0)
+		//	{
+		//		OutputDeviceComboBox.SuspendLayout();
+		//		OutputDeviceComboBox.Items.Clear();
 
-        private void SetInputDevicesComboBox()
-        {
-            InputDeviceComboBox.SuspendLayout();
-            InputDeviceComboBox.Items.Clear();
-            if(M.Preferences.AvailableMultimediaMidiInputDeviceNames.Count > 0)
-            {
-                foreach(string name in M.Preferences.AvailableMultimediaMidiInputDeviceNames)
-                {
-                    InputDeviceComboBox.Items.Add(name);
-                }
-                if(M.Preferences.AvailableMultimediaMidiInputDeviceNames.Contains(M.Preferences.PreferredInputDevice))
-                {
-                    InputDeviceComboBox.SelectedItem = M.Preferences.PreferredInputDevice;
-                }
-                else
-                {
-                    InputDeviceComboBox.SelectedIndex = 0;
-                }
-            }
-            else
-            {
-                InputDeviceComboBox.Hide();
-            }
-            InputDeviceComboBox.ResumeLayout();
-        }
+		//		foreach(string name in M.Preferences.AvailableMultimediaMidiOutputDeviceNames)
+		//		{
+		//			OutputDeviceComboBox.Items.Add(name);
+		//		}
 
-        private void SetOutputDevicesComboBox()
-        {
-            if(M.Preferences.AvailableMultimediaMidiOutputDeviceNames.Count > 0)
-            {
-                OutputDeviceComboBox.SuspendLayout();
-                OutputDeviceComboBox.Items.Clear();
-
-                foreach(string name in M.Preferences.AvailableMultimediaMidiOutputDeviceNames)
-                {
-                    OutputDeviceComboBox.Items.Add(name);
-                }
-
-                OutputDeviceComboBox.SelectedIndex = 0;
-                for(int i = 0; i < OutputDeviceComboBox.Items.Count; i++)
-                {
-                    if(OutputDeviceComboBox.Items[i].ToString() == M.Preferences.PreferredOutputDevice)
-                    {
-                        OutputDeviceComboBox.SelectedIndex = i;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                this.Close();
-            }
-        }
+		//		OutputDeviceComboBox.SelectedIndex = 0;
+		//		for(int i = 0; i < OutputDeviceComboBox.Items.Count; i++)
+		//		{
+		//			if(OutputDeviceComboBox.Items[i].ToString() == M.Preferences.PreferredOutputDevice)
+		//			{
+		//				OutputDeviceComboBox.SelectedIndex = i;
+		//				break;
+		//			}
+		//		}
+		//	}
+		//	else
+		//	{
+		//		this.Close();
+		//	}
+		//}
 
         #region Krystals Editor
         private void KrystalsEditorButton_Click(object sender, EventArgs e)
@@ -251,25 +223,20 @@ namespace Moritz
             this.Close();
         }
 
-        private void MidiInputDevicesComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            M.Preferences.CurrentInputDeviceName = (string)InputDeviceComboBox.SelectedItem;
-            CurrentInputDeviceLabel.Focus(); // deselects the text in the comboBox
-        }
-        private void MidiOutputDevicesComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            M.Preferences.CurrentOutputDeviceName = (string)OutputDeviceComboBox.SelectedItem;
-            CurrentOutputDeviceLabel.Focus(); // deselects the text in the comboBox
-        }
+		//private void MidiOutputDevicesComboBox_SelectedIndexChanged(object sender, EventArgs e)
+		//{
+		//	M.Preferences.CurrentOutputDeviceName = (string)OutputDeviceComboBox.SelectedItem;
+		//	CurrentOutputDeviceLabel.Focus(); // deselects the text in the comboBox
+		//}
         private void MoritzForm1_VisibleChanged(object sender, EventArgs e)
         {
             if( _assistantComposerForm != null)
             {
-                EnableDeviceComboBoxesAndPreferences(false);
+				this.PreferencesButton.Enabled = false;
             }
             else
-            {
-                EnableDeviceComboBoxesAndPreferences(true);
+			{
+				this.PreferencesButton.Enabled = true;
             }
 
             if(_assistantComposerForm != null)
@@ -287,10 +254,6 @@ namespace Moritz
         }
         private void EnableDeviceComboBoxesAndPreferences(bool enable)
         {
-            this.CurrentInputDeviceLabel.Enabled = enable;
-            this.InputDeviceComboBox.Enabled = enable;
-            this.CurrentOutputDeviceLabel.Enabled = enable;
-            this.OutputDeviceComboBox.Enabled = enable;
             this.PreferencesButton.Enabled = enable;
         }
 

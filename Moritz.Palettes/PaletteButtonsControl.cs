@@ -220,7 +220,7 @@ namespace Moritz.Palettes
                 PaletteForm paletteForm = this._paletteForm as PaletteForm;
                 Palette palette = null;
                 IUniqueDef iud = null;
-                OutputDevice outputDevice = M.Preferences.CurrentMultimediaMidiOutputDevice;
+                OutputDevice outputDevice = M.Preferences.GetMidiOutputDevice(M.Preferences.PreferredOutputDevice);
                 int midiChannel = 0;
 
                 int index = int.Parse(button.Text) - 1;

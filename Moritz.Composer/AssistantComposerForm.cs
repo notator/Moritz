@@ -23,6 +23,11 @@ namespace Moritz.Composer
         {
             InitializeComponent();
 
+			SetActiveDevicesComboBoxes();
+
+			this.OutputDevicesComboBox.SelectedItem = M.Preferences.PreferredOutputDevice;
+			this.OutputDevicesComboBox.SelectedIndexChanged += OutputDevicesComboBox_SelectedIndexChanged;
+
             _allTextBoxes = GetAllTextBoxes();
 
             _moritzForm1 = moritzForm1;
@@ -63,7 +68,24 @@ namespace Moritz.Composer
             this.Text = _scoreTitle + " algorithm";
         }
         #region called from ctor
-        private List<TextBox> GetAllTextBoxes()
+
+		private void SetActiveDevicesComboBoxes()
+		{
+			OutputDevicesComboBox.SuspendLayout();
+			OutputDevicesComboBox.Items.Clear();
+			foreach(string activeOutputDevice in M.Preferences.AvailableMultimediaMidiOutputDeviceNames)
+			{
+				OutputDevicesComboBox.Items.Add(activeOutputDevice);
+			}
+			if(OutputDevicesComboBox.Items.Count == 0)
+			{
+				OutputDevicesComboBox.Items.Add("");
+			}
+			OutputDevicesComboBox.ResumeLayout();
+			OutputDevicesComboBox.SelectedIndex = 0;
+		}
+
+		private List<TextBox> GetAllTextBoxes()
         {
             List<TextBox> textBoxes = new List<TextBox>();
 
@@ -359,6 +381,12 @@ namespace Moritz.Composer
         }
         #endregion helpers
 
+		private void OutputDevicesComboBox_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			SaveSettingsCreateScoreButton.Focus();
+			M.Preferences.PreferredOutputDevice = OutputDevicesComboBox.SelectedItem.ToString(); // might be "" if there are no midi output devices
+			M.Preferences.Save();
+		}
         private void SetMainFormSaveCreateButtonText(bool thereAreTouchedForms)
         {
             this.SuspendLayout();
@@ -2239,6 +2267,7 @@ namespace Moritz.Composer
         }
         public PageFormat PageFormat = null;
         #endregion score creation
+
         #endregion private variables
     }
 }
