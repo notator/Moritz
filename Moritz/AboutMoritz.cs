@@ -64,20 +64,6 @@ namespace Moritz
 			}
 
 		}
-        
-        private void JeffGlattsMidiSiteLinkLable_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            try
-			{
-				this.JeffGlattsMidiSiteLinkLable.LinkVisited = true;
-                System.Diagnostics.Process.Start("http://home.roadrunner.com/~jgglatt/");
-			}
-			catch
-			{
-                string msg = "Unable to open http://home.roadrunner.com/~jgglatt/";
-				MessageBox.Show(msg, "error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-			}  
-        }
 
 		private void MaxUndMoritzLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{

@@ -41,7 +41,7 @@ namespace Moritz
 			this.PreferencesFileLabel = new System.Windows.Forms.Label();
 			this.PreferencesFilePathLabel = new System.Windows.Forms.Label();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
-			this.LocalScoresRootFolderHelpLabel = new System.Windows.Forms.Label();
+			this.LocalMoritzFolderHelpText = new System.Windows.Forms.Label();
 			this.LocalScoresRootFolderInfoLabel = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
 			this.LocalAudioFolderLabel = new System.Windows.Forms.Label();
@@ -53,15 +53,10 @@ namespace Moritz
 			this.LocalKrystalsFolderInfoLabel = new System.Windows.Forms.Label();
 			this.LocalExpansionFieldsFolderInfoLabel = new System.Windows.Forms.Label();
 			this.LocalMoritzFolderTextBox = new System.Windows.Forms.TextBox();
+			this.LocalMoritzFolderLabel = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.OnlineXMLSchemasFolderLabel = new System.Windows.Forms.Label();
 			this.OnlineXMLSchemasFolderInfoLabel = new System.Windows.Forms.Label();
-			this.OnlineMoritzAudioFolderLabel = new System.Windows.Forms.Label();
-			this.OnlineMoritzAudioFolderInfoLabel = new System.Windows.Forms.Label();
-			this.OnlineMoritzFolderLabel = new System.Windows.Forms.Label();
-			this.OnlineMoritzFolderInfoLabel = new System.Windows.Forms.Label();
-			this.LocalMoritzFolderLabel = new System.Windows.Forms.Label();
-			this.LocalMoritzFolderHelpText = new System.Windows.Forms.Label();
 			this.DevicesGroupBox.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -70,7 +65,7 @@ namespace Moritz
 			// OKBtn
 			// 
 			this.OKBtn.DialogResult = System.Windows.Forms.DialogResult.OK;
-			this.OKBtn.Location = new System.Drawing.Point(345, 450);
+			this.OKBtn.Location = new System.Drawing.Point(273, 406);
 			this.OKBtn.Name = "OKBtn";
 			this.OKBtn.Size = new System.Drawing.Size(70, 23);
 			this.OKBtn.TabIndex = 0;
@@ -86,7 +81,7 @@ namespace Moritz
 			this.DevicesGroupBox.Controls.Add(this.InputDevicesComboBox);
 			this.DevicesGroupBox.Controls.Add(this.PreferredOutputDeviceLabel);
 			this.DevicesGroupBox.Controls.Add(this.PreferrredInputDeviceLabel);
-			this.DevicesGroupBox.Location = new System.Drawing.Point(167, 18);
+			this.DevicesGroupBox.Location = new System.Drawing.Point(95, 18);
 			this.DevicesGroupBox.Name = "DevicesGroupBox";
 			this.DevicesGroupBox.Size = new System.Drawing.Size(427, 109);
 			this.DevicesGroupBox.TabIndex = 1;
@@ -142,17 +137,17 @@ namespace Moritz
 			// PreferencesFileLabel
 			// 
 			this.PreferencesFileLabel.AutoSize = true;
-			this.PreferencesFileLabel.Location = new System.Drawing.Point(177, 23);
+			this.PreferencesFileLabel.Location = new System.Drawing.Point(137, 22);
 			this.PreferencesFileLabel.Name = "PreferencesFileLabel";
-			this.PreferencesFileLabel.Size = new System.Drawing.Size(143, 13);
+			this.PreferencesFileLabel.Size = new System.Drawing.Size(114, 13);
 			this.PreferencesFileLabel.TabIndex = 36;
-			this.PreferencesFileLabel.Text = "Local Moritz Preferences file:";
+			this.PreferencesFileLabel.Text = "Moritz Preferences file:";
 			// 
 			// PreferencesFilePathLabel
 			// 
 			this.PreferencesFilePathLabel.AutoSize = true;
 			this.PreferencesFilePathLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-			this.PreferencesFilePathLabel.Location = new System.Drawing.Point(317, 23);
+			this.PreferencesFilePathLabel.Location = new System.Drawing.Point(249, 23);
 			this.PreferencesFilePathLabel.Name = "PreferencesFilePathLabel";
 			this.PreferencesFilePathLabel.Size = new System.Drawing.Size(293, 13);
 			this.PreferencesFilePathLabel.TabIndex = 0;
@@ -161,73 +156,71 @@ namespace Moritz
 			// groupBox2
 			// 
 			this.groupBox2.Controls.Add(this.LocalMoritzFolderHelpText);
-			this.groupBox2.Controls.Add(this.LocalScoresRootFolderHelpLabel);
 			this.groupBox2.Controls.Add(this.LocalScoresRootFolderInfoLabel);
-			this.groupBox2.Controls.Add(this.label1);
-			this.groupBox2.Controls.Add(this.LocalAudioFolderLabel);
 			this.groupBox2.Controls.Add(this.LocalAudioFolderInfoLabel);
-			this.groupBox2.Controls.Add(this.LocalKrystalsFolderLabel);
-			this.groupBox2.Controls.Add(this.LocalExpansionFieldsFolderLabel);
-			this.groupBox2.Controls.Add(this.LocalModulationOperatorsLabel);
 			this.groupBox2.Controls.Add(this.LocalModulationOperatorsFolderInfoLabel);
 			this.groupBox2.Controls.Add(this.LocalKrystalsFolderInfoLabel);
 			this.groupBox2.Controls.Add(this.LocalExpansionFieldsFolderInfoLabel);
 			this.groupBox2.Controls.Add(this.LocalMoritzFolderTextBox);
-			this.groupBox2.Controls.Add(this.groupBox3);
-			this.groupBox2.Controls.Add(this.LocalMoritzFolderLabel);
 			this.groupBox2.Controls.Add(this.PreferencesFilePathLabel);
+			this.groupBox2.Controls.Add(this.label1);
+			this.groupBox2.Controls.Add(this.LocalAudioFolderLabel);
+			this.groupBox2.Controls.Add(this.LocalKrystalsFolderLabel);
+			this.groupBox2.Controls.Add(this.LocalExpansionFieldsFolderLabel);
+			this.groupBox2.Controls.Add(this.LocalModulationOperatorsLabel);
+			this.groupBox2.Controls.Add(this.LocalMoritzFolderLabel);
 			this.groupBox2.Controls.Add(this.PreferencesFileLabel);
 			this.groupBox2.Location = new System.Drawing.Point(18, 134);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(725, 303);
+			this.groupBox2.Size = new System.Drawing.Size(581, 196);
 			this.groupBox2.TabIndex = 2;
 			this.groupBox2.TabStop = false;
-			this.groupBox2.Text = "Environment files and folders";
+			this.groupBox2.Text = "Local files and folders";
 			// 
-			// LocalScoresRootFolderHelpLabel
+			// LocalMoritzFolderHelpText
 			// 
-			this.LocalScoresRootFolderHelpLabel.AutoSize = true;
-			this.LocalScoresRootFolderHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-			this.LocalScoresRootFolderHelpLabel.Location = new System.Drawing.Point(317, 147);
-			this.LocalScoresRootFolderHelpLabel.Name = "LocalScoresRootFolderHelpLabel";
-			this.LocalScoresRootFolderHelpLabel.Size = new System.Drawing.Size(218, 13);
-			this.LocalScoresRootFolderHelpLabel.TabIndex = 6;
-			this.LocalScoresRootFolderHelpLabel.Text = "(The root folder in which scores are created.)";
+			this.LocalMoritzFolderHelpText.AutoSize = true;
+			this.LocalMoritzFolderHelpText.ForeColor = System.Drawing.Color.RoyalBlue;
+			this.LocalMoritzFolderHelpText.Location = new System.Drawing.Point(394, 47);
+			this.LocalMoritzFolderHelpText.Name = "LocalMoritzFolderHelpText";
+			this.LocalMoritzFolderHelpText.Size = new System.Drawing.Size(150, 13);
+			this.LocalMoritzFolderHelpText.TabIndex = 53;
+			this.LocalMoritzFolderHelpText.Text = "(e.g. C:\\Documents or D: etc.)";
 			// 
 			// LocalScoresRootFolderInfoLabel
 			// 
 			this.LocalScoresRootFolderInfoLabel.AutoSize = true;
 			this.LocalScoresRootFolderInfoLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-			this.LocalScoresRootFolderInfoLabel.Location = new System.Drawing.Point(20, 164);
+			this.LocalScoresRootFolderInfoLabel.Location = new System.Drawing.Point(10, 164);
 			this.LocalScoresRootFolderInfoLabel.Name = "LocalScoresRootFolderInfoLabel";
-			this.LocalScoresRootFolderInfoLabel.Size = new System.Drawing.Size(704, 13);
+			this.LocalScoresRootFolderInfoLabel.Size = new System.Drawing.Size(567, 13);
 			this.LocalScoresRootFolderInfoLabel.TabIndex = 7;
-			this.LocalScoresRootFolderInfoLabel.Text = "MoritzFolderLocation\\Visual Studio\\Projects\\Web Development\\Projects\\MyWebsite\\ja" +
-    "mes-ingram-act-two\\open-source\\assistantPerformer\\scores";
+			this.LocalScoresRootFolderInfoLabel.Text = "MoritzFolderLocation\\Visual Studio\\Projects\\MyWebsite\\james-ingram-act-two\\open-s" +
+    "ource\\assistantPerformer\\scores";
 			// 
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(200, 147);
+			this.label1.Location = new System.Drawing.Point(145, 146);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(120, 13);
+			this.label1.Size = new System.Drawing.Size(106, 13);
 			this.label1.TabIndex = 52;
-			this.label1.Text = "Local scores root folder:";
+			this.label1.Text = "score creation folder:";
 			// 
 			// LocalAudioFolderLabel
 			// 
 			this.LocalAudioFolderLabel.AutoSize = true;
-			this.LocalAudioFolderLabel.Location = new System.Drawing.Point(226, 71);
+			this.LocalAudioFolderLabel.Location = new System.Drawing.Point(186, 70);
 			this.LocalAudioFolderLabel.Name = "LocalAudioFolderLabel";
-			this.LocalAudioFolderLabel.Size = new System.Drawing.Size(94, 13);
+			this.LocalAudioFolderLabel.Size = new System.Drawing.Size(65, 13);
 			this.LocalAudioFolderLabel.TabIndex = 50;
-			this.LocalAudioFolderLabel.Text = "Local audio folder:";
+			this.LocalAudioFolderLabel.Text = "audio folder:";
 			// 
 			// LocalAudioFolderInfoLabel
 			// 
 			this.LocalAudioFolderInfoLabel.AutoSize = true;
 			this.LocalAudioFolderInfoLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-			this.LocalAudioFolderInfoLabel.Location = new System.Drawing.Point(317, 71);
+			this.LocalAudioFolderInfoLabel.Location = new System.Drawing.Point(249, 71);
 			this.LocalAudioFolderInfoLabel.Name = "LocalAudioFolderInfoLabel";
 			this.LocalAudioFolderInfoLabel.Size = new System.Drawing.Size(169, 13);
 			this.LocalAudioFolderInfoLabel.TabIndex = 2;
@@ -236,35 +229,35 @@ namespace Moritz
 			// LocalKrystalsFolderLabel
 			// 
 			this.LocalKrystalsFolderLabel.AutoSize = true;
-			this.LocalKrystalsFolderLabel.Location = new System.Drawing.Point(217, 90);
+			this.LocalKrystalsFolderLabel.Location = new System.Drawing.Point(177, 89);
 			this.LocalKrystalsFolderLabel.Name = "LocalKrystalsFolderLabel";
-			this.LocalKrystalsFolderLabel.Size = new System.Drawing.Size(103, 13);
+			this.LocalKrystalsFolderLabel.Size = new System.Drawing.Size(74, 13);
 			this.LocalKrystalsFolderLabel.TabIndex = 44;
-			this.LocalKrystalsFolderLabel.Text = "Local krystals folder:";
+			this.LocalKrystalsFolderLabel.Text = "krystals folder:";
 			// 
 			// LocalExpansionFieldsFolderLabel
 			// 
 			this.LocalExpansionFieldsFolderLabel.AutoSize = true;
-			this.LocalExpansionFieldsFolderLabel.Location = new System.Drawing.Point(177, 109);
+			this.LocalExpansionFieldsFolderLabel.Location = new System.Drawing.Point(137, 108);
 			this.LocalExpansionFieldsFolderLabel.Name = "LocalExpansionFieldsFolderLabel";
-			this.LocalExpansionFieldsFolderLabel.Size = new System.Drawing.Size(143, 13);
+			this.LocalExpansionFieldsFolderLabel.Size = new System.Drawing.Size(114, 13);
 			this.LocalExpansionFieldsFolderLabel.TabIndex = 45;
-			this.LocalExpansionFieldsFolderLabel.Text = "Local expansion fields folder:";
+			this.LocalExpansionFieldsFolderLabel.Text = "expansion fields folder:";
 			// 
 			// LocalModulationOperatorsLabel
 			// 
 			this.LocalModulationOperatorsLabel.AutoSize = true;
-			this.LocalModulationOperatorsLabel.Location = new System.Drawing.Point(154, 128);
+			this.LocalModulationOperatorsLabel.Location = new System.Drawing.Point(114, 127);
 			this.LocalModulationOperatorsLabel.Name = "LocalModulationOperatorsLabel";
-			this.LocalModulationOperatorsLabel.Size = new System.Drawing.Size(166, 13);
+			this.LocalModulationOperatorsLabel.Size = new System.Drawing.Size(137, 13);
 			this.LocalModulationOperatorsLabel.TabIndex = 46;
-			this.LocalModulationOperatorsLabel.Text = "Local modulation operators folder:";
+			this.LocalModulationOperatorsLabel.Text = "modulation operators folder:";
 			// 
 			// LocalModulationOperatorsFolderInfoLabel
 			// 
 			this.LocalModulationOperatorsFolderInfoLabel.AutoSize = true;
 			this.LocalModulationOperatorsFolderInfoLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-			this.LocalModulationOperatorsFolderInfoLabel.Location = new System.Drawing.Point(317, 128);
+			this.LocalModulationOperatorsFolderInfoLabel.Location = new System.Drawing.Point(249, 128);
 			this.LocalModulationOperatorsFolderInfoLabel.Name = "LocalModulationOperatorsFolderInfoLabel";
 			this.LocalModulationOperatorsFolderInfoLabel.Size = new System.Drawing.Size(281, 13);
 			this.LocalModulationOperatorsFolderInfoLabel.TabIndex = 5;
@@ -274,7 +267,7 @@ namespace Moritz
 			// 
 			this.LocalKrystalsFolderInfoLabel.AutoSize = true;
 			this.LocalKrystalsFolderInfoLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-			this.LocalKrystalsFolderInfoLabel.Location = new System.Drawing.Point(317, 90);
+			this.LocalKrystalsFolderInfoLabel.Location = new System.Drawing.Point(249, 90);
 			this.LocalKrystalsFolderInfoLabel.Name = "LocalKrystalsFolderInfoLabel";
 			this.LocalKrystalsFolderInfoLabel.Size = new System.Drawing.Size(178, 13);
 			this.LocalKrystalsFolderInfoLabel.TabIndex = 3;
@@ -284,7 +277,7 @@ namespace Moritz
 			// 
 			this.LocalExpansionFieldsFolderInfoLabel.AutoSize = true;
 			this.LocalExpansionFieldsFolderInfoLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-			this.LocalExpansionFieldsFolderInfoLabel.Location = new System.Drawing.Point(317, 109);
+			this.LocalExpansionFieldsFolderInfoLabel.Location = new System.Drawing.Point(249, 109);
 			this.LocalExpansionFieldsFolderInfoLabel.Name = "LocalExpansionFieldsFolderInfoLabel";
 			this.LocalExpansionFieldsFolderInfoLabel.Size = new System.Drawing.Size(278, 13);
 			this.LocalExpansionFieldsFolderInfoLabel.TabIndex = 4;
@@ -292,7 +285,7 @@ namespace Moritz
 			// 
 			// LocalMoritzFolderTextBox
 			// 
-			this.LocalMoritzFolderTextBox.Location = new System.Drawing.Point(317, 44);
+			this.LocalMoritzFolderTextBox.Location = new System.Drawing.Point(249, 43);
 			this.LocalMoritzFolderTextBox.Name = "LocalMoritzFolderTextBox";
 			this.LocalMoritzFolderTextBox.Size = new System.Drawing.Size(143, 20);
 			this.LocalMoritzFolderTextBox.TabIndex = 1;
@@ -300,25 +293,30 @@ namespace Moritz
 			this.LocalMoritzFolderTextBox.Enter += new System.EventHandler(this.LocalMoritzFolderTextBox_Enter);
 			this.LocalMoritzFolderTextBox.Leave += new System.EventHandler(this.LocalMoritzFolderTextBox_Leave);
 			// 
+			// LocalMoritzFolderLabel
+			// 
+			this.LocalMoritzFolderLabel.AutoSize = true;
+			this.LocalMoritzFolderLabel.Location = new System.Drawing.Point(57, 46);
+			this.LocalMoritzFolderLabel.Name = "LocalMoritzFolderLabel";
+			this.LocalMoritzFolderLabel.Size = new System.Drawing.Size(194, 13);
+			this.LocalMoritzFolderLabel.TabIndex = 41;
+			this.LocalMoritzFolderLabel.Text = "User\'s Moritz documents folder location:";
+			// 
 			// groupBox3
 			// 
 			this.groupBox3.Controls.Add(this.OnlineXMLSchemasFolderLabel);
 			this.groupBox3.Controls.Add(this.OnlineXMLSchemasFolderInfoLabel);
-			this.groupBox3.Controls.Add(this.OnlineMoritzAudioFolderLabel);
-			this.groupBox3.Controls.Add(this.OnlineMoritzAudioFolderInfoLabel);
-			this.groupBox3.Controls.Add(this.OnlineMoritzFolderLabel);
-			this.groupBox3.Controls.Add(this.OnlineMoritzFolderInfoLabel);
-			this.groupBox3.Location = new System.Drawing.Point(94, 190);
+			this.groupBox3.Location = new System.Drawing.Point(74, 338);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(498, 94);
-			this.groupBox3.TabIndex = 8;
+			this.groupBox3.Size = new System.Drawing.Size(469, 56);
+			this.groupBox3.TabIndex = 9;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Online Folders";
 			// 
 			// OnlineXMLSchemasFolderLabel
 			// 
 			this.OnlineXMLSchemasFolderLabel.AutoSize = true;
-			this.OnlineXMLSchemasFolderLabel.Location = new System.Drawing.Point(36, 64);
+			this.OnlineXMLSchemasFolderLabel.Location = new System.Drawing.Point(25, 22);
 			this.OnlineXMLSchemasFolderLabel.Name = "OnlineXMLSchemasFolderLabel";
 			this.OnlineXMLSchemasFolderLabel.Size = new System.Drawing.Size(141, 13);
 			this.OnlineXMLSchemasFolderLabel.TabIndex = 38;
@@ -328,76 +326,20 @@ namespace Moritz
 			// 
 			this.OnlineXMLSchemasFolderInfoLabel.AutoSize = true;
 			this.OnlineXMLSchemasFolderInfoLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-			this.OnlineXMLSchemasFolderInfoLabel.Location = new System.Drawing.Point(174, 64);
+			this.OnlineXMLSchemasFolderInfoLabel.Location = new System.Drawing.Point(163, 22);
 			this.OnlineXMLSchemasFolderInfoLabel.Name = "OnlineXMLSchemasFolderInfoLabel";
 			this.OnlineXMLSchemasFolderInfoLabel.Size = new System.Drawing.Size(287, 13);
 			this.OnlineXMLSchemasFolderInfoLabel.TabIndex = 2;
 			this.OnlineXMLSchemasFolderInfoLabel.Text = "http://james-ingram-act-two.de/open-source/XMLSchemas";
-			// 
-			// OnlineMoritzAudioFolderLabel
-			// 
-			this.OnlineMoritzAudioFolderLabel.AutoSize = true;
-			this.OnlineMoritzAudioFolderLabel.Location = new System.Drawing.Point(47, 39);
-			this.OnlineMoritzAudioFolderLabel.Name = "OnlineMoritzAudioFolderLabel";
-			this.OnlineMoritzAudioFolderLabel.Size = new System.Drawing.Size(130, 13);
-			this.OnlineMoritzAudioFolderLabel.TabIndex = 36;
-			this.OnlineMoritzAudioFolderLabel.Text = "Online Moritz Audio folder:";
-			// 
-			// OnlineMoritzAudioFolderInfoLabel
-			// 
-			this.OnlineMoritzAudioFolderInfoLabel.AutoSize = true;
-			this.OnlineMoritzAudioFolderInfoLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-			this.OnlineMoritzAudioFolderInfoLabel.Location = new System.Drawing.Point(174, 39);
-			this.OnlineMoritzAudioFolderInfoLabel.Name = "OnlineMoritzAudioFolderInfoLabel";
-			this.OnlineMoritzAudioFolderInfoLabel.Size = new System.Drawing.Size(280, 13);
-			this.OnlineMoritzAudioFolderInfoLabel.TabIndex = 1;
-			this.OnlineMoritzAudioFolderInfoLabel.Text = "http://james-ingram-act-two.de/open-source/Moritz/audio";
-			// 
-			// OnlineMoritzFolderLabel
-			// 
-			this.OnlineMoritzFolderLabel.AutoSize = true;
-			this.OnlineMoritzFolderLabel.Location = new System.Drawing.Point(77, 16);
-			this.OnlineMoritzFolderLabel.Name = "OnlineMoritzFolderLabel";
-			this.OnlineMoritzFolderLabel.Size = new System.Drawing.Size(100, 13);
-			this.OnlineMoritzFolderLabel.TabIndex = 34;
-			this.OnlineMoritzFolderLabel.Text = "Online Moritz folder:";
-			// 
-			// OnlineMoritzFolderInfoLabel
-			// 
-			this.OnlineMoritzFolderInfoLabel.AutoSize = true;
-			this.OnlineMoritzFolderInfoLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-			this.OnlineMoritzFolderInfoLabel.Location = new System.Drawing.Point(174, 16);
-			this.OnlineMoritzFolderInfoLabel.Name = "OnlineMoritzFolderInfoLabel";
-			this.OnlineMoritzFolderInfoLabel.Size = new System.Drawing.Size(249, 13);
-			this.OnlineMoritzFolderInfoLabel.TabIndex = 0;
-			this.OnlineMoritzFolderInfoLabel.Text = "http://james-ingram-act-two.de/open-source/Moritz";
-			// 
-			// LocalMoritzFolderLabel
-			// 
-			this.LocalMoritzFolderLabel.AutoSize = true;
-			this.LocalMoritzFolderLabel.Location = new System.Drawing.Point(184, 47);
-			this.LocalMoritzFolderLabel.Name = "LocalMoritzFolderLabel";
-			this.LocalMoritzFolderLabel.Size = new System.Drawing.Size(136, 13);
-			this.LocalMoritzFolderLabel.TabIndex = 41;
-			this.LocalMoritzFolderLabel.Text = "Local Moritz folder location:";
-			// 
-			// LocalMoritzFolderHelpText
-			// 
-			this.LocalMoritzFolderHelpText.AutoSize = true;
-			this.LocalMoritzFolderHelpText.ForeColor = System.Drawing.Color.RoyalBlue;
-			this.LocalMoritzFolderHelpText.Location = new System.Drawing.Point(462, 47);
-			this.LocalMoritzFolderHelpText.Name = "LocalMoritzFolderHelpText";
-			this.LocalMoritzFolderHelpText.Size = new System.Drawing.Size(150, 13);
-			this.LocalMoritzFolderHelpText.TabIndex = 53;
-			this.LocalMoritzFolderHelpText.Text = "(e.g. C:\\Documents or D: etc.)";
 			// 
 			// PreferencesDialog
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(248)))), ((int)(((byte)(248)))));
-			this.ClientSize = new System.Drawing.Size(761, 488);
+			this.ClientSize = new System.Drawing.Size(618, 444);
 			this.ControlBox = false;
+			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.DevicesGroupBox);
 			this.Controls.Add(this.OKBtn);
@@ -423,14 +365,7 @@ namespace Moritz
 		private System.Windows.Forms.Label PreferredOutputDeviceLabel;
         private System.Windows.Forms.Label PreferencesFileLabel;
 		private System.Windows.Forms.Label PreferencesFilePathLabel;
-        private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.Label OnlineMoritzFolderLabel;
-        private System.Windows.Forms.Label OnlineMoritzFolderInfoLabel;
-        private System.Windows.Forms.Label OnlineXMLSchemasFolderLabel;
-        private System.Windows.Forms.Label OnlineXMLSchemasFolderInfoLabel;
-        private System.Windows.Forms.Label OnlineMoritzAudioFolderLabel;
-		private System.Windows.Forms.Label OnlineMoritzAudioFolderInfoLabel;
+		private System.Windows.Forms.GroupBox groupBox2;
 		private System.Windows.Forms.ComboBox InputDevicesComboBox;
 		private System.Windows.Forms.ComboBox OutputDevicesComboBox;
 		private System.Windows.Forms.Label label6;
@@ -446,7 +381,9 @@ namespace Moritz
 		private System.Windows.Forms.Label LocalModulationOperatorsFolderInfoLabel;
 		private System.Windows.Forms.Label LocalKrystalsFolderInfoLabel;
 		private System.Windows.Forms.Label LocalExpansionFieldsFolderInfoLabel;
-		private System.Windows.Forms.Label LocalScoresRootFolderHelpLabel;
 		private System.Windows.Forms.Label LocalMoritzFolderHelpText;
+		private System.Windows.Forms.GroupBox groupBox3;
+		private System.Windows.Forms.Label OnlineXMLSchemasFolderLabel;
+		private System.Windows.Forms.Label OnlineXMLSchemasFolderInfoLabel;
 	}
 }

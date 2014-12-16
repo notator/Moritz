@@ -31,8 +31,6 @@ namespace Moritz
             LocalModulationOperatorsFolderInfoLabel.Text = Preferences.LocalMoritzModulationOperatorsFolder;
             LocalScoresRootFolderInfoLabel.Text = Preferences.LocalMoritzScoresFolder;
 
-            OnlineMoritzFolderInfoLabel.Text = Preferences.OnlineMoritzFolder;
-            OnlineMoritzAudioFolderInfoLabel.Text = Preferences.OnlineMoritzAudioFolder;
             OnlineXMLSchemasFolderInfoLabel.Text = Preferences.OnlineXMLSchemasFolder;
         }
 

@@ -201,11 +201,9 @@ namespace Moritz.Globals
 		public string LocalMoritzKrystalsFolder	{ get { return LocalMoritzFolderLocation + @"\Moritz\krystals\krystals"; } }
 		public string LocalMoritzExpansionFieldsFolder { get { return LocalMoritzFolderLocation + @"\Moritz\krystals\expansion operators"; } }
 		public string LocalMoritzModulationOperatorsFolder { get { return LocalMoritzFolderLocation + @"\Moritz\krystals\modulation operators"; } }
-		public string LocalMoritzScoresFolder { get { return LocalMoritzFolderLocation + @"\Visual Studio\Projects\Web Development\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformer\scores"; } }
+		public string LocalMoritzScoresFolder { get { return LocalMoritzFolderLocation + @"\Visual Studio\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformer\scores"; } }
 		#endregion folders in the LocalMoritzFolder
 		#region online folders
-		public string OnlineMoritzFolder { get { return "http://james-ingram-act-two.de/moritz"; } }
-		public string OnlineMoritzAudioFolder {	get { return "http://james-ingram-act-two.de/moritz/audio"; } }
 		public string OnlineXMLSchemasFolder { get { return "http://james-ingram-act-two.de/open-source/XMLSchemas"; } }
 		#endregion online folders
 
