@@ -54,11 +54,6 @@ namespace Moritz
             }
         }
 
-        private void CloseAssistantComposerButton_Click(object sender, EventArgs e)
-        {
-            CloseAssistantComposer();
-        }
-
         private void PreferencesButton_Click(object sender, EventArgs e)
         {
             using(PreferencesDialog pd = new PreferencesDialog())
@@ -80,33 +75,6 @@ namespace Moritz
             this.Close();
         }
 
-		//private void MidiOutputDevicesComboBox_SelectedIndexChanged(object sender, EventArgs e)
-		//{
-		//	M.Preferences.CurrentOutputDeviceName = (string)OutputDeviceComboBox.SelectedItem;
-		//	CurrentOutputDeviceLabel.Focus(); // deselects the text in the comboBox
-		//}
-        private void MoritzForm1_VisibleChanged(object sender, EventArgs e)
-        {
-            if( _assistantComposerForm != null)
-            {
-				this.PreferencesButton.Enabled = false;
-            }
-            else
-			{
-				this.PreferencesButton.Enabled = true;
-            }
-
-            if(_assistantComposerForm != null)
-            {
-                LoadScoreSettingsButton.Hide();
-                CloseAssistantComposerButton.Show();
-            }
-            else
-            {
-                LoadScoreSettingsButton.Show();
-                CloseAssistantComposerButton.Hide();
-            }
-        }
         private void EnableDeviceComboBoxesAndPreferences(bool enable)
         {
             this.PreferencesButton.Enabled = enable;
@@ -132,7 +100,6 @@ namespace Moritz
                 _assistantComposerForm.Close();
                 _assistantComposerForm = null;
             }
-            MoritzForm1_VisibleChanged(null, null);
             this.Show();
         }
 

@@ -39,7 +39,7 @@ namespace Moritz.Composer
             _scoreTitle = Path.GetFileNameWithoutExtension(settingsPath);
 
 			this.Text = _settingsFolderPath.Substring(_settingsFolderPath.LastIndexOf('\\') + 1);
-            QuitAlgorithmButton.Text = "Quit " + _scoreTitle + " algorithm";
+			this.QuitAssistantComposerButton.Text = "Quit algorithm:  " + _scoreTitle;
 
             _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _fsf);
 
@@ -688,11 +688,6 @@ namespace Moritz.Composer
         }
         #endregion helpers
 
-        private void ShowMoritzButton_Click(object sender, EventArgs e)
-        {
-            _moritzForm1.Show();
-
-        }
         private void QuitMoritzButton_Click(object sender, EventArgs e)
         {
             if(DiscardAnyChanges())

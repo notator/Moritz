@@ -33,7 +33,7 @@ namespace Moritz.Composer
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.QuitAlgorithmButton = new System.Windows.Forms.Button();
+			this.QuitAssistantComposerButton = new System.Windows.Forms.Button();
 			this.PalettesListBox = new System.Windows.Forms.ListBox();
 			this.ShowSelectedPaletteButton = new System.Windows.Forms.Button();
 			this.AddPaletteButton = new System.Windows.Forms.Button();
@@ -84,7 +84,6 @@ namespace Moritz.Composer
 			this.RevertNotationButton = new System.Windows.Forms.Button();
 			this.SaveSettingsCreateScoreButton = new System.Windows.Forms.Button();
 			this.QuitMoritzButton = new System.Windows.Forms.Button();
-			this.ShowMoritzButton = new System.Windows.Forms.Button();
 			this.ShowSelectedKrystalButton = new System.Windows.Forms.Button();
 			this.DimensionsAndMetadataButton = new System.Windows.Forms.Button();
 			this.KrystalsGroupBox = new System.Windows.Forms.GroupBox();
@@ -101,17 +100,17 @@ namespace Moritz.Composer
 			this.PalettesGroupBox.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// QuitAlgorithmButton
+			// QuitAssistantComposerButton
 			// 
-			this.QuitAlgorithmButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.QuitAlgorithmButton.Font = new System.Drawing.Font("Arial", 8F);
-			this.QuitAlgorithmButton.Location = new System.Drawing.Point(600, 504);
-			this.QuitAlgorithmButton.Name = "QuitAlgorithmButton";
-			this.QuitAlgorithmButton.Size = new System.Drawing.Size(216, 26);
-			this.QuitAlgorithmButton.TabIndex = 2;
-			this.QuitAlgorithmButton.Text = "Quit algorithm";
-			this.QuitAlgorithmButton.UseVisualStyleBackColor = true;
-			this.QuitAlgorithmButton.Click += new System.EventHandler(this.QuitAssistantComposerButton_Click);
+			this.QuitAssistantComposerButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.QuitAssistantComposerButton.Font = new System.Drawing.Font("Arial", 8F);
+			this.QuitAssistantComposerButton.Location = new System.Drawing.Point(490, 504);
+			this.QuitAssistantComposerButton.Name = "QuitAssistantComposerButton";
+			this.QuitAssistantComposerButton.Size = new System.Drawing.Size(325, 26);
+			this.QuitAssistantComposerButton.TabIndex = 2;
+			this.QuitAssistantComposerButton.Text = "Quit algorithm";
+			this.QuitAssistantComposerButton.UseVisualStyleBackColor = true;
+			this.QuitAssistantComposerButton.Click += new System.EventHandler(this.QuitAssistantComposerButton_Click);
 			// 
 			// PalettesListBox
 			// 
@@ -759,26 +758,13 @@ namespace Moritz.Composer
 			// 
 			this.QuitMoritzButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.QuitMoritzButton.Font = new System.Drawing.Font("Arial", 8F);
-			this.QuitMoritzButton.Location = new System.Drawing.Point(823, 504);
+			this.QuitMoritzButton.Location = new System.Drawing.Point(824, 504);
 			this.QuitMoritzButton.Name = "QuitMoritzButton";
 			this.QuitMoritzButton.Size = new System.Drawing.Size(103, 26);
 			this.QuitMoritzButton.TabIndex = 3;
 			this.QuitMoritzButton.Text = "Quit Moritz";
 			this.QuitMoritzButton.UseVisualStyleBackColor = true;
 			this.QuitMoritzButton.Click += new System.EventHandler(this.QuitMoritzButton_Click);
-			// 
-			// ShowMoritzButton
-			// 
-			this.ShowMoritzButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.ShowMoritzButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
-			this.ShowMoritzButton.Font = new System.Drawing.Font("Arial", 8F);
-			this.ShowMoritzButton.Location = new System.Drawing.Point(490, 504);
-			this.ShowMoritzButton.Name = "ShowMoritzButton";
-			this.ShowMoritzButton.Size = new System.Drawing.Size(103, 26);
-			this.ShowMoritzButton.TabIndex = 7;
-			this.ShowMoritzButton.Text = "Show Moritz";
-			this.ShowMoritzButton.UseVisualStyleBackColor = false;
-			this.ShowMoritzButton.Click += new System.EventHandler(this.ShowMoritzButton_Click);
 			// 
 			// ShowSelectedKrystalButton
 			// 
@@ -945,10 +931,9 @@ namespace Moritz.Composer
 			this.Controls.Add(this.PalettesGroupBox);
 			this.Controls.Add(this.KrystalsGroupBox);
 			this.Controls.Add(this.DimensionsAndMetadataButton);
-			this.Controls.Add(this.ShowMoritzButton);
 			this.Controls.Add(this.QuitMoritzButton);
 			this.Controls.Add(this.SaveSettingsCreateScoreButton);
-			this.Controls.Add(this.QuitAlgorithmButton);
+			this.Controls.Add(this.QuitAssistantComposerButton);
 			this.Controls.Add(this.NotationGroupBox);
 			this.Font = new System.Drawing.Font("Arial", 8F);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -969,7 +954,7 @@ namespace Moritz.Composer
 
 		#endregion
 
-        private System.Windows.Forms.Button QuitAlgorithmButton;
+        private System.Windows.Forms.Button QuitAssistantComposerButton;
         private System.Windows.Forms.ListBox PalettesListBox;
         private System.Windows.Forms.Button ShowSelectedPaletteButton;
         private System.Windows.Forms.Button AddPaletteButton;
@@ -990,8 +975,7 @@ namespace Moritz.Composer
 		private System.Windows.Forms.Label MinimumCrotchetDurationLabel;
         private System.Windows.Forms.Label UnitsHelpLabel;
         private System.Windows.Forms.Button SaveSettingsCreateScoreButton;
-        private System.Windows.Forms.Button QuitMoritzButton;
-        private System.Windows.Forms.Button ShowMoritzButton;
+		private System.Windows.Forms.Button QuitMoritzButton;
         private System.Windows.Forms.Button ShowSelectedKrystalButton;
         private System.Windows.Forms.Label SystemStartBarsLabel;
         private System.Windows.Forms.TextBox SystemStartBarsTextBox;

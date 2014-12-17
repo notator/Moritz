@@ -31,7 +31,6 @@ namespace Moritz
 			this.QuitButton = new System.Windows.Forms.Button();
 			this.PreferencesButton = new System.Windows.Forms.Button();
 			this.LoadScoreSettingsButton = new System.Windows.Forms.Button();
-			this.CloseAssistantComposerButton = new System.Windows.Forms.Button();
 			this.KrystalsEditorButton = new System.Windows.Forms.Button();
 			this.AssistantComposerPanel = new System.Windows.Forms.Panel();
 			this.AssistantComposerLabel = new System.Windows.Forms.Label();
@@ -78,17 +77,6 @@ namespace Moritz
 			this.LoadScoreSettingsButton.UseVisualStyleBackColor = true;
 			this.LoadScoreSettingsButton.Click += new System.EventHandler(this.LoadScoreSettingsButton_Click);
 			// 
-			// CloseAssistantComposerButton
-			// 
-			this.CloseAssistantComposerButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-			this.CloseAssistantComposerButton.Location = new System.Drawing.Point(92, 30);
-			this.CloseAssistantComposerButton.Name = "CloseAssistantComposerButton";
-			this.CloseAssistantComposerButton.Size = new System.Drawing.Size(113, 31);
-			this.CloseAssistantComposerButton.TabIndex = 2;
-			this.CloseAssistantComposerButton.Text = "close";
-			this.CloseAssistantComposerButton.UseVisualStyleBackColor = true;
-			this.CloseAssistantComposerButton.Click += new System.EventHandler(this.CloseAssistantComposerButton_Click);
-			// 
 			// KrystalsEditorButton
 			// 
 			this.KrystalsEditorButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
@@ -105,7 +93,6 @@ namespace Moritz
 			this.AssistantComposerPanel.BackColor = System.Drawing.Color.Honeydew;
 			this.AssistantComposerPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.AssistantComposerPanel.Controls.Add(this.AssistantComposerLabel);
-			this.AssistantComposerPanel.Controls.Add(this.CloseAssistantComposerButton);
 			this.AssistantComposerPanel.Controls.Add(this.LoadScoreSettingsButton);
 			this.AssistantComposerPanel.Location = new System.Drawing.Point(12, 99);
 			this.AssistantComposerPanel.Name = "AssistantComposerPanel";
@@ -195,7 +182,6 @@ namespace Moritz
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Moritz v3";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MoritzForm1_FormClosing);
-			this.VisibleChanged += new System.EventHandler(this.MoritzForm1_VisibleChanged);
 			this.AssistantComposerPanel.ResumeLayout(false);
 			this.AssistantComposerPanel.PerformLayout();
 			this.KrystalsEditorPanel.ResumeLayout(false);
@@ -210,8 +196,7 @@ namespace Moritz
 
         private System.Windows.Forms.Button QuitButton;
 		private System.Windows.Forms.Button PreferencesButton;
-        private System.Windows.Forms.Button LoadScoreSettingsButton;
-        private System.Windows.Forms.Button CloseAssistantComposerButton;
+		private System.Windows.Forms.Button LoadScoreSettingsButton;
 		private System.Windows.Forms.Button KrystalsEditorButton;
         private System.Windows.Forms.Panel AssistantComposerPanel;
         private System.Windows.Forms.Label AssistantComposerLabel;
