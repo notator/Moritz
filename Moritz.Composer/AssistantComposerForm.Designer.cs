@@ -82,8 +82,6 @@ namespace Moritz.Composer
 			this.GapPixelsLabel = new System.Windows.Forms.Label();
 			this.ConfirmNotationButton = new System.Windows.Forms.Button();
 			this.RevertNotationButton = new System.Windows.Forms.Button();
-			this.ScoreComboBox = new System.Windows.Forms.ComboBox();
-			this.ScoreComboBoxLabel = new System.Windows.Forms.Label();
 			this.SaveSettingsCreateScoreButton = new System.Windows.Forms.Button();
 			this.QuitMoritzButton = new System.Windows.Forms.Button();
 			this.ShowMoritzButton = new System.Windows.Forms.Button();
@@ -97,8 +95,6 @@ namespace Moritz.Composer
 			this.RevertEverythingButton = new System.Windows.Forms.Button();
 			this.ShowUncheckedFormsButton = new System.Windows.Forms.Button();
 			this.ShowConfirmedFormsButton = new System.Windows.Forms.Button();
-			this.label1 = new System.Windows.Forms.Label();
-			this.OutputDevicesComboBox = new System.Windows.Forms.ComboBox();
 			this.NotationGroupBox.SuspendLayout();
 			this.StandardChordsOptionsPanel.SuspendLayout();
 			this.KrystalsGroupBox.SuspendLayout();
@@ -107,8 +103,9 @@ namespace Moritz.Composer
 			// 
 			// QuitAlgorithmButton
 			// 
+			this.QuitAlgorithmButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.QuitAlgorithmButton.Font = new System.Drawing.Font("Arial", 8F);
-			this.QuitAlgorithmButton.Location = new System.Drawing.Point(600, 539);
+			this.QuitAlgorithmButton.Location = new System.Drawing.Point(600, 504);
 			this.QuitAlgorithmButton.Name = "QuitAlgorithmButton";
 			this.QuitAlgorithmButton.Size = new System.Drawing.Size(216, 26);
 			this.QuitAlgorithmButton.TabIndex = 2;
@@ -118,7 +115,7 @@ namespace Moritz.Composer
 			// 
 			// PalettesListBox
 			// 
-			this.PalettesListBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.PalettesListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.PalettesListBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
 			this.PalettesListBox.FormattingEnabled = true;
 			this.PalettesListBox.ItemHeight = 14;
@@ -131,7 +128,7 @@ namespace Moritz.Composer
 			// 
 			// ShowSelectedPaletteButton
 			// 
-			this.ShowSelectedPaletteButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+			this.ShowSelectedPaletteButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ShowSelectedPaletteButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
 			this.ShowSelectedPaletteButton.Enabled = false;
 			this.ShowSelectedPaletteButton.Font = new System.Drawing.Font("Arial", 8F);
@@ -146,7 +143,7 @@ namespace Moritz.Composer
 			// 
 			// AddPaletteButton
 			// 
-			this.AddPaletteButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+			this.AddPaletteButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.AddPaletteButton.Font = new System.Drawing.Font("Arial", 8F);
 			this.AddPaletteButton.ForeColor = System.Drawing.SystemColors.ControlText;
 			this.AddPaletteButton.Location = new System.Drawing.Point(16, 303);
@@ -159,7 +156,7 @@ namespace Moritz.Composer
 			// 
 			// AddKrystalButton
 			// 
-			this.AddKrystalButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+			this.AddKrystalButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.AddKrystalButton.Font = new System.Drawing.Font("Arial", 8F);
 			this.AddKrystalButton.ForeColor = System.Drawing.SystemColors.ControlText;
 			this.AddKrystalButton.Location = new System.Drawing.Point(16, 304);
@@ -172,7 +169,7 @@ namespace Moritz.Composer
 			// 
 			// DeleteSelectedPaletteButton
 			// 
-			this.DeleteSelectedPaletteButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+			this.DeleteSelectedPaletteButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.DeleteSelectedPaletteButton.Enabled = false;
 			this.DeleteSelectedPaletteButton.Font = new System.Drawing.Font("Arial", 8F);
 			this.DeleteSelectedPaletteButton.ForeColor = System.Drawing.SystemColors.ControlText;
@@ -186,7 +183,7 @@ namespace Moritz.Composer
 			// 
 			// KrystalsListBox
 			// 
-			this.KrystalsListBox.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.KrystalsListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.KrystalsListBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
 			this.KrystalsListBox.FormattingEnabled = true;
 			this.KrystalsListBox.ItemHeight = 14;
@@ -199,7 +196,7 @@ namespace Moritz.Composer
 			// 
 			// RemoveSelectedKrystalButton
 			// 
-			this.RemoveSelectedKrystalButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+			this.RemoveSelectedKrystalButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.RemoveSelectedKrystalButton.Enabled = false;
 			this.RemoveSelectedKrystalButton.Font = new System.Drawing.Font("Arial", 8F);
 			this.RemoveSelectedKrystalButton.ForeColor = System.Drawing.SystemColors.ControlText;
@@ -213,6 +210,7 @@ namespace Moritz.Composer
 			// 
 			// NotationGroupBox
 			// 
+			this.NotationGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.NotationGroupBox.Controls.Add(this.VoiceIndicesHelpLabelLabel);
 			this.NotationGroupBox.Controls.Add(this.ChordTypeComboBoxLabel);
 			this.NotationGroupBox.Controls.Add(this.ChordTypeComboBox);
@@ -249,7 +247,7 @@ namespace Moritz.Composer
 			this.NotationGroupBox.Controls.Add(this.MinimumGapsBetweenStavesLabel);
 			this.NotationGroupBox.Controls.Add(this.GapPixelsLabel);
 			this.NotationGroupBox.ForeColor = System.Drawing.Color.Brown;
-			this.NotationGroupBox.Location = new System.Drawing.Point(15, 43);
+			this.NotationGroupBox.Location = new System.Drawing.Point(15, 8);
 			this.NotationGroupBox.Name = "NotationGroupBox";
 			this.NotationGroupBox.Size = new System.Drawing.Size(466, 490);
 			this.NotationGroupBox.TabIndex = 9;
@@ -258,6 +256,7 @@ namespace Moritz.Composer
 			// 
 			// VoiceIndicesHelpLabelLabel
 			// 
+			this.VoiceIndicesHelpLabelLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.VoiceIndicesHelpLabelLabel.AutoSize = true;
 			this.VoiceIndicesHelpLabelLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
 			this.VoiceIndicesHelpLabelLabel.Location = new System.Drawing.Point(111, 145);
@@ -270,6 +269,7 @@ namespace Moritz.Composer
 			// 
 			// ChordTypeComboBoxLabel
 			// 
+			this.ChordTypeComboBoxLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ChordTypeComboBoxLabel.AutoSize = true;
 			this.ChordTypeComboBoxLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
 			this.ChordTypeComboBoxLabel.Location = new System.Drawing.Point(6, 23);
@@ -281,6 +281,7 @@ namespace Moritz.Composer
 			// 
 			// ChordTypeComboBox
 			// 
+			this.ChordTypeComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ChordTypeComboBox.FormattingEnabled = true;
 			this.ChordTypeComboBox.Location = new System.Drawing.Point(68, 19);
 			this.ChordTypeComboBox.Name = "ChordTypeComboBox";
@@ -291,6 +292,7 @@ namespace Moritz.Composer
 			// 
 			// ShortStaffNamesHelpLabel
 			// 
+			this.ShortStaffNamesHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ShortStaffNamesHelpLabel.AutoSize = true;
 			this.ShortStaffNamesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
 			this.ShortStaffNamesHelpLabel.Location = new System.Drawing.Point(100, 387);
@@ -301,6 +303,7 @@ namespace Moritz.Composer
 			// 
 			// StandardChordsOptionsPanel
 			// 
+			this.StandardChordsOptionsPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.StandardChordsOptionsPanel.Controls.Add(this.BeamsCrossBarlinesCheckBox);
 			this.StandardChordsOptionsPanel.Controls.Add(this.MinimumCrotchetDurationTextBox);
 			this.StandardChordsOptionsPanel.Controls.Add(this.MinimumCrotchetDurationLabel);
@@ -311,6 +314,7 @@ namespace Moritz.Composer
 			// 
 			// BeamsCrossBarlinesCheckBox
 			// 
+			this.BeamsCrossBarlinesCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.BeamsCrossBarlinesCheckBox.AutoSize = true;
 			this.BeamsCrossBarlinesCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.BeamsCrossBarlinesCheckBox.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
@@ -324,6 +328,7 @@ namespace Moritz.Composer
 			// 
 			// MinimumCrotchetDurationTextBox
 			// 
+			this.MinimumCrotchetDurationTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.MinimumCrotchetDurationTextBox.Location = new System.Drawing.Point(95, 4);
 			this.MinimumCrotchetDurationTextBox.Name = "MinimumCrotchetDurationTextBox";
 			this.MinimumCrotchetDurationTextBox.Size = new System.Drawing.Size(63, 20);
@@ -333,6 +338,7 @@ namespace Moritz.Composer
 			// 
 			// MinimumCrotchetDurationLabel
 			// 
+			this.MinimumCrotchetDurationLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.MinimumCrotchetDurationLabel.AutoSize = true;
 			this.MinimumCrotchetDurationLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
 			this.MinimumCrotchetDurationLabel.Location = new System.Drawing.Point(0, 0);
@@ -345,6 +351,7 @@ namespace Moritz.Composer
 			// 
 			// LongStaffNamesHelpLabel
 			// 
+			this.LongStaffNamesHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.LongStaffNamesHelpLabel.AutoSize = true;
 			this.LongStaffNamesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
 			this.LongStaffNamesHelpLabel.Location = new System.Drawing.Point(97, 344);
@@ -355,6 +362,7 @@ namespace Moritz.Composer
 			// 
 			// VoiceIndicesPerStaffHelpLabel
 			// 
+			this.VoiceIndicesPerStaffHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.VoiceIndicesPerStaffHelpLabel.AutoSize = true;
 			this.VoiceIndicesPerStaffHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
 			this.VoiceIndicesPerStaffHelpLabel.Location = new System.Drawing.Point(250, 180);
@@ -366,6 +374,7 @@ namespace Moritz.Composer
 			// 
 			// ShortStaffNamesLabel
 			// 
+			this.ShortStaffNamesLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ShortStaffNamesLabel.AutoSize = true;
 			this.ShortStaffNamesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
 			this.ShortStaffNamesLabel.Location = new System.Drawing.Point(10, 387);
@@ -377,6 +386,7 @@ namespace Moritz.Composer
 			// 
 			// LongStaffNamesTextBox
 			// 
+			this.LongStaffNamesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.LongStaffNamesTextBox.Location = new System.Drawing.Point(10, 361);
 			this.LongStaffNamesTextBox.Name = "LongStaffNamesTextBox";
 			this.LongStaffNamesTextBox.Size = new System.Drawing.Size(440, 20);
@@ -386,6 +396,7 @@ namespace Moritz.Composer
 			// 
 			// VoiceIndicesHelpLabel
 			// 
+			this.VoiceIndicesHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.VoiceIndicesHelpLabel.AutoSize = true;
 			this.VoiceIndicesHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
 			this.VoiceIndicesHelpLabel.Location = new System.Drawing.Point(111, 160);
@@ -396,6 +407,7 @@ namespace Moritz.Composer
 			// 
 			// SystemStartBarsHelpLabel
 			// 
+			this.SystemStartBarsHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.SystemStartBarsHelpLabel.AutoSize = true;
 			this.SystemStartBarsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
 			this.SystemStartBarsHelpLabel.Location = new System.Drawing.Point(139, 442);
@@ -406,6 +418,7 @@ namespace Moritz.Composer
 			// 
 			// ShortStaffNamesTextBox
 			// 
+			this.ShortStaffNamesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ShortStaffNamesTextBox.Location = new System.Drawing.Point(10, 403);
 			this.ShortStaffNamesTextBox.Name = "ShortStaffNamesTextBox";
 			this.ShortStaffNamesTextBox.Size = new System.Drawing.Size(440, 20);
@@ -415,6 +428,7 @@ namespace Moritz.Composer
 			// 
 			// StafflinesPerStaffHelpLabel
 			// 
+			this.StafflinesPerStaffHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.StafflinesPerStaffHelpLabel.AutoSize = true;
 			this.StafflinesPerStaffHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
 			this.StafflinesPerStaffHelpLabel.Location = new System.Drawing.Point(250, 255);
@@ -425,6 +439,7 @@ namespace Moritz.Composer
 			// 
 			// VoiceIndicesPerStaffLabel
 			// 
+			this.VoiceIndicesPerStaffLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.VoiceIndicesPerStaffLabel.AutoSize = true;
 			this.VoiceIndicesPerStaffLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
 			this.VoiceIndicesPerStaffLabel.Location = new System.Drawing.Point(24, 180);
@@ -437,6 +452,7 @@ namespace Moritz.Composer
 			// 
 			// StafflinesPerStaffLabel
 			// 
+			this.StafflinesPerStaffLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.StafflinesPerStaffLabel.AutoSize = true;
 			this.StafflinesPerStaffLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
 			this.StafflinesPerStaffLabel.Location = new System.Drawing.Point(11, 264);
@@ -448,6 +464,7 @@ namespace Moritz.Composer
 			// 
 			// LongStaffNamesLabel
 			// 
+			this.LongStaffNamesLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.LongStaffNamesLabel.AutoSize = true;
 			this.LongStaffNamesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
 			this.LongStaffNamesLabel.Location = new System.Drawing.Point(10, 344);
@@ -459,6 +476,7 @@ namespace Moritz.Composer
 			// 
 			// VoiceIndicesPerStaffTextBox
 			// 
+			this.VoiceIndicesPerStaffTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.VoiceIndicesPerStaffTextBox.Location = new System.Drawing.Point(111, 177);
 			this.VoiceIndicesPerStaffTextBox.Name = "VoiceIndicesPerStaffTextBox";
 			this.VoiceIndicesPerStaffTextBox.Size = new System.Drawing.Size(136, 20);
@@ -468,6 +486,7 @@ namespace Moritz.Composer
 			// 
 			// ClefsPerStaffLabel
 			// 
+			this.ClefsPerStaffLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ClefsPerStaffLabel.AutoSize = true;
 			this.ClefsPerStaffLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
 			this.ClefsPerStaffLabel.Location = new System.Drawing.Point(32, 222);
@@ -479,6 +498,7 @@ namespace Moritz.Composer
 			// 
 			// ClefsPerStaffHelpLabel
 			// 
+			this.ClefsPerStaffHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ClefsPerStaffHelpLabel.AutoSize = true;
 			this.ClefsPerStaffHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
 			this.ClefsPerStaffHelpLabel.Location = new System.Drawing.Point(250, 214);
@@ -489,6 +509,7 @@ namespace Moritz.Composer
 			// 
 			// StaffGroupsHelpLabel
 			// 
+			this.StaffGroupsHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.StaffGroupsHelpLabel.AutoSize = true;
 			this.StaffGroupsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
 			this.StaffGroupsHelpLabel.Location = new System.Drawing.Point(250, 297);
@@ -500,6 +521,7 @@ namespace Moritz.Composer
 			// 
 			// StaffGroupsLabel
 			// 
+			this.StaffGroupsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.StaffGroupsLabel.AutoSize = true;
 			this.StaffGroupsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
 			this.StaffGroupsLabel.Location = new System.Drawing.Point(41, 306);
@@ -511,6 +533,7 @@ namespace Moritz.Composer
 			// 
 			// StafflinesPerStaffTextBox
 			// 
+			this.StafflinesPerStaffTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.StafflinesPerStaffTextBox.Location = new System.Drawing.Point(111, 261);
 			this.StafflinesPerStaffTextBox.Name = "StafflinesPerStaffTextBox";
 			this.StafflinesPerStaffTextBox.Size = new System.Drawing.Size(136, 20);
@@ -520,6 +543,7 @@ namespace Moritz.Composer
 			// 
 			// SystemStartBarsLabel
 			// 
+			this.SystemStartBarsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.SystemStartBarsLabel.AutoSize = true;
 			this.SystemStartBarsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
 			this.SystemStartBarsLabel.Location = new System.Drawing.Point(10, 442);
@@ -532,6 +556,7 @@ namespace Moritz.Composer
 			// 
 			// SystemStartBarsTextBox
 			// 
+			this.SystemStartBarsTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.SystemStartBarsTextBox.Location = new System.Drawing.Point(10, 459);
 			this.SystemStartBarsTextBox.Name = "SystemStartBarsTextBox";
 			this.SystemStartBarsTextBox.Size = new System.Drawing.Size(440, 20);
@@ -541,6 +566,7 @@ namespace Moritz.Composer
 			// 
 			// ClefsPerStaffTextBox
 			// 
+			this.ClefsPerStaffTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ClefsPerStaffTextBox.Location = new System.Drawing.Point(111, 219);
 			this.ClefsPerStaffTextBox.Name = "ClefsPerStaffTextBox";
 			this.ClefsPerStaffTextBox.Size = new System.Drawing.Size(136, 20);
@@ -550,6 +576,7 @@ namespace Moritz.Composer
 			// 
 			// StaffGroupsTextBox
 			// 
+			this.StaffGroupsTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.StaffGroupsTextBox.Location = new System.Drawing.Point(111, 303);
 			this.StaffGroupsTextBox.Name = "StaffGroupsTextBox";
 			this.StaffGroupsTextBox.Size = new System.Drawing.Size(136, 20);
@@ -559,6 +586,7 @@ namespace Moritz.Composer
 			// 
 			// UnitsHelpLabel
 			// 
+			this.UnitsHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.UnitsHelpLabel.AutoSize = true;
 			this.UnitsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
 			this.UnitsHelpLabel.Location = new System.Drawing.Point(304, 131);
@@ -569,6 +597,7 @@ namespace Moritz.Composer
 			// 
 			// MinimumGapsBetweenSystemsTextBox
 			// 
+			this.MinimumGapsBetweenSystemsTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.MinimumGapsBetweenSystemsTextBox.Location = new System.Drawing.Point(394, 107);
 			this.MinimumGapsBetweenSystemsTextBox.Name = "MinimumGapsBetweenSystemsTextBox";
 			this.MinimumGapsBetweenSystemsTextBox.Size = new System.Drawing.Size(58, 20);
@@ -578,6 +607,7 @@ namespace Moritz.Composer
 			// 
 			// MinimumGapsBetweenStavesTextBox
 			// 
+			this.MinimumGapsBetweenStavesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.MinimumGapsBetweenStavesTextBox.Location = new System.Drawing.Point(394, 79);
 			this.MinimumGapsBetweenStavesTextBox.Name = "MinimumGapsBetweenStavesTextBox";
 			this.MinimumGapsBetweenStavesTextBox.Size = new System.Drawing.Size(58, 20);
@@ -587,6 +617,7 @@ namespace Moritz.Composer
 			// 
 			// StafflineStemStrokeWidthComboBox
 			// 
+			this.StafflineStemStrokeWidthComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.StafflineStemStrokeWidthComboBox.FormattingEnabled = true;
 			this.StafflineStemStrokeWidthComboBox.Items.AddRange(new object[] {
             "0.25",
@@ -603,6 +634,7 @@ namespace Moritz.Composer
 			// 
 			// GapPixelsComboBox
 			// 
+			this.GapPixelsComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.GapPixelsComboBox.FormattingEnabled = true;
 			this.GapPixelsComboBox.Items.AddRange(new object[] {
             "1",
@@ -632,6 +664,7 @@ namespace Moritz.Composer
 			// 
 			// MinimumGapsBetweenSystemsLabel
 			// 
+			this.MinimumGapsBetweenSystemsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.MinimumGapsBetweenSystemsLabel.AutoSize = true;
 			this.MinimumGapsBetweenSystemsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
 			this.MinimumGapsBetweenSystemsLabel.Location = new System.Drawing.Point(217, 110);
@@ -643,6 +676,7 @@ namespace Moritz.Composer
 			// 
 			// StaffLineStemStrokeWidthLabel
 			// 
+			this.StaffLineStemStrokeWidthLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.StaffLineStemStrokeWidthLabel.AutoSize = true;
 			this.StaffLineStemStrokeWidthLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
 			this.StaffLineStemStrokeWidthLabel.Location = new System.Drawing.Point(230, 23);
@@ -654,6 +688,7 @@ namespace Moritz.Composer
 			// 
 			// MinimumGapsBetweenStavesLabel
 			// 
+			this.MinimumGapsBetweenStavesLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.MinimumGapsBetweenStavesLabel.AutoSize = true;
 			this.MinimumGapsBetweenStavesLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
 			this.MinimumGapsBetweenStavesLabel.Location = new System.Drawing.Point(225, 82);
@@ -665,6 +700,7 @@ namespace Moritz.Composer
 			// 
 			// GapPixelsLabel
 			// 
+			this.GapPixelsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.GapPixelsLabel.AutoSize = true;
 			this.GapPixelsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
 			this.GapPixelsLabel.Location = new System.Drawing.Point(228, 53);
@@ -676,11 +712,12 @@ namespace Moritz.Composer
 			// 
 			// ConfirmNotationButton
 			// 
+			this.ConfirmNotationButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ConfirmNotationButton.BackColor = System.Drawing.Color.Transparent;
 			this.ConfirmNotationButton.Enabled = false;
 			this.ConfirmNotationButton.Font = new System.Drawing.Font("Arial", 8F);
 			this.ConfirmNotationButton.ForeColor = System.Drawing.Color.Blue;
-			this.ConfirmNotationButton.Location = new System.Drawing.Point(362, 539);
+			this.ConfirmNotationButton.Location = new System.Drawing.Point(362, 504);
 			this.ConfirmNotationButton.Name = "ConfirmNotationButton";
 			this.ConfirmNotationButton.Size = new System.Drawing.Size(103, 26);
 			this.ConfirmNotationButton.TabIndex = 1;
@@ -690,11 +727,12 @@ namespace Moritz.Composer
 			// 
 			// RevertNotationButton
 			// 
+			this.RevertNotationButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.RevertNotationButton.BackColor = System.Drawing.Color.Transparent;
 			this.RevertNotationButton.Enabled = false;
 			this.RevertNotationButton.Font = new System.Drawing.Font("Arial", 8F);
 			this.RevertNotationButton.ForeColor = System.Drawing.Color.Red;
-			this.RevertNotationButton.Location = new System.Drawing.Point(251, 539);
+			this.RevertNotationButton.Location = new System.Drawing.Point(251, 504);
 			this.RevertNotationButton.Name = "RevertNotationButton";
 			this.RevertNotationButton.Size = new System.Drawing.Size(103, 26);
 			this.RevertNotationButton.TabIndex = 2;
@@ -702,34 +740,14 @@ namespace Moritz.Composer
 			this.RevertNotationButton.UseVisualStyleBackColor = false;
 			this.RevertNotationButton.Click += new System.EventHandler(this.RevertNotationToSavedButton_Click);
 			// 
-			// ScoreComboBox
-			// 
-			this.ScoreComboBox.FormattingEnabled = true;
-			this.ScoreComboBox.Location = new System.Drawing.Point(384, 15);
-			this.ScoreComboBox.Name = "ScoreComboBox";
-			this.ScoreComboBox.Size = new System.Drawing.Size(214, 22);
-			this.ScoreComboBox.TabIndex = 8;
-			this.ScoreComboBox.SelectedIndexChanged += new System.EventHandler(this.ScoreComboBox_SelectedIndexChanged);
-			this.ScoreComboBox.Leave += new System.EventHandler(this.ScoreComboBox_Leave);
-			// 
-			// ScoreComboBoxLabel
-			// 
-			this.ScoreComboBoxLabel.AutoSize = true;
-			this.ScoreComboBoxLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-			this.ScoreComboBoxLabel.Location = new System.Drawing.Point(347, 19);
-			this.ScoreComboBoxLabel.Margin = new System.Windows.Forms.Padding(0);
-			this.ScoreComboBoxLabel.Name = "ScoreComboBoxLabel";
-			this.ScoreComboBoxLabel.Size = new System.Drawing.Size(35, 14);
-			this.ScoreComboBoxLabel.TabIndex = 149;
-			this.ScoreComboBoxLabel.Text = "score";
-			// 
 			// SaveSettingsCreateScoreButton
 			// 
+			this.SaveSettingsCreateScoreButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.SaveSettingsCreateScoreButton.BackColor = System.Drawing.Color.Transparent;
 			this.SaveSettingsCreateScoreButton.Enabled = false;
 			this.SaveSettingsCreateScoreButton.Font = new System.Drawing.Font("Arial", 8F);
 			this.SaveSettingsCreateScoreButton.ForeColor = System.Drawing.Color.Blue;
-			this.SaveSettingsCreateScoreButton.Location = new System.Drawing.Point(713, 496);
+			this.SaveSettingsCreateScoreButton.Location = new System.Drawing.Point(713, 461);
 			this.SaveSettingsCreateScoreButton.Name = "SaveSettingsCreateScoreButton";
 			this.SaveSettingsCreateScoreButton.Size = new System.Drawing.Size(214, 31);
 			this.SaveSettingsCreateScoreButton.TabIndex = 0;
@@ -739,8 +757,9 @@ namespace Moritz.Composer
 			// 
 			// QuitMoritzButton
 			// 
+			this.QuitMoritzButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.QuitMoritzButton.Font = new System.Drawing.Font("Arial", 8F);
-			this.QuitMoritzButton.Location = new System.Drawing.Point(823, 539);
+			this.QuitMoritzButton.Location = new System.Drawing.Point(823, 504);
 			this.QuitMoritzButton.Name = "QuitMoritzButton";
 			this.QuitMoritzButton.Size = new System.Drawing.Size(103, 26);
 			this.QuitMoritzButton.TabIndex = 3;
@@ -750,9 +769,10 @@ namespace Moritz.Composer
 			// 
 			// ShowMoritzButton
 			// 
+			this.ShowMoritzButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ShowMoritzButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
 			this.ShowMoritzButton.Font = new System.Drawing.Font("Arial", 8F);
-			this.ShowMoritzButton.Location = new System.Drawing.Point(490, 539);
+			this.ShowMoritzButton.Location = new System.Drawing.Point(490, 504);
 			this.ShowMoritzButton.Name = "ShowMoritzButton";
 			this.ShowMoritzButton.Size = new System.Drawing.Size(103, 26);
 			this.ShowMoritzButton.TabIndex = 7;
@@ -762,7 +782,7 @@ namespace Moritz.Composer
 			// 
 			// ShowSelectedKrystalButton
 			// 
-			this.ShowSelectedKrystalButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+			this.ShowSelectedKrystalButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ShowSelectedKrystalButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
 			this.ShowSelectedKrystalButton.Enabled = false;
 			this.ShowSelectedKrystalButton.Font = new System.Drawing.Font("Arial", 8F);
@@ -777,9 +797,10 @@ namespace Moritz.Composer
 			// 
 			// DimensionsAndMetadataButton
 			// 
+			this.DimensionsAndMetadataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.DimensionsAndMetadataButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
 			this.DimensionsAndMetadataButton.Font = new System.Drawing.Font("Arial", 8F);
-			this.DimensionsAndMetadataButton.Location = new System.Drawing.Point(660, 12);
+			this.DimensionsAndMetadataButton.Location = new System.Drawing.Point(15, 504);
 			this.DimensionsAndMetadataButton.Name = "DimensionsAndMetadataButton";
 			this.DimensionsAndMetadataButton.Size = new System.Drawing.Size(214, 26);
 			this.DimensionsAndMetadataButton.TabIndex = 6;
@@ -789,12 +810,13 @@ namespace Moritz.Composer
 			// 
 			// KrystalsGroupBox
 			// 
+			this.KrystalsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.KrystalsGroupBox.Controls.Add(this.KrystalsListBox);
 			this.KrystalsGroupBox.Controls.Add(this.ShowSelectedKrystalButton);
 			this.KrystalsGroupBox.Controls.Add(this.AddKrystalButton);
 			this.KrystalsGroupBox.Controls.Add(this.RemoveSelectedKrystalButton);
 			this.KrystalsGroupBox.ForeColor = System.Drawing.Color.Brown;
-			this.KrystalsGroupBox.Location = new System.Drawing.Point(490, 43);
+			this.KrystalsGroupBox.Location = new System.Drawing.Point(490, 8);
 			this.KrystalsGroupBox.Name = "KrystalsGroupBox";
 			this.KrystalsGroupBox.Size = new System.Drawing.Size(214, 372);
 			this.KrystalsGroupBox.TabIndex = 10;
@@ -803,11 +825,12 @@ namespace Moritz.Composer
 			// 
 			// ConfirmKrystalsListButton
 			// 
+			this.ConfirmKrystalsListButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ConfirmKrystalsListButton.BackColor = System.Drawing.Color.Transparent;
 			this.ConfirmKrystalsListButton.Enabled = false;
 			this.ConfirmKrystalsListButton.Font = new System.Drawing.Font("Arial", 8F);
 			this.ConfirmKrystalsListButton.ForeColor = System.Drawing.Color.Blue;
-			this.ConfirmKrystalsListButton.Location = new System.Drawing.Point(601, 419);
+			this.ConfirmKrystalsListButton.Location = new System.Drawing.Point(601, 384);
 			this.ConfirmKrystalsListButton.Name = "ConfirmKrystalsListButton";
 			this.ConfirmKrystalsListButton.Size = new System.Drawing.Size(103, 26);
 			this.ConfirmKrystalsListButton.TabIndex = 2;
@@ -817,11 +840,12 @@ namespace Moritz.Composer
 			// 
 			// RevertKrystalsListButton
 			// 
+			this.RevertKrystalsListButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.RevertKrystalsListButton.BackColor = System.Drawing.Color.Transparent;
 			this.RevertKrystalsListButton.Enabled = false;
 			this.RevertKrystalsListButton.Font = new System.Drawing.Font("Arial", 8F);
 			this.RevertKrystalsListButton.ForeColor = System.Drawing.Color.Red;
-			this.RevertKrystalsListButton.Location = new System.Drawing.Point(490, 419);
+			this.RevertKrystalsListButton.Location = new System.Drawing.Point(490, 384);
 			this.RevertKrystalsListButton.Name = "RevertKrystalsListButton";
 			this.RevertKrystalsListButton.Size = new System.Drawing.Size(103, 26);
 			this.RevertKrystalsListButton.TabIndex = 1;
@@ -831,12 +855,13 @@ namespace Moritz.Composer
 			// 
 			// PalettesGroupBox
 			// 
+			this.PalettesGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.PalettesGroupBox.Controls.Add(this.DeleteSelectedPaletteButton);
 			this.PalettesGroupBox.Controls.Add(this.PalettesListBox);
 			this.PalettesGroupBox.Controls.Add(this.ShowSelectedPaletteButton);
 			this.PalettesGroupBox.Controls.Add(this.AddPaletteButton);
 			this.PalettesGroupBox.ForeColor = System.Drawing.Color.Brown;
-			this.PalettesGroupBox.Location = new System.Drawing.Point(713, 43);
+			this.PalettesGroupBox.Location = new System.Drawing.Point(713, 8);
 			this.PalettesGroupBox.Name = "PalettesGroupBox";
 			this.PalettesGroupBox.Size = new System.Drawing.Size(214, 372);
 			this.PalettesGroupBox.TabIndex = 11;
@@ -845,11 +870,12 @@ namespace Moritz.Composer
 			// 
 			// RevertPalettesListButton
 			// 
+			this.RevertPalettesListButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.RevertPalettesListButton.BackColor = System.Drawing.Color.Transparent;
 			this.RevertPalettesListButton.Enabled = false;
 			this.RevertPalettesListButton.Font = new System.Drawing.Font("Arial", 8F);
 			this.RevertPalettesListButton.ForeColor = System.Drawing.Color.Red;
-			this.RevertPalettesListButton.Location = new System.Drawing.Point(729, 419);
+			this.RevertPalettesListButton.Location = new System.Drawing.Point(729, 384);
 			this.RevertPalettesListButton.Name = "RevertPalettesListButton";
 			this.RevertPalettesListButton.Size = new System.Drawing.Size(183, 26);
 			this.RevertPalettesListButton.TabIndex = 2;
@@ -859,11 +885,12 @@ namespace Moritz.Composer
 			// 
 			// RevertEverythingButton
 			// 
+			this.RevertEverythingButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.RevertEverythingButton.BackColor = System.Drawing.Color.Transparent;
 			this.RevertEverythingButton.Enabled = false;
 			this.RevertEverythingButton.Font = new System.Drawing.Font("Arial", 8F);
 			this.RevertEverythingButton.ForeColor = System.Drawing.Color.Red;
-			this.RevertEverythingButton.Location = new System.Drawing.Point(490, 496);
+			this.RevertEverythingButton.Location = new System.Drawing.Point(490, 461);
 			this.RevertEverythingButton.Name = "RevertEverythingButton";
 			this.RevertEverythingButton.Size = new System.Drawing.Size(214, 31);
 			this.RevertEverythingButton.TabIndex = 1;
@@ -873,11 +900,12 @@ namespace Moritz.Composer
 			// 
 			// ShowUncheckedFormsButton
 			// 
+			this.ShowUncheckedFormsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ShowUncheckedFormsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(205)))), ((int)(((byte)(240)))), ((int)(((byte)(205)))));
 			this.ShowUncheckedFormsButton.Enabled = false;
 			this.ShowUncheckedFormsButton.Font = new System.Drawing.Font("Arial", 8F);
 			this.ShowUncheckedFormsButton.ForeColor = System.Drawing.SystemColors.ControlText;
-			this.ShowUncheckedFormsButton.Location = new System.Drawing.Point(490, 458);
+			this.ShowUncheckedFormsButton.Location = new System.Drawing.Point(490, 423);
 			this.ShowUncheckedFormsButton.Name = "ShowUncheckedFormsButton";
 			this.ShowUncheckedFormsButton.Size = new System.Drawing.Size(214, 31);
 			this.ShowUncheckedFormsButton.TabIndex = 5;
@@ -887,10 +915,11 @@ namespace Moritz.Composer
 			// 
 			// ShowConfirmedFormsButton
 			// 
+			this.ShowConfirmedFormsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.ShowConfirmedFormsButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(225)))), ((int)(((byte)(215)))));
 			this.ShowConfirmedFormsButton.Enabled = false;
 			this.ShowConfirmedFormsButton.Font = new System.Drawing.Font("Arial", 8F);
-			this.ShowConfirmedFormsButton.Location = new System.Drawing.Point(713, 458);
+			this.ShowConfirmedFormsButton.Location = new System.Drawing.Point(713, 423);
 			this.ShowConfirmedFormsButton.Name = "ShowConfirmedFormsButton";
 			this.ShowConfirmedFormsButton.Size = new System.Drawing.Size(214, 31);
 			this.ShowConfirmedFormsButton.TabIndex = 4;
@@ -898,33 +927,13 @@ namespace Moritz.Composer
 			this.ShowConfirmedFormsButton.UseVisualStyleBackColor = false;
 			this.ShowConfirmedFormsButton.Click += new System.EventHandler(this.ShowConfirmedFormsButton_Click);
 			// 
-			// label1
-			// 
-			this.label1.AutoSize = true;
-			this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-			this.label1.Location = new System.Drawing.Point(28, 19);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(97, 14);
-			this.label1.TabIndex = 191;
-			this.label1.Text = "MIDI output device:";
-			// 
-			// OutputDevicesComboBox
-			// 
-			this.OutputDevicesComboBox.FormattingEnabled = true;
-			this.OutputDevicesComboBox.Location = new System.Drawing.Point(126, 15);
-			this.OutputDevicesComboBox.Name = "OutputDevicesComboBox";
-			this.OutputDevicesComboBox.Size = new System.Drawing.Size(171, 22);
-			this.OutputDevicesComboBox.TabIndex = 192;
-			// 
 			// AssistantComposerForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(255)))), ((int)(((byte)(245)))));
-			this.ClientSize = new System.Drawing.Size(945, 581);
+			this.ClientSize = new System.Drawing.Size(945, 546);
 			this.ControlBox = false;
-			this.Controls.Add(this.OutputDevicesComboBox);
-			this.Controls.Add(this.label1);
 			this.Controls.Add(this.RevertPalettesListButton);
 			this.Controls.Add(this.RevertKrystalsListButton);
 			this.Controls.Add(this.ConfirmKrystalsListButton);
@@ -941,8 +950,6 @@ namespace Moritz.Composer
 			this.Controls.Add(this.SaveSettingsCreateScoreButton);
 			this.Controls.Add(this.QuitAlgorithmButton);
 			this.Controls.Add(this.NotationGroupBox);
-			this.Controls.Add(this.ScoreComboBox);
-			this.Controls.Add(this.ScoreComboBoxLabel);
 			this.Font = new System.Drawing.Font("Arial", 8F);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.Location = new System.Drawing.Point(250, 100);
@@ -957,7 +964,6 @@ namespace Moritz.Composer
 			this.KrystalsGroupBox.ResumeLayout(false);
 			this.PalettesGroupBox.ResumeLayout(false);
 			this.ResumeLayout(false);
-			this.PerformLayout();
 
 		}
 
@@ -981,9 +987,7 @@ namespace Moritz.Composer
         private System.Windows.Forms.Label MinimumGapsBetweenStavesLabel;
         private System.Windows.Forms.Label GapPixelsLabel;
         private System.Windows.Forms.TextBox MinimumCrotchetDurationTextBox;
-        private System.Windows.Forms.Label MinimumCrotchetDurationLabel;
-        private System.Windows.Forms.ComboBox ScoreComboBox;
-        private System.Windows.Forms.Label ScoreComboBoxLabel;
+		private System.Windows.Forms.Label MinimumCrotchetDurationLabel;
         private System.Windows.Forms.Label UnitsHelpLabel;
         private System.Windows.Forms.Button SaveSettingsCreateScoreButton;
         private System.Windows.Forms.Button QuitMoritzButton;
@@ -1026,9 +1030,7 @@ namespace Moritz.Composer
         private System.Windows.Forms.Button ConfirmNotationButton;
         private System.Windows.Forms.Button RevertNotationButton;
         private System.Windows.Forms.Button RevertPalettesListButton;
-        private System.Windows.Forms.Label VoiceIndicesHelpLabelLabel;
-		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.ComboBox OutputDevicesComboBox;
+		private System.Windows.Forms.Label VoiceIndicesHelpLabelLabel;
 
     }
 }

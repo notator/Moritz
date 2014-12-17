@@ -52,8 +52,7 @@ namespace Moritz
 			this.OnlineXMLSchemasFolderLabel = new System.Windows.Forms.Label();
 			this.OnlineXMLSchemasFolderInfoLabel = new System.Windows.Forms.Label();
 			this.MidiOutputDeviceLabel = new System.Windows.Forms.Label();
-			this.MidiOutputDeviceHelpLabel = new System.Windows.Forms.Label();
-			this.HiddenTextBox = new System.Windows.Forms.TextBox();
+			this.OutputDevicesComboBox = new System.Windows.Forms.ComboBox();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.SuspendLayout();
@@ -274,30 +273,19 @@ namespace Moritz
 			// 
 			this.MidiOutputDeviceLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.MidiOutputDeviceLabel.AutoSize = true;
-			this.MidiOutputDeviceLabel.Location = new System.Drawing.Point(122, 17);
+			this.MidiOutputDeviceLabel.Location = new System.Drawing.Point(121, 17);
 			this.MidiOutputDeviceLabel.Name = "MidiOutputDeviceLabel";
 			this.MidiOutputDeviceLabel.Size = new System.Drawing.Size(147, 13);
 			this.MidiOutputDeviceLabel.TabIndex = 4;
 			this.MidiOutputDeviceLabel.Text = "Preferred MIDI output device:";
 			// 
-			// MidiOutputDeviceHelpLabel
+			// OutputDevicesComboBox
 			// 
-			this.MidiOutputDeviceHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.MidiOutputDeviceHelpLabel.AutoSize = true;
-			this.MidiOutputDeviceHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
-			this.MidiOutputDeviceHelpLabel.Location = new System.Drawing.Point(267, 17);
-			this.MidiOutputDeviceHelpLabel.Name = "MidiOutputDeviceHelpLabel";
-			this.MidiOutputDeviceHelpLabel.Size = new System.Drawing.Size(253, 13);
-			this.MidiOutputDeviceHelpLabel.TabIndex = 5;
-			this.MidiOutputDeviceHelpLabel.Text = "MIDI device (change this in the Assistant Composer)";
-			// 
-			// HiddenTextBox
-			// 
-			this.HiddenTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.HiddenTextBox.Location = new System.Drawing.Point(61, 312);
-			this.HiddenTextBox.Name = "HiddenTextBox";
-			this.HiddenTextBox.Size = new System.Drawing.Size(143, 20);
-			this.HiddenTextBox.TabIndex = 2;
+			this.OutputDevicesComboBox.FormattingEnabled = true;
+			this.OutputDevicesComboBox.Location = new System.Drawing.Point(267, 14);
+			this.OutputDevicesComboBox.Name = "OutputDevicesComboBox";
+			this.OutputDevicesComboBox.Size = new System.Drawing.Size(171, 21);
+			this.OutputDevicesComboBox.TabIndex = 2;
 			// 
 			// PreferencesDialog
 			// 
@@ -306,8 +294,7 @@ namespace Moritz
 			this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(248)))), ((int)(((byte)(248)))));
 			this.ClientSize = new System.Drawing.Size(618, 347);
 			this.ControlBox = false;
-			this.Controls.Add(this.HiddenTextBox);
-			this.Controls.Add(this.MidiOutputDeviceHelpLabel);
+			this.Controls.Add(this.OutputDevicesComboBox);
 			this.Controls.Add(this.MidiOutputDeviceLabel);
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.groupBox2);
@@ -348,7 +335,6 @@ namespace Moritz
 		private System.Windows.Forms.Label OnlineXMLSchemasFolderLabel;
 		private System.Windows.Forms.Label OnlineXMLSchemasFolderInfoLabel;
 		private System.Windows.Forms.Label MidiOutputDeviceLabel;
-		private System.Windows.Forms.Label MidiOutputDeviceHelpLabel;
-		private System.Windows.Forms.TextBox HiddenTextBox;
+		private System.Windows.Forms.ComboBox OutputDevicesComboBox;
 	}
 }

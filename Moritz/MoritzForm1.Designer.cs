@@ -30,7 +30,6 @@ namespace Moritz
 		{
 			this.QuitButton = new System.Windows.Forms.Button();
 			this.PreferencesButton = new System.Windows.Forms.Button();
-			this.NewScoreSettingsButton = new System.Windows.Forms.Button();
 			this.LoadScoreSettingsButton = new System.Windows.Forms.Button();
 			this.CloseAssistantComposerButton = new System.Windows.Forms.Button();
 			this.KrystalsEditorButton = new System.Windows.Forms.Button();
@@ -39,8 +38,8 @@ namespace Moritz
 			this.KrystalsEditorPanel = new System.Windows.Forms.Panel();
 			this.KrystalsEditorLabel = new System.Windows.Forms.Label();
 			this.panel1 = new System.Windows.Forms.Panel();
-			this.label1 = new System.Windows.Forms.Label();
 			this.AboutButton = new System.Windows.Forms.Button();
+			this.label1 = new System.Windows.Forms.Label();
 			this.AssistantComposerPanel.SuspendLayout();
 			this.KrystalsEditorPanel.SuspendLayout();
 			this.panel1.SuspendLayout();
@@ -68,21 +67,10 @@ namespace Moritz
 			this.PreferencesButton.UseVisualStyleBackColor = true;
 			this.PreferencesButton.Click += new System.EventHandler(this.PreferencesButton_Click);
 			// 
-			// NewScoreSettingsButton
-			// 
-			this.NewScoreSettingsButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-			this.NewScoreSettingsButton.Location = new System.Drawing.Point(154, 30);
-			this.NewScoreSettingsButton.Name = "NewScoreSettingsButton";
-			this.NewScoreSettingsButton.Size = new System.Drawing.Size(113, 31);
-			this.NewScoreSettingsButton.TabIndex = 1;
-			this.NewScoreSettingsButton.Text = "new settings";
-			this.NewScoreSettingsButton.UseVisualStyleBackColor = true;
-			this.NewScoreSettingsButton.Click += new System.EventHandler(this.NewScoreSettingsButton_Click);
-			// 
 			// LoadScoreSettingsButton
 			// 
 			this.LoadScoreSettingsButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-			this.LoadScoreSettingsButton.Location = new System.Drawing.Point(31, 30);
+			this.LoadScoreSettingsButton.Location = new System.Drawing.Point(92, 30);
 			this.LoadScoreSettingsButton.Name = "LoadScoreSettingsButton";
 			this.LoadScoreSettingsButton.Size = new System.Drawing.Size(113, 31);
 			this.LoadScoreSettingsButton.TabIndex = 0;
@@ -118,7 +106,6 @@ namespace Moritz
 			this.AssistantComposerPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.AssistantComposerPanel.Controls.Add(this.AssistantComposerLabel);
 			this.AssistantComposerPanel.Controls.Add(this.CloseAssistantComposerButton);
-			this.AssistantComposerPanel.Controls.Add(this.NewScoreSettingsButton);
 			this.AssistantComposerPanel.Controls.Add(this.LoadScoreSettingsButton);
 			this.AssistantComposerPanel.Location = new System.Drawing.Point(12, 99);
 			this.AssistantComposerPanel.Name = "AssistantComposerPanel";
@@ -170,17 +157,6 @@ namespace Moritz
 			this.panel1.Size = new System.Drawing.Size(294, 80);
 			this.panel1.TabIndex = 3;
 			// 
-			// label1
-			// 
-			this.label1.AutoSize = true;
-			this.label1.Font = new System.Drawing.Font("Verdana", 9F);
-			this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
-			this.label1.Location = new System.Drawing.Point(125, 8);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(45, 14);
-			this.label1.TabIndex = 0;
-			this.label1.Text = "Moritz";
-			// 
 			// AboutButton
 			// 
 			this.AboutButton.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
@@ -191,6 +167,17 @@ namespace Moritz
 			this.AboutButton.Text = "about Moritz";
 			this.AboutButton.UseVisualStyleBackColor = true;
 			this.AboutButton.Click += new System.EventHandler(this.AboutButton_Click);
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Font = new System.Drawing.Font("Verdana", 9F);
+			this.label1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
+			this.label1.Location = new System.Drawing.Point(125, 8);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(45, 14);
+			this.label1.TabIndex = 0;
+			this.label1.Text = "Moritz";
 			// 
 			// MoritzForm1
 			// 
@@ -223,7 +210,6 @@ namespace Moritz
 
         private System.Windows.Forms.Button QuitButton;
 		private System.Windows.Forms.Button PreferencesButton;
-        private System.Windows.Forms.Button NewScoreSettingsButton;
         private System.Windows.Forms.Button LoadScoreSettingsButton;
         private System.Windows.Forms.Button CloseAssistantComposerButton;
 		private System.Windows.Forms.Button KrystalsEditorButton;

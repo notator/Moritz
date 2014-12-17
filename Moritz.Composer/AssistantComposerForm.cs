@@ -23,11 +23,6 @@ namespace Moritz.Composer
         {
             InitializeComponent();
 
-			SetActiveDevicesComboBoxes();
-
-			this.OutputDevicesComboBox.SelectedItem = M.Preferences.PreferredOutputDevice;
-			this.OutputDevicesComboBox.SelectedIndexChanged += OutputDevicesComboBox_SelectedIndexChanged;
-
             _allTextBoxes = GetAllTextBoxes();
 
             _moritzForm1 = moritzForm1;
@@ -41,10 +36,10 @@ namespace Moritz.Composer
 
             _settingsPath = settingsPath;
             _settingsFolderPath = Path.GetDirectoryName(settingsPath);
-
             _scoreTitle = Path.GetFileNameWithoutExtension(settingsPath);
 
-            this.QuitAlgorithmButton.Text = "Quit " + _scoreTitle;
+			this.Text = _settingsFolderPath.Substring(_settingsFolderPath.LastIndexOf('\\') + 1);
+            QuitAlgorithmButton.Text = "Quit " + _scoreTitle + " algorithm";
 
             _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _fsf);
 
@@ -54,36 +49,14 @@ namespace Moritz.Composer
 
             _outputVoiceIndices = GetOutputVoiceIndices(_algorithm.MidiChannelIndexPerOutputVoice.Count);
                 
-            SetScoreComboBoxItems(_settingsFolderPath);
-            ScoreComboBox.SelectedIndexChanged -= ScoreComboBox_SelectedIndexChanged;
-            ScoreComboBox.SelectedIndex = ScoreComboBox.Items.IndexOf(_scoreTitle);
             GetSelectedSettings();
-            ScoreComboBox.SelectedIndexChanged += ScoreComboBox_SelectedIndexChanged;
 
             if(VoiceIndicesPerStaffTextBox.Text == "")
             {
                 SetDefaultVoiceIndicesPerStaff(_algorithm.MidiChannelIndexPerOutputVoice.Count);
             }
-
-            this.Text = _scoreTitle + " algorithm";
         }
         #region called from ctor
-
-		private void SetActiveDevicesComboBoxes()
-		{
-			OutputDevicesComboBox.SuspendLayout();
-			OutputDevicesComboBox.Items.Clear();
-			foreach(string activeOutputDevice in M.Preferences.AvailableMultimediaMidiOutputDeviceNames)
-			{
-				OutputDevicesComboBox.Items.Add(activeOutputDevice);
-			}
-			if(OutputDevicesComboBox.Items.Count == 0)
-			{
-				OutputDevicesComboBox.Items.Add("");
-			}
-			OutputDevicesComboBox.ResumeLayout();
-			OutputDevicesComboBox.SelectedIndex = 0;
-		}
 
 		private List<TextBox> GetAllTextBoxes()
         {
@@ -163,29 +136,9 @@ namespace Moritz.Composer
             }
             return rval;
         }
-        /// <summary>
-        /// Loads the combo box with the names of all the scores which use this algorithm.
-        /// The names are the root names of all .mkss files in subdirectories of the
-        /// algorithmFolderPath.
-        /// </summary>
-        /// <param name="algorithmFolderPath"></param>
-        private void SetScoreComboBoxItems(string algorithmFolderPath)
-        {
-            List<string> scoreNames = M.ScoreNames(algorithmFolderPath);
-            ScoreComboBox.SelectedIndexChanged -= ScoreComboBox_SelectedIndexChanged;
-            ScoreComboBox.SuspendLayout();
-            ScoreComboBox.Items.Clear();
-            foreach(string scoreName in scoreNames)
-            {
-                ScoreComboBox.Items.Add(scoreName);
-            }
-            ScoreComboBox.ResumeLayout();
-            ScoreComboBox.SelectedIndex = 0;
-            ScoreComboBox.SelectedIndexChanged += ScoreComboBox_SelectedIndexChanged;
-        }
         private void GetSelectedSettings()
         {
-            LoadSettings();
+			LoadSettings();
 
             SetVoiceIndicesHelpLabel(_algorithm.MidiChannelIndexPerOutputVoice.Count, _algorithm.NumberOfInputVoices);
             SetSystemStartBarsHelpLabel(_algorithm.NumberOfBars);
@@ -381,12 +334,6 @@ namespace Moritz.Composer
         }
         #endregion helpers
 
-		private void OutputDevicesComboBox_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			SaveSettingsCreateScoreButton.Focus();
-			M.Preferences.PreferredOutputDevice = OutputDevicesComboBox.SelectedItem.ToString(); // might be "" if there are no midi output devices
-			M.Preferences.Save();
-		}
         private void SetMainFormSaveCreateButtonText(bool thereAreTouchedForms)
         {
             this.SuspendLayout();
@@ -441,34 +388,6 @@ namespace Moritz.Composer
                 _krystalBrowser = null;
             }
         }
-        #region ScoreComboBox
-        /// <summary>
-        /// This function ensures that the user can only use values in the ScoreComboBox's item list.
-        /// Typing custom values won't work.
-        /// </summary>
-        private void ScoreComboBox_Leave(object sender, EventArgs e)
-        {
-            SetComboBoxSelectedIndexFromText(ScoreComboBox);
-        }
-        private void ScoreComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            _dimensionsAndMetadataForm.Hide();
-            foreach(PaletteForm palette in CurrentPaletteForms)
-            {
-                palette.Close();
-            }
-            if(_krystalBrowser != null)
-            {
-                _krystalBrowser.Close();
-                _krystalBrowser = null;
-            }
-
-            string scoreName = ScoreComboBox.SelectedItem.ToString();
-            _dimensionsAndMetadataForm.Text = scoreName + ": Page Dimensions and Metadata";
-
-            GetSelectedSettings();
-        }
-        #endregion ScoreComboBox
         private void DimensionsAndMetadataButton_Click(object sender, EventArgs e)
         {
             _dimensionsAndMetadataForm.Enabled = true;

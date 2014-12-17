@@ -12,33 +12,53 @@ namespace Moritz
 		{
 			InitializeComponent();
 
-			this.HiddenTextBox.Hide();
-
-			Preferences = M.Preferences;
+			SetActiveDevicesComboBoxes();
+			this.OutputDevicesComboBox.SelectedItem = M.Preferences.PreferredOutputDevice;
+			this.OutputDevicesComboBox.SelectedIndexChanged += OutputDevicesComboBox_SelectedIndexChanged;
 
             SetUserInfo();
         }
 
+		private void SetActiveDevicesComboBoxes()
+		{
+			OutputDevicesComboBox.SuspendLayout();
+			OutputDevicesComboBox.Items.Clear();
+			foreach(string activeOutputDevice in M.Preferences.AvailableMultimediaMidiOutputDeviceNames)
+			{
+				OutputDevicesComboBox.Items.Add(activeOutputDevice);
+			}
+			if(OutputDevicesComboBox.Items.Count == 0)
+			{
+				OutputDevicesComboBox.Items.Add("");
+			}
+			OutputDevicesComboBox.ResumeLayout();
+			OutputDevicesComboBox.SelectedIndex = 0;
+		}
+
+		private void OutputDevicesComboBox_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			M.Preferences.PreferredOutputDevice = OutputDevicesComboBox.SelectedItem.ToString();
+			OKBtn.Focus();
+		}
+
         private void SetUserInfo()
         {
-			MidiOutputDeviceHelpLabel.Text = Preferences.PreferredOutputDevice + "  (change this in the Assistant Composer)";
+            LocalMoritzFolderTextBox.Text = M.Preferences.LocalMoritzFolderLocation;
+            PreferencesFilePathLabel.Text = M.Preferences.LocalMoritzPreferencesPath;
+            LocalAudioFolderInfoLabel.Text = M.Preferences.LocalMoritzAudioFolder;
+            LocalKrystalsFolderInfoLabel.Text = M.Preferences.LocalMoritzKrystalsFolder;
+            LocalExpansionFieldsFolderInfoLabel.Text = M.Preferences.LocalMoritzExpansionFieldsFolder;
+            LocalModulationOperatorsFolderInfoLabel.Text = M.Preferences.LocalMoritzModulationOperatorsFolder;
+            LocalScoresRootFolderInfoLabel.Text = M.Preferences.LocalMoritzScoresFolder;
 
-            LocalMoritzFolderTextBox.Text = Preferences.LocalMoritzFolderLocation;
-            PreferencesFilePathLabel.Text = Preferences.LocalMoritzPreferencesPath;
-            LocalAudioFolderInfoLabel.Text = Preferences.LocalMoritzAudioFolder;
-            LocalKrystalsFolderInfoLabel.Text = Preferences.LocalMoritzKrystalsFolder;
-            LocalExpansionFieldsFolderInfoLabel.Text = Preferences.LocalMoritzExpansionFieldsFolder;
-            LocalModulationOperatorsFolderInfoLabel.Text = Preferences.LocalMoritzModulationOperatorsFolder;
-            LocalScoresRootFolderInfoLabel.Text = Preferences.LocalMoritzScoresFolder;
-
-            OnlineXMLSchemasFolderInfoLabel.Text = Preferences.OnlineXMLSchemasFolder;
+            OnlineXMLSchemasFolderInfoLabel.Text = M.Preferences.OnlineXMLSchemasFolder;
         }
 
 		private void LocalMoritzFolderTextBox_Leave(object sender, EventArgs e)
 		{
 			if(Directory.Exists(LocalMoritzFolderTextBox.Text))
 			{ 
-				Preferences.LocalMoritzFolderLocation = LocalMoritzFolderTextBox.Text;
+				M.Preferences.LocalMoritzFolderLocation = LocalMoritzFolderTextBox.Text;
 				M.SetTextBoxErrorColorIfNotOkay(LocalMoritzFolderTextBox, true);
 				OKBtn.Enabled = true;
 				SetUserInfo();
@@ -59,11 +79,9 @@ namespace Moritz
 		#region OK, Cancel
 		private void OKBtn_Click(object sender, EventArgs e)
 		{
-			Preferences.Save();
+			M.Preferences.Save();
 			Close();			
 		}
 		#endregion
-
-        public Preferences Preferences = null;
 	}
 }
