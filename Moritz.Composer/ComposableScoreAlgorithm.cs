@@ -23,8 +23,6 @@ namespace Moritz.Composer
         ///     1. Two scores can't have the same title but different algorithms.
         ///     2. Different scores that use the same algorithm can have the same title if they are created in different folders.
         ///        (Different .mkss files can have the same name if they are in different folders.)
-        ///     3. More than one .mkss file can be put in the same folder. In this case, the diffent scores will all appear in
-        ///        the Assistant Composer's 'scores' pop-up menu.
         /// 
         /// To add a new score and/or algorithm, simply add a new case to the switch below.
         /// </summary>
