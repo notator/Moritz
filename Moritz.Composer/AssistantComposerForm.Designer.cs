@@ -702,12 +702,12 @@ namespace Moritz.Composer
 			this.GapPixelsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.GapPixelsLabel.AutoSize = true;
 			this.GapPixelsLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-			this.GapPixelsLabel.Location = new System.Drawing.Point(228, 53);
+			this.GapPixelsLabel.Location = new System.Drawing.Point(274, 53);
 			this.GapPixelsLabel.Margin = new System.Windows.Forms.Padding(0);
 			this.GapPixelsLabel.Name = "GapPixelsLabel";
-			this.GapPixelsLabel.Size = new System.Drawing.Size(165, 14);
+			this.GapPixelsLabel.Size = new System.Drawing.Size(119, 14);
 			this.GapPixelsLabel.TabIndex = 79;
-			this.GapPixelsLabel.Text = "gap between staff lines (pixels)*";
+			this.GapPixelsLabel.Text = "(output staff) gap size*";
 			// 
 			// ConfirmNotationButton
 			// 
