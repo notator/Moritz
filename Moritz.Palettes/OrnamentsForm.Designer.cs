@@ -164,8 +164,7 @@ namespace Moritz.Palettes
             this.NumBasicChordDefsHelpLabel.Name = "NumBasicChordDefsHelpLabel";
             this.NumBasicChordDefsHelpLabel.Size = new System.Drawing.Size(487, 14);
             this.NumBasicChordDefsHelpLabel.TabIndex = 153;
-            this.NumBasicChordDefsHelpLabel.Text = "1 integer in range [ 1..12 ]  ( Each of the following text boxes must mave this n" +
-    "umber of sub-fields. )";
+            this.NumBasicChordDefsHelpLabel.Text = "1 integer in range [ 1..12 ]";
             // 
             // NumBasicChordDefsTextBox
             // 
