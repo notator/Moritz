@@ -27,6 +27,10 @@ namespace Moritz.Symbols
                 w.SvgStartGroup("rest", null);
 
                 Debug.Assert(_msDuration > 0);
+				if(staffIsVisible)
+				{
+					w.WriteAttributeString("score", "alignmentX", Metrics.OriginX.ToString());
+				}
                 w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
 
                 if(this.Metrics != null && staffIsVisible)

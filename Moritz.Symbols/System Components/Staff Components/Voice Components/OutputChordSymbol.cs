@@ -37,6 +37,10 @@ namespace Moritz.Symbols
                 ChordMetrics.BeamBlock.WriteSVG(w);
 
             w.SvgStartGroup("outputChord", null);
+			if(staffIsVisible)
+			{ 
+				w.WriteAttributeString("score", "alignmentX", ChordMetrics.OriginX.ToString());
+			}
             
             _midiChordDef.WriteSvg(w);
 

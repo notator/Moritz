@@ -36,6 +36,10 @@ namespace Moritz.Symbols
 
             Debug.Assert(_msDuration > 0);
 
+			if(staffIsVisible)
+			{ 
+				w.WriteAttributeString("score", "alignmentX", ChordMetrics.OriginX.ToString());
+			}
             w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
 
             if(_inputChordDef.Lyric != null)
