@@ -49,7 +49,8 @@ namespace Moritz.Palettes
             _allTextBoxes = new List<TextBox>();
             _allTextBoxes.AddRange(_allNonOrnamentTextBoxes);
             _allTextBoxes.AddRange(_12OrnamentTextBoxes);
-            
+
+			NumBasicChordDefsTextBox_Leave(NumBasicChordDefsTextBox, null);
             TouchAllTextBoxes();
         }
 
