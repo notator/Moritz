@@ -107,7 +107,7 @@ namespace Moritz.Symbols
             _score.WriteSymbolDefinitions(w);
 
             #region pageObjects
-            w.SvgRect("frame", null, 0, 0, _pageFormat.Right, _pageFormat.Bottom, "#CCCCCC", 1, "white", null);
+            w.SvgRect(null, "frame", 0, 0, _pageFormat.Right, _pageFormat.Bottom, "#CCCCCC", 1, "white", null);
 
             WriteStyle(w);
 
