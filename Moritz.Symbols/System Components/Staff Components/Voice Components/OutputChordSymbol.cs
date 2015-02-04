@@ -39,7 +39,7 @@ namespace Moritz.Symbols
             w.SvgStartGroup("outputChord", null);
 			if(staffIsVisible)
 			{ 
-				w.WriteAttributeString("score", "alignmentX", ChordMetrics.OriginX.ToString());
+				w.WriteAttributeString("score", "alignmentX", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
 			}
             
             _midiChordDef.WriteSvg(w);
