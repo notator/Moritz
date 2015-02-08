@@ -390,7 +390,11 @@ namespace Moritz.Composer
 
         private void ConfirmButton_Click(object sender, EventArgs e)
         {
-            _fsf.SetSettingsAreConfirmed(this, M.HasError(_allTextBoxes), ConfirmButton); 
+            _fsf.SetSettingsAreConfirmed(this, M.HasError(_allTextBoxes), ConfirmButton);
+			if(!_isLoading)
+			{
+				_assistantComposerForm.UpdateMainFormState();
+			} 
         }
         #region RevertToSaved
         private void RevertToSavedButton_Click(object sender, EventArgs e)
