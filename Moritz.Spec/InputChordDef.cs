@@ -23,30 +23,30 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// constructs a 1-pitch chord pointing directly at a single sequence (msOffset = 0)
+        /// constructs a 1-pitch chord whose list of trkRefs contains a single trkRef (having msOffset = 0).
         /// </summary>
-        public InputChordDef(int msPosition, int msDuration, byte midiPitch, string lyric, byte seqVoiceID, byte seqLength, InputControls inputControls)
+        public InputChordDef(int msPosition, int msDuration, byte midiPitch, string lyric, byte trkVoiceID, byte trkLength, InputControls inputControls)
             : base(msDuration)
         {
             _msPosition = msPosition;
             _notatedMidiPitches = new List<byte>(){midiPitch};
             _lyric = lyric;
-            List<SeqRef> seqRefs = new List<SeqRef>(){new SeqRef(midiPitch, seqVoiceID, seqLength, 0, inputControls)}; // inputControls can be null
-            _seqRefsPerMidiPitch.Add(seqRefs);
+            List<TrkRef> trkRefs = new List<TrkRef>(){new TrkRef(midiPitch, trkVoiceID, trkLength, 0, inputControls)}; // inputControls can be null
+            _trkRefsPerMidiPitch.Add(trkRefs);
             _msDurationToNextBarline = null;
         }
 
         /// <summary>
-        /// Constructs a multi-pitch chord, each pitch having a list of seqRefs.
-        /// This constructor makes its own copy of the midiPitches but not the seqRefs.
+        /// Constructs a multi-pitch chord, each pitch having a list of trkRefs.
+        /// This constructor makes its own copy of the midiPitches but not the trkRefs.
         /// </summary>
-        public InputChordDef(int msPosition, int msDuration, List<byte> notatedMidiPitches, List<List<SeqRef>> seqRefsPerMidiPitch, string lyric)
+        public InputChordDef(int msPosition, int msDuration, List<byte> notatedMidiPitches, List<List<TrkRef>> trkRefsPerMidiPitch, string lyric)
             : base(msDuration)
         {
-            Debug.Assert(notatedMidiPitches.Count == seqRefsPerMidiPitch.Count);
+            Debug.Assert(notatedMidiPitches.Count == trkRefsPerMidiPitch.Count);
             _msPosition = msPosition;
             _notatedMidiPitches = new List<byte>(notatedMidiPitches);
-            _seqRefsPerMidiPitch = seqRefsPerMidiPitch;
+            _trkRefsPerMidiPitch = trkRefsPerMidiPitch;
             _lyric = lyric;
             _msDurationToNextBarline = null;
         }
@@ -92,13 +92,13 @@ namespace Moritz.Spec
                 byte pitch = _notatedMidiPitches[i];
                 w.WriteStartElement("inputNote");
                 w.WriteAttributeString("notatedKey", pitch.ToString());
-                List<SeqRef> seqRefs = this.SeqRefsPerMidiPitch[i];
-                w.WriteStartElement("seqRefs");
-                foreach(SeqRef seqRef in seqRefs)
+                List<TrkRef> trkRefs = this.TrkRefsPerMidiPitch[i];
+                w.WriteStartElement("trkRefs");
+                foreach(TrkRef trkRef in trkRefs)
                 {
-                    seqRef.WriteSvg(w);
+                    trkRef.WriteSvg(w);
                 }
-                w.WriteEndElement(); // score:seqRefs
+                w.WriteEndElement(); // score:trkRefs
                 w.WriteEndElement(); // score:inputNote
             }
             w.WriteEndElement(); // score:inputNotes
@@ -109,20 +109,20 @@ namespace Moritz.Spec
             throw new NotImplementedException("InputChordDef.DeepClone()");
         }
 
-        public List<byte> SeqVoiceIDs
+        public List<byte> TrkVoiceIDs
         {
             get
             {
-                List<byte> seqVoiceIDs = new List<byte>();
-                foreach(List<SeqRef> seqRefList in _seqRefsPerMidiPitch)
+                List<byte> trkVoiceIDs = new List<byte>();
+                foreach(List<TrkRef> trkRefList in _trkRefsPerMidiPitch)
                 {
-                    foreach(SeqRef seqRef in seqRefList)
+                    foreach(TrkRef trkRef in trkRefList)
                     {
-                        seqVoiceIDs.Add(seqRef.VoiceID);
+                        trkVoiceIDs.Add(trkRef.VoiceID);
                     }
                 }
 
-                return seqVoiceIDs;
+                return trkVoiceIDs;
             }
         }
 
@@ -132,8 +132,8 @@ namespace Moritz.Spec
         public List<byte> NotatedMidiPitches { get { return _notatedMidiPitches; } set { _notatedMidiPitches = value; } }
         protected List<byte> _notatedMidiPitches = new List<byte>();
 
-        public List<List<SeqRef>> SeqRefsPerMidiPitch { get { return _seqRefsPerMidiPitch; } }
-        private List<List<SeqRef>> _seqRefsPerMidiPitch = new List<List<SeqRef>>();
+        public List<List<TrkRef>> TrkRefsPerMidiPitch { get { return _trkRefsPerMidiPitch; } }
+        private List<List<TrkRef>> _trkRefsPerMidiPitch = new List<List<TrkRef>>();
 
         public string Lyric { get { return _lyric; } set { _lyric = value; } }
         private string _lyric;

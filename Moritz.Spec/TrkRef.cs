@@ -4,7 +4,7 @@ using Moritz.Xml;
 
 namespace Moritz.Spec
 {
-    public class SeqRef
+    public class TrkRef
     {
         /// <summary>
         /// The class used by InputNotes to define a referenced Seq.
@@ -14,7 +14,7 @@ namespace Moritz.Spec
         /// <param name="length">The number of chords and rests in the Seq</param>
         /// <param name="msOffset">The number of milliseconds between the postion of this input chord and the beginning of the Seq.</param>
         /// <param name="inputControls">An InputControls object or null</param>
-        public SeqRef(byte notatedInputMidiPitch, byte voiceID, int length, int msOffset, InputControls inputControls)
+        public TrkRef(byte notatedInputMidiPitch, byte voiceID, int length, int msOffset, InputControls inputControls)
         {
             Debug.Assert(notatedInputMidiPitch >= 0);
             Debug.Assert(voiceID >= 0);

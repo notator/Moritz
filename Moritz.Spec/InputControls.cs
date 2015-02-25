@@ -6,16 +6,16 @@ using Moritz.Xml;
 namespace Moritz.Spec
 {
     /// <summary>
-    /// This object defines how Seqs react to incoming performed information.
-    /// An InputControls object can be attached to a SeqRef in an InputChordDef.SeqRefs list.
+    /// This object defines how Trks react to incoming performed information.
+    /// An InputControls object can be attached to a TrkRef in an InputChordDef.TrkRefs list.
     /// The values these options can take in the InputControls are defined in enums in this namespace.
     /// (See below, and in the svgScoreExtensions documentation for details.)
     /// Each of these enums has a "dontOverride" member.
-    /// The option value applicable to a Seq is the current value of that option stored in the OutputVoice, unless
-    /// the SeqRef has an InputControls member, and the InputControls value of that option is something other than
+    /// The option value applicable to a Trk is the current value of that option stored in the OutputVoice, unless
+    /// the TrkRef has an InputControls member, and the InputControls value of that option is something other than
     /// "dontOverride". In this case, the InputControls option value overrides the OutputVoice's option value.
     /// Whether the result of the overriding is temporary or is transferred to the OutputVoice is set using the
-    /// InputControls.onlySeq option. The onlySeq option itself is not maintained in the OutputVoice.
+    /// InputControls.onlyTrk option. The onlyTrk option itself is not maintained in the OutputVoice.
     /// The default options for an Output Voice are:
     ///     noteOnKey="ignore" -- input midi pitches are ignored (the score uses its own, default pitches)
     ///     noteOnVel="ignore" -- input midi velocities are ignored (the score uses its own, default velocities) 
@@ -38,9 +38,9 @@ namespace Moritz.Spec
         {
             w.WriteStartElement("inputControls");
 
-            if(this.OnlySeq == true)
+            if(this.OnlyTrk == true)
             {
-                w.WriteAttributeString("onlySeq", "1");
+                w.WriteAttributeString("onlyTrk", "1");
             }
 
             if(this.NoteOnKeyOption != Spec.NoteOnKeyOption.dontOverride)
@@ -130,7 +130,7 @@ namespace Moritz.Spec
             w.WriteAttributeString("minVolume", MinimumVolume.ToString());
         }
 
-        public bool OnlySeq = false;
+        public bool OnlyTrk = false;
         public NoteOnKeyOption NoteOnKeyOption = NoteOnKeyOption.dontOverride;
         public NoteOnVelocityOption NoteOnVelocityOption = NoteOnVelocityOption.dontOverride;
         public NoteOffOption NoteOffOption = NoteOffOption.dontOverride;
@@ -147,9 +147,9 @@ namespace Moritz.Spec
     public enum NoteOnKeyOption
     {
         dontOverride, // Dont write the option to the score file. Use the current voice setting.
-        ignore, // any key will start the Seq. It will play using the notated pitches.
+        ignore, // any key will start the Trk. It will play using the notated pitches.
         transpose,
-        matchExactly // the Seq. will not start if the key does not match any of the notated pitchesd.
+        matchExactly // the Trk will not start if the key does not match any of the notated pitchesd.
     };
 
     public enum NoteOnVelocityOption

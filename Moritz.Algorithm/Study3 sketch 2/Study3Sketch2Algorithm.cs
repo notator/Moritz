@@ -95,7 +95,7 @@ namespace Moritz.Algorithm.Study3Sketch2
                 InputControls ics = new InputControls(); // all options are currently ignore
                 ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
                 ics.NoteOffOption = NoteOffOption.fade;
-                inputChordDef.SeqRefsPerMidiPitch[0][0].InputControls = ics;
+                inputChordDef.TrkRefsPerMidiPitch[0][0].InputControls = ics;
             }
         }
 
@@ -109,7 +109,7 @@ namespace Moritz.Algorithm.Study3Sketch2
                 ics.PitchWheelOption = ControllerOption.volume;
                 ics.MaximumVolume = 100;
                 ics.MinimumVolume = 50;
-                inputChordDef.SeqRefsPerMidiPitch[0][0].InputControls = ics;
+                inputChordDef.TrkRefsPerMidiPitch[0][0].InputControls = ics;
             }
         }
 
@@ -123,7 +123,7 @@ namespace Moritz.Algorithm.Study3Sketch2
                 ics.NoteOffOption = NoteOffOption.shortFade;
                 ics.NumberOfObjectsInFade = numberOfObjectsInFade++;
                 ics.PitchWheelOption = ControllerOption.pitchWheel;
-                inputChordDef.SeqRefsPerMidiPitch[0][0].InputControls = ics;
+                inputChordDef.TrkRefsPerMidiPitch[0][0].InputControls = ics;
             }
         }
 
@@ -141,7 +141,7 @@ namespace Moritz.Algorithm.Study3Sketch2
                 ics.SpeedOption = SpeedOption.noteOnKey;
                 ics.MaxSpeedPercent = 500;
 
-                inputChordDef.SeqRefsPerMidiPitch[0][0].InputControls = ics;
+                inputChordDef.TrkRefsPerMidiPitch[0][0].InputControls = ics;
             }
         }
         #region CreateBar1()
