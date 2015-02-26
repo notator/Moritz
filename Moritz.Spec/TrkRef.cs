@@ -30,8 +30,8 @@ namespace Moritz.Spec
 
         internal void WriteSvg(SvgWriter w)
         {
-            //w.WriteStartElement("score", "seqRef", null);
-            w.WriteStartElement("seqRef");
+            //w.WriteStartElement("score", "trkRef", null);
+            w.WriteStartElement("trkRef");
             w.WriteAttributeString("voiceID", _voiceID.ToString());
             w.WriteAttributeString("length", _length.ToString());
             if(_msOffset > 0)
@@ -42,7 +42,7 @@ namespace Moritz.Spec
             {
                 _inputControls.WriteSvg(w);
             }
-            w.WriteEndElement(); // score:seqRef
+            w.WriteEndElement(); // score:trkRef
         }
 
         public byte NotatedInputMidiPitch { get { return _notatedInputMidiPitch; } set { _notatedInputMidiPitch = value; } }

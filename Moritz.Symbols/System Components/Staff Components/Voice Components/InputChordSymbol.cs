@@ -42,11 +42,6 @@ namespace Moritz.Symbols
 			}
             w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
 
-            if(_inputChordDef.Lyric != null)
-            {
-                w.WriteAttributeString("score", "lyric", null, _inputChordDef.Lyric);
-            }
-
             _inputChordDef.WriteSvg(w);
 
             w.SvgStartGroup("graphics", null);

@@ -7,16 +7,17 @@ namespace Moritz.Spec
 {
     /// <summary>
     /// This object defines how Trks react to incoming performed information.
-    /// An InputControls object can be attached to a TrkRef in an InputChordDef.TrkRefs list.
+	/// 
+	/// An inputControls element can be contained in the following elements in score files:
+	///		inputChord (which contains a list of inputNotes)
+	///		inputNote (which contains a list of trkRefs)
+	///		trkRef
+	///		
+	/// See http://james-ingram-act-two.de/open-source/svgScoreExtensions.html for details as to how these inputControls are used.
+	/// 	
     /// The values these options can take in the InputControls are defined in enums in this namespace.
-    /// (See below, and in the svgScoreExtensions documentation for details.)
-    /// Each of these enums has a "dontOverride" member.
-    /// The option value applicable to a Trk is the current value of that option stored in the OutputVoice, unless
-    /// the TrkRef has an InputControls member, and the InputControls value of that option is something other than
-    /// "dontOverride". In this case, the InputControls option value overrides the OutputVoice's option value.
-    /// Whether the result of the overriding is temporary or is transferred to the OutputVoice is set using the
-    /// InputControls.onlyTrk option. The onlyTrk option itself is not maintained in the OutputVoice.
-    /// The default options for an Output Voice are:
+    /// In addition to the values stored in scores, each of these enums has a "dontOverride" member here in Moritz.
+    /// The default options for an Input Voice are:
     ///     noteOnKey="ignore" -- input midi pitches are ignored (the score uses its own, default pitches)
     ///     noteOnVel="ignore" -- input midi velocities are ignored (the score uses its own, default velocities) 
     ///     noteOff="ignore" -- input noteOffs are ignored.
@@ -28,7 +29,7 @@ namespace Moritz.Spec
     public class InputControls
     {
         /// <summary>
-        /// All options are set to null by default
+        /// All options are set to .dontOverride by default
         /// </summary>
         public InputControls()
         {
@@ -37,11 +38,6 @@ namespace Moritz.Spec
         public void WriteSvg(SvgWriter w)
         {
             w.WriteStartElement("inputControls");
-
-            if(this.OnlyTrk == true)
-            {
-                w.WriteAttributeString("onlyTrk", "1");
-            }
 
             if(this.NoteOnKeyOption != Spec.NoteOnKeyOption.dontOverride)
             {
@@ -130,7 +126,6 @@ namespace Moritz.Spec
             w.WriteAttributeString("minVolume", MinimumVolume.ToString());
         }
 
-        public bool OnlyTrk = false;
         public NoteOnKeyOption NoteOnKeyOption = NoteOnKeyOption.dontOverride;
         public NoteOnVelocityOption NoteOnVelocityOption = NoteOnVelocityOption.dontOverride;
         public NoteOffOption NoteOffOption = NoteOffOption.dontOverride;

@@ -151,6 +151,7 @@ namespace Moritz.Symbols
             w.WriteStartElement("script");
             w.WriteAttributeString("xlink", "href", null, "../../ap/SVG.js");
             w.WriteAttributeString("type", "text/javascript");
+			w.WriteString(""); // forces separate close tag to prevent warnings...
             w.WriteEndElement(); // script
         }
 

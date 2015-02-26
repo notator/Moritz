@@ -30,7 +30,9 @@ namespace Moritz.Spec
         {
             _msPosition = msPosition;
             _notatedMidiPitches = new List<byte>(){midiPitch};
-            _lyric = lyric;
+			_lyric = lyric;
+			_inputControls = null;
+			_inputControlsPerMidiPitch = null;
             List<TrkRef> trkRefs = new List<TrkRef>(){new TrkRef(midiPitch, trkVoiceID, trkLength, 0, inputControls)}; // inputControls can be null
             _trkRefsPerMidiPitch.Add(trkRefs);
             _msDurationToNextBarline = null;
@@ -38,7 +40,7 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Constructs a multi-pitch chord, each pitch having a list of trkRefs.
-        /// This constructor makes its own copy of the midiPitches but not the trkRefs.
+        /// This constructor makes its own copy of the midiPitches but not of the trkRefs.
         /// </summary>
         public InputChordDef(int msPosition, int msDuration, List<byte> notatedMidiPitches, List<List<TrkRef>> trkRefsPerMidiPitch, string lyric)
             : base(msDuration)
@@ -46,8 +48,10 @@ namespace Moritz.Spec
             Debug.Assert(notatedMidiPitches.Count == trkRefsPerMidiPitch.Count);
             _msPosition = msPosition;
             _notatedMidiPitches = new List<byte>(notatedMidiPitches);
+			_lyric = lyric;
+			_inputControls = null;
+			_inputControlsPerMidiPitch = null;
             _trkRefsPerMidiPitch = trkRefsPerMidiPitch;
-            _lyric = lyric;
             _msDurationToNextBarline = null;
         }
 
@@ -80,18 +84,28 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Writes the logical content of this InputChordDef (see ChordSymbol and MidiChordDef)
+        /// Writes the logical content of this InputChordDef
         /// </summary>
         /// <param name="w"></param>
         public void WriteSvg(SvgWriter w)
         {
+			// we are inside a score:inputChord element
+
+			if(_inputControls != null)
+			{
+				_inputControls.WriteSvg(w);
+			}
+
             w.WriteStartElement("score", "inputNotes", null);
-            // N.B.: the lyric has been written as an attribute of the containing InputChordSymbol.
             for(int i = 0; i < _notatedMidiPitches.Count; ++i)
             {
                 byte pitch = _notatedMidiPitches[i];
                 w.WriteStartElement("inputNote");
                 w.WriteAttributeString("notatedKey", pitch.ToString());
+				if(_inputControlsPerMidiPitch != null && _inputControlsPerMidiPitch[i] != null)
+				{
+					_inputControlsPerMidiPitch[i].WriteSvg(w);
+				}
                 List<TrkRef> trkRefs = this.TrkRefsPerMidiPitch[i];
                 w.WriteStartElement("trkRefs");
                 foreach(TrkRef trkRef in trkRefs)
@@ -129,14 +143,31 @@ namespace Moritz.Spec
         public int MsPosition { get { return _msPosition; } set { _msPosition = value; } }
         private int _msPosition = 0;
 
-        public List<byte> NotatedMidiPitches { get { return _notatedMidiPitches; } set { _notatedMidiPitches = value; } }
-        protected List<byte> _notatedMidiPitches = new List<byte>();
+		public string Lyric { get { return _lyric; } set { _lyric = value; } }
+		private string _lyric = null;
+
+		public InputControls InputControls { get { return _inputControls; } set { _inputControls = value; } }
+		private InputControls _inputControls = null;
+
+		public List<byte> NotatedMidiPitches { get { return _notatedMidiPitches; } set { _notatedMidiPitches = value; } }
+		protected List<byte> _notatedMidiPitches = new List<byte>();
+
+		public List<InputControls> InputControlsPerMidiPitch
+		{ 
+			get	{ return _inputControlsPerMidiPitch; }
+			set
+			{ 
+				if(value.Count != _notatedMidiPitches.Count)
+				{
+					throw new ApplicationException("This list must have one member per notated midi pitch (the member can be null).");
+				}
+				_inputControlsPerMidiPitch = value;
+			}
+		}
+		private List<InputControls> _inputControlsPerMidiPitch = null;
 
         public List<List<TrkRef>> TrkRefsPerMidiPitch { get { return _trkRefsPerMidiPitch; } }
         private List<List<TrkRef>> _trkRefsPerMidiPitch = new List<List<TrkRef>>();
-
-        public string Lyric { get { return _lyric; } set { _lyric = value; } }
-        private string _lyric;
 
         public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
         private int? _msDurationToNextBarline = null;

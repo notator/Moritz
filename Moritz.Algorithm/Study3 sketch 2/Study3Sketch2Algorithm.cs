@@ -92,7 +92,7 @@ namespace Moritz.Algorithm.Study3Sketch2
         {
             foreach(InputChordDef inputChordDef in bar2InputChordDefs)
             {
-                InputControls ics = new InputControls(); // all options are currently ignore
+                InputControls ics = new InputControls();
                 ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
                 ics.NoteOffOption = NoteOffOption.fade;
                 inputChordDef.TrkRefsPerMidiPitch[0][0].InputControls = ics;
@@ -103,7 +103,7 @@ namespace Moritz.Algorithm.Study3Sketch2
         {
             foreach(InputChordDef inputChordDef in bar3InputChordDefs)
             {
-                InputControls ics = new InputControls(); // all options are currently ignore
+                InputControls ics = new InputControls();
                 ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly; // this is the current value in the voice (has no effect)
                 ics.NoteOffOption = NoteOffOption.fade; // this is the current value in the voice (has no effect)
                 ics.PitchWheelOption = ControllerOption.volume;
@@ -118,7 +118,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             int numberOfObjectsInFade = 4;
             foreach(InputChordDef inputChordDef in bar4InputChordDefs)
             {
-                InputControls ics = new InputControls(); // all options are currently ignore
+                InputControls ics = new InputControls();
                 ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly; // this is the current value in the voice (has no effect)
                 ics.NoteOffOption = NoteOffOption.shortFade;
                 ics.NumberOfObjectsInFade = numberOfObjectsInFade++;
@@ -131,11 +131,7 @@ namespace Moritz.Algorithm.Study3Sketch2
         {
             foreach(InputChordDef inputChordDef in bar5InputChordDefs)
             {
-                //ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly; // this is the current value in the voice (has no effect)
-                //ics.NoteOffOption = NoteOffOption.shortFade;
-                //ics.NumberOfObjectsInFade = numberOfObjectsInFade++;
-                //ics.PitchWheelOption = ControllerOption.pitchWheel;
-                InputControls ics = new InputControls(); // all options are currently null
+                InputControls ics = new InputControls();
 
                 ics.PitchWheelOption = ControllerOption.pitchWheel; // this is the current value in the voice (has no effect)
                 ics.SpeedOption = SpeedOption.noteOnKey;
@@ -176,6 +172,30 @@ namespace Moritz.Algorithm.Study3Sketch2
                     inputVoiceDef.UniqueDefs.Add(newRest);
                 }
             }
+
+			#region set cascading inputControls on the first InputChordDef  (for testing)
+			InputChordDef inputChordDef1 = inputVoiceDef.UniqueDefs[0] as InputChordDef; // no need to check for null here.
+
+			InputControls chordInputControls = new InputControls();
+			chordInputControls.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
+			inputChordDef1.InputControls = chordInputControls;
+
+			InputControls midiPitchSeqInputControls = new InputControls();
+			midiPitchSeqInputControls.NoteOnKeyOption = NoteOnKeyOption.transpose;
+			List<InputControls> inputControlsPerMidiPitch = new List<InputControls>();
+			inputControlsPerMidiPitch.Add(midiPitchSeqInputControls);
+			// This list must have the same number of members as there are pitches, but members can be null.
+			// (A check is made in inputChordDef1.InputControlsPerMidiPitch set().)
+			inputChordDef1.InputControlsPerMidiPitch = inputControlsPerMidiPitch; 
+
+			InputControls trkInputControls = new InputControls();
+			trkInputControls.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
+			trkInputControls.NoteOffOption = NoteOffOption.fade;
+			trkInputControls.PitchWheelOption = ControllerOption.pitchWheel;
+			inputChordDef1.TrkRefsPerMidiPitch[0][0].InputControls = trkInputControls;
+
+			#endregion
+				 
             bar.Add(inputVoiceDef);
 
             return bar;
