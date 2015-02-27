@@ -25,7 +25,7 @@ namespace Moritz.Spec
         /// <summary>
         /// constructs a 1-pitch chord whose list of trkRefs contains a single trkRef (having msOffset = 0).
         /// </summary>
-        public InputChordDef(int msPosition, int msDuration, byte midiPitch, string lyric, byte trkVoiceID, byte trkLength, InputControls inputControls)
+        public InputChordDef(int msPosition, int msDuration, byte midiPitch, string lyric, byte trkMidiChannel, byte trkLength, InputControls inputControls)
             : base(msDuration)
         {
             _msPosition = msPosition;
@@ -33,7 +33,7 @@ namespace Moritz.Spec
 			_lyric = lyric;
 			_inputControls = null;
 			_inputControlsPerMidiPitch = null;
-            List<TrkRef> trkRefs = new List<TrkRef>(){new TrkRef(midiPitch, trkVoiceID, trkLength, 0, inputControls)}; // inputControls can be null
+            List<TrkRef> trkRefs = new List<TrkRef>(){new TrkRef(midiPitch, trkMidiChannel, trkLength, 0, inputControls)}; // inputControls can be null
             _trkRefsPerMidiPitch.Add(trkRefs);
             _msDurationToNextBarline = null;
         }
@@ -121,23 +121,6 @@ namespace Moritz.Spec
         public override IUniqueDef DeepClone()
         {
             throw new NotImplementedException("InputChordDef.DeepClone()");
-        }
-
-        public List<byte> TrkVoiceIDs
-        {
-            get
-            {
-                List<byte> trkVoiceIDs = new List<byte>();
-                foreach(List<TrkRef> trkRefList in _trkRefsPerMidiPitch)
-                {
-                    foreach(TrkRef trkRef in trkRefList)
-                    {
-                        trkVoiceIDs.Add(trkRef.VoiceID);
-                    }
-                }
-
-                return trkVoiceIDs;
-            }
         }
 
         public int MsPosition { get { return _msPosition; } set { _msPosition = value; } }
