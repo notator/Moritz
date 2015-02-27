@@ -210,14 +210,9 @@ namespace Moritz.Composer
                 {
                     foreach(byte invisibleOutputVoiceIndex in invisibleOutputVoiceIndices)
                     {
-                        byte? voiceID = null;
-                        if(_pageFormat.VisibleInputVoiceIndicesPerStaff.Count > 0)
-                        {
-                            voiceID = (byte?)invisibleOutputVoiceIndex;
-                        }
                         OutputVoiceDef invisibleOutputVoiceDef = barDef[invisibleOutputVoiceIndex] as OutputVoiceDef;
                         InvisibleOutputStaff invisibleOutputStaff = new InvisibleOutputStaff(system);
-                        OutputVoice outputVoice = new OutputVoice(invisibleOutputStaff, invisibleOutputVoiceDef.MidiChannel, voiceID, invisibleOutputVoiceDef.MasterVolume);
+                        OutputVoice outputVoice = new OutputVoice(invisibleOutputStaff, invisibleOutputVoiceDef.MidiChannel, invisibleOutputVoiceDef.MasterVolume);
                         outputVoice.VoiceDef = invisibleOutputVoiceDef;
                         invisibleOutputStaff.Voices.Add(outputVoice);
                         system.Staves.Add(invisibleOutputStaff);
@@ -233,15 +228,9 @@ namespace Moritz.Composer
                     List<byte> outputVoiceIndices = _pageFormat.VisibleOutputVoiceIndicesPerStaff[printedStaffIndex];
                     for(int ovIndex = 0; ovIndex < outputVoiceIndices.Count; ++ovIndex)
                     {
-                        byte? voiceID = null;
-                        if(_pageFormat.VisibleInputVoiceIndicesPerStaff.Count > 0)
-                        {
-                            voiceID = (byte?)outputVoiceIndices[ovIndex];
-                        }
-
                         OutputVoiceDef outputVoiceDef = barDef[outputVoiceIndices[ovIndex]] as OutputVoiceDef;
                         Debug.Assert(outputVoiceDef != null);
-                        OutputVoice outputVoice = new OutputVoice(outputStaff, outputVoiceDef.MidiChannel, voiceID, outputVoiceDef.MasterVolume);
+                        OutputVoice outputVoice = new OutputVoice(outputStaff, outputVoiceDef.MidiChannel, outputVoiceDef.MasterVolume);
                         outputVoice.VoiceDef = outputVoiceDef;
                         outputStaff.Voices.Add(outputVoice);
                     }
