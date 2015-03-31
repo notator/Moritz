@@ -13,8 +13,7 @@ namespace Moritz.Spec
         /// <param name="midiChannel">The referenced output voice's midiChannel</param>
         /// <param name="length">The number of chords and rests in the Seq</param>
         /// <param name="msOffset">The number of milliseconds between the postion of this input chord and the beginning of the Seq.</param>
-        /// <param name="inputControls">An InputControls object or null</param>
-        public TrkRef(byte notatedInputMidiPitch, byte midiChannel, int length, int msOffset, InputControls inputControls)
+        public TrkRef(byte notatedInputMidiPitch, byte midiChannel, int length, int msOffset)
         {
             Debug.Assert(notatedInputMidiPitch >= 0);
             Debug.Assert(midiChannel >= 0);
@@ -25,7 +24,6 @@ namespace Moritz.Spec
             _midiChannel = midiChannel;
             _length = length;
             _msOffset = msOffset;
-            _inputControls = inputControls; // can be null
         }
 
         internal void WriteSvg(SvgWriter w)
@@ -36,10 +34,6 @@ namespace Moritz.Spec
             if(_msOffset > 0)
             {
                 w.WriteAttributeString("msOffset", _msOffset.ToString());
-            }
-            if(_inputControls != null)
-            {
-                _inputControls.WriteSvg(w);
             }
             w.WriteEndElement(); // trkRef
         }
@@ -54,9 +48,6 @@ namespace Moritz.Spec
         private int _length;
 
         public int MsOffset { get { return _msOffset; } }
-        private int _msOffset;
-
-        public InputControls InputControls { get { return _inputControls; } set {_inputControls = value; } }
-        private InputControls _inputControls = null;       
+        private int _msOffset;     
     }
 }

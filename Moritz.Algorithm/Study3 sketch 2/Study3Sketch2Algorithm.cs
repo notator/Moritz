@@ -90,13 +90,17 @@ namespace Moritz.Algorithm.Study3Sketch2
 
         private void SetBar2NoteOnNoteOffControls(List<InputChordDef> bar2InputChordDefs)
         {
-            foreach(InputChordDef inputChordDef in bar2InputChordDefs)
-            {
-                InputControls ics = new InputControls();
-                ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
-                ics.NoteOffOption = NoteOffOption.fade;
-                inputChordDef.TrkRefsPerMidiPitch[0][0].InputControls = ics;
-            }
+			InputControls ics1 = new InputControls();
+			ics1.NoteOffOption = NoteOffOption.stop;
+			List<InputControls> icList1 =  new List<InputControls>();
+			icList1.Add(ics1);
+			bar2InputChordDefs[0].InputControlsPerMidiPitch = icList1;
+
+			InputControls ics2 = new InputControls();
+			ics2.NoteOffOption = NoteOffOption.fade;
+			List<InputControls> icList2 = new List<InputControls>();
+			icList2.Add(ics2);
+			bar2InputChordDefs[1].InputControlsPerMidiPitch = icList2;
         }
 
         private void SetBar3PitchWheelToVolumeControls(List<InputChordDef> bar3InputChordDefs)
@@ -109,7 +113,9 @@ namespace Moritz.Algorithm.Study3Sketch2
                 ics.PitchWheelOption = ControllerOption.volume;
                 ics.MaximumVolume = 100;
                 ics.MinimumVolume = 50;
-                inputChordDef.TrkRefsPerMidiPitch[0][0].InputControls = ics;
+				List<InputControls> icList = new List<InputControls>();
+				icList.Add(ics);
+				inputChordDef.InputControlsPerMidiPitch = icList;
             }
         }
 
@@ -120,10 +126,12 @@ namespace Moritz.Algorithm.Study3Sketch2
             {
                 InputControls ics = new InputControls();
                 ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly; // this is the current value in the voice (has no effect)
-                ics.NoteOffOption = NoteOffOption.shortFade;
+                ics.NoteOffOption = NoteOffOption.stop;
                 ics.NumberOfObjectsInFade = numberOfObjectsInFade++;
                 ics.PitchWheelOption = ControllerOption.pitchWheel;
-                inputChordDef.TrkRefsPerMidiPitch[0][0].InputControls = ics;
+				List<InputControls> icList = new List<InputControls>();
+				icList.Add(ics);
+				inputChordDef.InputControlsPerMidiPitch = icList;
             }
         }
 
@@ -136,8 +144,9 @@ namespace Moritz.Algorithm.Study3Sketch2
                 ics.PitchWheelOption = ControllerOption.pitchWheel; // this is the current value in the voice (has no effect)
                 ics.SpeedOption = SpeedOption.noteOnKey;
                 ics.MaxSpeedPercent = 500;
-
-                inputChordDef.TrkRefsPerMidiPitch[0][0].InputControls = ics;
+				List<InputControls> icList = new List<InputControls>();
+				icList.Add(ics);
+				inputChordDef.InputControlsPerMidiPitch = icList;
             }
         }
         #region CreateBar1()
@@ -177,7 +186,7 @@ namespace Moritz.Algorithm.Study3Sketch2
 			InputChordDef inputChordDef1 = inputVoiceDef.UniqueDefs[0] as InputChordDef; // no need to check for null here.
 
 			InputControls chordInputControls = new InputControls();
-			chordInputControls.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
+			chordInputControls.NoteOnKeyOption = NoteOnKeyOption.ignore;
 			inputChordDef1.InputControls = chordInputControls;
 
 			InputControls midiPitchSeqInputControls = new InputControls();
@@ -187,13 +196,6 @@ namespace Moritz.Algorithm.Study3Sketch2
 			// This list must have the same number of members as there are pitches, but members can be null.
 			// (A check is made in inputChordDef1.InputControlsPerMidiPitch set().)
 			inputChordDef1.InputControlsPerMidiPitch = inputControlsPerMidiPitch; 
-
-			InputControls trkInputControls = new InputControls();
-			trkInputControls.NoteOnKeyOption = NoteOnKeyOption.matchExactly;
-			trkInputControls.NoteOffOption = NoteOffOption.fade;
-			trkInputControls.PitchWheelOption = ControllerOption.pitchWheel;
-			inputChordDef1.TrkRefsPerMidiPitch[0][0].InputControls = trkInputControls;
-
 			#endregion
 				 
             bar.Add(inputVoiceDef);

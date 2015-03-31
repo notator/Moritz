@@ -33,7 +33,7 @@ namespace Moritz.Spec
 			_lyric = lyric;
 			_inputControls = null;
 			_inputControlsPerMidiPitch = null;
-            List<TrkRef> trkRefs = new List<TrkRef>(){new TrkRef(midiPitch, trkMidiChannel, trkLength, 0, inputControls)}; // inputControls can be null
+            List<TrkRef> trkRefs = new List<TrkRef>(){new TrkRef(midiPitch, trkMidiChannel, trkLength, 0)};
             _trkRefsPerMidiPitch.Add(trkRefs);
             _msDurationToNextBarline = null;
         }
