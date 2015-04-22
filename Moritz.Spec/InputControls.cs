@@ -156,12 +156,12 @@ namespace Moritz.Spec
 
     public enum NoteOffOption
     {
-        dontOverride, // Dont write the option to the score file. Use the current voice setting.
-        ignore,
-        stop,
-        stopNow,
-        fade,
-        shortFade
+        dontOverride, // Dont write the option to the score file. Use the current setting.
+        ignore, // ignore the noteOff and play the trk to completion (as written in the score)
+        stopChord, // stop when the current midiChord or midiRest completes
+        stopNow, // stop immediately, even inside a midiChord
+        fade, // fade velocity to end of trk
+        shortFade // fade velocity over a fixed number of midiObjects
     };
 
     /// <summary>

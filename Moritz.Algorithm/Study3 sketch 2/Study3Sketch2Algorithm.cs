@@ -91,7 +91,7 @@ namespace Moritz.Algorithm.Study3Sketch2
         private void SetBar2NoteOnNoteOffControls(List<InputChordDef> bar2InputChordDefs)
         {
 			InputControls ics1 = new InputControls();
-			ics1.NoteOffOption = NoteOffOption.stop;
+			ics1.NoteOffOption = NoteOffOption.stopChord;
 			List<InputControls> icList1 =  new List<InputControls>();
 			icList1.Add(ics1);
 			bar2InputChordDefs[0].InputControlsPerMidiPitch = icList1;
@@ -126,7 +126,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             {
                 InputControls ics = new InputControls();
                 ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly; // this is the current value in the voice (has no effect)
-                ics.NoteOffOption = NoteOffOption.stop;
+                ics.NoteOffOption = NoteOffOption.stopChord;
                 ics.NumberOfObjectsInFade = numberOfObjectsInFade++;
                 ics.PitchWheelOption = ControllerOption.pitchWheel;
 				List<InputControls> icList = new List<InputControls>();
