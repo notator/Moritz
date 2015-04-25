@@ -39,11 +39,11 @@ namespace Moritz.Symbols
             /// of the score. It is also the name of the folder inside the standard Moritz scores folder
             /// used for saving all the scores components.
             Metadata.MainTitle = scoreTitleName;
-            Metadata.Keywords = keywords;
-            Metadata.Comment = comment;
+			Metadata.Keywords = keywords;
+			Metadata.Comment = comment;
 
-            Metadata.Date = M.NowString;
-        }
+			Metadata.Date = M.NowString;
+		}
 
         protected virtual byte MidiChannel(int staffIndex) { throw new NotImplementedException(); }
 
@@ -177,26 +177,12 @@ namespace Moritz.Symbols
 
         #region fields loaded from .capx files
         public Metadata Metadata = null;
-        internal List<DrawObject> PageObjects = new List<DrawObject>();
         public List<SvgSystem> Systems = new List<SvgSystem>();
         #endregion
         #region moritz-specific private fields
 
         protected string _filename = "";
         public string Filename { get { return _filename; } }
-
-        #region Debugging fields
-#if Debug
-		/// <summary>
-		/// The duration symbols to be played by the performer in system order
-		/// </summary>
-		public List<List<DurationSymbol>> PerformerDurationSymbolList = new List<List<DurationSymbol>>();
-		/// <summary>
-		/// The duration symbols to be played by the assistant in system order
-		/// </summary>
-		public List<List<DurationSymbol>> AssistantDurationSymbolList = new List<List<DurationSymbol>>();
-#endif
-        #endregion
         #endregion
 
 
@@ -843,6 +829,7 @@ namespace Moritz.Symbols
         public static string UniqueID_Number { get { return (++_uniqueID_Number).ToString(); } }
         private static int _uniqueID_Number = 0;
 
+		public int PageCount { get { return _pages.Count; }}
         protected List<SvgPage> _pages = new List<SvgPage>();
 
         public PageFormat PageFormat { get { return _pageFormat; } } 

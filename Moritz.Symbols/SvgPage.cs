@@ -102,7 +102,7 @@ namespace Moritz.Symbols
 
             WriteSvgHeader(w, pageNumber);
 
-            metadata.WriteSVG(w);
+            metadata.WriteSVG(w, _pageNumber, _score.PageCount);
 
             _score.WriteSymbolDefinitions(w);
 
@@ -151,7 +151,7 @@ namespace Moritz.Symbols
 			w.WriteAttributeString("xmlns", "sodipodi", null, "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd");
 			w.WriteAttributeString("xmlns", "inkscape", null, "http://www.inkscape.org/namespaces/inkscape");
             w.WriteAttributeString("version", "1.1");
-            w.WriteAttributeString("baseProfile", "full");
+            //w.WriteAttributeString("baseProfile", "full");
             w.WriteAttributeString("width", _pageFormat.ScreenRight.ToString()); // the intended screen display size (100%)
             w.WriteAttributeString("height", _pageFormat.ScreenBottom.ToString()); // the intended screen display size (100%)
             string viewBox = "0 0 " + _pageFormat.Right.ToString() + " " + _pageFormat.Bottom.ToString();
