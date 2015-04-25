@@ -43,10 +43,7 @@ namespace Moritz.Composer
 			this.RemoveSelectedKrystalButton = new System.Windows.Forms.Button();
 			this.NotationGroupBox = new System.Windows.Forms.GroupBox();
 			this.VoiceIndicesHelpLabelLabel = new System.Windows.Forms.Label();
-			this.ChordTypeComboBoxLabel = new System.Windows.Forms.Label();
-			this.ChordTypeComboBox = new System.Windows.Forms.ComboBox();
 			this.ShortStaffNamesHelpLabel = new System.Windows.Forms.Label();
-			this.StandardChordsOptionsPanel = new System.Windows.Forms.Panel();
 			this.BeamsCrossBarlinesCheckBox = new System.Windows.Forms.CheckBox();
 			this.MinimumCrotchetDurationTextBox = new System.Windows.Forms.TextBox();
 			this.MinimumCrotchetDurationLabel = new System.Windows.Forms.Label();
@@ -95,7 +92,6 @@ namespace Moritz.Composer
 			this.ShowUncheckedFormsButton = new System.Windows.Forms.Button();
 			this.ShowConfirmedFormsButton = new System.Windows.Forms.Button();
 			this.NotationGroupBox.SuspendLayout();
-			this.StandardChordsOptionsPanel.SuspendLayout();
 			this.KrystalsGroupBox.SuspendLayout();
 			this.PalettesGroupBox.SuspendLayout();
 			this.SuspendLayout();
@@ -210,11 +206,11 @@ namespace Moritz.Composer
 			// NotationGroupBox
 			// 
 			this.NotationGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.NotationGroupBox.Controls.Add(this.MinimumCrotchetDurationTextBox);
+			this.NotationGroupBox.Controls.Add(this.BeamsCrossBarlinesCheckBox);
+			this.NotationGroupBox.Controls.Add(this.MinimumCrotchetDurationLabel);
 			this.NotationGroupBox.Controls.Add(this.VoiceIndicesHelpLabelLabel);
-			this.NotationGroupBox.Controls.Add(this.ChordTypeComboBoxLabel);
-			this.NotationGroupBox.Controls.Add(this.ChordTypeComboBox);
 			this.NotationGroupBox.Controls.Add(this.ShortStaffNamesHelpLabel);
-			this.NotationGroupBox.Controls.Add(this.StandardChordsOptionsPanel);
 			this.NotationGroupBox.Controls.Add(this.LongStaffNamesHelpLabel);
 			this.NotationGroupBox.Controls.Add(this.VoiceIndicesPerStaffHelpLabel);
 			this.NotationGroupBox.Controls.Add(this.ShortStaffNamesLabel);
@@ -266,29 +262,6 @@ namespace Moritz.Composer
 			this.VoiceIndicesHelpLabelLabel.Text = "available voice indices";
 			this.VoiceIndicesHelpLabelLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// ChordTypeComboBoxLabel
-			// 
-			this.ChordTypeComboBoxLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.ChordTypeComboBoxLabel.AutoSize = true;
-			this.ChordTypeComboBoxLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-			this.ChordTypeComboBoxLabel.Location = new System.Drawing.Point(6, 23);
-			this.ChordTypeComboBoxLabel.Margin = new System.Windows.Forms.Padding(0);
-			this.ChordTypeComboBoxLabel.Name = "ChordTypeComboBoxLabel";
-			this.ChordTypeComboBoxLabel.Size = new System.Drawing.Size(59, 14);
-			this.ChordTypeComboBoxLabel.TabIndex = 0;
-			this.ChordTypeComboBoxLabel.Text = "chord type";
-			// 
-			// ChordTypeComboBox
-			// 
-			this.ChordTypeComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.ChordTypeComboBox.FormattingEnabled = true;
-			this.ChordTypeComboBox.Location = new System.Drawing.Point(68, 19);
-			this.ChordTypeComboBox.Name = "ChordTypeComboBox";
-			this.ChordTypeComboBox.Size = new System.Drawing.Size(133, 22);
-			this.ChordTypeComboBox.TabIndex = 4;
-			this.ChordTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.ChordTypeComboBox_SelectedIndexChanged);
-			this.ChordTypeComboBox.Leave += new System.EventHandler(this.ChordTypeComboBox_Leave);
-			// 
 			// ShortStaffNamesHelpLabel
 			// 
 			this.ShortStaffNamesHelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -300,24 +273,13 @@ namespace Moritz.Composer
 			this.ShortStaffNamesHelpLabel.TabIndex = 176;
 			this.ShortStaffNamesHelpLabel.Text = "(x names, one per staff)";
 			// 
-			// StandardChordsOptionsPanel
-			// 
-			this.StandardChordsOptionsPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.StandardChordsOptionsPanel.Controls.Add(this.BeamsCrossBarlinesCheckBox);
-			this.StandardChordsOptionsPanel.Controls.Add(this.MinimumCrotchetDurationTextBox);
-			this.StandardChordsOptionsPanel.Controls.Add(this.MinimumCrotchetDurationLabel);
-			this.StandardChordsOptionsPanel.Location = new System.Drawing.Point(43, 45);
-			this.StandardChordsOptionsPanel.Name = "StandardChordsOptionsPanel";
-			this.StandardChordsOptionsPanel.Size = new System.Drawing.Size(158, 57);
-			this.StandardChordsOptionsPanel.TabIndex = 184;
-			// 
 			// BeamsCrossBarlinesCheckBox
 			// 
 			this.BeamsCrossBarlinesCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.BeamsCrossBarlinesCheckBox.AutoSize = true;
 			this.BeamsCrossBarlinesCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.BeamsCrossBarlinesCheckBox.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-			this.BeamsCrossBarlinesCheckBox.Location = new System.Drawing.Point(28, 36);
+			this.BeamsCrossBarlinesCheckBox.Location = new System.Drawing.Point(71, 51);
 			this.BeamsCrossBarlinesCheckBox.Name = "BeamsCrossBarlinesCheckBox";
 			this.BeamsCrossBarlinesCheckBox.Size = new System.Drawing.Size(130, 18);
 			this.BeamsCrossBarlinesCheckBox.TabIndex = 1;
@@ -328,7 +290,7 @@ namespace Moritz.Composer
 			// MinimumCrotchetDurationTextBox
 			// 
 			this.MinimumCrotchetDurationTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.MinimumCrotchetDurationTextBox.Location = new System.Drawing.Point(95, 4);
+			this.MinimumCrotchetDurationTextBox.Location = new System.Drawing.Point(138, 21);
 			this.MinimumCrotchetDurationTextBox.Name = "MinimumCrotchetDurationTextBox";
 			this.MinimumCrotchetDurationTextBox.Size = new System.Drawing.Size(63, 20);
 			this.MinimumCrotchetDurationTextBox.TabIndex = 0;
@@ -340,7 +302,7 @@ namespace Moritz.Composer
 			this.MinimumCrotchetDurationLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.MinimumCrotchetDurationLabel.AutoSize = true;
 			this.MinimumCrotchetDurationLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-			this.MinimumCrotchetDurationLabel.Location = new System.Drawing.Point(0, 0);
+			this.MinimumCrotchetDurationLabel.Location = new System.Drawing.Point(45, 17);
 			this.MinimumCrotchetDurationLabel.Margin = new System.Windows.Forms.Padding(0);
 			this.MinimumCrotchetDurationLabel.Name = "MinimumCrotchetDurationLabel";
 			this.MinimumCrotchetDurationLabel.Size = new System.Drawing.Size(90, 28);
@@ -944,8 +906,6 @@ namespace Moritz.Composer
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AssistantComposerForm_FormClosing);
 			this.NotationGroupBox.ResumeLayout(false);
 			this.NotationGroupBox.PerformLayout();
-			this.StandardChordsOptionsPanel.ResumeLayout(false);
-			this.StandardChordsOptionsPanel.PerformLayout();
 			this.KrystalsGroupBox.ResumeLayout(false);
 			this.PalettesGroupBox.ResumeLayout(false);
 			this.ResumeLayout(false);
@@ -1002,10 +962,7 @@ namespace Moritz.Composer
         private System.Windows.Forms.Label VoiceIndicesHelpLabel;
         private System.Windows.Forms.Label VoiceIndicesPerStaffLabel;
         private System.Windows.Forms.TextBox VoiceIndicesPerStaffTextBox;
-        private System.Windows.Forms.Label VoiceIndicesPerStaffHelpLabel;
-        private System.Windows.Forms.Panel StandardChordsOptionsPanel;
-        private System.Windows.Forms.Label ChordTypeComboBoxLabel;
-        private System.Windows.Forms.ComboBox ChordTypeComboBox;
+		private System.Windows.Forms.Label VoiceIndicesPerStaffHelpLabel;
         private System.Windows.Forms.Button RevertEverythingButton;
         private System.Windows.Forms.Button ShowUncheckedFormsButton;
         private System.Windows.Forms.Button ShowConfirmedFormsButton;

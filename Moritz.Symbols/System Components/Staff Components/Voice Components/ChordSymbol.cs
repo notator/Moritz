@@ -450,10 +450,10 @@ namespace Moritz.Symbols
             float localOverlap = 0F;
             foreach(AnchorageSymbol previousAS in previousNOM.AnchorageSymbols)
             {
-                if(this is Study2b2ChordSymbol)
-                    localOverlap = Metrics.OverlapWidth(previousAS);
-                else
-                    localOverlap = ChordMetrics.OverlapWidth(previousAS);
+				//if(this is Study2b2ChordSymbol)
+				//	localOverlap = Metrics.OverlapWidth(previousAS);
+				//else
+                localOverlap = ChordMetrics.OverlapWidth(previousAS);
 
                 overlap = overlap > localOverlap ? overlap : localOverlap;
             }

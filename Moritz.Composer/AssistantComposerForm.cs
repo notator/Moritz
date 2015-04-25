@@ -28,7 +28,6 @@ namespace Moritz.Composer
             _moritzForm1 = moritzForm1;
             _fsf = new FormStateFunctions();
 
-            M.PopulateComboBox(ChordTypeComboBox, M.ChordTypes);
             SetDefaultValues();
             DeselectAll();
 
@@ -874,28 +873,6 @@ namespace Moritz.Composer
 
         #region notation groupBox
         #region comboBoxes
-        /// <summary>
-        /// This function ensures that the user can only use values in the ChordTypeComboBox's item list.
-        /// Typing custom values won't work.
-        /// </summary>
-        private void ChordTypeComboBox_Leave(object sender, EventArgs e)
-        {
-            SetComboBoxSelectedIndexFromText(ChordTypeComboBox);
-            SetGroupBoxIsUnconfirmed(NotationGroupBox, ConfirmNotationButton, RevertNotationButton);
-        }
-        private void ChordTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            this.StandardChordsOptionsPanel.Visible = false;
-            if(((string)ChordTypeComboBox.SelectedItem) == "standard")
-                this.StandardChordsOptionsPanel.Visible = true;
-
-            this.VoiceIndicesPerStaffTextBox_Leave(null, null);
-            SetGroupBoxIsUnconfirmed(NotationGroupBox, ConfirmNotationButton, RevertNotationButton);
-        }
-        /// <summary>
-        /// This function ensures that the user can only use values in the ChordTypeComboBox's item list.
-        /// Typing custom values won't work.
-        /// </summary>
         private void StafflineStemStrokeWidthComboBox_Leave(object sender, EventArgs e)
         {
             SetComboBoxSelectedIndexFromText(StafflineStemStrokeWidthComboBox);
@@ -1039,8 +1016,7 @@ namespace Moritz.Composer
             bool error = false;
             foreach(List<byte> voiceIndicesPerStaff in voiceIndexLists)
             {
-                if(voiceIndicesPerStaff.Count == 0 || voiceIndicesPerStaff.Count > 2
-                || (voiceIndicesPerStaff.Count > 1 && ((string)ChordTypeComboBox.SelectedItem) != "standard"))
+                if(voiceIndicesPerStaff.Count == 0 || voiceIndicesPerStaff.Count > 2)
                 {
                     error = true;
                     break;
@@ -1733,7 +1709,7 @@ namespace Moritz.Composer
                 switch(r.Name)
                 {
                     case "chordSymbolType":
-                        SetStandardChordsOptionsPanel(r.Value);
+                        //SetStandardChordsOptionsPanel(r.Value);
                         break;
                     case "minimumCrotchetDuration":
                         MinimumCrotchetDurationTextBox.Text = r.Value;
@@ -1780,19 +1756,19 @@ namespace Moritz.Composer
                 (SavedState)NotationGroupBox.Tag, (SavedState)KrystalsGroupBox.Tag);
         }
         #region helpers
-        private void SetStandardChordsOptionsPanel(string value)
-        {
-            ChordTypeComboBox.SelectedItem = value;
-            StandardChordsOptionsPanel.Visible = false;
-            switch(value)
-            {
-                case "standard":
-                    StandardChordsOptionsPanel.Visible = true;
-                    break;
-                case "study2b2":
-                    break;
-            }
-        }
+		//private void SetStandardChordsOptionsPanel(string value)
+		//{
+		//	ChordTypeComboBox.SelectedItem = value;
+		//	StandardChordsOptionsPanel.Visible = false;
+		//	switch(value)
+		//	{
+		//		case "standard":
+		//			StandardChordsOptionsPanel.Visible = true;
+		//			break;
+		//		case "study2b2":
+		//			break;
+		//	}
+		//}
         private void SetBeamsCrossBarlinesCheckBoxChecked(string value)
         {
             if(value == "true")
@@ -1937,15 +1913,15 @@ namespace Moritz.Composer
         private void WriteNotation(XmlWriter w)
         {
             w.WriteStartElement("notation");
-            w.WriteAttributeString("chordSymbolType", ChordTypeComboBox.Text);
-            if(StandardChordsOptionsPanel.Visible)
-            {
+            //w.WriteAttributeString("chordSymbolType", ChordTypeComboBox.Text);
+			//if(StandardChordsOptionsPanel.Visible)
+			//{
                 w.WriteAttributeString("minimumCrotchetDuration", MinimumCrotchetDurationTextBox.Text);
                 if(BeamsCrossBarlinesCheckBox.Checked)
                     w.WriteAttributeString("beamsCrossBarlines", "true");
                 else
                     w.WriteAttributeString("beamsCrossBarlines", "false");
-            }
+            //}
             w.WriteAttributeString("stafflineStemStrokeWidth", StafflineStemStrokeWidthComboBox.Text);
             w.WriteAttributeString("gap", GapPixelsComboBox.Text);
             w.WriteAttributeString("minGapsBetweenStaves", this.MinimumGapsBetweenStavesTextBox.Text);
@@ -2107,7 +2083,7 @@ namespace Moritz.Composer
         }
         private void SetNotation(PageFormat pageFormat)
         {
-            pageFormat.ChordSymbolType = this.ChordTypeComboBox.SelectedItem.ToString();
+            pageFormat.ChordSymbolType = "standard";
             pageFormat.MinimumCrotchetDuration = int.Parse(this.MinimumCrotchetDurationTextBox.Text);
             pageFormat.BeamsCrossBarlines = this.BeamsCrossBarlinesCheckBox.Checked;
 

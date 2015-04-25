@@ -32,7 +32,7 @@ namespace Moritz.Symbols
                 {
                     w.SvgLine(null, this.Metrics.StafflinesLeft, stafflineY,
                                     this.Metrics.StafflinesRight, stafflineY,
-                                    "black", StafflineStemStrokeWidth, null, null);
+                                    "black", StafflineStemStrokeWidth, null);
 
                     if(staffLineIndex < (NumberOfStafflines - 1))
                         stafflineY += Gap;

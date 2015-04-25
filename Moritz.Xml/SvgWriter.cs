@@ -52,69 +52,157 @@ namespace Moritz.Xml
             _w.WriteEndElement();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id">Not written if null or empty</param>
-        /// <param name="cx"></param>
-        /// <param name="cy"></param>
-        /// <param name="rx"></param>
-        /// <param name="ry"></param>
-        /// <param name="strokeColour"></param>
-        /// <param name="strokeWidth">Not written if null or empty</param>
-        public void SvgEllipse(string id, float cx, float cy, float rx, float ry,
-            string strokeColor, float strokeWidth, string fillColor,
-            string transformString)
-        {
-            WriteStartElement("ellipse");
-            if(!String.IsNullOrEmpty(id))
-                _w.WriteAttributeString("id", id);
-            WriteAttributeString("cx", cx.ToString(M.En_USNumberFormat));
-            WriteAttributeString("cy", cy.ToString(M.En_USNumberFormat));
-            WriteAttributeString("rx", rx.ToString(M.En_USNumberFormat));
-            WriteAttributeString("ry", ry.ToString(M.En_USNumberFormat));
-            if(!String.IsNullOrEmpty(strokeColor))
-                WriteAttributeString("stroke", strokeColor);
-            WriteAttributeString("stroke-width", strokeWidth.ToString(M.En_USNumberFormat));
-            if(!String.IsNullOrEmpty(fillColor))
-                _w.WriteAttributeString("fill", fillColor);
-            if(!String.IsNullOrEmpty(transformString))
-                WriteAttributeString("transform", transformString);
-            WriteEndElement(); // ellipse
-        }
+		/// <summary>
+		/// Writes an SVG "line" element
+		/// </summary>
+		/// <param name="className">Not written if null or empty</param>
+		/// <param name="x1"></param>
+		/// <param name="y1"></param>
+		/// <param name="x2"></param>
+		/// <param name="y2"></param>
+		/// <param name="strokeColor">Not written if null or empty</param>
+		/// <param name="strokeWidth">Must be >= 0</param>
+		/// <param name="linecapString">Not written if null or empty</param>
+		public void SvgLine(string className, float x1, float y1, float x2, float y2,
+			string strokeColor, float strokeWidth, string linecapString)
+		{
+			_w.WriteStartElement("line");
+			if(!String.IsNullOrEmpty(className))
+				_w.WriteAttributeString("class", className);
+			_w.WriteAttributeString("x1", x1.ToString(M.En_USNumberFormat));
+			_w.WriteAttributeString("y1", y1.ToString(M.En_USNumberFormat));
+			_w.WriteAttributeString("x2", x2.ToString(M.En_USNumberFormat));
+			_w.WriteAttributeString("y2", y2.ToString(M.En_USNumberFormat));
+
+			StringBuilder styleSB = getStyleStringBuilder(strokeColor, strokeWidth, null, linecapString);
+			if(styleSB.Length > 0)
+				WriteAttributeString("style", styleSB.ToString());
+
+			_w.WriteEndElement(); //line
+		}
+
+		/// <summary>
+		/// Writes an SVG "rect" element.
+		/// </summary>
+		/// <param name="className">Not written if null or empty</param>
+		/// <param name="left"></param>
+		/// <param name="top"></param>
+		/// <param name="width"></param>
+		/// <param name="height"></param>
+		/// <param name="strokeColor">Not written if null or empty</param>
+		/// <param name="strokeWidth">Must be >= 0</param>
+		/// <param name="fillColor">Not written if null or empty</param>
+		public void SvgRect(string className, float left, float top, float width, float height,
+			string strokeColor, float strokeWidth, string fillColor)
+		{
+			Debug.Assert(strokeWidth > 0F);
+			_w.WriteStartElement("rect");
+			if(!String.IsNullOrEmpty(className))
+				_w.WriteAttributeString("class", className);
+			_w.WriteAttributeString("x", left.ToString(M.En_USNumberFormat));
+			_w.WriteAttributeString("y", top.ToString(M.En_USNumberFormat));
+			_w.WriteAttributeString("width", width.ToString(M.En_USNumberFormat));
+			_w.WriteAttributeString("height", height.ToString(M.En_USNumberFormat));
+
+			StringBuilder styleSB = getStyleStringBuilder(strokeColor, strokeWidth, fillColor, null);
+			if(styleSB.Length > 0)
+				WriteAttributeString("style", styleSB.ToString());
+
+			_w.WriteEndElement(); // rect
+		}
+
+		/// <summary>
+		/// Writes an SVG "circle" element.
+		/// </summary>
+		/// <param name="className">Not written if null or empty</param>
+		/// <param name="cx"></param>
+		/// <param name="cy"></param>
+		/// <param name="r"></param>
+		/// <param name="strokeColor">Not written if null or empty</param>
+		/// <param name="strokeWidth">Must be >= 0</param>
+		/// <param name="fillColorOrNull">Not written if null or empty</param>
+		public void SvgCircle(string className, float cx, float cy, float r,
+			string strokeColor, float strokeWidth, string fillColorOrNull)
+		{
+			WriteStartElement("circle");
+			if(!String.IsNullOrEmpty(className))
+				_w.WriteAttributeString("class", className);
+			WriteAttributeString("cx", cx.ToString(M.En_USNumberFormat));
+			WriteAttributeString("cy", cy.ToString(M.En_USNumberFormat));
+			WriteAttributeString("r", r.ToString(M.En_USNumberFormat));
+
+			StringBuilder styleSB = getStyleStringBuilder(strokeColor, strokeWidth, fillColorOrNull, null);
+			if(styleSB.Length > 0)
+				WriteAttributeString("style", styleSB.ToString());
+
+			WriteEndElement(); // circle
+		}
+
+		/// <summary>
+		/// Writes an SVG "ellipse" element.
+		/// </summary>
+		/// <param name="className">Not written if null or empty</param>
+		/// <param name="cx"></param>
+		/// <param name="cy"></param>
+		/// <param name="rx"></param>
+		/// <param name="ry"></param>
+		/// <param name="strokeColour">Not written if null or empty</param>
+		/// <param name="strokeWidth">Must be >= 0</param>
+		/// <param name="fillColor">Not written if null or empty</param>
+		/// <remarks>Note that Inkscape may turn this into a circle if rx == ry.</remarks>
+		public void SvgEllipse(string className, float cx, float cy, float rx, float ry,
+			string strokeColor, float strokeWidth, string fillColor)
+		{
+			WriteStartElement("ellipse");
+			if(!String.IsNullOrEmpty(className))
+				_w.WriteAttributeString("class", className);
+			WriteAttributeString("cx", cx.ToString(M.En_USNumberFormat));
+			WriteAttributeString("cy", cy.ToString(M.En_USNumberFormat));
+			WriteAttributeString("rx", rx.ToString(M.En_USNumberFormat));
+			WriteAttributeString("ry", ry.ToString(M.En_USNumberFormat));
+
+			StringBuilder styleSB = getStyleStringBuilder(strokeColor, strokeWidth, fillColor, null);
+			if(styleSB.Length > 0)
+				WriteAttributeString("style", styleSB.ToString());
+
+			WriteEndElement(); // ellipse
+		}
 
 
-        /// <summary>
-        /// Writes an SVG "line" element.
-        /// </summary>
-        /// <param name="type">Not written if null or empty</param>
-        /// <param name="x1"></param>
-        /// <param name="y1"></param>
-        /// <param name="x2"></param>
-        /// <param name="y2"></param>
-        /// <param name="strokeColor">Not written if null or empty</param>
-        /// <param name="strokeWidth">Not written if null</param>
-        public void SvgLine(string type, float x1, float y1, float x2, float y2,
-            string strokeColor, float strokeWidth,
-            string transformString,
-            string stroke_linecapString)
-        {
-            _w.WriteStartElement("line");
-            if(!String.IsNullOrEmpty(type))
-                _w.WriteAttributeString("class", type);
-            _w.WriteAttributeString("x1", x1.ToString(M.En_USNumberFormat));
-            _w.WriteAttributeString("y1", y1.ToString(M.En_USNumberFormat));
-            _w.WriteAttributeString("x2", x2.ToString(M.En_USNumberFormat));
-            _w.WriteAttributeString("y2", y2.ToString(M.En_USNumberFormat));
-            if(!String.IsNullOrEmpty(strokeColor))
-                _w.WriteAttributeString("stroke", strokeColor);
-            _w.WriteAttributeString("stroke-width", strokeWidth.ToString(M.En_USNumberFormat));
-            if(!String.IsNullOrEmpty(transformString))
-                _w.WriteAttributeString("transform", transformString);
-            if(!String.IsNullOrEmpty(stroke_linecapString))
-                _w.WriteAttributeString("stroke-linecap", stroke_linecapString);
-            _w.WriteEndElement(); //line
-        }
+		/// <summary>
+		/// Returns a Stringbuilder containing a style string
+		/// </summary>
+		/// <param name="strokeColorOrNull">If null, stroke is not set. '#000000' is black</param>
+		/// <param name="strokeWidth">Must be >= 0</param>
+		/// <param name="fillColorOrNull">If null, fill is not set.  '#000000' is black</param>
+		/// <param name="linecapStringOrNull">If null, lineCap is not set. Other values are: 'butt', 'round' and 'square'</param>
+		/// <returns>A style string</returns>
+		private StringBuilder getStyleStringBuilder(string strokeColorOrNull, float strokeWidth, string fillColorOrNull, string linecapStringOrNull)
+		{
+			StringBuilder rval = new StringBuilder();
+			string strokeWidthString = strokeWidth.ToString(M.En_USNumberFormat);
+
+			Debug.Assert(strokeWidth >= 0);
+			Debug.Assert(linecapStringOrNull == null
+				|| (string.Compare(linecapStringOrNull.ToString(), "butt") == 0)
+				|| (string.Compare(linecapStringOrNull.ToString(), "round") == 0)
+				|| (string.Compare(linecapStringOrNull.ToString(), "square") == 0));
+
+			if(!String.IsNullOrEmpty(strokeColorOrNull))
+				rval.Append("stroke:" + strokeColorOrNull + "; ");
+
+			rval.Append("stroke-width:" + strokeWidthString + "; ");
+
+			if(!String.IsNullOrEmpty(fillColorOrNull))
+				rval.Append("fill:" + fillColorOrNull + "; ");
+			if(!String.IsNullOrEmpty(linecapStringOrNull))
+				rval.Append("stroke-linecap:" + linecapStringOrNull + "; ");
+
+			if(rval.Length > 0)
+				rval.Remove(rval.Length - 2, 2);
+
+			return rval;
+		}
 
         /// <summary>
         /// A square bracket
@@ -184,41 +272,6 @@ namespace Moritz.Xml
             }
             _w.WriteAttributeString("d", dSB.ToString());
             _w.WriteEndElement(); // path
-        }
-
-        /// <summary>
-        /// Writes an SVG "rect" element.
-        /// </summary>
-        /// <param name="id">Can be null or empty or an id-string</param>
-        /// <param name="left"></param>
-        /// <param name="top"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="strokeColour">Not written if null or empty</param>
-        /// <param name="strokeWidth">Not written if null</param>
-        /// <param name="fillColour">Not written if null or empty</param>
-        public void SvgRect(string typeString, string id, float left, float top, float width, float height,
-            string strokeColour, float strokeWidth, string fillColour,
-            string transformString)
-        {
-            Debug.Assert(strokeWidth > 0F);
-            _w.WriteStartElement("rect");
-            if(!String.IsNullOrEmpty(typeString))
-                _w.WriteAttributeString("class", typeString);
-            if(!String.IsNullOrEmpty(id))
-                _w.WriteAttributeString("id", id);
-            _w.WriteAttributeString("x", left.ToString(M.En_USNumberFormat));
-            _w.WriteAttributeString("y", top.ToString(M.En_USNumberFormat));
-            _w.WriteAttributeString("width", width.ToString(M.En_USNumberFormat));
-            _w.WriteAttributeString("height", height.ToString(M.En_USNumberFormat));
-            if(!String.IsNullOrEmpty(strokeColour))
-                _w.WriteAttributeString("stroke", strokeColour);
-            _w.WriteAttributeString("stroke-width", strokeWidth.ToString(M.En_USNumberFormat));
-            if(!String.IsNullOrEmpty(fillColour))
-                _w.WriteAttributeString("fill", fillColour);
-            if(!String.IsNullOrEmpty(transformString))
-                _w.WriteAttributeString("transform", transformString);
-            _w.WriteEndElement(); // rect
         }
 
         public void SvgText(TextInfo textInfo, float x, float y)

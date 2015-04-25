@@ -100,13 +100,8 @@ namespace Moritz.Symbols
         {
             float overlap = float.MinValue;
 
-            Study2b2ChordSymbol study2b2ChordSymbol = previousAS as Study2b2ChordSymbol;
             OutputChordSymbol chord = previousAS as OutputChordSymbol;
-            if(study2b2ChordSymbol != null)
-            {
-                overlap = this.OverlapWidth(study2b2ChordSymbol.Metrics);
-            }
-            else if(chord != null)
+            if(chord != null)
             {
                 overlap = chord.ChordMetrics.OverlapWidth(this);
             }
@@ -249,7 +244,7 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            w.SvgLine(null, _originX, _top, _originX, _bottom, "black", StrokeWidth, null, "round");
+            w.SvgLine(null, _originX, _top, _originX, _bottom, "black", StrokeWidth, "round");
         }
 
         public object Clone()
@@ -301,7 +296,7 @@ namespace Moritz.Symbols
         {
             foreach(float y in Ys)
             {
-                w.SvgLine(null, _left + _strokeWidth, y, _right - _strokeWidth, y, "black", _strokeWidth, null, null);
+                w.SvgLine(null, _left + _strokeWidth, y, _right - _strokeWidth, y, "black", _strokeWidth, null);
             }
         }
 
@@ -378,7 +373,7 @@ namespace Moritz.Symbols
         public override void WriteSVG(SvgWriter w)
         {
             if(_drawExtender)
-                w.SvgLine(null, _left, _originY, _right, _originY, "black", _strokeWidth, null, "butt");
+                w.SvgLine(null, _left, _originY, _right, _originY, "black", _strokeWidth, "butt");
         }
 
         private readonly float _strokeWidth = 0F;
@@ -707,7 +702,7 @@ namespace Moritz.Symbols
         public override void WriteSVG(SvgWriter w)
         {
             base.WriteSVG(w);
-            w.SvgRect(null, null, _left, _top, _right - _left, _bottom - _top, "black", _strokeWidth, "none", null);
+            w.SvgRect(null, _left, _top, _right - _left, _bottom - _top, "black", _strokeWidth, "none");
         }
 
         float _strokeWidth = 0;
@@ -1283,115 +1278,6 @@ namespace Moritz.Symbols
             return this.MemberwiseClone();
         }
         public bool IsBelow;
-    }
-
-    internal class Study2b2ChordMetrics : GroupMetrics
-    {
-        public Study2b2ChordMetrics(Study2b2ChordSymbol s2b2c)
-            : base("2b2Symbol")
-        {
-             _objectType = s2b2c.GraphicSymbolID;
-             float onePixelFontHeight = 0.015F;
-             _fontHeight = s2b2c.FontHeight * onePixelFontHeight;
-            SetBasicMetrics(s2b2c);
-            SetPitchHeight(s2b2c);
-        }
-
-        private void SetBasicMetrics(Study2b2ChordSymbol s2b2c)
-        {
-            int staffNumberID = SymbolStaffNumberID(s2b2c.Voice.Staff);
-
-            switch(staffNumberID)
-            {
-                case 1: // "staff1Rectangle"
-                    _right = _fontHeight * 44F; // Constants found by experiment.
-                    _bottom = _fontHeight * 32;
-                    break;
-                case 2: // "staff2Circle"
-                    _right = _fontHeight * 46.13F;  // Constants found by experiment.
-                    _bottom = _fontHeight * 28.125F;
-                    break;
-                case 3: // "staff3Hexagon"
-                    _right = _fontHeight * 49.0F;  // Constants found by experiment.
-                    _bottom = _fontHeight * 32.34F;
-                    break;
-            }
-
-            _right *= 1.35F;
-
-            _top = -_bottom;
-            _left = 0;
-            _originX = 0;
-            _originY = _top;
-            Move(-_right/2, 0);
-        }
-
-        /// <summary>
-        /// Returns a number in range [1..3] for Study2b2ChordSymbols.
-        /// </summary>
-        private int SymbolStaffNumberID(Staff staff)
-        {
-            int symbolStaffNumberID = -1;
-            SvgSystem system = staff.SVGSystem;
-
-            for(int staffIndex = 0; staffIndex < system.Staves.Count; ++staffIndex)
-            {
-                if(system.Staves[staffIndex] == staff)
-                {
-                    symbolStaffNumberID = staffIndex + 1;
-                    break;
-                }
-            }
-            Debug.Assert(symbolStaffNumberID != -1);
-
-            // These two lines introduced so that 2b2 symbols can be used on any number of staves.
-            symbolStaffNumberID %= 3;
-            symbolStaffNumberID = (symbolStaffNumberID == 0) ? 3 : symbolStaffNumberID;
-
-            return symbolStaffNumberID;
-        }
-
-        private void SetPitchHeight(Study2b2ChordSymbol s2b2c)
-        {
-            float lowest = 90;
-            //float delta = 180F / 11F;
-            float delta = 100F / 11F;
-            float dy = 0;
-            int index = _objectType.LastIndexOf('_');
-            string symbolNumberString = _objectType.Substring(index+1);
-            int symbolNumber = 0;
-            try
-            {
-                symbolNumber = int.Parse(symbolNumberString);
-            }
-            catch
-            {
-                Debug.Assert(false);
-            }
-            dy = lowest - (delta * symbolNumber);
-
-            int symbolStaffNumberID = SymbolStaffNumberID(s2b2c.Voice.Staff);
-            
-            // Symbols on staff 2 are moved up an octave if their lowest midiPitch is >= 84.
-            // In the original Study 2b2 score, staff 2 has a two octave range [72..95].
-            if(symbolStaffNumberID == 2) 
-            {
-                int lowestMidiPitch = s2b2c.HeadsTopDown[s2b2c.HeadsTopDown.Count - 1].MidiPitch;
-                if(lowestMidiPitch >= 84)
-                {
-                    dy -= (delta * 12);
-                }
-            }
-
-            Move(0, dy); 
-        }
-
-        public override void WriteSVG(SvgWriter w)
-        {
-            w.SvgUseXY(_objectType, _objectType, _originX, _originY, _fontHeight);
-        }
-
-        private float _fontHeight = 0F;
     }
 
     public class GroupMetrics : Metrics

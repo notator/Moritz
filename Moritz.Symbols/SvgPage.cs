@@ -106,8 +106,11 @@ namespace Moritz.Symbols
 
             _score.WriteSymbolDefinitions(w);
 
+			w.WriteStartElement("g"); // start layer1 (for Inkscape)
+			WriteInkscapeLayerAttributes(w, "layer1", "moritz", true );
+
             #region pageObjects
-            w.SvgRect(null, "frame", 0, 0, _pageFormat.Right, _pageFormat.Bottom, "#CCCCCC", 1, "white", null);
+            w.SvgRect("frame", 0, 0, _pageFormat.Right, _pageFormat.Bottom, "#CCCCCC", 1, "white");
 
             WriteStyle(w);
 
@@ -124,26 +127,61 @@ namespace Moritz.Symbols
             {
                 system.WriteSVG(w, pageNumber, systemNumber++, _pageFormat);
             }
-            w.WriteEndElement(); // closes the svg element
+
+			w.WriteEndElement(); // end layer1 (for Inkscape)
+
+			w.WriteStartElement("g"); // start layer2 (for Inkscape)
+			WriteInkscapeLayerAttributes(w, "layer2", "annotations", false);
+			w.WriteEndElement(); // end layer2 (for Inkscape)
+			
+			w.WriteEndElement(); // close the svg element
             w.WriteEndDocument();
         }
 
         private void WriteSvgHeader(SvgWriter w, int pageNumber)
         {
+			w.WriteAttributeString("xmlns", "http://www.w3.org/2000/svg");
+			w.WriteAttributeString("xmlns", "score", null, "http://www.james-ingram-act-two.de/open-source/svgScoreExtensions.html");
+			w.WriteAttributeString("xmlns", "dc", null, "http://purl.org/dc/elements/1.1/");
+			w.WriteAttributeString("xmlns", "cc", null, "http://creativecommons.org/ns#");
+			w.WriteAttributeString("xmlns", "rdf", null, "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+			w.WriteAttributeString("xmlns", "svg", null, "http://www.w3.org/2000/svg");
+
+			w.WriteAttributeString("xmlns", "xlink", null, "http://www.w3.org/1999/xlink");
+			w.WriteAttributeString("xmlns", "sodipodi", null, "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd");
+			w.WriteAttributeString("xmlns", "inkscape", null, "http://www.inkscape.org/namespaces/inkscape");
             w.WriteAttributeString("version", "1.1");
             w.WriteAttributeString("baseProfile", "full");
             w.WriteAttributeString("width", _pageFormat.ScreenRight.ToString()); // the intended screen display size (100%)
             w.WriteAttributeString("height", _pageFormat.ScreenBottom.ToString()); // the intended screen display size (100%)
             string viewBox = "0 0 " + _pageFormat.Right.ToString() + " " + _pageFormat.Bottom.ToString();
-            w.WriteAttributeString("viewBox", viewBox); // the size of SVG's internal drawing surface (400%)
-            w.WriteAttributeString("xmlns", "xlink", null, "http://www.w3.org/1999/xlink");
-            w.WriteAttributeString("xmlns", "score", null, "http://www.james-ingram-act-two.de/open-source/svgScoreExtensions.html");
+            w.WriteAttributeString("viewBox", viewBox); // the size of SVG's internal drawing surface (400%)            
             if(pageNumber == 1)
             {
                 w.WriteAttributeString("onload", "onLoad()"); // function called when page 1 has loaded
                 WriteScriptLink(w);
             }
         }
+
+		/// <summary>
+		/// writes the following attributes:
+		///			inkscape:groupmode="layer"
+		///			id="layer1"
+		///			inkscape:label="moritz"
+		///			style="display:inline"
+		///			sodipodi:insensitive="true"
+		/// </summary>
+		/// <param name="w"></param>
+		private void WriteInkscapeLayerAttributes(SvgWriter w, String layerID, String layerName, bool insensitive )
+		{
+			//w.WriteAttributeString("score", "staffName", null, this.Staffname);
+			w.WriteAttributeString("inkscape", "groupmode", null, "layer");
+			w.WriteAttributeString("id", layerID);
+			w.WriteAttributeString("inkscape", "label", null, layerName);
+			w.WriteAttributeString("style", "display:inline");
+			if(insensitive == true)
+				w.WriteAttributeString("sodipodi", "insensitive", null, "true");
+		}
 
         // writes the line: <script xlink:href="../../ap/SVG.js" type="text/javascript"/>
         private void WriteScriptLink(SvgWriter w)

@@ -19,9 +19,9 @@ namespace Moritz.Symbols
                 case "standard":
                     SymbolSet = new StandardSymbolSet();
                     break;
-                case "2b2":
-                    SymbolSet = new Study2b2SymbolSet();
-                    break;
+				//case "2b2":
+				//	SymbolSet = new Study2b2SymbolSet();
+				//	break;
                 case "none":
                     SymbolSet = null;
                     break;

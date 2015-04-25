@@ -147,22 +147,22 @@ namespace Moritz.Symbols
         /// <summary>
         /// There are three markers per system: startMarker, runningMarker and endMarker.
         /// They initially have parameters which make them invisible. 
-        /// The parameters are set in Javascript when performing the score (MIDIPlayer).
+        /// The parameters are set properly in Javascript when loading the score.
         /// </summary>
         private void WriteMarkers(SvgWriter w)
         {
             w.SvgStartGroup("startMarker", null);
-            w.SvgLine(null, 0, 0, 0, 0, "#009900", 1, null, null);
-            w.SvgEllipse(null, 0, 0, 0, 0, null, 1, "#009900", null);
+            w.SvgLine(null, 0, 0, 0, 0, null, 1, null);
+			w.SvgCircle(null, 0, 0, 0, null, 1, null);
             w.SvgEndGroup();
 
             w.SvgStartGroup("runningMarker", null);
-            w.SvgLine(null, 0, 0, 0, 0, "#888888", 1, null, null);
+            w.SvgLine(null, 0, 0, 0, 0, null, 1, null);
             w.SvgEndGroup();
 
             w.SvgStartGroup("endMarker", null);
-            w.SvgLine(null, 0, 0, 0, 0, "#FF0000", 1, null, null);
-            w.SvgRect(null, null, 0, 0, 0, 0, null, 1, "#FF0000", null);
+            w.SvgLine(null, 0, 0, 0, 0, null, 1, null);
+            w.SvgRect(null, 0, 0, 0, 0, null, 1, null);
             w.SvgEndGroup();
          }
 

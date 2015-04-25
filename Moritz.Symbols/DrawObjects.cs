@@ -5,6 +5,7 @@ using System;
 using System.Drawing;
 
 using Moritz.Xml;
+using Moritz.Globals;
 
 namespace Moritz.Symbols
 {
@@ -80,13 +81,16 @@ namespace Moritz.Symbols
                     case TextFrameType.none:
                     break;
                     case TextFrameType.rectangle:
-                    w.SvgRect(null, null, Metrics.Left, Metrics.Top, Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top,
-                        _frameInfo.ColorString.String, _frameInfo.StrokeWidth, "none", null);
+                    w.SvgRect(null, Metrics.Left, Metrics.Top, Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top,
+						_frameInfo.ColorString.String, _frameInfo.StrokeWidth, "none");
                     break;
                     case TextFrameType.ellipse:
+					w.SvgEllipse(null, Metrics.Left, Metrics.Top, (Metrics.Right - Metrics.Left) / 2, (Metrics.Bottom - Metrics.Top) / 2,
+						_frameInfo.ColorString.String, _frameInfo.StrokeWidth, "none");
+					break;
                     case TextFrameType.circle:
-                    w.SvgEllipse(null, Metrics.Left, Metrics.Top, Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top,
-                        _frameInfo.ColorString.String, _frameInfo.StrokeWidth, "none", null);
+                    w.SvgCircle(null, Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top,((Metrics.Right - Metrics.Left)/2),
+						_frameInfo.ColorString.String, _frameInfo.StrokeWidth, "none");
                     break;
                 }
             }

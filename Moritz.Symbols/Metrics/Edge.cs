@@ -144,14 +144,9 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject noteObject in voice.NoteObjects)
                 {
-                    Study2b2ChordSymbol study2b2ChordSymbol = noteObject as Study2b2ChordSymbol;
                     OutputChordSymbol chordSymbol = noteObject as OutputChordSymbol;
                     ClefSymbol clef = noteObject as ClefSymbol;
-                    if(study2b2ChordSymbol != null)
-                    {
-                        Add(study2b2ChordSymbol.Metrics);
-                    }
-                    else if(chordSymbol != null)
+                    if(chordSymbol != null)
                     {
                         chordSymbol.ChordMetrics.AddToEdge(this);
                     }

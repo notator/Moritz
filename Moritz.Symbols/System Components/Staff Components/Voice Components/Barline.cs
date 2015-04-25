@@ -49,15 +49,15 @@ namespace Moritz.Symbols
                 w.SvgLine(null,
                     this.Metrics.OriginX - (strokeWidth * 3F), topY,
                     this.Metrics.OriginX - (strokeWidth * 3F), bottomY,
-                    this.ColorString.String, strokeWidth, null, null);
+                    this.ColorString.String, strokeWidth, null);
                 w.SvgLine(null,
                     this.Metrics.OriginX, topY,
                     this.Metrics.OriginX, bottomY,
-                    this.ColorString.String, strokeWidth * 2F, null, null);
+                    this.ColorString.String, strokeWidth * 2F, null);
             }
             else
             {
-                w.SvgLine(null, this.Metrics.OriginX, topY, this.Metrics.OriginX, bottomY, this.ColorString.String, strokeWidth, null, null);
+                w.SvgLine(null, this.Metrics.OriginX, topY, this.Metrics.OriginX, bottomY, this.ColorString.String, strokeWidth, null);
             }
             w.SvgEndGroup();
         }
