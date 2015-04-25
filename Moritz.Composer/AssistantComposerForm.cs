@@ -1708,9 +1708,6 @@ namespace Moritz.Composer
                 r.MoveToAttribute(i);
                 switch(r.Name)
                 {
-                    case "chordSymbolType":
-                        //SetStandardChordsOptionsPanel(r.Value);
-                        break;
                     case "minimumCrotchetDuration":
                         MinimumCrotchetDurationTextBox.Text = r.Value;
                         break;
@@ -1756,19 +1753,6 @@ namespace Moritz.Composer
                 (SavedState)NotationGroupBox.Tag, (SavedState)KrystalsGroupBox.Tag);
         }
         #region helpers
-		//private void SetStandardChordsOptionsPanel(string value)
-		//{
-		//	ChordTypeComboBox.SelectedItem = value;
-		//	StandardChordsOptionsPanel.Visible = false;
-		//	switch(value)
-		//	{
-		//		case "standard":
-		//			StandardChordsOptionsPanel.Visible = true;
-		//			break;
-		//		case "study2b2":
-		//			break;
-		//	}
-		//}
         private void SetBeamsCrossBarlinesCheckBoxChecked(string value)
         {
             if(value == "true")
@@ -1913,15 +1897,12 @@ namespace Moritz.Composer
         private void WriteNotation(XmlWriter w)
         {
             w.WriteStartElement("notation");
-            //w.WriteAttributeString("chordSymbolType", ChordTypeComboBox.Text);
-			//if(StandardChordsOptionsPanel.Visible)
-			//{
-                w.WriteAttributeString("minimumCrotchetDuration", MinimumCrotchetDurationTextBox.Text);
-                if(BeamsCrossBarlinesCheckBox.Checked)
-                    w.WriteAttributeString("beamsCrossBarlines", "true");
-                else
-                    w.WriteAttributeString("beamsCrossBarlines", "false");
-            //}
+
+            w.WriteAttributeString("minimumCrotchetDuration", MinimumCrotchetDurationTextBox.Text);
+            if(BeamsCrossBarlinesCheckBox.Checked)
+                w.WriteAttributeString("beamsCrossBarlines", "true");
+            else
+                w.WriteAttributeString("beamsCrossBarlines", "false");
             w.WriteAttributeString("stafflineStemStrokeWidth", StafflineStemStrokeWidthComboBox.Text);
             w.WriteAttributeString("gap", GapPixelsComboBox.Text);
             w.WriteAttributeString("minGapsBetweenStaves", this.MinimumGapsBetweenStavesTextBox.Text);
@@ -1933,6 +1914,7 @@ namespace Moritz.Composer
             w.WriteAttributeString("longStaffNames", LongStaffNamesTextBox.Text);
             w.WriteAttributeString("shortStaffNames", ShortStaffNamesTextBox.Text);
             w.WriteAttributeString("systemStartBars", SystemStartBarsTextBox.Text);
+
             w.WriteEndElement(); // notation
 
             SetGroupBoxIsSaved(NotationGroupBox, ConfirmNotationButton, RevertNotationButton,

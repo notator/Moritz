@@ -42,11 +42,11 @@ namespace Moritz.Composer
 			this.KrystalsListBox = new System.Windows.Forms.ListBox();
 			this.RemoveSelectedKrystalButton = new System.Windows.Forms.Button();
 			this.NotationGroupBox = new System.Windows.Forms.GroupBox();
+			this.MinimumCrotchetDurationTextBox = new System.Windows.Forms.TextBox();
+			this.BeamsCrossBarlinesCheckBox = new System.Windows.Forms.CheckBox();
+			this.MinimumCrotchetDurationLabel = new System.Windows.Forms.Label();
 			this.VoiceIndicesHelpLabelLabel = new System.Windows.Forms.Label();
 			this.ShortStaffNamesHelpLabel = new System.Windows.Forms.Label();
-			this.BeamsCrossBarlinesCheckBox = new System.Windows.Forms.CheckBox();
-			this.MinimumCrotchetDurationTextBox = new System.Windows.Forms.TextBox();
-			this.MinimumCrotchetDurationLabel = new System.Windows.Forms.Label();
 			this.LongStaffNamesHelpLabel = new System.Windows.Forms.Label();
 			this.VoiceIndicesPerStaffHelpLabel = new System.Windows.Forms.Label();
 			this.ShortStaffNamesLabel = new System.Windows.Forms.Label();
@@ -249,6 +249,43 @@ namespace Moritz.Composer
 			this.NotationGroupBox.TabStop = false;
 			this.NotationGroupBox.Text = "notation";
 			// 
+			// MinimumCrotchetDurationTextBox
+			// 
+			this.MinimumCrotchetDurationTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.MinimumCrotchetDurationTextBox.Location = new System.Drawing.Point(134, 47);
+			this.MinimumCrotchetDurationTextBox.Name = "MinimumCrotchetDurationTextBox";
+			this.MinimumCrotchetDurationTextBox.Size = new System.Drawing.Size(68, 20);
+			this.MinimumCrotchetDurationTextBox.TabIndex = 0;
+			this.MinimumCrotchetDurationTextBox.TextChanged += new System.EventHandler(this.MinimumCrotchetDurationTextBox_TextChanged);
+			this.MinimumCrotchetDurationTextBox.Leave += new System.EventHandler(this.MinimumCrotchetDurationTextBox_Leave);
+			// 
+			// BeamsCrossBarlinesCheckBox
+			// 
+			this.BeamsCrossBarlinesCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.BeamsCrossBarlinesCheckBox.AutoSize = true;
+			this.BeamsCrossBarlinesCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.BeamsCrossBarlinesCheckBox.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+			this.BeamsCrossBarlinesCheckBox.Location = new System.Drawing.Point(44, 82);
+			this.BeamsCrossBarlinesCheckBox.Name = "BeamsCrossBarlinesCheckBox";
+			this.BeamsCrossBarlinesCheckBox.Size = new System.Drawing.Size(130, 18);
+			this.BeamsCrossBarlinesCheckBox.TabIndex = 1;
+			this.BeamsCrossBarlinesCheckBox.Text = "beams cross barlines";
+			this.BeamsCrossBarlinesCheckBox.UseVisualStyleBackColor = true;
+			this.BeamsCrossBarlinesCheckBox.CheckedChanged += new System.EventHandler(this.BeamsCrossBarlinesCheckBox_CheckedChanged);
+			// 
+			// MinimumCrotchetDurationLabel
+			// 
+			this.MinimumCrotchetDurationLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.MinimumCrotchetDurationLabel.AutoSize = true;
+			this.MinimumCrotchetDurationLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
+			this.MinimumCrotchetDurationLabel.Location = new System.Drawing.Point(41, 43);
+			this.MinimumCrotchetDurationLabel.Margin = new System.Windows.Forms.Padding(0);
+			this.MinimumCrotchetDurationLabel.Name = "MinimumCrotchetDurationLabel";
+			this.MinimumCrotchetDurationLabel.Size = new System.Drawing.Size(90, 28);
+			this.MinimumCrotchetDurationLabel.TabIndex = 147;
+			this.MinimumCrotchetDurationLabel.Text = "minimum crotchet\r\nduration (ms)";
+			this.MinimumCrotchetDurationLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
 			// VoiceIndicesHelpLabelLabel
 			// 
 			this.VoiceIndicesHelpLabelLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -272,43 +309,6 @@ namespace Moritz.Composer
 			this.ShortStaffNamesHelpLabel.Size = new System.Drawing.Size(125, 14);
 			this.ShortStaffNamesHelpLabel.TabIndex = 176;
 			this.ShortStaffNamesHelpLabel.Text = "(x names, one per staff)";
-			// 
-			// BeamsCrossBarlinesCheckBox
-			// 
-			this.BeamsCrossBarlinesCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.BeamsCrossBarlinesCheckBox.AutoSize = true;
-			this.BeamsCrossBarlinesCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.BeamsCrossBarlinesCheckBox.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-			this.BeamsCrossBarlinesCheckBox.Location = new System.Drawing.Point(71, 51);
-			this.BeamsCrossBarlinesCheckBox.Name = "BeamsCrossBarlinesCheckBox";
-			this.BeamsCrossBarlinesCheckBox.Size = new System.Drawing.Size(130, 18);
-			this.BeamsCrossBarlinesCheckBox.TabIndex = 1;
-			this.BeamsCrossBarlinesCheckBox.Text = "beams cross barlines";
-			this.BeamsCrossBarlinesCheckBox.UseVisualStyleBackColor = true;
-			this.BeamsCrossBarlinesCheckBox.CheckedChanged += new System.EventHandler(this.BeamsCrossBarlinesCheckBox_CheckedChanged);
-			// 
-			// MinimumCrotchetDurationTextBox
-			// 
-			this.MinimumCrotchetDurationTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.MinimumCrotchetDurationTextBox.Location = new System.Drawing.Point(138, 21);
-			this.MinimumCrotchetDurationTextBox.Name = "MinimumCrotchetDurationTextBox";
-			this.MinimumCrotchetDurationTextBox.Size = new System.Drawing.Size(63, 20);
-			this.MinimumCrotchetDurationTextBox.TabIndex = 0;
-			this.MinimumCrotchetDurationTextBox.TextChanged += new System.EventHandler(this.MinimumCrotchetDurationTextBox_TextChanged);
-			this.MinimumCrotchetDurationTextBox.Leave += new System.EventHandler(this.MinimumCrotchetDurationTextBox_Leave);
-			// 
-			// MinimumCrotchetDurationLabel
-			// 
-			this.MinimumCrotchetDurationLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.MinimumCrotchetDurationLabel.AutoSize = true;
-			this.MinimumCrotchetDurationLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
-			this.MinimumCrotchetDurationLabel.Location = new System.Drawing.Point(45, 17);
-			this.MinimumCrotchetDurationLabel.Margin = new System.Windows.Forms.Padding(0);
-			this.MinimumCrotchetDurationLabel.Name = "MinimumCrotchetDurationLabel";
-			this.MinimumCrotchetDurationLabel.Size = new System.Drawing.Size(90, 28);
-			this.MinimumCrotchetDurationLabel.TabIndex = 147;
-			this.MinimumCrotchetDurationLabel.Text = "minimum crotchet\r\nduration (ms)";
-			this.MinimumCrotchetDurationLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// LongStaffNamesHelpLabel
 			// 
