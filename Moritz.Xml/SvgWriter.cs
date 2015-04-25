@@ -191,7 +191,7 @@ namespace Moritz.Xml
 			if(!String.IsNullOrEmpty(strokeColorOrNull))
 				rval.Append("stroke:" + strokeColorOrNull + "; ");
 
-			rval.Append("stroke-width:" + strokeWidthString + "; ");
+			rval.Append("stroke-width:" + strokeWidthString + "px; ");
 
 			if(!String.IsNullOrEmpty(fillColorOrNull))
 				rval.Append("fill:" + fillColorOrNull + "; ");
@@ -228,7 +228,7 @@ namespace Moritz.Xml
                 _w.WriteAttributeString("id", id);
             _w.WriteAttributeString("stroke", "black");
             _w.WriteAttributeString("fill", "none");
-            _w.WriteAttributeString("stroke-width", strokeWidth.ToString(M.En_USNumberFormat));
+            _w.WriteAttributeString("stroke-width", strokeWidth.ToString(M.En_USNumberFormat) + "px");
             _w.WriteAttributeString("stroke-linecap", "butt");
             StringBuilder d = new StringBuilder();
             d.Append("M " + rightStr + "," + topStr + " ");
@@ -267,7 +267,7 @@ namespace Moritz.Xml
             else
             {
                 _w.WriteAttributeString("stroke", "black");
-                _w.WriteAttributeString("stroke-width", strokeWidth.ToString(M.En_USNumberFormat));
+                _w.WriteAttributeString("stroke-width", strokeWidth.ToString(M.En_USNumberFormat) + "px");
                 _w.WriteAttributeString("fill", "black");
             }
             _w.WriteAttributeString("d", dSB.ToString());

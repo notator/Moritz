@@ -102,6 +102,8 @@ namespace Moritz.Symbols
 
             WriteSvgHeader(w, pageNumber);
 
+			WriteSodipodiNamedview(w); 
+
             metadata.WriteSVG(w, _pageNumber, _score.PageCount);
 
             _score.WriteSymbolDefinitions(w);
@@ -137,6 +139,19 @@ namespace Moritz.Symbols
 			w.WriteEndElement(); // close the svg element
             w.WriteEndDocument();
         }
+
+		/// <summary>
+		/// The presence of this element means that Inkscape opens the file at full screen size
+		/// with level2, the annotations, selected.
+		/// </summary>
+		/// <param name="w"></param>
+		private void WriteSodipodiNamedview(SvgWriter w)
+		{
+			w.WriteStartElement("sodipodi", "namedview", null);
+			w.WriteAttributeString("inkscape", "window-maximized", null, "1");
+			w.WriteAttributeString("inkscape", "current-layer", null, "layer2");
+			w.WriteEndElement(); // ends the sodipodi:namedview element
+		}
 
         private void WriteSvgHeader(SvgWriter w, int pageNumber)
         {
