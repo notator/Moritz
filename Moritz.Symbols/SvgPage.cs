@@ -112,7 +112,7 @@ namespace Moritz.Symbols
 			WriteInkscapeLayerAttributes(w, "layer1", "moritz", true );
 
             #region pageObjects
-            w.SvgRect("frame", 0, 0, _pageFormat.Right, _pageFormat.Bottom, "#CCCCCC", 1, "white");
+            w.SvgRect("frame", null, 0, 0, _pageFormat.Right, _pageFormat.Bottom, "#CCCCCC", 1, "white");
 
             WriteStyle(w);
 

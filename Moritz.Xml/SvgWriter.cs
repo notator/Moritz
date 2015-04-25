@@ -84,6 +84,7 @@ namespace Moritz.Xml
 		/// <summary>
 		/// Writes an SVG "rect" element.
 		/// </summary>
+		/// <param name="id">Not written if null or empty</param>
 		/// <param name="className">Not written if null or empty</param>
 		/// <param name="left"></param>
 		/// <param name="top"></param>
@@ -92,11 +93,13 @@ namespace Moritz.Xml
 		/// <param name="strokeColor">Not written if null or empty</param>
 		/// <param name="strokeWidth">Must be >= 0</param>
 		/// <param name="fillColor">Not written if null or empty</param>
-		public void SvgRect(string className, float left, float top, float width, float height,
+		public void SvgRect(string id, string className, float left, float top, float width, float height,
 			string strokeColor, float strokeWidth, string fillColor)
 		{
 			Debug.Assert(strokeWidth > 0F);
 			_w.WriteStartElement("rect");
+			if(!String.IsNullOrEmpty(id))
+				_w.WriteAttributeString("id", id);
 			if(!String.IsNullOrEmpty(className))
 				_w.WriteAttributeString("class", className);
 			_w.WriteAttributeString("x", left.ToString(M.En_USNumberFormat));

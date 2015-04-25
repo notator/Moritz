@@ -81,7 +81,7 @@ namespace Moritz.Symbols
                     case TextFrameType.none:
                     break;
                     case TextFrameType.rectangle:
-                    w.SvgRect(null, Metrics.Left, Metrics.Top, Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top,
+                    w.SvgRect(null, null, Metrics.Left, Metrics.Top, Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top,
 						_frameInfo.ColorString.String, _frameInfo.StrokeWidth, "none");
                     break;
                     case TextFrameType.ellipse:

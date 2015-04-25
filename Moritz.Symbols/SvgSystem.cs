@@ -162,7 +162,7 @@ namespace Moritz.Symbols
 
             w.SvgStartGroup("endMarker", null);
             w.SvgLine(null, 0, 0, 0, 0, null, 1, null);
-            w.SvgRect(null, 0, 0, 0, 0, null, 1, null);
+            w.SvgRect(null, null, 0, 0, 0, 0, null, 1, null);
             w.SvgEndGroup();
          }
 
