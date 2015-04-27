@@ -25,7 +25,7 @@ namespace Moritz.Symbols
 		/// <param name="w"></param>
 		/// <param name="pageNumber"></param>
 		/// <param name="nScorePages"></param>
-        public void WriteSVG(SvgWriter w, int pageNumber, int nScorePages)
+		public void WriteSVG(SvgWriter w, int pageNumber, int nScorePages, string aboutThePieceLinkURL)
         {
 			Debug.Assert(!String.IsNullOrEmpty(MainTitle));
 
@@ -79,8 +79,8 @@ namespace Moritz.Symbols
 				w.WriteEndElement(); // ends the dc:subject element
 			}
 
-			StringBuilder  desc = new StringBuilder("Originally created using my Assistant Composer software." +
-							"\nAnnotations, if there are any, have been made using Inkscape.");
+
+			StringBuilder desc = new StringBuilder("See: " + aboutThePieceLinkURL );
 
 			if(!String.IsNullOrEmpty(Comment))
 				desc.Append("\ncomments: " + Comment);
@@ -88,6 +88,17 @@ namespace Moritz.Symbols
 			w.WriteStartElement("dc", "description", null);
 			w.WriteString(desc.ToString());
 			w.WriteEndElement(); // ends the dc:description element
+
+			string contributor = "Originally created using Assistant Composer software:" +
+							"\nhttp://james-ingram-act-two.de/moritz3/assistantComposer/assistantComposer.html" +
+							"\nAnnotations, if there are any, have been made using Inkscape on the annotation layers.";
+			w.WriteStartElement("dc", "contributor", null);
+			w.WriteStartElement("cc", "Agent", null);
+			w.WriteStartElement("dc", "title", null);
+			w.WriteString(contributor);
+			w.WriteEndElement(); // ends the dc:title element
+			w.WriteEndElement(); // ends the cc:Agent element
+			w.WriteEndElement(); // ends the dc:creator element
 
 			w.WriteEndElement(); // ends the cc:Work element
 			w.WriteEndElement(); // ends the rdf:RDF element

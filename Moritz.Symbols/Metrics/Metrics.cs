@@ -702,7 +702,7 @@ namespace Moritz.Symbols
         public override void WriteSVG(SvgWriter w)
         {
             base.WriteSVG(w);
-            w.SvgRect(null, null, _left, _top, _right - _left, _bottom - _top, "black", _strokeWidth, "none");
+            w.SvgRect(null, _left, _top, _right - _left, _bottom - _top, "black", _strokeWidth, "none");
         }
 
         float _strokeWidth = 0;

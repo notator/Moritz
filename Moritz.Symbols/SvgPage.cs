@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms; // MessageBox
 using System.Diagnostics;
 using System.Xml;
+using System.Text;
 
 using Moritz.Globals;
 using Moritz.Xml;
@@ -102,43 +103,88 @@ namespace Moritz.Symbols
 
             WriteSvgHeader(w, pageNumber);
 
-			WriteSodipodiNamedview(w); 
+			WriteSodipodiNamedview(w);
 
-            metadata.WriteSVG(w, _pageNumber, _score.PageCount);
+			metadata.WriteSVG(w, _pageNumber, _score.PageCount, _pageFormat.AboutLinkURL);
 
             _score.WriteSymbolDefinitions(w);
 
-			w.WriteStartElement("g"); // start layer1 (for Inkscape)
-			WriteInkscapeLayerAttributes(w, "layer1", "moritz", true );
+			#region layers
 
-            #region pageObjects
-            w.SvgRect("frame", null, 0, 0, _pageFormat.Right, _pageFormat.Bottom, "#CCCCCC", 1, "white");
+			int layerNumber = 1;
 
-            WriteStyle(w);
+			WriteBoundaryLayer(w, layerNumber++, "boundary", _pageFormat.Right, _pageFormat.Bottom);
 
-            w.SvgText(_infoTextInfo, 80, 80);
+			WriteMoritzLayer(w, layerNumber++, "moritz", pageNumber, metadata);
 
-            if(_pageNumber == 1)
-            {
-                WritePage1LinkTitleAndAuthor(w, metadata);
-            }
-            #endregion
+			WriteEmptyLayer(w, layerNumber++, "score annotations", false);
 
-            int systemNumber = 1;
-            foreach(SvgSystem system in Systems)
-            {
-                system.WriteSVG(w, pageNumber, systemNumber++, _pageFormat);
-            }
+			WriteEmptyLayer(w, layerNumber++, "user annotations", true);
 
-			w.WriteEndElement(); // end layer1 (for Inkscape)
+			WriteTransparentClickableSurfaceLayer(w, layerNumber++, "transparent, clickable surface",
+						 _pageFormat.Right, _pageFormat.Bottom);
+			#endregion layers
 
-			w.WriteStartElement("g"); // start layer2 (for Inkscape)
-			WriteInkscapeLayerAttributes(w, "layer2", "annotations", false);
-			w.WriteEndElement(); // end layer2 (for Inkscape)
-			
 			w.WriteEndElement(); // close the svg element
             w.WriteEndDocument();
         }
+
+		private void WritePageSizedLayer(SvgWriter w, int layerNumber, string layerName, float width, float height, string style)
+		{
+			w.WriteStartElement("g"); // start layer (for Inkscape)
+			WriteInkscapeLayerAttributes(w, layerNumber, layerName, true);
+
+			w.WriteStartElement("rect");
+			w.WriteAttributeString("x", "0");
+			w.WriteAttributeString("y", "0");
+			w.WriteAttributeString("width", width.ToString(M.En_USNumberFormat));
+			w.WriteAttributeString("height", height.ToString(M.En_USNumberFormat));
+			w.WriteAttributeString("style", style);
+
+			w.WriteEndElement(); // rect
+			w.WriteEndElement(); // end layer2 (for Inkscape)
+		}
+
+		private void WriteBoundaryLayer(SvgWriter w, int layerNumber, string layerName, float width, float height)
+		{
+			string style = "stroke:black; stroke-width:4; fill:#ffffff";
+			WritePageSizedLayer(w, layerNumber, layerName, width, height, style);
+		}
+
+		private void WriteMoritzLayer(SvgWriter w, int layerNumber, string layerName, int pageNumber, Metadata metadata)
+		{
+			w.WriteStartElement("g"); // start layer (for Inkscape)
+			WriteInkscapeLayerAttributes(w, layerNumber, layerName, true);
+
+			w.SvgText(_infoTextInfo, 80, 80);
+
+			if(_pageNumber == 1)
+			{
+				WritePage1TitleAndAuthor(w, metadata);
+			}
+
+			int systemNumber = 1;
+			foreach(SvgSystem system in Systems)
+			{
+				system.WriteSVG(w, pageNumber, systemNumber++, _pageFormat);
+			}
+
+			w.WriteEndElement(); // end layer (for Inkscape)
+		}
+
+		private void WriteEmptyLayer(SvgWriter w, int layerNumber, string layerName, bool locked)
+		{
+			w.WriteStartElement("g"); // start layer (for Inkscape)
+			WriteInkscapeLayerAttributes(w, layerNumber, layerName, locked);
+			w.WriteEndElement(); // end layer (for Inkscape)
+		}
+
+
+		private void WriteTransparentClickableSurfaceLayer(SvgWriter w, int layerNumber, string layerName, float width, float height)
+		{
+			string style = "stroke:none; fill:#ffffff; fill-opacity:0";
+			WritePageSizedLayer(w, layerNumber, layerName, width, height, style);
+		}
 
 		/// <summary>
 		/// The presence of this element means that Inkscape opens the file at full screen size
@@ -147,9 +193,11 @@ namespace Moritz.Symbols
 		/// <param name="w"></param>
 		private void WriteSodipodiNamedview(SvgWriter w)
 		{
+			string scoreAnnotationsLayerID = "layer3";
+
 			w.WriteStartElement("sodipodi", "namedview", null);
 			w.WriteAttributeString("inkscape", "window-maximized", null, "1");
-			w.WriteAttributeString("inkscape", "current-layer", null, "layer2");
+			w.WriteAttributeString("inkscape", "current-layer", null, scoreAnnotationsLayerID);
 			w.WriteEndElement(); // ends the sodipodi:namedview element
 		}
 
@@ -187,11 +235,11 @@ namespace Moritz.Symbols
 		///			sodipodi:insensitive="true"
 		/// </summary>
 		/// <param name="w"></param>
-		private void WriteInkscapeLayerAttributes(SvgWriter w, String layerID, String layerName, bool insensitive )
+		private void WriteInkscapeLayerAttributes(SvgWriter w, int layerNumber, String layerName, bool insensitive )
 		{
 			//w.WriteAttributeString("score", "staffName", null, this.Staffname);
 			w.WriteAttributeString("inkscape", "groupmode", null, "layer");
-			w.WriteAttributeString("id", layerID);
+			w.WriteAttributeString("id", "layer" + layerNumber.ToString());
 			w.WriteAttributeString("inkscape", "label", null, layerName);
 			w.WriteAttributeString("style", "display:inline");
 			if(insensitive == true)
@@ -208,86 +256,24 @@ namespace Moritz.Symbols
             w.WriteEndElement(); // script
         }
 
-        // This style stops the cursor changing to an I-beam every time it
-        // passes over text (such as noteheads, clefs, dynamics etc.)
-        private void WriteStyle(SvgWriter w)
-        {
-            w.WriteStartElement("style");
-            w.WriteString("text:hover{cursor:default;}");
-            w.WriteEndElement();
-        }
+		/// <summary>
+		/// Adds the link, main title and the author to the first page.
+		/// </summary>
+		protected void WritePage1TitleAndAuthor(SvgWriter w, Metadata metadata)
+		{
+			string fontFamily = "Estrangelo Edessa";
 
-        /// <summary>
-        /// Adds the link, main title and the author to the first page.
-        /// </summary>
-        protected void WritePage1LinkTitleAndAuthor(SvgWriter w, Metadata metadata)
-        {
-            string fontFamily = "Estrangelo Edessa";
-
-            TextInfo titleInfo =
-                new TextInfo(metadata.MainTitle, fontFamily, _pageFormat.Page1TitleHeight,
-                    null, TextHorizAlign.center);
-            TextInfo authorInfo =
-              new TextInfo(metadata.Author, fontFamily, _pageFormat.Page1AuthorHeight,
-                  null, TextHorizAlign.right);
-            w.WriteStartElement("g");
-            w.WriteAttributeString("id", "page1LinkTitleAndAuthor" + SvgScore.UniqueID_Number);
-
-            WriteAboutLink(w, _pageFormat.AboutLinkURL, _pageFormat.AboutLinkText, fontFamily, _pageFormat.LeftMarginPos, _pageFormat.Page1TitleY);
-
-            w.SvgText(titleInfo, _pageFormat.Right / 2F, _pageFormat.Page1TitleY);
-            w.SvgText(authorInfo, _pageFormat.RightMarginPos, _pageFormat.Page1TitleY);
-            w.WriteEndElement(); // group
-        }
-
-        /// <summary>
-        /// If both _pageFormat.AboutLinkURL and _pageFormat.AboutLinkText are set, 
-        /// creates a link to the "About" file for this score (on my website).
-        /// Audio recordings should be included in the "About" documents for each composition.
-        /// </summary>
-        /// <param name="w"></param>
-        /// <param name="aboutURL"></param> 
-        /// <param name="aboutLinkText"></param>
-        /// <param name="fontFamily"></param>
-        /// <param name="left"></param>
-        /// <param name="titleBaseline"></param>
-        private void WriteAboutLink(
-            XmlWriter w,
-            string aboutURL,
-            string aboutLinkText,
-            string fontFamily,
-            float left,
-            float titleBaseline)
-        {
-            if(!String.IsNullOrEmpty(aboutURL) && !String.IsNullOrEmpty(aboutLinkText))
-            {
-                w.WriteStartElement("a");
-                w.WriteAttributeString("class", "linkClass");
-                w.WriteAttributeString("xlink", "href", null, aboutURL);
-                w.WriteAttributeString("xlink", "show", null, "new"); // open link in new window
-
-                w.WriteStartElement("text");
-                w.WriteAttributeString("x", left.ToString(M.En_USNumberFormat));
-                w.WriteAttributeString("y", titleBaseline.ToString(M.En_USNumberFormat));
-                w.WriteAttributeString("fill", "#1010C6");
-                w.WriteAttributeString("text-anchor", "start");
-                w.WriteAttributeString("font-size", _pageFormat.Page1AuthorHeight.ToString(M.En_USNumberFormat));
-                w.WriteAttributeString("font-family", fontFamily);
-
-                w.WriteStartElement("style");
-                w.WriteString(".linkClass:hover{text-decoration:underline;}");
-                w.WriteEndElement();
-
-                w.WriteString(aboutLinkText);
-
-                w.WriteEndElement(); // text
-                w.WriteEndElement(); // a 
-            }
-            else
-            {
-                MessageBox.Show("A link to my website document about this score should be provided in the Assistant Composer's Metadata dialog.", "Reminder");
-            }
-        }
+			TextInfo titleInfo =
+				new TextInfo(metadata.MainTitle, fontFamily, _pageFormat.Page1TitleHeight,
+					null, TextHorizAlign.center);
+			TextInfo authorInfo =
+			  new TextInfo(metadata.Author, fontFamily, _pageFormat.Page1AuthorHeight,
+				  null, TextHorizAlign.right);
+			w.WriteStartElement("g");
+			w.SvgText(titleInfo, _pageFormat.Right / 2F, _pageFormat.Page1TitleY);
+			w.SvgText(authorInfo, _pageFormat.RightMarginPos, _pageFormat.Page1TitleY);
+			w.WriteEndElement(); // group
+		}
 
         #region used when creating graphic score
         private readonly SvgScore _score;
