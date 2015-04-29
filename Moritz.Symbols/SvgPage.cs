@@ -113,16 +113,11 @@ namespace Moritz.Symbols
 
 			int layerNumber = 1;
 
-			WriteBoundaryLayer(w, layerNumber++, "boundary", _pageFormat.Right, _pageFormat.Bottom);
+			WriteFrameLayer(w, layerNumber++, "frame", _pageFormat.Right, _pageFormat.Bottom);
 
-			WriteMoritzLayer(w, layerNumber++, "moritz", pageNumber, metadata);
-
-			WriteEmptyLayer(w, layerNumber++, "score annotations", false);
+			WriteScoreLayer(w, layerNumber++, "score", pageNumber, metadata);
 
 			WriteEmptyLayer(w, layerNumber++, "user annotations", true);
-
-			WriteTransparentClickableSurfaceLayer(w, layerNumber++, "transparent, clickable surface",
-						 _pageFormat.Right, _pageFormat.Bottom);
 			#endregion layers
 
 			w.WriteEndElement(); // close the svg element
@@ -145,13 +140,13 @@ namespace Moritz.Symbols
 			w.WriteEndElement(); // end layer2 (for Inkscape)
 		}
 
-		private void WriteBoundaryLayer(SvgWriter w, int layerNumber, string layerName, float width, float height)
+		private void WriteFrameLayer(SvgWriter w, int layerNumber, string layerName, float width, float height)
 		{
 			string style = "stroke:black; stroke-width:4; fill:#ffffff";
 			WritePageSizedLayer(w, layerNumber, layerName, width, height, style);
 		}
 
-		private void WriteMoritzLayer(SvgWriter w, int layerNumber, string layerName, int pageNumber, Metadata metadata)
+		private void WriteScoreLayer(SvgWriter w, int layerNumber, string layerName, int pageNumber, Metadata metadata)
 		{
 			w.WriteStartElement("g"); // start layer (for Inkscape)
 			WriteInkscapeLayerAttributes(w, layerNumber, layerName, true);
@@ -177,13 +172,6 @@ namespace Moritz.Symbols
 			w.WriteStartElement("g"); // start layer (for Inkscape)
 			WriteInkscapeLayerAttributes(w, layerNumber, layerName, locked);
 			w.WriteEndElement(); // end layer (for Inkscape)
-		}
-
-
-		private void WriteTransparentClickableSurfaceLayer(SvgWriter w, int layerNumber, string layerName, float width, float height)
-		{
-			string style = "stroke:none; fill:#ffffff; fill-opacity:0";
-			WritePageSizedLayer(w, layerNumber, layerName, width, height, style);
 		}
 
 		/// <summary>

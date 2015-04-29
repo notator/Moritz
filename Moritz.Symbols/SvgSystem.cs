@@ -28,13 +28,6 @@ namespace Moritz.Symbols
             w.SvgStartGroup("system", "page" + pageNumber.ToString() + "_system" + systemNumber.ToString());
             //w.WriteAttributeString("score", "object", null, "system");
 
-            // the markers are behind the notes.
-            w.SvgStartGroup("markers", null);
-
-            WriteMarkers(w);
-
-            w.SvgEndGroup(); // markers
-
             for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
             {
                 Staves[staffIndex].WriteSVG(w, pageNumber, systemNumber, staffIndex + 1);
@@ -143,28 +136,6 @@ namespace Moritz.Symbols
             }
             return rval;
         }
-
-        /// <summary>
-        /// There are three markers per system: startMarker, runningMarker and endMarker.
-        /// They initially have parameters which make them invisible. 
-        /// The parameters are set properly in Javascript when loading the score.
-        /// </summary>
-        private void WriteMarkers(SvgWriter w)
-        {
-            w.SvgStartGroup("startMarker", null);
-            w.SvgLine(null, 0, 0, 0, 0, null, 1, null);
-			w.SvgCircle(null, 0, 0, 0, null, 1, null);
-            w.SvgEndGroup();
-
-            w.SvgStartGroup("runningMarker", null);
-            w.SvgLine(null, 0, 0, 0, 0, null, 1, null);
-            w.SvgEndGroup();
-
-            w.SvgStartGroup("endMarker", null);
-            w.SvgLine(null, 0, 0, 0, 0, null, 1, null);
-            w.SvgRect(null, 0, 0, 0, 0, null, 1, null);
-            w.SvgEndGroup();
-         }
 
         #region make graphics
         /// <summary>
