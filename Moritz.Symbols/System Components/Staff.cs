@@ -18,15 +18,15 @@ namespace Moritz.Symbols
             StafflineStemStrokeWidth = stafflineStemStrokeWidth;
         }
 
-        public abstract void WriteSVG(SvgWriter w, int pageNumber, int systemNumber, int staffNumber);
+        public abstract void WriteSVG(SvgWriter w, int systemNumber, int staffNumber);
 
-        public virtual void WriteSVG(SvgWriter w, bool staffIsVisible)
+        public virtual void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber)
         {
             if(staffIsVisible)
             {            
                 w.WriteAttributeString("score", "staffName", null, this.Staffname);
 
-                w.SvgStartGroup("stafflines", null);
+                w.SvgStartGroup("stafflines", "sys" + systemNumber.ToString() + "staff" + staffNumber.ToString() + "stafflines");
                 float stafflineY = this.Metrics.StafflinesTop;
                 for(int staffLineIndex = 0; staffLineIndex < NumberOfStafflines; staffLineIndex++)
                 {
@@ -39,9 +39,10 @@ namespace Moritz.Symbols
                 }
                 w.SvgEndGroup();
             }
+			int voiceNumber = 1;
             foreach(Voice voice in Voices)
             {
-                voice.WriteSVG(w, true);
+				voice.WriteSVG(w, staffIsVisible, systemNumber, staffNumber, voiceNumber++);
             }
         }
 

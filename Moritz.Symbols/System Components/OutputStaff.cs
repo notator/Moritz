@@ -15,11 +15,11 @@ namespace Moritz.Symbols
         /// <summary>
         /// Writes out the stafflines and noteObjects of an OutputStaff.
         /// </summary>
-        public override void WriteSVG(SvgWriter w, int pageNumber, int systemNumber, int staffNumber)
+        public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber)
         {
-            w.SvgStartGroup("outputStaff", "p" + pageNumber.ToString() + "_sys" + systemNumber.ToString() + "_staff" + staffNumber.ToString());
+            w.SvgStartGroup("outputStaff", "sys" + systemNumber.ToString() + "staff" + staffNumber.ToString());
 
-            base.WriteSVG(w, true);
+            base.WriteSVG(w, true, systemNumber, staffNumber);
 
             w.SvgEndGroup(); // outputStaff
         }
@@ -35,14 +35,15 @@ namespace Moritz.Symbols
         /// <summary>
         /// Writes out the (invisible) voices
         /// </summary>
-        public override void WriteSVG(SvgWriter w, int pageNumber, int systemNumber, int staffNumber)
+        public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber)
         {
-            w.SvgStartGroup("outputStaff", "p" + pageNumber.ToString() + "_sys" + systemNumber.ToString() + "_staff" + staffNumber.ToString());
+            w.SvgStartGroup("outputStaff", "sys" + systemNumber.ToString() + "staff" + staffNumber.ToString());
             w.WriteAttributeString("score", "invisible", null, "1");
 
+			int voiceNumber = 1;
             foreach(Voice voice in Voices)
             {
-                voice.WriteSVG(w, false);
+                voice.WriteSVG(w, false, systemNumber, staffNumber, voiceNumber++);
             }
 
             w.SvgEndGroup(); // outputStaff

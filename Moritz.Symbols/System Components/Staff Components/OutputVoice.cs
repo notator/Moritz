@@ -18,9 +18,9 @@ namespace Moritz.Symbols
             _masterVolume = masterVolume;
         }
 
-        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
+		public override void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, int voiceNumber)
         {
-            w.SvgStartGroup("outputVoice", null);
+			w.SvgStartGroup("outputVoice", "sys" + systemNumber.ToString() + "staff" + staffNumber.ToString() + "voice" + voiceNumber.ToString());
 
             if(MasterVolume != null) // is non-null only in the first system
             {

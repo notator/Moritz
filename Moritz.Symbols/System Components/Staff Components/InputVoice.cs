@@ -19,9 +19,9 @@ namespace Moritz.Symbols
         /// <summary>
         /// Writes out the noteObjects, and possibly the performanceOptions for an InputVoice.
         /// </summary>
-        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
+        public override void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, int voiceNumber)
         {
-            w.SvgStartGroup("inputVoice", null);
+			w.SvgStartGroup("inputVoice", "sys" + systemNumber.ToString() + "staff" + staffNumber.ToString() + "voice" + voiceNumber.ToString());
 
             if(_midiChannel < byte.MaxValue)
             {

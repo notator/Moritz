@@ -23,14 +23,14 @@ namespace Moritz.Symbols
         /// Writes out all the SVGSystem's staves. 
         /// </summary>
         /// <param name="w"></param>
-        public void WriteSVG(SvgWriter w, int pageNumber, int systemNumber, PageFormat pageFormat)
+        public void WriteSVG(SvgWriter w, int systemNumber, PageFormat pageFormat)
         {
-            w.SvgStartGroup("system", "page" + pageNumber.ToString() + "_system" + systemNumber.ToString());
+            w.SvgStartGroup("system", "sys" + systemNumber.ToString());
             //w.WriteAttributeString("score", "object", null, "system");
 
             for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
             {
-                Staves[staffIndex].WriteSVG(w, pageNumber, systemNumber, staffIndex + 1);
+                Staves[staffIndex].WriteSVG(w, systemNumber, staffIndex + 1);
             }
 
             w.SvgStartGroup("barlines", null);

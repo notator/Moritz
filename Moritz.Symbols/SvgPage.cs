@@ -151,7 +151,7 @@ namespace Moritz.Symbols
 			w.WriteStartElement("g"); // start layer (for Inkscape)
 			WriteInkscapeLayerAttributes(w, layerNumber, layerName, true);
 
-			w.SvgText(_infoTextInfo, 80, 80);
+			w.SvgText("timeStamp", _infoTextInfo, 80, 80);
 
 			if(_pageNumber == 1)
 			{
@@ -161,7 +161,7 @@ namespace Moritz.Symbols
 			int systemNumber = 1;
 			foreach(SvgSystem system in Systems)
 			{
-				system.WriteSVG(w, pageNumber, systemNumber++, _pageFormat);
+				system.WriteSVG(w, systemNumber++, _pageFormat);
 			}
 
 			w.WriteEndElement(); // end layer (for Inkscape)
@@ -181,11 +181,11 @@ namespace Moritz.Symbols
 		/// <param name="w"></param>
 		private void WriteSodipodiNamedview(SvgWriter w)
 		{
-			string scoreAnnotationsLayerID = "layer3";
+			string scoreLayerID = "layer2";
 
 			w.WriteStartElement("sodipodi", "namedview", null);
 			w.WriteAttributeString("inkscape", "window-maximized", null, "1");
-			w.WriteAttributeString("inkscape", "current-layer", null, scoreAnnotationsLayerID);
+			w.WriteAttributeString("inkscape", "current-layer", null, scoreLayerID);
 			w.WriteEndElement(); // ends the sodipodi:namedview element
 		}
 
@@ -258,8 +258,9 @@ namespace Moritz.Symbols
 			  new TextInfo(metadata.Author, fontFamily, _pageFormat.Page1AuthorHeight,
 				  null, TextHorizAlign.right);
 			w.WriteStartElement("g");
-			w.SvgText(titleInfo, _pageFormat.Right / 2F, _pageFormat.Page1TitleY);
-			w.SvgText(authorInfo, _pageFormat.RightMarginPos, _pageFormat.Page1TitleY);
+			w.WriteAttributeString("id", "titles");
+			w.SvgText("mainTitle", titleInfo, _pageFormat.Right / 2F, _pageFormat.Page1TitleY);
+			w.SvgText("author", authorInfo, _pageFormat.RightMarginPos, _pageFormat.Page1TitleY);
 			w.WriteEndElement(); // group
 		}
 

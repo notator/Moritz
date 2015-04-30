@@ -577,7 +577,7 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            w.SvgText(_textInfo, _originX, _originY);
+            w.SvgText(null, _textInfo, _originX, _originY);
         }
 
         /// <summary>

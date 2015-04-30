@@ -32,10 +32,12 @@ namespace Moritz.Symbols
 			string pageTitle = MainTitle + ", page " + pageNumber.ToString() + " of " + nScorePages.ToString();
 
             w.WriteStartElement("title");
+			w.WriteAttributeString("id", "pageTitle");
 			w.WriteString(pageTitle);
             w.WriteEndElement();
 
             w.WriteStartElement("metadata"); // Inkscape compatible
+			w.WriteAttributeString("id", "metadata");
 			w.WriteStartElement("rdf", "RDF", null);
 			w.WriteStartElement("cc", "Work", null);
 			w.WriteAttributeString("rdf", "about", null, "");

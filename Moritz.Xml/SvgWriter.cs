@@ -275,9 +275,14 @@ namespace Moritz.Xml
             _w.WriteEndElement(); // path
         }
 
-        public void SvgText(TextInfo textInfo, float x, float y)
+        public void SvgText(string id, TextInfo textInfo, float x, float y)
         {
             _w.WriteStartElement("text");
+			if(!String.IsNullOrEmpty(id))
+			{
+				_w.WriteAttributeString("id", id);
+
+			}
             _w.WriteAttributeString("x", x.ToString(M.En_USNumberFormat));
             _w.WriteAttributeString("y", y.ToString(M.En_USNumberFormat));
             switch(textInfo.TextHorizAlign)

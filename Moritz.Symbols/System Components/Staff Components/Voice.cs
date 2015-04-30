@@ -11,7 +11,7 @@ namespace Moritz.Symbols
     /// <summary>
     ///  A sequence of noteObjects.
     /// </summary>
-    public class Voice
+    public abstract class Voice
     {
         public Voice(Staff staff, Voice voice)
         {
@@ -24,6 +24,8 @@ namespace Moritz.Symbols
         {
             Staff = staff;
         }
+
+		public abstract void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, int voiceNumber);
 
         /// <summary>
         /// Writes out an SVG Voice

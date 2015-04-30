@@ -15,11 +15,11 @@ namespace Moritz.Symbols
         /// <summary>
         /// Writes out the stafflines, and noteObjects for an InputStaff.
         /// </summary>
-        public override void WriteSVG(SvgWriter w, int pageNumber, int systemNumber, int staffNumber)
+        public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber)
         {
-            w.SvgStartGroup("inputStaff", "p" + pageNumber.ToString() + "_sys" + systemNumber.ToString() + "_staff" + staffNumber.ToString());
+            w.SvgStartGroup("inputStaff", "sys" + systemNumber.ToString() + "staff" + staffNumber.ToString());
 
-            base.WriteSVG(w, true);
+            base.WriteSVG(w, true, systemNumber, staffNumber);
 
             w.SvgEndGroup(); // InputStaff
         }
