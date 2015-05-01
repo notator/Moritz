@@ -1,7 +1,6 @@
+using System;
 using System.Drawing;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Diagnostics;
 using System.Windows.Forms;
 
@@ -26,7 +25,9 @@ namespace Moritz.Symbols
         public void WriteSVG(SvgWriter w, int systemNumber, PageFormat pageFormat)
         {
             w.SvgStartGroup("system", "sys" + systemNumber.ToString());
-            //w.WriteAttributeString("score", "object", null, "system");
+
+			int height = (int) Math.Ceiling(Metrics.Bottom - Metrics.Top);
+            w.WriteAttributeString("height", height.ToString());
 
             for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
             {
