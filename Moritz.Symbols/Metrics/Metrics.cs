@@ -534,7 +534,7 @@ namespace Moritz.Symbols
         }
 
         /// <summary>
-        /// Only writes the Barline's barnumber to the SVG file.
+        /// Writes the staffName and Barline's barnumber to the SVG file.
         /// The barline itself is drawn when the system is complete.
         /// </summary>
         public override void WriteSVG(SvgWriter w)
@@ -1314,7 +1314,7 @@ namespace Moritz.Symbols
             ResetBoundary();
         }
 
-        public void ResetBoundary()
+        public virtual void ResetBoundary()
         {
             _top = float.MaxValue;
             _right = float.MinValue;

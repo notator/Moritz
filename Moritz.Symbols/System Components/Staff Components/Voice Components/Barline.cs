@@ -21,29 +21,39 @@ namespace Moritz.Symbols
         }
 
         /// <summary>
-        /// This function only writes the staff name and barnumber to the SVG file (if they are present).
-        /// The barline itself is drawn when the system (and staff edges) is complete.
+        /// This function also writes the staff name and barnumber to the SVG file (if they are present).
         /// </summary>
         public override void WriteSVG(SvgWriter w, bool staffIsVisible)
         {
-            BarlineMetrics barlineMetrics = Metrics as BarlineMetrics;
-            if(barlineMetrics != null && staffIsVisible)
-            {
-                barlineMetrics.WriteSVG(w);
-            }
+			SvgSystem system = Voice.Staff.SVGSystem;
+
+			if(staffIsVisible)
+			{ 
+				BarlineMetrics barlineMetrics = Metrics as BarlineMetrics;
+				if(barlineMetrics != null)
+				{
+					barlineMetrics.WriteSVG(w);
+					//if(barlineMetrics.BarnumberMetrics != null)
+					//	system.Metrics.Add(barlineMetrics.BarnumberMetrics);
+				}
+
+				float barlineStrokewidth = system.Score.PageFormat.BarlineStrokeWidth;
+				float top = Voice.Staff.Metrics.StafflinesTop;
+				float bottom = Voice.Staff.Metrics.StafflinesBottom;
+				WriteSVG(w, top, bottom, barlineStrokewidth);
+			}
         }
 
         /// <summary>
         /// Writes out an SVG Barline.
         /// May be called twice per staff.barline:
-        ///     1. for the range between top and bottom stafflines (if Barline.Visible is true)
-        ///     2. for the range between the staff's lower edge and the next staff's upper edge
+        ///     1. inside each voice, for the range between top and bottom stafflines (if Barline.Visible is true)
+        ///     2. for the range between a staff's lower edge and the next staff's upper edge
         ///        (if the staff's lower neighbour is in the same group)
         /// </summary>
         /// <param name="w"></param>
         public void WriteSVG(SvgWriter w, float topY, float bottomY, float strokeWidth)
         {
-            w.SvgStartGroup("barline", null);
             if(BarlineType == BarlineType.end)
             {
                 w.SvgLine(null,
@@ -59,7 +69,6 @@ namespace Moritz.Symbols
             {
                 w.SvgLine(null, this.Metrics.OriginX, topY, this.Metrics.OriginX, bottomY, this.ColorString.String, strokeWidth, null);
             }
-            w.SvgEndGroup();
         }
 
         internal Text SetFramedText(string text, string fontFace, float textFontHeight, float paddingX, float paddingY, float strokeWidth)
@@ -82,13 +91,4 @@ namespace Moritz.Symbols
         /// </summary>
         public bool Visible = true;
 	}
-
-    internal class RedBarline : Barline
-    {
-        public RedBarline(Voice voice)
-            :base(voice)
-        {
-            ColorString = new ColorString(Color.Red);
-        }
-    }
 }

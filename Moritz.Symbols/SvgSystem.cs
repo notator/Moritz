@@ -26,7 +26,7 @@ namespace Moritz.Symbols
         {
             w.SvgStartGroup("system", "sys" + systemNumber.ToString());
 
-			int height = (int) Math.Ceiling(Metrics.Bottom - Metrics.Top);
+			int height = (int) Math.Ceiling((Metrics.Bottom - Metrics.Top) / pageFormat.ViewBoxMagnification);
             w.WriteAttributeString("height", height.ToString());
 
             for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
@@ -76,25 +76,6 @@ namespace Moritz.Symbols
                         break;
                 }
                 #endregion set barlinesTop, barlinesBottom
-
-                #region draw barlines through stafflines
-                for(int i = 0; i < voice.NoteObjects.Count; ++i)
-                {
-                    barline = voice.NoteObjects[i] as Barline;
-                    if(barline != null)
-                    {
-                        if(barline.Visible)
-                        {
-                            if(staff.NumberOfStafflines >= 5 && i == (voice.NoteObjects.Count - 1))
-                            {
-                                barlinesTop -= (stafflineStrokeWidth / 2);
-                                barlinesBottom += (stafflineStrokeWidth / 2);
-                            }
-                            barline.WriteSVG(w, barlinesTop, barlinesBottom, barlineStrokeWidth);
-                        }
-                    }
-                }
-                #endregion
 
                 #region draw barlines down from staves
                 if(staffIndex < Staves.Count - 1)
@@ -158,6 +139,7 @@ namespace Moritz.Symbols
             // the left. If two standard chords are synchronous in two voices of the same staff,
             // and the noteheads would overlap, the lower chord will have been been moved slightly
             // left or right. The two chords are at their final positions relative to each other.
+			// Barnumbers are aligned centred at a default position just above the first barline
 
             MoveClefsAndBarlines(pageFormat.StafflineStemStrokeWidth);
 
@@ -191,15 +173,15 @@ namespace Moritz.Symbols
                 symbolSet.AddNoteheadExtenderLines(Staves, pageFormat.RightMarginPos, pageFormat.Gap,
                     pageFormat.NoteheadExtenderStrokeWidth, pageFormat.StafflineStemStrokeWidth, nextSystem);
 
-                AlignStaffnamesInLeftMargin(leftMargin, pageFormat.Gap);
-
-                ResetStaffMetricsBoundaries();
-
                 SetBarlineVisibility(pageFormat.BarlineContinuesDownList);
 
                 JustifyVertically(pageFormat.Right, pageFormat.Gap);
 
                 AdjustBarnumberVertically(pageFormat.Gap);
+
+				AlignStaffnamesInLeftMargin(leftMargin, pageFormat.Gap);
+
+				ResetStaffMetricsBoundaries();
             }
             else
             {
@@ -239,9 +221,9 @@ namespace Moritz.Symbols
                         NoteObject noteObject = staff.Voices[voiceIndex].NoteObjects[nIndex];
                         noteObject.Metrics = Score.Notator.SymbolSet.NoteObjectMetrics(graphics, noteObject, voice.StemDirection, staff.Gap, staff.StafflineStemStrokeWidth);
 
-                        if(noteObject.Metrics != null)
-                            staff.Metrics.Add(noteObject.Metrics);
-                        else
+						if(noteObject.Metrics != null)
+							staff.Metrics.Add(noteObject.Metrics);
+						else
                             NoteObjectsToRemove.Add(noteObject);
                     }
 
@@ -1097,7 +1079,7 @@ namespace Moritz.Symbols
                             float alignX = leftMarginPos / 2F;
                             float deltaX = alignX - barlineMetrics.OriginX + gap;
                             staffNameMetrics.Move(deltaX, 0F);
-                        }
+						}
                         break;
                     }
                 }
@@ -1108,7 +1090,7 @@ namespace Moritz.Symbols
         {
             foreach(Staff staff in Staves)
             {
-                if(!(staff is InvisibleOutputStaff))
+                if(!(staff is InvisibleOutputStaff)) 
                     staff.Metrics.ResetBoundary();
             }
         }
