@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 
 using Moritz.Xml;
+using Moritz.Globals;
 
 namespace Moritz.Symbols
 {
@@ -27,7 +28,7 @@ namespace Moritz.Symbols
             w.SvgStartGroup("system", "sys" + systemNumber.ToString());
 
 			float height = (Metrics.Bottom - Metrics.Top) / pageFormat.ViewBoxMagnification;
-            w.WriteAttributeString("height", height.ToString());
+            w.WriteAttributeString("height", height.ToString(M.En_USNumberFormat));
 
             for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
             {
