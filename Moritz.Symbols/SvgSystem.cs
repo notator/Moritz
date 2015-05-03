@@ -26,7 +26,7 @@ namespace Moritz.Symbols
         {
             w.SvgStartGroup("system", "sys" + systemNumber.ToString());
 
-			int height = (int) Math.Ceiling((Metrics.Bottom - Metrics.Top) / pageFormat.ViewBoxMagnification);
+			float height = (Metrics.Bottom - Metrics.Top) / pageFormat.ViewBoxMagnification;
             w.WriteAttributeString("height", height.ToString());
 
             for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
