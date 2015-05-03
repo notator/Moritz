@@ -35,13 +35,25 @@ namespace Moritz.Symbols
         {
             foreach(NoteObject noteObject in NoteObjects)
             {
+				Barline barline = noteObject as Barline;
+				if(staffIsVisible && barline != null)
+				{
+					float top = Staff.Metrics.StafflinesTop;
+					float bottom = Staff.Metrics.StafflinesBottom;
+					float strokeWidth = Staff.SVGSystem.Score.PageFormat.BarlineStrokeWidth;
+					barline.WriteSVG(w, top, bottom, strokeWidth);
+				}
+
                 ChordSymbol chordSymbol = noteObject as ChordSymbol;
                 if(chordSymbol != null)
                 {
                     chordSymbol.WriteSVG(w, staffIsVisible);
                 }
                 else
+				{
+					// if this is the first barline, the staff name and (maybe) barnumber will be written.
                     noteObject.WriteSVG(w, staffIsVisible);
+				}
             }
         }
 

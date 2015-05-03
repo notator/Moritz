@@ -261,26 +261,9 @@ namespace Moritz.Xml
 	public enum Articulation { staccato, tenuto, staccatissimo, normalAccent, strongAccent, weakBeat, strongBeat };
 
 	#region ExplicitBarlines
-	/// <summary>
-	/// Attribute of (noteObjects) "barline". Specifies the barline type.
-	/// Attribute name: "type"
-	/// The CapXML values: *** New in capella 2008: "dashed"
-	///   "single"
-	///   "double"
-	///   "end"
-	///   "repEnd"
-	///   "repBegin"
-	///   "repEndBegin"
-	///   "dashed"
-	/// When writing CapXML files, retrieve the field name or Description attribute
-	/// as a string using
-	///		M.GetEnumDescription()
-	/// </summary>
 	public enum BarlineType 
 	{
-		single,
-		[Description("double")] 
-		double_, 
+		single, 
 		end
 	};
 

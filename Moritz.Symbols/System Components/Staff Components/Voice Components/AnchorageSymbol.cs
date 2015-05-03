@@ -38,7 +38,6 @@ namespace Moritz.Symbols
         }
 
         public List<DrawObject> DrawObjects { get { return _drawObjects; } set { _drawObjects = value; } }
-        public ColorString ColorString = new ColorString("000000");
 
         private List<DrawObject> _drawObjects = new List<DrawObject>();
       

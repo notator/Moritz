@@ -43,23 +43,21 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         public void WriteSVG(SvgWriter w, float topY, float bottomY, float strokeWidth)
         {
-            w.SvgStartGroup("barline", null);
             if(BarlineType == BarlineType.end)
             {
                 w.SvgLine(null,
                     this.Metrics.OriginX - (strokeWidth * 3F), topY,
                     this.Metrics.OriginX - (strokeWidth * 3F), bottomY,
-                    this.ColorString.String, strokeWidth, null);
+                    "black", strokeWidth, null);
                 w.SvgLine(null,
                     this.Metrics.OriginX, topY,
                     this.Metrics.OriginX, bottomY,
-                    this.ColorString.String, strokeWidth * 2F, null);
+                    "black", strokeWidth * 2F, null);
             }
             else
             {
-                w.SvgLine(null, this.Metrics.OriginX, topY, this.Metrics.OriginX, bottomY, this.ColorString.String, strokeWidth, null);
+                w.SvgLine(null, this.Metrics.OriginX, topY, this.Metrics.OriginX, bottomY, "black", strokeWidth, null);
             }
-            w.SvgEndGroup();
         }
 
         internal Text SetFramedText(string text, string fontFace, float textFontHeight, float paddingX, float paddingY, float strokeWidth)
@@ -73,22 +71,13 @@ namespace Moritz.Symbols
         public override string ToString()
 		{
 			string type = M.GetEnumDescription(BarlineType);
-			return "ExplicitBarline: " + type;
+			return "Barline: " + type;
 		}
 
-		public BarlineType BarlineType = BarlineType.single; // capella default
+		public BarlineType BarlineType = BarlineType.single; // default
         /// <summary>
         /// Default is true
         /// </summary>
         public bool Visible = true;
 	}
-
-    internal class RedBarline : Barline
-    {
-        public RedBarline(Voice voice)
-            :base(voice)
-        {
-            ColorString = new ColorString(Color.Red);
-        }
-    }
 }
