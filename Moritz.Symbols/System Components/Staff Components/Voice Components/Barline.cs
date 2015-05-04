@@ -45,7 +45,7 @@ namespace Moritz.Symbols
         {
 			float topY = topStafflineY;
 			float bottomY = bottomStafflineY;
-			if(isLastNoteObject)
+			if(isLastNoteObject && !isConnector)
 			{
 				float halfStrokeWidth = (stafflineStrokeWidth / 2);
 				topY -= halfStrokeWidth;
@@ -57,8 +57,8 @@ namespace Moritz.Symbols
             {
 				barlineClass = isConnector ? null : "endBarlineLeft";
 				w.SvgLine(barlineClass,
-					this.Metrics.OriginX - (singleBarlineStrokeWidth * 3F), topStafflineY,
-					this.Metrics.OriginX - (singleBarlineStrokeWidth * 3F), bottomStafflineY,
+					this.Metrics.OriginX - (singleBarlineStrokeWidth * 3F), topY,
+					this.Metrics.OriginX - (singleBarlineStrokeWidth * 3F), bottomY,
                     "black", singleBarlineStrokeWidth, null);
 
 				barlineClass = isConnector ? null : "endBarlineRight";
