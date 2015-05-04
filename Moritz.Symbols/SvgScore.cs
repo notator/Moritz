@@ -17,6 +17,7 @@ namespace Moritz.Symbols
         public SvgScore(string folder, string scoreTitleName, string keywords, string comment, PageFormat pageFormat)
         {
             _pageFormat = pageFormat;
+			_uniqueID_Number = 0;
             SetFilePathAndMetadata(folder, scoreTitleName, keywords, comment);
         }
 
