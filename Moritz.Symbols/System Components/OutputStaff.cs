@@ -37,7 +37,7 @@ namespace Moritz.Symbols
         /// </summary>
         public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber)
         {
-            w.SvgStartGroup("outputStaff", "sys" + systemNumber.ToString() + "staff" + staffNumber.ToString());
+            w.SvgStartGroup("outputStaff", "sys" + systemNumber.ToString() + "invisibleStaff" + staffNumber.ToString());
             w.WriteAttributeString("score", "invisible", null, "1");
 
 			int voiceNumber = 1;
