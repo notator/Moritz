@@ -36,7 +36,7 @@ namespace Moritz.Symbols
             if(staffIsVisible && ChordMetrics.BeamBlock != null)
                 ChordMetrics.BeamBlock.WriteSVG(w);
 
-            w.SvgStartGroup("outputChord", null);
+			w.SvgStartGroup("outputChord", "outputChord" + SvgScore.UniqueID_Number);
 			if(staffIsVisible)
 			{ 
 				w.WriteAttributeString("score", "alignmentX", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
@@ -46,7 +46,7 @@ namespace Moritz.Symbols
 
             if(staffIsVisible)
             {
-                w.SvgStartGroup("graphics", null);
+				w.SvgStartGroup(null, "graphics" + SvgScore.UniqueID_Number);
                 ChordMetrics.WriteSVG(w);
                 w.SvgEndGroup();
             }

@@ -488,9 +488,6 @@ namespace Moritz.Symbols
         public BeamBlock BeamBlock = null; // defaults
         public List<Head> HeadsTopDown = new List<Head>(); // Heads are in top-down order.
 
-        public string GraphicSymbolID { get { return _graphicSymbolID; } }
-        protected string _graphicSymbolID = null;
-
         public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } }
         protected int? _msDurationToNextBarline = null;
     }

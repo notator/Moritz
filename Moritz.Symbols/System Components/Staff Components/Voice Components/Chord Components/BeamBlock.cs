@@ -844,7 +844,7 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            w.SvgStartGroup("beamBlock", null);
+            w.SvgStartGroup(null, "beamBlock" + SvgScore.UniqueID_Number);
             foreach(Beam beam in Beams)
             {
                 if(!(beam is QuaverBeam))

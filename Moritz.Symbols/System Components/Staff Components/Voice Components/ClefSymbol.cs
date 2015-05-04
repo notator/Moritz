@@ -76,7 +76,7 @@ namespace Moritz.Symbols
         {
             if(_isVisible && staffIsVisible)
             {
-                w.SvgStartGroup("clefChange", null);
+				w.SvgStartGroup(null, "clefChange" + SvgScore.UniqueID_Number);
                 base.WriteSVG(w, staffIsVisible);
                 w.SvgEndGroup();
             }
