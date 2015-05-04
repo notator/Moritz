@@ -57,8 +57,8 @@ namespace Moritz.Symbols
             {
 				barlineClass = isConnector ? null : "endBarlineLeft";
 				w.SvgLine(barlineClass,
-                    this.Metrics.OriginX - (singleBarlineStrokeWidth * 3F), topY,
-                    this.Metrics.OriginX - (singleBarlineStrokeWidth * 3F), bottomY,
+					this.Metrics.OriginX - (singleBarlineStrokeWidth * 3F), topStafflineY,
+					this.Metrics.OriginX - (singleBarlineStrokeWidth * 3F), bottomStafflineY,
                     "black", singleBarlineStrokeWidth, null);
 
 				barlineClass = isConnector ? null : "endBarlineRight";

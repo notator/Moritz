@@ -146,6 +146,7 @@ namespace Moritz.Symbols
                 {
                     OutputChordSymbol chordSymbol = noteObject as OutputChordSymbol;
                     ClefSymbol clef = noteObject as ClefSymbol;
+					
                     if(chordSymbol != null)
                     {
                         chordSymbol.ChordMetrics.AddToEdge(this);
@@ -158,6 +159,20 @@ namespace Moritz.Symbols
                     {
                         Add(noteObject.Metrics);
                     }
+
+					Barline barline = noteObject as Barline;
+					if(barline!= null)
+					{
+						BarlineMetrics barlineMetrics = barline.Metrics as BarlineMetrics;
+						if(barlineMetrics.BarnumberMetrics != null)
+						{
+							Add(barlineMetrics.BarnumberMetrics);
+						}
+						if(barlineMetrics.StaffNameMetrics != null)
+						{
+							Add(barlineMetrics.StaffNameMetrics);
+						}					
+					}					
                 }
             }
         }
