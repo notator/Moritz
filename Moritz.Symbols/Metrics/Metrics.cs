@@ -244,7 +244,7 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            w.SvgLine(null, _originX, _top, _originX, _bottom, "black", StrokeWidth, "round");
+			w.SvgLine("stem" + SvgScore.UniqueID_Number, _originX, _top, _originX, _bottom, "black", StrokeWidth, "round");
         }
 
         public object Clone()
@@ -296,7 +296,7 @@ namespace Moritz.Symbols
         {
             foreach(float y in Ys)
             {
-                w.SvgLine(null, _left + _strokeWidth, y, _right - _strokeWidth, y, "black", _strokeWidth, null);
+                w.SvgLine("ledger" + SvgScore.UniqueID_Number, _left + _strokeWidth, y, _right - _strokeWidth, y, "black", _strokeWidth, null);
             }
         }
 
@@ -373,7 +373,7 @@ namespace Moritz.Symbols
         public override void WriteSVG(SvgWriter w)
         {
             if(_drawExtender)
-                w.SvgLine(null, _left, _originY, _right, _originY, "black", _strokeWidth, "butt");
+				w.SvgLine("extender" + SvgScore.UniqueID_Number, _left, _originY, _right, _originY, "black", _strokeWidth, "butt");
         }
 
         private readonly float _strokeWidth = 0F;
@@ -450,9 +450,9 @@ namespace Moritz.Symbols
         public override void WriteSVG(SvgWriter w)
         {
             if(_stemDirection == VerticalDir.up)
-                w.SvgUseXY(null, _objectType, _left, _top, _fontHeight);
+				w.SvgUseXY(_objectType + SvgScore.UniqueID_Number, null, _left, _top, _fontHeight);
             else
-                w.SvgUseXY(null, _objectType, _left, _bottom, _fontHeight);
+				w.SvgUseXY(_objectType + SvgScore.UniqueID_Number, null, _left, _bottom, _fontHeight);
         }
 
         private readonly float _fontHeight;
@@ -491,7 +491,7 @@ namespace Moritz.Symbols
                         }
                         else
                         {
-                            _barnumberMetrics = new FramedTextMetrics(graphics, null, text.TextInfo, text.FrameInfo);
+                            _barnumberMetrics = new BarnumberMetrics(graphics, null, text.TextInfo, text.FrameInfo);
                             //_barnumberMetrics = new TextMetrics(graphics, null, text.TextInfo);
                             // move the bar number above this barline
                             float deltaY = (gap * 6F);
@@ -541,20 +541,20 @@ namespace Moritz.Symbols
         {
             if(_staffNameMetrics != null)
             {
-                _staffNameMetrics.WriteSVG(w);
+				_staffNameMetrics.WriteSVG(w, "staffName" + SvgScore.UniqueID_Number);
             }
             if(_barnumberMetrics != null)
             {
                 w.WriteStartElement("g");
-                w.WriteAttributeString("id", "barnumber" + SvgScore.UniqueID_Number);
-                _barnumberMetrics.WriteSVG(w); // writes the number (TextHorizAlign.centre) and the frame
+                w.WriteAttributeString("id", "barNumber" + SvgScore.UniqueID_Number);
+                _barnumberMetrics.WriteSVG(w); // writes the number and the frame
                 w.WriteEndElement(); // barnumber group
             }
         }
 
         private GroupMetrics _staffControlsGroupMetrics = null;
-        public FramedTextMetrics BarnumberMetrics { get { return _barnumberMetrics; } }
-        private FramedTextMetrics _barnumberMetrics = null;
+        public BarnumberMetrics BarnumberMetrics { get { return _barnumberMetrics; } }
+        private BarnumberMetrics _barnumberMetrics = null;
         public TextMetrics StaffNameMetrics { get { return _staffNameMetrics; } }
         private TextMetrics _staffNameMetrics = null;
     }
@@ -575,10 +575,10 @@ namespace Moritz.Symbols
             _textInfo = textInfo;
         }
 
-        public override void WriteSVG(SvgWriter w)
-        {
-            w.SvgText(null, _textInfo, _originX, _originY);
-        }
+		internal void WriteSVG(SvgWriter w, string id)
+		{
+			w.SvgText(id, _textInfo, _originX, _originY);
+		}
 
         /// <summary>
         /// Sets the default Top, Right, Bottom, Left.
@@ -648,8 +648,7 @@ namespace Moritz.Symbols
         }
 
         private readonly TextInfo _textInfo = null;
-
-    }
+	}
 
     internal class LyricMetrics : TextMetrics, ICloneable
     {
@@ -687,9 +686,9 @@ namespace Moritz.Symbols
         public readonly bool IsBelow;
     }
 
-    internal class FramedTextMetrics : TextMetrics
+    internal class BarnumberMetrics : TextMetrics
     {
-        public FramedTextMetrics(Graphics graphics, string ID_Type, TextInfo textInfo, FrameInfo frameInfo)
+        public BarnumberMetrics(Graphics graphics, string ID_Type, TextInfo textInfo, FrameInfo frameInfo)
             :base(graphics, ID_Type, textInfo)
         {
             _top = _top - frameInfo.PaddingY;
@@ -701,8 +700,8 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            base.WriteSVG(w);
-            w.SvgRect(null, _left, _top, _right - _left, _bottom - _top, "black", _strokeWidth, "none");
+			base.WriteSVG(w, "number" + SvgScore.UniqueID_Number);
+			w.SvgRect("box" + SvgScore.UniqueID_Number, _left, _top, _right - _left, _bottom - _top, "black", _strokeWidth, "none");
         }
 
         float _strokeWidth = 0;

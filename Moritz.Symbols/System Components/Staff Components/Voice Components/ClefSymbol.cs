@@ -29,7 +29,7 @@ namespace Moritz.Symbols
             {
                 ClefMetrics m = Metrics as ClefMetrics;
                 if(m != null)
-                    w.SvgUseXY(null, m.ID_Type, m.OriginX, m.OriginY, m.FontHeight);
+					w.SvgUseXY("clef" + SvgScore.UniqueID_Number, m.ID_Type, m.OriginX, m.OriginY, m.FontHeight);
             }
         }
 

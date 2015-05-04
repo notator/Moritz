@@ -991,7 +991,7 @@ namespace Moritz.Symbols
             }
 
             BarlineMetrics barlineMetrics = barline.Metrics as BarlineMetrics;
-            FramedTextMetrics barnumberMetrics = barlineMetrics.BarnumberMetrics;
+            BarnumberMetrics barnumberMetrics = barlineMetrics.BarnumberMetrics;
 
             if(barnumberMetrics != null)
             {
@@ -1018,7 +1018,7 @@ namespace Moritz.Symbols
         /// <param name="barnumberMetrics"></param>
         /// <param name="durationSymbolMetrics"></param>
         /// <param name="gap"></param>
-        private void RemoveCollision(FramedTextMetrics barnumberMetrics, DurationSymbol durationSymbol, float gap)
+        private void RemoveCollision(BarnumberMetrics barnumberMetrics, DurationSymbol durationSymbol, float gap)
         {
             ChordMetrics chordMetrics = durationSymbol.Metrics as ChordMetrics;
             float verticalOverlap = 0F;

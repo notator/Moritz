@@ -861,9 +861,9 @@ namespace Moritz.Symbols
                         topLeft = beam.LeftTopY - _beamThickness;
                         topRight = beam.RightTopY - _beamThickness;
                     }
-                    w.SvgBeam(null, beam.LeftX, beam.RightX, topLeft, topRight, _beamThickness * 1.5F, 0F, 0.65F);
+                    w.SvgBeam("beam" + SvgScore.UniqueID_Number, beam.LeftX, beam.RightX, topLeft, topRight, _beamThickness * 1.5F, 0F, 0.65F);
                 }
-                w.SvgBeam(null, beam.LeftX, beam.RightX, beam.LeftTopY, beam.RightTopY, _beamThickness, _strokeThickness, 1.0F);
+				w.SvgBeam("beam" + SvgScore.UniqueID_Number, beam.LeftX, beam.RightX, beam.LeftTopY, beam.RightTopY, _beamThickness, _strokeThickness, 1.0F);
             }
             w.SvgEndGroup();
         }
