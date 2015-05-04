@@ -1314,7 +1314,7 @@ namespace Moritz.Symbols
             ResetBoundary();
         }
 
-        public void ResetBoundary()
+        public virtual void ResetBoundary()
         {
             _top = float.MaxValue;
             _right = float.MinValue;

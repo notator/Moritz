@@ -41,22 +41,36 @@ namespace Moritz.Symbols
         ///        (if the staff's lower neighbour is in the same group)
         /// </summary>
         /// <param name="w"></param>
-        public void WriteSVG(SvgWriter w, float topY, float bottomY, float strokeWidth)
+        public void WriteSVG(SvgWriter w, float topStafflineY, float bottomStafflineY, float singleBarlineStrokeWidth, float stafflineStrokeWidth, bool isLastNoteObject, bool isConnector)
         {
+			float topY = topStafflineY;
+			float bottomY = bottomStafflineY;
+			if(isLastNoteObject)
+			{
+				float halfStrokeWidth = (stafflineStrokeWidth / 2);
+				topY -= halfStrokeWidth;
+				bottomY += halfStrokeWidth;
+			}
+
+			string barlineClass;
             if(BarlineType == BarlineType.end)
             {
-                w.SvgLine(null,
-                    this.Metrics.OriginX - (strokeWidth * 3F), topY,
-                    this.Metrics.OriginX - (strokeWidth * 3F), bottomY,
-                    "black", strokeWidth, null);
-                w.SvgLine(null,
+				barlineClass = isConnector ? null : "endBarlineLeft";
+				w.SvgLine(barlineClass,
+                    this.Metrics.OriginX - (singleBarlineStrokeWidth * 3F), topY,
+                    this.Metrics.OriginX - (singleBarlineStrokeWidth * 3F), bottomY,
+                    "black", singleBarlineStrokeWidth, null);
+
+				barlineClass = isConnector ? null : "endBarlineRight";
+				w.SvgLine(barlineClass,
                     this.Metrics.OriginX, topY,
                     this.Metrics.OriginX, bottomY,
-                    "black", strokeWidth * 2F, null);
+                    "black", singleBarlineStrokeWidth * 2F, null);
             }
             else
             {
-                w.SvgLine(null, this.Metrics.OriginX, topY, this.Metrics.OriginX, bottomY, "black", strokeWidth, null);
+				barlineClass = isConnector ? null : "barline";
+				w.SvgLine(barlineClass, this.Metrics.OriginX, topY, this.Metrics.OriginX, bottomY, "black", singleBarlineStrokeWidth, null);
             }
         }
 

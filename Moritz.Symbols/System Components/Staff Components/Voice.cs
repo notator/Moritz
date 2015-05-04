@@ -33,15 +33,19 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         public virtual void WriteSVG(SvgWriter w, bool staffIsVisible)
         {
-            foreach(NoteObject noteObject in NoteObjects)
+            for(int i = 0; i < NoteObjects.Count; ++i)
             {
+				NoteObject noteObject = NoteObjects[i];				
 				Barline barline = noteObject as Barline;
 				if(staffIsVisible && barline != null)
 				{
+					bool isLastNoteObject = (i == (NoteObjects.Count - 1));
 					float top = Staff.Metrics.StafflinesTop;
 					float bottom = Staff.Metrics.StafflinesBottom;
-					float strokeWidth = Staff.SVGSystem.Score.PageFormat.BarlineStrokeWidth;
-					barline.WriteSVG(w, top, bottom, strokeWidth);
+					PageFormat pageFormat = Staff.SVGSystem.Score.PageFormat;
+					float barlineStrokeWidth = pageFormat.BarlineStrokeWidth;
+					float stafflineStrokeWidth = pageFormat.StafflineStemStrokeWidth;
+					barline.WriteSVG(w, top, bottom, barlineStrokeWidth, stafflineStrokeWidth, isLastNoteObject, false);
 				}
 
                 ChordSymbol chordSymbol = noteObject as ChordSymbol;

@@ -77,10 +77,30 @@ namespace Moritz.Symbols
             _stafflinesBottom += dy;
         }
 
-        public void ResetMetrics()
-        {
-            ResetBoundary();
-        }
+		public override void ResetBoundary()
+		{
+			base.ResetBoundary();
+			foreach(Metrics metrics in MetricsList)
+			{
+				BarlineMetrics barlineMetrics = metrics as BarlineMetrics;
+				if(barlineMetrics != null)
+				{
+					expandMetrics(barlineMetrics.BarnumberMetrics);
+					expandMetrics(barlineMetrics.StaffNameMetrics);
+				}
+			}
+		}
+
+		private void expandMetrics(Metrics metrics)
+		{
+			if(metrics != null)
+			{
+				_top = _top < metrics.Top ? _top : metrics.Top;
+				_right = _right > metrics.Right ? _right : metrics.Right;
+				_bottom = _bottom > metrics.Bottom ? _bottom : metrics.Bottom;
+				_left = _left < metrics.Left ? _left : metrics.Left;
+			}
+		}
 
         public float StafflinesTop { get { return _stafflinesTop; } }
         private float _stafflinesTop = 0F;

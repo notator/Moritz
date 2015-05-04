@@ -31,16 +31,16 @@ namespace Moritz.Symbols
                 Staves[staffIndex].WriteSVG(w, systemNumber, staffIndex + 1);
             }
 
-            w.SvgStartGroup("barlines", null);
+            w.SvgStartGroup(null, "sys" + systemNumber.ToString() + "connectors");
 
-            WriteBarlines(w, pageFormat.BarlineStrokeWidth, pageFormat.StafflineStemStrokeWidth, pageFormat.Gap, pageFormat);
+            WriteConnectors(w, systemNumber, pageFormat);
 
-            w.SvgEndGroup(); // barlines
+            w.SvgEndGroup(); // connectors
 
             w.SvgEndGroup(); // system
         }
 
-        private void WriteBarlines(SvgWriter w, float barlineStrokeWidth, float stafflineStrokeWidth, float gap, PageFormat pageFormat)
+        private void WriteConnectors(SvgWriter w, int systemNumber, PageFormat pageFormat)
         {
             List<bool> barlineContinuesDownList = pageFormat.BarlineContinuesDownList;
             int topVisibleStaffIndex = TopVisibleStaffIndex();
@@ -77,7 +77,7 @@ namespace Moritz.Symbols
                 #region draw barlines down from staves
                 if(staffIndex < Staves.Count - 1)
                 {
-                    BottomEdge bottomEdge = new BottomEdge(staff, 0F, pageFormat.Right, gap);
+                    BottomEdge bottomEdge = new BottomEdge(staff, 0F, pageFormat.Right, pageFormat.Gap);
                     TopEdge topEdge = new TopEdge(Staves[staffIndex + 1], 0F, pageFormat.Right);
                     isFirstBarline = true;
 
@@ -92,7 +92,8 @@ namespace Moritz.Symbols
                             {
                                 float top = bottomEdge.YatX(barline.Metrics.OriginX);
                                 float bottom = topEdge.YatX(barline.Metrics.OriginX);
-                                barline.WriteSVG(w, top, bottom, barlineStrokeWidth);
+								bool isLastNoteObject = (i == (voice.NoteObjects.Count - 1));
+                                barline.WriteSVG(w, top, bottom, pageFormat.BarlineStrokeWidth, pageFormat.StafflineStemStrokeWidth, isLastNoteObject, true);
                                 isFirstBarline = false;
                             }
                         }
