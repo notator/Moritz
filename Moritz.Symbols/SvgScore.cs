@@ -137,7 +137,7 @@ namespace Moritz.Symbols
 
                 pageFilenames.Add(pageFilename);
 
-                SaveSVGPage(pagePath, page, this.Metadata, pageNumber);
+                SaveSVGPage(pagePath, page, this.Metadata);
                 pageNumber++;
             }
 
@@ -145,9 +145,8 @@ namespace Moritz.Symbols
         }
         /// <summary>
         /// Writes an SVG file containing one page of the score.
-        /// The metadata is only written to page 1.
         /// </summary>
-        public void SaveSVGPage(string pagePath, SvgPage page, Metadata metadata, int pageNumber)
+        public void SaveSVGPage(string pagePath, SvgPage page, Metadata metadata)
         {
             if(File.Exists(pagePath))
             {
@@ -164,7 +163,7 @@ namespace Moritz.Symbols
 
             using(SvgWriter w = new SvgWriter(pagePath, settings))
             {
-                page.WriteSVG(w, metadata, pageNumber);
+                page.WriteSVG(w, metadata);
             }
         }
 

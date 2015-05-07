@@ -94,14 +94,14 @@ namespace Moritz.Symbols
         /// Writes this page.
         /// </summary>
         /// <param name="w"></param>
-        public void WriteSVG(SvgWriter w, Metadata metadata, int pageNumber)
+        public void WriteSVG(SvgWriter w, Metadata metadata)
         {
             w.WriteStartDocument(); // standalone="no"
             //<?xml-stylesheet href="../../fontsStyleSheet.css" type="text/css"?>
             w.WriteProcessingInstruction("xml-stylesheet", "href=\"../../fontsStyleSheet.css\" type=\"text/css\"");
             w.WriteStartElement("svg", "http://www.w3.org/2000/svg");
 
-            WriteSvgHeader(w, pageNumber);
+            WriteSvgHeader(w);
 
 			WriteSodipodiNamedview(w);
 
@@ -115,7 +115,7 @@ namespace Moritz.Symbols
 
 			WriteFrameLayer(w, layerNumber++, "frame", _pageFormat.Right, _pageFormat.Bottom);
 
-			WriteScoreLayer(w, layerNumber++, "score", pageNumber, metadata);
+			WriteScoreLayer(w, layerNumber++, "score", _pageNumber, metadata);
 
 			WriteEmptyLayer(w, layerNumber++, "user annotations", true);
 			#endregion layers
@@ -189,7 +189,7 @@ namespace Moritz.Symbols
 			w.WriteEndElement(); // ends the sodipodi:namedview element
 		}
 
-        private void WriteSvgHeader(SvgWriter w, int pageNumber)
+        private void WriteSvgHeader(SvgWriter w)
         {
 			w.WriteAttributeString("xmlns", "http://www.w3.org/2000/svg");
 			w.WriteAttributeString("xmlns", "score", null, "http://www.james-ingram-act-two.de/open-source/svgScoreExtensions.html");
@@ -207,11 +207,6 @@ namespace Moritz.Symbols
             w.WriteAttributeString("height", _pageFormat.ScreenBottom.ToString()); // the intended screen display size (100%)
             string viewBox = "0 0 " + _pageFormat.Right.ToString() + " " + _pageFormat.Bottom.ToString();
             w.WriteAttributeString("viewBox", viewBox); // the size of SVG's internal drawing surface (400%)            
-            if(pageNumber == 1)
-            {
-                w.WriteAttributeString("onload", "onLoad()"); // function called when page 1 has loaded
-                WriteScriptLink(w);
-            }
         }
 
 		/// <summary>
@@ -233,16 +228,6 @@ namespace Moritz.Symbols
 			if(insensitive == true)
 				w.WriteAttributeString("sodipodi", "insensitive", null, "true");
 		}
-
-        // writes the line: <script xlink:href="../../ap/SVG.js" type="text/javascript"/>
-        private void WriteScriptLink(SvgWriter w)
-        {
-            w.WriteStartElement("script");
-            w.WriteAttributeString("xlink", "href", null, "../../ap/SVG.js");
-            w.WriteAttributeString("type", "text/javascript");
-			w.WriteString(""); // forces separate close tag to prevent warnings...
-            w.WriteEndElement(); // script
-        }
 
 		/// <summary>
 		/// Adds the link, main title and the author to the first page.
