@@ -450,9 +450,9 @@ namespace Moritz.Symbols
         public override void WriteSVG(SvgWriter w)
         {
             if(_stemDirection == VerticalDir.up)
-				w.SvgUseXY(_objectType + SvgScore.UniqueID_Number, null, _left, _top, _fontHeight);
+				w.SvgUseXY("flag" + SvgScore.UniqueID_Number, _objectType, _left, _top, _fontHeight);
             else
-				w.SvgUseXY(_objectType + SvgScore.UniqueID_Number, null, _left, _bottom, _fontHeight);
+				w.SvgUseXY("flag" + SvgScore.UniqueID_Number, _objectType, _left, _bottom, _fontHeight);
         }
 
         private readonly float _fontHeight;
