@@ -35,7 +35,7 @@ namespace Moritz.Symbols
             _originY += dy;
         }
 
-        public virtual void WriteSVG(SvgWriter w){}
+        public abstract void WriteSVG(SvgWriter w);
 
         /// <summary>
         /// Use this function to check all atomic overlaps (single character or line boxMetrics).
@@ -224,7 +224,9 @@ namespace Moritz.Symbols
             _right = right; 
             _bottom = bottom;
             _left = left;
-        } 
+        }
+
+		public override void WriteSVG(SvgWriter w){}
     }
 
     internal class StemMetrics : Metrics
@@ -344,6 +346,8 @@ namespace Moritz.Symbols
             _bottom = originY;
             _originY = originY;
         }
+
+		public override void WriteSVG(SvgWriter w) { }
     }
     /// <summary>
     /// Notehead extender lines are used when chord symbols cross barlines.
@@ -575,6 +579,11 @@ namespace Moritz.Symbols
             _textInfo = textInfo;
         }
 
+		public override void WriteSVG(SvgWriter w)
+		{
+			WriteSVG(w, null); 
+		}
+
 		internal virtual void WriteSVG(SvgWriter w, string id)
 		{
 			w.SvgText(id, _textInfo, _originX, _originY);
@@ -683,11 +692,6 @@ namespace Moritz.Symbols
         {
             return this.MemberwiseClone();
         }
-
-		public override void WriteSVG(SvgWriter w)
-		{
-			base.WriteSVG(w, null);
-		}
 
         public readonly bool IsBelow;
     }
@@ -1018,7 +1022,10 @@ namespace Moritz.Symbols
             FontHeight = clef.FontHeight;
 
         }
-        public readonly float FontHeight;
+
+		public override void WriteSVG(SvgWriter w){}
+		
+		public readonly float FontHeight;
     }
     internal class RestMetrics : CLichtCharacterMetrics
     {
