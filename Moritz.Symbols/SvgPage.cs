@@ -205,8 +205,8 @@ namespace Moritz.Symbols
             //w.WriteAttributeString("baseProfile", "full");
             w.WriteAttributeString("width", _pageFormat.ScreenRight.ToString()); // the intended screen display size (100%)
             w.WriteAttributeString("height", _pageFormat.ScreenBottom.ToString()); // the intended screen display size (100%)
-            string viewBox = "0 0 " + _pageFormat.Right.ToString() + " " + _pageFormat.Bottom.ToString();
-            w.WriteAttributeString("viewBox", viewBox); // the size of SVG's internal drawing surface (400%)            
+            string viewBox = "0 0 " + _pageFormat.RightVBPX.ToString() + " " + _pageFormat.BottomVBPX.ToString();
+            w.WriteAttributeString("viewBox", viewBox); // the size of SVG's internal drawing surface (800%)            
         }
 
 		/// <summary>

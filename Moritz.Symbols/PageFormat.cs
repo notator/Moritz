@@ -29,8 +29,8 @@ namespace Moritz.Symbols
 
         public string PaperSize; // default
         public bool IsLandscape = false;
-        public float RightVBPX = 0;
-        public float BottomVBPX = 0;
+        public int RightVBPX = 0;
+        public int BottomVBPX = 0;
         public readonly float HorizontalPixelsPerMillimeter = 3.4037F; // on my computer (December 2010).
         public readonly float VerticalPixelsPerMillimeter = 2.9464F; // on my computer (December 2010).
         #endregion
@@ -44,13 +44,13 @@ namespace Moritz.Symbols
 
         #region frame
         public float LeftScreenMarginPos { get { return LeftMarginPos / ViewBoxMagnification; } }
-        public float FirstPageFrameHeight { get { return BottomMarginPos - TopMarginPage1; } }
-        public float OtherPagesFrameHeight { get { return BottomMarginPos - TopMarginOtherPages; } }
-        public float TopMarginPage1;
-        public float TopMarginOtherPages;
-        public float RightMarginPos;
-        public float LeftMarginPos;
-        public float BottomMarginPos;
+        public int FirstPageFrameHeight { get { return BottomMarginPos - TopMarginPage1; } }
+        public int OtherPagesFrameHeight { get { return BottomMarginPos - TopMarginOtherPages; } }
+        public int TopMarginPage1;
+        public int TopMarginOtherPages;
+        public int RightMarginPos;
+        public int LeftMarginPos;
+        public int BottomMarginPos;
         #endregion
 
         #region website links

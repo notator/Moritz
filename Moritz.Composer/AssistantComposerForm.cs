@@ -2025,8 +2025,8 @@ namespace Moritz.Composer
         {
             pageFormat.PaperSize = _dimensionsAndMetadataForm.PaperSize;
             pageFormat.IsLandscape = _dimensionsAndMetadataForm.Landscape;
-            float bottomPX;
-            float rightPX;
+            int bottomPX;
+            int rightPX;
             Debug.Assert(Regex.Matches(pageFormat.PaperSize, @"^(A4|B4|A5|B5|A3|Letter|Legal|Tabloid)$") != null);
             if(pageFormat.IsLandscape == true)
             {

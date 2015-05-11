@@ -306,61 +306,61 @@ namespace Moritz.Composer
         #region TextBox_Leave handlers
         private void Page1TitleHeightTextBox_Leave(object sender, EventArgs e)
         {
-            CheckTextBoxIsFloat(this.Page1TitleHeightTextBox);
+            CheckTextBoxIsInt(this.Page1TitleHeightTextBox);
             SetSettingsHaveChanged();
         }
         private void Page1AuthorHeightTextBox_Leave(object sender, EventArgs e)
         {
-            CheckTextBoxIsFloat(this.Page1AuthorHeightTextBox);
+            CheckTextBoxIsInt(this.Page1AuthorHeightTextBox);
             SetSettingsHaveChanged();
         }
         private void Page1TitleYTextBox_Leave(object sender, EventArgs e)
         {
-            CheckTextBoxIsFloat(this.Page1TitleYTextBox);
+            CheckTextBoxIsInt(this.Page1TitleYTextBox);
             SetSettingsHaveChanged();
         }
 
         private void TopMarginPage1TextBox_Leave(object sender, EventArgs e)
         {
-            CheckTextBoxIsFloat(this.TopMarginPage1TextBox);
+            CheckTextBoxIsInt(this.TopMarginPage1TextBox);
             SetSettingsHaveChanged();
         }
         private void TopMarginOtherPagesTextBox_Leave(object sender, EventArgs e)
         {
-            CheckTextBoxIsFloat(this.TopMarginOtherPagesTextBox);
+            CheckTextBoxIsInt(this.TopMarginOtherPagesTextBox);
             SetSettingsHaveChanged();
         }
         private void RightMarginTextBox_Leave(object sender, EventArgs e)
         {
-            CheckTextBoxIsFloat(this.RightMarginTextBox);
+            CheckTextBoxIsInt(this.RightMarginTextBox);
             SetSettingsHaveChanged();
         }
         private void BottomMarginTextBox_Leave(object sender, EventArgs e)
         {
-            CheckTextBoxIsFloat(this.BottomMarginTextBox);
+            CheckTextBoxIsInt(this.BottomMarginTextBox);
             SetSettingsHaveChanged();
         }
         private void LeftMarginTextBox_Leave(object sender, EventArgs e)
         {
-            CheckTextBoxIsFloat(this.LeftMarginTextBox);
+            CheckTextBoxIsInt(this.LeftMarginTextBox);
             SetSettingsHaveChanged();
         }
 
-        private void CheckTextBoxIsFloat(TextBox textBox)
-        {
-            bool okay = true;
-            textBox.Text.Trim();
-            try
-            {
-                float i = float.Parse(textBox.Text, M.En_USNumberFormat);
-            }
-            catch
-            {
-                okay = false;
-            }
+		private void CheckTextBoxIsInt(TextBox textBox)
+		{
+			bool okay = true;
+			textBox.Text.Trim();
+			try
+			{
+				int i = int.Parse(textBox.Text, M.En_USNumberFormat);
+			}
+			catch
+			{
+				okay = false;
+			}
 
-            M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
-        }
+			M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
+		}
 
         private void AboutLinkTextTextBox_Leave(object sender, EventArgs e)
         {
@@ -469,11 +469,11 @@ namespace Moritz.Composer
         public float AuthorHeight { get { return float.Parse(Page1AuthorHeightTextBox.Text, M.En_USNumberFormat); } }
         public float TitleY { get { return float.Parse(Page1TitleYTextBox.Text, M.En_USNumberFormat); } }
 
-        public float TopMarginWidthPage1 { get { return float.Parse(TopMarginPage1TextBox.Text, M.En_USNumberFormat); } }
-        public float TopMarginWidthOtherPages { get { return float.Parse(TopMarginOtherPagesTextBox.Text, M.En_USNumberFormat); } }
-        public float RightMarginWidth { get { return float.Parse(RightMarginTextBox.Text, M.En_USNumberFormat); } }
-        public float BottomMarginWidth { get { return float.Parse(BottomMarginTextBox.Text, M.En_USNumberFormat); } }
-        public float LeftMarginWidth { get { return float.Parse(LeftMarginTextBox.Text, M.En_USNumberFormat); } }
+        public int TopMarginWidthPage1 { get { return int.Parse(TopMarginPage1TextBox.Text, M.En_USNumberFormat); } }
+        public int TopMarginWidthOtherPages { get { return int.Parse(TopMarginOtherPagesTextBox.Text, M.En_USNumberFormat); } }
+        public int RightMarginWidth { get { return int.Parse(RightMarginTextBox.Text, M.En_USNumberFormat); } }
+        public int BottomMarginWidth { get { return int.Parse(BottomMarginTextBox.Text, M.En_USNumberFormat); } }
+        public int LeftMarginWidth { get { return int.Parse(LeftMarginTextBox.Text, M.En_USNumberFormat); } }
 
         public string AboutLinkText { get { return AboutLinkTextTextBox.Text; } }
         public string AboutLinkURL { get { return AboutLinkURLTextBox.Text; } }
