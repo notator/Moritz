@@ -48,12 +48,12 @@ namespace Moritz.Symbols
 
         protected virtual byte MidiChannel(int staffIndex) { throw new NotImplementedException(); }
 
-        #region save SVG score
+        #region save multi-page score
         /// <summary>
         /// Silently overwrites the .html and all .svg pages.
         /// An SVGScore consists of an .html file which references one .svg file per page of the score. 
         /// </summary>
-        public void SaveSVGScore()
+        public void SaveMultiPageScore()
         {
             List<string> svgPagenames = SaveSVGPages();
 
@@ -173,10 +173,25 @@ namespace Moritz.Symbols
             Notator.SymbolSet.WriteSymbolDefinitions(w);
         }
 
-        #endregion save SVG score
+		#endregion save multi-page score
 
-        #region fields loaded from .capx files
-        public Metadata Metadata = null;
+		#region save single svg score
+		public void SaveSingleSVGScore()
+		{
+			string pageFilename = Path.GetFileNameWithoutExtension(FilePath) + ".svg";
+			string pagePath = Path.GetDirectoryName(FilePath) + @"\" + pageFilename;
+
+			TextInfo infoTextInfo = GetInfoTextAtTopOfPage(0);
+
+			SvgPage singlePage = new SvgPage(this, _pageFormat, 0, infoTextInfo, this.Systems, true);
+
+			SaveSVGPage(pagePath, singlePage, this.Metadata);
+		}
+
+
+		#endregion save single svg score
+		#region fields loaded from .capx files
+		public Metadata Metadata = null;
         public List<SvgSystem> Systems = new List<SvgSystem>();
         #endregion
         #region moritz-specific private fields
@@ -704,22 +719,18 @@ namespace Moritz.Symbols
 
         private TextInfo GetInfoTextAtTopOfPage(int pageNumber)
         {
-            string infoAtTopOfPage;
-            string fileName;
-            if(String.IsNullOrEmpty(_filename))
-                fileName = "";
-            else
-                fileName = Path.GetFileNameWithoutExtension(_filename);
+            StringBuilder infoAtTopOfPageSB = new StringBuilder();
 
-            if(String.IsNullOrEmpty(fileName))
-                infoAtTopOfPage = "page " + pageNumber.ToString();
-            else
-                infoAtTopOfPage = fileName + ": page " + pageNumber.ToString();
+            if(!String.IsNullOrEmpty(_filename))
+                infoAtTopOfPageSB.Append(Path.GetFileNameWithoutExtension(_filename));
+
+			if(pageNumber > 0)
+				infoAtTopOfPageSB.Append(" page " + pageNumber.ToString());
 
             if(Metadata != null)
-                infoAtTopOfPage = infoAtTopOfPage + ", " + Metadata.Date;
+                infoAtTopOfPageSB.AppendFormat(", " + Metadata.Date);
 
-            return new TextInfo(infoAtTopOfPage, "Arial", 72F, TextHorizAlign.left);
+            return new TextInfo(infoAtTopOfPageSB.ToString(), "Arial", 72F, TextHorizAlign.left);
         }
 
 

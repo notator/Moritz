@@ -15,6 +15,8 @@ namespace Moritz.Symbols
         /// <summary>
         /// The systems contain Metrics info, but their top staffline is at 0.
         /// The systems are moved to their correct vertical positions on the page here.
+		/// If pageNumber is set to 0, all the systems in pageSystems will be printed
+		/// in a single .svg file, whose page height has been changed accordingly.
         /// </summary>
         /// <param name="Systems"></param>
         public SvgPage(SvgScore containerScore, PageFormat pageFormat, int pageNumber, TextInfo infoTextInfo, List<SvgSystem> pageSystems, bool lastPage)
@@ -26,8 +28,31 @@ namespace Moritz.Symbols
 
             Systems = pageSystems;
 
-            MoveSystemsVertically(pageFormat, pageSystems, (pageNumber == 1), lastPage);
+			if(pageNumber == 0)
+			{
+				int bottomMargin = pageFormat.BottomVBPX - pageFormat.BottomMarginPos;
+
+				pageFormat.BottomMarginPos = HeightOfTitlesPlusAllSystems(pageSystems);
+				pageFormat.BottomVBPX = pageFormat.BottomMarginPos + bottomMargin;
+			}
+
+            MoveSystemsVertically(pageFormat, pageSystems, (pageNumber == 1 || pageNumber == 0), lastPage);
         }
+
+		private int HeightOfTitlesPlusAllSystems(List<SvgSystem> pageSystems)
+		{
+			int frameHeight = _pageFormat.TopMarginPage1 + 20;
+			int verticalSystemLeading = (int) _pageFormat.DefaultDistanceBetweenSystems;
+
+			foreach(SvgSystem system in pageSystems)
+			{
+				SystemMetrics sm = system.Metrics;
+				frameHeight += (int)((sm.Bottom - sm.Top) + verticalSystemLeading);
+			}
+			frameHeight -= verticalSystemLeading;
+
+			return frameHeight;
+		}
 
         /// <summary>
         /// Moves the systems to their correct vertical position. Justifies on all but the last page.
@@ -42,7 +67,7 @@ namespace Moritz.Symbols
             if(firstPage)
             {
                 frameTop = pageFormat.TopMarginPage1;
-                frameHeight = pageFormat.FirstPageFrameHeight;
+				frameHeight = pageFormat.FirstPageFrameHeight; // property uses BottomMarginPos
             }
             else
             {
@@ -153,7 +178,7 @@ namespace Moritz.Symbols
 
 			w.SvgText("timeStamp", _infoTextInfo, 80, 80);
 
-			if(_pageNumber == 1)
+			if(pageNumber == 1 || pageNumber == 0)
 			{
 				WritePage1TitleAndAuthor(w, metadata);
 			}

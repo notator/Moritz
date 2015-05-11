@@ -1984,8 +1984,9 @@ namespace Moritz.Composer
 
                 if(score != null && score.Systems.Count > 0)
                 {
-                    score.SaveSVGScore();
-                    // Opens the score in the program which is set by the system to open .svg files.
+                    score.SaveMultiPageScore();
+					score.SaveSingleSVGScore();
+                    // Opens the multi-page score in the program which is set by the system to open .svg files.
                     global::System.Diagnostics.Process.Start(score.FilePath);
                 }
             }

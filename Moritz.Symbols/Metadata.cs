@@ -29,7 +29,15 @@ namespace Moritz.Symbols
         {
 			Debug.Assert(!String.IsNullOrEmpty(MainTitle));
 
-			string pageTitle = MainTitle + ", page " + pageNumber.ToString() + " of " + nScorePages.ToString();
+			string pageTitle;
+			if(pageNumber == 0)
+			{
+				pageTitle = MainTitle + "(all systems)";
+			}
+			else
+			{
+				pageTitle = MainTitle + ", page " + pageNumber.ToString() + " of " + nScorePages.ToString();
+			}
 
             w.WriteStartElement("title");
 			w.WriteAttributeString("id", "pageTitle");
