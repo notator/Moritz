@@ -25,14 +25,14 @@ namespace Moritz.Symbols
 		/// <param name="w"></param>
 		/// <param name="pageNumber"></param>
 		/// <param name="nScorePages"></param>
-		public void WriteSVG(SvgWriter w, int pageNumber, int nScorePages, string aboutThePieceLinkURL)
+		public void WriteSVG(SvgWriter w, int pageNumber, int nScorePages, string aboutThePieceLinkURL, int nOutputVoices, int nInputVoices)
         {
 			Debug.Assert(!String.IsNullOrEmpty(MainTitle));
 
 			string pageTitle;
 			if(pageNumber == 0)
 			{
-				pageTitle = MainTitle + "(all systems)";
+				pageTitle = MainTitle + " (complete)";
 			}
 			else
 			{
@@ -89,9 +89,12 @@ namespace Moritz.Symbols
 				w.WriteEndElement(); // ends the dc:subject element
 			}
 
-
 			StringBuilder desc = new StringBuilder("See: " + aboutThePieceLinkURL );
-
+			desc.Append("\nNumber of output voices: " + nOutputVoices.ToString());
+			if(nInputVoices > 0)
+			{ 
+				desc.Append("\nNumber of input voices: " + nInputVoices.ToString());
+			}	
 			if(!String.IsNullOrEmpty(Comment))
 				desc.Append("\ncomments: " + Comment);
 
@@ -101,7 +104,7 @@ namespace Moritz.Symbols
 
 			string contributor = "Originally created using Assistant Composer software:" +
 							"\nhttp://james-ingram-act-two.de/moritz3/assistantComposer/assistantComposer.html" +
-							"\nAnnotations, if there are any, have been made using Inkscape on the annotation layers.";
+							"\nAnnotations, if there are any, have been made using Inkscape.";
 			w.WriteStartElement("dc", "contributor", null);
 			w.WriteStartElement("cc", "Agent", null);
 			w.WriteStartElement("dc", "title", null);

@@ -178,7 +178,7 @@ namespace Moritz.Symbols
 		#region save single svg score
 		public void SaveSingleSVGScore()
 		{
-			string pageFilename = Path.GetFileNameWithoutExtension(FilePath) + ".svg";
+			string pageFilename = Path.GetFileNameWithoutExtension(FilePath) + " (complete).svg";
 			string pagePath = Path.GetDirectoryName(FilePath) + @"\" + pageFilename;
 
 			TextInfo infoTextInfo = GetInfoTextAtTopOfPage(0);
@@ -724,7 +724,9 @@ namespace Moritz.Symbols
             if(!String.IsNullOrEmpty(_filename))
                 infoAtTopOfPageSB.Append(Path.GetFileNameWithoutExtension(_filename));
 
-			if(pageNumber > 0)
+			if(pageNumber == 0)
+				infoAtTopOfPageSB.Append(" (complete)");
+			else
 				infoAtTopOfPageSB.Append(" page " + pageNumber.ToString());
 
             if(Metadata != null)

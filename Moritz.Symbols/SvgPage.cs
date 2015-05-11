@@ -30,26 +30,21 @@ namespace Moritz.Symbols
 
 			if(pageNumber == 0)
 			{
-				int bottomMargin = pageFormat.BottomVBPX - pageFormat.BottomMarginPos;
-
-				pageFormat.BottomMarginPos = HeightOfTitlesPlusAllSystems(pageSystems);
-				pageFormat.BottomVBPX = pageFormat.BottomMarginPos + bottomMargin;
+				pageFormat.BottomVBPX = GetNewBottomVBPX(pageSystems);
+				pageFormat.BottomMarginPos = (int) (pageFormat.BottomVBPX - pageFormat.DefaultDistanceBetweenSystems);
 			}
 
             MoveSystemsVertically(pageFormat, pageSystems, (pageNumber == 1 || pageNumber == 0), lastPage);
         }
 
-		private int HeightOfTitlesPlusAllSystems(List<SvgSystem> pageSystems)
+		private int GetNewBottomVBPX(List<SvgSystem> pageSystems)
 		{
 			int frameHeight = _pageFormat.TopMarginPage1 + 20;
-			int verticalSystemLeading = (int) _pageFormat.DefaultDistanceBetweenSystems;
-
 			foreach(SvgSystem system in pageSystems)
 			{
 				SystemMetrics sm = system.Metrics;
-				frameHeight += (int)((sm.Bottom - sm.Top) + verticalSystemLeading);
+				frameHeight += (int)((sm.Bottom - sm.Top) + _pageFormat.DefaultDistanceBetweenSystems);
 			}
-			frameHeight -= verticalSystemLeading;
 
 			return frameHeight;
 		}
@@ -121,6 +116,10 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         public void WriteSVG(SvgWriter w, Metadata metadata)
         {
+			int nOutputVoices = 0;
+			int nInputVoices = 0;
+			GetNumbersOfVoices(Systems[0], ref nOutputVoices, ref nInputVoices);
+
             w.WriteStartDocument(); // standalone="no"
             //<?xml-stylesheet href="../../fontsStyleSheet.css" type="text/css"?>
             w.WriteProcessingInstruction("xml-stylesheet", "href=\"../../fontsStyleSheet.css\" type=\"text/css\"");
@@ -130,7 +129,7 @@ namespace Moritz.Symbols
 
 			WriteSodipodiNamedview(w);
 
-			metadata.WriteSVG(w, _pageNumber, _score.PageCount, _pageFormat.AboutLinkURL);
+			metadata.WriteSVG(w, _pageNumber, _score.PageCount, _pageFormat.AboutLinkURL, nOutputVoices, nInputVoices);
 
             _score.WriteSymbolDefinitions(w);
 
@@ -148,6 +147,27 @@ namespace Moritz.Symbols
 			w.WriteEndElement(); // close the svg element
             w.WriteEndDocument();
         }
+
+		private void GetNumbersOfVoices(SvgSystem svgSystem, ref int nOutputVoices, ref int nInputVoices)
+		{
+			nOutputVoices = 0;
+			nInputVoices = 0;
+			foreach(Staff staff in svgSystem.Staves)
+			{
+				foreach(Voice voice in staff.Voices)
+				{
+					if(voice is OutputVoice)
+					{
+						nOutputVoices++;
+					}
+					else if(voice is InputVoice)
+					{
+						nInputVoices++;
+					}
+				}
+			}
+		}
+
 
 		private void WritePageSizedLayer(SvgWriter w, int layerNumber, string layerName, float width, float height, string style)
 		{
