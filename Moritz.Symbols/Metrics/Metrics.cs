@@ -575,7 +575,7 @@ namespace Moritz.Symbols
             _textInfo = textInfo;
         }
 
-		internal void WriteSVG(SvgWriter w, string id)
+		internal virtual void WriteSVG(SvgWriter w, string id)
 		{
 			w.SvgText(id, _textInfo, _originX, _originY);
 		}
@@ -683,6 +683,12 @@ namespace Moritz.Symbols
         {
             return this.MemberwiseClone();
         }
+
+		public override void WriteSVG(SvgWriter w)
+		{
+			base.WriteSVG(w, null);
+		}
+
         public readonly bool IsBelow;
     }
 
