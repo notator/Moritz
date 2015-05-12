@@ -89,14 +89,12 @@ namespace Moritz.Symbols
 				w.WriteEndElement(); // ends the dc:subject element
 			}
 
-			StringBuilder desc = new StringBuilder("See: " + aboutThePieceLinkURL );
-			desc.Append("\nNumber of output voices: " + nOutputVoices.ToString());
-			if(nInputVoices > 0)
-			{ 
-				desc.Append("\nNumber of input voices: " + nInputVoices.ToString());
-			}	
+			StringBuilder desc = new StringBuilder("About: " + aboutThePieceLinkURL );
+			desc.Append("\nNumber of pages in the score: " + nScorePages.ToString());
+			desc.Append("\nNumber of output voices: " + nOutputVoices.ToString()); 
+			desc.Append("\nNumber of input voices: " + nInputVoices.ToString());	
 			if(!String.IsNullOrEmpty(Comment))
-				desc.Append("\ncomments: " + Comment);
+				desc.Append("\nComments: " + Comment);
 
 			w.WriteStartElement("dc", "description", null);
 			w.WriteString(desc.ToString());
