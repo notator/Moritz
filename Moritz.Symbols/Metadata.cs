@@ -90,7 +90,14 @@ namespace Moritz.Symbols
 			}
 
 			StringBuilder desc = new StringBuilder("About: " + aboutThePieceLinkURL );
-			desc.Append("\nNumber of pages in the score: " + nScorePages.ToString());
+			if(pageNumber == 0)
+			{
+				desc.Append("\nNumber of pages in the score: 1"); 
+			}
+			else
+			{ 
+				desc.Append("\nNumber of pages in the score: " + nScorePages.ToString());
+			}
 			desc.Append("\nNumber of output voices: " + nOutputVoices.ToString()); 
 			desc.Append("\nNumber of input voices: " + nInputVoices.ToString());	
 			if(!String.IsNullOrEmpty(Comment))
