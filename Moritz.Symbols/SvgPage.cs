@@ -137,7 +137,10 @@ namespace Moritz.Symbols
 
 			int layerNumber = 1;
 
-			WriteFrameLayer(w, layerNumber++, "frame", _pageFormat.Right, _pageFormat.Bottom);
+			if(_pageNumber > 0)
+			{ 
+				WriteFrameLayer(w, layerNumber++, "frame", _pageFormat.Right, _pageFormat.Bottom);
+			}
 
 			WriteScoreLayer(w, layerNumber++, "score", _pageNumber, metadata);
 
