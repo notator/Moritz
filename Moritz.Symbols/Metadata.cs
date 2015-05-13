@@ -32,7 +32,7 @@ namespace Moritz.Symbols
 			string pageTitle;
 			if(pageNumber == 0)
 			{
-				pageTitle = MainTitle + " (complete)";
+				pageTitle = MainTitle + " (scroll)";
 			}
 			else
 			{
