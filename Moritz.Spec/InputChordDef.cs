@@ -28,31 +28,34 @@ namespace Moritz.Spec
         public InputChordDef(int msPosition, int msDuration, byte midiPitch, string lyric, byte trkMidiChannel, byte trkLength, InputControls inputControls)
             : base(msDuration)
         {
-            _msPosition = msPosition;
-            _notatedMidiPitches = new List<byte>(){midiPitch};
+			_msPosition = msPosition;
 			_lyric = lyric;
-			_inputControls = null;
-			_inputControlsPerMidiPitch = null;
-            List<TrkRef> trkRefs = new List<TrkRef>(){new TrkRef(midiPitch, trkMidiChannel, trkLength, 0)};
-            _trkRefsPerMidiPitch.Add(trkRefs);
-            _msDurationToNextBarline = null;
+			_inputControls = inputControls;
+			_msDurationToNextBarline = null;
+			
+			_inputNoteDefs = new List<InputNoteDef>();
+			_inputNoteDefs.Add(new InputNoteDef(midiPitch, null, new List<TrkRef>() { new TrkRef(trkMidiChannel, trkLength, 0) }));
         }
 
         /// <summary>
-        /// Constructs a multi-pitch chord, each pitch having a list of trkRefs.
+        /// Constructs a multi-note chord, each note having a notated pitch, and a list of trkRefs.
         /// This constructor makes its own copy of the midiPitches but not of the trkRefs.
         /// </summary>
         public InputChordDef(int msPosition, int msDuration, List<byte> notatedMidiPitches, List<List<TrkRef>> trkRefsPerMidiPitch, string lyric)
             : base(msDuration)
         {
-            Debug.Assert(notatedMidiPitches.Count == trkRefsPerMidiPitch.Count);
+
             _msPosition = msPosition;
-            _notatedMidiPitches = new List<byte>(notatedMidiPitches);
 			_lyric = lyric;
 			_inputControls = null;
-			_inputControlsPerMidiPitch = null;
-            _trkRefsPerMidiPitch = trkRefsPerMidiPitch;
-            _msDurationToNextBarline = null;
+			_msDurationToNextBarline = null;
+
+			_inputNoteDefs = new List<InputNoteDef>();
+			Debug.Assert(notatedMidiPitches.Count == trkRefsPerMidiPitch.Count);
+			for(int i = 0; i < notatedMidiPitches.Count; ++i)
+			{
+				_inputNoteDefs.Add(new InputNoteDef(notatedMidiPitches[i], null, trkRefsPerMidiPitch[i]));
+			}
         }
 
         /// <summary>
@@ -63,9 +66,9 @@ namespace Moritz.Spec
         /// </summary>
         public void Transpose(int interval)
         {
-            for(int i = 0; i < _notatedMidiPitches.Count; ++i)
+			for(int i = 0; i < _inputNoteDefs.Count; ++i)
             {
-                _notatedMidiPitches[i] = M.MidiValue(_notatedMidiPitches[i] + interval);
+				_inputNoteDefs[i].NotatedMidiPitch = M.MidiValue(_inputNoteDefs[i].NotatedMidiPitch + interval);
             }
         }
 
@@ -97,24 +100,11 @@ namespace Moritz.Spec
 			}
 
             w.WriteStartElement("score", "inputNotes", null);
-            for(int i = 0; i < _notatedMidiPitches.Count; ++i)
-            {
-                byte pitch = _notatedMidiPitches[i];
-                w.WriteStartElement("inputNote");
-                w.WriteAttributeString("notatedKey", pitch.ToString());
-				if(_inputControlsPerMidiPitch != null && _inputControlsPerMidiPitch[i] != null)
-				{
-					_inputControlsPerMidiPitch[i].WriteSvg(w);
-				}
-                List<TrkRef> trkRefs = this.TrkRefsPerMidiPitch[i];
-                w.WriteStartElement("trkRefs");
-                foreach(TrkRef trkRef in trkRefs)
-                {
-                    trkRef.WriteSvg(w);
-                }
-                w.WriteEndElement(); // score:trkRefs
-                w.WriteEndElement(); // score:inputNote
-            }
+			foreach(InputNoteDef ind in _inputNoteDefs)
+			{
+				ind.WriteSvg(w);
+			}
+
             w.WriteEndElement(); // score:inputNotes
         }
 
@@ -132,25 +122,34 @@ namespace Moritz.Spec
 		public InputControls InputControls { get { return _inputControls; } set { _inputControls = value; } }
 		private InputControls _inputControls = null;
 
-		public List<byte> NotatedMidiPitches { get { return _notatedMidiPitches; } set { _notatedMidiPitches = value; } }
-		protected List<byte> _notatedMidiPitches = new List<byte>();
+		public List<InputNoteDef> InputNoteDefs { get {return _inputNoteDefs; }}
+		private List<InputNoteDef> _inputNoteDefs = new List<InputNoteDef>();
 
-		public List<InputControls> InputControlsPerMidiPitch
-		{ 
-			get	{ return _inputControlsPerMidiPitch; }
-			set
-			{ 
-				if(value.Count != _notatedMidiPitches.Count)
+		public List<byte> NotatedMidiPitches
+		{
+			get
+			{
+				List<byte> rList = new List<byte>();
+				foreach(InputNoteDef ind in _inputNoteDefs)
 				{
-					throw new ApplicationException("This list must have one member per notated midi pitch (the member can be null).");
+					rList.Add(ind.NotatedMidiPitch);
 				}
-				_inputControlsPerMidiPitch = value;
+				return rList;
+			}
+			/// This setter creates a new list of InputNoteheadDefs, without InputControls or TrkRefs
+			set
+			{
+				List<byte> newNoteheads = value;
+				_inputNoteDefs = new List<InputNoteDef>();
+				int previousPitch = -1;
+				foreach(byte midiPitch in newNoteheads)
+				{
+					Debug.Assert(midiPitch > previousPitch);
+					previousPitch = midiPitch;
+					_inputNoteDefs.Add(new InputNoteDef(midiPitch, null, null));
+				}
 			}
 		}
-		private List<InputControls> _inputControlsPerMidiPitch = null;
-
-        public List<List<TrkRef>> TrkRefsPerMidiPitch { get { return _trkRefsPerMidiPitch; } }
-        private List<List<TrkRef>> _trkRefsPerMidiPitch = new List<List<TrkRef>>();
 
         public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
         private int? _msDurationToNextBarline = null;

@@ -92,15 +92,11 @@ namespace Moritz.Algorithm.Study3Sketch2
         {
 			InputControls ics1 = new InputControls();
 			ics1.NoteOffOption = NoteOffOption.stopChord;
-			List<InputControls> icList1 =  new List<InputControls>();
-			icList1.Add(ics1);
-			bar2InputChordDefs[0].InputControlsPerMidiPitch = icList1;
+			bar2InputChordDefs[0].InputNoteDefs[0].InputControls = ics1;
 
 			InputControls ics2 = new InputControls();
 			ics2.NoteOffOption = NoteOffOption.fade;
-			List<InputControls> icList2 = new List<InputControls>();
-			icList2.Add(ics2);
-			bar2InputChordDefs[1].InputControlsPerMidiPitch = icList2;
+			bar2InputChordDefs[1].InputNoteDefs[0].InputControls = ics2;
         }
 
         private void SetBar3PitchWheelToVolumeControls(List<InputChordDef> bar3InputChordDefs)
@@ -108,14 +104,12 @@ namespace Moritz.Algorithm.Study3Sketch2
             foreach(InputChordDef inputChordDef in bar3InputChordDefs)
             {
                 InputControls ics = new InputControls();
-                ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly; // this is the current value in the voice (has no effect)
+                //ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly; // this is the current value in the voice (has no effect)
                 ics.NoteOffOption = NoteOffOption.fade; // this is the current value in the voice (has no effect)
                 ics.PitchWheelOption = ControllerOption.volume;
                 ics.MaximumVolume = 100;
                 ics.MinimumVolume = 50;
-				List<InputControls> icList = new List<InputControls>();
-				icList.Add(ics);
-				inputChordDef.InputControlsPerMidiPitch = icList;
+				inputChordDef.InputNoteDefs[0].InputControls = ics;
             }
         }
 
@@ -125,13 +119,11 @@ namespace Moritz.Algorithm.Study3Sketch2
             foreach(InputChordDef inputChordDef in bar4InputChordDefs)
             {
                 InputControls ics = new InputControls();
-                ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly; // this is the current value in the voice (has no effect)
+                //ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly; // this is the current value in the voice (has no effect)
                 ics.NoteOffOption = NoteOffOption.stopChord;
                 ics.NumberOfObjectsInFade = numberOfObjectsInFade++;
                 ics.PitchWheelOption = ControllerOption.pitchWheel;
-				List<InputControls> icList = new List<InputControls>();
-				icList.Add(ics);
-				inputChordDef.InputControlsPerMidiPitch = icList;
+				inputChordDef.InputNoteDefs[0].InputControls = ics;
             }
         }
 
@@ -144,9 +136,7 @@ namespace Moritz.Algorithm.Study3Sketch2
                 ics.PitchWheelOption = ControllerOption.pitchWheel; // this is the current value in the voice (has no effect)
                 ics.SpeedOption = SpeedOption.noteOnKey;
                 ics.MaxSpeedPercent = 500;
-				List<InputControls> icList = new List<InputControls>();
-				icList.Add(ics);
-				inputChordDef.InputControlsPerMidiPitch = icList;
+				inputChordDef.InputNoteDefs[0].InputControls = ics;
             }
         }
         #region CreateBar1()
@@ -186,16 +176,17 @@ namespace Moritz.Algorithm.Study3Sketch2
 			InputChordDef inputChordDef1 = inputVoiceDef.UniqueDefs[0] as InputChordDef; // no need to check for null here.
 
 			InputControls chordInputControls = new InputControls();
-			chordInputControls.NoteOnKeyOption = NoteOnKeyOption.ignore;
+			chordInputControls.NoteOnVelocityOption = NoteOnVelocityOption.overridden;
 			inputChordDef1.InputControls = chordInputControls;
 
-			InputControls midiPitchSeqInputControls = new InputControls();
-			midiPitchSeqInputControls.NoteOnKeyOption = NoteOnKeyOption.transpose;
-			List<InputControls> inputControlsPerMidiPitch = new List<InputControls>();
-			inputControlsPerMidiPitch.Add(midiPitchSeqInputControls);
-			// This list must have the same number of members as there are pitches, but members can be null.
-			// (A check is made in inputChordDef1.InputControlsPerMidiPitch set().)
-			inputChordDef1.InputControlsPerMidiPitch = inputControlsPerMidiPitch; 
+			InputControls noteInputControls = new InputControls();
+			noteInputControls.NoteOnVelocityOption = NoteOnVelocityOption.scale;
+			inputChordDef1.InputNoteDefs[0].InputControls = noteInputControls;
+			
+			InputControls trkRefInputControls = new InputControls();
+			trkRefInputControls.NoteOnVelocityOption = NoteOnVelocityOption.share;
+			inputChordDef1.InputNoteDefs[0].TrkRefs[0].InputControls = trkRefInputControls;
+			 
 			#endregion
 				 
             bar.Add(inputVoiceDef);

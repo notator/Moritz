@@ -39,10 +39,10 @@ namespace Moritz.Spec
         {
             w.WriteStartElement("inputControls");
 
-            if(this.NoteOnKeyOption != Spec.NoteOnKeyOption.dontOverride)
-            {
-                w.WriteAttributeString("noteOnKey", this.NoteOnKeyOption.ToString());
-            }
+			//if(this.NoteOnKeyOption != Spec.NoteOnKeyOption.dontOverride)
+			//{
+			//	w.WriteAttributeString("noteOnKey", this.NoteOnKeyOption.ToString());
+			//}
             if(this.NoteOnVelocityOption != Spec.NoteOnVelocityOption.dontOverride)
             {
                 w.WriteAttributeString("noteOnVel", this.NoteOnVelocityOption.ToString());
@@ -51,15 +51,15 @@ namespace Moritz.Spec
             {
                 w.WriteAttributeString("noteOff", this.NoteOffOption.ToString());
             }
-            if(this.NoteOffOption == NoteOffOption.shortFade)
-            {
-                if(NumberOfObjectsInFade == null)
-                    throw new ApplicationException(
-                            "\nInputControls Error:\n" +
-                            "If the NoteOffOption is set to 'shortFade',\n" +
-                            "then the NumberOfObjectsInFade must also be set.");
-                w.WriteAttributeString("shortFade", NumberOfObjectsInFade.ToString());
-            }
+			//if(this.NoteOffOption == NoteOffOption.shortFade)
+			//{
+			//	if(NumberOfObjectsInFade == null)
+			//		throw new ApplicationException(
+			//				"\nInputControls Error:\n" +
+			//				"If the NoteOffOption is set to 'shortFade',\n" +
+			//				"then the NumberOfObjectsInFade must also be set.");
+			//	w.WriteAttributeString("shortFade", NumberOfObjectsInFade.ToString());
+			//}
             bool isControllingVolume = false;
             if(this.PressureOption != ControllerOption.dontOverride)
             {
@@ -126,7 +126,7 @@ namespace Moritz.Spec
             w.WriteAttributeString("minVolume", MinimumVolume.ToString());
         }
 
-        public NoteOnKeyOption NoteOnKeyOption = NoteOnKeyOption.dontOverride;
+        //public NoteOnKeyOption NoteOnKeyOption = NoteOnKeyOption.dontOverride;
         public NoteOnVelocityOption NoteOnVelocityOption = NoteOnVelocityOption.dontOverride;
         public NoteOffOption NoteOffOption = NoteOffOption.dontOverride;
         public ControllerOption PressureOption = ControllerOption.dontOverride;
@@ -139,19 +139,22 @@ namespace Moritz.Spec
         public int? MaxSpeedPercent = null; // must be set to a value > 100 if the performer is controlling the speed (often set to about 400)
     }
 
-    public enum NoteOnKeyOption
-    {
-        dontOverride, // Dont write the option to the score file. Use the current voice setting.
-        ignore, // any key will start the Trk. It will play using the notated pitches.
-        transpose,
-        matchExactly // the Trk will not start if the key does not match any of the notated pitchesd.
-    };
+	//public enum NoteOnKeyOption
+	//{
+	//	dontOverride, // Dont write the option to the score file. Use the current voice setting.
+	//	//ignore, // any key will start the Trk. It will play using the notated pitches.
+	//	//transpose,
+	//	// matchExactly is currently the only way in which noteOns are treated.
+	//	matchExactly // the Trk will not start if the key does not match any of the notated pitchesd.
+	//};
 
     public enum NoteOnVelocityOption
     {
         dontOverride, // Dont write the option to the score file. Use the current voice setting.
         ignore,
-        scale
+        scale,
+		share,
+		overridden
     };
 
     public enum NoteOffOption
@@ -160,8 +163,9 @@ namespace Moritz.Spec
         ignore, // ignore the noteOff and play the trk to completion (as written in the score)
         stopChord, // stop when the current midiChord or midiRest completes
         stopNow, // stop immediately, even inside a midiChord
-        fade, // fade velocity to end of trk
-        shortFade // fade velocity over a fixed number of midiObjects
+        fade // fade velocity to end of trk
+		// short fade is not currently implemented.
+        //shortFade // fade velocity over a fixed number of midiObjects
     };
 
     /// <summary>
@@ -192,7 +196,7 @@ namespace Moritz.Spec
     public enum SpeedOption
     {
         dontOverride, // Dont write the option to the score file. Use the current voice setting.
-        none, // use the default durations in the score
+        none, // use the durations in the score
         noteOnKey,
         noteOnVel,
         pressure,
