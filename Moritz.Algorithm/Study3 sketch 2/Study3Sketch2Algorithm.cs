@@ -180,11 +180,11 @@ namespace Moritz.Algorithm.Study3Sketch2
 			inputChordDef1.InputControls = chordInputControls;
 
 			InputControls noteInputControls = new InputControls();
-			noteInputControls.NoteOnVelocityOption = NoteOnVelocityOption.scale;
+			noteInputControls.NoteOnVelocityOption = NoteOnVelocityOption.scaled;
 			inputChordDef1.InputNoteDefs[0].InputControls = noteInputControls;
 			
 			InputControls trkRefInputControls = new InputControls();
-			trkRefInputControls.NoteOnVelocityOption = NoteOnVelocityOption.share;
+			trkRefInputControls.NoteOnVelocityOption = NoteOnVelocityOption.shared;
 			inputChordDef1.InputNoteDefs[0].TrkRefs[0].InputControls = trkRefInputControls;
 			 
 			#endregion

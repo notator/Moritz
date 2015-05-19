@@ -152,8 +152,8 @@ namespace Moritz.Spec
     {
         dontOverride, // Dont write the option to the score file. Use the current voice setting.
         ignore,
-        scale,
-		share,
+        scaled,
+		shared,
 		overridden
     };
 
