@@ -16,20 +16,19 @@ namespace Moritz.Spec
 	/// See http://james-ingram-act-two.de/open-source/svgScoreExtensions.html for details as to how these inputControls are used.
 	/// 	
     /// The values these options can take in the InputControls are defined in enums in this namespace.
-    /// In addition to the values stored in scores, each of these enums has a "dontOverride" member here in Moritz.
+    /// In addition to the values stored in scores, each of these enums has a "undefined" member here in Moritz.
     /// The default options for an Input Voice are:
-    ///     noteOnKey="ignore" -- input midi pitches are ignored (the score uses its own, default pitches)
-    ///     noteOnVel="ignore" -- input midi velocities are ignored (the score uses its own, default velocities) 
-    ///     noteOff="ignore" -- input noteOffs are ignored.
-    ///     pressure="ignore" -- input channelPressure/aftertouch information is ignored.
-    ///     pitchWheel="ignore" -- input pitchWheel information is ignored.
-    ///     modulation="ignore" -- input modulation wheel information is ignored.
-    ///     speedOption="none" -- the default durations (set in the score) are used. 
+    ///     noteOnVel="undefined" -- input midi velocities are ignored (the score uses its own, default velocities) 
+    ///     noteOff="undefined" -- input noteOffs are ignored.
+    ///     pressure="undefined" -- input channelPressure/aftertouch information is ignored.
+    ///     pitchWheel="undefined" -- input pitchWheel information is ignored.
+    ///     modulation="undefined" -- input modulation wheel information is ignored.
+    ///     speedOption="undefined" -- the default durations (set in the score) are used. 
     /// </summary>
     public class InputControls
     {
         /// <summary>
-        /// All options are set to .dontOverride by default
+        /// All options are set to .undefined by default
         /// </summary>
         public InputControls()
         {
@@ -39,29 +38,29 @@ namespace Moritz.Spec
         {
             w.WriteStartElement("inputControls");
 
-			//if(this.NoteOnKeyOption != Spec.NoteOnKeyOption.dontOverride)
-			//{
-			//	w.WriteAttributeString("noteOnKey", this.NoteOnKeyOption.ToString());
-			//}
-            if(this.NoteOnVelocityOption != Spec.NoteOnVelocityOption.dontOverride)
+            if(this.NoteOnVelocityOption != Spec.NoteOnVelocityOption.undefined)
             {
                 w.WriteAttributeString("noteOnVel", this.NoteOnVelocityOption.ToString());
+				if(NoteOnVelocityOption != Spec.NoteOnVelocityOption.off)
+				{ 
+					if(this.MinimumVelocity == null || MinimumVelocity < 1 || MinimumVelocity > 127)
+					{
+						throw new ApplicationException(
+							"\nNoteOnVelocityOption Error:\n" +
+							"If the NoteOnVelocityOption is being used, then\n" +
+							"MinimumVelocity must be set to a value in range [1..127]");
+					}
+					w.WriteAttributeString("minVelocity", this.MinimumVelocity.ToString());
+				}
             }
-            if(this.NoteOffOption != Spec.NoteOffOption.dontOverride)
+
+            if(this.NoteOffOption != Spec.NoteOffOption.undefined)
             {
                 w.WriteAttributeString("noteOff", this.NoteOffOption.ToString());
             }
-			//if(this.NoteOffOption == NoteOffOption.shortFade)
-			//{
-			//	if(NumberOfObjectsInFade == null)
-			//		throw new ApplicationException(
-			//				"\nInputControls Error:\n" +
-			//				"If the NoteOffOption is set to 'shortFade',\n" +
-			//				"then the NumberOfObjectsInFade must also be set.");
-			//	w.WriteAttributeString("shortFade", NumberOfObjectsInFade.ToString());
-			//}
+
             bool isControllingVolume = false;
-            if(this.PressureOption != ControllerOption.dontOverride)
+            if(this.PressureOption != ControllerOption.undefined)
             {
                 w.WriteAttributeString("pressure", this.PressureOption.ToString());
                 if(this.PressureOption == ControllerOption.volume)
@@ -71,7 +70,7 @@ namespace Moritz.Spec
                 }
             }
 
-            if(this.PitchWheelOption != ControllerOption.dontOverride)
+            if(this.PitchWheelOption != ControllerOption.undefined)
             {
                 w.WriteAttributeString("pitchWheel", this.PitchWheelOption.ToString());
                 if(this.PitchWheelOption == ControllerOption.volume)
@@ -82,7 +81,7 @@ namespace Moritz.Spec
                 }
             }
 
-            if(this.ModWheelOption != ControllerOption.dontOverride)
+            if(this.ModWheelOption != ControllerOption.undefined)
             {
                 w.WriteAttributeString("modulation", this.ModWheelOption.ToString());
                 if(this.ModWheelOption == ControllerOption.volume)
@@ -93,17 +92,20 @@ namespace Moritz.Spec
                 }
             }
 
-            if(this.SpeedOption != Spec.SpeedOption.dontOverride)
+            if(this.SpeedOption != Spec.SpeedOption.undefined)
             {
                 w.WriteAttributeString("speedOption", this.SpeedOption.ToString());
-                if(MaxSpeedPercent == null || MaxSpeedPercent < 100)
-                {
-                    throw new ApplicationException(
-                        "\nInputControls Error:\n" +
-                        "If the SpeedOption is set, then MaxSpeedPercent must be set\n" +
-                        "to a value >= 100.");
-                }
-                w.WriteAttributeString("maxSpeedPercent", this.MaxSpeedPercent.ToString());
+				if(SpeedOption != Spec.SpeedOption.off)
+				{
+					if(MaxSpeedPercent == null || MaxSpeedPercent < 100)
+					{
+						throw new ApplicationException(
+							"\nInputControls Error:\n" +
+							"If the SpeedOption is set, then MaxSpeedPercent must be set\n" +
+							"to a value >= 100.");
+					}
+					w.WriteAttributeString("maxSpeedPercent", this.MaxSpeedPercent.ToString());
+				}
             }
             w.WriteEndElement(); // score:inputControls
         }
@@ -126,32 +128,22 @@ namespace Moritz.Spec
             w.WriteAttributeString("minVolume", MinimumVolume.ToString());
         }
 
-        //public NoteOnKeyOption NoteOnKeyOption = NoteOnKeyOption.dontOverride;
-        public NoteOnVelocityOption NoteOnVelocityOption = NoteOnVelocityOption.dontOverride;
-        public NoteOffOption NoteOffOption = NoteOffOption.dontOverride;
-        public ControllerOption PressureOption = ControllerOption.dontOverride;
-        public ControllerOption PitchWheelOption = ControllerOption.dontOverride;
-        public ControllerOption ModWheelOption = ControllerOption.dontOverride;
-        public SpeedOption SpeedOption = SpeedOption.dontOverride;
-        public int? NumberOfObjectsInFade = null; // must be set if the NoteOffOption is "limitedFade".
+        public NoteOnVelocityOption NoteOnVelocityOption = NoteOnVelocityOption.undefined;
+        public NoteOffOption NoteOffOption = NoteOffOption.undefined;
+        public ControllerOption PressureOption = ControllerOption.undefined;
+        public ControllerOption PitchWheelOption = ControllerOption.undefined;
+        public ControllerOption ModWheelOption = ControllerOption.undefined;
+        public SpeedOption SpeedOption = SpeedOption.undefined;
+		public byte? MinimumVelocity = null; // must be set if a velocity option is being used
         public byte? MaximumVolume = null; // must be set if the performer is controlling the volume
-        public byte? MinimumVolume = null; // must be set if the performer is controlling the volume
+		public byte? MinimumVolume = null; // must be set if the performer is controlling the volume
         public int? MaxSpeedPercent = null; // must be set to a value > 100 if the performer is controlling the speed (often set to about 400)
     }
 
-	//public enum NoteOnKeyOption
-	//{
-	//	dontOverride, // Dont write the option to the score file. Use the current voice setting.
-	//	//ignore, // any key will start the Trk. It will play using the notated pitches.
-	//	//transpose,
-	//	// matchExactly is currently the only way in which noteOns are treated.
-	//	matchExactly // the Trk will not start if the key does not match any of the notated pitchesd.
-	//};
-
     public enum NoteOnVelocityOption
     {
-        dontOverride, // Dont write the option to the score file. Use the current voice setting.
-        ignore,
+        undefined, // Dont write the option to the score file. Use the current setting.
+		off, // Written to the score file: turn this option off, overriding the current setting
         scaled,
 		shared,
 		overridden
@@ -159,13 +151,11 @@ namespace Moritz.Spec
 
     public enum NoteOffOption
     {
-        dontOverride, // Dont write the option to the score file. Use the current setting.
-        ignore, // ignore the noteOff and play the trk to completion (as written in the score)
+		undefined, // Dont write the option to the score file. Use the current setting.
+		off, // Written to the score file: turn this option off, overriding the current setting
         stopChord, // stop when the current midiChord or midiRest completes
         stopNow, // stop immediately, even inside a midiChord
         fade // fade velocity to end of trk
-		// short fade is not currently implemented.
-        //shortFade // fade velocity over a fixed number of midiObjects
     };
 
     /// <summary>
@@ -175,28 +165,28 @@ namespace Moritz.Spec
     /// </summary>
     public enum ControllerOption
     {
-        dontOverride, // Dont write the option to the score file. Use the current voice setting.
-        ignore = 0,
-        aftertouch = 1,
-        channelPressure = 2,
-        pitchWheel = 3,
-        modulation = 4,
-        volume = 5,
-        pan = 6,
-        expression = 7,
-        timbre = 8,
-        brightness = 9,
-        effects = 10,
-        tremolo = 11,
-        chorus = 12,
-        celeste = 13,
-        phaser = 14
+		undefined = 0, // Dont write the option to the score file. Use the current setting.
+		off = 1, // Written to the score file: turn this option off, overriding the current setting
+        aftertouch = 2,
+        channelPressure = 3,
+        pitchWheel = 4,
+        modulation = 5,
+        volume = 6,
+        pan = 7,
+        expression = 8,
+        timbre = 9,
+        brightness = 10,
+        effects = 11,
+        tremolo = 12,
+        chorus = 13,
+        celeste = 14,
+        phaser = 15
     };
 
     public enum SpeedOption
     {
-        dontOverride, // Dont write the option to the score file. Use the current voice setting.
-        none, // use the durations in the score
+		undefined, // Dont write the option to the score file. Use the current setting.
+		off, // Written to the score file: turn this option off, overriding the current setting
         noteOnKey,
         noteOnVel,
         pressure,

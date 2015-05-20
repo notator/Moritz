@@ -56,7 +56,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             List<InputChordDef> inputChordSymbolsInBar3 = GetInputChordDefsInBar(bars[2]);
             SetBar3PitchWheelToVolumeControls(inputChordSymbolsInBar3);
             List<InputChordDef> inputChordSymbolsInBar4 = GetInputChordDefsInBar(bars[3]);
-            SetBar4LimitedFadeControls(inputChordSymbolsInBar4);
+            SetBar4FadeControls(inputChordSymbolsInBar4);
             List<InputChordDef> inputChordSymbolsInBar5 = GetInputChordDefsInBar(bars[4]);
             SetBar5SpeedControls(inputChordSymbolsInBar5);
 
@@ -104,7 +104,6 @@ namespace Moritz.Algorithm.Study3Sketch2
             foreach(InputChordDef inputChordDef in bar3InputChordDefs)
             {
                 InputControls ics = new InputControls();
-                //ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly; // this is the current value in the voice (has no effect)
                 ics.NoteOffOption = NoteOffOption.fade; // this is the current value in the voice (has no effect)
                 ics.PitchWheelOption = ControllerOption.volume;
                 ics.MaximumVolume = 100;
@@ -113,15 +112,12 @@ namespace Moritz.Algorithm.Study3Sketch2
             }
         }
 
-        private void SetBar4LimitedFadeControls(List<InputChordDef> bar4InputChordDefs)
+        private void SetBar4FadeControls(List<InputChordDef> bar4InputChordDefs)
         {
-            int numberOfObjectsInFade = 4;
             foreach(InputChordDef inputChordDef in bar4InputChordDefs)
             {
                 InputControls ics = new InputControls();
-                //ics.NoteOnKeyOption = NoteOnKeyOption.matchExactly; // this is the current value in the voice (has no effect)
-                ics.NoteOffOption = NoteOffOption.stopChord;
-                ics.NumberOfObjectsInFade = numberOfObjectsInFade++;
+                ics.NoteOffOption = NoteOffOption.fade;
                 ics.PitchWheelOption = ControllerOption.pitchWheel;
 				inputChordDef.InputNoteDefs[0].InputControls = ics;
             }
@@ -177,14 +173,17 @@ namespace Moritz.Algorithm.Study3Sketch2
 
 			InputControls chordInputControls = new InputControls();
 			chordInputControls.NoteOnVelocityOption = NoteOnVelocityOption.overridden;
+			chordInputControls.MinimumVelocity = 19;
 			inputChordDef1.InputControls = chordInputControls;
 
 			InputControls noteInputControls = new InputControls();
 			noteInputControls.NoteOnVelocityOption = NoteOnVelocityOption.scaled;
+			noteInputControls.MinimumVelocity = 20;
 			inputChordDef1.InputNoteDefs[0].InputControls = noteInputControls;
 			
 			InputControls trkRefInputControls = new InputControls();
 			trkRefInputControls.NoteOnVelocityOption = NoteOnVelocityOption.shared;
+			trkRefInputControls.MinimumVelocity = 21;
 			inputChordDef1.InputNoteDefs[0].TrkRefs[0].InputControls = trkRefInputControls;
 			 
 			#endregion
