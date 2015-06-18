@@ -319,7 +319,6 @@ namespace Moritz.Palettes
             _bcc.TouchAllTextBoxes();
             BankIndicesTextBox_Leave(BankIndicesTextBox, null);
             PatchIndicesTextBox_Leave(PatchIndicesTextBox, null);
-            RepeatsTextBox_Leave(RepeatsTextBox, null);
             PitchwheelDeviationsTextBox_Leave(PitchwheelDeviationsTextBox, null);
             PitchwheelEnvelopesTextBox_Leave(PitchwheelEnvelopesTextBox, null);
             PanEnvelopesTextBox_Leave(PanEnvelopesTextBox, null);
@@ -572,7 +571,6 @@ namespace Moritz.Palettes
             _bcc.SetHelpLabels();
             BankIndicesHelpLabel.Text = countString + "integer values in range [ 0..127 ]";
             PatchIndicesHelpLabel.Text = countString + "integer values in range [ 0..127 ]";
-            RepeatsHelpLabel.Text = countString + "boolean values ( 1=true, 0=false )";
             PitchwheelDeviationsHelpLabel.Text = countString + integerString + valuesInRangeString + "[ 0..127 ]";
             PitchwheelEnvelopesHelpLabel.Text = envelopesHelpString;
             PanEnvelopesHelpLabel.Text = envelopesHelpString;
@@ -608,7 +606,6 @@ namespace Moritz.Palettes
             
             allTextBoxes.Add(BankIndicesTextBox);
             allTextBoxes.Add(PatchIndicesTextBox);
-            allTextBoxes.Add(RepeatsTextBox);
             allTextBoxes.Add(PitchwheelDeviationsTextBox);
             allTextBoxes.Add(PitchwheelEnvelopesTextBox);
             allTextBoxes.Add(PanEnvelopesTextBox);           
@@ -648,10 +645,6 @@ namespace Moritz.Palettes
             ModulationWheelEnvelopesLabel.Enabled = true;
             ModulationWheelEnvelopesTextBox.Enabled = true;
             ModulationWheelEnvelopesHelpLabel.Enabled = true;
-
-            RepeatsLabel.Enabled = true;
-            RepeatsTextBox.Enabled = true;
-            RepeatsHelpLabel.Enabled = true;
 
             PitchwheelDeviationsLabel.Enabled = true;
             PitchwheelDeviationsTextBox.Enabled = true;
@@ -753,11 +746,6 @@ namespace Moritz.Palettes
         private void PatchIndicesTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveIntRangeTextBox(sender as TextBox, false, (uint)_bcc.NumberOfChordValues, 0, 127, SetDialogState);
-        }
-
-        private void RepeatsTextBox_Leave(object sender, EventArgs e)
-        {
-            M.LeaveIntRangeTextBox(sender as TextBox, true, (uint)_bcc.NumberOfChordValues, 0, 1, SetDialogState);
         }
 
         private void PitchwheelDeviationsTextBox_Leave(object sender, EventArgs e)
@@ -1089,12 +1077,6 @@ namespace Moritz.Palettes
                 w.WriteString(PatchIndicesTextBox.Text.Replace(" ", ""));
                 w.WriteEndElement();
             }
-            if(!string.IsNullOrEmpty(RepeatsTextBox.Text))
-            {
-                w.WriteStartElement("repeats");
-                w.WriteString(RepeatsTextBox.Text.Replace(" ", ""));
-                w.WriteEndElement();
-            }
             if(!string.IsNullOrEmpty(PitchwheelDeviationsTextBox.Text))
             {
                 w.WriteStartElement("pitchwheelDeviations");
@@ -1160,7 +1142,6 @@ namespace Moritz.Palettes
             #region
             BankIndicesTextBox.Text = "";
             PatchIndicesTextBox.Text = "";
-            RepeatsTextBox.Text = "";
             PitchwheelDeviationsTextBox.Text = "";
             PitchwheelEnvelopesTextBox.Text = "";
             PanEnvelopesTextBox.Text = "";
@@ -1191,9 +1172,6 @@ namespace Moritz.Palettes
                             break;
                         case "patchIndices":
                             PatchIndicesTextBox.Text = r.ReadElementContentAsString();
-                            break;
-                        case "repeats":
-                            RepeatsTextBox.Text = r.ReadElementContentAsString();
                             break;
                         case "pitchwheelDeviations":
                             PitchwheelDeviationsTextBox.Text = r.ReadElementContentAsString();

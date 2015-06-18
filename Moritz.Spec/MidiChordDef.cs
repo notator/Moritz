@@ -31,7 +31,6 @@ namespace Moritz.Spec
         /// </summary>
         public MidiChordDef(
             int msDuration, // the total duration (this should be the sum of the durations of the basicMidiChordDefs)
-            bool repeat, // default is M.DefaultChordRepeats (=false)
             byte pitchWheelDeviation, // default is M.DefaultPitchWheelDeviation (=2)
             bool hasChordOff, // default is M.DefaultHasChordOff (=true)
             List<byte> midiPitches, // the pitches that are displayed in the score
@@ -45,7 +44,6 @@ namespace Moritz.Spec
 
             _msPosition = 0;
             _msDuration = msDuration;
-            _repeat = repeat;
             _pitchWheelDeviation = pitchWheelDeviation;
             _hasChordOff = hasChordOff;
             _displayedMidiPitches = midiPitches;
@@ -66,14 +64,13 @@ namespace Moritz.Spec
         /// <summary>
         /// This constructor creates a MidiChordDef at msPosition 0, lyric = null, containing a single BasicMidiChordDef and no sliders.
         /// </summary>
-        public MidiChordDef(List<byte> pitches, List<byte> velocities, int msPosition, int msDuration, bool repeat, bool hasChordOff)
+        public MidiChordDef(List<byte> pitches, List<byte> velocities, int msPosition, int msDuration, bool hasChordOff)
             : base(msDuration)
         {
             foreach(byte pitch in pitches)
                 Debug.Assert(pitch == M.MidiValue((int)pitch), "Pitch out of range.");
 
             _msPosition = msPosition;
-            _repeat = repeat;
             _hasChordOff = hasChordOff;
             _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 
@@ -112,7 +109,6 @@ namespace Moritz.Spec
             // rval.MsDuration must be set after setting BasicMidiChordDefs See below.
             rval.Bank = this.Bank;
             rval.Patch = this.Patch;
-            rval.Repeat = this.Repeat;
             rval.PitchWheelDeviation = this.PitchWheelDeviation;
             rval.HasChordOff = this.HasChordOff;
             rval.Lyric = this.Lyric;
@@ -345,8 +341,6 @@ namespace Moritz.Spec
             {
                 BasicMidiChordDefs[0].PatchIndex = Patch;
             }
-            if(Repeat == true)
-                w.WriteAttributeString("repeat", "1");
             if(HasChordOff == false)
                 w.WriteAttributeString("hasChordOff", "0");
             if(PitchWheelDeviation != null && PitchWheelDeviation != M.DefaultPitchWheelDeviation)
@@ -537,12 +531,6 @@ namespace Moritz.Spec
         private byte? _bank = null;
         public byte? Patch { get { return _patch; } set { _patch = value; } }
         private byte? _patch = null;
-        // If Repeat is true, the MidiChord will repeat in assisted performances
-        // if the performed duration is longer than the duration of the basicChords,
-        // and the performer continues to hold the key down.
-        // The duration in the score is always the sum of the durations of the basicChords.
-        public bool Repeat { get { return _repeat; } set { _repeat = value; } }
-        private bool _repeat = false;
         public byte? PitchWheelDeviation
         {
             get

@@ -28,7 +28,6 @@ namespace Moritz.Palettes
 
             _bankIndices = M.StringToByteList(paletteForm.BankIndicesTextBox.Text, ',');
             _patchIndices = M.StringToByteList(paletteForm.PatchIndicesTextBox.Text, ',');
-            _repeats = M.StringToBoolList(paletteForm.RepeatsTextBox.Text, ',');
             _pitchwheelDeviations = M.StringToByteList(paletteForm.PitchwheelDeviationsTextBox.Text, ',');
             _pitchwheelEnvelopes = M.StringToByteLists(paletteForm.PitchwheelEnvelopesTextBox.Text);
             _panEnvelopes = M.StringToByteLists(paletteForm.PanEnvelopesTextBox.Text);
@@ -74,7 +73,6 @@ namespace Moritz.Palettes
 
             _bankIndices = M.StringToByteList(paletteChordForm.BankIndexTextBox.Text, ',');
             _patchIndices = M.StringToByteList(paletteChordForm.PatchIndexTextBox.Text, ',');
-            _repeats = M.StringToBoolList(paletteChordForm.RepeatsTextBox.Text, ',');
             _pitchwheelDeviations = M.StringToByteList(paletteChordForm.PitchwheelDeviationTextBox.Text, ',');
 
             _pitchwheelEnvelopes = M.StringToByteLists(paletteChordForm.PitchwheelEnvelopeTextBox.Text);
@@ -121,7 +119,6 @@ namespace Moritz.Palettes
 
                 byte? bankIndex = ByteOrNull(_bankIndices, index);
                 byte? patchIndex = ByteOrNull(_patchIndices, index);
-                bool repeat = BoolOrDefaultValue(_repeats, index, M.DefaultChordRepeats); // false
                 byte pitchwheelDeviation = ByteOrDefaultValue(_pitchwheelDeviations, index, M.DefaultPitchWheelDeviation); // 2
                 List<byte> pitchwheelEnvelope = ListByte(_pitchwheelEnvelopes, index);
                 List<byte> panEnvelope = ListByte(_panEnvelopes, index);
@@ -205,7 +202,6 @@ namespace Moritz.Palettes
 
                 rval = new MidiChordDef(
                     duration,
-                    repeat,
                     pitchwheelDeviation,
                     hasChordOff,
                     rootMidiPitches,
@@ -285,7 +281,6 @@ namespace Moritz.Palettes
         private BasicChordMidiSettings _basicChordMidiSettings;
         private List<byte> _bankIndices;
         private List<byte> _patchIndices;
-        private List<bool> _repeats;
         private List<byte> _pitchwheelDeviations;
         private List<List<byte>> _pitchwheelEnvelopes;
         private List<List<byte>> _panEnvelopes;

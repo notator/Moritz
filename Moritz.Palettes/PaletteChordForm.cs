@@ -84,13 +84,6 @@ namespace Moritz.Palettes
                 _emptyDefaultHelpLabels.Add(this.BankIndexHelpLabel);
             }
 
-            if(string.IsNullOrEmpty(pf.RepeatsTextBox.Text))
-            {
-                _emptyDefaultLabels.Add(this.RepeatsLabel);
-                _emptyDefaultTextBoxes.Add(this.RepeatsTextBox);
-                _emptyDefaultHelpLabels.Add(this.RepeatsHelpLabel);
-            }
-
             if(string.IsNullOrEmpty(pf.PitchwheelDeviationsTextBox.Text))
             {
                 _emptyDefaultLabels.Add(this.PitchwheelDeviationLabel);
@@ -146,7 +139,7 @@ namespace Moritz.Palettes
         {
             _audioSampleButtons = new List<Button>();
             int x = 181;
-            int y = 582;
+            int y = 555;
             for(int i = 0; i < domain; ++i)
             {
                 CreateAudioSampleButton(x, y, i);
@@ -254,10 +247,6 @@ namespace Moritz.Palettes
             this.PatchIndexTextBox.Text = patchIndexSBs[1].ToString();
             _savedPatchIndexTextBoxText = PatchIndexTextBox.Text;
             _allTextBoxes.Add(PatchIndexTextBox);
-            repeatsSBs = GetSubStrings(paletteForm.RepeatsTextBox.Text, midiChordIndex);
-            this.RepeatsTextBox.Text = repeatsSBs[1].ToString();
-            _savedRepeatsTextBoxText = RepeatsTextBox.Text;
-            _allTextBoxes.Add(RepeatsTextBox);
             pitchwheelDeviationSBs = GetSubStrings(paletteForm.PitchwheelDeviationsTextBox.Text, midiChordIndex);
             this.PitchwheelDeviationTextBox.Text = pitchwheelDeviationSBs[1].ToString();
             _savedPitchwheelDeviationTextBoxText = PitchwheelDeviationTextBox.Text;
@@ -345,7 +334,6 @@ namespace Moritz.Palettes
                 VerticalVelocityFactorTextBox.Text =_savedVerticalVelocityFactorTextBoxText;
                 BankIndexTextBox.Text =_savedBankIndexTextBoxText;
                 PatchIndexTextBox.Text =_savedPatchIndexTextBoxText;
-                RepeatsTextBox.Text =_savedRepeatsTextBoxText;
                 PitchwheelDeviationTextBox.Text =_savedPitchwheelDeviationTextBoxText;
                 PitchwheelEnvelopeTextBox.Text =_savedPitchwheelEnvelopeTextBoxText;
                 PanEnvelopeTextBox.Text =_savedPanEnvelopeTextBoxText;
@@ -377,7 +365,6 @@ namespace Moritz.Palettes
         private string _savedVerticalVelocityFactorTextBoxText;
         private string _savedBankIndexTextBoxText;
         private string _savedPatchIndexTextBoxText;
-        private string _savedRepeatsTextBoxText;
         private string _savedPitchwheelDeviationTextBoxText;
         private string _savedPitchwheelEnvelopeTextBoxText;
         private string _savedPanEnvelopeTextBoxText;
@@ -421,7 +408,6 @@ namespace Moritz.Palettes
             allTextBoxes.Add(this.VerticalVelocityFactorTextBox);
             allTextBoxes.Add(this.BankIndexTextBox);
             allTextBoxes.Add(this.PatchIndexTextBox);
-            allTextBoxes.Add(this.RepeatsTextBox);
             allTextBoxes.Add(this.PitchwheelDeviationTextBox);
             allTextBoxes.Add(this.PitchwheelEnvelopeTextBox);
             allTextBoxes.Add(this.PanEnvelopeTextBox);
@@ -463,7 +449,6 @@ namespace Moritz.Palettes
 
                 _paletteForm.BankIndicesTextBox.Text = bankIndexSBs[0].ToString() + this.BankIndexTextBox.Text + bankIndexSBs[2].ToString();
                 _paletteForm.PatchIndicesTextBox.Text = patchIndexSBs[0].ToString() + this.PatchIndexTextBox.Text + patchIndexSBs[2].ToString();
-                _paletteForm.RepeatsTextBox.Text = repeatsSBs[0].ToString() + this.RepeatsTextBox.Text + repeatsSBs[2].ToString();
                 _paletteForm.PitchwheelDeviationsTextBox.Text = pitchwheelDeviationSBs[0].ToString() + this.PitchwheelDeviationTextBox.Text + pitchwheelDeviationSBs[2].ToString();
                 _paletteForm.PitchwheelEnvelopesTextBox.Text = pitchwheelEnvelopeSBs[0].ToString() + this.PitchwheelEnvelopeTextBox.Text + pitchwheelEnvelopeSBs[2].ToString();
                 _paletteForm.PanEnvelopesTextBox.Text = panEnvelopeSBs[0].ToString() + this.PanEnvelopeTextBox.Text + panEnvelopeSBs[2].ToString();
@@ -620,10 +605,6 @@ namespace Moritz.Palettes
         {
             M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, SetDialogState);
         }
-        private void RepeatsTextBox_Leave(object sender, EventArgs e)
-        {
-            M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 1, SetDialogState);
-        }
         private void PitchwheelDeviationTextBox_Leave(object sender, EventArgs e)
         {
             M.LeaveIntRangeTextBox(sender as TextBox, false, 1, 0, 127, SetDialogState);
@@ -689,7 +670,6 @@ namespace Moritz.Palettes
             VerticalVelocityFactorTextBox_Leave(VerticalVelocityFactorTextBox, null);
             BankIndexTextBox_Leave(BankIndexTextBox, null);
             PatchIndexTextBox_Leave(PatchIndexTextBox, null);
-            RepeatsTextBox_Leave(RepeatsTextBox, null);
             PitchwheelDeviationTextBox_Leave(PitchwheelDeviationTextBox, null);
             PitchwheelEnvelopeTextBox_Leave(PitchwheelEnvelopeTextBox, null);
             ModulationWheelEnvelopeTextBox_Leave(ModulationWheelEnvelopeTextBox, null);
@@ -789,7 +769,6 @@ namespace Moritz.Palettes
         List<StringBuilder> verticalVelocityFactorSBs;
         List<StringBuilder> bankIndexSBs;
         List<StringBuilder> patchIndexSBs;
-        List<StringBuilder> repeatsSBs;
         List<StringBuilder> pitchwheelDeviationSBs;
         List<StringBuilder> pitchwheelEnvelopeSBs;
         List<StringBuilder> panEnvelopeSBs;

@@ -481,7 +481,7 @@ namespace Moritz.Algorithm.SongSix
                 Debug.Assert(noteMsPosition < restMsPosition && restMsPosition < nextNoteMsPosition);
                 int noteMsDuration = restMsPosition - noteMsPosition;
                 int restMsDuration = nextNoteMsPosition - restMsPosition;
-                MidiChordDef umChordDef = new MidiChordDef(new List<byte>() { (byte)67 }, new List<byte>() { (byte)0 }, noteMsPosition, noteMsDuration, false, false);
+                MidiChordDef umChordDef = new MidiChordDef(new List<byte>() { (byte)67 }, new List<byte>() { (byte)0 }, noteMsPosition, noteMsDuration, false);
                 RestDef umRestDef = new RestDef(restMsPosition, restMsDuration);
                 controlLmdds.Add(umChordDef);
                 controlLmdds.Add(umRestDef);
