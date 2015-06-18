@@ -155,7 +155,8 @@ namespace Moritz.Spec
 		off, // Written to the score file: turn this option off, overriding the current setting
         stopChord, // stop when the current midiChord or midiRest completes
         stopNow, // stop immediately, even inside a midiChord
-        fade // fade velocity to end of trk
+        fade, // fade velocity to end of trk
+		loop // loop the Seq until a noteOff arrives
     };
 
     /// <summary>
