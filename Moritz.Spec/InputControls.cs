@@ -38,10 +38,10 @@ namespace Moritz.Spec
         {
             w.WriteStartElement("inputControls");
 
-            if(this.NoteOnVelocityOption != Spec.NoteOnVelocityOption.undefined)
+            if(this.NoteOnVelocityOption != NoteOnVelocityOption.undefined)
             {
                 w.WriteAttributeString("noteOnVel", this.NoteOnVelocityOption.ToString());
-				if(NoteOnVelocityOption != Spec.NoteOnVelocityOption.off)
+				if(NoteOnVelocityOption != NoteOnVelocityOption.off)
 				{ 
 					if(this.MinimumVelocity == null || MinimumVelocity < 1 || MinimumVelocity > 127)
 					{
@@ -54,7 +54,7 @@ namespace Moritz.Spec
 				}
             }
 
-            if(this.NoteOffOption != Spec.NoteOffOption.undefined)
+            if(this.NoteOffOption != NoteOffOption.undefined)
             {
                 w.WriteAttributeString("noteOff", this.NoteOffOption.ToString());
             }
@@ -92,10 +92,10 @@ namespace Moritz.Spec
                 }
             }
 
-            if(this.SpeedOption != Spec.SpeedOption.undefined)
+            if(this.SpeedOption != SpeedOption.undefined)
             {
                 w.WriteAttributeString("speedOption", this.SpeedOption.ToString());
-				if(SpeedOption != Spec.SpeedOption.off)
+				if(SpeedOption != SpeedOption.off)
 				{
 					if(MaxSpeedPercent == null || MaxSpeedPercent < 100)
 					{
@@ -156,7 +156,8 @@ namespace Moritz.Spec
         stopChord, // stop when the current midiChord or midiRest completes
         stopNow, // stop immediately, even inside a midiChord
         fade, // fade velocity to end of trk
-		loop // loop the Seq until a noteOff arrives
+		loop, // loop the Seq until a noteOff arrives
+		hold // the final duration in each Trk of the Seq is set to Number.Maxvalue, then the same as stopNow.
     };
 
     /// <summary>
