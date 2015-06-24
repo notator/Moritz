@@ -156,7 +156,6 @@ namespace Moritz.Spec
         stopChord, // stop when the current midiChord or midiRest completes
         stopNow, // stop immediately, even inside a midiChord
         fade, // fade velocity to end of trk
-		loop, // loop the Seq until a noteOff arrives
 		// Both hold options: The Assistant Performer silences the trk when the performer sends a noteOff.
 		holdLast, // The Assistant Performer removes noteOff messages from the last moment in the trk to contain any.
 		holdAll // The Assistant Performer removes all noteOff messages from the trk.
