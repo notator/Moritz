@@ -355,16 +355,14 @@ namespace Moritz.Symbols
                     {
                         foreach(DrawObject drawObject in firstBarline.DrawObjects)
                         {
-                            Text staffName = drawObject as Text;
+							StaffNameText staffName = drawObject as StaffNameText;
                             if(staffName != null)
                             {
                                 Debug.Assert(staffName.TextInfo != null);
-                                if(staffName.TextInfo.FontFamily == "Times New Roman") // staff name
-                                {
-                                    TextMetrics staffNameMetrics = new TextMetrics(graphics, null, staffName.TextInfo);
-                                    float nameWidth = staffNameMetrics.Right - staffNameMetrics.Left;
-                                    maxNameWidth = (maxNameWidth > nameWidth) ? maxNameWidth : nameWidth;
-                                }
+
+                                TextMetrics staffNameMetrics = new TextMetrics(graphics, null, staffName.TextInfo);
+                                float nameWidth = staffNameMetrics.Right - staffNameMetrics.Left;
+                                maxNameWidth = (maxNameWidth > nameWidth) ? maxNameWidth : nameWidth;
                             }
                         }
                         break;

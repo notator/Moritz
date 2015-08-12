@@ -74,14 +74,6 @@ namespace Moritz.Symbols
             }
         }
 
-        internal Text SetFramedText(string text, string fontFace, float textFontHeight, float paddingX, float paddingY, float strokeWidth)
-        {
-            TextInfo textInfo = new TextInfo(text, fontFace, textFontHeight, TextHorizAlign.center);
-            FrameInfo frameInfo = new FrameInfo(TextFrameType.rectangle, paddingX, paddingY, strokeWidth, new ColorString(Color.Black));
-            Text framedText = new Text(this, textInfo, frameInfo);
-            return framedText;
-        }
-
         public override string ToString()
 		{
 			string type = M.GetEnumDescription(BarlineType);

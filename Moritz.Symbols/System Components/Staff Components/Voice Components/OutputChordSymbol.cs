@@ -20,13 +20,13 @@ namespace Moritz.Symbols
 
             if(umcd.OrnamentNumberSymbol != 0)
             {
-                AddOrnamentSymbol("~" + umcd.OrnamentNumberSymbol.ToString());
+				OrnamentText ornamentText = new OrnamentText(this, "~" + umcd.OrnamentNumberSymbol.ToString(), FontHeight);
+				DrawObjects.Add(ornamentText);
             }
 
             if(umcd.Lyric != null)
             {
-                TextInfo textInfo = new TextInfo(umcd.Lyric, "Arial", (float)(FontHeight / 2F), TextHorizAlign.center);
-                Lyric lyric = new Lyric(this, textInfo);
+				LyricText lyric = new LyricText(this, umcd.Lyric, FontHeight);
                 DrawObjects.Add(lyric);
             }
         }

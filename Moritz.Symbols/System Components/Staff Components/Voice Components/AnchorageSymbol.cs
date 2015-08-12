@@ -93,67 +93,9 @@ namespace Moritz.Symbols
                 }
                 #endregion get dynamicString and _dynamic
 
-                TextInfo dynamicTextInfo = new TextInfo(dynamicString, "CLicht", this.FontHeight * 0.75F, TextHorizAlign.left);
-
-                Text dynamicText = new Text(this, dynamicTextInfo);
+				DynamicText dynamicText = new DynamicText(this, dynamicString, FontHeight);
                 this._drawObjects.Add(dynamicText);
             }
-        }
-
-        /// <summary>
-        /// Adds a text to this anchorageSymbol's DrawObjects list.
-        /// </summary>
-        /// <param name="text">The text.</param>
-        /// <param name="fontFamily">e.g. "Times New Roman", "Arial" etc.</param>
-        /// <param name="fontHeight">Text height (capella's default text has height 12).</param>
-        /// <param name="textHorizAlign">The horizontal alignment.</param>
-        public void AddText(string text, string fontFamily, float fontHeight, TextHorizAlign textHorizAlign)
-        {
-            TextInfo textInfo = new TextInfo(text, fontFamily, fontHeight, textHorizAlign);
-            Text textObject = new Text(this, textInfo);
-            DrawObjects.Add(textObject);
-        }
- 
-        /// <summary>
-        /// If textToRemove is the Content of a Text DrawObject attached to this AnchorageSymbol
-        /// or is the Content of a Text DrawObject contained in a DrawObjectGroup attached to this
-        /// AnchorageSymbol, the Text is removed. Empty DrawObjectGroups are also removed.
-        /// Otherwise, this function returns silently without doing anything.
-        /// </summary>
-        /// <param name="textToRemove"></param>
-        public void RemoveText(string textToRemove)
-        {
-            List<Text> textsToRemove = new List<Text>();
-            List<DrawObjectGroup> groupsToRemove = new List<DrawObjectGroup>();
-            foreach(DrawObject drawObject in DrawObjects)
-            {
-                Text text = drawObject as Text;
-                if(text != null && text.TextInfo.Text == textToRemove)
-                    textsToRemove.Add(text);
-                DrawObjectGroup group = drawObject as DrawObjectGroup;
-                if(group != null)
-                {
-                    List<Text> innerTextsToRemove = new List<Text>();
-                    foreach(DrawObject dObject in group.DrawObjects)
-                    {
-                        Text innerText = dObject as Text;
-                        if(innerText.TextInfo.Text == textToRemove)
-                        {
-                            innerTextsToRemove.Add(innerText);
-                        }
-                    }
-                    foreach(Text innerText in innerTextsToRemove)
-                    {
-                        group.DrawObjects.Remove(innerText);
-                    }
-                    if(group.DrawObjects.Count == 0)
-                        groupsToRemove.Add(group);
-                }
-            }
-            foreach(DrawObjectGroup group in groupsToRemove)
-                DrawObjects.Remove(group);
-            foreach(Text txt in textsToRemove)
-                DrawObjects.Remove(txt);
-        }
+        }  
     }
 }

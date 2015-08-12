@@ -199,7 +199,7 @@ namespace Moritz.Symbols
 			w.WriteStartElement("g"); // start layer (for Inkscape)
 			WriteInkscapeLayerAttributes(w, layerNumber, layerName, true);
 
-			w.SvgText("timeStamp", _infoTextInfo, 80, 80);
+			w.SvgText("timeStamp", _infoTextInfo, 32, 80);
 
 			if(pageNumber == 1 || pageNumber == 0)
 			{
@@ -282,13 +282,13 @@ namespace Moritz.Symbols
 		/// </summary>
 		protected void WritePage1TitleAndAuthor(SvgWriter w, Metadata metadata)
 		{
-			string fontFamily = "Estrangelo Edessa";
+			string titlesFontFamily = "Open Sans";
 
 			TextInfo titleInfo =
-				new TextInfo(metadata.MainTitle, fontFamily, _pageFormat.Page1TitleHeight,
+				new TextInfo(metadata.MainTitle, titlesFontFamily, _pageFormat.Page1TitleHeight,
 					null, TextHorizAlign.center);
 			TextInfo authorInfo =
-			  new TextInfo(metadata.Author, fontFamily, _pageFormat.Page1AuthorHeight,
+			  new TextInfo(metadata.Author, titlesFontFamily, _pageFormat.Page1AuthorHeight,
 				  null, TextHorizAlign.right);
 			w.WriteStartElement("g");
 			w.WriteAttributeString("id", "titles");

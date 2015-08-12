@@ -53,20 +53,12 @@ namespace Moritz.Symbols
         private string _enharmonicNote = "";
     }
 
-    #region primary DrawObject classes (each defines an XML element which is put inside a drawObj element)
-
-    internal class Text : DrawObject
+    internal abstract class Text : DrawObject
     {
-        public Text(object container, TextInfo textInfo)
+        public Text(object container, string text, string fontName, float fontHeight, TextHorizAlign align)
             : base(container)
         {
-            _textInfo = textInfo;
-        }
-
-        public Text(object container, TextInfo textInfo, FrameInfo frameInfo)
-            : this(container, textInfo)
-        {
-            _frameInfo = frameInfo;
+			_textInfo = new TextInfo(text, fontName, fontHeight, align);
         }
 
         public override void WriteSVG(SvgWriter w)
@@ -96,163 +88,83 @@ namespace Moritz.Symbols
             }
         }
 
-        public override string ToString()
-        {
-            return "Text : " + TextInfo.Text;
-        }
-
         // attributes
         public TextInfo TextInfo { get { return _textInfo; } }
         private TextInfo _textInfo = null;
         public FrameInfo FrameInfo { get { return _frameInfo; } }
-        private FrameInfo _frameInfo = null;
-    }
-    public class Lyric : DrawObject
-    {
-        public Lyric(object container, TextInfo textInfo)
-            : base(container)
-        {
-            _textInfo = textInfo;
-        }
-
-        public override void WriteSVG(SvgWriter w)
-        {
-            if(Metrics != null)
-                Metrics.WriteSVG(w);
-        }
-
-        public override string ToString()
-        {
-            return "Lyric : " + TextInfo.Text;
-        }
-
-        // attributes
-        public TextInfo TextInfo { get { return _textInfo; } }
-        private TextInfo _textInfo = null;
-    }
-    #endregion primary DrawObject classes
-    #region types containing a List<DrawObject>
-    /// <summary>
-    /// DrawObjects attached to a chord, a rest or the page.
-    /// All measures given in draw objects are relative to the object attached to.
-    /// For some horizontally spread draw objects the end is relative to another chord/rest
-    /// </summary>
-    internal class DrawObjectGroup : DrawObject
-    {
-        public DrawObjectGroup(List<DrawObject> drawObjects, object container)
-            : base(container)
-        {
-            DrawObjects = drawObjects;
-        }
-
-        protected DrawObjectGroup(AnchorageSymbol anchorageSymbol, List<string> strings, float fontHeight, ColorString colorString, TextHorizAlign textHorizAlign)
-        {
-            if(strings.Count > 0)
-            {
-                for(int i = 0; i < strings.Count; i++)
-                {
-                    TextInfo textInfo = new TextInfo(strings[i], "Arial", fontHeight, colorString, textHorizAlign);
-                    Text text = new Text(this, textInfo);
-                    DrawObjects.Add(text);
-                }
-            }
-        }
-
-        public override void WriteSVG(SvgWriter w)
-        {
-            w.SvgStartGroup(Metrics.ObjectType, null);
-            foreach(DrawObject drawObject in DrawObjects)
-                drawObject.WriteSVG(w);
-            w.SvgEndGroup();
-        }
-
-        #region Moritz helper property
-        /// <summary>
-        /// All the simple Moritz.Score.Text objects inside this DrawObjectGroup
-        /// (even in nested DrawObjectGroups)
-        /// </summary>
-        public List<Text> NestedTexts
-        {
-            get
-            {
-                List<Text> returnValue = new List<Text>();
-                foreach(DrawObject drawObject in DrawObjects)
-                {
-                    Text text = drawObject as Text;
-                    if(text != null)
-                    {
-                        returnValue.Add(text);
-                    }
-                    else
-                    {
-                        DrawObjectGroup dog = drawObject as DrawObjectGroup;
-                        if(dog != null)
-                            returnValue.AddRange(dog.NestedTexts); // recursive call
-                    }
-                }
-                return returnValue;
-            }
-        }
-        /// <summary>
-        /// All the simple Moritz.Score.DrawObjectGroup objects inside this DrawObjectGroup
-        /// (even in nested DrawObjectGroups)
-        /// </summary>
-        public List<DrawObjectGroup> NestedGroups
-        {
-            get
-            {
-                List<DrawObjectGroup> returnValue = new List<DrawObjectGroup>();
-                foreach(DrawObject drawObject in DrawObjects)
-                {
-                    DrawObjectGroup group = drawObject as DrawObjectGroup;
-                    if(group != null)
-                    {
-                        returnValue.Add(group);
-                        foreach(DrawObjectGroup nestedGroup in group.NestedGroups)
-                            returnValue.Add(nestedGroup); // recursive call
-                    }
-                }
-                return returnValue;
-            }
-        }
-        #endregion
-
-        public List<DrawObject> DrawObjects = new List<DrawObject>();
+        protected FrameInfo _frameInfo = null;
     }
 
-    #region classes used by AssistantComposer to differentiate between DrawObjectGroups
-    internal class StaffControlsGroup : DrawObjectGroup
-    {
-        public StaffControlsGroup(Barline firstBarline, 
-            List<string> controlStrings, string volume,
-            float fontHeight, ColorString colorString, TextHorizAlign textHorizAlign)
-            : base(firstBarline, controlStrings, fontHeight, colorString, textHorizAlign)
-        {
-            if(!String.IsNullOrEmpty(volume))
-            {
-                TextInfo textInfo = new TextInfo("v" + volume, "Arial", fontHeight * 2,
-                    new ColorString(Color.Black), textHorizAlign);
-                Text text = new Text(this, textInfo);
-                DrawObjects.Insert(0,text);
-            }
-        }
-    }
-    internal class OrnamentControlsGroup : DrawObjectGroup
-    {
-        public OrnamentControlsGroup(AnchorageSymbol anchorageSymbol, List<string> strings, float fontHeight, ColorString colorString, TextHorizAlign textHorizAlign)
-            : base(anchorageSymbol, strings, fontHeight, colorString, textHorizAlign)
-        {
-        }
-    }
-    internal class DurationSymbolControlsGroup : DrawObjectGroup
-    {
-        public DurationSymbolControlsGroup(AnchorageSymbol anchorageSymbol, List<string> strings, float fontHeight, ColorString colorString, TextHorizAlign textHorizAlign)
-            : base(anchorageSymbol, strings, fontHeight, colorString, textHorizAlign)
-        {
-        }
-    }
+	internal class StaffNameText : Text
+	{
+		public StaffNameText(object container, string staffName, float fontHeight)
+			: base(container, staffName, "Arial", fontHeight, TextHorizAlign.center)
+		{
+		}
 
-    #endregion
+		public override string ToString()
+		{
+			return "staffname: " + TextInfo.Text;
+		}
+	}
 
-    #endregion types containing a List<DrawObject>
+	internal class FramedBarNumberText : Text
+	{
+		public FramedBarNumberText(object container, string text, float gap, float stafflinethickness)
+			: base(container, text, "Arial", (gap * 2F), TextHorizAlign.center)
+		{
+			float paddingX = 22F;
+			if(text.Length > 1)
+				paddingX = 10F;
+			float paddingY = 22F;
+
+			float strokeWidth = stafflinethickness * 1.2F;
+
+			_frameInfo = new FrameInfo(TextFrameType.rectangle, paddingX, paddingY, strokeWidth, new ColorString("000000"));
+		}
+
+		public override string ToString()
+		{
+			return "barnumber: " + TextInfo.Text;
+		}
+	}
+
+	internal class OrnamentText : Text
+	{
+		public OrnamentText(object container, string text, float chordFontHeight)
+			: base(container, text, "Open Sans Condensed", chordFontHeight * 0.55F, TextHorizAlign.center)
+		{
+		}
+
+		public override string ToString()
+		{
+			return "ornament: " + TextInfo.Text;
+		}
+	}
+
+	internal class LyricText : Text
+	{
+		public LyricText(object container, string text, float chordFontHeight)
+			: base(container, text, "Arial", (chordFontHeight / 2F), TextHorizAlign.center)
+		{
+		}
+
+		public override string ToString()
+		{
+			return "lyric: " + TextInfo.Text;
+		}
+	}
+
+	internal class DynamicText : Text
+	{
+		public DynamicText(object container, string text, float chordFontHeight)
+			: base(container, text, "CLicht", chordFontHeight * 0.75F, TextHorizAlign.left)
+		{
+		}
+
+		public override string ToString()
+		{
+			return "dynamic: " + TextInfo.Text;
+		}
+	}
 }

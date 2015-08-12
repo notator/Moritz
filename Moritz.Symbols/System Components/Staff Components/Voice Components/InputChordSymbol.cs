@@ -21,8 +21,7 @@ namespace Moritz.Symbols
 
             if(umcd.Lyric != null)
             {
-                TextInfo textInfo = new TextInfo(umcd.Lyric, "Arial", (float)(FontHeight / 2F), TextHorizAlign.center);
-                Lyric lyricText = new Lyric(this, textInfo);
+                LyricText lyricText = new LyricText(this, umcd.Lyric, FontHeight );
                 DrawObjects.Add(lyricText);
             }
         }

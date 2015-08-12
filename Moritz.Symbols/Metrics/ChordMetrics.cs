@@ -712,10 +712,10 @@ namespace Moritz.Symbols
         /// <returns></returns>
         private LyricMetrics NewLyricMetrics(VerticalDir voiceStemDirection, Graphics graphics, float gap)
         {
-            Lyric lyric = null;
+            LyricText lyric = null;
             foreach(DrawObject drawObject in _drawObjects)
             {
-                lyric = drawObject as Lyric;
+                lyric = drawObject as LyricText;
                 if(lyric != null)
                     break;
             }
@@ -1128,6 +1128,7 @@ namespace Moritz.Symbols
                 if(_lyricMetrics.IsBelow)
                 {
                     delta = lyricTop - _lyricMetrics.Top;
+					delta *= 0.7F; // this line added 12.08.2015
                     _lyricMetrics.Move(0F, delta);
                     if(ornamentIsBelow && _ornamentMetrics != null)
                         _ornamentMetrics.Move(0F, delta);

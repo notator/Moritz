@@ -227,8 +227,7 @@ namespace Moritz.Symbols
                                     fontHeight *= _pageFormat.InputStavesSizeFactor;
 
                                 }
-                                TextInfo textInfo = new TextInfo(staff.Staffname, "Times New Roman", fontHeight, TextHorizAlign.center);
-                                Text staffNameText = new Text(firstBarline, textInfo);
+								StaffNameText staffNameText = new StaffNameText(firstBarline, staff.Staffname, fontHeight);
                                 firstBarline.DrawObjects.Add(staffNameText);
                                 break;
                             }
@@ -790,16 +789,9 @@ namespace Moritz.Symbols
                     {
                         if(isFirstBarline && system != Systems[0])
                         {
-                            float fontHeight = _pageFormat.Gap * 2F;
+							FramedBarNumberText framedBarNumber = new FramedBarNumberText(this, barNumber.ToString(), _pageFormat.Gap, _pageFormat.StafflineStemStrokeWidth);
 
-                            float paddingX = 22F;
-                            if(barNumber > 9)
-                                paddingX = 10F;
-                            float paddingY = 22F;
-
-                            float strokeWidth = _pageFormat.StafflineStemStrokeWidth * 1.2F;
-                            Text framedBarnumber = barline.SetFramedText(barNumber.ToString(), "Arial", fontHeight, paddingX, paddingY, strokeWidth);
-                            barline.DrawObjects.Add(framedBarnumber);
+							barline.DrawObjects.Add(framedBarNumber);
                             isFirstBarline = false;
                         }
                         barNumber++;

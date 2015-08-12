@@ -99,7 +99,7 @@ namespace Moritz.Symbols
 
         public List<int> SystemStartBars = null;
         public int DefaultNumberOfBarsPerSystem { get { return 5; } }
-        public float StaffNameFontHeight { get { return Gap * 2.5F; } }
+        public float StaffNameFontHeight { get { return Gap * 2.2F; } }
         /// <summary>
         /// the normal font size on staves having Gap sized spaces (after experimenting with cLicht). 
         /// </summary>

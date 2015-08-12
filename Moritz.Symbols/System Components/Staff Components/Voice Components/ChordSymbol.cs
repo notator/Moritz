@@ -19,14 +19,6 @@ namespace Moritz.Symbols
             // Beam is currently null. Create when necessary.
         }
 
-        protected void AddOrnamentSymbol(string ornamentString)
-        {
-            float fontHeight = FontHeight * 0.75F;
-            TextInfo textInfo = new TextInfo(ornamentString, "Estrangelo Edessa", fontHeight, TextHorizAlign.center);
-            Text controlText = new Text(this, textInfo);
-            DrawObjects.Add(controlText);
-        }
-
         public VerticalDir DefaultStemDirection(ClefSymbol clef)
         {
             Debug.Assert(this.HeadsTopDown.Count > 0);

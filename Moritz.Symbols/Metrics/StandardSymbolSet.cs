@@ -87,17 +87,18 @@ namespace Moritz.Symbols
             svgw.WriteEndElement(); // g
         }
         /// <summary>
+		/// (the actual numbers have changed -- see function below)
         /// [g id="trebleClef2x8"]
         ///     [text x="0" y="0" font-size="1px" font-family="CLicht"]&amp;[/text]
         ///     [text x="0.037" y="-1.17" font-size="0.67px" font-family="CLicht"]™[/text]
-        ///     [text x="0.252" y="-1.17" font-size="0.4px" font-family="Estrangelo Edessa"]x[/text]
+        ///     [text x="0.252" y="-1.17" font-size="0.4px" font-family="Arial"]x[/text]
         ///     [text x="0.441" y="-1.17" font-size="0.67px" font-family="CLicht"]•[/text]
         /// [/g]
         /// and
-        /// [g id="trebleClef3x8"]
+		/// [g id="trebleClef3x8"]
         ///     [text x="0" y="0" font-size="1px" font-family="CLicht"]&amp;[/text]
         ///     [text x="0.037" y="-1.17" font-size="0.67px" font-family="CLicht"]£[/text]
-        ///     [text x="0.252" y="-1.17" font-size="0.4px" font-family="Estrangelo Edessa"]x[/text]
+        ///     [text x="0.252" y="-1.17" font-size="0.4px" font-family="Arial"]x[/text]
         ///     [text x="0.441" y="-1.17" font-size="0.67px" font-family="CLicht"]•[/text]
         /// [/g]
         /// </summary>
@@ -115,7 +116,7 @@ namespace Moritz.Symbols
             svgw.WriteEndElement(); // text
 
             svgw.WriteStartElement("text");
-            svgw.WriteAttributeString("x", "0.037");
+            svgw.WriteAttributeString("x", "0.036");
             svgw.WriteAttributeString("y", "-1.17");
             svgw.WriteAttributeString("font-size", "0.67px");
             svgw.WriteAttributeString("font-family", "CLicht");
@@ -134,12 +135,12 @@ namespace Moritz.Symbols
             svgw.WriteAttributeString("x", "0.252");
             svgw.WriteAttributeString("y", "-1.17");
             svgw.WriteAttributeString("font-size", "0.4px");
-            svgw.WriteAttributeString("font-family", "Estrangelo Edessa");
+            svgw.WriteAttributeString("font-family", "Arial");
             svgw.WriteString("x");
             svgw.WriteEndElement(); // text
 
             svgw.WriteStartElement("text");
-            svgw.WriteAttributeString("x", "0.441");
+            svgw.WriteAttributeString("x", "0.48");
             svgw.WriteAttributeString("y", "-1.17");
             svgw.WriteAttributeString("font-size", "0.67px");
             svgw.WriteAttributeString("font-family", "CLicht");
@@ -193,17 +194,18 @@ namespace Moritz.Symbols
             svgw.WriteEndElement(); // g
         }
         /// <summary>
+		/// (The actual numbers have changed -- see function below.)
         /// [g id="bassClef2x8"]
         ///     [text x="0" y="0" font-size="1px" font-family="CLicht"]?[/text]
         ///     [text x="0" y="1.1" font-size="0.67px" font-family="CLicht"]™[/text]
-        ///     [text x="0.215" y="1.1" font-size="0.4px" font-family="Estrangelo Edessa"]x[/text]
+        ///     [text x="0.215" y="1.1" font-size="0.4px" font-family="Arial"]x[/text]
         ///     [text x="0.404" y="1.1" font-size="0.67px" font-family="CLicht"]•[/text]
         /// [/g]
         /// and
         /// [g id="bassClef3x8"]
         ///     [text x="0" y="0" font-size="1px" font-family="CLicht"]?[/text]
         ///     [text x="0" y="1.1" font-size="0.67px" font-family="CLicht"]£[/text]
-        ///     [text x="0.194" y="1.1" font-size="0.4px" font-family="Estrangelo Edessa"]x[/text]
+        ///     [text x="0.194" y="1.1" font-size="0.4px" font-family="Arial"]x[/text]
         ///     [text x="0.383" y="1.1" font-size="0.67px" font-family="CLicht"]•[/text]
         /// [/g]
         /// </summary>
@@ -237,15 +239,15 @@ namespace Moritz.Symbols
             svgw.WriteEndElement(); // text
 
             svgw.WriteStartElement("text");
-            svgw.WriteAttributeString("x", "0.194");
+            svgw.WriteAttributeString("x", "0.215");
             svgw.WriteAttributeString("y", "1.1");
             svgw.WriteAttributeString("font-size", "0.4px");
-            svgw.WriteAttributeString("font-family", "Estrangelo Edessa");
+            svgw.WriteAttributeString("font-family", "Arial");
             svgw.WriteString("x");
             svgw.WriteEndElement(); // text
 
             svgw.WriteStartElement("text");
-            svgw.WriteAttributeString("x", "0.383");
+            svgw.WriteAttributeString("x", "0.435");
             svgw.WriteAttributeString("y", "1.1");
             svgw.WriteAttributeString("font-size", "0.67px");
             svgw.WriteAttributeString("font-family", "CLicht");
