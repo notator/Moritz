@@ -143,9 +143,9 @@ namespace Moritz.Algorithm.Study3Sketch2
             byte channel = 0;
             foreach(Palette palette in _palettes)
             {
-                OutputVoiceDef outputVoice = new OutputVoiceDef();
-                bar.Add(outputVoice);
-                WriteVoiceMidiDurationDefs1(outputVoice, palette);
+                TrkDef trkDef = new TrkDef();
+                bar.Add(trkDef);
+                WriteVoiceMidiDurationDefs1(trkDef, palette);
                 ++channel;
             }
 
@@ -193,7 +193,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             return bar;
         }
 
-        private void WriteVoiceMidiDurationDefs1(OutputVoiceDef outputVoice, Palette palette)
+        private void WriteVoiceMidiDurationDefs1(TrkDef trkDef, Palette palette)
         {
             int bar1ChordMsSeparation = 1500;
             int msPosition = 0;
@@ -204,8 +204,8 @@ namespace Moritz.Algorithm.Study3Sketch2
                 noteDef.MsPosition = msPosition;
                 RestDef restDef = new RestDef(msPosition + noteDef.MsDuration, bar1ChordMsSeparation - noteDef.MsDuration);
                 msPosition += bar1ChordMsSeparation;
-                outputVoice.UniqueDefs.Add(noteDef);
-                outputVoice.UniqueDefs.Add(restDef);
+                trkDef.UniqueDefs.Add(noteDef);
+                trkDef.UniqueDefs.Add(restDef);
             }
         }
         #endregion CreateBar1()
@@ -219,30 +219,30 @@ namespace Moritz.Algorithm.Study3Sketch2
             List<VoiceDef> bar = new List<VoiceDef>();
 
             byte channel = 0;
-            List<OutputVoiceDef> voiceDefs = new List<OutputVoiceDef>();
+            List<TrkDef> trkDefs = new List<TrkDef>();
             foreach(Palette palette in _palettes)
             {
-                bar.Add(new OutputVoiceDef());
-                OutputVoiceDef voiceDef = palette.NewOutputVoiceDef();
-                voiceDef.SetMsDuration(6000);
-                voiceDefs.Add(voiceDef);
+                bar.Add(new TrkDef());
+                TrkDef trkDef = palette.NewTrkDef();
+                trkDef.SetMsDuration(6000);
+                trkDefs.Add(trkDef);
                 ++channel;
             }
 
             int msPosition = bar2StartMsPos;
             int maxBarMsPos = 0;
             int startMsDifference = 1500;
-            for(int i = 0; i < voiceDefs.Count; ++i)
+            for(int i = 0; i < trkDefs.Count; ++i)
             {
-                int maxMsPos = WriteVoiceMidiDurationDefsInBar2(bar[i], voiceDefs[i], msPosition, bar2StartMsPos);
+                int maxMsPos = WriteVoiceMidiDurationDefsInBar2(bar[i], trkDefs[i], msPosition, bar2StartMsPos);
                 maxBarMsPos = maxBarMsPos > maxMsPos ? maxBarMsPos : maxMsPos;
                 msPosition += startMsDifference;
             }
 
             // now add the final rest in the bar
-            for(int i = 0; i < voiceDefs.Count; ++i)
+            for(int i = 0; i < trkDefs.Count; ++i)
             {
-                int mdsdEndPos = voiceDefs[i].EndMsPosition;
+                int mdsdEndPos = trkDefs[i].EndMsPosition;
                 if(maxBarMsPos > mdsdEndPos)
                 {
                     RestDef rest2Def = new RestDef(mdsdEndPos, maxBarMsPos - mdsdEndPos);
@@ -268,7 +268,7 @@ namespace Moritz.Algorithm.Study3Sketch2
         /// Writes the first rest (if any) and the VoiceDef to the voice.
         /// Returns the endMsPos of the VoiceDef. 
         /// </summary>
-        private int WriteVoiceMidiDurationDefsInBar2(VoiceDef voice, OutputVoiceDef voiceDef, int msPosition, int bar2StartMsPos)
+        private int WriteVoiceMidiDurationDefsInBar2(VoiceDef voice, TrkDef trkDef, int msPosition, int bar2StartMsPos)
         {
             if(msPosition > bar2StartMsPos)
             {
@@ -276,13 +276,13 @@ namespace Moritz.Algorithm.Study3Sketch2
                 voice.UniqueDefs.Add(rest1Def);
             }
 
-            voiceDef.StartMsPosition = msPosition;
-            foreach(IUniqueDef iu in voiceDef)
+            trkDef.StartMsPosition = msPosition;
+            foreach(IUniqueDef iu in trkDef)
             {
                 voice.UniqueDefs.Add(iu);
             }
 
-            return voiceDef.EndMsPosition;
+            return trkDef.EndMsPosition;
         }
         #endregion CreateBar2()
 

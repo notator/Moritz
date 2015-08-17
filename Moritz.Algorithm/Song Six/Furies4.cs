@@ -8,14 +8,14 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.SongSix
 {
-    internal class Furies4 : OutputVoiceDef
+    internal class Furies4 : TrkDef
     {
         internal Furies4(int msDuration)
             : base(msDuration)
         {
         }
 
-        internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, OutputVoiceDef wind1, List<Palette> palettes)
+        internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, TrkDef wind1, List<Palette> palettes)
         {
             GetSnores(firstRestMsDuration, clytemnestra, wind1, palettes[1]);
             AddGrowlsToInterlude2AndVerse3(clytemnestra, palettes[3]);
@@ -60,7 +60,7 @@ namespace Moritz.Algorithm.SongSix
             AlignObjectAtIndex(38, 39, 40, clytemnestra[162].MsPosition);
         }
 
-        private void GetSnores(int firstRestMsDuration, Clytemnestra clytemnestra, OutputVoiceDef wind1, Palette snoresPalette)
+        private void GetSnores(int firstRestMsDuration, Clytemnestra clytemnestra, TrkDef wind1, Palette snoresPalette)
         {
             List<IUniqueDef> snores = new List<IUniqueDef>();
             int msPosition = 0;
@@ -141,7 +141,7 @@ namespace Moritz.Algorithm.SongSix
         #region finale
         internal void GetFinale(List<Palette> palettes, Dictionary<string, int> msPositions, Krystal krystal)
         {
-            OutputVoiceDef furies4Finale = GetF4Finale(palettes, krystal, msPositions);
+            TrkDef furies4Finale = GetF4Finale(palettes, krystal, msPositions);
 
             if(furies4Finale[furies4Finale.Count - 1] is RestDef)
             {
@@ -170,20 +170,20 @@ namespace Moritz.Algorithm.SongSix
             RemoveScorePitchWheelCommands(52, 53);
         }
 
-        private OutputVoiceDef GetF4Finale(List<Palette> palettes , Krystal krystal, Dictionary<string, int> msPositions)
+        private TrkDef GetF4Finale(List<Palette> palettes , Krystal krystal, Dictionary<string, int> msPositions)
         {
             Palette f4FinalePalette1 = palettes[9];
             Palette f4FinalePalette2 = palettes[13];
             Palette f4PostludePalette = palettes[17];
 
-            OutputVoiceDef interlude4Start = f4FinalePalette1.NewOutputVoiceDef(krystal);
+            TrkDef interlude4Start = f4FinalePalette1.NewTrkDef(krystal);
             Transform(interlude4Start, msPositions);
-            OutputVoiceDef interlude4EndVerse5 = f4FinalePalette2.NewOutputVoiceDef(krystal);
+            TrkDef interlude4EndVerse5 = f4FinalePalette2.NewTrkDef(krystal);
             Transform(interlude4EndVerse5, msPositions);
-            OutputVoiceDef postlude = f4PostludePalette.NewOutputVoiceDef(krystal);
+            TrkDef postlude = f4PostludePalette.NewTrkDef(krystal);
             Transform(postlude, msPositions);
 
-            OutputVoiceDef finale = GetFinaleSections(interlude4Start, interlude4EndVerse5, postlude, 7, 17);
+            TrkDef finale = GetFinaleSections(interlude4Start, interlude4EndVerse5, postlude, 7, 17);
 
             return finale;
         }
@@ -194,7 +194,7 @@ namespace Moritz.Algorithm.SongSix
         /// MsDuration. The DurationDefs come from different palettes, so use different pitches etc.
         /// This function simply creates a new VoiceDef by selecting the apropriate DurationDefs from each VoiceDef argument.
         /// </summary>
-        private OutputVoiceDef GetFinaleSections(OutputVoiceDef finalePart1, OutputVoiceDef finalePart2, OutputVoiceDef postlude, int part2Index, int postludeIndex)
+        private TrkDef GetFinaleSections(TrkDef finalePart1, TrkDef finalePart2, TrkDef postlude, int part2Index, int postludeIndex)
         {
             List<IUniqueDef> iumdds = new List<IUniqueDef>();
 
@@ -211,10 +211,10 @@ namespace Moritz.Algorithm.SongSix
                 iumdds.Add(postlude[i]);
             }
 
-            return new OutputVoiceDef(iumdds);
+            return new TrkDef(iumdds);
         }
 
-        private void Transform(OutputVoiceDef section, Dictionary<string, int> msPositions)
+        private void Transform(TrkDef section, Dictionary<string, int> msPositions)
         {
             section.RemoveRange(40, section.Count - 40);
 
@@ -236,7 +236,7 @@ namespace Moritz.Algorithm.SongSix
             }
         }
 
-        internal void AdjustAlignments(Furies1 furies1, Clytemnestra clytemnestra, OutputVoiceDef wind3)
+        internal void AdjustAlignments(Furies1 furies1, Clytemnestra clytemnestra, TrkDef wind3)
         {
             AlignObjectAtIndex(42, Count-1, Count, furies1[280].MsPosition);
 

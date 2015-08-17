@@ -64,7 +64,7 @@ namespace Moritz.Algorithm.Study2c3_1
             int msPosition = 0;
             for(int barIndex = 0; barIndex < dcValuesPerTopStaffBar.Count; barIndex++)
             {
-                VoiceDef voice = new OutputVoiceDef();
+                VoiceDef voice = new TrkDef();
                 List<int> sequence = dcValuesPerTopStaffBar[barIndex];
                 WriteDurationSymbolsForStrandInTopStaff(voice, barIndex, sequence, ref msPosition);
                 consecutiveBars.Add(voice);
@@ -96,7 +96,7 @@ namespace Moritz.Algorithm.Study2c3_1
             for(int barIndex = 0; barIndex < strandValuesList.Count; barIndex++)
             {
                 VoiceDef topStaffVoice =  topStaffBars[barIndex];
-                VoiceDef newVoice = new OutputVoiceDef();
+                VoiceDef newVoice = new TrkDef();
                 int currentMsPosition = topStaffVoice.UniqueDefs[0].MsPosition;
 
                 List<int> lowerStaffValueSequence = strandValuesList[barIndex];

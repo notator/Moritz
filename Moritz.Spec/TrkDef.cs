@@ -15,21 +15,21 @@ namespace Moritz.Spec
     /// <para></para>
     /// <para>This class is IEnumerable, so that foreach loops can be used.</para>
     /// <para>For example:</para>
-    /// <para>foreach(IUniqueDef iumdd in outputVoiceDef) { ... }</para>
+    /// <para>foreach(IUniqueDef iumdd in trkDef) { ... }</para>
     /// <para>An Enumerator for MidiChordDefs is also defined so that</para>
-    /// <para>foreach(MidiChordDef mcd in outputVoiceDef.MidiChordDefs) { ... }</para>
+    /// <para>foreach(MidiChordDef mcd in trkDef.MidiChordDefs) { ... }</para>
     /// <para>can also be used.</para>
     /// <para>This class is also indexable, as in:</para>
-    /// <para>IUniqueDef iu = outputVoiceDef[index];</para>
+    /// <para>IUniqueDef iu = trkDef[index];</para>
     /// </summary>
-    public class OutputVoiceDef : VoiceDef
+    public class TrkDef : VoiceDef
     {
         #region constructors
         /// <summary>
         /// An empty VoiceDef
         /// </summary>
         /// <param name="msDuration"></param>
-        public OutputVoiceDef()
+        public TrkDef()
             : base()
         {
         }
@@ -38,7 +38,7 @@ namespace Moritz.Spec
         /// A VoiceDef beginning at MsPosition = 0, and containing a single RestDef having msDuration
         /// </summary>
         /// <param name="msDuration"></param>
-        public OutputVoiceDef(int msDuration)
+        public TrkDef(int msDuration)
             : base(msDuration)
         {
         }
@@ -47,15 +47,15 @@ namespace Moritz.Spec
         /// <para>If the argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
         /// <para>The new VoiceDef's UniqueDefs list is simply set to the argument (which is not cloned).</para>
         /// </summary>
-        public OutputVoiceDef(List<IUniqueDef> iuds) 
+        public TrkDef(List<IUniqueDef> iuds) 
             : base(iuds)
         {
         }
 
         /// <summary>
-        /// Returns a deep clone of this OutputVoiceDef.
+        /// Returns a deep clone of this TrkDef.
         /// </summary>
-        public OutputVoiceDef DeepClone()
+        public TrkDef DeepClone()
         {
             List<IUniqueDef> clonedLmdds = new List<IUniqueDef>();
             foreach(IUniqueDef iu in this._uniqueDefs)
@@ -77,7 +77,7 @@ namespace Moritz.Spec
                 }
             }
 
-            return new OutputVoiceDef(clonedLmdds);
+            return new TrkDef(clonedLmdds);
         }
         #endregion constructors
 
@@ -95,7 +95,7 @@ namespace Moritz.Spec
         /// Adds the argument to the end of this VoiceDef.
         /// Sets the MsPositions of the appended UniqueDefs.
         /// </summary>
-        public void AddRange(OutputVoiceDef voiceDef)
+        public void AddRange(TrkDef voiceDef)
         {
             _AddRange((VoiceDef)voiceDef);
         }
@@ -112,19 +112,19 @@ namespace Moritz.Spec
         /// Inserts the voiceDef in the list at the given index, and then
         /// resets the positions of all the uniqueDefs in the list.
         /// </summary>
-        public void InsertRange(int index, OutputVoiceDef voiceDef)
+        public void InsertRange(int index, TrkDef voiceDef)
         {
             _InsertRange(index, (VoiceDef)voiceDef);
         }
         /// <summary>
-        /// Creates a new OutputVoiceDef containing just the argument midiChordDef,
+        /// Creates a new TrkDef containing just the argument midiChordDef,
         /// then calls the other InsertInRest() function with the voiceDef as argument. 
         /// </summary>
         public void InsertInRest(MidiChordDef midiChordDef)
         {
             List<IUniqueDef> iuds = new List<IUniqueDef>() { midiChordDef };
-            OutputVoiceDef iVoiceDef = new OutputVoiceDef(iuds);
-            InsertInRest(iVoiceDef);
+            TrkDef trkDefToInsert = new TrkDef(iuds);
+            InsertInRest(trkDefToInsert);
         }
         /// <summary>
         /// An attempt is made to insert the argument iVoiceDef in a rest in the VoiceDef.
@@ -137,10 +137,10 @@ namespace Moritz.Spec
         /// This function does not change the msPositions of any other chords or rests in the containing VoiceDef,
         /// It does, of course, change the indices of the inserted lmdds and the later chords and rests.
         /// </summary>
-        public void InsertInRest(OutputVoiceDef outputVoiceDef)
+        public void InsertInRest(TrkDef trkDef)
         {
-            Debug.Assert(outputVoiceDef[0] is MidiChordDef && outputVoiceDef[outputVoiceDef.Count - 1] is MidiChordDef);
-            _InsertInRest((VoiceDef)outputVoiceDef);
+            Debug.Assert(trkDef[0] is MidiChordDef && trkDef[trkDef.Count - 1] is MidiChordDef);
+            _InsertInRest((VoiceDef)trkDef);
         }
         /// <summary>
         /// Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
@@ -152,7 +152,7 @@ namespace Moritz.Spec
         }
         #endregion Count changers
 
-        #region OutputVoiceDef duration changers
+        #region TrkDef duration changers
         /// <summary>
         /// Multiplies the MsDuration of each midiChordDef from beginIndex to (not including) endIndex by factor.
         /// If a midiChordDef's MsDuration becomes less than minThreshold, it is removed.
@@ -165,13 +165,13 @@ namespace Moritz.Spec
         /// <summary>
         /// Multiplies the MsDuration of each midiChordDef in the UniqueDefs list by factor.
         /// If a midiChordDef's MsDuration becomes less than minThreshold, it is removed.
-        /// The total duration of this OutputVoiceDef changes accordingly.
+        /// The total duration of this TrkDef changes accordingly.
         /// </summary>
         public void AdjustChordMsDurations(double factor, int minThreshold = 100)
         {
             AdjustMsDurations<MidiChordDef>(0, _uniqueDefs.Count, factor, minThreshold);
         }
-        #endregion OutputVoiceDef duration changers
+        #endregion TrkDef duration changers
 
         #region MidiChordDef attribute changers
         /// <summary>
@@ -236,7 +236,7 @@ namespace Moritz.Spec
         /// The factors by which the velocities are multiplied change arithmetically: The velocities
         /// at beginIndex are multiplied by 1.0, and the velocities from endIndex to the end of the
         /// VoiceDef by finalFactor.
-        /// Can be used to create a diminueno or crescendo.
+        /// Can be used to create a diminuendo or crescendo.
         /// </summary>
         /// <param name="beginDimIndex"></param>
         /// <param name="endDimIndex"></param>
@@ -759,8 +759,8 @@ namespace Moritz.Spec
 
         /// <summary>
         /// The composition algorithm must set the MasterVolume (to a value != null)
-        /// in every OutputVoiceDef in the first bar of the score.
-        /// All other OutputVoiceDefs retain the default value 0. 
+        /// in every TrkDef in the first bar of the score.
+        /// All other TrkDefs retain the default value 0. 
         /// </summary>
         public byte? MasterVolume = null; // default value
 

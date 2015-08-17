@@ -46,11 +46,11 @@ namespace Moritz.Algorithm.SongSix
 
             _krystals = krystals;
             _palettes = palettes;
-            OutputVoiceDef wind3 = GetWind3(_palettes[0], _krystals[8]);
+            TrkDef wind3 = GetWind3(_palettes[0], _krystals[8]);
             Clytemnestra clytemnestra = new Clytemnestra(wind3);
             clytemnestra.AdjustVelocities(49, 59, 1.4);
-            OutputVoiceDef wind2 = GetWind2(wind3, clytemnestra);
-            OutputVoiceDef wind1 = GetWind1(wind3, wind2, clytemnestra);
+            TrkDef wind2 = GetWind2(wind3, clytemnestra);
+            TrkDef wind1 = GetWind1(wind3, wind2, clytemnestra);
             AdjustFinalWindChordPosition(wind1, wind2, wind3); // "fermata"
             // WindPitchWheelDeviations change approximately per section in Song Six
             AdjustWindPitchWheelDeviations(wind1);
@@ -91,7 +91,7 @@ namespace Moritz.Algorithm.SongSix
             GetFuriesInterlude3ToEnd(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3, _palettes, msPositions);
             // contouring test code 
             // fury1.SetContour(1, new List<int>(){2,2,2,2,2}, 1, 6);
-            OutputVoiceDef control = GetControlVoiceDef(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
+            TrkDef control = GetControlVoiceDef(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
             // Add each voiceDef to voiceDefs here, in top to bottom (=channelIndex) order in the score.
             List<VoiceDef> voiceDefs = new List<VoiceDef>() { furies1, furies2, furies3, furies4, control, clytemnestra, wind1, wind2, wind3 };
             Debug.Assert(voiceDefs.Count == MidiChannelIndexPerOutputVoice.Count);
@@ -128,13 +128,13 @@ namespace Moritz.Algorithm.SongSix
             furies3.InsertClefChange(112, "b");  // bar 43
             furies4.InsertClefChange(59, "b1"); // bar 104
         }
-        private void AdjustFinalWindChordPosition(OutputVoiceDef wind1, OutputVoiceDef wind2, OutputVoiceDef wind3)
+        private void AdjustFinalWindChordPosition(TrkDef wind1, TrkDef wind2, TrkDef wind3)
         {
             wind1.AlignObjectAtIndex(71, 81, 82, wind1[81].MsPosition - (wind1[81].MsDuration / 2));
             wind2.AlignObjectAtIndex(71, 81, 82, wind2[81].MsPosition - (wind2[81].MsDuration / 2));
             wind3.AlignObjectAtIndex(71, 81, 82, wind3[81].MsPosition - (wind3[81].MsDuration / 2));
         }
-        private void AdjustWindVelocities(OutputVoiceDef wind1, OutputVoiceDef wind2, OutputVoiceDef wind3)
+        private void AdjustWindVelocities(TrkDef wind1, TrkDef wind2, TrkDef wind3)
         {
             int beginInterlude2DimIndex = 25; // start of Interlude2
             int beginVerse3DimIndex = 31; // non-inclusive
@@ -150,7 +150,7 @@ namespace Moritz.Algorithm.SongSix
             wind2.AdjustVelocitiesHairpin(beginPostludeIndex, wind2.Count, 2.3);
             wind3.AdjustVelocitiesHairpin(beginPostludeIndex, wind3.Count, 2.3);
         }
-        private void AdjustWindPitchWheelDeviations(OutputVoiceDef wind)
+        private void AdjustWindPitchWheelDeviations(TrkDef wind)
         {
             byte versePwdValue = 3;
             double windStartPwdValue = 6, windEndPwdValue=28;
@@ -229,17 +229,17 @@ namespace Moritz.Algorithm.SongSix
         /// <summary>
         /// The returned barlineMsPositions contain both the position of bar 1 (0ms) and the position of the final barline.
         /// </summary>
-        private List<int> GetBarlineMsPositions(OutputVoiceDef control, OutputVoiceDef fury1, OutputVoiceDef fury2, OutputVoiceDef fury3, OutputVoiceDef fury4, Clytemnestra clytemnestra, OutputVoiceDef wind1, OutputVoiceDef wind2, OutputVoiceDef wind3)
+        private List<int> GetBarlineMsPositions(TrkDef control, TrkDef fury1, TrkDef fury2, TrkDef fury3, TrkDef fury4, Clytemnestra clytemnestra, TrkDef wind1, TrkDef wind2, TrkDef wind3)
         {
-            OutputVoiceDef ctl = control;
-            OutputVoiceDef f1 = fury1;
-            OutputVoiceDef f2 = fury2;
-            OutputVoiceDef f3 = fury3;
-            OutputVoiceDef f4 = fury4;
+            TrkDef ctl = control;
+            TrkDef f1 = fury1;
+            TrkDef f2 = fury2;
+            TrkDef f3 = fury3;
+            TrkDef f4 = fury4;
             Clytemnestra c = clytemnestra;
-            OutputVoiceDef w1 = wind1;
-            OutputVoiceDef w2 = wind2;
-            OutputVoiceDef w3 = wind3;
+            TrkDef w1 = wind1;
+            TrkDef w2 = wind2;
+            TrkDef w3 = wind3;
             List<int> barlineMsPositions = new List<int>()
             {
                 #region msPositions
@@ -381,16 +381,16 @@ namespace Moritz.Algorithm.SongSix
         /// <summary>
         /// The control VoiceDef consists of single note + rest pairs whose msPositions are composed here.
         /// </summary>
-        private OutputVoiceDef GetControlVoiceDef(OutputVoiceDef furies1, OutputVoiceDef furies2, OutputVoiceDef furies3, OutputVoiceDef furies4, Clytemnestra clytemnestra, OutputVoiceDef wind1, OutputVoiceDef wind2, OutputVoiceDef wind3)
+        private TrkDef GetControlVoiceDef(TrkDef furies1, TrkDef furies2, TrkDef furies3, TrkDef furies4, Clytemnestra clytemnestra, TrkDef wind1, TrkDef wind2, TrkDef wind3)
         {
-            OutputVoiceDef f1 = furies1;
-            OutputVoiceDef f2 = furies2;
-            OutputVoiceDef f3 = furies3;
-            OutputVoiceDef f4 = furies4;
-            OutputVoiceDef w1 = wind1;
-            OutputVoiceDef w2 = wind2;
-            OutputVoiceDef w3 = wind3;
-            OutputVoiceDef c = clytemnestra;
+            TrkDef f1 = furies1;
+            TrkDef f2 = furies2;
+            TrkDef f3 = furies3;
+            TrkDef f4 = furies4;
+            TrkDef w1 = wind1;
+            TrkDef w2 = wind2;
+            TrkDef w3 = wind3;
+            TrkDef c = clytemnestra;
             // The columns here are note MsPositions and rest MsPositions respectively.
             List<int> controlNoteAndRestMsPositions = new List<int>()
             {
@@ -465,12 +465,12 @@ namespace Moritz.Algorithm.SongSix
                 // Postlude off
                 w3.EndMsPosition // final barline position
             };
-            OutputVoiceDef controlVoiceDef = MakeControlVoiceDef(controlNoteAndRestMsPositions);
+            TrkDef controlVoiceDef = MakeControlVoiceDef(controlNoteAndRestMsPositions);
             return controlVoiceDef;
         }
         // This code should not change while composing the ControlVoiceDef.
         // It just makes the VoiceDef from the controlNoteAndRestMsPositions defined above.
-        private static OutputVoiceDef MakeControlVoiceDef(List<int> controlNoteAndRestMsPositions)
+        private static TrkDef MakeControlVoiceDef(List<int> controlNoteAndRestMsPositions)
         {
             List<IUniqueDef> controlLmdds = new List<IUniqueDef>();
             for(int i = 0; i < controlNoteAndRestMsPositions.Count - 2; i += 2)
@@ -486,7 +486,7 @@ namespace Moritz.Algorithm.SongSix
                 controlLmdds.Add(umChordDef);
                 controlLmdds.Add(umRestDef);
             }
-            OutputVoiceDef controlVoiceDef = new OutputVoiceDef(controlLmdds);
+            TrkDef controlVoiceDef = new TrkDef(controlLmdds);
             return controlVoiceDef;
         }
         private List<List<VoiceDef>> GetBars(List<VoiceDef> voiceDefs, List<int> barlineMsPositions)

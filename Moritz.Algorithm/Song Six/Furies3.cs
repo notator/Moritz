@@ -8,7 +8,7 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.SongSix
 {
-    internal class Furies3 : OutputVoiceDef
+    internal class Furies3 : TrkDef
     {
         internal Furies3(int msDuration)
             : base(msDuration)
@@ -16,7 +16,7 @@ namespace Moritz.Algorithm.SongSix
         }
 
         #region before Interlude3
-        internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, OutputVoiceDef wind1, List<Palette> palettes)
+        internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, TrkDef wind1, List<Palette> palettes)
         {
             GetFlutters(firstRestMsDuration, palettes[2]);
 
@@ -37,20 +37,20 @@ namespace Moritz.Algorithm.SongSix
         private void GetFlutters(int firstRestMsDuration, Palette palette)
         {
             // each flutter begins with a chord, and ends with a rest.
-            OutputVoiceDef furies3FlutterSequence1 = GetFlutter1(palette);
+            TrkDef furies3FlutterSequence1 = GetFlutter1(palette);
             furies3FlutterSequence1.AdjustVelocities(0.7);
 
-            OutputVoiceDef furies3FlutterSequence2 = GetNextFlutterSequence(furies3FlutterSequence1, 0.89, 1);
-            OutputVoiceDef furies3FlutterSequence3 = GetNextFlutterSequence(furies3FlutterSequence2, 0.89, 1);
-            OutputVoiceDef furies3FlutterSequence4 = GetNextFlutterSequence(furies3FlutterSequence3, 0.89, 1);
-            OutputVoiceDef furies3FlutterSequence5 = GetNextFlutterSequence(furies3FlutterSequence4, 0.89, 1);
-            OutputVoiceDef furies3FlutterSequence6 = GetNextFlutterSequence(furies3FlutterSequence5, 0.89, 2);
-            OutputVoiceDef furies3FlutterSequence7 = GetNextFlutterSequence(furies3FlutterSequence6, 0.89, 2);
-            OutputVoiceDef furies3FlutterSequence8 = GetNextFlutterSequence(furies3FlutterSequence7, 0.89, 2);
-            OutputVoiceDef furies3FlutterSequence9 = GetNextFlutterSequence(furies3FlutterSequence8, 0.89, 3);
-            OutputVoiceDef furies3FlutterSequence10 = GetNextFlutterSequence(furies3FlutterSequence9, 0.89, 3);
-            OutputVoiceDef furies3FlutterSequence11 = GetNextFlutterSequence(furies3FlutterSequence10, 0.89, 4);
-            OutputVoiceDef furies3FlutterSequence12 = GetNextFlutterSequence(furies3FlutterSequence11, 0.89, 5);
+            TrkDef furies3FlutterSequence2 = GetNextFlutterSequence(furies3FlutterSequence1, 0.89, 1);
+            TrkDef furies3FlutterSequence3 = GetNextFlutterSequence(furies3FlutterSequence2, 0.89, 1);
+            TrkDef furies3FlutterSequence4 = GetNextFlutterSequence(furies3FlutterSequence3, 0.89, 1);
+            TrkDef furies3FlutterSequence5 = GetNextFlutterSequence(furies3FlutterSequence4, 0.89, 1);
+            TrkDef furies3FlutterSequence6 = GetNextFlutterSequence(furies3FlutterSequence5, 0.89, 2);
+            TrkDef furies3FlutterSequence7 = GetNextFlutterSequence(furies3FlutterSequence6, 0.89, 2);
+            TrkDef furies3FlutterSequence8 = GetNextFlutterSequence(furies3FlutterSequence7, 0.89, 2);
+            TrkDef furies3FlutterSequence9 = GetNextFlutterSequence(furies3FlutterSequence8, 0.89, 3);
+            TrkDef furies3FlutterSequence10 = GetNextFlutterSequence(furies3FlutterSequence9, 0.89, 3);
+            TrkDef furies3FlutterSequence11 = GetNextFlutterSequence(furies3FlutterSequence10, 0.89, 4);
+            TrkDef furies3FlutterSequence12 = GetNextFlutterSequence(furies3FlutterSequence11, 0.89, 5);
 
             Furies3 f3 = new Furies3(firstRestMsDuration);
 
@@ -70,9 +70,9 @@ namespace Moritz.Algorithm.SongSix
             this._uniqueDefs = f3.UniqueDefs;
         }
 
-        private OutputVoiceDef GetNextFlutterSequence(OutputVoiceDef existingFlutter, double factor, int transposition)
+        private TrkDef GetNextFlutterSequence(TrkDef existingFlutter, double factor, int transposition)
         {
-            OutputVoiceDef nextFlutter = existingFlutter.DeepClone();
+            TrkDef nextFlutter = existingFlutter.DeepClone();
             nextFlutter.AdjustVelocities(factor);
             nextFlutter.AdjustMsDurations(factor);
             nextFlutter.AdjustRestMsDurations(factor);
@@ -80,7 +80,7 @@ namespace Moritz.Algorithm.SongSix
             return nextFlutter;
         }
 
-        private OutputVoiceDef GetFlutter1(Palette palette)
+        private TrkDef GetFlutter1(Palette palette)
         {
             List<IUniqueDef> flutter1 = new List<IUniqueDef>();
             int msPosition = 0;
@@ -101,7 +101,7 @@ namespace Moritz.Algorithm.SongSix
                 }
             }
 
-            OutputVoiceDef furies3FlutterSequence1 = new OutputVoiceDef(flutter1);
+            TrkDef furies3FlutterSequence1 = new TrkDef(flutter1);
 
             return furies3FlutterSequence1;
         }
@@ -158,7 +158,7 @@ namespace Moritz.Algorithm.SongSix
             return ticksSequence;
         }
 
-        internal void GetChirpsInInterlude2AndVerse3(OutputVoiceDef furies1, OutputVoiceDef furies2, Clytemnestra clytemnestra, OutputVoiceDef wind1, Palette chirpsPalette)
+        internal void GetChirpsInInterlude2AndVerse3(TrkDef furies1, TrkDef furies2, Clytemnestra clytemnestra, TrkDef wind1, Palette chirpsPalette)
         {
             int[] chirpIndices = { 4, 8, 2, 6, 10, 0 };
             int[] transpositions = { 2, 1, 3, 0, 4, 5 };
@@ -197,14 +197,14 @@ namespace Moritz.Algorithm.SongSix
 
         internal void GetFinale(List<Palette> palettes, Dictionary<string, int> msPositions, Krystal krystal)
         {
-            OutputVoiceDef furies3Finale = GetF3Finale(palettes, krystal, msPositions);
+            TrkDef furies3Finale = GetF3Finale(palettes, krystal, msPositions);
 
             InsertInRest(furies3Finale);
 
             AdjustPitchWheelDeviations(msPositions["interlude4"], msPositions["endOfPiece"], 5, 28);
         }
 
-        private OutputVoiceDef GetF3Finale(List<Palette> palettes, Krystal krystal, Dictionary<string, int> msPositions)
+        private TrkDef GetF3Finale(List<Palette> palettes, Krystal krystal, Dictionary<string, int> msPositions)
         {
             Palette f3FinalePalette1 = palettes[10]; // correct 1.1.2014
             Palette f3FinalePalette2 = palettes[14];
@@ -212,14 +212,14 @@ namespace Moritz.Algorithm.SongSix
 
             List<int> strandIndices = GetStrandIndices(krystal);
 
-            OutputVoiceDef finalePart1 = f3FinalePalette1.NewOutputVoiceDef(krystal);
+            TrkDef finalePart1 = f3FinalePalette1.NewTrkDef(krystal);
             Transform(finalePart1, msPositions, strandIndices);
-            OutputVoiceDef finalePart2 = f3FinalePalette2.NewOutputVoiceDef(krystal);
+            TrkDef finalePart2 = f3FinalePalette2.NewTrkDef(krystal);
             Transform(finalePart2, msPositions, strandIndices);
-            OutputVoiceDef postlude = f3PostludePalette.NewOutputVoiceDef(krystal);
+            TrkDef postlude = f3PostludePalette.NewTrkDef(krystal);
             Transform(postlude, msPositions, strandIndices);
 
-            OutputVoiceDef finale = GetFinaleSections(finalePart1, finalePart2, postlude, 77, 206);
+            TrkDef finale = GetFinaleSections(finalePart1, finalePart2, postlude, 77, 206);
 
             Cleanup(finale, msPositions["endOfPiece"]);
 
@@ -229,7 +229,7 @@ namespace Moritz.Algorithm.SongSix
         /// <summary>
         /// ACHTUNG: could be a protected virtual function in a furies class
         /// </summary>
-        private void Transform(OutputVoiceDef section, Dictionary<string, int> msPositions, List<int> strandIndices)
+        private void Transform(TrkDef section, Dictionary<string, int> msPositions, List<int> strandIndices)
         {
             List<int> strandDurations = GetStrandDurations(section, strandIndices);
 
@@ -269,7 +269,7 @@ namespace Moritz.Algorithm.SongSix
         /// <summary>
         /// Could be a protected function in a furies class
         /// </summary>
-        private void Cleanup(OutputVoiceDef finale, int endOfPieceMsPosition)
+        private void Cleanup(TrkDef finale, int endOfPieceMsPosition)
         {
             if(finale[finale.Count - 1] is RestDef)
             {
@@ -305,7 +305,7 @@ namespace Moritz.Algorithm.SongSix
         /// and MsDuration. The DurationDefs come from different palettes, so can otherwise have different parameters.
         /// This function simply creates a new VoiceDef by selecting the apropriate DurationDefs from each VoiceDef argument.
         /// </summary>
-        private OutputVoiceDef GetFinaleSections(OutputVoiceDef finalePart1, OutputVoiceDef finalePart2, OutputVoiceDef postlude, int part2Index, int postludeIndex)
+        private TrkDef GetFinaleSections(TrkDef finalePart1, TrkDef finalePart2, TrkDef postlude, int part2Index, int postludeIndex)
         {
             List<IUniqueDef> iumdds = new List<IUniqueDef>();
 
@@ -322,7 +322,7 @@ namespace Moritz.Algorithm.SongSix
                 iumdds.Add(postlude[i]);
             }
 
-            return new OutputVoiceDef(iumdds);
+            return new TrkDef(iumdds);
         }
 
         /// <summary>
@@ -332,7 +332,7 @@ namespace Moritz.Algorithm.SongSix
         /// <param name="voiceDef"></param>
         /// <param name="strandIndices"></param>
         /// <returns></returns>
-        private List<int> GetStrandDurations(OutputVoiceDef voiceDef, List<int> strandIndices)
+        private List<int> GetStrandDurations(TrkDef voiceDef, List<int> strandIndices)
         {
             List<int> strandDurations = new List<int>();
             int duration;
@@ -355,7 +355,7 @@ namespace Moritz.Algorithm.SongSix
         }
         #endregion
 
-        internal void AdjustAlignments(Furies1 f1, Furies2 f2, Furies4 f4, Clytemnestra c, OutputVoiceDef wind1)
+        internal void AdjustAlignments(Furies1 f1, Furies2 f2, Furies4 f4, Clytemnestra c, TrkDef wind1)
         {
             AlignObjectAtIndex(147, 150, 158, f1[56].MsPosition);
             AlignObjectAtIndex(150, 158, 170, f1[61].MsPosition);

@@ -113,9 +113,9 @@ namespace Moritz.Algorithm
         /// a real NoteObject containing layout information (by a Notator), and the NoteObject then added to a
         /// concrete Voice.NoteObjects list. See Notator.AddSymbolsToSystems().
         /// ACHTUNG:
-        /// The top (=first) VoiceDef in each bar definition must be an OutputVoiceDef.
+        /// The top (=first) VoiceDef in each bar definition must be a TrkDef.
         /// This can be followed by zero or more OutputVoices, followed by zero or more InputVoices.
-        /// The chord definitions in OutputVoiceDef.UniqueDefs must be MidiChordDefs.
+        /// The chord definitions in TrkDef.UniqueDefs must be MidiChordDefs.
         /// The chord definitions in InputVoice.UniqueDefs must be InputChordDefs.
         /// Algorithms declare the number of output and input voices they construct by defining the
         /// MidiChannelIndexPerOutputVoice and NumberOfInputVoices properties (see above).
@@ -180,12 +180,12 @@ namespace Moritz.Algorithm
             VoiceDef secondBarVoice;
             foreach(VoiceDef voice in originalBar)
             {
-                OutputVoiceDef outputVoice = voice as OutputVoiceDef;
+                TrkDef outputVoice = voice as TrkDef;
                 if(outputVoice != null)
                 {
-                    firstBarVoice = new OutputVoiceDef();
+                    firstBarVoice = new TrkDef();
                     firstBar.Add(firstBarVoice);
-                    secondBarVoice = new OutputVoiceDef();
+                    secondBarVoice = new TrkDef();
                     secondBar.Add(secondBarVoice);
                 }
                 else
@@ -335,13 +335,13 @@ namespace Moritz.Algorithm
         /// This function should be called for all scores when the bars are complete.
         /// </summary>
         /// <param name="firstBar"></param>
-        /// <param name="masterVolumes">A list with one value per OutputVoiceDef</param>
+        /// <param name="masterVolumes">A list with one value per TrkDef</param>
         protected void SetOutputVoiceChannelsAndMasterVolumes(List<VoiceDef> firstBar)
         {
             Debug.Assert(MasterVolumePerOutputVoice.Count == MidiChannelIndexPerOutputVoice.Count);
             for(int i = 0; i < MasterVolumePerOutputVoice.Count; ++i)
             {
-                OutputVoiceDef oVoice = firstBar[i] as OutputVoiceDef;
+                TrkDef oVoice = firstBar[i] as TrkDef;
                 Debug.Assert(oVoice != null);
                 Debug.Assert(MasterVolumePerOutputVoice[i] != 0);
                 Debug.Assert(MasterVolumePerOutputVoice[i] >= 0 && MasterVolumePerOutputVoice[i] < 128);

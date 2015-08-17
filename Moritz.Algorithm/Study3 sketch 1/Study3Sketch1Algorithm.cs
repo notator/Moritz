@@ -63,14 +63,14 @@ namespace Moritz.Algorithm.Study3Sketch1
 
             foreach(Palette palette in _palettes)
             {
-                OutputVoiceDef voice = new OutputVoiceDef();
+                TrkDef voice = new TrkDef();
                 bar.Add(voice);
                 WriteVoiceMidiDurationDefs1(voice, palette);
             }
             return bar;
         }
 
-        private void WriteVoiceMidiDurationDefs1(OutputVoiceDef voice, Palette palette)
+        private void WriteVoiceMidiDurationDefs1(TrkDef trkDef, Palette palette)
         {
             int msPosition = 0;
             int bar1ChordMsSeparation = 1500;
@@ -80,8 +80,8 @@ namespace Moritz.Algorithm.Study3Sketch1
                 durationDef.MsPosition = msPosition;
                 RestDef restDef = new RestDef(msPosition + durationDef.MsDuration, bar1ChordMsSeparation - durationDef.MsDuration);
                 msPosition += bar1ChordMsSeparation;
-                voice.UniqueDefs.Add(durationDef);
-                voice.UniqueDefs.Add(restDef);
+                trkDef.UniqueDefs.Add(durationDef);
+                trkDef.UniqueDefs.Add(restDef);
             }
         }
         #endregion CreateBar1()
@@ -95,28 +95,28 @@ namespace Moritz.Algorithm.Study3Sketch1
             List<VoiceDef> bar = new List<VoiceDef>();
 
             byte channel = 0;
-            List<OutputVoiceDef> voiceDefs = new List<OutputVoiceDef>();
+            List<TrkDef> trkDefs = new List<TrkDef>();
             foreach(Palette palette in _palettes)
             {
-                bar.Add(new OutputVoiceDef());
-                OutputVoiceDef voiceDef = palette.NewOutputVoiceDef();
-                voiceDef.SetMsDuration(6000);
-                voiceDefs.Add(voiceDef);
+                bar.Add(new TrkDef());
+                TrkDef trkDef = palette.NewTrkDef();
+                trkDef.SetMsDuration(6000);
+                trkDefs.Add(trkDef);
                 ++channel;
             }
             int msPosition = bar2StartMsPos;
             int maxBarMsPos = 0;
-            for(int i = 0; i < voiceDefs.Count; ++i)
+            for(int i = 0; i < trkDefs.Count; ++i)
             {
-                int maxMsPos = WriteVoiceMidiDurationDefsInBar2(bar[i], voiceDefs[i], msPosition, bar2StartMsPos);
+                int maxMsPos = WriteVoiceMidiDurationDefsInBar2(bar[i], trkDefs[i], msPosition, bar2StartMsPos);
                 maxBarMsPos = maxBarMsPos > maxMsPos ? maxBarMsPos : maxMsPos;
                 msPosition += 1500;
             }
 
             // now add the final rest in the bar
-            for(int i = 0; i < voiceDefs.Count; ++i)
+            for(int i = 0; i < trkDefs.Count; ++i)
             {
-                int mdsdEndPos = voiceDefs[i].EndMsPosition;
+                int mdsdEndPos = trkDefs[i].EndMsPosition;
                 if(maxBarMsPos > mdsdEndPos)
                 {
                     RestDef rest2Def = new RestDef(mdsdEndPos, maxBarMsPos - mdsdEndPos);
@@ -130,7 +130,7 @@ namespace Moritz.Algorithm.Study3Sketch1
         /// Writes the first rest (if any) and the VoiceDef to the voice.
         /// Returns the endMsPos of the VoiceDef. 
         /// </summary>
-        private int WriteVoiceMidiDurationDefsInBar2(VoiceDef voice, OutputVoiceDef voiceDef, int msPosition, int bar2StartMsPos)
+        private int WriteVoiceMidiDurationDefsInBar2(VoiceDef voice, TrkDef trkDef, int msPosition, int bar2StartMsPos)
         {
             RestDef rest1Def = null;
             if(msPosition > bar2StartMsPos)
@@ -139,13 +139,13 @@ namespace Moritz.Algorithm.Study3Sketch1
                 voice.UniqueDefs.Add(rest1Def);
             }
 
-            voiceDef.StartMsPosition = msPosition;
-            foreach(IUniqueDef iumdd in voiceDef)
+            trkDef.StartMsPosition = msPosition;
+            foreach(IUniqueDef iumdd in trkDef)
             {
                 voice.UniqueDefs.Add(iumdd);
             }
 
-            return voiceDef.EndMsPosition;
+            return trkDef.EndMsPosition;
         }
         #endregion CreateBar2()
         #region CreateBars3to5()

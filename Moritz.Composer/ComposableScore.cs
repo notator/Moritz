@@ -58,7 +58,7 @@ namespace Moritz.Composer
                     errorString = "One bar (at least) contains no voices.";
                     break;
                 }
-                if(!(bar[0] is OutputVoiceDef))
+                if(!(bar[0] is TrkDef))
                 {
                     errorString = "The top (first) voice in every bar must be an output voice.";
                     break;
@@ -83,7 +83,7 @@ namespace Moritz.Composer
             int nOutputVoices = 0;
             foreach(VoiceDef voiceDef in bar1)
             {
-                if(voiceDef is OutputVoiceDef)
+                if(voiceDef is TrkDef)
                 {
                     nOutputVoices++;
                 }
@@ -107,18 +107,18 @@ namespace Moritz.Composer
         private string CheckInputControlsDef(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
         {
             string errorString = null;
-            List<OutputVoiceDef> oVoices = new List<OutputVoiceDef>();
+            List<TrkDef> trkDefs = new List<TrkDef>();
             foreach(VoiceDef voice in voiceDefsPerSystemPerBar[0])
             {
-                OutputVoiceDef ov = voice as OutputVoiceDef;
-                if(ov != null)
+                TrkDef trkDef = voice as TrkDef;
+                if(trkDef != null)
                 {
-                    if(ov.MasterVolume == null)
+                    if(trkDef.MasterVolume == null)
                     {
                         errorString = "\nEvery OutputVoice in the first bar of a score\n" +
                                       "must have a MasterVolume value.";
                     }
-                    oVoices.Add(ov);
+                    trkDefs.Add(trkDef);
                 }
             }
             if(string.IsNullOrEmpty(errorString) && voiceDefsPerSystemPerBar.Count > 1)
@@ -127,10 +127,10 @@ namespace Moritz.Composer
                 {
                     foreach(VoiceDef voice in voiceDefsPerSystemPerBar[bar])
                     {
-                        OutputVoiceDef ov = voice as OutputVoiceDef;
-                        if(ov != null)
+                        TrkDef trkDef = voice as TrkDef;
+                        if(trkDef != null)
                         {
-                            if(ov.MasterVolume != null)
+                            if(trkDef.MasterVolume != null)
                             {
                                 errorString = "\nNo OutputVoice except the first may have a MasterVolume.";
                             }
@@ -210,10 +210,10 @@ namespace Moritz.Composer
                 {
                     foreach(byte invisibleOutputVoiceIndex in invisibleOutputVoiceIndices)
                     {
-                        OutputVoiceDef invisibleOutputVoiceDef = barDef[invisibleOutputVoiceIndex] as OutputVoiceDef;
+                        TrkDef invisibleTrkDef = barDef[invisibleOutputVoiceIndex] as TrkDef;
                         InvisibleOutputStaff invisibleOutputStaff = new InvisibleOutputStaff(system);
-                        OutputVoice outputVoice = new OutputVoice(invisibleOutputStaff, invisibleOutputVoiceDef.MidiChannel, invisibleOutputVoiceDef.MasterVolume);
-                        outputVoice.VoiceDef = invisibleOutputVoiceDef;
+                        OutputVoice outputVoice = new OutputVoice(invisibleOutputStaff, invisibleTrkDef.MidiChannel, invisibleTrkDef.MasterVolume);
+                        outputVoice.VoiceDef = invisibleTrkDef;
                         invisibleOutputStaff.Voices.Add(outputVoice);
                         system.Staves.Add(invisibleOutputStaff);
                     }
@@ -228,10 +228,10 @@ namespace Moritz.Composer
                     List<byte> outputVoiceIndices = _pageFormat.VisibleOutputVoiceIndicesPerStaff[printedStaffIndex];
                     for(int ovIndex = 0; ovIndex < outputVoiceIndices.Count; ++ovIndex)
                     {
-                        OutputVoiceDef outputVoiceDef = barDef[outputVoiceIndices[ovIndex]] as OutputVoiceDef;
-                        Debug.Assert(outputVoiceDef != null);
-                        OutputVoice outputVoice = new OutputVoice(outputStaff, outputVoiceDef.MidiChannel, outputVoiceDef.MasterVolume);
-                        outputVoice.VoiceDef = outputVoiceDef;
+                        TrkDef trkDef = barDef[outputVoiceIndices[ovIndex]] as TrkDef;
+                        Debug.Assert(trkDef != null);
+                        OutputVoice outputVoice = new OutputVoice(outputStaff, trkDef.MidiChannel, trkDef.MasterVolume);
+                        outputVoice.VoiceDef = trkDef;
                         outputStaff.Voices.Add(outputVoice);
                     }
                     SetStemDirections(outputStaff);
@@ -250,7 +250,7 @@ namespace Moritz.Composer
             List<byte> invisibleOutputVoiceIndices = new List<byte>();
             for(byte voiceIndex = 0; voiceIndex < voiceDefs.Count; ++voiceIndex)
             {
-                if(voiceDefs[voiceIndex] is OutputVoiceDef)
+                if(voiceDefs[voiceIndex] is TrkDef)
                 {
                     if(!visibleOutputVoiceIndices.Contains(voiceIndex))
                     {

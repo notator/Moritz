@@ -316,7 +316,7 @@ namespace Moritz.Palettes
             return midiChordDef;
         }
 
-        public OutputVoiceDef NewOutputVoiceDef(List<int> sequence)
+        public TrkDef NewTrkDef(List<int> sequence)
         {
             List<IUniqueDef> iuds = new List<IUniqueDef>();
             int msPosition = 0;
@@ -329,27 +329,27 @@ namespace Moritz.Palettes
                 msPosition += iumdd.MsDuration;
                 iuds.Add(iumdd);
             }
-            OutputVoiceDef ovd = new OutputVoiceDef(iuds);
-            return ovd;
+            TrkDef trkDef = new TrkDef(iuds);
+            return trkDef;
         }
 
-        public OutputVoiceDef NewOutputVoiceDef(Krystal krystal)
+        public TrkDef NewTrkDef(Krystal krystal)
         {
             List<int> sequence = krystal.GetValues((uint)1)[0];
-            return NewOutputVoiceDef(sequence);
+            return NewTrkDef(sequence);
         }
 
         /// <summary>
-        /// Constructs an OutputVoiceDef at MsPosition=0, containing a clone of the sequence of DurationDefs in the PaletteDef.
+        /// Constructs an TrkDef at MsPosition=0, containing a clone of the sequence of DurationDefs in the PaletteDef.
         /// </summary
-        public OutputVoiceDef NewOutputVoiceDef()
+        public TrkDef NewTrkDef()
         {
             List<int> sequence = new List<int>();
             for(int i = 1; i <= Count; ++i)
             {
                 sequence.Add(i);
             }
-            return NewOutputVoiceDef(sequence);
+            return NewTrkDef(sequence);
         }
     }
 

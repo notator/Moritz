@@ -16,7 +16,7 @@ namespace Moritz.Algorithm.SongSix
         /// The arguments are all complete to the end of Verse 3
         /// </summary>
         private void GetFuriesInterlude3ToEnd(Furies1 furies1, Furies2 furies2, Furies3 furies3, Furies4 furies4,
-            Clytemnestra clytemnestra, OutputVoiceDef wind1, OutputVoiceDef wind2, OutputVoiceDef wind3, List<Palette> palettes,
+            Clytemnestra clytemnestra, TrkDef wind1, TrkDef wind2, TrkDef wind3, List<Palette> palettes,
             Dictionary<string, int> msPositions)
         {
             furies1.GetFinale(palettes, msPositions, _krystals[9]); // _krystals[9] is xk3(12.12.1)-1.krys

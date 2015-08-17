@@ -10,9 +10,9 @@ namespace Moritz.Algorithm.SongSix
     /// <summary>
     /// Encapsulates the composition of Clytemnestra's VoiceDef
     /// </summary>
-    internal class Clytemnestra : OutputVoiceDef
+    internal class Clytemnestra : TrkDef
     {
-        internal Clytemnestra(OutputVoiceDef wind3) 
+        internal Clytemnestra(TrkDef wind3) 
             : base(new List<IUniqueDef>())
         {
             SetMomentDefsListPerVerse();
@@ -283,7 +283,7 @@ namespace Moritz.Algorithm.SongSix
         /// Sets Clytamnestra's _uniqueMidiDurationDefs for the whole piece including rests.
         /// Barline positions are set later.
         /// </summary>
-        private void SetUniqueMidiDurationDefs(OutputVoiceDef wind3)
+        private void SetUniqueMidiDurationDefs(TrkDef wind3)
         {
             Debug.Assert(_momentDefsListPerVerse.Count == 5);
 
