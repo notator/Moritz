@@ -391,7 +391,371 @@ namespace Moritz.Spec
                 }
             }
         }
+		#region alignment
+		/// <summary>
+		/// _uniqueDefs[indexToAlign] is moved to toMsPosition, and the surrounding symbols are spread accordingly
+		/// between those at anchor1Index and anchor2Index. The symbols at anchor1Index and anchor2Index do not move.
+		/// Note that indexToAlign cannot be 0, and that anchor2Index CAN be equal to _uniqueDefs.Count (i.e.on the final barline).
+		/// This function checks that 
+		///     1. anchor1Index is in range 0..(indexToAlign - 1),
+		///     2. anchor2Index is in range (indexToAlign + 1).._localizedMidiDurationDefs.Count
+		///     3. toPosition is greater than the msPosition at anchor1Index and less than the msPosition at anchor2Index.
+		/// and throws an appropriate exception if there is a problem.
+		/// </summary>
+		public void AlignObjectAtIndex(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPosition)
+		{
+			// throws an exception if there's a problem.
+			CheckAlignDefArgs(anchor1Index, indexToAlign, anchor2Index, toMsPosition);
+
+			List<IUniqueDef> lmdds = _uniqueDefs;
+			int anchor1MsPosition = lmdds[anchor1Index].MsPosition;
+			int fromMsPosition = lmdds[indexToAlign].MsPosition;
+			int anchor2MsPosition;
+			if(anchor2Index == lmdds.Count) // i.e. anchor2 is on the final barline
+			{
+				anchor2MsPosition = lmdds[anchor2Index - 1].MsPosition + lmdds[anchor2Index - 1].MsDuration;
+			}
+			else
+			{
+				anchor2MsPosition = lmdds[anchor2Index].MsPosition;
+			}
+
+			float leftFactor = (float)(((float)(toMsPosition - anchor1MsPosition)) / ((float)(fromMsPosition - anchor1MsPosition)));
+			for(int i = anchor1Index + 1; i < indexToAlign; ++i)
+			{
+				lmdds[i].MsPosition = anchor1MsPosition + ((int)((lmdds[i].MsPosition - anchor1MsPosition) * leftFactor));
+			}
+
+			lmdds[indexToAlign].MsPosition = toMsPosition;
+
+			float rightFactor = (float)(((float)(anchor2MsPosition - toMsPosition)) / ((float)(anchor2MsPosition - fromMsPosition)));
+			for(int i = anchor2Index - 1; i > indexToAlign; --i)
+			{
+				lmdds[i].MsPosition = anchor2MsPosition - ((int)((anchor2MsPosition - lmdds[i].MsPosition) * rightFactor));
+			}
+
+			#region fix MsDurations
+			for(int i = anchor1Index + 1; i <= anchor2Index; ++i)
+			{
+				if(i == lmdds.Count) // possible, when anchor2Index is the final barline
+				{
+					lmdds[i - 1].MsDuration = anchor2MsPosition - lmdds[i - 1].MsPosition;
+				}
+				else
+				{
+					lmdds[i - 1].MsDuration = lmdds[i].MsPosition - lmdds[i - 1].MsPosition;
+				}
+			}
+			#endregion
+		}
+		/// <summary>
+		/// Throws an exception if
+		///     1. the index arguments are not in ascending order. (None of them may not be equal either.)
+		///     2. any of the index arguments are out of range (anchor2Index CAN be _localizedMidiDurationDefs.Count, i.e. the final barline)
+		///     3. toPosition is not greater than the msPosition at anchor1Index and less than the msPosition at anchor2Index.
+		/// </summary>
+		private void CheckAlignDefArgs(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPosition)
+		{
+			List<IUniqueDef> lmdds = _uniqueDefs;
+			int count = lmdds.Count;
+			string msg = "\nError in VoiceDef.cs,\nfunction AlignDefMsPosition()\n\n";
+			if(anchor1Index >= indexToAlign || anchor2Index <= indexToAlign)
+			{
+				throw new Exception(msg + "Index out of order.\n" +
+					"\nanchor1Index=" + anchor1Index.ToString() +
+					"\nindexToAlign=" + indexToAlign.ToString() +
+					"\nanchor2Index=" + anchor2Index.ToString());
+			}
+			if((anchor1Index > (count - 2) || indexToAlign > (count - 1) || anchor2Index > count)// anchor2Index can be at the final barline (=count)!
+				|| (anchor1Index < 0 || indexToAlign < 1 || anchor2Index < 2))
+			{
+				throw new Exception(msg + "Index out of range.\n" +
+					"\ncount=" + count.ToString() +
+					"\nanchor1Index=" + anchor1Index.ToString() +
+					"\nindexToAlign=" + indexToAlign.ToString() +
+					"\nanchor2Index=" + anchor2Index.ToString());
+			}
+
+			int a1MsPos = lmdds[anchor1Index].MsPosition;
+			int a2MsPos;
+			if(anchor2Index == lmdds.Count)
+			{
+				a2MsPos = lmdds[anchor2Index - 1].MsPosition + lmdds[anchor2Index - 1].MsDuration;
+			}
+			else
+			{
+				a2MsPos = lmdds[anchor2Index].MsPosition;
+			}
+			if(toMsPosition <= a1MsPos || toMsPosition >= a2MsPos)
+			{
+				throw new Exception(msg + "Target (msPos) position out of range.\n" +
+					"\nanchor1Index=" + anchor1Index.ToString() +
+					"\nindexToAlign=" + indexToAlign.ToString() +
+					"\nanchor2Index=" + anchor2Index.ToString() +
+					"\ntoMsPosition=" + toMsPosition.ToString());
+			}
+		}
+		#endregion alignment
         #endregion MidiChordDef attribute changers)
+
+		#region Enumerators
+		private IEnumerable<MidiChordDef> MidiChordDefs
+		{
+			get
+			{
+				foreach(IUniqueDef iud in _uniqueDefs)
+				{
+					MidiChordDef midiChordDef = iud as MidiChordDef;
+					if(midiChordDef != null)
+						yield return midiChordDef;
+				}
+			}
+		}
+		#endregion
+
+		#region public Permute()
+		/// <summary>
+		/// Re-orders the UniqueMidiDurationDefs in (part of) this VoiceDef.
+		/// <para>1. creates partitions (lists of UniqueMidiDurationDefs) using the startAtIndex and partitionSizes in the first two</para>
+		/// <para>-  arguments (see parameter info below).</para>   
+		/// <para>2. Sorts the partitions into ascending order of their lowest pitches.
+		/// <para>3. Re-orders the partitions according to the contour retrieved (from the static K.Contour[] array) using</para>
+		/// <para>-  the contourNumber and axisNumber arguments.</para>
+		/// <para>4. Concatenates the re-ordered partitions, re-sets their MsPositions, and replaces the UniqueMidiDurationDefs in</para>
+		/// <para>-  the original List with the result.</para>
+		/// <para>5. If setLyricsToIndex is true, sets the lyrics to the new indices</para>
+		/// <para>SpecialCases:</para>
+		/// <para>If a partition contains a single LocalMidiRestDef (the partition is a *rest*, having no 'lowest pitch'), the other</para>
+		/// <para>partitions are re-ordered as if the rest-partition was not there, and the rest-partition is subsequently re-inserted</para>
+		/// <para>at its original partition position.</para>
+		/// <para>If two sub-VoiceDefs have the same initial base pitch, they stay in the same order as they were (not necessarily</para>
+		/// <para>together, of course.)</para>
+		/// </summary>
+		/// <param name="startAtIndex">The index in UniqueMidiDurationDefs at which to start the re-ordering.
+		/// </param>
+		/// <param name="partitionSizes">The number of UniqueMidiDurationDefs in each sub-voiceDef to be re-ordered.
+		/// <para>This partitionSizes list must contain:</para>
+		/// <para>    1..7 int sizes.</para>
+		/// <para>    sizes which are all greater than 0.</para>
+		/// <para>    The sum of all the sizes + startAtIndex must be less than or equal to UniqueMidiDurationDefs.Count.</para>
+		/// <para>An Exception is thrown if any of these conditions is not met.</para>
+		/// <para>If the partitions list contains only one value, this function returns silently without doing anything.</para>
+		/// </param>
+		/// <param name="contourNumber">A value greater than or equal to 1, and less than or equal to 12. An exception is thrown if this is not the case.</param>
+		/// <param name="axisNumber">A value greater than or equal to 1, and less than or equal to 12 An exception is thrown if this is not the case.</param>
+		public void Permute(int startAtIndex, List<int> partitionSizes, int axisNumber, int contourNumber)
+		{
+			CheckSetContourArgs(startAtIndex, partitionSizes, axisNumber, contourNumber);
+
+			List<List<IUniqueDef>> partitions = GetPartitions(startAtIndex, partitionSizes);
+
+			// Remove any partitions (from the partitions list) that contain only a single LocalMidiRestDef
+			// Store them (the rests), with their original partition indices, in the returned list of KeyValuePairs.
+			List<KeyValuePair<int, List<IUniqueDef>>> restPartitions = GetRestPartitions(partitions);
+
+			if(partitions.Count > 1)
+			{
+				// All the partitions now contain at least one LocalMidiChordDef
+				// Sort into ascending order (part 2 of the above comment)
+				partitions = SortPartitions(partitions);
+				// re-order the partitions (part 3 of the above comment)
+				partitions = DoContouring(partitions, axisNumber, contourNumber);
+			}
+
+			RestoreRestPartitions(partitions, restPartitions);
+
+			List<IUniqueDef> sortedLmdds = ConvertPartitionsToFlatLmdds(startAtIndex, partitions);
+
+			for(int i = 0; i < sortedLmdds.Count; ++i)
+			{
+				_uniqueDefs[startAtIndex + i] = sortedLmdds[i];
+			}
+		}
+
+		private List<IUniqueDef> ConvertPartitionsToFlatLmdds(int startAtIndex, List<List<IUniqueDef>> partitions)
+		{
+			List<IUniqueDef> newLmdds = new List<IUniqueDef>();
+			int msPosition = _uniqueDefs[startAtIndex].MsPosition;
+			foreach(List<IUniqueDef> partition in partitions)
+			{
+				foreach(IUniqueDef pLmdd in partition)
+				{
+					pLmdd.MsPosition = msPosition;
+					msPosition += pLmdd.MsDuration;
+					newLmdds.Add(pLmdd);
+				}
+			}
+			return newLmdds;
+		}
+
+		/// <summary>
+		/// Re-insert the restPartitions at their original positions
+		/// </summary>
+		private void RestoreRestPartitions(List<List<IUniqueDef>> partitions, List<KeyValuePair<int, List<IUniqueDef>>> restPartitions)
+		{
+			for(int i = restPartitions.Count - 1; i >= 0; --i)
+			{
+				KeyValuePair<int, List<IUniqueDef>> kvp = restPartitions[i];
+				partitions.Insert(kvp.Key, kvp.Value);
+			}
+		}
+
+		private List<List<IUniqueDef>> GetPartitions(int startAtIndex, List<int> partitionSizes)
+		{
+			List<List<IUniqueDef>> partitions = new List<List<IUniqueDef>>();
+			int lmddIndex = startAtIndex;
+			foreach(int size in partitionSizes)
+			{
+				List<IUniqueDef> partition = new List<IUniqueDef>();
+				for(int i = 0; i < size; ++i)
+				{
+					partition.Add(_uniqueDefs[lmddIndex++]);
+				}
+				partitions.Add(partition);
+			}
+			return partitions;
+		}
+
+		/// <summary>
+		/// Remove any partitions (from partitions) that contain only a single LocalMidiRestDef.
+		/// Store them, with their original partition indices, in the returned list of KeyValuePairs.
+		/// </summary>
+		private List<KeyValuePair<int, List<IUniqueDef>>> GetRestPartitions(List<List<IUniqueDef>> partitions)
+		{
+			List<List<IUniqueDef>> newPartitions = new List<List<IUniqueDef>>();
+			List<KeyValuePair<int, List<IUniqueDef>>> restPartitions = new List<KeyValuePair<int, List<IUniqueDef>>>();
+			for(int i = 0; i < partitions.Count; ++i)
+			{
+				List<IUniqueDef> partition = partitions[i];
+				if(partition.Count == 1 && partition[0] is RestDef)
+				{
+					restPartitions.Add(new KeyValuePair<int, List<IUniqueDef>>(i, partition));
+				}
+				else
+				{
+					newPartitions.Add(partition);
+				}
+			}
+
+			partitions = newPartitions;
+			return restPartitions;
+		}
+
+		/// <summary>
+		/// Returns the result of sorting the partitions into ascending order of their lowest pitches.
+		/// <para>All the partitions contain at least one MidiChordDef</para>
+		/// <para>If two partitions have the same lowest pitch, they stay in the same order as they were</para>
+		/// <para>(not necessarily together, of course.)</para>    
+		/// </summary>
+		private List<List<IUniqueDef>> SortPartitions(List<List<IUniqueDef>> partitions)
+		{
+			List<byte> lowestPitches = GetLowestPitches(partitions);
+			List<byte> sortedLowestPitches = new List<byte>(lowestPitches);
+			sortedLowestPitches.Sort();
+
+			List<List<IUniqueDef>> sortedPartitions = new List<List<IUniqueDef>>();
+			foreach(byte lowestPitch in sortedLowestPitches)
+			{
+				int pitchIndex = lowestPitches.FindIndex(item => item == lowestPitch);
+				sortedPartitions.Add(partitions[pitchIndex]);
+				lowestPitches[pitchIndex] = byte.MaxValue;
+			}
+
+			return sortedPartitions;
+		}
+
+		/// <summary>
+		/// Returns a list containing the lowest pitch in each partition
+		/// </summary>
+		private List<byte> GetLowestPitches(List<List<IUniqueDef>> partitions)
+		{
+			List<byte> lowestPitches = new List<byte>();
+			foreach(List<IUniqueDef> partition in partitions)
+			{
+				byte lowestPitch = byte.MaxValue;
+				foreach(MidiChordDef iumdd in partition)
+				{
+					foreach(BasicMidiChordDef bmcd in iumdd.BasicMidiChordDefs)
+					{
+						foreach(byte note in bmcd.Pitches)
+						{
+							lowestPitch = (lowestPitch < note) ? lowestPitch : note;
+						}
+					}
+				}
+				Debug.Assert(lowestPitch != byte.MaxValue, "There must be at least one MidiChordDef in the partition.");
+				lowestPitches.Add(lowestPitch);
+			}
+			return lowestPitches;
+		}
+
+		/// <summary>
+		/// Re-orders the partitions according to the contour retrieved (from the static K.Contour[] array)
+		/// <para>using partitions.Count and the contourNumber and axisNumber arguments.</para>
+		/// <para>Does not change the inner contents of the partitions themselves.</para>
+		/// </summary>
+		/// <returns>A re-ordered list of partitions</returns>
+		private List<List<IUniqueDef>> DoContouring(List<List<IUniqueDef>> partitions, int axisNumber, int contourNumber)
+		{
+			List<List<IUniqueDef>> contouredPartitions = new List<List<IUniqueDef>>();
+			int[] contour = K.Contour(partitions.Count, contourNumber, axisNumber);
+			foreach(int number in contour)
+			{
+				// K.Contour() always returns an array containing 7 values.
+				// For densities less than 7, the final values are 0.
+				if(number == 0)
+					break;
+				contouredPartitions.Add(partitions[number - 1]);
+			}
+
+			return contouredPartitions;
+		}
+
+		/// <summary>
+		/// Throws an exception if one of the following conditions is not met.
+		/// <para>startAtIndex is a valid index in the UniqueMidiDurationDefs list</para>
+		/// <para>partitionSizes.Count is greater than 0, and less than 8.</para>
+		/// <para>all sizes in partitionSizes are greater then 0.</para>
+		/// <para>the sum of startAtIndex plus all the partition sizes is not greater than UniqueMidiDurationDefs.Count</para>
+		/// <para>contourNumber is in the range 1..12</para>
+		/// <para>axisNumber is in the range 1..12</para>
+		/// </summary>
+		private void CheckSetContourArgs(int startAtIndex, List<int> partitionSizes, int axisNumber, int contourNumber)
+		{
+			List<IUniqueDef> lmdds = _uniqueDefs;
+			if(startAtIndex < 0 || startAtIndex > lmdds.Count - 1)
+			{
+				throw new ArgumentException("startAtIndex is out of range.");
+			}
+			if(partitionSizes.Count < 1 || partitionSizes.Count > 7)
+			{
+				throw new ArgumentException("partitionSizes.Count must be in range 1..7");
+			}
+
+			int totalNumberOfLmdds = startAtIndex;
+			foreach(int size in partitionSizes)
+			{
+				if(size < 1)
+				{
+					throw new ArgumentException("partitions must contain at least one IUniqueMidiDurationDef");
+				}
+				totalNumberOfLmdds += size;
+				if(totalNumberOfLmdds > lmdds.Count)
+				{
+					throw new ArgumentException("partitions are too big or start too late");
+				}
+			}
+
+			if(contourNumber < 1 || contourNumber > 12)
+			{
+				throw new ArgumentException("contourNumber out of range 1..12");
+			}
+			if(axisNumber < 1 || axisNumber > 12)
+			{
+				throw new ArgumentException("axisNumber out of range 1..12");
+			}
+		}
+		#endregion public Permute
 
         /// <summary>
         /// The composition algorithm must set the MasterVolume (to a value != null)
