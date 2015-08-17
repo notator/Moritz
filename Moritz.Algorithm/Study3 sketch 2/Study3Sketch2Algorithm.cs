@@ -32,20 +32,20 @@ namespace Moritz.Algorithm.Study3Sketch2
         /// <summary>
         /// See CompositionAlgorithm.DoAlgorithm()
         /// </summary>
-        public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+        public override List<List<TrkDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
         {
             _krystals = krystals;
             _palettes = palettes;
 
-            List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
-            List<VoiceDef> bar1 = CreateBar1();
+            List<List<TrkDef>> bars = new List<List<TrkDef>>();
+            List<TrkDef> bar1 = CreateBar1();
             bars.Add(bar1);
             int bar2StartMsPos = GetEndMsPosition(bar1);
-            List<VoiceDef> bar2 = CreateBar2(bar2StartMsPos);
+            List<TrkDef> bar2 = CreateBar2(bar2StartMsPos);
             bars.Add(bar2);
             int bar3StartMsPos = GetEndMsPosition(bar2);
-            List<List<VoiceDef>> bars3to5 = CreateBars3to5(bar3StartMsPos);
-            foreach(List<VoiceDef> bar in bars3to5)
+            List<List<TrkDef>> bars3to5 = CreateBars3to5(bar3StartMsPos);
+            foreach(List<TrkDef> bar in bars3to5)
             {
                 bars.Add(bar);
             }
@@ -66,11 +66,11 @@ namespace Moritz.Algorithm.Study3Sketch2
         /// <summary>
         /// Returns all the InputChordDefs in the bar.
         /// </summary>
-        private List<InputChordDef> GetInputChordDefsInBar(List<VoiceDef> bar)
+        private List<InputChordDef> GetInputChordDefsInBar(List<TrkDef> bar)
         {
             List<InputChordDef> inputChordDefs = new List<InputChordDef>();
 
-            foreach(VoiceDef voiceDef in bar)
+            foreach(TrkDef voiceDef in bar)
             {
                 InputVoiceDef inputVoiceDef = voiceDef as InputVoiceDef;
                 if(inputVoiceDef != null)
@@ -136,9 +136,9 @@ namespace Moritz.Algorithm.Study3Sketch2
             }
         }
         #region CreateBar1()
-        List<VoiceDef> CreateBar1()
+        List<TrkDef> CreateBar1()
         {
-            List<VoiceDef> bar = new List<VoiceDef>();
+            List<TrkDef> bar = new List<TrkDef>();
 
             byte channel = 0;
             foreach(Palette palette in _palettes)
@@ -150,7 +150,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             }
 
             InputVoiceDef inputVoiceDef = new InputVoiceDef();
-            VoiceDef topVoice = bar[0];
+            TrkDef topVoice = bar[0];
             foreach(IUniqueDef iud in topVoice.UniqueDefs)
             {
                 MidiChordDef mcd = iud as MidiChordDef;
@@ -214,9 +214,9 @@ namespace Moritz.Algorithm.Study3Sketch2
         /// <summary>
         /// This function creates only one bar, but with VoiceDef objects. 
         /// </summary>
-        List<VoiceDef> CreateBar2(int bar2StartMsPos)
+        List<TrkDef> CreateBar2(int bar2StartMsPos)
         {
-            List<VoiceDef> bar = new List<VoiceDef>();
+            List<TrkDef> bar = new List<TrkDef>();
 
             byte channel = 0;
             List<OutputVoiceDef> voiceDefs = new List<OutputVoiceDef>();
@@ -268,7 +268,7 @@ namespace Moritz.Algorithm.Study3Sketch2
         /// Writes the first rest (if any) and the VoiceDef to the voice.
         /// Returns the endMsPos of the VoiceDef. 
         /// </summary>
-        private int WriteVoiceMidiDurationDefsInBar2(VoiceDef voice, OutputVoiceDef voiceDef, int msPosition, int bar2StartMsPos)
+        private int WriteVoiceMidiDurationDefsInBar2(TrkDef voice, OutputVoiceDef voiceDef, int msPosition, int bar2StartMsPos)
         {
             if(msPosition > bar2StartMsPos)
             {
@@ -291,16 +291,16 @@ namespace Moritz.Algorithm.Study3Sketch2
         /// This function creates three bars, identical to bar2 with two internal barlines.
         /// The VoiceDef objects cross barlines. 
         /// </summary>
-        List<List<VoiceDef>> CreateBars3to5(int bar3StartMsPos)
+        List<List<TrkDef>> CreateBars3to5(int bar3StartMsPos)
         {
-            List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
-            List<VoiceDef> threeBars = CreateBar2(bar3StartMsPos);
+            List<List<TrkDef>> bars = new List<List<TrkDef>>();
+            List<TrkDef> threeBars = CreateBar2(bar3StartMsPos);
 
             //int bar4StartPos = bar3StartMsPos + 6000;
             int bar4StartPos = bar3StartMsPos + 5950;
-            List<List<VoiceDef>> bars3And4Plus5 = SplitBar(threeBars, bar4StartPos);
+            List<List<TrkDef>> bars3And4Plus5 = SplitBar(threeBars, bar4StartPos);
             int bar5StartPos = bar3StartMsPos + 10500;
-            List<List<VoiceDef>> bars4and5 = SplitBar(bars3And4Plus5[1], bar5StartPos);
+            List<List<TrkDef>> bars4and5 = SplitBar(bars3And4Plus5[1], bar5StartPos);
 
             bars.Add(bars3And4Plus5[0]); // bar 3
             //bars.Add(bars3And4Plus5[1]); // bars 4 and 5

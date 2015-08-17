@@ -138,13 +138,13 @@ namespace Moritz.Algorithm
         /// Algorithms simply set the InputVoice references to OutputVoices (voiceIDs) by using their index
         /// in the default bar layout being created.
         /// </summary>
-        public abstract List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes);
+        public abstract List<List<TrkDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes);
 
         /// <summary>
         /// Returns the position of the end of the last UniqueMidiDurationDef
         /// in the bar's first voice's UniqueMidiDurationDefs list.
         /// </summary>
-        protected int GetEndMsPosition(List<VoiceDef> bar)
+        protected int GetEndMsPosition(List<TrkDef> bar)
         {
             Debug.Assert(bar != null && bar.Count > 0 && bar[0].UniqueDefs.Count > 0);
             List<IUniqueDef> lmdd = bar[0].UniqueDefs;
@@ -164,11 +164,11 @@ namespace Moritz.Algorithm
         /// does not affect performance.
         /// ClefChangeDefs are placed at the end of the first bar, not at the start of the second bar.
         /// </summary>
-        protected List<List<VoiceDef>> SplitBar(List<VoiceDef> originalBar, int absoluteSplitPos)
+        protected List<List<TrkDef>> SplitBar(List<TrkDef> originalBar, int absoluteSplitPos)
         {
-            List<List<VoiceDef>> twoBars = new List<List<VoiceDef>>();
-            List<VoiceDef> firstBar = new List<VoiceDef>();
-            List<VoiceDef> secondBar = new List<VoiceDef>();
+            List<List<TrkDef>> twoBars = new List<List<TrkDef>>();
+            List<TrkDef> firstBar = new List<TrkDef>();
+            List<TrkDef> secondBar = new List<TrkDef>();
             twoBars.Add(firstBar);
             twoBars.Add(secondBar);
             int originalBarStartPos = originalBar[0].UniqueDefs[0].MsPosition;
@@ -176,9 +176,9 @@ namespace Moritz.Algorithm
                 originalBar[0].UniqueDefs[originalBar[0].UniqueDefs.Count - 1].MsPosition +
                 originalBar[0].UniqueDefs[originalBar[0].UniqueDefs.Count - 1].MsDuration;
 
-            VoiceDef firstBarVoice;
-            VoiceDef secondBarVoice;
-            foreach(VoiceDef voice in originalBar)
+            TrkDef firstBarVoice;
+            TrkDef secondBarVoice;
+            foreach(TrkDef voice in originalBar)
             {
                 OutputVoiceDef outputVoice = voice as OutputVoiceDef;
                 if(outputVoice != null)
@@ -270,11 +270,11 @@ namespace Moritz.Algorithm
         /// <summary>
         /// There is currently still one bar per system.
         /// </summary>
-        protected void ReplaceConsecutiveRestsInBars(List<List<VoiceDef>> voicesPerStaffPerSystem)
+        protected void ReplaceConsecutiveRestsInBars(List<List<TrkDef>> voicesPerStaffPerSystem)
         {
-            foreach(List<VoiceDef> voicesPerStaff in voicesPerStaffPerSystem)
+            foreach(List<TrkDef> voicesPerStaff in voicesPerStaffPerSystem)
             {
-                foreach(VoiceDef voice in voicesPerStaff)
+                foreach(TrkDef voice in voicesPerStaff)
                 {
                     // contains lists of consecutive rest indices
                     List<List<int>> restsToReplace = new List<List<int>>();
@@ -336,7 +336,7 @@ namespace Moritz.Algorithm
         /// </summary>
         /// <param name="firstBar"></param>
         /// <param name="masterVolumes">A list with one value per OutputVoiceDef</param>
-        protected void SetOutputVoiceChannelsAndMasterVolumes(List<VoiceDef> firstBar)
+        protected void SetOutputVoiceChannelsAndMasterVolumes(List<TrkDef> firstBar)
         {
             Debug.Assert(MasterVolumePerOutputVoice.Count == MidiChannelIndexPerOutputVoice.Count);
             for(int i = 0; i < MasterVolumePerOutputVoice.Count; ++i)

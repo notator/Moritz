@@ -20,7 +20,7 @@ namespace Moritz.Composer
             _algorithm = algorithm;
         }
 
-        private void CheckBars(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
+        private void CheckBars(List<List<TrkDef>> voiceDefsPerSystemPerBar)
         {
             string errorString = null;
             if(voiceDefsPerSystemPerBar.Count == 0)
@@ -39,10 +39,10 @@ namespace Moritz.Composer
             }
         }
         #region private to CheckBars(...)
-        private string BasicChecks(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
+        private string BasicChecks(List<List<TrkDef>> voiceDefsPerSystemPerBar)
         {
             string errorString = null;
-            List<VoiceDef> bar1 = voiceDefsPerSystemPerBar[0];
+            List<TrkDef> bar1 = voiceDefsPerSystemPerBar[0];
             if(NOutputVoices(bar1) != _algorithm.MidiChannelIndexPerOutputVoice.Count)
             {
                 return "The algorithm does not declare the correct number of output voices.";
@@ -51,7 +51,7 @@ namespace Moritz.Composer
             {
                 return "The algorithm does not declare the correct number of input voices.";
             }
-            foreach(List<VoiceDef> bar in voiceDefsPerSystemPerBar)
+            foreach(List<TrkDef> bar in voiceDefsPerSystemPerBar)
             {
                 if(bar.Count == 0)
                 {
@@ -65,7 +65,7 @@ namespace Moritz.Composer
                 }
                 for(int voiceIndex = 0; voiceIndex < bar.Count; ++voiceIndex)
                 {
-                    VoiceDef voiceDef = bar[voiceIndex];
+                    TrkDef voiceDef = bar[voiceIndex];
                     if(voiceDef.UniqueDefs.Count == 0)
                     {
                         errorString = "A voiceDef (voiceIndex=" + voiceIndex.ToString() + ") has an empty UniqueDefs list.";
@@ -78,10 +78,10 @@ namespace Moritz.Composer
             return errorString;
         }
 
-        private int NOutputVoices(List<VoiceDef> bar1)
+        private int NOutputVoices(List<TrkDef> bar1)
         {
             int nOutputVoices = 0;
-            foreach(VoiceDef voiceDef in bar1)
+            foreach(TrkDef voiceDef in bar1)
             {
                 if(voiceDef is OutputVoiceDef)
                 {
@@ -91,10 +91,10 @@ namespace Moritz.Composer
             return nOutputVoices;
         }
 
-        private int NInputVoices(List<VoiceDef> bar1)
+        private int NInputVoices(List<TrkDef> bar1)
         {
             int nInputVoices = 0;
-            foreach(VoiceDef voiceDef in bar1)
+            foreach(TrkDef voiceDef in bar1)
             {
                 if(voiceDef is InputVoiceDef)
                 {
@@ -104,11 +104,11 @@ namespace Moritz.Composer
             return nInputVoices;
         }
 
-        private string CheckInputControlsDef(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
+        private string CheckInputControlsDef(List<List<TrkDef>> voiceDefsPerSystemPerBar)
         {
             string errorString = null;
             List<OutputVoiceDef> oVoices = new List<OutputVoiceDef>();
-            foreach(VoiceDef voice in voiceDefsPerSystemPerBar[0])
+            foreach(TrkDef voice in voiceDefsPerSystemPerBar[0])
             {
                 OutputVoiceDef ov = voice as OutputVoiceDef;
                 if(ov != null)
@@ -125,7 +125,7 @@ namespace Moritz.Composer
             {
                 for(int bar = 1; bar < voiceDefsPerSystemPerBar.Count; ++bar)
                 {
-                    foreach(VoiceDef voice in voiceDefsPerSystemPerBar[bar])
+                    foreach(TrkDef voice in voiceDefsPerSystemPerBar[bar])
                     {
                         OutputVoiceDef ov = voice as OutputVoiceDef;
                         if(ov != null)
@@ -149,7 +149,7 @@ namespace Moritz.Composer
         protected bool CreateScore(List<Krystal> krystals, List<Palette> palettes)
         {
             bool success = true;
-            List<List<VoiceDef>> barDefsInOneSystem = _algorithm.DoAlgorithm(krystals, palettes);
+            List<List<TrkDef>> barDefsInOneSystem = _algorithm.DoAlgorithm(krystals, palettes);
             CheckBars(barDefsInOneSystem);
             CreateEmptySystems(barDefsInOneSystem, _pageFormat.VisibleInputVoiceIndicesPerStaff.Count); // one system per bar
             if(_pageFormat.ChordSymbolType != "none") // set by AudioButtonsControl
@@ -181,9 +181,9 @@ namespace Moritz.Composer
         /// The InputVoices are arranged according to _pageFormat.InputVoiceIndicesPerStaff.
         /// OutputVoices are given a midi channel allocated from top to bottom in the printed score.
         /// </summary>
-        public void CreateEmptySystems(List<List<VoiceDef>> barDefsInOneSystem, int numberOfVisibleInputStaves)
+        public void CreateEmptySystems(List<List<TrkDef>> barDefsInOneSystem, int numberOfVisibleInputStaves)
         {
-            foreach(List<VoiceDef> barVoiceDefs in barDefsInOneSystem)
+            foreach(List<TrkDef> barVoiceDefs in barDefsInOneSystem)
             {
                 SvgSystem system = new SvgSystem(this);
                 this.Systems.Add(system);
@@ -193,7 +193,7 @@ namespace Moritz.Composer
             CreateEmptyInputStaves(barDefsInOneSystem);
         }
 
-        private void CreateEmptyOutputStaves(List<List<VoiceDef>> barDefsInOneSystem, int numberOfVisibleInputStaves)
+        private void CreateEmptyOutputStaves(List<List<TrkDef>> barDefsInOneSystem, int numberOfVisibleInputStaves)
         {
             int nVisibleOutputStaves = _pageFormat.VisibleOutputVoiceIndicesPerStaff.Count;
             List<byte> invisibleOutputVoiceIndices = new List<byte>();
@@ -203,7 +203,7 @@ namespace Moritz.Composer
             for(int i = 0; i < Systems.Count; i++)
             {
                 SvgSystem system = Systems[i];
-                List<VoiceDef> barDef = barDefsInOneSystem[i];
+                List<TrkDef> barDef = barDefsInOneSystem[i];
 
                 #region create invisible staves
                 if(invisibleOutputVoiceIndices.Count > 0)
@@ -240,7 +240,7 @@ namespace Moritz.Composer
             }
         }
 
-        private List<byte> InvisibleOutputVoiceIndices(List<List<byte>> visibleOutputVoiceIndicesPerStaff, List<VoiceDef> voiceDefs)
+        private List<byte> InvisibleOutputVoiceIndices(List<List<byte>> visibleOutputVoiceIndicesPerStaff, List<TrkDef> voiceDefs)
         {
             List<byte> visibleOutputVoiceIndices = new List<byte>();
             foreach(List<byte> voiceIndices in visibleOutputVoiceIndicesPerStaff)
@@ -262,7 +262,7 @@ namespace Moritz.Composer
             return invisibleOutputVoiceIndices;
         }
 
-        private void CreateEmptyInputStaves(List<List<VoiceDef>> barDefsInOneSystem)
+        private void CreateEmptyInputStaves(List<List<TrkDef>> barDefsInOneSystem)
         {
             int nPrintedOutputStaves = _pageFormat.VisibleOutputVoiceIndicesPerStaff.Count;
             int nPrintedInputStaves = _pageFormat.VisibleInputVoiceIndicesPerStaff.Count;
@@ -271,7 +271,7 @@ namespace Moritz.Composer
             for(int i = 0; i < Systems.Count; i++)
             {
                 SvgSystem system = Systems[i];
-                List<VoiceDef> barDef = barDefsInOneSystem[i];
+                List<TrkDef> barDef = barDefsInOneSystem[i];
 
                 for(int staffIndex = 0; staffIndex < nPrintedInputStaves; staffIndex++)
                 {

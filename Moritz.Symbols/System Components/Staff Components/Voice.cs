@@ -402,7 +402,7 @@ namespace Moritz.Symbols
         public byte MidiChannel { get { return _midiChannel; } }
         protected byte _midiChannel;
 
-        public VoiceDef VoiceDef = null;
+        public TrkDef VoiceDef = null;
 
         private DurationSymbol _firstDurationSymbol;
     }

@@ -22,10 +22,10 @@ namespace Moritz.Spec
     /// <para>This class is also indexable, as in:</para>
     /// <para>IUniqueDef iu = this[index];</para>
     /// </summary>
-    public abstract class VoiceDef : IEnumerable
+    public abstract class TrkDef : IEnumerable
     {
         #region constructors
-        public VoiceDef()
+        public TrkDef()
         {
         }
 
@@ -33,7 +33,7 @@ namespace Moritz.Spec
         /// A VoiceDef beginning at MsPosition = 0, and containing a single UniqueMidiRestDef having msDuration
         /// </summary>
         /// <param name="msDuration"></param>
-        public VoiceDef(int msDuration)
+        public TrkDef(int msDuration)
         {
             RestDef lmRestDef = new RestDef(0, msDuration);
             _uniqueDefs.Add(lmRestDef);
@@ -43,7 +43,7 @@ namespace Moritz.Spec
         /// <para>If the argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
         /// <para>The new VoiceDef's _uniqueDefs list is simply set to the argument (which is not cloned).</para>
         /// </summary>
-        public VoiceDef(List<IUniqueDef> iuds)
+        public TrkDef(List<IUniqueDef> iuds)
         {
             Debug.Assert(iuds != null);
             if(iuds.Count > 0)
@@ -145,7 +145,7 @@ namespace Moritz.Spec
             iUniqueDef.MsPosition = lastLmdd.MsPosition + lastLmdd.MsDuration;
             _uniqueDefs.Add(iUniqueDef);
         }
-        protected void _AddRange(VoiceDef voiceDef)
+        protected void _AddRange(TrkDef voiceDef)
         {
             _uniqueDefs.AddRange(voiceDef.UniqueDefs);
             SetMsPositions();
@@ -156,12 +156,12 @@ namespace Moritz.Spec
             _uniqueDefs.Insert(index, iUniqueDef);
             SetMsPositions();
         }
-        protected void _InsertRange(int index, VoiceDef voiceDef)
+        protected void _InsertRange(int index, TrkDef voiceDef)
         {
             _uniqueDefs.InsertRange(index, voiceDef.UniqueDefs);
             SetMsPositions();
         }
-        protected void _InsertInRest(VoiceDef iVoiceDef)
+        protected void _InsertInRest(TrkDef iVoiceDef)
         {
             int iLmddsStartMsPos = iVoiceDef[0].MsPosition;
             int iLmddsEndMsPos = iVoiceDef[iVoiceDef.Count - 1].MsPosition + iVoiceDef[iVoiceDef.Count - 1].MsDuration;
@@ -215,7 +215,7 @@ namespace Moritz.Spec
             return index;
         }
 
-        private void InsertVoiceDefInRest(int restIndex, VoiceDef iVoiceDef)
+        private void InsertVoiceDefInRest(int restIndex, TrkDef iVoiceDef)
         {
             List<IUniqueDef> lmdds = _uniqueDefs;
             IUniqueDef rest = lmdds[restIndex];
@@ -232,7 +232,7 @@ namespace Moritz.Spec
         /// Returns a list having the position and duration of the originalRest.
         /// The iLmdds have been put in(side) the original rest, either at the beginning, middle, or end. 
         /// </summary>
-        private List<IUniqueDef> GetReplacementList(IUniqueDef originalRest, VoiceDef iVoiceDef)
+        private List<IUniqueDef> GetReplacementList(IUniqueDef originalRest, TrkDef iVoiceDef)
         {
             Debug.Assert(originalRest is RestDef);
             Debug.Assert(iVoiceDef[0] is MidiChordDef || iVoiceDef[0] is InputChordDef);

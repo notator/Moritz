@@ -28,9 +28,9 @@ namespace Moritz.Algorithm.PaletteDemo
         /// <summary>
         /// See CompositionAlgorithm.DoAlgorithm()
         /// </summary>
-        public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+        public override List<List<TrkDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
         {
-            VoiceDef voice = new OutputVoiceDef();
+            TrkDef voice = new OutputVoiceDef();
             int msPosition = 0;
             for(int i = 0; i < palettes[0].Count; ++i)
             {
@@ -39,8 +39,8 @@ namespace Moritz.Algorithm.PaletteDemo
                 msPosition += iumdd.MsDuration;
                 voice.UniqueDefs.Add(iumdd);
             }
-            List<List<VoiceDef>> voicesPerSystem = new List<List<VoiceDef>>();
-            List<VoiceDef> systemVoices = new List<VoiceDef>();
+            List<List<TrkDef>> voicesPerSystem = new List<List<TrkDef>>();
+            List<TrkDef> systemVoices = new List<TrkDef>();
             systemVoices.Add(voice);
             voicesPerSystem.Add(systemVoices);
             SetOutputVoiceChannelsAndMasterVolumes(voicesPerSystem[0]);
