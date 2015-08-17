@@ -29,7 +29,7 @@ namespace Moritz.Algorithm.SongSix
         /// <summary>
         /// See CompositionAlgorithm.DoAlgorithm()
         /// </summary>
-        public override List<List<TrkDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+        public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
         {
             // Palette indices:
             // Winds use palette 0.
@@ -93,7 +93,7 @@ namespace Moritz.Algorithm.SongSix
             // fury1.SetContour(1, new List<int>(){2,2,2,2,2}, 1, 6);
             OutputVoiceDef control = GetControlVoiceDef(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
             // Add each voiceDef to voiceDefs here, in top to bottom (=channelIndex) order in the score.
-            List<TrkDef> voiceDefs = new List<TrkDef>() { furies1, furies2, furies3, furies4, control, clytemnestra, wind1, wind2, wind3 };
+            List<VoiceDef> voiceDefs = new List<VoiceDef>() { furies1, furies2, furies3, furies4, control, clytemnestra, wind1, wind2, wind3 };
             Debug.Assert(voiceDefs.Count == MidiChannelIndexPerOutputVoice.Count);
             //********************************************************
             //foreach(VoiceDef voiceDef in voiceDefs)
@@ -103,7 +103,7 @@ namespace Moritz.Algorithm.SongSix
             //********************************************************
             List<int> barlineMsPositions = GetBarlineMsPositions(control, furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
             InsertClefChanges(furies1, furies2, furies3, furies4);
-            List<List<TrkDef>> bars = GetBars(voiceDefs, barlineMsPositions);
+            List<List<VoiceDef>> bars = GetBars(voiceDefs, barlineMsPositions);
             base.SetOutputVoiceChannelsAndMasterVolumes(bars[0]);
             return bars;
         }
@@ -489,10 +489,10 @@ namespace Moritz.Algorithm.SongSix
             OutputVoiceDef controlVoiceDef = new OutputVoiceDef(controlLmdds);
             return controlVoiceDef;
         }
-        private List<List<TrkDef>> GetBars(List<TrkDef> voiceDefs, List<int> barlineMsPositions)
+        private List<List<VoiceDef>> GetBars(List<VoiceDef> voiceDefs, List<int> barlineMsPositions)
         {
             // barlineMsPositions contains both msPos=0 and the position of the final barline
-            List<List<TrkDef>> bars = new List<List<TrkDef>>();
+            List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
             bars = GetBarsFromBarlineMsPositions(voiceDefs, barlineMsPositions);
             Debug.Assert(bars.Count == NumberOfBars);
             return bars;
@@ -501,10 +501,10 @@ namespace Moritz.Algorithm.SongSix
         /// Splits the voices (currently in a single bar) into bars
         /// barlineMsPositions contains both msPosition 0, and the position of the final barline.
         /// </summary>
-        private List<List<TrkDef>> GetBarsFromBarlineMsPositions(List<TrkDef> voices, List<int> barLineMsPositions)
+        private List<List<VoiceDef>> GetBarsFromBarlineMsPositions(List<VoiceDef> voices, List<int> barLineMsPositions)
         {
-            List<List<TrkDef>> bars = new List<List<TrkDef>>();
-            List<List<TrkDef>> twoBars = null;
+            List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
+            List<List<VoiceDef>> twoBars = null;
             for(int i = barLineMsPositions.Count - 2; i >= 1; --i)
             {
                 twoBars = SplitBar(voices, barLineMsPositions[i]);

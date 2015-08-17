@@ -31,21 +31,21 @@ namespace Moritz.Algorithm.Study2c3_1
         /// <summary>
         /// See CompositionAlgorithm.DoAlgorithm()
         /// </summary>
-        public override List<List<TrkDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+        public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
         {
             _krystals = krystals;
             _palettes = palettes;
 
-            List<TrkDef> sequentialStaff1Bars = WriteTopStaff();
-            List<TrkDef> sequentialStaff2Bars = WriteLowerStaff(2, sequentialStaff1Bars);
-            List<TrkDef> sequentialStaff3Bars = WriteLowerStaff(3, sequentialStaff1Bars);
+            List<VoiceDef> sequentialStaff1Bars = WriteTopStaff();
+            List<VoiceDef> sequentialStaff2Bars = WriteLowerStaff(2, sequentialStaff1Bars);
+            List<VoiceDef> sequentialStaff3Bars = WriteLowerStaff(3, sequentialStaff1Bars);
             Debug.Assert((sequentialStaff1Bars.Count == sequentialStaff2Bars.Count) 
                       && (sequentialStaff1Bars.Count == sequentialStaff3Bars.Count));
 
-            List<List<TrkDef>> bars = new List<List<TrkDef>>();
+            List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
             for(int barIndex = 0; barIndex < sequentialStaff1Bars.Count; ++barIndex)
             {
-                List<TrkDef> bar = new List<TrkDef>();
+                List<VoiceDef> bar = new List<VoiceDef>();
                 bar.Add(sequentialStaff1Bars[barIndex]);
                 bar.Add(sequentialStaff2Bars[barIndex]);
                 bar.Add(sequentialStaff3Bars[barIndex]);
@@ -57,14 +57,14 @@ namespace Moritz.Algorithm.Study2c3_1
             return bars;
         }
 
-        private List<TrkDef> WriteTopStaff()
+        private List<VoiceDef> WriteTopStaff()
         {
-            List<TrkDef> consecutiveBars = new List<TrkDef>();
+            List<VoiceDef> consecutiveBars = new List<VoiceDef>();
             List<List<int>> dcValuesPerTopStaffBar = _krystals[0].GetValues(_krystals[0].Level);
             int msPosition = 0;
             for(int barIndex = 0; barIndex < dcValuesPerTopStaffBar.Count; barIndex++)
             {
-                TrkDef voice = new OutputVoiceDef();
+                VoiceDef voice = new OutputVoiceDef();
                 List<int> sequence = dcValuesPerTopStaffBar[barIndex];
                 WriteDurationSymbolsForStrandInTopStaff(voice, barIndex, sequence, ref msPosition);
                 consecutiveBars.Add(voice);
@@ -72,7 +72,7 @@ namespace Moritz.Algorithm.Study2c3_1
             return consecutiveBars;
         }
 
-        private void WriteDurationSymbolsForStrandInTopStaff(TrkDef voice, int barIndex, List<int> originalStrandValues, ref int msPosition)
+        private void WriteDurationSymbolsForStrandInTopStaff(VoiceDef voice, int barIndex, List<int> originalStrandValues, ref int msPosition)
         {
             Palette palette = _palettes[0]; // top templateDefs
             for(int valueIndex = 0; valueIndex < originalStrandValues.Count; valueIndex++)
@@ -85,9 +85,9 @@ namespace Moritz.Algorithm.Study2c3_1
             }
         }
 
-        private List<TrkDef> WriteLowerStaff(int staffNumber, List<TrkDef> topStaffBars)
+        private List<VoiceDef> WriteLowerStaff(int staffNumber, List<VoiceDef> topStaffBars)
         {
-            List<TrkDef> consecutiveBars = new List<TrkDef>();
+            List<VoiceDef> consecutiveBars = new List<VoiceDef>();
             Krystal krystal = _krystals[staffNumber - 1];
             Palette palette = _palettes[staffNumber - 1];
             List<List<int>> strandValuesList = krystal.GetValues(krystal.Level);
@@ -95,8 +95,8 @@ namespace Moritz.Algorithm.Study2c3_1
 
             for(int barIndex = 0; barIndex < strandValuesList.Count; barIndex++)
             {
-                TrkDef topStaffVoice =  topStaffBars[barIndex];
-                TrkDef newVoice = new OutputVoiceDef();
+                VoiceDef topStaffVoice =  topStaffBars[barIndex];
+                VoiceDef newVoice = new OutputVoiceDef();
                 int currentMsPosition = topStaffVoice.UniqueDefs[0].MsPosition;
 
                 List<int> lowerStaffValueSequence = strandValuesList[barIndex];
@@ -116,7 +116,7 @@ namespace Moritz.Algorithm.Study2c3_1
             return consecutiveBars;
         }
 
-        private List<int> LowerStaffMsDurations(TrkDef topStaffVoice, int numberOfDurationSymbolsToConstruct)
+        private List<int> LowerStaffMsDurations(VoiceDef topStaffVoice, int numberOfDurationSymbolsToConstruct)
         {
             #region get topStaffVoice durations and positions
             int voiceMsDuration = 0;

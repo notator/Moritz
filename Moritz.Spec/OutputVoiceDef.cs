@@ -22,7 +22,7 @@ namespace Moritz.Spec
     /// <para>This class is also indexable, as in:</para>
     /// <para>IUniqueDef iu = outputVoiceDef[index];</para>
     /// </summary>
-    public class OutputVoiceDef : TrkDef
+    public class OutputVoiceDef : VoiceDef
     {
         #region constructors
         /// <summary>
@@ -97,7 +97,7 @@ namespace Moritz.Spec
         /// </summary>
         public void AddRange(OutputVoiceDef voiceDef)
         {
-            _AddRange((TrkDef)voiceDef);
+            _AddRange((VoiceDef)voiceDef);
         }
         /// <summary>
         /// Inserts the iUniqueDef in the list at the given index, and then
@@ -114,7 +114,7 @@ namespace Moritz.Spec
         /// </summary>
         public void InsertRange(int index, OutputVoiceDef voiceDef)
         {
-            _InsertRange(index, (TrkDef)voiceDef);
+            _InsertRange(index, (VoiceDef)voiceDef);
         }
         /// <summary>
         /// Creates a new OutputVoiceDef containing just the argument midiChordDef,
@@ -140,7 +140,7 @@ namespace Moritz.Spec
         public void InsertInRest(OutputVoiceDef outputVoiceDef)
         {
             Debug.Assert(outputVoiceDef[0] is MidiChordDef && outputVoiceDef[outputVoiceDef.Count - 1] is MidiChordDef);
-            _InsertInRest((TrkDef)outputVoiceDef);
+            _InsertInRest((VoiceDef)outputVoiceDef);
         }
         /// <summary>
         /// Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
