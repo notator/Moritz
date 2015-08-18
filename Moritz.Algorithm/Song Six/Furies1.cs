@@ -10,8 +10,8 @@ namespace Moritz.Algorithm.SongSix
 {
     internal class Furies1 : TrkDef
     {
-        internal Furies1(int msDuration)
-            : base(msDuration)
+        internal Furies1(byte midiChannel, int msDuration)
+			: base(midiChannel, msDuration)
         {
         }
 
@@ -95,7 +95,7 @@ namespace Moritz.Algorithm.SongSix
 
         private TrkDef GetF1FinalePart1(Palette palette, Krystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
         {
-            TrkDef f1FinalePart1 = palette.NewTrkDef(krystal);
+            TrkDef f1FinalePart1 = palette.NewTrkDef(0, krystal);
 
             List<int> f1eStrandDurations = GetStrandDurations(f1FinalePart1, strandIndices);
 
@@ -153,7 +153,7 @@ namespace Moritz.Algorithm.SongSix
 
         private TrkDef GetF1FinalePart2(Palette f1FinalePalette2, Krystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
         {
-            TrkDef f1FinalePart2 = f1FinalePalette2.NewTrkDef(krystal);
+			TrkDef f1FinalePart2 = f1FinalePalette2.NewTrkDef(this.MidiChannel, krystal);
 
             List<int> f1eStrandDurations = GetStrandDurations(f1FinalePart2, strandIndices);
 
@@ -182,7 +182,7 @@ namespace Moritz.Algorithm.SongSix
 
         private TrkDef GetF1Postlude(Palette f1PostludePalette, Krystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
         {
-            TrkDef f1p = f1PostludePalette.NewTrkDef(krystal);
+			TrkDef f1p = f1PostludePalette.NewTrkDef(this.MidiChannel, krystal);
 
             List<int> f1eStrandDurations = GetStrandDurations(f1p, strandIndices);
 

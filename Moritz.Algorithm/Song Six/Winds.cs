@@ -12,20 +12,20 @@ namespace Moritz.Algorithm.SongSix
     /// </summary>
     public partial class SongSixAlgorithm : CompositionAlgorithm
     {
-        private TrkDef GetWind3(Palette palette, Krystal krystal)
+        private TrkDef GetWind3(byte midiChannel, Palette palette, Krystal krystal)
         {
-            TrkDef wind3 = palette.NewTrkDef(krystal);
+            TrkDef wind3 = palette.NewTrkDef(midiChannel, krystal);
             wind3.Transpose(0, wind3.Count, -13);
             wind3.StepwiseGliss(74, wind3.Count, 19);
             return wind3;
         }
 
-        private TrkDef GetWind2(TrkDef wind3, Clytemnestra clytemnestra)
+		private TrkDef GetWind2(byte midiChannel, TrkDef wind3, Clytemnestra clytemnestra)
         {
             List<IUniqueDef> clytLmdds = clytemnestra.UniqueDefs;
             int rotationMsPosition = clytLmdds[59].MsPosition + 700;
 
-            TrkDef wind2 = GetRotatedWind(wind3, rotationMsPosition);
+            TrkDef wind2 = GetRotatedWind(midiChannel, wind3, rotationMsPosition);
             wind2.Transpose(0, wind2.Count, 12);
 
             wind2.StepwiseGliss(0, 15, 7);
@@ -40,12 +40,12 @@ namespace Moritz.Algorithm.SongSix
             return wind2;
         }
 
-        private TrkDef GetWind1(TrkDef wind3, TrkDef wind2, Clytemnestra clytemnestra)
+		private TrkDef GetWind1(byte midiChannel, TrkDef wind3, TrkDef wind2, Clytemnestra clytemnestra)
         {
             List<IUniqueDef> clytLmdds = clytemnestra.UniqueDefs;
             int rotationMsPosition = clytLmdds[116].MsPosition + 700;
 
-            TrkDef wind1 = GetRotatedWind(wind3, rotationMsPosition);
+			TrkDef wind1 = GetRotatedWind(midiChannel, wind3, rotationMsPosition);
             wind1.Transpose(0, wind1.Count, 19);
             wind1.StepwiseGliss(0, 25, 12);
             wind1.Transpose(25, wind1.Count, 12);
@@ -63,9 +63,11 @@ namespace Moritz.Algorithm.SongSix
         /// </summary>
         /// <param name="originalVoiceDef"></param>
         /// <returns></returns>
-        private TrkDef GetRotatedWind(TrkDef originalVoiceDef, int rotationMsPosition)
+        private TrkDef GetRotatedWind(byte midiChannel, TrkDef originalVoiceDef, int rotationMsPosition)
         {
             TrkDef tempWind = originalVoiceDef.DeepClone();
+			tempWind.MidiChannel = midiChannel;
+
             int finalBarlineMsPosition = originalVoiceDef.EndMsPosition;
             int msDurationAfterSynch = finalBarlineMsPosition - rotationMsPosition;
 
@@ -93,7 +95,7 @@ namespace Moritz.Algorithm.SongSix
                 iu.MsPosition = msPosition;
                 msPosition += iu.MsDuration;
             }
-            TrkDef newRotatedWind = new TrkDef(newWindLmdds);
+            TrkDef newRotatedWind = new TrkDef(midiChannel, newWindLmdds);
 
             return newRotatedWind;
         }

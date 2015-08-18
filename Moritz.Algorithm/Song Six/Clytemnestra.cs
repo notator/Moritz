@@ -12,8 +12,8 @@ namespace Moritz.Algorithm.SongSix
     /// </summary>
     internal class Clytemnestra : TrkDef
     {
-        internal Clytemnestra(TrkDef wind3) 
-            : base(new List<IUniqueDef>())
+        internal Clytemnestra(byte midiChannel, TrkDef wind3) 
+            : base(midiChannel, new List<IUniqueDef>())
         {
             SetMomentDefsListPerVerse();
             SetUniqueMidiDurationDefs(wind3);

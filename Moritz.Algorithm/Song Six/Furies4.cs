@@ -10,8 +10,8 @@ namespace Moritz.Algorithm.SongSix
 {
     internal class Furies4 : TrkDef
     {
-        internal Furies4(int msDuration)
-            : base(msDuration)
+        internal Furies4(byte midiChannel, int msDuration)
+            : base(midiChannel, msDuration)
         {
         }
 
@@ -176,11 +176,11 @@ namespace Moritz.Algorithm.SongSix
             Palette f4FinalePalette2 = palettes[13];
             Palette f4PostludePalette = palettes[17];
 
-            TrkDef interlude4Start = f4FinalePalette1.NewTrkDef(krystal);
+			TrkDef interlude4Start = f4FinalePalette1.NewTrkDef(this.MidiChannel, krystal);
             Transform(interlude4Start, msPositions);
-            TrkDef interlude4EndVerse5 = f4FinalePalette2.NewTrkDef(krystal);
+			TrkDef interlude4EndVerse5 = f4FinalePalette2.NewTrkDef(this.MidiChannel, krystal);
             Transform(interlude4EndVerse5, msPositions);
-            TrkDef postlude = f4PostludePalette.NewTrkDef(krystal);
+			TrkDef postlude = f4PostludePalette.NewTrkDef(this.MidiChannel, krystal);
             Transform(postlude, msPositions);
 
             TrkDef finale = GetFinaleSections(interlude4Start, interlude4EndVerse5, postlude, 7, 17);
@@ -211,7 +211,7 @@ namespace Moritz.Algorithm.SongSix
                 iumdds.Add(postlude[i]);
             }
 
-            return new TrkDef(iumdds);
+            return new TrkDef(this.MidiChannel, iumdds);
         }
 
         private void Transform(TrkDef section, Dictionary<string, int> msPositions)

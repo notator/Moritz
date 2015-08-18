@@ -10,8 +10,8 @@ namespace Moritz.Algorithm.SongSix
 {
     internal class Furies3 : TrkDef
     {
-        internal Furies3(int msDuration)
-            : base(msDuration)
+        internal Furies3(byte midiChannel, int msDuration)
+			: base(midiChannel, msDuration)
         {
         }
 
@@ -52,7 +52,7 @@ namespace Moritz.Algorithm.SongSix
             TrkDef furies3FlutterSequence11 = GetNextFlutterSequence(furies3FlutterSequence10, 0.89, 4);
             TrkDef furies3FlutterSequence12 = GetNextFlutterSequence(furies3FlutterSequence11, 0.89, 5);
 
-            Furies3 f3 = new Furies3(firstRestMsDuration);
+            Furies3 f3 = new Furies3(2, firstRestMsDuration);
 
             f3.AddRange(furies3FlutterSequence1);
             f3.AddRange(furies3FlutterSequence2);
@@ -101,7 +101,7 @@ namespace Moritz.Algorithm.SongSix
                 }
             }
 
-            TrkDef furies3FlutterSequence1 = new TrkDef(flutter1);
+            TrkDef furies3FlutterSequence1 = new TrkDef(this.MidiChannel, flutter1);
 
             return furies3FlutterSequence1;
         }
@@ -212,11 +212,11 @@ namespace Moritz.Algorithm.SongSix
 
             List<int> strandIndices = GetStrandIndices(krystal);
 
-            TrkDef finalePart1 = f3FinalePalette1.NewTrkDef(krystal);
+            TrkDef finalePart1 = f3FinalePalette1.NewTrkDef(2, krystal);
             Transform(finalePart1, msPositions, strandIndices);
-            TrkDef finalePart2 = f3FinalePalette2.NewTrkDef(krystal);
+            TrkDef finalePart2 = f3FinalePalette2.NewTrkDef(2, krystal);
             Transform(finalePart2, msPositions, strandIndices);
-            TrkDef postlude = f3PostludePalette.NewTrkDef(krystal);
+            TrkDef postlude = f3PostludePalette.NewTrkDef(2, krystal);
             Transform(postlude, msPositions, strandIndices);
 
             TrkDef finale = GetFinaleSections(finalePart1, finalePart2, postlude, 77, 206);
@@ -322,7 +322,7 @@ namespace Moritz.Algorithm.SongSix
                 iumdds.Add(postlude[i]);
             }
 
-            return new TrkDef(iumdds);
+            return new TrkDef(this.MidiChannel, iumdds);
         }
 
         /// <summary>

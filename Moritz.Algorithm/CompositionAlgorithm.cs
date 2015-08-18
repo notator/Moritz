@@ -183,9 +183,9 @@ namespace Moritz.Algorithm
                 TrkDef outputVoice = voice as TrkDef;
                 if(outputVoice != null)
                 {
-                    firstBarVoice = new TrkDef();
+					firstBarVoice = new TrkDef(outputVoice.MidiChannel,new List<IUniqueDef>());
                     firstBar.Add(firstBarVoice);
-                    secondBarVoice = new TrkDef();
+					secondBarVoice = new TrkDef(outputVoice.MidiChannel, new List<IUniqueDef>());
                     secondBar.Add(secondBarVoice);
                 }
                 else

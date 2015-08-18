@@ -21,8 +21,8 @@ namespace Moritz.Algorithm.SongSix
         {
         }
 
-        public override List<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8 }; } }
-        public override List<int> MasterVolumePerOutputVoice { get { return new List<int>() { 100, 100, 100, 100, 100, 100, 100, 100, 100 }; } }
+        public override List<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
+        public override List<int> MasterVolumePerOutputVoice { get { return new List<int>() { 100, 100, 100, 100, 100, 100, 100, 100 }; } }
         public override int NumberOfInputVoices { get { return 0; } }
         public override int NumberOfBars { get { return 106; } }
 
@@ -46,11 +46,11 @@ namespace Moritz.Algorithm.SongSix
 
             _krystals = krystals;
             _palettes = palettes;
-            TrkDef wind3 = GetWind3(_palettes[0], _krystals[8]);
-            Clytemnestra clytemnestra = new Clytemnestra(wind3);
+            TrkDef wind3 = GetWind3(7,_palettes[0], _krystals[8]);
+            Clytemnestra clytemnestra = new Clytemnestra(4, wind3);
             clytemnestra.AdjustVelocities(49, 59, 1.4);
-            TrkDef wind2 = GetWind2(wind3, clytemnestra);
-            TrkDef wind1 = GetWind1(wind3, wind2, clytemnestra);
+            TrkDef wind2 = GetWind2(6, wind3, clytemnestra);
+            TrkDef wind1 = GetWind1(5, wind3, wind2, clytemnestra);
             AdjustFinalWindChordPosition(wind1, wind2, wind3); // "fermata"
             // WindPitchWheelDeviations change approximately per section in Song Six
             AdjustWindPitchWheelDeviations(wind1);
@@ -79,21 +79,21 @@ namespace Moritz.Algorithm.SongSix
             // contouring test code
             //wind1.SetContour(2, new List<int>() { 1, 1, 1 }, 12, 1);
             // Construct the Furies up to Interlude3.
-            Furies4 furies4 = new Furies4(msPositions["endOfPiece"]);
+            Furies4 furies4 = new Furies4(3, msPositions["endOfPiece"]);
             furies4.GetBeforeInterlude3(wind3[0].MsDuration / 2, clytemnestra, wind1, _palettes);
-            Furies3 furies3 = new Furies3(msPositions["endOfPiece"]);
+            Furies3 furies3 = new Furies3(2, msPositions["endOfPiece"]);
             furies3.GetBeforeInterlude3(msPositions["interlude1"], clytemnestra, wind1, _palettes);
-            Furies2 furies2 = new Furies2(msPositions["endOfPiece"]);
+            Furies2 furies2 = new Furies2(1, msPositions["endOfPiece"]);
             furies2.GetBeforeInterlude3(clytemnestra, wind1, furies3, _palettes);
-            Furies1 furies1 = new Furies1(msPositions["endOfPiece"]);
+            Furies1 furies1 = new Furies1(0, msPositions["endOfPiece"]);
             furies1.GetBeforeInterlude3(clytemnestra, wind1, furies2, _palettes[8]);
             furies3.GetChirpsInInterlude2AndVerse3(furies1, furies2, clytemnestra, wind1, _palettes[6]);
             GetFuriesInterlude3ToEnd(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3, _palettes, msPositions);
             // contouring test code 
             // fury1.SetContour(1, new List<int>(){2,2,2,2,2}, 1, 6);
-            TrkDef control = GetControlVoiceDef(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
+
             // Add each voiceDef to voiceDefs here, in top to bottom (=channelIndex) order in the score.
-            List<VoiceDef> voiceDefs = new List<VoiceDef>() { furies1, furies2, furies3, furies4, control, clytemnestra, wind1, wind2, wind3 };
+            List<VoiceDef> voiceDefs = new List<VoiceDef>() { furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3 };
             Debug.Assert(voiceDefs.Count == MidiChannelIndexPerOutputVoice.Count);
             //********************************************************
             //foreach(VoiceDef voiceDef in voiceDefs)
@@ -101,7 +101,7 @@ namespace Moritz.Algorithm.SongSix
             //    voiceDef.SetLyricsToIndex();
             //}
             //********************************************************
-            List<int> barlineMsPositions = GetBarlineMsPositions(control, furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
+            List<int> barlineMsPositions = GetBarlineMsPositions(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
             InsertClefChanges(furies1, furies2, furies3, furies4);
             List<List<VoiceDef>> bars = GetBars(voiceDefs, barlineMsPositions);
             base.SetOutputVoiceChannelsAndMasterVolumes(bars[0]);
@@ -229,9 +229,8 @@ namespace Moritz.Algorithm.SongSix
         /// <summary>
         /// The returned barlineMsPositions contain both the position of bar 1 (0ms) and the position of the final barline.
         /// </summary>
-        private List<int> GetBarlineMsPositions(TrkDef control, TrkDef fury1, TrkDef fury2, TrkDef fury3, TrkDef fury4, Clytemnestra clytemnestra, TrkDef wind1, TrkDef wind2, TrkDef wind3)
+        private List<int> GetBarlineMsPositions(TrkDef fury1, TrkDef fury2, TrkDef fury3, TrkDef fury4, Clytemnestra clytemnestra, TrkDef wind1, TrkDef wind2, TrkDef wind3)
         {
-            TrkDef ctl = control;
             TrkDef f1 = fury1;
             TrkDef f2 = fury2;
             TrkDef f3 = fury3;
@@ -378,117 +377,7 @@ namespace Moritz.Algorithm.SongSix
             Debug.Assert(barlineMsPositions.Count == NumberOfBars + 1); // includes bar 1 (mPos=0) and the final barline.
             return barlineMsPositions;
         }
-        /// <summary>
-        /// The control VoiceDef consists of single note + rest pairs whose msPositions are composed here.
-        /// </summary>
-        private TrkDef GetControlVoiceDef(TrkDef furies1, TrkDef furies2, TrkDef furies3, TrkDef furies4, Clytemnestra clytemnestra, TrkDef wind1, TrkDef wind2, TrkDef wind3)
-        {
-            TrkDef f1 = furies1;
-            TrkDef f2 = furies2;
-            TrkDef f3 = furies3;
-            TrkDef f4 = furies4;
-            TrkDef w1 = wind1;
-            TrkDef w2 = wind2;
-            TrkDef w3 = wind3;
-            TrkDef c = clytemnestra;
-            // The columns here are note MsPositions and rest MsPositions respectively.
-            List<int> controlNoteAndRestMsPositions = new List<int>()
-            {
-                0, f4[1].MsPosition / 2, 
-                f4[1].MsPosition, f4[2].MsPosition, 
-                f4[3].MsPosition, f4[4].MsPosition, 
-                f4[5].MsPosition, f4[6].MsPosition,
-                f4[7].MsPosition, f4[8].MsPosition, // verse 1 starts inside f4[7] 
-                f4[9].MsPosition, f4[10].MsPosition,
-                f4[11].MsPosition, f4[12].MsPosition,
-                c[49].MsPosition, (c[58].MsPosition + c[59].MsPosition) / 2,
-                // Interlude 1
-                f3[1].MsPosition, f3[12].MsPosition,
-                f3[13].MsPosition, f3[24].MsPosition,
-                // Verse 2
-                c[60].MsPosition, c[61].MsPosition,
-                c[62].MsPosition, c[65].MsPosition,
-                c[66].MsPosition, c[82].MsPosition,
-                c[83].MsPosition, c[93].MsPosition,
-                c[94].MsPosition, c[98].MsPosition,
-                c[99].MsPosition, c[105].MsPosition,
-                c[106].MsPosition, c[116].MsPosition,
-                // Interlude 2
-                f3[61].MsPosition, f3[72].MsPosition,
-                f1[1].MsPosition, f1[2].MsPosition,
-                f1[3].MsPosition, f2[18].MsPosition,
-                f3[96].MsPosition, f1[5].MsPosition,
-                f2[29].MsPosition, f3[116].MsPosition,
-                f4[29].MsPosition, f1[10].MsPosition,
-                f3[131].MsPosition, f2[47].MsPosition,
-                // Verse 3
-                c[117].MsPosition, c[118].MsPosition,
-                c[119].MsPosition, c[122].MsPosition,
-                c[123].MsPosition, c[129].MsPosition,
-                c[130].MsPosition, c[140].MsPosition,
-                c[141].MsPosition, c[151].MsPosition,
-                c[152].MsPosition, c[162].MsPosition,
-                c[163].MsPosition, c[173].MsPosition,
-                // Interlude 3 (=beginning of Finale)
-                f1[25].MsPosition, f1[29].MsPosition, 
-                f1[30].MsPosition, f1[34].MsPosition + 100, 
-                f1[35].MsPosition, f1[40].MsPosition,
-                f1[41].MsPosition, f1[45].MsPosition,
-                f1[46].MsPosition, f1[51].MsPosition,
-                f1[52].MsPosition, f2[66].MsPosition + 100,
-                f1[56].MsPosition, f1[60].MsPosition + 100,
-                f1[61].MsPosition, f1[67].MsPosition + 100,
-                f1[68].MsPosition, f1[73].MsPosition + 100,
-                // Verse 4
-                c[174].MsPosition, c[184].MsPosition,
-                c[185].MsPosition, c[215].MsPosition,
-                c[216].MsPosition, c[234].MsPosition,
-                c[235].MsPosition, c[254].MsPosition,
-                //c[255].MsPosition, c[268].MsPosition,
-                c[255].MsPosition, f2[134].MsPosition + 100,
-                // Interlude 4
-                //f4[42].MsPosition, f4[43].MsPosition,
-                f4[42].MsPosition, f1[132].MsPosition + 100,
-                //f4[45].MsPosition, f4[46].MsPosition,
-                f4[45].MsPosition, f1[145].MsPosition - 100,
-                //f4[47].MsPosition, f4[48].MsPosition,
-                w3[63].MsPosition, f2[177].MsPosition,
-                //f4[49].MsPosition, f4[50].MsPosition,
-                f4[49].MsPosition, f1[170].MsPosition + 100,
-                //f4[52].MsPosition, f4[53].MsPosition,
-                f4[52].MsPosition, f1[189].MsPosition,
-                // Verse 5
-                c[269].MsPosition, c[277].MsPosition,
-                //c[278].MsPosition, c[287].MsPosition,
-                c[278].MsPosition, f2[232].MsPosition + 50,
-                c[288].MsPosition, c[289].MsPosition,
-                // Postlude off
-                w3.EndMsPosition // final barline position
-            };
-            TrkDef controlVoiceDef = MakeControlVoiceDef(controlNoteAndRestMsPositions);
-            return controlVoiceDef;
-        }
-        // This code should not change while composing the ControlVoiceDef.
-        // It just makes the VoiceDef from the controlNoteAndRestMsPositions defined above.
-        private static TrkDef MakeControlVoiceDef(List<int> controlNoteAndRestMsPositions)
-        {
-            List<IUniqueDef> controlLmdds = new List<IUniqueDef>();
-            for(int i = 0; i < controlNoteAndRestMsPositions.Count - 2; i += 2)
-            {
-                int noteMsPosition = controlNoteAndRestMsPositions[i];
-                int restMsPosition = controlNoteAndRestMsPositions[i + 1];
-                int nextNoteMsPosition = controlNoteAndRestMsPositions[i + 2];
-                Debug.Assert(noteMsPosition < restMsPosition && restMsPosition < nextNoteMsPosition);
-                int noteMsDuration = restMsPosition - noteMsPosition;
-                int restMsDuration = nextNoteMsPosition - restMsPosition;
-                MidiChordDef umChordDef = new MidiChordDef(new List<byte>() { (byte)67 }, new List<byte>() { (byte)0 }, noteMsPosition, noteMsDuration, false);
-                RestDef umRestDef = new RestDef(restMsPosition, restMsDuration);
-                controlLmdds.Add(umChordDef);
-                controlLmdds.Add(umRestDef);
-            }
-            TrkDef controlVoiceDef = new TrkDef(controlLmdds);
-            return controlVoiceDef;
-        }
+
         private List<List<VoiceDef>> GetBars(List<VoiceDef> voiceDefs, List<int> barlineMsPositions)
         {
             // barlineMsPositions contains both msPos=0 and the position of the final barline

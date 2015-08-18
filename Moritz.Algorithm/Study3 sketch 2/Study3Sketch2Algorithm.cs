@@ -143,22 +143,26 @@ namespace Moritz.Algorithm.Study3Sketch2
             byte channel = 0;
             foreach(Palette palette in _palettes)
             {
-                TrkDef trkDef = new TrkDef();
+                TrkDef trkDef = new TrkDef(channel, new List<IUniqueDef>());
                 bar.Add(trkDef);
                 WriteVoiceMidiDurationDefs1(trkDef, palette);
                 ++channel;
             }
 
             InputVoiceDef inputVoiceDef = new InputVoiceDef();
-            VoiceDef topVoice = bar[0];
-            foreach(IUniqueDef iud in topVoice.UniqueDefs)
+            VoiceDef bottomOutputVoice = bar[0];
+			
+            foreach(IUniqueDef iud in bottomOutputVoice.UniqueDefs)
             {
                 MidiChordDef mcd = iud as MidiChordDef;
                 RestDef rd = iud as RestDef;
                 if(mcd != null)
                 {
+					TrkDef trkDef = new TrkDef(bottomOutputVoice.MidiChannel, new List<IUniqueDef>(){(IUniqueDef)mcd});
                     byte pitch = (byte)(mcd.NotatedMidiPitches[0] + 36);
                     InputChordDef icd = new InputChordDef(mcd.MsPosition, mcd.MsDuration, pitch, null, 0, 1, null);
+					icd.InputNoteDefs[0].AddNoteOnTrkMsg(trkDef, TrkMessageType.trkOn);
+					icd.InputNoteDefs[0].AddNoteOffTrkMsg(trkDef, TrkMessageType.trkOff);
                     inputVoiceDef.UniqueDefs.Add(icd);
                 }
                 else if(rd != null)
@@ -180,11 +184,6 @@ namespace Moritz.Algorithm.Study3Sketch2
 			noteInputControls.NoteOnVelocityOption = NoteOnVelocityOption.scaled;
 			noteInputControls.MinimumVelocity = 20;
 			inputChordDef1.InputNoteDefs[0].InputControls = noteInputControls;
-			
-			InputControls trkRefInputControls = new InputControls();
-			trkRefInputControls.NoteOnVelocityOption = NoteOnVelocityOption.shared;
-			trkRefInputControls.MinimumVelocity = 21;
-			inputChordDef1.InputNoteDefs[0].TrkRefs[0].InputControls = trkRefInputControls;
 			 
 			#endregion
 				 
@@ -222,8 +221,8 @@ namespace Moritz.Algorithm.Study3Sketch2
             List<TrkDef> trkDefs = new List<TrkDef>();
             foreach(Palette palette in _palettes)
             {
-                bar.Add(new TrkDef());
-                TrkDef trkDef = palette.NewTrkDef();
+                bar.Add(new TrkDef(channel, new List<IUniqueDef>()));
+				TrkDef trkDef = palette.NewTrkDef(channel);
                 trkDef.SetMsDuration(6000);
                 trkDefs.Add(trkDef);
                 ++channel;

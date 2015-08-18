@@ -25,32 +25,43 @@ namespace Moritz.Spec
     public class TrkDef : VoiceDef
     {
         #region constructors
-        /// <summary>
-        /// An empty VoiceDef
-        /// </summary>
-        /// <param name="msDuration"></param>
-        public TrkDef()
-            : base()
-        {
-        }
+		///// <summary>
+		///// An empty VoiceDef
+		///// </summary>
+		///// <param name="msDuration"></param>
+		//public TrkDef()
+		//	: base()
+		//{
+		//}
 
         /// <summary>
         /// A VoiceDef beginning at MsPosition = 0, and containing a single RestDef having msDuration
         /// </summary>
         /// <param name="msDuration"></param>
-        public TrkDef(int msDuration)
-            : base(msDuration)
+        public TrkDef(byte midiChannel, int msDuration)
+			: base(msDuration)
         {
+			MidiChannel = midiChannel;
         }
 
-        /// <summary>
-        /// <para>If the argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
-        /// <para>The new VoiceDef's UniqueDefs list is simply set to the argument (which is not cloned).</para>
-        /// </summary>
-        public TrkDef(List<IUniqueDef> iuds) 
-            : base(iuds)
-        {
-        }
+		///// <summary>
+		///// <para>If the argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
+		///// <para>The new VoiceDef's UniqueDefs list is simply set to the argument (which is not cloned).</para>
+		///// </summary>
+		//public TrkDef(List<IUniqueDef> iuds)
+		//	: base(iuds)
+		//{
+		//}
+
+		/// <summary>
+		/// <para>If the argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
+		/// <para>The new VoiceDef's UniqueDefs list is simply set to the argument (which is not cloned).</para>
+		/// </summary>
+		public TrkDef(byte midiChannel, List<IUniqueDef> iuds)
+			: base(iuds)
+		{
+			MidiChannel = midiChannel;
+		}
 
         /// <summary>
         /// Returns a deep clone of this TrkDef.
@@ -77,7 +88,7 @@ namespace Moritz.Spec
                 }
             }
 
-            return new TrkDef(clonedLmdds);
+            return new TrkDef(this.MidiChannel, clonedLmdds);
         }
         #endregion constructors
 
@@ -123,7 +134,7 @@ namespace Moritz.Spec
         public void InsertInRest(MidiChordDef midiChordDef)
         {
             List<IUniqueDef> iuds = new List<IUniqueDef>() { midiChordDef };
-            TrkDef trkDefToInsert = new TrkDef(iuds);
+            TrkDef trkDefToInsert = new TrkDef(this.MidiChannel, iuds);
             InsertInRest(trkDefToInsert);
         }
         /// <summary>
@@ -763,6 +774,5 @@ namespace Moritz.Spec
         /// All other TrkDefs retain the default value 0. 
         /// </summary>
         public byte? MasterVolume = null; // default value
-
     }
 }

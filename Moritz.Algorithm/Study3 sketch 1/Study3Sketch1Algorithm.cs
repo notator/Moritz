@@ -61,11 +61,13 @@ namespace Moritz.Algorithm.Study3Sketch1
         {
             List<VoiceDef> bar = new List<VoiceDef>();
 
+			byte channel = 0;
             foreach(Palette palette in _palettes)
             {
-                TrkDef voice = new TrkDef();
+                TrkDef voice = new TrkDef(channel, new List<IUniqueDef>());
                 bar.Add(voice);
                 WriteVoiceMidiDurationDefs1(voice, palette);
+				channel++;
             }
             return bar;
         }
@@ -98,8 +100,8 @@ namespace Moritz.Algorithm.Study3Sketch1
             List<TrkDef> trkDefs = new List<TrkDef>();
             foreach(Palette palette in _palettes)
             {
-                bar.Add(new TrkDef());
-                TrkDef trkDef = palette.NewTrkDef();
+                bar.Add(new TrkDef(channel, new List<IUniqueDef>()));
+                TrkDef trkDef = palette.NewTrkDef(channel);
                 trkDef.SetMsDuration(6000);
                 trkDefs.Add(trkDef);
                 ++channel;

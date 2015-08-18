@@ -34,7 +34,7 @@ namespace Moritz.Spec
 			_msDurationToNextBarline = null;
 			
 			_inputNoteDefs = new List<InputNoteDef>();
-			_inputNoteDefs.Add(new InputNoteDef(midiPitch, null, new List<TrkRef>() { new TrkRef(trkMidiChannel, trkLength, 0) }));
+			_inputNoteDefs.Add(new InputNoteDef(midiPitch, msPosition, null));
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Moritz.Spec
 			Debug.Assert(notatedMidiPitches.Count == trkRefsPerMidiPitch.Count);
 			for(int i = 0; i < notatedMidiPitches.Count; ++i)
 			{
-				_inputNoteDefs.Add(new InputNoteDef(notatedMidiPitches[i], null, trkRefsPerMidiPitch[i]));
+				_inputNoteDefs.Add(new InputNoteDef(notatedMidiPitches[i], msPosition, null));
 			}
         }
 
@@ -146,7 +146,7 @@ namespace Moritz.Spec
 				{
 					Debug.Assert(midiPitch > previousPitch);
 					previousPitch = midiPitch;
-					_inputNoteDefs.Add(new InputNoteDef(midiPitch, null, null));
+					_inputNoteDefs.Add(new InputNoteDef(midiPitch, _msPosition, null));
 				}
 			}
 		}
