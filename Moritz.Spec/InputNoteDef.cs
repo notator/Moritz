@@ -25,11 +25,11 @@ namespace Moritz.Spec
 			_inputControls = inputControls;
 		}
 
-		internal void WriteSvg(SvgWriter w)
+		internal void WriteSvg(SvgWriter w, int chordMsPosition)
 		{
 			w.WriteStartElement("inputNote");
 			w.WriteAttributeString("notatedKey", _notatedMidiPitch.ToString());
-			_seqDef.WriteSvg(w);
+			_seqDef.WriteSvg(w, chordMsPosition);
 			if(_inputControls != null)
 			{
 				_inputControls.WriteSvg(w);

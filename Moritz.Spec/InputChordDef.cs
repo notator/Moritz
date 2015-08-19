@@ -27,7 +27,7 @@ namespace Moritz.Spec
 			int pitchBelow = -1;
 			foreach(InputNoteDef ind in inputNoteDefs)
 			{
-				Debug.Assert(ind.NotatedMidiPitch <= pitchBelow);
+				Debug.Assert(ind.NotatedMidiPitch > pitchBelow);
 				pitchBelow = ind.NotatedMidiPitch;
 				foreach(TrkRef trkRef in ind.SeqDef.TrkRefs)
 				{
@@ -87,7 +87,7 @@ namespace Moritz.Spec
             w.WriteStartElement("score", "inputNotes", null);
 			foreach(InputNoteDef ind in _inputNoteDefs)
 			{
-				ind.WriteSvg(w);
+				ind.WriteSvg(w, _msPosition);
 			}
 
             w.WriteEndElement(); // score:inputNotes

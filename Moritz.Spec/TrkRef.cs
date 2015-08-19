@@ -29,11 +29,17 @@ namespace Moritz.Spec
 			_inputControls = inputControls;
 		}
 
-        internal void WriteSvg(SvgWriter w)
+        internal void WriteSvg(SvgWriter w, int chordMsPosition)
         {
+			int msOffset = _trkMsPosition - chordMsPosition;
+			Debug.Assert(msOffset >= 0);
+
             w.WriteStartElement("trkRef");
 			w.WriteAttributeString("midiChannel", _trkMidiChannel.ToString());
-			w.WriteAttributeString("msPosition", _trkMsPosition.ToString());
+			if(msOffset > 0)
+			{
+				w.WriteAttributeString("msOffset", msOffset.ToString());
+			}
 			w.WriteAttributeString("durationsCount", _trkDurationsCount.ToString());
 			if(_inputControls != null)
 			{

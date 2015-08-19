@@ -11,12 +11,12 @@ namespace Moritz.Spec
 			_trkRefs = trkRefs;
 		}
 
-		internal void WriteSvg(Xml.SvgWriter w)
+		internal void WriteSvg(Xml.SvgWriter w, int chordMsPosition)
 		{
 			w.WriteStartElement("seq");
 			foreach(TrkRef trkRef in _trkRefs)
 			{
-				trkRef.WriteSvg(w);
+				trkRef.WriteSvg(w, chordMsPosition);
 			}
 			w.WriteEndElement(); // seq
 		}
