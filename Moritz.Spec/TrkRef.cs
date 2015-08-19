@@ -4,34 +4,37 @@ using Moritz.Xml;
 
 namespace Moritz.Spec
 {
+	/// Describes what happens when a NoteOn, NoteOff or pressure info is received by an InputNote.
     public class TrkRef
     {
-		/// <param name="trkMsg">The message to be sent to the referenced Trk</param>
-		/// <param name="midiChannel">The referenced Trk's midiChannel</param>
-		/// <param name="length">The number of chords and rests in the referenced Trk</param>
-		/// <param name="msOffset">The number of milliseconds between the postion of the containing input chord and the beginning of the Trk.</param>
-		public TrkRef(TrkMessageType trkMsg, byte midiChannel, int length, int msOffset)
+		/// <param name="trkDef">The target trk's midi channel</param>
+		/// <param name="trkStartPosition">The target trk's startMsPosition</param>
+		/// <param name="trkDurationsCount">The number of MidiChordDefs and RestDefs in the target trk.</param>
+		/// <param name="inputControls">If non-null, this inputControls overrrides the InputControls in the InputNote or InputChord</param>
+		public TrkRef(byte trkMidiChannel, int trkStartPosition, int trkDurationsCount, InputControls inputControls)
 		{
-			Debug.Assert(midiChannel >= 0);
-			Debug.Assert(length >= 0);
-			Debug.Assert(msOffset >= 0);
+			_trkMidiChannel = trkMidiChannel;
+			_trkMsPosition = trkStartPosition;
+			_trkDurationsCount = trkDurationsCount;
+			_inputControls = inputControls;
+		}
 
-			_trkMsg = trkMsg;
-			_midiChannel = midiChannel;
-			_length = length;
-			_msOffset = msOffset;
+		/// <param name="trkDef">The target trk</param>
+		/// <param name="inputControls">If non-null, this inputControls overrrides the InputControls in the InputNote or InputChord</param>
+		public TrkRef(TrkDef trkDef, InputControls inputControls)
+		{
+			_trkMidiChannel = trkDef.MidiChannel;
+			_trkMsPosition = trkDef.StartMsPosition;
+			_trkDurationsCount = trkDef.DurationsCount; // includes MidiChordDef, RestDef
+			_inputControls = inputControls;
 		}
 
         internal void WriteSvg(SvgWriter w)
         {
             w.WriteStartElement("trkRef");
-			w.WriteAttributeString("trkMsg", _trkMsg.ToString());
-            w.WriteAttributeString("midiChannel", _midiChannel.ToString());
-            w.WriteAttributeString("length", _length.ToString());
-            if(_msOffset > 0)
-            {
-                w.WriteAttributeString("msOffset", _msOffset.ToString());
-            }		
+			w.WriteAttributeString("midiChannel", _trkMidiChannel.ToString());
+			w.WriteAttributeString("msPosition", _trkMsPosition.ToString());
+			w.WriteAttributeString("durationsCount", _trkDurationsCount.ToString());
 			if(_inputControls != null)
 			{
 				_inputControls.WriteSvg(w);
@@ -39,19 +42,11 @@ namespace Moritz.Spec
             w.WriteEndElement(); // trkRef
         }
 
-		public TrkMessageType TrkMsg { get { return _trkMsg; } }
-		private TrkMessageType _trkMsg; 
+        private byte _trkMidiChannel;
+        private int _trkMsPosition;
+		private int _trkDurationsCount;
+		private InputControls _inputControls;
 
-        public byte MidiChannel { get { return _midiChannel; } }
-        private byte _midiChannel;
-
-        public int Length { get { return _length; } }
-        private int _length;
-
-        public int MsOffset { get { return _msOffset; } }
-        private int _msOffset;
-
-		public InputControls InputControls { get { return _inputControls; } set { _inputControls = value; } }
-		private InputControls _inputControls;     
-    }
+		public int TrkMsPosition { get{return _trkMsPosition;}}
+	}
 }

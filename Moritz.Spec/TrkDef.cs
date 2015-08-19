@@ -768,11 +768,30 @@ namespace Moritz.Spec
 		}
 		#endregion public Permute
 
+		/// <summary>
+		/// The number of MidiChordDefs and RestDefs in this TrkDef
+		/// </summary>
+		public int DurationsCount
+		{
+			get
+			{
+				int count = 0;
+				foreach(IUniqueDef iud in _uniqueDefs)
+				{
+					if(iud is MidiChordDef || iud is RestDef)
+					{
+						count++;
+					}
+				}
+				return count;
+			}
+		}
+
         /// <summary>
         /// The composition algorithm must set the MasterVolume (to a value != null)
         /// in every TrkDef in the first bar of the score.
         /// All other TrkDefs retain the default value 0. 
         /// </summary>
         public byte? MasterVolume = null; // default value
-    }
+	}
 }

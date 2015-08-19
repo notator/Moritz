@@ -45,23 +45,4 @@ namespace Moritz.Spec
 
         public List<MidiChordDef> MidiChordDefs = new List<MidiChordDef>();
     }
-
-    public class MidiControlDef
-    {
-        public MidiControlDef(ChannelMessage channelMessage)
-        {
-            Channel = (byte) channelMessage.MidiChannel;
-            ChannelCommand = channelMessage.Command;
-            Value = (byte)channelMessage.Data1;
-            if(ChannelCommand == ChannelCommand.Controller)
-            {
-                ControllerType = (ControllerType)channelMessage.Data1;
-                Value = (byte)channelMessage.Data2;
-            }
-        }
-        public byte Channel;
-        public ControllerType ControllerType = ControllerType.EffectControl2Fine;
-        public ChannelCommand ChannelCommand = ChannelCommand.Controller;
-        public byte Value;
-    }
 }

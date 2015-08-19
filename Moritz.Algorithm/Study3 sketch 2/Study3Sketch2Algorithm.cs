@@ -91,11 +91,11 @@ namespace Moritz.Algorithm.Study3Sketch2
         private void SetBar2NoteOnNoteOffControls(List<InputChordDef> bar2InputChordDefs)
         {
 			InputControls ics1 = new InputControls();
-			ics1.NoteOffOption = NoteOffOption.stopChord;
+			ics1.TrkOffOption = TrkOffOption.stopChord;
 			bar2InputChordDefs[0].InputNoteDefs[0].InputControls = ics1;
 
 			InputControls ics2 = new InputControls();
-			ics2.NoteOffOption = NoteOffOption.fade;
+			ics2.TrkOffOption = TrkOffOption.fade;
 			bar2InputChordDefs[1].InputNoteDefs[0].InputControls = ics2;
         }
 
@@ -103,9 +103,9 @@ namespace Moritz.Algorithm.Study3Sketch2
         {
             foreach(InputChordDef inputChordDef in bar3InputChordDefs)
             {
-                InputControls ics = new InputControls();
-                ics.NoteOffOption = NoteOffOption.fade; // this is the current value in the voice (has no effect)
-                ics.PitchWheelOption = ControllerOption.volume;
+                InputControls ics = new InputControls();				
+                ics.TrkOffOption = TrkOffOption.fade; // this is the current value in the voice (has no effect)
+                ics.PitchWheelOption = ControllerType.volume;
                 ics.MaximumVolume = 100;
                 ics.MinimumVolume = 50;
 				inputChordDef.InputNoteDefs[0].InputControls = ics;
@@ -117,8 +117,8 @@ namespace Moritz.Algorithm.Study3Sketch2
             foreach(InputChordDef inputChordDef in bar4InputChordDefs)
             {
                 InputControls ics = new InputControls();
-                ics.NoteOffOption = NoteOffOption.fade;
-                ics.PitchWheelOption = ControllerOption.pitchWheel;
+                ics.TrkOffOption = TrkOffOption.fade;
+                ics.PitchWheelOption = ControllerType.pitchWheel;
 				inputChordDef.InputNoteDefs[0].InputControls = ics;
             }
         }
@@ -129,7 +129,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             {
                 InputControls ics = new InputControls();
 
-                ics.PitchWheelOption = ControllerOption.pitchWheel; // this is the current value in the voice (has no effect)
+                ics.PitchWheelOption = ControllerType.pitchWheel; // this is the current value in the voice (has no effect)
                 ics.SpeedOption = SpeedOption.noteOnKey;
                 ics.MaxSpeedPercent = 500;
 				inputChordDef.InputNoteDefs[0].InputControls = ics;
@@ -158,11 +158,27 @@ namespace Moritz.Algorithm.Study3Sketch2
                 RestDef rd = iud as RestDef;
                 if(mcd != null)
                 {
-					TrkDef trkDef = new TrkDef(bottomOutputVoice.MidiChannel, new List<IUniqueDef>(){(IUniqueDef)mcd});
-                    byte pitch = (byte)(mcd.NotatedMidiPitches[0] + 36);
-                    InputChordDef icd = new InputChordDef(mcd.MsPosition, mcd.MsDuration, pitch, null, 0, 1, null);
-					icd.InputNoteDefs[0].AddNoteOnTrkMsg(trkDef, TrkMessageType.trkOn);
-					icd.InputNoteDefs[0].AddNoteOffTrkMsg(trkDef, TrkMessageType.trkOff);
+					List<IUniqueDef> iuds = new List<IUniqueDef>() { (IUniqueDef)mcd };
+
+					// Note that the msPosition of the trkDef is trkDef.StartMsPosition (= iuds[0].msPosition),
+					// which may be greater than the InputChordDef's msPosition
+					TrkDef trkDef = new TrkDef(bottomOutputVoice.MidiChannel, iuds);
+
+					// If non-null, arg2 overrides the inputControls attached to the InputNote or InputChord.
+					TrkRef trkRef = new TrkRef(trkDef, null);
+					List<TrkRef> trkRefs = new List<TrkRef>() { trkRef };
+				
+					SeqDef seqDef = new SeqDef(trkRefs);
+
+					byte displayPitch = (byte)(mcd.NotatedMidiPitches[0] + 36);
+					
+					InputNoteDef inputNoteDef = new InputNoteDef(displayPitch, seqDef, null);
+
+					List<InputNoteDef> inputNoteDefs = new List<InputNoteDef>() { inputNoteDef };
+                    
+					// The InputChordDef's msPosition must be <= the msPosition of any of the contained trkRefs
+                    InputChordDef icd = new InputChordDef(mcd.MsPosition, mcd.MsDuration, inputNoteDefs);
+
                     inputVoiceDef.UniqueDefs.Add(icd);
                 }
                 else if(rd != null)
@@ -176,12 +192,13 @@ namespace Moritz.Algorithm.Study3Sketch2
 			InputChordDef inputChordDef1 = inputVoiceDef.UniqueDefs[0] as InputChordDef; // no need to check for null here.
 
 			InputControls chordInputControls = new InputControls();
-			chordInputControls.NoteOnVelocityOption = NoteOnVelocityOption.overridden;
+
+			chordInputControls.TrkVelocityOption = TrkVelocityOption.overridden;
 			chordInputControls.MinimumVelocity = 19;
 			inputChordDef1.InputControls = chordInputControls;
 
 			InputControls noteInputControls = new InputControls();
-			noteInputControls.NoteOnVelocityOption = NoteOnVelocityOption.scaled;
+			noteInputControls.TrkVelocityOption = TrkVelocityOption.scaled;
 			noteInputControls.MinimumVelocity = 20;
 			inputChordDef1.InputNoteDefs[0].InputControls = noteInputControls;
 			 
@@ -254,7 +271,12 @@ namespace Moritz.Algorithm.Study3Sketch2
             int msPos = bar2StartMsPos;
             for(int i = 0; i < bar.Count; ++i)
             {
-                InputChordDef inputChordDef = new InputChordDef(msPos, startMsDifference, 64, null, (byte)i, (byte)12, null);
+				TrkRef trkRef = new TrkRef((byte)i, msPos, 12, null); 
+				List<TrkRef> trkRefs = new List<TrkRef>(){trkRef}; 
+				SeqDef seqDef = new SeqDef(trkRefs);
+				InputNoteDef inputNoteDef = new InputNoteDef((byte)64, seqDef, null);
+				List<InputNoteDef> inputNoteDefs = new List<InputNoteDef>(){inputNoteDef};
+				InputChordDef inputChordDef = new InputChordDef(msPos, startMsDifference, inputNoteDefs);
                 inputVoiceDef.InsertInRest(inputChordDef);
                 msPos += startMsDifference;
             }

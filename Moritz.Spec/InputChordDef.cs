@@ -13,49 +13,34 @@ namespace Moritz.Spec
     ///<summary>
     /// A InputChordDef can be saved and retrieved from voices in an SVG file.
     /// Each inputChord in an SVG file will be given an ID of the form "inputChord"+uniqueNumber, but
-    /// Moritz does not actually use the ids, so they are not read into in UniqueInputChordDefs.
+    /// Neither the AssistantPerformer nor Moritz actually uses these ids.
     ///</summary>
     public class InputChordDef : DurationDef, IUniqueSplittableChordDef
     {
-        public InputChordDef()
-            :base(0)
-        {
-        }
-
         /// <summary>
-        /// constructs a 1-pitch chord whose list of trkRefs contains a single trkRef (having msOffset = 0).
+        /// Constructs a multi-note chord, each inputNoteDef has a notated pitch and a SeqDef.
+		/// The inputNoteDefs must be in order of their notated pitches.
         /// </summary>
-        public InputChordDef(int msPosition, int msDuration, byte midiPitch, string lyric, byte trkMidiChannel, byte trkLength, InputControls inputControls)
+        public InputChordDef(int msPosition, int msDuration, List<InputNoteDef> inputNoteDefs)
             : base(msDuration)
         {
-			_msPosition = msPosition;
-			_lyric = lyric;
-			_inputControls = inputControls;
-			_msDurationToNextBarline = null;
-			
-			_inputNoteDefs = new List<InputNoteDef>();
-			_inputNoteDefs.Add(new InputNoteDef(midiPitch, msPosition, null));
-        }
-
-        /// <summary>
-        /// Constructs a multi-note chord, each note having a notated pitch, and a list of trkRefs.
-        /// This constructor makes its own copy of the midiPitches but not of the trkRefs.
-        /// </summary>
-        public InputChordDef(int msPosition, int msDuration, List<byte> notatedMidiPitches, List<List<TrkRef>> trkRefsPerMidiPitch, string lyric)
-            : base(msDuration)
-        {
+			int pitchBelow = -1;
+			foreach(InputNoteDef ind in inputNoteDefs)
+			{
+				Debug.Assert(ind.NotatedMidiPitch <= pitchBelow);
+				pitchBelow = ind.NotatedMidiPitch;
+				foreach(TrkRef trkRef in ind.SeqDef.TrkRefs)
+				{
+					Debug.Assert(msPosition <= trkRef.TrkMsPosition);
+				}
+			}
 
             _msPosition = msPosition;
-			_lyric = lyric;
+			_msDuration = msDuration;
+			_inputNoteDefs = inputNoteDefs;
+			_lyric = null;
 			_inputControls = null;
 			_msDurationToNextBarline = null;
-
-			_inputNoteDefs = new List<InputNoteDef>();
-			Debug.Assert(notatedMidiPitches.Count == trkRefsPerMidiPitch.Count);
-			for(int i = 0; i < notatedMidiPitches.Count; ++i)
-			{
-				_inputNoteDefs.Add(new InputNoteDef(notatedMidiPitches[i], msPosition, null));
-			}
         }
 
         /// <summary>
@@ -136,17 +121,18 @@ namespace Moritz.Spec
 				}
 				return rList;
 			}
-			/// This setter creates a new list of InputNoteheadDefs, without InputControls or TrkRefs
+			// The new pitches must be in ascending order
 			set
 			{
-				List<byte> newNoteheads = value;
-				_inputNoteDefs = new List<InputNoteDef>();
-				int previousPitch = -1;
-				foreach(byte midiPitch in newNoteheads)
+				List<byte> newPitches = value;
+				Debug.Assert(newPitches.Count == _inputNoteDefs.Count);
+				int pitchBelow = -1;
+				for(int i = 0; i < newPitches.Count; ++i)
 				{
-					Debug.Assert(midiPitch > previousPitch);
-					previousPitch = midiPitch;
-					_inputNoteDefs.Add(new InputNoteDef(midiPitch, _msPosition, null));
+					byte newPitch = newPitches[i];
+					Debug.Assert(newPitch > pitchBelow);
+					pitchBelow = newPitch;
+					_inputNoteDefs[i].NotatedMidiPitch = newPitch;
 				}
 			}
 		}
