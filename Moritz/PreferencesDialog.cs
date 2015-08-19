@@ -14,6 +14,9 @@ namespace Moritz
 
 			SetActiveDevicesComboBoxes();
 			this.OutputDevicesComboBox.SelectedItem = M.Preferences.PreferredOutputDevice;
+			// if the PreferredOutputDevice was not found, set it to the top item in the comboBox
+			M.Preferences.PreferredOutputDevice = (string) this.OutputDevicesComboBox.SelectedItem;
+
 			this.OutputDevicesComboBox.SelectedIndexChanged += OutputDevicesComboBox_SelectedIndexChanged;
 
             SetUserInfo();

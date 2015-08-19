@@ -17,6 +17,7 @@ namespace Moritz.Globals
 			string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
 			string moritzAppDataFolder = appData + @"\Moritz";
+			// C:\Users\James\AppData\Roaming\Moritz
 			M.CreateDirectoryIfItDoesNotExist(moritzAppDataFolder);
 
 			LocalMoritzPreferencesPath = moritzAppDataFolder + @"\Preferences.mzpf";
@@ -58,7 +59,7 @@ namespace Moritz.Globals
                 if((!String.IsNullOrEmpty(PreferredOutputDevice)) && MultimediaMidiOutputDevices.ContainsKey(PreferredOutputDevice) == false)
                 {
                     string message = "Can't find the " + PreferredOutputDevice + ".\n\n" +
-                        "To use it, quit, turn it on, and restart.";
+                        "Check the preferences.";
                     MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 else
