@@ -6,7 +6,8 @@ using Moritz.Xml;
 namespace Moritz.Spec
 {
     /// <summary>
-    /// This object defines how Trks react to incoming performed information.
+    /// Subject to the message types defined in inputNotes,
+	/// This object defines how Trks react to incoming performed information.
 	/// 
 	/// An inputControls element can be contained in the following elements in score files:
 	///		inputChord (which contains a list of inputNotes)
@@ -16,22 +17,15 @@ namespace Moritz.Spec
 	/// See http://james-ingram-act-two.de/open-source/svgScoreExtensions.html for details as to how these inputControls are used.
 	/// 	
     /// The values these options can take in the InputControls are defined in enums in this namespace.
-    /// In addition to the values stored in scores, each of these enums has a "undefined" member here in Moritz.
     /// The default options (which are not written to score files) are:
-	///     noteOnMsg="trkOn" -- input midi noteOns send trkOn messages
-	///     noteOffMsg="trkOff" -- input midi noteOffs send trkOff messages
-	///     trkVel="undefined" -- input midi velocities are ignored (the score uses its own, default velocities)
-	///     trkOff="stopNow" -- must be defined if "trkOff" messages are being sent.
-    ///     pressure="undefined" -- input channelPressure/aftertouch information is ignored.
+	///     velocity="undefined" -- input midi velocities are ignored (the score uses its own, default velocities)
+	///     pressure="undefined" -- input channelPressure/aftertouch information is ignored.
+	///     trkOff="undefined" -- input midi noteOff messages ae ignored (trks complete as defined).
     ///     pitchWheel="undefined" -- input pitchWheel information is ignored.
     ///     modulation="undefined" -- input modulation wheel information is ignored.
     ///     speedOption="undefined" -- the default durations (set in the score) are used. 
 	/// 
-	/// In the AssistantPerformer, new InputControls objects should only be initialized with the _defined_ values:
-	///    NoteOnTrkMessage = "trkOn"
-	///    NoteOffTrkMessage = "trkOff"
-	///    TrkOffOption = "stopNow"
-	/// The inputControls object can then be completed by settting/adding the values given in the score.
+	/// In the AssistantPerformer, new InputControls objects should be empty -- contain no defined members.
     /// </summary>
     public class InputControls
     {
@@ -42,48 +36,17 @@ namespace Moritz.Spec
         public void WriteSvg(SvgWriter w)
         {
             w.WriteStartElement("inputControls");
-
-			if(this.NoteOnTrkMessage != TrkMessageType.trkOn)
-			{
-				w.WriteAttributeString("noteOnMsg", this.NoteOnTrkMessage.ToString());				
-			}
-
-			if(this.NoteOffTrkMessage != TrkMessageType.trkOff)
-			{
-				w.WriteAttributeString("noteOffMsg", this.NoteOffTrkMessage.ToString());
-			}
 			
-			if(this.TrkVelocityOption != TrkVelocityOption.undefined)
+			if(this.VelocityOption != VelocityOption.undefined)
 			{
 				if(this.MinimumVelocity == null || MinimumVelocity < 1 || MinimumVelocity > 127)
 				{
 					Debug.Assert(false,
-						"If the TrkVelocityOption is being used, then\n" +
+						"If the VelocityOption is being used, then\n" +
 						"MinimumVelocity must be set to a value in range [1..127]");
 				}
-				w.WriteAttributeString("trkVel", this.TrkVelocityOption.ToString());
+				w.WriteAttributeString("velocity", this.VelocityOption.ToString());
 				w.WriteAttributeString("minVelocity", this.MinimumVelocity.ToString());		
-			}
-
-			if(this.TrkOffOption != TrkOffOption.stopNow)
-			{
-				bool trkOffMessagesAreBeingSent = (this.NoteOffTrkMessage == TrkMessageType.trkOff || this.NoteOnTrkMessage == TrkMessageType.trkOff);
-				if(trkOffMessagesAreBeingSent)
-				{
-					if(this.TrkOffOption == TrkOffOption.undefined)
-					{
-						Debug.Assert(false, "TrkOffOption must be defined if trkOff messages are being sent.");
-					}
-				}
-				else
-				{
-					if(this.TrkOffOption != TrkOffOption.undefined)
-					{ 
-						Debug.Assert(false, "TrkOffOption must be undefined if no trkOff messages are being sent.");
-					}				
-				}
-				
-				w.WriteAttributeString("trkOff", this.TrkOffOption.ToString());
 			}
 
 			bool isControllingVolume = false;
@@ -97,6 +60,11 @@ namespace Moritz.Spec
 				}
 			}
 
+			if(this.TrkOffOption != TrkOffOption.undefined)
+			{
+				w.WriteAttributeString("trkOff", this.TrkOffOption.ToString());
+			}
+		
 			if(this.PitchWheelOption != ControllerType.undefined)
 			{
 				w.WriteAttributeString("pitchWheel", this.PitchWheelOption.ToString());
@@ -153,11 +121,9 @@ namespace Moritz.Spec
 		/* 
 		 * Default values. These values are not written to score files.
 		 */
-		public TrkMessageType NoteOnTrkMessage = TrkMessageType.trkOn;
-		public TrkMessageType NoteOffTrkMessage = TrkMessageType.trkOff;
-        public TrkVelocityOption TrkVelocityOption = TrkVelocityOption.undefined;
-		public TrkOffOption TrkOffOption = TrkOffOption.stopNow; // must be set if trkOff messages are being sent
-        public ControllerType PressureOption = ControllerType.undefined;
+        public VelocityOption VelocityOption = VelocityOption.undefined;
+		public ControllerType PressureOption = ControllerType.undefined;
+		public TrkOffOption TrkOffOption = TrkOffOption.undefined;
         public ControllerType PitchWheelOption = ControllerType.undefined;
         public ControllerType ModWheelOption = ControllerType.undefined;
         public SpeedOption SpeedOption = SpeedOption.undefined;
@@ -167,17 +133,7 @@ namespace Moritz.Spec
         public int? MaxSpeedPercent = null; // must be set to a value > 100 if the performer is controlling the speed (often set to about 400)
     }
 
-	/// <summary>
-	/// Message types that can be sent to Trks from incoming NoteOns or NoteOffs
-	/// </summary>
-	public enum TrkMessageType
-	{
-		undefined,
-		trkOn,
-		trkOff
-	}
-
-    public enum TrkVelocityOption
+    public enum VelocityOption
     {
         undefined,
         scaled,

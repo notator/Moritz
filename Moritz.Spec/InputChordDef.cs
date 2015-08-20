@@ -24,16 +24,33 @@ namespace Moritz.Spec
         public InputChordDef(int msPosition, int msDuration, List<InputNoteDef> inputNoteDefs)
             : base(msDuration)
         {
+			#region check notated pitches and trkRef positions
 			int pitchBelow = -1;
 			foreach(InputNoteDef ind in inputNoteDefs)
 			{
 				Debug.Assert(ind.NotatedMidiPitch > pitchBelow);
 				pitchBelow = ind.NotatedMidiPitch;
-				foreach(TrkRef trkRef in ind.SeqDef.TrkRefs)
+
+				foreach(SeqDef seqDef in ind.NoteOnSeqDefs)
 				{
-					Debug.Assert(msPosition <= trkRef.TrkMsPosition);
+					foreach(TrkRef trkRef in seqDef.TrkRefs)
+					{ 
+						Debug.Assert(msPosition <= trkRef.TrkMsPosition);
+					}
+				}
+				if(ind.NoteOffSeqDefs != null && ind.NoteOffSeqDefs.Count > 0)
+				{
+					int minSeqPos = msPosition + msDuration;
+					foreach(SeqDef seqDef in ind.NoteOffSeqDefs)
+					{
+						foreach(TrkRef trkRef in seqDef.TrkRefs)
+						{
+							Debug.Assert(minSeqPos <= trkRef.TrkMsPosition);
+						}
+					} 
 				}
 			}
+			#endregion
 
             _msPosition = msPosition;
 			_msDuration = msDuration;
@@ -79,15 +96,15 @@ namespace Moritz.Spec
         {
 			// we are inside a score:inputChord element
 
-			if(_inputControls != null)
-			{
-				_inputControls.WriteSvg(w);
-			}
-
             w.WriteStartElement("score", "inputNotes", null);
 			foreach(InputNoteDef ind in _inputNoteDefs)
 			{
-				ind.WriteSvg(w, _msPosition);
+				ind.WriteSvg(w);
+			}
+
+			if(_inputControls != null)
+			{
+				_inputControls.WriteSvg(w);
 			}
 
             w.WriteEndElement(); // score:inputNotes

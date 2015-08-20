@@ -168,11 +168,20 @@ namespace Moritz.Algorithm.Study3Sketch2
 					TrkRef trkRef = new TrkRef(trkDef, null);
 					List<TrkRef> trkRefs = new List<TrkRef>() { trkRef };
 				
-					SeqDef seqDef = new SeqDef(trkRefs);
+					SeqDef seqDef = new SeqDef(trkRefs, null);
 
 					byte displayPitch = (byte)(mcd.NotatedMidiPitches[0] + 36);
+					List<SeqDef> noteOnSeqDefs = new List<SeqDef>() { seqDef };
+					List<byte> noteOnTrkOffChannels = new List<byte>();
+					List<byte> notePressureChannels = new List<byte>();
+					List<SeqDef> noteOffSeqDefs = new List<SeqDef>();
+					List<byte> noteOffTrkOffChannels = new List<byte>(){trkRef.TrkMidiChannel}; 
 					
-					InputNoteDef inputNoteDef = new InputNoteDef(displayPitch, seqDef, null);
+					InputNoteDef inputNoteDef = new InputNoteDef(displayPitch,
+																	noteOnSeqDefs, noteOnTrkOffChannels,
+																	notePressureChannels,
+																	noteOffSeqDefs, noteOffTrkOffChannels,
+																	null);
 
 					List<InputNoteDef> inputNoteDefs = new List<InputNoteDef>() { inputNoteDef };
                     
@@ -193,12 +202,12 @@ namespace Moritz.Algorithm.Study3Sketch2
 
 			InputControls chordInputControls = new InputControls();
 
-			chordInputControls.TrkVelocityOption = TrkVelocityOption.overridden;
+			chordInputControls.VelocityOption = VelocityOption.overridden;
 			chordInputControls.MinimumVelocity = 19;
 			inputChordDef1.InputControls = chordInputControls;
 
 			InputControls noteInputControls = new InputControls();
-			noteInputControls.TrkVelocityOption = TrkVelocityOption.scaled;
+			noteInputControls.VelocityOption = VelocityOption.scaled;
 			noteInputControls.MinimumVelocity = 20;
 			inputChordDef1.InputNoteDefs[0].InputControls = noteInputControls;
 			 
@@ -271,10 +280,14 @@ namespace Moritz.Algorithm.Study3Sketch2
             int msPos = bar2StartMsPos;
             for(int i = 0; i < bar.Count; ++i)
             {
-				TrkRef trkRef = new TrkRef((byte)i, msPos, 12, null); 
-				List<TrkRef> trkRefs = new List<TrkRef>(){trkRef}; 
-				SeqDef seqDef = new SeqDef(trkRefs);
-				InputNoteDef inputNoteDef = new InputNoteDef((byte)64, seqDef, null);
+				TrkRef trkRef = new TrkRef((byte)i, msPos, 12, null);
+				List<TrkRef> trkRefs = new List<TrkRef>() { trkRef };
+				SeqDef seqDef = new SeqDef(trkRefs, null);
+				List<SeqDef> noteOnSeqDefs = new List<SeqDef>() { seqDef };
+				List<byte> noteOffTrkOffChannels = new List<byte>() { trkRef.TrkMidiChannel };
+
+				InputNoteDef inputNoteDef = new InputNoteDef(64, noteOnSeqDefs, null, noteOffTrkOffChannels, null);
+
 				List<InputNoteDef> inputNoteDefs = new List<InputNoteDef>(){inputNoteDef};
 				InputChordDef inputChordDef = new InputChordDef(msPos, startMsDifference, inputNoteDefs);
                 inputVoiceDef.InsertInRest(inputChordDef);
