@@ -17,13 +17,13 @@ namespace Moritz.Spec
 		internal void WriteSvg(Xml.SvgWriter w)
 		{
 			w.WriteStartElement("seq");
-			foreach(TrkRef trkRef in _trkRefs)
-			{
-				trkRef.WriteSvg(w);
-			}
 			if(_inputControls != null)
 			{
 				_inputControls.WriteSvg(w);
+			}
+			foreach(TrkRef trkRef in _trkRefs)
+			{
+				trkRef.WriteSvg(w);
 			}
 			w.WriteEndElement(); // seq
 		}

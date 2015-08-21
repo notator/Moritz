@@ -97,17 +97,15 @@ namespace Moritz.Spec
 			// we are inside a score:inputChord element
 
             w.WriteStartElement("score", "inputNotes", null);
+			if(_inputControls != null)
+			{
+				_inputControls.WriteSvg(w);
+			}			
 			foreach(InputNoteDef ind in _inputNoteDefs)
 			{
 				ind.WriteSvg(w);
 			}
-
-			if(_inputControls != null)
-			{
-				_inputControls.WriteSvg(w);
-			}
-
-            w.WriteEndElement(); // score:inputNotes
+			w.WriteEndElement(); // score:inputNotes
         }
 
         public override IUniqueDef DeepClone()

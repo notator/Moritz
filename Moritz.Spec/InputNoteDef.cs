@@ -59,6 +59,11 @@ namespace Moritz.Spec
 			w.WriteStartElement("inputNote");
 			w.WriteAttributeString("notatedKey", _notatedMidiPitch.ToString());
 
+			if(InputControls != null)
+			{
+				InputControls.WriteSvg(w);
+			}
+
 			w.WriteStartElement("noteOn");
 			if(NoteOnTrkOffChannels != null && NoteOnTrkOffChannels.Count > 0)
 			{
@@ -98,11 +103,6 @@ namespace Moritz.Spec
 					}
 				}
 				w.WriteEndElement(); // noteOff
-			}
-
-			if(InputControls != null)
-			{
-				InputControls.WriteSvg(w);
 			}
 
 			w.WriteEndElement(); // score:inputNote
