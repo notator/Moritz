@@ -54,8 +54,6 @@ namespace Moritz.Spec
 
 		internal void WriteSvg(SvgWriter w)
 		{
-			Debug.Assert(NoteOnSeqDefs != null && NoteOnSeqDefs.Count > 0);
-
 			w.WriteStartElement("inputNote");
 			w.WriteAttributeString("notatedKey", _notatedMidiPitch.ToString());
 
@@ -64,20 +62,23 @@ namespace Moritz.Spec
 				InputControls.WriteSvg(w);
 			}
 
-			w.WriteStartElement("noteOn");
-			if(NoteOnTrkOffChannels != null && NoteOnTrkOffChannels.Count > 0)
-			{
-				string trkOffs = M.ByteListToString(NoteOnTrkOffChannels);
-				w.WriteAttributeString("trkOffs", trkOffs);
-			}
-			if(NoteOnSeqDefs != null && NoteOnSeqDefs.Count > 0)
-			{
-				foreach(SeqDef seqDef in NoteOnSeqDefs)
+			if((NoteOnSeqDefs != null && NoteOnSeqDefs.Count > 0) || (NoteOnTrkOffChannels != null && NoteOnTrkOffChannels.Count > 0))
+			{ 
+				w.WriteStartElement("noteOn");
+				if(NoteOnTrkOffChannels != null && NoteOnTrkOffChannels.Count > 0)
 				{
-					seqDef.WriteSvg(w);
+					string trkOffs = M.ByteListToString(NoteOnTrkOffChannels);
+					w.WriteAttributeString("trkOffs", trkOffs);
 				}
+				if(NoteOnSeqDefs != null && NoteOnSeqDefs.Count > 0)
+				{
+					foreach(SeqDef seqDef in NoteOnSeqDefs)
+					{
+						seqDef.WriteSvg(w);
+					}
+				}
+				w.WriteEndElement(); // noteOn
 			}
-			w.WriteEndElement(); // noteOn
 
 			if(NotePressureChannels != null && NotePressureChannels.Count > 0)
 			{
@@ -105,7 +106,7 @@ namespace Moritz.Spec
 				w.WriteEndElement(); // noteOff
 			}
 
-			w.WriteEndElement(); // score:inputNote
+			w.WriteEndElement(); // score:inputNote N.B. This element can be empty!
 		}
 
 		public byte NotatedMidiPitch { get { return _notatedMidiPitch; } set {_notatedMidiPitch = M.MidiValue(value); }}

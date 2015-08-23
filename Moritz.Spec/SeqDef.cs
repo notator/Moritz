@@ -21,6 +21,7 @@ namespace Moritz.Spec
 			{
 				_inputControls.WriteSvg(w);
 			}
+			Debug.Assert(_trkRefs != null && _trkRefs.Count > 0);
 			foreach(TrkRef trkRef in _trkRefs)
 			{
 				trkRef.WriteSvg(w);
@@ -29,7 +30,7 @@ namespace Moritz.Spec
 		}
 
 		public List<TrkRef> TrkRefs { get{ return _trkRefs;} }
-		private List<TrkRef> _trkRefs = new List<TrkRef>();
+		private List<TrkRef> _trkRefs = null;
 
 		private InputControls _inputControls;
 
