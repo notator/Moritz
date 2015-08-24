@@ -67,8 +67,8 @@ namespace Moritz.Spec
 				w.WriteStartElement("noteOn");
 				if(NoteOnTrkOffChannels != null && NoteOnTrkOffChannels.Count > 0)
 				{
-					string trkOffs = M.ByteListToString(NoteOnTrkOffChannels);
-					w.WriteAttributeString("trkOffs", trkOffs);
+					string midiChannelOffs = M.ByteListToString(NoteOnTrkOffChannels);
+					w.WriteAttributeString("midiChannelOffs", midiChannelOffs);
 				}
 				if(NoteOnSeqDefs != null && NoteOnSeqDefs.Count > 0)
 				{
@@ -82,9 +82,9 @@ namespace Moritz.Spec
 
 			if(NotePressureChannels != null && NotePressureChannels.Count > 0)
 			{
-				string channels = M.ByteListToString(NotePressureChannels);
+				string midiChannels = M.ByteListToString(NotePressureChannels);
 				w.WriteStartElement("pressure");
-				w.WriteAttributeString("channels", channels);
+				w.WriteAttributeString("midiChannels", midiChannels);
 				w.WriteEndElement();
 			}
 
@@ -93,8 +93,8 @@ namespace Moritz.Spec
 				w.WriteStartElement("noteOff");
 				if(NoteOffTrkOffChannels != null && NoteOffTrkOffChannels.Count > 0)
 				{
-					string trkOffs = M.ByteListToString(NoteOffTrkOffChannels);
-					w.WriteAttributeString("trkOffs", trkOffs);
+					string midiChannelOffs = M.ByteListToString(NoteOffTrkOffChannels);
+					w.WriteAttributeString("midiChannelOffs", midiChannelOffs);
 				}
 				if(NoteOffSeqDefs != null && NoteOffSeqDefs.Count > 0)
 				{
