@@ -165,20 +165,20 @@ namespace Moritz.Algorithm.Study3Sketch2
 					TrkDef trkDef = new TrkDef(bottomOutputVoice.MidiChannel, iuds);
 
 					// If non-null, arg2 overrides the inputControls attached to the InputNote or InputChord.
-					TrkRef trkRef = new TrkRef(trkDef, null);
-					List<TrkRef> trkRefs = new List<TrkRef>() { trkRef };
-				
-					SeqDef seqDef = new SeqDef(trkRefs, null);
+					TrkOn trkRef = new TrkOn(trkDef, null);
+					List<TrkOn> trkRefs = new List<TrkOn>() { trkRef };			
+					TrkOns trkOns = new TrkOns(trkRefs, null);
 
 					byte displayPitch = (byte)(mcd.NotatedMidiPitches[0] + 36);
 					List<byte> notePressureChannels = new List<byte>();
 					TrkOff trkOff = new TrkOff(trkRef.TrkMidiChannel, mcd.MsPosition, null);
 					List<TrkOff> noteOffTrkOffs = new List<TrkOff>() { trkOff }; 
+					TrkOffs trkOffs = new TrkOffs(noteOffTrkOffs, null);
 					
 					InputNoteDef inputNoteDef = new InputNoteDef(displayPitch,
-																	seqDef, null,
+																	trkOns, null,
 																	notePressureChannels,
-																	null, noteOffTrkOffs,
+																	null, trkOffs,
 																	null);
 
 					List<InputNoteDef> inputNoteDefs = new List<InputNoteDef>() { inputNoteDef };
@@ -278,9 +278,9 @@ namespace Moritz.Algorithm.Study3Sketch2
             int msPos = bar2StartMsPos;
             for(int i = 0; i < bar.Count; ++i)
             {
-				TrkRef trkRef = new TrkRef((byte)i, msPos, 12, null);
-				List<TrkRef> trkRefs = new List<TrkRef>() { trkRef };
-				SeqDef seqDef = new SeqDef(trkRefs, null);
+				TrkOn trkRef = new TrkOn((byte)i, msPos, 12, null);
+				List<TrkOn> trkRefs = new List<TrkOn>() { trkRef };
+				TrkOns seqDef = new TrkOns(trkRefs, null);
 
 				InputNoteDef inputNoteDef = new InputNoteDef(64, seqDef, null, null);
 

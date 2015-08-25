@@ -50,8 +50,9 @@
     <Compile Include="ClefChangeDef.cs" />
     <Compile Include="InputNoteDef.cs" />
     <Compile Include="TrkOff.cs" />
-    <Compile Include="SeqDef.cs" />
-    <Compile Include="TrkRef.cs" />
+    <Compile Include="TrkOffs.cs" />
+    <Compile Include="TrkOns.cs" />
+    <Compile Include="TrkOn.cs" />
     <Compile Include="DurationDef.cs" />
     <Compile Include="InputChordDef.cs" />
     <Compile Include="InputControls.cs" />

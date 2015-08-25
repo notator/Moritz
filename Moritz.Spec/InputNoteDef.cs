@@ -24,19 +24,19 @@ namespace Moritz.Spec
 		/// <param name="noteOffTrkOffs">Can be null or empty</param>
 		/// <param name="inputControls">Can be null</param>
 		public InputNoteDef(byte notatedMidiPitch,
-							SeqDef noteOnSeqDef, List<TrkOff> noteOnTrkOffs,
+							TrkOns noteOnSeqDef, TrkOffs noteOnTrkOffs,
 							List<byte> notePressureChannels,
-							SeqDef noteOffSeqDef, List<TrkOff> noteOffTrkOffs,
+							TrkOns noteOffSeqDef, TrkOffs noteOffTrkOffs,
 							InputControls inputControls)
 		{
 			Debug.Assert(notatedMidiPitch >= 0 && notatedMidiPitch <= 127);
 			// If inputControls is null, the higher level inputControls are used.
 
 			NotatedMidiPitch = notatedMidiPitch;
-			NoteOnSeqDef = noteOnSeqDef;
+			NoteOnTrkOns = noteOnSeqDef;
 			NoteOnTrkOffs = noteOnTrkOffs;
 			NotePressureChannels = notePressureChannels;
-			NoteOffSeqDef = noteOffSeqDef; 
+			NoteOffTrkOns = noteOffSeqDef; 
 			NoteOffTrkOffs = noteOffTrkOffs;
 			InputControls = inputControls;	
 		}
@@ -48,14 +48,28 @@ namespace Moritz.Spec
 		/// <param name="noteOnSeqDefs">Must contain at least one SeqDef</param>
 		/// <param name="notePressureChannels">Can be null or empty</param>
 		/// <param name="inputControls">Can be null</param>
-		public InputNoteDef(byte notatedMidiPitch, SeqDef noteOnSeqDef, List<byte> notePressureChannels, InputControls inputControls)
+		public InputNoteDef(byte notatedMidiPitch, TrkOns noteOnSeqDef, List<byte> notePressureChannels, InputControls inputControls)
 			: this(notatedMidiPitch, noteOnSeqDef, null, notePressureChannels, null, null, inputControls)
 		{
 			Debug.Assert(noteOnSeqDef != null);
-			foreach(TrkRef trkRef in NoteOnSeqDef.TrkRefs)
+			List<TrkOff> trkOffs = new List<TrkOff>();
+			foreach(TrkOn trkOn in NoteOnTrkOns)
 			{ 
-				TrkOff trkOff = new TrkOff(trkRef.TrkMidiChannel, trkRef.TrkMsPosition, inputControls);
-				NoteOffTrkOffs = new List<TrkOff>(){trkOff};
+				TrkOff trkOff = new TrkOff(trkOn.TrkMidiChannel, trkOn.TrkMsPosition, inputControls);
+				trkOffs.Add(trkOff);
+			}
+			NoteOffTrkOffs = new TrkOffs(trkOffs, null);
+		}
+
+		private void WriteNoteOnOff(SvgWriter w, TrkOns trkOns, TrkOffs trkOffs)
+		{
+			if(trkOns != null)
+			{
+				trkOns.WriteSvg(w);
+			}
+			if(trkOffs != null)
+			{
+				trkOffs.WriteSvg(w);
 			}
 		}
 
@@ -69,22 +83,10 @@ namespace Moritz.Spec
 				InputControls.WriteSvg(w);
 			}
 
-			if(NoteOnSeqDef != null || (NoteOnTrkOffs != null && NoteOnTrkOffs.Count > 0))
+			if(NoteOnTrkOns != null || NoteOnTrkOffs != null)
 			{ 
 				w.WriteStartElement("noteOn");
-				if(NoteOnTrkOffs != null && NoteOnTrkOffs.Count > 0)
-				{
-					w.WriteStartElement("trkOffs");
-					foreach(TrkOff trkOff in NoteOnTrkOffs)
-					{
-						trkOff.WriteSvg(w);
-					}
-					w.WriteEndElement();
-				}
-				if(NoteOnSeqDef != null)
-				{
-					NoteOnSeqDef.WriteSvg(w);
-				}
+				WriteNoteOnOff(w, NoteOnTrkOns, NoteOnTrkOffs);
 				w.WriteEndElement(); // noteOn
 			}
 
@@ -96,22 +98,10 @@ namespace Moritz.Spec
 				w.WriteEndElement();
 			}
 
-			if(NoteOffSeqDef != null || (NoteOffTrkOffs != null && NoteOffTrkOffs.Count > 0))
+			if(NoteOffTrkOns != null || NoteOffTrkOffs != null)
 			{
 				w.WriteStartElement("noteOff");
-				if(NoteOffTrkOffs != null && NoteOffTrkOffs.Count > 0)
-				{
-					w.WriteStartElement("trkOffs");
-					foreach(TrkOff trkOff in NoteOffTrkOffs)
-					{
-						trkOff.WriteSvg(w);
-					}
-					w.WriteEndElement();
-				}
-				if(NoteOffSeqDef != null)
-				{
-					NoteOffSeqDef.WriteSvg(w);
-				}
+				WriteNoteOnOff(w, NoteOffTrkOns, NoteOffTrkOffs);
 				w.WriteEndElement(); // noteOff
 			}
 
@@ -121,11 +111,11 @@ namespace Moritz.Spec
 		public byte NotatedMidiPitch { get { return _notatedMidiPitch; } set {_notatedMidiPitch = M.MidiValue(value); }}
 		private byte _notatedMidiPitch;
 
-		public SeqDef NoteOnSeqDef = null;
-		public List<TrkOff> NoteOnTrkOffs = null;
+		public TrkOns NoteOnTrkOns = null;
+		public TrkOffs NoteOnTrkOffs = null;
 		public List<byte> NotePressureChannels = null;
-		public SeqDef NoteOffSeqDef = null;
-		public List<TrkOff> NoteOffTrkOffs = null;
+		public TrkOns NoteOffTrkOns = null;
+		public TrkOffs NoteOffTrkOffs = null;
 
 		public InputControls InputControls = null;
 	}
