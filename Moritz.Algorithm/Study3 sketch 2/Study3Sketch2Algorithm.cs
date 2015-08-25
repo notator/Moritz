@@ -171,16 +171,14 @@ namespace Moritz.Algorithm.Study3Sketch2
 					SeqDef seqDef = new SeqDef(trkRefs, null);
 
 					byte displayPitch = (byte)(mcd.NotatedMidiPitches[0] + 36);
-					List<SeqDef> noteOnSeqDefs = new List<SeqDef>() { seqDef };
-					List<byte> noteOnTrkOffChannels = new List<byte>();
 					List<byte> notePressureChannels = new List<byte>();
-					List<SeqDef> noteOffSeqDefs = new List<SeqDef>();
-					List<byte> noteOffTrkOffChannels = new List<byte>(){trkRef.TrkMidiChannel}; 
+					TrkOff trkOff = new TrkOff(trkRef.TrkMidiChannel, mcd.MsPosition, null);
+					List<TrkOff> noteOffTrkOffs = new List<TrkOff>() { trkOff }; 
 					
 					InputNoteDef inputNoteDef = new InputNoteDef(displayPitch,
-																	noteOnSeqDefs, noteOnTrkOffChannels,
+																	seqDef, null,
 																	notePressureChannels,
-																	noteOffSeqDefs, noteOffTrkOffChannels,
+																	null, noteOffTrkOffs,
 																	null);
 
 					List<InputNoteDef> inputNoteDefs = new List<InputNoteDef>() { inputNoteDef };
@@ -283,10 +281,8 @@ namespace Moritz.Algorithm.Study3Sketch2
 				TrkRef trkRef = new TrkRef((byte)i, msPos, 12, null);
 				List<TrkRef> trkRefs = new List<TrkRef>() { trkRef };
 				SeqDef seqDef = new SeqDef(trkRefs, null);
-				List<SeqDef> noteOnSeqDefs = new List<SeqDef>() { seqDef };
-				List<byte> noteOffTrkOffChannels = new List<byte>() { trkRef.TrkMidiChannel };
 
-				InputNoteDef inputNoteDef = new InputNoteDef(64, noteOnSeqDefs, null, noteOffTrkOffChannels, null);
+				InputNoteDef inputNoteDef = new InputNoteDef(64, seqDef, null, null);
 
 				List<InputNoteDef> inputNoteDefs = new List<InputNoteDef>(){inputNoteDef};
 				InputChordDef inputChordDef = new InputChordDef(msPos, startMsDifference, inputNoteDefs);

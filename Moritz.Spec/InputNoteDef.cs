@@ -17,40 +17,47 @@ namespace Moritz.Spec
 		/// 
 		/// </summary>
 		/// <param name="notatedMidiPitch">In range 0..127</param>
-		/// <param name="noteOnSeqDefs">Must contain at least one SeqDef</param>
-		/// <param name="noteOnTrkOffChannels">Can be null or empty</param>
+		/// <param name="noteOnSeqDef">Can be null or empty</param>
+		/// <param name="noteOnTrkOffs">Can be null or empty</param>
 		/// <param name="notePressureChannels">Can be null or empty</param>
-		/// <param name="noteOffSeqDefs">Can be null or empty</param>
-		/// <param name="noteOffTrkOffChannels">Can be null or empty</param>
+		/// <param name="noteOffSeqDef">Can be null or empty</param>
+		/// <param name="noteOffTrkOffs">Can be null or empty</param>
 		/// <param name="inputControls">Can be null</param>
 		public InputNoteDef(byte notatedMidiPitch,
-							List<SeqDef> noteOnSeqDefs, List<byte> noteOnTrkOffChannels,
+							SeqDef noteOnSeqDef, List<TrkOff> noteOnTrkOffs,
 							List<byte> notePressureChannels,
-							List<SeqDef> noteOffSeqDefs, List<byte> noteOffTrkOffChannels,
+							SeqDef noteOffSeqDef, List<TrkOff> noteOffTrkOffs,
 							InputControls inputControls)
 		{
 			Debug.Assert(notatedMidiPitch >= 0 && notatedMidiPitch <= 127);
-			Debug.Assert(noteOnSeqDefs != null && noteOnSeqDefs.Count > 0);
 			// If inputControls is null, the higher level inputControls are used.
 
 			NotatedMidiPitch = notatedMidiPitch;
-			NoteOnSeqDefs = noteOnSeqDefs;
-			NoteOnTrkOffChannels = noteOnTrkOffChannels;
+			NoteOnSeqDef = noteOnSeqDef;
+			NoteOnTrkOffs = noteOnTrkOffs;
 			NotePressureChannels = notePressureChannels;
-			NoteOffSeqDefs = noteOffSeqDefs; 
-			NoteOffTrkOffChannels = noteOffTrkOffChannels;
+			NoteOffSeqDef = noteOffSeqDef; 
+			NoteOffTrkOffs = noteOffTrkOffs;
 			InputControls = inputControls;	
-
 		}
 
+		/// <summary>
+		/// This constructs an InputNoteDef that, when the noteOff arrives, turns off all the trks it has turned on. 
+		/// </summary>
 		/// <param name="notatedMidiPitch">In range 0..127</param>
 		/// <param name="noteOnSeqDefs">Must contain at least one SeqDef</param>
 		/// <param name="notePressureChannels">Can be null or empty</param>
-		/// <param name="noteOffTrkOffChannels">Can be null or empty</param>
 		/// <param name="inputControls">Can be null</param>
-		public InputNoteDef(byte notatedMidiPitch, List<SeqDef> noteOnSeqDefs, List<byte> notePressureChannels, List<byte> noteOffTrkOffChannels, InputControls inputControls)
-			: this(notatedMidiPitch, noteOnSeqDefs, null, notePressureChannels, null, noteOffTrkOffChannels, inputControls)
-		{ }
+		public InputNoteDef(byte notatedMidiPitch, SeqDef noteOnSeqDef, List<byte> notePressureChannels, InputControls inputControls)
+			: this(notatedMidiPitch, noteOnSeqDef, null, notePressureChannels, null, null, inputControls)
+		{
+			Debug.Assert(noteOnSeqDef != null);
+			foreach(TrkRef trkRef in NoteOnSeqDef.TrkRefs)
+			{ 
+				TrkOff trkOff = new TrkOff(trkRef.TrkMidiChannel, trkRef.TrkMsPosition, inputControls);
+				NoteOffTrkOffs = new List<TrkOff>(){trkOff};
+			}
+		}
 
 		internal void WriteSvg(SvgWriter w)
 		{
@@ -62,20 +69,21 @@ namespace Moritz.Spec
 				InputControls.WriteSvg(w);
 			}
 
-			if((NoteOnSeqDefs != null && NoteOnSeqDefs.Count > 0) || (NoteOnTrkOffChannels != null && NoteOnTrkOffChannels.Count > 0))
+			if(NoteOnSeqDef != null || (NoteOnTrkOffs != null && NoteOnTrkOffs.Count > 0))
 			{ 
 				w.WriteStartElement("noteOn");
-				if(NoteOnTrkOffChannels != null && NoteOnTrkOffChannels.Count > 0)
+				if(NoteOnTrkOffs != null && NoteOnTrkOffs.Count > 0)
 				{
-					string midiChannelOffs = M.ByteListToString(NoteOnTrkOffChannels);
-					w.WriteAttributeString("midiChannelOffs", midiChannelOffs);
-				}
-				if(NoteOnSeqDefs != null && NoteOnSeqDefs.Count > 0)
-				{
-					foreach(SeqDef seqDef in NoteOnSeqDefs)
+					w.WriteStartElement("trkOffs");
+					foreach(TrkOff trkOff in NoteOnTrkOffs)
 					{
-						seqDef.WriteSvg(w);
+						trkOff.WriteSvg(w);
 					}
+					w.WriteEndElement();
+				}
+				if(NoteOnSeqDef != null)
+				{
+					NoteOnSeqDef.WriteSvg(w);
 				}
 				w.WriteEndElement(); // noteOn
 			}
@@ -88,20 +96,21 @@ namespace Moritz.Spec
 				w.WriteEndElement();
 			}
 
-			if((NoteOffSeqDefs != null && NoteOffSeqDefs.Count > 0) || (NoteOffTrkOffChannels != null && NoteOffTrkOffChannels.Count > 0))
+			if(NoteOffSeqDef != null || (NoteOffTrkOffs != null && NoteOffTrkOffs.Count > 0))
 			{
 				w.WriteStartElement("noteOff");
-				if(NoteOffTrkOffChannels != null && NoteOffTrkOffChannels.Count > 0)
+				if(NoteOffTrkOffs != null && NoteOffTrkOffs.Count > 0)
 				{
-					string midiChannelOffs = M.ByteListToString(NoteOffTrkOffChannels);
-					w.WriteAttributeString("midiChannelOffs", midiChannelOffs);
-				}
-				if(NoteOffSeqDefs != null && NoteOffSeqDefs.Count > 0)
-				{
-					foreach(SeqDef seqDef in NoteOffSeqDefs)
+					w.WriteStartElement("trkOffs");
+					foreach(TrkOff trkOff in NoteOffTrkOffs)
 					{
-						seqDef.WriteSvg(w);
+						trkOff.WriteSvg(w);
 					}
+					w.WriteEndElement();
+				}
+				if(NoteOffSeqDef != null)
+				{
+					NoteOffSeqDef.WriteSvg(w);
 				}
 				w.WriteEndElement(); // noteOff
 			}
@@ -112,11 +121,11 @@ namespace Moritz.Spec
 		public byte NotatedMidiPitch { get { return _notatedMidiPitch; } set {_notatedMidiPitch = M.MidiValue(value); }}
 		private byte _notatedMidiPitch;
 
-		public List<SeqDef> NoteOnSeqDefs = null;
-		public List<byte> NoteOnTrkOffChannels = null;
+		public SeqDef NoteOnSeqDef = null;
+		public List<TrkOff> NoteOnTrkOffs = null;
 		public List<byte> NotePressureChannels = null;
-		public List<SeqDef> NoteOffSeqDefs = null;
-		public List<byte> NoteOffTrkOffChannels = null;
+		public SeqDef NoteOffSeqDef = null;
+		public List<TrkOff> NoteOffTrkOffs = null;
 
 		public InputControls InputControls = null;
 	}

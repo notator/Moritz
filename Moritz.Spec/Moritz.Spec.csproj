@@ -49,6 +49,7 @@
     <Compile Include="CautionaryChordDef.cs" />
     <Compile Include="ClefChangeDef.cs" />
     <Compile Include="InputNoteDef.cs" />
+    <Compile Include="TrkOff.cs" />
     <Compile Include="SeqDef.cs" />
     <Compile Include="TrkRef.cs" />
     <Compile Include="DurationDef.cs" />

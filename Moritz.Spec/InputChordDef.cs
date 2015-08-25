@@ -19,7 +19,7 @@ namespace Moritz.Spec
     {
         /// <summary>
         /// Constructs a multi-note chord, each inputNoteDef has a notated pitch and a SeqDef.
-		/// The inputNoteDefs must be in order of their notated pitches.
+		/// The inputNoteDefs must be in order of their notated pitches (bottom to top).
         /// </summary>
         public InputChordDef(int msPosition, int msDuration, List<InputNoteDef> inputNoteDefs)
             : base(msDuration)
@@ -31,23 +31,20 @@ namespace Moritz.Spec
 				Debug.Assert(ind.NotatedMidiPitch > pitchBelow);
 				pitchBelow = ind.NotatedMidiPitch;
 
-				foreach(SeqDef seqDef in ind.NoteOnSeqDefs)
+				if(ind.NoteOnSeqDef != null)
 				{
-					foreach(TrkRef trkRef in seqDef.TrkRefs)
+					foreach(TrkRef trkRef in ind.NoteOnSeqDef.TrkRefs)
 					{ 
 						Debug.Assert(msPosition <= trkRef.TrkMsPosition);
 					}
 				}
-				if(ind.NoteOffSeqDefs != null && ind.NoteOffSeqDefs.Count > 0)
+				if(ind.NoteOffSeqDef != null)
 				{
 					int minSeqPos = msPosition + msDuration;
-					foreach(SeqDef seqDef in ind.NoteOffSeqDefs)
+					foreach(TrkRef trkRef in ind.NoteOffSeqDef.TrkRefs)
 					{
-						foreach(TrkRef trkRef in seqDef.TrkRefs)
-						{
-							Debug.Assert(minSeqPos <= trkRef.TrkMsPosition);
-						}
-					} 
+						Debug.Assert(minSeqPos <= trkRef.TrkMsPosition);
+					}
 				}
 			}
 			#endregion
