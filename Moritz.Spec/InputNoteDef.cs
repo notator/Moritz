@@ -17,26 +17,26 @@ namespace Moritz.Spec
 		/// 
 		/// </summary>
 		/// <param name="notatedMidiPitch">In range 0..127</param>
-		/// <param name="noteOnSeqDef">Can be null or empty</param>
+		/// <param name="noteOnTrkOns">Can be null or empty</param>
 		/// <param name="noteOnTrkOffs">Can be null or empty</param>
-		/// <param name="notePressureChannels">Can be null or empty</param>
-		/// <param name="noteOffSeqDef">Can be null or empty</param>
+		/// <param name="pressures">Can be null or empty</param>
+		/// <param name="noteOffTrkOns">Can be null or empty</param>
 		/// <param name="noteOffTrkOffs">Can be null or empty</param>
 		/// <param name="inputControls">Can be null</param>
 		public InputNoteDef(byte notatedMidiPitch,
-							TrkOns noteOnSeqDef, TrkOffs noteOnTrkOffs,
-							List<byte> notePressureChannels,
-							TrkOns noteOffSeqDef, TrkOffs noteOffTrkOffs,
+							TrkOns noteOnTrkOns, TrkOffs noteOnTrkOffs,
+							Pressures pressures,
+							TrkOns noteOffTrkOns, TrkOffs noteOffTrkOffs,
 							InputControls inputControls)
 		{
 			Debug.Assert(notatedMidiPitch >= 0 && notatedMidiPitch <= 127);
 			// If inputControls is null, the higher level inputControls are used.
 
 			NotatedMidiPitch = notatedMidiPitch;
-			NoteOnTrkOns = noteOnSeqDef;
+			NoteOnTrkOns = noteOnTrkOns;
 			NoteOnTrkOffs = noteOnTrkOffs;
-			NotePressureChannels = notePressureChannels;
-			NoteOffTrkOns = noteOffSeqDef; 
+			NotePressures = pressures;
+			NoteOffTrkOns = noteOffTrkOns; 
 			NoteOffTrkOffs = noteOffTrkOffs;
 			InputControls = inputControls;	
 		}
@@ -46,10 +46,10 @@ namespace Moritz.Spec
 		/// </summary>
 		/// <param name="notatedMidiPitch">In range 0..127</param>
 		/// <param name="noteOnSeqDefs">Must contain at least one SeqDef</param>
-		/// <param name="notePressureChannels">Can be null or empty</param>
+		/// <param name="pressures">Can be null or empty</param>
 		/// <param name="inputControls">Can be null</param>
-		public InputNoteDef(byte notatedMidiPitch, TrkOns noteOnSeqDef, List<byte> notePressureChannels, InputControls inputControls)
-			: this(notatedMidiPitch, noteOnSeqDef, null, notePressureChannels, null, null, inputControls)
+		public InputNoteDef(byte notatedMidiPitch, TrkOns noteOnSeqDef, Pressures pressures, InputControls inputControls)
+			: this(notatedMidiPitch, noteOnSeqDef, null, pressures, null, null, inputControls)
 		{
 			Debug.Assert(noteOnSeqDef != null);
 			List<TrkOff> trkOffs = new List<TrkOff>();
@@ -90,12 +90,9 @@ namespace Moritz.Spec
 				w.WriteEndElement(); // noteOn
 			}
 
-			if(NotePressureChannels != null && NotePressureChannels.Count > 0)
+			if(NotePressures != null)
 			{
-				string midiChannels = M.ByteListToString(NotePressureChannels);
-				w.WriteStartElement("pressure");
-				w.WriteAttributeString("midiChannels", midiChannels);
-				w.WriteEndElement();
+				NotePressures.WriteSvg(w);
 			}
 
 			if(NoteOffTrkOns != null || NoteOffTrkOffs != null)
@@ -113,7 +110,7 @@ namespace Moritz.Spec
 
 		public TrkOns NoteOnTrkOns = null;
 		public TrkOffs NoteOnTrkOffs = null;
-		public List<byte> NotePressureChannels = null;
+		public Pressures NotePressures = null;
 		public TrkOns NoteOffTrkOns = null;
 		public TrkOffs NoteOffTrkOffs = null;
 

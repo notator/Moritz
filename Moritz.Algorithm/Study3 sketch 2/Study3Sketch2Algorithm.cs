@@ -170,14 +170,15 @@ namespace Moritz.Algorithm.Study3Sketch2
 					TrkOns trkOns = new TrkOns(trkRefs, null);
 
 					byte displayPitch = (byte)(mcd.NotatedMidiPitches[0] + 36);
-					List<byte> notePressureChannels = new List<byte>();
+					Pressure pressure = new Pressure(0, null);
+					Pressures pressures = new Pressures(new List<Pressure>() {pressure}, null);
 					TrkOff trkOff = new TrkOff(trkRef.TrkMidiChannel, mcd.MsPosition, null);
 					List<TrkOff> noteOffTrkOffs = new List<TrkOff>() { trkOff }; 
 					TrkOffs trkOffs = new TrkOffs(noteOffTrkOffs, null);
 					
 					InputNoteDef inputNoteDef = new InputNoteDef(displayPitch,
 																	trkOns, null,
-																	notePressureChannels,
+																	pressures,
 																	null, trkOffs,
 																	null);
 

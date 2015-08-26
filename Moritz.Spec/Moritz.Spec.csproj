@@ -49,7 +49,9 @@
     <Compile Include="CautionaryChordDef.cs" />
     <Compile Include="ClefChangeDef.cs" />
     <Compile Include="InputNoteDef.cs" />
+    <Compile Include="Pressure.cs" />
     <Compile Include="TrkOff.cs" />
+    <Compile Include="Pressures.cs" />
     <Compile Include="TrkOffs.cs" />
     <Compile Include="TrkOns.cs" />
     <Compile Include="TrkOn.cs" />
