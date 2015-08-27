@@ -17,4 +17,4 @@ Anyone is welcome to dive into and use any of my code in any way they like, but 
 December 2014<br />
 James Ingram
 
-[1] The [Assistant Performer](http://james-ingram-act-two.de/open-source/publicAssistantPerformer/aboutAssistantPerformer.html) is itself no longer part of Moritz. It is now a separate [open-source project](https://github.com/notator/assistant-performer), written in Javascript. I have not yet begun to implement the "advanced prepared piano" scenario, but that is the next project on my agenda &mdash; when the Assistant Composer's documentation is complete.
+[1] The [Assistant Performer](http://james-ingram-act-two.de/open-source/aboutAssistantPerformer.html) is itself no longer part of Moritz. It is now a separate [open-source project](https://github.com/notator/assistant-performer), written in Javascript. I have not yet begun to implement the "advanced prepared piano" scenario, but that is the next project on my agenda &mdash; when the Assistant Composer's documentation is complete.
