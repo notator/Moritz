@@ -9,14 +9,14 @@ namespace Moritz.Spec
     /// Subject to the message types defined in inputNotes,
 	/// This object defines how Trks react to incoming performed information.
 	/// 
-	/// An inputControls element can be contained in the following elements in score files:
+	/// An trkOptions element can be contained in the following elements in score files:
 	///		inputChord (which contains a list of inputNotes)
 	///		inputNote (which contains a list of trkRefs)
 	///		trkRef
 	///		
-	/// See http://james-ingram-act-two.de/open-source/svgScoreExtensions.html for details as to how these inputControls are used.
+	/// See http://james-ingram-act-two.de/open-source/svgScoreExtensions.html for details as to how these trkOptions are used.
 	/// 	
-    /// The values these options can take in the InputControls are defined in enums in this namespace.
+    /// The values these options can take in the TrkOptions are defined in enums in this namespace.
     /// The default options (which are not written to score files) are:
 	///     velocity="undefined" -- input midi velocities are ignored (the score uses its own, default velocities)
 	///     pressure="undefined" -- input channelPressure/aftertouch information is ignored.
@@ -25,17 +25,17 @@ namespace Moritz.Spec
     ///     modulation="undefined" -- input modulation wheel information is ignored.
     ///     speedOption="undefined" -- the default durations (set in the score) are used. 
 	/// 
-	/// In the AssistantPerformer, new InputControls objects should be empty -- contain no defined members.
+	/// In the AssistantPerformer, new TrkOptions objects should be empty -- contain no defined members.
     /// </summary>
-    public class InputControls
+    public class TrkOptions
     {
-        public InputControls()
+        public TrkOptions()
         {
         }
 
         public void WriteSvg(SvgWriter w)
         {
-            w.WriteStartElement("inputControls");
+            w.WriteStartElement("trkOptions");
 			
 			if(this.VelocityOption != VelocityOption.undefined)
 			{
@@ -98,7 +98,7 @@ namespace Moritz.Spec
 				w.WriteAttributeString("maxSpeedPercent", this.MaxSpeedPercent.ToString());
 			}
 
-            w.WriteEndElement(); // score:inputControls
+            w.WriteEndElement(); // score:trkOptions
         }
 
         private void WriteMaxMinVolume(SvgWriter w)

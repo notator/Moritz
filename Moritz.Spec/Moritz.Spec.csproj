@@ -57,7 +57,7 @@
     <Compile Include="TrkOn.cs" />
     <Compile Include="DurationDef.cs" />
     <Compile Include="InputChordDef.cs" />
-    <Compile Include="InputControls.cs" />
+    <Compile Include="TrkOptions.cs" />
     <Compile Include="InputVoiceDef.cs" />
     <Compile Include="IUniqueChordDef.cs" />
     <Compile Include="IUniqueDef.cs" />

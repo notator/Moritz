@@ -31,7 +31,7 @@ namespace Moritz.Composer
             }
             if(string.IsNullOrEmpty(errorString))
             {
-                errorString = CheckInputControlsDef(voiceDefsPerSystemPerBar);
+                errorString = CheckTrkOptionsDef(voiceDefsPerSystemPerBar);
             }
             if(!string.IsNullOrEmpty(errorString))
             {
@@ -104,7 +104,7 @@ namespace Moritz.Composer
             return nInputVoices;
         }
 
-        private string CheckInputControlsDef(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
+        private string CheckTrkOptionsDef(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
         {
             string errorString = null;
             List<TrkDef> trkDefs = new List<TrkDef>();

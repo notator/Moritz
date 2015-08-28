@@ -10,23 +10,23 @@ namespace Moritz.Spec
 		/// <param name="trkDef">The target trk's midi channel</param>
 		/// <param name="trkStartPosition">The target trk's startMsPosition</param>
 		/// <param name="trkNumMidiObjects">The number of MidiChordDefs and RestDefs in the target trk.</param>
-		/// <param name="inputControls">If non-null, this inputControls overrrides the InputControls in the InputNote or InputChord</param>
-		public TrkOn(byte trkMidiChannel, int trkStartPosition, int trkNumMidiObjects, InputControls inputControls)
+		/// <param name="trkOptions">If non-null, this trkOptions overrrides the TrkOptions in the InputNote or InputChord</param>
+		public TrkOn(byte trkMidiChannel, int trkStartPosition, int trkNumMidiObjects, TrkOptions trkOptions)
 		{
 			_trkMidiChannel = trkMidiChannel;
 			_trkMsPosition = trkStartPosition;
 			_trkNumMidiObjects = trkNumMidiObjects;
-			_inputControls = inputControls;
+			_trkOptions = trkOptions;
 		}
 
 		/// <param name="trkDef">The target trk</param>
-		/// <param name="inputControls">If non-null, this inputControls overrrides the InputControls in the InputNote or InputChord</param>
-		public TrkOn(TrkDef trkDef, InputControls inputControls)
+		/// <param name="trkOptions">If non-null, this trkOptions overrrides the TrkOptions in the InputNote or InputChord</param>
+		public TrkOn(TrkDef trkDef, TrkOptions trkOptions)
 		{
 			_trkMidiChannel = trkDef.MidiChannel;
 			_trkMsPosition = trkDef.StartMsPosition;
 			_trkNumMidiObjects = trkDef.DurationsCount; // includes MidiChordDef, RestDef
-			_inputControls = inputControls;
+			_trkOptions = trkOptions;
 		}
 
         internal void WriteSvg(SvgWriter w)
@@ -35,9 +35,9 @@ namespace Moritz.Spec
 			w.WriteAttributeString("midiChannel", _trkMidiChannel.ToString());
 			w.WriteAttributeString("msPosition", _trkMsPosition.ToString());
 			w.WriteAttributeString("nMidiObjects", _trkNumMidiObjects.ToString());
-			if(_inputControls != null)
+			if(_trkOptions != null)
 			{
-				_inputControls.WriteSvg(w);
+				_trkOptions.WriteSvg(w);
 			}
             w.WriteEndElement(); // trkOn
         }
@@ -49,6 +49,6 @@ namespace Moritz.Spec
         private int _trkMsPosition;
 
 		private int _trkNumMidiObjects;
-		private InputControls _inputControls;
+		private TrkOptions _trkOptions;
 	}
 }

@@ -8,20 +8,20 @@ namespace Moritz.Spec
 	public class TrkOffs : IEnumerable
 	{
 		/// <param name="trkOffs"></param>
-		/// <param name="inputControls">Can be null</param>
-		public TrkOffs(List<TrkOff> trkOffs, InputControls inputControls)
+		/// <param name="trkOptions">Can be null</param>
+		public TrkOffs(List<TrkOff> trkOffs, TrkOptions trkOptions)
 		{
 			Debug.Assert(trkOffs != null && trkOffs.Count > 0);
-			_inputControls = inputControls;
+			_trkOptions = trkOptions;
 			_trkOffs = trkOffs;
 		}
 
 		internal void WriteSvg(Xml.SvgWriter w)
 		{
 			w.WriteStartElement("trkOffs");
-			if(_inputControls != null)
+			if(_trkOptions != null)
 			{
-				_inputControls.WriteSvg(w);
+				_trkOptions.WriteSvg(w);
 			}
 			Debug.Assert(_trkOffs != null && _trkOffs.Count > 0);
 			foreach(TrkOff trkOff in _trkOffs)
@@ -84,7 +84,7 @@ namespace Moritz.Spec
 		//public List<TrkOff> TrkOffs { get{ return _trkOffs;} }
 		private List<TrkOff> _trkOffs = null;
 
-		private InputControls _inputControls;
+		private TrkOptions _trkOptions;
 
 	}
 }

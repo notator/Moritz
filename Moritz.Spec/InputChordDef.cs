@@ -54,7 +54,7 @@ namespace Moritz.Spec
 			_msDuration = msDuration;
 			_inputNoteDefs = inputNoteDefs;
 			_lyric = null;
-			_inputControls = null;
+			_trkOptions = null;
 			_msDurationToNextBarline = null;
         }
 
@@ -95,9 +95,9 @@ namespace Moritz.Spec
 			// we are inside a score:inputChord element
 
             w.WriteStartElement("score", "inputNotes", null);
-			if(_inputControls != null)
+			if(_trkOptions != null)
 			{
-				_inputControls.WriteSvg(w);
+				_trkOptions.WriteSvg(w);
 			}			
 			foreach(InputNoteDef ind in _inputNoteDefs)
 			{
@@ -117,8 +117,8 @@ namespace Moritz.Spec
 		public string Lyric { get { return _lyric; } set { _lyric = value; } }
 		private string _lyric = null;
 
-		public InputControls InputControls { get { return _inputControls; } set { _inputControls = value; } }
-		private InputControls _inputControls = null;
+		public TrkOptions TrkOptions { get { return _trkOptions; } set { _trkOptions = value; } }
+		private TrkOptions _trkOptions = null;
 
 		public List<InputNoteDef> InputNoteDefs { get {return _inputNoteDefs; }}
 		private List<InputNoteDef> _inputNoteDefs = new List<InputNoteDef>();

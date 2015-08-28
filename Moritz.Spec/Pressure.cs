@@ -6,25 +6,25 @@ namespace Moritz.Spec
 	public class Pressure
 	{
 		/// <param name="midiChannel">The midi channel of the Track to be sent a pressure message</param>
-		/// <param name="inputControls">Can be null</param>
-		public Pressure(byte midiChannel, InputControls inputControls)
+		/// <param name="trkOptions">Can be null</param>
+		public Pressure(byte midiChannel, TrkOptions trkOptions)
 		{
 			_midiChannel = midiChannel;
-			_inputControls = inputControls;
+			_trkOptions = trkOptions;
 		}
 
 		internal void WriteSvg(Xml.SvgWriter w)
 		{
 			w.WriteStartElement("pressure");
 			w.WriteAttributeString("midiChannel", _midiChannel.ToString());
-			if(_inputControls != null)
+			if(_trkOptions != null)
 			{
-				_inputControls.WriteSvg(w);
+				_trkOptions.WriteSvg(w);
 			}
 			w.WriteEndElement(); // trkOff
 		}
 
 		private byte _midiChannel;
-		private InputControls _inputControls;
+		private TrkOptions _trkOptions;
 	}
 }

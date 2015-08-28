@@ -8,20 +8,20 @@ namespace Moritz.Spec
 	public class Pressures : IEnumerable
 	{
 		/// <param name="pressures"></param>
-		/// <param name="inputControls">Can be null</param>
-		public Pressures(List<Pressure> pressures, InputControls inputControls)
+		/// <param name="trkOptions">Can be null</param>
+		public Pressures(List<Pressure> pressures, TrkOptions trkOptions)
 		{
 			Debug.Assert(pressures != null && pressures.Count > 0);
-			_inputControls = inputControls;
+			_trkOptions = trkOptions;
 			_pressures = pressures;
 		}
 
 		internal void WriteSvg(Xml.SvgWriter w)
 		{
 			w.WriteStartElement("pressures");
-			if(_inputControls != null)
+			if(_trkOptions != null)
 			{
-				_inputControls.WriteSvg(w);
+				_trkOptions.WriteSvg(w);
 			}
 			Debug.Assert(_pressures != null && _pressures.Count > 0);
 			foreach(Pressure pressure in _pressures)
@@ -84,7 +84,7 @@ namespace Moritz.Spec
 		//public List<Pressure> Pressures { get{ return _pressures;} }
 		private List<Pressure> _pressures = null;
 
-		private InputControls _inputControls;
+		private TrkOptions _trkOptions;
 
 	}
 }

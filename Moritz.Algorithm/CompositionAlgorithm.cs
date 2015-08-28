@@ -121,8 +121,8 @@ namespace Moritz.Algorithm
         /// MidiChannelIndexPerOutputVoice and NumberOfInputVoices properties (see above).
         /// For convenience in the Assistant Composer, the number of bars is also returned (in the
         /// NumberOfBars property).
-        /// If one or more InputVoices are defined, then an InputControls object must be created, given
-        /// default values, and assigned to this.InputControls (see below).
+        /// If one or more InputVoices are defined, then an TrkOptions object must be created, given
+        /// default values, and assigned to this.TrkOptions (see below).
         /// 
         /// A note about voiceIDs and midi channels in scores:
         /// The Assistant Composer allocates the voiceIDs saved in the score automatically when the score is 

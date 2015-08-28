@@ -90,25 +90,25 @@ namespace Moritz.Algorithm.Study3Sketch2
 
         private void SetBar2NoteOnNoteOffControls(List<InputChordDef> bar2InputChordDefs)
         {
-			InputControls ics1 = new InputControls();
+			TrkOptions ics1 = new TrkOptions();
 			ics1.TrkOffOption = TrkOffOption.stopChord;
-			bar2InputChordDefs[0].InputNoteDefs[0].InputControls = ics1;
+			bar2InputChordDefs[0].InputNoteDefs[0].TrkOptions = ics1;
 
-			InputControls ics2 = new InputControls();
+			TrkOptions ics2 = new TrkOptions();
 			ics2.TrkOffOption = TrkOffOption.fade;
-			bar2InputChordDefs[1].InputNoteDefs[0].InputControls = ics2;
+			bar2InputChordDefs[1].InputNoteDefs[0].TrkOptions = ics2;
         }
 
         private void SetBar3PitchWheelToVolumeControls(List<InputChordDef> bar3InputChordDefs)
         {
             foreach(InputChordDef inputChordDef in bar3InputChordDefs)
             {
-                InputControls ics = new InputControls();				
+                TrkOptions ics = new TrkOptions();				
                 ics.TrkOffOption = TrkOffOption.fade; // this is the current value in the voice (has no effect)
                 ics.PitchWheelOption = ControllerType.volume;
                 ics.MaximumVolume = 100;
                 ics.MinimumVolume = 50;
-				inputChordDef.InputNoteDefs[0].InputControls = ics;
+				inputChordDef.InputNoteDefs[0].TrkOptions = ics;
             }
         }
 
@@ -116,10 +116,10 @@ namespace Moritz.Algorithm.Study3Sketch2
         {
             foreach(InputChordDef inputChordDef in bar4InputChordDefs)
             {
-                InputControls ics = new InputControls();
+                TrkOptions ics = new TrkOptions();
                 ics.TrkOffOption = TrkOffOption.fade;
                 ics.PitchWheelOption = ControllerType.pitchWheel;
-				inputChordDef.InputNoteDefs[0].InputControls = ics;
+				inputChordDef.InputNoteDefs[0].TrkOptions = ics;
             }
         }
 
@@ -127,12 +127,12 @@ namespace Moritz.Algorithm.Study3Sketch2
         {
             foreach(InputChordDef inputChordDef in bar5InputChordDefs)
             {
-                InputControls ics = new InputControls();
+                TrkOptions ics = new TrkOptions();
 
                 ics.PitchWheelOption = ControllerType.pitchWheel; // this is the current value in the voice (has no effect)
                 ics.SpeedOption = SpeedOption.noteOnKey;
                 ics.MaxSpeedPercent = 500;
-				inputChordDef.InputNoteDefs[0].InputControls = ics;
+				inputChordDef.InputNoteDefs[0].TrkOptions = ics;
             }
         }
         #region CreateBar1()
@@ -164,7 +164,7 @@ namespace Moritz.Algorithm.Study3Sketch2
 					// which may be greater than the InputChordDef's msPosition
 					TrkDef trkDef = new TrkDef(bottomOutputVoice.MidiChannel, iuds);
 
-					// If non-null, arg2 overrides the inputControls attached to the InputNote or InputChord.
+					// If non-null, arg2 overrides the trkOptions attached to the InputNote or InputChord.
 					TrkOn trkRef = new TrkOn(trkDef, null);
 					List<TrkOn> trkRefs = new List<TrkOn>() { trkRef };			
 					TrkOns trkOns = new TrkOns(trkRefs, null);
@@ -196,19 +196,19 @@ namespace Moritz.Algorithm.Study3Sketch2
                 }
             }
 
-			#region set cascading inputControls on the first InputChordDef  (for testing)
+			#region set cascading trkOptions on the first InputChordDef  (for testing)
 			InputChordDef inputChordDef1 = inputVoiceDef.UniqueDefs[0] as InputChordDef; // no need to check for null here.
 
-			InputControls chordInputControls = new InputControls();
+			TrkOptions chordTrkOptions = new TrkOptions();
 
-			chordInputControls.VelocityOption = VelocityOption.overridden;
-			chordInputControls.MinimumVelocity = 19;
-			inputChordDef1.InputControls = chordInputControls;
+			chordTrkOptions.VelocityOption = VelocityOption.overridden;
+			chordTrkOptions.MinimumVelocity = 19;
+			inputChordDef1.TrkOptions = chordTrkOptions;
 
-			InputControls noteInputControls = new InputControls();
-			noteInputControls.VelocityOption = VelocityOption.scaled;
-			noteInputControls.MinimumVelocity = 20;
-			inputChordDef1.InputNoteDefs[0].InputControls = noteInputControls;
+			TrkOptions noteTrkOptions = new TrkOptions();
+			noteTrkOptions.VelocityOption = VelocityOption.scaled;
+			noteTrkOptions.MinimumVelocity = 20;
+			inputChordDef1.InputNoteDefs[0].TrkOptions = noteTrkOptions;
 			 
 			#endregion
 				 
