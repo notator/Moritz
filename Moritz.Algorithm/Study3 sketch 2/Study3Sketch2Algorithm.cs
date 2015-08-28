@@ -105,7 +105,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             {
                 TrkOptions ics = new TrkOptions();				
                 ics.TrkOffOption = TrkOffOption.fade; // this is the current value in the voice (has no effect)
-                ics.PitchWheelOption = ControllerType.volume;
+                ics.PitchWheelDeviationOption = 5;
                 ics.MaximumVolume = 100;
                 ics.MinimumVolume = 50;
 				inputChordDef.InputNoteDefs[0].TrkOptions = ics;
@@ -118,7 +118,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             {
                 TrkOptions ics = new TrkOptions();
                 ics.TrkOffOption = TrkOffOption.fade;
-                ics.PitchWheelOption = ControllerType.pitchWheel;
+                ics.PitchWheelDeviationOption = 6;
 				inputChordDef.InputNoteDefs[0].TrkOptions = ics;
             }
         }
@@ -127,12 +127,11 @@ namespace Moritz.Algorithm.Study3Sketch2
         {
             foreach(InputChordDef inputChordDef in bar5InputChordDefs)
             {
-                TrkOptions ics = new TrkOptions();
+                TrkOptions tOpts = new TrkOptions();
 
-                ics.PitchWheelOption = ControllerType.pitchWheel; // this is the current value in the voice (has no effect)
-                ics.SpeedOption = SpeedOption.noteOnKey;
-                ics.MaxSpeedPercent = 500;
-				inputChordDef.InputNoteDefs[0].TrkOptions = ics;
+                tOpts.PitchWheelOption = PitchWheelOption.speed;
+				tOpts.SpeedDeviationOption = 2.2F;
+				inputChordDef.InputNoteDefs[0].TrkOptions = tOpts;
             }
         }
         #region CreateBar1()

@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 
+using Moritz.Globals;
 using Moritz.Xml;
 
 namespace Moritz.Spec
@@ -37,65 +38,65 @@ namespace Moritz.Spec
         {
             w.WriteStartElement("trkOptions");
 			
-			if(this.VelocityOption != VelocityOption.undefined)
+			if(VelocityOption != VelocityOption.undefined)
 			{
-				if(this.MinimumVelocity == null || MinimumVelocity < 1 || MinimumVelocity > 127)
+				if(MinimumVelocity == null || MinimumVelocity < 1 || MinimumVelocity > 127)
 				{
 					Debug.Assert(false,
 						"If the VelocityOption is being used, then\n" +
 						"MinimumVelocity must be set to a value in range [1..127]");
 				}
-				w.WriteAttributeString("velocity", this.VelocityOption.ToString());
-				w.WriteAttributeString("minVelocity", this.MinimumVelocity.ToString());		
+				w.WriteAttributeString("velocity", VelocityOption.ToString());
+				w.WriteAttributeString("minVelocity", MinimumVelocity.ToString());		
 			}
 
 			bool isControllingVolume = false;
-			if(this.PressureOption != ControllerType.undefined)
+			if(PressureOption != ControllerType.undefined)
 			{
-				w.WriteAttributeString("pressure", this.PressureOption.ToString());
-				if(this.PressureOption == ControllerType.volume)
+				w.WriteAttributeString("pressure", PressureOption.ToString());
+				if(PressureOption == ControllerType.volume)
 				{
 					WriteMaxMinVolume(w);
 					isControllingVolume = true;
 				}
 			}
 
-			if(this.TrkOffOption != TrkOffOption.undefined)
+			if(TrkOffOption != TrkOffOption.undefined)
 			{
-				w.WriteAttributeString("trkOff", this.TrkOffOption.ToString());
+				w.WriteAttributeString("trkOff", TrkOffOption.ToString());
 			}
-		
-			if(this.PitchWheelOption != ControllerType.undefined)
+
+			if(PitchWheelOption != PitchWheelOption.undefined)
 			{
-				w.WriteAttributeString("pitchWheel", this.PitchWheelOption.ToString());
-				if(this.PitchWheelOption == ControllerType.volume)
+				w.WriteAttributeString("pitchWheel", PitchWheelOption.ToString());
+			}
+
+			if(PitchWheelDeviationOption != null)
+			{
+				//(range 0..127)
+				Debug.Assert(PitchWheelDeviationOption >= 0 && PitchWheelDeviationOption <= 127);
+				w.WriteAttributeString("pitchWheelDeviation", PitchWheelDeviationOption.ToString());
+			}
+			if(SpeedDeviationOption != null)
+			{
+				w.WriteAttributeString("speedDeviation", ((float)SpeedDeviationOption).ToString(M.En_USNumberFormat));
+			}
+			if(PanOriginOption != null)
+			{
+				//(range 0..127, centre is 64)
+				Debug.Assert(PanOriginOption >= 0 && PanOriginOption <= 127);
+				w.WriteAttributeString("panOrigin", PanOriginOption.ToString());
+			}
+
+			if(ModWheelOption != ControllerType.undefined)
+			{
+				w.WriteAttributeString("modulation", ModWheelOption.ToString());
+				if(ModWheelOption == ControllerType.volume)
 				{
 					Debug.Assert(isControllingVolume == false);
 					WriteMaxMinVolume(w);
 					isControllingVolume = true;
 				}
-			}
-
-			if(this.ModWheelOption != ControllerType.undefined)
-			{
-				w.WriteAttributeString("modulation", this.ModWheelOption.ToString());
-				if(this.ModWheelOption == ControllerType.volume)
-				{
-					Debug.Assert(isControllingVolume == false);
-					WriteMaxMinVolume(w);
-					isControllingVolume = true;
-				}
-			}
-
-			if(this.SpeedOption != SpeedOption.undefined)
-			{
-				if(MaxSpeedPercent == null || MaxSpeedPercent < 100)
-				{
-					Debug.Assert(false,
-						"If the SpeedOption is set, then MaxSpeedPercent must be set to a value >= 100.");
-				}
-				w.WriteAttributeString("speedOption", this.SpeedOption.ToString());
-				w.WriteAttributeString("maxSpeedPercent", this.MaxSpeedPercent.ToString());
 			}
 
             w.WriteEndElement(); // score:trkOptions
@@ -124,13 +125,14 @@ namespace Moritz.Spec
         public VelocityOption VelocityOption = VelocityOption.undefined;
 		public ControllerType PressureOption = ControllerType.undefined;
 		public TrkOffOption TrkOffOption = TrkOffOption.undefined;
-        public ControllerType PitchWheelOption = ControllerType.undefined;
+		public PitchWheelOption PitchWheelOption = PitchWheelOption.undefined;
+		public byte? PitchWheelDeviationOption = null; // should be set if the PitchWheelOption is set to pitchWheel
+		public float? SpeedDeviationOption = null; // should be set if the PitchWheelOption is set to speed
+		public byte? PanOriginOption = null;  // should be set if the PitchWheelOption is set to pan. (range 0..127, centre is 64)
         public ControllerType ModWheelOption = ControllerType.undefined;
-        public SpeedOption SpeedOption = SpeedOption.undefined;
 		public byte? MinimumVelocity = null; // must be set if a velocity option is being used
         public byte? MaximumVolume = null; // must be set if the performer is controlling the volume
 		public byte? MinimumVolume = null; // must be set if the performer is controlling the volume
-        public int? MaxSpeedPercent = null; // must be set to a value > 100 if the performer is controlling the speed (often set to about 400)
     }
 
     public enum VelocityOption
@@ -157,10 +159,8 @@ namespace Moritz.Spec
 		undefined,
         aftertouch,
         channelPressure,
-        pitchWheel,
         modulation,
-        volume,
-        pan,
+		volume,
         expression,
         timbre,
         brightness,
@@ -171,13 +171,11 @@ namespace Moritz.Spec
         phaser
     };
 
-    public enum SpeedOption
+    public enum PitchWheelOption
     {
 		undefined,
-        noteOnKey,
-        noteOnVel,
-        pressure,
-        pitchWheel,
-        modulation
+        pitch,
+        speed,
+		pan
     };
 }
