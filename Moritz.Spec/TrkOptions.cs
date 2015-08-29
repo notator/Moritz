@@ -61,6 +61,11 @@ namespace Moritz.Spec
 				}
 			}
 
+			if(PedalOption != PedalOption.undefined)
+			{
+				w.WriteAttributeString("pedal", PedalOption.ToString());
+			}
+
 			if(TrkOffOption != TrkOffOption.undefined)
 			{
 				w.WriteAttributeString("trkOff", TrkOffOption.ToString());
@@ -129,6 +134,7 @@ namespace Moritz.Spec
 		 */
         public VelocityOption VelocityOption = VelocityOption.undefined;
 		public ControllerType PressureOption = ControllerType.undefined;
+		public PedalOption PedalOption = PedalOption.undefined;
 		public TrkOffOption TrkOffOption = TrkOffOption.undefined;
 		public PitchWheelOption PitchWheelOption = PitchWheelOption.undefined;
 		public byte? PitchWheelDeviationOption = null; // should be set if the PitchWheelOption is set to pitchWheel
@@ -148,15 +154,20 @@ namespace Moritz.Spec
 		overridden
     };
 
+	public enum PedalOption
+	{
+		undefined,
+		holdLast, // remove noteOffs from trk's last moment that contains any, and don't send allNotesOff
+		holdAll // remove all noteOff messages from the track, and don't send allNotesOff
+		holdAllStop // like holdAll, but sends AllNotesOff when the track stops (or is stopped)
+	};
+
     public enum TrkOffOption
     {
 		undefined,
         stopChord, // stop when the current midiChord or midiRest completes
         stopNow, // stop immediately, even inside a midiChord
-        fade, // fade velocity to end of trk
-		// Both hold options: The Assistant Performer silences the trk when the performer sends a noteOff.
-		holdLast, // The Assistant Performer removes noteOff messages from the last moment in the trk to contain any.
-		holdAll // The Assistant Performer removes all noteOff messages from the trk.
+        fade // fade velocity to end of trk
     };
 
     public enum ControllerType
