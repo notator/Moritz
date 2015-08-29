@@ -158,7 +158,7 @@ namespace Moritz.Spec
 	{
 		undefined,
 		holdLast, // remove noteOffs from trk's last moment that contains any, and don't send allNotesOff
-		holdAll // remove all noteOff messages from the track, and don't send allNotesOff
+		holdAll, // remove all noteOff messages from the track, and don't send allNotesOff
 		holdAllStop // like holdAll, but sends AllNotesOff when the track stops (or is stopped)
 	};
 
