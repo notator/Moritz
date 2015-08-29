@@ -69,23 +69,28 @@ namespace Moritz.Spec
 			if(PitchWheelOption != PitchWheelOption.undefined)
 			{
 				w.WriteAttributeString("pitchWheel", PitchWheelOption.ToString());
-			}
-
-			if(PitchWheelDeviationOption != null)
-			{
-				//(range 0..127)
-				Debug.Assert(PitchWheelDeviationOption >= 0 && PitchWheelDeviationOption <= 127);
-				w.WriteAttributeString("pitchWheelDeviation", PitchWheelDeviationOption.ToString());
-			}
-			if(SpeedDeviationOption != null)
-			{
-				w.WriteAttributeString("speedDeviation", ((float)SpeedDeviationOption).ToString(M.En_USNumberFormat));
-			}
-			if(PanOriginOption != null)
-			{
-				//(range 0..127, centre is 64)
-				Debug.Assert(PanOriginOption >= 0 && PanOriginOption <= 127);
-				w.WriteAttributeString("panOrigin", PanOriginOption.ToString());
+				switch(PitchWheelOption)
+				{
+					case PitchWheelOption.pitch:
+						Debug.Assert(PitchWheelDeviationOption != null);
+						//(range 0..127)
+						Debug.Assert(PitchWheelDeviationOption >= 0 && PitchWheelDeviationOption <= 127);
+						w.WriteAttributeString("pitchWheelDeviation", PitchWheelDeviationOption.ToString());
+						break;
+					case PitchWheelOption.pan:
+						Debug.Assert(PanOriginOption != null);
+						//(range 0..127, centre is 64)
+						Debug.Assert(PanOriginOption >= 0 && PanOriginOption <= 127);
+						w.WriteAttributeString("panOrigin", PanOriginOption.ToString());
+						break;
+					case PitchWheelOption.speed:
+						Debug.Assert(SpeedDeviationOption != null);
+						// maximum speed is when durations = durations / speedDeviation
+						// minimum speed is when durations = durations * speedDeviation 
+						Debug.Assert(SpeedDeviationOption > 0);
+						w.WriteAttributeString("speedDeviation", ((float)SpeedDeviationOption).ToString(M.En_USNumberFormat));
+						break;
+				}
 			}
 
 			if(ModWheelOption != ControllerType.undefined)
