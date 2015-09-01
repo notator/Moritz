@@ -91,11 +91,11 @@ namespace Moritz.Algorithm.Study3Sketch2
         private void SetBar2NoteOnNoteOffControls(List<InputChordDef> bar2InputChordDefs)
         {
 			TrkOptions ics1 = new TrkOptions();
-			ics1.TrkOffOption = TrkOffOption.stopChord;
+			ics1.OnSeqOffOption = SeqOffOption.stopChord;
 			bar2InputChordDefs[0].InputNoteDefs[0].TrkOptions = ics1;
 
 			TrkOptions ics2 = new TrkOptions();
-			ics2.TrkOffOption = TrkOffOption.fade;
+			ics2.OnSeqOffOption = SeqOffOption.fade;
 			bar2InputChordDefs[1].InputNoteDefs[0].TrkOptions = ics2;
         }
 
@@ -104,7 +104,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             foreach(InputChordDef inputChordDef in bar3InputChordDefs)
             {
                 TrkOptions ics = new TrkOptions();				
-                ics.TrkOffOption = TrkOffOption.fade; // this is the current value in the voice (has no effect)
+                ics.OnSeqOffOption = SeqOffOption.fade; // this is the current value in the voice (has no effect)
                 ics.PitchWheelDeviationOption = 5;
                 ics.MaximumVolume = 100;
                 ics.MinimumVolume = 50;
@@ -117,7 +117,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             foreach(InputChordDef inputChordDef in bar4InputChordDefs)
             {
                 TrkOptions ics = new TrkOptions();
-                ics.TrkOffOption = TrkOffOption.fade;
+                ics.OnSeqOffOption = SeqOffOption.fade;
                 ics.PitchWheelDeviationOption = 6;
 				inputChordDef.InputNoteDefs[0].TrkOptions = ics;
             }

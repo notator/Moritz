@@ -20,11 +20,13 @@ namespace Moritz.Spec
     /// The values these options can take in the TrkOptions are defined in enums in this namespace.
     /// The default options (which are not written to score files) are:
 	///     velocity="undefined" -- input midi velocities are ignored (the score uses its own, default velocities)
+	///     onSeqPedal -- the Seq triggered by noteOn is played as written in the score
+	///     onSeqOff="undefined" -- input midi noteOff messages are ignored (the Seq completes as defined).
+	///     offSeqPedal -- the Seq triggered by noteOff is played as written in the score
+	///     offSeqOff="undefined" -- input midi noteOff messages are ignored (the Seq completes as defined).
 	///     pressure="undefined" -- input channelPressure/aftertouch information is ignored.
-	///     trkOff="undefined" -- input midi noteOff messages ae ignored (trks complete as defined).
     ///     pitchWheel="undefined" -- input pitchWheel information is ignored.
     ///     modulation="undefined" -- input modulation wheel information is ignored.
-    ///     speedOption="undefined" -- the default durations (set in the score) are used. 
 	/// 
 	/// In the AssistantPerformer, new TrkOptions objects should be empty -- contain no defined members.
     /// </summary>
@@ -50,6 +52,24 @@ namespace Moritz.Spec
 				w.WriteAttributeString("minVelocity", MinimumVelocity.ToString());		
 			}
 
+			if(OnSeqPedalOption != PedalOption.undefined)
+			{
+				w.WriteAttributeString("onSeqPedal", OnSeqPedalOption.ToString());
+			}
+			if(OnSeqOffOption != SeqOffOption.undefined)
+			{
+				w.WriteAttributeString("onSeqOff", OnSeqOffOption.ToString());
+			}
+
+			if(OffSeqPedalOption != PedalOption.undefined)
+			{
+				w.WriteAttributeString("offSeqPedal", OffSeqPedalOption.ToString());
+			}
+			if(OffSeqOffOption != SeqOffOption.undefined)
+			{
+				w.WriteAttributeString("offSeqOff", OffSeqOffOption.ToString());
+			}
+
 			bool isControllingVolume = false;
 			if(PressureOption != ControllerType.undefined)
 			{
@@ -59,16 +79,6 @@ namespace Moritz.Spec
 					WriteMaxMinVolume(w);
 					isControllingVolume = true;
 				}
-			}
-
-			if(PedalOption != PedalOption.undefined)
-			{
-				w.WriteAttributeString("pedal", PedalOption.ToString());
-			}
-
-			if(TrkOffOption != TrkOffOption.undefined)
-			{
-				w.WriteAttributeString("trkOff", TrkOffOption.ToString());
 			}
 
 			if(PitchWheelOption != PitchWheelOption.undefined)
@@ -92,7 +102,7 @@ namespace Moritz.Spec
 						Debug.Assert(SpeedDeviationOption != null);
 						// maximum speed is when durations = durations / speedDeviation
 						// minimum speed is when durations = durations * speedDeviation 
-						Debug.Assert(SpeedDeviationOption > 0);
+						Debug.Assert(SpeedDeviationOption > 1.0F);
 						w.WriteAttributeString("speedDeviation", ((float)SpeedDeviationOption).ToString(M.En_USNumberFormat));
 						break;
 				}
@@ -105,7 +115,6 @@ namespace Moritz.Spec
 				{
 					Debug.Assert(isControllingVolume == false);
 					WriteMaxMinVolume(w);
-					isControllingVolume = true;
 				}
 			}
 
@@ -133,17 +142,19 @@ namespace Moritz.Spec
 		 * Default values. These values are not written to score files.
 		 */
         public VelocityOption VelocityOption = VelocityOption.undefined;
-		public ControllerType PressureOption = ControllerType.undefined;
-		public PedalOption PedalOption = PedalOption.undefined;
-		public TrkOffOption TrkOffOption = TrkOffOption.undefined;
+		public PedalOption OnSeqPedalOption = PedalOption.undefined;
+		public SeqOffOption OnSeqOffOption = SeqOffOption.undefined;
+		public PedalOption OffSeqPedalOption = PedalOption.undefined;
+		public SeqOffOption OffSeqOffOption = SeqOffOption.undefined;
 		public PitchWheelOption PitchWheelOption = PitchWheelOption.undefined;
-		public byte? PitchWheelDeviationOption = null; // should be set if the PitchWheelOption is set to pitchWheel
-		public float? SpeedDeviationOption = null; // should be set if the PitchWheelOption is set to speed
-		public byte? PanOriginOption = null;  // should be set if the PitchWheelOption is set to pan. (range 0..127, centre is 64)
-        public ControllerType ModWheelOption = ControllerType.undefined;
+		public byte? PitchWheelDeviationOption = null; // is set if the PitchWheelOption is set to pitchWheel
+		public float? SpeedDeviationOption = null; // is set if the PitchWheelOption is set to speed
+		public byte? PanOriginOption = null;  // is set if the PitchWheelOption is set to pan. (range 0..127, centre is 64)
+		public ControllerType ModWheelOption = ControllerType.undefined;
+		public ControllerType PressureOption = ControllerType.undefined;
 		public byte? MinimumVelocity = null; // must be set if a velocity option is being used
-        public byte? MaximumVolume = null; // must be set if the performer is controlling the volume
-		public byte? MinimumVolume = null; // must be set if the performer is controlling the volume
+		public byte? MaximumVolume = null; // is set if ControllerType.volume is being used
+		public byte? MinimumVolume = null; // is set if ControllerType.volume is being used
     }
 
     public enum VelocityOption
@@ -162,7 +173,7 @@ namespace Moritz.Spec
 		holdAllStop // like holdAll, but sends AllNotesOff when the track stops (or is stopped)
 	};
 
-    public enum TrkOffOption
+    public enum SeqOffOption
     {
 		undefined,
         stopChord, // stop when the current midiChord or midiRest completes
