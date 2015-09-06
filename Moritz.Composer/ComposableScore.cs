@@ -58,7 +58,7 @@ namespace Moritz.Composer
                     errorString = "One bar (at least) contains no voices.";
                     break;
                 }
-                if(!(bar[0] is TrkDef))
+                if(!(bar[0] is Trk))
                 {
                     errorString = "The top (first) voice in every bar must be an output voice.";
                     break;
@@ -83,7 +83,7 @@ namespace Moritz.Composer
             int nOutputVoices = 0;
             foreach(VoiceDef voiceDef in bar1)
             {
-                if(voiceDef is TrkDef)
+                if(voiceDef is Trk)
                 {
                     nOutputVoices++;
                 }
@@ -107,10 +107,10 @@ namespace Moritz.Composer
         private string CheckTrkOptionsDef(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
         {
             string errorString = null;
-            List<TrkDef> trkDefs = new List<TrkDef>();
+            List<Trk> trkDefs = new List<Trk>();
             foreach(VoiceDef voice in voiceDefsPerSystemPerBar[0])
             {
-                TrkDef trkDef = voice as TrkDef;
+                Trk trkDef = voice as Trk;
                 if(trkDef != null)
                 {
                     if(trkDef.MasterVolume == null)
@@ -127,7 +127,7 @@ namespace Moritz.Composer
                 {
                     foreach(VoiceDef voice in voiceDefsPerSystemPerBar[bar])
                     {
-                        TrkDef trkDef = voice as TrkDef;
+                        Trk trkDef = voice as Trk;
                         if(trkDef != null)
                         {
                             if(trkDef.MasterVolume != null)
@@ -210,7 +210,7 @@ namespace Moritz.Composer
                 {
                     foreach(byte invisibleOutputVoiceIndex in invisibleOutputVoiceIndices)
                     {
-                        TrkDef invisibleTrkDef = barDef[invisibleOutputVoiceIndex] as TrkDef;
+                        Trk invisibleTrkDef = barDef[invisibleOutputVoiceIndex] as Trk;
                         InvisibleOutputStaff invisibleOutputStaff = new InvisibleOutputStaff(system);
                         OutputVoice outputVoice = new OutputVoice(invisibleOutputStaff, invisibleTrkDef.MidiChannel, invisibleTrkDef.MasterVolume);
                         outputVoice.VoiceDef = invisibleTrkDef;
@@ -228,7 +228,7 @@ namespace Moritz.Composer
                     List<byte> outputVoiceIndices = _pageFormat.VisibleOutputVoiceIndicesPerStaff[printedStaffIndex];
                     for(int ovIndex = 0; ovIndex < outputVoiceIndices.Count; ++ovIndex)
                     {
-                        TrkDef trkDef = barDef[outputVoiceIndices[ovIndex]] as TrkDef;
+                        Trk trkDef = barDef[outputVoiceIndices[ovIndex]] as Trk;
                         Debug.Assert(trkDef != null);
                         OutputVoice outputVoice = new OutputVoice(outputStaff, trkDef.MidiChannel, trkDef.MasterVolume);
                         outputVoice.VoiceDef = trkDef;
@@ -250,7 +250,7 @@ namespace Moritz.Composer
             List<byte> invisibleOutputVoiceIndices = new List<byte>();
             for(byte voiceIndex = 0; voiceIndex < voiceDefs.Count; ++voiceIndex)
             {
-                if(voiceDefs[voiceIndex] is TrkDef)
+                if(voiceDefs[voiceIndex] is Trk)
                 {
                     if(!visibleOutputVoiceIndices.Contains(voiceIndex))
                     {

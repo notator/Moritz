@@ -30,7 +30,7 @@ namespace Moritz.Algorithm.PaletteDemo
         /// </summary>
         public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
         {
-            VoiceDef voice = new TrkDef(0, new List<IUniqueDef>());
+            VoiceDef voice = new Trk(0, new List<IUniqueDef>());
             int msPosition = 0;
             for(int i = 0; i < palettes[0].Count; ++i)
             {

@@ -8,14 +8,14 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.SongSix
 {
-    internal class Furies1 : TrkDef
+    internal class Furies1 : Trk
     {
         internal Furies1(byte midiChannel, int msDuration)
 			: base(midiChannel, msDuration)
         {
         }
 
-        internal void GetBeforeInterlude3(Clytemnestra clytemnestra, TrkDef wind1, TrkDef furies2, Palette cheepsPalette)
+        internal void GetBeforeInterlude3(Clytemnestra clytemnestra, Trk wind1, Trk furies2, Palette cheepsPalette)
         {
             int[] cheepIndices = { 4, 8, 2, 6, 10, 0, 1, 3, 5, 7, 9, 11 };
             int[] transpositions = { 2, 1, 3, 0, 4, -3, 5, 10, 6, 9, 7, 8 };
@@ -65,11 +65,11 @@ namespace Moritz.Algorithm.SongSix
                 index += krystal.Strands[i].Values.Count;
             }
 
-            TrkDef f1Interlude3Verse4e = GetF1FinalePart1(f1FinalePalette1, krystal, strandIndices, msPositions);
-            TrkDef f1Verse4eVerse5 = GetF1FinalePart2(f1FinalePalette2, krystal, strandIndices, msPositions);
-            TrkDef f1Postlude = GetF1Postlude(f1PostludePalette, krystal, strandIndices, msPositions);
+            Trk f1Interlude3Verse4e = GetF1FinalePart1(f1FinalePalette1, krystal, strandIndices, msPositions);
+            Trk f1Verse4eVerse5 = GetF1FinalePart2(f1FinalePalette2, krystal, strandIndices, msPositions);
+            Trk f1Postlude = GetF1Postlude(f1PostludePalette, krystal, strandIndices, msPositions);
 
-            TrkDef furies1Finale = f1Interlude3Verse4e;
+            Trk furies1Finale = f1Interlude3Verse4e;
 
             furies1Finale.AddRange(f1Verse4eVerse5);
             furies1Finale.AddRange(f1Postlude);
@@ -93,9 +93,9 @@ namespace Moritz.Algorithm.SongSix
             AdjustPitchWheelDeviations(msPositions["interlude3"], msPositions["endOfPiece"], 5, 28 );
         }
 
-        private TrkDef GetF1FinalePart1(Palette palette, Krystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
+        private Trk GetF1FinalePart1(Palette palette, Krystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
         {
-            TrkDef f1FinalePart1 = palette.NewTrkDef(0, krystal);
+            Trk f1FinalePart1 = palette.NewTrkDef(0, krystal);
 
             List<int> f1eStrandDurations = GetStrandDurations(f1FinalePart1, strandIndices);
 
@@ -129,7 +129,7 @@ namespace Moritz.Algorithm.SongSix
         /// <param name="voiceDef"></param>
         /// <param name="strandIndices"></param>
         /// <returns></returns>
-        private List<int> GetStrandDurations(TrkDef voiceDef, List<int> strandIndices)
+        private List<int> GetStrandDurations(Trk voiceDef, List<int> strandIndices)
         {
             List<int> strandDurations = new List<int>();
             int duration;
@@ -151,9 +151,9 @@ namespace Moritz.Algorithm.SongSix
             return strandDurations;
         }
 
-        private TrkDef GetF1FinalePart2(Palette f1FinalePalette2, Krystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
+        private Trk GetF1FinalePart2(Palette f1FinalePalette2, Krystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
         {
-			TrkDef f1FinalePart2 = f1FinalePalette2.NewTrkDef(this.MidiChannel, krystal);
+			Trk f1FinalePart2 = f1FinalePalette2.NewTrkDef(this.MidiChannel, krystal);
 
             List<int> f1eStrandDurations = GetStrandDurations(f1FinalePart2, strandIndices);
 
@@ -180,9 +180,9 @@ namespace Moritz.Algorithm.SongSix
             return f1FinalePart2;
         }
 
-        private TrkDef GetF1Postlude(Palette f1PostludePalette, Krystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
+        private Trk GetF1Postlude(Palette f1PostludePalette, Krystal krystal, List<int> strandIndices, Dictionary<string, int> msPositions)
         {
-			TrkDef f1p = f1PostludePalette.NewTrkDef(this.MidiChannel, krystal);
+			Trk f1p = f1PostludePalette.NewTrkDef(this.MidiChannel, krystal);
 
             List<int> f1eStrandDurations = GetStrandDurations(f1p, strandIndices);
 
@@ -201,7 +201,7 @@ namespace Moritz.Algorithm.SongSix
             return f1p;
         }
 
-        internal void AdjustAlignments(Clytemnestra c, TrkDef w2, TrkDef w3)
+        internal void AdjustAlignments(Clytemnestra c, Trk w2, Trk w3)
         {
             Debug.Assert(this[213] is RestDef);
             this[213].MsDuration += this[212].MsDuration;

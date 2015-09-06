@@ -5,49 +5,49 @@ using System.Collections;
 
 namespace Moritz.Spec
 {
-	public class TrkOns : IEnumerable
+	public class Seq : IEnumerable
 	{
-		/// <param name="trkOns"></param>
+		/// <param name="trkRefs"></param>
 		/// <param name="trkOptions">Can be null</param>
-		public TrkOns(List<TrkOn> trkOns, TrkOptions trkOptions)
+		public Seq(List<TrkRef> trkRefs, TrkOptions trkOptions)
 		{
-			Debug.Assert(trkOns != null && trkOns.Count > 0);
-			_trkOptions = trkOptions;
-			_trkOns = trkOns;
+			Debug.Assert(trkRefs != null && trkRefs.Count > 0);
+			TrkOptions = trkOptions;
+			TrkRefs = trkRefs;
 		}
 
 		internal void WriteSvg(Xml.SvgWriter w)
 		{
-			w.WriteStartElement("trkOns");
-			if(_trkOptions != null)
+			w.WriteStartElement("seq");
+			if(TrkOptions != null)
 			{
-				_trkOptions.WriteSvg(w);
+				TrkOptions.WriteSvg(w);
 			}
-			Debug.Assert(_trkOns != null && _trkOns.Count > 0);
-			foreach(TrkOn trkOn in _trkOns)
+			Debug.Assert(TrkRefs != null && TrkRefs.Count > 0);
+			foreach(TrkRef trkRef in TrkRefs)
 			{
-				trkOn.WriteSvg(w);
+				trkRef.WriteSvg(w, true);
 			}
-			w.WriteEndElement(); // trkOns
+			w.WriteEndElement(); // trks
 		}
 
 		#region Enumerable
 
 		public IEnumerator GetEnumerator()
 		{
-			return new TrkOnEnumerator(_trkOns);
+			return new TrkOnEnumerator(TrkRefs);
 		}
 
 		// private enumerator class
 		// see http://support.microsoft.com/kb/322022/en-us
 		private class TrkOnEnumerator : IEnumerator
 		{
-			public List<TrkOn> _trkOns;
+			public List<TrkRef> _trkRefs;
 			int position = -1;
 			//constructor
-			public TrkOnEnumerator(List<TrkOn> trkOns)
+			public TrkOnEnumerator(List<TrkRef> trkRefs)
 			{
-				_trkOns = trkOns;
+				_trkRefs = trkRefs;
 			}
 			private IEnumerator getEnumerator()
 			{
@@ -57,7 +57,7 @@ namespace Moritz.Spec
 			public bool MoveNext()
 			{
 				position++;
-				return (position < _trkOns.Count);
+				return (position < _trkRefs.Count);
 			}
 			//IEnumerator
 			public void Reset()
@@ -69,7 +69,7 @@ namespace Moritz.Spec
 				{
 					try
 					{
-						return _trkOns[position];
+						return _trkRefs[position];
 					}
 					catch(IndexOutOfRangeException)
 					{
@@ -80,8 +80,8 @@ namespace Moritz.Spec
 			}
 		}  //end nested class
 		#endregion
-		private List<TrkOn> _trkOns = null;
-		private TrkOptions _trkOptions;
 
+		public List<TrkRef> TrkRefs = null;
+		public TrkOptions TrkOptions = null;
 	}
 }

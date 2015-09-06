@@ -21,7 +21,7 @@ namespace Moritz.Spec
         /// Constructs a multi-note chord, each inputNoteDef has a notated pitch and a SeqDef.
 		/// The inputNoteDefs must be in order of their notated pitches (bottom to top).
         /// </summary>
-        public InputChordDef(int msPosition, int msDuration, List<InputNoteDef> inputNoteDefs)
+        public InputChordDef(int msPosition, int msDuration, List<InputNoteDef> inputNoteDefs, TrkOptions trkOptions)
             : base(msDuration)
         {
 			#region check notated pitches and trkRef positions
@@ -31,19 +31,19 @@ namespace Moritz.Spec
 				Debug.Assert(ind.NotatedMidiPitch > pitchBelow);
 				pitchBelow = ind.NotatedMidiPitch;
 
-				if(ind.NoteOnTrkOns != null)
+				if(ind.NoteOn != null && ind.NoteOn.Seq != null)
 				{
-					foreach(TrkOn trkOn in ind.NoteOnTrkOns)
+					foreach(TrkRef trk in ind.NoteOn.Seq)
 					{ 
-						Debug.Assert(msPosition <= trkOn.TrkMsPosition);
+						Debug.Assert(msPosition <= trk.MsPosition);
 					}
 				}
-				if(ind.NoteOffTrkOns != null)
+				if(ind.NoteOff != null && ind.NoteOff.Seq != null)
 				{
 					int minSeqPos = msPosition + msDuration;
-					foreach(TrkOn trkRef in ind.NoteOffTrkOns)
+					foreach(TrkRef trk in ind.NoteOff.Seq)
 					{
-						Debug.Assert(minSeqPos <= trkRef.TrkMsPosition);
+						Debug.Assert(minSeqPos <= trk.MsPosition);
 					}
 				}
 				// Note that there is no corresponding check for ind.NoteOnTrkOffs and ind.NoteOffTrkOffs
@@ -54,7 +54,7 @@ namespace Moritz.Spec
 			_msDuration = msDuration;
 			_inputNoteDefs = inputNoteDefs;
 			_lyric = null;
-			_trkOptions = null;
+			_trkOptions = trkOptions;
 			_msDurationToNextBarline = null;
         }
 

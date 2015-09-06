@@ -8,7 +8,7 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.SongSix
 {
-    internal class Furies2 : TrkDef
+    internal class Furies2 : Trk
     {
         internal Furies2(byte midiChannel, int msDuration)
 			: base(midiChannel, msDuration)
@@ -16,7 +16,7 @@ namespace Moritz.Algorithm.SongSix
         }
 
         #region before Interlude3
-        internal void GetBeforeInterlude3(Clytemnestra clytemnestra, TrkDef wind1, TrkDef furies3, List<Palette> _palettes)
+        internal void GetBeforeInterlude3(Clytemnestra clytemnestra, Trk wind1, Trk furies3, List<Palette> _palettes)
         {
             GetFuries2Interlude2(clytemnestra, wind1, furies3);
             AddFuries2ChirpsForInterlude2AndVerse3(clytemnestra, wind1, _palettes[7]);
@@ -24,7 +24,7 @@ namespace Moritz.Algorithm.SongSix
         /// <summary>
         /// Steals the ticks from furies 3, then agglommerates the remaining rests in furies3...
         /// </summary>
-        private void GetFuries2Interlude2(Clytemnestra clytemnestra, TrkDef wind1, TrkDef furies3)
+        private void GetFuries2Interlude2(Clytemnestra clytemnestra, Trk wind1, Trk furies3)
         {
             List<int> furies3TickIndices = new List<int>()
             {
@@ -51,7 +51,7 @@ namespace Moritz.Algorithm.SongSix
             furies3.AgglomerateRests();
         }
 
-        private void AddFuries2ChirpsForInterlude2AndVerse3(Clytemnestra clytemnestra, TrkDef wind1, Palette chirpsPalette)
+        private void AddFuries2ChirpsForInterlude2AndVerse3(Clytemnestra clytemnestra, Trk wind1, Palette chirpsPalette)
         {
             int[] chirpIndices = { 4, 6, 10, 0, 1, 3, 5, 7, 9, 11 };
             int[] transpositions = { 2, 0, 4, 11, 5, 10, 6, 9, 7, 8 };
@@ -92,7 +92,7 @@ namespace Moritz.Algorithm.SongSix
 
         internal void GetFinale(List<Palette> palettes, Dictionary<string, int> msPositions, Krystal krystal)
         {
-            TrkDef furies2Finale = GetF2Finale(palettes, krystal, msPositions);
+            Trk furies2Finale = GetF2Finale(palettes, krystal, msPositions);
 
             if(furies2Finale[furies2Finale.Count - 1] is RestDef)
             {
@@ -122,7 +122,7 @@ namespace Moritz.Algorithm.SongSix
             return strandIndices;
         }
 
-        private TrkDef GetF2Finale(List<Palette> palettes, Krystal krystal, Dictionary<string, int> msPositions)
+        private Trk GetF2Finale(List<Palette> palettes, Krystal krystal, Dictionary<string, int> msPositions)
         {
             Palette f2FinalePalette1 = palettes[11];
             Palette f2FinalePalette2 = palettes[15];
@@ -130,14 +130,14 @@ namespace Moritz.Algorithm.SongSix
 
             List<int> strandIndices = GetStrandIndices(krystal);
 
-            TrkDef finalePart1 = f2FinalePalette1.NewTrkDef(this.MidiChannel, krystal);
+            Trk finalePart1 = f2FinalePalette1.NewTrkDef(this.MidiChannel, krystal);
             Transform(finalePart1, msPositions, strandIndices);
-			TrkDef finalePart2 = f2FinalePalette2.NewTrkDef(this.MidiChannel, krystal);
+			Trk finalePart2 = f2FinalePalette2.NewTrkDef(this.MidiChannel, krystal);
             Transform(finalePart2, msPositions, strandIndices);
-			TrkDef postlude = f2PostludePalette.NewTrkDef(this.MidiChannel, krystal);
+			Trk postlude = f2PostludePalette.NewTrkDef(this.MidiChannel, krystal);
             Transform(postlude, msPositions, strandIndices);
 
-            TrkDef finale = GetFinaleSections(finalePart1, finalePart2, postlude, 71, 175);
+            Trk finale = GetFinaleSections(finalePart1, finalePart2, postlude, 71, 175);
 
             return finale;
 
@@ -168,7 +168,7 @@ namespace Moritz.Algorithm.SongSix
         /// and MsDuration. The DurationDefs come from different palettes, so can otherwise have different parameters.
         /// This function simply creates a new VoiceDef by selecting the apropriate DurationDefs from each VoiceDef argument.
         /// </summary>
-        private TrkDef GetFinaleSections(TrkDef finalePart1, TrkDef finalePart2, TrkDef postlude, int part2Index, int postludeIndex)
+        private Trk GetFinaleSections(Trk finalePart1, Trk finalePart2, Trk postlude, int part2Index, int postludeIndex)
         {
             List<IUniqueDef> iumdds = new List<IUniqueDef>();
 
@@ -185,10 +185,10 @@ namespace Moritz.Algorithm.SongSix
                 iumdds.Add(postlude[i]);
             }
 
-            return new TrkDef(this.MidiChannel, iumdds);
+            return new Trk(this.MidiChannel, iumdds);
         }
 
-        private void Transform(TrkDef section, Dictionary<string, int> msPositions, List<int> strandIndices)
+        private void Transform(Trk section, Dictionary<string, int> msPositions, List<int> strandIndices)
         {
             List<int> strandDurations = GetStrandDurations(section, strandIndices);
 
@@ -228,7 +228,7 @@ namespace Moritz.Algorithm.SongSix
         /// <param name="voiceDef"></param>
         /// <param name="strandIndices"></param>
         /// <returns></returns>
-        private List<int> GetStrandDurations(TrkDef voiceDef, List<int> strandIndices)
+        private List<int> GetStrandDurations(Trk voiceDef, List<int> strandIndices)
         {
             List<int> strandDurations = new List<int>();
             int duration;

@@ -180,12 +180,12 @@ namespace Moritz.Algorithm
             VoiceDef secondBarVoice;
             foreach(VoiceDef voice in originalBar)
             {
-                TrkDef outputVoice = voice as TrkDef;
+                Trk outputVoice = voice as Trk;
                 if(outputVoice != null)
                 {
-					firstBarVoice = new TrkDef(outputVoice.MidiChannel,new List<IUniqueDef>());
+					firstBarVoice = new Trk(outputVoice.MidiChannel,new List<IUniqueDef>());
                     firstBar.Add(firstBarVoice);
-					secondBarVoice = new TrkDef(outputVoice.MidiChannel, new List<IUniqueDef>());
+					secondBarVoice = new Trk(outputVoice.MidiChannel, new List<IUniqueDef>());
                     secondBar.Add(secondBarVoice);
                 }
                 else
@@ -341,7 +341,7 @@ namespace Moritz.Algorithm
             Debug.Assert(MasterVolumePerOutputVoice.Count == MidiChannelIndexPerOutputVoice.Count);
             for(int i = 0; i < MasterVolumePerOutputVoice.Count; ++i)
             {
-                TrkDef oVoice = firstBar[i] as TrkDef;
+                Trk oVoice = firstBar[i] as Trk;
                 Debug.Assert(oVoice != null);
                 Debug.Assert(MasterVolumePerOutputVoice[i] != 0);
                 Debug.Assert(MasterVolumePerOutputVoice[i] >= 0 && MasterVolumePerOutputVoice[i] < 128);

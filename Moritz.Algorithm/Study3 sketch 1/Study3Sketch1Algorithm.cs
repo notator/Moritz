@@ -64,7 +64,7 @@ namespace Moritz.Algorithm.Study3Sketch1
 			byte channel = 0;
             foreach(Palette palette in _palettes)
             {
-                TrkDef voice = new TrkDef(channel, new List<IUniqueDef>());
+                Trk voice = new Trk(channel, new List<IUniqueDef>());
                 bar.Add(voice);
                 WriteVoiceMidiDurationDefs1(voice, palette);
 				channel++;
@@ -72,7 +72,7 @@ namespace Moritz.Algorithm.Study3Sketch1
             return bar;
         }
 
-        private void WriteVoiceMidiDurationDefs1(TrkDef trkDef, Palette palette)
+        private void WriteVoiceMidiDurationDefs1(Trk trkDef, Palette palette)
         {
             int msPosition = 0;
             int bar1ChordMsSeparation = 1500;
@@ -97,11 +97,11 @@ namespace Moritz.Algorithm.Study3Sketch1
             List<VoiceDef> bar = new List<VoiceDef>();
 
             byte channel = 0;
-            List<TrkDef> trkDefs = new List<TrkDef>();
+            List<Trk> trkDefs = new List<Trk>();
             foreach(Palette palette in _palettes)
             {
-                bar.Add(new TrkDef(channel, new List<IUniqueDef>()));
-                TrkDef trkDef = palette.NewTrkDef(channel);
+                bar.Add(new Trk(channel, new List<IUniqueDef>()));
+                Trk trkDef = palette.NewTrkDef(channel);
                 trkDef.SetMsDuration(6000);
                 trkDefs.Add(trkDef);
                 ++channel;
@@ -132,7 +132,7 @@ namespace Moritz.Algorithm.Study3Sketch1
         /// Writes the first rest (if any) and the VoiceDef to the voice.
         /// Returns the endMsPos of the VoiceDef. 
         /// </summary>
-        private int WriteVoiceMidiDurationDefsInBar2(VoiceDef voice, TrkDef trkDef, int msPosition, int bar2StartMsPos)
+        private int WriteVoiceMidiDurationDefsInBar2(VoiceDef voice, Trk trkDef, int msPosition, int bar2StartMsPos)
         {
             RestDef rest1Def = null;
             if(msPosition > bar2StartMsPos)

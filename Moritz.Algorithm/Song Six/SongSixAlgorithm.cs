@@ -46,11 +46,11 @@ namespace Moritz.Algorithm.SongSix
 
             _krystals = krystals;
             _palettes = palettes;
-            TrkDef wind3 = GetWind3(7,_palettes[0], _krystals[8]);
+            Trk wind3 = GetWind3(7,_palettes[0], _krystals[8]);
             Clytemnestra clytemnestra = new Clytemnestra(4, wind3);
             clytemnestra.AdjustVelocities(49, 59, 1.4);
-            TrkDef wind2 = GetWind2(6, wind3, clytemnestra);
-            TrkDef wind1 = GetWind1(5, wind3, wind2, clytemnestra);
+            Trk wind2 = GetWind2(6, wind3, clytemnestra);
+            Trk wind1 = GetWind1(5, wind3, wind2, clytemnestra);
             AdjustFinalWindChordPosition(wind1, wind2, wind3); // "fermata"
             // WindPitchWheelDeviations change approximately per section in Song Six
             AdjustWindPitchWheelDeviations(wind1);
@@ -128,13 +128,13 @@ namespace Moritz.Algorithm.SongSix
             furies3.InsertClefChange(112, "b");  // bar 43
             furies4.InsertClefChange(59, "b1"); // bar 104
         }
-        private void AdjustFinalWindChordPosition(TrkDef wind1, TrkDef wind2, TrkDef wind3)
+        private void AdjustFinalWindChordPosition(Trk wind1, Trk wind2, Trk wind3)
         {
             wind1.AlignObjectAtIndex(71, 81, 82, wind1[81].MsPosition - (wind1[81].MsDuration / 2));
             wind2.AlignObjectAtIndex(71, 81, 82, wind2[81].MsPosition - (wind2[81].MsDuration / 2));
             wind3.AlignObjectAtIndex(71, 81, 82, wind3[81].MsPosition - (wind3[81].MsDuration / 2));
         }
-        private void AdjustWindVelocities(TrkDef wind1, TrkDef wind2, TrkDef wind3)
+        private void AdjustWindVelocities(Trk wind1, Trk wind2, Trk wind3)
         {
             int beginInterlude2DimIndex = 25; // start of Interlude2
             int beginVerse3DimIndex = 31; // non-inclusive
@@ -150,7 +150,7 @@ namespace Moritz.Algorithm.SongSix
             wind2.AdjustVelocitiesHairpin(beginPostludeIndex, wind2.Count, 2.3);
             wind3.AdjustVelocitiesHairpin(beginPostludeIndex, wind3.Count, 2.3);
         }
-        private void AdjustWindPitchWheelDeviations(TrkDef wind)
+        private void AdjustWindPitchWheelDeviations(Trk wind)
         {
             byte versePwdValue = 3;
             double windStartPwdValue = 6, windEndPwdValue=28;
@@ -229,16 +229,16 @@ namespace Moritz.Algorithm.SongSix
         /// <summary>
         /// The returned barlineMsPositions contain both the position of bar 1 (0ms) and the position of the final barline.
         /// </summary>
-        private List<int> GetBarlineMsPositions(TrkDef fury1, TrkDef fury2, TrkDef fury3, TrkDef fury4, Clytemnestra clytemnestra, TrkDef wind1, TrkDef wind2, TrkDef wind3)
+        private List<int> GetBarlineMsPositions(Trk fury1, Trk fury2, Trk fury3, Trk fury4, Clytemnestra clytemnestra, Trk wind1, Trk wind2, Trk wind3)
         {
-            TrkDef f1 = fury1;
-            TrkDef f2 = fury2;
-            TrkDef f3 = fury3;
-            TrkDef f4 = fury4;
+            Trk f1 = fury1;
+            Trk f2 = fury2;
+            Trk f3 = fury3;
+            Trk f4 = fury4;
             Clytemnestra c = clytemnestra;
-            TrkDef w1 = wind1;
-            TrkDef w2 = wind2;
-            TrkDef w3 = wind3;
+            Trk w1 = wind1;
+            Trk w2 = wind2;
+            Trk w3 = wind3;
             List<int> barlineMsPositions = new List<int>()
             {
                 #region msPositions

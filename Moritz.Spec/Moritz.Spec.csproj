@@ -48,13 +48,11 @@
     <Compile Include="BasicMidiChordDef.cs" />
     <Compile Include="CautionaryChordDef.cs" />
     <Compile Include="ClefChangeDef.cs" />
+    <Compile Include="ContinuousControls.cs" />
     <Compile Include="InputNoteDef.cs" />
-    <Compile Include="Pressure.cs" />
-    <Compile Include="TrkOff.cs" />
-    <Compile Include="Pressures.cs" />
-    <Compile Include="TrkOffs.cs" />
-    <Compile Include="TrkOns.cs" />
-    <Compile Include="TrkOn.cs" />
+    <Compile Include="NoteTrigger.cs" />
+    <Compile Include="Seq.cs" />
+    <Compile Include="TrkRef.cs" />
     <Compile Include="DurationDef.cs" />
     <Compile Include="InputChordDef.cs" />
     <Compile Include="TrkOptions.cs" />
@@ -65,7 +63,7 @@
     <Compile Include="MidiChordDef.cs" />
     <Compile Include="MidiChordSliderDefs.cs" />
     <Compile Include="MomentDef.cs" />
-    <Compile Include="TrkDef.cs" />
+    <Compile Include="Trk.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RestDef.cs" />
     <Compile Include="VoiceDef.cs" />

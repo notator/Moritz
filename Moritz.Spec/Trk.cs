@@ -22,7 +22,7 @@ namespace Moritz.Spec
     /// <para>This class is also indexable, as in:</para>
     /// <para>IUniqueDef iu = trkDef[index];</para>
     /// </summary>
-    public class TrkDef : VoiceDef
+    public class Trk : VoiceDef
     {
         #region constructors
 		///// <summary>
@@ -38,26 +38,17 @@ namespace Moritz.Spec
         /// A VoiceDef beginning at MsPosition = 0, and containing a single RestDef having msDuration
         /// </summary>
         /// <param name="msDuration"></param>
-        public TrkDef(byte midiChannel, int msDuration)
+        public Trk(byte midiChannel, int msDuration)
 			: base(msDuration)
         {
 			MidiChannel = midiChannel;
         }
 
-		///// <summary>
-		///// <para>If the argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
-		///// <para>The new VoiceDef's UniqueDefs list is simply set to the argument (which is not cloned).</para>
-		///// </summary>
-		//public TrkDef(List<IUniqueDef> iuds)
-		//	: base(iuds)
-		//{
-		//}
-
 		/// <summary>
 		/// <para>If the argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
 		/// <para>The new VoiceDef's UniqueDefs list is simply set to the argument (which is not cloned).</para>
 		/// </summary>
-		public TrkDef(byte midiChannel, List<IUniqueDef> iuds)
+		public Trk(byte midiChannel, List<IUniqueDef> iuds)
 			: base(iuds)
 		{
 			MidiChannel = midiChannel;
@@ -66,7 +57,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Returns a deep clone of this TrkDef.
         /// </summary>
-        public TrkDef DeepClone()
+        public Trk DeepClone()
         {
             List<IUniqueDef> clonedLmdds = new List<IUniqueDef>();
             foreach(IUniqueDef iu in this._uniqueDefs)
@@ -88,7 +79,7 @@ namespace Moritz.Spec
                 }
             }
 
-            return new TrkDef(this.MidiChannel, clonedLmdds);
+            return new Trk(this.MidiChannel, clonedLmdds);
         }
         #endregion constructors
 
@@ -106,7 +97,7 @@ namespace Moritz.Spec
         /// Adds the argument to the end of this VoiceDef.
         /// Sets the MsPositions of the appended UniqueDefs.
         /// </summary>
-        public void AddRange(TrkDef voiceDef)
+        public void AddRange(Trk voiceDef)
         {
             _AddRange((VoiceDef)voiceDef);
         }
@@ -123,7 +114,7 @@ namespace Moritz.Spec
         /// Inserts the voiceDef in the list at the given index, and then
         /// resets the positions of all the uniqueDefs in the list.
         /// </summary>
-        public void InsertRange(int index, TrkDef voiceDef)
+        public void InsertRange(int index, Trk voiceDef)
         {
             _InsertRange(index, (VoiceDef)voiceDef);
         }
@@ -134,7 +125,7 @@ namespace Moritz.Spec
         public void InsertInRest(MidiChordDef midiChordDef)
         {
             List<IUniqueDef> iuds = new List<IUniqueDef>() { midiChordDef };
-            TrkDef trkDefToInsert = new TrkDef(this.MidiChannel, iuds);
+            Trk trkDefToInsert = new Trk(this.MidiChannel, iuds);
             InsertInRest(trkDefToInsert);
         }
         /// <summary>
@@ -148,7 +139,7 @@ namespace Moritz.Spec
         /// This function does not change the msPositions of any other chords or rests in the containing VoiceDef,
         /// It does, of course, change the indices of the inserted lmdds and the later chords and rests.
         /// </summary>
-        public void InsertInRest(TrkDef trkDef)
+        public void InsertInRest(Trk trkDef)
         {
             Debug.Assert(trkDef[0] is MidiChordDef && trkDef[trkDef.Count - 1] is MidiChordDef);
             _InsertInRest((VoiceDef)trkDef);
