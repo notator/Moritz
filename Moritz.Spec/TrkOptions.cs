@@ -1,19 +1,13 @@
-using System;
 using System.Diagnostics;
 
 using Moritz.Globals;
 using Moritz.Xml;
+using System.Collections.Generic;
 
 namespace Moritz.Spec
 {
     /// <summary>
-    /// Subject to the message types defined in inputNotes,
-	/// This object defines how Trks react to incoming performed information.
-	/// 
-	/// An trkOptions element can be contained in the following elements in score files:
-	///		inputChord (which contains a list of inputNotes)
-	///		inputNote (which contains a list of trkRefs)
-	///		trkRef
+	/// This object defines how Trks react to incoming performed information. 
 	///		
 	/// See http://james-ingram-act-two.de/open-source/svgScoreExtensions.html for details as to how these trkOptions are used.
 	/// 	
@@ -28,11 +22,17 @@ namespace Moritz.Spec
 	/// 
 	/// In the AssistantPerformer, new TrkOptions objects should be empty -- contain no defined members.
     /// </summary>
-    public class TrkOptions
+    public sealed class TrkOptions
     {
-        public TrkOptions()
-        {
-        }
+		public TrkOptions(TrkOption trkOption)
+		{
+			AddList(new List<TrkOption>() { trkOption });
+		}
+
+		public TrkOptions(List<TrkOption> optList)
+		{
+			AddList(optList);
+		}
 
         public void WriteSvg(SvgWriter w)
         {
@@ -64,11 +64,12 @@ namespace Moritz.Spec
 			if(_pressureOption != ControllerType.undefined)
 			{
 				w.WriteAttributeString("pressure", _pressureOption.ToString());
-				if(_pressureOption == ControllerType.volume)
-				{
-					WriteMaxMinVolume(w);
-					isControllingVolume = true;
-				}
+			}
+			else if(_pressureVolumeOption == true)
+			{
+				w.WriteAttributeString("pressure", "volume");
+				WriteMaxMinVolume(w);
+				isControllingVolume = true;
 			}
 
 			if(_pitchWheelOption != PitchWheelOption.undefined)
@@ -77,22 +78,19 @@ namespace Moritz.Spec
 				switch(_pitchWheelOption)
 				{
 					case PitchWheelOption.pitch:
-						Debug.Assert(_pitchWheelDeviationOption != null);
 						//(range 0..127)
-						Debug.Assert(_pitchWheelDeviationOption >= 0 && _pitchWheelDeviationOption <= 127);
+						Debug.Assert(_pitchWheelDeviationOption != null && _pitchWheelDeviationOption >= 0 && _pitchWheelDeviationOption <= 127);
 						w.WriteAttributeString("pitchWheelDeviation", _pitchWheelDeviationOption.ToString());
 						break;
 					case PitchWheelOption.pan:
-						Debug.Assert(_panOriginOption != null);
 						//(range 0..127, centre is 64)
-						Debug.Assert(_panOriginOption >= 0 && _panOriginOption <= 127);
+						Debug.Assert(_panOriginOption != null && _panOriginOption >= 0 && _panOriginOption <= 127);
 						w.WriteAttributeString("panOrigin", _panOriginOption.ToString());
 						break;
 					case PitchWheelOption.speed:
-						Debug.Assert(_speedDeviationOption != null);
 						// maximum speed is when durations = durations / speedDeviation
 						// minimum speed is when durations = durations * speedDeviation 
-						Debug.Assert(_speedDeviationOption > 0);
+						Debug.Assert(_speedDeviationOption != null && _speedDeviationOption > 0);
 						w.WriteAttributeString("speedDeviation", ((float)_speedDeviationOption).ToString(M.En_USNumberFormat));
 						break;
 				}
@@ -101,12 +99,13 @@ namespace Moritz.Spec
 			if(_modWheelOption != ControllerType.undefined)
 			{
 				w.WriteAttributeString("modWheel", _modWheelOption.ToString());
-				if(_modWheelOption == ControllerType.volume)
-				{
-					Debug.Assert(isControllingVolume == false);
-					WriteMaxMinVolume(w);
-					isControllingVolume = true;
-				}
+			}
+			else if(_modWheelVolumeOption == true)
+			{
+				Debug.Assert(isControllingVolume == false, "Can't control volume with both pressure and modWheel.");
+				w.WriteAttributeString("modWheel", "volume");
+				WriteMaxMinVolume(w);
+				isControllingVolume = true;
 			}
 
             w.WriteEndElement(); // score:trkOptions
@@ -130,262 +129,166 @@ namespace Moritz.Spec
             w.WriteAttributeString("minVolume", _minimumVolume.ToString());
         }
 
-		public void Add(VelocityScaledTrkOption velocityTrkOption)
+		public void AddList(List<TrkOption> optList)
+		{
+			foreach(TrkOption opt in optList)
+			{
+				PedalControl pto = opt as PedalControl;
+				if(pto != null)
+				{
+					Add(pto);
+				}
+				TrkOffControl toto = opt as TrkOffControl;
+				if(toto != null)
+				{
+					Add(toto);
+				}
+				VelocityTrkOption vto = opt as VelocityTrkOption;
+				if(vto != null)
+				{
+					Add(vto);
+				}
+				PressureControl pcto = opt as PressureControl;
+				if(pcto != null)
+				{
+					Add(pcto);
+				}
+				ModWheelControl mwcto = opt as ModWheelControl;
+				if(mwcto != null)
+				{
+					Add(mwcto);
+				}
+				PressureVolumeControl pvto = opt as PressureVolumeControl;
+				if(pvto != null)
+				{
+					Add(pvto);
+				}
+				ModWheelVolumeControl mwvto = opt as ModWheelVolumeControl;
+				if(mwvto != null)
+				{
+					Add(mwvto);
+				}
+				PitchWheelPitchControl pwpito = opt as PitchWheelPitchControl;
+				if(pwpito != null)
+				{
+					Add(pwpito);
+				}
+				PitchWheelPanControl pwpato = opt as PitchWheelPanControl;
+				if(pwpato != null)
+				{
+					Add(pwpato);
+				}
+				PitchWheelSpeedControl pwsto = opt as PitchWheelSpeedControl;
+				if(pwsto != null)
+				{
+					Add(pwsto);
+				}
+			}
+		}
+
+		public void Add(PedalControl pedalTrkOption)
+		{
+			_pedalOption = pedalTrkOption.PedalOption;
+		}
+		public void Add(TrkOffControl trkOffTrkOption)
+		{
+			_trkOffOption = trkOffTrkOption.TrkOffOption;
+		}
+		public void Add(VelocityTrkOption velocityTrkOption)
 		{
 			_velocityOption = velocityTrkOption.VelocityOption;
 			_minimumVelocity = velocityTrkOption.MinimumVelocity;
 		}
-
-		public void Add(VelocitySharedTrkOption velocityTrkOption)
+		public void Add(PressureControl pressureControl)
 		{
-			_velocityOption = velocityTrkOption.VelocityOption;
-			_minimumVelocity = velocityTrkOption.MinimumVelocity;
+			_pressureOption = pressureControl.ControllerType;
 		}
-
-		public void Add(VelocityOverriddenTrkOption velocityTrkOption)
+		public void Add(ModWheelControl modWheelControllerTrkOption)
 		{
-			_velocityOption = velocityTrkOption.VelocityOption;
-			_minimumVelocity = velocityTrkOption.MinimumVelocity;
+			_modWheelOption = modWheelControllerTrkOption.ControllerType;
 		}
-
-		public void Add(PressureControllerTrkOption pressureControllerTrkOption)
+		public void Add(PressureVolumeControl pressureVolumeTrkOption)
 		{
-			_pressureOption = pressureControllerTrkOption.PressureOption;
-		}
-
-		public void Add(PressureVolumeTrkOption pressureVolumeTrkOption)
-		{
-			_pressureOption = pressureVolumeTrkOption.PressureOption;
+			_pressureVolumeOption = true;
 			_minimumVolume = pressureVolumeTrkOption.MinimumVolume;
 			_maximumVolume = pressureVolumeTrkOption.MaximumVolume;
-		}
 
-		public void Add(PitchWheelPitchTrkOption pitchWheelPitchTrkOption)
-		{
-			_pitchWheelOption = pitchWheelPitchTrkOption.PitchWheelOption;
-			_pitchWheelDeviationOption = pitchWheelPitchTrkOption.PitchWheelDeviationOption;
 		}
-
-		public void Add(PitchWheelPanTrkOption pitchWheelPanTrkOption)
+		public void Add(ModWheelVolumeControl modWheelVolumeTrkOption)
 		{
-			_pitchWheelOption = pitchWheelPanTrkOption.PitchWheelOption;
-			_panOriginOption = pitchWheelPanTrkOption.PanOriginOption;
-		}
-
-		public void Add(PitchWheelSpeedTrkOption pitchWheelSpeedTrkOption)
-		{
-			_pitchWheelOption = pitchWheelSpeedTrkOption.PitchWheelOption;
-			_speedDeviationOption = pitchWheelSpeedTrkOption.SpeedDeviationOption;
-		}
-
-		public void Add(ModWheelControllerTrkOption modWheelControllerTrkOption)
-		{
-			_modWheelOption = modWheelControllerTrkOption.ModWheelOption;
-		}
-		
-		public void Add(ModWheelVolumeTrkOption modWheelVolumeTrkOption)
-		{
-			_modWheelOption = modWheelVolumeTrkOption.ModWheelOption;
+			_modWheelVolumeOption = true;
 			_minimumVolume = modWheelVolumeTrkOption.MinimumVolume;
 			_maximumVolume = modWheelVolumeTrkOption.MaximumVolume;
+
+		}
+		public void Add(PitchWheelPitchControl pitchWheelPitchTrkOption)
+		{
+			_pitchWheelOption = PitchWheelOption.pitch;
+			_pitchWheelDeviationOption = pitchWheelPitchTrkOption.PitchWheelDeviation;
+		}
+		public void Add(PitchWheelPanControl pitchWheelPanTrkOption)
+		{
+			_pitchWheelOption = PitchWheelOption.pan;
+			_panOriginOption = pitchWheelPanTrkOption.PanOriginOption;
+		}
+		public void Add(PitchWheelSpeedControl pitchWheelSpeedTrkOption)
+		{
+			_pitchWheelOption = PitchWheelOption.speed;
+			_speedDeviationOption = pitchWheelSpeedTrkOption.SpeedDeviationOption;
 		}
 
 		/* 
 		 * Default values are all null. These values are not written to score files.
 		 */
-		public PedalOption PedalOption = PedalOption.undefined;
-		public TrkOffOption TrkOffOption = TrkOffOption.undefined;
+		public PedalOption PedalOption { get { return _pedalOption; } }
+		private PedalOption _pedalOption = PedalOption.undefined;
+
+		public TrkOffOption TrkOffOption { get { return _trkOffOption; } }
+		private TrkOffOption _trkOffOption = TrkOffOption.undefined;
 
 		public VelocityOption VelocityOption
 		{ 
 			get { return _velocityOption; }
-			set
-			{ 
-				Debug.Assert(false, "Set this option by calling TrkOptions.Add(new VelocityTrkOption(...)).");
-			}
 		}
-        protected VelocityOption _velocityOption = VelocityOption.undefined;
+        private VelocityOption _velocityOption = VelocityOption.undefined;
 
 		public ControllerType PressureOption
 		{
 			get { return _pressureOption; }
-			set
-			{ 
-				if(value == ControllerType.volume)
-				{
-					Debug.Assert(false, "Set the pressure-volume option by calling TrkOptions.Add(new PressureVolumeTrkOption(...)).");
-				}
-				else
-				{
-					_pressureOption = value;
-				}
-			} 
 		}
-		protected ControllerType _pressureOption = ControllerType.undefined;
+		private ControllerType _pressureOption = ControllerType.undefined;
+		public bool PressureVolumeOption { get { return _pressureVolumeOption; } }
+		private bool _pressureVolumeOption = false;
 
 		public PitchWheelOption PitchWheelOption
 		{
 			get { return _pitchWheelOption; }
-			set
-			{
-				Debug.Assert(false, "Set the pitchWheel option by calling one of the following:\n\n" +
-					"TrkOptions.Add(new PitchWheelPitchTrkOption(...)),\n" +
-					"TrkOptions.Add(new PitchWheelPanTrkOption(...)),\n" +
-					"TrkOptions.Add(new PitchWheelSpeedTrkOption(...)).");
-			}
 		}
-		protected PitchWheelOption _pitchWheelOption = PitchWheelOption.undefined;
+		private PitchWheelOption _pitchWheelOption = PitchWheelOption.undefined;
 
-		public ControllerType ModWheelOption
-		{
-			get { return _modWheelOption; }
-			set
-			{
-				if(value == ControllerType.volume)
-				{
-					Debug.Assert(false, "Set the modWheel-volume option by calling TrkOptions.Add(new ModWheelVolumeTrkOption(...)).");
-				}
-				else
-				{
-					_modWheelOption = value;
-				}
-			}
-		}
-		protected ControllerType _modWheelOption = ControllerType.undefined;
+		public ControllerType ModWheelOption { get { return _modWheelOption; } }
+		private ControllerType _modWheelOption = ControllerType.undefined;
+		public bool ModWheelVolumeOption { get { return _modWheelVolumeOption; } }
+		private bool _modWheelVolumeOption = false;
 
 		public byte? PitchWheelDeviationOption { get { return _pitchWheelDeviationOption; } }
-		protected byte? _pitchWheelDeviationOption = null; // should be set if the PitchWheelOption is set to pitchWheel
+		private byte? _pitchWheelDeviationOption = null; // should be set if the PitchWheelOption is set to pitchWheel
 		public byte? PanOriginOption { get { return _panOriginOption; } }
-		protected byte? _panOriginOption = null;  // should be set if the PitchWheelOption is set to pan. (range 0..127, centre is 64)
+		private byte? _panOriginOption = null;  // should be set if the PitchWheelOption is set to pan. (range 0..127, centre is 64)
 		public float? SpeedDeviationOption { get { return _speedDeviationOption; } }
-		protected float? _speedDeviationOption = null; // should be set if the PitchWheelOption is set to speed ( < 1 )
+		private float? _speedDeviationOption = null; // should be set if the PitchWheelOption is set to speed ( < 1 )
 		public byte? MinimumVelocity { get { return _minimumVelocity; } }
-		protected byte? _minimumVelocity = null; // must be set if a velocity option is being used
+		private byte? _minimumVelocity = null; // must be set if a velocity option is being used
 		public byte? MaximumVolume { get { return _maximumVolume; } }
-        protected byte? _maximumVolume = null; // must be set if the performer is controlling the volume
+		private byte? _maximumVolume = null; // must be set if the performer is controlling the volume
 		public byte? MinimumVolume { get { return _minimumVolume; } }
-		protected byte? _minimumVolume = null; // must be set if the performer is controlling the volume
+		private byte? _minimumVolume = null; // must be set if the performer is controlling the volume
     }
 
-	public class VelocityScaledTrkOption : TrkOptions
+	public class TrkOption
 	{
-		public VelocityScaledTrkOption(byte minVelocity)
-			: base()
-		{
-			Debug.Assert(minVelocity > 0 && minVelocity < 128);
-			_velocityOption = VelocityOption.scaled;
-			_minimumVelocity = minVelocity;
-		}
+		protected TrkOption() { }
 	}
-	public class VelocitySharedTrkOption : TrkOptions
-	{
-		public VelocitySharedTrkOption(byte minVelocity)
-			: base()
-		{
-			Debug.Assert(minVelocity > 0 && minVelocity < 128);
-			_velocityOption = VelocityOption.shared;
-			_minimumVelocity = minVelocity;
-		}
-	}
-	public class VelocityOverriddenTrkOption : TrkOptions
-	{
-		public VelocityOverriddenTrkOption(byte minVelocity)
-			: base()
-		{
-			Debug.Assert(minVelocity > 0 && minVelocity < 128);
-			_velocityOption = VelocityOption.overridden;
-			_minimumVelocity = minVelocity;
-		}
-	}
-
-	public class PressureControllerTrkOption : TrkOptions
-	{
-		public PressureControllerTrkOption(ControllerType controller)
-		{
-			PressureOption = controller; // checks that it is not volume.
-		}
-	}
-
-	public class PressureVolumeTrkOption : TrkOptions
-	{
-		public PressureVolumeTrkOption(byte minVolume, byte maxVolume)
-			: base()
-		{
-			Debug.Assert(minVolume < maxVolume);
-			Debug.Assert(minVolume > 0 && minVolume < 128);
-			Debug.Assert(maxVolume > 0 && maxVolume < 128);
-			_pressureOption = ControllerType.volume;
-			_minimumVolume = minVolume;
-			_maximumVolume = maxVolume;
-		}
-	}
-
-	#region PitchWheelOptions
-	public class PitchWheelPitchTrkOption : TrkOptions
-	{
-		public PitchWheelPitchTrkOption(byte deviation)
-			: base()
-		{
-			Debug.Assert(deviation > 0 && deviation < 128);
-			_pitchWheelOption = PitchWheelOption.pitch;
-			_pitchWheelDeviationOption = deviation;
-		}
-	}
-
-	public class PitchWheelPanTrkOption : TrkOptions
-	{
-		public PitchWheelPanTrkOption(byte origin)
-			: base()
-		{
-			// pan centre is 64)
-			Debug.Assert(origin >= 0 && origin < 128);
-			_pitchWheelOption = PitchWheelOption.pan;
-			_panOriginOption = origin;
-		}
-	}
-
-	public class PitchWheelSpeedTrkOption : TrkOptions
-	{
-		public PitchWheelSpeedTrkOption(float maxFactor)
-			: base()
-		{
-			Debug.Assert(maxFactor > 1.0F);
-			_pitchWheelOption = PitchWheelOption.speed;
-			_speedDeviationOption = maxFactor;
-		}
-	}
-	#endregion
-
-
-	public class ModWheelControllerTrkOption : TrkOptions
-	{
-		public ModWheelControllerTrkOption(ControllerType controller)
-		{
-			ModWheelOption = controller; // checks that it is not volume.
-		}
-	}
-
-	public class ModWheelVolumeTrkOption : TrkOptions
-	{
-		public ModWheelVolumeTrkOption(byte minVolume, byte maxVolume)
-			: base()
-		{
-			Debug.Assert(minVolume < maxVolume);
-			Debug.Assert(minVolume > 0 && minVolume < 128);
-			Debug.Assert(maxVolume > 0 && maxVolume < 128);
-			_modWheelOption = ControllerType.volume;
-			_minimumVolume = minVolume;
-			_maximumVolume = maxVolume;
-		}
-	}
-
-    public enum VelocityOption
-    {
-        undefined,
-        scaled,
-		shared,
-		overridden
-    };
 
 	public enum PedalOption
 	{
@@ -394,37 +297,187 @@ namespace Moritz.Spec
 		holdAll, // remove all noteOff messages from the track, and don't send allNotesOff
 		holdAllStop // like holdAll, but sends AllNotesOff when the track stops (or is stopped)
 	};
+	public class PedalControl: TrkOption
+	{
+		public PedalControl(PedalOption pedalOption)
+		{
+			_pedalOption = pedalOption;
+		}
+		
+		public PedalOption PedalOption {get{return _pedalOption;}}
+		private PedalOption _pedalOption;
+	}
 
-    public enum TrkOffOption
-    {
+	public enum TrkOffOption
+	{
 		undefined,
-        stopChord, // stop when the current midiChord or midiRest completes
-        stopNow, // stop immediately, even inside a midiChord
-        fade // fade velocity to end of trk
-    };
+		stopChord, // stop when the current midiChord or midiRest completes
+		stopNow, // stop immediately, even inside a midiChord
+		fade // fade velocity to end of trk
+	};
+	public class TrkOffControl : TrkOption
+	{
+		public TrkOffControl(TrkOffOption trkOffOption)
+		{ 
+			_trkOffOption = trkOffOption;
+		}
 
-    public enum ControllerType
-    {
-		undefined,
-        aftertouch,
-        channelPressure,
-        modulation,
-		volume,
-        expression,
-        timbre,
-        brightness,
-        effects,
-        tremolo,
-        chorus,
-        celeste,
-        phaser
-    };
+		public TrkOffOption TrkOffOption { get { return _trkOffOption; } }
+		private TrkOffOption _trkOffOption;
+	}
 
-    public enum PitchWheelOption
-    {
+	public enum VelocityOption
+	{
 		undefined,
-        pitch,
-        speed,
-		pan
-    };
+		scaled,
+		shared,
+		overridden
+	};
+	public class VelocityTrkOption :TrkOption
+	{
+		protected VelocityTrkOption(VelocityOption velocityOption, byte minVelocity)
+		{
+			Debug.Assert(minVelocity > 0 && minVelocity < 128);
+			_minVelocity = minVelocity;
+			_velocityOption = velocityOption;
+		}
+
+		public VelocityOption VelocityOption { get { return _velocityOption; } }
+		private VelocityOption _velocityOption;
+		public byte MinimumVelocity { get { return _minVelocity; } }
+		private byte _minVelocity;
+	}
+	public class VelocityScaledControl : VelocityTrkOption
+	{
+		public VelocityScaledControl(byte minVelocity)
+			: base(VelocityOption.scaled, minVelocity)
+		{
+		}
+	}
+	public class VelocitySharedControl : VelocityTrkOption
+	{
+		public VelocitySharedControl(byte minVelocity)
+			: base(VelocityOption.shared, minVelocity)
+		{
+		}
+	}
+	public class VelocityOverriddenControl : VelocityTrkOption
+	{
+		public VelocityOverriddenControl(byte minVelocity)
+			: base(VelocityOption.overridden, minVelocity)
+		{
+		}
+	}
+
+	public enum ControllerType
+	{
+		undefined,
+		aftertouch,
+		channelPressure,
+		modulation,
+		expression,
+		timbre,
+		brightness,
+		effects,
+		tremolo,
+		chorus,
+		celeste,
+		phaser
+	};
+	public class ControllerTrkOption : TrkOption
+	{
+		protected ControllerTrkOption(ControllerType controllerType)
+		{
+			_controllerType = controllerType;
+		}
+		public ControllerType ControllerType {get{return _controllerType;}}
+		private ControllerType _controllerType;
+	}
+	public class PressureControl : ControllerTrkOption
+	{
+		public PressureControl(ControllerType controllerType)
+			: base(controllerType)
+		{
+		}
+	}
+	public class ModWheelControl : ControllerTrkOption
+	{
+		public ModWheelControl(ControllerType controllerType)
+			: base(controllerType)
+		{
+		}
+	}
+
+	public class PressureVolumeControl : TrkOption
+	{
+		public PressureVolumeControl(byte minVolume, byte maxVolume)
+		{
+			Debug.Assert(minVolume < maxVolume);
+			Debug.Assert(minVolume > 0 && minVolume < 128);
+			Debug.Assert(maxVolume > 0 && maxVolume < 128);
+			_minimumVolume = minVolume;
+			_maximumVolume = maxVolume;
+		}
+		public byte MinimumVolume { get { return _minimumVolume; } }
+		private byte _minimumVolume;
+		public byte MaximumVolume { get { return _maximumVolume; } }
+		private byte _maximumVolume;
+	}
+	public class ModWheelVolumeControl : TrkOption
+	{
+		public ModWheelVolumeControl(byte minVolume, byte maxVolume)
+		{
+			Debug.Assert(minVolume < maxVolume);
+			Debug.Assert(minVolume > 0 && minVolume < 128);
+			Debug.Assert(maxVolume > 0 && maxVolume < 128);
+			_minimumVolume = minVolume;
+			_maximumVolume = maxVolume;
+		}
+		public byte MinimumVolume { get { return _minimumVolume; } }
+		private byte _minimumVolume;
+		public byte MaximumVolume { get { return _maximumVolume; } }
+		private byte _maximumVolume;
+	}
+
+	public enum PitchWheelOption
+	{
+		undefined,
+		pitch,
+		pan,
+		speed
+	};
+	public class PitchWheelControl : TrkOption
+	{
+	}
+	public class PitchWheelPitchControl : PitchWheelControl
+	{
+		public PitchWheelPitchControl(byte deviation)
+		{
+			Debug.Assert(deviation > 0 && deviation < 128);
+			_pitchWheelDeviation = deviation;
+		}
+		public byte PitchWheelDeviation { get { return _pitchWheelDeviation; } }
+		private byte _pitchWheelDeviation;
+	}
+	public class PitchWheelPanControl : PitchWheelControl
+	{
+		public PitchWheelPanControl(byte origin)
+		{
+			// pan centre is 64)
+			Debug.Assert(origin >= 0 && origin < 128);
+			_panOriginOption = origin;
+		}
+		public byte PanOriginOption { get { return _panOriginOption; } }
+		private byte _panOriginOption;
+	}
+	public class PitchWheelSpeedControl : PitchWheelControl
+	{
+		public PitchWheelSpeedControl(float maxFactor)
+		{
+			Debug.Assert(maxFactor > 1.0F);
+			_speedDeviationOption = maxFactor;
+		}
+		public float SpeedDeviationOption { get { return _speedDeviationOption; } }
+		private float _speedDeviationOption;
+	}  
 }

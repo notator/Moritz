@@ -13,19 +13,20 @@ namespace Moritz.Spec
 {
 	public class ContinuousControls
 	{
-		protected ContinuousControls(Dictionary<byte, TrkOptions> trkChannelTrkOptions, TrkOptions trkOptions)
+		protected ContinuousControls(Dictionary<byte, TrkOption> trkChannelTrkOption, TrkOption trkOption)
 		{
-			TrkChannelTrkOptions = trkChannelTrkOptions;
-			TrkOptions = trkOptions;
+			_trkChannelTrkOption = trkChannelTrkOption;
+			_trkOption = trkOption;
 		}
 
-		private void WriteTrkInController(SvgWriter w, byte midiChannel, TrkOptions trkOptions)
+		private void WriteTrkInController(SvgWriter w, byte midiChannel, TrkOption trkOption)
 		{
 			w.WriteStartElement("trk");
 			w.WriteAttributeString("midiChannel", midiChannel.ToString());
-			if(trkOptions != null)
+			if(trkOption != null)
 			{
-				trkOptions.WriteSvg(w);
+				TrkOptions tos = new TrkOptions(trkOption);
+				tos.WriteSvg(w);
 			}
 			w.WriteEndElement(); // trk
 		}
@@ -33,26 +34,38 @@ namespace Moritz.Spec
 		protected void WriteSvg(SvgWriter w, string elementName )
 		{
 			w.WriteStartElement(elementName); // "pressures", "pitchWheels" or "modWheels"
-			if(TrkOptions != null)
+			if(_trkOption != null)
 			{
-				TrkOptions.WriteSvg(w);
+				TrkOptions tos = new TrkOptions(_trkOption);
+				tos.WriteSvg(w);
 			}
-			foreach(KeyValuePair<byte, TrkOptions> elem in TrkChannelTrkOptions)
+			foreach(KeyValuePair<byte, TrkOption> elem in _trkChannelTrkOption)
 			{
 				WriteTrkInController(w, elem.Key, elem.Value);
 			}
 			w.WriteEndElement(); // "pressures", "pitchWheels" or "modWheels"
 		}
 
-		public Dictionary<byte, TrkOptions> TrkChannelTrkOptions = null;
-		public TrkOptions TrkOptions = null; 
+		protected Dictionary<byte, TrkOption> _trkChannelTrkOption = null;
+		protected TrkOption _trkOption = null; 
 	}
 
 	public class Pressures : ContinuousControls
 	{
-		public Pressures(Dictionary<byte, TrkOptions> trkChannelTrkOptions, TrkOptions trkOptions)
-			: base(trkChannelTrkOptions, trkOptions)
-		{ }
+		/// <summary>
+		/// The pressures element (contained in an SVG noteOn element)
+		/// </summary>
+		/// <param name="trkChannelTrkOption">The TrkOptions in this dictionary must be either PressureControls, PressureVolumeControls or null.</param>
+		/// <param name="trkOption">Must be either a PressureControl, a PressureVolumeControl or null.</param>
+		public Pressures(Dictionary<byte, TrkOption> trkChannelTrkOption, TrkOption trkOption)
+			: base(trkChannelTrkOption, trkOption)
+		{
+			Debug.Assert(trkOption == null || trkOption is PressureControl || trkOption is PressureVolumeControl);
+			foreach(TrkOption opt in trkChannelTrkOption.Values)
+			{
+				Debug.Assert(opt == null || opt is PressureControl || opt is PressureVolumeControl);
+			}
+		}
 
 		public void WriteSvg(SvgWriter w)
 		{
@@ -62,9 +75,20 @@ namespace Moritz.Spec
 
 	public class PitchWheels : ContinuousControls
 	{
-		public PitchWheels(Dictionary<byte, TrkOptions> trkChannelTrkOptions, TrkOptions trkOptions)
-			: base(trkChannelTrkOptions, trkOptions)
-		{ }
+		/// <summary>
+		/// The pitchWheels element (contained in an SVG noteOn or noteOff element)
+		/// </summary>
+		/// <param name="trkChannelTrkOption">The TrkOptions in this dictionary must be either PitchWheelControls or null.</param>
+		/// <param name="trkOption">Must be either a PitchWheelControl or null.</param>
+		public PitchWheels(Dictionary<byte, TrkOption> trkChannelTrkOption, TrkOption trkOption)
+			: base(trkChannelTrkOption, trkOption)
+		{
+			Debug.Assert(trkOption == null || trkOption is PitchWheelControl);
+			foreach(TrkOption opt in trkChannelTrkOption.Values)
+			{
+				Debug.Assert(opt == null || opt is PitchWheelControl);
+			}
+		}
 
 		public void WriteSvg(SvgWriter w)
 		{
@@ -74,9 +98,20 @@ namespace Moritz.Spec
 
 	public class ModWheels : ContinuousControls
 	{
-		public ModWheels(Dictionary<byte, TrkOptions> trkChannelTrkOptions, TrkOptions trkOptions)
-			: base(trkChannelTrkOptions, trkOptions)
-		{ }
+		/// <summary>
+		/// The modWheels element (contained in an SVG noteOn or noteOff element)
+		/// </summary>
+		/// <param name="trkChannelTrkOption">The TrkOptions in this dictionary must be either ModWheelControls, ModWheelVolumeControls or null.</param>
+		/// <param name="trkOption">Must be either a ModWheelControl, a ModWheelVolumeControl or null.</param>
+		public ModWheels(Dictionary<byte, TrkOption> trkChannelTrkOption, TrkOption trkOption)
+			: base(trkChannelTrkOption, trkOption)
+		{
+			Debug.Assert(trkOption == null || trkOption is ModWheelControl || trkOption is ModWheelVolumeControl);
+			foreach(TrkOption opt in trkChannelTrkOption.Values)
+			{
+				Debug.Assert(opt == null || opt is ModWheelControl || opt is ModWheelVolumeControl);
+			}
+		}
 
 		public void WriteSvg(SvgWriter w)
 		{
