@@ -26,7 +26,7 @@ namespace Moritz.Spec
 			Debug.Assert(TrkRefs != null && TrkRefs.Count > 0);
 			foreach(TrkRef trkRef in TrkRefs)
 			{
-				trkRef.WriteSvg(w, true);
+				trkRef.WriteSvg(w);
 			}
 			w.WriteEndElement(); // trks
 		}

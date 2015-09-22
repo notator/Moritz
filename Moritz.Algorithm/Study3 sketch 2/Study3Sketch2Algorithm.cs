@@ -219,8 +219,12 @@ namespace Moritz.Algorithm.Study3Sketch2
 				nOnSeq.TrkRefs[i].TrkOptions = new TrkOptions(new VelocityOverriddenControl((byte)(i + 4)));
 			}
 			#endregion
-
 			#endregion noteOn
+			#region noteOff
+			List<byte> newTrkOffs = new List<byte>() { 0,4,2,3,5 };
+			inputChordDef1.InputNoteDefs[0].NoteOff.TrkOffs = newTrkOffs;
+			inputChordDef1.InputNoteDefs[0].NoteOn.TrkOffs = newTrkOffs;
+			#endregion noteOff
 
 			#endregion set trkOptions on the first InputChordDef
 				 
@@ -291,7 +295,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             int msPos = bar2StartMsPos;
             for(int i = 0; i < bar.Count; ++i)
             {
-				TrkRef trk = new TrkRef((byte)i, msPos, 12, null);
+				TrkRef trk =  new TrkRef((byte)i, msPos, 12, null);
 				List<TrkRef> trks = new List<TrkRef>() { trk };
 				Seq seq = new Seq(trks, null);
 

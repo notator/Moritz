@@ -13,11 +13,11 @@ namespace Moritz.Spec
 {
 	public class NoteTrigger
 	{
-		protected NoteTrigger(Seq seq, List<TrkRef> trkOffs, TrkOptions trkOptions)
+		protected NoteTrigger(Seq seq, List<byte> trkOffs, TrkOptions trkOptions)
 		{
 			_seq = seq;
-			_trkOffs = trkOffs;	
-			_trkOptions = trkOptions;	
+			_trkOffs = trkOffs;
+			_trkOptions = trkOptions;
 		}
 
 		protected void WriteSvg(SvgWriter w, string elementName)
@@ -34,38 +34,46 @@ namespace Moritz.Spec
 				_seq.WriteSvg(w);
 			}
 
-			if(_trkOffs != null)
+			if(_trkOffs != null && _trkOffs.Count > 0)
 			{
-				w.WriteStartElement("trkOffs");
-				foreach(TrkRef trkRef in _trkOffs)
+				StringBuilder sb = new StringBuilder();
+				foreach(byte midiChannel in _trkOffs)
 				{
-					trkRef.WriteSvg(w, false);
+					sb.Append(midiChannel);
+					sb.Append(' ');
 				}
+				sb.Remove(sb.Length - 1, 1);
+
+				w.WriteStartElement("trkOffs");
+
+				w.WriteAttributeString("midiChannels", sb.ToString());
+
 				w.WriteEndElement(); // trkOffs
 			}
 
 			w.WriteEndElement(); // noteOn or noteOff
 		}
 
+		public Seq Seq { get { return _seq; } }
 		private Seq _seq = null;
-		private List<TrkRef> _trkOffs = null;
+
+		public TrkOptions TrkOptions { get { return _trkOptions; } set { _trkOptions = value; } }
 		private TrkOptions _trkOptions = null;
 
-		public Seq Seq { get { return _seq; } }
-		public List<TrkRef> TrkOffs { get { return _trkOffs; } }
-		public TrkOptions TrkOptions { get { return _trkOptions; } set { _trkOptions = value; } } 
+		public List<byte> TrkOffs { get { return _trkOffs; } set {_trkOffs = value;}}
+		protected List<byte> _trkOffs = null;
 	}
 
 	public class NoteOn : NoteTrigger
 	{
-		public NoteOn(Seq seq, List<TrkRef> trkOffs, TrkOptions trkOptions)
+		public NoteOn(Seq seq, List<byte> trkOffs, TrkOptions trkOptions)
 			: base(seq, trkOffs, trkOptions)
 		{
 		}
 
 		// a NoteOn that uses no continuous controllers, turns no trks off, and has no trkOptions.
 		public NoteOn(Seq seq)
-			: base(seq, null, null)
+			: base(seq, new List<byte>(), null)
 		{
 
 		}
@@ -79,19 +87,20 @@ namespace Moritz.Spec
 	public class NoteOff : NoteTrigger
 	{
 		public NoteOff(NoteOn noteOn, Seq seq, TrkOptions trkOptions)
-			: base(seq, noteOn.Seq.TrkRefs, trkOptions)
+			: base(seq, new List<byte>(), trkOptions)
 		{
-
+			foreach(TrkRef tr in noteOn.Seq.TrkRefs)
+			{
+				_trkOffs.Add(tr.MidiChannel);
+			}
 		}
 
 		/// <summary>
 		/// A NoteOff that does nothing except turn off the trks that were turned on by the noteOn argument.
 		/// </summary>
-		/// <param name="noteOn"></param>
 		public NoteOff(NoteOn noteOn)
-			: base(null, noteOn.Seq.TrkRefs, null)
+			: this(noteOn, null, null)
 		{
-
 		}
 
 		public void WriteSvg(SvgWriter w)

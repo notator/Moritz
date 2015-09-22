@@ -28,18 +28,15 @@ namespace Moritz.Spec
 			TrkOptions = trkOptions;
 		}
 
-        internal void WriteSvg(SvgWriter w, bool inSeq)
+        internal void WriteSvg(SvgWriter w)
         {
             w.WriteStartElement("trk");
 			w.WriteAttributeString("midiChannel", _trkMidiChannel.ToString());
 			w.WriteAttributeString("msPosition", _trkMsPosition.ToString());
-			if(inSeq)
-			{ 
-				w.WriteAttributeString("nMidiObjects", _trkNumMidiObjects.ToString());
-				if(TrkOptions != null)
-				{
-					TrkOptions.WriteSvg(w, false);
-				}
+			w.WriteAttributeString("nMidiObjects", _trkNumMidiObjects.ToString());
+			if(TrkOptions != null)
+			{
+				TrkOptions.WriteSvg(w, false);
 			}
             w.WriteEndElement(); // trk
         }
