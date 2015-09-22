@@ -93,12 +93,13 @@ namespace Moritz.Spec
         public void WriteSvg(SvgWriter w)
         {
 			// we are inside a score:inputChord element
-
-            w.WriteStartElement("score", "inputNotes", null);
 			if(_trkOptions != null)
 			{
 				_trkOptions.WriteSvg(w);
-			}			
+			}
+
+            w.WriteStartElement("score", "inputNotes", null);
+			
 			foreach(InputNoteDef ind in _inputNoteDefs)
 			{
 				ind.WriteSvg(w);

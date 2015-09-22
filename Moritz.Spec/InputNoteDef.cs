@@ -31,8 +31,8 @@ namespace Moritz.Spec
 		public InputNoteDef(byte notatedMidiPitch, NoteOn noteOn, TrkOptions trkOptions)
 			: this(notatedMidiPitch, noteOn, null, trkOptions)
 		{
-			//public NoteOff(NoteOn noteOn, Seq seq, PitchWheels pitchWheels, ModWheels modWheels, TrkOptions trkOptions)
-			NoteOff = new NoteOff(noteOn, null, null, null, null);
+			//public NoteOff(NoteOn noteOn, Seq seq, TrkOptions trkOptions)
+			NoteOff = new NoteOff(noteOn, null, null);
 		}
 
 		internal void WriteSvg(SvgWriter w)

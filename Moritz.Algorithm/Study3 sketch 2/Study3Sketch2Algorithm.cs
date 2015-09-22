@@ -101,9 +101,6 @@ namespace Moritz.Algorithm.Study3Sketch2
 				inputChordDef.InputNoteDefs[0].TrkOptions = new TrkOptions(new List<TrkOption>()
 				{
 					new TrkOffControl(TrkOffOption.fade),
-					new PressureControl(ControllerType.phaser),
-					new PitchWheelPitchControl(5),
-					new ModWheelVolumeControl(50, 100)
 				});
             }
         }
@@ -114,18 +111,17 @@ namespace Moritz.Algorithm.Study3Sketch2
             {
 				inputChordDef.InputNoteDefs[0].TrkOptions = new TrkOptions(new List<TrkOption>()
 				{
-					new TrkOffControl(TrkOffOption.stopChord),
-					new PitchWheelPitchControl(6)			
+					new TrkOffControl(TrkOffOption.stopChord),	
 				});
 			}
         }
 
         private void SetBar5SpeedControls(List<InputChordDef> bar5InputChordDefs)
         {
-            foreach(InputChordDef inputChordDef in bar5InputChordDefs)
-            {
-				inputChordDef.InputNoteDefs[0].TrkOptions = new TrkOptions(new PitchWheelSpeedControl(2.2F));
-            }
+			//foreach(InputChordDef inputChordDef in bar5InputChordDefs)
+			//{
+			//	inputChordDef.InputNoteDefs[0].TrkOptions = new TrkOptions(new PitchWheelSpeedControl(2.2F));
+			//}
         }
         #region CreateBar1()
         List<VoiceDef> CreateBar1()
@@ -192,9 +188,7 @@ namespace Moritz.Algorithm.Study3Sketch2
 				new VelocityScaledControl(3),
 				new PedalControl(PedalOption.holdAll),
 				new TrkOffControl(TrkOffOption.fade),
-				new PressureControl(ControllerType.channelPressure),
-				new PitchWheelPitchControl(3),
-				new ModWheelVolumeControl(30, 127)
+				new SpeedControl(1.5F)
 			});
 			#endregion chordTrkOptions
 
@@ -209,7 +203,7 @@ namespace Moritz.Algorithm.Study3Sketch2
 				new VelocityScaledControl(3),
 				new PedalControl(PedalOption.holdAll),
 				new TrkOffControl(TrkOffOption.fade),
-				new PitchWheelPitchControl(4)
+				new SpeedControl(2.1F)
 			});
 
 			for(int i = 0; i < nOnSeq.TrkRefs.Count; ++i)
@@ -218,41 +212,6 @@ namespace Moritz.Algorithm.Study3Sketch2
 			}
 			#endregion
 
-			#region noteOn.Pressures
-			TrkOption mainPressureOpt = new PressureControl(ControllerType.channelPressure);
-			TrkOption trkOpt1 = new PressureControl(ControllerType.modulation);
-			TrkOption trkOpt2= new PressureVolumeControl(20, 127);
-			Dictionary<byte, TrkOption> pressureChannels = new Dictionary<byte, TrkOption>()
-					{
-						{0, null}, // midiChannel, trkOptions
-						{1, trkOpt1}, // midiChannel, trkOptions
-						{2, trkOpt2} // midiChannel, trkOptions
-					};
-			nOn.Pressures = new Pressures(pressureChannels, mainPressureOpt);
-			#endregion
-
-			#region noteOn.PitchWheels
-			TrkOption mainPWOption = new PitchWheelPitchControl(3);
-			TrkOption pwto1 = new PitchWheelSpeedControl(4.33F);
-			TrkOption pwto2 = new PitchWheelPanControl(20);
-			Dictionary<byte, TrkOption> pitchWheelChannels = new Dictionary<byte, TrkOption>()
-					{
-						{0, pwto1}, // midiChannel, trkOption
-						{1, pwto2}, // midiChannel, trkOption
-						{2, null} // midiChannel, trkOption					
-					};
-
-			nOn.PitchWheels = new PitchWheels(pitchWheelChannels, mainPWOption);
-			#endregion
-
-			#region noteOn.ModWheels
-			TrkOption mainMWTrkOpt = new ModWheelControl(ControllerType.expression);
-			Dictionary<byte, TrkOption> modWheelChannels = new Dictionary<byte, TrkOption>()
-					{
-						{0, null} // midiChannel, trkOptions
-					};
-			nOn.ModWheels = new ModWheels(modWheelChannels, mainMWTrkOpt);
-			#endregion
 			#endregion noteOn
 
 			#endregion set trkOptions on the first InputChordDef
