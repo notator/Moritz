@@ -21,7 +21,7 @@ namespace Moritz.Spec
 			w.WriteStartElement("seq");
 			if(TrkOptions != null)
 			{
-				TrkOptions.WriteSvg(w);
+				TrkOptions.WriteSvg(w, false);
 			}
 			Debug.Assert(TrkRefs != null && TrkRefs.Count > 0);
 			foreach(TrkRef trkRef in TrkRefs)

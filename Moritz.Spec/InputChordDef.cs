@@ -93,9 +93,14 @@ namespace Moritz.Spec
         public void WriteSvg(SvgWriter w)
         {
 			// we are inside a score:inputChord element
+			if(_ccSettings != null)
+			{
+				_ccSettings.WriteSvg(w);
+			}
+
 			if(_trkOptions != null)
 			{
-				_trkOptions.WriteSvg(w);
+				_trkOptions.WriteSvg(w, true);
 			}
 
             w.WriteStartElement("score", "inputNotes", null);
@@ -120,6 +125,9 @@ namespace Moritz.Spec
 
 		public TrkOptions TrkOptions { get { return _trkOptions; } set { _trkOptions = value; } }
 		private TrkOptions _trkOptions = null;
+
+		public CCSettings CCSettings { get { return _ccSettings; } set { _ccSettings = value; } }
+		private CCSettings _ccSettings = null;
 
 		public List<InputNoteDef> InputNoteDefs { get {return _inputNoteDefs; }}
 		private List<InputNoteDef> _inputNoteDefs = new List<InputNoteDef>();

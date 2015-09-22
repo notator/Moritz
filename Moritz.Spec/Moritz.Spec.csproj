@@ -47,8 +47,10 @@
   <ItemGroup>
     <Compile Include="BasicMidiChordDef.cs" />
     <Compile Include="CautionaryChordDef.cs" />
+    <Compile Include="CCSettings.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ClefChangeDef.cs" />
-    <Compile Include="ContinuousControls.cs" />
     <Compile Include="InputNoteDef.cs" />
     <Compile Include="NoteTrigger.cs" />
     <Compile Include="Seq.cs" />

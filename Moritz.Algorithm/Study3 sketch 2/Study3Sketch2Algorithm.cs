@@ -182,6 +182,14 @@ namespace Moritz.Algorithm.Study3Sketch2
 			#region set trkOptions on the first InputChordDef  (for testing)
 			InputChordDef inputChordDef1 = inputVoiceDef.UniqueDefs[0] as InputChordDef; // no need to check for null here.
 
+			#region set ccSettings
+			inputChordDef1.CCSettings = new CCSettings(new List<CCSetting>()
+			{
+				new PitchWheelPitchControl(5),
+				new PressureControl(CControllerType.channelPressure),
+				new ModWheelVolumeControl(20,127)			
+			});
+			#endregion
 			#region set chordTrkOptions
 			inputChordDef1.TrkOptions = new TrkOptions(new List<TrkOption>()
 			{
@@ -202,7 +210,7 @@ namespace Moritz.Algorithm.Study3Sketch2
 			{
 				new VelocityScaledControl(3),
 				new PedalControl(PedalOption.holdAll),
-				new TrkOffControl(TrkOffOption.fade),
+				new TrkOffControl(TrkOffOption.disabled),
 				new SpeedControl(2.1F)
 			});
 

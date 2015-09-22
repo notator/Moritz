@@ -38,7 +38,7 @@ namespace Moritz.Spec
 				w.WriteAttributeString("nMidiObjects", _trkNumMidiObjects.ToString());
 				if(TrkOptions != null)
 				{
-					TrkOptions.WriteSvg(w);
+					TrkOptions.WriteSvg(w, false);
 				}
 			}
             w.WriteEndElement(); // trk

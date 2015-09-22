@@ -42,7 +42,7 @@ namespace Moritz.Spec
 
 			if(TrkOptions != null)
 			{
-				TrkOptions.WriteSvg(w);
+				TrkOptions.WriteSvg(w, false);
 			}
 
 			if(NoteOn != null)

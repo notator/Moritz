@@ -26,7 +26,7 @@ namespace Moritz.Spec
 
 			if(_trkOptions != null)
 			{
-				_trkOptions.WriteSvg(w);
+				_trkOptions.WriteSvg(w, false);
 			}
 
 			if(_seq != null)
