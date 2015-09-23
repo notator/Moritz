@@ -3,16 +3,75 @@ using System.Diagnostics;
 using Moritz.Globals;
 using Moritz.Xml;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Moritz.Spec
 {
-    /// <summary>		
-	/// CCSettings are switches that are only settable as InputChordDef components.
+	/// <summary>		
+	/// In a CCsettings object (attached to an InputChordDef), there is logically one TrackCCSettings object
+	/// for each output voice in the score.
+	/// If the DefaultSettings are not defined, voices having no TrackCCSettings will be unaffected.
+	public sealed class CCSettings
+	{
+		/// <param name="defaultSettings">TrackCCSettings, that initially apply to all output voices. MidiChannel must be null.</param>
+		/// <param name="overrideSettings">A list of TrackCCSettings that override the default setting.\n
+		///                                Each MidiChannel must be unique and not null.</param>
+		public CCSettings(TrackCCSettings defaultSettings, List<TrackCCSettings> overrideSettings)
+		{
+			#region check args
+			// There must be a _defaultSettings and/or an _overrideSettings
+			// Note that if the DefaultSettings are not defined, voices having no TrackCCSettings will be unaffected.
+			Debug.Assert(defaultSettings != null || overrideSettings != null);
+
+			List<byte?> channels = new List<byte?>();
+			if(defaultSettings != null)
+			{ 
+				Debug.Assert(defaultSettings.MidiChannel == null);
+			}
+			if(overrideSettings != null)
+			{ 
+				foreach(TrackCCSettings tccs in overrideSettings)
+				{
+					Debug.Assert(tccs.MidiChannel != null);
+					Debug.Assert(!channels.Contains(tccs.MidiChannel));
+					channels.Add(tccs.MidiChannel);
+				}
+			}
+			#endregion check args
+
+			_defaultSettings = defaultSettings;
+			_overrideSettings = overrideSettings;
+		}
+
+		public void WriteSvg(SvgWriter w)
+		{
+			w.WriteStartElement("score", "ccSettings", null);
+
+			if(_defaultSettings != null)
+			{
+				_defaultSettings.WriteSvg(w, "default");
+			}
+			if(_overrideSettings != null)
+			{
+				foreach(TrackCCSettings tccs in _overrideSettings)
+				{
+					tccs.WriteSvg(w, "track");
+				}
+			}
+			w.WriteEndElement(); // score:ccSettings
+		}
+
+		public TrackCCSettings DefaultSettings { get { return _defaultSettings; } }
+		private TrackCCSettings _defaultSettings = null;
+		public ReadOnlyCollection<TrackCCSettings> OverrideSettings { get { return _overrideSettings.AsReadOnly(); } }
+		private List<TrackCCSettings> _overrideSettings = null;
+	}
+	/// TrackCCSettings are switches that are components of InputChordDef.ccSettings objects.
 	/// The Assistant Performer sets these values when the chord with which they are associated is performed.
 	/// The setting for each of the three continuous controlers persists until it is changed in a later
 	/// InputChordDef.ccSettings object.
-	/// CCSettings can have CControllerType values (defined in an enum in this file).
-    /// The default options are:
+	/// TrackCCSettings can have CControllerType values (defined in an enum in this file).
+	/// The default options are:
 	///     pressure="undefined" -- not written to scores. Means "keep the current setting".
 	///     pitchWheel="undefined" -- not written to scores. Means "keep the current setting".
 	///     modulation="undefined" -- not written to scores. Means "keep the current setting".
@@ -20,26 +79,33 @@ namespace Moritz.Spec
 	/// The continuous controllers are disabled by default in the Assistant Performer.
 	/// 
 	/// See also: http://james-ingram-act-two.de/open-source/svgScoreExtensions.html
-    /// </summary>
-    public sealed class CCSettings
-    {
-		public CCSettings(CCSetting ccSetting)
+	/// </summary>
+	public sealed class TrackCCSettings
+	{
+		public TrackCCSettings(byte? midiChannel, CCSetting ccSetting)
 		{
+			_midiChannel = midiChannel;
 			AddList(new List<CCSetting>() { ccSetting });
 		}
 
-		public CCSettings(List<CCSetting> optList)
+		public TrackCCSettings(byte? midiChannel, List<CCSetting> optList)
 		{
+			_midiChannel = midiChannel;
 			AddList(optList);
 		}
 
-        public void WriteSvg(SvgWriter w)
-        {
+		public void WriteSvg(SvgWriter w, string elementName)
+		{
 			Debug.Assert((_pressureOption != CControllerType.undefined || _pressureVolumeOption == true)
 					|| (_modWheelOption != CControllerType.undefined || _modWheelVolumeOption == true)
-					|| (_pitchWheelOption != PitchWheelOption.undefined), "Attempt to write an empty CCSettings element.");
+					|| (_pitchWheelOption != PitchWheelOption.undefined), "Attempt to write an empty TrackCCSettings element.");
 
-            w.WriteStartElement("score", "ccSettings", null);
+			w.WriteStartElement(elementName);
+
+			if(_midiChannel != null)
+			{
+				w.WriteAttributeString("midiChannel", _midiChannel.ToString());
+			}
 
 			bool isControllingVolume = false;
 			if(_pressureOption != CControllerType.undefined)
@@ -89,31 +155,31 @@ namespace Moritz.Spec
 				isControllingVolume = true;
 			}
 
-            w.WriteEndElement(); // score:ccSettings
-        }
+			w.WriteEndElement(); // "default" or "track"
+		}
 
-        private void WriteMaxMinVolume(SvgWriter w)
-        {
-            if(_maximumVolume == null || _minimumVolume == null)
-            {
-                Debug.Assert(false,
-                    "If any of the continuous controllers is set to control the *volume*,\n" +
-                    "then both MaximumVolume and MinimumVolume must also be set.\n\n" +
-					"Use either the PressureVolume(...) or ModWheelVolume(...) constructor.");
-            }
-            if(_maximumVolume <= _minimumVolume)
-            {
+		private void WriteMaxMinVolume(SvgWriter w)
+		{
+			if(_maximumVolume == null || _minimumVolume == null)
+			{
 				Debug.Assert(false,
-                    "MaximumVolume must be greater than MinimumVolume.");
-            }
-            w.WriteAttributeString("maxVolume", _maximumVolume.ToString());
-            w.WriteAttributeString("minVolume", _minimumVolume.ToString());
-        }
+					"If any of the continuous controllers is set to control the *volume*,\n" +
+					"then both MaximumVolume and MinimumVolume must also be set.\n\n" +
+					"Use either the PressureVolume(...) or ModWheelVolume(...) constructor.");
+			}
+			if(_maximumVolume <= _minimumVolume)
+			{
+				Debug.Assert(false,
+					"MaximumVolume must be greater than MinimumVolume.");
+			}
+			w.WriteAttributeString("maxVolume", _maximumVolume.ToString());
+			w.WriteAttributeString("minVolume", _minimumVolume.ToString());
+		}
 
 		public void AddList(List<CCSetting> optList)
 		{
 			Debug.Assert(optList.Count < 4, "Each of the three continuous controllers can only be set once!");
-			Debug.Assert(optList.Count > 0, "Empty CCSettings list.");
+			Debug.Assert(optList.Count > 0, "Empty TrackCCSettings list.");
 			foreach(CCSetting opt in optList)
 			{
 				PressureControl pcto = opt as PressureControl;
@@ -208,6 +274,10 @@ namespace Moritz.Spec
 		/* 
 		 * These default values are not written to score files.
 		 */
+
+		public byte? MidiChannel { get { return _midiChannel; } }
+		private byte? _midiChannel = null;
+
 		public CControllerType PressureOption
 		{
 			get { return _pressureOption; }
@@ -237,7 +307,7 @@ namespace Moritz.Spec
 		private byte? _maximumVolume = null; // must be set if the performer is controlling the volume
 		public byte? MinimumVolume { get { return _minimumVolume; } }
 		private byte? _minimumVolume = null; // must be set if the performer is controlling the volume
-    }
+	}
 
 	public class CCSetting
 	{
@@ -266,7 +336,7 @@ namespace Moritz.Spec
 		{
 			_controllerType = controllerType;
 		}
-		public CControllerType ControllerType {get{return _controllerType;}}
+		public CControllerType ControllerType { get { return _controllerType; } }
 		private CControllerType _controllerType;
 	}
 	public class PressureControl : ControllerCCSetting
@@ -355,5 +425,5 @@ namespace Moritz.Spec
 		}
 		public float SpeedDeviationOption { get { return _speedDeviationOption; } }
 		private float _speedDeviationOption;
-	}  
+	}
 }

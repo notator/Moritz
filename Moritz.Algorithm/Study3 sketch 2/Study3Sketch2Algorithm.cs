@@ -183,12 +183,13 @@ namespace Moritz.Algorithm.Study3Sketch2
 			InputChordDef inputChordDef1 = inputVoiceDef.UniqueDefs[0] as InputChordDef; // no need to check for null here.
 
 			#region set ccSettings
-			inputChordDef1.CCSettings = new CCSettings(new List<CCSetting>()
+			TrackCCSettings defaultCCSettings = new TrackCCSettings(null, new List<CCSetting>()
 			{
 				new PitchWheelPitchControl(5),
 				new PressureControl(CControllerType.channelPressure),
 				new ModWheelVolumeControl(20,127)			
 			});
+			inputChordDef1.CCSettings = new CCSettings(defaultCCSettings, null);
 			#endregion
 			#region set chordTrkOptions
 			inputChordDef1.TrkOptions = new TrkOptions(new List<TrkOption>()
