@@ -118,10 +118,10 @@ namespace Moritz.Algorithm.Study3Sketch2
 
         private void SetBar5SpeedControls(List<InputChordDef> bar5InputChordDefs)
         {
-			//foreach(InputChordDef inputChordDef in bar5InputChordDefs)
-			//{
-			//	inputChordDef.InputNoteDefs[0].TrkOptions = new TrkOptions(new PitchWheelSpeedControl(2.2F));
-			//}
+			foreach(InputChordDef inputChordDef in bar5InputChordDefs)
+			{
+				inputChordDef.InputNoteDefs[0].TrkOptions = new TrkOptions(new SpeedControl(2.2F));
+			}
         }
         #region CreateBar1()
         List<VoiceDef> CreateBar1()
@@ -211,7 +211,7 @@ namespace Moritz.Algorithm.Study3Sketch2
 			{
 				new VelocityScaledControl(3),
 				new PedalControl(PedalOption.holdAll),
-				new TrkOffControl(TrkOffOption.disabled),
+				new TrkOffControl(TrkOffOption.undefined),
 				new SpeedControl(2.1F)
 			});
 
@@ -353,7 +353,6 @@ namespace Moritz.Algorithm.Study3Sketch2
             List<List<VoiceDef>> bars4and5 = SplitBar(bars3And4Plus5[1], bar5StartPos);
 
             bars.Add(bars3And4Plus5[0]); // bar 3
-            //bars.Add(bars3And4Plus5[1]); // bars 4 and 5
             bars.Add(bars4and5[0]); // bar 4
             bars.Add(bars4and5[1]); // bar 5
             return bars;

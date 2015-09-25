@@ -20,16 +20,16 @@ namespace Moritz.Spec
 	///	  2. The settings then cascade (individually) according to the above hierarchy.
 	/// 
     /// The default options are:
-	///     velocity="undefined" -- not written to scores. Means "keep the current setting"
-	///     pedal="undefined" -- not written to scores. Means "keep the current setting"
+	///     velocity="inherit" -- not written to scores. Means "keep the current setting"
+	///     pedal="inherit" -- not written to scores. Means "keep the current setting"
 	///     speed=-1 -- (N.B. minus 1) not written to scores. Means "keep the current setting"
-	///     trkOff="undefined" -- not written to scores. Means "keep the current setting"
+	///     trkOff="inherit" -- not written to scores. Means "keep the current setting"
 	/// To turn an option off at some point in a score, use the enum "disabled" setting, or set the speed to 1.
 	/// The Assistant Performer's default settings are:
-	///     velocity="disabled" -- input midi noteOn velocities are ignored (velocities are performed as written in the score.)
-	///     pedal="disabled" -- noteOffs in the trk are performed as written in the score
+	///     velocity="undefined" -- input midi noteOn velocities are ignored (velocities are performed as written in the score.)
+	///     pedal="undefined" -- noteOffs in the trk are performed as written in the score
 	///     speed=1 -- performed durations are the msDurations written in the score.
-	///     trkOff="disabled" -- performed noteOff messages have no affect on the trk (trks play to completion, as written in the score).
+	///     trkOff="undefined" -- performed noteOff messages have no affect on the trk (trks play to completion, as written in the score).
 	///     
 	/// See also: http://james-ingram-act-two.de/open-source/svgScoreExtensions.html
     /// </summary>
@@ -56,10 +56,10 @@ namespace Moritz.Spec
 				w.WriteStartElement("trkOptions");
 			}
 			
-			if(_velocityOption != VelocityOption.undefined)
+			if(_velocityOption != VelocityOption.inherit)
 			{
 				w.WriteAttributeString("velocity", _velocityOption.ToString());
-				if(_velocityOption != VelocityOption.disabled)
+				if(_velocityOption != VelocityOption.undefined)
 				{ 
 					if(_minimumVelocity == null || _minimumVelocity < 1 || _minimumVelocity > 127)
 					{
@@ -71,7 +71,7 @@ namespace Moritz.Spec
 				}		
 			}
 
-			if(PedalOption != PedalOption.undefined)
+			if(PedalOption != PedalOption.inherit)
 			{
 				w.WriteAttributeString("pedal", PedalOption.ToString());
 			}
@@ -81,7 +81,7 @@ namespace Moritz.Spec
 				w.WriteAttributeString("speed", SpeedOption.ToString(M.En_USNumberFormat));
 			}
 
-			if(TrkOffOption != TrkOffOption.undefined)
+			if(TrkOffOption != TrkOffOption.inherit)
 			{
 				w.WriteAttributeString("trkOff", TrkOffOption.ToString());
 			}
@@ -138,19 +138,19 @@ namespace Moritz.Spec
 		 * These default values are not written to score files.
 		 */
 		public PedalOption PedalOption { get { return _pedalOption; } }
-		private PedalOption _pedalOption = PedalOption.undefined;
+		private PedalOption _pedalOption = PedalOption.inherit;
 
 		public float SpeedOption { get { return _speedOption; } }
 		private float _speedOption = -1;
 
 		public TrkOffOption TrkOffOption { get { return _trkOffOption; } }
-		private TrkOffOption _trkOffOption = TrkOffOption.undefined;
+		private TrkOffOption _trkOffOption = TrkOffOption.inherit;
 
 		public VelocityOption VelocityOption
 		{ 
 			get { return _velocityOption; }
 		}
-        private VelocityOption _velocityOption = VelocityOption.undefined;
+        private VelocityOption _velocityOption = VelocityOption.inherit;
 		public byte? MinimumVelocity { get { return _minimumVelocity; } }
 		private byte? _minimumVelocity = null; // must be set if a velocity option is being used
     }
@@ -162,8 +162,8 @@ namespace Moritz.Spec
 
 	public enum PedalOption
 	{
-		undefined,
-		disabled, // the trk will play as written in the score
+		inherit,
+		undefined, // the trk will play as written in the score
 		holdLast, // remove noteOffs from trk's last moment that contains any, and don't send allNotesOff
 		holdAll, // remove all noteOff messages from the track, and don't send allNotesOff
 		holdAllStop // like holdAll, but sends AllNotesOff when the track stops (or is stopped)
@@ -193,8 +193,8 @@ namespace Moritz.Spec
 
 	public enum TrkOffOption
 	{
-		undefined,
-		disabled, // the trk will ignore an incoming noteOff event, and play to its end (as written in the score).
+		inherit,
+		undefined, // the trk will ignore an incoming noteOff event, and play to its end (as written in the score).
 		stopChord, // stop when the current midiChord or midiRest completes
 		stopNow, // stop immediately, even inside a midiChord
 		fade // fade velocity to end of trk
@@ -212,8 +212,8 @@ namespace Moritz.Spec
 
 	public enum VelocityOption
 	{
-		undefined,
-		disabled, // the velocity written in the score will be played.
+		inherit,
+		undefined, // the velocity written in the score will be played.
 		scaled,
 		shared,
 		overridden
