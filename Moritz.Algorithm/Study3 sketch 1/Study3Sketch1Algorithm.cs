@@ -49,10 +49,6 @@ namespace Moritz.Algorithm.Study3Sketch1
                 bars.Add(bar);
             }
 
-            Debug.Assert(bars.Count == NumberOfBars);
-
-            base.SetOutputVoiceChannelsAndMasterVolumes(bars[0]);
-
             return bars;
         }
 

@@ -43,7 +43,6 @@ namespace Moritz.Algorithm.PaletteDemo
             List<VoiceDef> systemVoices = new List<VoiceDef>();
             systemVoices.Add(voice);
             voicesPerSystem.Add(systemVoices);
-            SetOutputVoiceChannelsAndMasterVolumes(voicesPerSystem[0]);
             Debug.Assert(voicesPerSystem.Count == NumberOfBars);
             return voicesPerSystem;
         }

@@ -104,7 +104,6 @@ namespace Moritz.Algorithm.SongSix
             List<int> barlineMsPositions = GetBarlineMsPositions(furies1, furies2, furies3, furies4, clytemnestra, wind1, wind2, wind3);
             InsertClefChanges(furies1, furies2, furies3, furies4);
             List<List<VoiceDef>> bars = GetBars(voiceDefs, barlineMsPositions);
-            base.SetOutputVoiceChannelsAndMasterVolumes(bars[0]);
             return bars;
         }
         /// <summary>

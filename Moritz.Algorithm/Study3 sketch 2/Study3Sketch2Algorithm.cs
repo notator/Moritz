@@ -50,7 +50,7 @@ namespace Moritz.Algorithm.Study3Sketch2
                 bars.Add(bar);
             }
             Debug.Assert(bars.Count == NumberOfBars);
-            base.SetOutputVoiceChannelsAndMasterVolumes(bars[0]);
+
             List<InputChordDef> inputChordSymbolsInBar2 = GetInputChordDefsInBar(bars[1]);
             SetBar2NoteOnNoteOffControls(inputChordSymbolsInBar2);
             List<InputChordDef> inputChordSymbolsInBar3 = GetInputChordDefsInBar(bars[2]);
@@ -61,31 +61,6 @@ namespace Moritz.Algorithm.Study3Sketch2
             SetBar5SpeedControls(inputChordSymbolsInBar5);
 
             return bars;
-        }
-
-        /// <summary>
-        /// Returns all the InputChordDefs in the bar.
-        /// </summary>
-        private List<InputChordDef> GetInputChordDefsInBar(List<VoiceDef> bar)
-        {
-            List<InputChordDef> inputChordDefs = new List<InputChordDef>();
-
-            foreach(VoiceDef voiceDef in bar)
-            {
-                InputVoiceDef inputVoiceDef = voiceDef as InputVoiceDef;
-                if(inputVoiceDef != null)
-                {
-                    foreach(IUniqueDef uniqueDef in inputVoiceDef.UniqueDefs)
-                    {
-                        InputChordDef icd = uniqueDef as InputChordDef;
-                        if(icd != null)
-                        {
-                            inputChordDefs.Add(icd);
-                        }
-                    }
-                }
-            }
-            return inputChordDefs;
         }
 
         private void SetBar2NoteOnNoteOffControls(List<InputChordDef> bar2InputChordDefs)

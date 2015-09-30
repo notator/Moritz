@@ -33,6 +33,10 @@ namespace Moritz.Composer
             {
                 errorString = CheckTrkOptionsDef(voiceDefsPerSystemPerBar);
             }
+			if(string.IsNullOrEmpty(errorString))
+			{
+				errorString = CheckCCSettings(voiceDefsPerSystemPerBar);
+			}
             if(!string.IsNullOrEmpty(errorString))
             {
                 throw new ApplicationException("\nComposableScore.CheckBars(): Algorithm error:\n" + errorString);
@@ -140,6 +144,54 @@ namespace Moritz.Composer
             }
             return errorString;
         }
+
+		/// <summary>
+		/// Synchronous continuous controller settings (ccSettings) are not allowed.
+		/// </summary>
+		private string CheckCCSettings(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
+		{
+			string errorString = null;
+			List<InputVoiceDef> ivds = new List<InputVoiceDef>();
+			List<int> ccSettingsMsPositions = new List<int>();
+			foreach(List<VoiceDef> bar in voiceDefsPerSystemPerBar)
+			{
+				foreach(VoiceDef voice in bar)
+				{
+					InputVoiceDef ivd = voice as InputVoiceDef;
+					if(ivd != null)
+					{
+						foreach(IUniqueDef iud in ivd.UniqueDefs)
+						{
+							InputChordDef icd = iud as InputChordDef;
+							if(icd != null && icd.CCSettings != null)
+							{
+								int msPos = icd.MsPosition;
+								if(ccSettingsMsPositions.Contains(msPos))
+								{
+									errorString = "\nSynchronous continuous controller settings (ccSettings) are not allowed.";
+									break;
+								}
+								else
+								{
+									ccSettingsMsPositions.Add(msPos);
+								}
+
+							}
+						}
+						if(!string.IsNullOrEmpty(errorString))
+						{
+							break;
+						}
+					}
+				}
+				if(!string.IsNullOrEmpty(errorString))
+				{
+					break;
+				}
+			}
+
+			return errorString;
+		}
         #endregion
 
         /// <summary>
@@ -150,8 +202,13 @@ namespace Moritz.Composer
         {
             bool success = true;
             List<List<VoiceDef>> barDefsInOneSystem = _algorithm.DoAlgorithm(krystals, palettes);
+
+			SetOutputVoiceChannelsAndMasterVolumes(barDefsInOneSystem[0]);
+
             CheckBars(barDefsInOneSystem);
+
             CreateEmptySystems(barDefsInOneSystem, _pageFormat.VisibleInputVoiceIndicesPerStaff.Count); // one system per bar
+
             if(_pageFormat.ChordSymbolType != "none") // set by AudioButtonsControl
             {
                 Notator.ConvertVoiceDefsToNoteObjects(this.Systems);
@@ -169,6 +226,28 @@ namespace Moritz.Composer
             }
             return success;
         }
+
+		/// <summary>
+		/// This function should be called for all scores when the bars are complete.
+		/// </summary>
+		/// <param name="firstBar"></param>
+		/// <param name="masterVolumes">A list with one value per TrkDef</param>
+		private void SetOutputVoiceChannelsAndMasterVolumes(List<VoiceDef> firstBar)
+		{
+			List<int> masterVolumePerOutputVoice = _algorithm.MasterVolumePerOutputVoice;
+			List<int> midiChannelIndexPerOutputVoice = _algorithm.MidiChannelIndexPerOutputVoice;
+			Debug.Assert(masterVolumePerOutputVoice.Count == midiChannelIndexPerOutputVoice.Count);
+			for(int i = 0; i < masterVolumePerOutputVoice.Count; ++i)
+			{
+				Trk oVoice = firstBar[i] as Trk;
+				Debug.Assert(oVoice != null);
+				Debug.Assert(masterVolumePerOutputVoice[i] != 0);
+				Debug.Assert(masterVolumePerOutputVoice[i] >= 0 && masterVolumePerOutputVoice[i] < 128);
+				Debug.Assert(midiChannelIndexPerOutputVoice[i] >= 0 && midiChannelIndexPerOutputVoice[i] < 16);
+				oVoice.MidiChannel = (byte)midiChannelIndexPerOutputVoice[i];
+				oVoice.MasterVolume = (byte)masterVolumePerOutputVoice[i];
+			}
+		}
 
         /// <summary>
         /// Creates one System per bar (=list of VoiceDefs) in the argument.

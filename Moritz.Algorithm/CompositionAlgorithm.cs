@@ -331,25 +331,32 @@ namespace Moritz.Algorithm
             }
         }
 
-        /// <summary>
-        /// This function should be called for all scores when the bars are complete.
-        /// </summary>
-        /// <param name="firstBar"></param>
-        /// <param name="masterVolumes">A list with one value per TrkDef</param>
-        protected void SetOutputVoiceChannelsAndMasterVolumes(List<VoiceDef> firstBar)
-        {
-            Debug.Assert(MasterVolumePerOutputVoice.Count == MidiChannelIndexPerOutputVoice.Count);
-            for(int i = 0; i < MasterVolumePerOutputVoice.Count; ++i)
-            {
-                Trk oVoice = firstBar[i] as Trk;
-                Debug.Assert(oVoice != null);
-                Debug.Assert(MasterVolumePerOutputVoice[i] != 0);
-                Debug.Assert(MasterVolumePerOutputVoice[i] >= 0 && MasterVolumePerOutputVoice[i] < 128);
-                Debug.Assert(MidiChannelIndexPerOutputVoice[i] >= 0 && MidiChannelIndexPerOutputVoice[i] < 16);
-                oVoice.MidiChannel = (byte)MidiChannelIndexPerOutputVoice[i];
-                oVoice.MasterVolume = (byte) MasterVolumePerOutputVoice[i];
-            }
-        }
+		/// <summary>
+		/// Returns all the InputChordDefs in the bar.
+		/// </summary>
+		protected List<InputChordDef> GetInputChordDefsInBar(List<VoiceDef> bar)
+		{
+			List<InputChordDef> inputChordDefs = new List<InputChordDef>();
+			List<int> ccSettingsPositions = new List<int>();
+
+			foreach(VoiceDef voiceDef in bar)
+			{
+				InputVoiceDef inputVoiceDef = voiceDef as InputVoiceDef;
+				if(inputVoiceDef != null)
+				{
+					foreach(IUniqueDef uniqueDef in inputVoiceDef.UniqueDefs)
+					{
+						InputChordDef icd = uniqueDef as InputChordDef;
+						if(icd != null)
+						{
+							inputChordDefs.Add(icd);
+						}
+					}
+				}
+			}
+			return inputChordDefs;
+		}
+
 
         protected List<Krystal> _krystals;
         protected List<Palette> _palettes;
