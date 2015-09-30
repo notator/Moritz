@@ -20,130 +20,167 @@ namespace Moritz.Composer
             _algorithm = algorithm;
         }
 
-        private void CheckBars(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
+        /// <summary>
+        /// Called by the derived class after setting _algorithm and Notator.
+        /// Returns false if it fails for some reason. Otherwise true.
+        /// </summary>
+        protected bool CreateScore(List<Krystal> krystals, List<Palette> palettes)
         {
-            string errorString = null;
-            if(voiceDefsPerSystemPerBar.Count == 0)
-                errorString = "The algorithm has not created any bars!";
-            else
+            bool success = true;
+
+			CheckOutputVoiceChannelsAndMasterVolumes(_algorithm);
+
+            List<List<VoiceDef>> barDefsInOneSystem = _algorithm.DoAlgorithm(krystals, palettes);
+
+            CheckBars(barDefsInOneSystem);
+
+			SetOutputVoiceChannelsAndMasterVolumes(barDefsInOneSystem[0]);
+
+            CreateEmptySystems(barDefsInOneSystem, _pageFormat.VisibleInputVoiceIndicesPerStaff.Count); // one system per bar
+
+            if(_pageFormat.ChordSymbolType != "none") // set by AudioButtonsControl
             {
-                errorString = BasicChecks(voiceDefsPerSystemPerBar);
+                Notator.ConvertVoiceDefsToNoteObjects(this.Systems);
+
+                FinalizeSystemStructure(); // adds barlines, joins bars to create systems, etc.
+
+                /// The systems do not yet contain Metrics info.
+                /// The systems are given Metrics inside the following function then justified internally,
+                /// both horizontally and vertically.
+                success = Notator.CreateMetricsAndJustifySystems(this.Systems);
+                if(success)
+                {
+                    success = CreatePages();
+                }
             }
-            if(string.IsNullOrEmpty(errorString))
-            {
-                errorString = CheckTrkOptionsDef(voiceDefsPerSystemPerBar);
-            }
+            return success;
+        }
+
+		/// <summary>
+		/// This function should be called before running the algorithm.
+		/// </summary>
+		private void CheckOutputVoiceChannelsAndMasterVolumes(CompositionAlgorithm algorithm)
+		{
+			string errorString = null;
+			List<int> masterVolumePerOutputVoice = algorithm.MasterVolumePerOutputVoice;
+			List<int> midiChannelIndexPerOutputVoice = algorithm.MidiChannelIndexPerOutputVoice;
+			if(masterVolumePerOutputVoice.Count != midiChannelIndexPerOutputVoice.Count)
+			{
+				errorString = "There must be the same number of master volumes and midi channel indices.";
+			}
+			if(string.IsNullOrEmpty(errorString))
+			{
+				for(int i = 0; i < masterVolumePerOutputVoice.Count; ++i)
+				{
+					if(masterVolumePerOutputVoice[i] <= 0)
+					{
+						errorString = "All master volumes must be > 0.";
+						break;
+					}
+					if(masterVolumePerOutputVoice[i] > 127)
+					{
+						errorString = "All master volumes must be < 128.";
+						break;
+					}
+					if(midiChannelIndexPerOutputVoice[i] < 0)
+					{
+						errorString = "All midi channel indices must be >= 0.";
+						break;
+					}
+					if(midiChannelIndexPerOutputVoice[i] > 15)
+					{
+						errorString = "All midi channel indices must be < 16.";
+						break;
+					}
+				}
+			}
+			Debug.Assert(string.IsNullOrEmpty(errorString), "Error in algorithm definition: \n\n" + errorString);
+		}
+
+		private void CheckBars(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
+		{
+			string errorString = null;
+			if(voiceDefsPerSystemPerBar.Count == 0)
+				errorString = "The algorithm has not created any bars!";
+			else
+			{
+				errorString = BasicChecks(voiceDefsPerSystemPerBar);
+			}
 			if(string.IsNullOrEmpty(errorString))
 			{
 				errorString = CheckCCSettings(voiceDefsPerSystemPerBar);
 			}
-            if(!string.IsNullOrEmpty(errorString))
-            {
-                throw new ApplicationException("\nComposableScore.CheckBars(): Algorithm error:\n" + errorString);
-            }
-        }
-        #region private to CheckBars(...)
-        private string BasicChecks(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
-        {
-            string errorString = null;
-            List<VoiceDef> bar1 = voiceDefsPerSystemPerBar[0];
-            if(NOutputVoices(bar1) != _algorithm.MidiChannelIndexPerOutputVoice.Count)
-            {
-                return "The algorithm does not declare the correct number of output voices.";
-            }
-            if(NInputVoices(bar1) != _algorithm.NumberOfInputVoices)
-            {
-                return "The algorithm does not declare the correct number of input voices.";
-            }
-            foreach(List<VoiceDef> bar in voiceDefsPerSystemPerBar)
-            {
-                if(bar.Count == 0)
-                {
-                    errorString = "One bar (at least) contains no voices.";
-                    break;
-                }
-                if(!(bar[0] is Trk))
-                {
-                    errorString = "The top (first) voice in every bar must be an output voice.";
-                    break;
-                }
-                for(int voiceIndex = 0; voiceIndex < bar.Count; ++voiceIndex)
-                {
-                    VoiceDef voiceDef = bar[voiceIndex];
-                    if(voiceDef.UniqueDefs.Count == 0)
-                    {
-                        errorString = "A voiceDef (voiceIndex=" + voiceIndex.ToString() + ") has an empty UniqueDefs list.";
-                        break;
-                    }
-                }
-                if(!string.IsNullOrEmpty(errorString))
-                    break;
-            }
-            return errorString;
-        }
+			if(!string.IsNullOrEmpty(errorString))
+			{
+				throw new ApplicationException("\nComposableScore.CheckBars(): Algorithm error:\n" + errorString);
+			}
+		}
+		#region private to CheckBars(...)
+		private string BasicChecks(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
+		{
+			string errorString = null;
+			List<VoiceDef> bar1 = voiceDefsPerSystemPerBar[0];
+			if(NOutputVoices(bar1) != _algorithm.MidiChannelIndexPerOutputVoice.Count)
+			{
+				return "The algorithm does not declare the correct number of output voices.";
+			}
+			if(NInputVoices(bar1) != _algorithm.NumberOfInputVoices)
+			{
+				return "The algorithm does not declare the correct number of input voices.";
+			}
 
-        private int NOutputVoices(List<VoiceDef> bar1)
-        {
-            int nOutputVoices = 0;
-            foreach(VoiceDef voiceDef in bar1)
-            {
-                if(voiceDef is Trk)
-                {
-                    nOutputVoices++;
-                }
-            }
-            return nOutputVoices;
-        }
+			foreach(List<VoiceDef> bar in voiceDefsPerSystemPerBar)
+			{
+				if(bar.Count == 0)
+				{
+					errorString = "One bar (at least) contains no voices.";
+					break;
+				}
+				if(!(bar[0] is Trk))
+				{
+					errorString = "The top (first) voice in every bar must be an output voice.";
+					break;
+				}
+				for(int voiceIndex = 0; voiceIndex < bar.Count; ++voiceIndex)
+				{
+					VoiceDef voiceDef = bar[voiceIndex];
+					if(voiceDef.UniqueDefs.Count == 0)
+					{
+						errorString = "A voiceDef (voiceIndex=" + voiceIndex.ToString() + ") has an empty UniqueDefs list.";
+						break;
+					}
+				}
+				if(!string.IsNullOrEmpty(errorString))
+					break;
+			}
+			return errorString;
+		}
 
-        private int NInputVoices(List<VoiceDef> bar1)
-        {
-            int nInputVoices = 0;
-            foreach(VoiceDef voiceDef in bar1)
-            {
-                if(voiceDef is InputVoiceDef)
-                {
-                    nInputVoices++;
-                }
-            }
-            return nInputVoices;
-        }
+		private int NOutputVoices(List<VoiceDef> bar1)
+		{
+			int nOutputVoices = 0;
+			foreach(VoiceDef voiceDef in bar1)
+			{
+				if(voiceDef is Trk)
+				{
+					nOutputVoices++;
+				}
+			}
+			return nOutputVoices;
+		}
 
-        private string CheckTrkOptionsDef(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
-        {
-            string errorString = null;
-            List<Trk> trkDefs = new List<Trk>();
-            foreach(VoiceDef voice in voiceDefsPerSystemPerBar[0])
-            {
-                Trk trkDef = voice as Trk;
-                if(trkDef != null)
-                {
-                    if(trkDef.MasterVolume == null)
-                    {
-                        errorString = "\nEvery OutputVoice in the first bar of a score\n" +
-                                      "must have a MasterVolume value.";
-                    }
-                    trkDefs.Add(trkDef);
-                }
-            }
-            if(string.IsNullOrEmpty(errorString) && voiceDefsPerSystemPerBar.Count > 1)
-            {
-                for(int bar = 1; bar < voiceDefsPerSystemPerBar.Count; ++bar)
-                {
-                    foreach(VoiceDef voice in voiceDefsPerSystemPerBar[bar])
-                    {
-                        Trk trkDef = voice as Trk;
-                        if(trkDef != null)
-                        {
-                            if(trkDef.MasterVolume != null)
-                            {
-                                errorString = "\nNo OutputVoice except the first may have a MasterVolume.";
-                            }
-                        }
-                    }
-                }
-            }
-            return errorString;
-        }
+		private int NInputVoices(List<VoiceDef> bar1)
+		{
+			int nInputVoices = 0;
+			foreach(VoiceDef voiceDef in bar1)
+			{
+				if(voiceDef is InputVoiceDef)
+				{
+					nInputVoices++;
+				}
+			}
+			return nInputVoices;
+		}
 
 		/// <summary>
 		/// Synchronous continuous controller settings (ccSettings) are not allowed.
@@ -155,6 +192,8 @@ namespace Moritz.Composer
 			List<int> ccSettingsMsPositions = new List<int>();
 			foreach(List<VoiceDef> bar in voiceDefsPerSystemPerBar)
 			{
+				ccSettingsMsPositions.Clear();
+
 				foreach(VoiceDef voice in bar)
 				{
 					InputVoiceDef ivd = voice as InputVoiceDef;
@@ -192,58 +231,21 @@ namespace Moritz.Composer
 
 			return errorString;
 		}
-        #endregion
 
-        /// <summary>
-        /// Called by the derived class after setting _midiAlgorithm and Notator.
-        /// Returns false if it fails for some reason. Otherwise true.
-        /// </summary>
-        protected bool CreateScore(List<Krystal> krystals, List<Palette> palettes)
-        {
-            bool success = true;
-            List<List<VoiceDef>> barDefsInOneSystem = _algorithm.DoAlgorithm(krystals, palettes);
-
-			SetOutputVoiceChannelsAndMasterVolumes(barDefsInOneSystem[0]);
-
-            CheckBars(barDefsInOneSystem);
-
-            CreateEmptySystems(barDefsInOneSystem, _pageFormat.VisibleInputVoiceIndicesPerStaff.Count); // one system per bar
-
-            if(_pageFormat.ChordSymbolType != "none") // set by AudioButtonsControl
-            {
-                Notator.ConvertVoiceDefsToNoteObjects(this.Systems);
-
-                FinalizeSystemStructure(); // adds barlines, joins bars to create systems, etc.
-
-                /// The systems do not yet contain Metrics info.
-                /// The systems are given Metrics inside the following function then justified internally,
-                /// both horizontally and vertically.
-                success = Notator.CreateMetricsAndJustifySystems(this.Systems);
-                if(success)
-                {
-                    success = CreatePages();
-                }
-            }
-            return success;
-        }
+		#endregion
 
 		/// <summary>
 		/// This function should be called for all scores when the bars are complete.
+		/// The plausibility checks have been made.
 		/// </summary>
-		/// <param name="firstBar"></param>
-		/// <param name="masterVolumes">A list with one value per TrkDef</param>
 		private void SetOutputVoiceChannelsAndMasterVolumes(List<VoiceDef> firstBar)
 		{
 			List<int> masterVolumePerOutputVoice = _algorithm.MasterVolumePerOutputVoice;
 			List<int> midiChannelIndexPerOutputVoice = _algorithm.MidiChannelIndexPerOutputVoice;
-			Debug.Assert(masterVolumePerOutputVoice.Count == midiChannelIndexPerOutputVoice.Count);
 			for(int i = 0; i < masterVolumePerOutputVoice.Count; ++i)
 			{
 				Trk oVoice = firstBar[i] as Trk;
-				Debug.Assert(oVoice != null);
-				Debug.Assert(masterVolumePerOutputVoice[i] != 0);
-				Debug.Assert(masterVolumePerOutputVoice[i] >= 0 && masterVolumePerOutputVoice[i] < 128);
-				Debug.Assert(midiChannelIndexPerOutputVoice[i] >= 0 && midiChannelIndexPerOutputVoice[i] < 16);
+				Debug.Assert(oVoice != null); // should be okay - the check has already been made
 				oVoice.MidiChannel = (byte)midiChannelIndexPerOutputVoice[i];
 				oVoice.MasterVolume = (byte)masterVolumePerOutputVoice[i];
 			}
