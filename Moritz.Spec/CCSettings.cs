@@ -137,7 +137,7 @@ namespace Moritz.Spec
 					case PitchWheelOption.speed:
 						// maximum speed is when durations = durations / speedDeviation
 						// minimum speed is when durations = durations * speedDeviation 
-						Debug.Assert(_speedDeviationOption != null && _speedDeviationOption > 0);
+						Debug.Assert(_speedDeviationOption != null && _speedDeviationOption >= 1);
 						w.WriteAttributeString("speedDeviation", ((float)_speedDeviationOption).ToString(M.En_USNumberFormat));
 						break;
 				}
