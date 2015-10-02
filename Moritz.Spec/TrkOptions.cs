@@ -13,7 +13,7 @@ namespace Moritz.Spec
 	///		inputNote         (InputNoteDef)
 	///		noteOn or noteOff (NoteTrigger)
 	///		seq               (Seq)
-	///		trk               (TrkRef)
+	///		trkRef            (TrkRef)
 	/// The Assistant Performer uses these values as follows:
 	///   1. A TrkOptions element attached to an inputChord persists to the following inputChords until a 
 	///	     further inputChord.trkOptions element is encountered.
@@ -165,8 +165,8 @@ namespace Moritz.Spec
 		inherit,
 		undefined, // the trk will play as written in the score
 		holdLast, // remove noteOffs from trk's last moment that contains any, and don't send allNotesOff
-		holdAll, // remove all noteOff messages from the track, and don't send allNotesOff
-		holdAllStop // like holdAll, but sends AllNotesOff when the track stops (or is stopped)
+		holdAll, // remove all noteOff messages from the trk, and don't send allNotesOff
+		holdAllStop // like holdAll, but sends AllNotesOff when the trk stops (or is stopped)
 	};
 	public class PedalControl: TrkOption
 	{

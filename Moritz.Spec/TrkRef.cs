@@ -30,7 +30,7 @@ namespace Moritz.Spec
 
         internal void WriteSvg(SvgWriter w)
         {
-            w.WriteStartElement("trk");
+            w.WriteStartElement("trkRef");
 			w.WriteAttributeString("midiChannel", _trkMidiChannel.ToString());
 			w.WriteAttributeString("msPosition", _trkMsPosition.ToString());
 			w.WriteAttributeString("nMidiObjects", _trkNumMidiObjects.ToString());
