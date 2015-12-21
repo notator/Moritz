@@ -449,7 +449,7 @@ namespace Moritz.Symbols
 					float noteBottom = bottomHeadMetrics.OriginY;
 					if(bottomAccidentalMetrics != null)
 					{
-						noteBottom = bottomAccidentalMetrics.Bottom;
+						noteBottom = bottomAccidentalMetrics.Bottom + (_gap / 2);
 					}
 					float beamBottom =
 						noteBottom + durationClassBeamThickness[Chords[i].DurationClass];
@@ -480,7 +480,7 @@ namespace Moritz.Symbols
 					float noteTop = topHeadMetrics.OriginY;
 					if(topAccidentalMetrics != null)
 					{
-						noteTop = topAccidentalMetrics.Top;
+						noteTop = topAccidentalMetrics.Top - (_gap / 2);
 					}
 					float beamTop =
 						noteTop - durationClassBeamThickness[Chords[i].DurationClass];
