@@ -138,24 +138,27 @@ namespace Moritz.Symbols
         }
     }
 
-    /**********************************************************************************************/
-    public interface IBeamStub
-    {
+	/**********************************************************************************************/
+	public interface IBeamStub
+	{
+		DurationClass DurationClass { get; }
         void ShearBeamStub(float shearAxis, float tanAlpha, float stemX);
     }
 
-    internal class SemiquaverBeamStub : SemiquaverBeam, IBeamStub
-    {
-        public SemiquaverBeamStub(float left, float right)
-            : base(left, right)
-        {
-        }
+	internal class SemiquaverBeamStub : SemiquaverBeam, IBeamStub
+	{
+		public SemiquaverBeamStub(float left, float right)
+			: base(left, right)
+		{
+		}
 
-        public void ShearBeamStub(float shearAxis, float tanAlpha, float stemX)
-        {
-            base.ShearStub(shearAxis, tanAlpha, stemX);
-        }
-    }
+		public void ShearBeamStub(float shearAxis, float tanAlpha, float stemX)
+		{
+			base.ShearStub(shearAxis, tanAlpha, stemX);
+		}
+
+		public DurationClass DurationClass { get { return DurationClass.semiquaver; } }
+	}
     internal class ThreeFlagsBeamStub : ThreeFlagsBeam, IBeamStub
     {
         public ThreeFlagsBeamStub(float left, float right)
@@ -167,7 +170,9 @@ namespace Moritz.Symbols
         {
             base.ShearStub(shearAxis, tanAlpha, stemX);
         }
-    }
+
+		public DurationClass DurationClass { get { return DurationClass.threeFlags; } }
+	}
     internal class FourFlagsBeamStub : FourFlagsBeam, IBeamStub
     {
         public FourFlagsBeamStub(float left, float right)
@@ -179,7 +184,9 @@ namespace Moritz.Symbols
         {
             base.ShearStub(shearAxis, tanAlpha, stemX);
         }
-    }
+
+		public DurationClass DurationClass { get { return DurationClass.fourFlags; } }
+	}
     internal class FiveFlagsBeamStub : FiveFlagsBeam, IBeamStub
     {
         public FiveFlagsBeamStub(float left, float right)
@@ -191,5 +198,7 @@ namespace Moritz.Symbols
         {
             base.ShearStub(shearAxis, tanAlpha, stemX);
         }
-    }
+
+		public DurationClass DurationClass { get { return DurationClass.fiveFlags; } }
+	}
 }

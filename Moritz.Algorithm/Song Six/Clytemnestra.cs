@@ -1,16 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-
-using Moritz.Algorithm;
-using Moritz.Palettes;
 using Moritz.Spec;
 
 namespace Moritz.Algorithm.SongSix
 {
-    /// <summary>
-    /// Encapsulates the composition of Clytemnestra's VoiceDef
-    /// </summary>
-    internal class Clytemnestra : Trk
+	/// <summary>
+	/// Encapsulates the composition of Clytemnestra's VoiceDef
+	/// </summary>
+	internal class Clytemnestra : Trk
     {
         internal Clytemnestra(byte midiChannel, Trk wind3) 
             : base(midiChannel, new List<IUniqueDef>())

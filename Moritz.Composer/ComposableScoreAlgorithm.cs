@@ -7,6 +7,7 @@ using Moritz.Algorithm.Study2c3_1;
 using Moritz.Algorithm.SongSix;
 using Moritz.Algorithm.Study3Sketch1;
 using Moritz.Algorithm.Study3Sketch2;
+using Moritz.Algorithm.PianolaMusic;
 
 namespace Moritz.Composer
 {
@@ -43,10 +44,13 @@ namespace Moritz.Composer
                 case "Study 3 sketch 1":
                     algorithm = new Study3Sketch1Algorithm();
                     break;
-                case "Study 3 sketch 2":
-                    algorithm = new Study3Sketch2Algorithm();
-                    break;
-                default:
+				case "Study 3 sketch 2":
+					algorithm = new Study3Sketch2Algorithm();
+					break;
+				case "Pianola Music":
+					algorithm = new PianolaMusicAlgorithm();
+					break;
+				default:
                     MessageBox.Show("Error in ComposableScoreAlgorithm.cs:\n\n" +
                                     "Score title not found in switch in ComposableSvgScore.Algorithm(...).\n" +
                                     "(Add a new case statement.)",

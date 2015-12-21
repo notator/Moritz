@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -156,10 +157,10 @@ namespace Moritz.Symbols
                 DurationClass.semiquaver,
                 DurationClass.quaver
             };
-            float stubWidth =  _gap * 1.2F;
+
             foreach(DurationClass durationClass in durationClasses)
             {
-                List<Beam> beams = CreateBeams(durationClass, stubWidth);
+                List<Beam> beams = CreateBeams(durationClass);
                 _left = float.MaxValue;
                 _right = float.MinValue;
                 foreach(Beam beam in beams)
@@ -171,6 +172,7 @@ namespace Moritz.Symbols
                 _originX = _left;
                 // _left, _right and _originX never change again after they have been set here
             }
+			SetBeamStubs(Beams);
             SetVerticalBounds();
             #endregion
             Dictionary<DurationClass, float> durationClassBeamThickness = GetBeamThicknessesPerDurationClass(durationClasses);
@@ -181,7 +183,63 @@ namespace Moritz.Symbols
             MoveStemTips();
         }
 
-        List<ChordMetrics> GetChordsMetrics()
+		private void SetBeamStubs(HashSet<Beam> beamsHash)
+		{
+			List<Beam> beams = new List<Beam>(beamsHash);
+			float stubWidth = _gap * 1.2F;
+
+			for(int i = 0; i < beams.Count; ++i)
+			{
+				Beam beam = beams[i];
+				if(beam is IBeamStub)
+				{
+					Beam leftEndLongBeam = LeftEndLongBeam(beams, beam.LeftX);
+					beamsHash.Remove(beam);
+					DurationClass durationClass = (beam as IBeamStub).DurationClass;
+					Beam newBeamStub;
+					if(leftEndLongBeam.LeftX == beam.LeftX)
+					{
+						// add a beamStub to the right of the stem
+						newBeamStub = NewBeam(durationClass, beam.LeftX, beam.LeftX + stubWidth, true);	
+					}
+					else
+					{
+						newBeamStub = NewBeam(durationClass, beam.LeftX - stubWidth, beam.LeftX, true);
+					}
+
+					beamsHash.Add(newBeamStub);
+				}
+			}
+		}
+
+		private Beam LeftEndLongBeam(List<Beam> beams, float stemX)
+		{
+			float leftX = int.MaxValue;
+			Beam rval = null;
+
+			foreach(Beam beam in beams)
+			{
+				if(!(beam is IBeamStub) && beam.LeftX < leftX)
+				{
+					rval = beam;
+					leftX = beam.LeftX;
+				}
+			}
+
+			foreach(Beam beam in beams)
+			{
+				if(stemX == beam.LeftX && !(beam is IBeamStub) && !(rval == beam))
+				{
+					rval = beam;
+				}
+			}
+
+			Debug.Assert(!(rval is IBeamStub));
+
+			return rval;
+		}
+
+		List<ChordMetrics> GetChordsMetrics()
         {
             List<ChordMetrics> chordsMetrics = new List<ChordMetrics>();
             foreach(ChordSymbol chord in Chords)
@@ -206,7 +264,7 @@ namespace Moritz.Symbols
             _originY = _top;
         }
 
-        private List<Beam> CreateBeams(DurationClass durationClass, float stubWidth)
+        private List<Beam> CreateBeams(DurationClass durationClass)
         {
             List<Beam> newBeams = new List<Beam>();
             bool inBeam = false;
@@ -236,14 +294,10 @@ namespace Moritz.Symbols
 
                 if(inBeam && ((!hasLessThanOrEqualBeams) || stemX == rightMostStemX)) // different durationClass or end of beamBlock
                 {
-                    bool isStub = false;
-                    if(beamLeft == beamRight)
-                    {
-                        // Create a beamStub. All beam stubs are initially to the left of the stem to which they are attached.
-                        // Beam stubs attached to the first stem in a beamed group are replaced later in this function.
-                        beamLeft -= stubWidth;
-                        isStub = true;
-                    }
+					// BeamStubs are initially created with LeftX == RightX == stemX.
+					// They are replaced by proper beamStubs when the BeamBlock is complete
+					// (See SetBeamStubs() above.)
+					bool isStub = (beamLeft == beamRight) ? true : false;
 
                     Beam newBeam = NewBeam(durationClass, beamLeft, beamRight, isStub);
                     newBeams.Add(newBeam);
@@ -252,27 +306,16 @@ namespace Moritz.Symbols
                 stemNumber++;
             }
 
-            ChordMetrics leftMostChordMetrics = (ChordMetrics)Chords[0].Metrics;
-            float leftMostStemX = leftMostChordMetrics.StemMetrics.OriginX;
-
-            if(newBeams.Count > 0 && newBeams[0].LeftX < leftMostStemX && newBeams[0].RightX == leftMostStemX)
-            {
-                // Replace a beamStub on the left of the first stem by a beam stub on the right.
-                Beam newBeam = NewBeam(durationClass, leftMostStemX, leftMostStemX + stubWidth, true);
-                newBeams.RemoveAt(0);
-                newBeams.Insert(0, newBeam);
-            }
-
-            return newBeams;
+			return newBeams;
         }
 
-        /// <summary>
-        /// returns true if the currentDC has a less than or equal number of beams than the stemDC
-        /// </summary>
-        /// <param name="currentDC"></param>
-        /// <param name="stemDC"></param>
-        /// <returns></returns>
-        private bool HasLessThanOrEqualBeams(DurationClass currentDC, DurationClass stemDC)
+		/// <summary>
+		/// returns true if the currentDC has a less than or equal number of beams than the stemDC
+		/// </summary>
+		/// <param name="currentDC"></param>
+		/// <param name="stemDC"></param>
+		/// <returns></returns>
+		private bool HasLessThanOrEqualBeams(DurationClass currentDC, DurationClass stemDC)
         {
             bool hasLessThanOrEqualBeams = false;
             switch(currentDC)
