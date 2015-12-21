@@ -441,9 +441,19 @@ namespace Moritz.Symbols
                 {
                     ChordMetrics chordMetrics = chordsMetrics[i];
                     HeadMetrics bottomHeadMetrics = chordMetrics.BottomHeadMetrics;
-                    float beamBottom =
-                        bottomHeadMetrics.OriginY + durationClassBeamThickness[Chords[i].DurationClass];
-                    if(((bottomHeadMetrics.OriginY - staffOriginY) % _gap) != 0)
+					AccidentalMetrics bottomAccidentalMetrics = null;
+					if(chordMetrics.AccidentalsMetrics.Count > 0)
+					{
+						bottomAccidentalMetrics = chordMetrics.AccidentalsMetrics[chordMetrics.AccidentalsMetrics.Count - 1];
+					}
+					float noteBottom = bottomHeadMetrics.OriginY;
+					if(bottomAccidentalMetrics != null)
+					{
+						noteBottom = bottomAccidentalMetrics.Bottom;
+					}
+					float beamBottom =
+						noteBottom + durationClassBeamThickness[Chords[i].DurationClass];
+                    if(((noteBottom - staffOriginY) % _gap) != 0)
                         beamBottom +=(_gap * 2.5F);
                     else
                         beamBottom += (_gap * 2.65F);
@@ -462,9 +472,19 @@ namespace Moritz.Symbols
                 {
                     ChordMetrics chordMetrics = chordsMetrics[i];
                     HeadMetrics topHeadMetrics = chordMetrics.TopHeadMetrics;
-                    float beamTop =
-                        topHeadMetrics.OriginY - durationClassBeamThickness[Chords[i].DurationClass];
-                    if(((topHeadMetrics.OriginY - staffOriginY) % _gap) != 0)
+					AccidentalMetrics topAccidentalMetrics = null;
+					if(chordMetrics.AccidentalsMetrics.Count > 0)
+					{
+						topAccidentalMetrics = chordMetrics.AccidentalsMetrics[0];
+					}
+					float noteTop = topHeadMetrics.OriginY;
+					if(topAccidentalMetrics != null)
+					{
+						noteTop = topAccidentalMetrics.Top;
+					}
+					float beamTop =
+						noteTop - durationClassBeamThickness[Chords[i].DurationClass];
+                    if(((noteTop - staffOriginY) % _gap) != 0)
                         beamTop -= (_gap * 2.5F);
                     else
                         beamTop -= (_gap * 2.65F);
