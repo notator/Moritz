@@ -25,7 +25,6 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         public override void WriteSymbolDefinitions(SvgWriter w)
         {
-            w.SvgStartDefs(null);
             WriteTrebleClefSymbolDef(w);
             WriteTrebleClef8SymbolDef(w);
             WriteTrebleClefMulti8SymbolDef(w, 2);
@@ -39,7 +38,6 @@ namespace Moritz.Symbols
                 WriteRightFlagBlock(w, i);
                 WriteLeftFlagBlock(w, i);
             }
-            w.SvgEndDefs(); // end of defs
         }
         #region symbol definitions
         /// <summary>

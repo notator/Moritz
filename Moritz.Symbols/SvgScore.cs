@@ -167,11 +167,58 @@ namespace Moritz.Symbols
             }
         }
 
-        public void WriteSymbolDefinitions(SvgWriter w)
+        public void WriteDefs(SvgWriter w)
         {
             Debug.Assert(Notator != null);
-            Notator.SymbolSet.WriteSymbolDefinitions(w);
-        }
+			w.SvgStartDefs(null);
+			WriteFontDefs(w);
+			Notator.SymbolSet.WriteSymbolDefinitions(w);
+			w.SvgEndDefs(); // end of defs
+		}
+
+		private void WriteFontDefs(SvgWriter w)
+		{
+			string fontDefs =
+			@"
+			@font-face
+			{
+				font-family: 'CLicht';
+				src: url('http://james-ingram-act-two.de/fonts/clicht_plain-webfont.eot');
+				src: url('http://james-ingram-act-two.de/fonts/clicht_plain-webfont.eot?#iefix') format('embedded-opentype'),
+				url('http://james-ingram-act-two.de/fonts/clicht_plain-webfont.woff') format('woff'),
+				url('http://james-ingram-act-two.de/fonts/clicht_plain-webfont.ttf') format('truetype'),
+				url('http://james-ingram-act-two.de/fonts/clicht_plain-webfont.svg#webfontl9D2oOyX') format('svg');
+				font-weight: normal;
+				font-style: normal;
+			}
+			@font-face
+			{
+				font-family: 'Arial';
+				src: url('http://james-ingram-act-two.de/fonts/arial.ttf') format('truetype');
+				font-weight:400;
+				font-style: normal;
+			}
+			@font-face
+			{
+				font-family: 'Open Sans';
+				src: url('http://james-ingram-act-two.de/fonts/OpenSans-Regular.ttf') format('truetype');
+				font-weight:400;
+				font-style: normal;
+			}
+			@font-face
+			{
+				font-family: 'Open Sans Condensed';
+				src: url('http://james-ingram-act-two.de/fonts/OpenSans-CondBold.ttf') format('truetype');
+				font-weight:600;
+				font-style: normal;
+			}
+		";
+
+			w.WriteStartElement("style");
+			w.WriteAttributeString("type", "text/css");
+			w.WriteString(fontDefs);
+			w.WriteEndElement();
+		}
 
 		#endregion save multi-page score
 
