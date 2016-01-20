@@ -38,7 +38,7 @@ namespace Moritz.Algorithm.PianolaMusic
 
 			List<List<VoiceDef>> bars = GetBars(trks, NumberOfBars);
 
-			InsertClefChanges(bars);
+			SetInitialPatch(bars);
 
 			return bars;
 		}
@@ -81,7 +81,7 @@ namespace Moritz.Algorithm.PianolaMusic
 			Debug.Assert(pitches.Count == 96);
 			Debug.Assert(durations.Count == 96);
 
-			const int durationFactor = 96;	// the shortest note is 96ms
+			const int durationFactor = 48;	// the shortest note is 48ms
 
 			List<IUniqueDef> defs = new List<IUniqueDef>();
 			List<byte> velocities = new List<byte>() { (byte)127 };
@@ -243,8 +243,20 @@ namespace Moritz.Algorithm.PianolaMusic
 			return bars;
 		}
 
-		private void InsertClefChanges(List<List<VoiceDef>> bars)
+		private void SetInitialPatch(List<List<VoiceDef>> bars)
 		{
+			List<VoiceDef> bar0 = bars[0];
+			MidiChordDef midiChordDef = null;
+			foreach(VoiceDef voiceDef in bar0)
+			{
+				foreach(IUniqueDef iUniqueDef in voiceDef.UniqueDefs)
+				{
+					midiChordDef = iUniqueDef as MidiChordDef;
+					if(midiChordDef != null)
+						break;
+				}
+				midiChordDef.Patch = 0;
+			}
 		}
 	}
 }
