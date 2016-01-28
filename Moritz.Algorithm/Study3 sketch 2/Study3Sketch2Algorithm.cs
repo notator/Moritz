@@ -51,7 +51,17 @@ namespace Moritz.Algorithm.Study3Sketch2
             }
             Debug.Assert(bars.Count == NumberOfBars);
 
-            List<InputChordDef> inputChordSymbolsInBar2 = GetInputChordDefsInBar(bars[1]);
+			/****************************************************************************************
+			* This score is liable to be recompiled when other things change in the SVG-MIDI file format,
+			* so its default version should be kept simple.
+			* The default CC settings are set in the first InputChordDef in bar 1, but setting trkOptions
+			* has therefore been commented out in the following functions. 
+			* For information as to how to set TrkOptions, see the code in the commented-out sections of
+			* the following functions, and the comment at the top of TrkOptions.cs.
+			*****************************************************************************************/
+			List<InputChordDef> inputChordSymbolsInBar1 = GetInputChordDefsInBar(bars[0]);
+			SetPerformanceOptionsOnFirstInputChordDef(inputChordSymbolsInBar1);
+			List<InputChordDef> inputChordSymbolsInBar2 = GetInputChordDefsInBar(bars[1]);
             SetBar2NoteOnNoteOffControls(inputChordSymbolsInBar2);
             List<InputChordDef> inputChordSymbolsInBar3 = GetInputChordDefsInBar(bars[2]);
             SetBar3PitchWheelToVolumeControls(inputChordSymbolsInBar3);
@@ -63,75 +73,128 @@ namespace Moritz.Algorithm.Study3Sketch2
             return bars;
         }
 
-        private void SetBar2NoteOnNoteOffControls(List<InputChordDef> bar2InputChordDefs)
-        {
-			bar2InputChordDefs[0].InputNoteDefs[0].TrkOptions = new TrkOptions(new TrkOffControl(TrkOffOption.stopChord));
-			bar2InputChordDefs[1].InputNoteDefs[0].TrkOptions = new TrkOptions(new TrkOffControl(TrkOffOption.fade));
-        }
-
-        private void SetBar3PitchWheelToVolumeControls(List<InputChordDef> bar3InputChordDefs)
-        {
-            foreach(InputChordDef inputChordDef in bar3InputChordDefs)
-            {
-				inputChordDef.InputNoteDefs[0].TrkOptions = new TrkOptions(new List<TrkOption>()
-				{
-					new TrkOffControl(TrkOffOption.fade),
-				});
-            }
-        }
-
-        private void SetBar4FadeControls(List<InputChordDef> bar4InputChordDefs)
-        {
-            foreach(InputChordDef inputChordDef in bar4InputChordDefs)
-            {
-				inputChordDef.InputNoteDefs[0].TrkOptions = new TrkOptions(new List<TrkOption>()
-				{
-					new TrkOffControl(TrkOffOption.stopChord),	
-				});
-			}
-        }
-
-        private void SetBar5SpeedControls(List<InputChordDef> bar5InputChordDefs)
-        {
-			foreach(InputChordDef inputChordDef in bar5InputChordDefs)
+		private static void SetPerformanceOptionsOnFirstInputChordDef(List<InputChordDef> inputChordDefs)
+		{
+			InputChordDef inputChordDef1 = inputChordDefs[0]; // no need to check for null here.
+			#region set ccSettings
+			TrackCCSettings defaultCCSettings = new TrackCCSettings(null, new List<CCSetting>()
 			{
-				inputChordDef.InputNoteDefs[0].TrkOptions = new TrkOptions(new SpeedControl(2.2F));
-			}
+				new PitchWheelPitchControl(5),
+				new PressureControl(CControllerType.channelPressure),
+				new ModWheelVolumeControl(20,127)
+			});
+			inputChordDef1.CCSettings = new CCSettings(defaultCCSettings, null);
+			#endregion
+
+			#region set chord level TrkOptions
+			//inputChordDef1.TrkOptions = new TrkOptions(new List<TrkOption>()
+			//{
+			//	new VelocityScaledControl(3),
+			//	new PedalControl(PedalOption.holdAll),
+			//	new TrkOffControl(TrkOffOption.fade),
+			//	new SpeedControl(1.5F)
+			//});
+			#endregion chordTrkOptions
+
+			#region set note level TrkOptions
+			//inputChordDef1.InputNoteDefs[0].TrkOptions = new TrkOptions(new VelocityScaledControl(2));
+			#endregion
+
+			#region set noteOn TrkOptions
+			//NoteOn nOn = inputChordDef1.InputNoteDefs[0].NoteOn;
+			//#region noteOnSeq
+			//Seq nOnSeq = nOn.Seq;
+			//nOnSeq.TrkOptions = new TrkOptions(new List<TrkOption>()
+			//{
+			//	new VelocityScaledControl(3),
+			//	new PedalControl(PedalOption.holdAll),
+			//	new TrkOffControl(TrkOffOption.undefined),
+			//	new SpeedControl(2.1F)
+			//});
+
+			//for(int i = 0; i < nOnSeq.TrkRefs.Count; ++i)
+			//{
+			//	nOnSeq.TrkRefs[i].TrkOptions = new TrkOptions(new VelocityOverriddenControl((byte)(i + 4)));
+			//}
+			//#endregion
+			#endregion set noteOn TrkOptions
+
+			#region set noteOff TrkOptions
+			//List<byte> newTrkOffs = new List<byte>() { 0,4,2,3,5 };
+			//inputChordDef1.InputNoteDefs[0].NoteOff.TrkOffs = newTrkOffs;
+			//inputChordDef1.InputNoteDefs[0].NoteOn.TrkOffs = newTrkOffs;
+			#endregion set noteOff TrkOptions
+		}
+
+		private static void SetBar2NoteOnNoteOffControls(List<InputChordDef> bar2InputChordDefs)
+        {
+			//bar2InputChordDefs[0].InputNoteDefs[0].TrkOptions = new TrkOptions(new TrkOffControl(TrkOffOption.stopChord));
+			//bar2InputChordDefs[1].InputNoteDefs[0].TrkOptions = new TrkOptions(new TrkOffControl(TrkOffOption.fade));
         }
+
+        private static void SetBar3PitchWheelToVolumeControls(List<InputChordDef> bar3InputChordDefs)
+        {
+			//	foreach(InputChordDef inputChordDef in bar3InputChordDefs)
+			//	{
+			//		inputChordDef.InputNoteDefs[0].TrkOptions = new TrkOptions(new List<TrkOption>()
+			//		{
+			//			new TrkOffControl(TrkOffOption.fade),
+			//		});
+			//	}
+        }
+
+        private static void SetBar4FadeControls(List<InputChordDef> bar4InputChordDefs)
+        {
+			//  foreach(InputChordDef inputChordDef in bar4InputChordDefs)
+			//  {
+			//		inputChordDef.InputNoteDefs[0].TrkOptions = new TrkOptions(new List<TrkOption>()
+			//		{
+			//			new TrkOffControl(TrkOffOption.stopChord),	
+			//		});
+			//	}
+        }
+
+        private static void SetBar5SpeedControls(List<InputChordDef> bar5InputChordDefs)
+        {
+			//foreach(InputChordDef inputChordDef in bar5InputChordDefs)
+			//{
+			//	inputChordDef.InputNoteDefs[0].TrkOptions = new TrkOptions(new SpeedControl(2.2F));
+			//}
+        }
+
         #region CreateBar1()
         List<VoiceDef> CreateBar1()
-        {
-            List<VoiceDef> bar = new List<VoiceDef>();
+		{
+			List<VoiceDef> bar = new List<VoiceDef>();
 
-            byte channel = 0;
-            foreach(Palette palette in _palettes)
-            {
-                Trk trkDef = new Trk(channel, new List<IUniqueDef>());
-                bar.Add(trkDef);
-                WriteVoiceMidiDurationDefs1(trkDef, palette);
-                ++channel;
-            }
+			byte channel = 0;
+			foreach(Palette palette in _palettes)
+			{
+				Trk trkDef = new Trk(channel, new List<IUniqueDef>());
+				bar.Add(trkDef);
+				WriteVoiceMidiDurationDefs1(trkDef, palette);
+				++channel;
+			}
 
-            InputVoiceDef inputVoiceDef = new InputVoiceDef();
-            VoiceDef bottomOutputVoice = bar[0];
-			
-            foreach(IUniqueDef iud in bottomOutputVoice.UniqueDefs)
-            {
-                MidiChordDef mcd = iud as MidiChordDef;
-                RestDef rd = iud as RestDef;
-                if(mcd != null)
-                {
-					List<IUniqueDef> iuds = new List<IUniqueDef>() { (IUniqueDef)mcd };
+			InputVoiceDef inputVoiceDef = new InputVoiceDef();
+			VoiceDef bottomOutputVoice = bar[0];
 
-					// Note that the msPosition of the trk is trk.StartMsPosition (= iuds[0].msPosition),
-					// which may be greater than the InputChordDef's msPosition
-					Trk trk0 = new Trk(bottomOutputVoice.MidiChannel, iuds);
+			for(int i = 0; i < bottomOutputVoice.UniqueDefs.Count; ++i)
+			{
+				IUniqueDef iud = bottomOutputVoice.UniqueDefs[i];
+				MidiChordDef mcd = iud as MidiChordDef;
+				RestDef rd = iud as RestDef;
+				if(mcd != null)
+				{
+					List<TrkRef> trkRefs = new List<TrkRef>();
+					for(byte j = 0; j < _palettes.Count; ++j)
+					{
+						VoiceDef voiceDef = bar[j];
+						MidiChordDef trkMCD = voiceDef[i] as MidiChordDef;
+						TrkRef trkRef = new TrkRef(j, trkMCD.MsPosition, 1, null);
+						trkRefs.Add(trkRef);
+					};
 
-
-					// If non-null, arg2 overrides the trkOptions attached to the InputNote or InputChord.
-					TrkRef trkRef = new TrkRef(trk0, null);
-					//TrkRef trkRef2 = new TrkRef(1,0,1,null);
-					List<TrkRef> trkRefs = new List<TrkRef>() { trkRef };			
 					Seq seq = new Seq(trkRefs, null);
 
 					NoteOn noteOn = new NoteOn(seq);
@@ -143,73 +206,23 @@ namespace Moritz.Algorithm.Study3Sketch2
 					List<InputNoteDef> inputNoteDefs = new List<InputNoteDef>() { inputNoteDef };
 
 					// The InputChordDef's msPosition must be <= the msPosition of any of the contained trkRefs
-                    InputChordDef icd = new InputChordDef(mcd.MsPosition, mcd.MsDuration, inputNoteDefs, null);
+					InputChordDef icd = new InputChordDef(mcd.MsPosition, mcd.MsDuration, inputNoteDefs, null);
 
-                    inputVoiceDef.UniqueDefs.Add(icd);
-                }
-                else if(rd != null)
-                {
-                    RestDef newRest = new RestDef(rd.MsPosition, rd.MsDuration);
-                    inputVoiceDef.UniqueDefs.Add(newRest);
-                }
-            }
-
-			#region set trkOptions on the first InputChordDef  (for testing)
-			InputChordDef inputChordDef1 = inputVoiceDef.UniqueDefs[0] as InputChordDef; // no need to check for null here.
-
-			#region set ccSettings
-			TrackCCSettings defaultCCSettings = new TrackCCSettings(null, new List<CCSetting>()
-			{
-				new PitchWheelPitchControl(5),
-				new PressureControl(CControllerType.channelPressure),
-				new ModWheelVolumeControl(20,127)			
-			});
-			inputChordDef1.CCSettings = new CCSettings(defaultCCSettings, null);
-			#endregion
-			#region set chordTrkOptions
-			inputChordDef1.TrkOptions = new TrkOptions(new List<TrkOption>()
-			{
-				new VelocityScaledControl(3),
-				new PedalControl(PedalOption.holdAll),
-				new TrkOffControl(TrkOffOption.fade),
-				new SpeedControl(1.5F)
-			});
-			#endregion chordTrkOptions
-
-			inputChordDef1.InputNoteDefs[0].TrkOptions = new TrkOptions(new VelocityScaledControl(2));
-
-			#region noteOn
-			NoteOn nOn = inputChordDef1.InputNoteDefs[0].NoteOn;
-			#region noteOnSeq
-			Seq nOnSeq = nOn.Seq;
-			nOnSeq.TrkOptions = new TrkOptions(new List<TrkOption>()
-			{
-				new VelocityScaledControl(3),
-				new PedalControl(PedalOption.holdAll),
-				new TrkOffControl(TrkOffOption.undefined),
-				new SpeedControl(2.1F)
-			});
-
-			for(int i = 0; i < nOnSeq.TrkRefs.Count; ++i)
-			{
-				nOnSeq.TrkRefs[i].TrkOptions = new TrkOptions(new VelocityOverriddenControl((byte)(i + 4)));
+					inputVoiceDef.UniqueDefs.Add(icd);
+				}
+				else if(rd != null)
+				{
+					RestDef newRest = new RestDef(rd.MsPosition, rd.MsDuration);
+					inputVoiceDef.UniqueDefs.Add(newRest);
+				}
 			}
-			#endregion
-			#endregion noteOn
-			#region noteOff
-			List<byte> newTrkOffs = new List<byte>() { 0,4,2,3,5 };
-			inputChordDef1.InputNoteDefs[0].NoteOff.TrkOffs = newTrkOffs;
-			inputChordDef1.InputNoteDefs[0].NoteOn.TrkOffs = newTrkOffs;
-			#endregion noteOff
 
-			#endregion set trkOptions on the first InputChordDef
-				 
-            bar.Add(inputVoiceDef);
+			bar.Add(inputVoiceDef);
 
-            return bar;
-        }
+			return bar;
+		}
 
-        private void WriteVoiceMidiDurationDefs1(Trk trkDef, Palette palette)
+		private void WriteVoiceMidiDurationDefs1(Trk trkDef, Palette palette)
         {
             int bar1ChordMsSeparation = 1500;
             int msPosition = 0;
