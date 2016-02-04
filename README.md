@@ -17,4 +17,4 @@ Anyone is welcome to dive into and use any of my code in any way they like, but 
 February 2016<br />
 James Ingram
 
-[1] The Assistant Performer is no longer part of Moritz. It is now a separate, open-source web application, written in Javascript. Links: [About the Assistant Performer](http://james-ingram-act-two.de/open-source/aboutAssistantPerformer.html), [on the web](http://james-ingram-act-two.de/open-source/assistantPerformer/assistantPerformer.html), [on GitHub](https://github.com/notator/assistant-performer).
+[1] The Assistant Performer used to be part of Moritz, but it is now a separate, open-source web application, written in Javascript. Links: [About the Assistant Performer](http://james-ingram-act-two.de/open-source/aboutAssistantPerformer.html), [on the web](http://james-ingram-act-two.de/open-source/assistantPerformer/assistantPerformer.html), [on GitHub](https://github.com/notator/assistant-performer).
