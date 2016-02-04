@@ -28,7 +28,7 @@ namespace Moritz.Spec
 			{
 				trkRef.WriteSvg(w);
 			}
-			w.WriteEndElement(); // trks
+			w.WriteEndElement(); // seq
 		}
 
 		#region Enumerable
