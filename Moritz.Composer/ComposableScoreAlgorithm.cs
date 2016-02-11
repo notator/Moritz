@@ -8,6 +8,7 @@ using Moritz.Algorithm.SongSix;
 using Moritz.Algorithm.Study3Sketch1;
 using Moritz.Algorithm.Study3Sketch2;
 using Moritz.Algorithm.PianolaMusic;
+using Moritz.Algorithm.Tombeau1;
 
 namespace Moritz.Composer
 {
@@ -49,6 +50,9 @@ namespace Moritz.Composer
 					break;
 				case "Pianola Music":
 					algorithm = new PianolaMusicAlgorithm();
+					break;
+				case "Tombeau 1":
+					algorithm = new Tombeau1Algorithm();
 					break;
 				default:
                     MessageBox.Show("Error in ComposableScoreAlgorithm.cs:\n\n" +
