@@ -44,9 +44,17 @@ namespace Moritz.Algorithm.Tombeau1
 			 
 			Debug.Assert(barsData.Count == NumberOfBars);
 
-			// voices are basically in order background to foreground
-			// I want each initially to be a simple krystal development, but to permute blocks...
-			// The blocks don't necessarily coincide with bars... but...
+			/*********************************************************************************************
+			Voices are basically in order background to foreground.
+			I want each initially to be a simple krystal development, but to permute blocks (=trks?)...
+			The blocks don't necessarily coincide with bars... but...
+			I also want to write "harmony & counterpoint" by having related Trks in different voices,
+			the Trks being simultaneous or slightly displaced.
+			The "harmony & counterpoint" is not only in the pitches, its also in the dynamics, and the pan position...
+			I need to create the palettes containing the ornaments, think about a top level structure, and about trks (lists of timeObjects) and how they relate...
+			Tuning is a parameter that could be introduced later...
+			Are trks controlled by krystal expansions? I think a bigger piece like this needs some kind of higher level organisation like that...
+			*********************************************************************************************/
 			List<VoiceDef> voiceDefs = new List<VoiceDef>();
 
 			VoiceDef voice0 = CreateVoice0(barsData);
@@ -86,11 +94,14 @@ namespace Moritz.Algorithm.Tombeau1
 
 			List<List<VoiceDef>> bars = CreateBars(barsData, voiceDefs);
 
+			// Possibly do a time warp here (warp the durations of the bars with their contents).
+			// Possibly join some bars (i.e. delete some barlines) or add new barlines here.
+
 			return bars;
 		}
 
-		// Simply breaks the voiceDefs (that currently contain a complete channel for the piece)
-		// into bars. This code should not need to change.
+		// Simply breaks the voiceDefs (each currently contains a complete channel for the piece) into bars.
+		// This code should not need to change.
 		private List<List<VoiceDef>> CreateBars(List<BarData> barsData, List<VoiceDef> voiceDefs)
 		{
 			List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
@@ -202,6 +213,10 @@ namespace Moritz.Algorithm.Tombeau1
 			public int number;
 			public int msDuration;
 			public int msPosition;
+			public override string ToString()
+			{
+				return "barNumber=" + number.ToString() + " msDuration=" + msDuration.ToString() + " msPosition=" + msPosition.ToString();
+			}
 		}
 
 		private List<BarData> getBarData(int numberOfBars)
