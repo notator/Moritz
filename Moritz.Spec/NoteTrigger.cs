@@ -13,9 +13,9 @@ namespace Moritz.Spec
 {
 	public class NoteTrigger
 	{
-		protected NoteTrigger(Seq seq, List<byte> trkOffs, TrkOptions trkOptions)
+		protected NoteTrigger(SeqRef seqRef, List<byte> trkOffs, TrkOptions trkOptions)
 		{
-			_seq = seq;
+			_seqRef = seqRef;
 			_trkOffs = trkOffs;
 			_trkOptions = trkOptions;
 		}
@@ -29,9 +29,9 @@ namespace Moritz.Spec
 				_trkOptions.WriteSvg(w, false);
 			}
 
-			if(_seq != null)
+			if(_seqRef != null)
 			{
-				_seq.WriteSvg(w);
+				_seqRef.WriteSvg(w);
 			}
 
 			if(_trkOffs != null && _trkOffs.Count > 0)
@@ -54,8 +54,8 @@ namespace Moritz.Spec
 			w.WriteEndElement(); // noteOn or noteOff
 		}
 
-		public Seq Seq { get { return _seq; } }
-		private Seq _seq = null;
+		public SeqRef SeqRef { get { return _seqRef; } }
+		private SeqRef _seqRef = null;
 
 		public TrkOptions TrkOptions { get { return _trkOptions; } set { _trkOptions = value; } }
 		private TrkOptions _trkOptions = null;
@@ -66,14 +66,14 @@ namespace Moritz.Spec
 
 	public class NoteOn : NoteTrigger
 	{
-		public NoteOn(Seq seq, List<byte> trkOffs, TrkOptions trkOptions)
-			: base(seq, trkOffs, trkOptions)
+		public NoteOn(SeqRef seqRef, List<byte> trkOffs, TrkOptions trkOptions)
+			: base(seqRef, trkOffs, trkOptions)
 		{
 		}
 
 		// a NoteOn that uses no continuous controllers, turns no trks off, and has no trkOptions.
-		public NoteOn(Seq seq)
-			: base(seq, new List<byte>(), null)
+		public NoteOn(SeqRef seqRef)
+			: base(seqRef, new List<byte>(), null)
 		{
 
 		}
@@ -86,10 +86,10 @@ namespace Moritz.Spec
 
 	public class NoteOff : NoteTrigger
 	{
-		public NoteOff(NoteOn noteOn, Seq seq, TrkOptions trkOptions)
-			: base(seq, new List<byte>(), trkOptions)
+		public NoteOff(NoteOn noteOn, SeqRef seqRef, TrkOptions trkOptions)
+			: base(seqRef, new List<byte>(), trkOptions)
 		{
-			foreach(TrkRef tr in noteOn.Seq.TrkRefs)
+			foreach(TrkRef tr in noteOn.SeqRef.TrkRefs)
 			{
 				_trkOffs.Add(tr.MidiChannel);
 			}

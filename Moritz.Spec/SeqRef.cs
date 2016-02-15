@@ -5,17 +5,23 @@ using System.Collections;
 
 namespace Moritz.Spec
 {
-	public class Seq : IEnumerable
+	public class SeqRef : IEnumerable
 	{
 		/// <param name="trkRefs"></param>
 		/// <param name="trkOptions">Can be null</param>
-		public Seq(List<TrkRef> trkRefs, TrkOptions trkOptions)
+		public SeqRef(List<TrkRef> trkRefs, TrkOptions trkOptions)
 		{
 			Debug.Assert(trkRefs != null && trkRefs.Count > 0);
 			TrkOptions = trkOptions;
 			TrkRefs = trkRefs;
 		}
 
+		/// <summary>
+		/// This function only writes TrkRefs that refer to Trks stored in external VoiceDefs. 
+		/// Note that successive Trks in the same VoiceDef may contain common IUniqueDefs...
+		/// SVG files contain voice definitions that contain MidiChordDefs and restDefs, but no Trks.
+		/// </summary>
+		/// <param name="w"></param>
 		internal void WriteSvg(Xml.SvgWriter w)
 		{
 			w.WriteStartElement("seq");

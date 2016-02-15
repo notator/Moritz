@@ -195,9 +195,9 @@ namespace Moritz.Algorithm.Study3Sketch2
 						trkRefs.Add(trkRef);
 					};
 
-					Seq seq = new Seq(trkRefs, null);
+					SeqRef seqRef = new SeqRef(trkRefs, null);
 
-					NoteOn noteOn = new NoteOn(seq);
+					NoteOn noteOn = new NoteOn(seqRef);
 					NoteOff noteOff = new NoteOff(noteOn);
 
 					byte notatedMidiPitch = (byte)(mcd.NotatedMidiPitches[0] + 36);
@@ -286,9 +286,9 @@ namespace Moritz.Algorithm.Study3Sketch2
             {
 				TrkRef trk =  new TrkRef((byte)i, msPos, 12, null);
 				List<TrkRef> trks = new List<TrkRef>() { trk };
-				Seq seq = new Seq(trks, null);
+				SeqRef seqRef = new SeqRef(trks, null);
 
-				NoteOn noteOn = new NoteOn(seq);
+				NoteOn noteOn = new NoteOn(seqRef);
 
 				InputNoteDef inputNoteDef = new InputNoteDef(64, noteOn, null);
 

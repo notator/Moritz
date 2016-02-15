@@ -31,17 +31,17 @@ namespace Moritz.Spec
 				Debug.Assert(ind.NotatedMidiPitch > pitchBelow);
 				pitchBelow = ind.NotatedMidiPitch;
 
-				if(ind.NoteOn != null && ind.NoteOn.Seq != null)
+				if(ind.NoteOn != null && ind.NoteOn.SeqRef != null)
 				{
-					foreach(TrkRef trk in ind.NoteOn.Seq)
+					foreach(TrkRef trk in ind.NoteOn.SeqRef)
 					{ 
 						Debug.Assert(msPosition <= trk.MsPosition);
 					}
 				}
-				if(ind.NoteOff != null && ind.NoteOff.Seq != null)
+				if(ind.NoteOff != null && ind.NoteOff.SeqRef != null)
 				{
 					int minSeqPos = msPosition + msDuration;
-					foreach(TrkRef trk in ind.NoteOff.Seq)
+					foreach(TrkRef trk in ind.NoteOff.SeqRef)
 					{
 						Debug.Assert(minSeqPos <= trk.MsPosition);
 					}
