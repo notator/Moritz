@@ -30,7 +30,7 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// A VoiceDef beginning at MsPosition = 0, and containing a single UniqueMidiRestDef having msDuration
+        /// A VoiceDef beginning at MsPosition = 0, and containing a single RestDef having msDuration
         /// </summary>
         /// <param name="msDuration"></param>
         public VoiceDef(int msDuration)
@@ -348,7 +348,7 @@ namespace Moritz.Spec
         }
         /// <summary>
         /// Returns the index of the IUniqueDef which starts at or is otherwise current at msPosition.
-        /// If msPosition is the EndMsPosition, the index of the final IUniqueMidiDurationDef (Count-1) is returned.
+        /// If msPosition is the EndMsPosition, the index of the final IUniqueDef (Count-1) is returned.
         /// If the VoiceDef does not span msPosition, -1 (=error) is returned.
         /// </summary>
         /// <param name="p"></param>
@@ -406,7 +406,7 @@ namespace Moritz.Spec
             AdjustMsDurations<RestDef>(beginIndex, endIndex, factor, minThreshold);
         }
         /// <summary>
-        /// Multiplies the MsDuration of each rest in the UniqueMidiDurationDefs list by factor.
+        /// Multiplies the MsDuration of each rest in the UniqueDefs list by factor.
         /// If a rest's MsDuration becomes less than minThreshold, it is removed.
         /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
@@ -522,7 +522,7 @@ namespace Moritz.Spec
         #region public properties
         /// <summary>
         /// The absolute position of the first note or rest in the sequence.
-        /// Setting this value resets all the MsPositions in this VoiceDef,
+        /// Setting this value resets the MsPositions of all the IUniqueDefs in this VoiceDef,
         /// including the EndMsPosition.
         /// </summary>
         public int MsPosition 
@@ -539,32 +539,83 @@ namespace Moritz.Spec
                 SetMsPositions();
             } 
         }
-        /// <summary>
-        /// The absolute position of the end of the last note or rest in the sequence.
-        /// Setting this value changes the msDuration of the final IUniqueMidiDurationDef.
-        /// (The EndMsPosition cannot be set if this VoiceDef is empty, or before the last IUniqueMidiDurationDef.) 
-        /// </summary>
-        public int EndMsPosition 
-        { 
-            get 
-            {
-                int endPosition = 0;
-                if(_uniqueDefs.Count > 0)
-                {
-                    IUniqueDef lastLmdd = _uniqueDefs[_uniqueDefs.Count - 1];
-                    endPosition = lastLmdd.MsPosition + lastLmdd.MsDuration;
-                }
-                return endPosition;
-            }
-            set
-            {
-                Debug.Assert(_uniqueDefs.Count > 0);
-                IUniqueDef lastLmdd = _uniqueDefs[_uniqueDefs.Count - 1];
-                Debug.Assert(value > lastLmdd.MsPosition);
-                lastLmdd.MsDuration = value - lastLmdd.MsPosition;
-            }
-        }
-        public int Count { get { return _uniqueDefs.Count; } }
+		/// <summary>
+		/// Setting this property stretches or compresses all the durations in the UniqueDefs list to fit the given total duration.
+		/// This does not change the VoiceDef's MsPosition, but does affect its EndMsPosition.
+		/// See also EndMsPosition.set.
+		/// </summary>
+		public int MsDuration
+		{
+			get
+			{
+				int total = 0;
+				foreach(IUniqueDef iud in _uniqueDefs)
+				{
+					total += iud.MsDuration;
+				}
+				return total;
+			}
+			set
+			{
+				Debug.Assert(value > 0);
+
+				int msDuration = value;
+
+				List<int> relativeDurations = new List<int>();
+				foreach(IUniqueDef iumdd in _uniqueDefs)
+				{
+					if(iumdd.MsDuration > 0)
+						relativeDurations.Add(iumdd.MsDuration);
+				}
+
+				List<int> newDurations = MidiChordDef.GetIntDurations(msDuration, relativeDurations, relativeDurations.Count);
+
+				Debug.Assert(newDurations.Count == relativeDurations.Count);
+				int i = 0;
+				int newTotal = 0;
+				foreach(IUniqueDef iumdd in _uniqueDefs)
+				{
+					if(iumdd.MsDuration > 0)
+					{
+						iumdd.MsDuration = newDurations[i];
+						newTotal += iumdd.MsDuration;
+						++i;
+					}
+				}
+
+				Debug.Assert(msDuration == newTotal);
+
+				SetMsPositions();
+			}
+		}
+		/// <summary>
+		/// The position of the end of the last UniqueDef in the list, or 0 if the list is empty.
+		/// Setting this value can only be done if the UniqueDefs list is not empty, and the value
+		/// is greater than the position of the final UniqueDef in the list. It then changes
+		/// the msDuration of the final IUniqueDef.
+		/// See also MsDuration.set.
+		/// </summary>
+		public int EndMsPosition
+		{
+			get
+			{
+				int endPosition = 0;
+				if(_uniqueDefs.Count > 0)
+				{
+					IUniqueDef lastIUD = _uniqueDefs[_uniqueDefs.Count - 1];
+					endPosition = lastIUD.MsPosition + lastIUD.MsDuration;
+				}
+				return endPosition;
+			}
+			set
+			{
+				Debug.Assert(_uniqueDefs.Count > 0);
+				IUniqueDef lastLmdd = _uniqueDefs[_uniqueDefs.Count - 1];
+				Debug.Assert(value > lastLmdd.MsPosition);
+				lastLmdd.MsDuration = value - lastLmdd.MsPosition;
+			}
+		}
+		public int Count { get { return _uniqueDefs.Count; } }
 
         #endregion public properties
 
@@ -725,12 +776,12 @@ namespace Moritz.Spec
 		/// For an example of using this function, see SongSixAlgorithm.cs
 		/// Note that clef changes must be inserted backwards per voiceDef, so that IUniqueDef indices are correct. 
 		/// Inserting a clef change changes the subsequent indices.
-		/// Note also that if a ClefChange is defined here on a UniqueMidiRestDef which has no MidiChordDef
+		/// Note also that if a ClefChange is defined here on a RestDef which has no MidiChordDef
 		/// to its right on the staff, the resulting ClefSymbol will be placed immediately before the final barline
 		/// on the staff.
 		/// ClefChanges which would happen at the beginning of a staff are moved to the end of the equivalent staff
 		/// in the previous system.
-		/// A ClefChange defined here on a MidiChordDef or UniqueMidiRestDef which is eventually preceded
+		/// A ClefChange defined here on a MidiChordDef or RestDef which is eventually preceded
 		/// by a barline, are placed to the left of the barline.  
 		/// The clefType must be one of the following strings "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"
 		/// </summary>
@@ -756,55 +807,6 @@ namespace Moritz.Spec
 		}
 
         public List<IUniqueDef> UniqueDefs { get { return _uniqueDefs; } }
-
-		/// <summary>
-		/// Setting this property stretches or compresses all the durations in the UniqueDefs list to fit the given total duration.
-		/// This does not change the VoiceDef's MsPosition, but does affect its EndMsPosition.
-		/// </summary>
-		public int MsDuration
-		{ 
-			get
-			{
-				int total = 0;
-				foreach(IUniqueDef iud in _uniqueDefs)
-				{
-					total += iud.MsDuration;
-				}
-				return total;
-			}
-			set
-			{					
-				Debug.Assert(value > 0);
-
-				int msDuration = value;
-
-				List<int> relativeDurations = new List<int>();
-				foreach(IUniqueDef iumdd in _uniqueDefs)
-				{
-					if(iumdd.MsDuration > 0)
-						relativeDurations.Add(iumdd.MsDuration);
-				}
-
-				List<int> newDurations = MidiChordDef.GetIntDurations(msDuration, relativeDurations, relativeDurations.Count);
-
-				Debug.Assert(newDurations.Count == relativeDurations.Count);
-				int i = 0;
-				int newTotal = 0;
-				foreach(IUniqueDef iumdd in _uniqueDefs)
-				{
-					if(iumdd.MsDuration > 0)
-					{
-						iumdd.MsDuration = newDurations[i];
-						newTotal += iumdd.MsDuration;
-						++i;
-					}
-				}
-
-				Debug.Assert(msDuration == newTotal);
-
-				SetMsPositions();
-			}
-		}
 
 		public byte MidiChannel = byte.MaxValue; // the MidiChannel will only be valid if set to a value in range [0..15]
 

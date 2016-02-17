@@ -141,8 +141,8 @@ namespace Moritz.Algorithm
         public abstract List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes);
 
         /// <summary>
-        /// Returns the position of the end of the last UniqueMidiDurationDef
-        /// in the bar's first voice's UniqueMidiDurationDefs list.
+        /// Returns the position of the end of the last UniqueDef
+        /// in the bar's first voice's UniqueDefs list.
         /// </summary>
         protected int GetEndMsPosition(List<VoiceDef> bar)
         {
@@ -156,10 +156,10 @@ namespace Moritz.Algorithm
         /// <summary>
         /// Returns two bars. The first is the beginning of the argument bar up to absoluteSplitPos,
         /// The second is the end of the argument bar beginning at absoluteSplitPos.
-        /// The final UniqueMidiDurationDef in each voice.UniqueMidiDurationDefs list is converted
+        /// The final UniqueDef in each voice.UniqueDefs list is converted
         /// to a FinalLMDDInVoice object containing an MsDurationToBarline property.
         /// If a chord or rest overlaps a barline, a LocalizedCautionaryChordDef object is created at the
-        /// start of the voice.UniqueMidiDurationDefs in the second bar. A LocalizedCautionaryChordDef
+        /// start of the voice.UniqueDefs in the second bar. A LocalizedCautionaryChordDef
         /// object is a kind of chord which is used while justifying systems, but is not displayed and
         /// does not affect performance.
         /// ClefChangeDefs are placed at the end of the first bar, not at the start of the second bar.

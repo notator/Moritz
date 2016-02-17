@@ -187,7 +187,7 @@ namespace Moritz.Spec
             }
         }
         /// <summary>
-        /// Multiplies each expression value in the UniqueMidiDurationDefs by the argument factor.
+        /// Multiplies each expression value in the UniqueDefs by the argument factor.
         /// </summary>
         public void AdjustExpression(double factor)
         {
@@ -267,9 +267,9 @@ namespace Moritz.Spec
         #endregion deprecated function
         /// Creates a hairpin in the velocities from startMsPosition to endMsPosition (non-inclusive).
         /// This function does NOT change velocities outside the range given in its arguments.
-        /// There must be at least two IUniqueMidiDurationDefs in the msPosition range given in the arguments.
+        /// There must be at least two IUniqueDefs in the msPosition range given in the arguments.
         /// The factors by which the velocities are multiplied change arithmetically:
-        /// The velocity of the first IUniqueMidiDurationDefs is multiplied by startFactor, and the velocity
+        /// The velocity of the first IUniqueDefs is multiplied by startFactor, and the velocity
         /// of the last MidiChordDef in range by endFactor.
         /// Can be used to create a diminueno or crescendo.
         public void AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
@@ -510,13 +510,13 @@ namespace Moritz.Spec
 
 		#region public Permute()
 		/// <summary>
-		/// Re-orders the UniqueMidiDurationDefs in (part of) this VoiceDef.
-		/// <para>1. creates partitions (lists of UniqueMidiDurationDefs) using the startAtIndex and partitionSizes in the first two</para>
+		/// Re-orders the UniqueDefs in (part of) this VoiceDef.
+		/// <para>1. creates partitions (lists of UniqueDefs) using the startAtIndex and partitionSizes in the first two</para>
 		/// <para>-  arguments (see parameter info below).</para>   
 		/// <para>2. Sorts the partitions into ascending order of their lowest pitches.
 		/// <para>3. Re-orders the partitions according to the contour retrieved (from the static K.Contour[] array) using</para>
 		/// <para>-  the contourNumber and axisNumber arguments.</para>
-		/// <para>4. Concatenates the re-ordered partitions, re-sets their MsPositions, and replaces the UniqueMidiDurationDefs in</para>
+		/// <para>4. Concatenates the re-ordered partitions, re-sets their MsPositions, and replaces the UniqueDefs in</para>
 		/// <para>-  the original List with the result.</para>
 		/// <para>5. If setLyricsToIndex is true, sets the lyrics to the new indices</para>
 		/// <para>SpecialCases:</para>
@@ -526,13 +526,13 @@ namespace Moritz.Spec
 		/// <para>If two sub-VoiceDefs have the same initial base pitch, they stay in the same order as they were (not necessarily</para>
 		/// <para>together, of course.)</para>
 		/// </summary>
-		/// <param name="startAtIndex">The index in UniqueMidiDurationDefs at which to start the re-ordering.
+		/// <param name="startAtIndex">The index in UniqueDefs at which to start the re-ordering.
 		/// </param>
-		/// <param name="partitionSizes">The number of UniqueMidiDurationDefs in each sub-voiceDef to be re-ordered.
+		/// <param name="partitionSizes">The number of UniqueDefs in each sub-voiceDef to be re-ordered.
 		/// <para>This partitionSizes list must contain:</para>
 		/// <para>    1..7 int sizes.</para>
 		/// <para>    sizes which are all greater than 0.</para>
-		/// <para>    The sum of all the sizes + startAtIndex must be less than or equal to UniqueMidiDurationDefs.Count.</para>
+		/// <para>    The sum of all the sizes + startAtIndex must be less than or equal to UniqueDefs.Count.</para>
 		/// <para>An Exception is thrown if any of these conditions is not met.</para>
 		/// <para>If the partitions list contains only one value, this function returns silently without doing anything.</para>
 		/// </param>
@@ -708,10 +708,10 @@ namespace Moritz.Spec
 
 		/// <summary>
 		/// Throws an exception if one of the following conditions is not met.
-		/// <para>startAtIndex is a valid index in the UniqueMidiDurationDefs list</para>
+		/// <para>startAtIndex is a valid index in the UniqueDefs list</para>
 		/// <para>partitionSizes.Count is greater than 0, and less than 8.</para>
 		/// <para>all sizes in partitionSizes are greater then 0.</para>
-		/// <para>the sum of startAtIndex plus all the partition sizes is not greater than UniqueMidiDurationDefs.Count</para>
+		/// <para>the sum of startAtIndex plus all the partition sizes is not greater than UniqueDefs.Count</para>
 		/// <para>contourNumber is in the range 1..12</para>
 		/// <para>axisNumber is in the range 1..12</para>
 		/// </summary>
@@ -732,7 +732,7 @@ namespace Moritz.Spec
 			{
 				if(size < 1)
 				{
-					throw new ArgumentException("partitions must contain at least one IUniqueMidiDurationDef");
+					throw new ArgumentException("partitions must contain at least one IUniqueDef");
 				}
 				totalNumberOfLmdds += size;
 				if(totalNumberOfLmdds > lmdds.Count)

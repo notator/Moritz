@@ -58,8 +58,8 @@ namespace Moritz.Algorithm.SongSix
         }
 
         /// <summary>
-        /// Returns a VoiceDef containing clones of the UniqueMidiDurationDefs in the originalVoiceDef argument,
-        /// rotated so that the original first IUniqueMidiDurationDef is positioned close to rotationMsPosition.
+        /// Returns a VoiceDef containing clones of the UniqueDefs in the originalVoiceDef argument,
+        /// rotated so that the original first IUniqueDef is positioned close to rotationMsPosition.
         /// </summary>
         /// <param name="originalVoiceDef"></param>
         /// <returns></returns>

@@ -7,9 +7,9 @@ using Moritz.Globals;
 namespace Moritz.Spec
 {
     ///<summary>
-    /// A ClefChangeDef is a IUniqueMidiDurationDef which can be created while programming a score.
-    /// It must be added to a voice.UniqueMidiDurationDefs list immediately before a MidiChordDef or
-    /// UniqueMidiRestDef. It shares the same MsPosition.
+    /// A ClefChangeDef is a IUniqueDef which can be created while programming a score.
+    /// It must be added to a voice.UniqueDefs list immediately before a MidiChordDef or
+    /// RestDef. It shares the same MsPosition.
     /// When converting definitions to symbols, the Notator uses this class to ensure that both voices in
     /// a two-voice staff contain the same ClefSigns (see Notator.AddSymbolsToSystems(List<SvgSystem> systems)).
     /// (The ClefSigns may have different visibility in the two voices.)
@@ -18,7 +18,7 @@ namespace Moritz.Spec
     {
         /// <summary>
         /// The clefType must be one of the following strings "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"
-        /// The followingUniqueMidiChordOrRestDef must be a MidiChordDef or UniqueMidiRestDef.
+        /// The following IUniqueDef must be a MidiChordDef or RestDef.
         /// </summary>
         public ClefChangeDef(string clefType, IUniqueDef followingUniqueChordOrRestDef)
             :base()
@@ -69,7 +69,7 @@ namespace Moritz.Spec
             return deepClone;
         }
 
-        public int MsDuration { get { return 0; } set { } }
+        public int MsDuration { get { return 0; } set { throw new System.NotSupportedException(); } }
         public int MsPosition
         {
             get
@@ -77,7 +77,7 @@ namespace Moritz.Spec
                 Debug.Assert(_followingChordOrRestDef != null);
                 return _followingChordOrRestDef.MsPosition;
             }
-            set { }
+            set { throw new System.NotSupportedException(); }
         }
         #endregion IUniqueDef
 

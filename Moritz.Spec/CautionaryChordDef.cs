@@ -46,7 +46,6 @@ namespace Moritz.Spec
             return deepClone;
         }
 
-        // ????? public int MsDuration { get { return 0; } set { } }
         public int MsDuration { get { return _msDuration; } set { _msDuration = value; } }
         private int _msDuration = 0;
         public int MsPosition { get { return _msPosition; } set { _msPosition = value; } }

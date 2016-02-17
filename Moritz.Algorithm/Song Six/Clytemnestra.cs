@@ -13,7 +13,7 @@ namespace Moritz.Algorithm.SongSix
             : base(midiChannel, new List<IUniqueDef>())
         {
             SetMomentDefsListPerVerse();
-            SetUniqueMidiDurationDefs(wind3);
+            SetUniqueDefs(wind3);
             // There are no pitchWheel commands in the score.
             // They can be created by a live performer
             SetPitchWheelDeviation(1, 60, 1);    // verse 1
@@ -277,10 +277,10 @@ namespace Moritz.Algorithm.SongSix
         }
 
         /// <summary>
-        /// Sets Clytamnestra's _uniqueMidiDurationDefs for the whole piece including rests.
+        /// Sets Clytamnestra's _uniqueDefs for the whole piece including rests.
         /// Barline positions are set later.
         /// </summary>
-        private void SetUniqueMidiDurationDefs(Trk wind3)
+        private void SetUniqueDefs(Trk wind3)
         {
             Debug.Assert(_momentDefsListPerVerse.Count == 5);
 

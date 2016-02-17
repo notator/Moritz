@@ -107,14 +107,14 @@ namespace Moritz.Algorithm.SongSix
             return bars;
         }
         /// <summary>
-        /// Note that clef changes must be inserted backwards per voiceDef, so that IUniqueMidiDurationDef
+        /// Note that clef changes must be inserted backwards per voiceDef, so that IUniqueDef
         /// indices are correct. Inserting a clef change changes the indices.
-        /// Note also that if a ClefChange is defined here on a UniqueMidiRestDef which has no MidiChordDef
+        /// Note also that if a ClefChange is defined here on a RestDef which has no MidiChordDef
         /// to its right on the staff, the resulting ClefSymbol will be placed immediately before the final barline
         /// on the staff.
         /// ClefChanges which would happen at the beginning of a staff are written as cautionary clefs on the
         /// equivalent staff in the previous system.
-        /// A ClefChange defined here on a MidiChordDef or UniqueMidiRestDef which is eventually preceded
+        /// A ClefChange defined here on a MidiChordDef or RestDef which is eventually preceded
         /// by a barline, are placed to the left of the barline. 
         /// </summary>
         private void InsertClefChanges(Furies1 furies1, Furies2 furies2, Furies3 furies3, Furies4 furies4)
