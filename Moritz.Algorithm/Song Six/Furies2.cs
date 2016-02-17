@@ -204,7 +204,7 @@ namespace Moritz.Algorithm.SongSix
                 }
             }
 
-            section.StartMsPosition = msPositions["furies2FinaleStart"];
+            section.MsPosition = msPositions["furies2FinaleStart"];
 
             //double factor = 10;
 

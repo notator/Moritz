@@ -436,13 +436,13 @@ namespace Moritz.Algorithm
 					if(trkToAdd.UniqueDefs.Count > 0)
 					{
 						Trk trk = trks[i];
-						int trkToAddStartMsPosition = seq.MsPosition + trkToAdd.StartMsPosition;
+						int trkToAddStartMsPosition = seq.MsPosition + trkToAdd.MsPosition;
 
 						Debug.Assert(trk.EndMsPosition <= trkToAddStartMsPosition);
 
 						if(trk.EndMsPosition < trkToAddStartMsPosition)
 						{
-							trk.Add(new RestDef(trk.EndMsPosition, trkToAdd.StartMsPosition - trk.EndMsPosition));
+							trk.Add(new RestDef(trk.EndMsPosition, trkToAdd.MsPosition - trk.EndMsPosition));
 						}
 						trk.AddRange(trkToAdd);
 					}

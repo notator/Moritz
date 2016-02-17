@@ -137,7 +137,7 @@ namespace Moritz.Algorithm.Study3Sketch1
                 voice.UniqueDefs.Add(rest1Def);
             }
 
-            trkDef.StartMsPosition = msPosition;
+            trkDef.MsPosition = msPosition;
             foreach(IUniqueDef iumdd in trkDef)
             {
                 voice.UniqueDefs.Add(iumdd);

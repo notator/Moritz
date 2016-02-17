@@ -218,7 +218,7 @@ namespace Moritz.Algorithm.SongSix
         {
             section.RemoveRange(40, section.Count - 40);
 
-            section.StartMsPosition = msPositions["interlude4"];
+            section.MsPosition = msPositions["interlude4"];
 
             //double factor = 10;
 

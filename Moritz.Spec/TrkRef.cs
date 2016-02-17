@@ -23,7 +23,7 @@ namespace Moritz.Spec
 		public TrkRef(Trk trkDef, TrkOptions trkOptions)
 		{
 			_trkMidiChannel = trkDef.MidiChannel;
-			_trkMsPosition = trkDef.StartMsPosition;
+			_trkMsPosition = trkDef.MsPosition;
 			_trkNumMidiObjects = trkDef.DurationsCount; // includes MidiChordDef, RestDef
 			TrkOptions = trkOptions;
 		}

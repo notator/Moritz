@@ -111,7 +111,7 @@ namespace Moritz.Algorithm.SongSix
                 }
             }
 
-            f1FinalePart1.StartMsPosition = msPositions["interlude3Bar2"];
+            f1FinalePart1.MsPosition = msPositions["interlude3Bar2"];
 
             f1FinalePart1.RemoveBetweenMsPositions(msPositions["verse4EsCaped"], int.MaxValue);
 
@@ -169,7 +169,7 @@ namespace Moritz.Algorithm.SongSix
                 }
             }
 
-            f1FinalePart2.StartMsPosition = msPositions["verse4EsCaped"];
+            f1FinalePart2.MsPosition = msPositions["verse4EsCaped"];
             f1FinalePart2.RemoveBetweenMsPositions(msPositions["verse5Calls"], int.MaxValue);
 
             if(f1FinalePart2[f1FinalePart2.Count - 1] is RestDef)
@@ -195,7 +195,7 @@ namespace Moritz.Algorithm.SongSix
                 }
             }
 
-            f1p.StartMsPosition = msPositions["postlude"];
+            f1p.MsPosition = msPositions["postlude"];
             f1p.RemoveBetweenMsPositions(msPositions["endOfPiece"], int.MaxValue);
             
             return f1p;

@@ -6,15 +6,15 @@ using System.Collections.ObjectModel;
 
 namespace Moritz.Spec
 {
-	/// <summary>
-	/// Every Trk in trks is either empty or begins and ends with a MidiChordDef.
-	/// Trk msPositions are relative to the start of the Seq.
-	/// The earliest MidiChordDef in any Trk has MsPosition = 0.
-	/// The trks list does not have to be complete, but each tkr.MidiChannel must be
-	/// unique and present in the midiChannelIndexPerOutputVoice list.
-	/// </summary>
 	public class Seq
 	{
+		/// <summary>
+		/// <para>Every Trk in trks is either empty or begins and ends with a MidiChordDef.</para>
+		/// <para>Trk msPositions are relative to the start of the Seq.</para>
+		/// <para>There is at least one non-empty Trk having MsPosition = 0.</para>
+		/// <para>The trks list does not have to be complete, but each tkr.MidiChannel must be
+		/// unique and present in the midiChannelIndexPerOutputVoice list.</para>
+		/// </summary>
 		public Seq(List<Trk> trks, List<int> midiChannelIndexPerOutputVoice)
 		{
 			AssertConsistency(trks, midiChannelIndexPerOutputVoice);
@@ -47,7 +47,7 @@ namespace Moritz.Spec
 
 		/// <summary>
 		/// Every Trk in trks is either empty or begins and ends with a MidiChordDef.
-		/// The earliest MidiChordDef in any Trk has MsPosition = 0.
+		/// There is at least one Trk having MsPosition == 0.
 		/// The trks list does not have to be complete, but each MidiChannel must be set to a valid value.
 		/// </summary>
 		public void AssertConsistency(List<Trk> trks, List<int> midiChannelIndexPerOutputVoice)
@@ -75,14 +75,10 @@ namespace Moritz.Spec
 			bool found = false;
 			foreach(Trk trk in trks)
 			{
-				if(trk.UniqueDefs.Count > 0)
+				if(trk.UniqueDefs.Count > 0 && trk.MsPosition == 0)
 				{
-					IUniqueDef firstIUD = trk.UniqueDefs[0];
-					if(firstIUD.MsPosition == 0)
-					{
-						found = true;
-						break;
-					}
+					found = true;
+					break;
 				}
 			}
 			Debug.Assert(found == true, "The first UniqueDef in at least one trk must have MsPosition=0");

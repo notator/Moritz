@@ -280,7 +280,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             }
 
             InputVoiceDef inputVoiceDef = new InputVoiceDef(maxBarMsPos - bar2StartMsPos);
-            inputVoiceDef.StartMsPosition = bar2StartMsPos; 
+            inputVoiceDef.MsPosition = bar2StartMsPos; 
             int msPos = bar2StartMsPos;
             for(int i = 0; i < bar.Count; ++i)
             {
@@ -314,7 +314,7 @@ namespace Moritz.Algorithm.Study3Sketch2
                 voice.UniqueDefs.Add(rest1Def);
             }
 
-            trkDef.StartMsPosition = msPosition;
+            trkDef.MsPosition = msPosition;
             foreach(IUniqueDef iu in trkDef)
             {
                 voice.UniqueDefs.Add(iu);

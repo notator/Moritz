@@ -525,7 +525,7 @@ namespace Moritz.Spec
         /// Setting this value resets all the MsPositions in this VoiceDef,
         /// including the EndMsPosition.
         /// </summary>
-        public int StartMsPosition 
+        public int MsPosition 
         { 
             get 
             { 
