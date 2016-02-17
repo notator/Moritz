@@ -98,7 +98,7 @@ namespace Moritz.Algorithm.Study3Sketch1
             {
                 bar.Add(new Trk(channel, new List<IUniqueDef>()));
                 Trk trkDef = palette.NewTrkDef(channel);
-                trkDef.SetMsDuration(6000);
+                trkDef.MsDuration = 6000;
                 trkDefs.Add(trkDef);
                 ++channel;
             }

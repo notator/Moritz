@@ -141,8 +141,8 @@ namespace Moritz.Spec
         protected void _Add(IUniqueDef iUniqueDef)
         {
             Debug.Assert(_uniqueDefs.Count > 0);
-            IUniqueDef lastLmdd = _uniqueDefs[_uniqueDefs.Count - 1];
-            iUniqueDef.MsPosition = lastLmdd.MsPosition + lastLmdd.MsDuration;
+            IUniqueDef lastIud = _uniqueDefs[_uniqueDefs.Count - 1];
+            iUniqueDef.MsPosition = lastIud.MsPosition + lastIud.MsDuration;
             _uniqueDefs.Add(iUniqueDef);
         }
         protected void _AddRange(VoiceDef voiceDef)
@@ -370,41 +370,7 @@ namespace Moritz.Spec
         #endregion list functions
 
         #region VoiceDef duration changers
-        /// <summary>
-        /// Stretch or compress all the durations in the list to fit the given total duration.
-        /// This does not change the VoiceDef's MsPosition, but does affect its EndMsPosition.
-        /// </summary>
-        /// <param name="msDuration"></param>
-        public void SetMsDuration(int msDuration)
-        {
-            Debug.Assert(msDuration > 0);
 
-            List<int> relativeDurations = new List<int>();
-            foreach(IUniqueDef iumdd in _uniqueDefs)
-            {
-                if(iumdd.MsDuration > 0)
-                    relativeDurations.Add(iumdd.MsDuration);
-            }
-
-            List<int> newDurations = MidiChordDef.GetIntDurations(msDuration, relativeDurations, relativeDurations.Count);
-
-            Debug.Assert(newDurations.Count == relativeDurations.Count);
-            int i = 0;
-            int newTotal = 0;
-            foreach(IUniqueDef iumdd in _uniqueDefs)
-            {
-                if(iumdd.MsDuration > 0)
-                {
-                    iumdd.MsDuration = newDurations[i];
-                    newTotal += iumdd.MsDuration;
-                    ++i;
-                }
-            }
-
-            Debug.Assert(msDuration == newTotal);
-
-            SetMsPositions();
-        }
         /// <summary>
         /// Removes all the rests in this VoiceDef
         /// </summary>
@@ -791,7 +757,56 @@ namespace Moritz.Spec
 
         public List<IUniqueDef> UniqueDefs { get { return _uniqueDefs; } }
 
-        public byte MidiChannel = byte.MaxValue; // the MidiChannel will only be valid if set to a value in range [0..15]
+		/// <summary>
+		/// Setting this property stretches or compresses all the durations in the UniqueDefs list to fit the given total duration.
+		/// This does not change the VoiceDef's MsPosition, but does affect its EndMsPosition.
+		/// </summary>
+		public int MsDuration
+		{ 
+			get
+			{
+				int total = 0;
+				foreach(IUniqueDef iud in _uniqueDefs)
+				{
+					total += iud.MsDuration;
+				}
+				return total;
+			}
+			set
+			{					
+				Debug.Assert(value > 0);
+
+				int msDuration = value;
+
+				List<int> relativeDurations = new List<int>();
+				foreach(IUniqueDef iumdd in _uniqueDefs)
+				{
+					if(iumdd.MsDuration > 0)
+						relativeDurations.Add(iumdd.MsDuration);
+				}
+
+				List<int> newDurations = MidiChordDef.GetIntDurations(msDuration, relativeDurations, relativeDurations.Count);
+
+				Debug.Assert(newDurations.Count == relativeDurations.Count);
+				int i = 0;
+				int newTotal = 0;
+				foreach(IUniqueDef iumdd in _uniqueDefs)
+				{
+					if(iumdd.MsDuration > 0)
+					{
+						iumdd.MsDuration = newDurations[i];
+						newTotal += iumdd.MsDuration;
+						++i;
+					}
+				}
+
+				Debug.Assert(msDuration == newTotal);
+
+				SetMsPositions();
+			}
+		}
+
+		public byte MidiChannel = byte.MaxValue; // the MidiChannel will only be valid if set to a value in range [0..15]
 
         #endregion public
 
