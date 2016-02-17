@@ -546,32 +546,14 @@ namespace Moritz.Composer
         {
             if(SaveSettingsCreateScoreButton.Text.StartsWith("save"))
             {
-                try
-                {
-                    // The settings are saved here in case there is going to be an error while creating the score.
-                    SaveSettings();
-                    SetMainFormIsSaved();
-                }
-                catch(Exception ex)
-                {
-                    string msg = "Failed to save the settings.\r\n\r\n"
-                        + "Exception message: " + ex.Message;
-                    MessageBox.Show(msg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                }
+                // The settings are saved here in case there is going to be an error while creating the score.
+                SaveSettings();
+                SetMainFormIsSaved();
             }
             else
             {
                 Debug.Assert(SaveSettingsCreateScoreButton.Text.StartsWith("create"));
-                try
-                {
-                    CreateSVGScore();
-                }
-                catch(Exception ex)
-                {
-                    string msg = "Failed to create the score.\r\n\r\n"
-                        + "Exception message: " + ex.Message;
-                    MessageBox.Show(msg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                }
+                CreateSVGScore();
             }
         }
 
@@ -1967,8 +1949,6 @@ namespace Moritz.Composer
         /// </summary>
         private void CreateSVGScore()
         {
-            try
-            {
                 List<Krystal> krystals = null;
                 List<Palette> palettes = null;
                 GetKrystalsAndPalettes(out krystals, out palettes);
@@ -1989,13 +1969,6 @@ namespace Moritz.Composer
                     // Opens the multi-page score in the program which is set by the system to open .svg files.
                     global::System.Diagnostics.Process.Start(score.FilePath);
                 }
-            }
-            catch(Exception ex)
-            {
-                string msg = "Failed to create score, or to open it in the browser.\r\n\r\n"
-                    + "Exception message: " + ex.Message;
-                MessageBox.Show(msg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
         }
         private void GetKrystalsAndPalettes(out List<Krystal> krystals, out List<Palette> palettes)
         {
