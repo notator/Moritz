@@ -34,16 +34,20 @@ namespace Moritz.Algorithm.Tombeau1
 			_palettes = palettes;
 
 			/*********************************************************************************************
-			Voices are basically in order background to foreground.
-			I want to compose in terms of Seqs. A Seq has a List<Trk>, the Trks being in parallel channels.
-			Composing with Seqs will promote the use of "harmony and counterpoint" parameters since the
-			vertical relation between contained Trks will be under control.
-			A bigger piece like this needs some kind of higher level organisation like this...
-			I want to be able to superimpose Seqs and reorder them. Note that Seqs don't necessarily coincide with bars.
-			The "harmony & counterpoint" is not only in the pitches, its also in the dynamics, and the pan position... 
-			I need to create the palettes containing the ornaments, think about a top level structure, and about trks (lists of timeObjects)
-			and how they relate...
-			Tuning is a parameter that could be introduced later...
+			Think Nancarrow, but (especially) with background/foreground. Think Study 1. Depth.
+
+			"Harmony & counterpoint" is not only going to be there in the pitches, its will also be there in the dynamics,
+			and the pan position...	Tuning is a parameter that could be introduced later...
+			Using Seqs and Trks should make it possible to compose powerful, comprehensible, pregnant relations at every
+			structural level.
+
+			I need to think about the structural levels:
+			> create the palettes containing the ornaments,
+			> how notes/chords relate horizontally inside a trk
+			> how notes/chords relate vertically inside a seq (How trks relate to each other inside seqs?),
+			> and about how seqs relate to each other globally...
+
+			Seqs can be superimposed, juxtaposed, repeated and re-ordered.			
 			*********************************************************************************************/
 
 			List<Seq> seqs = new List<Seq>();
@@ -68,12 +72,15 @@ namespace Moritz.Algorithm.Tombeau1
 			trks[5].UniqueDefs.Insert(1, new ClefChangeDef("t", trks[5].UniqueDefs[1]));
 			trks[6].UniqueDefs.Insert(2, new ClefChangeDef("t", trks[6].UniqueDefs[2]));
 
-			Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
+			Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The MsPosition can change again later.
 
 			seqs.Add(seq);
 
 			#endregion temp code
 			/**********************************************/
+
+			// Note that Seqs can be constructed in any order, but they should be sorted in order of MsPosition before calling GetVoiceDefs.
+			seqs.Sort((a, b) => a.MsPosition.CompareTo(b.MsPosition));
 
 			List<VoiceDef> voiceDefs = GetVoiceDefs(seqs); // virtual function in CompositionAlgorithm.cs
 
@@ -174,28 +181,29 @@ namespace Moritz.Algorithm.Tombeau1
 
 		/// <summary>
 		/// Temp function that just returns nBars barline end positions equally distributed across the sequence.
+		/// Rewrite this function when the composition is complete.
 		/// Empty bars are allowed, but barlines should usually try to align with MidiChordDefs.
 		/// </summary>
 		private static List<int> GetBarlineEndMsPositions(List<VoiceDef> voiceDefs, int nBars)
 		{
-			List<int> barlineMsPositions = new List<int>();
+			List<int> barlineEndMsPositions = new List<int>();
 			int sequenceMsDuration = voiceDefs[0].MsDuration;
 			int barMsDuration = sequenceMsDuration / nBars;
 			int msPos = barMsDuration;
 			for(int i = 0; i < nBars - 1; ++i)
 			{
-				barlineMsPositions.Add(msPos);
+				barlineEndMsPositions.Add(msPos);
 				msPos += barMsDuration;
 			}
-			barlineMsPositions.Add(sequenceMsDuration);	// the final barline
+			barlineEndMsPositions.Add(sequenceMsDuration);  // the final barline
 
-			#region conditions
-			Debug.Assert(barlineMsPositions[0] != 0);
-			Debug.Assert(barlineMsPositions[barlineMsPositions.Count - 1] == sequenceMsDuration);
-			Debug.Assert(barlineMsPositions.Count == nBars);
+			#region conditions (these also have to be met when this function has been rewritten) 
+			Debug.Assert(barlineEndMsPositions[0] != 0);
+			Debug.Assert(barlineEndMsPositions[barlineEndMsPositions.Count - 1] == sequenceMsDuration);
+			Debug.Assert(barlineEndMsPositions.Count == nBars);
 			#endregion
 
-			return barlineMsPositions;
+			return barlineEndMsPositions;
 		}
 	}
 }

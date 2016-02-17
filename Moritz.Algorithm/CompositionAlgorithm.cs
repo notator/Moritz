@@ -358,17 +358,22 @@ namespace Moritz.Algorithm
 		}
 
 		/// <summary>
-		/// <para>The seqs are first sorted in order of their MsPosition.</para> 
-		/// <para>The returned (parallel) VoiceDefs all start at MsPosition=0 and have the same MsDuration.</para>
+		/// <para>The argument seqs must be in order of their MsPosition, whereby some seqs may have the same MsPosition.</para>
+		/// <para>The first seq is at MsPosition == 0.</para>
+		/// <para>All seqs have the same number of parallel trks, and share the same midiChannel structure, but trks may be empty</para>
+		/// <para>The returned (parallel) voiceDefs all start at MsPosition=0 and have the same MsDuration.</para>
 		/// <para>There is at least one MidiChordDef at the start of the sequence, and at least one MidiChordDef ends at its end.</para>
-		/// <para>ClefChangeDefs at the beginning of a returned VoiceDef are silently removed.</para>
 		/// </summary>
 		protected List<VoiceDef> GetVoiceDefs(List<Seq> seqs)
 		{
 			#region conditions
-			Debug.Assert(seqs != null && seqs.Count > 0);
-			seqs.Sort((a, b) => a.MsPosition.CompareTo(b.MsPosition));
-
+			Debug.Assert(seqs != null && seqs.Count > 0 && seqs[0].MsPosition == 0);
+			int msPosition = 0;
+			foreach(Seq seq in seqs)
+			{
+				Debug.Assert(seq.MsPosition >= msPosition);
+				msPosition = seq.MsPosition;
+			}
 			List<int> midiChannelIndexPerOutputVoice = new List<int>();
 			Seq firstSeq = seqs[0];
 			int nTrks = firstSeq.Trks.Count;
@@ -386,29 +391,23 @@ namespace Moritz.Algorithm
 				}
 			}
 			#endregion conditions
-
 			List<VoiceDef> voiceDefs = new List<VoiceDef>();
 			List<Trk> sequenceTrks = GetSequenceTrks(seqs);
 
-			foreach(Trk sequenceTrk in sequenceTrks)
-			{
-				Debug.Assert(!(sequenceTrk.UniqueDefs[0] is ClefChangeDef), "A sequence Trk may not begin with a ClefChangeDef.");
-			}
-
 			int sequenceMsDuration = GetSequenceMsDuration(sequenceTrks);
 
-			foreach(Trk trk in sequenceTrks)
+			foreach(Trk sequenceTrk in sequenceTrks)
 			{
-				Trk voiceDef = new Trk(trk.MidiChannel, trk.UniqueDefs);
+				Trk voiceDef = new Trk(sequenceTrk.MidiChannel, sequenceTrk.UniqueDefs);
 
-				IUniqueDef firstIUD = trk.UniqueDefs[0];
+				IUniqueDef firstIUD = sequenceTrk.UniqueDefs[0];
 				int startRestMsDuration = firstIUD.MsPosition;
 				if(startRestMsDuration > 0)
 				{
 					voiceDef.UniqueDefs.Insert(0, new RestDef(0, startRestMsDuration));
 				}
 
-				IUniqueDef lastChord = trk.UniqueDefs[trk.UniqueDefs.Count - 1];
+				IUniqueDef lastChord = sequenceTrk.UniqueDefs[sequenceTrk.UniqueDefs.Count - 1];
 				int endOfTrkMsPosition = lastChord.MsPosition + lastChord.MsDuration;
 				int endRestMsDuration = sequenceMsDuration - endOfTrkMsPosition;
 				if(endRestMsDuration > 0)
@@ -426,10 +425,10 @@ namespace Moritz.Algorithm
 		#region private to GetVoiceDefs
 		private List<Trk> GetSequenceTrks(List<Seq> seqs)
 		{
-			List<Trk> trks = new List<Trk>();
+			List<Trk> sequenceTrks = new List<Trk>();
 			foreach(Trk trk in seqs[0].Trks)
 			{
-				trks.Add(new Trk(trk.MidiChannel, new List<IUniqueDef>()));
+				sequenceTrks.Add(new Trk(trk.MidiChannel, new List<IUniqueDef>()));
 			}
 
 			foreach(Seq seq in seqs)
@@ -441,21 +440,26 @@ namespace Moritz.Algorithm
 					Trk trkToAdd = seqTrks[i];
 					if(trkToAdd.UniqueDefs.Count > 0)
 					{
-						Trk trk = trks[i];
+						Trk sequenceTrk = sequenceTrks[i];
 						int trkToAddStartMsPosition = seq.MsPosition + trkToAdd.MsPosition;
 
-						Debug.Assert(trk.EndMsPosition <= trkToAddStartMsPosition);
+						Debug.Assert(sequenceTrk.EndMsPosition <= trkToAddStartMsPosition);
 
-						if(trk.EndMsPosition < trkToAddStartMsPosition)
+						if(sequenceTrk.EndMsPosition < trkToAddStartMsPosition)
 						{
-							trk.Add(new RestDef(trk.EndMsPosition, trkToAdd.MsPosition - trk.EndMsPosition));
+							sequenceTrk.Add(new RestDef(sequenceTrk.EndMsPosition, trkToAdd.MsPosition - sequenceTrk.EndMsPosition));
 						}
-						trk.AddRange(trkToAdd);
+						sequenceTrk.AddRange(trkToAdd);
 					}
 				}
 			}
 
-			return trks;
+			foreach(Trk sequenceTrk in sequenceTrks)
+			{
+				Debug.Assert(!(sequenceTrk.UniqueDefs[0] is ClefChangeDef), "A sequence Trk may not begin with a ClefChangeDef.");
+			}
+
+			return sequenceTrks;
 		}
 
 		private int GetSequenceMsDuration(List<Trk> trks)
@@ -474,6 +478,7 @@ namespace Moritz.Algorithm
 		}
 
 		/// <summary>
+		/// A voiceDef may not begin with a ClefChangeDef.
 		/// VoiceDefs must all start at MsPosition=0 and have the same MsDuration.
 		/// There is at least one MidiChordDef at the start of the sequence,
 		/// and at least one MidiChordDef ends at its end.
