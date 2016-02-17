@@ -25,14 +25,6 @@ namespace Moritz.Spec
     public class Trk : VoiceDef
     {
         #region constructors
-		///// <summary>
-		///// An empty VoiceDef
-		///// </summary>
-		///// <param name="msDuration"></param>
-		//public TrkDef()
-		//	: base()
-		//{
-		//}
 
         /// <summary>
         /// A VoiceDef beginning at MsPosition = 0, and containing a single RestDef having msDuration
@@ -54,10 +46,10 @@ namespace Moritz.Spec
 			MidiChannel = midiChannel;
 		}
 
-        /// <summary>
-        /// Returns a deep clone of this TrkDef.
-        /// </summary>
-        public Trk DeepClone()
+		/// <summary>
+		/// Returns a deep clone of this TrkDef.
+		/// </summary>
+		public Trk DeepClone()
         {
             List<IUniqueDef> clonedLmdds = new List<IUniqueDef>();
             foreach(IUniqueDef iu in this._uniqueDefs)
@@ -79,7 +71,7 @@ namespace Moritz.Spec
                 }
             }
 
-            return new Trk(this.MidiChannel, clonedLmdds);
+            return new Trk(MidiChannel, clonedLmdds);
         }
         #endregion constructors
 
@@ -93,19 +85,20 @@ namespace Moritz.Spec
             Debug.Assert(!(iUniqueDef is InputChordDef));
             _Add(iUniqueDef);
         }
-        /// <summary>
-        /// Adds the argument to the end of this VoiceDef.
-        /// Sets the MsPositions of the appended UniqueDefs.
-        /// </summary>
-        public void AddRange(Trk voiceDef)
+
+		/// <summary>
+		/// Adds the argument to the end of this Trk.
+		/// Sets the MsPositions of the appended UniqueDefs.
+		/// </summary>
+		public void AddRange(Trk trk)
         {
-            _AddRange((VoiceDef)voiceDef);
+            _AddRange(trk);
         }
-        /// <summary>
-        /// Inserts the iUniqueDef in the list at the given index, and then
-        /// resets the positions of all the uniqueDefs in the list.
-        /// </summary>
-        public override void Insert(int index, IUniqueDef iUniqueDef)
+		/// <summary>
+		/// Inserts the iUniqueDef in the list at the given index, and then
+		/// resets the positions of all the uniqueDefs in the list.
+		/// </summary>
+		public override void Insert(int index, IUniqueDef iUniqueDef)
         {
             Debug.Assert(!(iUniqueDef is InputChordDef));
             _Insert(index, iUniqueDef);
@@ -114,9 +107,9 @@ namespace Moritz.Spec
         /// Inserts the voiceDef in the list at the given index, and then
         /// resets the positions of all the uniqueDefs in the list.
         /// </summary>
-        public void InsertRange(int index, Trk voiceDef)
+        public void InsertRange(int index, Trk trk)
         {
-            _InsertRange(index, (VoiceDef)voiceDef);
+            _InsertRange(index, trk);
         }
         /// <summary>
         /// Creates a new TrkDef containing just the argument midiChordDef,
@@ -139,22 +132,22 @@ namespace Moritz.Spec
         /// This function does not change the msPositions of any other chords or rests in the containing VoiceDef,
         /// It does, of course, change the indices of the inserted lmdds and the later chords and rests.
         /// </summary>
-        public void InsertInRest(Trk trkDef)
+        public void InsertInRest(Trk trk)
         {
-            Debug.Assert(trkDef[0] is MidiChordDef && trkDef[trkDef.Count - 1] is MidiChordDef);
-            _InsertInRest((VoiceDef)trkDef);
+            Debug.Assert(trk[0] is MidiChordDef && trk[trk.Count - 1] is MidiChordDef);
+            _InsertInRest(trk);
         }
-        /// <summary>
-        /// Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
-        /// </summary>
-        public void Replace(int index, IUniqueDef replacementIUnique)
+		/// <summary>
+		/// Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
+		/// </summary>
+		public void Replace(int index, IUniqueDef replacementIUnique)
         {
             Debug.Assert(!(replacementIUnique is InputChordDef));
             _Replace(index, replacementIUnique);
         }
         #endregion Count changers
 
-        #region TrkDef duration changers
+        #region Trk duration changers
         /// <summary>
         /// Multiplies the MsDuration of each midiChordDef from beginIndex to (not including) endIndex by factor.
         /// If a midiChordDef's MsDuration becomes less than minThreshold, it is removed.
