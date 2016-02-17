@@ -53,18 +53,22 @@ namespace Moritz.Algorithm.Tombeau1
 			#region temp code
 			
 			List<Trk> trks = new List<Trk>();
-			List<IUniqueDef> iuds = new List<IUniqueDef>();
-			iuds.Add(new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 60 }, 0, 500, true));
-			iuds.Add(new RestDef(500, 800000 - 1000));
-			iuds.Add(new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 60 }, 800000 - 500, 500, true));
+
 			for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
 			{
+				List<IUniqueDef> iuds = new List<IUniqueDef>();
+				iuds.Add(new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 60 }, 0, 500, true));
+				iuds.Add(new RestDef(500, 800000 - 1000));
+				iuds.Add(new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 60 }, 800000 - 500, 500, true));
+
 				Trk trk = new Trk((byte)MidiChannelIndexPerOutputVoice[i], iuds);
 				trks.Add(trk);
 			}
+			//trks[4].UniqueDefs.Insert(0, new ClefChangeDef("t", trks[4].UniqueDefs[0]));
+			trks[5].UniqueDefs.Insert(1, new ClefChangeDef("t", trks[5].UniqueDefs[1]));
+			trks[6].UniqueDefs.Insert(2, new ClefChangeDef("t", trks[6].UniqueDefs[2]));
 
-			Seq seq = new Seq(trks, MidiChannelIndexPerOutputVoice);
-			seq.MsPosition = 0;
+			Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
 
 			seqs.Add(seq);
 

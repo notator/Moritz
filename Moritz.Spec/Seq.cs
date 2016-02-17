@@ -15,9 +15,11 @@ namespace Moritz.Spec
 		/// <para>The trks list does not have to be complete, but each tkr.MidiChannel must be
 		/// unique and present in the midiChannelIndexPerOutputVoice list.</para>
 		/// </summary>
-		public Seq(List<Trk> trks, List<int> midiChannelIndexPerOutputVoice)
+		public Seq(int seqMsPosition, List<Trk> trks, List<int> midiChannelIndexPerOutputVoice)
 		{
-			AssertConsistency(trks, midiChannelIndexPerOutputVoice);
+			AssertConsistency(seqMsPosition, trks, midiChannelIndexPerOutputVoice);
+
+			_msPosition = seqMsPosition;
 
 			foreach(int midiChannel in midiChannelIndexPerOutputVoice)
 			{
@@ -46,12 +48,13 @@ namespace Moritz.Spec
 		}
 
 		/// <summary>
-		/// Every Trk in trks is either empty or begins and ends with a MidiChordDef.
+		/// Every Trk in trks is either empty, or begins with a MidiChordDef or ClefChangeDef, and ends with a MidiChordDef.
 		/// There is at least one Trk having MsPosition == 0.
 		/// The trks list does not have to be complete, but each MidiChannel must be set to a valid value.
 		/// </summary>
-		public void AssertConsistency(List<Trk> trks, List<int> midiChannelIndexPerOutputVoice)
+		public void AssertConsistency(int seqMsPosition, List<Trk> trks, List<int> midiChannelIndexPerOutputVoice)
 		{
+			Debug.Assert(seqMsPosition >= 0);
 			Debug.Assert(trks != null && trks.Count > 0);
 			Debug.Assert(midiChannelIndexPerOutputVoice != null && midiChannelIndexPerOutputVoice.Count > 0);
 			#region trks all start and end with a MidiChordDef
@@ -62,14 +65,14 @@ namespace Moritz.Spec
 				{
 					IUniqueDef firstIUD = trk.UniqueDefs[0];
 					IUniqueDef lastIUD = trk.UniqueDefs[trk.UniqueDefs.Count - 1];
-					if(!(firstIUD is MidiChordDef && lastIUD is MidiChordDef))
+					if(!((firstIUD is MidiChordDef || firstIUD is ClefChangeDef) && lastIUD is MidiChordDef))
 					{
 						okay = false;
 						break;
 					}
 				}
 			}
-			Debug.Assert(okay == true, "All trks must begin and end with a MidiChordDef");
+			Debug.Assert(okay == true, "All non-empty trks must begin with a MidiChordDef or ClefChangeDef, and end with a MidiChordDef");
 			#endregion
 			#region position of earliest IUniqueDef
 			bool found = false;
@@ -106,6 +109,16 @@ namespace Moritz.Spec
 			get { return _trks.AsReadOnly(); }
 		}
 
-		public int MsPosition = 0;
+		public int MsPosition
+		{
+			get	{ return _msPosition; }
+			set
+			{
+				Debug.Assert(value >= 0);
+				_msPosition = value;
+			}
+		}
+
+		private int _msPosition;
 	}
 }

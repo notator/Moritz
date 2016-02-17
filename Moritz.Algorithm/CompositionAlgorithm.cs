@@ -361,11 +361,13 @@ namespace Moritz.Algorithm
 		/// <para>The seqs are first sorted in order of their MsPosition.</para> 
 		/// <para>The returned (parallel) VoiceDefs all start at MsPosition=0 and have the same MsDuration.</para>
 		/// <para>There is at least one MidiChordDef at the start of the sequence, and at least one MidiChordDef ends at its end.</para>
+		/// <para>ClefChangeDefs at the beginning of a returned VoiceDef are silently removed.</para>
 		/// </summary>
 		protected List<VoiceDef> GetVoiceDefs(List<Seq> seqs)
 		{
 			#region conditions
 			Debug.Assert(seqs != null && seqs.Count > 0);
+			seqs.Sort((a, b) => a.MsPosition.CompareTo(b.MsPosition));
 
 			List<int> midiChannelIndexPerOutputVoice = new List<int>();
 			Seq firstSeq = seqs[0];
@@ -385,18 +387,22 @@ namespace Moritz.Algorithm
 			}
 			#endregion conditions
 
-			seqs.Sort((a, b) => a.MsPosition.CompareTo(b.MsPosition));
 			List<VoiceDef> voiceDefs = new List<VoiceDef>();
-			List<Trk> trks = GetTrks(seqs);
+			List<Trk> sequenceTrks = GetSequenceTrks(seqs);
 
-			int sequenceMsDuration = GetSequenceMsDuration(trks);
+			foreach(Trk sequenceTrk in sequenceTrks)
+			{
+				Debug.Assert(!(sequenceTrk.UniqueDefs[0] is ClefChangeDef), "A sequence Trk may not begin with a ClefChangeDef.");
+			}
 
-			foreach(Trk trk in trks)
+			int sequenceMsDuration = GetSequenceMsDuration(sequenceTrks);
+
+			foreach(Trk trk in sequenceTrks)
 			{
 				Trk voiceDef = new Trk(trk.MidiChannel, trk.UniqueDefs);
 
-				IUniqueDef firstChord = trk.UniqueDefs[0];
-				int startRestMsDuration = firstChord.MsPosition;
+				IUniqueDef firstIUD = trk.UniqueDefs[0];
+				int startRestMsDuration = firstIUD.MsPosition;
 				if(startRestMsDuration > 0)
 				{
 					voiceDef.UniqueDefs.Insert(0, new RestDef(0, startRestMsDuration));
@@ -418,7 +424,7 @@ namespace Moritz.Algorithm
 			return voiceDefs;
 		}
 		#region private to GetVoiceDefs
-		private List<Trk> GetTrks(List<Seq> seqs)
+		private List<Trk> GetSequenceTrks(List<Seq> seqs)
 		{
 			List<Trk> trks = new List<Trk>();
 			foreach(Trk trk in seqs[0].Trks)
@@ -474,6 +480,12 @@ namespace Moritz.Algorithm
 		/// </summary>
 		private void AssertSequenceConsistency(List<VoiceDef> voiceDefs, int sequenceMsDuration)
 		{
+			#region A voiceDef may not begin with a ClefChangeDef
+			foreach(VoiceDef voiceDef in voiceDefs)
+			{
+				Debug.Assert(!(voiceDef.UniqueDefs[0] is ClefChangeDef), "A voiceDef may not begin with a ClefChangeDef.");
+			}
+			#endregion
 			#region All voiceDefs must begin at MsPosition=0 and have the same MsDuration
 			bool okay = true;
 			foreach(VoiceDef voiceDef in voiceDefs)

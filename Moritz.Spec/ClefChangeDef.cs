@@ -77,7 +77,10 @@ namespace Moritz.Spec
                 Debug.Assert(_followingChordOrRestDef != null);
                 return _followingChordOrRestDef.MsPosition;
             }
-            set { throw new System.NotSupportedException(); }
+            set
+			{ 
+				// This function is deliberately empty!
+			}
         }
         #endregion IUniqueDef
 
