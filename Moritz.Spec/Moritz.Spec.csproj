@@ -53,6 +53,7 @@
     <Compile Include="ClefChangeDef.cs" />
     <Compile Include="InputNoteDef.cs" />
     <Compile Include="NoteTrigger.cs" />
+    <Compile Include="Seq.cs" />
     <Compile Include="SeqRef.cs" />
     <Compile Include="TrkRef.cs" />
     <Compile Include="DurationDef.cs" />

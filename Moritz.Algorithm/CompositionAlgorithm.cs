@@ -357,8 +357,168 @@ namespace Moritz.Algorithm
 			return inputChordDefs;
 		}
 
+		/// <summary>
+		/// <para>The seqs are first sorted in order of their MsPosition.</para> 
+		/// <para>The returned (parallel) VoiceDefs all start at MsPosition=0 and have the same MsDuration.</para>
+		/// <para>There is at least one MidiChordDef at the start of the sequence, and at least one MidiChordDef ends at its end.</para>
+		/// </summary>
+		protected List<VoiceDef> GetVoiceDefs(List<Seq> seqs)
+		{
+			#region conditions
+			Debug.Assert(seqs != null && seqs.Count > 0);
 
-        protected List<Krystal> _krystals;
+			List<int> midiChannelIndexPerOutputVoice = new List<int>();
+			Seq firstSeq = seqs[0];
+			int nTrks = firstSeq.Trks.Count;
+			foreach(Trk trk in firstSeq.Trks)
+			{
+				midiChannelIndexPerOutputVoice.Add(trk.MidiChannel);
+			}
+			foreach(Seq seq in seqs)
+			{
+				IReadOnlyList<Trk> tk = seq.Trks;
+				Debug.Assert(seq.Trks.Count == midiChannelIndexPerOutputVoice.Count);
+				for(int i = 0; i < tk.Count; ++i)
+				{
+					Debug.Assert(tk[i].MidiChannel == midiChannelIndexPerOutputVoice[i]);
+				}
+			}
+			#endregion conditions
+
+			seqs.Sort((a, b) => a.MsPosition.CompareTo(b.MsPosition));
+			List<VoiceDef> voiceDefs = new List<VoiceDef>();
+			List<Trk> trks = GetTrks(seqs);
+
+			int sequenceMsDuration = GetSequenceMsDuration(trks);
+
+			foreach(Trk trk in trks)
+			{
+				Trk voiceDef = new Trk(trk.MidiChannel, trk.UniqueDefs);
+
+				IUniqueDef firstChord = trk.UniqueDefs[0];
+				int startRestMsDuration = firstChord.MsPosition;
+				if(startRestMsDuration > 0)
+				{
+					voiceDef.UniqueDefs.Insert(0, new RestDef(0, startRestMsDuration));
+				}
+
+				IUniqueDef lastChord = trk.UniqueDefs[trk.UniqueDefs.Count - 1];
+				int endOfTrkMsPosition = lastChord.MsPosition + lastChord.MsDuration;
+				int endRestMsDuration = sequenceMsDuration - endOfTrkMsPosition;
+				if(endRestMsDuration > 0)
+				{
+					voiceDef.UniqueDefs.Add(new RestDef(endOfTrkMsPosition, endRestMsDuration));
+				}
+
+				voiceDefs.Add(voiceDef);
+			}
+
+			AssertSequenceConsistency(voiceDefs, sequenceMsDuration);
+
+			return voiceDefs;
+		}
+		#region private to GetVoiceDefs
+		private List<Trk> GetTrks(List<Seq> seqs)
+		{
+			List<Trk> trks = new List<Trk>();
+			foreach(Trk trk in seqs[0].Trks)
+			{
+				trks.Add(new Trk(trk.MidiChannel, new List<IUniqueDef>()));
+			}
+
+			foreach(Seq seq in seqs)
+			{
+				IReadOnlyList<Trk> seqTrks = seq.Trks;
+
+				for(int i = 0; i < seqTrks.Count; ++i)
+				{
+					Trk trkToAdd = seqTrks[i];
+					if(trkToAdd.UniqueDefs.Count > 0)
+					{
+						Trk trk = trks[i];
+						int trkToAddStartMsPosition = seq.MsPosition + trkToAdd.StartMsPosition;
+
+						Debug.Assert(trk.EndMsPosition <= trkToAddStartMsPosition);
+
+						if(trk.EndMsPosition < trkToAddStartMsPosition)
+						{
+							trk.Add(new RestDef(trk.EndMsPosition, trkToAdd.StartMsPosition - trk.EndMsPosition));
+						}
+						trk.AddRange(trkToAdd);
+					}
+				}
+			}
+
+			return trks;
+		}
+
+		private int GetSequenceMsDuration(List<Trk> trks)
+		{
+			int msDuration = 0;
+			foreach(Trk trk in trks)
+			{
+				if(trk.UniqueDefs.Count > 0)
+				{
+					IUniqueDef lastIUD = trk.UniqueDefs[trk.UniqueDefs.Count - 1];
+					int trkMsDuration = lastIUD.MsPosition + lastIUD.MsDuration;
+					msDuration = (msDuration > trkMsDuration) ? msDuration : trkMsDuration;
+				}
+			}
+			return msDuration;
+		}
+
+		/// <summary>
+		/// VoiceDefs must all start at MsPosition=0 and have the same MsDuration.
+		/// There is at least one MidiChordDef at the start of the sequence,
+		/// and at least one MidiChordDef ends at its end.
+		/// </summary>
+		private void AssertSequenceConsistency(List<VoiceDef> voiceDefs, int sequenceMsDuration)
+		{
+			#region All voiceDefs must begin at MsPosition=0 and have the same MsDuration
+			bool okay = true;
+			foreach(VoiceDef voiceDef in voiceDefs)
+			{
+				if(voiceDef.UniqueDefs.Count > 0)
+				{
+					IUniqueDef firstIUD = voiceDef.UniqueDefs[0];
+					IUniqueDef lastIUD = voiceDef.UniqueDefs[voiceDef.UniqueDefs.Count - 1];
+					int endOfTrk = lastIUD.MsPosition + lastIUD.MsDuration;
+					if(!(firstIUD.MsPosition == 0 && endOfTrk == sequenceMsDuration))
+					{
+						okay = false;
+						break;
+					}
+				}
+			}
+			Debug.Assert(okay == true, "All voiceDefs must begin at MsPosition=0 and have the same MsDuration");
+			#endregion
+			#region There is a MidiChordDef at the beginning and end of the Sequence
+			bool foundStartMidiChordDef = false;
+			bool foundEndMidiChordDef = false;
+			foreach(VoiceDef voiceDef in voiceDefs)
+			{
+				if(voiceDef.UniqueDefs.Count > 0)
+				{
+					IUniqueDef firstIUD = voiceDef.UniqueDefs[0];
+					IUniqueDef lastIUD = voiceDef.UniqueDefs[voiceDef.UniqueDefs.Count - 1];
+					int endOfTrk = lastIUD.MsPosition + lastIUD.MsDuration;
+					if(firstIUD is MidiChordDef)
+					{
+						foundStartMidiChordDef = true;
+					}
+					if(lastIUD is MidiChordDef)
+					{
+						foundEndMidiChordDef = true;
+					}
+				}
+			}
+			Debug.Assert((foundStartMidiChordDef == true && foundEndMidiChordDef == true),
+						"The sequence must begin and end with at least one MidiChordDef.");
+			#endregion
+		}
+		#endregion
+
+		protected List<Krystal> _krystals;
         protected List<Palette> _palettes;
     }
 }
