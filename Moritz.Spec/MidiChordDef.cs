@@ -117,15 +117,17 @@ namespace Moritz.Spec
             // rval.MidiVelocity must be set after setting BasicMidiChordDefs See below.
             rval.OrnamentNumberSymbol = this.OrnamentNumberSymbol; // the displayed ornament number
 
-            MidiChordSliderDefs m = this.MidiChordSliderDefs;
-            List<byte> pitchWheelMsbs = NewListByteOrNull(m.PitchWheelMsbs);
-            List<byte> panMsbs = NewListByteOrNull(m.PanMsbs);
-            List<byte> modulationWheelMsbs = NewListByteOrNull(m.ModulationWheelMsbs);
-            List<byte> expressionMsbs = NewListByteOrNull(m.ExpressionMsbs);
-            if(pitchWheelMsbs != null || panMsbs != null || modulationWheelMsbs != null || expressionMsbs != null)
-                rval.MidiChordSliderDefs = new MidiChordSliderDefs(pitchWheelMsbs, panMsbs, modulationWheelMsbs, expressionMsbs);
-            else
-                rval.MidiChordSliderDefs = null;
+			rval.MidiChordSliderDefs = null;
+			MidiChordSliderDefs m = this.MidiChordSliderDefs;
+			if(m != null)
+			{
+				List<byte> pitchWheelMsbs = NewListByteOrNull(m.PitchWheelMsbs);
+				List<byte> panMsbs = NewListByteOrNull(m.PanMsbs);
+				List<byte> modulationWheelMsbs = NewListByteOrNull(m.ModulationWheelMsbs);
+				List<byte> expressionMsbs = NewListByteOrNull(m.ExpressionMsbs);
+				if(pitchWheelMsbs != null || panMsbs != null || modulationWheelMsbs != null || expressionMsbs != null)
+					rval.MidiChordSliderDefs = new MidiChordSliderDefs(pitchWheelMsbs, panMsbs, modulationWheelMsbs, expressionMsbs);					
+			}
 
             List<BasicMidiChordDef> newBs = new List<BasicMidiChordDef>();
             foreach(BasicMidiChordDef b in this.BasicMidiChordDefs)

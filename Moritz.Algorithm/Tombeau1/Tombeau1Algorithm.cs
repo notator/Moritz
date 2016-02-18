@@ -20,8 +20,8 @@ namespace Moritz.Algorithm.Tombeau1
 		{
 		}
 
-		public override List<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6 }; } }
-		public override List<int> MasterVolumePerOutputVoice { get { return new List<int>() { 100, 100, 100, 100, 100, 100, 100 }; } }
+		public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6 }; } }
+		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 100, 100, 100, 100, 100, 100, 100 }; } }
 		public override int NumberOfInputVoices { get { return 0; } }
 		public override int NumberOfBars { get { return 200; } }
 
@@ -50,10 +50,8 @@ namespace Moritz.Algorithm.Tombeau1
 			Seqs can be superimposed, juxtaposed, repeated and re-ordered.			
 			*********************************************************************************************/
 
-			List<Seq> seqs = new List<Seq>();
-
 			/**********************************************/
-			/*** Create the Seqs here. ***/
+			/*** Create the main seq here. ***/
 			#region temp code
 			
 			List<Trk> trks = new List<Trk>();
@@ -62,8 +60,8 @@ namespace Moritz.Algorithm.Tombeau1
 			{
 				List<IUniqueDef> iuds = new List<IUniqueDef>();
 				iuds.Add(new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 60 }, 0, 500, true));
-				iuds.Add(new RestDef(500, 800000 - 1000));
-				iuds.Add(new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 60 }, 800000 - 500, 500, true));
+				iuds.Add(new RestDef(500, 400000 - 1000));
+				iuds.Add(new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 60 }, 400000 - 500, 500, true));
 
 				Trk trk = new Trk((byte)MidiChannelIndexPerOutputVoice[i], iuds);
 				trks.Add(trk);
@@ -72,17 +70,15 @@ namespace Moritz.Algorithm.Tombeau1
 			trks[5].UniqueDefs.Insert(1, new ClefChangeDef("t", trks[5].UniqueDefs[1]));
 			trks[6].UniqueDefs.Insert(2, new ClefChangeDef("t", trks[6].UniqueDefs[2]));
 
-			Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The MsPosition can change again later.
+			Seq seq1 = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The MsPosition can change again later.
+			Seq seq2 = new Seq(seq1.MsDuration, trks, MidiChannelIndexPerOutputVoice);
 
-			seqs.Add(seq);
+			Seq mainSeq = new Seq(seq1, seq2);
 
 			#endregion temp code
 			/**********************************************/
 
-			// Note that Seqs can be constructed in any order, but they should be sorted in order of MsPosition before calling GetVoiceDefs.
-			seqs.Sort((a, b) => a.MsPosition.CompareTo(b.MsPosition));
-
-			List<VoiceDef> voiceDefs = GetVoiceDefs(seqs); // virtual function in CompositionAlgorithm.cs
+			List<VoiceDef> voiceDefs = GetVoiceDefs(mainSeq); // virtual function in CompositionAlgorithm.cs
 
 			WarpDurations(voiceDefs);
 
