@@ -77,7 +77,7 @@ namespace Moritz.Algorithm
         /// These values must be in range [ 0..15 ].
         /// A midi channel's voiceID (written into in the score, if there are input voices) is its position in this list.
         /// </summary>
-        public abstract List<int> MidiChannelIndexPerOutputVoice { get; }
+        public abstract IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get; }
 
         /// <summary>
         /// Returns the master volume of each output voice in top to bottom order in the original algorithm.
@@ -86,7 +86,7 @@ namespace Moritz.Algorithm
         /// A midi channel's voiceID (written into in the score, if there are input voices) is its position in this list.
         /// According to Jeff Glatt, the Master Volume should be set to 90 by default.
         /// </summary>
-        public abstract List<int> MasterVolumePerOutputVoice { get; }
+        public abstract IReadOnlyList<int> MasterVolumePerOutputVoice { get; }
 
         /// <summary>
         /// Returns the number of inputVoices created by the algorithm.

@@ -20,8 +20,8 @@ namespace Moritz.Algorithm.PaletteDemo
         {
         }
 
-        public override List<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0 }; } }
-        public override List<int> MasterVolumePerOutputVoice { get { return new List<int>() { 127 }; } }
+        public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0 }; } }
+        public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 127 }; } }
         public override int NumberOfInputVoices { get { return 0; } }
         public override int NumberOfBars { get { return 1; } }
 

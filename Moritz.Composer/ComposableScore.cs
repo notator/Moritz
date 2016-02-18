@@ -62,8 +62,8 @@ namespace Moritz.Composer
 		private void CheckOutputVoiceChannelsAndMasterVolumes(CompositionAlgorithm algorithm)
 		{
 			string errorString = null;
-			List<int> masterVolumePerOutputVoice = algorithm.MasterVolumePerOutputVoice;
-			List<int> midiChannelIndexPerOutputVoice = algorithm.MidiChannelIndexPerOutputVoice;
+			IReadOnlyList<int> masterVolumePerOutputVoice = algorithm.MasterVolumePerOutputVoice;
+			IReadOnlyList<int> midiChannelIndexPerOutputVoice = algorithm.MidiChannelIndexPerOutputVoice;
 			if(masterVolumePerOutputVoice.Count != midiChannelIndexPerOutputVoice.Count)
 			{
 				errorString = "There must be the same number of master volumes and midi channel indices.";
@@ -240,8 +240,8 @@ namespace Moritz.Composer
 		/// </summary>
 		private void SetOutputVoiceChannelsAndMasterVolumes(List<VoiceDef> firstBar)
 		{
-			List<int> masterVolumePerOutputVoice = _algorithm.MasterVolumePerOutputVoice;
-			List<int> midiChannelIndexPerOutputVoice = _algorithm.MidiChannelIndexPerOutputVoice;
+			IReadOnlyList<int> masterVolumePerOutputVoice = _algorithm.MasterVolumePerOutputVoice;
+			IReadOnlyList<int> midiChannelIndexPerOutputVoice = _algorithm.MidiChannelIndexPerOutputVoice;
 			for(int i = 0; i < masterVolumePerOutputVoice.Count; ++i)
 			{
 				Trk oVoice = firstBar[i] as Trk;
