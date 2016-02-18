@@ -66,12 +66,14 @@ namespace Moritz.Algorithm.Tombeau1
 				Trk trk = new Trk((byte)MidiChannelIndexPerOutputVoice[i], iuds);
 				trks.Add(trk);
 			}
-			//trks[4].UniqueDefs.Insert(0, new ClefChangeDef("t", trks[4].UniqueDefs[0]));
-			trks[5].UniqueDefs.Insert(1, new ClefChangeDef("t", trks[5].UniqueDefs[1]));
-			trks[6].UniqueDefs.Insert(2, new ClefChangeDef("t", trks[6].UniqueDefs[2]));
 
 			Seq seq1 = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The MsPosition can change again later.
-			Seq seq2 = new Seq(seq1.MsDuration, trks, MidiChannelIndexPerOutputVoice);
+			Seq seq2 = seq1.DeepClone();
+
+			//seq2.MsPosition = 0;
+
+			seq1.Trks[5].UniqueDefs.Insert(1, new ClefChangeDef("t", trks[5].UniqueDefs[1]));
+			seq1.Trks[6].UniqueDefs.Insert(2, new ClefChangeDef("t", trks[6].UniqueDefs[2]));
 
 			Seq mainSeq = new Seq(seq1, seq2);
 

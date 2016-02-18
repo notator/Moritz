@@ -110,15 +110,13 @@ namespace Moritz.Composer
 			{
 				errorString = CheckCCSettings(voiceDefsPerSystemPerBar);
 			}
-			if(!string.IsNullOrEmpty(errorString))
-			{
-				throw new ApplicationException("\nComposableScore.CheckBars(): Algorithm error:\n" + errorString);
-			}
+			Debug.Assert(string.IsNullOrEmpty(errorString), errorString);
 		}
 		#region private to CheckBars(...)
 		private string BasicChecks(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
 		{
 			string errorString = null;
+
 			List<VoiceDef> bar1 = voiceDefsPerSystemPerBar[0];
 			if(NOutputVoices(bar1) != _algorithm.MidiChannelIndexPerOutputVoice.Count)
 			{
@@ -129,11 +127,20 @@ namespace Moritz.Composer
 				return "The algorithm does not declare the correct number of input voices.";
 			}
 
-			foreach(List<VoiceDef> bar in voiceDefsPerSystemPerBar)
+			List<string> currentClefs = new List<string>();
+			foreach(string clef in _pageFormat.ClefsList)
 			{
+				currentClefs.Add(clef);
+			}
+
+			for(int i = 0; i < voiceDefsPerSystemPerBar.Count; ++i)
+			{
+				List<VoiceDef> bar = voiceDefsPerSystemPerBar[i];
+				string barNumber = (i + 1).ToString();
+				 
 				if(bar.Count == 0)
 				{
-					errorString = "One bar (at least) contains no voices.";
+					errorString = "Bar " + barNumber + " contains no voices.";
 					break;
 				}
 				if(!(bar[0] is Trk))
@@ -144,10 +151,25 @@ namespace Moritz.Composer
 				for(int voiceIndex = 0; voiceIndex < bar.Count; ++voiceIndex)
 				{
 					VoiceDef voiceDef = bar[voiceIndex];
+					string voiceNumber = (voiceIndex + 1).ToString();
 					if(voiceDef.UniqueDefs.Count == 0)
 					{
-						errorString = "A voiceDef (voiceIndex=" + voiceIndex.ToString() + ") has an empty UniqueDefs list.";
+						errorString = "Voice number " + voiceNumber + " in Bar " + barNumber + " has an empty UniqueDefs list.";
 						break;
+					}
+					foreach(IUniqueDef iud in voiceDef.UniqueDefs)
+					{
+						ClefChangeDef ccd = iud as ClefChangeDef;
+						if(ccd != null)
+						{
+							if(ccd.ClefType == currentClefs[voiceIndex])
+							{
+								errorString = "Voice number " + voiceNumber + " has an unnecessary clef change in or after bar " + barNumber + "." +
+								"\n(It will have moved to the next chord in the score, or the end of the system, whichever is earlier.)";
+								break;
+							}
+							currentClefs[voiceIndex] = ccd.ClefType;
+						}
 					}
 				}
 				if(!string.IsNullOrEmpty(errorString))
