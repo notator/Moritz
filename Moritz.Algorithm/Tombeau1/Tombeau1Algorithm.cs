@@ -36,13 +36,26 @@ namespace Moritz.Algorithm.Tombeau1
 			/*********************************************************************************************
 			Think Nancarrow, but (especially) with background/foreground. Think Study 1. Depth.
 
-			"Harmony & counterpoint" is not only going to be there in the pitches, its will also be there in the dynamics,
-			and the pan position...	Tuning is a parameter that could be introduced later...
-			Using Seqs and Trks should make it possible to compose powerful, comprehensible, pregnant relations at every
-			structural level.
+			The following parameters can be controlled using the Resident Sf2 Synth:
+				Commands:	preset, pitchwheel
+				Controls:	volume, pan, pitchWheelDeviation, allControllersOff, allSoundOff
+				Note:		velocity, pitch.
+			
+			Tombeau1 is just going to use preset 0:0 (=grandPiano), so the available parameters are:
+				"tuning" -- i.e. pitchWheelDeviation and pitchWheel
+				pan,
+				velocity,
+				pitch
 
-			I need to think about the structural levels:
-			> create the palettes containing the ornaments,
+			Using Seqs and Trks should make it possible to compose powerful, comprehensible, pregnant
+			relations between these	parameters at every	structural level. "Harmony & counterpoint" is
+			not only going to be there in the pitches (chords, contours...), but also in the velocities
+			and the pan positions... Tuning is a parameter that could be introduced as a surprise later...
+
+			I need to think diagonally about the structural levels:
+			> create the palettes containing the channel objects (atoms, MidiChordDefs): notes/chords, ornaments,
+			> structural layers between the objects in the palettes and trks (or are trks constructed from
+			  vertical reltions inside seqs?)
 			> how notes/chords relate horizontally inside a trk
 			> how notes/chords relate vertically inside a seq (How trks relate to each other inside seqs?),
 			> and about how seqs relate to each other globally...
@@ -53,7 +66,7 @@ namespace Moritz.Algorithm.Tombeau1
 			/**********************************************/
 			/*** Create the main seq here. ***/
 			#region temp code
-			
+
 			List<Trk> trks = new List<Trk>();
 
 			for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
