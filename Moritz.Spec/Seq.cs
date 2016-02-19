@@ -48,50 +48,59 @@ namespace Moritz.Spec
 		}
 
 		/// <summary>
-		/// Creates a new Seq by concatenating deep clones of the argument seqs.
-		/// Seq2.MsPosition is the earliest position, relative to the new Seq, at which it can be concatenated.
+		/// A new Seq that is the concatenation of (deep)clones of the argument seqs.
+		/// </summary>
+		public Seq(Seq seqArg1, Seq seqArg2)
+		{
+			Seq seq1 = seqArg1.Clone();
+
+			seq1.Concat(seqArg2);
+
+			_msPosition = seq1.MsPosition;
+			_trks = seq1.Trks;
+			MidiChannelIndexPerOutputVoice = seq1.MidiChannelIndexPerOutputVoice; 
+		}
+
+		/// <summary>
+		/// Concatenates a deep clone of seq2 to the caller (seq1). Returns a pointer to the caller.
+		/// Seq2.MsPosition is the earliest position, relative to seq1, at which it can be concatenated.
 		/// For example:
 		/// If seq2.MsPosition==0, it will be concatenated such that there will be at least one trk concatenation without an
 		/// intervening rest.
 		/// If seq2.MsPosition == seq1.MsDuration, the seqs will be juxtaposed.
 		/// If seq2.MsPosition > seq1.MsDuration, the seqs will be concatenated with an intervening rest.
-		/// The new Seq's MsPosition is copied from seq1.MsPosition (but can be changed later).
+		/// Redundant clef changes are silently removed.
 		/// </summary>
-		public Seq(Seq seq1, Seq seq2)
+		public Seq Concat(Seq seq2)
 		{
 			#region assertions
-			Debug.Assert(seq1.MidiChannelIndexPerOutputVoice.Count == seq2.MidiChannelIndexPerOutputVoice.Count);
-			for(int i = 0; i < seq1.MidiChannelIndexPerOutputVoice.Count; ++i)
+			Debug.Assert(MidiChannelIndexPerOutputVoice.Count == seq2.MidiChannelIndexPerOutputVoice.Count);
+			for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
 			{
-				Debug.Assert(seq1.MidiChannelIndexPerOutputVoice[i] == seq2.MidiChannelIndexPerOutputVoice[i]);
+				Debug.Assert(MidiChannelIndexPerOutputVoice[i] == seq2.MidiChannelIndexPerOutputVoice[i]);
 			}
 			#endregion
-			_msPosition = seq1.MsPosition;
-			MidiChannelIndexPerOutputVoice = seq1.MidiChannelIndexPerOutputVoice;
-			int concatMsPos = seq2.MsPosition;
-			if(seq2.MsPosition < seq1.MsDuration)
+
+			Seq seq2Clone = seq2.Clone();
+			int nTrks = _trks.Count;
+			int concatMsPos = seq2Clone.MsPosition;
+			if(seq2Clone.MsPosition < MsDuration)
 			{
-				for(int i = 0; i < seq1.Trks.Count; ++i)
+				for(int i = 0; i < nTrks; ++i)
 				{
-					Trk trk1 = seq1.Trks[i];
-					Trk trk2 = seq2.Trks[i];
+					Trk trk1 = _trks[i];
+					Trk trk2 = seq2Clone.Trks[i];
 					int earliestConcatPos = trk1.EndMsPosition - trk2.MsPosition;
 					concatMsPos = (earliestConcatPos > concatMsPos) ? earliestConcatPos : concatMsPos;
 				}
 			}
-			Seq seq1Clone = seq1.DeepClone();
-			Seq seq2Clone = seq2.DeepClone();
-			for(int i = 0; i < seq1Clone.Trks.Count; ++i)
-			{
-				_trks.Add(seq1Clone.Trks[i]);
-			}
-
-			for(int i = 0; i < _trks.Count; ++i)
+		
+			for(int i = 0; i < nTrks; ++i)
 			{
 				Trk trk2 = seq2Clone.Trks[i];
 				if(trk2.UniqueDefs.Count > 0)
 				{
-					Trk trk1 = _trks[i];
+					Trk trk1 = Trks[i];
 					int trk2StartMsPosition = concatMsPos + trk2.MsPosition;
 					if(trk1.EndMsPosition < trk2StartMsPosition)
 					{
@@ -100,14 +109,52 @@ namespace Moritz.Spec
 					trk1.AddRange(trk2);
 				}
 			}
+
+			RemoveRedundantClefChanges();
+
+			return this;
 		}
 
-		public Seq DeepClone()
+		private void RemoveRedundantClefChanges()
+		{
+
+			int nTrks = _trks.Count;
+
+			for(int i = 0; i < nTrks; ++i)
+			{
+				string currentClef = "";
+				List<int> redundantClefIndices = new List<int>();
+				Trk trk = _trks[i];
+				string trkNumber = (i + 1).ToString();
+				List<IUniqueDef> iuds = trk.UniqueDefs;
+				if(iuds.Count > 0)
+				{
+					for(int iudIndex = 0; iudIndex < iuds.Count; ++iudIndex)
+					{
+						ClefChangeDef ccd = iuds[iudIndex] as ClefChangeDef;
+						if(ccd != null)
+						{
+							if(ccd.ClefType == currentClef)
+							{
+								redundantClefIndices.Add(iudIndex);
+							}
+							currentClef = ccd.ClefType;
+						}
+					}
+				}
+				for(int j = redundantClefIndices.Count - 1; j >= 0; --j)
+				{
+					iuds.RemoveAt(redundantClefIndices[j]);
+				}
+			}
+		}
+
+		public Seq Clone()
 		{
 			List<Trk> trks = new List<Trk>();
 			for(int i = 0; i < _trks.Count; ++i)
 			{
-				trks.Add(_trks[i].DeepClone());
+				trks.Add(_trks[i].Clone());
 			}
 
 			Seq clone = new Seq(_msPosition, trks, MidiChannelIndexPerOutputVoice);
@@ -172,7 +219,7 @@ namespace Moritz.Spec
 		}
 
 		private List<Trk> _trks = new List<Trk>();
-		public IReadOnlyList<Trk> Trks { get { return _trks.AsReadOnly(); } }
+		public List<Trk> Trks { get { return _trks; } }
 
 		private int _msPosition;
 		public int MsPosition

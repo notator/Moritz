@@ -68,7 +68,7 @@ namespace Moritz.Algorithm.Tombeau1
 			}
 
 			Seq seq1 = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The MsPosition can change again later.
-			Seq seq2 = seq1.DeepClone();
+			Seq seq2 = seq1.Clone();
 
 			//seq2.MsPosition = 0;
 
@@ -76,6 +76,9 @@ namespace Moritz.Algorithm.Tombeau1
 			seq1.Trks[6].UniqueDefs.Insert(2, new ClefChangeDef("t", trks[6].UniqueDefs[2]));
 
 			Seq mainSeq = new Seq(seq1, seq2);
+
+			//Seq mainSeq = seq1;
+			mainSeq.Concat(seq2);
 
 			#endregion temp code
 			/**********************************************/
