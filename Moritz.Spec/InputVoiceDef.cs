@@ -59,7 +59,7 @@ namespace Moritz.Spec
             List<IUniqueDef> clonedLmdds = new List<IUniqueDef>();
             foreach(IUniqueDef iu in this._uniqueDefs)
             {
-                IUniqueDef clone = iu.DeepClone();
+                IUniqueDef clone = iu.Clone();
                 clonedLmdds.Add(clone);
             }
 

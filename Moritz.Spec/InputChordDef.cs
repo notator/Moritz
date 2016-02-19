@@ -112,7 +112,7 @@ namespace Moritz.Spec
 			w.WriteEndElement(); // score:inputNotes
         }
 
-        public override IUniqueDef DeepClone()
+        public override IUniqueDef Clone()
         {
             throw new NotImplementedException("InputChordDef.DeepClone()");
         }

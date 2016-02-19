@@ -11,7 +11,11 @@ namespace Moritz.Spec
             _msDuration = msDuration;
         }
 
-        public abstract IUniqueDef DeepClone();
+		/// <summary>
+		/// This is always a deep clone.
+		/// </summary>
+		/// <returns>A deep clone</returns>
+        public abstract IUniqueDef Clone();
 
         public virtual int MsDuration { get { return _msDuration; } set { _msDuration = value; } }
         protected int _msDuration = 0;

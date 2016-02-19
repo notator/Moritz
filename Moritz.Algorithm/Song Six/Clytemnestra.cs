@@ -320,7 +320,7 @@ namespace Moritz.Algorithm.SongSix
                     }
 
                     MidiChordDef mcd = momentDef.MidiChordDefs[0];
-                    IUniqueDef lmcd = mcd.DeepClone();
+                    IUniqueDef lmcd = mcd.Clone();
                     lmcd.MsPosition = momentDef.MsPosition;
                     lmcd.MsDuration = momentDef.MsWidth;
                     Debug.Assert(lmcd.MsDuration > 0);

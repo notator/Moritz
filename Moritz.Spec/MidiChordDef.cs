@@ -101,7 +101,11 @@ namespace Moritz.Spec
         #region IUniqueCloneDef
         #region IUniqueSplittableChordDef
 
-        public override IUniqueDef DeepClone()
+		/// <summary>
+		/// A deep clone!
+		/// </summary>
+		/// <returns></returns>
+        public override IUniqueDef Clone()
         {
             MidiChordDef rval = new MidiChordDef();
 

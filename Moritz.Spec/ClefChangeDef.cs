@@ -63,7 +63,7 @@ namespace Moritz.Spec
         /// ClefChangeDefs should be replaced. See VoiceDef.Clone().
         /// </summary>
         /// <returns></returns>
-        public IUniqueDef DeepClone()
+        public IUniqueDef Clone()
         {
             ClefChangeDef deepClone = new ClefChangeDef(this._clefType, this._followingChordOrRestDef);
             return deepClone;

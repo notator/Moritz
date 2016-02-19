@@ -49,12 +49,12 @@ namespace Moritz.Spec
 		/// <summary>
 		/// Returns a deep clone of this TrkDef.
 		/// </summary>
-		public Trk DeepClone()
+		public Trk Clone()
         {
             List<IUniqueDef> clonedLmdds = new List<IUniqueDef>();
             foreach(IUniqueDef iu in this._uniqueDefs)
             {
-                IUniqueDef clone = iu.DeepClone();
+                IUniqueDef clone = iu.Clone();
                 clonedLmdds.Add(clone);
             }
 

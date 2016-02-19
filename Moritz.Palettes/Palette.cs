@@ -299,7 +299,7 @@ namespace Moritz.Palettes
         public int Count { get { return _durationDefs.Count; } }
         public IUniqueDef UniqueDurationDef(int index)
         {
-            return _durationDefs[index].DeepClone();
+            return _durationDefs[index].Clone();
         }
         /// <summary>
         /// Returns a MidiChordDef if the object at index is a MidiChordDef,
@@ -307,7 +307,7 @@ namespace Moritz.Palettes
         /// </summary>
         public MidiChordDef MidiChordDef(int index)
         {
-            MidiChordDef midiChordDef = _durationDefs[index].DeepClone() as MidiChordDef;
+            MidiChordDef midiChordDef = _durationDefs[index].Clone() as MidiChordDef;
             if(midiChordDef == null)
             {
                 throw new ApplicationException("The indexed object was not a MidiChordDef.");

@@ -65,7 +65,7 @@ namespace Moritz.Algorithm.SongSix
         /// <returns></returns>
         private Trk GetRotatedWind(byte midiChannel, Trk originalVoiceDef, int rotationMsPosition)
         {
-            Trk tempWind = originalVoiceDef.DeepClone();
+            Trk tempWind = originalVoiceDef.Clone();
 			tempWind.MidiChannel = midiChannel;
 
             int finalBarlineMsPosition = originalVoiceDef.EndMsPosition;

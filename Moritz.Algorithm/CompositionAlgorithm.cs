@@ -365,7 +365,7 @@ namespace Moritz.Algorithm
 		protected List<VoiceDef> GetVoiceDefs(Seq seq)
 		{
 			List<VoiceDef> voiceDefs = new List<VoiceDef>();
-			IReadOnlyList<Trk> trks = seq.Trks;
+			List<Trk> trks = seq.Trks;
 
 			int msDuration = seq.MsDuration;
 

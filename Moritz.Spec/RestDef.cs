@@ -22,7 +22,7 @@ namespace Moritz.Spec
             return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString() + " RestDef" );
         }
 
-        public override IUniqueDef DeepClone()
+        public override IUniqueDef Clone()
         {
             RestDef umrd = new RestDef(this.MsPosition, this.MsDuration);
             return umrd;

@@ -42,7 +42,7 @@ namespace Moritz.Algorithm.SongSix
                 InsertInRest(ticksChord);
             }
 
-            MidiChordDef lastTicksBeforeVerse3 = (MidiChordDef)((MidiChordDef)this[39]).DeepClone();
+            MidiChordDef lastTicksBeforeVerse3 = (MidiChordDef)((MidiChordDef)this[39]).Clone();
             lastTicksBeforeVerse3.MsPosition = furies3[155].MsPosition + furies3[155].MsDuration;
             lastTicksBeforeVerse3.MsDuration = clytemnestra[117].MsPosition - lastTicksBeforeVerse3.MsPosition;
             lastTicksBeforeVerse3.Transpose(10);

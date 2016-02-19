@@ -72,7 +72,7 @@ namespace Moritz.Algorithm.SongSix
 
         private Trk GetNextFlutterSequence(Trk existingFlutter, double factor, int transposition)
         {
-            Trk nextFlutter = existingFlutter.DeepClone();
+            Trk nextFlutter = existingFlutter.Clone();
             nextFlutter.AdjustVelocities(factor);
             nextFlutter.AdjustMsDurations(factor);
             nextFlutter.AdjustRestMsDurations(factor);
