@@ -42,7 +42,7 @@ namespace Moritz.Composer
 
             _dimensionsAndMetadataForm = new DimensionsAndMetadataForm(this, _settingsPath, _fsf);
 
-            _algorithm = ComposableSvgScore.Algorithm(_scoreTitle);
+            _algorithm = ComposableScore.Algorithm(_scoreTitle);
 
             Debug.Assert(_algorithm != null);
 
@@ -1953,7 +1953,7 @@ namespace Moritz.Composer
                 List<Palette> palettes = null;
                 GetKrystalsAndPalettes(out krystals, out palettes);
                 PageFormat pageFormat = GetPageFormat();
-                ComposableSvgScore score =
+                ComposableScore score =
                     new KrystalPaletteScore(_scoreTitle,
                                             _algorithm,
                                             pageFormat,

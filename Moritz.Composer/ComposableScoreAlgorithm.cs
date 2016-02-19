@@ -12,7 +12,7 @@ using Moritz.Algorithm.Tombeau1;
 
 namespace Moritz.Composer
 {
-    public partial class ComposableSvgScore : SvgScore
+    public partial class ComposableScore : SvgScore
     {
         /// <summary>
         /// The argument (title) will be printed as the title of the score on its first page.

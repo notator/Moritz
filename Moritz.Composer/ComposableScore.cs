@@ -12,9 +12,9 @@ using Moritz.Xml;
 
 namespace Moritz.Composer
 {
-    public partial class ComposableSvgScore : SvgScore
+    public partial class ComposableScore : SvgScore
     {
-        public ComposableSvgScore(string folder, string scoreTitleName, CompositionAlgorithm algorithm, string keywords, string comment, PageFormat pageFormat)
+        public ComposableScore(string folder, string scoreTitleName, CompositionAlgorithm algorithm, string keywords, string comment, PageFormat pageFormat)
             : base(folder, scoreTitleName, keywords, comment, pageFormat)
         {
             _algorithm = algorithm;
@@ -32,7 +32,7 @@ namespace Moritz.Composer
 
             List<List<VoiceDef>> barDefsInOneSystem = _algorithm.DoAlgorithm(krystals, palettes);
 
-            CheckBars(barDefsInOneSystem);
+			CheckBars(barDefsInOneSystem);
 
 			SetOutputVoiceChannelsAndMasterVolumes(barDefsInOneSystem[0]);
 
@@ -128,10 +128,22 @@ namespace Moritz.Composer
 			}
 
 			List<string> currentClefs = new List<string>();
-			foreach(string clef in _pageFormat.ClefsList)
+			List<int> lowerVoiceIndices = new List<int>();
+			for(int i = 0; i < _pageFormat.ClefsList.Count; ++i)
 			{
-				currentClefs.Add(clef);
+				List<byte> outputVoiceIndices = _pageFormat.VisibleOutputVoiceIndicesPerStaff[i];
+				string clef = _pageFormat.ClefsList[i];
+				foreach(byte voiceIndex in outputVoiceIndices)
+				{ 
+					currentClefs.Add(clef);
+				}
+				if(outputVoiceIndices.Count > 1)
+				{
+					lowerVoiceIndices.Add(outputVoiceIndices[1]);
+				}
 			}
+
+			Debug.Assert(currentClefs.Count == voiceDefsPerSystemPerBar[0].Count);
 
 			for(int i = 0; i < voiceDefsPerSystemPerBar.Count; ++i)
 			{
@@ -162,7 +174,13 @@ namespace Moritz.Composer
 						ClefChangeDef ccd = iud as ClefChangeDef;
 						if(ccd != null)
 						{
-							if(ccd.ClefType == currentClefs[voiceIndex])
+							if(lowerVoiceIndices.Contains(voiceIndex))
+							{
+								errorString = "Voice number " + voiceNumber + " is a lower voice on a staff, and contains a clef change.\n" +
+								"Clefs should only be changed in the staff's top voice.";
+								break;
+							}
+							else if(ccd.ClefType == currentClefs[voiceIndex])
 							{
 								errorString = "Voice number " + voiceNumber + " has an unnecessary clef change in or after bar " + barNumber + "." +
 								"\n(It will have moved to the next chord in the score, or the end of the system, whichever is earlier.)";

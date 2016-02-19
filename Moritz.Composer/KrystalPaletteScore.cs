@@ -8,7 +8,7 @@ using Moritz.Symbols;
 
 namespace Moritz.Composer
 {
-    public class KrystalPaletteScore : ComposableSvgScore
+    public class KrystalPaletteScore : ComposableScore
     {
 
         public KrystalPaletteScore(string scoreTitleName, CompositionAlgorithm algorithm, PageFormat pageFormat,
