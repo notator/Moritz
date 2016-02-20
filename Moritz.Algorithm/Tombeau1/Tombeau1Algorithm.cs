@@ -60,7 +60,16 @@ namespace Moritz.Algorithm.Tombeau1
 			> how notes/chords relate vertically inside a seq (How trks relate to each other inside seqs?),
 			> and about how seqs relate to each other globally...
 
-			Seqs can be superimposed, juxtaposed, repeated and re-ordered.			
+			Seqs can be superimposed, juxtaposed, repeated and re-ordered.
+			
+			Chords:
+			1. Think Boulez' chord addition.
+			2. Study 1 chords can have holes... 
+			3. Velocity gradients in Study 1 chords: bottom->top (="consonant") --> top->bottom (="dissonant")...
+			4. Chord pitch transposition is allowed (but not ad. lib. transposition of the pitches inside the chord)...
+			5. Chord velocity transposition is allowed (but not ad. lib. transposition of the velocities inside the chord)...
+			6. "Chords are colour" (Stockhausen)
+						
 			*********************************************************************************************/
 
 			/**********************************************/
@@ -120,7 +129,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 		private void WarpDurations(List<VoiceDef> voiceDefs)
 		{
-			// The grid is a superimposed structural layer, used for doing a time warp and setting barlines
+			// The grid is a superimposed structural layer, used for doing a time warp
 			List<GridElement> gridData = getBasicGridData(voiceDefs[0].MsDuration);
 
 			SetGridData(gridData); // set each GridElement.durationFactor
