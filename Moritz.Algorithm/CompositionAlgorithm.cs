@@ -140,11 +140,11 @@ namespace Moritz.Algorithm
         /// </summary>
         public abstract List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes);
 
-        /// <summary>
-        /// Returns the position of the end of the last UniqueDef
-        /// in the bar's first voice's UniqueDefs list.
-        /// </summary>
-        protected int GetEndMsPosition(List<VoiceDef> bar)
+		/// <summary>
+		/// Returns the position of the end of the last UniqueDef
+		/// in the bar's first voice's UniqueDefs list.
+		/// </summary>
+		protected int GetEndMsPosition(List<VoiceDef> bar)
         {
             Debug.Assert(bar != null && bar.Count > 0 && bar[0].UniqueDefs.Count > 0);
             List<IUniqueDef> lmdd = bar[0].UniqueDefs;
@@ -361,6 +361,7 @@ namespace Moritz.Algorithm
 		/// Returns a list of (parallel) VoiceDefs that are the seq.Trks padded at the beginning and end with rests.
 		/// The returned voiceDefs all start at MsPosition=0 and have the same MsDuration.
 		/// There is at least one MidiChordDef at the start of the sequence, and at least one MidiChordDef ends at its end.
+		/// If the original seq.trk.UniqueDefs list is empty, the voiceDef will contain a single rest having the same duration as the other trks.
 		/// </summary>
 		protected List<VoiceDef> GetVoiceDefs(Seq seq)
 		{
@@ -373,19 +374,26 @@ namespace Moritz.Algorithm
 			{
 				Trk voiceDef = new Trk(trk.MidiChannel, trk.UniqueDefs); // this is not a clone...
 
-				IUniqueDef firstIUD = trk.UniqueDefs[0];
-				Debug.Assert(!(firstIUD is ClefChangeDef), "VoiceDefs may not begin with a ClefChangeDef. (Trk.UniqueDefs can.)");
-				int startRestMsDuration = firstIUD.MsPosition;
-				if(startRestMsDuration > 0)
+				if(voiceDef.UniqueDefs.Count > 0)
 				{
-					voiceDef.UniqueDefs.Insert(0, new RestDef(0, startRestMsDuration));
-				}
+					IUniqueDef firstIUD = trk.UniqueDefs[0];
+					Debug.Assert(!(firstIUD is ClefChangeDef), "VoiceDefs may not begin with a ClefChangeDef. (Trk.UniqueDefs can.)");
+					int startRestMsDuration = firstIUD.MsPosition;
+					if(startRestMsDuration > 0)
+					{
+						voiceDef.UniqueDefs.Insert(0, new RestDef(0, startRestMsDuration));
+					}
 
-				int endOfTrkMsPosition = trk.EndMsPosition;
-				int endRestMsDuration = msDuration - endOfTrkMsPosition;
-				if(endRestMsDuration > 0)
+					int endOfTrkMsPosition = trk.EndMsPosition;
+					int endRestMsDuration = msDuration - endOfTrkMsPosition;
+					if(endRestMsDuration > 0)
+					{
+						voiceDef.UniqueDefs.Add(new RestDef(endOfTrkMsPosition, endRestMsDuration));
+					}
+				}
+				else
 				{
-					voiceDef.UniqueDefs.Add(new RestDef(endOfTrkMsPosition, endRestMsDuration));
+					voiceDef.UniqueDefs.Add(new RestDef(0, msDuration));
 				}
 
 				voiceDefs.Add(voiceDef);
@@ -401,8 +409,7 @@ namespace Moritz.Algorithm
 		/// <summary>
 		/// A voiceDef may not begin with a ClefChangeDef.
 		/// VoiceDefs must all start at MsPosition=0 and have the same MsDuration.
-		/// There is at least one MidiChordDef at the start of the sequence,
-		/// and at least one MidiChordDef ends at its end.
+		/// There is at least one MidiChordDef at the start of the sequence, and at least one MidiChordDef ends at its end.
 		/// </summary>
 		private void AssertConsistency(List<VoiceDef> voiceDefs, int sequenceMsDuration)
 		{
