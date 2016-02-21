@@ -30,7 +30,7 @@ namespace Moritz.Spec
         /// A VoiceDef beginning at MsPosition = 0, and containing a single RestDef having msDuration
         /// </summary>
         /// <param name="msDuration"></param>
-        public Trk(byte midiChannel, int msDuration)
+        public Trk(int midiChannel, int msDuration)
 			: base(msDuration)
         {
 			MidiChannel = midiChannel;
@@ -40,7 +40,7 @@ namespace Moritz.Spec
 		/// <para>If the argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
 		/// <para>The new VoiceDef's UniqueDefs list is simply set to the argument (which is not cloned).</para>
 		/// </summary>
-		public Trk(byte midiChannel, List<IUniqueDef> iuds)
+		public Trk(int midiChannel, List<IUniqueDef> iuds)
 			: base(iuds)
 		{
 			MidiChannel = midiChannel;

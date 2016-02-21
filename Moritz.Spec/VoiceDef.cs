@@ -808,7 +808,19 @@ namespace Moritz.Spec
 
         public List<IUniqueDef> UniqueDefs { get { return _uniqueDefs; } }
 
-		public byte MidiChannel = byte.MaxValue; // the MidiChannel will only be valid if set to a value in range [0..15]
+		private int _midiChannel = int.MaxValue; // the MidiChannel will only be valid if set to a value in range [0..15]
+		public int MidiChannel
+		{
+			get
+			{
+				return _midiChannel;
+			}
+			set
+			{
+				Debug.Assert(value >= 0 && value <= 15);
+				_midiChannel = value;
+			}
+		}
 
         #endregion public
 

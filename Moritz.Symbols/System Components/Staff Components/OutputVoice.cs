@@ -11,10 +11,10 @@ namespace Moritz.Symbols
 {
     public class OutputVoice : Voice
     {
-        public OutputVoice(OutputStaff outputStaff, byte midiChannel, byte? masterVolume)
+        public OutputVoice(OutputStaff outputStaff, int midiChannel, byte? masterVolume)
             : base(outputStaff)
         {
-            _midiChannel = midiChannel;
+            MidiChannel = midiChannel;
             _masterVolume = masterVolume;
         }
 

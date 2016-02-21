@@ -316,7 +316,7 @@ namespace Moritz.Palettes
             return midiChordDef;
         }
 
-        public Trk NewTrkDef(byte midiChannel, List<int> sequence)
+        public Trk NewTrkDef(int midiChannel, List<int> sequence)
         {
             List<IUniqueDef> iuds = new List<IUniqueDef>();
             int msPosition = 0;
@@ -333,7 +333,7 @@ namespace Moritz.Palettes
             return trkDef;
         }
 
-		public Trk NewTrkDef(byte midiChannel, Krystal krystal)
+		public Trk NewTrkDef(int midiChannel, Krystal krystal)
         {
             List<int> sequence = krystal.GetValues((uint)1)[0];
 			return NewTrkDef(midiChannel, sequence);
@@ -342,7 +342,7 @@ namespace Moritz.Palettes
         /// <summary>
         /// Constructs an TrkDef at MsPosition=0, containing a clone of the sequence of DurationDefs in the PaletteDef.
         /// </summary
-        public Trk NewTrkDef(byte midiChannel)
+        public Trk NewTrkDef(int midiChannel)
         {
             List<int> sequence = new List<int>();
             for(int i = 1; i <= Count; ++i)

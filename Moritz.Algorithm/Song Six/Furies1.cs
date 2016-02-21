@@ -10,7 +10,7 @@ namespace Moritz.Algorithm.SongSix
 {
     internal class Furies1 : Trk
     {
-        internal Furies1(byte midiChannel, int msDuration)
+        internal Furies1(int midiChannel, int msDuration)
 			: base(midiChannel, msDuration)
         {
         }

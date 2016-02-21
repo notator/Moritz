@@ -74,7 +74,7 @@ namespace Moritz.Symbols
                             if (systemIndex == 0)
                             {
                                 InputVoiceDef inputVoiceDef = inputVoice.VoiceDef as InputVoiceDef;
-                                inputVoice.SetMidiChannel(inputVoiceDef.MidiChannel, systemIndex);
+                                inputVoice.MidiChannel = inputVoiceDef.MidiChannel; // The channel is only set in the first system
                             }
                         }
                         foreach(IUniqueDef iud in voice.VoiceDef.UniqueDefs)
