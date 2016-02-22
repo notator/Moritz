@@ -134,7 +134,7 @@ namespace Moritz.Spec
 			}
 
             List<BasicMidiChordDef> newBs = new List<BasicMidiChordDef>();
-            foreach(BasicMidiChordDef b in this.BasicMidiChordDefs)
+            foreach(BasicMidiChordDef b in BasicMidiChordDefs)
             {
                 List<byte> pitches = new List<byte>(b.Pitches);
                 List<byte> velocities = new List<byte>(b.Velocities);
@@ -148,12 +148,12 @@ namespace Moritz.Spec
            return rval;
         }
 
-        /// <summary>
-        /// Returns null if listToClone is null, otherwise returns a clone of the listToClone.
-        /// </summary>
-        /// <param name="listToClone"></param>
-        /// <returns></returns>
-        private List<byte> NewListByteOrNull(List<byte> listToClone)
+		/// <summary>
+		/// Returns null if listToClone is null, otherwise returns a clone of the listToClone.
+		/// </summary>
+		/// <param name="listToClone"></param>
+		/// <returns></returns>
+		private List<byte> NewListByteOrNull(List<byte> listToClone)
         {
             List<byte> newListByte = null;
             if(listToClone != null)
@@ -164,43 +164,68 @@ namespace Moritz.Spec
         public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
         private int? _msDurationToNextBarline = null;
 
-        #region IUniqueChordDef
-        /// <summary>
-        /// Transpose (both notation and sound) by the number of semitones given in the argument.
-        /// Negative interval values transpose down.
-        /// It is not an error if Midi values would exceed the range 0..127.
-        /// In this case, they are silently coerced to 0 or 127 respectively.
-        /// </summary>
-        /// <summary>
-        /// Transpose (both notation and sound) by the number of semitones given in the argument.
-        /// Negative interval values transpose down.
-        /// It is not an error if Midi values would exceed the range 0..127.
-        /// In this case, they are silently coerced to 0 or 127 respectively.
-        /// </summary>
-        public void Transpose(int interval)
+		#region IUniqueChordDef
+		/// <summary>
+		/// Transpose (both notation and sound) by the number of semitones given in the argument.
+		/// Negative interval values transpose down.
+		/// It is not an error if Midi values would exceed the range 0..127.
+		/// In this case, they are silently coerced to 0 or 127 respectively.
+		/// ACHTUNG: If both SetVerticalDensity() and this function are to be used, use SetVerticalDensity() first!
+		/// </summary>
+		public void Transpose(int interval)
         {
             for(int i = 0; i < _displayedMidiPitches.Count; ++i)
             {
                 int newValue = _displayedMidiPitches[i] + interval;
                 _displayedMidiPitches[i] = M.MidiValue(_displayedMidiPitches[i] + interval);
             }
-            _displayedMidiPitches = ReduceList(_displayedMidiPitches);
+            _displayedMidiPitches = ReduceList(_displayedMidiPitches); // remove duplicate 0s and 127s
 
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
                 List<byte> notes = bmcd.Pitches;
                 for(int i = 0; i < notes.Count; ++i)
                 {
-                    notes[i] = M.MidiValue(notes[i] + interval);
-                }
+                    notes[i] = M.MidiValue(notes[i] + interval); // remove duplicate 0s and 127s
+				}
                 bmcd.Pitches = ReduceList(notes);
             }
         }
 
+		/// <summary>
+		/// Sets the number of pitches in the NotatedMidiPitches and BasicMidiChordDefs to chordDensity, by
+		/// removing the upper pitches as necessary. (Also sets the number of velocities in the BasicMidiChordDefs.)
+		/// Requires chordDensity to be less than or equal to the current vertical density, and the lengths of all
+		/// the affected lists to be the same.
+		/// ACHTUNG: this function can't be used if an ornament has added pitches to a BasicMidiChordDef. In other
+		/// words, the "note density factors" field in the Ornaments dialog must only contain 1s.
+		/// </summary>
+		/// <param name="chordDensity"></param>
+		public void SetVerticalDensity(int chordDensity)
+		{
+			#region require
+			Debug.Assert(chordDensity <= NotatedMidiPitches.Count); // if its equal, do nothing
+			foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+			{
+				Debug.Assert(NotatedMidiPitches.Count == bmcd.Pitches.Count && bmcd.Pitches.Count == bmcd.Velocities.Count);
+			}
+			#endregion require
 
+			if(chordDensity < NotatedMidiPitches.Count) // if its equal, do nothing
+			{
+				NotatedMidiPitches.RemoveRange(chordDensity, NotatedMidiPitches.Count - chordDensity);
+				foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+				{
+					List<byte> pitches = bmcd.Pitches;
+					List<byte> velocities = bmcd.Velocities;
+					pitches.RemoveRange(chordDensity, pitches.Count - chordDensity);
+					velocities.RemoveRange(chordDensity, velocities.Count - chordDensity);
+				}
+			}
+		}
 
-        #region IUniqueDef
-        public override string ToString()
+		#region IUniqueDef
+		public override string ToString()
         {
             return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString() + " MidiChordDef");
         }
@@ -287,34 +312,16 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Returns a list which is ascending order, and in which duplicate 0 and 127 values have been removed,
+        /// Returns a list which is ascending order, and in which duplicate values have been removed,
         /// </summary>
         private List<byte> ReduceList(List<byte> list)
         {
             List<byte> reducedList = new List<byte>();
-            bool minvalFound = false;
-            bool maxvalFound = false;
             for(int i = 0; i < list.Count; ++i)
             {
-                if(list[i] == 0)
-                {
-                    if(!minvalFound)
-                    {
-                        reducedList.Add(0);
-                        minvalFound = true;
-                    }
-                }
-                else if(list[i] == 127)
-                {
-                    if(!maxvalFound)
-                    {
-                        reducedList.Add(127);
-                        maxvalFound = true;
-                    }
-                }
-                else
-                {
-                    reducedList.Add(list[i]);
+                if(!reducedList.Contains(list[i]))
+				{
+					reducedList.Add(list[i]);
                 }
             }
 

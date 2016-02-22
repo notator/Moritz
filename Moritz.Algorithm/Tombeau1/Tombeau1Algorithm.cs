@@ -115,8 +115,8 @@ namespace Moritz.Algorithm.Tombeau1
 				for(int j = 0; j < mcds.Count; ++j)
 				{
 					MidiChordDef mcd = mcds[j] as MidiChordDef;
-					mcd.NotatedMidiPitches.RemoveRange(chordDensity, mcd.NotatedMidiPitches.Count - chordDensity);
-					mcd.Lyric = (j + 1).ToString() + "." + chordDensity.ToString();
+					mcd.SetVerticalDensity(chordDensity);
+					mcd.Lyric = (j).ToString() + "." + chordDensity.ToString();
 				}
 				Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], mcds);
 				trks.Add(trk);
