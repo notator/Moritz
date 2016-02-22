@@ -108,43 +108,27 @@ namespace Moritz.Algorithm.Tombeau1
 			#region alternative 2: Trks construction (from palette)
 			List<Trk> trks = new List<Trk>();
 			#region bar 1
-			#region dev2.0 trk0 construction (from palette)
-			Palette palette = _palettes[0];
-			List<IUniqueDef> mcds = PaletteMidiChordDefs(0);
-			for(int i = 0; i < mcds.Count; ++i)
-			{
-				MidiChordDef mcd = mcds[i] as MidiChordDef;
-				mcd.Lyric = (i + 1).ToString() + ".8";
-			}
-			Trk trk0 = new Trk((byte)MidiChannelIndexPerOutputVoice[7], mcds);
-			trks.Add(trk0);
-			#endregion dev2.0 trk0 construction (from palette)
-
-			for(int i = 1; i < MidiChannelIndexPerOutputVoice.Count; ++i)
+			for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
 			{
 				int chordDensity = 8 - i;
-				Trk trk = trk0.Clone();
-				trk.MidiChannel = MidiChannelIndexPerOutputVoice[7 - i];
-				List<IUniqueDef> tMcds = trk.UniqueDefs;
-				for(int j = 0; j < tMcds.Count; ++j)
+				List<IUniqueDef> mcds = PaletteMidiChordDefs(0);
+				for(int j = 0; j < mcds.Count; ++j)
 				{
-					MidiChordDef mcd = tMcds[j] as MidiChordDef;
+					MidiChordDef mcd = mcds[j] as MidiChordDef;
 					mcd.NotatedMidiPitches.RemoveRange(chordDensity, mcd.NotatedMidiPitches.Count - chordDensity);
 					mcd.Lyric = (j + 1).ToString() + "." + chordDensity.ToString();
 				}
-
+				Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], mcds);
 				trks.Add(trk);
 			}
 
-			trks.Reverse();
-
 			Seq seq1 = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
 			#endregion bar1
-			#region bar2
-			Seq seq2 = seq1.Clone();
 
-			//seq2.MsPosition = 0;
+			#region bar2
+			Seq seq2 = seq1.Clone();  //seq2.MsPosition = 0;
 			#endregion bar2
+
 			#region bar3
 			Seq seq3 = seq1.Clone();
 			#endregion bar3
