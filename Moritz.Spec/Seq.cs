@@ -9,21 +9,24 @@ namespace Moritz.Spec
 	public class Seq
 	{
 		/// <summary>
-		/// <para>Every Trk in trks is either empty or begins and ends with a MidiChordDef.</para>
+		/// <para>Each trk in trks has a constructed UniqueDefs list, which may either be empty
+		/// or contain any combination of RestDef, MidiChordDef, ClefChangeDef.</para>
+		/// <para>The trks list does not have to be complete or in the correct order, but each
+		/// tkr.MidiChannel must be unique and present in the midiChannelIndexPerOutputVoice list.</para>
+		/// The Seq will have all the trks corresponding to the midiChannels in midiChannelIndexPerOutputVoice,
+		/// but some of them can have an empty UniqueDefs list.
 		/// <para>Trk msPositions are relative to the start of the Seq.</para>
 		/// <para>There is at least one non-empty Trk having MsPosition = 0.</para>
-		/// <para>The trks list does not have to be complete, but each tkr.MidiChannel must be
-		/// unique and present in the midiChannelIndexPerOutputVoice list.</para>
 		/// </summary>
 		public Seq(int seqMsPosition, List<Trk> trks, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
 		{
 			_msPosition = seqMsPosition;
+
 			foreach(int midiChannel in midiChannelIndexPerOutputVoice)
 			{
 				Trk trk = new Trk((byte)midiChannel, new List<IUniqueDef>());
 				_trks.Add(trk);
 			}
-			MidiChannelIndexPerOutputVoice = midiChannelIndexPerOutputVoice;
 
 			bool success = false;
 			foreach(Trk trk in trks)
@@ -44,6 +47,7 @@ namespace Moritz.Spec
 			}
 			Debug.Assert(success == true);
 
+			AssertChannelConsistency(midiChannelIndexPerOutputVoice);
 			AssertConsistency();
 		}
 
@@ -58,7 +62,19 @@ namespace Moritz.Spec
 
 			_msPosition = seq1.MsPosition;
 			_trks = seq1.Trks;
-			MidiChannelIndexPerOutputVoice = seq1.MidiChannelIndexPerOutputVoice; 
+		}
+
+		private IReadOnlyList<int> MidiChannelIndexPerOutputVoice 
+		{
+			get
+			{
+				List<int> channels = new List<int>();
+				foreach(Trk trk in _trks)
+				{
+					channels.Add(trk.MidiChannel);
+				}
+				return channels;
+			}
 		}
 
 		/// <summary>
@@ -74,15 +90,13 @@ namespace Moritz.Spec
 		public Seq Concat(Seq seq2)
 		{
 			#region assertions
-			Debug.Assert(MidiChannelIndexPerOutputVoice.Count == seq2.MidiChannelIndexPerOutputVoice.Count);
-			for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
-			{
-				Debug.Assert(MidiChannelIndexPerOutputVoice[i] == seq2.MidiChannelIndexPerOutputVoice[i]);
-			}
+			AssertChannelConsistency(seq2.MidiChannelIndexPerOutputVoice);
 			#endregion
 
 			Seq seq2Clone = seq2.Clone();
 			int nTrks = _trks.Count;
+
+			#region find concatMsPos
 			int concatMsPos = seq2Clone.MsPosition;
 			if(seq2Clone.MsPosition < MsDuration)
 			{
@@ -94,7 +108,9 @@ namespace Moritz.Spec
 					concatMsPos = (earliestConcatPos > concatMsPos) ? earliestConcatPos : concatMsPos;
 				}
 			}
-		
+			#endregion
+
+			#region concatenation
 			for(int i = 0; i < nTrks; ++i)
 			{
 				Trk trk2 = seq2Clone.Trks[i];
@@ -109,8 +125,16 @@ namespace Moritz.Spec
 					trk1.AddRange(trk2);
 				}
 			}
+			#endregion
+
+			foreach(Trk trk in Trks)
+			{
+				trk.AgglomerateRests();
+			}
 
 			RemoveRedundantClefChanges();
+
+			AssertConsistency();
 
 			return this;
 		}
@@ -163,31 +187,38 @@ namespace Moritz.Spec
 		}
 
 		/// <summary>
-		/// Every Trk in trks is either empty, or begins with a MidiChordDef or ClefChangeDef, and ends with a MidiChordDef.
+		/// Every Trk.MidiChannel is unique and is parallel to the indices in midiChannelIndexPerOutputVoice.
+		/// </summary>
+		private void AssertChannelConsistency(IReadOnlyList<int> midiChannelIndexPerOutputVoice)
+		{
+			Debug.Assert(_trks != null && _trks.Count > 0 && _trks.Count == midiChannelIndexPerOutputVoice.Count);		
+			for(int i = 0; i < _trks.Count; ++i)
+			{
+				Debug.Assert(_trks[i].MidiChannel == midiChannelIndexPerOutputVoice[i], "All trk.MidiChannels must correspond.");
+				for(int j = i + 1; j < _trks.Count; ++j)
+				{
+					Debug.Assert(_trks[i].MidiChannel != _trks[j].MidiChannel, "All trk.MidiChannels must be unique.");
+				}
+			}
+		}
+
+		/// <summary>
+		/// Every Trk in trks is either empty, or contains any combination of RestDef, MidiChordDef or ClefChangeDef.
 		/// There is at least one Trk having MsPosition == 0.
-		/// The trks list does not have to be complete, but each MidiChannel must be set to a valid value.
 		/// </summary>
 		private void AssertConsistency()
 		{
-			Debug.Assert(_msPosition >= 0);
 			Debug.Assert(_trks != null && _trks.Count > 0);
-			Debug.Assert(MidiChannelIndexPerOutputVoice != null && MidiChannelIndexPerOutputVoice.Count > 0);
-			#region trks all start and end with a MidiChordDef
-			bool okay = true;
+			Debug.Assert(_msPosition >= 0);
+			#region Every Trk in trks is either empty, or contains any combination of MidiChordDef, RestDef or ClefChangeDef.
 			foreach(Trk trk in _trks)
 			{
-				if(trk.UniqueDefs.Count > 0)
+				Debug.Assert(trk.UniqueDefs != null);
+				foreach(IUniqueDef iud in trk.UniqueDefs)
 				{
-					IUniqueDef firstIUD = trk.UniqueDefs[0];
-					IUniqueDef lastIUD = trk.UniqueDefs[trk.UniqueDefs.Count - 1];
-					if(!((firstIUD is MidiChordDef || firstIUD is ClefChangeDef) && lastIUD is MidiChordDef))
-					{
-						okay = false;
-						break;
-					}
+					Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is ClefChangeDef);
 				}
 			}
-			Debug.Assert(okay == true, "All non-empty trks must begin with a MidiChordDef or ClefChangeDef, and end with a MidiChordDef");
 			#endregion
 			#region position of earliest IUniqueDef
 			bool found = false;
@@ -200,21 +231,6 @@ namespace Moritz.Spec
 				}
 			}
 			Debug.Assert(found == true, "The first UniqueDef in at least one trk must have MsPosition=0");
-			#endregion
-			#region all trks must have a valid midiChannel		
-			foreach(Trk trk in _trks)
-			{
-				bool midiChannelOkay = false;
-				foreach(int midiChannel in MidiChannelIndexPerOutputVoice)
-				{
-					if(midiChannel == trk.MidiChannel)
-					{
-						midiChannelOkay = true;
-						break;
-					}
-				}
-				Debug.Assert(midiChannelOkay == true, "All trks must have a valid midiChannel");
-			}
 			#endregion
 		}
 
@@ -278,7 +294,5 @@ namespace Moritz.Spec
 				Debug.Assert(MsDuration == value); 
 			}
 		}
-
-		private IReadOnlyList<int> MidiChannelIndexPerOutputVoice;
 	}
 }

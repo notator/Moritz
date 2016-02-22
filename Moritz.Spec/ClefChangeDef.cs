@@ -21,21 +21,9 @@ namespace Moritz.Spec
         /// The following IUniqueDef must be a MidiChordDef or RestDef.
         /// </summary>
         public ClefChangeDef(string clefType, IUniqueDef followingUniqueChordOrRestDef)
-            :base()
+            :this(clefType, followingUniqueChordOrRestDef.MsPosition)
         {
             #region check args
-            if(String.Equals(clefType, "t") == false
-            && String.Equals(clefType, "t1") == false
-            && String.Equals(clefType, "t2") == false
-            && String.Equals(clefType, "t3") == false
-            && String.Equals(clefType, "b") == false
-            && String.Equals(clefType, "b1") == false
-            && String.Equals(clefType, "b2") == false
-            && String.Equals(clefType, "b3") == false)
-            {
-                Debug.Assert(false, "Unknown clef type.");
-            }
-
             if(!(followingUniqueChordOrRestDef is MidiChordDef) 
             && !(followingUniqueChordOrRestDef is InputChordDef)
             && !(followingUniqueChordOrRestDef is RestDef))
@@ -43,48 +31,64 @@ namespace Moritz.Spec
                 Debug.Assert(false, "Clef change must be followed by a chord or rest.");
             }
             #endregion
-
-            _id = "clefChange" + UniqueClefChangeIDNumber.ToString();
-            _clefType = clefType;
-            _followingChordOrRestDef = followingUniqueChordOrRestDef;
         }
 
-        #region IUniqueDef
-        public override string ToString()
+		private ClefChangeDef(string clefType, int msPosition)
+			:base()
+		{
+			#region check args
+			if(String.Equals(clefType, "t") == false
+			&& String.Equals(clefType, "t1") == false
+			&& String.Equals(clefType, "t2") == false
+			&& String.Equals(clefType, "t3") == false
+			&& String.Equals(clefType, "b") == false
+			&& String.Equals(clefType, "b1") == false
+			&& String.Equals(clefType, "b2") == false
+			&& String.Equals(clefType, "b3") == false)
+			{
+				Debug.Assert(false, "Unknown clef type.");
+			}
+			#endregion
+
+			_id = "clefChange" + UniqueClefChangeIDNumber.ToString();
+			_clefType = clefType;
+			MsPosition = msPosition;
+		}
+
+		#region IUniqueDef
+		public override string ToString()
         {
             return ("MsPosition=" + MsPosition.ToString() + " clefChange: type=" + _clefType + " ClefChangeDef");
         }
 
         public void AdjustMsDuration(double factor) {}
 
-        /// <summary>
-        /// ACHTUNG: The clone points at the same _followingChordOrRestDef as the original.
-        /// This is not usually what is wanted. After cloning a VoiceDef, the cloned
-        /// ClefChangeDefs should be replaced. See VoiceDef.Clone().
-        /// </summary>
-        /// <returns></returns>
         public IUniqueDef Clone()
         {
-            ClefChangeDef deepClone = new ClefChangeDef(this._clefType, this._followingChordOrRestDef);
+            ClefChangeDef deepClone = new ClefChangeDef(_clefType, MsPosition);
             return deepClone;
         }
 
         public int MsDuration { get { return 0; } set { throw new System.NotSupportedException(); } }
+		private int _msPosition = -1;
+		/// <summary>
+		/// Care should be taken to ensure that ClefChangeDefs always have the same msPosition as the following MidiChordDef or RestDef
+		/// </summary>
         public int MsPosition
         {
             get
             {
-                Debug.Assert(_followingChordOrRestDef != null);
-                return _followingChordOrRestDef.MsPosition;
+                Debug.Assert(_msPosition >= 0);
+                return _msPosition;
             }
             set
-			{ 
-				// This function is deliberately empty!
+			{
+				Debug.Assert(value >= 0);
+				_msPosition = value;
 			}
         }
         #endregion IUniqueDef
 
-        private IUniqueDef _followingChordOrRestDef;
         public string ID { get { return _id; } }
         private string _id;
 

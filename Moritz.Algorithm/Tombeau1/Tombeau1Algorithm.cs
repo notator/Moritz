@@ -20,10 +20,10 @@ namespace Moritz.Algorithm.Tombeau1
 		{
 		}
 
-		public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6 }; } }
-		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 100, 100, 100, 100, 100, 100, 100 }; } }
+		public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
+		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 100, 100, 100, 100, 100, 100, 100, 100 }; } }
 		public override int NumberOfInputVoices { get { return 0; } }
-		public override int NumberOfBars { get { return 200; } }
+		public override int NumberOfBars { get { return 3; } }
 
 		/// <summary>
 		/// See CompositionAlgorithm.DoAlgorithm()
@@ -33,6 +33,7 @@ namespace Moritz.Algorithm.Tombeau1
 			_krystals = krystals;
 			_palettes = palettes;
 
+			#region main comment (thoughts etc.)
 			/*********************************************************************************************
 			Think Nancarrow, but (especially) with background/foreground. Think Study 1. Depth.
 
@@ -63,46 +64,100 @@ namespace Moritz.Algorithm.Tombeau1
 			Seqs can be superimposed, juxtaposed, repeated and re-ordered.
 			
 			Chords:
-			1. Think Boulez' chord addition.
+			1. Think Boulez' chord addition: Starting with any chord in system 1 of alternative 1 (below), add the
+			   intervals of any other chord (or the same chord) in the system to each of the pitches in the original
+			   chord. Remove any duplicate pitches -- which one probably depends on the velocities of the duplicates
+			   (to be worked out later) -- and re-order the pitches (in ascending order).
 			2. Study 1 chords can have holes... 
 			3. Velocity gradients in Study 1 chords: bottom->top (="consonant") --> top->bottom (="dissonant")...
 			4. Chord pitch transposition is allowed (but not ad. lib. transposition of the pitches inside the chord)...
 			5. Chord velocity transposition is allowed (but not ad. lib. transposition of the velocities inside the chord)...
 			6. "Chords are colour" (Stockhausen)
+			7. If a chord is added to the pitch of a root chord, then its root should have the velocity of that pitch...
 						
 			*********************************************************************************************/
-
+			#endregion main comments
 			/**********************************************/
+			Seq mainSeq;
 			/*** Create the main seq here. ***/
-			#region temp code
+			#region alternative 1: (Seq construction functions demo: new Seq(), seq.Clone(), seq.Concat() ) 
+			//List<Trk> trks = new List<Trk>();
+			//for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
+			//{
+			//	List<IUniqueDef> iuds = new List<IUniqueDef>();
+			//	iuds.Add(new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 60 }, 0, 500, true));
+			//	iuds.Add(new RestDef(500, 1000));
+			//	iuds.Add(new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 60 }, 1500, 500, true));
 
+			//	Trk trk = new Trk((byte)MidiChannelIndexPerOutputVoice[i], iuds);
+			//	trks.Add(trk);
+			//}
+			//Seq seq1 = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
+			//Seq seq2 = seq1.Clone();
+
+			////seq2.MsPosition = 0;
+
+			//// Add clef changes here
+			////seq1.Trks[5].UniqueDefs.Insert(1, new ClefChangeDef("t", trks[5].UniqueDefs[1]));
+			////seq1.Trks[6].UniqueDefs.Insert(2, new ClefChangeDef("t", trks[6].UniqueDefs[2]));
+
+			//mainSeq = new Seq(seq1, seq2);
+			//mainSeq.Concat(seq2);
+			#endregion alternative 1: (Seq construction functions demo: new Seq(), seq.Clone(), seq.Concat() ) 
+
+			#region alternative 2: Trks construction (from palette)
 			List<Trk> trks = new List<Trk>();
-
-			for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
+			#region bar 1
+			#region dev2.0 trk0 construction (from palette)
+			Palette palette = _palettes[0];
+			List<IUniqueDef> mcds = PaletteMidiChordDefs(0);
+			for(int i = 0; i < mcds.Count; ++i)
 			{
-				List<IUniqueDef> iuds = new List<IUniqueDef>();
-				iuds.Add(new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 60 }, 0, 500, true));
-				iuds.Add(new RestDef(500, 400000 - 1000));
-				iuds.Add(new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 60 }, 400000 - 500, 500, true));
+				MidiChordDef mcd = mcds[i] as MidiChordDef;
+				mcd.Lyric = (i + 1).ToString() + ".8";
+			}
+			Trk trk0 = new Trk((byte)MidiChannelIndexPerOutputVoice[7], mcds);
+			trks.Add(trk0);
+			#endregion dev2.0 trk0 construction (from palette)
 
-				Trk trk = new Trk((byte)MidiChannelIndexPerOutputVoice[i], iuds);
+			for(int i = 1; i < MidiChannelIndexPerOutputVoice.Count; ++i)
+			{
+				int chordDensity = 8 - i;
+				Trk trk = trk0.Clone();
+				trk.MidiChannel = MidiChannelIndexPerOutputVoice[7 - i];
+				List<IUniqueDef> tMcds = trk.UniqueDefs;
+				for(int j = 0; j < tMcds.Count; ++j)
+				{
+					MidiChordDef mcd = tMcds[j] as MidiChordDef;
+					mcd.NotatedMidiPitches.RemoveRange(chordDensity, mcd.NotatedMidiPitches.Count - chordDensity);
+					mcd.Lyric = (j + 1).ToString() + "." + chordDensity.ToString();
+				}
+
 				trks.Add(trk);
 			}
 
-			Seq seq1 = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The MsPosition can change again later.
+			trks.Reverse();
+
+			Seq seq1 = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
+			#endregion bar1
+			#region bar2
 			Seq seq2 = seq1.Clone();
 
 			//seq2.MsPosition = 0;
+			#endregion bar2
+			#region bar3
+			Seq seq3 = seq1.Clone();
+			#endregion bar3
 
-			seq1.Trks[5].UniqueDefs.Insert(1, new ClefChangeDef("t", trks[5].UniqueDefs[1]));
-			seq1.Trks[6].UniqueDefs.Insert(2, new ClefChangeDef("t", trks[6].UniqueDefs[2]));
+			// Add clef changes here
+			//seq2.Trks[0].UniqueDefs.Insert(0, new ClefChangeDef("b", seq2.Trks[0].UniqueDefs[0]));
+			//seq2.Trks[6].UniqueDefs.Insert(2, new ClefChangeDef("b", seq2.Trks[6].UniqueDefs[2]));
 
-			Seq mainSeq = new Seq(seq1, seq2);
-
-			//Seq mainSeq = seq1;
+			mainSeq = seq1;
 			mainSeq.Concat(seq2);
+			mainSeq.Concat(seq3);
+			#endregion alternative 2: Trks construction (from palette)
 
-			#endregion temp code
 			/**********************************************/
 
 			List<VoiceDef> voiceDefs = GetVoiceDefs(mainSeq); // virtual function in CompositionAlgorithm.cs
@@ -112,6 +167,21 @@ namespace Moritz.Algorithm.Tombeau1
 			List<List<VoiceDef>> bars = CreateBars(voiceDefs, NumberOfBars);
 
 			return bars;
+		}
+
+		private List<IUniqueDef> PaletteMidiChordDefs(int paletteIndex)
+		{
+			List<IUniqueDef> iuds = new List<IUniqueDef>();
+			Palette palette = _palettes[paletteIndex];
+			int msPosition = 0;
+			for(int i = 0; i < palette.Count; ++i)
+			{
+				MidiChordDef mcd = palette.MidiChordDef(i);
+				mcd.MsPosition = msPosition;
+				msPosition += mcd.MsDuration;
+				iuds.Add(mcd);
+			}
+			return iuds;
 		}
 
 		#region WarpDurations

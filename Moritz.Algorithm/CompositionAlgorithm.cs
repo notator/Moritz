@@ -361,7 +361,8 @@ namespace Moritz.Algorithm
 		/// Returns a list of (parallel) VoiceDefs that are the seq.Trks padded at the beginning and end with rests.
 		/// The returned voiceDefs all start at MsPosition=0 and have the same MsDuration.
 		/// There is at least one MidiChordDef at the start of the sequence, and at least one MidiChordDef ends at its end.
-		/// If the original seq.trk.UniqueDefs list is empty, the voiceDef will contain a single rest having the same duration as the other trks.
+		/// If the original seq.trk.UniqueDefs list is empty or contains a single restDef, the voiceDef will contain a single
+		/// rest having the same duration as the other trks.
 		/// </summary>
 		protected List<VoiceDef> GetVoiceDefs(Seq seq)
 		{
@@ -372,12 +373,24 @@ namespace Moritz.Algorithm
 
 			foreach(Trk trk in trks)
 			{
+				#region A voiceDef may not begin with a ClefChangeDef
+				foreach(IUniqueDef iud in trk.UniqueDefs)
+				{
+					if(iud is MidiChordDef || iud is ClefChangeDef)
+					{
+						Debug.Assert((iud is MidiChordDef),
+							"A voiceDef (that represents the whole midi channel for the piece) may not\n" +
+							"have a ClefChangeDef before the first MidiChordDef. (Other Trks can.)");
+						break;
+					}
+				}
+				#endregion
+
 				Trk voiceDef = new Trk(trk.MidiChannel, trk.UniqueDefs); // this is not a clone...
 
 				if(voiceDef.UniqueDefs.Count > 0)
 				{
 					IUniqueDef firstIUD = trk.UniqueDefs[0];
-					Debug.Assert(!(firstIUD is ClefChangeDef), "VoiceDefs may not begin with a ClefChangeDef. (Trk.UniqueDefs can.)");
 					int startRestMsDuration = firstIUD.MsPosition;
 					if(startRestMsDuration > 0)
 					{
@@ -390,6 +403,7 @@ namespace Moritz.Algorithm
 					{
 						voiceDef.UniqueDefs.Add(new RestDef(endOfTrkMsPosition, endRestMsDuration));
 					}
+					voiceDef.AgglomerateRests();
 				}
 				else
 				{
@@ -407,35 +421,23 @@ namespace Moritz.Algorithm
 
 
 		/// <summary>
-		/// A voiceDef may not begin with a ClefChangeDef.
+		/// A voiceDef (that represents the whole midi channel for the piece) may not have a ClefChangeDef before the first MidiChordDef.
 		/// VoiceDefs must all start at MsPosition=0 and have the same MsDuration.
-		/// There is at least one MidiChordDef at the start of the sequence, and at least one MidiChordDef ends at its end.
+		/// RestDefs are agglomerated.
+		/// Otherwise, VoiceDefs may contain any combination of RestDef, MidiChordDef and ClefChangeDef. 
 		/// </summary>
 		private void AssertConsistency(List<VoiceDef> voiceDefs, int sequenceMsDuration)
 		{
-			#region A voiceDef may not begin with a ClefChangeDef
-			foreach(VoiceDef voiceDef in voiceDefs)
-			{
-				Debug.Assert(!(voiceDef.UniqueDefs[0] is ClefChangeDef), "A voiceDef may not begin with a ClefChangeDef.");
-			}
-			#endregion
 			#region All voiceDefs must begin at MsPosition=0 and have the same MsDuration
-			bool okay = true;
 			foreach(VoiceDef voiceDef in voiceDefs)
 			{
 				if(voiceDef.UniqueDefs.Count > 0)
 				{
 					IUniqueDef firstIUD = voiceDef.UniqueDefs[0];
-					IUniqueDef lastIUD = voiceDef.UniqueDefs[voiceDef.UniqueDefs.Count - 1];
-					int endOfTrk = lastIUD.MsPosition + lastIUD.MsDuration;
-					if(!(firstIUD.MsPosition == 0 && endOfTrk == sequenceMsDuration))
-					{
-						okay = false;
-						break;
-					}
+					Debug.Assert((firstIUD.MsPosition == 0 && voiceDef.MsDuration == sequenceMsDuration),
+						"All voiceDefs must begin at MsPosition=0 and have the same MsDuration");
 				}
 			}
-			Debug.Assert(okay == true, "All voiceDefs must begin at MsPosition=0 and have the same MsDuration");
 			#endregion
 			#region There is a MidiChordDef at the beginning and end of the Sequence
 			bool foundStartMidiChordDef = false;
@@ -445,13 +447,12 @@ namespace Moritz.Algorithm
 				if(voiceDef.UniqueDefs.Count > 0)
 				{
 					IUniqueDef firstIUD = voiceDef.UniqueDefs[0];
-					IUniqueDef lastIUD = voiceDef.UniqueDefs[voiceDef.UniqueDefs.Count - 1];
-					int endOfTrk = lastIUD.MsPosition + lastIUD.MsDuration;
 					if(firstIUD is MidiChordDef)
 					{
 						foundStartMidiChordDef = true;
 					}
-					if(lastIUD is MidiChordDef)
+					IUniqueDef lastIUD = voiceDef.UniqueDefs[voiceDef.UniqueDefs.Count - 1];
+					if(lastIUD is MidiChordDef && voiceDef.MsDuration == sequenceMsDuration)
 					{
 						foundEndMidiChordDef = true;
 					}

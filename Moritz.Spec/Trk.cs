@@ -37,7 +37,7 @@ namespace Moritz.Spec
         }
 
 		/// <summary>
-		/// <para>If the argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
+		/// <para>If the iuds argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
 		/// <para>The new VoiceDef's UniqueDefs list is simply set to the argument (which is not cloned).</para>
 		/// </summary>
 		public Trk(int midiChannel, List<IUniqueDef> iuds)
@@ -52,7 +52,7 @@ namespace Moritz.Spec
 		public Trk Clone()
         {
             List<IUniqueDef> clonedLmdds = new List<IUniqueDef>();
-            foreach(IUniqueDef iu in this._uniqueDefs)
+            foreach(IUniqueDef iu in _uniqueDefs)
             {
                 IUniqueDef clone = iu.Clone();
                 clonedLmdds.Add(clone);
