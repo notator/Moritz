@@ -186,6 +186,86 @@ namespace Moritz.Spec
 			return clone;
 		}
 
+		#region WarpDurations
+		/// <summary>
+		/// The argument warp is a list of doubles, in ascending order, beginning at 0 and ending at 1.
+		/// The doubles represent points in the original duration that will be equally spaced
+		/// in the Seq when the function returns. The MsDuration of the Seq is not changed.
+		/// </summary>
+		public void WarpDurations(List<double> warp)
+		{
+			throw new NotImplementedException();
+		}
+
+		private class GridElement
+		{
+			public int index;
+			public int msDuration;
+			public int msPosition;
+			public double durationFactor;
+			public override string ToString()
+			{
+				return "index=" + index.ToString() + " msDuration=" + msDuration.ToString() + " msPosition=" + msPosition.ToString();
+			}
+		}
+
+		private void WarpDurations(List<VoiceDef> voiceDefs)
+		{
+			// The grid is a superimposed structural layer, used for doing a time warp
+			List<GridElement> gridData = getBasicGridData(voiceDefs[0].MsDuration);
+
+			SetGridData(gridData); // set each GridElement.durationFactor
+
+			// warp the durations here
+		}
+
+		/// <summary>
+		/// Temporary function version(?) Maybe this could be improved...
+		/// </summary>
+		private List<GridElement> getBasicGridData(int totalGridDuration)
+		{
+			List<GridElement> grid = new List<GridElement>();
+			int gridSize = 1000; // milliseconds
+			int msPosition = 0;
+			int remainingDuration = totalGridDuration; // milliseconds
+			int index = 0;
+			while(remainingDuration > 1000)
+			{
+				GridElement gridElem = new GridElement();
+				gridElem.index = index++;
+				gridElem.msDuration = gridSize;
+				gridElem.msPosition = msPosition;
+				gridElem.durationFactor = 1.0;
+				msPosition += gridSize;
+				grid.Add(gridElem);
+				remainingDuration -= gridSize;
+			}
+			if(remainingDuration > 0)
+			{
+				GridElement gridElem = new GridElement();
+				gridElem.index = index;
+				gridElem.msDuration = remainingDuration;
+				gridElem.msPosition = msPosition;
+				gridElem.durationFactor = 1.0;
+				grid.Add(gridElem);
+			}
+			return grid;
+		}
+
+		// demo function (causes accel to double speed).
+		private void SetGridData(List<GridElement> gridData)
+		{
+			double exp = Math.Pow(2, ((double)1 / gridData.Count));
+			double factor = 1;
+
+			foreach(GridElement gridElement in gridData)
+			{
+				gridElement.durationFactor *= factor;
+				factor *= exp;
+			}
+		}
+		#endregion WarpDurations
+
 		/// <summary>
 		/// Every Trk.MidiChannel is unique and is parallel to the indices in midiChannelIndexPerOutputVoice.
 		/// </summary>

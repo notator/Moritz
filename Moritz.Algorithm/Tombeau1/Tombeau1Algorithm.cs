@@ -80,34 +80,9 @@ namespace Moritz.Algorithm.Tombeau1
 			/**********************************************/
 			Seq mainSeq;
 			/*** Create the main seq here. ***/
-			#region alternative 1: (Seq construction functions demo: new Seq(), seq.Clone(), seq.Concat() ) 
-			//List<Trk> trks = new List<Trk>();
-			//for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
-			//{
-			//	List<IUniqueDef> iuds = new List<IUniqueDef>();
-			//	iuds.Add(new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 60 }, 0, 500, true));
-			//	iuds.Add(new RestDef(500, 1000));
-			//	iuds.Add(new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 60 }, 1500, 500, true));
-
-			//	Trk trk = new Trk((byte)MidiChannelIndexPerOutputVoice[i], iuds);
-			//	trks.Add(trk);
-			//}
-			//Seq seq1 = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
-			//Seq seq2 = seq1.Clone();
-
-			////seq2.MsPosition = 0;
-
-			//// Add clef changes here
-			////seq1.Trks[5].UniqueDefs.Insert(1, new ClefChangeDef("t", trks[5].UniqueDefs[1]));
-			////seq1.Trks[6].UniqueDefs.Insert(2, new ClefChangeDef("t", trks[6].UniqueDefs[2]));
-
-			//mainSeq = new Seq(seq1, seq2);
-			//mainSeq.Concat(seq2);
-			#endregion alternative 1: (Seq construction functions demo: new Seq(), seq.Clone(), seq.Concat() ) 
-
 			#region alternative 2: Trks construction (from palette)
 			List<Trk> trks = new List<Trk>();
-			#region bar 1
+			#region system 1
 			for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
 			{
 				int chordDensity = 8 - i;
@@ -122,33 +97,42 @@ namespace Moritz.Algorithm.Tombeau1
 				trks.Add(trk);
 			}
 
-			Seq seq1 = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
-			#endregion bar1
+			Seq system1 = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
+			#endregion system 1
 
-			#region bar2
-			Seq seq2 = seq1.Clone();  //seq2.MsPosition = 0;
-			#endregion bar2
+			#region  system 2
+			Seq system2 = system1.Clone();  //seq2.MsPosition = 0;
+			#endregion  system 2
 
-			#region bar3
-			Seq seq3 = seq1.Clone();
-			#endregion bar3
+			#region  system 3
+			Seq system3 = system1.Clone();
+			#endregion  system 3
 
 			// Add clef changes here
 			//seq2.Trks[0].UniqueDefs.Insert(0, new ClefChangeDef("b", seq2.Trks[0].UniqueDefs[0]));
 			//seq2.Trks[6].UniqueDefs.Insert(2, new ClefChangeDef("b", seq2.Trks[6].UniqueDefs[2]));
 
-			mainSeq = seq1;
-			mainSeq.Concat(seq2);
-			mainSeq.Concat(seq3);
+			//// Seqs can be warped...
+			//List<double> warp = new List<double>() { 0, 1 };
+			//system1.WarpDurations(warp);
+
+			mainSeq = system1;
+			mainSeq.Concat(system2);
+			mainSeq.Concat(system3);
 			#endregion alternative 2: Trks construction (from palette)
 
 			/**********************************************/
 
 			List<VoiceDef> voiceDefs = GetVoiceDefs(mainSeq); // virtual function in CompositionAlgorithm.cs
 
-			WarpDurations(voiceDefs);
+			#region set barlines
+			List<int> barlineEndMsPositions = new List<int>();
+			barlineEndMsPositions.Add(system1.MsDuration);
+			barlineEndMsPositions.Add(system1.MsDuration + system2.MsDuration);
+			barlineEndMsPositions.Add(system1.MsDuration + system2.MsDuration + system3.MsDuration);
+			#endregion set barlines
 
-			List<List<VoiceDef>> bars = CreateBars(voiceDefs, NumberOfBars);
+			List<List<VoiceDef>> bars = CreateBars(voiceDefs, barlineEndMsPositions);
 
 			return bars;
 		}
@@ -168,82 +152,10 @@ namespace Moritz.Algorithm.Tombeau1
 			return iuds;
 		}
 
-		#region WarpDurations
-		private class GridElement
-		{
-			public int index;
-			public int msDuration;
-			public int msPosition;
-			public double durationFactor;
-			public override string ToString()
-			{
-				return "index=" + index.ToString() + " msDuration=" + msDuration.ToString() + " msPosition=" + msPosition.ToString();
-			}
-		}
-
-		private void WarpDurations(List<VoiceDef> voiceDefs)
-		{
-			// The grid is a superimposed structural layer, used for doing a time warp
-			List<GridElement> gridData = getBasicGridData(voiceDefs[0].MsDuration);
-
-			SetGridData(gridData); // set each GridElement.durationFactor
-
-			// warp the durations here
-		}
-
-		/// <summary>
-		/// Temporary function version(?) Maybe this could be improved...
-		/// </summary>
-		private List<GridElement> getBasicGridData(int totalGridDuration)
-		{
-			List<GridElement> grid = new List<GridElement>();
-			int gridSize = 1000; // milliseconds
-			int msPosition = 0;
-			int remainingDuration = totalGridDuration; // milliseconds
-			int index = 0;
-			while(remainingDuration > 1000)
-			{
-				GridElement gridElem = new GridElement();
-				gridElem.index = index++;
-				gridElem.msDuration = gridSize;
-				gridElem.msPosition = msPosition;
-				gridElem.durationFactor = 1.0;
-				msPosition += gridSize;
-				grid.Add(gridElem);
-				remainingDuration -= gridSize;
-			}
-			if(remainingDuration > 0)
-			{
-				GridElement gridElem = new GridElement();
-				gridElem.index = index;
-				gridElem.msDuration = remainingDuration;
-				gridElem.msPosition = msPosition;
-				gridElem.durationFactor = 1.0;
-				grid.Add(gridElem);
-			}
-			return grid;
-		}
-
-		// demo function (causes accel to double speed).
-		private void SetGridData(List<GridElement> gridData)
-		{
-			double exp = Math.Pow(2, ((double)1 / gridData.Count));
-			double factor = 1;
-
-			foreach(GridElement gridElement in gridData)
-			{
-				gridElement.durationFactor *= factor;
-				factor *= exp;
-			}
-		}
-		#endregion WarpDurations
-
-		// Breaks the voiceDefs (each currently contains a complete channel for the piece) into bars.
-		private List<List<VoiceDef>> CreateBars(List<VoiceDef> voiceDefs, int numberOfBars)
+		// Breaks the voiceDefs (each currently contains a complete channel for the piece) into bars=systems.
+		private List<List<VoiceDef>> CreateBars(List<VoiceDef> voiceDefs, List<int> barlineEndMsPositions)
 		{
 			List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
-
-			List<int> barlineEndMsPositions = GetBarlineEndMsPositions(voiceDefs, numberOfBars);
 
 			List<VoiceDef> longBar = voiceDefs;
 			foreach(int barlineEndMsPosition in barlineEndMsPositions)
@@ -254,33 +166,6 @@ namespace Moritz.Algorithm.Tombeau1
 			}
 
 			return bars;
-		}
-
-		/// <summary>
-		/// Temp function that just returns nBars barline end positions equally distributed across the sequence.
-		/// Rewrite this function when the composition is complete.
-		/// Empty bars are allowed, but barlines should usually try to align with MidiChordDefs.
-		/// </summary>
-		private static List<int> GetBarlineEndMsPositions(List<VoiceDef> voiceDefs, int nBars)
-		{
-			List<int> barlineEndMsPositions = new List<int>();
-			int sequenceMsDuration = voiceDefs[0].MsDuration;
-			int barMsDuration = sequenceMsDuration / nBars;
-			int msPos = barMsDuration;
-			for(int i = 0; i < nBars - 1; ++i)
-			{
-				barlineEndMsPositions.Add(msPos);
-				msPos += barMsDuration;
-			}
-			barlineEndMsPositions.Add(sequenceMsDuration);  // the final barline
-
-			#region conditions (these also have to be met when this function has been rewritten) 
-			Debug.Assert(barlineEndMsPositions[0] != 0);
-			Debug.Assert(barlineEndMsPositions[barlineEndMsPositions.Count - 1] == sequenceMsDuration);
-			Debug.Assert(barlineEndMsPositions.Count == nBars);
-			#endregion
-
-			return barlineEndMsPositions;
 		}
 	}
 }
