@@ -264,15 +264,15 @@ namespace Moritz.Spec
                 }
             }
         }
-        #endregion deprecated function
-        /// Creates a hairpin in the velocities from startMsPosition to endMsPosition (non-inclusive).
-        /// This function does NOT change velocities outside the range given in its arguments.
-        /// There must be at least two IUniqueDefs in the msPosition range given in the arguments.
-        /// The factors by which the velocities are multiplied change arithmetically:
-        /// The velocity of the first IUniqueDefs is multiplied by startFactor, and the velocity
-        /// of the last MidiChordDef in range by endFactor.
-        /// Can be used to create a diminueno or crescendo.
-        public void AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
+		#endregion deprecated function
+		/// Creates a hairpin in the velocities from startMsPosition to endMsPosition (non-inclusive).
+		/// This function does NOT change velocities outside the range given in its arguments.
+		/// There must be at least two IUniqueDefs in the msPosition range given in the arguments.
+		/// The factors by which the velocities are multiplied change arithmetically:
+		/// The velocity of the first IUniqueDefs is multiplied by startFactor, and the velocity
+		/// of the last MidiChordDef in range by endFactor.
+		/// Can be used to create a diminueno or crescendo.
+		public void AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
         {
             int beginIndex = FindIndexAtMsPosition(startMsPosition);
             int endIndex = FindIndexAtMsPosition(endMsPosition);
@@ -491,7 +491,93 @@ namespace Moritz.Spec
 			}
 		}
 		#endregion alignment
-        #endregion MidiChordDef attribute changers)
+		/// <summary>
+		/// The argument warp is a list of doubles, in ascending order, beginning with 0 and ending with 1.
+		/// The doubles represent moments in the original duration that will be separated from each other
+		/// by equal durations when the function returns. The MsDuration of the Trk is not changed.
+		/// </summary>
+		public void WarpDurations(List<double> warp)
+		{
+			#region requirements
+			Debug.Assert(warp != null && warp.Count > 1 && warp[0] == 0 && warp[warp.Count - 1] == 1);
+			for(int i = 1; i < warp.Count; ++i)
+			{
+				Debug.Assert(warp[i - 1] < warp[i]);
+			}
+			#endregion
+
+			List<double> factors = new List<double>();
+			List<int> originalWarpMsPositions = new List<int>();
+			#region get factors and originalWarpMsPositions
+			double finalSeparation = MsDuration / (warp.Count - 1); // the final duration separation between the moments (in range 0..MsDuration)
+
+			for(int i = 0; i < warp.Count; ++i)
+			{
+				originalWarpMsPositions.Add((int)(MsDuration * warp[i])); // includes MsDuration
+			}
+			for(int i = 0; i < originalWarpMsPositions.Count - 1; ++i)
+			{
+				factors.Add(finalSeparation / (originalWarpMsPositions[i + 1] - originalWarpMsPositions[i]));
+			}
+			#endregion
+
+			int factorIndex = 0;
+			int iudMsPosition = 0;
+			int originalMsDuration = MsDuration;
+			foreach(IUniqueDef iud in UniqueDefs)
+			{
+				int remainingMsDuration = iud.MsDuration;
+				double newMsDuration = GetNewMsDuration(ref factorIndex, originalWarpMsPositions, factors, iud.MsPosition, ref remainingMsDuration);
+				iud.AdjustMsDuration(newMsDuration / iud.MsDuration);
+				iud.MsPosition = iudMsPosition;
+				iudMsPosition += iud.MsDuration;
+			}
+			// correct rounding errors
+			int msDuration = MsDuration;
+			if(msDuration != originalMsDuration)
+			{
+				IUniqueDef lastiud = UniqueDefs[UniqueDefs.Count - 1];
+				lastiud.MsDuration = originalMsDuration - lastiud.MsPosition;
+			}
+
+			Debug.Assert(originalMsDuration == MsDuration);
+		}
+		/// <summary>
+		/// Recursive function called by WarpDurations()
+		/// </summary>
+		private double GetNewMsDuration(ref int factorIndex, List<int> originalWarpMsPositions, List<double> factors,
+								int originalMsPosition, ref int remainingMsDuration)
+		{
+			int currentEndMsPos = originalMsPosition + remainingMsDuration;
+			int upperMsPos = originalWarpMsPositions[factorIndex + 1];
+			double factor = factors[factorIndex];
+			double newMsDuration = 0;
+
+			while(remainingMsDuration > 0)
+			{
+				if(currentEndMsPos < upperMsPos)
+				{
+					newMsDuration += remainingMsDuration * factor;
+					remainingMsDuration = 0;
+				}
+				else if(originalMsPosition < upperMsPos)
+				{
+					int durationToWarp = upperMsPos - originalMsPosition;
+					remainingMsDuration -= durationToWarp;
+					originalMsPosition = upperMsPos;
+					newMsDuration += (durationToWarp * factor);
+				}
+				else
+				{
+					factorIndex++;
+					newMsDuration += GetNewMsDuration(ref factorIndex, originalWarpMsPositions, factors,
+										originalMsPosition, ref remainingMsDuration);
+				}
+			}
+
+			return newMsDuration;
+		}
+		#endregion MidiChordDef attribute changers)
 
 		#region Enumerators
 		private IEnumerable<MidiChordDef> MidiChordDefs

@@ -79,8 +79,7 @@ namespace Moritz.Algorithm.Tombeau1
 			#endregion main comments
 			/**********************************************/
 			Seq mainSeq;
-			/*** Create the main seq here. ***/
-			#region alternative 2: Trks construction (from palette)
+
 			List<Trk> trks = new List<Trk>();
 			#region system 1
 			for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
@@ -112,18 +111,18 @@ namespace Moritz.Algorithm.Tombeau1
 			//seq2.Trks[0].UniqueDefs.Insert(0, new ClefChangeDef("b", seq2.Trks[0].UniqueDefs[0]));
 			//seq2.Trks[6].UniqueDefs.Insert(2, new ClefChangeDef("b", seq2.Trks[6].UniqueDefs[2]));
 
-			//// Seqs can be warped...
-			//List<double> warp = new List<double>() { 0, 1 };
-			//system1.WarpDurations(warp);
+			//// Sequences can be warped...
+			List<double> warp = new List<double>() { 0, 0.1, 0.3, 0.6, 1 };
+			system1.ToSequence();
+			system1.WarpDurations(warp);
 
-			mainSeq = system1;
+			mainSeq = system1.Clone();
 			mainSeq.Concat(system2);
 			mainSeq.Concat(system3);
-			#endregion alternative 2: Trks construction (from palette)
 
 			/**********************************************/
 
-			List<VoiceDef> voiceDefs = GetVoiceDefs(mainSeq); // virtual function in CompositionAlgorithm.cs
+			List<VoiceDef> voiceDefs = mainSeq.ToSequence();
 
 			#region set barlines
 			List<int> barlineEndMsPositions = new List<int>();
