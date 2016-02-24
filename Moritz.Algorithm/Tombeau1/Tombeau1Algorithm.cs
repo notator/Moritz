@@ -64,17 +64,13 @@ namespace Moritz.Algorithm.Tombeau1
 			Seqs can be superimposed, juxtaposed, repeated and re-ordered.
 			
 			Chords:
-			1. Think Boulez' chord addition: Starting with any chord in system 1 of alternative 1 (below), add the
-			   intervals of any other chord (or the same chord) in the system to each of the pitches in the original
-			   chord. Remove any duplicate pitches -- which one probably depends on the velocities of the duplicates
-			   (to be worked out later) -- and re-order the pitches (in ascending order).
-			2. Study 1 chords can have holes... 
-			3. Velocity gradients in Study 1 chords: bottom->top (="consonant") --> top->bottom (="dissonant")...
-			4. Chord pitch transposition is allowed (but not ad. lib. transposition of the pitches inside the chord)...
-			5. Chord velocity transposition is allowed (but not ad. lib. transposition of the velocities inside the chord)...
-			6. "Chords are colour" (Stockhausen)
-			7. If a chord is added to the pitch of a root chord, then its root should have the velocity of that pitch...
-						
+			1. "Chords are colour" (Stockhausen)
+			2. Boulez' chord addition has been implemented in the function MidiChordDef.AddNotes(MidiChordDef).
+			3. Chord pitch transposition has already been implemented in the function MidiChordDef.Transpose(MidiChordDef),
+			   but it contains known bugs. Chord velocity transposition should be implemented analogously.
+			4. Chords can have holes... Do I need filters? Maybe a MidiChordDef.SubtractNotes(...) function? 
+			5. Velocity gradients in the root chords of additions: bottom->top (="consonant") --> top->bottom (="dissonant")...
+			
 			*********************************************************************************************/
 			#endregion main comments
 			/**********************************************/
@@ -112,7 +108,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 				MidiChordDef sum = (MidiChordDef) mcd1.Clone();
 				sum.Lyric = "sum";
-				sum.Add(mcd2);
+				sum.AddNotes(mcd2);
 
 				trk.Add(sum);
 
