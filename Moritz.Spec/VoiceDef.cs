@@ -69,7 +69,7 @@ namespace Moritz.Spec
             {
                 if(i < 0 || i >= _uniqueDefs.Count)
                 {
-                    throw new IndexOutOfRangeException();
+					Debug.Assert(false, "Index out of range");
                 }
                 return _uniqueDefs[i];
             }
@@ -77,8 +77,8 @@ namespace Moritz.Spec
             {
                 if(i < 0 || i >= _uniqueDefs.Count)
                 {
-                    throw new IndexOutOfRangeException();
-                }
+					Debug.Assert(false, "Index out of range");
+				}
                 _uniqueDefs[i] = value;
                 SetMsPositions();
             }

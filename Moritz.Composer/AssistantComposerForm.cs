@@ -1872,7 +1872,7 @@ namespace Moritz.Composer
                 WriteKrystals(w);
                 WritePalettes(w);
                 w.WriteEndElement(); // closes the moritzKrystalScore element
-                w.Close(); // close unnecessary because of the using statement?
+				// the XmlWriter is closed automatically at the end of this using clause.
             }
             #endregion do the save
         }
