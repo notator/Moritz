@@ -275,7 +275,6 @@ namespace Moritz.Spec
 		/// Negative interval values transpose down.
 		/// It is not an error if Midi values would exceed the range 0..127.
 		/// In this case, they are silently coerced to 0 or 127 respectively.
-		/// ACHTUNG: If both SetVerticalDensity() and this function are to be used, use SetVerticalDensity() first!
 		/// </summary>
 		public void Transpose(int interval)
         {
@@ -349,11 +348,34 @@ namespace Moritz.Spec
         #endregion IUniqueSplittableChordDef
         #endregion
 
+		/// <summary>
+		/// Notes are removed if their velocities become zero.
+		/// An assertion fails if the chord subsequently has no notes.
+		/// </summary>
+		/// <param name="factor"></param>
         public void AdjustVelocities(double factor)
         {
-            byte newVelocity = M.MidiValue((int)(MidiVelocity * factor));
-            MidiVelocity = newVelocity;
-        }
+			foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+			{
+				for(int i = 0; i < bmcd.Velocities.Count; ++i)
+				{
+					byte velocity = M.MidiValue((int)Math.Ceiling((bmcd.Velocities[i] * factor)));
+					bmcd.Velocities[i] = velocity;
+				}
+				for(int i = bmcd.Velocities.Count - 1; i >= 0; --i)
+				{
+					if(bmcd.Velocities[i] == 0)
+					{
+						bmcd.Pitches.RemoveAt(i);
+						bmcd.Velocities.RemoveAt(i);
+					}
+				}
+
+				Debug.Assert(bmcd.Pitches.Count > 0);
+
+				NotatedMidiPitches = new List<byte>(BasicMidiChordDefs[0].Pitches);
+			}
+		}
 
         public void AdjustExpression(double factor)
         {
@@ -704,15 +726,9 @@ namespace Moritz.Spec
 
                 if(value != BasicMidiChordDefs[0].Velocities[0])
                 {
-                    double factor = (((double)value) / ((double)BasicMidiChordDefs[0].Velocities[0]));
-                    foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
-                    {
-                        for(int i = 0; i < bmcd.Velocities.Count; ++i)
-                        {
-                            bmcd.Velocities[i] = M.MidiValue((int)((double)bmcd.Velocities[i] * factor));
-                        }
-                    }
-                }
+                    double factor = (((double)value) / BasicMidiChordDefs[0].Velocities[0]);
+					AdjustVelocities(factor);
+				}
             }
         }
 
