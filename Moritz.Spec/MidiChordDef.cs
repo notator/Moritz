@@ -46,7 +46,7 @@ namespace Moritz.Spec
             _msDuration = msDuration;
             _pitchWheelDeviation = pitchWheelDeviation;
             _hasChordOff = hasChordOff;
-            _displayedMidiPitches = midiPitches;
+            _notatedMidiPitches = midiPitches;
             // midiVelocities are handled via the basicMidiChordDefs
             _lyric = null;
             _ornamentNumberSymbol = ornamentNumberSymbol;
@@ -74,7 +74,7 @@ namespace Moritz.Spec
             _hasChordOff = hasChordOff;
             _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 
-            _displayedMidiPitches = pitches;
+            _notatedMidiPitches = pitches;
             // midiVelocity is handled via the BasicMidiChordDefs
             _ornamentNumberSymbol = 0;
 
@@ -116,8 +116,8 @@ namespace Moritz.Spec
             rval.PitchWheelDeviation = this.PitchWheelDeviation;
             rval.HasChordOff = this.HasChordOff;
             rval.Lyric = this.Lyric;
-            rval.MinimumBasicMidiChordMsDuration = this.MinimumBasicMidiChordMsDuration; // required when changing a midiChord's duration
-            rval.NotatedMidiPitches = new List<byte>(this.NotatedMidiPitches); // the displayed noteheads
+            rval.MinimumBasicMidiChordMsDuration = MinimumBasicMidiChordMsDuration; // required when changing a midiChord's duration
+            rval.NotatedMidiPitches = new List<byte>(_notatedMidiPitches); // the displayed noteheads
             // rval.MidiVelocity must be set after setting BasicMidiChordDefs See below.
             rval.OrnamentNumberSymbol = this.OrnamentNumberSymbol; // the displayed ornament number
 
@@ -206,7 +206,7 @@ namespace Moritz.Spec
 				bmcd.Velocities = newVelocities;
 			}
 
-			NotatedMidiPitches = new List<byte>(BasicMidiChordDefs[0].Pitches);
+			_notatedMidiPitches = new List<byte>(BasicMidiChordDefs[0].Pitches);
 
 			return this; // this function can be chained
 		}
@@ -275,26 +275,120 @@ namespace Moritz.Spec
 		/// Negative interval values transpose down.
 		/// It is not an error if Midi values would exceed the range 0..127.
 		/// In this case, they are silently coerced to 0 or 127 respectively.
+		/// Duplicate 0 and 127 pitches are removed.
 		/// </summary>
 		public void Transpose(int interval)
         {
-            for(int i = 0; i < _displayedMidiPitches.Count; ++i)
-            {
-                int newValue = _displayedMidiPitches[i] + interval;
-                _displayedMidiPitches[i] = M.MidiValue(_displayedMidiPitches[i] + interval);
-            }
-            _displayedMidiPitches = ReduceList(_displayedMidiPitches); // remove duplicate 0s and 127s
-
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
-                List<byte> notes = bmcd.Pitches;
-                for(int i = 0; i < notes.Count; ++i)
+				List<byte> pitches = bmcd.Pitches;
+				List<byte> velocities = bmcd.Velocities;
+				Debug.Assert(pitches.Count == velocities.Count);
+
+				for(int i = 0; i < pitches.Count; ++i)
                 {
-                    notes[i] = M.MidiValue(notes[i] + interval); // remove duplicate 0s and 127s
+                    pitches[i] = M.MidiValue(pitches[i] + interval);
 				}
-                bmcd.Pitches = ReduceList(notes);
+				#region remove duplicate 0 and 127 pitches
+				bool found0 = false;
+				bool found127 = false;
+				for(int i = pitches.Count - 1; i >= 0; --i )
+				{
+					if(pitches[i] == 0)
+					{
+						if(found0 == true)
+						{
+							pitches.RemoveAt(i);
+							velocities.RemoveAt(i);
+						}
+						found0 = true;
+					}
+					if(pitches[i] == 127)
+					{
+						if(found127 == true)
+						{
+							pitches.RemoveAt(i);
+							velocities.RemoveAt(i);
+						}
+						found127 = true;
+					}
+				}
+				#endregion
             }
+			_notatedMidiPitches = new List<byte>(BasicMidiChordDefs[0].Pitches);
         }
+
+		/// <summary>
+		/// Calls Transpose(interval).
+		/// Gets BasicMidiChordDefs[0].Pitches[0].
+		/// Sets BasicMidiChordDefs[0].Pitches[0] to value, transposing the other pitches accordingly.
+		/// </summary>
+		public byte MidiBasePitch
+		{
+			get { return BasicMidiChordDefs[0].Pitches[0]; }
+			set
+			{
+				Debug.Assert(BasicMidiChordDefs != null && BasicMidiChordDefs.Count > 0
+					&& BasicMidiChordDefs[0].Pitches != null && BasicMidiChordDefs[0].Pitches.Count > 0);
+
+				if(value != BasicMidiChordDefs[0].Velocities[0])
+				{
+					int interval = value - BasicMidiChordDefs[0].Velocities[0];
+					Transpose(interval);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Notes are removed if their velocities become zero.
+		/// An assertion fails if the chord subsequently has no notes.
+		/// </summary>
+		/// <param name="factor"></param>
+		public void AdjustVelocities(double factor)
+		{
+			foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+			{
+				for(int i = 0; i < bmcd.Velocities.Count; ++i)
+				{
+					byte velocity = M.MidiValue((int)Math.Ceiling((bmcd.Velocities[i] * factor)));
+					bmcd.Velocities[i] = velocity;
+				}
+				for(int i = bmcd.Velocities.Count - 1; i >= 0; --i)
+				{
+					if(bmcd.Velocities[i] == 0)
+					{
+						bmcd.Pitches.RemoveAt(i);
+						bmcd.Velocities.RemoveAt(i);
+					}
+				}
+
+				Debug.Assert(bmcd.Pitches.Count > 0);
+
+				_notatedMidiPitches = new List<byte>(BasicMidiChordDefs[0].Pitches);
+			}
+		}
+
+		/// <summary>
+		/// Calls AdjustVelocities(factor).
+		/// The MidiVelocity field is used when displaying dynamics in the score.
+		/// Gets basicMidichordDefs[0].Velocities[0].
+		/// Sets BasicMidiChordDefs[0].Velocities[0] to value, and the other velocities so that the original proportions are kept.
+		/// </summary>
+		public byte MidiVelocity
+		{
+			get { return BasicMidiChordDefs[0].Velocities[0]; }
+			set
+			{
+				Debug.Assert(BasicMidiChordDefs != null && BasicMidiChordDefs.Count > 0
+					&& BasicMidiChordDefs[0].Velocities != null && BasicMidiChordDefs[0].Velocities.Count > 0);
+
+				if(value != BasicMidiChordDefs[0].Velocities[0])
+				{
+					double factor = (((double)value) / BasicMidiChordDefs[0].Velocities[0]);
+					AdjustVelocities(factor);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Sets the number of pitches in the NotatedMidiPitches and BasicMidiChordDefs to chordDensity, by
@@ -308,16 +402,16 @@ namespace Moritz.Spec
 		public void SetVerticalDensity(int chordDensity)
 		{
 			#region require
-			Debug.Assert(chordDensity <= NotatedMidiPitches.Count); // if its equal, do nothing
+			Debug.Assert(chordDensity <= _notatedMidiPitches.Count); // if its equal, do nothing
 			foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
 			{
-				Debug.Assert(NotatedMidiPitches.Count == bmcd.Pitches.Count && bmcd.Pitches.Count == bmcd.Velocities.Count);
+				Debug.Assert(_notatedMidiPitches.Count == bmcd.Pitches.Count && bmcd.Pitches.Count == bmcd.Velocities.Count);
 			}
 			#endregion require
 
-			if(chordDensity < NotatedMidiPitches.Count) // if its equal, do nothing
+			if(chordDensity < _notatedMidiPitches.Count) // if its equal, do nothing
 			{
-				NotatedMidiPitches.RemoveRange(chordDensity, NotatedMidiPitches.Count - chordDensity);
+				_notatedMidiPitches.RemoveRange(chordDensity, _notatedMidiPitches.Count - chordDensity);
 				foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
 				{
 					List<byte> pitches = bmcd.Pitches;
@@ -347,35 +441,6 @@ namespace Moritz.Spec
         #endregion IUniqueChordDef
         #endregion IUniqueSplittableChordDef
         #endregion
-
-		/// <summary>
-		/// Notes are removed if their velocities become zero.
-		/// An assertion fails if the chord subsequently has no notes.
-		/// </summary>
-		/// <param name="factor"></param>
-        public void AdjustVelocities(double factor)
-        {
-			foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
-			{
-				for(int i = 0; i < bmcd.Velocities.Count; ++i)
-				{
-					byte velocity = M.MidiValue((int)Math.Ceiling((bmcd.Velocities[i] * factor)));
-					bmcd.Velocities[i] = velocity;
-				}
-				for(int i = bmcd.Velocities.Count - 1; i >= 0; --i)
-				{
-					if(bmcd.Velocities[i] == 0)
-					{
-						bmcd.Pitches.RemoveAt(i);
-						bmcd.Velocities.RemoveAt(i);
-					}
-				}
-
-				Debug.Assert(bmcd.Pitches.Count > 0);
-
-				NotatedMidiPitches = new List<byte>(BasicMidiChordDefs[0].Pitches);
-			}
-		}
 
         public void AdjustExpression(double factor)
         {
@@ -436,25 +501,6 @@ namespace Moritz.Spec
             {
                 pitchWheels[i] = M.MidiValue((int)(pitchWheels[i] * factor));
             }
-        }
-
-        /// <summary>
-        /// Returns a list which is ascending order, and in which duplicate values have been removed,
-        /// </summary>
-        private List<byte> ReduceList(List<byte> list)
-        {
-            List<byte> reducedList = new List<byte>();
-            for(int i = 0; i < list.Count; ++i)
-            {
-                if(!reducedList.Contains(list[i]))
-				{
-					reducedList.Add(list[i]);
-                }
-            }
-
-            reducedList.Sort();
-
-            return reducedList;
         }
 
         /// <summary>
@@ -697,40 +743,19 @@ namespace Moritz.Spec
         private int _minimumBasicMidiChordMsDuration = 1;
         /// <summary>
         /// This MidiPitches field is used when displaying the chord's noteheads.
-        /// The performed pitches are set in the BasicMidiChordDefs.
+        /// Setting this field does not set the performed pitches in the BasicMidiChordDefs.
         /// </summary>
         public List<byte> NotatedMidiPitches
         { 
-            get { return _displayedMidiPitches; } 
+            get { return _notatedMidiPitches; } 
             set 
             {
                 foreach(byte pitch in value)
-                    Debug.Assert(pitch == M.MidiValue((int)pitch));
-                _displayedMidiPitches = value; 
+                    Debug.Assert(pitch == M.MidiValue(pitch));
+                _notatedMidiPitches = value; 
             } 
         }
-        private List<byte> _displayedMidiPitches = null;
-        /// <summary>
-        /// The MidiVelocity field is used when displaying dynamics in the score.
-        /// Gets basicMidichordDefs[0].Velocities[0].
-        /// Sets BasicMidiChordDefs[0].Velocities[0] to value, and the other velocities so that the original proportions are kept.
-        /// ( see also: AdjustVelocities(double factor) )
-        /// </summary>
-        public byte MidiVelocity
-        {
-            get { return BasicMidiChordDefs[0].Velocities[0]; }
-            set
-            {
-                Debug.Assert(BasicMidiChordDefs != null && BasicMidiChordDefs.Count > 0
-                    && BasicMidiChordDefs[0].Velocities != null && BasicMidiChordDefs[0].Velocities.Count > 0);
-
-                if(value != BasicMidiChordDefs[0].Velocities[0])
-                {
-                    double factor = (((double)value) / BasicMidiChordDefs[0].Velocities[0]);
-					AdjustVelocities(factor);
-				}
-            }
-        }
+        private List<byte> _notatedMidiPitches = null;
 
         public int OrnamentNumberSymbol { get { return _ornamentNumberSymbol; } set { _ornamentNumberSymbol = value; } }
         private int _ornamentNumberSymbol = 0;
