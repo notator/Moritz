@@ -149,6 +149,21 @@ namespace Moritz.Spec
         }
 
 		/// <summary>
+		/// Boulez Addition:
+		/// Adds the intervals in mcd2's first BasicMidiChordDef above each of this MidiChordDef.BasicMidiChordDefs
+		/// Velocities in this MidiChordDef are preserved.
+		/// The velocities of added pitches are transposed to the velocity of the root pitch.
+		/// A pitch is only added if there is no equal pitch already present, and the new pitch's velocity is greater than zero.
+		/// When the BasicMidiChordDefs are complete, this MidiChordDef's NotatedMidiPitches are set to the pitches in
+		/// the first BasicMidiChordDef.
+		/// </summary>
+		/// <param name="mcd2"></param>
+		public MidiChordDef Add(MidiChordDef mcd2)
+		{
+			return this; // this function can be chained
+		}
+
+		/// <summary>
 		/// Returns null if listToClone is null, otherwise returns a clone of the listToClone.
 		/// </summary>
 		/// <param name="listToClone"></param>

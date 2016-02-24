@@ -140,9 +140,15 @@ namespace Moritz.Spec
         public abstract void Add(IUniqueDef iUniqueDef);
         protected void _Add(IUniqueDef iUniqueDef)
         {
-            Debug.Assert(_uniqueDefs.Count > 0);
-            IUniqueDef lastIud = _uniqueDefs[_uniqueDefs.Count - 1];
-            iUniqueDef.MsPosition = lastIud.MsPosition + lastIud.MsDuration;
+			if(_uniqueDefs.Count > 0)
+			{
+				IUniqueDef lastIud = _uniqueDefs[_uniqueDefs.Count - 1];
+				iUniqueDef.MsPosition = lastIud.MsPosition + lastIud.MsDuration;
+			}
+			else
+			{
+				iUniqueDef.MsPosition = 0;
+			}
             _uniqueDefs.Add(iUniqueDef);
         }
         protected void _AddRange(VoiceDef voiceDef)

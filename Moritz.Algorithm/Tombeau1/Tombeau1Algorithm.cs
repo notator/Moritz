@@ -80,55 +80,80 @@ namespace Moritz.Algorithm.Tombeau1
 			/**********************************************/
 			Seq mainSeq;
 
-			List<Trk> trks = new List<Trk>();
 			#region system 1
+			List<Trk> sys1Trks = new List<Trk>();
 			for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
 			{
 				int chordDensity = 8 - i;
-				List<IUniqueDef> mcds = PaletteMidiChordDefs(0);
-				for(int j = 0; j < mcds.Count; ++j)
+				List<IUniqueDef> sys1mcds = PaletteMidiChordDefs(0);
+				for(int j = 0; j < sys1mcds.Count; ++j)
 				{
-					MidiChordDef mcd = mcds[j] as MidiChordDef;
-					mcd.SetVerticalDensity(chordDensity);
+					MidiChordDef mcd = sys1mcds[j] as MidiChordDef;
 					mcd.Lyric = (j).ToString() + "." + chordDensity.ToString();
-				}
-				Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], mcds);
-				trks.Add(trk);
-			}
 
-			Seq system1 = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
+					mcd.SetVerticalDensity(chordDensity);
+				}
+				Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], sys1mcds);
+				sys1Trks.Add(trk);
+			}
+			Seq system1Seq = new Seq(0, sys1Trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
 			#endregion system 1
 
 			#region  system 2
-			Seq system2 = system1.Clone();  //seq2.MsPosition = 0;
+			List<Trk> sys2Trks = new List<Trk>();
+			int startIndex = 2;
+			for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
+			{
+				Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], new List<IUniqueDef>());
+				MidiChordDef mcd1 = (MidiChordDef)sys1Trks[5][startIndex].Clone();
+				trk.Add(mcd1);
+				MidiChordDef mcd2 = (MidiChordDef)sys1Trks[5][startIndex + 1].Clone();
+				trk.Add(mcd2);
+
+				MidiChordDef sum = (MidiChordDef) mcd1.Clone();
+				sum.Lyric = "sum";
+				sum.Add(mcd2);
+
+				trk.Add(sum);
+
+				RestDef rest = new RestDef(0, system1Seq.MsDuration - trk.EndMsPosition);
+				trk.Add(rest);
+
+				sys2Trks.Add(trk);
+
+				startIndex++;
+			}
+			Seq system2Seq = new Seq(0, sys2Trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
 			#endregion  system 2
 
 			#region  system 3
-			Seq system3 = system1.Clone();
+			// Blocks can be warped...
+			List<double> warp = new List<double>() { 0, 0.1, 0.3, 0.6, 1 };
+			Block system3Block = new Block(system1Seq.Clone());
+			system3Block.WarpDurations(warp);
 			#endregion  system 3
 
 			// Add clef changes here
-			//seq2.Trks[0].UniqueDefs.Insert(0, new ClefChangeDef("b", seq2.Trks[0].UniqueDefs[0]));
+			// system1Seq.Trks[0].UniqueDefs.Insert(0, new ClefChangeDef("b", system1Seq.Trks[0].UniqueDefs[0]));
+			system3Block.Trks[0].UniqueDefs.Insert(0, new ClefChangeDef("b", system3Block.Trks[0].UniqueDefs[0]));
 			//seq2.Trks[6].UniqueDefs.Insert(2, new ClefChangeDef("b", seq2.Trks[6].UniqueDefs[2]));
 
-			//// Sequences can be warped...
-			List<double> warp = new List<double>() { 0, 0.1, 0.3, 0.6, 1 };
-			system1.ToSequence();
-			system1.WarpDurations(warp);
+			mainSeq = system1Seq.Clone();
+			mainSeq.Concat(system2Seq);
+			mainSeq.Concat(system3Block);
 
-			mainSeq = system1.Clone();
-			mainSeq.Concat(system2);
-			mainSeq.Concat(system3);
+			// Blocks expose a list of VoiceDefs
+			Block mainSequence = new Block(mainSeq); // converts mainSeq to a block
 
 			/**********************************************/
 
-			List<VoiceDef> voiceDefs = mainSeq.ToSequence();
+			List<VoiceDef> voiceDefs = mainSequence.VoiceDefs;
 
 			#region set barlines
 			List<int> barlineEndMsPositions = new List<int>();
-			barlineEndMsPositions.Add(system1.MsDuration);
-			barlineEndMsPositions.Add(system1.MsDuration + system2.MsDuration);
-			barlineEndMsPositions.Add(system1.MsDuration + system2.MsDuration + system3.MsDuration);
+			barlineEndMsPositions.Add(system1Seq.MsDuration);
+			barlineEndMsPositions.Add(system1Seq.MsDuration + system2Seq.MsDuration);
+			barlineEndMsPositions.Add(system1Seq.MsDuration + system2Seq.MsDuration + system3Block.MsDuration);
 			#endregion set barlines
 
 			List<List<VoiceDef>> bars = CreateBars(voiceDefs, barlineEndMsPositions);
