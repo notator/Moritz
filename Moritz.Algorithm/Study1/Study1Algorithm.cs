@@ -162,17 +162,16 @@ namespace Moritz.Algorithm.Study1
 		List<byte> GetChordVelocities()
 		{
 			List<byte> velocities = new List<byte>();
-			byte minVelocity = 22;
-			byte maxVelocity = 127;
-			byte velocityDiff = (byte)Math.Round((double)(maxVelocity - minVelocity) / 7);
-			byte velocity = 22;
-			for(int chordNum = 0; chordNum < 8; ++chordNum)
-			{
-				Debug.Assert(velocity <= 127);
-				velocities.Add(velocity);
-				velocity += velocityDiff;
-			}
-			velocities.Reverse();
+			// velocities from the original composition (see About Study 1)
+			velocities.Add(127);
+			velocities.Add(103);
+			velocities.Add(84);
+			velocities.Add(67);
+			velocities.Add(55);
+			velocities.Add(44);
+			velocities.Add(36);
+			velocities.Add(29);
+
 			return velocities;
 		}
 
