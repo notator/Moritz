@@ -10,12 +10,18 @@ namespace Moritz.Algorithm.SongSix
 {
     internal class Furies4 : Trk
     {
-        internal Furies4(int midiChannel, int msDuration)
-            : base(midiChannel, msDuration)
+		/// <summary>
+		/// A VoiceDef beginning at MsPosition = 0, and containing a single RestDef having msDuration
+		/// </summary>
+		/// <param name="msDuration"></param>
+		internal Furies4(int midiChannel, int msDuration)
+			: base(midiChannel)
         {
-        }
+			RestDef lmRestDef = new RestDef(0, msDuration);
+			_uniqueDefs.Add(lmRestDef);
+		}
 
-        internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, Trk wind1, List<Palette> palettes)
+		internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, Trk wind1, List<Palette> palettes)
         {
             GetSnores(firstRestMsDuration, clytemnestra, wind1, palettes[1]);
             AddGrowlsToInterlude2AndVerse3(clytemnestra, palettes[3]);

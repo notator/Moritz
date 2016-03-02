@@ -523,9 +523,10 @@ namespace Moritz.Spec
             _uniqueDefs.RemoveAt(index);
         }
 
-        #endregion Count changers
+		#endregion Count changers
 
-        #region public properties
+		#region public properties
+		private int _msPosition = 0;
         /// <summary>
         /// The absolute position of the first note or rest in the sequence.
         /// Setting this value resets the MsPositions of all the IUniqueDefs in this VoiceDef,
@@ -535,13 +536,12 @@ namespace Moritz.Spec
         { 
             get 
             { 
-                Debug.Assert(_uniqueDefs.Count > 0);
-                return _uniqueDefs[0].MsPosition;
+                return _msPosition;
             }
             set
             {
-                Debug.Assert(_uniqueDefs.Count > 0);
-                _uniqueDefs[0].MsPosition = value;
+				Debug.Assert(value >= 0);
+				_msPosition = value;
                 SetMsPositions();
             } 
         }
@@ -605,20 +605,21 @@ namespace Moritz.Spec
 		{
 			get
 			{
-				int endPosition = 0;
+				int endPosition = MsPosition; // MsPosition is the start of the VoiceDef
 				if(_uniqueDefs.Count > 0)
 				{
 					IUniqueDef lastIUD = _uniqueDefs[_uniqueDefs.Count - 1];
-					endPosition = lastIUD.MsPosition + lastIUD.MsDuration;
+					endPosition += (lastIUD.MsPosition + lastIUD.MsDuration);
 				}
 				return endPosition;
 			}
 			set
 			{
 				Debug.Assert(_uniqueDefs.Count > 0);
+				Debug.Assert(value > EndMsPosition);
+
 				IUniqueDef lastLmdd = _uniqueDefs[_uniqueDefs.Count - 1];
-				Debug.Assert(value > lastLmdd.MsPosition);
-				lastLmdd.MsDuration = value - lastLmdd.MsPosition;
+				lastLmdd.MsDuration = value - EndMsPosition;
 			}
 		}
 		public int Count { get { return _uniqueDefs.Count; } }
@@ -833,15 +834,14 @@ namespace Moritz.Spec
         #region protected
         /// <summary>
         /// Sets the MsPosition attribute of each IUniqueDef in the _uniqueDefs list.
-        /// Uses all the MsDuration attributes, and the MsPosition of the first IUniqueDef as origin.
+        /// Uses all the MsDuration attributes, and _msPosition as origin.
         /// This function must be called at the end of any function that changes the _uniqueDefs list.
         /// </summary>
         protected void SetMsPositions()
         {
             if(_uniqueDefs.Count > 0)
             {
-                int currentPosition = _uniqueDefs[0].MsPosition;
-                Debug.Assert(currentPosition >= 0);
+                int currentPosition = _msPosition;
                 foreach(IUniqueDef umcd in _uniqueDefs)
                 {
                     umcd.MsPosition = currentPosition;

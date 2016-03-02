@@ -51,6 +51,7 @@
     <Compile Include="Song Six\FuriesInterlude3ToEnd.cs" />
     <Compile Include="Song Six\SongSixAlgorithm.cs" />
     <Compile Include="Song Six\Winds.cs" />
+    <Compile Include="Study1\Study1Algorithm.cs" />
     <Compile Include="Tombeau1\Tombeau1Algorithm.cs" />
     <Compile Include="Study2c3_1\Study2c3_1Algorithm.cs" />
     <Compile Include="Study3 sketch 1\Study3Sketch1Algorithm.cs" />

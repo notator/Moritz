@@ -3,11 +3,12 @@ using System.Windows.Forms;
 using Moritz.Symbols;
 using Moritz.Algorithm;
 using Moritz.Algorithm.PaletteDemo;
+using Moritz.Algorithm.PianolaMusic;
+using Moritz.Algorithm.Study1;
 using Moritz.Algorithm.Study2c3_1;
-using Moritz.Algorithm.SongSix;
 using Moritz.Algorithm.Study3Sketch1;
 using Moritz.Algorithm.Study3Sketch2;
-using Moritz.Algorithm.PianolaMusic;
+using Moritz.Algorithm.SongSix;
 using Moritz.Algorithm.Tombeau1;
 
 namespace Moritz.Composer
@@ -36,20 +37,23 @@ namespace Moritz.Composer
                 case "paletteDemo":
                     algorithm = new PaletteDemoAlgorithm();
                     break;
-                case "Song Six":
-                    algorithm = new SongSixAlgorithm();
-                    break;
-                case "Study 2c3.1":
-                    algorithm = new Study2c3_1Algorithm();
-                    break;                
-                case "Study 3 sketch 1":
+				case "Pianola Music":
+					algorithm = new PianolaMusicAlgorithm();
+					break;
+				case "Study 1":
+					algorithm = new Study1Algorithm();
+					break;
+				case "Study 2c3.1":
+					algorithm = new Study2c3_1Algorithm();
+					break;
+				case "Study 3 sketch 1":
                     algorithm = new Study3Sketch1Algorithm();
                     break;
 				case "Study 3 sketch 2":
 					algorithm = new Study3Sketch2Algorithm();
 					break;
-				case "Pianola Music":
-					algorithm = new PianolaMusicAlgorithm();
+				case "Song Six":
+					algorithm = new SongSixAlgorithm();
 					break;
 				case "Tombeau 1":
 					algorithm = new Tombeau1Algorithm();

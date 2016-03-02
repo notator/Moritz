@@ -307,6 +307,7 @@ namespace Moritz.Composer
             foreach(List<VoiceDef> barVoiceDefs in barDefsInOneSystem)
             {
                 SvgSystem system = new SvgSystem(this);
+				system.MsPosition = barVoiceDefs[0].MsPosition;
                 this.Systems.Add(system);
             }
 

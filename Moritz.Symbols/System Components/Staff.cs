@@ -758,7 +758,7 @@ namespace Moritz.Symbols
                              "Symbol.MsPosition must be set before calling this funcion!");
                         if(!dict.ContainsKey(symbol.MsPosition))
                         {
-                            dict.Add(symbol.MsPosition, new NoteObjectMoment(symbol));
+                            dict.Add(symbol.MsPosition, new NoteObjectMoment(SVGSystem.MsPosition, symbol));
                         }
                         else
                         {

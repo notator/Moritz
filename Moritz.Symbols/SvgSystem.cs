@@ -141,7 +141,7 @@ namespace Moritz.Symbols
 
             MoveClefsAndBarlines(pageFormat.StafflineStemStrokeWidth);
 
-            List<NoteObjectMoment> moments = this.MomentSymbols();
+            List<NoteObjectMoment> moments = MomentSymbols();
 
             // barlineWidths:  Key is a moment's msPosition. Value is the distance between the left edge 
             // of the barline and the AlignmentX of the moment which immediately follows it.
@@ -158,10 +158,10 @@ namespace Moritz.Symbols
             symbolSet.AdjustRestsVertically(Staves);
             symbolSet.SetBeamedStemLengths(Staves); // see the comment next to the function
 
-            bool success = JustifyHorizontally(moments, barlineWidths, pageFormat.StafflineStemStrokeWidth);
-            if(success)
-            {
-                symbolSet.FinalizeBeamBlocks(Staves);
+			bool success = JustifyHorizontally(moments, barlineWidths, pageFormat.StafflineStemStrokeWidth);
+			if(success)
+			{
+				symbolSet.FinalizeBeamBlocks(Staves);
                 symbolSet.AlignLyrics(Staves);
                 SvgSystem nextSystem = null;
                 if(systemNumber < this.Score.Systems.Count)
@@ -180,18 +180,18 @@ namespace Moritz.Symbols
 				AlignStaffnamesInLeftMargin(leftMargin, pageFormat.Gap);
 
 				ResetStaffMetricsBoundaries();
-            }
-            else
-            {
-                string msg = 
-                    "There was not enough horizontal space for all the symbols in\n\n" +
-                    "                         system number " + systemNumber.ToString() + ".\n\n" +
-                    "Possible solutions:\n" +
-                    "    Reduce the number of bars in the system.\n" +
-                    "    Set a smaller gap size for the score.";
-                MessageBox.Show(msg, "Problem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-            return success;
+			}
+			else
+			{
+				string msg =
+					"There was not enough horizontal space for all the symbols in\n\n" +
+					"                         system number " + systemNumber.ToString() + ".\n\n" +
+					"Possible solutions:\n" +
+					"    Reduce the number of bars in the system.\n" +
+					"    Set a smaller gap size for the score.";
+				MessageBox.Show(msg, "Problem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+			}
+			return success;
         }
 
         private float CreateMetrics(Graphics graphics, PageFormat pageFormat, float leftMarginPos)
@@ -318,7 +318,7 @@ namespace Moritz.Symbols
             }
         }
 
-        private Dictionary<int, float> JustifyLowerVoicesHorizontally(ref bool lowerVoiceMoved, 
+		private Dictionary<int, float> JustifyLowerVoicesHorizontally(ref bool lowerVoiceMoved, 
             List<NoteObjectMoment> systemMoments, Dictionary<int, float> barlineWidths,
             HashSet<int> nonCompressibleSystemMomentPositions, float hairline)
         {
@@ -372,7 +372,7 @@ namespace Moritz.Symbols
                         if(voiceNOM == null)
                         {
                             // noteObject in voice 1
-                            voiceNOM = new NoteObjectMoment(noteObject, systemNOM.MsPosition);
+                            voiceNOM = new NoteObjectMoment(noteObject, MsPosition + systemNOM.MsPosition);
                             voiceNOM.AlignmentX = systemNOM.AlignmentX;
                         }
                         else // noteObject in voice 2
@@ -401,7 +401,7 @@ namespace Moritz.Symbols
                         if(staffNOM == null)
                         {
                             // noteObject in voice 1
-                            staffNOM = new NoteObjectMoment(noteObject, systemNOM.MsPosition);
+                            staffNOM = new NoteObjectMoment(noteObject, MsPosition + systemNOM.MsPosition);
                             staffNOM.AlignmentX = systemNOM.AlignmentX;
                         }
                         else // noteObject in voice 2
@@ -461,6 +461,7 @@ namespace Moritz.Symbols
         /// <typeparam name="Type">DurationSymbol, ChordSymbol, RestSymbol</typeparam>
         private List<NoteObjectMoment> MomentSymbols()
         {
+			// The msPosition wrt the start of the piece.
             int finalBarlineMsPosition = FinalBarlineMsPosition();
 
             SortedDictionary<int, NoteObjectMoment> dict = new SortedDictionary<int, NoteObjectMoment>();
@@ -480,22 +481,24 @@ namespace Moritz.Symbols
                         DurationSymbol durationSymbol = noteObject as DurationSymbol;
                         if(durationSymbol != null)
                         {
-                            if(!dict.ContainsKey(durationSymbol.MsPosition))
+							int key = MsPosition + durationSymbol.MsPosition;
+
+							if(!dict.ContainsKey(key))
                             {
-                                dict.Add(durationSymbol.MsPosition, new NoteObjectMoment(durationSymbol));
+                                dict.Add(key, new NoteObjectMoment(MsPosition, durationSymbol));
                             }
                             else
                             {
-                                dict[durationSymbol.MsPosition].Add(durationSymbol);
+                                dict[key].Add(durationSymbol);
                             }
                             if(clef != null)
                             {
-                                dict[durationSymbol.MsPosition].Add(clef);
+                                dict[key].Add(clef);
                                 clef = null;
                             }
                             if(barline != null)
                             {
-                                dict[durationSymbol.MsPosition].Add(barline);
+                                dict[key].Add(barline);
                                 barline = null;
                             }
                         }
@@ -544,47 +547,10 @@ namespace Moritz.Symbols
 
         private int FinalBarlineMsPosition()
         {
-            int finalBarlineMsPosition = -1;
-            SvgScore score = this.Score;
-            int thisSystemIndex = -1;
-            for(int i = 0; i < score.Systems.Count; ++i)
-            {
-                if(score.Systems[i] == this)
-                {
-                    thisSystemIndex = i;
-                }
-            }
+			DurationSymbol finalDurationSymbol = Staves[0].Voices[0].FinalDurationSymbol;
+			int finalBarlineMsPosition = MsPosition + finalDurationSymbol.MsPosition + finalDurationSymbol.MsDuration;
 
-            Debug.Assert(thisSystemIndex >= 0);
-            if(thisSystemIndex < (score.Systems.Count - 1))
-            {
-                int nextSystemIndex = thisSystemIndex + 1;
-                Voice topVoiceInNextSystem = Score.Systems[nextSystemIndex].Staves[0].Voices[0];
-                foreach(NoteObject noteObject in topVoiceInNextSystem.NoteObjects)
-                {
-                    DurationSymbol durationSymbol = noteObject as DurationSymbol;
-                    if(durationSymbol != null)
-                    {
-                        finalBarlineMsPosition = durationSymbol.MsPosition;
-                        break;
-                    }
-                }
-            }
-            else
-            {   // the final system
-                List<NoteObject> noteObjects = this.Staves[0].Voices[0].NoteObjects;
-                for(int i = noteObjects.Count - 1; i >= 0; --i)
-                {
-                    DurationSymbol durationSymbol = noteObjects[i] as DurationSymbol;
-                    if(durationSymbol != null)
-                    {
-                        finalBarlineMsPosition = durationSymbol.MsPosition + durationSymbol.MsDuration;
-                        break;
-                    }
-                }
-            }
-
-            Debug.Assert(finalBarlineMsPosition > 0);
+			Debug.Assert(finalBarlineMsPosition > 0);
 
             return finalBarlineMsPosition;
         }
@@ -1192,9 +1158,11 @@ namespace Moritz.Symbols
             }
             return rval;
         }
-        #endregion
+		#endregion
 
-        public List<Staff> Staves = new List<Staff>();
+		public int MsPosition = 0;
+
+		public List<Staff> Staves = new List<Staff>();
         internal SystemMetrics Metrics = null;
 
         public SvgScore Score; // containing score

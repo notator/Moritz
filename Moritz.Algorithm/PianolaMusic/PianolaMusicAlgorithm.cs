@@ -190,19 +190,6 @@ namespace Moritz.Algorithm.PianolaMusic
 			return GetTrks(2, t3Pitches, 3, t4Pitches, durations);
 		}
 
-		private List<int> GetBarlineMsPositions(int totalDuration, int nBars)
-		{
-			int msPosition = 0;
-			int barlength = totalDuration / nBars;
-			List<int> barlineMsPositions = new List<int>();
-			for(int i = 0; i< nBars; ++i)
-			{
-				barlineMsPositions.Add(msPosition);
-				msPosition += barlength;
-			}
-			return barlineMsPositions;
-		}
-
 		private List<List<VoiceDef>> GetBars(List<Trk> trks, int nBars)
 		{
 			int barMsDuration = trks[0].EndMsPosition / nBars;

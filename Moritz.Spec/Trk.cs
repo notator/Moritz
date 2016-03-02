@@ -26,16 +26,6 @@ namespace Moritz.Spec
     {
         #region constructors
 
-        /// <summary>
-        /// A VoiceDef beginning at MsPosition = 0, and containing a single RestDef having msDuration
-        /// </summary>
-        /// <param name="msDuration"></param>
-        public Trk(int midiChannel, int msDuration)
-			: base(msDuration)
-        {
-			MidiChannel = midiChannel;
-        }
-
 		/// <summary>
 		/// <para>If the iuds argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
 		/// <para>The new VoiceDef's UniqueDefs list is simply set to the argument (which is not cloned).</para>
@@ -44,6 +34,25 @@ namespace Moritz.Spec
 			: base(iuds)
 		{
 			MidiChannel = midiChannel;
+		}
+
+		/// <summary>
+		/// A Trk having an empty UniqueDefs list.
+		/// </summary>
+		protected Trk(int midiChannel)
+			: this(midiChannel, new List<IUniqueDef>())
+		{
+
+		}
+
+		/// <summary>
+		/// A Trk having an empty UniqueDefs list beginning at MsPosition.
+		/// </summary>
+		public Trk(int midiChannel, int msPosition)
+			: this(midiChannel)
+		{
+			MidiChannel = midiChannel;
+			MsPosition = msPosition;
 		}
 
 		/// <summary>
@@ -77,9 +86,8 @@ namespace Moritz.Spec
 
         #region Count changers
         /// <summary>
-        /// Appends the new iUniqueDef to the end of the list.
+        /// Appends the new iUniqueDef to the end of the list. Automatically sets the iUniqueDef's msPosition.
         /// </summary>
-        /// <param name="iUniqueDef"></param>
         public override void Add(IUniqueDef iUniqueDef)
         {
             Debug.Assert(!(iUniqueDef is InputChordDef));

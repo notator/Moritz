@@ -14,9 +14,9 @@ namespace Moritz.Symbols
     /// </summary>
     public class NoteObjectMoment
     {
-        public NoteObjectMoment(DurationSymbol durationSymbol)
+        public NoteObjectMoment(int systemMsPosition, DurationSymbol durationSymbol)
         {
-            _msPosition = durationSymbol.MsPosition;
+            _msPosition = systemMsPosition + durationSymbol.MsPosition;
             AddNoteObject(durationSymbol);
         }
 
