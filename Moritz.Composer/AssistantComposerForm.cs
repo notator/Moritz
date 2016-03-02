@@ -1117,7 +1117,14 @@ namespace Moritz.Composer
             List<string> trimmedNames = new List<string>();
             foreach(string name in names)
             {
-                trimmedNames.Add(name.Trim());
+				if(name == " ")
+				{
+					trimmedNames.Add(" ");
+				}
+				else
+				{
+					trimmedNames.Add(name.Trim());
+				}
             }
             if(trimmedNames.Count == _numberOfStaves && _numberOfStaves > 0)
             {

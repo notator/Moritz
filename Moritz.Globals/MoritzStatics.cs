@@ -538,7 +538,7 @@ namespace Moritz.Globals
         }
         /// <summary>
         /// Converts a string containing strings separated by whitespace and the character in arg2
-        /// to a list of trimmed strings.
+        /// to a list of trimmed strings. A string containing a single space character will not be trimmed.
         /// </summary>
         public static List<string> StringToStringList(string s, char separator)
         {
@@ -548,7 +548,14 @@ namespace Moritz.Globals
             List<string> returnList = new List<string>();
             foreach(string a in strings)
             {
-                returnList.Add(a.Trim());
+				if(a == " ")
+				{
+					returnList.Add(" ");
+				}
+				else
+				{
+					returnList.Add(a.Trim());
+				}
             }
             return returnList;
         }
