@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 
 using Krystals4ObjectLibrary;
-using Moritz.Algorithm;
 using Moritz.Palettes;
 using Moritz.Spec;
-using Moritz.Globals;
 
 namespace Moritz.Algorithm.Study1
 {
-	public class Study1Algorithm : CompositionAlgorithm
+    public class Study1Algorithm : CompositionAlgorithm
 	{
 		public Study1Algorithm()
             : base()
@@ -50,7 +45,7 @@ namespace Moritz.Algorithm.Study1
 			int nLocalChords = 0;
 			// total number of chords is 1219
 			List<int> nChordsInSystemPerSystem = new List<int>();
-			for(int i = 0; i < numberOfBars - 1; ++i)
+			for(int i = 0; i < numberOfBars; ++i)
 			{
 				nChordsInSystemPerSystem.Add(18);
 				nLocalChords += 18;
@@ -61,10 +56,6 @@ namespace Moritz.Algorithm.Study1
 				nLocalChords -= 1;
 
 			}
-			Debug.Assert(nLocalChords < nChords);
-			int nChordsInLastSystem = nChords - nLocalChords;
-			nChordsInSystemPerSystem.Add(nChordsInLastSystem);
-			nLocalChords += nChordsInLastSystem;
 
 			Debug.Assert(nChordsInSystemPerSystem.Count == numberOfBars);
 			Debug.Assert(nLocalChords == nChords);
@@ -221,51 +212,6 @@ namespace Moritz.Algorithm.Study1
 			return bars;
 		}
 
-		private List<int> GetBarlineMsPositions(Trk track, List<int> nChordsPerSystem)
-		{
-			int msPosition = 0;
-			int chordIndex = 0;
-			List<int> barlineMsPositions = new List<int>();
-			barlineMsPositions.Add(msPosition);
-
-			foreach(int nChords in nChordsPerSystem)
-			{
-				for(int i = 0; i < nChords; ++i)
-				{
-					msPosition += track.UniqueDefs[chordIndex++].MsDuration;
-				}
-				barlineMsPositions.Add(msPosition);
-			}
-
-			return barlineMsPositions;
-		}
-
-		private List<List<VoiceDef>> OldGetBars(List<Trk> trks, int nBars)
-		{
-			int msPosition = 0;
-			List<int> barlineMsPositions = new List<int>();
-			for(int i = 0; i < nBars; ++i)
-			{
-				Trk bar = trks[i];
-				barlineMsPositions.Add(msPosition);
-				msPosition += bar.MsDuration;
-			}
-			barlineMsPositions.Add(msPosition);
-			// barlineMsPositions contains both msPos=0 and the position of the final barline
-
-			List<VoiceDef> voiceDefs = new List<VoiceDef>();
-			Trk oneTrk = new Trk(0, new List<IUniqueDef>());
-			voiceDefs.Add(oneTrk);
-			foreach(Trk trk in trks)
-			{
-				foreach(IUniqueDef iud in trk.UniqueDefs)
-				{
-					oneTrk.Add(iud);
-				}
-			}
-			List<List<VoiceDef>> bars = GetBarsFromBarlineMsPositions(voiceDefs, barlineMsPositions);
-			return bars;
-		}
 		/// <summary>
 		/// Splits the voices (currently in a single bar) into bars
 		/// barlineMsPositions contains both msPosition 0, and the position of the final barline.
