@@ -17,7 +17,7 @@ namespace Moritz.Symbols
         /// </summary>
         public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber)
         {
-            w.SvgStartGroup("outputStaff", "sys" + systemNumber.ToString() + "staff" + staffNumber.ToString());
+            w.SvgStartGroup("outputStaff");
 
             base.WriteSVG(w, true, systemNumber, staffNumber);
 
@@ -37,7 +37,7 @@ namespace Moritz.Symbols
         /// </summary>
         public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber)
         {
-            w.SvgStartGroup("outputStaff", "sys" + systemNumber.ToString() + "invisibleStaff" + staffNumber.ToString());
+            w.SvgStartGroup("outputStaff");
             w.WriteAttributeString("score", "invisible", null, "1");
 
 			int voiceNumber = 1;

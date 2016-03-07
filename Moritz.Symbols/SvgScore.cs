@@ -17,7 +17,6 @@ namespace Moritz.Symbols
         public SvgScore(string folder, string scoreTitleName, string keywords, string comment, PageFormat pageFormat)
         {
             _pageFormat = pageFormat;
-			_uniqueID_Number = 0;
             SetFilePathAndMetadata(folder, scoreTitleName, keywords, comment);
         }
 
@@ -874,12 +873,6 @@ namespace Moritz.Symbols
                 }
             }
         }
-
-        /// <summary>
-        /// This value is used to provide a unique id for objects in SVG files.
-        /// </summary>
-        public static string UniqueID_Number { get { return (++_uniqueID_Number).ToString(); } }
-        private static int _uniqueID_Number = 0;
 
 		public int PageCount { get { return _pages.Count; }}
         protected List<SvgPage> _pages = new List<SvgPage>();

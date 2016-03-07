@@ -182,16 +182,7 @@ namespace Moritz.Symbols
 		/// </summary>
 		public float Left { get { return _left; } }
 		protected float _left = 0F;
-		/// <summary>
-		/// The object's type (which will be used when writing it to the SVG file).
-		/// </summary>
-		public string ObjectType
-		{
-			get
-			{
-				return _objectType;
-			}
-		}
+
 		/// <summary>
 		/// The object's unicode value or type (used when writing cLicht characters to the SVG file).
 		/// </summary>
@@ -246,7 +237,7 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-			w.SvgLine("stem" + SvgScore.UniqueID_Number, _originX, _top, _originX, _bottom, "black", StrokeWidth, "round");
+			w.SvgLine(null, _originX, _top, _originX, _bottom, "black", StrokeWidth, "round");
 		}
 
 		public object Clone()
@@ -299,7 +290,7 @@ namespace Moritz.Symbols
 		{
 			foreach(float y in Ys)
 			{
-				w.SvgLine("ledger" + SvgScore.UniqueID_Number, _left + _strokeWidth, y, _right - _strokeWidth, y, "black", _strokeWidth, null);
+				w.SvgLine(null, _left + _strokeWidth, y, _right - _strokeWidth, y, "black", _strokeWidth, null);
 			}
 		}
 
@@ -378,7 +369,7 @@ namespace Moritz.Symbols
 		public override void WriteSVG(SvgWriter w)
 		{
 			if(_drawExtender)
-				w.SvgLine("extender" + SvgScore.UniqueID_Number, _left, _originY, _right, _originY, "black", _strokeWidth, "butt");
+				w.SvgLine(null, _left, _originY, _right, _originY, "black", _strokeWidth, "butt");
 		}
 
 		private readonly float _strokeWidth = 0F;
@@ -455,9 +446,9 @@ namespace Moritz.Symbols
 		public override void WriteSVG(SvgWriter w)
 		{
 			if(_stemDirection == VerticalDir.up)
-				w.SvgUseXY("flag" + SvgScore.UniqueID_Number, _objectType, _left, _top, _fontHeight);
+				w.SvgUseXY(null, _objectType, _left, _top, _fontHeight);
 			else
-				w.SvgUseXY("flag" + SvgScore.UniqueID_Number, _objectType, _left, _bottom, _fontHeight);
+				w.SvgUseXY(null, _objectType, _left, _bottom, _fontHeight);
 		}
 
 		private readonly float _fontHeight;
@@ -528,12 +519,12 @@ namespace Moritz.Symbols
 		{
 			if(_staffNameMetrics != null)
 			{
-				_staffNameMetrics.WriteSVG(w, "staffName" + SvgScore.UniqueID_Number);
+				_staffNameMetrics.WriteSVG(w, "staffName");
 			}
 			if(_barnumberMetrics != null)
 			{
 				w.WriteStartElement("g");
-				w.WriteAttributeString("id", "barNumber" + SvgScore.UniqueID_Number);
+				w.WriteAttributeString("class", "barNumber");
 				_barnumberMetrics.WriteSVG(w); // writes the number and the frame
 				w.WriteEndElement(); // barnumber group
 			}
@@ -560,9 +551,9 @@ namespace Moritz.Symbols
 			WriteSVG(w, null);
 		}
 
-		internal virtual void WriteSVG(SvgWriter w, string id)
+		internal virtual void WriteSVG(SvgWriter w, string type)
 		{
-			w.SvgText(id, _textInfo, _originX, _originY);
+			w.SvgText(type, _textInfo, _originX, _originY);
 		}
 
 		/// <summary>
@@ -664,7 +655,6 @@ namespace Moritz.Symbols
 		public readonly bool IsBelow;
 	}
 
-
 	internal class OrnamentMetrics : TextMetrics, ICloneable
 	{
 		public OrnamentMetrics(float gap, Graphics graphics, TextInfo textInfo, bool isBelow)
@@ -695,14 +685,14 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-			base.WriteSVG(w, "number" + SvgScore.UniqueID_Number);
-			w.SvgRect("box" + SvgScore.UniqueID_Number, _left, _top, _right - _left, _bottom - _top, "black", _strokeWidth, "none");
+			base.WriteSVG(w, "number");
+			w.SvgRect(null, _left, _top, _right - _left, _bottom - _top, "black", _strokeWidth, "none");
 		}
 
 		float _strokeWidth = 0;
 	}
 
-	internal class CLichtCharacterMetrics : Metrics
+    internal class CLichtCharacterMetrics : Metrics
 	{
 		public CLichtCharacterMetrics(string name, bool isDynamic, float fontHeight, TextHorizAlign textHorizAlign)
 			: base()
@@ -771,8 +761,8 @@ namespace Moritz.Symbols
 		public override void WriteSVG(SvgWriter w)
 		{
 			w.WriteStartElement("text");
-			w.WriteAttributeString("x", _originX.ToString(M.En_USNumberFormat));
-			w.WriteAttributeString("y", _originY.ToString(M.En_USNumberFormat));
+            w.WriteAttributeString("x", _originX.ToString(M.En_USNumberFormat));
+            w.WriteAttributeString("y", _originY.ToString(M.En_USNumberFormat));
 			w.WriteAttributeString("font-size", _fontHeight.ToString(M.En_USNumberFormat));
 			w.WriteAttributeString("font-family", "CLicht");
 			switch(_textHorizAlign)
@@ -1342,7 +1332,7 @@ namespace Moritz.Symbols
 
 		public void WriteSVG(SvgWriter w, string id)
 		{
-			w.SvgStartGroup(null, null);
+			w.SvgStartGroup(null);
 			foreach(Metrics metrics in MetricsList)
 			{
 				metrics.WriteSVG(w);

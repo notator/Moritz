@@ -24,14 +24,14 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         public void WriteSVG(SvgWriter w, int systemNumber, PageFormat pageFormat)
         {
-            w.SvgStartGroup("system", "sys" + systemNumber.ToString());
+            w.SvgStartGroup("system");
 
             for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
             {
                 Staves[staffIndex].WriteSVG(w, systemNumber, staffIndex + 1);
             }
 
-            w.SvgStartGroup(null, "sys" + systemNumber.ToString() + "connectors");
+            w.SvgStartGroup("staffConnectors");
 
             WriteConnectors(w, systemNumber, pageFormat);
 

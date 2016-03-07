@@ -22,8 +22,8 @@ namespace Moritz.Symbols
         {
             if(Visible && staffIsVisible)
             {
-                w.SvgStartGroup(null, "cautionaryChord" + SvgScore.UniqueID_Number);
-                w.SvgStartGroup(null, null);
+                w.SvgStartGroup("cautionaryChord");
+                w.SvgStartGroup(null);
 
                 this.ChordMetrics.WriteSvg(w);
 

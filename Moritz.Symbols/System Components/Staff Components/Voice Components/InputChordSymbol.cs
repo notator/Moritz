@@ -31,7 +31,7 @@ namespace Moritz.Symbols
             if(ChordMetrics.BeamBlock != null)
                 ChordMetrics.BeamBlock.WriteSVG(w);
 
-			w.SvgStartGroup("inputChord", "inputChord" + SvgScore.UniqueID_Number);
+			w.SvgStartGroup("inputChord");
 
             Debug.Assert(_msDuration > 0);
 
@@ -43,7 +43,7 @@ namespace Moritz.Symbols
 
             _inputChordDef.WriteSvg(w);
 
-			w.SvgStartGroup(null, "graphics" + SvgScore.UniqueID_Number);
+			w.SvgStartGroup("graphics");
             ChordMetrics.WriteSVG(w);
             w.SvgEndGroup();
 

@@ -24,7 +24,7 @@ namespace Moritz.Symbols
         {
             if(LocalCautionaryChordDef == null)
             {
-				w.SvgStartGroup("rest", "rest" + SvgScore.UniqueID_Number);
+				w.SvgStartGroup("rest");
 
                 Debug.Assert(_msDuration > 0);
 				if(staffIsVisible)

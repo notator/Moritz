@@ -26,11 +26,11 @@ namespace Moritz.Symbols
             {            
                 w.WriteAttributeString("score", "staffName", null, this.Staffname);
 
-                w.SvgStartGroup("stafflines", "sys" + systemNumber.ToString() + "staff" + staffNumber.ToString() + "stafflines");
+                w.SvgStartGroup("stafflines");
                 float stafflineY = this.Metrics.StafflinesTop;
                 for(int staffLineIndex = 0; staffLineIndex < NumberOfStafflines; staffLineIndex++)
                 {
-					w.SvgLine("staffline" + SvgScore.UniqueID_Number, this.Metrics.StafflinesLeft, stafflineY,
+					w.SvgLine(null, this.Metrics.StafflinesLeft, stafflineY,
                                     this.Metrics.StafflinesRight, stafflineY,
                                     "black", StafflineStemStrokeWidth, null);
 
