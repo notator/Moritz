@@ -197,7 +197,7 @@ namespace Moritz.Algorithm.Study1
 				{
 					trk.Add(track[trackIndex++]);					
 				}
-				msPosition = trk.EndMsPosition;
+				msPosition = trk.EndMsPositionReTrk;
 				barlineMsPositions.Add(msPosition);
 				consecutiveBars.Add(trk);
 			}

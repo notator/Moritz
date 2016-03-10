@@ -40,22 +40,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompositionAlgorithm.cs" />
-    <Compile Include="PaletteDemoScore\PaletteDemoAlgorithm.cs" />
-    <Compile Include="PianolaMusic\PianolaMusicAlgorithm.cs" />
+    <Compile Include="Pianola Music\PianolaMusicAlgorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Song Six\Clytemnestra.cs" />
-    <Compile Include="Song Six\Furies1.cs" />
-    <Compile Include="Song Six\Furies2.cs" />
-    <Compile Include="Song Six\Furies3.cs" />
-    <Compile Include="Song Six\Furies4.cs" />
-    <Compile Include="Song Six\FuriesInterlude3ToEnd.cs" />
-    <Compile Include="Song Six\SongSixAlgorithm.cs" />
-    <Compile Include="Song Six\Winds.cs" />
-    <Compile Include="Study1\Study1Algorithm.cs" />
-    <Compile Include="Tombeau1\Tombeau1Algorithm.cs" />
-    <Compile Include="Study2c3_1\Study2c3_1Algorithm.cs" />
-    <Compile Include="Study3 sketch 1\Study3Sketch1Algorithm.cs" />
-    <Compile Include="Study3 sketch 2\Study3Sketch2Algorithm.cs" />
+    <Compile Include="Study 1\Study1Algorithm.cs" />
+    <Compile Include="Tombeau 1\Tombeau1Algorithm.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Krystals4ObjectLibrary\Krystals4ObjectLibrary.csproj">
@@ -82,6 +70,12 @@
       <Project>{df59888c-f935-4e4f-ba31-664daf79f7d6}</Project>
       <Name>Moritz.Symbols</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Song Six\" />
+    <Folder Include="Study 2\" />
+    <Folder Include="Study 3.1\" />
+    <Folder Include="Study 3.2\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

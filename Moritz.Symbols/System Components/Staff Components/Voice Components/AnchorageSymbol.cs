@@ -59,43 +59,45 @@ namespace Moritz.Symbols
                 #region get dynamicString and _dynamic
                 // note that cLicht has pppp and ffff, but these dynamics are not used here (in Study2)
                 // These are the dynamicStrings for cLicht
-                if(midiVelocity > 112F)
+                // March 2016: The dynamic symbols are now related logarithmically to the midiVelocity.
+                // This corresponds to the way gain is usually rendered by MIDI synthesizers.
+                if(midiVelocity > 119) // sqrt(0.875) * 127  (was 112 until March 2016)
                 {
-                    dynamicString = "Ï";
+                    dynamicString = "Ï";    // fff
                 }
-                else if(midiVelocity > 96)
+                else if(midiVelocity > 110) // sqrt(0.75) * 127 (was 96)
                 {
-                    dynamicString = "ƒ";
+                    dynamicString = "ƒ";    // ff
                 }
-                else if(midiVelocity > 80)
+                else if(midiVelocity > 100) // sqrt(0.625) * 127 (was 80)
                 {
-                    dynamicString = "f";
+                    dynamicString = "f";    // f
                 }
-                else if(midiVelocity > 64)
+                else if(midiVelocity > 90)  // sqrt(0.5) * 127 (was 64)
                 {
-                    dynamicString = "F";
+                    dynamicString = "F";    // mf
                 }
-                else if(midiVelocity > 48)
+                else if(midiVelocity > 78)  // sqrt(0.375) * 127 (was 48)
                 {
-                    dynamicString = "P";
+                    dynamicString = "P";    // mp
                 }
-                else if(midiVelocity > 32)
+                else if(midiVelocity > 64)  // sqrt(0.25) * 127 (was 32)
                 {
-                    dynamicString = "p";
+                    dynamicString = "p";    // p
                 }
-                else if(midiVelocity > 16)
+                else if(midiVelocity > 45)  // sqrt(0.125) * 127 (was 16)
                 {
-                    dynamicString = "π";
+                    dynamicString = "π";    // pp
                 }
-                else
+                else // > 0
                 {
-                    dynamicString = "∏";
+                    dynamicString = "∏";    // ppp
                 }
                 #endregion get dynamicString and _dynamic
 
-				DynamicText dynamicText = new DynamicText(this, dynamicString, FontHeight);
+                DynamicText dynamicText = new DynamicText(this, dynamicString, FontHeight);
                 this._drawObjects.Add(dynamicText);
             }
-        }  
+        }
     }
 }
