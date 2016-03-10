@@ -10,7 +10,7 @@ namespace Moritz.Symbols
     public class OutputChordSymbol : ChordSymbol
     {
         public OutputChordSymbol(Voice voice, MidiChordDef umcd, int minimumCrotchetDurationMS, float fontSize)
-            : base(voice, umcd.MsDuration, umcd.MsPosition, minimumCrotchetDurationMS, fontSize)
+            : base(voice, umcd.MsDuration, umcd.MsPositionReTrk, minimumCrotchetDurationMS, fontSize)
         {
             _midiChordDef = umcd;
 

@@ -28,6 +28,6 @@ namespace Moritz.Spec
         void AdjustMsDuration(double factor);
 
         int MsDuration { get; set; }
-        int MsPosition { get; set; }
+        int MsPositionReTrk { get; set; }
     }
 }

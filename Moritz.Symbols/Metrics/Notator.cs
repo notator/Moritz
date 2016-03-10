@@ -134,7 +134,7 @@ namespace Moritz.Symbols
             string lastClefType = null;
             if(lastVoice0Def != null)
             {
-                if((lastVoice1Def == null) || (lastVoice0Def.MsPosition > lastVoice1Def.MsPosition))
+                if((lastVoice1Def == null) || (lastVoice0Def.MsPositionReTrk > lastVoice1Def.MsPositionReTrk))
                 {
                     lastClefType = lastVoice0Def.ClefType;
                 }
@@ -142,7 +142,7 @@ namespace Moritz.Symbols
 
             if(lastVoice1Def != null)
             {
-                if((lastVoice0Def == null) || (lastVoice1Def.MsPosition >= lastVoice0Def.MsPosition))
+                if((lastVoice0Def == null) || (lastVoice1Def.MsPositionReTrk >= lastVoice0Def.MsPositionReTrk))
                 {
                     lastClefType = lastVoice1Def.ClefType;
                 }
@@ -199,7 +199,7 @@ namespace Moritz.Symbols
         {
             foreach(ClefChangeDef ccd in clefChangeDefs)
             {
-                ClefChangeSymbol invisibleClefChangeSymbol = new ClefChangeSymbol(voice, ccd.ClefType, _pageFormat.CautionaryNoteheadsFontHeight, ccd.MsPosition);
+                ClefChangeSymbol invisibleClefChangeSymbol = new ClefChangeSymbol(voice, ccd.ClefType, _pageFormat.CautionaryNoteheadsFontHeight, ccd.MsPositionReTrk);
                 invisibleClefChangeSymbol.IsVisible = false;
                 InsertInvisibleClefChangeInNoteObjects(voice, invisibleClefChangeSymbol);
             }

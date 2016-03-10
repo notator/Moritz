@@ -244,7 +244,7 @@ namespace Moritz.Composer
 							InputChordDef icd = iud as InputChordDef;
 							if(icd != null && icd.CCSettings != null)
 							{
-								int msPos = icd.MsPosition;
+								int msPos = icd.MsPositionReTrk;
 								if(ccSettingsMsPositions.Contains(msPos))
 								{
 									errorString = "\nSynchronous continuous controller settings (ccSettings) are not allowed.";
@@ -307,7 +307,7 @@ namespace Moritz.Composer
             foreach(List<VoiceDef> barVoiceDefs in barDefsInOneSystem)
             {
                 SvgSystem system = new SvgSystem(this);
-				system.MsPosition = barVoiceDefs[0].MsPosition;
+				system.MsPosition = barVoiceDefs[0].MsPositionReSeq;
                 this.Systems.Add(system);
             }
 

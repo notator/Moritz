@@ -21,7 +21,7 @@ namespace Moritz.Spec
         /// Constructs a multi-note chord, each inputNoteDef has a notated pitch and a SeqDef.
 		/// The inputNoteDefs must be in order of their notated pitches (bottom to top).
         /// </summary>
-        public InputChordDef(int msPosition, int msDuration, List<InputNoteDef> inputNoteDefs, TrkOptions trkOptions)
+        public InputChordDef(int msPositionReTrk, int msDuration, List<InputNoteDef> inputNoteDefs, TrkOptions trkOptions)
             : base(msDuration)
         {
 			#region check notated pitches and trkRef positions
@@ -35,12 +35,12 @@ namespace Moritz.Spec
 				{
 					foreach(TrkRef trk in ind.NoteOn.SeqRef)
 					{ 
-						Debug.Assert(msPosition <= trk.MsPosition);
+						Debug.Assert(msPositionReTrk <= trk.MsPosition);
 					}
 				}
 				if(ind.NoteOff != null && ind.NoteOff.SeqRef != null)
 				{
-					int minSeqPos = msPosition + msDuration;
+					int minSeqPos = msPositionReTrk + msDuration;
 					foreach(TrkRef trk in ind.NoteOff.SeqRef)
 					{
 						Debug.Assert(minSeqPos <= trk.MsPosition);
@@ -50,7 +50,7 @@ namespace Moritz.Spec
 			}
 			#endregion
 
-            _msPosition = msPosition;
+            _msPositionReTrk = msPositionReTrk;
 			_msDuration = msDuration;
 			_inputNoteDefs = inputNoteDefs;
 			_lyric = null;
@@ -74,7 +74,7 @@ namespace Moritz.Spec
 
         public override string ToString()
         {
-            return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString() + " InputChordDef");
+            return ("MsPositionReTrk=" + MsPositionReTrk.ToString() + " MsDuration=" + MsDuration.ToString() + " InputChordDef");
         }
 
         /// <summary>
@@ -117,8 +117,8 @@ namespace Moritz.Spec
             throw new NotImplementedException("InputChordDef.DeepClone()");
         }
 
-        public int MsPosition { get { return _msPosition; } set { _msPosition = value; } }
-        private int _msPosition = 0;
+        public int MsPositionReTrk { get { return _msPositionReTrk; } set { _msPositionReTrk = value; } }
+        private int _msPositionReTrk = 0;
 
 		public string Lyric { get { return _lyric; } set { _lyric = value; } }
 		private string _lyric = null;

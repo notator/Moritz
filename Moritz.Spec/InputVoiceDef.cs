@@ -70,7 +70,7 @@ namespace Moritz.Spec
                 if(clone != null)
                 {
                     Debug.Assert(i < (clonedLmdds.Count - 1));
-                    ClefChangeDef replacement = new ClefChangeDef(clone.ClefType, clonedLmdds[i + 1]);
+                    ClefChangeDef replacement = new ClefChangeDef(clone.ClefType, clonedLmdds[i + 1].MsPositionReTrk);
                     clonedLmdds.RemoveAt(i);
                     clonedLmdds.Insert(i, replacement);
                 }
@@ -109,9 +109,10 @@ namespace Moritz.Spec
         /// Adds the argument to the end of this VoiceDef.
         /// Sets the MsPositions of the appended UniqueDefs.
         /// </summary>
-        public void AddRange(InputVoiceDef voiceDef)
+        public override void AddRange(VoiceDef inputVoiceDef)
         {
-            _AddRange((VoiceDef)voiceDef);
+            Debug.Assert(inputVoiceDef is InputVoiceDef);
+            _AddRange(inputVoiceDef);
         }
         /// <summary>
         /// Inserts the iUniqueDef in the list at the given index, and then

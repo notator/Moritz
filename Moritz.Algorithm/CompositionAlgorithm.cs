@@ -140,224 +140,135 @@ namespace Moritz.Algorithm
         /// </summary>
         public abstract List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes);
 
-		/// <summary>
-		/// Returns the position of the end of the last UniqueDef
-		/// in the bar's first voice's UniqueDefs list.
-		/// </summary>
-		protected int GetEndMsPosition(List<VoiceDef> bar)
+        /// <summary>
+        /// Returns the position of the end of the last UniqueDef
+        /// in the bar's first voice's UniqueDefs list.
+        /// </summary>
+        protected int GetEndMsPositionReTrk(List<VoiceDef> bar)
         {
             Debug.Assert(bar != null && bar.Count > 0 && bar[0].UniqueDefs.Count > 0);
             List<IUniqueDef> lmdd = bar[0].UniqueDefs;
             IUniqueDef lastLmdd = lmdd[lmdd.Count - 1];
-            int endMsPosition = lastLmdd.MsPosition + lastLmdd.MsDuration;
-            return endMsPosition;
+            int endMsPositionReTrk = lastLmdd.MsPositionReTrk + lastLmdd.MsDuration;
+            return endMsPositionReTrk;
         }
 
         /// <summary>
-        /// Returns two bars. The first is the beginning of the argument bar up to absoluteSplitPos,
-        /// The second is the end of the argument bar beginning at absoluteSplitPos.
-        /// The final UniqueDef in each voice.UniqueDefs list is converted
-        /// to a FinalLMDDInVoice object containing an MsDurationToBarline property.
-        /// If a chord or rest overlaps a barline, a LocalizedCautionaryChordDef object is created at the
-        /// start of the voice.UniqueDefs in the second bar. A LocalizedCautionaryChordDef
-        /// object is a kind of chord which is used while justifying systems, but is not displayed and
-        /// does not affect performance.
-        /// ClefChangeDefs are placed at the end of the first bar, not at the start of the second bar.
+        /// When this function returns, the sequence is empty, and is no longer usable.
         /// </summary>
-        protected List<List<VoiceDef>> SplitBar(List<VoiceDef> originalBar, int absoluteSplitPos)
+        protected List<List<VoiceDef>> ConvertBlockToBars(Block sequence, List<int> barlineEndAbsMsPositions)
         {
-            List<List<VoiceDef>> twoBars = new List<List<VoiceDef>>();
-            List<VoiceDef> firstBar = new List<VoiceDef>();
-            List<VoiceDef> secondBar = new List<VoiceDef>();
-            twoBars.Add(firstBar);
-            twoBars.Add(secondBar);
-            int originalBarStartPos = originalBar[0].UniqueDefs[0].MsPosition;
-            int originalBarEndPos =
-                originalBar[0].UniqueDefs[originalBar[0].UniqueDefs.Count - 1].MsPosition +
-                originalBar[0].UniqueDefs[originalBar[0].UniqueDefs.Count - 1].MsDuration;
+            int finalBarlineAbsMsPosition = barlineEndAbsMsPositions[barlineEndAbsMsPositions.Count - 1];
 
-            VoiceDef firstBarVoice;
-            VoiceDef secondBarVoice;
-            foreach(VoiceDef voice in originalBar)
+            Debug.Assert(finalBarlineAbsMsPosition == sequence.AbsMsPosition + sequence.MsDuration);
+
+            List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
+
+            int barlineIndex = 0;
+            while(sequence.AbsMsPosition < finalBarlineAbsMsPosition)
             {
-                Trk outputVoice = voice as Trk;
-                if(outputVoice != null)
-                {
-					firstBarVoice = new Trk(outputVoice.MidiChannel,new List<IUniqueDef>());
-                    firstBar.Add(firstBarVoice);
-					secondBarVoice = new Trk(outputVoice.MidiChannel, new List<IUniqueDef>());
-                    secondBar.Add(secondBarVoice);
-                }
-                else
-                {
-                    firstBarVoice = new InputVoiceDef();
-                    firstBar.Add(firstBarVoice);
-                    secondBarVoice = new InputVoiceDef();
-                    secondBar.Add(secondBarVoice);
-                }
-                foreach(IUniqueDef iUnique in voice.UniqueDefs)
-                {
-                    int udMsDuration = iUnique.MsDuration;
-                    IUniqueSplittableChordDef uniqueChordDef = iUnique as IUniqueSplittableChordDef;
-                    if(uniqueChordDef != null)
-                    {
-                        udMsDuration = (uniqueChordDef.MsDurationToNextBarline == null) ? iUnique.MsDuration : (int)uniqueChordDef.MsDurationToNextBarline;
-                    }
+                int barlineEndMsPosition = barlineEndAbsMsPositions[barlineIndex++];
 
-                    int udEndPos = iUnique.MsPosition + udMsDuration;
+                List<VoiceDef> bar = sequence.GetBar(barlineEndMsPosition);
 
-                    if(iUnique.MsPosition >= absoluteSplitPos)
-                    {
-                        if(iUnique.MsPosition == absoluteSplitPos && iUnique is ClefChangeDef)
-                        {
-                            firstBarVoice.UniqueDefs.Add(iUnique);
-                        }
-                        else
-                        {
-                            Debug.Assert(udEndPos <= originalBarEndPos);
-                            secondBarVoice.UniqueDefs.Add(iUnique);
-                        }
-                    }
-                    else if(udEndPos > absoluteSplitPos)
-                    {
-                        int durationAfterBarline = udEndPos - absoluteSplitPos;
-                        if(iUnique is RestDef)
-                        {
-                            // This is a rest. Split it.
-                            RestDef firstRestHalf = new RestDef(iUnique.MsPosition, absoluteSplitPos - iUnique.MsPosition);
-                            firstBarVoice.UniqueDefs.Add(firstRestHalf);
-
-                            RestDef secondRestHalf = new RestDef(absoluteSplitPos, durationAfterBarline);
-                            secondBarVoice.UniqueDefs.Add(secondRestHalf);
-                        }
-                        else if(iUnique is CautionaryChordDef)
-                        {
-                            // This is a cautionary chord. Set the position of the following barline, and
-                            // Add an LocalizedCautionaryChordDef at the beginning of the following bar.
-                            iUnique.MsDuration = absoluteSplitPos - iUnique.MsPosition;
-                            firstBarVoice.UniqueDefs.Add(iUnique);
-
-                            CautionaryChordDef secondLmdd = new CautionaryChordDef((IUniqueChordDef)iUnique, absoluteSplitPos, durationAfterBarline);
-                            secondBarVoice.UniqueDefs.Add(secondLmdd);
-                        }
-                        else
-                        {
-                            // This is a MidiChordDef or a InputChordDef. 
-                            // Set the position of the following barline, and add a CautionaryChordDef at the beginning
-                            // of the following bar.
-                            if(uniqueChordDef != null)
-                            {
-                                uniqueChordDef.MsDurationToNextBarline = absoluteSplitPos - iUnique.MsPosition;
-                            }
-
-                            firstBarVoice.UniqueDefs.Add((IUniqueDef)uniqueChordDef);
-
-                            CautionaryChordDef secondLmdd = new CautionaryChordDef((IUniqueChordDef)uniqueChordDef,
-                                absoluteSplitPos, durationAfterBarline);
-                            secondBarVoice.UniqueDefs.Add(secondLmdd);
-                        }
-                    }
-                    else
-                    {
-                        Debug.Assert(udEndPos <= absoluteSplitPos && iUnique.MsPosition >= originalBarStartPos);
-                        firstBarVoice.UniqueDefs.Add(iUnique);
-                    }
-                }
+                bars.Add(bar);
             }
-            return twoBars;
+
+            return bars;
         }
+
+
+        ///// <summary>
+        ///// There is currently still one bar per system.
+        ///// </summary>
+        //protected void ReplaceConsecutiveRestsInBars(List<List<VoiceDef>> voicesPerStaffPerSystem)
+        //{
+        //    foreach(List<VoiceDef> voicesPerStaff in voicesPerStaffPerSystem)
+        //    {
+        //        foreach(VoiceDef voice in voicesPerStaff)
+        //        {
+        //            // contains lists of consecutive rest indices
+        //            List<List<int>> restsToReplace = new List<List<int>>();
+        //            #region find the consecutive rests
+        //            List<int> consecRestIndices = new List<int>();
+        //            for(int i = 0; i < voice.UniqueDefs.Count - 1; i++)
+        //            {
+        //                MidiChordDef mcd1 = voice.UniqueDefs[i] as MidiChordDef;
+        //                MidiChordDef mcd2 = voice.UniqueDefs[i + 1] as MidiChordDef;
+        //                if(mcd1 == null && mcd2 == null)
+        //                {
+        //                    if(!consecRestIndices.Contains(i))
+        //                    {
+        //                        consecRestIndices.Add(i);
+        //                    }
+        //                    consecRestIndices.Add(i + 1);
+        //                }
+        //                else
+        //                {
+        //                    if(consecRestIndices != null && consecRestIndices.Count > 0)
+        //                    {
+        //                        restsToReplace.Add(consecRestIndices);
+        //                        consecRestIndices = new List<int>();
+        //                    }
+        //                }
+
+        //                if(i == voice.UniqueDefs.Count - 2 && consecRestIndices.Count > 0)
+        //                {
+        //                    restsToReplace.Add(consecRestIndices);
+        //                }
+        //            }
+        //            #endregion
+        //            #region replace the consecutive rests
+        //            if(restsToReplace.Count > 0)
+        //            {
+        //                for(int i = restsToReplace.Count - 1; i >= 0; i--)
+        //                {
+        //                    List<int> indToReplace = restsToReplace[i];
+        //                    int msDuration = 0;
+        //                    int msPosition = voice.UniqueDefs[indToReplace[0]].MsPositionReTrk;
+        //                    for(int j = indToReplace.Count - 1; j >= 0; j--)
+        //                    {
+        //                        IUniqueDef iumdd = voice.UniqueDefs[indToReplace[j]];
+        //                        Debug.Assert(iumdd.MsDuration > 0);
+        //                        msDuration += iumdd.MsDuration;
+        //                        voice.UniqueDefs.RemoveAt(indToReplace[j]);
+        //                    }
+        //                    RestDef replacementLmdd = new RestDef(msPosition, msDuration);
+        //                    voice.UniqueDefs.Insert(indToReplace[0], replacementLmdd);
+        //                }
+        //            }
+        //            #endregion
+        //        }
+        //    }
+        //}
 
         /// <summary>
-        /// There is currently still one bar per system.
+        /// Returns all the InputChordDefs in the bar.
         /// </summary>
-        protected void ReplaceConsecutiveRestsInBars(List<List<VoiceDef>> voicesPerStaffPerSystem)
+        protected List<InputChordDef> GetInputChordDefsInBar(List<VoiceDef> bar)
         {
-            foreach(List<VoiceDef> voicesPerStaff in voicesPerStaffPerSystem)
-            {
-                foreach(VoiceDef voice in voicesPerStaff)
-                {
-                    // contains lists of consecutive rest indices
-                    List<List<int>> restsToReplace = new List<List<int>>();
-                    #region find the consecutive rests
-                    List<int> consecRestIndices = new List<int>();
-                    for(int i = 0; i < voice.UniqueDefs.Count - 1; i++)
-                    {
-                        MidiChordDef mcd1 = voice.UniqueDefs[i] as MidiChordDef;
-                        MidiChordDef mcd2 = voice.UniqueDefs[i + 1] as MidiChordDef;
-                        if(mcd1 == null && mcd2 == null)
-                        {
-                            if(!consecRestIndices.Contains(i))
-                            {
-                                consecRestIndices.Add(i);
-                            }
-                            consecRestIndices.Add(i + 1);
-                        }
-                        else
-                        {
-                            if(consecRestIndices != null && consecRestIndices.Count > 0)
-                            {
-                                restsToReplace.Add(consecRestIndices);
-                                consecRestIndices = new List<int>();
-                            }
-                        }
+            List<InputChordDef> inputChordDefs = new List<InputChordDef>();
+            List<int> ccSettingsPositions = new List<int>();
 
-                        if(i == voice.UniqueDefs.Count - 2 && consecRestIndices.Count > 0)
-                        {
-                            restsToReplace.Add(consecRestIndices);
-                        }
-                    }
-                    #endregion
-                    #region replace the consecutive rests
-                    if(restsToReplace.Count > 0)
+            foreach(VoiceDef voiceDef in bar)
+            {
+                InputVoiceDef inputVoiceDef = voiceDef as InputVoiceDef;
+                if(inputVoiceDef != null)
+                {
+                    foreach(IUniqueDef uniqueDef in inputVoiceDef.UniqueDefs)
                     {
-                        for(int i = restsToReplace.Count - 1; i >= 0; i--)
+                        InputChordDef icd = uniqueDef as InputChordDef;
+                        if(icd != null)
                         {
-                            List<int> indToReplace = restsToReplace[i];
-                            int msDuration = 0;
-                            int msPosition = voice.UniqueDefs[indToReplace[0]].MsPosition;
-                            for(int j = indToReplace.Count - 1; j >= 0; j--)
-                            {
-                                IUniqueDef iumdd = voice.UniqueDefs[indToReplace[j]];
-                                Debug.Assert(iumdd.MsDuration > 0);
-                                msDuration += iumdd.MsDuration;
-                                voice.UniqueDefs.RemoveAt(indToReplace[j]);
-                            }
-                            RestDef replacementLmdd = new RestDef(msPosition, msDuration);
-                            voice.UniqueDefs.Insert(indToReplace[0], replacementLmdd);
+                            inputChordDefs.Add(icd);
                         }
                     }
-                    #endregion
                 }
             }
+            return inputChordDefs;
         }
 
-		/// <summary>
-		/// Returns all the InputChordDefs in the bar.
-		/// </summary>
-		protected List<InputChordDef> GetInputChordDefsInBar(List<VoiceDef> bar)
-		{
-			List<InputChordDef> inputChordDefs = new List<InputChordDef>();
-			List<int> ccSettingsPositions = new List<int>();
-
-			foreach(VoiceDef voiceDef in bar)
-			{
-				InputVoiceDef inputVoiceDef = voiceDef as InputVoiceDef;
-				if(inputVoiceDef != null)
-				{
-					foreach(IUniqueDef uniqueDef in inputVoiceDef.UniqueDefs)
-					{
-						InputChordDef icd = uniqueDef as InputChordDef;
-						if(icd != null)
-						{
-							inputChordDefs.Add(icd);
-						}
-					}
-				}
-			}
-			return inputChordDefs;
-		}
-
-		protected List<Krystal> _krystals;
+        protected List<Krystal> _krystals;
         protected List<Palette> _palettes;
     }
 }

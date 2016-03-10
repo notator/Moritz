@@ -11,7 +11,7 @@ namespace Moritz.Symbols
 	internal class RestSymbol : DurationSymbol
 	{
         public RestSymbol(Voice voice, IUniqueDef iumdd, int minimumCrotchetDurationMS, float fontHeight)
-            : base(voice, iumdd.MsDuration, iumdd.MsPosition, minimumCrotchetDurationMS, fontHeight)
+            : base(voice, iumdd.MsDuration, iumdd.MsPositionReTrk, minimumCrotchetDurationMS, fontHeight)
         {
             if(iumdd is CautionaryChordDef)
             {

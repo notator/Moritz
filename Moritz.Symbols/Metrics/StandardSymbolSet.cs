@@ -341,7 +341,7 @@ namespace Moritz.Symbols
             }
             else if(clefChangeDef != null)
             {
-                ClefChangeSymbol clefChangeSymbol = new ClefChangeSymbol(voice, clefChangeDef.ClefType, cautionaryFontHeight, ((IUniqueDef)iud).MsPosition);
+                ClefChangeSymbol clefChangeSymbol = new ClefChangeSymbol(voice, clefChangeDef.ClefType, cautionaryFontHeight, ((IUniqueDef)iud).MsPositionReTrk);
                 noteObject = clefChangeSymbol;
             }
 

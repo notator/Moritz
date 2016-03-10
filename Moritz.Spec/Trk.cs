@@ -52,7 +52,7 @@ namespace Moritz.Spec
 			: this(midiChannel)
 		{
 			MidiChannel = midiChannel;
-			MsPosition = msPosition;
+			base.MsPositionReSeq = msPosition;
 		}
 
 		/// <summary>
@@ -60,55 +60,42 @@ namespace Moritz.Spec
 		/// </summary>
 		public Trk Clone()
         {
-            List<IUniqueDef> clonedLmdds = new List<IUniqueDef>();
+            List<IUniqueDef> clonedIUDs = new List<IUniqueDef>();
             foreach(IUniqueDef iu in _uniqueDefs)
             {
                 IUniqueDef clone = iu.Clone();
-                clonedLmdds.Add(clone);
+                clonedIUDs.Add(clone);
             }
 
-            // Clefchange symbols must point at the following object in their own VoiceDef
-            for(int i = 0; i < clonedLmdds.Count; ++i)
-            {
-                ClefChangeDef clone = clonedLmdds[i] as ClefChangeDef;
-                if(clone != null)
-                {
-                    Debug.Assert(i < (clonedLmdds.Count - 1));
-                    ClefChangeDef replacement = new ClefChangeDef(clone.ClefType, clonedLmdds[i + 1]);
-                    clonedLmdds.RemoveAt(i);
-                    clonedLmdds.Insert(i, replacement);
-                }
-            }
-
-            return new Trk(MidiChannel, clonedLmdds);
+            return new Trk(MidiChannel, clonedIUDs);
         }
         #endregion constructors
 
         #region Count changers
         /// <summary>
-        /// Appends the new iUniqueDef to the end of the list. Automatically sets the iUniqueDef's msPosition.
+        /// Appends the new MidiChordDef or RestDef to the end of the list. Automatically sets the iUniqueDef's msPosition.
         /// </summary>
         public override void Add(IUniqueDef iUniqueDef)
         {
-            Debug.Assert(!(iUniqueDef is InputChordDef));
+            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is RestDef);
             _Add(iUniqueDef);
         }
-
-		/// <summary>
-		/// Adds the argument to the end of this Trk.
-		/// Sets the MsPositions of the appended UniqueDefs.
-		/// </summary>
-		public void AddRange(Trk trk)
+        /// <summary>
+        /// Adds the argument to the end of this Trk.
+        /// Sets the MsPositions of the appended UniqueDefs.
+        /// </summary>
+        public override void AddRange(VoiceDef trk)
         {
+            Debug.Assert(trk is Trk);
             _AddRange(trk);
         }
-		/// <summary>
-		/// Inserts the iUniqueDef in the list at the given index, and then
-		/// resets the positions of all the uniqueDefs in the list.
-		/// </summary>
-		public override void Insert(int index, IUniqueDef iUniqueDef)
+        /// <summary>
+        /// Inserts the iUniqueDef in the list at the given index, and then
+        /// resets the positions of all the uniqueDefs in the list.
+        /// </summary>
+        public override void Insert(int index, IUniqueDef iUniqueDef)
         {
-            Debug.Assert(!(iUniqueDef is InputChordDef));
+            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is RestDef);
             _Insert(index, iUniqueDef);
         }
         /// <summary>
@@ -150,7 +137,7 @@ namespace Moritz.Spec
 		/// </summary>
 		public void Replace(int index, IUniqueDef replacementIUnique)
         {
-            Debug.Assert(!(replacementIUnique is InputChordDef));
+            Debug.Assert(replacementIUnique is MidiChordDef || replacementIUnique is RestDef);
             _Replace(index, replacementIUnique);
         }
         #endregion Count changers
@@ -282,8 +269,8 @@ namespace Moritz.Spec
 		/// Can be used to create a diminueno or crescendo.
 		public void AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
         {
-            int beginIndex = FindIndexAtMsPosition(startMsPosition);
-            int endIndex = FindIndexAtMsPosition(endMsPosition);
+            int beginIndex = FindIndexAtMsPositionReTrk(startMsPosition);
+            int endIndex = FindIndexAtMsPositionReTrk(endMsPosition);
 
             Debug.Assert(((beginIndex + 1) < endIndex) && (startFactor >= 0) && (endFactor >= 0) && (endIndex <= Count));
 
@@ -310,8 +297,8 @@ namespace Moritz.Spec
         /// </summary>
         public void SetPanGliss(int startMsPosition, int endMsPosition, int startPanValue, int endPanValue)
         {
-            int beginIndex = FindIndexAtMsPosition(startMsPosition);
-            int endIndex = FindIndexAtMsPosition(endMsPosition);
+            int beginIndex = FindIndexAtMsPositionReTrk(startMsPosition);
+            int endIndex = FindIndexAtMsPositionReTrk(endMsPosition);
 
             Debug.Assert(((beginIndex + 1) < endIndex) && (startPanValue >= 0) && (startPanValue <= 127)
                 && (endPanValue >= 0) && (endPanValue <=127) && (endIndex <= Count));
@@ -378,8 +365,8 @@ namespace Moritz.Spec
         protected void AdjustPitchWheelDeviations(int startMsPosition, int endMsPosition, int startPwd, int endPwd)
         {
             double furies1StartPwdValue = startPwd, furies1EndPwdValue = endPwd;
-            int beginIndex = FindIndexAtMsPosition(startMsPosition);
-            int endIndex = FindIndexAtMsPosition(endMsPosition);
+            int beginIndex = FindIndexAtMsPositionReTrk(startMsPosition);
+            int endIndex = FindIndexAtMsPositionReTrk(endMsPosition);
 
             int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
 
@@ -405,36 +392,36 @@ namespace Moritz.Spec
 		///     3. toPosition is greater than the msPosition at anchor1Index and less than the msPosition at anchor2Index.
 		/// and throws an appropriate exception if there is a problem.
 		/// </summary>
-		public void AlignObjectAtIndex(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPosition)
+		public void AlignObjectAtIndex(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPositionReTrk)
 		{
 			// throws an exception if there's a problem.
-			CheckAlignDefArgs(anchor1Index, indexToAlign, anchor2Index, toMsPosition);
+			CheckAlignDefArgs(anchor1Index, indexToAlign, anchor2Index, toMsPositionReTrk);
 
 			List<IUniqueDef> lmdds = _uniqueDefs;
-			int anchor1MsPosition = lmdds[anchor1Index].MsPosition;
-			int fromMsPosition = lmdds[indexToAlign].MsPosition;
-			int anchor2MsPosition;
+			int anchor1MsPositionReTrk = lmdds[anchor1Index].MsPositionReTrk;
+			int fromMsPositionReTrk = lmdds[indexToAlign].MsPositionReTrk;
+			int anchor2MsPositionReTrk;
 			if(anchor2Index == lmdds.Count) // i.e. anchor2 is on the final barline
 			{
-				anchor2MsPosition = lmdds[anchor2Index - 1].MsPosition + lmdds[anchor2Index - 1].MsDuration;
+				anchor2MsPositionReTrk = lmdds[anchor2Index - 1].MsPositionReTrk + lmdds[anchor2Index - 1].MsDuration;
 			}
 			else
 			{
-				anchor2MsPosition = lmdds[anchor2Index].MsPosition;
+				anchor2MsPositionReTrk = lmdds[anchor2Index].MsPositionReTrk;
 			}
 
-			float leftFactor = (float)(((float)(toMsPosition - anchor1MsPosition)) / ((float)(fromMsPosition - anchor1MsPosition)));
+			float leftFactor = (float)(((float)(toMsPositionReTrk - anchor1MsPositionReTrk)) / ((float)(fromMsPositionReTrk - anchor1MsPositionReTrk)));
 			for(int i = anchor1Index + 1; i < indexToAlign; ++i)
 			{
-				lmdds[i].MsPosition = anchor1MsPosition + ((int)((lmdds[i].MsPosition - anchor1MsPosition) * leftFactor));
+				lmdds[i].MsPositionReTrk = anchor1MsPositionReTrk + ((int)((lmdds[i].MsPositionReTrk - anchor1MsPositionReTrk) * leftFactor));
 			}
 
-			lmdds[indexToAlign].MsPosition = toMsPosition;
+			lmdds[indexToAlign].MsPositionReTrk = toMsPositionReTrk;
 
-			float rightFactor = (float)(((float)(anchor2MsPosition - toMsPosition)) / ((float)(anchor2MsPosition - fromMsPosition)));
+			float rightFactor = (float)(((float)(anchor2MsPositionReTrk - toMsPositionReTrk)) / ((float)(anchor2MsPositionReTrk - fromMsPositionReTrk)));
 			for(int i = anchor2Index - 1; i > indexToAlign; --i)
 			{
-				lmdds[i].MsPosition = anchor2MsPosition - ((int)((anchor2MsPosition - lmdds[i].MsPosition) * rightFactor));
+				lmdds[i].MsPositionReTrk = anchor2MsPositionReTrk - ((int)((anchor2MsPositionReTrk - lmdds[i].MsPositionReTrk) * rightFactor));
 			}
 
 			#region fix MsDurations
@@ -442,11 +429,11 @@ namespace Moritz.Spec
 			{
 				if(i == lmdds.Count) // possible, when anchor2Index is the final barline
 				{
-					lmdds[i - 1].MsDuration = anchor2MsPosition - lmdds[i - 1].MsPosition;
+					lmdds[i - 1].MsDuration = anchor2MsPositionReTrk - lmdds[i - 1].MsPositionReTrk;
 				}
 				else
 				{
-					lmdds[i - 1].MsDuration = lmdds[i].MsPosition - lmdds[i - 1].MsPosition;
+					lmdds[i - 1].MsDuration = lmdds[i].MsPositionReTrk - lmdds[i - 1].MsPositionReTrk;
 				}
 			}
 			#endregion
@@ -479,17 +466,17 @@ namespace Moritz.Spec
 					"\nanchor2Index=" + anchor2Index.ToString());
 			}
 
-			int a1MsPos = lmdds[anchor1Index].MsPosition;
-			int a2MsPos;
+			int a1MsPos = lmdds[anchor1Index].MsPositionReTrk;
+			int a2MsPosReTrk;
 			if(anchor2Index == lmdds.Count)
 			{
-				a2MsPos = lmdds[anchor2Index - 1].MsPosition + lmdds[anchor2Index - 1].MsDuration;
+				a2MsPosReTrk = lmdds[anchor2Index - 1].MsPositionReTrk + lmdds[anchor2Index - 1].MsDuration;
 			}
 			else
 			{
-				a2MsPos = lmdds[anchor2Index].MsPosition;
+				a2MsPosReTrk = lmdds[anchor2Index].MsPositionReTrk;
 			}
-			if(toMsPosition <= a1MsPos || toMsPosition >= a2MsPos)
+			if(toMsPosition <= a1MsPos || toMsPosition >= a2MsPosReTrk)
 			{
 				throw new Exception(msg + "Target (msPos) position out of range.\n" +
 					"\nanchor1Index=" + anchor1Index.ToString() +
@@ -499,92 +486,7 @@ namespace Moritz.Spec
 			}
 		}
 		#endregion alignment
-		/// <summary>
-		/// The argument warp is a list of doubles, in ascending order, beginning with 0 and ending with 1.
-		/// The doubles represent moments in the original duration that will be separated from each other
-		/// by equal durations when the function returns. The MsDuration of the Trk is not changed.
-		/// </summary>
-		public void WarpDurations(List<double> warp)
-		{
-			#region requirements
-			Debug.Assert(warp != null && warp.Count > 1 && warp[0] == 0 && warp[warp.Count - 1] == 1);
-			for(int i = 1; i < warp.Count; ++i)
-			{
-				Debug.Assert(warp[i - 1] < warp[i]);
-			}
-			#endregion
 
-			List<double> factors = new List<double>();
-			List<int> originalWarpMsPositions = new List<int>();
-			#region get factors and originalWarpMsPositions
-			double finalSeparation = MsDuration / (warp.Count - 1); // the final duration separation between the moments (in range 0..MsDuration)
-
-			for(int i = 0; i < warp.Count; ++i)
-			{
-				originalWarpMsPositions.Add((int)(MsDuration * warp[i])); // includes MsDuration
-			}
-			for(int i = 0; i < originalWarpMsPositions.Count - 1; ++i)
-			{
-				factors.Add(finalSeparation / (originalWarpMsPositions[i + 1] - originalWarpMsPositions[i]));
-			}
-			#endregion
-
-			int factorIndex = 0;
-			int iudMsPosition = 0;
-			int originalMsDuration = MsDuration;
-			foreach(IUniqueDef iud in UniqueDefs)
-			{
-				int remainingMsDuration = iud.MsDuration;
-				double newMsDuration = GetNewMsDuration(ref factorIndex, originalWarpMsPositions, factors, iud.MsPosition, ref remainingMsDuration);
-				iud.AdjustMsDuration(newMsDuration / iud.MsDuration);
-				iud.MsPosition = iudMsPosition;
-				iudMsPosition += iud.MsDuration;
-			}
-			// correct rounding errors
-			int msDuration = MsDuration;
-			if(msDuration != originalMsDuration)
-			{
-				IUniqueDef lastiud = UniqueDefs[UniqueDefs.Count - 1];
-				lastiud.MsDuration = originalMsDuration - lastiud.MsPosition;
-			}
-
-			Debug.Assert(originalMsDuration == MsDuration);
-		}
-		/// <summary>
-		/// Recursive function called by WarpDurations()
-		/// </summary>
-		private double GetNewMsDuration(ref int factorIndex, List<int> originalWarpMsPositions, List<double> factors,
-								int originalMsPosition, ref int remainingMsDuration)
-		{
-			int currentEndMsPos = originalMsPosition + remainingMsDuration;
-			int upperMsPos = originalWarpMsPositions[factorIndex + 1];
-			double factor = factors[factorIndex];
-			double newMsDuration = 0;
-
-			while(remainingMsDuration > 0)
-			{
-				if(currentEndMsPos < upperMsPos)
-				{
-					newMsDuration += remainingMsDuration * factor;
-					remainingMsDuration = 0;
-				}
-				else if(originalMsPosition < upperMsPos)
-				{
-					int durationToWarp = upperMsPos - originalMsPosition;
-					remainingMsDuration -= durationToWarp;
-					originalMsPosition = upperMsPos;
-					newMsDuration += (durationToWarp * factor);
-				}
-				else
-				{
-					factorIndex++;
-					newMsDuration += GetNewMsDuration(ref factorIndex, originalWarpMsPositions, factors,
-										originalMsPosition, ref remainingMsDuration);
-				}
-			}
-
-			return newMsDuration;
-		}
 		#endregion MidiChordDef attribute changers)
 
 		#region Enumerators
@@ -664,13 +566,13 @@ namespace Moritz.Spec
 		private List<IUniqueDef> ConvertPartitionsToFlatLmdds(int startAtIndex, List<List<IUniqueDef>> partitions)
 		{
 			List<IUniqueDef> newLmdds = new List<IUniqueDef>();
-			int msPosition = _uniqueDefs[startAtIndex].MsPosition;
+			int msPositionReTrk = _uniqueDefs[startAtIndex].MsPositionReTrk;
 			foreach(List<IUniqueDef> partition in partitions)
 			{
 				foreach(IUniqueDef pLmdd in partition)
 				{
-					pLmdd.MsPosition = msPosition;
-					msPosition += pLmdd.MsDuration;
+					pLmdd.MsPositionReTrk = msPositionReTrk;
+					msPositionReTrk += pLmdd.MsDuration;
 					newLmdds.Add(pLmdd);
 				}
 			}

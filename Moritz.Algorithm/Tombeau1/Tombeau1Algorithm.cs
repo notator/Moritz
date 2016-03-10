@@ -33,8 +33,8 @@ namespace Moritz.Algorithm.Tombeau1
 			_krystals = krystals;
 			_palettes = palettes;
 
-			#region main comment (thoughts etc.)
-			/*********************************************************************************************
+            #region main comment (thoughts etc.)
+            /*********************************************************************************************
 			Think Nancarrow, but (especially) with background/foreground. Think Study 1. Depth.
 
 			The following parameters can be controlled using the Resident Sf2 Synth:
@@ -72,9 +72,10 @@ namespace Moritz.Algorithm.Tombeau1
 			5. Velocity gradients in the root chords of additions: bottom->top (="consonant") --> top->bottom (="dissonant")...
 			
 			*********************************************************************************************/
-			#endregion main comments
-			/**********************************************/
-			Seq mainSeq;
+            #endregion main comments
+            /**********************************************/
+
+            List<Seq> seqs = new List<Seq>();
 
 			#region system 1
 			List<Trk> sys1Trks = new List<Trk>();
@@ -112,7 +113,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 				trk.Add(sum);
 
-				RestDef rest = new RestDef(0, system1Seq.MsDuration - trk.EndMsPosition);
+				RestDef rest = new RestDef(0, system1Seq.MsDuration - trk.EndMsPositionReTrk);
 				trk.Add(rest);
 
 				sys2Trks.Add(trk);
@@ -125,67 +126,50 @@ namespace Moritz.Algorithm.Tombeau1
 			#region  system 3
 			// Blocks can be warped...
 			List<double> warp = new List<double>() { 0, 0.1, 0.3, 0.6, 1 };
-			Block system3Block = new Block(system1Seq.Clone());
+			Block system3Block = new Block(system1Seq.Clone(), null);
 			system3Block.WarpDurations(warp);
 			#endregion  system 3
 
-			// Add clef changes here
-			// system1Seq.Trks[0].UniqueDefs.Insert(0, new ClefChangeDef("b", system1Seq.Trks[0].UniqueDefs[0]));
-			system3Block.Trks[0].UniqueDefs.Insert(0, new ClefChangeDef("b", system3Block.Trks[0].UniqueDefs[0]));
-			//seq2.Trks[6].UniqueDefs.Insert(2, new ClefChangeDef("b", seq2.Trks[6].UniqueDefs[2]));
+            #region set barlines
+            List<int> barlineEndMsPositions = new List<int>();
+            barlineEndMsPositions.Add(system1Seq.MsDuration);
+            barlineEndMsPositions.Add(system1Seq.MsDuration + system2Seq.MsDuration);
+            barlineEndMsPositions.Add(system1Seq.MsDuration + system2Seq.MsDuration + system3Block.MsDuration);
+            #endregion set barlines
 
-			mainSeq = system1Seq.Clone();
+            Seq mainSeq = system1Seq.Clone();
 			mainSeq.Concat(system2Seq);
 			mainSeq.Concat(system3Block);
 
-			// Blocks expose a list of VoiceDefs
-			Block mainSequence = new Block(mainSeq); // converts mainSeq to a block
+			// Blocks contain a list of VoiceDefs
+			Block sequence = new Block(mainSeq, null); // converts mainSeq to a block (There are no InputVoiceDefs in this score.)
 
-			/**********************************************/
+			List<List<VoiceDef>> bars = ConvertBlockToBars(sequence, barlineEndMsPositions);
 
-			List<VoiceDef> voiceDefs = mainSequence.VoiceDefs;
+            // Add clef changes here.
+            // Testing... 
+            //bars[0][0].InsertClefChange(12, "t");
+            //bars[0][0].InsertClefChange(2, "b");
 
-			#region set barlines
-			List<int> barlineEndMsPositions = new List<int>();
-			barlineEndMsPositions.Add(system1Seq.MsDuration);
-			barlineEndMsPositions.Add(system1Seq.MsDuration + system2Seq.MsDuration);
-			barlineEndMsPositions.Add(system1Seq.MsDuration + system2Seq.MsDuration + system3Block.MsDuration);
-			#endregion set barlines
+            //bars[1][1].InsertClefChange(3, "b");
 
-			List<List<VoiceDef>> bars = CreateBars(voiceDefs, barlineEndMsPositions);
-
-			return bars;
+            return bars;
 		}
 
-		private List<IUniqueDef> PaletteMidiChordDefs(int paletteIndex)
+        private List<IUniqueDef> PaletteMidiChordDefs(int paletteIndex)
 		{
 			List<IUniqueDef> iuds = new List<IUniqueDef>();
 			Palette palette = _palettes[paletteIndex];
-			int msPosition = 0;
+			int msPositionReTrk = 0;
 			for(int i = 0; i < palette.Count; ++i)
 			{
 				MidiChordDef mcd = palette.MidiChordDef(i);
-				mcd.MsPosition = msPosition;
-				msPosition += mcd.MsDuration;
+				mcd.MsPositionReTrk = msPositionReTrk;
+				msPositionReTrk += mcd.MsDuration;
 				iuds.Add(mcd);
 			}
 			return iuds;
 		}
 
-		// Breaks the voiceDefs (each currently contains a complete channel for the piece) into bars=systems.
-		private List<List<VoiceDef>> CreateBars(List<VoiceDef> voiceDefs, List<int> barlineEndMsPositions)
-		{
-			List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
-
-			List<VoiceDef> longBar = voiceDefs;
-			foreach(int barlineEndMsPosition in barlineEndMsPositions)
-			{
-				List<List<VoiceDef>> twoBars = SplitBar(longBar, barlineEndMsPosition);
-				bars.Add(twoBars[0]);
-				longBar = twoBars[1];
-			}
-
-			return bars;
-		}
 	}
 }
