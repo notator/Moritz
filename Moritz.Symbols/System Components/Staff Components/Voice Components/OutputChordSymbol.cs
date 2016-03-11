@@ -9,8 +9,8 @@ namespace Moritz.Symbols
 {
     public class OutputChordSymbol : ChordSymbol
     {
-        public OutputChordSymbol(Voice voice, MidiChordDef umcd, int minimumCrotchetDurationMS, float fontSize)
-            : base(voice, umcd.MsDuration, umcd.MsPositionReTrk, minimumCrotchetDurationMS, fontSize)
+        public OutputChordSymbol(Voice voice, MidiChordDef umcd, int absMsPosition, int minimumCrotchetDurationMS, float fontSize)
+            : base(voice, umcd.MsDuration, absMsPosition, minimumCrotchetDurationMS, fontSize)
         {
             _midiChordDef = umcd;
 

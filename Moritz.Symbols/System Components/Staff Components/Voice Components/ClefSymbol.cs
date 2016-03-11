@@ -56,10 +56,10 @@ namespace Moritz.Symbols
     /// </summary>
     public class ClefChangeSymbol : ClefSymbol
     {
-        public ClefChangeSymbol(Voice voice, string clefType, float fontHeight, int msPosition)
+        public ClefChangeSymbol(Voice voice, string clefType, int absMsPosition, float fontHeight)
             : base(voice, clefType, fontHeight)
         {
-            _msPosition = msPosition;
+            _absMsPosition = absMsPosition;
             _isVisible = true;
         }
 
@@ -82,8 +82,8 @@ namespace Moritz.Symbols
             }
         }
 
-        public int MsPosition { get { return _msPosition; } }
-        private int _msPosition;
+        public int AbsMsPosition { get { return _absMsPosition; } }
+        private int _absMsPosition;
 
         public bool IsVisible { get { return _isVisible; } set { _isVisible = value; } }
         private bool _isVisible;

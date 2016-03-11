@@ -125,14 +125,14 @@ namespace Moritz.Symbols
         public List<ChordSymbol> EnclosedChords(Voice otherVoice)
         {
             Debug.Assert(Chords.Count > 1);
-            int startMsPos = Chords[0].MsPosition;
-            int endMsPos = Chords[Chords.Count-1].MsPosition;
+            int startMsPos = Chords[0].AbsMsPosition;
+            int endMsPos = Chords[Chords.Count-1].AbsMsPosition;
             List<ChordSymbol> enclosedChordSymbols = new List<ChordSymbol>();
             foreach(ChordSymbol otherChord in otherVoice.ChordSymbols)
             {
-                if(otherChord.MsPosition >= startMsPos && otherChord.MsPosition <= endMsPos)
+                if(otherChord.AbsMsPosition >= startMsPos && otherChord.AbsMsPosition <= endMsPos)
                     enclosedChordSymbols.Add(otherChord);
-                if(otherChord.MsPosition > endMsPos)
+                if(otherChord.AbsMsPosition > endMsPos)
                     break;
             }
             return enclosedChordSymbols;
@@ -761,14 +761,14 @@ namespace Moritz.Symbols
 
         public void ShiftStemsForOtherVoice(Voice otherVoice)
         {
-            float minMsPosition = Chords[0].MsPosition;
-            float maxMsPosition = Chords[Chords.Count - 1].MsPosition;
+            float minMsPosition = Chords[0].AbsMsPosition;
+            float maxMsPosition = Chords[Chords.Count - 1].AbsMsPosition;
             List<ChordSymbol> otherChords = new List<ChordSymbol>();
             foreach(ChordSymbol otherChordSymbol in otherVoice.ChordSymbols)
             {
-                if(otherChordSymbol.MsPosition >= minMsPosition && otherChordSymbol.MsPosition <= maxMsPosition)
+                if(otherChordSymbol.AbsMsPosition >= minMsPosition && otherChordSymbol.AbsMsPosition <= maxMsPosition)
                     otherChords.Add(otherChordSymbol);
-                if(otherChordSymbol.MsPosition > maxMsPosition)
+                if(otherChordSymbol.AbsMsPosition > maxMsPosition)
                     break;
             }
             if(otherChords.Count > 0)
@@ -815,9 +815,9 @@ namespace Moritz.Symbols
             {
                 float distanceToChord = float.MaxValue;
                 if(_stemDirection == VerticalDir.up)
-                    distanceToChord = VerticalDistanceToHead(chord.ChordMetrics.TopHeadMetrics, chord.MsPosition);
+                    distanceToChord = VerticalDistanceToHead(chord.ChordMetrics.TopHeadMetrics, chord.AbsMsPosition);
                 else
-                    distanceToChord = VerticalDistanceToHead(chord.ChordMetrics.BottomHeadMetrics, chord.MsPosition);
+                    distanceToChord = VerticalDistanceToHead(chord.ChordMetrics.BottomHeadMetrics, chord.AbsMsPosition);
 
                 minimumDistanceToChords = minimumDistanceToChords < distanceToChord ? minimumDistanceToChords : distanceToChord;
             }
@@ -873,36 +873,36 @@ namespace Moritz.Symbols
         private float BeamBeginMsPosition(Beam beam)
         {
             Debug.Assert(this.Beams.Contains(beam));
-            float beamBeginMsPosition = float.MinValue;
+            float beamBeginAbsMsPosition = float.MinValue;
             foreach(ChordSymbol chord in Chords)
             {
                 float stemX = chord.ChordMetrics.StemMetrics.OriginX;
                 if(stemX == beam.LeftX || stemX == beam.RightX) // rightX can be a beam stub
                 {
-                    beamBeginMsPosition = chord.MsPosition;
+                    beamBeginAbsMsPosition = chord.AbsMsPosition;
                     break;
                 }
             }
-            Debug.Assert(beamBeginMsPosition != float.MinValue);
-            return beamBeginMsPosition;
+            Debug.Assert(beamBeginAbsMsPosition != float.MinValue);
+            return beamBeginAbsMsPosition;
         }
 
         private float BeamEndMsPosition(Beam beam)
         {
             Debug.Assert(this.Beams.Contains(beam));
-            float beamEndMsPosition = float.MinValue;
+            float beamEndAbsMsPosition = float.MinValue;
             for(int i = Chords.Count - 1; i >= 0; --i)
             {
                 ChordSymbol chord = Chords[i];
                 float stemX = chord.ChordMetrics.StemMetrics.OriginX;
                 if(stemX == beam.LeftX || stemX == beam.RightX) // rightX can be a beam stub
                 {
-                    beamEndMsPosition = chord.MsPosition;
+                    beamEndAbsMsPosition = chord.AbsMsPosition;
                     break;
                 }
             }
-            Debug.Assert(beamEndMsPosition != float.MinValue);
-            return beamEndMsPosition;
+            Debug.Assert(beamEndAbsMsPosition != float.MinValue);
+            return beamEndAbsMsPosition;
         }
 
         public override void WriteSVG(SvgWriter w)

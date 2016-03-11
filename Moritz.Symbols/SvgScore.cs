@@ -299,9 +299,9 @@ namespace Moritz.Symbols
                         {
                             Debug.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline);
                             // contains lists of consecutive rest indices
-                            List<List<int>> restsToReplace = new List<List<int>>();
+                            List<List<int>> restIndexLists = new List<List<int>>();
                             #region find the consecutive rests
-                            List<int> consecRestIndices = new List<int>();
+                            List<int> consecutiveRestIndexList = new List<int>();
                             for(int i = 0; i < voice.NoteObjects.Count - 1; i++)
                             {
                                 Debug.Assert(!(voice.NoteObjects[i] is Barline));
@@ -310,44 +310,41 @@ namespace Moritz.Symbols
                                 RestSymbol rest2 = voice.NoteObjects[i + 1] as RestSymbol;
                                 if(rest1 != null && rest2 != null)
                                 {
-                                    if(!consecRestIndices.Contains(i))
+                                    if(!consecutiveRestIndexList.Contains(i))
                                     {
-                                        consecRestIndices.Add(i);
+                                        consecutiveRestIndexList.Add(i);
                                     }
-                                    consecRestIndices.Add(i + 1);
+                                    consecutiveRestIndexList.Add(i + 1);
                                 }
                                 else
                                 {
-                                    if(consecRestIndices != null && consecRestIndices.Count > 0)
+                                    if(consecutiveRestIndexList != null && consecutiveRestIndexList.Count > 0)
                                     {
-                                        restsToReplace.Add(consecRestIndices);
-                                        consecRestIndices = new List<int>();
+                                        restIndexLists.Add(consecutiveRestIndexList);
+                                        consecutiveRestIndexList = new List<int>();
                                     }
                                 }
                             }
                             #endregion
                             #region replace the consecutive rests
-                            if(restsToReplace.Count > 0)
+                            if(restIndexLists.Count > 0)
                             {
-                                for(int i = restsToReplace.Count - 1; i >= 0; i--)
+                                for(int i = restIndexLists.Count - 1; i >= 0; i--)
                                 {
-                                    List<int> indToReplace = restsToReplace[i];
+                                    List<int> consecutiveRestIndices = restIndexLists[i];
                                     int msDuration = 0;
-                                    int msPos = 0;
-                                    float fontSize = 0F;
-                                    for(int j = indToReplace.Count - 1; j >= 0; j--)
+                                    RestSymbol rest = null;
+                                    // remove all but the first rest
+                                    for(int j = consecutiveRestIndices.Count - 1; j > 0; j--)
                                     {
-                                        RestSymbol rest = voice.NoteObjects[indToReplace[j]] as RestSymbol;
+                                        rest = voice.NoteObjects[consecutiveRestIndices[j]] as RestSymbol;
                                         Debug.Assert(rest != null);
                                         msDuration += rest.MsDuration;
-                                        msPos = rest.MsPosition;
-                                        fontSize = rest.FontHeight;
-                                        voice.NoteObjects.RemoveAt(indToReplace[j]);
+                                        voice.NoteObjects.RemoveAt(consecutiveRestIndices[j]);
                                     }
-                                    RestDef umrd = new RestDef(msPos, msDuration);
-                                    RestSymbol newRest = new RestSymbol(voice, umrd, minimumCrotchetDuration, _pageFormat.MusicFontHeight);
-                                    newRest.MsPosition = msPos;
-                                    voice.NoteObjects.Insert(indToReplace[0], newRest);
+                                    rest = voice.NoteObjects[consecutiveRestIndices[0]] as RestSymbol;
+                                    msDuration += rest.MsDuration;
+                                    rest.MsDuration = msDuration;
                                 }
                             }
                             #endregion

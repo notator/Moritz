@@ -14,15 +14,15 @@ namespace Moritz.Symbols
     /// </summary>
     public class NoteObjectMoment
     {
-        public NoteObjectMoment(int systemMsPosition, DurationSymbol durationSymbol)
+        public NoteObjectMoment(DurationSymbol durationSymbol)
         {
-            _msPosition = systemMsPosition + durationSymbol.MsPosition;
+            _absMsPosition = durationSymbol.AbsMsPosition;
             AddNoteObject(durationSymbol);
         }
 
-        public NoteObjectMoment(NoteObject noteObject, int msPosition)
+        public NoteObjectMoment(NoteObject noteObject, int absMsPosition)
         {
-            _msPosition = msPosition;
+            _absMsPosition = absMsPosition;
             AddNoteObject(noteObject);
         }
 
@@ -136,12 +136,10 @@ namespace Moritz.Symbols
             DurationSymbol durationSymbol = noteObject as DurationSymbol;
             if(durationSymbol != null && _noteObjects.Count > 0)
             {
-                Debug.Assert(durationSymbol.MsPosition == _msPosition);
+                Debug.Assert(durationSymbol.AbsMsPosition == _absMsPosition);
                 Debug.Assert(durationSymbol.Voice.Staff == _noteObjects[0].Voice.Staff);
             }
-
             _noteObjects.Add(noteObject);
-
         }
 
         public void ShowWarning_ControlsMustBeInTopVoice(DurationSymbol durationSymbol)
@@ -170,7 +168,7 @@ namespace Moritz.Symbols
                 voiceIndex++;
             }
             string msg = "Found a " + type + " at\n" +
-                        "    millisecond position " + durationSymbol.MsPosition + "\n" +
+                        "    millisecond position " + durationSymbol.AbsMsPosition + "\n" +
                         "    staff index " + staffIndex.ToString() + "\n" +
                         "    voice index " + voiceIndex.ToString() + "\n\n" +
                         "Controls which are not attached to the top voice\n" +
@@ -181,7 +179,7 @@ namespace Moritz.Symbols
         public void Add(NoteObject noteObject)
         {
             DurationSymbol durationSymbol = noteObject as DurationSymbol;
-            if(durationSymbol != null && _msPosition != durationSymbol.MsPosition)
+            if(durationSymbol != null && _absMsPosition != durationSymbol.AbsMsPosition)
                 throw new InvalidOperationException("Attempt to add a non-synchronous DurationSymbol to a MomentSymbol.");
             _noteObjects.Add(noteObject);
         }
@@ -222,8 +220,8 @@ namespace Moritz.Symbols
         /// <summary>
         /// The logical position in milliseconds from the beginning of the score.
         /// </summary>
-        public int MsPosition { get { return _msPosition; } }
-        private int _msPosition = -1;
+        public int AbsMsPosition { get { return _absMsPosition; } }
+        private int _absMsPosition = -1;
 
         public List<NoteObject> NoteObjects { get { return _noteObjects; } }
         private List<NoteObject> _noteObjects = new List<NoteObject>();

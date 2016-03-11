@@ -299,7 +299,7 @@ namespace Moritz.Symbols
             return returnMetrics;
         }
 
-        public override NoteObject GetNoteObject(Voice voice, IUniqueDef iud, bool firstDefInVoice,
+        public override NoteObject GetNoteObject(Voice voice, int absMsPosition, IUniqueDef iud, bool firstDefInVoice,
             ref byte currentVelocity, float musicFontHeight)
         {
             NoteObject noteObject = null;
@@ -315,12 +315,12 @@ namespace Moritz.Symbols
  
             if(cautionaryChordDef != null && firstDefInVoice)
             {
-                CautionaryChordSymbol cautionaryChordSymbol = new CautionaryChordSymbol(voice, cautionaryChordDef, cautionaryFontHeight);
+                CautionaryChordSymbol cautionaryChordSymbol = new CautionaryChordSymbol(voice, cautionaryChordDef, absMsPosition, cautionaryFontHeight);
                 noteObject = cautionaryChordSymbol;
             }                
             else if(midiChordDef != null)
             {
-                OutputChordSymbol outputChordSymbol = new OutputChordSymbol(voice, midiChordDef, minimumCrotchetDuration, musicFontHeight);
+                OutputChordSymbol outputChordSymbol = new OutputChordSymbol(voice, midiChordDef, absMsPosition, minimumCrotchetDuration, musicFontHeight);
 
                 if(midiChordDef.MidiVelocity != currentVelocity)
                 {
@@ -331,17 +331,17 @@ namespace Moritz.Symbols
             }
             else if(inputChordDef != null)
             {
-                InputChordSymbol inputChordSymbol = new InputChordSymbol(voice, inputChordDef, minimumCrotchetDuration, musicFontHeight);
+                InputChordSymbol inputChordSymbol = new InputChordSymbol(voice, inputChordDef, absMsPosition, minimumCrotchetDuration, musicFontHeight);
                 noteObject = inputChordSymbol;
             }
             else if(restDef != null) 
             {
-                RestSymbol restSymbol = new RestSymbol(voice, iud, minimumCrotchetDuration, musicFontHeight);
+                RestSymbol restSymbol = new RestSymbol(voice, iud, absMsPosition, minimumCrotchetDuration, musicFontHeight);
                 noteObject = restSymbol;
             }
             else if(clefChangeDef != null)
             {
-                ClefChangeSymbol clefChangeSymbol = new ClefChangeSymbol(voice, clefChangeDef.ClefType, cautionaryFontHeight, ((IUniqueDef)iud).MsPositionReTrk);
+                ClefChangeSymbol clefChangeSymbol = new ClefChangeSymbol(voice, clefChangeDef.ClefType, absMsPosition, cautionaryFontHeight);
                 noteObject = clefChangeSymbol;
             }
 
@@ -355,12 +355,12 @@ namespace Moritz.Symbols
             {
                 foreach(ChordSymbol voice1chord in staff.Voices[1].ChordSymbols)
                 {
-                    if(voice0chord.MsPosition == voice1chord.MsPosition)
+                    if(voice0chord.AbsMsPosition == voice1chord.AbsMsPosition)
                     {
                         ForceNaturals(voice0chord, voice1chord);
                         break;
                     }
-                    if(voice0chord.MsPosition < voice1chord.MsPosition)
+                    if(voice0chord.AbsMsPosition < voice1chord.AbsMsPosition)
                         break;
                 }               
             }
@@ -372,7 +372,7 @@ namespace Moritz.Symbols
         /// </summary>
         private void ForceNaturals(ChordSymbol synchChord1, ChordSymbol synchChord2)
         {
-            Debug.Assert(synchChord1.MsPosition == synchChord2.MsPosition);
+            Debug.Assert(synchChord1.AbsMsPosition == synchChord2.AbsMsPosition);
             foreach(Head head1 in synchChord1.HeadsTopDown)
             {
                 foreach(Head head2 in synchChord2.HeadsTopDown)

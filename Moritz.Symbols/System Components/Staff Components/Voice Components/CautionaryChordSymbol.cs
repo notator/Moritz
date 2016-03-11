@@ -8,8 +8,8 @@ namespace Moritz.Symbols
 {
     internal class CautionaryChordSymbol : ChordSymbol
     {
-        public CautionaryChordSymbol(Voice voice, CautionaryChordDef lccd, float fontSize)
-            : base(voice, lccd.MsDuration, lccd.MsPositionReTrk, 600, fontSize)
+        public CautionaryChordSymbol(Voice voice, CautionaryChordDef lccd, int absMsPosition, float fontSize)
+            : base(voice, lccd.MsDuration, absMsPosition, 600, fontSize)
         {
             SetNoteheadPitches(lccd.NotatedMidiPitches);
 

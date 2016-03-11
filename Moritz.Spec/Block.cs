@@ -72,10 +72,11 @@ namespace Moritz.Spec
         /// The Trks may contain any combination of RestDef, MidiChordDef and ClefChangeDef.
         /// The InputVoiceDefs may contain any combination of RestDef, InputChordDef and ClefChangeDef.
         /// <para>1. All voiceDefs start at MsPositionReSeq=0 and have the same MsDuration.</para>
-        /// <para>2. A restDef is never followed by another RestDef (RestDefs are agglomerated).</para>
-        /// <para>3. No voiceDef may have a ClefChangeDef before the first MidiChordDef.</para>
-        /// <para>4. There is at least one MidiChordDef or InputChordDef at the beginning of the block</para>
-        /// <para>5. At least one MidiChordDef or InputChordDef ends at the end of the block</para>
+        /// <para>2. A RestDef is never followed by another RestDef (RestDefs have been agglomerated).</para>
+        /// <para>3. There is at least one MidiChordDef or InputChordDef or CautionaryChordDef at the beginning of the block</para>
+        /// <para>4. At least one MidiChordDef or InputChordDef ends at the end of the block</para>,
+        /// <para>5. VoiceDefs in Blocks may only contain MidiChordDefs, InputChordDefs and RestDefs.</para>
+        /// <para>6. UniqueDef.MsPositionReTrk attributes are all set correctly (starting at 0).</para>
         /// </summary>
         private void AssertBlockConsistency()
 		{
@@ -89,59 +90,89 @@ namespace Moritz.Spec
                 }
             }
             #endregion
-            #region There is at least one MidiChordDef or InputChordDef at the beginning and end of the Sequence
-            bool foundStartChordDef = false;
-			bool foundEndChordDef = false;
+            #region A restDef is never followed by another RestDef (RestDefs are agglomerated).
             foreach(VoiceDef voiceDef in _voiceDefs)
             {
-				if(voiceDef.UniqueDefs.Count > 0)
-				{
-                    IUniqueDef firstIUD = voiceDef.UniqueDefs[0];
-					if(firstIUD is MidiChordDef || firstIUD is InputChordDef)
-					{
-						foundStartChordDef = true;
-					}
-                    IUniqueDef lastIUD = voiceDef.UniqueDefs[voiceDef.UniqueDefs.Count - 1];
-					if(lastIUD is MidiChordDef || lastIUD is InputChordDef)
-					{
-						foundEndChordDef = true;
-					}
-				}
-			}
-
-			Debug.Assert((foundStartChordDef == true && foundEndChordDef == true),
-						"A block must begin and end with at least one MidiChordDef or InputChordDef.");
-			#endregion
-		}
-
-		/// <summary>
-		/// A Block may not have a ClefChangeDef before the first MidiChordDef if the Block is at MsPosition 0.
-		/// </summary>
-		private void AssertBlockClefChangeConsistency()
-		{
-			if(AbsMsPosition == 0)
-			{
-                foreach(VoiceDef voiceDef in _voiceDefs)
+                bool restFound = false;
+                foreach(IUniqueDef iud in voiceDef.UniqueDefs)
                 {
-					foreach(IUniqueDef iud in voiceDef.UniqueDefs)
-					{
-						if(iud is MidiChordDef || iud is InputChordDef || iud is ClefChangeDef)
-						{
-                            Debug.Assert((iud is MidiChordDef || iud is InputChordDef),
-								"A Block may not have a ClefChangeDef before the first ChordDef if the Block is at MsPosition 0.");
-							break;
-						}
-					}
-				}
-			}
-		}
+                    if(iud is RestDef)
+                    {
+                        if(restFound)
+                        {
+                            Debug.Assert(false, "Consecutive rests found!");
+                        }
+                        restFound = true;
+                    }
+                    else
+                    {
+                        restFound = false;
+                    }
+                }
+            }
+            #endregion
+            #region There is at least one MidiChordDef or InputChordDef or CautionaryChordDef at the beginning of the Block, 
+            bool foundStartChordDef = false;
+            foreach(VoiceDef voiceDef in _voiceDefs)
+            {
+                if(voiceDef.UniqueDefs.Count > 0)
+                {
+                    IUniqueDef firstIUD = voiceDef.UniqueDefs[0];
+                    if(firstIUD is MidiChordDef || firstIUD is CautionaryChordDef || firstIUD is InputChordDef)
+                    {
+                        foundStartChordDef = true;
+                    }
+                }
+            }
 
-		/// <summary>
-		/// The argument warp is a list of doubles, in ascending order, beginning with 0 and ending with 1.
-		/// The doubles represent moments in the original duration that will be separated from each other
-		/// by equal durations when the function returns. The MsDuration of the Seq is not changed.
-		/// </summary>
-		public void WarpDurations(List<double> warp)
+            Debug.Assert((foundStartChordDef == true),
+                        "A block must begin with at least one MidiChordDef or InputChordDef or CautionaryChordDef.");
+            #endregion
+            #region At least one MidiChordDef or InputChordDef ends at the end of the Block 
+            bool foundEndChordDef = false;
+            foreach(VoiceDef voiceDef in _voiceDefs)
+            {
+                if(voiceDef.UniqueDefs.Count > 0)
+                {
+                    IUniqueDef lastIUD = voiceDef.UniqueDefs[voiceDef.UniqueDefs.Count - 1];
+                    if(lastIUD is MidiChordDef || lastIUD is InputChordDef)
+                    {
+                        foundEndChordDef = true;
+                    }
+                }
+            }
+            Debug.Assert((foundEndChordDef == true),
+                        "At least one MidiChordDef or InputChordDef must end at the end of the Block.");
+            #endregion
+            #region VoiceDefs in Blocks may only contain MidiChordDefs, InputChordDefs, RestDefs and CautionaryChordDefs.
+            foreach(VoiceDef voiceDef in _voiceDefs)
+            {
+                foreach(IUniqueDef iud in voiceDef.UniqueDefs)
+                {
+                    Debug.Assert((iud is MidiChordDef || iud is RestDef || iud is CautionaryChordDef || iud is InputChordDef),
+                        "VoiceDefs in Blocks may only contain MidiChordDefs, InputChordDefs and RestDefs");
+                }
+            }
+            #endregion
+            #region UniqueDef.MsPositionReTrk attributes are all set correctly (starting at 0)
+            foreach(VoiceDef voiceDef in _voiceDefs)
+            {
+                int msPositionReTrk = 0;
+                foreach(IUniqueDef iud in voiceDef.UniqueDefs)
+                {     
+                    Debug.Assert((iud.MsPositionReTrk == msPositionReTrk), "Error in uniqueDef.MsPositionReTrk.");
+                    msPositionReTrk += iud.MsDuration;
+                }
+            }
+            #endregion
+        }
+
+        /// <summary>
+        /// The argument warp is a list of doubles, in ascending order, beginning with 0 and ending with 1.
+        /// The doubles represent moments in the original duration that will be separated from each other
+        /// by equal durations when the function returns. The MsDuration of the Seq is not changed.
+        /// </summary>
+        public void WarpDurations(List<double> warp)
 		{
 			AssertBlockConsistency();
 			int sequenceMsDuration = MsDuration;
@@ -162,6 +193,7 @@ namespace Moritz.Spec
         public List<VoiceDef> GetBar(int barlineAbsEndMsPosition)
         {
             Debug.Assert(AbsMsPosition < barlineAbsEndMsPosition);
+            AssertBlockConsistency();
 
             List<VoiceDef> firstBar = new List<VoiceDef>();
             List<VoiceDef> secondBar = new List<VoiceDef>();
@@ -190,9 +222,6 @@ namespace Moritz.Spec
                 }
                 foreach(IUniqueDef iud in voiceDef.UniqueDefs)
                 {
-                    Debug.Assert((iud is MidiChordDef || iud is RestDef || iud is InputChordDef),
-                         "Illegal IUniqueDef type in voiceDef.UniqueDefs");
-
                     int iudMsDuration = iud.MsDuration;
                     int iudAbsStartPos = this.AbsMsPosition + iud.MsPositionReTrk;
                     int iudAbsEndPos = iudAbsStartPos + iudMsDuration;
@@ -204,22 +233,37 @@ namespace Moritz.Spec
                     }
                     else if(iudAbsEndPos > barlineAbsEndMsPosition)
                     {
+                        int durationBeforeBarline = barlineAbsEndMsPosition - iudAbsStartPos;
                         int durationAfterBarline = iudAbsEndPos - barlineAbsEndMsPosition;
                         if(iud is RestDef)
                         {
                             // This is a rest. Split it.
-                            RestDef firstRestHalf = new RestDef(iudAbsStartPos, barlineAbsEndMsPosition - iudAbsStartPos);
+                            RestDef firstRestHalf = new RestDef(iudAbsStartPos, durationBeforeBarline);
                             firstBarVoice.UniqueDefs.Add(firstRestHalf);
 
                             RestDef secondRestHalf = new RestDef(barlineAbsEndMsPosition, durationAfterBarline);
                             secondBarVoice.UniqueDefs.Add(secondRestHalf);
                         }
+                        else if(iud is CautionaryChordDef)
+                        {
+                            // This is a cautionary chord. Set the position of the following barline, and
+                            // Add a CautionaryChordDef at the beginning of the following bar.
+                            iud.MsDuration = barlineAbsEndMsPosition - iudAbsStartPos;
+                            firstBarVoice.UniqueDefs.Add(iud);
+
+                            Debug.Assert(secondBarVoice.UniqueDefs.Count == 0);
+                            CautionaryChordDef secondLmdd = new CautionaryChordDef((IUniqueChordDef)iud, 0, durationAfterBarline);
+                            secondBarVoice.UniqueDefs.Add(secondLmdd);
+                        }
                         else if(iud is MidiChordDef || iud is InputChordDef)
                         {
                             IUniqueSplittableChordDef uniqueChordDef = iud as IUniqueSplittableChordDef;
-                            uniqueChordDef.MsDurationToNextBarline = barlineAbsEndMsPosition - iudAbsStartPos;
-
+                            uniqueChordDef.MsDurationToNextBarline = durationBeforeBarline;
                             firstBarVoice.UniqueDefs.Add(uniqueChordDef);
+
+                            Debug.Assert(secondBarVoice.UniqueDefs.Count == 0);
+                            CautionaryChordDef ccd = new CautionaryChordDef(uniqueChordDef, 0, durationAfterBarline);
+                            secondBarVoice.UniqueDefs.Add(ccd);
                         }
                     }
                     else

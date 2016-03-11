@@ -349,7 +349,12 @@ namespace Moritz.Xml
             else
                 type.Append("Flags");
 
-            SvgStartGroup(type.ToString());
+            string id = type.ToString();
+
+            _w.WriteStartElement("g");
+
+            if(!String.IsNullOrEmpty(id))
+                _w.WriteAttributeString("id", id);
 
             string x1 = "0";
             string x2 = "0";
@@ -379,7 +384,8 @@ namespace Moritz.Xml
                 _w.WriteAttributeString("d", dAttributeSB.ToString());
                 _w.WriteEndElement();
             }
-            SvgEndGroup();
+
+            _w.WriteEndElement();
 
         }
 

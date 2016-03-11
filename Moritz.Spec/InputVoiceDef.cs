@@ -102,7 +102,7 @@ namespace Moritz.Spec
         /// <param name="iUniqueDef"></param>
         public override void Add(IUniqueDef iUniqueDef)
         {
-            Debug.Assert(!(iUniqueDef is MidiChordDef));
+            Debug.Assert(iUniqueDef is InputChordDef || iUniqueDef is RestDef || iUniqueDef is CautionaryChordDef);
             _Add(iUniqueDef);
         }
         /// <summary>
@@ -120,7 +120,7 @@ namespace Moritz.Spec
         /// </summary>
         public override void Insert(int index, IUniqueDef iUniqueDef)
         {
-            Debug.Assert(!(iUniqueDef is MidiChordDef));
+            Debug.Assert(iUniqueDef is InputChordDef || iUniqueDef is RestDef || iUniqueDef is CautionaryChordDef);
             _Insert(index, iUniqueDef);
         }
         /// <summary>

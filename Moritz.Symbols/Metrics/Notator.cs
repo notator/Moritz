@@ -44,10 +44,13 @@ namespace Moritz.Symbols
             List<ClefChangeDef> voice0ClefChangeDefs = new List<ClefChangeDef>();
             List<ClefChangeDef> voice1ClefChangeDefs = new List<ClefChangeDef>();
 
+            int systemAbsMsPos = 0;
             for(int systemIndex = 0; systemIndex < systems.Count; ++systemIndex)
             {
                 SvgSystem system = systems[systemIndex];
+                system.AbsMsPosition = systemAbsMsPos;
                 int visibleStaffIndex = -1;
+                int msPositionReVoiceDef = 0;
                 for(int staffIndex = 0; staffIndex < system.Staves.Count; ++staffIndex)
                 {
                     Staff staff = system.Staves[staffIndex];
@@ -57,6 +60,7 @@ namespace Moritz.Symbols
                     }
                     voice0ClefChangeDefs.Clear();
                     voice1ClefChangeDefs.Clear();
+                    msPositionReVoiceDef = 0;
                     for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                     {
                         Voice voice = staff.Voices[voiceIndex];
@@ -77,11 +81,24 @@ namespace Moritz.Symbols
                                 inputVoice.MidiChannel = inputVoiceDef.MidiChannel; // The channel is only set in the first system
                             }
                         }
+                        msPositionReVoiceDef = 0;
                         foreach(IUniqueDef iud in voice.VoiceDef.UniqueDefs)
                         {
-                            NoteObject noteObject =
-                                SymbolSet.GetNoteObject(voice, iud, firstLmdd, ref currentChannelVelocities[staffIndex], musicFontHeight);
+                            int absMsPosition = systemAbsMsPos + msPositionReVoiceDef;
 
+                            NoteObject noteObject =
+                                SymbolSet.GetNoteObject(voice, absMsPosition, iud, firstLmdd, ref currentChannelVelocities[staffIndex], musicFontHeight);
+
+                            IUniqueSplittableChordDef iscd = iud as IUniqueSplittableChordDef;
+                            if(iscd != null && iscd.MsDurationToNextBarline != null)
+                            {
+                                msPositionReVoiceDef += (int)iscd.MsDurationToNextBarline;
+                            }
+                            else
+                            {
+                                msPositionReVoiceDef += iud.MsDuration;
+                            }
+                            
                             ClefChangeSymbol clefChangeSymbol = noteObject as ClefChangeSymbol;
                             if(clefChangeSymbol != null)
                             {
@@ -105,7 +122,7 @@ namespace Moritz.Symbols
 
                     if(staff.Voices.Count == 2)
                     {
-                        InsertInvisibleClefChangeSymbols(staff.Voices, voice0ClefChangeDefs, voice1ClefChangeDefs);
+                        InsertInvisibleClefChangeSymbols(staff.Voices, systemAbsMsPos, voice0ClefChangeDefs, voice1ClefChangeDefs);
 
                         CheckClefTypes(staff.Voices);
 
@@ -114,6 +131,7 @@ namespace Moritz.Symbols
                             standardSymbolSet.ForceNaturalsInSynchronousChords(staff);
                     }
                 }
+                systemAbsMsPos += msPositionReVoiceDef;
             }
         }
 
@@ -155,13 +173,13 @@ namespace Moritz.Symbols
         /// Insert invisible clefChangeSymbols into the other voice.
         /// ClefChangeSymbols are used by the Notator when deciding how to notate chords.
         /// </summary>
-        private void InsertInvisibleClefChangeSymbols(List<Voice> voices, List<ClefChangeDef> voice0ClefChangeDefs, List<ClefChangeDef> voice1ClefChangeDefs)
+        private void InsertInvisibleClefChangeSymbols(List<Voice> voices, int systemAbsMsPos, List<ClefChangeDef> voice0ClefChangeDefs, List<ClefChangeDef> voice1ClefChangeDefs)
         {
             Debug.Assert(voices.Count == 2);
             if(voice1ClefChangeDefs.Count > 0)
-                InsertInvisibleClefChanges(voices[0], voice1ClefChangeDefs);
+                InsertInvisibleClefChanges(voices[0], systemAbsMsPos, voice1ClefChangeDefs);
             if(voice0ClefChangeDefs.Count > 0)
-                InsertInvisibleClefChanges(voices[1], voice0ClefChangeDefs);
+                InsertInvisibleClefChanges(voices[1], systemAbsMsPos, voice0ClefChangeDefs);
         }
 
         /// <summary>
@@ -195,11 +213,12 @@ namespace Moritz.Symbols
             return clefs;
         }
 
-        private void InsertInvisibleClefChanges(Voice voice, List<ClefChangeDef> clefChangeDefs)
+        private void InsertInvisibleClefChanges(Voice voice, int systemAbsMsPos, List<ClefChangeDef> clefChangeDefs)
         {
             foreach(ClefChangeDef ccd in clefChangeDefs)
             {
-                ClefChangeSymbol invisibleClefChangeSymbol = new ClefChangeSymbol(voice, ccd.ClefType, _pageFormat.CautionaryNoteheadsFontHeight, ccd.MsPositionReTrk);
+                int absPos = systemAbsMsPos + ccd.MsPositionReTrk;
+                ClefChangeSymbol invisibleClefChangeSymbol = new ClefChangeSymbol(voice, ccd.ClefType, absPos, _pageFormat.CautionaryNoteheadsFontHeight);
                 invisibleClefChangeSymbol.IsVisible = false;
                 InsertInvisibleClefChangeInNoteObjects(voice, invisibleClefChangeSymbol);
             }
@@ -209,7 +228,7 @@ namespace Moritz.Symbols
         {
             Debug.Assert(!(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline));
 
-            int msPos = invisibleClefChangeSymbol.MsPosition;
+            int absMsPos = invisibleClefChangeSymbol.AbsMsPosition;
             List<DurationSymbol> durationSymbols = new List<DurationSymbol>();
             foreach(DurationSymbol durationSymbol in voice.DurationSymbols)
             {
@@ -218,11 +237,11 @@ namespace Moritz.Symbols
 
             Debug.Assert(durationSymbols.Count > 0);
 
-            if(msPos <= durationSymbols[0].MsPosition)
+            if(absMsPos <= durationSymbols[0].AbsMsPosition)
             {
                 InsertBeforeDS(voice.NoteObjects, durationSymbols[0], invisibleClefChangeSymbol);
             }
-            else if(msPos > durationSymbols[durationSymbols.Count - 1].MsPosition)
+            else if(absMsPos > durationSymbols[durationSymbols.Count - 1].AbsMsPosition)
             {
                 // the noteObjects do not yet have a final barline (see Debug.Assert() above)
                 voice.NoteObjects.Add(invisibleClefChangeSymbol);
@@ -232,7 +251,7 @@ namespace Moritz.Symbols
                 Debug.Assert(durationSymbols.Count > 1);
                 for(int i = 1; i < durationSymbols.Count; ++i)
                 {
-                    if(durationSymbols[i - 1].MsPosition < msPos && durationSymbols[i].MsPosition >= msPos)
+                    if(durationSymbols[i - 1].AbsMsPosition < absMsPos && durationSymbols[i].AbsMsPosition >= absMsPos)
                     {
                         InsertBeforeDS(voice.NoteObjects, durationSymbols[i], invisibleClefChangeSymbol);
                         break;
