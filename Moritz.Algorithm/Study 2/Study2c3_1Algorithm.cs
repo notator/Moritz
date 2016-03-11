@@ -10,7 +10,7 @@ namespace Moritz.Algorithm.Study2c3_1
 {
     /// <summary>
     /// Algorithm for testing Song 6's palettes.
-    /// This may develope as composition progresses...
+    /// This may develop as composition progresses...
     /// </summary>
     public class Study2c3_1Algorithm : CompositionAlgorithm
     {
@@ -70,15 +70,15 @@ namespace Moritz.Algorithm.Study2c3_1
             return consecutiveBars;
         }
 
-        private void WriteDurationSymbolsForStrandInTopStaff(VoiceDef voice, int barIndex, List<int> originalStrandValues, ref int msPosition)
+        private void WriteDurationSymbolsForStrandInTopStaff(VoiceDef voice, int barIndex, List<int> originalStrandValues, ref int msPositionReTrk)
         {
             Palette palette = _palettes[0]; // top templateDefs
             for(int valueIndex = 0; valueIndex < originalStrandValues.Count; valueIndex++)
             {
                 int value = originalStrandValues[valueIndex];
                 IUniqueDef noteDef = palette.UniqueDurationDef(value - 1);
-                noteDef.MsPosition = msPosition;
-                msPosition += noteDef.MsDuration;
+                noteDef.MsPositionReTrk = msPositionReTrk;
+                msPositionReTrk += noteDef.MsDuration;
                 voice.UniqueDefs.Add(noteDef);
             }
         }
@@ -95,7 +95,7 @@ namespace Moritz.Algorithm.Study2c3_1
             {
                 VoiceDef topStaffVoice =  topStaffBars[barIndex];
 				VoiceDef newVoice = new Trk((byte)(staffNumber-1), new List<IUniqueDef>());
-                int currentMsPosition = topStaffVoice.UniqueDefs[0].MsPosition;
+                int currentMsPositionReTrk = topStaffVoice.UniqueDefs[0].MsPositionReTrk;
 
                 List<int> lowerStaffValueSequence = strandValuesList[barIndex];
                 List<int> lowerStaffMsDurations = LowerStaffMsDurations(topStaffVoice, lowerStaffValueSequence.Count);
@@ -104,8 +104,8 @@ namespace Moritz.Algorithm.Study2c3_1
                     int value = lowerStaffValueSequence[valueIndex];
                     IUniqueDef noteDef = palette.UniqueDurationDef(value - 1);
                     noteDef.MsDuration = lowerStaffMsDurations[valueIndex];
-                    noteDef.MsPosition = currentMsPosition;
-                    currentMsPosition += noteDef.MsDuration; 
+                    noteDef.MsPositionReTrk = currentMsPositionReTrk;
+                    currentMsPositionReTrk += noteDef.MsDuration; 
                     newVoice.UniqueDefs.Add(noteDef);
                 }
 
@@ -129,19 +129,19 @@ namespace Moritz.Algorithm.Study2c3_1
             int equal1MsDuration = voiceMsDuration / numberOfTopDurations;
             List<int> equal1MsPositions = new List<int>();
             int equal1MsPosition = 0;
-            List<int> actual1MsPositions = new List<int>();
+            List<int> actual1MsPositionsReTrk = new List<int>();
             List<int> actual1MsDurations = new List<int>();
             foreach(IUniqueDef iumdd in topStaffVoice.UniqueDefs)
             {
                 equal1MsPositions.Add(equal1MsPosition);
                 equal1MsPosition += equal1MsDuration;
 
-                actual1MsPositions.Add(iumdd.MsPosition);
+                actual1MsPositionsReTrk.Add(iumdd.MsPositionReTrk);
                 actual1MsDurations.Add(iumdd.MsDuration);
             }
             for(int i = 0; i < equal1MsPositions.Count; i++)
             {
-                equal1MsPositions[i] += actual1MsPositions[0];
+                equal1MsPositions[i] += actual1MsPositionsReTrk[0];
             }
             int followingBarlinePosition = equal1MsPositions[0] + voiceMsDuration;
             #endregion
@@ -159,7 +159,7 @@ namespace Moritz.Algorithm.Study2c3_1
             }
             for(int i = 0; i < equal2MsPositions.Count; i++)
             {
-                equal2MsPositions[i] += actual1MsPositions[0];
+                equal2MsPositions[i] += actual1MsPositionsReTrk[0];
             }
             #endregion
 
@@ -182,7 +182,7 @@ namespace Moritz.Algorithm.Study2c3_1
                         else upperLimit = equal1MsPositions[i + 1];
                         if(e2MsPosition < upperLimit && e2MsPosition >= equal1MsPositions[i])
                         {
-                            actualStaff2MsPosition = actual1MsPositions[i] +
+                            actualStaff2MsPosition = actual1MsPositionsReTrk[i] +
                                 (((e2MsPosition - equal1MsPositions[i]) * actual1MsDurations[i]) / equal1MsDuration);
                             break;
                         }

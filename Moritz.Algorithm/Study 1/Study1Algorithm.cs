@@ -65,13 +65,13 @@ namespace Moritz.Algorithm.Study1
 
 		private byte[] GetTrackChordNumbers()
 		{
-			byte[] bytes = File.ReadAllBytes(@"D:\Visual Studio\Projects\Moritz\Moritz.Algorithm\Study1\A4chordNumbers");
+			byte[] bytes = File.ReadAllBytes(@"D:\Visual Studio\Projects\Moritz\Moritz.Algorithm\Study 1\A4chordNumbers");
 			return bytes;
 		}
 
 		private byte[] GetTrackRootPitches()
 		{
-			byte[] bytes = File.ReadAllBytes(@"D:\Visual Studio\Projects\Moritz\Moritz.Algorithm\Study1\A4pitches");
+			byte[] bytes = File.ReadAllBytes(@"D:\Visual Studio\Projects\Moritz\Moritz.Algorithm\Study 1\A4pitches");
 			return bytes;
 		}
 
@@ -153,17 +153,28 @@ namespace Moritz.Algorithm.Study1
 		List<byte> GetChordVelocities()
 		{
 			List<byte> velocities = new List<byte>();
-			// velocities from the original composition (see About Study 1)
-			velocities.Add(127);
-			velocities.Add(103);
-			velocities.Add(84);
-			velocities.Add(67);
-			velocities.Add(55);
-			velocities.Add(44);
-			velocities.Add(36);
-			velocities.Add(29);
+            // velocities from the original composition (see About Study 1)
+            //velocities.Add(127);
+            //velocities.Add(103);
+            //velocities.Add(84);
+            //velocities.Add(67);
+            //velocities.Add(55);
+            //velocities.Add(44);
+            //velocities.Add(36);
+            //velocities.Add(29);
 
-			return velocities;
+            // Max value per duration symbol (March 2016)
+            // See Moritz.Symbols/System Components/Staff Components/VoiceComponents/AnchorageSymbol.cs.AddDynamic(...)
+            velocities.Add(127); // fff
+            velocities.Add(119); // ff
+            velocities.Add(110); // f
+            velocities.Add(100); // mf
+            velocities.Add(90); // mp
+            velocities.Add(78); // p
+            velocities.Add(64); // pp
+            velocities.Add(45); // ppp
+
+            return velocities;
 		}
 
 		private List<int> GetChordMsDurations()
@@ -209,24 +220,6 @@ namespace Moritz.Algorithm.Study1
 				bars.Add(bar);
 			}
 
-			return bars;
-		}
-
-		/// <summary>
-		/// Splits the voices (currently in a single bar) into bars
-		/// barlineMsPositions contains both msPosition 0, and the position of the final barline.
-		/// </summary>
-		private List<List<VoiceDef>> GetBarsFromBarlineMsPositions(List<VoiceDef> voices, List<int> barLineMsPositions)
-		{
-			List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
-			List<List<VoiceDef>> twoBars = null;
-			for(int i = barLineMsPositions.Count - 2; i >= 1; --i)
-			{
-				twoBars = SplitBar(voices, barLineMsPositions[i]);
-				bars.Insert(0, twoBars[1]);
-				voices = twoBars[0];
-			}
-			bars.Insert(0, twoBars[0]);
 			return bars;
 		}
 
