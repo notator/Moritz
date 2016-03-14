@@ -463,7 +463,7 @@ namespace Moritz.Symbols
         private List<NoteObjectMoment> MomentSymbols()
         {
 			// The msPosition wrt the start of the piece.
-            int finalBarlineAbsMsPosition = this.AbsMsPosition + SystemMsDuration();
+            int rightmostBarlineAbsMsPosition = this.AbsMsPosition + SystemMsDuration();
 
             SortedDictionary<int, NoteObjectMoment> dict = new SortedDictionary<int, NoteObjectMoment>();
             Barline barline = null;
@@ -508,17 +508,17 @@ namespace Moritz.Symbols
 
                     if(clef != null) // final clef
                     {
-                        if(dict.ContainsKey(finalBarlineAbsMsPosition))
-                            dict[finalBarlineAbsMsPosition].Add(clef);
+                        if(dict.ContainsKey(rightmostBarlineAbsMsPosition))
+                            dict[rightmostBarlineAbsMsPosition].Add(clef);
                         else
-                            dict.Add(finalBarlineAbsMsPosition, new NoteObjectMoment(clef, finalBarlineAbsMsPosition));
+                            dict.Add(rightmostBarlineAbsMsPosition, new NoteObjectMoment(clef, rightmostBarlineAbsMsPosition));
                     }
                     if(barline != null) // final barline
                     {
-                        if(dict.ContainsKey(finalBarlineAbsMsPosition))
-                            dict[finalBarlineAbsMsPosition].Add(barline);
+                        if(dict.ContainsKey(rightmostBarlineAbsMsPosition))
+                            dict[rightmostBarlineAbsMsPosition].Add(barline);
                         else
-                            dict.Add(finalBarlineAbsMsPosition, new NoteObjectMoment(barline, finalBarlineAbsMsPosition));
+                            dict.Add(rightmostBarlineAbsMsPosition, new NoteObjectMoment(barline, rightmostBarlineAbsMsPosition));
                     }
                 }
             }
@@ -548,18 +548,15 @@ namespace Moritz.Symbols
 
         private int SystemMsDuration()
         {
-            VoiceDef firstVoiceDef = Staves[0].Voices[0].VoiceDef;
-            IUniqueDef lastIud = firstVoiceDef[firstVoiceDef.Count - 1];
-
             int systemMsDuration = 0;
-            IUniqueSplittableChordDef iuscd = lastIud as IUniqueSplittableChordDef;
-            if(iuscd != null && iuscd.MsDurationToNextBarline != null)
+            List<NoteObject> noteObjects = Staves[0].Voices[0].NoteObjects;
+            foreach(NoteObject noteObject in noteObjects)
             {
-                systemMsDuration = iuscd.MsPositionReTrk + (int)(iuscd.MsDurationToNextBarline);
-            }
-            else
-            {
-                systemMsDuration = lastIud.MsPositionReTrk + lastIud.MsDuration;
+                DurationSymbol durationSymbol = noteObject as DurationSymbol;
+                if(durationSymbol != null)
+                {
+                    systemMsDuration += durationSymbol.MsDuration;
+                }
             }
 
             return systemMsDuration;
