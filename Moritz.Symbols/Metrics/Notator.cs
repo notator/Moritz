@@ -48,7 +48,7 @@ namespace Moritz.Symbols
             for(int systemIndex = 0; systemIndex < systems.Count; ++systemIndex)
             {
                 SvgSystem system = systems[systemIndex];
-                system.AbsMsPosition = systemAbsMsPos;
+                system.AbsStartMsPosition = systemAbsMsPos;
                 int visibleStaffIndex = -1;
                 int msPositionReVoiceDef = 0;
                 for(int staffIndex = 0; staffIndex < system.Staves.Count; ++staffIndex)

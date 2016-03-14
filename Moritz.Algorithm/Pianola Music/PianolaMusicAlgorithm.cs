@@ -35,16 +35,16 @@ namespace Moritz.Algorithm.PianolaMusic
 
             Block sequence = new Block(mainSeq, null);
 
-            List<int> barlineEndMsPositions = GetBarlineEndPositions(sequence, NumberOfBars);
+            List<int> absMsPositionsOfRightBarlines = GetAbsMsPositionsOfRightBarlines(sequence, NumberOfBars);
 
-            List<List<VoiceDef>> bars = ConvertBlockToBars(sequence, barlineEndMsPositions);
+            List<List<VoiceDef>> bars = ConvertBlockToBars(sequence, absMsPositionsOfRightBarlines);
 
             SetPatch0InAllChords(bars);
 
 			return bars;
 		}
 
-        private List<int> GetBarlineEndPositions(Block sequence, int nBars)
+        private List<int> GetAbsMsPositionsOfRightBarlines(Block sequence, int nBars)
         {
             double barMsDuration = ((double)sequence.MsDuration) / nBars;
             double msPosition = barMsDuration;

@@ -637,12 +637,37 @@ namespace Moritz.Symbols
             ReplaceConsecutiveRestsInBars(_pageFormat.MinimumCrotchetDuration);
             SetSystemsToBeginAtBars(_pageFormat.SystemStartBars);
 
+            SetSystemAbsEndMsPositions();
+
             MoveRestClefChangesToEndsOfSystems();
 
             FinalizeAccidentals();
             AddBarlineAtStartOfEachSystem();
             AddBarNumbers();
             SetStaffNames();
+        }
+
+        private void SetSystemAbsEndMsPositions()
+        {
+            int totalMsDuration = 0;
+            foreach(SvgSystem system in Systems)
+            {
+                List<NoteObject> noteObjects = system.Staves[0].Voices[0].NoteObjects;
+                foreach(NoteObject noteObject in noteObjects)
+                {
+                    DurationSymbol ds = noteObject as DurationSymbol;
+                    if(ds != null)
+                    {
+                        totalMsDuration += ds.MsDuration;
+                    }
+                }
+            }
+            int endMsPosition = totalMsDuration;
+            for(int i = Systems.Count - 1; i >= 0; --i)
+            {
+                Systems[i].AbsEndMsPosition = endMsPosition;
+                endMsPosition = Systems[i].AbsStartMsPosition;
+            }
         }
 
         /// <summary>

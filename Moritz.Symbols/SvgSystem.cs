@@ -462,9 +462,6 @@ namespace Moritz.Symbols
         /// <typeparam name="Type">DurationSymbol, ChordSymbol, RestSymbol</typeparam>
         private List<NoteObjectMoment> MomentSymbols()
         {
-			// The msPosition wrt the start of the piece.
-            int rightmostBarlineAbsMsPosition = this.AbsMsPosition + SystemMsDuration();
-
             SortedDictionary<int, NoteObjectMoment> dict = new SortedDictionary<int, NoteObjectMoment>();
             Barline barline = null;
             ClefSymbol clef = null;
@@ -508,17 +505,17 @@ namespace Moritz.Symbols
 
                     if(clef != null) // final clef
                     {
-                        if(dict.ContainsKey(rightmostBarlineAbsMsPosition))
-                            dict[rightmostBarlineAbsMsPosition].Add(clef);
+                        if(dict.ContainsKey(this.AbsEndMsPosition))
+                            dict[this.AbsEndMsPosition].Add(clef);
                         else
-                            dict.Add(rightmostBarlineAbsMsPosition, new NoteObjectMoment(clef, rightmostBarlineAbsMsPosition));
+                            dict.Add(this.AbsEndMsPosition, new NoteObjectMoment(clef, this.AbsEndMsPosition));
                     }
                     if(barline != null) // final barline
                     {
-                        if(dict.ContainsKey(rightmostBarlineAbsMsPosition))
-                            dict[rightmostBarlineAbsMsPosition].Add(barline);
+                        if(dict.ContainsKey(this.AbsEndMsPosition))
+                            dict[this.AbsEndMsPosition].Add(barline);
                         else
-                            dict.Add(rightmostBarlineAbsMsPosition, new NoteObjectMoment(barline, rightmostBarlineAbsMsPosition));
+                            dict.Add(this.AbsEndMsPosition, new NoteObjectMoment(barline, this.AbsEndMsPosition));
                     }
                 }
             }
@@ -546,21 +543,6 @@ namespace Moritz.Symbols
             return momentSymbols;
         }
 
-        private int SystemMsDuration()
-        {
-            int systemMsDuration = 0;
-            List<NoteObject> noteObjects = Staves[0].Voices[0].NoteObjects;
-            foreach(NoteObject noteObject in noteObjects)
-            {
-                DurationSymbol durationSymbol = noteObject as DurationSymbol;
-                if(durationSymbol != null)
-                {
-                    systemMsDuration += durationSymbol.MsDuration;
-                }
-            }
-
-            return systemMsDuration;
-        }
         /// <summary>
         /// Moves clefs and barlines to the left of the following duration symbols, leaving a hairline gap between the symbols.
         /// If the first durationSymbol at the start of the staff is a cautionary, the distance from the clef to the barline is gap.
@@ -1167,7 +1149,8 @@ namespace Moritz.Symbols
         }
         #endregion
 
-        public int AbsMsPosition;
+        public int AbsStartMsPosition;
+        public int AbsEndMsPosition;
 
         public List<Staff> Staves = new List<Staff>();
         internal SystemMetrics Metrics = null;

@@ -32,19 +32,6 @@ namespace Moritz.Spec
 			AssertConsistency();
 		}
 
-		/// <summary>
-		/// A new Seq that is the concatenation of (deep)clones of the argument seqs.
-		/// </summary>
-		public Seq(Seq seqArg1, Seq seqArg2)
-		{
-			Seq seq1 = seqArg1.Clone();
-
-			seq1.Concat(seqArg2);
-
-			_absMsPosition = seq1.AbsMsPosition;
-			_trks = seq1.Trks;
-		}
-
         /// <summary>
         /// Creates a Seq from the Trks in block, ignoring any InputVoiceDefs in the block.
         /// </summary>
@@ -78,34 +65,35 @@ namespace Moritz.Spec
 			}
 		}
 
-		/// <summary>
-		/// Concatenates a deep clone of seq2 to the caller (seq1). Returns a pointer to the caller.
-		/// Seq2.MsPosition is the earliest position, relative to seq1, at which it can be concatenated.
-		/// For example:
-		/// If seq2.MsPosition==0, it will be concatenated such that there will be at least one trk concatenation without an
-		/// intervening rest.
-		/// If seq2.MsPosition == seq1.MsDuration, the seqs will be juxtaposed.
-		/// If seq2.MsPosition > seq1.MsDuration, the seqs will be concatenated with an intervening rest.
-		/// Redundant clef changes are silently removed.
-		/// </summary>
-		public Seq Concat(Seq seq2)
+        /// <summary>
+        /// Concatenates seq2 to the caller (seq1). Returns a pointer to the caller.
+        /// When this function is called, seq2.AbsMsPosition is the earliest position, relative to seq1, at which it can be concatenated.
+        /// When it returns, seq2's Trks will have been concatenated to Seq1, and seq1 is consistent.
+        /// If Seq2 is needed after calling thei function, then it should be cloned first.
+        /// For example:
+        /// If seq2.MsPosition==0, it will be concatenated such that there will be at least one trk concatenation without an
+        /// intervening rest.
+        /// If seq2.MsPosition == seq1.MsDuration, the seqs will be juxtaposed.
+        /// If seq2.MsPosition > seq1.MsDuration, the seqs will be concatenated with an intervening rest.
+        /// Redundant clef changes are silently removed.
+        /// </summary>
+        public Seq Concat(Seq seq2)
 		{
             #region assertions
             Debug.Assert(_trks.Count == seq2.Trks.Count);
             AssertChannelConsistency(seq2.MidiChannelIndexPerOutputVoice);
 			#endregion
 
-			Seq seq2Clone = seq2.Clone();
 			int nTrks = _trks.Count;
 
 			#region find concatMsPos
-			int absConcatMsPos = seq2Clone.AbsMsPosition;
-			if(seq2Clone.AbsMsPosition < (AbsMsPosition + MsDuration))
+			int absConcatMsPos = seq2.AbsMsPosition;
+			if(seq2.AbsMsPosition < (AbsMsPosition + MsDuration))
 			{
 				for(int i = 0; i < nTrks; ++i)
 				{
 					Trk trk1 = _trks[i];
-                    Trk trk2 = seq2Clone.Trks[i];
+                    Trk trk2 = seq2.Trks[i];
 					int earliestAbsConcatPos = trk1.MsPositionReSeq + trk1.EndMsPositionReTrk - trk2.MsPositionReSeq;
 					absConcatMsPos = (earliestAbsConcatPos > absConcatMsPos) ? earliestAbsConcatPos : absConcatMsPos;
 				}
@@ -115,15 +103,15 @@ namespace Moritz.Spec
 			#region concatenation
 			for(int i = 0; i < nTrks; ++i)
 			{
-				Trk trk2 = seq2Clone.Trks[i];
+				Trk trk2 = seq2.Trks[i];
 				if(trk2.UniqueDefs.Count > 0)
 				{
                     Trk trk1 = _trks[i];
-                    int trk11AbsEndMsPosition = AbsMsPosition + trk1.MsPositionReSeq + trk1.EndMsPositionReTrk; 
+                    int trk1AbsEndMsPosition = AbsMsPosition + trk1.MsPositionReSeq + trk1.EndMsPositionReTrk; 
 					int trk2AbsStartMsPosition = absConcatMsPos + trk2.MsPositionReSeq;
-					if(trk11AbsEndMsPosition < trk2AbsStartMsPosition)
+					if(trk1AbsEndMsPosition < trk2AbsStartMsPosition)
 					{
-						trk1.Add(new RestDef(trk1.EndMsPositionReTrk, trk2AbsStartMsPosition - trk11AbsEndMsPosition));
+						trk1.Add(new RestDef(trk1.EndMsPositionReTrk, trk2AbsStartMsPosition - trk1AbsEndMsPosition));
 					}
 					trk1.AddRange(trk2);
 				}
@@ -140,11 +128,12 @@ namespace Moritz.Spec
 			return this;
 		}
 
-
-        public void Concat(Block block)
+        public Seq Concat(Block block)
         {
             Seq seq = new Seq(block);
             Concat(seq);
+
+            return this;
         }
 
 		public Seq Clone()

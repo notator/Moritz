@@ -75,8 +75,6 @@ namespace Moritz.Algorithm.Tombeau1
             #endregion main comments
             /**********************************************/
 
-            List<Seq> seqs = new List<Seq>();
-
 			#region system 1
 			List<Trk> sys1Trks = new List<Trk>();
 			for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
@@ -137,12 +135,12 @@ namespace Moritz.Algorithm.Tombeau1
             barlineEndMsPositions.Add(system1Seq.MsDuration + system2Seq.MsDuration + system3Block.MsDuration);
             #endregion set barlines
 
-            Seq mainSeq = system1Seq.Clone();
-			mainSeq.Concat(system2Seq);
-			mainSeq.Concat(system3Block);
+            Seq mainSeq = system1Seq;
+			mainSeq.Concat(system2Seq); // N.B. pass a Clone if the argument is needed later!
+			mainSeq.Concat(system3Block); // N.B. pass a Clone if the argument is needed later!
 
-			// Blocks contain a list of VoiceDefs
-			Block sequence = new Block(mainSeq, null); // converts mainSeq to a block (There are no InputVoiceDefs in this score.)
+            // Blocks contain a list of VoiceDefs
+            Block sequence = new Block(mainSeq, null); // converts mainSeq to a block (There are no InputVoiceDefs in this score.)
 
 			List<List<VoiceDef>> bars = ConvertBlockToBars(sequence, barlineEndMsPositions);
 

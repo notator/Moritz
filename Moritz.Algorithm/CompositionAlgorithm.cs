@@ -141,24 +141,11 @@ namespace Moritz.Algorithm
         public abstract List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes);
 
         /// <summary>
-        /// Returns the position of the end of the last UniqueDef
-        /// in the bar's first voice's UniqueDefs list.
-        /// </summary>
-        protected int GetEndMsPositionReTrk(List<VoiceDef> bar)
-        {
-            Debug.Assert(bar != null && bar.Count > 0 && bar[0].UniqueDefs.Count > 0);
-            List<IUniqueDef> lmdd = bar[0].UniqueDefs;
-            IUniqueDef lastLmdd = lmdd[lmdd.Count - 1];
-            int endMsPositionReTrk = lastLmdd.MsPositionReTrk + lastLmdd.MsDuration;
-            return endMsPositionReTrk;
-        }
-
-        /// <summary>
         /// When this function returns, the sequence is empty, and is no longer usable.
         /// </summary>
-        protected List<List<VoiceDef>> ConvertBlockToBars(Block sequence, List<int> barlineEndAbsMsPositions)
+        protected List<List<VoiceDef>> ConvertBlockToBars(Block sequence, List<int> absMsPositionsOfRightBarlines)
         {
-            int finalBarlineAbsMsPosition = barlineEndAbsMsPositions[barlineEndAbsMsPositions.Count - 1];
+            int finalBarlineAbsMsPosition = absMsPositionsOfRightBarlines[absMsPositionsOfRightBarlines.Count - 1];
 
             Debug.Assert(finalBarlineAbsMsPosition == sequence.AbsMsPosition + sequence.MsDuration);
 
@@ -167,7 +154,7 @@ namespace Moritz.Algorithm
             int barlineIndex = 0;
             while(sequence.AbsMsPosition < finalBarlineAbsMsPosition)
             {
-                int barlineEndMsPosition = barlineEndAbsMsPositions[barlineIndex++];
+                int barlineEndMsPosition = absMsPositionsOfRightBarlines[barlineIndex++];
 
                 List<VoiceDef> bar = sequence.GetBar(barlineEndMsPosition);
 
