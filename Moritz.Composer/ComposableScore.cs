@@ -127,25 +127,45 @@ namespace Moritz.Composer
 				return "The algorithm does not declare the correct number of input voices.";
 			}
 
-			List<string> currentClefs = new List<string>();
-			List<int> lowerVoiceIndices = new List<int>();
-			for(int i = 0; i < _pageFormat.ClefsList.Count; ++i)
-			{
-				List<byte> outputVoiceIndices = _pageFormat.VisibleOutputVoiceIndicesPerStaff[i];
-				string clef = _pageFormat.ClefsList[i];
-				foreach(byte voiceIndex in outputVoiceIndices)
-				{ 
-					currentClefs.Add(clef);
-				}
-				if(outputVoiceIndices.Count > 1)
-				{
-					lowerVoiceIndices.Add(outputVoiceIndices[1]);
-				}
-			}
+            int nVisibleOutputStaves = _pageFormat.VisibleOutputVoiceIndicesPerStaff.Count;
+            int nVisibleInputStaves = _pageFormat.VisibleInputVoiceIndicesPerStaff.Count;
+            Debug.Assert(_pageFormat.ClefsList.Count == nVisibleOutputStaves + nVisibleInputStaves);
 
-			Debug.Assert(currentClefs.Count == voiceDefsPerSystemPerBar[0].Count);
+            int nTrks = GetNumberOfTrks(bar1);
 
-			for(int i = 0; i < voiceDefsPerSystemPerBar.Count; ++i)
+            List<int> visibleLowerVoiceIndices = new List<int>();
+            Dictionary<int, string> upperVoiceClef = new Dictionary<int, string>();
+            int clefIndex = 0;
+            #region get upperVoiceClefs and visibleLowerVoiceIndices
+            for(int i = 0; i < nVisibleOutputStaves; ++i)
+            {
+                List<byte> visibleOutputVoiceIndicesPerStaff = _pageFormat.VisibleOutputVoiceIndicesPerStaff[i];
+                upperVoiceClef.Add(visibleOutputVoiceIndicesPerStaff[0], _pageFormat.ClefsList[clefIndex++]);
+                if(visibleOutputVoiceIndicesPerStaff.Count > 1)
+                {
+                    visibleLowerVoiceIndices.Add(visibleOutputVoiceIndicesPerStaff[1]);
+                }
+
+            }
+            for(int i = 0; i < nVisibleInputStaves; ++i)
+            {
+                List<byte> visibleInputVoiceIndicesPerStaff = _pageFormat.VisibleInputVoiceIndicesPerStaff[i];
+                upperVoiceClef.Add(nTrks + visibleInputVoiceIndicesPerStaff[0], _pageFormat.ClefsList[clefIndex++]);
+                if(visibleInputVoiceIndicesPerStaff.Count > 1)
+                {
+                    visibleLowerVoiceIndices.Add(nTrks + visibleInputVoiceIndicesPerStaff[1]);
+                }
+            }
+            for(int i = 0; i < bar1.Count; ++i)
+            {
+                if(!upperVoiceClef.ContainsKey(i))
+                {
+                    upperVoiceClef.Add(i, "noClef");
+                }
+            }
+            #endregion
+
+            for(int i = 0; i < voiceDefsPerSystemPerBar.Count; ++i)
 			{
 				List<VoiceDef> bar = voiceDefsPerSystemPerBar[i];
 				string barNumber = (i + 1).ToString();
@@ -160,10 +180,10 @@ namespace Moritz.Composer
 					errorString = "The top (first) voice in every bar must be an output voice.";
 					break;
 				}
-				for(int voiceIndex = 0; voiceIndex < bar.Count; ++voiceIndex)
+				for(int localVoiceIndex = 0; localVoiceIndex < bar.Count; ++localVoiceIndex)
 				{
-					VoiceDef voiceDef = bar[voiceIndex];
-					string voiceNumber = (voiceIndex + 1).ToString();
+					VoiceDef voiceDef = bar[localVoiceIndex];
+					string voiceNumber = (localVoiceIndex + 1).ToString();
 					if(voiceDef.UniqueDefs.Count == 0)
 					{
 						errorString = "Voice number " + voiceNumber + " in Bar " + barNumber + " has an empty UniqueDefs list.";
@@ -174,19 +194,18 @@ namespace Moritz.Composer
 						ClefChangeDef ccd = iud as ClefChangeDef;
 						if(ccd != null)
 						{
-							if(lowerVoiceIndices.Contains(voiceIndex))
+							if(visibleLowerVoiceIndices.Contains(localVoiceIndex))
 							{
 								errorString = "Voice number " + voiceNumber + " is a lower voice on a staff, and contains a clef change.\n" +
 								"Clefs should only be changed in the staff's top voice.";
 								break;
 							}
-							else if(ccd.ClefType == currentClefs[voiceIndex])
+							else if(upperVoiceClef.ContainsKey(localVoiceIndex) && upperVoiceClef[localVoiceIndex] == ccd.ClefType)
 							{
-								errorString = "Voice number " + voiceNumber + " has an unnecessary clef change in or after bar " + barNumber + "." +
-								"\n(It will have moved to the next chord in the score, or the end of the system, whichever is earlier.)";
+								errorString = "Voice number " + voiceNumber + " has an unnecessary clef change in or after bar " + barNumber + ".";
 								break;
 							}
-							currentClefs[voiceIndex] = ccd.ClefType;
+                            upperVoiceClef[localVoiceIndex] = ccd.ClefType;
 						}
 					}
 				}
@@ -196,7 +215,20 @@ namespace Moritz.Composer
 			return errorString;
 		}
 
-		private int NOutputVoices(List<VoiceDef> bar1)
+        private int GetNumberOfTrks(List<VoiceDef> voiceDefs)
+        {
+            int nTrks = 0;
+            foreach(VoiceDef voiceDef in voiceDefs)
+            {
+                if(voiceDef is Trk)
+                {
+                    nTrks++;
+                }
+            }
+            return nTrks;
+        }
+
+        private int NOutputVoices(List<VoiceDef> bar1)
 		{
 			int nOutputVoices = 0;
 			foreach(VoiceDef voiceDef in bar1)
@@ -244,7 +276,7 @@ namespace Moritz.Composer
 							InputChordDef icd = iud as InputChordDef;
 							if(icd != null && icd.CCSettings != null)
 							{
-								int msPos = icd.MsPositionReTrk;
+								int msPos = icd.MsPositionReFirstUD;
 								if(ccSettingsMsPositions.Contains(msPos))
 								{
 									errorString = "\nSynchronous continuous controller settings (ccSettings) are not allowed.";

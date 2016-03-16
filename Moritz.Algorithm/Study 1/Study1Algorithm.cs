@@ -77,7 +77,7 @@ namespace Moritz.Algorithm.Study1
 
 		private Trk GetTrack(byte[] trackChordNumbers, byte[] trackRootPitches)
 		{
-			Trk track = new Trk(0, new List<IUniqueDef>());
+			Trk track = new Trk(0, 0, new List<IUniqueDef>());
 			List<List<byte>> chordIntervals = GetChordIntervals();
 			List<byte> chordVelocities = GetChordVelocities();
 			List<int> chordDurations = GetChordMsDurations();
@@ -200,16 +200,16 @@ namespace Moritz.Algorithm.Study1
 			List<int> barlineMsPositions = new List<int>() { 0 };
 
 			int trackIndex = 0;
-			int msPosition = 0;
+			int msPositionReContainer = 0;
 			foreach(int nChords in nChordsPerSystem)
 			{
-				Trk trk = new Trk(0, msPosition);
+				Trk trk = new Trk(0, msPositionReContainer, new List<IUniqueDef>());
 				for(int i = 0; i < nChords; ++i)
 				{
 					trk.Add(track[trackIndex++]);					
 				}
-				msPosition = trk.EndMsPositionReTrk;
-				barlineMsPositions.Add(msPosition);
+				msPositionReContainer = trk.EndMsPositionReFirstIUD;
+				barlineMsPositions.Add(msPositionReContainer);
 				consecutiveBars.Add(trk);
 			}
 

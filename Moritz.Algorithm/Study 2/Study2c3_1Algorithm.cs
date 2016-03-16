@@ -62,7 +62,7 @@ namespace Moritz.Algorithm.Study2c3_1
             int msPosition = 0;
             for(int barIndex = 0; barIndex < dcValuesPerTopStaffBar.Count; barIndex++)
             {
-                VoiceDef voice = new Trk(0, new List<IUniqueDef>());
+                VoiceDef voice = new Trk(0, 0, new List<IUniqueDef>());
                 List<int> sequence = dcValuesPerTopStaffBar[barIndex];
                 WriteDurationSymbolsForStrandInTopStaff(voice, barIndex, sequence, ref msPosition);
                 consecutiveBars.Add(voice);
@@ -70,15 +70,15 @@ namespace Moritz.Algorithm.Study2c3_1
             return consecutiveBars;
         }
 
-        private void WriteDurationSymbolsForStrandInTopStaff(VoiceDef voice, int barIndex, List<int> originalStrandValues, ref int msPositionReTrk)
+        private void WriteDurationSymbolsForStrandInTopStaff(VoiceDef voice, int barIndex, List<int> originalStrandValues, ref int msPositionReFirstIUD)
         {
             Palette palette = _palettes[0]; // top templateDefs
             for(int valueIndex = 0; valueIndex < originalStrandValues.Count; valueIndex++)
             {
                 int value = originalStrandValues[valueIndex];
                 IUniqueDef noteDef = palette.UniqueDurationDef(value - 1);
-                noteDef.MsPositionReTrk = msPositionReTrk;
-                msPositionReTrk += noteDef.MsDuration;
+                noteDef.MsPositionReFirstUD = msPositionReFirstIUD;
+                msPositionReFirstIUD += noteDef.MsDuration;
                 voice.UniqueDefs.Add(noteDef);
             }
         }
@@ -94,8 +94,8 @@ namespace Moritz.Algorithm.Study2c3_1
             for(int barIndex = 0; barIndex < strandValuesList.Count; barIndex++)
             {
                 VoiceDef topStaffVoice =  topStaffBars[barIndex];
-				VoiceDef newVoice = new Trk((byte)(staffNumber-1), new List<IUniqueDef>());
-                int currentMsPositionReTrk = topStaffVoice.UniqueDefs[0].MsPositionReTrk;
+				VoiceDef newVoice = new Trk(staffNumber-1, 0, new List<IUniqueDef>());
+                int currentMsPositionReFirstIUD = topStaffVoice.UniqueDefs[0].MsPositionReFirstUD;
 
                 List<int> lowerStaffValueSequence = strandValuesList[barIndex];
                 List<int> lowerStaffMsDurations = LowerStaffMsDurations(topStaffVoice, lowerStaffValueSequence.Count);
@@ -104,8 +104,8 @@ namespace Moritz.Algorithm.Study2c3_1
                     int value = lowerStaffValueSequence[valueIndex];
                     IUniqueDef noteDef = palette.UniqueDurationDef(value - 1);
                     noteDef.MsDuration = lowerStaffMsDurations[valueIndex];
-                    noteDef.MsPositionReTrk = currentMsPositionReTrk;
-                    currentMsPositionReTrk += noteDef.MsDuration; 
+                    noteDef.MsPositionReFirstUD = currentMsPositionReFirstIUD;
+                    currentMsPositionReFirstIUD += noteDef.MsDuration; 
                     newVoice.UniqueDefs.Add(noteDef);
                 }
 
@@ -129,19 +129,19 @@ namespace Moritz.Algorithm.Study2c3_1
             int equal1MsDuration = voiceMsDuration / numberOfTopDurations;
             List<int> equal1MsPositions = new List<int>();
             int equal1MsPosition = 0;
-            List<int> actual1MsPositionsReTrk = new List<int>();
+            List<int> actual1MsPositionsReFirstIUD = new List<int>();
             List<int> actual1MsDurations = new List<int>();
             foreach(IUniqueDef iumdd in topStaffVoice.UniqueDefs)
             {
                 equal1MsPositions.Add(equal1MsPosition);
                 equal1MsPosition += equal1MsDuration;
 
-                actual1MsPositionsReTrk.Add(iumdd.MsPositionReTrk);
+                actual1MsPositionsReFirstIUD.Add(iumdd.MsPositionReFirstUD);
                 actual1MsDurations.Add(iumdd.MsDuration);
             }
             for(int i = 0; i < equal1MsPositions.Count; i++)
             {
-                equal1MsPositions[i] += actual1MsPositionsReTrk[0];
+                equal1MsPositions[i] += actual1MsPositionsReFirstIUD[0];
             }
             int followingBarlinePosition = equal1MsPositions[0] + voiceMsDuration;
             #endregion
@@ -159,7 +159,7 @@ namespace Moritz.Algorithm.Study2c3_1
             }
             for(int i = 0; i < equal2MsPositions.Count; i++)
             {
-                equal2MsPositions[i] += actual1MsPositionsReTrk[0];
+                equal2MsPositions[i] += actual1MsPositionsReFirstIUD[0];
             }
             #endregion
 
@@ -182,7 +182,7 @@ namespace Moritz.Algorithm.Study2c3_1
                         else upperLimit = equal1MsPositions[i + 1];
                         if(e2MsPosition < upperLimit && e2MsPosition >= equal1MsPositions[i])
                         {
-                            actualStaff2MsPosition = actual1MsPositionsReTrk[i] +
+                            actualStaff2MsPosition = actual1MsPositionsReFirstIUD[i] +
                                 (((e2MsPosition - equal1MsPositions[i]) * actual1MsDurations[i]) / equal1MsDuration);
                             break;
                         }

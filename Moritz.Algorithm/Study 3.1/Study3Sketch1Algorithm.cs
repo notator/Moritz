@@ -50,7 +50,7 @@ namespace Moritz.Algorithm.Study3Sketch1
             mainSeq.Concat(bars3to5);
 
             // Blocks contain a list of VoiceDefs
-            Block sequence = new Block(mainSeq, null); // converts mainSeq to a block (There are no InputVoiceDefs in this score.)
+            Block sequence = new Block(mainSeq); // converts mainSeq to a block (There are no InputVoiceDefs in this score.)
 
             List<List<VoiceDef>> bars = ConvertBlockToBars(sequence, absMsPositionsOfRightBarlines);
 
@@ -79,7 +79,7 @@ namespace Moritz.Algorithm.Study3Sketch1
 			byte channel = 0;
             foreach(Palette palette in _palettes)
             {
-                Trk voice = new Trk(channel, new List<IUniqueDef>());
+                Trk voice = new Trk(channel, 0, new List<IUniqueDef>());
                 bar.Add(voice);
                 WriteVoiceMidiDurationDefs1(voice, palette);
 				channel++;
@@ -92,14 +92,14 @@ namespace Moritz.Algorithm.Study3Sketch1
 
         private void WriteVoiceMidiDurationDefs1(Trk trk, Palette palette)
         {
-            int msPositionReTrk = 0;
+            int msPositionReFirstIUD = 0;
             int bar1ChordMsSeparation = 1500;
             for(int i = 0; i < palette.Count;++i)
             {
                 IUniqueDef durationDef = palette.UniqueDurationDef(i);
-                durationDef.MsPositionReTrk = msPositionReTrk;
-                RestDef restDef = new RestDef(msPositionReTrk + durationDef.MsDuration, bar1ChordMsSeparation - durationDef.MsDuration);
-                msPositionReTrk += bar1ChordMsSeparation;
+                durationDef.MsPositionReFirstUD = msPositionReFirstIUD;
+                RestDef restDef = new RestDef(msPositionReFirstIUD + durationDef.MsDuration, bar1ChordMsSeparation - durationDef.MsDuration);
+                msPositionReFirstIUD += bar1ChordMsSeparation;
                 trk.UniqueDefs.Add(durationDef);
                 trk.UniqueDefs.Add(restDef);
             }
@@ -133,13 +133,13 @@ namespace Moritz.Algorithm.Study3Sketch1
                     trk.Insert(0, restDef);
                 }
                 restMsDuration += 1500;
-                maxMsPosReBar = trk.EndMsPositionReTrk;
+                maxMsPosReBar = trk.EndMsPositionReFirstIUD;
             }
 
             // add the final rest in the bar
             foreach(Trk trk in bar)
             {
-                int trkEndMsPosReBar = trk.EndMsPositionReTrk;
+                int trkEndMsPosReBar = trk.EndMsPositionReFirstIUD;
                 if(maxMsPosReBar > trkEndMsPosReBar)
                 {
                     RestDef restDef = new RestDef(trkEndMsPosReBar, maxMsPosReBar - trkEndMsPosReBar);

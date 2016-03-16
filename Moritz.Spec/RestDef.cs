@@ -11,20 +11,20 @@ namespace Moritz.Spec
     ///<summary>
     public class RestDef : DurationDef, IUniqueDef
     {
-        public RestDef(int msPositionReTrk, int msDuration)
+        public RestDef(int msPositionReFirstIUD, int msDuration)
             : base(msDuration)
         {
-            MsPositionReTrk = msPositionReTrk;
+            MsPositionReFirstUD = msPositionReFirstIUD;
         }
 
         public override string ToString()
         {
-            return ("MsPositionReTrk=" + MsPositionReTrk.ToString() + " MsDuration=" + MsDuration.ToString() + " RestDef" );
+            return ("MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " MsDuration=" + MsDuration.ToString() + " RestDef" );
         }
 
         public override IUniqueDef Clone()
         {
-            RestDef umrd = new RestDef(this.MsPositionReTrk, this.MsDuration);
+            RestDef umrd = new RestDef(this.MsPositionReFirstUD, this.MsDuration);
             return umrd;
         }
 
@@ -37,7 +37,7 @@ namespace Moritz.Spec
             MsDuration = (int)(_msDuration * factor);
         }
 
-        public int MsPositionReTrk { get { return _msPositionReTrk; } set { _msPositionReTrk = value; } }
-        private int _msPositionReTrk = 0;
+        public int MsPositionReFirstUD { get { return _msPositionReFirstIUD; } set { _msPositionReFirstIUD = value; } }
+        private int _msPositionReFirstIUD = 0;
     }
 }

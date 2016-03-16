@@ -6,91 +6,178 @@ using System.Collections.ObjectModel;
 
 namespace Moritz.Spec
 {
-	public class Block
-	{
+    public class Block
+    {
         /// <summary>
         /// A Block contains a list of voiceDefs, that can be of both kinds: Trks and InputVoiceDefs. A Seq can only contains Trks.
-        /// This constructor converts its argument to a Block so, if the arguments need to be preserved, pass clones.
-        /// <para>The seq's Trks and the InputVoiceDefs are cast to VoiceDefs, and then padded at the beginning and end with rests
+        /// This constructor converts its argument to a Block so, if the argument needs to be preserved, pass a clone.
+        /// <para>The seq's Trks are cast to VoiceDefs, and then padded at the beginning and end with rests
         /// so that they all start at the beginning of the Block and have the same duration.</para>
         /// <para>The Block's AbsMsPosition is set to the seq's AbsMsPosition.</para>
-        /// <para>There is at least one MidiChordDef or InputChordDef at the start of the Block, and at least one
-        /// MidiChordDef ends at its end.</para>
+        /// <para>There is at least one MidiChordDef at the start of the Block, and at least one MidiChordDef ends at its end.</para>
         /// <para>If an original seq.trk.UniqueDefs list is empty or contains a single restDef, the corresponding
         /// voiceDef will contain a single rest having the same duration as the other trks.</para>
+        /// <para>For further documentation about Block consistency, see its private AssertBlockConsistency() function.
         /// </summary>
         /// <param name="seq">cannot be null, and must have Trks</param>
-        /// <param name="inputVoiceDefs">can be null</param>
-        public Block(Seq seq, List<InputVoiceDef> inputVoiceDefs)
-		{
+        public Block(Seq seq)
+        {
             AbsMsPosition = seq.AbsMsPosition;
 
             foreach(Trk trk in seq.Trks)
             {
                 _voiceDefs.Add(trk);
-            }
-            if(inputVoiceDefs != null)
+            } 
+
+            Blockify();
+
+            AssertBlockConsistency();
+        }
+
+        public void AddInputVoice(InputVoiceDef ivd)
+        {
+            Debug.Assert((ivd.MsPositionReContainer + ivd.MsDuration) <= MsDuration);
+            Debug.Assert(ivd.MidiChannel >= 0 && ivd.MidiChannel <= 3);
+            #region check for an existing InputVoiceDef having the same MidiChannel
+            foreach(VoiceDef voiceDef in _voiceDefs)
             {
-                foreach(InputVoiceDef ivd in inputVoiceDefs)
-                {
-                    _voiceDefs.Add(ivd);
+                InputVoiceDef existingInputVoiceDef = voiceDef as InputVoiceDef;
+                if(existingInputVoiceDef != null)
+                { 
+                    Debug.Assert(existingInputVoiceDef.MidiChannel != ivd.MidiChannel, "Error: An InputVoiceDef with the same MidiChannel already exists.");
                 }
             }
+            #endregion
 
-            int blockMsDuration = MsDuration; // MsDuration is a property that looks at UniqueDefs in this block. 
+            int startPos = ivd.MsPositionReContainer;
+            ivd.MsPositionReContainer = 0;
+            foreach(IUniqueDef iud in ivd.UniqueDefs)
+            {
+                iud.MsPositionReFirstUD += startPos;
+            }
 
-			foreach(VoiceDef voiceDef in _voiceDefs)
-			{
-				if(voiceDef.UniqueDefs.Count > 0)
-				{
+            _voiceDefs.Add(ivd);
+
+            Blockify();
+
+            AssertBlockConsistency();
+        }
+
+        /// <summary>
+        /// Pads the Block with rests at the beginning and end of each VoiceDef where necessary.
+        /// Agglommerates rests.
+        /// </summary>
+        private void Blockify()
+        {
+            int blockMsDuration = MsDuration; // MsDuration is a property that looks at UniqueDefs in this block.
+
+            foreach(VoiceDef voiceDef in _voiceDefs)
+            {
+                if(voiceDef.UniqueDefs.Count > 0)
+                {
                     IUniqueDef firstIUD = voiceDef.UniqueDefs[0];
-					int startRestMsDuration = firstIUD.MsPositionReTrk;
-					if(startRestMsDuration > 0)
-					{
-						voiceDef.UniqueDefs.Insert(0, new RestDef(0, startRestMsDuration));
-					}
+                    int startRestMsDuration = voiceDef.MsPositionReContainer;
+                    if(startRestMsDuration > 0)
+                    {
+                        voiceDef.Insert(0, new RestDef(0, startRestMsDuration));
+                        voiceDef.MsPositionReContainer = 0;
+                    }
 
-					int endOfTrkMsPositionReTrk = voiceDef.EndMsPositionReTrk;
-					int endRestMsDuration = blockMsDuration - endOfTrkMsPositionReTrk;
-					if(endRestMsDuration > 0)
-					{
-						voiceDef.UniqueDefs.Add(new RestDef(endOfTrkMsPositionReTrk, endRestMsDuration));
-					}
-					voiceDef.AgglomerateRests();
-				}
-				else
-				{
-					voiceDef.UniqueDefs.Add(new RestDef(0, blockMsDuration));
-				}
-			}
+                    int endOfTrkMsPositionReFirstIUD = voiceDef.EndMsPositionReFirstIUD;
+                    int endRestMsDuration = blockMsDuration - endOfTrkMsPositionReFirstIUD;
+                    if(endRestMsDuration > 0)
+                    {
+                        voiceDef.UniqueDefs.Add(new RestDef(endOfTrkMsPositionReFirstIUD, endRestMsDuration));
+                    }
+                    voiceDef.AgglomerateRests();
+                }
+                else
+                {
+                    voiceDef.Add(new RestDef(0, blockMsDuration));
+                }
+            }
+        }
 
-			AssertBlockConsistency();
-		}
+        public void Concat(Block bar2Block)
+        {
+            Debug.Assert(_voiceDefs.Count == bar2Block._voiceDefs.Count);
+            for(int i = 0; i < _voiceDefs.Count; ++i)
+            {
+                Trk trk = _voiceDefs[i] as Trk;
+                Trk trk2 = bar2Block._voiceDefs[i] as Trk;
+                InputVoiceDef ivd = _voiceDefs[i] as InputVoiceDef;
+                InputVoiceDef ivd2 = bar2Block._voiceDefs[i] as InputVoiceDef;
+
+                Debug.Assert((trk != null && trk2 != null) || (ivd != null && ivd2 != null));
+
+                _voiceDefs[i].AddRange(bar2Block._voiceDefs[i]);
+                _voiceDefs[i].AgglomerateRests();
+            }
+            AssertBlockConsistency();
+        }
 
         /// <summary>
         /// A Block must fulfill the following criteria:
         /// The Trks may contain any combination of RestDef, MidiChordDef and ClefChangeDef.
         /// The InputVoiceDefs may contain any combination of RestDef, InputChordDef and ClefChangeDef.
-        /// <para>1. All voiceDefs start at MsPositionReSeq=0 and have the same MsDuration.</para>
-        /// <para>2. A RestDef is never followed by another RestDef (RestDefs have been agglomerated).</para>
-        /// <para>3. There is at least one MidiChordDef or InputChordDef or CautionaryChordDef at the beginning of the block</para>
-        /// <para>4. At least one MidiChordDef or InputChordDef ends at the end of the block</para>,
-        /// <para>5. VoiceDefs in Blocks may only contain MidiChordDefs, InputChordDefs and RestDefs.</para>
-        /// <para>6. UniqueDef.MsPositionReTrk attributes are all set correctly (starting at 0).</para>
+        /// <para>1. The first VoiceDef in a Block must be a Trk.</para>
+        /// <para>2. Trks precede InputVoiceDefs (if any) in the _voiceDefs list.</para>
+        /// <para>3. All voiceDefs start at MsPositionReSeq=0 and have the same MsDuration.</para>
+        /// <para>4. UniqueDef.MsPositionReFirstIUD attributes are all set correctly (starting at 0).</para>
+        /// <para>5. A RestDef is never followed by another RestDef (RestDefs have been agglomerated).</para>
+        /// <para>6. VoiceDefs in Blocks may only contain MidiChordDefs, InputChordDefs, RestDefs and CautionaryChordDefs.</para>
+        /// <para>7. There is at least one MidiChordDef or CautionaryChordDef at the beginning of the set of Trks</para>
+        /// <para>8. At least one MidiChordDef ends at the end of the set of Trks</para>
+        /// <para>9. If the Block contains an InputVoiceDef, then
+        ///         <para>9.1. There is at least one InputChordDef or CautionaryChordDef at the beginning of the set of InputVoiceDefs</para>
+        ///         <para>9.2. At least one InputChordDef ends at the end of the block</para></para>
+        ///         <para>9.3. There may not be more than 4 InputVoiceDefs</para></para>
         /// </summary>
         private void AssertBlockConsistency()
-		{
-			#region All voiceDefs must begin at MsPosition=0 and have the same MsDuration
-			int blockMsDuration = MsDuration;
+        {
+            #region 1. The first VoiceDef in a Block must be a Trk.
+            Debug.Assert(_voiceDefs[0] is Trk, "The first VoiceDef in a Block must be a Trk.");
+            #endregion
+
+            #region 2. Trks precede InputVoiceDefs (if any) in the _voiceDefs list.
+            bool inputVoiceDefFound = false;
             foreach(VoiceDef voiceDef in _voiceDefs)
             {
-                if(voiceDef.MsPositionReSeq > 0 || voiceDef.MsDuration != blockMsDuration)
+                if(voiceDef is InputVoiceDef)
+                {
+                    inputVoiceDefFound = true;
+                }
+                if(voiceDef is Trk)
+                {
+                    Debug.Assert(inputVoiceDefFound == false, "Trks must precede InputVoiceDefs (if any) in the _voiceDefs list.");
+                }
+            }
+            #endregion
+
+            #region 3. All voiceDefs must begin at MsPosition=0 and have the same MsDuration
+            int blockMsDuration = MsDuration;
+            foreach(VoiceDef voiceDef in _voiceDefs)
+            {
+                if(voiceDef.MsPositionReContainer > 0 || voiceDef.MsDuration != blockMsDuration)
                 {
                     Debug.Assert(false, "All voiceDefs in a block must begin at MsPosition=0 and have the same MsDuration.");
                 }
             }
             #endregion
-            #region A restDef is never followed by another RestDef (RestDefs are agglomerated).
+
+            #region 4. UniqueDef.MsPositionReFirstIUD attributes are all set correctly (starting at 0)
+            foreach(VoiceDef voiceDef in _voiceDefs)
+            {
+                int msPositionReFirstIUD = 0;
+                foreach(IUniqueDef iud in voiceDef.UniqueDefs)
+                {
+                    Debug.Assert((iud.MsPositionReFirstUD == msPositionReFirstIUD), "Error in uniqueDef.MsPositionReFirstIUD.");
+                    msPositionReFirstIUD += iud.MsDuration;
+                }
+            }
+            #endregion
+
+            #region 5. A RestDef is never followed by another RestDef (RestDefs are agglomerated).
             foreach(VoiceDef voiceDef in _voiceDefs)
             {
                 bool restFound = false;
@@ -111,40 +198,8 @@ namespace Moritz.Spec
                 }
             }
             #endregion
-            #region There is at least one MidiChordDef or InputChordDef or CautionaryChordDef at the beginning of the Block, 
-            bool foundStartChordDef = false;
-            foreach(VoiceDef voiceDef in _voiceDefs)
-            {
-                if(voiceDef.UniqueDefs.Count > 0)
-                {
-                    IUniqueDef firstIUD = voiceDef.UniqueDefs[0];
-                    if(firstIUD is MidiChordDef || firstIUD is CautionaryChordDef || firstIUD is InputChordDef)
-                    {
-                        foundStartChordDef = true;
-                    }
-                }
-            }
 
-            Debug.Assert((foundStartChordDef == true),
-                        "A block must begin with at least one MidiChordDef or InputChordDef or CautionaryChordDef.");
-            #endregion
-            #region At least one MidiChordDef or InputChordDef ends at the end of the Block 
-            bool foundEndChordDef = false;
-            foreach(VoiceDef voiceDef in _voiceDefs)
-            {
-                if(voiceDef.UniqueDefs.Count > 0)
-                {
-                    IUniqueDef lastIUD = voiceDef.UniqueDefs[voiceDef.UniqueDefs.Count - 1];
-                    if(lastIUD is MidiChordDef || lastIUD is InputChordDef)
-                    {
-                        foundEndChordDef = true;
-                    }
-                }
-            }
-            Debug.Assert((foundEndChordDef == true),
-                        "At least one MidiChordDef or InputChordDef must end at the end of the Block.");
-            #endregion
-            #region VoiceDefs in Blocks may only contain MidiChordDefs, InputChordDefs, RestDefs and CautionaryChordDefs.
+            #region 6. VoiceDefs in Blocks may only contain MidiChordDefs, InputChordDefs, RestDefs and CautionaryChordDefs.
             foreach(VoiceDef voiceDef in _voiceDefs)
             {
                 foreach(IUniqueDef iud in voiceDef.UniqueDefs)
@@ -154,17 +209,109 @@ namespace Moritz.Spec
                 }
             }
             #endregion
-            #region UniqueDef.MsPositionReTrk attributes are all set correctly (starting at 0)
+
+            #region 7. There is at least one MidiChordDef or CautionaryChordDef at the beginning of the Block 
+            bool foundStartMidiChordDef = false;
             foreach(VoiceDef voiceDef in _voiceDefs)
             {
-                int msPositionReTrk = 0;
-                foreach(IUniqueDef iud in voiceDef.UniqueDefs)
-                {     
-                    Debug.Assert((iud.MsPositionReTrk == msPositionReTrk), "Error in uniqueDef.MsPositionReTrk.");
-                    msPositionReTrk += iud.MsDuration;
+                if(voiceDef is Trk && voiceDef.UniqueDefs.Count > 0)
+                {
+                    IUniqueDef firstIUD = voiceDef.UniqueDefs[0];
+                    if(firstIUD is MidiChordDef || firstIUD is CautionaryChordDef)
+                    {
+                        foundStartMidiChordDef = true;
+                        break;
+                    }
                 }
             }
+
+            Debug.Assert((foundStartMidiChordDef == true),
+                        "There must be at least one MidiChordDef or CautionaryChordDef at the beginning of the Block.");
             #endregion
+
+            //#region 8. At least one MidiChordDef ends at the end of the block 
+            //bool foundEndChordDef = false;
+            //foreach(VoiceDef voiceDef in _voiceDefs)
+            //{
+            //    if(voiceDef is Trk && voiceDef.UniqueDefs.Count > 0)
+            //    {
+            //        IUniqueDef lastIUD = voiceDef.UniqueDefs[voiceDef.UniqueDefs.Count - 1];
+            //        if(lastIUD is MidiChordDef)
+            //        {
+            //            foundEndChordDef = true;
+            //            break;
+            //        }
+            //    }
+            //}
+            //Debug.Assert((foundEndChordDef == true),
+            //            "At least one MidiChordDef must end at the end of the Block.");
+            //#endregion
+
+            #region 9 If the Block contains an InputVoiceDef...
+            bool foundInputVoiceDef = false;
+            foreach(VoiceDef voiceDef in _voiceDefs)
+            {
+                if(voiceDef is InputVoiceDef)
+                {
+                    foundInputVoiceDef = true;
+                    break;
+                }
+            }
+
+            if(foundInputVoiceDef)
+            {
+                #region 9.1. There is at least one InputChordDef or CautionaryChordDef at the beginning of the set of InputVoiceDefs
+                bool foundStartInputChordDef = false;
+                foreach(VoiceDef voiceDef in _voiceDefs)
+                {
+                    if(voiceDef is InputVoiceDef && voiceDef.UniqueDefs.Count > 0)
+                    {
+                        IUniqueDef firstIUD = voiceDef.UniqueDefs[0];
+                        if(firstIUD is InputChordDef || firstIUD is CautionaryChordDef)
+                        {
+                            foundStartInputChordDef = true;
+                            break;
+                        }
+                    }
+                }
+                Debug.Assert((foundStartInputChordDef == true),
+                    "If there is an InputVoiceDef, then there must be at least one InputChordDef or CautionaryChordDef at the beginning of the InputVoiceDefs.");
+                #endregion 9.1
+
+                //#region 9.2. At least one InputChordDef ends at the end of the block 
+
+                //bool foundEndInputChordDef = false;
+                //foreach(VoiceDef voiceDef in _voiceDefs)
+                //{
+                //    if(voiceDef is InputVoiceDef && voiceDef.UniqueDefs.Count > 0)
+                //    {
+                //        IUniqueDef lastIUD = voiceDef.UniqueDefs[voiceDef.UniqueDefs.Count - 1];
+                //        if(lastIUD is InputChordDef)
+                //        {
+                //            foundEndInputChordDef = true;
+                //            break;
+                //        }
+                //    }
+                //}
+                //Debug.Assert((foundEndInputChordDef == true),
+                //            "If there is an InputVoiceDef, then there must be at least one InputChordDef at the end of the Block.");
+                //#endregion 9.2
+
+                #region 9.3 There may not be more than 4 InputVoiceDefs
+                int nInputVoiceDefs = 0;
+                foreach(VoiceDef voiceDef in _voiceDefs)
+                {
+                    if(voiceDef is InputVoiceDef)
+                    {
+                        nInputVoiceDefs++;
+                    }
+                }
+                Debug.Assert((nInputVoiceDefs <= 4),
+                            "There may not be more than 4 InputVoiceDefs.");
+
+                #endregion 9.3
+            }
+            #endregion 9
         }
 
         /// <summary>
@@ -173,16 +320,16 @@ namespace Moritz.Spec
         /// by equal durations when the function returns. The MsDuration of the Seq is not changed.
         /// </summary>
         public void WarpDurations(List<double> warp)
-		{
-			AssertBlockConsistency();
-			int sequenceMsDuration = MsDuration;
+        {
+            AssertBlockConsistency();
+            int sequenceMsDuration = MsDuration;
             foreach(VoiceDef voiceDef in _voiceDefs)
             {
                 voiceDef.WarpDurations(warp);
-			}
-			Debug.Assert(sequenceMsDuration == MsDuration);
-			AssertBlockConsistency();
-		}
+            }
+            Debug.Assert(sequenceMsDuration == MsDuration);
+            AssertBlockConsistency();
+        }
 
         /// <summary>
         /// Creates a "bar" which is a list of voiceDefs containing IUniqueDefs that begin before barlineEndMsPosition,
@@ -206,24 +353,25 @@ namespace Moritz.Spec
             foreach(VoiceDef voiceDef in _voiceDefs)
             {
                 Trk outputVoice = voiceDef as Trk;
+                InputVoiceDef inputVoice = voiceDef as InputVoiceDef;
                 if(outputVoice != null)
                 {
-                    firstBarVoice = new Trk(outputVoice.MidiChannel, new List<IUniqueDef>());
+                    firstBarVoice = new Trk(outputVoice.MidiChannel, 0, new List<IUniqueDef>());
                     firstBar.Add(firstBarVoice);
-                    secondBarVoice = new Trk(outputVoice.MidiChannel, new List<IUniqueDef>());
+                    secondBarVoice = new Trk(outputVoice.MidiChannel, 0, new List<IUniqueDef>());
                     secondBar.Add(secondBarVoice);
                 }
                 else
                 {
-                    firstBarVoice = new InputVoiceDef();
+                    firstBarVoice = new InputVoiceDef(inputVoice.MidiChannel, 0, new List<IUniqueDef>());
                     firstBar.Add(firstBarVoice);
-                    secondBarVoice = new InputVoiceDef();
+                    secondBarVoice = new InputVoiceDef(inputVoice.MidiChannel, 0, new List<IUniqueDef>());
                     secondBar.Add(secondBarVoice);
                 }
                 foreach(IUniqueDef iud in voiceDef.UniqueDefs)
                 {
                     int iudMsDuration = iud.MsDuration;
-                    int iudAbsStartPos = this.AbsMsPosition + iud.MsPositionReTrk;
+                    int iudAbsStartPos = this.AbsMsPosition + iud.MsPositionReFirstUD;
                     int iudAbsEndPos = iudAbsStartPos + iudMsDuration;
 
                     if(iudAbsStartPos >= barlineAbsEndMsPosition)
@@ -295,7 +443,7 @@ namespace Moritz.Spec
                 int msPosition = 0;
                 foreach(IUniqueDef iud in voiceDef)
                 {
-                    iud.MsPositionReTrk = msPosition;
+                    iud.MsPositionReFirstUD = msPosition;
                     msPosition += iud.MsDuration;
                 }
             }
@@ -315,8 +463,8 @@ namespace Moritz.Spec
                     if(voiceDef.UniqueDefs.Count > 0)
                     {
                         IUniqueDef lastIUD = voiceDef.UniqueDefs[voiceDef.UniqueDefs.Count - 1];
-                        int endMsPosReTrk = lastIUD.MsPositionReTrk + lastIUD.MsDuration;
-                        msDuration = (msDuration < endMsPosReTrk) ? endMsPosReTrk : msDuration;
+                        int endMsPosReFirstIUD = lastIUD.MsPositionReFirstUD + lastIUD.MsDuration;
+                        msDuration = (msDuration < endMsPosReFirstIUD) ? endMsPosReFirstIUD : msDuration;
                     }
                 }
                 return msDuration;
@@ -330,16 +478,16 @@ namespace Moritz.Spec
                 foreach(VoiceDef voiceDef in _voiceDefs)
                 {
                     voiceDef.MsDuration = (int)Math.Round(voiceDef.MsDuration * factor);
-                    voiceDef.MsPositionReSeq = (int)Math.Round(voiceDef.MsPositionReSeq * factor);
+                    voiceDef.MsPositionReContainer = (int)Math.Round(voiceDef.MsPositionReContainer * factor);
                 }
                 int roundingError = value - MsDuration;
                 if(roundingError != 0)
                 {
                     foreach(VoiceDef voiceDef in _voiceDefs)
                     {
-                        if((voiceDef.EndMsPositionReTrk + roundingError) == value)
+                        if((voiceDef.EndMsPositionReFirstIUD + roundingError) == value)
                         {
-                            voiceDef.EndMsPositionReTrk += roundingError;
+                            voiceDef.EndMsPositionReFirstIUD += roundingError;
                         }
                     }
                 }
@@ -367,5 +515,5 @@ namespace Moritz.Spec
         }
 
         private List<VoiceDef> _voiceDefs = new List<VoiceDef>();
-	}
+    }
 }

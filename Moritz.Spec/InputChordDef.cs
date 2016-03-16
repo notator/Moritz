@@ -12,8 +12,6 @@ namespace Moritz.Spec
 {
     ///<summary>
     /// A InputChordDef can be saved and retrieved from voices in an SVG file.
-    /// Each inputChord in an SVG file will be given an ID of the form "inputChord"+uniqueNumber, but
-    /// Neither the AssistantPerformer nor Moritz actually uses these ids.
     ///</summary>
     public class InputChordDef : DurationDef, IUniqueSplittableChordDef
     {
@@ -21,7 +19,7 @@ namespace Moritz.Spec
         /// Constructs a multi-note chord, each inputNoteDef has a notated pitch and a SeqDef.
 		/// The inputNoteDefs must be in order of their notated pitches (bottom to top).
         /// </summary>
-        public InputChordDef(int msPositionReTrk, int msDuration, List<InputNoteDef> inputNoteDefs, TrkOptions trkOptions)
+        public InputChordDef(int msPositionReFirstIUD, int msDuration, List<InputNoteDef> inputNoteDefs, TrkOptions trkOptions)
             : base(msDuration)
         {
 			#region check notated pitches and trkRef positions
@@ -35,12 +33,12 @@ namespace Moritz.Spec
 				{
 					foreach(TrkRef trk in ind.NoteOn.SeqRef)
 					{ 
-						Debug.Assert(msPositionReTrk <= trk.MsPosition);
+						Debug.Assert(msPositionReFirstIUD <= trk.MsPosition);
 					}
 				}
 				if(ind.NoteOff != null && ind.NoteOff.SeqRef != null)
 				{
-					int minSeqPos = msPositionReTrk + msDuration;
+					int minSeqPos = msPositionReFirstIUD + msDuration;
 					foreach(TrkRef trk in ind.NoteOff.SeqRef)
 					{
 						Debug.Assert(minSeqPos <= trk.MsPosition);
@@ -50,7 +48,7 @@ namespace Moritz.Spec
 			}
 			#endregion
 
-            _msPositionReTrk = msPositionReTrk;
+            _msPositionReFirstIUD = msPositionReFirstIUD;
 			_msDuration = msDuration;
 			_inputNoteDefs = inputNoteDefs;
 			_lyric = null;
@@ -74,7 +72,7 @@ namespace Moritz.Spec
 
         public override string ToString()
         {
-            return ("MsPositionReTrk=" + MsPositionReTrk.ToString() + " MsDuration=" + MsDuration.ToString() + " InputChordDef");
+            return ("MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " MsDuration=" + MsDuration.ToString() + " InputChordDef");
         }
 
         /// <summary>
@@ -117,8 +115,8 @@ namespace Moritz.Spec
             throw new NotImplementedException("InputChordDef.DeepClone()");
         }
 
-        public int MsPositionReTrk { get { return _msPositionReTrk; } set { _msPositionReTrk = value; } }
-        private int _msPositionReTrk = 0;
+        public int MsPositionReFirstUD { get { return _msPositionReFirstIUD; } set { _msPositionReFirstIUD = value; } }
+        private int _msPositionReFirstIUD = 0;
 
 		public string Lyric { get { return _lyric; } set { _lyric = value; } }
 		private string _lyric = null;

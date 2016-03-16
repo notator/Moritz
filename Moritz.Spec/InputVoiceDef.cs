@@ -24,31 +24,13 @@ namespace Moritz.Spec
     public class InputVoiceDef : VoiceDef
     {
         #region constructors
-        /// <summary>
-        /// An empty InputVoiceDef
-        /// </summary>
-        /// <param name="msDuration"></param>
-        public InputVoiceDef()
-            : base()
-        {
-        }
-
-        /// <summary>
-        /// A VoiceDef beginning at MsPosition = 0, and containing a single RestDef having msDuration
-        /// </summary>
-        /// <param name="msDuration"></param>
-        public InputVoiceDef(int msDuration)
-            : base(msDuration)
-        {
-        }
-
-        /// <summary>
-        /// <para>If the argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
-        /// <para>The new VoiceDef's UniqueDefs list is simply set to the argument (which is not cloned).</para>
-        /// </summary>
-        public InputVoiceDef(List<IUniqueDef> iuds) 
-            : base(iuds)
-        {
+        public InputVoiceDef(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
+			: base(midiChannel, msPositionReContainer, iuds)
+		{
+            foreach(IUniqueDef iud in iuds)
+            {
+                Debug.Assert(iud is InputChordDef || iud is RestDef || iud is CautionaryChordDef);
+            }
         }
 
         /// <summary>
@@ -70,13 +52,13 @@ namespace Moritz.Spec
                 if(clone != null)
                 {
                     Debug.Assert(i < (clonedLmdds.Count - 1));
-                    ClefChangeDef replacement = new ClefChangeDef(clone.ClefType, clonedLmdds[i + 1].MsPositionReTrk);
+                    ClefChangeDef replacement = new ClefChangeDef(clone.ClefType, clonedLmdds[i + 1].MsPositionReFirstUD);
                     clonedLmdds.RemoveAt(i);
                     clonedLmdds.Insert(i, replacement);
                 }
             }
 
-            return new InputVoiceDef(clonedLmdds);
+            return new InputVoiceDef(this.MidiChannel, this.MsPositionReContainer, clonedLmdds);
         }
         #endregion constructors
 
@@ -97,7 +79,7 @@ namespace Moritz.Spec
 
         #region Count changers
         /// <summary>
-        /// Appends the new iUniqueDef to the end of the list.
+        /// Appends the new iUniqueDef to the end of the list. Sets the MsPosition of the iUniqueDef re the first iUniqueDef in the list.
         /// </summary>
         /// <param name="iUniqueDef"></param>
         public override void Add(IUniqueDef iUniqueDef)
@@ -107,13 +89,29 @@ namespace Moritz.Spec
         }
         /// <summary>
         /// Adds the argument to the end of this VoiceDef.
-        /// Sets the MsPositions of the appended UniqueDefs.
+        /// Sets the MsPositions of the appended UniqueDefs re the first iUniqueDef in the list.
         /// </summary>
         public override void AddRange(VoiceDef inputVoiceDef)
         {
             Debug.Assert(inputVoiceDef is InputVoiceDef);
             _AddRange(inputVoiceDef);
         }
+
+        /// <summary>
+        /// Adds the argument to the end of this VoiceDef.
+        /// Sets the MsPositions of the appended UniqueDefs.
+        /// </summary>
+        public void Concat(InputVoiceDef inputVoiceDef)
+        {
+            int thisEndMsPositionReSeq = this.EndMsPositionReFirstIUD + this.MsPositionReContainer;
+            if(inputVoiceDef.MsPositionReContainer > thisEndMsPositionReSeq)
+            {
+                RestDef rest = new RestDef(this.EndMsPositionReFirstIUD, inputVoiceDef.MsPositionReContainer - thisEndMsPositionReSeq);
+                this.Add(rest);
+            }
+            _AddRange(inputVoiceDef);
+        }
+
         /// <summary>
         /// Inserts the iUniqueDef in the list at the given index, and then
         /// resets the positions of all the uniqueDefs in the list.
@@ -138,7 +136,7 @@ namespace Moritz.Spec
         public void InsertInRest(InputChordDef inputChordDef)
         {
             List<IUniqueDef> iuds = new List<IUniqueDef>() { inputChordDef };
-            InputVoiceDef iVoiceDef = new InputVoiceDef(iuds);
+            InputVoiceDef iVoiceDef = new InputVoiceDef(this.MidiChannel, 0, iuds);
             InsertInRest(iVoiceDef);
         }
         /// <summary>

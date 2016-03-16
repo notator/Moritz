@@ -88,7 +88,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 					mcd.SetVerticalDensity(chordDensity);
 				}
-				Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], sys1mcds);
+				Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, sys1mcds);
 				sys1Trks.Add(trk);
 			}
 			Seq system1Seq = new Seq(0, sys1Trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
@@ -99,7 +99,7 @@ namespace Moritz.Algorithm.Tombeau1
 			int startIndex = 2;
 			for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
 			{
-				Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], new List<IUniqueDef>());
+				Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, new List<IUniqueDef>());
 				MidiChordDef mcd1 = (MidiChordDef)sys1Trks[5][startIndex].Clone();
 				trk.Add(mcd1);
 				MidiChordDef mcd2 = (MidiChordDef)sys1Trks[5][startIndex + 1].Clone();
@@ -111,7 +111,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 				trk.Add(sum);
 
-				RestDef rest = new RestDef(0, system1Seq.MsDuration - trk.EndMsPositionReTrk);
+				RestDef rest = new RestDef(0, system1Seq.MsDuration - trk.EndMsPositionReFirstIUD);
 				trk.Add(rest);
 
 				sys2Trks.Add(trk);
@@ -124,7 +124,7 @@ namespace Moritz.Algorithm.Tombeau1
 			#region  system 3
 			// Blocks can be warped...
 			List<double> warp = new List<double>() { 0, 0.1, 0.3, 0.6, 1 };
-			Block system3Block = new Block(system1Seq.Clone(), null);
+			Block system3Block = new Block(system1Seq.Clone());
 			system3Block.WarpDurations(warp);
 			#endregion  system 3
 
@@ -140,7 +140,7 @@ namespace Moritz.Algorithm.Tombeau1
 			mainSeq.Concat(system3Block); // N.B. pass a Clone if the argument is needed later!
 
             // Blocks contain a list of VoiceDefs
-            Block sequence = new Block(mainSeq, null); // converts mainSeq to a block (There are no InputVoiceDefs in this score.)
+            Block sequence = new Block(mainSeq); // converts mainSeq to a block (There are no InputVoiceDefs in this score.)
 
 			List<List<VoiceDef>> bars = ConvertBlockToBars(sequence, barlineEndMsPositions);
 
@@ -158,12 +158,12 @@ namespace Moritz.Algorithm.Tombeau1
 		{
 			List<IUniqueDef> iuds = new List<IUniqueDef>();
 			Palette palette = _palettes[paletteIndex];
-			int msPositionReTrk = 0;
+			int msPositionReFirstIUD = 0;
 			for(int i = 0; i < palette.Count; ++i)
 			{
 				MidiChordDef mcd = palette.MidiChordDef(i);
-				mcd.MsPositionReTrk = msPositionReTrk;
-				msPositionReTrk += mcd.MsDuration;
+				mcd.MsPositionReFirstUD = msPositionReFirstIUD;
+				msPositionReFirstIUD += mcd.MsDuration;
 				iuds.Add(mcd);
 			}
 			return iuds;

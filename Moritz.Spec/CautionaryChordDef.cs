@@ -12,14 +12,14 @@ namespace Moritz.Spec
     /// </summary>
     public class CautionaryChordDef : IUniqueChordDef
     {
-        public CautionaryChordDef(IUniqueChordDef chordDef, int msPositionReTrk, int msDuration)
+        public CautionaryChordDef(IUniqueChordDef chordDef, int msPositionReFirstIUD, int msDuration)
         {
             _midiPitches = new List<byte>();
             foreach(byte midiPitch in chordDef.NotatedMidiPitches)
             {
                 _midiPitches.Add(midiPitch);
             }
-            MsPositionReTrk = msPositionReTrk;
+            MsPositionReFirstUD = msPositionReFirstIUD;
             MsDuration = msDuration;
         }
 
@@ -35,21 +35,21 @@ namespace Moritz.Spec
         #region IUniqueDef
         public override string ToString()
         {
-            return ("MsPositionReTrk=" + MsPositionReTrk.ToString() + " MsDuration=" + MsDuration.ToString() + " CautionaryChordDef");
+            return ("MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " MsDuration=" + MsDuration.ToString() + " CautionaryChordDef");
         }
 
         public void AdjustMsDuration(double factor) { }
 
         public IUniqueDef Clone()
         {
-            CautionaryChordDef deepClone = new CautionaryChordDef(this, this._msPositionReTrk, this._msDuration);
+            CautionaryChordDef deepClone = new CautionaryChordDef(this, this._msPositionReFirstIUD, this._msDuration);
             return deepClone;
         }
 
         public int MsDuration { get { return _msDuration; } set { _msDuration = value; } }
         private int _msDuration = 0;
-        public int MsPositionReTrk { get { return _msPositionReTrk; } set { _msPositionReTrk = value; } }
-        private int _msPositionReTrk = 0;
+        public int MsPositionReFirstUD { get { return _msPositionReFirstIUD; } set { _msPositionReFirstIUD = value; } }
+        private int _msPositionReFirstIUD = 0;
         #endregion IUniqueDef
         #endregion IUniqueChordDef
 

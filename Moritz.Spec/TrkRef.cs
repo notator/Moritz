@@ -7,13 +7,13 @@ namespace Moritz.Spec
     public class TrkRef
     {
 		/// <param name="trkMidiChannel">The trk's midi channel</param>
-		/// <param name="trkStartPosition">The trk's startMsPosition</param>
+		/// <param name="absTrkStartPosition">The trk's absolute startMsPosition</param>
 		/// <param name="trkNumMidiObjects">The number of MidiChordDefs and RestDefs.</param>
 		/// <param name="trkOptions">If non-null, this trkOptions overrrides the TrkOptions in the InputNote or InputChord</param>
-		public TrkRef(byte trkMidiChannel, int trkStartPosition, int trkNumMidiObjects, TrkOptions trkOptions)
+		public TrkRef(byte trkMidiChannel, int absTrkStartPosition, int trkNumMidiObjects, TrkOptions trkOptions)
 		{
 			MidiChannel = trkMidiChannel;
-			_trkMsPosition = trkStartPosition;
+			_trkMsPosition = absTrkStartPosition;
 			_trkNumMidiObjects = trkNumMidiObjects;
 			TrkOptions = trkOptions;
 		}
@@ -23,7 +23,7 @@ namespace Moritz.Spec
 		public TrkRef(Trk trkDef, TrkOptions trkOptions)
 		{
 			MidiChannel = trkDef.MidiChannel;
-			_trkMsPosition = trkDef.MsPositionReSeq;
+			_trkMsPosition = trkDef.MsPositionReContainer;
 			_trkNumMidiObjects = trkDef.DurationsCount; // includes MidiChordDef, RestDef
 			TrkOptions = trkOptions;
 		}

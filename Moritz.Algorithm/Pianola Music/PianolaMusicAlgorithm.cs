@@ -33,7 +33,7 @@ namespace Moritz.Algorithm.PianolaMusic
 
             Seq mainSeq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
 
-            Block sequence = new Block(mainSeq, null);
+            Block sequence = new Block(mainSeq);
 
             List<int> absMsPositionsOfRightBarlines = GetAbsMsPositionsOfRightBarlines(sequence, NumberOfBars);
 
@@ -115,10 +115,10 @@ namespace Moritz.Algorithm.PianolaMusic
 		private List<Trk> GetTrks(int upperChannel, List<int> upperTrackPitches, int lowerChannel, List<int> lowerTrackPitches, List<List<int>> durations)
 		{
 			List<IUniqueDef> t1MidiChordDefs = GetMidiChordDefs(upperTrackPitches, durations[0]);
-			Trk trk1 = new Trk((byte)upperChannel, t1MidiChordDefs);
+			Trk trk1 = new Trk((byte)upperChannel, 0, t1MidiChordDefs);
 
 			List<IUniqueDef> t6MidiChordDefs = GetMidiChordDefs(lowerTrackPitches, durations[1]);
-			Trk trk6 = new Trk((byte)lowerChannel, t6MidiChordDefs);
+			Trk trk6 = new Trk((byte)lowerChannel, 0, t6MidiChordDefs);
 
 			List<Trk> trks = new List<Trk>();
 			trks.Add(trk1);

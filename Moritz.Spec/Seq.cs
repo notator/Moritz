@@ -24,7 +24,7 @@ namespace Moritz.Spec
 
             foreach(Trk trk in trks)
             {
-                Debug.Assert(trk.MsPositionReSeq >= 0);
+                Debug.Assert(trk.MsPositionReContainer >= 0);
                 _trks.Add(trk);
             }
 
@@ -46,7 +46,7 @@ namespace Moritz.Spec
 
             foreach(Trk trk in trks)
             {
-                Debug.Assert(trk.MsPositionReSeq >= 0);
+                Debug.Assert(trk.MsPositionReContainer >= 0);
                 _trks.Add(trk);
             }
             AssertConsistency();
@@ -94,7 +94,7 @@ namespace Moritz.Spec
 				{
 					Trk trk1 = _trks[i];
                     Trk trk2 = seq2.Trks[i];
-					int earliestAbsConcatPos = trk1.MsPositionReSeq + trk1.EndMsPositionReTrk - trk2.MsPositionReSeq;
+					int earliestAbsConcatPos = trk1.MsPositionReContainer + trk1.EndMsPositionReFirstIUD - trk2.MsPositionReContainer;
 					absConcatMsPos = (earliestAbsConcatPos > absConcatMsPos) ? earliestAbsConcatPos : absConcatMsPos;
 				}
 			}
@@ -107,11 +107,11 @@ namespace Moritz.Spec
 				if(trk2.UniqueDefs.Count > 0)
 				{
                     Trk trk1 = _trks[i];
-                    int trk1AbsEndMsPosition = AbsMsPosition + trk1.MsPositionReSeq + trk1.EndMsPositionReTrk; 
-					int trk2AbsStartMsPosition = absConcatMsPos + trk2.MsPositionReSeq;
+                    int trk1AbsEndMsPosition = AbsMsPosition + trk1.MsPositionReContainer + trk1.EndMsPositionReFirstIUD; 
+					int trk2AbsStartMsPosition = absConcatMsPos + trk2.MsPositionReContainer;
 					if(trk1AbsEndMsPosition < trk2AbsStartMsPosition)
 					{
-						trk1.Add(new RestDef(trk1.EndMsPositionReTrk, trk2AbsStartMsPosition - trk1AbsEndMsPosition));
+						trk1.Add(new RestDef(trk1.EndMsPositionReFirstIUD, trk2AbsStartMsPosition - trk1AbsEndMsPosition));
 					}
 					trk1.AddRange(trk2);
 				}
@@ -128,6 +128,11 @@ namespace Moritz.Spec
 			return this;
 		}
 
+        /// <summary>
+        /// Ignores any InputVoiceDefs in the block
+        /// </summary>
+        /// <param name="block"></param>
+        /// <returns></returns>
         public Seq Concat(Block block)
         {
             Seq seq = new Seq(block);
@@ -222,8 +227,8 @@ namespace Moritz.Spec
 					if(trk.UniqueDefs.Count > 0)
 					{
 						IUniqueDef lastIUD = trk.UniqueDefs[trk.UniqueDefs.Count - 1];
-						int endMsPosReTrk = lastIUD.MsPositionReTrk + lastIUD.MsDuration;
-						msDuration = (msDuration < endMsPosReTrk) ? endMsPosReTrk : msDuration;
+						int endMsPosReFirstIUD = lastIUD.MsPositionReFirstUD + lastIUD.MsDuration;
+						msDuration = (msDuration < endMsPosReFirstIUD) ? endMsPosReFirstIUD : msDuration;
 					}
 				}
 				return msDuration;
@@ -237,16 +242,16 @@ namespace Moritz.Spec
 				foreach(Trk trk in _trks)
 				{
 					trk.MsDuration = (int) Math.Round(trk.MsDuration * factor);
-					trk.MsPositionReSeq = (int) Math.Round(trk.MsPositionReSeq * factor);
+					trk.MsPositionReContainer = (int) Math.Round(trk.MsPositionReContainer * factor);
 				}
 				int roundingError = value - MsDuration;
 				if(roundingError != 0)
 				{
 					foreach(Trk trk in _trks)
 					{
-						if((trk.EndMsPositionReTrk + roundingError) == value)
+						if((trk.EndMsPositionReFirstIUD + roundingError) == value)
 						{
-							trk.EndMsPositionReTrk += roundingError;
+							trk.EndMsPositionReFirstIUD += roundingError;
 						}
 					}
 				}

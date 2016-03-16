@@ -42,7 +42,7 @@ namespace Moritz.Spec
             foreach(byte pitch in midiPitches)
                 Debug.Assert(pitch == M.MidiValue((int)pitch), "Pitch out of range.");
 
-            _msPositionReTrk = 0;
+            _msPositionReFirstIUD = 0;
             _msDuration = msDuration;
             _pitchWheelDeviation = pitchWheelDeviation;
             _hasChordOff = hasChordOff;
@@ -64,13 +64,13 @@ namespace Moritz.Spec
         /// <summary>
         /// This constructor creates a MidiChordDef at msPosition 0, lyric = null, containing a single BasicMidiChordDef and no sliders.
         /// </summary>
-        public MidiChordDef(List<byte> pitches, List<byte> velocities, int msPositionReTrk, int msDuration, bool hasChordOff)
+        public MidiChordDef(List<byte> pitches, List<byte> velocities, int msPositionReFirstIUD, int msDuration, bool hasChordOff)
             : base(msDuration)
         {
             foreach(byte pitch in pitches)
                 Debug.Assert(pitch == M.MidiValue((int)pitch), "Pitch out of range.");
 
-            _msPositionReTrk = msPositionReTrk;
+            _msPositionReFirstIUD = msPositionReFirstIUD;
             _hasChordOff = hasChordOff;
             _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 
@@ -109,7 +109,7 @@ namespace Moritz.Spec
         {
             MidiChordDef rval = new MidiChordDef();
 
-            rval.MsPositionReTrk = this.MsPositionReTrk;
+            rval.MsPositionReFirstUD = this.MsPositionReFirstUD;
             // rval.MsDuration must be set after setting BasicMidiChordDefs See below.
             rval.Bank = this.Bank;
             rval.Patch = this.Patch;
@@ -425,7 +425,7 @@ namespace Moritz.Spec
 		#region IUniqueDef
 		public override string ToString()
         {
-            return ("MsPositionReTrk=" + MsPositionReTrk.ToString() + " MsDuration=" + MsDuration.ToString() + " MidiChordDef");
+            return ("MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " MsDuration=" + MsDuration.ToString() + " MidiChordDef");
         }
 
         /// <summary>
@@ -690,8 +690,8 @@ namespace Moritz.Spec
 
         /****************************************************************************/
 
-        public int MsPositionReTrk { get { return _msPositionReTrk; } set { _msPositionReTrk = value; } }
-        private int _msPositionReTrk = 0;
+        public int MsPositionReFirstUD { get { return _msPositionReFirstIUD; } set { _msPositionReFirstIUD = value; } }
+        private int _msPositionReFirstIUD = 0;
 
         public override int MsDuration
         {

@@ -45,6 +45,7 @@
     <Compile Include="Study 1\Study1Algorithm.cs" />
     <Compile Include="Study 2\Study2c3_1Algorithm.cs" />
     <Compile Include="Study 3.1\Study3Sketch1Algorithm.cs" />
+    <Compile Include="Study 3.2\Study3Sketch2Algorithm.cs" />
     <Compile Include="Tombeau 1\Tombeau1Algorithm.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -75,7 +76,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Song Six\" />
-    <Folder Include="Study 3.2\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

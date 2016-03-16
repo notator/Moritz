@@ -9,7 +9,7 @@ namespace Moritz.Spec
     ///<summary>
     /// A ClefChangeDef is a IUniqueDef which can be created while programming a score.
     /// It must be either be added to a voice.UniqueDefs list immediately before a MidiChordDef or RestDef with which it
-    /// shares the same MsPosition, or appended to the voice.UniqueDefs list (in which case it has the EndMsPositionReTrk of
+    /// shares the same MsPosition, or appended to the voice.UniqueDefs list (in which case it has the EndMsPositionReFirstIUD of
     /// the voiceDef (which does not contain barlines).
     /// When converting definitions to symbols, the Notator uses this class to ensure that both voices in
     /// a two-voice staff contain the same ClefSigns (see Notator.AddSymbolsToSystems(List<SvgSystem> systems)).
@@ -17,7 +17,7 @@ namespace Moritz.Spec
     ///</summary>
     public class ClefChangeDef : IUniqueDef
     {
-		public ClefChangeDef(string clefType, int msPositionReTrk)
+		public ClefChangeDef(string clefType, int msPositionReFirstIUD)
 			:base()
 		{
 			#region check args
@@ -36,39 +36,39 @@ namespace Moritz.Spec
 
 			_id = "clefChange" + UniqueClefChangeIDNumber.ToString();
 			_clefType = clefType;
-			MsPositionReTrk = msPositionReTrk;
+			MsPositionReFirstUD = msPositionReFirstIUD;
 		}
 
 		#region IUniqueDef
 		public override string ToString()
         {
-            return ("MsPositionReTrk=" + MsPositionReTrk.ToString() + " clefChange: type=" + _clefType + " ClefChangeDef");
+            return ("MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " clefChange: type=" + _clefType + " ClefChangeDef");
         }
 
         public void AdjustMsDuration(double factor) {}
 
         public IUniqueDef Clone()
         {
-            ClefChangeDef deepClone = new ClefChangeDef(_clefType, MsPositionReTrk);
+            ClefChangeDef deepClone = new ClefChangeDef(_clefType, MsPositionReFirstUD);
             return deepClone;
         }
 
         public int MsDuration { get { return 0; } set { throw new System.NotSupportedException(); } }
-		private int _msPositionReTrk = -1;
+		private int _msPositionReFirstIUD = -1;
 		/// <summary>
 		/// Care should be taken to ensure that ClefChangeDefs always have the same msPosition as the following MidiChordDef or RestDef
 		/// </summary>
-        public int MsPositionReTrk
+        public int MsPositionReFirstUD
         {
             get
             {
-                Debug.Assert(_msPositionReTrk >= 0);
-                return _msPositionReTrk;
+                Debug.Assert(_msPositionReFirstIUD >= 0);
+                return _msPositionReFirstIUD;
             }
             set
 			{
 				Debug.Assert(value >= 0);
-				_msPositionReTrk = value;
+				_msPositionReFirstIUD = value;
 			}
         }
         #endregion IUniqueDef

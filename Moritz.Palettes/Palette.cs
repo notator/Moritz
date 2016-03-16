@@ -316,31 +316,31 @@ namespace Moritz.Palettes
             return midiChordDef;
         }
 
-        public Trk NewTrk(int midiChannel, List<int> sequence)
+        public Trk NewTrk(int midiChannel, int msPositionReContainer, List<int> sequence)
         {
             List<IUniqueDef> iuds = new List<IUniqueDef>();
-            int msPositionReTrk = 0;
+            int msPositionReFirstIUD = 0;
             foreach(int value in sequence)
             {
                 Debug.Assert((value > 0 && value <= this.Count), "Illegal argument: value out of range in sequence");
 
                 IUniqueDef iumdd = this.UniqueDurationDef(value - 1);
-                iumdd.MsPositionReTrk = msPositionReTrk;
-                msPositionReTrk += iumdd.MsDuration;
+                iumdd.MsPositionReFirstUD = msPositionReFirstIUD;
+                msPositionReFirstIUD += iumdd.MsDuration;
                 iuds.Add(iumdd);
             }
-            Trk trkDef = new Trk(midiChannel, iuds);
+            Trk trkDef = new Trk(midiChannel, msPositionReContainer, iuds);
             return trkDef;
         }
 
-		public Trk NewTrk(int midiChannel, Krystal krystal)
+		public Trk NewTrk(int midiChannel, int msPositionReContainer, Krystal krystal)
         {
             List<int> sequence = krystal.GetValues((uint)1)[0];
-			return NewTrk(midiChannel, sequence);
+			return NewTrk(midiChannel, msPositionReContainer, sequence);
         }
 
         /// <summary>
-        /// Constructs an Trk at MsPosition=0, containing a clone of the sequence of DurationDefs in the Palette.
+        /// Constructs an Trk at MsPositionReContainer=0, containing a clone of the sequence of DurationDefs in the Palette.
         /// </summary
         public Trk NewTrk(int midiChannel)
         {
@@ -349,7 +349,7 @@ namespace Moritz.Palettes
             {
                 sequence.Add(i);
             }
-            return NewTrk(midiChannel, sequence);
+            return NewTrk(midiChannel, 0, sequence);
         }
     }
 
