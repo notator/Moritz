@@ -81,18 +81,22 @@ namespace Moritz.Algorithm.Tombeau1
 
             Block system3Block = GetSystem3Block(system1Block);
 
+            Block system4Block = GetSystem4VelocityTestBlock();
+
             #region set barlines
             List<int> barlineEndMsPositions = new List<int>();
             barlineEndMsPositions.Add(system1Block.MsDuration);
             barlineEndMsPositions.Add(system1Block.MsDuration + system2Block.MsDuration);
             barlineEndMsPositions.Add(system1Block.MsDuration + system2Block.MsDuration + system3Block.MsDuration);
+            barlineEndMsPositions.Add(system1Block.MsDuration + system2Block.MsDuration + system3Block.MsDuration + system4Block.MsDuration);
             #endregion set barlines
 
             Block sequence = system1Block;
-			sequence.Concat(system2Block); // N.B. pass a Clone if the argument is needed later!
-			sequence.Concat(system3Block); // N.B. pass a Clone if the argument is needed later!
+			sequence.Concat(system2Block);
+            sequence.Concat(system3Block);
+            sequence.Concat(system4Block);
 
-			List<List<VoiceDef>> bars = ConvertBlockToBars(sequence, barlineEndMsPositions);
+            List<List<VoiceDef>> bars = ConvertBlockToBars(sequence, barlineEndMsPositions);
 
             // Add clef changes here.
             // Testing... 
@@ -103,6 +107,32 @@ namespace Moritz.Algorithm.Tombeau1
 
             return bars;
 		}
+
+        private Block GetSystem4VelocityTestBlock()
+        {
+            List<Trk> trks = new List<Trk>();
+            MidiChordDef baseMidiChordDef = new MidiChordDef(new List<byte>() { (byte)64 }, new List<byte>() { (byte)127 }, 0, 1000, true);
+            byte velocity = 0;
+            for(int trkIndex = 0; trkIndex < MidiChannelIndexPerOutputVoice.Count; ++trkIndex)
+            {
+                Trk trk = new Trk(MidiChannelIndexPerOutputVoice[trkIndex], 0, new List<IUniqueDef>());
+                for(int j = 0; j < 16; ++j)
+                {
+                    MidiChordDef mcd = baseMidiChordDef.Clone() as MidiChordDef;
+                    mcd.BasicMidiChordDefs[0].Velocities[0] = velocity;
+                    mcd.Lyric = (velocity).ToString();
+                    velocity++;
+
+                    trk.Add(mcd);
+                }
+                
+                trks.Add(trk);
+            }
+
+            Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
+
+            return new Block(seq);
+        }
 
         private Block GetSystem3Block(Block system1Block)
         {
