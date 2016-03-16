@@ -75,72 +75,22 @@ namespace Moritz.Algorithm.Tombeau1
             #endregion main comments
             /**********************************************/
 
-			#region system 1
-			List<Trk> sys1Trks = new List<Trk>();
-			for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
-			{
-				int chordDensity = 8 - i;
-				List<IUniqueDef> sys1mcds = PaletteMidiChordDefs(0);
-				for(int j = 0; j < sys1mcds.Count; ++j)
-				{
-					MidiChordDef mcd = sys1mcds[j] as MidiChordDef;
-					mcd.Lyric = (j).ToString() + "." + chordDensity.ToString();
+            Block system1Block = GetSystem1Block();
 
-					mcd.SetVerticalDensity(chordDensity);
-				}
-				Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, sys1mcds);
-				sys1Trks.Add(trk);
-			}
-			Seq system1Seq = new Seq(0, sys1Trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
-			#endregion system 1
+            Block system2Block = GetSystem2Block(system1Block);
 
-			#region  system 2
-			List<Trk> sys2Trks = new List<Trk>();
-			int startIndex = 2;
-			for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
-			{
-				Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, new List<IUniqueDef>());
-				MidiChordDef mcd1 = (MidiChordDef)sys1Trks[5][startIndex].Clone();
-				trk.Add(mcd1);
-				MidiChordDef mcd2 = (MidiChordDef)sys1Trks[5][startIndex + 1].Clone();
-				trk.Add(mcd2);
-
-				MidiChordDef sum = (MidiChordDef) mcd1.Clone();
-				sum.Lyric = "sum";
-				sum.AddNotes(mcd2);
-
-				trk.Add(sum);
-
-				RestDef rest = new RestDef(0, system1Seq.MsDuration - trk.EndMsPositionReFirstIUD);
-				trk.Add(rest);
-
-				sys2Trks.Add(trk);
-
-				startIndex++;
-			}
-			Seq system2Seq = new Seq(0, sys2Trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
-			#endregion  system 2
-
-			#region  system 3
-			// Blocks can be warped...
-			List<double> warp = new List<double>() { 0, 0.1, 0.3, 0.6, 1 };
-			Block system3Block = new Block(system1Seq.Clone());
-			system3Block.WarpDurations(warp);
-			#endregion  system 3
+            Block system3Block = GetSystem3Block(system1Block);
 
             #region set barlines
             List<int> barlineEndMsPositions = new List<int>();
-            barlineEndMsPositions.Add(system1Seq.MsDuration);
-            barlineEndMsPositions.Add(system1Seq.MsDuration + system2Seq.MsDuration);
-            barlineEndMsPositions.Add(system1Seq.MsDuration + system2Seq.MsDuration + system3Block.MsDuration);
+            barlineEndMsPositions.Add(system1Block.MsDuration);
+            barlineEndMsPositions.Add(system1Block.MsDuration + system2Block.MsDuration);
+            barlineEndMsPositions.Add(system1Block.MsDuration + system2Block.MsDuration + system3Block.MsDuration);
             #endregion set barlines
 
-            Seq mainSeq = system1Seq;
-			mainSeq.Concat(system2Seq); // N.B. pass a Clone if the argument is needed later!
-			mainSeq.Concat(system3Block); // N.B. pass a Clone if the argument is needed later!
-
-            // Blocks contain a list of VoiceDefs
-            Block sequence = new Block(mainSeq); // converts mainSeq to a block (There are no InputVoiceDefs in this score.)
+            Block sequence = system1Block;
+			sequence.Concat(system2Block); // N.B. pass a Clone if the argument is needed later!
+			sequence.Concat(system3Block); // N.B. pass a Clone if the argument is needed later!
 
 			List<List<VoiceDef>> bars = ConvertBlockToBars(sequence, barlineEndMsPositions);
 
@@ -153,6 +103,68 @@ namespace Moritz.Algorithm.Tombeau1
 
             return bars;
 		}
+
+        private Block GetSystem3Block(Block system1Block)
+        {
+            Block system3Block = system1Block.Clone();
+
+            // Blocks can be warped...
+            List<double> warp = new List<double>() { 0, 0.1, 0.3, 0.6, 1 };
+            system3Block.WarpDurations(warp);
+
+            return system3Block;
+        }
+
+        private Block GetSystem1Block()
+        {
+            List<Trk> sys1Trks = new List<Trk>();
+            for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
+            {
+                int chordDensity = 8 - i;
+                List<IUniqueDef> sys1mcds = PaletteMidiChordDefs(0);
+                for(int j = 0; j < sys1mcds.Count; ++j)
+                {
+                    MidiChordDef mcd = sys1mcds[j] as MidiChordDef;
+                    mcd.Lyric = (j).ToString() + "." + chordDensity.ToString();
+
+                    mcd.SetVerticalDensity(chordDensity);
+                }
+                Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, sys1mcds);
+                sys1Trks.Add(trk);
+            }
+            Seq system1Seq = new Seq(0, sys1Trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
+            return new Block(system1Seq);
+        }
+
+        private Block GetSystem2Block(Block system1Block)
+        {
+            List<Trk> sys2Trks = new List<Trk>();
+            int startIndex = 2;
+            for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
+            {
+                Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, new List<IUniqueDef>());
+                MidiChordDef mcd1 = (MidiChordDef)system1Block.Trks[5][startIndex].Clone();
+                trk.Add(mcd1);
+                MidiChordDef mcd2 = (MidiChordDef)system1Block.Trks[5][startIndex + 1].Clone();
+                trk.Add(mcd2);
+
+                MidiChordDef sum = (MidiChordDef)mcd1.Clone();
+                sum.Lyric = "sum";
+                sum.AddNotes(mcd2);
+
+                trk.Add(sum);
+
+                RestDef rest = new RestDef(0, system1Block.MsDuration - trk.EndMsPositionReFirstIUD);
+                trk.Add(rest);
+
+                sys2Trks.Add(trk);
+
+                startIndex++;
+            }
+            Seq system2Seq = new Seq(0, sys2Trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
+
+            return new Block(system2Seq);
+        }
 
         private List<IUniqueDef> PaletteMidiChordDefs(int paletteIndex)
 		{

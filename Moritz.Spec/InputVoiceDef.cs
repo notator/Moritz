@@ -36,7 +36,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Returns a deep clone of this InputVoiceDef.
         /// </summary>
-        public InputVoiceDef DeepClone()
+        public InputVoiceDef Clone()
         {
             List<IUniqueDef> clonedLmdds = new List<IUniqueDef>();
             foreach(IUniqueDef iu in this._uniqueDefs)

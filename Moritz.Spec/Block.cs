@@ -117,6 +117,29 @@ namespace Moritz.Spec
         }
 
         /// <summary>
+        /// A deep clone of the Block
+        /// </summary>
+        public Block Clone()
+        {
+            List<Trk> trks = new List<Trk>();
+            List<int> midiChannelPerOutputVoice = new List<int>();
+            foreach(Trk trk in Trks)
+            {
+                trks.Add(trk.Clone());
+                midiChannelPerOutputVoice.Add(trk.MidiChannel);
+            }
+            Seq seq = new Seq(this.AbsMsPosition, trks, midiChannelPerOutputVoice);
+            Block clone = new Block(seq);
+
+            foreach(InputVoiceDef ivd in InputVoiceDefs)
+            {
+                clone.AddInputVoice(ivd.Clone());
+            }
+
+            return clone;
+        }
+
+        /// <summary>
         /// A Block must fulfill the following criteria:
         /// The Trks may contain any combination of RestDef, MidiChordDef and ClefChangeDef.
         /// The InputVoiceDefs may contain any combination of RestDef, InputChordDef and ClefChangeDef.
@@ -511,6 +534,23 @@ namespace Moritz.Spec
                     }
                 }
                 return trks;
+            }
+        }
+
+        public List<InputVoiceDef> InputVoiceDefs
+        {
+            get
+            {
+                List<InputVoiceDef> inputVoiceDefs = new List<InputVoiceDef>();
+                foreach(VoiceDef voiceDef in _voiceDefs)
+                {
+                    InputVoiceDef inputVoiceDef = voiceDef as InputVoiceDef;
+                    if(inputVoiceDef != null)
+                    {
+                        inputVoiceDefs.Add(inputVoiceDef);
+                    }
+                }
+                return inputVoiceDefs;
             }
         }
 
