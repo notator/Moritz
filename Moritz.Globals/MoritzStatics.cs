@@ -642,6 +642,44 @@ namespace Moritz.Globals
             { "Tabloid", new PaperSize(279F, 432F)},
         };
 
+        /// <summary>
+        /// The key is one of the following strings: "fff", "ff", "f", "mf", "mp", "p", "pp", "ppp".
+        /// The value is used to determine Moritz' transcription of velocity -> dynamic symbol.
+        /// </summary>
+        public static Dictionary<string, byte> MaxMidiVelocity = new Dictionary<string, byte>()
+        {
+            //// The dynamic symbols related logarithmically to the midiVelocity.
+            //// This corresponds to the way gain is usually rendered by MIDI synthesizers.
+            //{ "fff", 127},
+            //{ "ff", 119},
+            //{ "f", 110},
+            //{ "mf", 100},
+            //{ "mp", 90},
+            //{ "p", 78},
+            //{ "pp", 64},
+            //{ "ppp", 45},
+
+            //// Linear correspondence
+            //{ "fff", 127},
+            //{ "ff", 111},
+            //{ "f", 95},
+            //{ "mf", 79},
+            //{ "mp", 63},
+            //{ "p", 47},
+            //{ "pp", 31},
+            //{ "ppp", 15},
+
+            // March 2016:  average between logarithmic and linear correspondence
+            { "fff", 127},
+            { "ff", 115},
+            { "f", 103},
+            { "mf", 90},
+            { "mp", 77},
+            { "p", 63},
+            { "pp", 48},
+            { "ppp", 30}
+        };
+
         public readonly static Preferences Preferences;
         public readonly static IFormatProvider En_USNumberFormat;
 

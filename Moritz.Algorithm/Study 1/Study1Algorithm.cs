@@ -6,6 +6,7 @@ using System.IO;
 using Krystals4ObjectLibrary;
 using Moritz.Palettes;
 using Moritz.Spec;
+using Moritz.Globals;
 
 namespace Moritz.Algorithm.Study1
 {
@@ -163,16 +164,27 @@ namespace Moritz.Algorithm.Study1
             //velocities.Add(36);
             //velocities.Add(29);
 
+            //// Max value per duration symbol (March 2016)
+            //// See Moritz.Symbols/System Components/Staff Components/VoiceComponents/AnchorageSymbol.cs.AddDynamic(...)
+            //velocities.Add(127); // fff
+            //velocities.Add(119); // ff
+            //velocities.Add(110); // f
+            //velocities.Add(100); // mf
+            //velocities.Add(90); // mp
+            //velocities.Add(78); // p
+            //velocities.Add(64); // pp
+            //velocities.Add(45); // ppp
+
             // Max value per duration symbol (March 2016)
             // See Moritz.Symbols/System Components/Staff Components/VoiceComponents/AnchorageSymbol.cs.AddDynamic(...)
-            velocities.Add(127); // fff
-            velocities.Add(119); // ff
-            velocities.Add(110); // f
-            velocities.Add(100); // mf
-            velocities.Add(90); // mp
-            velocities.Add(78); // p
-            velocities.Add(64); // pp
-            velocities.Add(45); // ppp
+            velocities.Add(M.MaxMidiVelocity["fff"]);
+            velocities.Add(M.MaxMidiVelocity["ff"]);
+            velocities.Add(M.MaxMidiVelocity["f"]);
+            velocities.Add(M.MaxMidiVelocity["mf"]);
+            velocities.Add(M.MaxMidiVelocity["mp"]);
+            velocities.Add(M.MaxMidiVelocity["p"]);
+            velocities.Add(M.MaxMidiVelocity["pp"]);
+            velocities.Add(M.MaxMidiVelocity["ppp"]);
 
             return velocities;
 		}

@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
-using Moritz.Xml;
+using Moritz.Globals;
 
 namespace Moritz.Symbols
 {
@@ -53,51 +54,56 @@ namespace Moritz.Symbols
 
         public void AddDynamic(byte midiVelocity, byte currentVelocity)
         {
-            if(midiVelocity != currentVelocity)
-            {
-                string dynamicString = "";
-                #region get dynamicString and _dynamic
-                // note that cLicht has pppp and ffff, but these dynamics are not used here (in Study2)
-                // These are the dynamicStrings for cLicht
-                // March 2016: The dynamic symbols are now related logarithmically to the midiVelocity.
-                // This corresponds to the way gain is usually rendered by MIDI synthesizers.
-                if(midiVelocity > 119) // sqrt(0.875) * 127  (was 112 until March 2016)
-                {
-                    dynamicString = "Ï";    // fff
-                }
-                else if(midiVelocity > 110) // sqrt(0.75) * 127 (was 96)
-                {
-                    dynamicString = "ƒ";    // ff
-                }
-                else if(midiVelocity > 100) // sqrt(0.625) * 127 (was 80)
-                {
-                    dynamicString = "f";    // f
-                }
-                else if(midiVelocity > 90)  // sqrt(0.5) * 127 (was 64)
-                {
-                    dynamicString = "F";    // mf
-                }
-                else if(midiVelocity > 78)  // sqrt(0.375) * 127 (was 48)
-                {
-                    dynamicString = "P";    // mp
-                }
-                else if(midiVelocity > 64)  // sqrt(0.25) * 127 (was 32)
-                {
-                    dynamicString = "p";    // p
-                }
-                else if(midiVelocity > 45)  // sqrt(0.125) * 127 (was 16)
-                {
-                    dynamicString = "π";    // pp
-                }
-                else // > 0
-                {
-                    dynamicString = "∏";    // ppp
-                }
-                #endregion get dynamicString and _dynamic
+            string newDynamicString = GetDynamicString(midiVelocity);
+            string currentDynamicString = GetDynamicString(currentVelocity);
 
-                DynamicText dynamicText = new DynamicText(this, dynamicString, FontHeight);
+            if(String.Compare(newDynamicString, currentDynamicString) != 0)
+            {
+                DynamicText dynamicText = new DynamicText(this, newDynamicString, FontHeight);
                 this._drawObjects.Add(dynamicText);
             }
+        }
+
+        private string GetDynamicString(byte midiVelocity)
+        {
+            string dynamicString = "";
+            #region get dynamicString and _dynamic
+            // note that cLicht has pppp and ffff, but these dynamics are not used here (in Study2)
+            // These are the dynamicStrings for cLicht
+            if(midiVelocity > M.MaxMidiVelocity["ff"]) // sqrt(0.875) * 127  (was 112 until March 2016)
+            {
+                dynamicString = "Ï";    // fff
+            }
+            else if(midiVelocity > M.MaxMidiVelocity["f"]) // sqrt(0.75) * 127 (was 96)
+            {
+                dynamicString = "ƒ";    // ff
+            }
+            else if(midiVelocity > M.MaxMidiVelocity["mf"]) // sqrt(0.625) * 127 (was 80)
+            {
+                dynamicString = "f";    // f
+            }
+            else if(midiVelocity > M.MaxMidiVelocity["mp"])  // sqrt(0.5) * 127 (was 64)
+            {
+                dynamicString = "F";    // mf
+            }
+            else if(midiVelocity > M.MaxMidiVelocity["p"])  // sqrt(0.375) * 127 (was 48)
+            {
+                dynamicString = "P";    // mp
+            }
+            else if(midiVelocity > M.MaxMidiVelocity["pp"])  // sqrt(0.25) * 127 (was 32)
+            {
+                dynamicString = "p";    // p
+            }
+            else if(midiVelocity > M.MaxMidiVelocity["ppp"])  // sqrt(0.125) * 127 (was 16)
+            {
+                dynamicString = "π";    // pp
+            }
+            else // > 0
+            {
+                dynamicString = "∏";    // ppp
+            }
+            #endregion get dynamicString and _dynamic
+            return dynamicString;
         }
     }
 }
