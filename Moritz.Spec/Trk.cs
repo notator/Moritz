@@ -10,12 +10,11 @@ using Moritz.Globals;
 namespace Moritz.Spec
 {
     /// <summary>
-    /// A temporal sequence of IUniqueDef objects.
-    /// <para>(IUniqueDef is implemented by all Unique...Defs that will eventually be converted to NoteObjects.)</para>
-    /// <para></para>
-    /// <para>This class is IEnumerable, so that foreach loops can be used.</para>
+    /// In Seqs, a temporal sequence of MidiChordDef and RestDef objects (condition Asserted in Seq).
+    /// In Blocks, Trks may also contain CautionaryChordDef objects (condition Asserted in Block);
+    /// <para>All VoiceDef objects are IEnumerable, so that foreach loops can be used.</para>
     /// <para>For example:</para>
-    /// <para>foreach(IUniqueDef iumdd in trkDef) { ... }</para>
+    /// <para>foreach(IUniqueDef iumdd in trk) { ... }</para>
     /// <para>An Enumerator for MidiChordDefs is also defined so that</para>
     /// <para>foreach(MidiChordDef mcd in trkDef.MidiChordDefs) { ... }</para>
     /// <para>can also be used.</para>
@@ -25,19 +24,25 @@ namespace Moritz.Spec
     public class Trk : VoiceDef
     {
         #region constructors
-		public Trk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
-			: base(midiChannel, msPositionReContainer, iuds)
-		{
-            foreach(IUniqueDef iud in iuds)
-            {
-                Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is CautionaryChordDef);
-            }
-		}
+        public Trk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
+            : base(midiChannel, msPositionReContainer, iuds)
+        {
+            AssertConstructionConsistency();
+        }
 
-		/// <summary>
-		/// Returns a deep clone of this TrkDef.
-		/// </summary>
-		public Trk Clone()
+        /// <summary>
+        /// A Trk with msPositionReContainer=0 and an empty UniqueDefs list.
+        /// This constructor is used by Block.PopBar(...).
+        /// </summary>
+        public Trk(int midiChannel)
+            : base(midiChannel, 0, new List<IUniqueDef>())
+        {
+        }
+
+        /// <summary>
+        /// Returns a deep clone of this TrkDef.
+        /// </summary>
+        public Trk Clone()
         {
             List<IUniqueDef> clonedIUDs = new List<IUniqueDef>();
             foreach(IUniqueDef iu in _uniqueDefs)
@@ -50,10 +55,29 @@ namespace Moritz.Spec
         }
         #endregion constructors
 
+        internal void AssertConstructionConsistency()
+        {
+            foreach(IUniqueDef iud in UniqueDefs)
+            {
+                // In blocks, trks can also contain CautionaryChordDefs
+                Debug.Assert(iud is MidiChordDef || iud is RestDef);
+            }
+        }
+
+        internal override void AssertConsistentInBlock()
+        {
+            foreach(IUniqueDef iud in UniqueDefs)
+            {
+                // In blocks, trks can also contain CautionaryChordDefs
+                Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is CautionaryChordDef);
+            }
+        }
+
         #region Count changers
         /// <summary>
         /// Appends the new MidiChordDef or RestDef or CautionaryChordDef to the end of the list.
         /// Automatically sets the iUniqueDef's msPosition.
+        /// Used by Block.PopBar(...), so accepts a CautionaryChordDef argument.
         /// </summary>
         public override void Add(IUniqueDef iUniqueDef)
         {
@@ -75,7 +99,7 @@ namespace Moritz.Spec
         /// </summary>
         public override void Insert(int index, IUniqueDef iUniqueDef)
         {
-            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is RestDef || iUniqueDef is CautionaryChordDef);
+            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is RestDef);
             _Insert(index, iUniqueDef);
         }
         /// <summary>
@@ -376,7 +400,7 @@ namespace Moritz.Spec
 			}
             #endregion
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
 		/// <summary>
 		/// Debug.Assert fails if
@@ -497,7 +521,7 @@ namespace Moritz.Spec
 				_uniqueDefs[startAtIndex + i] = sortedLmdds[i];
 			}
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
 		}
 
 		private List<IUniqueDef> ConvertPartitionsToFlatIUDs(int startAtIndex, List<List<IUniqueDef>> partitions)
@@ -527,7 +551,7 @@ namespace Moritz.Spec
 				partitions.Insert(kvp.Key, kvp.Value);
 			}
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
 		}
 
 		private List<List<IUniqueDef>> GetPartitions(int startAtIndex, List<int> partitionSizes)

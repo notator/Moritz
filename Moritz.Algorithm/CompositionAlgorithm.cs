@@ -156,7 +156,7 @@ namespace Moritz.Algorithm
             {
                 int barlineEndMsPosition = absMsPositionsOfRightBarlines[barlineIndex++];
 
-                List<VoiceDef> bar = sequence.GetBar(barlineEndMsPosition);
+                List<VoiceDef> bar = sequence.PopBar(barlineEndMsPosition);
 
                 bars.Add(bar);
             }

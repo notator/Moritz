@@ -29,7 +29,7 @@ namespace Moritz.Spec
             }
 
 			AssertChannelConsistency(midiChannelIndexPerOutputVoice);
-			AssertConsistency();
+			AssertSeqConsistency();
 		}
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Moritz.Spec
                 Debug.Assert(trk.MsPositionReContainer >= 0);
                 _trks.Add(trk);
             }
-            AssertConsistency();
+            AssertSeqConsistency();
         }
 
         public IReadOnlyList<int> MidiChannelIndexPerOutputVoice 
@@ -123,7 +123,7 @@ namespace Moritz.Spec
 				trk.AgglomerateRests();
 			}
 
-			AssertConsistency();
+			AssertSeqConsistency();
 
 			return this;
 		}
@@ -182,17 +182,13 @@ namespace Moritz.Spec
         /// <summary>
         /// Every Trk in _trks is either empty, or contains any combination of RestDef or MidiChordDef.
         /// </summary>
-        private void AssertConsistency()
+        private void AssertSeqConsistency()
 		{
 			Debug.Assert(_trks != null && _trks.Count > 0);
             #region Every Trk in _trks is either empty, or contains any combination of RestDef or MidiChordDef.
             foreach(Trk trk in _trks)
             {
-                Debug.Assert(trk.UniqueDefs != null);
-                foreach(IUniqueDef iud in trk.UniqueDefs)
-                {
-                    Debug.Assert(iud is MidiChordDef || iud is RestDef);
-                }
+                trk.AssertConstructionConsistency();
             }
             #endregion
 		}
@@ -220,7 +216,7 @@ namespace Moritz.Spec
 		{ 
 			get
 			{
-				AssertConsistency();  // there is a trk that begins at msPosition==0.
+				AssertSeqConsistency();  // there is a trk that begins at msPosition==0.
 				int msDuration = 0;
 				foreach(Trk trk in _trks)
 				{

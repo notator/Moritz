@@ -32,13 +32,14 @@ namespace Moritz.Spec
             this.MsPositionReContainer = msPositionReContainer;
             this._uniqueDefs = iuds;
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
         #endregion constructors
 
         #region public indexer & enumerator
         /// <summary>
         /// Indexer. Allows individual UniqueDefs to be accessed using array notation on the VoiceDef.
+        /// Automatically resets the MsPositions of all UniqueDefs in the list.
         /// e.g. iumdd = voiceDef[3].
         /// </summary>
         public IUniqueDef this[int i]
@@ -57,9 +58,12 @@ namespace Moritz.Spec
                 {
 					Debug.Assert(false, "Index out of range");
 				}
+                
+                Debug.Assert(!((this is Trk && value is InputChordDef) || (this is InputVoiceDef && value is MidiChordDef)));
+
                 _uniqueDefs[i] = value;
-                SetMsPositionsReFirstIUD();
-                AssertConsistency();
+                SetMsPositionsReFirstUD();
+                AssertVoiceDefConsistency();
             }
         }
 
@@ -114,7 +118,7 @@ namespace Moritz.Spec
 
         #region public
 
-        public void AssertConsistency()
+        protected void AssertVoiceDefConsistency()
         {
             Debug.Assert(MidiChannel >= 0 && MidiChannel <= 15);
             Debug.Assert(MsPositionReContainer >= 0);
@@ -132,6 +136,8 @@ namespace Moritz.Spec
             }
         }
 
+        internal abstract void AssertConsistentInBlock();
+
         #region Count changers
         #region list functions
         public abstract void Add(IUniqueDef iUniqueDef);
@@ -148,30 +154,30 @@ namespace Moritz.Spec
 			}
             _uniqueDefs.Add(iUniqueDef);
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
         public abstract void AddRange(VoiceDef voiceDef);
         protected void _AddRange(VoiceDef voiceDef)
         {
             _uniqueDefs.AddRange(voiceDef.UniqueDefs);
-            SetMsPositionsReFirstIUD();
+            SetMsPositionsReFirstUD();
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
         public abstract void Insert(int index, IUniqueDef iUniqueDef);
         protected void _Insert(int index, IUniqueDef iUniqueDef)
         {
             _uniqueDefs.Insert(index, iUniqueDef);
-            SetMsPositionsReFirstIUD();
+            SetMsPositionsReFirstUD();
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
         protected void _InsertRange(int index, VoiceDef voiceDef)
         {
             _uniqueDefs.InsertRange(index, voiceDef.UniqueDefs);
-            SetMsPositionsReFirstIUD();
+            SetMsPositionsReFirstUD();
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
         protected void _InsertInRest(VoiceDef iVoiceDef)
         {
@@ -184,13 +190,13 @@ namespace Moritz.Spec
             if(restIndex >= 0)
             {
                 InsertVoiceDefInRest(restIndex, iVoiceDef);
-                SetMsPositionsReFirstIUD(); // just to be sure!
+                SetMsPositionsReFirstUD(); // just to be sure!
             }
             else
             {
                 Debug.Assert(false, "Can't find a rest spanning the chord!");
             }
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
         #region _InsertInRest() implementation
         /// <summary>
@@ -277,9 +283,9 @@ namespace Moritz.Spec
             Debug.Assert(_uniqueDefs.Count > 0);
             Debug.Assert(_uniqueDefs.Contains(iUniqueDef));
             _uniqueDefs.Remove(iUniqueDef);
-            SetMsPositionsReFirstIUD();
+            SetMsPositionsReFirstUD();
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
         /// <summary>
         /// Removes the iUniqueMidiDurationDef at index from the list, and then resets the positions of all the lmdds in the list.
@@ -288,9 +294,9 @@ namespace Moritz.Spec
         {
             Debug.Assert(index >= 0 && index < _uniqueDefs.Count);
             _uniqueDefs.RemoveAt(index);
-            SetMsPositionsReFirstIUD();
+            SetMsPositionsReFirstUD();
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
         /// <summary>
         /// Removes count iUniqueDefs from the list, startíng with the iUniqueDef at index.
@@ -299,9 +305,9 @@ namespace Moritz.Spec
         {
             Debug.Assert(index >= 0 && count >= 0 && ((index + count) <= _uniqueDefs.Count));
             _uniqueDefs.RemoveRange(index, count);
-            SetMsPositionsReFirstIUD();
+            SetMsPositionsReFirstUD();
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
         /// <summary>
         /// Remove the IUniques which start between startMsPosReFirstIUD and (not including) endMsPosReFirstIUD 
@@ -316,9 +322,9 @@ namespace Moritz.Spec
                 _uniqueDefs.Remove(iumdd);
                 iumdd = _uniqueDefs.Find(f => (f.MsPositionReFirstUD >= startMsPosReFirstIUD) && (f.MsPositionReFirstUD < endMsPosReFirstIUD));
             }
-            SetMsPositionsReFirstIUD();
+            SetMsPositionsReFirstUD();
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
         /// <summary>
         /// Removes the iUniqueMidiDurationDef at index from the list, and then inserts the replacement at the same index.
@@ -328,9 +334,9 @@ namespace Moritz.Spec
             Debug.Assert(index >= 0 && index < _uniqueDefs.Count);
             _uniqueDefs.RemoveAt(index);
             _uniqueDefs.Insert(index, replacementIUnique);
-            SetMsPositionsReFirstIUD();
+            SetMsPositionsReFirstUD();
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
         /// <summary>
         /// From startMsPosition to (not including) endMsPosition,
@@ -356,7 +362,7 @@ namespace Moritz.Spec
 
             AgglomerateRests();
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
         /// <summary>
         /// Extracts nUniqueDefs from the uniqueDefs, and then inserts them again at the toIndex.
@@ -368,9 +374,9 @@ namespace Moritz.Spec
             List<IUniqueDef> extractedLmdds = _uniqueDefs.GetRange(fromIndex, nUniqueDefs);
             _uniqueDefs.RemoveRange(fromIndex, nUniqueDefs);
             _uniqueDefs.InsertRange(toIndex, extractedLmdds);
-            SetMsPositionsReFirstIUD();
+            SetMsPositionsReFirstUD();
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
         /// <summary>
         /// Returns the index of the IUniqueDef which starts at or is otherwise current at msPosition.
@@ -469,9 +475,9 @@ namespace Moritz.Spec
                 }
             }
 
-            SetMsPositionsReFirstIUD();
+            SetMsPositionsReFirstUD();
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
 
         /// <summary>
@@ -509,9 +515,9 @@ namespace Moritz.Spec
                 factor += basicIncrement;
             }
 
-            SetMsPositionsReFirstIUD();
+            SetMsPositionsReFirstUD();
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
 
         #endregion VoiceDef duration changers
@@ -535,7 +541,7 @@ namespace Moritz.Spec
                 }
             }
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
         /// <summary>
         /// Removes the rest or chord at index, and extends the previous rest or chord
@@ -548,7 +554,7 @@ namespace Moritz.Spec
             _uniqueDefs[index - 1].MsDuration += _uniqueDefs[index].MsDuration;
             _uniqueDefs.RemoveAt(index);
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
 
 		#endregion Count changers
@@ -607,7 +613,7 @@ namespace Moritz.Spec
 
             Debug.Assert(originalMsDuration == MsDuration);
 
-            AssertConsistency();
+            AssertVoiceDefConsistency();
         }
 
         /// <summary>
@@ -691,9 +697,9 @@ namespace Moritz.Spec
 
 				Debug.Assert(msDuration == newTotal);
 
-				SetMsPositionsReFirstIUD();
+				SetMsPositionsReFirstUD();
 
-                AssertConsistency();
+                AssertVoiceDefConsistency();
             }
 		}
 		/// <summary>
@@ -723,7 +729,7 @@ namespace Moritz.Spec
 				IUniqueDef lastLmdd = _uniqueDefs[_uniqueDefs.Count - 1];
 				lastLmdd.MsDuration = value - EndMsPositionReFirstIUD;
 
-                AssertConsistency();
+                AssertVoiceDefConsistency();
             }
 		}
 		public int Count { get { return _uniqueDefs.Count; } }
@@ -947,7 +953,7 @@ namespace Moritz.Spec
         /// Uses all the MsDuration attributes, and _msPosition as origin.
         /// This function must be called at the end of any function that changes the _uniqueDefs list.
         /// </summary>
-        protected void SetMsPositionsReFirstIUD()
+        protected void SetMsPositionsReFirstUD()
         {
             if(_uniqueDefs.Count > 0)
             {
