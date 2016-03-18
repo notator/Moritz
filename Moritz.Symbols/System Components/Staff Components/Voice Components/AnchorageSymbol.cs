@@ -70,37 +70,41 @@ namespace Moritz.Symbols
             #region get dynamicString and _dynamic
             // note that cLicht has pppp and ffff, but these dynamics are not used here (in Study2)
             // These are the dynamicStrings for cLicht
-            if(midiVelocity > M.MaxMidiVelocity["ff"]) // sqrt(0.875) * 127  (was 112 until March 2016)
+            if(midiVelocity > M.MaxMidiVelocity["ff"])
             {
                 dynamicString = "Ï";    // fff
             }
-            else if(midiVelocity > M.MaxMidiVelocity["f"]) // sqrt(0.75) * 127 (was 96)
+            else if(midiVelocity > M.MaxMidiVelocity["f"])
             {
                 dynamicString = "ƒ";    // ff
             }
-            else if(midiVelocity > M.MaxMidiVelocity["mf"]) // sqrt(0.625) * 127 (was 80)
+            else if(midiVelocity > M.MaxMidiVelocity["mf"])
             {
                 dynamicString = "f";    // f
             }
-            else if(midiVelocity > M.MaxMidiVelocity["mp"])  // sqrt(0.5) * 127 (was 64)
+            else if(midiVelocity > M.MaxMidiVelocity["mp"])
             {
                 dynamicString = "F";    // mf
             }
-            else if(midiVelocity > M.MaxMidiVelocity["p"])  // sqrt(0.375) * 127 (was 48)
+            else if(midiVelocity > M.MaxMidiVelocity["p"])
             {
                 dynamicString = "P";    // mp
             }
-            else if(midiVelocity > M.MaxMidiVelocity["pp"])  // sqrt(0.25) * 127 (was 32)
+            else if(midiVelocity > M.MaxMidiVelocity["pp"])
             {
                 dynamicString = "p";    // p
             }
-            else if(midiVelocity > M.MaxMidiVelocity["ppp"])  // sqrt(0.125) * 127 (was 16)
+            else if(midiVelocity > M.MaxMidiVelocity["ppp"])
             {
                 dynamicString = "π";    // pp
             }
-            else // > 0
+            else if(midiVelocity > M.MaxMidiVelocity["pppp"])
             {
                 dynamicString = "∏";    // ppp
+            }
+            else // > 0 
+            {
+                dynamicString = "Ø";    // pppp
             }
             #endregion get dynamicString and _dynamic
             return dynamicString;

@@ -643,23 +643,12 @@ namespace Moritz.Globals
         };
 
         /// <summary>
-        /// The key is one of the following strings: "fff", "ff", "f", "mf", "mp", "p", "pp", "ppp".
+        /// The key is one of the following strings: "fff", "ff", "f", "mf", "mp", "p", "pp", "ppp", "pppp".
         /// The value is used to determine Moritz' transcription of velocity -> dynamic symbol.
         /// </summary>
         public static Dictionary<string, byte> MaxMidiVelocity = new Dictionary<string, byte>()
         {
-            //// The dynamic symbols related logarithmically to the midiVelocity.
-            //// This corresponds to the way gain is usually rendered by MIDI synthesizers.
-            //{ "fff", 127},
-            //{ "ff", 119},
-            //{ "f", 110},
-            //{ "mf", 100},
-            //{ "mp", 90},
-            //{ "p", 78},
-            //{ "pp", 64},
-            //{ "ppp", 45},
-
-            //// Linear correspondence
+            //// Linear correspondence ppp->fff (before March 2016)
             //{ "fff", 127},
             //{ "ff", 111},
             //{ "f", 95},
@@ -669,15 +658,16 @@ namespace Moritz.Globals
             //{ "pp", 31},
             //{ "ppp", 15},
 
-            // March 2016:  average between logarithmic and linear correspondence
+            // March 2016:  equal steps between 15 (max pppp) and 127 (max fff)
             { "fff", 127},
-            { "ff", 115},
-            { "f", 103},
-            { "mf", 90},
-            { "mp", 77},
-            { "p", 63},
-            { "pp", 48},
-            { "ppp", 30}
+            { "ff", 113},
+            { "f", 99},
+            { "mf", 85},
+            { "mp", 71},
+            { "p", 57},
+            { "pp", 43},
+            { "ppp", 29},
+            { "pppp", 15}
         };
 
         public readonly static Preferences Preferences;
