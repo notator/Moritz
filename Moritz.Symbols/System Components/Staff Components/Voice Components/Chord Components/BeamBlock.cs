@@ -490,6 +490,7 @@ namespace Moritz.Symbols
                         {
                             beamTopReStaff = topNoteOriginY - (_gap * 3.5F) - beamThickness;
                         }
+
                         else
                         {
                             beamTopReStaff = topNoteOriginY - (_gap * 2.5F) - beamThickness;
