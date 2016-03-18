@@ -6,8 +6,8 @@ using Moritz.Xml;
 
 namespace Moritz.Symbols
 {
-	public class BeamBlock : Metrics
-	{
+    public class BeamBlock : Metrics
+    {
         public BeamBlock(ClefSymbol clef, List<ChordSymbol> chordsBeamedTogether, VerticalDir voiceStemDirection, float beamThickness, float strokeThickness)
             : base(null, 0, 0)
         {
@@ -21,7 +21,7 @@ namespace Moritz.Symbols
             _beamThickness = beamThickness;
             _strokeThickness = strokeThickness;
             _stemDirection = Chords[0].Stem.Direction;
-            
+
             /******************************************************************************
              * Important to set stem tips to this value before justifying horizontally.
              * Allows collisions between the objects outside the tips (e.g. dynamics or ornaments)
@@ -126,7 +126,7 @@ namespace Moritz.Symbols
         {
             Debug.Assert(Chords.Count > 1);
             int startMsPos = Chords[0].AbsMsPosition;
-            int endMsPos = Chords[Chords.Count-1].AbsMsPosition;
+            int endMsPos = Chords[Chords.Count - 1].AbsMsPosition;
             List<ChordSymbol> enclosedChordSymbols = new List<ChordSymbol>();
             foreach(ChordSymbol otherChord in otherVoice.ChordSymbols)
             {
@@ -172,7 +172,7 @@ namespace Moritz.Symbols
                 _originX = _left;
                 // _left, _right and _originX never change again after they have been set here
             }
-			SetBeamStubs(Beams);
+            SetBeamStubs(Beams);
             SetVerticalBounds();
             #endregion
             Dictionary<DurationClass, float> durationClassBeamThickness = GetBeamThicknessesPerDurationClass(durationClasses);
@@ -183,63 +183,63 @@ namespace Moritz.Symbols
             MoveStemTips();
         }
 
-		private void SetBeamStubs(HashSet<Beam> beamsHash)
-		{
-			List<Beam> beams = new List<Beam>(beamsHash);
-			float stubWidth = _gap * 1.2F;
+        private void SetBeamStubs(HashSet<Beam> beamsHash)
+        {
+            List<Beam> beams = new List<Beam>(beamsHash);
+            float stubWidth = _gap * 1.2F;
 
-			for(int i = 0; i < beams.Count; ++i)
-			{
-				Beam beam = beams[i];
-				if(beam is IBeamStub)
-				{
-					Beam leftEndLongBeam = LeftEndLongBeam(beams, beam.LeftX);
-					beamsHash.Remove(beam);
-					DurationClass durationClass = (beam as IBeamStub).DurationClass;
-					Beam newBeamStub;
-					if(leftEndLongBeam.LeftX == beam.LeftX)
-					{
-						// add a beamStub to the right of the stem
-						newBeamStub = NewBeam(durationClass, beam.LeftX, beam.LeftX + stubWidth, true);	
-					}
-					else
-					{
-						newBeamStub = NewBeam(durationClass, beam.LeftX - stubWidth, beam.LeftX, true);
-					}
+            for(int i = 0; i < beams.Count; ++i)
+            {
+                Beam beam = beams[i];
+                if(beam is IBeamStub)
+                {
+                    Beam leftEndLongBeam = LeftEndLongBeam(beams, beam.LeftX);
+                    beamsHash.Remove(beam);
+                    DurationClass durationClass = (beam as IBeamStub).DurationClass;
+                    Beam newBeamStub;
+                    if(leftEndLongBeam.LeftX == beam.LeftX)
+                    {
+                        // add a beamStub to the right of the stem
+                        newBeamStub = NewBeam(durationClass, beam.LeftX, beam.LeftX + stubWidth, true);
+                    }
+                    else
+                    {
+                        newBeamStub = NewBeam(durationClass, beam.LeftX - stubWidth, beam.LeftX, true);
+                    }
 
-					beamsHash.Add(newBeamStub);
-				}
-			}
-		}
+                    beamsHash.Add(newBeamStub);
+                }
+            }
+        }
 
-		private Beam LeftEndLongBeam(List<Beam> beams, float stemX)
-		{
-			float leftX = int.MaxValue;
-			Beam rval = null;
+        private Beam LeftEndLongBeam(List<Beam> beams, float stemX)
+        {
+            float leftX = int.MaxValue;
+            Beam rval = null;
 
-			foreach(Beam beam in beams)
-			{
-				if(!(beam is IBeamStub) && beam.LeftX < leftX)
-				{
-					rval = beam;
-					leftX = beam.LeftX;
-				}
-			}
+            foreach(Beam beam in beams)
+            {
+                if(!(beam is IBeamStub) && beam.LeftX < leftX)
+                {
+                    rval = beam;
+                    leftX = beam.LeftX;
+                }
+            }
 
-			foreach(Beam beam in beams)
-			{
-				if(stemX == beam.LeftX && !(beam is IBeamStub) && !(rval == beam))
-				{
-					rval = beam;
-				}
-			}
+            foreach(Beam beam in beams)
+            {
+                if(stemX == beam.LeftX && !(beam is IBeamStub) && !(rval == beam))
+                {
+                    rval = beam;
+                }
+            }
 
-			Debug.Assert(!(rval is IBeamStub));
+            Debug.Assert(!(rval is IBeamStub));
 
-			return rval;
-		}
+            return rval;
+        }
 
-		List<ChordMetrics> GetChordsMetrics()
+        List<ChordMetrics> GetChordsMetrics()
         {
             List<ChordMetrics> chordsMetrics = new List<ChordMetrics>();
             foreach(ChordSymbol chord in Chords)
@@ -294,10 +294,10 @@ namespace Moritz.Symbols
 
                 if(inBeam && ((!hasLessThanOrEqualBeams) || stemX == rightMostStemX)) // different durationClass or end of beamBlock
                 {
-					// BeamStubs are initially created with LeftX == RightX == stemX.
-					// They are replaced by proper beamStubs when the BeamBlock is complete
-					// (See SetBeamStubs() above.)
-					bool isStub = (beamLeft == beamRight) ? true : false;
+                    // BeamStubs are initially created with LeftX == RightX == stemX.
+                    // They are replaced by proper beamStubs when the BeamBlock is complete
+                    // (See SetBeamStubs() above.)
+                    bool isStub = (beamLeft == beamRight) ? true : false;
 
                     Beam newBeam = NewBeam(durationClass, beamLeft, beamRight, isStub);
                     newBeams.Add(newBeam);
@@ -306,16 +306,16 @@ namespace Moritz.Symbols
                 stemNumber++;
             }
 
-			return newBeams;
+            return newBeams;
         }
 
-		/// <summary>
-		/// returns true if the currentDC has a less than or equal number of beams than the stemDC
-		/// </summary>
-		/// <param name="currentDC"></param>
-		/// <param name="stemDC"></param>
-		/// <returns></returns>
-		private bool HasLessThanOrEqualBeams(DurationClass currentDC, DurationClass stemDC)
+        /// <summary>
+        /// returns true if the currentDC has a less than or equal number of beams than the stemDC
+        /// </summary>
+        /// <param name="currentDC"></param>
+        /// <param name="stemDC"></param>
+        /// <returns></returns>
+        private bool HasLessThanOrEqualBeams(DurationClass currentDC, DurationClass stemDC)
         {
             bool hasLessThanOrEqualBeams = false;
             switch(currentDC)
@@ -434,77 +434,67 @@ namespace Moritz.Symbols
         private void MoveToNoteheads(List<ChordMetrics> chordsMetrics, Dictionary<DurationClass, float> durationClassBeamThickness)
         {
             float staffOriginY = Chords[0].Voice.Staff.Metrics.OriginY;
-
             if(_stemDirection == VerticalDir.down)
             {
-                float lowestBottomReStaff = float.MinValue;
+                float lowestBottom = float.MinValue;
                 for(int i = 0; i < Chords.Count; ++i)
                 {
                     ChordMetrics chordMetrics = chordsMetrics[i];
                     HeadMetrics bottomHeadMetrics = chordMetrics.BottomHeadMetrics;
-                    float bottomNoteOriginY = bottomHeadMetrics.OriginY;
-                    float beamBottomReStaff = 0;
-                    float beamThickness = durationClassBeamThickness[Chords[i].DurationClass];
-                    if(bottomNoteOriginY < (staffOriginY + (_gap * -1))) // above the staff
+                    AccidentalMetrics bottomAccidentalMetrics = null;
+                    if(chordMetrics.AccidentalsMetrics.Count > 0)
                     {
-                        beamBottomReStaff = (_gap * 2) + beamThickness;
+                        bottomAccidentalMetrics = chordMetrics.AccidentalsMetrics[chordMetrics.AccidentalsMetrics.Count - 1];
                     }
-                    else if(bottomNoteOriginY <= (staffOriginY + (_gap * 2))) // above the mid line
+                    float noteBottom = bottomHeadMetrics.OriginY;
+                    if(bottomAccidentalMetrics != null)
                     {
-                        if(Chords[i].DurationClass == DurationClass.quaver)
-                        {
-                            beamBottomReStaff = bottomNoteOriginY + (_gap * 3.5F) + beamThickness;
-                        }
-                        else
-                        {
-                            beamBottomReStaff = bottomNoteOriginY + (_gap * 2.5F) + beamThickness;
-                        }
+                        noteBottom = bottomAccidentalMetrics.Bottom + (_gap / 2);
                     }
+                    float beamBottom =
+                        noteBottom + durationClassBeamThickness[Chords[i].DurationClass];
+                    if(((noteBottom - staffOriginY) % _gap) != 0)
+                        beamBottom += (_gap * 2.5F);
                     else
-                    {
-                        beamBottomReStaff = bottomNoteOriginY + (_gap * 3F) + beamThickness;
-                    }
+                        beamBottom += (_gap * 2.65F);
 
-                    lowestBottomReStaff = lowestBottomReStaff > beamBottomReStaff ? lowestBottomReStaff : beamBottomReStaff;
+                    lowestBottom = lowestBottom > beamBottom ? lowestBottom : beamBottom;
                 }
+                if(Beams.Count == 1) // only a quaver beam
+                    lowestBottom += _gap;
 
-                Move(lowestBottomReStaff - staffOriginY);
+                Move(lowestBottom - staffOriginY);
             }
             else // stems up
             {
-                float highestTopReStaff = float.MaxValue;
+                float highestTop = float.MaxValue;
                 for(int i = 0; i < Chords.Count; ++i)
                 {
                     ChordMetrics chordMetrics = chordsMetrics[i];
                     HeadMetrics topHeadMetrics = chordMetrics.TopHeadMetrics;
-					float topNoteOriginY = topHeadMetrics.OriginY;
-                    float beamTopReStaff = 0;
-                    float beamThickness = durationClassBeamThickness[Chords[i].DurationClass];
-                    if(topNoteOriginY > staffOriginY + (_gap * 5)) // below the staff
+                    AccidentalMetrics topAccidentalMetrics = null;
+                    if(chordMetrics.AccidentalsMetrics.Count > 0)
                     {
-                        beamTopReStaff = (_gap * 2) - beamThickness;
+                        topAccidentalMetrics = chordMetrics.AccidentalsMetrics[0];
                     }
-                    else if(topNoteOriginY >= staffOriginY + ((_gap * 2))) // below the mid line
+                    float noteTop = topHeadMetrics.OriginY;
+                    if(topAccidentalMetrics != null)
                     {
-                        if(Chords[i].DurationClass == DurationClass.quaver)
-                        {
-                            beamTopReStaff = topNoteOriginY - (_gap * 3.5F) - beamThickness;
-                        }
+                        noteTop = topAccidentalMetrics.Top - (_gap / 2);
+                    }
+                    float beamTop =
+                        noteTop - durationClassBeamThickness[Chords[i].DurationClass];
+                    if(((noteTop - staffOriginY) % _gap) != 0)
+                        beamTop -= (_gap * 2.5F);
+                    else
+                        beamTop -= (_gap * 2.65F);
 
-                        else
-                        {
-                            beamTopReStaff = topNoteOriginY - (_gap * 2.5F) - beamThickness;
-                        }
-                    }
-                    else // above the mid-line
-                    {
-                        beamTopReStaff = topNoteOriginY - (_gap * 3F) - beamThickness;
-                    }
-
-                    highestTopReStaff = highestTopReStaff < beamTopReStaff ? highestTopReStaff : beamTopReStaff;
+                    highestTop = highestTop < beamTop ? highestTop : beamTop;
                 }
+                if(Beams.Count == 1) // only a quaver beam
+                    highestTop -= _gap;
 
-                Move(highestTopReStaff - staffOriginY);
+                Move(highestTop - staffOriginY);
             }
         }
         private Dictionary<DurationClass, float> GetBeamThicknessesPerDurationClass(HashSet<DurationClass> durationClasses)
@@ -537,7 +527,7 @@ namespace Moritz.Symbols
                         break;
                 }
             }
-            return btpdc;           
+            return btpdc;
         }
 
         private void Shear(List<ChordMetrics> chordsMetrics)
@@ -554,7 +544,7 @@ namespace Moritz.Symbols
             foreach(ChordMetrics chordMetrics in chordsMetrics)
             {
                 float width = chordMetrics.StemMetrics.OriginX - shearAxis;
-                float stemX = chordMetrics.StemMetrics.OriginX; 
+                float stemX = chordMetrics.StemMetrics.OriginX;
                 float dy = width * tanAlpha;
                 foreach(Beam beam in Beams)
                 {
@@ -578,7 +568,7 @@ namespace Moritz.Symbols
         private float ShearAngle(List<ChordMetrics> chordsMetrics)
         {
             ChordMetrics leftChordMetrics = chordsMetrics[0];
-            ChordMetrics rightChordMetrics = chordsMetrics[chordsMetrics.Count -1]; 
+            ChordMetrics rightChordMetrics = chordsMetrics[chordsMetrics.Count - 1];
             float height =
                     (((rightChordMetrics.TopHeadMetrics.OriginY + rightChordMetrics.BottomHeadMetrics.OriginY) / 2)
                    - ((leftChordMetrics.TopHeadMetrics.OriginY + leftChordMetrics.BottomHeadMetrics.OriginY) / 2));
@@ -645,7 +635,7 @@ namespace Moritz.Symbols
         private void SetToStaff(Dictionary<DurationClass, float> durationClassBeamThickness)
         {
             float staffTop = Chords[0].Voice.Staff.Metrics.OriginY;
-            float staffBottom = staffTop + (_gap * (Chords[0].Voice.Staff.NumberOfStafflines -1));
+            float staffBottom = staffTop + (_gap * (Chords[0].Voice.Staff.NumberOfStafflines - 1));
             float staffMiddleY = (staffTop + staffBottom) / 2F;
             float deltaY;
             if(this._stemDirection == VerticalDir.up)
@@ -674,7 +664,7 @@ namespace Moritz.Symbols
                 else if(this._top <= staffTop)
                 {
                     deltaY = staffMiddleY - (_gap * 1.35F) - this._top;
-                    if(deltaY > 0F) 
+                    if(deltaY > 0F)
                         Move(deltaY);
                 }
             }
@@ -732,7 +722,7 @@ namespace Moritz.Symbols
         /// <returns></returns>
         public List<HLine> OuterEdge()
         {
-            QuaverBeam qBeam  = null;
+            QuaverBeam qBeam = null;
             foreach(Beam beam in Beams)
             {
                 qBeam = beam as QuaverBeam;
@@ -811,7 +801,7 @@ namespace Moritz.Symbols
                         }
                     }
                 }
-            }   
+            }
         }
 
         /// <summary>
@@ -848,7 +838,7 @@ namespace Moritz.Symbols
             float tanA = this.TanAngle;
             if(_stemDirection == VerticalDir.up)
             {
-                float beamBottomAtHeadY; 
+                float beamBottomAtHeadY;
                 foreach(Beam beam in Beams)
                 {
                     float beamBeginMsPosition = BeamBeginMsPosition(beam);
@@ -936,12 +926,12 @@ namespace Moritz.Symbols
                     }
                     w.SvgBeam(null, beam.LeftX, beam.RightX, topLeft, topRight, _beamThickness * 1.5F, 0F, 0.65F);
                 }
-				w.SvgBeam(null, beam.LeftX, beam.RightX, beam.LeftTopY, beam.RightTopY, _beamThickness, _strokeThickness, 1.0F);
+                w.SvgBeam(null, beam.LeftX, beam.RightX, beam.LeftTopY, beam.RightTopY, _beamThickness, _strokeThickness, 1.0F);
             }
             w.SvgEndGroup();
         }
 
-		public readonly List<ChordSymbol> Chords = null;
+        public readonly List<ChordSymbol> Chords = null;
         public float DefaultStemTipY { get { return _defaultStemTipY; } }
         private readonly float _defaultStemTipY;
         private readonly float _gap;
@@ -951,5 +941,5 @@ namespace Moritz.Symbols
         private readonly VerticalDir _stemDirection = VerticalDir.none;
 
         public HashSet<Beam> Beams = new HashSet<Beam>();
-	}
+    }
 }
