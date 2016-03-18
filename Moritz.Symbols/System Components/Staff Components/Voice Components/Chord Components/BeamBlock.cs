@@ -434,67 +434,76 @@ namespace Moritz.Symbols
         private void MoveToNoteheads(List<ChordMetrics> chordsMetrics, Dictionary<DurationClass, float> durationClassBeamThickness)
         {
             float staffOriginY = Chords[0].Voice.Staff.Metrics.OriginY;
+
             if(_stemDirection == VerticalDir.down)
             {
-                float lowestBottom = float.MinValue;
+                float lowestBottomReStaff = float.MinValue;
                 for(int i = 0; i < Chords.Count; ++i)
                 {
                     ChordMetrics chordMetrics = chordsMetrics[i];
                     HeadMetrics bottomHeadMetrics = chordMetrics.BottomHeadMetrics;
-					AccidentalMetrics bottomAccidentalMetrics = null;
-					if(chordMetrics.AccidentalsMetrics.Count > 0)
-					{
-						bottomAccidentalMetrics = chordMetrics.AccidentalsMetrics[chordMetrics.AccidentalsMetrics.Count - 1];
-					}
-					float noteBottom = bottomHeadMetrics.OriginY;
-					if(bottomAccidentalMetrics != null)
-					{
-						noteBottom = bottomAccidentalMetrics.Bottom + (_gap / 2);
-					}
-					float beamBottom =
-						noteBottom + durationClassBeamThickness[Chords[i].DurationClass];
-                    if(((noteBottom - staffOriginY) % _gap) != 0)
-                        beamBottom +=(_gap * 2.5F);
+                    float bottomNoteOriginY = bottomHeadMetrics.OriginY;
+                    float beamBottomReStaff = 0;
+                    float beamThickness = durationClassBeamThickness[Chords[i].DurationClass];
+                    if(bottomNoteOriginY < (staffOriginY + (_gap * -1))) // above the staff
+                    {
+                        beamBottomReStaff = (_gap * 2) + beamThickness;
+                    }
+                    else if(bottomNoteOriginY <= (staffOriginY + (_gap * 2))) // above the mid line
+                    {
+                        if(Chords[i].DurationClass == DurationClass.quaver)
+                        {
+                            beamBottomReStaff = bottomNoteOriginY + (_gap * 3.5F) + beamThickness;
+                        }
+                        else
+                        {
+                            beamBottomReStaff = bottomNoteOriginY + (_gap * 2.5F) + beamThickness;
+                        }
+                    }
                     else
-                        beamBottom += (_gap * 2.65F);
+                    {
+                        beamBottomReStaff = bottomNoteOriginY + (_gap * 3F) + beamThickness;
+                    }
 
-                    lowestBottom = lowestBottom > beamBottom ? lowestBottom : beamBottom;
+                    lowestBottomReStaff = lowestBottomReStaff > beamBottomReStaff ? lowestBottomReStaff : beamBottomReStaff;
                 }
-                if(Beams.Count == 1) // only a quaver beam
-                    lowestBottom += _gap;
 
-                Move(lowestBottom - staffOriginY);
+                Move(lowestBottomReStaff - staffOriginY);
             }
             else // stems up
             {
-                float highestTop = float.MaxValue;
+                float highestTopReStaff = float.MaxValue;
                 for(int i = 0; i < Chords.Count; ++i)
                 {
                     ChordMetrics chordMetrics = chordsMetrics[i];
                     HeadMetrics topHeadMetrics = chordMetrics.TopHeadMetrics;
-					AccidentalMetrics topAccidentalMetrics = null;
-					if(chordMetrics.AccidentalsMetrics.Count > 0)
-					{
-						topAccidentalMetrics = chordMetrics.AccidentalsMetrics[0];
-					}
-					float noteTop = topHeadMetrics.OriginY;
-					if(topAccidentalMetrics != null)
-					{
-						noteTop = topAccidentalMetrics.Top - (_gap / 2);
-					}
-					float beamTop =
-						noteTop - durationClassBeamThickness[Chords[i].DurationClass];
-                    if(((noteTop - staffOriginY) % _gap) != 0)
-                        beamTop -= (_gap * 2.5F);
-                    else
-                        beamTop -= (_gap * 2.65F);
+					float topNoteOriginY = topHeadMetrics.OriginY;
+                    float beamTopReStaff = 0;
+                    float beamThickness = durationClassBeamThickness[Chords[i].DurationClass];
+                    if(topNoteOriginY > staffOriginY + (_gap * 5)) // below the staff
+                    {
+                        beamTopReStaff = (_gap * 2) - beamThickness;
+                    }
+                    else if(topNoteOriginY >= staffOriginY + ((_gap * 2))) // below the mid line
+                    {
+                        if(Chords[i].DurationClass == DurationClass.quaver)
+                        {
+                            beamTopReStaff = topNoteOriginY - (_gap * 3.5F) - beamThickness;
+                        }
+                        else
+                        {
+                            beamTopReStaff = topNoteOriginY - (_gap * 2.5F) - beamThickness;
+                        }
+                    }
+                    else // above the mid-line
+                    {
+                        beamTopReStaff = topNoteOriginY - (_gap * 3F) - beamThickness;
+                    }
 
-                    highestTop = highestTop < beamTop ? highestTop : beamTop;
+                    highestTopReStaff = highestTopReStaff < beamTopReStaff ? highestTopReStaff : beamTopReStaff;
                 }
-                if(Beams.Count == 1) // only a quaver beam
-                    highestTop -= _gap;
 
-                Move(highestTop - staffOriginY);
+                Move(highestTopReStaff - staffOriginY);
             }
         }
         private Dictionary<DurationClass, float> GetBeamThicknessesPerDurationClass(HashSet<DurationClass> durationClasses)
