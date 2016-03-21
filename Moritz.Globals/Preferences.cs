@@ -76,8 +76,12 @@ namespace Moritz.Globals
             {
                 try
                 {
-                    Multimedia.Midi.OutputDevice outputDevice = new Multimedia.Midi.OutputDevice(netOutputDevice.ID);
-                    MultimediaMidiOutputDevices.Add(netOutputDevice.Name, outputDevice);
+                    // The new VirtualMidiSynth beta does not work for some reason, so just use the Microsoft GS Wavetable Synth.
+                    if(netOutputDevice.Name.Contains("Microsoft"))
+                    {
+                        Multimedia.Midi.OutputDevice outputDevice = new Multimedia.Midi.OutputDevice(netOutputDevice.ID);
+                        MultimediaMidiOutputDevices.Add(netOutputDevice.Name, outputDevice);
+                    }
                 }
                 catch
                 {
