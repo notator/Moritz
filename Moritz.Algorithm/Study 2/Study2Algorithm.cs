@@ -6,19 +6,15 @@ using Moritz.Algorithm;
 using Moritz.Palettes;
 using Moritz.Spec;
 
-namespace Moritz.Algorithm.Study2c3_1
+namespace Moritz.Algorithm.Study2
 {
-    /// <summary>
-    /// Algorithm for testing Song 6's palettes.
-    /// This may develop as composition progresses...
-    /// </summary>
-    public class Study2c3_1Algorithm : CompositionAlgorithm
+    public class Study2Algorithm : CompositionAlgorithm
     {
         /// <summary>
         /// This constructor can be called with both parameters null,
         /// just to get the overridden properties.
         /// </summary>
-        public Study2c3_1Algorithm()
+        public Study2Algorithm()
             : base()
         {
         }

@@ -4,7 +4,7 @@ using Moritz.Symbols;
 using Moritz.Algorithm;
 using Moritz.Algorithm.PianolaMusic;
 using Moritz.Algorithm.Study1;
-using Moritz.Algorithm.Study2c3_1;
+using Moritz.Algorithm.Study2;
 using Moritz.Algorithm.Study3Sketch1;
 using Moritz.Algorithm.Study3Sketch2;
 //using Moritz.Algorithm.SongSix;
@@ -39,8 +39,8 @@ namespace Moritz.Composer
                 case "Study 1":
                     algorithm = new Study1Algorithm();
                     break;
-                case "Study 2c3.1":
-                    algorithm = new Study2c3_1Algorithm();
+                case "Study 2":
+                    algorithm = new Study2Algorithm();
                     break;
                 case "Study 3 sketch 1":
                     algorithm = new Study3Sketch1Algorithm();
