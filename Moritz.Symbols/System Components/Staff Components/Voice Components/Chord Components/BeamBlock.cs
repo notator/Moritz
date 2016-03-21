@@ -179,11 +179,76 @@ namespace Moritz.Symbols
             List<ChordMetrics> chordsMetrics = GetChordsMetrics();
             ExpandVerticallyAtNoteheads(chordsMetrics, durationClassBeamThicknesses);
             Shear(chordsMetrics);
-            ShiftVerticallyToAvoidAccidentals(chordsMetrics, durationClassBeamThicknesses[DurationClass.quaver]);
+            FinalAdjustmentReNoteheads(chordsMetrics, durationClassBeamThicknesses[DurationClass.quaver]);
+            FinalAdjustmentReAccidentals(chordsMetrics, durationClassBeamThicknesses[DurationClass.quaver]);
             MoveStemTips();
         }
 
-        private void ShiftVerticallyToAvoidAccidentals(List<ChordMetrics> chordsMetrics, float singleBeamThickness)
+        /// <summary>
+        /// If the minimum distance between an inner beam and a notehead is less than 2.5 gaps,
+        /// The beamBlock is moved away from the noteheads until the minimum distance is 2.5 gaps
+        /// </summary>
+        private void FinalAdjustmentReNoteheads(List<ChordMetrics> chordsMetrics, float singleBeamThickness)
+        {
+            float beamTan = GetBeamTan();
+
+            foreach(ChordMetrics chordMetrics in chordsMetrics)
+            {
+                if(this._stemDirection == VerticalDir.down)
+                {
+                    float minimumSeparationY = float.MaxValue;
+                    HeadMetrics bottomHeadMetrics = chordMetrics.BottomHeadMetrics;
+                    float bhLeft = bottomHeadMetrics.Left;
+                    float bhRight = bottomHeadMetrics.Right;
+                    float bhOriginX = bottomHeadMetrics.OriginX;
+                    foreach(Beam beam in Beams)
+                    {
+                        if(beam.LeftX <= bhRight && beam.RightX >= bhLeft)
+                        {
+                            float beamTopAtHeadOriginX = beam.LeftTopY + ((bhOriginX - beam.LeftX) * beamTan);
+                            float localSeparationY = beamTopAtHeadOriginX - bottomHeadMetrics.OriginY;
+                            minimumSeparationY = (localSeparationY < minimumSeparationY) ? localSeparationY : minimumSeparationY;
+                        }
+                    }
+
+                    float shiftY = (_gap * 2.5F) - minimumSeparationY;
+                    if(shiftY > 0)
+                    {
+                        Move(shiftY);
+                    }
+                }
+
+                if(this._stemDirection == VerticalDir.up)
+                {
+                    float minimumSeparationY = float.MaxValue;
+                    HeadMetrics topHeadMetrics = chordMetrics.TopHeadMetrics;
+                    float thLeft = topHeadMetrics.Left;
+                    float thRight = topHeadMetrics.Right;
+                    float thOriginX = topHeadMetrics.OriginX;
+                    foreach(Beam beam in Beams)
+                    {
+                        if(beam.LeftX <= thRight && beam.RightX >= thLeft)
+                        {
+                            float beamBottomAtHeadOriginX = beam.LeftTopY + ((thOriginX - beam.LeftX) * beamTan) + singleBeamThickness;
+                            float localSeparationY = topHeadMetrics.OriginY - beamBottomAtHeadOriginX;
+                            minimumSeparationY = (localSeparationY < minimumSeparationY) ? localSeparationY : minimumSeparationY;
+                        }
+                    }
+
+                    float shiftY = (_gap * 2.5F) - minimumSeparationY;
+                    if(shiftY > 0)
+                    {
+                        Move(shiftY * -1);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// If the minimum distance between an inner beam overlaps an accidental,
+        /// The beamBlock is moved away from the accidentals.
+        /// </summary>
+        private void FinalAdjustmentReAccidentals(List<ChordMetrics> chordsMetrics, float singleBeamThickness)
         {
             float beamTan = GetBeamTan();
 
@@ -195,10 +260,12 @@ namespace Moritz.Symbols
                     if(chordMetrics.AccidentalsMetrics.Count > 0)
                     {
                         AccidentalMetrics bottomAccidentalMetrics = chordMetrics.AccidentalsMetrics[chordMetrics.AccidentalsMetrics.Count - 1];
+                        float baLeft = bottomAccidentalMetrics.Left;
+                        float baRight = bottomAccidentalMetrics.Right;
                         float baOriginX = bottomAccidentalMetrics.OriginX;
                         foreach(Beam beam in Beams)
                         {
-                            if(beam.LeftX <= baOriginX && beam.RightX >= baOriginX)
+                            if(beam.LeftX <= baRight && beam.RightX >= baLeft)
                             {
                                 float beamTopAtAccidentalOriginX = beam.LeftTopY + ((baOriginX - beam.LeftX) * beamTan);
                                 if(bottomAccidentalMetrics.Bottom > beamTopAtAccidentalOriginX)
@@ -211,12 +278,12 @@ namespace Moritz.Symbols
                     }
                     if(positiveDeltaY >= 0)
                     {
-                        float halfGapShiftY = 0;
-                        while(halfGapShiftY < positiveDeltaY)
+                        float shiftY = 0;
+                        while(shiftY < positiveDeltaY)
                         {
-                            halfGapShiftY += _gap / 2;
+                            shiftY += _gap * 0.75F;
                         }
-                        Move(halfGapShiftY);
+                        Move(shiftY);
                     }
                 }
 
@@ -226,10 +293,12 @@ namespace Moritz.Symbols
                     if(chordMetrics.AccidentalsMetrics.Count > 0)
                     {
                         AccidentalMetrics topAccidentalMetrics = chordMetrics.AccidentalsMetrics[0];
+                        float taLeft = topAccidentalMetrics.Left;
+                        float taRight = topAccidentalMetrics.Right;
                         float taOriginX = topAccidentalMetrics.OriginX;
                         foreach(Beam beam in Beams)
                         {
-                            if(beam.LeftX <= taOriginX && beam.RightX >= taOriginX)
+                            if(beam.LeftX <= taRight && beam.RightX >= taLeft)
                             {
                                 float beamBottomAtAccidentalOriginX = beam.LeftTopY + ((taOriginX - beam.LeftX) * beamTan) + singleBeamThickness;
                                 if(topAccidentalMetrics.Top < beamBottomAtAccidentalOriginX)
@@ -242,12 +311,12 @@ namespace Moritz.Symbols
                     }
                     if(negativeDeltaY <= 0)
                     {
-                        float halfGapShiftY = 0;
-                        while(halfGapShiftY > negativeDeltaY)
+                        float shiftY = 0;
+                        while(shiftY > negativeDeltaY)
                         {
-                            halfGapShiftY -= _gap / 2;
+                            shiftY -= _gap * 0.75F;
                         }
-                        Move(halfGapShiftY);
+                        Move(shiftY);
                     }
                 }
             }
@@ -692,10 +761,10 @@ namespace Moritz.Symbols
             float width = rightChordMetrics.StemMetrics.OriginX - leftChordMetrics.StemMetrics.OriginX;
             float tanAlpha = (height / width) / 3;
 
-            if(tanAlpha > 0.15F)
-                tanAlpha = 0.15F;
-            if(tanAlpha < -0.15F)
-                tanAlpha = -0.15F;
+            if(tanAlpha > 0.10F)
+                tanAlpha = 0.10F;
+            if(tanAlpha < -0.10F)
+                tanAlpha = -0.10F;
 
             return tanAlpha;
         }
