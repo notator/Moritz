@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-using Multimedia.Midi;
+using Sanford.Multimedia.Midi;
 
 namespace Moritz.Midi
 {
@@ -37,52 +37,34 @@ namespace Moritz.Midi
         /// <summary>
         /// Used by PitchWheelDeviation controller, which must set both its coarse and fine controllers.
         /// </summary>
-        protected MidiControl(int channel, ControllerType coarseController, ControllerType fineController, byte msb)
+        protected MidiControl(int channel, ControllerType coarseController, ControllerType fineController, int msb)
         {
-            ChannelMessages.Add(BuildMessage(ChannelCommand.Controller, channel, (int)coarseController, msb));
-            ChannelMessages.Add(BuildMessage(ChannelCommand.Controller, channel, (int)fineController, msb));
+            ChannelMessages.Add(new ChannelMessage(ChannelCommand.Controller, channel, (int)coarseController, msb));
+            ChannelMessages.Add(new ChannelMessage(ChannelCommand.Controller, channel, (int)fineController, msb));
         }
 
         /// <summary>
         /// Used by controllers which only need to set their coarse controller.
         /// </summary>
-        protected MidiControl(int channel, ControllerType coarseController, byte msb)
+        protected MidiControl(int channel, ControllerType coarseController, int msb)
         {
-            ChannelMessages.Add(BuildMessage(ChannelCommand.Controller, channel, (int)coarseController, msb));
+            ChannelMessages.Add(new ChannelMessage(ChannelCommand.Controller, channel, (int)coarseController, msb));
         }
 
         /// <summary>
 		/// Sets the control's ChannelMessage MSB. LSBs are not used.
 		/// </summary>
-		protected MidiControl(int channel, ChannelCommand command, byte value)
+		protected MidiControl(int channel, ChannelCommand command, int value)
 		{
-            ChannelMessages.Add(BuildMessage(command, channel, value, 0));
+            ChannelMessages.Add(new ChannelMessage(command, channel, value, 0));
 		}
         /// <summary>
         /// Sets the control's ChannelMessage MSB and LSB.
         /// </summary>
-        protected MidiControl(int channel, ChannelCommand command, byte msb, byte lsb)
+        protected MidiControl(int channel, ChannelCommand command, int msb, int lsb)
         {
-            ChannelMessages.Add(BuildMessage(command, channel, msb, lsb));
+            ChannelMessages.Add(new ChannelMessage(command, channel, msb, lsb));
         }
-        
-        protected ChannelMessage BuildMessage(ChannelCommand command, int channel, int data1, int data2)
-		{
-			if(channel > 15 || channel < 0)
-				throw new ApplicationException("Channel index must be in range 0..15");
-			if(data1 > 127 || data1 < 0)
-				throw new ApplicationException("Value must be in range 0..127");
-			if(data2 > 127 || data2 < 0)
-				throw new ApplicationException("Value must be in range 0..127");
-
-			ChannelMessageBuilder builder = new ChannelMessageBuilder();
-			builder.Command = command;
-			builder.MidiChannel = channel;
-			builder.Data1 = data1;
-			builder.Data2 = data2;
-			builder.Build();
-            return builder.Result;
-		}
 
 		public List<ChannelMessage> ChannelMessages = new List<ChannelMessage>();
 	}

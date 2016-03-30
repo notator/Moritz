@@ -1,10 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
-using System.Xml;
 
-using Multimedia.Midi;
-using Krystals4ObjectLibrary;
 using Moritz.Globals;
 using Moritz.Xml;
 

@@ -10,8 +10,6 @@ using Moritz.Spec;
 using Moritz.Globals;
 using Moritz.Midi;
 
-using Multimedia.Midi;
-
 namespace Moritz.Palettes
 {
     public partial class PaletteChordForm : Form
@@ -705,7 +703,7 @@ namespace Moritz.Palettes
                 if(midiChordDef != null)
                 {
                     int midiChannel = 0;
-                    OutputDevice outputDevice = M.Preferences.CurrentMultimediaMidiOutputDevice;
+                    Sanford.Multimedia.Midi.OutputDevice outputDevice = M.Preferences.CurrentMultimediaMidiOutputDevice;
                     if(_paletteForm.IsPercussionPalette)
                     {
                         midiChannel = 9;

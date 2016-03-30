@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-using Multimedia.Midi;
-
 namespace Moritz.Spec
 {
     /// <summary>

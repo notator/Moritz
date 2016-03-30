@@ -31,13 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Multimedia, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Sanford.Multimedia.Midi, Version=6.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Sanford Libraries\Multimedia.dll</HintPath>
-    </Reference>
-    <Reference Include="Multimedia.Midi, Version=4.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Sanford Libraries\Multimedia.Midi.dll</HintPath>
+      <HintPath>..\Sanford.Multimedia.Midi.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

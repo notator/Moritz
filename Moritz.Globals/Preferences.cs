@@ -76,12 +76,8 @@ namespace Moritz.Globals
             {
                 try
                 {
-                    // The new VirtualMidiSynth beta does not work for some reason, so just use the Microsoft GS Wavetable Synth.
-                    if(netOutputDevice.Name.Contains("Microsoft"))
-                    {
-                        Multimedia.Midi.OutputDevice outputDevice = new Multimedia.Midi.OutputDevice(netOutputDevice.ID);
-                        MultimediaMidiOutputDevices.Add(netOutputDevice.Name, outputDevice);
-                    }
+                    Sanford.Multimedia.Midi.OutputDevice outputDevice = new Sanford.Multimedia.Midi.OutputDevice(netOutputDevice.ID);
+                    MultimediaMidiOutputDevices.Add(netOutputDevice.Name, outputDevice);
                 }
                 catch
                 {
@@ -182,7 +178,7 @@ namespace Moritz.Globals
             }
         }
 
-        public Multimedia.Midi.OutputDevice CurrentMultimediaMidiOutputDevice
+        public Sanford.Multimedia.Midi.OutputDevice CurrentMultimediaMidiOutputDevice
         {
             get 
             {
@@ -200,13 +196,13 @@ namespace Moritz.Globals
                 }
             }
         }
-        public Multimedia.Midi.OutputDevice GetMidiOutputDevice(string deviceName)
+        public Sanford.Multimedia.Midi.OutputDevice GetMidiOutputDevice(string deviceName)
         {
             Debug.Assert(MultimediaMidiOutputDevices.ContainsKey(deviceName));
             return MultimediaMidiOutputDevices[deviceName];
         }
 
-        private Dictionary<string, Multimedia.Midi.OutputDevice> MultimediaMidiOutputDevices = new Dictionary<string, Multimedia.Midi.OutputDevice>();
+        private Dictionary<string, Sanford.Multimedia.Midi.OutputDevice> MultimediaMidiOutputDevices = new Dictionary<string, Sanford.Multimedia.Midi.OutputDevice>();
         private const int _sysExBufferSize = 1024;
     }
 }
