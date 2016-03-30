@@ -124,11 +124,11 @@ namespace Moritz.Algorithm.Tombeau1
                                                     int velocityEccentricity
                                                   );
                Both the pitchHierarchy and velocityHierarchy tables would then be static objects inside the function.
-               Interesting that this function has density, ecentricity and absolute hierarchy inputs! (The density is the density of
+               Interesting that this function has density, eccentricity and absolute hierarchy inputs! (The density is the density of
                the MidiChordDef.)
                 
 
-            ** Move unused VoiceDef and Trk functions into "unused" or "Song Six" #region, or into separate "partial class" files.
+            ** Move unused VoiceDef and Trk functions into "unused" or "Song Six" #regions, or into separate "partial class" files.
              
 			//2. Boulez' chord addition has been implemented in the function MidiChordDef.AddNotes(MidiChordDef).
 			//3. Chord pitch transposition has already been implemented in the function MidiChordDef.Transpose(MidiChordDef),

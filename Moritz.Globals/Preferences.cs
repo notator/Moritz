@@ -81,9 +81,11 @@ namespace Moritz.Globals
                 }
                 catch
                 {
-                    MultimediaMidiOutputDevices.Clear();
-                    success = false;
-                    break;
+                    Debug.Assert(false, "VirtualMIDISynth #2 is already in use. Wait until it is free, and then try again.");
+
+                    //MultimediaMidiOutputDevices.Clear();
+                    //success = false;
+                    //break;
                 }
             }
             return success;
