@@ -25,7 +25,7 @@ namespace Moritz.Globals.IODevices
         }
 
         /// <summary>
-        /// Loads/reloads only VirtualMIDISynth #2 (which is reserved for Moritz).
+        /// Loads/reloads all devices except VirtualMIDISynth #1 (which is reserved for the Assistant Performer).
         /// </summary>
         public static void LoadOutputDevices()
         {
@@ -40,14 +40,12 @@ namespace Moritz.Globals.IODevices
                     MIDIOUTCAPS caps = new MIDIOUTCAPS();
                     uint returnValue = Functions.midiOutGetDevCaps(i, ref caps, (UInt32)Marshal.SizeOf(caps));
                     Debug.Assert(returnValue  == Constants.MMSYSERR_NOERROR);
-                    if(string.Compare(caps.szPname, "VirtualMIDISynth #2") == 0)
+                    if(string.Compare(caps.szPname, "VirtualMIDISynth #1") != 0)
                     {
                         devices.Add(new OutputDevice(i, caps));
-                        break;
                     }
                 }
             }
-            Debug.Assert(devices.Count == 1, "Unable to load VirtualMIDISynth #2.");
 
             outputDevices = devices.AsReadOnly();
         }
