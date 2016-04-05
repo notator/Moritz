@@ -83,12 +83,15 @@ namespace Moritz.Globals
                 }
                 catch
                 {
-                    MessageBox.Show(netOutputDevice.Name + " is already in use." +
-                    "\n\nMoritz can still be used, but no output device will be available." +
-                    "\n\nIf Moritz needs an output device, close the program that is using" +
-                    "\n" + netOutputDevice.Name + ", restart Moritz, and then restart the other program." +
-                    "\n\n(Currently, Moritz can use all available output devices except VirtualMIDISynth #1," +
-                    "\nwhich is reserved for the Assistant Performer.)", "Information");
+                    // The following MessageBox proved to be more of a nuisance than a help.
+                    // The comment it contains is, however, still correct.
+
+                    //MessageBox.Show(netOutputDevice.Name + " is already in use." +
+                    //"\n\nMoritz can still be used, but no output device will be available." +
+                    //"\n\nIf Moritz needs an output device, close the program that is using" +
+                    //"\n" + netOutputDevice.Name + ", restart Moritz, and then restart the other program." +
+                    //"\n\n(Currently, Moritz can use all available output devices except VirtualMIDISynth #1," +
+                    //"\nwhich is reserved for the Assistant Performer.)", "Information");
 
                     MultimediaMidiOutputDevices.Clear();
                     success = false;
