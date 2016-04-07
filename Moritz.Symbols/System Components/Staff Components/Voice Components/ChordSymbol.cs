@@ -451,8 +451,6 @@ namespace Moritz.Symbols
             }
             return overlap;
         }
-
-
         #endregion composition
 
         #region display attributes

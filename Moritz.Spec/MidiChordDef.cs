@@ -10,21 +10,41 @@ namespace Moritz.Spec
     ///<summary>
     /// A MidiChordDef can either be saved and retrieved from voices in an SVG file, or
     /// retrieved from a palette (whereby the pallete makes a deep clone of its contained values).
-    /// Each midiChord in an SVG file will be given an ID of the form "midiChord"+uniqueNumber, but
-    /// Moritz does not actually use the ids, so they are not read into in MidiChordDefs.
     ///</summary>
     public class MidiChordDef : DurationDef, IUniqueSplittableChordDef
     {
-        public MidiChordDef()
-            : base(0)
-        {
-        }
-
-        #region Constructor used when creating a list of DurationDef templates from a Palette.
+        #region constructors
         /// <summary>
-        /// The palette has created new values for all the arguments, so this 
-        /// constructor simply transfers those values to the new MidiChordDef.
-        /// msPosition is set to 0, lyric is set to null.
+        /// A MidiChordDef containing a single BasicMidiChordDef. Absent fields are set to 0 or null.
+        /// </summary>
+        public MidiChordDef(List<byte> pitches, List<byte> velocities, int msPositionReFirstIUD, int msDuration, bool hasChordOff)
+            : base(msDuration)
+        {
+            foreach(byte pitch in pitches)
+                Debug.Assert(pitch == M.MidiValue((int)pitch), "Pitch out of range.");
+
+            _msPositionReFirstIUD = msPositionReFirstIUD;
+            _hasChordOff = hasChordOff;
+            _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
+
+            _notatedMidiPitches = pitches;
+            // midiVelocity is handled via the BasicMidiChordDefs
+            _ornamentNumberSymbol = 0;
+
+            MidiChordSliderDefs = null;
+
+            byte? bank = null;
+            byte? patch = null;
+
+            BasicMidiChordDefs.Add(new BasicMidiChordDef(msDuration, bank, patch, hasChordOff, pitches, velocities));
+
+            CheckTotalDuration();
+        }
+ 
+        /// <summary>
+        /// Constructor used when creating a list of DurationDef templates from a Palette.
+        /// The palette has created new values for all the arguments, so this constructor simply transfers
+        /// those values to the new MidiChordDef. MsPositionReFirstIUD is set to 0, lyric is set to null.
         /// </summary>
         public MidiChordDef(
             int msDuration, // the total duration (this should be the sum of the durations of the basicMidiChordDefs)
@@ -55,36 +75,15 @@ namespace Moritz.Spec
             CheckTotalDuration();
 
         }
-        #endregion
 
-        #region No sliders constructor
         /// <summary>
-        /// This constructor creates a MidiChordDef at msPosition 0, lyric = null, containing a single BasicMidiChordDef and no sliders.
+        /// private constructor -- used by Clone()
         /// </summary>
-        public MidiChordDef(List<byte> pitches, List<byte> velocities, int msPositionReFirstIUD, int msDuration, bool hasChordOff)
-            : base(msDuration)
+        private MidiChordDef()
+            : base(0)
         {
-            foreach(byte pitch in pitches)
-                Debug.Assert(pitch == M.MidiValue((int)pitch), "Pitch out of range.");
-
-            _msPositionReFirstIUD = msPositionReFirstIUD;
-            _hasChordOff = hasChordOff;
-            _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
-
-            _notatedMidiPitches = pitches;
-            // midiVelocity is handled via the BasicMidiChordDefs
-            _ornamentNumberSymbol = 0;
-
-            MidiChordSliderDefs = null;
-
-            byte? bank = null;
-            byte? patch = null;
-
-            BasicMidiChordDefs.Add(new BasicMidiChordDef(msDuration, bank, patch, hasChordOff, pitches, velocities));
-
-            CheckTotalDuration();
         }
-        #endregion
+        #endregion constructors
 
         private void CheckTotalDuration()
         {
@@ -94,9 +93,6 @@ namespace Moritz.Spec
                 sumDurations += bcd;
             Debug.Assert(_msDuration == sumDurations);
         }
-
-        #region IUniqueCloneDef
-        #region IUniqueSplittableChordDef
 
 		/// <summary>
 		/// A deep clone!
@@ -145,19 +141,30 @@ namespace Moritz.Spec
            return rval;
         }
 
-		#region Boulez addition
-		/// <summary>
-		/// Boulez Addition: (Does not affect the sliders in this MidiChordDef.)
-		/// Notes (Pitches and their Velocities) in this MidiChordDef's BasicMidiChordDefs are preserved. The pitches and
-		/// velocities in the notes in each BasicMidiChordDef, and used as roots to which the pitch and velocity intervals
-		/// in mcd2's first BasicMidiChordDef are added.
-		/// A note is added only if its pitch is not already present, and its velocity is greater than 0.
-		/// A velocity that would be greater than 127 is coerced to 127.
-		/// When the BasicMidiChordDefs are complete, this MidiChordDef's NotatedMidiPitches are set to the pitches in
-		/// the first BasicMidiChordDef.
-		/// </summary>
-		/// <param name="mcd2"></param>
-		public MidiChordDef AddNotes(MidiChordDef mcd2)
+        /// <summary>
+        /// Used by Clone(). Returns null if listToClone is null, otherwise returns a clone of the listToClone.
+        /// </summary>
+        private List<byte> NewListByteOrNull(List<byte> listToClone)
+        {
+            List<byte> newListByte = null;
+            if(listToClone != null)
+                newListByte = new List<byte>(listToClone);
+            return newListByte;
+        }
+
+        #region Boulez addition
+        /// <summary>
+        /// Boulez Addition: (Does not affect the sliders in this MidiChordDef.)
+        /// Notes (Pitches and their Velocities) in this MidiChordDef's BasicMidiChordDefs are preserved. The pitches and
+        /// velocities in the notes in each BasicMidiChordDef, and used as roots to which the pitch and velocity intervals
+        /// in mcd2's first BasicMidiChordDef are added.
+        /// A note is added only if its pitch is not already present, and its velocity is greater than 0.
+        /// A velocity that would be greater than 127 is coerced to 127.
+        /// When the BasicMidiChordDefs are complete, this MidiChordDef's NotatedMidiPitches are set to the pitches in
+        /// the first BasicMidiChordDef.
+        /// </summary>
+        /// <param name="mcd2"></param>
+        public MidiChordDef AddNotes(MidiChordDef mcd2)
 		{
 			Debug.Assert(mcd2.BasicMidiChordDefs[0].Pitches.Count > 1, "The chord to be added must have at least two pitches.");
 
@@ -248,20 +255,40 @@ namespace Moritz.Spec
 			return intervals;
 		}
 
-		#endregion Boulez addition
+        #endregion Boulez addition
 
-		/// <summary>
-		/// Returns null if listToClone is null, otherwise returns a clone of the listToClone.
-		/// </summary>
-		/// <param name="listToClone"></param>
-		/// <returns></returns>
-		private List<byte> NewListByteOrNull(List<byte> listToClone)
+        #region SetVelocityPerAbsolutePitch
+        /// <summary>
+        /// The argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
+        /// For example: If the MidiChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
+        /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc.
+        /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef. 
+        /// </summary>
+        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
+        public void SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch)
         {
-            List<byte> newListByte = null;
-            if(listToClone != null)
-                newListByte = new List<byte>(listToClone);
-            return newListByte;
+            #region conditions
+            Debug.Assert(velocityPerAbsolutePitch.Count == 12);
+            for(int i = 0; i < 12; ++i)
+            {
+                int v = velocityPerAbsolutePitch[i];
+                Debug.Assert(v >= 0 && v <= 127);
+            }
+            #endregion conditions
+
+            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+            {
+                List<byte> pitches = bmcd.Pitches;
+                List<byte> velocities = bmcd.Velocities;
+                Debug.Assert(pitches.Count == velocities.Count);
+                for(int pitchIndex = 0; pitchIndex < pitches.Count; ++pitchIndex)
+                {
+                    int absPitch = pitches[pitchIndex] % 12;
+                    velocities[pitchIndex] = (byte) velocityPerAbsolutePitch[absPitch];
+                }
+            }
         }
+        #endregion SetVelocityPerAbsolutePitch
 
         public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
         private int? _msDurationToNextBarline = null;
@@ -436,8 +463,6 @@ namespace Moritz.Spec
 
         #endregion IUniqueDef
         #endregion IUniqueChordDef
-        #endregion IUniqueSplittableChordDef
-        #endregion
 
         public void AdjustExpression(double factor)
         {
@@ -503,7 +528,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Note that, unlike Rests, MidiChordDefs do not have a msDuration attribute.
         /// Their msDuration is deduced from the contained BasicMidiChords.
-        /// Patch indices already set in the BasicMidiChordDefs take priority over those set in the main MidiChordDef.
+        /// Patch indices set in the BasicMidiChordDefs override those set in the main MidiChordDef.
         /// However, if BasicMidiChordDefs[0].PatchIndex is null, and this.Patch is set, BasicMidiChordDefs[0].PatchIndex is set to Patch.
         /// The same is true for Bank settings.  
         /// The AssistantPerformer therefore only needs to look at BasicMidiChordDefs to find Bank and Patch changes.
