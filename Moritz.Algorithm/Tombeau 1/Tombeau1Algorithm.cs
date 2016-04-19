@@ -129,15 +129,18 @@ namespace Moritz.Algorithm.Tombeau1
                The result of the first function can be passed to many different chords using the second function.
          
             ** Thinking about the representation of velocity in chords/noteheads:
-               I think Moritz should create multiple versions of a score. One version would use black noteheads and dynamic symbols in
-               all chords as before. A new version (A) could represent notehead velocities with coloured or grey-scale noteheads in
-               OutputChords, and use dynamic symbols to describe how InputChords should be *performed*...
-               The concept of InputChords is still a bit hazy. Why should they ever have more than one notehead?...
-               But I could implement version (A) for Tombeau 1 anyway...
+               I should create a new Notator class that notates velocities in outputChords as coloured or grey-scale noteheads.
+               I can first create the notator class, and then experiment to see which colours or grey-scales work best.
+               Dynamic symbols could be reserved for use in inputChords..
                Grey-scale velocities might be 100%black(==fff) --> 30%black(==pppp).
-               Coloured noteheads might be BrightRed(==fff) --> DarkRed(==mf), DarkGreen(==mp) --> BrightGreen(==pppp). 
+               Coloured noteheads might be BrightRed(==fff) --> DarkRed(==mf), DarkGreen(==mp) --> BrightGreen(==pppp).
+               The Assistant Composer Form should provide a pop-up menu for selecting the appropriate notator for the score.
 
-               
+            ** The concept of InputChords is still a bit hazy. Why should they ever have more than one notehead?...
+               But I could implement version (A) for Tombeau 1(that doesn't have inputChords) anyway...
+               Also, *annotations* that are instructions to performers (hairpins spring to mind). Conventional dynamic symbols are,
+               I think meant for *performers*, so should only be attached to inputChords...
+               The info in *outputChords* is the info that could go in a MIDI file, and vice versa.
              
 			//3. Chord pitch transposition has already been implemented in the function MidiChordDef.Transpose(MidiChordDef),
 			//   but it contains known bugs. Chord velocity transposition could be implemented analogously.
@@ -152,22 +155,18 @@ namespace Moritz.Algorithm.Tombeau1
 
             Block system2Block = GetSystem2Block(system1Block);
 
-            Block system3Block = GetSystem3Block(system1Block);
-
-            Block system4Block = GetSystem4VelocityTestBlock();
+            Block system3Block = GetSystem3VelocityTestBlock();
 
             #region set barlines
             List<int> barlineEndMsPositions = new List<int>();
             barlineEndMsPositions.Add(system1Block.MsDuration);
             barlineEndMsPositions.Add(system1Block.MsDuration + system2Block.MsDuration);
             barlineEndMsPositions.Add(system1Block.MsDuration + system2Block.MsDuration + system3Block.MsDuration);
-            barlineEndMsPositions.Add(system1Block.MsDuration + system2Block.MsDuration + system3Block.MsDuration + system4Block.MsDuration);
             #endregion set barlines
 
             Block sequence = system1Block;
-			sequence.Concat(system2Block);
+            sequence.Concat(system2Block);
             sequence.Concat(system3Block);
-            sequence.Concat(system4Block);
 
             List<List<VoiceDef>> bars = ConvertBlockToBars(sequence, barlineEndMsPositions);
 
@@ -181,7 +180,7 @@ namespace Moritz.Algorithm.Tombeau1
             return bars;
 		}
 
-        private Block GetSystem4VelocityTestBlock()
+        private Block GetSystem3VelocityTestBlock()
         {
             List<Trk> trks = new List<Trk>();
             MidiChordDef baseMidiChordDef = new MidiChordDef(new List<byte>() { (byte)64 }, new List<byte>() { (byte)127 }, 0, 1000, true);
@@ -207,7 +206,7 @@ namespace Moritz.Algorithm.Tombeau1
             return new Block(seq);
         }
 
-        private Block GetSystem3Block(Block system1Block)
+        private Block GetSystem2Block(Block system1Block)
         {
             Block system3Block = system1Block.Clone();
 
@@ -295,36 +294,6 @@ namespace Moritz.Algorithm.Tombeau1
                 velocityPerAbsPitch.Add(velocity);
             }
             return velocityPerAbsPitch;
-        }
-
-        private Block GetSystem2Block(Block system1Block)
-        {
-            List<Trk> sys2Trks = new List<Trk>();
-            int startIndex = 2;
-            for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
-            {
-                Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, new List<IUniqueDef>());
-                MidiChordDef mcd1 = (MidiChordDef)system1Block.Trks[5][startIndex].Clone();
-                trk.Add(mcd1);
-                MidiChordDef mcd2 = (MidiChordDef)system1Block.Trks[5][startIndex + 1].Clone();
-                trk.Add(mcd2);
-
-                MidiChordDef sum = (MidiChordDef)mcd1.Clone();
-                sum.Lyric = "sum";
-                sum.AddNotes(mcd2);
-
-                trk.Add(sum);
-
-                RestDef rest = new RestDef(0, system1Block.MsDuration - trk.EndMsPositionReFirstIUD);
-                trk.Add(rest);
-
-                sys2Trks.Add(trk);
-
-                startIndex++;
-            }
-            Seq system2Seq = new Seq(0, sys2Trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
-
-            return new Block(system2Seq);
         }
 
         private List<IUniqueDef> PaletteMidiChordDefs(int paletteIndex)

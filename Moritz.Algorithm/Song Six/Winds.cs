@@ -14,7 +14,7 @@ namespace Moritz.Algorithm.SongSix
     {
         private Trk GetWind3(int midiChannel, Palette palette, Krystal krystal)
         {
-            Trk wind3 = palette.NewTrkDef(midiChannel, krystal);
+            Trk wind3 = palette.NewTrk(midiChannel, krystal);
             wind3.Transpose(0, wind3.Count, -13);
             wind3.StepwiseGliss(74, wind3.Count, 19);
             return wind3;
@@ -23,7 +23,7 @@ namespace Moritz.Algorithm.SongSix
 		private Trk GetWind2(int midiChannel, Trk wind3, Clytemnestra clytemnestra)
         {
             List<IUniqueDef> clytLmdds = clytemnestra.UniqueDefs;
-            int rotationMsPosition = clytLmdds[59].MsPosition + 700;
+            int rotationMsPosition = clytLmdds[59].MsPositionReTrk + 700;
 
             Trk wind2 = GetRotatedWind(midiChannel, wind3, rotationMsPosition);
             wind2.Transpose(0, wind2.Count, 12);
@@ -34,8 +34,8 @@ namespace Moritz.Algorithm.SongSix
             wind2.StepwiseGliss(75, wind2.Count, 12);
 
             wind2.AlignObjectAtIndex(0, 15, 82, rotationMsPosition);
-            wind2.AlignObjectAtIndex(15, 39, 82, clytLmdds[173].MsPosition);
-            wind2.AlignObjectAtIndex(39, 57, 82, clytLmdds[268].MsPosition);
+            wind2.AlignObjectAtIndex(15, 39, 82, clytLmdds[173].MsPositionReTrk);
+            wind2.AlignObjectAtIndex(39, 57, 82, clytLmdds[268].MsPositionReTrk);
 
             return wind2;
         }
@@ -43,16 +43,16 @@ namespace Moritz.Algorithm.SongSix
 		private Trk GetWind1(int midiChannel, Trk wind3, Trk wind2, Clytemnestra clytemnestra)
         {
             List<IUniqueDef> clytLmdds = clytemnestra.UniqueDefs;
-            int rotationMsPosition = clytLmdds[116].MsPosition + 700;
+            int rotationMsPosition = clytLmdds[116].MsPositionReTrk + 700;
 
 			Trk wind1 = GetRotatedWind(midiChannel, wind3, rotationMsPosition);
             wind1.Transpose(0, wind1.Count, 19);
             wind1.StepwiseGliss(0, 25, 12);
             wind1.Transpose(25, wind1.Count, 12);
 
-            wind1.AlignObjectAtIndex(0, 15, 82, wind2[15].MsPosition);
+            wind1.AlignObjectAtIndex(0, 15, 82, wind2[15].MsPositionReTrk);
             wind1.AlignObjectAtIndex(15, 25, 82, rotationMsPosition);
-            wind1.AlignObjectAtIndex(25, 74, 82, clytLmdds[289].MsPosition);
+            wind1.AlignObjectAtIndex(25, 74, 82, clytLmdds[289].MsPositionReTrk);
 
             return wind1;
         }
@@ -92,7 +92,7 @@ namespace Moritz.Algorithm.SongSix
             int msPosition = 0;
             foreach(IUniqueDef iu in newWindLmdds)
             {
-                iu.MsPosition = msPosition;
+                iu.MsPositionReTrk = msPosition;
                 msPosition += iu.MsDuration;
             }
             Trk newRotatedWind = new Trk(midiChannel, newWindLmdds);

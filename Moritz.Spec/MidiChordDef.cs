@@ -152,110 +152,110 @@ namespace Moritz.Spec
             return newListByte;
         }
 
-        #region Boulez addition
-        /// <summary>
-        /// Boulez Addition: (Does not affect the sliders in this MidiChordDef.)
-        /// Notes (Pitches and their Velocities) in this MidiChordDef's BasicMidiChordDefs are preserved. The pitches and
-        /// velocities in the notes in each BasicMidiChordDef, and used as roots to which the pitch and velocity intervals
-        /// in mcd2's first BasicMidiChordDef are added.
-        /// A note is added only if its pitch is not already present, and its velocity is greater than 0.
-        /// A velocity that would be greater than 127 is coerced to 127.
-        /// When the BasicMidiChordDefs are complete, this MidiChordDef's NotatedMidiPitches are set to the pitches in
-        /// the first BasicMidiChordDef.
-        /// </summary>
-        /// <param name="mcd2"></param>
-        public MidiChordDef AddNotes(MidiChordDef mcd2)
-		{
-			Debug.Assert(mcd2.BasicMidiChordDefs[0].Pitches.Count > 1, "The chord to be added must have at least two pitches.");
+        #region Boulez addition (commented out)
+        //      /// <summary>
+        //      /// Boulez Addition: (Does not affect the sliders in this MidiChordDef.)
+        //      /// Notes (Pitches and their Velocities) in this MidiChordDef's BasicMidiChordDefs are preserved. The pitches and
+        //      /// velocities in the notes in each BasicMidiChordDef, and used as roots to which the pitch and velocity intervals
+        //      /// in mcd2's first BasicMidiChordDef are added.
+        //      /// A note is added only if its pitch is not already present, and its velocity is greater than 0.
+        //      /// A velocity that would be greater than 127 is coerced to 127.
+        //      /// When the BasicMidiChordDefs are complete, this MidiChordDef's NotatedMidiPitches are set to the pitches in
+        //      /// the first BasicMidiChordDef.
+        //      /// </summary>
+        //      /// <param name="mcd2"></param>
+        //      public MidiChordDef AddNotes(MidiChordDef mcd2)
+        //{
+        //	Debug.Assert(mcd2.BasicMidiChordDefs[0].Pitches.Count > 1, "The chord to be added must have at least two pitches.");
 
-			List<int> pitchIntervalsToAdd = GetIntervals(mcd2.BasicMidiChordDefs[0].Pitches);
-			// velocityIntervals can be negative
-			List<int> velocityIntervalsToAdd = GetIntervals(mcd2.BasicMidiChordDefs[0].Velocities);
+        //	List<int> pitchIntervalsToAdd = GetIntervals(mcd2.BasicMidiChordDefs[0].Pitches);
+        //	// velocityIntervals can be negative
+        //	List<int> velocityIntervalsToAdd = GetIntervals(mcd2.BasicMidiChordDefs[0].Velocities);
 
-			foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
-			{
-				List<byte> newPitches = new List<byte>();
-				List<byte> newVelocities = new List<byte>();
-				for(int i = 0; i < bmcd.Pitches.Count; ++i)
-				{
-					byte rootPitch = bmcd.Pitches[i];
-					byte rootVelocity = bmcd.Velocities[i];
+        //	foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+        //	{
+        //		List<byte> newPitches = new List<byte>();
+        //		List<byte> newVelocities = new List<byte>();
+        //		for(int i = 0; i < bmcd.Pitches.Count; ++i)
+        //		{
+        //			byte rootPitch = bmcd.Pitches[i];
+        //			byte rootVelocity = bmcd.Velocities[i];
 
-					newPitches.Add(rootPitch);
-					newVelocities.Add(rootVelocity);
+        //			newPitches.Add(rootPitch);
+        //			newVelocities.Add(rootVelocity);
 
-					for(int j = 0; j < pitchIntervalsToAdd.Count; ++j)
-					{
-						int pitchInterval = pitchIntervalsToAdd[j];
-						int velocityInterval = velocityIntervalsToAdd[j];
+        //			for(int j = 0; j < pitchIntervalsToAdd.Count; ++j)
+        //			{
+        //				int pitchInterval = pitchIntervalsToAdd[j];
+        //				int velocityInterval = velocityIntervalsToAdd[j];
 
-						int newPitch = rootPitch + pitchInterval;
-						int newVelocity = rootVelocity + velocityInterval;
+        //				int newPitch = rootPitch + pitchInterval;
+        //				int newVelocity = rootVelocity + velocityInterval;
 
-						if(newPitch <= 127 
-						&& (!newPitches.Contains((byte)newPitch))
-						&& (!bmcd.Pitches.Contains((byte)newPitch))
-						&& newVelocity > 0)
-						{
-							newVelocity = (newVelocity < 128) ? newVelocity : 127;
+        //				if(newPitch <= 127 
+        //				&& (!newPitches.Contains((byte)newPitch))
+        //				&& (!bmcd.Pitches.Contains((byte)newPitch))
+        //				&& newVelocity > 0)
+        //				{
+        //					newVelocity = (newVelocity < 128) ? newVelocity : 127;
 
-							newPitches.Add((byte)newPitch);
-							newVelocities.Add((byte)newVelocity);
-						}
-					}
-				}
-				SortPitchesAndVelocities(newPitches, newVelocities);
+        //					newPitches.Add((byte)newPitch);
+        //					newVelocities.Add((byte)newVelocity);
+        //				}
+        //			}
+        //		}
+        //		SortPitchesAndVelocities(newPitches, newVelocities);
 
-				bmcd.Pitches = newPitches;
-				bmcd.Velocities = newVelocities;
-			}
+        //		bmcd.Pitches = newPitches;
+        //		bmcd.Velocities = newVelocities;
+        //	}
 
-			_notatedMidiPitches = new List<byte>(BasicMidiChordDefs[0].Pitches);
+        //	_notatedMidiPitches = new List<byte>(BasicMidiChordDefs[0].Pitches);
 
-			return this; // this function can be chained
-		}
+        //	return this; // this function can be chained
+        //}
 
-		private void SortPitchesAndVelocities(List<byte> newPitches, List<byte> newVelocities)
-		{
-			List<byte> sortedPitches = new List<byte>();
-			List<byte> sortedVelocities = new List<byte>();
-			while(newPitches.Count > 0)
-			{
-				byte smallestPitch = newPitches[0];
-				int indexOfSmallestPitch = 0;
-				for(int i = 0; i < newPitches.Count; ++i)
-				{
-					if(newPitches[i] < smallestPitch)
-					{
-						smallestPitch = newPitches[i];
-						indexOfSmallestPitch = i;
-					}
-				}
-				sortedPitches.Add(newPitches[indexOfSmallestPitch]);
-				sortedVelocities.Add(newVelocities[indexOfSmallestPitch]);
+        //private void SortPitchesAndVelocities(List<byte> newPitches, List<byte> newVelocities)
+        //{
+        //	List<byte> sortedPitches = new List<byte>();
+        //	List<byte> sortedVelocities = new List<byte>();
+        //	while(newPitches.Count > 0)
+        //	{
+        //		byte smallestPitch = newPitches[0];
+        //		int indexOfSmallestPitch = 0;
+        //		for(int i = 0; i < newPitches.Count; ++i)
+        //		{
+        //			if(newPitches[i] < smallestPitch)
+        //			{
+        //				smallestPitch = newPitches[i];
+        //				indexOfSmallestPitch = i;
+        //			}
+        //		}
+        //		sortedPitches.Add(newPitches[indexOfSmallestPitch]);
+        //		sortedVelocities.Add(newVelocities[indexOfSmallestPitch]);
 
-				newPitches.RemoveAt(indexOfSmallestPitch);
-				newVelocities.RemoveAt(indexOfSmallestPitch);
-			}
-			for(int i = 0; i < sortedPitches.Count; ++i)
-			{
-				newPitches.Add(sortedPitches[i]);
-				newVelocities.Add(sortedVelocities[i]);	
-			}
-		}
+        //		newPitches.RemoveAt(indexOfSmallestPitch);
+        //		newVelocities.RemoveAt(indexOfSmallestPitch);
+        //	}
+        //	for(int i = 0; i < sortedPitches.Count; ++i)
+        //	{
+        //		newPitches.Add(sortedPitches[i]);
+        //		newVelocities.Add(sortedVelocities[i]);	
+        //	}
+        //}
 
-		private List<int> GetIntervals(List<byte> bytes)
-		{
-			List<int> intervals = new List<int>();
-			
-			for(int i = 1; i < bytes.Count; ++i)
-			{
-				intervals.Add(bytes[i] - bytes[0]);
-			}
-			return intervals;
-		}
+        //private List<int> GetIntervals(List<byte> bytes)
+        //{
+        //	List<int> intervals = new List<int>();
 
-        #endregion Boulez addition
+        //	for(int i = 1; i < bytes.Count; ++i)
+        //	{
+        //		intervals.Add(bytes[i] - bytes[0]);
+        //	}
+        //	return intervals;
+        //}
+
+        #endregion Boulez addition (commented out)
 
         #region SetVelocityPerAbsolutePitch
         /// <summary>
