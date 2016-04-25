@@ -205,6 +205,7 @@ namespace Moritz.Palettes
                     pitchwheelDeviation,
                     hasChordOff,
                     rootMidiPitches,
+                    rootMidiVelocities,
                     ornamentNumber,
                     midiChordSliderDefs,
                     basicMidiChordDefs);

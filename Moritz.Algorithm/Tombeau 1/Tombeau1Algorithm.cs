@@ -67,84 +67,89 @@ namespace Moritz.Algorithm.Tombeau1
 			Chords:
 			** "Chords are colour" (Stockhausen)
             ** I want to keep the number of pitches in chords fairly low, so that they are recognisable. Strategies like
-               Boulez' chord addition don't really work... (The code I've written for that in MidiChordDef should be deleted.)
+               Boulez' chord addition don't really work... (The code I've written for that in MidiChordDef has been commented out.)
             ** Chords can have any pitches (construct some interesting palettes with some differently coloured chords).
                But velocities can be controlled independently to emphasise "harmonic" relations in areas of the score.
                Repeated chord sequences can be thus "filtered" differently as in a digital painting...
-            ** Write a function that sets note velocities according to the position of the note's pitch in a (harmonic)
-               hierarchy of *absolute pitches* (not intervals):
-               The absolute, equal temperament pitch hierarchy relating to the harmonic series can be found as follows
-               (decimals rounded to 3 figures):
-                 absolute    equal              harmonic:     absolute         closest
-                 pitch:   temperament                         harmonic     equal temperament
-                            factor:                            factor:      absolute pitch:
-                    0:       1.000       |          1   ->   1/1  = 1.000  ->     0:
-                    1:       1.059       |          3   ->   3/2  = 1.500  ->     7:
-                    2:       1.122       |          5   ->   5/4  = 1.250  ->     4:
-                    3:       1.189       |          7   ->   7/4  = 1.750  ->     10:
-                    4:       1.260       |          9   ->   9/8  = 1.125  ->     2:
-                    5:       1.335       |         11   ->  11/8  = 1.375  ->     5:
-                    6:       1.414       |         13   ->  13/8  = 1.625  ->     9:
-                    7:       1.498       |         15   ->  15/8  = 1.875  ->     11:
-                    8:       1.587       |         17   ->  17/16 = 1.063  ->     1:
-                    9:       1.682       |         19   ->  19/16 = 1.187  ->     3:
-                    10:      1.782       |         21   ->  21/16 = 1.313  ->     
-                    11:      1.888       |         23   ->  23/16 = 1.438  ->     6:
-                                         |         25   ->  25/16 = 1.563  ->     8:
-
-               Giving the absolute pitch hierarchy:
-                    0, 7, 4, 10, 2, 5, 9, 11, 1, 3, 6, 8         
-               
-               Octaves are treated equivalently:
-                    12, 24, 36 etc. will be given the same velocity as the base pitch 0,
-                    19, 31, 43 etc. will be given the same velocity as the fifth (7),
-                    etc.
-
-               The pitch hierarchy is for absolute pitches, so should be related to a circular field, but the pitches
-               are all relative to 0, so the 0 should initially be omitted in the field and replaced later at position 0
-               in all hierarchies. The result is defined below in:
-
-                        static List<List<int>> circularPitchHierarchies
-
-               Since I want to impose global harmonic hierarchies, I've defined two functions:
-               
-                       private List<int> GetVelocityPerAbsolutePitch
-                                            (
-                                                int basePitch,// The base pitch for the pitch hierarchy.
-                                                int baseVelocity,   // the velocity given to any absolute base pitch (if it exists) in the MidiChordDef
-                                                List<int> relativePitchHierarchy, // one of the circularPitchHierarchies,
-                                                List<double> velocityFactorPerPitch // (see below) 
-                                            )
-                       
-                                   // velocityFactorPerPitch is a list of 12 values in descending order, each value in range 1..0.
-                                   // This list is the same length as the relativePitchHierarchy (12 values), and contains a set
-                                   // of values that are always in descending order. The values are factors by which to multiply
-                                   // the baseVelocity for each of the corresponding pitches in the relativePitchHierarchy.
-                                   // The factors are standard values taken from a field calculated using a static function:
-                                   //              VelocityFactorsPerPitch() (see below).
-               and
-                       
-                        private void MidiChordDef.SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch) 
-                                       
-               The result of the first function can be passed to many different chords using the second function.
+            ** Two functions have been written for setting the velocities of individual notes in a MidiChordDef.
+               Both these functions affect the velocities of both the notated pitches and the BasicMidiChords:
+               1. SetVerticalVelocityGradient(rootVelocity, topVelocity):
+                  The arguments are both in range [1..127].
+                  The velocities of the root and top notes in the chord are set to the argument values. The other velocities
+                  are interpolated linearly. (((double)topVelocity) / rootvelocity ) is the verticalVelocityFactor.  
+               2. SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch):
+                  this function sets note velocities according to the position of the note's pitch in a (harmonic) hierarchy of
+                  *absolute pitches* (not intervals):
+                  The absolute, equal temperament pitch hierarchy relating to the harmonic series can be found as follows
+                  (decimals rounded to 3 figures):
+                    absolute    equal              harmonic:     absolute         closest
+                    pitch:   temperament                         harmonic     equal temperament
+                               factor:                            factor:      absolute pitch:
+                       0:       1.000       |          1   ->   1/1  = 1.000  ->     0:
+                       1:       1.059       |          3   ->   3/2  = 1.500  ->     7:
+                       2:       1.122       |          5   ->   5/4  = 1.250  ->     4:
+                       3:       1.189       |          7   ->   7/4  = 1.750  ->     10:
+                       4:       1.260       |          9   ->   9/8  = 1.125  ->     2:
+                       5:       1.335       |         11   ->  11/8  = 1.375  ->     5:
+                       6:       1.414       |         13   ->  13/8  = 1.625  ->     9:
+                       7:       1.498       |         15   ->  15/8  = 1.875  ->     11:
+                       8:       1.587       |         17   ->  17/16 = 1.063  ->     1:
+                       9:       1.682       |         19   ->  19/16 = 1.187  ->     3:
+                       10:      1.782       |         21   ->  21/16 = 1.313  ->     
+                       11:      1.888       |         23   ->  23/16 = 1.438  ->     6:
+                                            |         25   ->  25/16 = 1.563  ->     8:
+                  
+                  Giving the absolute pitch hierarchy:
+                       0, 7, 4, 10, 2, 5, 9, 11, 1, 3, 6, 8         
+                  
+                  Octaves are treated equivalently:
+                       12, 24, 36 etc. will be given the same velocity as the base pitch 0,
+                       19, 31, 43 etc. will be given the same velocity as the fifth (7),
+                       etc.
+                  
+                  The pitch hierarchy is for absolute pitches, so should be related to a circular field, but the pitches
+                  are all relative to 0, so the 0 should initially be omitted in the field and replaced later at position 0
+                  in all hierarchies. The result is defined below in:
+                  
+                           static List<List<int>> circularPitchHierarchies
+                  
+                  Since I want to impose global harmonic hierarchies, I've defined two functions:
+                      /// velocityFactorPerPitch is a list of 12 values in descending order, each value in range 1..0.
+                      /// This list is the same length as the relativePitchHierarchy (12 values), and contains a set
+                      /// of values that are always in descending order. The values are factors by which to multiply
+                      /// the baseVelocity for each of the corresponding pitches in the relativePitchHierarchy.
+                      /// The factors are standard values taken from a field calculated using a static function:
+                      ///              VelocityFactorsPerPitch() (see below).
+                      private List<int> GetVelocityPerAbsolutePitch
+                          (
+                              int basePitch,// The base pitch for the pitch hierarchy.
+                              int baseVelocity,   // the velocity given to any absolute base pitch in the MidiChordDef
+                              List<int> relativePitchHierarchy, // one of the circularPitchHierarchies,
+                              List<double> velocityFactorPerPitch // (see below) 
+                          )
+                  and    
+                      private void MidiChordDef.SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch) 
+                                           
+                  The result of GetVelocityPerAbsolutePitch(...) can be passed to many different chords using SetVelocityPerAbsolutePitch(...).
          
-            ** Thinking about the representation of velocity in chords/noteheads:
-               I should create a new Notator class that notates velocities in outputChords as coloured or grey-scale noteheads.
-               I can first create the notator class, and then experiment to see which colours or grey-scales work best.
-               Dynamic symbols could be reserved for use in inputChords..
-               Grey-scale velocities might be 100%black(==fff) --> 30%black(==pppp).
-               Coloured noteheads might be BrightRed(==fff) --> DarkRed(==mf), DarkGreen(==mp) --> BrightGreen(==pppp).
-               The Assistant Composer Form should provide a pop-up menu for selecting the appropriate notator for the score.
+            ** Representing velocity using coloured noteheads and extenders:
+               There is a new pop-up menu in the Assistant Composer's main form for setting the output chord symbol type.
+               This has two values: "standard black" and "coloured velocities". This value is saved in .mkss files.
+               (Input chord symbols have no midi velocity, so their noteheads and extenders are never coloured anything but black.) 
+               If "coloured velocities" is selected, (output) noteheads and extenders are coloured according to the velocities
+               constructed either from the density and vertical velocity parameters in a palette or by passing velocities directly
+               to a MidiChordDef constructor. The densities and velocities of BasicChordDefs depend on ornament definitions,
+               so are independent of the notated values.
+               The colours themselves are defined in a private static readonly List<string> in OuputChordSymbol.cs
 
             ** The concept of InputChords is still a bit hazy. Why should they ever have more than one notehead?...
-               But I could implement version (A) for Tombeau 1(that doesn't have inputChords) anyway...
+               But I can compose Tombeau 1(that doesn't have inputChords) before worrying about that...
                Also, *annotations* that are instructions to performers (hairpins spring to mind). Conventional dynamic symbols are,
                I think meant for *performers*, so should only be attached to inputChords...
                The info in *outputChords* is the info that could go in a MIDI file, and vice versa.
              
 			//3. Chord pitch transposition has already been implemented in the function MidiChordDef.Transpose(MidiChordDef),
-			//   but it contains known bugs. Chord velocity transposition could be implemented analogously.
-			//4. Chords can have holes... Do I need filters? Maybe a MidiChordDef.SubtractNotes(...) function? 
+			//   but it contains known bugs. Chord velocity transposition could be implemented analogously. 
 			//5. Velocity gradients in the root chords of additions: bottom->top (="consonant") --> top->bottom (="dissonant")...
 			
 			*********************************************************************************************/
@@ -172,8 +177,8 @@ namespace Moritz.Algorithm.Tombeau1
 
             // Add clef changes here.
             // Testing... 
-            bars[0][0].InsertClefChange(9, "t");
-            bars[0][0].InsertClefChange(2, "b");
+            //bars[0][0].InsertClefChange(9, "t");
+            //bars[0][0].InsertClefChange(2, "b");
 
             //bars[1][1].InsertClefChange(3, "b");
 
@@ -192,6 +197,7 @@ namespace Moritz.Algorithm.Tombeau1
                 {
                     MidiChordDef mcd = baseMidiChordDef.Clone() as MidiChordDef;
                     mcd.BasicMidiChordDefs[0].Velocities[0] = velocity;
+                    mcd.NotatedMidiVelocities[0] = velocity;
                     mcd.Lyric = (velocity).ToString();
                     velocity++;
 
@@ -220,26 +226,32 @@ namespace Moritz.Algorithm.Tombeau1
         private Block GetSystem1Block()
         {
             List<Trk> sys1Trks = new List<Trk>();
+            List<byte> topVelocities = new List<byte>() { 1, 12, 24, 35, 47, 58, 70, 81, 93, 104, 116, 127 };
+            List<byte> rootVelocities = new List<byte>() { 127, 116, 104, 93, 81, 70, 58, 47, 35, 24, 12, 1 };
             for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
             {
                 int chordDensity = 8;
                 List<IUniqueDef> sys1mcds = PaletteMidiChordDefs(0);
                 for(int j = 0; j < sys1mcds.Count; ++j)
                 {
-                    MidiChordDef mcd = sys1mcds[j] as MidiChordDef;
-                    mcd.Transpose(j);
+                    MidiChordDef mcd = sys1mcds[j] as MidiChordDef;         
+
+                    mcd.Transpose(j - 7);
                     mcd.Lyric = (j).ToString() + "." + chordDensity.ToString();
 
                     mcd.SetVerticalDensity(chordDensity);
 
-                    List<int> velocityPerAbsolutePitch =
-                        GetVelocityPerAbsolutePitch(j,    // The base pitch for the pitch hierarchy.
-                                                    127,  // the velocity given to any absolute base pitch (if it exists) in the MidiChordDef
-                                                    circularPitchHierarchies[i], // the pitch hierarchy for the chord,
-                                                    velocityFactors[0]  // A list of 12 values in descending order, each value in range 1..0
-                                                   );
+                    mcd.SetVerticalVelocityGradient(rootVelocities[j], topVelocities[j]);
 
-                    mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+
+                    //List<int> velocityPerAbsolutePitch =
+                    //    GetVelocityPerAbsolutePitch(j,    // The base pitch for the pitch hierarchy.
+                    //                                127,  // the velocity given to any absolute base pitch (if it exists) in the MidiChordDef
+                    //                                circularPitchHierarchies[i], // the pitch hierarchy for the chord,
+                    //                                velocityFactors[0]  // A list of 12 values in descending order, each value in range 1..0
+                    //                               );
+
+                    //mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
                 }
                 Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, sys1mcds);
                 sys1Trks.Add(trk);

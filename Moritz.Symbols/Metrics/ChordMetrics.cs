@@ -21,7 +21,7 @@ namespace Moritz.Symbols
             _gap = gap;
 
             // The _objectType is written to the SVG file as a group name, but is otherwise not used.
-            if(chord is CautionaryChordSymbol)
+            if(chord is CautionaryOutputChordSymbol)
                 _objectType = "cautionary chord";
             else
                 _objectType = "chord";
@@ -45,7 +45,13 @@ namespace Moritz.Symbols
 
             // These objects are created with originX and originY at 0,0 (the chord's origin).
             CreateLedgerlineAndAccidentalMetrics(chord.FontHeight, chord.HeadsTopDown, _headsMetricsTopDown, stemStrokeWidthVBPX);
-            CautionaryChordSymbol cautionaryChordSymbol = chord as CautionaryChordSymbol;
+
+            ChordSymbol cautionaryChordSymbol = chord as CautionaryOutputChordSymbol;
+            if(cautionaryChordSymbol == null)
+            {
+                cautionaryChordSymbol = chord as CautionaryInputChordSymbol;
+
+            }
             if(cautionaryChordSymbol != null)
             {
                 CreateCautionaryBracketsMetrics(cautionaryChordSymbol);
@@ -96,7 +102,7 @@ namespace Moritz.Symbols
         {
             _headsMetricsTopDown = new List<HeadMetrics>();
 
-            HeadMetrics hMetrics = new HeadMetrics(chord, _gap); // the head is horizontally aligned at 0 by default.
+            HeadMetrics hMetrics = new HeadMetrics(chord, null, _gap); // the head is horizontally aligned at 0 by default.
             float horizontalShift = hMetrics.RightStemX - hMetrics.LeftStemX - (ledgerlineStemStrokeWidth / 2F); // the distance to shift left or right if heads would collide
             float shiftRange = _gap * 0.75F;
 
@@ -125,7 +131,7 @@ namespace Moritz.Symbols
                             newHeadAlignX = 0;
                     }
 
-                    HeadMetrics headMetrics = new HeadMetrics(chord, _gap);
+                    HeadMetrics headMetrics = new HeadMetrics(chord, head, _gap);
                     headMetrics.Move(newHeadAlignX, newHeadOriginY); // moves head.originY to headY
                     bottomUpMetrics.Add(headMetrics);
                 }
@@ -154,7 +160,7 @@ namespace Moritz.Symbols
                             newHeadAlignX = 0;
                     }
 
-                    HeadMetrics headMetrics = new HeadMetrics(chord, _gap);
+                    HeadMetrics headMetrics = new HeadMetrics(chord, head, _gap);
                     headMetrics.Move(newHeadAlignX, newHeadOriginY); // moves head.originY to headY
                     _headsMetricsTopDown.Add(headMetrics);
                 }
@@ -190,7 +196,7 @@ namespace Moritz.Symbols
             }
         }
 
-        private void CreateCautionaryBracketsMetrics(CautionaryChordSymbol chord)
+        private void CreateCautionaryBracketsMetrics(ChordSymbol chord)
         {
             PageFormat pageFormat = chord.Voice.Staff.SVGSystem.Score.PageFormat;
             float gap = pageFormat.Gap;

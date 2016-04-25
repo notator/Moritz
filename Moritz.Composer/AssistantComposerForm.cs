@@ -855,6 +855,11 @@ namespace Moritz.Composer
 
         #region notation groupBox
         #region comboBoxes
+
+        private void NotatorComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SetGroupBoxIsUnconfirmed(NotationGroupBox, ConfirmNotationButton, RevertNotationButton);
+        }
         private void StafflineStemStrokeWidthComboBox_Leave(object sender, EventArgs e)
         {
             SetComboBoxSelectedIndexFromText(StafflineStemStrokeWidthComboBox);
@@ -1692,11 +1697,18 @@ namespace Moritz.Composer
         {
             Debug.Assert(r.Name == "notation");
             int count = r.AttributeCount;
+            OutputChordSymbolTypeComboBox.SelectedIndex = 0; // default is standard outputChord symbols (all noteheads black)
             for(int i = 0; i < count; i++)
             {
                 r.MoveToAttribute(i);
                 switch(r.Name)
                 {
+                    case "outputChordSymbolType":
+                        if(string.Compare(r.Value, "coloured velocities") == 0)
+                        {
+                            OutputChordSymbolTypeComboBox.SelectedIndex = 1;
+                        }
+                        break;
                     case "minimumCrotchetDuration":
                         MinimumCrotchetDurationTextBox.Text = r.Value;
                         break;
@@ -1887,6 +1899,10 @@ namespace Moritz.Composer
         {
             w.WriteStartElement("notation");
 
+            if(OutputChordSymbolTypeComboBox.SelectedIndex > 0)
+            {
+                w.WriteAttributeString("outputChordSymbolType", OutputChordSymbolTypeComboBox.Text);
+            }
             w.WriteAttributeString("minimumCrotchetDuration", MinimumCrotchetDurationTextBox.Text);
             if(BeamsCrossBarlinesCheckBox.Checked)
                 w.WriteAttributeString("beamsCrossBarlines", "true");
@@ -2046,7 +2062,16 @@ namespace Moritz.Composer
         }
         private void SetNotation(PageFormat pageFormat)
         {
-            pageFormat.ChordSymbolType = "standard";
+            switch(OutputChordSymbolTypeComboBox.SelectedIndex)
+            {
+                case 0:
+                    pageFormat.ChordSymbolType = "standard";
+                    break;
+                case 1:
+                    pageFormat.ChordSymbolType = "coloredVelocities";
+                    break;
+            }
+            
             pageFormat.MinimumCrotchetDuration = int.Parse(this.MinimumCrotchetDurationTextBox.Text);
             pageFormat.BeamsCrossBarlines = this.BeamsCrossBarlinesCheckBox.Checked;
 

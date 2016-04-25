@@ -130,32 +130,45 @@ namespace Moritz.Spec
 		public List<InputNoteDef> InputNoteDefs { get {return _inputNoteDefs; }}
 		private List<InputNoteDef> _inputNoteDefs = new List<InputNoteDef>();
 
-		public List<byte> NotatedMidiPitches
-		{
-			get
-			{
-				List<byte> rList = new List<byte>();
-				foreach(InputNoteDef ind in _inputNoteDefs)
-				{
-					rList.Add(ind.NotatedMidiPitch);
-				}
-				return rList;
-			}
-			// The new pitches must be in ascending order
-			set
-			{
-				List<byte> newPitches = value;
-				Debug.Assert(newPitches.Count == _inputNoteDefs.Count);
-				int pitchBelow = -1;
-				for(int i = 0; i < newPitches.Count; ++i)
-				{
-					byte newPitch = newPitches[i];
-					Debug.Assert(newPitch > pitchBelow);
-					pitchBelow = newPitch;
-					_inputNoteDefs[i].NotatedMidiPitch = newPitch;
-				}
-			}
-		}
+        public List<byte> NotatedMidiPitches
+        {
+            get
+            {
+                List<byte> rList = new List<byte>();
+                foreach(InputNoteDef ind in _inputNoteDefs)
+                {
+                    rList.Add(ind.NotatedMidiPitch);
+                }
+                return rList;
+            }
+            // The new pitches must be in ascending order
+            set
+            {
+                List<byte> newPitches = value;
+                Debug.Assert(newPitches.Count == _inputNoteDefs.Count);
+                int pitchBelow = -1;
+                for(int i = 0; i < newPitches.Count; ++i)
+                {
+                    byte newPitch = newPitches[i];
+                    Debug.Assert(newPitch > pitchBelow);
+                    pitchBelow = newPitch;
+                    _inputNoteDefs[i].NotatedMidiPitch = newPitch;
+                }
+            }
+        }
+
+        public List<byte> NotatedMidiVelocities
+        {
+            get
+            {
+                Debug.Assert(false, "Input Chords do not have notated Midi velocities.");
+                return null;
+            }
+            set
+            {
+                Debug.Assert(false, "Input Chords do not have notated Midi velocities.");
+            }
+        }
 
         public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
         private int? _msDurationToNextBarline = null;

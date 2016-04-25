@@ -47,10 +47,6 @@ namespace Moritz.Symbols
         /// dynamic has been attached to this anchorageSymbol..
         /// </summary>
         public bool HasExplicitDynamic = false;
-        /// <summary>
-        /// Both rests, chords and the final barline have Velocity and ControlSymbols, so that hairpins etc. can be attached to them!
-        /// </summary>
-        public byte Velocity = 0;
 
         public void AddDynamic(byte midiVelocity, byte currentVelocity)
         {

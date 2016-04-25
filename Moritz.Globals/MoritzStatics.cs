@@ -34,27 +34,6 @@ namespace Moritz.Globals
         }
 
         /// <summary>
-        /// These values are used to populate ComboBoxes (see NewScoreDialog).
-        /// </summary>
-        public static List<string> Algorithms = new List<string>()
-        {
-            "Study 2c",
-            "Song Six",
-            "Study 3 sketch"
-        };
-
-        /// <summary>
-        /// These values are used to populate ComboBoxes (see AssistantComposerForm).
-        /// The value "none" is used to indicate that a score has no folder, no graphics and no (.mkss) settings file.
-        /// "none" is used by the temporary PaletteDemoScore which is created by audio demo buttons in palettes.
-        /// </summary>
-        public static List<string> ChordTypes = new List<string>()
-        {
-            "standard",
-            "2b2"
-        };
-
-        /// <summary>
         /// The clefs are:
         ///     four treble clefs (0, 1, 2, 3 octaves higher),
         ///     four bass clefs (0, 1, 2, 3 octaves lower)

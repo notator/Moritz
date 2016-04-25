@@ -6,12 +6,12 @@ using Moritz.Spec;
 
 namespace Moritz.Symbols
 {
-    internal class CautionaryChordSymbol : ChordSymbol
+    internal class CautionaryOutputChordSymbol : OutputChordSymbol
     {
-        public CautionaryChordSymbol(Voice voice, CautionaryChordDef lccd, int absMsPosition, float fontSize)
+        public CautionaryOutputChordSymbol(Voice voice, CautionaryChordDef lccd, int absMsPosition, float fontSize)
             : base(voice, lccd.MsDuration, absMsPosition, 600, fontSize)
         {
-            SetNoteheadPitches(lccd.NotatedMidiPitches);
+            SetNoteheadPitchesAndVelocities(lccd.NotatedMidiPitches, lccd.NotatedMidiVelocities);
 
             _durationClass = DurationClass.cautionary;
             _msDuration = 0;

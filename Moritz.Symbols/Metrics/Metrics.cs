@@ -200,8 +200,7 @@ namespace Moritz.Symbols
 		/// </summary>
 		public float OriginY { get { return _originY; } }
 		protected float _originY = 0F;
-
-	}
+    }
 
 	/// <summary>
 	/// This class is used to construct the CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX dictionary.
@@ -346,7 +345,7 @@ namespace Moritz.Symbols
 	/// </summary>
 	internal class NoteheadExtenderMetrics : Metrics
 	{
-		public NoteheadExtenderMetrics(float left, float right, float originY, float strokeWidth, float gap, bool drawExtender)
+		public NoteheadExtenderMetrics(float left, float right, float originY, string colorAttribute, float strokeWidth, float gap, bool drawExtender)
 			: base()
 		{
 			_left = left;
@@ -362,6 +361,10 @@ namespace Moritz.Symbols
 			}
 
 			_originY = originY;
+            if(! string.IsNullOrEmpty(colorAttribute))
+            {
+                _colorAttribute = colorAttribute;
+            }
 			_strokeWidth = strokeWidth;
 			_drawExtender = drawExtender;
 		}
@@ -369,9 +372,11 @@ namespace Moritz.Symbols
 		public override void WriteSVG(SvgWriter w)
 		{
 			if(_drawExtender)
-				w.SvgLine(null, _left, _originY, _right, _originY, "black", _strokeWidth, "butt");
+				w.SvgLine(null, _left, _originY, _right, _originY, _colorAttribute, _strokeWidth, "butt");
 		}
 
+        public string ColorAttribute { get { return _colorAttribute; } }
+        private readonly string _colorAttribute = "black";
 		private readonly float _strokeWidth = 0F;
 		private readonly bool _drawExtender;
 	}
@@ -765,6 +770,10 @@ namespace Moritz.Symbols
             w.WriteAttributeString("y", _originY.ToString(M.En_USNumberFormat));
 			w.WriteAttributeString("font-size", _fontHeight.ToString(M.En_USNumberFormat));
 			w.WriteAttributeString("font-family", "CLicht");
+            if(! string.IsNullOrEmpty(_colorAttribute))
+            {
+                w.WriteAttributeString("fill", _colorAttribute);
+            }
 			switch(_textHorizAlign)
 			{
 				case TextHorizAlign.left:
@@ -901,7 +910,9 @@ namespace Moritz.Symbols
 		public float FontHeight { get { return _fontHeight; } }
 		protected float _fontHeight;
 		protected TextHorizAlign _textHorizAlign = TextHorizAlign.left;
-	}
+        public string ColorAttribute { get { return _colorAttribute; } }
+        protected string _colorAttribute = "";
+    }
 
 	internal class ClefMetrics : Metrics // defined objects in SVG
 	{
@@ -1109,7 +1120,7 @@ namespace Moritz.Symbols
 	}
 	internal class HeadMetrics : CLichtCharacterMetrics
 	{
-		public HeadMetrics(ChordSymbol chord, float gapVBPX)
+		public HeadMetrics(ChordSymbol chord, Head head, float gapVBPX)
 			: base(chord.DurationClass, false, chord.FontHeight)
 		{
 			Move((Left - Right) / 2F, 0F); // centre horizontally
@@ -1119,6 +1130,10 @@ namespace Moritz.Symbols
 			_rightStemX = _right;
 			_left -= horizontalPadding;
 			_right += horizontalPadding;
+            if(head != null && head.ColorAttribute != null)
+            {
+                _colorAttribute = head.ColorAttribute;
+            }
 		}
 
 		/// <summary>
@@ -1188,9 +1203,9 @@ namespace Moritz.Symbols
 
 		public float LeftStemX { get { return _leftStemX; } }
 		private float _leftStemX;
-		public float RightStemX { get { return _rightStemX; } }
-		private float _rightStemX;
-	}
+        public float RightStemX { get { return _rightStemX; } }
+        private float _rightStemX;
+    }
 	internal class AccidentalMetrics : CLichtCharacterMetrics
 	{
 		public AccidentalMetrics(Head head, float fontHeight, float gap)
@@ -1214,12 +1229,12 @@ namespace Moritz.Symbols
 					_left -= gap * 0.1F;
 					_right += gap * 0.1F;
 					break;
-				//case "#":
-				//    _left -= gap * 0.05F;
-				//    _right += gap * 0.05F;
-				//    break;
 			}
-		}
+            if(head != null && head.ColorAttribute != null)
+            {
+                _colorAttribute = head.ColorAttribute;
+            }
+        }
 
 		public object Clone()
 		{

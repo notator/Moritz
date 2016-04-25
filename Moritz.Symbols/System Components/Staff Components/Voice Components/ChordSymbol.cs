@@ -51,55 +51,6 @@ namespace Moritz.Symbols
 
         #region composition
 
-        /// <summary>
-        /// This function uses a sophisticated algorithm to decide whether flats or sharps are to be used to
-        /// represent the chord. Chords can have naturals and either sharps or flats (but not both).
-        /// The display of naturals is forced if the same notehead height also exists with a sharp or flat.
-        /// (The display of other accidentals are always forced in the Head constructor.)
-        /// Exceptions: This function throws an exception if
-        ///     1) any of the input midiPitches is out of midi range (0..127).
-        ///     2) the midiPitches are not in ascending order
-        ///     3) the midiPitches are not unique.
-        /// The midiPitches argument must be in order of size (ascending), but Heads are created in top-down order.
-        /// </summary>
-        /// <param name="midiPitches"></param>
-        public void SetNoteheadPitches(List<byte> midiPitches)
-        {
-            #region check inputs
-            int pitch = -1;
-            foreach(int midiPitch in midiPitches)
-            {
-                if(midiPitch < 0 || midiPitch > 127)
-                    throw new ApplicationException("Composition.SetPitches(): midiPitch out of range");
-                if(midiPitch <= pitch)
-                    throw new ApplicationException(
-                        "Composition.SetPitches(): midiPitches must be unique and in ascending order");
-                pitch = midiPitch;
-            }
-            #endregion
-            this.HeadsTopDown.Clear();
-            bool useSharp = UseSharps(midiPitches); // returns false if flats are to be used
-            for(int i = midiPitches.Count-1; i >= 0; --i)
-            {
-                Head head = new Head(this, midiPitches[i], useSharp);
-                this.HeadsTopDown.Add(head);
-            }
-            for(int i = 0; i < midiPitches.Count; i++)
-            {
-                if(this.HeadsTopDown[i].Alteration == 0)
-                {
-                    this.HeadsTopDown[i].DisplayAccidental = DisplayAccidental.suppress;
-                }
-            }
-            for(int i = 1; i < midiPitches.Count; i++)
-            {
-                if(this.HeadsTopDown[i].Pitch == this.HeadsTopDown[i - 1].Pitch)
-                {
-                    this.HeadsTopDown[i - 1].DisplayAccidental = DisplayAccidental.force;
-                    this.HeadsTopDown[i].DisplayAccidental = DisplayAccidental.force;
-                }
-            }
-        }
         #region private for SetPitches()
         /// <summary>
         /// Returns true if sharps are to be used to represent the midiPitches,
@@ -107,7 +58,7 @@ namespace Moritz.Symbols
         /// </summary>
         /// <param name="midiPitches"></param>
         /// <returns></returns>
-        private bool UseSharps(List<byte> midiPitches)
+        internal bool UseSharps(List<byte> midiPitches, List<byte> midiVelocities)
         {
             for(int i = 0; i < midiPitches.Count; i++)
             {
@@ -142,7 +93,15 @@ namespace Moritz.Symbols
                     }
                     // index is now both the index of the "most preferred" interval 
                     // and the index of the lower midiPitch of the "most preferred" interval.
-                    Head head = new Head(null, midiPitches[index], true);
+                    Head head = null;
+                    if(midiVelocities != null)
+                    {
+                        head = new Head(null, midiPitches[index], midiVelocities[index], true);
+                    }
+                    else
+                    {
+                        head = new Head(null, midiPitches[index], -1, true);  // a Head in an InputChordSymbol
+                    }
                     // head is either natural or sharp.
                     int preferredInterval = collapsedIntervals[index];
                     useSharpsOrNull = GetUseSharps(head, preferredInterval);

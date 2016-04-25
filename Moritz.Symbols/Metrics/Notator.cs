@@ -18,10 +18,12 @@ namespace Moritz.Symbols
             {
                 case "standard":
                     SymbolSet = new StandardSymbolSet();
+                    _coloredVelocities = false;
                     break;
-				//case "2b2":
-				//	SymbolSet = new Study2b2SymbolSet();
-				//	break;
+                case "coloredVelocities":
+                    SymbolSet = new StandardSymbolSet();
+                    _coloredVelocities = true;
+                    break;
                 case "none":
                     SymbolSet = null;
                     break;
@@ -88,6 +90,12 @@ namespace Moritz.Symbols
 
                             NoteObject noteObject =
                                 SymbolSet.GetNoteObject(voice, absMsPosition, iud, firstLmdd, ref currentChannelVelocities[staffIndex], musicFontHeight);
+
+                            OutputChordSymbol outputChordSymbol = noteObject as OutputChordSymbol;
+                            if(outputChordSymbol != null && this._coloredVelocities == true)
+                            {
+                                outputChordSymbol.SetNoteheadColors();
+                            }
 
                             IUniqueSplittableChordDef iscd = iud as IUniqueSplittableChordDef;
                             if(iscd != null && iscd.MsDurationToNextBarline != null)
@@ -398,6 +406,8 @@ namespace Moritz.Symbols
         protected readonly PageFormat _pageFormat;
 
         public SymbolSet SymbolSet = null;
+        private readonly bool _coloredVelocities
+        ;
 
         #endregion
 
