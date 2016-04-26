@@ -57,7 +57,7 @@ namespace Moritz.Algorithm.Tombeau1
 			I need to think diagonally about the structural levels:
 			> create the palettes containing the channel objects (atoms, MidiChordDefs): notes/chords, ornaments,
 			> structural layers between the objects in the palettes and trks (or are trks constructed from
-			  vertical reltions inside seqs?)
+			  vertical relations inside seqs?)
 			> how notes/chords relate horizontally inside a trk
 			> how notes/chords relate vertically inside a seq (How trks relate to each other inside seqs?),
 			> and about how seqs relate to each other globally...
@@ -66,11 +66,23 @@ namespace Moritz.Algorithm.Tombeau1
 			
 			Chords:
 			** "Chords are colour" (Stockhausen)
-            ** I want to keep the number of pitches in chords fairly low, so that they are recognisable. Strategies like
-               Boulez' chord addition don't really work... (The code I've written for that in MidiChordDef has been commented out.)
+            
+            ** I want to keep the number of pitches in chords fairly low, so that they are recognisable.
+            
             ** Chords can have any pitches (construct some interesting palettes with some differently coloured chords).
                But velocities can be controlled independently to emphasise "harmonic" relations in areas of the score.
                Repeated chord sequences can be thus "filtered" differently as in a digital painting...
+                        
+            ** Representing velocity using coloured noteheads and extenders:
+               There is a new pop-up menu in the Assistant Composer's main form for setting the output chord symbol type.
+               This has two values: "standard black" and "coloured velocities". This value is saved in .mkss files.
+               (Input chord symbols have no midi velocity, so their noteheads and extenders are never coloured anything but black.) 
+               If "coloured velocities" is selected, (output) noteheads and extenders are coloured according to the velocities
+               constructed either from the density and vertical velocity parameters in a palette or by passing velocities directly
+               to a MidiChordDef constructor. The densities and velocities of BasicChordDefs depend on ornament definitions,
+               so are independent of the notated values.
+               The colours themselves are defined in a private static readonly List<string> in OuputChordSymbol.cs
+
             ** Two functions have been written for setting the velocities of individual notes in a MidiChordDef.
                Both these functions affect the velocities of both the notated pitches and the BasicMidiChords:
                1. SetVerticalVelocityGradient(rootVelocity, topVelocity):
@@ -131,16 +143,6 @@ namespace Moritz.Algorithm.Tombeau1
                       private void MidiChordDef.SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch) 
                                            
                   The result of GetVelocityPerAbsolutePitch(...) can be passed to many different chords using SetVelocityPerAbsolutePitch(...).
-         
-            ** Representing velocity using coloured noteheads and extenders:
-               There is a new pop-up menu in the Assistant Composer's main form for setting the output chord symbol type.
-               This has two values: "standard black" and "coloured velocities". This value is saved in .mkss files.
-               (Input chord symbols have no midi velocity, so their noteheads and extenders are never coloured anything but black.) 
-               If "coloured velocities" is selected, (output) noteheads and extenders are coloured according to the velocities
-               constructed either from the density and vertical velocity parameters in a palette or by passing velocities directly
-               to a MidiChordDef constructor. The densities and velocities of BasicChordDefs depend on ornament definitions,
-               so are independent of the notated values.
-               The colours themselves are defined in a private static readonly List<string> in OuputChordSymbol.cs
 
             ** The concept of InputChords is still a bit hazy. Why should they ever have more than one notehead?...
                But I can compose Tombeau 1(that doesn't have inputChords) before worrying about that...

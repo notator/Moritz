@@ -555,6 +555,9 @@ namespace Moritz.Globals
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Returns the value argument as a byte, coerced to the range [0..127] 
+        /// </summary>
         public static byte MidiValue(int value)
         {
             int rval;
