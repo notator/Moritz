@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.ComponentModel;
 using System.Threading;
 
-using Multimedia.Midi;
+using Sanford.Multimedia.Midi;
 
 namespace Moritz.Midi
 {
@@ -31,15 +31,15 @@ namespace Moritz.Midi
 	/// </summary>
 	public abstract class MidiSlider : MidiControl
 	{
-        protected MidiSlider(int channel, ChannelCommand command, byte msb, ControlContinuation continuation)
+        protected MidiSlider(int channel, ChannelCommand command, int msb, ControlContinuation continuation)
             : base(channel, command, msb)
         {
         }
-        protected MidiSlider(int channel, ChannelCommand command, byte msb, byte lsb, ControlContinuation continuation)
+        protected MidiSlider(int channel, ChannelCommand command, int msb, int lsb, ControlContinuation continuation)
             : base(channel, command, msb, lsb)
         {
         }
-        protected MidiSlider(int channel, ControllerType controller, byte msb, ControlContinuation continuation)
+        protected MidiSlider(int channel, ControllerType controller, int msb, ControlContinuation continuation)
 			: base(channel, controller, msb)
 		{
 		}
@@ -54,42 +54,42 @@ namespace Moritz.Midi
         /// <param name="channel"></param>
         /// <param name="lsb"></param>
         /// <param name="continuation"></param>
-        public PitchWheel(int channel, byte lsb, ControlContinuation continuation)
+        public PitchWheel(int channel, int lsb, ControlContinuation continuation)
             : base(channel, ChannelCommand.PitchWheel, 0, lsb, continuation)
         {
         }
     }
 	public class ModulationWheel : MidiSlider
 	{
-		public ModulationWheel(int channel, byte msb, ControlContinuation continuation)
+		public ModulationWheel(int channel, int msb, ControlContinuation continuation)
 			: base(channel, ControllerType.ModulationWheel, msb, continuation)
 		{
 		}
 	}
 	public class BreathController : MidiSlider
 	{
-		public BreathController(int channel, byte msb, ControlContinuation continuation)
+		public BreathController(int channel, int msb, ControlContinuation continuation)
 			: base(channel, ControllerType.BreathControl, msb, continuation)
 		{
 		}
 	}
 	public class FootPedal : MidiSlider
 	{
-        public FootPedal(int channel, byte msb, ControlContinuation continuation)
+        public FootPedal(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.FootPedal, msb, continuation)
         {
         }
     }
 	public class PortamentoTime : MidiSlider
 	{
-        public PortamentoTime(int channel, byte msb, ControlContinuation continuation)
+        public PortamentoTime(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.PortamentoTime, msb, continuation)
         {
         }
     }
 	public class Volume : MidiSlider
 	{
-        public Volume(int channel, byte msb, ControlContinuation continuation)
+        public Volume(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.Volume, msb, continuation)
         {
             //  ControllerType.VolumeFine is ignored
@@ -97,7 +97,7 @@ namespace Moritz.Midi
     }
 	public class Balance : MidiSlider
 	{
-        public Balance(int channel, byte msb, ControlContinuation continuation)
+        public Balance(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.Balance, msb, continuation)
         {
              //  ControllerType.BalanceFine is ignored.
@@ -105,7 +105,7 @@ namespace Moritz.Midi
     }
 	public class Pan : MidiSlider
 	{
-        public Pan(int channel, byte msb, ControlContinuation continuation)
+        public Pan(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.Pan, msb, continuation)
         {
             //  ControllerType.PanFine is ignored.
@@ -113,7 +113,7 @@ namespace Moritz.Midi
     }
 	public class Expression : MidiSlider
 	{
-        public Expression(int channel, byte msb, ControlContinuation continuation)
+        public Expression(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.Expression, msb, continuation)
         {
             //  ControllerType.ExpressionFine is ignored
@@ -121,14 +121,14 @@ namespace Moritz.Midi
     }
 	public class EffectControl1 : MidiSlider
 	{
-        public EffectControl1(int channel, byte msb, ControlContinuation continuation)
+        public EffectControl1(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.EffectControl1, msb, continuation)
         {
         }
     }
 	public class EffectControl2 : MidiSlider
 	{
-        public EffectControl2(int channel, byte msb, ControlContinuation continuation)
+        public EffectControl2(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.EffectControl2, msb, continuation)
         {
         }
@@ -137,49 +137,49 @@ namespace Moritz.Midi
 	#region short (1-byte) sliders
 	public class ChannelPressure : MidiSlider
 	{
-        public ChannelPressure(int channel, byte msb, ControlContinuation continuation)
+        public ChannelPressure(int channel, int msb, ControlContinuation continuation)
             : base(channel, ChannelCommand.ChannelPressure, msb, continuation)
         {
         }
     }
 	public class GeneralPurposeSlider1 : MidiSlider
 	{
-        public GeneralPurposeSlider1(int channel, byte msb, ControlContinuation continuation)
+        public GeneralPurposeSlider1(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.GeneralPurposeSlider1, msb, continuation)
         {
         }
     }
 	public class GeneralPurposeSlider2 : MidiSlider
 	{
-        public GeneralPurposeSlider2(int channel, byte msb, ControlContinuation continuation)
+        public GeneralPurposeSlider2(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.GeneralPurposeSlider2, msb, continuation)
         {
         }
     }
 	public class GeneralPurposeSlider3 : MidiSlider
 	{
-        public GeneralPurposeSlider3(int channel, byte msb, ControlContinuation continuation)
+        public GeneralPurposeSlider3(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.GeneralPurposeSlider3, msb, continuation)
         {
         }
     }
 	public class GeneralPurposeSlider4 : MidiSlider
 	{
-        public GeneralPurposeSlider4(int channel, byte msb, ControlContinuation continuation)
+        public GeneralPurposeSlider4(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.GeneralPurposeSlider4, msb, continuation)
         {
         }
     }
 	public class SoundVariation : MidiSlider
 	{
-        public SoundVariation(int channel, byte msb, ControlContinuation continuation)
+        public SoundVariation(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.SoundVariation, msb, continuation)
         {
         }
     }
 	public class SoundTimbre : MidiSlider
 	{
-        public SoundTimbre(int channel, byte msb, ControlContinuation continuation)
+        public SoundTimbre(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.SoundTimbre, msb, continuation)
         {
         }
@@ -187,91 +187,91 @@ namespace Moritz.Midi
 	}
 	public class SoundReleaseTime : MidiSlider
 	{
-        public SoundReleaseTime(int channel, byte msb, ControlContinuation continuation)
+        public SoundReleaseTime(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.SoundReleaseTime, msb, continuation)
         {
         }
     }
 	public class SoundAttackTime : MidiSlider
 	{
-        public SoundAttackTime(int channel, byte msb, ControlContinuation continuation)
+        public SoundAttackTime(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.SoundAttackTime, msb, continuation)
         {
         }
     }
 	public class SoundBrightness : MidiSlider
 	{
-        public SoundBrightness(int channel, byte msb, ControlContinuation continuation)
+        public SoundBrightness(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.SoundBrightness, msb, continuation)
         {
         }
     }
 	public class SoundControl6 : MidiSlider
 	{
-        public SoundControl6(int channel, byte msb, ControlContinuation continuation)
+        public SoundControl6(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.SoundControl6, msb, continuation)
         {
         }
     }
 	public class SoundControl7 : MidiSlider
 	{
-        public SoundControl7(int channel, byte msb, ControlContinuation continuation)
+        public SoundControl7(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.SoundControl7, msb, continuation)
         {
         }
     }
 	public class SoundControl8 : MidiSlider
 	{
-        public SoundControl8(int channel, byte msb, ControlContinuation continuation)
+        public SoundControl8(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.SoundControl8, msb, continuation)
         {
         }
     }
 	public class SoundControl9 : MidiSlider
 	{
-        public SoundControl9(int channel, byte msb, ControlContinuation continuation)
+        public SoundControl9(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.SoundControl9, msb, continuation)
         {
         }
     }
 	public class SoundControl10 : MidiSlider
 	{
-        public SoundControl10(int channel, byte msb, ControlContinuation continuation)
+        public SoundControl10(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.SoundControl10, msb, continuation)
         {
         }
     }
 	public class EffectsLevel : MidiSlider
 	{
-        public EffectsLevel(int channel, byte msb, ControlContinuation continuation)
+        public EffectsLevel(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.EffectsLevel, msb, continuation)
         {
         }
     }
 	public class TremoloLevel : MidiSlider
 	{
-        public TremoloLevel(int channel, byte msb, ControlContinuation continuation)
+        public TremoloLevel(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.TremeloLevel, msb, continuation)
         {
         }
     }
 	public class ChorusLevel : MidiSlider
 	{
-        public ChorusLevel(int channel, byte msb, ControlContinuation continuation)
+        public ChorusLevel(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.ChorusLevel, msb, continuation)
         {
         }
     }
 	public class CelesteLevel : MidiSlider
 	{
-        public CelesteLevel(int channel, byte msb, ControlContinuation continuation)
+        public CelesteLevel(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.CelesteLevel, msb, continuation)
         {
         }
     }
     public class PhaserLevel : MidiSlider
     {
-        public PhaserLevel(int channel, byte msb, ControlContinuation continuation)
+        public PhaserLevel(int channel, int msb, ControlContinuation continuation)
             : base(channel, ControllerType.PhaserLevel, msb, continuation)
         {
         }

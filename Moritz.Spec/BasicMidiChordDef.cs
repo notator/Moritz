@@ -26,10 +26,11 @@ namespace Moritz.Spec
             Debug.Assert(_msDuration > 0, "msDuration out of range");
             Debug.Assert(BankIndex == null || BankIndex == M.MidiValue((int)BankIndex), "Bank out of range.");
             Debug.Assert(PatchIndex == null || PatchIndex == M.MidiValue((int)PatchIndex), "Patch out of range.");
+            Debug.Assert(Pitches.Count == Velocities.Count, "There must be the same number of pitches and velocities.");
             foreach(byte pitch in Pitches)
                 Debug.Assert(pitch == M.MidiValue((int)pitch), "Pitch out of range.");
             foreach(byte velocity in Velocities)
-                Debug.Assert(velocity == M.MidiValue((int)velocity), "velocity out of range.");
+                Debug.Assert(velocity == M.MidiValue((int)velocity), "velocity out of range.");       
             #endregion
         }
 

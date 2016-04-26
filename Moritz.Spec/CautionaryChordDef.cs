@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+using System.Diagnostics;
 using Krystals4ObjectLibrary;
 using Moritz.Globals;
 
@@ -12,14 +12,16 @@ namespace Moritz.Spec
     /// </summary>
     public class CautionaryChordDef : IUniqueChordDef
     {
-        public CautionaryChordDef(IUniqueChordDef chordDef, int msPosition, int msDuration)
+        public CautionaryChordDef(IUniqueChordDef chordDef, int msPositionReFirstIUD, int msDuration)
         {
-            _midiPitches = new List<byte>();
-            foreach(byte midiPitch in chordDef.NotatedMidiPitches)
-            {
-                _midiPitches.Add(midiPitch);
+            NotatedMidiPitches = chordDef.NotatedMidiPitches;
+            MidiChordDef midiChordDef = chordDef as MidiChordDef;
+            if(midiChordDef != null)
+            { 
+                NotatedMidiVelocities = chordDef.NotatedMidiVelocities;
             }
-            MsPosition = msPosition;
+
+            MsPositionReFirstUD = msPositionReFirstIUD;
             MsDuration = msDuration;
         }
 
@@ -29,27 +31,61 @@ namespace Moritz.Spec
         /// </summary>
         public void Transpose(int interval) { }
 
-        public List<byte> NotatedMidiPitches { get { return _midiPitches; } set { _midiPitches = value; } }
-        private List<byte> _midiPitches = null;
+        /// <summary>
+        /// This NotatedMidiPitches field is used when displaying the chord's noteheads.
+        /// </summary>
+        public List<byte> NotatedMidiPitches
+        {
+            get { return _notatedMidiPitches; }
+            set
+            {
+                foreach(byte pitch in value)
+                {
+                    Debug.Assert(pitch == M.MidiValue(pitch));
+                }
+                _notatedMidiPitches = new List<byte>(value);
+            }
+        }
+        private List<byte> _notatedMidiPitches = null;
+
+        /// <summary>
+        /// This NotatedMidiVelocities field is used when displaying the chord's noteheads.
+        /// </summary>
+        public List<byte> NotatedMidiVelocities
+        {
+            get
+            {
+                return _notatedMidiVelocities;
+            }
+            set
+            {
+                foreach(byte velocity in value)
+                {
+                    Debug.Assert(velocity == M.MidiValue(velocity));
+                }
+                _notatedMidiVelocities = new List<byte>(value);
+            }
+        }
+        private List<byte> _notatedMidiVelocities = null;
 
         #region IUniqueDef
         public override string ToString()
         {
-            return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString() + " CautionaryChordDef");
+            return ("MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " MsDuration=" + MsDuration.ToString() + " CautionaryChordDef");
         }
 
         public void AdjustMsDuration(double factor) { }
 
         public IUniqueDef Clone()
         {
-            CautionaryChordDef deepClone = new CautionaryChordDef(this, this._msPosition, this._msDuration);
+            CautionaryChordDef deepClone = new CautionaryChordDef(this, this._msPositionReFirstIUD, this._msDuration);
             return deepClone;
         }
 
         public int MsDuration { get { return _msDuration; } set { _msDuration = value; } }
         private int _msDuration = 0;
-        public int MsPosition { get { return _msPosition; } set { _msPosition = value; } }
-        private int _msPosition = 0;
+        public int MsPositionReFirstUD { get { return _msPositionReFirstIUD; } set { _msPositionReFirstIUD = value; } }
+        private int _msPositionReFirstIUD = 0;
         #endregion IUniqueDef
         #endregion IUniqueChordDef
 

@@ -14,8 +14,9 @@ namespace Moritz.Symbols
         /// </summary>
         /// <param name="chord">The containing ChordSymbol</param>
         /// <param name="midiPitch">The midiPitch. Must be in range [0..127]</param>
+        /// <param name="midiVelocity">The midiVelocity. Must be in range [0..127] for output Heads. Is -1 for input Heads</param>
         /// <param name="useSharp">true means use #, false means use flat(if there is a choice).</param>
-        public Head(ChordSymbol chord, int midiPitch, bool useSharp)
+        public Head(ChordSymbol chord, int midiPitch, int midiVelocity, bool useSharp)
         {
             Chord = chord;
             KeyValuePair<string, int> sharpKVP = new KeyValuePair<string, int>();
@@ -51,6 +52,8 @@ namespace Moritz.Symbols
 
             if(chord != null)
                 FontSize = chord.FontHeight;
+
+            _midiVelocity = midiVelocity;
         }
 
         /// <summary>
@@ -205,6 +208,9 @@ namespace Moritz.Symbols
                 return midiPitch;
             }
         }
+
+        public int MidiVelocity { get { return _midiVelocity; } }
+
         public bool Silent = false;
         public HeadShape Shape = HeadShape.auto;
         public int Alteration
@@ -216,6 +222,18 @@ namespace Moritz.Symbols
                 _alteration = value;
             }
         }
+
+        public string ColorAttribute
+        {
+            get { return _colorAttribute; }
+            internal set
+            {
+                Debug.Assert(Regex.IsMatch(value, @"^#[0-9a-fA-F]{6}$"));
+                _colorAttribute = value;
+            }
+        }
+        private string _colorAttribute = ""; // default is black
+
         /// <summary>
         /// Specifies if and how the accidental should be displayed. Meanings:
         ///  auto: automatically
@@ -229,5 +247,6 @@ namespace Moritz.Symbols
 
         private string _pitch;
         private int _alteration = 0;
+        private int _midiVelocity;
     }
 }

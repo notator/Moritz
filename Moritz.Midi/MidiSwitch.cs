@@ -1,4 +1,4 @@
-using Multimedia.Midi;
+using Sanford.Multimedia.Midi;
 
 namespace Moritz.Midi
 {

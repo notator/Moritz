@@ -6,12 +6,12 @@ using Moritz.Spec;
 
 namespace Moritz.Symbols
 {
-    internal class CautionaryChordSymbol : ChordSymbol
+    internal class CautionaryOutputChordSymbol : OutputChordSymbol
     {
-        public CautionaryChordSymbol(Voice voice, CautionaryChordDef lccd, float fontSize)
-            : base(voice, lccd.MsDuration, lccd.MsPosition, 600, fontSize)
+        public CautionaryOutputChordSymbol(Voice voice, CautionaryChordDef lccd, int absMsPosition, float fontSize)
+            : base(voice, lccd.MsDuration, absMsPosition, 600, fontSize)
         {
-            SetNoteheadPitches(lccd.NotatedMidiPitches);
+            SetNoteheadPitchesAndVelocities(lccd.NotatedMidiPitches, lccd.NotatedMidiVelocities);
 
             _durationClass = DurationClass.cautionary;
             _msDuration = 0;
@@ -22,8 +22,8 @@ namespace Moritz.Symbols
         {
             if(Visible && staffIsVisible)
             {
-                w.SvgStartGroup(null, "cautionaryChord" + SvgScore.UniqueID_Number);
-                w.SvgStartGroup(null, null);
+                w.SvgStartGroup("cautionaryChord");
+                w.SvgStartGroup(null);
 
                 this.ChordMetrics.WriteSvg(w);
 

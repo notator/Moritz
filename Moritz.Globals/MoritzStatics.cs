@@ -34,27 +34,6 @@ namespace Moritz.Globals
         }
 
         /// <summary>
-        /// These values are used to populate ComboBoxes (see NewScoreDialog).
-        /// </summary>
-        public static List<string> Algorithms = new List<string>()
-        {
-            "Study 2c",
-            "Song Six",
-            "Study 3 sketch"
-        };
-
-        /// <summary>
-        /// These values are used to populate ComboBoxes (see AssistantComposerForm).
-        /// The value "none" is used to indicate that a score has no folder, no graphics and no (.mkss) settings file.
-        /// "none" is used by the temporary PaletteDemoScore which is created by audio demo buttons in palettes.
-        /// </summary>
-        public static List<string> ChordTypes = new List<string>()
-        {
-            "standard",
-            "2b2"
-        };
-
-        /// <summary>
         /// The clefs are:
         ///     four treble clefs (0, 1, 2, 3 octaves higher),
         ///     four bass clefs (0, 1, 2, 3 octaves lower)
@@ -538,7 +517,7 @@ namespace Moritz.Globals
         }
         /// <summary>
         /// Converts a string containing strings separated by whitespace and the character in arg2
-        /// to a list of trimmed strings.
+        /// to a list of trimmed strings. A string containing a single space character will not be trimmed.
         /// </summary>
         public static List<string> StringToStringList(string s, char separator)
         {
@@ -548,7 +527,14 @@ namespace Moritz.Globals
             List<string> returnList = new List<string>();
             foreach(string a in strings)
             {
-                returnList.Add(a.Trim());
+				if(a == " ")
+				{
+					returnList.Add(" ");
+				}
+				else
+				{
+					returnList.Add(a.Trim());
+				}
             }
             return returnList;
         }
@@ -569,6 +555,9 @@ namespace Moritz.Globals
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Returns the value argument as a byte, coerced to the range [0..127] 
+        /// </summary>
         public static byte MidiValue(int value)
         {
             int rval;
@@ -633,6 +622,34 @@ namespace Moritz.Globals
             { "Letter", new PaperSize(216F, 279F)},
             { "Legal", new PaperSize(216F, 356F)},
             { "Tabloid", new PaperSize(279F, 432F)},
+        };
+
+        /// <summary>
+        /// The key is one of the following strings: "fff", "ff", "f", "mf", "mp", "p", "pp", "ppp", "pppp".
+        /// The value is used to determine Moritz' transcription of velocity -> dynamic symbol.
+        /// </summary>
+        public static Dictionary<string, byte> MaxMidiVelocity = new Dictionary<string, byte>()
+        {
+            //// Linear correspondence ppp->fff (before March 2016)
+            //{ "fff", 127},
+            //{ "ff", 111},
+            //{ "f", 95},
+            //{ "mf", 79},
+            //{ "mp", 63},
+            //{ "p", 47},
+            //{ "pp", 31},
+            //{ "ppp", 15},
+
+            // March 2016:  equal steps between 15 (max pppp) and 127 (max fff)
+            { "fff", 127},
+            { "ff", 113},
+            { "f", 99},
+            { "mf", 85},
+            { "mp", 71},
+            { "p", 57},
+            { "pp", 43},
+            { "ppp", 29},
+            { "pppp", 15}
         };
 
         public readonly static Preferences Preferences;

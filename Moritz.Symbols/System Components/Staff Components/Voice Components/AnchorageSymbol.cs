@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
-using Moritz.Xml;
+using Moritz.Globals;
 
 namespace Moritz.Symbols
 {
@@ -46,56 +47,63 @@ namespace Moritz.Symbols
         /// dynamic has been attached to this anchorageSymbol..
         /// </summary>
         public bool HasExplicitDynamic = false;
-        /// <summary>
-        /// Both rests, chords and the final barline have Velocity and ControlSymbols, so that hairpins etc. can be attached to them!
-        /// </summary>
-        public byte Velocity = 0;
 
         public void AddDynamic(byte midiVelocity, byte currentVelocity)
         {
-            if(midiVelocity != currentVelocity)
-            {
-                string dynamicString = "";
-                #region get dynamicString and _dynamic
-                // note that cLicht has pppp and ffff, but these dynamics are not used here (in Study2)
-                // These are the dynamicStrings for cLicht
-                if(midiVelocity > 112F)
-                {
-                    dynamicString = "Ï";
-                }
-                else if(midiVelocity > 96)
-                {
-                    dynamicString = "ƒ";
-                }
-                else if(midiVelocity > 80)
-                {
-                    dynamicString = "f";
-                }
-                else if(midiVelocity > 64)
-                {
-                    dynamicString = "F";
-                }
-                else if(midiVelocity > 48)
-                {
-                    dynamicString = "P";
-                }
-                else if(midiVelocity > 32)
-                {
-                    dynamicString = "p";
-                }
-                else if(midiVelocity > 16)
-                {
-                    dynamicString = "π";
-                }
-                else
-                {
-                    dynamicString = "∏";
-                }
-                #endregion get dynamicString and _dynamic
+            string newDynamicString = GetDynamicString(midiVelocity);
+            string currentDynamicString = GetDynamicString(currentVelocity);
 
-				DynamicText dynamicText = new DynamicText(this, dynamicString, FontHeight);
+            if(String.Compare(newDynamicString, currentDynamicString) != 0)
+            {
+                DynamicText dynamicText = new DynamicText(this, newDynamicString, FontHeight);
                 this._drawObjects.Add(dynamicText);
             }
-        }  
+        }
+
+        private string GetDynamicString(byte midiVelocity)
+        {
+            string dynamicString = "";
+            #region get dynamicString and _dynamic
+            // note that cLicht has pppp and ffff, but these dynamics are not used here (in Study2)
+            // These are the dynamicStrings for cLicht
+            if(midiVelocity > M.MaxMidiVelocity["ff"])
+            {
+                dynamicString = "Ï";    // fff
+            }
+            else if(midiVelocity > M.MaxMidiVelocity["f"])
+            {
+                dynamicString = "ƒ";    // ff
+            }
+            else if(midiVelocity > M.MaxMidiVelocity["mf"])
+            {
+                dynamicString = "f";    // f
+            }
+            else if(midiVelocity > M.MaxMidiVelocity["mp"])
+            {
+                dynamicString = "F";    // mf
+            }
+            else if(midiVelocity > M.MaxMidiVelocity["p"])
+            {
+                dynamicString = "P";    // mp
+            }
+            else if(midiVelocity > M.MaxMidiVelocity["pp"])
+            {
+                dynamicString = "p";    // p
+            }
+            else if(midiVelocity > M.MaxMidiVelocity["ppp"])
+            {
+                dynamicString = "π";    // pp
+            }
+            else if(midiVelocity > M.MaxMidiVelocity["pppp"])
+            {
+                dynamicString = "∏";    // ppp
+            }
+            else // > 0 
+            {
+                dynamicString = "Ø";    // pppp
+            }
+            #endregion get dynamicString and _dynamic
+            return dynamicString;
+        }
     }
 }

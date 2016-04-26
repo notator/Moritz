@@ -285,11 +285,11 @@ namespace Moritz.Algorithm.SongSix
             Debug.Assert(_momentDefsListPerVerse.Count == 5);
 
             List<int> verseMsPositions = new List<int>();
-            verseMsPositions.Add(wind3[8].MsPosition);
-            verseMsPositions.Add(wind3[20].MsPosition);
-            verseMsPositions.Add(wind3[33].MsPosition);
-            verseMsPositions.Add(wind3[49].MsPosition);
-            verseMsPositions.Add(wind3[70].MsPosition);
+            verseMsPositions.Add(wind3[8].MsPositionReTrk);
+            verseMsPositions.Add(wind3[20].MsPositionReTrk);
+            verseMsPositions.Add(wind3[33].MsPositionReTrk);
+            verseMsPositions.Add(wind3[49].MsPositionReTrk);
+            verseMsPositions.Add(wind3[70].MsPositionReTrk);
 
             int currentVerseMsPosition = 0;
             int currentEndMsPosition = 0;
@@ -321,7 +321,7 @@ namespace Moritz.Algorithm.SongSix
 
                     MidiChordDef mcd = momentDef.MidiChordDefs[0];
                     IUniqueDef lmcd = mcd.Clone();
-                    lmcd.MsPosition = momentDef.MsPosition;
+                    lmcd.MsPositionReTrk = momentDef.MsPosition;
                     lmcd.MsDuration = momentDef.MsWidth;
                     Debug.Assert(lmcd.MsDuration > 0);
 
@@ -331,7 +331,7 @@ namespace Moritz.Algorithm.SongSix
                     {
                         _uniqueDefs.Add(lmrd);
                     }
-                    currentEndMsPosition = _uniqueDefs[_uniqueDefs.Count - 1].MsPosition +
+                    currentEndMsPosition = _uniqueDefs[_uniqueDefs.Count - 1].MsPositionReTrk +
                         _uniqueDefs[_uniqueDefs.Count - 1].MsDuration;
                 }
             }

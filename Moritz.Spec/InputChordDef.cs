@@ -12,8 +12,6 @@ namespace Moritz.Spec
 {
     ///<summary>
     /// A InputChordDef can be saved and retrieved from voices in an SVG file.
-    /// Each inputChord in an SVG file will be given an ID of the form "inputChord"+uniqueNumber, but
-    /// Neither the AssistantPerformer nor Moritz actually uses these ids.
     ///</summary>
     public class InputChordDef : DurationDef, IUniqueSplittableChordDef
     {
@@ -21,7 +19,7 @@ namespace Moritz.Spec
         /// Constructs a multi-note chord, each inputNoteDef has a notated pitch and a SeqDef.
 		/// The inputNoteDefs must be in order of their notated pitches (bottom to top).
         /// </summary>
-        public InputChordDef(int msPosition, int msDuration, List<InputNoteDef> inputNoteDefs, TrkOptions trkOptions)
+        public InputChordDef(int msPositionReFirstIUD, int msDuration, List<InputNoteDef> inputNoteDefs, TrkOptions trkOptions)
             : base(msDuration)
         {
 			#region check notated pitches and trkRef positions
@@ -35,12 +33,12 @@ namespace Moritz.Spec
 				{
 					foreach(TrkRef trk in ind.NoteOn.SeqRef)
 					{ 
-						Debug.Assert(msPosition <= trk.MsPosition);
+						Debug.Assert(msPositionReFirstIUD <= trk.MsPosition);
 					}
 				}
 				if(ind.NoteOff != null && ind.NoteOff.SeqRef != null)
 				{
-					int minSeqPos = msPosition + msDuration;
+					int minSeqPos = msPositionReFirstIUD + msDuration;
 					foreach(TrkRef trk in ind.NoteOff.SeqRef)
 					{
 						Debug.Assert(minSeqPos <= trk.MsPosition);
@@ -50,7 +48,7 @@ namespace Moritz.Spec
 			}
 			#endregion
 
-            _msPosition = msPosition;
+            _msPositionReFirstIUD = msPositionReFirstIUD;
 			_msDuration = msDuration;
 			_inputNoteDefs = inputNoteDefs;
 			_lyric = null;
@@ -74,7 +72,7 @@ namespace Moritz.Spec
 
         public override string ToString()
         {
-            return ("MsPosition=" + MsPosition.ToString() + " MsDuration=" + MsDuration.ToString() + " InputChordDef");
+            return ("MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " MsDuration=" + MsDuration.ToString() + " InputChordDef");
         }
 
         /// <summary>
@@ -117,8 +115,8 @@ namespace Moritz.Spec
             throw new NotImplementedException("InputChordDef.DeepClone()");
         }
 
-        public int MsPosition { get { return _msPosition; } set { _msPosition = value; } }
-        private int _msPosition = 0;
+        public int MsPositionReFirstUD { get { return _msPositionReFirstIUD; } set { _msPositionReFirstIUD = value; } }
+        private int _msPositionReFirstIUD = 0;
 
 		public string Lyric { get { return _lyric; } set { _lyric = value; } }
 		private string _lyric = null;
@@ -132,32 +130,45 @@ namespace Moritz.Spec
 		public List<InputNoteDef> InputNoteDefs { get {return _inputNoteDefs; }}
 		private List<InputNoteDef> _inputNoteDefs = new List<InputNoteDef>();
 
-		public List<byte> NotatedMidiPitches
-		{
-			get
-			{
-				List<byte> rList = new List<byte>();
-				foreach(InputNoteDef ind in _inputNoteDefs)
-				{
-					rList.Add(ind.NotatedMidiPitch);
-				}
-				return rList;
-			}
-			// The new pitches must be in ascending order
-			set
-			{
-				List<byte> newPitches = value;
-				Debug.Assert(newPitches.Count == _inputNoteDefs.Count);
-				int pitchBelow = -1;
-				for(int i = 0; i < newPitches.Count; ++i)
-				{
-					byte newPitch = newPitches[i];
-					Debug.Assert(newPitch > pitchBelow);
-					pitchBelow = newPitch;
-					_inputNoteDefs[i].NotatedMidiPitch = newPitch;
-				}
-			}
-		}
+        public List<byte> NotatedMidiPitches
+        {
+            get
+            {
+                List<byte> rList = new List<byte>();
+                foreach(InputNoteDef ind in _inputNoteDefs)
+                {
+                    rList.Add(ind.NotatedMidiPitch);
+                }
+                return rList;
+            }
+            // The new pitches must be in ascending order
+            set
+            {
+                List<byte> newPitches = value;
+                Debug.Assert(newPitches.Count == _inputNoteDefs.Count);
+                int pitchBelow = -1;
+                for(int i = 0; i < newPitches.Count; ++i)
+                {
+                    byte newPitch = newPitches[i];
+                    Debug.Assert(newPitch > pitchBelow);
+                    pitchBelow = newPitch;
+                    _inputNoteDefs[i].NotatedMidiPitch = newPitch;
+                }
+            }
+        }
+
+        public List<byte> NotatedMidiVelocities
+        {
+            get
+            {
+                Debug.Assert(false, "Input Chords do not have notated Midi velocities.");
+                return null;
+            }
+            set
+            {
+                Debug.Assert(false, "Input Chords do not have notated Midi velocities.");
+            }
+        }
 
         public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
         private int? _msDurationToNextBarline = null;

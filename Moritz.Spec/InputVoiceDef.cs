@@ -10,7 +10,8 @@ using Moritz.Globals;
 namespace Moritz.Spec
 {
     /// <summary>
-    /// A temporal sequence of IUniqueDef objects.
+    /// During construction, InputVoiceDefs only contain InputChordDef and RestDef objects.
+    /// In Blocks, they may also contain CautionaryChordDef objects.
     /// <para></para>
     /// <para>This class is IEnumerable, so that foreach loops can be used.</para>
     /// <para>For example:</para>
@@ -24,37 +25,29 @@ namespace Moritz.Spec
     public class InputVoiceDef : VoiceDef
     {
         #region constructors
-        /// <summary>
-        /// An empty InputVoiceDef
-        /// </summary>
-        /// <param name="msDuration"></param>
-        public InputVoiceDef()
-            : base()
+        public InputVoiceDef(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
+            : base(midiChannel, msPositionReContainer, iuds)
         {
+            foreach(IUniqueDef iud in UniqueDefs)
+            {
+                // In blocks, inputChordDefs can also contain CautionaryChordDefs
+                Debug.Assert(iud is InputChordDef || iud is RestDef);
+            }
         }
 
         /// <summary>
-        /// A VoiceDef beginning at MsPosition = 0, and containing a single RestDef having msDuration
+        /// An InputVoiceDef with msPositionReContainer=0 and an empty UniqueDefs list.
+        /// This constructor is used by Block.PopBar(...).
         /// </summary>
-        /// <param name="msDuration"></param>
-        public InputVoiceDef(int msDuration)
-            : base(msDuration)
-        {
-        }
-
-        /// <summary>
-        /// <para>If the argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
-        /// <para>The new VoiceDef's UniqueDefs list is simply set to the argument (which is not cloned).</para>
-        /// </summary>
-        public InputVoiceDef(List<IUniqueDef> iuds) 
-            : base(iuds)
+        public InputVoiceDef(int midiChannel)
+            : base(midiChannel, 0, new List<IUniqueDef>())
         {
         }
 
         /// <summary>
         /// Returns a deep clone of this InputVoiceDef.
         /// </summary>
-        public InputVoiceDef DeepClone()
+        public InputVoiceDef Clone()
         {
             List<IUniqueDef> clonedLmdds = new List<IUniqueDef>();
             foreach(IUniqueDef iu in this._uniqueDefs)
@@ -63,63 +56,63 @@ namespace Moritz.Spec
                 clonedLmdds.Add(clone);
             }
 
-            // Clefchange symbols must point at the following object in their own VoiceDef
-            for(int i = 0; i < clonedLmdds.Count; ++i)
-            {
-                ClefChangeDef clone = clonedLmdds[i] as ClefChangeDef;
-                if(clone != null)
-                {
-                    Debug.Assert(i < (clonedLmdds.Count - 1));
-                    ClefChangeDef replacement = new ClefChangeDef(clone.ClefType, clonedLmdds[i + 1]);
-                    clonedLmdds.RemoveAt(i);
-                    clonedLmdds.Insert(i, replacement);
-                }
-            }
-
-            return new InputVoiceDef(clonedLmdds);
+            return new InputVoiceDef(this.MidiChannel, this.MsPositionReContainer, clonedLmdds);
         }
         #endregion constructors
 
-        #region Enumerators
-        public IEnumerable<InputChordDef> InputChordDefs
+        internal override void AssertConsistentInBlock()
         {
-            get
+            foreach(IUniqueDef iud in UniqueDefs)
             {
-                foreach(IUniqueDef iud in _uniqueDefs)
-                {
-                    InputChordDef inputChordDef = iud as InputChordDef;
-                    if(inputChordDef != null)
-                        yield return inputChordDef;
-                }
+                // In blocks, inputChordDefs can also contain CautionaryChordDefs
+                Debug.Assert(iud is InputChordDef || iud is RestDef || iud is CautionaryChordDef);
             }
         }
-        #endregion
 
         #region Count changers
         /// <summary>
-        /// Appends the new iUniqueDef to the end of the list.
+        /// Appends the new iUniqueDef to the end of the list. Sets the MsPosition of the iUniqueDef re the first iUniqueDef in the list.
+        /// Automatically sets the iUniqueDef's msPosition.
+        /// Used by Block.PopBar(...), so accepts a CautionaryChordDef argument.
         /// </summary>
         /// <param name="iUniqueDef"></param>
-        public override void Add(IUniqueDef iUniqueDef)
+        public override void Add(IUniqueDef iud)
         {
-            Debug.Assert(!(iUniqueDef is MidiChordDef));
-            _Add(iUniqueDef);
+            Debug.Assert(iud is InputChordDef || iud is RestDef || iud is CautionaryChordDef);
+            _Add(iud);
         }
+        /// <summary>
+        /// Adds the argument to the end of this VoiceDef.
+        /// Sets the MsPositions of the appended UniqueDefs re the first iUniqueDef in the list.
+        /// </summary>
+        public override void AddRange(VoiceDef inputVoiceDef)
+        {
+            Debug.Assert(inputVoiceDef is InputVoiceDef);
+            _AddRange(inputVoiceDef);
+        }
+
         /// <summary>
         /// Adds the argument to the end of this VoiceDef.
         /// Sets the MsPositions of the appended UniqueDefs.
         /// </summary>
-        public void AddRange(InputVoiceDef voiceDef)
+        public void Concat(InputVoiceDef inputVoiceDef)
         {
-            _AddRange((VoiceDef)voiceDef);
+            int thisEndMsPositionReSeq = this.EndMsPositionReFirstIUD + this.MsPositionReContainer;
+            if(inputVoiceDef.MsPositionReContainer > thisEndMsPositionReSeq)
+            {
+                RestDef rest = new RestDef(this.EndMsPositionReFirstIUD, inputVoiceDef.MsPositionReContainer - thisEndMsPositionReSeq);
+                this.Add(rest);
+            }
+            _AddRange(inputVoiceDef);
         }
+
         /// <summary>
         /// Inserts the iUniqueDef in the list at the given index, and then
         /// resets the positions of all the uniqueDefs in the list.
         /// </summary>
         public override void Insert(int index, IUniqueDef iUniqueDef)
         {
-            Debug.Assert(!(iUniqueDef is MidiChordDef));
+            Debug.Assert(iUniqueDef is InputChordDef || iUniqueDef is RestDef || iUniqueDef is CautionaryChordDef);
             _Insert(index, iUniqueDef);
         }
         /// <summary>
@@ -137,7 +130,7 @@ namespace Moritz.Spec
         public void InsertInRest(InputChordDef inputChordDef)
         {
             List<IUniqueDef> iuds = new List<IUniqueDef>() { inputChordDef };
-            InputVoiceDef iVoiceDef = new InputVoiceDef(iuds);
+            InputVoiceDef iVoiceDef = new InputVoiceDef(this.MidiChannel, 0, iuds);
             InsertInRest(iVoiceDef);
         }
         /// <summary>

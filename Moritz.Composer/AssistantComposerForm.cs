@@ -855,6 +855,11 @@ namespace Moritz.Composer
 
         #region notation groupBox
         #region comboBoxes
+
+        private void NotatorComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SetGroupBoxIsUnconfirmed(NotationGroupBox, ConfirmNotationButton, RevertNotationButton);
+        }
         private void StafflineStemStrokeWidthComboBox_Leave(object sender, EventArgs e)
         {
             SetComboBoxSelectedIndexFromText(StafflineStemStrokeWidthComboBox);
@@ -1117,7 +1122,14 @@ namespace Moritz.Composer
             List<string> trimmedNames = new List<string>();
             foreach(string name in names)
             {
-                trimmedNames.Add(name.Trim());
+				if(name == " ")
+				{
+					trimmedNames.Add(" ");
+				}
+				else
+				{
+					trimmedNames.Add(name.Trim());
+				}
             }
             if(trimmedNames.Count == _numberOfStaves && _numberOfStaves > 0)
             {
@@ -1685,11 +1697,18 @@ namespace Moritz.Composer
         {
             Debug.Assert(r.Name == "notation");
             int count = r.AttributeCount;
+            OutputChordSymbolTypeComboBox.SelectedIndex = 0; // default is standard outputChord symbols (all noteheads black)
             for(int i = 0; i < count; i++)
             {
                 r.MoveToAttribute(i);
                 switch(r.Name)
                 {
+                    case "outputChordSymbolType":
+                        if(string.Compare(r.Value, "coloured velocities") == 0)
+                        {
+                            OutputChordSymbolTypeComboBox.SelectedIndex = 1;
+                        }
+                        break;
                     case "minimumCrotchetDuration":
                         MinimumCrotchetDurationTextBox.Text = r.Value;
                         break;
@@ -1872,7 +1891,7 @@ namespace Moritz.Composer
                 WriteKrystals(w);
                 WritePalettes(w);
                 w.WriteEndElement(); // closes the moritzKrystalScore element
-                w.Close(); // close unnecessary because of the using statement?
+				// the XmlWriter is closed automatically at the end of this using clause.
             }
             #endregion do the save
         }
@@ -1880,6 +1899,10 @@ namespace Moritz.Composer
         {
             w.WriteStartElement("notation");
 
+            if(OutputChordSymbolTypeComboBox.SelectedIndex > 0)
+            {
+                w.WriteAttributeString("outputChordSymbolType", OutputChordSymbolTypeComboBox.Text);
+            }
             w.WriteAttributeString("minimumCrotchetDuration", MinimumCrotchetDurationTextBox.Text);
             if(BeamsCrossBarlinesCheckBox.Checked)
                 w.WriteAttributeString("beamsCrossBarlines", "true");
@@ -2039,7 +2062,16 @@ namespace Moritz.Composer
         }
         private void SetNotation(PageFormat pageFormat)
         {
-            pageFormat.ChordSymbolType = "standard";
+            switch(OutputChordSymbolTypeComboBox.SelectedIndex)
+            {
+                case 0:
+                    pageFormat.ChordSymbolType = "standard";
+                    break;
+                case 1:
+                    pageFormat.ChordSymbolType = "coloredVelocities";
+                    break;
+            }
+            
             pageFormat.MinimumCrotchetDuration = int.Parse(this.MinimumCrotchetDurationTextBox.Text);
             pageFormat.BeamsCrossBarlines = this.BeamsCrossBarlinesCheckBox.Checked;
 

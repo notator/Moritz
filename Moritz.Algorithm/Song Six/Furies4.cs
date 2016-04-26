@@ -10,12 +10,18 @@ namespace Moritz.Algorithm.SongSix
 {
     internal class Furies4 : Trk
     {
-        internal Furies4(int midiChannel, int msDuration)
-            : base(midiChannel, msDuration)
+		/// <summary>
+		/// A VoiceDef beginning at MsPosition = 0, and containing a single RestDef having msDuration
+		/// </summary>
+		/// <param name="msDuration"></param>
+		internal Furies4(int midiChannel, int msDuration)
+			: base(midiChannel)
         {
-        }
+			RestDef lmRestDef = new RestDef(0, msDuration);
+			_uniqueDefs.Add(lmRestDef);
+		}
 
-        internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, Trk wind1, List<Palette> palettes)
+		internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, Trk wind1, List<Palette> palettes)
         {
             GetSnores(firstRestMsDuration, clytemnestra, wind1, palettes[1]);
             AddGrowlsToInterlude2AndVerse3(clytemnestra, palettes[3]);
@@ -29,10 +35,10 @@ namespace Moritz.Algorithm.SongSix
             //double[] velocityfactors = { 1,1,1,1 };
             int[] msPositions =
             { 
-                this[24].MsPosition + 200, 
-                this[26].MsPosition + 200, 
-                this[30].MsPosition + 200, 
-                this[32].MsPosition + 200, 
+                this[24].MsPositionReTrk + 200, 
+                this[26].MsPositionReTrk + 200, 
+                this[30].MsPositionReTrk + 200, 
+                this[32].MsPositionReTrk + 200, 
             };
             int[] msDurations =
             {
@@ -46,7 +52,7 @@ namespace Moritz.Algorithm.SongSix
             {
                 MidiChordDef growl = growlsPalette.UniqueDurationDef(growlIndices[i]) as MidiChordDef;
                 Debug.Assert(growl != null);
-                growl.MsPosition = msPositions[i];
+                growl.MsPositionReTrk = msPositions[i];
                 growl.MsDuration = msDurations[i];
                 //growl.AdjustVelocities(velocityfactors[i]);
                 //growl.Transpose(transpositions[i]);
@@ -55,9 +61,9 @@ namespace Moritz.Algorithm.SongSix
 
             AgglomerateRestOrChordAt(40);
 
-            AlignObjectAtIndex(34, 35, 36, clytemnestra[140].MsPosition);
-            AlignObjectAtIndex(35, 36, 37, clytemnestra[141].MsPosition);
-            AlignObjectAtIndex(38, 39, 40, clytemnestra[162].MsPosition);
+            AlignObjectAtIndex(34, 35, 36, clytemnestra[140].MsPositionReTrk);
+            AlignObjectAtIndex(35, 36, 37, clytemnestra[141].MsPositionReTrk);
+            AlignObjectAtIndex(38, 39, 40, clytemnestra[162].MsPositionReTrk);
         }
 
         private void GetSnores(int firstRestMsDuration, Clytemnestra clytemnestra, Trk wind1, Palette snoresPalette)
@@ -74,7 +80,7 @@ namespace Moritz.Algorithm.SongSix
             for(int i = 0; i < 7; ++i)
             {
                 IUniqueDef snore = snoresPalette.UniqueDurationDef(i);
-                snore.MsPosition = msPosition;
+                snore.MsPositionReTrk = msPosition;
                 msPosition += snore.MsDuration;
                 MidiChordDef iumdd = snore as MidiChordDef;
                 if(iumdd != null)
@@ -98,7 +104,7 @@ namespace Moritz.Algorithm.SongSix
             for(int i = 0; i < 10; ++i)
             {
                 IUniqueDef snore = snoresPalette.UniqueDurationDef(i / 2);
-                snore.MsPosition = msPosition;
+                snore.MsPositionReTrk = msPosition;
                 factor = factors[i];
                 msDuration = snore.MsDuration * factor;
                 snore.MsDuration = (int)msDuration;
@@ -118,20 +124,20 @@ namespace Moritz.Algorithm.SongSix
                 snores.Add(rest);
             }
 
-            snores[snores.Count - 1].MsDuration = clytemnestra.EndMsPosition - snores[snores.Count - 1].MsPosition;
+            snores[snores.Count - 1].MsDuration = clytemnestra.EndMsPosition - snores[snores.Count - 1].MsPositionReTrk;
 
             this._uniqueDefs = snores;
 
             AdjustVelocitiesHairpin(13, Count, 0.25);
 
             #region alignments before Interlude3
-            AlignObjectAtIndex(7, 8, 9, clytemnestra[3].MsPosition);
-            AlignObjectAtIndex(8, 9, 10, clytemnestra[7].MsPosition);
-            AlignObjectAtIndex(9, 10, 11, clytemnestra[16].MsPosition);
-            AlignObjectAtIndex(10, 11, 12, clytemnestra[24].MsPosition);
-            AlignObjectAtIndex(11, 12, 13, clytemnestra[39].MsPosition);
-            AlignObjectAtIndex(12, 13, 14, clytemnestra[42].MsPosition);
-            AlignObjectAtIndex(14, 34, Count, wind1[38].MsPosition); // rest at start of Interlude3
+            AlignObjectAtIndex(7, 8, 9, clytemnestra[3].MsPositionReTrk);
+            AlignObjectAtIndex(8, 9, 10, clytemnestra[7].MsPositionReTrk);
+            AlignObjectAtIndex(9, 10, 11, clytemnestra[16].MsPositionReTrk);
+            AlignObjectAtIndex(10, 11, 12, clytemnestra[24].MsPositionReTrk);
+            AlignObjectAtIndex(11, 12, 13, clytemnestra[39].MsPositionReTrk);
+            AlignObjectAtIndex(12, 13, 14, clytemnestra[42].MsPositionReTrk);
+            AlignObjectAtIndex(14, 34, Count, wind1[38].MsPositionReTrk); // rest at start of Interlude3
             #endregion
 
             RemoveScorePitchWheelCommands(0, 13); // pitchwheeldeviation is 20 for R2M
@@ -148,7 +154,7 @@ namespace Moritz.Algorithm.SongSix
                 furies4Finale.RemoveAt(furies4Finale.Count - 1);
             }
 
-            if(furies4Finale[furies4Finale.Count - 1].MsPosition + furies4Finale[furies4Finale.Count - 1].MsDuration > msPositions["endOfPiece"])
+            if(furies4Finale[furies4Finale.Count - 1].MsPositionReTrk + furies4Finale[furies4Finale.Count - 1].MsDuration > msPositions["endOfPiece"])
             {
                 furies4Finale.RemoveAt(furies4Finale.Count - 1);
             }
@@ -176,11 +182,11 @@ namespace Moritz.Algorithm.SongSix
             Palette f4FinalePalette2 = palettes[13];
             Palette f4PostludePalette = palettes[17];
 
-			Trk interlude4Start = f4FinalePalette1.NewTrkDef(this.MidiChannel, krystal);
+			Trk interlude4Start = f4FinalePalette1.NewTrk(this.MidiChannel, krystal);
             Transform(interlude4Start, msPositions);
-			Trk interlude4EndVerse5 = f4FinalePalette2.NewTrkDef(this.MidiChannel, krystal);
+			Trk interlude4EndVerse5 = f4FinalePalette2.NewTrk(this.MidiChannel, krystal);
             Transform(interlude4EndVerse5, msPositions);
-			Trk postlude = f4PostludePalette.NewTrkDef(this.MidiChannel, krystal);
+			Trk postlude = f4PostludePalette.NewTrk(this.MidiChannel, krystal);
             Transform(postlude, msPositions);
 
             Trk finale = GetFinaleSections(interlude4Start, interlude4EndVerse5, postlude, 7, 17);
@@ -218,7 +224,7 @@ namespace Moritz.Algorithm.SongSix
         {
             section.RemoveRange(40, section.Count - 40);
 
-            section.MsPosition = msPositions["interlude4"];
+            section.MsPositionReSeq = msPositions["interlude4"];
 
             //double factor = 10;
 
@@ -232,20 +238,20 @@ namespace Moritz.Algorithm.SongSix
             if(section[section.Count - 1] is RestDef)
             {
                 //section[section.Count - 1].MsDuration = msPositions["interlude4End"] - section[section.Count - 1].MsPosition;
-                section[section.Count - 1].MsDuration = msPositions["endOfPiece"] - section[section.Count - 1].MsPosition;
+                section[section.Count - 1].MsDuration = msPositions["endOfPiece"] - section[section.Count - 1].MsPositionReTrk;
             }
         }
 
         internal void AdjustAlignments(Furies1 furies1, Clytemnestra clytemnestra, Trk wind3)
         {
-            AlignObjectAtIndex(42, Count-1, Count, furies1[280].MsPosition);
+            AlignObjectAtIndex(42, Count-1, Count, furies1[280].MsPositionReTrk);
 
-            AlignObjectAtIndex(42, 43, 45, furies1[126].MsPosition);
-            AlignObjectAtIndex(43, 45, 49, furies1[138].MsPosition);
-            AlignObjectAtIndex(45, 49, 59, furies1[165].MsPosition);
-            AlignObjectAtIndex(49, 59, 69, furies1[212].MsPosition);
+            AlignObjectAtIndex(42, 43, 45, furies1[126].MsPositionReTrk);
+            AlignObjectAtIndex(43, 45, 49, furies1[138].MsPositionReTrk);
+            AlignObjectAtIndex(45, 49, 59, furies1[165].MsPositionReTrk);
+            AlignObjectAtIndex(49, 59, 69, furies1[212].MsPositionReTrk);
 
-            AlignObjectAtIndex(59, 69, Count-1, furies1[248].MsPosition);
+            AlignObjectAtIndex(59, 69, Count-1, furies1[248].MsPositionReTrk);
         }
 
         internal void AdjustVelocities(Dictionary<string, int> msPositions)
@@ -292,7 +298,7 @@ namespace Moritz.Algorithm.SongSix
                 {
                     transposition = transpositionArray1[mod7Values[valueIndex++] - 1];
                     umcd.Transpose(transposition);
-                    msPosTranspositionDict.Add(umcd.MsPosition, transposition);
+                    msPosTranspositionDict.Add(umcd.MsPositionReTrk, transposition);
                 }
             }
             valueIndex = 0;
@@ -303,7 +309,7 @@ namespace Moritz.Algorithm.SongSix
                 {
                     transposition = transpositionArray2[mod12Values[valueIndex++] - 1];
                     umcd.Transpose(transposition);
-                    msPosTranspositionDict.Add(umcd.MsPosition, transposition);
+                    msPosTranspositionDict.Add(umcd.MsPositionReTrk, transposition);
                 }
             }
             valueIndex = 0;
@@ -314,7 +320,7 @@ namespace Moritz.Algorithm.SongSix
                 {
                     transposition = transpositionArray3[mod12Values[valueIndex++] - 1];
                     umcd.Transpose(transposition);
-                    msPosTranspositionDict.Add(umcd.MsPosition, transposition);
+                    msPosTranspositionDict.Add(umcd.MsPositionReTrk, transposition);
                 }
             }
 

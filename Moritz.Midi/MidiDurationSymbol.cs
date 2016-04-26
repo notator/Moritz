@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 using Moritz.Globals;
-using Multimedia.Midi;
+using Sanford.Multimedia.Midi;
 
 namespace Moritz.Midi
 {

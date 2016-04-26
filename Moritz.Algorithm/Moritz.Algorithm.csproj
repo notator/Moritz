@@ -40,21 +40,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompositionAlgorithm.cs" />
-    <Compile Include="PaletteDemoScore\PaletteDemoAlgorithm.cs" />
-    <Compile Include="PianolaMusic\PianolaMusicAlgorithm.cs" />
+    <Compile Include="Pianola Music\PianolaMusicAlgorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Song Six\Clytemnestra.cs" />
-    <Compile Include="Song Six\Furies1.cs" />
-    <Compile Include="Song Six\Furies2.cs" />
-    <Compile Include="Song Six\Furies3.cs" />
-    <Compile Include="Song Six\Furies4.cs" />
-    <Compile Include="Song Six\FuriesInterlude3ToEnd.cs" />
-    <Compile Include="Song Six\SongSixAlgorithm.cs" />
-    <Compile Include="Song Six\Winds.cs" />
-    <Compile Include="Tombeau1\Tombeau1Algorithm.cs" />
-    <Compile Include="Study2c3_1\Study2c3_1Algorithm.cs" />
-    <Compile Include="Study3 sketch 1\Study3Sketch1Algorithm.cs" />
-    <Compile Include="Study3 sketch 2\Study3Sketch2Algorithm.cs" />
+    <Compile Include="Study 1\Study1Algorithm.cs" />
+    <Compile Include="Study 2\Study2Algorithm.cs" />
+    <Compile Include="Study 3.1\Study3Sketch1Algorithm.cs" />
+    <Compile Include="Study 3.2\Study3Sketch2Algorithm.cs" />
+    <Compile Include="Tombeau 1\Tombeau1Algorithm.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Krystals4ObjectLibrary\Krystals4ObjectLibrary.csproj">
@@ -82,6 +74,7 @@
       <Name>Moritz.Symbols</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

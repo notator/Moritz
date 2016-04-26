@@ -26,11 +26,11 @@ namespace Moritz.Symbols
             {            
                 w.WriteAttributeString("score", "staffName", null, this.Staffname);
 
-                w.SvgStartGroup("stafflines", "sys" + systemNumber.ToString() + "staff" + staffNumber.ToString() + "stafflines");
+                w.SvgStartGroup("stafflines");
                 float stafflineY = this.Metrics.StafflinesTop;
                 for(int staffLineIndex = 0; staffLineIndex < NumberOfStafflines; staffLineIndex++)
                 {
-					w.SvgLine("staffline" + SvgScore.UniqueID_Number, this.Metrics.StafflinesLeft, stafflineY,
+					w.SvgLine(null, this.Metrics.StafflinesLeft, stafflineY,
                                     this.Metrics.StafflinesRight, stafflineY,
                                     "black", StafflineStemStrokeWidth, null);
 
@@ -219,9 +219,9 @@ namespace Moritz.Symbols
                         RestSymbol lowerRestSymbol = lowerObject as RestSymbol;
                         if(lowerRestSymbol != null)
                         {
-                            if(topRest.MsPosition < lowerRestSymbol.MsPosition)
+                            if(topRest.AbsMsPosition < lowerRestSymbol.AbsMsPosition)
                                 break;
-                            if(topRest.MsPosition == lowerRestSymbol.MsPosition)
+                            if(topRest.AbsMsPosition == lowerRestSymbol.AbsMsPosition)
                             {
                                 RestMetrics lowerRestMetrics = (RestMetrics)lowerRestSymbol.Metrics;
                                 float verticalOverlap = lowerRestMetrics.OverlapHeight(upperRestMetrics, 0F);
@@ -285,10 +285,10 @@ namespace Moritz.Symbols
                         OutputChordSymbol chordSymbol = chordObject as OutputChordSymbol;
                         if(chordSymbol != null)
                         {
-                            if(chordSymbol.MsPosition > restSymbol.MsPosition)
+                            if(chordSymbol.AbsMsPosition > restSymbol.AbsMsPosition)
                                 break;
 
-                            if(chordSymbol.MsPosition == restSymbol.MsPosition)
+                            if(chordSymbol.AbsMsPosition == restSymbol.AbsMsPosition)
                             {
                                 RestMetrics restMetrics = restSymbol.RestMetrics;
                                 ChordMetrics chordMetrics = chordSymbol.ChordMetrics;
@@ -403,7 +403,7 @@ namespace Moritz.Symbols
             {
                 foreach(ChordSymbol lowerChord in Voices[1].ChordSymbols)
                 {
-                    if(upperChord.MsPosition == lowerChord.MsPosition)
+                    if(upperChord.AbsMsPosition == lowerChord.AbsMsPosition)
                     {
                         AdjustStemLengths(upperChord, lowerChord);
                         // N.B. the stems lengths must have been corrected for
@@ -550,12 +550,12 @@ namespace Moritz.Symbols
         /// </summary>
         private void AdjustLowerChordXPosition(ChordSymbol upperChord, ChordSymbol lowerChord)
         {
-            Debug.Assert(upperChord.MsPosition == lowerChord.MsPosition);
-            if(!(upperChord is CautionaryChordSymbol))
+            Debug.Assert(upperChord.AbsMsPosition == lowerChord.AbsMsPosition);
+            if(!(upperChord is CautionaryOutputChordSymbol || upperChord is CautionaryInputChordSymbol))
             {
                 Debug.Assert(upperChord.Stem.Direction == VerticalDir.up);
             }
-            if(!(lowerChord is CautionaryChordSymbol))
+            if(!(lowerChord is CautionaryOutputChordSymbol || lowerChord is CautionaryInputChordSymbol))
             {
                 Debug.Assert(lowerChord.Stem.Direction == VerticalDir.down);
             }
@@ -754,15 +754,15 @@ namespace Moritz.Symbols
                     DurationSymbol symbol = noteObject as DurationSymbol;
                     if(symbol != null && symbol is Type)
                     {
-                        Debug.Assert(symbol.MsPosition >= 0,
+                        Debug.Assert(symbol.AbsMsPosition >= 0,
                              "Symbol.MsPosition must be set before calling this funcion!");
-                        if(!dict.ContainsKey(symbol.MsPosition))
+                        if(!dict.ContainsKey(symbol.AbsMsPosition))
                         {
-                            dict.Add(symbol.MsPosition, new NoteObjectMoment(symbol));
+                            dict.Add(symbol.AbsMsPosition, new NoteObjectMoment(symbol));
                         }
                         else
                         {
-                            dict[symbol.MsPosition].Add(symbol);
+                            dict[symbol.AbsMsPosition].Add(symbol);
                         }
                     }
                 }

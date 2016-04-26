@@ -73,15 +73,15 @@ namespace Moritz.Symbols
                     case TextFrameType.none:
                     break;
                     case TextFrameType.rectangle:
-                    w.SvgRect("rectangle" + SvgScore.UniqueID_Number, Metrics.Left, Metrics.Top, Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top,
+                    w.SvgRect("rectangle", Metrics.Left, Metrics.Top, Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top,
 						_frameInfo.ColorString.String, _frameInfo.StrokeWidth, "none");
                     break;
                     case TextFrameType.ellipse:
-					w.SvgEllipse("ellipse" + SvgScore.UniqueID_Number, Metrics.Left, Metrics.Top, (Metrics.Right - Metrics.Left) / 2, (Metrics.Bottom - Metrics.Top) / 2,
+					w.SvgEllipse("ellipse", Metrics.Left, Metrics.Top, (Metrics.Right - Metrics.Left) / 2, (Metrics.Bottom - Metrics.Top) / 2,
 						_frameInfo.ColorString.String, _frameInfo.StrokeWidth, "none");
 					break;
                     case TextFrameType.circle:
-					w.SvgCircle("circle" + SvgScore.UniqueID_Number, Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top, ((Metrics.Right - Metrics.Left) / 2),
+					w.SvgCircle("circle", Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top, ((Metrics.Right - Metrics.Left) / 2),
 						_frameInfo.ColorString.String, _frameInfo.StrokeWidth, "none");
                     break;
                 }

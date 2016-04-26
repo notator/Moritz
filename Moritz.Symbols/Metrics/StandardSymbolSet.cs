@@ -269,7 +269,8 @@ namespace Moritz.Symbols
             Metrics returnMetrics = null;
             ClefSymbol clef = noteObject as ClefSymbol;
             Barline barline = noteObject as Barline;
-            CautionaryChordSymbol cautionaryChordSymbol = noteObject as CautionaryChordSymbol;
+            CautionaryOutputChordSymbol cautionaryOutputChordSymbol = noteObject as CautionaryOutputChordSymbol;
+            CautionaryInputChordSymbol cautionaryInputChordSymbol = noteObject as CautionaryInputChordSymbol;
             ChordSymbol chord = noteObject as ChordSymbol;
             RestSymbol rest = noteObject as RestSymbol;
             if(barline != null)
@@ -281,9 +282,13 @@ namespace Moritz.Symbols
                 if(clef.ClefType != "n")
                     returnMetrics = new ClefMetrics(clef, gap);                    
             }
-            else if(cautionaryChordSymbol != null)
+            else if(cautionaryOutputChordSymbol != null)
             {
-                returnMetrics = new ChordMetrics(graphics, cautionaryChordSymbol, voiceStemDirection, gap, strokeWidth);
+                returnMetrics = new ChordMetrics(graphics, cautionaryOutputChordSymbol, voiceStemDirection, gap, strokeWidth);
+            }
+            else if(cautionaryInputChordSymbol != null)
+            {
+                returnMetrics = new ChordMetrics(graphics, cautionaryInputChordSymbol, voiceStemDirection, gap, strokeWidth);
             }
             else if(chord != null)
             {
@@ -299,7 +304,7 @@ namespace Moritz.Symbols
             return returnMetrics;
         }
 
-        public override NoteObject GetNoteObject(Voice voice, IUniqueDef iud, bool firstDefInVoice,
+        public override NoteObject GetNoteObject(Voice voice, int absMsPosition, IUniqueDef iud, bool firstDefInVoice,
             ref byte currentVelocity, float musicFontHeight)
         {
             NoteObject noteObject = null;
@@ -315,12 +320,21 @@ namespace Moritz.Symbols
  
             if(cautionaryChordDef != null && firstDefInVoice)
             {
-                CautionaryChordSymbol cautionaryChordSymbol = new CautionaryChordSymbol(voice, cautionaryChordDef, cautionaryFontHeight);
-                noteObject = cautionaryChordSymbol;
+                if(cautionaryChordDef.NotatedMidiVelocities != null)
+                {
+                    CautionaryOutputChordSymbol cautionaryOutputChordSymbol = new CautionaryOutputChordSymbol(voice, cautionaryChordDef, absMsPosition, cautionaryFontHeight);
+                    noteObject = cautionaryOutputChordSymbol;
+                }
+                else
+                {
+                    CautionaryInputChordSymbol cautionaryInputChordSymbol = new CautionaryInputChordSymbol(voice, cautionaryChordDef, absMsPosition, cautionaryFontHeight);
+                    noteObject = cautionaryInputChordSymbol;
+
+                }
             }                
             else if(midiChordDef != null)
             {
-                OutputChordSymbol outputChordSymbol = new OutputChordSymbol(voice, midiChordDef, minimumCrotchetDuration, musicFontHeight);
+                OutputChordSymbol outputChordSymbol = new OutputChordSymbol(voice, midiChordDef, absMsPosition, minimumCrotchetDuration, musicFontHeight);
 
                 if(midiChordDef.MidiVelocity != currentVelocity)
                 {
@@ -331,17 +345,17 @@ namespace Moritz.Symbols
             }
             else if(inputChordDef != null)
             {
-                InputChordSymbol inputChordSymbol = new InputChordSymbol(voice, inputChordDef, minimumCrotchetDuration, musicFontHeight);
+                InputChordSymbol inputChordSymbol = new InputChordSymbol(voice, inputChordDef, absMsPosition, minimumCrotchetDuration, musicFontHeight);
                 noteObject = inputChordSymbol;
             }
             else if(restDef != null) 
             {
-                RestSymbol restSymbol = new RestSymbol(voice, iud, minimumCrotchetDuration, musicFontHeight);
+                RestSymbol restSymbol = new RestSymbol(voice, iud, absMsPosition, minimumCrotchetDuration, musicFontHeight);
                 noteObject = restSymbol;
             }
             else if(clefChangeDef != null)
             {
-                ClefChangeSymbol clefChangeSymbol = new ClefChangeSymbol(voice, clefChangeDef.ClefType, cautionaryFontHeight, ((IUniqueDef)iud).MsPosition);
+                ClefChangeSymbol clefChangeSymbol = new ClefChangeSymbol(voice, clefChangeDef.ClefType, absMsPosition, cautionaryFontHeight);
                 noteObject = clefChangeSymbol;
             }
 
@@ -355,12 +369,12 @@ namespace Moritz.Symbols
             {
                 foreach(ChordSymbol voice1chord in staff.Voices[1].ChordSymbols)
                 {
-                    if(voice0chord.MsPosition == voice1chord.MsPosition)
+                    if(voice0chord.AbsMsPosition == voice1chord.AbsMsPosition)
                     {
                         ForceNaturals(voice0chord, voice1chord);
                         break;
                     }
-                    if(voice0chord.MsPosition < voice1chord.MsPosition)
+                    if(voice0chord.AbsMsPosition < voice1chord.AbsMsPosition)
                         break;
                 }               
             }
@@ -372,7 +386,7 @@ namespace Moritz.Symbols
         /// </summary>
         private void ForceNaturals(ChordSymbol synchChord1, ChordSymbol synchChord2)
         {
-            Debug.Assert(synchChord1.MsPosition == synchChord2.MsPosition);
+            Debug.Assert(synchChord1.AbsMsPosition == synchChord2.AbsMsPosition);
             foreach(Head head1 in synchChord1.HeadsTopDown)
             {
                 foreach(Head head2 in synchChord2.HeadsTopDown)
@@ -469,15 +483,19 @@ namespace Moritz.Symbols
                     {
                         List<NoteObject> noteObjects = voice.NoteObjects;
                         ClefSymbol firstClef = null;
-                        CautionaryChordSymbol cautionaryChordSymbol = null;
+                        ChordSymbol cautionaryChordSymbol = null;
+                        CautionaryInputChordSymbol cautionaryInputChordSymbol = null;
+                        CautionaryOutputChordSymbol cautionaryOutputChordSymbol = null;
                         ChordSymbol firstChord = null;
                         RestSymbol firstRest = null;
                         for(int index = 0; index < noteObjects.Count; ++index)
                         {
                             if(firstClef == null)
                                 firstClef = noteObjects[index] as ClefSymbol;
-                            if(cautionaryChordSymbol == null)
-                                cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
+                            if(cautionaryInputChordSymbol == null)
+                                cautionaryChordSymbol = noteObjects[index] as CautionaryInputChordSymbol;
+                            if(cautionaryOutputChordSymbol == null)
+                                cautionaryChordSymbol = noteObjects[index] as CautionaryOutputChordSymbol;
                             if(firstChord == null)
                                 firstChord = noteObjects[index] as ChordSymbol;
                             if(firstRest == null)
@@ -507,19 +525,19 @@ namespace Moritz.Symbols
                                 }
                             }
                             cautionaryChordSymbol.ChordMetrics.NoteheadExtendersMetricsBefore =
-                                CreateExtenders(x1s, x2s, ys, extenderStrokeWidth, gap, true);
+                                CreateExtenders(x1s, x2s, ys, cautionaryChordSymbol.ChordMetrics.HeadsMetrics, extenderStrokeWidth, gap, true);
 
                             // extender right of cautionary
                             x1s = GetEqualFloats(cbMetrics[1].Right, ys.Count);
                             x2s = GetCautionaryRightExtenderX2s(cautionaryChordSymbol, voice.NoteObjects, x1s, ys, hairlinePadding);
                             cautionaryChordSymbol.ChordMetrics.NoteheadExtendersMetrics =
-                                CreateExtenders(x1s, x2s, ys, extenderStrokeWidth, gap, true);
+                                CreateExtenders(x1s, x2s, ys, cautionaryChordSymbol.ChordMetrics.HeadsMetrics, extenderStrokeWidth, gap, true);
                         }
                     }
                 }
             }
         }
-        private List<float> GetCautionaryRightExtenderX2s(CautionaryChordSymbol cautionaryChordSymbol1,
+        private List<float> GetCautionaryRightExtenderX2s(ChordSymbol cautionaryChordSymbol1,
             List<NoteObject> noteObjects, List<float> x1s, List<float> ys, float hairlinePadding)
         {
             List<float> x2s = new List<float>();
@@ -569,7 +587,8 @@ namespace Moritz.Symbols
             for(int i = 0; i < noteObjects.Count; ++i)
             {
                 NoteObject noteObject = noteObjects[i];
-                if(firstCautionaryChordSymbolFound == false && noteObject is CautionaryChordSymbol)
+                if(firstCautionaryChordSymbolFound == false
+                && (noteObject is CautionaryOutputChordSymbol || noteObject is CautionaryInputChordSymbol))
                 {
                     firstCautionaryChordSymbolFound = true;
                     continue;
@@ -577,10 +596,16 @@ namespace Moritz.Symbols
 
                 if(firstCautionaryChordSymbolFound)
                 {
-                    CautionaryChordSymbol followingCautionary = noteObject as CautionaryChordSymbol;
-                    if(followingCautionary != null)
+                    CautionaryOutputChordSymbol followingOutputCautionary = noteObject as CautionaryOutputChordSymbol;
+                    if(followingOutputCautionary != null)
                     {
-                        followingCautionary.Visible = false;
+                        followingOutputCautionary.Visible = false;
+                        continue;
+                    }
+                    CautionaryInputChordSymbol followingInputCautionary = noteObject as CautionaryInputChordSymbol;
+                    if(followingInputCautionary != null)
+                    {
+                        followingInputCautionary.Visible = false;
                         continue;
                     }
 
@@ -626,12 +651,17 @@ namespace Moritz.Symbols
                                 {
                                     while(index < noteObjects.Count)
                                     {
-                                        CautionaryChordSymbol cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
+                                        CautionaryOutputChordSymbol cautionaryOutputChordSymbol = noteObjects[index] as CautionaryOutputChordSymbol;
+                                        CautionaryInputChordSymbol cautionaryInputChordSymbol = noteObjects[index] as CautionaryInputChordSymbol;
                                         ChordSymbol chord2 = noteObjects[index] as ChordSymbol;
                                         RestSymbol rest2 = noteObjects[index] as RestSymbol;
-                                        if(cautionaryChordSymbol != null)
+                                        if(cautionaryOutputChordSymbol != null)
                                         {
-                                            cautionaryChordSymbol.Visible = false;
+                                            cautionaryOutputChordSymbol.Visible = false;
+                                        }
+                                        else if(cautionaryInputChordSymbol != null)
+                                        {
+                                            cautionaryInputChordSymbol.Visible = false;
                                         }
                                         else if(chord2 != null)
                                         {
@@ -669,7 +699,7 @@ namespace Moritz.Symbols
                                             drawExtender = false;
 
                                         chord1.ChordMetrics.NoteheadExtendersMetrics =
-                                            CreateExtenders(x1s, x2s, ys, extenderStrokeWidth, gap, drawExtender);
+                                            CreateExtenders(x1s, x2s, ys, chord1.ChordMetrics.HeadsMetrics, extenderStrokeWidth, gap, drawExtender);
                                     }
                                 }
                             }
@@ -696,15 +726,22 @@ namespace Moritz.Symbols
                         List<NoteObject> noteObjects = voice.NoteObjects;
                         ChordSymbol lastChord = null;
                         RestSymbol lastRest = null;
-                        CautionaryChordSymbol cautionary = null;
+                        CautionaryOutputChordSymbol cautionaryOutputChordsymbol = null;
+                        CautionaryInputChordSymbol cautionaryInputChordsymbol = null;
                         for(int index = noteObjects.Count - 1; index >= 0; --index)
                         {
                             lastChord = noteObjects[index] as ChordSymbol;
                             lastRest = noteObjects[index] as RestSymbol;
-                            cautionary = noteObjects[index] as CautionaryChordSymbol;
-                            if(cautionary != null)
+                            cautionaryOutputChordsymbol = noteObjects[index] as CautionaryOutputChordSymbol;
+                            cautionaryInputChordsymbol = noteObjects[index] as CautionaryInputChordSymbol;
+                            if(cautionaryOutputChordsymbol != null)
                             {
-                                cautionary.Visible = false;
+                                cautionaryOutputChordsymbol.Visible = false;
+                                // a CautionaryChordSymbol is a ChordSymbol, but we have not found a real one yet. 
+                            }
+                            else if(cautionaryInputChordsymbol != null)
+                            {
+                                cautionaryInputChordsymbol.Visible = false;
                                 // a CautionaryChordSymbol is a ChordSymbol, but we have not found a real one yet. 
                             }
                             else if(lastChord != null || lastRest != null)
@@ -725,7 +762,7 @@ namespace Moritz.Symbols
                                 x2s = GetEqualFloats(rightMarginPos, x1s.Count);
                             }
                             lastChord.ChordMetrics.NoteheadExtendersMetrics =
-                                CreateExtenders(x1s, x2s, ys, extenderStrokeWidth, gap, true);
+                                CreateExtenders(x1s, x2s, ys, lastChord.ChordMetrics.HeadsMetrics, extenderStrokeWidth, gap, true);
                         }
                     }
                 }
@@ -737,7 +774,7 @@ namespace Moritz.Symbols
             bool firstDurationSymbolIsCautionary = false;
             foreach(NoteObject noteObject in voiceOnNextSystem.NoteObjects)
             {
-                if(noteObject is CautionaryChordSymbol)
+                if(noteObject is CautionaryOutputChordSymbol || noteObject is CautionaryInputChordSymbol)
                 {
                     firstDurationSymbolIsCautionary = true;
                     break;
@@ -754,7 +791,7 @@ namespace Moritz.Symbols
         /// This is so that extenders become part of the staff's edge, which is used when shifting staves and drawing barlines.
         /// Extenders shorter than a gap are not created.
         /// </summary>
-        private List<NoteheadExtenderMetrics> CreateExtenders(List<float> x1s, List<float> x2s, List<float> ys, float extenderStrokeWidth, float gap, bool drawExtender)
+        private List<NoteheadExtenderMetrics> CreateExtenders(List<float> x1s, List<float> x2s, List<float> ys, List<HeadMetrics> headMetrics, float extenderStrokeWidth, float gap, bool drawExtender)
         {
             Debug.Assert(ys.Count == x1s.Count);
             Debug.Assert(ys.Count == x2s.Count);
@@ -766,7 +803,7 @@ namespace Moritz.Symbols
                 if((x2s[i] - x1s[i]) > (gap / 2))
                 {
                     NoteheadExtenderMetrics nem =
-                        new NoteheadExtenderMetrics(x1s[i], x2s[i], ys[i], extenderStrokeWidth, gap, drawExtender);
+                        new NoteheadExtenderMetrics(x1s[i], x2s[i], ys[i], headMetrics[i].ColorAttribute, extenderStrokeWidth, gap, drawExtender);
 
                     noteheadExtendersMetrics.Add(nem);
                 }

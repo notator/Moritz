@@ -10,8 +10,8 @@ namespace Moritz.Symbols
 {
 	internal class RestSymbol : DurationSymbol
 	{
-        public RestSymbol(Voice voice, IUniqueDef iumdd, int minimumCrotchetDurationMS, float fontHeight)
-            : base(voice, iumdd.MsDuration, iumdd.MsPosition, minimumCrotchetDurationMS, fontHeight)
+        public RestSymbol(Voice voice, IUniqueDef iumdd, int absMsPosition, int minimumCrotchetDurationMS, float fontHeight)
+            : base(voice, iumdd.MsDuration, absMsPosition, minimumCrotchetDurationMS, fontHeight)
         {
             if(iumdd is CautionaryChordDef)
             {
@@ -24,7 +24,7 @@ namespace Moritz.Symbols
         {
             if(LocalCautionaryChordDef == null)
             {
-				w.SvgStartGroup("rest", "rest" + SvgScore.UniqueID_Number);
+				w.SvgStartGroup("rest");
 
                 Debug.Assert(_msDuration > 0);
 				if(staffIsVisible)
@@ -73,6 +73,13 @@ namespace Moritz.Symbols
                 Debug.Assert(restMetrics != null);
                 return restMetrics;
             }
+        }
+
+        // Rest MsDuration should only be set when agglommerating consecutive Rests
+        public override int MsDuration
+        {
+            get { return _msDuration; }
+            set { _msDuration = value; } 
         }
 
         public RestDef MidiRestDef { get { return _midiRestDef; } }

@@ -25,42 +25,21 @@ namespace Moritz.Spec
     public abstract class VoiceDef : IEnumerable
     {
         #region constructors
-        public VoiceDef()
-        {
-        }
 
-        /// <summary>
-        /// A VoiceDef beginning at MsPosition = 0, and containing a single RestDef having msDuration
-        /// </summary>
-        /// <param name="msDuration"></param>
-        public VoiceDef(int msDuration)
+        protected VoiceDef(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
         {
-            RestDef lmRestDef = new RestDef(0, msDuration);
-            _uniqueDefs.Add(lmRestDef);
-        }
+            this.MidiChannel = midiChannel;
+            this.MsPositionReContainer = msPositionReContainer;
+            this._uniqueDefs = iuds;
 
-        /// <summary>
-        /// <para>If the argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
-        /// <para>The new VoiceDef's _uniqueDefs list is simply set to the argument (which is not cloned).</para>
-        /// </summary>
-        public VoiceDef(List<IUniqueDef> iuds)
-        {
-            Debug.Assert(iuds != null);
-            if(iuds.Count > 0)
-            {
-                for(int i = 1; i < iuds.Count; ++i)
-                {
-                    Debug.Assert(iuds[i - 1].MsPosition + iuds[i - 1].MsDuration == iuds[i].MsPosition);
-                }
-            }
-            _uniqueDefs = iuds;
+            AssertVoiceDefConsistency();
         }
-
         #endregion constructors
 
         #region public indexer & enumerator
         /// <summary>
-        /// Indexer. Allows individual lmdds to be accessed using array notation on the VoiceDef.
+        /// Indexer. Allows individual UniqueDefs to be accessed using array notation on the VoiceDef.
+        /// Automatically resets the MsPositions of all UniqueDefs in the list.
         /// e.g. iumdd = voiceDef[3].
         /// </summary>
         public IUniqueDef this[int i]
@@ -69,7 +48,7 @@ namespace Moritz.Spec
             {
                 if(i < 0 || i >= _uniqueDefs.Count)
                 {
-                    throw new IndexOutOfRangeException();
+					Debug.Assert(false, "Index out of range");
                 }
                 return _uniqueDefs[i];
             }
@@ -77,10 +56,14 @@ namespace Moritz.Spec
             {
                 if(i < 0 || i >= _uniqueDefs.Count)
                 {
-                    throw new IndexOutOfRangeException();
-                }
+					Debug.Assert(false, "Index out of range");
+				}
+                
+                Debug.Assert(!((this is Trk && value is InputChordDef) || (this is InputVoiceDef && value is MidiChordDef)));
+
                 _uniqueDefs[i] = value;
-                SetMsPositions();
+                SetMsPositionsReFirstUD();
+                AssertVoiceDefConsistency();
             }
         }
 
@@ -135,49 +118,85 @@ namespace Moritz.Spec
 
         #region public
 
+        protected void AssertVoiceDefConsistency()
+        {
+            Debug.Assert(MidiChannel >= 0 && MidiChannel <= 15);
+            Debug.Assert(MsPositionReContainer >= 0);
+            Debug.Assert(UniqueDefs != null);
+            if(UniqueDefs.Count > 0)
+            {
+                Debug.Assert(UniqueDefs[0].MsPositionReFirstUD == 0);
+
+                for(int i = 1; i < UniqueDefs.Count; ++i)
+                {
+                    IUniqueDef prevIUD = UniqueDefs[i - 1];
+                    int msPosition = prevIUD.MsPositionReFirstUD + prevIUD.MsDuration;
+                    Debug.Assert(UniqueDefs[i].MsPositionReFirstUD == msPosition);
+                }
+            }
+        }
+
+        internal abstract void AssertConsistentInBlock();
+
         #region Count changers
         #region list functions
         public abstract void Add(IUniqueDef iUniqueDef);
         protected void _Add(IUniqueDef iUniqueDef)
         {
-            Debug.Assert(_uniqueDefs.Count > 0);
-            IUniqueDef lastIud = _uniqueDefs[_uniqueDefs.Count - 1];
-            iUniqueDef.MsPosition = lastIud.MsPosition + lastIud.MsDuration;
+			if(_uniqueDefs.Count > 0)
+			{
+				IUniqueDef lastIud = _uniqueDefs[_uniqueDefs.Count - 1];
+				iUniqueDef.MsPositionReFirstUD = lastIud.MsPositionReFirstUD + lastIud.MsDuration;
+			}
+			else
+			{
+				iUniqueDef.MsPositionReFirstUD = 0;
+			}
             _uniqueDefs.Add(iUniqueDef);
+
+            AssertVoiceDefConsistency();
         }
+        public abstract void AddRange(VoiceDef voiceDef);
         protected void _AddRange(VoiceDef voiceDef)
         {
             _uniqueDefs.AddRange(voiceDef.UniqueDefs);
-            SetMsPositions();
+            SetMsPositionsReFirstUD();
+
+            AssertVoiceDefConsistency();
         }
         public abstract void Insert(int index, IUniqueDef iUniqueDef);
         protected void _Insert(int index, IUniqueDef iUniqueDef)
         {
             _uniqueDefs.Insert(index, iUniqueDef);
-            SetMsPositions();
+            SetMsPositionsReFirstUD();
+
+            AssertVoiceDefConsistency();
         }
         protected void _InsertRange(int index, VoiceDef voiceDef)
         {
             _uniqueDefs.InsertRange(index, voiceDef.UniqueDefs);
-            SetMsPositions();
+            SetMsPositionsReFirstUD();
+
+            AssertVoiceDefConsistency();
         }
         protected void _InsertInRest(VoiceDef iVoiceDef)
         {
-            int iLmddsStartMsPos = iVoiceDef[0].MsPosition;
-            int iLmddsEndMsPos = iVoiceDef[iVoiceDef.Count - 1].MsPosition + iVoiceDef[iVoiceDef.Count - 1].MsDuration;
+            int iLmddsStartMsPosReFirstIUD = iVoiceDef[0].MsPositionReFirstUD;
+            int iLmddsEndMsPosReFirstIUD = iVoiceDef[iVoiceDef.Count - 1].MsPositionReFirstUD + iVoiceDef[iVoiceDef.Count - 1].MsDuration;
 
-            int restIndex = FindIndexOfSpanningRest(iLmddsStartMsPos, iLmddsEndMsPos);
+            int restIndex = FindIndexOfSpanningRest(iLmddsStartMsPosReFirstIUD, iLmddsEndMsPosReFirstIUD);
 
             // if index >= 0, it is the index of a rest into which the chord will fit.
             if(restIndex >= 0)
             {
                 InsertVoiceDefInRest(restIndex, iVoiceDef);
-                SetMsPositions(); // just to be sure!
+                SetMsPositionsReFirstUD(); // just to be sure!
             }
             else
             {
                 Debug.Assert(false, "Can't find a rest spanning the chord!");
             }
+            AssertVoiceDefConsistency();
         }
         #region _InsertInRest() implementation
         /// <summary>
@@ -190,22 +209,22 @@ namespace Moritz.Spec
         private int FindIndexOfSpanningRest(int startMsPos, int endMsPos)
         {
             List<IUniqueDef> lmdds = _uniqueDefs;
-            int index = -1, restStartMsPos = -1, restEndMsPos = -1;
+            int index = -1, restStartMsPosReFirstIUD = -1, restEndMsPosReFirstIUD = -1;
 
             for(int i = 0; i < lmdds.Count; ++i)
             {
                 RestDef umrd = lmdds[i] as RestDef;
                 if(umrd != null)
                 {
-                    restStartMsPos = lmdds[i].MsPosition;
-                    restEndMsPos = lmdds[i].MsPosition + lmdds[i].MsDuration;
+                    restStartMsPosReFirstIUD = lmdds[i].MsPositionReFirstUD;
+                    restEndMsPosReFirstIUD = lmdds[i].MsPositionReFirstUD + lmdds[i].MsDuration;
 
-                    if(startMsPos >= restStartMsPos && endMsPos <= restEndMsPos)
+                    if(startMsPos >= restStartMsPosReFirstIUD && endMsPos <= restEndMsPosReFirstIUD)
                     {
                         index = i;
                         break;
                     }
-                    if(startMsPos < restStartMsPos)
+                    if(startMsPos < restStartMsPosReFirstIUD)
                     {
                         break;
                     }
@@ -220,11 +239,11 @@ namespace Moritz.Spec
             List<IUniqueDef> lmdds = _uniqueDefs;
             IUniqueDef rest = lmdds[restIndex];
             List<IUniqueDef> replacement = GetReplacementList(rest, iVoiceDef);
-            int replacementStart = replacement[0].MsPosition;
-            int replacementEnd = replacement[replacement.Count - 1].MsPosition + replacement[replacement.Count - 1].MsDuration;
-            int restStart = rest.MsPosition;
-            int restEnd = rest.MsPosition + rest.MsDuration;
-            Debug.Assert(restStart == replacementStart && restEnd == replacementEnd);
+            int replacementStartMsPosReFirstIUD = replacement[0].MsPositionReFirstUD;
+            int replacementEndMsPosReFirstIUD = replacement[replacement.Count - 1].MsPositionReFirstUD + replacement[replacement.Count - 1].MsDuration;
+            int restStartMsPosReFirstIUD = rest.MsPositionReFirstUD;
+            int restEndMsPosReFirstIUD = rest.MsPositionReFirstUD + rest.MsDuration;
+            Debug.Assert(restStartMsPosReFirstIUD == replacementStartMsPosReFirstIUD && restEndMsPosReFirstIUD == replacementEndMsPosReFirstIUD);
             lmdds.RemoveAt(restIndex);
             lmdds.InsertRange(restIndex, replacement);
         }
@@ -239,17 +258,17 @@ namespace Moritz.Spec
             Debug.Assert(iVoiceDef[iVoiceDef.Count - 1] is MidiChordDef || iVoiceDef[iVoiceDef.Count - 1] is InputChordDef);
 
             List<IUniqueDef> rList = new List<IUniqueDef>();
-            if(iVoiceDef[0].MsPosition > originalRest.MsPosition)
+            if(iVoiceDef[0].MsPositionReFirstUD > originalRest.MsPositionReFirstUD)
             {
-                RestDef rest1 = new RestDef(originalRest.MsPosition, iVoiceDef[0].MsPosition - originalRest.MsPosition);
+                RestDef rest1 = new RestDef(originalRest.MsPositionReFirstUD, iVoiceDef[0].MsPositionReFirstUD - originalRest.MsPositionReFirstUD);
                 rList.Add(rest1);
             }
             rList.AddRange(iVoiceDef.UniqueDefs);
-            int iLmddsEndMsPos = iVoiceDef[iVoiceDef.Count - 1].MsPosition + iVoiceDef[iVoiceDef.Count - 1].MsDuration;
-            int originalRestEndMsPos = originalRest.MsPosition + originalRest.MsDuration;
-            if(originalRestEndMsPos > iLmddsEndMsPos)
+            int iudEndMsPosReFirstIUD = iVoiceDef[iVoiceDef.Count - 1].MsPositionReFirstUD + iVoiceDef[iVoiceDef.Count - 1].MsDuration;
+            int originalRestEndMsPosReFirstIUD = originalRest.MsPositionReFirstUD + originalRest.MsDuration;
+            if(originalRestEndMsPosReFirstIUD > iudEndMsPosReFirstIUD)
             {
-                RestDef rest2 = new RestDef(iLmddsEndMsPos, originalRestEndMsPos - iLmddsEndMsPos);
+                RestDef rest2 = new RestDef(iudEndMsPosReFirstIUD, originalRestEndMsPosReFirstIUD - iudEndMsPosReFirstIUD);
                 rList.Add(rest2);
             }
 
@@ -264,7 +283,9 @@ namespace Moritz.Spec
             Debug.Assert(_uniqueDefs.Count > 0);
             Debug.Assert(_uniqueDefs.Contains(iUniqueDef));
             _uniqueDefs.Remove(iUniqueDef);
-            SetMsPositions();
+            SetMsPositionsReFirstUD();
+
+            AssertVoiceDefConsistency();
         }
         /// <summary>
         /// Removes the iUniqueMidiDurationDef at index from the list, and then resets the positions of all the lmdds in the list.
@@ -273,7 +294,9 @@ namespace Moritz.Spec
         {
             Debug.Assert(index >= 0 && index < _uniqueDefs.Count);
             _uniqueDefs.RemoveAt(index);
-            SetMsPositions();
+            SetMsPositionsReFirstUD();
+
+            AssertVoiceDefConsistency();
         }
         /// <summary>
         /// Removes count iUniqueDefs from the list, startíng with the iUniqueDef at index.
@@ -282,22 +305,26 @@ namespace Moritz.Spec
         {
             Debug.Assert(index >= 0 && count >= 0 && ((index + count) <= _uniqueDefs.Count));
             _uniqueDefs.RemoveRange(index, count);
-            SetMsPositions();
+            SetMsPositionsReFirstUD();
+
+            AssertVoiceDefConsistency();
         }
         /// <summary>
-        /// Remove the IUniques which start between startMsPos and (not including) endMsPos 
+        /// Remove the IUniques which start between startMsPosReFirstIUD and (not including) endMsPosReFirstIUD 
         /// </summary>
         /// <param name="p1"></param>
         /// <param name="p2"></param>
-        public void RemoveBetweenMsPositions(int startMsPos, int endMsPos)
+        public void RemoveBetweenMsPositions(int startMsPosReFirstIUD, int endMsPosReFirstIUD)
         {
-            IUniqueDef iumdd = _uniqueDefs.Find(f => (f.MsPosition >= startMsPos) && (f.MsPosition < endMsPos));
+            IUniqueDef iumdd = _uniqueDefs.Find(f => (f.MsPositionReFirstUD >= startMsPosReFirstIUD) && (f.MsPositionReFirstUD < endMsPosReFirstIUD));
             while(iumdd != null)
             {
                 _uniqueDefs.Remove(iumdd);
-                iumdd = _uniqueDefs.Find(f => (f.MsPosition >= startMsPos) && (f.MsPosition < endMsPos));
+                iumdd = _uniqueDefs.Find(f => (f.MsPositionReFirstUD >= startMsPosReFirstIUD) && (f.MsPositionReFirstUD < endMsPosReFirstIUD));
             }
-            SetMsPositions();
+            SetMsPositionsReFirstUD();
+
+            AssertVoiceDefConsistency();
         }
         /// <summary>
         /// Removes the iUniqueMidiDurationDef at index from the list, and then inserts the replacement at the same index.
@@ -307,7 +334,9 @@ namespace Moritz.Spec
             Debug.Assert(index >= 0 && index < _uniqueDefs.Count);
             _uniqueDefs.RemoveAt(index);
             _uniqueDefs.Insert(index, replacementIUnique);
-            SetMsPositions();
+            SetMsPositionsReFirstUD();
+
+            AssertVoiceDefConsistency();
         }
         /// <summary>
         /// From startMsPosition to (not including) endMsPosition,
@@ -315,8 +344,8 @@ namespace Moritz.Spec
         /// </summary>
         public void Erase(int startMsPosition, int endMsPosition)
         {
-            int beginIndex = FindIndexAtMsPosition(startMsPosition);
-            int endIndex = FindIndexAtMsPosition(endMsPosition);
+            int beginIndex = FindIndexAtMsPositionReFirstIUD(startMsPosition);
+            int endIndex = FindIndexAtMsPositionReFirstIUD(endMsPosition);
 
             for(int i = beginIndex; i < endIndex; ++i)
             {
@@ -325,13 +354,15 @@ namespace Moritz.Spec
                 IUniqueDef iud = (mcd == null) ? (IUniqueDef)icd : (IUniqueDef)mcd;
                 if(iud != null)
                 {
-                    RestDef umrd = new RestDef(iud.MsPosition, iud.MsDuration);
+                    RestDef umrd = new RestDef(iud.MsPositionReFirstUD, iud.MsDuration);
                     RemoveAt(i);
                     Insert(i, umrd);
                 }
             }
 
             AgglomerateRests();
+
+            AssertVoiceDefConsistency();
         }
         /// <summary>
         /// Extracts nUniqueDefs from the uniqueDefs, and then inserts them again at the toIndex.
@@ -340,11 +371,12 @@ namespace Moritz.Spec
         {
             Debug.Assert((fromIndex + nUniqueDefs) <= _uniqueDefs.Count);
             Debug.Assert(toIndex <= (_uniqueDefs.Count - nUniqueDefs));
-            int msPosition = _uniqueDefs[0].MsPosition;
             List<IUniqueDef> extractedLmdds = _uniqueDefs.GetRange(fromIndex, nUniqueDefs);
             _uniqueDefs.RemoveRange(fromIndex, nUniqueDefs);
             _uniqueDefs.InsertRange(toIndex, extractedLmdds);
-            SetMsPositions();
+            SetMsPositionsReFirstUD();
+
+            AssertVoiceDefConsistency();
         }
         /// <summary>
         /// Returns the index of the IUniqueDef which starts at or is otherwise current at msPosition.
@@ -353,16 +385,16 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        public int FindIndexAtMsPosition(int msPosition)
+        public int FindIndexAtMsPositionReFirstIUD(int msPositionReFirstIUD)
         {
             int returnedIndex = -1;
-            if(msPosition == EndMsPosition)
+            if(msPositionReFirstIUD == EndMsPositionReFirstIUD)
             {
                 returnedIndex = this.Count - 1;
             }
-            else if(msPosition >= _uniqueDefs[0].MsPosition && msPosition < EndMsPosition)
+            else if(msPositionReFirstIUD >= _uniqueDefs[0].MsPositionReFirstUD && msPositionReFirstIUD < EndMsPositionReFirstIUD)
             {
-                returnedIndex = _uniqueDefs.FindIndex(u => ((u.MsPosition <= msPosition) && ((u.MsPosition + u.MsDuration) > msPosition)));
+                returnedIndex = _uniqueDefs.FindIndex(u => ((u.MsPositionReFirstUD <= msPositionReFirstIUD) && ((u.MsPositionReFirstUD + u.MsDuration) > msPositionReFirstIUD)));
             }
             Debug.Assert(returnedIndex != -1);
             return returnedIndex;
@@ -443,7 +475,9 @@ namespace Moritz.Spec
                 }
             }
 
-            SetMsPositions();
+            SetMsPositionsReFirstUD();
+
+            AssertVoiceDefConsistency();
         }
 
         /// <summary>
@@ -481,7 +515,9 @@ namespace Moritz.Spec
                 factor += basicIncrement;
             }
 
-            SetMsPositions();
+            SetMsPositionsReFirstUD();
+
+            AssertVoiceDefConsistency();
         }
 
         #endregion VoiceDef duration changers
@@ -504,6 +540,8 @@ namespace Moritz.Spec
                     }
                 }
             }
+
+            AssertVoiceDefConsistency();
         }
         /// <summary>
         /// Removes the rest or chord at index, and extends the previous rest or chord
@@ -515,36 +553,110 @@ namespace Moritz.Spec
             Debug.Assert(index > 0 && index < Count);
             _uniqueDefs[index - 1].MsDuration += _uniqueDefs[index].MsDuration;
             _uniqueDefs.RemoveAt(index);
+
+            AssertVoiceDefConsistency();
         }
 
-        #endregion Count changers
+		#endregion Count changers
 
-        #region public properties
+		#region public properties
+		private int _msPosition = 0;
+
         /// <summary>
-        /// The absolute position of the first note or rest in the sequence.
-        /// Setting this value resets the MsPositions of all the IUniqueDefs in this VoiceDef,
-        /// including the EndMsPosition.
+        /// The argument warp is a list of doubles, in ascending order, beginning with 0 and ending with 1.
+        /// The doubles represent moments in the original duration that will be separated from each other
+        /// by equal durations when the function returns. The MsDuration of the Trk is not changed.
         /// </summary>
-        public int MsPosition 
-        { 
-            get 
-            { 
-                Debug.Assert(_uniqueDefs.Count > 0);
-                return _uniqueDefs[0].MsPosition;
-            }
-            set
+        public void WarpDurations(List<double> warp)
+        {
+            #region requirements
+            Debug.Assert(warp != null && warp.Count > 1 && warp[0] == 0 && warp[warp.Count - 1] == 1);
+            for(int i = 1; i < warp.Count; ++i)
             {
-                Debug.Assert(_uniqueDefs.Count > 0);
-                _uniqueDefs[0].MsPosition = value;
-                SetMsPositions();
-            } 
+                Debug.Assert(warp[i - 1] < warp[i]);
+            }
+            #endregion
+
+            List<double> factors = new List<double>();
+            List<int> originalWarpMsPositions = new List<int>();
+            #region get factors and originalWarpMsPositions
+            double finalSeparation = MsDuration / (warp.Count - 1); // the final duration separation between the moments (in range 0..MsDuration)
+
+            for(int i = 0; i < warp.Count; ++i)
+            {
+                originalWarpMsPositions.Add((int)(MsDuration * warp[i])); // includes MsDuration
+            }
+            for(int i = 0; i < originalWarpMsPositions.Count - 1; ++i)
+            {
+                factors.Add(finalSeparation / (originalWarpMsPositions[i + 1] - originalWarpMsPositions[i]));
+            }
+            #endregion
+
+            int factorIndex = 0;
+            int iudMsPositionReFirstIUD = 0;
+            int originalMsDuration = MsDuration;
+            foreach(IUniqueDef iud in UniqueDefs)
+            {
+                int remainingMsDuration = iud.MsDuration;
+                double newMsDuration = GetNewMsDuration(ref factorIndex, originalWarpMsPositions, factors, iud.MsPositionReFirstUD, ref remainingMsDuration);
+                iud.AdjustMsDuration(newMsDuration / iud.MsDuration);
+                iud.MsPositionReFirstUD = iudMsPositionReFirstIUD;
+                iudMsPositionReFirstIUD += iud.MsDuration;
+            }
+            // correct rounding errors
+            int msDuration = MsDuration;
+            if(msDuration != originalMsDuration)
+            {
+                IUniqueDef lastiud = UniqueDefs[UniqueDefs.Count - 1];
+                lastiud.MsDuration = originalMsDuration - lastiud.MsPositionReFirstUD;
+            }
+
+            Debug.Assert(originalMsDuration == MsDuration);
+
+            AssertVoiceDefConsistency();
         }
-		/// <summary>
-		/// Setting this property stretches or compresses all the durations in the UniqueDefs list to fit the given total duration.
-		/// This does not change the VoiceDef's MsPosition, but does affect its EndMsPosition.
-		/// See also EndMsPosition.set.
-		/// </summary>
-		public int MsDuration
+
+        /// <summary>
+        /// Recursive function called by WarpDurations()
+        /// </summary>
+        private double GetNewMsDuration(ref int factorIndex, List<int> originalWarpMsPositions, List<double> factors,
+                                int originalMsPosition, ref int remainingMsDuration)
+        {
+            int currentEndMsPos = originalMsPosition + remainingMsDuration;
+            int upperMsPos = originalWarpMsPositions[factorIndex + 1];
+            double factor = factors[factorIndex];
+            double newMsDuration = 0;
+
+            while(remainingMsDuration > 0)
+            {
+                if(currentEndMsPos < upperMsPos)
+                {
+                    newMsDuration += remainingMsDuration * factor;
+                    remainingMsDuration = 0;
+                }
+                else if(originalMsPosition < upperMsPos)
+                {
+                    int durationToWarp = upperMsPos - originalMsPosition;
+                    remainingMsDuration -= durationToWarp;
+                    originalMsPosition = upperMsPos;
+                    newMsDuration += (durationToWarp * factor);
+                }
+                else
+                {
+                    factorIndex++;
+                    newMsDuration += GetNewMsDuration(ref factorIndex, originalWarpMsPositions, factors,
+                                        originalMsPosition, ref remainingMsDuration);
+                }
+            }
+
+            return newMsDuration;
+        }
+        /// <summary>
+        /// Setting this property stretches or compresses all the durations in the UniqueDefs list to fit the given total duration.
+        /// This does not change the VoiceDef's MsPosition, but does affect its EndMsPosition.
+        /// See also EndMsPosition.set.
+        /// </summary>
+        public int MsDuration
 		{
 			get
 			{
@@ -585,35 +697,40 @@ namespace Moritz.Spec
 
 				Debug.Assert(msDuration == newTotal);
 
-				SetMsPositions();
-			}
+				SetMsPositionsReFirstUD();
+
+                AssertVoiceDefConsistency();
+            }
 		}
 		/// <summary>
-		/// The position of the end of the last UniqueDef in the list, or 0 if the list is empty.
+		/// The position of the end of the last UniqueDef in the list re the first IUniqueDef in the list, or 0 if the list is empty.
 		/// Setting this value can only be done if the UniqueDefs list is not empty, and the value
 		/// is greater than the position of the final UniqueDef in the list. It then changes
 		/// the msDuration of the final IUniqueDef.
 		/// See also MsDuration.set.
 		/// </summary>
-		public int EndMsPosition
+		public int EndMsPositionReFirstIUD
 		{
 			get
 			{
-				int endPosition = 0;
+				int endMsPosReFirstUID = 0;
 				if(_uniqueDefs.Count > 0)
 				{
 					IUniqueDef lastIUD = _uniqueDefs[_uniqueDefs.Count - 1];
-					endPosition = lastIUD.MsPosition + lastIUD.MsDuration;
+					endMsPosReFirstUID += (lastIUD.MsPositionReFirstUD + lastIUD.MsDuration);
 				}
-				return endPosition;
+				return endMsPosReFirstUID;
 			}
 			set
 			{
 				Debug.Assert(_uniqueDefs.Count > 0);
+				Debug.Assert(value > EndMsPositionReFirstIUD);
+
 				IUniqueDef lastLmdd = _uniqueDefs[_uniqueDefs.Count - 1];
-				Debug.Assert(value > lastLmdd.MsPosition);
-				lastLmdd.MsDuration = value - lastLmdd.MsPosition;
-			}
+				lastLmdd.MsDuration = value - EndMsPositionReFirstIUD;
+
+                AssertVoiceDefConsistency();
+            }
 		}
 		public int Count { get { return _uniqueDefs.Count; } }
 
@@ -699,15 +816,15 @@ namespace Moritz.Spec
         {
             List<int> dictPositions = new List<int>(msPosTranspositionDict.Keys);
 
-            int currentMsPos = dictPositions[0];
+            int currentMsPosReFirstIUD = dictPositions[0];
             int j = 0;
             for(int i = 1; i < msPosTranspositionDict.Count; ++i)
             {
-                int transposition = msPosTranspositionDict[currentMsPos];
-                int nextMsPos = dictPositions[i];
-                while(j < _uniqueDefs.Count && _uniqueDefs[j].MsPosition < nextMsPos)
+                int transposition = msPosTranspositionDict[currentMsPosReFirstIUD];
+                int nextMsPosReFirstIUD = dictPositions[i];
+                while(j < _uniqueDefs.Count && _uniqueDefs[j].MsPositionReFirstUD < nextMsPosReFirstIUD)
                 {
-                    if(_uniqueDefs[j].MsPosition >= currentMsPos)
+                    if(_uniqueDefs[j].MsPositionReFirstUD >= currentMsPosReFirstIUD)
                     {
                         IUniqueChordDef iucd = _uniqueDefs[j] as IUniqueChordDef;
                         if(iucd != null)
@@ -717,7 +834,7 @@ namespace Moritz.Spec
                     }
                     ++j;
                 }
-                currentMsPos = nextMsPos;
+                currentMsPosReFirstIUD = nextMsPosReFirstIUD;
             }
         }
 
@@ -772,23 +889,21 @@ namespace Moritz.Spec
         }
         #endregion public SetLyricsToIndex()
 
-		/// <summary>
-		/// For an example of using this function, see SongSixAlgorithm.cs
-		/// Note that clef changes must be inserted backwards per voiceDef, so that IUniqueDef indices are correct. 
-		/// Inserting a clef change changes the subsequent indices.
-		/// Note also that if a ClefChange is defined here on a RestDef which has no MidiChordDef
-		/// to its right on the staff, the resulting ClefSymbol will be placed immediately before the final barline
-		/// on the staff.
-		/// ClefChanges which would happen at the beginning of a staff are moved to the end of the equivalent staff
-		/// in the previous system.
-		/// A ClefChange defined here on a MidiChordDef or RestDef which is eventually preceded
-		/// by a barline, are placed to the left of the barline.  
-		/// The clefType must be one of the following strings "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"
-		/// </summary>
-		public void InsertClefChange(int index, string clefType)
+        /// <summary>
+        /// Clef changes on the same staff must be added backwards so that the indices are correct.
+        /// Clef changes cannot be made at index 0. Change them in the previous system instead.
+        /// If the index is equal to or greater than the number of chords, rests and clefChanges in the voiceDef,
+        /// the ClefChange will be appended to the voiceDef.
+        /// Note that if a ClefChange is defined here on a RestDef which has no MidiChordDef
+        /// to its right on the staff, the resulting ClefSymbol will be placed immediately before the final barline
+        /// on the staff.  
+        /// The clefType must be one of the following strings "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"
+        /// </summary>
+        public void InsertClefChange(int index, string clefType)
 		{
-			#region check args
-			Debug.Assert(index < _uniqueDefs.Count);
+            #region check args
+            Debug.Assert(index > 0, "Clef changes cannot be made before the first chord or rest in a bar.");
+
 			if(String.Equals(clefType, "t") == false
 			&& String.Equals(clefType, "t1") == false
 			&& String.Equals(clefType, "t2") == false
@@ -800,10 +915,18 @@ namespace Moritz.Spec
 			{
 				Debug.Assert(false, "Unknown clef type.");
 			}
-			#endregion
+            #endregion
 
-			ClefChangeDef clefChangeDef = new ClefChangeDef(clefType, _uniqueDefs[index]);
-			_uniqueDefs.Insert(index, clefChangeDef);
+            if(index > _uniqueDefs.Count - 1)
+            {
+                ClefChangeDef clefChangeDef = new ClefChangeDef(clefType, EndMsPositionReFirstIUD);
+                _uniqueDefs.Add(clefChangeDef);
+            }
+            else
+            {
+                ClefChangeDef clefChangeDef = new ClefChangeDef(clefType, _uniqueDefs[index].MsPositionReFirstUD);
+                _uniqueDefs.Insert(index, clefChangeDef);
+            }
 		}
 
         public List<IUniqueDef> UniqueDefs { get { return _uniqueDefs; } }
@@ -827,20 +950,37 @@ namespace Moritz.Spec
         #region protected
         /// <summary>
         /// Sets the MsPosition attribute of each IUniqueDef in the _uniqueDefs list.
-        /// Uses all the MsDuration attributes, and the MsPosition of the first IUniqueDef as origin.
+        /// Uses all the MsDuration attributes, and _msPosition as origin.
         /// This function must be called at the end of any function that changes the _uniqueDefs list.
         /// </summary>
-        protected void SetMsPositions()
+        protected void SetMsPositionsReFirstUD()
         {
             if(_uniqueDefs.Count > 0)
             {
-                int currentPosition = _uniqueDefs[0].MsPosition;
-                Debug.Assert(currentPosition >= 0);
+                int currentPositionReFirstIUD = 0;
                 foreach(IUniqueDef umcd in _uniqueDefs)
                 {
-                    umcd.MsPosition = currentPosition;
-                    currentPosition += umcd.MsDuration;
+                    umcd.MsPositionReFirstUD = currentPositionReFirstIUD;
+                    currentPositionReFirstIUD += umcd.MsDuration;
                 }
+            }
+        }
+
+        private int _msPositionReSeq = 0;
+        /// <summary>
+        /// The msPosition of the first note or rest in the UniqueDefs list re the start of the containing Seq.
+        /// The msPositions of the IUniqueDefs in the Trk are re the first IUniqueDef in the list, so the first IUniqueDef.MsPositionReFirstUID is always 0;
+        /// </summary>
+        public int MsPositionReContainer
+        {
+            get
+            {
+                return _msPositionReSeq;
+            }
+            set
+            {
+                Debug.Assert(value >= 0);
+                _msPositionReSeq = value;
             }
         }
 
@@ -851,6 +991,7 @@ namespace Moritz.Spec
         }
 
 		protected List<IUniqueDef> _uniqueDefs = new List<IUniqueDef>();
+
         #endregion protected
     }
 }

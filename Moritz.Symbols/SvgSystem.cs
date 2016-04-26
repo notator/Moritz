@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 
 using Moritz.Xml;
+using Moritz.Spec;
 
 namespace Moritz.Symbols
 {
@@ -24,14 +25,14 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         public void WriteSVG(SvgWriter w, int systemNumber, PageFormat pageFormat)
         {
-            w.SvgStartGroup("system", "sys" + systemNumber.ToString());
+            w.SvgStartGroup("system");
 
             for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
             {
                 Staves[staffIndex].WriteSVG(w, systemNumber, staffIndex + 1);
             }
 
-            w.SvgStartGroup(null, "sys" + systemNumber.ToString() + "connectors");
+            w.SvgStartGroup("staffConnectors");
 
             WriteConnectors(w, systemNumber, pageFormat);
 
@@ -141,7 +142,7 @@ namespace Moritz.Symbols
 
             MoveClefsAndBarlines(pageFormat.StafflineStemStrokeWidth);
 
-            List<NoteObjectMoment> moments = this.MomentSymbols();
+            List<NoteObjectMoment> moments = MomentSymbols();
 
             // barlineWidths:  Key is a moment's msPosition. Value is the distance between the left edge 
             // of the barline and the AlignmentX of the moment which immediately follows it.
@@ -158,10 +159,10 @@ namespace Moritz.Symbols
             symbolSet.AdjustRestsVertically(Staves);
             symbolSet.SetBeamedStemLengths(Staves); // see the comment next to the function
 
-            bool success = JustifyHorizontally(moments, barlineWidths, pageFormat.StafflineStemStrokeWidth);
-            if(success)
-            {
-                symbolSet.FinalizeBeamBlocks(Staves);
+			bool success = JustifyHorizontally(moments, barlineWidths, pageFormat.StafflineStemStrokeWidth);
+			if(success)
+			{
+				symbolSet.FinalizeBeamBlocks(Staves);
                 symbolSet.AlignLyrics(Staves);
                 SvgSystem nextSystem = null;
                 if(systemNumber < this.Score.Systems.Count)
@@ -180,18 +181,18 @@ namespace Moritz.Symbols
 				AlignStaffnamesInLeftMargin(leftMargin, pageFormat.Gap);
 
 				ResetStaffMetricsBoundaries();
-            }
-            else
-            {
-                string msg = 
-                    "There was not enough horizontal space for all the symbols in\n\n" +
-                    "                         system number " + systemNumber.ToString() + ".\n\n" +
-                    "Possible solutions:\n" +
-                    "    Reduce the number of bars in the system.\n" +
-                    "    Set a smaller gap size for the score.";
-                MessageBox.Show(msg, "Problem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-            return success;
+			}
+			else
+			{
+				string msg =
+					"There was not enough horizontal space for all the symbols in\n\n" +
+					"                         system number " + systemNumber.ToString() + ".\n\n" +
+					"Possible solutions:\n" +
+					"    Reduce the number of bars in the system.\n" +
+					"    Set a smaller gap size for the score.";
+				MessageBox.Show(msg, "Problem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+			}
+			return success;
         }
 
         private float CreateMetrics(Graphics graphics, PageFormat pageFormat, float leftMarginPos)
@@ -318,7 +319,7 @@ namespace Moritz.Symbols
             }
         }
 
-        private Dictionary<int, float> JustifyLowerVoicesHorizontally(ref bool lowerVoiceMoved, 
+		private Dictionary<int, float> JustifyLowerVoicesHorizontally(ref bool lowerVoiceMoved, 
             List<NoteObjectMoment> systemMoments, Dictionary<int, float> barlineWidths,
             HashSet<int> nonCompressibleSystemMomentPositions, float hairline)
         {
@@ -372,7 +373,7 @@ namespace Moritz.Symbols
                         if(voiceNOM == null)
                         {
                             // noteObject in voice 1
-                            voiceNOM = new NoteObjectMoment(noteObject, systemNOM.MsPosition);
+                            voiceNOM = new NoteObjectMoment(noteObject, systemNOM.AbsMsPosition);
                             voiceNOM.AlignmentX = systemNOM.AlignmentX;
                         }
                         else // noteObject in voice 2
@@ -401,7 +402,7 @@ namespace Moritz.Symbols
                         if(staffNOM == null)
                         {
                             // noteObject in voice 1
-                            staffNOM = new NoteObjectMoment(noteObject, systemNOM.MsPosition);
+                            staffNOM = new NoteObjectMoment(noteObject, systemNOM.AbsMsPosition);
                             staffNOM.AlignmentX = systemNOM.AlignmentX;
                         }
                         else // noteObject in voice 2
@@ -434,10 +435,10 @@ namespace Moritz.Symbols
             float endBarlineLeftMargin = endBarline.OriginX - endBarline.Left;
 
             Barline barline = null;
-            int msPos = 0;
+            int absMsPos = 0;
             for(int i = 1; i < moments.Count; i++)
             {
-                msPos = moments[i].MsPosition;
+                absMsPos = moments[i].AbsMsPosition;
                 float barlineWidth = 0F;
                 Debug.Assert(moments.Count > 1);
 
@@ -445,7 +446,7 @@ namespace Moritz.Symbols
                 if(barline != null)
                 {
                     barlineWidth = moments[i].AlignmentX - barline.Metrics.Left;
-                    barlineWidths.Add(msPos, barlineWidth);
+                    barlineWidths.Add(absMsPos, barlineWidth);
                 }
             }
             return barlineWidths;
@@ -461,8 +462,6 @@ namespace Moritz.Symbols
         /// <typeparam name="Type">DurationSymbol, ChordSymbol, RestSymbol</typeparam>
         private List<NoteObjectMoment> MomentSymbols()
         {
-            int finalBarlineMsPosition = FinalBarlineMsPosition();
-
             SortedDictionary<int, NoteObjectMoment> dict = new SortedDictionary<int, NoteObjectMoment>();
             Barline barline = null;
             ClefSymbol clef = null;
@@ -480,22 +479,24 @@ namespace Moritz.Symbols
                         DurationSymbol durationSymbol = noteObject as DurationSymbol;
                         if(durationSymbol != null)
                         {
-                            if(!dict.ContainsKey(durationSymbol.MsPosition))
+							int key = durationSymbol.AbsMsPosition;
+
+							if(!dict.ContainsKey(key))
                             {
-                                dict.Add(durationSymbol.MsPosition, new NoteObjectMoment(durationSymbol));
+                                dict.Add(key, new NoteObjectMoment(durationSymbol));
                             }
                             else
                             {
-                                dict[durationSymbol.MsPosition].Add(durationSymbol);
+                                dict[key].Add(durationSymbol);
                             }
                             if(clef != null)
                             {
-                                dict[durationSymbol.MsPosition].Add(clef);
+                                dict[key].Add(clef);
                                 clef = null;
                             }
                             if(barline != null)
                             {
-                                dict[durationSymbol.MsPosition].Add(barline);
+                                dict[key].Add(barline);
                                 barline = null;
                             }
                         }
@@ -504,17 +505,17 @@ namespace Moritz.Symbols
 
                     if(clef != null) // final clef
                     {
-                        if(dict.ContainsKey(finalBarlineMsPosition))
-                            dict[finalBarlineMsPosition].Add(clef);
+                        if(dict.ContainsKey(this.AbsEndMsPosition))
+                            dict[this.AbsEndMsPosition].Add(clef);
                         else
-                            dict.Add(finalBarlineMsPosition, new NoteObjectMoment(clef, finalBarlineMsPosition));
+                            dict.Add(this.AbsEndMsPosition, new NoteObjectMoment(clef, this.AbsEndMsPosition));
                     }
                     if(barline != null) // final barline
                     {
-                        if(dict.ContainsKey(finalBarlineMsPosition))
-                            dict[finalBarlineMsPosition].Add(barline);
+                        if(dict.ContainsKey(this.AbsEndMsPosition))
+                            dict[this.AbsEndMsPosition].Add(barline);
                         else
-                            dict.Add(finalBarlineMsPosition, new NoteObjectMoment(barline, finalBarlineMsPosition));
+                            dict.Add(this.AbsEndMsPosition, new NoteObjectMoment(barline, this.AbsEndMsPosition));
                     }
                 }
             }
@@ -534,60 +535,14 @@ namespace Moritz.Symbols
             float prevMsPos = -1;
             foreach(NoteObjectMoment moment in momentSymbols)
             {
-                Debug.Assert(moment.MsPosition > prevMsPos);
-                prevMsPos = moment.MsPosition;
+                Debug.Assert(moment.AbsMsPosition > prevMsPos);
+                prevMsPos = moment.AbsMsPosition;
             }
             #endregion
 
             return momentSymbols;
         }
 
-        private int FinalBarlineMsPosition()
-        {
-            int finalBarlineMsPosition = -1;
-            SvgScore score = this.Score;
-            int thisSystemIndex = -1;
-            for(int i = 0; i < score.Systems.Count; ++i)
-            {
-                if(score.Systems[i] == this)
-                {
-                    thisSystemIndex = i;
-                }
-            }
-
-            Debug.Assert(thisSystemIndex >= 0);
-            if(thisSystemIndex < (score.Systems.Count - 1))
-            {
-                int nextSystemIndex = thisSystemIndex + 1;
-                Voice topVoiceInNextSystem = Score.Systems[nextSystemIndex].Staves[0].Voices[0];
-                foreach(NoteObject noteObject in topVoiceInNextSystem.NoteObjects)
-                {
-                    DurationSymbol durationSymbol = noteObject as DurationSymbol;
-                    if(durationSymbol != null)
-                    {
-                        finalBarlineMsPosition = durationSymbol.MsPosition;
-                        break;
-                    }
-                }
-            }
-            else
-            {   // the final system
-                List<NoteObject> noteObjects = this.Staves[0].Voices[0].NoteObjects;
-                for(int i = noteObjects.Count - 1; i >= 0; --i)
-                {
-                    DurationSymbol durationSymbol = noteObjects[i] as DurationSymbol;
-                    if(durationSymbol != null)
-                    {
-                        finalBarlineMsPosition = durationSymbol.MsPosition + durationSymbol.MsDuration;
-                        break;
-                    }
-                }
-            }
-
-            Debug.Assert(finalBarlineMsPosition > 0);
-
-            return finalBarlineMsPosition;
-        }
         /// <summary>
         /// Moves clefs and barlines to the left of the following duration symbols, leaving a hairline gap between the symbols.
         /// If the first durationSymbol at the start of the staff is a cautionary, the distance from the clef to the barline is gap.
@@ -651,7 +606,7 @@ namespace Moritz.Symbols
             float momentWidth = 0;
             for(int i = 1; i < moments.Count; i++)
             {
-                momentWidth = (moments[i].MsPosition - moments[i - 1].MsPosition) * 10000F;
+                momentWidth = (moments[i].AbsMsPosition - moments[i - 1].AbsMsPosition) * 10000F;
                 momentWidths.Add(momentWidth);
             }
             momentWidths.Add(0F); // final barline
@@ -675,9 +630,9 @@ namespace Moritz.Symbols
             float currentPosition = leftMarginPos + leftEdgeToFirstAlignment;
             for(int i = 0; i < momentWidths.Count; i++)
             {
-                if(barlineWidths.ContainsKey(moments[i].MsPosition))
+                if(barlineWidths.ContainsKey(moments[i].AbsMsPosition))
                 {
-                    currentPosition += barlineWidths[moments[i].MsPosition];
+                    currentPosition += barlineWidths[moments[i].AbsMsPosition];
                 }
                 moments[i].MoveToAlignmentX(currentPosition);
                 currentPosition += momentWidths[i] * factor;
@@ -694,7 +649,7 @@ namespace Moritz.Symbols
 
             NoteObjectMoment previousNOM = null;
             float overlapWidth = 0;
-            int msPos = 0;
+            int absMsPos = 0;
             int previousMsPos = 0;
 
             foreach(NoteObjectMoment nom in staffMoments)
@@ -706,8 +661,8 @@ namespace Moritz.Symbols
                         overlapWidth = aS.OverlapWidth(previousNOM);
                         if(overlapWidth >= 0)
                         {
-                            msPos = nom.MsPosition;
-                            previousMsPos = previousNOM.MsPosition;
+                            absMsPos = nom.AbsMsPosition;
+                            previousMsPos = previousNOM.AbsMsPosition;
 
                             overlapWidth += hairline;
                             if(overlaps.ContainsKey(previousMsPos))
@@ -751,12 +706,12 @@ namespace Moritz.Symbols
 
                 for(int i = 1; i < systemMoments.Count; ++i)
                 {
-                    int sysMomentMsPos = systemMoments[i - 1].MsPosition;
+                    int sysMomentMsPos = systemMoments[i - 1].AbsMsPosition;
                     float existingWidth = systemMomentWidthsWithoutBarlines[sysMomentMsPos];
                     float alignmentX = systemMoments[i - 1].AlignmentX + (existingWidth * widthFactors[sysMomentMsPos]);
 
-                    if(barlineWidths.ContainsKey(systemMoments[i].MsPosition))
-                        alignmentX += barlineWidths[systemMoments[i].MsPosition];
+                    if(barlineWidths.ContainsKey(systemMoments[i].AbsMsPosition))
+                        alignmentX += barlineWidths[systemMoments[i].AbsMsPosition];
 
                     systemMoments[i].MoveToAlignmentX(alignmentX);
                 }
@@ -777,12 +732,12 @@ namespace Moritz.Symbols
             for(int i = 1; i < moments.Count; i++)
             {
                 originalWidth = moments[i].AlignmentX - moments[i - 1].AlignmentX;
-                if(barlineWidths.ContainsKey(moments[i].MsPosition))
+                if(barlineWidths.ContainsKey(moments[i].AbsMsPosition))
                 {
-                    originalWidth -= barlineWidths[moments[i].MsPosition];
+                    originalWidth -= barlineWidths[moments[i].AbsMsPosition];
                 }
 
-                originalWidthsWithoutBarlines.Add(moments[i - 1].MsPosition, originalWidth);
+                originalWidthsWithoutBarlines.Add(moments[i - 1].AbsMsPosition, originalWidth);
             }
 
             return originalWidthsWithoutBarlines;
@@ -801,19 +756,19 @@ namespace Moritz.Symbols
             Debug.Assert(staffMoments.Count > 1);
             for(int stmIndex = 1; stmIndex < staffMoments.Count; ++stmIndex)
             {
-                int prevMPos = staffMoments[stmIndex - 1].MsPosition;
-                int mPos = staffMoments[stmIndex].MsPosition;
+                int prevMPos = staffMoments[stmIndex - 1].AbsMsPosition;
+                int mPos = staffMoments[stmIndex].AbsMsPosition;
                 if(staffOverlaps.ContainsKey(prevMPos))
                 {
                     int startIndex = 0;
                     int endIndex = 0;
                     for(int i = 0; i < systemMoments.Count; ++i)
                     {
-                        if(systemMoments[i].MsPosition == prevMPos)
+                        if(systemMoments[i].AbsMsPosition == prevMPos)
                         {
                             startIndex = i;
                         }
-                        if(systemMoments[i].MsPosition == mPos)
+                        if(systemMoments[i].AbsMsPosition == mPos)
                         {
                             endIndex = i;
                             break;
@@ -821,7 +776,7 @@ namespace Moritz.Symbols
                     }
                     for(int i = startIndex; i < endIndex; ++i)
                     {
-                        nonCompressibleSystemMomentPositions.Add(systemMoments[i].MsPosition);
+                        nonCompressibleSystemMomentPositions.Add(systemMoments[i].AbsMsPosition);
                     }
                 }
             }
@@ -909,7 +864,7 @@ namespace Moritz.Symbols
             List<int> systemMomentKeys = new List<int>();
             foreach(NoteObjectMoment nom in systemMoments)
             {
-                systemMomentKeys.Add(nom.MsPosition);
+                systemMomentKeys.Add(nom.AbsMsPosition);
             }
 
             Dictionary<int, float> widthFactors = new Dictionary<int, float>();
@@ -926,8 +881,8 @@ namespace Moritz.Symbols
             float expFactor = 0;
             for(int i = 1; i < staffMoments.Count; ++i)
             {
-                int startMsPos = staffMoments[i - 1].MsPosition;
-                int endMsPos = staffMoments[i].MsPosition;
+                int startMsPos = staffMoments[i - 1].AbsMsPosition;
+                int endMsPos = staffMoments[i].AbsMsPosition;
                 if(staffExpansionFactors.ContainsKey(startMsPos))
                 {
                     expFactor = staffExpansionFactors[startMsPos];
@@ -1109,7 +1064,8 @@ namespace Moritz.Symbols
                         (((visibleStaffIndex == 0) || !barlineContinuesDownList[visibleStaffIndex - 1]) // there is no grouped staff above
                             && (!barlineContinuesDownList[visibleStaffIndex])); // there is no grouped staff below 
 
-                    if(noteObjects[i] is CautionaryChordSymbol && !isSingleStaffGroup)
+                    if((noteObjects[i] is CautionaryOutputChordSymbol || noteObjects[i] is CautionaryInputChordSymbol)
+                    && !isSingleStaffGroup)
                     {                           
                         Barline barline = noteObjects[i - 1] as Barline;
                         Debug.Assert(barline != null);
@@ -1136,7 +1092,9 @@ namespace Moritz.Symbols
                     {
                         List<NoteObject> noteObjects = Staves[staffIndex].Voices[0].NoteObjects;
                         Barline barline = noteObjects[noteObjects.Count - 1] as Barline;
-                        if(barline != null && nextSystem.Staves[staffIndex].Voices[0].FirstDurationSymbol is CautionaryChordSymbol)
+                        DurationSymbol durationSymbol = nextSystem.Staves[staffIndex].Voices[0].FirstDurationSymbol;
+                        if(barline != null
+                        && (durationSymbol is CautionaryOutputChordSymbol || durationSymbol is CautionaryInputChordSymbol))
                         {
                             barline.Visible = false;
                         }
@@ -1194,9 +1152,13 @@ namespace Moritz.Symbols
         }
         #endregion
 
+        public int AbsStartMsPosition;
+        public int AbsEndMsPosition;
+
         public List<Staff> Staves = new List<Staff>();
         internal SystemMetrics Metrics = null;
 
         public SvgScore Score; // containing score
+        
     }
 }

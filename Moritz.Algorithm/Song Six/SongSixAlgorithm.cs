@@ -58,22 +58,22 @@ namespace Moritz.Algorithm.SongSix
             AdjustWindPitchWheelDeviations(wind3);
             AdjustWindVelocities(wind1, wind2, wind3);
             Dictionary<string, int> msPositions = new Dictionary<string, int>();
-            msPositions.Add("verse1", clytemnestra[1].MsPosition);
-            msPositions.Add("interlude1", wind1[15].MsPosition);
-            msPositions.Add("verse2", clytemnestra[60].MsPosition);
-            msPositions.Add("interlude2", wind1[25].MsPosition);
-            msPositions.Add("verse3", clytemnestra[117].MsPosition);
-            msPositions.Add("interlude3", wind1[38].MsPosition);
-            msPositions.Add("interlude3Bar2", wind3[40].MsPosition);
-            msPositions.Add("verse4", clytemnestra[174].MsPosition);
-            msPositions.Add("verse4EsCaped", clytemnestra[236].MsPosition);
-            msPositions.Add("interlude4", wind1[57].MsPosition);
-            msPositions.Add("interlude4End", wind3[65].MsPosition);
-            msPositions.Add("verse5", clytemnestra[269].MsPosition);
-            msPositions.Add("verse5Calls", clytemnestra[288].MsPosition);
-            msPositions.Add("postlude", clytemnestra[289].MsPosition);
-            msPositions.Add("postludeDiminuendo", wind1[80].MsPosition);
-            msPositions.Add("finalWindChord", wind1[81].MsPosition);
+            msPositions.Add("verse1", clytemnestra[1].MsPositionReTrk);
+            msPositions.Add("interlude1", wind1[15].MsPositionReTrk);
+            msPositions.Add("verse2", clytemnestra[60].MsPositionReTrk);
+            msPositions.Add("interlude2", wind1[25].MsPositionReTrk);
+            msPositions.Add("verse3", clytemnestra[117].MsPositionReTrk);
+            msPositions.Add("interlude3", wind1[38].MsPositionReTrk);
+            msPositions.Add("interlude3Bar2", wind3[40].MsPositionReTrk);
+            msPositions.Add("verse4", clytemnestra[174].MsPositionReTrk);
+            msPositions.Add("verse4EsCaped", clytemnestra[236].MsPositionReTrk);
+            msPositions.Add("interlude4", wind1[57].MsPositionReTrk);
+            msPositions.Add("interlude4End", wind3[65].MsPositionReTrk);
+            msPositions.Add("verse5", clytemnestra[269].MsPositionReTrk);
+            msPositions.Add("verse5Calls", clytemnestra[288].MsPositionReTrk);
+            msPositions.Add("postlude", clytemnestra[289].MsPositionReTrk);
+            msPositions.Add("postludeDiminuendo", wind1[80].MsPositionReTrk);
+            msPositions.Add("finalWindChord", wind1[81].MsPositionReTrk);
             msPositions.Add("endOfPiece", wind1.EndMsPosition);
             // other positions are added as the voices are completed (see GetFuriesInterlude3ToEnd() )
             // contouring test code
@@ -129,9 +129,9 @@ namespace Moritz.Algorithm.SongSix
         }
         private void AdjustFinalWindChordPosition(Trk wind1, Trk wind2, Trk wind3)
         {
-            wind1.AlignObjectAtIndex(71, 81, 82, wind1[81].MsPosition - (wind1[81].MsDuration / 2));
-            wind2.AlignObjectAtIndex(71, 81, 82, wind2[81].MsPosition - (wind2[81].MsDuration / 2));
-            wind3.AlignObjectAtIndex(71, 81, 82, wind3[81].MsPosition - (wind3[81].MsDuration / 2));
+            wind1.AlignObjectAtIndex(71, 81, 82, wind1[81].MsPositionReTrk - (wind1[81].MsDuration / 2));
+            wind2.AlignObjectAtIndex(71, 81, 82, wind2[81].MsPositionReTrk - (wind2[81].MsDuration / 2));
+            wind3.AlignObjectAtIndex(71, 81, 82, wind3[81].MsPositionReTrk - (wind3[81].MsDuration / 2));
         }
         private void AdjustWindVelocities(Trk wind1, Trk wind2, Trk wind3)
         {
@@ -243,131 +243,131 @@ namespace Moritz.Algorithm.SongSix
                 #region msPositions
                 #region intro
                 0,
-                w3[1].MsPosition,
-                w3[3].MsPosition,
-                w3[5].MsPosition,
+                w3[1].MsPositionReTrk,
+                w3[3].MsPositionReTrk,
+                w3[5].MsPositionReTrk,
                 #endregion
                 #region verse 1
-                c[1].MsPosition,
-                c[3].MsPosition,
-                c[8].MsPosition,
-                c[12].MsPosition,
-                c[15].MsPosition,
-                c[18].MsPosition,
-                c[22].MsPosition,
-                c[27].MsPosition,
-                c[34].MsPosition,
-                c[38].MsPosition,
-                c[41].MsPosition,
-                c[47].MsPosition,
-                c[49].MsPosition,
-                c[50].MsPosition,
-                c[54].MsPosition,
-                c[58].MsPosition,
+                c[1].MsPositionReTrk,
+                c[3].MsPositionReTrk,
+                c[8].MsPositionReTrk,
+                c[12].MsPositionReTrk,
+                c[15].MsPositionReTrk,
+                c[18].MsPositionReTrk,
+                c[22].MsPositionReTrk,
+                c[27].MsPositionReTrk,
+                c[34].MsPositionReTrk,
+                c[38].MsPositionReTrk,
+                c[41].MsPositionReTrk,
+                c[47].MsPositionReTrk,
+                c[49].MsPositionReTrk,
+                c[50].MsPositionReTrk,
+                c[54].MsPositionReTrk,
+                c[58].MsPositionReTrk,
                 #endregion
                 #region interlude after verse 1
-                w2[15].MsPosition,
-                w2[16].MsPosition,
-                w2[18].MsPosition,
+                w2[15].MsPositionReTrk,
+                w2[16].MsPositionReTrk,
+                w2[18].MsPositionReTrk,
                 #endregion
                 #region verse 2
-                c[60].MsPosition,
-                c[62].MsPosition,
-                c[67].MsPosition,
-                c[71].MsPosition,
-                c[73].MsPosition,
-                c[77].MsPosition,
-                c[81].MsPosition,
-                c[86].MsPosition,
-                c[88].MsPosition,
-                c[92].MsPosition,
-                c[94].MsPosition,
-                c[97].MsPosition,
-                c[100].MsPosition,
-                c[104].MsPosition,
-                c[107].MsPosition,
-                c[111].MsPosition,
-                c[115].MsPosition,
+                c[60].MsPositionReTrk,
+                c[62].MsPositionReTrk,
+                c[67].MsPositionReTrk,
+                c[71].MsPositionReTrk,
+                c[73].MsPositionReTrk,
+                c[77].MsPositionReTrk,
+                c[81].MsPositionReTrk,
+                c[86].MsPositionReTrk,
+                c[88].MsPositionReTrk,
+                c[92].MsPositionReTrk,
+                c[94].MsPositionReTrk,
+                c[97].MsPositionReTrk,
+                c[100].MsPositionReTrk,
+                c[104].MsPositionReTrk,
+                c[107].MsPositionReTrk,
+                c[111].MsPositionReTrk,
+                c[115].MsPositionReTrk,
                 #endregion
                 #region interlude after verse 2
-                w1[25].MsPosition,
-                w1[26].MsPosition,
-                w1[28].MsPosition,
-                w1[30].MsPosition,
+                w1[25].MsPositionReTrk,
+                w1[26].MsPositionReTrk,
+                w1[28].MsPositionReTrk,
+                w1[30].MsPositionReTrk,
                 #endregion
                 #region verse 3
-                c[117].MsPosition,
-                c[119].MsPosition,
-                c[124].MsPosition,
-                c[126].MsPosition,
-                c[128].MsPosition,
-                c[131].MsPosition,
-                c[135].MsPosition,
-                c[139].MsPosition,
-                c[141].MsPosition,
-                c[146].MsPosition,
-                c[148].MsPosition,
-                c[152].MsPosition,
-                c[159].MsPosition,
-                c[164].MsPosition,
-                c[168].MsPosition,
-                c[172].MsPosition,
+                c[117].MsPositionReTrk,
+                c[119].MsPositionReTrk,
+                c[124].MsPositionReTrk,
+                c[126].MsPositionReTrk,
+                c[128].MsPositionReTrk,
+                c[131].MsPositionReTrk,
+                c[135].MsPositionReTrk,
+                c[139].MsPositionReTrk,
+                c[141].MsPositionReTrk,
+                c[146].MsPositionReTrk,
+                c[148].MsPositionReTrk,
+                c[152].MsPositionReTrk,
+                c[159].MsPositionReTrk,
+                c[164].MsPositionReTrk,
+                c[168].MsPositionReTrk,
+                c[172].MsPositionReTrk,
                 #endregion
                 #region interlude after verse 3
-                w1[38].MsPosition,
-                w3[40].MsPosition,
-                w3[42].MsPosition,
-                w3[44].MsPosition,
-                w3[45].MsPosition,
-                w3[47].MsPosition,
+                w1[38].MsPositionReTrk,
+                w3[40].MsPositionReTrk,
+                w3[42].MsPositionReTrk,
+                w3[44].MsPositionReTrk,
+                w3[45].MsPositionReTrk,
+                w3[47].MsPositionReTrk,
                 #endregion
                 #region verse 4, Oft have ye...
-                c[174].MsPosition,
-                c[177].MsPosition,
-                c[183].MsPosition,
-                c[185].MsPosition,
-                c[192].MsPosition,
-                c[196].MsPosition,
-                c[204].MsPosition,
-                c[206].MsPosition,
-                c[214].MsPosition,
-                c[219].MsPosition,
-                c[221].MsPosition,
-                c[225].MsPosition,
-                c[227].MsPosition,
-                c[229].MsPosition,
-                c[233].MsPosition,
-                c[236].MsPosition,
-                c[242].MsPosition,
-                c[252].MsPosition,
-                c[257].MsPosition,
-                c[259].MsPosition,
-                c[263].MsPosition,
-                c[267].MsPosition,
-                c[268].MsPosition, // new bar 89
+                c[174].MsPositionReTrk,
+                c[177].MsPositionReTrk,
+                c[183].MsPositionReTrk,
+                c[185].MsPositionReTrk,
+                c[192].MsPositionReTrk,
+                c[196].MsPositionReTrk,
+                c[204].MsPositionReTrk,
+                c[206].MsPositionReTrk,
+                c[214].MsPositionReTrk,
+                c[219].MsPositionReTrk,
+                c[221].MsPositionReTrk,
+                c[225].MsPositionReTrk,
+                c[227].MsPositionReTrk,
+                c[229].MsPositionReTrk,
+                c[233].MsPositionReTrk,
+                c[236].MsPositionReTrk,
+                c[242].MsPositionReTrk,
+                c[252].MsPositionReTrk,
+                c[257].MsPositionReTrk,
+                c[259].MsPositionReTrk,
+                c[263].MsPositionReTrk,
+                c[267].MsPositionReTrk,
+                c[268].MsPositionReTrk, // new bar 89
                 #endregion
                 #region interlude after verse 4
-                w1[57].MsPosition,
-                w3[59].MsPosition,
-                f4[45].MsPosition, // was w3[61].MsPosition,
-                w3[63].MsPosition,
-                w2[65].MsPosition, // was w3[65].MsPosition,
-                w1[66].MsPosition, // w3[67].MsPosition,
-                w1[68].MsPosition,
+                w1[57].MsPositionReTrk,
+                w3[59].MsPositionReTrk,
+                f4[45].MsPositionReTrk, // was w3[61].MsPosition,
+                w3[63].MsPositionReTrk,
+                w2[65].MsPositionReTrk, // was w3[65].MsPosition,
+                w1[66].MsPositionReTrk, // w3[67].MsPosition,
+                w1[68].MsPositionReTrk,
                 #endregion
                 #region verse 5
-                c[269].MsPosition,
-                c[270].MsPosition,
-                c[272].MsPosition,
-                c[276].MsPosition,
-                c[279].MsPosition,
-                c[283].MsPosition,
-                c[288].MsPosition,
+                c[269].MsPositionReTrk,
+                c[270].MsPositionReTrk,
+                c[272].MsPositionReTrk,
+                c[276].MsPositionReTrk,
+                c[279].MsPositionReTrk,
+                c[283].MsPositionReTrk,
+                c[288].MsPositionReTrk,
                 #endregion
                 #region postlude
-                c[289].MsPosition,
-                f1[248].MsPosition,
-                f1[280].MsPosition, // new bar 105
+                c[289].MsPositionReTrk,
+                f1[248].MsPositionReTrk,
+                f1[280].MsPositionReTrk, // new bar 105
                 #endregion
                 // final barline
                 w3.EndMsPosition

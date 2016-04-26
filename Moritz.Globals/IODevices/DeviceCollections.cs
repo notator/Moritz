@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace Moritz.Globals.IODevices
 {
@@ -24,7 +25,7 @@ namespace Moritz.Globals.IODevices
         }
 
         /// <summary>
-        /// Loads/reloads the MIDI output devices
+        /// Loads/reloads all devices except VirtualMIDISynth #1 (which is reserved for the Assistant Performer).
         /// </summary>
         public static void LoadOutputDevices()
         {
@@ -37,12 +38,15 @@ namespace Moritz.Globals.IODevices
                 for(Int32 i = 0 ; i < numberOfDevices ; i++)
                 {
                     MIDIOUTCAPS caps = new MIDIOUTCAPS();
-                    if(Functions.midiOutGetDevCaps(i, ref caps, (UInt32) Marshal.SizeOf(caps)) == Constants.MMSYSERR_NOERROR)
+                    uint returnValue = Functions.midiOutGetDevCaps(i, ref caps, (UInt32)Marshal.SizeOf(caps));
+                    Debug.Assert(returnValue  == Constants.MMSYSERR_NOERROR);
+                    if(string.Compare(caps.szPname, "VirtualMIDISynth #1") != 0)
                     {
                         devices.Add(new OutputDevice(i, caps));
                     }
                 }
             }
+
             outputDevices = devices.AsReadOnly();
         }
 

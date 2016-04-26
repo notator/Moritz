@@ -20,7 +20,7 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, int voiceNumber)
         {
-			w.SvgStartGroup("outputVoice", "sys" + systemNumber.ToString() + "staff" + staffNumber.ToString() + "voice" + voiceNumber.ToString());
+			w.SvgStartGroup("outputVoice");
 
             if(MasterVolume != null) // is non-null only in the first system
             {

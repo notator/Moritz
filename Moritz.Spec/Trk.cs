@@ -10,101 +10,100 @@ using Moritz.Globals;
 namespace Moritz.Spec
 {
     /// <summary>
-    /// A temporal sequence of IUniqueDef objects.
-    /// <para>(IUniqueDef is implemented by all Unique...Defs that will eventually be converted to NoteObjects.)</para>
-    /// <para></para>
-    /// <para>This class is IEnumerable, so that foreach loops can be used.</para>
+    /// In Seqs, a temporal sequence of MidiChordDef and RestDef objects (condition Asserted in Seq).
+    /// In Blocks, Trks may also contain CautionaryChordDef objects (condition Asserted in Block);
+    /// <para>All VoiceDef objects are IEnumerable, so that foreach loops can be used.</para>
     /// <para>For example:</para>
-    /// <para>foreach(IUniqueDef iumdd in trkDef) { ... }</para>
+    /// <para>foreach(IUniqueDef iumdd in trk) { ... }</para>
     /// <para>An Enumerator for MidiChordDefs is also defined so that</para>
     /// <para>foreach(MidiChordDef mcd in trkDef.MidiChordDefs) { ... }</para>
     /// <para>can also be used.</para>
     /// <para>This class is also indexable, as in:</para>
-    /// <para>IUniqueDef iu = trkDef[index];</para>
+    /// <para>IUniqueDef iu = trk[index];</para>
     /// </summary>
     public class Trk : VoiceDef
     {
         #region constructors
-
-        /// <summary>
-        /// A VoiceDef beginning at MsPosition = 0, and containing a single RestDef having msDuration
-        /// </summary>
-        /// <param name="msDuration"></param>
-        public Trk(int midiChannel, int msDuration)
-			: base(msDuration)
+        public Trk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
+            : base(midiChannel, msPositionReContainer, iuds)
         {
-			MidiChannel = midiChannel;
+            AssertConstructionConsistency();
         }
 
-		/// <summary>
-		/// <para>If the iuds argument is not empty, the MsPositions and MsDurations in the list are checked for consistency.</para>
-		/// <para>The new VoiceDef's UniqueDefs list is simply set to the argument (which is not cloned).</para>
-		/// </summary>
-		public Trk(int midiChannel, List<IUniqueDef> iuds)
-			: base(iuds)
-		{
-			MidiChannel = midiChannel;
-		}
-
-		/// <summary>
-		/// Returns a deep clone of this TrkDef.
-		/// </summary>
-		public Trk Clone()
+        /// <summary>
+        /// A Trk with msPositionReContainer=0 and an empty UniqueDefs list.
+        /// This constructor is used by Block.PopBar(...).
+        /// </summary>
+        public Trk(int midiChannel)
+            : base(midiChannel, 0, new List<IUniqueDef>())
         {
-            List<IUniqueDef> clonedLmdds = new List<IUniqueDef>();
+        }
+
+        /// <summary>
+        /// Returns a deep clone of this TrkDef.
+        /// </summary>
+        public Trk Clone()
+        {
+            List<IUniqueDef> clonedIUDs = new List<IUniqueDef>();
             foreach(IUniqueDef iu in _uniqueDefs)
             {
                 IUniqueDef clone = iu.Clone();
-                clonedLmdds.Add(clone);
+                clonedIUDs.Add(clone);
             }
 
-            // Clefchange symbols must point at the following object in their own VoiceDef
-            for(int i = 0; i < clonedLmdds.Count; ++i)
-            {
-                ClefChangeDef clone = clonedLmdds[i] as ClefChangeDef;
-                if(clone != null)
-                {
-                    Debug.Assert(i < (clonedLmdds.Count - 1));
-                    ClefChangeDef replacement = new ClefChangeDef(clone.ClefType, clonedLmdds[i + 1]);
-                    clonedLmdds.RemoveAt(i);
-                    clonedLmdds.Insert(i, replacement);
-                }
-            }
-
-            return new Trk(MidiChannel, clonedLmdds);
+            return new Trk(MidiChannel, MsPositionReContainer, clonedIUDs);
         }
         #endregion constructors
 
-        #region Count changers
-        /// <summary>
-        /// Appends the new iUniqueDef to the end of the list.
-        /// </summary>
-        /// <param name="iUniqueDef"></param>
-        public override void Add(IUniqueDef iUniqueDef)
+        internal void AssertConstructionConsistency()
         {
-            Debug.Assert(!(iUniqueDef is InputChordDef));
-            _Add(iUniqueDef);
+            foreach(IUniqueDef iud in UniqueDefs)
+            {
+                // In blocks, trks can also contain CautionaryChordDefs
+                Debug.Assert(iud is MidiChordDef || iud is RestDef);
+            }
         }
 
-		/// <summary>
-		/// Adds the argument to the end of this Trk.
-		/// Sets the MsPositions of the appended UniqueDefs.
-		/// </summary>
-		public void AddRange(Trk trk)
+        internal override void AssertConsistentInBlock()
         {
+            foreach(IUniqueDef iud in UniqueDefs)
+            {
+                // In blocks, trks can also contain CautionaryChordDefs
+                Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is CautionaryChordDef);
+            }
+        }
+
+        #region Count changers
+        /// <summary>
+        /// Appends the new MidiChordDef or RestDef or CautionaryChordDef to the end of the list.
+        /// Automatically sets the iUniqueDef's msPosition.
+        /// Used by Block.PopBar(...), so accepts a CautionaryChordDef argument.
+        /// </summary>
+        public override void Add(IUniqueDef iUniqueDef)
+        {
+            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is RestDef || iUniqueDef is CautionaryChordDef);
+            _Add(iUniqueDef);
+        }
+        /// <summary>
+        /// Adds the argument's UniqueDefs to the end of this Trk.
+        /// Sets the MsPositions of the appended UniqueDefs.
+        /// </summary>
+        public override void AddRange(VoiceDef trk)
+        {
+            Debug.Assert(trk is Trk);
             _AddRange(trk);
         }
-		/// <summary>
-		/// Inserts the iUniqueDef in the list at the given index, and then
-		/// resets the positions of all the uniqueDefs in the list.
-		/// </summary>
-		public override void Insert(int index, IUniqueDef iUniqueDef)
+        /// <summary>
+        /// Inserts the iUniqueDef in the list at the given index, and then
+        /// resets the positions of all the uniqueDefs in the list.
+        /// </summary>
+        public override void Insert(int index, IUniqueDef iUniqueDef)
         {
-            Debug.Assert(!(iUniqueDef is InputChordDef));
+            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is RestDef);
             _Insert(index, iUniqueDef);
         }
         /// <summary>
-        /// Inserts the voiceDef in the list at the given index, and then
+        /// Inserts the trk's UniqueDefs in the list at the given index, and then
         /// resets the positions of all the uniqueDefs in the list.
         /// </summary>
         public void InsertRange(int index, Trk trk)
@@ -118,7 +117,7 @@ namespace Moritz.Spec
         public void InsertInRest(MidiChordDef midiChordDef)
         {
             List<IUniqueDef> iuds = new List<IUniqueDef>() { midiChordDef };
-            Trk trkDefToInsert = new Trk(this.MidiChannel, iuds);
+            Trk trkDefToInsert = new Trk(this.MidiChannel, 0, iuds);
             InsertInRest(trkDefToInsert);
         }
         /// <summary>
@@ -142,7 +141,7 @@ namespace Moritz.Spec
 		/// </summary>
 		public void Replace(int index, IUniqueDef replacementIUnique)
         {
-            Debug.Assert(!(replacementIUnique is InputChordDef));
+            Debug.Assert(replacementIUnique is MidiChordDef || replacementIUnique is RestDef);
             _Replace(index, replacementIUnique);
         }
         #endregion Count changers
@@ -222,60 +221,18 @@ namespace Moritz.Spec
                 mcd.AdjustVelocities(factor);
             }
         }
-        #region deprecated function
-        /// <summary>
-        /// ACHTUNG: This function is deprecated!! Use the other AdjustVelocitiesHairpin(...).
-        /// First creates a hairpin in the velocities from beginIndex to endIndex (non-inclusive),
-        /// then adjusts all the remaining velocities in this VoiceDef by the finalFactor.
-        /// endIndex must be greater than beginIndex + 1.
-        /// The factors by which the velocities are multiplied change arithmetically: The velocities
-        /// at beginIndex are multiplied by 1.0, and the velocities from endIndex to the end of the
-        /// VoiceDef by finalFactor.
-        /// Can be used to create a diminuendo or crescendo.
-        /// </summary>
-        /// <param name="beginDimIndex"></param>
-        /// <param name="endDimIndex"></param>
-        /// <param name="p"></param>
-        public void AdjustVelocitiesHairpin(int beginIndex, int endIndex, double finalFactor)
+
+		/// Creates a hairpin in the velocities from startMsPosition to endMsPosition (non-inclusive).
+		/// This function does NOT change velocities outside the range given in its arguments.
+		/// There must be at least two IUniqueDefs in the msPosition range given in the arguments.
+		/// The factors by which the velocities are multiplied change arithmetically:
+		/// The velocity of the first IUniqueDefs is multiplied by startFactor, and the velocity
+		/// of the last MidiChordDef in range by endFactor.
+		/// Can be used to create a diminueno or crescendo.
+		public void AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
         {
-            Debug.Assert(((beginIndex + 1) < endIndex) && (finalFactor >= 0) && (endIndex <= Count));
-
-            int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
-
-            double factorIncrement = (finalFactor - 1.0) / (endIndex - beginIndex - nNonMidiChordDefs);
-            double factor = 1.0;
-
-            for(int i = beginIndex; i < endIndex; ++i)
-            {
-                MidiChordDef iumdd = _uniqueDefs[i] as MidiChordDef;
-                if(iumdd != null)
-                {
-                    iumdd.AdjustVelocities(factor);
-                    factor += factorIncrement;
-                }
-            }
-
-            for(int i = endIndex; i < _uniqueDefs.Count; ++i)
-            {
-                MidiChordDef iumdd = _uniqueDefs[i] as MidiChordDef;
-                if(iumdd != null)
-                {
-                    iumdd.AdjustVelocities(factor);
-                }
-            }
-        }
-        #endregion deprecated function
-        /// Creates a hairpin in the velocities from startMsPosition to endMsPosition (non-inclusive).
-        /// This function does NOT change velocities outside the range given in its arguments.
-        /// There must be at least two IUniqueDefs in the msPosition range given in the arguments.
-        /// The factors by which the velocities are multiplied change arithmetically:
-        /// The velocity of the first IUniqueDefs is multiplied by startFactor, and the velocity
-        /// of the last MidiChordDef in range by endFactor.
-        /// Can be used to create a diminueno or crescendo.
-        public void AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
-        {
-            int beginIndex = FindIndexAtMsPosition(startMsPosition);
-            int endIndex = FindIndexAtMsPosition(endMsPosition);
+            int beginIndex = FindIndexAtMsPositionReFirstIUD(startMsPosition);
+            int endIndex = FindIndexAtMsPositionReFirstIUD(endMsPosition);
 
             Debug.Assert(((beginIndex + 1) < endIndex) && (startFactor >= 0) && (endFactor >= 0) && (endIndex <= Count));
 
@@ -302,8 +259,8 @@ namespace Moritz.Spec
         /// </summary>
         public void SetPanGliss(int startMsPosition, int endMsPosition, int startPanValue, int endPanValue)
         {
-            int beginIndex = FindIndexAtMsPosition(startMsPosition);
-            int endIndex = FindIndexAtMsPosition(endMsPosition);
+            int beginIndex = FindIndexAtMsPositionReFirstIUD(startMsPosition);
+            int endIndex = FindIndexAtMsPositionReFirstIUD(endMsPosition);
 
             Debug.Assert(((beginIndex + 1) < endIndex) && (startPanValue >= 0) && (startPanValue <= 127)
                 && (endPanValue >= 0) && (endPanValue <=127) && (endIndex <= Count));
@@ -370,8 +327,8 @@ namespace Moritz.Spec
         protected void AdjustPitchWheelDeviations(int startMsPosition, int endMsPosition, int startPwd, int endPwd)
         {
             double furies1StartPwdValue = startPwd, furies1EndPwdValue = endPwd;
-            int beginIndex = FindIndexAtMsPosition(startMsPosition);
-            int endIndex = FindIndexAtMsPosition(endMsPosition);
+            int beginIndex = FindIndexAtMsPositionReFirstIUD(startMsPosition);
+            int endIndex = FindIndexAtMsPositionReFirstIUD(endMsPosition);
 
             int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
 
@@ -397,36 +354,36 @@ namespace Moritz.Spec
 		///     3. toPosition is greater than the msPosition at anchor1Index and less than the msPosition at anchor2Index.
 		/// and throws an appropriate exception if there is a problem.
 		/// </summary>
-		public void AlignObjectAtIndex(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPosition)
+		public void AlignObjectAtIndex(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPositionReFirstIUD)
 		{
 			// throws an exception if there's a problem.
-			CheckAlignDefArgs(anchor1Index, indexToAlign, anchor2Index, toMsPosition);
+			CheckAlignDefArgs(anchor1Index, indexToAlign, anchor2Index, toMsPositionReFirstIUD);
 
 			List<IUniqueDef> lmdds = _uniqueDefs;
-			int anchor1MsPosition = lmdds[anchor1Index].MsPosition;
-			int fromMsPosition = lmdds[indexToAlign].MsPosition;
-			int anchor2MsPosition;
+			int anchor1MsPositionReFirstIUD = lmdds[anchor1Index].MsPositionReFirstUD;
+			int fromMsPositionReFirstIUD = lmdds[indexToAlign].MsPositionReFirstUD;
+			int anchor2MsPositionReFirstIUD;
 			if(anchor2Index == lmdds.Count) // i.e. anchor2 is on the final barline
 			{
-				anchor2MsPosition = lmdds[anchor2Index - 1].MsPosition + lmdds[anchor2Index - 1].MsDuration;
+				anchor2MsPositionReFirstIUD = lmdds[anchor2Index - 1].MsPositionReFirstUD + lmdds[anchor2Index - 1].MsDuration;
 			}
 			else
 			{
-				anchor2MsPosition = lmdds[anchor2Index].MsPosition;
+				anchor2MsPositionReFirstIUD = lmdds[anchor2Index].MsPositionReFirstUD;
 			}
 
-			float leftFactor = (float)(((float)(toMsPosition - anchor1MsPosition)) / ((float)(fromMsPosition - anchor1MsPosition)));
+			float leftFactor = (float)(((float)(toMsPositionReFirstIUD - anchor1MsPositionReFirstIUD)) / ((float)(fromMsPositionReFirstIUD - anchor1MsPositionReFirstIUD)));
 			for(int i = anchor1Index + 1; i < indexToAlign; ++i)
 			{
-				lmdds[i].MsPosition = anchor1MsPosition + ((int)((lmdds[i].MsPosition - anchor1MsPosition) * leftFactor));
+				lmdds[i].MsPositionReFirstUD = anchor1MsPositionReFirstIUD + ((int)((lmdds[i].MsPositionReFirstUD - anchor1MsPositionReFirstIUD) * leftFactor));
 			}
 
-			lmdds[indexToAlign].MsPosition = toMsPosition;
+			lmdds[indexToAlign].MsPositionReFirstUD = toMsPositionReFirstIUD;
 
-			float rightFactor = (float)(((float)(anchor2MsPosition - toMsPosition)) / ((float)(anchor2MsPosition - fromMsPosition)));
+			float rightFactor = (float)(((float)(anchor2MsPositionReFirstIUD - toMsPositionReFirstIUD)) / ((float)(anchor2MsPositionReFirstIUD - fromMsPositionReFirstIUD)));
 			for(int i = anchor2Index - 1; i > indexToAlign; --i)
 			{
-				lmdds[i].MsPosition = anchor2MsPosition - ((int)((anchor2MsPosition - lmdds[i].MsPosition) * rightFactor));
+				lmdds[i].MsPositionReFirstUD = anchor2MsPositionReFirstIUD - ((int)((anchor2MsPositionReFirstIUD - lmdds[i].MsPositionReFirstUD) * rightFactor));
 			}
 
 			#region fix MsDurations
@@ -434,64 +391,62 @@ namespace Moritz.Spec
 			{
 				if(i == lmdds.Count) // possible, when anchor2Index is the final barline
 				{
-					lmdds[i - 1].MsDuration = anchor2MsPosition - lmdds[i - 1].MsPosition;
+					lmdds[i - 1].MsDuration = anchor2MsPositionReFirstIUD - lmdds[i - 1].MsPositionReFirstUD;
 				}
 				else
 				{
-					lmdds[i - 1].MsDuration = lmdds[i].MsPosition - lmdds[i - 1].MsPosition;
+					lmdds[i - 1].MsDuration = lmdds[i].MsPositionReFirstUD - lmdds[i - 1].MsPositionReFirstUD;
 				}
 			}
-			#endregion
-		}
+            #endregion
+
+            AssertVoiceDefConsistency();
+        }
 		/// <summary>
-		/// Throws an exception if
-		///     1. the index arguments are not in ascending order. (None of them may not be equal either.)
+		/// Debug.Assert fails if
+		///     1. the index arguments are not in ascending order or if any are equal.
 		///     2. any of the index arguments are out of range (anchor2Index CAN be _localizedMidiDurationDefs.Count, i.e. the final barline)
 		///     3. toPosition is not greater than the msPosition at anchor1Index and less than the msPosition at anchor2Index.
 		/// </summary>
-		private void CheckAlignDefArgs(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPosition)
+		private void CheckAlignDefArgs(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPositionReFirstUD)
 		{
 			List<IUniqueDef> lmdds = _uniqueDefs;
 			int count = lmdds.Count;
 			string msg = "\nError in VoiceDef.cs,\nfunction AlignDefMsPosition()\n\n";
-			if(anchor1Index >= indexToAlign || anchor2Index <= indexToAlign)
-			{
-				throw new Exception(msg + "Index out of order.\n" +
-					"\nanchor1Index=" + anchor1Index.ToString() +
-					"\nindexToAlign=" + indexToAlign.ToString() +
-					"\nanchor2Index=" + anchor2Index.ToString());
-			}
-			if((anchor1Index > (count - 2) || indexToAlign > (count - 1) || anchor2Index > count)// anchor2Index can be at the final barline (=count)!
-				|| (anchor1Index < 0 || indexToAlign < 1 || anchor2Index < 2))
-			{
-				throw new Exception(msg + "Index out of range.\n" +
+            Debug.Assert((anchor1Index < indexToAlign && anchor2Index > indexToAlign),
+                    msg + "Index out of order.\n" +
+                    "\nanchor1Index=" + anchor1Index.ToString() +
+                    "\nindexToAlign=" + indexToAlign.ToString() +
+                    "\nanchor2Index=" + anchor2Index.ToString());
+
+            Debug.Assert(!(anchor1Index > (count - 2) || indexToAlign > (count - 1) || anchor2Index > count)// anchor2Index can be at the final barline (=count)!
+				|| (anchor1Index < 0 || indexToAlign < 1 || anchor2Index < 2),
+                    msg + "Index out of range.\n" +
 					"\ncount=" + count.ToString() +
 					"\nanchor1Index=" + anchor1Index.ToString() +
 					"\nindexToAlign=" + indexToAlign.ToString() +
 					"\nanchor2Index=" + anchor2Index.ToString());
-			}
 
-			int a1MsPos = lmdds[anchor1Index].MsPosition;
-			int a2MsPos;
+			int a1MsPosReFirstUD = lmdds[anchor1Index].MsPositionReFirstUD;
+			int a2MsPosReFirstIUD;
 			if(anchor2Index == lmdds.Count)
 			{
-				a2MsPos = lmdds[anchor2Index - 1].MsPosition + lmdds[anchor2Index - 1].MsDuration;
+				a2MsPosReFirstIUD = lmdds[anchor2Index - 1].MsPositionReFirstUD + lmdds[anchor2Index - 1].MsDuration;
 			}
 			else
 			{
-				a2MsPos = lmdds[anchor2Index].MsPosition;
+				a2MsPosReFirstIUD = lmdds[anchor2Index].MsPositionReFirstUD;
 			}
-			if(toMsPosition <= a1MsPos || toMsPosition >= a2MsPos)
-			{
-				throw new Exception(msg + "Target (msPos) position out of range.\n" +
+			Debug.Assert((toMsPositionReFirstUD > a1MsPosReFirstUD && toMsPositionReFirstUD < a2MsPosReFirstIUD),
+			        msg + "Target (msPos) position out of range.\n" +
 					"\nanchor1Index=" + anchor1Index.ToString() +
 					"\nindexToAlign=" + indexToAlign.ToString() +
 					"\nanchor2Index=" + anchor2Index.ToString() +
-					"\ntoMsPosition=" + toMsPosition.ToString());
-			}
+					"\ntoMsPosition=" + toMsPositionReFirstUD.ToString());
 		}
 		#endregion alignment
-        #endregion MidiChordDef attribute changers)
+
+		#endregion MidiChordDef attribute changers)
 
 		#region Enumerators
 		private IEnumerable<MidiChordDef> MidiChordDefs
@@ -559,28 +514,30 @@ namespace Moritz.Spec
 
 			RestoreRestPartitions(partitions, restPartitions);
 
-			List<IUniqueDef> sortedLmdds = ConvertPartitionsToFlatLmdds(startAtIndex, partitions);
+			List<IUniqueDef> sortedLmdds = ConvertPartitionsToFlatIUDs(startAtIndex, partitions);
 
 			for(int i = 0; i < sortedLmdds.Count; ++i)
 			{
 				_uniqueDefs[startAtIndex + i] = sortedLmdds[i];
 			}
+
+            AssertVoiceDefConsistency();
 		}
 
-		private List<IUniqueDef> ConvertPartitionsToFlatLmdds(int startAtIndex, List<List<IUniqueDef>> partitions)
+		private List<IUniqueDef> ConvertPartitionsToFlatIUDs(int startAtIndex, List<List<IUniqueDef>> partitions)
 		{
-			List<IUniqueDef> newLmdds = new List<IUniqueDef>();
-			int msPosition = _uniqueDefs[startAtIndex].MsPosition;
+			List<IUniqueDef> newIUDs = new List<IUniqueDef>();
+			int msPositionReFirstIUD = _uniqueDefs[startAtIndex].MsPositionReFirstUD;
 			foreach(List<IUniqueDef> partition in partitions)
 			{
 				foreach(IUniqueDef pLmdd in partition)
 				{
-					pLmdd.MsPosition = msPosition;
-					msPosition += pLmdd.MsDuration;
-					newLmdds.Add(pLmdd);
+					pLmdd.MsPositionReFirstUD = msPositionReFirstIUD;
+					msPositionReFirstIUD += pLmdd.MsDuration;
+					newIUDs.Add(pLmdd);
 				}
 			}
-			return newLmdds;
+			return newIUDs;
 		}
 
 		/// <summary>
@@ -593,6 +550,8 @@ namespace Moritz.Spec
 				KeyValuePair<int, List<IUniqueDef>> kvp = restPartitions[i];
 				partitions.Insert(kvp.Key, kvp.Value);
 			}
+
+            AssertVoiceDefConsistency();
 		}
 
 		private List<List<IUniqueDef>> GetPartitions(int startAtIndex, List<int> partitionSizes)
@@ -612,7 +571,7 @@ namespace Moritz.Spec
 		}
 
 		/// <summary>
-		/// Remove any partitions (from partitions) that contain only a single LocalMidiRestDef.
+		/// Remove any partitions (from partitions) that contain only a single RestDef.
 		/// Store them, with their original partition indices, in the returned list of KeyValuePairs.
 		/// </summary>
 		private List<KeyValuePair<int, List<IUniqueDef>>> GetRestPartitions(List<List<IUniqueDef>> partitions)
@@ -707,7 +666,7 @@ namespace Moritz.Spec
 		}
 
 		/// <summary>
-		/// Throws an exception if one of the following conditions is not met.
+		/// Debug.Assert fails if one of the following conditions is not met.
 		/// <para>startAtIndex is a valid index in the UniqueDefs list</para>
 		/// <para>partitionSizes.Count is greater than 0, and less than 8.</para>
 		/// <para>all sizes in partitionSizes are greater then 0.</para>
@@ -718,37 +677,18 @@ namespace Moritz.Spec
 		private void CheckSetContourArgs(int startAtIndex, List<int> partitionSizes, int axisNumber, int contourNumber)
 		{
 			List<IUniqueDef> lmdds = _uniqueDefs;
-			if(startAtIndex < 0 || startAtIndex > lmdds.Count - 1)
-			{
-				throw new ArgumentException("startAtIndex is out of range.");
-			}
-			if(partitionSizes.Count < 1 || partitionSizes.Count > 7)
-			{
-				throw new ArgumentException("partitionSizes.Count must be in range 1..7");
-			}
+			Debug.Assert(!(startAtIndex < 0 || startAtIndex > lmdds.Count - 1), "startAtIndex is out of range.");
+			Debug.Assert(!(partitionSizes.Count < 1 || partitionSizes.Count > 7), "partitionSizes.Count must be in range 1..7");
 
 			int totalNumberOfLmdds = startAtIndex;
 			foreach(int size in partitionSizes)
 			{
-				if(size < 1)
-				{
-					throw new ArgumentException("partitions must contain at least one IUniqueDef");
-				}
+				Debug.Assert(size >= 1, "partitions must contain at least one IUniqueDef");
 				totalNumberOfLmdds += size;
-				if(totalNumberOfLmdds > lmdds.Count)
-				{
-					throw new ArgumentException("partitions are too big or start too late");
-				}
+				Debug.Assert(!(totalNumberOfLmdds > lmdds.Count), "partitions are too big or start too late");
 			}
-
-			if(contourNumber < 1 || contourNumber > 12)
-			{
-				throw new ArgumentException("contourNumber out of range 1..12");
-			}
-			if(axisNumber < 1 || axisNumber > 12)
-			{
-				throw new ArgumentException("axisNumber out of range 1..12");
-			}
+            Debug.Assert(!(contourNumber < 1 || contourNumber > 12), "contourNumber out of range 1..12");
+            Debug.Assert(!(axisNumber < 1 || axisNumber > 12), "axisNumber out of range 1..12");
 		}
 		#endregion public Permute
 

@@ -179,13 +179,14 @@ namespace Moritz.Symbols
 
             foreach(NoteObject noteObject in NoteObjects)
             {
-                CautionaryChordSymbol cautionaryChord = noteObject as CautionaryChordSymbol;
+                CautionaryOutputChordSymbol cautionaryOutputChord = noteObject as CautionaryOutputChordSymbol;
+                CautionaryInputChordSymbol cautionaryInputChord = noteObject as CautionaryInputChordSymbol;
                 ChordSymbol chord = noteObject as ChordSymbol;
                 RestSymbol rest = noteObject as RestSymbol;
                 ClefSymbol clef = noteObject as ClefSymbol;
                 Barline barline = noteObject as Barline;
 
-                if(cautionaryChord != null)
+                if(cautionaryOutputChord != null || cautionaryInputChord != null)
                     continue;
 
                 if(chord != null)

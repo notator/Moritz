@@ -10,13 +10,19 @@ namespace Moritz.Algorithm.SongSix
 {
     internal class Furies3 : Trk
     {
-        internal Furies3(int midiChannel, int msDuration)
-			: base(midiChannel, msDuration)
+		/// <summary>
+		/// A VoiceDef beginning at MsPosition = 0, and containing a single RestDef having msDuration
+		/// </summary>
+		/// <param name="msDuration"></param>
+		internal Furies3(int midiChannel, int msDuration)
+			: base(midiChannel)
         {
-        }
+			RestDef lmRestDef = new RestDef(0, msDuration);
+			_uniqueDefs.Add(lmRestDef);
+		}
 
-        #region before Interlude3
-        internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, Trk wind1, List<Palette> palettes)
+		#region before Interlude3
+		internal void GetBeforeInterlude3(int firstRestMsDuration, Clytemnestra clytemnestra, Trk wind1, List<Palette> palettes)
         {
             GetFlutters(firstRestMsDuration, palettes[2]);
 
@@ -25,12 +31,12 @@ namespace Moritz.Algorithm.SongSix
             EndMsPosition = clytemnestra.EndMsPosition;
 
             #region alignments
-            AlignObjectAtIndex(1, 25, 37, clytemnestra[61].MsPosition);
-            AlignObjectAtIndex(25, 37, 49, clytemnestra[82].MsPosition);
-            AlignObjectAtIndex(37, 49, 61, clytemnestra[98].MsPosition);
-            AlignObjectAtIndex(49, 61, 106, wind1[25].MsPosition);
-            AlignObjectAtIndex(61, 106, 134, wind1[28].MsPosition);
-            AlignObjectAtIndex(106, 134, 136, wind1[30].MsPosition);
+            AlignObjectAtIndex(1, 25, 37, clytemnestra[61].MsPositionReTrk);
+            AlignObjectAtIndex(25, 37, 49, clytemnestra[82].MsPositionReTrk);
+            AlignObjectAtIndex(37, 49, 61, clytemnestra[98].MsPositionReTrk);
+            AlignObjectAtIndex(49, 61, 106, wind1[25].MsPositionReTrk);
+            AlignObjectAtIndex(61, 106, 134, wind1[28].MsPositionReTrk);
+            AlignObjectAtIndex(106, 134, 136, wind1[30].MsPositionReTrk);
             #endregion
         }
 
@@ -89,7 +95,7 @@ namespace Moritz.Algorithm.SongSix
             {
                 int[] contour = K.Contour(7, 11, 7);
                 IUniqueDef flutter = palette.UniqueDurationDef(contour[i] - 1);
-                flutter.MsPosition = msPosition;
+                flutter.MsPositionReTrk = msPosition;
                 msPosition += flutter.MsDuration;
                 flutter1.Add(flutter);
 
@@ -142,7 +148,7 @@ namespace Moritz.Algorithm.SongSix
                 for(int j = 6; j >= 0; --j)
                 {
                     IUniqueDef ticks = ticksPalette.UniqueDurationDef(contour[j] - 1);
-                    ticks.MsPosition = msPosition;
+                    ticks.MsPositionReTrk = msPosition;
                     msPosition += ticks.MsDuration;
                     MidiChordDef iumdd = ticks as MidiChordDef;
                     if(iumdd != null)
@@ -166,27 +172,27 @@ namespace Moritz.Algorithm.SongSix
             double[] velocityfactors = { 0.32, 0.34, 0.36, 0.38, 0.40, 0.42 };
             int[] msPositions =
             { 
-                this[112].MsPosition + 200, 
-                this[129].MsPosition + 500, 
-                clytemnestra[118].MsPosition,
-                clytemnestra[138].MsPosition + 250,
-                clytemnestra[151].MsPosition,
-                furies2[57].MsPosition
+                this[112].MsPositionReTrk + 200, 
+                this[129].MsPositionReTrk + 500, 
+                clytemnestra[118].MsPositionReTrk,
+                clytemnestra[138].MsPositionReTrk + 250,
+                clytemnestra[151].MsPositionReTrk,
+                furies2[57].MsPositionReTrk
             };
             for(int i = 5; i >=0; --i)
             {
                 MidiChordDef cheep = chirpsPalette.MidiChordDef(chirpIndices[i]);
-                cheep.MsPosition = msPositions[i];
+                cheep.MsPositionReTrk = msPositions[i];
                 cheep.AdjustVelocities(velocityfactors[i]);
                 cheep.Transpose(transpositions[i]);
                 InsertInRest(cheep);
             }
 
-            AlignObjectAtIndex(25, 30, 31, clytemnestra[65].MsPosition);
-            AlignObjectAtIndex(140, 141, 142, clytemnestra[119].MsPosition);
-            AlignObjectAtIndex(142, 143, 144, clytemnestra[140].MsPosition);
-            AlignObjectAtIndex(144, 145, 146, clytemnestra[152].MsPosition);
-            AlignObjectAtIndex(146, 147, 148, furies1[23].MsPosition);
+            AlignObjectAtIndex(25, 30, 31, clytemnestra[65].MsPositionReTrk);
+            AlignObjectAtIndex(140, 141, 142, clytemnestra[119].MsPositionReTrk);
+            AlignObjectAtIndex(142, 143, 144, clytemnestra[140].MsPositionReTrk);
+            AlignObjectAtIndex(144, 145, 146, clytemnestra[152].MsPositionReTrk);
+            AlignObjectAtIndex(146, 147, 148, furies1[23].MsPositionReTrk);
 
             AgglomerateRestOrChordAt(114);
 
@@ -212,11 +218,11 @@ namespace Moritz.Algorithm.SongSix
 
             List<int> strandIndices = GetStrandIndices(krystal);
 
-            Trk finalePart1 = f3FinalePalette1.NewTrkDef(2, krystal);
+            Trk finalePart1 = f3FinalePalette1.NewTrk(2, krystal);
             Transform(finalePart1, msPositions, strandIndices);
-            Trk finalePart2 = f3FinalePalette2.NewTrkDef(2, krystal);
+            Trk finalePart2 = f3FinalePalette2.NewTrk(2, krystal);
             Transform(finalePart2, msPositions, strandIndices);
-            Trk postlude = f3PostludePalette.NewTrkDef(2, krystal);
+            Trk postlude = f3PostludePalette.NewTrk(2, krystal);
             Transform(postlude, msPositions, strandIndices);
 
             Trk finale = GetFinaleSections(finalePart1, finalePart2, postlude, 77, 206);
@@ -239,13 +245,13 @@ namespace Moritz.Algorithm.SongSix
             {
                 if(strandIndices.Contains(i))
                 {
-                    RestDef umrd = new RestDef(section[i].MsPosition, strandDurations[strandIndices.IndexOf(i)] + extraTime);
+                    RestDef umrd = new RestDef(section[i].MsPositionReTrk, strandDurations[strandIndices.IndexOf(i)] + extraTime);
                     extraTime -= diff;
                     section.Insert(i, umrd);
                 }
             }
 
-            section.MsPosition = msPositions["furies3FinaleStart"];
+            section.MsPositionReSeq = msPositions["furies3FinaleStart"];
 
             #region old
             //double factor = 10;
@@ -261,7 +267,7 @@ namespace Moritz.Algorithm.SongSix
             if(section[section.Count - 1] is RestDef)
             {
                 //section[section.Count - 1].MsDuration = msPositions["interlude4End"] - section[section.Count - 1].MsPosition;
-                section[section.Count - 1].MsDuration = msPositions["endOfPiece"] - section[section.Count - 1].MsPosition;
+                section[section.Count - 1].MsDuration = msPositions["endOfPiece"] - section[section.Count - 1].MsPositionReTrk;
             }
         }
 
@@ -276,7 +282,7 @@ namespace Moritz.Algorithm.SongSix
                 finale.RemoveAt(finale.Count - 1);
             }
 
-            if(finale[finale.Count - 1].MsPosition + finale[finale.Count - 1].MsDuration > endOfPieceMsPosition)
+            if(finale[finale.Count - 1].MsPositionReTrk + finale[finale.Count - 1].MsDuration > endOfPieceMsPosition)
             {
                 finale.RemoveAt(finale.Count - 1);
             }
@@ -357,42 +363,42 @@ namespace Moritz.Algorithm.SongSix
 
         internal void AdjustAlignments(Furies1 f1, Furies2 f2, Furies4 f4, Clytemnestra c, Trk wind1)
         {
-            AlignObjectAtIndex(147, 150, 158, f1[56].MsPosition);
-            AlignObjectAtIndex(150, 158, 170, f1[61].MsPosition);
-            AlignObjectAtIndex(158, 170, 175, c[174].MsPosition);
-            AlignObjectAtIndex(170, 176, 183, c[184].MsPosition);
-            AlignObjectAtIndex(175, 183, 212, c[196].MsPosition);
-            AlignObjectAtIndex(183, 212, 217, c[242].MsPosition);
-            AlignObjectAtIndex(212, 217, 218, c[254].MsPosition);
-            AlignObjectAtIndex(217, 218, 224, c[259].MsPosition);
-            AlignObjectAtIndex(218, 224, 290, wind1[57].MsPosition);
-            AlignObjectAtIndex(224, 290, 296, f4[49].MsPosition);
-            AlignObjectAtIndex(290, 296, 318, wind1[66].MsPosition);
-            AlignObjectAtIndex(296, 318, 344, f4[53].MsPosition);
-            AlignObjectAtIndex(318, 344, 350, c[283].MsPosition);
-            AlignObjectAtIndex(344, 350, 353, c[287].MsPosition);
-            AlignObjectAtIndex(350, 353, 354, c[288].MsPosition - 200);
-            AlignObjectAtIndex(353, 354, 390, f4[59].MsPosition);
-            AlignObjectAtIndex(354, 390, 401, f4[69].MsPosition);
+            AlignObjectAtIndex(147, 150, 158, f1[56].MsPositionReTrk);
+            AlignObjectAtIndex(150, 158, 170, f1[61].MsPositionReTrk);
+            AlignObjectAtIndex(158, 170, 175, c[174].MsPositionReTrk);
+            AlignObjectAtIndex(170, 176, 183, c[184].MsPositionReTrk);
+            AlignObjectAtIndex(175, 183, 212, c[196].MsPositionReTrk);
+            AlignObjectAtIndex(183, 212, 217, c[242].MsPositionReTrk);
+            AlignObjectAtIndex(212, 217, 218, c[254].MsPositionReTrk);
+            AlignObjectAtIndex(217, 218, 224, c[259].MsPositionReTrk);
+            AlignObjectAtIndex(218, 224, 290, wind1[57].MsPositionReTrk);
+            AlignObjectAtIndex(224, 290, 296, f4[49].MsPositionReTrk);
+            AlignObjectAtIndex(290, 296, 318, wind1[66].MsPositionReTrk);
+            AlignObjectAtIndex(296, 318, 344, f4[53].MsPositionReTrk);
+            AlignObjectAtIndex(318, 344, 350, c[283].MsPositionReTrk);
+            AlignObjectAtIndex(344, 350, 353, c[287].MsPositionReTrk);
+            AlignObjectAtIndex(350, 353, 354, c[288].MsPositionReTrk - 200);
+            AlignObjectAtIndex(353, 354, 390, f4[59].MsPositionReTrk);
+            AlignObjectAtIndex(354, 390, 401, f4[69].MsPositionReTrk);
 
             // final adjustments for R2M
-            AlignObjectAtIndex(139, 140, 141, c[119].MsPosition - 200);
+            AlignObjectAtIndex(139, 140, 141, c[119].MsPositionReTrk - 200);
 
-            AlignObjectAtIndex(141, 142, 143, c[140].MsPosition - 100);
+            AlignObjectAtIndex(141, 142, 143, c[140].MsPositionReTrk - 100);
 
 
-            AlignObjectAtIndex(143, 144, 145, c[152].MsPosition - 200);
-            AlignObjectAtIndex(145, 146, 147, c[173].MsPosition - 200);
-            AlignObjectAtIndex(146, 147, 152, f2[64].MsPosition);
+            AlignObjectAtIndex(143, 144, 145, c[152].MsPositionReTrk - 200);
+            AlignObjectAtIndex(145, 146, 147, c[173].MsPositionReTrk - 200);
+            AlignObjectAtIndex(146, 147, 152, f2[64].MsPositionReTrk);
 
-            AlignObjectAtIndex(147, 151, 152, f1[56].MsPosition - 100);
+            AlignObjectAtIndex(147, 151, 152, f1[56].MsPositionReTrk - 100);
 
-            AlignObjectAtIndex(152, 159, 160, f1[61].MsPosition - 100);
+            AlignObjectAtIndex(152, 159, 160, f1[61].MsPositionReTrk - 100);
 
-            AlignObjectAtIndex(160, 171, 172, c[174].MsPosition - 600);
-            AlignObjectAtIndex(172, 176, 177, c[184].MsPosition - 200);
-            AlignObjectAtIndex(212, 217, 218, c[254].MsPosition - 200);
-            AlignObjectAtIndex(275, 291, 292, f4[49].MsPosition - 200);
+            AlignObjectAtIndex(160, 171, 172, c[174].MsPositionReTrk - 600);
+            AlignObjectAtIndex(172, 176, 177, c[184].MsPositionReTrk - 200);
+            AlignObjectAtIndex(212, 217, 218, c[254].MsPositionReTrk - 200);
+            AlignObjectAtIndex(275, 291, 292, f4[49].MsPositionReTrk - 200);
 
 
 
@@ -419,8 +425,8 @@ namespace Moritz.Algorithm.SongSix
         internal void AdjustVelocities(Dictionary<string, int> msPositions)
         {
             //AdjustVelocitiesHairpin(msPositions["furies3FinaleStart"], this[165].MsPosition, 0.4, 0.6);
-            AdjustVelocitiesHairpin(this[147].MsPosition, this[165].MsPosition, 0.4, 0.6);
-            AdjustVelocitiesHairpin(this[165].MsPosition, msPositions["verse4"], 0.6, 0.3);
+            AdjustVelocitiesHairpin(this[147].MsPositionReTrk, this[165].MsPositionReTrk, 0.4, 0.6);
+            AdjustVelocitiesHairpin(this[165].MsPositionReTrk, msPositions["verse4"], 0.6, 0.3);
             AdjustVelocitiesHairpin(msPositions["verse4"], msPositions["furies2FinalePart2Start"], 0.3, 0.3);
             AdjustVelocitiesHairpin(msPositions["furies2FinalePart2Start"], msPositions["interlude4"], 0.3, 0.4);
             AdjustVelocitiesHairpin(msPositions["interlude4"], msPositions["verse5"], 0.5, 1.0);

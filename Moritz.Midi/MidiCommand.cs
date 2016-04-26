@@ -1,11 +1,11 @@
 
-using Multimedia.Midi;
+using Sanford.Multimedia.Midi;
 
 namespace Moritz.Midi
 {
     public abstract class MidiCommand : MidiControl
     {
-        protected MidiCommand(int channel, ControllerType controller, byte value)
+        protected MidiCommand(int channel, ControllerType controller, int value)
             : base(channel, controller, value)
         {
         }
@@ -16,7 +16,7 @@ namespace Moritz.Midi
     /// </summary>
     public abstract class MidiOffControl : MidiCommand
     {
-        protected MidiOffControl(int channel, ControllerType controller, byte value, float xPos)
+        protected MidiOffControl(int channel, ControllerType controller, int value, float xPos)
             : base(channel, controller, value)
         {
             if(xPos > 0.0)

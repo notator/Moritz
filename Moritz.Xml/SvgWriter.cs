@@ -18,17 +18,13 @@ namespace Moritz.Xml
         /// <summary>
         /// Starts an SVG "g" element. End the group with WriteEndGroup().
         /// </summary>
-        /// <param name="type">Can be null or empty or a class attribute</param>
-        /// <param name="id">Can be null or empty or an id attribute</param>
-        public void SvgStartGroup(string type, string id)
+        /// <param name="type">Can be null or empty or a class attribute</param
+        public void SvgStartGroup(string type)
         {
             _w.WriteStartElement("g");
 
             if(!String.IsNullOrEmpty(type))
                 _w.WriteAttributeString("class", type);
-
-            if(!String.IsNullOrEmpty(id))
-                _w.WriteAttributeString("id", id);
         }
 
         public void SvgEndGroup()
@@ -40,12 +36,12 @@ namespace Moritz.Xml
         /// <summary>
         /// Starts an SVG "defs" element. End the group with WriteEndDefs().
         /// </summary>
-        /// <param name="id">Can be null or empty or an id-string</param>
-        public void SvgStartDefs(string id)
+        /// <param name="type">Can be null or empty or a type string</param>
+        public void SvgStartDefs(string type)
         {
             _w.WriteStartElement("defs");
-            if(!String.IsNullOrEmpty(id))
-                _w.WriteAttributeString("id", id);
+            if(!String.IsNullOrEmpty(type))
+                _w.WriteAttributeString("class", type);
         }
         public void SvgEndDefs()
         {
@@ -55,7 +51,7 @@ namespace Moritz.Xml
 		/// <summary>
 		/// Writes an SVG "line" element
 		/// </summary>
-		/// <param name="id">Not written if null or empty</param>
+		/// <param name="type">Not written if null or empty</param>
 		/// <param name="x1"></param>
 		/// <param name="y1"></param>
 		/// <param name="x2"></param>
@@ -63,12 +59,12 @@ namespace Moritz.Xml
 		/// <param name="strokeColor">Not written if null or empty</param>
 		/// <param name="strokeWidth">Must be >= 0</param>
 		/// <param name="linecapString">Not written if null or empty</param>
-		public void SvgLine(string id, float x1, float y1, float x2, float y2,
+		public void SvgLine(string type, float x1, float y1, float x2, float y2,
 			string strokeColor, float strokeWidth, string linecapString)
 		{
 			_w.WriteStartElement("line");
-			if(!String.IsNullOrEmpty(id))
-				_w.WriteAttributeString("id", id);
+			if(!String.IsNullOrEmpty(type))
+				_w.WriteAttributeString("class", type);
 			_w.WriteAttributeString("x1", x1.ToString(M.En_USNumberFormat));
 			_w.WriteAttributeString("y1", y1.ToString(M.En_USNumberFormat));
 			_w.WriteAttributeString("x2", x2.ToString(M.En_USNumberFormat));
@@ -84,7 +80,7 @@ namespace Moritz.Xml
 		/// <summary>
 		/// Writes an SVG "rect" element.
 		/// </summary>
-		/// <param name="id">Not written if null or empty</param>
+		/// <param name="type">Not written if null or empty</param>
 		/// <param name="left"></param>
 		/// <param name="top"></param>
 		/// <param name="width"></param>
@@ -92,13 +88,13 @@ namespace Moritz.Xml
 		/// <param name="strokeColor">Not written if null or empty</param>
 		/// <param name="strokeWidth">Must be >= 0</param>
 		/// <param name="fillColor">Not written if null or empty</param>
-		public void SvgRect(string id, float left, float top, float width, float height,
+		public void SvgRect(string type, float left, float top, float width, float height,
 			string strokeColor, float strokeWidth, string fillColor)
 		{
 			Debug.Assert(strokeWidth > 0F);
 			_w.WriteStartElement("rect");
-			if(!String.IsNullOrEmpty(id))
-				_w.WriteAttributeString("id", id);
+			if(!String.IsNullOrEmpty(type))
+				_w.WriteAttributeString("class", type);
 			_w.WriteAttributeString("x", left.ToString(M.En_USNumberFormat));
 			_w.WriteAttributeString("y", top.ToString(M.En_USNumberFormat));
 			_w.WriteAttributeString("width", width.ToString(M.En_USNumberFormat));
@@ -114,19 +110,19 @@ namespace Moritz.Xml
 		/// <summary>
 		/// Writes an SVG "circle" element.
 		/// </summary>
-		/// <param name="id">Not written if null or empty</param>
+		/// <param name="type">Not written if null or empty</param>
 		/// <param name="cx"></param>
 		/// <param name="cy"></param>
 		/// <param name="r"></param>
 		/// <param name="strokeColor">Not written if null or empty</param>
 		/// <param name="strokeWidth">Must be >= 0</param>
 		/// <param name="fillColorOrNull">Not written if null or empty</param>
-		public void SvgCircle(string id, float cx, float cy, float r,
+		public void SvgCircle(string type, float cx, float cy, float r,
 			string strokeColor, float strokeWidth, string fillColorOrNull)
 		{
 			WriteStartElement("circle");
-			if(!String.IsNullOrEmpty(id))
-				_w.WriteAttributeString("id", id);
+			if(!String.IsNullOrEmpty(type))
+				_w.WriteAttributeString("class", type);
 			WriteAttributeString("cx", cx.ToString(M.En_USNumberFormat));
 			WriteAttributeString("cy", cy.ToString(M.En_USNumberFormat));
 			WriteAttributeString("r", r.ToString(M.En_USNumberFormat));
@@ -141,7 +137,7 @@ namespace Moritz.Xml
 		/// <summary>
 		/// Writes an SVG "ellipse" element.
 		/// </summary>
-		/// <param name="id">Not written if null or empty</param>
+		/// <param name="type">Not written if null or empty</param>
 		/// <param name="cx"></param>
 		/// <param name="cy"></param>
 		/// <param name="rx"></param>
@@ -150,12 +146,12 @@ namespace Moritz.Xml
 		/// <param name="strokeWidth">Must be >= 0</param>
 		/// <param name="fillColor">Not written if null or empty</param>
 		/// <remarks>Note that Inkscape may turn this into a circle if rx == ry.</remarks>
-		public void SvgEllipse(string id, float cx, float cy, float rx, float ry,
+		public void SvgEllipse(string type, float cx, float cy, float rx, float ry,
 			string strokeColor, float strokeWidth, string fillColor)
 		{
 			WriteStartElement("ellipse");
-			if(!String.IsNullOrEmpty(id))
-				_w.WriteAttributeString("id", id);
+			if(!String.IsNullOrEmpty(type))
+				_w.WriteAttributeString("class", type);
 			WriteAttributeString("cx", cx.ToString(M.En_USNumberFormat));
 			WriteAttributeString("cy", cy.ToString(M.En_USNumberFormat));
 			WriteAttributeString("rx", rx.ToString(M.En_USNumberFormat));
@@ -167,7 +163,6 @@ namespace Moritz.Xml
 
 			WriteEndElement(); // ellipse
 		}
-
 
 		/// <summary>
 		/// Returns a Stringbuilder containing a style string
@@ -207,7 +202,7 @@ namespace Moritz.Xml
         /// <summary>
         /// A square bracket
         /// </summary>
-        public void SvgCautionaryBracket(string id, bool isLeftBracket, float top, float right, float bottom, float left, float strokeWidth)
+        public void SvgCautionaryBracket(string type, bool isLeftBracket, float top, float right, float bottom, float left, float strokeWidth)
         {
             if(!isLeftBracket)
             {
@@ -224,8 +219,8 @@ namespace Moritz.Xml
             string bottomStr = bottom.ToString(M.En_USNumberFormat);
 
             _w.WriteStartElement("path");
-            if(!String.IsNullOrEmpty(id))
-                _w.WriteAttributeString("id", id);
+            if(!String.IsNullOrEmpty(type))
+                _w.WriteAttributeString("class", type);
             _w.WriteAttributeString("stroke", "black");
             _w.WriteAttributeString("fill", "none");
             _w.WriteAttributeString("stroke-width", strokeWidth.ToString(M.En_USNumberFormat) + "px");
@@ -242,14 +237,14 @@ namespace Moritz.Xml
         /// <summary>
         /// Draws a vertical parallelogram with black fill and stroke.
         /// </summary>
-        /// <param name="id">Not written if null or empty</param>
+        /// <param name="type">Not written if null or empty</param>
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <param name="topLeftY"></param>
         /// <param name="topRightY"></param>
         /// <param name="beamWidth">The vertical distance between the coordinates on the left and right sides.</param>
         /// <param name="strokeWidth"></param>
-        public void SvgBeam(string id, float left, float right, float topLeftY, float topRightY, float beamWidth, float strokeWidth, float opacity)
+        public void SvgBeam(string type, float left, float right, float topLeftY, float topRightY, float beamWidth, float strokeWidth, float opacity)
         {
             float bottomLeftY = topLeftY + beamWidth;
             float bottomRightY = topRightY + beamWidth;
@@ -260,8 +255,8 @@ namespace Moritz.Xml
             dSB.Append(left.ToString(M.En_USNumberFormat) + " " + bottomLeftY.ToString(M.En_USNumberFormat) + " z");
 
             _w.WriteStartElement("path");
-			if(!String.IsNullOrEmpty(id))
-				_w.WriteAttributeString("id", id);
+			if(!String.IsNullOrEmpty(type))
+				_w.WriteAttributeString("class", type);
 
             if(opacity < 1.0F && opacity > 0F)
             {
@@ -278,12 +273,12 @@ namespace Moritz.Xml
             _w.WriteEndElement(); // path
         }
 
-        public void SvgText(string id, TextInfo textInfo, float x, float y)
+        public void SvgText(string type, TextInfo textInfo, float x, float y)
         {
             _w.WriteStartElement("text");
-			if(!String.IsNullOrEmpty(id))
+			if(!String.IsNullOrEmpty(type))
 			{
-				_w.WriteAttributeString("id", id);
+				_w.WriteAttributeString("class", type);
 			}
             _w.WriteAttributeString("x", x.ToString(M.En_USNumberFormat));
             _w.WriteAttributeString("y", y.ToString(M.En_USNumberFormat));
@@ -311,18 +306,18 @@ namespace Moritz.Xml
         /// <summary>
         /// Writes an SVG "use" element, overriding its y-coordinate.
         /// </summary>
-        /// <param name="id">Can be null or empty or an id String</param>
+        /// <param name="type">Can be null or empty or an id String</param>
         /// <param name="y">This element's y-coordinate.</param>
         /// <param name="objectToUse">(Do not include the leading '#'. It will be inserted automatically.)</param>
-        public void SvgUseXY(string id, string objectToUse, float x, float y, float fontSize)
+        public void SvgUseXY(string type, string objectToUse, float x, float y, float fontSize)
         {
             string transformString =
                 "translate(" + x.ToString(M.En_USNumberFormat) + "," + y.ToString(M.En_USNumberFormat) + ") " +
                 "scale(" + fontSize.ToString(M.En_USNumberFormat) + ")";
 
             _w.WriteStartElement("use");
-            if(!String.IsNullOrEmpty(id))
-                _w.WriteAttributeString("id", id);
+            if(!String.IsNullOrEmpty(type))
+                _w.WriteAttributeString("class", type);
             _w.WriteAttributeString("xlink", "href", null, "#" + objectToUse);
             _w.WriteAttributeString("x", "0");
             _w.WriteAttributeString("y", "0");
@@ -354,7 +349,12 @@ namespace Moritz.Xml
             else
                 type.Append("Flags");
 
-            SvgStartGroup(null, type.ToString());
+            string id = type.ToString();
+
+            _w.WriteStartElement("g");
+
+            if(!String.IsNullOrEmpty(id))
+                _w.WriteAttributeString("id", id);
 
             string x1 = "0";
             string x2 = "0";
@@ -384,7 +384,8 @@ namespace Moritz.Xml
                 _w.WriteAttributeString("d", dAttributeSB.ToString());
                 _w.WriteEndElement();
             }
-            SvgEndGroup();
+
+            _w.WriteEndElement();
 
         }
 

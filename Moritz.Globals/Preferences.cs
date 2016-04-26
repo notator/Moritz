@@ -72,20 +72,33 @@ namespace Moritz.Globals
         private bool CaptureOutputDevices()
         {
             bool success = true;
+            // DeviceCollections.OutputDevices contains all available output devices except VirtualMIDISynth #1,
+            // which is reserved for Chrome. 
             foreach(Moritz.Globals.IODevices.OutputDevice netOutputDevice in DeviceCollections.OutputDevices)
             {
                 try
                 {
-                    Multimedia.Midi.OutputDevice outputDevice = new Multimedia.Midi.OutputDevice(netOutputDevice.ID);
+                    Sanford.Multimedia.Midi.OutputDevice outputDevice = new Sanford.Multimedia.Midi.OutputDevice(netOutputDevice.ID);
                     MultimediaMidiOutputDevices.Add(netOutputDevice.Name, outputDevice);
                 }
                 catch
                 {
+                    // The following MessageBox proved to be more of a nuisance than a help.
+                    // The comment it contains is, however, still correct.
+
+                    //MessageBox.Show(netOutputDevice.Name + " is already in use." +
+                    //"\n\nMoritz can still be used, but no output device will be available." +
+                    //"\n\nIf Moritz needs an output device, close the program that is using" +
+                    //"\n" + netOutputDevice.Name + ", restart Moritz, and then restart the other program." +
+                    //"\n\n(Currently, Moritz can use all available output devices except VirtualMIDISynth #1," +
+                    //"\nwhich is reserved for the Assistant Performer.)", "Information");
+
                     MultimediaMidiOutputDevices.Clear();
                     success = false;
                     break;
                 }
             }
+
             return success;
         }
 
@@ -178,7 +191,7 @@ namespace Moritz.Globals
             }
         }
 
-        public Multimedia.Midi.OutputDevice CurrentMultimediaMidiOutputDevice
+        public Sanford.Multimedia.Midi.OutputDevice CurrentMultimediaMidiOutputDevice
         {
             get 
             {
@@ -196,13 +209,13 @@ namespace Moritz.Globals
                 }
             }
         }
-        public Multimedia.Midi.OutputDevice GetMidiOutputDevice(string deviceName)
+        public Sanford.Multimedia.Midi.OutputDevice GetMidiOutputDevice(string deviceName)
         {
             Debug.Assert(MultimediaMidiOutputDevices.ContainsKey(deviceName));
             return MultimediaMidiOutputDevices[deviceName];
         }
 
-        private Dictionary<string, Multimedia.Midi.OutputDevice> MultimediaMidiOutputDevices = new Dictionary<string, Multimedia.Midi.OutputDevice>();
+        private Dictionary<string, Sanford.Multimedia.Midi.OutputDevice> MultimediaMidiOutputDevices = new Dictionary<string, Sanford.Multimedia.Midi.OutputDevice>();
         private const int _sysExBufferSize = 1024;
     }
 }

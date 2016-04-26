@@ -1,4 +1,5 @@
 using System.Text;
+using System.Diagnostics;
 
 using Moritz.Xml;
 
@@ -12,11 +13,11 @@ namespace Moritz.Symbols
         /// <summary>
         /// Used by the Assistant Composer
         /// </summary>
-        public DurationSymbol(Voice voice, int msDuration, int msPosition, int minimumCrotchetDuration, float fontHeight)
+        public DurationSymbol(Voice voice, int msDuration, int absMsPosition, int minimumCrotchetDuration, float fontHeight)
             : base(voice, fontHeight)
         {
             _msDuration = msDuration;
-            _msPosition = msPosition;
+            _absMsPosition = absMsPosition;
             this.SetDurationClass(MsDuration, minimumCrotchetDuration);
         }
 
@@ -58,7 +59,7 @@ namespace Moritz.Symbols
             {
                 StringBuilder sb = new StringBuilder();
                 sb.Append("staff=" + Voice.Staff.Staffname + " ");
-                sb.Append("msPos=" + this.MsPosition.ToString() + " ");
+                sb.Append("msPos=" + this.AbsMsPosition.ToString() + " ");
                 sb.Append("msDur=" + this.MsDuration.ToString());
                 return sb.ToString();
             }
@@ -67,17 +68,17 @@ namespace Moritz.Symbols
         /// <summary>
         /// The position from the beginning of the piece.
         /// </summary>
-        public int MsPosition
+        public int AbsMsPosition
         {
-            get { return _msPosition; }
-            set { _msPosition = value; }
+            get { return _absMsPosition; }
+            set { _absMsPosition = value; }
         }
-        protected int _msPosition = 0;
+        protected int _absMsPosition = 0;
 
-        public int MsDuration 
+        public virtual int MsDuration 
         { 
             get { return _msDuration; }
-            //set { _msDuration = value; } 
+            set { Debug.Assert(false, "This property should only be set when agglomerating RestSymbols."); } 
         }
         protected int _msDuration = 0;
 

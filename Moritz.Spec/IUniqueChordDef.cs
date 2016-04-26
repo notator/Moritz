@@ -24,5 +24,6 @@ namespace Moritz.Spec
         void Transpose(int interval);
 
         List<byte> NotatedMidiPitches { get; set; }
+        List<byte> NotatedMidiVelocities { get; set; }
     }
 }

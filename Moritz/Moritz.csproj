@@ -56,12 +56,6 @@
     <Compile Include="MoritzForm1.Designer.cs">
       <DependentUpon>MoritzForm1.cs</DependentUpon>
     </Compile>
-    <Compile Include="NewScoreDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NewScoreDialog.Designer.cs">
-      <DependentUpon>NewScoreDialog.cs</DependentUpon>
-    </Compile>
     <Compile Include="PreferencesDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -76,9 +70,6 @@
     <EmbeddedResource Include="MoritzForm1.resx">
       <DependentUpon>MoritzForm1.cs</DependentUpon>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NewScoreDialog.resx">
-      <DependentUpon>NewScoreDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PreferencesDialog.resx">
       <DependentUpon>PreferencesDialog.cs</DependentUpon>

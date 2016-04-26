@@ -17,7 +17,7 @@ namespace Moritz.Symbols
         /// </summary>
         public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber)
         {
-            w.SvgStartGroup("inputStaff", "sys" + systemNumber.ToString() + "staff" + staffNumber.ToString());
+            w.SvgStartGroup("inputStaff");
 
             base.WriteSVG(w, true, systemNumber, staffNumber);
 

@@ -1,11 +1,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.ComponentModel;
 using System.Threading;
 
-using Multimedia.Midi;
+using Sanford.Multimedia.Midi;
 using Moritz.Spec;
-using Moritz.Globals;
 
 namespace Moritz.Midi
 {
@@ -167,7 +165,7 @@ namespace Moritz.Midi
         private MidiChordSlider _modulationWheelSlider = null;
         private MidiChordSlider _expressionSlider = null;
 
-        private readonly Multimedia.Midi.OutputDevice _midiOutputDevice = null;
+        private readonly OutputDevice _midiOutputDevice = null;
 
         // msPosInChord, messageMoment
         private SortedDictionary<int,List<ChannelMessage>> _messagesDict;

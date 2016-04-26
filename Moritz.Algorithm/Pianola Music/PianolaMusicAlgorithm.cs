@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Krystals4ObjectLibrary;
-using Moritz.Algorithm;
 using Moritz.Palettes;
 using Moritz.Spec;
-using Moritz.Globals;
 
 namespace Moritz.Algorithm.PianolaMusic
 {
-	public class PianolaMusicAlgorithm : CompositionAlgorithm
+    public class PianolaMusicAlgorithm : CompositionAlgorithm
 	{
 		public PianolaMusicAlgorithm()
             : base()
@@ -36,15 +31,35 @@ namespace Moritz.Algorithm.PianolaMusic
 			List<Trk> trks = new List<Trk>() { tracks1and6[0], tracks2and5[0], tracks3and4[0], tracks3and4[1], tracks2and5[1], tracks1and6[1] };
 			Debug.Assert(trks.Count == MidiChannelIndexPerOutputVoice.Count);
 
-			List<List<VoiceDef>> bars = GetBars(trks, NumberOfBars);
+            Seq mainSeq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
 
-			SetPatch0InAllChords(bars);
+            Block sequence = new Block(mainSeq);
+
+            List<int> absMsPositionsOfRightBarlines = GetAbsMsPositionsOfRightBarlines(sequence, NumberOfBars);
+
+            List<List<VoiceDef>> bars = ConvertBlockToBars(sequence, absMsPositionsOfRightBarlines);
+
+            SetPatch0InAllChords(bars);
 
 			return bars;
 		}
 
-		// Returns two lists of ints. The first is contains the durations of the upper track, the second the lower.
-		private static List<List<int>> trackDurations(List<int> firstHalfUpperTrack)
+        private List<int> GetAbsMsPositionsOfRightBarlines(Block sequence, int nBars)
+        {
+            double barMsDuration = ((double)sequence.MsDuration) / nBars;
+            double msPosition = barMsDuration;
+            List<int> barlineEndMsPositions = new List<int>();
+            for(int i = 0; i < nBars; ++i)
+            {
+                barlineEndMsPositions.Add((int)(Math.Round(msPosition)));
+                msPosition += barMsDuration;
+            }
+            Debug.Assert(barlineEndMsPositions[barlineEndMsPositions.Count - 1] == sequence.MsDuration);
+            return barlineEndMsPositions;
+        }
+
+        // Returns two lists of ints. The first is contains the durations of the upper track, the second the lower.
+        private static List<List<int>> trackDurations(List<int> firstHalfUpperTrack)
 		{
 			List<int> secondHalfUpperTrack = new List<int>(firstHalfUpperTrack);
 			secondHalfUpperTrack.Reverse();
@@ -100,10 +115,10 @@ namespace Moritz.Algorithm.PianolaMusic
 		private List<Trk> GetTrks(int upperChannel, List<int> upperTrackPitches, int lowerChannel, List<int> lowerTrackPitches, List<List<int>> durations)
 		{
 			List<IUniqueDef> t1MidiChordDefs = GetMidiChordDefs(upperTrackPitches, durations[0]);
-			Trk trk1 = new Trk((byte)upperChannel, t1MidiChordDefs);
+			Trk trk1 = new Trk((byte)upperChannel, 0, t1MidiChordDefs);
 
 			List<IUniqueDef> t6MidiChordDefs = GetMidiChordDefs(lowerTrackPitches, durations[1]);
-			Trk trk6 = new Trk((byte)lowerChannel, t6MidiChordDefs);
+			Trk trk6 = new Trk((byte)lowerChannel, 0, t6MidiChordDefs);
 
 			List<Trk> trks = new List<Trk>();
 			trks.Add(trk1);
@@ -188,59 +203,6 @@ namespace Moritz.Algorithm.PianolaMusic
 			#endregion durations
 
 			return GetTrks(2, t3Pitches, 3, t4Pitches, durations);
-		}
-
-		private List<int> GetBarlineMsPositions(int totalDuration, int nBars)
-		{
-			int msPosition = 0;
-			int barlength = totalDuration / nBars;
-			List<int> barlineMsPositions = new List<int>();
-			for(int i = 0; i< nBars; ++i)
-			{
-				barlineMsPositions.Add(msPosition);
-				msPosition += barlength;
-			}
-			return barlineMsPositions;
-		}
-
-		private List<List<VoiceDef>> GetBars(List<Trk> trks, int nBars)
-		{
-			int barMsDuration = trks[0].EndMsPosition / nBars;
-			int msPosition = 0;
-			List<int> barlineMsPositions = new List<int>();
-			for(int i = 0; i < nBars + 1; ++i)
-			{
-				barlineMsPositions.Add(msPosition);
-				msPosition += barMsDuration;
-			}
-			// barlineMsPositions contains both msPos=0 and the position of the final barline
-
-			List<VoiceDef> voiceDefs = new List<VoiceDef>();
-			foreach(Trk trk in trks)
-			{
-				voiceDefs.Add(trk);
-			}
-
-			List<List<VoiceDef>> bars = GetBarsFromBarlineMsPositions(voiceDefs, barlineMsPositions);
-			Debug.Assert(bars.Count == NumberOfBars);
-			return bars;
-		}
-		/// <summary>
-		/// Splits the voices (currently in a single bar) into bars
-		/// barlineMsPositions contains both msPosition 0, and the position of the final barline.
-		/// </summary>
-		private List<List<VoiceDef>> GetBarsFromBarlineMsPositions(List<VoiceDef> voices, List<int> barLineMsPositions)
-		{
-			List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
-			List<List<VoiceDef>> twoBars = null;
-			for(int i = barLineMsPositions.Count - 2; i >= 1; --i)
-			{
-				twoBars = SplitBar(voices, barLineMsPositions[i]);
-				bars.Insert(0, twoBars[1]);
-				voices = twoBars[0];
-			}
-			bars.Insert(0, twoBars[0]);
-			return bars;
 		}
 
 		/// <summary>

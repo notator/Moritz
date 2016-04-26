@@ -205,6 +205,7 @@ namespace Moritz.Palettes
                     pitchwheelDeviation,
                     hasChordOff,
                     rootMidiPitches,
+                    rootMidiVelocities,
                     ornamentNumber,
                     midiChordSliderDefs,
                     basicMidiChordDefs);
@@ -316,40 +317,40 @@ namespace Moritz.Palettes
             return midiChordDef;
         }
 
-        public Trk NewTrkDef(int midiChannel, List<int> sequence)
+        public Trk NewTrk(int midiChannel, int msPositionReContainer, List<int> sequence)
         {
             List<IUniqueDef> iuds = new List<IUniqueDef>();
-            int msPosition = 0;
+            int msPositionReFirstIUD = 0;
             foreach(int value in sequence)
             {
                 Debug.Assert((value > 0 && value <= this.Count), "Illegal argument: value out of range in sequence");
 
                 IUniqueDef iumdd = this.UniqueDurationDef(value - 1);
-                iumdd.MsPosition = msPosition;
-                msPosition += iumdd.MsDuration;
+                iumdd.MsPositionReFirstUD = msPositionReFirstIUD;
+                msPositionReFirstIUD += iumdd.MsDuration;
                 iuds.Add(iumdd);
             }
-            Trk trkDef = new Trk(midiChannel, iuds);
+            Trk trkDef = new Trk(midiChannel, msPositionReContainer, iuds);
             return trkDef;
         }
 
-		public Trk NewTrkDef(int midiChannel, Krystal krystal)
+		public Trk NewTrk(int midiChannel, int msPositionReContainer, Krystal krystal)
         {
             List<int> sequence = krystal.GetValues((uint)1)[0];
-			return NewTrkDef(midiChannel, sequence);
+			return NewTrk(midiChannel, msPositionReContainer, sequence);
         }
 
         /// <summary>
-        /// Constructs an TrkDef at MsPosition=0, containing a clone of the sequence of DurationDefs in the PaletteDef.
+        /// Constructs an Trk at MsPositionReContainer=0, containing a clone of the sequence of DurationDefs in the Palette.
         /// </summary
-        public Trk NewTrkDef(int midiChannel)
+        public Trk NewTrk(int midiChannel)
         {
             List<int> sequence = new List<int>();
             for(int i = 1; i <= Count; ++i)
             {
                 sequence.Add(i);
             }
-            return NewTrkDef(midiChannel, sequence);
+            return NewTrk(midiChannel, 0, sequence);
         }
     }
 
