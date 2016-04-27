@@ -386,8 +386,8 @@ namespace Moritz.Spec
                     if(voiceDef.UniqueDefs.Count > 0)
                     {
                         IUniqueDef lastIUD = voiceDef.UniqueDefs[voiceDef.UniqueDefs.Count - 1];
-                        int endMsPosReFirstIUD = voiceDef.MsPositionReContainer + lastIUD.MsPositionReFirstUD + lastIUD.MsDuration;
-                        msDuration = (msDuration < endMsPosReFirstIUD) ? endMsPosReFirstIUD : msDuration;
+                        int endMsPosReBlock = voiceDef.MsPositionReContainer + lastIUD.MsPositionReFirstUD + lastIUD.MsDuration;
+                        msDuration = (msDuration < endMsPosReBlock) ? endMsPosReBlock : msDuration;
                     }
                 }
                 return msDuration;
