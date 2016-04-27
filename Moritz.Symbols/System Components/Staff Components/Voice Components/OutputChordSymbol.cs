@@ -93,20 +93,6 @@ namespace Moritz.Symbols
             }
         }
 
-        // These colours were found using a separate, self-written program.
-        private static readonly List<string> noteheadColors = new List<string>()
-            {
-                "#FF0000", // fff
-                "#D50055", // ff
-                "#B5007E", // f
-                "#8800B5", // mf 
-                "#0000CA", // mp 
-                "#0069A8", // p
-                "#008474", // pp
-                "#009F28", // ppp
-                "#00CA00"  // pppp
-            };
-
         internal void SetNoteheadColors()
         {
             foreach(Head head in HeadsTopDown)
@@ -114,41 +100,41 @@ namespace Moritz.Symbols
                 Debug.Assert(head.MidiVelocity >= 0 && head.MidiVelocity <= 127);
 
                 int velocity = head.MidiVelocity;
-                if(velocity > M.MaxMidiVelocity["ff"])
+                if(velocity > M.MaxMidiVelocity[M.Dynamic.ff])
                 {
-                    head.ColorAttribute = noteheadColors[0]; // fff    
+                    head.ColorAttribute = M.NoteheadColors[M.Dynamic.fff]; // fff    
                 }
-                else if(velocity > M.MaxMidiVelocity["f"])
+                else if(velocity > M.MaxMidiVelocity[M.Dynamic.f])
                 {
-                    head.ColorAttribute = noteheadColors[1]; // ff
+                    head.ColorAttribute = M.NoteheadColors[M.Dynamic.ff]; // ff
                 }
-                else if(velocity > M.MaxMidiVelocity["mf"])
+                else if(velocity > M.MaxMidiVelocity[M.Dynamic.mf])
                 {
-                    head.ColorAttribute = noteheadColors[2]; // f
+                    head.ColorAttribute = M.NoteheadColors[M.Dynamic.f]; // f
                 }
-                else if(velocity > M.MaxMidiVelocity["mp"])
+                else if(velocity > M.MaxMidiVelocity[M.Dynamic.mp])
                 {
-                    head.ColorAttribute = noteheadColors[3]; // mf
+                    head.ColorAttribute = M.NoteheadColors[M.Dynamic.mf]; // mf
                 }
-                else if(velocity > M.MaxMidiVelocity["p"])
+                else if(velocity > M.MaxMidiVelocity[M.Dynamic.p])
                 {
-                    head.ColorAttribute = noteheadColors[4]; // mp
+                    head.ColorAttribute = M.NoteheadColors[M.Dynamic.mp]; // mp
                 }
-                else if(velocity > M.MaxMidiVelocity["pp"])
+                else if(velocity > M.MaxMidiVelocity[M.Dynamic.pp])
                 {
-                    head.ColorAttribute = noteheadColors[5]; // p
+                    head.ColorAttribute = M.NoteheadColors[M.Dynamic.p]; // p
                 }
-                else if(velocity > M.MaxMidiVelocity["ppp"])
+                else if(velocity > M.MaxMidiVelocity[M.Dynamic.ppp])
                 {
-                    head.ColorAttribute = noteheadColors[6]; // pp
+                    head.ColorAttribute = M.NoteheadColors[M.Dynamic.pp]; // pp
                 }
-                else if(velocity > M.MaxMidiVelocity["pppp"])
+                else if(velocity > M.MaxMidiVelocity[M.Dynamic.pppp])
                 {
-                    head.ColorAttribute = noteheadColors[7]; // ppp
+                    head.ColorAttribute = M.NoteheadColors[M.Dynamic.ppp]; // ppp
                 }
                 else // > 0 
                 {
-                    head.ColorAttribute = noteheadColors[8]; // pppp
+                    head.ColorAttribute = M.NoteheadColors[M.Dynamic.pppp]; // pppp
                 }
             }
         }

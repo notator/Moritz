@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.ComponentModel;
@@ -27,7 +27,7 @@ namespace Moritz.Globals
 
             SetMidiPitchDict();
 
-			Preferences = new Preferences();
+            Preferences = new Preferences();
 
             MoritzPerformanceOptionsExtension = ".mpox";
             MoritzKrystalScoreSettingsExtension = ".mkss";
@@ -527,14 +527,14 @@ namespace Moritz.Globals
             List<string> returnList = new List<string>();
             foreach(string a in strings)
             {
-				if(a == " ")
-				{
-					returnList.Add(" ");
-				}
-				else
-				{
-					returnList.Add(a.Trim());
-				}
+                if(a == " ")
+                {
+                    returnList.Add(" ");
+                }
+                else
+                {
+                    returnList.Add(a.Trim());
+                }
             }
             return returnList;
         }
@@ -624,33 +624,65 @@ namespace Moritz.Globals
             { "Tabloid", new PaperSize(279F, 432F)},
         };
 
+        public enum Dynamic
+        {
+            none, pppp, ppp, pp, p, mp, mf, f, ff, fff, ffff
+        }
+
         /// <summary>
         /// The key is one of the following strings: "fff", "ff", "f", "mf", "mp", "p", "pp", "ppp", "pppp".
         /// The value is used to determine Moritz' transcription of velocity -> dynamic symbol.
+        /// Note that Moritz does not use M.Dynamic.ffff although it is defined in CLicht.
         /// </summary>
-        public static Dictionary<string, byte> MaxMidiVelocity = new Dictionary<string, byte>()
+        public static Dictionary<M.Dynamic, byte> MaxMidiVelocity = new Dictionary<M.Dynamic, byte>()
         {
-            //// Linear correspondence ppp->fff (before March 2016)
-            //{ "fff", 127},
-            //{ "ff", 111},
-            //{ "f", 95},
-            //{ "mf", 79},
-            //{ "mp", 63},
-            //{ "p", 47},
-            //{ "pp", 31},
-            //{ "ppp", 15},
-
             // March 2016:  equal steps between 15 (max pppp) and 127 (max fff)
-            { "fff", 127},
-            { "ff", 113},
-            { "f", 99},
-            { "mf", 85},
-            { "mp", 71},
-            { "p", 57},
-            { "pp", 43},
-            { "ppp", 29},
-            { "pppp", 15}
+            { M.Dynamic.fff, 127},
+            { M.Dynamic.ff, 113},
+            { M.Dynamic.f, 99},
+            { M.Dynamic.mf, 85},
+            { M.Dynamic.mp, 71},
+            { M.Dynamic.p, 57},
+            { M.Dynamic.pp, 43},
+            { M.Dynamic.ppp, 29},
+            { M.Dynamic.pppp, 15}
         };
+
+
+        /// <summary>
+        /// The key is one of the following strings: "ffff", "fff", "ff", "f", "mf", "mp", "p", "pp", "ppp", "pppp".
+        /// The value is a string containing the equivalent CLicht character.
+        /// </summary>
+        public static Dictionary<M.Dynamic, string> CLichtDynamicsCharacters = new Dictionary<M.Dynamic, string>()
+        {
+            { M.Dynamic.ffff, "Î"}, // unused by Moritz (see M.MaxMidiVelocity)
+            { M.Dynamic.fff, "Ï"},
+            { M.Dynamic.ff, "ƒ"},
+            { M.Dynamic.f, "f"},
+            { M.Dynamic.mf, "F"},
+            { M.Dynamic.mp, "P"},
+            { M.Dynamic.p, "p"},
+            { M.Dynamic.pp, "π"},
+            { M.Dynamic.ppp, "∏"},
+            { M.Dynamic.pppp, "Ø"}
+        };
+
+        /// <summary>
+        /// Note that Moritz does not use M.Dynamic.ffff although it is defined in CLicht.
+        /// (These colours were found using a separate, self-written program.)
+        /// </summary>
+        public static readonly Dictionary<M.Dynamic, string> NoteheadColors = new Dictionary<M.Dynamic, string>()
+        {
+            { M.Dynamic.fff, "#FF0000" },
+            { M.Dynamic.ff, "#D50055" },
+            { M.Dynamic.f, "#B5007E" },
+            { M.Dynamic.mf, "#8800B5" }, 
+            { M.Dynamic.mp, "#0000CA" }, 
+            { M.Dynamic.p, "#0069A8" },
+            { M.Dynamic.pp, "#008474" },
+            { M.Dynamic.ppp, "#009F28" },
+            { M.Dynamic.pppp,"#00CA00" }
+        };  
 
         public readonly static Preferences Preferences;
         public readonly static IFormatProvider En_USNumberFormat;

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 
 using Moritz.Xml;
+using Moritz.Globals;
 
 namespace Moritz.Symbols
 {
@@ -65,7 +66,7 @@ namespace Moritz.Symbols
                 GetRelativePositions(chord.Voice.StemDirection, _lyricMetrics, out ornamentIsBelow, out dynamicIsBelow);
                 _ornamentMetrics = NewOrnamentMetrics(graphics, gap, ornamentIsBelow);
 
-                _dynamicMetrics = NewDynamicMetrics(gap, dynamicIsBelow);
+                _dynamicMetrics = NewCLichtDynamicMetrics(gap, dynamicIsBelow);
 
                 MoveAuxilliaries(chord.Stem.Direction, gap);
             }
@@ -744,7 +745,7 @@ namespace Moritz.Symbols
         /// <param name="gap"></param>
         /// <param name="dynamicIsBelow"></param>
         /// <returns></returns>
-        private DynamicMetrics NewDynamicMetrics(float gap, bool dynamicIsBelow)
+        private DynamicMetrics NewCLichtDynamicMetrics(float gap, bool dynamicIsBelow)
         {
             List<string> clichtDynamics = new List<string>() { "Ø", "∏", "π", "p", "P", "F", "f", "ƒ", "Ï", "Î" };
             Text dynamicText = null;

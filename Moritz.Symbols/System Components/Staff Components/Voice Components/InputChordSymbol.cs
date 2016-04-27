@@ -22,8 +22,14 @@ namespace Moritz.Symbols
 
             if(umcd.Lyric != null)
             {
-                LyricText lyricText = new LyricText(this, umcd.Lyric, FontHeight );
+                LyricText lyricText = new LyricText(this, umcd.Lyric, FontHeight);
                 DrawObjects.Add(lyricText);
+            }
+
+            if(umcd.Dynamic != null)
+            {
+                DynamicText dynamicText = new DynamicText(this, umcd.Dynamic, FontHeight);
+                DrawObjects.Add(dynamicText);
             }
         }
 

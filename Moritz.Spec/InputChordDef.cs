@@ -17,9 +17,9 @@ namespace Moritz.Spec
     {
         /// <summary>
         /// Constructs a multi-note chord, each inputNoteDef has a notated pitch and a SeqDef.
-		/// The inputNoteDefs must be in order of their notated pitches (bottom to top).
+		/// The inputNoteDefs must be in order of their notated pitches (bottom to top). 
         /// </summary>
-        public InputChordDef(int msPositionReFirstIUD, int msDuration, List<InputNoteDef> inputNoteDefs, TrkOptions trkOptions)
+        public InputChordDef(int msPositionReFirstIUD, int msDuration, List<InputNoteDef> inputNoteDefs, M.Dynamic dynamic, TrkOptions trkOptions)
             : base(msDuration)
         {
 			#region check notated pitches and trkRef positions
@@ -49,9 +49,10 @@ namespace Moritz.Spec
 			#endregion
 
             _msPositionReFirstIUD = msPositionReFirstIUD;
-			_msDuration = msDuration;
+			_msDuration = msDuration;                                          
 			_inputNoteDefs = inputNoteDefs;
 			_lyric = null;
+            _dynamic = (dynamic == M.Dynamic.none) ? null : M.CLichtDynamicsCharacters[dynamic];
 			_trkOptions = trkOptions;
 			_msDurationToNextBarline = null;
         }
@@ -118,10 +119,13 @@ namespace Moritz.Spec
         public int MsPositionReFirstUD { get { return _msPositionReFirstIUD; } set { _msPositionReFirstIUD = value; } }
         private int _msPositionReFirstIUD = 0;
 
-		public string Lyric { get { return _lyric; } set { _lyric = value; } }
-		private string _lyric = null;
+        public string Lyric { get { return _lyric; } set { _lyric = value; } }
+        private string _lyric = null;
 
-		public TrkOptions TrkOptions { get { return _trkOptions; } set { _trkOptions = value; } }
+        public string Dynamic { get { return _dynamic; } set { _dynamic = value; } }
+        private string _dynamic = null;
+
+        public TrkOptions TrkOptions { get { return _trkOptions; } set { _trkOptions = value; } }
 		private TrkOptions _trkOptions = null;
 
 		public CCSettings CCSettings { get { return _ccSettings; } set { _ccSettings = value; } }

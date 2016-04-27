@@ -166,14 +166,14 @@ namespace Moritz.Algorithm.Study1
 
             // Max value per duration symbol (March 2016)
             // See Moritz.Symbols/System Components/Staff Components/VoiceComponents/AnchorageSymbol.cs.AddDynamic(...)
-            velocities.Add(M.MaxMidiVelocity["fff"]);   // 127
-            velocities.Add(M.MaxMidiVelocity["ff"]);    // 113
-            velocities.Add(M.MaxMidiVelocity["f"]);     // 99
-            velocities.Add(M.MaxMidiVelocity["mf"]);    // 85
-            velocities.Add(M.MaxMidiVelocity["mp"]);    // 71
-            velocities.Add(M.MaxMidiVelocity["p"]);     // 57
-            velocities.Add(M.MaxMidiVelocity["pp"]);    // 43
-            velocities.Add(M.MaxMidiVelocity["ppp"]);   // 29
+            velocities.Add(M.MaxMidiVelocity[M.Dynamic.fff]);   // 127
+            velocities.Add(M.MaxMidiVelocity[M.Dynamic.ff]);    // 113
+            velocities.Add(M.MaxMidiVelocity[M.Dynamic.f]);     // 99
+            velocities.Add(M.MaxMidiVelocity[M.Dynamic.mf]);    // 85
+            velocities.Add(M.MaxMidiVelocity[M.Dynamic.mp]);    // 71
+            velocities.Add(M.MaxMidiVelocity[M.Dynamic.p]);     // 57
+            velocities.Add(M.MaxMidiVelocity[M.Dynamic.pp]);    // 43
+            velocities.Add(M.MaxMidiVelocity[M.Dynamic.ppp]);   // 29
 
             return velocities;
 		}

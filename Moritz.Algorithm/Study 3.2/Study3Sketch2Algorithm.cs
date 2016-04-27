@@ -5,6 +5,7 @@ using Krystals4ObjectLibrary;
 using Moritz.Algorithm;
 using Moritz.Palettes;
 using Moritz.Symbols;
+using Moritz.Globals;
 using Moritz.Spec;
 using System;
 
@@ -130,7 +131,7 @@ namespace Moritz.Algorithm.Study3Sketch2
                     {                      
                         inputNoteDefs.Add(new InputNoteDef((byte)(notatedMidiPitch + 36), noteOn, null));
                     }
-                    InputChordDef icd = new InputChordDef(tIud.MsPositionReFirstUD, tIud.MsDuration, inputNoteDefs, null);
+                    InputChordDef icd = new InputChordDef(tIud.MsPositionReFirstUD, tIud.MsDuration, inputNoteDefs, M.Dynamic.none, null);
                     ivd.Add(icd);
                 }     
             }
@@ -157,7 +158,7 @@ namespace Moritz.Algorithm.Study3Sketch2
                         NoteOn noteOn = new NoteOn(seqRef);
                         List<InputNoteDef> inputNoteDefs = new List<InputNoteDef>();
                         inputNoteDefs.Add(new InputNoteDef((byte)65, noteOn, null));
-                        InputChordDef icd = new InputChordDef(firstMidiChordDef.MsPositionReFirstUD, 1500, inputNoteDefs, null);
+                        InputChordDef icd = new InputChordDef(firstMidiChordDef.MsPositionReFirstUD, 1500, inputNoteDefs, M.Dynamic.none, null);
                         ivd.Add(icd);
                         break;
                     }

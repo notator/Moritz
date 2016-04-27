@@ -66,41 +66,41 @@ namespace Moritz.Symbols
             #region get dynamicString and _dynamic
             // note that cLicht has pppp and ffff, but these dynamics are not used here (in Study2)
             // These are the dynamicStrings for cLicht
-            if(midiVelocity > M.MaxMidiVelocity["ff"])
+            if(midiVelocity > M.MaxMidiVelocity[M.Dynamic.ff])
             {
-                dynamicString = "Ï";    // fff
+                dynamicString = M.CLichtDynamicsCharacters[M.Dynamic.fff]; // "Ï"
             }
-            else if(midiVelocity > M.MaxMidiVelocity["f"])
+            else if(midiVelocity > M.MaxMidiVelocity[M.Dynamic.f])
             {
-                dynamicString = "ƒ";    // ff
+                dynamicString = M.CLichtDynamicsCharacters[M.Dynamic.ff]; // "ƒ"
             }
-            else if(midiVelocity > M.MaxMidiVelocity["mf"])
+            else if(midiVelocity > M.MaxMidiVelocity[M.Dynamic.mf])
             {
-                dynamicString = "f";    // f
+                dynamicString = M.CLichtDynamicsCharacters[M.Dynamic.f]; // "f"
             }
-            else if(midiVelocity > M.MaxMidiVelocity["mp"])
+            else if(midiVelocity > M.MaxMidiVelocity[M.Dynamic.mp])
             {
-                dynamicString = "F";    // mf
+                dynamicString = M.CLichtDynamicsCharacters[M.Dynamic.mf]; // "F"
             }
-            else if(midiVelocity > M.MaxMidiVelocity["p"])
+            else if(midiVelocity > M.MaxMidiVelocity[M.Dynamic.p])
             {
-                dynamicString = "P";    // mp
+                dynamicString = M.CLichtDynamicsCharacters[M.Dynamic.mp]; // "P"
             }
-            else if(midiVelocity > M.MaxMidiVelocity["pp"])
+            else if(midiVelocity > M.MaxMidiVelocity[M.Dynamic.pp])
             {
-                dynamicString = "p";    // p
+                dynamicString = M.CLichtDynamicsCharacters[M.Dynamic.p]; // "p"
             }
-            else if(midiVelocity > M.MaxMidiVelocity["ppp"])
+            else if(midiVelocity > M.MaxMidiVelocity[M.Dynamic.ppp])
             {
-                dynamicString = "π";    // pp
+                dynamicString = M.CLichtDynamicsCharacters[M.Dynamic.pp]; // "π"
             }
-            else if(midiVelocity > M.MaxMidiVelocity["pppp"])
+            else if(midiVelocity > M.MaxMidiVelocity[M.Dynamic.pppp])
             {
-                dynamicString = "∏";    // ppp
+                dynamicString = M.CLichtDynamicsCharacters[M.Dynamic.ppp]; // "∏"
             }
             else // > 0 
             {
-                dynamicString = "Ø";    // pppp
+                dynamicString = M.CLichtDynamicsCharacters[M.Dynamic.pppp]; // "Ø"
             }
             #endregion get dynamicString and _dynamic
             return dynamicString;
