@@ -640,8 +640,8 @@ namespace Moritz.Symbols
             MoveMetrics(_ornamentMetrics, _ornamentMetrics.IsBelow, ref topBoundary, (gap * 0.6F), ref bottomBoundary, (gap * 0.4F));
         }
         /// <summary>
-        /// Moves the ornament to its correct position wrt the topBoundary or bottomBoundary.
-        /// Does nothing if ornamentMetrics is null.
+        /// Moves the lyric to its correct position wrt the topBoundary or bottomBoundary.
+        /// Does nothing if lyricMetrics is null.
         /// </summary>
         private void MoveLyricMetrics(float gap, ref float topBoundary, ref float bottomBoundary)
         {
@@ -803,14 +803,14 @@ namespace Moritz.Symbols
         /// bottomBoundary is set to bottomStaffline
         /// then these bounds are widened if the chord lies outside:
         /// If there is no stem,
-        ///     topBoundary is set to topNotehead.Top
-        ///     bottomBoundary is set to bottomNotehead.Bottom
+        ///     topBoundary is set to topNotehead.Top or top of top accidental
+        ///     bottomBoundary is set to bottomNotehead.Bottom (but not to bottom of bottom accidental).
         /// else if stem is up, 
-        ///     topBoundardy is set to stemTopTipY or topNoteheadTop, 
-        ///     bottomBoundary is set to bottomNotehead.Bottom.
+        ///     topBoundardy is set to stemTopTipY, 
+        ///     bottomBoundary is set to bottomNotehead.Bottom (but not to bottom of bottom accidental).
         /// else if stem is down, 
-        ///     topBoundary is set to topNotehead.Top, 
-        ///     bottomBoundary is set to stemBottomTipY or bottomNoteheadBottom. 
+        ///     topBoundary is set to topNotehead.Top or top of top accidental, 
+        ///     bottomBoundary is set to stemBottomTipY or bottomNoteheadBottom or bottom of bottom accidental. 
         /// </summary>
         private void GetTopAndBottomBounds(VerticalDir stemDirection, out float topBoundary, out float bottomBoundary)
         {
@@ -825,6 +825,15 @@ namespace Moritz.Symbols
 
                 float bottomOfBottomHead = _headsMetricsTopDown[_headsMetricsTopDown.Count - 1].Bottom;
                 bottomBoundary = (bottomBoundary > bottomOfBottomHead) ? bottomBoundary : bottomOfBottomHead;
+
+                if(_topDownAccidentalsMetrics != null)
+                {
+                    Debug.Assert(_topDownAccidentalsMetrics.Count > 0);
+                    float topOfTopAccidental = _topDownAccidentalsMetrics[0].Top;
+                    topBoundary = (topBoundary < topOfTopAccidental) ? topBoundary : topOfTopAccidental;
+                    //float bottomOfBottomAccidental = _topDownAccidentalsMetrics[_topDownAccidentalsMetrics.Count - 1].Bottom;
+                    //bottomBoundary = (bottomBoundary > bottomOfBottomAccidental) ? bottomBoundary : bottomOfBottomAccidental;
+                }
             }
             else if(_stemMetrics.VerticalDir == VerticalDir.up)
             {
@@ -832,11 +841,23 @@ namespace Moritz.Symbols
 
                 float bottomOfBottomHead = _headsMetricsTopDown[_headsMetricsTopDown.Count - 1].Bottom;
                 bottomBoundary = (bottomBoundary > bottomOfBottomHead) ? bottomBoundary : bottomOfBottomHead;
+                //if(_topDownAccidentalsMetrics != null)
+                //{
+                //    Debug.Assert(_topDownAccidentalsMetrics.Count > 0);
+                //    float bottomOfBottomAccidental = _topDownAccidentalsMetrics[_topDownAccidentalsMetrics.Count - 1].Bottom;
+                //    bottomBoundary = (bottomBoundary > bottomOfBottomAccidental) ? bottomBoundary : bottomOfBottomAccidental;
+                //}
             }
             else
             {
                 float topOfTopHead = _headsMetricsTopDown[0].Top;
                 topBoundary = (topBoundary < topOfTopHead) ? topBoundary : topOfTopHead;
+                if(_topDownAccidentalsMetrics != null)
+                {
+                    Debug.Assert(_topDownAccidentalsMetrics.Count > 0);
+                    float topOfTopAccidental = _topDownAccidentalsMetrics[0].Top;
+                    topBoundary = (topBoundary < topOfTopAccidental) ? topBoundary : topOfTopAccidental;
+                }
 
                 bottomBoundary = (bottomBoundary > _stemMetrics.Bottom) ? bottomBoundary : _stemMetrics.Bottom;
             }
