@@ -291,7 +291,9 @@ namespace Moritz.Spec
                 SetVelocities(bmcd.Velocities, rootVelocityFactor, verticalVelocityFactor);
             }
         }
-
+        /// <summary>
+        /// Called by the above function
+        /// </summary>
         private void SetVelocities(List<byte> velocities, double rootVelocityFactor, double verticalVelocityFactor)
         {
             if(velocities.Count > 1)

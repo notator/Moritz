@@ -71,7 +71,11 @@ namespace Moritz.Algorithm.Tombeau1
             
             ** Chords can have any pitches (construct some interesting palettes with some differently coloured chords).
                But velocities can be controlled independently to emphasise "harmonic" relations in areas of the score.
-               Repeated chord sequences can be thus "filtered" differently as in a digital painting...
+               Repeated chord sequences can be thus "filtered" differently as in a digital painting.
+               See MidiChordDef.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch) below.
+            
+            ** For Trk construction, think "broken chords". Like ornaments, but on a larger scale. Sequences of chords
+               whose roots are the pitches of a base chord...
                         
             ** Representing velocity using coloured noteheads and extenders:
                There is a new pop-up menu in the Assistant Composer's main form for setting the output chord symbol type.
@@ -228,8 +232,16 @@ namespace Moritz.Algorithm.Tombeau1
         private Block GetSystem1Block()
         {
             List<Trk> sys1Trks = new List<Trk>();
-            List<byte> topVelocities = new List<byte>() { 1, 12, 24, 35, 47, 58, 70, 81, 93, 104, 116, 127 };
-            List<byte> rootVelocities = new List<byte>() { 127, 116, 104, 93, 81, 70, 58, 47, 35, 24, 12, 1 };
+            //List<byte> topVelocities = new List<byte>() { 1, 12, 24, 35, 47, 58, 70, 81, 93, 104, 116, 127 };
+            //List<byte> rootVelocities = new List<byte>() { 127, 116, 104, 93, 81, 70, 58, 47, 35, 24, 12, 1 };
+
+            List<int> velocityPerAbsolutePitch =
+                GetVelocityPerAbsolutePitch(5,    // The base pitch for the pitch hierarchy.
+                                            127,  // the velocity given to any absolute base pitch (if it exists) in the MidiChordDef
+                                            circularPitchHierarchies[0], // the pitch hierarchy for the chord,
+                                            velocityFactors[0]  // A list of 12 values in descending order, each value in range 1..0
+                                           );
+
             for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
             {
                 int chordDensity = 8;
@@ -238,22 +250,14 @@ namespace Moritz.Algorithm.Tombeau1
                 {
                     MidiChordDef mcd = sys1mcds[j] as MidiChordDef;         
 
-                    mcd.Transpose(j - 7);
+                    mcd.Transpose(i + j - 7);
                     mcd.Lyric = (j).ToString() + "." + chordDensity.ToString();
 
                     mcd.SetVerticalDensity(chordDensity);
 
-                    mcd.SetVerticalVelocityGradient(rootVelocities[j], topVelocities[j]);
+                    //mcd.SetVerticalVelocityGradient(rootVelocities[j], topVelocities[j]);
 
-
-                    //List<int> velocityPerAbsolutePitch =
-                    //    GetVelocityPerAbsolutePitch(j,    // The base pitch for the pitch hierarchy.
-                    //                                127,  // the velocity given to any absolute base pitch (if it exists) in the MidiChordDef
-                    //                                circularPitchHierarchies[i], // the pitch hierarchy for the chord,
-                    //                                velocityFactors[0]  // A list of 12 values in descending order, each value in range 1..0
-                    //                               );
-
-                    //mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+                    mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
                 }
                 Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, sys1mcds);
                 sys1Trks.Add(trk);

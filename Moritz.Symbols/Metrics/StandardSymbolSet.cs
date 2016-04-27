@@ -10,13 +10,10 @@ namespace Moritz.Symbols
 {
     public class StandardSymbolSet : SymbolSet
     {
-        /// <summary>
-        /// This constructor can be called with both parameters null,
-        /// just to get the overridden properties.
-        /// </summary>
-        public StandardSymbolSet()
+        public StandardSymbolSet(bool coloredVelocities)
             : base()
         {
+            _coloredVelocities = coloredVelocities;
         }
 
         /// <summary>
@@ -336,7 +333,11 @@ namespace Moritz.Symbols
             {
                 OutputChordSymbol outputChordSymbol = new OutputChordSymbol(voice, midiChordDef, absMsPosition, minimumCrotchetDuration, musicFontHeight);
 
-                if(midiChordDef.MidiVelocity != currentVelocity)
+                if(this._coloredVelocities == true)
+                {
+                    outputChordSymbol.SetNoteheadColors();
+                }
+                else if(midiChordDef.MidiVelocity != currentVelocity)
                 {
                     outputChordSymbol.AddDynamic(midiChordDef.MidiVelocity, currentVelocity);
                     currentVelocity = midiChordDef.MidiVelocity;
@@ -937,5 +938,7 @@ namespace Moritz.Symbols
                 }
             }
         }
+
+        private readonly bool _coloredVelocities;
     }
 }
