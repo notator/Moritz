@@ -373,7 +373,7 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// The duration between the beginning of the first UniqueDef in the block and the end of the last UniqueDef in the block.
+        /// The duration between the beginning of the block and the end of the last UniqueDef in the block.
         /// Setting this value stretches or compresses the msDurations of all the voiceDefs and their contained UniqueDefs.
         /// </summary>
         public int MsDuration
@@ -386,7 +386,7 @@ namespace Moritz.Spec
                     if(voiceDef.UniqueDefs.Count > 0)
                     {
                         IUniqueDef lastIUD = voiceDef.UniqueDefs[voiceDef.UniqueDefs.Count - 1];
-                        int endMsPosReFirstIUD = lastIUD.MsPositionReFirstUD + lastIUD.MsDuration;
+                        int endMsPosReFirstIUD = voiceDef.MsPositionReContainer + lastIUD.MsPositionReFirstUD + lastIUD.MsDuration;
                         msDuration = (msDuration < endMsPosReFirstIUD) ? endMsPosReFirstIUD : msDuration;
                     }
                 }
