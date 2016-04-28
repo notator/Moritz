@@ -320,6 +320,7 @@ namespace Moritz.Spec
                 }
             }
         }
+
         /// <summary>
         /// Creates an exponential change (per index) of pitchwheelDeviation from startMsPosition to endMsPosition,
         /// </summary>
@@ -690,12 +691,165 @@ namespace Moritz.Spec
             Debug.Assert(!(contourNumber < 1 || contourNumber > 12), "contourNumber out of range 1..12");
             Debug.Assert(!(axisNumber < 1 || axisNumber > 12), "axisNumber out of range 1..12");
 		}
-		#endregion public Permute
+        #endregion public Permute
 
-		/// <summary>
-		/// The number of MidiChordDefs and RestDefs in this TrkDef
-		/// </summary>
-		public int DurationsCount
+        #region SortByVelocity
+
+        /// <summary>
+        /// Re-orders the UniqueDefs in order of increasing velocity.
+        /// 1. The positions of any Rests are saved.
+        /// 2. Each MidiChordDef is associated with a List of its velocities sorted into descending order.
+        /// 3. The velocity lists are sorted into ascending order (shorter lists come first, as in sorting words)
+        /// 4. The MidiChordDefs are sorted similarly.
+        /// 5. Rests are re-inserted at their original positions.
+        /// </summary>
+        public void SortByVelocity()
+        {
+            List<IUniqueDef> localIUDs = new List<IUniqueDef>(UniqueDefs);
+            // Remove any rests from localIUDs, and store them (the rests), with their original indices,
+            // in the returned list of KeyValuePairs.
+            List<KeyValuePair<int, IUniqueDef>> rests = ExtractRests(localIUDs);
+
+            List<List<byte>> mcdVelocities = GetSortedMidiChordDefVelocities(localIUDs);
+            List<int> sortedOrder = GetSortedOrder(mcdVelocities);
+
+            List<IUniqueDef> finalList = new List<IUniqueDef>();
+            for(int i = 0; i < localIUDs.Count; ++i)
+            {
+                finalList.Add(localIUDs[sortedOrder[i]]);
+            }
+            foreach(KeyValuePair<int, IUniqueDef> rest in rests)
+            {
+                finalList.Insert(rest.Key, rest.Value);
+            }
+
+            for(int i = UniqueDefs.Count - 1; i >= 0; --i)
+            {
+                RemoveAt(i);
+            }
+            foreach(IUniqueDef iud in finalList)
+            {
+                _Add(iud);
+            }
+
+        }
+
+        /// <summary>
+        /// The contained lists contain values in range [1..127] and are sorted into descending order.
+        /// Return the indices of the lists sorted into ascending order 
+        /// </summary>
+        private List<int> GetSortedOrder(List<List<byte>> mcdVelocities)
+        {
+            List<ulong> values = GetValuesFromVelocityLists(mcdVelocities);
+
+            List<int> sortedOrder = new List<int>();
+            for(int i = 0; i < values.Count; ++i)
+            {
+                ulong minVal = ulong.MaxValue;
+                int index = -1;
+                for(int j = 0; j < values.Count; ++j)
+                {
+                    if(values[j] < minVal)
+                    {
+                        minVal = values[j];
+                        index = j;
+                    }
+                }
+                sortedOrder.Add(index);
+                values[index] = ulong.MaxValue;
+            }
+            return sortedOrder;
+        }
+
+        /// <summary>
+        /// Each list of bytes is converted to a ulong value representing its sort order
+        /// </summary>
+        /// <returns></returns>
+        private List<ulong> GetValuesFromVelocityLists(List<List<byte>> mcdVelocities)
+        {
+            int maxCount = 0;
+            foreach(List<byte> bytes in mcdVelocities)
+            {
+                maxCount = (bytes.Count > maxCount) ? bytes.Count : maxCount;
+            }
+            List<ulong> values = new List<ulong>();
+            foreach(List<byte> bytes in mcdVelocities)
+            {
+                ulong val = 0;
+                double factor = Math.Pow((double)128, (double)(maxCount - 1));
+                foreach(byte b in bytes)
+                {
+                    val += (ulong)(b * factor);
+                    factor /= 128;
+                }
+                if(bytes.Count < maxCount)
+                {
+                    Debug.Assert(factor > 1);
+                    int remainingCount = maxCount - bytes.Count;
+                    for(int i = 0; i < remainingCount; ++i)
+                    {
+                        val += (ulong)(128 * factor);
+                        factor /= 128;
+                    }
+                }
+                Debug.Assert(factor == (double)1 / 128);
+                values.Add(val);
+            }
+            return values;
+        }
+
+        /// <summary>
+        /// Returns a list of the velocities used by each MidiChordDef.
+        /// Each list of velocities is sorted into descending order.
+        /// </summary>
+        /// <param name="mcds"></param>
+        /// <returns></returns>
+        private List<List<byte>> GetSortedMidiChordDefVelocities(List<IUniqueDef> mcds)
+        {
+            #region conditions
+            foreach(IUniqueDef iud in mcds)
+            {
+                Debug.Assert(iud is MidiChordDef);
+            }
+            #endregion conditions
+
+            List<List<byte>> sortedVelocities = new List<List<byte>>();
+            foreach(IUniqueDef iud in mcds)
+            {
+                MidiChordDef mcd = iud as MidiChordDef;
+                List<byte> velocities = new List<byte>(mcd.NotatedMidiVelocities);
+                velocities.Sort();
+                velocities.Reverse();
+                sortedVelocities.Add(velocities);
+            }
+            return sortedVelocities;
+        }
+
+        /// <summary>
+        /// Remove any rests from localIUDs, and store them (the rests), with their original indices,
+        /// in the returned list of KeyValuePairs.
+        /// </summary>
+        /// <returns></returns>
+        private List<KeyValuePair<int, IUniqueDef>> ExtractRests(List<IUniqueDef> iuds)
+        {
+            List<KeyValuePair<int, IUniqueDef>> rests = new List<KeyValuePair<int, IUniqueDef>>();
+            for(int i = iuds.Count - 1; i >= 0; --i)
+            {
+                if(iuds[i] is RestDef)
+                {
+                    rests.Add(new KeyValuePair<int, IUniqueDef>(i, iuds[i]));
+                    iuds.RemoveAt(i);
+                }
+            }
+            return rests;
+        }
+
+        #endregion SortByVelocity
+
+        /// <summary>
+        /// The number of MidiChordDefs and RestDefs in this TrkDef
+        /// </summary>
+        public int DurationsCount
 		{
 			get
 			{

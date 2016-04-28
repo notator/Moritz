@@ -162,24 +162,24 @@ namespace Moritz.Algorithm.Tombeau1
             #endregion main comments
             /**********************************************/
 
-            Block system1Block = GetSystem1Block();
+            Block system1Block = GetVerticalVelocityColorsTestBlock();
+            List<int> systemEndMsPositions = new List<int>() { system1Block.MsDuration };
 
-            Block system2Block = GetSystem2Block(system1Block);
+            Block system2Block = GetWarpDurationsTestBlock(system1Block);
+            systemEndMsPositions = AddSystemDuration(systemEndMsPositions, system2Block.MsDuration);
 
-            Block system3Block = GetSystem3VelocityTestBlock();
+            Block system3Block = GetSimpleVelocityColorsTestBlock();
+            systemEndMsPositions = AddSystemDuration(systemEndMsPositions, system3Block.MsDuration);
 
-            #region set barlines
-            List<int> barlineEndMsPositions = new List<int>();
-            barlineEndMsPositions.Add(system1Block.MsDuration);
-            barlineEndMsPositions.Add(system1Block.MsDuration + system2Block.MsDuration);
-            barlineEndMsPositions.Add(system1Block.MsDuration + system2Block.MsDuration + system3Block.MsDuration);
-            #endregion set barlines
+            Block system4Block = GetTrksTestBlock();
+            systemEndMsPositions = AddSystemDuration(systemEndMsPositions, system4Block.MsDuration);
 
             Block sequence = system1Block;
             sequence.Concat(system2Block);
             sequence.Concat(system3Block);
+            sequence.Concat(system4Block);
 
-            List<List<VoiceDef>> bars = ConvertBlockToBars(sequence, barlineEndMsPositions);
+            List<List<VoiceDef>> bars = ConvertBlockToBars(sequence, systemEndMsPositions);
 
             // Add clef changes here.
             // Testing... 
@@ -191,7 +191,52 @@ namespace Moritz.Algorithm.Tombeau1
             return bars;
 		}
 
-        private Block GetSystem3VelocityTestBlock()
+        private List<int> AddSystemDuration(List<int> systemEndMsPositions, int systemMsDuration)
+        {
+            systemEndMsPositions.Add(systemEndMsPositions[systemEndMsPositions.Count - 1] + systemMsDuration);
+            return systemEndMsPositions;
+        }
+
+        private Block GetTrksTestBlock()
+        {
+            List<Trk> sysTrks = new List<Trk>();
+
+            List<int> velocityPerAbsolutePitch =
+                GetVelocityPerAbsolutePitch(5,    // The base pitch for the pitch hierarchy.
+                                            127,  // the velocity given to any absolute base pitch (if it exists) in the MidiChordDef
+                                            circularPitchHierarchies[0], // the pitch hierarchy for the chord,
+                                            velocityFactors[0]  // A list of 12 values in descending order, each value in range 1..0
+                                           );
+
+            for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
+            {
+                int chordDensity = 6;
+                List<IUniqueDef> sys1mcds = PaletteMidiChordDefs(0);
+                List<IUniqueDef> midiChordDefs = new List<IUniqueDef>();
+
+                for(int j = 0; j < 8; ++j)
+                {
+                    MidiChordDef mcd = sys1mcds[j] as MidiChordDef;
+                    midiChordDefs.Add(mcd);
+
+                    mcd.Transpose(i + j - 7);
+                    mcd.Lyric = (j).ToString() + "." + chordDensity.ToString();
+
+                    mcd.SetVerticalDensity(chordDensity);
+
+                    mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+                }
+                Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], (i * 500), midiChordDefs);
+                trk.SortByVelocity();
+                //trk.Permute(0, new List<int>() { 1,1,1,1,1,1,2 }, i + 1, 12);
+                sysTrks.Add(trk);
+            }
+            Seq systemSeq = new Seq(0, sysTrks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
+
+            return new Block(systemSeq);
+        }
+
+        private Block GetSimpleVelocityColorsTestBlock()
         {
             List<Trk> trks = new List<Trk>();
             MidiChordDef baseMidiChordDef = new MidiChordDef(new List<byte>() { (byte)64 }, new List<byte>() { (byte)127 }, 0, 1000, true);
@@ -218,7 +263,7 @@ namespace Moritz.Algorithm.Tombeau1
             return new Block(seq);
         }
 
-        private Block GetSystem2Block(Block system1Block)
+        private Block GetWarpDurationsTestBlock(Block system1Block)
         {
             Block system3Block = system1Block.Clone();
 
@@ -229,7 +274,7 @@ namespace Moritz.Algorithm.Tombeau1
             return system3Block;
         }
 
-        private Block GetSystem1Block()
+        private Block GetVerticalVelocityColorsTestBlock()
         {
             List<Trk> sys1Trks = new List<Trk>();
             //List<byte> topVelocities = new List<byte>() { 1, 12, 24, 35, 47, 58, 70, 81, 93, 104, 116, 127 };
@@ -267,10 +312,10 @@ namespace Moritz.Algorithm.Tombeau1
         }
 
         /// <summary>
-        /// 
+        /// The returned List contains values in range [1..127]
         /// </summary>
         /// <param name="basePitch">In range [0..127]</param>
-        /// <param name="baseVelocity">In range [0..127]</param>
+        /// <param name="baseVelocity">In range [1..127]</param>
         /// <param name="relativePitchHierarchy">A list of 12 unique values in range 0..11</param>
         /// <param name="velocityFactors">A list of 12 values in descending order, in range 1..0</param>
         private List<int> GetVelocityPerAbsolutePitch(int basePitch,
@@ -281,7 +326,7 @@ namespace Moritz.Algorithm.Tombeau1
         {
             #region conditions
             Debug.Assert(basePitch >= 0 && basePitch <= 127);
-            Debug.Assert(baseVelocity >= 0 && baseVelocity <= 127);
+            Debug.Assert(baseVelocity >= 1 && baseVelocity <= 127);
             Debug.Assert(relativePitchHierarchy.Count == 12);
             Debug.Assert(relativePitchHierarchy[0] == 0);
             foreach(int pitch in relativePitchHierarchy)
@@ -308,6 +353,7 @@ namespace Moritz.Algorithm.Tombeau1
 
                 int vFactorIndex = relativePitchHierarchy.IndexOf(pitchRelBase);
                 velocity = M.MidiValue((int)(baseVelocity * velocityFactorPerPitch[vFactorIndex]));
+                velocity = (velocity == 0) ? 1 : velocity;
 
                 velocityPerAbsPitch.Add(velocity);
             }
