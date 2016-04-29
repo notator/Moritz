@@ -25,12 +25,43 @@ namespace Moritz.Spec
             foreach(Trk trk in trks)
             {
                 Debug.Assert(trk.MsPositionReContainer >= 0);
+                Debug.Assert(trk.AlignmentMsPositionReFirstUD >= 0);
                 _trks.Add(trk);
+                AlignTrks();
             }
 
 			AssertChannelConsistency(midiChannelIndexPerOutputVoice);
 			AssertSeqConsistency();
 		}
+
+        /// <summary>
+        /// Aligns the Trk's AlignmentMsPositions, changing the width of the Seq as necessary.
+        /// </summary>
+        private void AlignTrks()
+        {
+            int minAlign = int.MaxValue;
+            foreach(Trk trk in _trks)
+            {
+                int trkAlign = trk.MsPositionReContainer + trk.AlignmentMsPositionReFirstUD;
+                minAlign = (minAlign < trkAlign) ? minAlign : trkAlign;
+            }
+            int minMsPos = int.MaxValue;
+            List<int> msPosReContainer = new List<int>();
+            foreach(Trk trk in _trks)
+            {
+                int msPosReC = minAlign - trk.AlignmentMsPositionReFirstUD;
+                msPosReContainer.Add(msPosReC);
+                minMsPos = (minMsPos < msPosReC) ? minMsPos : msPosReC;
+            }
+            for(int i = 0; i < msPosReContainer.Count; ++i)
+            {
+                msPosReContainer[i] -= minMsPos;
+            }
+            for(int i = 0; i < msPosReContainer.Count; ++i)
+            {
+                _trks[i].MsPositionReContainer = msPosReContainer[i];
+            }
+        }
 
         /// <summary>
         /// Creates a Seq from the Trks in block, ignoring any InputVoiceDefs in the block.

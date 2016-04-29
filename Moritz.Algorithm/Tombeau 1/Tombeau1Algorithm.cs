@@ -226,12 +226,14 @@ namespace Moritz.Algorithm.Tombeau1
 
                     mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
                 }
-                Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], (i * 500), midiChordDefs);
-                trk.SortVelocityIncreasing();
+                Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, midiChordDefs);
+                int alignmentPosition = trk.UniqueDefs[i].MsPositionReFirstUD + (i * 222);
+                trk.AlignmentMsPositionReFirstUD = alignmentPosition;
+                //trk.SortVelocityIncreasing();
                 //trk.SortVelocityDecreasing();
                 //trk.SortRootNotatedPitchAscending();
                 //trk.SortRootNotatedPitchDescending();
-                //trk.Permute(0, new List<int>() { 1,1,1,1,1,1,2 }, i + 1, 7);
+                trk.Permute(0, new List<int>() { 1,1,1,1,1,1,2 }, i + 1, 7);
                 sysTrks.Add(trk);
             }
             Seq systemSeq = new Seq(0, sysTrks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.

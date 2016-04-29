@@ -27,6 +27,7 @@ namespace Moritz.Spec
         public Trk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
             : base(midiChannel, msPositionReContainer, iuds)
         {
+            // initialiser: AlignmentMsPositionReTrkStart = 0;
             AssertConstructionConsistency();
         }
 
@@ -884,6 +885,8 @@ namespace Moritz.Spec
 				return count;
 			}
 		}
+
+        public int AlignmentMsPositionReFirstUD = 0;
 
         /// <summary>
         /// The composition algorithm must set the MasterVolume (to a value != null)
