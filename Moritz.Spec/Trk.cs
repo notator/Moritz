@@ -469,18 +469,10 @@ namespace Moritz.Spec
 		/// Re-orders the UniqueDefs in (part of) this VoiceDef.
 		/// <para>1. creates partitions (lists of UniqueDefs) using the startAtIndex and partitionSizes in the first two</para>
 		/// <para>-  arguments (see parameter info below).</para>   
-		/// <para>2. Sorts the partitions into ascending order of their lowest pitches.
-		/// <para>3. Re-orders the partitions according to the contour retrieved (from the static K.Contour[] array) using</para>
-		/// <para>-  the contourNumber and axisNumber arguments.</para>
-		/// <para>4. Concatenates the re-ordered partitions, re-sets their MsPositions, and replaces the UniqueDefs in</para>
+		/// <para>2. Re-orders the partitions according to the contour retrieved (from the static K.Contour[] array) using</para>
+		/// <para>-  the axisNumber and contourNumber arguments.</para>
+		/// <para>3. Concatenates the re-ordered partitions, re-sets their MsPositions, and replaces the UniqueDefs in</para>
 		/// <para>-  the original List with the result.</para>
-		/// <para>5. If setLyricsToIndex is true, sets the lyrics to the new indices</para>
-		/// <para>SpecialCases:</para>
-		/// <para>If a partition contains a single LocalMidiRestDef (the partition is a *rest*, having no 'lowest pitch'), the other</para>
-		/// <para>partitions are re-ordered as if the rest-partition was not there, and the rest-partition is subsequently re-inserted</para>
-		/// <para>at its original partition position.</para>
-		/// <para>If two sub-VoiceDefs have the same initial base pitch, they stay in the same order as they were (not necessarily</para>
-		/// <para>together, of course.)</para>
 		/// </summary>
 		/// <param name="startAtIndex">The index in UniqueDefs at which to start the re-ordering.
 		/// </param>
@@ -500,16 +492,13 @@ namespace Moritz.Spec
 
 			List<List<IUniqueDef>> partitions = GetPartitions(startAtIndex, partitionSizes);
 
-			// Remove any partitions (from the partitions list) that contain only a single LocalMidiRestDef
+			// Remove any partitions (from the partitions list) that contain only a single RestDef
 			// Store them (the rests), with their original partition indices, in the returned list of KeyValuePairs.
 			List<KeyValuePair<int, List<IUniqueDef>>> restPartitions = GetRestPartitions(partitions);
 
 			if(partitions.Count > 1)
 			{
-				// All the partitions now contain at least one LocalMidiChordDef
-				// Sort into ascending order (part 2 of the above comment)
-				partitions = SortPartitions(partitions);
-				// re-order the partitions (part 3 of the above comment)
+				// re-order the partitions
 				partitions = DoContouring(partitions, axisNumber, contourNumber);
 			}
 
@@ -597,54 +586,6 @@ namespace Moritz.Spec
 		}
 
 		/// <summary>
-		/// Returns the result of sorting the partitions into ascending order of their lowest pitches.
-		/// <para>All the partitions contain at least one MidiChordDef</para>
-		/// <para>If two partitions have the same lowest pitch, they stay in the same order as they were</para>
-		/// <para>(not necessarily together, of course.)</para>    
-		/// </summary>
-		private List<List<IUniqueDef>> SortPartitions(List<List<IUniqueDef>> partitions)
-		{
-			List<byte> lowestPitches = GetLowestPitches(partitions);
-			List<byte> sortedLowestPitches = new List<byte>(lowestPitches);
-			sortedLowestPitches.Sort();
-
-			List<List<IUniqueDef>> sortedPartitions = new List<List<IUniqueDef>>();
-			foreach(byte lowestPitch in sortedLowestPitches)
-			{
-				int pitchIndex = lowestPitches.FindIndex(item => item == lowestPitch);
-				sortedPartitions.Add(partitions[pitchIndex]);
-				lowestPitches[pitchIndex] = byte.MaxValue;
-			}
-
-			return sortedPartitions;
-		}
-
-		/// <summary>
-		/// Returns a list containing the lowest pitch in each partition
-		/// </summary>
-		private List<byte> GetLowestPitches(List<List<IUniqueDef>> partitions)
-		{
-			List<byte> lowestPitches = new List<byte>();
-			foreach(List<IUniqueDef> partition in partitions)
-			{
-				byte lowestPitch = byte.MaxValue;
-				foreach(MidiChordDef iumdd in partition)
-				{
-					foreach(BasicMidiChordDef bmcd in iumdd.BasicMidiChordDefs)
-					{
-						foreach(byte note in bmcd.Pitches)
-						{
-							lowestPitch = (lowestPitch < note) ? lowestPitch : note;
-						}
-					}
-				}
-				Debug.Assert(lowestPitch != byte.MaxValue, "There must be at least one MidiChordDef in the partition.");
-				lowestPitches.Add(lowestPitch);
-			}
-			return lowestPitches;
-		}
-
-		/// <summary>
 		/// Re-orders the partitions according to the contour retrieved (from the static K.Contour[] array)
 		/// <para>using partitions.Count and the contourNumber and axisNumber arguments.</para>
 		/// <para>Does not change the inner contents of the partitions themselves.</para>
@@ -690,10 +631,74 @@ namespace Moritz.Spec
 			}
             Debug.Assert(!(contourNumber < 1 || contourNumber > 12), "contourNumber out of range 1..12");
             Debug.Assert(!(axisNumber < 1 || axisNumber > 12), "axisNumber out of range 1..12");
-		}
+        }
         #endregion public Permute
 
+        #region SortByRootNotatedPitch
+
+        public void SortRootNotatedPitchAscending()
+        {
+            SortByRootNotatedPitch(true);
+        }
+
+        public void SortRootNotatedPitchDescending()
+        {
+            SortByRootNotatedPitch(false);
+        }
+
+        /// <summary>
+        /// Re-orders the UniqueDefs in order of increasing root notated pitch.
+        /// 1. The positions of any Rests are saved.
+        /// 2. Each MidiChordDef is associated with a List of its velocities sorted into descending order.
+        /// 3. The velocity lists are sorted into ascending order (shorter lists come first, as in sorting words)
+        /// 4. The MidiChordDefs are sorted similarly.
+        /// 5. Rests are re-inserted at their original positions.
+        /// </summary>
+        private void SortByRootNotatedPitch(bool ascending)
+        {
+            List<IUniqueDef> localIUDs = new List<IUniqueDef>(UniqueDefs);
+            // Remove any rests from localIUDs, and store them (the rests), with their original indices,
+            // in the returned list of KeyValuePairs.
+            List<KeyValuePair<int, IUniqueDef>> rests = ExtractRests(localIUDs);
+
+            List<ulong> lowestPitches = GetLowestNotatedPitches(localIUDs);
+            List<int> sortedOrder = GetSortedOrder(lowestPitches);
+            if(ascending == false)
+            {
+                sortedOrder.Reverse();
+            }
+
+            FinalizeSort(localIUDs, sortedOrder, rests);
+        }
+
+        /// <summary>
+        /// Returns a list containing the lowest pitch in each MidiChordDef in order
+        /// </summary>
+        private List<ulong> GetLowestNotatedPitches(List<IUniqueDef> localIUDs)
+        {
+            List<ulong> lowestPitches = new List<ulong>();
+            foreach(IUniqueDef iud in localIUDs)
+            {
+                MidiChordDef mcd = iud as MidiChordDef;
+                Debug.Assert(mcd != null);
+                lowestPitches.Add(mcd.NotatedMidiPitches[0]);
+            }
+            return lowestPitches;
+        }
+
+        #endregion SortByRootNotatedPitch
+
         #region SortByVelocity
+
+        public void SortVelocityIncreasing()
+        {
+            SortByVelocity(true);
+        }
+
+        public void SortVelocityDecreasing()
+        {
+            SortByVelocity(false);
+        }
 
         /// <summary>
         /// Re-orders the UniqueDefs in order of increasing velocity.
@@ -703,7 +708,7 @@ namespace Moritz.Spec
         /// 4. The MidiChordDefs are sorted similarly.
         /// 5. Rests are re-inserted at their original positions.
         /// </summary>
-        public void SortByVelocity()
+        private void SortByVelocity(bool increasing)
         {
             List<IUniqueDef> localIUDs = new List<IUniqueDef>(UniqueDefs);
             // Remove any rests from localIUDs, and store them (the rests), with their original indices,
@@ -711,8 +716,23 @@ namespace Moritz.Spec
             List<KeyValuePair<int, IUniqueDef>> rests = ExtractRests(localIUDs);
 
             List<List<byte>> mcdVelocities = GetSortedMidiChordDefVelocities(localIUDs);
-            List<int> sortedOrder = GetSortedOrder(mcdVelocities);
+            List<ulong> values = GetValuesFromVelocityLists(mcdVelocities);
+            List<int> sortedOrder = GetSortedOrder(values);
+            if(increasing == false)
+            {
+                sortedOrder.Reverse();
+            }
+            FinalizeSort(localIUDs, sortedOrder, rests);
+        }
 
+        /// <summary>
+        /// Create the sorted (rest-less) list, reinsert any rests, and reset the Trk's UniqueDefs to the result.
+        /// </summary>
+        /// <param name="localIUDs">A copy of the original UniqueDefs, from which the rests have been removed.</param>
+        /// <param name="sortedOrder">The order in which to sort localIUDs</param>
+        /// <param name="rests">The removed rests, with their original indices.</param>
+        private void FinalizeSort(List<IUniqueDef> localIUDs, List<int> sortedOrder, List<KeyValuePair<int, IUniqueDef>> rests)
+        {
             List<IUniqueDef> finalList = new List<IUniqueDef>();
             for(int i = 0; i < localIUDs.Count; ++i)
             {
@@ -731,17 +751,16 @@ namespace Moritz.Spec
             {
                 _Add(iud);
             }
-
         }
 
         /// <summary>
-        /// The contained lists contain values in range [1..127] and are sorted into descending order.
-        /// Return the indices of the lists sorted into ascending order 
+        /// The values are in unsorted order. To sort the values into ascending order, copy them
+        /// to a new list in the order of the indices in the list returned from this function.
         /// </summary>
-        private List<int> GetSortedOrder(List<List<byte>> mcdVelocities)
+        /// <param name="values"></param>
+        /// <returns></returns>
+        private static List<int> GetSortedOrder(List<ulong> values)
         {
-            List<ulong> values = GetValuesFromVelocityLists(mcdVelocities);
-
             List<int> sortedOrder = new List<int>();
             for(int i = 0; i < values.Count; ++i)
             {
@@ -758,6 +777,7 @@ namespace Moritz.Spec
                 sortedOrder.Add(index);
                 values[index] = ulong.MaxValue;
             }
+
             return sortedOrder;
         }
 
