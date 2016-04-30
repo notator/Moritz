@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Collections;
-using System.Collections.ObjectModel;
 
 namespace Moritz.Spec
 {
-	public class Seq
+	public class Seq : IVoiceDefContainer
 	{
         /// <summary>
         /// <para>Each Trk in trks has a constructed UniqueDefs list which is either empty, or contains any
@@ -26,6 +24,7 @@ namespace Moritz.Spec
             {
                 Debug.Assert(trk.MsPositionReContainer >= 0);
                 Debug.Assert(trk.AlignmentMsPositionReFirstUD >= 0);
+                trk.Container = this;
                 _trks.Add(trk);
                 AlignTrks();
             }
@@ -34,10 +33,50 @@ namespace Moritz.Spec
 			AssertSeqConsistency();
 		}
 
+        public Seq(int absSeqMsPosition, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
+        {
+            Debug.Assert(absSeqMsPosition >= 0);
+            _absMsPosition = absSeqMsPosition;
+
+            foreach(int channel in midiChannelIndexPerOutputVoice)
+            {
+                Trk trk = new Trk(channel);
+                _trks.Add(trk);
+            }
+
+            AssertChannelConsistency(midiChannelIndexPerOutputVoice);
+            AssertSeqConsistency();
+        }
+
         /// <summary>
-        /// Aligns the Trk's AlignmentMsPositions, changing the width of the Seq as necessary.
+        /// Replaces a trk having the same channel.
         /// </summary>
-        private void AlignTrks()
+        /// <param name="trk"></param>
+        public void SetTrk(Trk trk)
+        {
+            Debug.Assert(trk.MsPositionReContainer >= 0);
+            Debug.Assert(trk.AlignmentMsPositionReFirstUD >= 0);
+            bool found = false;
+            for(int i = 0; i < _trks.Count; ++i)
+            {
+                if(trk.MidiChannel == _trks[i].MidiChannel)
+                {
+                    trk.Container = this;
+                    _trks[i] = trk;
+                    found = true;
+                    break;
+                }
+            }
+            Debug.Assert(found == true, "Illegal channel");
+            AlignTrks();
+        }
+
+        public IReadOnlyList<Trk> Trks { get { return _trks.AsReadOnly(); } }
+
+        /// <summary>
+        /// Aligns the Trks' AlignmentMsPositions, changing the Trks' MsPositionReContainer and width of the Seq as necessary.
+        /// </summary>
+        public void AlignTrks()
         {
             int minAlign = int.MaxValue;
             foreach(Trk trk in _trks)
@@ -61,26 +100,6 @@ namespace Moritz.Spec
             {
                 _trks[i].MsPositionReContainer = msPosReContainer[i];
             }
-        }
-
-        /// <summary>
-        /// Creates a Seq from the Trks in block, ignoring any InputVoiceDefs in the block.
-        /// </summary>
-        /// <param name="block"></param>
-        public Seq(Block block)
-        {
-
-            Debug.Assert(block.AbsMsPosition >= 0);
-            _absMsPosition = block.AbsMsPosition;
-
-            List<Trk> trks = block.Trks;
-
-            foreach(Trk trk in trks)
-            {
-                Debug.Assert(trk.MsPositionReContainer >= 0);
-                _trks.Add(trk);
-            }
-            AssertSeqConsistency();
         }
 
         public IReadOnlyList<int> MidiChannelIndexPerOutputVoice 
@@ -159,25 +178,12 @@ namespace Moritz.Spec
 			return this;
 		}
 
-        /// <summary>
-        /// Ignores any InputVoiceDefs in the block
-        /// </summary>
-        /// <param name="block"></param>
-        /// <returns></returns>
-        public Seq Concat(Block block)
-        {
-            Seq seq = new Seq(block);
-            Concat(seq);
-
-            return this;
-        }
-
 		public Seq Clone()
 		{
 			List<Trk> trks = new List<Trk>();
 			for(int i = 0; i < _trks.Count; ++i)
-			{
-				trks.Add(_trks[i].Clone());
+			{             
+                trks.Add(_trks[i].Clone());
 			}
 
 			Seq clone = new Seq(_absMsPosition, trks, MidiChannelIndexPerOutputVoice);
@@ -212,20 +218,24 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Every Trk in _trks is either empty, or contains any combination of RestDef or MidiChordDef.
+        /// There is always a trk having MsPositionReContainer == zero.
         /// </summary>
-        private void AssertSeqConsistency()
+        public void AssertSeqConsistency()
 		{
 			Debug.Assert(_trks != null && _trks.Count > 0);
             #region Every Trk in _trks is either empty, or contains any combination of RestDef or MidiChordDef.
+            int minMsPositionReContainer = int.MaxValue;
             foreach(Trk trk in _trks)
             {
                 trk.AssertConstructionConsistency();
+                minMsPositionReContainer = (minMsPositionReContainer < trk.MsPositionReContainer) ? minMsPositionReContainer : trk.MsPositionReContainer;
             }
+            Debug.Assert(minMsPositionReContainer == 0, "The minimum trk.MsPositionReContainer must always be 0." );
             #endregion
-		}
+        }
 
 		private List<Trk> _trks = new List<Trk>();
-		public List<Trk> Trks { get { return _trks; } }
+		//public List<Trk> Trks { get { return _trks; } }
 
 		private int _absMsPosition;
 

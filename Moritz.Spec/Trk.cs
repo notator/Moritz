@@ -52,7 +52,11 @@ namespace Moritz.Spec
                 clonedIUDs.Add(clone);
             }
 
-            return new Trk(MidiChannel, MsPositionReContainer, clonedIUDs);
+            Trk trk = new Trk(MidiChannel, MsPositionReContainer, clonedIUDs);
+            trk.AlignmentMsPositionReFirstUD = this.AlignmentMsPositionReFirstUD;
+            trk.Container = this.Container;
+
+            return trk; 
         }
         #endregion constructors
 
@@ -491,26 +495,29 @@ namespace Moritz.Spec
 		{
 			CheckSetContourArgs(startAtIndex, partitionSizes, axisNumber, contourNumber);
 
-			List<List<IUniqueDef>> partitions = GetPartitions(startAtIndex, partitionSizes);
+            // Remove any Rests from the UniqueDefs list, returning them with their original index in the returned List.
+            // If any partitionSize becomes zero, remove it from the partitionSizes.
+            List<Tuple<int, IUniqueDef>> rests = ExtractRests(partitionSizes);
 
-			// Remove any partitions (from the partitions list) that contain only a single RestDef
-			// Store them (the rests), with their original partition indices, in the returned list of KeyValuePairs.
-			List<KeyValuePair<int, List<IUniqueDef>>> restPartitions = GetRestPartitions(partitions);
+            if(partitionSizes.Count > 0)
+            {
+                List<List<IUniqueDef>> partitions = GetPartitions(startAtIndex, partitionSizes);
 
-			if(partitions.Count > 1)
-			{
-				// re-order the partitions
-				partitions = DoContouring(partitions, axisNumber, contourNumber);
-			}
+                if(partitions.Count > 1)
+                {
+                    // re-order the partitions
+                    partitions = DoContouring(partitions, axisNumber, contourNumber);
+                }
 
-			RestoreRestPartitions(partitions, restPartitions);
+			    List<IUniqueDef> sortedLmdds = ConvertPartitionsToFlatIUDs(startAtIndex, partitions);
 
-			List<IUniqueDef> sortedLmdds = ConvertPartitionsToFlatIUDs(startAtIndex, partitions);
+			    for(int i = 0; i < sortedLmdds.Count; ++i)
+			    {
+				    _uniqueDefs[startAtIndex + i] = sortedLmdds[i];
+			    }
+            }
 
-			for(int i = 0; i < sortedLmdds.Count; ++i)
-			{
-				_uniqueDefs[startAtIndex + i] = sortedLmdds[i];
-			}
+            RestoreRests(rests);
 
             AssertVoiceDefConsistency();
 		}
@@ -532,17 +539,19 @@ namespace Moritz.Spec
 		}
 
 		/// <summary>
-		/// Re-insert the restPartitions at their original positions
+		/// Re-insert the rests at their original positions.
+        /// The argument is in ascending index order.
 		/// </summary>
-		private void RestoreRestPartitions(List<List<IUniqueDef>> partitions, List<KeyValuePair<int, List<IUniqueDef>>> restPartitions)
+		private void RestoreRests(List<Tuple<int, IUniqueDef>> rests)
 		{
-			for(int i = restPartitions.Count - 1; i >= 0; --i)
+			for(int i = 0; i < rests.Count; ++ i)
 			{
-				KeyValuePair<int, List<IUniqueDef>> kvp = restPartitions[i];
-				partitions.Insert(kvp.Key, kvp.Value);
-			}
+                int index = rests[i].Item1;
+                Debug.Assert(rests[i].Item2 is RestDef);
+                RestDef restDef = rests[i].Item2 as RestDef;
 
-            AssertVoiceDefConsistency();
+                Insert(index, restDef); // recalculates MsPositionReContainer
+			}
 		}
 
 		private List<List<IUniqueDef>> GetPartitions(int startAtIndex, List<int> partitionSizes)
@@ -561,29 +570,43 @@ namespace Moritz.Spec
 			return partitions;
 		}
 
-		/// <summary>
-		/// Remove any partitions (from partitions) that contain only a single RestDef.
-		/// Store them, with their original partition indices, in the returned list of KeyValuePairs.
-		/// </summary>
-		private List<KeyValuePair<int, List<IUniqueDef>>> GetRestPartitions(List<List<IUniqueDef>> partitions)
+        /// <summary>
+        /// Remove any Rests from the UniqueDefs list, returning them with their original index in the returned List.
+        /// The rests are removed in reverse order, so the returned List is in descending index order.
+        /// If any partitionSize becomes zero, remove it from the partitionSizes.
+        /// </summary>
+        private List<Tuple<int, IUniqueDef>> ExtractRests(List<int> partitionSizes)
 		{
-			List<List<IUniqueDef>> newPartitions = new List<List<IUniqueDef>>();
-			List<KeyValuePair<int, List<IUniqueDef>>> restPartitions = new List<KeyValuePair<int, List<IUniqueDef>>>();
-			for(int i = 0; i < partitions.Count; ++i)
+            int index = UniqueDefs.Count - 1;
+            List<int> newPartitionSizes = new List<int>();
+            List<Tuple<int, IUniqueDef>> rests = new List<Tuple<int, IUniqueDef>>();
+
+            for(int i = partitionSizes.Count - 1; i >= 0; --i)
 			{
-				List<IUniqueDef> partition = partitions[i];
-				if(partition.Count == 1 && partition[0] is RestDef)
-				{
-					restPartitions.Add(new KeyValuePair<int, List<IUniqueDef>>(i, partition));
-				}
-				else
-				{
-					newPartitions.Add(partition);
-				}
+                newPartitionSizes.Insert(0, partitionSizes[i]);
+                for(int j = partitionSizes[i] - 1; j >= 0 ; --j)
+                {
+                    if(UniqueDefs[index] is RestDef)
+                    {
+                        var tuple = new Tuple<int, IUniqueDef>(index, UniqueDefs[index]);
+                        rests.Insert(0, tuple);
+                        Remove(UniqueDefs[index]); // recalculates MsPositionReContainer
+                        newPartitionSizes[0]--;
+                    }
+                    --index;
+                }
 			}
 
-			partitions = newPartitions;
-			return restPartitions;
+            partitionSizes.Clear();
+            foreach(int size in newPartitionSizes)
+            {
+                if(size > 0)
+                {
+                    partitionSizes.Add(size);
+                }
+            }
+
+			return rests;
 		}
 
 		/// <summary>
@@ -657,6 +680,8 @@ namespace Moritz.Spec
         /// </summary>
         private void SortByRootNotatedPitch(bool ascending)
         {
+            Debug.Assert(!(Container is Block), "Cannot sort inside a Block.");
+
             List<IUniqueDef> localIUDs = new List<IUniqueDef>(UniqueDefs);
             // Remove any rests from localIUDs, and store them (the rests), with their original indices,
             // in the returned list of KeyValuePairs.
@@ -711,6 +736,8 @@ namespace Moritz.Spec
         /// </summary>
         private void SortByVelocity(bool increasing)
         {
+            Debug.Assert(!(Container is Block), "Cannot sort inside a Block.");
+
             List<IUniqueDef> localIUDs = new List<IUniqueDef>(UniqueDefs);
             // Remove any rests from localIUDs, and store them (the rests), with their original indices,
             // in the returned list of KeyValuePairs.
@@ -886,7 +913,40 @@ namespace Moritz.Spec
 			}
 		}
 
-        public int AlignmentMsPositionReFirstUD = 0;
+        /// <summary>
+        /// Setting this Property cannot lead to the minimum MsPositionReContainer in the Seq being greater than zero.
+        /// </summary>
+        public override int MsPositionReContainer
+        {
+            get
+            {
+                return base.MsPositionReContainer;
+            }
+            set
+            {
+                Debug.Assert(!(Container is Block), "Cannot set MsPosReContainer inside a Block.");
+                base.MsPositionReContainer = value;
+                if(Container is Seq)
+                {
+                    ((Seq)Container).AssertSeqConsistency();
+                }
+            }
+        }
+
+        public int AlignmentMsPositionReFirstUD
+        {
+            get { return _alignmentMsPositionReFirstUD; }
+            set
+            {
+                Debug.Assert(!(Container is Block), "Cannot set AlignmentMsPositionReFirstUD inside a Block.");
+                _alignmentMsPositionReFirstUD = value;
+                if(Container is Seq)
+                {
+                    ((Seq)Container).AlignTrks();
+                }
+            }
+        }
+        private int _alignmentMsPositionReFirstUD = 0;
 
         /// <summary>
         /// The composition algorithm must set the MasterVolume (to a value != null)

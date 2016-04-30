@@ -55,8 +55,9 @@ namespace Moritz.Spec
                 IUniqueDef clone = iu.Clone();
                 clonedLmdds.Add(clone);
             }
-
-            return new InputVoiceDef(this.MidiChannel, this.MsPositionReContainer, clonedLmdds);
+            var ivd = new InputVoiceDef(this.MidiChannel, this.MsPositionReContainer, clonedLmdds);
+            ivd.Container = this.Container; 
+            return ivd;
         }
         #endregion constructors
 

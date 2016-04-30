@@ -199,7 +199,7 @@ namespace Moritz.Algorithm.Tombeau1
 
         private Block GetTrksTestBlock()
         {
-            List<Trk> sysTrks = new List<Trk>();
+            Seq systemSeq = new Seq(0, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
 
             List<int> velocityPerAbsolutePitch =
                 GetVelocityPerAbsolutePitch(5,    // The base pitch for the pitch hierarchy.
@@ -233,12 +233,26 @@ namespace Moritz.Algorithm.Tombeau1
                 //trk.SortVelocityDecreasing();
                 //trk.SortRootNotatedPitchAscending();
                 //trk.SortRootNotatedPitchDescending();
-                trk.Permute(0, new List<int>() { 1,1,1,1,1,1,2 }, i + 1, 7);
-                sysTrks.Add(trk);
+                //trk.Permute(0, new List<int>() { 1,1,1,1,1,1,2 }, i + 1, 7);
+                systemSeq.SetTrk(trk);
             }
-            Seq systemSeq = new Seq(0, sysTrks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
 
-            return new Block(systemSeq);
+            Trk trk2 = systemSeq.Trks[2];
+            //trk2.AlignmentMsPositionReFirstUD = trk2.UniqueDefs[7].MsPositionReFirstUD;
+            trk2.MsPositionReContainer = 100;
+            trk2.SortRootNotatedPitchDescending();
+            trk2.Insert(4, new RestDef(0, 444));
+
+            Trk trk3 = systemSeq.Trks[3];
+            //trk3.AlignmentMsPositionReFirstUD = trk2.UniqueDefs[7].MsPositionReFirstUD;
+            //trk3.MsPositionReContainer = 100;
+            //trk3.SortRootNotatedPitchAscending();
+            //trk3.Insert(4, new RestDef(0, 444));
+            trk3.Permute(0, new List<int>() { 1, 1, 1, 1, 1, 1, 2 }, 4, 7);
+
+            Block block = new Block(systemSeq);
+
+            return block;
         }
 
         private Block GetSimpleVelocityColorsTestBlock()

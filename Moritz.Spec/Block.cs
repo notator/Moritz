@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 
 namespace Moritz.Spec
 {
-    public class Block
+    public class Block : IVoiceDefContainer
     {
         /// <summary>
         /// A Block contains a list of voiceDefs, that can be of both kinds: Trks and InputVoiceDefs. A Seq can only contains Trks.
@@ -26,10 +26,16 @@ namespace Moritz.Spec
 
             foreach(Trk trk in seq.Trks)
             {
+                trk.Container = null;
                 _voiceDefs.Add(trk);
             } 
 
             Blockify();
+
+            foreach(Trk trk in seq.Trks)
+            {
+                trk.Container = this;
+            }
 
             AssertBlockConsistency();
         }
@@ -103,15 +109,22 @@ namespace Moritz.Spec
             Debug.Assert(_voiceDefs.Count == bar2Block._voiceDefs.Count);
             for(int i = 0; i < _voiceDefs.Count; ++i)
             {
-                Trk trk = _voiceDefs[i] as Trk;
-                Trk trk2 = bar2Block._voiceDefs[i] as Trk;
-                InputVoiceDef ivd = _voiceDefs[i] as InputVoiceDef;
-                InputVoiceDef ivd2 = bar2Block._voiceDefs[i] as InputVoiceDef;
+                VoiceDef vd1 = _voiceDefs[i];
+                VoiceDef vd2 = bar2Block._voiceDefs[i];
 
-                Debug.Assert((trk != null && trk2 != null) || (ivd != null && ivd2 != null));
+                Trk trk1 = vd1 as Trk; 
+                Trk trk2 = vd2 as Trk;
 
-                _voiceDefs[i].AddRange(bar2Block._voiceDefs[i]);
-                _voiceDefs[i].AgglomerateRests();
+                InputVoiceDef ivd1 = vd1 as InputVoiceDef;
+                InputVoiceDef ivd2 = vd2 as InputVoiceDef;
+
+                Debug.Assert((trk1 != null && trk2 != null) || (ivd1 != null && ivd2 != null));
+
+                vd1.Container = null;
+                vd2.Container = null;
+                vd1.AddRange(vd2);
+                vd1.AgglomerateRests();
+                vd1.Container = this;
             }
             AssertBlockConsistency();
         }
@@ -125,7 +138,8 @@ namespace Moritz.Spec
             List<int> midiChannelPerOutputVoice = new List<int>();
             foreach(Trk trk in Trks)
             {
-                trks.Add(trk.Clone());
+                Trk trkClone = trk.Clone();
+                trks.Add(trkClone);
                 midiChannelPerOutputVoice.Add(trk.MidiChannel);
             }
             Seq seq = new Seq(this.AbsMsPosition, trks, midiChannelPerOutputVoice);
@@ -418,9 +432,19 @@ namespace Moritz.Spec
             }
         }
 
-        public int AbsMsPosition = 0;
+        private int _absMsPosition;
 
-        public List<Trk> Trks
+        public int AbsMsPosition
+        {
+            get { return _absMsPosition; }
+            set
+            {
+                Debug.Assert(value >= 0);
+                _absMsPosition = value;
+            }
+        }
+
+        public IReadOnlyList<Trk> Trks
         {
             get
             {
@@ -433,7 +457,7 @@ namespace Moritz.Spec
                         trks.Add(trk);
                     }
                 }
-                return trks;
+                return trks.AsReadOnly();
             }
         }
 

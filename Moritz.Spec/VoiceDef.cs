@@ -143,7 +143,9 @@ namespace Moritz.Spec
         public abstract void Add(IUniqueDef iUniqueDef);
         protected void _Add(IUniqueDef iUniqueDef)
         {
-			if(_uniqueDefs.Count > 0)
+            Debug.Assert(!(Container is Block), "Cannot Add IUniqueDefs inside a Block.");
+
+            if(_uniqueDefs.Count > 0)
 			{
 				IUniqueDef lastIud = _uniqueDefs[_uniqueDefs.Count - 1];
 				iUniqueDef.MsPositionReFirstUD = lastIud.MsPositionReFirstUD + lastIud.MsDuration;
@@ -154,33 +156,60 @@ namespace Moritz.Spec
 			}
             _uniqueDefs.Add(iUniqueDef);
 
+            if(Container is Seq)
+            {
+                ((Seq)Container).AlignTrks();
+            }
+
             AssertVoiceDefConsistency();
         }
         public abstract void AddRange(VoiceDef voiceDef);
         protected void _AddRange(VoiceDef voiceDef)
         {
+            Debug.Assert(!(Container is Block), "Cannot AddRange of VoiceDefs inside a Block.");
+
             _uniqueDefs.AddRange(voiceDef.UniqueDefs);
             SetMsPositionsReFirstUD();
+
+            if(Container is Seq)
+            {
+                ((Seq)Container).AlignTrks();
+            }
 
             AssertVoiceDefConsistency();
         }
         public abstract void Insert(int index, IUniqueDef iUniqueDef);
         protected void _Insert(int index, IUniqueDef iUniqueDef)
         {
+            Debug.Assert(!(Container is Block), "Cannot Insert IUniqueDefs inside a Block.");
+
             _uniqueDefs.Insert(index, iUniqueDef);
             SetMsPositionsReFirstUD();
+
+            if(Container is Seq)
+            {
+                ((Seq)Container).AlignTrks();
+            }
 
             AssertVoiceDefConsistency();
         }
         protected void _InsertRange(int index, VoiceDef voiceDef)
         {
+            Debug.Assert(!(Container is Block), "Cannot Insert range of IUniqueDefs inside a Block.");
+
             _uniqueDefs.InsertRange(index, voiceDef.UniqueDefs);
             SetMsPositionsReFirstUD();
+            if(Container is Seq)
+            {
+                ((Seq)Container).AlignTrks();
+            }
 
             AssertVoiceDefConsistency();
         }
         protected void _InsertInRest(VoiceDef iVoiceDef)
         {
+            Debug.Assert(!(Container is Block), "Cannot Insert a Trk in a RestDef inside a Block.");
+
             int iLmddsStartMsPosReFirstIUD = iVoiceDef[0].MsPositionReFirstUD;
             int iLmddsEndMsPosReFirstIUD = iVoiceDef[iVoiceDef.Count - 1].MsPositionReFirstUD + iVoiceDef[iVoiceDef.Count - 1].MsDuration;
 
@@ -195,6 +224,11 @@ namespace Moritz.Spec
             else
             {
                 Debug.Assert(false, "Can't find a rest spanning the chord!");
+            }
+
+            if(Container is Seq)
+            {
+                ((Seq)Container).AlignTrks();
             }
             AssertVoiceDefConsistency();
         }
@@ -276,7 +310,7 @@ namespace Moritz.Spec
         }
         #endregion InsertInRest() implementation
         /// <summary>
-        /// removes the iUniqueDef from the list, and then resets the positions of all the iUniques in the list.
+        /// removes the iUniqueDef from the list, and then resets the positions of all the iUniqueDefs in the list.
         /// </summary>
         public void Remove(IUniqueDef iUniqueDef)
         {
@@ -331,10 +365,17 @@ namespace Moritz.Spec
         /// </summary>
         protected void _Replace(int index, IUniqueDef replacementIUnique)
         {
+            Debug.Assert(!(Container is Block), "Cannot Replace IUniqueDefs inside a Block.");
+
             Debug.Assert(index >= 0 && index < _uniqueDefs.Count);
             _uniqueDefs.RemoveAt(index);
             _uniqueDefs.Insert(index, replacementIUnique);
             SetMsPositionsReFirstUD();
+
+            if(Container is Seq)
+            {
+                ((Seq)Container).AlignTrks();
+            }
 
             AssertVoiceDefConsistency();
         }
@@ -454,6 +495,8 @@ namespace Moritz.Spec
         /// </summary>
         protected void AdjustMsDurations<T>(int beginIndex, int endIndex, double factor, int minThreshold = 100)
         {
+            Debug.Assert(!(Container is Block), "Cannot AdjustChordMsDurations inside a Block.");
+
             CheckIndices(beginIndex, endIndex);
             Debug.Assert(factor >= 0);
 
@@ -476,6 +519,11 @@ namespace Moritz.Spec
             }
 
             SetMsPositionsReFirstUD();
+
+            if(Container is Seq)
+            {
+                ((Seq)Container).AlignTrks();
+            }
 
             AssertVoiceDefConsistency();
         }
@@ -945,6 +993,8 @@ namespace Moritz.Spec
 			}
 		}
 
+        public IVoiceDefContainer Container = null;
+
         #endregion public
 
         #region protected
@@ -971,7 +1021,7 @@ namespace Moritz.Spec
         /// The msPosition of the first note or rest in the UniqueDefs list re the start of the containing Seq.
         /// The msPositions of the IUniqueDefs in the Trk are re the first IUniqueDef in the list, so the first IUniqueDef.MsPositionReFirstUID is always 0;
         /// </summary>
-        public int MsPositionReContainer
+        public virtual int MsPositionReContainer
         {
             get
             {
