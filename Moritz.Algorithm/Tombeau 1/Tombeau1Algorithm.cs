@@ -76,6 +76,9 @@ namespace Moritz.Algorithm.Tombeau1
             
             ** For Trk construction, think "broken chords". Like ornaments, but on a larger scale. Sequences of chords
                whose roots are the pitches of a base chord...
+            
+            ** Think about creating a Seq (or Seqs) with a particular palette, then using exactly the same code but with
+               a different palette to create further Seq(s)...
                         
             ** Representing velocity using coloured noteheads and extenders:
                There is a new pop-up menu in the Assistant Composer's main form for setting the output chord symbol type.
@@ -154,10 +157,6 @@ namespace Moritz.Algorithm.Tombeau1
                I think meant for *performers*, so should only be attached to inputChords...
                The info in *outputChords* is the info that could go in a MIDI file, and vice versa.
              
-			//3. Chord pitch transposition has already been implemented in the function MidiChordDef.Transpose(MidiChordDef),
-			//   but it contains known bugs. Chord velocity transposition could be implemented analogously. 
-			//5. Velocity gradients in the root chords of additions: bottom->top (="consonant") --> top->bottom (="dissonant")...
-			
 			*********************************************************************************************/
             #endregion main comments
             /**********************************************/
