@@ -1016,21 +1016,21 @@ namespace Moritz.Spec
             }
         }
 
-        private int _msPositionReSeq = 0;
+        private int _msPositionReContainer = 0;
         /// <summary>
-        /// The msPosition of the first note or rest in the UniqueDefs list re the start of the containing Seq.
+        /// The msPosition of the first note or rest in the UniqueDefs list re the start of the containing Seq or Block.
         /// The msPositions of the IUniqueDefs in the Trk are re the first IUniqueDef in the list, so the first IUniqueDef.MsPositionReFirstUID is always 0;
         /// </summary>
         public virtual int MsPositionReContainer
         {
             get
             {
-                return _msPositionReSeq;
+                return _msPositionReContainer;
             }
             set
             {
                 Debug.Assert(value >= 0);
-                _msPositionReSeq = value;
+                _msPositionReContainer = value;
             }
         }
 
