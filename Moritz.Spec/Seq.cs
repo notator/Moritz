@@ -48,11 +48,12 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Replaces a trk having the same channel. trk.Container is set to the Seq.
+        /// If trk.MsPositionReContainer is negative, the seq is Normalized.
+        /// (All the trks are shifted so that it becomes zero).
         /// </summary>
         /// <param name="trk"></param>
         public void SetTrk(Trk trk)
         {
-            Debug.Assert(trk.MsPositionReContainer >= 0);
             bool found = false;
             for(int i = 0; i < _trks.Count; ++i)
             {
@@ -64,37 +65,36 @@ namespace Moritz.Spec
                     break;
                 }
             }
+
             Debug.Assert(found == true, "Illegal channel");
+
+            Normalize();
         }
 
         public IReadOnlyList<Trk> Trks { get { return _trks.AsReadOnly(); } }
 
         /// <summary>
-        /// Aligns the Trks to the alignmentMsPositions given in the argument, changing the Trks' MsPositionReContainer and width of
-        /// the Seq as necessary.
-        /// The integer part of each alignmentPosition is a valid UniqueDef index in a trk.
-        /// The decimal part of each alignmentPosition, relates to the duration of the indexed UniqueDef.
+        /// Aligns the Trk UniqueDefs whose indices are given in the argument.
+        /// The Seq is Normalized, and its msDuration changes automatically.
+        /// Each alignmentPosition must be a valid UniqueDef index in its trk.
         /// The argument.Count must be equal to the number of trks in the Seq, and in order of the trks in the seq's _trks list.
         /// </summary>
-        public void AlignTrks(List<double> alignmentPositions)
+        public void AlignTrkUniqueDefs(List<int> indicesToAlign)
         {
-            Debug.Assert(alignmentPositions.Count == this._trks.Count);
+            Debug.Assert(indicesToAlign.Count == this._trks.Count);
             List<int> newMsPositionsReContainer = new List<int>();
             int minMsPositionReContainer = int.MaxValue;
             for(int i = 0; i < _trks.Count; ++i)
             {
                 Trk trk = _trks[i];
-                double alignmentPosition = alignmentPositions[i];
-                Debug.Assert(alignmentPosition >= 0 && alignmentPosition < trk.UniqueDefs.Count);
-                int index = (int)Math.Floor(alignmentPosition);
-                double fract = alignmentPosition - index;
+                int index = indicesToAlign[i];
+                Debug.Assert(index >= 0 && index < trk.UniqueDefs.Count);
 
                 int alignmentMsPositionReFirstUD = 0;
-                for(int j = 0; j <= index; ++j)
+                for(int j = 0; j < index; ++j)
                 {
                     alignmentMsPositionReFirstUD += trk.UniqueDefs[j].MsDuration;
                 }
-                alignmentMsPositionReFirstUD += (int)Math.Floor(trk.UniqueDefs[index].MsDuration * fract);
 
                 int newMsPositionReContainer = trk.MsPositionReContainer - alignmentMsPositionReFirstUD;
                 newMsPositionsReContainer.Add(newMsPositionReContainer);
@@ -105,6 +105,9 @@ namespace Moritz.Spec
                 Trk trk = _trks[i];
                 trk.MsPositionReContainer = newMsPositionsReContainer[i] - minMsPositionReContainer;
             }
+
+            Normalize();
+
             AssertSeqConsistency();
         }
 
@@ -230,17 +233,49 @@ namespace Moritz.Spec
 		{
 			Debug.Assert(_trks != null && _trks.Count > 0);
             #region Every Trk in _trks is either empty, or contains any combination of RestDef or MidiChordDef.
-            int minMsPositionReContainer = int.MaxValue;
             foreach(Trk trk in _trks)
             {
                 trk.AssertConstructionConsistency();
-                minMsPositionReContainer = (minMsPositionReContainer < trk.MsPositionReContainer) ? minMsPositionReContainer : trk.MsPositionReContainer;
             }
-            Debug.Assert(minMsPositionReContainer == 0, "The minimum trk.MsPositionReContainer must always be 0." );
             #endregion
         }
 
-		private List<Trk> _trks = new List<Trk>();
+        /// <summary>
+        /// True if the earliest trk.MsPositionReContainer is 0.
+        /// </summary>
+        internal bool IsNormalized
+        {
+            get
+            {
+                int minMsPositionReContainer = int.MaxValue;
+                foreach(Trk trk in _trks)
+                {
+                    minMsPositionReContainer = (minMsPositionReContainer < trk.MsPositionReContainer) ? minMsPositionReContainer : trk.MsPositionReContainer;
+                }
+                return (minMsPositionReContainer == 0);
+            }
+        }
+
+        /// <summary>
+        /// Shifts the Trks so that the earliest trk.MsPositionReContainer is 0.
+        /// </summary>
+        public void Normalize()
+        {
+            int minMsPositionReContainer = int.MaxValue;
+            foreach(Trk trk in _trks)
+            {
+                minMsPositionReContainer = (minMsPositionReContainer < trk.MsPositionReContainer) ? minMsPositionReContainer : trk.MsPositionReContainer;
+            }
+            if(minMsPositionReContainer != 0)
+            {
+                foreach(Trk trk in _trks)
+                {
+                    trk.MsPositionReContainer -= minMsPositionReContainer;
+                }
+            }
+        }
+
+        private List<Trk> _trks = new List<Trk>();
 		//public List<Trk> Trks { get { return _trks; } }
 
 		private int _absMsPosition;

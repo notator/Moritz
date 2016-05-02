@@ -29,7 +29,7 @@ namespace Moritz.Spec
         protected VoiceDef(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
         {
             this.MidiChannel = midiChannel;
-            this.MsPositionReContainer = msPositionReContainer;
+            this._msPositionReContainer = msPositionReContainer;
             this._uniqueDefs = iuds;
 
             AssertVoiceDefConsistency();
@@ -121,7 +121,6 @@ namespace Moritz.Spec
         protected void AssertVoiceDefConsistency()
         {
             Debug.Assert(MidiChannel >= 0 && MidiChannel <= 15);
-            Debug.Assert(MsPositionReContainer >= 0);
             Debug.Assert(UniqueDefs != null);
             if(UniqueDefs.Count > 0)
             {
@@ -996,7 +995,6 @@ namespace Moritz.Spec
             }
             set
             {
-                Debug.Assert(value >= 0);
                 _msPositionReContainer = value;
             }
         }

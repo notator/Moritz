@@ -27,7 +27,7 @@ namespace Moritz.Spec
         public Trk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
             : base(midiChannel, msPositionReContainer, iuds)
         {
-            // initialiser: AlignmentMsPositionReTrkStart = 0;
+            // N.B. msPositionReContainer can be negative here. Seqs are normalised independently.
             AssertConstructionConsistency();
         }
 
@@ -924,11 +924,7 @@ namespace Moritz.Spec
             set
             {
                 Debug.Assert(!(Container is Block), "Cannot set MsPosReContainer inside a Block.");
-                base.MsPositionReContainer = value;
-                if(Container is Seq)
-                {
-                    ((Seq)Container).AssertSeqConsistency();
-                }
+                base.MsPositionReContainer = value; // can be negative
             }
         }
 

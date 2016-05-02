@@ -22,6 +22,8 @@ namespace Moritz.Spec
         /// <param name="seq">cannot be null, and must have Trks</param>
         public Block(Seq seq)
         {
+            Debug.Assert(seq.IsNormalized);
+
             AbsMsPosition = seq.AbsMsPosition;
 
             foreach(Trk trk in seq.Trks)

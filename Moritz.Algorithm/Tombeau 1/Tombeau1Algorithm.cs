@@ -234,15 +234,31 @@ namespace Moritz.Algorithm.Tombeau1
                 systemSeq.SetTrk(trk);
             }
 
-            systemSeq.AlignTrks(new List<double>() { 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5 });
+            systemSeq.AlignTrkUniqueDefs(new List<int>() { 0,1,2,3,4,5,6,7 });
 
             Trk trk2 = systemSeq.Trks[2];
-            trk2.MsPositionReContainer += 600;
+            trk2.MsPositionReContainer = -500;
             trk2.SortRootNotatedPitchDescending();
             trk2.Insert(4, new RestDef(0, 444));
 
             Trk trk3 = systemSeq.Trks[3];
             trk3.Permute(0, new List<int>() { 1, 1, 1, 1, 1, 1, 2 }, 4, 7);
+
+            Trk trk4 = systemSeq.Trks[4];
+            trk4.SortVelocityDecreasing();
+
+            systemSeq.Normalize();
+
+            // Implement these: (They just call the corresponding function on all the Trks in the seq.)
+            //systemSeq.SortVelocityIncreasing();
+            //systemSeq.SortVelocityDecreasing();
+            //systemSeq.SortRootNotatedPitchAscending();
+            //systemSeq.SortRootNotatedPitchDescending();
+
+            //maybe implement Seq.ShiftTrks(List<int> shiftPerTrk) ?
+
+            // Can something like this be done? Using the Alignment positions?
+            //systemSeq.Permute(0, new List<int>() { 1,1,1,1,1,1,2 }, i + 1, 7);
 
             Block block = new Block(systemSeq);
 
