@@ -24,7 +24,7 @@ namespace Moritz.Algorithm.Tombeau1
 		public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
 		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 127, 127, 127, 127, 127, 127, 127, 127 }; } }
 		public override int NumberOfInputVoices { get { return 0; } }
-		public override int NumberOfBars { get { return 3; } }
+		public override int NumberOfBars { get { return 4; } }
 
 		/// <summary>
 		/// See CompositionAlgorithm.DoAlgorithm()
@@ -226,8 +226,6 @@ namespace Moritz.Algorithm.Tombeau1
                     mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
                 }
                 Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, midiChordDefs);
-                int alignmentPosition = trk.UniqueDefs[i].MsPositionReFirstUD + (i * 222);
-                trk.AlignmentMsPositionReFirstUD = alignmentPosition;
                 //trk.SortVelocityIncreasing();
                 //trk.SortVelocityDecreasing();
                 //trk.SortRootNotatedPitchAscending();
@@ -236,17 +234,14 @@ namespace Moritz.Algorithm.Tombeau1
                 systemSeq.SetTrk(trk);
             }
 
+            systemSeq.AlignTrks(new List<double>() { 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5 });
+
             Trk trk2 = systemSeq.Trks[2];
-            //trk2.AlignmentMsPositionReFirstUD = trk2.UniqueDefs[7].MsPositionReFirstUD;
-            trk2.MsPositionReContainer = 100;
+            trk2.MsPositionReContainer += 600;
             trk2.SortRootNotatedPitchDescending();
             trk2.Insert(4, new RestDef(0, 444));
 
             Trk trk3 = systemSeq.Trks[3];
-            //trk3.AlignmentMsPositionReFirstUD = trk2.UniqueDefs[7].MsPositionReFirstUD;
-            //trk3.MsPositionReContainer = 100;
-            //trk3.SortRootNotatedPitchAscending();
-            //trk3.Insert(4, new RestDef(0, 444));
             trk3.Permute(0, new List<int>() { 1, 1, 1, 1, 1, 1, 2 }, 4, 7);
 
             Block block = new Block(systemSeq);

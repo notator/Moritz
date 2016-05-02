@@ -53,7 +53,6 @@ namespace Moritz.Spec
             }
 
             Trk trk = new Trk(MidiChannel, MsPositionReContainer, clonedIUDs);
-            trk.AlignmentMsPositionReFirstUD = this.AlignmentMsPositionReFirstUD;
             trk.Container = this.Container;
 
             return trk; 
@@ -932,21 +931,6 @@ namespace Moritz.Spec
                 }
             }
         }
-
-        public int AlignmentMsPositionReFirstUD
-        {
-            get { return _alignmentMsPositionReFirstUD; }
-            set
-            {
-                Debug.Assert(!(Container is Block), "Cannot set AlignmentMsPositionReFirstUD inside a Block.");
-                _alignmentMsPositionReFirstUD = value;
-                if(Container is Seq)
-                {
-                    ((Seq)Container).AlignTrks();
-                }
-            }
-        }
-        private int _alignmentMsPositionReFirstUD = 0;
 
         /// <summary>
         /// The composition algorithm must set the MasterVolume (to a value != null)

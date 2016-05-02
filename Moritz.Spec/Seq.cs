@@ -23,10 +23,8 @@ namespace Moritz.Spec
             foreach(Trk trk in trks)
             {
                 Debug.Assert(trk.MsPositionReContainer >= 0);
-                Debug.Assert(trk.AlignmentMsPositionReFirstUD >= 0);
                 trk.Container = this;
                 _trks.Add(trk);
-                AlignTrks();
             }
 
 			AssertChannelConsistency(midiChannelIndexPerOutputVoice);
@@ -49,13 +47,12 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Replaces a trk having the same channel.
+        /// Replaces a trk having the same channel. trk.Container is set to the Seq.
         /// </summary>
         /// <param name="trk"></param>
         public void SetTrk(Trk trk)
         {
             Debug.Assert(trk.MsPositionReContainer >= 0);
-            Debug.Assert(trk.AlignmentMsPositionReFirstUD >= 0);
             bool found = false;
             for(int i = 0; i < _trks.Count; ++i)
             {
@@ -68,38 +65,47 @@ namespace Moritz.Spec
                 }
             }
             Debug.Assert(found == true, "Illegal channel");
-            AlignTrks();
         }
 
         public IReadOnlyList<Trk> Trks { get { return _trks.AsReadOnly(); } }
 
         /// <summary>
-        /// Aligns the Trks' AlignmentMsPositions, changing the Trks' MsPositionReContainer and width of the Seq as necessary.
+        /// Aligns the Trks to the alignmentMsPositions given in the argument, changing the Trks' MsPositionReContainer and width of
+        /// the Seq as necessary.
+        /// The integer part of each alignmentPosition is a valid UniqueDef index in a trk.
+        /// The decimal part of each alignmentPosition, relates to the duration of the indexed UniqueDef.
+        /// The argument.Count must be equal to the number of trks in the Seq, and in order of the trks in the seq's _trks list.
         /// </summary>
-        public void AlignTrks()
+        public void AlignTrks(List<double> alignmentPositions)
         {
-            int minAlign = int.MaxValue;
-            foreach(Trk trk in _trks)
+            Debug.Assert(alignmentPositions.Count == this._trks.Count);
+            List<int> newMsPositionsReContainer = new List<int>();
+            int minMsPositionReContainer = int.MaxValue;
+            for(int i = 0; i < _trks.Count; ++i)
             {
-                int trkAlign = trk.MsPositionReContainer + trk.AlignmentMsPositionReFirstUD;
-                minAlign = (minAlign < trkAlign) ? minAlign : trkAlign;
+                Trk trk = _trks[i];
+                double alignmentPosition = alignmentPositions[i];
+                Debug.Assert(alignmentPosition >= 0 && alignmentPosition < trk.UniqueDefs.Count);
+                int index = (int)Math.Floor(alignmentPosition);
+                double fract = alignmentPosition - index;
+
+                int alignmentMsPositionReFirstUD = 0;
+                for(int j = 0; j <= index; ++j)
+                {
+                    alignmentMsPositionReFirstUD += trk.UniqueDefs[j].MsDuration;
+                }
+                alignmentMsPositionReFirstUD += (int)Math.Floor(trk.UniqueDefs[index].MsDuration * fract);
+
+                int newMsPositionReContainer = trk.MsPositionReContainer - alignmentMsPositionReFirstUD;
+                newMsPositionsReContainer.Add(newMsPositionReContainer);
+                minMsPositionReContainer = (minMsPositionReContainer < newMsPositionReContainer) ? minMsPositionReContainer : newMsPositionReContainer;
             }
-            int minMsPos = int.MaxValue;
-            List<int> msPosReContainer = new List<int>();
-            foreach(Trk trk in _trks)
+            for(int i = 0; i < _trks.Count; ++i)
             {
-                int msPosReC = minAlign - trk.AlignmentMsPositionReFirstUD;
-                msPosReContainer.Add(msPosReC);
-                minMsPos = (minMsPos < msPosReC) ? minMsPos : msPosReC;
+                Trk trk = _trks[i];
+                trk.MsPositionReContainer = newMsPositionsReContainer[i] - minMsPositionReContainer;
             }
-            for(int i = 0; i < msPosReContainer.Count; ++i)
-            {
-                msPosReContainer[i] -= minMsPos;
-            }
-            for(int i = 0; i < msPosReContainer.Count; ++i)
-            {
-                _trks[i].MsPositionReContainer = msPosReContainer[i];
-            }
+            AssertSeqConsistency();
         }
 
         public IReadOnlyList<int> MidiChannelIndexPerOutputVoice 

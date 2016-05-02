@@ -156,11 +156,6 @@ namespace Moritz.Spec
 			}
             _uniqueDefs.Add(iUniqueDef);
 
-            if(Container is Seq)
-            {
-                ((Seq)Container).AlignTrks();
-            }
-
             AssertVoiceDefConsistency();
         }
         public abstract void AddRange(VoiceDef voiceDef);
@@ -170,11 +165,6 @@ namespace Moritz.Spec
 
             _uniqueDefs.AddRange(voiceDef.UniqueDefs);
             SetMsPositionsReFirstUD();
-
-            if(Container is Seq)
-            {
-                ((Seq)Container).AlignTrks();
-            }
 
             AssertVoiceDefConsistency();
         }
@@ -186,11 +176,6 @@ namespace Moritz.Spec
             _uniqueDefs.Insert(index, iUniqueDef);
             SetMsPositionsReFirstUD();
 
-            if(Container is Seq)
-            {
-                ((Seq)Container).AlignTrks();
-            }
-
             AssertVoiceDefConsistency();
         }
         protected void _InsertRange(int index, VoiceDef voiceDef)
@@ -199,10 +184,6 @@ namespace Moritz.Spec
 
             _uniqueDefs.InsertRange(index, voiceDef.UniqueDefs);
             SetMsPositionsReFirstUD();
-            if(Container is Seq)
-            {
-                ((Seq)Container).AlignTrks();
-            }
 
             AssertVoiceDefConsistency();
         }
@@ -226,10 +207,6 @@ namespace Moritz.Spec
                 Debug.Assert(false, "Can't find a rest spanning the chord!");
             }
 
-            if(Container is Seq)
-            {
-                ((Seq)Container).AlignTrks();
-            }
             AssertVoiceDefConsistency();
         }
         #region _InsertInRest() implementation
@@ -371,11 +348,6 @@ namespace Moritz.Spec
             _uniqueDefs.RemoveAt(index);
             _uniqueDefs.Insert(index, replacementIUnique);
             SetMsPositionsReFirstUD();
-
-            if(Container is Seq)
-            {
-                ((Seq)Container).AlignTrks();
-            }
 
             AssertVoiceDefConsistency();
         }
@@ -519,11 +491,6 @@ namespace Moritz.Spec
             }
 
             SetMsPositionsReFirstUD();
-
-            if(Container is Seq)
-            {
-                ((Seq)Container).AlignTrks();
-            }
 
             AssertVoiceDefConsistency();
         }
