@@ -403,9 +403,9 @@ namespace Moritz.Composer
             this.SystemStartBarsHelpLabel.ForeColor = System.Drawing.Color.RoyalBlue;
             this.SystemStartBarsHelpLabel.Location = new System.Drawing.Point(139, 442);
             this.SystemStartBarsHelpLabel.Name = "SystemStartBarsHelpLabel";
-            this.SystemStartBarsHelpLabel.Size = new System.Drawing.Size(150, 14);
+            this.SystemStartBarsHelpLabel.Size = new System.Drawing.Size(144, 14);
             this.SystemStartBarsHelpLabel.TabIndex = 179;
-            this.SystemStartBarsHelpLabel.Text = "(default is 5 bars per system)";
+            this.SystemStartBarsHelpLabel.Text = "(default is 1 bar per system)";
             // 
             // ShortStaffNamesTextBox
             // 

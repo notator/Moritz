@@ -175,7 +175,7 @@ namespace Moritz.Composer
 
         private void SetSystemStartBarsHelpLabel(int numberOfBars)
         {
-            SystemStartBarsHelpLabel.Text = "(" + numberOfBars.ToString() + " bars. Default is 5 bars per system)";
+            SystemStartBarsHelpLabel.Text = "(" + numberOfBars.ToString() + " bars. Default is 1 bar per system)";
         }
         #endregion helpers
         private void SetDefaultVoiceIndicesPerStaff(int nVoices)
@@ -1156,27 +1156,37 @@ namespace Moritz.Composer
         /// <returns></returns>
         private string NormalizedSystemStartBars()
         {
-            Debug.Assert(SystemStartBarsTextBox.Text.Length > 0);
-            List<int> startBars = M.StringToIntList(SystemStartBarsTextBox.Text, ',');
-            StringBuilder sb = new StringBuilder();
-            startBars.Sort();
-
-            if(startBars.Count > 1)
-            {   // remove duplicates
-                int currentStartBar = startBars[startBars.Count - 1];
-                for(int i = startBars.Count - 2; i >= 0; --i)
+            List<int> startBars = new List<int>();
+            if(SystemStartBarsTextBox.Text.Length == 0)
+            {
+                for(int i = 1; i <= _algorithm.NumberOfBars; ++i)
                 {
-                    if(startBars[i] == currentStartBar)
-                        startBars.RemoveAt(i);
-                    else
-                        currentStartBar = startBars[i];
+                    startBars.Add(i);
                 }
-                if(startBars[0] != 1 || startBars[startBars.Count - 1] > _algorithm.NumberOfBars)
-                    M.SetTextBoxErrorColorIfNotOkay(SystemStartBarsTextBox, false);
-                else
-                    M.SetTextBoxErrorColorIfNotOkay(SystemStartBarsTextBox, true);
+            }
+            else
+            {
+                startBars = M.StringToIntList(SystemStartBarsTextBox.Text, ',');
+                startBars.Sort();
+
+                if(startBars.Count > 1)
+                {   // remove duplicates
+                    int currentStartBar = startBars[startBars.Count - 1];
+                    for(int i = startBars.Count - 2; i >= 0; --i)
+                    {
+                        if(startBars[i] == currentStartBar)
+                            startBars.RemoveAt(i);
+                        else
+                            currentStartBar = startBars[i];
+                    }
+                    if(startBars[0] != 1 || startBars[startBars.Count - 1] > _algorithm.NumberOfBars)
+                        M.SetTextBoxErrorColorIfNotOkay(SystemStartBarsTextBox, false);
+                    else
+                        M.SetTextBoxErrorColorIfNotOkay(SystemStartBarsTextBox, true);
+                }
             }
 
+            StringBuilder sb = new StringBuilder();
             foreach(int val in startBars)
             {
                 sb.Append(", ");
@@ -1189,8 +1199,7 @@ namespace Moritz.Composer
         {
             // Passing uint.MaxValue means that the list can have any number of values (including none).
             M.LeaveIntRangeTextBox(SystemStartBarsTextBox, true, uint.MaxValue, 1, int.MaxValue, M.SetTextBoxErrorColorIfNotOkay);
-            if((SystemStartBarsTextBox.BackColor != M.TextBoxErrorColor)
-            && (SystemStartBarsTextBox.Text.Length > 0))
+            if(SystemStartBarsTextBox.BackColor != M.TextBoxErrorColor)
             {
                 SystemStartBarsTextBox.Text = NormalizedSystemStartBars();
             }
