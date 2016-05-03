@@ -164,9 +164,9 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Aligns the Trk UniqueDefs whose indices are given in the argument.
-        /// The Seq is normalized after the alignment. Its msDuration changes automatically.
-        /// Each alignmentPosition must be a valid UniqueDef index in its trk.
         /// The argument.Count must be equal to the number of trks in the Seq, and in order of the trks in the seq's _trks list.
+        /// Each alignmentPosition must be a valid UniqueDef index in its trk.
+        /// The Seq is normalized at the end of this function. Its msDuration changes automatically.
         /// </summary>
         public void AlignTrkUniqueDefs(List<int> indicesToAlign)
         {
@@ -195,6 +195,25 @@ namespace Moritz.Spec
                 trk.MsPositionReContainer = newMsPositionsReContainer[i] - minMsPositionReContainer;
             }
 
+            Normalize();
+
+            AssertSeqConsistency();
+        }
+
+        /// <summary>
+        /// Shifts each track by adding the corresponding millisecond argument to its MsPositionReContainer attribute.
+        /// The argument.Count must be equal to the number of trks in the Seq, and in order of the trks in the seq's _trks list.
+        /// The Seq is normalized at the end of this function. Its msDuration changes automatically.
+        /// </summary>
+        /// <param name="msShifts">The number of milliseconds to shift each trk. (May be negative.)</param>
+        public void ShiftTrks(List<int> msShifts)
+        {
+            Debug.Assert(msShifts.Count == this._trks.Count);
+            for(int i = 0; i < msShifts.Count; ++i)
+            {
+                Trk trk = _trks[i];
+                trk.MsPositionReContainer += msShifts[i];
+            }
             Normalize();
 
             AssertSeqConsistency();
