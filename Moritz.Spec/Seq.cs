@@ -13,7 +13,8 @@ namespace Moritz.Spec
         /// unique and present in the midiChannelIndexPerOutputVoice list.</para>
         /// The Seq will have all the trks corresponding to the midiChannels in midiChannelIndexPerOutputVoice,
         /// but some of them can have an empty UniqueDefs list.
-        /// <para>Argument trk.MsPositionReSeq values must be >= 0, and set relative to the start of the Seq.</para>
+        /// The MsPositionReContainer field in each argument trk can have any value, but the Seq is Normalized
+        /// by this constructor.
         /// </summary>
         public Seq(int absSeqMsPosition, List<Trk> trks, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
 		{
@@ -22,10 +23,11 @@ namespace Moritz.Spec
 
             foreach(Trk trk in trks)
             {
-                Debug.Assert(trk.MsPositionReContainer >= 0);
                 trk.Container = this;
                 _trks.Add(trk);
             }
+
+            Normalize();
 
 			AssertChannelConsistency(midiChannelIndexPerOutputVoice);
 			AssertSeqConsistency();
@@ -41,6 +43,7 @@ namespace Moritz.Spec
                 Trk trk = new Trk(channel);
                 _trks.Add(trk);
             }
+            // No need to normalize here, all trk.MsPositionReContainer fields are already set to 0.
 
             AssertChannelConsistency(midiChannelIndexPerOutputVoice);
             AssertSeqConsistency();
@@ -48,8 +51,7 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Replaces a trk having the same channel. trk.Container is set to the Seq.
-        /// If trk.MsPositionReContainer is negative, the seq is Normalized.
-        /// (All the trks are shifted so that it becomes zero).
+        /// trk.MsPositionReContainer can have any value, but this function normalizes the seq.
         /// </summary>
         /// <param name="trk"></param>
         public void SetTrk(Trk trk)
@@ -71,11 +73,98 @@ namespace Moritz.Spec
             Normalize();
         }
 
-        public IReadOnlyList<Trk> Trks { get { return _trks.AsReadOnly(); } }
+        /// <summary>
+        /// Every Trk.MidiChannel is unique and is parallel to the indices in midiChannelIndexPerOutputVoice.
+        /// </summary>
+        private void AssertChannelConsistency(IReadOnlyList<int> midiChannelIndexPerOutputVoice)
+        {
+            Debug.Assert(_trks != null && _trks.Count > 0);
+            int nTrks = 0;
+            for(int i = 0; i < _trks.Count; ++i)
+            {
+                Trk trk = _trks[i] as Trk;
+                if(trk != null)
+                {
+                    nTrks++;
+                    Debug.Assert(trk.MidiChannel == midiChannelIndexPerOutputVoice[i], "All trk.MidiChannels must correspond.");
+                    for(int j = i + 1; j < _trks.Count; ++j)
+                    {
+                        Debug.Assert(trk.MidiChannel != _trks[j].MidiChannel, "All trk.MidiChannels must be unique.");
+                    }
+                }
+            }
+
+            Debug.Assert(nTrks == midiChannelIndexPerOutputVoice.Count);
+        }
+
+        /// <summary>
+        /// Every Trk in _trks is either empty, or contains any combination of RestDef or MidiChordDef.
+        /// There is always a trk having MsPositionReContainer == zero.
+        /// </summary>
+        public void AssertSeqConsistency()
+        {
+            Debug.Assert(_trks != null && _trks.Count > 0);
+            #region Every Trk in _trks is either empty, or contains any combination of RestDef or MidiChordDef.
+            foreach(Trk trk in _trks)
+            {
+                trk.AssertConstructionConsistency();
+            }
+            #endregion
+        }
+
+        /// <summary>
+        /// Shifts the Trks so that the earliest trk.MsPositionReContainer is 0.
+        /// </summary>
+        public void Normalize()
+        {
+            int minMsPositionReContainer = int.MaxValue;
+            foreach(Trk trk in _trks)
+            {
+                minMsPositionReContainer = (minMsPositionReContainer < trk.MsPositionReContainer) ? minMsPositionReContainer : trk.MsPositionReContainer;
+            }
+            if(minMsPositionReContainer != 0)
+            {
+                foreach(Trk trk in _trks)
+                {
+                    trk.MsPositionReContainer -= minMsPositionReContainer;
+                }
+            }
+        }
+
+        #region sort functions
+        public void SortVelocityIncreasing()
+        {
+            foreach(Trk trk in Trks)
+            {
+                trk.SortVelocityIncreasing();
+            }
+        }
+        public void SortVelocityDecreasing()
+        {
+            foreach(Trk trk in Trks)
+            {
+                trk.SortVelocityDecreasing();
+            }
+        }
+        public void SortRootNotatedPitchAscending()
+        {
+            foreach(Trk trk in Trks)
+            {
+                trk.SortRootNotatedPitchAscending();
+            }
+        }
+        public void SortRootNotatedPitchDescending()
+        {
+            foreach(Trk trk in Trks)
+            {
+                trk.SortRootNotatedPitchDescending();
+            }
+        }
+        #endregion sort functions
 
         /// <summary>
         /// Aligns the Trk UniqueDefs whose indices are given in the argument.
-        /// The Seq is Normalized, and its msDuration changes automatically.
+        /// The Seq is normalized after the alignment. Its msDuration changes automatically.
         /// Each alignmentPosition must be a valid UniqueDef index in its trk.
         /// The argument.Count must be equal to the number of trks in the Seq, and in order of the trks in the seq's _trks list.
         /// </summary>
@@ -111,21 +200,9 @@ namespace Moritz.Spec
             AssertSeqConsistency();
         }
 
-        public IReadOnlyList<int> MidiChannelIndexPerOutputVoice 
-		{
-			get
-			{
-				List<int> channels = new List<int>();
-				foreach(Trk trk in _trks)
-				{
-					channels.Add(trk.MidiChannel);
-				}
-				return channels;
-			}
-		}
-
         /// <summary>
         /// Concatenates seq2 to the caller (seq1). Returns a pointer to the caller.
+        /// Both Seqs must be normalized before calling this function.
         /// When this function is called, seq2.AbsMsPosition is the earliest position, relative to seq1, at which it can be concatenated.
         /// When it returns, seq2's Trks will have been concatenated to Seq1, and seq1 is consistent.
         /// If Seq2 is needed after calling thei function, then it should be cloned first.
@@ -140,6 +217,8 @@ namespace Moritz.Spec
 		{
             #region assertions
             Debug.Assert(_trks.Count == seq2.Trks.Count);
+            Debug.Assert(this.IsNormalized);
+            Debug.Assert(seq2.IsNormalized);
             AssertChannelConsistency(seq2.MidiChannelIndexPerOutputVoice);
 			#endregion
 
@@ -200,46 +279,6 @@ namespace Moritz.Spec
 			return clone;
 		}
 
-
-        /// <summary>
-        /// Every Trk.MidiChannel is unique and is parallel to the indices in midiChannelIndexPerOutputVoice.
-        /// </summary>
-        private void AssertChannelConsistency(IReadOnlyList<int> midiChannelIndexPerOutputVoice)
-		{
-			Debug.Assert(_trks != null && _trks.Count > 0);
-            int nTrks = 0;		
-			for(int i = 0; i < _trks.Count; ++i)
-			{
-                Trk trk = _trks[i] as Trk;
-                if(trk != null)
-                {
-                    nTrks++;
-                    Debug.Assert(trk.MidiChannel == midiChannelIndexPerOutputVoice[i], "All trk.MidiChannels must correspond.");
-                    for(int j = i + 1; j < _trks.Count; ++j)
-                    {
-                        Debug.Assert(trk.MidiChannel != _trks[j].MidiChannel, "All trk.MidiChannels must be unique.");
-                    }
-                }
-			}
-
-            Debug.Assert(nTrks == midiChannelIndexPerOutputVoice.Count);
-        }
-
-        /// <summary>
-        /// Every Trk in _trks is either empty, or contains any combination of RestDef or MidiChordDef.
-        /// There is always a trk having MsPositionReContainer == zero.
-        /// </summary>
-        public void AssertSeqConsistency()
-		{
-			Debug.Assert(_trks != null && _trks.Count > 0);
-            #region Every Trk in _trks is either empty, or contains any combination of RestDef or MidiChordDef.
-            foreach(Trk trk in _trks)
-            {
-                trk.AssertConstructionConsistency();
-            }
-            #endregion
-        }
-
         /// <summary>
         /// True if the earliest trk.MsPositionReContainer is 0.
         /// </summary>
@@ -256,27 +295,8 @@ namespace Moritz.Spec
             }
         }
 
-        /// <summary>
-        /// Shifts the Trks so that the earliest trk.MsPositionReContainer is 0.
-        /// </summary>
-        public void Normalize()
-        {
-            int minMsPositionReContainer = int.MaxValue;
-            foreach(Trk trk in _trks)
-            {
-                minMsPositionReContainer = (minMsPositionReContainer < trk.MsPositionReContainer) ? minMsPositionReContainer : trk.MsPositionReContainer;
-            }
-            if(minMsPositionReContainer != 0)
-            {
-                foreach(Trk trk in _trks)
-                {
-                    trk.MsPositionReContainer -= minMsPositionReContainer;
-                }
-            }
-        }
-
+        public IReadOnlyList<Trk> Trks { get { return _trks.AsReadOnly(); } }
         private List<Trk> _trks = new List<Trk>();
-		//public List<Trk> Trks { get { return _trks; } }
 
 		private int _absMsPosition;
 
@@ -337,38 +357,17 @@ namespace Moritz.Spec
 			}
 		}
 
-        #region sort functions
-        public void SortVelocityIncreasing()
+        public IReadOnlyList<int> MidiChannelIndexPerOutputVoice
         {
-            foreach(Trk trk in Trks)
+            get
             {
-                trk.SortVelocityIncreasing();
+                List<int> channels = new List<int>();
+                foreach(Trk trk in _trks)
+                {
+                    channels.Add(trk.MidiChannel);
+                }
+                return channels;
             }
         }
-
-        public void SortVelocityDecreasing()
-        {
-            foreach(Trk trk in Trks)
-            {
-                trk.SortVelocityDecreasing();
-            }
-        }
-
-        public void SortRootNotatedPitchAscending()
-        {
-            foreach(Trk trk in Trks)
-            {
-                trk.SortRootNotatedPitchAscending();
-            }
-        }
-
-        public void SortRootNotatedPitchDescending()
-        {
-            foreach(Trk trk in Trks)
-            {
-                trk.SortRootNotatedPitchDescending();
-            }
-        }
-        #endregion sort functions
     }
 }
