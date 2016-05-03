@@ -337,5 +337,38 @@ namespace Moritz.Spec
 			}
 		}
 
-	}
+        #region sort functions
+        public void SortVelocityIncreasing()
+        {
+            foreach(Trk trk in Trks)
+            {
+                trk.SortVelocityIncreasing();
+            }
+        }
+
+        public void SortVelocityDecreasing()
+        {
+            foreach(Trk trk in Trks)
+            {
+                trk.SortVelocityDecreasing();
+            }
+        }
+
+        public void SortRootNotatedPitchAscending()
+        {
+            foreach(Trk trk in Trks)
+            {
+                trk.SortRootNotatedPitchAscending();
+            }
+        }
+
+        public void SortRootNotatedPitchDescending()
+        {
+            foreach(Trk trk in Trks)
+            {
+                trk.SortRootNotatedPitchDescending();
+            }
+        }
+        #endregion sort functions
+    }
 }
