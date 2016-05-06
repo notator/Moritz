@@ -209,11 +209,11 @@ namespace Moritz.Algorithm.Tombeau1
 
             for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
             {
-                int chordDensity = 6;
+                int chordDensity = 2;
                 List<IUniqueDef> sys1mcds = PaletteMidiChordDefs(0);
                 List<IUniqueDef> midiChordDefs = new List<IUniqueDef>();
 
-                for(int j = 0; j < 8; ++j)
+                for(int j = 0; j < 12; ++j)
                 {
                     MidiChordDef mcd = sys1mcds[j] as MidiChordDef;
                     midiChordDefs.Add(mcd);
@@ -226,7 +226,7 @@ namespace Moritz.Algorithm.Tombeau1
                     mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
                 }
                 Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, midiChordDefs);
-                //trk.SortVelocityIncreasing();
+                trk.SortVelocityIncreasing();
                 //trk.SortVelocityDecreasing();
                 //trk.SortRootNotatedPitchAscending();
                 //trk.SortRootNotatedPitchDescending();
@@ -234,28 +234,46 @@ namespace Moritz.Algorithm.Tombeau1
                 systemSeq.SetTrk(trk);
             }
 
-            systemSeq.AlignTrkUniqueDefs(new List<int>() { 0,1,2,3,4,5,6,7 });
+            //systemSeq.AlignTrkUniqueDefs(new List<int>() { 0,1,2,3,4,5,6,7 });
+            //systemSeq.ShiftTrks(new List<int>() { 0, 100, 200, 300, 400, 500, 600, 700 });
 
-            Trk trk2 = systemSeq.Trks[2];
-            trk2.MsPositionReContainer = -500;
-            trk2.SortRootNotatedPitchDescending();
-            trk2.Insert(4, new RestDef(0, 444));
+            //Trk trk2 = systemSeq.Trks[2];
+            //trk2.MsPositionReContainer = -500;
+            //trk2.SortRootNotatedPitchDescending();
+            //trk2.Insert(4, new RestDef(0, 444));
+
+            /******/
+
+            for(int i = 0; i < systemSeq.Trks.Count; ++i)
+            {
+                Trk trk = systemSeq.Trks[i];
+                trk.Permute(i + 1, 7); // sets trk.AxisIndex
+            }
+
+            //for(int i = 0; i < systemSeq.Trks.Count; ++i)
+            //{
+            //    Trk trk = systemSeq.Trks[i];
+            //    trk.AxisUDIndex = i;
+            //}
+
+            systemSeq.AlignTrkAxes();
+
+            /*******/
 
             Trk trk3 = systemSeq.Trks[3];
-            trk3.Permute(0, new List<int>() { 1, 1, 1, 1, 1, 1, 2 }, 4, 7);
-
-            Trk trk4 = systemSeq.Trks[4];
-            trk4.SortVelocityDecreasing();
+            trk3.PermutePartitions(7, 1, new List<int>() { 2, 2, 1, 2, 2, 1, 2 });
+            //Trk trk4 = systemSeq.Trks[4];
+            //trk4.SortVelocityDecreasing();
 
             systemSeq.Normalize();
 
-            // Implement these: (They just call the corresponding function on all the Trks in the seq.)
+            // Implemented and tested these: (They just call the corresponding function on all the Trks in the seq.)
             //systemSeq.SortVelocityIncreasing();
             //systemSeq.SortVelocityDecreasing();
             //systemSeq.SortRootNotatedPitchAscending();
             //systemSeq.SortRootNotatedPitchDescending();
 
-            //maybe implement Seq.ShiftTrks(List<int> shiftPerTrk) ?
+
 
             // Can something like this be done? Using the Alignment positions?
             //systemSeq.Permute(0, new List<int>() { 1,1,1,1,1,1,2 }, i + 1, 7);

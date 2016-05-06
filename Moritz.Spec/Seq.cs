@@ -200,6 +200,17 @@ namespace Moritz.Spec
             AssertSeqConsistency();
         }
 
+
+        public void AlignTrkAxes()
+        {
+            List<int> indicesToAlign = new List<int>();
+            foreach(Trk trk in Trks)
+            {
+                indicesToAlign.Add(trk.AxisIndex);
+            }
+            AlignTrkUniqueDefs(indicesToAlign);
+        }
+
         /// <summary>
         /// Shifts each track by adding the corresponding millisecond argument to its MsPositionReContainer attribute.
         /// The argument.Count must be equal to the number of trks in the Seq, and in order of the trks in the seq's _trks list.
