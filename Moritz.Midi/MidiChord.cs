@@ -4,6 +4,7 @@ using System.Threading;
 
 using Sanford.Multimedia.Midi;
 using Moritz.Spec;
+using Moritz.Globals;
 
 namespace Moritz.Midi
 {
@@ -19,7 +20,7 @@ namespace Moritz.Midi
 
             List<BasicMidiChordDef> basicMidiChordDefs = midiChordDef.BasicMidiChordDefs;
             Debug.Assert(basicMidiChordDefs.Count > 0);
-            List<int> realBasicMidiChordDurations = MidiChordDef.GetIntDurations(MsDuration, midiChordDef.BasicChordDurations, basicMidiChordDefs.Count);
+            List<int> realBasicMidiChordDurations = M.IntDivisionSizes(MsDuration, midiChordDef.BasicChordDurations);
 
             var notesToStop = new SortedSet<byte>();
             int i = 0;
