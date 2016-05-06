@@ -682,49 +682,49 @@ namespace Moritz.Spec
             return numberOfOrnamentChords;
         }
 
-        /// <summary>
-        /// This function returns a List whose count is numberOfOrnamentChords.
-        /// It also ensures that the sum of the ints in the List is exactly equal to msDuration.
-        /// This function is also used when setting the duration of a MidiDefList.
-        /// </summary>
-        public static List<int> GetIntDurations(int msDuration, List<int> relativeDurations, int numberOfOrnamentChords)
-        {
-            int sumRelative = 0;
-            for(int i = 0; i < numberOfOrnamentChords; ++i)
-            {
-                sumRelative += relativeDurations[i];
-            }
-            // basicDurations are the float durations taking into account minimumOrnamentChordMsDuration
-            float factor = ((float)msDuration / (float)sumRelative);
-            float fPos = 0;
-            List<int> intPositions = new List<int>();
-            for(int i = 0; i < numberOfOrnamentChords; ++i)
-            {
-                intPositions.Add((int)(Math.Floor(fPos)));
-                fPos += (relativeDurations[i] * factor);
-            }
-            intPositions.Add((int)Math.Floor(fPos));
+        ///// <summary>
+        ///// This function returns a List whose count is numberOfOrnamentChords.
+        ///// It also ensures that the sum of the ints in the List is exactly equal to msDuration.
+        ///// This function is also used when setting the duration of a MidiDefList.
+        ///// </summary>
+        //public static List<int> GetIntDurations(int msDuration, List<int> relativeDurations, int numberOfOrnamentChords)
+        //{
+        //    int sumRelative = 0;
+        //    for(int i = 0; i < numberOfOrnamentChords; ++i)
+        //    {
+        //        sumRelative += relativeDurations[i];
+        //    }
+        //    // basicDurations are the float durations taking into account minimumOrnamentChordMsDuration
+        //    float factor = ((float)msDuration / (float)sumRelative);
+        //    float fPos = 0;
+        //    List<int> intPositions = new List<int>();
+        //    for(int i = 0; i < numberOfOrnamentChords; ++i)
+        //    {
+        //        intPositions.Add((int)(Math.Floor(fPos)));
+        //        fPos += (relativeDurations[i] * factor);
+        //    }
+        //    intPositions.Add((int)Math.Floor(fPos));
 
-            List<int> intDurations = new List<int>();
-            for(int i = 0; i < numberOfOrnamentChords; ++i)
-            {
-                int intDuration = (int)(intPositions[i + 1] - intPositions[i]);
-                intDurations.Add(intDuration);
-            }
+        //    List<int> intDurations = new List<int>();
+        //    for(int i = 0; i < numberOfOrnamentChords; ++i)
+        //    {
+        //        int intDuration = (int)(intPositions[i + 1] - intPositions[i]);
+        //        intDurations.Add(intDuration);
+        //    }
 
-            int intSum = 0;
-            foreach(int i in intDurations)
-                intSum += i;
-            Debug.Assert(intSum <= msDuration);
-            if(intSum < msDuration)
-            {
-                int lastDuration = intDurations[intDurations.Count - 1];
-                lastDuration += (msDuration - intSum);
-                intDurations.RemoveAt(intDurations.Count - 1);
-                intDurations.Add(lastDuration);
-            }
-            return intDurations;
-        }
+        //    int intSum = 0;
+        //    foreach(int i in intDurations)
+        //        intSum += i;
+        //    Debug.Assert(intSum <= msDuration);
+        //    if(intSum < msDuration)
+        //    {
+        //        int lastDuration = intDurations[intDurations.Count - 1];
+        //        lastDuration += (msDuration - intSum);
+        //        intDurations.RemoveAt(intDurations.Count - 1);
+        //        intDurations.Add(lastDuration);
+        //    }
+        //    return intDurations;
+        //}
 
         /// <summary>
         /// Returns a list of (millisecond) durations whose sum is msDuration.
@@ -739,7 +739,14 @@ namespace Moritz.Spec
         {
             int numberOfOrnamentChords = GetNumberOfOrnamentChords(msDuration, relativeDurations, ornamentMinMsDuration);
 
-            List<int> intDurations = GetIntDurations(msDuration, relativeDurations, numberOfOrnamentChords);
+            List<int> actualRelativeDurations = new List<int>();
+            for(int i = 0; i< numberOfOrnamentChords; ++i)
+            {
+                actualRelativeDurations.Add(relativeDurations[i]);
+            }
+
+            List<int> intDurations = M.IntDivisionSizes(msDuration, actualRelativeDurations);
+
             return intDurations;
         }
 

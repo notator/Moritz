@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
+using System.Diagnostics;
 
 namespace Moritz.Globals
 {
@@ -553,6 +554,67 @@ namespace Moritz.Globals
             }
             sb.Remove(0, 1);
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// This function divides total into divisor parts, returning a List of ints whose:
+        ///     * Count is equal to divisor.
+        ///     * sum is exactly equal to total
+        ///     * members are as equal as possible. 
+        /// </summary>
+        public static List<int> IntDivisionSizes(int total, int divisor)
+        {
+            List<int> relativeSizes = new List<int>();
+            for(int i = 0; i < divisor; ++i)
+            {
+                relativeSizes.Add(1);
+            }
+            return IntDivisionSizes(total, relativeSizes);
+
+        }
+        /// <summary>
+        /// This function divides total into relativeSizes.Count parts, returning a List whose:
+        ///     * Count is relativeSizes.Count.
+        ///     * sum is exactly equal to total
+        ///     * members have the relative sizes (as nearly as possible) to the values in the relativeSizes argument. 
+        /// </summary>
+        public static List<int> IntDivisionSizes(int total, List<int> relativeSizes)
+        {
+            int divisor = relativeSizes.Count;
+            int sumRelative = 0;
+            for(int i = 0; i < divisor; ++i)
+            {
+                sumRelative += relativeSizes[i];
+            }
+            float factor = ((float)total / (float)sumRelative);
+            float fPos = 0;
+            List<int> intPositions = new List<int>();
+            for(int i = 0; i < divisor; ++i)
+            {
+                intPositions.Add((int)(Math.Floor(fPos)));
+                fPos += (relativeSizes[i] * factor);
+            }
+            intPositions.Add((int)Math.Floor(fPos));
+
+            List<int> intDivisionSizes = new List<int>();
+            for(int i = 0; i < divisor; ++i)
+            {
+                int intDuration = (int)(intPositions[i + 1] - intPositions[i]);
+                intDivisionSizes.Add(intDuration);
+            }
+
+            int intSum = 0;
+            foreach(int i in intDivisionSizes)
+                intSum += i;
+            Debug.Assert(intSum <= total);
+            if(intSum < total)
+            {
+                int lastDuration = intDivisionSizes[intDivisionSizes.Count - 1];
+                lastDuration += (total - intSum);
+                intDivisionSizes.RemoveAt(intDivisionSizes.Count - 1);
+                intDivisionSizes.Add(lastDuration);
+            }
+            return intDivisionSizes;
         }
 
         /// <summary>
