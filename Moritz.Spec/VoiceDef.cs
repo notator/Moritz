@@ -694,7 +694,7 @@ namespace Moritz.Spec
 						relativeDurations.Add(iumdd.MsDuration);
 				}
 
-				List<int> newDurations = MidiChordDef.GetIntDurations(msDuration, relativeDurations, relativeDurations.Count);
+				List<int> newDurations = M.IntDivisionSizes(msDuration, relativeDurations);
 
 				Debug.Assert(newDurations.Count == relativeDurations.Count);
 				int i = 0;
