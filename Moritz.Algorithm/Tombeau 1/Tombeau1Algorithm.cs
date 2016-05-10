@@ -288,7 +288,16 @@ namespace Moritz.Algorithm.Tombeau1
             List<Trk> trks = new List<Trk>();
             MidiChordDef baseMidiChordDef = new MidiChordDef(new List<byte>() { (byte)64 }, new List<byte>() { (byte)127 }, 0, 1000, true);
             byte velocity = 0;
-            for(int trkIndex = 0; trkIndex < MidiChannelIndexPerOutputVoice.Count; ++trkIndex)
+            for(int trkIndex = 0; trkIndex < 3; ++trkIndex)
+            {
+                Trk trk = new Trk(MidiChannelIndexPerOutputVoice[trkIndex], 0, new List<IUniqueDef>());
+                for(int j = 0; j < 16; ++j)
+                {
+                    velocity++;
+                }
+                trks.Add(trk);
+            }
+            for(int trkIndex = 3; trkIndex < MidiChannelIndexPerOutputVoice.Count; ++trkIndex)
             {
                 Trk trk = new Trk(MidiChannelIndexPerOutputVoice[trkIndex], 0, new List<IUniqueDef>());
                 for(int j = 0; j < 16; ++j)
@@ -301,7 +310,7 @@ namespace Moritz.Algorithm.Tombeau1
 
                     trk.Add(mcd);
                 }
-                
+
                 trks.Add(trk);
             }
 

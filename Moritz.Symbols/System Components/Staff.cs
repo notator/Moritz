@@ -20,8 +20,17 @@ namespace Moritz.Symbols
 
         public abstract void WriteSVG(SvgWriter w, int systemNumber, int staffNumber);
 
+        /// <summary>
+        /// staffIsVisble is the global pageFormat setting.
+        /// Single, empty staves are also not displayed -- though their rest lengths are written in the score.
+        /// </summary>
         public virtual void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber)
         {
+            if(IsEmpty == true)
+            {
+                staffIsVisible = false;
+                w.WriteAttributeString("score", "invisible", null, "1");
+            }
             if(staffIsVisible)
             {            
                 w.WriteAttributeString("score", "staffName", null, this.Staffname);
@@ -43,6 +52,33 @@ namespace Moritz.Symbols
             foreach(Voice voice in Voices)
             {
 				voice.WriteSVG(w, staffIsVisible, systemNumber, staffNumber, voiceNumber++);
+            }
+        }
+
+        /// <summary>
+        /// Returns false if the staff contains at least one ChordSymbol. Otherwise true.
+        /// </summary>
+        public bool IsEmpty
+        {
+            get
+            {
+                bool isEmpty = true;
+                foreach(Voice voice in this.Voices)
+                {
+                    foreach(NoteObject noteObject in voice.NoteObjects)
+                    {
+                        if(noteObject is ChordSymbol)
+                        {
+                            isEmpty = false;
+                            break;
+                        }
+                    }
+                    if(isEmpty == false)
+                    {
+                        break;
+                    }
+                }
+                return isEmpty;
             }
         }
 
@@ -797,6 +833,7 @@ namespace Moritz.Symbols
         internal readonly int NumberOfStafflines = 0;
         internal readonly float Gap = 0;
         internal readonly float StafflineStemStrokeWidth = 0;
+        // Empty staves are invisble. Their Metrics attribute remains null.
         internal StaffMetrics Metrics = null;
         #endregion
     }

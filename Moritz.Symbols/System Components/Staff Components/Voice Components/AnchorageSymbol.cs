@@ -32,8 +32,11 @@ namespace Moritz.Symbols
             float localOverlap = float.MinValue;
             foreach(AnchorageSymbol previousAS in previousNOM.AnchorageSymbols)
             {
-                localOverlap = this.Metrics.OverlapWidth(previousAS);
-                overlap = overlap > localOverlap ? overlap : localOverlap;
+                if(this.Metrics != null)
+                {
+                    localOverlap = this.Metrics.OverlapWidth(previousAS);
+                    overlap = overlap > localOverlap ? overlap : localOverlap;
+                }
             }
             return overlap;
         }
