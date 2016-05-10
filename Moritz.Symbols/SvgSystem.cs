@@ -111,7 +111,8 @@ namespace Moritz.Symbols
             int rval = 0;
             for(int i = 0; i < Staves.Count; ++i)
             {
-                if(!(Staves[i] is InvisibleOutputStaff) && Staves[i].IsEmpty == false)
+                Staff staff = Staves[i];
+                if(!(staff is InvisibleOutputStaff) && staff.IsEmpty == false)
                 {
                     rval = i;
                     break;

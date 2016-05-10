@@ -25,6 +25,12 @@ namespace Moritz.Symbols
         }
     }
 
+    /// <summary>
+    /// An InvisibleOutputStaff is invisible in all systems, regardless of its content.
+    /// Such output staves are defined using PageFormat.VisibleOutputVoiceIndicesPerStaff.
+    /// <para>Note also that individual staves are only printed if they contain at least one ChordSymbol.
+    /// (i.e. An InputStaff or OutputStaff will be invisible if its IsEmpty property is true.)</para>
+    /// </summary>
     public class InvisibleOutputStaff : OutputStaff
     {
         public InvisibleOutputStaff(SvgSystem svgSystem)
