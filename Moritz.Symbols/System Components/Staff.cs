@@ -29,7 +29,6 @@ namespace Moritz.Symbols
             if(IsEmpty == true)
             {
                 staffIsVisible = false;
-                w.WriteAttributeString("score", "invisible", null, "1");
             }
             if(staffIsVisible)
             {            
