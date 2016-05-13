@@ -364,11 +364,11 @@ namespace Moritz.Composer
                     foreach(byte invisibleOutputVoiceIndex in invisibleOutputVoiceIndices)
                     {
                         Trk invisibleTrkDef = barDef[invisibleOutputVoiceIndex] as Trk;
-                        InvisibleOutputStaff invisibleOutputStaff = new InvisibleOutputStaff(system);
-                        OutputVoice outputVoice = new OutputVoice(invisibleOutputStaff, invisibleTrkDef.MidiChannel, invisibleTrkDef.MasterVolume);
+                        HiddenOutputStaff hiddenOutputStaff = new HiddenOutputStaff(system);
+                        OutputVoice outputVoice = new OutputVoice(hiddenOutputStaff, invisibleTrkDef.MidiChannel, invisibleTrkDef.MasterVolume);
                         outputVoice.VoiceDef = invisibleTrkDef;
-                        invisibleOutputStaff.Voices.Add(outputVoice);
-                        system.Staves.Add(invisibleOutputStaff);
+                        hiddenOutputStaff.Voices.Add(outputVoice);
+                        system.Staves.Add(hiddenOutputStaff);
                     }
                 }
                 #endregion create invisible staves

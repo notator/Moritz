@@ -257,21 +257,18 @@ namespace Moritz.Symbols
                 for(int staffIndex = 0; staffIndex < system.Staves.Count; staffIndex++)
                 {
                     Staff staff = system.Staves[staffIndex];
-                    if(!(staff is InvisibleOutputStaff))
+                    if(!(staff is HiddenOutputStaff))
                     {
                         foreach(NoteObject noteObject in staff.Voices[0].NoteObjects)
                         {
                             Barline firstBarline = noteObject as Barline;
                             if(firstBarline != null)
                             {
-
                                 float fontHeight = _pageFormat.StaffNameFontHeight;
 
                                 if(staff is InputStaff)
                                 {
-
                                     fontHeight *= _pageFormat.InputStavesSizeFactor;
-
                                 }
 								StaffNameText staffNameText = new StaffNameText(firstBarline, staff.Staffname, fontHeight);
                                 firstBarline.DrawObjects.Add(staffNameText);
@@ -293,7 +290,7 @@ namespace Moritz.Symbols
             {
                 foreach(Staff staff in system.Staves)
                 {
-                    if(!(staff is InvisibleOutputStaff))
+                    if(!(staff is HiddenOutputStaff))
                     {
                         foreach(Voice voice in staff.Voices)
                         {
@@ -446,9 +443,9 @@ namespace Moritz.Symbols
 
             for(int staffIndex = 0; staffIndex < system2.Staves.Count; staffIndex++)
             {
-                bool visibleStaff = !(system1.Staves[staffIndex] is InvisibleOutputStaff);
+                bool staffIsNotHidden = !(system1.Staves[staffIndex] is HiddenOutputStaff);
                 string clefTypeAtEndOfStaff1 = null;
-                if(visibleStaff)
+                if(staffIsNotHidden)
                 {
                     // If a staff has two voices, both contain the same clefTypes (some clefs may be invisible).
                     clefTypeAtEndOfStaff1 = FindClefTypeAtEndOfStaff1(system1.Staves[staffIndex].Voices[0]);
@@ -458,7 +455,7 @@ namespace Moritz.Symbols
                 {
                     Voice voice1 = system1.Staves[staffIndex].Voices[voiceIndex];
                     Voice voice2 = system2.Staves[staffIndex].Voices[voiceIndex];
-                    if(visibleStaff)
+                    if(staffIsNotHidden)
                     {
                         ClefSymbol voice2FirstClef = voice2.NoteObjects[0] as ClefSymbol;
                         Debug.Assert(voice2FirstClef != null && clefTypeAtEndOfStaff1 == voice2FirstClef.ClefType);
@@ -557,11 +554,10 @@ namespace Moritz.Symbols
             {
                 foreach(Staff staff in Systems[systemIndex].Staves)
                 {
-                    if(!(staff is InvisibleOutputStaff))
+                    if(!(staff is HiddenOutputStaff))
                     {
                         foreach(Voice voice in staff.Voices)
                         {
-
                             Debug.Assert(voice.NoteObjects.Count > 0
                                 && !(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline));
 
@@ -643,6 +639,7 @@ namespace Moritz.Symbols
 
             FinalizeAccidentals();
             AddBarlineAtStartOfEachSystem();
+
             AddBarNumbers();
             SetStaffNames();
         }
@@ -679,7 +676,7 @@ namespace Moritz.Symbols
             {
                 foreach(Staff staff in system.Staves)
                 {
-                    if(!(staff is InvisibleOutputStaff))
+                    if(!(staff is HiddenOutputStaff))
                     {
                         foreach(Voice voice in staff.Voices)
                         {
@@ -826,7 +823,7 @@ namespace Moritz.Symbols
         {
             for(int staffIndex = 0; staffIndex < Systems[0].Staves.Count; staffIndex++)
             {
-                if(!(Systems[0].Staves[staffIndex] is InvisibleOutputStaff))
+                if(!(Systems[0].Staves[staffIndex] is HiddenOutputStaff))
                 {
                     NoteObjectMoment previousStaffMoment = null;
                     foreach(SvgSystem system in Systems)
@@ -848,11 +845,11 @@ namespace Moritz.Symbols
             int barNumber = 1;
             foreach(SvgSystem system in Systems)
             {
-                Voice topVisibleVoice = system.TopVisibleVoice();
+                Voice barnumberVoice = system.VoiceForBarnumber();
                 bool isFirstBarline = true;
-                for(int i = 0; i < topVisibleVoice.NoteObjects.Count - 1; i++)
+                for(int i = 0; i < barnumberVoice.NoteObjects.Count - 1; i++)
                 {
-                    Barline barline = topVisibleVoice.NoteObjects[i] as Barline;
+                    Barline barline = barnumberVoice.NoteObjects[i] as Barline;
                     if(barline != null)
                     {
                         if(isFirstBarline && system != Systems[0])
@@ -878,7 +875,7 @@ namespace Moritz.Symbols
             {
                 foreach(Staff staff in system.Staves)
                 {
-                    if(!(staff is InvisibleOutputStaff))
+                    if(!(staff is HiddenOutputStaff))
                     {
                         foreach(Voice voice in staff.Voices)
                         {

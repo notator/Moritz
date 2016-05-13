@@ -54,7 +54,7 @@ namespace Moritz.Symbols
                 for(int staffIndex = 0; staffIndex < system.Staves.Count; ++staffIndex)
                 {
                     Staff staff = system.Staves[staffIndex];
-                    if(!(staff is InvisibleOutputStaff))
+                    if(!(staff is HiddenOutputStaff))
                     {
                         visibleStaffIndex++;
                     }
@@ -65,7 +65,7 @@ namespace Moritz.Symbols
                     {
                         Voice voice = staff.Voices[voiceIndex];
                         float musicFontHeight = (voice is OutputVoice) ? _pageFormat.MusicFontHeight : _pageFormat.MusicFontHeight * _pageFormat.InputStavesSizeFactor;
-                        if(!(staff is InvisibleOutputStaff))
+                        if(!(staff is HiddenOutputStaff))
                         {
                             Debug.Assert(_pageFormat.ClefsList[visibleStaffIndex] != null);
                             voice.NoteObjects.Add(new ClefSymbol(voice, _pageFormat.ClefsList[visibleStaffIndex], musicFontHeight));

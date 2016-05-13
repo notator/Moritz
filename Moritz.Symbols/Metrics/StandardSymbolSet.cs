@@ -425,7 +425,7 @@ namespace Moritz.Symbols
         {
             foreach(Staff staff in staves)
             {
-                if(!(staff is InvisibleOutputStaff))
+                if(!(staff is HiddenOutputStaff))
                 {
                     for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                     {
@@ -478,7 +478,7 @@ namespace Moritz.Symbols
         {
             foreach(Staff staff in staves)
             {
-                if(!(staff is InvisibleOutputStaff))
+                if(!(staff is HiddenOutputStaff))
                 {
                     foreach(Voice voice in staff.Voices)
                     {
@@ -631,7 +631,7 @@ namespace Moritz.Symbols
         {
             foreach(Staff staff in staves)
             {
-                if(!(staff is InvisibleOutputStaff))
+                if(!(staff is HiddenOutputStaff))
                 {
                     foreach(Voice voice in staff.Voices)
                     {
@@ -719,7 +719,7 @@ namespace Moritz.Symbols
             for(int staffIndex = 0; staffIndex < staves.Count; ++staffIndex)
             {
                 Staff staff = staves[staffIndex];
-                if(!(staff is InvisibleOutputStaff))
+                if(!(staff is HiddenOutputStaff))
                 {
                     for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                     {
@@ -900,7 +900,7 @@ namespace Moritz.Symbols
         {
             foreach(Staff staff in staves)
             {
-                if(!(staff is InvisibleOutputStaff))
+                if(!(staff is HiddenOutputStaff))
                 {
                     foreach(Voice voice in staff.Voices)
                     {
@@ -929,7 +929,7 @@ namespace Moritz.Symbols
             FinalizeBeamBlocks(staves);
             foreach(Staff staff in staves)
             {
-                if(!(staff is InvisibleOutputStaff))
+                if(!(staff is HiddenOutputStaff))
                 {
                     foreach(Voice voice in staff.Voices)
                     {
