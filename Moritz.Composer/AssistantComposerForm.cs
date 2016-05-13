@@ -1585,7 +1585,7 @@ namespace Moritz.Composer
             bool rval = false;
             foreach(PaletteForm paletteForm in currentPaletteForms)
             {
-                if(paletteForm.SavedName == dialog.PaletteName)
+                if(paletteForm.PaletteName == dialog.PaletteName)
                 {
                     rval = true;
                     break;

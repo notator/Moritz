@@ -38,7 +38,7 @@ namespace Moritz.Palettes
             _assistantComposerForm = acForm;
             ConnectBasicChordControl();
 
-            Text = paletteForm.SavedName + " : ornaments";
+            Text = paletteForm.PaletteName + " : ornaments";
             if(r != null)
             {
                 _numberOfBasicChordDefs = ReadOrnamentSettingsForm(r);
@@ -635,7 +635,7 @@ namespace Moritz.Palettes
                             if(r.NodeType != XmlNodeType.EndElement)
                             {
                                 r.MoveToAttribute("name");
-                                if(r.Value == _paletteForm.SavedName)
+                                if(r.Value == _paletteForm.PaletteName)
                                 {
                                     M.ReadToXmlElementTag(r, "ornamentSettings");
                                     _numberOfBasicChordDefs = ReadOrnamentSettingsForm(r);

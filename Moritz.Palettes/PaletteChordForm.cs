@@ -18,7 +18,7 @@ namespace Moritz.Palettes
         {
             InitializeComponent();
 
-            Text = paletteForm.SavedName + " : midi chord " + (midiChordIndex + 1).ToString();
+            Text = paletteForm.PaletteName + " : midi chord " + (midiChordIndex + 1).ToString();
 
             _paletteForm = paletteForm;
             _bcc = bcc;

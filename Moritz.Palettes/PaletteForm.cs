@@ -1056,7 +1056,7 @@ namespace Moritz.Palettes
         public void WritePalette(XmlWriter w)
         {
             w.WriteStartElement("palette");
-            w.WriteAttributeString("name", SavedName);
+            w.WriteAttributeString("name", PaletteName);
             w.WriteAttributeString("domain", _domain.ToString());
             if(PercussionCheckBox.Checked)
             {
@@ -1228,7 +1228,7 @@ namespace Moritz.Palettes
         public OrnamentsForm OrnamentsForm { get { return _ornamentsForm; } }
         public PaletteButtonsControl PaletteButtonsControl { get { return _paletteButtonsControl; } }
         public bool IsPercussionPalette { get { return PercussionCheckBox.Checked; } }
-        public string SavedName { get { return _savedName; } }
+        public string PaletteName { get { return _savedName; } }
         #endregion public variables
 
         #region private variables

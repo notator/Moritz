@@ -14,6 +14,8 @@ namespace Moritz.Palettes
     {
         public Palette(PaletteForm paletteForm)
         {
+            Name = paletteForm.PaletteName;
+
             BasicChordFormSettings bcfs = new BasicChordFormSettings();
             bcfs.Durations = M.StringToIntList(paletteForm.BasicChordControl.DurationsTextBox.Text, ',');
             bcfs.Velocities = M.StringToByteList(paletteForm.BasicChordControl.VelocitiesTextBox.Text, ',');
@@ -298,6 +300,9 @@ namespace Moritz.Palettes
         public bool IsPercussionPalette { get { return _isPercussionPalette; } }
 
         public int Count { get { return _durationDefs.Count; } }
+
+        public string Name { get; private set; }
+
         public IUniqueDef UniqueDurationDef(int index)
         {
             return _durationDefs[index].Clone();

@@ -69,6 +69,22 @@ namespace Moritz.Algorithm
 
         }
 
+        protected Palette GetPaletteByName(string paletteName)
+        {
+            Debug.Assert(_palettes != null && _palettes.Count > 0);
+            Palette rval = null;
+            foreach(Palette palette in _palettes)
+            {
+                if(string.Compare(palette.Name, paletteName) == 0)
+                {
+                    rval = palette;
+                    break;
+                }
+            }
+            Debug.Assert(rval != null);
+            return rval;
+        }
+
         /// <summary>
         /// Returns the midi channel of each output voice in top to bottom order in the original algorithm.
         /// The midi channels are usually in order, starting at 0, but this need not be the case.
