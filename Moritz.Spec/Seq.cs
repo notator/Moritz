@@ -7,25 +7,51 @@ namespace Moritz.Spec
 	public class Seq : IVoiceDefContainer
 	{
         /// <summary>
-        /// <para>Each Trk in trks has a constructed UniqueDefs list which is either empty, or contains any
-        /// combination of RestDef or MidiChordDef.</para>
-        /// <para>There must be one Trk entry per midiChannelIndexPerOutputVoice. Each tkr.MidiChannel must be
-        /// unique and present in the midiChannelIndexPerOutputVoice list.</para>
-        /// The Seq will have all the trks corresponding to the midiChannels in midiChannelIndexPerOutputVoice,
-        /// but some of them can have an empty UniqueDefs list.
-        /// The MsPositionReContainer field in each argument trk can have any value, but the Seq is Normalized
-        /// by this constructor.
+        /// trks.Count must be less than or equal to midiChannelIndexPerOutputVoice.Count. (See trks parameter comment.)
         /// </summary>
+        /// <param name="absSeqMsPosition">Must be greater than or equal to zero.</param>
+        /// <param name="trks">Each Trk must have a constructed UniqueDefs list which is either empty, or contains any
+        /// combination of RestDef or MidiChordDef. Each trk.MidiChannel must be unique and present in the
+        /// midiChannelIndexPerOutputVoice list. Not all the Seq's channels need to be given an explicit Trk in the trks
+        /// argument. The seq will be given empty (default) Trks for the channels that are missing.
+        /// The MsPositionReContainer field in each argument trk can have any value, but the Seq is Normalized
+        /// by this constructor.</param>
+        /// <param name="midiChannelIndexPerOutputVoice">The Seq will contain one trk for each channel in this list.</param>
         public Seq(int absSeqMsPosition, List<Trk> trks, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
 		{
+            #region conditions
             Debug.Assert(absSeqMsPosition >= 0);
+            for(int i = 0; i < trks.Count - 1; ++i)
+            {
+                for(int j = i + 1; j < trks.Count; ++j)
+                {
+                    Debug.Assert(trks[i].MidiChannel != trks[j].MidiChannel);
+                }
+            }
+            #endregion conditions
+
             _absMsPosition = absSeqMsPosition;
 
-            foreach(Trk trk in trks)
+            foreach(int channel in midiChannelIndexPerOutputVoice)
             {
-                trk.Container = this;
-                _trks.Add(trk);
+                Trk newTrk = null;
+                foreach(Trk trk in trks)
+                {
+                    if(trk.MidiChannel == channel)
+                    {
+                        newTrk = trk;
+                        break;
+                    }
+                }
+                if(newTrk == null)
+                {
+                    newTrk = new Trk(channel);
+                }
+                newTrk.Container = this;
+                _trks.Add(newTrk);
             }
+
+
 
             Normalize();
 
