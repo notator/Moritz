@@ -161,7 +161,8 @@ namespace Moritz.Algorithm.Tombeau1
             #endregion main comments
             /**********************************************/
 
-            Block system1Block = GetVerticalVelocityColorsTestBlock();
+            //Block system1Block = GetVerticalVelocityColorsTestBlock();
+            Block system1Block = GetTriadsCycleBlock();
             List<int> systemEndMsPositions = new List<int>() { system1Block.MsDuration };
 
             Block system2Block = GetWarpDurationsTestBlock(system1Block);
@@ -178,7 +179,7 @@ namespace Moritz.Algorithm.Tombeau1
             sequence.Concat(system3Block);
             sequence.Concat(system4Block);
 
-            List<List<VoiceDef>> bars = ConvertBlockToBars(sequence, systemEndMsPositions);
+            List<List<VoiceDef>> bars = ConvertBlockToBars(system1Block, systemEndMsPositions);
 
             // Add clef changes here.
             // Testing... 
@@ -189,6 +190,44 @@ namespace Moritz.Algorithm.Tombeau1
 
             return bars;
 		}
+
+        private Block GetTriadsCycleBlock()
+        {
+            Palette triads1Palette = GetPaletteByName("triads1");
+            Palette triads2Palette = GetPaletteByName("triads2");
+
+            List<IUniqueDef> triadsCycle = new List<IUniqueDef>();
+            List<IUniqueDef> triads1 = new List<IUniqueDef>();
+            for(int i = 0; i < 3; ++i)
+            {
+                MidiChordDef mcd = triads1Palette.MidiChordDef(i);
+                mcd.MsPositionReFirstUD = 0;
+                triads1.Add(mcd);
+            }
+            List<IUniqueDef> triads2 = new List<IUniqueDef>();
+            for(int i = 0; i < 3; ++i)
+            {
+                MidiChordDef mcd = triads2Palette.MidiChordDef(i);
+                mcd.MsPositionReFirstUD = 0;
+                triads2.Add(mcd);
+            }
+            Trk trk = new Trk(0);
+            for(int i = 0; i < 3; ++i)
+            {
+                trk.Add(triads1[2].Clone());
+                trk.Add(triads1[1].Clone());
+                trk.Add(triads1[0].Clone());
+                trk.Add(triads2[0].Clone());
+                trk.Add(triads2[1].Clone());
+                trk.Add(triads2[2].Clone());
+            }
+            List<Trk> sys1Trks = new List<Trk>() { trk };
+            //Trk ch1Trk = trk.Clone();
+            //ch1Trk.MidiChannel = 1;
+            //sys1Trks.Add(ch1Trk);
+            Seq system1Seq = new Seq(0, sys1Trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
+            return new Block(system1Seq);
+        }
 
         private List<int> AddSystemDuration(List<int> systemEndMsPositions, int systemMsDuration)
         {
@@ -345,7 +384,7 @@ namespace Moritz.Algorithm.Tombeau1
 
             for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
             {
-                int chordDensity = 8;
+                int chordDensity = 4;
                 List<IUniqueDef> sys1mcds = PaletteMidiChordDefs(0);
                 for(int j = 0; j < sys1mcds.Count; ++j)
                 {

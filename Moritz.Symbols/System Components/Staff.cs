@@ -26,7 +26,7 @@ namespace Moritz.Symbols
         /// </summary>
         public virtual void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber)
         {
-            if(IsEmpty == true)
+            if(this.Metrics == null)
             {
                 staffIsVisible = false;
             }
@@ -55,29 +55,29 @@ namespace Moritz.Symbols
         }
 
         /// <summary>
-        /// Returns false if the staff contains at least one ChordSymbol. Otherwise true.
+        /// Returns true if the staff contains at least one ChordSymbol. Otherwise false.
         /// </summary>
-        public bool IsEmpty
+        public bool ContainsAChordSymbol
         {
             get
             {
-                bool isEmpty = true;
+                bool containsAChordSymbol = false;
                 foreach(Voice voice in this.Voices)
                 {
                     foreach(NoteObject noteObject in voice.NoteObjects)
                     {
                         if(noteObject is ChordSymbol)
                         {
-                            isEmpty = false;
+                            containsAChordSymbol = true;
                             break;
                         }
                     }
-                    if(isEmpty == false)
+                    if(containsAChordSymbol == true)
                     {
                         break;
                     }
                 }
-                return isEmpty;
+                return containsAChordSymbol;
             }
         }
 
