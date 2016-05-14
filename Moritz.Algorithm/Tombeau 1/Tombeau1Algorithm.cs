@@ -10,7 +10,7 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-	public class Tombeau1Algorithm : CompositionAlgorithm
+	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
 		/// <summary>
 		/// This constructor can be called with both parameters null,
@@ -24,7 +24,7 @@ namespace Moritz.Algorithm.Tombeau1
 		public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
 		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 127, 127, 127, 127, 127, 127, 127, 127 }; } }
 		public override int NumberOfInputVoices { get { return 0; } }
-		public override int NumberOfBars { get { return 6; } }
+		public override int NumberOfBars { get { return 5; } }
 
 		/// <summary>
 		/// See CompositionAlgorithm.DoAlgorithm()
@@ -165,13 +165,12 @@ namespace Moritz.Algorithm.Tombeau1
             List<Tuple<Block, List<int>>> blocks = new List<Tuple<Block, List<int>>>();
 
             blocks.Add(TriadsCycleBlock());
-            blocks.Add(TrksTestBlock());
-            blocks.Add(VerticalVelocityColorsTestBlock());
             blocks.Add(WarpDurationsTestBlock(blocks[0].Item1));
+            blocks.Add(VerticalVelocityColorsTestBlock());
+            blocks.Add(TrksTestBlock());
             blocks.Add(SimpleVelocityColorsTestBlock());
-            blocks.Add(TriadsCycleBlock());
 
-            Tuple<Block, List<int>> sequence = GetSequence(blocks);
+            Tuple<Block, List<int>> sequence = GetCompleteSequence(blocks);
             List<List<VoiceDef>> bars = ConvertBlockToBars(sequence.Item1, sequence.Item2);
 
             // Add clef changes here.
@@ -184,7 +183,12 @@ namespace Moritz.Algorithm.Tombeau1
             return bars;
 		}
 
-        private Tuple<Block, List<int>> GetSequence(List<Tuple<Block, List<int>>> blocks)
+        #region functions called from this file or more than one other file
+        /// <summary>
+        /// Returns a Block that is the concatenation of the argument blocks,
+        /// and a list of all the barline msPositions in order (not including 0).
+        /// </summary>
+        private Tuple<Block, List<int>> GetCompleteSequence(List<Tuple<Block, List<int>>> blocks)
         {
             Block sequence = blocks[0].Item1;
             List<int> allBarlineMsPositions = blocks[0].Item2;
@@ -202,254 +206,24 @@ namespace Moritz.Algorithm.Tombeau1
             return new Tuple<Block, List<int>>(sequence, allBarlineMsPositions);
         }
 
-        private Tuple<Block, List<int>> TriadsCycleBlock()
+        /// <summary>
+        /// A list of the MidiChordDefs defined in the palette.
+        /// </summary>
+        private List<IUniqueDef> PaletteMidiChordDefs(Palette palette)
         {
-            Palette triads1Palette = GetPaletteByName("triads1");
-            Palette triads2Palette = GetPaletteByName("triads2");
-            Palette triads1widePalette = GetPaletteByName("triads1.wide");
-            Palette triads2widePalette = GetPaletteByName("triads2.wide");
-
-            List<IUniqueDef> triadsCycle = new List<IUniqueDef>();
-            List<IUniqueDef> triads1 = new List<IUniqueDef>();
-            for(int i = 0; i < 3; ++i)
+            List<IUniqueDef> iuds = new List<IUniqueDef>();
+            int msPositionReFirstIUD = 0;
+            for(int i = 0; i < palette.Count; ++i)
             {
-                MidiChordDef mcd = triads1Palette.MidiChordDef(i);
-                mcd.MsPositionReFirstUD = 0;
-                triads1.Add(mcd);
+                MidiChordDef mcd = palette.MidiChordDef(i);
+                mcd.MsPositionReFirstUD = msPositionReFirstIUD;
+                msPositionReFirstIUD += mcd.MsDuration;
+                iuds.Add(mcd);
             }
-            List<IUniqueDef> triads2 = new List<IUniqueDef>();
-            for(int i = 0; i < 3; ++i)
-            {
-                MidiChordDef mcd = triads2Palette.MidiChordDef(i);
-                mcd.MsPositionReFirstUD = 0;
-                triads2.Add(mcd);
-            }
-            List<IUniqueDef> triads1wide = new List<IUniqueDef>();
-            for(int i = 0; i < 3; ++i)
-            {
-                MidiChordDef mcd = triads1widePalette.MidiChordDef(i);
-                mcd.MsPositionReFirstUD = 0;
-                triads1wide.Add(mcd);
-            }
-            List<IUniqueDef> triads2wide = new List<IUniqueDef>();
-            for(int i = 0; i < 3; ++i)
-            {
-                MidiChordDef mcd = triads2widePalette.MidiChordDef(i);
-                mcd.MsPositionReFirstUD = 0;
-                triads2wide.Add(mcd);
-            }
-            Trk trk = new Trk(0);
-            for(int i = 0; i < 2; ++i)
-            {
-                trk.Add(triads1[1].Clone());
-                trk.Add(triads1[0].Clone());
-                trk.Add(triads2[0].Clone());
-                trk.Add(triads2[1].Clone());
-                trk.Add(triads2[2].Clone());
-                trk.Add(triads1[2].Clone());
-
-                trk.Add(triads2wide[0].Clone());
-                trk.Add(triads1wide[0].Clone());
-                trk.Add(triads1wide[1].Clone());
-                trk.Add(triads1wide[2].Clone());
-                trk.Add(triads2wide[2].Clone());
-                trk.Add(triads2wide[1].Clone());
-            }
-            List<Trk> sys1Trks = new List<Trk>() { trk };
-            //Trk ch1Trk = trk.Clone();
-            //ch1Trk.MidiChannel = 1;
-            //sys1Trks.Add(ch1Trk);
-            Seq seq = new Seq(0, sys1Trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
-
-            Block block = new Block(seq);
-            List<int> barlineMsPositions = new List<int>() { block.MsDuration };             
-            return new Tuple<Block, List<int>>(block, barlineMsPositions);
+            return iuds;
         }
 
-        private List<int> AddSystemDuration(List<int> systemEndMsPositions, int systemMsDuration)
-        {
-            systemEndMsPositions.Add(systemEndMsPositions[systemEndMsPositions.Count - 1] + systemMsDuration);
-            return systemEndMsPositions;
-        }
-
-        private Tuple<Block, List<int>> TrksTestBlock()
-        {
-            Seq seq = new Seq(0, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
-
-            List<int> velocityPerAbsolutePitch =
-                GetVelocityPerAbsolutePitch(5,    // The base pitch for the pitch hierarchy.
-                                            127,  // the velocity given to any absolute base pitch (if it exists) in the MidiChordDef
-                                            circularPitchHierarchies[0], // the pitch hierarchy for the chord,
-                                            velocityFactors[0]  // A list of 12 values in descending order, each value in range 1..0
-                                           );
-
-            for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
-            {
-                int chordDensity = 2;
-                List<IUniqueDef> sys1mcds = PaletteMidiChordDefs(0);
-                List<IUniqueDef> midiChordDefs = new List<IUniqueDef>();
-
-                for(int j = 0; j < 12; ++j)
-                {
-                    MidiChordDef mcd = sys1mcds[j] as MidiChordDef;
-                    midiChordDefs.Add(mcd);
-
-                    mcd.Transpose(i + j - 7);
-                    mcd.Lyric = (j).ToString() + "." + chordDensity.ToString();
-
-                    mcd.SetVerticalDensity(chordDensity);
-
-                    mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
-                }
-                Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, midiChordDefs);
-                trk.SortVelocityIncreasing();
-                //trk.SortVelocityDecreasing();
-                //trk.SortRootNotatedPitchAscending();
-                //trk.SortRootNotatedPitchDescending();
-                //trk.Permute(0, new List<int>() { 1,1,1,1,1,1,2 }, i + 1, 7);
-                seq.SetTrk(trk);
-            }
-
-            //systemSeq.AlignTrkUniqueDefs(new List<int>() { 0,1,2,3,4,5,6,7 });
-            //systemSeq.ShiftTrks(new List<int>() { 0, 100, 200, 300, 400, 500, 600, 700 });
-
-            //Trk trk2 = systemSeq.Trks[2];
-            //trk2.MsPositionReContainer = -500;
-            //trk2.SortRootNotatedPitchDescending();
-            //trk2.Insert(4, new RestDef(0, 444));
-
-            /******/
-
-            for(int i = 0; i < seq.Trks.Count; ++i)
-            {
-                Trk trk = seq.Trks[i];
-                trk.Permute(i + 1, 7); // sets trk.AxisIndex
-            }
-
-            //for(int i = 0; i < systemSeq.Trks.Count; ++i)
-            //{
-            //    Trk trk = systemSeq.Trks[i];
-            //    trk.AxisUDIndex = i;
-            //}
-
-            seq.AlignTrkAxes();
-
-            /*******/
-
-            Trk trk3 = seq.Trks[3];
-            trk3.PermutePartitions(7, 1, new List<int>() { 2, 2, 1, 2, 2, 1, 2 });
-            //Trk trk4 = systemSeq.Trks[4];
-            //trk4.SortVelocityDecreasing();
-
-            seq.Normalize();
-
-            // Implemented and tested these: (They just call the corresponding function on all the Trks in the seq.)
-            //systemSeq.SortVelocityIncreasing();
-            //systemSeq.SortVelocityDecreasing();
-            //systemSeq.SortRootNotatedPitchAscending();
-            //systemSeq.SortRootNotatedPitchDescending();
-
-
-
-            // Can something like this be done? Using the Alignment positions?
-            //systemSeq.Permute(0, new List<int>() { 1,1,1,1,1,1,2 }, i + 1, 7);
-
-            Block block = new Block(seq);
-            List<int> barlineMsPositions = new List<int>() { block.MsDuration };
-            return new Tuple<Block, List<int>>(block, barlineMsPositions);
-        }
-
-        private Tuple<Block, List<int>> SimpleVelocityColorsTestBlock()
-        {
-            List<Trk> trks = new List<Trk>();
-            MidiChordDef baseMidiChordDef = new MidiChordDef(new List<byte>() { (byte)64 }, new List<byte>() { (byte)127 }, 0, 1000, true);
-            byte velocity = 0;
-            for(int trkIndex = 0; trkIndex < 3; ++trkIndex)
-            {
-                Trk trk = new Trk(MidiChannelIndexPerOutputVoice[trkIndex], 0, new List<IUniqueDef>());
-                for(int j = 0; j < 16; ++j)
-                {
-                    velocity++;
-                }
-                trks.Add(trk);
-            }
-            for(int trkIndex = 3; trkIndex < MidiChannelIndexPerOutputVoice.Count; ++trkIndex)
-            {
-                Trk trk = new Trk(MidiChannelIndexPerOutputVoice[trkIndex], 0, new List<IUniqueDef>());
-                for(int j = 0; j < 16; ++j)
-                {
-                    MidiChordDef mcd = baseMidiChordDef.Clone() as MidiChordDef;
-                    mcd.BasicMidiChordDefs[0].Velocities[0] = velocity;
-                    mcd.NotatedMidiVelocities[0] = velocity;
-                    mcd.Lyric = (velocity).ToString();
-                    velocity++;
-
-                    trk.Add(mcd);
-                }
-
-                trks.Add(trk);
-            }
-
-            Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
-
-            Block block = new Block(seq);
-            List<int> barlineMsPositions = new List<int>() { block.MsDuration };
-            return new Tuple<Block, List<int>>(block, barlineMsPositions);
-        }
-
-        private Tuple<Block, List<int>> WarpDurationsTestBlock(Block originalBlock)
-        {
-            Block block = originalBlock.Clone();
-
-            // Blocks can be warped...
-            List<double> warp = new List<double>() { 0, 0.1, 0.3, 0.6, 1 };
-            block.WarpDurations(warp);
-
-            List<int> barlineMsPositions = new List<int>() { block.MsDuration };
-            return new Tuple<Block, List<int>>(block, barlineMsPositions);
-        }
-
-        private Tuple<Block, List<int>> VerticalVelocityColorsTestBlock()
-        {
-            List<Trk> sys1Trks = new List<Trk>();
-            //List<byte> topVelocities = new List<byte>() { 1, 12, 24, 35, 47, 58, 70, 81, 93, 104, 116, 127 };
-            //List<byte> rootVelocities = new List<byte>() { 127, 116, 104, 93, 81, 70, 58, 47, 35, 24, 12, 1 };
-
-            List<int> velocityPerAbsolutePitch =
-                GetVelocityPerAbsolutePitch(5,    // The base pitch for the pitch hierarchy.
-                                            127,  // the velocity given to any absolute base pitch (if it exists) in the MidiChordDef
-                                            circularPitchHierarchies[0], // the pitch hierarchy for the chord,
-                                            velocityFactors[0]  // A list of 12 values in descending order, each value in range 1..0
-                                           );
-
-            for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
-            {
-                int chordDensity = 4;
-                List<IUniqueDef> sys1mcds = PaletteMidiChordDefs(0);
-                for(int j = 0; j < sys1mcds.Count; ++j)
-                {
-                    MidiChordDef mcd = sys1mcds[j] as MidiChordDef;         
-
-                    mcd.Transpose(i + j - 7);
-                    mcd.Lyric = (j).ToString() + "." + chordDensity.ToString();
-
-                    mcd.SetVerticalDensity(chordDensity);
-
-                    //mcd.SetVerticalVelocityGradient(rootVelocities[j], topVelocities[j]);
-
-                    mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
-                }
-                Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, sys1mcds);
-                sys1Trks.Add(trk);
-            }
-
-            Seq seq = new Seq(0, sys1Trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
-
-            Block block = new Block(seq);
-            List<int> barlineMsPositions = new List<int>() { block.MsDuration };
-            return new Tuple<Block, List<int>>(block, barlineMsPositions);
-        }
-
+        #region GetVelocityPerAbsolutePitch 
         /// <summary>
         /// The returned List contains values in range [1..127]
         /// </summary>
@@ -498,21 +272,6 @@ namespace Moritz.Algorithm.Tombeau1
             }
             return velocityPerAbsPitch;
         }
-
-        private List<IUniqueDef> PaletteMidiChordDefs(int paletteIndex)
-		{
-			List<IUniqueDef> iuds = new List<IUniqueDef>();
-			Palette palette = _palettes[paletteIndex];
-			int msPositionReFirstIUD = 0;
-			for(int i = 0; i < palette.Count; ++i)
-			{
-				MidiChordDef mcd = palette.MidiChordDef(i);
-				mcd.MsPositionReFirstUD = msPositionReFirstIUD;
-				msPositionReFirstIUD += mcd.MsDuration;
-				iuds.Add(mcd);
-			}
-			return iuds;
-		}
 
         ///// <summary>
         ///// 20 lists
@@ -569,7 +328,6 @@ namespace Moritz.Algorithm.Tombeau1
             new List<int>(){ 0, 10,  7,  5,  4, 11,  2,  3,  9,  8,  1,  6 }, // 20
             new List<int>(){ 0,  7, 10,  4,  5,  2, 11,  9,  3,  1,  8,  6 }, // 21 
         };
-
 
         private List<List<double>> velocityFactors = VelocityFactorsPerPitch();
 
@@ -640,6 +398,7 @@ namespace Moritz.Algorithm.Tombeau1
 
             return rval;
         }
+
         /// <summary>
         /// Returns the distance between the two points, to the power of two, as a double.
         /// </summary>
@@ -655,5 +414,8 @@ namespace Moritz.Algorithm.Tombeau1
             return result;
         }
 
+        #endregion GetVelocityPerAbsolutePitch
+
+        #endregion functions called from this file or more than one other file
     }
 }
