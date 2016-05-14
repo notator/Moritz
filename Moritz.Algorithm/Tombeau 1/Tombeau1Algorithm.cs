@@ -24,7 +24,7 @@ namespace Moritz.Algorithm.Tombeau1
 		public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
 		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 127, 127, 127, 127, 127, 127, 127, 127 }; } }
 		public override int NumberOfInputVoices { get { return 0; } }
-		public override int NumberOfBars { get { return 4; } }
+		public override int NumberOfBars { get { return 6; } }
 
 		/// <summary>
 		/// See CompositionAlgorithm.DoAlgorithm()
@@ -161,25 +161,18 @@ namespace Moritz.Algorithm.Tombeau1
             #endregion main comments
             /**********************************************/
 
-            //Block system1Block = GetVerticalVelocityColorsTestBlock();
-            Block system1Block = GetTriadsCycleBlock();
-            List<int> systemEndMsPositions = new List<int>() { system1Block.MsDuration };
+            // Each Tuple is a Block, combined with barline positions re the start of the Block.
+            List<Tuple<Block, List<int>>> blocks = new List<Tuple<Block, List<int>>>();
 
-            Block system2Block = GetWarpDurationsTestBlock(system1Block);
-            systemEndMsPositions = AddSystemDuration(systemEndMsPositions, system2Block.MsDuration);
+            blocks.Add(TriadsCycleBlock());
+            blocks.Add(TrksTestBlock());
+            blocks.Add(VerticalVelocityColorsTestBlock());
+            blocks.Add(WarpDurationsTestBlock(blocks[0].Item1));
+            blocks.Add(SimpleVelocityColorsTestBlock());
+            blocks.Add(TriadsCycleBlock());
 
-            Block system3Block = GetSimpleVelocityColorsTestBlock();
-            systemEndMsPositions = AddSystemDuration(systemEndMsPositions, system3Block.MsDuration);
-
-            Block system4Block = GetTrksTestBlock();
-            systemEndMsPositions = AddSystemDuration(systemEndMsPositions, system4Block.MsDuration);
-
-            Block sequence = system1Block;
-            sequence.Concat(system2Block);
-            sequence.Concat(system3Block);
-            sequence.Concat(system4Block);
-
-            List<List<VoiceDef>> bars = ConvertBlockToBars(system1Block, systemEndMsPositions);
+            Tuple<Block, List<int>> sequence = GetSequence(blocks);
+            List<List<VoiceDef>> bars = ConvertBlockToBars(sequence.Item1, sequence.Item2);
 
             // Add clef changes here.
             // Testing... 
@@ -191,7 +184,25 @@ namespace Moritz.Algorithm.Tombeau1
             return bars;
 		}
 
-        private Block GetTriadsCycleBlock()
+        private Tuple<Block, List<int>> GetSequence(List<Tuple<Block, List<int>>> blocks)
+        {
+            Block sequence = blocks[0].Item1;
+            List<int> allBarlineMsPositions = blocks[0].Item2;
+            for(int i = 1; i < blocks.Count; ++i)
+            {
+                sequence.Concat(blocks[i].Item1);
+
+                int firstBarlineMsPosition = allBarlineMsPositions[allBarlineMsPositions.Count - 1];
+                List<int> blockBarlineMsPositions = blocks[i].Item2;
+                foreach(int msPosition in blockBarlineMsPositions)
+                {
+                    allBarlineMsPositions.Add(firstBarlineMsPosition + msPosition);
+                }
+            }
+            return new Tuple<Block, List<int>>(sequence, allBarlineMsPositions);
+        }
+
+        private Tuple<Block, List<int>> TriadsCycleBlock()
         {
             Palette triads1Palette = GetPaletteByName("triads1");
             Palette triads2Palette = GetPaletteByName("triads2");
@@ -248,8 +259,11 @@ namespace Moritz.Algorithm.Tombeau1
             //Trk ch1Trk = trk.Clone();
             //ch1Trk.MidiChannel = 1;
             //sys1Trks.Add(ch1Trk);
-            Seq system1Seq = new Seq(0, sys1Trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
-            return new Block(system1Seq);
+            Seq seq = new Seq(0, sys1Trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
+
+            Block block = new Block(seq);
+            List<int> barlineMsPositions = new List<int>() { block.MsDuration };             
+            return new Tuple<Block, List<int>>(block, barlineMsPositions);
         }
 
         private List<int> AddSystemDuration(List<int> systemEndMsPositions, int systemMsDuration)
@@ -258,9 +272,9 @@ namespace Moritz.Algorithm.Tombeau1
             return systemEndMsPositions;
         }
 
-        private Block GetTrksTestBlock()
+        private Tuple<Block, List<int>> TrksTestBlock()
         {
-            Seq systemSeq = new Seq(0, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
+            Seq seq = new Seq(0, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
 
             List<int> velocityPerAbsolutePitch =
                 GetVelocityPerAbsolutePitch(5,    // The base pitch for the pitch hierarchy.
@@ -293,7 +307,7 @@ namespace Moritz.Algorithm.Tombeau1
                 //trk.SortRootNotatedPitchAscending();
                 //trk.SortRootNotatedPitchDescending();
                 //trk.Permute(0, new List<int>() { 1,1,1,1,1,1,2 }, i + 1, 7);
-                systemSeq.SetTrk(trk);
+                seq.SetTrk(trk);
             }
 
             //systemSeq.AlignTrkUniqueDefs(new List<int>() { 0,1,2,3,4,5,6,7 });
@@ -306,9 +320,9 @@ namespace Moritz.Algorithm.Tombeau1
 
             /******/
 
-            for(int i = 0; i < systemSeq.Trks.Count; ++i)
+            for(int i = 0; i < seq.Trks.Count; ++i)
             {
-                Trk trk = systemSeq.Trks[i];
+                Trk trk = seq.Trks[i];
                 trk.Permute(i + 1, 7); // sets trk.AxisIndex
             }
 
@@ -318,16 +332,16 @@ namespace Moritz.Algorithm.Tombeau1
             //    trk.AxisUDIndex = i;
             //}
 
-            systemSeq.AlignTrkAxes();
+            seq.AlignTrkAxes();
 
             /*******/
 
-            Trk trk3 = systemSeq.Trks[3];
+            Trk trk3 = seq.Trks[3];
             trk3.PermutePartitions(7, 1, new List<int>() { 2, 2, 1, 2, 2, 1, 2 });
             //Trk trk4 = systemSeq.Trks[4];
             //trk4.SortVelocityDecreasing();
 
-            systemSeq.Normalize();
+            seq.Normalize();
 
             // Implemented and tested these: (They just call the corresponding function on all the Trks in the seq.)
             //systemSeq.SortVelocityIncreasing();
@@ -340,12 +354,12 @@ namespace Moritz.Algorithm.Tombeau1
             // Can something like this be done? Using the Alignment positions?
             //systemSeq.Permute(0, new List<int>() { 1,1,1,1,1,1,2 }, i + 1, 7);
 
-            Block block = new Block(systemSeq);
-
-            return block;
+            Block block = new Block(seq);
+            List<int> barlineMsPositions = new List<int>() { block.MsDuration };
+            return new Tuple<Block, List<int>>(block, barlineMsPositions);
         }
 
-        private Block GetSimpleVelocityColorsTestBlock()
+        private Tuple<Block, List<int>> SimpleVelocityColorsTestBlock()
         {
             List<Trk> trks = new List<Trk>();
             MidiChordDef baseMidiChordDef = new MidiChordDef(new List<byte>() { (byte)64 }, new List<byte>() { (byte)127 }, 0, 1000, true);
@@ -378,21 +392,24 @@ namespace Moritz.Algorithm.Tombeau1
 
             Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
 
-            return new Block(seq);
+            Block block = new Block(seq);
+            List<int> barlineMsPositions = new List<int>() { block.MsDuration };
+            return new Tuple<Block, List<int>>(block, barlineMsPositions);
         }
 
-        private Block GetWarpDurationsTestBlock(Block system1Block)
+        private Tuple<Block, List<int>> WarpDurationsTestBlock(Block originalBlock)
         {
-            Block system3Block = system1Block.Clone();
+            Block block = originalBlock.Clone();
 
             // Blocks can be warped...
             List<double> warp = new List<double>() { 0, 0.1, 0.3, 0.6, 1 };
-            system3Block.WarpDurations(warp);
+            block.WarpDurations(warp);
 
-            return system3Block;
+            List<int> barlineMsPositions = new List<int>() { block.MsDuration };
+            return new Tuple<Block, List<int>>(block, barlineMsPositions);
         }
 
-        private Block GetVerticalVelocityColorsTestBlock()
+        private Tuple<Block, List<int>> VerticalVelocityColorsTestBlock()
         {
             List<Trk> sys1Trks = new List<Trk>();
             //List<byte> topVelocities = new List<byte>() { 1, 12, 24, 35, 47, 58, 70, 81, 93, 104, 116, 127 };
@@ -425,8 +442,12 @@ namespace Moritz.Algorithm.Tombeau1
                 Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, sys1mcds);
                 sys1Trks.Add(trk);
             }
-            Seq system1Seq = new Seq(0, sys1Trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
-            return new Block(system1Seq);
+
+            Seq seq = new Seq(0, sys1Trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
+
+            Block block = new Block(seq);
+            List<int> barlineMsPositions = new List<int>() { block.MsDuration };
+            return new Tuple<Block, List<int>>(block, barlineMsPositions);
         }
 
         /// <summary>

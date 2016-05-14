@@ -631,6 +631,7 @@ namespace Moritz.Symbols
             SetBarlines();
 
             ReplaceConsecutiveRestsInBars(_pageFormat.MinimumCrotchetDuration);
+
             SetSystemsToBeginAtBars(_pageFormat.SystemStartBars);
 
             SetSystemAbsEndMsPositions();
