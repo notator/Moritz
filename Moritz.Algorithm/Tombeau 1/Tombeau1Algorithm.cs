@@ -54,7 +54,7 @@ namespace Moritz.Algorithm.Tombeau1
 			not only going to be there in the pitches (chords, contours...), but also in the velocities
 			and the pan positions... Tuning is a parameter that could be introduced as a surprise later...
 
-			I need to think diagonally about the structural levels:
+			Thinking about the structural levels:
 			> create the palettes containing the channel objects (atoms, MidiChordDefs): notes/chords, ornaments,
 			> structural layers between the objects in the palettes and trks (or are trks constructed from
 			  vertical relations inside seqs?)
@@ -72,10 +72,19 @@ namespace Moritz.Algorithm.Tombeau1
             ** Chords can have any pitches (construct some interesting palettes with some differently coloured chords).
                But velocities can be controlled independently to emphasise "harmonic" relations in areas of the score.
                Repeated chord sequences can be thus "filtered" differently as in a digital painting.
-               See MidiChordDef.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch) below.
+               See MidiChordDef.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch).
             
             ** For Trk construction, think "broken chords". Like ornaments, but on a larger scale. Sequences of chords
                whose roots are the pitches of a base chord...
+            
+            ** Draw a map of the chords that are to be used, showing the way they relate to each other.
+               Use this drawing to create a data structure, containing the chords, that can be used when composing.
+               Positions in this structure can probably be assigned to krystal values somehow...
+
+            ** Write the following functions:
+                   1. midiChordDef = fromMidiChordDef.Gliss(toMidiChordDef);
+                   2. midiChordDef = startMidiChordDef.Tremolo(auxillaryMidiChordDef, nBasicMidiChordDefs);
+               These could be used to characterise particular Blocks... 
             
             ** Think about creating a Seq (or Seqs) with a particular palette, then using exactly the same code but with
                a different palette to create further Seq(s)...
@@ -88,7 +97,8 @@ namespace Moritz.Algorithm.Tombeau1
                constructed either from the density and vertical velocity parameters in a palette or by passing velocities directly
                to a MidiChordDef constructor. The densities and velocities of BasicChordDefs depend on ornament definitions,
                so are independent of the notated values.
-               The colours themselves are defined in a private static readonly List<string> in OuputChordSymbol.cs
+               The colours themselves are defined in MoritzStatics.cs:
+                   public static readonly Dictionary<M.Dynamic, string> NoteheadColors
 
             ** Two functions have been written for setting the velocities of individual notes in a MidiChordDef.
                Both these functions affect the velocities of both the notated pitches and the BasicMidiChords:
@@ -161,7 +171,8 @@ namespace Moritz.Algorithm.Tombeau1
             #endregion main comments
             /**********************************************/
 
-            // Each Tuple is a Block, combined with barline positions re the start of the Block.
+            // Each Tuple is a Block and a list of barline positions re the start of
+            // the Block (not including the barline at msPosition == 0).
             List<Tuple<Block, List<int>>> blocks = new List<Tuple<Block, List<int>>>();
 
             blocks.Add(TriadsCycleBlock());
@@ -186,7 +197,8 @@ namespace Moritz.Algorithm.Tombeau1
         #region functions called from this file or more than one other file
         /// <summary>
         /// Returns a Block that is the concatenation of the argument blocks,
-        /// and a list of all the barline msPositions in order (not including 0).
+        /// and an ordered list of all the barline msPositions re the start of
+        /// the returned block (not including the barline at msPosition == 0).
         /// </summary>
         private Tuple<Block, List<int>> GetCompleteSequence(List<Tuple<Block, List<int>>> blocks)
         {
