@@ -195,6 +195,8 @@ namespace Moritz.Algorithm.Tombeau1
         {
             Palette triads1Palette = GetPaletteByName("triads1");
             Palette triads2Palette = GetPaletteByName("triads2");
+            Palette triads1widePalette = GetPaletteByName("triads1.wide");
+            Palette triads2widePalette = GetPaletteByName("triads2.wide");
 
             List<IUniqueDef> triadsCycle = new List<IUniqueDef>();
             List<IUniqueDef> triads1 = new List<IUniqueDef>();
@@ -211,15 +213,36 @@ namespace Moritz.Algorithm.Tombeau1
                 mcd.MsPositionReFirstUD = 0;
                 triads2.Add(mcd);
             }
-            Trk trk = new Trk(0);
+            List<IUniqueDef> triads1wide = new List<IUniqueDef>();
             for(int i = 0; i < 3; ++i)
             {
-                trk.Add(triads1[2].Clone());
+                MidiChordDef mcd = triads1widePalette.MidiChordDef(i);
+                mcd.MsPositionReFirstUD = 0;
+                triads1wide.Add(mcd);
+            }
+            List<IUniqueDef> triads2wide = new List<IUniqueDef>();
+            for(int i = 0; i < 3; ++i)
+            {
+                MidiChordDef mcd = triads2widePalette.MidiChordDef(i);
+                mcd.MsPositionReFirstUD = 0;
+                triads2wide.Add(mcd);
+            }
+            Trk trk = new Trk(0);
+            for(int i = 0; i < 2; ++i)
+            {
                 trk.Add(triads1[1].Clone());
                 trk.Add(triads1[0].Clone());
                 trk.Add(triads2[0].Clone());
                 trk.Add(triads2[1].Clone());
                 trk.Add(triads2[2].Clone());
+                trk.Add(triads1[2].Clone());
+
+                trk.Add(triads2wide[0].Clone());
+                trk.Add(triads1wide[0].Clone());
+                trk.Add(triads1wide[1].Clone());
+                trk.Add(triads1wide[2].Clone());
+                trk.Add(triads2wide[2].Clone());
+                trk.Add(triads2wide[1].Clone());
             }
             List<Trk> sys1Trks = new List<Trk>() { trk };
             //Trk ch1Trk = trk.Clone();
