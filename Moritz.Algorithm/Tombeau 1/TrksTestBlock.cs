@@ -12,7 +12,7 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-        private Tuple<Block, List<int>> TrksTestBlock()
+        private Block TrksTestBlock()
         {
             Seq seq = new Seq(0, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
 
@@ -95,9 +95,9 @@ namespace Moritz.Algorithm.Tombeau1
             // Can something like this be done? Using the Alignment positions?
             //systemSeq.Permute(0, new List<int>() { 1,1,1,1,1,1,2 }, i + 1, 7);
 
-            Block block = new Block(seq);
-            List<int> barlineMsPositions = new List<int>() { block.MsDuration };
-            return new Tuple<Block, List<int>>(block, barlineMsPositions);
+            Block block = new Block(seq, new List<int>() { seq.MsDuration });
+
+            return block;
         }
 
     }

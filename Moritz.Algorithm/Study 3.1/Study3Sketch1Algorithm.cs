@@ -50,9 +50,9 @@ namespace Moritz.Algorithm.Study3Sketch1
             mainSeq.Concat(bars3to5);
 
             // Blocks contain a list of VoiceDefs
-            Block sequence = new Block(mainSeq); // converts mainSeq to a block (There are no InputVoiceDefs in this score.)
+            Block block = new Block(mainSeq, absMsPositionsOfRightBarlines); // converts mainSeq to a block (There are no InputVoiceDefs in this score.)
 
-            List<List<VoiceDef>> bars = ConvertBlockToBars(sequence, absMsPositionsOfRightBarlines);
+            List<List<VoiceDef>> bars = block.ConvertToBars();
 
             return bars;
         }

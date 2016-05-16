@@ -24,7 +24,7 @@ namespace Moritz.Algorithm.Tombeau1
 		public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
 		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 127, 127, 127, 127, 127, 127, 127, 127 }; } }
 		public override int NumberOfInputVoices { get { return 0; } }
-		public override int NumberOfBars { get { return 5; } }
+		public override int NumberOfBars { get { return 19; } }
 
 		/// <summary>
 		/// See CompositionAlgorithm.DoAlgorithm()
@@ -173,16 +173,18 @@ namespace Moritz.Algorithm.Tombeau1
 
             // Each Tuple is a Block and a list of barline positions re the start of
             // the Block (not including the barline at msPosition == 0).
-            List<Tuple<Block, List<int>>> blocks = new List<Tuple<Block, List<int>>>();
+            List<Block> blocks = new List<Block>();
 
             blocks.Add(TriadsCycleBlock());
-            blocks.Add(WarpDurationsTestBlock(blocks[0].Item1));
+            blocks.Add(WarpDurationsTestBlock(blocks[0]));
             blocks.Add(VerticalVelocityColorsTestBlock());
+            blocks.Add(WarpDurationsTestBlock(blocks[2]));
             blocks.Add(TrksTestBlock());
             blocks.Add(SimpleVelocityColorsTestBlock());
+            blocks.Add(WarpDurationsTestBlock(blocks[5]));
 
-            Tuple<Block, List<int>> sequence = GetCompleteSequence(blocks);
-            List<List<VoiceDef>> bars = ConvertBlockToBars(sequence.Item1, sequence.Item2);
+            Block block = GetCompleteSequence(blocks);
+            List<List<VoiceDef>> bars = block.ConvertToBars();
 
             // Add clef changes here.
             // Testing... 
@@ -196,26 +198,17 @@ namespace Moritz.Algorithm.Tombeau1
 
         #region functions called from this file or more than one other file
         /// <summary>
-        /// Returns a Block that is the concatenation of the argument blocks,
-        /// and an ordered list of all the barline msPositions re the start of
-        /// the returned block (not including the barline at msPosition == 0).
+        /// Returns a Block that is the concatenation of the argument blocks.
+        /// This function consumes its arguments.
         /// </summary>
-        private Tuple<Block, List<int>> GetCompleteSequence(List<Tuple<Block, List<int>>> blocks)
+        private Block GetCompleteSequence(List<Block> blocks)
         {
-            Block sequence = blocks[0].Item1;
-            List<int> allBarlineMsPositions = blocks[0].Item2;
+            Block returnBlock = blocks[0];
             for(int i = 1; i < blocks.Count; ++i)
             {
-                sequence.Concat(blocks[i].Item1);
-
-                int firstBarlineMsPosition = allBarlineMsPositions[allBarlineMsPositions.Count - 1];
-                List<int> blockBarlineMsPositions = blocks[i].Item2;
-                foreach(int msPosition in blockBarlineMsPositions)
-                {
-                    allBarlineMsPositions.Add(firstBarlineMsPosition + msPosition);
-                }
+                returnBlock.Concat(blocks[i]);
             }
-            return new Tuple<Block, List<int>>(sequence, allBarlineMsPositions);
+            return returnBlock;
         }
 
         /// <summary>

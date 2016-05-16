@@ -9,7 +9,7 @@ namespace Moritz.Spec
     public class Block : IVoiceDefContainer
     {
         /// <summary>
-        /// A Block contains a list of voiceDefs, that can be of both kinds: Trks and InputVoiceDefs. A Seq can only contains Trks.
+        /// A Block contains a list of voiceDefs, that can be of both kinds: Trks and InputVoiceDefs. A Seq can only contain Trks.
         /// This constructor converts its argument to a Block so, if the argument needs to be preserved, pass a clone.
         /// <para>The seq's Trks are cast to VoiceDefs, and then padded at the beginning and end with rests
         /// so that they all start at the beginning of the Block and have the same duration.</para>
@@ -20,7 +20,8 @@ namespace Moritz.Spec
         /// <para>For further documentation about Block consistency, see its private AssertBlockConsistency() function.
         /// </summary>
         /// <param name="seq">cannot be null, and must have Trks</param>
-        public Block(Seq seq)
+        /// <param name="barlineMsPositions">can be null or empty</param>
+        public Block(Seq seq, List<int> barlineMsPositions)
         {
             Debug.Assert(seq.IsNormalized);
 
@@ -37,6 +38,11 @@ namespace Moritz.Spec
             foreach(Trk trk in seq.Trks)
             {
                 trk.Container = this;
+            }
+
+            if(barlineMsPositions != null)
+            {
+                BarlineMsPositions = new List<int>(barlineMsPositions);
             }
 
             AssertBlockConsistency();
@@ -106,13 +112,20 @@ namespace Moritz.Spec
             }
         }
 
-        public void Concat(Block bar2Block)
+        public void Concat(Block block2)
         {
-            Debug.Assert(_voiceDefs.Count == bar2Block._voiceDefs.Count);
+            Debug.Assert(_voiceDefs.Count == block2._voiceDefs.Count);
+
+            List<int> block2BarlineMsPositions = block2.BarlineMsPositions;
+            foreach(int msPosition in block2BarlineMsPositions)
+            {
+                BarlineMsPositions.Add(this.MsDuration + msPosition);
+            }
+
             for(int i = 0; i < _voiceDefs.Count; ++i)
             {
                 VoiceDef vd1 = _voiceDefs[i];
-                VoiceDef vd2 = bar2Block._voiceDefs[i];
+                VoiceDef vd2 = block2._voiceDefs[i];
 
                 Trk trk1 = vd1 as Trk; 
                 Trk trk2 = vd2 as Trk;
@@ -128,6 +141,7 @@ namespace Moritz.Spec
                 vd1.AgglomerateRests();
                 vd1.Container = this;
             }
+
             AssertBlockConsistency();
         }
 
@@ -145,7 +159,7 @@ namespace Moritz.Spec
                 midiChannelPerOutputVoice.Add(trk.MidiChannel);
             }
             Seq seq = new Seq(this.AbsMsPosition, trks, midiChannelPerOutputVoice);
-            Block clone = new Block(seq);
+            Block clone = new Block(seq, BarlineMsPositions);
 
             foreach(InputVoiceDef ivd in InputVoiceDefs)
             {
@@ -166,6 +180,7 @@ namespace Moritz.Spec
         /// <para>5. A RestDef is never followed by another RestDef (RestDefs have been agglomerated).</para>
         /// <para>6. In Blocks, Trk and InputVoiceDef objects can additionally contain CautionaryChordDefs (See Seq and InputVoiceDef).</para>
         /// <para>7. There may not be more than 4 InputVoiceDefs</para>
+        /// <para>8. The final barline may not be beyond the end of the block.</para>
         /// </summary>
         private void AssertBlockConsistency()
         {
@@ -251,23 +266,86 @@ namespace Moritz.Spec
             }
             Debug.Assert((nInputVoiceDefs <= 4), "There may not be more than 4 InputVoiceDefs.");
             #endregion 7
+
+            #region 8. The final barline may not be beyond the end of the block.
+            if(BarlineMsPositions.Count > 0)
+            {
+                Debug.Assert(MsDuration >= BarlineMsPositions[BarlineMsPositions.Count - 1], "The final barline may not be beyond the end of the block.");
+            }
+            #endregion 8. The final barline may not be beyond the end of the block.
         }
 
         /// <summary>
         /// The argument warp is a list of doubles, in ascending order, beginning with 0 and ending with 1.
         /// The doubles represent moments in the original duration that will be separated from each other
-        /// by equal durations when the function returns. The MsDuration of the Seq is not changed.
+        /// by equal durations when the function returns. The MsDuration of the Block is not changed.
         /// </summary>
         public void WarpDurations(List<double> warp)
         {
             AssertBlockConsistency();
-            int sequenceMsDuration = MsDuration;
+            int blockMsDuration = MsDuration;
+
+            Dictionary<int, int> warpedMsPositionsDict = new Dictionary<int, int>();
+            warpedMsPositionsDict.Add(MsDuration, MsDuration);
+
             foreach(VoiceDef voiceDef in _voiceDefs)
             {
+                IReadOnlyList<int> originalPositions = voiceDef.UDMsPositionsReFirstUD;
                 voiceDef.WarpDurations(warp);
+                IReadOnlyList<int> warpedPositions = voiceDef.UDMsPositionsReFirstUD;
+                for(int i = 0; i < originalPositions.Count; ++i)
+                {
+                    if(!warpedMsPositionsDict.ContainsKey(originalPositions[i]))
+                    {
+                        warpedMsPositionsDict.Add(originalPositions[i], warpedPositions[i]);
+                    }
+                }
             }
-            Debug.Assert(sequenceMsDuration == MsDuration);
+
+            WarpBarlineMsPositions(warpedMsPositionsDict);
+
+            Debug.Assert(blockMsDuration == MsDuration);
             AssertBlockConsistency();
+        }
+
+        private void WarpBarlineMsPositions(Dictionary<int, int> warpedMsPositionsDict)
+        {
+            for(int i = 0; i < BarlineMsPositions.Count; ++i)
+            {
+                Debug.Assert(warpedMsPositionsDict.ContainsKey(BarlineMsPositions[i]));
+                BarlineMsPositions[i] = warpedMsPositionsDict[BarlineMsPositions[i]];
+            }
+        }
+
+        /// <summary>
+        /// When this function returns, the block has been consumed, and is no longer usable.
+        /// </summary>
+        public List<List<VoiceDef>> ConvertToBars()
+        {
+            #region conditions
+            Debug.Assert(BarlineMsPositions.Count > 0, "Block must have at least one barline.");
+            Debug.Assert(BarlineMsPositions[BarlineMsPositions.Count - 1] == AbsMsPosition + MsDuration, "The final barline must be at end of the block.");
+            #endregion conditions
+
+            List<int> barlineMsPositions = new List<int>( BarlineMsPositions );
+            int finalBarlineMsPosition = barlineMsPositions[barlineMsPositions.Count - 1];
+
+            List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
+
+            int barlineIndex = 0;
+            while(AbsMsPosition < finalBarlineMsPosition)
+            {
+                int barlineEndMsPosition = barlineMsPositions[barlineIndex++];
+                for(int i = 1; i < BarlineMsPositions.Count; ++i)
+                {
+                    BarlineMsPositions[i] -= BarlineMsPositions[0];
+                }
+                BarlineMsPositions.RemoveAt(0);
+                List<VoiceDef> bar = PopBar(barlineEndMsPosition);
+                bars.Add(bar);
+            }
+
+            return bars;
         }
 
         /// <summary>
@@ -276,7 +354,7 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="endBarlineAbsMsPosition"></param>
         /// <returns>The popped bar</returns>
-        public List<VoiceDef> PopBar(int endBarlineAbsMsPosition)
+        private List<VoiceDef> PopBar(int endBarlineAbsMsPosition)
         {
             Debug.Assert(AbsMsPosition < endBarlineAbsMsPosition);
             AssertBlockConsistency();
@@ -462,6 +540,8 @@ namespace Moritz.Spec
                 return trks.AsReadOnly();
             }
         }
+
+        public List<int> BarlineMsPositions = new List<int>();
 
         public List<InputVoiceDef> InputVoiceDefs
         {

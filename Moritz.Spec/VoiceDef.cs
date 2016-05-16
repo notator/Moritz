@@ -319,6 +319,22 @@ namespace Moritz.Spec
 
             AssertVoiceDefConsistency();
         }
+
+        internal IReadOnlyList<int> UDMsPositionsReFirstUD
+        {
+            get
+            {
+                List<int> msPositions = new List<int>();
+
+                foreach(IUniqueDef iud in _uniqueDefs)
+                {
+                    msPositions.Add(iud.MsPositionReFirstUD);
+                }
+
+                return msPositions;
+            } 
+        }
+
         /// <summary>
         /// Remove the IUniques which start between startMsPosReFirstIUD and (not including) endMsPosReFirstIUD 
         /// </summary>
@@ -665,6 +681,7 @@ namespace Moritz.Spec
 
             return newMsDuration;
         }
+
         /// <summary>
         /// Setting this property stretches or compresses all the durations in the UniqueDefs list to fit the given total duration.
         /// This does not change the VoiceDef's MsPosition, but does affect its EndMsPosition.

@@ -12,7 +12,7 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-        private Tuple<Block, List<int>> TriadsCycleBlock()
+        private Block TriadsCycleBlock()
         {
             Palette triads1Palette = GetPaletteByName("triads1");
             Palette triads2Palette = GetPaletteByName("triads2");
@@ -71,9 +71,18 @@ namespace Moritz.Algorithm.Tombeau1
             //sys1Trks.Add(ch1Trk);
             Seq seq = new Seq(0, sys1Trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
 
-            Block block = new Block(seq);
-            List<int> barlineMsPositions = new List<int>() { block.MsDuration };             
-            return new Tuple<Block, List<int>>(block, barlineMsPositions);
+            List<int> barlineMsPositions = new List<int>();
+            int barMsDuration = seq.MsDuration / 4;
+            int barlineMsPosition = barMsDuration;
+            for(int i = 1; i < 5; ++i)
+            {
+                barlineMsPositions.Add(barlineMsPosition);
+                barlineMsPosition += barMsDuration;
+            }
+
+            Block block = new Block(seq, barlineMsPositions);
+
+            return block;
         }
     }
 }

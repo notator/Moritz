@@ -50,7 +50,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             bar2Seq.AbsMsPosition = seq2StartMsPos;
             bars345Seq.AbsMsPosition = seq3StartMsPos;
 
-            List<int> absMsPositionsOfRightBarlines = GetAbsMsPositionsOfRightBarlines(seq2StartMsPos, seq3StartMsPos, totalMsDuration);
+            List<int> bars345RightBarlines = Bars345RightBarlines(bars345Seq.MsDuration);
 
             /****************************************************************************************
 			* This score is liable to be recompiled when other things change in the SVG-MIDI file format,
@@ -76,9 +76,9 @@ namespace Moritz.Algorithm.Study3Sketch2
             ivd.Concat(bars345InputVoiceDef);
 
             // Blocks contain a list of VoiceDefs
-            Block bar1Block = new Block(bar1Seq);
-            Block bar2Block = new Block(bar2Seq);
-            Block bar345Block = new Block(bars345Seq);
+            Block bar1Block = new Block(bar1Seq, new List<int>() { bar1Seq.MsDuration });
+            Block bar2Block = new Block(bar2Seq, new List<int>() { bar2Seq.MsDuration });
+            Block bar345Block = new Block(bars345Seq, bars345RightBarlines);
 
             Block mainBlock = bar1Block;
             mainBlock.Concat(bar2Block);
@@ -86,7 +86,7 @@ namespace Moritz.Algorithm.Study3Sketch2
 
             mainBlock.AddInputVoice(ivd);
 
-            List<List<VoiceDef>> bars = ConvertBlockToBars(mainBlock, absMsPositionsOfRightBarlines);
+            List<List<VoiceDef>> bars = mainBlock.ConvertToBars();
 
             return bars;
         }
@@ -352,15 +352,15 @@ namespace Moritz.Algorithm.Study3Sketch2
             return seq;
         }
 
-        private List<int> GetAbsMsPositionsOfRightBarlines(int bar2StartMsPos, int bar3StartMsPos, int bar5EndMsPos)
+        private List<int> Bars345RightBarlines(int bar5EndMsPos)
         {
-            List<int> rightBarlinePositions = new List<int>() { bar2StartMsPos, bar3StartMsPos };
+            List<int> rightBarlinePositions = new List<int>();
 
-            int bar4StartPos = bar3StartMsPos + 5950;
-            int bar5StartPos = bar3StartMsPos + 10500;
+            int bar3EndMsPos = 5950;
+            int bar4EndMsPos = 10500;
 
-            rightBarlinePositions.Add(bar4StartPos);
-            rightBarlinePositions.Add(bar5StartPos);
+            rightBarlinePositions.Add(bar3EndMsPos);
+            rightBarlinePositions.Add(bar4EndMsPos);
             rightBarlinePositions.Add(bar5EndMsPos);
 
             return rightBarlinePositions;

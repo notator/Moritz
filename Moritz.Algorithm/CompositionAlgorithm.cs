@@ -156,30 +156,6 @@ namespace Moritz.Algorithm
         /// </summary>
         public abstract List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes);
 
-        /// <summary>
-        /// When this function returns, the sequence is empty, and is no longer usable.
-        /// </summary>
-        protected List<List<VoiceDef>> ConvertBlockToBars(Block sequence, List<int> absMsPositionsOfRightBarlines)
-        {
-            int finalBarlineAbsMsPosition = absMsPositionsOfRightBarlines[absMsPositionsOfRightBarlines.Count - 1];
-
-            Debug.Assert(finalBarlineAbsMsPosition == sequence.AbsMsPosition + sequence.MsDuration);
-
-            List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
-
-            int barlineIndex = 0;
-            while(sequence.AbsMsPosition < finalBarlineAbsMsPosition)
-            {
-                int barlineEndMsPosition = absMsPositionsOfRightBarlines[barlineIndex++];
-
-                List<VoiceDef> bar = sequence.PopBar(barlineEndMsPosition);
-
-                bars.Add(bar);
-            }
-
-            return bars;
-        }
-
         protected List<Krystal> _krystals;
         protected List<Palette> _palettes;
     }

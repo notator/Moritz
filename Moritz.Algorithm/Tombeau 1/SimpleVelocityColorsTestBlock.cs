@@ -12,7 +12,7 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-        private Tuple<Block, List<int>> SimpleVelocityColorsTestBlock()
+        private Block SimpleVelocityColorsTestBlock()
         {
             List<Trk> trks = new List<Trk>();
             MidiChordDef baseMidiChordDef = new MidiChordDef(new List<byte>() { (byte)64 }, new List<byte>() { (byte)127 }, 0, 1000, true);
@@ -45,9 +45,9 @@ namespace Moritz.Algorithm.Tombeau1
 
             Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
 
-            Block block = new Block(seq);
-            List<int> barlineMsPositions = new List<int>() { block.MsDuration };
-            return new Tuple<Block, List<int>>(block, barlineMsPositions);
+            Block block = new Block(seq, new List<int>() { seq.MsDuration });
+
+            return block;
         }
     }
 }
