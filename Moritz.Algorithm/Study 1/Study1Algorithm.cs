@@ -104,7 +104,8 @@ namespace Moritz.Algorithm.Study1
 			List<byte> pitches = GetPitches(relativePitch, chordIntervals);
 			List<byte> velocities = GetVelocities(chordVelocity, chordIntervals.Count() + 1);
 
-			IUniqueDef mcd = new MidiChordDef(pitches, velocities, msPosition, chordDuration, true);
+			IUniqueDef mcd = new MidiChordDef(pitches, velocities, chordDuration, true);
+            mcd.MsPositionReFirstUD = msPosition;
 
 			return mcd;
 		}

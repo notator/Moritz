@@ -24,12 +24,15 @@ namespace Moritz.Algorithm.Tombeau1
 		public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
 		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 127, 127, 127, 127, 127, 127, 127, 127 }; } }
 		public override int NumberOfInputVoices { get { return 0; } }
-		public override int NumberOfBars { get { return 19; } }
+		public override int NumberOfBars { get { return 22; } }
 
-		/// <summary>
-		/// See CompositionAlgorithm.DoAlgorithm()
-		/// </summary>
-		public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+        List<MidiChordDef> majorCircularPalette = null;
+        List<MidiChordDef> minorCircularPalette = null;
+
+        /// <summary>
+        /// See CompositionAlgorithm.DoAlgorithm()
+        /// </summary>
+        public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
 		{
 			_krystals = krystals;
 			_palettes = palettes;
@@ -175,13 +178,19 @@ namespace Moritz.Algorithm.Tombeau1
             // the Block (not including the barline at msPosition == 0).
             List<Block> blocks = new List<Block>();
 
-            blocks.Add(TriadsCycleBlock());
-            blocks.Add(WarpDurationsTestBlock(blocks[0]));
-            blocks.Add(VerticalVelocityColorsTestBlock());
-            blocks.Add(WarpDurationsTestBlock(blocks[2]));
-            blocks.Add(TrksTestBlock());
-            blocks.Add(SimpleVelocityColorsTestBlock());
-            blocks.Add(WarpDurationsTestBlock(blocks[5]));
+            int chordDensity = 3;
+            majorCircularPalette = GetMajorCircularPalette(chordDensity);
+            minorCircularPalette = UpsideDownChords(majorCircularPalette, chordDensity);
+
+            blocks.Add(VerticalVelocityChordsTestBlock()); // 2 bars (2 systems)
+            blocks.Add(HarmonicVelocityChordsTestBlock()); // 2 bars (2 systems)
+            blocks.Add(TriadsCycleBlock()); // 4 bars (1 system)
+            blocks.Add(WarpDurationsTestBlock(blocks[2])); // 4 bars (1 system)
+            blocks.Add(VerticalVelocityColorsTestBlock()); // 4 bars (1 system)
+            blocks.Add(WarpDurationsTestBlock(blocks[4])); // 4 bars (1 system)
+            blocks.Add(TrksTestBlock()); // 1 bar (1 system)
+            blocks.Add(SimpleVelocityColorsTestBlock()); // 1 bar (1 system)
+            blocks.Add(WarpDurationsTestBlock(blocks[7])); // 1 bar (1 system)
 
             Block block = GetCompleteSequence(blocks);
             List<List<VoiceDef>> bars = block.ConvertToBars();
@@ -193,10 +202,31 @@ namespace Moritz.Algorithm.Tombeau1
 
             //bars[1][1].InsertClefChange(3, "b");
 
-            return bars;
+             return bars;
 		}
 
         #region functions called from this file or more than one other file
+
+        private List<MidiChordDef> GetMajorPalette(List<List<int>> pitchHierarchies, int chordDensity)
+        {
+            List<MidiChordDef> majorCircularPalette = new List<MidiChordDef>();
+            for(int j = 0; j < pitchHierarchies.Count; ++j)
+            {
+                List<int> cph = pitchHierarchies[j];
+
+                MidiChordDef mcd = new MidiChordDef(chordDensity, 5, cph, 127, 1200, true);
+                mcd.Lyric = (j).ToString();
+                majorCircularPalette.Add(mcd);
+            }
+            return majorCircularPalette;
+        }
+
+        private List<MidiChordDef> GetMajorCircularPalette(int chordDensity)
+        {
+            List<MidiChordDef> majorCircularPalette = GetMajorPalette(circularPitchHierarchies, chordDensity);
+            return majorCircularPalette;
+        }
+
         /// <summary>
         /// Returns a Block that is the concatenation of the argument blocks.
         /// This function consumes its arguments.
@@ -227,8 +257,7 @@ namespace Moritz.Algorithm.Tombeau1
             }
             return iuds;
         }
-
-        #region GetVelocityPerAbsolutePitch 
+ 
         /// <summary>
         /// The returned List contains values in range [1..127]
         /// </summary>
@@ -334,92 +363,66 @@ namespace Moritz.Algorithm.Tombeau1
             new List<int>(){ 0,  7, 10,  4,  5,  2, 11,  9,  3,  1,  8,  6 }, // 21 
         };
 
+        /// <summary>
+        /// The maximum velocity for each dynamic symbol (ppp-fff)
+        /// </summary>
+        private static List<byte> dynamicSymbolsMaximumVelocities = new List<byte>()
+                {
+                    M.MaxMidiVelocity[M.Dynamic.ppp],
+                    M.MaxMidiVelocity[M.Dynamic.pp],
+                    M.MaxMidiVelocity[M.Dynamic.p],
+                    M.MaxMidiVelocity[M.Dynamic.mp],
+                    M.MaxMidiVelocity[M.Dynamic.mf],
+                    M.MaxMidiVelocity[M.Dynamic.f],
+                    M.MaxMidiVelocity[M.Dynamic.ff],
+                    M.MaxMidiVelocity[M.Dynamic.fff]
+                };
+
         private List<List<double>> velocityFactors = VelocityFactorsPerPitch();
 
         /// <summary>
-        /// Returns a list of lists of double containing the following values:
-        ///      y=0   | y=1    | y=2    | y=3    | y=4    | y=5    | y=6    | y=7    | y=8    | y=9    | y=10   | y=11   | 
-        /// x=0: 1     | 0,9797 | 0,9206 | 0,8274 | 0,7077 | 0,5712 | 0,4288 | 0,2923 | 0,1726 | 0,0794 | 0,0203 | 0      | 
-        /// x=1: 1     | 0,9799 | 0,9213 | 0,8289 | 0,7101 | 0,5747 | 0,4336 | 0,2981 | 0,1794 | 0,0870 | 0,0284 | 0,0083 | 
-        /// x=2: 1     | 0,9806 | 0,9238 | 0,8343 | 0,7194 | 0,5883 | 0,4517 | 0,3206 | 0,2057 | 0,1162 | 0,0594 | 0,04   | 
-        /// x=3: 1     | 0,9820 | 0,9294 | 0,8466 | 0,7402 | 0,6188 | 0,4923 | 0,3709 | 0,2645 | 0,1817 | 0,1291 | 0,1111 | 
-        /// x=4: 1     | 0,9848 | 0,9405 | 0,8706 | 0,7808 | 0,6784 | 0,5716 | 0,4692 | 0,3794 | 0,3095 | 0,2652 | 0,25   | 
-        /// x=5: 1     | 0,9901 | 0,9611 | 0,9155 | 0,8568 | 0,7900 | 0,7202 | 0,6534 | 0,5947 | 0,5491 | 0,5201 | 0,5102 | 
-        /// x=6: 1     | 1      | 1      | 1      | 1      | 1      | 1      | 1      | 1      | 1      | 1      | 1      |
-        /// 
-        /// The algorithm is like the calculation of eccentricity: It uses 7 radius coordinates at 0 degrees, in a semicircular
-        /// linear field having 12 foci: the returned doubles are the squares of the distances from the radius coordinates to
-        /// the foci, rounded to 4 decimal places. The values at y=0 are normalised to 1, by dividing the whole line by the initial value.
+        /// Returns a list of lists of double containing the following values (rounded to 5 decimal places):
+        ///      y=0 | y=1     | y=2     | y=3     | y=4     | y=5     | y=6     | y=7     | y=8     | y=9     | y=10    | y=11    | 
+        /// x=0: 1   | 0,92985 | 0,8597  | 0,78955 | 0,7194  | 0,64925 | 0,5791  | 0,50895 | 0,4388  | 0,36865 | 0,2985  | 0,22835 | 
+        /// x=1: 1   | 0,93987 | 0,87974 | 0,81961 | 0,75948 | 0,69936 | 0,63923 | 0,5791  | 0,51897 | 0,45884 | 0,39871 | 0,33858 | 
+        /// x=2: 1   | 0,94989 | 0,89979 | 0,84968 | 0,79957 | 0,74946 | 0,69936 | 0,64925 | 0,59914 | 0,54903 | 0,49893 | 0,44882 | 
+        /// x=3: 1   | 0,95991 | 0,91983 | 0,87974 | 0,83966 | 0,79957 | 0,75948 | 0,7194  | 0,67931 | 0,63923 | 0,59914 | 0,55906 | 
+        /// x=4: 1   | 0,96994 | 0,93987 | 0,90981 | 0,87974 | 0,84968 | 0,81961 | 0,78955 | 0,75948 | 0,72942 | 0,69936 | 0,66929 | 
+        /// x=5: 1   | 0,97996 | 0,95991 | 0,93987 | 0,91983 | 0,89979 | 0,87974 | 0,8597  | 0,83966 | 0,81961 | 0,79957 | 0,77953 | 
+        /// x=5: 1   | 0,98998 | 0,97996 | 0,96994 | 0,95991 | 0,94989 | 0,93987 | 0,92985 | 0,91983 | 0,90981 | 0,89979 | 0,88976 | 
+        /// x=7: 1   | 1       | 1       | 1       | 1       | 1       | 1       | 1       | 1       | 1       | 1       | 1       | 
         /// </summary>
         private static List<List<double>> VelocityFactorsPerPitch()
         {
             List<List<double>> rval = new List<List<double>>();
 
-            double rY = 0; // constant
-            for(int rEccnt = 0; rEccnt < 7; ++rEccnt)
+            for(int x = 0; x < dynamicSymbolsMaximumVelocities.Count; ++x)
             {
-                List<double> eList = new List<double>();
-                rval.Add(eList);
-                double rX = 1.0 - (rEccnt / 6.0);
-                for(int focus = 0; focus < 12; ++focus)
+                double minVelocity = dynamicSymbolsMaximumVelocities[x];
+                List<double> factors = new List<double>();
+                double decrement = (127 - minVelocity) / 11;
+                double currentVelocity = 127;
+                for(int y = 0; y < 12; ++y)
                 {
-                    double alpha = (focus * Math.PI) / 11.0;
-                    double focusX = Math.Cos(alpha);
-                    double focusY = Math.Sin(alpha);
-                    double squaredDistance = SquaredDistance(rX, rY, focusX, focusY);
-                    eList.Insert(0, squaredDistance);
+                    factors.Add(currentVelocity / 127);
+                    currentVelocity -= decrement;
                 }
+                rval.Add(factors);
             }
 
-            //for(int eccnt = 0; eccnt < 7; ++eccnt)
+            //for(int x = 0; x < dynamicSymbolsMaximumVelocities.Count; ++x)
             //{
-            //    Console.Write("eccnt:" + eccnt.ToString() + " ");
+            //    Console.Write("x:" + x.ToString() + " ");
             //    for(int v = 0; v < 12; ++v)
             //    {
-            //        Console.Write(rval[eccnt][v].ToString() + " | ");
-            //    }
-            //    Console.WriteLine();
-            //}
-
-            // normalize rval[0..6][0] to 1.
-            for(int x = 0; x < 7; ++x)
-            {
-                double v1 = rval[x][0];
-                for(int v = 0; v < 12; ++v)
-                {
-                    rval[x][v] = Math.Round((rval[x][v] / v1), 4);
-                }
-            }
-
-            //for(int eccnt = 0; eccnt < 7; ++eccnt)
-            //{
-            //    Console.Write("eccnt:" + eccnt.ToString() + " ");
-            //    for(int v = 0; v < 12; ++v)
-            //    {
-            //        Console.Write(rval[eccnt][v].ToString() + " | ");
+            //        double val = Math.Round(rval[x][v], 5);
+            //        Console.Write(val.ToString() + " | ");
             //    }
             //    Console.WriteLine();
             //}
 
             return rval;
         }
-
-        /// <summary>
-        /// Returns the distance between the two points, to the power of two, as a double.
-        /// </summary>
-        /// <param name="x1">point1 x</param>
-        /// <param name="y1">point1 y</param>
-        /// <param name="x2">point2 x</param>
-        /// <param name="y2">point2 y</param>
-        private static double SquaredDistance(double x1, double y1, double x2, double y2)
-        {
-            double x = x2 - x1;
-            double y = y2 - y1;
-            double result = (x * x) + (y * y);
-            return result;
-        }
-
-        #endregion GetVelocityPerAbsolutePitch
 
         #endregion functions called from this file or more than one other file
     }

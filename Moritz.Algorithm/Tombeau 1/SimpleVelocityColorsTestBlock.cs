@@ -15,7 +15,7 @@ namespace Moritz.Algorithm.Tombeau1
         private Block SimpleVelocityColorsTestBlock()
         {
             List<Trk> trks = new List<Trk>();
-            MidiChordDef baseMidiChordDef = new MidiChordDef(new List<byte>() { (byte)64 }, new List<byte>() { (byte)127 }, 0, 1000, true);
+            MidiChordDef baseMidiChordDef = new MidiChordDef(new List<byte>() { (byte)64 }, new List<byte>() { (byte)127 }, 1000, true);
             byte velocity = 0;
             for(int trkIndex = 0; trkIndex < 3; ++trkIndex)
             {

@@ -16,21 +16,78 @@ namespace Moritz.Spec
         #region constructors
         /// <summary>
         /// A MidiChordDef containing a single BasicMidiChordDef. Absent fields are set to 0 or null.
-        /// The pitches argument is used to set the NotatedMidiPitches and BasicMidiChordDefs[0].Pitches.
+        /// The pitches argument is used to set both the NotatedMidiPitches and BasicMidiChordDefs[0].Pitches.
         /// The velocities argument is used to set the NotatedMIDIVelocities and BasicMidiChordDefs[0].Velocities. 
         /// </summary>
-        public MidiChordDef(List<byte> pitches, List<byte> velocities, int msPositionReFirstIUD, int msDuration, bool hasChordOff)
+        public MidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff)
             : base(msDuration)
         {
+            #region conditions
             Debug.Assert(pitches.Count == velocities.Count);
             foreach(byte pitch in pitches)
                 Debug.Assert(pitch == M.MidiValue((int)pitch), "Pitch out of range.");
             foreach(byte velocity in velocities)
                 Debug.Assert(velocity == M.MidiValue((int)velocity), "Velocity out of range.");
+            #endregion conditions
 
-            _msPositionReFirstIUD = msPositionReFirstIUD;
+            _msPositionReFirstIUD = 0; // default value
             _hasChordOff = hasChordOff;
             _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
+
+            _notatedMidiPitches = pitches;
+            _notatedMidiVelocities = velocities;
+
+            _ornamentNumberSymbol = 0;
+
+            MidiChordSliderDefs = null;
+
+            byte? bank = null;                                                                           
+            byte? patch = null;
+
+            BasicMidiChordDefs.Add(new BasicMidiChordDef(msDuration, bank, patch, hasChordOff, pitches, velocities));
+
+            CheckTotalDuration();
+        }
+
+        /// <summary>
+        /// A MidiChordDef containing a single BasicMidiChordDef. Absent fields are set to 0 or null.
+        /// The pitches arguments are used to set both the NotatedMidiPitches and BasicMidiChordDefs[0].Pitches.
+        /// All pitches are given the same velocity.
+        /// The pitchHierarchy argument contains a list of _absolute_pitches_ (in range [0..11]. 0 is C natural, 1 is C# etc.
+        /// First the root pitch is found, then pitches are added to the top of the chord (from the absolute pitchHierarchy)
+        /// until the chord has density pitches, whereby the minimum number of octaves is added to each absolute pitch as necessary.
+        /// A Debug.Assertion will fail if an attempt is made to create a pitch whose value exceeds 127.
+        /// </summary>
+        /// <param name="density">The number of pitches in the chord. (range [1..12])</param>
+        /// <param name="rootOctave">The octave for the chord's root midiPitch (range [0..10]).
+        /// (The root midiPitch will be 60, middle C, if rootOctave == 5 and pitchHierarchy[0] == 0.)</param>
+        /// <param name="pitchHierarchy">A list _absolute_pitches_ (in range [0..11]. Count is in range [density..12]. Duplicate pitches are allowed.</param>
+        /// <param name="velocity">All notes are given this velocity (range [1..127])</param>
+        /// <param name="msDuration">The chord's msDuration (greater than 0).</param>
+        /// <param name="hasChordOff">Does the chord have a chordOff?</param>
+        public MidiChordDef(int density, int rootOctave, List<int> pitchHierarchy, int velocity, int msDuration, bool hasChordOff)
+            : base(msDuration)
+        {
+            #region conditions
+            Debug.Assert(density > 0 && density <= 12);
+            Debug.Assert(rootOctave >= 0 && rootOctave <= 10);
+            Debug.Assert(pitchHierarchy.Count >= density && pitchHierarchy.Count <= 12);
+            foreach(byte pitch in pitchHierarchy)
+                Debug.Assert(pitch >= 0 && pitch <= 11); // can include duplicates.
+            Debug.Assert(velocity > 0 && velocity <= 127);
+            Debug.Assert(msDuration > 0);
+            #endregion conditions
+
+            _msPositionReFirstIUD = 0; // default value
+            _hasChordOff = hasChordOff;
+            _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
+
+            List<byte> pitches = GetPitches(density, rootOctave, pitchHierarchy);
+            List<byte> velocities = new List<byte>();
+            foreach(byte pitch in pitches)
+            {
+                velocities.Add((byte)velocity);
+            } 
 
             _notatedMidiPitches = pitches;
             _notatedMidiVelocities = velocities;
@@ -46,7 +103,33 @@ namespace Moritz.Spec
 
             CheckTotalDuration();
         }
- 
+
+        private List<byte> GetPitches(int density, int rootOctave, List<int> pitchHierarchy)
+        {
+            List<int> pitches = new List<int>();
+            pitches.Add(pitchHierarchy[0] + (rootOctave * 12));
+            for(int i = 1; i < density; ++i )
+            {
+                int pitch = pitchHierarchy[i];
+                while(pitch <= pitches[i-1])
+                {
+                    pitch += 12;
+                }
+                pitches.Add(pitch);
+            }
+
+            List<byte> bytePitches = new List<byte>();
+            foreach(int pitch in pitches)
+            {
+                //Debug.Assert(pitch >= 0 && pitch <= 127);
+                if(pitch <= 127)
+                {
+                    bytePitches.Add((byte)pitch);
+                }
+            }
+            return bytePitches;
+        }
+
         /// <summary>
         /// Constructor used when creating a list of DurationDef templates from a Palette.
         /// The palette has created new values for all the arguments, so this constructor simply transfers
@@ -300,7 +383,7 @@ namespace Moritz.Spec
             {
                 byte rootVelocity = M.MidiValue((int)(Math.Round(velocities[0] * rootVelocityFactor)));
                 byte topVelocity = M.MidiValue((int)(Math.Round(rootVelocity * verticalVelocityFactor)));
-                double increment = ((topVelocity - rootVelocity) / velocities.Count - 1);
+                double increment = (((double)(topVelocity - rootVelocity)) / (velocities.Count - 1));
                 double newVelocity = rootVelocity;
                 for(int velocityIndex = 0; velocityIndex < velocities.Count; ++velocityIndex)
                 {
