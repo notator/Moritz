@@ -351,6 +351,74 @@ namespace Moritz.Spec
 
         #endregion Boulez addition (commented out)
 
+        #region AddNotes(MidiChordDef mcd2)
+        /// <summary>
+        /// Adds midiPitches and midiVelocities from the argument to this MidiChordDef's pitches and velocities.
+        /// The argument MidiChordDef is not changed.
+        /// Neither the original MidiChordDef nor the argument may contain more than one BasicMidiChordDef.
+        /// The argument's NotatedMidiPitches and BasicMidiChordDefs[0].Pitches are used to set this MidiChordDef's
+        /// NotatedMidiPitches and BasicMidiChordDefs[0].Pitches respectively.
+        /// If a pitch already exists, the larger of the two velocities is used, otherwise the new pitch is
+        /// inserted in the current pitch list at the appropriate position so that pitches continue to be in
+        /// ascending order, and the new velocity is inserted at the corresponding position in the velocities list.
+        /// </summary>
+        public void AddNotes(MidiChordDef mcd2)
+        {
+            Debug.Assert(BasicMidiChordDefs.Count == 1);
+            Debug.Assert(mcd2.BasicMidiChordDefs.Count == 1);
+
+            List<byte> pitches = new List<byte>(mcd2.NotatedMidiPitches);
+            List<byte> velocities = new List<byte>(mcd2.NotatedMidiVelocities);
+
+            Debug.Assert(pitches.Count == velocities.Count);
+
+            _AddNotes(_notatedMidiPitches, _notatedMidiVelocities, pitches, velocities);
+
+            pitches = new List<byte>(mcd2.BasicMidiChordDefs[0].Pitches);
+            velocities = new List<byte>(mcd2.BasicMidiChordDefs[0].Velocities);
+
+            Debug.Assert(pitches.Count == velocities.Count);
+
+            _AddNotes(BasicMidiChordDefs[0].Pitches, BasicMidiChordDefs[0].Velocities, pitches, velocities);
+        }
+
+        private void _AddNotes(List<byte> existingMidiPitches, List<byte> existingMidiVelocities, List<byte> pitches, List<byte> velocities)
+        {
+
+            for(int i = 0; i < pitches.Count; ++i)
+            {
+                byte pitch = pitches[i];
+                byte velocity = velocities[i];
+                bool found = false;
+                int index = existingMidiPitches.Count; // default is append at top of list
+                for(int j = 0; j < existingMidiPitches.Count; ++j)
+                {
+                    if(existingMidiPitches[j] == pitch)
+                    {
+                        index = j;
+                        found = true;
+                        break;
+                    }
+                    if(existingMidiPitches[j] > pitch)
+                    {
+                        index = j;
+                        break;
+                    }
+                }
+                if(found)
+                {
+                    existingMidiVelocities[index] = (existingMidiVelocities[index] > velocity) ? existingMidiVelocities[index] : velocity;
+                }
+                else
+                {
+                    existingMidiPitches.Insert(index, pitch);
+                    existingMidiVelocities.Insert(index, velocity);
+                }
+            }
+        }
+
+        #endregion AddNotes(MidiChordDef mcd2)
+
         #region SetVerticalVelocityGradient
         /// <summary>
         /// The arguments are both in range [1..127].
