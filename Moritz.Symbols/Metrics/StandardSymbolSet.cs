@@ -337,10 +337,10 @@ namespace Moritz.Symbols
                 {
                     outputChordSymbol.SetNoteheadColors();
                 }
-                else if(midiChordDef.MidiVelocity != currentVelocity)
+                else if(midiChordDef.BaseMidiVelocity != currentVelocity)
                 {
-                    outputChordSymbol.AddDynamic(midiChordDef.MidiVelocity, currentVelocity);
-                    currentVelocity = midiChordDef.MidiVelocity;
+                    outputChordSymbol.AddDynamic(midiChordDef.BaseMidiVelocity, currentVelocity);
+                    currentVelocity = midiChordDef.BaseMidiVelocity;
                 }
                 noteObject = outputChordSymbol;
             }

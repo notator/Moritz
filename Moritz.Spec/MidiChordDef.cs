@@ -103,7 +103,6 @@ namespace Moritz.Spec
 
             CheckTotalDuration();
         }
-
         private List<byte> GetPitches(int density, int rootOctave, List<int> pitchHierarchy)
         {
             List<int> pitches = new List<int>();
@@ -185,10 +184,11 @@ namespace Moritz.Spec
             Debug.Assert(_msDuration == sumDurations);
         }
 
-		/// <summary>
-		/// A deep clone!
-		/// </summary>
-		/// <returns></returns>
+        #region Clone
+        /// <summary>
+        /// A deep clone!
+        /// </summary>
+        /// <returns></returns>
         public override IUniqueDef Clone()
         {
             MidiChordDef rval = new MidiChordDef();
@@ -229,7 +229,7 @@ namespace Moritz.Spec
             rval.BasicMidiChordDefs = newBs;
 
             rval.MsDuration = this.MsDuration;
-            rval.MidiVelocity = this.MidiVelocity; // needed for displaying dynamics (must be set *after* setting BasicMidiChordDefs)
+            rval.BaseMidiVelocity = this.BaseMidiVelocity; // needed for displaying dynamics (must be set *after* setting BasicMidiChordDefs)
 
            return rval;
         }
@@ -244,6 +244,7 @@ namespace Moritz.Spec
                 newListByte = new List<byte>(listToClone);
             return newListByte;
         }
+        #endregion Clone
 
         #region Boulez addition (commented out)
         //      /// <summary>
@@ -434,9 +435,6 @@ namespace Moritz.Spec
         }
         #endregion SetVelocityPerAbsolutePitch
 
-        public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
-        private int? _msDurationToNextBarline = null;
-
         #region IUniqueChordDef
         /// <summary>
         /// Transposes the pitches in NotatedMidiPitches, and all BasicMidiChordDef.Pitches by the number of semitones
@@ -498,27 +496,6 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Calls Transpose(interval).
-        /// Gets BasicMidiChordDefs[0].Pitches[0].
-        /// Sets BasicMidiChordDefs[0].Pitches[0] to value, transposing the other pitches accordingly.
-        /// </summary>
-        public byte MidiBasePitch
-		{
-			get { return BasicMidiChordDefs[0].Pitches[0]; }
-			set
-			{
-				Debug.Assert(BasicMidiChordDefs != null && BasicMidiChordDefs.Count > 0
-					&& BasicMidiChordDefs[0].Pitches != null && BasicMidiChordDefs[0].Pitches.Count > 0);
-
-				if(value != BasicMidiChordDefs[0].Velocities[0])
-				{
-					int interval = value - BasicMidiChordDefs[0].Velocities[0];
-					Transpose(interval);
-				}
-			}
-		}
-
-        /// <summary>
         /// Multiplies the velocities in NotatedMidiVelocities, and all BasicMidiChordDef.Velocities by the argument factor.
         /// If a velocity would be less than 1, it is silently coerced to 1.
         /// If a velocity would be greater than 127, it is silently coerced to 127.
@@ -545,13 +522,33 @@ namespace Moritz.Spec
 			}
 		}
 
-		/// <summary>
-		/// Calls AdjustVelocities(factor).
-		/// The MidiVelocity field is used when displaying dynamics in the score.
-		/// Gets basicMidichordDefs[0].Velocities[0].
-		/// Sets BasicMidiChordDefs[0].Velocities[0] to value, and the other velocities so that the original proportions are kept.
-		/// </summary>
-		public byte MidiVelocity
+        /// <summary>
+        /// Calls Transpose(interval).
+        /// Gets BasicMidiChordDefs[0].Pitches[0].
+        /// Sets BasicMidiChordDefs[0].Pitches[0] to value, transposing the other pitches accordingly.
+        /// </summary>
+        public byte BaseMidiPitch
+        {
+            get { return BasicMidiChordDefs[0].Pitches[0]; }
+            set
+            {
+                Debug.Assert(BasicMidiChordDefs != null && BasicMidiChordDefs.Count > 0
+                    && BasicMidiChordDefs[0].Pitches != null && BasicMidiChordDefs[0].Pitches.Count > 0);
+
+                if(value != BasicMidiChordDefs[0].Velocities[0])
+                {
+                    int interval = value - BasicMidiChordDefs[0].Velocities[0];
+                    Transpose(interval);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Calls AdjustVelocities(factor).
+        /// Gets BasicMidichordDefs[0].Velocities[0].
+        /// Sets BasicMidiChordDefs[0].Velocities[0] to value, and the other velocities so that the original proportions are kept.
+        /// </summary>
+        public byte BaseMidiVelocity
 		{
 			get { return BasicMidiChordDefs[0].Velocities[0]; }
 			set
@@ -765,50 +762,6 @@ namespace Moritz.Spec
             return numberOfOrnamentChords;
         }
 
-        ///// <summary>
-        ///// This function returns a List whose count is numberOfOrnamentChords.
-        ///// It also ensures that the sum of the ints in the List is exactly equal to msDuration.
-        ///// This function is also used when setting the duration of a MidiDefList.
-        ///// </summary>
-        //public static List<int> GetIntDurations(int msDuration, List<int> relativeDurations, int numberOfOrnamentChords)
-        //{
-        //    int sumRelative = 0;
-        //    for(int i = 0; i < numberOfOrnamentChords; ++i)
-        //    {
-        //        sumRelative += relativeDurations[i];
-        //    }
-        //    // basicDurations are the float durations taking into account minimumOrnamentChordMsDuration
-        //    float factor = ((float)msDuration / (float)sumRelative);
-        //    float fPos = 0;
-        //    List<int> intPositions = new List<int>();
-        //    for(int i = 0; i < numberOfOrnamentChords; ++i)
-        //    {
-        //        intPositions.Add((int)(Math.Floor(fPos)));
-        //        fPos += (relativeDurations[i] * factor);
-        //    }
-        //    intPositions.Add((int)Math.Floor(fPos));
-
-        //    List<int> intDurations = new List<int>();
-        //    for(int i = 0; i < numberOfOrnamentChords; ++i)
-        //    {
-        //        int intDuration = (int)(intPositions[i + 1] - intPositions[i]);
-        //        intDurations.Add(intDuration);
-        //    }
-
-        //    int intSum = 0;
-        //    foreach(int i in intDurations)
-        //        intSum += i;
-        //    Debug.Assert(intSum <= msDuration);
-        //    if(intSum < msDuration)
-        //    {
-        //        int lastDuration = intDurations[intDurations.Count - 1];
-        //        lastDuration += (msDuration - intSum);
-        //        intDurations.RemoveAt(intDurations.Count - 1);
-        //        intDurations.Add(lastDuration);
-        //    }
-        //    return intDurations;
-        //}
-
         /// <summary>
         /// Returns a list of (millisecond) durations whose sum is msDuration.
         /// The List contains the maximum number of durations which can be fit from relativeDurations into the msDuration
@@ -974,6 +927,9 @@ namespace Moritz.Spec
 
         public MidiChordSliderDefs MidiChordSliderDefs = null;
         public List<BasicMidiChordDef> BasicMidiChordDefs = new List<BasicMidiChordDef>();
+
+        public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
+        private int? _msDurationToNextBarline = null;
 
         #endregion properties
     }
