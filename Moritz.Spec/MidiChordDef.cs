@@ -381,7 +381,7 @@ namespace Moritz.Spec
             List<byte> arg1Velocities = mcd1.NotatedMidiVelocities;
             List<byte> arg2Pitches = mcd2.NotatedMidiPitches;
             List<byte> arg2Velocities = mcd2.NotatedMidiVelocities;
-                                                               .
+
             switch(midiChordPitchOperator)
             {
                 case MidiChordPitchOperator.allArg1AndArg2:
