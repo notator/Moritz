@@ -178,19 +178,32 @@ namespace Moritz.Algorithm.Tombeau1
             // the Block (not including the barline at msPosition == 0).
             List<Block> blocks = new List<Block>();
 
-            int chordDensity = 3;
-            majorCircularPalette = GetMajorCircularPalette(chordDensity);
-            minorCircularPalette = UpsideDownChords(majorCircularPalette, chordDensity);
+            #region test blocks
+            //int chordDensity = 3;
+            //majorCircularPalette = GetMajorCircularPalette(chordDensity);
+            //minorCircularPalette = UpsideDownChords(majorCircularPalette, chordDensity);
 
-            blocks.Add(VerticalVelocityChordsTestBlock()); // 2 bars (2 systems)
-            blocks.Add(HarmonicVelocityChordsTestBlock()); // 2 bars (2 systems)
-            blocks.Add(TriadsCycleBlock()); // 4 bars (1 system)
-            blocks.Add(WarpDurationsTestBlock(blocks[2])); // 4 bars (1 system)
-            blocks.Add(VerticalVelocityColorsTestBlock()); // 4 bars (1 system)
-            blocks.Add(WarpDurationsTestBlock(blocks[4])); // 4 bars (1 system)
-            blocks.Add(TrksTestBlock()); // 1 bar (1 system)
-            blocks.Add(SimpleVelocityColorsTestBlock()); // 1 bar (1 system)
-            blocks.Add(WarpDurationsTestBlock(blocks[7])); // 1 bar (1 system)
+            //blocks.Add(VerticalVelocityChordsTestBlock()); // 2 bars (2 systems)
+            //blocks.Add(HarmonicVelocityChordsTestBlock()); // 2 bars (2 systems)
+            //blocks.Add(TriadsCycleBlock()); // 4 bars (1 system)
+            //blocks.Add(WarpDurationsTestBlock(blocks[2])); // 4 bars (1 system)
+            //blocks.Add(VerticalVelocityColorsTestBlock()); // 4 bars (1 system)
+            //blocks.Add(WarpDurationsTestBlock(blocks[4])); // 4 bars (1 system)
+            //blocks.Add(TrksTestBlock()); // 1 bar (1 system)
+            //blocks.Add(SimpleVelocityColorsTestBlock()); // 1 bar (1 system)
+            //blocks.Add(WarpDurationsTestBlock(blocks[7])); // 1 bar (1 system)
+
+            #endregion test blocks
+
+            blocks.Add(PalettesTestBlock("exStudy3p", 1, 8));
+            blocks.Add(PalettesTestBlock("exSongSix", 1, 8));
+            blocks.Add(PalettesTestBlock("exSongSix", 9, 16));
+            blocks.Add(PalettesTestBlock("exSongSix", 17, 21));
+
+            Block tombeau1PalettesBlock = PalettesTestBlock("tombeau1p", 1, 2);
+            tombeau1PalettesBlock.BarlineMsPositions = GetBarlinePositions(tombeau1PalettesBlock.Trks[1]);
+
+            blocks.Add(tombeau1PalettesBlock);
 
             Block block = GetCompleteSequence(blocks);
             List<List<VoiceDef>> bars = block.ConvertToBars();
@@ -204,6 +217,18 @@ namespace Moritz.Algorithm.Tombeau1
 
              return bars;
 		}
+
+        private List<int> GetBarlinePositions(Trk trk)
+        {
+            List<int> barlinePositions = new List<int>();
+            int bPos = 0;
+            foreach(IUniqueDef iud in trk.UniqueDefs)
+            {
+                bPos += iud.MsDuration;
+                barlinePositions.Add(bPos);
+            }
+            return barlinePositions;
+        }
 
         #region functions called from this file or more than one other file
 
