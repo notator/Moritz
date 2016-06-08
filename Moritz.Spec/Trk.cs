@@ -73,7 +73,7 @@ namespace Moritz.Spec
             foreach(IUniqueDef iud in UniqueDefs)
             {
                 // In blocks, trks can also contain CautionaryChordDefs
-                Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is CautionaryChordDef);
+                Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is CautionaryChordDef || iud is ClefChangeDef);
             }
         }
 
@@ -103,7 +103,7 @@ namespace Moritz.Spec
         /// </summary>
         public override void Insert(int index, IUniqueDef iUniqueDef)
         {
-            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is RestDef);
+            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is RestDef || iUniqueDef is ClefChangeDef);
             _Insert(index, iUniqueDef);
         }
         /// <summary>

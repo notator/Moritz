@@ -167,10 +167,11 @@ namespace Moritz.Spec
 
             AssertVoiceDefConsistency();
         }
+
         public abstract void Insert(int index, IUniqueDef iUniqueDef);
         protected void _Insert(int index, IUniqueDef iUniqueDef)
         {
-            Debug.Assert(!(Container is Block), "Cannot Insert IUniqueDefs inside a Block.");
+            Debug.Assert(!(Container is Block && iUniqueDef.MsDuration > 0), "Cannot Insert IUniqueDefs that have msDuration inside a Block.");
 
             _uniqueDefs.Insert(index, iUniqueDef);
             SetMsPositionsReFirstUD();
@@ -552,6 +553,33 @@ namespace Moritz.Spec
 
         #endregion VoiceDef duration changers
 
+        internal void RemoveDuplicateClefChanges()
+        {
+            if(_uniqueDefs.Count > 1)
+            {
+                for(int i = _uniqueDefs.Count - 1; i > 0; --i)
+                {
+                    IUniqueDef iud1 = _uniqueDefs[i];
+                    if(iud1 is ClefChangeDef)
+                    {
+                        for(int j = i - 1; j >= 0; --j)
+                        {
+                            IUniqueDef iud2 = _uniqueDefs[j];
+                            if(iud2 is ClefChangeDef)
+                            {
+                                if(string.Compare(((ClefChangeDef)iud1).ClefType, ((ClefChangeDef)iud2).ClefType) == 0) 
+                                {
+                                    _uniqueDefs.RemoveAt(i);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                AssertVoiceDefConsistency();
+            }
+        }
+
         /// <summary>
         /// Combines all consecutive rests.
         /// </summary>
@@ -573,6 +601,7 @@ namespace Moritz.Spec
 
             AssertVoiceDefConsistency();
         }
+
         /// <summary>
         /// Removes the rest or chord at index, and extends the previous rest or chord
         /// by the removed duration, so that other msPositions don't change.

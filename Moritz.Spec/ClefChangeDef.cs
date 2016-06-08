@@ -42,7 +42,7 @@ namespace Moritz.Spec
 		#region IUniqueDef
 		public override string ToString()
         {
-            return ("MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " clefChange: type=" + _clefType + " ClefChangeDef");
+            return ("MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " ClefType=" + _clefType + " ClefChangeDef");
         }
 
         public void AdjustMsDuration(double factor) {}

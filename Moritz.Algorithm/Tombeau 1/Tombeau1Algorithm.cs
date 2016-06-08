@@ -174,8 +174,6 @@ namespace Moritz.Algorithm.Tombeau1
             #endregion main comments
             /**********************************************/
 
-            // Each Tuple is a Block and a list of barline positions re the start of
-            // the Block (not including the barline at msPosition == 0).
             List<Block> blocks = new List<Block>();
 
             #region test blocks
@@ -195,37 +193,60 @@ namespace Moritz.Algorithm.Tombeau1
 
             #endregion test blocks
 
-            blocks.Add(PalettesTestBlock("exStudy3p", 1, 8));
-            blocks.Add(PalettesTestBlock("exSongSix", 1, 8));
-            blocks.Add(PalettesTestBlock("exSongSix", 9, 16));
-            blocks.Add(PalettesTestBlock("exSongSix", 17, 21));
+            Block exStudy3PalettesBlock = PalettesTestBlock("exStudy3p", 1, 8);
+
+            Block firstBlock = exStudy3PalettesBlock;
+            // The initial clefs in the first block are used when removing duplicates in later blocks.
+            // These initial clefs must be the same as defined in the pageFormat!
+            firstBlock.SetInitialClefs(new List<string>() { "b2", "b2", "b2", "b2", "t", "t", "t", "t" });
+
+            Block exSongSixPalettesBlock1 = PalettesTestBlock("exSongSix", 1, 8);
+            exSongSixPalettesBlock1.SetInitialClefs(new List<string>() { "b2", "b2", "b2", "b2", "b1", "b1", "b", "b" });
+
+            Block exSongSixPalettesBlock2 = PalettesTestBlock("exSongSix", 9, 16);
+            exSongSixPalettesBlock2.SetInitialClefs(new List<string>() { "b2", "b2", "t", "t", "t1", "b1", "t1", "t" });
+
+            Block exSongSixPalettesBlock3 = PalettesTestBlock("exSongSix", 17, 21);
+            exSongSixPalettesBlock3.SetInitialClefs(new List<string>() { "t1", "b2", "t1", "t1", "t1", "b1", "t1", "t" });
 
             Block tombeau1PalettesBlock = PalettesTestBlock("tombeau1p", 1, 2);
-            tombeau1PalettesBlock.BarlineMsPositions = GetBarlinePositions(tombeau1PalettesBlock.Trks[1]);
+            tombeau1PalettesBlock.SetInitialClefs(new List<string>() { "t", "b2", "t1", "t1", "t1", "b1", "t1", "t" });
 
+            setTombeau1FurtherClefs(tombeau1PalettesBlock);
+            tombeau1PalettesBlock.BarlineMsPositions = GetTombeau1BarlinePositions(tombeau1PalettesBlock.Trks[1]);
+
+            blocks.Add(firstBlock);
+            blocks.Add(exSongSixPalettesBlock1);
+            blocks.Add(exSongSixPalettesBlock2);
+            blocks.Add(exSongSixPalettesBlock3);
             blocks.Add(tombeau1PalettesBlock);
 
             Block block = GetCompleteSequence(blocks);
             List<List<VoiceDef>> bars = block.ConvertToBars();
 
-            // Add clef changes here.
-            // Testing... 
-            //bars[0][0].InsertClefChange(9, "t");
-            //bars[0][0].InsertClefChange(2, "b");
-
-            //bars[1][1].InsertClefChange(3, "b");
-
-             return bars;
+            return bars;
 		}
 
-        private List<int> GetBarlinePositions(Trk trk)
+        private void setTombeau1FurtherClefs(Block tombeau1PalettesBlock)
+        {
+            Trk trk0 = tombeau1PalettesBlock.Trks[0];
+            trk0.InsertClefChange(4, "t1");
+
+            Trk trk1 = tombeau1PalettesBlock.Trks[1];
+            trk1.InsertClefChange(4, "b1");
+        }
+
+        private List<int> GetTombeau1BarlinePositions(Trk trk)
         {
             List<int> barlinePositions = new List<int>();
             int bPos = 0;
             foreach(IUniqueDef iud in trk.UniqueDefs)
             {
-                bPos += iud.MsDuration;
-                barlinePositions.Add(bPos);
+                if(!(iud is ClefChangeDef))
+                {
+                    bPos += iud.MsDuration;
+                    barlinePositions.Add(bPos);
+                }
             }
             return barlinePositions;
         }

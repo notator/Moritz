@@ -68,7 +68,18 @@ namespace Moritz.Symbols
                         if(!(staff is HiddenOutputStaff))
                         {
                             Debug.Assert(_pageFormat.ClefsList[visibleStaffIndex] != null);
-                            voice.NoteObjects.Add(new ClefSymbol(voice, _pageFormat.ClefsList[visibleStaffIndex], musicFontHeight));
+                            string clefType = _pageFormat.ClefsList[visibleStaffIndex];
+                            #region A clef at the beginning of the first voiceDef (stipulated by the algorithm) must agree with the pageFormat clef.                           
+                            if(voice.VoiceDef.UniqueDefs.Count > 0)
+                            {
+                                ClefChangeDef clefChangeDef = voice.VoiceDef.UniqueDefs[0] as ClefChangeDef;
+                                if(clefChangeDef != null)
+                                {
+                                    Debug.Assert((string.Compare(clefType, clefChangeDef.ClefType) == 0), "The first clefs in the score (stipulated by the algorithm) must agree with the pageFormat clefs.");
+                                }
+                            }
+                            #endregion
+                            voice.NoteObjects.Add(new ClefSymbol(voice, clefType, musicFontHeight));
                         }
                         bool firstLmdd = true;
 
@@ -82,8 +93,9 @@ namespace Moritz.Symbols
                             }
                         }
                         msPositionReVoiceDef = 0;
-                        foreach(IUniqueDef iud in voice.VoiceDef.UniqueDefs)
+                        for(int iudIndex = 0; iudIndex < voice.VoiceDef.UniqueDefs.Count; ++ iudIndex)
                         {
+                            IUniqueDef iud = voice.VoiceDef.UniqueDefs[iudIndex];
                             int absMsPosition = systemAbsMsPos + msPositionReVoiceDef;
 
                             NoteObject noteObject =
@@ -108,7 +120,12 @@ namespace Moritz.Symbols
                                     voice1ClefChangeDefs.Add(iud as ClefChangeDef);
                             }
 
-                            voice.NoteObjects.Add(noteObject);
+                            // Don't add initial clefs that are stipulated by the algorithm here!
+                            // (They are the same as in the pageFormat -- see the Debug assertion above).
+                            if(!(clefChangeSymbol != null && iudIndex == 0))
+                            {
+                                voice.NoteObjects.Add(noteObject);
+                            }
 
                             firstLmdd = false;
                         }

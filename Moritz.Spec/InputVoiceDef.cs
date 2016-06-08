@@ -66,7 +66,7 @@ namespace Moritz.Spec
             foreach(IUniqueDef iud in UniqueDefs)
             {
                 // In blocks, inputChordDefs can also contain CautionaryChordDefs
-                Debug.Assert(iud is InputChordDef || iud is RestDef || iud is CautionaryChordDef);
+                Debug.Assert(iud is InputChordDef || iud is RestDef || iud is CautionaryChordDef || iud is ClefChangeDef);
             }
         }
 
