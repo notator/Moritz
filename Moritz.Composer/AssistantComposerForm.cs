@@ -1713,7 +1713,7 @@ namespace Moritz.Composer
                 switch(r.Name)
                 {
                     case "outputChordSymbolType":
-                        if(string.Compare(r.Value, "coloured velocities") == 0)
+                        if(string.Compare(r.Value, "coloredVelocities") == 0)
                         {
                             OutputChordSymbolTypeComboBox.SelectedIndex = 1;
                         }
@@ -1910,7 +1910,7 @@ namespace Moritz.Composer
 
             if(OutputChordSymbolTypeComboBox.SelectedIndex > 0)
             {
-                w.WriteAttributeString("outputChordSymbolType", OutputChordSymbolTypeComboBox.Text);
+                w.WriteAttributeString("outputChordSymbolType", "coloredVelocities");
             }
             w.WriteAttributeString("minimumCrotchetDuration", MinimumCrotchetDurationTextBox.Text);
             if(BeamsCrossBarlinesCheckBox.Checked)
