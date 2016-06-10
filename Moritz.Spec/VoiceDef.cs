@@ -675,7 +675,7 @@ namespace Moritz.Spec
                     else if(roundingError < 0)
                     {
                         iud.MsDuration--;
-                        Debug.Assert(iud.MsDuration > 0, "Impossible Warp: An UniqueDef's msDuration cannot be set to zero!");
+                        Debug.Assert(iud.MsDuration > 0, "Impossible Warp: A UniqueDef's msDuration may not be set to zero!");
                         roundingError++;
                     }
                     else

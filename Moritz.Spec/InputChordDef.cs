@@ -83,6 +83,7 @@ namespace Moritz.Spec
         public void AdjustMsDuration(double factor)
         {
             MsDuration = (int)(_msDuration * factor);
+            Debug.Assert(MsDuration > 0, "A UniqueDef's MsDuration may not be set to zero!");
         }
 
         /// <summary>
