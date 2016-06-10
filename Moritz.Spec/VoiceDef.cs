@@ -652,25 +652,41 @@ namespace Moritz.Spec
             #endregion
 
             int factorIndex = 0;
-            int iudMsPositionReFirstIUD = 0;
             int originalMsDuration = MsDuration;
             foreach(IUniqueDef iud in UniqueDefs)
             {
                 int remainingMsDuration = iud.MsDuration;
                 double newMsDuration = GetNewMsDuration(ref factorIndex, originalWarpMsPositions, factors, iud.MsPositionReFirstUD, ref remainingMsDuration);
                 iud.AdjustMsDuration(newMsDuration / iud.MsDuration);
-                iud.MsPositionReFirstUD = iudMsPositionReFirstIUD;
-                iudMsPositionReFirstIUD += iud.MsDuration;
             }
-            // correct rounding errors
-            int msDuration = MsDuration;
-            if(msDuration != originalMsDuration)
+
+            int roundingError = originalMsDuration - MsDuration;
+            while(roundingError != 0)
             {
-                IUniqueDef lastiud = UniqueDefs[UniqueDefs.Count - 1];
-                lastiud.MsDuration = originalMsDuration - lastiud.MsPositionReFirstUD;
+                // correct rounding errors
+                for(int index = 0; index < UniqueDefs.Count; ++index)
+                {
+                    IUniqueDef iud = UniqueDefs[index];
+                    if(roundingError > 0)
+                    {
+                        iud.MsDuration++;
+                        roundingError--;
+                    }
+                    else if(roundingError < 0)
+                    {
+                        iud.MsDuration--;
+                        roundingError++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
             }
 
             Debug.Assert(originalMsDuration == MsDuration);
+
+            SetMsPositionsReFirstUD();
 
             AssertVoiceDefConsistency();
         }
