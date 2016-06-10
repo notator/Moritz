@@ -246,6 +246,21 @@ namespace Moritz.Spec
         }
         #endregion Clone
 
+        #region Sliders
+        public void SetPitchWheelSliderEnvelope(List<byte> envelope)
+        {
+            MidiChordSliderDefs mcsd = this.MidiChordSliderDefs;
+            if(mcsd != null)
+            {
+                mcsd.PitchWheelMsbs = envelope;
+            }
+            else
+            {
+                MidiChordSliderDefs = new MidiChordSliderDefs(envelope, null, null, null);
+            }
+        }
+        #endregion Sliders
+
         #region Boulez addition (commented out)
         //      /// <summary>
         //      /// Boulez Addition: (Does not affect the sliders in this MidiChordDef.)

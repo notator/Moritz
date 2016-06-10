@@ -108,6 +108,9 @@ namespace Moritz.Algorithm.Tombeau1
 
         private List<List<MidiChordDef>> PitchWheelCoreMidiChordDefs = new List<List<MidiChordDef>>();
 
+        /// <summary>
+        /// Sets up the standard MidiChordDefs and Trks that will be used in the composition.
+        /// </summary>
         private Block Init()
         {
             List<List<List<byte>>> envelopes = new List<List<List<byte>>>()
@@ -133,7 +136,7 @@ namespace Moritz.Algorithm.Tombeau1
             foreach(List<byte> envelope in envList)
             {
                 MidiChordDef mcd = new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 127 }, 1000, true);
-                mcd.MidiChordSliderDefs = new MidiChordSliderDefs(envelope, null, null, null);
+                mcd.SetPitchWheelSliderEnvelope(envelope);  
                 rval.Add(mcd);
             }
             return rval;

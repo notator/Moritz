@@ -12,7 +12,7 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-        private Block HarmonicVelocityChordsTestBlock()
+        private Block HarmonicVelocityChordsTestBlock(List<MidiChordDef> majorCircularPalette, List<MidiChordDef> minorCircularPalette)
         {
             List<Trk> trks = new List<Trk>();
 

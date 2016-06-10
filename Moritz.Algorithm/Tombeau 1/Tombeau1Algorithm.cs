@@ -24,7 +24,7 @@ namespace Moritz.Algorithm.Tombeau1
 		public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
 		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 127, 127, 127, 127, 127, 127, 127, 127 }; } }
 		public override int NumberOfInputVoices { get { return 0; } }
-		public override int NumberOfBars { get { return 22; } }
+		public override int NumberOfBars { get { return 24; } }
 
         List<MidiChordDef> majorCircularPalette = null;
         List<MidiChordDef> minorCircularPalette = null;
@@ -176,59 +176,43 @@ namespace Moritz.Algorithm.Tombeau1
 
             List<Block> blocks = new List<Block>();
 
-            #region test blocks
-            //int chordDensity = 3;
-            //majorCircularPalette = GetMajorCircularPalette(chordDensity);
-            //minorCircularPalette = UpsideDownChords(majorCircularPalette, chordDensity);
-
-            //blocks.Add(VerticalVelocityChordsTestBlock()); // 2 bars (2 systems)
-            //blocks.Add(HarmonicVelocityChordsTestBlock()); // 2 bars (2 systems)
-            //blocks.Add(TriadsCycleBlock()); // 4 bars (1 system)
-            //blocks.Add(WarpDurationsTestBlock(blocks[2])); // 4 bars (1 system)
-            //blocks.Add(VerticalVelocityColorsTestBlock()); // 4 bars (1 system)
-            //blocks.Add(WarpDurationsTestBlock(blocks[4])); // 4 bars (1 system)
-            //blocks.Add(TrksTestBlock()); // 1 bar (1 system)
-            //blocks.Add(SimpleVelocityColorsTestBlock()); // 1 bar (1 system)
-            //blocks.Add(WarpDurationsTestBlock(blocks[7])); // 1 bar (1 system)
-
-
-
-            //Block exStudy3PalettesBlock = PalettesTestBlock("exStudy3p", 1, 8);
-
-            //Block firstBlock = exStudy3PalettesBlock;
-            //// The initial clefs in the first block are used when removing duplicates in later blocks.
-            //// These initial clefs must be the same as defined in the pageFormat!
-            //firstBlock.SetInitialClefs(new List<string>() { "b2", "b2", "b2", "b2", "t", "t", "t", "t" });
-
-            //Block exSongSixPalettesBlock1 = PalettesTestBlock("exSongSix", 1, 8);
-            //exSongSixPalettesBlock1.SetInitialClefs(new List<string>() { "b2", "b2", "b2", "b2", "b1", "b1", "b", "b" });
-
-            //Block exSongSixPalettesBlock2 = PalettesTestBlock("exSongSix", 9, 16);
-            //exSongSixPalettesBlock2.SetInitialClefs(new List<string>() { "b2", "b2", "t", "t", "t1", "b1", "t1", "t" });
-
-            //Block exSongSixPalettesBlock3 = PalettesTestBlock("exSongSix", 17, 21);
-            //exSongSixPalettesBlock3.SetInitialClefs(new List<string>() { "t1", "b2", "t1", "t1", "t1", "b1", "t1", "t" });
-
-            //Block tombeau1PalettesBlock = PalettesTestBlock("tombeau1p", 1, 2);
-            //tombeau1PalettesBlock.SetInitialClefs(new List<string>() { "t", "b2", "t1", "t1", "t1", "b1", "t1", "t" });
-
-            //setTombeau1FurtherClefs(tombeau1PalettesBlock);
-            //tombeau1PalettesBlock.BarlineMsPositions = GetTombeau1BarlinePositions(tombeau1PalettesBlock.Trks[1]);
-
-            //blocks.Add(firstBlock);
-            //blocks.Add(exSongSixPalettesBlock1);
-            //blocks.Add(exSongSixPalettesBlock2);
-            //blocks.Add(exSongSixPalettesBlock3);
-            //blocks.Add(tombeau1PalettesBlock);
-
-            #endregion test blocks
+            int chordDensity = 3;
+            majorCircularPalette = GetMajorCircularPalette(chordDensity);
+            minorCircularPalette = UpsideDownChords(majorCircularPalette, chordDensity);
 
             Block initBlock = Init();
             initBlock.SetInitialClefs(new List<string>() { "t", "t", "t", "t", "t", "t", "t", "t" });
-
-
-
             blocks.Add(initBlock);
+
+            #region test blocks
+            Block verticalVelocityChordsTestBlock = VerticalVelocityChordsTestBlock(majorCircularPalette, minorCircularPalette);
+            blocks.Add(verticalVelocityChordsTestBlock); // 2 bars (2 systems)
+
+            Block harmonicVelocityChordsTestBlock = HarmonicVelocityChordsTestBlock(majorCircularPalette, minorCircularPalette);
+            blocks.Add(harmonicVelocityChordsTestBlock); // 2 bars (2 systems)
+
+            Block triadsCycleBlock = TriadsCycleBlock();
+            blocks.Add(triadsCycleBlock); // 4 bars (1 system)
+
+            Block warpTriadsDurationsTestBlock = WarpDurationsTestBlock(triadsCycleBlock);
+            blocks.Add(warpTriadsDurationsTestBlock); // 4 bars (1 system)
+
+            Block verticalVelocityColorsTestBlock = VerticalVelocityColorsTestBlock();
+            blocks.Add(verticalVelocityColorsTestBlock); // 4 bars (1 system)
+
+            Block warpVVDurationsTestBlock = WarpDurationsTestBlock(verticalVelocityColorsTestBlock);
+            blocks.Add(warpVVDurationsTestBlock); // 4 bars (1 system)
+
+            Block trksTestBlock = TrksTestBlock();
+            blocks.Add(trksTestBlock); // 1 bar (1 system)
+
+            Block simpleVelocityColorsTestBlock = SimpleVelocityColorsTestBlock();
+            blocks.Add(simpleVelocityColorsTestBlock); // 1 bar (1 system)
+
+            Block warpSVDurationsTestBlock = WarpDurationsTestBlock(simpleVelocityColorsTestBlock);
+            blocks.Add(WarpDurationsTestBlock(warpSVDurationsTestBlock)); // 1 bar (1 system)
+
+            #endregion test blocks
 
             Block block = GetCompleteSequence(blocks);
             List<List<VoiceDef>> bars = block.ConvertToBars();
