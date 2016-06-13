@@ -729,13 +729,15 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// The distortion argument must be greater than or equal to 1. It is the ratio between the greatest
-        /// and smallest warp factors. Greater distortion leads to greater time distortion.
+        /// See Envelope.TimeWarp() for a description of the arguments.
         /// </summary>
+        /// <param name="envelope"></param>
+        /// <param name="distortion"></param>
         public void TimeWarp(Envelope envelope, double distortion)
         {
             #region requirements
             Debug.Assert(distortion >= 1);
+            Debug.Assert(_uniqueDefs.Count > 0);
             #endregion
 
             int originalMsDuration = MsDuration;
@@ -754,9 +756,8 @@ namespace Moritz.Spec
                     msPos += dd.MsDuration;
                 }
             }
-            originalPositions.Add(msPos); // end position of final DurationDef
+            originalPositions.Add(msPos); // end position of duration to warp.
             #endregion
-
             List<int> newPositions = envelope.TimeWarp(originalPositions, distortion);
 
             for(int i = 0; i < durationDefs.Count; ++i)

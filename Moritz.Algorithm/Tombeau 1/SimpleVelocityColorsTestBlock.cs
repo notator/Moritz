@@ -43,6 +43,9 @@ namespace Moritz.Algorithm.Tombeau1
                 trks.Add(trk);
             }
 
+            //double distortion = 64;
+            //trks[4].TimeWarp(new Envelope(new List<byte>() { 127,0,127 }), distortion);
+
             Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
 
             Block block = new Block(seq, new List<int>() { seq.MsDuration });

@@ -14,8 +14,9 @@ namespace Moritz.Spec
     /// <summary>
     /// An envelope is a list of bytes whose values are greater than or equal to 0, and less than or equal to 127.
     /// The number of bytes must be greater than 1, but is otherwise unlimited.
-    /// Values that are set to 0 in envelope.Original are set to _maxValue in envelope.Inversion.
-    /// Values that are set to _maxValue in envelope.Original are set to 0 in envelope.Inversion.
+    /// This is similar to the definition of MidiChordDef Sliders.
+    /// Values that are set to 0 in envelope.Original are set to 127 in envelope.Inversion.
+    /// Values that are set to 127 in envelope.Original are set to 0 in envelope.Inversion.
     /// </summary>
 	public class Envelope
 	{
@@ -34,19 +35,20 @@ namespace Moritz.Spec
         /// <summary>
         /// The values in the returned list are the msPositions to which the corresponding originalMsPositions should be moved.
         /// originalMsPositions[0] must be 0. The originalMsPositions must be in ascending order. 
-        /// The distortion argument must be greater than 0. Greater distortion leads to greater time distortion.
-        /// The distortion is the relation between the envelopeValue==0 and envelopeValue==127 multiplication factors.
-        /// Note that firstOriginalPosition==firstReturnedPosition==0, and the lastOriginalPosition==lastReturnedPosition.
-        /// Note also that rounding errors are corrected inside this function, so that the returned positions may not always be
-        /// *exactly* as expected from the input durations.
+        /// The distortion argument must be greater than 1. Greater distortion leads to greater time distortion.
+        /// The distortion is the ratio between the multiplication factors associated with envelopeValue==127 and envelopeValue==0.
+        /// Note that firstOriginalPosition==firstReturnedPosition==0,
+        /// and lastOriginalPosition==lastReturnedPosition==totalMsDuration being warped.
+        /// Note also that rounding errors are corrected inside this function, so that the other returned positions may not
+        /// always be *exactly* as expected from the input.
         /// </summary>
         /// <param name="originalMsPositions">Contains the end msPosition of the final DurationDef.</param>
-        /// <returns></returns>
         public List<int> TimeWarp(List<int> originalMsPositions, double distortion)
         {
             #region conditions
+            Debug.Assert(originalMsPositions.Count > 1); // At least the start and end positions of the duration to warp.
             Debug.Assert(originalMsPositions[0] == 0);
-            Debug.Assert(distortion > 0);
+            Debug.Assert(distortion > 1);
             for(int i = 1; i < originalMsPositions.Count; ++i)
             {
                 Debug.Assert(originalMsPositions[i] > originalMsPositions[i - 1]);
