@@ -52,6 +52,7 @@
     <Compile Include="ClefChangeDef.cs" />
     <Compile Include="InputNoteDef.cs" />
     <Compile Include="IVoiceDefContainer.cs" />
+    <Compile Include="Envelope.cs" />
     <Compile Include="NoteTrigger.cs" />
     <Compile Include="Seq.cs" />
     <Compile Include="SeqRef.cs" />

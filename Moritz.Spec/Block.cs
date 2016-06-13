@@ -317,45 +317,69 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// The argument warp is a list of doubles, in ascending order, beginning with 0 and ending with 1.
-        /// The doubles represent moments in the original duration that will be separated from each other
-        /// by equal durations when the function returns. The MsDuration of the Block is not changed.
+        /// See Envelope.TimeWarp() for a description of the arguments.
         /// </summary>
-        public void WarpDurations(List<double> warp)
+        /// <param name="envelope"></param>
+        /// <param name="distortion"></param>
+        public void TimeWarp(Envelope envelope, double distortion)
         {
             AssertBlockConsistency();
-            int blockMsDuration = MsDuration;
+            int originalMsDuration = MsDuration;
 
-            Dictionary<int, int> warpedMsPositionsDict = new Dictionary<int, int>();
-            warpedMsPositionsDict.Add(MsDuration, MsDuration);
+            List<int> originalMsPositions = new List<int>();
+            #region get originalMsPositions 
+            foreach(VoiceDef voiceDef in _voiceDefs)
+            {
+                foreach(IUniqueDef iud in voiceDef)
+                {
+                    int msPos = iud.MsPositionReFirstUD;
+                    if(!originalMsPositions.Contains(msPos))
+                    {
+                        originalMsPositions.Add(msPos);
+                    }   
+                }
+                originalMsPositions.Sort();
+            }
+            originalMsPositions.Add(originalMsDuration);
+            #endregion get originalMsPositions
+
+            Dictionary<int, int> warpDict = new Dictionary<int, int>();
+            #region get warpDict
+            List<int> newMsPositions = envelope.TimeWarp(originalMsPositions, distortion);
+
+            for(int i = 0; i < newMsPositions.Count; ++i)
+            {
+                warpDict.Add(originalMsPositions[i], newMsPositions[i]);
+            }
+            #endregion get warpDict
 
             foreach(VoiceDef voiceDef in _voiceDefs)
             {
-                IReadOnlyList<int> originalPositions = voiceDef.UDMsPositionsReFirstUD;
-                voiceDef.WarpDurations(warp);
-                IReadOnlyList<int> warpedPositions = voiceDef.UDMsPositionsReFirstUD;
-                for(int i = 0; i < originalPositions.Count; ++i)
+                List<IUniqueDef> iuds = voiceDef.UniqueDefs;
+                IUniqueDef iud = null;
+                int msPos = 0;
+                for(int i = 1; i < iuds.Count; ++i)
                 {
-                    if(!warpedMsPositionsDict.ContainsKey(originalPositions[i]))
-                    {
-                        warpedMsPositionsDict.Add(originalPositions[i], warpedPositions[i]);
-                    }
+                    iud = iuds[i-1];
+                    msPos = warpDict[iud.MsPositionReFirstUD];
+                    iud.MsPositionReFirstUD = msPos;
+                    iud.MsDuration = warpDict[iuds[i].MsPositionReFirstUD] - msPos;
+                    msPos += iud.MsDuration;
                 }
+                iud = iuds[iuds.Count - 1];
+                iud.MsPositionReFirstUD = msPos;
+                iud.MsDuration = originalMsDuration - msPos;
             }
 
-            WarpBarlineMsPositions(warpedMsPositionsDict);
+            Debug.Assert(originalMsDuration == MsDuration);
 
-            Debug.Assert(blockMsDuration == MsDuration);
-            AssertBlockConsistency();
-        }
-
-        private void WarpBarlineMsPositions(Dictionary<int, int> warpedMsPositionsDict)
-        {
             for(int i = 0; i < BarlineMsPositions.Count; ++i)
             {
-                Debug.Assert(warpedMsPositionsDict.ContainsKey(BarlineMsPositions[i]));
-                BarlineMsPositions[i] = warpedMsPositionsDict[BarlineMsPositions[i]];
+                Debug.Assert(warpDict.ContainsKey(BarlineMsPositions[i]));
+                BarlineMsPositions[i] = warpDict[BarlineMsPositions[i]];
             }
+
+            AssertBlockConsistency();
         }
 
         /// <summary>

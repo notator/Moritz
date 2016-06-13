@@ -49,7 +49,7 @@
     <Compile Include="Tombeau 1\Init.cs" />
     <Compile Include="Tombeau 1\VerticalVelocityChordsTestBlock.cs" />
     <Compile Include="Tombeau 1\HarmonicVelocityChordsTestBlock.cs" />
-    <Compile Include="Tombeau 1\WarpDurationsTestBlock.cs" />
+    <Compile Include="Tombeau 1\TimeWarpTestBlock.cs" />
     <Compile Include="Tombeau 1\VerticalVelocityColorsTestBlock.cs" />
     <Compile Include="Tombeau 1\SimpleVelocityColorsTestBlock.cs" />
     <Compile Include="Tombeau 1\TrksTestBlock.cs" />

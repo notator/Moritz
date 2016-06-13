@@ -194,14 +194,14 @@ namespace Moritz.Algorithm.Tombeau1
             Block triadsCycleBlock = TriadsCycleBlock();
             blocks.Add(triadsCycleBlock); // 4 bars (1 system)
 
-            Block warpTriadsDurationsTestBlock = WarpDurationsTestBlock(triadsCycleBlock);
-            blocks.Add(warpTriadsDurationsTestBlock); // 4 bars (1 system)
+            Block timeWarpTriadsTestBlock = TimeWarpTestBlock(triadsCycleBlock);
+            blocks.Add(timeWarpTriadsTestBlock); // 4 bars (1 system)
 
             Block verticalVelocityColorsTestBlock = VerticalVelocityColorsTestBlock();
             blocks.Add(verticalVelocityColorsTestBlock); // 4 bars (1 system)
 
-            Block warpVVDurationsTestBlock = WarpDurationsTestBlock(verticalVelocityColorsTestBlock);
-            blocks.Add(warpVVDurationsTestBlock); // 4 bars (1 system)
+            Block timeWarpVVTestBlock = TimeWarpTestBlock(verticalVelocityColorsTestBlock);
+            blocks.Add(timeWarpVVTestBlock); // 4 bars (1 system)
 
             Block trksTestBlock = TrksTestBlock();
             blocks.Add(trksTestBlock); // 1 bar (1 system)
@@ -209,8 +209,8 @@ namespace Moritz.Algorithm.Tombeau1
             Block simpleVelocityColorsTestBlock = SimpleVelocityColorsTestBlock();
             blocks.Add(simpleVelocityColorsTestBlock); // 1 bar (1 system)
 
-            Block warpSVDurationsTestBlock = WarpDurationsTestBlock(simpleVelocityColorsTestBlock);
-            blocks.Add(WarpDurationsTestBlock(warpSVDurationsTestBlock)); // 1 bar (1 system)
+            Block timeWarpSVTestBlock = TimeWarpTestBlock(simpleVelocityColorsTestBlock);
+            blocks.Add(timeWarpSVTestBlock); // 1 bar (1 system)
 
             #endregion test blocks
 
