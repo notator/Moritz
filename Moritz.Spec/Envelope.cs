@@ -62,7 +62,6 @@ namespace Moritz.Spec
             #region 1. create newIntMsDurations: a list containing the new msDurations
             List<byte> spreadEnvelope = Spread(originalMsPositions.Count - 1);
             List<double> newDoubleMsDurations = new List<double>();
-            //double factorIncr = distortion / _maxValue;
             double rootDistortion = Math.Pow(distortion, (((double)1) / _maxValue));             
             double newDoubleTotalDuration = 0;
             for(int i = 1; i < originalMsPositions.Count; ++i)

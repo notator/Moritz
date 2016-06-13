@@ -246,6 +246,7 @@ namespace Moritz.Spec
         }
         #endregion Clone
 
+        #region Envelopes
         #region Sliders
         public void SetPitchWheelSliderEnvelope(List<byte> envelope)
         {
@@ -260,6 +261,45 @@ namespace Moritz.Spec
             }
         }
         #endregion Sliders
+
+        /// <summary>
+        /// Changes the msPositions of the BasicMidiChordDefs without chnaging the length of the MidiChordDef. Has no effect on Sliders.
+        /// A Debug.Assertion fails if an attempt is made to set a BasicMidiChordDef.MsDuration less than _minimumBasicMidiChordMsDuration. 
+        /// See Envelope.TimeWarp() for a description of the arguments.
+        /// </summary>
+        /// <param name="envelope"></param>
+        /// <param name="distortion"></param>
+        public void TimeWarp(Envelope envelope, double distortion)
+        {
+            #region requirements
+            Debug.Assert(distortion >= 1);
+            Debug.Assert(BasicMidiChordDefs.Count > 0);
+            #endregion
+
+            int originalMsDuration = MsDuration;
+
+            List<int> originalPositions = new List<int>();
+            #region 1. create originalPositions
+            // originalPositions contains the msPositions of the BasicMidiChordDefs re the MidiChordDef
+            // plus the end msPosition of the final BasicMidiChordDef.
+            int msPos = 0;
+            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+            {
+                    originalPositions.Add(msPos);
+                    msPos += bmcd.MsDuration;
+            }
+            originalPositions.Add(msPos); // end position of duration to warp.
+            #endregion
+            List<int> newPositions = envelope.TimeWarp(originalPositions, distortion);
+
+            for(int i = 0; i < BasicMidiChordDefs.Count; ++i)
+            {
+                BasicMidiChordDef bmcd = BasicMidiChordDefs[i];
+                bmcd.MsDuration = newPositions[i + 1] - newPositions[i];
+                Debug.Assert(_minimumBasicMidiChordMsDuration > bmcd.MsDuration);
+            }
+        }
+        #endregion Envelopes
 
         #region Boulez addition (commented out)
         //      /// <summary>
