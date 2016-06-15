@@ -70,6 +70,12 @@ namespace Moritz.Spec
             }
         }
 
+        public Envelope Clone()
+        {
+            Envelope clone = new Envelope(_original, UpperBound);
+            return clone;
+        }
+
         /// <summary>
         /// The values in the returned list are the msPositions to which the corresponding originalMsPositions should be moved.
         /// originalMsPositions[0] must be 0. The originalMsPositions must be in ascending order. 
@@ -172,7 +178,7 @@ namespace Moritz.Spec
         /// The minimum value in _original is set to 0.
         /// </summary>
         /// <param name="upperBound">Greater than or equal to 0</param>
-        public void SetToRange(int upperBound)
+        public void SpreadToBounds(int upperBound)
         {
             #region condition
             if(upperBound < 0)
@@ -191,6 +197,17 @@ namespace Moritz.Spec
         /// </summary>
         private List<int> Spread(List<int> argList, int nValues)
         {
+            #region conditions
+            if(argList == null || !argList.Any())
+            {
+                throw new ArgumentException($"{nameof(argList)} cannot be null or empty.");
+            }
+            if(nValues < 1)
+            {
+                throw new ArgumentException($"{nameof(nValues)} cannot be less than 1.");
+            }
+            #endregion conditions
+
             List<int> spread = null;
             if(nValues == 1)
             {
@@ -260,14 +277,18 @@ namespace Moritz.Spec
 
             return spread;
         }
-        #endregion Spread
 
-        private static List<int> JustifyVertically(List<int> argList, int finalMin, int finalMax)
+        /// <summary>
+        /// The minimum value in the returned list is finalMin.
+        /// The maximum value in the returned list is finalMax.
+        /// </summary>
+        /// <returns></returns>
+        private List<int> JustifyVertically(List<int> argList, int finalMin, int finalMax)
         {
             #region conditions
             if(finalMax < finalMin)
             {
-                throw new ArgumentException("finalMax must be greater than or equal to finalMin");
+                throw new ArgumentException($"{nameof(finalMax)} must be greater than or equal to {nameof(finalMin)}");
             }
             #endregion conditions
 
@@ -286,6 +307,30 @@ namespace Moritz.Spec
                 rval.Add((int)(Math.Round(finalMin + ((argList[i] - currentMin) * wideningFactor))));
             }
             return rval;
+        }
+        #endregion Spread
+
+        /// <summary>
+        /// Stretches or compresses the original envelope by a factor of finalUpperBound/UpperBound.
+        /// Sets UpperBound to finalUpperBound.
+        /// </summary>
+        public void WarpVertically(int finalUpperBound)
+        {
+            #region conditions
+            if(finalUpperBound < 0)
+            {
+                throw new ArgumentException($"{nameof(finalUpperBound)} must be greater than or equal to 0");
+            }
+            #endregion conditions
+
+            List<int> rval = new List<int>();
+            double wideningFactor = ((double)finalUpperBound) / _upperBound;
+            for(int i = 0; i < _original.Count; ++i)
+            {
+                rval.Add((int)(Math.Round(_original[i] * wideningFactor)));
+            }
+            _original = rval;
+            UpperBound = finalUpperBound;
         }
 
         public List<int> Original

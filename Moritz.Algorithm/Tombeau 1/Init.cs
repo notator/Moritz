@@ -107,6 +107,7 @@ namespace Moritz.Algorithm.Tombeau1
         #endregion envelopes
 
         private List<List<MidiChordDef>> PitchWheelCoreMidiChordDefs = new List<List<MidiChordDef>>();
+        private List<List<MidiChordDef>> OrnamentCoreMidiChordDefs = new List<List<MidiChordDef>>();
 
         /// <summary>
         /// Sets up the standard MidiChordDefs and Trks that will be used in the composition.
@@ -118,13 +119,16 @@ namespace Moritz.Algorithm.Tombeau1
                 Envelopes2, Envelopes3, Envelopes4, Envelopes5, Envelopes6, Envelopes7, EnvelopesLong
             };
 
+            int cphIndex = 10;
             foreach(List<List<byte>> envList in envelopes)
             {
-                List<MidiChordDef> mcds = GetPitchWheelCoreMidiChordDefs(envList);
-                PitchWheelCoreMidiChordDefs.Add(mcds);
+                List<MidiChordDef> pwmcds = GetPitchWheelCoreMidiChordDefs(envList);
+                PitchWheelCoreMidiChordDefs.Add(pwmcds);
+                List<MidiChordDef> omcds = GetOrnamentCoreMidiChordDefs(envList, circularPitchHierarchies[cphIndex++]);
+                OrnamentCoreMidiChordDefs.Add(omcds);
             }
 
-            Block displayBlock = GetDisplayBlock(PitchWheelCoreMidiChordDefs);
+            Block displayBlock = GetDisplayBlock(PitchWheelCoreMidiChordDefs, OrnamentCoreMidiChordDefs);
 
             return displayBlock;
         }
@@ -136,38 +140,59 @@ namespace Moritz.Algorithm.Tombeau1
             foreach(List<byte> envelope in envList)
             {
                 MidiChordDef mcd = new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 127 }, 1000, true);
-                mcd.SetPitchWheelSliderEnvelope(envelope);  
+                mcd.SetPitchWheelSliderEnvelope(envelope);
+                rval.Add(mcd);
+            }
+            return rval;
+        }
+
+        private List<MidiChordDef> GetOrnamentCoreMidiChordDefs(List<List<byte>> envList, List<int> circularPitchHierarchy)
+        {
+            List<MidiChordDef> rval = new List<MidiChordDef>();
+            foreach(List<byte> envelope in envList)
+            {
+                MidiChordDef mcd = new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 127 }, 1000, true);
+                mcd.SetOrnament(new Envelope(envelope, 127), circularPitchHierarchy, 20, 8);
                 rval.Add(mcd);
             }
             return rval;
         }
 
         #region GetDisplayBlock()
-        private Block GetDisplayBlock(List<List<MidiChordDef>> pitchWheelCoreMidiChordDefs)
+        private Block GetDisplayBlock(List<List<MidiChordDef>> pitchWheelCoreMidiChordDefs, List<List<MidiChordDef>> ornamentCoreMidiChordDefs)
         {
-            List<Trk> trks = new List<Trk>();
+            Block block = GetBlockFromMidiChordDefLists(pitchWheelCoreMidiChordDefs);
+            Block block2 = GetBlockFromMidiChordDefLists(ornamentCoreMidiChordDefs);
+
+            block.Concat(block2);
+
+            return block;
+        }
+
+        private Block GetBlockFromMidiChordDefLists(List<List<MidiChordDef>> pitchWheelCoreMidiChordDefs)
+        {
             int midiChannel = 0;
+            List<Trk> trks = new List<Trk>();
             foreach(List<MidiChordDef> pwmcdList in pitchWheelCoreMidiChordDefs)
             {
-                List<IUniqueDef> mcds = GetOrderedPitchWheelCoreMidiChordDefs(pwmcdList);
+                List<IUniqueDef> mcds = GetOrderedCoreMidiChordDefs(pwmcdList);
                 Trk trk = new Trk(midiChannel++, 0, mcds);
                 trks.Add(trk);
             }
 
-            Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
-
+            Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
             Block block = new Block(seq, new List<int>() { seq.MsDuration });
 
             return block;
         }
 
-        private List<IUniqueDef> GetOrderedPitchWheelCoreMidiChordDefs(List<MidiChordDef> pwmcdList)
+        private List<IUniqueDef> GetOrderedCoreMidiChordDefs(List<MidiChordDef> mcdList)
         {
             List<IUniqueDef> rval = new List<IUniqueDef>();
             int msPositionReFirstIUD = 0;
-            for(int index = 0; index < pwmcdList.Count; ++index)
+            for(int index = 0; index < mcdList.Count; ++index)
             {
-                MidiChordDef originalMcd = pwmcdList[index];
+                MidiChordDef originalMcd = mcdList[index];
                 MidiChordDef mcd = originalMcd.Clone() as MidiChordDef;
                 mcd.Lyric = index.ToString();
                 mcd.MsPositionReFirstUD = msPositionReFirstIUD;

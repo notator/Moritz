@@ -247,6 +247,81 @@ namespace Moritz.Spec
         #endregion Clone
 
         #region Envelopes
+        #region Ornaments
+        /// <summary>
+        /// Creats countArg BasicMidiChordDefs, having equal msDuration, in this MidiChordDef without changing its msDuration.
+        /// Each BasicMidiChordDef has a single pitch having velocity 127.
+        /// The pitch is NotatedMidiPitches[0] + an interval found in the pitchHierarchy.
+        /// The index of the interval is found using the envelope, and is in range [0..domainArg-1].
+        /// Note that, since pitchHierarchy[0] is always 0, if domainArg==1 the pitch of all the BasicMidiChordDefs will be
+        /// NotatedMidiPitches[0]. domainArg is the number of possibly different pitches in the result. 
+        /// </summary>
+        /// <param name="envelope"></param>
+        /// <param name="pitchHierarchy">One of the standard hierarchies (e.g. in circularPitchHierarchies)</param>
+        /// <param name="countArg">The number of BasicMidiChordDefs to create.</param>
+        /// <param name="domainArg">Less than or equal to pitchHierarchy.Count</param>
+        public void SetOrnament(Envelope envelope, List<int> pitchHierarchy, int countArg, int domainArg)
+        {
+            #region conditions
+            if(countArg < 1)
+            {
+                throw new ArgumentException($"{nameof(countArg)} cannot be less than 1.");
+            }
+            if(domainArg < 1)
+            {
+                throw new ArgumentException($"{nameof(domainArg)} cannot be less than 1.");
+            }
+            if(domainArg > pitchHierarchy.Count)
+            {
+                throw new ArgumentException($"{nameof(domainArg)} cannot be greater than {nameof(pitchHierarchy)}.Count.");
+            }
+            if(NotatedMidiPitches.Count != 1)
+            {
+                throw new ArgumentException($"{nameof(NotatedMidiPitches)} must contain exactly one pitch.");
+            }
+            #endregion conditions
+ 
+            List<int> availableRelativePitches = new List<int>(); // the (sorted) first domainArg relativePitches in pitchHierarchy 
+            List<int> envelopeIndices = null; // an envelope of indices in availableRelativePitches
+
+            #region get availableRelativePitches and envelopeIndices 
+            List<int> availableRelativePitches1 = new List<int>();
+            for(int i = 0; i < domainArg; ++i)
+            {
+                availableRelativePitches1.Add(pitchHierarchy[i]);
+            }
+            availableRelativePitches1.Sort();
+            for(int i = 1; i < domainArg; ++i)
+            {
+                availableRelativePitches.Add(availableRelativePitches1[i] - 12);
+            }
+            availableRelativePitches.AddRange(availableRelativePitches1);
+            Debug.Assert(availableRelativePitches.Count == (domainArg * 2) - 1);
+
+            envelope = envelope.Clone();
+            envelope.SetCount(countArg);
+            envelope.WarpVertically(availableRelativePitches.Count - 1);
+            envelopeIndices = envelope.Original;
+
+            #endregion get availableRelativePitches and envelopeIndices 
+
+            byte basePitch = this.NotatedMidiPitches[0];
+            int msDuration = this.MsDuration;
+            BasicMidiChordDefs.Clear();
+            List<byte> pitches = new List<byte>() { 0 };
+            List<byte> velocities = new List<byte>() { 127 };
+            foreach(int i in envelopeIndices)
+            {
+                byte pitch = M.MidiValue(basePitch + availableRelativePitches[i]);
+                pitches[0] = pitch;
+                BasicMidiChordDef bmcd = new BasicMidiChordDef(1000, null, null, true, pitches, velocities);
+                BasicMidiChordDefs.Add(bmcd);
+            }
+            this.MsDuration = msDuration; // resets the BasicMidiChordDef msDurations.
+
+            _ornamentNumberSymbol = countArg;
+        }
+        #endregion Ornaments
         #region Sliders
         public void SetPitchWheelSliderEnvelope(List<byte> envelope)
         {
@@ -833,7 +908,7 @@ namespace Moritz.Spec
 		}
 
         #region IUniqueDef
-        public override string ToString() => $"MsPositionReFirstIUD={MsPositionReFirstUD.ToString()} MsDuration={MsDuration.ToString()} MidiChordDef";
+        public override string ToString() => $"MidiChordDef: MsDuration={MsDuration} BasePitch={NotatedMidiPitches[0]} MsPositionReFirstIUD={MsPositionReFirstUD}";
 
         /// <summary>
         /// Multiplies the MsDuration by the given factor.

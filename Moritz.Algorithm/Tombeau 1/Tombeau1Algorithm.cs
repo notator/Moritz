@@ -24,7 +24,7 @@ namespace Moritz.Algorithm.Tombeau1
 		public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
 		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 127, 127, 127, 127, 127, 127, 127, 127 }; } }
 		public override int NumberOfInputVoices { get { return 0; } }
-		public override int NumberOfBars { get { return 24; } }
+		public override int NumberOfBars { get { return 25; } }
 
         List<MidiChordDef> majorCircularPalette = null;
         List<MidiChordDef> minorCircularPalette = null;
@@ -219,30 +219,6 @@ namespace Moritz.Algorithm.Tombeau1
 
             return bars;
 		}
-
-        private void setTombeau1FurtherClefs(Block tombeau1PalettesBlock)
-        {
-            Trk trk0 = tombeau1PalettesBlock.Trks[0];
-            trk0.InsertClefChange(4, "t1");
-
-            Trk trk1 = tombeau1PalettesBlock.Trks[1];
-            trk1.InsertClefChange(4, "b1");
-        }
-
-        private List<int> GetTombeau1BarlinePositions(Trk trk)
-        {
-            List<int> barlinePositions = new List<int>();
-            int bPos = 0;
-            foreach(IUniqueDef iud in trk.UniqueDefs)
-            {
-                if(!(iud is ClefChangeDef))
-                {
-                    bPos += iud.MsDuration;
-                    barlinePositions.Add(bPos);
-                }
-            }
-            return barlinePositions;
-        }
 
         #region functions called from this file or more than one other file
 

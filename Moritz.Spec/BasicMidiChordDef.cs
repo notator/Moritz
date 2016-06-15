@@ -65,6 +65,8 @@ namespace Moritz.Spec
             w.WriteEndElement();
         }
 
+        public override string ToString() => $"BasicMidiChordDef: MsDuration={MsDuration.ToString()} BasePitch={Pitches[0]} ";
+
         public int MsDuration { get { return _msDuration; } set { _msDuration = value; } }
         protected int _msDuration = 0;
 
