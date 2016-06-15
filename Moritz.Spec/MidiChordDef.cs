@@ -832,11 +832,8 @@ namespace Moritz.Spec
 			}
 		}
 
-		#region IUniqueDef
-		public override string ToString()
-        {
-            return ("MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " MsDuration=" + MsDuration.ToString() + " MidiChordDef");
-        }
+        #region IUniqueDef
+        public override string ToString() => $"MsPositionReFirstIUD={MsPositionReFirstUD.ToString()} MsDuration={MsDuration.ToString()} MidiChordDef";
 
         /// <summary>
         /// Multiplies the MsDuration by the given factor.

@@ -17,7 +17,7 @@ namespace Moritz.Algorithm.Tombeau1
             Block block = originalBlock.Clone();
 
             double distortion = 32;
-            block.TimeWarp(new Envelope(new List<byte> { 0, 127, 0 }), distortion);
+            block.TimeWarp(new Envelope(new List<byte> { 0, 127, 0 }, 127), distortion);
 
             return block;
         }
