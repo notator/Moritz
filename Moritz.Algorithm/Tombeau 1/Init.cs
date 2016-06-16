@@ -162,6 +162,9 @@ namespace Moritz.Algorithm.Tombeau1
         private Block GetDisplayBlock(List<List<MidiChordDef>> pitchWheelCoreMidiChordDefs, List<List<MidiChordDef>> ornamentCoreMidiChordDefs)
         {
             Block block = GetBlockFromMidiChordDefLists(pitchWheelCoreMidiChordDefs);
+
+            block.SetPitchWheelSliderEnvelope(new Envelope(new List<byte>() { 0, 127 }, 127));
+
             Block block2 = GetBlockFromMidiChordDefLists(ornamentCoreMidiChordDefs);
 
             block.Concat(block2);

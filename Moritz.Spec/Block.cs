@@ -327,24 +327,7 @@ namespace Moritz.Spec
         {
             AssertBlockConsistency();
             int originalMsDuration = MsDuration;
-
-            List<int> originalMsPositions = new List<int>();
-            #region get originalMsPositions 
-            foreach(VoiceDef voiceDef in _voiceDefs)
-            {
-                foreach(IUniqueDef iud in voiceDef)
-                {
-                    int msPos = iud.MsPositionReFirstUD;
-                    if(!originalMsPositions.Contains(msPos))
-                    {
-                        originalMsPositions.Add(msPos);
-                    }   
-                }
-                originalMsPositions.Sort();
-            }
-            originalMsPositions.Add(originalMsDuration);
-            #endregion get originalMsPositions
-
+            List<int> originalMsPositions = GetOriginalMsPositions(originalMsDuration);
             Dictionary<int, int> warpDict = new Dictionary<int, int>();
             #region get warpDict
             List<int> newMsPositions = envelope.TimeWarp(originalMsPositions, distortion);
@@ -362,7 +345,7 @@ namespace Moritz.Spec
                 int msPos = 0;
                 for(int i = 1; i < iuds.Count; ++i)
                 {
-                    iud = iuds[i-1];
+                    iud = iuds[i - 1];
                     msPos = warpDict[iud.MsPositionReFirstUD];
                     iud.MsPositionReFirstUD = msPos;
                     iud.MsDuration = warpDict[iuds[i].MsPositionReFirstUD] - msPos;
@@ -383,6 +366,90 @@ namespace Moritz.Spec
 
             AssertBlockConsistency();
         }
+
+        /// <summary>
+        /// returns a list containing the msPositions of all IuniqueDefs plus the endMsPosition of the final object.
+        /// </summary>
+        /// <param name="originalMsDuration"></param>
+        /// <returns></returns>
+        private List<int> GetOriginalMsPositions(int originalMsDuration)
+        {
+            List<int> originalMsPositions = new List<int>();
+            #region get originalMsPositions 
+            foreach(VoiceDef voiceDef in _voiceDefs)
+            {
+                foreach(IUniqueDef iud in voiceDef)
+                {
+                    int msPos = iud.MsPositionReFirstUD;
+                    if(!originalMsPositions.Contains(msPos))
+                    {
+                        originalMsPositions.Add(msPos);
+                    }
+                }
+                originalMsPositions.Sort();
+            }
+            originalMsPositions.Add(originalMsDuration);
+            #endregion get originalMsPositions
+            return originalMsPositions;
+        }
+
+        public void SetPitchWheelSliderEnvelope(Envelope envelope)
+        {
+            #region condition
+            if(envelope.UpperBound != 127)
+            {
+                throw new ArgumentException($"{nameof(envelope.UpperBound)} must be 127.");
+            }
+            #endregion condition
+            AssertBlockConsistency();
+            int originalMsDuration = MsDuration;
+            List<int> originalMsPositions = GetOriginalMsPositions(originalMsDuration);
+
+            envelope = envelope.Clone();
+            envelope.SetCount(originalMsPositions.Count);
+            List<int> pitchWheelValues = envelope.Original;
+            Dictionary<int, int> pitchWheelValuesPerMsPosition = new Dictionary<int, int>();
+            for(int i = 0; i < originalMsPositions.Count; ++i)
+            {
+                pitchWheelValuesPerMsPosition.Add(originalMsPositions[i], pitchWheelValues[i]);
+            }
+
+            foreach(VoiceDef voiceDef in _voiceDefs)
+            {
+                if(voiceDef is Trk)
+                {
+                    foreach(IUniqueDef iud in voiceDef)
+                    {
+                        MidiChordDef mcd = iud as MidiChordDef;
+                        if(mcd != null)
+                        {
+                            int startMsPos = mcd.MsPositionReFirstUD;
+                            int endMsPos = startMsPos + mcd.MsDuration;
+                            List<int> mcdEnvelope = new List<int>();
+                            for(int i = 0; i < originalMsPositions.Count; ++i)
+                            {
+                                int msPos = originalMsPositions[i];
+                                if(msPos >= startMsPos)
+                                {
+                                    if(msPos <= endMsPos)
+                                    {
+                                        mcdEnvelope.Add(pitchWheelValuesPerMsPosition[msPos]);
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                            mcd.SetPitchWheelSliderEnvelope(new Envelope(mcdEnvelope, 127));
+                        }
+                    }
+                }
+            }
+
+            AssertBlockConsistency();
+        }
+
         #endregion envelopes
 
         /// <summary>

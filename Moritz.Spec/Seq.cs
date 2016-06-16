@@ -411,6 +411,11 @@ namespace Moritz.Spec
 
             AssertSeqConsistency();
         }
+
+        public void SetPitchWheelSliderEnvelope(Envelope envelope)
+        {
+            throw new NotImplementedException();
+        }
         #endregion Envelopes
 
         public IReadOnlyList<Trk> Trks { get { return _trks.AsReadOnly(); } }
