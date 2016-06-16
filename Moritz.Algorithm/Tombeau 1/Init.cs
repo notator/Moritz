@@ -153,6 +153,7 @@ namespace Moritz.Algorithm.Tombeau1
             {
                 MidiChordDef mcd = new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 127 }, 1000, true);
                 mcd.SetOrnament(new Envelope(envelope, 127), circularPitchHierarchy, 10, 8);
+                mcd.TimeWarp(new Envelope(new List<byte>() { 127, 0 }, 127), 16);
                 rval.Add(mcd);
             }
             return rval;

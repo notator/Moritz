@@ -281,7 +281,7 @@ namespace Moritz.Spec
             {
                 BasicMidiChordDef bmcd = BasicMidiChordDefs[i];
                 bmcd.MsDuration = newPositions[i + 1] - newPositions[i];
-                Debug.Assert(_minimumBasicMidiChordMsDuration > bmcd.MsDuration);
+                Debug.Assert(_minimumBasicMidiChordMsDuration <= bmcd.MsDuration);
             }
         }
 
