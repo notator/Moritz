@@ -327,7 +327,7 @@ namespace Moritz.Spec
         {
             AssertBlockConsistency();
             int originalMsDuration = MsDuration;
-            List<int> originalMsPositions = GetOriginalMsPositions(originalMsDuration);
+            List<int> originalMsPositions = GetMsPositions();
             Dictionary<int, int> warpDict = new Dictionary<int, int>();
             #region get warpDict
             List<int> newMsPositions = envelope.TimeWarp(originalMsPositions, distortion);
@@ -368,14 +368,13 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// returns a list containing the msPositions of all IuniqueDefs plus the endMsPosition of the final object.
+        /// Returns a list containing the msPositions of all IUniqueDefs plus the endMsPosition of the final object.
         /// </summary>
-        /// <param name="originalMsDuration"></param>
-        /// <returns></returns>
-        private List<int> GetOriginalMsPositions(int originalMsDuration)
+        private List<int> GetMsPositions()
         {
+            int originalMsDuration = MsDuration;
+
             List<int> originalMsPositions = new List<int>();
-            #region get originalMsPositions 
             foreach(VoiceDef voiceDef in _voiceDefs)
             {
                 foreach(IUniqueDef iud in voiceDef)
@@ -389,7 +388,6 @@ namespace Moritz.Spec
                 originalMsPositions.Sort();
             }
             originalMsPositions.Add(originalMsDuration);
-            #endregion get originalMsPositions
             return originalMsPositions;
         }
 
@@ -401,53 +399,18 @@ namespace Moritz.Spec
                 throw new ArgumentException($"{nameof(envelope.UpperBound)} must be 127.");
             }
             #endregion condition
-            AssertBlockConsistency();
-            int originalMsDuration = MsDuration;
-            List<int> originalMsPositions = GetOriginalMsPositions(originalMsDuration);
 
-            envelope = envelope.Clone();
-            envelope.SetCount(originalMsPositions.Count);
-            List<int> pitchWheelValues = envelope.Original;
-            Dictionary<int, int> pitchWheelValuesPerMsPosition = new Dictionary<int, int>();
-            for(int i = 0; i < originalMsPositions.Count; ++i)
-            {
-                pitchWheelValuesPerMsPosition.Add(originalMsPositions[i], pitchWheelValues[i]);
-            }
+            List<int> msPositions = GetMsPositions();
+            Dictionary<int, int> pitchWheelValuesPerMsPosition = envelope.GetValuePerMsPosition(msPositions);
 
             foreach(VoiceDef voiceDef in _voiceDefs)
             {
-                if(voiceDef is Trk)
+                Trk trk = voiceDef as Trk;
+                if(trk != null)
                 {
-                    foreach(IUniqueDef iud in voiceDef)
-                    {
-                        MidiChordDef mcd = iud as MidiChordDef;
-                        if(mcd != null)
-                        {
-                            int startMsPos = mcd.MsPositionReFirstUD;
-                            int endMsPos = startMsPos + mcd.MsDuration;
-                            List<int> mcdEnvelope = new List<int>();
-                            for(int i = 0; i < originalMsPositions.Count; ++i)
-                            {
-                                int msPos = originalMsPositions[i];
-                                if(msPos >= startMsPos)
-                                {
-                                    if(msPos <= endMsPos)
-                                    {
-                                        mcdEnvelope.Add(pitchWheelValuesPerMsPosition[msPos]);
-                                    }
-                                    else
-                                    {
-                                        break;
-                                    }
-                                }
-                            }
-                            mcd.SetPitchWheelSliderEnvelope(new Envelope(mcdEnvelope, 127));
-                        }
-                    }
+                    trk.SetMidiChordDefPitchWheelSliders(pitchWheelValuesPerMsPosition);
                 }
             }
-
-            AssertBlockConsistency();
         }
 
         #endregion envelopes

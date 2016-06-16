@@ -361,24 +361,7 @@ namespace Moritz.Spec
         {
             AssertSeqConsistency();
             int originalMsDuration = MsDuration;
-
-            List<int> originalMsPositions = new List<int>();
-            #region get originalMsPositions 
-            foreach(Trk trk in _trks)
-            {
-                foreach(IUniqueDef iud in trk)
-                {
-                    int msPos = iud.MsPositionReFirstUD;
-                    if(!originalMsPositions.Contains(msPos))
-                    {
-                        originalMsPositions.Add(msPos);
-                    }
-                }
-                originalMsPositions.Sort();
-            }
-            originalMsPositions.Add(originalMsDuration);
-            #endregion get originalMsPositions
-
+            List<int> originalMsPositions = GetMsPositions();
             Dictionary<int, int> warpDict = new Dictionary<int, int>();
             #region get warpDict
             List<int> newMsPositions = envelope.TimeWarp(originalMsPositions, distortion);
@@ -412,9 +395,49 @@ namespace Moritz.Spec
             AssertSeqConsistency();
         }
 
+        /// <summary>
+        /// returns a list containing the msPositions of all the IUniqueDefs plus the endMsPosition of the final object.
+        /// </summary>
+        /// <returns></returns>
+        private List<int> GetMsPositions()
+        {
+            int originalMsDuration = MsDuration;
+
+            List<int> originalMsPositions = new List<int>();
+            foreach(Trk trk in _trks)
+            {
+                foreach(IUniqueDef iud in trk)
+                {
+                    int msPos = iud.MsPositionReFirstUD;
+                    if(!originalMsPositions.Contains(msPos))
+                    {
+                        originalMsPositions.Add(msPos);
+                    }
+                }
+                originalMsPositions.Sort();
+            }
+            originalMsPositions.Add(originalMsDuration);
+
+            return originalMsPositions;
+        }
+
         public void SetPitchWheelSliderEnvelope(Envelope envelope)
         {
-            throw new NotImplementedException();
+            #region condition
+            if(envelope.UpperBound != 127)
+            {
+                throw new ArgumentException($"{nameof(envelope.UpperBound)} must be 127.");
+            }
+            #endregion condition
+
+            List<int> msPositions = GetMsPositions();
+
+            Dictionary<int, int> pitchWheelValuesPerMsPosition = envelope.GetValuePerMsPosition(msPositions);
+
+            foreach(Trk trk in _trks)
+            {
+                trk.SetMidiChordDefPitchWheelSliders(pitchWheelValuesPerMsPosition);
+            }
         }
         #endregion Envelopes
 

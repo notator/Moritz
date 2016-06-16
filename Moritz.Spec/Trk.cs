@@ -174,6 +174,68 @@ namespace Moritz.Spec
         #region Changing MidiChordDef attributes
 
         #region Envelopes
+
+        public void SetPitchWheelSliderEnvelope(Envelope envelope)
+        {
+            #region condition
+            if(envelope.UpperBound != 127)
+            {
+                throw new ArgumentException($"{nameof(envelope.UpperBound)} must be 127.");
+            }
+            #endregion condition
+
+            List<int> msPositions = GetMsPositions();
+
+            Dictionary<int, int> pitchWheelValuesPerMsPosition = envelope.GetValuePerMsPosition(msPositions);
+
+            SetMidiChordDefPitchWheelSliders(pitchWheelValuesPerMsPosition);
+        }
+
+        private List<int> GetMsPositions()
+        {
+            int originalMsDuration = MsDuration;
+
+            List<int> originalMsPositions = new List<int>();
+            foreach(IUniqueDef iud in UniqueDefs)
+            {
+                originalMsPositions.Add(iud.MsPositionReFirstUD);
+            }
+            originalMsPositions.Add(originalMsDuration);
+
+            return originalMsPositions;
+        }
+
+        /// <summary>
+        /// Also used by Trks in Seq and Block
+        /// </summary>
+        public void SetMidiChordDefPitchWheelSliders(Dictionary<int, int> pitchWheelValuesPerMsPosition)
+        {
+            foreach(IUniqueDef iud in UniqueDefs)
+            {
+                MidiChordDef mcd = iud as MidiChordDef;
+                if(mcd != null)
+                {
+                    int startMsPos = mcd.MsPositionReFirstUD;
+                    int endMsPos = startMsPos + mcd.MsDuration;
+                    List<int> mcdEnvelope = new List<int>();
+                    foreach(int msPos in pitchWheelValuesPerMsPosition.Keys)
+                    {
+                        if(msPos >= startMsPos)
+                        {
+                            if(msPos <= endMsPos)
+                            {
+                                mcdEnvelope.Add(pitchWheelValuesPerMsPosition[msPos]);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    mcd.SetPitchWheelSliderEnvelope(new Envelope(mcdEnvelope, 127));
+                }
+            }
+        }
         #endregion Envelopes
 
         /// <summary>

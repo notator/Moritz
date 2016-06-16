@@ -333,6 +333,29 @@ namespace Moritz.Spec
             UpperBound = finalUpperBound;
         }
 
+        /// <summary>
+        /// Returns a dictionary in which:
+        /// Key: one of the positions in msPositions,
+        /// Value: the envelope value at that msPosition.
+        /// </summary>
+        /// <param name="msPositions"></param>
+        /// <returns></returns>
+        internal Dictionary<int, int> GetValuePerMsPosition(List<int> msPositions)
+        {
+            Envelope envelope = Clone();
+            envelope.SetCount(msPositions.Count);
+            List<int> pitchWheelValues = envelope.Original;
+
+            Dictionary<int, int> pitchWheelValuesPerMsPosition = new Dictionary<int, int>();
+
+            for(int i = 0; i < msPositions.Count; ++i)
+            {
+                pitchWheelValuesPerMsPosition.Add(msPositions[i], pitchWheelValues[i]);
+            }
+
+            return pitchWheelValuesPerMsPosition;
+        }
+
         public List<int> Original
         {
             get
