@@ -318,6 +318,7 @@ namespace Moritz.Spec
 
         #region envelopes
         /// <summary>
+        /// This function does not change the MsDuration of the Block.
         /// See Envelope.TimeWarp() for a description of the arguments.
         /// </summary>
         /// <param name="envelope"></param>

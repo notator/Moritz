@@ -351,6 +351,66 @@ namespace Moritz.Spec
         }
 
         #region Envelopes
+        /// <summary>
+        /// This function does not change the MsDuration of the Seq.
+        /// See Envelope.TimeWarp() for a description of the arguments.
+        /// </summary>
+        /// <param name="envelope"></param>
+        /// <param name="distortion"></param>
+        public void TimeWarp(Envelope envelope, double distortion)
+        {
+            AssertSeqConsistency();
+            int originalMsDuration = MsDuration;
+
+            List<int> originalMsPositions = new List<int>();
+            #region get originalMsPositions 
+            foreach(Trk trk in _trks)
+            {
+                foreach(IUniqueDef iud in trk)
+                {
+                    int msPos = iud.MsPositionReFirstUD;
+                    if(!originalMsPositions.Contains(msPos))
+                    {
+                        originalMsPositions.Add(msPos);
+                    }
+                }
+                originalMsPositions.Sort();
+            }
+            originalMsPositions.Add(originalMsDuration);
+            #endregion get originalMsPositions
+
+            Dictionary<int, int> warpDict = new Dictionary<int, int>();
+            #region get warpDict
+            List<int> newMsPositions = envelope.TimeWarp(originalMsPositions, distortion);
+
+            for(int i = 0; i < newMsPositions.Count; ++i)
+            {
+                warpDict.Add(originalMsPositions[i], newMsPositions[i]);
+            }
+            #endregion get warpDict
+
+            foreach(Trk trk in _trks)
+            {
+                List<IUniqueDef> iuds = trk.UniqueDefs;
+                IUniqueDef iud = null;
+                int msPos = 0;
+                for(int i = 1; i < iuds.Count; ++i)
+                {
+                    iud = iuds[i - 1];
+                    msPos = warpDict[iud.MsPositionReFirstUD];
+                    iud.MsPositionReFirstUD = msPos;
+                    iud.MsDuration = warpDict[iuds[i].MsPositionReFirstUD] - msPos;
+                    msPos += iud.MsDuration;
+                }
+                iud = iuds[iuds.Count - 1];
+                iud.MsPositionReFirstUD = msPos;
+                iud.MsDuration = originalMsDuration - msPos;
+            }
+
+            Debug.Assert(originalMsDuration == MsDuration);
+
+            AssertSeqConsistency();
+        }
         #endregion Envelopes
 
         public IReadOnlyList<Trk> Trks { get { return _trks.AsReadOnly(); } }

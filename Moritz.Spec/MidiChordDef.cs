@@ -286,16 +286,22 @@ namespace Moritz.Spec
         }
 
         #region Sliders
-        public void SetPitchWheelSliderEnvelope(List<byte> envelope)
+        public void SetPitchWheelSliderEnvelope(Envelope envelope)
         {
+            #region condition
+            if(envelope.UpperBound != 127)
+            {
+                throw new ArgumentException($"{nameof(envelope.UpperBound)} must be 127.");
+            }
+            #endregion condition
             MidiChordSliderDefs mcsd = this.MidiChordSliderDefs;
             if(mcsd != null)
             {
-                mcsd.PitchWheelMsbs = envelope;
+                mcsd.PitchWheelMsbs = envelope.OriginalAsBytes;
             }
             else
             {
-                MidiChordSliderDefs = new MidiChordSliderDefs(envelope, null, null, null);
+                MidiChordSliderDefs = new MidiChordSliderDefs(envelope.OriginalAsBytes, null, null, null);
             }
         }
         #endregion Sliders
