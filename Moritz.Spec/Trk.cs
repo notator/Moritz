@@ -172,6 +172,10 @@ namespace Moritz.Spec
         #endregion Changing the Trk's duration
 
         #region Changing MidiChordDef attributes
+
+        #region Envelopes
+        #endregion Envelopes
+
         /// <summary>
         /// Multiplies each expression value in the MidiChordDefs
         /// from beginIndex to (not including) endIndex by the argument factor.
@@ -348,6 +352,7 @@ namespace Moritz.Spec
                 }
             }
         }
+
 		#region alignment
 		/// <summary>
 		/// _uniqueDefs[indexToAlign] is moved to toMsPosition, and the surrounding symbols are spread accordingly

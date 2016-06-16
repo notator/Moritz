@@ -226,7 +226,6 @@ namespace Moritz.Spec
             AssertSeqConsistency();
         }
 
-
         public void AlignTrkAxes()
         {
             List<int> indicesToAlign = new List<int>();
@@ -350,6 +349,9 @@ namespace Moritz.Spec
                 return (minMsPositionReContainer == 0);
             }
         }
+
+        #region Envelopes
+        #endregion Envelopes
 
         public IReadOnlyList<Trk> Trks { get { return _trks.AsReadOnly(); } }
         private List<Trk> _trks = new List<Trk>();

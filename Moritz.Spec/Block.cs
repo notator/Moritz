@@ -316,6 +316,7 @@ namespace Moritz.Spec
             #endregion
         }
 
+        #region envelopes
         /// <summary>
         /// See Envelope.TimeWarp() for a description of the arguments.
         /// </summary>
@@ -381,6 +382,7 @@ namespace Moritz.Spec
 
             AssertBlockConsistency();
         }
+        #endregion envelopes
 
         /// <summary>
         /// When this function returns, the block has been consumed, and is no longer usable.

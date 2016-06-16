@@ -247,10 +247,63 @@ namespace Moritz.Spec
         #endregion Clone
 
         #region Envelopes
+        /// <summary>
+        /// Changes the msPositions of the BasicMidiChordDefs without changing the length of the MidiChordDef. Has no effect on Sliders.
+        /// A Debug.Assertion fails if an attempt is made to set a BasicMidiChordDef.MsDuration less than _minimumBasicMidiChordMsDuration. 
+        /// See Envelope.TimeWarp() for a description of the arguments.
+        /// </summary>
+        /// <param name="envelope"></param>
+        /// <param name="distortion"></param>
+        public void TimeWarp(Envelope envelope, double distortion)
+        {
+            #region requirements
+            Debug.Assert(distortion >= 1);
+            Debug.Assert(BasicMidiChordDefs.Count > 0);
+            #endregion
+
+            int originalMsDuration = MsDuration;
+
+            List<int> originalPositions = new List<int>();
+            #region 1. create originalPositions
+            // originalPositions contains the msPositions of the BasicMidiChordDefs re the MidiChordDef
+            // plus the end msPosition of the final BasicMidiChordDef.
+            int msPos = 0;
+            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+            {
+                originalPositions.Add(msPos);
+                msPos += bmcd.MsDuration;
+            }
+            originalPositions.Add(msPos); // end position of duration to warp.
+            #endregion
+            List<int> newPositions = envelope.TimeWarp(originalPositions, distortion);
+
+            for(int i = 0; i < BasicMidiChordDefs.Count; ++i)
+            {
+                BasicMidiChordDef bmcd = BasicMidiChordDefs[i];
+                bmcd.MsDuration = newPositions[i + 1] - newPositions[i];
+                Debug.Assert(_minimumBasicMidiChordMsDuration > bmcd.MsDuration);
+            }
+        }
+
+        #region Sliders
+        public void SetPitchWheelSliderEnvelope(List<byte> envelope)
+        {
+            MidiChordSliderDefs mcsd = this.MidiChordSliderDefs;
+            if(mcsd != null)
+            {
+                mcsd.PitchWheelMsbs = envelope;
+            }
+            else
+            {
+                MidiChordSliderDefs = new MidiChordSliderDefs(envelope, null, null, null);
+            }
+        }
+        #endregion Sliders
+
         #region Ornaments
         /// <summary>
         /// Creats countArg BasicMidiChordDefs, having equal msDuration, in this MidiChordDef without changing its msDuration.
-        /// Each BasicMidiChordDef has a single pitch having velocity 127.
+        /// Each BasicMidiChordDef has a single pitch having velocity 127. Any existing BasicMidiChordDefs are deleted.
         /// The pitch is NotatedMidiPitches[0] + an interval found in the pitchHierarchy.
         /// The index of the interval is found using the envelope, and is in range [0..domainArg-1].
         /// Note that, since pitchHierarchy[0] is always 0, if domainArg==1 the pitch of all the BasicMidiChordDefs will be
@@ -322,58 +375,52 @@ namespace Moritz.Spec
             _ornamentNumberSymbol = countArg;
         }
         #endregion Ornaments
-        #region Sliders
-        public void SetPitchWheelSliderEnvelope(List<byte> envelope)
-        {
-            MidiChordSliderDefs mcsd = this.MidiChordSliderDefs;
-            if(mcsd != null)
-            {
-                mcsd.PitchWheelMsbs = envelope;
-            }
-            else
-            {
-                MidiChordSliderDefs = new MidiChordSliderDefs(envelope, null, null, null);
-            }
-        }
-        #endregion Sliders
 
+        // delete SetVerticalVelocityGradient?
+        #region SetVerticalVelocityGradient
         /// <summary>
-        /// Changes the msPositions of the BasicMidiChordDefs without chnaging the length of the MidiChordDef. Has no effect on Sliders.
-        /// A Debug.Assertion fails if an attempt is made to set a BasicMidiChordDef.MsDuration less than _minimumBasicMidiChordMsDuration. 
-        /// See Envelope.TimeWarp() for a description of the arguments.
+        /// The arguments are both in range [1..127].
+        /// This function changes the velocities in both the notated chord and the BasicChordDefs.
+        /// The velocities of the root and top notes in the chord are set to the argument values, and the other velocities
+        /// are interpolated linearly. 
         /// </summary>
-        /// <param name="envelope"></param>
-        /// <param name="distortion"></param>
-        public void TimeWarp(Envelope envelope, double distortion)
+        public void SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
         {
-            #region requirements
-            Debug.Assert(distortion >= 1);
-            Debug.Assert(BasicMidiChordDefs.Count > 0);
-            #endregion
+            #region conditions
+            Debug.Assert(rootVelocity > 0 && rootVelocity <= 127);
+            Debug.Assert(topVelocity > 0 && topVelocity <= 127);
+            #endregion conditions
 
-            int originalMsDuration = MsDuration;
+            double rootVelocityFactor = ((double)rootVelocity) / NotatedMidiVelocities[0];
+            double verticalVelocityFactor = ((double)topVelocity) / rootVelocity;
 
-            List<int> originalPositions = new List<int>();
-            #region 1. create originalPositions
-            // originalPositions contains the msPositions of the BasicMidiChordDefs re the MidiChordDef
-            // plus the end msPosition of the final BasicMidiChordDef.
-            int msPos = 0;
+            SetVelocities(NotatedMidiVelocities, rootVelocityFactor, verticalVelocityFactor);
+
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
-                    originalPositions.Add(msPos);
-                    msPos += bmcd.MsDuration;
-            }
-            originalPositions.Add(msPos); // end position of duration to warp.
-            #endregion
-            List<int> newPositions = envelope.TimeWarp(originalPositions, distortion);
-
-            for(int i = 0; i < BasicMidiChordDefs.Count; ++i)
-            {
-                BasicMidiChordDef bmcd = BasicMidiChordDefs[i];
-                bmcd.MsDuration = newPositions[i + 1] - newPositions[i];
-                Debug.Assert(_minimumBasicMidiChordMsDuration > bmcd.MsDuration);
+                SetVelocities(bmcd.Velocities, rootVelocityFactor, verticalVelocityFactor);
             }
         }
+        /// <summary>
+        /// Called by the above function
+        /// </summary>
+        private void SetVelocities(List<byte> velocities, double rootVelocityFactor, double verticalVelocityFactor)
+        {
+            if(velocities.Count > 1)
+            {
+                byte rootVelocity = M.MidiValue((int)(Math.Round(velocities[0] * rootVelocityFactor)));
+                byte topVelocity = M.MidiValue((int)(Math.Round(rootVelocity * verticalVelocityFactor)));
+                double increment = (((double)(topVelocity - rootVelocity)) / (velocities.Count - 1));
+                double newVelocity = rootVelocity;
+                for(int velocityIndex = 0; velocityIndex < velocities.Count; ++velocityIndex)
+                {
+                    velocities[velocityIndex] = M.MidiValue((int)Math.Round(newVelocity));
+                    newVelocity += increment;
+                }
+            }
+        }
+        #endregion SetVerticalVelocityGradient
+
         #endregion Envelopes
 
         #region Boulez addition (commented out)
@@ -659,50 +706,6 @@ namespace Moritz.Spec
 
         #endregion OrNotesExclusive
         #endregion GetNoteCombination() 
-
-        #region SetVerticalVelocityGradient
-        /// <summary>
-        /// The arguments are both in range [1..127].
-        /// This function changes the velocities in both the notated chord and the BasicChordDefs.
-        /// The velocities of the root and top notes in the chord are set to the argument values, and the other velocities
-        /// are interpolated linearly. 
-        /// </summary>
-        public void SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
-        {
-            #region conditions
-            Debug.Assert(rootVelocity > 0 && rootVelocity <= 127);
-            Debug.Assert(topVelocity > 0 && topVelocity <= 127);
-            #endregion conditions
-
-            double rootVelocityFactor = ((double)rootVelocity) / NotatedMidiVelocities[0];
-            double verticalVelocityFactor = ((double)topVelocity) / rootVelocity;
-
-            SetVelocities(NotatedMidiVelocities, rootVelocityFactor, verticalVelocityFactor);
-            
-            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
-            {
-                SetVelocities(bmcd.Velocities, rootVelocityFactor, verticalVelocityFactor);
-            }
-        }
-        /// <summary>
-        /// Called by the above function
-        /// </summary>
-        private void SetVelocities(List<byte> velocities, double rootVelocityFactor, double verticalVelocityFactor)
-        {
-            if(velocities.Count > 1)
-            {
-                byte rootVelocity = M.MidiValue((int)(Math.Round(velocities[0] * rootVelocityFactor)));
-                byte topVelocity = M.MidiValue((int)(Math.Round(rootVelocity * verticalVelocityFactor)));
-                double increment = (((double)(topVelocity - rootVelocity)) / (velocities.Count - 1));
-                double newVelocity = rootVelocity;
-                for(int velocityIndex = 0; velocityIndex < velocities.Count; ++velocityIndex)
-                {
-                    velocities[velocityIndex] = M.MidiValue((int)Math.Round(newVelocity));
-                    newVelocity += increment;
-                }
-            }
-        }
-        #endregion SetVerticalVelocityGradient
 
         #region SetVelocityPerAbsolutePitch
         /// <summary>

@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Xml;
 using System.Diagnostics;
-
-using Krystals4ObjectLibrary;
 using Moritz.Globals;
 
 namespace Moritz.Spec
@@ -64,6 +62,9 @@ namespace Moritz.Spec
 
             w.WriteEndElement();
         }
+
+        #region Envelopes
+        #endregion Envelopes
 
         public override string ToString() => $"BasicMidiChordDef: MsDuration={MsDuration.ToString()} BasePitch={Pitches[0]} ";
 

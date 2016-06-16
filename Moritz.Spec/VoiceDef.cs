@@ -622,49 +622,6 @@ namespace Moritz.Spec
 		private int _msPosition = 0;
 
         /// <summary>
-        /// See Envelope.TimeWarp() for a description of the arguments.
-        /// </summary>
-        /// <param name="envelope"></param>
-        /// <param name="distortion"></param>
-        public void TimeWarp(Envelope envelope, double distortion)
-        {
-            #region requirements
-            Debug.Assert(distortion >= 1);
-            Debug.Assert(_uniqueDefs.Count > 0);
-            #endregion
-
-            int originalMsDuration = MsDuration;
-
-            #region 1. create a List of ints containing the msPositions of the DurationDefs plus the end msPosition of the final DurationDef.
-            List<DurationDef> durationDefs = new List<DurationDef>();
-            List<int> originalPositions = new List<int>();
-            int msPos = 0;
-            foreach(IUniqueDef iud in UniqueDefs)
-            {
-                DurationDef dd = iud as DurationDef;
-                if(dd != null)
-                {
-                    durationDefs.Add(dd);
-                    originalPositions.Add(msPos);
-                    msPos += dd.MsDuration;
-                }
-            }
-            originalPositions.Add(msPos); // end position of duration to warp.
-            #endregion
-            List<int> newPositions = envelope.TimeWarp(originalPositions, distortion);
-
-            for(int i = 0; i < durationDefs.Count; ++i)
-            {
-                DurationDef dd = durationDefs[i];
-                dd.MsDuration = newPositions[i+1] - newPositions[i]; 
-            }
-
-            SetMsPositionsReFirstUD();
-
-            AssertVoiceDefConsistency();
-        }
-
-        /// <summary>
         /// Setting this property stretches or compresses all the durations in the UniqueDefs list to fit the given total duration.
         /// This does not change the VoiceDef's MsPosition, but does affect its EndMsPosition.
         /// See also EndMsPosition.set.
@@ -769,6 +726,52 @@ namespace Moritz.Spec
             return nNonMidiChordDefs;
         }
 
+        #region Envelopes
+        /// <summary>
+        /// See Envelope.TimeWarp() for a description of the arguments.
+        /// </summary>
+        /// <param name="envelope"></param>
+        /// <param name="distortion"></param>
+        public void TimeWarp(Envelope envelope, double distortion)
+        {
+            #region requirements
+            Debug.Assert(distortion >= 1);
+            Debug.Assert(_uniqueDefs.Count > 0);
+            #endregion
+
+            int originalMsDuration = MsDuration;
+
+            #region 1. create a List of ints containing the msPositions of the DurationDefs plus the end msPosition of the final DurationDef.
+            List<DurationDef> durationDefs = new List<DurationDef>();
+            List<int> originalPositions = new List<int>();
+            int msPos = 0;
+            foreach(IUniqueDef iud in UniqueDefs)
+            {
+                DurationDef dd = iud as DurationDef;
+                if(dd != null)
+                {
+                    durationDefs.Add(dd);
+                    originalPositions.Add(msPos);
+                    msPos += dd.MsDuration;
+                }
+            }
+            originalPositions.Add(msPos); // end position of duration to warp.
+            #endregion
+            List<int> newPositions = envelope.TimeWarp(originalPositions, distortion);
+
+            for(int i = 0; i < durationDefs.Count; ++i)
+            {
+                DurationDef dd = durationDefs[i];
+                dd.MsDuration = newPositions[i + 1] - newPositions[i];
+            }
+
+            SetMsPositionsReFirstUD();
+
+            AssertVoiceDefConsistency();
+        }
+        #endregion Envelopes
+
+        #region Transpose
         /// <summary>
         /// Transpose all the IUniqueChordDefs from beginIndex to (not including) endIndex
         /// up by the number of semitones given in the interval argument.
@@ -879,6 +882,7 @@ namespace Moritz.Spec
                 }
             }
         }
+        #endregion Transpose
 
         #endregion  public attribute changers (Transpose etc.)
 
