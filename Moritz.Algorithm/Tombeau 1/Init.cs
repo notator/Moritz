@@ -125,8 +125,8 @@ namespace Moritz.Algorithm.Tombeau1
                 List<MidiChordDef> pwmcds = GetPitchWheelCoreMidiChordDefs(envList);
                 PitchWheelCoreMidiChordDefs.Add(pwmcds);
 
-                PitchMode pitchMode = new PitchMode(cphIndex++, 8, 7);
-                List<MidiChordDef> omcds = GetOrnamentCoreMidiChordDefs(envList, pitchMode.Gamut);
+                Gamut gamut = new Gamut(cphIndex++, 8, 7);
+                List<MidiChordDef> omcds = GetOrnamentCoreMidiChordDefs(envList, gamut);
                 OrnamentCoreMidiChordDefs.Add(omcds);
             }
 

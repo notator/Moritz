@@ -340,14 +340,12 @@ namespace Moritz.Spec
             #endregion conditions
 
             byte notatedPitch = this.NotatedMidiPitches[0];
-            List<int> gamutList = gamutArg.AsList;
 
-            #region get gamut containing octaves of notatedPitch
-            if(!gamutList.Contains(notatedPitch))
-            {
-                gamutList = Gamut.InsertOctaves(gamutList, notatedPitch);
-            }
-            #endregion get gamut containing octaves of notatedPitch
+            Gamut gamut = gamutArg.Clone();
+
+            gamut.AddOctaves(notatedPitch); // only adds the octaves that are not already there.
+
+            List<int> gamutList = gamut.AsList;
 
             envelope = envelope.Clone();
             envelope.SetCount(countArg);
