@@ -246,7 +246,7 @@ namespace Moritz.Spec
         }
         #endregion Clone
 
-        #region Envelopes
+        #region Functions that use Envelopes
         /// <summary>
         /// Changes the msPositions of the BasicMidiChordDefs without changing the length of the MidiChordDef. Has no effect on Sliders.
         /// A Debug.Assertion fails if an attempt is made to set a BasicMidiChordDef.MsDuration less than _minimumBasicMidiChordMsDuration. 
@@ -310,68 +310,75 @@ namespace Moritz.Spec
         /// <summary>
         /// Creats countArg BasicMidiChordDefs, having equal msDuration, in this MidiChordDef without changing its msDuration.
         /// Each BasicMidiChordDef has a single pitch having velocity 127. Any existing BasicMidiChordDefs are deleted.
-        /// The pitch is NotatedMidiPitches[0] + an interval found in the pitchHierarchy.
-        /// The index of the interval is found using the envelope, and is in range [0..domainArg-1].
-        /// Note that, since pitchHierarchy[0] is always 0, if domainArg==1 the pitch of all the BasicMidiChordDefs will be
-        /// NotatedMidiPitches[0]. domainArg is the number of possibly different pitches in the result. 
+        /// The gamut argument contains all the pitches that are available as base pitches for the new ornaments.
+        /// If NotatedMidiPitches[0] is not in gamut, all its octaves are added to the gamut before calculating the ornament.
+        /// pitchRange is the number of pitches in gamut equivalent to the range [0..envelope.UpperBound]. 
+        /// The index of each pitch in gamut is found using NotatedMidiPitches[0] and the envelope.
+        /// Attempts to index before the beginning of gamut result in pitch=0.
+        /// Attempts to index beyond the end of gamut result in pitch=127.
+        /// Note that if pitchRange is 1, the pitch of all the BasicMidiChordDefs will be NotatedMidiPitches[0]. 
         /// </summary>
         /// <param name="envelope"></param>
-        /// <param name="pitchHierarchy">One of the standard hierarchies (e.g. in circularPitchHierarchies)</param>
         /// <param name="countArg">The number of BasicMidiChordDefs to create.</param>
-        /// <param name="domainArg">Less than or equal to pitchHierarchy.Count</param>
-        public void SetOrnament(Envelope envelope, List<int> pitchHierarchy, int countArg, int domainArg)
+        /// <param name="pitchRange">The number of pitches equivalent to the range [0..envelope.UpperBound].</param>
+        /// <param name="gamutArg">All the available absolute pitches. (see Mode.Gamut)</param>
+        public void SetOrnament(Envelope envelope, int countArg, int pitchRange, Gamut gamutArg)
         {
             #region conditions
             if(countArg < 1)
             {
                 throw new ArgumentException($"{nameof(countArg)} cannot be less than 1.");
             }
-            if(domainArg < 1)
+            if(pitchRange < 1)
             {
-                throw new ArgumentException($"{nameof(domainArg)} cannot be less than 1.");
-            }
-            if(domainArg > pitchHierarchy.Count)
-            {
-                throw new ArgumentException($"{nameof(domainArg)} cannot be greater than {nameof(pitchHierarchy)}.Count.");
+                throw new ArgumentException($"{nameof(pitchRange)} cannot be less than 1.");
             }
             if(NotatedMidiPitches.Count != 1)
             {
                 throw new ArgumentException($"{nameof(NotatedMidiPitches)} must contain exactly one pitch.");
             }
             #endregion conditions
- 
-            List<int> availableRelativePitches = new List<int>(); // the (sorted) first domainArg relativePitches in pitchHierarchy 
-            List<int> envelopeIndices = null; // an envelope of indices in availableRelativePitches
 
-            #region get availableRelativePitches and envelopeIndices 
-            List<int> availableRelativePitches1 = new List<int>();
-            for(int i = 0; i < domainArg; ++i)
+            byte notatedPitch = this.NotatedMidiPitches[0];
+            List<int> gamutList = gamutArg.AsList;
+
+            #region get gamut containing octaves of notatedPitch
+            if(!gamutList.Contains(notatedPitch))
             {
-                availableRelativePitches1.Add(pitchHierarchy[i]);
+                gamutList = Gamut.InsertOctaves(gamutList, notatedPitch);
             }
-            availableRelativePitches1.Sort();
-            for(int i = 1; i < domainArg; ++i)
-            {
-                availableRelativePitches.Add(availableRelativePitches1[i] - 12);
-            }
-            availableRelativePitches.AddRange(availableRelativePitches1);
-            Debug.Assert(availableRelativePitches.Count == (domainArg * 2) - 1);
+            #endregion get gamut containing octaves of notatedPitch
 
             envelope = envelope.Clone();
             envelope.SetCount(countArg);
-            envelope.WarpVertically(availableRelativePitches.Count - 1);
-            envelopeIndices = envelope.Original;
+            envelope.WarpVertically(pitchRange);
+            List<int> envelopeIndices = envelope.Original;
 
-            #endregion get availableRelativePitches and envelopeIndices 
-
-            byte basePitch = this.NotatedMidiPitches[0];
+            int baseIndex = gamutList.IndexOf(notatedPitch);
+            int indexShift = baseIndex - envelopeIndices[0];
+            for(int i = 0; i < envelopeIndices.Count; ++i )
+            {
+                envelopeIndices[i] += indexShift;
+            }
             int msDuration = this.MsDuration;
+            byte pitch = 0;
             BasicMidiChordDefs.Clear();
             List<byte> pitches = new List<byte>() { 0 };
             List<byte> velocities = new List<byte>() { 127 };
             foreach(int i in envelopeIndices)
             {
-                byte pitch = M.MidiValue(basePitch + availableRelativePitches[i]);
+                if(i < 0)
+                {
+                    pitch = 0;
+                }
+                else if(i >= gamutList.Count)
+                {
+                    pitch = 127;
+                }
+                else
+                {
+                    pitch = (byte)gamutList[i];
+                }
                 pitches[0] = pitch;
                 BasicMidiChordDef bmcd = new BasicMidiChordDef(1000, null, null, true, pitches, velocities);
                 BasicMidiChordDefs.Add(bmcd);
@@ -380,6 +387,7 @@ namespace Moritz.Spec
 
             _ornamentNumberSymbol = countArg;
         }
+
         #endregion Ornaments
 
         // delete SetVerticalVelocityGradient?
@@ -427,7 +435,7 @@ namespace Moritz.Spec
         }
         #endregion SetVerticalVelocityGradient
 
-        #endregion Envelopes
+        #endregion Functions that use Envelopes
 
         #region Boulez addition (commented out)
         //      /// <summary>

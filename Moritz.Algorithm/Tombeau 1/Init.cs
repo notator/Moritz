@@ -124,7 +124,9 @@ namespace Moritz.Algorithm.Tombeau1
             {
                 List<MidiChordDef> pwmcds = GetPitchWheelCoreMidiChordDefs(envList);
                 PitchWheelCoreMidiChordDefs.Add(pwmcds);
-                List<MidiChordDef> omcds = GetOrnamentCoreMidiChordDefs(envList, circularPitchHierarchies[cphIndex++]);
+
+                PitchMode pitchMode = new PitchMode(cphIndex++, 8, 7);
+                List<MidiChordDef> omcds = GetOrnamentCoreMidiChordDefs(envList, pitchMode.Gamut);
                 OrnamentCoreMidiChordDefs.Add(omcds);
             }
 
@@ -146,14 +148,15 @@ namespace Moritz.Algorithm.Tombeau1
             return rval;
         }
 
-        private List<MidiChordDef> GetOrnamentCoreMidiChordDefs(List<List<byte>> envList, List<int> circularPitchHierarchy)
+        private List<MidiChordDef> GetOrnamentCoreMidiChordDefs(List<List<byte>> envList, Gamut gamut)
         {
             List<MidiChordDef> rval = new List<MidiChordDef>();
+
             foreach(List<byte> envelope in envList)
             {
                 MidiChordDef mcd = new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 127 }, 1000, true);
-                mcd.SetOrnament(new Envelope(envelope, 127), circularPitchHierarchy, 10, 8);
-                mcd.TimeWarp(new Envelope(new List<byte>() { 127, 0 }, 127), 16);
+                mcd.SetOrnament(new Envelope(envelope, 127), 10, 24, gamut);
+                mcd.TimeWarp(new Envelope(new List<byte>() { 127, 64,127 }, 127), 16);
                 rval.Add(mcd);
             }
             return rval;
