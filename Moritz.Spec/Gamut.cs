@@ -10,17 +10,36 @@ namespace Moritz.Spec
     public class Gamut
     {
         #region constructors
+
         /// <summary>
-        /// Sets Gamut to contain a list of absolute pitches in an ascending order scale.
-        /// Gamut.AsList[0] == basePitch. All the values are different. The final value is less than or equal to 127.
-        /// This constructor creates the pitches in each octave above the basePitch by adding 12 to the previous octave's pitches.
+        /// A Gamut contains/is a list of absolute pitch numbers in an ascending order scale.
+        /// All the values are different and in range [0..127].
+        /// The Gamut usually spans all midi octaves, but does not include all the pitches in that range.
+        /// Each octave above the base pitch (at Gamut.List[0]) can contain the same absolute pitches,
+        /// but this is not necessarily the case.
         /// Pitches can be added to the Gamut later by calling AddPitches(...) or AddOctaves(...).
-        /// Absolute pitches often exist in each octave (as happens with this constructor), but this is not necessarily the case.
-        /// To create a Gamut whose AsList can be easily transposed, create one using basePitch==0.
         /// </summary>
-        /// <param name="index">The index of the relativePitchHierarchy in the static list. (Range [0..21]</param>
-        /// <param name="nPitchesPerOctave">The number of different pitches in each octave in the Mode. (Range [1..12])</param>
-        /// <param name="basePitch">The basePitch of the PitchMode's Gamut. (Range [0..11])</param>
+        /// <param name="list">A valid gamut list (see summary)</param>
+        public Gamut(List<int> list)
+        {
+            #region conditions
+            ThrowExceptionIfGamutListIsInvalid(list);
+            #endregion conditions
+
+            _list = new List<int>(list);
+        }
+
+        /// <summary>
+        /// A Gamut contains/is a list of absolute pitch numbers in an ascending order scale.
+        /// All the values are different and in range [0..127].
+        /// This constructor uses its arguments to create a Gamut in which:
+        /// 1. Gamut.List[0] == basePitch (restricted to range [0..11]).
+        /// 2. Each octave above the base pitch contains the same absolute pitches.
+        /// 3. Gamut.List contains as many pitches as possible using the defined relativePitchHierarchy.
+        /// </summary>
+        /// <param name="index">The index in the static relativePitchHierarchies list. (Range [0..21]</param>
+        /// <param name="nPitchesPerOctave">The number of different pitches in each octave. (Range [1..12])</param>
+        /// <param name="basePitch">The Gamut's lowest pitch. (Range [0..11])</param>
         public Gamut(int index, int nPitchesPerOctave, int basePitch)
         {
             #region conditions
@@ -45,14 +64,9 @@ namespace Moritz.Spec
             #endregion conditions
 
             List<int> rph = relativePitchHierarchies[index];
-            for(int i = 0; i < nPitchesPerOctave; ++i)
-            {
-                _relativePitchHierarchy.Add(rph[i]);
-            }
+            List<int> sortedBasePitches = SortedBasePitches(basePitch, rph);
 
-            List<int> sortedBasePitches = SortedBasePitches(basePitch);
-
-            _gamutList = new List<int>();
+            _list = new List<int>();
             int rphIndex = 0;
             int octave = 0;
             while(true)
@@ -62,7 +76,7 @@ namespace Moritz.Spec
                 {
                     break;
                 }
-                _gamutList.Add(pitch);
+                _list.Add(pitch);
 
                 if(rphIndex >= sortedBasePitches.Count)
                 {
@@ -71,115 +85,8 @@ namespace Moritz.Spec
                 }
             }
 
-            ThrowExceptionIfGamutListIsInvalid(_gamutList);
+            ThrowExceptionIfGamutListIsInvalid(_list);
         }
-
-        /// <summary>
-        /// Private constructor, used by Clone()
-        /// A Gamut contains/is a list of absolute pitch numbers in an ascending order scale.
-        /// It usually spans all midi octaves, but does not include all the pitches in that range.
-        /// All the values are different and in range [0..127]. The final value is less than or equal to 127.
-        /// The octaves often contain similar pitches, but this is not necessarily the case.
-        /// </summary>
-        /// <param name="gamutList"></param>
-        /// <param name="relativePitchHierarchy">Can be null</param>
-        private Gamut(List<int> gamutList, List<int> relativePitchHierarchy)
-        {
-            #region conditions
-            ThrowExceptionIfGamutListIsInvalid(gamutList);
-            ThrowExceptionIfRelativePitchHierarchyIsInvalid(relativePitchHierarchy, -1);
-            #endregion conditions
-
-            _gamutList = new List<int>(gamutList);
-            if(relativePitchHierarchy != null)
-            {
-                _relativePitchHierarchy = new List<int>(relativePitchHierarchy);
-            }
-        }
-        #endregion constructors
-
-        #region public functions
-
-        public Gamut Clone()
-        {
-            return new Gamut(_gamutList, _relativePitchHierarchy);
-        }
-
-        /// <summary>
-        /// Adds all the pitches that are pitchArg or octaves thereof.
-        /// Only adds the octaves that are not already there.
-        /// </summary>
-        /// <param name="pitchArg">in range [0..127]</param>
-        public void AddOctaves(int pitchArg)
-        {
-            #region conditions
-            if(pitchArg < 0 || pitchArg > 127)
-            {
-                throw new ArgumentNullException($"{nameof(pitchArg)} must be in range [0..127].");
-            }
-            #endregion conditions
-
-            int pitch = pitchArg % 12;
-            List<int> newPitches = new List<int>();
-            while(pitch <= 127)
-            {
-                newPitches.Add(pitch);
-                pitch += 12;
-            }
-
-            AddPitches(newPitches);
-        }
-
-        /// <summary>
-        /// The pitchList can contain values in range [0..127] in any order.
-        /// If a value is already present in the Gamut, it will be silently ignored.
-        /// Otherwise it will be added to the Gamut's private list at the correct position.
-        /// </summary>
-        /// <param name="pitchList"></param>
-        public void AddPitches(List<int> pitchList)
-        {
-            #region conditions
-            foreach(int pitch in pitchList)
-            {
-                if(pitch < 0 || pitch > 127)
-                {
-                    throw new ArgumentNullException($"{nameof(pitchList)} can only contain values in the range [0..127].");
-                }
-            }
-            #endregion conditions
-            int plIndex = 0;
-            while( plIndex < pitchList.Count)
-            {
-                int newPitch = pitchList[plIndex];
-                if(_gamutList.Contains(newPitch))
-                {
-                    plIndex++;
-                }
-                else
-                {
-                    if(newPitch > _gamutList[_gamutList.Count - 1])
-                    {
-                        _gamutList.Add(newPitch);
-                        plIndex++;
-                    }
-                    else
-                    {
-                        for(int i = 0; i < _gamutList.Count; ++i)
-                        {
-                            if(_gamutList[i] > newPitch)
-                            {
-                                _gamutList.Insert(i, newPitch);
-                                plIndex++;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            ThrowExceptionIfGamutListIsInvalid(_gamutList);
-        }
-        #endregion public functions
 
         #region private helper functions
         /// <summary>
@@ -203,7 +110,7 @@ namespace Moritz.Spec
             string errorSource;
             if(index >= 0)
             {
-                errorSource = $"static {nameof(relativePitchHierarchies)}[{index}]."; 
+                errorSource = $"static {nameof(relativePitchHierarchies)}[{index}].";
             }
             else
             {
@@ -261,9 +168,9 @@ namespace Moritz.Spec
         /// The first value in the returned list is the basePitch.
         /// </summary>
         /// <param name="basePitch">In range [0..11]</param>
-        private List<int> SortedBasePitches(int basePitch)
+        private List<int> SortedBasePitches(int basePitch, List<int> relativePitchHierarchy)
         {
-            List<int> rval = RelativePitchHierarchy; // a clone
+            List<int> rval = new List<int>(relativePitchHierarchy); // a clone
             rval.Sort();
             for(int i = 0; i < rval.Count; ++i)
             {
@@ -274,22 +181,98 @@ namespace Moritz.Spec
         }
         #endregion private helper functions
 
-        #region properties
-        public int NumberOfPitchesPerOctave { get { return _relativePitchHierarchy.Count; } }
-        /// <summary>
-        ///  A clone of the private list.
-        /// </summary>
-        public List<int> RelativePitchHierarchy { get { return new List<int>(_relativePitchHierarchy); } }
-        /// <summary>
-        /// A clone of one the static relativePitchHierarchies, truncated to the number of pitches per octave.
-        /// </summary>
-        private List<int> _relativePitchHierarchy = new List<int>();
+        #endregion constructors
 
+        #region public functions
+
+        public Gamut Clone()
+        {
+            return new Gamut(_list);
+        }
+
+        /// <summary>
+        /// Adds all the pitches that are pitchArg or octaves thereof.
+        /// Only adds the octaves that are not already there.
+        /// </summary>
+        /// <param name="pitchArg">in range [0..127]</param>
+        public void AddOctaves(int pitchArg)
+        {
+            #region conditions
+            if(pitchArg < 0 || pitchArg > 127)
+            {
+                throw new ArgumentNullException($"{nameof(pitchArg)} must be in range [0..127].");
+            }
+            #endregion conditions
+
+            int pitch = pitchArg % 12;
+            List<int> newPitches = new List<int>();
+            while(pitch <= 127)
+            {
+                newPitches.Add(pitch);
+                pitch += 12;
+            }
+
+            AddPitches(newPitches);
+        }
+
+        /// <summary>
+        /// The pitchList can contain values in range [0..127] in any order.
+        /// If a value is already present in the Gamut, it will be silently ignored.
+        /// Otherwise it will be added to the Gamut's private list at the correct position.
+        /// </summary>
+        /// <param name="pitchList"></param>
+        public void AddPitches(List<int> pitchList)
+        {
+            #region conditions
+            foreach(int pitch in pitchList)
+            {
+                if(pitch < 0 || pitch > 127)
+                {
+                    throw new ArgumentNullException($"{nameof(pitchList)} can only contain values in the range [0..127].");
+                }
+            }
+            #endregion conditions
+            int plIndex = 0;
+            while( plIndex < pitchList.Count)
+            {
+                int newPitch = pitchList[plIndex];
+                if(_list.Contains(newPitch))
+                {
+                    plIndex++;
+                }
+                else
+                {
+                    if(newPitch > _list[_list.Count - 1])
+                    {
+                        _list.Add(newPitch);
+                        plIndex++;
+                    }
+                    else
+                    {
+                        for(int i = 0; i < _list.Count; ++i)
+                        {
+                            if(_list[i] > newPitch)
+                            {
+                                _list.Insert(i, newPitch);
+                                plIndex++;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            ThrowExceptionIfGamutListIsInvalid(_list);
+        }
+        #endregion public functions
+
+        #region properties
         /// <summary>
         /// A clone of the private list.
         /// </summary>
-        public List<int> AsList { get { return new List<int>(_gamutList); } }
-        private List<int> _gamutList;
+        public List<int> List { get { return new List<int>(_list); } }
+
+        private List<int> _list;
         #endregion properties
 
         #region static relativePitchHierarchies 

@@ -345,7 +345,7 @@ namespace Moritz.Spec
 
             gamut.AddOctaves(notatedPitch); // only adds the octaves that are not already there.
 
-            List<int> gamutList = gamut.AsList;
+            List<int> gamutList = gamut.List; // a clone of the list.
 
             envelope = envelope.Clone();
             envelope.SetCount(countArg);
