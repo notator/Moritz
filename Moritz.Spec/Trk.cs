@@ -178,9 +178,9 @@ namespace Moritz.Spec
         public void SetPitchWheelSliderEnvelope(Envelope envelope)
         {
             #region condition
-            if(envelope.UpperBound != 127)
+            if(envelope.Domain != 127)
             {
-                throw new ArgumentException($"{nameof(envelope.UpperBound)} must be 127.");
+                throw new ArgumentException($"{nameof(envelope.Domain)} must be 127.");
             }
             #endregion condition
 
@@ -232,7 +232,7 @@ namespace Moritz.Spec
                             }
                         }
                     }
-                    mcd.SetPitchWheelSliderEnvelope(new Envelope(mcdEnvelope, 127));
+                    mcd.SetPitchWheelSliderEnvelope(new Envelope(mcdEnvelope, 127, 127, mcdEnvelope.Count));
                 }
             }
         }

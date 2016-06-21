@@ -142,7 +142,7 @@ namespace Moritz.Algorithm.Tombeau1
             foreach(List<byte> envelope in envList)
             {
                 MidiChordDef mcd = new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 127 }, 1000, true);
-                mcd.SetPitchWheelSliderEnvelope(new Envelope(envelope, 127));
+                mcd.SetPitchWheelSliderEnvelope(new Envelope(envelope, 127, 127, envelope.Count));
                 rval.Add(mcd);
             }
             return rval;
@@ -154,9 +154,27 @@ namespace Moritz.Algorithm.Tombeau1
 
             foreach(List<byte> envelope in envList)
             {
-                MidiChordDef mcd = new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 127 }, 1000, true);
-                mcd.SetOrnament(new Envelope(envelope, 127), 10, 24, gamut);
-                mcd.TimeWarp(new Envelope(new List<byte>() { 127, 64,127 }, 127), 16);
+                Envelope env = new Envelope(envelope, 127, 0, 1);
+                List<int> basicMidiChordRootPitches = null;
+
+                int firstPitch = 60;
+                if(gamut.IndexOf(firstPitch) >= 0)
+                {
+                    basicMidiChordRootPitches = gamut.PitchSequence(firstPitch, env);
+                }
+                else
+                {
+                    basicMidiChordRootPitches = new List<int>() { firstPitch };
+                }
+
+                MidiChordDef mcd = new MidiChordDef(1000, basicMidiChordRootPitches);
+
+                if(basicMidiChordRootPitches.Count > 1)
+                {
+                    Envelope timeWarpEnvelope = new Envelope(new List<byte>() { 127, 64, 127 }, 127, 127, 3);
+                    mcd.TimeWarp(timeWarpEnvelope, 16);
+                }
+
                 rval.Add(mcd);
             }
             return rval;
@@ -167,7 +185,9 @@ namespace Moritz.Algorithm.Tombeau1
         {
             Block block = GetBlockFromMidiChordDefLists(pitchWheelCoreMidiChordDefs);
 
-            block.SetPitchWheelSliderEnvelope(new Envelope(new List<byte>() { 0, 127 }, 127));
+            Envelope envelope = new Envelope(new List<byte>() { 0, 127 }, 127, 127, 2);
+
+            block.SetPitchWheelSliderEnvelope(envelope);
 
             Block block2 = GetBlockFromMidiChordDefLists(ornamentCoreMidiChordDefs);
 

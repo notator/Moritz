@@ -130,6 +130,35 @@ namespace Moritz.Spec
         }
 
         /// <summary>
+        /// A MidiChordDef having msDuration, and containing an ornament having single-note BasicMidiChordDefs.
+        /// The notated pitch is set to bmcdRootPitches[0]. The notated velocity is set to 127.
+        /// The pitches of the BasicMidiChordDefs are set to bmcdRootPitches, their velocities are set to 127.
+        /// Their durations are as equal as possible, to give the overall msDuration.
+        /// The MidiChordDef has a ChordOff.
+        /// </summary>
+        /// <param name="msDuration">The duration of this MidiChordDef</param>
+        /// <param name="bmcdRootPitches">The root pitches of the BasicMidiChordDefs sequence.</param>
+        public MidiChordDef(int msDuration, List<int> bmcdRootPitches)
+            :this(new List<byte>() { (byte) bmcdRootPitches[0] }, new List<byte>() { 127 }, msDuration, true) 
+        {
+            BasicMidiChordDefs.Clear();
+            List<byte> pitches = new List<byte>() { 0 };
+            List<byte> velocities = new List<byte>() { 127 };
+            foreach(int rootPitch in bmcdRootPitches)
+            {
+                pitches[0] = (byte)rootPitch;
+                BasicMidiChordDef bmcd = new BasicMidiChordDef(1000, null, null, true, pitches, velocities);
+                BasicMidiChordDefs.Add(bmcd);
+            }
+            this.MsDuration = msDuration; // resets the BasicMidiChordDef msDurations.
+
+            if(bmcdRootPitches.Count > 1)
+            {
+                _ornamentNumberSymbol = bmcdRootPitches.Count;
+            }
+        }
+
+        /// <summary>
         /// Constructor used when creating a list of DurationDef templates from a Palette.
         /// The palette has created new values for all the arguments, so this constructor simply transfers
         /// those values to the new MidiChordDef. MsPositionReFirstIUD is set to 0, lyric is set to null.
@@ -249,6 +278,7 @@ namespace Moritz.Spec
         #region Functions that use Envelopes
         /// <summary>
         /// Changes the msPositions of the BasicMidiChordDefs without changing the length of the MidiChordDef. Has no effect on Sliders.
+        /// ArgumentExceptions are thrown if BasicMidiChordDefs.Count==0 or distortion is less than 1.
         /// A Debug.Assertion fails if an attempt is made to set a BasicMidiChordDef.MsDuration less than _minimumBasicMidiChordMsDuration. 
         /// See Envelope.TimeWarp() for a description of the arguments.
         /// </summary>
@@ -256,10 +286,16 @@ namespace Moritz.Spec
         /// <param name="distortion"></param>
         public void TimeWarp(Envelope envelope, double distortion)
         {
-            #region requirements
-            Debug.Assert(distortion >= 1);
-            Debug.Assert(BasicMidiChordDefs.Count > 0);
-            #endregion
+            #region conditions
+            if(BasicMidiChordDefs.Count == 0)
+            {
+                throw new ArgumentException($"{nameof(BasicMidiChordDefs)}.Count must be greater than 0.");
+            }
+            if(distortion < 1)
+            {
+                throw new ArgumentException($"{nameof(distortion)} may not be less than 1.");
+            }
+            #endregion conditions
 
             int originalMsDuration = MsDuration;
 
@@ -289,9 +325,9 @@ namespace Moritz.Spec
         public void SetPitchWheelSliderEnvelope(Envelope envelope)
         {
             #region condition
-            if(envelope.UpperBound != 127)
+            if(envelope.Domain != 127)
             {
-                throw new ArgumentException($"{nameof(envelope.UpperBound)} must be 127.");
+                throw new ArgumentException($"{nameof(envelope.Domain)} must be 127.");
             }
             #endregion condition
             MidiChordSliderDefs mcsd = this.MidiChordSliderDefs;
@@ -305,88 +341,6 @@ namespace Moritz.Spec
             }
         }
         #endregion Sliders
-
-        #region Ornaments
-        /// <summary>
-        /// Creats countArg BasicMidiChordDefs, having equal msDuration, in this MidiChordDef without changing its msDuration.
-        /// Each BasicMidiChordDef has a single pitch having velocity 127. Any existing BasicMidiChordDefs are deleted.
-        /// The gamut argument contains all the pitches that are available as base pitches for the new ornaments.
-        /// If NotatedMidiPitches[0] is not in gamut, all its octaves are added to the gamut before calculating the ornament.
-        /// pitchRange is the number of pitches in gamut equivalent to the range [0..envelope.UpperBound]. 
-        /// The index of each pitch in gamut is found using NotatedMidiPitches[0] and the envelope.
-        /// Attempts to index before the beginning of gamut result in pitch=0.
-        /// Attempts to index beyond the end of gamut result in pitch=127.
-        /// Note that if pitchRange is 1, the pitch of all the BasicMidiChordDefs will be NotatedMidiPitches[0]. 
-        /// </summary>
-        /// <param name="envelope"></param>
-        /// <param name="countArg">The number of BasicMidiChordDefs to create.</param>
-        /// <param name="pitchRange">The number of pitches equivalent to the range [0..envelope.UpperBound].</param>
-        /// <param name="gamutArg">All the available absolute pitches. (see Mode.Gamut)</param>
-        public void SetOrnament(Envelope envelope, int countArg, int pitchRange, Gamut gamutArg)
-        {
-            #region conditions
-            if(countArg < 1)
-            {
-                throw new ArgumentException($"{nameof(countArg)} cannot be less than 1.");
-            }
-            if(pitchRange < 1)
-            {
-                throw new ArgumentException($"{nameof(pitchRange)} cannot be less than 1.");
-            }
-            if(NotatedMidiPitches.Count != 1)
-            {
-                throw new ArgumentException($"{nameof(NotatedMidiPitches)} must contain exactly one pitch.");
-            }
-            #endregion conditions
-
-            byte notatedPitch = this.NotatedMidiPitches[0];
-
-            Gamut gamut = gamutArg.Clone();
-
-            gamut.AddOctaves(notatedPitch); // only adds the octaves that are not already there.
-
-            List<int> gamutList = gamut.List; // a clone of the list.
-
-            envelope = envelope.Clone();
-            envelope.SetCount(countArg);
-            envelope.WarpVertically(pitchRange);
-            List<int> envelopeIndices = envelope.Original;
-
-            int baseIndex = gamutList.IndexOf(notatedPitch);
-            int indexShift = baseIndex - envelopeIndices[0];
-            for(int i = 0; i < envelopeIndices.Count; ++i )
-            {
-                envelopeIndices[i] += indexShift;
-            }
-            int msDuration = this.MsDuration;
-            byte pitch = 0;
-            BasicMidiChordDefs.Clear();
-            List<byte> pitches = new List<byte>() { 0 };
-            List<byte> velocities = new List<byte>() { 127 };
-            foreach(int i in envelopeIndices)
-            {
-                if(i < 0)
-                {
-                    pitch = 0;
-                }
-                else if(i >= gamutList.Count)
-                {
-                    pitch = 127;
-                }
-                else
-                {
-                    pitch = (byte)gamutList[i];
-                }
-                pitches[0] = pitch;
-                BasicMidiChordDef bmcd = new BasicMidiChordDef(1000, null, null, true, pitches, velocities);
-                BasicMidiChordDefs.Add(bmcd);
-            }
-            this.MsDuration = msDuration; // resets the BasicMidiChordDef msDurations.
-
-            _ornamentNumberSymbol = countArg;
-        }
-
-        #endregion Ornaments
 
         // delete SetVerticalVelocityGradient?
         #region SetVerticalVelocityGradient

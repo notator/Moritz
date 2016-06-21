@@ -8,71 +8,93 @@ namespace Moritz.Spec
 {
     public class Envelope
 	{
+        #region constructors
         /// <summary> 
-        /// An envelope is a list of integral values that are greater than or equal to 0, and less than or equal to
-        /// the envelope's UpperBound.
+        /// An envelope is a list of integral values that are greater than or equal to 0, and less than
+        /// or equal to the envelope's Domain.
         /// The list's Count must be greater than 0, but is otherwise unlimited.
-        /// UpperBound must be >= 0. MidiChordDef Sliders use envelopes having UpperBound==127.
+        /// Domain must be >= 0. MidiChordDef Sliders use envelopes having Domain==127.
         /// The list's values can repeat. Not all values in range have to be present.
-        /// Values that are set to 0 in envelope.Original are set to UpperBound in envelope.Inversion.
-        /// Values that are set to UpperBound in envelope.Original are set to 0 in envelope.Inversion.
+        /// Values that are set to 0 in envelope.Original are set to Domain in envelope.Inversion.
+        /// Values that are set to Domain in envelope.Original are set to 0 in envelope.Inversion.
         /// </summary>
-        /// <param name="values">In range [0..UpperBound]</param>
-        /// <param name="upperBound">Greater than or equal to 0</param>
-        public Envelope(List<byte> values, int upperBound)
+        /// <param name="inputValues">At least one value. All values in range [0..inputDomain]</param>
+        /// <param name="inputDomain">Greater than or equal to 0</param>
+        /// <param name="domain">Greater than or equal to 0</param>
+        /// <param name="count">Greater than 0</param>
+        public Envelope(List<byte> inputValues, int inputDomain, int domain, int count)
         {
-            List<int> bytesAsInts = new List<int>();
-            foreach(byte b in values)
-            {
-                bytesAsInts.Add(b);
-            }
             #region conditions
-            CheckValues(bytesAsInts, nameof(values));
+            List<int> inputBytesAsInts = new List<int>();
+            foreach(byte b in inputValues)
+            {
+                inputBytesAsInts.Add(b);
+            }
             #endregion conditions
 
-            _original = bytesAsInts;
-            UpperBound = upperBound;
+            CompleteConstructor(inputBytesAsInts, inputDomain, domain, count);
         }
 
         /// <summary> 
         /// An envelope is a list of integral values that are greater than or equal to 0, and less than
-        /// or equal to the envelope's UpperBound.
+        /// or equal to the envelope's Domain.
         /// The list's Count must be greater than 0, but is otherwise unlimited.
-        /// UpperBound must be >= 0. MidiChordDef Sliders use envelopes having UpperBound==127.
+        /// Domain must be >= 0. MidiChordDef Sliders use envelopes having Domain==127.
         /// The list's values can repeat. Not all values in range have to be present.
-        /// Values that are set to 0 in envelope.Original are set to UpperBound in envelope.Inversion.
-        /// Values that are set to UpperBound in envelope.Original are set to 0 in envelope.Inversion.
+        /// Values that are set to 0 in envelope.Original are set to Domain in envelope.Inversion.
+        /// Values that are set to Domain in envelope.Original are set to 0 in envelope.Inversion.
         /// </summary>
-        /// <param name="values">In range [0..UpperBound]</param>
-        /// <param name="upperBound">Greater than or equal to 0</param>
-        public Envelope(List<int> values, int upperBound)
+        /// <param name="inputValues">At least one value. All values in range [0..inputDomain]</param>
+        /// <param name="inputDomain">Greater than or equal to 0</param>
+        /// <param name="domain">Greater than or equal to 0</param>
+        /// <param name="count">Greater than 0</param>
+        public Envelope(List<int> inputValues, int inputDomain, int domain, int count)
         {
-            #region conditions
-            CheckValues(values, nameof(values));
-            #endregion conditions
-
-            _original = new List<int>(values);
-            UpperBound = upperBound;
+            CompleteConstructor(inputValues, inputDomain, domain, count);
         }
 
-        private void CheckValues(List<int> values, string nameOfValues)
+        private void CompleteConstructor(List<int> inputValues, int inputDomain, int domain, int count)
         {
-            if(values == null || !values.Any())
+            if(inputValues == null || !inputValues.Any())
             {
-                throw new ArgumentException("The values list cannot be null or empty.", nameOfValues);
+                throw new ArgumentException($"The {inputValues} list cannot be null or empty.");
             }
-            foreach(int i in values)
+            foreach(int i in inputValues)
             {
-                if(i < 0)
+                if(i < 0 || i > inputDomain)
                 {
-                    throw new ArgumentException($"All the values in the {nameOfValues} list must be greater than or equal to 0.");
+                    throw new ArgumentException($"All values in the {inputValues} list must be in range [0..{inputDomain}].");
                 }
             }
+            if(domain < 0)
+            {
+                throw new ArgumentException($"The {nameof(domain)} cannot be less than 0.");
+            }
+            if(count < 1)
+            {
+                throw new ArgumentException($"The {nameof(count)} cannot be less than 1.");
+            }
+
+            _original = new List<int>(inputValues);
+            Domain = inputDomain;
+
+            if(count != inputValues.Count)
+            {
+                SetCount(count);
+            }
+            if(domain != inputDomain)
+            {
+                WarpVertically(domain);
+            }
+
+            Domain = domain;
         }
+
+        #endregion constructors
 
         public Envelope Clone()
         {
-            Envelope clone = new Envelope(_original, UpperBound);
+            Envelope clone = new Envelope(_original, _domain, _domain, _original.Count );
             return clone;
         }
 
@@ -80,9 +102,9 @@ namespace Moritz.Spec
         /// The values in the returned list are the msPositions to which the corresponding originalMsPositions should be moved.
         /// originalMsPositions[0] must be 0. The originalMsPositions must be in ascending order. 
         /// The distortion argument must be greater than 1. Greater distortion leads to greater time distortion.
-        /// The distortion is the ratio between the multiplication factors associated with envelopeValue==UpperBound and envelopeValue==0.
+        /// The distortion is the ratio between the multiplication factors associated with envelopeValue==Domain and envelopeValue==0.
         /// Note that firstOriginalPosition==firstReturnedPosition==0,
-        /// and lastOriginalPosition==lastReturnedPosition==totalMsDuration being warped.
+        /// and lastOriginalPosition==lastReturnedPosition==totalMsDuration (the duration being warped).
         /// Note also that rounding errors are corrected inside this function, so that the other returned positions may not
         /// always be *exactly* as expected from the input.
         /// </summary>
@@ -90,7 +112,7 @@ namespace Moritz.Spec
         public List<int> TimeWarp(List<int> originalMsPositions, double distortion)
         {
             #region conditions
-            Debug.Assert(_upperBound > 0);
+            Debug.Assert(_domain > 0);
             Debug.Assert(originalMsPositions.Count > 1); // At least the start and end positions of the duration to warp.
             Debug.Assert(originalMsPositions[0] == 0);
             Debug.Assert(distortion > 1);
@@ -107,7 +129,7 @@ namespace Moritz.Spec
             #region 1. create newIntMsDurations: a list containing the new msDurations
             List<int> spreadEnvelope = Spread(_original, originalMsPositions.Count - 1);
             List<double> newDoubleMsDurations = new List<double>();
-            double rootDistortion = Math.Pow(distortion, (((double)1) / _upperBound));             
+            double rootDistortion = Math.Pow(distortion, (((double)1) / _domain));             
             double newDoubleTotalDuration = 0;
             for(int i = 1; i < originalMsPositions.Count; ++i)
             {
@@ -166,79 +188,61 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Sets _original to a list having nValues values interpolated between the original values.
+        /// Sets _original to a list having count values (interpolated between the original values).
         /// </summary>
-        public void SetCount(int nValues)
+        public void SetCount(int count)
         {
-            _original = Spread(_original, nValues);
-        }
-
-        /// <summary>
-        /// Both _upperBound and the maximum value in _original are set to upperBound.
-        /// The minimum value in _original is set to 0.
-        /// </summary>
-        /// <param name="upperBound">Greater than or equal to 0</param>
-        public void SpreadToBounds(int upperBound)
-        {
-            #region condition
-            if(upperBound < 0)
-            {
-                throw new ArgumentException($"{nameof(upperBound)} cannot be negative");
-            }
-            #endregion condition
-
-            _original = JustifyVertically(_original, 0, upperBound);
-            UpperBound = upperBound;
+            _original = Spread(_original, count);
         }
 
         #region Spread
         /// <summary>
-        /// Returns a list having nValues values interpolated between the original values
+        /// Returns a list having count values interpolated between the original values
         /// </summary>
-        private List<int> Spread(List<int> argList, int nValues)
+        private List<int> Spread(List<int> argList, int count)
         {
             #region conditions
             if(argList == null || !argList.Any())
             {
                 throw new ArgumentException($"{nameof(argList)} cannot be null or empty.");
             }
-            if(nValues < 1)
+            if(count < 1)
             {
-                throw new ArgumentException($"{nameof(nValues)} cannot be less than 1.");
+                throw new ArgumentException($"{nameof(count)} cannot be less than 1.");
             }
             #endregion conditions
 
             List<int> spread = null;
-            if(nValues == 1)
+            if(count == 1)
             {
                 spread = new List<int>() { argList[0] };
             }
             else if(argList.Count == 1)
             {
                 spread = new List<int>();
-                for(int i= 0; i <nValues; ++i)
+                for(int i= 0; i <count; ++i)
                 {
                     spread.Add(argList[0]);
                 }
             }
-            else if(nValues == argList.Count)
+            else if(count == argList.Count)
             {
                 spread = new List<int>(argList);
             }
             else
             {
-                spread = GeneralSpread(argList, nValues);
+                spread = GeneralSpread(argList, count);
             }
             return spread;
         }
 
-        private List<int> GeneralSpread(List<int> argList, int nValues)
+        private List<int> GeneralSpread(List<int> argList, int count)
         {
             #region conditions
-            Debug.Assert(nValues > 1 && argList.Count > 1 && nValues != argList.Count);
+            Debug.Assert(count > 1 && argList.Count > 1 && count != argList.Count);
             #endregion conditions
 
-            int nValuesMinusOne = nValues - 1;
+            int nValuesMinusOne = count - 1;
             int nOriginalValuesMinusOne = argList.Count - 1;
             List<int> longSpread = new List<int>();
             for(int i = 0; i < nOriginalValuesMinusOne; ++i)
@@ -311,26 +315,29 @@ namespace Moritz.Spec
         #endregion Spread
 
         /// <summary>
-        /// Stretches or compresses the original envelope by a factor of finalUpperBound/UpperBound.
-        /// Sets UpperBound to finalUpperBound.
+        /// Stretches or compresses the original envelope by a factor of finalDomain/domain.
+        /// Sets Domain to finalDomain.
         /// </summary>
-        public void WarpVertically(int finalUpperBound)
+        public void WarpVertically(int finalDomain)
         {
             #region conditions
-            if(finalUpperBound < 0)
+            if(finalDomain < 0)
             {
-                throw new ArgumentException($"{nameof(finalUpperBound)} must be greater than or equal to 0");
+                throw new ArgumentException($"{nameof(finalDomain)} must be greater than or equal to 0");
             }
             #endregion conditions
 
-            List<int> rval = new List<int>();
-            double wideningFactor = ((double)finalUpperBound) / _upperBound;
-            for(int i = 0; i < _original.Count; ++i)
+            if(_domain > 0) // if _domain == 0 do nothing.
             {
-                rval.Add((int)(Math.Round(_original[i] * wideningFactor)));
+                List<int> rval = new List<int>();
+                double wideningFactor = ((double)finalDomain) / _domain;
+                for(int i = 0; i < _original.Count; ++i)
+                {
+                    rval.Add((int)(Math.Round(_original[i] * wideningFactor)));
+                }
+                _original = rval;
+                Domain = finalDomain;
             }
-            _original = rval;
-            UpperBound = finalUpperBound;
         }
 
         /// <summary>
@@ -370,7 +377,7 @@ namespace Moritz.Spec
                 List<int> inversion = new List<int>();
                 foreach(int b in _original)
                 {
-                    inversion.Add(_upperBound - b);
+                    inversion.Add(_domain - b);
                 }
                 return inversion;
             }
@@ -392,7 +399,7 @@ namespace Moritz.Spec
                 ri.Reverse();
                 for(int i = 0; i < ri.Count; ++i)
                 {
-                    ri[i] = _upperBound - ri[i];
+                    ri[i] = _domain - ri[i];
                 }
                 return ri;
             }
@@ -419,7 +426,7 @@ namespace Moritz.Spec
                 List<byte> inversion = new List<byte>();
                 foreach(byte b in originalBytes)
                 {
-                    inversion.Add((byte)(_upperBound - b));
+                    inversion.Add((byte)(_domain - b));
                 }
                 return inversion;
             }
@@ -441,17 +448,19 @@ namespace Moritz.Spec
                 ri.Reverse();
                 for(int i = 0; i < ri.Count; ++i)
                 {
-                    ri[i] = (byte)(_upperBound - ri[i]);
+                    ri[i] = (byte)(_domain - ri[i]);
                 }
                 return ri;
             }
         }
 
-        private List<int> _original = null;
-        private int _upperBound;
-        public int UpperBound
+        /// <summary>
+        /// The maximum possible value in the envelope. This value need not actually be present.
+        /// the minimum possible value in the envelope is always 0.
+        /// </summary>
+        public int Domain
         {
-            get { return _upperBound; }
+            get { return _domain; }
             set
             {
                 #region conditions
@@ -461,18 +470,21 @@ namespace Moritz.Spec
                 }
                 if(_original == null || !_original.Any())
                 {
-                    throw new ArgumentException($"Cannot set {nameof(UpperBound)} when {nameof(_original)} is null or empty.");
+                    throw new ArgumentException($"Cannot set {nameof(Domain)} when {nameof(_original)} is null or empty.");
                 }
                 foreach(int i in _original)
                 {
                     if(i > value)
                     {
-                        throw new ArgumentException($"Cannot set {nameof(UpperBound)} smaller than a value in {nameof(_original)}.");
+                        throw new ArgumentException($"Cannot set {nameof(Domain)} smaller than a value in {nameof(_original)}.");
                     }
                 }
                 #endregion conditions
-                _upperBound = value;
+                _domain = value;
             }
         }
+
+        private List<int> _original = null;
+        private int _domain;
     }
 }
