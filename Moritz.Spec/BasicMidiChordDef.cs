@@ -63,16 +63,28 @@ namespace Moritz.Spec
             w.WriteEndElement();
         }
 
-        #region Envelopes
-        #endregion Envelopes
+        /// <summary>
+        /// The argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
+        /// For example: If the MidiChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
+        /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc. 
+        /// </summary>
+        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
+        public void SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch)
+        {
+            for(int pitchIndex = 0; pitchIndex < Pitches.Count; ++pitchIndex)
+            {
+                int absPitch = Pitches[pitchIndex] % 12;
+                Velocities[pitchIndex] = (byte)velocityPerAbsolutePitch[absPitch];
+            }
+        }
 
         public override string ToString() => $"BasicMidiChordDef: MsDuration={MsDuration.ToString()} BasePitch={Pitches[0]} ";
 
         public int MsDuration { get { return _msDuration; } set { _msDuration = value; } }
-        protected int _msDuration = 0;
+        private int _msDuration = 0;
 
-        public List<byte> Pitches = new List<byte>(); // A string of midiPitch numbers separated by spaces.
-        public List<byte> Velocities = new List<byte>(); // A string of midi velocity values separated by spaces.
+        public List<byte> Pitches = new List<byte>();
+        public List<byte> Velocities = new List<byte>();
         public byte? BankIndex = null; // optional. If null, bank commands are not sent
         public byte? PatchIndex = null; // optional. If null, patch commands are not sent
         public bool HasChordOff = true;

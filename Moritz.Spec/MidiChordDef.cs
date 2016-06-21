@@ -701,14 +701,7 @@ namespace Moritz.Spec
 
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
-                List<byte> pitches = bmcd.Pitches;
-                List<byte> velocities = bmcd.Velocities;
-                Debug.Assert(pitches.Count == velocities.Count);
-                for(int pitchIndex = 0; pitchIndex < pitches.Count; ++pitchIndex)
-                {
-                    int absPitch = pitches[pitchIndex] % 12;
-                    velocities[pitchIndex] = (byte)velocityPerAbsolutePitch[absPitch];
-                }
+                bmcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
             }
         }
         #endregion SetVelocityPerAbsolutePitch

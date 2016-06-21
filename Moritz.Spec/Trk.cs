@@ -236,6 +236,35 @@ namespace Moritz.Spec
                 }
             }
         }
+
+        #region SetVelocityPerAbsolutePitch
+        /// <summary>
+        /// The argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
+        /// For example: If the MidiChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
+        /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc.
+        /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef. 
+        /// </summary>
+        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
+        public void SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch)
+        {
+            #region conditions
+            Debug.Assert(velocityPerAbsolutePitch.Count == 12);
+            for(int i = 0; i < 12; ++i)
+            {
+                int v = velocityPerAbsolutePitch[i];
+                Debug.Assert(v >= 0 && v <= 127);
+            }
+            #endregion conditions
+            foreach(IUniqueDef iud in UniqueDefs)
+            {
+                MidiChordDef mcd = iud as MidiChordDef;
+                if(mcd != null)
+                {
+                    mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+                }
+            }
+        }
+        #endregion SetVelocityPerAbsolutePitch
         #endregion Envelopes
 
         /// <summary>
