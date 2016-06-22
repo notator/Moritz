@@ -19,11 +19,11 @@ namespace Moritz.Algorithm.Tombeau1
             //List<byte> rootVelocities = new List<byte>() { 127, 116, 104, 93, 81, 70, 58, 47, 35, 24, 12, 1 };
 
             List<int> velocityPerAbsolutePitch =
-                GetVelocityPerAbsolutePitch(5,    // The base pitch for the pitch hierarchy.
-                                            127,  // the velocity given to any absolute base pitch (if it exists) in the MidiChordDef
-                                            circularPitchHierarchies[0], // the pitch hierarchy for the chord,
-                                            velocityFactors[0]  // A list of 12 values in descending order, each value in range 1..0
-                                           );
+                M.GetVelocityPerAbsolutePitch(5,    // The base pitch for the pitch hierarchy.
+                                              127,  // the velocity given to any absolute base pitch (if it exists) in the MidiChordDef
+                                              0,    // index in M.RelativePitchHierarchies: in range [0..21]
+                                              0     // index in M.VelocityFactors: in range [0..7]
+                                             );
 
             Palette palette = GetPaletteByName("Tombeau1.1");
             for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)

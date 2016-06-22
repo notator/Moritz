@@ -32,17 +32,28 @@ namespace Moritz.Algorithm.Tombeau1
 
         private Block HarmonicVelocityTestBlock(List<MidiChordDef> staffMidiChordDefs)
         {
-            List<int> pitchHierarchy = circularPitchHierarchies[0];
-
             List<Trk> trks = new List<Trk>();
-            for(int vfIndex = 0; vfIndex < velocityFactors.Count; ++vfIndex)
+            int velocityFactorsListsCount = 0;
+            while(true)
+            {
+                try
+                {
+                    M.GetVelocityFactors(velocityFactorsListsCount);
+                    velocityFactorsListsCount++;
+                }
+                catch
+                {
+                    break;
+                }
+            }
+            for(int vfIndex = 0; vfIndex < velocityFactorsListsCount; ++vfIndex)
             {
                 Trk trk = new Trk(vfIndex);
                 List<int> velocityPerAbsolutePitch =
-                        GetVelocityPerAbsolutePitch(0,    // The base pitch for the pitch hierarchy.
+                        M.GetVelocityPerAbsolutePitch(0,    // The base pitch for the pitch hierarchy.
                         127,  // the velocity given to any absolute base pitch (if it exists) in the MidiChordDef
-                        pitchHierarchy, // the pitch hierarchy for the chords in the block,
-                        velocityFactors[vfIndex]  // A list of 12 values in descending order, each value in range 1..0
+                        0, // index in M.RelativePitchHierarchies: in range [0..21]
+                        vfIndex  // index in M.VelocityFactors: in range [0..7]
                        );
 
                 foreach(MidiChordDef paletteMcd in staffMidiChordDefs)

@@ -31,11 +31,21 @@ namespace Moritz.Algorithm.Tombeau1
         private Block VerticalVelocityTestBlock(List<MidiChordDef> staffMidiChordDefs)
         {
             List<Trk> trks = new List<Trk>();
-            for(int vfIndex = 0; vfIndex < dynamicSymbolsMaximumVelocities.Count; ++vfIndex)
+            List<byte> topVelocities = new List<byte>();
+            topVelocities.Add(M.MaxMidiVelocity[M.Dynamic.ppp]);
+            topVelocities.Add(M.MaxMidiVelocity[M.Dynamic.pp]);
+            topVelocities.Add(M.MaxMidiVelocity[M.Dynamic.p]);
+            topVelocities.Add(M.MaxMidiVelocity[M.Dynamic.mp]);
+            topVelocities.Add(M.MaxMidiVelocity[M.Dynamic.mf]);
+            topVelocities.Add(M.MaxMidiVelocity[M.Dynamic.f]);
+            topVelocities.Add(M.MaxMidiVelocity[M.Dynamic.ff]);
+            topVelocities.Add(M.MaxMidiVelocity[M.Dynamic.fff]);
+
+            for(int vfIndex = 0; vfIndex < topVelocities.Count; ++vfIndex)
             {
                 Trk trk = new Trk(vfIndex);
                 byte rootVelocity = M.MaxMidiVelocity[M.Dynamic.fff];
-                byte topVelocity = dynamicSymbolsMaximumVelocities[vfIndex];
+                byte topVelocity = topVelocities[vfIndex];
 
                 foreach(MidiChordDef paletteMcd in staffMidiChordDefs)
                 {

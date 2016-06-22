@@ -154,7 +154,7 @@ namespace Moritz.Algorithm.Tombeau1
 
             foreach(List<byte> envelope in envList)
             {
-                Envelope env = new Envelope(envelope, 127, 0, 1);
+                Envelope env = new Envelope(envelope, 127, 8, 10);
                 List<int> basicMidiChordRootPitches = null;
 
                 int firstPitch = 60;
