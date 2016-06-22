@@ -126,7 +126,7 @@ namespace Moritz.Algorithm.Tombeau1
 
             List<Block> blocks = new List<Block>();
 
-            int chordDensity = 3;
+            int chordDensity = 5;
             majorPalette = GetMajorPalette(chordDensity);
             minorPalette = UpsideDownChords(majorPalette, chordDensity);
 
@@ -174,13 +174,14 @@ namespace Moritz.Algorithm.Tombeau1
 
         private List<MidiChordDef> GetMajorPalette(int chordDensity)
         {
-            List<List<int>> relativePitchHierarchies = new List<List<int>>();
+            List<List<int>> absolutePitchHierarchies = new List<List<int>>();
             int phIndex = 0;
+            int rootPitch = 63;
             while(true)
             {
                 try
                 {
-                    relativePitchHierarchies.Add(M.GetRelativePitchHierarchy(phIndex++));
+                    absolutePitchHierarchies.Add(M.GetAbsolutePitchHeirarchy(phIndex++, rootPitch));
                 }
                 catch
                 {
@@ -188,11 +189,15 @@ namespace Moritz.Algorithm.Tombeau1
                 }     
             }
             List<MidiChordDef> majorCircularPalette = new List<MidiChordDef>();
-            for(int j = 0; j < relativePitchHierarchies.Count; ++j)
+            for(int j = 0; j < absolutePitchHierarchies.Count; ++j)
             {
-                List<int> relativePitchHierarchy = relativePitchHierarchies[j];
+                List<int> absolutePitchHierarchy = absolutePitchHierarchies[0];
 
-                MidiChordDef mcd = new MidiChordDef(chordDensity, 60, relativePitchHierarchy, 127, 1200, true);
+                MidiChordDef mcd = new MidiChordDef(chordDensity, 60 + j, absolutePitchHierarchy, 127, 1200, true);
+
+                List<int> velocityPerAbsolutePitch = M.GetVelocityPerAbsolutePitch(rootPitch, 127, 0, 0);
+                mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+
                 mcd.Lyric = (j).ToString();
                 majorCircularPalette.Add(mcd);
             }

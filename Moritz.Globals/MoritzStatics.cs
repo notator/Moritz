@@ -250,6 +250,7 @@ namespace Moritz.Globals
                 }
             }
         }
+
         /// <summary>
         /// Returns null if
         ///     textBox.Text is empty, or
@@ -788,40 +789,48 @@ namespace Moritz.Globals
         /// <summary>
         /// Returns a list of pitch numbers in range [0..127] in ascending order.
         /// The first pitch in the returned list is always rootPitch.
-        /// The pitches are found as follows: maxNPitches relative pitches are found as the sum of rootPitch and
-        /// the first maxNPitches values in relativePitchHierarchy. The resulting pitches are then forced into
-        /// ascending order by adding 12 as necessary to each value in turn.
+        /// The pitches are the nPitches beginning with and following the rootPitch in the absolutePitchHierarchy,
+        /// transposed to be in ascending order by adding 12 as necessary.
         /// Pitches that would be higher than 127 are simply not added to the returned list, so that the actual
-        /// number of pitches can be less than maxNPitches. 
+        /// number of pitches can be less than nPitches. 
         /// </summary>
-        /// <param name="maxNPitches"></param>
-        /// <param name="rootPitch"></param>
-        /// <param name="relativePitchHierarchy"></param>
+        /// <param name="nPitches">In range [1..12]</param>
+        /// <param name="rootPitch">In range [0..127]</param>
+        /// <param name="absolutePitchHierarchy"></param>
         /// <returns></returns>
-        public static List<byte> GetAscendingPitches(int maxNPitches, int rootPitch, List<int> relativePitchHierarchy)
+        public static List<byte> GetAscendingPitches(int nPitches, int rootPitch, List<int> absolutePitchHierarchy)
         {
-            Debug.Assert(maxNPitches >= 0 && maxNPitches <= 12);
+            Debug.Assert(nPitches > 0 && nPitches <= 12);
             Debug.Assert(rootPitch >= 0 && rootPitch <= 127);
+            Debug.Assert(absolutePitchHierarchy.Count == 12);
 
             List<int> pitches = new List<int>();
             pitches.Add(rootPitch);
-            for(int i = 1; i < maxNPitches; ++i)
+
+            if(nPitches > 1)
             {
-                int pitch = rootPitch + relativePitchHierarchy[i];
-                while(pitch <= pitches[i - 1])
+                int absRootPitch = rootPitch % 12;
+                int index = absolutePitchHierarchy.IndexOf(absRootPitch);
+                int maxIndex = index + nPitches;
+                List<int> localAbsPH = new List<int>(absolutePitchHierarchy);
+                localAbsPH.AddRange(absolutePitchHierarchy); // now has double length
+                for(int i = index + 1; i < maxIndex; ++i)
                 {
-                    pitch += 12;
-                }
-                if(pitch <= 127)
-                {
-                    pitches.Add(pitch);
-                }
-                else
-                {
-                    break;
+                    int pitch = localAbsPH[i];
+                    while(pitch <= pitches[pitches.Count - 1])
+                    {
+                        pitch += 12;
+                    }
+                    if(pitch <= 127)
+                    {
+                        pitches.Add(pitch);
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
-
             List<byte> bytePitches = new List<byte>();
             foreach(int pitch in pitches)
             {
@@ -829,12 +838,52 @@ namespace Moritz.Globals
             }
             return bytePitches;
         }
+
+        #region static AbsolutePitchHirearchies
+
+        /// <summary>
+        /// Returns a list that basically contains the sums of absoluteValue(rootPitch) + RelativePitchHierarchies[index].
+        /// If a value would be greater than 11, value = value - 12, so that all values are in range [0..11].
+        /// </summary>
+        /// <param name="index">In range [0..21]</param>
+        /// <param name="rootPitch">In range [0..127]</param>
+        public static List<int> GetAbsolutePitchHeirarchy(int index, int rootPitch)
+        {
+            if(RelativePitchHierarchies.Count != 22)
+            {
+                throw new ArgumentException($"{nameof(RelativePitchHierarchies)} has changed!");
+            }
+            if(index < 0 || index > 21)
+            {
+                throw new ArgumentException($"{nameof(index)} out of range.");
+            }
+            if(rootPitch < 0 || rootPitch > 127)
+            {
+                throw new ArgumentException($"{nameof(rootPitch)} out of range.");
+            }
+
+            List<int> absolutePitchHierarchy = new List<int>(RelativePitchHierarchies[index]); // checks index
+            int absRootPitch = rootPitch % 12;
+
+            for(int i = 0; i < absolutePitchHierarchy.Count; ++i)
+            {
+                absolutePitchHierarchy[i] += absRootPitch;
+                absolutePitchHierarchy[i] = (absolutePitchHierarchy[i] > 11) ? absolutePitchHierarchy[i] - 12: absolutePitchHierarchy[i];
+            }
+            return absolutePitchHierarchy;
+        }
+        #endregion static AbsolutePitchHirearchies
         #region static RelativePitchHierarchies
         /// <summary>
         /// Returns a clone of the private list.
         /// </summary>
+        /// <param name="index">In range [0..21]</param>
         public static List<int> GetRelativePitchHierarchy(int index)
         {
+            if(RelativePitchHierarchies.Count != 22)
+            {
+                throw new ArgumentException($"{nameof(RelativePitchHierarchies)} has changed!");
+            }
             if(index < 0 || index >= RelativePitchHierarchies.Count)
             {
                 throw new ArgumentException($"{nameof(index)} out of range.");
