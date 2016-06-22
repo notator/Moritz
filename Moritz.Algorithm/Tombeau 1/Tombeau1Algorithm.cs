@@ -26,8 +26,8 @@ namespace Moritz.Algorithm.Tombeau1
 		public override int NumberOfInputVoices { get { return 0; } }
 		public override int NumberOfBars { get { return 25; } }
 
-        List<MidiChordDef> majorCircularPalette = null;
-        List<MidiChordDef> minorCircularPalette = null;
+        List<MidiChordDef> majorPalette = null;
+        List<MidiChordDef> minorPalette = null;
 
         /// <summary>
         /// See CompositionAlgorithm.DoAlgorithm()
@@ -127,18 +127,18 @@ namespace Moritz.Algorithm.Tombeau1
             List<Block> blocks = new List<Block>();
 
             int chordDensity = 3;
-            majorCircularPalette = GetMajorCircularPalette(chordDensity);
-            minorCircularPalette = UpsideDownChords(majorCircularPalette, chordDensity);
+            majorPalette = GetMajorPalette(chordDensity);
+            minorPalette = UpsideDownChords(majorPalette, chordDensity);
 
-            Block initBlock = Init();
+            Block initBlock = Init();                                   
             initBlock.SetInitialClefs(new List<string>() { "t", "t", "t", "t", "t", "t", "t", "t" });
             blocks.Add(initBlock);
 
             #region test blocks
-            Block verticalVelocityChordsTestBlock = VerticalVelocityChordsTestBlock(majorCircularPalette, minorCircularPalette);
+            Block verticalVelocityChordsTestBlock = VerticalVelocityChordsTestBlock(majorPalette, minorPalette);
             blocks.Add(verticalVelocityChordsTestBlock); // 2 bars (2 systems)
 
-            Block harmonicVelocityChordsTestBlock = HarmonicVelocityChordsTestBlock(majorCircularPalette, minorCircularPalette);
+            Block harmonicVelocityChordsTestBlock = HarmonicVelocityChordsTestBlock(majorPalette, minorPalette);
             blocks.Add(harmonicVelocityChordsTestBlock); // 2 bars (2 systems)
 
             Block triadsCycleBlock = TriadsCycleBlock();
@@ -174,13 +174,13 @@ namespace Moritz.Algorithm.Tombeau1
 
         private List<MidiChordDef> GetMajorPalette(int chordDensity)
         {
-            List<List<int>> pitchHierarchies = new List<List<int>>();
+            List<List<int>> relativePitchHierarchies = new List<List<int>>();
             int phIndex = 0;
             while(true)
             {
                 try
                 {
-                    pitchHierarchies.Add(M.GetRelativePitchHierarchy(phIndex++));
+                    relativePitchHierarchies.Add(M.GetRelativePitchHierarchy(phIndex++));
                 }
                 catch
                 {
@@ -188,20 +188,14 @@ namespace Moritz.Algorithm.Tombeau1
                 }     
             }
             List<MidiChordDef> majorCircularPalette = new List<MidiChordDef>();
-            for(int j = 0; j < pitchHierarchies.Count; ++j)
+            for(int j = 0; j < relativePitchHierarchies.Count; ++j)
             {
-                List<int> cph = pitchHierarchies[j];
+                List<int> relativePitchHierarchy = relativePitchHierarchies[j];
 
-                MidiChordDef mcd = new MidiChordDef(chordDensity, 5, cph, 127, 1200, true);
+                MidiChordDef mcd = new MidiChordDef(chordDensity, 60, relativePitchHierarchy, 127, 1200, true);
                 mcd.Lyric = (j).ToString();
                 majorCircularPalette.Add(mcd);
             }
-            return majorCircularPalette;
-        }
-
-        private List<MidiChordDef> GetMajorCircularPalette(int chordDensity)
-        {
-            List<MidiChordDef> majorCircularPalette = GetMajorPalette(chordDensity);
             return majorCircularPalette;
         }
 

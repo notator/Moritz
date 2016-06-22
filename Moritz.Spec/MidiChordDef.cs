@@ -50,29 +50,28 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// A MidiChordDef containing a single BasicMidiChordDef. Absent fields are set to 0 or null.
+        /// A MidiChordDef containing a single BasicMidiChordDef having density notes. Absent fields are set to 0 or null.
         /// The pitches arguments are used to set both the NotatedMidiPitches and BasicMidiChordDefs[0].Pitches.
         /// All pitches are given the same velocity.
-        /// The pitchHierarchy argument contains a list of _absolute_pitches_ (in range [0..11]. 0 is C natural, 1 is C# etc.
-        /// First the root pitch is found, then pitches are added to the top of the chord (from the absolute pitchHierarchy)
-        /// until the chord has density pitches, whereby the minimum number of octaves is added to each absolute pitch as necessary.
+        /// The pitches are found as follows: nPitchesInChord relative pitches are found by adding rootPitch to the first
+        /// values in relativePitchHierarchy, then these pitches are forced into ascending order by adding 12 as neccessary
+        /// to each value.
         /// A Debug.Assertion will fail if an attempt is made to create a pitch whose value exceeds 127.
         /// </summary>
-        /// <param name="density">The number of pitches in the chord. (range [1..12])</param>
-        /// <param name="rootOctave">The octave for the chord's root midiPitch (range [0..10]).
-        /// (The root midiPitch will be 60, middle C, if rootOctave == 5 and pitchHierarchy[0] == 0.)</param>
-        /// <param name="pitchHierarchy">A list _absolute_pitches_ (in range [0..11]. Count is in range [density..12]. Duplicate pitches are allowed.</param>
+        /// <param name="nPitchesInChord">The number of pitches in the chord. (range [1..12])</param>
+        /// <param name="rootPitch">The chord's root midiPitch (range [0..127]).</param>
+        /// <param name="relativePitchHierarchy">Count is 12, relativePitchHierarchy[0] is 0, values are in range [0..11].</param>
         /// <param name="velocity">All notes are given this velocity (range [1..127])</param>
         /// <param name="msDuration">The chord's msDuration (greater than 0).</param>
         /// <param name="hasChordOff">Does the chord have a chordOff?</param>
-        public MidiChordDef(int density, int rootOctave, List<int> pitchHierarchy, int velocity, int msDuration, bool hasChordOff)
+        public MidiChordDef(int nPitchesInChord, int rootPitch, List<int> relativePitchHierarchy, int velocity, int msDuration, bool hasChordOff)
             : base(msDuration)
         {
             #region conditions
-            Debug.Assert(density > 0 && density <= 12);
-            Debug.Assert(rootOctave >= 0 && rootOctave <= 10);
-            Debug.Assert(pitchHierarchy.Count >= density && pitchHierarchy.Count <= 12);
-            foreach(byte pitch in pitchHierarchy)
+            Debug.Assert(nPitchesInChord > 0 && nPitchesInChord <= 12);
+            Debug.Assert(rootPitch >= 0 && rootPitch <= 127);
+            Debug.Assert(relativePitchHierarchy.Count >= nPitchesInChord && relativePitchHierarchy.Count <= 12);
+            foreach(byte pitch in relativePitchHierarchy)
                 Debug.Assert(pitch >= 0 && pitch <= 11); // can include duplicates.
             Debug.Assert(velocity > 0 && velocity <= 127);
             Debug.Assert(msDuration > 0);
@@ -82,7 +81,7 @@ namespace Moritz.Spec
             _hasChordOff = hasChordOff;
             _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 
-            List<byte> pitches = GetPitches(density, rootOctave, pitchHierarchy);
+            List<byte> pitches = GetPitches(nPitchesInChord, rootPitch, relativePitchHierarchy);
             List<byte> velocities = new List<byte>();
             foreach(byte pitch in pitches)
             {
@@ -103,13 +102,13 @@ namespace Moritz.Spec
 
             CheckTotalDuration();
         }
-        private List<byte> GetPitches(int density, int rootOctave, List<int> pitchHierarchy)
+        private List<byte> GetPitches(int density, int rootPitch, List<int> relativePitchHierarchy)
         {
             List<int> pitches = new List<int>();
-            pitches.Add(pitchHierarchy[0] + (rootOctave * 12));
+            pitches.Add(rootPitch);
             for(int i = 1; i < density; ++i )
             {
-                int pitch = pitchHierarchy[i];
+                int pitch = rootPitch + relativePitchHierarchy[i];
                 while(pitch <= pitches[i-1])
                 {
                     pitch += 12;
@@ -120,7 +119,7 @@ namespace Moritz.Spec
             List<byte> bytePitches = new List<byte>();
             foreach(int pitch in pitches)
             {
-                //Debug.Assert(pitch >= 0 && pitch <= 127);
+                Debug.Assert(pitch >= 0 && pitch <= 127);
                 if(pitch <= 127)
                 {
                     bytePitches.Add((byte)pitch);
@@ -137,14 +136,14 @@ namespace Moritz.Spec
         /// The MidiChordDef has a ChordOff.
         /// </summary>
         /// <param name="msDuration">The duration of this MidiChordDef</param>
-        /// <param name="bmcdRootPitches">The root pitches of the BasicMidiChordDefs sequence.</param>
-        public MidiChordDef(int msDuration, List<int> bmcdRootPitches)
-            :this(new List<byte>() { (byte) bmcdRootPitches[0] }, new List<byte>() { 127 }, msDuration, true) 
+        /// <param name="basicMidiChordRootPitches">The root pitches of the BasicMidiChordDefs sequence.</param>
+        public MidiChordDef(int msDuration, List<int> basicMidiChordRootPitches)
+            :this(new List<byte>() { (byte) basicMidiChordRootPitches[0] }, new List<byte>() { 127 }, msDuration, true) 
         {
             BasicMidiChordDefs.Clear();
             List<byte> pitches = new List<byte>() { 0 };
             List<byte> velocities = new List<byte>() { 127 };
-            foreach(int rootPitch in bmcdRootPitches)
+            foreach(int rootPitch in basicMidiChordRootPitches)
             {
                 pitches[0] = (byte)rootPitch;
                 BasicMidiChordDef bmcd = new BasicMidiChordDef(1000, null, null, true, pitches, velocities);
@@ -152,9 +151,9 @@ namespace Moritz.Spec
             }
             this.MsDuration = msDuration; // resets the BasicMidiChordDef msDurations.
 
-            if(bmcdRootPitches.Count > 1)
+            if(basicMidiChordRootPitches.Count > 1)
             {
-                _ornamentNumberSymbol = bmcdRootPitches.Count;
+                _ornamentNumberSymbol = basicMidiChordRootPitches.Count;
             }
         }
 
