@@ -34,6 +34,46 @@ namespace Moritz.Spec
             #endregion
         }
 
+        /// <summary>
+        /// A BasicMidiChordDef having density notes. Absent fields are set to 0 or null.
+        /// All pitches are given the same velocity.
+        /// The pitches are found as follows: nPitchesInChord relative pitches are found by adding rootPitch to the first
+        /// values in relativePitchHierarchy, then these pitches are forced into ascending order by adding 12 as neccessary
+        /// to each value.
+        /// Pitches that would be higher than 127 are simply not added to the returned list, so that the actual
+        /// number of pitches can be less than nPitchesInChord. 
+        /// </summary>
+        /// <param name="nPitchesInChord">The number of pitches in the chord if all pitches are in range [0..127]. (range [1..12])</param>
+        /// <param name="rootPitch">The chord's root midiPitch (range [0..127]).</param>
+        /// <param name="relativePitchHierarchy">Count is 12, relativePitchHierarchy[0] is 0, values are in range [0..11].</param>
+        /// <param name="velocity">All notes are given this velocity (range [1..127])</param>
+        /// <param name="msDuration">The chord's msDuration (greater than 0).</param>
+        /// <param name="hasChordOff">Does the chord have a chordOff?</param>
+        public BasicMidiChordDef(int nPitchesInChord, int rootPitch, List<int> relativePitchHierarchy, int velocity, int msDuration, bool hasChordOff)
+        {
+            #region conditions
+            Debug.Assert(nPitchesInChord > 0 && nPitchesInChord <= 12);
+            Debug.Assert(rootPitch >= 0 && rootPitch <= 127);
+            Debug.Assert(relativePitchHierarchy.Count >= nPitchesInChord && relativePitchHierarchy.Count <= 12);
+            foreach(byte pitch in relativePitchHierarchy)
+                Debug.Assert(pitch >= 0 && pitch <= 11); // can include duplicates.
+            Debug.Assert(velocity > 0 && velocity <= 127);
+            Debug.Assert(msDuration > 0);
+            #endregion conditions
+
+            _msDuration = msDuration; // read-only!
+            BankIndex = null;
+            PatchIndex = null;
+            HasChordOff = hasChordOff;
+
+            Pitches = M.GetAscendingPitches(nPitchesInChord, rootPitch, relativePitchHierarchy);
+            Velocities = new List<byte>();
+            foreach(byte pitch in Pitches)
+            {
+                Velocities.Add((byte)velocity);
+            }
+        }
+
         public BasicMidiChordDef(BasicMidiChordDef original, int msDuration)
         {
             _msDuration = msDuration; // read-only!

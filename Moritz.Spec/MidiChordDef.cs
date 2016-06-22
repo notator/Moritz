@@ -55,10 +55,10 @@ namespace Moritz.Spec
         /// All pitches are given the same velocity.
         /// The pitches are found as follows: nPitchesInChord relative pitches are found by adding rootPitch to the first
         /// values in relativePitchHierarchy, then these pitches are forced into ascending order by adding 12 as neccessary
-        /// to each value.
-        /// A Debug.Assertion will fail if an attempt is made to create a pitch whose value exceeds 127.
+        /// to each value. Pitches that would be higher than 127 are simply not added to the returned list, so that the actual
+        /// number of pitches can be less than nPitchesInChord. 
         /// </summary>
-        /// <param name="nPitchesInChord">The number of pitches in the chord. (range [1..12])</param>
+        /// <param name="nPitchesInChord">The number of pitches in the chord if all pitches are in range [0..127]. (range [1..12])</param>
         /// <param name="rootPitch">The chord's root midiPitch (range [0..127]).</param>
         /// <param name="relativePitchHierarchy">Count is 12, relativePitchHierarchy[0] is 0, values are in range [0..11].</param>
         /// <param name="velocity">All notes are given this velocity (range [1..127])</param>
@@ -81,7 +81,7 @@ namespace Moritz.Spec
             _hasChordOff = hasChordOff;
             _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 
-            List<byte> pitches = GetPitches(nPitchesInChord, rootPitch, relativePitchHierarchy);
+            List<byte> pitches = M.GetAscendingPitches(nPitchesInChord, rootPitch, relativePitchHierarchy);
             List<byte> velocities = new List<byte>();
             foreach(byte pitch in pitches)
             {
@@ -101,31 +101,6 @@ namespace Moritz.Spec
             BasicMidiChordDefs.Add(new BasicMidiChordDef(msDuration, bank, patch, hasChordOff, pitches, velocities));
 
             CheckTotalDuration();
-        }
-        private List<byte> GetPitches(int density, int rootPitch, List<int> relativePitchHierarchy)
-        {
-            List<int> pitches = new List<int>();
-            pitches.Add(rootPitch);
-            for(int i = 1; i < density; ++i )
-            {
-                int pitch = rootPitch + relativePitchHierarchy[i];
-                while(pitch <= pitches[i-1])
-                {
-                    pitch += 12;
-                }
-                pitches.Add(pitch);
-            }
-
-            List<byte> bytePitches = new List<byte>();
-            foreach(int pitch in pitches)
-            {
-                Debug.Assert(pitch >= 0 && pitch <= 127);
-                if(pitch <= 127)
-                {
-                    bytePitches.Add((byte)pitch);
-                }
-            }
-            return bytePitches;
         }
 
         /// <summary>

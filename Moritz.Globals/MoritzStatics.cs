@@ -784,6 +784,51 @@ namespace Moritz.Globals
             }
             return velocityPerAbsPitch;
         }
+
+        /// <summary>
+        /// Returns a list of pitch numbers in range [0..127] in ascending order.
+        /// The first pitch in the returned list is always rootPitch.
+        /// The pitches are found as follows: maxNPitches relative pitches are found as the sum of rootPitch and
+        /// the first maxNPitches values in relativePitchHierarchy. The resulting pitches are then forced into
+        /// ascending order by adding 12 as necessary to each value in turn.
+        /// Pitches that would be higher than 127 are simply not added to the returned list, so that the actual
+        /// number of pitches can be less than maxNPitches. 
+        /// </summary>
+        /// <param name="maxNPitches"></param>
+        /// <param name="rootPitch"></param>
+        /// <param name="relativePitchHierarchy"></param>
+        /// <returns></returns>
+        public static List<byte> GetAscendingPitches(int maxNPitches, int rootPitch, List<int> relativePitchHierarchy)
+        {
+            Debug.Assert(maxNPitches >= 0 && maxNPitches <= 12);
+            Debug.Assert(rootPitch >= 0 && rootPitch <= 127);
+
+            List<int> pitches = new List<int>();
+            pitches.Add(rootPitch);
+            for(int i = 1; i < maxNPitches; ++i)
+            {
+                int pitch = rootPitch + relativePitchHierarchy[i];
+                while(pitch <= pitches[i - 1])
+                {
+                    pitch += 12;
+                }
+                if(pitch <= 127)
+                {
+                    pitches.Add(pitch);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            List<byte> bytePitches = new List<byte>();
+            foreach(int pitch in pitches)
+            {
+                bytePitches.Add((byte)pitch);
+            }
+            return bytePitches;
+        }
         #region static RelativePitchHierarchies
         /// <summary>
         /// Returns a clone of the private list.
