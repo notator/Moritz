@@ -342,13 +342,48 @@ namespace Moritz.Spec
         }
         #endregion Sliders
 
-        // delete SetVerticalVelocityGradient?
+        #region SetVelocityPerAbsolutePitch
+        /// <summary>
+        /// The argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
+        /// For example: If the MidiChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
+        /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc.
+        /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef. 
+        /// </summary>
+        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
+        public void SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch)
+        {
+            #region conditions
+            Debug.Assert(velocityPerAbsolutePitch.Count == 12);
+            for(int i = 0; i < 12; ++i)
+            {
+                int v = velocityPerAbsolutePitch[i];
+                Debug.Assert(v >= 0 && v <= 127);
+            }
+            #endregion conditions
+
+            Debug.Assert(this.NotatedMidiPitches.Count == NotatedMidiVelocities.Count);
+            for(int pitchIndex = 0; pitchIndex < NotatedMidiPitches.Count; ++pitchIndex)
+            {
+                int absPitch = NotatedMidiPitches[pitchIndex] % 12;
+                NotatedMidiVelocities[pitchIndex] = (byte)velocityPerAbsolutePitch[absPitch];
+            }
+
+            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+            {
+                bmcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+            }
+        }
+        #endregion SetVelocityPerAbsolutePitch
+
         #region SetVerticalVelocityGradient
         /// <summary>
         /// The arguments are both in range [1..127].
         /// This function changes the velocities in both the notated chord and the BasicChordDefs.
         /// The velocities of the root and top notes in the chord are set to the argument values, and the other velocities
-        /// are interpolated linearly. 
+        /// are interpolated linearly.
+        /// The root velocities of all the BasicMidiChordDefs change proportionaly to any change in NotatedMidiVelocities[0].
+        /// The verticalVelocityFactor is (((double)topVelocity) / rootVelocity), and is the same for the NotatedMidiVelocities
+        /// and all the BasicMidiChordDef velocities. 
         /// </summary>
         public void SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
         {
@@ -357,34 +392,28 @@ namespace Moritz.Spec
             Debug.Assert(topVelocity > 0 && topVelocity <= 127);
             #endregion conditions
 
-            double rootVelocityFactor = ((double)rootVelocity) / NotatedMidiVelocities[0];
-            double verticalVelocityFactor = ((double)topVelocity) / rootVelocity;
-
-            SetVelocities(NotatedMidiVelocities, rootVelocityFactor, verticalVelocityFactor);
-
-            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+            if(NotatedMidiVelocities.Count > 1)
             {
-                SetVelocities(bmcd.Velocities, rootVelocityFactor, verticalVelocityFactor);
-            }
-        }
-        /// <summary>
-        /// Called by the above function
-        /// </summary>
-        private void SetVelocities(List<byte> velocities, double rootVelocityFactor, double verticalVelocityFactor)
-        {
-            if(velocities.Count > 1)
-            {
-                byte rootVelocity = M.MidiValue((int)(Math.Round(velocities[0] * rootVelocityFactor)));
-                byte topVelocity = M.MidiValue((int)(Math.Round(rootVelocity * verticalVelocityFactor)));
-                double increment = (((double)(topVelocity - rootVelocity)) / (velocities.Count - 1));
+                double increment = (((double)(topVelocity - rootVelocity)) / (NotatedMidiVelocities.Count - 1));
                 double newVelocity = rootVelocity;
-                for(int velocityIndex = 0; velocityIndex < velocities.Count; ++velocityIndex)
+                for(int velocityIndex = 0; velocityIndex < NotatedMidiVelocities.Count; ++velocityIndex)
                 {
-                    velocities[velocityIndex] = M.MidiValue((int)Math.Round(newVelocity));
+                    NotatedMidiVelocities[velocityIndex] = M.MidiValue((int)Math.Round(newVelocity));
                     newVelocity += increment;
                 }
             }
+
+            double rootVelocityFactor = ((double)rootVelocity) / NotatedMidiVelocities[0];
+            double verticalVelocityFactor = ((double)topVelocity) / rootVelocity;
+
+            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+            {
+                byte bmcdRootVelocity = M.MidiValue((int)(Math.Round(bmcd.Velocities[0] * rootVelocityFactor)));
+                byte bmcdTopVelocity = M.MidiValue((int)(Math.Round(bmcdRootVelocity * verticalVelocityFactor)));
+                bmcd.SetVerticalVelocityGradient(bmcdRootVelocity, bmcdTopVelocity);
+            }
         }
+
         #endregion SetVerticalVelocityGradient
 
         #endregion Functions that use Envelopes
@@ -672,39 +701,6 @@ namespace Moritz.Spec
 
         #endregion OrNotesExclusive
         #endregion GetNoteCombination() 
-
-        #region SetVelocityPerAbsolutePitch
-        /// <summary>
-        /// The argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
-        /// For example: If the MidiChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
-        /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc.
-        /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef. 
-        /// </summary>
-        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
-        public void SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch)
-        {
-            #region conditions
-            Debug.Assert(velocityPerAbsolutePitch.Count == 12);
-            for(int i = 0; i < 12; ++i)
-            {
-                int v = velocityPerAbsolutePitch[i];
-                Debug.Assert(v >= 0 && v <= 127);
-            }
-            #endregion conditions
-
-            Debug.Assert(this.NotatedMidiPitches.Count == NotatedMidiVelocities.Count);
-            for(int pitchIndex = 0; pitchIndex < NotatedMidiPitches.Count; ++pitchIndex)
-            {
-                int absPitch = NotatedMidiPitches[pitchIndex] % 12;
-                NotatedMidiVelocities[pitchIndex] = (byte)velocityPerAbsolutePitch[absPitch];
-            }
-
-            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
-            {
-                bmcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
-            }
-        }
-        #endregion SetVelocityPerAbsolutePitch
 
         #region IUniqueChordDef
         /// <summary>

@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Xml;
 using System.Diagnostics;
+
 using Moritz.Globals;
 
 namespace Moritz.Spec
@@ -75,6 +77,30 @@ namespace Moritz.Spec
             {
                 int absPitch = Pitches[pitchIndex] % 12;
                 Velocities[pitchIndex] = (byte)velocityPerAbsolutePitch[absPitch];
+            }
+        }
+
+        /// <summary>
+        /// The arguments are both in range [1..127].
+        /// If the basicMidiChordDef contains more than 1 note (=velocity), the velocities of the root and top notes in the
+        /// chord are set to the argument values, and the other velocities are interpolated linearly. 
+        /// </summary>
+        public void SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
+        {
+            #region conditions
+            Debug.Assert(rootVelocity > 0 && rootVelocity <= 127);
+            Debug.Assert(topVelocity > 0 && topVelocity <= 127);
+            #endregion conditions
+            
+            if(Velocities.Count > 1)
+            {
+                double increment = (((double)(topVelocity - rootVelocity)) / (Velocities.Count - 1));
+                double newVelocity = rootVelocity;
+                for(int velocityIndex = 0; velocityIndex < Velocities.Count; ++velocityIndex)
+                {
+                    Velocities[velocityIndex] = M.MidiValue((int)Math.Round(newVelocity));
+                    newVelocity += increment;
+                }
             }
         }
 

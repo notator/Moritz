@@ -78,17 +78,15 @@ namespace Moritz.Algorithm.Tombeau1
                further pitches to one-note chords.
             ** NOTE VELOCITIES can be controlled independently to emphasise "harmonic" relations in areas of the score.
                Repeated chord sequences can be thus "filtered" differently as in a digital painting.
-               There are currently two functions for setting velocities:
-               -- SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch), which has been defined at three levels:
-                  for the BasicMidiChordDef, MidiChordDef and Trk classes.
+               There are currently two functions for setting velocities.
+               Both of these have been implemented in the BasicMidiChordDef, MidiChordDef and Trk classes:
+               -- SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch):
                   The argument for SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch) is created by calling
                   the static function GetVelocityPerAbsolutePitch(...), which is defined and documented in Moritz.Statics.
                -- SetVerticalVelocityGradient(rootVelocity, topVelocity):
                   The arguments are both in range [1..127].
                   The velocities of the root and top notes in the chord are set to the argument values. The other velocities
-                  are interpolated linearly. (((double)topVelocity) / rootvelocity ) is the verticalVelocityFactor.
-                  This function is currently implemented only in MidiChordDef.
-                  TODO: Implement it in BasicMidiChordDef and Trk. 
+                  are interpolated linearly. (((double)topVelocity) / rootvelocity ) is the verticalVelocityFactor. 
             
             ** Draw a map of the chords that are to be used, showing the way they relate to each other.
                Use this drawing to create a data structure, containing the chords, that can be used when composing.

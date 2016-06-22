@@ -265,6 +265,31 @@ namespace Moritz.Spec
             }
         }
         #endregion SetVelocityPerAbsolutePitch
+
+        #region SetVerticalVelocityGradient
+        /// <summary>
+        /// The arguments are both in range [1..127].
+        /// This function calls MidiChordDef.SetVerticalVelocityGradient(rootVelocity, topVelocity)
+        /// on all the MidiChordDefs in the Trk. 
+        /// </summary>
+        public void SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
+        {
+            #region conditions
+            Debug.Assert(rootVelocity > 0 && rootVelocity <= 127);
+            Debug.Assert(topVelocity > 0 && topVelocity <= 127);
+            #endregion conditions
+
+            foreach(IUniqueDef iud in UniqueDefs)
+            {
+                MidiChordDef mcd = iud as MidiChordDef;
+                if(mcd != null)
+                {
+                    mcd.SetVerticalVelocityGradient(rootVelocity, topVelocity);
+                }
+            }
+        }
+
+        #endregion SetVerticalVelocityGradient
         #endregion Envelopes
 
         /// <summary>
