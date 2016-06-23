@@ -751,34 +751,18 @@ namespace Moritz.Globals
         /// The returned values are in order of absolute pitch, with C natural (absolute pitch 0) at position 0,
         /// C# (absolute pitch 1) at position 1, etc.
         /// </summary>
-        /// <param name="basePitch">In range [0..127]</param>
-        /// <param name="baseVelocity">In range [1..127]</param>
-        /// <param name="relativePitchHierarchyIndex">index in M.RelativePitchHierarchies: in range [0..21]</param>
-        /// <param name="velocityFactorsIndex">index in M.VelocityFactors: in range [0..7}</param>
-        public static List<int> GetVelocityPerAbsolutePitch(int basePitch,
-                                                      int baseVelocity,
-                                                      int relativePitchHierarchyIndex,
-                                                      int velocityFactorsIndex
-                                                     )
+        /// <param name="absolutePitchHierarchy">retrieved using M.GetAbsolutePitchHierarchy(...)</param>
+        /// <param name="velocityFactorsIndex">index in M.VelocityFactors: in range [0..7]</param>
+        public static List<int> GetVelocityPerAbsolutePitch(List<int> absolutePitchHierarchy, int velocityFactorsIndex )
         {
-            #region conditions
-            Debug.Assert(basePitch >= 0 && basePitch <= 127);
-            Debug.Assert(baseVelocity >= 1 && baseVelocity <= 127);
-            #endregion conditions
-
-            List<int> relativePitchHierarchy = GetRelativePitchHierarchy(relativePitchHierarchyIndex);
             List<double> velocityFactorPerPitch = GetVelocityFactors(velocityFactorsIndex);
 
             List<int> velocityPerAbsPitch = new List<int>();
-            int baseAbsPitch = basePitch % 12;
             for(int absPitch = 0; absPitch < 12; ++absPitch)
             {
-                int velocity = 0;
-                int pitchRelBase = absPitch - baseAbsPitch;
-                pitchRelBase = (pitchRelBase >= 0) ? pitchRelBase : pitchRelBase + 12;
+                int absPitchIndex = absolutePitchHierarchy.IndexOf(absPitch);
 
-                int vFactorIndex = relativePitchHierarchy.IndexOf(pitchRelBase);
-                velocity = M.MidiValue((int)(baseVelocity * velocityFactorPerPitch[vFactorIndex]));
+                int velocity = M.MidiValue((int)(127 * velocityFactorPerPitch[absPitchIndex]));
                 velocity = (velocity == 0) ? 1 : velocity;
 
                 velocityPerAbsPitch.Add(velocity);
@@ -846,24 +830,24 @@ namespace Moritz.Globals
         /// Returns a list that basically contains the sums of absoluteValue(rootPitch) + RelativePitchHierarchies[index].
         /// If a value would be greater than 11, value = value - 12, so that all values are in range [0..11].
         /// </summary>
-        /// <param name="index">In range [0..21]</param>
+        /// <param name="relativePitchHierarchyIndex">In range [0..21]</param>
         /// <param name="rootPitch">In range [0..127]</param>
-        public static List<int> GetAbsolutePitchHierarchy(int index, int rootPitch)
+        public static List<int> GetAbsolutePitchHierarchy(int relativePitchHierarchyIndex, int rootPitch)
         {
             if(RelativePitchHierarchies.Count != 22)
             {
                 throw new ArgumentException($"{nameof(RelativePitchHierarchies)} has changed!");
             }
-            if(index < 0 || index > 21)
+            if(relativePitchHierarchyIndex < 0 || relativePitchHierarchyIndex >= RelativePitchHierarchies.Count)
             {
-                throw new ArgumentException($"{nameof(index)} out of range.");
+                throw new ArgumentException($"{nameof(relativePitchHierarchyIndex)} out of range.");
             }
             if(rootPitch < 0 || rootPitch > 127)
             {
                 throw new ArgumentException($"{nameof(rootPitch)} out of range.");
             }
 
-            List<int> absolutePitchHierarchy = new List<int>(RelativePitchHierarchies[index]); // checks index
+            List<int> absolutePitchHierarchy = new List<int>(RelativePitchHierarchies[relativePitchHierarchyIndex]); // checks index
             int absRootPitch = rootPitch % 12;
 
             for(int i = 0; i < absolutePitchHierarchy.Count; ++i)

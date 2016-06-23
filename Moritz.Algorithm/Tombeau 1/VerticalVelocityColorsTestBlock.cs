@@ -15,15 +15,9 @@ namespace Moritz.Algorithm.Tombeau1
         private Block VerticalVelocityColorsTestBlock()
         {
             List<Trk> sys1Trks = new List<Trk>();
-            //List<byte> topVelocities = new List<byte>() { 1, 12, 24, 35, 47, 58, 70, 81, 93, 104, 116, 127 };
-            //List<byte> rootVelocities = new List<byte>() { 127, 116, 104, 93, 81, 70, 58, 47, 35, 24, 12, 1 };
 
-            List<int> velocityPerAbsolutePitch =
-                M.GetVelocityPerAbsolutePitch(5,    // The base pitch for the pitch hierarchy.
-                                              127,  // the velocity given to any absolute base pitch (if it exists) in the MidiChordDef
-                                              0,    // index in M.RelativePitchHierarchies: in range [0..21]
-                                              0     // index in M.VelocityFactors: in range [0..7]
-                                             );
+            List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(0, 0);
+            List<int> velocityPerAbsolutePitch = M.GetVelocityPerAbsolutePitch(absolutePitchHierarchy, 0);
 
             Palette palette = GetPaletteByName("Tombeau1.1");
             for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)

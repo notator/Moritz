@@ -15,9 +15,10 @@ namespace Moritz.Algorithm.Tombeau1
         private Block VelocityPerAbsolutePitchTestBlock(List<MidiChordDef> majorCircularPalette, List<MidiChordDef> minorCircularPalette)
         {
             List<Block> blocks = new List<Block>();
+            int chordDensity = 5;
 
-            blocks.Add(VelocityPerAbsolutePitchTestBar(majorCircularPalette));
-            blocks.Add(VelocityPerAbsolutePitchTestBar(minorCircularPalette));
+            blocks.Add(VelocityPerAbsolutePitchTestBar(chordDensity, false));
+            blocks.Add(VelocityPerAbsolutePitchTestBar(chordDensity, true));
 
             Block mainBlock = blocks[0];
             for(int i = 1; i < blocks.Count; ++i)
@@ -28,20 +29,31 @@ namespace Moritz.Algorithm.Tombeau1
             return mainBlock;           
         }
 
-        private Block VelocityPerAbsolutePitchTestBar(List<MidiChordDef> staffMidiChordDefs)
+        private Block VelocityPerAbsolutePitchTestBar(int chordDensity, bool invert)
         {
             List<Trk> trks = new List<Trk>();
 
+            int relativePitchHierarchyIndex = 0;
+
+            List<int> blockAbsolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, 0);
+
             for(int rootPitch = 0; rootPitch < 8; ++rootPitch)
             {
-                List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(0, rootPitch);
+                List<int> staffAbsolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, rootPitch);
+
                 Trk trk = new Trk(rootPitch);
 
-                foreach(MidiChordDef paletteMcd in staffMidiChordDefs)
+                for(int j = 0; j < 20; ++j)
                 {
-                    MidiChordDef mcd = ((MidiChordDef)paletteMcd.Clone());
+                    MidiChordDef mcd = new MidiChordDef(chordDensity, 60 + j, staffAbsolutePitchHierarchy, 127, 1200, true);
+                    if(invert == true)
+                    {
+                        mcd = mcd.UpsideDown();
+                    }
 
-                    List<int> velocityPerAbsolutePitch = M.GetVelocityPerAbsolutePitch(rootPitch, 127, 0, 0);
+                    mcd.Lyric = (j).ToString();
+
+                    List<int> velocityPerAbsolutePitch = M.GetVelocityPerAbsolutePitch(blockAbsolutePitchHierarchy, 0);
                     mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
 
                     trk.Add(mcd);

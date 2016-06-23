@@ -16,12 +16,8 @@ namespace Moritz.Algorithm.Tombeau1
         {
             Seq seq = new Seq(0, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
 
-            List<int> velocityPerAbsolutePitch =
-                M.GetVelocityPerAbsolutePitch(5,    // The base pitch for the pitch hierarchy.
-                                              127,  // the velocity given to any absolute base pitch (if it exists) in the MidiChordDef
-                                              0,    // index in M.RelativePitchHierarchies: in range [0..21]
-                                              0     // index in M.VelocityFactors: in range [0..7]
-                                             );
+            List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(0, 5);
+            List<int> velocityPerAbsolutePitch = M.GetVelocityPerAbsolutePitch(absolutePitchHierarchy, 0);
 
             Palette palette = GetPaletteByName("Tombeau1.1");
             for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)

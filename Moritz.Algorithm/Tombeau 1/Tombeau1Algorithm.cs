@@ -189,7 +189,7 @@ namespace Moritz.Algorithm.Tombeau1
                 }     
             }
             List<MidiChordDef> majorCircularPalette = new List<MidiChordDef>();
-            for(int j = 0; j < absolutePitchHierarchies.Count; ++j)
+            for(int j = 0; j < 24; ++j)
             {
                 List<int> absolutePitchHierarchy = absolutePitchHierarchies[0];
 

@@ -49,12 +49,9 @@ namespace Moritz.Algorithm.Tombeau1
             for(int vfIndex = 0; vfIndex < velocityFactorsListsCount; ++vfIndex)
             {
                 Trk trk = new Trk(vfIndex);
-                List<int> velocityPerAbsolutePitch =
-                        M.GetVelocityPerAbsolutePitch(0,    // The base pitch for the pitch hierarchy.
-                        127,  // the velocity given to any absolute base pitch (if it exists) in the MidiChordDef
-                        0, // index in M.RelativePitchHierarchies: in range [0..21]
-                        vfIndex  // index in M.VelocityFactors: in range [0..7]
-                       );
+
+                List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(0, 0);
+                List<int> velocityPerAbsolutePitch = M.GetVelocityPerAbsolutePitch(absolutePitchHierarchy, vfIndex);
 
                 foreach(MidiChordDef paletteMcd in staffMidiChordDefs)
                 {
