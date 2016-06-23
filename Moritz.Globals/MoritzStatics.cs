@@ -789,10 +789,11 @@ namespace Moritz.Globals
         /// <summary>
         /// Returns a list of pitch numbers in range [0..127] in ascending order.
         /// The first pitch in the returned list is always rootPitch.
-        /// The pitches are the nPitches beginning with and following the rootPitch in the absolutePitchHierarchy,
-        /// transposed to be in ascending order by adding 12 as necessary.
-        /// Pitches that would be higher than 127 are simply not added to the returned list, so that the actual
-        /// number of pitches can be less than nPitches. 
+        /// The other returned pitches are transposed to be in ascending order by adding 12 as necessary.
+        /// The maximum number of pitches returned is either nPitches or the number of pitches beginning with and
+        /// following the rootPitch in the absolutePitchHierarchy, whichever is smaller.
+        /// The number of returned pitches can also be smaller than nPitches because pitches that would be higher
+        /// than 127 are simply not added to the returned list.
         /// </summary>
         /// <param name="nPitches">In range [1..12]</param>
         /// <param name="rootPitch">In range [0..127]</param>
@@ -810,17 +811,17 @@ namespace Moritz.Globals
             if(nPitches > 1)
             {
                 int absRootPitch = rootPitch % 12;
-                int index = absolutePitchHierarchy.IndexOf(absRootPitch);
-                int maxIndex = index + nPitches;
-                List<int> localAbsPH = new List<int>(absolutePitchHierarchy);
-                localAbsPH.AddRange(absolutePitchHierarchy); // now has double length
-                for(int i = index + 1; i < maxIndex; ++i)
+                int rootIndex = absolutePitchHierarchy.IndexOf(absRootPitch);
+                int maxIndex = rootIndex + nPitches;
+                maxIndex = (maxIndex < absolutePitchHierarchy.Count) ? maxIndex : absolutePitchHierarchy.Count;
+                for(int i = rootIndex + 1; i < maxIndex; ++i)
                 {
-                    int pitch = localAbsPH[i];
+                    int pitch = absolutePitchHierarchy[i];
                     while(pitch <= pitches[pitches.Count - 1])
                     {
                         pitch += 12;
                     }
+
                     if(pitch <= 127)
                     {
                         pitches.Add(pitch);
