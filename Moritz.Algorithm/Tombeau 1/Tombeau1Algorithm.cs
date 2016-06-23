@@ -135,8 +135,8 @@ namespace Moritz.Algorithm.Tombeau1
             blocks.Add(initBlock);
 
             #region test blocks
-            Block verticalVelocityChordsTestBlock = VerticalVelocityChordsTestBlock(majorPalette, minorPalette);
-            blocks.Add(verticalVelocityChordsTestBlock); // 2 bars (2 systems)
+            Block velocityPerAbsolutePitchTestBlock = VelocityPerAbsolutePitchTestBlock(majorPalette, minorPalette);
+            blocks.Add(velocityPerAbsolutePitchTestBlock); // 2 bars (2 systems)
 
             Block harmonicVelocityChordsTestBlock = HarmonicVelocityChordsTestBlock(majorPalette, minorPalette);
             blocks.Add(harmonicVelocityChordsTestBlock); // 2 bars (2 systems)
@@ -176,7 +176,7 @@ namespace Moritz.Algorithm.Tombeau1
         {
             List<List<int>> absolutePitchHierarchies = new List<List<int>>();
             int phIndex = 0;
-            int rootPitch = 63;
+            int rootPitch = 0;
             while(true)
             {
                 try
@@ -194,9 +194,6 @@ namespace Moritz.Algorithm.Tombeau1
                 List<int> absolutePitchHierarchy = absolutePitchHierarchies[0];
 
                 MidiChordDef mcd = new MidiChordDef(chordDensity, 60 + j, absolutePitchHierarchy, 127, 1200, true);
-
-                List<int> velocityPerAbsolutePitch = M.GetVelocityPerAbsolutePitch(rootPitch, 127, 0, 0);
-                mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
 
                 mcd.Lyric = (j).ToString();
                 majorCircularPalette.Add(mcd);

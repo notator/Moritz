@@ -47,7 +47,7 @@
     <Compile Include="Study 3.1\Study3Sketch1Algorithm.cs" />
     <Compile Include="Study 3.2\Study3Sketch2Algorithm.cs" />
     <Compile Include="Tombeau 1\Init.cs" />
-    <Compile Include="Tombeau 1\VerticalVelocityChordsTestBlock.cs" />
+    <Compile Include="Tombeau 1\VelocityPerAbsolutePitchTestBlock.cs" />
     <Compile Include="Tombeau 1\HarmonicVelocityChordsTestBlock.cs" />
     <Compile Include="Tombeau 1\TimeWarpTestBlock.cs" />
     <Compile Include="Tombeau 1\VerticalVelocityColorsTestBlock.cs" />
