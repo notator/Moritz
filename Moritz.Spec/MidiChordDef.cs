@@ -276,6 +276,7 @@ namespace Moritz.Spec
                     pitches.Add((byte)(pitches[pitches.Count - 1] + interval));
                 }
                 mcdInverted = new MidiChordDef(pitches, NotatedMidiVelocities, MsDuration, true);
+                mcdInverted.Lyric = (Lyric == null) ? null : String.Copy(Lyric);
             }
             else
             {
