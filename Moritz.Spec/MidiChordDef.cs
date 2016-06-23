@@ -248,6 +248,44 @@ namespace Moritz.Spec
         }
         #endregion Clone
 
+        #region UpsideDown
+        /// <summary>
+        /// Creates a MidiChordDef containing a single BasicMidiChordDef having the NotatedMidiPitches.
+        /// The original base pitch is preserved, but the top-bottom order of the prime intervals is reversed.
+        /// Velocities remain in the same order, bottom to top. They are not inverted.
+        /// To add upside-down BasicMidiChordDefs, call BasicMidiChordDef.UpsideDown() 
+        /// </summary>
+        /// <returns></returns>
+        public MidiChordDef UpsideDown()
+        {
+            MidiChordDef mcdInverted = null;
+
+            if(NotatedMidiPitches.Count > 1)
+            {
+                List<byte> intervals = new List<byte>();
+
+                for(int i = 1; i < NotatedMidiPitches.Count; ++i)
+                {
+                    intervals.Add((byte)(NotatedMidiPitches[i] - NotatedMidiPitches[i - 1]));
+                }
+                intervals.Reverse();
+                List<byte> pitches = new List<byte>() { NotatedMidiPitches[0] };
+                for(int i = 0; i < intervals.Count; ++i)
+                {
+                    byte interval = intervals[i];
+                    pitches.Add((byte)(pitches[pitches.Count - 1] + interval));
+                }
+                mcdInverted = new MidiChordDef(pitches, NotatedMidiVelocities, MsDuration, true);
+            }
+            else
+            {
+                mcdInverted = (MidiChordDef) Clone();
+            }
+
+            return mcdInverted;
+        }
+        #endregion UpsideDown
+
         #region Functions that use Envelopes
         /// <summary>
         /// Changes the msPositions of the BasicMidiChordDefs without changing the length of the MidiChordDef. Has no effect on Sliders.

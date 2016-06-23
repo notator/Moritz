@@ -50,7 +50,6 @@ namespace Moritz.Algorithm.Tombeau1
                 foreach(MidiChordDef paletteMcd in staffMidiChordDefs)
                 {
                     MidiChordDef mcd = ((MidiChordDef)paletteMcd.Clone());
-                    //mcd.SetVerticalVelocityGradient(rootVelocity, topVelocity);
 
                     trk.Add(mcd);
                 }

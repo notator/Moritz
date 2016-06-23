@@ -83,25 +83,9 @@ namespace Moritz.Algorithm.Tombeau1
             List<MidiChordDef> minor = new List<MidiChordDef>();
             foreach(MidiChordDef mcd in midiChordDefs)
             {
-                List<byte> intervals = new List<byte>();
+                MidiChordDef upsideDownMCD = mcd.UpsideDown();
 
-                for(int i = 1; i < density; ++i)
-                {
-                    intervals.Add((byte)(mcd.NotatedMidiPitches[i] - mcd.NotatedMidiPitches[i - 1]));
-                }
-                intervals.Reverse();
-                List<byte> pitches = new List<byte>() { mcd.NotatedMidiPitches[0] };
-                List<byte> velocities = new List<byte>() { mcd.NotatedMidiVelocities[0] }; ;
-                for(int i = 0; i < intervals.Count; ++i)
-                {
-                    byte interval = intervals[i];
-                    pitches.Add((byte)(pitches[pitches.Count - 1] + interval));
-                    velocities.Add(mcd.NotatedMidiVelocities[i]);
-                }
-
-                MidiChordDef mcdInverted = new MidiChordDef(pitches, velocities, mcd.MsDuration, true);
-
-                minor.Add(mcdInverted);
+                minor.Add(upsideDownMCD);
             }
             return minor;
         }

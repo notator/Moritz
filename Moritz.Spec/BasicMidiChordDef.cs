@@ -82,6 +82,40 @@ namespace Moritz.Spec
             Velocities = new List<byte>(original.Velocities);
         }
 
+        #region UpsideDown
+        /// <summary>
+        /// Creates a BasicMidiChordDef having the original base pitch,
+        /// but in which the top-bottom order of the prime intervals is reversed. 
+        /// Velocities remain in the same order, bottom to top. They are not inverted. 
+        /// </summary>
+        /// <returns></returns>
+        public BasicMidiChordDef UpsideDown()
+        {
+            List<byte> pitches = Pitches; // default if Pitches.Count == 1
+
+            if(Pitches.Count > 1)
+            {
+                List<byte> intervals = new List<byte>();
+
+                for(int i = 1; i < Pitches.Count; ++i)
+                {
+                    intervals.Add((byte)(Pitches[i] - Pitches[i - 1]));
+                }
+                intervals.Reverse();
+                pitches = new List<byte>() { Pitches[0] };
+                for(int i = 0; i < intervals.Count; ++i)
+                {
+                    byte interval = intervals[i];
+                    pitches.Add((byte)(pitches[pitches.Count - 1] + interval));
+                }
+            }
+
+            BasicMidiChordDef invertedBMCD = new BasicMidiChordDef(_msDuration, BankIndex, PatchIndex, HasChordOff, pitches, Velocities);
+
+            return invertedBMCD;
+        }
+        #endregion UpsideDown
+
         public void WriteSVG(XmlWriter w)
         {
             w.WriteStartElement("basicChord");
