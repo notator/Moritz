@@ -89,7 +89,7 @@ namespace Moritz.Spec
         /// Velocities remain in the same order, bottom to top. They are not inverted. 
         /// </summary>
         /// <returns></returns>
-        public BasicMidiChordDef UpsideDown()
+        public BasicMidiChordDef Inversion()
         {
             List<byte> pitches = Pitches; // default if Pitches.Count == 1
 

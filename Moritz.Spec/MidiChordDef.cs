@@ -256,7 +256,7 @@ namespace Moritz.Spec
         /// To add upside-down BasicMidiChordDefs, call BasicMidiChordDef.UpsideDown() 
         /// </summary>
         /// <returns></returns>
-        public MidiChordDef UpsideDown()
+        public MidiChordDef Inversion()
         {
             MidiChordDef mcdInverted = null;
 

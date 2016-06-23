@@ -24,10 +24,7 @@ namespace Moritz.Algorithm.Tombeau1
 		public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
 		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 127, 127, 127, 127, 127, 127, 127, 127 }; } }
 		public override int NumberOfInputVoices { get { return 0; } }
-		public override int NumberOfBars { get { return 25; } }
-
-        List<MidiChordDef> majorPalette = null;
-        List<MidiChordDef> minorPalette = null;
+		public override int NumberOfBars { get { return 27; } }
 
         /// <summary>
         /// See CompositionAlgorithm.DoAlgorithm()
@@ -126,20 +123,19 @@ namespace Moritz.Algorithm.Tombeau1
 
             List<Block> blocks = new List<Block>();
 
-            int chordDensity = 5;
-            majorPalette = GetMajorPalette(chordDensity);
-            minorPalette = UpsideDownChords(majorPalette, chordDensity);
-
             Block initBlock = Init();                                   
             initBlock.SetInitialClefs(new List<string>() { "t", "t", "t", "t", "t", "t", "t", "t" });
             blocks.Add(initBlock);
 
             #region test blocks
-            Block velocityPerAbsolutePitchTestBlock = VelocityPerAbsolutePitchTestBlock(majorPalette, minorPalette);
+            Block velocityPerAbsolutePitchTestBlock = VelocityPerAbsolutePitchTestBlock();
             blocks.Add(velocityPerAbsolutePitchTestBlock); // 2 bars (2 systems)
 
-            Block harmonicVelocityChordsTestBlock = HarmonicVelocityChordsTestBlock(majorPalette, minorPalette);
-            blocks.Add(harmonicVelocityChordsTestBlock); // 2 bars (2 systems)
+            Block gamutTestBlock = GamutTestBlock();
+            blocks.Add(gamutTestBlock); // 2 bars (2 systems)
+
+            Block verticalVelocityGradientTestBlock = VerticalVelocityGradientTestBlock();
+            blocks.Add(verticalVelocityGradientTestBlock); // 2 bars (2 systems)
 
             Block triadsCycleBlock = TriadsCycleBlock();
             blocks.Add(triadsCycleBlock); // 4 bars (1 system)
@@ -171,35 +167,6 @@ namespace Moritz.Algorithm.Tombeau1
 		}
 
         #region functions called from this file or more than one other file
-
-        private List<MidiChordDef> GetMajorPalette(int chordDensity)
-        {
-            List<List<int>> absolutePitchHierarchies = new List<List<int>>();
-            int phIndex = 0;
-            int rootPitch = 0;
-            while(true)
-            {
-                try
-                {
-                    absolutePitchHierarchies.Add(M.GetAbsolutePitchHierarchy(phIndex++, rootPitch));
-                }
-                catch
-                {
-                    break;
-                }     
-            }
-            List<MidiChordDef> majorCircularPalette = new List<MidiChordDef>();
-            for(int j = 0; j < 24; ++j)
-            {
-                List<int> absolutePitchHierarchy = absolutePitchHierarchies[0];
-
-                MidiChordDef mcd = new MidiChordDef(chordDensity, 60 + j, absolutePitchHierarchy, 127, 1200, true);
-
-                mcd.Lyric = (j).ToString();
-                majorCircularPalette.Add(mcd);
-            }
-            return majorCircularPalette;
-        }
 
         /// <summary>
         /// Returns a Block that is the concatenation of the argument blocks.

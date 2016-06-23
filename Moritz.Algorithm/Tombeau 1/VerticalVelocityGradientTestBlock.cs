@@ -12,13 +12,13 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-        private Block VelocityPerAbsolutePitchTestBlock()
+        private Block VerticalVelocityGradientTestBlock()
         {
             List<Block> blocks = new List<Block>();
-            int chordDensity = 3;
+            int chordDensity = 5;
 
-            blocks.Add(VelocityPerAbsolutePitchTestBar(chordDensity, false));
-            blocks.Add(VelocityPerAbsolutePitchTestBar(chordDensity, true));
+            blocks.Add(VerticalVelocityGradientTestBar(chordDensity, false));
+            blocks.Add(VerticalVelocityGradientTestBar(chordDensity, true));
 
             Block mainBlock = blocks[0];
             for(int i = 1; i < blocks.Count; ++i)
@@ -29,13 +29,11 @@ namespace Moritz.Algorithm.Tombeau1
             return mainBlock;           
         }
 
-        private Block VelocityPerAbsolutePitchTestBar(int chordDensity, bool invert)
+        private Block VerticalVelocityGradientTestBar(int chordDensity, bool invert)
         {
             List<Trk> trks = new List<Trk>();
 
             int relativePitchHierarchyIndex = 0;
-
-            List<int> blockAbsolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, 0);
 
             for(int rootPitch = 0; rootPitch < 8; ++rootPitch)
             {
@@ -53,8 +51,7 @@ namespace Moritz.Algorithm.Tombeau1
 
                     mcd.Lyric = (j).ToString();
 
-                    List<int> velocityPerAbsolutePitch = M.GetVelocityPerAbsolutePitch(blockAbsolutePitchHierarchy, 0);
-                    mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+                    mcd.SetVerticalVelocityGradient(127, 12);
 
                     trk.Add(mcd);
                 }

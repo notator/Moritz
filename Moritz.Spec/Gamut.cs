@@ -49,6 +49,37 @@ namespace Moritz.Spec
 
             List<int> sortedBasePitches = SortedBasePitches(relativePitchHierarchy, basePitch, nPitchesPerOctave);
 
+            SetGamutList(sortedBasePitches);
+        }
+
+        public Gamut(List<int> absolutePitchHierarchy, int nPitchesPerOctave)
+        {
+            List<int> sortedBasePitches = new List<int>();
+            for(int i = 0; i < nPitchesPerOctave; ++i)
+            {
+                sortedBasePitches.Add(absolutePitchHierarchy[i]);
+            }
+            sortedBasePitches.Sort();
+
+            SetGamutList(sortedBasePitches);
+        }
+
+        /// <summary>
+        /// This private constructor is used by Clone.
+        /// </summary>
+        /// <param name="list">A valid gamut list (see class summary)</param>
+        private Gamut(List<int> list)
+        {
+            #region conditions
+            ThrowExceptionIfGamutListIsInvalid(list);
+            #endregion conditions
+
+            _list = new List<int>(list);
+        }
+
+        #region private helper functions
+        private void SetGamutList(List<int> sortedBasePitches)
+        {
             _list = new List<int>();
             int rphIndex = 0;
             int octave = 0;
@@ -70,21 +101,6 @@ namespace Moritz.Spec
 
             ThrowExceptionIfGamutListIsInvalid(_list);
         }
-
-        /// <summary>
-        /// This private constructor is used by Clone.
-        /// </summary>
-        /// <param name="list">A valid gamut list (see class summary)</param>
-        private Gamut(List<int> list)
-        {
-            #region conditions
-            ThrowExceptionIfGamutListIsInvalid(list);
-            #endregion conditions
-
-            _list = new List<int>(list);
-        }
-
-        #region private helper functions
         /// <summary>
         /// Throws an exception if the argument is invalid for any of the following reasons:
         /// 1. The argument may not be null or empty.
