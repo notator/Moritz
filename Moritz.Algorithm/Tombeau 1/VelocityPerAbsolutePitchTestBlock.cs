@@ -34,7 +34,7 @@ namespace Moritz.Algorithm.Tombeau1
 
             for(int rootPitch = 0; rootPitch < 8; ++rootPitch)
             {
-                List<int> absolutePitchHierarchy = M.GetAbsolutePitchHeirarchy(0, rootPitch);
+                List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(0, rootPitch);
                 Trk trk = new Trk(rootPitch);
 
                 foreach(MidiChordDef paletteMcd in staffMidiChordDefs)

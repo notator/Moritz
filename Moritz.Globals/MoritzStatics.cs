@@ -840,7 +840,7 @@ namespace Moritz.Globals
             return bytePitches;
         }
 
-        #region static AbsolutePitchHirearchies
+        #region static AbsolutePitchHierarchies
 
         /// <summary>
         /// Returns a list that basically contains the sums of absoluteValue(rootPitch) + RelativePitchHierarchies[index].
@@ -848,7 +848,7 @@ namespace Moritz.Globals
         /// </summary>
         /// <param name="index">In range [0..21]</param>
         /// <param name="rootPitch">In range [0..127]</param>
-        public static List<int> GetAbsolutePitchHeirarchy(int index, int rootPitch)
+        public static List<int> GetAbsolutePitchHierarchy(int index, int rootPitch)
         {
             if(RelativePitchHierarchies.Count != 22)
             {
@@ -873,7 +873,7 @@ namespace Moritz.Globals
             }
             return absolutePitchHierarchy;
         }
-        #endregion static AbsolutePitchHirearchies
+        #endregion static AbsolutePitchHierarchies
         #region static RelativePitchHierarchies
         /// <summary>
         /// Returns a clone of the private list.

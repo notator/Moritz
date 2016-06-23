@@ -181,7 +181,7 @@ namespace Moritz.Algorithm.Tombeau1
             {
                 try
                 {
-                    absolutePitchHierarchies.Add(M.GetAbsolutePitchHeirarchy(phIndex++, rootPitch));
+                    absolutePitchHierarchies.Add(M.GetAbsolutePitchHierarchy(phIndex++, rootPitch));
                 }
                 catch
                 {
