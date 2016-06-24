@@ -232,7 +232,7 @@ namespace Moritz.Spec
                             }
                         }
                     }
-                    mcd.SetPitchWheelSliderEnvelope(new Envelope(mcdEnvelope, 127, 127, mcdEnvelope.Count));
+                    mcd.SetPitchWheelEnvelope(new Envelope(mcdEnvelope, 127, 127, mcdEnvelope.Count));
                 }
             }
         }

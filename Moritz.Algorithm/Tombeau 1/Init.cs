@@ -142,7 +142,7 @@ namespace Moritz.Algorithm.Tombeau1
             foreach(List<byte> envelope in envList)
             {
                 MidiChordDef mcd = new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 127 }, 1000, true);
-                mcd.SetPitchWheelSliderEnvelope(new Envelope(envelope, 127, 127, envelope.Count));
+                mcd.SetPitchWheelEnvelope(new Envelope(envelope, 127, 127, envelope.Count));
                 rval.Add(mcd);
             }
             return rval;

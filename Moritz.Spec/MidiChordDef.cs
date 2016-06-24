@@ -231,7 +231,6 @@ namespace Moritz.Spec
             rval.BasicMidiChordDefs = newBs;
 
             rval.MsDuration = this.MsDuration;
-            rval.BaseMidiVelocity = this.BaseMidiVelocity; // needed for displaying dynamics (must be set *after* setting BasicMidiChordDefs)
 
            return rval;
         }
@@ -248,12 +247,12 @@ namespace Moritz.Spec
         }
         #endregion Clone
 
-        #region UpsideDown
+        #region Inversion
         /// <summary>
         /// Creates a MidiChordDef containing a single BasicMidiChordDef having the NotatedMidiPitches.
         /// The original base pitch is preserved, but the top-bottom order of the prime intervals is reversed.
         /// Velocities remain in the same order, bottom to top. They are not inverted.
-        /// To add upside-down BasicMidiChordDefs, call BasicMidiChordDef.UpsideDown() 
+        /// To add inversions of BasicMidiChordDefs, call BasicMidiChordDef.Inversion() 
         /// </summary>
         /// <returns></returns>
         public MidiChordDef Inversion()
@@ -285,7 +284,7 @@ namespace Moritz.Spec
 
             return mcdInverted;
         }
-        #endregion UpsideDown
+        #endregion Inversion
 
         #region Functions that use Envelopes
         /// <summary>
@@ -334,22 +333,53 @@ namespace Moritz.Spec
         }
 
         #region Sliders
-        public void SetPitchWheelSliderEnvelope(Envelope envelope)
+        public void SetPitchWheelEnvelope(Envelope envelope)
+        {
+            SetSliderEnvelope(envelope.Domain, envelope.OriginalAsBytes, null, null, null);
+        }
+        public void SetPanEnvelope(Envelope envelope)
+        {
+            SetSliderEnvelope(envelope.Domain, null, envelope.OriginalAsBytes, null, null);
+        }
+        public void SetModulationWheelEnvelope(Envelope envelope)
+        {
+            SetSliderEnvelope(envelope.Domain, null, null, envelope.OriginalAsBytes, null);
+        }
+        public void SetExpressionEnvelope(Envelope envelope)
+        {
+            SetSliderEnvelope(envelope.Domain, null, null, null, envelope.OriginalAsBytes);
+        }
+        private void SetSliderEnvelope(int domain, List<byte> pitchWheelBytes, List<byte> panBytes, List<byte> modulationBytes, List<byte> expressionBytes)
         {
             #region condition
-            if(envelope.Domain != 127)
+            if(domain != 127)
             {
-                throw new ArgumentException($"{nameof(envelope.Domain)} must be 127.");
+                throw new ArgumentException($"{nameof(domain)} must be 127.");
             }
             #endregion condition
-            MidiChordSliderDefs mcsd = this.MidiChordSliderDefs;
-            if(mcsd != null)
+
+            if(MidiChordSliderDefs == null)
             {
-                mcsd.PitchWheelMsbs = envelope.OriginalAsBytes;
+                MidiChordSliderDefs = new MidiChordSliderDefs(null, null, null, null);
+            }
+            if(pitchWheelBytes != null)
+            {
+                MidiChordSliderDefs.PitchWheelMsbs = pitchWheelBytes;  
             }
             else
+            if(panBytes != null)
             {
-                MidiChordSliderDefs = new MidiChordSliderDefs(envelope.OriginalAsBytes, null, null, null);
+                MidiChordSliderDefs.PanMsbs = panBytes;
+            }
+            else
+            if(modulationBytes != null)
+            {
+                MidiChordSliderDefs.ModulationWheelMsbs = modulationBytes;
+            }
+            else
+            if(expressionBytes != null)
+            {
+                MidiChordSliderDefs.ExpressionMsbs = expressionBytes;
             }
         }
         #endregion Sliders
@@ -558,7 +588,7 @@ namespace Moritz.Spec
         /// <param name="mcd2"></param>
         /// <param name="midiChordPitchOperator"></param>
         /// <returns></returns>
-        public Tuple<List<byte>, List<byte>> GetNoteCombination(MidiChordDef mcd1, MidiChordDef mcd2, MidiChordPitchOperator midiChordPitchOperator)
+        public static Tuple<List<byte>, List<byte>> GetNoteCombination(MidiChordDef mcd1, MidiChordDef mcd2, MidiChordPitchOperator midiChordPitchOperator)
         {
             Tuple<List<byte>, List<byte>> rval = null;
 
@@ -595,7 +625,7 @@ namespace Moritz.Spec
         /// inserted in the pitches list at the appropriate position (so that pitches continue to be in
         /// ascending order), and the new velocity is inserted at the corresponding position in the velocities list.
         /// </summary>
-        private Tuple<List<byte>, List<byte>> AddNotes(List<byte> arg1Pitches, List<byte> arg1Velocities, List<byte> arg2Pitches, List<byte> arg2Velocities)
+        private static Tuple<List<byte>, List<byte>> AddNotes(List<byte> arg1Pitches, List<byte> arg1Velocities, List<byte> arg2Pitches, List<byte> arg2Velocities)
         {
             List<byte> pitches = new List<byte>(arg1Pitches);
             List<byte> velocities = new List<byte>(arg1Velocities);
@@ -642,7 +672,7 @@ namespace Moritz.Spec
         /// Note that Tuple.Item1 should be checked to see if it is empty before attempting to use the lists to create a new
         /// MidiChordDef (maybe create a RestDef instead).
         /// </summary>
-        private Tuple<List<byte>, List<byte>> SubtractNotes(List<byte> arg1Pitches, List<byte> arg1Velocities, List<byte> arg2Pitches)
+        private static Tuple<List<byte>, List<byte>> SubtractNotes(List<byte> arg1Pitches, List<byte> arg1Velocities, List<byte> arg2Pitches)
         {
             List<byte> pitches = new List<byte>();
             List<byte> velocities = new List<byte>();
@@ -667,7 +697,7 @@ namespace Moritz.Spec
         /// Note that Tuple.Item1 should be checked to see if it is empty before attempting to use the lists to create a new
         /// MidiChordDef (maybe create a RestDef instead).
         /// </summary>
-        private Tuple<List<byte>, List<byte>> OrNotesInclusive(List<byte> arg1Pitches, List<byte> arg1Velocities, List<byte> arg2Pitches)
+        private static Tuple<List<byte>, List<byte>> OrNotesInclusive(List<byte> arg1Pitches, List<byte> arg1Velocities, List<byte> arg2Pitches)
         {
             List<byte> pitches = new List<byte>();
             List<byte> velocities = new List<byte>();
@@ -693,7 +723,7 @@ namespace Moritz.Spec
         /// Note that Tuple.Item1 should be checked to see if it is empty before attempting to use the lists to create a new
         /// MidiChordDef (maybe create a RestDef instead).
         /// </summary>
-        private Tuple<List<byte>, List<byte>> OrNotesExclusive(List<byte> arg1Pitches, List<byte> arg1Velocities, List<byte> arg2Pitches, List<byte> arg2Velocities )
+        private static Tuple<List<byte>, List<byte>> OrNotesExclusive(List<byte> arg1Pitches, List<byte> arg1Velocities, List<byte> arg2Pitches, List<byte> arg2Velocities )
         {
             Tuple<List<byte>, List<byte>> rval = AddNotes(arg1Pitches, arg1Velocities, arg2Pitches, arg2Velocities);
 
@@ -803,80 +833,36 @@ namespace Moritz.Spec
 		}
 
         /// <summary>
-        /// Calls Transpose(interval).
-        /// Gets BasicMidiChordDefs[0].Pitches[0].
-        /// Sets BasicMidiChordDefs[0].Pitches[0] to value, transposing the other pitches accordingly.
-        /// </summary>
-        public byte BaseMidiPitch
-        {
-            get { return BasicMidiChordDefs[0].Pitches[0]; }
-            set
-            {
-                Debug.Assert(BasicMidiChordDefs != null && BasicMidiChordDefs.Count > 0
-                    && BasicMidiChordDefs[0].Pitches != null && BasicMidiChordDefs[0].Pitches.Count > 0);
-
-                if(value != BasicMidiChordDefs[0].Velocities[0])
-                {
-                    int interval = value - BasicMidiChordDefs[0].Velocities[0];
-                    Transpose(interval);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Calls AdjustVelocities(factor).
-        /// Gets BasicMidichordDefs[0].Velocities[0].
-        /// Sets BasicMidiChordDefs[0].Velocities[0] to value, and the other velocities so that the original proportions are kept.
-        /// </summary>
-        public byte BaseMidiVelocity
-		{
-			get { return BasicMidiChordDefs[0].Velocities[0]; }
-			set
-			{
-				Debug.Assert(BasicMidiChordDefs != null && BasicMidiChordDefs.Count > 0
-					&& BasicMidiChordDefs[0].Velocities != null && BasicMidiChordDefs[0].Velocities.Count > 0);
-
-				if(value != BasicMidiChordDefs[0].Velocities[0])
-				{
-					double factor = (((double)value) / BasicMidiChordDefs[0].Velocities[0]);
-					AdjustVelocities(factor);
-				}
-			}
-		}
-
-        /// <summary>
         /// Sets the number of values in NotatedMidiPitches, NotatedMidiVelocities, and all BasicMidiChordDef.Pitches and
-        /// BasicMidiChordDef.Velocities to newDensity, by removing the upper pitches as necessary.
-        /// Requires newDensity to be less than or equal to the current vertical density, and the lengths of all
-        /// the affected lists to be the same.
-        /// ACHTUNG: this function can't be used if an ornament has added pitches to a BasicMidiChordDef. In other
-        /// words, the "note density factors" field in the Ornaments dialog must only contain 1s.
+        /// BasicMidiChordDef.Velocities to newDensity, by removing the upper pitches (and their velocities) as necessary.
+        /// Requires newDensity to be less than or equal to the current vertical density of all the chords to be changed.
         /// </summary>
         public void SetVerticalDensity(int newDensity)
 		{
-            int currentDensity = _notatedMidiPitches.Count;
             #region require
-            Debug.Assert(newDensity <= currentDensity); // if its equal, do nothing
-            Debug.Assert(currentDensity == _notatedMidiVelocities.Count);
+            Debug.Assert(newDensity <= _notatedMidiPitches.Count); // if its equal, do nothing
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
 			{
-				Debug.Assert(currentDensity == bmcd.Pitches.Count
-                 && currentDensity == bmcd.Velocities.Count);
+                Debug.Assert(newDensity <= bmcd.Pitches.Count);
 			}
             #endregion require
 
-            int nElementsToRemove = currentDensity - newDensity;
+            int nElementsToRemove = _notatedMidiPitches.Count - newDensity;
             if(nElementsToRemove > 0)
             {
                 _notatedMidiPitches.RemoveRange(newDensity, nElementsToRemove);
                 _notatedMidiVelocities.RemoveRange(newDensity, nElementsToRemove);
-                foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
-				{
-					bmcd.Pitches.RemoveRange(newDensity, nElementsToRemove);
-					bmcd.Velocities.RemoveRange(newDensity, nElementsToRemove);
-				}
 			}
-		}
+            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+            {
+                nElementsToRemove = bmcd.Pitches.Count - newDensity;
+                if(nElementsToRemove > 0)
+                {
+                    bmcd.Pitches.RemoveRange(newDensity, nElementsToRemove);
+                    bmcd.Velocities.RemoveRange(newDensity, nElementsToRemove);
+                }
+            }
+        }
 
         #region IUniqueDef
         public override string ToString() => $"MidiChordDef: MsDuration={MsDuration} BasePitch={NotatedMidiPitches[0]} MsPositionReFirstIUD={MsPositionReFirstUD}";

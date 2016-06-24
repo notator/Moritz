@@ -69,27 +69,46 @@ namespace Moritz.Algorithm.Tombeau1
             
             ** I want to keep the number of pitches in chords fairly low, so that they are recognisable.
             
-            ** ROOT PITCHES of BasicMidiChordDefs and MidiChordDefs can be constructed using appropriate constructors in
-               the BasicMidiChordDef, MidiChordDef and Trk classes. These constructors are flexible enough to define tremolos.
-            ** ADDITIONAL PITCHES TODO: write functions in the BasicMidiChordDef, MidiChordDef and Trk classes for adding
-               further pitches to one-note chords.
-            ** NOTE VELOCITIES can be controlled independently to emphasise "harmonic" relations in areas of the score.
-               Repeated chord sequences can be thus "filtered" differently as in a digital painting.
-               There are currently two functions for setting velocities.
-               Both of these have been implemented in the BasicMidiChordDef, MidiChordDef and Trk classes:
-               -- SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch):
-                  The argument for SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch) is created by calling
-                  the static function GetVelocityPerAbsolutePitch(...), which is defined and documented in Moritz.Statics.
-               -- SetVerticalVelocityGradient(rootVelocity, topVelocity):
-                  The arguments are both in range [1..127].
-                  The velocities of the root and top notes in the chord are set to the argument values. The other velocities
-                  are interpolated linearly. (((double)topVelocity) / rootvelocity ) is the verticalVelocityFactor. 
+            ** 24.06.16 MidiChordDef functions that have been implementd and are especially relevant to this project:
+                MidiChordDef  constructors:
+                SIMPLE MidiChordDefs (containing a single BasicMidiChordDef):
+                    MidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff)
+                    MidiChordDef(int nPitches, int rootPitch, List<int> absolutePitchHierarchy, int velocity, int msDuration, bool hasChordOff)
+                ORNAMENTS having msDuration, and single-note BasicMidiChordDefs:    
+                    MidiChordDef(int msDuration, List<int> basicMidiChordRootPitches)
+                PALETTE MidiChordDefs (MidiChordDefs created from palettes):    
+                    MidiChordDef(int msDuration, byte pitchWheelDeviation, bool hasChordOff, List<byte> rootMidiPitches, List<byte> rootMidiVelocities, int ornamentNumberSymbol, MidiChordSliderDefs midiChordSliderDefs, List<BasicMidiChordDef> basicMidiChordDefs)
+                    
+                Clone()
+                Inversion()
+
+                TimeWarp(Envelope envelope, double distortion) // Changes the msPositions of the BasicMidiChordDefs without changing the length of the MidiChordDef.
+                MsDuration {get; set;} // set changes the durations of contained BasicMidiChordDefs
+                AdjustMsDuration(double factor) // Multiplies the MsDuration by the given factor.
+
+                SetVerticalDensity(int newDensity)
+                GetNoteCombination(MidiChordDef mcd1, MidiChordDef mcd2, MidiChordPitchOperator midiChordPitchOperator) // a static function
+                
+                Transpose(int interval)
+
+                SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch)
+                SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
+                AdjustVelocities(double factor) // Multiplies the velocities in NotatedMidiVelocities, and all BasicMidiChordDef.Velocities by the argument factor. 
+
+                SetPitchWheelEnvelope(Envelope envelope)
+                SetPanEnvelope(Envelope envelope)
+                SetModulationWheelEnvelope(Envelope envelope)
+                SetExpressionEnvelope(Envelope envelope)
+                AdjustPitchWheel(double factor)
+                PanMsbs {get; set;}
+                AdjustModulationWheel(double factor)
+                AdjustExpression(double factor) 
             
             ** Draw a map of the chords that are to be used, showing the way they relate to each other.
                Use this drawing to create a data structure, containing the chords, that can be used when composing.
                Positions in this structure can probably be assigned to krystal values somehow...
 
-            ** TODO: Write the following functions:
+            ** The following functions could be written:
                -- MidiChordDef.Gliss(toMidiChordDef)
                   This would create both a pitchwheel gliss from the pitchwheel setting of the original chord to the pitchwheel
                   setting of the argument chord, and a transformation in the basicMidiChordDefs to the first basicMidiChordDef
@@ -97,7 +116,7 @@ namespace Moritz.Algorithm.Tombeau1
                -- List<MidiChordDef> MidiChordDef.ToMidiChordDefList()
                   Returns the midiChordDef's basicMidiChordDefs as a list of simple midiChordDefs. The msDurations of the
                   returned midiChordDefs are those of the original basicMidiChorddefs, so the msDuration of the list is the
-                  msDuration of the original midiChordDef. The original midiChordDef can therefore be replaced by list in
+                  msDuration of the original midiChordDef. The original midiChordDef can therefore be replaced by the list in
                   a host Trk.  
                         
             ** Representing velocity using coloured noteheads and extenders:

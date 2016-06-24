@@ -82,7 +82,7 @@ namespace Moritz.Spec
             Velocities = new List<byte>(original.Velocities);
         }
 
-        #region UpsideDown
+        #region Inversion
         /// <summary>
         /// Creates a BasicMidiChordDef having the original base pitch,
         /// but in which the top-bottom order of the prime intervals is reversed. 
@@ -114,7 +114,7 @@ namespace Moritz.Spec
 
             return invertedBMCD;
         }
-        #endregion UpsideDown
+        #endregion Inversion
 
         public void WriteSVG(XmlWriter w)
         {
