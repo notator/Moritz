@@ -99,6 +99,27 @@ namespace Moritz.Spec
         }
 
         /// <summary>
+        /// Uses the values in envelope.Original as indices in the availableValues list
+        /// to create and return a list of values of type T.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="availableValues"></param>
+        /// <returns></returns>
+        public List<T> ValueList<T>(List<T> availableValues)
+        {
+            #region conditions
+            Debug.Assert(Domain < availableValues.Count);
+            #endregion conditions
+
+            List<T> values = new List<T>();
+            foreach(int i in _original)
+            {
+                values.Add(availableValues[i]);
+            }
+            return values;
+        }
+
+        /// <summary>
         /// The values in the returned list are the msPositions to which the corresponding originalMsPositions should be moved.
         /// originalMsPositions[0] must be 0. The originalMsPositions must be in ascending order. 
         /// The distortion argument must be greater than 1. Greater distortion leads to greater time distortion.
@@ -126,7 +147,7 @@ namespace Moritz.Spec
 
             List<int> newMsPositions = new List<int>();
 
-            #region 1. create newIntMsDurations: a list containing the new msDurations
+             #region Create newIntMsDurations: a list containing the new msDurations
             List<int> spreadEnvelope = Spread(_original, originalMsPositions.Count - 1);
             List<double> newDoubleMsDurations = new List<double>();
             double rootDistortion = Math.Pow(distortion, (((double)1) / _domain));             
@@ -149,7 +170,7 @@ namespace Moritz.Spec
                 newIntMsDurations.Add(msDuration);
                 newIntTotalDuration += msDuration;
             }
-            #region 1a. correct any rounding error
+            #region Correct any rounding error
             int roundingError = originalTotalDuration - newIntTotalDuration;
             while(roundingError != 0)
             {
@@ -171,8 +192,8 @@ namespace Moritz.Spec
                     roundingError++;
                 }
             }
-            #endregion correct any rounding error
-            #endregion
+            #endregion Correct any rounding error
+            #endregion Create newIntMsDurations: a list containing the new msDurations
             int msPos = 0;
             foreach(int msDuration in newIntMsDurations)
             {
@@ -188,131 +209,48 @@ namespace Moritz.Spec
         }
 
         /// <summary>
+        /// The returned list contains a list of pitches, one pitch per envelope.Original.Count.
+        /// Throws an exception if firstPitch is not in the gamut.
+        /// Pitches that would be lower or higher than any pitch in the gamut are silently coerced to
+        /// the lowest or highest values respectively.
+        /// </summary>
+        /// <param name="firstPitch">Will be the first pitch in the returned list.</param>
+        public List<int> PitchSequence(int firstPitch, Gamut gamut)
+        {
+            #region conditions
+            if(gamut.IndexOf(firstPitch) < 0)
+            {
+                throw new ArgumentException($"{nameof(firstPitch)} must exist in gamut.List.");
+            }
+            #endregion conditions
+            int firstIndexInEnvelope = _original[0]; // clone
+            int indexOfFirstPitchInGamut = gamut.IndexOf(firstPitch);
+            int indexDiff = indexOfFirstPitchInGamut - firstIndexInEnvelope;
+
+            List<int> indices = Original; // clone
+            for(int i = 0; i < indices.Count; ++i)
+            {
+                indices[i] += indexDiff;
+                indices[i] = (indices[i] < 0) ? 0 : indices[i];
+                indices[i] = (indices[i] >= gamut.Count) ? gamut.Count - 1 : indices[i];
+            }
+
+            List<int> pitches = new List<int>();
+            foreach(int index in indices)
+            {
+                pitches.Add(gamut[index]);
+            }
+
+            return pitches;
+        }
+
+        /// <summary>
         /// Sets _original to a list having count values (interpolated between the original values).
         /// </summary>
         public void SetCount(int count)
         {
             _original = Spread(_original, count);
         }
-
-        #region Spread
-        /// <summary>
-        /// Returns a list having count values interpolated between the original values
-        /// </summary>
-        private List<int> Spread(List<int> argList, int count)
-        {
-            #region conditions
-            if(argList == null || !argList.Any())
-            {
-                throw new ArgumentException($"{nameof(argList)} cannot be null or empty.");
-            }
-            if(count < 1)
-            {
-                throw new ArgumentException($"{nameof(count)} cannot be less than 1.");
-            }
-            #endregion conditions
-
-            List<int> spread = null;
-            if(count == 1)
-            {
-                spread = new List<int>() { argList[0] };
-            }
-            else if(argList.Count == 1)
-            {
-                spread = new List<int>();
-                for(int i= 0; i <count; ++i)
-                {
-                    spread.Add(argList[0]);
-                }
-            }
-            else if(count == argList.Count)
-            {
-                spread = new List<int>(argList);
-            }
-            else
-            {
-                spread = GeneralSpread(argList, count);
-            }
-            return spread;
-        }
-
-        private List<int> GeneralSpread(List<int> argList, int count)
-        {
-            #region conditions
-            Debug.Assert(count > 1 && argList.Count > 1 && count != argList.Count);
-            #endregion conditions
-
-            int nValuesMinusOne = count - 1;
-            int nOriginalValuesMinusOne = argList.Count - 1;
-            List<int> longSpread = new List<int>();
-            for(int i = 0; i < nOriginalValuesMinusOne; ++i)
-            {
-                int b1 = argList[i];
-                int b2 = argList[i + 1];
-                double delta = ((double)(b2 - b1)) / nValuesMinusOne;
-                for(int j = 0; j < nValuesMinusOne; ++j)
-                {
-                    longSpread.Add((int)(Math.Round(b1 + (j * delta))));
-                }
-            }
-
-            Debug.Assert(longSpread.Count == (nOriginalValuesMinusOne * nValuesMinusOne));
-
-            List<int> spread = new List<int>();
-            int index = 0;
-            for(int i = 0; i < nValuesMinusOne; ++i)
-            {
-                spread.Add(longSpread[index]);
-                index += nOriginalValuesMinusOne;
-            }
-            spread.Add(argList[argList.Count - 1]);
-
-            // The spread now contains the correct shape and number of elements.
-            // Now set the minimum and maximum values to the values they have in the original envelope.
-            int originalMin = int.MaxValue;
-            int originalMax = int.MinValue;
-            foreach(int b in argList)
-            {
-                originalMin = (b < originalMin) ? b : originalMin;
-                originalMax = (b > originalMax) ? b : originalMax;
-            }
-
-            spread = JustifyVertically(spread, originalMin, originalMax);
-
-            return spread;
-        }
-
-        /// <summary>
-        /// The minimum value in the returned list is finalMin.
-        /// The maximum value in the returned list is finalMax.
-        /// </summary>
-        /// <returns></returns>
-        private List<int> JustifyVertically(List<int> argList, int finalMin, int finalMax)
-        {
-            #region conditions
-            if(finalMax < finalMin)
-            {
-                throw new ArgumentException($"{nameof(finalMax)} must be greater than or equal to {nameof(finalMin)}");
-            }
-            #endregion conditions
-
-            int currentMin = int.MaxValue;
-            int currentMax = int.MinValue;
-            foreach(int b in argList)
-            {
-                currentMin = (b < currentMin) ? b : currentMin;
-                currentMax = (b > currentMax) ? b : currentMax;
-            }
-
-            List<int> rval = new List<int>();
-            double wideningFactor = (currentMax == currentMin) ? 0 : (double)((finalMax - finalMin)) / (currentMax - currentMin);
-            for(int i = 0; i < argList.Count; ++i)
-            {
-                rval.Add((int)(Math.Round(finalMin + ((argList[i] - currentMin) * wideningFactor))));
-            }
-            return rval;
-        }
-        #endregion Spread
 
         /// <summary>
         /// Stretches or compresses the original envelope by a factor of finalDomain/domain.
@@ -347,7 +285,7 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="msPositions"></param>
         /// <returns></returns>
-        internal Dictionary<int, int> GetValuePerMsPosition(List<int> msPositions)
+        public Dictionary<int, int> GetValuePerMsPosition(List<int> msPositions)
         {
             Envelope envelope = Clone();
             envelope.SetCount(msPositions.Count);
@@ -484,7 +422,129 @@ namespace Moritz.Spec
             }
         }
 
+        #region private
+        #region Spread
+        /// <summary>
+        /// Returns a list having count values interpolated between the original values
+        /// </summary>
+        private List<int> Spread(List<int> argList, int count)
+        {
+            #region conditions
+            if(argList == null || !argList.Any())
+            {
+                throw new ArgumentException($"{nameof(argList)} cannot be null or empty.");
+            }
+            if(count < 1)
+            {
+                throw new ArgumentException($"{nameof(count)} cannot be less than 1.");
+            }
+            #endregion conditions
+
+            List<int> spread = null;
+            if(count == 1)
+            {
+                spread = new List<int>() { argList[0] };
+            }
+            else if(argList.Count == 1)
+            {
+                spread = new List<int>();
+                for(int i = 0; i < count; ++i)
+                {
+                    spread.Add(argList[0]);
+                }
+            }
+            else if(count == argList.Count)
+            {
+                spread = new List<int>(argList);
+            }
+            else
+            {
+                spread = GeneralSpread(argList, count);
+            }
+            return spread;
+        }
+
+        private List<int> GeneralSpread(List<int> argList, int count)
+        {
+            #region conditions
+            Debug.Assert(count > 1 && argList.Count > 1 && count != argList.Count);
+            #endregion conditions
+
+            int nValuesMinusOne = count - 1;
+            int nOriginalValuesMinusOne = argList.Count - 1;
+            List<int> longSpread = new List<int>();
+            for(int i = 0; i < nOriginalValuesMinusOne; ++i)
+            {
+                int b1 = argList[i];
+                int b2 = argList[i + 1];
+                double delta = ((double)(b2 - b1)) / nValuesMinusOne;
+                for(int j = 0; j < nValuesMinusOne; ++j)
+                {
+                    longSpread.Add((int)(Math.Round(b1 + (j * delta))));
+                }
+            }
+
+            Debug.Assert(longSpread.Count == (nOriginalValuesMinusOne * nValuesMinusOne));
+
+            List<int> spread = new List<int>();
+            int index = 0;
+            for(int i = 0; i < nValuesMinusOne; ++i)
+            {
+                spread.Add(longSpread[index]);
+                index += nOriginalValuesMinusOne;
+            }
+            spread.Add(argList[argList.Count - 1]);
+
+            // The spread now contains the correct shape and number of elements.
+            // Now set the minimum and maximum values to the values they have in the original envelope.
+            int originalMin = int.MaxValue;
+            int originalMax = int.MinValue;
+            foreach(int b in argList)
+            {
+                originalMin = (b < originalMin) ? b : originalMin;
+                originalMax = (b > originalMax) ? b : originalMax;
+            }
+
+            spread = JustifyVertically(spread, originalMin, originalMax);
+
+            return spread;
+        }
+
+        /// <summary>
+        /// The minimum value in the returned list is finalMin.
+        /// The maximum value in the returned list is finalMax.
+        /// </summary>
+        /// <returns></returns>
+        private List<int> JustifyVertically(List<int> argList, int finalMin, int finalMax)
+        {
+            #region conditions
+            if(finalMax < finalMin)
+            {
+                throw new ArgumentException($"{nameof(finalMax)} must be greater than or equal to {nameof(finalMin)}");
+            }
+            #endregion conditions
+
+            int currentMin = int.MaxValue;
+            int currentMax = int.MinValue;
+            foreach(int b in argList)
+            {
+                currentMin = (b < currentMin) ? b : currentMin;
+                currentMax = (b > currentMax) ? b : currentMax;
+            }
+
+            List<int> rval = new List<int>();
+            double wideningFactor = (currentMax == currentMin) ? 0 : (double)((finalMax - finalMin)) / (currentMax - currentMin);
+            for(int i = 0; i < argList.Count; ++i)
+            {
+                rval.Add((int)(Math.Round(finalMin + ((argList[i] - currentMin) * wideningFactor))));
+            }
+            return rval;
+        }
+        #endregion private Spread
+
         private List<int> _original = null;
         private int _domain;
+
+        #endregion private
     }
 }

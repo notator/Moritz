@@ -69,8 +69,8 @@ namespace Moritz.Algorithm.Tombeau1
             
             ** I want to keep the number of pitches in chords fairly low, so that they are recognisable.
             
-            ** 24.06.16 MidiChordDef functions that have been implementd and are especially relevant to this project:
-                MidiChordDef  constructors:
+            *** 24.06.16 public MidiChordDef functions that have been implemented and are especially relevant to this project:
+                constructors:
                 SIMPLE MidiChordDefs (containing a single BasicMidiChordDef):
                     MidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff)
                     MidiChordDef(int nPitches, int rootPitch, List<int> absolutePitchHierarchy, int velocity, int msDuration, bool hasChordOff)
@@ -102,8 +102,38 @@ namespace Moritz.Algorithm.Tombeau1
                 AdjustPitchWheel(double factor)
                 PanMsbs {get; set;}
                 AdjustModulationWheel(double factor)
-                AdjustExpression(double factor) 
+                AdjustExpression(double factor)
             
+            *** 24.06.16 public Envelope functions that have been implemented:
+                consructors:
+                Envelope(List<byte> inputValues, int inputDomain, int domain, int count)
+                Envelope(List<int> inputValues, int inputDomain, int domain, int count)
+
+                Clone()
+
+                SetCount(int count)
+                WarpVertically(int finalDomain)
+
+                ValueList<T>(List<T> availableValues) // Uses the values in envelope.Original as indices in the availableValues list to create and return a list of values of type T.
+                TimeWarp(List<int> originalMsPositions, double distortion)
+                GetValuePerMsPosition(List<int> msPositions) // Returns a dictionary in which: Key is one of the positions in msPositions, Value is the envelope value at that msPosition.
+                PitchSequence(int firstPitch, Gamut gamut)
+
+            *** 24.06.16 public Gamut functions that have been implemented:
+                constructors:
+                Gamut(int indexInRelativePitchHierarchiesList, int nPitchesPerOctave, int basePitch)
+                Gamut(List<int> absolutePitchHierarchy, int nPitchesPerOctave)
+
+                Clone()
+
+                AddOctaves(int pitchArg)
+                RemoveOctaves(int pitchArg)
+
+                IndexOf(int pitch)
+                List {get;} // a copy of the private list.
+                Count {get;}
+
+
             ** Draw a map of the chords that are to be used, showing the way they relate to each other.
                Use this drawing to create a data structure, containing the chords, that can be used when composing.
                Positions in this structure can probably be assigned to krystal values somehow...

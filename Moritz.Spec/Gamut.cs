@@ -28,12 +28,12 @@ namespace Moritz.Spec
         /// <para>Pitches can be added to, or removed from, a gamut by calling
         /// AddOctaves(...) or RemoveOctaves(...).</para>
         /// </summary>
-        /// <param name="index">The index in the static RelativePitchHierarchies list. (Range [0..21]</param>
+        /// <param name="indexInRelativePitchHierarchiesList">The index in the static RelativePitchHierarchies list. (Range [0..21]</param>
         /// <param name="nPitchesPerOctave">The number of different pitches in each octave. (Range [1..12])</param>
         /// <param name="basePitch">The Gamut's lowest pitch. (Range [0..11])</param>
-        public Gamut(int index, int nPitchesPerOctave, int basePitch)
+        public Gamut(int indexInRelativePitchHierarchiesList, int nPitchesPerOctave, int basePitch)
         {
-            List<int> relativePitchHierarchy = M.GetRelativePitchHierarchy(index); // checks index
+            List<int> relativePitchHierarchy = M.GetRelativePitchHierarchy(indexInRelativePitchHierarchiesList); // checks index
 
             #region conditions
             if(nPitchesPerOctave < 1 || nPitchesPerOctave > relativePitchHierarchy.Count)
@@ -187,42 +187,6 @@ namespace Moritz.Spec
         public Gamut Clone()
         {
             return new Gamut(_list);
-        }
-
-        /// <summary>
-        /// The returned list contains a list of pitches, one pitch per envelope.Original.Count.
-        /// Throws an exception if firstPitch is not in the gamut.
-        /// </summary>
-        /// <param name="firstPitch">Will be the first pitch in the returned list.</param>
-        /// <param name="envelope">envelope.Original.Count will be the length of the returned list.</param>
-        /// <returns></returns>
-        public List<int> PitchSequence(int firstPitch, Envelope envelope)
-        {
-            #region conditions
-            if(!_list.Contains(firstPitch))
-            {
-                throw new ArgumentException($"{nameof(firstPitch)} must exist in gamut.List.");
-            }
-            #endregion conditions
-            int firstIndexInEnvelope = envelope.Original[0]; // clone
-            int indexOfFirstPitchInGamut = _list.IndexOf(firstPitch);
-            int indexDiff = indexOfFirstPitchInGamut - firstIndexInEnvelope;
-
-            List<int> indices = envelope.Original; // clone
-            for(int i = 0; i < indices.Count; ++i)
-            {
-                indices[i] += indexDiff;
-                indices[i] = (indices[i] < 0) ? 0 : indices[i];
-                indices[i] = (indices[i] >= _list.Count) ? _list.Count - 1 : indices[i];
-            }
-
-            List<int> pitches = new List<int>();
-            foreach(int index in indices)
-            {
-                pitches.Add(_list[index]);
-            }
-
-            return pitches;
         }
 
         /// <summary>

@@ -135,7 +135,6 @@ namespace Moritz.Algorithm.Tombeau1
             return displayBlock;
         }
 
-
         private List<MidiChordDef> GetPitchWheelCoreMidiChordDefs(List<List<byte>> envList)
         {
             List<MidiChordDef> rval = new List<MidiChordDef>();
@@ -160,7 +159,7 @@ namespace Moritz.Algorithm.Tombeau1
                 int firstPitch = 60;
                 if(gamut.IndexOf(firstPitch) >= 0)
                 {
-                    basicMidiChordRootPitches = gamut.PitchSequence(firstPitch, env);
+                    basicMidiChordRootPitches = env.PitchSequence(firstPitch, gamut);
                 }
                 else
                 {
