@@ -119,13 +119,15 @@ namespace Moritz.Algorithm.Tombeau1
                 Envelopes2, Envelopes3, Envelopes4, Envelopes5, Envelopes6, Envelopes7, EnvelopesLong
             };
 
-            int cphIndex = 10;
+            int relativePitchHierarchyIndex = 10;
             foreach(List<List<byte>> envList in envelopes)
             {
                 List<MidiChordDef> pwmcds = GetPitchWheelCoreMidiChordDefs(envList);
                 PitchWheelCoreMidiChordDefs.Add(pwmcds);
 
-                Gamut gamut = new Gamut(cphIndex++, 8, 7);
+                List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex++, 7);
+                Gamut gamut = new Gamut(absolutePitchHierarchy, 8);
+
                 List<MidiChordDef> omcds = GetOrnamentCoreMidiChordDefs(envList, gamut);
                 OrnamentCoreMidiChordDefs.Add(omcds);
             }

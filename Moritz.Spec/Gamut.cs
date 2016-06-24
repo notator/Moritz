@@ -18,40 +18,6 @@ namespace Moritz.Spec
     public class Gamut
     {
         #region constructors
-
-        /// <summary>
-        /// A Gamut contains/is a list of absolute pitch numbers in an ascending order scale.
-        /// All the values are different and in range [0..127].
-        /// <para>Gamut.List[0] == basePitch (restricted to range [0..11]).</para>
-        /// <para>Each absolute pitch exists at all possible octaves in the gamut.
-        /// (So each octave range in the gamut contains the same absolute pitches.)</para>
-        /// <para>Pitches can be added to, or removed from, a gamut by calling
-        /// AddOctaves(...) or RemoveOctaves(...).</para>
-        /// </summary>
-        /// <param name="indexInRelativePitchHierarchiesList">The index in the static RelativePitchHierarchies list. (Range [0..21]</param>
-        /// <param name="nPitchesPerOctave">The number of different pitches in each octave. (Range [1..12])</param>
-        /// <param name="basePitch">The Gamut's lowest pitch. (Range [0..11])</param>
-        public Gamut(int indexInRelativePitchHierarchiesList, int nPitchesPerOctave, int basePitch)
-        {
-            List<int> relativePitchHierarchy = M.GetRelativePitchHierarchy(indexInRelativePitchHierarchiesList); // checks index
-
-            #region conditions
-            if(nPitchesPerOctave < 1 || nPitchesPerOctave > relativePitchHierarchy.Count)
-            {
-                throw new ArgumentException($"{nameof(nPitchesPerOctave)} out of range.");
-            }
-
-            if(basePitch < 0 || basePitch > 11)
-            {
-                throw new ArgumentException($"{nameof(basePitch)} out of range.");
-            }
-            #endregion conditions
-
-            List<int> sortedBasePitches = SortedBasePitches(relativePitchHierarchy, basePitch, nPitchesPerOctave);
-
-            SetGamutList(sortedBasePitches);
-        }
-
         public Gamut(List<int> absolutePitchHierarchy, int nPitchesPerOctave)
         {
             List<int> sortedBasePitches = new List<int>();

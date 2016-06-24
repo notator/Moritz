@@ -104,8 +104,13 @@ namespace Moritz.Algorithm.Tombeau1
                 AdjustModulationWheel(double factor)
                 AdjustExpression(double factor)
             
+            *** 24.06.16 public static Moritz.Statics functions relating to pitch hierarchies and velocities:
+                GetAbsolutePitchHierarchy(int relativePitchHierarchyIndex, int rootPitch)
+                GetVelocityPerAbsolutePitch(List<int> absolutePitchHierarchy, int velocityFactorsIndex)
+                GetAscendingPitches(int nPitches, int rootPitch, List<int> absolutePitchHierarchy)
+            
             *** 24.06.16 public Envelope functions that have been implemented:
-                consructors:
+                constructors:
                 Envelope(List<byte> inputValues, int inputDomain, int domain, int count)
                 Envelope(List<int> inputValues, int inputDomain, int domain, int count)
 
@@ -120,8 +125,7 @@ namespace Moritz.Algorithm.Tombeau1
                 PitchSequence(int firstPitch, Gamut gamut)
 
             *** 24.06.16 public Gamut functions that have been implemented:
-                constructors:
-                Gamut(int indexInRelativePitchHierarchiesList, int nPitchesPerOctave, int basePitch)
+                constructor:
                 Gamut(List<int> absolutePitchHierarchy, int nPitchesPerOctave)
 
                 Clone()

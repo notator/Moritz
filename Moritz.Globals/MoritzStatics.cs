@@ -747,13 +747,15 @@ namespace Moritz.Globals
         };
 
         /// <summary>
-        /// The returned list contains 12 velocity values in range [1..127]
+        /// The returned list contains 12 velocity values in range [1..127].
+        /// The pitch at absolutePitchHierarchy[0] is given velocity=127. The other pitches are given velocities
+        /// = 127 * the factor in their corresponding index in M.VelocityFactors[velocityFactorsIndex].
         /// The returned values are in order of absolute pitch, with C natural (absolute pitch 0) at position 0,
         /// C# (absolute pitch 1) at position 1, etc.
         /// </summary>
         /// <param name="absolutePitchHierarchy">retrieved using M.GetAbsolutePitchHierarchy(...)</param>
         /// <param name="velocityFactorsIndex">index in M.VelocityFactors: in range [0..7]</param>
-        public static List<int> GetVelocityPerAbsolutePitch(List<int> absolutePitchHierarchy, int velocityFactorsIndex )
+        public static List<int> GetVelocityPerAbsolutePitch(List<int> absolutePitchHierarchy, int velocityFactorsIndex)
         {
             List<double> velocityFactorPerPitch = GetVelocityFactors(velocityFactorsIndex);
 
@@ -858,61 +860,8 @@ namespace Moritz.Globals
             return absolutePitchHierarchy;
         }
         #endregion static AbsolutePitchHierarchies
+
         #region static RelativePitchHierarchies
-        /// <summary>
-        /// Returns a clone of the private list.
-        /// </summary>
-        /// <param name="index">In range [0..21]</param>
-        public static List<int> GetRelativePitchHierarchy(int index)
-        {
-            if(RelativePitchHierarchies.Count != 22)
-            {
-                throw new ArgumentException($"{nameof(RelativePitchHierarchies)} has changed!");
-            }
-            if(index < 0 || index >= RelativePitchHierarchies.Count)
-            {
-                throw new ArgumentException($"{nameof(index)} out of range.");
-            }
-
-            List<int> relativePitchHierarchy = new List<int>(RelativePitchHierarchies[index]);
-
-            #region check relativePitchHierarchy
-            // Throws an exception if the relativePitchHierarchy is invalid for any of the following reasons:
-            // 1. the number of values in the list is not 12.
-            // 2. the first value in the list is not 0.
-            // 3. any value is < 0 or > 11.
-            // 4. all values must be different.
-            if(relativePitchHierarchy.Count != 12)
-            {
-                throw new ArgumentException($"All lists in the static {nameof(M.RelativePitchHierarchies)} must have 12 values.");
-            }
-            if(relativePitchHierarchy[0] != 0)
-            {
-                throw new ArgumentException($"All lists in the static {nameof(M.RelativePitchHierarchies)} must begin with the value 0.");
-            }
-
-            string errorSource = $"static {nameof(M.RelativePitchHierarchies)}[{index}].";
-
-            for(int i = 0; i < relativePitchHierarchy.Count; ++i)
-            {
-                int value = relativePitchHierarchy[i];
-                if(value < 0 || value > 11)
-                {
-                    throw new ArgumentException($"Illegal value in {errorSource}");
-                }
-                for(int j = i + 1; j < relativePitchHierarchy.Count; ++j)
-                {
-                    int value2 = relativePitchHierarchy[j];
-                    if(value == value2)
-                    {
-                        throw new ArgumentException($"Duplicate values in {errorSource}");
-                    }
-                }
-            }
-            #endregion check relativePitchHierarchy
-
-            return relativePitchHierarchy;
-        }
         /// <summary>
         /// This series of RelativePitchHierarchies is derived from the "most consonant" hierarchy at index 0:
         ///                    0, 7, 4, 10, 2, 5, 9, 11, 1, 3, 6, 8
@@ -971,7 +920,7 @@ namespace Moritz.Globals
         /// If the index argument to this function is 7, all the doubles will be the same size (=1).
         /// </summary>
         /// <param name="index">In range [0..7]</param>
-        public static List<double> GetVelocityFactors(int index)
+        private static List<double> GetVelocityFactors(int index)
         {
             if(index < 0 || index >= VelocityFactors.Count)
             {
