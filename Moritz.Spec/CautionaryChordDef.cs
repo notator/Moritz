@@ -76,7 +76,7 @@ namespace Moritz.Spec
 
         public void AdjustMsDuration(double factor) { }
 
-        public IUniqueDef Clone()
+        public object Clone()
         {
             CautionaryChordDef deepClone = new CautionaryChordDef(this, this._msPositionReFirstIUD, this._msDuration);
             return deepClone;

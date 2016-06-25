@@ -48,7 +48,7 @@ namespace Moritz.Spec
             List<IUniqueDef> clonedIUDs = new List<IUniqueDef>();
             foreach(IUniqueDef iu in _uniqueDefs)
             {
-                IUniqueDef clone = iu.Clone();
+                IUniqueDef clone = (IUniqueDef) iu.Clone();
                 clonedIUDs.Add(clone);
             }
 

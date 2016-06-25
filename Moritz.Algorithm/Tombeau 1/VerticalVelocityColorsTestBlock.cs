@@ -19,14 +19,18 @@ namespace Moritz.Algorithm.Tombeau1
             List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(0, 0);
             List<int> velocityPerAbsolutePitch = M.GetVelocityPerAbsolutePitch(absolutePitchHierarchy, 0);
 
-            Palette palette = GetPaletteByName("Tombeau1.1");
             for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
             {
                 int chordDensity = 4;
-                List<IUniqueDef> sys1mcds = PaletteMidiChordDefs(palette);
-                for(int j = 0; j < sys1mcds.Count; ++j)
+                List<MidiChordDef> mcds = Tombeau1ReadonlyConstants.PaletteMidiChordDefs[0];
+                List<IUniqueDef> iuds = new List<IUniqueDef>();
+                int msPosReFirstUD = 0;
+                for(int j = 0; j < mcds.Count; ++j)
                 {
-                    MidiChordDef mcd = sys1mcds[j] as MidiChordDef;
+
+                    MidiChordDef mcd = (MidiChordDef) mcds[j].Clone();
+                    mcd.MsPositionReFirstUD = msPosReFirstUD;
+                    msPosReFirstUD += mcd.MsDuration;
 
                     mcd.Transpose(i + j - 7);
                     mcd.Lyric = (j).ToString() + "." + chordDensity.ToString();
@@ -36,8 +40,10 @@ namespace Moritz.Algorithm.Tombeau1
                     //mcd.SetVerticalVelocityGradient(rootVelocities[j], topVelocities[j]);
 
                     mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+
+                    iuds.Add(mcd as IUniqueDef);
                 }
-                Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, sys1mcds);
+                Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, iuds);
                 sys1Trks.Add(trk);
             }
 

@@ -305,7 +305,7 @@ namespace Moritz.Palettes
 
         public IUniqueDef UniqueDurationDef(int index)
         {
-            return _durationDefs[index].Clone();
+            return (IUniqueDef) _durationDefs[index].Clone();
         }
         /// <summary>
         /// Returns a MidiChordDef if the object at index is a MidiChordDef,

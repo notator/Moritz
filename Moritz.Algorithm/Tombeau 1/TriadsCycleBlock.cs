@@ -51,19 +51,19 @@ namespace Moritz.Algorithm.Tombeau1
             Trk trk = new Trk(0);
             for(int i = 0; i < 2; ++i)
             {
-                trk.Add(triads1[1].Clone());
-                trk.Add(triads1[0].Clone());
-                trk.Add(triads2[0].Clone());
-                trk.Add(triads2[1].Clone());
-                trk.Add(triads2[2].Clone());
-                trk.Add(triads1[2].Clone());
+                trk.Add((IUniqueDef)triads1[1].Clone());
+                trk.Add((IUniqueDef)triads1[0].Clone());
+                trk.Add((IUniqueDef)triads2[0].Clone());
+                trk.Add((IUniqueDef)triads2[1].Clone());
+                trk.Add((IUniqueDef)triads2[2].Clone());
+                trk.Add((IUniqueDef)triads1[2].Clone());
 
-                trk.Add(triads2wide[0].Clone());
-                trk.Add(triads1wide[0].Clone());
-                trk.Add(triads1wide[1].Clone());
-                trk.Add(triads1wide[2].Clone());
-                trk.Add(triads2wide[2].Clone());
-                trk.Add(triads2wide[1].Clone());
+                trk.Add((IUniqueDef)triads2wide[0].Clone());
+                trk.Add((IUniqueDef)triads1wide[0].Clone());
+                trk.Add((IUniqueDef)triads1wide[1].Clone());
+                trk.Add((IUniqueDef)triads1wide[2].Clone());
+                trk.Add((IUniqueDef)triads2wide[2].Clone());
+                trk.Add((IUniqueDef)triads2wide[1].Clone());
             }
             List<Trk> sys1Trks = new List<Trk>() { trk };
             //Trk ch1Trk = trk.Clone();

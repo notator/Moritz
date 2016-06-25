@@ -52,7 +52,7 @@ namespace Moritz.Spec
             List<IUniqueDef> clonedLmdds = new List<IUniqueDef>();
             foreach(IUniqueDef iu in this._uniqueDefs)
             {
-                IUniqueDef clone = iu.Clone();
+                IUniqueDef clone = (IUniqueDef) iu.Clone();
                 clonedLmdds.Add(clone);
             }
             var ivd = new InputVoiceDef(this.MidiChannel, this.MsPositionReContainer, clonedLmdds);

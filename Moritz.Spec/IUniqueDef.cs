@@ -23,7 +23,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Returns a deep clone (a unique object)
         /// </summary>
-        IUniqueDef Clone();
+        object Clone();
 
         void AdjustMsDuration(double factor);
 

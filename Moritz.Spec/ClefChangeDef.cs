@@ -47,7 +47,7 @@ namespace Moritz.Spec
 
         public void AdjustMsDuration(double factor) {}
 
-        public IUniqueDef Clone()
+        public object Clone()
         {
             ClefChangeDef deepClone = new ClefChangeDef(_clefType, MsPositionReFirstUD);
             return deepClone;

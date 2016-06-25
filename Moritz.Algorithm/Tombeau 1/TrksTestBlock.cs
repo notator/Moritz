@@ -19,17 +19,18 @@ namespace Moritz.Algorithm.Tombeau1
             List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(0, 5);
             List<int> velocityPerAbsolutePitch = M.GetVelocityPerAbsolutePitch(absolutePitchHierarchy, 0);
 
-            Palette palette = GetPaletteByName("Tombeau1.1");
+            List<MidiChordDef> mcds = Tombeau1ReadonlyConstants.PaletteMidiChordDefs[0]; // a clone
+
             for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
             {
                 int chordDensity = 3;
-                List<IUniqueDef> sys1mcds = PaletteMidiChordDefs(palette);
-                List<IUniqueDef> midiChordDefs = new List<IUniqueDef>();
-
+                List<IUniqueDef> iuds = new List<IUniqueDef>();
+                int msPosReFirstUD = 0;
                 for(int j = 0; j < 12; ++j)
                 {
-                    MidiChordDef mcd = sys1mcds[j] as MidiChordDef;
-                    midiChordDefs.Add(mcd);
+                    MidiChordDef mcd = (MidiChordDef) mcds[j].Clone();
+                    mcd.MsPositionReFirstUD = msPosReFirstUD;
+                    msPosReFirstUD += mcd.MsDuration;
 
                     mcd.Transpose(i + j - 7);
                     mcd.Lyric = (j).ToString() + "." + chordDensity.ToString();
@@ -37,25 +38,14 @@ namespace Moritz.Algorithm.Tombeau1
                     mcd.SetVerticalDensity(chordDensity);
 
                     mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+
+                    IUniqueDef iud = mcd as IUniqueDef;
+                    iuds.Add(iud);
                 }
-                Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, midiChordDefs);
+                Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, iuds);
                 trk.SortVelocityIncreasing();
-                //trk.SortVelocityDecreasing();
-                //trk.SortRootNotatedPitchAscending();
-                //trk.SortRootNotatedPitchDescending();
-                //trk.Permute(0, new List<int>() { 1,1,1,1,1,1,2 }, i + 1, 7);
                 seq.SetTrk(trk);
             }
-
-            //systemSeq.AlignTrkUniqueDefs(new List<int>() { 0,1,2,3,4,5,6,7 });
-            //systemSeq.ShiftTrks(new List<int>() { 0, 100, 200, 300, 400, 500, 600, 700 });
-
-            //Trk trk2 = systemSeq.Trks[2];
-            //trk2.MsPositionReContainer = -500;
-            //trk2.SortRootNotatedPitchDescending();
-            //trk2.Insert(4, new RestDef(0, 444));
-
-            /******/
 
             for(int i = 0; i < seq.Trks.Count; ++i)
             {
@@ -63,33 +53,14 @@ namespace Moritz.Algorithm.Tombeau1
                 trk.Permute(i + 1, 7); // sets trk.AxisIndex
             }
 
-            //for(int i = 0; i < systemSeq.Trks.Count; ++i)
-            //{
-            //    Trk trk = systemSeq.Trks[i];
-            //    trk.AxisUDIndex = i;
-            //}
-
             seq.AlignTrkAxes();
 
             /*******/
 
             Trk trk3 = seq.Trks[3];
             trk3.PermutePartitions(7, 1, new List<int>() { 2, 2, 1, 2, 2, 1, 2 });
-            //Trk trk4 = systemSeq.Trks[4];
-            //trk4.SortVelocityDecreasing();
 
             seq.Normalize();
-
-            // Implemented and tested these: (They just call the corresponding function on all the Trks in the seq.)
-            //systemSeq.SortVelocityIncreasing();
-            //systemSeq.SortVelocityDecreasing();
-            //systemSeq.SortRootNotatedPitchAscending();
-            //systemSeq.SortRootNotatedPitchDescending();
-
-
-
-            // Can something like this be done? Using the Alignment positions?
-            //systemSeq.Permute(0, new List<int>() { 1,1,1,1,1,1,2 }, i + 1, 7);
 
             Block block = new Block(seq, new List<int>() { seq.MsDuration });
 

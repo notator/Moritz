@@ -21,7 +21,7 @@ namespace Moritz.Algorithm.Tombeau1
 		{
 		}
 
-		public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
+        public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
 		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 127, 127, 127, 127, 127, 127, 127, 127 }; } }
 		public override int NumberOfInputVoices { get { return 0; } }
 		public override int NumberOfBars { get { return 27; } }
@@ -174,11 +174,13 @@ namespace Moritz.Algorithm.Tombeau1
             #endregion main comments
             /**********************************************/
 
+            SetReadonlyConstants();
+
             List<Block> blocks = new List<Block>();
 
-            Block initBlock = Init();                                   
-            initBlock.SetInitialClefs(new List<string>() { "t", "t", "t", "t", "t", "t", "t", "t" });
-            blocks.Add(initBlock);
+            Block block1TestBlock = Block1TestBlock();                                   
+            block1TestBlock.SetInitialClefs(new List<string>() { "t", "t", "t", "t", "t", "t", "t", "t" });
+            blocks.Add(block1TestBlock);
 
             #region test blocks
             Block velocityPerAbsolutePitchTestBlock = VelocityPerAbsolutePitchTestBlock();
@@ -213,45 +215,105 @@ namespace Moritz.Algorithm.Tombeau1
 
             #endregion test blocks
 
-            Block block = GetCompleteSequence(blocks);
+            Block block = Block.GetCompleteSequence(blocks);
             List<List<VoiceDef>> bars = block.ConvertToBars();
 
             return bars;
 		}
 
-        #region functions called from this file or more than one other file
-
+        #region SetReadonlyConstants 
         /// <summary>
-        /// Returns a Block that is the concatenation of the argument blocks.
-        /// This function consumes its arguments.
+        /// Sets up the standard MidiChordDefs, Trks etc. that will be used in the composition.
         /// </summary>
-        private Block GetCompleteSequence(List<Block> blocks)
+        private void SetReadonlyConstants()
         {
-            Block returnBlock = blocks[0];
-            for(int i = 1; i < blocks.Count; ++i)
+            List<List<MidiChordDef>> pitchWheelCoreMidiChordDefs = new List<List<MidiChordDef>>();
+            List<List<MidiChordDef>> ornamentCoreMidiChordDefs = new List<List<MidiChordDef>>();
+
+            int relativePitchHierarchyIndex = 10;
+            foreach(List<List<byte>> envList in Tombeau1Statics.Envelopes)
             {
-                returnBlock.Concat(blocks[i]);
+                List<MidiChordDef> pwmcds = GetPitchWheelCoreMidiChordDefs(envList);
+                pitchWheelCoreMidiChordDefs.Add(pwmcds);
+
+                List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex++, 7);
+                Gamut gamut = new Gamut(absolutePitchHierarchy, 8);
+
+                List<MidiChordDef> omcds = GetOrnamentCoreMidiChordDefs(envList, gamut);
+                ornamentCoreMidiChordDefs.Add(omcds);
             }
-            return returnBlock;
+
+            List<List<MidiChordDef>> paletteMidiChordDefs = new List<List<MidiChordDef>>();
+            paletteMidiChordDefs.Add(PaletteMidiChordDefs("Tombeau1.1"));
+
+            Tombeau1Constants = new Tombeau1ReadonlyConstants(pitchWheelCoreMidiChordDefs,
+                                                        ornamentCoreMidiChordDefs,
+                                                        paletteMidiChordDefs
+                                                      );
+        }
+
+        private List<MidiChordDef> GetPitchWheelCoreMidiChordDefs(List<List<byte>> envList)
+        {
+            List<MidiChordDef> rval = new List<MidiChordDef>();
+            foreach(List<byte> envelope in envList)
+            {
+                MidiChordDef mcd = new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 127 }, 1000, true);
+                mcd.SetPitchWheelEnvelope(new Envelope(envelope, 127, 127, envelope.Count));
+                rval.Add(mcd);
+            }
+            return rval;
+        }
+
+        private List<MidiChordDef> GetOrnamentCoreMidiChordDefs(List<List<byte>> envList, Gamut gamut)
+        {
+            List<MidiChordDef> rval = new List<MidiChordDef>();
+
+            foreach(List<byte> envelope in envList)
+            {
+                Envelope env = new Envelope(envelope, 127, 8, 10);
+                List<int> basicMidiChordRootPitches = null;
+
+                int firstPitch = 60;
+                if(gamut.IndexOf(firstPitch) >= 0)
+                {
+                    basicMidiChordRootPitches = env.PitchSequence(firstPitch, gamut);
+                }
+                else
+                {
+                    basicMidiChordRootPitches = new List<int>() { firstPitch };
+                }
+
+                MidiChordDef mcd = new MidiChordDef(1000, basicMidiChordRootPitches);
+
+                if(basicMidiChordRootPitches.Count > 1)
+                {
+                    Envelope timeWarpEnvelope = new Envelope(new List<byte>() { 127, 64, 127 }, 127, 127, 3);
+                    mcd.TimeWarp(timeWarpEnvelope, 16);
+                }
+
+                rval.Add(mcd);
+            }
+            return rval;
         }
 
         /// <summary>
         /// A list of the MidiChordDefs defined in the palette.
         /// </summary>
-        private List<IUniqueDef> PaletteMidiChordDefs(Palette palette)
+        private List<MidiChordDef> PaletteMidiChordDefs(string paletteName)
         {
-            List<IUniqueDef> iuds = new List<IUniqueDef>();
-            int msPositionReFirstIUD = 0;
+            List<MidiChordDef> midiChordDefs = new List<MidiChordDef>();
+            Palette palette = GetPaletteByName(paletteName);
             for(int i = 0; i < palette.Count; ++i)
             {
-                MidiChordDef mcd = palette.MidiChordDef(i);
-                mcd.MsPositionReFirstUD = msPositionReFirstIUD;
-                msPositionReFirstIUD += mcd.MsDuration;
-                iuds.Add(mcd);
+                IUniqueDef iud = palette.UniqueDurationDef(i);
+                Debug.Assert(iud is MidiChordDef);
+                midiChordDefs.Add(iud as MidiChordDef);
             }
-            return iuds;
+            return midiChordDefs;
         }
 
-        #endregion functions called from this file or more than one other file
+        #endregion SetReadonlyConstants
+
+        private Tombeau1ReadonlyConstants Tombeau1Constants = null; // set at the beginning of the algorithm code
     }
 }

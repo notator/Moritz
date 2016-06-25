@@ -172,6 +172,20 @@ namespace Moritz.Spec
         }
 
         /// <summary>
+        /// Returns a Block that is the concatenation of the argument blocks.
+        /// This function consumes its arguments.
+        /// </summary>
+        public static Block GetCompleteSequence(List<Block> blocks)
+        {
+            Block returnBlock = blocks[0];
+            for(int i = 1; i < blocks.Count; ++i)
+            {
+                returnBlock.Concat(blocks[i]);
+            }
+            return returnBlock;
+        }
+
+        /// <summary>
         /// Sets the clefs in order of voiceDef (i.e. Trk and InputVoiceDef) (top to bottom).
         /// The clefs list count must be equal to the number of voiceDefs (Trks and InputVoiceDefs) in the block.
         /// Clefs that already exist at the beginning of the block are replaced.

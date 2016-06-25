@@ -24,7 +24,7 @@ namespace Moritz.Spec
             return ("MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " MsDuration=" + MsDuration.ToString() + " RestDef" );
         }
 
-        public override IUniqueDef Clone()
+        public override object Clone()
         {
             RestDef umrd = new RestDef(this.MsPositionReFirstUD, this.MsDuration);
             return umrd;

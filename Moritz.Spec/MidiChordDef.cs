@@ -191,7 +191,7 @@ namespace Moritz.Spec
         /// A deep clone!
         /// </summary>
         /// <returns></returns>
-        public override IUniqueDef Clone()
+        public override object Clone()
         {
             MidiChordDef rval = new MidiChordDef();
 
