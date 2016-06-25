@@ -1,0 +1,150 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+using Krystals4ObjectLibrary;
+
+using Moritz.Globals;
+using Moritz.Palettes;
+using Moritz.Spec;
+
+namespace Moritz.Algorithm.Tombeau1
+{
+	public partial class Tombeau1Algorithm : CompositionAlgorithm
+	{
+        private static class Tombeau1Statics
+        {
+            #region envelopes
+            private static List<List<byte>> Envelopes2 = new List<List<byte>>()
+            {
+                { new List<byte>() {64, 0} },
+                { new List<byte>() {64, 18} },
+                { new List<byte>() {64, 36} },
+                { new List<byte>() {64, 54} },
+                { new List<byte>() {64, 72} },
+                { new List<byte>() {64, 91} },
+                { new List<byte>() {64, 109} },
+                { new List<byte>() {64, 127} }
+            };
+            private static List<List<byte>> Envelopes3 = new List<List<byte>>()
+            {
+                { new List<byte>() {64, 0, 64} },
+                { new List<byte>() {64, 18, 64} },
+                { new List<byte>() {64, 36, 64} },
+                { new List<byte>() {64, 54, 64} },
+                { new List<byte>() {64, 72, 64} },
+                { new List<byte>() {64, 91, 64} },
+                { new List<byte>() {64, 109, 64} },
+                { new List<byte>() {64, 127, 64} }
+            };
+            private static List<List<byte>> Envelopes4 = new List<List<byte>>()
+            {
+                { new List<byte>() {64, 0, 64, 64} },
+                { new List<byte>() {64, 22, 64, 64} },
+                { new List<byte>() {64, 22, 96, 64} },
+                { new List<byte>() {64, 64, 0, 64} },
+                { new List<byte>() {64, 64, 22, 64} },
+                { new List<byte>() {64, 64, 80, 64} },
+                { new List<byte>() {64, 80, 64, 64} },
+                { new List<byte>() {64, 96, 22, 64 } }
+            };
+            private static List<List<byte>> Envelopes5 = new List<List<byte>>()
+            {
+                { new List<byte>() {64, 50, 72, 50, 64} },
+                { new List<byte>() {64, 64, 0, 64, 64} },
+                { new List<byte>() {64, 64, 64, 80, 64} },
+                { new List<byte>() {64, 64, 64, 106, 64} },
+                { new List<byte>() {64, 64, 127, 64, 64} },
+                { new List<byte>() {64, 70, 35, 105, 64} },
+                { new List<byte>() {64, 72, 50, 70, 64} },
+                { new List<byte>() {64, 80, 64, 64, 64} },
+                { new List<byte>() {64, 105, 35, 70, 64} },
+                { new List<byte>() {64, 106, 64, 64, 64} }
+            };
+            private static List<List<byte>> Envelopes6 = new List<List<byte>>()
+            {
+                { new List<byte>() {64, 22, 43, 64, 64, 64} },
+                { new List<byte>() {64, 30, 78, 64, 40, 64} },
+                { new List<byte>() {64, 40, 64, 78, 30, 64} },
+                { new List<byte>() {64, 43, 106, 64, 64, 64} },
+                { new List<byte>() {64, 64, 64, 43, 22, 64} },
+                { new List<byte>() {64, 64, 64, 64, 106, 64} },
+                { new List<byte>() {64, 64, 64, 64, 127, 64} },
+                { new List<byte>() {64, 64, 64, 106, 43, 64} },
+                { new List<byte>() {64, 106, 64, 64, 64, 64} },
+                { new List<byte>() {64, 127, 127, 22, 64, 64} }
+            };
+            private static List<List<byte>> Envelopes7 = new List<List<byte>>()
+            {
+                { new List<byte>() {64, 0, 0, 106, 106, 64, 64} },
+                { new List<byte>() {64, 28, 68, 48, 108, 88, 64} },
+                { new List<byte>() {64, 40, 20, 80, 60, 100, 64} },
+                { new List<byte>() {64, 55, 50, 75, 50, 64, 64} },
+                { new List<byte>() {64, 64, 64, 64, 64, 32, 64} },
+                { new List<byte>() {64, 64, 50, 75, 50, 55, 64} },
+                { new List<byte>() {64, 73, 78, 53, 78, 64, 64} },
+                { new List<byte>() {64, 85, 64, 106, 64, 127, 64} },
+                { new List<byte>() {64, 88, 108, 48, 68, 28, 64} },
+                { new List<byte>() {64, 100, 60, 80, 20, 40, 64} },
+                { new List<byte>() {64, 127, 127, 64, 64, 64, 64} }
+            };
+            private static List<List<byte>> EnvelopesLong = new List<List<byte>>()
+            {
+                { new List<byte>() {64, 0, 64, 96, 127, 30, 0, 64} },
+                { new List<byte>() {64, 64, 64, 127, 64, 106, 43, 64} },
+                { new List<byte>() {64, 64, 43, 43, 64, 64, 85, 22, 64} },
+                { new List<byte>() {64, 64, 64, 0, 64, 127, 0, 64, 64} },
+                { new List<byte>() {64, 80, 64, 92, 64, 64, 64, 98, 64} },
+                { new List<byte>() {64, 98, 64, 64, 64, 92, 64, 80, 64} },
+                { new List<byte>() {64, 64, 64, 0, 64, 127, 0, 64, 127, 0, 64, 64} },
+                { new List<byte>() {64, 64, 64, 64, 64, 64, 64, 64, 64, 100, 50, 100} },
+                { new List<byte>() {64, 64, 64, 64, 64, 64, 64, 64, 64, 127, 43, 127, 64} },
+                { new List<byte>() {64, 127, 43, 127, 64, 64, 64, 64, 64, 64, 64, 64, 64} },
+                { new List<byte>() {64, 64, 64, 64, 64, 64, 64, 127, 43, 127, 64, 127, 43, 127, 64} },
+                { new List<byte>() {64, 127, 43, 127, 43, 127, 64, 64, 64, 64, 64, 64, 64, 64, 64} },
+                { new List<byte>() {64, 64, 64, 0, 64, 127, 0, 64, 127, 64, 0, 64, 127, 64, 0, 64} },
+                { new List<byte>() {64, 127, 64, 64, 0, 64, 127, 0, 64, 127, 64, 0, 64, 127, 64, 0, 64} },
+                { new List<byte>() {64, 127, 43, 127, 43, 127, 64, 127, 43, 127, 43, 127, 64, 64, 64, 64, 64, 64, 64, 64, 64} }
+            };
+            #endregion envelopes
+
+            #region duration modi
+            private static List<int> Durations1 = new List<int>()
+            {   1000 };
+            private static List<int> Durations2 = new List<int>()
+            {   1000, 707 }; // 1 / ( 2^(1 / 2) )
+            private static List<int> Durations3 = new List<int>()
+            {   1000, 794, 630 }; // 1 / ( 2^(1 / 3) )
+            private static List<int> Durations4 = new List<int>()
+            {   1000, 841, 707, 595 }; // 1 / ( 2^(1 / 4) )
+            private static List<int> Durations5 = new List<int>()
+            {   1000, 871, 758, 660, 574 }; // 1 / ( 2^(1 / 5) )
+            private static List<int> Durations6 = new List<int>()
+            {   1000, 891, 794, 707, 630, 561 }; // 1 / ( 2^(1 / 6) )
+            private static List<int> Durations7 = new List<int>()
+            {   1000, 906, 820, 743, 673, 610, 552 }; // 1 / ( 2^(1 / 7) )
+            private static List<int> Durations8 = new List<int>()
+            {   1000, 917, 841, 771, 707, 648, 595, 545}; // 1 / ( 2^(1 / 8) )
+            private static List<int> Durations9 = new List<int>()
+            {   1000, 926, 857, 794, 735, 680, 630, 583, 540}; // 1 / ( 2^(1 / 9) )
+            private static List<int> Durations10 = new List<int>()
+            {   1000, 933, 871, 812, 758, 707, 660, 616, 574, 536}; // 1 / ( 2^(1 / 10) )
+            private static List<int> Durations11 = new List<int>()
+            {   1000, 939, 882, 828, 777, 730, 685, 643, 604, 567, 533 }; // 1 / ( 2^(1 / 11) )
+            private static List<int> Durations12 = new List<int>()
+            {   1000, 944, 891, 841, 794, 749, 707, 667, 630, 595, 561, 530 }; // 1 / ( 2^(1 / 12) )
+
+            #endregion duration modi
+
+            public static List<List<List<byte>>> Envelopes = new List<List<List<byte>>>()
+            {
+                Envelopes2, Envelopes3, Envelopes4, Envelopes5, Envelopes6, Envelopes7, EnvelopesLong
+            };
+
+            public static List<List<int>> DurationModi = new List<List<int>>()
+            {
+                Durations1, Durations2, Durations3, Durations4, Durations5, Durations6, Durations7, Durations8, Durations9, Durations10, Durations11, Durations12
+            };
+        }       
+    }
+}
