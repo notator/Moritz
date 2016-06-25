@@ -172,20 +172,6 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Returns a Block that is the concatenation of the argument blocks.
-        /// This function consumes its arguments.
-        /// </summary>
-        public static Block GetCompleteSequence(List<Block> blocks)
-        {
-            Block returnBlock = blocks[0];
-            for(int i = 1; i < blocks.Count; ++i)
-            {
-                returnBlock.Concat(blocks[i]);
-            }
-            return returnBlock;
-        }
-
-        /// <summary>
         /// Sets the clefs in order of voiceDef (i.e. Trk and InputVoiceDef) (top to bottom).
         /// The clefs list count must be equal to the number of voiceDefs (Trks and InputVoiceDefs) in the block.
         /// Clefs that already exist at the beginning of the block are replaced.
@@ -328,6 +314,23 @@ namespace Moritz.Spec
             Debug.Assert(hasCorrectBeginning, "At least one Trk must start with a MidiChordDef, possibly preceded by a ClefChangeDef");
 
             #endregion
+        }
+
+        /// <summary>
+        /// Returns the bars in the concatenation of the argument blocks.
+        /// This function consumes its arguments.
+        /// </summary>
+        public static List<List<VoiceDef>> ConvertToBars(List<Block> blocks)
+        {
+            Block block = blocks[0];
+            for(int i = 1; i < blocks.Count; ++i)
+            {
+                block.Concat(blocks[i]);
+            }
+
+            List<List<VoiceDef>> bars = block.ConvertToBars();
+
+            return bars;
         }
 
         #region envelopes

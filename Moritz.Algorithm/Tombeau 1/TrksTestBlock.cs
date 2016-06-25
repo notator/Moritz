@@ -19,7 +19,7 @@ namespace Moritz.Algorithm.Tombeau1
             List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(0, 5);
             List<int> velocityPerAbsolutePitch = M.GetVelocityPerAbsolutePitch(absolutePitchHierarchy, 0);
 
-            List<MidiChordDef> mcds = Tombeau1ReadonlyConstants.PaletteMidiChordDefs[0]; // a clone
+            List<MidiChordDef> mcds = Tombeau1Templates.PaletteMidiChordDefs[0]; // a clone
 
             for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
             {

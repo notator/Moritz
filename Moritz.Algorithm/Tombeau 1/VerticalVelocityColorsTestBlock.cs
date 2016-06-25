@@ -22,7 +22,7 @@ namespace Moritz.Algorithm.Tombeau1
             for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
             {
                 int chordDensity = 4;
-                List<MidiChordDef> mcds = Tombeau1ReadonlyConstants.PaletteMidiChordDefs[0];
+                List<MidiChordDef> mcds = Tombeau1Templates.PaletteMidiChordDefs[0];
                 List<IUniqueDef> iuds = new List<IUniqueDef>();
                 int msPosReFirstUD = 0;
                 for(int j = 0; j < mcds.Count; ++j)

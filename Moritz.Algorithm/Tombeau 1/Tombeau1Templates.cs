@@ -12,7 +12,7 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-        private static class Tombeau1Statics
+        private static class Tombeau1Templates
         {
             #region envelopes
             private static List<List<byte>> Envelopes2 = new List<List<byte>>()
@@ -136,15 +136,168 @@ namespace Moritz.Algorithm.Tombeau1
 
             #endregion duration modi
 
-            public static List<List<List<byte>>> Envelopes = new List<List<List<byte>>>()
+            #region Init 
+            /// <summary>
+            /// Sets up the standard MidiChordDefs, Trks etc. that will be used in the composition.
+            /// </summary>
+            public static void Init(List<Palette> paletteList)
+            {
+                int relativePitchHierarchyIndex = 10;
+                foreach(List<List<byte>> envList in _envelopes)
+                {
+                    List<MidiChordDef> pwmcds = GetPitchWheelCoreMidiChordDefs(envList);
+                    _pitchWheelCoreMidiChordDefs.Add(pwmcds);
+
+                    List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex++, 7);
+                    Gamut gamut = new Gamut(absolutePitchHierarchy, 8);
+
+                    List<MidiChordDef> omcds = GetOrnamentCoreMidiChordDefs(envList, gamut);
+                    _ornamentCoreMidiChordDefs.Add(omcds);
+                }
+
+                List<List<MidiChordDef>> paletteMidiChordDefs = new List<List<MidiChordDef>>();
+                foreach(Palette palette in paletteList)
+                {
+                    _paletteMidiChordDefs.Add(GetPaletteMidiChordDefs(palette));
+                }
+            }
+
+            private static List<MidiChordDef> GetPitchWheelCoreMidiChordDefs(List<List<byte>> envList)
+            {
+                List<MidiChordDef> rval = new List<MidiChordDef>();
+                foreach(List<byte> envelope in envList)
+                {
+                    MidiChordDef mcd = new MidiChordDef(new List<byte>() { 60 }, new List<byte>() { 127 }, 1000, true);
+                    mcd.SetPitchWheelEnvelope(new Envelope(envelope, 127, 127, envelope.Count));
+                    rval.Add(mcd);
+                }
+                return rval;
+            }
+            private static List<MidiChordDef> GetOrnamentCoreMidiChordDefs(List<List<byte>> envList, Gamut gamut)
+            {
+                List<MidiChordDef> rval = new List<MidiChordDef>();
+
+                foreach(List<byte> envelope in envList)
+                {
+                    Envelope env = new Envelope(envelope, 127, 8, 10);
+                    List<int> basicMidiChordRootPitches = null;
+
+                    int firstPitch = 60;
+                    if(gamut.IndexOf(firstPitch) >= 0)
+                    {
+                        basicMidiChordRootPitches = env.PitchSequence(firstPitch, gamut);
+                    }
+                    else
+                    {
+                        basicMidiChordRootPitches = new List<int>() { firstPitch };
+                    }
+
+                    MidiChordDef mcd = new MidiChordDef(1000, basicMidiChordRootPitches);
+
+                    if(basicMidiChordRootPitches.Count > 1)
+                    {
+                        Envelope timeWarpEnvelope = new Envelope(new List<byte>() { 127, 64, 127 }, 127, 127, 3);
+                        mcd.TimeWarp(timeWarpEnvelope, 16);
+                    }
+
+                    rval.Add(mcd);
+                }
+                return rval;
+            }
+            /// <summary>
+            /// A list of the MidiChordDefs defined in the palette.
+            /// </summary>
+            private static List<MidiChordDef> GetPaletteMidiChordDefs(Palette palette)
+            {
+                List<MidiChordDef> midiChordDefs = new List<MidiChordDef>();
+                for(int i = 0; i < palette.Count; ++i)
+                {
+                    IUniqueDef iud = palette.UniqueDurationDef(i);
+                    Debug.Assert(iud is MidiChordDef);
+                    midiChordDefs.Add(iud as MidiChordDef);
+                }
+                return midiChordDefs;
+            }
+            #endregion init
+
+            public static List<List<List<byte>>> Envelopes
+            {
+                get
+                {
+                    return DeepCloneOf(_envelopes);
+                }
+            }
+            public static List<List<int>> DurationModi
+            {
+                get
+                {
+                    return DeepCloneOf(_durationModi);
+                }
+            }
+            public static List<List<MidiChordDef>> PitchWheelCoreMidiChordDefs
+            {
+                get
+                {
+                    return DeepCloneOf(_pitchWheelCoreMidiChordDefs);
+                }
+            }
+            public static List<List<MidiChordDef>> OrnamentCoreMidiChordDefs
+            {
+                get
+                {
+                    return DeepCloneOf(_ornamentCoreMidiChordDefs);
+                }
+            }
+            public static List<List<MidiChordDef>> PaletteMidiChordDefs
+            {
+                get
+                {
+                    return DeepCloneOf(_paletteMidiChordDefs);
+                }
+            }
+            private static List<List<T>> DeepCloneOf<T>(List<List<T>> original)
+            {
+                List<List<T>> tListList = new List<List<T>>();
+                foreach(List<T> tList in original)
+                {
+                    List<T> newTList = new List<T>();
+                    tListList.Add(newTList);
+                    foreach(T t in tList)
+                    {
+                        ICloneable c = t as ICloneable;
+                        if(c != null)
+                        {
+                            newTList.Add((T)c.Clone());
+                        }
+                        else
+                        {
+                            newTList.Add(t);
+                        }
+                    }
+                }
+                return tListList;
+            }
+            private static List<List<List<T>>> DeepCloneOf<T>(List<List<List<T>>> original)
+            {
+                List<List<List<T>>> tListListList = new List<List<List<T>>>();
+                foreach(List<List<T>> tListList in original)
+                {
+                    tListListList.Add(DeepCloneOf(tListList));
+                }
+                return tListListList;
+            }
+
+            private static List<List<List<byte>>> _envelopes = new List<List<List<byte>>>()
             {
                 Envelopes2, Envelopes3, Envelopes4, Envelopes5, Envelopes6, Envelopes7, EnvelopesLong
             };
-
-            public static List<List<int>> DurationModi = new List<List<int>>()
+            private static List<List<int>> _durationModi = new List<List<int>>()
             {
                 Durations1, Durations2, Durations3, Durations4, Durations5, Durations6, Durations7, Durations8, Durations9, Durations10, Durations11, Durations12
             };
+            private static List<List<MidiChordDef>> _pitchWheelCoreMidiChordDefs = new List<List<MidiChordDef>>();
+            private static List<List<MidiChordDef>> _ornamentCoreMidiChordDefs = new List<List<MidiChordDef>>();
+            private static List<List<MidiChordDef>> _paletteMidiChordDefs = new List<List<MidiChordDef>>();
         }       
     }
 }

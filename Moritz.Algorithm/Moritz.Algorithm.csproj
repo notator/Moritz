@@ -46,8 +46,7 @@
     <Compile Include="Study 2\Study2Algorithm.cs" />
     <Compile Include="Study 3.1\Study3Sketch1Algorithm.cs" />
     <Compile Include="Study 3.2\Study3Sketch2Algorithm.cs" />
-    <Compile Include="Tombeau 1\Tombeau1Constants.cs" />
-    <Compile Include="Tombeau 1\Tombeau1Statics.cs" />
+    <Compile Include="Tombeau 1\Tombeau1Templates.cs" />
     <Compile Include="Tombeau 1\Block1TestBlock.cs" />
     <Compile Include="Tombeau 1\GamutTestBlock.cs" />
     <Compile Include="Tombeau 1\VerticalVelocityGradientTestBlock.cs" />
@@ -56,7 +55,6 @@
     <Compile Include="Tombeau 1\VerticalVelocityColorsTestBlock.cs" />
     <Compile Include="Tombeau 1\SimpleVelocityColorsTestBlock.cs" />
     <Compile Include="Tombeau 1\TrksTestBlock.cs" />
-    <Compile Include="Tombeau 1\TriadsCycleBlock.cs" />
     <Compile Include="Tombeau 1\Tombeau1Algorithm.cs" />
   </ItemGroup>
   <ItemGroup>
