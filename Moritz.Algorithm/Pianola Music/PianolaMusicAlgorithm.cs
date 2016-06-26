@@ -37,8 +37,6 @@ namespace Moritz.Algorithm.PianolaMusic
 
             Block block = new Block(mainSeq, absMsPositionsOfRightBarlines);
 
-            
-
             List<List<VoiceDef>> bars = block.ConvertToBars();
 
             SetPatch0InAllChords(bars);

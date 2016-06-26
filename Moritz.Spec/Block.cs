@@ -49,6 +49,224 @@ namespace Moritz.Spec
             AssertBlockConsistency();
         }
 
+
+        /// <summary>
+        /// A Block that is the concatenation of the argument blocks.
+        /// This function consumes its argument blocks.
+        /// </summary>
+        public Block(List<Block> blocks)
+        {
+            Block block = blocks[0];
+            for(int i = 1; i < blocks.Count; ++i)
+            {
+                block.Concat(blocks[i]);
+            }
+            this._absMsPosition = block.AbsMsPosition;
+            this.BarlineMsPositions = block.BarlineMsPositions;
+            this._voiceDefs = block._voiceDefs;
+        }
+
+        /// <summary>
+        /// A deep clone of the Block
+        /// </summary>
+        public Block Clone()
+        {
+            List<Trk> trks = new List<Trk>();
+            List<int> midiChannelPerOutputVoice = new List<int>();
+            foreach(Trk trk in Trks)
+            {
+                Trk trkClone = trk.Clone();
+                trks.Add(trkClone);
+                midiChannelPerOutputVoice.Add(trk.MidiChannel);
+            }
+            Seq seq = new Seq(this.AbsMsPosition, trks, midiChannelPerOutputVoice);
+            Block clone = new Block(seq, BarlineMsPositions);
+
+            foreach(InputVoiceDef ivd in InputVoiceDefs)
+            {
+                clone.AddInputVoice(ivd.Clone());
+            }
+
+            return clone;
+        }
+
+        public void Concat(Block block2)
+        {
+            Debug.Assert(_voiceDefs.Count == block2._voiceDefs.Count);
+
+            List<int> block2BarlineMsPositions = block2.BarlineMsPositions;
+            foreach(int msPosition in block2BarlineMsPositions)
+            {
+                BarlineMsPositions.Add(this.MsDuration + msPosition);
+            }
+
+            for(int i = 0; i < _voiceDefs.Count; ++i)
+            {
+                VoiceDef vd1 = _voiceDefs[i];
+                VoiceDef vd2 = block2._voiceDefs[i];
+
+                Trk trk1 = vd1 as Trk;
+                Trk trk2 = vd2 as Trk;
+
+                InputVoiceDef ivd1 = vd1 as InputVoiceDef;
+                InputVoiceDef ivd2 = vd2 as InputVoiceDef;
+
+                Debug.Assert((trk1 != null && trk2 != null) || (ivd1 != null && ivd2 != null));
+
+                vd1.Container = null;
+                vd2.Container = null;
+                vd1.AddRange(vd2);
+                vd1.RemoveDuplicateClefChanges();
+                vd1.AgglomerateRests();
+                vd1.Container = this;
+            }
+
+            AssertBlockConsistency();
+        }
+
+        /// <summary>
+        /// When this function returns, the block has been consumed, and is no longer usable.
+        /// </summary>
+        public List<List<VoiceDef>> ConvertToBars()
+        {
+            #region conditions
+            Debug.Assert(BarlineMsPositions.Count > 0, "Block must have at least one barline.");
+            Debug.Assert(BarlineMsPositions[BarlineMsPositions.Count - 1] == AbsMsPosition + MsDuration, "The final barline must be at end of the block.");
+            #endregion conditions
+
+            List<int> barlineMsPositions = new List<int>(BarlineMsPositions);
+            int finalBarlineMsPosition = barlineMsPositions[barlineMsPositions.Count - 1];
+
+            List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
+
+            int barlineIndex = 0;
+            while(AbsMsPosition < finalBarlineMsPosition)
+            {
+                int barlineEndMsPosition = barlineMsPositions[barlineIndex++];
+                for(int i = 1; i < BarlineMsPositions.Count; ++i)
+                {
+                    BarlineMsPositions[i] -= BarlineMsPositions[0];
+                }
+                BarlineMsPositions.RemoveAt(0);
+                List<VoiceDef> bar = PopBar(barlineEndMsPosition);
+                bars.Add(bar);
+            }
+
+            return bars;
+        }
+
+        /// <summary>
+        /// Creates a "bar" which is a list of voiceDefs containing IUniqueDefs that begin before barlineEndMsPosition,
+        /// and removes these IUniqueDefs from the current block.
+        /// </summary>
+        /// <param name="endBarlineAbsMsPosition"></param>
+        /// <returns>The popped bar</returns>
+        private List<VoiceDef> PopBar(int endBarlineAbsMsPosition)
+        {
+            Debug.Assert(AbsMsPosition < endBarlineAbsMsPosition);
+            AssertBlockConsistency();
+
+            List<VoiceDef> poppedBar = new List<VoiceDef>();
+            List<VoiceDef> remainingBar = new List<VoiceDef>();
+            int currentBlockAbsEndPos = this.AbsMsPosition + this.MsDuration;
+
+            bool isLastBar = (currentBlockAbsEndPos == endBarlineAbsMsPosition);
+
+            VoiceDef poppedBarVoice;
+            VoiceDef remainingBarVoice;
+            foreach(VoiceDef voiceDef in _voiceDefs)
+            {
+                Trk outputVoice = voiceDef as Trk;
+                InputVoiceDef inputVoice = voiceDef as InputVoiceDef;
+                if(outputVoice != null)
+                {
+                    poppedBarVoice = new Trk(outputVoice.MidiChannel);
+                    poppedBar.Add(poppedBarVoice);
+                    remainingBarVoice = new Trk(outputVoice.MidiChannel);
+                    remainingBar.Add(remainingBarVoice);
+                }
+                else
+                {
+                    poppedBarVoice = new InputVoiceDef(inputVoice.MidiChannel);
+                    poppedBar.Add(poppedBarVoice);
+                    remainingBarVoice = new InputVoiceDef(inputVoice.MidiChannel);
+                    remainingBar.Add(remainingBarVoice);
+                }
+                foreach(IUniqueDef iud in voiceDef.UniqueDefs)
+                {
+                    int iudMsDuration = iud.MsDuration;
+                    int iudAbsStartPos = this.AbsMsPosition + iud.MsPositionReFirstUD;
+                    int iudAbsEndPos = iudAbsStartPos + iudMsDuration;
+
+                    if(iudAbsStartPos >= endBarlineAbsMsPosition)
+                    {
+                        Debug.Assert(iudAbsEndPos <= currentBlockAbsEndPos);
+                        if(iud is ClefChangeDef && iudAbsStartPos == endBarlineAbsMsPosition)
+                        {
+                            poppedBarVoice.UniqueDefs.Add(iud);
+                        }
+                        else
+                        {
+                            remainingBarVoice.UniqueDefs.Add(iud);
+                        }
+                    }
+                    else if(iudAbsEndPos > endBarlineAbsMsPosition)
+                    {
+                        int durationBeforeBarline = endBarlineAbsMsPosition - iudAbsStartPos;
+                        int durationAfterBarline = iudAbsEndPos - endBarlineAbsMsPosition;
+                        if(iud is RestDef)
+                        {
+                            // This is a rest. Split it.
+                            RestDef firstRestHalf = new RestDef(iudAbsStartPos, durationBeforeBarline);
+                            poppedBarVoice.UniqueDefs.Add(firstRestHalf);
+
+                            RestDef secondRestHalf = new RestDef(endBarlineAbsMsPosition, durationAfterBarline);
+                            remainingBarVoice.UniqueDefs.Add(secondRestHalf);
+                        }
+                        else if(iud is CautionaryChordDef)
+                        {
+                            // This is a cautionary chord. Set the position of the following barline, and
+                            // Add a CautionaryChordDef at the beginning of the following bar.
+                            iud.MsDuration = endBarlineAbsMsPosition - iudAbsStartPos;
+                            poppedBarVoice.UniqueDefs.Add(iud);
+
+                            Debug.Assert(remainingBarVoice.UniqueDefs.Count == 0);
+                            CautionaryChordDef secondLmdd = new CautionaryChordDef((IUniqueChordDef)iud, 0, durationAfterBarline);
+                            remainingBarVoice.UniqueDefs.Add(secondLmdd);
+                        }
+                        else if(iud is MidiChordDef || iud is InputChordDef)
+                        {
+                            IUniqueSplittableChordDef uniqueChordDef = iud as IUniqueSplittableChordDef;
+                            uniqueChordDef.MsDurationToNextBarline = durationBeforeBarline;
+                            poppedBarVoice.UniqueDefs.Add(uniqueChordDef);
+
+                            Debug.Assert(remainingBarVoice.UniqueDefs.Count == 0);
+                            CautionaryChordDef ccd = new CautionaryChordDef(uniqueChordDef, 0, durationAfterBarline);
+                            remainingBarVoice.UniqueDefs.Add(ccd);
+                        }
+                    }
+                    else
+                    {
+                        Debug.Assert(iudAbsEndPos <= endBarlineAbsMsPosition && iudAbsStartPos >= AbsMsPosition);
+                        poppedBarVoice.UniqueDefs.Add(iud);
+                    }
+                }
+            }
+
+            this.AbsMsPosition = endBarlineAbsMsPosition;
+
+            this._voiceDefs = remainingBar;
+            SetMsPositions();
+
+            if(!isLastBar)
+            {
+                // _voiceDefs is not empty
+                AssertBlockConsistency();
+            }
+
+            return poppedBar;
+        }
+
         public void AddInputVoice(InputVoiceDef ivd)
         {
             Debug.Assert((ivd.MsPositionReContainer + ivd.MsDuration) <= MsDuration);
@@ -111,64 +329,6 @@ namespace Moritz.Spec
                     voiceDef.Add(new RestDef(0, blockMsDuration));
                 }
             }
-        }
-
-        public void Concat(Block block2)
-        {
-            Debug.Assert(_voiceDefs.Count == block2._voiceDefs.Count);
-
-            List<int> block2BarlineMsPositions = block2.BarlineMsPositions;
-            foreach(int msPosition in block2BarlineMsPositions)
-            {
-                BarlineMsPositions.Add(this.MsDuration + msPosition);
-            }
-
-            for(int i = 0; i < _voiceDefs.Count; ++i)
-            {
-                VoiceDef vd1 = _voiceDefs[i];
-                VoiceDef vd2 = block2._voiceDefs[i];
-
-                Trk trk1 = vd1 as Trk; 
-                Trk trk2 = vd2 as Trk;
-
-                InputVoiceDef ivd1 = vd1 as InputVoiceDef;
-                InputVoiceDef ivd2 = vd2 as InputVoiceDef;
-
-                Debug.Assert((trk1 != null && trk2 != null) || (ivd1 != null && ivd2 != null));
-
-                vd1.Container = null;
-                vd2.Container = null;
-                vd1.AddRange(vd2);
-                vd1.RemoveDuplicateClefChanges();
-                vd1.AgglomerateRests();
-                vd1.Container = this;
-            }
-
-            AssertBlockConsistency();
-        }
-
-        /// <summary>
-        /// A deep clone of the Block
-        /// </summary>
-        public Block Clone()
-        {
-            List<Trk> trks = new List<Trk>();
-            List<int> midiChannelPerOutputVoice = new List<int>();
-            foreach(Trk trk in Trks)
-            {
-                Trk trkClone = trk.Clone();
-                trks.Add(trkClone);
-                midiChannelPerOutputVoice.Add(trk.MidiChannel);
-            }
-            Seq seq = new Seq(this.AbsMsPosition, trks, midiChannelPerOutputVoice);
-            Block clone = new Block(seq, BarlineMsPositions);
-
-            foreach(InputVoiceDef ivd in InputVoiceDefs)
-            {
-                clone.AddInputVoice(ivd.Clone());
-            }
-
-            return clone;
         }
 
         /// <summary>
@@ -316,23 +476,6 @@ namespace Moritz.Spec
             #endregion
         }
 
-        /// <summary>
-        /// Returns the bars in the concatenation of the argument blocks.
-        /// This function consumes its arguments.
-        /// </summary>
-        public static List<List<VoiceDef>> ConvertToBars(List<Block> blocks)
-        {
-            Block block = blocks[0];
-            for(int i = 1; i < blocks.Count; ++i)
-            {
-                block.Concat(blocks[i]);
-            }
-
-            List<List<VoiceDef>> bars = block.ConvertToBars();
-
-            return bars;
-        }
-
         #region envelopes
         /// <summary>
         /// This function does not change the MsDuration of the Block.
@@ -432,148 +575,6 @@ namespace Moritz.Spec
 
         #endregion envelopes
 
-        /// <summary>
-        /// When this function returns, the block has been consumed, and is no longer usable.
-        /// </summary>
-        public List<List<VoiceDef>> ConvertToBars()
-        {
-            #region conditions
-            Debug.Assert(BarlineMsPositions.Count > 0, "Block must have at least one barline.");
-            Debug.Assert(BarlineMsPositions[BarlineMsPositions.Count - 1] == AbsMsPosition + MsDuration, "The final barline must be at end of the block.");
-            #endregion conditions
-
-            List<int> barlineMsPositions = new List<int>( BarlineMsPositions );
-            int finalBarlineMsPosition = barlineMsPositions[barlineMsPositions.Count - 1];
-
-            List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
-
-            int barlineIndex = 0;
-            while(AbsMsPosition < finalBarlineMsPosition)
-            {
-                int barlineEndMsPosition = barlineMsPositions[barlineIndex++];
-                for(int i = 1; i < BarlineMsPositions.Count; ++i)
-                {
-                    BarlineMsPositions[i] -= BarlineMsPositions[0];
-                }
-                BarlineMsPositions.RemoveAt(0);
-                List<VoiceDef> bar = PopBar(barlineEndMsPosition);
-                bars.Add(bar);
-            }
-
-            return bars;
-        }
-
-        /// <summary>
-        /// Creates a "bar" which is a list of voiceDefs containing IUniqueDefs that begin before barlineEndMsPosition,
-        /// and removes these IUniqueDefs from the current block.
-        /// </summary>
-        /// <param name="endBarlineAbsMsPosition"></param>
-        /// <returns>The popped bar</returns>
-        private List<VoiceDef> PopBar(int endBarlineAbsMsPosition)
-        {
-            Debug.Assert(AbsMsPosition < endBarlineAbsMsPosition);
-            AssertBlockConsistency();
-
-            List<VoiceDef> poppedBar = new List<VoiceDef>();
-            List<VoiceDef> remainingBar = new List<VoiceDef>();
-            int currentBlockAbsEndPos = this.AbsMsPosition + this.MsDuration;
-
-            bool isLastBar = (currentBlockAbsEndPos == endBarlineAbsMsPosition);
-
-            VoiceDef poppedBarVoice;
-            VoiceDef remainingBarVoice;
-            foreach(VoiceDef voiceDef in _voiceDefs)
-            {
-                Trk outputVoice = voiceDef as Trk;
-                InputVoiceDef inputVoice = voiceDef as InputVoiceDef;
-                if(outputVoice != null)
-                {
-                    poppedBarVoice = new Trk(outputVoice.MidiChannel);
-                    poppedBar.Add(poppedBarVoice);
-                    remainingBarVoice = new Trk(outputVoice.MidiChannel);
-                    remainingBar.Add(remainingBarVoice);
-                }
-                else
-                {
-                    poppedBarVoice = new InputVoiceDef(inputVoice.MidiChannel);
-                    poppedBar.Add(poppedBarVoice);
-                    remainingBarVoice = new InputVoiceDef(inputVoice.MidiChannel);
-                    remainingBar.Add(remainingBarVoice);
-                }
-                foreach(IUniqueDef iud in voiceDef.UniqueDefs)
-                {
-                    int iudMsDuration = iud.MsDuration;
-                    int iudAbsStartPos = this.AbsMsPosition + iud.MsPositionReFirstUD;
-                    int iudAbsEndPos = iudAbsStartPos + iudMsDuration;
-
-                    if(iudAbsStartPos >= endBarlineAbsMsPosition)
-                    {
-                        Debug.Assert(iudAbsEndPos <= currentBlockAbsEndPos);
-                        if(iud is ClefChangeDef && iudAbsStartPos == endBarlineAbsMsPosition)
-                        {
-                            poppedBarVoice.UniqueDefs.Add(iud);
-                        }
-                        else
-                        {
-                            remainingBarVoice.UniqueDefs.Add(iud);
-                        }
-                    }
-                    else if(iudAbsEndPos > endBarlineAbsMsPosition)
-                    {
-                        int durationBeforeBarline = endBarlineAbsMsPosition - iudAbsStartPos;
-                        int durationAfterBarline = iudAbsEndPos - endBarlineAbsMsPosition;
-                        if(iud is RestDef)
-                        {
-                            // This is a rest. Split it.
-                            RestDef firstRestHalf = new RestDef(iudAbsStartPos, durationBeforeBarline);
-                            poppedBarVoice.UniqueDefs.Add(firstRestHalf);
-
-                            RestDef secondRestHalf = new RestDef(endBarlineAbsMsPosition, durationAfterBarline);
-                            remainingBarVoice.UniqueDefs.Add(secondRestHalf);
-                        }
-                        else if(iud is CautionaryChordDef)
-                        {
-                            // This is a cautionary chord. Set the position of the following barline, and
-                            // Add a CautionaryChordDef at the beginning of the following bar.
-                            iud.MsDuration = endBarlineAbsMsPosition - iudAbsStartPos;
-                            poppedBarVoice.UniqueDefs.Add(iud);
-
-                            Debug.Assert(remainingBarVoice.UniqueDefs.Count == 0);
-                            CautionaryChordDef secondLmdd = new CautionaryChordDef((IUniqueChordDef)iud, 0, durationAfterBarline);
-                            remainingBarVoice.UniqueDefs.Add(secondLmdd);
-                        }
-                        else if(iud is MidiChordDef || iud is InputChordDef)
-                        {
-                            IUniqueSplittableChordDef uniqueChordDef = iud as IUniqueSplittableChordDef;
-                            uniqueChordDef.MsDurationToNextBarline = durationBeforeBarline;
-                            poppedBarVoice.UniqueDefs.Add(uniqueChordDef);
-
-                            Debug.Assert(remainingBarVoice.UniqueDefs.Count == 0);
-                            CautionaryChordDef ccd = new CautionaryChordDef(uniqueChordDef, 0, durationAfterBarline);
-                            remainingBarVoice.UniqueDefs.Add(ccd);
-                        }
-                    }
-                    else
-                    {
-                        Debug.Assert(iudAbsEndPos <= endBarlineAbsMsPosition && iudAbsStartPos >= AbsMsPosition);
-                        poppedBarVoice.UniqueDefs.Add(iud);
-                    }
-                }
-            }
-
-            this.AbsMsPosition = endBarlineAbsMsPosition;
-
-            this._voiceDefs = remainingBar;
-            SetMsPositions();
-
-            if(!isLastBar)
-            {
-                // _voiceDefs is not empty
-                AssertBlockConsistency();
-            }
-
-            return poppedBar;
-        }
 
         private void SetMsPositions()
         {
@@ -646,6 +647,8 @@ namespace Moritz.Spec
             }
         }
 
+        public List<int> BarlineMsPositions = new List<int>();
+
         public IReadOnlyList<Trk> Trks
         {
             get
@@ -662,8 +665,6 @@ namespace Moritz.Spec
                 return trks.AsReadOnly();
             }
         }
-
-        public List<int> BarlineMsPositions = new List<int>();
 
         public List<InputVoiceDef> InputVoiceDefs
         {

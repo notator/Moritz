@@ -272,11 +272,41 @@ namespace Moritz.Algorithm.Tombeau1
                 // Properties
                 Trks { get; }
                 AbsMsPosition { get; set; }
-                MsDuration { get; set; }
+                MsDuration { get; set; } // Setting this value stretches or compresses the msDurations of all the trks and their contained UniqueDefs.
                 MidiChannelIndexPerOutputVoice { get; }
 
             ***************************************************************************/
             #endregion Seq functions
+            #region Block functions
+            /***************************************************************************            
+            public Block functions that have been implemented and are especially relevant to this project:
+                constructors:
+                Block(Seq seq, List<int> rightBarlineMsPositions)
+                Block(List<Block> blocks)
+
+                Clone()
+
+                Concat(Block block2)
+
+                ConvertToBars()
+
+                AddInputVoice(InputVoiceDef ivd)
+
+                SetInitialClefs(List<string> clefs)
+
+                // Envelopes
+                TimeWarp(Envelope envelope, double distortion)
+                SetPitchWheelSliderEnvelope(Envelope envelope)
+
+                // Properties
+                MsDuration { get; set; } // Setting this value stretches or compresses the msDurations of all the voiceDefs and their contained UniqueDefs.
+                AbsMsPosition { get; set; }
+                BarlineMsPositions // public List<int>
+                Trks { get; } 
+                InputVoiceDefs { get; }
+
+            ***************************************************************************/
+            #endregion Block functions
 
 
             /**********************************************/
@@ -318,7 +348,8 @@ namespace Moritz.Algorithm.Tombeau1
 
             #endregion test blocks
 
-            List<List<VoiceDef>> bars = Block.ConvertToBars(blocks);
+            Block block = new Block(blocks);
+            List<List<VoiceDef>> bars = block.ConvertToBars();
 
             return bars;
 		}
