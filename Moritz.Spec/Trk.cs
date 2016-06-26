@@ -114,16 +114,6 @@ namespace Moritz.Spec
             _InsertRange(index, trk);
         }
         /// <summary>
-        /// Creates a new TrkDef containing just the argument midiChordDef,
-        /// then calls the other InsertInRest() function with the voiceDef as argument. 
-        /// </summary>
-        public void InsertInRest(MidiChordDef midiChordDef)
-        {
-            List<IUniqueDef> iuds = new List<IUniqueDef>() { midiChordDef };
-            Trk trkDefToInsert = new Trk(this.MidiChannel, 0, iuds);
-            InsertInRest(trkDefToInsert);
-        }
-        /// <summary>
         /// An attempt is made to insert the argument iVoiceDef in a rest in the VoiceDef.
         /// The rest is found using the iVoiceDef's MsPositon and MsDuration.
         /// The first and last objects in the argument must be chords, not rests.
@@ -139,10 +129,20 @@ namespace Moritz.Spec
             Debug.Assert(trk[0] is MidiChordDef && trk[trk.Count - 1] is MidiChordDef);
             _InsertInRest(trk);
         }
-		/// <summary>
-		/// Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
-		/// </summary>
-		public void Replace(int index, IUniqueDef replacementIUnique)
+        /// <summary>
+        /// Creates a new TrkDef containing just the argument midiChordDef,
+        /// then calls the other InsertInRest() function with the voiceDef as argument. 
+        /// </summary>
+        public void InsertInRest(MidiChordDef midiChordDef)
+        {
+            List<IUniqueDef> iuds = new List<IUniqueDef>() { midiChordDef };
+            Trk trkDefToInsert = new Trk(this.MidiChannel, 0, iuds);
+            InsertInRest(trkDefToInsert);
+        }
+        /// <summary>
+        /// Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
+        /// </summary>
+        public void Replace(int index, IUniqueDef replacementIUnique)
         {
             Debug.Assert(replacementIUnique is MidiChordDef || replacementIUnique is RestDef);
             _Replace(index, replacementIUnique);
@@ -189,7 +189,6 @@ namespace Moritz.Spec
 
             SetMidiChordDefPitchWheelSliders(pitchWheelValuesPerMsPosition);
         }
-
         private List<int> GetMsPositions()
         {
             int originalMsDuration = MsDuration;
@@ -467,19 +466,20 @@ namespace Moritz.Spec
                 }
             }
         }
+        #endregion Changing MidiChordDef attributes
 
-		#region alignment
-		/// <summary>
-		/// _uniqueDefs[indexToAlign] is moved to toMsPosition, and the surrounding symbols are spread accordingly
-		/// between those at anchor1Index and anchor2Index. The symbols at anchor1Index and anchor2Index do not move.
-		/// Note that indexToAlign cannot be 0, and that anchor2Index CAN be equal to _uniqueDefs.Count (i.e.on the final barline).
-		/// This function checks that 
-		///     1. anchor1Index is in range 0..(indexToAlign - 1),
-		///     2. anchor2Index is in range (indexToAlign + 1).._localizedMidiDurationDefs.Count
-		///     3. toPosition is greater than the msPosition at anchor1Index and less than the msPosition at anchor2Index.
-		/// and throws an appropriate exception if there is a problem.
-		/// </summary>
-		public void AlignObjectAtIndex(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPositionReFirstIUD)
+        #region alignment
+        /// <summary>
+        /// _uniqueDefs[indexToAlign] is moved to toMsPositionReFirstIUD, and the surrounding symbols are spread accordingly
+        /// between those at anchor1Index and anchor2Index. The symbols at anchor1Index and anchor2Index do not move.
+        /// Note that indexToAlign cannot be 0, and that anchor2Index CAN be equal to _uniqueDefs.Count (i.e.on the final barline).
+        /// This function checks that 
+        ///     1. anchor1Index is in range 0..(indexToAlign - 1),
+        ///     2. anchor2Index is in range (indexToAlign + 1).._localizedMidiDurationDefs.Count
+        ///     3. toPosition is greater than the msPosition at anchor1Index and less than the msPosition at anchor2Index.
+        /// and throws an appropriate exception if there is a problem.
+        /// </summary>
+        public void AlignObjectAtIndex(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPositionReFirstIUD)
 		{
 			// throws an exception if there's a problem.
 			CheckAlignDefArgs(anchor1Index, indexToAlign, anchor2Index, toMsPositionReFirstIUD);
@@ -570,8 +570,6 @@ namespace Moritz.Spec
 					"\ntoMsPosition=" + toMsPositionReFirstUD.ToString());
 		}
         #endregion alignment
-
-        #endregion Changing MidiChordDef attributes
 
         #region Re-ordering the Trk's UniqueDefs
 

@@ -181,6 +181,65 @@ namespace Moritz.Algorithm.Tombeau1
                 AdjustExpression(double factor)
             ***************************************************************************/
             #endregion MidiChordDef functions
+            #region Trk functions
+            /***************************************************************************            
+            public Trk functions that have been implemented and are especially relevant to this project:
+                constructors:
+                Trk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
+                Trk(int midiChannel)
+
+                Clone()
+
+                // Add, Remove, Insert, Replace objects in the trk
+                Add(IUniqueDef iUniqueDef) // Appends the new IUniqueDef to the end of the trk.
+                AddRange(VoiceDef trk) // Adds the argument's UniqueDefs to the end of the trk.
+                Insert(int index, IUniqueDef iUniqueDef) // Inserts the iUniqueDef in the list at the given index.
+                InsertRange(int index, Trk trk) // Inserts the trk's UniqueDefs in the list at the given index.
+                InsertInRest(Trk trk) // An attempt is made to insert the argument trk in a rest in the host trk.
+                InsertInRest(MidiChordDef midiChordDef) // Creates a new TrkDef the midiChordDef, then calls the other InsertInRest() function.
+                Replace(int index, IUniqueDef replacementIUnique) // Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
+                
+                // Changing the trk's duration
+                AdjustChordMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
+                AdjustChordMsDurations(double factor, int minThreshold = 100)
+
+                // Envelopes
+                SetPitchWheelSliderEnvelope(Envelope envelope)
+                SetMidiChordDefPitchWheelSliders(Dictionary<int, int> pitchWheelValuesPerMsPosition)
+                SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch)
+                SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
+
+                // Changing other MidiChordDef attributes
+                AdjustExpression(int beginIndex, int endIndex, double factor)
+                AdjustExpression(double factor)
+                AdjustVelocities(int beginIndex, int endIndex, double factor)
+                AdjustVelocities(double factor)
+                AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
+                SetPanGliss(int startMsPosition, int endMsPosition, int startPanValue, int endPanValue)
+                SetPitchWheelDeviation(int beginIndex, int endIndex, int deviation)
+                RemoveScorePitchWheelCommands(int beginIndex, int endIndex)
+                AdjustPitchWheelDeviations(int startMsPosition, int endMsPosition, int startPwd, int endPwd)
+
+                // Alignment
+                AlignObjectAtIndex(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPositionReFirstIUD)
+
+                // Permutation and Sorting
+                Permute(int axisNumber, int contourNumber) // permutes recursively
+                PermutePartitions(int axisNumber, int contourNumber, List<int> partitionSizes)
+                SortRootNotatedPitchAscending()
+                SortRootNotatedPitchDescending()
+                SortVelocityIncreasing()
+                SortVelocityDecreasing()
+
+                // Properties
+                AxisIndex { get; set; } // The index of the UniqueDef (in the UniqueDefs list) that will be aligned when calling Seq.AlignTrkAxes().
+                DurationsCount { get; } // The number of MidiChordDefs and RestDefs in this TrkDef
+                MsPositionReContainer { get; set; }
+                byte? MasterVolume // Algorithms must set this value in the first Trk in each midichannel in the score. Otherwise = null;
+
+            ***************************************************************************/
+            #endregion Trk functions
+
 
             /**********************************************/
 
