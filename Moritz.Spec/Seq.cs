@@ -75,8 +75,88 @@ namespace Moritz.Spec
             AssertSeqConsistency();
         }
 
+        public Seq Clone()
+        {
+            List<Trk> trks = new List<Trk>();
+            for(int i = 0; i < _trks.Count; ++i)
+            {
+                trks.Add(_trks[i].Clone());
+            }
+
+            Seq clone = new Seq(_absMsPosition, trks, MidiChannelIndexPerOutputVoice);
+
+            return clone;
+        }
+
         /// <summary>
-        /// Replaces a trk having the same channel. trk.Container is set to the Seq.
+        /// Concatenates seq2 to the caller (seq1). Returns a pointer to the caller.
+        /// Both Seqs must be normalized before calling this function.
+        /// When this function is called, seq2.AbsMsPosition is the earliest position, relative to seq1, at which it can be concatenated.
+        /// When it returns, seq2's Trks will have been concatenated to Seq1, and seq1 is consistent.
+        /// If Seq2 is needed after calling thei function, then it should be cloned first.
+        /// For example:
+        /// If seq2.MsPosition==0, it will be concatenated such that there will be at least one trk concatenation without an
+        /// intervening rest.
+        /// If seq2.MsPosition == seq1.MsDuration, the seqs will be juxtaposed.
+        /// If seq2.MsPosition > seq1.MsDuration, the seqs will be concatenated with an intervening rest.
+        /// Redundant clef changes are silently removed.
+        /// </summary>
+        public Seq Concat(Seq seq2)
+        {
+            #region assertions
+            Debug.Assert(_trks.Count == seq2.Trks.Count);
+            Debug.Assert(this.IsNormalized);
+            Debug.Assert(seq2.IsNormalized);
+            AssertChannelConsistency(seq2.MidiChannelIndexPerOutputVoice);
+            #endregion
+
+            int nTrks = _trks.Count;
+
+            #region find concatMsPos
+            int absConcatMsPos = seq2.AbsMsPosition;
+            if(seq2.AbsMsPosition < (AbsMsPosition + MsDuration))
+            {
+                for(int i = 0; i < nTrks; ++i)
+                {
+                    Trk trk1 = _trks[i];
+                    Trk trk2 = seq2.Trks[i];
+                    int earliestAbsConcatPos = trk1.MsPositionReContainer + trk1.EndMsPositionReFirstIUD - trk2.MsPositionReContainer;
+                    absConcatMsPos = (earliestAbsConcatPos > absConcatMsPos) ? earliestAbsConcatPos : absConcatMsPos;
+                }
+            }
+            #endregion
+
+            #region concatenation
+            for(int i = 0; i < nTrks; ++i)
+            {
+                Trk trk2 = seq2.Trks[i];
+                if(trk2.UniqueDefs.Count > 0)
+                {
+                    Trk trk1 = _trks[i];
+                    int trk1AbsEndMsPosition = AbsMsPosition + trk1.MsPositionReContainer + trk1.EndMsPositionReFirstIUD;
+                    int trk2AbsStartMsPosition = absConcatMsPos + trk2.MsPositionReContainer;
+                    if(trk1AbsEndMsPosition < trk2AbsStartMsPosition)
+                    {
+                        trk1.Add(new RestDef(trk1.EndMsPositionReFirstIUD, trk2AbsStartMsPosition - trk1AbsEndMsPosition));
+                    }
+                    trk1.AddRange(trk2);
+                }
+            }
+            #endregion
+
+            foreach(Trk trk in Trks)
+            {
+                trk.AgglomerateRests();
+            }
+
+            AssertSeqConsistency();
+
+            return this;
+        }
+
+        /// <summary>
+        /// Replaces (or updates) a trk having the same channel in the seq. trk.Container is set to the Seq.
+        /// An exception is thrown if the trk to replace is not found.
         /// trk.MsPositionReContainer can have any value, but this function normalizes the seq.
         /// </summary>
         /// <param name="trk"></param>
@@ -127,7 +207,7 @@ namespace Moritz.Spec
         /// Every Trk in _trks is either empty, or contains any combination of RestDef or MidiChordDef.
         /// There is always a trk having MsPositionReContainer == zero.
         /// </summary>
-        public void AssertSeqConsistency()
+        private void AssertSeqConsistency()
         {
             Debug.Assert(_trks != null && _trks.Count > 0);
             #region Every Trk in _trks is either empty, or contains any combination of RestDef or MidiChordDef.
@@ -254,85 +334,6 @@ namespace Moritz.Spec
 
             AssertSeqConsistency();
         }
-
-        /// <summary>
-        /// Concatenates seq2 to the caller (seq1). Returns a pointer to the caller.
-        /// Both Seqs must be normalized before calling this function.
-        /// When this function is called, seq2.AbsMsPosition is the earliest position, relative to seq1, at which it can be concatenated.
-        /// When it returns, seq2's Trks will have been concatenated to Seq1, and seq1 is consistent.
-        /// If Seq2 is needed after calling thei function, then it should be cloned first.
-        /// For example:
-        /// If seq2.MsPosition==0, it will be concatenated such that there will be at least one trk concatenation without an
-        /// intervening rest.
-        /// If seq2.MsPosition == seq1.MsDuration, the seqs will be juxtaposed.
-        /// If seq2.MsPosition > seq1.MsDuration, the seqs will be concatenated with an intervening rest.
-        /// Redundant clef changes are silently removed.
-        /// </summary>
-        public Seq Concat(Seq seq2)
-		{
-            #region assertions
-            Debug.Assert(_trks.Count == seq2.Trks.Count);
-            Debug.Assert(this.IsNormalized);
-            Debug.Assert(seq2.IsNormalized);
-            AssertChannelConsistency(seq2.MidiChannelIndexPerOutputVoice);
-			#endregion
-
-			int nTrks = _trks.Count;
-
-			#region find concatMsPos
-			int absConcatMsPos = seq2.AbsMsPosition;
-			if(seq2.AbsMsPosition < (AbsMsPosition + MsDuration))
-			{
-				for(int i = 0; i < nTrks; ++i)
-				{
-					Trk trk1 = _trks[i];
-                    Trk trk2 = seq2.Trks[i];
-					int earliestAbsConcatPos = trk1.MsPositionReContainer + trk1.EndMsPositionReFirstIUD - trk2.MsPositionReContainer;
-					absConcatMsPos = (earliestAbsConcatPos > absConcatMsPos) ? earliestAbsConcatPos : absConcatMsPos;
-				}
-			}
-			#endregion
-
-			#region concatenation
-			for(int i = 0; i < nTrks; ++i)
-			{
-				Trk trk2 = seq2.Trks[i];
-				if(trk2.UniqueDefs.Count > 0)
-				{
-                    Trk trk1 = _trks[i];
-                    int trk1AbsEndMsPosition = AbsMsPosition + trk1.MsPositionReContainer + trk1.EndMsPositionReFirstIUD; 
-					int trk2AbsStartMsPosition = absConcatMsPos + trk2.MsPositionReContainer;
-					if(trk1AbsEndMsPosition < trk2AbsStartMsPosition)
-					{
-						trk1.Add(new RestDef(trk1.EndMsPositionReFirstIUD, trk2AbsStartMsPosition - trk1AbsEndMsPosition));
-					}
-					trk1.AddRange(trk2);
-				}
-			}
-			#endregion
-
-			foreach(Trk trk in Trks)
-			{
-				trk.AgglomerateRests();
-			}
-
-			AssertSeqConsistency();
-
-			return this;
-		}
-
-		public Seq Clone()
-		{
-			List<Trk> trks = new List<Trk>();
-			for(int i = 0; i < _trks.Count; ++i)
-			{             
-                trks.Add(_trks[i].Clone());
-			}
-
-			Seq clone = new Seq(_absMsPosition, trks, MidiChannelIndexPerOutputVoice);
-
-			return clone;
-		}
 
         /// <summary>
         /// True if the earliest trk.MsPositionReContainer is 0.

@@ -239,6 +239,44 @@ namespace Moritz.Algorithm.Tombeau1
 
             ***************************************************************************/
             #endregion Trk functions
+            #region Seq functions
+            /***************************************************************************            
+            public Seq functions that have been implemented and are especially relevant to this project:
+                constructors:
+                Seq(int absSeqMsPosition, List<Trk> trks, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
+                Seq(int absSeqMsPosition, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
+
+                Clone()
+
+                Concat(Seq seq2) // Concatenates seq2 to the caller (seq1). Returns a pointer to the caller.
+
+                SetTrk(Trk trk) // replaces or updates the trk having the same channel in the Seg.
+
+                Normalize() // Shifts the Trks so that the earliest trk.MsPositionReContainer is 0.
+
+                // Sorting (These functions smply call the coresponding function on each trk.)
+                SortVelocityIncreasing()
+                SortVelocityDecreasing()
+                SortRootNotatedPitchAscending()
+                SortRootNotatedPitchDescending()
+
+                AlignTrkUniqueDefs(List<int> indicesToAlign) // Aligns the Trk UniqueDefs whose indices are given in the argument.
+                AlignTrkAxes()// Aligns using each trk.AxisIndex.
+
+                ShiftTrks(List<int> msShifts) // Shifts each track by adding the corresponding millisecond argument to its MsPositionReContainer attribute.
+
+                // Envelopes
+                TimeWarp(Envelope envelope, double distortion)
+                SetPitchWheelSliderEnvelope(Envelope envelope)
+
+                // Properties
+                Trks { get; }
+                AbsMsPosition { get; set; }
+                MsDuration { get; set; }
+                MidiChannelIndexPerOutputVoice { get; }
+
+            ***************************************************************************/
+            #endregion Seq functions
 
 
             /**********************************************/
