@@ -184,58 +184,86 @@ namespace Moritz.Algorithm.Tombeau1
             #region Trk functions
             /***************************************************************************            
             public Trk functions that have been implemented and are especially relevant to this project:
-                constructors:
+            constructors:
                 Trk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
                 Trk(int midiChannel)
 
                 Clone()
+ 
+                this[i] { get; set; } // indexer (set sets MsPositionsReFirstUD in whole Trk
+                uniqueDefs // enumerator
 
-                // Add, Remove, Insert, Replace objects in the trk
-                Add(IUniqueDef iUniqueDef) // Appends the new IUniqueDef to the end of the trk.
-                AddRange(VoiceDef trk) // Adds the argument's UniqueDefs to the end of the trk.
-                Insert(int index, IUniqueDef iUniqueDef) // Inserts the iUniqueDef in the list at the given index.
-                InsertRange(int index, Trk trk) // Inserts the trk's UniqueDefs in the list at the given index.
-                InsertInRest(Trk trk) // An attempt is made to insert the argument trk in a rest in the host trk.
-                InsertInRest(MidiChordDef midiChordDef) // Creates a new TrkDef the midiChordDef, then calls the other InsertInRest() function.
-                Replace(int index, IUniqueDef replacementIUnique) // Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
-                
-                // Changing the trk's duration
-                AdjustChordMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
-                AdjustChordMsDurations(double factor, int minThreshold = 100)
-
-                // Envelopes
-                SetPitchWheelSliderEnvelope(Envelope envelope)
-                SetMidiChordDefPitchWheelSliders(Dictionary<int, int> pitchWheelValuesPerMsPosition)
-                SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch)
-                SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
-
-                // Changing other MidiChordDef attributes
-                AdjustExpression(int beginIndex, int endIndex, double factor)
-                AdjustExpression(double factor)
-                AdjustVelocities(int beginIndex, int endIndex, double factor)
-                AdjustVelocities(double factor)
-                AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
-                SetPanGliss(int startMsPosition, int endMsPosition, int startPanValue, int endPanValue)
-                SetPitchWheelDeviation(int beginIndex, int endIndex, int deviation)
-                RemoveScorePitchWheelCommands(int beginIndex, int endIndex)
-                AdjustPitchWheelDeviations(int startMsPosition, int endMsPosition, int startPwd, int endPwd)
-
-                // Alignment
+                **** Changing the trk without changing its duration ****
+                // clefs, lyrics
+                InsertClefChange(int index, string clefType)
+                SetLyricsToIndex()
+                // alignment changers
+                TimeWarp(Envelope envelope, double distortion)
+                FindIndexAtMsPositionReFirstIUD(int msPositionReFirstIUD) // Returns the index of the IUniqueDef which starts at or is otherwise current at msPosition.
                 AlignObjectAtIndex(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPositionReFirstIUD)
-
-                // Permutation and Sorting
-                Permute(int axisNumber, int contourNumber) // permutes recursively
-                PermutePartitions(int axisNumber, int contourNumber, List<int> partitionSizes)
+                // sorting and permutation
                 SortRootNotatedPitchAscending()
                 SortRootNotatedPitchDescending()
                 SortVelocityIncreasing()
                 SortVelocityDecreasing()
+                Permute(int axisNumber, int contourNumber) // permutes recursively
+                PermutePartitions(int axisNumber, int contourNumber, List<int> partitionSizes)
+                // rests
+                Erase(int startMsPosition, int endMsPosition) // Replace all the IUniqueDefs from startMsPosition to (not including) endMsPosition by a single rest.
+                InsertInRest(Trk trk) // An attempt is made to insert the argument trk in a rest in the host trk.
+                InsertInRest(MidiChordDef midiChordDef) // Creates a new TrkDef the midiChordDef, then calls the other InsertInRest() function.
+                // replace and translate
+                Replace(int index, IUniqueDef replacementIUnique) // Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
+                Translate(int fromIndex, int nUniqueDefs, int toIndex) // Extracts nUniqueDefs from the uniqueDefs, and then inserts them again at the toIndex.
+                // sliders
+                AdjustExpression(int beginIndex, int endIndex, double factor)
+                AdjustExpression(double factor)
+                SetPanGliss(int startMsPosition, int endMsPosition, int startPanValue, int endPanValue)
+                SetPitchWheelSliderEnvelope(Envelope envelope)
+                SetMidiChordDefPitchWheelSliders(Dictionary<int, int> pitchWheelValuesPerMsPosition)
+                SetPitchWheelDeviation(int beginIndex, int endIndex, int deviation)
+                RemoveScorePitchWheelCommands(int beginIndex, int endIndex)
+                AdjustPitchWheelDeviations(int startMsPosition, int endMsPosition, int startPwd, int endPwd)
+                // pitch
+                Transpose(int beginIndex, int endIndex, int interval)
+                Transpose(int interval)
+                TransposeNotation(int semitonesToTranspose)
+                TransposeToDict(Dictionary<int, int> msPosTranspositionDict)
+                StepwiseGliss(int beginIndex, int endIndex, int glissInterval)
+                // velocity
+                AdjustVelocities(int beginIndex, int endIndex, double factor)
+                AdjustVelocities(double factor)
+                AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
+                SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch)
+                SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
 
-                // Properties
-                AxisIndex { get; set; } // The index of the UniqueDef (in the UniqueDefs list) that will be aligned when calling Seq.AlignTrkAxes().
+                **** Functions that change trk's duration ****
+                CreateAccel(int beginIndex, int endIndex, double startEndRatio) // Creates an exponential accelerando or decelerando from beginIndex to (not including) endIndex.
+                Add(IUniqueDef iUniqueDef) // Appends the new IUniqueDef to the end of the trk.
+                AddRange(VoiceDef trk) // Adds the argument's UniqueDefs to the end of the trk.
+                Insert(int index, IUniqueDef iUniqueDef) // Inserts the iUniqueDef in the list at the given index.
+                InsertRange(int index, Trk trk) // Inserts the trk's UniqueDefs in the list at the given index.
+                Remove(IUniqueDef iUniqueDef) // removes the iUniqueDef from the list.
+                RemoveAt(int index) // Removes the iUniqueDef at index from the list.
+                RemoveRange(int index, int count) // Removes count iUniqueDefs from the list, startíng with the iUniqueDef at index.
+                RemoveBetweenMsPositions(int startMsPosReFirstIUD, int endMsPosReFirstIUD) // Remove the IUniqueDefs which start between startMsPosReFirstIUD and (not including) endMsPosReFirstIUD
+                RemoveRests() // Removes all the rests in this Trk
+                AdjustMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
+                AdjustMsDurations(double factor, int minThreshold = 100)
+                AdjustChordMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
+                AdjustChordMsDurations(double factor, int minThreshold = 100)
+                AdjustRestMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
+                AdjustRestMsDurations(double factor, int minThreshold = 100)
+
+                **** Properties ****
+                MidiChannel  { get; set; }
+                Count { get; } // The number of IUniqueDefs in this TrkDef
                 DurationsCount { get; } // The number of MidiChordDefs and RestDefs in this TrkDef
-                MsPositionReContainer { get; set; }
-                byte? MasterVolume // Algorithms must set this value in the first Trk in each midichannel in the score. Otherwise = null;
+                MsDuration { get; set; } // set stretches or compresses each IUniqueDef to fit the new duration
+                EndMsPositionReFirstIUD  { get; set; }  // set changes the msDuration of the last IUniqueDef in the trk.
+                MsPositionReContainer  { get; set; } // The trk's MsPosition wrt the containing Seq.
+                AxisIndex { get; set; } // The index of the UniqueDef (in the UniqueDefs list) that will be aligned when calling Seq.AlignTrkAxes().
+                MasterVolume // Algorithms must set this value in the first Trk in each midiChannel in the score. (Default is null.)
 
             ***************************************************************************/
             #endregion Trk functions
@@ -307,7 +335,6 @@ namespace Moritz.Algorithm.Tombeau1
 
             ***************************************************************************/
             #endregion Block functions
-
 
             /**********************************************/
 

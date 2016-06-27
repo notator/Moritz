@@ -116,7 +116,12 @@ namespace Moritz.Spec
         #endregion
         #endregion public indexer & enumerator
 
-        #region public
+        #region consistency
+        protected void CheckIndices(int beginIndex, int endIndex)
+        {
+            Debug.Assert(beginIndex >= 0 && beginIndex < _uniqueDefs.Count);
+            Debug.Assert(endIndex >= 0 && endIndex <= _uniqueDefs.Count);
+        }
 
         protected void AssertVoiceDefConsistency()
         {
@@ -136,6 +141,262 @@ namespace Moritz.Spec
         }
 
         internal abstract void AssertConsistentInBlock();
+        #endregion consistency
+
+        #region  miscellaneous
+        /// <summary>
+        /// Sets the MsPosition attribute of each IUniqueDef in the _uniqueDefs list.
+        /// Uses all the MsDuration attributes, and _msPosition as origin.
+        /// This function must be called at the end of any function that changes the _uniqueDefs list.
+        /// </summary>
+        private void SetMsPositionsReFirstUD()
+        {
+            if(_uniqueDefs.Count > 0)
+            {
+                int currentPositionReFirstIUD = 0;
+                foreach(IUniqueDef umcd in _uniqueDefs)
+                {
+                    umcd.MsPositionReFirstUD = currentPositionReFirstIUD;
+                    currentPositionReFirstIUD += umcd.MsDuration;
+                }
+            }
+        }
+        /// <summary>
+        /// Rests dont have lyrics, so their index in the VoiceDef can't be shown as a lyric.
+        /// Overridden by Clytemnestra, where the index is inserted before her lyrics.
+        /// </summary>
+        /// <param name="voiceDef"></param>
+        public virtual void SetLyricsToIndex()
+        {
+            for(int index = 0; index < _uniqueDefs.Count; ++index)
+            {
+                IUniqueSplittableChordDef lmcd = _uniqueDefs[index] as IUniqueSplittableChordDef;
+                if(lmcd != null)
+                {
+                    lmcd.Lyric = index.ToString();
+                }
+            }
+        }       
+        /// <summary>
+        /// Clef changes on the same staff must be added backwards so that the indices are correct.
+        /// Clef changes cannot be made at index 0. Change them in the previous system instead.
+        /// If the index is equal to or greater than the number of chords, rests and clefChanges in the voiceDef,
+        /// the ClefChange will be appended to the voiceDef.
+        /// Note that if a ClefChange is defined here on a RestDef which has no MidiChordDef
+        /// to its right on the staff, the resulting ClefSymbol will be placed immediately before the final barline
+        /// on the staff.  
+        /// The clefType must be one of the following strings "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"
+        /// </summary>
+        public void InsertClefChange(int index, string clefType)
+        {
+            #region check args
+            Debug.Assert(index > 0, "Clef changes cannot be made before the first chord or rest in a bar.");
+
+            if(String.Equals(clefType, "t") == false
+            && String.Equals(clefType, "t1") == false
+            && String.Equals(clefType, "t2") == false
+            && String.Equals(clefType, "t3") == false
+            && String.Equals(clefType, "b") == false
+            && String.Equals(clefType, "b1") == false
+            && String.Equals(clefType, "b2") == false
+            && String.Equals(clefType, "b3") == false)
+            {
+                Debug.Assert(false, "Unknown clef type.");
+            }
+            #endregion
+
+            if(index > _uniqueDefs.Count - 1)
+            {
+                ClefChangeDef clefChangeDef = new ClefChangeDef(clefType, EndMsPositionReFirstIUD);
+                _uniqueDefs.Add(clefChangeDef);
+            }
+            else
+            {
+                ClefChangeDef clefChangeDef = new ClefChangeDef(clefType, _uniqueDefs[index].MsPositionReFirstUD);
+                _uniqueDefs.Insert(index, clefChangeDef);
+            }
+        }
+        #endregion miscellaneous
+
+        #region attribute changers (Transpose etc.)
+
+        /// <summary>
+        /// An object is a NonMidiOrInputChordDef if it is not a MidiChordDef and it is not an InputChordDef.
+        /// For example: a CautionaryChordDef, a RestDef or ClefChangeDef.
+        /// </summary>
+        /// <param name="beginIndex"></param>
+        /// <param name="endIndex"></param>
+        /// <returns></returns>
+        protected int GetNumberOfNonMidiOrInputChordDefs(int beginIndex, int endIndex)
+        {
+            int nNonMidiChordDefs = 0;
+            for(int i = beginIndex; i < endIndex; ++i)
+            {
+                if(!(_uniqueDefs[i] is MidiChordDef) && !(_uniqueDefs[i] is InputChordDef))
+                    nNonMidiChordDefs++;
+            }
+            return nNonMidiChordDefs;
+        }
+
+        #region Envelopes
+        /// <summary>
+        /// See Envelope.TimeWarp() for a description of the arguments.
+        /// </summary>
+        /// <param name="envelope"></param>
+        /// <param name="distortion"></param>
+        public void TimeWarp(Envelope envelope, double distortion)
+        {
+            #region requirements
+            Debug.Assert(distortion >= 1);
+            Debug.Assert(_uniqueDefs.Count > 0);
+            #endregion
+
+            int originalMsDuration = MsDuration;
+
+            #region 1. create a List of ints containing the msPositions of the DurationDefs plus the end msPosition of the final DurationDef.
+            List<DurationDef> durationDefs = new List<DurationDef>();
+            List<int> originalPositions = new List<int>();
+            int msPos = 0;
+            foreach(IUniqueDef iud in UniqueDefs)
+            {
+                DurationDef dd = iud as DurationDef;
+                if(dd != null)
+                {
+                    durationDefs.Add(dd);
+                    originalPositions.Add(msPos);
+                    msPos += dd.MsDuration;
+                }
+            }
+            originalPositions.Add(msPos); // end position of duration to warp.
+            #endregion
+            List<int> newPositions = envelope.TimeWarp(originalPositions, distortion);
+
+            for(int i = 0; i < durationDefs.Count; ++i)
+            {
+                DurationDef dd = durationDefs[i];
+                dd.MsDuration = newPositions[i + 1] - newPositions[i];
+            }
+
+            SetMsPositionsReFirstUD();
+
+            AssertVoiceDefConsistency();
+        }
+        #endregion Envelopes
+
+        #region Transpose
+        /// <summary>
+        /// Transpose all the IUniqueChordDefs from beginIndex to (not including) endIndex
+        /// up by the number of semitones given in the interval argument.
+        /// IUniqueChordDefs are MidiChordDef, InputChordDef and CautionaryChordDef.
+        /// Negative interval values transpose down.
+        /// It is not an error if Midi pitch values would exceed the range 0..127.
+        /// In this case, they are silently coerced to 0 or 127 respectively.
+        /// </summary>
+        /// <param name="interval"></param>
+        public void Transpose(int beginIndex, int endIndex, int interval)
+        {
+            CheckIndices(beginIndex, endIndex);
+            for(int i = beginIndex; i < endIndex; ++i)
+            {
+                IUniqueChordDef iucd = _uniqueDefs[i] as IUniqueChordDef;
+                if(iucd != null)
+                {
+                    iucd.Transpose(interval);
+                }
+            }
+        }
+        /// <summary>
+        /// Transpose the whole VoiceDef up by the number of semitones given in the argument.
+        /// </summary>
+        /// <param name="interval"></param>
+        public void Transpose(int interval)
+        {
+            Transpose(0, _uniqueDefs.Count, interval);
+        }
+        /// <summary>
+        /// Transposes all the MidiHeadSymbols in this VoiceDef by the number of semitones in the argument
+        /// without changing the sound. Negative arguments transpose downwards.
+        /// If the resulting midiHeadSymbol would be less than 0 or greater than 127,
+        /// it is silently coerced to 0 or 127 respectively.
+        /// </summary>
+        /// <param name="p"></param>
+        public void TransposeNotation(int semitonesToTranspose)
+        {
+            foreach(IUniqueDef iud in _uniqueDefs)
+            {
+                IUniqueChordDef iucd = iud as IUniqueChordDef;
+                if(iucd != null)
+                {
+                    List<byte> midiPitches = iucd.NotatedMidiPitches;
+                    for(int i = 0; i < midiPitches.Count; ++i)
+                    {
+                        midiPitches[i] = M.MidiValue(midiPitches[i] + semitonesToTranspose);
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// Each IUniqueChordDef is transposed by the interval current at its position.
+        /// The argument contains a dictionary[msPosition, transposition].
+        /// </summary>
+        /// <param name="msPosTranspositionDict"></param>
+        public void TransposeToDict(Dictionary<int, int> msPosTranspositionDict)
+        {
+            List<int> dictPositions = new List<int>(msPosTranspositionDict.Keys);
+
+            int currentMsPosReFirstIUD = dictPositions[0];
+            int j = 0;
+            for(int i = 1; i < msPosTranspositionDict.Count; ++i)
+            {
+                int transposition = msPosTranspositionDict[currentMsPosReFirstIUD];
+                int nextMsPosReFirstIUD = dictPositions[i];
+                while(j < _uniqueDefs.Count && _uniqueDefs[j].MsPositionReFirstUD < nextMsPosReFirstIUD)
+                {
+                    if(_uniqueDefs[j].MsPositionReFirstUD >= currentMsPosReFirstIUD)
+                    {
+                        IUniqueChordDef iucd = _uniqueDefs[j] as IUniqueChordDef;
+                        if(iucd != null)
+                        {
+                            iucd.Transpose(transposition);
+                        }
+                    }
+                    ++j;
+                }
+                currentMsPosReFirstIUD = nextMsPosReFirstIUD;
+            }
+        }
+
+        /// <summary>
+        /// Transposes the UniqueDefs from the beginIndex upto (but not including) endIndex
+        /// by an equally increasing amount, so that the final MidiChordDef or InputChordDef is transposed by glissInterval.
+        /// beginIndex must be less than endIndex.
+        /// glissInterval can be negative.
+        /// </summary>
+        public void StepwiseGliss(int beginIndex, int endIndex, int glissInterval)
+        {
+            CheckIndices(beginIndex, endIndex);
+            Debug.Assert(beginIndex < endIndex);
+
+            int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
+
+            int nSteps = (endIndex - beginIndex - nNonMidiChordDefs);
+            double interval = ((double)glissInterval) / nSteps;
+            double step = interval;
+            for(int i = beginIndex; i < endIndex; ++i)
+            {
+                MidiChordDef mcd = _uniqueDefs[i] as MidiChordDef;
+                InputChordDef icd = _uniqueDefs[i] as InputChordDef;
+                IUniqueChordDef iucd = (mcd == null) ? (IUniqueChordDef)icd : (IUniqueChordDef)mcd;
+                if(iucd != null)
+                {
+                    iucd.Transpose((int)Math.Round(interval));
+                    interval += step;
+                }
+            }
+        }
+        #endregion Transpose
+
+        #endregion  attribute changers (Transpose etc.)
 
         #region Count changers
         #region list functions
@@ -299,7 +560,7 @@ namespace Moritz.Spec
             AssertVoiceDefConsistency();
         }
         /// <summary>
-        /// Removes the iUniqueMidiDurationDef at index from the list, and then resets the positions of all the lmdds in the list.
+        /// Removes the iUniqueDef at index from the list, and then resets the positions of all the lmdds in the list.
         /// </summary>
         public void RemoveAt(int index)
         {
@@ -321,23 +582,8 @@ namespace Moritz.Spec
             AssertVoiceDefConsistency();
         }
 
-        internal IReadOnlyList<int> UDMsPositionsReFirstUD
-        {
-            get
-            {
-                List<int> msPositions = new List<int>();
-
-                foreach(IUniqueDef iud in _uniqueDefs)
-                {
-                    msPositions.Add(iud.MsPositionReFirstUD);
-                }
-
-                return msPositions;
-            } 
-        }
-
         /// <summary>
-        /// Remove the IUniques which start between startMsPosReFirstIUD and (not including) endMsPosReFirstIUD 
+        /// Remove the IUniqueDefs which start between startMsPosReFirstIUD and (not including) endMsPosReFirstIUD 
         /// </summary>
         /// <param name="p1"></param>
         /// <param name="p2"></param>
@@ -368,8 +614,7 @@ namespace Moritz.Spec
             AssertVoiceDefConsistency();
         }
         /// <summary>
-        /// From startMsPosition to (not including) endMsPosition,
-        /// replace all MidiChordDefs or InputChordDefs by UniqueMidiRestDefs, then aglommerate the rests.
+        /// Replace all the IUniqueDefs from startMsPosition to (not including) endMsPosition by a single rest.
         /// </summary>
         public void Erase(int startMsPosition, int endMsPosition)
         {
@@ -616,374 +861,27 @@ namespace Moritz.Spec
             AssertVoiceDefConsistency();
         }
 
-		#endregion Count changers
+        #endregion Count changers
 
-		#region public properties
-		private int _msPosition = 0;
+        #region Properties
 
-        /// <summary>
-        /// Setting this property stretches or compresses all the durations in the UniqueDefs list to fit the given total duration.
-        /// This does not change the VoiceDef's MsPosition, but does affect its EndMsPosition.
-        /// See also EndMsPosition.set.
-        /// </summary>
-        public int MsDuration
-		{
-			get
-			{
-				int total = 0;
-				foreach(IUniqueDef iud in _uniqueDefs)
-				{
-					total += iud.MsDuration;
-				}
-				return total;
-			}
-			set
-			{
-				Debug.Assert(value > 0);
-
-				int msDuration = value;
-
-				List<int> relativeDurations = new List<int>();
-				foreach(IUniqueDef iumdd in _uniqueDefs)
-				{
-					if(iumdd.MsDuration > 0)
-						relativeDurations.Add(iumdd.MsDuration);
-				}
-
-				List<int> newDurations = M.IntDivisionSizes(msDuration, relativeDurations);
-
-				Debug.Assert(newDurations.Count == relativeDurations.Count);
-				int i = 0;
-				int newTotal = 0;
-				foreach(IUniqueDef iumdd in _uniqueDefs)
-				{
-					if(iumdd.MsDuration > 0)
-					{
-						iumdd.MsDuration = newDurations[i];
-						newTotal += iumdd.MsDuration;
-						++i;
-					}
-				}
-
-				Debug.Assert(msDuration == newTotal);
-
-				SetMsPositionsReFirstUD();
-
-                AssertVoiceDefConsistency();
-            }
-		}
-		/// <summary>
-		/// The position of the end of the last UniqueDef in the list re the first IUniqueDef in the list, or 0 if the list is empty.
-		/// Setting this value can only be done if the UniqueDefs list is not empty, and the value
-		/// is greater than the position of the final UniqueDef in the list. It then changes
-		/// the msDuration of the final IUniqueDef.
-		/// See also MsDuration.set.
-		/// </summary>
-		public int EndMsPositionReFirstIUD
-		{
-			get
-			{
-				int endMsPosReFirstUID = 0;
-				if(_uniqueDefs.Count > 0)
-				{
-					IUniqueDef lastIUD = _uniqueDefs[_uniqueDefs.Count - 1];
-					endMsPosReFirstUID += (lastIUD.MsPositionReFirstUD + lastIUD.MsDuration);
-				}
-				return endMsPosReFirstUID;
-			}
-			set
-			{
-				Debug.Assert(_uniqueDefs.Count > 0);
-				Debug.Assert(value > EndMsPositionReFirstIUD);
-
-				IUniqueDef lastLmdd = _uniqueDefs[_uniqueDefs.Count - 1];
-				lastLmdd.MsDuration = value - EndMsPositionReFirstIUD;
-
-                AssertVoiceDefConsistency();
-            }
-		}
-		public int Count { get { return _uniqueDefs.Count; } }
-
-        #endregion public properties
-
-        #region public attribute changers (Transpose etc.)
-
-        /// <summary>
-        /// An object is a NonMidiOrInputChordDef if it is not a MidiChordDef and it is not an InputChordDef.
-        /// For example: a CautionaryChordDef, a RestDef or ClefChangeDef.
-        /// </summary>
-        /// <param name="beginIndex"></param>
-        /// <param name="endIndex"></param>
-        /// <returns></returns>
-        protected int GetNumberOfNonMidiOrInputChordDefs(int beginIndex, int endIndex)
+        private int _midiChannel = int.MaxValue; // the MidiChannel will only be valid if set to a value in range [0..15]
+        public int MidiChannel
         {
-            int nNonMidiChordDefs = 0;
-            for(int i = beginIndex; i < endIndex; ++i)
+            get
             {
-                if(!(_uniqueDefs[i] is MidiChordDef) && !(_uniqueDefs[i] is InputChordDef))
-                    nNonMidiChordDefs++;
+                return _midiChannel;
             }
-            return nNonMidiChordDefs;
-        }
-
-        #region Envelopes
-        /// <summary>
-        /// See Envelope.TimeWarp() for a description of the arguments.
-        /// </summary>
-        /// <param name="envelope"></param>
-        /// <param name="distortion"></param>
-        public void TimeWarp(Envelope envelope, double distortion)
-        {
-            #region requirements
-            Debug.Assert(distortion >= 1);
-            Debug.Assert(_uniqueDefs.Count > 0);
-            #endregion
-
-            int originalMsDuration = MsDuration;
-
-            #region 1. create a List of ints containing the msPositions of the DurationDefs plus the end msPosition of the final DurationDef.
-            List<DurationDef> durationDefs = new List<DurationDef>();
-            List<int> originalPositions = new List<int>();
-            int msPos = 0;
-            foreach(IUniqueDef iud in UniqueDefs)
+            set
             {
-                DurationDef dd = iud as DurationDef;
-                if(dd != null)
-                {
-                    durationDefs.Add(dd);
-                    originalPositions.Add(msPos);
-                    msPos += dd.MsDuration;
-                }
-            }
-            originalPositions.Add(msPos); // end position of duration to warp.
-            #endregion
-            List<int> newPositions = envelope.TimeWarp(originalPositions, distortion);
-
-            for(int i = 0; i < durationDefs.Count; ++i)
-            {
-                DurationDef dd = durationDefs[i];
-                dd.MsDuration = newPositions[i + 1] - newPositions[i];
-            }
-
-            SetMsPositionsReFirstUD();
-
-            AssertVoiceDefConsistency();
-        }
-        #endregion Envelopes
-
-        #region Transpose
-        /// <summary>
-        /// Transpose all the IUniqueChordDefs from beginIndex to (not including) endIndex
-        /// up by the number of semitones given in the interval argument.
-        /// IUniqueChordDefs are MidiChordDef, InputChordDef and CautionaryChordDef.
-        /// Negative interval values transpose down.
-        /// It is not an error if Midi pitch values would exceed the range 0..127.
-        /// In this case, they are silently coerced to 0 or 127 respectively.
-        /// </summary>
-        /// <param name="interval"></param>
-        public void Transpose(int beginIndex, int endIndex, int interval)
-        {
-            CheckIndices(beginIndex, endIndex);
-            for(int i = beginIndex; i < endIndex; ++i)
-            {
-                IUniqueChordDef iucd = _uniqueDefs[i] as IUniqueChordDef;
-                if(iucd != null)
-                {
-                    iucd.Transpose(interval);
-                }
+                Debug.Assert(value >= 0 && value <= 15);
+                _midiChannel = value;
             }
         }
-        /// <summary>
-        /// Transpose the whole VoiceDef up by the number of semitones given in the argument.
-        /// </summary>
-        /// <param name="interval"></param>
-        public void Transpose(int interval)
-        {
-            Transpose(0, _uniqueDefs.Count, interval);
-        }
-        /// <summary>
-        /// Transposes all the MidiHeadSymbols in this VoiceDef by the number of semitones in the argument
-        /// without changing the sound. Negative arguments transpose downwards.
-        /// If the resulting midiHeadSymbol would be less than 0 or greater than 127,
-        /// it is silently coerced to 0 or 127 respectively.
-        /// </summary>
-        /// <param name="p"></param>
-        public void TransposeNotation(int semitonesToTranspose)
-        {
-            foreach(IUniqueDef iud in _uniqueDefs)
-            {
-                IUniqueChordDef iucd = iud as IUniqueChordDef;
-                if(iucd != null)
-                {
-                    List<byte> midiPitches = iucd.NotatedMidiPitches;
-                    for(int i = 0; i < midiPitches.Count; ++i)
-                    {
-                        midiPitches[i] = M.MidiValue(midiPitches[i] + semitonesToTranspose);
-                    }
-                }
-            }
-        }
-        /// <summary>
-        /// Each IUniqueChordDef is transposed by the interval current at its position.
-        /// The argument contains a dictionary[msPosition, transposition].
-        /// </summary>
-        /// <param name="msPosTranspositionDict"></param>
-        public void TransposeToDict(Dictionary<int, int> msPosTranspositionDict)
-        {
-            List<int> dictPositions = new List<int>(msPosTranspositionDict.Keys);
-
-            int currentMsPosReFirstIUD = dictPositions[0];
-            int j = 0;
-            for(int i = 1; i < msPosTranspositionDict.Count; ++i)
-            {
-                int transposition = msPosTranspositionDict[currentMsPosReFirstIUD];
-                int nextMsPosReFirstIUD = dictPositions[i];
-                while(j < _uniqueDefs.Count && _uniqueDefs[j].MsPositionReFirstUD < nextMsPosReFirstIUD)
-                {
-                    if(_uniqueDefs[j].MsPositionReFirstUD >= currentMsPosReFirstIUD)
-                    {
-                        IUniqueChordDef iucd = _uniqueDefs[j] as IUniqueChordDef;
-                        if(iucd != null)
-                        {
-                            iucd.Transpose(transposition);
-                        }
-                    }
-                    ++j;
-                }
-                currentMsPosReFirstIUD = nextMsPosReFirstIUD;
-            }
-        }
-
-        /// <summary>
-        /// Transposes the UniqueDefs from the beginIndex upto (but not including) endIndex
-        /// by an equally increasing amount, so that the final MidiChordDef or InputChordDef is transposed by glissInterval.
-        /// beginIndex must be less than endIndex.
-        /// glissInterval can be negative.
-        /// </summary>
-        public void StepwiseGliss(int beginIndex, int endIndex, int glissInterval)
-        {
-            CheckIndices(beginIndex, endIndex);
-            Debug.Assert(beginIndex < endIndex);
-
-            int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
-
-            int nSteps = (endIndex - beginIndex - nNonMidiChordDefs);
-            double interval = ((double)glissInterval) / nSteps;
-            double step = interval;
-            for(int i = beginIndex; i < endIndex; ++i)
-            {
-                MidiChordDef mcd = _uniqueDefs[i] as MidiChordDef;
-                InputChordDef icd = _uniqueDefs[i] as InputChordDef;
-                IUniqueChordDef iucd = (mcd == null) ? (IUniqueChordDef)icd : (IUniqueChordDef)mcd;
-                if(iucd != null)
-                {
-                    iucd.Transpose((int)Math.Round(interval));
-                    interval += step;
-                }
-            }
-        }
-        #endregion Transpose
-
-        #endregion  public attribute changers (Transpose etc.)
-
-        #region  public SetLyricsToIndex()
-
-        /// <summary>
-        /// Rests dont have lyrics, so their index in the VoiceDef can't be shown as a lyric.
-        /// Overridden by Clytemnestra, where the index is inserted before her lyrics.
-        /// </summary>
-        /// <param name="voiceDef"></param>
-        public virtual void SetLyricsToIndex()
-        {
-            for(int index = 0; index < _uniqueDefs.Count; ++index)
-            {
-                IUniqueSplittableChordDef lmcd = _uniqueDefs[index] as IUniqueSplittableChordDef;
-                if(lmcd != null)
-                {
-                    lmcd.Lyric = index.ToString();
-                }
-            }
-        }
-        #endregion public SetLyricsToIndex()
-
-        /// <summary>
-        /// Clef changes on the same staff must be added backwards so that the indices are correct.
-        /// Clef changes cannot be made at index 0. Change them in the previous system instead.
-        /// If the index is equal to or greater than the number of chords, rests and clefChanges in the voiceDef,
-        /// the ClefChange will be appended to the voiceDef.
-        /// Note that if a ClefChange is defined here on a RestDef which has no MidiChordDef
-        /// to its right on the staff, the resulting ClefSymbol will be placed immediately before the final barline
-        /// on the staff.  
-        /// The clefType must be one of the following strings "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"
-        /// </summary>
-        public void InsertClefChange(int index, string clefType)
-		{
-            #region check args
-            Debug.Assert(index > 0, "Clef changes cannot be made before the first chord or rest in a bar.");
-
-			if(String.Equals(clefType, "t") == false
-			&& String.Equals(clefType, "t1") == false
-			&& String.Equals(clefType, "t2") == false
-			&& String.Equals(clefType, "t3") == false
-			&& String.Equals(clefType, "b") == false
-			&& String.Equals(clefType, "b1") == false
-			&& String.Equals(clefType, "b2") == false
-			&& String.Equals(clefType, "b3") == false)
-			{
-				Debug.Assert(false, "Unknown clef type.");
-			}
-            #endregion
-
-            if(index > _uniqueDefs.Count - 1)
-            {
-                ClefChangeDef clefChangeDef = new ClefChangeDef(clefType, EndMsPositionReFirstIUD);
-                _uniqueDefs.Add(clefChangeDef);
-            }
-            else
-            {
-                ClefChangeDef clefChangeDef = new ClefChangeDef(clefType, _uniqueDefs[index].MsPositionReFirstUD);
-                _uniqueDefs.Insert(index, clefChangeDef);
-            }
-		}
-
-        public List<IUniqueDef> UniqueDefs { get { return _uniqueDefs; } }
-
-		private int _midiChannel = int.MaxValue; // the MidiChannel will only be valid if set to a value in range [0..15]
-		public int MidiChannel
-		{
-			get
-			{
-				return _midiChannel;
-			}
-			set
-			{
-				Debug.Assert(value >= 0 && value <= 15);
-				_midiChannel = value;
-			}
-		}
 
         public IVoiceDefContainer Container = null;
 
-        #endregion public
-
-        #region protected
-        /// <summary>
-        /// Sets the MsPosition attribute of each IUniqueDef in the _uniqueDefs list.
-        /// Uses all the MsDuration attributes, and _msPosition as origin.
-        /// This function must be called at the end of any function that changes the _uniqueDefs list.
-        /// </summary>
-        protected void SetMsPositionsReFirstUD()
-        {
-            if(_uniqueDefs.Count > 0)
-            {
-                int currentPositionReFirstIUD = 0;
-                foreach(IUniqueDef umcd in _uniqueDefs)
-                {
-                    umcd.MsPositionReFirstUD = currentPositionReFirstIUD;
-                    currentPositionReFirstIUD += umcd.MsDuration;
-                }
-            }
-        }
+        public int Count { get { return _uniqueDefs.Count; } }
 
         private int _msPositionReContainer = 0;
         /// <summary>
@@ -1002,14 +900,92 @@ namespace Moritz.Spec
             }
         }
 
-        protected void CheckIndices(int beginIndex, int endIndex)
+        /// <summary>
+        /// Setting this property stretches or compresses all the durations in the UniqueDefs list to fit the given total duration.
+        /// This does not change the VoiceDef's MsPosition, but does affect its EndMsPosition.
+        /// See also EndMsPosition.set.
+        /// </summary>
+        public int MsDuration
         {
-            Debug.Assert(beginIndex >= 0 && beginIndex < _uniqueDefs.Count);
-            Debug.Assert(endIndex >= 0 && endIndex <= _uniqueDefs.Count);
+            get
+            {
+                int total = 0;
+                foreach(IUniqueDef iud in _uniqueDefs)
+                {
+                    total += iud.MsDuration;
+                }
+                return total;
+            }
+            set
+            {
+                Debug.Assert(value > 0);
+
+                int msDuration = value;
+
+                List<int> relativeDurations = new List<int>();
+                foreach(IUniqueDef iumdd in _uniqueDefs)
+                {
+                    if(iumdd.MsDuration > 0)
+                        relativeDurations.Add(iumdd.MsDuration);
+                }
+
+                List<int> newDurations = M.IntDivisionSizes(msDuration, relativeDurations);
+
+                Debug.Assert(newDurations.Count == relativeDurations.Count);
+                int i = 0;
+                int newTotal = 0;
+                foreach(IUniqueDef iumdd in _uniqueDefs)
+                {
+                    if(iumdd.MsDuration > 0)
+                    {
+                        iumdd.MsDuration = newDurations[i];
+                        newTotal += iumdd.MsDuration;
+                        ++i;
+                    }
+                }
+
+                Debug.Assert(msDuration == newTotal);
+
+                SetMsPositionsReFirstUD();
+
+                AssertVoiceDefConsistency();
+            }
         }
 
-		protected List<IUniqueDef> _uniqueDefs = new List<IUniqueDef>();
+        /// <summary>
+        /// The position of the end of the last UniqueDef in the list re the first IUniqueDef in the list, or 0 if the list is empty.
+        /// Setting this value can only be done if the UniqueDefs list is not empty, and the value
+        /// is greater than the position of the final UniqueDef in the list. It then changes
+        /// the msDuration of the final IUniqueDef.
+        /// See also MsDuration.set.
+        /// </summary>
+        public int EndMsPositionReFirstIUD
+        {
+            get
+            {
+                int endMsPosReFirstUID = 0;
+                if(_uniqueDefs.Count > 0)
+                {
+                    IUniqueDef lastIUD = _uniqueDefs[_uniqueDefs.Count - 1];
+                    endMsPosReFirstUID += (lastIUD.MsPositionReFirstUD + lastIUD.MsDuration);
+                }
+                return endMsPosReFirstUID;
+            }
+            set
+            {
+                Debug.Assert(_uniqueDefs.Count > 0);
+                Debug.Assert(value > EndMsPositionReFirstIUD);
 
-        #endregion protected
+                IUniqueDef lastLmdd = _uniqueDefs[_uniqueDefs.Count - 1];
+                lastLmdd.MsDuration = value - EndMsPositionReFirstIUD;
+
+                AssertVoiceDefConsistency();
+            }
+        }
+
+        public List<IUniqueDef> UniqueDefs { get { return _uniqueDefs; } }
+        protected List<IUniqueDef> _uniqueDefs = new List<IUniqueDef>();
+ 
+        #endregion Properties
     }
 }
