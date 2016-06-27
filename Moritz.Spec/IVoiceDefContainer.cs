@@ -15,7 +15,7 @@ namespace Moritz.Spec
         int MsDuration { get; set; }
 
         void TimeWarp(Envelope envelope, double distortion);
-        void SetPitchWheelSliderEnvelope(Envelope envelope);
+        void SetPitchWheelSliders(Envelope envelope);
 
         IReadOnlyList<Trk> Trks { get; }
     }

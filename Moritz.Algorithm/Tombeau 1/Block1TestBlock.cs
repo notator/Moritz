@@ -26,7 +26,7 @@ namespace Moritz.Algorithm.Tombeau1
 
             Envelope envelope = new Envelope(new List<byte>() { 0, 127 }, 127, 127, 2);
 
-            block.SetPitchWheelSliderEnvelope(envelope);
+            block.SetPitchWheelSliders(envelope);
 
             Block block2 = GetBlockFromMidiChordDefLists(ornamentCoreMidiChordDefs);
 

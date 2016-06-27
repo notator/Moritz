@@ -219,8 +219,8 @@ namespace Moritz.Algorithm.Tombeau1
                 AdjustExpression(int beginIndex, int endIndex, double factor)
                 AdjustExpression(double factor)
                 SetPanGliss(int startMsPosition, int endMsPosition, int startPanValue, int endPanValue)
-                SetPitchWheelSliderEnvelope(Envelope envelope)
-                SetMidiChordDefPitchWheelSliders(Dictionary<int, int> pitchWheelValuesPerMsPosition)
+                SetPitchWheelSliders(Envelope envelope)
+                SetPitchWheelSliders(Dictionary<int, int> pitchWheelValuesPerMsPosition) // called by Seq and Block
                 SetPitchWheelDeviation(int beginIndex, int endIndex, int deviation)
                 RemoveScorePitchWheelCommands(int beginIndex, int endIndex)
                 AdjustPitchWheelDeviations(int startMsPosition, int endMsPosition, int startPwd, int endPwd)
@@ -295,7 +295,7 @@ namespace Moritz.Algorithm.Tombeau1
 
                 // Envelopes
                 TimeWarp(Envelope envelope, double distortion)
-                SetPitchWheelSliderEnvelope(Envelope envelope)
+                SetPitchWheelSliders(Envelope envelope)
 
                 // Properties
                 Trks { get; }
@@ -324,7 +324,7 @@ namespace Moritz.Algorithm.Tombeau1
 
                 // Envelopes
                 TimeWarp(Envelope envelope, double distortion)
-                SetPitchWheelSliderEnvelope(Envelope envelope)
+                SetPitchWheelSliders(Envelope envelope)
 
                 // Properties
                 MsDuration { get; set; } // Setting this value stretches or compresses the msDurations of all the voiceDefs and their contained UniqueDefs.

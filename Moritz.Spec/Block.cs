@@ -551,7 +551,7 @@ namespace Moritz.Spec
             return originalMsPositions;
         }
 
-        public void SetPitchWheelSliderEnvelope(Envelope envelope)
+        public void SetPitchWheelSliders(Envelope envelope)
         {
             #region condition
             if(envelope.Domain != 127)
@@ -568,7 +568,7 @@ namespace Moritz.Spec
                 Trk trk = voiceDef as Trk;
                 if(trk != null)
                 {
-                    trk.SetMidiChordDefPitchWheelSliders(pitchWheelValuesPerMsPosition);
+                    trk.SetPitchWheelSliders(pitchWheelValuesPerMsPosition);
                 }
             }
         }

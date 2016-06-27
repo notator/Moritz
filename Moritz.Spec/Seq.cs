@@ -422,7 +422,7 @@ namespace Moritz.Spec
             return originalMsPositions;
         }
 
-        public void SetPitchWheelSliderEnvelope(Envelope envelope)
+        public void SetPitchWheelSliders(Envelope envelope)
         {
             #region condition
             if(envelope.Domain != 127)
@@ -437,7 +437,7 @@ namespace Moritz.Spec
 
             foreach(Trk trk in _trks)
             {
-                trk.SetMidiChordDefPitchWheelSliders(pitchWheelValuesPerMsPosition);
+                trk.SetPitchWheelSliders(pitchWheelValuesPerMsPosition);
             }
         }
         #endregion Envelopes

@@ -174,7 +174,7 @@ namespace Moritz.Spec
 
         #region Envelopes
 
-        public void SetPitchWheelSliderEnvelope(Envelope envelope)
+        public void SetPitchWheelSliders(Envelope envelope)
         {
             #region condition
             if(envelope.Domain != 127)
@@ -187,7 +187,7 @@ namespace Moritz.Spec
 
             Dictionary<int, int> pitchWheelValuesPerMsPosition = envelope.GetValuePerMsPosition(msPositions);
 
-            SetMidiChordDefPitchWheelSliders(pitchWheelValuesPerMsPosition);
+            SetPitchWheelSliders(pitchWheelValuesPerMsPosition);
         }
         private List<int> GetMsPositions()
         {
@@ -206,7 +206,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Also used by Trks in Seq and Block
         /// </summary>
-        public void SetMidiChordDefPitchWheelSliders(Dictionary<int, int> pitchWheelValuesPerMsPosition)
+        public void SetPitchWheelSliders(Dictionary<int, int> pitchWheelValuesPerMsPosition)
         {
             foreach(IUniqueDef iud in UniqueDefs)
             {
