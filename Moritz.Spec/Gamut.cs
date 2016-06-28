@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 
 using Moritz.Globals;
 
@@ -20,6 +21,9 @@ namespace Moritz.Spec
         #region constructors
         public Gamut(List<int> absolutePitchHierarchy, int nPitchesPerOctave)
         {
+            AbsolutePitchHierarchy = absolutePitchHierarchy;
+            NPitchesPerOctave = nPitchesPerOctave;
+
             List<int> sortedBasePitches = new List<int>();
             for(int i = 0; i < nPitchesPerOctave; ++i)
             {
@@ -156,6 +160,46 @@ namespace Moritz.Spec
         }
 
         /// <summary>
+        /// The returned list contains a list of pitches, one pitch per envelope.Original.Count.
+        /// Throws an exception if firstPitch is not in the gamut.List.
+        /// Pitches that would be lower or higher than any pitch in the gamut are silently coerced to
+        /// the lowest or highest values respectively.
+        /// </summary>
+        /// <param name="firstPitch">Will be the first pitch in the returned list.</param>
+        internal List<int> PitchSequence(int firstPitch, Envelope envelope)
+        {
+            Debug.Assert(_list.Contains(firstPitch), $"{nameof(firstPitch)} is not in gamut.");
+
+            List<int> pitchSequence = new List<int>();
+            if(envelope == null)
+            {
+                pitchSequence.Add(firstPitch);
+            }
+            else
+            {
+                List<int> envOriginal = envelope.Original; // clone
+                int firstIndexInEnvelope = envOriginal[0];
+                int indexOfFirstPitchInGamut = IndexOf(firstPitch);
+                int indexDiff = indexOfFirstPitchInGamut - firstIndexInEnvelope;
+
+                List<int> indices = envOriginal;
+                for(int i = 0; i < indices.Count; ++i)
+                {
+                    indices[i] += indexDiff;
+                    indices[i] = (indices[i] < 0) ? 0 : indices[i];
+                    indices[i] = (indices[i] >= this.Count) ? this.Count - 1 : indices[i];
+                }
+
+                foreach(int index in indices)
+                {
+                    pitchSequence.Add(_list[index]);
+                }
+            }
+
+            return pitchSequence;
+        }
+
+        /// <summary>
         /// Adds all the pitches that are pitchArg or octaves thereof.
         /// An exception is thrown if an attempt is made to add a pitch that already exists. 
         /// </summary>
@@ -172,7 +216,13 @@ namespace Moritz.Spec
             {
                 throw new ArgumentException($"{nameof(_list)} already contains pitch {pitch}.");
             }
+            Debug.Assert(AbsolutePitchHierarchy.Count == 12);
             #endregion conditions
+
+            // move pitch to the end of the 'exists' part of the AbsolutePitchHierarchy
+            AbsolutePitchHierarchy.Remove(pitch);
+            AbsolutePitchHierarchy.Insert(NPitchesPerOctave, pitch);
+            NPitchesPerOctave++;
 
             List<int> newPitches = new List<int>();
             while(pitch <= 127)
@@ -246,7 +296,13 @@ namespace Moritz.Spec
             {
                 throw new ArgumentNullException($"{nameof(pitchArg)} must be in range [0..127].");
             }
+            Debug.Assert(AbsolutePitchHierarchy.Count == 12);
             #endregion conditions
+
+            NPitchesPerOctave--;
+            // move pitch beyond the end of the 'exists' part of the AbsolutePitchHierarchy
+            AbsolutePitchHierarchy.Remove(pitch);
+            AbsolutePitchHierarchy.Insert(NPitchesPerOctave, pitch);
 
             while(pitch <= 127)
             {
@@ -267,6 +323,12 @@ namespace Moritz.Spec
                 return _list[i];
             }
         }
+
+        public bool Contains(int pitch)
+        {
+            return _list.Contains(pitch);
+        }
+
         /// <summary>
         /// Returns -1 if pitch is not found.
         /// </summary>
@@ -285,6 +347,9 @@ namespace Moritz.Spec
         /// A clone of the private list.
         /// </summary>
         public List<int> List { get { return new List<int>(_list); } }
+
+        public int NPitchesPerOctave { get; private set; }
+        public List<int> AbsolutePitchHierarchy { get; private set; }
         #endregion public interface
 
         #region private property

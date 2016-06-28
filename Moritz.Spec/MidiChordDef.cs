@@ -104,16 +104,22 @@ namespace Moritz.Spec
 
         /// <summary>
         /// A MidiChordDef having msDuration, and containing an ornament having single-note BasicMidiChordDefs.
-        /// The notated pitch is set to bmcdRootPitches[0]. The notated velocity is set to 127.
-        /// The pitches of the BasicMidiChordDefs are set to bmcdRootPitches, their velocities are set to 127.
-        /// Their durations are as equal as possible, to give the overall msDuration.
-        /// The MidiChordDef has a ChordOff.
+        /// The notated pitch and the pitch of BasicMidiChordDefs[0] are set to notatedPitch.
+        /// The notated velocity of all pitches is set to 127.
+        /// The pitches of the BasicMidiChordDefs begin with the notated pitch, and follow the ornamentEnvelope, using the ornamnetEnvelope's
+        /// values as indices in the gamut. Their durations are as equal as possible, to give the overall msDuration.
+        /// If ornamentEnvelope is null, there will be no ornament but a single, one-note BasicMidiChordDef.
+        /// An exception is thrown if notated pitch is not in the gamut.
         /// </summary>
         /// <param name="msDuration">The duration of this MidiChordDef</param>
-        /// <param name="basicMidiChordRootPitches">The root pitches of the BasicMidiChordDefs sequence.</param>
-        public MidiChordDef(int msDuration, List<int> basicMidiChordRootPitches)
-            :this(new List<byte>() { (byte) basicMidiChordRootPitches[0] }, new List<byte>() { 127 }, msDuration, true) 
+        /// <param name="gamut">The gamut containing the ornament's pitches.</param>
+        /// <param name="notatedPitch">The notated pitch. Also the pitch of BasicMidiChordDefs[0].</param>
+        /// <param name="ornamentEnvelope">The ornament definition.</param>
+        public MidiChordDef(int msDuration, Gamut gamut, int notatedPitch, Envelope ornamentEnvelope)
+            :base(msDuration) 
         {
+            List<int> basicMidiChordRootPitches = gamut.PitchSequence(notatedPitch, ornamentEnvelope);
+
             BasicMidiChordDefs.Clear();
             List<byte> pitches = new List<byte>() { 0 };
             List<byte> velocities = new List<byte>() { 127 };
@@ -124,6 +130,9 @@ namespace Moritz.Spec
                 BasicMidiChordDefs.Add(bmcd);
             }
             this.MsDuration = msDuration; // resets the BasicMidiChordDef msDurations.
+
+            NotatedMidiPitches = new List<byte>(BasicMidiChordDefs[0].Pitches);
+            NotatedMidiVelocities = new List<byte>() { 127 };
 
             if(basicMidiChordRootPitches.Count > 1)
             {
@@ -308,27 +317,31 @@ namespace Moritz.Spec
             }
             #endregion conditions
 
-            int originalMsDuration = MsDuration;
-
-            List<int> originalPositions = new List<int>();
-            #region 1. create originalPositions
-            // originalPositions contains the msPositions of the BasicMidiChordDefs re the MidiChordDef
-            // plus the end msPosition of the final BasicMidiChordDef.
-            int msPos = 0;
-            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+            // if BasicMidiChordDefs.Count == 1, do nothing.
+            if(BasicMidiChordDefs.Count > 1)
             {
-                originalPositions.Add(msPos);
-                msPos += bmcd.MsDuration;
-            }
-            originalPositions.Add(msPos); // end position of duration to warp.
-            #endregion
-            List<int> newPositions = envelope.TimeWarp(originalPositions, distortion);
+                int originalMsDuration = MsDuration;
 
-            for(int i = 0; i < BasicMidiChordDefs.Count; ++i)
-            {
-                BasicMidiChordDef bmcd = BasicMidiChordDefs[i];
-                bmcd.MsDuration = newPositions[i + 1] - newPositions[i];
-                Debug.Assert(_minimumBasicMidiChordMsDuration <= bmcd.MsDuration);
+                List<int> originalPositions = new List<int>();
+                #region 1. create originalPositions
+                // originalPositions contains the msPositions of the BasicMidiChordDefs re the MidiChordDef
+                // plus the end msPosition of the final BasicMidiChordDef.
+                int msPos = 0;
+                foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+                {
+                    originalPositions.Add(msPos);
+                    msPos += bmcd.MsDuration;
+                }
+                originalPositions.Add(msPos); // end position of duration to warp.
+                #endregion
+                List<int> newPositions = envelope.TimeWarp(originalPositions, distortion);
+
+                for(int i = 0; i < BasicMidiChordDefs.Count; ++i)
+                {
+                    BasicMidiChordDef bmcd = BasicMidiChordDefs[i];
+                    bmcd.MsDuration = newPositions[i + 1] - newPositions[i];
+                    Debug.Assert(_minimumBasicMidiChordMsDuration <= bmcd.MsDuration);
+                }
             }
         }
 
@@ -759,47 +772,86 @@ namespace Moritz.Spec
             {
                 _notatedMidiPitches[i] = (byte) M.MidiValue(_notatedMidiPitches[i] + interval);
             }
-            RemoveDuplicate0And127Pitches(_notatedMidiPitches, _notatedMidiVelocities);
+            RemoveDuplicateExtremePitches(_notatedMidiPitches, _notatedMidiVelocities, 0, 127);
 
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
-                for(int i = 0; i < bmcd.Pitches.Count; ++i)
+                List<byte> pitches = bmcd.Pitches;
+                List<byte> velocities = bmcd.Velocities;
+                for(int i = 0; i < pitches.Count; ++i)
                 {
-                    bmcd.Pitches[i] = (byte)M.MidiValue(bmcd.Pitches[i] + interval);
+                    pitches[i] = (byte)M.MidiValue(pitches[i] + interval);
                 }
-            }
-            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
-            {
-				List<byte> pitches = bmcd.Pitches;
-				List<byte> velocities = bmcd.Velocities;
-                RemoveDuplicate0And127Pitches(pitches, velocities);
+                RemoveDuplicateExtremePitches(pitches, velocities, 0, 127);
             }
         }
 
-        private void RemoveDuplicate0And127Pitches(List<byte> pitches, List<byte> velocities)
+        /// <summary>
+        /// Transposes the pitches in NotatedMidiPitches, and all BasicMidiChordDef.Pitches by
+        /// the number of steps in the gamut given in the second argument. Negative values transpose down.
+        /// It is not an error if Midi values would exceed the range of the gamut.
+        /// In this case, they are silently coerced to the bottom or top notes of the gamut respectively.
+        /// Duplicate top and bottom gamut pitches are removed.
+        /// An exception is thrown if the gamut does not contain BasicMidiChordDefs[0].Pitches[0].
+        /// </summary>
+        public void Transpose(Gamut gamut, int steps)
+        {
+            Debug.Assert(gamut.Contains(BasicMidiChordDefs[0].Pitches[0]));
+
+            int bottomMostPitch = gamut[0];
+            int topMostPitch = gamut[gamut.Count - 1];
+
+            for(int i = 0; i < NotatedMidiPitches.Count; ++i)
+            {
+                NotatedMidiPitches[i] = DoTranspose(NotatedMidiPitches[i], gamut, steps);
+            }
+            RemoveDuplicateExtremePitches(_notatedMidiPitches, _notatedMidiVelocities, bottomMostPitch, topMostPitch);
+            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+            {
+                List<byte> pitches = bmcd.Pitches;
+                List<byte> velocities = bmcd.Velocities;
+                for(int i = 0; i < pitches.Count; ++i)
+                {
+                    pitches[i] = DoTranspose(pitches[i], gamut, steps);
+                }
+                RemoveDuplicateExtremePitches(pitches, velocities, bottomMostPitch, topMostPitch);
+            }
+        }
+
+        private byte DoTranspose(byte initialValue, Gamut gamut, int steps)
+        {
+            int index = gamut.IndexOf(initialValue);
+            int newIndex = index + steps;
+            newIndex = (newIndex >= 0) ? newIndex : 0;
+            newIndex = (newIndex < gamut.Count) ? newIndex : gamut.Count - 1;
+
+            return (byte)gamut[newIndex];
+        }
+
+        private void RemoveDuplicateExtremePitches(List<byte> pitches, List<byte> velocities, int bottomMost, int topMost)
         {
             Debug.Assert(pitches.Count == velocities.Count);
-            bool found0 = false;
-            bool found127 = false;
+            bool foundBottomMost = false;
+            bool fountdTopMost = false;
             for(int i = pitches.Count - 1; i >= 0; --i)
             {
-                if(pitches[i] == 0)
+                if(pitches[i] == bottomMost)
                 {
-                    if(found0 == true)
+                    if(foundBottomMost == true)
                     {
                         pitches.RemoveAt(i);
                         velocities.RemoveAt(i);
                     }
-                    found0 = true;
+                    foundBottomMost = true;
                 }
-                if(pitches[i] == 127)
+                if(pitches[i] == topMost)
                 {
-                    if(found127 == true)
+                    if(fountdTopMost == true)
                     {
                         pitches.RemoveAt(i);
                         velocities.RemoveAt(i);
                     }
-                    found127 = true;
+                    fountdTopMost = true;
                 }
             }
             Debug.Assert(pitches.Count == velocities.Count);

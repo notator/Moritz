@@ -14,7 +14,7 @@ namespace Moritz.Algorithm.Tombeau1
 	{
         private Block Block1TestBlock()
         {
-            Block displayBlock = GetDisplayBlock(Tombeau1Templates.PitchWheelCoreMidiChordDefs, Tombeau1Templates.OrnamentCoreMidiChordDefs);
+            Block displayBlock = GetDisplayBlock(Tombeau1Templates.PitchWheelTestMidiChordDefs, Tombeau1Templates.OrnamentTestMidiChordDefs);
 
             return displayBlock;
         }

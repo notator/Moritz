@@ -124,7 +124,6 @@ namespace Moritz.Algorithm.Tombeau1
                 ValueList<T>(List<T> availableValues) // Uses the values in envelope.Original as indices in the availableValues list to create and return a list of values of type T.
                 TimeWarp(List<int> originalMsPositions, double distortion)
                 GetValuePerMsPosition(List<int> msPositions) // Returns a dictionary in which: Key is one of the positions in msPositions, Value is the envelope value at that msPosition.
-                PitchSequence(int firstPitch, Gamut gamut)
             ***************************************************************************/
             #endregion Envelope functions
             #region Gamut functions
@@ -138,7 +137,10 @@ namespace Moritz.Algorithm.Tombeau1
                 AddOctaves(int pitchArg)
                 RemoveOctaves(int pitchArg)
 
+                PitchSequence(int pitch1OctaveIndex, int pitch1pitchInOctaveIndex, Envelope envelope)
+
                 IndexOf(int pitch)
+                NPitchesPerOctave { get; private set; }
                 List {get;} // a copy of the private list.
                 Count {get;}            
 			***************************************************************************/

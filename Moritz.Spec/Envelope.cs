@@ -209,42 +209,6 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// The returned list contains a list of pitches, one pitch per envelope.Original.Count.
-        /// Throws an exception if firstPitch is not in the gamut.
-        /// Pitches that would be lower or higher than any pitch in the gamut are silently coerced to
-        /// the lowest or highest values respectively.
-        /// </summary>
-        /// <param name="firstPitch">Will be the first pitch in the returned list.</param>
-        public List<int> PitchSequence(int firstPitch, Gamut gamut)
-        {
-            #region conditions
-            if(gamut.IndexOf(firstPitch) < 0)
-            {
-                throw new ArgumentException($"{nameof(firstPitch)} must exist in gamut.List.");
-            }
-            #endregion conditions
-            int firstIndexInEnvelope = _original[0]; // clone
-            int indexOfFirstPitchInGamut = gamut.IndexOf(firstPitch);
-            int indexDiff = indexOfFirstPitchInGamut - firstIndexInEnvelope;
-
-            List<int> indices = Original; // clone
-            for(int i = 0; i < indices.Count; ++i)
-            {
-                indices[i] += indexDiff;
-                indices[i] = (indices[i] < 0) ? 0 : indices[i];
-                indices[i] = (indices[i] >= gamut.Count) ? gamut.Count - 1 : indices[i];
-            }
-
-            List<int> pitches = new List<int>();
-            foreach(int index in indices)
-            {
-                pitches.Add(gamut[index]);
-            }
-
-            return pitches;
-        }
-
-        /// <summary>
         /// Sets _original to a list having count values (interpolated between the original values).
         /// </summary>
         public void SetCount(int count)
