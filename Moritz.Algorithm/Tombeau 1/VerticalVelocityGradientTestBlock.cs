@@ -37,21 +37,41 @@ namespace Moritz.Algorithm.Tombeau1
 
             for(int rootPitch = 0; rootPitch < 8; ++rootPitch)
             {
-                List<int> staffAbsolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, rootPitch);
+                List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex++, rootPitch);
+                Gamut gamut = new Gamut(absolutePitchHierarchy, 8);
 
                 Trk trk = new Trk(rootPitch);
 
-                for(int j = 0; j < 20; ++j)
+                for(int gamutIndex = 40; gamutIndex < 52; ++gamutIndex)
                 {
-                    MidiChordDef mcd = new MidiChordDef(chordDensity, 60 + j, staffAbsolutePitchHierarchy, 127, 1200, true);
+                    int mcdRootPitch = gamut.List[gamutIndex];
+
+                    MidiChordDef mcd = new MidiChordDef(1000, gamut, mcdRootPitch, 3, null);
                     if(invert == true)
                     {
                         mcd = mcd.Inversion();
                     }
 
-                    mcd.Lyric = (j).ToString();
+                    mcd.Lyric = (gamutIndex).ToString();
 
                     mcd.SetVerticalVelocityGradient(127, 12);
+
+                    trk.Add(mcd);
+                }
+
+                for(int gamutIndex = 40; gamutIndex < 52; ++gamutIndex)
+                {
+                    int mcdRootPitch = gamut.List[gamutIndex];
+                    MidiChordDef mcd = new MidiChordDef(1000, gamut, mcdRootPitch, chordDensity, null);
+                    if(invert == true)
+                    {
+                        mcd = mcd.Inversion();
+                    }
+
+                    mcd.Lyric = (gamutIndex).ToString();
+
+                    List<byte> velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(20);
+                    mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
 
                     trk.Add(mcd);
                 }

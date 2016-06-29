@@ -33,38 +33,32 @@ namespace Moritz.Algorithm.Tombeau1
         {
             List<Trk> trks = new List<Trk>();
 
-            int relativePitchHierarchyIndex = 9;
-            int BlockHarmonicRoot = 0;
+            int relativePitchHierarchyIndex = 0;
             int nPitchesPerOctave = 8;
             int lyricNumber = 1;
 
-            List<int> blockAbsolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, BlockHarmonicRoot);
-            Gamut gamut = new Gamut(blockAbsolutePitchHierarchy, nPitchesPerOctave);
-
-            for(int rootPitch = 0; rootPitch < 8; ++rootPitch)
+            for(int midiChannel = 0; midiChannel < 8; ++midiChannel)
             {
-                List<int> staffAbsolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, rootPitch);
+                List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex++, midiChannel);
+                Gamut gamut = new Gamut(absolutePitchHierarchy, nPitchesPerOctave);
 
-                Trk trk = new Trk(rootPitch);
+                Trk trk = new Trk(midiChannel);
 
-                for(int j = 0; j < gamut.List.Count; ++j)
+                for(int gamutIndex = 40; gamutIndex < 52; ++gamutIndex)
                 {
-                    int mcdRootPitch = gamut.List[j];
-                    if(mcdRootPitch > 59 && mcdRootPitch < 85)
+                    int mcdRootPitch = gamut.List[gamutIndex];
+                    MidiChordDef mcd = new MidiChordDef(1000, gamut, mcdRootPitch, 3, null);
+                    if(invert == true)
                     {
-                        MidiChordDef mcd = new MidiChordDef(chordDensity, mcdRootPitch, staffAbsolutePitchHierarchy, 127, 1200, true);
-                        if(invert == true)
-                        {
-                            mcd = mcd.Inversion();
-                        }
-
-                        mcd.Lyric = (lyricNumber++).ToString();
-
-                        List<int> velocityPerAbsolutePitch = M.GetVelocityPerAbsolutePitch(blockAbsolutePitchHierarchy, 0);
-                        mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
-
-                        trk.Add(mcd);
+                        mcd = mcd.Inversion();
                     }
+
+                    mcd.Lyric = (lyricNumber++).ToString();
+
+                    List<byte> velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(20);
+                    mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+
+                    trk.Add(mcd);
                 }
 
                 trks.Add(trk);

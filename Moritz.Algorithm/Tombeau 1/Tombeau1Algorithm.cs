@@ -36,7 +36,9 @@ namespace Moritz.Algorithm.Tombeau1
 
             #region main comment (thoughts etc.)
             /*********************************************************************************************
-			Think Nancarrow, but (especially) with background/foreground. Think Study 1. Depth.
+			Think Nancarrow.
+            Think Bach, Brückner, Reich. Repeating/changing, fairly fast groups of chords with harmonic support... and ornaments...
+            Think Study 1: background/foreground, depth.
 
 			The following parameters can be controlled using the Resident Sf2 Synth:
 				Commands:	preset, pitchwheel
@@ -105,8 +107,6 @@ namespace Moritz.Algorithm.Tombeau1
             /***************************************************************************
             public static Moritz.Statics functions relating to pitch hierarchies and velocities:
                 GetAbsolutePitchHierarchy(int relativePitchHierarchyIndex, int rootPitch)
-                GetVelocityPerAbsolutePitch(List<int> absolutePitchHierarchy, int velocityFactorsIndex)
-                GetAscendingPitches(int nPitches, int rootPitch, List<int> absolutePitchHierarchy)
             ***************************************************************************/
             #endregion MoritzStatics functions
             #region Envelope functions
@@ -138,6 +138,9 @@ namespace Moritz.Algorithm.Tombeau1
                 RemoveOctaves(int pitchArg)
 
                 PitchSequence(int pitch1OctaveIndex, int pitch1pitchInOctaveIndex, Envelope envelope)
+                GetChord(int rootPitch, int nPitches)
+
+                GetVelocityPerAbsolutePitch(int minimumVelocity)
 
                 IndexOf(int pitch)
                 NPitchesPerOctave { get; private set; }
@@ -151,9 +154,8 @@ namespace Moritz.Algorithm.Tombeau1
                 constructors:
                 SIMPLE MidiChordDefs (containing a single BasicMidiChordDef):
                     MidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff)
-                    MidiChordDef(int nPitches, int rootPitch, List<int> absolutePitchHierarchy, int velocity, int msDuration, bool hasChordOff)
-                ORNAMENTS having msDuration, and single-note BasicMidiChordDefs:    
-                    MidiChordDef(int msDuration, List<int> basicMidiChordRootPitches)
+                ORNAMENTS
+                    MidiChordDef(int msDuration, Gamut gamut, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null)    
                 PALETTE MidiChordDefs (MidiChordDefs created from palettes):    
                     MidiChordDef(int msDuration, byte pitchWheelDeviation, bool hasChordOff, List<byte> rootMidiPitches, List<byte> rootMidiVelocities, int ornamentNumberSymbol, MidiChordSliderDefs midiChordSliderDefs, List<BasicMidiChordDef> basicMidiChordDefs)
                     
@@ -168,6 +170,7 @@ namespace Moritz.Algorithm.Tombeau1
                 GetNoteCombination(MidiChordDef mcd1, MidiChordDef mcd2, MidiChordPitchOperator midiChordPitchOperator) // a static function
                 
                 Transpose(int interval)
+                Transpose(Gamut gamut, int steps)
 
                 SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch)
                 SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)

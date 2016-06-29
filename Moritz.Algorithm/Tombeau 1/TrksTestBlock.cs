@@ -17,7 +17,8 @@ namespace Moritz.Algorithm.Tombeau1
             Seq seq = new Seq(0, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
 
             List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(0, 5);
-            List<int> velocityPerAbsolutePitch = M.GetVelocityPerAbsolutePitch(absolutePitchHierarchy, 0);
+            Gamut gamut = new Gamut(absolutePitchHierarchy, 8);
+            List<byte> velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(20);
 
             List<MidiChordDef> mcds = Tombeau1Templates.PaletteMidiChordDefs[0]; // a clone
 

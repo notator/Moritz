@@ -746,90 +746,9 @@ namespace Moritz.Globals
             { M.Dynamic.pppp,"#00CA00" }
         };
 
+        #region Pitch Hierarchies
         /// <summary>
-        /// The returned list contains 12 velocity values in range [1..127].
-        /// The pitch at absolutePitchHierarchy[0] is given velocity=127. The other pitches are given velocities
-        /// = 127 * the factor in their corresponding index in M.VelocityFactors[velocityFactorsIndex].
-        /// The returned values are in order of absolute pitch, with C natural (absolute pitch 0) at position 0,
-        /// C# (absolute pitch 1) at position 1, etc.
-        /// </summary>
-        /// <param name="absolutePitchHierarchy">retrieved using M.GetAbsolutePitchHierarchy(...)</param>
-        /// <param name="velocityFactorsIndex">index in M.VelocityFactors: in range [0..7]</param>
-        public static List<int> GetVelocityPerAbsolutePitch(List<int> absolutePitchHierarchy, int velocityFactorsIndex)
-        {
-            List<double> velocityFactorPerPitch = GetVelocityFactors(velocityFactorsIndex);
-
-            List<int> velocityPerAbsPitch = new List<int>();
-            for(int absPitch = 0; absPitch < 12; ++absPitch)
-            {
-                int absPitchIndex = absolutePitchHierarchy.IndexOf(absPitch);
-
-                int velocity = M.MidiValue((int)(127 * velocityFactorPerPitch[absPitchIndex]));
-                velocity = (velocity == 0) ? 1 : velocity;
-
-                velocityPerAbsPitch.Add(velocity);
-            }
-            return velocityPerAbsPitch;
-        }
-
-        /// <summary>
-        /// Returns a list of pitch numbers in range [0..127] in ascending order.
-        /// The first pitch in the returned list is always rootPitch.
-        /// The other returned pitches are transposed to be in ascending order by adding 12 as necessary.
-        /// The maximum number of pitches returned is either nPitches or the number of pitches beginning with and
-        /// following the rootPitch in the absolutePitchHierarchy, whichever is smaller.
-        /// The number of returned pitches can also be smaller than nPitches because pitches that would be higher
-        /// than 127 are simply not added to the returned list.
-        /// </summary>
-        /// <param name="nPitches">In range [1..12]</param>
-        /// <param name="rootPitch">In range [0..127]</param>
-        /// <param name="absolutePitchHierarchy"></param>
-        /// <returns></returns>
-        public static List<byte> GetAscendingPitches(int nPitches, int rootPitch, List<int> absolutePitchHierarchy)
-        {
-            Debug.Assert(nPitches > 0 && nPitches <= 12);
-            Debug.Assert(rootPitch >= 0 && rootPitch <= 127);
-            Debug.Assert(absolutePitchHierarchy.Count == 12);
-
-            List<int> pitches = new List<int>();
-            pitches.Add(rootPitch);
-
-            if(nPitches > 1)
-            {
-                int absRootPitch = rootPitch % 12;
-                int rootIndex = absolutePitchHierarchy.IndexOf(absRootPitch);
-                int maxIndex = rootIndex + nPitches;
-                maxIndex = (maxIndex < absolutePitchHierarchy.Count) ? maxIndex : absolutePitchHierarchy.Count;
-                for(int i = rootIndex + 1; i < maxIndex; ++i)
-                {
-                    int pitch = absolutePitchHierarchy[i];
-                    while(pitch <= pitches[pitches.Count - 1])
-                    {
-                        pitch += 12;
-                    }
-
-                    if(pitch <= 127)
-                    {
-                        pitches.Add(pitch);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-            List<byte> bytePitches = new List<byte>();
-            foreach(int pitch in pitches)
-            {
-                bytePitches.Add((byte)pitch);
-            }
-            return bytePitches;
-        }
-
-        #region static AbsolutePitchHierarchies
-
-        /// <summary>
-        /// Returns a list that basically contains the sums of absoluteValue(rootPitch) + RelativePitchHierarchies[index].
+        /// Returns a list that contains the sums of absoluteValue(rootPitch) + RelativePitchHierarchies[index].
         /// If a value would be greater than 11, value = value - 12, so that all values are in range [0..11].
         /// </summary>
         /// <param name="relativePitchHierarchyIndex">In range [0..21]</param>
@@ -859,9 +778,7 @@ namespace Moritz.Globals
             }
             return absolutePitchHierarchy;
         }
-        #endregion static AbsolutePitchHierarchies
 
-        #region static RelativePitchHierarchies
         /// <summary>
         /// This series of RelativePitchHierarchies is derived from the "most consonant" hierarchy at index 0:
         ///                    0, 7, 4, 10, 2, 5, 9, 11, 1, 3, 6, 8
@@ -909,94 +826,7 @@ namespace Moritz.Globals
             new List<int>(){ 0, 10,  7,  5,  4, 11,  2,  3,  9,  8,  1,  6 }, // 20
             new List<int>(){ 0,  7, 10,  4,  5,  2, 11,  9,  3,  1,  8,  6 }, // 21 
         };
-        #endregion static RelativePitchHierarchies  
-
-        #region VelocityFactors
-        /// <summary>
-        /// Returns a list of 12 doubles, in decreasing order of size (A copy of the static values.).
-        /// Each value is in range [1..0], and represents the relative velocity of the corresponding pitch in a
-        /// relativePitchHierarchy. The first value in the returned list is always 1.
-        /// If the index argument to this function is 0, the double at the end of the returned list will be very small.
-        /// If the index argument to this function is 7, all the doubles will be the same size (=1).
-        /// </summary>
-        /// <param name="index">In range [0..7]</param>
-        private static List<double> GetVelocityFactors(int index)
-        {
-            if(index < 0 || index >= VelocityFactors.Count)
-            {
-                throw new ArgumentException($"{nameof(index)} out of range.");
-            }
-
-            List<double> velocityFactors = new List<double>(VelocityFactors[index]);
-
-            Debug.Assert(velocityFactors.Count == 12);
-            Debug.Assert(velocityFactors[0] == 1.0);
-            for(int i = 1; i < 12; ++i)
-            {
-                double factor = velocityFactors[i];
-                Debug.Assert(factor <= 1.0 && factor >= 0.0);
-                Debug.Assert(velocityFactors[i - 1] >= factor);
-            }
-
-            return velocityFactors;
-        }
-        /// <summary>
-        /// The xth (indexth) list contains 12 doubles, each of which represents the
-        /// relative velocity of the corresponding pitch in a relativePitchHierarchy.
-        /// <para>A list of lists of double containing the following values (rounded to 5 decimal places):
-        ///      y=0 | y=1     | y=2     | y=3     | y=4     | y=5     | y=6     | y=7     | y=8     | y=9     | y=10    | y=11    | 
-        /// x=0: 1   | 0,92985 | 0,8597  | 0,78955 | 0,7194  | 0,64925 | 0,5791  | 0,50895 | 0,4388  | 0,36865 | 0,2985  | 0,22835 | 
-        /// x=1: 1   | 0,93987 | 0,87974 | 0,81961 | 0,75948 | 0,69936 | 0,63923 | 0,5791  | 0,51897 | 0,45884 | 0,39871 | 0,33858 | 
-        /// x=2: 1   | 0,94989 | 0,89979 | 0,84968 | 0,79957 | 0,74946 | 0,69936 | 0,64925 | 0,59914 | 0,54903 | 0,49893 | 0,44882 | 
-        /// x=3: 1   | 0,95991 | 0,91983 | 0,87974 | 0,83966 | 0,79957 | 0,75948 | 0,7194  | 0,67931 | 0,63923 | 0,59914 | 0,55906 | 
-        /// x=4: 1   | 0,96994 | 0,93987 | 0,90981 | 0,87974 | 0,84968 | 0,81961 | 0,78955 | 0,75948 | 0,72942 | 0,69936 | 0,66929 | 
-        /// x=5: 1   | 0,97996 | 0,95991 | 0,93987 | 0,91983 | 0,89979 | 0,87974 | 0,8597  | 0,83966 | 0,81961 | 0,79957 | 0,77953 | 
-        /// x=5: 1   | 0,98998 | 0,97996 | 0,96994 | 0,95991 | 0,94989 | 0,93987 | 0,92985 | 0,91983 | 0,90981 | 0,89979 | 0,88976 | 
-        /// x=7: 1   | 1       | 1       | 1       | 1       | 1       | 1       | 1       | 1       | 1       | 1       | 1       |
-        /// </para>
-        /// </summary>
-        private static List<List<double>> VelocityFactors = VelocityFactorsPerPitch();
-        private static List<List<double>> VelocityFactorsPerPitch()
-        {
-            List<List<double>> rval = new List<List<double>>();
-            List<byte> maximumVelocityPerDynamicSymbol = new List<byte>();
-            maximumVelocityPerDynamicSymbol.Add(M.MaxMidiVelocity[M.Dynamic.ppp]);
-            maximumVelocityPerDynamicSymbol.Add(M.MaxMidiVelocity[M.Dynamic.pp]);
-            maximumVelocityPerDynamicSymbol.Add(M.MaxMidiVelocity[M.Dynamic.p]);
-            maximumVelocityPerDynamicSymbol.Add(M.MaxMidiVelocity[M.Dynamic.mp]);
-            maximumVelocityPerDynamicSymbol.Add(M.MaxMidiVelocity[M.Dynamic.mf]);
-            maximumVelocityPerDynamicSymbol.Add(M.MaxMidiVelocity[M.Dynamic.f]);
-            maximumVelocityPerDynamicSymbol.Add(M.MaxMidiVelocity[M.Dynamic.ff]);
-            maximumVelocityPerDynamicSymbol.Add(M.MaxMidiVelocity[M.Dynamic.fff]);
-
-            for(int x = 0; x < maximumVelocityPerDynamicSymbol.Count; ++x)
-            {
-                double minVelocity = maximumVelocityPerDynamicSymbol[x];
-                List<double> factors = new List<double>();
-                double decrement = (127 - minVelocity) / 11;
-                double currentVelocity = 127;
-                for(int y = 0; y < 12; ++y)
-                {
-                    factors.Add(currentVelocity / 127);
-                    currentVelocity -= decrement;
-                }
-                rval.Add(factors);
-            }
-
-            //for(int x = 0; x < maximumVelocityPerDynamicSymbol.Count; ++x)
-            //{
-            //    Console.Write("x:" + x.ToString() + " ");
-            //    for(int v = 0; v < 12; ++v)
-            //    {
-            //        double val = Math.Round(rval[x][v], 5);
-            //        Console.Write(val.ToString() + " | ");
-            //    }
-            //    Console.WriteLine();
-            //}
-
-            return rval;
-        }
-        #endregion VelocityFactors
+        #endregion Pitch Hierarchies  
 
         public readonly static Preferences Preferences;
         public readonly static IFormatProvider En_USNumberFormat;

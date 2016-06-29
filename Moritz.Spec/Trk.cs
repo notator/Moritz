@@ -243,7 +243,7 @@ namespace Moritz.Spec
         /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef. 
         /// </summary>
         /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
-        public void SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch)
+        public void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch)
         {
             #region conditions
             Debug.Assert(velocityPerAbsolutePitch.Count == 12);

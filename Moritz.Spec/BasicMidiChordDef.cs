@@ -38,48 +38,30 @@ namespace Moritz.Spec
         /// A BasicMidiChordDef having density notes. Absent fields are set to 0 or null.
         /// Note that the number of pitches returned can be less than nPitches. Pitches that would be higher than 127 are
         /// simply not added to the returned list.
-        /// All pitches are given the same velocity.
-        /// The pitches are found using the function M.GetAscendingPitches(...). See that function for further documentation.
+        /// All pitches are given velocity = 127.
+        /// The pitches are found using the function gamut.GetChord(rootPitch, density). See that function for further documentation.
         /// </summary>
-        /// <param name="nPitches">The number of pitches in the chord if all pitches are in range [0..127]. (range [1..12])</param>
-        /// <param name="rootPitch">The chord's root midiPitch (range [0..127]).</param>
-        /// <param name="absolutePitchHierarchy">Count is 12, values are in range [0..11].</param>
-        /// <param name="velocity">All notes are given this velocity (range [1..127])</param>
-        /// <param name="msDuration">The chord's msDuration (greater than 0).</param>
-        /// <param name="hasChordOff">Does the chord have a chordOff?</param>
-        public BasicMidiChordDef(int nPitches, int rootPitch, List<int> absolutePitchHierarchy, int velocity, int msDuration, bool hasChordOff)
+        /// <param name="msDuration">The duration</param>
+        /// <param name="gamut"></param>
+        /// <param name="rootPitch">The lowest pitch</param>
+        /// <param name="density">The number of pitches. The actual number created can be smaller.</param>
+        public BasicMidiChordDef(int msDuration, Gamut gamut, int rootPitch, int density)
         {
             #region conditions
-            Debug.Assert(nPitches > 0 && nPitches <= 12);
+            Debug.Assert(density > 0 && density <= 12);
             Debug.Assert(rootPitch >= 0 && rootPitch <= 127);
-            Debug.Assert(absolutePitchHierarchy.Count >= nPitches && absolutePitchHierarchy.Count <= 12);
-            foreach(byte pitch in absolutePitchHierarchy)
-                Debug.Assert(pitch >= 0 && pitch <= 11); // can include duplicates.
-            Debug.Assert(velocity > 0 && velocity <= 127);
             Debug.Assert(msDuration > 0);
             #endregion conditions
 
             _msDuration = msDuration; // read-only!
-            BankIndex = null;
-            PatchIndex = null;
-            HasChordOff = hasChordOff;
 
-            Pitches = M.GetAscendingPitches(nPitches, rootPitch, absolutePitchHierarchy);
-            Velocities = new List<byte>();
-            foreach(byte pitch in Pitches)
+            Pitches = gamut.GetChord(rootPitch, density);
+            var newVelocities = new List<byte>();
+            foreach(byte pitch in Pitches) // can be less than nPitchesPerChord
             {
-                Velocities.Add((byte)velocity);
+                newVelocities.Add(127);
             }
-        }
-
-        public BasicMidiChordDef(BasicMidiChordDef original, int msDuration)
-        {
-            _msDuration = msDuration; // read-only!
-            BankIndex = original.BankIndex;
-            PatchIndex = original.PatchIndex;
-            HasChordOff = original.HasChordOff;
-            Pitches = new List<byte>(original.Pitches);
-            Velocities = new List<byte>(original.Velocities);
+            Velocities = newVelocities;
         }
 
         #region Inversion
@@ -143,12 +125,12 @@ namespace Moritz.Spec
         /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc. 
         /// </summary>
         /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
-        public void SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch)
+        public void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch)
         {
             for(int pitchIndex = 0; pitchIndex < Pitches.Count; ++pitchIndex)
             {
                 int absPitch = Pitches[pitchIndex] % 12;
-                Velocities[pitchIndex] = (byte)velocityPerAbsolutePitch[absPitch];
+                Velocities[pitchIndex] = velocityPerAbsolutePitch[absPitch];
             }
         }
 

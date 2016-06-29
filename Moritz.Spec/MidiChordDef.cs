@@ -49,90 +49,44 @@ namespace Moritz.Spec
             CheckTotalDuration();
         }
 
-        /// <summary>
-        /// A MidiChordDef containing a single BasicMidiChordDef having nPitches notes. Absent fields are set to 0 or null.
-        /// Note that the number of pitches returned can be less than nPitches. Pitches that would be higher than 127 are
-        /// simply not added to the returned list.
-        /// The pitches arguments are used to set both the NotatedMidiPitches and BasicMidiChordDefs[0].Pitches.
-        /// All pitches are given the same velocity.
-        /// The pitches are found using the function M.GetAscendingPitches(...). See that function for further documentation.
-        /// </summary>
-        /// <param name="nPitches">The number of pitches in the chord if all pitches are in range [0..127]. (range [1..12])</param>
-        /// <param name="rootPitch">The chord's lowest midiPitch (range [0..127]).</param>
-        /// <param name="absolutePitchHierarchy">Count is 12, values are in range [0..11].</param>
-        /// <param name="velocity">All notes are given this velocity (range [1..127])</param>
-        /// <param name="msDuration">The chord's msDuration (greater than 0).</param>
-        /// <param name="hasChordOff">Does the chord have a chordOff?</param>
-        public MidiChordDef(int nPitches, int rootPitch, List<int> absolutePitchHierarchy, int velocity, int msDuration, bool hasChordOff)
-            : base(msDuration)
-        {
-            #region conditions
-            Debug.Assert(nPitches > 0 && nPitches <= 12);
-            Debug.Assert(rootPitch >= 0 && rootPitch <= 127);
-            Debug.Assert(absolutePitchHierarchy.Count == 12);
-            foreach(byte pitch in absolutePitchHierarchy)
-                Debug.Assert(pitch >= 0 && pitch <= 11);
-            Debug.Assert(velocity > 0 && velocity <= 127);
-            Debug.Assert(msDuration > 0);
-            #endregion conditions
-
-            _msPositionReFirstIUD = 0; // default value
-            _hasChordOff = hasChordOff;
-            _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
-
-            List<byte> pitches = M.GetAscendingPitches(nPitches, rootPitch, absolutePitchHierarchy);
-            List<byte> velocities = new List<byte>();
-            foreach(byte pitch in pitches)
-            {
-                velocities.Add((byte)velocity);
-            } 
-
-            _notatedMidiPitches = pitches;
-            _notatedMidiVelocities = velocities;
-
-            _ornamentNumberSymbol = 0;
-
-            MidiChordSliderDefs = null;
-
-            byte? bank = null;
-            byte? patch = null;
-
-            BasicMidiChordDefs.Add(new BasicMidiChordDef(msDuration, bank, patch, hasChordOff, pitches, velocities));
-
-            CheckTotalDuration();
-        }
 
         /// <summary>
-        /// A MidiChordDef having msDuration, and containing an ornament having single-note BasicMidiChordDefs.
-        /// The notated pitch and the pitch of BasicMidiChordDefs[0] are set to notatedPitch.
+        /// A MidiChordDef having msDuration, and containing an ornament having BasicMidiChordDefs with nPitchesPerChord.
+        /// The notated pitch and the pitch of BasicMidiChordDefs[0] are set to rootNotatedPitch.
         /// The notated velocity of all pitches is set to 127.
-        /// The pitches of the BasicMidiChordDefs begin with the notated pitch, and follow the ornamentEnvelope, using the ornamnetEnvelope's
-        /// values as indices in the gamut. Their durations are as equal as possible, to give the overall msDuration.
-        /// If ornamentEnvelope is null, there will be no ornament but a single, one-note BasicMidiChordDef.
-        /// An exception is thrown if notated pitch is not in the gamut.
-        /// </summary>
+        /// The root pitches of the BasicMidiChordDefs begin with rootNotatedPitch, and follow the ornamentEnvelope, using
+        /// the ornamentEnvelope's values as indices in the gamut. Their durations are as equal as possible, to give the
+        /// overall msDuration.
+        /// If ornamentEnvelope is null, a single, one-note BasicMidiChordDef will be created.
+        /// The number of pitches in a chord may be less than nPitchesPerChord (see gamut.GetChord(...) ).
+        /// An exception is thrown if rootNotatedPitch is not in the gamut.
+        /// </summary>        
         /// <param name="msDuration">The duration of this MidiChordDef</param>
-        /// <param name="gamut">The gamut containing the ornament's pitches.</param>
-        /// <param name="notatedPitch">The notated pitch. Also the pitch of BasicMidiChordDefs[0].</param>
+        /// <param name="gamut">The gamut containing all the pitches.</param>
+        /// <param name="rootNotatedPitch">The lowest notated pitch. Also the lowest pitch of BasicMidiChordDefs[0].</param>
+        /// <param name="nPitchesPerChord">The chord density (some chords may have less pitches).</param>
         /// <param name="ornamentEnvelope">The ornament definition.</param>
-        public MidiChordDef(int msDuration, Gamut gamut, int notatedPitch, Envelope ornamentEnvelope)
-            :base(msDuration) 
+        public MidiChordDef(int msDuration, Gamut gamut, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null)
+            : base(msDuration) 
         {
-            List<int> basicMidiChordRootPitches = gamut.PitchSequence(notatedPitch, ornamentEnvelope);
+            NotatedMidiPitches = gamut.GetChord(rootNotatedPitch, nPitchesPerChord);
+            var nmVelocities = new List<byte>();
+            foreach(byte pitch in NotatedMidiPitches) // can be less than nPitchesPerChord
+            {
+                nmVelocities.Add(127);
+            }
+            NotatedMidiVelocities = nmVelocities;
 
-            BasicMidiChordDefs.Clear();
-            List<byte> pitches = new List<byte>() { 0 };
-            List<byte> velocities = new List<byte>() { 127 };
+            List<int> basicMidiChordRootPitches = gamut.PitchSequence(rootNotatedPitch, ornamentEnvelope);
+            // If ornamentEnvelope is null, basicMidiChordRootPitches will only contain rootNotatedpitch.
+
+            BasicMidiChordDefs = new List<BasicMidiChordDef>();
             foreach(int rootPitch in basicMidiChordRootPitches)
             {
-                pitches[0] = (byte)rootPitch;
-                BasicMidiChordDef bmcd = new BasicMidiChordDef(1000, null, null, true, pitches, velocities);
+                BasicMidiChordDef bmcd = new BasicMidiChordDef(1000, gamut, rootPitch, nPitchesPerChord);
                 BasicMidiChordDefs.Add(bmcd);
             }
             this.MsDuration = msDuration; // resets the BasicMidiChordDef msDurations.
-
-            NotatedMidiPitches = new List<byte>(BasicMidiChordDefs[0].Pitches);
-            NotatedMidiVelocities = new List<byte>() { 127 };
 
             if(basicMidiChordRootPitches.Count > 1)
             {
@@ -405,7 +359,7 @@ namespace Moritz.Spec
         /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef. 
         /// </summary>
         /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
-        public void SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch)
+        public void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch)
         {
             #region conditions
             Debug.Assert(velocityPerAbsolutePitch.Count == 12);
@@ -421,7 +375,7 @@ namespace Moritz.Spec
             for(int pitchIndex = 0; pitchIndex < NotatedMidiPitches.Count; ++pitchIndex)
             {
                 int absPitch = NotatedMidiPitches[pitchIndex] % 12;
-                NotatedMidiVelocities[pitchIndex] = (byte)velocityPerAbsolutePitch[absPitch];
+                NotatedMidiVelocities[pitchIndex] = velocityPerAbsolutePitch[absPitch];
             }
 
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)

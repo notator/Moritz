@@ -200,6 +200,98 @@ namespace Moritz.Spec
         }
 
         /// <summary>
+        /// Returns a list of pitch numbers in range [0..127] in ascending order.
+        /// The first pitch in the returned list is always rootPitch.
+        /// The other returned pitches are transposed to be in ascending order by adding 12 as necessary.
+        /// The maximum number of pitches returned is either nPitches or the number of pitches beginning with and
+        /// following the rootPitch in the absolutePitchHierarchy, whichever is smaller.
+        /// The number of returned pitches can also be smaller than nPitches because pitches that would be higher
+        /// than 127 are simply not added to the returned list.
+        /// </summary>
+        /// <param name="rootPitch">In range [0..127]</param>
+        /// <param name="nPitches">In range [1..12]</param>
+        /// <returns></returns>
+        public List<byte> GetChord(int rootPitch, int nPitches)
+        {
+            Debug.Assert(nPitches > 0 && nPitches <= 12);
+            Debug.Assert(rootPitch >= 0 && rootPitch <= 127);
+
+            List<int> pitches = new List<int>();
+            pitches.Add(rootPitch);
+
+            if(nPitches > 1)
+            {
+                int absRootPitch = rootPitch % 12;
+                int rootIndex = AbsolutePitchHierarchy.IndexOf(absRootPitch);
+                int maxIndex = rootIndex + nPitches;
+                maxIndex = (maxIndex < AbsolutePitchHierarchy.Count) ? maxIndex : AbsolutePitchHierarchy.Count;
+                for(int i = rootIndex + 1; i < maxIndex; ++i)
+                {
+                    int pitch = AbsolutePitchHierarchy[i];
+                    while(pitch <= pitches[pitches.Count - 1])
+                    {
+                        pitch += 12;
+                    }
+
+                    if(pitch <= 127)
+                    {
+                        pitches.Add(pitch);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            List<byte> bytePitches = new List<byte>();
+            foreach(int pitch in pitches)
+            {
+                bytePitches.Add((byte)pitch);
+            }
+            return bytePitches;
+        }
+
+        /// <summary>
+        /// The returned list contains 12 velocity values in range [0..127].
+        /// Pitches in the gamut are given velocities in range [1..127]. Other pitches are given velocity = 0.
+        /// The returned values are in order of absolute pitch, with C natural (absolute pitch 0) at position 0,
+        /// C# (absolute pitch 1) at position 1, etc.
+        /// The pitch at AbsolutePitchHierarchy[0] is given velocity=127.
+        /// The pitch at AbsolutePitchHierarchy[NPitchesPerOctave - 1] is given minimumVelocity.
+        /// The velocities in between are scaled linearly.
+        /// </summary>
+        /// <param name="minimumVelocity">In range [1..127]. The velocity to be given to the pitch at AbsolutePitchHierarchy[NPitchesPerOctave - 1]</param>
+        public List<byte> GetVelocityPerAbsolutePitch(int minimumVelocity)
+        {
+            Debug.Assert(minimumVelocity > 0 && minimumVelocity < 128);
+
+            List<byte> velocities = new List<byte>();
+            byte localVelocity = 127;
+            double velocityDiff = ((double)(127 - minimumVelocity)) / (NPitchesPerOctave - 1);
+            for(int i = 0; i < NPitchesPerOctave; ++i)
+            {
+                byte vel = (byte)(localVelocity - (byte)Math.Round((i * velocityDiff)));
+                vel = (vel == 0) ? (byte)1 : vel;
+                velocities.Add(vel);
+            }
+
+            List<byte> velocityPerAbsPitch = new List<byte>();
+            for(int i = 0; i < 12; ++i)
+            {
+                velocityPerAbsPitch.Add(0);
+            }
+
+            for(int absPitchIndex = 0; absPitchIndex < NPitchesPerOctave ; ++absPitchIndex)
+            {
+                int absPitch = AbsolutePitchHierarchy[absPitchIndex];
+                byte velocity = velocities[absPitchIndex];
+                
+                velocityPerAbsPitch[absPitch] = velocity;
+            }
+            return velocityPerAbsPitch;
+        }
+
+        /// <summary>
         /// Adds all the pitches that are pitchArg or octaves thereof.
         /// An exception is thrown if an attempt is made to add a pitch that already exists. 
         /// </summary>

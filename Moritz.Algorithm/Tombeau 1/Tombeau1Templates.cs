@@ -249,7 +249,7 @@ namespace Moritz.Algorithm.Tombeau1
                     {
                         firstPitch++;
                     }
-                    MidiChordDef mcd = new MidiChordDef(msDuration, gamut, firstPitch, ornamentEnvelope);
+                    MidiChordDef mcd = new MidiChordDef(msDuration, gamut, firstPitch, 1, ornamentEnvelope);
 
                     mcd.TimeWarp(timeWarpEnvelope, 16);
 
