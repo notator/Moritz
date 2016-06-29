@@ -146,51 +146,47 @@ namespace Moritz.Algorithm.Tombeau1
                 SetPitchWheelTestMidiChordDefs();
                 SetOrnamentTestMidiChordDefs();
 
-                //SetTemplateTrks();
+                SetTemplateTrks();
             }
 
-            //private static void SetTemplateTrks()
-            //{
+            private static void SetTemplateTrks()
+            {
+                int trkDuration = 1000;
+                List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(0, 0);
+                Gamut gamut = new Gamut(absolutePitchHierarchy, 9);
+                List<Trk> trks0 = new List<Trk>();
+                Trk trk1 = GetTrk0(gamut);
+                trk1.MsDuration = trkDuration;
+                
+                trks0.Add(trk1);
+                
+                _trks.Add(trks0);
+            }
 
-            //    List<MidiChordDef> lastMidiChordDefList = _ornamentTestMidiChordDefs[_ornamentTestMidiChordDefs.Count - 1];
+            private static Trk GetTrk0(Gamut gamut)
+            {
+                List<IUniqueDef> iuds = new List<IUniqueDef>();
+                int rootNotatedPitch = gamut[40];
+                int nPitchesPerChord = 1;
+                int msDuration = 1000;
+                Envelope envelope = new Envelope(new List<byte>() { 0, 127 }, 127, 8, 4);
+                MidiChordDef mcd1 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 1, null);
+                iuds.Add(mcd1);
+                MidiChordDef mcd2 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 2, null);
+                mcd2.Transpose(gamut, 1);
+                iuds.Add(mcd2);
+                MidiChordDef mcd3 = new MidiChordDef(msDuration + 300, gamut, rootNotatedPitch, nPitchesPerChord + 3, envelope);
+                mcd3.Transpose(gamut, 2);
+                iuds.Add(mcd3);
+                MidiChordDef mcd4 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 4, null);
+                mcd4.Transpose(gamut, 3);
+                iuds.Add(mcd4);
 
-            //    SetTrk1(_trks[0][0]);
-            //}
+                Trk trk0 = new Trk(0, 0, iuds);
 
-            //private static void SetTrk1(Trk trk)
-            //{
-            //    int relativePitchHierarchyIndex = 0;
-            //    int gamutRoot = 0;
-            //    int nPitchesPerOctave = 8;
 
-            //    List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, gamutRoot);
-            //     Gamut gamut = new Gamut(absolutePitchHierarchy, nPitchesPerOctave);
-
-            //    int nMidiChordDefs = 4;
-            //    List<int> chordDensities = new List<int>() { 4, 4, 5, 4 };
-            //    for(int i = 0; i < nMidiChordDefs; ++i)
-            //    {
-            //        MidiChordDef mcd = null;
-            //        int mcdRootPitch = gamut.List[i];
-
-            //        if(i == 2)
-            //        {
-            //            //List<byte> basicMidiChordRootPitches = new List<byte>() { };
-            //            //// create an ornament
-            //            //mcd = new MidiChordDef(1000, basicMidiChordRootPitches);
-
-            //        }
-            //        else
-            //        {
-            //            mcd = new MidiChordDef(chordDensities[i], mcdRootPitch, absolutePitchHierarchy, 127, 1000, true);
-            //        }
-
-            //        List<int> velocityPerAbsolutePitch = M.GetVelocityPerAbsolutePitch(absolutePitchHierarchy, 0);
-            //        mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
-
-            //        trk.Add(mcd);
-            //    }
-            //}
+                return trk0;
+            }
 
             private static void SetPaletteMidiChordDefs(List<Palette> paletteList)
             {

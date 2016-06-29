@@ -344,14 +344,18 @@ namespace Moritz.Spec
             }
         }
 
-		/// Creates a hairpin in the velocities from startMsPosition to endMsPosition (non-inclusive).
-		/// This function does NOT change velocities outside the range given in its arguments.
-		/// There must be at least two IUniqueDefs in the msPosition range given in the arguments.
-		/// The factors by which the velocities are multiplied change arithmetically:
-		/// The velocity of the first IUniqueDefs is multiplied by startFactor, and the velocity
-		/// of the last MidiChordDef in range by endFactor.
-		/// Can be used to create a diminueno or crescendo.
-		public void AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
+        /// Creates a hairpin in the velocities from startMsPosition to endMsPosition (non-inclusive).
+        /// This function does NOT change velocities outside the range given in its arguments.
+        /// There must be at least two IUniqueDefs in the msPosition range given in the arguments.
+        /// The factors by which the velocities are multiplied change arithmetically:
+        /// The velocity of the first IUniqueDefs is multiplied by startFactor, and the velocity
+        /// of the last MidiChordDef in range by endFactor.
+        /// Can be used to create a diminueno or crescendo.
+        /// <param name="startMsPosition">MsPositionReFirstIUD</param>
+        /// <param name="endMsPosition">MsPositionReFirstIUD</param>
+        /// <param name="startFactor"></param>
+        /// <param name="endFactor"></param>
+        public void AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
         {
             int beginIndex = FindIndexAtMsPositionReFirstIUD(startMsPosition);
             int endIndex = FindIndexAtMsPositionReFirstIUD(endMsPosition);

@@ -214,7 +214,7 @@ namespace Moritz.Spec
         public List<byte> GetChord(int rootPitch, int nPitches)
         {
             Debug.Assert(nPitches > 0 && nPitches <= 12);
-            Debug.Assert(rootPitch >= 0 && rootPitch <= 127);
+            Debug.Assert(_list.Contains(rootPitch));
 
             List<int> pitches = new List<int>();
             pitches.Add(rootPitch);
@@ -224,7 +224,7 @@ namespace Moritz.Spec
                 int absRootPitch = rootPitch % 12;
                 int rootIndex = AbsolutePitchHierarchy.IndexOf(absRootPitch);
                 int maxIndex = rootIndex + nPitches;
-                maxIndex = (maxIndex < AbsolutePitchHierarchy.Count) ? maxIndex : AbsolutePitchHierarchy.Count;
+                maxIndex = (maxIndex < NPitchesPerOctave) ? maxIndex : NPitchesPerOctave;
                 for(int i = rootIndex + 1; i < maxIndex; ++i)
                 {
                     int pitch = AbsolutePitchHierarchy[i];

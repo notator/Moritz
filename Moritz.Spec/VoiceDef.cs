@@ -32,6 +32,8 @@ namespace Moritz.Spec
             this._msPositionReContainer = msPositionReContainer;
             this._uniqueDefs = iuds;
 
+            SetMsPositionsReFirstUD();
+
             AssertVoiceDefConsistency();
         }
         #endregion constructors
