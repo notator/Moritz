@@ -166,20 +166,20 @@ namespace Moritz.Algorithm.Tombeau1
             private static Trk GetTrk0(Gamut gamut)
             {
                 List<IUniqueDef> iuds = new List<IUniqueDef>();
-                int rootNotatedPitch = gamut[40];
+                int rootNotatedPitch = gamut[gamut.Count / 2];
                 int nPitchesPerChord = 1;
                 int msDuration = 1000;
                 Envelope envelope = new Envelope(new List<byte>() { 0, 127 }, 127, 8, 4);
                 MidiChordDef mcd1 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 1, null);
                 iuds.Add(mcd1);
                 MidiChordDef mcd2 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 2, null);
-                mcd2.Transpose(gamut, 1);
+                mcd2.TransposeInGamut(1);
                 iuds.Add(mcd2);
-                MidiChordDef mcd3 = new MidiChordDef(msDuration + 300, gamut, rootNotatedPitch, nPitchesPerChord + 3, envelope);
-                mcd3.Transpose(gamut, 2);
+                MidiChordDef mcd3 = new MidiChordDef(msDuration * 2, gamut, rootNotatedPitch, nPitchesPerChord + 3, envelope);
+                mcd3.TransposeInGamut(2);
                 iuds.Add(mcd3);
                 MidiChordDef mcd4 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 4, null);
-                mcd4.Transpose(gamut, 3);
+                mcd4.TransposeInGamut(3);
                 iuds.Add(mcd4);
 
                 Trk trk0 = new Trk(0, 0, iuds);

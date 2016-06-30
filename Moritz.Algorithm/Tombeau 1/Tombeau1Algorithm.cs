@@ -161,7 +161,6 @@ namespace Moritz.Algorithm.Tombeau1
                     MidiChordDef(int msDuration, byte pitchWheelDeviation, bool hasChordOff, List<byte> rootMidiPitches, List<byte> rootMidiVelocities, int ornamentNumberSymbol, MidiChordSliderDefs midiChordSliderDefs, List<BasicMidiChordDef> basicMidiChordDefs)
                     
                 Clone()
-                Inversion()
                 Conjugate() // requires MidiChordDef.Gamut to be set.
 
                 TimeWarp(Envelope envelope, double distortion) // Changes the msPositions of the BasicMidiChordDefs without changing the length of the MidiChordDef.
@@ -171,7 +170,8 @@ namespace Moritz.Algorithm.Tombeau1
                 SetVerticalDensity(int newDensity)
                 GetNoteCombination(MidiChordDef mcd1, MidiChordDef mcd2, MidiChordPitchOperator midiChordPitchOperator) // a static function
                 
-                Transpose(int interval)
+                Invert(int nPitchesToShift) // shifts the lower pitches up one octave. The pitches stay in the Gamut, if any.
+                Transpose(int interval) // sets Gamut to null
                 Transpose(Gamut gamut, int steps)
 
                 SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch)

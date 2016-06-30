@@ -56,6 +56,7 @@ namespace Moritz.Spec
 
             return trk; 
         }
+
         #endregion constructors
 
         internal void AssertConstructionConsistency()
@@ -171,6 +172,17 @@ namespace Moritz.Spec
         #endregion Changing the Trk's duration
 
         #region Changing MidiChordDef attributes
+
+        public void TransposeInGamut(int stepsToTranspose)
+        {
+            foreach(MidiChordDef mcd in MidiChordDefs)
+            {
+                if(mcd.Gamut != null)
+                {
+                    mcd.TransposeInGamut(stepsToTranspose);
+                }
+            }
+        }
 
         #region Envelopes
 

@@ -17,8 +17,8 @@ namespace Moritz.Algorithm.Tombeau1
             List<Block> blocks = new List<Block>();
             int chordDensity = 3;
 
-            blocks.Add(VelocityPerAbsolutePitchTestBar(chordDensity, false));
-            blocks.Add(VelocityPerAbsolutePitchTestBar(chordDensity, true));
+            blocks.Add(VelocityPerAbsolutePitchTestBar(chordDensity, false, false));
+            blocks.Add(VelocityPerAbsolutePitchTestBar(chordDensity, false, true));
 
             Block mainBlock = blocks[0];
             for(int i = 1; i < blocks.Count; ++i)
@@ -29,7 +29,7 @@ namespace Moritz.Algorithm.Tombeau1
             return mainBlock;           
         }
 
-        private Block VelocityPerAbsolutePitchTestBar(int chordDensity, bool useConjugate)
+        private Block VelocityPerAbsolutePitchTestBar(int chordDensity, bool useConjugate, bool invert)
         {
             List<Trk> trks = new List<Trk>();
 
@@ -51,6 +51,10 @@ namespace Moritz.Algorithm.Tombeau1
                     if(useConjugate == true)
                     {
                         mcd = mcd.Conjugate();
+                    }
+                    if(invert == true)
+                    {
+                        mcd.Invert(7);
                     }
 
                     mcd.Lyric = (gamutIndex).ToString();

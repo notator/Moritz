@@ -210,45 +210,6 @@ namespace Moritz.Spec
         }
         #endregion Clone
 
-        #region Inversion
-        /// <summary>
-        /// Creates a MidiChordDef containing a single BasicMidiChordDef having the NotatedMidiPitches.
-        /// The original base pitch is preserved, but the top-bottom order of the prime intervals is reversed.
-        /// Velocities remain in the same order, bottom to top. They are not inverted.
-        /// To add inversions of BasicMidiChordDefs, call BasicMidiChordDef.Inversion() 
-        /// </summary>
-        /// <returns></returns>
-        public MidiChordDef Inversion()
-        {
-            MidiChordDef mcdInverted = null;
-
-            if(NotatedMidiPitches.Count > 1)
-            {
-                List<byte> intervals = new List<byte>();
-
-                for(int i = 1; i < NotatedMidiPitches.Count; ++i)
-                {
-                    intervals.Add((byte)(NotatedMidiPitches[i] - NotatedMidiPitches[i - 1]));
-                }
-                intervals.Reverse();
-                List<byte> pitches = new List<byte>() { NotatedMidiPitches[0] };
-                for(int i = 0; i < intervals.Count; ++i)
-                {
-                    byte interval = intervals[i];
-                    pitches.Add((byte)(pitches[pitches.Count - 1] + interval));
-                }
-                mcdInverted = new MidiChordDef(pitches, NotatedMidiVelocities, MsDuration, true);
-                mcdInverted.Lyric = (Lyric == null) ? null : String.Copy(Lyric);
-            }
-            else
-            {
-                mcdInverted = (MidiChordDef) Clone();
-            }
-
-            return mcdInverted;
-        }
-        #endregion Inversion
-
         #region Conjugate
         /// <summary>
         /// 1. Creates a new, conjugate gamut from the current Gamut (see Gamut.Conjugate()).
@@ -474,110 +435,52 @@ namespace Moritz.Spec
 
         #endregion Functions that use Envelopes
 
-        #region Boulez addition (commented out)
-        //      /// <summary>
-        //      /// Boulez Addition: (Does not affect the sliders in this MidiChordDef.)
-        //      /// Notes (Pitches and their Velocities) in this MidiChordDef's BasicMidiChordDefs are preserved. The pitches and
-        //      /// velocities in the notes in each BasicMidiChordDef, and used as roots to which the pitch and velocity intervals
-        //      /// in mcd2's first BasicMidiChordDef are added.
-        //      /// A note is added only if its pitch is not already present, and its velocity is greater than 0.
-        //      /// A velocity that would be greater than 127 is coerced to 127.
-        //      /// When the BasicMidiChordDefs are complete, this MidiChordDef's NotatedMidiPitches are set to the pitches in
-        //      /// the first BasicMidiChordDef.
-        //      /// </summary>
-        //      /// <param name="mcd2"></param>
-        //      public MidiChordDef AddNotes(MidiChordDef mcd2)
-        //{
-        //	Debug.Assert(mcd2.BasicMidiChordDefs[0].Pitches.Count > 1, "The chord to be added must have at least two pitches.");
+        #region Invert
+        /// <summary>
+        /// In each chord in this MidiChordDef:
+        /// 1. nPitchesToShift is set to nPitchesToShiftArg % nPitches in the chord.
+        /// 2. nPitchesToShift pitches are shifted up one octave.
+        /// 3. The pitch list is resorted to be in ascending order.
+        /// Notes:
+        /// a) Velocities do not change. They remain in the same order as they were before this function was called.
+        /// b) The pitches thereby remain part of the Gamut, if there is one. 
+        /// </summary>
+        /// <returns></returns>
+        public void Invert(int nPitchesToShiftArg)
+        {
+            #region conditions
+            Debug.Assert(nPitchesToShiftArg >= 0);
+            #endregion conditions
 
-        //	List<int> pitchIntervalsToAdd = GetIntervals(mcd2.BasicMidiChordDefs[0].Pitches);
-        //	// velocityIntervals can be negative
-        //	List<int> velocityIntervalsToAdd = GetIntervals(mcd2.BasicMidiChordDefs[0].Velocities);
+            InvertPitches(NotatedMidiPitches, nPitchesToShiftArg);
+            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+            {
+                InvertPitches(bmcd.Pitches, nPitchesToShiftArg);
+            }
+        }
 
-        //	foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
-        //	{
-        //		List<byte> newPitches = new List<byte>();
-        //		List<byte> newVelocities = new List<byte>();
-        //		for(int i = 0; i < bmcd.Pitches.Count; ++i)
-        //		{
-        //			byte rootPitch = bmcd.Pitches[i];
-        //			byte rootVelocity = bmcd.Velocities[i];
-
-        //			newPitches.Add(rootPitch);
-        //			newVelocities.Add(rootVelocity);
-
-        //			for(int j = 0; j < pitchIntervalsToAdd.Count; ++j)
-        //			{
-        //				int pitchInterval = pitchIntervalsToAdd[j];
-        //				int velocityInterval = velocityIntervalsToAdd[j];
-
-        //				int newPitch = rootPitch + pitchInterval;
-        //				int newVelocity = rootVelocity + velocityInterval;
-
-        //				if(newPitch <= 127 
-        //				&& (!newPitches.Contains((byte)newPitch))
-        //				&& (!bmcd.Pitches.Contains((byte)newPitch))
-        //				&& newVelocity > 0)
-        //				{
-        //					newVelocity = (newVelocity < 128) ? newVelocity : 127;
-
-        //					newPitches.Add((byte)newPitch);
-        //					newVelocities.Add((byte)newVelocity);
-        //				}
-        //			}
-        //		}
-        //		SortPitchesAndVelocities(newPitches, newVelocities);
-
-        //		bmcd.Pitches = newPitches;
-        //		bmcd.Velocities = newVelocities;
-        //	}
-
-        //	_notatedMidiPitches = new List<byte>(BasicMidiChordDefs[0].Pitches);
-
-        //	return this; // this function can be chained
-        //}
-
-        //private void SortPitchesAndVelocities(List<byte> newPitches, List<byte> newVelocities)
-        //{
-        //	List<byte> sortedPitches = new List<byte>();
-        //	List<byte> sortedVelocities = new List<byte>();
-        //	while(newPitches.Count > 0)
-        //	{
-        //		byte smallestPitch = newPitches[0];
-        //		int indexOfSmallestPitch = 0;
-        //		for(int i = 0; i < newPitches.Count; ++i)
-        //		{
-        //			if(newPitches[i] < smallestPitch)
-        //			{
-        //				smallestPitch = newPitches[i];
-        //				indexOfSmallestPitch = i;
-        //			}
-        //		}
-        //		sortedPitches.Add(newPitches[indexOfSmallestPitch]);
-        //		sortedVelocities.Add(newVelocities[indexOfSmallestPitch]);
-
-        //		newPitches.RemoveAt(indexOfSmallestPitch);
-        //		newVelocities.RemoveAt(indexOfSmallestPitch);
-        //	}
-        //	for(int i = 0; i < sortedPitches.Count; ++i)
-        //	{
-        //		newPitches.Add(sortedPitches[i]);
-        //		newVelocities.Add(sortedVelocities[i]);	
-        //	}
-        //}
-
-        //private List<int> GetIntervals(List<byte> bytes)
-        //{
-        //	List<int> intervals = new List<int>();
-
-        //	for(int i = 1; i < bytes.Count; ++i)
-        //	{
-        //		intervals.Add(bytes[i] - bytes[0]);
-        //	}
-        //	return intervals;
-        //}
-
-        #endregion Boulez addition (commented out)
+        private void InvertPitches(List<byte> pitches, int nPitchesToShiftArg)
+        {
+            int nPitchesToShift = nPitchesToShiftArg % pitches.Count;
+            for(int i = 0; i < nPitchesToShift; ++i)
+            {
+                byte newPitch = (byte) (pitches[i] + 12);
+                if(newPitch > 127)
+                {
+                    if(Gamut != null)
+                    {
+                        newPitch = (byte) Gamut[Gamut.Count - 1];
+                    }
+                    else
+                    {
+                        newPitch = 127;
+                    }
+                }
+                pitches[i] = newPitch;
+            }
+            pitches.Sort();
+        }
+        #endregion Invert
 
         #region GetNoteCombination() 
         public enum MidiChordPitchOperator
@@ -765,6 +668,7 @@ namespace Moritz.Spec
         /// It is not an error if Midi values would exceed the range 0..127.
         /// In this case, they are silently coerced to 0 or 127 respectively.
         /// Duplicate 0 and 127 pitches are removed.
+        /// Gamut is set to null.
         /// </summary>
         public void Transpose(int interval)
         {
@@ -784,19 +688,23 @@ namespace Moritz.Spec
                 }
                 RemoveDuplicateExtremePitches(pitches, velocities, 0, 127);
             }
+
+            Gamut = null;
         }
 
-        /// <summary>
+        /// <summary>        
+        /// An exception is thrown if this MidiChord's Gamut is null.
         /// Transposes the pitches in NotatedMidiPitches, and all BasicMidiChordDef.Pitches by
-        /// the number of steps in the gamut given in the second argument. Negative values transpose down.
+        /// the number of steps in the MidiChordDef's Gamut. Negative values transpose down.
         /// It is not an error if Midi values would exceed the range of the gamut.
         /// In this case, they are silently coerced to the bottom or top notes of the gamut respectively.
         /// Duplicate top and bottom gamut pitches are removed.
-        /// An exception is thrown if the gamut does not contain BasicMidiChordDefs[0].Pitches[0].
         /// </summary>
-        public void Transpose(Gamut gamut, int steps)
+        public void TransposeInGamut(int steps)
         {
-            Debug.Assert(gamut.Contains(BasicMidiChordDefs[0].Pitches[0]));
+            Debug.Assert(Gamut != null);
+
+            Gamut gamut = Gamut;
 
             int bottomMostPitch = gamut[0];
             int topMostPitch = gamut[gamut.Count - 1];
