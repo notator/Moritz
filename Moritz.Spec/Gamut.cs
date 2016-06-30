@@ -18,12 +18,21 @@ namespace Moritz.Spec
     /// </summary>
     public class Gamut
     {
-        #region constructors
+        #region constructor
+        /// <summary>                                                                                           _list
+        /// Gamuts are immutable!
+        /// </summary>
         public Gamut(List<int> absolutePitchHierarchy, int nPitchesPerOctave)
         {
-            AbsolutePitchHierarchy = absolutePitchHierarchy;
-            NPitchesPerOctave = nPitchesPerOctave;
+            _absolutePitchHierarchy = new List<int>(absolutePitchHierarchy);
+            _nPitchesPerOctave = nPitchesPerOctave;
 
+            _list = GetGamutList(_absolutePitchHierarchy, _nPitchesPerOctave);
+        }
+
+        #region private helper functions
+        private List<int> GetGamutList(List<int> absolutePitchHierarchy, int nPitchesPerOctave)
+        {
             List<int> sortedBasePitches = new List<int>();
             for(int i = 0; i < nPitchesPerOctave; ++i)
             {
@@ -31,26 +40,7 @@ namespace Moritz.Spec
             }
             sortedBasePitches.Sort();
 
-            SetGamutList(sortedBasePitches);
-        }
-
-        /// <summary>
-        /// This private constructor is used by Clone.
-        /// </summary>
-        /// <param name="list">A valid gamut list (see class summary)</param>
-        private Gamut(List<int> list)
-        {
-            #region conditions
-            ThrowExceptionIfGamutListIsInvalid(list);
-            #endregion conditions
-
-            _list = new List<int>(list);
-        }
-
-        #region private helper functions
-        private void SetGamutList(List<int> sortedBasePitches)
-        {
-            _list = new List<int>();
+            List<int> gamutList = new List<int>();
             int rphIndex = 0;
             int octave = 0;
             while(true)
@@ -60,7 +50,7 @@ namespace Moritz.Spec
                 {
                     break;
                 }
-                _list.Add(pitch);
+                gamutList.Add(pitch);
 
                 if(rphIndex >= sortedBasePitches.Count)
                 {
@@ -69,7 +59,9 @@ namespace Moritz.Spec
                 }
             }
 
-            ThrowExceptionIfGamutListIsInvalid(_list);
+            ThrowExceptionIfGamutListIsInvalid(gamutList);
+
+            return gamutList;
         }
         /// <summary>
         /// Throws an exception if the argument is invalid for any of the following reasons:
@@ -128,35 +120,30 @@ namespace Moritz.Spec
             }
             #endregion check pitch consistency
         }
-
-        /// <summary>
-        /// The limited number of pitches in the first octave above the base pitch (in ascending order).
-        /// The first value in the returned list is the basePitch.
-        /// </summary>
-        /// <param name="basePitch">In range [0..11]</param>
-        private List<int> SortedBasePitches(List<int> relativePitchHierarchy, int basePitch, int nPitchesPerOctave)
-        {
-            List<int> sortedBasePitches = new List<int>();
-            for(int i = 0; i < nPitchesPerOctave; ++i)
-            {
-                sortedBasePitches.Add(relativePitchHierarchy[i]);
-            }
-            sortedBasePitches.Sort();
-            for(int i = 0; i < sortedBasePitches.Count; ++i)
-            {
-                sortedBasePitches[i] += basePitch;
-            }
-
-            return sortedBasePitches;
-        }
         #endregion private helper functions
 
-        #endregion constructors
+        #endregion constructor
 
-        #region public interface
-        public Gamut Clone()
+        #region public functions
+        public int this[int i]
         {
-            return new Gamut(_list);
+            get
+            {
+                return _list[i];
+            }
+        }
+
+        public bool Contains(int pitch)
+        {
+            return _list.Contains(pitch);
+        }
+
+        /// <summary>
+        /// Returns -1 if pitch is not found.
+        /// </summary>
+        public int IndexOf(int pitch)
+        {
+            return _list.IndexOf(pitch);
         }
 
         /// <summary>
@@ -291,161 +278,25 @@ namespace Moritz.Spec
             return velocityPerAbsPitch;
         }
 
-        /// <summary>
-        /// Adds all the pitches that are pitchArg or octaves thereof.
-        /// An exception is thrown if an attempt is made to add a pitch that already exists. 
-        /// </summary>
-        /// <param name="pitchArg">in range [0..127]</param>
-        public void AddOctaves(int pitchArg)
-        {
-            int pitch = pitchArg % 12;
-            #region conditions
-            if(pitchArg < 0 || pitchArg > 127)
-            {
-                throw new ArgumentNullException($"{nameof(pitchArg)} must be in range [0..127].");
-            }
-            if(_list.Contains(pitch))
-            {
-                throw new ArgumentException($"{nameof(_list)} already contains pitch {pitch}.");
-            }
-            Debug.Assert(AbsolutePitchHierarchy.Count == 12);
-            #endregion conditions
+        #endregion public functions
 
-            // move pitch to the end of the 'exists' part of the AbsolutePitchHierarchy
-            AbsolutePitchHierarchy.Remove(pitch);
-            AbsolutePitchHierarchy.Insert(NPitchesPerOctave, pitch);
-            NPitchesPerOctave++;
-
-            List<int> newPitches = new List<int>();
-            while(pitch <= 127)
-            {
-                newPitches.Add(pitch);
-                pitch += 12;
-            }
-
-            InsertPitches(newPitches);
-        }
-        /// <summary>
-        /// The pitchList can contain values in range [0..127] in any order.
-        /// An exception is thrown if a value is already present in the Gamut, otherwise it will be inserted
-        /// in the Gamut's private list at the correct position.
-        /// </summary>
-        /// <param name="pitchList"></param>
-        private void InsertPitches(List<int> pitchList)
-        {
-            #region conditions
-            foreach(int pitch in pitchList)
-            {
-                if(pitch < 0 || pitch > 127)
-                {
-                    throw new ArgumentNullException($"{nameof(pitchList)} can only contain values in the range [0..127].");
-                }
-            }
-            #endregion conditions
-            int plIndex = 0;
-            while( plIndex < pitchList.Count)
-            {
-                int newPitch = pitchList[plIndex];
-                if(_list.Contains(newPitch))
-                {
-                    throw new ArgumentException($"{nameof(_list)} already contains pitch {newPitch}.");
-                }
-                else
-                {
-                    if(newPitch > _list[_list.Count - 1])
-                    {
-                        _list.Add(newPitch);
-                        plIndex++;
-                    }
-                    else
-                    {
-                        for(int i = 0; i < _list.Count; ++i)
-                        {
-                            if(_list[i] > newPitch)
-                            {
-                                _list.Insert(i, newPitch);
-                                plIndex++;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            ThrowExceptionIfGamutListIsInvalid(_list);
-        }
+        #region public properties
+        public int NPitchesPerOctave { get { return _nPitchesPerOctave; } }
+        public int _nPitchesPerOctave;
 
         /// <summary>
-        /// Removes all the pitches that are pitchArg or octaves thereof.
-        /// An exception is thrown if an attempt is made to remove a non-existent pitch. 
+        /// A clone of the private list.
         /// </summary>
-        /// <param name="pitchArg">in range [0..127]</param>
-        public void RemoveOctaves(int pitchArg)
-        {
-            int pitch = pitchArg % 12;
-            #region conditions
-            if(pitchArg < 0 || pitchArg > 127)
-            {
-                throw new ArgumentNullException($"{nameof(pitchArg)} must be in range [0..127].");
-            }
-            Debug.Assert(AbsolutePitchHierarchy.Count == 12);
-            #endregion conditions
+        public List<int> AbsolutePitchHierarchy { get { return new List<int>(_absolutePitchHierarchy); } }
+        private List<int> _absolutePitchHierarchy = new List<int>();
 
-            NPitchesPerOctave--;
-            // move pitch beyond the end of the 'exists' part of the AbsolutePitchHierarchy
-            AbsolutePitchHierarchy.Remove(pitch);
-            AbsolutePitchHierarchy.Insert(NPitchesPerOctave, pitch);
-
-            while(pitch <= 127)
-            {
-                if(!(_list.Contains(pitch)))
-                {
-                    throw new ArgumentNullException($"Attempt to remove a non-existent pitch ({pitch}) from {nameof(_list)}.");
-                }
-                _list.Remove(pitch);
-                pitch += 12;
-            }
-        }
-        
-
-        public int this[int i]
-        {
-            get
-            {
-                return _list[i];
-            }
-        }
-
-        public bool Contains(int pitch)
-        {
-            return _list.Contains(pitch);
-        }
-
-        /// <summary>
-        /// Returns -1 if pitch is not found.
-        /// </summary>
-        public int IndexOf(int pitch)
-        {
-            return _list.IndexOf(pitch);
-        }
-        public int Count
-        {
-            get
-            {
-                return _list.Count;
-            }
-        }
         /// <summary>
         /// A clone of the private list.
         /// </summary>
         public List<int> List { get { return new List<int>(_list); } }
-
-        public int NPitchesPerOctave { get; private set; }
-        public List<int> AbsolutePitchHierarchy { get; private set; }
-        #endregion public interface
-
-        #region private property
         private List<int> _list;
-        #endregion  private property
+
+        public int Count { get { return _list.Count; } }
+        #endregion public interface
     }
 }
