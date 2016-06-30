@@ -128,23 +128,26 @@ namespace Moritz.Algorithm.Tombeau1
             #endregion Envelope functions
             #region Gamut functions
             /***************************************************************************
-            public Gamut functions that have been implemented:
+            public Gamut functions and properties that have been implemented:
+                (Gamut is immutable)
                 constructor:
                 Gamut(List<int> absolutePitchHierarchy, int nPitchesPerOctave)
 
                 Clone()
                 Conjugate()
 
-                AddOctaves(int pitchArg)
-                RemoveOctaves(int pitchArg)
+                Contains(byte pitch)
+                ContainsAllPitches(List<byte> pitches)
 
                 PitchSequence(int pitch1OctaveIndex, int pitch1pitchInOctaveIndex, Envelope envelope)
                 GetChord(int rootPitch, int nPitches)
 
                 GetVelocityPerAbsolutePitch(int minimumVelocity)
 
+                Gamut[i] { get; }
                 IndexOf(int pitch)
-                NPitchesPerOctave { get; private set; }
+                NPitchesPerOctave { get; }
+                AbsolutePitchHierarchy  { get; } // a copy of the private list.
                 List {get;} // a copy of the private list.
                 Count {get;}            
 			***************************************************************************/
@@ -186,6 +189,8 @@ namespace Moritz.Algorithm.Tombeau1
                 PanMsbs {get; set;}
                 AdjustModulationWheel(double factor)
                 AdjustExpression(double factor)
+
+                Gamut {get; set;} // The Gamut can only be set (or changed) if all the pitches in the MidiChordDef are in the new Gamut.
             ***************************************************************************/
             #endregion MidiChordDef functions
             #region Trk functions
