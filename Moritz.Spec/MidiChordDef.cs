@@ -68,7 +68,7 @@ namespace Moritz.Spec
         public MidiChordDef(int msDuration, Gamut gamut, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null)
             : base(msDuration) 
         {
-            Gamut = gamut;
+            _gamut = gamut;
 
             NotatedMidiPitches = gamut.GetChord(rootNotatedPitch, nPitchesPerChord);
             var nmVelocities = new List<byte>();
@@ -164,7 +164,6 @@ namespace Moritz.Spec
             rval.PitchWheelDeviation = this.PitchWheelDeviation;
             rval.HasChordOff = this.HasChordOff;
             rval.Lyric = this.Lyric;
-            rval.Gamut = this.Gamut;
             rval.MinimumBasicMidiChordMsDuration = MinimumBasicMidiChordMsDuration; // required when changing a midiChord's duration
             rval.NotatedMidiPitches = _notatedMidiPitches; // a clone of the displayed notehead pitches
             rval.NotatedMidiVelocities = _notatedMidiVelocities; // a clone of the displayed notehead velocities
@@ -193,6 +192,7 @@ namespace Moritz.Spec
             }
             rval.BasicMidiChordDefs = newBs;
 
+            rval.Gamut = this.Gamut;
             rval.MsDuration = this.MsDuration;
 
            return rval;
@@ -689,7 +689,7 @@ namespace Moritz.Spec
                 RemoveDuplicateExtremePitches(pitches, velocities, 0, 127);
             }
 
-            Gamut = null;
+            _gamut = null;
         }
 
         /// <summary>        
@@ -1122,8 +1122,34 @@ namespace Moritz.Spec
             } 
         }
         private List<byte> _notatedMidiPitches = null;
-
-        public Gamut Gamut { get { return _gamut; } set { _gamut = value; } }
+        /// <summary>
+        /// The Gamut is set if all the pitches in the MidiChordDef are in the Gamut.
+        /// Otherwise, the original Gamut value is left unchanged.
+        /// </summary>
+        public Gamut Gamut
+        { 
+            get { return _gamut; }          
+            set
+            {
+                Gamut testGamut = value;
+                if(testGamut != null && testGamut.ContainsAllPitches(_notatedMidiPitches))
+                {
+                    bool okay = true;
+                    foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+                    {
+                        if(!testGamut.ContainsAllPitches(bmcd.Pitches))
+                        {
+                            okay = false;
+                            break;
+                        }
+                    }
+                    if(okay)
+                    {
+                        _gamut = value;
+                    }   
+                }   
+            }
+        }
         private Gamut _gamut = null;
 
         /// <summary>

@@ -215,6 +215,23 @@ namespace Moritz.Spec
         }
 
         /// <summary>
+        /// Returns true if the gamut.List contains all the pitches in the argument. Otherwise false. 
+        /// </summary>
+        internal bool ContainsAllPitches(List<byte> pitches)
+        {
+            bool containsAllPitches = true;
+            foreach(byte pitch in pitches)
+            {
+                if(_list.Contains(pitch) == false)
+                {
+                    containsAllPitches = false;
+                    break;
+                }
+            }
+            return containsAllPitches;
+        }
+
+        /// <summary>
         /// Returns -1 if pitch is not found.
         /// </summary>
         public int IndexOf(int pitch)
