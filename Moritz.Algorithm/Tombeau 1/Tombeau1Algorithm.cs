@@ -133,6 +133,7 @@ namespace Moritz.Algorithm.Tombeau1
                 Gamut(List<int> absolutePitchHierarchy, int nPitchesPerOctave)
 
                 Clone()
+                Conjugate()
 
                 AddOctaves(int pitchArg)
                 RemoveOctaves(int pitchArg)
@@ -161,6 +162,7 @@ namespace Moritz.Algorithm.Tombeau1
                     
                 Clone()
                 Inversion()
+                Conjugate() // requires MidiChordDef.Gamut to be set.
 
                 TimeWarp(Envelope envelope, double distortion) // Changes the msPositions of the BasicMidiChordDefs without changing the length of the MidiChordDef.
                 MsDuration {get; set;} // set changes the durations of contained BasicMidiChordDefs

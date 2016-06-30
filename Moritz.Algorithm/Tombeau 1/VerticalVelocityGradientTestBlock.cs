@@ -29,7 +29,7 @@ namespace Moritz.Algorithm.Tombeau1
             return mainBlock;           
         }
 
-        private Block VerticalVelocityGradientTestBar(int chordDensity, bool invert)
+        private Block VerticalVelocityGradientTestBar(int chordDensity, bool useConjugate)
         {
             List<Trk> trks = new List<Trk>();
 
@@ -47,9 +47,9 @@ namespace Moritz.Algorithm.Tombeau1
                     int mcdRootPitch = gamut.List[gamutIndex];
 
                     MidiChordDef mcd = new MidiChordDef(1000, gamut, mcdRootPitch, 3, null);
-                    if(invert == true)
+                    if(useConjugate == true)
                     {
-                        mcd = mcd.Inversion();
+                        mcd = mcd.Conjugate();
                     }
 
                     mcd.Lyric = (gamutIndex).ToString();
@@ -63,9 +63,9 @@ namespace Moritz.Algorithm.Tombeau1
                 {
                     int mcdRootPitch = gamut.List[gamutIndex];
                     MidiChordDef mcd = new MidiChordDef(1000, gamut, mcdRootPitch, chordDensity, null);
-                    if(invert == true)
+                    if(useConjugate == true)
                     {
-                        mcd = mcd.Inversion();
+                        mcd = mcd.Conjugate();
                     }
 
                     mcd.Lyric = (gamutIndex).ToString();

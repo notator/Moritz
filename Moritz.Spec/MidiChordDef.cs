@@ -49,7 +49,6 @@ namespace Moritz.Spec
             CheckTotalDuration();
         }
 
-
         /// <summary>
         /// A MidiChordDef having msDuration, and containing an ornament having BasicMidiChordDefs with nPitchesPerChord.
         /// The notated pitch and the pitch of BasicMidiChordDefs[0] are set to rootNotatedPitch.
@@ -69,6 +68,8 @@ namespace Moritz.Spec
         public MidiChordDef(int msDuration, Gamut gamut, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null)
             : base(msDuration) 
         {
+            Gamut = gamut;
+
             NotatedMidiPitches = gamut.GetChord(rootNotatedPitch, nPitchesPerChord);
             var nmVelocities = new List<byte>();
             foreach(byte pitch in NotatedMidiPitches) // can be less than nPitchesPerChord
@@ -121,9 +122,7 @@ namespace Moritz.Spec
             _notatedMidiPitches = rootMidiPitches;
             _notatedMidiVelocities = rootMidiVelocities;
 
-            _lyric = null;
             _ornamentNumberSymbol = ornamentNumberSymbol;
-            _lyric = null;
 
             MidiChordSliderDefs = midiChordSliderDefs;
             BasicMidiChordDefs = basicMidiChordDefs;
@@ -165,6 +164,7 @@ namespace Moritz.Spec
             rval.PitchWheelDeviation = this.PitchWheelDeviation;
             rval.HasChordOff = this.HasChordOff;
             rval.Lyric = this.Lyric;
+            rval.Gamut = this.Gamut;
             rval.MinimumBasicMidiChordMsDuration = MinimumBasicMidiChordMsDuration; // required when changing a midiChord's duration
             rval.NotatedMidiPitches = _notatedMidiPitches; // a clone of the displayed notehead pitches
             rval.NotatedMidiVelocities = _notatedMidiVelocities; // a clone of the displayed notehead velocities
@@ -248,6 +248,52 @@ namespace Moritz.Spec
             return mcdInverted;
         }
         #endregion Inversion
+
+        #region Conjugate
+        /// <summary>
+        /// 1. Creates a new, conjugate gamut from the current Gamut (see Gamut.Conjugate()).
+        /// 2. Clones this MidiChordDef, and replaces the clone's pitches by the equivalent pitches in the conjugate Gamut.
+        /// 3. Sets the clone's Gamut to the conjugate gamut.
+        /// 4. Returns the clone.
+        /// </summary>
+        public MidiChordDef Conjugate()
+        {
+            #region conditions
+            Debug.Assert(Gamut != null);
+            #endregion conditions
+
+            Gamut conjugateGamut = this.Gamut.Conjugate();
+            MidiChordDef conjugateMCD = (MidiChordDef)Clone();
+
+            #region conditions
+            Debug.Assert(Gamut[0] == conjugateGamut[0]);
+            Debug.Assert(Gamut.NPitchesPerOctave == conjugateGamut.NPitchesPerOctave);
+            // N.B. it is not necessarily true that Gamut.Count == conjugateGamut.Count.
+            #endregion conditions
+
+            // Substitute the conjugateMCD's pitches by the equivalent pitches in the conjugateGamut.
+            ConjugatePitches(conjugateGamut, conjugateMCD.NotatedMidiPitches);
+            foreach(BasicMidiChordDef bmcd in conjugateMCD.BasicMidiChordDefs)
+            {
+                ConjugatePitches(conjugateGamut, bmcd.Pitches);
+            }
+
+            conjugateMCD.Gamut = conjugateGamut;
+
+            return conjugateMCD;
+        }
+
+        private void ConjugatePitches(Gamut conjugateGamut, List<byte> pitches)
+        {
+            for(int i = 0; i < pitches.Count; ++i)
+            {
+                int pitchIndex = Gamut.IndexOf(pitches[i]);
+                // N.B. it is not necessarily true that Gamut.Count == conjugateGamut.Count.
+                pitchIndex = (pitchIndex < conjugateGamut.Count) ? pitchIndex : conjugateGamut.Count - 1;
+                pitches[i] = (byte)conjugateGamut[pitchIndex];
+            }
+        }
+        #endregion Conjugate
 
         #region Functions that use Envelopes
         /// <summary>
@@ -1168,6 +1214,9 @@ namespace Moritz.Spec
             } 
         }
         private List<byte> _notatedMidiPitches = null;
+
+        public Gamut Gamut { get { return _gamut; } set { _gamut = value; } }
+        private Gamut _gamut = null;
 
         /// <summary>
         /// This NotatedMidiVelocities field is used when displaying the chord's noteheads.

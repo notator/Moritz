@@ -10,20 +10,22 @@ namespace Moritz.Spec
     /// <summary>
     /// A Gamut contains/is a list of absolute pitch numbers in an ascending order scale.
     /// All the values are different and in range [0..127].
-    /// <para>Gamut.List[0] == basePitch (restricted to range [0..11]).</para>
-    /// <para>Each absolute pitch exists at all possible octaves in the gamut.
+    /// <para>Gamut.List[0] == absolutePitchHierarchy[0] % 12 (restricted to range [0..11]).</para>
+    /// <para>Each absolute pitch exists at all possible octaves above Gamut.List[0].
     /// (So each octave range in the gamut contains the same absolute pitches.)</para>
-    /// <para>Pitches can be added to, or removed from, a gamut by calling
-    /// AddOctaves(...) or RemoveOctaves(...).</para>
     /// </summary>
     public class Gamut
     {
         #region constructor
-        /// <summary>                                                                                           _list
+        /// <summary>
         /// Gamuts are immutable!
         /// </summary>
         public Gamut(List<int> absolutePitchHierarchy, int nPitchesPerOctave)
         {
+            #region condition
+            ThrowExceptionIfPitchHierarchyIsInvalid(absolutePitchHierarchy);
+            #endregion condition
+
             _absolutePitchHierarchy = new List<int>(absolutePitchHierarchy);
             _nPitchesPerOctave = nPitchesPerOctave;
 
@@ -31,8 +33,37 @@ namespace Moritz.Spec
         }
 
         #region private helper functions
+        /// <summary>
+        /// A pitchHierarchy.Count must be 12.
+        /// Each value must be in range [0..11] and occur only once (no duplicates).
+        /// </summary>
+        /// <param name="pitchHierarchy"></param>
+        private void ThrowExceptionIfPitchHierarchyIsInvalid(List<int> pitchHierarchy)
+        {
+            Debug.Assert(pitchHierarchy.Count == 12);
+            List<bool> presence = new List<bool>();
+            for(int i = 0; i < 12; ++i)
+            {
+                presence.Add(false);
+            }
+
+            foreach(int value in pitchHierarchy)
+            {
+                Debug.Assert(value >= 0 && value <= 11);
+                Debug.Assert(presence[value] == false);
+                presence[value] = true;
+            }
+
+            for(int i = 0; i < 12; ++i)
+            {
+                Debug.Assert(presence[i] == true);
+            }
+        }
+
         private List<int> GetGamutList(List<int> absolutePitchHierarchy, int nPitchesPerOctave)
         {
+            int rootPitch = absolutePitchHierarchy[0];
+
             List<int> sortedBasePitches = new List<int>();
             for(int i = 0; i < nPitchesPerOctave; ++i)
             {
@@ -50,7 +81,11 @@ namespace Moritz.Spec
                 {
                     break;
                 }
-                gamutList.Add(pitch);
+
+                if(pitch >= rootPitch)
+                {
+                    gamutList.Add(pitch);
+                }
 
                 if(rphIndex >= sortedBasePitches.Count)
                 {
@@ -76,9 +111,9 @@ namespace Moritz.Spec
             {
                 throw new ArgumentNullException($"The {nameof(gamutList)} argument is null or empty.");
             }
-            if(gamutList[0] < 0 || gamutList[0] > 127)
+            if(gamutList[0] % 12 != AbsolutePitchHierarchy[0])
             {
-                throw new ArgumentException($"{nameof(gamutList)}[0] is out of range.");
+                throw new ArgumentException($"The lowest pitch in a gamutList must always be equal to {nameof(AbsolutePitchHierarchy)}[0].");
             }
             for(int i = 1; i < gamutList.Count; ++i)
             {
@@ -95,10 +130,10 @@ namespace Moritz.Spec
             #region check pitch consistency
             List<int> basePitches = new List<int>();
             int pitchIndex = 0;
-            int octaveAboveBasePitch = _list[0] + 12;
-            while(pitchIndex < _list.Count && _list[pitchIndex] < octaveAboveBasePitch)
+            int octaveAboveBasePitch = gamutList[0] + 12;
+            while(pitchIndex < gamutList.Count && gamutList[pitchIndex] < octaveAboveBasePitch)
             {
-                basePitches.Add(_list[pitchIndex++]); 
+                basePitches.Add(gamutList[pitchIndex++]); 
             }
             int pitchCount = 0;
             foreach(int pitch in basePitches)
@@ -106,7 +141,7 @@ namespace Moritz.Spec
                 int pitchOctave = pitch;
                 while(pitchOctave < 128)
                 {
-                    if(!_list.Contains(pitchOctave))
+                    if(!gamutList.Contains(pitchOctave))
                     {
                         throw new Exception($"Missing pitch in gamut list.");
                     }
@@ -114,7 +149,7 @@ namespace Moritz.Spec
                     pitchOctave += 12;
                 }
             }
-            if(_list.Count > pitchCount)
+            if(gamutList.Count > pitchCount)
             {
                 throw new Exception($"Unknown pitch in gamut list.");
             }
@@ -123,6 +158,47 @@ namespace Moritz.Spec
         #endregion private helper functions
 
         #endregion constructor
+
+        /// <summary>
+        /// Returns the conjugate Gamut.
+        /// This is the Gamut whose AbsolutePitchHierachy is inverted re this Gamut
+        /// </summary>
+        /// <returns></returns>
+        internal Gamut Conjugate()
+        {
+            List<int> conjugateAbsolutePitchHierachy = GetConjugateAbsolutePitchHierarchy();
+            Gamut conjugateGamut = new Gamut(conjugateAbsolutePitchHierachy, NPitchesPerOctave);
+            return conjugateGamut; 
+        }
+        private List<int> GetConjugateAbsolutePitchHierarchy()
+        {
+            List<int> pitchHierarchy = AbsolutePitchHierarchy; // a clone
+            int rootPitch = pitchHierarchy[0];
+            for(int i = 0; i < pitchHierarchy.Count; ++i)
+            {
+                pitchHierarchy[i] -= rootPitch;
+            }
+            // pitchHierachy[0] is now 0.
+            // invert the pitchHierarchy
+            for(int i = 0; i < pitchHierarchy.Count; ++i)
+            {
+                pitchHierarchy[i] *= -1;
+            }
+            // reset the rootPitch
+            for(int i = 0; i < pitchHierarchy.Count; ++i)
+            {
+                pitchHierarchy[i] += rootPitch;
+            }
+            // normalize the pitchHierachy
+            for(int i = 0; i < pitchHierarchy.Count; ++i)
+            {
+                pitchHierarchy[i] = (pitchHierarchy[i] < 0) ? pitchHierarchy[i] + 12 : pitchHierarchy[i];
+                pitchHierarchy[i] = (pitchHierarchy[i] > 11) ? pitchHierarchy[i] - 12 : pitchHierarchy[i];
+            }
+            ThrowExceptionIfPitchHierarchyIsInvalid(pitchHierarchy);
+
+            return pitchHierarchy;
+        }
 
         #region public functions
         public int this[int i]
