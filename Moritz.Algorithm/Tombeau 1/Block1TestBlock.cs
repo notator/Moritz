@@ -45,47 +45,54 @@ namespace Moritz.Algorithm.Tombeau1
 
         private Block GetBarFromTTTrks(List<List<Trk>> TTTrks)
         {
-            int midiChannel = 0;
+
+
+            Trk channel0Trk = GetChannelTrk(0, TTTrks[0][0]); // absolutePitchHierarchy(0, 0); NPitchesPerOctave = 9
+            channel0Trk.AdjustVelocitiesHairpin(0, channel0Trk.EndMsPositionReFirstIUD, 0.1, 1);
+
+            Trk channel1Trk = GetChannelTrk(1, TTTrks[0][1]);
+            channel1Trk.AdjustVelocitiesHairpin(0, channel1Trk.EndMsPositionReFirstIUD, 1, 0.1);
+            List<byte> velocityPerAbsolutePitch = ((MidiChordDef)channel1Trk[0]).Gamut.GetVelocityPerAbsolutePitch(10);
+            channel1Trk.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+            channel1Trk.TransposeInGamut(-9);
+
             List<Trk> trks = new List<Trk>();
-
-            if(TTTrks != null)
-            {
-                Trk tt0 = TTTrks[0][0];
-                tt0.MidiChannel = midiChannel++;
-                Gamut gamut = (tt0.UniqueDefs[0] as MidiChordDef).Gamut;
-                Trk tt1 = tt0.Clone();
-                tt1.TransposeInGamut(2);
-                Trk tt2 = tt1.Clone();
-                tt2.TransposeInGamut(1);
-                Trk tt3 = tt2.Clone();
-                tt3.TransposeInGamut(2);
-                Trk tt4 = tt3.Clone();
-                tt4.TransposeInGamut(2);
-                Trk tt5 = tt4.Clone();
-                tt5.TransposeInGamut(2);
-                Trk tt6 = tt5.Clone();
-                tt6.TransposeInGamut(1);
-
-                tt4.Permute(1, 7);
-
-                tt0.AddRange(tt1);
-                tt0.AddRange(tt2);
-                tt0.AddRange(tt3);
-                tt0.AddRange(tt4);
-                tt0.AddRange(tt5);
-                tt0.AddRange(tt6);
-                tt0.MsDuration = 6500;
-                //tt0.TransposeInGamut(13);
-
-                tt0.AdjustVelocitiesHairpin(0, tt0.EndMsPositionReFirstIUD, 0.25, 1);
-
-                trks.Add(tt0);
-            }
-
+            trks.Add(channel0Trk);
+            trks.Add(channel1Trk);
             Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
             Block block = new Block(seq, new List<int>() { seq.MsDuration });
 
             return block;
+        }
+
+        private Trk GetChannelTrk(int midiChannel, Trk trkArg)
+        {
+            Trk trk = trkArg.Clone();
+            trk.MidiChannel = midiChannel;
+            Trk tt1 = trk.Clone();
+            tt1.TransposeInGamut(2);
+            Trk tt2 = tt1.Clone();
+            tt2.TransposeInGamut(1);
+            Trk tt3 = tt2.Clone();
+            tt3.TransposeInGamut(2);
+            Trk tt4 = tt3.Clone();
+            tt4.TransposeInGamut(2);
+            Trk tt5 = tt4.Clone();
+            tt5.TransposeInGamut(2);
+            Trk tt6 = tt5.Clone();
+            tt6.TransposeInGamut(1);
+
+            tt4.Permute(1, 5);
+
+            trk.AddRange(tt1);
+            trk.AddRange(tt2);
+            trk.AddRange(tt3);
+            trk.AddRange(tt4);
+            trk.AddRange(tt5);
+            trk.AddRange(tt6);
+            trk.MsDuration = 6500;
+
+            return trk;
         }
 
         private Block GetBarFromMidiChordDefLists(List<List<MidiChordDef>> midiChordDefLists)

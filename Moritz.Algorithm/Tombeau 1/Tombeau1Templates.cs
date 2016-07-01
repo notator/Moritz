@@ -151,19 +151,25 @@ namespace Moritz.Algorithm.Tombeau1
 
             private static void SetTemplateTrks()
             {
-                int trkDuration = 1000;
-                List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(0, 0);
-                Gamut gamut = new Gamut(absolutePitchHierarchy, 9);
                 List<Trk> trks0 = new List<Trk>();
-                Trk trk1 = GetTrk0(gamut);
+                int trkDuration = 1000;
+
+                List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(0, 0);
+                Trk trk0 = GetTrk(new Gamut(absolutePitchHierarchy, 9));
+                trk0.MsDuration = trkDuration;
+
+                trks0.Add(trk0);
+
+                absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(6, 6);
+                Trk trk1 = GetTrk(new Gamut(absolutePitchHierarchy, 9));
                 trk1.MsDuration = trkDuration;
-                
+
                 trks0.Add(trk1);
-                
+
                 _trks.Add(trks0);
             }
 
-            private static Trk GetTrk0(Gamut gamut)
+            private static Trk GetTrk(Gamut gamut)
             {
                 List<IUniqueDef> iuds = new List<IUniqueDef>();
                 int rootNotatedPitch = gamut[gamut.Count / 2];
