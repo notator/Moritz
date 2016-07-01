@@ -29,16 +29,19 @@ namespace Moritz.Algorithm.Tombeau1
         {
             Block bar1 = GetBarFromTTTrks(TTTrks);
 
-            Block bar2 = GetBarFromMidiChordDefLists(pitchWheelCoreMidiChordDefs);
+            Block bar2 = bar1.Clone();
+
+            Block bar3 = GetBarFromMidiChordDefLists(pitchWheelCoreMidiChordDefs);
 
             Envelope envelope = new Envelope(new List<byte>() { 0, 127 }, 127, 127, 2);
 
-            bar2.SetPitchWheelSliders(envelope);
+            bar3.SetPitchWheelSliders(envelope);
 
-            Block bar3 = GetBarFromMidiChordDefLists(ornamentCoreMidiChordDefs);
+            Block bar4 = GetBarFromMidiChordDefLists(ornamentCoreMidiChordDefs);
 
             bar1.Concat(bar2);
             bar1.Concat(bar3);
+            bar1.Concat(bar4);
 
             return bar1;
         }
