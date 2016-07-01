@@ -256,6 +256,53 @@ namespace Moritz.Spec
         }
         #endregion Conjugate
 
+        #region Invert (shift lowest notes up by one octave)
+        /// <summary>
+        /// In each chord in this MidiChordDef:
+        /// 1. nPitchesToShift is set to nPitchesToShiftArg % nPitches in the chord.
+        /// 2. nPitchesToShift pitches are shifted up one octave.
+        /// 3. The pitch list is resorted to be in ascending order.
+        /// Notes:
+        /// a) Velocities do not change. They remain in the same order as they were before this function was called.
+        /// b) The pitches thereby remain part of the Gamut, if there is one. 
+        /// </summary>
+        /// <returns></returns>
+        public void Invert(int nPitchesToShiftArg)
+        {
+            #region conditions
+            Debug.Assert(nPitchesToShiftArg >= 0);
+            #endregion conditions
+
+            InvertPitches(NotatedMidiPitches, nPitchesToShiftArg);
+            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+            {
+                InvertPitches(bmcd.Pitches, nPitchesToShiftArg);
+            }
+        }
+
+        private void InvertPitches(List<byte> pitches, int nPitchesToShiftArg)
+        {
+            int nPitchesToShift = nPitchesToShiftArg % pitches.Count;
+            for(int i = 0; i < nPitchesToShift; ++i)
+            {
+                byte newPitch = (byte) (pitches[i] + 12);
+                if(newPitch > 127)
+                {
+                    if(Gamut != null)
+                    {
+                        newPitch = (byte) Gamut[Gamut.Count - 1];
+                    }
+                    else
+                    {
+                        newPitch = 127;
+                    }
+                }
+                pitches[i] = newPitch;
+            }
+            pitches.Sort();
+        }
+        #endregion Invert (shift lowest notes up by one octave)
+
         #region Functions that use Envelopes
         /// <summary>
         /// Changes the msPositions of the BasicMidiChordDefs without changing the length of the MidiChordDef. Has no effect on Sliders.
@@ -338,7 +385,7 @@ namespace Moritz.Spec
             }
             if(pitchWheelBytes != null)
             {
-                MidiChordSliderDefs.PitchWheelMsbs = pitchWheelBytes;  
+                MidiChordSliderDefs.PitchWheelMsbs = pitchWheelBytes;
             }
             else
             if(panBytes != null)
@@ -434,53 +481,6 @@ namespace Moritz.Spec
         #endregion SetVerticalVelocityGradient
 
         #endregion Functions that use Envelopes
-
-        #region Invert
-        /// <summary>
-        /// In each chord in this MidiChordDef:
-        /// 1. nPitchesToShift is set to nPitchesToShiftArg % nPitches in the chord.
-        /// 2. nPitchesToShift pitches are shifted up one octave.
-        /// 3. The pitch list is resorted to be in ascending order.
-        /// Notes:
-        /// a) Velocities do not change. They remain in the same order as they were before this function was called.
-        /// b) The pitches thereby remain part of the Gamut, if there is one. 
-        /// </summary>
-        /// <returns></returns>
-        public void Invert(int nPitchesToShiftArg)
-        {
-            #region conditions
-            Debug.Assert(nPitchesToShiftArg >= 0);
-            #endregion conditions
-
-            InvertPitches(NotatedMidiPitches, nPitchesToShiftArg);
-            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
-            {
-                InvertPitches(bmcd.Pitches, nPitchesToShiftArg);
-            }
-        }
-
-        private void InvertPitches(List<byte> pitches, int nPitchesToShiftArg)
-        {
-            int nPitchesToShift = nPitchesToShiftArg % pitches.Count;
-            for(int i = 0; i < nPitchesToShift; ++i)
-            {
-                byte newPitch = (byte) (pitches[i] + 12);
-                if(newPitch > 127)
-                {
-                    if(Gamut != null)
-                    {
-                        newPitch = (byte) Gamut[Gamut.Count - 1];
-                    }
-                    else
-                    {
-                        newPitch = 127;
-                    }
-                }
-                pitches[i] = newPitch;
-            }
-            pitches.Sort();
-        }
-        #endregion Invert
 
         #region GetNoteCombination() 
         public enum MidiChordPitchOperator
@@ -1131,13 +1131,13 @@ namespace Moritz.Spec
             get { return _gamut; }          
             set
             {
-                Gamut testGamut = value;
-                if(testGamut != null && testGamut.ContainsAllPitches(_notatedMidiPitches))
+                Gamut newGamut = value;
+                if(newGamut != null && newGamut.ContainsAllPitches(_notatedMidiPitches))
                 {
                     bool okay = true;
                     foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
                     {
-                        if(!testGamut.ContainsAllPitches(bmcd.Pitches))
+                        if(!newGamut.ContainsAllPitches(bmcd.Pitches))
                         {
                             okay = false;
                             break;
