@@ -18,7 +18,7 @@ namespace Moritz.Algorithm.Tombeau1
 
             List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(0, 5);
             Gamut gamut = new Gamut(absolutePitchHierarchy, 8);
-            List<byte> velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(20);
+            List<byte> velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(20, true);
 
             List<MidiChordDef> mcds = Tombeau1Templates.PaletteMidiChordDefs[0]; // a clone
 

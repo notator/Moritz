@@ -18,7 +18,7 @@ namespace Moritz.Algorithm.Tombeau1
 
             List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(0, 0);
             Gamut gamut = new Gamut(absolutePitchHierarchy, 8);
-            List<byte> velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(20);
+            List<byte> velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(20, true);
 
             for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
             {

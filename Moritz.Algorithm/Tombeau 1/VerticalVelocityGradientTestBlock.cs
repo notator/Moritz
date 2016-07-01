@@ -70,7 +70,7 @@ namespace Moritz.Algorithm.Tombeau1
 
                     mcd.Lyric = (gamutIndex).ToString();
 
-                    List<byte> velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(20);
+                    List<byte> velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(20, true);
                     mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
 
                     trk.Add(mcd);

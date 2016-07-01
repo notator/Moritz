@@ -333,39 +333,57 @@ namespace Moritz.Spec
 
         /// <summary>
         /// The returned list contains 12 velocity values in range [0..127].
-        /// Pitches in the gamut are given velocities in range [1..127]. Other pitches are given velocity = 0.
+        /// Pitches in the gamut are given velocities in range [1..127]. Other pitches are given velocity = 1.
         /// The returned values are in order of absolute pitch, with C natural (absolute pitch 0) at position 0,
         /// C# (absolute pitch 1) at position 1, etc.
         /// The pitch at AbsolutePitchHierarchy[0] is given velocity=127.
         /// The pitch at AbsolutePitchHierarchy[NPitchesPerOctave - 1] is given minimumVelocity.
-        /// The velocities in between are scaled linearly.
+        /// The velocities in between are scaled linearly or logarithmically, depending on the value of the second argument.
         /// </summary>
         /// <param name="minimumVelocity">In range [1..127]. The velocity to be given to the pitch at AbsolutePitchHierarchy[NPitchesPerOctave - 1]</param>
-        public List<byte> GetVelocityPerAbsolutePitch(int minimumVelocity)
+        public List<byte> GetVelocityPerAbsolutePitch(int minimumVelocity, bool isLinearGradient)
         {
             Debug.Assert(minimumVelocity > 0 && minimumVelocity < 128);
 
-            List<byte> velocities = new List<byte>();
-            byte localVelocity = 127;
-            double velocityDiff = ((double)(127 - minimumVelocity)) / (NPitchesPerOctave - 1);
-            for(int i = 0; i < NPitchesPerOctave; ++i)
+            List<double> velocities = new List<double>();
+            if(NPitchesPerOctave == 1)
             {
-                byte vel = (byte)(localVelocity - (byte)Math.Round((i * velocityDiff)));
-                vel = (vel == 0) ? (byte)1 : vel;
-                velocities.Add(vel);
+                velocities.Add(127);
+            }
+            else if(isLinearGradient)
+            {
+                double velocityDiff = ((double)(127 - minimumVelocity)) / (NPitchesPerOctave - 1);
+                for(int i = 0; i < NPitchesPerOctave; ++i)
+                {
+                    double vel = 127 - (i * velocityDiff);
+                    velocities.Add(vel);
+                }
+            }
+            else
+            {
+                double factor = ((double) Math.Pow(((double)minimumVelocity / 127), (((double)1) / (NPitchesPerOctave - 1))));
+                velocities.Add(127);
+                for(int i = 1; i < NPitchesPerOctave; ++i)
+                {
+                    double vel = velocities[i - 1] * factor;
+                    velocities.Add(vel);
+                }
             }
 
             List<byte> velocityPerAbsPitch = new List<byte>();
             for(int i = 0; i < 12; ++i)
             {
-                velocityPerAbsPitch.Add(0);
+                velocityPerAbsPitch.Add(1); // default value
             }
 
             for(int absPitchIndex = 0; absPitchIndex < NPitchesPerOctave ; ++absPitchIndex)
             {
                 int absPitch = AbsolutePitchHierarchy[absPitchIndex];
-                byte velocity = velocities[absPitchIndex];
-                
+
+                byte velocity = (byte) Math.Round(velocities[absPitchIndex]);
+                velocity = (velocity > 1) ? velocity : (byte)1;
+                velocity = (velocity <= 127) ? velocity : (byte)127;
+
                 velocityPerAbsPitch[absPitch] = velocity;
             }
             return velocityPerAbsPitch;

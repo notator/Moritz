@@ -52,7 +52,7 @@ namespace Moritz.Algorithm.Tombeau1
 
             Trk channel1Trk = GetChannelTrk(1, TTTrks[0][1]);
             channel1Trk.AdjustVelocitiesHairpin(0, channel1Trk.EndMsPositionReFirstIUD, 1, 0.1);
-            List<byte> velocityPerAbsolutePitch = ((MidiChordDef)channel1Trk[0]).Gamut.GetVelocityPerAbsolutePitch(10);
+            List<byte> velocityPerAbsolutePitch = ((MidiChordDef)channel1Trk[0]).Gamut.GetVelocityPerAbsolutePitch(5, false);
             channel1Trk.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
             channel1Trk.TransposeInGamut(-9);
 
