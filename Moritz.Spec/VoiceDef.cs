@@ -656,7 +656,7 @@ namespace Moritz.Spec
         }
         /// <summary>
         /// Returns the index of the IUniqueDef which starts at or is otherwise current at msPosition.
-        /// If msPosition is the EndMsPosition, the index of the final IUniqueDef (Count-1) is returned.
+        /// If msPosition is the EndMsPosition, the index of the final IUniqueDef + 1 (=Count) is returned.
         /// If the VoiceDef does not span msPosition, -1 (=error) is returned.
         /// </summary>
         /// <param name="p"></param>
@@ -666,7 +666,7 @@ namespace Moritz.Spec
             int returnedIndex = -1;
             if(msPositionReFirstIUD == EndMsPositionReFirstIUD)
             {
-                returnedIndex = this.Count - 1;
+                returnedIndex = this.Count;
             }
             else if(msPositionReFirstIUD >= _uniqueDefs[0].MsPositionReFirstUD && msPositionReFirstIUD < EndMsPositionReFirstIUD)
             {
