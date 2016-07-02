@@ -8,22 +8,12 @@ namespace Moritz.Symbols
 {
     /// <summary>
     /// A list of synchronous NoteObjects.
-    /// All NoteObjectMomentSymbols contain at least one DurationSymbol. This is ensured by
-    ///  1. having no constructor with zero arguments, and
-    ///  2. no RemoveDurationSymbol() function.
     /// </summary>
     public class NoteObjectMoment
     {
-        public NoteObjectMoment(DurationSymbol durationSymbol)
-        {
-            _absMsPosition = durationSymbol.AbsMsPosition;
-            AddNoteObject(durationSymbol);
-        }
-
-        public NoteObjectMoment(NoteObject noteObject, int absMsPosition)
+        public NoteObjectMoment(int absMsPosition)
         {
             _absMsPosition = absMsPosition;
-            AddNoteObject(noteObject);
         }
 
         /// <summary>
@@ -104,7 +94,7 @@ namespace Moritz.Symbols
         /// Aligns barline glyphs in this moment, moving an immediately preceding clef, but
         /// without moving the following duration symbol (which is aligned at this.AlignmentX).
         /// </summary>
-        public void AlignBarlineGlyphs()
+        public void AlignBarlineAndClefGlyphs(float gap)
         {
             float minBarlineOriginX = float.MaxValue;
             foreach(NoteObject noteObject in _noteObjects)
@@ -116,6 +106,7 @@ namespace Moritz.Symbols
             for(int index = 0; index < _noteObjects.Count; index++)
             {
                 Barline barline = _noteObjects[index] as Barline;
+                ChordSymbol chordSymbol = _noteObjects[index] as ChordSymbol;
                 if(barline != null && barline.Metrics != null)
                 {
                     Debug.Assert(AlignmentX == 0F);
@@ -126,6 +117,15 @@ namespace Moritz.Symbols
                             clef.Metrics.Move(minBarlineOriginX - barline.Metrics.OriginX, 0);
                     }
                     barline.Metrics.Move(minBarlineOriginX - barline.Metrics.OriginX, 0);
+                }
+                else if(chordSymbol != null && chordSymbol.Metrics != null)
+                {
+                    if(index > 0)
+                    {
+                        ClefChangeSymbol clefChange = _noteObjects[index - 1] as ClefChangeSymbol;
+                        if(clefChange != null)
+                            clefChange.Metrics.Move(chordSymbol.Metrics.Left - clefChange.Metrics.Right + gap, 0);
+                    }
                 }
             }
         }
@@ -138,6 +138,10 @@ namespace Moritz.Symbols
             {
                 Debug.Assert(durationSymbol.AbsMsPosition == _absMsPosition);
                 Debug.Assert(durationSymbol.Voice.Staff == _noteObjects[0].Voice.Staff);
+            }
+            if(noteObject is ClefSymbol)
+            {
+
             }
             _noteObjects.Add(noteObject);
         }
@@ -182,15 +186,6 @@ namespace Moritz.Symbols
             if(durationSymbol != null && _absMsPosition != durationSymbol.AbsMsPosition)
                 throw new InvalidOperationException("Attempt to add a non-synchronous DurationSymbol to a MomentSymbol.");
             _noteObjects.Add(noteObject);
-        }
-
-        public IEnumerable DurationSymbols
-        {
-            get
-            {
-                foreach(DurationSymbol durationSymbol in _noteObjects)
-                    yield return durationSymbol;
-            }
         }
 
         public IEnumerable AnchorageSymbols

@@ -20,27 +20,6 @@ namespace Moritz.Symbols
         {
         }
 
-        /// <summary>
-        /// Returns the (positive) horizontal distance by which this anchorage symbol overlaps
-        /// (any characters in) the previous noteObjectMoment (which contains symbols from both voices
-        /// in a 2-voice staff). The result can be 0. If there is no overlap, the result is float.Minval.
-        /// </summary>
-        /// <param name="previousAS"></param>
-        public virtual float OverlapWidth(NoteObjectMoment previousNOM)
-        {
-            float overlap = float.MinValue;
-            float localOverlap = float.MinValue;
-            foreach(AnchorageSymbol previousAS in previousNOM.AnchorageSymbols)
-            {
-                if(this.Metrics != null)
-                {
-                    localOverlap = this.Metrics.OverlapWidth(previousAS);
-                    overlap = overlap > localOverlap ? overlap : localOverlap;
-                }
-            }
-            return overlap;
-        }
-
         public List<DrawObject> DrawObjects { get { return _drawObjects; } set { _drawObjects = value; } }
 
         private List<DrawObject> _drawObjects = new List<DrawObject>();

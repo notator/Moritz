@@ -174,7 +174,7 @@ namespace Moritz.Symbols
 
             MoveClefsAndBarlines(pageFormat.StafflineStemStrokeWidth);
 
-            List<NoteObjectMoment> moments = MomentSymbols();
+            List<NoteObjectMoment> moments = MomentSymbols(pageFormat.Gap);
 
             // barlineWidths:  Key is a moment's msPosition. Value is the distance between the left edge 
             // of the barline and the AlignmentX of the moment which immediately follows it.
@@ -409,7 +409,8 @@ namespace Moritz.Symbols
                         if(voiceNOM == null)
                         {
                             // noteObject in voice 1
-                            voiceNOM = new NoteObjectMoment(noteObject, systemNOM.AbsMsPosition);
+                            voiceNOM = new NoteObjectMoment(systemNOM.AbsMsPosition);
+                            voiceNOM.Add(noteObject);
                             voiceNOM.AlignmentX = systemNOM.AlignmentX;
                         }
                         else // noteObject in voice 2
@@ -438,7 +439,8 @@ namespace Moritz.Symbols
                         if(staffNOM == null)
                         {
                             // noteObject in voice 1
-                            staffNOM = new NoteObjectMoment(noteObject, systemNOM.AbsMsPosition);
+                            staffNOM = new NoteObjectMoment(systemNOM.AbsMsPosition);
+                            staffNOM.Add(noteObject);
                             staffNOM.AlignmentX = systemNOM.AlignmentX;
                         }
                         else // noteObject in voice 2
@@ -496,7 +498,7 @@ namespace Moritz.Symbols
         /// and aligned internally at AlignmentX = 0;
         /// </summary>
         /// <typeparam name="Type">DurationSymbol, ChordSymbol, RestSymbol</typeparam>
-        private List<NoteObjectMoment> MomentSymbols()
+        private List<NoteObjectMoment> MomentSymbols(float gap)
         {
             SortedDictionary<int, NoteObjectMoment> dict = new SortedDictionary<int, NoteObjectMoment>();
             Barline barline = null;
@@ -505,26 +507,27 @@ namespace Moritz.Symbols
             {
                 foreach(Voice voice in staff.Voices)
                 {
+                    int key = -1;
                     #region foreach noteObject
                     foreach(NoteObject noteObject in voice.NoteObjects)
                     {
-                        if(noteObject is ClefSymbol)
-                            clef = noteObject as ClefSymbol;
-                        if(noteObject is Barline)
-                            barline = noteObject as Barline;
                         DurationSymbol durationSymbol = noteObject as DurationSymbol;
-                        if(durationSymbol != null)
+                        if(durationSymbol == null)
                         {
-							int key = durationSymbol.AbsMsPosition;
+                            if(noteObject is ClefSymbol)
+                                clef = noteObject as ClefSymbol;
+                            if(noteObject is Barline)
+                                barline = noteObject as Barline;
+                        }
+                        else
+                        {
+                            key = durationSymbol.AbsMsPosition;
 
 							if(!dict.ContainsKey(key))
                             {
-                                dict.Add(key, new NoteObjectMoment(durationSymbol));
+                                dict.Add(key, new NoteObjectMoment(durationSymbol.AbsMsPosition));
                             }
-                            else
-                            {
-                                dict[key].Add(durationSymbol);
-                            }
+
                             if(clef != null)
                             {
                                 dict[key].Add(clef);
@@ -535,6 +538,8 @@ namespace Moritz.Symbols
                                 dict[key].Add(barline);
                                 barline = null;
                             }
+
+                            dict[key].Add(durationSymbol);
                         }
                     }
                     #endregion
@@ -544,14 +549,22 @@ namespace Moritz.Symbols
                         if(dict.ContainsKey(this.AbsEndMsPosition))
                             dict[this.AbsEndMsPosition].Add(clef);
                         else
-                            dict.Add(this.AbsEndMsPosition, new NoteObjectMoment(clef, this.AbsEndMsPosition));
+                        {
+                            NoteObjectMoment nom = new NoteObjectMoment(this.AbsEndMsPosition);
+                            nom.Add(clef);
+                            dict.Add(this.AbsEndMsPosition, nom);
+                        }
                     }
                     if(barline != null) // final barline
                     {
                         if(dict.ContainsKey(this.AbsEndMsPosition))
                             dict[this.AbsEndMsPosition].Add(barline);
                         else
-                            dict.Add(this.AbsEndMsPosition, new NoteObjectMoment(barline, this.AbsEndMsPosition));
+                        {
+                            NoteObjectMoment nom = new NoteObjectMoment(this.AbsEndMsPosition);
+                            nom.Add(barline);
+                            dict.Add(this.AbsEndMsPosition, nom);
+                        }
                     }
                 }
             }
@@ -563,7 +576,7 @@ namespace Moritz.Symbols
 
             foreach(NoteObjectMoment momentSymbol in momentSymbols)
             {
-                momentSymbol.AlignBarlineGlyphs();
+                momentSymbol.AlignBarlineAndClefGlyphs(gap);
             }
 
             #region debug
@@ -692,9 +705,9 @@ namespace Moritz.Symbols
             {
                 if(previousNOM != null)
                 {
-                    foreach(AnchorageSymbol aS in nom.AnchorageSymbols)
+                    foreach(NoteObject noteObject in nom.NoteObjects)
                     {
-                        overlapWidth = aS.OverlapWidth(previousNOM);
+                        overlapWidth = noteObject.OverlapWidth(previousNOM);
                         if(overlapWidth >= 0)
                         {
                             absMsPos = nom.AbsMsPosition;

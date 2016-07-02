@@ -27,10 +27,7 @@ namespace Moritz.Algorithm.Tombeau1
                                     List<List<MidiChordDef>> ornamentCoreMidiChordDefs,
                                     List<List<Trk>> TTTrks)
         {
-            Block bar1 = GetBarFromTTTrks(TTTrks);
-
-            Block bar2 = bar1.Clone();
-            bar2.Trks[1].Transpose(-18);
+            Block bars1and2 = GetBars1and2FromTTTrks(TTTrks);
 
             Block bar3 = GetBarFromMidiChordDefLists(pitchWheelCoreMidiChordDefs);
 
@@ -40,17 +37,15 @@ namespace Moritz.Algorithm.Tombeau1
 
             Block bar4 = GetBarFromMidiChordDefLists(ornamentCoreMidiChordDefs);
 
-            bar1.Concat(bar2);
-            bar1.Concat(bar3);
-            bar1.Concat(bar4);
+            Block block1 = bars1and2;
+            block1.Concat(bar3);
+            block1.Concat(bar4);
 
-            return bar1;
+            return block1;
         }
 
-        private Block GetBarFromTTTrks(List<List<Trk>> TTTrks)
+        private Block GetBars1and2FromTTTrks(List<List<Trk>> TTTrks)
         {
-
-
             Trk channel0Trk = GetChannelTrk(0, TTTrks[0][0]); // absolutePitchHierarchy(0, 0); NPitchesPerOctave = 9
             channel0Trk.AdjustVelocitiesHairpin(0, channel0Trk.EndMsPositionReFirstIUD, 0.1, 1);
 
@@ -59,14 +54,24 @@ namespace Moritz.Algorithm.Tombeau1
             List<byte> velocityPerAbsolutePitch = ((MidiChordDef)channel1Trk[0]).Gamut.GetVelocityPerAbsolutePitch(5, false);
             channel1Trk.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
             channel1Trk.TransposeInGamut(-9);
+            channel1Trk.MsPositionReContainer = 531;
 
             List<Trk> trks = new List<Trk>();
             trks.Add(channel0Trk);
             trks.Add(channel1Trk);
-            Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
-            Block block = new Block(seq, new List<int>() { seq.MsDuration });
+            Seq seq0 = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
+            int barline1MsPosition = channel0Trk.MsDuration;
 
-            return block;
+            Seq seq1 = seq0.Clone();
+            seq1.Trks[1].Transpose(-18);
+            seq1.Trks[1].InsertClefChange(0, "b");
+
+            seq0.Concat(seq1);
+            int barline2MsPosition = seq0.MsDuration;
+
+            Block bars1and2 = new Block(seq0, new List<int>() { barline1MsPosition, barline2MsPosition });
+
+            return bars1and2;
         }
 
         private Trk GetChannelTrk(int midiChannel, Trk trkArg)

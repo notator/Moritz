@@ -180,7 +180,7 @@ namespace Moritz.Spec
             }
         }       
         /// <summary>
-        /// Clef changes on the same staff must be added backwards so that the indices are correct.
+        /// Clef changes in the same voiceDef must be added backwards so that the indices are correct.
         /// Clef changes cannot be made at index 0. Change them in the previous system instead.
         /// If the index is equal to or greater than the number of chords, rests and clefChanges in the voiceDef,
         /// the ClefChange will be appended to the voiceDef.
@@ -192,7 +192,7 @@ namespace Moritz.Spec
         public void InsertClefChange(int index, string clefType)
         {
             #region check args
-            Debug.Assert(index > 0, "Clef changes cannot be made before the first chord or rest in a bar.");
+            Debug.Assert(index >= 0);
 
             if(String.Equals(clefType, "t") == false
             && String.Equals(clefType, "t1") == false

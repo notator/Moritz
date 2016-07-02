@@ -793,7 +793,9 @@ namespace Moritz.Symbols
                              "Symbol.MsPosition must be set before calling this funcion!");
                         if(!dict.ContainsKey(symbol.AbsMsPosition))
                         {
-                            dict.Add(symbol.AbsMsPosition, new NoteObjectMoment(symbol));
+                            NoteObjectMoment nom = new NoteObjectMoment(symbol.AbsMsPosition);
+                            nom.Add(symbol);
+                            dict.Add(symbol.AbsMsPosition, nom);
                         }
                         else
                         {
