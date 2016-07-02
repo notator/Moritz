@@ -1123,7 +1123,7 @@ namespace Moritz.Symbols
                     {                           
                         Barline barline = noteObjects[i - 1] as Barline;
                         Debug.Assert(barline != null);
-                        barline.Visible = false;
+                        barline.IsVisible = false;
                     }
                 }
             }
@@ -1150,7 +1150,7 @@ namespace Moritz.Symbols
                         if(barline != null
                         && (durationSymbol is CautionaryOutputChordSymbol || durationSymbol is CautionaryInputChordSymbol))
                         {
-                            barline.Visible = false;
+                            barline.IsVisible = false;
                         }
                     }
                 }

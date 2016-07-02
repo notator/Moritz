@@ -84,6 +84,6 @@ namespace Moritz.Symbols
         /// <summary>
         /// Default is true
         /// </summary>
-        public bool Visible = true;
+        public bool IsVisible = true;
 	}
 }

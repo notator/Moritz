@@ -37,7 +37,7 @@ namespace Moritz.Symbols
             {
 				NoteObject noteObject = NoteObjects[i];				
 				Barline barline = noteObject as Barline;
-				if(staffIsVisible && barline != null)
+				if(staffIsVisible && barline != null && barline.IsVisible)
 				{
 					bool isLastNoteObject = (i == (NoteObjects.Count - 1));
 					float top = Staff.Metrics.StafflinesTop;
