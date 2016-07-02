@@ -160,6 +160,29 @@ namespace Moritz.Spec
         #endregion constructor
 
         /// <summary>
+        /// Returns a new gamut transposed by the interval argument.
+        /// </summary>
+        /// <param name="interval">In range [-127..127]</param>
+        /// <returns>A new, transposed gamut</returns>
+        internal Gamut Transposition(int interval)
+        {
+            Debug.Assert(interval >= -127 && interval <= 127);
+
+            List<int> absolutePitchHierarchy = new List<int>(_absolutePitchHierarchy);
+            for(int i = 0; i < absolutePitchHierarchy.Count; ++i)
+            {
+                int value = (absolutePitchHierarchy[i] + interval) % 12;
+                value = (value >= 0) ? value : value + 12;
+
+                absolutePitchHierarchy[i] = value;
+            }
+
+            Gamut transposedGamut = new Gamut(absolutePitchHierarchy, NPitchesPerOctave);
+
+            return transposedGamut;
+        }
+
+        /// <summary>
         /// Returns the conjugate Gamut.
         /// This is the Gamut whose AbsolutePitchHierachy is inverted re this Gamut
         /// </summary>

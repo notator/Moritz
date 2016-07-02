@@ -30,6 +30,7 @@ namespace Moritz.Algorithm.Tombeau1
             Block bar1 = GetBarFromTTTrks(TTTrks);
 
             Block bar2 = bar1.Clone();
+            bar2.Trks[1].Transpose(-18);
 
             Block bar3 = GetBarFromMidiChordDefLists(pitchWheelCoreMidiChordDefs);
 

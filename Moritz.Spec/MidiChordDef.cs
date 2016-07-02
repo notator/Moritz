@@ -667,29 +667,65 @@ namespace Moritz.Spec
         /// given in the argument interval. Negative interval values transpose down.
         /// It is not an error if Midi values would exceed the range 0..127.
         /// In this case, they are silently coerced to 0 or 127 respectively.
-        /// Duplicate 0 and 127 pitches are removed.
-        /// Gamut is set to null.
+        /// If pitches become duplicated at the extremes, the duplicates are removed.
+        /// If Gamut != null, it is replaced by a new Gamut that is the old one transposed by interval % 12.
         /// </summary>
         public void Transpose(int interval)
         {
-            for(int i = 0; i < _notatedMidiPitches.Count; ++i)
+            if(_gamut == null)
             {
-                _notatedMidiPitches[i] = (byte) M.MidiValue(_notatedMidiPitches[i] + interval);
-            }
-            RemoveDuplicateExtremePitches(_notatedMidiPitches, _notatedMidiVelocities, 0, 127);
-
-            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
-            {
-                List<byte> pitches = bmcd.Pitches;
-                List<byte> velocities = bmcd.Velocities;
-                for(int i = 0; i < pitches.Count; ++i)
+                #region transpose wthout gamut
+                for(int i = 0; i < _notatedMidiPitches.Count; ++i)
                 {
-                    pitches[i] = (byte)M.MidiValue(pitches[i] + interval);
+                    _notatedMidiPitches[i] = (byte)M.MidiValue(_notatedMidiPitches[i] + interval);
                 }
-                RemoveDuplicateExtremePitches(pitches, velocities, 0, 127);
-            }
+                RemoveDuplicateExtremePitches(_notatedMidiPitches, _notatedMidiVelocities, 0, 127);
 
-            _gamut = null;
+                foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+                {
+                    List<byte> pitches = bmcd.Pitches;
+                    List<byte> velocities = bmcd.Velocities;
+                    for(int i = 0; i < pitches.Count; ++i)
+                    {
+                        pitches[i] = (byte)M.MidiValue(pitches[i] + interval);
+                    }
+                    RemoveDuplicateExtremePitches(pitches, velocities, 0, 127);
+                }
+                #endregion transpose wthout gamut
+            }
+            else
+            {
+                #region using Gamut transposition
+
+                Gamut newGamut = _gamut.Transposition(interval);
+                int anchorPitch = (interval < 0) ? _gamut[_gamut.Count - 1] : _gamut[0];
+                int indexShift = newGamut.IndexOf(anchorPitch + interval) - _gamut.IndexOf(anchorPitch);
+
+                for(int i = 0; i < _notatedMidiPitches.Count; ++i)
+                {
+                    int newIndex = _gamut.IndexOf(_notatedMidiPitches[i]) + indexShift;
+                    newIndex = (newIndex >= 0) ? newIndex : 0;
+                    newIndex = (newIndex < newGamut.Count) ? newIndex : newGamut.Count - 1;
+                    _notatedMidiPitches[i] = (byte) newGamut[newIndex];
+                }
+                RemoveDuplicateExtremePitches(_notatedMidiPitches, _notatedMidiVelocities, 0, 127);
+
+                foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+                {
+                    List<byte> pitches = bmcd.Pitches;
+                    List<byte> velocities = bmcd.Velocities;
+                    for(int i = 0; i < pitches.Count; ++i)
+                    {
+                        int newIndex = _gamut.IndexOf(pitches[i]) + indexShift;
+                        newIndex = (newIndex >= 0) ? newIndex : 0;
+                        newIndex = (newIndex < newGamut.Count) ? newIndex : newGamut.Count - 1;
+                        pitches[i] = (byte)newGamut[newIndex];
+                    }
+                    RemoveDuplicateExtremePitches(pitches, velocities, 0, 127);
+                }
+                _gamut = newGamut;
+                #endregion using Gamut transposition
+            }
         }
 
         /// <summary>        
