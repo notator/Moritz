@@ -297,6 +297,32 @@ namespace Moritz.Spec
         }
 
         /// <summary>
+        /// If an existing barline has no associated IUniqueDef in the inputVoiceDefs, it is moved to the nearest one.
+        /// </summary>
+        public void AdjustBarlinePositionsForInputVoices()
+        {
+            for(int bpIndex = 0; bpIndex <BarlineMsPositions.Count; ++bpIndex)
+            {
+                int barlineMsPos = BarlineMsPositions[bpIndex];
+                IUniqueDef closest = null;
+                int minDiff = int.MaxValue;
+                foreach(InputVoiceDef inputVoiceDef in this.InputVoiceDefs)
+                {
+                    foreach(IUniqueDef iud in inputVoiceDef.UniqueDefs)
+                    {
+                        int diff = Math.Abs(barlineMsPos - (iud.MsPositionReFirstUD + iud.MsDuration));
+                        if(diff < minDiff)
+                        {
+                            minDiff = diff;
+                            closest = iud;
+                        }
+                    }
+                }
+                BarlineMsPositions[bpIndex] = closest.MsPositionReFirstUD + closest.MsDuration;
+            }
+        }
+
+        /// <summary>
         /// Pads the Block with rests at the beginning and end of each VoiceDef where necessary.
         /// Agglommerates rests.
         /// </summary>

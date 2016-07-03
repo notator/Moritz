@@ -54,7 +54,7 @@ namespace Moritz.Algorithm.Tombeau1
             List<byte> velocityPerAbsolutePitch = ((MidiChordDef)channel1Trk[0]).Gamut.GetVelocityPerAbsolutePitch(5, false);
             channel1Trk.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
             channel1Trk.TransposeInGamut(-9);
-            channel1Trk.MsPositionReContainer = 531;
+            channel1Trk.MsPositionReContainer = 231;
 
             List<Trk> trks = new List<Trk>();
             trks.Add(channel0Trk);

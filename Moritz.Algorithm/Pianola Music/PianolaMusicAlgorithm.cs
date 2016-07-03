@@ -55,26 +55,8 @@ namespace Moritz.Algorithm.PianolaMusic
                 msPosition += barMsDuration;
             }
 
-            List<int> barlineEndMsPositions = new List<int>();
-            
-            foreach(int approxBarlineMsPos in approxBarlineEndMsPositions)
-            {
-                int barlineMsPos = 0; // the largest uid.MsPosition + uid.MsDuration less than or equal to approxBarlineMsPos
-                foreach(Trk trk in sequence.Trks)
-                {
-                    for(int uidIndex = trk.Count - 1; uidIndex >= 0; --uidIndex)
-                    {
-                        int absPos = trk[uidIndex].MsPositionReFirstUD + trk[uidIndex].MsDuration; // this is the main sequence (starts at absPos==0)
-                        if(absPos <= approxBarlineMsPos)
-                        {
-                            barlineMsPos = (barlineMsPos > absPos) ? barlineMsPos : absPos;
-                        }
-                    }
-                }
-                barlineEndMsPositions.Add(barlineMsPos);
-            }
+            List<int> barlineEndMsPositions = sequence.GetBarlineAbsMsPositions(approxBarlineEndMsPositions);
 
-            Debug.Assert(barlineEndMsPositions[barlineEndMsPositions.Count - 1] == sequence.MsDuration);
             return barlineEndMsPositions;
         }
 

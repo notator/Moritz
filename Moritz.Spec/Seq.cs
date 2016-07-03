@@ -59,6 +59,43 @@ namespace Moritz.Spec
 			AssertSeqConsistency();
 		}
 
+        /// <summary>
+        /// Each returned msPosition is the largest uid.MsPosition + uid.MsDuration less than or equal to the corresponding approxBarlineMsPos.
+        /// approxBarlineAbsMsPositions must contain the end barline for each bar proposed in the Seq.
+        /// This seq's AbsmsPosition must be 0.
+        /// The final value in approxBarlineAbsMsPositions must equal this seq's MsDuration.
+        /// </summary>
+        public List<int> GetBarlineAbsMsPositions(List<int> approxBarlineAbsMsPositions)
+        {
+            #region conditions
+            Debug.Assert(this.AbsMsPosition == 0);
+            Debug.Assert(approxBarlineAbsMsPositions[approxBarlineAbsMsPositions.Count - 1] == this.MsDuration);
+            #endregion conditions
+
+            List<int> barlineEndMsPositions = new List<int>();
+
+            foreach(int approxBarlineMsPos in approxBarlineAbsMsPositions)
+            {
+                int barlineMsPos = 0;
+                foreach(Trk trk in this.Trks)
+                {
+                    for(int uidIndex = trk.Count - 1; uidIndex >= 0; --uidIndex)
+                    {
+                        int absPos = trk[uidIndex].MsPositionReFirstUD + trk[uidIndex].MsDuration; // this is the main sequence (starts at absPos==0)
+                        if(absPos <= approxBarlineMsPos)
+                        {
+                            barlineMsPos = (barlineMsPos > absPos) ? barlineMsPos : absPos;
+                        }
+                    }
+                }
+                barlineEndMsPositions.Add(barlineMsPos);
+            }
+
+            Debug.Assert(barlineEndMsPositions[barlineEndMsPositions.Count - 1] == this.MsDuration);
+
+            return barlineEndMsPositions;
+        }
+
         public Seq(int absSeqMsPosition, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
         {
             Debug.Assert(absSeqMsPosition >= 0);

@@ -43,21 +43,24 @@ namespace Moritz.Algorithm.Study3Sketch1
             int bar3StartMsPos = bar2StartMsPos + bar2.MsDuration;
             int bar5EndMsPos = bar3StartMsPos + bars3to5.MsDuration; 
 
-            List<int> absMsPositionsOfRightBarlines = GetAbsMsPositionsOfRightBarlines( bar2StartMsPos, bar3StartMsPos, bar5EndMsPos );
+            List<int> approxAbsMsPositionsOfRightBarlines = GetApproxAbsMsPositionsOfRightBarlines( bar2StartMsPos, bar3StartMsPos, bar5EndMsPos );
+
 
             Seq mainSeq = bar1;
             mainSeq.Concat(bar2);
             mainSeq.Concat(bars3to5);
 
+            List<int> barlineEndMsPositions = mainSeq.GetBarlineAbsMsPositions(approxAbsMsPositionsOfRightBarlines);
+
             // Blocks contain a list of VoiceDefs
-            Block block = new Block(mainSeq, absMsPositionsOfRightBarlines); // converts mainSeq to a block (There are no InputVoiceDefs in this score.)
+            Block block = new Block(mainSeq, barlineEndMsPositions); // converts mainSeq to a block (There are no InputVoiceDefs in this score.)
 
             List<List<VoiceDef>> bars = block.ConvertToBars();
 
             return bars;
         }
 
-        private List<int> GetAbsMsPositionsOfRightBarlines(int bar2StartMsPos, int bar3StartMsPos, int bar5EndMsPos)
+        private List<int> GetApproxAbsMsPositionsOfRightBarlines(int bar2StartMsPos, int bar3StartMsPos, int bar5EndMsPos)
         {
             List<int> rightBarlinePositions = new List<int>() { bar2StartMsPos, bar3StartMsPos };
 

@@ -51,6 +51,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             bars345Seq.AbsMsPosition = seq3StartMsPos;
 
             List<int> bars345RightBarlines = Bars345RightBarlines(bars345Seq.MsDuration);
+            List<int> approxAbsMsPositionsOfRightBarlines = GetApproxAbsMsPositionsOfRightBarlines(seq2StartMsPos, seq3StartMsPos, bars345RightBarlines);
 
             /****************************************************************************************
 			* This score is liable to be recompiled when other things change in the SVG-MIDI file format,
@@ -75,18 +76,18 @@ namespace Moritz.Algorithm.Study3Sketch2
             ivd.Concat(bar2InputVoiceDef);
             ivd.Concat(bars345InputVoiceDef);
 
-            // Blocks contain a list of VoiceDefs
-            Block bar1Block = new Block(bar1Seq, new List<int>() { bar1Seq.MsDuration });
-            Block bar2Block = new Block(bar2Seq, new List<int>() { bar2Seq.MsDuration });
-            Block bar345Block = new Block(bars345Seq, bars345RightBarlines);
+            Seq mainSeq = bar1Seq;
+            mainSeq.Concat(bar2Seq);
+            mainSeq.Concat(bars345Seq);
+            
+            List<int> barlineEndMsPositions = mainSeq.GetBarlineAbsMsPositions(approxAbsMsPositionsOfRightBarlines);
 
-            Block mainBlock = bar1Block;
-            mainBlock.Concat(bar2Block);
-            mainBlock.Concat(bar345Block);
+            Block block = new Block(mainSeq, barlineEndMsPositions);
 
-            mainBlock.AddInputVoice(ivd);
+            block.AddInputVoice(ivd);
+            block.AdjustBarlinePositionsForInputVoices();
 
-            List<List<VoiceDef>> bars = mainBlock.ConvertToBars();
+            List<List<VoiceDef>> bars = block.ConvertToBars();
 
             return bars;
         }
@@ -350,6 +351,18 @@ namespace Moritz.Algorithm.Study3Sketch2
             Seq seq = new Seq(0, bar, MidiChannelIndexPerOutputVoice);
 
             return seq;
+        }
+
+        private List<int> GetApproxAbsMsPositionsOfRightBarlines(int seq2StartMsPos, int seq3StartMsPos, List<int> bars345RightBarlines)
+        {
+            List<int> approxBarlinePositions = new List<int>();
+            approxBarlinePositions.Add(seq2StartMsPos);
+            approxBarlinePositions.Add(seq3StartMsPos);
+            foreach(int val in bars345RightBarlines)
+            {
+                approxBarlinePositions.Add(seq3StartMsPos + val);
+            }
+            return approxBarlinePositions;
         }
 
         private List<int> Bars345RightBarlines(int bar5EndMsPos)
