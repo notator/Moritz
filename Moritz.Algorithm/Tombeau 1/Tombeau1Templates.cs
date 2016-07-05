@@ -12,7 +12,7 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-        private static class Tombeau1Templates
+        private class Tombeau1Templates
         {
             #region envelopes
             private static List<List<byte>> Envelopes2 = new List<List<byte>>()
@@ -140,7 +140,7 @@ namespace Moritz.Algorithm.Tombeau1
             /// <summary>
             /// Sets up the standard MidiChordDefs, Trks etc. that will be used in the composition.
             /// </summary>
-            public static void Init(List<Palette> paletteList)
+            public Tombeau1Templates(List<Palette> paletteList)
             {
                 SetPaletteMidiChordDefs(paletteList);
                 SetPitchWheelTestMidiChordDefs();
@@ -149,7 +149,7 @@ namespace Moritz.Algorithm.Tombeau1
                 SetTemplateTrks();
             }
 
-            private static void SetTemplateTrks()
+            private void SetTemplateTrks()
             {
                 List<Trk> trks0 = new List<Trk>();
                 int trkDuration = 1000;
@@ -168,8 +168,7 @@ namespace Moritz.Algorithm.Tombeau1
 
                 _trks.Add(trks0);
             }
-
-            private static Trk GetTrk(Gamut gamut)
+            private Trk GetTrk(Gamut gamut)
             {
                 List<IUniqueDef> iuds = new List<IUniqueDef>();
                 int rootNotatedPitch = gamut[gamut.Count / 2];
@@ -194,7 +193,7 @@ namespace Moritz.Algorithm.Tombeau1
                 return trk0;
             }
 
-            private static void SetPaletteMidiChordDefs(List<Palette> paletteList)
+            private void SetPaletteMidiChordDefs(List<Palette> paletteList)
             {
                 List<List<MidiChordDef>> paletteMidiChordDefs = new List<List<MidiChordDef>>();
                 foreach(Palette palette in paletteList)
@@ -202,7 +201,7 @@ namespace Moritz.Algorithm.Tombeau1
                     _paletteMidiChordDefs.Add(GetPaletteMidiChordDefs(palette));
                 }
             }
-            private static void SetPitchWheelTestMidiChordDefs()
+            private void SetPitchWheelTestMidiChordDefs()
             {
                 foreach(List<List<byte>> envList in _envelopes)
                 {
@@ -210,7 +209,7 @@ namespace Moritz.Algorithm.Tombeau1
                     _pitchWheelTestMidiChordDefs.Add(pwmcds);
                 }
             }
-            private static void SetOrnamentTestMidiChordDefs()
+            private void SetOrnamentTestMidiChordDefs()
             {
                 int relativePitchHierarchyIndex = 0;
                 int absHierarchyRoot = 0;
@@ -222,7 +221,7 @@ namespace Moritz.Algorithm.Tombeau1
                 }
             }
 
-            private static List<MidiChordDef> GetPitchWheelTestMidiChordDefs(List<List<byte>> envList)
+            private List<MidiChordDef> GetPitchWheelTestMidiChordDefs(List<List<byte>> envList)
             {
                 List<MidiChordDef> rval = new List<MidiChordDef>();
                 foreach(List<byte> envelope in envList)
@@ -233,7 +232,7 @@ namespace Moritz.Algorithm.Tombeau1
                 }
                 return rval;
             }
-            private static List<MidiChordDef> GetOrnamentTestMidiChordDefs(List<List<byte>> envList, int relativePitchHierarchyIndex, int absHierarchyRoot)
+            private List<MidiChordDef> GetOrnamentTestMidiChordDefs(List<List<byte>> envList, int relativePitchHierarchyIndex, int absHierarchyRoot)
             {
                 List<MidiChordDef> rval = new List<MidiChordDef>();
 
@@ -265,7 +264,7 @@ namespace Moritz.Algorithm.Tombeau1
             /// <summary>
             /// A list of the MidiChordDefs defined in the palette.
             /// </summary>
-            private static List<MidiChordDef> GetPaletteMidiChordDefs(Palette palette)
+            private List<MidiChordDef> GetPaletteMidiChordDefs(Palette palette)
             {
                 List<MidiChordDef> midiChordDefs = new List<MidiChordDef>();
                 for(int i = 0; i < palette.Count; ++i)
@@ -279,59 +278,59 @@ namespace Moritz.Algorithm.Tombeau1
             #endregion init
 
             #region _envelopes, _durationModi
-            public static List<List<List<byte>>> Envelopes
+            public List<List<List<byte>>> Envelopes
             {
                 get
                 {
                     return DeepCloneOf(_envelopes);
                 }
             }
-            public static List<List<int>> DurationModi
+            public List<List<int>> DurationModi
             {
                 get
                 {
                     return DeepCloneOf(_durationModi);
                 }
             }
-            private static List<List<List<byte>>> _envelopes = new List<List<List<byte>>>()
+            private List<List<List<byte>>> _envelopes = new List<List<List<byte>>>()
             {
                 Envelopes2, Envelopes3, Envelopes4, Envelopes5, Envelopes6, Envelopes7, EnvelopesLong
             };
-            private static List<List<int>> _durationModi = new List<List<int>>()
+            private List<List<int>> _durationModi = new List<List<int>>()
             {
                 Durations1, Durations2, Durations3, Durations4, Durations5, Durations6, Durations7, Durations8, Durations9, Durations10, Durations11, Durations12
             };
             #endregion _envelopes, _durationModi
 
-            public static List<List<Trk>> Trks
+            public List<List<Trk>> Trks
             {
                 get
                 {
                     return DeepCloneOf(_trks);
                 }
             }
-            public static List<List<MidiChordDef>> PaletteMidiChordDefs
+            public List<List<MidiChordDef>> PaletteMidiChordDefs
             {
                 get
                 {
                     return DeepCloneOf(_paletteMidiChordDefs);
                 }
             }
-            public static List<List<MidiChordDef>> PitchWheelTestMidiChordDefs
+            public List<List<MidiChordDef>> PitchWheelTestMidiChordDefs
             {
                 get
                 {
                     return DeepCloneOf(_pitchWheelTestMidiChordDefs);
                 }
             }
-            public static List<List<MidiChordDef>> OrnamentTestMidiChordDefs
+            public List<List<MidiChordDef>> OrnamentTestMidiChordDefs
             {
                 get
                 {
                     return DeepCloneOf(_ornamentTestMidiChordDefs);
                 }
             }
-            private static List<List<T>> DeepCloneOf<T>(List<List<T>> original)
+            private List<List<T>> DeepCloneOf<T>(List<List<T>> original)
             {
                 List<List<T>> tListList = new List<List<T>>();
                 foreach(List<T> tList in original)
@@ -353,7 +352,7 @@ namespace Moritz.Algorithm.Tombeau1
                 }
                 return tListList;
             }
-            private static List<List<List<T>>> DeepCloneOf<T>(List<List<List<T>>> original)
+            private List<List<List<T>>> DeepCloneOf<T>(List<List<List<T>>> original)
             {
                 List<List<List<T>>> tListListList = new List<List<List<T>>>();
                 foreach(List<List<T>> tListList in original)
@@ -364,11 +363,11 @@ namespace Moritz.Algorithm.Tombeau1
             }
 
 
-            private static List<List<Trk>> _trks = new List<List<Trk>>();
-            private static List<List<MidiChordDef>> _paletteMidiChordDefs = new List<List<MidiChordDef>>();
+            private List<List<Trk>> _trks = new List<List<Trk>>();
+            private List<List<MidiChordDef>> _paletteMidiChordDefs = new List<List<MidiChordDef>>();
 
-            private static List<List<MidiChordDef>> _pitchWheelTestMidiChordDefs = new List<List<MidiChordDef>>();
-            private static List<List<MidiChordDef>> _ornamentTestMidiChordDefs = new List<List<MidiChordDef>>();
+            private List<List<MidiChordDef>> _pitchWheelTestMidiChordDefs = new List<List<MidiChordDef>>();
+            private List<List<MidiChordDef>> _ornamentTestMidiChordDefs = new List<List<MidiChordDef>>();
 
         }       
     }

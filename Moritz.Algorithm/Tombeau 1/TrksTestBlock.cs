@@ -12,7 +12,7 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-        private Block TrksTestBlock()
+        private Block TrksTestBlock(List<MidiChordDef> paletteMidiChordDefs)
         {
             Seq seq = new Seq(0, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
 
@@ -20,7 +20,7 @@ namespace Moritz.Algorithm.Tombeau1
             Gamut gamut = new Gamut(absolutePitchHierarchy, 8);
             List<byte> velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(20, true);
 
-            List<MidiChordDef> mcds = Tombeau1Templates.PaletteMidiChordDefs[0]; // a clone
+            List<MidiChordDef> mcds = paletteMidiChordDefs; // a clone
 
             for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
             {

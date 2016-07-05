@@ -12,7 +12,7 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-        private Block VerticalVelocityColorsTestBlock()
+        private Block VerticalVelocityColorsTestBlock(List<MidiChordDef> paletteMidiChordDefs)
         {
             List<Trk> sys1Trks = new List<Trk>();
 
@@ -23,7 +23,7 @@ namespace Moritz.Algorithm.Tombeau1
             for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
             {
                 int chordDensity = 4;
-                List<MidiChordDef> mcds = Tombeau1Templates.PaletteMidiChordDefs[0];
+                List<MidiChordDef> mcds = paletteMidiChordDefs;
                 List<IUniqueDef> iuds = new List<IUniqueDef>();
                 int msPosReFirstUD = 0;
                 for(int j = 0; j < mcds.Count; ++j)

@@ -12,12 +12,12 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-        private Block Block1TestBlock()
+        private Block Block1TestBlock(Tombeau1Templates t1t)
         {
             // Each of the Tombeau1Templates objects is cloned automatically. 
-            Block displayBlock = GetDisplayBlock(Tombeau1Templates.PitchWheelTestMidiChordDefs,
-                                                Tombeau1Templates.OrnamentTestMidiChordDefs,
-                                                Tombeau1Templates.Trks);
+            Block displayBlock = GetDisplayBlock(t1t.PitchWheelTestMidiChordDefs,
+                                                t1t.OrnamentTestMidiChordDefs,
+                                                t1t.Trks);
 
             return displayBlock;
         }

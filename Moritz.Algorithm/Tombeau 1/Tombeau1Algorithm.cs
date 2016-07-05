@@ -352,12 +352,12 @@ namespace Moritz.Algorithm.Tombeau1
 
             Palette palette = GetPaletteByName("Tombeau1.1");
             // more palletes could be loaded here
-            Tombeau1Templates.Init(new List<Palette>() { palette });
+            Tombeau1Templates tombeau1Templates = new Tombeau1Templates(new List<Palette>() { palette });
 
             List<Block> blocks = new List<Block>();
 
             #region test blocks
-            Block block1TestBlock = Block1TestBlock();                                   
+            Block block1TestBlock = Block1TestBlock(tombeau1Templates);                                   
             block1TestBlock.SetInitialClefs(new List<string>() { "t", "t", "t", "t", "t", "t", "t", "t" });
             blocks.Add(block1TestBlock);
 
@@ -370,13 +370,13 @@ namespace Moritz.Algorithm.Tombeau1
             Block verticalVelocityGradientTestBlock = VerticalVelocityGradientTestBlock();
             blocks.Add(verticalVelocityGradientTestBlock); // 2 bars (2 systems)
 
-            Block verticalVelocityColorsTestBlock = VerticalVelocityColorsTestBlock();
+            Block verticalVelocityColorsTestBlock = VerticalVelocityColorsTestBlock(tombeau1Templates.PaletteMidiChordDefs[0]);
             blocks.Add(verticalVelocityColorsTestBlock); // 4 bars (1 system)
 
             Block timeWarpVVTestBlock = TimeWarpTestBlock(verticalVelocityColorsTestBlock);
             blocks.Add(timeWarpVVTestBlock); // 4 bars (1 system)
 
-            Block trksTestBlock = TrksTestBlock();
+            Block trksTestBlock = TrksTestBlock(tombeau1Templates.PaletteMidiChordDefs[0]);
             blocks.Add(trksTestBlock); // 1 bar (1 system)
 
             Block simpleVelocityColorsTestBlock = SimpleVelocityColorsTestBlock();
@@ -392,6 +392,5 @@ namespace Moritz.Algorithm.Tombeau1
 
             return bars;
 		}
-
     }
 }
