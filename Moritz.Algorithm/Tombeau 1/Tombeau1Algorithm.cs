@@ -357,9 +357,12 @@ namespace Moritz.Algorithm.Tombeau1
             List<Block> blocks = new List<Block>();
 
             #region test blocks
-            Block block1TestBlock = Block1TestBlock(tombeau1Templates);                                   
+            Block block1TestBlock = Block1TestBlock(tombeau1Templates.Trks);
             block1TestBlock.SetInitialClefs(new List<string>() { "t", "t", "t", "t", "t", "t", "t", "t" });
-            blocks.Add(block1TestBlock);
+            blocks.Add(block1TestBlock); // 2 bars
+
+            Block block2TestBlock = Block2TestBlock(tombeau1Templates.PitchWheelTestMidiChordDefs, tombeau1Templates.OrnamentTestMidiChordDefs);
+            blocks.Add(block2TestBlock);   // 2 bars
 
             Block velocityPerAbsolutePitchTestBlock = VelocityPerAbsolutePitchTestBlock();
             blocks.Add(velocityPerAbsolutePitchTestBlock); // 2 bars (2 systems)

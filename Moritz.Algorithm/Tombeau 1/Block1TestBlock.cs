@@ -12,34 +12,9 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-        private Block Block1TestBlock(Tombeau1Templates t1t)
+        private Block Block1TestBlock(List<List<Trk>> TTTrks)
         {
-            // Each of the Tombeau1Templates objects is cloned automatically. 
-            Block displayBlock = GetDisplayBlock(t1t.PitchWheelTestMidiChordDefs,
-                                                t1t.OrnamentTestMidiChordDefs,
-                                                t1t.Trks);
-
-            return displayBlock;
-        }
-
-        #region GetDisplayBlock()
-        private Block GetDisplayBlock(List<List<MidiChordDef>> pitchWheelCoreMidiChordDefs,
-                                    List<List<MidiChordDef>> ornamentCoreMidiChordDefs,
-                                    List<List<Trk>> TTTrks)
-        {
-            Block bars1and2 = GetBars1and2FromTTTrks(TTTrks);
-
-            Block bar3 = GetBarFromMidiChordDefLists(pitchWheelCoreMidiChordDefs);
-
-            Envelope envelope = new Envelope(new List<byte>() { 0, 127 }, 127, 127, 2);
-
-            bar3.SetPitchWheelSliders(envelope);
-
-            Block bar4 = GetBarFromMidiChordDefLists(ornamentCoreMidiChordDefs);
-
-            Block block1 = bars1and2;
-            block1.Concat(bar3);
-            block1.Concat(bar4);
+            Block block1 = GetBars1and2FromTTTrks(TTTrks);
 
             return block1;
         }
@@ -49,11 +24,13 @@ namespace Moritz.Algorithm.Tombeau1
             Trk channel0Trk = GetChannelTrk(0, TTTrks[0][0]); // absolutePitchHierarchy(0, 0); NPitchesPerOctave = 9
             channel0Trk.AdjustVelocitiesHairpin(0, channel0Trk.EndMsPositionReFirstIUD, 0.1, 1);
 
+            Gamut gamut = ((MidiChordDef)channel0Trk[0]).Gamut;
+
             Trk channel1Trk = GetChannelTrk(1, TTTrks[0][1]);
             channel1Trk.AdjustVelocitiesHairpin(0, channel1Trk.EndMsPositionReFirstIUD, 1, 0.1);
             List<byte> velocityPerAbsolutePitch = ((MidiChordDef)channel1Trk[0]).Gamut.GetVelocityPerAbsolutePitch(5, false);
             channel1Trk.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
-            channel1Trk.TransposeInGamut(-9);
+            channel1Trk.TransposeInGamut(-(gamut.NPitchesPerOctave));
             channel1Trk.MsPositionReContainer = 231;
 
             List<Trk> trks = new List<Trk>();
@@ -63,7 +40,7 @@ namespace Moritz.Algorithm.Tombeau1
             int barline1MsPosition = channel0Trk.MsDuration;
 
             Seq seq1 = seq0.Clone();
-            seq1.Trks[1].Transpose(-18);
+            seq1.Trks[1].TransposeInGamut(-((int)(gamut.NPitchesPerOctave * 1.5)));
             seq1.Trks[1].InsertClefChange(0, "b");
 
             seq0.Concat(seq1);
@@ -103,40 +80,5 @@ namespace Moritz.Algorithm.Tombeau1
 
             return trk;
         }
-
-        private Block GetBarFromMidiChordDefLists(List<List<MidiChordDef>> midiChordDefLists)
-        {
-            int midiChannel = 0;
-            List<Trk> trks = new List<Trk>();
-
-            foreach(List<MidiChordDef> pwmcdList in midiChordDefLists)
-            {
-                List<IUniqueDef> mcds = GetOrderedCoreMidiChordDefs(pwmcdList);
-                Trk trk = new Trk(midiChannel++, 0, mcds);
-                trks.Add(trk);
-            }
-
-            Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
-            Block block = new Block(seq, new List<int>() { seq.MsDuration });
-
-            return block;
-        }
-
-        private List<IUniqueDef> GetOrderedCoreMidiChordDefs(List<MidiChordDef> mcdList)
-        {
-            List<IUniqueDef> rval = new List<IUniqueDef>();
-            int msPositionReFirstIUD = 0;
-            for(int index = 0; index < mcdList.Count; ++index)
-            {
-                MidiChordDef originalMcd = mcdList[index];
-                MidiChordDef mcd = originalMcd.Clone() as MidiChordDef;
-                mcd.Lyric = index.ToString();
-                mcd.MsPositionReFirstUD = msPositionReFirstIUD;
-                msPositionReFirstIUD += mcd.MsDuration;
-                rval.Add(mcd);
-            }
-            return rval;
-        }
-        #endregion GetDisplayBlock()
     }
 }
