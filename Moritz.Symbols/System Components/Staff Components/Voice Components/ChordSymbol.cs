@@ -9,12 +9,12 @@ namespace Moritz.Symbols
 {
     public abstract class ChordSymbol : DurationSymbol
     {
-        public ChordSymbol(Voice voice, int msDuration, int absMsPosition, int minimumCrotchetDurationMS, float fontSize)
+        public ChordSymbol(Voice voice, int msDuration, int absMsPosition, int minimumCrotchetDurationMS, bool beamContinues, float fontSize)
             : base(voice,  msDuration, absMsPosition, minimumCrotchetDurationMS, fontSize)
         {            
             // note that all chord symbols have a stem! 
             // Even cautionary, semibreves and breves need a stem direction in order to set chord Metrics correctly.
-            Stem = new Stem(this);
+            Stem = new Stem(this, beamContinues);
 
             // Beam is currently null. Create when necessary.
         }

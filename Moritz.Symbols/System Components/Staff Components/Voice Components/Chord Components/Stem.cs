@@ -5,7 +5,7 @@ namespace Moritz.Symbols
 {
 	public class Stem
 	{
-        public Stem(ChordSymbol chordSymbol)
+        public Stem(ChordSymbol chordSymbol, bool beamContinues)
         {
             Chord = chordSymbol;
             if(chordSymbol.DurationClass == DurationClass.breve
@@ -14,19 +14,10 @@ namespace Moritz.Symbols
                 || chordSymbol.DurationClass == DurationClass.crotchet)
                 BeamContinues = false;
             else
-                BeamContinues = true; // theoretically, I can reset this default value later (when breaking beams programmatically)
+                BeamContinues = beamContinues;
         }
 
-        public Stem(ChordSymbol chordSymbol, Stem stem)
-        {
-            Chord = chordSymbol;
-            if(stem != null)
-            {
-                Direction = stem.Direction;
-            }
-        }
-
-		public readonly ChordSymbol Chord;
+        public readonly ChordSymbol Chord;
 
 		public VerticalDir Direction = VerticalDir.none;
         public bool BeamContinues = true;

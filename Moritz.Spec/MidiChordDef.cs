@@ -163,6 +163,7 @@ namespace Moritz.Spec
             rval.Patch = this.Patch;
             rval.PitchWheelDeviation = this.PitchWheelDeviation;
             rval.HasChordOff = this.HasChordOff;
+            rval.BeamContinues = this.BeamContinues;
             rval.Lyric = this.Lyric;
             rval.MinimumBasicMidiChordMsDuration = MinimumBasicMidiChordMsDuration; // required when changing a midiChord's duration
             rval.NotatedMidiPitches = _notatedMidiPitches; // a clone of the displayed notehead pitches
@@ -1134,6 +1135,8 @@ namespace Moritz.Spec
         public byte? _pitchWheelDeviation = null;
         public bool HasChordOff { get { return _hasChordOff; } set { _hasChordOff = value; } }
         private bool _hasChordOff = true;
+        public bool BeamContinues { get { return _beamContinues; } set { _beamContinues = value; } }
+        private bool _beamContinues = true;
         public string Lyric { get { return _lyric; } set { _lyric = value; } }
         private string _lyric = null; 
         public int MinimumBasicMidiChordMsDuration { get { return _minimumBasicMidiChordMsDuration; } set { _minimumBasicMidiChordMsDuration = value; } }
@@ -1218,6 +1221,7 @@ namespace Moritz.Spec
         public List<BasicMidiChordDef> BasicMidiChordDefs = new List<BasicMidiChordDef>();
 
         public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
+
         private int? _msDurationToNextBarline = null;
 
         #endregion properties

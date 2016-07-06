@@ -711,6 +711,5 @@ namespace Moritz.Spec
         }
 
         private List<VoiceDef> _voiceDefs = new List<VoiceDef>();
-        private List<Block> blocks;
     }
 }

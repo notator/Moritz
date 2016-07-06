@@ -24,6 +24,8 @@ namespace Moritz.Algorithm.Tombeau1
             int midiChannel = 0;
             Trk trk0 = GetChannelTrk(midiChannel++, TTTrks[0][0]); // absolutePitchHierarchy(0, 0); NPitchesPerOctave = 9
             trk0.AdjustVelocitiesHairpin(0, trk0.EndMsPositionReFirstIUD, 0.1, 1);
+            MidiChordDef lastTrk0MidiChordDef = (MidiChordDef) trk0[trk0.Count - 1];
+            lastTrk0MidiChordDef.BeamContinues = false;
 
             Gamut gamut = ((MidiChordDef)trk0[0]).Gamut;
 
@@ -39,7 +41,9 @@ namespace Moritz.Algorithm.Tombeau1
             List<byte> velocityPerAbsolutePitch = ((MidiChordDef)trk2[0]).Gamut.GetVelocityPerAbsolutePitch(5, false);
             trk2.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
             trk2.TransposeInGamut(-(gamut.NPitchesPerOctave));
-            trk2.MsPositionReContainer = 231;
+            trk2.MsPositionReContainer = 531;
+            MidiChordDef lastTrk2MidiChordDef = (MidiChordDef)trk2[trk2.Count - 1];
+            lastTrk2MidiChordDef.BeamContinues = false;
 
             List<Trk> trks = new List<Trk>();
             trks.Add(trk0);

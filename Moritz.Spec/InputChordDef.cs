@@ -177,5 +177,8 @@ namespace Moritz.Spec
 
         public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
         private int? _msDurationToNextBarline = null;
+
+        public bool BeamContinues { get { return _beamContinues; } set { _beamContinues = value; } }
+        private bool _beamContinues = true;
     }
 }

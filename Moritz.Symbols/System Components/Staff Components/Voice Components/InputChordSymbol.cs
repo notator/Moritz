@@ -12,7 +12,7 @@ namespace Moritz.Symbols
     public class InputChordSymbol : ChordSymbol
     {
         public InputChordSymbol(Voice voice, InputChordDef umcd, int absMsPosition, int minimumCrotchetDurationMS, float fontSize)
-            : base(voice, umcd.MsDuration, absMsPosition, minimumCrotchetDurationMS, fontSize)
+            : base(voice, umcd.MsDuration, absMsPosition, minimumCrotchetDurationMS, umcd.BeamContinues, fontSize)
         {
             _inputChordDef = umcd;
 
@@ -37,7 +37,7 @@ namespace Moritz.Symbols
         /// used by CautonaryInputChordSymbol
         /// </summary>
         public InputChordSymbol(Voice voice, int msDuration, int absMsPosition, int minimumCrotchetDurationMS, float fontSize)
-            : base(voice,  msDuration, absMsPosition, minimumCrotchetDurationMS, fontSize)
+            : base(voice,  msDuration, absMsPosition, minimumCrotchetDurationMS, false, fontSize)
         {
 
         }
