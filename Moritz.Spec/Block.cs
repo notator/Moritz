@@ -54,9 +54,10 @@ namespace Moritz.Spec
         /// A Block that is the concatenation of the argument blocks.
         /// This function consumes its argument blocks.
         /// </summary>
-        public Block(List<Block> blocks)
+        public Block(List<string> initialClefs, List<Block> blocks)
         {
             Block block = blocks[0];
+            block.SetInitialClefs(initialClefs);
             for(int i = 1; i < blocks.Count; ++i)
             {
                 block.Concat(blocks[i]);
@@ -64,6 +65,26 @@ namespace Moritz.Spec
             this._absMsPosition = block.AbsMsPosition;
             this.BarlineMsPositions = block.BarlineMsPositions;
             this._voiceDefs = block._voiceDefs;
+        }
+
+        /// <summary>
+        /// Sets the clefs in order of voiceDef (i.e. Trk and InputVoiceDef) (top to bottom).
+        /// The clefs list count must be equal to the number of voiceDefs (Trks and InputVoiceDefs) in the block.
+        /// Clefs that already exist at the beginning of the block are replaced.
+        /// </summary>
+        /// <param name="initialClefs"></param>
+        private void SetInitialClefs(List<string> initialClefs)
+        {
+            Debug.Assert(initialClefs.Count == _voiceDefs.Count);
+            for(int voiceDefIndex = 0; voiceDefIndex < initialClefs.Count; ++voiceDefIndex)
+            {
+                VoiceDef voiceDef = _voiceDefs[voiceDefIndex];
+                if(voiceDef.UniqueDefs.Count > 0 && voiceDef.UniqueDefs[0] is ClefChangeDef)
+                {
+                    voiceDef.UniqueDefs.RemoveAt(0);
+                }
+                voiceDef.Insert(0, new ClefChangeDef(initialClefs[voiceDefIndex], 0));
+            }
         }
 
         /// <summary>
@@ -354,26 +375,6 @@ namespace Moritz.Spec
                 {
                     voiceDef.Add(new RestDef(0, blockMsDuration));
                 }
-            }
-        }
-
-        /// <summary>
-        /// Sets the clefs in order of voiceDef (i.e. Trk and InputVoiceDef) (top to bottom).
-        /// The clefs list count must be equal to the number of voiceDefs (Trks and InputVoiceDefs) in the block.
-        /// Clefs that already exist at the beginning of the block are replaced.
-        /// </summary>
-        /// <param name="clefs"></param>
-        public void SetInitialClefs(List<string> clefs)
-        {
-            Debug.Assert(clefs.Count == _voiceDefs.Count);
-            for(int voiceDefIndex = 0; voiceDefIndex < clefs.Count; ++voiceDefIndex)
-            {
-                VoiceDef voiceDef = _voiceDefs[voiceDefIndex];
-                if(voiceDef.UniqueDefs.Count > 0 && voiceDef.UniqueDefs[0] is ClefChangeDef)
-                {
-                    voiceDef.UniqueDefs.RemoveAt(0);
-                }
-                voiceDef.Insert(0, new ClefChangeDef(clefs[voiceDefIndex], 0));
             }
         }
 
@@ -710,5 +711,6 @@ namespace Moritz.Spec
         }
 
         private List<VoiceDef> _voiceDefs = new List<VoiceDef>();
+        private List<Block> blocks;
     }
 }

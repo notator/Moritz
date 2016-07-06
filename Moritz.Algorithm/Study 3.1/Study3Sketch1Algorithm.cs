@@ -12,10 +12,6 @@ namespace Moritz.Algorithm.Study3Sketch1
     /// </summary>
     public class Study3Sketch1Algorithm : CompositionAlgorithm
     {
-        /// <summary>
-        /// This constructor can be called with both parameters null,
-        /// just to get the overridden properties.
-        /// </summary>
         public Study3Sketch1Algorithm()
             : base()
         {

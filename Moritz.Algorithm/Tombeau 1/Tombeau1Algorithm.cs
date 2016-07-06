@@ -12,14 +12,10 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-		/// <summary>
-		/// This constructor can be called with both parameters null,
-		/// just to get the overridden properties.
-		/// </summary>
 		public Tombeau1Algorithm()
-			: base()
-		{
-		}
+            : base()
+        {
+        }
 
         public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
 		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 127, 127, 127, 127, 127, 127, 127, 127 }; } }
@@ -358,7 +354,6 @@ namespace Moritz.Algorithm.Tombeau1
 
             #region test blocks
             Block block1TestBlock = Block1TestBlock(tombeau1Templates.Trks);
-            block1TestBlock.SetInitialClefs(new List<string>() { "t", "t", "t", "t", "t", "t", "t", "t" });
             blocks.Add(block1TestBlock); // 2 bars
 
             Block block2TestBlock = Block2TestBlock(tombeau1Templates.PitchWheelTestMidiChordDefs, tombeau1Templates.OrnamentTestMidiChordDefs);
@@ -390,8 +385,8 @@ namespace Moritz.Algorithm.Tombeau1
 
             #endregion test blocks
 
-            Block block = new Block(blocks);
-            List<List<VoiceDef>> bars = block.ConvertToBars();
+            Block wholePiece = new Block(_initialClefs, blocks);
+            List<List<VoiceDef>> bars = wholePiece.ConvertToBars();
 
             return bars;
 		}

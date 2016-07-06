@@ -10,10 +10,6 @@ namespace Moritz.Algorithm.Study2
 {
     public class Study2Algorithm : CompositionAlgorithm
     {
-        /// <summary>
-        /// This constructor can be called with both parameters null,
-        /// just to get the overridden properties.
-        /// </summary>
         public Study2Algorithm()
             : base()
         {

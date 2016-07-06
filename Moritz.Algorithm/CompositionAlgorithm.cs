@@ -156,6 +156,9 @@ namespace Moritz.Algorithm
         /// </summary>
         public abstract List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes);
 
+        public List<string> InitialClefs { set { _initialClefs = value; } }
+
+        protected List<string> _initialClefs;
         protected List<Krystal> _krystals;
         protected List<Palette> _palettes;
     }
