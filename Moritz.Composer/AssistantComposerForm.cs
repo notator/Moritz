@@ -1981,26 +1981,27 @@ namespace Moritz.Composer
         /// </summary>
         private void CreateSVGScore()
         {
-                List<Krystal> krystals = null;
-                List<Palette> palettes = null;
-                GetKrystalsAndPalettes(out krystals, out palettes);
-                PageFormat pageFormat = GetPageFormat();
-                ComposableScore score =
-                    new KrystalPaletteScore(_scoreTitle,
-                                            _algorithm,
-                                            pageFormat,
-                                            krystals, palettes,
-                                            _settingsFolderPath,
-                                            _dimensionsAndMetadataForm.Keywords,
-                                            _dimensionsAndMetadataForm.Comment);
+            List<Krystal> krystals = null;
+            List<Palette> palettes = null;
+            GetKrystalsAndPalettes(out krystals, out palettes);
+            PageFormat pageFormat = GetPageFormat();
+            _algorithm.InitialClefs = pageFormat.ClefsList;
+            ComposableScore score =
+                new KrystalPaletteScore(_scoreTitle,
+                                        _algorithm,
+                                        pageFormat,
+                                        krystals, palettes,
+                                        _settingsFolderPath,
+                                        _dimensionsAndMetadataForm.Keywords,
+                                        _dimensionsAndMetadataForm.Comment);
 
-                if(score != null && score.Systems.Count > 0)
-                {
-                    score.SaveMultiPageScore();
-					score.SaveSingleSVGScore();
-                    // Opens the multi-page score in the program which is set by the system to open .svg files.
-                    global::System.Diagnostics.Process.Start(score.FilePath);
-                }
+            if(score != null && score.Systems.Count > 0)
+            {
+                score.SaveMultiPageScore();
+				score.SaveSingleSVGScore();
+                // Opens the multi-page score in the program which is set by the system to open .svg files.
+                global::System.Diagnostics.Process.Start(score.FilePath);
+            }
         }
         private void GetKrystalsAndPalettes(out List<Krystal> krystals, out List<Palette> palettes)
         {
