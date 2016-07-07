@@ -14,27 +14,27 @@ namespace Moritz.Algorithm.Tombeau1
 	{
         private Block Block1TestBlock(List<List<Trk>> TTTrks)
         {
-            Block block1 = GetBars1and2FromTTTrks(TTTrks);
+            Block block1 = Bars1and2(TTTrks);
 
             return block1;
         }
 
-        private Block GetBars1and2FromTTTrks(List<List<Trk>> TTTrks)
+        private Block Bars1and2(List<List<Trk>> TTTrks)
         {
-            int midiChannel = 0;
-            Trk trk0 = GetChannelTrk(midiChannel++, TTTrks[0][0]); // absolutePitchHierarchy(0, 0); NPitchesPerOctave = 9
-            trk0.AdjustVelocitiesHairpin(0, trk0.EndMsPositionReFirstIUD, 0.1, 1);
-            MidiChordDef lastTrk0MidiChordDef = (MidiChordDef) trk0[trk0.Count - 1];
+            int midiChannel = 1;
+            Trk trk1 = GetChannelTrk(midiChannel++, TTTrks[0][0]); // absolutePitchHierarchy(0, 0); NPitchesPerOctave = 9
+            trk1.AdjustVelocitiesHairpin(0, trk1.EndMsPositionReFirstIUD, 0.1, 1);
+            MidiChordDef lastTrk0MidiChordDef = (MidiChordDef) trk1[trk1.Count - 1];
             lastTrk0MidiChordDef.BeamContinues = false;
 
-            Gamut gamut = ((MidiChordDef)trk0[0]).Gamut;
+            Gamut gamut = ((MidiChordDef)trk1[0]).Gamut;
 
             int initialDelay = 1500;
-            Trk trk1 = trk0.Clone();
-            trk1.MidiChannel = midiChannel++;
-            trk1.TransposeInGamut(8);
-            trk1.MsPositionReContainer = initialDelay;
-            trk1.MsDuration = trk0.MsDuration - (initialDelay / 2); 
+            Trk trk0 = trk1.Clone();
+            trk0.MidiChannel = 0; // N.B.
+            trk0.TransposeInGamut(8);
+            trk0.MsPositionReContainer = initialDelay;
+            trk0.MsDuration = trk1.MsDuration - (initialDelay / 2); 
 
             Trk trk2 = GetChannelTrk(midiChannel++, TTTrks[0][1]);
             trk2.AdjustVelocitiesHairpin(0, trk2.EndMsPositionReFirstIUD, 1, 0.1);
@@ -50,12 +50,13 @@ namespace Moritz.Algorithm.Tombeau1
             trks.Add(trk1);
             trks.Add(trk2);
             Seq seq0 = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
-            int barline1MsPosition = trk0.MsDuration;
+            int barline1MsPosition = trk1.MsDuration;
 
             Seq seq1 = seq0.Clone();
-            seq1.Trks[1].MsPositionReContainer = (initialDelay / 2);
+            seq1.Trks[0].MsPositionReContainer = (initialDelay / 2);
             //seq1.Trks[2].TransposeInGamut(-((int)(gamut.NPitchesPerOctave * 1.5)));
-            seq1.Trks[2].TransposeInGamut(-2);
+            seq1.Trks[2].TransposeInGamut(6);
+            seq1.Trks[2].SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
             //seq1.Trks[2].InsertClefChange(0, "b");
 
             seq0.Concat(seq1);
