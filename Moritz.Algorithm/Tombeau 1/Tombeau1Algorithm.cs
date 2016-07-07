@@ -346,49 +346,65 @@ namespace Moritz.Algorithm.Tombeau1
 
             /**********************************************/
 
+            #region initialization
             Palette palette = GetPaletteByName("Tombeau1.1");
             // more palletes could be loaded here
             Tombeau1Templates tombeau1Templates = new Tombeau1Templates(new List<Palette>() { palette });
+            List<Trk> accumulatedTrks = new List<Trk>();
+            foreach(int midiChannel in MidiChannelIndexPerOutputVoice)
+            {
+                accumulatedTrks.Add(new Trk(midiChannel));
+            }
+            List<int> accumulatedAbsBarlinePositions = new List<int>();
+            #endregion initialization
 
-            List<Block> blocks = new List<Block>();
+            AppendBars1and2(_initialClefs, tombeau1Templates.Trks, accumulatedTrks, accumulatedAbsBarlinePositions);
 
-            #region test blocks
-            Block block1TestBlock = Block1TestBlock(tombeau1Templates.Trks);
-            blocks.Add(block1TestBlock); // 2 bars
+            #region commented out
+            //List<Block> blocks = new List<Block>();
 
-            Block block2TestBlock = Block2TestBlock(tombeau1Templates.PitchWheelTestMidiChordDefs, tombeau1Templates.OrnamentTestMidiChordDefs);
-            blocks.Add(block2TestBlock);   // 2 bars
+            //#region test blocks
+            //Block block1TestBlock = Block1TestBlock(tombeau1Templates.Trks);
+            //blocks.Add(block1TestBlock); // 2 bars
 
-            Block velocityPerAbsolutePitchTestBlock = VelocityPerAbsolutePitchTestBlock();
-            blocks.Add(velocityPerAbsolutePitchTestBlock); // 2 bars (2 systems)
+            //Block block2TestBlock = Block2TestBlock(tombeau1Templates.PitchWheelTestMidiChordDefs, tombeau1Templates.OrnamentTestMidiChordDefs);
+            //blocks.Add(block2TestBlock);   // 2 bars
 
-            Block gamutTestBlock = GamutTestBlock();
-            blocks.Add(gamutTestBlock); // 2 bars (2 systems)
+            //Block velocityPerAbsolutePitchTestBlock = VelocityPerAbsolutePitchTestBlock();
+            //blocks.Add(velocityPerAbsolutePitchTestBlock); // 2 bars (2 systems)
 
-            Block verticalVelocityGradientTestBlock = VerticalVelocityGradientTestBlock();
-            blocks.Add(verticalVelocityGradientTestBlock); // 2 bars (2 systems)
+            //Block gamutTestBlock = GamutTestBlock();
+            //blocks.Add(gamutTestBlock); // 2 bars (2 systems)
 
-            Block verticalVelocityColorsTestBlock = VerticalVelocityColorsTestBlock(tombeau1Templates.PaletteMidiChordDefs[0]);
-            blocks.Add(verticalVelocityColorsTestBlock); // 4 bars (1 system)
+            //Block verticalVelocityGradientTestBlock = VerticalVelocityGradientTestBlock();
+            //blocks.Add(verticalVelocityGradientTestBlock); // 2 bars (2 systems)
 
-            Block timeWarpVVTestBlock = TimeWarpTestBlock(verticalVelocityColorsTestBlock);
-            blocks.Add(timeWarpVVTestBlock); // 4 bars (1 system)
+            //Block verticalVelocityColorsTestBlock = VerticalVelocityColorsTestBlock(tombeau1Templates.PaletteMidiChordDefs[0]);
+            //blocks.Add(verticalVelocityColorsTestBlock); // 4 bars (1 system)
 
-            Block trksTestBlock = TrksTestBlock(tombeau1Templates.PaletteMidiChordDefs[0]);
-            blocks.Add(trksTestBlock); // 1 bar (1 system)
+            //Block timeWarpVVTestBlock = TimeWarpTestBlock(verticalVelocityColorsTestBlock);
+            //blocks.Add(timeWarpVVTestBlock); // 4 bars (1 system)
 
-            Block simpleVelocityColorsTestBlock = SimpleVelocityColorsTestBlock();
-            blocks.Add(simpleVelocityColorsTestBlock); // 1 bar (1 system)
+            //Block trksTestBlock = TrksTestBlock(tombeau1Templates.PaletteMidiChordDefs[0]);
+            //blocks.Add(trksTestBlock); // 1 bar (1 system)
 
-            Block timeWarpSVTestBlock = TimeWarpTestBlock(simpleVelocityColorsTestBlock);
-            blocks.Add(timeWarpSVTestBlock); // 1 bar (1 system)
+            //Block simpleVelocityColorsTestBlock = SimpleVelocityColorsTestBlock();
+            //blocks.Add(simpleVelocityColorsTestBlock); // 1 bar (1 system)
 
-            #endregion test blocks
+            //Block timeWarpSVTestBlock = TimeWarpTestBlock(simpleVelocityColorsTestBlock);
+            //blocks.Add(timeWarpSVTestBlock); // 1 bar (1 system)
 
-            Block wholePiece = new Block(_initialClefs, blocks);
+            //#endregion test blocks
+            #endregion commented out
+
+            Seq seq0 = new Seq(0, accumulatedTrks, MidiChannelIndexPerOutputVoice);
+            Block wholePiece = new Block(seq0, accumulatedAbsBarlinePositions);
+
             List<List<VoiceDef>> bars = wholePiece.ConvertToBars();
 
             return bars;
 		}
+
+
     }
 }

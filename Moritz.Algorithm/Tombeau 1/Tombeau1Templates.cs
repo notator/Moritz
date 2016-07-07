@@ -154,7 +154,7 @@ namespace Moritz.Algorithm.Tombeau1
                 List<Trk> trks0 = new List<Trk>();
                 int trkDuration = 1000;
 
-                List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(0, 0);
+                List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(4, 0);
                 Trk trk0 = GetTrk(new Gamut(absolutePitchHierarchy, 9));
                 trk0.MsDuration = trkDuration;
 
