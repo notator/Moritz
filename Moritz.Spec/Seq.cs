@@ -112,6 +112,43 @@ namespace Moritz.Spec
             AssertSeqConsistency();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="absSeqMsPosition"></param>
+        /// <param name="trks"></param>
+        /// <param name="barlineMsPositionsReSeq">can be null</param>
+        /// <param name="midiChannelIndexPerOutputVoice"></param>
+        public Seq(int absSeqMsPosition, List<Trk> trks, List<int> barlineMsPositionsReSeq, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
+            : this(absSeqMsPosition, trks, midiChannelIndexPerOutputVoice)
+        {
+            if(barlineMsPositionsReSeq != null)
+            {
+                BarlineMsPositionsReSeq = new List<int>(barlineMsPositionsReSeq);
+            }
+        }
+
+        /// <summary>
+        /// Sets the clefs in order of Trk (top to bottom).
+        /// The clefs list count must be greater than or equal to the number of Trks.
+        /// (the list can also contain InputVoiceDef clefs).
+        /// Clefs that already exist at the beginning of a Trk are replaced.
+        /// </summary>
+        /// <param name="initialClefs"></param>
+        public void SetInitialClefs(List<string> initialClefs)
+        {
+            Debug.Assert(initialClefs.Count >= _trks.Count); // initialClefs can also contain InputVoiceDef clefs
+            for(int trkIndex = 0; trkIndex < _trks.Count; ++trkIndex)
+            {
+                Trk trk = _trks[trkIndex];
+                if(trk.UniqueDefs.Count > 0 && trk.UniqueDefs[0] is ClefChangeDef)
+                {
+                    trk.UniqueDefs.RemoveAt(0);
+                }
+                trk.Insert(0, new ClefChangeDef(initialClefs[trkIndex], 0));
+            }
+        }
+
         public Seq Clone()
         {
             List<Trk> trks = new List<Trk>();
@@ -130,7 +167,7 @@ namespace Moritz.Spec
         /// Both Seqs must be normalized before calling this function.
         /// When this function is called, seq2.AbsMsPosition is the earliest position, relative to seq1, at which it can be concatenated.
         /// When it returns, seq2's Trks will have been concatenated to Seq1, and seq1 is consistent.
-        /// If Seq2 is needed after calling thei function, then it should be cloned first.
+        /// If Seq2 is needed after calling this function, then it should be cloned first.
         /// For example:
         /// If seq2.MsPosition==0, it will be concatenated such that there will be at least one trk concatenation without an
         /// intervening rest.
@@ -178,6 +215,10 @@ namespace Moritz.Spec
                     }
                     trk1.AddRange(trk2);
                 }
+            }
+            foreach(int barlineMsPosReSeq2 in seq2.BarlineMsPositionsReSeq)
+            {
+                this.BarlineMsPositionsReSeq.Add(barlineMsPosReSeq2 + absConcatMsPos);
             }
             #endregion
 
@@ -243,6 +284,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Every Trk in _trks is either empty, or contains any combination of RestDef or MidiChordDef.
         /// There is always a trk having MsPositionReContainer == zero.
+        /// BarlineMsPositionsReSeq are in ascending order with no duplicates.
         /// </summary>
         private void AssertSeqConsistency()
         {
@@ -253,6 +295,14 @@ namespace Moritz.Spec
                 trk.AssertConstructionConsistency();
             }
             #endregion
+            #region BarlineMsPositionsReSeq are in ascending order with no duplicates.
+            int prevPos = -1;
+            foreach(int pos in BarlineMsPositionsReSeq)
+            {
+                Debug.Assert(pos > prevPos);
+                prevPos = pos;
+            }
+            #endregion BarlineMsPositionsReSeq are in ascending order with no duplicates.
         }
 
         /// <summary>
@@ -483,6 +533,7 @@ namespace Moritz.Spec
         private List<Trk> _trks = new List<Trk>();
 
 		private int _absMsPosition;
+        public List<int> BarlineMsPositionsReSeq = new List<int>();
 
         public int AbsMsPosition
 		{	

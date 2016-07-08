@@ -48,7 +48,7 @@
     <Compile Include="Study 3.2\Study3Sketch2Algorithm.cs" />
     <Compile Include="Tombeau 1\Block2TestBlock.cs" />
     <Compile Include="Tombeau 1\Tombeau1Templates.cs" />
-    <Compile Include="Tombeau 1\AppendBars1and2.cs" />
+    <Compile Include="Tombeau 1\Bars1and2.cs" />
     <Compile Include="Tombeau 1\GamutTestBlock.cs" />
     <Compile Include="Tombeau 1\VerticalVelocityGradientTestBlock.cs" />
     <Compile Include="Tombeau 1\VelocityPerAbsolutePitchTestBlock.cs" />

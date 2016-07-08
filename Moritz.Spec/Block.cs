@@ -32,7 +32,7 @@ namespace Moritz.Spec
             {
                 trk.Container = null;
                 _voiceDefs.Add(trk);
-            } 
+            }
 
             Blockify();
 
@@ -43,7 +43,47 @@ namespace Moritz.Spec
 
             if(rightBarlineMsPositions != null)
             {
-                BarlineMsPositions = new List<int>(rightBarlineMsPositions);
+                BarlineMsPositionsReBlock = new List<int>(rightBarlineMsPositions);
+            }
+
+            AssertBlockConsistency();
+        }
+
+        /// <summary>
+        /// A Block contains a list of voiceDefs, that can be of both kinds: Trks and InputVoiceDefs. A Seq can only contain Trks.
+        /// This constructor converts its argument to a Block so, if the argument needs to be preserved, pass a clone.
+        /// <para>The seq's Trks are cast to VoiceDefs, and then padded at the beginning and end with rests
+        /// so that they all start at the beginning of the Block and have the same duration.</para>
+        /// <para>The Block's AbsMsPosition is set to the seq's AbsMsPosition.</para>
+        /// <para>There is at least one MidiChordDef at the start of the Block (possibly following a ClefChangeDef, and
+        /// at least one MidiChordDef ends at its end.</para>
+        /// <para>If an original seq.trk.UniqueDefs list is empty or contains a single restDef, the corresponding
+        /// voiceDef will contain a single rest having the same duration as the other trks.</para>
+        /// <para>For further documentation about Block consistency, see its private AssertBlockConsistency() function.
+        /// </summary>
+        /// <param name="seq">cannot be null, and must have Trks</param>
+        public Block(Seq seq)
+        {
+            Debug.Assert(seq.IsNormalized);
+
+            AbsMsPosition = seq.AbsMsPosition;
+
+            foreach(Trk trk in seq.Trks)
+            {
+                trk.Container = null;
+                _voiceDefs.Add(trk);
+            }
+
+            Blockify();
+
+            foreach(Trk trk in seq.Trks)
+            {
+                trk.Container = this;
+            }
+
+            if(seq.BarlineMsPositionsReSeq != null)
+            {
+                BarlineMsPositionsReBlock = new List<int>(seq.BarlineMsPositionsReSeq);
             }
 
             AssertBlockConsistency();
@@ -62,8 +102,8 @@ namespace Moritz.Spec
                 trks.Add(trkClone);
                 midiChannelPerOutputVoice.Add(trk.MidiChannel);
             }
-            Seq seq = new Seq(this.AbsMsPosition, trks, midiChannelPerOutputVoice);
-            Block clone = new Block(seq, BarlineMsPositions);
+            Seq seq = new Seq(this.AbsMsPosition, trks, BarlineMsPositionsReBlock, midiChannelPerOutputVoice);
+            Block clone = new Block(seq);
 
             foreach(InputVoiceDef ivd in InputVoiceDefs)
             {
@@ -77,10 +117,10 @@ namespace Moritz.Spec
         {
             Debug.Assert(_voiceDefs.Count == block2._voiceDefs.Count);
 
-            List<int> block2BarlineMsPositions = block2.BarlineMsPositions;
+            List<int> block2BarlineMsPositions = block2.BarlineMsPositionsReBlock;
             foreach(int msPosition in block2BarlineMsPositions)
             {
-                BarlineMsPositions.Add(this.MsDuration + msPosition);
+                BarlineMsPositionsReBlock.Add(this.MsDuration + msPosition);
             }
 
             for(int i = 0; i < _voiceDefs.Count; ++i)
@@ -113,11 +153,11 @@ namespace Moritz.Spec
         public List<List<VoiceDef>> ConvertToBars()
         {
             #region conditions
-            Debug.Assert(BarlineMsPositions.Count > 0, "Block must have at least one barline.");
-            Debug.Assert(BarlineMsPositions[BarlineMsPositions.Count - 1] == AbsMsPosition + MsDuration, "The final barline must be at end of the block.");
+            Debug.Assert(BarlineMsPositionsReBlock.Count > 0, "Block must have at least one barline.");
+            Debug.Assert(BarlineMsPositionsReBlock[BarlineMsPositionsReBlock.Count - 1] == AbsMsPosition + MsDuration, "The final barline must be at end of the block.");
             #endregion conditions
 
-            List<int> barlineMsPositions = new List<int>(BarlineMsPositions);
+            List<int> barlineMsPositions = new List<int>(BarlineMsPositionsReBlock);
             int finalBarlineMsPosition = barlineMsPositions[barlineMsPositions.Count - 1];
 
             List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
@@ -126,11 +166,11 @@ namespace Moritz.Spec
             while(AbsMsPosition < finalBarlineMsPosition)
             {
                 int barlineEndMsPosition = barlineMsPositions[barlineIndex++];
-                for(int i = 1; i < BarlineMsPositions.Count; ++i)
+                for(int i = 1; i < BarlineMsPositionsReBlock.Count; ++i)
                 {
-                    BarlineMsPositions[i] -= BarlineMsPositions[0];
+                    BarlineMsPositionsReBlock[i] -= BarlineMsPositionsReBlock[0];
                 }
-                BarlineMsPositions.RemoveAt(0);
+                BarlineMsPositionsReBlock.RemoveAt(0);
                 List<VoiceDef> bar = PopBar(barlineEndMsPosition);
                 bars.Add(bar);
             }
@@ -284,9 +324,9 @@ namespace Moritz.Spec
         /// </summary>
         public void AdjustBarlinePositionsForInputVoices()
         {
-            for(int bpIndex = 0; bpIndex <BarlineMsPositions.Count; ++bpIndex)
+            for(int bpIndex = 0; bpIndex <BarlineMsPositionsReBlock.Count; ++bpIndex)
             {
-                int barlineMsPos = BarlineMsPositions[bpIndex];
+                int barlineMsPos = BarlineMsPositionsReBlock[bpIndex];
                 IUniqueDef closest = null;
                 int minDiff = int.MaxValue;
                 foreach(InputVoiceDef inputVoiceDef in this.InputVoiceDefs)
@@ -301,7 +341,7 @@ namespace Moritz.Spec
                         }
                     }
                 }
-                BarlineMsPositions[bpIndex] = closest.MsPositionReFirstUD + closest.MsDuration;
+                BarlineMsPositionsReBlock[bpIndex] = closest.MsPositionReFirstUD + closest.MsDuration;
             }
         }
 
@@ -351,9 +391,10 @@ namespace Moritz.Spec
         /// <para>5. A RestDef is never followed by another RestDef (RestDefs have been agglomerated).</para>
         /// <para>6. In Blocks, Trk and InputVoiceDef objects can additionally contain CautionaryChordDefs and ClefChangeDefs (See Seq and InputVoiceDef).</para>
         /// <para>7. There may not be more than 4 InputVoiceDefs</para>
-        /// <para>8. The final barline may not be beyond the end of the block.</para>
-        /// <para>9. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefChangeDef.</para>
-        /// </summary>
+        /// <para>8. If there are any barlines, they are in ascending order with no duplicates.</para>
+        /// <para>9. If there are any barlines, the final barline may not be beyond the end of the block.</para>
+        /// <para>10. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefChangeDef.</para>
+        /// </summary> 
         private void AssertBlockConsistency()
         {
             #region 1. The first VoiceDef in a Block must be a Trk.
@@ -439,14 +480,26 @@ namespace Moritz.Spec
             Debug.Assert((nInputVoiceDefs <= 4), "There may not be more than 4 InputVoiceDefs.");
             #endregion 7
 
-            #region 8. The final barline may not be beyond the end of the block.
-            if(BarlineMsPositions.Count > 0)
+            #region 8. If there are any barlines, they are in ascending order with no duplicates.
+            if(BarlineMsPositionsReBlock.Count > 0)
             {
-                Debug.Assert(MsDuration >= BarlineMsPositions[BarlineMsPositions.Count - 1], "The final barline may not be beyond the end of the block.");
+                int prevPos = -1;
+                foreach(int pos in BarlineMsPositionsReBlock)
+                {
+                    Debug.Assert(pos > prevPos);
+                    prevPos = pos;
+                }
             }
-            #endregion 8. The final barline may not be beyond the end of the block.
+            #endregion 8. If there are any barlines, they are in ascending order with no duplicates.
 
-            #region 9. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefChangeDef.
+            #region 9. If there are any barlines, the final barline may not be beyond the end of the block.
+            if(BarlineMsPositionsReBlock.Count > 0)
+            {
+                Debug.Assert(MsDuration >= BarlineMsPositionsReBlock[BarlineMsPositionsReBlock.Count - 1], "The final barline may not be beyond the end of the block.");
+            }
+            #endregion 9. If there are any barlines, the final barline may not be beyond the end of the block.
+
+            #region 10. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefChangeDef.
             bool hasCorrectBeginning = false;
             foreach(VoiceDef voiceDef in _voiceDefs)
             {
@@ -507,10 +560,10 @@ namespace Moritz.Spec
 
             Debug.Assert(originalMsDuration == MsDuration);
 
-            for(int i = 0; i < BarlineMsPositions.Count; ++i)
+            for(int i = 0; i < BarlineMsPositionsReBlock.Count; ++i)
             {
-                Debug.Assert(warpDict.ContainsKey(BarlineMsPositions[i]));
-                BarlineMsPositions[i] = warpDict[BarlineMsPositions[i]];
+                Debug.Assert(warpDict.ContainsKey(BarlineMsPositionsReBlock[i]));
+                BarlineMsPositionsReBlock[i] = warpDict[BarlineMsPositionsReBlock[i]];
             }
 
             AssertBlockConsistency();
@@ -636,7 +689,7 @@ namespace Moritz.Spec
             }
         }
 
-        public List<int> BarlineMsPositions = new List<int>();
+        public List<int> BarlineMsPositionsReBlock = new List<int>();
 
         public IReadOnlyList<Trk> Trks
         {

@@ -12,22 +12,12 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-        private void AppendBars1and2(List<string> initialClefs, List<List<Trk>> TTTrks, List<Trk> accumulatedTrks, List<int> accumulatedAbsBarlinePositions)
+        private Seq Bars1and2(List<List<Trk>> TTTrks)
         {
-            #region conditions
-            Debug.Assert(initialClefs.Count == MidiChannelIndexPerOutputVoice.Count);
-            Debug.Assert(accumulatedTrks.Count == initialClefs.Count);
-            foreach(Trk trk in accumulatedTrks)
-            {
-                Debug.Assert(trk.Count == 0);
-            }
-            Debug.Assert(accumulatedAbsBarlinePositions.Count == 0);
-            #endregion conditions
-
-            SetInitialClefs(initialClefs, accumulatedTrks);
+            List<int> barlineMsPositionsReSeq = new List<int>();
 
             int midiChannel = 1;
-            Trk trk1a = GetChannelTrk(midiChannel++, TTTrks[0][0]); // absolutePitchHierarchy(0, 0); NPitchesPerOctave = 9
+            Trk trk1a = GetChannelTrk(midiChannel++, TTTrks[0][0]);
             trk1a.AdjustVelocitiesHairpin(0, trk1a.EndMsPositionReFirstIUD, 0.1, 1);
             MidiChordDef lastTrk0MidiChordDef = (MidiChordDef) trk1a[trk1a.Count - 1];
             lastTrk0MidiChordDef.BeamContinues = false;
@@ -49,7 +39,7 @@ namespace Moritz.Algorithm.Tombeau1
             MidiChordDef lastTrk2MidiChordDef = (MidiChordDef)trk2a[trk2a.Count - 1];
             lastTrk2MidiChordDef.BeamContinues = false;
 
-            accumulatedAbsBarlinePositions.Add(trk1a.MsDuration);
+            barlineMsPositionsReSeq.Add(trk1a.MsDuration);
 
             Trk trk0b = trk0a.Clone();           
             ((MidiChordDef)trk0a[0]).PanMsbs = new List<byte>() { 0 };
@@ -67,38 +57,16 @@ namespace Moritz.Algorithm.Tombeau1
             trk1a.AddRange(trk1b);
             trk2a.AddRange(trk2b);
 
-            int barline2MsPosition = trk2a.MsDuration;
-            accumulatedAbsBarlinePositions.Add(barline2MsPosition);
+            List<Trk> trks = new List<Trk>();
+            trks.Add(trk0a);
+            trks.Add(trk1a);
+            trks.Add(trk2a);
 
-            accumulatedTrks[0].AddRange(trk0a);
-            accumulatedTrks[1].AddRange(trk1a);
-            accumulatedTrks[2].AddRange(trk2a);
+            barlineMsPositionsReSeq.Add(trk2a.MsDuration + trk2a.MsPositionReContainer);
 
-            // the other trks are empty (have a rest)
-            for(int i = 3; i < accumulatedTrks.Count; ++i)
-            {
-                accumulatedTrks[i].Add(new RestDef(0, barline2MsPosition));
-            }
-        }
+            Seq bars1and2 = new Seq(0, trks, barlineMsPositionsReSeq, MidiChannelIndexPerOutputVoice);
 
-        /// <summary>
-        /// Sets the clefs in order of Trk (top to bottom).
-        /// The clefs list count must be equal to the number of Trks.
-        /// Clefs that already exist at the beginning of the Trk are replaced.
-        /// </summary>
-        /// <param name="initialClefs"></param>
-        private void SetInitialClefs(List<string> initialClefs, List<Trk> cumulativeTrks)
-        {
-            Debug.Assert(initialClefs.Count == cumulativeTrks.Count);
-            for(int trkIndex = 0; trkIndex < initialClefs.Count; ++trkIndex)
-            {
-                Trk trk = cumulativeTrks[trkIndex];
-                if(trk.UniqueDefs.Count > 0 && trk.UniqueDefs[0] is ClefChangeDef)
-                {
-                    trk.UniqueDefs.RemoveAt(0);
-                }
-                trk.Insert(0, new ClefChangeDef(initialClefs[trkIndex], 0));
-            }
+            return bars1and2;
         }
 
         private Trk GetChannelTrk(int midiChannel, Trk trkArg)

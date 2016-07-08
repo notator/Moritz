@@ -350,15 +350,13 @@ namespace Moritz.Algorithm.Tombeau1
             Palette palette = GetPaletteByName("Tombeau1.1");
             // more palletes could be loaded here
             Tombeau1Templates tombeau1Templates = new Tombeau1Templates(new List<Palette>() { palette });
-            List<Trk> accumulatedTrks = new List<Trk>();
-            foreach(int midiChannel in MidiChannelIndexPerOutputVoice)
-            {
-                accumulatedTrks.Add(new Trk(midiChannel));
-            }
-            List<int> accumulatedAbsBarlinePositions = new List<int>();
             #endregion initialization
 
-            AppendBars1and2(_initialClefs, tombeau1Templates.Trks, accumulatedTrks, accumulatedAbsBarlinePositions);
+            Seq mainSeq = new Seq(0, MidiChannelIndexPerOutputVoice);
+            mainSeq.SetInitialClefs(_initialClefs);
+
+            Seq seq0 = Bars1and2(tombeau1Templates.Trks);
+            mainSeq.Concat(seq0);
 
             #region commented out
             //List<Block> blocks = new List<Block>();
@@ -397,10 +395,9 @@ namespace Moritz.Algorithm.Tombeau1
             //#endregion test blocks
             #endregion commented out
 
-            Seq seq0 = new Seq(0, accumulatedTrks, MidiChannelIndexPerOutputVoice);
-            Block wholePiece = new Block(seq0, accumulatedAbsBarlinePositions);
+            Block mainBlock = new Block(mainSeq);
 
-            List<List<VoiceDef>> bars = wholePiece.ConvertToBars();
+            List<List<VoiceDef>> bars = mainBlock.ConvertToBars();
 
             return bars;
 		}
