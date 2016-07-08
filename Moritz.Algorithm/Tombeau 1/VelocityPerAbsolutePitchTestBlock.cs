@@ -14,68 +14,70 @@ namespace Moritz.Algorithm.Tombeau1
 	{
         private Block VelocityPerAbsolutePitchTestBlock()
         {
-            List<Block> blocks = new List<Block>();
-            int chordDensity = 3;
+            return null;
+            //List<Block> blocks = new List<Block>();
+            //int chordDensity = 3;
 
-            blocks.Add(VelocityPerAbsolutePitchTestBar(chordDensity, false, false));
-            blocks.Add(VelocityPerAbsolutePitchTestBar(chordDensity, false, true));
+            //blocks.Add(VelocityPerAbsolutePitchTestBar(chordDensity, false, false));
+            //blocks.Add(VelocityPerAbsolutePitchTestBar(chordDensity, false, true));
 
-            Block mainBlock = blocks[0];
-            for(int i = 1; i < blocks.Count; ++i)
-            {
-                mainBlock.Concat(blocks[i]);
-            }
+            //Block mainBlock = blocks[0];
+            //for(int i = 1; i < blocks.Count; ++i)
+            //{
+            //    mainBlock.Concat(blocks[i]);
+            //}
 
-            return mainBlock;           
+            //return mainBlock;           
         }
 
         private Block VelocityPerAbsolutePitchTestBar(int chordDensity, bool useConjugate, bool invert)
         {
-            List<Trk> trks = new List<Trk>();
+            return null;
+            //List<Trk> trks = new List<Trk>();
 
-            int relativePitchHierarchyIndex = 0;
+            //int relativePitchHierarchyIndex = 0;
 
-            List<int> blockAbsolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, 0);
+            //List<int> blockAbsolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, 0);
 
-            for(int midiChannel = 0; midiChannel < 8; ++midiChannel)
-            {
-                List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex++, midiChannel);
-                Gamut gamut = new Gamut(absolutePitchHierarchy, 8);
+            //for(int midiChannel = 0; midiChannel < 8; ++midiChannel)
+            //{
+            //    List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex++, midiChannel);
+            //    Gamut gamut = new Gamut(absolutePitchHierarchy, 8);
 
-                Trk trk = new Trk(midiChannel);
+            //    Trk trk = new Trk(midiChannel);
 
-                for(int gamutIndex = 40; gamutIndex < 52; ++gamutIndex)
-                {
-                    int mcdRootPitch = gamut.List[gamutIndex];
-                    MidiChordDef mcd = new MidiChordDef(1000, gamut, mcdRootPitch, chordDensity, null);
-                    if(useConjugate == true)
-                    {
-                        mcd = mcd.Conjugate();
-                    }
-                    if(invert == true)
-                    {
-                        mcd.Invert(7);
-                    }
+            //    for(int gamutIndex = 40; gamutIndex < 52; ++gamutIndex)
+            //    {
+            //        int mcdRootPitch = gamut.List[gamutIndex];
+            //        MidiChordDef mcd = new MidiChordDef(1000, gamut, mcdRootPitch, chordDensity, null);
+            //        if(useConjugate == true)
+            //        {
+            //            mcd = mcd.Conjugate();
+            //        }
+            //        if(invert == true)
+            //        {
+            //            mcd.Invert(7);
+            //        }
 
-                    mcd.Lyric = (gamutIndex).ToString();
+            //        mcd.Lyric = (gamutIndex).ToString();
 
-                    List<byte> velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(20, true);
-                    mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+            //        List<byte> velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(20, true);
+            //        mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
 
-                    trk.Add(mcd);
-                }
+            //        trk.Add(mcd);
+            //    }
 
-                trks.Add(trk);
-            }
+            //    trks.Add(trk);
+            //}
 
-            Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
+            //Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
 
-            List<int> barlineMsPositions = new List<int>();
-            barlineMsPositions.Add(seq.MsDuration);
+            //List<int> barlineMsPositions = new List<int>();
+            //barlineMsPositions.Add(seq.MsDuration);
 
-            Block block = new Block(seq, barlineMsPositions);
+            //Block block = new Block(seq, barlineMsPositions);
 
-            return block;
+            //return block;
         }
 
     }

@@ -39,15 +39,8 @@ namespace Moritz.Algorithm.Study3Sketch2
             Seq bar2Seq = CreateBar2Seq();
             Seq bars345Seq = bar2Seq.Clone();
 
-            int seq2StartMsPos = bar1Seq.MsDuration;
-            int seq3StartMsPos = seq2StartMsPos + bar2Seq.MsDuration;
-            int totalMsDuration = seq3StartMsPos + bars345Seq.MsDuration;
-
-            bar2Seq.AbsMsPosition = seq2StartMsPos;
-            bars345Seq.AbsMsPosition = seq3StartMsPos;
-
-            List<int> bars345RightBarlines = Bars345RightBarlines(bars345Seq.MsDuration);
-            List<int> approxAbsMsPositionsOfRightBarlines = GetApproxAbsMsPositionsOfRightBarlines(seq2StartMsPos, seq3StartMsPos, bars345RightBarlines);
+            bars345Seq.AddBarline(5950); // puts the barline in front of the nearest IUniqueDef
+            bars345Seq.AddBarline(10500);
 
             /****************************************************************************************
 			* This score is liable to be recompiled when other things change in the SVG-MIDI file format,
@@ -75,10 +68,8 @@ namespace Moritz.Algorithm.Study3Sketch2
             Seq mainSeq = bar1Seq;
             mainSeq.Concat(bar2Seq);
             mainSeq.Concat(bars345Seq);
-            
-            List<int> barlineEndMsPositions = mainSeq.GetBarlineAbsMsPositions(approxAbsMsPositionsOfRightBarlines);
 
-            Block block = new Block(mainSeq, barlineEndMsPositions);
+            Block block = new Block(mainSeq);
 
             block.AddInputVoice(ivd);
             block.AdjustBarlinePositionsForInputVoices();
@@ -271,15 +262,17 @@ namespace Moritz.Algorithm.Study3Sketch2
             List<Trk> bar = new List<Trk>();
 
             byte channel = 0;
+            int endBarlineMsPos = 0;
             foreach(Palette palette in _palettes)
             {
                 Trk trk = new Trk(channel, 0, new List<IUniqueDef>());
                 bar.Add(trk);
                 WriteVoiceMidiDurationDefs1(trk, palette);
+                endBarlineMsPos = (endBarlineMsPos > trk.MsDuration) ? endBarlineMsPos : trk.MsDuration;
                 channel++;
             }
 
-            Seq seq = new Seq(0, bar, MidiChannelIndexPerOutputVoice);
+            Seq seq = new Seq(0, bar, new List<int>() { endBarlineMsPos }, MidiChannelIndexPerOutputVoice);
 
             return seq;
         }
@@ -300,7 +293,7 @@ namespace Moritz.Algorithm.Study3Sketch2
                 trk.UniqueDefs.Add(restDef);
             }
         }
-        #endregion CreateBar1()
+        #endregion CreateBar1Seq()
 
         /// <summary>
         /// This function creates only one bar, using Trk objects. 
@@ -344,35 +337,9 @@ namespace Moritz.Algorithm.Study3Sketch2
                 }
             }
 
-            Seq seq = new Seq(0, bar, MidiChannelIndexPerOutputVoice);
+            Seq seq = new Seq(0, bar, new List<int>() { maxMsPosReBar }, MidiChannelIndexPerOutputVoice);
 
             return seq;
-        }
-
-        private List<int> GetApproxAbsMsPositionsOfRightBarlines(int seq2StartMsPos, int seq3StartMsPos, List<int> bars345RightBarlines)
-        {
-            List<int> approxBarlinePositions = new List<int>();
-            approxBarlinePositions.Add(seq2StartMsPos);
-            approxBarlinePositions.Add(seq3StartMsPos);
-            foreach(int val in bars345RightBarlines)
-            {
-                approxBarlinePositions.Add(seq3StartMsPos + val);
-            }
-            return approxBarlinePositions;
-        }
-
-        private List<int> Bars345RightBarlines(int bar5EndMsPos)
-        {
-            List<int> rightBarlinePositions = new List<int>();
-
-            int bar3EndMsPos = 5950;
-            int bar4EndMsPos = 10500;
-
-            rightBarlinePositions.Add(bar3EndMsPos);
-            rightBarlinePositions.Add(bar4EndMsPos);
-            rightBarlinePositions.Add(bar5EndMsPos);
-
-            return rightBarlinePositions;
         }
     }
 }

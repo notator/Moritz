@@ -16,36 +16,38 @@ namespace Moritz.Algorithm.Tombeau1
                                     List<List<MidiChordDef>> ornamentMidiChordDefs)
         {
 
-            Block b2bar1 = GetBlock2BarFromMidiChordDefLists(pitchWheelMidiChordDefs);
+            //Block b2bar1 = GetBlock2BarFromMidiChordDefLists(pitchWheelMidiChordDefs);
 
-            Envelope envelope = new Envelope(new List<byte>() { 0, 127 }, 127, 127, 2);
+            //Envelope envelope = new Envelope(new List<byte>() { 0, 127 }, 127, 127, 2);
 
-            b2bar1.SetPitchWheelSliders(envelope);
+            //b2bar1.SetPitchWheelSliders(envelope);
 
-            Block b2bar2 = GetBlock2BarFromMidiChordDefLists(ornamentMidiChordDefs);
+            //Block b2bar2 = GetBlock2BarFromMidiChordDefLists(ornamentMidiChordDefs);
 
-            Block block1 = b2bar1;
-            block1.Concat(b2bar2);
+            //Block block1 = b2bar1;
+            //block1.Concat(b2bar2);
 
-            return block1;
+            //return block1;
+            return null;
         }
 
         private Block GetBlock2BarFromMidiChordDefLists(List<List<MidiChordDef>> midiChordDefLists)
         {
-            int midiChannel = 0;
-            List<Trk> trks = new List<Trk>();
+            //int midiChannel = 0;
+            //List<Trk> trks = new List<Trk>();
 
-            foreach(List<MidiChordDef> pwmcdList in midiChordDefLists)
-            {
-                List<IUniqueDef> mcds = GetBlock2OrderedMidiChordDefs(pwmcdList);
-                Trk trk = new Trk(midiChannel++, 0, mcds);
-                trks.Add(trk);
-            }
+            //foreach(List<MidiChordDef> pwmcdList in midiChordDefLists)
+            //{
+            //    List<IUniqueDef> mcds = GetBlock2OrderedMidiChordDefs(pwmcdList);
+            //    Trk trk = new Trk(midiChannel++, 0, mcds);
+            //    trks.Add(trk);
+            //}
 
-            Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
-            Block block = new Block(seq, new List<int>() { seq.MsDuration });
+            //Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
+            //Block block = new Block(seq, new List<int>() { seq.MsDuration });
 
-            return block;
+            //return block;
+            return null;
         }
 
         private List<IUniqueDef> GetBlock2OrderedMidiChordDefs(List<MidiChordDef> mcdList)

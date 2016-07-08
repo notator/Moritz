@@ -21,47 +21,6 @@ namespace Moritz.Spec
         /// <para>For further documentation about Block consistency, see its private AssertBlockConsistency() function.
         /// </summary>
         /// <param name="seq">cannot be null, and must have Trks</param>
-        /// <param name="rightBarlineMsPositions">All barline positions except 0. Can be null or empty</param>
-        public Block(Seq seq, List<int> rightBarlineMsPositions)
-        {
-            Debug.Assert(seq.IsNormalized);
-
-            AbsMsPosition = seq.AbsMsPosition;
-
-            foreach(Trk trk in seq.Trks)
-            {
-                trk.Container = null;
-                _voiceDefs.Add(trk);
-            }
-
-            Blockify();
-
-            foreach(Trk trk in seq.Trks)
-            {
-                trk.Container = this;
-            }
-
-            if(rightBarlineMsPositions != null)
-            {
-                BarlineMsPositionsReBlock = new List<int>(rightBarlineMsPositions);
-            }
-
-            AssertBlockConsistency();
-        }
-
-        /// <summary>
-        /// A Block contains a list of voiceDefs, that can be of both kinds: Trks and InputVoiceDefs. A Seq can only contain Trks.
-        /// This constructor converts its argument to a Block so, if the argument needs to be preserved, pass a clone.
-        /// <para>The seq's Trks are cast to VoiceDefs, and then padded at the beginning and end with rests
-        /// so that they all start at the beginning of the Block and have the same duration.</para>
-        /// <para>The Block's AbsMsPosition is set to the seq's AbsMsPosition.</para>
-        /// <para>There is at least one MidiChordDef at the start of the Block (possibly following a ClefChangeDef, and
-        /// at least one MidiChordDef ends at its end.</para>
-        /// <para>If an original seq.trk.UniqueDefs list is empty or contains a single restDef, the corresponding
-        /// voiceDef will contain a single rest having the same duration as the other trks.</para>
-        /// <para>For further documentation about Block consistency, see its private AssertBlockConsistency() function.
-        /// </summary>
-        /// <param name="seq">cannot be null, and must have Trks</param>
         public Block(Seq seq)
         {
             Debug.Assert(seq.IsNormalized);
@@ -616,7 +575,6 @@ namespace Moritz.Spec
         }
 
         #endregion envelopes
-
 
         private void SetMsPositions()
         {

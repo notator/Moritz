@@ -30,70 +30,52 @@ namespace Moritz.Algorithm.Study3Sketch1
             _krystals = krystals;
             _palettes = palettes;
 
-            Seq bar1 = CreateBar1();
+            Seq bar1Seq = CreateBar1Seq();
+            Seq bar2Seq = CreateBar2Seq();
+            Seq bars345Seq = bar2Seq.Clone();
 
-            int bar2StartMsPos = bar1.MsDuration;
-            Seq bar2 = CreateBar2(bar2StartMsPos);
-            
-            Seq bars3to5 = bar2.Clone();
-            int bar3StartMsPos = bar2StartMsPos + bar2.MsDuration;
-            int bar5EndMsPos = bar3StartMsPos + bars3to5.MsDuration; 
+            bars345Seq.AddBarline(5950); // puts the barline in front of the nearest IUniqueDef
+            bars345Seq.AddBarline(10500);
 
-            List<int> approxAbsMsPositionsOfRightBarlines = GetApproxAbsMsPositionsOfRightBarlines( bar2StartMsPos, bar3StartMsPos, bar5EndMsPos );
+            Seq mainSeq = bar1Seq;
+            mainSeq.Concat(bar2Seq);
+            mainSeq.Concat(bars345Seq);
 
-
-            Seq mainSeq = bar1;
-            mainSeq.Concat(bar2);
-            mainSeq.Concat(bars3to5);
-
-            List<int> barlineEndMsPositions = mainSeq.GetBarlineAbsMsPositions(approxAbsMsPositionsOfRightBarlines);
-
-            // Blocks contain a list of VoiceDefs
-            Block block = new Block(mainSeq, barlineEndMsPositions); // converts mainSeq to a block (There are no InputVoiceDefs in this score.)
+            Block block = new Block(mainSeq);
 
             List<List<VoiceDef>> bars = block.ConvertToBars();
 
             return bars;
         }
 
-        private List<int> GetApproxAbsMsPositionsOfRightBarlines(int bar2StartMsPos, int bar3StartMsPos, int bar5EndMsPos)
-        {
-            List<int> rightBarlinePositions = new List<int>() { bar2StartMsPos, bar3StartMsPos };
-
-            int bar4StartPos = bar3StartMsPos + 5950;
-            int bar5StartPos = bar3StartMsPos + 10500;
-
-            rightBarlinePositions.Add(bar4StartPos);
-            rightBarlinePositions.Add(bar5StartPos);
-            rightBarlinePositions.Add(bar5EndMsPos);
-
-            return rightBarlinePositions;
-        }
-
-        #region CreateBar1()
-        private Seq CreateBar1()
+        #region CreateBar1Seq()
+        private Seq CreateBar1Seq()
         {
             List<Trk> bar = new List<Trk>();
 
-			byte channel = 0;
+            byte channel = 0;
+            int endBarlineMsPos = 0;
             foreach(Palette palette in _palettes)
             {
-                Trk voice = new Trk(channel, 0, new List<IUniqueDef>());
-                bar.Add(voice);
-                WriteVoiceMidiDurationDefs1(voice, palette);
-				channel++;
+                Trk trk = new Trk(channel, 0, new List<IUniqueDef>());
+                bar.Add(trk);
+                WriteVoiceMidiDurationDefs1(trk, palette);
+                endBarlineMsPos = (endBarlineMsPos > trk.MsDuration) ? endBarlineMsPos : trk.MsDuration;
+                channel++;
             }
 
-            Seq seq = new Seq(0, bar, MidiChannelIndexPerOutputVoice);
+            Seq seq = new Seq(0, bar, new List<int>() { endBarlineMsPos }, MidiChannelIndexPerOutputVoice);
 
             return seq;
         }
 
         private void WriteVoiceMidiDurationDefs1(Trk trk, Palette palette)
         {
+            trk.MsPositionReContainer = 0;
+
             int msPositionReFirstIUD = 0;
             int bar1ChordMsSeparation = 1500;
-            for(int i = 0; i < palette.Count;++i)
+            for(int i = 0; i < palette.Count; ++i)
             {
                 IUniqueDef durationDef = palette.UniqueDurationDef(i);
                 durationDef.MsPositionReFirstUD = msPositionReFirstIUD;
@@ -103,12 +85,12 @@ namespace Moritz.Algorithm.Study3Sketch1
                 trk.UniqueDefs.Add(restDef);
             }
         }
-        #endregion CreateBar1()
+        #endregion CreateBar1Seq()
 
         /// <summary>
         /// This function creates only one bar, using Trk objects. 
         /// </summary>
-        private Seq CreateBar2(int barStartAbsMsPos)
+        private Seq CreateBar2Seq()
         {
             List<Trk> bar = new List<Trk>();
 
@@ -116,6 +98,7 @@ namespace Moritz.Algorithm.Study3Sketch1
             foreach(Palette palette in _palettes)
             {
                 Trk trk = palette.NewTrk(channel);
+                trk.MsPositionReContainer = 0;
                 trk.MsDuration = 6000; // stretches or compresses the trk duration to 6000ms
                 bar.Add(trk);
                 ++channel;
@@ -146,7 +129,7 @@ namespace Moritz.Algorithm.Study3Sketch1
                 }
             }
 
-            Seq seq = new Seq(barStartAbsMsPos, bar, MidiChannelIndexPerOutputVoice);
+            Seq seq = new Seq(0, bar, new List<int>() { maxMsPosReBar }, MidiChannelIndexPerOutputVoice);
 
             return seq;
         }

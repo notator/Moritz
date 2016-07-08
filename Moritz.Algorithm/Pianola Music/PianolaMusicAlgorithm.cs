@@ -31,11 +31,15 @@ namespace Moritz.Algorithm.PianolaMusic
 			List<Trk> trks = new List<Trk>() { tracks1and6[0], tracks2and5[0], tracks3and4[0], tracks3and4[1], tracks2and5[1], tracks1and6[1] };
 			Debug.Assert(trks.Count == MidiChannelIndexPerOutputVoice.Count);
 
-            Seq mainSeq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
+            Seq mainSeq = new Seq(0, trks, new List<int>() { trks[0].MsDuration }, MidiChannelIndexPerOutputVoice);
 
-            List<int> absMsPositionsOfRightBarlines = GetAbsMsPositionsOfRightBarlines(mainSeq, NumberOfBars);
-
-            Block block = new Block(mainSeq, absMsPositionsOfRightBarlines);
+            double approxBarlength = ((double)trks[0].MsDuration / 8);
+            for(int barnumber = 1; barnumber < 8; ++barnumber)
+            {
+                mainSeq.AddBarline((int)Math.Round(approxBarlength * barnumber));
+            }
+            
+            Block block = new Block(mainSeq);
 
             List<List<VoiceDef>> bars = block.ConvertToBars();
 
@@ -43,22 +47,6 @@ namespace Moritz.Algorithm.PianolaMusic
 
 			return bars;
 		}
-
-        private List<int> GetAbsMsPositionsOfRightBarlines(Seq sequence, int nBars)
-        {
-            double barMsDuration = ((double)sequence.MsDuration) / nBars;
-            double msPosition = barMsDuration;
-            List<int> approxBarlineEndMsPositions = new List<int>();
-            for(int i = 0; i < nBars; ++i)
-            {
-                approxBarlineEndMsPositions.Add((int)(Math.Round(msPosition)));
-                msPosition += barMsDuration;
-            }
-
-            List<int> barlineEndMsPositions = sequence.GetBarlineAbsMsPositions(approxBarlineEndMsPositions);
-
-            return barlineEndMsPositions;
-        }
 
         // Returns two lists of ints. The first is contains the durations of the upper track, the second the lower.
         private static List<List<int>> trackDurations(List<int> firstHalfUpperTrack)
