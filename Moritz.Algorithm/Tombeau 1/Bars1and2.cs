@@ -30,15 +30,6 @@ namespace Moritz.Algorithm.Tombeau1
             trk0a.TransposeInGamut(8);
             trk0a.MsDuration = trk1a.MsDuration - (initialDelay / 2);
 
-            Trk trk2a = GetChannelTrk(midiChannel++, TTTrks[0][1]);
-            trk2a.AdjustVelocitiesHairpin(0, trk2a.EndMsPositionReFirstIUD, 1, 0.1);
-            List<byte> velocityPerAbsolutePitch = ((MidiChordDef)trk2a[0]).Gamut.GetVelocityPerAbsolutePitch(25, false);
-            trk2a.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
-            trk2a.TransposeInGamut(-(gamut.NPitchesPerOctave));
-            trk2a.MsPositionReContainer = 531;
-            MidiChordDef lastTrk2MidiChordDef = (MidiChordDef)trk2a[trk2a.Count - 1];
-            lastTrk2MidiChordDef.BeamContinues = false;
-
             barlineMsPositionsReSeq.Add(trk1a.MsDuration);
 
             Trk trk0b = trk0a.Clone();           
@@ -47,22 +38,15 @@ namespace Moritz.Algorithm.Tombeau1
 
             Trk trk1b = trk1a.Clone();
             ((MidiChordDef)trk1a[0]).PanMsbs = new List<byte>() { 127 };
-            Trk trk2b = trk2a.Clone();
-            trk2a.Insert(0, new RestDef(0, 531));
-            trk2b.TransposeInGamut(6);
-            trk2b.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
-            trk2b.InsertClefChange(0, "t1");
 
             trk0a.AddRange(trk0b);
             trk1a.AddRange(trk1b);
-            trk2a.AddRange(trk2b);
 
             List<Trk> trks = new List<Trk>();
             trks.Add(trk0a);
             trks.Add(trk1a);
-            trks.Add(trk2a);
 
-            barlineMsPositionsReSeq.Add(trk2a.MsDuration + trk2a.MsPositionReContainer);
+            barlineMsPositionsReSeq.Add(trk1a.MsDuration);
 
             Seq bars1and2 = new Seq(0, trks, barlineMsPositionsReSeq, MidiChannelIndexPerOutputVoice);
 

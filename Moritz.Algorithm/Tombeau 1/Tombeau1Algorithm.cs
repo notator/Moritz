@@ -397,11 +397,12 @@ namespace Moritz.Algorithm.Tombeau1
 
             Block mainBlock = new Block(mainSeq);
 
+            Block vpapBlock = VPAPBlock(tombeau1Templates.Trks);
+            mainBlock.Concat(vpapBlock);
+
             List<List<VoiceDef>> bars = mainBlock.ConvertToBars();
 
             return bars;
 		}
-
-
     }
 }

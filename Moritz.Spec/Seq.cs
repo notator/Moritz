@@ -100,6 +100,15 @@ namespace Moritz.Spec
             }
         }
 
+        public void AddEndBarline()
+        {
+            int finalBarlinePositionReSeq = MsDuration;
+            if(!BarlineMsPositionsReSeq.Contains(finalBarlinePositionReSeq))
+            {
+                BarlineMsPositionsReSeq.Add(finalBarlinePositionReSeq);
+            }
+        }
+
         /// <summary>
         /// Adds the barline at the msPosition of the nearest IUniqueDef in the Seq.
         /// </summary>
