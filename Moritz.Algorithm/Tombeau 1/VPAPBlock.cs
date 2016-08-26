@@ -16,13 +16,16 @@ namespace Moritz.Algorithm.Tombeau1
         {
             Seq vpapSeq = VPAPBars(TTTrks);
             Block vpapBlock = new Block(vpapSeq);
+
+            int blockMsDuration = vpapBlock.MsDuration;
+            vpapBlock.AddBarline(blockMsDuration / 2);
+            vpapBlock.AddBarline(blockMsDuration);
+
             return vpapBlock;
         }
 
         private Seq VPAPBars(List<List<Trk>> TTTrks)
         {
-            List<int> barlineMsPositionsReSeq = new List<int>();
-
             Trk vpapTrka = GetVPAPChannelTrk(2, TTTrks[0][1]);
             Gamut gamut = ((MidiChordDef)vpapTrka[0]).Gamut;
 
@@ -38,14 +41,12 @@ namespace Moritz.Algorithm.Tombeau1
             vpapTrkb.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
             vpapTrkb.InsertClefChange(0, "t1");
 
-            barlineMsPositionsReSeq.Add(vpapTrka.MsDuration);
             vpapTrka.AddRange(vpapTrkb);
-            barlineMsPositionsReSeq.Add(vpapTrka.MsDuration);
 
             List<Trk> trks = new List<Trk>();
             trks.Add(vpapTrka);
 
-            Seq VPAPBars = new Seq(0, trks, barlineMsPositionsReSeq, MidiChannelIndexPerOutputVoice);
+            Seq VPAPBars = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
 
             return VPAPBars;
         }

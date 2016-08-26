@@ -25,20 +25,16 @@ namespace Moritz.Spec
             foreach(int channel in midiChannelIndexPerOutputVoice)
             {
                 VoiceDef trk = new Trk(channel);
+                trk.Add(new ClefChangeDef(initialClefs[channel], 0));
                 _voiceDefs.Add(trk);
             }
 
+            int inputVoiceIndex = midiChannelIndexPerOutputVoice.Count;
             for(int i = 0; i < nInputVoices; ++i)
             {
                 VoiceDef inputVoiceDef = new InputVoiceDef(i);
+                inputVoiceDef.Add(new ClefChangeDef(initialClefs[inputVoiceIndex], 0));
                 _voiceDefs.Add(inputVoiceDef);
-            }
-
-            // set initial Clefs
-            for(int voiceDefIndex = 0; voiceDefIndex < _voiceDefs.Count; ++voiceDefIndex)
-            {
-                VoiceDef voiceDef = _voiceDefs[voiceDefIndex];
-                voiceDef.Add(new ClefChangeDef(initialClefs[voiceDefIndex], 0));
             }
         }
 
@@ -74,11 +70,6 @@ namespace Moritz.Spec
                 trk.Container = this;
             }
 
-            if(seq.BarlineMsPositionsReSeq != null)
-            {
-                BarlineMsPositionsReBlock = new List<int>(seq.BarlineMsPositionsReSeq);
-            }
-
             AssertNonEmptyBlockConsistency();
         }
 
@@ -95,7 +86,7 @@ namespace Moritz.Spec
                 trks.Add(trkClone);
                 midiChannelPerOutputVoice.Add(trk.MidiChannel);
             }
-            Seq seq = new Seq(this.AbsMsPosition, trks, BarlineMsPositionsReBlock, midiChannelPerOutputVoice);
+            Seq seq = new Seq(this.AbsMsPosition, trks, midiChannelPerOutputVoice);
             Block clone = new Block(seq);
 
             foreach(InputVoiceDef ivd in InputVoiceDefs)
@@ -103,17 +94,85 @@ namespace Moritz.Spec
                 clone.AddInputVoice(ivd.Clone());
             }
 
+            clone.AddBarlines(_barlineMsPositionsReBlock);
+
             return clone;
+        }
+
+        /// <summary>
+        /// Throws an exception if the end barline already exists.
+        /// </summary>
+        public void AddEndBarline()
+        {
+            int finalBarlinePositionReBlock = MsDuration;
+            Debug.Assert(!_barlineMsPositionsReBlock.Contains(finalBarlinePositionReBlock));
+            _barlineMsPositionsReBlock.Add(finalBarlinePositionReBlock);
+        }
+
+        /// <summary>
+        /// Adds the barline at the nearest end msPosition of any IUniqueDef in the Block.
+        /// Barlines can be added in any order. This function sorts _barlineMsPositionsReBlock into ascending order.
+        /// An exception is thrown either:
+        ///    1) if approxBarlinePositionReBlock is greater than the msDuration of the block,
+        /// or 2) if an attempt is made to add a barline that already exists.
+        /// </summary>
+        public void AddBarline(int approxBarlinePositionReBlock)
+        {
+            #region conditions
+            Debug.Assert(approxBarlinePositionReBlock <= this.MsDuration);
+            #endregion conditions
+
+            int barlineMsPos = 0;
+            int diff = int.MaxValue;
+            foreach(VoiceDef voiceDef in this._voiceDefs)
+            {
+                for(int uidIndex = voiceDef.Count - 1; uidIndex >= 0; --uidIndex)
+                {
+                    int absPos = voiceDef[uidIndex].MsPositionReFirstUD + voiceDef[uidIndex].MsDuration;
+                    int localDiff = Math.Abs(approxBarlinePositionReBlock - absPos);
+                    if(localDiff < diff)
+                    {
+                        diff = localDiff;
+                        barlineMsPos = absPos;
+                    }
+                    if(diff == 0)
+                    {
+                        break;
+                    }
+                }
+                if(diff == 0)
+                {
+                    break;
+                }
+            }
+
+            Debug.Assert(!_barlineMsPositionsReBlock.Contains(barlineMsPos));
+
+            _barlineMsPositionsReBlock.Add(barlineMsPos);
+            _barlineMsPositionsReBlock.Sort();
+        }
+
+        /// <summary>
+        /// Calls AddBarline(msPosition).
+        /// Adds the barlines at the nearest end msPosition of any IUniqueDef in the Block.
+        /// The private list is sorted after adding the barline msPositions.
+        /// </summary>
+        public void AddBarlines(List<int> barlineMsPositionsReBlock)
+        {
+            foreach(int msPosition in barlineMsPositionsReBlock)
+            {
+                AddBarline(msPosition);
+            }
         }
 
         public void Concat(Block block2)
         {
             Debug.Assert(_voiceDefs.Count == block2._voiceDefs.Count);
 
-            List<int> block2BarlineMsPositions = block2.BarlineMsPositionsReBlock;
+            IReadOnlyList<int> block2BarlineMsPositions = block2.BarlineMsPositionsReBlock;
             foreach(int msPosition in block2BarlineMsPositions)
             {
-                BarlineMsPositionsReBlock.Add(this.MsDuration + msPosition);
+                _barlineMsPositionsReBlock.Add(this.MsDuration + msPosition);
             }
 
             for(int i = 0; i < _voiceDefs.Count; ++i)
@@ -159,11 +218,11 @@ namespace Moritz.Spec
             while(AbsMsPosition < finalBarlineMsPosition)
             {
                 int barlineEndMsPosition = barlineMsPositions[barlineIndex++];
-                for(int i = 1; i < BarlineMsPositionsReBlock.Count; ++i)
+                for(int i = 1; i < _barlineMsPositionsReBlock.Count; ++i)
                 {
-                    BarlineMsPositionsReBlock[i] -= BarlineMsPositionsReBlock[0];
+                    _barlineMsPositionsReBlock[i] -= _barlineMsPositionsReBlock[0];
                 }
-                BarlineMsPositionsReBlock.RemoveAt(0);
+                _barlineMsPositionsReBlock.RemoveAt(0);
                 List<VoiceDef> bar = PopBar(barlineEndMsPosition);
                 bars.Add(bar);
             }
@@ -317,9 +376,9 @@ namespace Moritz.Spec
         /// </summary>
         public void AdjustBarlinePositionsForInputVoices()
         {
-            for(int bpIndex = 0; bpIndex <BarlineMsPositionsReBlock.Count; ++bpIndex)
+            for(int bpIndex = 0; bpIndex < _barlineMsPositionsReBlock.Count; ++bpIndex)
             {
-                int barlineMsPos = BarlineMsPositionsReBlock[bpIndex];
+                int barlineMsPos = _barlineMsPositionsReBlock[bpIndex];
                 IUniqueDef closest = null;
                 int minDiff = int.MaxValue;
                 foreach(InputVoiceDef inputVoiceDef in this.InputVoiceDefs)
@@ -334,7 +393,7 @@ namespace Moritz.Spec
                         }
                     }
                 }
-                BarlineMsPositionsReBlock[bpIndex] = closest.MsPositionReFirstUD + closest.MsDuration;
+                _barlineMsPositionsReBlock[bpIndex] = closest.MsPositionReFirstUD + closest.MsDuration;
             }
         }
 
@@ -473,26 +532,20 @@ namespace Moritz.Spec
             Debug.Assert((nInputVoiceDefs <= 4), "There may not be more than 4 InputVoiceDefs.");
             #endregion 7
 
-            #region 8. If there are any barlines, they are in ascending order with no duplicates.
-            if(BarlineMsPositionsReBlock.Count > 0)
+            #region 8. If there are any barlines, they must be in ascending order with no duplicates, and the final barline may not be beyond the end of the block.
+            if(_barlineMsPositionsReBlock.Count > 0)
             {
                 int prevPos = -1;
-                foreach(int pos in BarlineMsPositionsReBlock)
+                foreach(int pos in _barlineMsPositionsReBlock)
                 {
-                    Debug.Assert(pos > prevPos);
+                    Debug.Assert(pos > prevPos, "barlines must be in ascending order with no duplicates.");
                     prevPos = pos;
                 }
-            }
-            #endregion 8. If there are any barlines, they are in ascending order with no duplicates.
-
-            #region 9. If there are any barlines, the final barline may not be beyond the end of the block.
-            if(BarlineMsPositionsReBlock.Count > 0)
-            {
-                Debug.Assert(MsDuration >= BarlineMsPositionsReBlock[BarlineMsPositionsReBlock.Count - 1], "The final barline may not be beyond the end of the block.");
+                Debug.Assert(MsDuration >= _barlineMsPositionsReBlock[_barlineMsPositionsReBlock.Count - 1], "The final barline may not be beyond the end of the block.");
             }
             #endregion 9. If there are any barlines, the final barline may not be beyond the end of the block.
 
-            #region 10. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefChangeDef.
+            #region 9. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefChangeDef.
             bool hasCorrectBeginning = false;
             foreach(VoiceDef voiceDef in _voiceDefs)
             {
@@ -553,10 +606,10 @@ namespace Moritz.Spec
 
             Debug.Assert(originalMsDuration == MsDuration);
 
-            for(int i = 0; i < BarlineMsPositionsReBlock.Count; ++i)
+            for(int i = 0; i < _barlineMsPositionsReBlock.Count; ++i)
             {
-                Debug.Assert(warpDict.ContainsKey(BarlineMsPositionsReBlock[i]));
-                BarlineMsPositionsReBlock[i] = warpDict[BarlineMsPositionsReBlock[i]];
+                Debug.Assert(warpDict.ContainsKey(_barlineMsPositionsReBlock[i]));
+                _barlineMsPositionsReBlock[i] = warpDict[_barlineMsPositionsReBlock[i]];
             }
 
             AssertNonEmptyBlockConsistency();
@@ -681,7 +734,11 @@ namespace Moritz.Spec
             }
         }
 
-        public List<int> BarlineMsPositionsReBlock = new List<int>();
+        public IReadOnlyList<int> BarlineMsPositionsReBlock
+        {
+            get { return _barlineMsPositionsReBlock.AsReadOnly(); }
+        }
+        private List<int> _barlineMsPositionsReBlock = new List<int>();
 
         public IReadOnlyList<Trk> Trks
         {

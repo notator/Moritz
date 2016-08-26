@@ -374,6 +374,9 @@ namespace Moritz.Algorithm.Tombeau1
             //Block verticalVelocityGradientTestBlock = VerticalVelocityGradientTestBlock();
             //blocks.Add(verticalVelocityGradientTestBlock); // 2 bars (2 systems)
 
+            Block vpapBlock = VPAPBlock(tombeau1Templates.Trks);
+            blocks.Add(vpapBlock);   // 2 bars
+
             Block verticalVelocityColorsTestBlock = VerticalVelocityColorsTestBlock(tombeau1Templates.PaletteMidiChordDefs[0]);
             blocks.Add(verticalVelocityColorsTestBlock); // 2 bars (1 system)
 
@@ -392,10 +395,9 @@ namespace Moritz.Algorithm.Tombeau1
             //#endregion test blocks
             #endregion commented out
 
-            Block vpapBlock = VPAPBlock(tombeau1Templates.Trks);
-            blocks.Add(vpapBlock);   // 2 bars
 
-            Block mainBlock = new Block(_initialClefs, MidiChannelIndexPerOutputVoice);
+
+            Block mainBlock = new Block(InitialClefs, MidiChannelIndexPerOutputVoice);
 
             foreach(Block block in blocks)
             {

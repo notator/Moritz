@@ -18,7 +18,7 @@ namespace Moritz.Spec
         /// by this constructor.</param>
         /// <param name="barlineMsPositionsReSeq">Can be null or empty. All barlineMsPositions must be unique, in ascending order, and less than or equal to the final msDuration of the Seq.</param>
         /// <param name="midiChannelIndexPerOutputVoice">The Seq will contain one trk for each channel in this list.</param>
-        public Seq(int absSeqMsPosition, List<Trk> trks, List<int> barlineMsPositionsReSeq, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
+        public Seq(int absSeqMsPosition, List<Trk> trks, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
         {
             #region conditions
             Debug.Assert(absSeqMsPosition >= 0);
@@ -33,10 +33,6 @@ namespace Moritz.Spec
             #endregion conditions
 
             _absMsPosition = absSeqMsPosition;
-            if(barlineMsPositionsReSeq != null)
-            {
-                _barlineMsPositionsReSeq = new List<int>(barlineMsPositionsReSeq);
-            }
 
             foreach(int channel in midiChannelIndexPerOutputVoice)
             {
@@ -63,59 +59,6 @@ namespace Moritz.Spec
             AssertSeqConsistency();
         }
 
-        /// <summary>
-        /// Throws an exception if the end barline already exists.
-        /// </summary>
-        public void AddEndBarline()
-        {
-            int finalBarlinePositionReSeq = MsDuration;
-            Debug.Assert(!_barlineMsPositionsReSeq.Contains(finalBarlinePositionReSeq));
-            _barlineMsPositionsReSeq.Add(finalBarlinePositionReSeq);
-        }
-
-        /// <summary>
-        /// Adds the barline at the nearest end msPosition of any IUniqueDef in the Seq.
-        /// Barlines can be added in any order. This function sorts _barlineMsPositionsReSeq into ascending order.
-        /// An exception is thrown either:
-        ///    1) if approxBarlinePositionReSeq is greater than the msDuration of the seq,
-        /// or 2) if an attempt is made to add a barline that already exists.
-        /// </summary>
-        public void AddBarline(int approxBarlinePositionReSeq)
-        {
-            #region conditions
-            Debug.Assert(approxBarlinePositionReSeq <= this.MsDuration);
-            #endregion conditions
-
-            int barlineMsPos = 0;
-            int diff = int.MaxValue;
-            foreach(Trk trk in this.Trks)
-            {
-                for(int uidIndex = trk.Count - 1; uidIndex >= 0; --uidIndex)
-                {
-                    int absPos = trk[uidIndex].MsPositionReFirstUD + trk[uidIndex].MsDuration;
-                    int localDiff = Math.Abs(approxBarlinePositionReSeq - absPos);
-                    if(localDiff < diff)
-                    {
-                        diff = localDiff;
-                        barlineMsPos = absPos;
-                    } 
-                    if(diff == 0)
-                    {
-                        break;
-                    }
-                }
-                if(diff == 0)
-                {
-                    break;
-                }
-            }
-
-            Debug.Assert(!_barlineMsPositionsReSeq.Contains(barlineMsPos));
-
-            _barlineMsPositionsReSeq.Add(barlineMsPos);
-            _barlineMsPositionsReSeq.Sort();
-        }
-
         public Seq Clone()
         {
             List<Trk> trks = new List<Trk>();
@@ -124,7 +67,7 @@ namespace Moritz.Spec
                 trks.Add(_trks[i].Clone());
             }
 
-            Seq clone = new Seq(_absMsPosition, trks, _barlineMsPositionsReSeq, MidiChannelIndexPerOutputVoice);
+            Seq clone = new Seq(_absMsPosition, trks, MidiChannelIndexPerOutputVoice);
 
             return clone;
         }
@@ -182,10 +125,6 @@ namespace Moritz.Spec
                     }
                     trk1.AddRange(trk2);
                 }
-            }
-            foreach(int barlineMsPosReSeq2 in seq2._barlineMsPositionsReSeq)
-            {
-                this._barlineMsPositionsReSeq.Add(barlineMsPosReSeq2 + absConcatMsPos);
             }
             #endregion
 
@@ -251,7 +190,6 @@ namespace Moritz.Spec
         /// <summary>
         /// Every Trk in _trks is either empty, or contains any combination of RestDef or MidiChordDef.
         /// There is always a trk having MsPositionReContainer == zero.
-        /// _barlineMsPositionsReSeq are in ascending order with no duplicates.
         /// </summary>
         private void AssertSeqConsistency()
         {
@@ -262,28 +200,6 @@ namespace Moritz.Spec
                 trk.AssertConstructionConsistency();
             }
             #endregion
-            #region _barlineMsPositionsReSeq are in ascending order with no duplicates.
-            int prevPos = -1;
-            foreach(int pos in _barlineMsPositionsReSeq)
-            {
-                Debug.Assert(pos > prevPos);
-                prevPos = pos;
-            }
-            if(prevPos > -1)
-            {
-                int maxBarlineMsPositionReSeq = prevPos;
-                bool error = true;
-                foreach(Trk trk in _trks)
-                {
-                    if((trk.MsPositionReContainer + trk.MsDuration) >= maxBarlineMsPositionReSeq)
-                    {
-                        error = false;
-                        break;
-                    }
-                }
-                Debug.Assert(error == false);
-            }
-            #endregion _barlineMsPositionsReSeq are in ascending order with no duplicates.
         }
 
         /// <summary>
@@ -514,11 +430,6 @@ namespace Moritz.Spec
         private List<Trk> _trks = new List<Trk>();
 
 		private int _absMsPosition;
-        public IReadOnlyList<int> BarlineMsPositionsReSeq
-        {
-            get { return _barlineMsPositionsReSeq.AsReadOnly(); }
-        }
-        private List<int> _barlineMsPositionsReSeq = new List<int>();
 
         public int AbsMsPosition
 		{	

@@ -47,12 +47,11 @@ namespace Moritz.Algorithm.Tombeau1
                 sys1Trks.Add(trk);
             }
 
-            Seq seq = new Seq(0, sys1Trks, null, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
-
-            seq.AddBarline(seq.Trks[0].UniqueDefs[6].MsPositionReFirstUD);
-            seq.AddBarline(seq.MsDuration);
-
+            Seq seq = new Seq(0, sys1Trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later
             Block block = new Block(seq);
+
+            block.AddBarline(block.Trks[0].UniqueDefs[6].MsPositionReFirstUD);
+            block.AddEndBarline();
 
             return block;
 

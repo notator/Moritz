@@ -14,7 +14,7 @@ namespace Moritz.Algorithm.Tombeau1
 	{
         private Block Bars1and2(List<List<Trk>> TTTrks)
         {
-            List<int> barlineMsPositionsReSeq = new List<int>();
+            List<int> barlineMsPositionsReBlock = new List<int>();
 
             int midiChannel = 1;
             Trk trk1a = GetChannelTrk(midiChannel++, TTTrks[0][0]);
@@ -30,7 +30,7 @@ namespace Moritz.Algorithm.Tombeau1
             trk0a.TransposeInGamut(8);
             trk0a.MsDuration = trk1a.MsDuration - (initialDelay / 2);
 
-            barlineMsPositionsReSeq.Add(trk1a.MsDuration);
+            barlineMsPositionsReBlock.Add(trk1a.MsDuration);
 
             Trk trk0b = trk0a.Clone();           
             ((MidiChordDef)trk0a[0]).PanMsbs = new List<byte>() { 0 };
@@ -46,11 +46,12 @@ namespace Moritz.Algorithm.Tombeau1
             trks.Add(trk0a);
             trks.Add(trk1a);
 
-            barlineMsPositionsReSeq.Add(trk1a.MsDuration);
+            barlineMsPositionsReBlock.Add(trk1a.MsDuration);
 
-            Seq bars1and2 = new Seq(0, trks, barlineMsPositionsReSeq, MidiChannelIndexPerOutputVoice);
+            Seq bars1and2 = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
 
             Block bars1and2Block = new Block(bars1and2);
+            bars1and2Block.AddBarlines(barlineMsPositionsReBlock);
 
             return bars1and2Block;
         }

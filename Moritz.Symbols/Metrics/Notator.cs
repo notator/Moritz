@@ -44,6 +44,8 @@ namespace Moritz.Symbols
             List<ClefChangeDef> voice0ClefChangeDefs = new List<ClefChangeDef>();
             List<ClefChangeDef> voice1ClefChangeDefs = new List<ClefChangeDef>();
 
+            List<string> currentClefPerStaffList = new List<string>(_pageFormat.ClefsList);
+
             int systemAbsMsPos = 0;
             for(int systemIndex = 0; systemIndex < systems.Count; ++systemIndex)
             {
@@ -67,8 +69,8 @@ namespace Moritz.Symbols
                         float musicFontHeight = (voice is OutputVoice) ? _pageFormat.MusicFontHeight : _pageFormat.MusicFontHeight * _pageFormat.InputStavesSizeFactor;
                         if(!(staff is HiddenOutputStaff))
                         {
-                            Debug.Assert(_pageFormat.ClefsList[visibleStaffIndex] != null);
-                            string clefType = _pageFormat.ClefsList[visibleStaffIndex];
+                            Debug.Assert(currentClefPerStaffList[visibleStaffIndex] != null);
+                            string clefType = currentClefPerStaffList[visibleStaffIndex];
                             #region A clef at the beginning of the first voiceDef (stipulated by the algorithm) must agree with the pageFormat clef.                           
                             if(voice.VoiceDef.UniqueDefs.Count > 0)
                             {
@@ -134,7 +136,7 @@ namespace Moritz.Symbols
                     if(voice0ClefChangeDefs.Count > 0 || voice1ClefChangeDefs.Count > 0)
                     {
                         // the main clef on this staff in the next system
-                        SetNextSystemClefType(staffIndex, voice0ClefChangeDefs, voice1ClefChangeDefs);
+                        SetNextSystemClefType(currentClefPerStaffList, staffIndex, voice0ClefChangeDefs, voice1ClefChangeDefs);
                     }
 
                     if(staff.Voices.Count == 2)
@@ -152,7 +154,7 @@ namespace Moritz.Symbols
             }
         }
 
-        private void SetNextSystemClefType(int staffIndex, List<ClefChangeDef> voice0ClefChangeDefs, List<ClefChangeDef> voice1ClefChangeDefs)
+        private void SetNextSystemClefType(List<string> currentClefPerStaffList, int staffIndex, List<ClefChangeDef> voice0ClefChangeDefs, List<ClefChangeDef> voice1ClefChangeDefs)
         {
             Debug.Assert(voice0ClefChangeDefs.Count > 0 || voice1ClefChangeDefs.Count > 0);
 
@@ -183,7 +185,7 @@ namespace Moritz.Symbols
                 }
             }
 
-            _pageFormat.ClefsList[staffIndex] = lastClefType;
+            currentClefPerStaffList[staffIndex] = lastClefType;
         }
 
         /// <summary>
@@ -308,41 +310,6 @@ namespace Moritz.Symbols
                 }
             }
             return currentMsPositionPerVoicePerStaff;
-        }
-
-        /// <summary>
-        /// Returns the clefType current at msPosition.
-        /// </summary>
-        private string GetClefType(int msPosition, SortedDictionary<int, string> clefTypesPerMsPos)
-        {
-            Debug.Assert(clefTypesPerMsPos.Count > 0 && clefTypesPerMsPos.ContainsKey(0));
-
-            string clefType = null;
-            if(clefTypesPerMsPos.Count == 1)
-            {
-                clefType = clefTypesPerMsPos[0];
-            }
-            else
-            {
-                List<int> keys = new List<int>(clefTypesPerMsPos.Keys);
-                if(msPosition >= keys[keys.Count - 1])
-                {
-                    clefType = clefTypesPerMsPos[keys[keys.Count - 1]];
-                }
-                else
-                {
-                    for(int i = 1; i < clefTypesPerMsPos.Count; ++i)
-                    {
-                        if(msPosition >= keys[i - 1] && msPosition < keys[i])
-                        {
-                            clefType = clefTypesPerMsPos[keys[i - 1]];
-                            break;
-                        }
-                    }
-                }
-            }
-
-            return clefType;
         }
 
         /// <summary>

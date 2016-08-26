@@ -1985,7 +1985,7 @@ namespace Moritz.Composer
             List<Palette> palettes = null;
             GetKrystalsAndPalettes(out krystals, out palettes);
             PageFormat pageFormat = GetPageFormat();
-            _algorithm.InitialClefs = pageFormat.ClefsList;
+            _algorithm.InitialClefs = GetCurrentClefPerStaffList(pageFormat.ClefsList, pageFormat.VisibleOutputVoiceIndicesPerStaff, pageFormat.VisibleInputVoiceIndicesPerStaff);
             ComposableScore score =
                 new KrystalPaletteScore(_scoreTitle,
                                         _algorithm,
@@ -2002,6 +2002,29 @@ namespace Moritz.Composer
                 // Opens the multi-page score in the program which is set by the system to open .svg files.
                 global::System.Diagnostics.Process.Start(score.FilePath);
             }
+        }
+
+        private List<string> GetCurrentClefPerStaffList(List<string> pageFormatClefsList, List<List<byte>> visibleOutputVoiceIndicesPerStaff, List<List<byte>> visibleInputVoiceIndicesPerStaff)
+        {
+            List<string> currentClefPerStaffList = new List<string>(pageFormatClefsList); // just so that the new list can be indexed.
+            int pageFormatClefsListIndex = 0;
+            for(int i = 0; i < visibleOutputVoiceIndicesPerStaff.Count; ++i)
+            {
+                List<byte> voiceIndices = visibleOutputVoiceIndicesPerStaff[i];
+                foreach(byte index in voiceIndices)
+                {
+                    currentClefPerStaffList[index] = pageFormatClefsList[pageFormatClefsListIndex++];
+                }
+            }
+            for(int i = 0; i < visibleInputVoiceIndicesPerStaff.Count; ++i)
+            {
+                List<byte> voiceIndices = visibleOutputVoiceIndicesPerStaff[i];
+                foreach(byte index in voiceIndices)
+                {
+                    currentClefPerStaffList[index] = pageFormatClefsList[pageFormatClefsListIndex++];
+                }
+            }
+            return currentClefPerStaffList;
         }
         private void GetKrystalsAndPalettes(out List<Krystal> krystals, out List<Palette> palettes)
         {
