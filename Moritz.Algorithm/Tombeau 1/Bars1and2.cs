@@ -12,7 +12,7 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-        private Seq Bars1and2(List<List<Trk>> TTTrks)
+        private Block Bars1and2(List<List<Trk>> TTTrks)
         {
             List<int> barlineMsPositionsReSeq = new List<int>();
 
@@ -50,7 +50,9 @@ namespace Moritz.Algorithm.Tombeau1
 
             Seq bars1and2 = new Seq(0, trks, barlineMsPositionsReSeq, MidiChannelIndexPerOutputVoice);
 
-            return bars1and2;
+            Block bars1and2Block = new Block(bars1and2);
+
+            return bars1and2Block;
         }
 
         private Trk GetChannelTrk(int midiChannel, Trk trkArg)

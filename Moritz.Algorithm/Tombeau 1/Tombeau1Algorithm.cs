@@ -352,14 +352,10 @@ namespace Moritz.Algorithm.Tombeau1
             Tombeau1Templates tombeau1Templates = new Tombeau1Templates(new List<Palette>() { palette });
             #endregion initialization
 
-            Seq mainSeq = new Seq(0, MidiChannelIndexPerOutputVoice);
-            mainSeq.SetInitialClefs(_initialClefs);
+            List<Block> blocks = new List<Block>();
 
-            Seq seq0 = Bars1and2(tombeau1Templates.Trks);
-            mainSeq.Concat(seq0);
-            Block mainBlock = new Block(mainSeq);
-
-            List<Block> blocksToAdd = new List<Block>();
+            Block bars1and2Block = Bars1and2(tombeau1Templates.Trks);
+            blocks.Add(bars1and2Block);
 
             #region commented out
             //#region test blocks
@@ -367,7 +363,7 @@ namespace Moritz.Algorithm.Tombeau1
             //blocks.Add(block1TestBlock); // 2 bars
 
             Block block2TestBlock = Block2TestBlock(tombeau1Templates.PitchWheelTestMidiChordDefs, tombeau1Templates.OrnamentTestMidiChordDefs);
-            blocksToAdd.Add(block2TestBlock);   // 2 bars
+            blocks.Add(block2TestBlock);   // 2 bars
 
             //Block velocityPerAbsolutePitchTestBlock = VelocityPerAbsolutePitchTestBlock();
             //blocks.Add(velocityPerAbsolutePitchTestBlock); // 2 bars (2 systems)
@@ -379,7 +375,7 @@ namespace Moritz.Algorithm.Tombeau1
             //blocks.Add(verticalVelocityGradientTestBlock); // 2 bars (2 systems)
 
             Block verticalVelocityColorsTestBlock = VerticalVelocityColorsTestBlock(tombeau1Templates.PaletteMidiChordDefs[0]);
-            blocksToAdd.Add(verticalVelocityColorsTestBlock); // 2 bars (1 system)
+            blocks.Add(verticalVelocityColorsTestBlock); // 2 bars (1 system)
 
             //Block timeWarpVVTestBlock = TimeWarpTestBlock(verticalVelocityColorsTestBlock);
             //blocks.Add(timeWarpVVTestBlock); // 4 bars (1 system)
@@ -397,9 +393,11 @@ namespace Moritz.Algorithm.Tombeau1
             #endregion commented out
 
             Block vpapBlock = VPAPBlock(tombeau1Templates.Trks);
-            blocksToAdd.Add(vpapBlock);   // 2 bars
+            blocks.Add(vpapBlock);   // 2 bars
 
-            foreach(Block block in blocksToAdd)
+            Block mainBlock = new Block(_initialClefs, MidiChannelIndexPerOutputVoice);
+
+            foreach(Block block in blocks)
             {
                 mainBlock.Concat(block);
             }

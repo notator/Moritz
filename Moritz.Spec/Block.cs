@@ -1,13 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Collections;
-using System.Collections.ObjectModel;
 
 namespace Moritz.Spec
 {
     public class Block : IVoiceDefContainer
     {
+        /// <summary>
+        /// A Block contains a list of VoiceDefs consisting of a group of Trks followed by InputVoiceDefs. (A Seq can only contain Trks.)
+        /// This constructor creates an empty Block (at absBlockMsPosition = 0), having one empty Trk per OutputVoice and
+        /// nInputVoiceDef empty InputVoiceDefs. The clefs at the beginnings of the Trks and InputVoiceDefs are set to those
+        /// in the initialClefs parameter.
+        /// </summary>
+        /// <param name="initialClefs">The clefs to set at the start of the Trks and InputVoiceDefs</param>
+        /// <param name="midiChannelIndexPerOutputVoice">The channels to be allocated to Trks.</param>
+        /// <param name="nInputVoices">(optional) The number of InputVoiceDefs to create.</param>
+        public Block(List<string> initialClefs, IReadOnlyList<int> midiChannelIndexPerOutputVoice, int nInputVoices = 0)
+        {
+            Debug.Assert(midiChannelIndexPerOutputVoice.Count > 0);
+            Debug.Assert(initialClefs.Count == (midiChannelIndexPerOutputVoice.Count + nInputVoices));
+
+            _absMsPosition = 0;
+
+            foreach(int channel in midiChannelIndexPerOutputVoice)
+            {
+                VoiceDef trk = new Trk(channel);
+                _voiceDefs.Add(trk);
+            }
+
+            for(int i = 0; i < nInputVoices; ++i)
+            {
+                VoiceDef inputVoiceDef = new InputVoiceDef(i);
+                _voiceDefs.Add(inputVoiceDef);
+            }
+
+            // set initial Clefs
+            for(int voiceDefIndex = 0; voiceDefIndex < _voiceDefs.Count; ++voiceDefIndex)
+            {
+                VoiceDef voiceDef = _voiceDefs[voiceDefIndex];
+                voiceDef.Add(new ClefChangeDef(initialClefs[voiceDefIndex], 0));
+            }
+        }
+
         /// <summary>
         /// A Block contains a list of voiceDefs, that can be of both kinds: Trks and InputVoiceDefs. A Seq can only contain Trks.
         /// This constructor converts its argument to a Block so, if the argument needs to be preserved, pass a clone.
@@ -45,7 +79,7 @@ namespace Moritz.Spec
                 BarlineMsPositionsReBlock = new List<int>(seq.BarlineMsPositionsReSeq);
             }
 
-            AssertBlockConsistency();
+            AssertNonEmptyBlockConsistency();
         }
 
         /// <summary>
@@ -103,7 +137,7 @@ namespace Moritz.Spec
                 vd1.Container = this;
             }
 
-            AssertBlockConsistency();
+            AssertNonEmptyBlockConsistency();
         }
 
         /// <summary>
@@ -146,7 +180,7 @@ namespace Moritz.Spec
         private List<VoiceDef> PopBar(int endBarlineAbsMsPosition)
         {
             Debug.Assert(AbsMsPosition < endBarlineAbsMsPosition);
-            AssertBlockConsistency();
+            AssertNonEmptyBlockConsistency();
 
             List<VoiceDef> poppedBar = new List<VoiceDef>();
             List<VoiceDef> remainingBar = new List<VoiceDef>();
@@ -243,7 +277,7 @@ namespace Moritz.Spec
             if(!isLastBar)
             {
                 // _voiceDefs is not empty
-                AssertBlockConsistency();
+                AssertNonEmptyBlockConsistency();
             }
 
             return poppedBar;
@@ -275,7 +309,7 @@ namespace Moritz.Spec
 
             Blockify();
 
-            AssertBlockConsistency();
+            AssertNonEmptyBlockConsistency();
         }
 
         /// <summary>
@@ -340,7 +374,7 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// A Block must fulfill the following criteria:
+        /// A non-empty Block must fulfill the following criteria:
         /// The Trks may contain any combination of RestDef, MidiChordDef, CautionaryChordDef and ClefChangeDef.
         /// The InputVoiceDefs may contain any combination of RestDef, InputChordDef, CautionaryChordDef and ClefChangeDef.
         /// <para>1. The first VoiceDef in a Block must be a Trk.</para>
@@ -354,7 +388,7 @@ namespace Moritz.Spec
         /// <para>9. If there are any barlines, the final barline may not be beyond the end of the block.</para>
         /// <para>10. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefChangeDef.</para>
         /// </summary> 
-        private void AssertBlockConsistency()
+        private void AssertNonEmptyBlockConsistency()
         {
             #region 1. The first VoiceDef in a Block must be a Trk.
             Debug.Assert(_voiceDefs[0] is Trk, "The first VoiceDef in a Block must be a Trk.");
@@ -486,7 +520,7 @@ namespace Moritz.Spec
         /// <param name="distortion"></param>
         public void TimeWarp(Envelope envelope, double distortion)
         {
-            AssertBlockConsistency();
+            AssertNonEmptyBlockConsistency();
             int originalMsDuration = MsDuration;
             List<int> originalMsPositions = GetMsPositions();
             Dictionary<int, int> warpDict = new Dictionary<int, int>();
@@ -525,7 +559,7 @@ namespace Moritz.Spec
                 BarlineMsPositionsReBlock[i] = warpDict[BarlineMsPositionsReBlock[i]];
             }
 
-            AssertBlockConsistency();
+            AssertNonEmptyBlockConsistency();
         }
 
         /// <summary>
@@ -612,7 +646,7 @@ namespace Moritz.Spec
             set
             {
                 Debug.Assert(_voiceDefs.Count > 0);
-                AssertBlockConsistency(); // all Trks and InputVoiceDefs have MsPositionReSeq == 0, and are the same length.
+                AssertNonEmptyBlockConsistency(); // all Trks and InputVoiceDefs have MsPositionReSeq == 0, and are the same length.
                 int currentDuration = MsDuration;
                 double factor = ((double)value) / currentDuration;
                 foreach(VoiceDef voiceDef in _voiceDefs)

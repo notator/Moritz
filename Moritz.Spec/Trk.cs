@@ -72,20 +72,20 @@ namespace Moritz.Spec
         {
             foreach(IUniqueDef iud in UniqueDefs)
             {
-                // In blocks, trks can also contain CautionaryChordDefs
+                // In blocks, trks can also contain ClefChangeDef and CautionaryChordDefs
                 Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is ClefChangeDef || iud is CautionaryChordDef);
             }
         }
 
         #region Add, Remove, Insert, Replace objects in the Trk
         /// <summary>
-        /// Appends the new MidiChordDef or RestDef or CautionaryChordDef to the end of the list.
+        /// Appends the new MidiChordDef, RestDef, CautionaryChordDef or ClefChangeDef to the end of the list.
         /// Automatically sets the iUniqueDef's msPosition.
         /// Used by Block.PopBar(...), so accepts a CautionaryChordDef argument.
         /// </summary>
         public override void Add(IUniqueDef iUniqueDef)
         {
-            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is RestDef || iUniqueDef is CautionaryChordDef);
+            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is RestDef || iUniqueDef is CautionaryChordDef || iUniqueDef is ClefChangeDef);
             _Add(iUniqueDef);
         }
         /// <summary>

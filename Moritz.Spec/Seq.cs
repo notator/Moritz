@@ -1,28 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 namespace Moritz.Spec
 {
 	public class Seq : IVoiceDefContainer
 	{
-        public Seq(int absSeqMsPosition, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
-        {
-            Debug.Assert(absSeqMsPosition >= 0);
-            _absMsPosition = absSeqMsPosition;
-
-            foreach(int channel in midiChannelIndexPerOutputVoice)
-            {
-                Trk trk = new Trk(channel);
-                _trks.Add(trk);
-            }
-            // No need to normalize here, all trk.MsPositionReContainer fields are already set to 0.
-
-            AssertChannelConsistency(midiChannelIndexPerOutputVoice);
-            AssertSeqConsistency();
-        }
-
         /// <summary>
         /// trks.Count must be less than or equal to midiChannelIndexPerOutputVoice.Count. (See trks parameter comment.)
         /// </summary>
@@ -78,27 +61,6 @@ namespace Moritz.Spec
 
             AssertChannelConsistency(midiChannelIndexPerOutputVoice);
             AssertSeqConsistency();
-        }
-
-        /// <summary>
-        /// Sets the clefs in order of Trk (top to bottom).
-        /// The clefs list count must be greater than or equal to the number of Trks.
-        /// (the list can also contain InputVoiceDef clefs).
-        /// Clefs that already exist at the beginning of a Trk are replaced.
-        /// </summary>
-        /// <param name="initialClefs"></param>
-        public void SetInitialClefs(List<string> initialClefs)
-        {
-            Debug.Assert(initialClefs.Count >= _trks.Count); // initialClefs can also contain InputVoiceDef clefs
-            for(int trkIndex = 0; trkIndex < _trks.Count; ++trkIndex)
-            {
-                Trk trk = _trks[trkIndex];
-                if(trk.UniqueDefs.Count > 0 && trk.UniqueDefs[0] is ClefChangeDef)
-                {
-                    trk.UniqueDefs.RemoveAt(0);
-                }
-                trk.Insert(0, new ClefChangeDef(initialClefs[trkIndex], 0));
-            }
         }
 
         /// <summary>
@@ -552,7 +514,7 @@ namespace Moritz.Spec
         private List<Trk> _trks = new List<Trk>();
 
 		private int _absMsPosition;
-        public ReadOnlyCollection<int> BarlineMsPositionsReSeq
+        public IReadOnlyList<int> BarlineMsPositionsReSeq
         {
             get { return _barlineMsPositionsReSeq.AsReadOnly(); }
         }
