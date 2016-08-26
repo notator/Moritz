@@ -14,52 +14,49 @@ namespace Moritz.Algorithm.Tombeau1
 	{
         private Block VerticalVelocityColorsTestBlock(List<MidiChordDef> paletteMidiChordDefs)
         {
-            return null;
-            //List<Trk> sys1Trks = new List<Trk>();
+            List<Trk> sys1Trks = new List<Trk>();
 
-            //List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(0, 0);
-            //Gamut gamut = new Gamut(absolutePitchHierarchy, 8);
-            //List<byte> velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(20, true);
+            List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(0, 0);
+            Gamut gamut = new Gamut(absolutePitchHierarchy, 8);
+            List<byte> velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(20, true);
 
-            //for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
-            //{
-            //    int chordDensity = 4;
-            //    List<MidiChordDef> mcds = paletteMidiChordDefs;
-            //    List<IUniqueDef> iuds = new List<IUniqueDef>();
-            //    int msPosReFirstUD = 0;
-            //    for(int j = 0; j < mcds.Count; ++j)
-            //    {
+            for(int i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
+            {
+                int chordDensity = 4;
+                List<MidiChordDef> mcds = paletteMidiChordDefs;
+                List<IUniqueDef> iuds = new List<IUniqueDef>();
+                int msPosReFirstUD = 0;
+                for(int j = 0; j < mcds.Count; ++j)
+                {
+                    MidiChordDef mcd = (MidiChordDef)mcds[j].Clone();
+                    mcd.MsPositionReFirstUD = msPosReFirstUD;
+                    msPosReFirstUD += mcd.MsDuration;
 
-            //        MidiChordDef mcd = (MidiChordDef) mcds[j].Clone();
-            //        mcd.MsPositionReFirstUD = msPosReFirstUD;
-            //        msPosReFirstUD += mcd.MsDuration;
+                    mcd.Transpose(i + j - 7);
+                    mcd.Lyric = (j).ToString() + "." + chordDensity.ToString();
 
-            //        mcd.Transpose(i + j - 7);
-            //        mcd.Lyric = (j).ToString() + "." + chordDensity.ToString();
+                    mcd.SetVerticalDensity(chordDensity);
 
-            //        mcd.SetVerticalDensity(chordDensity);
+                    //mcd.SetVerticalVelocityGradient(rootVelocities[j], topVelocities[j]);
 
-            //        //mcd.SetVerticalVelocityGradient(rootVelocities[j], topVelocities[j]);
+                    mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
 
-            //        mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+                    iuds.Add(mcd as IUniqueDef);
+                }
+                Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, iuds);
+                sys1Trks.Add(trk);
+            }
 
-            //        iuds.Add(mcd as IUniqueDef);
-            //    }
-            //    Trk trk = new Trk(MidiChannelIndexPerOutputVoice[i], 0, iuds);
-            //    sys1Trks.Add(trk);
-            //}
+            Seq seq = new Seq(0, sys1Trks, null, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
 
-            //Seq seq = new Seq(0, sys1Trks, MidiChannelIndexPerOutputVoice); // The Seq's MsPosition can change again later.
+            seq.AddBarline(seq.Trks[0].UniqueDefs[6].MsPositionReFirstUD);
+            seq.AddBarline(seq.MsDuration);
 
-            //List<int> barlineMsPositions = new List<int>();
-            //barlineMsPositions.Add(seq.Trks[0].UniqueDefs[3].MsPositionReFirstUD);
-            //barlineMsPositions.Add(seq.Trks[0].UniqueDefs[6].MsPositionReFirstUD);
-            //barlineMsPositions.Add(seq.Trks[0].UniqueDefs[9].MsPositionReFirstUD);
-            //barlineMsPositions.Add(seq.MsDuration);
+            Block block = new Block(seq);
 
-            //Block block = new Block(seq, barlineMsPositions);
+            return block;
 
-            //return block;
+            //return null;
         }
 
     }

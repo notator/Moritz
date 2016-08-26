@@ -174,7 +174,7 @@ namespace Moritz.Algorithm.Tombeau1
                 int rootNotatedPitch = gamut[gamut.Count / 2];
                 int nPitchesPerChord = 1;
                 int msDuration = 1000;
-                Envelope envelope = new Envelope(new List<byte>() { 0, 127 }, 127, 8, 4);
+                Envelope envelope = new Envelope(new List<byte>() { 0, 127 }, 127, 8, 7);
                 MidiChordDef mcd1 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 1, null);
                 iuds.Add(mcd1);
                 MidiChordDef mcd2 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 2, null);

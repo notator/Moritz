@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 namespace Moritz.Spec
@@ -551,9 +552,9 @@ namespace Moritz.Spec
         private List<Trk> _trks = new List<Trk>();
 
 		private int _absMsPosition;
-        public List<int> BarlineMsPositionsReSeq
+        public ReadOnlyCollection<int> BarlineMsPositionsReSeq
         {
-            get { return new List<int>(_barlineMsPositionsReSeq); }
+            get { return _barlineMsPositionsReSeq.AsReadOnly(); }
         }
         private List<int> _barlineMsPositionsReSeq = new List<int>();
 
