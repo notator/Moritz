@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicMidiChordDef.cs" />
+    <Compile Include="MainBlock.cs" />
     <Compile Include="Block.cs" />
     <Compile Include="CautionaryChordDef.cs" />
     <Compile Include="CCSettings.cs">

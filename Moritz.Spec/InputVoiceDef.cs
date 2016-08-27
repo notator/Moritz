@@ -79,7 +79,7 @@ namespace Moritz.Spec
         /// <param name="iUniqueDef"></param>
         public override void Add(IUniqueDef iud)
         {
-            Debug.Assert(iud is InputChordDef || iud is RestDef || iud is CautionaryChordDef);
+            Debug.Assert(iud is InputChordDef || iud is RestDef || iud is CautionaryChordDef || iud is ClefChangeDef);
             _Add(iud);
         }
         /// <summary>

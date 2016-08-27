@@ -5,6 +5,7 @@ using System.Diagnostics;
 using Krystals4ObjectLibrary;
 using Moritz.Palettes;
 using Moritz.Spec;
+using Moritz.Symbols;
 
 namespace Moritz.Algorithm
 {
@@ -156,7 +157,53 @@ namespace Moritz.Algorithm
         /// </summary>
         public abstract List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes);
 
-        public List<string> InitialClefs = null;
+        /// <summary>
+        /// Sets InitialClefPerChannel to contain a clef for every channel (=voiceDef).
+        /// Channels that will end up on a HiddenOutputStaff are also given a clef - even though it isn't going to be displayed.
+        /// </summary>
+        public void GetInitialClefPerChannel(PageFormat pageFormat)
+        {
+            List<string> pageFormatClefsList = pageFormat.ClefsList;
+            List<List<byte>> visibleOutputVoiceIndicesPerStaff = pageFormat.VisibleOutputVoiceIndicesPerStaff;
+            List<List<byte>> visibleInputVoiceIndicesPerStaff = pageFormat.VisibleInputVoiceIndicesPerStaff;
+
+            List<string> initialClefs = new List<string>();
+            #region fill initialClefs to the right length, just so that it can be indexed.
+            for(int i = 0; i < this.MidiChannelIndexPerOutputVoice.Count; ++i)
+            {
+                initialClefs.Add("t");
+            }
+            for(int i = 0; i < this.NumberOfInputVoices; ++i)
+            {
+                initialClefs.Add("t");
+            }
+            #endregion
+
+            int pageFormatClefsListIndex = 0;
+            for(int i = 0; i < visibleOutputVoiceIndicesPerStaff.Count; ++i)
+            {
+                List<byte> voiceIndices = visibleOutputVoiceIndicesPerStaff[i];
+                foreach(byte index in voiceIndices)
+                {
+                    initialClefs[index] = pageFormatClefsList[pageFormatClefsListIndex++];
+                }
+            }
+
+            int firstInputClefIndex = this.MidiChannelIndexPerOutputVoice.Count;
+            for(int i = 0; i < visibleInputVoiceIndicesPerStaff.Count; ++i)
+            {
+                List<byte> inputVoiceIndices = visibleInputVoiceIndicesPerStaff[i];
+                foreach(byte index in inputVoiceIndices)
+                {
+                    initialClefs[firstInputClefIndex + index] = pageFormatClefsList[pageFormatClefsListIndex++];
+                }
+            }
+            
+            InitialClefPerChannel = initialClefs;
+        }
+
+
+        public List<string> InitialClefPerChannel = null;
 
         protected List<Krystal> _krystals;
         protected List<Palette> _palettes;

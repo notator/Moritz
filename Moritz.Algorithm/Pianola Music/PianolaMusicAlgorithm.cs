@@ -34,7 +34,7 @@ namespace Moritz.Algorithm.PianolaMusic
             Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
             Block block = new Block(seq);
 
-            Block mainBlock = new Block(InitialClefs, MidiChannelIndexPerOutputVoice);
+            MainBlock mainBlock = new MainBlock(InitialClefPerChannel, MidiChannelIndexPerOutputVoice);
             mainBlock.Concat(block);
 
             double approxBarlength = ((double)trks[0].MsDuration / 8);

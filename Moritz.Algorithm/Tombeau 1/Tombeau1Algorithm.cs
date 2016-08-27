@@ -395,9 +395,7 @@ namespace Moritz.Algorithm.Tombeau1
             //#endregion test blocks
             #endregion commented out
 
-
-
-            Block mainBlock = new Block(InitialClefs, MidiChannelIndexPerOutputVoice);
+            MainBlock mainBlock = new MainBlock(InitialClefPerChannel, MidiChannelIndexPerOutputVoice);
 
             foreach(Block block in blocks)
             {

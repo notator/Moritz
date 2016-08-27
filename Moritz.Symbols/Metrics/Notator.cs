@@ -35,6 +35,8 @@ namespace Moritz.Symbols
 
         /// <summary>
         /// There is still one system per bar.
+        /// In each system, the staff list begins with HiddenOutputStaff objects (if any), followed by OutputStaff objects,
+        /// followed by InputStaff objects. InputStaffs are never hidden.
         /// </summary>
         /// <param name="systems"></param>
         public void ConvertVoiceDefsToNoteObjects(List<SvgSystem> systems)
@@ -44,7 +46,7 @@ namespace Moritz.Symbols
             List<ClefChangeDef> voice0ClefChangeDefs = new List<ClefChangeDef>();
             List<ClefChangeDef> voice1ClefChangeDefs = new List<ClefChangeDef>();
 
-            List<string> currentClefPerStaffList = new List<string>(_pageFormat.ClefsList);
+            List<string> currentClefPerVisibleStaffList = new List<string>(_pageFormat.ClefsList);
 
             int systemAbsMsPos = 0;
             for(int systemIndex = 0; systemIndex < systems.Count; ++systemIndex)
@@ -69,8 +71,8 @@ namespace Moritz.Symbols
                         float musicFontHeight = (voice is OutputVoice) ? _pageFormat.MusicFontHeight : _pageFormat.MusicFontHeight * _pageFormat.InputStavesSizeFactor;
                         if(!(staff is HiddenOutputStaff))
                         {
-                            Debug.Assert(currentClefPerStaffList[visibleStaffIndex] != null);
-                            string clefType = currentClefPerStaffList[visibleStaffIndex];
+                            Debug.Assert(currentClefPerVisibleStaffList[visibleStaffIndex] != null);
+                            string clefType = currentClefPerVisibleStaffList[visibleStaffIndex];
                             #region A clef at the beginning of the first voiceDef (stipulated by the algorithm) must agree with the pageFormat clef.                           
                             if(voice.VoiceDef.UniqueDefs.Count > 0)
                             {
@@ -133,10 +135,10 @@ namespace Moritz.Symbols
                         }
                     }
 
-                    if(voice0ClefChangeDefs.Count > 0 || voice1ClefChangeDefs.Count > 0)
+                    if(!(staff is HiddenOutputStaff) && (voice0ClefChangeDefs.Count > 0 || voice1ClefChangeDefs.Count > 0))
                     {
                         // the main clef on this staff in the next system
-                        SetNextSystemClefType(currentClefPerStaffList, staffIndex, voice0ClefChangeDefs, voice1ClefChangeDefs);
+                        SetNextSystemClefType(currentClefPerVisibleStaffList, visibleStaffIndex, staffIndex, voice0ClefChangeDefs, voice1ClefChangeDefs);
                     }
 
                     if(staff.Voices.Count == 2)
@@ -154,7 +156,7 @@ namespace Moritz.Symbols
             }
         }
 
-        private void SetNextSystemClefType(List<string> currentClefPerStaffList, int staffIndex, List<ClefChangeDef> voice0ClefChangeDefs, List<ClefChangeDef> voice1ClefChangeDefs)
+        private void SetNextSystemClefType(List<string> currentClefPerVisibleStaffList, int visibleStaffIndex, int staffIndex, List<ClefChangeDef> voice0ClefChangeDefs, List<ClefChangeDef> voice1ClefChangeDefs)
         {
             Debug.Assert(voice0ClefChangeDefs.Count > 0 || voice1ClefChangeDefs.Count > 0);
 
@@ -185,7 +187,7 @@ namespace Moritz.Symbols
                 }
             }
 
-            currentClefPerStaffList[staffIndex] = lastClefType;
+            currentClefPerVisibleStaffList[visibleStaffIndex] = lastClefType;
         }
 
         /// <summary>
