@@ -15,11 +15,11 @@ namespace Moritz.Algorithm.Tombeau1
         private Block VPAPBlock(List<List<Trk>> TTTrks)
         {
             Seq vpapSeq = VPAPBars(TTTrks);
-            Block vpapBlock = new Block(vpapSeq);
 
-            int blockMsDuration = vpapBlock.MsDuration;
-            vpapBlock.AddBarline(blockMsDuration / 2);
-            vpapBlock.AddBarline(blockMsDuration);
+            int seqMsDur = vpapSeq.MsDuration;
+            List<int> barlineMsPositions = new List<int>() { seqMsDur/2, seqMsDur};
+
+            Block vpapBlock = new Block(vpapSeq, barlineMsPositions);
 
             return vpapBlock;
         }

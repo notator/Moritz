@@ -17,7 +17,6 @@ namespace Moritz.Algorithm.Tombeau1
         {
 
             Block b2bar1 = GetBlock2BarFromMidiChordDefLists(pitchWheelMidiChordDefs);
-            b2bar1.AddEndBarline();
 
             Envelope envelope = new Envelope(new List<byte>() { 0, 127 }, 127, 127, 2);
 
@@ -26,7 +25,6 @@ namespace Moritz.Algorithm.Tombeau1
             Block b2bar2 = GetBlock2BarFromMidiChordDefLists(ornamentMidiChordDefs);
 
             b2bar2.SetPitchWheelSliders(envelope);
-            b2bar2.AddEndBarline();
 
             Block block1 = b2bar1;
             block1.Concat(b2bar2);
@@ -48,10 +46,9 @@ namespace Moritz.Algorithm.Tombeau1
             }
 
             Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
-            Block block = new Block(seq);
+            Block block = new Block(seq, new List<int>() { seq.MsDuration });
 
             return block;
-            //return null;
         }
 
         private List<IUniqueDef> GetBlock2OrderedMidiChordDefs(List<MidiChordDef> mcdList)

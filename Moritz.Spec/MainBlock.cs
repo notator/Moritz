@@ -211,30 +211,5 @@ namespace Moritz.Spec
             return poppedBar;
         }
 
-        /// <summary>
-        /// If an existing barline has no associated IUniqueDef in the inputVoiceDefs, it is moved to the nearest one.
-        /// </summary>
-        public void AdjustBarlinePositionsForInputVoices()
-        {
-            for(int bpIndex = 0; bpIndex < _barlineMsPositionsReBlock.Count; ++bpIndex)
-            {
-                int barlineMsPos = _barlineMsPositionsReBlock[bpIndex];
-                IUniqueDef closest = null;
-                int minDiff = int.MaxValue;
-                foreach(InputVoiceDef inputVoiceDef in this.InputVoiceDefs)
-                {
-                    foreach(IUniqueDef iud in inputVoiceDef.UniqueDefs)
-                    {
-                        int diff = Math.Abs(barlineMsPos - (iud.MsPositionReFirstUD + iud.MsDuration));
-                        if(diff < minDiff)
-                        {
-                            minDiff = diff;
-                            closest = iud;
-                        }
-                    }
-                }
-                _barlineMsPositionsReBlock[bpIndex] = closest.MsPositionReFirstUD + closest.MsDuration;
-            }
-        }
     }
 }

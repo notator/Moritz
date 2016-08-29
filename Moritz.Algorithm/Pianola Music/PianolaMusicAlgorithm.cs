@@ -32,17 +32,17 @@ namespace Moritz.Algorithm.PianolaMusic
 			Debug.Assert(trks.Count == MidiChannelIndexPerOutputVoice.Count);
 
             Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
-            List<Block> blockList = new List<Block>() { new Block(seq) };
-
-            MainBlock mainBlock = new MainBlock(InitialClefPerChannel, blockList);
-
-            double approxBarlength = ((double)trks[0].MsDuration / 8);
+            double approxBarMsDuration = ((double)seq.MsDuration / 8);
+            List<int> approxBarlineMsPositions = new List<int>();
             for(int barnumber = 1; barnumber < 9; ++barnumber)
             {
-                mainBlock.AddBarline((int)Math.Round(approxBarlength * barnumber));
+                approxBarlineMsPositions.Add((int)Math.Round(approxBarMsDuration * barnumber));
             }
+            Block block = new Block(seq, approxBarlineMsPositions);
 
-            List<List<VoiceDef>> bars = mainBlock.ConvertToBars();
+            MainBlock mainBlock = new MainBlock(InitialClefPerChannel, new List<Block>() { block });
+
+            List <List<VoiceDef>> bars = mainBlock.ConvertToBars();
 
             SetPatch0InAllChords(bars);
 

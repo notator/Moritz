@@ -50,8 +50,7 @@ namespace Moritz.Algorithm.Tombeau1
 
             Seq bars1and2 = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
 
-            Block bars1and2Block = new Block(bars1and2);
-            bars1and2Block.AddBarlines(barlineMsPositionsReBlock);
+            Block bars1and2Block = new Block(bars1and2, barlineMsPositionsReBlock);
 
             return bars1and2Block;
         }

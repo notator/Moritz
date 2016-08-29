@@ -22,7 +22,7 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="seq">Cannot be null, and must have Trks</param>
         /// <param name="inputVoiceDefs">This list can be null or empty</param>
-        public Block(Seq seq, List<InputVoiceDef> inputVoiceDefs = null)
+        public Block(Seq seq, IReadOnlyList<int> approxBarlineMsPositions, List<InputVoiceDef> inputVoiceDefs = null)
         {
             Debug.Assert(seq.IsNormalized);
 
@@ -50,6 +50,8 @@ namespace Moritz.Spec
                 voiceDef.Container = this;
             }
 
+            AddBarlines(approxBarlineMsPositions);
+
             AssertNonEmptyBlockConsistency();
         }
 
@@ -58,23 +60,21 @@ namespace Moritz.Spec
         /// </summary>
         public Block Clone()
         {
-            List<Trk> trks = new List<Trk>();
+            List<Trk> clonedTrks = new List<Trk>();
             List<int> midiChannelPerOutputVoice = new List<int>();
             foreach(Trk trk in Trks)
             {
                 Trk trkClone = trk.Clone();
-                trks.Add(trkClone);
+                clonedTrks.Add(trkClone);
                 midiChannelPerOutputVoice.Add(trk.MidiChannel);
             }
-            Seq seq = new Seq(this.AbsMsPosition, trks, midiChannelPerOutputVoice);
-            Block clone = new Block(seq);
-
+            Seq clonedSeq = new Seq(this.AbsMsPosition, clonedTrks, midiChannelPerOutputVoice);
+            List<InputVoiceDef> clonedInputVoiceDefs = new List<Spec.InputVoiceDef>();
             foreach(InputVoiceDef ivd in InputVoiceDefs)
             {
-                clone.AddInputVoice(ivd.Clone());
+                clonedInputVoiceDefs.Add(ivd.Clone());
             }
-
-            clone.AddBarlines(_barlineMsPositionsReBlock);
+            Block clone = new Block(clonedSeq, this.BarlineMsPositionsReBlock, clonedInputVoiceDefs);
 
             return clone;
         }
@@ -109,69 +109,105 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Throws an exception if the end barline already exists.
-        /// </summary>
-        public void AddEndBarline()
-        {
-            int finalBarlinePositionReBlock = MsDuration;
-            Debug.Assert(!_barlineMsPositionsReBlock.Contains(finalBarlinePositionReBlock));
-            _barlineMsPositionsReBlock.Add(finalBarlinePositionReBlock);
-        }
-
-        /// <summary>
-        /// Adds the barline at the nearest end msPosition of any IUniqueDef in the Block.
-        /// Barlines can be added in any order. This function sorts _barlineMsPositionsReBlock into ascending order.
+        /// Adds each barline at the nearest end msPosition of any IUniqueDef in the Block.
         /// An exception is thrown either:
         ///    1) if approxBarlinePositionReBlock is greater than the msDuration of the block,
         /// or 2) if an attempt is made to add a barline that already exists.
+        /// Barlines can be added in any order.
+        /// If an existing barline has no associated IUniqueDef in an inputVoiceDef, it is moved to the nearest one.
+        /// This function ends by sorting the block's _barlineMsPositionsReBlock into ascending order.
         /// </summary>
-        public void AddBarline(int approxBarlinePositionReBlock)
+        private void AddBarlines(IReadOnlyList<int> barlineMsPositionsReBlock)
         {
             #region conditions
-            Debug.Assert(approxBarlinePositionReBlock <= this.MsDuration);
+            int msDuration = this.MsDuration;
+            for(int i = 0; i < barlineMsPositionsReBlock.Count; ++i)
+            {
+                int msPosition = barlineMsPositionsReBlock[i];
+                Debug.Assert(msPosition <= this.MsDuration);
+                for(int j = i + 1; j < barlineMsPositionsReBlock.Count; ++j)
+                {
+                    Debug.Assert(msPosition != barlineMsPositionsReBlock[j], "Error: Duplicate barline msPositions.");
+                }
+            }
             #endregion conditions
 
-            int barlineMsPos = 0;
-            int diff = int.MaxValue;
-            foreach(VoiceDef voiceDef in this._voiceDefs)
+            foreach(int msPosition in barlineMsPositionsReBlock)
             {
-                for(int uidIndex = voiceDef.Count - 1; uidIndex >= 0; --uidIndex)
+                #region conditions
+                Debug.Assert(msPosition <= this.MsDuration);
+                #endregion conditions
+
+                int barlineMsPos = 0;
+                int diff = int.MaxValue;
+                foreach(VoiceDef voiceDef in this._voiceDefs)
                 {
-                    int absPos = voiceDef[uidIndex].MsPositionReFirstUD + voiceDef[uidIndex].MsDuration;
-                    int localDiff = Math.Abs(approxBarlinePositionReBlock - absPos);
-                    if(localDiff < diff)
+                    for(int uidIndex = voiceDef.Count - 1; uidIndex >= 0; --uidIndex)
                     {
-                        diff = localDiff;
-                        barlineMsPos = absPos;
+                        int absPos = voiceDef[uidIndex].MsPositionReFirstUD + voiceDef[uidIndex].MsDuration;
+                        int localDiff = Math.Abs(msPosition - absPos);
+                        if(localDiff < diff)
+                        {
+                            diff = localDiff;
+                            barlineMsPos = absPos;
+                        }
+                        if(diff == 0)
+                        {
+                            break;
+                        }
                     }
                     if(diff == 0)
                     {
                         break;
                     }
                 }
-                if(diff == 0)
-                {
-                    break;
-                }
+
+                Debug.Assert(!_barlineMsPositionsReBlock.Contains(barlineMsPos), "Error: Cannot add barline at duplicate position.");
+
+                _barlineMsPositionsReBlock.Add(barlineMsPos);
             }
 
-            Debug.Assert(!_barlineMsPositionsReBlock.Contains(barlineMsPos));
+            if(InputVoiceDefs != null && InputVoiceDefs.Count > 0)
+            {
+                AdjustBarlinePositionsForInputVoices();
+            }
 
-            _barlineMsPositionsReBlock.Add(barlineMsPos);
             _barlineMsPositionsReBlock.Sort();
         }
 
         /// <summary>
-        /// Calls AddBarline(msPosition).
-        /// Adds the barlines at the nearest end msPosition of any IUniqueDef in the Block.
-        /// The private list is sorted after adding the barline msPositions.
+        /// Barlines are moved to the end of the nearest existing IUniqueDef in the inputVoiceDefs.
+        /// If the position to which it would be moved is already occupied, it is simply removed.
         /// </summary>
-        public void AddBarlines(List<int> barlineMsPositionsReBlock)
+        private void AdjustBarlinePositionsForInputVoices()
         {
-            foreach(int msPosition in barlineMsPositionsReBlock)
+            List<int> newMsPositions = new List<int>();
+
+            for(int bpIndex = 0; bpIndex < _barlineMsPositionsReBlock.Count; ++bpIndex)
             {
-                AddBarline(msPosition);
+                int barlineMsPos = _barlineMsPositionsReBlock[bpIndex];
+                IUniqueDef closest = null;
+                int minDiff = int.MaxValue;
+                foreach(InputVoiceDef inputVoiceDef in this.InputVoiceDefs)
+                {
+                    foreach(IUniqueDef iud in inputVoiceDef.UniqueDefs)
+                    {
+                        int diff = Math.Abs(barlineMsPos - (iud.MsPositionReFirstUD + iud.MsDuration));
+                        if(diff < minDiff)
+                        {
+                            minDiff = diff;
+                            closest = iud;
+                        }
+                    }
+                }
+                int closestMsPosition = closest.MsPositionReFirstUD + closest.MsDuration;
+                if(!newMsPositions.Contains(closestMsPosition))
+                {
+                    newMsPositions.Add(closestMsPosition);
+                }
             }
+
+            _barlineMsPositionsReBlock = newMsPositions;
         }
 
         public void Concat(Block block2)
