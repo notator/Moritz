@@ -352,10 +352,10 @@ namespace Moritz.Algorithm.Tombeau1
             Tombeau1Templates tombeau1Templates = new Tombeau1Templates(new List<Palette>() { palette });
             #endregion initialization
 
-            List<Block> blocks = new List<Block>();
+            List<Block> blockList = new List<Block>();
 
             Block bars1and2Block = Bars1and2(tombeau1Templates.Trks);
-            blocks.Add(bars1and2Block);
+            blockList.Add(bars1and2Block);
 
             #region commented out
             //#region test blocks
@@ -363,7 +363,7 @@ namespace Moritz.Algorithm.Tombeau1
             //blocks.Add(block1TestBlock); // 2 bars
 
             Block block2TestBlock = Block2TestBlock(tombeau1Templates.PitchWheelTestMidiChordDefs, tombeau1Templates.OrnamentTestMidiChordDefs);
-            blocks.Add(block2TestBlock);   // 2 bars
+            blockList.Add(block2TestBlock);   // 2 bars
 
             //Block velocityPerAbsolutePitchTestBlock = VelocityPerAbsolutePitchTestBlock();
             //blocks.Add(velocityPerAbsolutePitchTestBlock); // 2 bars (2 systems)
@@ -375,10 +375,10 @@ namespace Moritz.Algorithm.Tombeau1
             //blocks.Add(verticalVelocityGradientTestBlock); // 2 bars (2 systems)
 
             Block vpapBlock = VPAPBlock(tombeau1Templates.Trks);
-            blocks.Add(vpapBlock);   // 2 bars
+            blockList.Add(vpapBlock);   // 2 bars
 
             Block verticalVelocityColorsTestBlock = VerticalVelocityColorsTestBlock(tombeau1Templates.PaletteMidiChordDefs[0]);
-            blocks.Add(verticalVelocityColorsTestBlock); // 2 bars (1 system)
+            blockList.Add(verticalVelocityColorsTestBlock); // 2 bars (1 system)
 
             //Block timeWarpVVTestBlock = TimeWarpTestBlock(verticalVelocityColorsTestBlock);
             //blocks.Add(timeWarpVVTestBlock); // 4 bars (1 system)
@@ -395,12 +395,7 @@ namespace Moritz.Algorithm.Tombeau1
             //#endregion test blocks
             #endregion commented out
 
-            MainBlock mainBlock = new MainBlock(InitialClefPerChannel, MidiChannelIndexPerOutputVoice);
-
-            foreach(Block block in blocks)
-            {
-                mainBlock.Concat(block);
-            }
+            MainBlock mainBlock = new MainBlock(InitialClefPerChannel, blockList);
 
             List<List<VoiceDef>> bars = mainBlock.ConvertToBars();
 

@@ -7,33 +7,64 @@ namespace Moritz.Spec
     public class MainBlock : Block
     {
         /// <summary>
-        /// A Block contains a list of VoiceDefs consisting of a group of Trks followed by InputVoiceDefs. (A Seq can only contain Trks.)
-        /// This constructor creates an empty Block (at absBlockMsPosition = 0), having one empty Trk per OutputVoice and
-        /// nInputVoiceDef empty InputVoiceDefs. The clefs at the beginnings of the Trks and InputVoiceDefs are set to those
-        /// in the initialClefs parameter.
+        /// A Block contains a list of VoiceDefs consisting of a group of Trks followed by InputVoiceDefs.
+        /// This constructor creates a MainBlock consisting of the concatenation of the Blocks in the argument blockList.
+        /// The initialClefs are set to the clefs in initialClefsPerChannel.
+        /// initialClefsPerChannel contains the clefs for the Trks followed by the clefs for the clefs for the InputVoiceDefs.
+        /// Note that initialClefsPerChannel contains a clef for each channel, regardless of whether it is going to be printed or not. 
+        /// The channels for both Trks and InputVoiceDefs are in ascending order. Their order from top to bottom in the score is determined later.
         /// </summary>
-        /// <param name="initialClefPerChannel">The clefs to set at the start of the Trks and InputVoiceDefs</param>
-        /// <param name="midiChannelIndexPerOutputVoice">The channels to be allocated to Trks.</param>
-        /// <param name="nInputVoices">(optional) The number of InputVoiceDefs to create.</param>
-        public MainBlock(List<string> initialClefPerChannel, IReadOnlyList<int> midiChannelIndexPerOutputVoice, int nInputVoices = 0)
+        /// <param name="initialClefPerChannel">The clefs to set at the start of each Trk followed by the clefs for each InputVoiceDef</param>
+        /// <param name="blockList">A list of Blocks that will be concatenated to become this MainBlock.</param>
+        public MainBlock(List<string> initialClefPerChannel, List<Block> blockList)
             : base()
         {
-            Debug.Assert(midiChannelIndexPerOutputVoice.Count > 0);
-            Debug.Assert(initialClefPerChannel.Count == (midiChannelIndexPerOutputVoice.Count + nInputVoices));
+            Debug.Assert(blockList != null && blockList.Count > 0);
 
-            foreach(int channel in midiChannelIndexPerOutputVoice)
+            Block block1 = blockList[0];
+            int nTrks = block1.Trks.Count; 
+            int nInputVoiceDefs = block1.InputVoiceDefs.Count;
+
+            #region conditions
+            Debug.Assert(initialClefPerChannel.Count == (nTrks + nInputVoiceDefs));
+            foreach(Block block in blockList)
             {
+                Debug.Assert(block.Trks.Count == nTrks);
+                Debug.Assert(block.InputVoiceDefs.Count == nInputVoiceDefs);
+                for(int trkIndex = 0; trkIndex < nTrks; ++trkIndex)
+                {
+                    // Achtung: Trk midiChannels are those defined in the algorithm's MidiChannelIndexPerOutputVoice.
+                    // The output channels must be in ascending oder, **_but_do_not_need_to_be_contiguous_**.
+                    // See comment at CompositionAlgorithm.MidiChannelIndexPerOutputVoice.
+                    Debug.Assert(block.Trks[trkIndex].MidiChannel == block1.Trks[trkIndex].MidiChannel);
+                }
+                for(int ivdIndex = 0; ivdIndex < nInputVoiceDefs; ++ivdIndex)
+                {
+                    // Input channels are in ascending order, starting at 0, and are contiguous.
+                    Debug.Assert(block.Trks[ivdIndex].MidiChannel == ivdIndex);
+                }
+            }
+            #endregion conditions
+
+            for(int i = 0; i < nTrks; ++i)
+            {
+                int channel = block1.Trks[i].MidiChannel;
                 VoiceDef trk = new Trk(channel);
                 trk.Add(new ClefChangeDef(initialClefPerChannel[channel], 0));
                 _voiceDefs.Add(trk);
             }
 
-            int inputVoiceIndex = midiChannelIndexPerOutputVoice.Count;
-            for(int i = 0; i < nInputVoices; ++i)
+            int inputVoiceIndex = Trks.Count;
+            for(int i = 0; i < nInputVoiceDefs; ++i)
             {
                 VoiceDef inputVoiceDef = new InputVoiceDef(i);
                 inputVoiceDef.Add(new ClefChangeDef(initialClefPerChannel[inputVoiceIndex++], 0));
                 _voiceDefs.Add(inputVoiceDef);
+            }
+
+            foreach(Block block in blockList)
+            {
+                this.Concat(block);
             }
         }
 

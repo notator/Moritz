@@ -77,9 +77,9 @@ namespace Moritz.Algorithm.Study3Sketch2
 
             List<InputVoiceDef> inputVoiceDefs = new List<InputVoiceDef>() { ivd };
 
-            MainBlock mainBlock = new MainBlock(InitialClefPerChannel, MidiChannelIndexPerOutputVoice, inputVoiceDefs.Count);
-            Block block = new Block(mainSeq, inputVoiceDefs);
-            mainBlock.Concat(block);
+            List<Block> blockList = new List<Block>() { new Block(mainSeq, inputVoiceDefs) };
+
+            MainBlock mainBlock = new MainBlock(InitialClefPerChannel, blockList);
 
             mainBlock.AddBarlines(barlineMsPositions);
             mainBlock.AdjustBarlinePositionsForInputVoices();

@@ -164,7 +164,7 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Every Trk.MidiChannel is unique and is parallel to the indices in midiChannelIndexPerOutputVoice.
+        /// Every Trk.MidiChannel is parallel to the indices in midiChannelIndexPerOutputVoice.
         /// </summary>
         private void AssertChannelConsistency(IReadOnlyList<int> midiChannelIndexPerOutputVoice)
         {
@@ -177,10 +177,6 @@ namespace Moritz.Spec
                 {
                     nTrks++;
                     Debug.Assert(trk.MidiChannel == midiChannelIndexPerOutputVoice[i], "All trk.MidiChannels must correspond.");
-                    for(int j = i + 1; j < _trks.Count; ++j)
-                    {
-                        Debug.Assert(trk.MidiChannel != _trks[j].MidiChannel, "All trk.MidiChannels must be unique.");
-                    }
                 }
             }
 

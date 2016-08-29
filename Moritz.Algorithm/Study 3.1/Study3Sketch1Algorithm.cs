@@ -46,10 +46,9 @@ namespace Moritz.Algorithm.Study3Sketch1
             Seq seq = bar1Seq;
             seq.Concat(bar2Seq);
             seq.Concat(bars345Seq);
-            Block block = new Block(seq);
+            List<Block> blockList = new List<Block>() { new Block(seq) };
 
-            MainBlock mainBlock = new MainBlock(InitialClefPerChannel, MidiChannelIndexPerOutputVoice);
-            mainBlock.Concat(block);
+            MainBlock mainBlock = new MainBlock(InitialClefPerChannel, blockList);
 
             mainBlock.AddBarlines(barlineMsPositions);
 

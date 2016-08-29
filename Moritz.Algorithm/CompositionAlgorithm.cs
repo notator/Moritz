@@ -36,26 +36,22 @@ namespace Moritz.Algorithm
                 throw new ApplicationException("CompositionAlgorithm: There can not be more than 16 output voices.");
 
             if(channelCount != MasterVolumePerOutputVoice.Count)
-                throw new ApplicationException("CompositionAlgorithm: Wrong number of master volumes"); 
+                throw new ApplicationException("CompositionAlgorithm: Wrong number of master volumes");
 
+            int previousChannelIndex = -1;
             for(int i = 0; i < channelCount; ++i)
             {
                 int channelIndex = MidiChannelIndexPerOutputVoice[i];
+                if(channelIndex <= previousChannelIndex)
+                    throw new ApplicationException("CompositionAlgorithm: midi channels must be unique and in ascending order (but need not be contiguous)!");
+                previousChannelIndex = channelIndex;
+
                 if(channelIndex < 0 || channelIndex > 15)
                     throw new ApplicationException("CompositionAlgorithm: midi channel out of range!");
 
                 int masterVolume = MasterVolumePerOutputVoice[i];
                 if(masterVolume < 0 || masterVolume > 127)
                     throw new ApplicationException("CompositionAlgorithm: master volume out of range!");
-
-                if(i < channelCount - 1)
-                {
-                    for(int j = i + 1; j < channelCount; ++j)
-                    {
-                        if(channelIndex == MidiChannelIndexPerOutputVoice[j])
-                            throw new ApplicationException("Output midi channels must be unique per output voice.");
-                    }
-                }
             }
 
             // Midi input devices are identified by their midi channel, so there may not be more than 16 of them.
@@ -87,12 +83,13 @@ namespace Moritz.Algorithm
         }
 
         /// <summary>
-        /// Returns the midi channel of each output voice in top to bottom order in the original algorithm.
-        /// The midi channels are usually in order, starting at 0, but this need not be the case.
-        /// This is so that the standard midi percussion channel (channelIndex 9) can be used.
-        /// These values are written once in the score (to each voice in the first system in the score).
-        /// These values must be in range [ 0..15 ].
+        /// Returns a midi channel for each output voice.
+        /// These midi channels must always be in ascending order, starting at 0.
+        /// Not every channel has to exist, so that the standard midi percussion channel (channelIndex 9) can be used or omitted.
+        /// These values must be in range [ 0..15 ] are written once to each voice in the score file (in the first system).
         /// A midi channel's voiceID (written into in the score, if there are input voices) is its position in this list.
+        /// The top to bottom printed order of the voices in the score (and whether the voices are printed at all) is determined by
+        /// a parameter in the .mkss file. 
         /// </summary>
         public abstract IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get; }
 
