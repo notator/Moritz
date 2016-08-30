@@ -354,19 +354,23 @@ namespace Moritz.Algorithm.Tombeau1
 
             List<Block> blockList = new List<Block>();
 
-            Block bars1and2Block = Bars1and2(tombeau1Templates.Trks);
+            Block bars1and2Block = StartBlock(tombeau1Templates.Trks);
             blockList.Add(bars1and2Block); // 2 bars
 
+            Block target1Block = Target1Block(tombeau1Templates.Trks);
+            blockList.Add(target1Block); // 2 bars
+
+            /************************************************/
+            Block vpapBlock = VPAPBlock(tombeau1Templates.Trks);
+            blockList.Add(vpapBlock);   // 2 bars
+
+            /************************************************/
+            #region test blocks
             Block block2TestBlock = Block2TestBlock(tombeau1Templates.PitchWheelTestMidiChordDefs, tombeau1Templates.OrnamentTestMidiChordDefs);
             blockList.Add(block2TestBlock);   // 2 bars
 
             Block verticalVelocityColorsTestBlock = VerticalVelocityColorsTestBlock(tombeau1Templates.PaletteMidiChordDefs[0]);
             blockList.Add(verticalVelocityColorsTestBlock); // 2 bars
-
-            Block vpapBlock = VPAPBlock(tombeau1Templates.Trks);
-            blockList.Add(vpapBlock);   // 2 bars
-
-            #region commented out
 
             Block velocityPerAbsolutePitchTestBlock = VelocityPerAbsolutePitchTestBlock();
             blockList.Add(velocityPerAbsolutePitchTestBlock); // 2 bars
@@ -383,13 +387,13 @@ namespace Moritz.Algorithm.Tombeau1
             Block trksTestBlock = TrksTestBlock(tombeau1Templates.PaletteMidiChordDefs[0]);
             blockList.Add(trksTestBlock); // 1 bar (1 system)
 
-            //Block simpleVelocityColorsTestBlock = SimpleVelocityColorsTestBlock();
-            //blockList.Add(simpleVelocityColorsTestBlock); // 1 bar
+            Block simpleVelocityColorsTestBlock = SimpleVelocityColorsTestBlock();
+            blockList.Add(simpleVelocityColorsTestBlock); // 1 bar
 
             //Block timeWarpSVTestBlock = TimeWarpTestBlock(simpleVelocityColorsTestBlock);
             //blockList.Add(timeWarpSVTestBlock); // 1 bar
 
-            #endregion commented out
+            #endregion test blocks
 
             MainBlock mainBlock = new MainBlock(InitialClefPerChannel, blockList);
 

@@ -12,12 +12,12 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-        private Block Bars1and2(List<List<Trk>> TTTrks)
+        private Block Target1Block(List<List<Trk>> TTTrks)
         {
             List<int> barlineMsPositionsReBlock = new List<int>();
 
             int midiChannel = 1;
-            Trk trk1a = GetChannelTrk(midiChannel++, TTTrks[0][0]);
+            Trk trk1a = Target1GetChannelTrk(midiChannel++, TTTrks[0][0]);
             trk1a.AdjustVelocitiesHairpin(0, trk1a.EndMsPositionReFirstIUD, 0.1, 1);
             MidiChordDef lastTrk0MidiChordDef = (MidiChordDef) trk1a[trk1a.Count - 1];
             lastTrk0MidiChordDef.BeamContinues = false;
@@ -48,14 +48,14 @@ namespace Moritz.Algorithm.Tombeau1
 
             barlineMsPositionsReBlock.Add(trk1a.MsDuration);
 
-            Seq bars1and2 = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
+            Seq target1Seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
 
-            Block bars1and2Block = new Block(bars1and2, barlineMsPositionsReBlock);
+            Block target1Block = new Block(target1Seq, barlineMsPositionsReBlock);
 
-            return bars1and2Block;
+            return target1Block;
         }
 
-        private Trk GetChannelTrk(int midiChannel, Trk trkArg)
+        private Trk Target1GetChannelTrk(int midiChannel, Trk trkArg)
         {
             Trk trk = trkArg.Clone();
             trk.MidiChannel = midiChannel;
