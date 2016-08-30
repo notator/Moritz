@@ -18,6 +18,7 @@ namespace Moritz.Algorithm.Tombeau1
             int chordDensity = 3;
 
             blocks.Add(VelocityPerAbsolutePitchTestBar(chordDensity, false, false));
+            blocks[0].Trks[2].InsertClefChange(0, "t");
             blocks.Add(VelocityPerAbsolutePitchTestBar(chordDensity, false, true));
 
             Block block = blocks[0];

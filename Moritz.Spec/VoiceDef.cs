@@ -178,16 +178,15 @@ namespace Moritz.Spec
                     lmcd.Lyric = index.ToString();
                 }
             }
-        }       
+        }
         /// <summary>
-        /// Clef changes in the same voiceDef must be added backwards so that the indices are correct.
-        /// Clef changes cannot be made at index 0. Change them in the previous system instead.
         /// If the index is equal to or greater than the number of chords, rests and clefChanges in the voiceDef,
         /// the ClefChange will be appended to the voiceDef.
-        /// Note that if a ClefChange is defined here on a RestDef which has no MidiChordDef
-        /// to its right on the staff, the resulting ClefSymbol will be placed immediately before the final barline
-        /// on the staff.  
-        /// The clefType must be one of the following strings "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"
+        /// Notes: 1) When changing clefs more than once in the same VoiceDef, it is easier to get the indices right if
+        ///           they are added backwards.
+        ///        2) if a ClefChange is defined here on a RestDef which has no MidiChordDef to its right on the staff,
+        ///           the resulting ClefSymbol will be placed immediately before the final barline on the staff.  
+        ///        3) The clefType must be one of the following strings "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"
         /// </summary>
         public void InsertClefChange(int index, string clefType)
         {
