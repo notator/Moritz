@@ -24,6 +24,12 @@ namespace Moritz.Spec
         /// <param name="inputVoiceDefs">This list can be null or empty</param>
         public Block(Seq seq, IReadOnlyList<int> approxBarlineMsPositions, List<InputVoiceDef> inputVoiceDefs = null)
         {
+            FinalizeBlock(seq, approxBarlineMsPositions, inputVoiceDefs);
+        }
+
+        // Also called by other, specialised Block constructors
+        protected void FinalizeBlock(Seq seq, IReadOnlyList<int> approxBarlineMsPositions, List<InputVoiceDef> inputVoiceDefs = null)
+        {
             Debug.Assert(seq.IsNormalized);
 
             AbsMsPosition = seq.AbsMsPosition;

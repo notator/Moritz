@@ -354,10 +354,10 @@ namespace Moritz.Algorithm.Tombeau1
 
             List<Block> blockList = new List<Block>();
 
-            Block bars1and2Block = StartBlock(tombeau1Templates.Trks);
-            blockList.Add(bars1and2Block); // 2 bars
+            Block startBlock = new StartBlock(tombeau1Templates.Trks, MidiChannelIndexPerOutputVoice);
+            blockList.Add(startBlock); // 2 bars
 
-            Block target1Block = Target1Block(tombeau1Templates.Trks);
+            Block target1Block = new Target1Block(tombeau1Templates.Trks, MidiChannelIndexPerOutputVoice);
             blockList.Add(target1Block); // 2 bars
 
             /************************************************/

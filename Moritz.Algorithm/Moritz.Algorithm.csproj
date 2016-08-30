@@ -46,8 +46,8 @@
     <Compile Include="Study 2\Study2Algorithm.cs" />
     <Compile Include="Study 3.1\Study3Sketch1Algorithm.cs" />
     <Compile Include="Study 3.2\Study3Sketch2Algorithm.cs" />
-    <Compile Include="Tombeau 1\StartBlock.cs" />
     <Compile Include="Tombeau 1\Target1Block.cs" />
+    <Compile Include="Tombeau 1\StartBlock.cs" />
     <Compile Include="Tombeau 1\VPAPBlock.cs" />
     <Compile Include="Tombeau 1\Block2TestBlock.cs" />
     <Compile Include="Tombeau 1\Tombeau1Templates.cs" />

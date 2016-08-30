@@ -10,14 +10,15 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-	public partial class Tombeau1Algorithm : CompositionAlgorithm
+	public class StartBlock : Block
 	{
-        private Block StartBlock(List<List<Trk>> TTTrks)
+        public StartBlock(List<List<Trk>> TTTrks, IReadOnlyList<int> MidiChannelIndexPerOutputVoice)
+            : base()
         {
             List<int> barlineMsPositionsReBlock = new List<int>();
 
             int midiChannel = 1;
-            Trk trk1a = StartBlockGetChannelTrk(midiChannel++, TTTrks[0][0]);
+            Trk trk1a = GetChannelTrk(midiChannel++, TTTrks[0][0]);
             trk1a.AdjustVelocitiesHairpin(0, trk1a.EndMsPositionReFirstIUD, 0.1, 1);
             MidiChordDef lastTrk0MidiChordDef = (MidiChordDef) trk1a[trk1a.Count - 1];
             lastTrk0MidiChordDef.BeamContinues = false;
@@ -50,12 +51,10 @@ namespace Moritz.Algorithm.Tombeau1
 
             Seq startSeq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
 
-            Block startBlock = new Block(startSeq, barlineMsPositionsReBlock);
-
-            return startBlock;
+            FinalizeBlock(startSeq, barlineMsPositionsReBlock);
         }
 
-        private Trk StartBlockGetChannelTrk(int midiChannel, Trk trkArg)
+        private Trk GetChannelTrk(int midiChannel, Trk trkArg)
         {
             Trk trk = trkArg.Clone();
             trk.MidiChannel = midiChannel;
