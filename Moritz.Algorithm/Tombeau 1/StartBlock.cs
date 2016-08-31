@@ -10,48 +10,48 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-	public class StartBlock : Block
+	public class StartBlock : Tombeau1Block
 	{
-        public StartBlock(List<List<Trk>> TTTrks, IReadOnlyList<int> MidiChannelIndexPerOutputVoice)
-            : base()
+        public StartBlock(BlockArgs blockArgs)
+            : base(blockArgs.CommonArgs)
         {
-            List<int> barlineMsPositionsReBlock = new List<int>();
+            int blockMsDuration = blockArgs.BlockMsDuration;
+            int trk0InitialDelay = blockArgs.Trk0InitialDelay;
+            Trk template = blockArgs.Template.Clone();
+
+            List<int> _barlineMsPositionsReSeq = new List<int>();
 
             int midiChannel = 1;
-            Trk trk1a = GetChannelTrk(midiChannel++, TTTrks[0][0]);
+            Trk trk1a = GetChannelTrk(midiChannel++, template);
             trk1a.AdjustVelocitiesHairpin(0, trk1a.EndMsPositionReFirstIUD, 0.1, 1);
-            MidiChordDef lastTrk0MidiChordDef = (MidiChordDef) trk1a[trk1a.Count - 1];
+            MidiChordDef lastTrk0MidiChordDef = (MidiChordDef)trk1a[trk1a.Count - 1];
             lastTrk0MidiChordDef.BeamContinues = false;
 
-            Gamut gamut = ((MidiChordDef)trk1a[0]).Gamut;
-
-            int initialDelay = 1500;
             Trk trk0a = trk1a.Clone();
             trk0a.MidiChannel = 0; // N.B. midichannel constructed out of order.
             trk0a.TransposeInGamut(8);
-            trk0a.MsDuration = trk1a.MsDuration - (initialDelay / 2);
 
-            barlineMsPositionsReBlock.Add(trk1a.MsDuration);
-
-            Trk trk0b = trk0a.Clone();           
+            trk0a.AddRange(trk0a.Clone());
+            trk0a.MsDuration = blockMsDuration - trk0InitialDelay;
             ((MidiChordDef)trk0a[0]).PanMsbs = new List<byte>() { 0 };
-            trk0a.Insert(0, new RestDef(0, initialDelay));
+            trk0a.Insert(0, new RestDef(0, trk0InitialDelay));
 
             Trk trk1b = trk1a.Clone();
-            ((MidiChordDef)trk1a[0]).PanMsbs = new List<byte>() { 127 };
-
-            trk0a.AddRange(trk0b);
             trk1a.AddRange(trk1b);
+            trk1a.MsDuration = blockMsDuration;
+            ((MidiChordDef)trk1a[0]).PanMsbs = new List<byte>() { 127 };
 
             List<Trk> trks = new List<Trk>();
             trks.Add(trk0a);
             trks.Add(trk1a);
 
-            barlineMsPositionsReBlock.Add(trk1a.MsDuration);
+            _barlineMsPositionsReSeq.Add(blockMsDuration / 2);
+            _barlineMsPositionsReSeq.Add(blockMsDuration);
 
-            Seq startSeq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
+            Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
 
-            FinalizeBlock(startSeq, barlineMsPositionsReBlock);
+            FinalizeBlock(seq, _barlineMsPositionsReSeq);
+
         }
 
         private Trk GetChannelTrk(int midiChannel, Trk trkArg)
