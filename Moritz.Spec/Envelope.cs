@@ -22,7 +22,7 @@ namespace Moritz.Spec
         /// <param name="inputDomain">Greater than or equal to 0</param>
         /// <param name="domain">Greater than or equal to 0</param>
         /// <param name="count">Greater than 0</param>
-        public Envelope(List<byte> inputValues, int inputDomain, int domain, int count)
+        public Envelope(IReadOnlyList<byte> inputValues, int inputDomain, int domain, int count)
         {
             #region conditions
             List<int> inputBytesAsInts = new List<int>();

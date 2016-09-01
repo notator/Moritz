@@ -353,11 +353,11 @@ namespace Moritz.Algorithm.Tombeau1
             CommonArgs commonArgs = new CommonArgs(tombeau1Templates, MidiChannelIndexPerOutputVoice);
             #endregion initialization
 
-            AddType1Block(commonArgs, 13000, commonArgs.Templates.Trks[0][0], 1500);
-            AddType1Block(commonArgs, 13000, commonArgs.Templates.Trks[0][1], 153);
+            AddType1Block(commonArgs, 13000, commonArgs.TemplateTrks[0], 1500);
+            AddType1Block(commonArgs, 13000, commonArgs.TemplateTrks[1], 153);
 
             /************************************************/
-            Block vpapBlock = VPAPBlock(commonArgs.Templates.Trks);
+            Block vpapBlock = VPAPBlock(commonArgs.TemplateTrks[1]);
             commonArgs.BlockList.Add(vpapBlock);   // 2 bars
 
             /************************************************/

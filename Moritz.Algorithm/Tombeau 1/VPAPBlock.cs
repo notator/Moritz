@@ -12,9 +12,9 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-        private Block VPAPBlock(IReadOnlyList<IReadOnlyList<Trk>> templates)
+        private Block VPAPBlock(Trk templateTrk)
         {
-            Seq vpapSeq = VPAPBars(templates);
+            Seq vpapSeq = VPAPBars(templateTrk);
 
             int seqMsDur = vpapSeq.MsDuration;
             List<int> barlineMsPositions = new List<int>() { seqMsDur/2, seqMsDur};
@@ -24,9 +24,9 @@ namespace Moritz.Algorithm.Tombeau1
             return vpapBlock;
         }
 
-        private Seq VPAPBars(IReadOnlyList<IReadOnlyList<Trk>> templates)
+        private Seq VPAPBars(Trk templateTrk)
         {
-            Trk vpapTrka = GetVPAPChannelTrk(2, templates[0][1]);
+            Trk vpapTrka = GetVPAPChannelTrk(2, templateTrk);
             Gamut gamut = ((MidiChordDef)vpapTrka[0]).Gamut;
 
             vpapTrka.AdjustVelocitiesHairpin(0, vpapTrka.EndMsPositionReFirstIUD, 1, 0.1);

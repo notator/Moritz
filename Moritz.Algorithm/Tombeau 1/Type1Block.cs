@@ -12,15 +12,13 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public class Type1Block : Tombeau1Block
 	{
-        public Type1Block(CommonArgs commonArgs, int blockMsDuration, Trk templateArg, int trk0InitialDelay)
+        public Type1Block(CommonArgs commonArgs, int blockMsDuration, Trk templateTrk, int trk0InitialDelay)
             : base(commonArgs)
         {
-            Trk template = templateArg.Clone();
-
             List<int> _barlineMsPositionsReSeq = new List<int>();
 
             int midiChannel = 1;
-            Trk trk1a = GetChannelTrk(midiChannel++, template);
+            Trk trk1a = GetChannelTrk(midiChannel++, templateTrk);
             trk1a.AdjustVelocitiesHairpin(0, trk1a.EndMsPositionReFirstIUD, 0.1, 1);
             MidiChordDef lastTrk0MidiChordDef = (MidiChordDef)trk1a[trk1a.Count - 1];
             lastTrk0MidiChordDef.BeamContinues = false;
@@ -49,7 +47,6 @@ namespace Moritz.Algorithm.Tombeau1
             Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
 
             FinalizeBlock(seq, _barlineMsPositionsReSeq);
-
         }
 
         private Trk GetChannelTrk(int midiChannel, Trk trkArg)
