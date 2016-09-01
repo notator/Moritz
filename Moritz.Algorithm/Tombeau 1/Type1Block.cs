@@ -10,14 +10,12 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-	public class StartBlock : Tombeau1Block
+	public class Type1Block : Tombeau1Block
 	{
-        public StartBlock(BlockArgs blockArgs)
-            : base(blockArgs.CommonArgs)
+        public Type1Block(CommonArgs commonArgs, int blockMsDuration, Trk templateArg, int trk0InitialDelay)
+            : base(commonArgs)
         {
-            int blockMsDuration = blockArgs.BlockMsDuration;
-            int trk0InitialDelay = blockArgs.Trk0InitialDelay;
-            Trk template = blockArgs.Template.Clone();
+            Trk template = templateArg.Clone();
 
             List<int> _barlineMsPositionsReSeq = new List<int>();
 
