@@ -49,7 +49,6 @@
     <Compile Include="Tombeau 1\Type1Block.cs" />
     <Compile Include="Tombeau 1\VPAPBlock.cs" />
     <Compile Include="Tombeau 1\Block2TestBlock.cs" />
-    <Compile Include="Tombeau 1\Tombeau1Factory.cs" />
     <Compile Include="Tombeau 1\GamutTestBlock.cs" />
     <Compile Include="Tombeau 1\VerticalVelocityGradientTestBlock.cs" />
     <Compile Include="Tombeau 1\VelocityPerAbsolutePitchTestBlock.cs" />

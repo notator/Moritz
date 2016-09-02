@@ -1,24 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-
-using Krystals4ObjectLibrary;
-
-using Moritz.Globals;
-using Moritz.Palettes;
+﻿using System.Collections.Generic;
 using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-	public class Type1Block : Block
+    public class Type1Block : Block
 	{
-        public Type1Block(Tombeau1Factory factory, int blockMsDuration, int type1TemplateTrkIndex, int trk0InitialDelay)
+        public Type1Block(int blockMsDuration, Trk type1TemplateTrk, int trk0InitialDelay, IReadOnlyList<int> MidiChannelIndexPerOutputVoice)
             : base()
         {
             List<int> barlineMsPositionsReBlock = new List<int>();
 
             int midiChannel = 1;
-            Trk trk1a = GetChannelTrk(midiChannel++, factory.Type1TemplateTrks[type1TemplateTrkIndex]);
+            Trk trk1a = GetChannelTrk(midiChannel++, type1TemplateTrk);
             trk1a.AdjustVelocitiesHairpin(0, trk1a.EndMsPositionReFirstIUD, 0.1, 1);
             MidiChordDef lastTrk0MidiChordDef = (MidiChordDef)trk1a[trk1a.Count - 1];
             lastTrk0MidiChordDef.BeamContinues = false;
@@ -47,7 +40,7 @@ namespace Moritz.Algorithm.Tombeau1
             barlineMsPositionsReBlock.Add(blockMsDuration / 2);
             barlineMsPositionsReBlock.Add(blockMsDuration);
 
-            Seq seq = new Seq(0, trks, factory.MidiChannelIndexPerOutputVoice);
+            Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
 
             FinalizeBlock(seq, barlineMsPositionsReBlock);
         }
