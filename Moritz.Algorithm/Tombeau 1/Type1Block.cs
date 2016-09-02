@@ -10,15 +10,15 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-	public class Type1Block : Tombeau1Block
+	public class Type1Block : Block
 	{
-        public Type1Block(CommonArgs commonArgs, int blockMsDuration, Trk templateTrk, int trk0InitialDelay)
-            : base(commonArgs)
+        public Type1Block(Tombeau1Factory factory, int blockMsDuration, int type1TemplateTrkIndex, int trk0InitialDelay)
+            : base()
         {
-            List<int> _barlineMsPositionsReSeq = new List<int>();
+            List<int> barlineMsPositionsReBlock = new List<int>();
 
             int midiChannel = 1;
-            Trk trk1a = GetChannelTrk(midiChannel++, templateTrk);
+            Trk trk1a = GetChannelTrk(midiChannel++, factory.Type1TemplateTrks[type1TemplateTrkIndex]);
             trk1a.AdjustVelocitiesHairpin(0, trk1a.EndMsPositionReFirstIUD, 0.1, 1);
             MidiChordDef lastTrk0MidiChordDef = (MidiChordDef)trk1a[trk1a.Count - 1];
             lastTrk0MidiChordDef.BeamContinues = false;
@@ -30,7 +30,10 @@ namespace Moritz.Algorithm.Tombeau1
             trk0a.AddRange(trk0a.Clone());
             trk0a.MsDuration = blockMsDuration - trk0InitialDelay;
             ((MidiChordDef)trk0a[0]).PanMsbs = new List<byte>() { 0 };
-            trk0a.Insert(0, new RestDef(0, trk0InitialDelay));
+            if(trk0InitialDelay > 0)
+            {
+                trk0a.Insert(0, new RestDef(0, trk0InitialDelay));
+            }
 
             Trk trk1b = trk1a.Clone();
             trk1a.AddRange(trk1b);
@@ -41,12 +44,12 @@ namespace Moritz.Algorithm.Tombeau1
             trks.Add(trk0a);
             trks.Add(trk1a);
 
-            _barlineMsPositionsReSeq.Add(blockMsDuration / 2);
-            _barlineMsPositionsReSeq.Add(blockMsDuration);
+            barlineMsPositionsReBlock.Add(blockMsDuration / 2);
+            barlineMsPositionsReBlock.Add(blockMsDuration);
 
-            Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
+            Seq seq = new Seq(0, trks, factory.MidiChannelIndexPerOutputVoice);
 
-            FinalizeBlock(seq, _barlineMsPositionsReSeq);
+            FinalizeBlock(seq, barlineMsPositionsReBlock);
         }
 
         private Trk GetChannelTrk(int midiChannel, Trk trkArg)

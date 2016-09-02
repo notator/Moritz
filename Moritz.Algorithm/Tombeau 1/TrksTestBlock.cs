@@ -12,13 +12,13 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-        private Block TrksTestBlock(List<MidiChordDef> paletteMidiChordDefs)
+        private Block TrksTestBlock(IReadOnlyList<MidiChordDef> paletteMidiChordDefs)
         {
             List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(0, 5);
             Gamut gamut = new Gamut(absolutePitchHierarchy, 8);
             List<byte> velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(20, true);
 
-            List<MidiChordDef> mcds = paletteMidiChordDefs; // a clone
+            IReadOnlyList<MidiChordDef> mcds = paletteMidiChordDefs;
 
             List<Trk> trkList = new List<Trk>();
 

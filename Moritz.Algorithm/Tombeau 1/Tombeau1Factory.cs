@@ -10,16 +10,21 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-    public class Tombeau1Templates
+    public class Tombeau1Factory
     {
         /// <summary>
         /// Sets up the standard MidiChordDefs, Trks etc. that will be used in the composition.
         /// </summary>
-        public Tombeau1Templates(List<Palette> paletteList)
+        public Tombeau1Factory(List<Palette> paletteList, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
         {
+            MidiChannelIndexPerOutputVoice = midiChannelIndexPerOutputVoice;
+
             SetPaletteMidiChordDefs(paletteList);
             SetPitchWheelTestMidiChordDefs();
             SetOrnamentTestMidiChordDefs();
+
+            SetType1TemplateTrks();
+            // maybe define other template trk types, and add them here.
         }
 
         #region constructor helper functions
@@ -31,6 +36,21 @@ namespace Moritz.Algorithm.Tombeau1
                 _paletteMidiChordDefs.Add(GetPaletteMidiChordDefs(palette));
             }
         }
+        /// <summary>
+        /// A list of the MidiChordDefs defined in the palette.
+        /// </summary>
+        private List<MidiChordDef> GetPaletteMidiChordDefs(Palette palette)
+        {
+            List<MidiChordDef> midiChordDefs = new List<MidiChordDef>();
+            for(int i = 0; i < palette.Count; ++i)
+            {
+                IUniqueDef iud = palette.UniqueDurationDef(i);
+                Debug.Assert(iud is MidiChordDef);
+                midiChordDefs.Add(iud as MidiChordDef);
+            }
+            return midiChordDefs;
+        }
+
         private void SetPitchWheelTestMidiChordDefs()
         {
             foreach(List<List<byte>> envList in _envelopeShapes)
@@ -50,6 +70,7 @@ namespace Moritz.Algorithm.Tombeau1
             }
             return rval;
         }
+
         private void SetOrnamentTestMidiChordDefs()
         {
             int relativePitchHierarchyIndex = 0;
@@ -89,25 +110,16 @@ namespace Moritz.Algorithm.Tombeau1
             }
             return rval;
         }
-        #endregion constructor helper functions
 
-
-        /// <summary>
-        /// A list of the MidiChordDefs defined in the palette.
-        /// </summary>
-        private List<MidiChordDef> GetPaletteMidiChordDefs(Palette palette)
+        private void SetType1TemplateTrks()
         {
-            List<MidiChordDef> midiChordDefs = new List<MidiChordDef>();
-            for(int i = 0; i < palette.Count; ++i)
-            {
-                IUniqueDef iud = palette.UniqueDurationDef(i);
-                Debug.Assert(iud is MidiChordDef);
-                midiChordDefs.Add(iud as MidiChordDef);
-            }
-            return midiChordDefs;
+            Trk templateTrk0 = GetType1TemplateTrk(4, 0, 9, new List<byte>() { 0, 127 }, 7);
+            _type1TemplateTrks.Add(templateTrk0);
+            Trk templateTrk1 = GetType1TemplateTrk(6, 6, 9, new List<byte>() { 0, 127 }, 7);
+            // maybe add more type1 template trks here.
+            _type1TemplateTrks.Add(templateTrk1);
         }
-
-        public Trk GetTrk(int relativePitchHierarchyIndex, int rootPitch, int nPitchesPerOctave, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
+        private Trk GetType1TemplateTrk(int relativePitchHierarchyIndex, int rootPitch, int nPitchesPerOctave, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
         {
             List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, rootPitch);
             Gamut gamut = new Gamut(absolutePitchHierarchy, nPitchesPerOctave);
@@ -134,11 +146,23 @@ namespace Moritz.Algorithm.Tombeau1
 
             return trk0;
         }
+        #endregion constructor helper functions
+
+        public void AddType1Block(List<Block> blockList, int blockMsDuration, int type1TemplateTrkIndex, int trk0InitialDelay)
+        {
+            Debug.Assert(blockList != null && blockMsDuration > 0 && type1TemplateTrkIndex >= 0 && trk0InitialDelay >= 0);
+
+            Type1Block type1Block = new Type1Block(this, blockMsDuration, type1TemplateTrkIndex, trk0InitialDelay);
+            blockList.Add(type1Block);
+        }
+
+        public IReadOnlyList<int> MidiChannelIndexPerOutputVoice;
         public IReadOnlyList<IReadOnlyList<MidiChordDef>> PaletteMidiChordDefs { get { return _paletteMidiChordDefs.AsReadOnly(); } }
         public IReadOnlyList<IReadOnlyList<MidiChordDef>> PitchWheelTestMidiChordDefs { get { return _pitchWheelTestMidiChordDefs.AsReadOnly(); } }
         public IReadOnlyList<IReadOnlyList<MidiChordDef>> OrnamentTestMidiChordDefs { get { return _ornamentTestMidiChordDefs.AsReadOnly(); } }
         public IReadOnlyList<IReadOnlyList<IReadOnlyList<byte>>> EnvelopeShapes { get { return _envelopeShapes.AsReadOnly(); } }
         public IReadOnlyList<IReadOnlyList<int>> DurationModi { get { return _durationModi.AsReadOnly(); } }
+        public IReadOnlyList<Trk> Type1TemplateTrks { get { return _type1TemplateTrks.AsReadOnly(); } }
 
 
         private List<List<MidiChordDef>> _paletteMidiChordDefs = new List<List<MidiChordDef>>();
@@ -152,6 +176,7 @@ namespace Moritz.Algorithm.Tombeau1
             {
                 Durations1, Durations2, Durations3, Durations4, Durations5, Durations6, Durations7, Durations8, Durations9, Durations10, Durations11, Durations12
             };
+        private List<Trk> _type1TemplateTrks = new List<Trk>();
 
         #region envelopes
         private static List<List<byte>> EnvelopesShapes2 = new List<List<byte>>()

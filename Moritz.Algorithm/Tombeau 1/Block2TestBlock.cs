@@ -12,8 +12,8 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-        private Block Block2TestBlock(List<List<MidiChordDef>> pitchWheelMidiChordDefs,
-                                    List<List<MidiChordDef>> ornamentMidiChordDefs)
+        private Block Block2TestBlock(IReadOnlyList<IReadOnlyList<MidiChordDef>> pitchWheelMidiChordDefs,
+                                    IReadOnlyList<IReadOnlyList<MidiChordDef>> ornamentMidiChordDefs)
         {
 
             Block b2bar1 = GetBlock2BarFromMidiChordDefLists(pitchWheelMidiChordDefs);
@@ -33,7 +33,7 @@ namespace Moritz.Algorithm.Tombeau1
             //return null;
         }
 
-        private Block GetBlock2BarFromMidiChordDefLists(List<List<MidiChordDef>> midiChordDefLists)
+        private Block GetBlock2BarFromMidiChordDefLists(IReadOnlyList<IReadOnlyList<MidiChordDef>> midiChordDefLists)
         {
             int midiChannel = 0;
             List<Trk> trks = new List<Trk>();
@@ -51,7 +51,7 @@ namespace Moritz.Algorithm.Tombeau1
             return block;
         }
 
-        private List<IUniqueDef> GetBlock2OrderedMidiChordDefs(List<MidiChordDef> mcdList)
+        private List<IUniqueDef> GetBlock2OrderedMidiChordDefs(IReadOnlyList<MidiChordDef> mcdList)
         {
             List<IUniqueDef> rval = new List<IUniqueDef>();
             int msPositionReFirstIUD = 0;
