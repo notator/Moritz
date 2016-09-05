@@ -348,8 +348,13 @@ namespace Moritz.Algorithm.Tombeau1
 
             Init(new List<string>() { "Tombeau1.1" });
 
-            AddNewType1Block(13000, 0, 1500);
-            AddNewType1Block(13000, 1, 1600);
+            AddNewType1Block(13000, 0, 6, 1500);
+            AddNewType1Block(12000, 1, 5, 1400);
+            AddNewType1Block(11000, 1, 4, 1300);
+            AddNewType1Block(10000, 1, 3, 1200);
+            AddNewType1Block(9000, 1, 2, 1100);
+            AddNewType1Block(8000, 1, 1, 1000);
+            AddNewType1Block(7000, 1, 0, 900);
 
             /************************************************/
             Block vpapBlock = VPAPBlock(_type1TemplateTrks[1]);
@@ -399,11 +404,11 @@ namespace Moritz.Algorithm.Tombeau1
         /// <param name="blockMsDuration">The duration of the block</param>
         /// <param name="type1TemplateTrkIndex">The index of the template Trk in Type1Templates</param>
         /// <param name="trk0InitialDelay">The duration of the rest at the beginning of track (=channel) 0</param>
-        private void AddNewType1Block(int blockMsDuration, int type1TemplateTrkIndex, int trk0InitialDelay)
+        private void AddNewType1Block(int blockMsDuration, int type1TemplateTrkIndex, int nSubTrks, int trk0InitialDelay)
         {
             Debug.Assert(_blockList != null && blockMsDuration > 0 && type1TemplateTrkIndex >= 0 && trk0InitialDelay >= 0);
 
-            Type1Block type1Block = new Type1Block(blockMsDuration, _type1TemplateTrks[type1TemplateTrkIndex], trk0InitialDelay, MidiChannelIndexPerOutputVoice);
+            Type1Block type1Block = new Type1Block(blockMsDuration, _type1TemplateTrks[type1TemplateTrkIndex], nSubTrks, trk0InitialDelay, MidiChannelIndexPerOutputVoice);
             _blockList.Add(type1Block);
         }
 

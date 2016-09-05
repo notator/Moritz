@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
     public class Type1Block : Block
 	{
-        public Type1Block(int blockMsDuration, Trk type1TemplateTrk, int trk0InitialDelay, IReadOnlyList<int> MidiChannelIndexPerOutputVoice)
+        public Type1Block(int blockMsDuration, Trk type1TemplateTrk, int nSubTrks, int trk0InitialDelay, IReadOnlyList<int> MidiChannelIndexPerOutputVoice)
             : base()
         {
             List<int> barlineMsPositionsReBlock = new List<int>();
 
             int midiChannel = 1;
-            Trk trk1a = GetChannelTrk(midiChannel++, type1TemplateTrk);
+            Trk trk1a = GetChannelTrk(midiChannel++, type1TemplateTrk, nSubTrks);
             trk1a.AdjustVelocitiesHairpin(0, trk1a.EndMsPositionReFirstIUD, 0.1, 1);
             MidiChordDef lastTrk0MidiChordDef = (MidiChordDef)trk1a[trk1a.Count - 1];
             lastTrk0MidiChordDef.BeamContinues = false;
@@ -45,34 +46,41 @@ namespace Moritz.Algorithm.Tombeau1
             FinalizeBlock(seq, barlineMsPositionsReBlock);
         }
 
-        private Trk GetChannelTrk(int midiChannel, Trk trkArg)
+        /// <summary>
+        /// returns a new Trk that is the concatenation of (a clone of) the original templateTrk
+        /// with nSubTrks Trks that are variations of the original templateTrk.
+        /// The returned Trk has nSubtrks + 1 versions of the original template (including the original).
+        /// </summary>
+        /// <param name="midiChannel"></param>
+        /// <param name="templateTrk"></param>
+        /// <param name="nSubTrks"></param>
+        /// <returns></returns>
+        private Trk GetChannelTrk(int midiChannel, Trk templateTrk, int nSubTrks)
         {
-            Trk trk = trkArg.Clone();
+            List<int> relativeTranspositions = new List<int>() { 2, 1, 2, 2, 2, 1 };
+            Debug.Assert(nSubTrks <= relativeTranspositions.Count);
+
+            List<Trk> subTrks = new List<Trk>();
+            Trk trk = templateTrk.Clone();
             trk.MidiChannel = midiChannel;
-            Trk tt1 = trk.Clone();
-            tt1.TransposeInGamut(2);
-            Trk tt2 = tt1.Clone();
-            tt2.TransposeInGamut(1);
-            Trk tt3 = tt2.Clone();
-            tt3.TransposeInGamut(2);
-            Trk tt4 = tt3.Clone();
-            tt4.TransposeInGamut(2);
-            Trk tt5 = tt4.Clone();
-            tt5.TransposeInGamut(2);
-            Trk tt6 = tt5.Clone();
-            tt6.TransposeInGamut(1);
 
-            tt1.Permute(1, 7);
-            tt3.Permute(1, 7);
-            tt5.Permute(1, 7);
+            Trk currentTrk = trk;
+            for(int i = 0; i < nSubTrks; ++i)
+            {
+                Trk subTrk = currentTrk.Clone();
+                subTrk.TransposeInGamut(relativeTranspositions[i]);
+                if((i % 2) == 0)
+                {
+                    subTrk.Permute(1, 7);
+                }
+                subTrks.Add(subTrk);
+                currentTrk = subTrk;
+            }
 
-            trk.AddRange(tt1);
-            trk.AddRange(tt2);
-            trk.AddRange(tt3);
-            trk.AddRange(tt4);
-            trk.AddRange(tt5);
-            trk.AddRange(tt6);
-            trk.MsDuration = 6500;
+            foreach(Trk subTrk in subTrks)
+            {
+                trk.AddRange(subTrk);
+            }
 
             return trk;
         }
