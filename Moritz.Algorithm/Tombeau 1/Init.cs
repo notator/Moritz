@@ -33,6 +33,7 @@ namespace Moritz.Algorithm.Tombeau1
         }
 
         #region Init() helper functions
+        #region SetPaletteMidiChordDefs
         private void SetPaletteMidiChordDefs(List<Palette> paletteList)
         {
             List<List<MidiChordDef>> paletteMidiChordDefs = new List<List<MidiChordDef>>();
@@ -54,12 +55,13 @@ namespace Moritz.Algorithm.Tombeau1
             }
             return midiChordDefs;
         }
-
+        #endregion SetPaletteMidiChordDefs
+        #region SetPitchWheelTestMidiChordDefs
         private void SetPitchWheelTestMidiChordDefs()
         {
             IReadOnlyList<IReadOnlyList<IReadOnlyList<byte>>> EnvelopeShapes = new List<IReadOnlyList<IReadOnlyList<byte>>>()
             {
-                _envelopesShapes2, _envelopeShapes3, _envelopeShapes4, _envelopeShapes5, _envelopeShapes6, _envelopeShapes7, _envelopeShapesLong
+                _sliderShapes2, _sliderShapes3, _sliderShapes4, _sliderShapes5, _sliderShapes6, _sliderShapes7, _sliderShapesLong
             };
             List<List<MidiChordDef>> pitchWheelTestMidiChordDefs = new List<List<MidiChordDef>>();
             foreach(IReadOnlyList<IReadOnlyList<byte>> envList in EnvelopeShapes)
@@ -81,12 +83,13 @@ namespace Moritz.Algorithm.Tombeau1
             }
             return rval;
         }
-
+        #endregion SetPitchWheelTestMidiChordDefs
+        #region SetOrnamentTestMidiChordDefs
         private void SetOrnamentTestMidiChordDefs()
         {
             IReadOnlyList<IReadOnlyList<IReadOnlyList<byte>>> EnvelopeShapes = new List<IReadOnlyList<IReadOnlyList<byte>>>()
             {
-                _envelopesShapes2, _envelopeShapes3, _envelopeShapes4, _envelopeShapes5, _envelopeShapes6, _envelopeShapes7, _envelopeShapesLong
+                _sliderShapes2, _sliderShapes3, _sliderShapes4, _sliderShapes5, _sliderShapes6, _sliderShapes7, _sliderShapesLong
             };
             List<List<MidiChordDef>> ornamentTestMidiChordDefs = new List<List<MidiChordDef>>();
             int relativePitchHierarchyIndex = 0;
@@ -129,7 +132,8 @@ namespace Moritz.Algorithm.Tombeau1
             }
             return rval;
         }
-
+        #endregion SetOrnamentTestMidiChordDefs
+        #region SetType1TemplateTrks
         private void SetType1TemplateTrks()
         {
             List<Trk> type1TemplateTrks = new List<Trk>();
@@ -142,6 +146,7 @@ namespace Moritz.Algorithm.Tombeau1
 
             _type1TemplateTrks = type1TemplateTrks;
         }
+
         private Trk GetType1TemplateTrk(int relativePitchHierarchyIndex, int rootPitch, int nPitchesPerOctave, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
         {
             List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, rootPitch);
@@ -154,13 +159,17 @@ namespace Moritz.Algorithm.Tombeau1
 
             MidiChordDef mcd1 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 1, null);
             iuds.Add(mcd1);
+
             MidiChordDef mcd2 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 2, null);
             mcd2.TransposeInGamut(1);
             iuds.Add(mcd2);
-            Envelope ornamentEnvelope = new Envelope(ornamentShape, 127, nPitchesPerOctave, nOrnamentChords);
-            MidiChordDef mcd3 = new MidiChordDef(msDuration * 2, gamut, rootNotatedPitch, nPitchesPerChord + 3, ornamentEnvelope);
+
+            //Envelope ornamentEnvelope = new Envelope(ornamentShape, 127, nPitchesPerOctave, nOrnamentChords);
+            //MidiChordDef mcd3 = new MidiChordDef(msDuration * 2, gamut, rootNotatedPitch, nPitchesPerChord + 3, ornamentEnvelope);
+            MidiChordDef mcd3 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 3, null);
             mcd3.TransposeInGamut(2);
             iuds.Add(mcd3);
+
             MidiChordDef mcd4 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 4, null);
             mcd4.TransposeInGamut(3);
             iuds.Add(mcd4);
@@ -169,6 +178,7 @@ namespace Moritz.Algorithm.Tombeau1
 
             return trk0;
         }
+        #endregion SetType1TemplateTrks
         #endregion Init() helper functions
     }
 }

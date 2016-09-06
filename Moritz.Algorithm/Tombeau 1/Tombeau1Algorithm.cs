@@ -348,13 +348,14 @@ namespace Moritz.Algorithm.Tombeau1
 
             Init(new List<string>() { "Tombeau1.1" });
 
-            AddNewType1Block(13000, 0, 6, 1500);
-            AddNewType1Block(12000, 1, 5, 1400);
-            AddNewType1Block(11000, 1, 4, 1300);
-            AddNewType1Block(10000, 1, 3, 1200);
-            AddNewType1Block(9000, 1, 2, 1100);
-            AddNewType1Block(8000, 1, 1, 1000);
-            AddNewType1Block(7000, 1, 0, 900);
+            AddNewType1Block(13000, 0, 6, 1500, _ornamentShapes[0], 7);
+            AddNewType1Block(12500, 1, 5, 1400, _ornamentShapes[1], 7);
+            AddNewType1Block(12000, 1, 5, 1300, _ornamentShapes[2], 7);
+            AddNewType1Block(11500, 1, 6, 1200, _ornamentShapes[3], 7);
+            AddNewType1Block(11000, 1, 6, 1100, _ornamentShapes[4], 7);
+            AddNewType1Block(10500, 1, 6, 1000, _ornamentShapes[5], 7);
+            AddNewType1Block(10000, 1, 5, 900, _ornamentShapes[6], 7);
+            AddNewType1Block(10000, 1, 5, 900, _ornamentShapes[7], 7);
 
             /************************************************/
             Block vpapBlock = VPAPBlock(_type1TemplateTrks[1]);
@@ -404,11 +405,15 @@ namespace Moritz.Algorithm.Tombeau1
         /// <param name="blockMsDuration">The duration of the block</param>
         /// <param name="type1TemplateTrkIndex">The index of the template Trk in Type1Templates</param>
         /// <param name="trk0InitialDelay">The duration of the rest at the beginning of track (=channel) 0</param>
-        private void AddNewType1Block(int blockMsDuration, int type1TemplateTrkIndex, int nSubTrks, int trk0InitialDelay)
+        private void AddNewType1Block(int blockMsDuration, int type1TemplateTrkIndex, int nSubTrks, int trk0InitialDelay,
+                                        IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
         {
             Debug.Assert(_blockList != null && blockMsDuration > 0 && type1TemplateTrkIndex >= 0 && trk0InitialDelay >= 0);
 
-            Type1Block type1Block = new Type1Block(blockMsDuration, _type1TemplateTrks[type1TemplateTrkIndex], nSubTrks, trk0InitialDelay, MidiChannelIndexPerOutputVoice);
+            Type1Block type1Block = new Type1Block(blockMsDuration, _type1TemplateTrks[type1TemplateTrkIndex], nSubTrks, trk0InitialDelay,
+                                                    ornamentShape, nOrnamentChords,
+                                                    _durationModi, MidiChannelIndexPerOutputVoice);
+
             _blockList.Add(type1Block);
         }
 
@@ -421,7 +426,65 @@ namespace Moritz.Algorithm.Tombeau1
         private IReadOnlyList<Trk> _type1TemplateTrks = null;
         #endregion initialised by Init()
         #region envelopes
-        private static IReadOnlyList<IReadOnlyList<byte>> _envelopesShapes2 = new List<List<byte>>()
+        private static IReadOnlyList<IReadOnlyList<byte>> _ornamentShapes = new List<List<byte>>()
+            {
+                { new List<byte>() {0, 127} },
+                { new List<byte>() {127, 0} },
+                { new List<byte>() {0, 127, 0} },
+                { new List<byte>() {127, 0, 127} },
+                { new List<byte>() {0, 64, 0, 127, 0} },
+                { new List<byte>() {0, 127, 0, 64, 0} },
+                { new List<byte>() {127, 64, 127, 0, 127} },
+                { new List<byte>() {127, 0, 127, 64, 127} }
+            };
+
+        /// <summary>
+        /// If domain is null, the returned shape will come from the _sliderShapesLong list. 
+        /// </summary>
+        /// <param name="domain">null, or in range 2..7</param>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private IReadOnlyList<byte> SliderShape(int? domain, int index)
+        {
+            if(domain != null)
+            {
+                Debug.Assert(domain > 1 && domain < 8);
+            }
+            IReadOnlyList<byte> rval = null;
+            switch (domain)
+            {
+                case 2:
+                    Debug.Assert(index < _sliderShapes2.Count);
+                    rval = _sliderShapes2[index];
+                    break;
+                case 3:
+                    Debug.Assert(index < _sliderShapes3.Count);
+                    rval = _sliderShapes3[index];
+                    break;
+                case 4:
+                    Debug.Assert(index < _sliderShapes4.Count);
+                    rval = _sliderShapes4[index];
+                    break;
+                case 5:
+                    Debug.Assert(index < _sliderShapes5.Count);
+                    rval = _sliderShapes5[index];
+                    break;
+                case 6:
+                    Debug.Assert(index < _sliderShapes6.Count);
+                    rval = _sliderShapes6[index];
+                    break;
+                case 7:
+                    Debug.Assert(index < _sliderShapes7.Count);
+                    rval = _sliderShapes7[index];
+                    break;
+                case null:
+                    Debug.Assert(index < _sliderShapesLong.Count);
+                    rval = _sliderShapesLong[index];
+                    break;
+            }
+            return rval;
+        }
+        private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapes2 = new List<List<byte>>()
             {
                 { new List<byte>() {64, 0} },
                 { new List<byte>() {64, 18} },
@@ -432,7 +495,7 @@ namespace Moritz.Algorithm.Tombeau1
                 { new List<byte>() {64, 109} },
                 { new List<byte>() {64, 127} }
             };
-        private static IReadOnlyList<IReadOnlyList<byte>> _envelopeShapes3 = new List<List<byte>>()
+        private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapes3 = new List<List<byte>>()
             {
                 { new List<byte>() {64, 0, 64} },
                 { new List<byte>() {64, 18, 64} },
@@ -443,7 +506,7 @@ namespace Moritz.Algorithm.Tombeau1
                 { new List<byte>() {64, 109, 64} },
                 { new List<byte>() {64, 127, 64} }
             };
-        private static IReadOnlyList<IReadOnlyList<byte>> _envelopeShapes4 = new List<List<byte>>()
+        private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapes4 = new List<List<byte>>()
             {
                 { new List<byte>() {64, 0, 64, 64} },
                 { new List<byte>() {64, 22, 64, 64} },
@@ -454,7 +517,7 @@ namespace Moritz.Algorithm.Tombeau1
                 { new List<byte>() {64, 80, 64, 64} },
                 { new List<byte>() {64, 96, 22, 64 } }
             };
-        private static IReadOnlyList<IReadOnlyList<byte>> _envelopeShapes5 = new List<List<byte>>()
+        private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapes5 = new List<List<byte>>()
             {
                 { new List<byte>() {64, 50, 72, 50, 64} },
                 { new List<byte>() {64, 64, 0, 64, 64} },
@@ -467,7 +530,7 @@ namespace Moritz.Algorithm.Tombeau1
                 { new List<byte>() {64, 105, 35, 70, 64} },
                 { new List<byte>() {64, 106, 64, 64, 64} }
             };
-        private static IReadOnlyList<IReadOnlyList<byte>> _envelopeShapes6 = new List<List<byte>>()
+        private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapes6 = new List<List<byte>>()
             {
                 { new List<byte>() {64, 22, 43, 64, 64, 64} },
                 { new List<byte>() {64, 30, 78, 64, 40, 64} },
@@ -480,7 +543,7 @@ namespace Moritz.Algorithm.Tombeau1
                 { new List<byte>() {64, 106, 64, 64, 64, 64} },
                 { new List<byte>() {64, 127, 127, 22, 64, 64} }
             };
-        private static IReadOnlyList<IReadOnlyList<byte>> _envelopeShapes7 = new List<List<byte>>()
+        private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapes7 = new List<List<byte>>()
             {
                 { new List<byte>() {64, 0, 0, 106, 106, 64, 64} },
                 { new List<byte>() {64, 28, 68, 48, 108, 88, 64} },
@@ -494,7 +557,7 @@ namespace Moritz.Algorithm.Tombeau1
                 { new List<byte>() {64, 100, 60, 80, 20, 40, 64} },
                 { new List<byte>() {64, 127, 127, 64, 64, 64, 64} }
             };
-        private static IReadOnlyList<IReadOnlyList<byte>> _envelopeShapesLong = new List<List<byte>>()
+        private static IReadOnlyList<IReadOnlyList<byte>> _sliderShapesLong = new List<List<byte>>()
             {
                 { new List<byte>() {64, 0, 64, 96, 127, 30, 0, 64} },
                 { new List<byte>() {64, 64, 64, 127, 64, 106, 43, 64} },
@@ -514,29 +577,35 @@ namespace Moritz.Algorithm.Tombeau1
             };
         #endregion envelopes
         #region duration modi
-        private static IReadOnlyList<int> _durations1 = new List<int>()
+        private static IReadOnlyList<IReadOnlyList<int>> _durationModi = new List<List<int>>()
+        {
+            _durations1, _durations2, _durations3, _durations4, _durations5,_durations6,
+            _durations7, _durations8, _durations9, _durations10, _durations11, _durations12
+
+        };
+        private static List<int> _durations1 = new List<int>()
             {   1000 };
-        private static IReadOnlyList<int> _durations2 = new List<int>()
+        private static List<int> _durations2 = new List<int>()
             {   1000, 707 }; // 1 / ( 2^(1 / 2) )
-        private static IReadOnlyList<int> _durations3 = new List<int>()
+        private static List<int> _durations3 = new List<int>()
             {   1000, 794, 630 }; // 1 / ( 2^(1 / 3) )
-        private static IReadOnlyList<int> _durations4 = new List<int>()
+        private static List<int> _durations4 = new List<int>()
             {   1000, 841, 707, 595 }; // 1 / ( 2^(1 / 4) )
-        private static IReadOnlyList<int> _durations5 = new List<int>()
+        private static List<int> _durations5 = new List<int>()
             {   1000, 871, 758, 660, 574 }; // 1 / ( 2^(1 / 5) )
-        private static IReadOnlyList<int> _durations6 = new List<int>()
+        private static List<int> _durations6 = new List<int>()
             {   1000, 891, 794, 707, 630, 561 }; // 1 / ( 2^(1 / 6) )
-        private static IReadOnlyList<int> _durations7 = new List<int>()
+        private static List<int> _durations7 = new List<int>()
             {   1000, 906, 820, 743, 673, 610, 552 }; // 1 / ( 2^(1 / 7) )
-        private static IReadOnlyList<int> _durations8 = new List<int>()
+        private static List<int> _durations8 = new List<int>()
             {   1000, 917, 841, 771, 707, 648, 595, 545}; // 1 / ( 2^(1 / 8) )
-        private static IReadOnlyList<int> _durations9 = new List<int>()
+        private static List<int> _durations9 = new List<int>()
             {   1000, 926, 857, 794, 735, 680, 630, 583, 540}; // 1 / ( 2^(1 / 9) )
-        private static IReadOnlyList<int> _durations10 = new List<int>()
+        private static List<int> _durations10 = new List<int>()
             {   1000, 933, 871, 812, 758, 707, 660, 616, 574, 536}; // 1 / ( 2^(1 / 10) )
-        private static IReadOnlyList<int> _durations11 = new List<int>()
+        private static List<int> _durations11 = new List<int>()
             {   1000, 939, 882, 828, 777, 730, 685, 643, 604, 567, 533 }; // 1 / ( 2^(1 / 11) )
-        private static IReadOnlyList<int> _durations12 = new List<int>()
+        private static List<int> _durations12 = new List<int>()
             {   1000, 944, 891, 841, 794, 749, 707, 667, 630, 595, 561, 530 }; // 1 / ( 2^(1 / 12) )
 
         #endregion duration modi

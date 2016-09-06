@@ -78,21 +78,8 @@ namespace Moritz.Spec
             }
             NotatedMidiVelocities = nmVelocities;
 
-            List<int> basicMidiChordRootPitches = gamut.PitchSequence(rootNotatedPitch, ornamentEnvelope);
-            // If ornamentEnvelope is null, basicMidiChordRootPitches will only contain rootNotatedpitch.
-
-            BasicMidiChordDefs = new List<BasicMidiChordDef>();
-            foreach(int rootPitch in basicMidiChordRootPitches)
-            {
-                BasicMidiChordDef bmcd = new BasicMidiChordDef(1000, gamut, rootPitch, nPitchesPerChord);
-                BasicMidiChordDefs.Add(bmcd);
-            }
-            this.MsDuration = msDuration; // resets the BasicMidiChordDef msDurations.
-
-            if(basicMidiChordRootPitches.Count > 1)
-            {
-                _ornamentNumberSymbol = basicMidiChordRootPitches.Count;
-            }
+            // Sets BasicMidiChords. If ornamentEnvelope == null, BasicMidiChords[0] is set to the NotatedMidiChord.
+            SetOrnament(ornamentEnvelope);
         }
 
         /// <summary>
@@ -351,6 +338,35 @@ namespace Moritz.Spec
                     bmcd.MsDuration = newPositions[i + 1] - newPositions[i];
                     Debug.Assert(_minimumBasicMidiChordMsDuration <= bmcd.MsDuration);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Sets an ornament having the shape and number of elements in the ornamentEnvelope.
+        /// If ornamentEnvelope == null, BasicMidiChords[0] is set to the NotatedMidiChord.
+        /// using the NotatedMidiPitches as the first chord.
+        /// Uses the current Gamut.
+        /// Replaces any existing ornament.
+        /// Sets the OrnamentNumberSymbol to the number of BasicMidiChordDefs.
+        /// </summary>
+        /// <param name="ornamentEnvelope"></param>
+        public void SetOrnament(Envelope ornamentEnvelope)
+        {
+            Debug.Assert(_gamut != null);
+            List<int> basicMidiChordRootPitches = _gamut.PitchSequence(_notatedMidiPitches[0], ornamentEnvelope);
+            // If ornamentEnvelope is null, basicMidiChordRootPitches will only contain rootNotatedpitch.
+
+            BasicMidiChordDefs = new List<BasicMidiChordDef>();
+            foreach(int rootPitch in basicMidiChordRootPitches)
+            {
+                BasicMidiChordDef bmcd = new BasicMidiChordDef(1000, _gamut, rootPitch, _notatedMidiPitches.Count);
+                BasicMidiChordDefs.Add(bmcd);
+            }
+            this.MsDuration = _msDuration; // resets the BasicMidiChordDef msDurations.
+
+            if(basicMidiChordRootPitches.Count > 1)
+            {
+                _ornamentNumberSymbol = basicMidiChordRootPitches.Count;
             }
         }
 
