@@ -20,7 +20,8 @@ namespace Moritz.Algorithm.Tombeau1
         public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
 		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 127, 127, 127, 127, 127, 127, 127, 127 }; } }
 		public override int NumberOfInputVoices { get { return 0; } }
-		public override int NumberOfBars { get { return 46; } }
+        //public override int NumberOfBars { get { return 46; } } // includes VPAP Block
+        public override int NumberOfBars { get { return 61; } }  // including 17 test bars
 
         /// <summary>
         /// See CompositionAlgorithm.DoAlgorithm()
@@ -374,37 +375,37 @@ namespace Moritz.Algorithm.Tombeau1
             AddNewType1Block(13000, 2, 21, 1000);
 
             /************************************************/
-            //Block vpapBlock = VPAPBlock(_level2TemplateTrks[1]);
-            //_blockList.Add(vpapBlock);   // 2 bars
+            Block vpapBlock = VPAPBlock(_level1TemplateTrks[1]);
+            _blockList.Add(vpapBlock);   // 2 bars
 
             /************************************************/
             #region test blocks
-            //Block block2TestBlock = Block2TestBlock(PitchWheelTestMidiChordDefs, OrnamentTestMidiChordDefs);
-            //blockList.Add(block2TestBlock);   // 2 bars
+            //Block block2TestBlock = Block2TestBlock(_pitchWheelTestMidiChordDefs, _ornamentTestMidiChordDefs);
+            //_blockList.Add(block2TestBlock);   // 2 bars
 
-            //Block verticalVelocityColorsTestBlock = VerticalVelocityColorsTestBlock(PaletteMidiChordDefs[0]);
-            //blockList.Add(verticalVelocityColorsTestBlock); // 2 bars
+            //Block verticalVelocityColorsTestBlock = VerticalVelocityColorsTestBlock(_paletteMidiChordDefs[0]);
+            //_blockList.Add(verticalVelocityColorsTestBlock); // 2 bars
 
             //Block velocityPerAbsolutePitchTestBlock = VelocityPerAbsolutePitchTestBlock();
-            //blockList.Add(velocityPerAbsolutePitchTestBlock); // 2 bars
+            //_blockList.Add(velocityPerAbsolutePitchTestBlock); // 2 bars
 
             //Block gamutTestBlock = GamutTestBlock();
-            //blockList.Add(gamutTestBlock); // 2 bars
+            //_blockList.Add(gamutTestBlock); // 2 bars
 
             //Block verticalVelocityGradientTestBlock = VerticalVelocityGradientTestBlock();
-            //blockList.Add(verticalVelocityGradientTestBlock); // 2 bars
+            //_blockList.Add(verticalVelocityGradientTestBlock); // 2 bars
 
             //Block timeWarpVVTestBlock = TimeWarpTestBlock(verticalVelocityGradientTestBlock);
-            //blockList.Add(timeWarpVVTestBlock); // 4 bars (1 system)
+            //_blockList.Add(timeWarpVVTestBlock); // 4 bars (1 system)
 
-            //Block trksTestBlock = TrksTestBlock(PaletteMidiChordDefs[0]);
-            //blockList.Add(trksTestBlock); // 1 bar (1 system)
+            //Block trksTestBlock = TrksTestBlock(_paletteMidiChordDefs[0]);
+            //_blockList.Add(trksTestBlock); // 1 bar (1 system)
 
             //Block simpleVelocityColorsTestBlock = SimpleVelocityColorsTestBlock();
-            //blockList.Add(simpleVelocityColorsTestBlock); // 1 bar
+            //_blockList.Add(simpleVelocityColorsTestBlock); // 1 bar
 
             //Block timeWarpSVTestBlock = TimeWarpTestBlock(simpleVelocityColorsTestBlock);
-            //blockList.Add(timeWarpSVTestBlock); // 1 bar
+            //_blockList.Add(timeWarpSVTestBlock); // 1 bar
 
             #endregion test blocks
 
