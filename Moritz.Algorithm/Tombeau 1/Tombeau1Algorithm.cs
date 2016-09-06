@@ -20,7 +20,7 @@ namespace Moritz.Algorithm.Tombeau1
         public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
 		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 127, 127, 127, 127, 127, 127, 127, 127 }; } }
 		public override int NumberOfInputVoices { get { return 0; } }
-		public override int NumberOfBars { get { return 27; } }
+		public override int NumberOfBars { get { return 46; } }
 
         /// <summary>
         /// See CompositionAlgorithm.DoAlgorithm()
@@ -348,18 +348,34 @@ namespace Moritz.Algorithm.Tombeau1
 
             Init(new List<string>() { "Tombeau1.1" });
 
-            AddNewType1Block(13000, 0, 6, 1500, _ornamentShapes[0], 7);
-            AddNewType1Block(12500, 1, 5, 1400, _ornamentShapes[1], 7);
-            AddNewType1Block(12000, 1, 5, 1300, _ornamentShapes[2], 7);
-            AddNewType1Block(11500, 1, 6, 1200, _ornamentShapes[3], 7);
-            AddNewType1Block(11000, 1, 6, 1100, _ornamentShapes[4], 7);
-            AddNewType1Block(10500, 1, 6, 1000, _ornamentShapes[5], 7);
-            AddNewType1Block(10000, 1, 5, 900, _ornamentShapes[6], 7);
-            AddNewType1Block(10000, 1, 5, 900, _ornamentShapes[7], 7);
+            AddNewType1Block(13000, 2, 0, 1500);
+            AddNewType1Block(13000, 2, 1, 1400);
+            AddNewType1Block(13000, 2, 2, 1300);
+            AddNewType1Block(13000, 2, 3, 1200);
+            AddNewType1Block(13000, 2, 4, 1100);
+            AddNewType1Block(13000, 2, 5, 1000);
+            AddNewType1Block(13000, 2, 6, 900);
+            AddNewType1Block(13000, 2, 7, 900);
+
+            AddNewType1Block(13000, 2, 8, 1500);
+            AddNewType1Block(13000, 2, 9, 1400);
+            AddNewType1Block(13000, 2, 10, 1300);
+            AddNewType1Block(13000, 2, 11, 1200);
+            AddNewType1Block(13000, 2, 12, 1100);
+            AddNewType1Block(13000, 2, 13, 1000);
+            AddNewType1Block(13000, 2, 14, 900);
+            AddNewType1Block(13000, 2, 15, 900);
+
+            AddNewType1Block(13000, 2, 16, 1500);
+            AddNewType1Block(13000, 2, 17, 1400);
+            AddNewType1Block(13000, 2, 18, 1300);
+            AddNewType1Block(13000, 2, 19, 1200);
+            AddNewType1Block(13000, 2, 20, 1100);
+            AddNewType1Block(13000, 2, 21, 1000);
 
             /************************************************/
-            Block vpapBlock = VPAPBlock(_type1TemplateTrks[1]);
-            _blockList.Add(vpapBlock);   // 2 bars
+            //Block vpapBlock = VPAPBlock(_level2TemplateTrks[1]);
+            //_blockList.Add(vpapBlock);   // 2 bars
 
             /************************************************/
             #region test blocks
@@ -403,16 +419,14 @@ namespace Moritz.Algorithm.Tombeau1
         /// Adds a new Type1Block to Tombeau1Algorithm's private _blockList
         /// </summary>
         /// <param name="blockMsDuration">The duration of the block</param>
-        /// <param name="type1TemplateTrkIndex">The index of the template Trk in Type1Templates</param>
+        /// <param name="level2TemplateTrkIndex">The index of the template Trk in Type1Templates</param>
         /// <param name="trk0InitialDelay">The duration of the rest at the beginning of track (=channel) 0</param>
-        private void AddNewType1Block(int blockMsDuration, int type1TemplateTrkIndex, int nSubTrks, int trk0InitialDelay,
-                                        IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
+        private void AddNewType1Block(int blockMsDuration, int nBars, int level2TemplateTrkIndex, int trk0InitialDelay)
         {
-            Debug.Assert(_blockList != null && blockMsDuration > 0 && type1TemplateTrkIndex >= 0 && trk0InitialDelay >= 0);
+            Debug.Assert(_blockList != null && blockMsDuration > 0 && level2TemplateTrkIndex >= 0 && trk0InitialDelay >= 0);
 
-            Type1Block type1Block = new Type1Block(blockMsDuration, _type1TemplateTrks[type1TemplateTrkIndex], nSubTrks, trk0InitialDelay,
-                                                    ornamentShape, nOrnamentChords,
-                                                    _durationModi, MidiChannelIndexPerOutputVoice);
+            Type1Block type1Block = new Type1Block(blockMsDuration, _level2TemplateTrks[level2TemplateTrkIndex], trk0InitialDelay,
+                                                    _durationModi, nBars, MidiChannelIndexPerOutputVoice);
 
             _blockList.Add(type1Block);
         }
@@ -423,7 +437,8 @@ namespace Moritz.Algorithm.Tombeau1
         private IReadOnlyList<IReadOnlyList<MidiChordDef>> _paletteMidiChordDefs = null;
         private IReadOnlyList<IReadOnlyList<MidiChordDef>> _pitchWheelTestMidiChordDefs = null;
         private IReadOnlyList<IReadOnlyList<MidiChordDef>> _ornamentTestMidiChordDefs = null;
-        private IReadOnlyList<Trk> _type1TemplateTrks = null;
+        private IReadOnlyList<Trk> _level1TemplateTrks = null;
+        private IReadOnlyList<Trk> _level2TemplateTrks = null;
         #endregion initialised by Init()
         #region envelopes
         private static IReadOnlyList<IReadOnlyList<byte>> _ornamentShapes = new List<List<byte>>()
