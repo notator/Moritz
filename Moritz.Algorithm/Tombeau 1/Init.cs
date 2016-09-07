@@ -197,19 +197,24 @@ namespace Moritz.Algorithm.Tombeau1
             List<IUniqueDef> iuds = new List<IUniqueDef>();
             int rootNotatedPitch = gamut[gamut.Count / 2];
             int nPitchesPerChord = 1;
-            int msDuration = 1000;
+            
+            List<int> durations4 = new List<int>() { 1000, 841, 707, 595 }; // (1000 / n( 2^(1 / 4) )  for n = 1..4
 
+            int msDuration = durations4[3];
             MidiChordDef mcd1 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 1, null);
             iuds.Add(mcd1);
 
+            msDuration = durations4[1];
             MidiChordDef mcd2 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 2, null);
             mcd2.TransposeInGamut(1);
             iuds.Add(mcd2);
 
+            msDuration = durations4[0];
             MidiChordDef mcd3 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 3, null);
             mcd3.TransposeInGamut(2);
             iuds.Add(mcd3);
 
+            msDuration = durations4[2];
             MidiChordDef mcd4 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 4, null);
             mcd4.TransposeInGamut(3);
             iuds.Add(mcd4);
@@ -225,16 +230,16 @@ namespace Moritz.Algorithm.Tombeau1
         /// The returned Trk has nSubtrks + 1 versions of the original template (including the original).
         /// </summary>
         /// <param name="midiChannel"></param>
-        /// <param name="templateTrk"></param>
+        /// <param name="level1TemplateTrk"></param>
         /// <param name="nSubTrks"></param>
         /// <returns></returns>
-        private Trk NewLevel2TemplateTrk(Trk templateTrk, int nSubTrks, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
+        private Trk NewLevel2TemplateTrk(Trk level1TemplateTrk, int nSubTrks, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
         {
             List<int> relativeTranspositions = new List<int>() { 2, 1, 2, 2, 2, 1 };
             Debug.Assert(nSubTrks <= relativeTranspositions.Count);
 
             List<Trk> subTrks = new List<Trk>();
-            Trk trk = templateTrk.Clone();
+            Trk trk = level1TemplateTrk.Clone();
 
             //SetOrnament(trk.UniqueDefs[2] as MidiChordDef, _envelopeShapes[0], 7);
             SetOrnament(trk.UniqueDefs[2] as MidiChordDef, ornamentShape, nOrnamentChords);
