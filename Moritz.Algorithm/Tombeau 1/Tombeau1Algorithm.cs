@@ -420,14 +420,14 @@ namespace Moritz.Algorithm.Tombeau1
         /// Adds a new Type1Block to Tombeau1Algorithm's private _blockList
         /// </summary>
         /// <param name="blockMsDuration">The duration of the block</param>
-        /// <param name="level2TemplateTrkIndex">The index of the template Trk in Type1Templates</param>
+        /// <param name="level2TemplateTrkIndex">The index of the template Trk in _level2TemplateTrks</param>
         /// <param name="trk0InitialDelay">The duration of the rest at the beginning of track (=channel) 0</param>
         private void AddNewType1Block(int blockMsDuration, int nBars, int level2TemplateTrkIndex, int trk0InitialDelay)
         {
             Debug.Assert(_blockList != null && blockMsDuration > 0 && level2TemplateTrkIndex >= 0 && trk0InitialDelay >= 0);
 
-            Type1Block type1Block = new Type1Block(blockMsDuration, _level2TemplateTrks[level2TemplateTrkIndex], trk0InitialDelay,
-                                                    _durationModi, nBars, MidiChannelIndexPerOutputVoice);
+            Type1Block type1Block = new Type1Block(blockMsDuration, _level2TemplateTrks[level2TemplateTrkIndex], trk0InitialDelay, nBars,
+                                                    MidiChannelIndexPerOutputVoice);
 
             _blockList.Add(type1Block);
         }

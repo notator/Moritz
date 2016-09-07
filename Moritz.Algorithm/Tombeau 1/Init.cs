@@ -199,7 +199,6 @@ namespace Moritz.Algorithm.Tombeau1
             int nPitchesPerChord = 1;
             
             List<int> durations4 = new List<int>() { 1000, 841, 707, 595 }; // (1000 / n( 2^(1 / 4) )  for n = 1..4
-
             int msDuration = durations4[3];
             MidiChordDef mcd1 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 1, null);
             iuds.Add(mcd1);
@@ -262,6 +261,8 @@ namespace Moritz.Algorithm.Tombeau1
             {
                 trk.AddRange(subTrk);
             }
+
+            trk.AdjustVelocitiesHairpin(0, trk.EndMsPositionReFirstIUD, 0.1, 1);
 
             MidiChordDef lastTrk0MidiChordDef = (MidiChordDef)trk[trk.Count - 1];
             lastTrk0MidiChordDef.BeamContinues = false;
