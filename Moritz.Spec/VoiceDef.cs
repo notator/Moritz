@@ -28,6 +28,8 @@ namespace Moritz.Spec
 
         protected VoiceDef(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
         {
+            Debug.Assert(midiChannel >= 0 && msPositionReContainer >= 0 && iuds != null);
+
             this.MidiChannel = midiChannel;
             this._msPositionReContainer = msPositionReContainer;
             this._uniqueDefs = iuds;

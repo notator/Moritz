@@ -136,32 +136,32 @@ namespace Moritz.Algorithm.Tombeau1
         #region SetType1TemplateTrks
         private void SetType1TemplateTrks()
         {
-            List<Trk> level1TemplateTrks = new List<Trk>();
+            List<Level1TemplateTrk> level1TemplateTrks = new List<Level1TemplateTrk>();
 
             int nPitchesPerOctave = 2;
 
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(0, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(11, 0, nPitchesPerOctave++));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(1, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(12, 0, nPitchesPerOctave++));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(2, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(13, 0, nPitchesPerOctave++));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(3, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(14, 0, nPitchesPerOctave++));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(4, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(15, 0, nPitchesPerOctave++));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(5, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(16, 0, nPitchesPerOctave++));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(6, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(17, 0, nPitchesPerOctave++));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(7, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(18, 0, nPitchesPerOctave++));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(8, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(19, 0, nPitchesPerOctave++));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(9, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(20, 0, nPitchesPerOctave++));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(10, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(21, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(new Level1TemplateTrk(0, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(new Level1TemplateTrk(11, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(1, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(new Level1TemplateTrk(12, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(2, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(new Level1TemplateTrk(13, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(3, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(new Level1TemplateTrk(14, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(4, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(new Level1TemplateTrk(15, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(5, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(new Level1TemplateTrk(16, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(6, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(new Level1TemplateTrk(17, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(7, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(new Level1TemplateTrk(18, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(8, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(new Level1TemplateTrk(19, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(9, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(new Level1TemplateTrk(20, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(10, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(new Level1TemplateTrk(21, 0, nPitchesPerOctave));
 
             List<Trk> level2TemplateTrks = new List<Trk>();
             level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[0], 6, _ornamentShapes[0], 7));
@@ -191,40 +191,6 @@ namespace Moritz.Algorithm.Tombeau1
             _level2TemplateTrks = level2TemplateTrks;
         }
 
-        private Trk NewLevel1TemplateTrk(int relativePitchHierarchyIndex, int rootPitch, int nPitchesPerOctave)
-        {
-            List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, rootPitch);
-            Gamut gamut = new Gamut(absolutePitchHierarchy, nPitchesPerOctave);
-
-            List<IUniqueDef> iuds = new List<IUniqueDef>();
-            int rootNotatedPitch = gamut[gamut.Count / 2] - 24;
-            int nPitchesPerChord = 1;
-            
-            List<int> durations4 = new List<int>() { 1000, 841, 707, 595 }; // (1000 / n( 2^(1 / 4) )  for n = 1..4
-            int msDuration = durations4[3];
-            MidiChordDef mcd1 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 1, null);
-            iuds.Add(mcd1);
-
-            msDuration = durations4[1];
-            MidiChordDef mcd2 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 2, null);
-            mcd2.TransposeInGamut(1);
-            iuds.Add(mcd2);
-
-            msDuration = durations4[0];
-            MidiChordDef mcd3 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 3, null);
-            mcd3.TransposeInGamut(2);
-            iuds.Add(mcd3);
-
-            msDuration = durations4[2];
-            MidiChordDef mcd4 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 4, null);
-            mcd4.TransposeInGamut(3);
-            iuds.Add(mcd4);
-
-            Trk trk0 = new Trk(0, 0, iuds);
-
-            return trk0;
-        }
-
         /// <summary>
         /// Returns a new Trk that is the concatenation of (a clone of) the original templateTrk
         /// with nSubTrks Trks that are variations of the original templateTrk.
@@ -234,21 +200,21 @@ namespace Moritz.Algorithm.Tombeau1
         /// <param name="level1TemplateTrk"></param>
         /// <param name="nSubTrks"></param>
         /// <returns></returns>
-        private Trk NewLevel2TemplateTrk(Trk level1TemplateTrk, int nSubTrks, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
+        private Trk NewLevel2TemplateTrk(Level1TemplateTrk level1TemplateTrk, int nSubTrks, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
         {
             List<int> relativeTranspositions = new List<int>() { 2, 1, 2, 2, 2, 1 };
             Debug.Assert(nSubTrks <= relativeTranspositions.Count);
 
             List<Trk> subTrks = new List<Trk>();
-            Trk trk = level1TemplateTrk.Clone();
+            Level1TemplateTrk trk = level1TemplateTrk.Clone();
 
             //SetOrnament(trk.UniqueDefs[2] as MidiChordDef, _envelopeShapes[0], 7);
             SetOrnament(trk.UniqueDefs[2] as MidiChordDef, ornamentShape, nOrnamentChords);
 
-            Trk currentTrk = trk;
+            Level1TemplateTrk currentTrk = trk;
             for(int i = 0; i < nSubTrks; ++i)
             {
-                Trk subTrk = currentTrk.Clone();
+                Level1TemplateTrk subTrk = currentTrk.Clone();
                 subTrk.TransposeInGamut(relativeTranspositions[i]);
 
                 if((i % 2) == 0)

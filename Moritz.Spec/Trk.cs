@@ -40,21 +40,30 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Returns a deep clone of this TrkDef.
+        /// Returns a deep clone of this Trk.
         /// </summary>
         public Trk Clone()
         {
-            List<IUniqueDef> clonedIUDs = new List<IUniqueDef>();
-            foreach(IUniqueDef iu in _uniqueDefs)
-            {
-                IUniqueDef clone = (IUniqueDef) iu.Clone();
-                clonedIUDs.Add(clone);
-            }
-
+            List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
             Trk trk = new Trk(MidiChannel, MsPositionReContainer, clonedIUDs);
             trk.Container = this.Container;
 
             return trk; 
+        }
+
+        /// <summary>
+        /// Also used by Clone() functions in subclasses
+        /// </summary>
+        /// <returns></returns>
+        protected List<IUniqueDef> GetUniqueDefsClone()
+        {
+            List<IUniqueDef> clonedIUDs = new List<IUniqueDef>();
+            foreach(IUniqueDef iu in _uniqueDefs)
+            {
+                IUniqueDef clonedIUD = (IUniqueDef)iu.Clone();
+                clonedIUDs.Add(clonedIUD);
+            }
+            return clonedIUDs;
         }
 
         #endregion constructors
