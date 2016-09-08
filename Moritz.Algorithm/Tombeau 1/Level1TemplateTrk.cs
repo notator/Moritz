@@ -32,7 +32,7 @@ namespace Moritz.Algorithm.Tombeau1
 
             Debug.Assert(_uniqueDefs != null && _uniqueDefs.Count == 0);
 
-            int rootNotatedPitch = gamut[gamut.Count / 2] - 24;
+            int rootNotatedPitch = gamut[gamut.Count / 2];
             int nPitchesPerChord = 1;
 
             List<int> durations4 = new List<int>() { 1000, 841, 707, 595 }; // (1000 / n( 2^(1 / 4) )  for n = 1..4

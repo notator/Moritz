@@ -54,8 +54,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Also used by Clone() functions in subclasses
         /// </summary>
-        /// <returns></returns>
-        protected List<IUniqueDef> GetUniqueDefsClone()
+        public List<IUniqueDef> GetUniqueDefsClone()
         {
             List<IUniqueDef> clonedIUDs = new List<IUniqueDef>();
             foreach(IUniqueDef iu in _uniqueDefs)

@@ -138,32 +138,32 @@ namespace Moritz.Algorithm.Tombeau1
         {
             List<Level1TemplateTrk> level1TemplateTrks = new List<Level1TemplateTrk>();
 
-            int nPitchesPerOctave = 2;
+            int nPitchesPerOctave = 7;
 
             level1TemplateTrks.Add(new Level1TemplateTrk(0, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(new Level1TemplateTrk(11, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(11, 0, nPitchesPerOctave));
             level1TemplateTrks.Add(new Level1TemplateTrk(1, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(new Level1TemplateTrk(12, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(12, 0, nPitchesPerOctave));
             level1TemplateTrks.Add(new Level1TemplateTrk(2, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(new Level1TemplateTrk(13, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(13, 0, nPitchesPerOctave));
             level1TemplateTrks.Add(new Level1TemplateTrk(3, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(new Level1TemplateTrk(14, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(14, 0, nPitchesPerOctave));
             level1TemplateTrks.Add(new Level1TemplateTrk(4, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(new Level1TemplateTrk(15, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(15, 0, nPitchesPerOctave));
             level1TemplateTrks.Add(new Level1TemplateTrk(5, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(new Level1TemplateTrk(16, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(16, 0, nPitchesPerOctave));
             level1TemplateTrks.Add(new Level1TemplateTrk(6, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(new Level1TemplateTrk(17, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(17, 0, nPitchesPerOctave));
             level1TemplateTrks.Add(new Level1TemplateTrk(7, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(new Level1TemplateTrk(18, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(18, 0, nPitchesPerOctave));
             level1TemplateTrks.Add(new Level1TemplateTrk(8, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(new Level1TemplateTrk(19, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(19, 0, nPitchesPerOctave));
             level1TemplateTrks.Add(new Level1TemplateTrk(9, 0, nPitchesPerOctave));
-            level1TemplateTrks.Add(new Level1TemplateTrk(20, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(new Level1TemplateTrk(20, 0, nPitchesPerOctave));
             level1TemplateTrks.Add(new Level1TemplateTrk(10, 0, nPitchesPerOctave));
             level1TemplateTrks.Add(new Level1TemplateTrk(21, 0, nPitchesPerOctave));
 
-            List<Trk> level2TemplateTrks = new List<Trk>();
+            List<Level2TemplateTrk> level2TemplateTrks = new List<Level2TemplateTrk>();
             level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[0], 6, _ornamentShapes[0], 7));
             level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[1], 5, _ornamentShapes[1], 7));
             level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[2], 5, _ornamentShapes[2], 7));

@@ -439,7 +439,7 @@ namespace Moritz.Algorithm.Tombeau1
         private IReadOnlyList<IReadOnlyList<MidiChordDef>> _pitchWheelTestMidiChordDefs = null;
         private IReadOnlyList<IReadOnlyList<MidiChordDef>> _ornamentTestMidiChordDefs = null;
         private IReadOnlyList<Level1TemplateTrk> _level1TemplateTrks = null;
-        private IReadOnlyList<Trk> _level2TemplateTrks = null;
+        private IReadOnlyList<Level2TemplateTrk> _level2TemplateTrks = null;
         #endregion initialised by Init()
         #region envelopes
         private static IReadOnlyList<IReadOnlyList<byte>> _ornamentShapes = new List<List<byte>>()
