@@ -46,6 +46,8 @@ namespace Moritz.Algorithm.Tombeau1
                 UniqueDefs.AddRange(subTrk.UniqueDefs);
             }
 
+            SetDurationsFromPitches(1000, 2000, false);
+
             MidiChordDef lastTrk0MidiChordDef = (MidiChordDef)UniqueDefs[UniqueDefs.Count - 1];
             lastTrk0MidiChordDef.BeamContinues = false;
         }

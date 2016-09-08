@@ -348,6 +348,72 @@ namespace Moritz.Spec
         #endregion Envelopes
 
         /// <summary>
+        /// Preserves the MsDuration of the Trk as a whole by resetting it after doing the following:
+        /// 1. Creates a sorted list of the unique bottom or top pitches in all the MidiChordDefs in the Trk.
+        ///    The use of the bottom or top pitch is controlled by argument 3: useBottomPitch.
+        /// 2. Creates a parallel list of msDuration values, whereby msDurations[0] is durationForLowestPitch
+        ///    and msDurations[msDurations.Count - 1] is durationForHighestPitch. The intermediate values are
+        ///    interpolated logarithmically.
+        /// 3. sets the MsDuration of each MidiChordDef according to its NotatedMidiPitch[0]. Rest msDurations
+        ///    are left unchanged at this stage.
+        /// 4. resets the MsDuration of the Trk to its original value.
+        /// </summary>
+        /// <param name="durationForLowestPitch"></param>
+        /// <param name="durationForHighestPitch"></param>
+        public void SetDurationsFromPitches(int durationForLowestPitch, int durationForHighestPitch, bool useBottomPitch)
+        {
+            List<byte> pitches = new List<byte>();
+            #region get pitches
+            foreach(IUniqueDef iud in _uniqueDefs)
+            {
+                MidiChordDef mcd = iud as MidiChordDef;
+                if(mcd != null)
+                {
+                    byte pitch = (useBottomPitch == true) ? mcd.NotatedMidiPitches[0] : mcd.NotatedMidiPitches[mcd.NotatedMidiPitches.Count - 1];
+                    if(!pitches.Contains(pitch))
+                    {
+                        pitches.Add(pitch);
+                    }
+                }
+            }
+            pitches.Sort();
+            #endregion get pitches
+            #region get durations
+            int nPitches = pitches.Count;
+            double factor = Math.Pow((((double)durationForHighestPitch) / durationForLowestPitch), (((double)1) / (nPitches - 1)));
+            List<int> msDurations = new List<int>();
+            double msDuration = durationForLowestPitch;
+            foreach(byte pitch in pitches)
+            {
+                msDurations.Add((int)Math.Round(msDuration));
+                msDuration *= factor;
+            }
+            Debug.Assert(msDurations.Count == nPitches);
+            Debug.Assert(msDurations[msDurations.Count - 1] == durationForHighestPitch);
+            #endregion get durations
+            #region get duration per pitch dictionary
+            Dictionary<byte, int> msDurPerPitch = new Dictionary<byte, int>();
+            for(int i = 0; i < nPitches; ++i)
+            {
+                msDurPerPitch.Add(pitches[i], msDurations[i]);
+            }
+            #endregion get get duration per pitch dictionary
+            #region set durations
+            int currentMsDuration = this.MsDuration;
+            foreach(IUniqueDef iud in _uniqueDefs)
+            {
+                MidiChordDef mcd = iud as MidiChordDef;
+                if(mcd != null)
+                {
+                    byte pitch = (useBottomPitch == true) ? mcd.NotatedMidiPitches[0] : mcd.NotatedMidiPitches[mcd.NotatedMidiPitches.Count - 1];
+                    mcd.MsDuration = msDurPerPitch[pitch];
+                }
+            }
+            this.MsDuration = currentMsDuration;
+            #endregion set durations
+        }
+
+        /// <summary>
         /// Multiplies each expression value in the MidiChordDefs
         /// from beginIndex to (not including) endIndex by the argument factor.
         /// </summary>
