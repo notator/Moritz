@@ -138,28 +138,30 @@ namespace Moritz.Algorithm.Tombeau1
         {
             List<Trk> level1TemplateTrks = new List<Trk>();
 
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(0, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(11, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(1, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(12, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(2, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(13, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(3, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(14, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(4, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(15, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(5, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(16, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(6, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(17, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(7, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(18, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(8, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(19, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(9, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(20, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(10, 0, 9));
-            level1TemplateTrks.Add(NewLevel1TemplateTrk(21, 0, 9));
+            int nPitchesPerOctave = 2;
+
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(0, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(11, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(1, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(12, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(2, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(13, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(3, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(14, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(4, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(15, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(5, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(16, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(6, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(17, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(7, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(18, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(8, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(19, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(9, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(20, 0, nPitchesPerOctave++));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(10, 0, nPitchesPerOctave));
+            level1TemplateTrks.Add(NewLevel1TemplateTrk(21, 0, nPitchesPerOctave));
 
             List<Trk> level2TemplateTrks = new List<Trk>();
             level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[0], 6, _ornamentShapes[0], 7));
@@ -195,7 +197,7 @@ namespace Moritz.Algorithm.Tombeau1
             Gamut gamut = new Gamut(absolutePitchHierarchy, nPitchesPerOctave);
 
             List<IUniqueDef> iuds = new List<IUniqueDef>();
-            int rootNotatedPitch = gamut[gamut.Count / 2];
+            int rootNotatedPitch = gamut[gamut.Count / 2] - 24;
             int nPitchesPerChord = 1;
             
             List<int> durations4 = new List<int>() { 1000, 841, 707, 595 }; // (1000 / n( 2^(1 / 4) )  for n = 1..4
@@ -261,8 +263,6 @@ namespace Moritz.Algorithm.Tombeau1
             {
                 trk.AddRange(subTrk);
             }
-
-            trk.AdjustVelocitiesHairpin(0, trk.EndMsPositionReFirstIUD, 0.1, 1);
 
             MidiChordDef lastTrk0MidiChordDef = (MidiChordDef)trk[trk.Count - 1];
             lastTrk0MidiChordDef.BeamContinues = false;

@@ -456,6 +456,49 @@ namespace Moritz.Spec
         }
         #endregion SetVelocityPerAbsolutePitch
 
+        /// <summary>
+        /// Sets all velocities in the MidiChordDef to a value related to its msDuration.
+        /// The new velocity will be in the same proportion between velocityForMinMsDuration and velocityForMaxMsDuration
+        /// as MsDuration is between msDurationRangeMin and msDurationRangeMax.
+        /// N.B 1) Neither velocityForMinMsDuration nor velocityForMaxMsDuration can be zero! -- that would be a NoteOff.
+        /// and 2) velocityForMinMsDuration can be less than, equal to, or greater than velocityForMaxMsDuration
+        /// </summary>
+        /// <param name="msDurationRangeMin">less than or equal to the current MsDuration and less than or equal to msDurationRangeMax</param>
+        /// <param name="msDurationRangeMax">greater than or equal to the current MsDuration and greater than or equal to msDurationRangeMin</param>
+        /// <param name="velocityForMinMsDuration">in range 1..127</param>
+        /// <param name="velocityForMaxMsDuration">in range 1..127</param>
+        public void SetVelocityFromDuration(int msDurationRangeMin, int msDurationRangeMax, byte velocityForMinMsDuration, byte velocityForMaxMsDuration)
+        {
+            Debug.Assert(_msDuration >= msDurationRangeMin && _msDuration <= msDurationRangeMax);
+            Debug.Assert(msDurationRangeMin <= msDurationRangeMax);
+            // neither velocityForMinMsDuration nor velocityForMaxMsDuration can be zero!
+            // velocityForMinMsDuration can be less than, equal to, or greater than velocityForMaxMsDuration
+            Debug.Assert(velocityForMinMsDuration >= 1 && velocityForMinMsDuration <= 127);
+            Debug.Assert(velocityForMaxMsDuration >= 1 && velocityForMaxMsDuration <= 127);
+
+            double msDurationRange = msDurationRangeMax - msDurationRangeMin;
+            double velocityRange = velocityForMaxMsDuration - velocityForMinMsDuration;
+            byte velocity = velocityForMinMsDuration;
+            if(msDurationRange != 0)
+            {
+                double factor = ((double)(MsDuration - msDurationRangeMin)) / msDurationRange;
+                int increment = (int)(factor * velocityRange);
+                velocity = M.MidiValue(velocityForMinMsDuration + increment);
+            }
+            for(int i = 0; i < _notatedMidiVelocities.Count; ++i)
+            {
+                _notatedMidiVelocities[i] = velocity;
+            }
+            for(int i = 0; i < BasicMidiChordDefs.Count; ++i)
+            {
+                List<byte> bmcdVelocities = BasicMidiChordDefs[i].Velocities;
+                for(int j = 0; j < bmcdVelocities.Count; ++j)
+                {
+                    bmcdVelocities[j] = velocity;
+                }
+            }
+        }
+
         #region SetVerticalVelocityGradient
         /// <summary>
         /// The arguments are both in range [1..127].

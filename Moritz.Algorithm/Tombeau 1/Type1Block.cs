@@ -12,9 +12,20 @@ namespace Moritz.Algorithm.Tombeau1
             : base()
         {
             Trk trk0 = level2TemplateTrk.Clone();
+
+            List<byte> velocityPerAbsolutePitch = ((MidiChordDef)trk0[0]).Gamut.GetVelocityPerAbsolutePitch(25, true);
+
             trk0.MidiChannel = 0;
             trk0.TransposeInGamut(8);
-            trk0.AddRange(trk0.Clone());
+            Trk trk0a = trk0.Clone();
+
+            trk0.SetVelocitiesFromDurations(75, 127);
+            trk0.AdjustVelocitiesHairpin(0, trk0.EndMsPositionReFirstIUD, 0.1, 1);
+
+            trk0a.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+            trk0a.AdjustVelocitiesHairpin(0, trk0a.EndMsPositionReFirstIUD, 0.5, 2);
+
+            trk0.AddRange(trk0a);
             trk0.MsDuration = blockMsDuration - trk0InitialDelay;
             ((MidiChordDef)trk0[0]).PanMsbs = new List<byte>() { 0 };
             if(trk0InitialDelay > 0)
@@ -24,8 +35,15 @@ namespace Moritz.Algorithm.Tombeau1
 
             Trk trk1 = level2TemplateTrk.Clone();
             trk1.MidiChannel = 1;
-            //trk1.TransposeInGamut(7); 
-            trk1.AddRange(trk1.Clone());
+            //trk1.TransposeInGamut(7);
+            Trk trk1a = trk1.Clone();
+
+            trk1.AdjustVelocitiesHairpin(0, trk1.EndMsPositionReFirstIUD, 0.1, 1);
+
+            trk1a.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+            trk1a.AdjustVelocitiesHairpin(0, trk1a.EndMsPositionReFirstIUD, 0.5, 1.5);
+
+            trk1.AddRange(trk1a);
             trk1.MsDuration = blockMsDuration;
             ((MidiChordDef)trk1[0]).PanMsbs = new List<byte>() { 127 };
 

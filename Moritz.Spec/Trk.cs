@@ -275,7 +275,44 @@ namespace Moritz.Spec
             }
         }
         #endregion SetVelocityPerAbsolutePitch
+        #region SetVelocitiesFromDurations
+        /// <summary>
+        /// Sets the velocity of each MidiChordDef in the Trk (anti-)proportionally to its duration.
+        /// N.B 1) Neither velocityForMinMsDuration nor velocityForMaxMsDuration can be zero! -- that would be a NoteOff.
+        /// and 2) velocityForMinMsDuration can be less than, equal to, or greater than velocityForMaxMsDuration
+        /// </summary>
+        /// <param name="velocityForMinMsDuration">in range 1..127</param>
+        /// <param name="velocityForMaxMsDuration">in range 1..127</param>
+        public void SetVelocitiesFromDurations(byte velocityForMinMsDuration, byte velocityForMaxMsDuration)
+        {
+            Debug.Assert(velocityForMinMsDuration >= 1 && velocityForMinMsDuration <= 127);
+            Debug.Assert(velocityForMaxMsDuration >= 1 && velocityForMaxMsDuration <= 127);
 
+            int msDurationRangeMin = int.MaxValue;
+            int msDurationRangeMax = int.MinValue;
+
+            #region find msDurationRangeMin and msDurationRangeMax 
+            foreach(IUniqueDef iud in _uniqueDefs)
+            {
+                MidiChordDef mcd = iud as MidiChordDef;
+                if(mcd != null)
+                {
+                    msDurationRangeMin = (msDurationRangeMin < mcd.MsDuration) ? msDurationRangeMin : mcd.MsDuration;
+                    msDurationRangeMax = (msDurationRangeMax > mcd.MsDuration) ? msDurationRangeMax : mcd.MsDuration;
+                }
+            }
+            #endregion find msDurationRangeMin and msDurationRangeMax
+
+            foreach(IUniqueDef iud in _uniqueDefs)
+            {
+                MidiChordDef mcd = iud as MidiChordDef;
+                if(mcd != null)
+                {
+                    mcd.SetVelocityFromDuration(msDurationRangeMin, msDurationRangeMax, velocityForMinMsDuration, velocityForMaxMsDuration);
+                }
+            }
+        }
+        #endregion SetVelocitiesFromDurations
         #region SetVerticalVelocityGradient
         /// <summary>
         /// The arguments are both in range [1..127].
@@ -376,7 +413,7 @@ namespace Moritz.Spec
 
             int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
 
-            double factorIncrement = (endFactor - startFactor) / (endIndex - beginIndex - nNonMidiChordDefs);
+            double factorIncrement = (endFactor - startFactor) / (endIndex - beginIndex - nNonMidiChordDefs - 1);
             double factor = startFactor;
             List<IUniqueDef> lmdds = _uniqueDefs;
 
@@ -1087,7 +1124,6 @@ namespace Moritz.Spec
                 _Add(iud);
             }
         }
-
         #endregion common to sort functions
 
         #endregion Sort functions
