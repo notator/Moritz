@@ -164,84 +164,34 @@ namespace Moritz.Algorithm.Tombeau1
             level1TemplateTrks.Add(new Level1TemplateTrk(21, 0, nPitchesPerOctave));
 
             List<Trk> level2TemplateTrks = new List<Trk>();
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[0], 6, _ornamentShapes[0], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[1], 5, _ornamentShapes[1], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[2], 5, _ornamentShapes[2], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[3], 6, _ornamentShapes[3], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[4], 6, _ornamentShapes[4], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[5], 6, _ornamentShapes[5], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[6], 5, _ornamentShapes[6], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[7], 5, _ornamentShapes[7], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[8], 5, _ornamentShapes[6], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[9], 5, _ornamentShapes[5], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[10], 5, _ornamentShapes[4], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[11], 5, _ornamentShapes[3], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[12], 5, _ornamentShapes[2], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[13], 5, _ornamentShapes[1], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[14], 5, _ornamentShapes[0], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[15], 5, _ornamentShapes[1], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[16], 5, _ornamentShapes[2], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[17], 5, _ornamentShapes[3], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[18], 5, _ornamentShapes[4], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[19], 5, _ornamentShapes[5], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[20], 5, _ornamentShapes[6], 7));
-            level2TemplateTrks.Add(NewLevel2TemplateTrk(level1TemplateTrks[21], 5, _ornamentShapes[7], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[0], 6, _ornamentShapes[0], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[1], 5, _ornamentShapes[1], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[2], 5, _ornamentShapes[2], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[3], 6, _ornamentShapes[3], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[4], 6, _ornamentShapes[4], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[5], 6, _ornamentShapes[5], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[6], 5, _ornamentShapes[6], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[7], 5, _ornamentShapes[7], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[8], 5, _ornamentShapes[6], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[9], 5, _ornamentShapes[5], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[10], 5, _ornamentShapes[4], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[11], 5, _ornamentShapes[3], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[12], 5, _ornamentShapes[2], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[13], 5, _ornamentShapes[1], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[14], 5, _ornamentShapes[0], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[15], 5, _ornamentShapes[1], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[16], 5, _ornamentShapes[2], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[17], 5, _ornamentShapes[3], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[18], 5, _ornamentShapes[4], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[19], 5, _ornamentShapes[5], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[20], 5, _ornamentShapes[6], 7));
+            level2TemplateTrks.Add(new Level2TemplateTrk(level1TemplateTrks[21], 5, _ornamentShapes[7], 7));
 
             _level1TemplateTrks = level1TemplateTrks;
             _level2TemplateTrks = level2TemplateTrks;
         }
 
-        /// <summary>
-        /// Returns a new Trk that is the concatenation of (a clone of) the original templateTrk
-        /// with nSubTrks Trks that are variations of the original templateTrk.
-        /// The returned Trk has nSubtrks + 1 versions of the original template (including the original).
-        /// </summary>
-        /// <param name="midiChannel"></param>
-        /// <param name="level1TemplateTrk"></param>
-        /// <param name="nSubTrks"></param>
-        /// <returns></returns>
-        private Trk NewLevel2TemplateTrk(Level1TemplateTrk level1TemplateTrk, int nSubTrks, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
-        {
-            List<int> relativeTranspositions = new List<int>() { 2, 1, 2, 2, 2, 1 };
-            Debug.Assert(nSubTrks <= relativeTranspositions.Count);
-
-            List<Trk> subTrks = new List<Trk>();
-            Level1TemplateTrk trk = level1TemplateTrk.Clone();
-
-            //SetOrnament(trk.UniqueDefs[2] as MidiChordDef, _envelopeShapes[0], 7);
-            SetOrnament(trk.UniqueDefs[2] as MidiChordDef, ornamentShape, nOrnamentChords);
-
-            Level1TemplateTrk currentTrk = trk;
-            for(int i = 0; i < nSubTrks; ++i)
-            {
-                Level1TemplateTrk subTrk = currentTrk.Clone();
-                subTrk.TransposeInGamut(relativeTranspositions[i]);
-
-                if((i % 2) == 0)
-                {
-                    subTrk.Permute(1, 7);
-                }
-                subTrks.Add(subTrk);
-                currentTrk = subTrk;
-            }
-
-            foreach(Trk subTrk in subTrks)
-            {
-                trk.AddRange(subTrk);
-            }
-
-            MidiChordDef lastTrk0MidiChordDef = (MidiChordDef)trk[trk.Count - 1];
-            lastTrk0MidiChordDef.BeamContinues = false;
-
-            return trk;
-        }
-
-        private void SetOrnament(MidiChordDef midiChordDef, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
-        {
-            int nPitchesPerOctave = midiChordDef.Gamut.NPitchesPerOctave;
-            Envelope ornamentEnvelope = new Envelope(ornamentShape, 127, nPitchesPerOctave, nOrnamentChords);
-            midiChordDef.SetOrnament(ornamentEnvelope);
-        }
+        
 
 
         #endregion SetType1TemplateTrks

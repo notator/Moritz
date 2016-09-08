@@ -60,7 +60,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// TemplateTrks are all constructed with MidiChannel=0 and msPositionReContainer=0.
         /// This constructor is used by Level1TemplateTrk.Clone()
         /// </summary>
-        public Level1TemplateTrk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
+        private Level1TemplateTrk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
             : base(midiChannel, msPositionReContainer, iuds)
         {
         }
