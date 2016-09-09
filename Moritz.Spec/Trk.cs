@@ -257,13 +257,16 @@ namespace Moritz.Spec
 
         #region SetVelocityPerAbsolutePitch
         /// <summary>
-        /// The argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
+        /// The first argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
+        /// The second (optional) argument determines the proportion of the final velocity determined by this function.
+        /// The other component is the existing velocity. If percent is 100.0, the existing velocity is replaced completely.
         /// For example: If the MidiChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
         /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc.
         /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef. 
         /// </summary>
         /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
-        public void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch)
+        /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
+        public void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, double percent = 100.0)
         {
             #region conditions
             Debug.Assert(velocityPerAbsolutePitch.Count == 12);
@@ -278,7 +281,7 @@ namespace Moritz.Spec
                 MidiChordDef mcd = iud as MidiChordDef;
                 if(mcd != null)
                 {
-                    mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+                    mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, percent);
                 }
             }
         }
@@ -286,12 +289,15 @@ namespace Moritz.Spec
         #region SetVelocitiesFromDurations
         /// <summary>
         /// Sets the velocity of each MidiChordDef in the Trk (anti-)proportionally to its duration.
+        /// The (optional) percent argument determines the proportion of the final velocity for which this function is responsible.
+        /// The other component of the final velocity value is its existing velocity. If percent is 100.0, the existing velocity
+        /// is replaced completely.
         /// N.B 1) Neither velocityForMinMsDuration nor velocityForMaxMsDuration can be zero! -- that would be a NoteOff.
-        /// and 2) velocityForMinMsDuration can be less than, equal to, or greater than velocityForMaxMsDuration
+        /// and 2) velocityForMinMsDuration can be less than, equal to, or greater than velocityForMaxMsDuration.
         /// </summary>
         /// <param name="velocityForMinMsDuration">in range 1..127</param>
         /// <param name="velocityForMaxMsDuration">in range 1..127</param>
-        public void SetVelocitiesFromDurations(byte velocityForMinMsDuration, byte velocityForMaxMsDuration)
+        public void SetVelocitiesFromDurations(byte velocityForMinMsDuration, byte velocityForMaxMsDuration, double percent = 100.0)
         {
             Debug.Assert(velocityForMinMsDuration >= 1 && velocityForMinMsDuration <= 127);
             Debug.Assert(velocityForMaxMsDuration >= 1 && velocityForMaxMsDuration <= 127);
@@ -316,7 +322,7 @@ namespace Moritz.Spec
                 MidiChordDef mcd = iud as MidiChordDef;
                 if(mcd != null)
                 {
-                    mcd.SetVelocityFromDuration(msDurationRangeMin, msDurationRangeMax, velocityForMinMsDuration, velocityForMaxMsDuration);
+                    mcd.SetVelocityFromDuration(msDurationRangeMin, msDurationRangeMax, velocityForMinMsDuration, velocityForMaxMsDuration, percent);
                 }
             }
         }
@@ -351,17 +357,19 @@ namespace Moritz.Spec
         /// Preserves the MsDuration of the Trk as a whole by resetting it after doing the following:
         /// 1. Creates a sorted list of the unique bottom or top pitches in all the MidiChordDefs in the Trk.
         ///    The use of the bottom or top pitch is controlled by argument 3: useBottomPitch.
-        /// 2. Creates a parallel list of msDuration values, whereby msDurations[0] is durationForLowestPitch
-        ///    and msDurations[msDurations.Count - 1] is durationForHighestPitch. The intermediate values are
+        /// 2. Creates a duration per pitch dictionary, whereby durationPerPitch[lowestPitch] is durationForLowestPitch
+        ///    and durationPerPitch[lowestPitch] is durationForHighestPitch. The intermediate duration values are
         ///    interpolated logarithmically.
-        /// 3. sets the MsDuration of each MidiChordDef according to its NotatedMidiPitch[0]. Rest msDurations
-        ///    are left unchanged at this stage.
-        /// 4. resets the MsDuration of the Trk to its original value.
+        /// 3. Sets the MsDuration of each MidiChordDef to (percent * the values found in the duration per pitch dictionary) plus
+        ///   ((100-percent)percent * the original durations). Rest msDurations are left unchanged at this stage.
+        /// 4. Resets the MsDuration of the Trk to its original value.
         /// </summary>
         /// <param name="durationForLowestPitch"></param>
         /// <param name="durationForHighestPitch"></param>
-        public void SetDurationsFromPitches(int durationForLowestPitch, int durationForHighestPitch, bool useBottomPitch)
+        public void SetDurationsFromPitches(int durationForLowestPitch, int durationForHighestPitch, bool useBottomPitch, double percent = 100.0)
         {
+            Debug.Assert(percent >= 0 && percent <= 100);
+
             List<byte> pitches = new List<byte>();
             #region get pitches
             foreach(IUniqueDef iud in _uniqueDefs)
@@ -399,6 +407,8 @@ namespace Moritz.Spec
             }
             #endregion get get duration per pitch dictionary
             #region set durations
+            double factorForNewValue = percent / 100.0;
+            double factorForOldValue = 1 - factorForNewValue;
             int currentMsDuration = this.MsDuration;
             foreach(IUniqueDef iud in _uniqueDefs)
             {
@@ -406,7 +416,9 @@ namespace Moritz.Spec
                 if(mcd != null)
                 {
                     byte pitch = (useBottomPitch == true) ? mcd.NotatedMidiPitches[0] : mcd.NotatedMidiPitches[mcd.NotatedMidiPitches.Count - 1];
-                    mcd.MsDuration = msDurPerPitch[pitch];
+                    int oldDuration = mcd.MsDuration;
+                    int durPerPitch = msDurPerPitch[pitch];
+                    mcd.MsDuration = (int)Math.Round((oldDuration * factorForOldValue) + (durPerPitch * factorForNewValue));
                 }
             }
             this.MsDuration = currentMsDuration;

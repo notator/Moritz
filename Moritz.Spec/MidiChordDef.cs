@@ -436,13 +436,16 @@ namespace Moritz.Spec
 
         #region SetVelocityPerAbsolutePitch
         /// <summary>
-        /// The argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
+        /// The first argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
+        /// The second (optional) argument determines the proportion of the final velocity determined by this function.
+        /// The other component is the existing velocity. If percent is 100.0, the existing velocity is replaced completely.
         /// For example: If the MidiChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
         /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc.
         /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef. 
         /// </summary>
         /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
-        public void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch)
+        /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
+        public void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, double percent = 100.0)
         {
             #region conditions
             Debug.Assert(velocityPerAbsolutePitch.Count == 12);
@@ -451,14 +454,20 @@ namespace Moritz.Spec
                 int v = velocityPerAbsolutePitch[i];
                 Debug.Assert(v >= 0 && v <= 127);
             }
-            #endregion conditions
-
+            Debug.Assert(percent >= 0 && percent <= 100);
             Debug.Assert(this.NotatedMidiPitches.Count == NotatedMidiVelocities.Count);
-
+            #endregion conditions
+            double factorForNewValue = percent / 100;
+            double factorForOldValue = 1 - factorForNewValue;
             for(int pitchIndex = 0; pitchIndex < NotatedMidiPitches.Count; ++pitchIndex)
             {
+                byte oldVelocity = NotatedMidiVelocities[pitchIndex];
+
                 int absPitch = NotatedMidiPitches[pitchIndex] % 12;
-                NotatedMidiVelocities[pitchIndex] = velocityPerAbsolutePitch[absPitch];
+                byte newVelocity = velocityPerAbsolutePitch[absPitch];
+                int valueToSet = (int)Math.Round((oldVelocity * factorForOldValue) + (newVelocity * factorForNewValue));
+                Debug.Assert(valueToSet >= 0 && valueToSet <= 127);
+                NotatedMidiVelocities[pitchIndex] = M.MidiValue(valueToSet); 
             }
 
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
@@ -470,16 +479,20 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Sets all velocities in the MidiChordDef to a value related to its msDuration.
-        /// The new velocity will be in the same proportion between velocityForMinMsDuration and velocityForMaxMsDuration
-        /// as MsDuration is between msDurationRangeMin and msDurationRangeMax.
+        /// If percent has its default value 100, the new velocity will be in the same proportion between velocityForMinMsDuration
+        /// and velocityForMaxMsDuration as MsDuration is between msDurationRangeMin and msDurationRangeMax.
         /// N.B 1) Neither velocityForMinMsDuration nor velocityForMaxMsDuration can be zero! -- that would be a NoteOff.
         /// and 2) velocityForMinMsDuration can be less than, equal to, or greater than velocityForMaxMsDuration
+        /// The (optional) percent argument determines the proportion of the final velocity for which this function is responsible.
+        /// The other component of the final velocity value is its existing velocity. If percent is 100.0, the existing velocity
+        /// is replaced completely.
         /// </summary>
         /// <param name="msDurationRangeMin">less than or equal to the current MsDuration and less than or equal to msDurationRangeMax</param>
         /// <param name="msDurationRangeMax">greater than or equal to the current MsDuration and greater than or equal to msDurationRangeMin</param>
         /// <param name="velocityForMinMsDuration">in range 1..127</param>
         /// <param name="velocityForMaxMsDuration">in range 1..127</param>
-        public void SetVelocityFromDuration(int msDurationRangeMin, int msDurationRangeMax, byte velocityForMinMsDuration, byte velocityForMaxMsDuration)
+        /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
+        public void SetVelocityFromDuration(int msDurationRangeMin, int msDurationRangeMax, byte velocityForMinMsDuration, byte velocityForMaxMsDuration, double percent = 100.0)
         {
             Debug.Assert(_msDuration >= msDurationRangeMin && _msDuration <= msDurationRangeMax);
             Debug.Assert(msDurationRangeMin <= msDurationRangeMax);
@@ -487,26 +500,37 @@ namespace Moritz.Spec
             // velocityForMinMsDuration can be less than, equal to, or greater than velocityForMaxMsDuration
             Debug.Assert(velocityForMinMsDuration >= 1 && velocityForMinMsDuration <= 127);
             Debug.Assert(velocityForMaxMsDuration >= 1 && velocityForMaxMsDuration <= 127);
+            Debug.Assert(percent >= 0 && percent <= 100);
+
+            double factorForNewValue = percent / 100;
+            double factorForOldValue = 1 - factorForNewValue;
 
             double msDurationRange = msDurationRangeMax - msDurationRangeMin;
             double velocityRange = velocityForMaxMsDuration - velocityForMinMsDuration;
-            byte velocity = velocityForMinMsDuration;
+            byte newVelocity = velocityForMinMsDuration;
             if(msDurationRange != 0)
             {
                 double factor = ((double)(MsDuration - msDurationRangeMin)) / msDurationRange;
                 int increment = (int)(factor * velocityRange);
-                velocity = M.MidiValue(velocityForMinMsDuration + increment);
+                newVelocity = M.MidiValue(velocityForMinMsDuration + increment);
             }
             for(int i = 0; i < _notatedMidiVelocities.Count; ++i)
             {
-                _notatedMidiVelocities[i] = velocity;
+                byte oldVelocity = _notatedMidiVelocities[i];
+                int valueToSet = (int)Math.Round((oldVelocity * factorForOldValue) + (newVelocity * factorForNewValue));
+                Debug.Assert(valueToSet >= 0 && valueToSet <= 127);
+                _notatedMidiVelocities[i] = M.MidiValue(valueToSet);
+
             }
             for(int i = 0; i < BasicMidiChordDefs.Count; ++i)
             {
                 List<byte> bmcdVelocities = BasicMidiChordDefs[i].Velocities;
                 for(int j = 0; j < bmcdVelocities.Count; ++j)
                 {
-                    bmcdVelocities[j] = velocity;
+                    byte oldVelocity = bmcdVelocities[j];
+                    int valueToSet = (int)Math.Round((oldVelocity * factorForOldValue) + (newVelocity * factorForNewValue));
+                    Debug.Assert(valueToSet >= 0 && valueToSet <= 127);
+                    bmcdVelocities[j] = M.MidiValue(valueToSet);
                 }
             }
         }
