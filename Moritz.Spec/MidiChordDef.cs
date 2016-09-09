@@ -342,6 +342,18 @@ namespace Moritz.Spec
         }
 
         /// <summary>
+        /// Calls the other SetOrnament function
+        /// </summary>
+        /// <param name="ornamentShape"></param>
+        /// <param name="nOrnamentChords"></param>
+        public void SetOrnament(IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
+        {
+            int nPitchesPerOctave = this.Gamut.NPitchesPerOctave;
+            Envelope ornamentEnvelope = new Envelope(ornamentShape, 127, nPitchesPerOctave, nOrnamentChords);
+            SetOrnament(ornamentEnvelope);
+        }
+
+        /// <summary>
         /// Sets an ornament having the shape and number of elements in the ornamentEnvelope.
         /// If ornamentEnvelope == null, BasicMidiChords[0] is set to the NotatedMidiChord.
         /// using the NotatedMidiPitches as the first chord.

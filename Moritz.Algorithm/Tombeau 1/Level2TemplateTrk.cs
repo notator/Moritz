@@ -25,7 +25,12 @@ namespace Moritz.Algorithm.Tombeau1
             level1Trks.Add(level1TemplateTrk.Clone());
 
             //SetOrnament(trk.UniqueDefs[2] as MidiChordDef, _envelopeShapes[0], 7);
-            SetOrnament(level1Trks[0].UniqueDefs[2] as MidiChordDef, ornamentShape, nOrnamentChords);
+
+            //MidiChordDef mcd = level1Trks[0].UniqueDefs[2] as MidiChordDef;
+            //if(mcd != null)
+            //{
+            //    mcd.SetOrnament(ornamentShape, nOrnamentChords);
+            //}
 
             Level1TemplateTrk currentTrk = level1Trks[0];
             for(int i = 0; i < nSubTrks; ++i)
@@ -43,20 +48,16 @@ namespace Moritz.Algorithm.Tombeau1
 
             foreach(Level1TemplateTrk subTrk in level1Trks)
             {
+                MidiChordDef mcd = (MidiChordDef)subTrk.UniqueDefs[subTrk.UniqueDefs.Count - 1];
+                mcd.BeamContinues = false;
+
                 UniqueDefs.AddRange(subTrk.UniqueDefs);
             }
 
-            SetDurationsFromPitches(1000, 2000, false);
+            //SetDurationsFromPitches(1000, 2000, false);
 
-            MidiChordDef lastTrk0MidiChordDef = (MidiChordDef)UniqueDefs[UniqueDefs.Count - 1];
-            lastTrk0MidiChordDef.BeamContinues = false;
-        }
-
-        private void SetOrnament(MidiChordDef midiChordDef, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
-        {
-            int nPitchesPerOctave = midiChordDef.Gamut.NPitchesPerOctave;
-            Envelope ornamentEnvelope = new Envelope(ornamentShape, 127, nPitchesPerOctave, nOrnamentChords);
-            midiChordDef.SetOrnament(ornamentEnvelope);
+            //MidiChordDef lastTrk0MidiChordDef = (MidiChordDef)UniqueDefs[UniqueDefs.Count - 1];
+            //lastTrk0MidiChordDef.BeamContinues = false;
         }
 
         /// <summary>

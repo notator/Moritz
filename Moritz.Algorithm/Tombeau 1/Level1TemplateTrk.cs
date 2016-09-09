@@ -24,7 +24,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// <summary>
         /// TemplateTrks are all constructed with MidiChannel=0 and msPositionReContainer=0.
         /// </summary>
-        public Level1TemplateTrk(int relativePitchHierarchyIndex, int rootPitch, int nPitchesPerOctave)
+        public Level1TemplateTrk(int relativePitchHierarchyIndex, int rootPitch, int nPitchesPerOctave, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
             : base()
         {
             List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, rootPitch);
@@ -32,28 +32,31 @@ namespace Moritz.Algorithm.Tombeau1
 
             Debug.Assert(_uniqueDefs != null && _uniqueDefs.Count == 0);
 
-            int rootNotatedPitch = gamut[gamut.Count / 2];
-            int nPitchesPerChord = 1;
+            //int rootNotatedPitch = gamut[gamut.Count / 2];
+            int nPitchesPerChord = 5;
 
-            List<int> durations4 = new List<int>() { 1000, 841, 707, 595 }; // (1000 / n( 2^(1 / 4) )  for n = 1..4
-            int msDuration = durations4[3];
-            MidiChordDef mcd1 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 1, null);
-            _uniqueDefs.Add(mcd1);
+            int msDuration = 1000; // dummy -- overridden by SetDurationsFromPitches() below
+            int rootIndex = gamut.IndexOf(rootPitch);
+            Debug.Assert(rootIndex >= 0 && rootIndex < nPitchesPerOctave);
+            rootIndex += (nPitchesPerOctave * 5);
 
-            msDuration = durations4[1];
-            MidiChordDef mcd2 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 2, null);
-            mcd2.TransposeInGamut(1);
-            _uniqueDefs.Add(mcd2);
+            for(int i = 0; i < nPitchesPerOctave; ++i)
+            {
+                MidiChordDef mcd = new MidiChordDef(msDuration, gamut, gamut[rootIndex + i], nPitchesPerChord, null);
+                if(i == 2)
+                {
+                    mcd.SetOrnament(ornamentShape, nOrnamentChords);
+                }
+                _uniqueDefs.Add(mcd);
+            }
 
-            msDuration = durations4[0];
-            MidiChordDef mcd3 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 3, null);
-            mcd3.TransposeInGamut(2);
-            _uniqueDefs.Add(mcd3);
+            // 1000, 841, 707, 595 is (1000 / n( 2^(1 / 4) )  for n = 1..4
+            // The actual durations are set such that MsDuration stays at 4000ms.
+            SetDurationsFromPitches(1000, 595, true);
+            SetVelocitiesFromDurations(75, 127);
 
-            msDuration = durations4[2];
-            MidiChordDef mcd4 = new MidiChordDef(msDuration, gamut, rootNotatedPitch, nPitchesPerChord + 4, null);
-            mcd4.TransposeInGamut(3);
-            _uniqueDefs.Add(mcd4);
+            /********************************************************************/
+            // The ornament, durations and velocities are defaults that can be overridden by containing Trks, Seqs and Blocks.
         }
 
         /// <summary>

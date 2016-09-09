@@ -49,7 +49,7 @@ namespace Moritz.Algorithm.Tombeau1
             trk0a.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
             trk0a.AdjustVelocitiesHairpin(0, trk0a.EndMsPositionReFirstIUD, 0.5, 2);
 
-            List<Level2TemplateTrk> level2TemplateTrks = new List<Tombeau1.Level2TemplateTrk>() { trk0, trk0a };
+            List<Level2TemplateTrk> level2TemplateTrks = new List<Tombeau1.Level2TemplateTrk>() { trk0 /*, trk0a */ };
             Level3Trk level3trk0 = new Level3Trk(midiChannel, 0, level2TemplateTrks);
 
             level3trk0.MsDuration = blockMsDuration - trk0InitialDelay;
@@ -65,17 +65,17 @@ namespace Moritz.Algorithm.Tombeau1
         private Level3Trk GetLevel3Trk1(int blockMsDuration, Level2TemplateTrk level2TemplateTrk, int midiChannel)
         {
             Level2TemplateTrk trk1 = level2TemplateTrk.Clone();
-            Level2TemplateTrk trk1a = level2TemplateTrk.Clone();
 
             List<byte> velocityPerAbsolutePitch = ((MidiChordDef)trk1[0]).Gamut.GetVelocityPerAbsolutePitch(25, true);
             trk1.MidiChannel = 1;
             //trk1.TransposeInGamut(7);
-            trk1.AdjustVelocitiesHairpin(0, trk1.EndMsPositionReFirstIUD, 0.1, 1);
+            //trk1.AdjustVelocitiesHairpin(0, trk1.EndMsPositionReFirstIUD, 0.1, 1);
 
-            trk1a.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
-            trk1a.AdjustVelocitiesHairpin(0, trk1a.EndMsPositionReFirstIUD, 0.5, 1.5);
+            //Level2TemplateTrk trk1a = level2TemplateTrk.Clone();
+            //trk1a.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+            //trk1a.AdjustVelocitiesHairpin(0, trk1a.EndMsPositionReFirstIUD, 0.5, 1.5);
 
-            List<Level2TemplateTrk> level2TemplateTrks = new List<Tombeau1.Level2TemplateTrk>() { trk1, trk1a };
+            List<Level2TemplateTrk> level2TemplateTrks = new List<Tombeau1.Level2TemplateTrk>() { trk1 /*, trk1a */ };
             Level3Trk level3trk1 = new Level3Trk(midiChannel, 0, level2TemplateTrks);
 
             level3trk1.MsDuration = blockMsDuration;

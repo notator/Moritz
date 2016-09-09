@@ -357,26 +357,13 @@ namespace Moritz.Algorithm.Tombeau1
             AddNewType1Block(13000, 2, 5, 1000);
             AddNewType1Block(13000, 2, 6, 900);
             AddNewType1Block(13000, 2, 7, 900);
-
             AddNewType1Block(13000, 2, 8, 1500);
             AddNewType1Block(13000, 2, 9, 1400);
             AddNewType1Block(13000, 2, 10, 1300);
-            AddNewType1Block(13000, 2, 11, 1200);
-            AddNewType1Block(13000, 2, 12, 1100);
-            AddNewType1Block(13000, 2, 13, 1000);
-            AddNewType1Block(13000, 2, 14, 900);
-            AddNewType1Block(13000, 2, 15, 900);
-
-            AddNewType1Block(13000, 2, 16, 1500);
-            AddNewType1Block(13000, 2, 17, 1400);
-            AddNewType1Block(13000, 2, 18, 1300);
-            AddNewType1Block(13000, 2, 19, 1200);
-            AddNewType1Block(13000, 2, 20, 1100);
-            AddNewType1Block(13000, 2, 21, 1000);
 
             /************************************************/
-            Block vpapBlock = VPAPBlock(_level1TemplateTrks[1]);
-            _blockList.Add(vpapBlock);   // 2 bars
+            //Block vpapBlock = VPAPBlock(_level1TemplateTrks[1]);
+            //_blockList.Add(vpapBlock);   // 2 bars
 
             /************************************************/
             #region test blocks
@@ -448,10 +435,13 @@ namespace Moritz.Algorithm.Tombeau1
                 { new List<byte>() {127, 0} },
                 { new List<byte>() {0, 127, 0} },
                 { new List<byte>() {127, 0, 127} },
+                { new List<byte>() {0, 127, 0, 127} },
+                { new List<byte>() {127, 0, 127, 0} },
                 { new List<byte>() {0, 64, 0, 127, 0} },
                 { new List<byte>() {0, 127, 0, 64, 0} },
                 { new List<byte>() {127, 64, 127, 0, 127} },
-                { new List<byte>() {127, 0, 127, 64, 127} }
+                { new List<byte>() {127, 0, 127, 64, 127} },
+                { new List<byte>() {127, 0, 127, 64, 127, 0} }
             };
 
         /// <summary>
