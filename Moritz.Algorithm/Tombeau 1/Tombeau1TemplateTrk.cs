@@ -5,17 +5,16 @@ using Moritz.Globals;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-    public class Level2TemplateTrk : Tombeau1Trk
+    public class Tombeau1TemplateTrk : Tombeau1Trk
     {
         /// <summary>
         /// Returns a new Trk that is the concatenation of (a clone of) the original level1TemplateTrk
         /// with nSubTrks Trks that are variations of the original level1TemplateTrk.
         /// The returned Level2TemplateTrk is the concatenation of nSubtrks + 1 versions of the original level1TemplateTrk (including the original).
         /// </summary>
-        /// <param name="midiChannel"></param>
         /// <param name="level1TemplateTrk"></param>
         /// <param name="nSubTrks"></param>
-        public Level2TemplateTrk(Level1TemplateTrk level1TemplateTrk, int nSubTrks, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
+        public Tombeau1TemplateTrk(Level1TemplateTrk level1TemplateTrk, int nSubTrks, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
             : base(0, 0, 100, new List<IUniqueDef>())
         {
             List<int> relativeTranspositions = new List<int>() { 2, 1, 2, 2, 2, 1 };
@@ -23,14 +22,6 @@ namespace Moritz.Algorithm.Tombeau1
 
             List<Level1TemplateTrk> level1Trks = new List<Level1TemplateTrk>();
             level1Trks.Add(level1TemplateTrk.Clone());
-
-            //SetOrnament(trk.UniqueDefs[2] as MidiChordDef, _envelopeShapes[0], 7);
-
-            //MidiChordDef mcd = level1Trks[0].UniqueDefs[2] as MidiChordDef;
-            //if(mcd != null)
-            //{
-            //    mcd.SetOrnament(ornamentShape, nOrnamentChords);
-            //}
 
             Level1TemplateTrk currentTrk = level1Trks[0];
             for(int i = 0; i < nSubTrks; ++i)
@@ -53,18 +44,13 @@ namespace Moritz.Algorithm.Tombeau1
 
                 UniqueDefs.AddRange(subTrk.UniqueDefs);
             }
-
-            //SetDurationsFromPitches(1000, 2000, false);
-
-            //MidiChordDef lastTrk0MidiChordDef = (MidiChordDef)UniqueDefs[UniqueDefs.Count - 1];
-            //lastTrk0MidiChordDef.BeamContinues = false;
         }
 
         /// <summary>
         /// TemplateTrks are initialized with MidiChannel=0 and msPositionReContainer=0, transformationPercent = 100.
         /// This constructor is used by Level2TemplateTrk.Clone()
         /// </summary>
-        private Level2TemplateTrk(int midiChannel, int msPositionReContainer, double transformationPercent, List<IUniqueDef> iuds)
+        private Tombeau1TemplateTrk(int midiChannel, int msPositionReContainer, double transformationPercent, List<IUniqueDef> iuds)
             : base(midiChannel, msPositionReContainer, transformationPercent, iuds)
         {
         }
@@ -72,10 +58,10 @@ namespace Moritz.Algorithm.Tombeau1
         /// <summary>
         /// Returns a deep clone of this Level1TemplateTrk.
         /// </summary>
-        public new Level2TemplateTrk Clone()
+        public new Tombeau1TemplateTrk Clone()
         {
             List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
-            Level2TemplateTrk clone = new Level2TemplateTrk(MidiChannel, MsPositionReContainer, _transformationPercent, clonedIUDs);
+            Tombeau1TemplateTrk clone = new Tombeau1TemplateTrk(MidiChannel, MsPositionReContainer, TransformationPercent, clonedIUDs);
             clone.Container = this.Container;
 
             return clone;

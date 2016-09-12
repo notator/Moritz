@@ -15,11 +15,11 @@ namespace Moritz.Algorithm.Tombeau1
         protected Tombeau1Trk(int midiChannel, int msPositionReContainer, double transformationPercent, List<IUniqueDef> iuds)
             : base(midiChannel, msPositionReContainer, iuds)
             {
-                _transformationPercent = transformationPercent;
-
+                TransformationPercent = transformationPercent;
             }
         
-        protected readonly double _transformationPercent = 100.0;
+        protected double TransformationPercent { get; private set; }
+
     }
 
     public class Level1TemplateTrk : Tombeau1Trk
@@ -77,7 +77,7 @@ namespace Moritz.Algorithm.Tombeau1
         public new Level1TemplateTrk Clone()
         {
             List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
-            Level1TemplateTrk clone = new Level1TemplateTrk(MidiChannel, MsPositionReContainer, _transformationPercent, clonedIUDs);
+            Level1TemplateTrk clone = new Level1TemplateTrk(MidiChannel, MsPositionReContainer, TransformationPercent, clonedIUDs);
             clone.Container = this.Container;
 
             return clone;

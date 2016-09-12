@@ -46,10 +46,9 @@
     <Compile Include="Study 2\Study2Algorithm.cs" />
     <Compile Include="Study 3.1\Study3Sketch1Algorithm.cs" />
     <Compile Include="Study 3.2\Study3Sketch2Algorithm.cs" />
-    <Compile Include="Tombeau 1\Level3Trk.cs" />
-    <Compile Include="Tombeau 1\Level2TemplateTrk.cs" />
+    <Compile Include="Tombeau 1\Tombeau1TemplateTrk.cs" />
     <Compile Include="Tombeau 1\Level1TemplateTrk.cs" />
-    <Compile Include="Tombeau 1\Type1Block.cs" />
+    <Compile Include="Tombeau 1\Tombeau1Block.cs" />
     <Compile Include="Tombeau 1\Init.cs" />
     <Compile Include="Tombeau 1\VPAPBlock.cs" />
     <Compile Include="Tombeau 1\Block2TestBlock.cs" />
