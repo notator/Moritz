@@ -21,7 +21,7 @@ namespace Moritz.Algorithm.Tombeau1
 		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 127, 127, 127, 127, 127, 127, 127, 127 }; } }
 		public override int NumberOfInputVoices { get { return 0; } }
         //public override int NumberOfBars { get { return 46; } } // includes VPAP Block
-        public override int NumberOfBars { get { return 61; } }  // including 17 test bars
+        public override int NumberOfBars { get { return 66; } }  // including tests
 
         /// <summary>
         /// See CompositionAlgorithm.DoAlgorithm()
@@ -349,17 +349,17 @@ namespace Moritz.Algorithm.Tombeau1
 
             Init(new List<string>() { "Tombeau1.1" });
 
-            AddNewType1Block(13000, 2, 0, 1500);
-            AddNewType1Block(13000, 2, 1, 1400);
-            AddNewType1Block(13000, 2, 2, 1300);
-            AddNewType1Block(13000, 2, 3, 1200);
-            AddNewType1Block(13000, 2, 4, 1100);
-            AddNewType1Block(13000, 2, 5, 1000);
-            AddNewType1Block(13000, 2, 6, 900);
-            AddNewType1Block(13000, 2, 7, 900);
-            AddNewType1Block(13000, 2, 8, 1500);
-            AddNewType1Block(13000, 2, 9, 1400);
-            AddNewType1Block(13000, 2, 10, 1300);
+            AddNewType1Block(13000, 2, 0, 0, 1500);
+            AddNewType1Block(13000, 2, 1, 10, 1400);
+            AddNewType1Block(13000, 2, 2, 20, 1300);
+            AddNewType1Block(13000, 2, 3, 30, 1200);
+            AddNewType1Block(13000, 2, 4, 40, 1100);
+            AddNewType1Block(13000, 2, 5, 50, 1000);
+            AddNewType1Block(13000, 2, 6, 60, 900);
+            AddNewType1Block(13000, 2, 7, 70, 900);
+            AddNewType1Block(13000, 2, 8, 80, 1500);
+            AddNewType1Block(13000, 2, 9, 90, 1400);
+            AddNewType1Block(13000, 2, 10, 100, 1300);
 
             /************************************************/
             //Block vpapBlock = VPAPBlock(_level1TemplateTrks[1]);
@@ -409,11 +409,12 @@ namespace Moritz.Algorithm.Tombeau1
         /// <param name="blockMsDuration">The duration of the block</param>
         /// <param name="level2TemplateTrkIndex">The index of the template Trk in _level2TemplateTrks</param>
         /// <param name="trk0InitialDelay">The duration of the rest at the beginning of track (=channel) 0</param>
-        private void AddNewType1Block(int blockMsDuration, int nBars, int level2TemplateTrkIndex, int trk0InitialDelay)
+        private void AddNewType1Block(int blockMsDuration, int nBars, int level2TemplateTrkIndex, double transformationPercent, int trk0InitialDelay)
         {
-            Debug.Assert(_blockList != null && blockMsDuration > 0 && level2TemplateTrkIndex >= 0 && trk0InitialDelay >= 0);
+            Debug.Assert(_blockList != null && blockMsDuration > 0 && level2TemplateTrkIndex >= 0 &&
+                         transformationPercent >= 0 && transformationPercent <= 100 && trk0InitialDelay >= 0);
 
-            Type1Block type1Block = new Type1Block(blockMsDuration, _level2TemplateTrks[level2TemplateTrkIndex], trk0InitialDelay, nBars,
+            Type1Block type1Block = new Type1Block(blockMsDuration, _level2TemplateTrks[level2TemplateTrkIndex], transformationPercent, trk0InitialDelay, nBars,
                                                     MidiChannelIndexPerOutputVoice);
 
             _blockList.Add(type1Block);

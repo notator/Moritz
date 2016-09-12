@@ -16,7 +16,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// <param name="level1TemplateTrk"></param>
         /// <param name="nSubTrks"></param>
         public Level2TemplateTrk(Level1TemplateTrk level1TemplateTrk, int nSubTrks, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
-            :base()
+            : base(0, 0, 100, new List<IUniqueDef>())
         {
             List<int> relativeTranspositions = new List<int>() { 2, 1, 2, 2, 2, 1 };
             Debug.Assert(nSubTrks <= relativeTranspositions.Count);
@@ -61,11 +61,11 @@ namespace Moritz.Algorithm.Tombeau1
         }
 
         /// <summary>
-        /// TemplateTrks are all constructed with MidiChannel=0 and msPositionReContainer=0.
+        /// TemplateTrks are initialized with MidiChannel=0 and msPositionReContainer=0, transformationPercent = 100.
         /// This constructor is used by Level2TemplateTrk.Clone()
         /// </summary>
-        private Level2TemplateTrk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
-            : base(midiChannel, msPositionReContainer, iuds)
+        private Level2TemplateTrk(int midiChannel, int msPositionReContainer, double transformationPercent, List<IUniqueDef> iuds)
+            : base(midiChannel, msPositionReContainer, transformationPercent, iuds)
         {
         }
 
@@ -75,7 +75,7 @@ namespace Moritz.Algorithm.Tombeau1
         public new Level2TemplateTrk Clone()
         {
             List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
-            Level2TemplateTrk clone = new Level2TemplateTrk(MidiChannel, MsPositionReContainer, clonedIUDs);
+            Level2TemplateTrk clone = new Level2TemplateTrk(MidiChannel, MsPositionReContainer, _transformationPercent, clonedIUDs);
             clone.Container = this.Container;
 
             return clone;

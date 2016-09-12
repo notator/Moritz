@@ -10,8 +10,8 @@ namespace Moritz.Algorithm.Tombeau1
         /// <summary>
         /// Returns a new Level3Trk that is a concatenation of (clones of) the original level2TemplateTrks
         /// Parallel Level3Trks are used to construct Seqs in Tombeau1
-        public Level3Trk(int midiChannel, int msPositionReContainer, List<Level2TemplateTrk> level2TemplateTrks)
-            :base(midiChannel, msPositionReContainer, new List<IUniqueDef>()) 
+        public Level3Trk(int midiChannel, int msPositionReContainer, List<Level2TemplateTrk> level2TemplateTrks, double transformationPercent)
+            :base(midiChannel, msPositionReContainer, transformationPercent, new List<IUniqueDef>()) 
         {
             foreach(Level2TemplateTrk subTrk in level2TemplateTrks)
             {
