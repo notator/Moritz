@@ -261,19 +261,23 @@ namespace Moritz.Spec
             int minMsPositionReContainer = int.MaxValue;
             for(int i = 0; i < _trks.Count; ++i)
             {
+                newMsPositionsReContainer.Add(0); // default value
                 Trk trk = _trks[i];
                 int index = indicesToAlign[i];
-                Debug.Assert(index >= 0 && index < trk.UniqueDefs.Count);
+                Debug.Assert(index >= 0);
 
-                int alignmentMsPositionReFirstUD = 0;
-                for(int j = 0; j < index; ++j)
+                if(index < trk.UniqueDefs.Count)
                 {
-                    alignmentMsPositionReFirstUD += trk.UniqueDefs[j].MsDuration;
-                }
+                    int alignmentMsPositionReFirstUD = 0;
+                    for(int j = 0; j < index; ++j)
+                    {
+                        alignmentMsPositionReFirstUD += trk.UniqueDefs[j].MsDuration;
+                    }
 
-                int newMsPositionReContainer = trk.MsPositionReContainer - alignmentMsPositionReFirstUD;
-                newMsPositionsReContainer.Add(newMsPositionReContainer);
-                minMsPositionReContainer = (minMsPositionReContainer < newMsPositionReContainer) ? minMsPositionReContainer : newMsPositionReContainer;
+                    int newMsPositionReContainer = trk.MsPositionReContainer - alignmentMsPositionReFirstUD;
+                    newMsPositionsReContainer[i] = newMsPositionReContainer;
+                    minMsPositionReContainer = (minMsPositionReContainer < newMsPositionReContainer) ? minMsPositionReContainer : newMsPositionReContainer;
+                }
             }
             for(int i = 0; i < _trks.Count; ++i)
             {

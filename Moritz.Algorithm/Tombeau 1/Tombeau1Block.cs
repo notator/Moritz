@@ -21,24 +21,41 @@ namespace Moritz.Algorithm.Tombeau1
             }
             if(blockNum > 3)
             {
-                //Trk trk2 = GetTrk2(blockNum, nBlocks, blockMsDuration, tombeau1BaseTrk,, MidiChannelIndexPerOutputVoice[2]);
+                //Trk trk2 = GetTrk1(blockNum, nBlocks, blockMsDuration, tombeau1BaseTrk, MidiChannelIndexPerOutputVoice[2]);
                 //trks.Add(trk2);
+
+                //Trk trk2 = GetTrk2(blockNum, nBlocks, blockMsDuration, tombeau1BaseTrk,, MidiChannelIndexPerOutputVoice[2]);
+                //trks.Add(trk2)
             }
             if(blockNum > 7)
             {
+                //Trk trk3 = GetTrk1(blockNum, nBlocks, blockMsDuration, tombeau1BaseTrk, MidiChannelIndexPerOutputVoice[3]);
+                //trks.Add(trk3);
+
                 //Trk trk3 = GetTrk3(blockNum, nBlocks, blockMsDuration, tombeau1BaseTrk, MidiChannelIndexPerOutputVoice[3]);
                 //trks.Add(trk3);
             }
             if(blockNum > 13)
             {
+                //Trk trk4 = GetTrk1(blockNum, nBlocks, blockMsDuration, tombeau1BaseTrk, MidiChannelIndexPerOutputVoice[4]);
+                //trks.Add(trk4);
+
                 //Trk trk4 = GetTrk4(blockNum, nBlocks, blockMsDuration, tombeau1BaseTrk, MidiChannelIndexPerOutputVoice[4]);
                 //trks.Add(trk4);
             }
 
             Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
 
+            seq.AlignTrkAxes();
+
+            List<int> barlineMsPositionsReBlock = GetBarlineMsPositionsReBlock(blockMsDuration, nBarsInBlock);
+            FinalizeBlock(seq, barlineMsPositionsReBlock);
+        }
+
+        private List<int> GetBarlineMsPositionsReBlock(int blockMsDuration, int nBarsInBlock)
+        {
             List<int> barlineMsPositionsReBlock = new List<int>();
-            #region set barlines
+
             int barMsDuration = blockMsDuration / nBarsInBlock;
             int currentBarlineMsPosition = barMsDuration;
             int nMidBars = nBarsInBlock - 1;
@@ -48,8 +65,8 @@ namespace Moritz.Algorithm.Tombeau1
                 currentBarlineMsPosition += barMsDuration;
             }
             barlineMsPositionsReBlock.Add(blockMsDuration); // Done here to prevent rounding errors.
-            #endregion set barlines
-            FinalizeBlock(seq, barlineMsPositionsReBlock);
+
+            return barlineMsPositionsReBlock;
         }
 
         private Trk GetTrk0(int blockNum, int nBlocks, int blockMsDuration, Tombeau1BaseTrk tombeau1BaseTrk, int midiChannel)
@@ -59,34 +76,55 @@ namespace Moritz.Algorithm.Tombeau1
             trk.MsDuration = blockMsDuration;
             ((MidiChordDef)trk[0]).PanMsbs = new List<byte>() { 127 };
 
+            int maxAxisIndex = trk.Count - 1;
+            List<int> axisOffsets = new List<int>()
+            { 0, 0, maxAxisIndex - 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            Debug.Assert(axisOffsets.Count == nBlocks);
+            trk.AxisIndex = maxAxisIndex - axisOffsets[blockNum - 1];
+
+            double velocityFactor = 1 - ((double)(blockNum - 1) / (nBlocks * 1.5));
+            trk.AdjustVelocities(velocityFactor);
+
             return trk;
         }
 
         private Trk GetTrk1(int blockNum, int nBlocks, int blockMsDuration, Tombeau1BaseTrk tombeau1TemplateTrk, int midiChannel)
         {
             Tombeau1BaseTrk trk = tombeau1TemplateTrk.Clone();
-            List<int> initialDelays = new List<int>()
-            { 0, 1800, 1700, 1600, 1500, 1400, 1300, 1200, 1100, 1000, 900, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900 };
-            Debug.Assert(initialDelays.Count == nBlocks);
+            List<int> durationCompressions = new List<int>()
+            { 0, 1100, 1700, 1600, 1500, 1400, 1300, 1200, 1100, 1000, 900, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900 };
+            Debug.Assert(durationCompressions.Count == nBlocks);
             List<int> transformationPercents = new List<int>()
             { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
             Debug.Assert(transformationPercents.Count == nBlocks);
 
-            int trk0InitialDelay = initialDelays[blockNum - 1];
-            int transformationPercent = transformationPercents[blockNum - 1];
+            int maxAxisIndex = trk.Count - 1;
+            List<int> axisOffsets = new List<int>()
+            { 0, 0, maxAxisIndex - 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            Debug.Assert(axisOffsets.Count == nBlocks);
+            trk.AxisIndex = maxAxisIndex - axisOffsets[blockNum - 1];
 
-           List<byte> velocityPerAbsolutePitch = ((MidiChordDef)trk[0]).Gamut.GetVelocityPerAbsolutePitch(25, true);
+            ((MidiChordDef)trk[0]).PanMsbs = new List<byte>() { 0 };
+
+            List<byte> velocityPerAbsolutePitch = ((MidiChordDef)trk[0]).Gamut.GetVelocityPerAbsolutePitch(25, true);
 
             trk.MidiChannel = midiChannel;
             trk.TransposeInGamut(8);
-            trk.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, transformationPercent);
+            trk.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, transformationPercents[blockNum - 1]);
 
-            trk.MsDuration = blockMsDuration - trk0InitialDelay;
-            ((MidiChordDef)trk[0]).PanMsbs = new List<byte>() { 0 };
-            if(trk0InitialDelay > 0)
+            switch (blockNum)
             {
-                trk.Insert(0, new RestDef(0, trk0InitialDelay));
+                case 2:
+                    trk.AdjustVelocitiesHairpin(0, trk.MsDuration, 0.7, 1.0);
+                    break;
+                case 3:
+                    trk.AdjustVelocitiesHairpin(0, trk.MsDuration, 1.0, 0.7);
+                    break;
+                default:
+                    break;
             }
+
+            trk.MsDuration = blockMsDuration - durationCompressions[blockNum - 1];
 
             return trk;
         }

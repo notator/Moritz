@@ -51,11 +51,6 @@ namespace Moritz.Spec
 
             Blockify();
 
-            foreach(VoiceDef voiceDef in _voiceDefs)
-            {
-                voiceDef.Container = this;
-            }
-
             AddBarlines(approxBarlineMsPositions);
 
             AssertNonEmptyBlockConsistency();
@@ -267,7 +262,6 @@ namespace Moritz.Spec
                     if(startRestMsDuration > 0)
                     {
                         voiceDef.Insert(0, new RestDef(0, startRestMsDuration));
-                        voiceDef.MsPositionReContainer = 0;
                     }
 
                     int endOfTrkMsPositionReFirstIUD = voiceDef.EndMsPositionReFirstIUD;
@@ -282,6 +276,9 @@ namespace Moritz.Spec
                 {
                     voiceDef.Add(new RestDef(0, blockMsDuration));
                 }
+
+                voiceDef.MsPositionReContainer = 0;
+                voiceDef.Container = this;
             }
         }
 
