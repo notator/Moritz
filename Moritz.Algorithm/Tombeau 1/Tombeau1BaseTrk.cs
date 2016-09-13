@@ -5,7 +5,7 @@ using Moritz.Globals;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-    public class Tombeau1TemplateTrk : Tombeau1Trk
+    public class Tombeau1BaseTrk : Tombeau1Trk
     {
         /// <summary>
         /// Returns a new Trk that is the concatenation of (a clone of) the original level1TemplateTrk
@@ -14,7 +14,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// </summary>
         /// <param name="level1TemplateTrk"></param>
         /// <param name="nSubTrks"></param>
-        public Tombeau1TemplateTrk(Level1TemplateTrk level1TemplateTrk, int nSubTrks, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
+        public Tombeau1BaseTrk(Level1TemplateTrk level1TemplateTrk, int nSubTrks, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
             : base(0, 0, 100, new List<IUniqueDef>())
         {
             List<int> relativeTranspositions = new List<int>() { 2, 1, 2, 2, 2, 1 };
@@ -50,7 +50,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// TemplateTrks are initialized with MidiChannel=0 and msPositionReContainer=0, transformationPercent = 100.
         /// This constructor is used by Level2TemplateTrk.Clone()
         /// </summary>
-        private Tombeau1TemplateTrk(int midiChannel, int msPositionReContainer, double transformationPercent, List<IUniqueDef> iuds)
+        private Tombeau1BaseTrk(int midiChannel, int msPositionReContainer, double transformationPercent, List<IUniqueDef> iuds)
             : base(midiChannel, msPositionReContainer, transformationPercent, iuds)
         {
         }
@@ -58,10 +58,10 @@ namespace Moritz.Algorithm.Tombeau1
         /// <summary>
         /// Returns a deep clone of this Level1TemplateTrk.
         /// </summary>
-        public new Tombeau1TemplateTrk Clone()
+        public new Tombeau1BaseTrk Clone()
         {
             List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
-            Tombeau1TemplateTrk clone = new Tombeau1TemplateTrk(MidiChannel, MsPositionReContainer, TransformationPercent, clonedIUDs);
+            Tombeau1BaseTrk clone = new Tombeau1BaseTrk(MidiChannel, MsPositionReContainer, TransformationPercent, clonedIUDs);
             clone.Container = this.Container;
 
             return clone;

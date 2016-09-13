@@ -186,31 +186,31 @@ namespace Moritz.Algorithm.Tombeau1
             int nSubTrks = 5;
             int nChordsPerOrnament = 5;
 
-            List<Tombeau1TemplateTrk> templateTrks = new List<Tombeau1TemplateTrk>();
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[0], nSubTrks, _ornamentShapes[0], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[1], nSubTrks, _ornamentShapes[1], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[2], nSubTrks, _ornamentShapes[2], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[3], nSubTrks, _ornamentShapes[3], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[4], nSubTrks, _ornamentShapes[4], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[5], nSubTrks, _ornamentShapes[5], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[6], nSubTrks, _ornamentShapes[6], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[7], nSubTrks, _ornamentShapes[7], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[8], nSubTrks, _ornamentShapes[8], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[9], nSubTrks, _ornamentShapes[9], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[10], nSubTrks, _ornamentShapes[10], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[11], nSubTrks, _ornamentShapes[10], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[12], nSubTrks, _ornamentShapes[9], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[13], nSubTrks, _ornamentShapes[8], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[14], nSubTrks, _ornamentShapes[7], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[15], nSubTrks, _ornamentShapes[6], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[16], nSubTrks, _ornamentShapes[5], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[17], nSubTrks, _ornamentShapes[4], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[18], nSubTrks, _ornamentShapes[3], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[19], nSubTrks, _ornamentShapes[2], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[20], nSubTrks, _ornamentShapes[1], nChordsPerOrnament));
-            templateTrks.Add(new Tombeau1TemplateTrk(level1TemplateTrks[21], nSubTrks, _ornamentShapes[0], nChordsPerOrnament));
+            List<Tombeau1BaseTrk> templateTrks = new List<Tombeau1BaseTrk>();
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[0], nSubTrks, _ornamentShapes[0], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[1], nSubTrks, _ornamentShapes[1], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[2], nSubTrks, _ornamentShapes[2], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[3], nSubTrks, _ornamentShapes[3], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[4], nSubTrks, _ornamentShapes[4], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[5], nSubTrks, _ornamentShapes[5], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[6], nSubTrks, _ornamentShapes[6], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[7], nSubTrks, _ornamentShapes[7], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[8], nSubTrks, _ornamentShapes[8], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[9], nSubTrks, _ornamentShapes[9], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[10], nSubTrks, _ornamentShapes[10], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[11], nSubTrks, _ornamentShapes[10], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[12], nSubTrks, _ornamentShapes[9], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[13], nSubTrks, _ornamentShapes[8], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[14], nSubTrks, _ornamentShapes[7], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[15], nSubTrks, _ornamentShapes[6], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[16], nSubTrks, _ornamentShapes[5], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[17], nSubTrks, _ornamentShapes[4], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[18], nSubTrks, _ornamentShapes[3], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[19], nSubTrks, _ornamentShapes[2], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[20], nSubTrks, _ornamentShapes[1], nChordsPerOrnament));
+            templateTrks.Add(new Tombeau1BaseTrk(level1TemplateTrks[21], nSubTrks, _ornamentShapes[0], nChordsPerOrnament));
 
-            _templateTrks = templateTrks;
+            _tombeau1BaseTrks = templateTrks;
         }
 
         #endregion SetType1TemplateTrks
