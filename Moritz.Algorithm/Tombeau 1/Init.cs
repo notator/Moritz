@@ -136,8 +136,8 @@ namespace Moritz.Algorithm.Tombeau1
         #region SetType1TemplateTrks
         private void SetTemplateTrks()
         {
-            List<Level1TemplateTrk> level1TemplateTrks = GetLevel1TemplateTrks();
-            SetTemplateTrks(level1TemplateTrks);
+            _level1TemplateTrks = GetLevel1TemplateTrks();
+            SetTemplateTrks(_level1TemplateTrks);
         }
 
         private List<Level1TemplateTrk> GetLevel1TemplateTrks()

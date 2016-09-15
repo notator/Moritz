@@ -29,7 +29,6 @@ namespace Moritz.Spec
                     Debug.Assert(trks[i].MidiChannel != trks[j].MidiChannel);
                 }
             }
-            // barlineMsPositionsReSeq are checked later (in AssertSeqConsistency())
             #endregion conditions
 
             _absMsPosition = absSeqMsPosition;

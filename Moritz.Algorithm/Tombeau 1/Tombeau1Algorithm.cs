@@ -348,32 +348,17 @@ namespace Moritz.Algorithm.Tombeau1
 
             Init(new List<string>() { "Tombeau1.1" });
 
-            int nBlocks = 22;
+            List<Seq> seqs = new List<Seq>();
 
-            AddNewTombeau1Block(1, nBlocks, 13000, 1);
-            AddNewTombeau1Block(2, nBlocks, 13000, 1);
-            AddNewTombeau1Block(3, nBlocks, 13000, 1);
-            AddNewTombeau1Block(4, nBlocks, 13000, 1);
-            AddNewTombeau1Block(5, nBlocks, 13000, 1);
-            AddNewTombeau1Block(6, nBlocks, 13000, 1);
-            AddNewTombeau1Block(7, nBlocks, 13000, 1);
-            AddNewTombeau1Block(8, nBlocks, 13000, 1);
-            AddNewTombeau1Block(9, nBlocks, 13000, 1);
-            AddNewTombeau1Block(10, nBlocks, 13000, 1);
-            AddNewTombeau1Block(11, nBlocks, 13000, 1);
-
-            AddNewTombeau1Block(12, nBlocks, 13000, 1);
-            AddNewTombeau1Block(13, nBlocks, 13000, 1);
-            AddNewTombeau1Block(14, nBlocks, 13000, 1);
-            AddNewTombeau1Block(15, nBlocks, 13000, 1);
-            AddNewTombeau1Block(16, nBlocks, 13000, 1);
-            AddNewTombeau1Block(17, nBlocks, 13000, 1);
-            AddNewTombeau1Block(18, nBlocks, 13000, 1);
-            AddNewTombeau1Block(19, nBlocks, 13000, 1);
-            AddNewTombeau1Block(20, nBlocks, 13000, 1);
-            AddNewTombeau1Block(21, nBlocks, 13000, 1);
-            AddNewTombeau1Block(22, nBlocks, 13000, 1);
-
+            List<Trk> seqTrks0 = GetSeqTrks0(MidiChannelIndexPerOutputVoice[0]);
+            foreach(Trk seqTrk in seqTrks0)
+            {
+                seqs.Add(new Seq(0, new List<Trk>() { seqTrk }, MidiChannelIndexPerOutputVoice));
+            }
+            AddSeqTrks1(seqs, MidiChannelIndexPerOutputVoice[1]);
+            //AddSeqTrks2(seqs, MidiChannelIndexPerOutputVoice[2]);
+            //AddSeqTrks3(seqs, MidiChannelIndexPerOutputVoice[3]);
+            //AddSeqTrks4(seqs, MidiChannelIndexPerOutputVoice[4]);
             /************************************************/
             //Block vpapBlock = VPAPBlock(_level1TemplateTrks[1]);
             //_blockList.Add(vpapBlock);   // 2 bars
@@ -409,34 +394,87 @@ namespace Moritz.Algorithm.Tombeau1
 
             #endregion test blocks
 
-            MainBlock mainBlock = new MainBlock(InitialClefPerChannel, _blockList);
+            Seq mainSeq = seqs[0];
+            List<int> barlineMsPositions = new List<int>() { mainSeq.MsDuration };
+            for(int i = 1; i < seqs.Count;  ++i)
+            {
+                mainSeq.Concat(seqs[i]);
+                barlineMsPositions.Add(mainSeq.MsDuration);
+            }
+
+            MainBlock mainBlock = new MainBlock(InitialClefPerChannel, mainSeq, barlineMsPositions);
 
             List<List<VoiceDef>> bars = mainBlock.ConvertToBars();
 
             return bars;
 		}
 
-        /// <summary>
-        /// Adds a new Tombeau1Block to Tombeau1Algorithm's private _blockList
-        /// </summary>
-        /// <param name="blockMsDuration">The duration of the block</param>
-        /// <param name="level2TemplateTrkIndex">The index of the template Trk in _level2TemplateTrks</param>
-        /// <param name="trk0InitialDelay">The duration of the rest at the beginning of track (=channel) 0</param>
-        private void AddNewTombeau1Block(int blockNum, int nBlocks, int blockMsDuration, int nBarsInBlock)
+        private List<Trk> GetSeqTrks0(int channel)
         {
-            Debug.Assert(blockNum > 0 && _blockList != null && blockMsDuration > 0 );
+            int blockMsDuration = 13000;
+            List<Trk> seqTrks0 = new List<Trk>();
+            int nSeqTrks = _tombeau1BaseTrks.Count;
+            for(int i = 0; i < nSeqTrks; ++i)
+            {
+                Tombeau1BaseTrk trk = _tombeau1BaseTrks[i].Clone();
+                trk.MidiChannel = channel;
+                trk.MsDuration = blockMsDuration;
+                ((MidiChordDef)trk[0]).PanMsbs = new List<byte>() { 127 };
 
-            Tombeau1Block tombeau1Block = new Tombeau1Block(blockNum, nBlocks, blockMsDuration, _tombeau1BaseTrks[blockNum - 1], nBarsInBlock, MidiChannelIndexPerOutputVoice);
+                double velocityFactor = 1 - ((double)(i) / (nSeqTrks * 1.5));
+                trk.AdjustVelocities(velocityFactor);
 
-            _blockList.Add(tombeau1Block);
+                seqTrks0.Add(trk);
+            }
+
+            return seqTrks0;
         }
 
+        /// <summary>
+        /// seqs contains a list of consecutive Seqs, each of which has a completed Trk for channel 0.
+        /// All the other Trks in the Seqs are *empty*.
+        /// </summary>
+        /// <param name="seqs"></param>
+        /// <param name="v"></param>
+        private void AddSeqTrks1(List<Seq> seqs, int channel)
+        {
+            int nSeqs = seqs.Count;
+
+            // Trk0 msDurations are currently all 13000ms
+            List<int> trk1MsDurations = new List<int>()
+            { 11100, 11200, 11300, 11400, 11500, 11600, 11700, 11800, 11900, 12000, 12100, 12100, 
+              12000, 11900, 11800, 11700, 11600, 11500, 11400, 11300, 11200, 11100 };
+            Debug.Assert(trk1MsDurations.Count == nSeqs);
+            List<int> transformationPercents = new List<int>()
+            { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+            Debug.Assert(transformationPercents.Count == nSeqs);
+
+            for(int i = 0; i < nSeqs; ++i)
+            {
+                Debug.Assert(seqs[i].Trks[0].UniqueDefs.Count > 0);
+                Debug.Assert(seqs[i].Trks[1].UniqueDefs.Count == 0);
+
+                //Level1TemplateTrk l1tTrk = _level1TemplateTrks[i];
+                Trk trk0 = seqs[i].Trks[0];
+                Trk trk1 = trk0.Clone();
+
+                trk1.MidiChannel = channel;
+                trk1.MsDuration = trk1MsDurations[i];
+                trk1.TransposeInGamut(12);
+                List<byte> velocityPerAbsolutePitch = ((MidiChordDef)trk1[0]).Gamut.GetVelocityPerAbsolutePitch(25, true);
+                trk1.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, transformationPercents[i]);
+
+                seqs[i].Trks[channel].AddRange(trk1);
+            }
+            ((MidiChordDef)seqs[0].Trks[1][0]).PanMsbs = new List<byte>() { 0 };
+        }
+        
         #region private properties for use by Tombeau1Algorithm
-        private List<Block> _blockList = new List<Block>(); // List to which new Blocks are added as Tombeau1 is being constructed.
         #region initialised by Init()
         private IReadOnlyList<IReadOnlyList<MidiChordDef>> _paletteMidiChordDefs = null;
         private IReadOnlyList<IReadOnlyList<MidiChordDef>> _pitchWheelTestMidiChordDefs = null;
         private IReadOnlyList<IReadOnlyList<MidiChordDef>> _ornamentTestMidiChordDefs = null;
+        private IReadOnlyList<Level1TemplateTrk> _level1TemplateTrks;
         private IReadOnlyList<Tombeau1BaseTrk> _tombeau1BaseTrks = null;
         #endregion initialised by Init()
         #region envelopes

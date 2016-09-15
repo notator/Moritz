@@ -22,7 +22,7 @@ namespace Moritz.Spec
             Debug.Assert(blockList != null && blockList.Count > 0);
 
             Block block1 = blockList[0];
-            int nTrks = block1.Trks.Count; 
+            int nTrks = block1.Trks.Count;
             int nInputVoiceDefs = block1.InputVoiceDefs.Count;
 
             #region conditions
@@ -66,6 +66,42 @@ namespace Moritz.Spec
             {
                 this.Concat(block);
             }
+        }
+
+        /// <summary>
+        /// A Block contains a list of VoiceDefs consisting of a group of Trks possibly followed by InputVoiceDefs.
+        /// This constructor creates a MainBlock consisting of the Trks in the mainSeq.
+        /// The initialClefs are set to the clefs in initialClefsPerChannel.
+        /// initialClefsPerChannel contains the clefs for the Trks followed by the clefs for the clefs for the InputVoiceDefs.
+        /// Note that initialClefsPerChannel contains a clef for each channel, regardless of whether it is going to be printed or not. 
+        /// </summary>
+        /// <param name="initialClefPerChannel">The clefs to set at the start of each Trk followed by the clefs for each InputVoiceDef (if any)</param>
+        /// <param name="mainSeq">A Seq containing the trks for this MainBlock.</param>
+        /// <param name="barlineMsPositions">Does not contain the value 0, but must contain a barline at mainSeq.MsDuration.</param>
+        public MainBlock(List<string> initialClefPerChannel, Seq mainSeq, List<int> barlineMsPositions)
+            : base()
+        {
+            #region conditions
+            Debug.Assert(initialClefPerChannel != null && mainSeq != null && mainSeq.Trks != null && barlineMsPositions != null);
+            Debug.Assert(initialClefPerChannel.Count == mainSeq.Trks.Count);
+            Debug.Assert(barlineMsPositions.Count > 0 && barlineMsPositions[barlineMsPositions.Count - 1] == mainSeq.MsDuration);
+            #endregion conditions
+
+            int nTrks = mainSeq.Trks.Count;
+            int blockMsDuration = mainSeq.MsDuration;
+
+            for(int i = 0; i < nTrks; ++i)
+            {
+                Trk trk = mainSeq.Trks[i];
+                if(trk.MsDuration < blockMsDuration)
+                {
+                    trk.Add(new RestDef(0, blockMsDuration - trk.MsDuration));
+                }
+                trk.UniqueDefs.Insert(0, new ClefChangeDef(initialClefPerChannel[trk.MidiChannel], 0));
+                _voiceDefs.Add(trk);
+            }
+
+            _barlineMsPositionsReBlock = barlineMsPositions;
         }
 
         /// <summary>
