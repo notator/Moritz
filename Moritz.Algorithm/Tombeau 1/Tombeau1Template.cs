@@ -5,30 +5,13 @@ using Moritz.Globals;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-    public class Tombeau1Trk : Trk
-    {
-        protected Tombeau1Trk()
-            : base(0, 0, new List<IUniqueDef>())
-        {
-        }
-
-        protected Tombeau1Trk(int midiChannel, int msPositionReContainer, double transformationPercent, List<IUniqueDef> iuds)
-            : base(midiChannel, msPositionReContainer, iuds)
-            {
-                TransformationPercent = transformationPercent;
-            }
-        
-        protected double TransformationPercent { get; private set; }
-
-    }
-
-    public class Level1TemplateTrk : Tombeau1Trk
+    public class Tombeau1Template : Trk
     {
         /// <summary>
         /// TemplateTrks are all constructed with MidiChannel=0 and msPositionReContainer=0.
         /// </summary>
-        public Level1TemplateTrk(int relativePitchHierarchyIndex, int rootPitch, int nPitchesPerOctave, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
-            : base()
+        public Tombeau1Template(int relativePitchHierarchyIndex, int rootPitch, int nPitchesPerOctave, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
+            : base(0)
         {
             List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, rootPitch);
             Gamut gamut = new Gamut(absolutePitchHierarchy, nPitchesPerOctave);
@@ -66,18 +49,18 @@ namespace Moritz.Algorithm.Tombeau1
         /// TemplateTrks are all constructed with MidiChannel=0 and msPositionReContainer=0.
         /// This constructor is used by Level1TemplateTrk.Clone()
         /// </summary>
-        private Level1TemplateTrk(int midiChannel, int msPositionReContainer, double transformationPercent, List<IUniqueDef> iuds)
-            : base(midiChannel, msPositionReContainer, transformationPercent, iuds)
+        private Tombeau1Template(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
+            : base(midiChannel, msPositionReContainer, iuds)
         {
         }
 
         /// <summary>
         /// Returns a deep clone of this Level1TemplateTrk.
         /// </summary>
-        public new Level1TemplateTrk Clone()
+        public new Tombeau1Template Clone()
         {
             List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
-            Level1TemplateTrk clone = new Level1TemplateTrk(MidiChannel, MsPositionReContainer, TransformationPercent, clonedIUDs);
+            Tombeau1Template clone = new Tombeau1Template(MidiChannel, MsPositionReContainer, clonedIUDs);
             clone.Container = this.Container;
 
             return clone;
