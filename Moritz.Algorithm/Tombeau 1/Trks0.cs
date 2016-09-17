@@ -1,34 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-    interface ITrkArray
-    {
-        Trk this[int index] { get; }
-        int Count();
-    }
-
-    internal class Trks0 : ITrkArray
+    internal class Trks0 : TrkSequence
     {
         public Trks0(IReadOnlyList<Tombeau1Template> tombeau1Templates, IReadOnlyList<IReadOnlyList<byte>> ornamentShapes, int channel)
+            : base()
         {
             Trks = GetSeqTrk0s(tombeau1Templates, ornamentShapes, channel);
-        }
-
-        public Trk this[int index]    // Indexer declaration
-        {
-            get
-            {
-                Debug.Assert(index < Trks.Count);
-                return Trks[index];
-            }
-        }
-
-        public int Count()
-        {
-            return Trks.Count;
         }
 
         private IReadOnlyList<Trk> GetSeqTrk0s(IReadOnlyList<Tombeau1Template> tombeau1Templates, IReadOnlyList<IReadOnlyList<byte>> ornamentShapes, int channel)
@@ -106,8 +89,5 @@ namespace Moritz.Algorithm.Tombeau1
 
             return trk0;
         }
-
-        private IReadOnlyList<Trk> Trks { get; }
-
     }
 }

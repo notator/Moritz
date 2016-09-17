@@ -5,9 +5,10 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-    internal class Trks1 : ITrkArray
+    internal class Trks1 : TrkSequence
     {
         public Trks1(List<Seq> seqs, IReadOnlyList<Tombeau1Template> tombeau1Templates, IReadOnlyList<IReadOnlyList<byte>> ornamentShapes, int channel)
+            : base()
         {
             List<Trk> trk0s = GetTrk0s(seqs);
             Trks = GetTrk1s(trk0s, tombeau1Templates, ornamentShapes, channel);
@@ -21,20 +22,6 @@ namespace Moritz.Algorithm.Tombeau1
                 trk0s.Add(seq.Trks[0]);
             }
             return trk0s;
-        }
-
-        public Trk this[int index]    // Indexer declaration
-        {
-            get
-            {
-                Debug.Assert(index < Trks.Count); 
-                return Trks[index];
-            }
-        }
-
-        public int Count()
-        {
-            return Trks.Count;
         }
 
         private IReadOnlyList<Trk> GetTrk1s(List<Trk> trk0s, IReadOnlyList<Tombeau1Template> tombeau1Templates, IReadOnlyList<IReadOnlyList<byte>> ornamentShapes, int channel)
@@ -65,15 +52,11 @@ namespace Moritz.Algorithm.Tombeau1
                 trk1.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, transformationPercents[i]);
 
                 returnTrks.Add(trk1);
-
-                //seqs[i].Trks[channel].AddRange(trk1);
             }
 
             ((MidiChordDef)returnTrks[0][0]).PanMsbs = new List<byte>() { 0 };
 
             return returnTrks;
         }
-
-        private IReadOnlyList<Trk> Trks { get; }
     }
 }

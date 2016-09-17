@@ -414,22 +414,22 @@ namespace Moritz.Algorithm.Tombeau1
             return bars;
 		}
 
-        private void AddTrksToSeqs(List<Seq> seqs, ITrkArray trkArray)
+        private void AddTrksToSeqs(List<Seq> seqs, TrkSequence trkSequence)
         {
             if(seqs.Count == 0)
             {
-                for(int i = 0; i < trkArray.Count(); ++i)
+                for(int i = 0; i < trkSequence.Count; ++i)
                 {
-                    Trk trk = trkArray[i];
+                    Trk trk = trkSequence[i];
                     seqs.Add(new Seq(0, new List<Trk>() { trk }, MidiChannelIndexPerOutputVoice));
                 }
             }
             else
             {
-                Debug.Assert(seqs.Count == trkArray.Count());
+                Debug.Assert(seqs.Count == trkSequence.Count);
                 for(int i = 0; i < seqs.Count;  ++i)
                 {
-                    seqs[i].SetTrk(trkArray[i]);
+                    seqs[i].SetTrk(trkSequence[i]);
                 }
             }
         }
