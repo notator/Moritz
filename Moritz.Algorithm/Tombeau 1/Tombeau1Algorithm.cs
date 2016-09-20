@@ -37,22 +37,22 @@ namespace Moritz.Algorithm.Tombeau1
             Think Study 1: background/foreground, depth.
 
 			The following parameters can be controlled using the Resident Sf2 Synth:
-				Commands:	preset, pitchwheel
-				Controls:	volume, pan, pitchWheelDeviation, allControllersOff, allSoundOff
-				Note:		velocity, pitch.
+			    Commands:    preset, pitchwheel
+			    Controls:    volume, pan, pitchWheelDeviation, allControllersOff, allSoundOff
+			    Note:        velocity, pitch.
 			
 			Tombeau1 is just going to use preset 0:0 (=grandPiano), so the available parameters are:
-				"tuning" -- i.e. pitchWheelDeviation and pitchWheel
-				pan,
-				velocity,
-				pitch
+			    "tuning" -- i.e. pitchWheelDeviation and pitchWheel
+			    pan,
+			    velocity,
+			    pitch
 
 			** "Chords are colour" (Stockhausen)
             
             ** I want to keep the number of pitches in chords fairly low, so that they are recognisable.
 
             ** Using Seqs and Trks should make it possible to compose powerful, comprehensible, pregnant
-			   relations between these	parameters at every	structural level. "Harmony & counterpoint" is
+			   relations between these parameters at every structural level. "Harmony & counterpoint" is
                not only going to be there in the pitches (chords, envelopes...), but also in the velocities
                and the pan positions... Tuning is a parameter that could be introduced as a surprise later...
 
@@ -78,7 +78,13 @@ namespace Moritz.Algorithm.Tombeau1
                   Returns the midiChordDef's basicMidiChordDefs as a list of simple midiChordDefs. The msDurations of the
                   returned midiChordDefs are those of the original basicMidiChorddefs, so the msDuration of the list is the
                   msDuration of the original midiChordDef. The original midiChordDef can therefore be replaced by the list in
-                  a host Trk.  
+                  a host Trk.
+               -- MidiChordDef = trk.ToMidiChordDef(msDuration) or MidiChordDef = new MidiChordDef(trk, msDuration);
+                  Converts the trk's MidiChordDefs (just their NotatedPitches and NotatedVelocities) to BasicMidiChords in a
+                  single, ornamented MidiChordDef. 
+               -- Seq.AlignTrk(alignmentMsPosReSeq, trkIndex, trkUniqueDefIndex)
+                  Shifts the trk horizontally in the seq until the indexed UniqueDef is at alignmentMsPosReSeq. The relative
+                  positions of the UniqueDefs in the trk do not change.                   
                         
             ** Representing velocity using coloured noteheads and extenders:
                There is a new pop-up menu in the Assistant Composer's main form for setting the output chord symbol type.
@@ -93,8 +99,8 @@ namespace Moritz.Algorithm.Tombeau1
 
             ** The concept of InputChords is still a bit hazy. Why should they ever have more than one notehead?...
                But I can compose Tombeau 1(that doesn't have inputChords) before worrying about that...
-               Also, *annotations* that are instructions to performers (hairpins spring to mind). Conventional dynamic symbols are,
-               I think meant for *performers*, so should only be attached to inputChords...
+               Also, *annotations* that are instructions to performers (hairpins spring to mind).
+               Conventional dynamic symbols are, I think, meant for *performers*, so should only be attached to inputChords...
                The info in *outputChords* is the info that could go in a MIDI file, and vice versa.
 
             ****************************************************************************/

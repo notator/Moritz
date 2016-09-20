@@ -708,6 +708,18 @@ namespace Moritz.Spec
 					"\nanchor2Index=" + anchor2Index.ToString() +
 					"\ntoMsPosition=" + toMsPositionReFirstUD.ToString());
 		}
+
+        /// <summary>
+        /// _uniqueDefs[indexToAlign] is moved to msPositionReContainer.
+        /// This whole Trk is shifted horizontally by setting its MsPositionReContainer.
+        /// </summary>
+        public void AlignObjectAtIndex(int indexToAlign, int msPositionReContainer)
+        {
+            Debug.Assert(indexToAlign >= 0 && indexToAlign < this.Count);
+            int currentMsPositionReContainer = this.MsPositionReContainer + this[indexToAlign].MsPositionReFirstUD;
+            int shift = msPositionReContainer - currentMsPositionReContainer;
+            this.MsPositionReContainer += shift;
+        }
         #endregion alignment
 
         #region Re-ordering the Trk's UniqueDefs
