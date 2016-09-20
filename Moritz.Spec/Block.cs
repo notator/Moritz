@@ -118,7 +118,7 @@ namespace Moritz.Spec
         /// If an existing barline has no associated IUniqueDef in an inputVoiceDef, it is moved to the nearest one.
         /// This function ends by sorting the block's _barlineMsPositionsReBlock into ascending order.
         /// </summary>
-        private void AddBarlines(IReadOnlyList<int> barlineMsPositionsReBlock)
+        protected void AddBarlines(IReadOnlyList<int> barlineMsPositionsReBlock)
         {
             #region conditions
             int msDuration = this.MsDuration;
@@ -293,9 +293,8 @@ namespace Moritz.Spec
         /// <para>5. A RestDef is never followed by another RestDef (RestDefs have been agglomerated).</para>
         /// <para>6. In Blocks, Trk and InputVoiceDef objects can additionally contain CautionaryChordDefs and ClefChangeDefs (See Seq and InputVoiceDef).</para>
         /// <para>7. There may not be more than 4 InputVoiceDefs</para>
-        /// <para>8. If there are any barlines, they are in ascending order with no duplicates.</para>
-        /// <para>9. If there are any barlines, the final barline may not be beyond the end of the block.</para>
-        /// <para>10. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefChangeDef.</para>
+        /// <para>8. If there are any barlines, they are in ascending order with no duplicates. And the final barline may not be beyond the end of the block.</para>
+        /// <para>9. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefChangeDef, or with a CautionaryChordDef.</para>
         /// </summary> 
         protected void AssertNonEmptyBlockConsistency()
         {
@@ -400,13 +399,13 @@ namespace Moritz.Spec
             }
             #endregion 9. If there are any barlines, the final barline may not be beyond the end of the block.
 
-            #region 9. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefChangeDef.
+            #region 9. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefChangeDef, or with a CautionaryChordDef.
             bool hasCorrectBeginning = false;
             foreach(VoiceDef voiceDef in _voiceDefs)
             {
                 if(voiceDef is Trk)
                 {
-                    if((voiceDef.UniqueDefs.Count > 0 && voiceDef.UniqueDefs[0] is MidiChordDef)
+                    if((voiceDef.UniqueDefs.Count > 0 && ((voiceDef.UniqueDefs[0] is MidiChordDef) || (voiceDef.UniqueDefs[0] is CautionaryChordDef)))
                     || (voiceDef.UniqueDefs.Count > 1 && voiceDef.UniqueDefs[0] is ClefChangeDef && voiceDef.UniqueDefs[1] is MidiChordDef))
                     {
                         hasCorrectBeginning = true;
@@ -593,6 +592,9 @@ namespace Moritz.Spec
         {
             get { return _barlineMsPositionsReBlock.AsReadOnly(); }
         }
+
+        // If barlines are added to this list using the protected AddBarlines() function,
+        // they will be moved to the end of the nearest chord or rest.
         protected List<int> _barlineMsPositionsReBlock = new List<int>();
 
         public IReadOnlyList<Trk> Trks

@@ -101,7 +101,7 @@ namespace Moritz.Spec
                 _voiceDefs.Add(trk);
             }
 
-            _barlineMsPositionsReBlock = barlineMsPositions;
+            this.AddBarlines(barlineMsPositions);
         }
 
         /// <summary>
