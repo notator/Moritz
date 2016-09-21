@@ -13,7 +13,8 @@ namespace Moritz.Algorithm.Tombeau1
         public Tombeau1Template(int relativePitchHierarchyIndex, int rootPitch, int nPitchesPerOctave, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
             : base(0)
         {
-            List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, rootPitch);
+            int rootPitchAbs = rootPitch % 12;
+            List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, rootPitchAbs);
             Gamut gamut = new Gamut(absolutePitchHierarchy, nPitchesPerOctave);
 
             Debug.Assert(_uniqueDefs != null && _uniqueDefs.Count == 0);
@@ -23,9 +24,10 @@ namespace Moritz.Algorithm.Tombeau1
 
             int msDuration = 1000; // dummy -- overridden by SetDurationsFromPitches() below
             int rootIndex = gamut.IndexOf(rootPitch);
-            Debug.Assert(rootIndex >= 0 && rootIndex < nPitchesPerOctave);
-            int rootOctave = 6;
-            rootIndex += (nPitchesPerOctave * rootOctave); 
+            Debug.Assert(rootIndex >= 0);
+            //Debug.Assert(rootIndex >= 0 && rootIndex < nPitchesPerOctave);
+            //int rootOctave = 9;
+            //rootIndex += (nPitchesPerOctave * rootOctave); 
 
             for(int i = 0; i < nPitchesPerOctave; ++i)
             {

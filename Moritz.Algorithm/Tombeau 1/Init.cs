@@ -136,7 +136,7 @@ namespace Moritz.Algorithm.Tombeau1
         #region SetTombeau1Templates
         private void SetTombeau1Templates()
         {
-            int rootPitch = 0;
+            int rootPitch = 60;
             int nPitchesPerOctave = 8;
             int nChordsPerOrnament = 5;
 
