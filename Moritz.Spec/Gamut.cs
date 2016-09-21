@@ -331,7 +331,9 @@ namespace Moritz.Spec
                 for(int i = rootIndex + 1; i < maxIndex; ++i)
                 {
                     int pitch = AbsolutePitchHierarchy[i];
-                    while(pitch <= pitches[pitches.Count - 1])
+                    int lowerPitch = pitches[pitches.Count - 1];
+                    int minimumInterval = MinimumInterval(lowerPitch);
+                    while((pitch - lowerPitch) < minimumInterval)
                     {
                         pitch += 12;
                     }
@@ -351,7 +353,58 @@ namespace Moritz.Spec
             {
                 bytePitches.Add((byte)pitch);
             }
+
             return bytePitches;
+        }
+
+        private int MinimumInterval(int lowerPitch)
+        {
+            int minimumInterval;
+
+            if(lowerPitch < 6)
+                minimumInterval = 15;
+            else if(lowerPitch < 15)
+                minimumInterval = 14;
+            else if(lowerPitch < 23)
+                minimumInterval = 13;
+            else if(lowerPitch < 30)
+                minimumInterval = 12;
+            else if(lowerPitch < 36)
+                minimumInterval = 11;
+            else if(lowerPitch < 41)
+                minimumInterval = 10;
+            else if(lowerPitch < 45)
+                minimumInterval = 9;
+            else if(lowerPitch < 48)
+                minimumInterval = 8;
+            else if(lowerPitch < 50)
+                minimumInterval = 7;
+            else
+            {
+                switch(lowerPitch)
+                {
+                    case 50:
+                        minimumInterval = 6;
+                        break;
+                    case 51:
+                        minimumInterval = 5;
+                        break;
+                    case 52:
+                        minimumInterval = 4;
+                        break;
+                    case 53:
+                        minimumInterval = 3;
+                        break;
+                    case 54:
+                        minimumInterval = 2;
+                        break;
+                    default:
+                        minimumInterval = 1;
+                        break;
+                }
+            }
+
+            return minimumInterval;
         }
 
         /// <summary>

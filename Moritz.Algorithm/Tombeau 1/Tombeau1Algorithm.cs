@@ -358,8 +358,8 @@ namespace Moritz.Algorithm.Tombeau1
             Trks0 trks0 = new Trks0(_tombeau1Templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[0]);
             AddTrksToSeqs(seqs, trks0);
 
-            Trks1 trks1 = new Trks1(seqs, _tombeau1Templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[1]);
-            AddTrksToSeqs(seqs, trks1);
+            //Trks1 trks1 = new Trks1(seqs, _tombeau1Templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[1]);
+            //AddTrksToSeqs(seqs, trks1);
 
             //Trks2 trks2 = new Trks2(seqs, _tombeau1Templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[2]);
             //AddTrksToSeqs(seqs, trks2);

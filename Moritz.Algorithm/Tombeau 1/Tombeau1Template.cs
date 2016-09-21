@@ -24,7 +24,8 @@ namespace Moritz.Algorithm.Tombeau1
             int msDuration = 1000; // dummy -- overridden by SetDurationsFromPitches() below
             int rootIndex = gamut.IndexOf(rootPitch);
             Debug.Assert(rootIndex >= 0 && rootIndex < nPitchesPerOctave);
-            rootIndex += (nPitchesPerOctave * 5);
+            int rootOctave = 6;
+            rootIndex += (nPitchesPerOctave * rootOctave); 
 
             for(int i = 0; i < nPitchesPerOctave; ++i)
             {
