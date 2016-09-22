@@ -68,8 +68,6 @@ namespace Moritz.Spec
         public MidiChordDef(int msDuration, Gamut gamut, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null)
             : base(msDuration) 
         {
-            _gamut = gamut;
-
             NotatedMidiPitches = gamut.GetChord(rootNotatedPitch, nPitchesPerChord);
             var nmVelocities = new List<byte>();
             foreach(byte pitch in NotatedMidiPitches) // can be less than nPitchesPerChord
@@ -79,7 +77,7 @@ namespace Moritz.Spec
             NotatedMidiVelocities = nmVelocities;
 
             // Sets BasicMidiChords. If ornamentEnvelope == null, BasicMidiChords[0] is set to the NotatedMidiChord.
-            SetOrnament(ornamentEnvelope);
+            SetOrnament(gamut, ornamentEnvelope);
         }
 
         /// <summary>
@@ -179,8 +177,6 @@ namespace Moritz.Spec
                 newBs.Add(new BasicMidiChordDef(b.MsDuration, b.BankIndex, b.PatchIndex, b.HasChordOff, pitches, velocities));
             }
             rval.BasicMidiChordDefs = newBs;
-
-            rval.Gamut = this.Gamut;
             rval.MsDuration = this.MsDuration;
 
            return rval;
@@ -198,51 +194,48 @@ namespace Moritz.Spec
         }
         #endregion Clone
 
-        #region Conjugate
+        #region Opposite
         /// <summary>
-        /// 1. Creates a new, conjugate gamut from the current Gamut (see Gamut.Conjugate()).
-        /// 2. Clones this MidiChordDef, and replaces the clone's pitches by the equivalent pitches in the conjugate Gamut.
-        /// 3. Sets the clone's Gamut to the conjugate gamut.
-        /// 4. Returns the clone.
+        /// 1. Creates a new, opposite gamut from the argument Gamut (see Gamut.Opposite()).
+        /// 2. Clones this MidiChordDef, and replaces the clone's pitches by the equivalent pitches in the opposite Gamut.
+        /// 3. Returns the clone.
         /// </summary>
-        public MidiChordDef Conjugate()
+        public MidiChordDef Opposite(Gamut gamut)
         {
             #region conditions
-            Debug.Assert(Gamut != null);
+            Debug.Assert(gamut != null);
             #endregion conditions
 
-            Gamut conjugateGamut = this.Gamut.Conjugate();
-            MidiChordDef conjugateMCD = (MidiChordDef)Clone();
+            Gamut oppositeGamut = gamut.Opposite();
+            MidiChordDef oppositeMCD = (MidiChordDef)Clone();
 
             #region conditions
-            Debug.Assert(Gamut[0] == conjugateGamut[0]);
-            Debug.Assert(Gamut.NPitchesPerOctave == conjugateGamut.NPitchesPerOctave);
-            // N.B. it is not necessarily true that Gamut.Count == conjugateGamut.Count.
+            Debug.Assert(gamut[0] == oppositeGamut[0]);
+            Debug.Assert(gamut.NPitchesPerOctave == oppositeGamut.NPitchesPerOctave);
+            // N.B. it is not necessarily true that gamut.Count == oppositeGamut.Count.
             #endregion conditions
 
-            // Substitute the conjugateMCD's pitches by the equivalent pitches in the conjugateGamut.
-            ConjugatePitches(conjugateGamut, conjugateMCD.NotatedMidiPitches);
-            foreach(BasicMidiChordDef bmcd in conjugateMCD.BasicMidiChordDefs)
+            // Substitute the oppositeMCD's pitches by the equivalent pitches in the oppositeGamut.
+            OppositePitches(gamut, oppositeGamut, oppositeMCD.NotatedMidiPitches);
+            foreach(BasicMidiChordDef bmcd in oppositeMCD.BasicMidiChordDefs)
             {
-                ConjugatePitches(conjugateGamut, bmcd.Pitches);
+                OppositePitches(gamut, oppositeGamut, bmcd.Pitches);
             }
 
-            conjugateMCD.Gamut = conjugateGamut;
-
-            return conjugateMCD;
+            return oppositeMCD;
         }
 
-        private void ConjugatePitches(Gamut conjugateGamut, List<byte> pitches)
+        private void OppositePitches(Gamut gamut, Gamut oppositeGamut, List<byte> pitches)
         {
             for(int i = 0; i < pitches.Count; ++i)
             {
-                int pitchIndex = Gamut.IndexOf(pitches[i]);
-                // N.B. it is not necessarily true that Gamut.Count == conjugateGamut.Count.
-                pitchIndex = (pitchIndex < conjugateGamut.Count) ? pitchIndex : conjugateGamut.Count - 1;
-                pitches[i] = (byte)conjugateGamut[pitchIndex];
+                int pitchIndex = gamut.IndexOf(pitches[i]);
+                // N.B. it is not necessarily true that gamut.Count == oppositeGamut.Count.
+                pitchIndex = (pitchIndex < oppositeGamut.Count) ? pitchIndex : oppositeGamut.Count - 1;
+                pitches[i] = (byte)oppositeGamut[pitchIndex];
             }
         }
-        #endregion Conjugate
+        #endregion Opposite
 
         #region Invert (shift lowest notes up by one octave)
         /// <summary>
@@ -262,10 +255,12 @@ namespace Moritz.Spec
             #endregion conditions
 
             InvertPitches(NotatedMidiPitches, nPitchesToShiftArg);
+            RemoveDuplicateNotes(NotatedMidiPitches, NotatedMidiVelocities);
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
                 InvertPitches(bmcd.Pitches, nPitchesToShiftArg);
-            }
+                RemoveDuplicateNotes(bmcd.Pitches, bmcd.Velocities);
+            } 
         }
 
         private void InvertPitches(List<byte> pitches, int nPitchesToShiftArg)
@@ -274,17 +269,7 @@ namespace Moritz.Spec
             for(int i = 0; i < nPitchesToShift; ++i)
             {
                 byte newPitch = (byte) (pitches[i] + 12);
-                if(newPitch > 127)
-                {
-                    if(Gamut != null)
-                    {
-                        newPitch = (byte) Gamut[Gamut.Count - 1];
-                    }
-                    else
-                    {
-                        newPitch = 127;
-                    }
-                }
+                newPitch = (newPitch < 127) ? newPitch : (byte)127;
                 pitches[i] = newPitch;
             }
             pitches.Sort();
@@ -346,11 +331,11 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="ornamentShape"></param>
         /// <param name="nOrnamentChords"></param>
-        public void SetOrnament(IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
+        public void SetOrnament(Gamut gamut, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
         {
-            int nPitchesPerOctave = this.Gamut.NPitchesPerOctave;
+            int nPitchesPerOctave = gamut.NPitchesPerOctave;
             Envelope ornamentEnvelope = new Envelope(ornamentShape, 127, nPitchesPerOctave, nOrnamentChords);
-            SetOrnament(ornamentEnvelope);
+            SetOrnament(gamut, ornamentEnvelope);
         }
 
         /// <summary>
@@ -362,16 +347,16 @@ namespace Moritz.Spec
         /// Sets the OrnamentNumberSymbol to the number of BasicMidiChordDefs.
         /// </summary>
         /// <param name="ornamentEnvelope"></param>
-        public void SetOrnament(Envelope ornamentEnvelope)
+        public void SetOrnament(Gamut gamut, Envelope ornamentEnvelope)
         {
-            Debug.Assert(_gamut != null);
-            List<int> basicMidiChordRootPitches = _gamut.PitchSequence(_notatedMidiPitches[0], ornamentEnvelope);
+            Debug.Assert(gamut != null);
+            List<int> basicMidiChordRootPitches = gamut.PitchSequence(_notatedMidiPitches[0], ornamentEnvelope);
             // If ornamentEnvelope is null, basicMidiChordRootPitches will only contain rootNotatedpitch.
 
             BasicMidiChordDefs = new List<BasicMidiChordDef>();
             foreach(int rootPitch in basicMidiChordRootPitches)
             {
-                BasicMidiChordDef bmcd = new BasicMidiChordDef(1000, _gamut, rootPitch, _notatedMidiPitches.Count);
+                BasicMidiChordDef bmcd = new BasicMidiChordDef(1000, gamut, rootPitch, _notatedMidiPitches.Count);
                 BasicMidiChordDefs.Add(bmcd);
             }
             this.MsDuration = _msDuration; // resets the BasicMidiChordDef msDurations.
@@ -764,79 +749,51 @@ namespace Moritz.Spec
         /// It is not an error if Midi values would exceed the range 0..127.
         /// In this case, they are silently coerced to 0 or 127 respectively.
         /// If pitches become duplicated at the extremes, the duplicates are removed.
-        /// If Gamut != null, it is replaced by a new Gamut that is the old one transposed by interval % 12.
         /// </summary>
         public void Transpose(int interval)
         {
-            if(_gamut == null)
+            for(int i = 0; i < _notatedMidiPitches.Count; ++i)
             {
-                #region transpose wthout gamut
-                for(int i = 0; i < _notatedMidiPitches.Count; ++i)
-                {
-                    _notatedMidiPitches[i] = (byte)M.MidiValue(_notatedMidiPitches[i] + interval);
-                }
-                RemoveDuplicateExtremePitches(_notatedMidiPitches, _notatedMidiVelocities, 0, 127);
-
-                foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
-                {
-                    List<byte> pitches = bmcd.Pitches;
-                    List<byte> velocities = bmcd.Velocities;
-                    for(int i = 0; i < pitches.Count; ++i)
-                    {
-                        pitches[i] = (byte)M.MidiValue(pitches[i] + interval);
-                    }
-                    RemoveDuplicateExtremePitches(pitches, velocities, 0, 127);
-                }
-                #endregion transpose wthout gamut
+                _notatedMidiPitches[i] = (byte)M.MidiValue(_notatedMidiPitches[i] + interval);
             }
-            else
+            RemoveDuplicateNotes(_notatedMidiPitches, _notatedMidiVelocities);
+
+            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
-                #region using Gamut transposition
-
-                Gamut newGamut = _gamut.Transposition(interval);
-                int anchorPitch = (interval < 0) ? _gamut[_gamut.Count - 1] : _gamut[0];
-                int indexShift = newGamut.IndexOf(anchorPitch + interval) - _gamut.IndexOf(anchorPitch);
-
-                for(int i = 0; i < _notatedMidiPitches.Count; ++i)
+                List<byte> pitches = bmcd.Pitches;
+                List<byte> velocities = bmcd.Velocities;
+                for(int i = 0; i < pitches.Count; ++i)
                 {
-                    int newIndex = _gamut.IndexOf(_notatedMidiPitches[i]) + indexShift;
-                    newIndex = (newIndex >= 0) ? newIndex : 0;
-                    newIndex = (newIndex < newGamut.Count) ? newIndex : newGamut.Count - 1;
-                    _notatedMidiPitches[i] = (byte) newGamut[newIndex];
+                    pitches[i] = (byte)M.MidiValue(pitches[i] + interval);
                 }
-                RemoveDuplicateExtremePitches(_notatedMidiPitches, _notatedMidiVelocities, 0, 127);
-
-                foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
-                {
-                    List<byte> pitches = bmcd.Pitches;
-                    List<byte> velocities = bmcd.Velocities;
-                    for(int i = 0; i < pitches.Count; ++i)
-                    {
-                        int newIndex = _gamut.IndexOf(pitches[i]) + indexShift;
-                        newIndex = (newIndex >= 0) ? newIndex : 0;
-                        newIndex = (newIndex < newGamut.Count) ? newIndex : newGamut.Count - 1;
-                        pitches[i] = (byte)newGamut[newIndex];
-                    }
-                    RemoveDuplicateExtremePitches(pitches, velocities, 0, 127);
-                }
-                _gamut = newGamut;
-                #endregion using Gamut transposition
+                RemoveDuplicateNotes(pitches, velocities);
             }
         }
 
-        /// <summary>        
-        /// An exception is thrown if this MidiChord's Gamut is null.
+        /// <summary>
+        /// All the pitches in the MidiChordDef must be contained in the gamut.
         /// Transposes the pitches in NotatedMidiPitches, and all BasicMidiChordDef.Pitches by
-        /// the number of steps in the MidiChordDef's Gamut. Negative values transpose down.
+        /// the number of steps in the gamut. Negative values transpose down.
         /// It is not an error if Midi values would exceed the range of the gamut.
         /// In this case, they are silently coerced to the bottom or top notes of the gamut respectively.
         /// Duplicate top and bottom gamut pitches are removed.
         /// </summary>
-        public void TransposeInGamut(int steps)
+        public void TransposeInGamut(Gamut gamut, int steps)
         {
-            Debug.Assert(Gamut != null);
-
-            Gamut gamut = Gamut;
+            #region conditions
+            Debug.Assert(gamut != null);
+            foreach(int pitch in NotatedMidiPitches)
+            {
+                Debug.Assert(gamut.Contains(pitch));
+            }
+            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+            {
+                foreach(int pitch in bmcd.Pitches)
+                {
+                    Debug.Assert(gamut.Contains(pitch));
+                }
+            }
+            #endregion conditions
 
             int bottomMostPitch = gamut[0];
             int topMostPitch = gamut[gamut.Count - 1];
@@ -845,7 +802,7 @@ namespace Moritz.Spec
             {
                 NotatedMidiPitches[i] = DoTranspose(NotatedMidiPitches[i], gamut, steps);
             }
-            RemoveDuplicateExtremePitches(_notatedMidiPitches, _notatedMidiVelocities, bottomMostPitch, topMostPitch);
+            RemoveDuplicateNotes(_notatedMidiPitches, _notatedMidiVelocities);
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
                 List<byte> pitches = bmcd.Pitches;
@@ -854,7 +811,7 @@ namespace Moritz.Spec
                 {
                     pitches[i] = DoTranspose(pitches[i], gamut, steps);
                 }
-                RemoveDuplicateExtremePitches(pitches, velocities, bottomMostPitch, topMostPitch);
+                RemoveDuplicateNotes(pitches, velocities);
             }
         }
 
@@ -868,30 +825,24 @@ namespace Moritz.Spec
             return (byte)gamut[newIndex];
         }
 
-        private void RemoveDuplicateExtremePitches(List<byte> pitches, List<byte> velocities, int bottomMost, int topMost)
+        private void RemoveDuplicateNotes(List<byte> pitches, List<byte> velocities)
         {
             Debug.Assert(pitches.Count == velocities.Count);
-            bool foundBottomMost = false;
-            bool fountdTopMost = false;
-            for(int i = pitches.Count - 1; i >= 0; --i)
+            pitches.Sort(); // just to be sure
+            List<int> indicesOfPitchesToRemove = new List<int>();
+            for(int i = 1; i < pitches.Count; ++i)
             {
-                if(pitches[i] == bottomMost)
+                if(pitches[i] == pitches[i-1])
                 {
-                    if(foundBottomMost == true)
-                    {
-                        pitches.RemoveAt(i);
-                        velocities.RemoveAt(i);
-                    }
-                    foundBottomMost = true;
+                    indicesOfPitchesToRemove.Add(i);
                 }
-                if(pitches[i] == topMost)
+            }
+            for(int i = pitches.Count - 1; i > 0; --i)
+            {
+                if(indicesOfPitchesToRemove.Contains(i))
                 {
-                    if(fountdTopMost == true)
-                    {
-                        pitches.RemoveAt(i);
-                        velocities.RemoveAt(i);
-                    }
-                    fountdTopMost = true;
+                    pitches.RemoveAt(i);
+                    velocities.RemoveAt(i);
                 }
             }
             Debug.Assert(pitches.Count == velocities.Count);
@@ -1256,35 +1207,6 @@ namespace Moritz.Spec
             } 
         }
         private List<byte> _notatedMidiPitches = null;
-        /// <summary>
-        /// The Gamut is set if all the pitches in the MidiChordDef are in the Gamut.
-        /// Otherwise, the original Gamut value is left unchanged.
-        /// </summary>
-        public Gamut Gamut
-        { 
-            get { return _gamut; }          
-            set
-            {
-                Gamut newGamut = value;
-                if(newGamut != null && newGamut.ContainsAllPitches(_notatedMidiPitches))
-                {
-                    bool okay = true;
-                    foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
-                    {
-                        if(!newGamut.ContainsAllPitches(bmcd.Pitches))
-                        {
-                            okay = false;
-                            break;
-                        }
-                    }
-                    if(okay)
-                    {
-                        _gamut = value;
-                    }   
-                }   
-            }
-        }
-        private Gamut _gamut = null;
 
         /// <summary>
         /// This NotatedMidiVelocities field is used when displaying the chord's noteheads.

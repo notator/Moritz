@@ -48,7 +48,7 @@ namespace Moritz.Algorithm.Tombeau1
                 trk1.MidiChannel = channel;
                 trk1.MsDuration = trk1MsDurations[i];
                 trk1.TransposeInGamut(12);
-                List<byte> velocityPerAbsolutePitch = ((MidiChordDef)trk1[0]).Gamut.GetVelocityPerAbsolutePitch(25, true);
+                List<byte> velocityPerAbsolutePitch = trk0.Gamut.GetVelocityPerAbsolutePitch(25, true);
                 trk1.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, transformationPercents[i]);
                 int indexToAlign = trk1.Count - 1;
                 int msPositionReContainer = trk0.UniqueDefs[trk0.UniqueDefs.Count - 1].MsPositionReFirstUD;

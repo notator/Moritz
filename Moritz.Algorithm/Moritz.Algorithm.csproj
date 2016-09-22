@@ -51,15 +51,8 @@
     <Compile Include="Tombeau 1\Trks0.cs" />
     <Compile Include="Tombeau 1\Tombeau1Template.cs" />
     <Compile Include="Tombeau 1\Init.cs" />
-    <Compile Include="Tombeau 1\VPAPBlock.cs" />
-    <Compile Include="Tombeau 1\Block2TestBlock.cs" />
-    <Compile Include="Tombeau 1\GamutTestBlock.cs" />
-    <Compile Include="Tombeau 1\VerticalVelocityGradientTestBlock.cs" />
-    <Compile Include="Tombeau 1\VelocityPerAbsolutePitchTestBlock.cs" />
-    <Compile Include="Tombeau 1\TimeWarpTestBlock.cs" />
-    <Compile Include="Tombeau 1\VerticalVelocityColorsTestBlock.cs" />
-    <Compile Include="Tombeau 1\SimpleVelocityColorsTestBlock.cs" />
-    <Compile Include="Tombeau 1\TrksTestBlock.cs" />
+    <Compile Include="Tombeau 1\_VPAPBlock.cs" />
+    <Compile Include="Tombeau 1\_TimeWarpTestBlock.cs" />
     <Compile Include="Tombeau 1\Tombeau1Algorithm.cs" />
   </ItemGroup>
   <ItemGroup>

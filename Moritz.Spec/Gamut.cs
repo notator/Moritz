@@ -20,16 +20,19 @@ namespace Moritz.Spec
         /// <summary>
         /// Gamuts are immutable!
         /// </summary>
-        public Gamut(List<int> absolutePitchHierarchy, int nPitchesPerOctave)
+        public Gamut(int relativePitchHierarchyIndex, int basePitch, int nPitchesPerOctave)
         {
+            List<int> absolutePitchHierarchy = GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, basePitch);
             #region condition
             ThrowExceptionIfPitchHierarchyIsInvalid(absolutePitchHierarchy);
             #endregion condition
 
-            _absolutePitchHierarchy = new List<int>(absolutePitchHierarchy);
-            _nPitchesPerOctave = nPitchesPerOctave;
+            RelativePitchHierarchyIndex = relativePitchHierarchyIndex;
+            BasePitch = basePitch;
+            NPitchesPerOctave = nPitchesPerOctave;
 
-            _list = GetGamutList(_absolutePitchHierarchy, _nPitchesPerOctave);
+            _absolutePitchHierarchy = new List<int>(absolutePitchHierarchy);
+            _list = GetGamutList(_absolutePitchHierarchy, NPitchesPerOctave);
         }
 
         #region private helper functions
@@ -98,6 +101,12 @@ namespace Moritz.Spec
 
             return gamutList;
         }
+
+        public Gamut Clone()
+        {
+            return new Gamut(RelativePitchHierarchyIndex, BasePitch, NPitchesPerOctave);
+        }
+
         /// <summary>
         /// Throws an exception if the argument is invalid for any of the following reasons:
         /// 1. The argument may not be null or empty.
@@ -160,67 +169,20 @@ namespace Moritz.Spec
         #endregion constructor
 
         /// <summary>
-        /// Returns a new gamut transposed by the interval argument.
-        /// </summary>
-        /// <param name="interval">In range [-127..127]</param>
-        /// <returns>A new, transposed gamut</returns>
-        internal Gamut Transposition(int interval)
-        {
-            Debug.Assert(interval >= -127 && interval <= 127);
-
-            List<int> absolutePitchHierarchy = new List<int>(_absolutePitchHierarchy);
-            for(int i = 0; i < absolutePitchHierarchy.Count; ++i)
-            {
-                int value = (absolutePitchHierarchy[i] + interval) % 12;
-                value = (value >= 0) ? value : value + 12;
-
-                absolutePitchHierarchy[i] = value;
-            }
-
-            Gamut transposedGamut = new Gamut(absolutePitchHierarchy, NPitchesPerOctave);
-
-            return transposedGamut;
-        }
-
-        /// <summary>
-        /// Returns the conjugate Gamut.
-        /// This is the Gamut whose AbsolutePitchHierachy is inverted re this Gamut
+        /// Returns the opposite Gamut.
+        /// This is the Gamut whose BasePitch and NPitchesPerOctave are the same,
+        /// but whose RelativePitchHierarchyIndex is at 180°.
         /// </summary>
         /// <returns></returns>
-        internal Gamut Conjugate()
+        internal Gamut Opposite()
         {
-            List<int> conjugateAbsolutePitchHierachy = GetConjugateAbsolutePitchHierarchy();
-            Gamut conjugateGamut = new Gamut(conjugateAbsolutePitchHierachy, NPitchesPerOctave);
-            return conjugateGamut; 
-        }
-        private List<int> GetConjugateAbsolutePitchHierarchy()
-        {
-            List<int> pitchHierarchy = AbsolutePitchHierarchy; // a clone
-            int rootPitch = pitchHierarchy[0];
-            for(int i = 0; i < pitchHierarchy.Count; ++i)
-            {
-                pitchHierarchy[i] -= rootPitch;
-            }
-            // pitchHierachy[0] is now 0.
-            // invert the pitchHierarchy
-            for(int i = 0; i < pitchHierarchy.Count; ++i)
-            {
-                pitchHierarchy[i] *= -1;
-            }
-            // reset the rootPitch
-            for(int i = 0; i < pitchHierarchy.Count; ++i)
-            {
-                pitchHierarchy[i] += rootPitch;
-            }
-            // normalize the pitchHierachy
-            for(int i = 0; i < pitchHierarchy.Count; ++i)
-            {
-                pitchHierarchy[i] = (pitchHierarchy[i] < 0) ? pitchHierarchy[i] + 12 : pitchHierarchy[i];
-                pitchHierarchy[i] = (pitchHierarchy[i] > 11) ? pitchHierarchy[i] - 12 : pitchHierarchy[i];
-            }
-            ThrowExceptionIfPitchHierarchyIsInvalid(pitchHierarchy);
+            int newPitchHierarchyIndex = (RelativePitchHierarchyIndex + (RelativePitchHierarchies.Count / 2));
+            newPitchHierarchyIndex = (newPitchHierarchyIndex < RelativePitchHierarchies.Count) ?
+                newPitchHierarchyIndex : newPitchHierarchyIndex - RelativePitchHierarchies.Count;
 
-            return pitchHierarchy;
+            Gamut oppositeGamut = new Gamut(newPitchHierarchyIndex, BasePitch, NPitchesPerOctave);
+
+            return oppositeGamut; 
         }
 
         #region public functions
@@ -468,8 +430,9 @@ namespace Moritz.Spec
         #endregion public functions
 
         #region public properties
-        public int NPitchesPerOctave { get { return _nPitchesPerOctave; } }
-        public int _nPitchesPerOctave;
+        public int RelativePitchHierarchyIndex { get; private set; }
+        public int BasePitch { get; private set; }
+        public int NPitchesPerOctave { get; private set; }
 
         /// <summary>
         /// A clone of the private list.
@@ -485,5 +448,87 @@ namespace Moritz.Spec
 
         public int Count { get { return _list.Count; } }
         #endregion public interface
+
+        #region Pitch Hierarchies
+        /// <summary>
+        /// Returns a list that contains the sums of absoluteValue(rootPitch) + RelativePitchHierarchies[index].
+        /// If a value would be greater than 11, value = value - 12, so that all values are in range [0..11].
+        /// </summary>
+        /// <param name="relativePitchHierarchyIndex">In range [0..21]</param>
+        /// <param name="rootPitch">In range [0..127]</param>
+        private static List<int> GetAbsolutePitchHierarchy(int relativePitchHierarchyIndex, int rootPitch)
+        {
+            if(RelativePitchHierarchies.Count != 22)
+            {
+                throw new ArgumentException($"{nameof(RelativePitchHierarchies)} has changed!");
+            }
+            if(relativePitchHierarchyIndex < 0 || relativePitchHierarchyIndex >= RelativePitchHierarchies.Count)
+            {
+                throw new ArgumentException($"{nameof(relativePitchHierarchyIndex)} out of range.");
+            }
+            if(rootPitch < 0 || rootPitch > 127)
+            {
+                throw new ArgumentException($"{nameof(rootPitch)} out of range.");
+            }
+
+            List<int> absolutePitchHierarchy = new List<int>(RelativePitchHierarchies[relativePitchHierarchyIndex]); // checks index
+            int absRootPitch = rootPitch % 12;
+
+            for(int i = 0; i < absolutePitchHierarchy.Count; ++i)
+            {
+                absolutePitchHierarchy[i] += absRootPitch;
+                absolutePitchHierarchy[i] = (absolutePitchHierarchy[i] > 11) ? absolutePitchHierarchy[i] - 12 : absolutePitchHierarchy[i];
+            }
+            return absolutePitchHierarchy;
+        }
+
+        /// <summary>
+        /// This series of RelativePitchHierarchies is derived from the "most consonant" hierarchy at index 0:
+        ///                    0, 7, 4, 10, 2, 5, 9, 11, 1, 3, 6, 8
+        /// which has been deduced from the harmonic series as follows (decimals rounded to 3 figures):
+        /// 
+        ///              absolute   equal              harmonic:     absolute         closest
+        ///              pitch:  temperament                         harmonic    equal temperament
+        ///                        factor:                           factor:       absolute pitch:
+        ///                0:       1.000       |          1   ->   1/1  = 1.000  ->     0:
+        ///                1:       1.059       |          3   ->   3/2  = 1.500  ->     7:
+        ///                2:       1.122       |          5   ->   5/4  = 1.250  ->     4:
+        ///                3:       1.189       |          7   ->   7/4  = 1.750  ->     10:
+        ///                4:       1.260       |          9   ->   9/8  = 1.125  ->     2:
+        ///                5:       1.335       |         11   ->  11/8  = 1.375  ->     5:
+        ///                6:       1.414       |         13   ->  13/8  = 1.625  ->     9:
+        ///                7:       1.498       |         15   ->  15/8  = 1.875  ->     11:
+        ///                8:       1.587       |         17   ->  17/16 = 1.063  ->     1:
+        ///                9:       1.682       |         19   ->  19/16 = 1.187  ->     3:
+        ///                10:      1.782       |         21   ->  21/16 = 1.313  ->     
+        ///                11:      1.888       |         23   ->  23/16 = 1.438  ->     6:
+        ///                                     |         25   ->  25/16 = 1.563  ->     8:
+        /// </summary>
+        private static List<List<int>> RelativePitchHierarchies = new List<List<int>>()
+        {
+            new List<int>(){ 0,  7,  4, 10,  2,  5,  9, 11,  1,  3,  6,  8 }, //  0
+            new List<int>(){ 0,  4,  7,  2, 10,  9,  5,  1, 11,  6,  3,  8 }, //  1
+            new List<int>(){ 0,  4,  2,  7,  9, 10,  1,  5,  6, 11,  8,  3 }, //  2
+            new List<int>(){ 0,  2,  4,  9,  7,  1, 10,  6,  5,  8, 11,  3 }, //  3
+            new List<int>(){ 0,  2,  9,  4,  1,  7,  6, 10,  8,  5,  3, 11 }, //  4
+            new List<int>(){ 0,  9,  2,  1,  4,  6,  7,  8, 10,  3,  5, 11 }, //  5
+            new List<int>(){ 0,  9,  1,  2,  6,  4,  8,  7,  3, 10, 11,  5 }, //  6
+            new List<int>(){ 0,  1,  9,  6,  2,  8,  4,  3,  7, 11, 10,  5 }, //  7
+            new List<int>(){ 0,  1,  6,  9,  8,  2,  3,  4, 11,  7,  5, 10 }, //  8
+            new List<int>(){ 0,  6,  1,  8,  9,  3,  2, 11,  4,  5,  7, 10 }, //  9
+            new List<int>(){ 0,  6,  8,  1,  3,  9, 11,  2,  5,  4, 10,  7 }, // 10
+            new List<int>(){ 0,  8,  6,  3,  1, 11,  9,  5,  2, 10,  4,  7 }, // 11
+            new List<int>(){ 0,  8,  3,  6, 11,  1,  5,  9, 10,  2,  7,  4 }, // 12
+            new List<int>(){ 0,  3,  8, 11,  6,  5,  1, 10,  9,  7,  2,  4 }, // 13
+            new List<int>(){ 0,  3, 11,  8,  5,  6, 10,  1,  7,  9,  4,  2 }, // 14
+            new List<int>(){ 0, 11,  3,  5,  8, 10,  6,  7,  1,  4,  9,  2 }, // 15
+            new List<int>(){ 0, 11,  5,  3, 10,  8,  7,  6,  4,  1,  2,  9 }, // 16
+            new List<int>(){ 0,  5, 11, 10,  3,  7,  8,  4,  6,  2,  1,  9 }, // 17
+            new List<int>(){ 0,  5, 10, 11,  7,  3,  4,  8,  2,  6,  9,  1 }, // 18
+            new List<int>(){ 0, 10,  5,  7, 11,  4,  3,  2,  8,  9,  6,  1 }, // 19
+            new List<int>(){ 0, 10,  7,  5,  4, 11,  2,  3,  9,  8,  1,  6 }, // 20
+            new List<int>(){ 0,  7, 10,  4,  5,  2, 11,  9,  3,  1,  8,  6 }, // 21 
+        };
+        #endregion Pitch Hierarchies
     }
 }

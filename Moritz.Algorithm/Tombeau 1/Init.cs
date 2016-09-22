@@ -108,8 +108,7 @@ namespace Moritz.Algorithm.Tombeau1
         {
             List<MidiChordDef> rval = new List<MidiChordDef>();
 
-            List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, absHierarchyRoot);
-            Gamut gamut = new Gamut(absolutePitchHierarchy, 8);
+            Gamut gamut = new Gamut(relativePitchHierarchyIndex, absHierarchyRoot, 8);
 
             foreach(List<byte> envelope in envList)
             {

@@ -27,10 +27,10 @@ namespace Moritz.Algorithm.Tombeau1
         private Seq VPAPBars(Trk templateTrk)
         {
             Trk vpapTrka = GetVPAPChannelTrk(2, templateTrk);
-            Gamut gamut = ((MidiChordDef)vpapTrka[0]).Gamut;
+            Gamut gamut = templateTrk.Gamut;
 
             vpapTrka.AdjustVelocitiesHairpin(0, vpapTrka.EndMsPositionReFirstIUD, 1, 0.1);
-            List<byte> velocityPerAbsolutePitch = ((MidiChordDef)vpapTrka[0]).Gamut.GetVelocityPerAbsolutePitch(25, false);
+            List<byte> velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(25, false);
             vpapTrka.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
             vpapTrka.TransposeInGamut(-(gamut.NPitchesPerOctave));
             MidiChordDef lastTrk2MidiChordDef = (MidiChordDef)vpapTrka[vpapTrka.Count - 1];

@@ -358,8 +358,8 @@ namespace Moritz.Algorithm.Tombeau1
             Trks0 trks0 = new Trks0(_tombeau1Templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[0]);
             AddTrksToSeqs(seqs, trks0);
 
-            //Trks1 trks1 = new Trks1(seqs, _tombeau1Templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[1]);
-            //AddTrksToSeqs(seqs, trks1);
+            Trks1 trks1 = new Trks1(seqs, _tombeau1Templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[1]);
+            AddTrksToSeqs(seqs, trks1);
 
             //Trks2 trks2 = new Trks2(seqs, _tombeau1Templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[2]);
             //AddTrksToSeqs(seqs, trks2);
@@ -370,41 +370,15 @@ namespace Moritz.Algorithm.Tombeau1
             //Trks4 trks4 = new Trks4(seqs, _tombeau1Templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[4]);
             //AddTrksToSeqs(seqs, trks4);
 
+            #region test blocks
             /************************************************/
             //Block vpapBlock = VPAPBlock(_level1TemplateTrks[1]);
             //_blockList.Add(vpapBlock);   // 2 bars
 
-            /************************************************/
-            #region test blocks
-            //Block block2TestBlock = Block2TestBlock(_pitchWheelTestMidiChordDefs, _ornamentTestMidiChordDefs);
-            //_blockList.Add(block2TestBlock);   // 2 bars
-
-            //Block verticalVelocityColorsTestBlock = VerticalVelocityColorsTestBlock(_paletteMidiChordDefs[0]);
-            //_blockList.Add(verticalVelocityColorsTestBlock); // 2 bars
-
-            //Block velocityPerAbsolutePitchTestBlock = VelocityPerAbsolutePitchTestBlock();
-            //_blockList.Add(velocityPerAbsolutePitchTestBlock); // 2 bars
-
-            //Block gamutTestBlock = GamutTestBlock();
-            //_blockList.Add(gamutTestBlock); // 2 bars
-
-            //Block verticalVelocityGradientTestBlock = VerticalVelocityGradientTestBlock();
-            //_blockList.Add(verticalVelocityGradientTestBlock); // 2 bars
-
             //Block timeWarpVVTestBlock = TimeWarpTestBlock(verticalVelocityGradientTestBlock);
             //_blockList.Add(timeWarpVVTestBlock); // 4 bars (1 system)
-
-            //Block trksTestBlock = TrksTestBlock(_paletteMidiChordDefs[0]);
-            //_blockList.Add(trksTestBlock); // 1 bar (1 system)
-
-            //Block simpleVelocityColorsTestBlock = SimpleVelocityColorsTestBlock();
-            //_blockList.Add(simpleVelocityColorsTestBlock); // 1 bar
-
-            //Block timeWarpSVTestBlock = TimeWarpTestBlock(simpleVelocityColorsTestBlock);
-            //_blockList.Add(timeWarpSVTestBlock); // 1 bar
-
+            /************************************************/
             #endregion test blocks
-
 
             Seq mainSeq = new Seq(0, new List<Trk>() { new Trk(0) }, MidiChannelIndexPerOutputVoice);
             List<int> approximateBarlineMsPositions = new List<int>();

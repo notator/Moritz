@@ -8,14 +8,13 @@ namespace Moritz.Algorithm.Tombeau1
     public class Tombeau1Template : Trk
     {
         /// <summary>
-        /// TemplateTrks are all constructed with MidiChannel=0 and msPositionReContainer=0.
+        /// Tombeau1Templates are all constructed with MidiChannel=0 and MsPositionReContainer=0.
         /// </summary>
         public Tombeau1Template(int relativePitchHierarchyIndex, int rootPitch, int nPitchesPerOctave, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
             : base(0)
         {
             int rootPitchAbs = rootPitch % 12;
-            List<int> absolutePitchHierarchy = M.GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, rootPitchAbs);
-            Gamut gamut = new Gamut(absolutePitchHierarchy, nPitchesPerOctave);
+            Gamut = new Gamut(relativePitchHierarchyIndex, rootPitchAbs, nPitchesPerOctave);
 
             Debug.Assert(_uniqueDefs != null && _uniqueDefs.Count == 0);
 
@@ -23,7 +22,7 @@ namespace Moritz.Algorithm.Tombeau1
             int nPitchesPerChord = 5;
 
             int msDuration = 1000; // dummy -- overridden by SetDurationsFromPitches() below
-            int rootIndex = gamut.IndexOf(rootPitch);
+            int rootIndex = Gamut.IndexOf(rootPitch);
             Debug.Assert(rootIndex >= 0);
             //Debug.Assert(rootIndex >= 0 && rootIndex < nPitchesPerOctave);
             //int rootOctave = 9;
@@ -31,10 +30,10 @@ namespace Moritz.Algorithm.Tombeau1
 
             for(int i = 0; i < nPitchesPerOctave; ++i)
             {
-                MidiChordDef mcd = new MidiChordDef(msDuration, gamut, gamut[rootIndex + i], nPitchesPerChord, null);
+                MidiChordDef mcd = new MidiChordDef(msDuration, Gamut, Gamut[rootIndex + i], nPitchesPerChord, null);
                 if(i == 2)
                 {
-                    mcd.SetOrnament(ornamentShape, nOrnamentChords);
+                    mcd.SetOrnament(this.Gamut, ornamentShape, nOrnamentChords);
                 }
                 _uniqueDefs.Add(mcd);
             }
@@ -49,21 +48,26 @@ namespace Moritz.Algorithm.Tombeau1
         }
 
         /// <summary>
-        /// TemplateTrks are all constructed with MidiChannel=0 and msPositionReContainer=0.
-        /// This constructor is used by Level1TemplateTrk.Clone()
+        /// Tombeau1Templates are all constructed with MidiChannel=0 and msPositionReContainer=0.
+        /// This constructor is used by Tombeau1Template.Clone()
         /// </summary>
-        private Tombeau1Template(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
-            : base(midiChannel, msPositionReContainer, iuds)
+        private Tombeau1Template(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds, Gamut gamut = null)
+            : base(midiChannel, msPositionReContainer, iuds, gamut)
         {
         }
 
         /// <summary>
-        /// Returns a deep clone of this Level1TemplateTrk.
+        /// Returns a deep clone of this Tombeau1Template.
         /// </summary>
         public new Tombeau1Template Clone()
         {
             List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
-            Tombeau1Template clone = new Tombeau1Template(MidiChannel, MsPositionReContainer, clonedIUDs);
+            Gamut gamut = null;
+            if(this.Gamut != null)
+            {
+                gamut = this.Gamut.Clone();
+            }
+            Tombeau1Template clone = new Tombeau1Template(MidiChannel, MsPositionReContainer, clonedIUDs, gamut);
             clone.Container = this.Container;
 
             return clone;

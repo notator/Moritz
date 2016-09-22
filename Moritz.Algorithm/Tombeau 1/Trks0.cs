@@ -76,7 +76,7 @@ namespace Moritz.Algorithm.Tombeau1
                 currentTrk = subTrk;
             }
 
-            Trk trk0 = new Trk(channel);
+            Trk trk0 = new Trk(0, 0, new List<IUniqueDef>(), tombeau1Template.Gamut.Clone());
             foreach(Trk subTrk in trk0SubTrks)
             {
                 MidiChordDef mcd = (MidiChordDef)subTrk.UniqueDefs[subTrk.UniqueDefs.Count - 1];

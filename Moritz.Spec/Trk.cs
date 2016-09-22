@@ -23,11 +23,13 @@ namespace Moritz.Spec
     public class Trk : VoiceDef
     {
         #region constructors
-        public Trk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
+        public Trk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds, Gamut gamut = null)
             : base(midiChannel, msPositionReContainer, iuds)
         {
+            Gamut = gamut;
             // N.B. msPositionReContainer can be negative here. Seqs are normalised independently.
             AssertConstructionConsistency();
+
         }
 
         /// <summary>
@@ -45,10 +47,10 @@ namespace Moritz.Spec
         public Trk Clone()
         {
             List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
-            Trk trk = new Trk(MidiChannel, MsPositionReContainer, clonedIUDs);
+            Trk trk = new Trk(MidiChannel, MsPositionReContainer, clonedIUDs, Gamut);
             trk.Container = this.Container;
 
-            return trk; 
+            return trk;
         }
 
         /// <summary>
@@ -180,15 +182,17 @@ namespace Moritz.Spec
         #endregion Changing the Trk's duration
 
         #region Changing MidiChordDef attributes
-
+        /// <summary>
+        /// All the pitches in all the MidiChordDefs must be contained in the gamut.
+        /// Otherwise a Debug.Assert() fails.
+        /// </summary>
+        /// <param name="gamut"></param>
+        /// <param name="stepsToTranspose"></param>
         public void TransposeInGamut(int stepsToTranspose)
         {
             foreach(MidiChordDef mcd in MidiChordDefs)
             {
-                if(mcd.Gamut != null)
-                {
-                    mcd.TransposeInGamut(stepsToTranspose);
-                }
+                mcd.TransposeInGamut(this.Gamut, stepsToTranspose);
             }
         }
 
@@ -524,7 +528,7 @@ namespace Moritz.Spec
             int endIndex = FindIndexAtMsPositionReFirstIUD(endMsPosition);
 
             Debug.Assert(((beginIndex + 1) < endIndex) && (startPanValue >= 0) && (startPanValue <= 127)
-                && (endPanValue >= 0) && (endPanValue <=127) && (endIndex <= Count));
+                && (endPanValue >= 0) && (endPanValue <= 127) && (endIndex <= Count));
 
             int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
 
@@ -619,64 +623,64 @@ namespace Moritz.Spec
         /// and throws an appropriate exception if there is a problem.
         /// </summary>
         public void AlignObjectAtIndex(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPositionReFirstIUD)
-		{
-			// throws an exception if there's a problem.
-			CheckAlignDefArgs(anchor1Index, indexToAlign, anchor2Index, toMsPositionReFirstIUD);
+        {
+            // throws an exception if there's a problem.
+            CheckAlignDefArgs(anchor1Index, indexToAlign, anchor2Index, toMsPositionReFirstIUD);
 
-			List<IUniqueDef> lmdds = _uniqueDefs;
-			int anchor1MsPositionReFirstIUD = lmdds[anchor1Index].MsPositionReFirstUD;
-			int fromMsPositionReFirstIUD = lmdds[indexToAlign].MsPositionReFirstUD;
-			int anchor2MsPositionReFirstIUD;
-			if(anchor2Index == lmdds.Count) // i.e. anchor2 is on the final barline
-			{
-				anchor2MsPositionReFirstIUD = lmdds[anchor2Index - 1].MsPositionReFirstUD + lmdds[anchor2Index - 1].MsDuration;
-			}
-			else
-			{
-				anchor2MsPositionReFirstIUD = lmdds[anchor2Index].MsPositionReFirstUD;
-			}
+            List<IUniqueDef> lmdds = _uniqueDefs;
+            int anchor1MsPositionReFirstIUD = lmdds[anchor1Index].MsPositionReFirstUD;
+            int fromMsPositionReFirstIUD = lmdds[indexToAlign].MsPositionReFirstUD;
+            int anchor2MsPositionReFirstIUD;
+            if(anchor2Index == lmdds.Count) // i.e. anchor2 is on the final barline
+            {
+                anchor2MsPositionReFirstIUD = lmdds[anchor2Index - 1].MsPositionReFirstUD + lmdds[anchor2Index - 1].MsDuration;
+            }
+            else
+            {
+                anchor2MsPositionReFirstIUD = lmdds[anchor2Index].MsPositionReFirstUD;
+            }
 
-			float leftFactor = (float)(((float)(toMsPositionReFirstIUD - anchor1MsPositionReFirstIUD)) / ((float)(fromMsPositionReFirstIUD - anchor1MsPositionReFirstIUD)));
-			for(int i = anchor1Index + 1; i < indexToAlign; ++i)
-			{
-				lmdds[i].MsPositionReFirstUD = anchor1MsPositionReFirstIUD + ((int)((lmdds[i].MsPositionReFirstUD - anchor1MsPositionReFirstIUD) * leftFactor));
-			}
+            float leftFactor = (float)(((float)(toMsPositionReFirstIUD - anchor1MsPositionReFirstIUD)) / ((float)(fromMsPositionReFirstIUD - anchor1MsPositionReFirstIUD)));
+            for(int i = anchor1Index + 1; i < indexToAlign; ++i)
+            {
+                lmdds[i].MsPositionReFirstUD = anchor1MsPositionReFirstIUD + ((int)((lmdds[i].MsPositionReFirstUD - anchor1MsPositionReFirstIUD) * leftFactor));
+            }
 
-			lmdds[indexToAlign].MsPositionReFirstUD = toMsPositionReFirstIUD;
+            lmdds[indexToAlign].MsPositionReFirstUD = toMsPositionReFirstIUD;
 
-			float rightFactor = (float)(((float)(anchor2MsPositionReFirstIUD - toMsPositionReFirstIUD)) / ((float)(anchor2MsPositionReFirstIUD - fromMsPositionReFirstIUD)));
-			for(int i = anchor2Index - 1; i > indexToAlign; --i)
-			{
-				lmdds[i].MsPositionReFirstUD = anchor2MsPositionReFirstIUD - ((int)((anchor2MsPositionReFirstIUD - lmdds[i].MsPositionReFirstUD) * rightFactor));
-			}
+            float rightFactor = (float)(((float)(anchor2MsPositionReFirstIUD - toMsPositionReFirstIUD)) / ((float)(anchor2MsPositionReFirstIUD - fromMsPositionReFirstIUD)));
+            for(int i = anchor2Index - 1; i > indexToAlign; --i)
+            {
+                lmdds[i].MsPositionReFirstUD = anchor2MsPositionReFirstIUD - ((int)((anchor2MsPositionReFirstIUD - lmdds[i].MsPositionReFirstUD) * rightFactor));
+            }
 
-			#region fix MsDurations
-			for(int i = anchor1Index + 1; i <= anchor2Index; ++i)
-			{
-				if(i == lmdds.Count) // possible, when anchor2Index is the final barline
-				{
-					lmdds[i - 1].MsDuration = anchor2MsPositionReFirstIUD - lmdds[i - 1].MsPositionReFirstUD;
-				}
-				else
-				{
-					lmdds[i - 1].MsDuration = lmdds[i].MsPositionReFirstUD - lmdds[i - 1].MsPositionReFirstUD;
-				}
-			}
+            #region fix MsDurations
+            for(int i = anchor1Index + 1; i <= anchor2Index; ++i)
+            {
+                if(i == lmdds.Count) // possible, when anchor2Index is the final barline
+                {
+                    lmdds[i - 1].MsDuration = anchor2MsPositionReFirstIUD - lmdds[i - 1].MsPositionReFirstUD;
+                }
+                else
+                {
+                    lmdds[i - 1].MsDuration = lmdds[i].MsPositionReFirstUD - lmdds[i - 1].MsPositionReFirstUD;
+                }
+            }
             #endregion
 
             AssertVoiceDefConsistency();
         }
-		/// <summary>
-		/// Debug.Assert fails if
-		///     1. the index arguments are not in ascending order or if any are equal.
-		///     2. any of the index arguments are out of range (anchor2Index CAN be _localizedMidiDurationDefs.Count, i.e. the final barline)
-		///     3. toPosition is not greater than the msPosition at anchor1Index and less than the msPosition at anchor2Index.
-		/// </summary>
-		private void CheckAlignDefArgs(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPositionReFirstUD)
-		{
-			List<IUniqueDef> lmdds = _uniqueDefs;
-			int count = lmdds.Count;
-			string msg = "\nError in VoiceDef.cs,\nfunction AlignDefMsPosition()\n\n";
+        /// <summary>
+        /// Debug.Assert fails if
+        ///     1. the index arguments are not in ascending order or if any are equal.
+        ///     2. any of the index arguments are out of range (anchor2Index CAN be _localizedMidiDurationDefs.Count, i.e. the final barline)
+        ///     3. toPosition is not greater than the msPosition at anchor1Index and less than the msPosition at anchor2Index.
+        /// </summary>
+        private void CheckAlignDefArgs(int anchor1Index, int indexToAlign, int anchor2Index, int toMsPositionReFirstUD)
+        {
+            List<IUniqueDef> lmdds = _uniqueDefs;
+            int count = lmdds.Count;
+            string msg = "\nError in VoiceDef.cs,\nfunction AlignDefMsPosition()\n\n";
             Debug.Assert((anchor1Index < indexToAlign && anchor2Index > indexToAlign),
                     msg + "Index out of order.\n" +
                     "\nanchor1Index=" + anchor1Index.ToString() +
@@ -684,30 +688,30 @@ namespace Moritz.Spec
                     "\nanchor2Index=" + anchor2Index.ToString());
 
             Debug.Assert(!(anchor1Index > (count - 2) || indexToAlign > (count - 1) || anchor2Index > count)// anchor2Index can be at the final barline (=count)!
-				|| (anchor1Index < 0 || indexToAlign < 1 || anchor2Index < 2),
+                || (anchor1Index < 0 || indexToAlign < 1 || anchor2Index < 2),
                     msg + "Index out of range.\n" +
-					"\ncount=" + count.ToString() +
-					"\nanchor1Index=" + anchor1Index.ToString() +
-					"\nindexToAlign=" + indexToAlign.ToString() +
-					"\nanchor2Index=" + anchor2Index.ToString());
+                    "\ncount=" + count.ToString() +
+                    "\nanchor1Index=" + anchor1Index.ToString() +
+                    "\nindexToAlign=" + indexToAlign.ToString() +
+                    "\nanchor2Index=" + anchor2Index.ToString());
 
-			int a1MsPosReFirstUD = lmdds[anchor1Index].MsPositionReFirstUD;
-			int a2MsPosReFirstIUD;
-			if(anchor2Index == lmdds.Count)
-			{
-				a2MsPosReFirstIUD = lmdds[anchor2Index - 1].MsPositionReFirstUD + lmdds[anchor2Index - 1].MsDuration;
-			}
-			else
-			{
-				a2MsPosReFirstIUD = lmdds[anchor2Index].MsPositionReFirstUD;
-			}
-			Debug.Assert((toMsPositionReFirstUD > a1MsPosReFirstUD && toMsPositionReFirstUD < a2MsPosReFirstIUD),
-			        msg + "Target (msPos) position out of range.\n" +
-					"\nanchor1Index=" + anchor1Index.ToString() +
-					"\nindexToAlign=" + indexToAlign.ToString() +
-					"\nanchor2Index=" + anchor2Index.ToString() +
-					"\ntoMsPosition=" + toMsPositionReFirstUD.ToString());
-		}
+            int a1MsPosReFirstUD = lmdds[anchor1Index].MsPositionReFirstUD;
+            int a2MsPosReFirstIUD;
+            if(anchor2Index == lmdds.Count)
+            {
+                a2MsPosReFirstIUD = lmdds[anchor2Index - 1].MsPositionReFirstUD + lmdds[anchor2Index - 1].MsDuration;
+            }
+            else
+            {
+                a2MsPosReFirstIUD = lmdds[anchor2Index].MsPositionReFirstUD;
+            }
+            Debug.Assert((toMsPositionReFirstUD > a1MsPosReFirstUD && toMsPositionReFirstUD < a2MsPosReFirstIUD),
+                    msg + "Target (msPos) position out of range.\n" +
+                    "\nanchor1Index=" + anchor1Index.ToString() +
+                    "\nindexToAlign=" + indexToAlign.ToString() +
+                    "\nanchor2Index=" + anchor2Index.ToString() +
+                    "\ntoMsPosition=" + toMsPositionReFirstUD.ToString());
+        }
 
         /// <summary>
         /// _uniqueDefs[indexToAlign] is moved to msPositionReContainer.
@@ -1242,6 +1246,8 @@ namespace Moritz.Spec
             }
         }
         #endregion
+
+        public Gamut Gamut { get; protected set; }
 
         /// <summary>
         /// This value is used by Seq.AlignTrkAxes(). It is set by the Permute functions, but can also be set manually.
