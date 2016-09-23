@@ -45,12 +45,12 @@ namespace Moritz.Spec
         /// at the positions given by their MsPositionReFirstIUD added to trk2.MsPositionReContainer,
         /// whereby trk2.MsPositionReContainer is used with respect to the calling Trk's container.
         /// Before doing the superimposition, the calling Trk is given leading and trailing RestDefs
-        /// so that trk2's uniqueDefs can be added at their original positions without any problem
-        /// there. These leading and trailing RestDefs are however removed before the function returns.
+        /// so that trk2's uniqueDefs can be added at their original positions without any problem.
+        /// These leading and trailing RestDefs are however removed before the function returns.
         /// The superimposed uniqueDefs will be placed at their original positions if they fit inside
-        /// a RestDef in the original Trk. If this is not the case, they are interspersed wth the
-        /// original uniqueDefs in order of the original positions, so that the original positions
-        /// in both Trks will change.
+        /// a RestDef in the original Trk. A Debug.Assert() fails if this is not the case.
+        /// To insert single uniqueDefs between existing uniqueDefs, call the function
+        /// Trk.Insert(index, iudToInsert).
         /// trk2's UniqueDefs are not cloned.
         /// </summary>
         /// <returns>this</returns>
@@ -62,53 +62,23 @@ namespace Moritz.Spec
                 Gamut = null;
             }
 
-            AlignAndJustifyWith(trk2);
-            Debug.Assert(this.MsDuration == trk2.MsDuration);
-
             SuperimposeUniqueDefs(trk2);
-
-            Trim();
 
             AssertConsistentInSeq();
 
             return this;
         }
-        /// <summary>
-        /// Makes both tracks the same length by adding rests at the beginnings and ends.
-        /// The Alignment is found using this.MsPositionReContainer and trk2.MsPositionReContainer
-        /// </summary>
-        private void AlignAndJustifyWith(Trk trk2)
-        {
-            this.Trim();
-            if(this.MsPositionReContainer > 0)
-            {
-                this.Insert(0, new RestDef(0, this.MsPositionReContainer));
-                this.MsPositionReContainer = 0;
-            }
-            trk2.Trim();
-            if(trk2.MsPositionReContainer > 0)
-            {
-                trk2.Insert(0, new RestDef(0, trk2.MsPositionReContainer));
-                trk2.MsPositionReContainer = 0;
-            }
-            int lengthDiff = trk2.MsDuration - this.MsDuration;
-            if(lengthDiff > 0)
-            {
-                this.Add(new RestDef(0, lengthDiff));
-            }
-            else if(lengthDiff < 0)
-            {
-                trk2.Add(new RestDef(0, -lengthDiff));
-            }
-        }
 
         /// <summary>
-        /// Does the actual superimposition. Assumes both trks are the same length.
-        /// When calling this function, both Trks are aligned and may be padded at the beginning and/or end by a rest.
+        /// Does the actual superimposition.
+        /// Inside this function, both Trks are aligned and may be padded at the beginning and/or end by a rest.
+        /// The padding is removed before the function returns.
         /// </summary>
         /// <param name="trk2"></param>
         private void SuperimposeUniqueDefs(Trk trk2)
         {
+            AlignAndJustifyWith(trk2);
+
             Debug.Assert(this.MsDuration == trk2.MsDuration);
             int thisIndex = 0;
             int trk2Index = 0;
@@ -150,6 +120,7 @@ namespace Moritz.Spec
                     }
                 } while(currentIndex < currentTrk.Count && currentTrk[currentIndex] is RestDef);
                 #endregion get next non-rest iud in either trk
+
                 if(currentIndex < currentTrk.Count)
                 {
                     IUniqueDef iudToAdd = currentTrk[currentIndex];
@@ -161,6 +132,10 @@ namespace Moritz.Spec
                         newUniqueDefs.Add(new RestDef(0, restMsDuration));
                         currentDuration += restMsDuration;
                     }
+                    else if(iudToAdd.MsPositionReFirstUD < currentDuration)
+                    {
+                        Debug.Assert(false, $"Error: Can't add UniqueDef at current position ({currentDuration}).");
+                    }
                     newUniqueDefs.Add(iudToAdd);
                     currentDuration += iudToAdd.MsDuration;
                     #endregion add iudToAdd to the _uniqueDefs
@@ -170,6 +145,37 @@ namespace Moritz.Spec
             _uniqueDefs = newUniqueDefs;
 
             SetMsPositionsReFirstUD();
+
+            Trim();
+        }
+
+        /// <summary>
+        /// Makes both tracks the same length by adding rests at the beginnings and ends.
+        /// The Alignment is found using this.MsPositionReContainer and trk2.MsPositionReContainer
+        /// </summary>
+        private void AlignAndJustifyWith(Trk trk2)
+        {
+            this.Trim();
+            if(this.MsPositionReContainer > 0)
+            {
+                this.Insert(0, new RestDef(0, this.MsPositionReContainer));
+                this.MsPositionReContainer = 0;
+            }
+            trk2.Trim();
+            if(trk2.MsPositionReContainer > 0)
+            {
+                trk2.Insert(0, new RestDef(0, trk2.MsPositionReContainer));
+                trk2.MsPositionReContainer = 0;
+            }
+            int lengthDiff = trk2.MsDuration - this.MsDuration;
+            if(lengthDiff > 0)
+            {
+                this.Add(new RestDef(0, lengthDiff));
+            }
+            else if(lengthDiff < 0)
+            {
+                trk2.Add(new RestDef(0, -lengthDiff));
+            }
         }
 
         /// <summary>
@@ -301,32 +307,7 @@ namespace Moritz.Spec
         {
             _InsertRange(index, trk);
         }
-        /// <summary>
-        /// An attempt is made to insert the argument iVoiceDef in a rest in the VoiceDef.
-        /// The rest is found using the iVoiceDef's MsPositon and MsDuration.
-        /// The first and last objects in the argument must be chords, not rests.
-        /// The argument may contain just one chord.
-        /// The inserted iVoiceDef may end up at the beginning, middle or end of the spanning rest (which will
-        /// be split as necessary).
-        /// If no rest is found spanning the iVoiceDef, the attempt fails and an exception is thrown.
-        /// This function does not change the msPositions of any other chords or rests in the containing VoiceDef,
-        /// It does, of course, change the indices of the inserted lmdds and the later chords and rests.
-        /// </summary>
-        public void InsertInRest(Trk trk)
-        {
-            Debug.Assert(trk[0] is MidiChordDef && trk[trk.Count - 1] is MidiChordDef);
-            _InsertInRest(trk);
-        }
-        /// <summary>
-        /// Creates a new TrkDef containing just the argument midiChordDef,
-        /// then calls the other InsertInRest() function with the voiceDef as argument. 
-        /// </summary>
-        public void InsertInRest(MidiChordDef midiChordDef)
-        {
-            List<IUniqueDef> iuds = new List<IUniqueDef>() { midiChordDef };
-            Trk trkDefToInsert = new Trk(this.MidiChannel, 0, iuds);
-            InsertInRest(trkDefToInsert);
-        }
+
         /// <summary>
         /// Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
         /// </summary>
@@ -1423,6 +1404,12 @@ namespace Moritz.Spec
             }
         }
         #endregion
+
+
+        public override string ToString()
+        {
+            return ("Trk:" + " MsPositionReContainer=" + MsPositionReContainer.ToString() + " Count=" + Count.ToString());
+        }
 
         public Gamut Gamut { get; protected set; }
 
