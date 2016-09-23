@@ -59,6 +59,10 @@ namespace Moritz.Algorithm.Tombeau1
 
                 trkB.Superimpose(trkB1);
 
+                MidiChordDef trkmcd = trkB.ToMidiChordDef(2000);
+
+                trkB.Insert(trkB.Count, trkmcd);
+
                 Trk trk1 = trkA.Superimpose(trkB);
 
                 trk1.MidiChannel = channel;

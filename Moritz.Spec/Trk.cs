@@ -40,6 +40,101 @@ namespace Moritz.Spec
         {
         }
 
+        /// <summary>
+        /// Returns a deep clone of this Trk.
+        /// </summary>
+        public Trk Clone()
+        {
+            List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
+            Trk trk = new Trk(MidiChannel, MsPositionReContainer, clonedIUDs, Gamut);
+            trk.Container = this.Container;
+
+            return trk;
+        }
+
+        /// <summary>
+        /// Also used by Clone() functions in subclasses
+        /// </summary>
+        public List<IUniqueDef> GetUniqueDefsClone()
+        {
+            List<IUniqueDef> clonedIUDs = new List<IUniqueDef>();
+            foreach(IUniqueDef iu in _uniqueDefs)
+            {
+                IUniqueDef clonedIUD = (IUniqueDef)iu.Clone();
+                clonedIUDs.Add(clonedIUD);
+            }
+            return clonedIUDs;
+        }
+
+        #endregion constructors
+        /// <summary>
+        /// In seqs, trks can contain any combination of RestDef, MidiChordDef and ClefChangeDef.
+        /// </summary>
+        internal void AssertConsistentInSeq()
+        {
+            foreach(IUniqueDef iud in UniqueDefs)
+            {
+                Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is ClefChangeDef);
+            }
+        }
+
+        /// <summary>
+        /// In blocks, trks can contain any combination of RestDef, MidiChordDef, ClefChangeDef and CautionaryChordDef.
+        /// </summary>
+        internal override void AssertConsistentInBlock()
+        {
+            foreach(IUniqueDef iud in UniqueDefs)
+            {
+                Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is ClefChangeDef || iud is CautionaryChordDef);
+            }
+        }
+
+        #region Add, Remove, Insert, Replace objects in the Trk
+        /// <summary>
+        /// Appends the new MidiChordDef, RestDef, CautionaryChordDef or ClefChangeDef to the end of the list.
+        /// Automatically sets the iUniqueDef's msPosition.
+        /// Used by Block.PopBar(...), so accepts a CautionaryChordDef argument.
+        /// </summary>
+        public override void Add(IUniqueDef iUniqueDef)
+        {
+            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is RestDef || iUniqueDef is CautionaryChordDef || iUniqueDef is ClefChangeDef);
+            _Add(iUniqueDef);
+        }
+        /// <summary>
+        /// Adds the argument's UniqueDefs to the end of this Trk.
+        /// Sets the MsPositions of the appended UniqueDefs.
+        /// </summary>
+        public override void AddRange(VoiceDef trk)
+        {
+            Debug.Assert(trk is Trk);
+            _AddRange(trk);
+        }
+        /// <summary>
+        /// Inserts the iUniqueDef in the list at the given index, and then
+        /// resets the positions of all the uniqueDefs in the list.
+        /// </summary>
+        public override void Insert(int index, IUniqueDef iUniqueDef)
+        {
+            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is RestDef || iUniqueDef is ClefChangeDef);
+            _Insert(index, iUniqueDef);
+        }
+        /// <summary>
+        /// Inserts the trk's UniqueDefs in the list at the given index, and then
+        /// resets the positions of all the uniqueDefs in the list.
+        /// </summary>
+        public void InsertRange(int index, Trk trk)
+        {
+            _InsertRange(index, trk);
+        }
+        /// <summary>
+        /// Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
+        /// </summary>
+        public void Replace(int index, IUniqueDef replacementIUnique)
+        {
+            Debug.Assert(replacementIUnique is MidiChordDef || replacementIUnique is RestDef);
+            _Replace(index, replacementIUnique);
+        }
+        #region Superimpose
         /// <summary> 
         /// This function attempts to add all the non-RestDef UniqueDefs in trk2 to the calling Trk
         /// at the positions given by their MsPositionReFirstIUD added to trk2.MsPositionReContainer,
@@ -220,102 +315,7 @@ namespace Moritz.Spec
                 RemoveAt(index);
             }
         }
-
-        /// <summary>
-        /// Returns a deep clone of this Trk.
-        /// </summary>
-        public Trk Clone()
-        {
-            List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
-            Trk trk = new Trk(MidiChannel, MsPositionReContainer, clonedIUDs, Gamut);
-            trk.Container = this.Container;
-
-            return trk;
-        }
-
-        /// <summary>
-        /// Also used by Clone() functions in subclasses
-        /// </summary>
-        public List<IUniqueDef> GetUniqueDefsClone()
-        {
-            List<IUniqueDef> clonedIUDs = new List<IUniqueDef>();
-            foreach(IUniqueDef iu in _uniqueDefs)
-            {
-                IUniqueDef clonedIUD = (IUniqueDef)iu.Clone();
-                clonedIUDs.Add(clonedIUD);
-            }
-            return clonedIUDs;
-        }
-
-        #endregion constructors
-        /// <summary>
-        /// In seqs, trks can contain any combination of RestDef, MidiChordDef and ClefChangeDef.
-        /// </summary>
-        internal void AssertConsistentInSeq()
-        {
-            foreach(IUniqueDef iud in UniqueDefs)
-            {
-                Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is ClefChangeDef);
-            }
-        }
-
-        /// <summary>
-        /// In blocks, trks can contain any combination of RestDef, MidiChordDef, ClefChangeDef and CautionaryChordDef.
-        /// </summary>
-        internal override void AssertConsistentInBlock()
-        {
-            foreach(IUniqueDef iud in UniqueDefs)
-            {
-                Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is ClefChangeDef || iud is CautionaryChordDef);
-            }
-        }
-
-        #region Add, Remove, Insert, Replace objects in the Trk
-        /// <summary>
-        /// Appends the new MidiChordDef, RestDef, CautionaryChordDef or ClefChangeDef to the end of the list.
-        /// Automatically sets the iUniqueDef's msPosition.
-        /// Used by Block.PopBar(...), so accepts a CautionaryChordDef argument.
-        /// </summary>
-        public override void Add(IUniqueDef iUniqueDef)
-        {
-            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is RestDef || iUniqueDef is CautionaryChordDef || iUniqueDef is ClefChangeDef);
-            _Add(iUniqueDef);
-        }
-        /// <summary>
-        /// Adds the argument's UniqueDefs to the end of this Trk.
-        /// Sets the MsPositions of the appended UniqueDefs.
-        /// </summary>
-        public override void AddRange(VoiceDef trk)
-        {
-            Debug.Assert(trk is Trk);
-            _AddRange(trk);
-        }
-        /// <summary>
-        /// Inserts the iUniqueDef in the list at the given index, and then
-        /// resets the positions of all the uniqueDefs in the list.
-        /// </summary>
-        public override void Insert(int index, IUniqueDef iUniqueDef)
-        {
-            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is RestDef || iUniqueDef is ClefChangeDef);
-            _Insert(index, iUniqueDef);
-        }
-        /// <summary>
-        /// Inserts the trk's UniqueDefs in the list at the given index, and then
-        /// resets the positions of all the uniqueDefs in the list.
-        /// </summary>
-        public void InsertRange(int index, Trk trk)
-        {
-            _InsertRange(index, trk);
-        }
-
-        /// <summary>
-        /// Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
-        /// </summary>
-        public void Replace(int index, IUniqueDef replacementIUnique)
-        {
-            Debug.Assert(replacementIUnique is MidiChordDef || replacementIUnique is RestDef);
-            _Replace(index, replacementIUnique);
-        }
+        #endregion Superimpose
         #endregion Add, Remove, Insert, Replace objects in the Trk
 
         #region Changing the Trk's duration
@@ -1405,6 +1405,66 @@ namespace Moritz.Spec
         }
         #endregion
 
+        /// <summary>
+        /// Returns a new MidiChordDef having msDuration, whose BasicMidiChordDefs are the Notated MidiChordDefs and RestDefs in the Trk.
+        /// BasicMidiChordDefs created from RestDefs have a single pitch (=0) and velocity=0.
+        /// The durations of the returned BasicMidiChordDefs are in proportion to the durations of the MidiChordDefs and RestDefs in the Trk. 
+        /// The Trk (which must contain at least one MidiChordDef) is not changed by calling this function.
+        /// </summary>
+        /// <param name="msDuration">The duration of the returned MidiChordDef</param>
+        public MidiChordDef ToMidiChordDef(int msDuration)
+        {
+            List<BasicMidiChordDef> basicMidiChordDefs = new List<BasicMidiChordDef>();
+            List<byte> restPitch = new List<byte>() { 0 };
+            List<byte> restVelocity = new List<byte>() { 0 };
+            List<byte> bmcPitches = null;
+            List<byte> bmcVelocities = null;
+            int totalDuration = 0;
+            int localMsDuration = 0;
+            int nMidiChordDefs = 0;
+            foreach(IUniqueDef iud in UniqueDefs)
+            {
+                MidiChordDef mcd = iud as MidiChordDef;
+                RestDef restDef = iud as RestDef;
+
+                if(mcd != null)
+                {
+                    bmcPitches = mcd.NotatedMidiPitches;
+                    bmcVelocities = mcd.NotatedMidiVelocities;
+                    localMsDuration = mcd.MsDuration;
+                    nMidiChordDefs++;
+                }
+                else if(restDef != null)
+                {
+                    bmcPitches = restPitch;
+                    bmcVelocities = restVelocity;
+                    localMsDuration = restDef.MsDuration;
+                }
+
+                if(iud is DurationDef)
+                {
+                    var basicMidiChordDef = new BasicMidiChordDef(localMsDuration, null, null, true, bmcPitches, bmcVelocities);
+                    totalDuration += localMsDuration;
+                    basicMidiChordDefs.Add(basicMidiChordDef);
+                }
+            }
+
+            Debug.Assert(nMidiChordDefs > 0, "Error: The original Trk must contain at least one MidiChordDef.");
+
+            const byte pitchWheelDeviation = 2;
+            const bool hasChordOff = true;
+            const MidiChordSliderDefs midiChordSliderDefs = null;
+
+            List<byte> rootMidiPitches = new List<byte>(basicMidiChordDefs[0].Pitches);
+            List<byte> rootMidiVelocities = new List<byte>(basicMidiChordDefs[0].Velocities);
+
+            MidiChordDef returnMCD = new MidiChordDef(totalDuration, pitchWheelDeviation, hasChordOff, rootMidiPitches, rootMidiVelocities,
+                                                        nMidiChordDefs, midiChordSliderDefs, basicMidiChordDefs);
+
+            returnMCD.MsDuration = msDuration;
+
+            return returnMCD;
+        }
 
         public override string ToString()
         {

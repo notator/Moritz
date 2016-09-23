@@ -92,7 +92,7 @@ namespace Moritz.Spec
             List<byte> rootMidiPitches, // the pitches defined in the root chord settings (displayed, by default, in the score).
             List<byte> rootMidiVelocities, // the velocities defined in the root chord settings (displayed, by default, in the score).
             int ornamentNumberSymbol, // is 0 when there is no ornament
-            MidiChordSliderDefs midiChordSliderDefs, // can contain empty lists
+            MidiChordSliderDefs midiChordSliderDefs, // can be null or contain empty lists
             List<BasicMidiChordDef> basicMidiChordDefs)
             : base(msDuration)
         {
