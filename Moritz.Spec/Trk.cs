@@ -62,7 +62,7 @@ namespace Moritz.Spec
                 Gamut = null;
             }
 
-            AlignAndJustify(trk2);
+            AlignAndJustifyWith(trk2);
             Debug.Assert(this.MsDuration == trk2.MsDuration);
 
             SuperimposeUniqueDefs(trk2);
@@ -76,9 +76,8 @@ namespace Moritz.Spec
         /// <summary>
         /// Makes both tracks the same length by adding rests at the beginnings and ends.
         /// The Alignment is found using this.MsPositionReContainer and trk2.MsPositionReContainer
-        /// to pad the trks with RestDefs at their beginnings.
         /// </summary>
-        private void AlignAndJustify(Trk trk2)
+        private void AlignAndJustifyWith(Trk trk2)
         {
             this.Trim();
             if(this.MsPositionReContainer > 0)
