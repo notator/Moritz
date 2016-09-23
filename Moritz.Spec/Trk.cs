@@ -9,8 +9,8 @@ using Moritz.Globals;
 namespace Moritz.Spec
 {
     /// <summary>
-    /// In Seqs, a temporal sequence of MidiChordDef and RestDef objects (condition Asserted in Seq).
-    /// In Blocks, Trks may also contain CautionaryChordDef objects (condition Asserted in Block);
+    /// In Seqs, Trks can contain any combination of RestDef, MidiChordDef and ClefChangeDef..
+    /// In Blocks, Trks can additionally contain CautionaryChordDefs.
     /// <para>All VoiceDef objects are IEnumerable, so that foreach loops can be used.</para>
     /// <para>For example:</para>
     /// <para>foreach(IUniqueDef iumdd in trk) { ... }</para>
@@ -28,8 +28,7 @@ namespace Moritz.Spec
         {
             Gamut = gamut;
             // N.B. msPositionReContainer can be negative here. Seqs are normalised independently.
-            AssertConstructionConsistency();
-
+            AssertConsistentInSeq();
         }
 
         /// <summary>
@@ -39,6 +38,182 @@ namespace Moritz.Spec
         public Trk(int midiChannel)
             : base(midiChannel, 0, new List<IUniqueDef>())
         {
+        }
+
+        /// <summary> 
+        /// This function attempts to add all the non-RestDef UniqueDefs in trk2 to the calling Trk
+        /// at the positions given by their MsPositionReFirstIUD added to trk2.MsPositionReContainer,
+        /// whereby trk2.MsPositionReContainer is used with respect to the calling Trk's container.
+        /// Before doing the superimposition, the calling Trk is given leading and trailing RestDefs
+        /// so that trk2's uniqueDefs can be added at their original positions without any problem
+        /// there. These leading and trailing RestDefs are however removed before the function returns.
+        /// The superimposed uniqueDefs will be placed at their original positions if they fit inside
+        /// a RestDef in the original Trk. If this is not the case, they are interspersed wth the
+        /// original uniqueDefs in order of the original positions, so that the original positions
+        /// in both Trks will change.
+        /// trk2's UniqueDefs are not cloned.
+        /// </summary>
+        /// <returns>this</returns>
+        public Trk Superimpose(Trk trk2)
+        {
+            Debug.Assert(MidiChannel == trk2.MidiChannel);
+            if(this.Gamut != trk2.Gamut)
+            {
+                Gamut = null;
+            }
+
+            AlignAndJustify(trk2);
+            Debug.Assert(this.MsDuration == trk2.MsDuration);
+
+            SuperimposeUniqueDefs(trk2);
+
+            Trim();
+
+            AssertConsistentInSeq();
+
+            return this;
+        }
+        /// <summary>
+        /// Makes both tracks the same length by adding rests at the beginnings and ends.
+        /// The Alignment is found using this.MsPositionReContainer and trk2.MsPositionReContainer
+        /// to pad the trks with RestDefs at their beginnings.
+        /// </summary>
+        private void AlignAndJustify(Trk trk2)
+        {
+            this.Trim();
+            if(this.MsPositionReContainer > 0)
+            {
+                this.Insert(0, new RestDef(0, this.MsPositionReContainer));
+                this.MsPositionReContainer = 0;
+            }
+            trk2.Trim();
+            if(trk2.MsPositionReContainer > 0)
+            {
+                trk2.Insert(0, new RestDef(0, trk2.MsPositionReContainer));
+                trk2.MsPositionReContainer = 0;
+            }
+            int lengthDiff = trk2.MsDuration - this.MsDuration;
+            if(lengthDiff > 0)
+            {
+                this.Add(new RestDef(0, lengthDiff));
+            }
+            else if(lengthDiff < 0)
+            {
+                trk2.Add(new RestDef(0, -lengthDiff));
+            }
+        }
+
+        /// <summary>
+        /// Does the actual superimposition. Assumes both trks are the same length.
+        /// When calling this function, both Trks are aligned and may be padded at the beginning and/or end by a rest.
+        /// </summary>
+        /// <param name="trk2"></param>
+        private void SuperimposeUniqueDefs(Trk trk2)
+        {
+            Debug.Assert(this.MsDuration == trk2.MsDuration);
+            int thisIndex = 0;
+            int trk2Index = 0;
+            List<IUniqueDef> newUniqueDefs = new List<IUniqueDef>();
+            Trk currentTrk = this;
+            int currentIndex = 0;
+            int currentDuration = 0;
+            while(thisIndex < this.Count || trk2Index < trk2.Count)
+            {
+                #region get next non-rest iud in either trk
+                do
+                {
+                    if(trk2Index == trk2.Count && thisIndex == this.Count)
+                    {
+                        break;
+                    }
+                    else if(trk2Index == trk2.Count && thisIndex < this.Count)
+                    {
+                        currentTrk = this;
+                        currentIndex = thisIndex++;
+                    }
+                    else if(thisIndex == this.Count && trk2Index < trk2.Count)
+                    {
+                        currentTrk = trk2;
+                        currentIndex = trk2Index++;
+                    }
+                    else // (thisIndex < this.Count && trk2Index < trk2.Count)
+                    {
+                        if(this[thisIndex].MsPositionReFirstUD < trk2[trk2Index].MsPositionReFirstUD)
+                        {
+                            currentTrk = this;
+                            currentIndex = thisIndex++;
+                        }
+                        else if(trk2Index < trk2.Count)
+                        {
+                            currentTrk = trk2;
+                            currentIndex = trk2Index++;
+                        }
+                    }
+                } while(currentIndex < currentTrk.Count && currentTrk[currentIndex] is RestDef);
+                #endregion get next non-rest iud in either trk
+                if(currentIndex < currentTrk.Count)
+                {
+                    IUniqueDef iudToAdd = currentTrk[currentIndex];
+
+                    #region add iudToAdd to the newUniqueDefs
+                    if(iudToAdd.MsPositionReFirstUD > currentDuration)
+                    {
+                        int restMsDuration = iudToAdd.MsPositionReFirstUD - currentDuration;
+                        newUniqueDefs.Add(new RestDef(0, restMsDuration));
+                        currentDuration += restMsDuration;
+                    }
+                    newUniqueDefs.Add(iudToAdd);
+                    currentDuration += iudToAdd.MsDuration;
+                    #endregion add iudToAdd to the _uniqueDefs
+                }
+            }
+
+            _uniqueDefs = newUniqueDefs;
+
+            SetMsPositionsReFirstUD();
+        }
+
+        /// <summary>
+        /// Removes rests from the beginning and end of the UniqueDefs list.
+        /// Updates MsPositionReContainer if necessary.
+        /// </summary>
+        private void Trim()
+        {
+            List<int> restIndicesToRemoveAtStart = new List<int>();
+            for(int i = 0; i < UniqueDefs.Count; ++i)
+            {
+                if(UniqueDefs[i] is RestDef)
+                {
+                    restIndicesToRemoveAtStart.Add(i);
+                }
+                else if(UniqueDefs[i] is MidiChordDef)
+                {
+                    break;
+                }
+            }
+            List<int> restIndicesToRemoveAtEnd = new List<int>();
+            for(int i = UniqueDefs.Count - 1; i >= 0; --i)
+            {
+                if(UniqueDefs[i] is RestDef)
+                {
+                    restIndicesToRemoveAtEnd.Add(i);
+                }
+                else if(UniqueDefs[i] is MidiChordDef)
+                {
+                    break;
+                }
+            }
+            for(int i = restIndicesToRemoveAtEnd.Count - 1; i >= 0; --i)
+            {
+                int index = restIndicesToRemoveAtEnd[i];
+                RemoveAt(index);
+            }
+            for(int i = restIndicesToRemoveAtStart.Count - 1; i >= 0; --i)
+            {
+                int index = restIndicesToRemoveAtStart[i];
+                MsPositionReContainer += UniqueDefs[index].MsDuration;
+                RemoveAt(index);
+            }
         }
 
         /// <summary>
@@ -68,21 +243,24 @@ namespace Moritz.Spec
         }
 
         #endregion constructors
-
-        internal void AssertConstructionConsistency()
+        /// <summary>
+        /// In seqs, trks can contain any combination of RestDef, MidiChordDef and ClefChangeDef.
+        /// </summary>
+        internal void AssertConsistentInSeq()
         {
             foreach(IUniqueDef iud in UniqueDefs)
             {
-                // In blocks, trks can also contain CautionaryChordDefs
                 Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is ClefChangeDef);
             }
         }
 
+        /// <summary>
+        /// In blocks, trks can contain any combination of RestDef, MidiChordDef, ClefChangeDef and CautionaryChordDef.
+        /// </summary>
         internal override void AssertConsistentInBlock()
         {
             foreach(IUniqueDef iud in UniqueDefs)
             {
-                // In blocks, trks can also contain ClefChangeDef and CautionaryChordDefs
                 Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is ClefChangeDef || iud is CautionaryChordDef);
             }
         }

@@ -153,7 +153,7 @@ namespace Moritz.Spec
         /// Uses all the MsDuration attributes, and _msPosition as origin.
         /// This function must be called at the end of any function that changes the _uniqueDefs list.
         /// </summary>
-        private void SetMsPositionsReFirstUD()
+        protected void SetMsPositionsReFirstUD()
         {
             if(_uniqueDefs.Count > 0)
             {

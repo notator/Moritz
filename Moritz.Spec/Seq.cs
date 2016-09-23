@@ -192,7 +192,7 @@ namespace Moritz.Spec
             #region Every Trk in _trks is either empty, or contains any combination of MidiChordDef, RestDef or ClefChangeDef.
             foreach(Trk trk in _trks)
             {
-                trk.AssertConstructionConsistency();
+                trk.AssertConsistentInSeq();
             }
             #endregion
         }
