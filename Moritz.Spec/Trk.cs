@@ -1406,7 +1406,8 @@ namespace Moritz.Spec
         #endregion
 
         /// <summary>
-        /// Returns a new MidiChordDef having msDuration, whose BasicMidiChordDefs are the Notated MidiChordDefs and RestDefs in the Trk.
+        /// Returns a new MidiChordDef having msDuration, whose BasicMidiChordDefs are created from the MidiChordDefs and RestDefs in the Trk.
+        /// BasicMidiChordDefs created from MidiChordDefs are the MidiChordDef's BasicMidiChordDef[0].
         /// BasicMidiChordDefs created from RestDefs have a single pitch (=0) and velocity=0.
         /// The durations of the returned BasicMidiChordDefs are in proportion to the durations of the MidiChordDefs and RestDefs in the Trk. 
         /// The Trk (which must contain at least one MidiChordDef) is not changed by calling this function.
@@ -1415,12 +1416,15 @@ namespace Moritz.Spec
         public MidiChordDef ToMidiChordDef(int msDuration)
         {
             List<BasicMidiChordDef> basicMidiChordDefs = new List<BasicMidiChordDef>();
+            int bmcMsDuration = 0;
+            byte? bmcBank = null;
+            byte? bmcPatch = null;
+            bool bmcHasChordOff = true;
             List<byte> restPitch = new List<byte>() { 0 };
             List<byte> restVelocity = new List<byte>() { 0 };
             List<byte> bmcPitches = null;
             List<byte> bmcVelocities = null;
             int totalDuration = 0;
-            int localMsDuration = 0;
             int nMidiChordDefs = 0;
             foreach(IUniqueDef iud in UniqueDefs)
             {
@@ -1429,22 +1433,28 @@ namespace Moritz.Spec
 
                 if(mcd != null)
                 {
-                    bmcPitches = mcd.NotatedMidiPitches;
-                    bmcVelocities = mcd.NotatedMidiVelocities;
-                    localMsDuration = mcd.MsDuration;
+                    bmcBank = mcd.BasicMidiChordDefs[0].BankIndex;
+                    bmcPatch = mcd.BasicMidiChordDefs[0].PatchIndex;
+                    bmcHasChordOff = mcd.BasicMidiChordDefs[0].HasChordOff;
+                    bmcPitches = mcd.BasicMidiChordDefs[0].Pitches;
+                    bmcVelocities = mcd.BasicMidiChordDefs[0].Velocities;
+                    bmcMsDuration = mcd.MsDuration;
                     nMidiChordDefs++;
                 }
                 else if(restDef != null)
                 {
+                    bmcBank = null;
+                    bmcPatch = null;
+                    bmcHasChordOff = false;
                     bmcPitches = restPitch;
                     bmcVelocities = restVelocity;
-                    localMsDuration = restDef.MsDuration;
+                    bmcMsDuration = restDef.MsDuration;
                 }
 
                 if(iud is DurationDef)
                 {
-                    var basicMidiChordDef = new BasicMidiChordDef(localMsDuration, null, null, true, bmcPitches, bmcVelocities);
-                    totalDuration += localMsDuration;
+                    var basicMidiChordDef = new BasicMidiChordDef(bmcMsDuration, bmcBank, bmcPatch, bmcHasChordOff, bmcPitches, bmcVelocities);
+                    totalDuration += bmcMsDuration;
                     basicMidiChordDefs.Add(basicMidiChordDef);
                 }
             }
