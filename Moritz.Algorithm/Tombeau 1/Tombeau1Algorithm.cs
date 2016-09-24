@@ -15,6 +15,7 @@ namespace Moritz.Algorithm.Tombeau1
 		public Tombeau1Algorithm()
             : base()
         {
+            CheckParameters();
         }
 
         public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4 }; } }

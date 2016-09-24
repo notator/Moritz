@@ -15,7 +15,8 @@ namespace Moritz.Algorithm.Study1
 		public Study1Algorithm()
             : base()
         {
-		}
+            CheckParameters();
+        }
 
 		public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get{ return new List<int>() { 0 }; }}
 		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get{ return new List<int>() { 127 }; }}

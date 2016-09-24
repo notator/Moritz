@@ -13,6 +13,7 @@ namespace Moritz.Algorithm.Study2
         public Study2Algorithm()
             : base()
         {
+            CheckParameters();
         }
 
         public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2 }; } }

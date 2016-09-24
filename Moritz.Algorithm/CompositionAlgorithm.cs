@@ -24,7 +24,6 @@ namespace Moritz.Algorithm
     {
         protected CompositionAlgorithm()
         {
-            CheckParameters();
         }
 
         protected void CheckParameters()

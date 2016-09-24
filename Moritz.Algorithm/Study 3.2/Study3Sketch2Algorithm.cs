@@ -20,6 +20,7 @@ namespace Moritz.Algorithm.Study3Sketch2
         public Study3Sketch2Algorithm()
             : base()
         {
+            CheckParameters();
         }
 
         public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
