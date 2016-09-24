@@ -561,186 +561,7 @@ namespace Moritz.Spec
 
         #endregion SetVerticalVelocityGradient
 
-        #endregion Functions that use Envelopes
-
-        #region GetNoteCombination() 
-        public enum MidiChordPitchOperator
-        {
-            // GetNoteCombination() returns all the pitches in both operands
-            allArg1AndArg2,
-            // GetNoteCombination() returns all the pitches that occur in the first operand except those that occur in the second operand.
-            inArg1ButNotArg2,
-            // GetNoteCombination() returns only the pitches that occur in both operands 
-            inBothArg1AndArg2,
-            // GetNoteCombination() returns all the pitches that occur either in the first or second operand, but not both.
-            inEitherArg1OrArg2ButNotBoth
-        }
-
-        /// <summary>
-        /// Returns a Tuple containing two new lists: the pitches and velocities that can be used to construct a new MidiChordDef.
-        /// This function only uses the Notated pitches and velocities of its arguments. The BasicMidiChordDefs are ignored.
-        /// The returned lists should be checked to see that they are not empty. If they *are* empty, maybe create a rest.
-        /// </summary>
-        /// <param name="mcd1"></param>
-        /// <param name="mcd2"></param>
-        /// <param name="midiChordPitchOperator"></param>
-        /// <returns></returns>
-        public static Tuple<List<byte>, List<byte>> GetNoteCombination(MidiChordDef mcd1, MidiChordDef mcd2, MidiChordPitchOperator midiChordPitchOperator)
-        {
-            Tuple<List<byte>, List<byte>> rval = null;
-
-            List<byte> arg1Pitches = mcd1.NotatedMidiPitches;
-            List<byte> arg1Velocities = mcd1.NotatedMidiVelocities;
-            List<byte> arg2Pitches = mcd2.NotatedMidiPitches;
-            List<byte> arg2Velocities = mcd2.NotatedMidiVelocities;
-
-            switch(midiChordPitchOperator)
-            {
-                case MidiChordPitchOperator.allArg1AndArg2:
-                    rval = AddNotes(arg1Pitches, arg1Velocities, arg2Pitches, arg2Velocities);
-                    break;
-                case MidiChordPitchOperator.inArg1ButNotArg2:
-                    rval = SubtractNotes(arg1Pitches, arg1Velocities, arg2Pitches);
-                    break;
-                case MidiChordPitchOperator.inBothArg1AndArg2:
-                    rval = OrNotesInclusive(arg1Pitches, arg1Velocities, arg2Pitches);
-                    break;
-                case MidiChordPitchOperator.inEitherArg1OrArg2ButNotBoth:
-                    rval = OrNotesExclusive(arg1Pitches, arg1Velocities, arg2Pitches, arg2Velocities);
-                    break;
-            }
-
-            return rval;
-        }
-
-        #region AddNotes
-        /// <summary>
-        /// Returns a Tuple containing two new lists: the pitches and velocities that can be used to construct a new MidiChordDef.
-        /// This function first clones arg1Pitches and arg1Velocities, then adds midiPitches and midiVelocities from
-        /// arg2Pitches and arg2Velocities to the clones. The clones are returned in the returned Tuple.
-        /// If a pitch already exists, the larger of the two velocities is used, otherwise the new pitch is
-        /// inserted in the pitches list at the appropriate position (so that pitches continue to be in
-        /// ascending order), and the new velocity is inserted at the corresponding position in the velocities list.
-        /// </summary>
-        private static Tuple<List<byte>, List<byte>> AddNotes(List<byte> arg1Pitches, List<byte> arg1Velocities, List<byte> arg2Pitches, List<byte> arg2Velocities)
-        {
-            List<byte> pitches = new List<byte>(arg1Pitches);
-            List<byte> velocities = new List<byte>(arg1Velocities);
-
-            for(int i = 0; i < arg2Pitches.Count; ++i)
-            {
-                byte pitchToAdd = arg2Pitches[i];
-                byte velocitytoAdd = arg2Velocities[i];
-                bool found = false;
-                int index = pitches.Count; // default is append at top of list
-                for(int j = 0; j < pitches.Count; ++j)
-                {
-                    if(pitches[j] == pitchToAdd)
-                    {
-                        index = j;
-                        found = true;
-                        break;
-                    }
-                    if(pitches[j] > pitchToAdd)
-                    {
-                        index = j;
-                        break;
-                    }
-                }
-                if(found)
-                {
-                    velocities[index] = (velocities[index] > velocitytoAdd) ? velocities[index] : velocitytoAdd;
-                }
-                else
-                {
-                    pitches.Insert(index, pitchToAdd);
-                    velocities.Insert(index, velocitytoAdd);
-                }
-            }
-
-            return new Tuple<List<byte>, List<byte>>(pitches, velocities);
-        }
-        #endregion AddNotes(MidiChordDef mcd2)
-        #region SubtractNotes
-        /// <summary>
-        /// Returns a Tuple containing two new lists: the pitches and velocities that can be used to construct a new MidiChordDef.
-        /// Tuple.Item1 contains the pitches from arg1Pitches that are not in arg2Pitches. Tuple.Item2 contains the original
-        /// velocities of the pitches in Tuple.Item1.
-        /// Note that Tuple.Item1 should be checked to see if it is empty before attempting to use the lists to create a new
-        /// MidiChordDef (maybe create a RestDef instead).
-        /// </summary>
-        private static Tuple<List<byte>, List<byte>> SubtractNotes(List<byte> arg1Pitches, List<byte> arg1Velocities, List<byte> arg2Pitches)
-        {
-            List<byte> pitches = new List<byte>();
-            List<byte> velocities = new List<byte>();
-
-            for(int i = 0; i < arg1Pitches.Count; ++i)
-            {
-                if(!arg2Pitches.Contains(arg1Pitches[i]))
-                {
-                    pitches.Add(arg1Pitches[i]);
-                    velocities.Add(arg1Velocities[i]);
-                }
-            }
-
-            return new Tuple<List<byte>, List<byte>>(pitches, velocities);
-        }
-        #endregion SubtractNotes
-        #region OrNotesInclusive
-        /// <summary>
-        /// Returns a Tuple containing two new lists: the pitches and velocities that can be used to construct a new MidiChordDef.
-        /// Tuple.Item1 contains the pitches from arg1Pitches that are also in arg2Pitches.
-        /// Tuple.Item2 contains the original velocities of the pitches in Tuple.Item1.
-        /// Note that Tuple.Item1 should be checked to see if it is empty before attempting to use the lists to create a new
-        /// MidiChordDef (maybe create a RestDef instead).
-        /// </summary>
-        private static Tuple<List<byte>, List<byte>> OrNotesInclusive(List<byte> arg1Pitches, List<byte> arg1Velocities, List<byte> arg2Pitches)
-        {
-            List<byte> pitches = new List<byte>();
-            List<byte> velocities = new List<byte>();
-
-            for(int i = 0; i < arg1Pitches.Count; ++i)
-            {
-                if(arg2Pitches.Contains(arg1Pitches[i]))
-                {
-                    pitches.Add(arg1Pitches[i]);
-                    velocities.Add(arg1Velocities[i]);
-                }
-            }
-
-            return new Tuple<List<byte>, List<byte>>(pitches, velocities);
-        }
-
-        #endregion OrNotesInclusive
-        #region OrNotesExclusive
-        /// <summary>
-        /// Returns a Tuple containing two new lists: the pitches and velocities that can be used to construct a new MidiChordDef.
-        /// Tuple.Item1 contains the pitches that are either in arg1Pitches or in arg2Pitches, but not both. Tuple.Item2 contains
-        /// the original velocities of the pitches in Tuple.Item1.
-        /// Note that Tuple.Item1 should be checked to see if it is empty before attempting to use the lists to create a new
-        /// MidiChordDef (maybe create a RestDef instead).
-        /// </summary>
-        private static Tuple<List<byte>, List<byte>> OrNotesExclusive(List<byte> arg1Pitches, List<byte> arg1Velocities, List<byte> arg2Pitches, List<byte> arg2Velocities )
-        {
-            Tuple<List<byte>, List<byte>> rval = AddNotes(arg1Pitches, arg1Velocities, arg2Pitches, arg2Velocities);
-
-            List<byte> pitches = rval.Item1;
-            List<byte> velocities = rval.Item2;
-
-            for(int i = pitches.Count - 1; i >= 0; --i)
-            {
-                if(arg1Pitches.Contains(pitches[i]) && arg2Pitches.Contains(pitches[i]))
-                {
-                    pitches.RemoveAt(i);
-                    velocities.RemoveAt(i);
-                }
-            }
-
-            return rval;
-        }
-
-        #endregion OrNotesExclusive
-        #endregion GetNoteCombination() 
+        #endregion Functions that use Envelopes 
 
         #region IUniqueChordDef
         /// <summary>
@@ -922,6 +743,47 @@ namespace Moritz.Spec
 
         #endregion IUniqueDef
         #endregion IUniqueChordDef
+
+        /// <summary>
+        /// Returns a new Trk having msDuration and midiChannel, whose MidiChordDefs and RestDefs are created from this
+        /// MidiChordDef's BasicMidiChordDefs.
+        /// If a non-null gamut argument is given, a check is made (in the Trk constructor) to ensure that it contains
+        /// all the pitches (having velocity greater than 0) in this MidiChordDef.
+        /// Each new MidiChordDef has one BasicMidiChordDef, which is a copy of a BasicMidiChordDef from this MidiChordDef.
+        /// The new MidiChordDef's notated pitches and velocities are the same as its BasicMidiChordDef's.
+        /// If the original BasicMidiChordDef has a solitary velocity=0, a RestDef is created.
+        /// The durations of the returned MidiChordDefs and RestDefs are in proportion to the durations of the original
+        /// BasicMidichordDefs.
+        /// This MidiChordDef is not changed by calling this function.
+        /// </summary>
+        /// <param name="msDuration">The duration of the returned Trk</param>
+        /// <param name="midiChannel">The duration of the returned Trk</param>
+        /// <param name="gamut">If defined, the gamut must contain all the pitches in this MidiChordDef -- except those that have velocity=0.</param>
+        public Trk ToTrk(int msDuration, int midiChannel, Gamut gamut = null)
+        {
+            List<IUniqueDef> iuds = new List<IUniqueDef>();
+            foreach(BasicMidiChordDef bmcd in this.BasicMidiChordDefs)
+            {
+                if(bmcd.Velocities.Count == 1 && bmcd.Velocities[0] == 0)
+                {
+                    RestDef restDef = new RestDef(0, bmcd.MsDuration);
+                    iuds.Add(restDef);
+                }
+                else
+                {
+                    MidiChordDef mcd = new MidiChordDef(bmcd.Pitches, bmcd.Velocities, bmcd.MsDuration, bmcd.HasChordOff);
+                    mcd.BasicMidiChordDefs[0].BankIndex = bmcd.BankIndex;
+                    mcd.BasicMidiChordDefs[0].PatchIndex = bmcd.PatchIndex;
+                    mcd.BasicMidiChordDefs[0].HasChordOff = bmcd.HasChordOff;
+                    iuds.Add(mcd);
+                }
+            }
+
+            Trk trk = new Trk(midiChannel, 0, iuds, gamut); // checks and sets the trk.Gamut.
+            trk.MsDuration = msDuration; // calls Trk.SetMsPositionsReFirstUD();
+            
+            return trk;
+        }
 
         public void AdjustExpression(double factor)
         {

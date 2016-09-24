@@ -52,7 +52,8 @@ namespace Moritz.Algorithm.Tombeau1
                 msPositionReContainer = trk0.UniqueDefs[31].MsPositionReFirstUD;
                 trkB.AlignObjectAtIndex(indexToAlign, msPositionReContainer);
 
-                MidiChordDef mcd = new MidiChordDef(new List<byte>() { 47 }, new List<byte>() { 127 }, 500, true);
+                byte newPitch = 47;
+                MidiChordDef mcd = new MidiChordDef(new List<byte>() { newPitch }, new List<byte>() { 127 }, 500, true);
                 Trk trkB1 = new Trk(trkB.MidiChannel, 0, new List<IUniqueDef>() { mcd });
 
                 trkB1.MsPositionReContainer = trkB.MsPositionReContainer + trkB.MsDuration + 500;
@@ -61,11 +62,20 @@ namespace Moritz.Algorithm.Tombeau1
 
                 MidiChordDef trkmcd = trkB.ToMidiChordDef(2000);
 
+                Gamut gamut = (trk0.Gamut.Contains(newPitch)) ? trk0.Gamut : null;
+
+                Trk trkC = trkmcd.ToTrk(3000, trkB.MidiChannel, gamut);
+
                 trkB.Insert(trkB.Count, trkmcd);
+                trkB.AddRange(trkC);
+
 
                 Trk trk1 = trkA.Superimpose(trkB);
 
                 trk1.MidiChannel = channel;
+                trk1.MsDuration = trk0.MsDuration;
+                trk1.MsPositionReContainer = 0;
+                
 
                 returnTrks.Add(trk1);
             }

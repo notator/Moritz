@@ -202,18 +202,35 @@ namespace Moritz.Spec
         /// <summary>
         /// Returns true if the gamut.List contains all the pitches in the argument. Otherwise false. 
         /// </summary>
-        internal bool ContainsAllPitches(List<byte> pitches)
+        internal bool ContainsAllPitches(MidiChordDef mcd)
         {
-            bool containsAllPitches = true;
-            foreach(byte pitch in pitches)
+            foreach(BasicMidiChordDef bmcd in mcd.BasicMidiChordDefs)
             {
-                if(_list.Contains(pitch) == false)
+                for(int i = 0; i < bmcd.Pitches.Count; ++i)
                 {
-                    containsAllPitches = false;
-                    break;
+                    if(bmcd.Velocities[i] > 0 && (this.Contains(bmcd.Pitches[i]) == false))
+                    {
+                        return false;
+                    }
                 }
             }
-            return containsAllPitches;
+            return true;
+        }
+
+        /// <summary>
+        /// Returns true if the gamut.List contains all the pitches in the argument. Otherwise false. 
+        /// </summary>
+        internal bool ContainsAllPitches(List<IUniqueDef> iuds)
+        {
+            foreach(IUniqueDef iud in iuds)
+            {
+                MidiChordDef mcd = iud as MidiChordDef;
+                if(mcd != null && ContainsAllPitches(mcd) == false)
+                {
+                    return false;                    
+                }
+            }
+            return true;
         }
 
         /// <summary>

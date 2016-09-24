@@ -26,6 +26,7 @@ namespace Moritz.Spec
         public Trk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds, Gamut gamut = null)
             : base(midiChannel, msPositionReContainer, iuds)
         {
+            Debug.Assert(gamut == null || gamut.ContainsAllPitches(iuds));
             Gamut = gamut;
             // N.B. msPositionReContainer can be negative here. Seqs are normalised independently.
             AssertConsistentInSeq();

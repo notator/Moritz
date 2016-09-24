@@ -198,11 +198,9 @@ namespace Moritz.Algorithm
             InitialClefPerChannel = initialClefs;
         }
 
-
         public List<string> InitialClefPerChannel = null;
 
         protected List<Krystal> _krystals;
-        protected List<Palette> _palettes;
-        
+        protected List<Palette> _palettes;       
     }
 }
