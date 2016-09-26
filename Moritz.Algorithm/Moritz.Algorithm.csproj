@@ -47,11 +47,12 @@
     <Compile Include="Study 3.1\Study3Sketch1Algorithm.cs" />
     <Compile Include="Study 3.2\Study3Sketch2Algorithm.cs" />
     <Compile Include="Tombeau 1\SetTemplates.cs" />
+    <Compile Include="Tombeau 1\Trks3.cs" />
     <Compile Include="Tombeau 1\Trks2.cs" />
     <Compile Include="Tombeau 1\TrkSequence.cs" />
     <Compile Include="Tombeau 1\Trks1.cs" />
     <Compile Include="Tombeau 1\Trks0.cs" />
-    <Compile Include="Tombeau 1\Tombeau1Template.cs" />
+    <Compile Include="Tombeau 1\Template1.cs" />
     <Compile Include="Tombeau 1\Tombeau1Algorithm.cs" />
   </ItemGroup>
   <ItemGroup>

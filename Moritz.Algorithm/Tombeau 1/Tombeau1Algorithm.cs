@@ -58,13 +58,13 @@ namespace Moritz.Algorithm.Tombeau1
                and the pan positions... Tuning is a parameter that could be introduced as a surprise later...
 
 			** Thinking about templates and the structural levels:
-			   First create a set of Tombeau1Templates: Envelopes, Durations, MidiChordDefs, Trks etc. that can be
+			   First create a set of Template1: Envelopes, Durations, MidiChordDefs, Trks etc. that can be
                used as the basis for similar objects in the piece. This includes MidiChordDefs created from pallets.
 			   Trks in the piece may be derived fairly simply from templates, but they may also be influenced by
                their containing Seqs.
 			   How do notes/chords relate horizontally inside a trk? How do they relate vertically inside a seq?
                How do seqs relate to each other globally...
-			   Seqs can also be cloned, but I dont think there should be Seqs in Tombeau1Templates.
+			   Seqs can also be cloned, but I dont think there should be Seqs in Template1.
 
             ** Draw a map of the chords that are to be used, showing the way they relate to each other.
                Use this drawing to create a data structure, containing the chords, that can be used when composing.
@@ -356,19 +356,19 @@ namespace Moritz.Algorithm.Tombeau1
             SetTemplates();
 
             List<Seq> seqs = new List<Seq>();
-            Trks0 trks0 = new Trks0(_templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[0]);
+            Trks0 trks0 = new Trks0(_template1s, MidiChannelIndexPerOutputVoice[0]);
             AddTrksToSeqs(seqs, trks0);
 
-            Trks1 trks1 = new Trks1(seqs, _templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[1]);
+            Trks1 trks1 = new Trks1(seqs, _template1s, MidiChannelIndexPerOutputVoice[1]);
             AddTrksToSeqs(seqs, trks1);
 
-            Trks2 trks2 = new Trks2(seqs, _templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[2]);
+            Trks2 trks2 = new Trks2(seqs, _template1s, MidiChannelIndexPerOutputVoice[2]);
             AddTrksToSeqs(seqs, trks2);
 
-            //Trks3 trks3 = new Trks3(seqs, _tombeau1Templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[3]);
+            //Trks3 trks3 = new Trks3(seqs, _template1s, MidiChannelIndexPerOutputVoice[3]);
             //AddTrksToSeqs(seqs, trks3);
 
-            //Trks4 trks4 = new Trks4(seqs, _tombeau1Templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[4]);
+            //Trks4 trks4 = new Trks4(seqs, _template1s, _ornamentShapes, MidiChannelIndexPerOutputVoice[4]);
             //AddTrksToSeqs(seqs, trks4);
 
             Seq mainSeq = new Seq(0, new List<Trk>() { new Trk(0) }, MidiChannelIndexPerOutputVoice);
@@ -463,21 +463,6 @@ namespace Moritz.Algorithm.Tombeau1
 
         #region private properties for use by Tombeau1Algorithm
         #region envelopes
-        private static IReadOnlyList<IReadOnlyList<byte>> _ornamentShapes = new List<List<byte>>()
-            {
-                { new List<byte>() {0, 127} },
-                { new List<byte>() {127, 0} },
-                { new List<byte>() {0, 127, 0} },
-                { new List<byte>() {127, 0, 127} },
-                { new List<byte>() {0, 127, 0, 127} },
-                { new List<byte>() {127, 0, 127, 0} },
-                { new List<byte>() {0, 64, 0, 127, 0} },
-                { new List<byte>() {0, 127, 0, 64, 0} },
-                { new List<byte>() {127, 64, 127, 0, 127} },
-                { new List<byte>() {127, 0, 127, 64, 127} },
-                { new List<byte>() {127, 0, 127, 64, 127, 0} }
-            };
-
         /// <summary>
         /// If domain is null, the returned shape will come from the _sliderShapesLong list. 
         /// </summary>

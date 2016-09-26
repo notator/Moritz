@@ -17,43 +17,31 @@ namespace Moritz.Algorithm.Tombeau1
         /// </summary>
         private void SetTemplates()
         {
-            int rootPitch = 60;
-            int nPitchesPerOctave = 8;
-            int nChordsPerOrnament = 5;
-
-            Debug.Assert(_ornamentShapes.Count > 10);
+            List<Template1> template1s = new List<Template1>();
+            //List<Template2> template2s = new List<Template2>();
 
             // The standard relative pitch heirarchies are in a circular matrix having 22 values.
             // These pitch hierarchies are in order of distance from the root heirarchy.
-            Tombeau1Template t1template0 = new Tombeau1Template(0, rootPitch, nPitchesPerOctave, _ornamentShapes[0], nChordsPerOrnament);
-            Tombeau1Template t1template1 = new Tombeau1Template(21, rootPitch, nPitchesPerOctave, _ornamentShapes[1], nChordsPerOrnament);
-            Tombeau1Template t1template2 = new Tombeau1Template(1, rootPitch, nPitchesPerOctave, _ornamentShapes[2], nChordsPerOrnament);
-            Tombeau1Template t1template3 = new Tombeau1Template(20, rootPitch, nPitchesPerOctave, _ornamentShapes[3], nChordsPerOrnament);
-            Tombeau1Template t1template4 = new Tombeau1Template(2, rootPitch, nPitchesPerOctave, _ornamentShapes[4], nChordsPerOrnament);
-            Tombeau1Template t1template5 = new Tombeau1Template(19, rootPitch, nPitchesPerOctave, _ornamentShapes[5], nChordsPerOrnament);
-            Tombeau1Template t1template6 = new Tombeau1Template(3, rootPitch, nPitchesPerOctave, _ornamentShapes[6], nChordsPerOrnament);
-            Tombeau1Template t1template7 = new Tombeau1Template(18, rootPitch, nPitchesPerOctave, _ornamentShapes[7], nChordsPerOrnament);
-            Tombeau1Template t1template8 = new Tombeau1Template(4, rootPitch, nPitchesPerOctave, _ornamentShapes[8], nChordsPerOrnament);
-            Tombeau1Template t1template9 = new Tombeau1Template(17, rootPitch, nPitchesPerOctave, _ornamentShapes[9], nChordsPerOrnament);
-            Tombeau1Template t1template10 = new Tombeau1Template(5, rootPitch, nPitchesPerOctave, _ornamentShapes[10], nChordsPerOrnament);
-            Tombeau1Template t1template11 = new Tombeau1Template(16, rootPitch, nPitchesPerOctave, _ornamentShapes[10], nChordsPerOrnament);
-            Tombeau1Template t1template12 = new Tombeau1Template(6, rootPitch, nPitchesPerOctave, _ornamentShapes[9], nChordsPerOrnament);
-            Tombeau1Template t1template13 = new Tombeau1Template(15, rootPitch, nPitchesPerOctave, _ornamentShapes[8], nChordsPerOrnament);
-            Tombeau1Template t1template14 = new Tombeau1Template(7, rootPitch, nPitchesPerOctave, _ornamentShapes[7], nChordsPerOrnament);
-            Tombeau1Template t1template15 = new Tombeau1Template(14, rootPitch, nPitchesPerOctave, _ornamentShapes[6], nChordsPerOrnament);
-            Tombeau1Template t1template16 = new Tombeau1Template(8, rootPitch, nPitchesPerOctave, _ornamentShapes[5], nChordsPerOrnament);
-            Tombeau1Template t1template17 = new Tombeau1Template(13, rootPitch, nPitchesPerOctave, _ornamentShapes[4], nChordsPerOrnament);
-            Tombeau1Template t1template18 = new Tombeau1Template(9, rootPitch, nPitchesPerOctave, _ornamentShapes[3], nChordsPerOrnament);
-            Tombeau1Template t1template19 = new Tombeau1Template(12, rootPitch, nPitchesPerOctave, _ornamentShapes[2], nChordsPerOrnament);
-            Tombeau1Template t1template20 = new Tombeau1Template(10, rootPitch, nPitchesPerOctave, _ornamentShapes[1], nChordsPerOrnament);
-            Tombeau1Template t1template21 = new Tombeau1Template(11, rootPitch, nPitchesPerOctave, _ornamentShapes[0], nChordsPerOrnament);
+            List<int> relativePitchHierarchyIndices = new List<int>()
+            { 0, 21, 1, 20, 2, 19, 3, 18, 4, 17, 5, 16, 6, 15, 7, 14, 8, 13, 9, 12, 10, 11 };
 
-            _templates = new List<Tombeau1Template>()
-            { t1template0, t1template1, t1template2, t1template3, t1template4, t1template5, t1template6, t1template7, t1template8, t1template9,
-              t1template10, t1template11, t1template12, t1template13, t1template14, t1template15, t1template16, t1template17, t1template18, t1template19,
-              t1template20, t1template21 };
+            int rootPitch = 60;
+            int nPitchesPerOctave = 8;
+            foreach(int rphi in relativePitchHierarchyIndices)
+            {
+                int rootPitchAbs = rootPitch % 12;
+                Gamut gamut= new Gamut(rphi, rootPitchAbs, nPitchesPerOctave);
+
+                template1s.Add(new Template1(gamut, rootPitch)); 
+                //template2s.Add(new Template2(gamut, rootPitch));
+            }
+
+            _template1s = template1s;
+            //_template2s = template2s;
+
         }
 
-        private IReadOnlyList<Tombeau1Template> _templates;
+        private IReadOnlyList<Template1> _template1s;
+        //private IReadOnlyList<Template2> _template2s;
     }
 }

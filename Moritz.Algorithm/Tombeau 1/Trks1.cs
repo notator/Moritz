@@ -7,11 +7,11 @@ namespace Moritz.Algorithm.Tombeau1
 {
     internal class Trks1 : TrkSequence
     {
-        public Trks1(List<Seq> seqs, IReadOnlyList<Tombeau1Template> tombeau1Templates, IReadOnlyList<IReadOnlyList<byte>> ornamentShapes, int channel)
+        public Trks1(List<Seq> seqs, IReadOnlyList<Template1> template1s, int channel)
             : base()
         {
             List<Trk> trk0s = GetTrk0s(seqs);
-            Trks = GetTrk1s(trk0s, tombeau1Templates, ornamentShapes, channel);
+            Trks = GetTrk1s(trk0s, template1s, channel);
         }
 
         private List<Trk> GetTrk0s(List<Seq> seqs)
@@ -24,7 +24,7 @@ namespace Moritz.Algorithm.Tombeau1
             return trk0s;
         }
 
-        private IReadOnlyList<Trk> GetTrk1s(List<Trk> trk0s, IReadOnlyList<Tombeau1Template> tombeau1Templates, IReadOnlyList<IReadOnlyList<byte>> ornamentShapes, int channel)
+        private IReadOnlyList<Trk> GetTrk1s(List<Trk> trk0s, IReadOnlyList<Template1> template1s, int channel)
         {
             int nTrks = trk0s.Count;
 

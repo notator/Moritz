@@ -47,7 +47,12 @@ namespace Moritz.Spec
         public Trk Clone()
         {
             List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
-            Trk trk = new Trk(MidiChannel, MsPositionReContainer, clonedIUDs, Gamut);
+            Gamut gamut = null;
+            if(this.Gamut != null)
+            {
+                gamut = this.Gamut.Clone();
+            }
+            Trk trk = new Trk(MidiChannel, MsPositionReContainer, clonedIUDs, gamut);
             trk.Container = this.Container;
 
             return trk;
