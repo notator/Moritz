@@ -5,26 +5,27 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-    internal class Trks1 : TrkSequence
+    internal class SopranoTrks : TrkSequence
     {
-        public Trks1(List<Seq> seqs, IReadOnlyList<Template1> template1s, int channel)
+        public SopranoTrks(List<Seq> seqs, IReadOnlyList<SopranoTemplate> sopranoTemplates, int channel)
             : base()
         {
-            List<Trk> trk0s = GetTrk0s(seqs);
-            Trks = GetTrk1s(trk0s, template1s, channel);
+            List<Trk> tenorTrks = GetTenorTrks(seqs);
+            Trks = GetSopranoTrks(tenorTrks, sopranoTemplates, channel);
         }
 
-        private List<Trk> GetTrk0s(List<Seq> seqs)
+        private List<Trk> GetTenorTrks(List<Seq> seqs)
         {
-            List<Trk> trk0s = new List<Trk>();
+            int tenorChannel = 2;
+            List<Trk> tenorTrks = new List<Trk>();
             foreach(Seq seq in seqs)
             {
-                trk0s.Add(seq.Trks[0]);
+                tenorTrks.Add(seq.Trks[tenorChannel]);
             }
-            return trk0s;
+            return tenorTrks;
         }
 
-        private IReadOnlyList<Trk> GetTrk1s(List<Trk> trk0s, IReadOnlyList<Template1> template1s, int channel)
+        private IReadOnlyList<Trk> GetSopranoTrks(List<Trk> trk0s, IReadOnlyList<SopranoTemplate> sopranoTemplates, int channel)
         {
             int nTrks = trk0s.Count;
 

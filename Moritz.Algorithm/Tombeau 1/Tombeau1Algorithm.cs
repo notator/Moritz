@@ -356,20 +356,17 @@ namespace Moritz.Algorithm.Tombeau1
             SetTemplates();
 
             List<Seq> seqs = new List<Seq>();
-            Trks0 trks0 = new Trks0(_template1s, MidiChannelIndexPerOutputVoice[0]);
-            AddTrksToSeqs(seqs, trks0);
+            TenorTrks tenorTrks = new TenorTrks(_tenorTemplates, MidiChannelIndexPerOutputVoice[2]);
+            AddTrksToSeqs(seqs, tenorTrks);
 
-            Trks1 trks1 = new Trks1(seqs, _template1s, MidiChannelIndexPerOutputVoice[1]);
-            AddTrksToSeqs(seqs, trks1);
+            //SopranoTrks sopranoTrks = new SopranoTrks(seqs, _sopranoTemplates, MidiChannelIndexPerOutputVoice[0]);
+            //AddTrksToSeqs(seqs, sopranoTrks);
 
-            Trks2 trks2 = new Trks2(seqs, _template1s, MidiChannelIndexPerOutputVoice[2]);
-            AddTrksToSeqs(seqs, trks2);
+            //BassTrks bassTrks = new BassTrks(seqs, _bassTemplates, MidiChannelIndexPerOutputVoice[3]);
+            //AddTrksToSeqs(seqs, bassTrks);
 
-            //Trks3 trks3 = new Trks3(seqs, _template1s, MidiChannelIndexPerOutputVoice[3]);
-            //AddTrksToSeqs(seqs, trks3);
-
-            //Trks4 trks4 = new Trks4(seqs, _template1s, _ornamentShapes, MidiChannelIndexPerOutputVoice[4]);
-            //AddTrksToSeqs(seqs, trks4);
+            //AltoTrks altoTrks = new AltoTrks(seqs, _altoTemplates, MidiChannelIndexPerOutputVoice[1]);
+            //AddTrksToSeqs(seqs, altoTrks);
 
             Seq mainSeq = new Seq(0, new List<Trk>() { new Trk(0) }, MidiChannelIndexPerOutputVoice);
             List<int> approximateBarlineMsPositions = new List<int>();

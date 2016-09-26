@@ -5,9 +5,9 @@ using Moritz.Globals;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-    public class Template1 : Trk
+    public class BassTemplate : Trk
     {
-        public Template1(Gamut gamut, int rootPitch)
+        public BassTemplate(Gamut gamut, int rootPitch)
             : base(0, 0, new List<IUniqueDef>(), gamut)
         {
             //int rootNotatedPitch = gamut[gamut.Count / 2];

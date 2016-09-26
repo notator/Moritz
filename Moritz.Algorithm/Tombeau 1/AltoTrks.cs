@@ -5,13 +5,13 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-    internal class Trks3 : TrkSequence
+    internal class AltoTrks : TrkSequence
     {
-        public Trks3(List<Seq> seqs, IReadOnlyList<Template1> template1s, int channel)
+        public AltoTrks(List<Seq> seqs, IReadOnlyList<AltoTemplate> altoTemplates, int channel)
             : base()
         {
             List<Trk> trk0s = GetTrk0s(seqs);
-            Trks = GetTrk3s(trk0s, template1s, channel);
+            Trks = GetAltoTrks(trk0s, altoTemplates, channel);
         }
 
         private List<Trk> GetTrk0s(List<Seq> seqs)
@@ -24,11 +24,11 @@ namespace Moritz.Algorithm.Tombeau1
             return trk0s;
         }
 
-        private IReadOnlyList<Trk> GetTrk3s(List<Trk> trk0s, IReadOnlyList<Template1> template1s, int channel)
+        private IReadOnlyList<Trk> GetAltoTrks(List<Trk> trk0s, IReadOnlyList<AltoTemplate> altoTemplates, int channel)
         {
-            Debug.Assert(trk0s.Count == template1s.Count);
+            Debug.Assert(trk0s.Count == altoTemplates.Count);
 
-            int nTrks = template1s.Count;
+            int nTrks = altoTemplates.Count;
 
             List<Trk> returnTrks = new List<Trk>();
             for(int i = 0; i < nTrks; ++i)
@@ -36,8 +36,8 @@ namespace Moritz.Algorithm.Tombeau1
                 Debug.Assert(trk0s[i].UniqueDefs.Count > 0);
 
                 Trk trk0 = trk0s[i];
-                Trk trkA = template1s[0].Clone();
-                Trk trkB = template1s[i].Clone();
+                Trk trkA = altoTemplates[0].Clone();
+                Trk trkB = altoTemplates[i].Clone();
 
                 trkB.MsPositionReContainer = 6000;
 
