@@ -353,16 +353,16 @@ namespace Moritz.Algorithm.Tombeau1
 
             /**********************************************/
 
-            Init(new List<string>() { "Tombeau1.1" });
+            SetTemplates();
 
             List<Seq> seqs = new List<Seq>();
-            Trks0 trks0 = new Trks0(_tombeau1Templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[0]);
+            Trks0 trks0 = new Trks0(_templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[0]);
             AddTrksToSeqs(seqs, trks0);
 
-            //Trks1 trks1 = new Trks1(seqs, _tombeau1Templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[1]);
-            //AddTrksToSeqs(seqs, trks1);
+            Trks1 trks1 = new Trks1(seqs, _templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[1]);
+            AddTrksToSeqs(seqs, trks1);
 
-            Trks2 trks2 = new Trks2(seqs, _tombeau1Templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[2]);
+            Trks2 trks2 = new Trks2(seqs, _templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[2]);
             AddTrksToSeqs(seqs, trks2);
 
             //Trks3 trks3 = new Trks3(seqs, _tombeau1Templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[3]);
@@ -370,16 +370,6 @@ namespace Moritz.Algorithm.Tombeau1
 
             //Trks4 trks4 = new Trks4(seqs, _tombeau1Templates, _ornamentShapes, MidiChannelIndexPerOutputVoice[4]);
             //AddTrksToSeqs(seqs, trks4);
-
-            #region test blocks
-            /************************************************/
-            //Block vpapBlock = VPAPBlock(_level1TemplateTrks[1]);
-            //_blockList.Add(vpapBlock);   // 2 bars
-
-            //Block timeWarpVVTestBlock = TimeWarpTestBlock(verticalVelocityGradientTestBlock);
-            //_blockList.Add(timeWarpVVTestBlock); // 4 bars (1 system)
-            /************************************************/
-            #endregion test blocks
 
             Seq mainSeq = new Seq(0, new List<Trk>() { new Trk(0) }, MidiChannelIndexPerOutputVoice);
             List<int> approximateBarlineMsPositions = new List<int>();
@@ -470,14 +460,8 @@ namespace Moritz.Algorithm.Tombeau1
                 }
             }
         }
-        
+
         #region private properties for use by Tombeau1Algorithm
-        #region initialised by Init()
-        private IReadOnlyList<IReadOnlyList<MidiChordDef>> _paletteMidiChordDefs = null;
-        private IReadOnlyList<IReadOnlyList<MidiChordDef>> _pitchWheelTestMidiChordDefs = null;
-        private IReadOnlyList<IReadOnlyList<MidiChordDef>> _ornamentTestMidiChordDefs = null;
-        private IReadOnlyList<Tombeau1Template> _tombeau1Templates;
-        #endregion initialised by Init()
         #region envelopes
         private static IReadOnlyList<IReadOnlyList<byte>> _ornamentShapes = new List<List<byte>>()
             {

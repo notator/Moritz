@@ -55,9 +55,10 @@ namespace Moritz.Spec
         /// The notated velocity of all pitches is set to 127.
         /// The root pitches of the BasicMidiChordDefs begin with rootNotatedPitch, and follow the ornamentEnvelope, using
         /// the ornamentEnvelope's values as indices in the gamut. Their durations are as equal as possible, to give the
-        /// overall msDuration.
-        /// If ornamentEnvelope is null, a single, one-note BasicMidiChordDef will be created.
-        /// The number of pitches in a chord may be less than nPitchesPerChord (see gamut.GetChord(...) ).
+        /// overall msDuration. If ornamentEnvelope is null, a single, one-note BasicMidiChordDef will be created.
+        /// This constructor uses Gamut.GetChord(rootNotatedPitch, nPitchesPerChord) which returns pitches that are
+        /// vertically spaced differently according to the absolute height of the rootNotatedPitch. The number of pitches
+        /// in a chord may also be less than nPitchesPerChord (see gamut.GetChord(...) ).
         /// An exception is thrown if rootNotatedPitch is not in the gamut.
         /// </summary>        
         /// <param name="msDuration">The duration of this MidiChordDef</param>
