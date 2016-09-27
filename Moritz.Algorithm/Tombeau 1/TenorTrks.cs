@@ -59,10 +59,41 @@ namespace Moritz.Algorithm.Tombeau1
             List<Trk> trk0SubTrks = new List<Trk>();
             trk0SubTrks.Add(template1.Clone());
 
-            Trk currentTrk = trk0SubTrks[0];
+            Trk subT = trk0SubTrks[0];
+            /*** available transformations ***/
+            //subT.Add();
+            //subT.AddRange();
+            //subT.AdjustChordMsDurations();
+            //subT.AdjustExpression();
+            //subT.AdjustVelocities();
+            //subT.AdjustVelocitiesHairpin();
+            //subT.AlignObjectAtIndex();
+            //subT.CreateAccel();
+            //subT.FindIndexAtMsPositionReFirstIUD();
+            //subT.Insert();
+            //subT.InsertRange();
+            //subT.Permute();
+            //subT.Remove();
+            //subT.RemoveAt();
+            //subT.RemoveBetweenMsPositions();
+            //subT.RemoveRange();
+            //subT.RemoveScorePitchWheelCommands();
+            //subT.Replace();
+            //subT.SetDurationsFromPitches();
+            //subT.SetPanGliss(0, subT.MsDuration, 0, 127);
+            //subT.SetPitchWheelDeviation();
+            //subT.SetPitchWheelSliders();
+            //subT.SetVelocitiesFromDurations();
+            //subT.SetVelocityPerAbsolutePitch();
+            //subT.TimeWarp();
+            //subT.Translate();
+            //subT.Transpose();
+            //subT.TransposeInGamut();
+
+            /*********************************/
             for(int i = 0; i < nSubTrks; ++i)
             {
-                Trk subTrk = currentTrk.Clone();
+                Trk subTrk = subT.Clone();
                 subTrk.TransposeInGamut(relativeTranspositions[i]);
 
                 if((i % 2) == 0)
@@ -70,7 +101,7 @@ namespace Moritz.Algorithm.Tombeau1
                     subTrk.Permute(1, 7);
                 }
                 trk0SubTrks.Add(subTrk);
-                currentTrk = subTrk;
+                subT = subTrk;
             }
 
             Trk trk0 = new Trk(0, 0, new List<IUniqueDef>(), template1.Gamut.Clone());

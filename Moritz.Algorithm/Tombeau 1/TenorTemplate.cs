@@ -7,10 +7,10 @@ namespace Moritz.Algorithm.Tombeau1
 {
     public class TenorTemplate : Trk
     {
-        public TenorTemplate(Gamut gamut, int rootPitch)
+        public TenorTemplate(Gamut gamut)
             : base(0, 0, new List<IUniqueDef>(), gamut)
         {
-            //int rootNotatedPitch = gamut[gamut.Count / 2];
+            int rootPitch = gamut.BasePitch + (4 * 12);
             int nPitchesPerChord = 5;
             int nOrnamentChords = 5;
 

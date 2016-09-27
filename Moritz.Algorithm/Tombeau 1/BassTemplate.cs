@@ -7,12 +7,14 @@ namespace Moritz.Algorithm.Tombeau1
 {
     public class BassTemplate : Trk
     {
-        public BassTemplate(Gamut gamut, int rootPitch)
+        public BassTemplate(Gamut gamut)
             : base(0, 0, new List<IUniqueDef>(), gamut)
         {
-            //int rootNotatedPitch = gamut[gamut.Count / 2];
+            int rootPitch = gamut.BasePitch + (3 * 12);
             int nPitchesPerChord = 5;
             int nOrnamentChords = 5;
+
+            Gamut = new Gamut(gamut.RelativePitchHierarchyIndex, gamut.BasePitch, gamut.NPitchesPerOctave - 1);
 
             int msDuration = 1000; // dummy -- overridden by SetDurationsFromPitches() below
             int rootIndex = Gamut.IndexOf(rootPitch);

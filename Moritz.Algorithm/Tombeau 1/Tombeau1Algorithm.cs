@@ -18,8 +18,8 @@ namespace Moritz.Algorithm.Tombeau1
             CheckParameters();
         }
 
-        public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4 }; } }
-		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 127, 127, 127, 127, 127 }; } }
+        public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3 }; } }
+		public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 127, 127, 127, 127 }; } }
 		public override int NumberOfInputVoices { get { return 0; } }
         public override int NumberOfBars { get { return 50; } }
 
@@ -353,19 +353,24 @@ namespace Moritz.Algorithm.Tombeau1
 
             /**********************************************/
 
-            SetTemplates();
+            List<Gamut> gamuts = GetGamuts();
+
+            IReadOnlyList<TenorTemplate> tenorTemplates = GetTenorTemplates(gamuts);
+            //IReadOnlyList<SopranoTemplate> sopranoTemplates = GetSopranoTemplates(gamuts);
+            //IReadOnlyList<BassTemplate> bassTemplates = GetBassTemplates(gamuts);
+            //IReadOnlyList<AltoTemplate> altoTemplates = GetAltoTemplates(gamuts);
 
             List<Seq> seqs = new List<Seq>();
-            TenorTrks tenorTrks = new TenorTrks(_tenorTemplates, MidiChannelIndexPerOutputVoice[2]);
+            TenorTrks tenorTrks = new TenorTrks(tenorTemplates, MidiChannelIndexPerOutputVoice[2]);
             AddTrksToSeqs(seqs, tenorTrks);
 
-            //SopranoTrks sopranoTrks = new SopranoTrks(seqs, _sopranoTemplates, MidiChannelIndexPerOutputVoice[0]);
+            //SopranoTrks sopranoTrks = new SopranoTrks(seqs, sopranoTemplates, MidiChannelIndexPerOutputVoice[0]);
             //AddTrksToSeqs(seqs, sopranoTrks);
 
-            //BassTrks bassTrks = new BassTrks(seqs, _bassTemplates, MidiChannelIndexPerOutputVoice[3]);
+            //BassTrks bassTrks = new BassTrks(seqs, bassTemplates, MidiChannelIndexPerOutputVoice[3]);
             //AddTrksToSeqs(seqs, bassTrks);
 
-            //AltoTrks altoTrks = new AltoTrks(seqs, _altoTemplates, MidiChannelIndexPerOutputVoice[1]);
+            //AltoTrks altoTrks = new AltoTrks(seqs, altoTemplates, MidiChannelIndexPerOutputVoice[1]);
             //AddTrksToSeqs(seqs, altoTrks);
 
             Seq mainSeq = new Seq(0, new List<Trk>() { new Trk(0) }, MidiChannelIndexPerOutputVoice);

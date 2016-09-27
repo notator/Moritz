@@ -7,10 +7,10 @@ namespace Moritz.Algorithm.Tombeau1
 {
     public class SopranoTemplate : Trk
     {
-        public SopranoTemplate(Gamut gamut, int rootPitch)
+        public SopranoTemplate(Gamut gamut)
             : base(0, 0, new List<IUniqueDef>(), gamut)
         {
-            //int rootNotatedPitch = gamut[gamut.Count / 2];
+            int rootPitch = gamut.BasePitch + (6 * 12);
             int nPitchesPerChord = 5;
             int nOrnamentChords = 5;
 

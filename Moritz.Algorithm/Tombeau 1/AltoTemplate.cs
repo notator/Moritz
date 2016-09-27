@@ -7,10 +7,10 @@ namespace Moritz.Algorithm.Tombeau1
 {
     public class AltoTemplate : Trk
     {
-        public AltoTemplate(Gamut gamut, int rootPitch)
+        public AltoTemplate(Gamut gamut)
             : base(0, 0, new List<IUniqueDef>(), gamut)
         {
-            //int rootNotatedPitch = gamut[gamut.Count / 2];
+            int rootPitch = gamut.BasePitch + (5 * 12);
             int nPitchesPerChord = 5;
             int nOrnamentChords = 5;
 
