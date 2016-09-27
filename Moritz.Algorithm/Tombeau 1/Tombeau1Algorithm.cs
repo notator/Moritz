@@ -361,17 +361,17 @@ namespace Moritz.Algorithm.Tombeau1
             //IReadOnlyList<AltoTemplate> altoTemplates = GetAltoTemplates(gamuts);
 
             List<Seq> seqs = new List<Seq>();
-            TenorTrks tenorTrks = new TenorTrks(tenorTemplates, MidiChannelIndexPerOutputVoice[2]);
-            AddTrksToSeqs(seqs, tenorTrks);
+            TenorTrks tenorTrks = new TenorTrks(tenorTemplates);
+            AddTrksToSeqs(seqs, tenorTrks, MidiChannelIndexPerOutputVoice[2]);
 
-            //SopranoTrks sopranoTrks = new SopranoTrks(seqs, sopranoTemplates, MidiChannelIndexPerOutputVoice[0]);
-            //AddTrksToSeqs(seqs, sopranoTrks);
+            //SopranoTrks sopranoTrks = new SopranoTrks(seqs, sopranoTemplates);
+            //AddTrksToSeqs(seqs, sopranoTrks, MidiChannelIndexPerOutputVoice[0]);
 
-            //BassTrks bassTrks = new BassTrks(seqs, bassTemplates, MidiChannelIndexPerOutputVoice[3]);
-            //AddTrksToSeqs(seqs, bassTrks);
+            //BassTrks bassTrks = new BassTrks(seqs, bassTemplates);
+            //AddTrksToSeqs(seqs, bassTrks, MidiChannelIndexPerOutputVoice[3]);
 
-            //AltoTrks altoTrks = new AltoTrks(seqs, altoTemplates, MidiChannelIndexPerOutputVoice[1]);
-            //AddTrksToSeqs(seqs, altoTrks);
+            //AltoTrks altoTrks = new AltoTrks(seqs, altoTemplates);
+            //AddTrksToSeqs(seqs, altoTrks, MidiChannelIndexPerOutputVoice[1]);
 
             //Adjust MidiChordDef alignments(maybe ignoring template boundaries), insert clef changes etc.
             FinalizeSeqs(seqs);
@@ -446,13 +446,14 @@ namespace Moritz.Algorithm.Tombeau1
             return barlineMsPositionsReSeq;
         }
 
-        private void AddTrksToSeqs(List<Seq> seqs, TrkSequence trkSequence)
+        private void AddTrksToSeqs(List<Seq> seqs, TrkSequence trkSequence, int midiChannel)
         {
             if(seqs.Count == 0)
             {
                 for(int i = 0; i < trkSequence.Count; ++i)
                 {
                     Trk trk = trkSequence[i];
+                    trk.MidiChannel = midiChannel;
                     seqs.Add(new Seq(0, new List<Trk>() { trk }, MidiChannelIndexPerOutputVoice));
                 }
             }
@@ -461,7 +462,9 @@ namespace Moritz.Algorithm.Tombeau1
                 Debug.Assert(seqs.Count == trkSequence.Count);
                 for(int i = 0; i < seqs.Count;  ++i)
                 {
-                    seqs[i].SetTrk(trkSequence[i]);
+                    Trk trk = trkSequence[i];
+                    trk.MidiChannel = midiChannel;
+                    seqs[i].SetTrk(trk);
                 }
             }
         }

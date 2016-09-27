@@ -7,11 +7,11 @@ namespace Moritz.Algorithm.Tombeau1
 {
     internal class BassTrks : TrkSequence
     {
-        public BassTrks(List<Seq> seqs, IReadOnlyList<BassTemplate> bassTemplates, int channel)
+        public BassTrks(List<Seq> seqs, IReadOnlyList<BassTemplate> bassTemplates)
             : base()
         {
             List<Trk> trk0s = GetTrk0s(seqs);
-            Trks = GetTrk3s(trk0s, bassTemplates, channel);
+            Trks = GetTrk3s(trk0s, bassTemplates);
         }
 
         private List<Trk> GetTrk0s(List<Seq> seqs)
@@ -24,7 +24,7 @@ namespace Moritz.Algorithm.Tombeau1
             return trk0s;
         }
 
-        private IReadOnlyList<Trk> GetTrk3s(List<Trk> trk0s, IReadOnlyList<BassTemplate> bassTemplates, int channel)
+        private IReadOnlyList<Trk> GetTrk3s(List<Trk> trk0s, IReadOnlyList<BassTemplate> bassTemplates)
         {
             Debug.Assert(trk0s.Count == bassTemplates.Count);
 
@@ -69,14 +69,11 @@ namespace Moritz.Algorithm.Tombeau1
                 trkB.Insert(trkB.Count, trkmcd);
                 trkB.AddRange(trkC);
 
-
                 Trk trk1 = trkA.Superimpose(trkB);
 
-                trk1.MidiChannel = channel;
                 trk1.MsDuration = trk0.MsDuration;
                 trk1.MsPositionReContainer = 0;
                 
-
                 returnTrks.Add(trk1);
             }
 

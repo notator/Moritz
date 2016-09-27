@@ -7,11 +7,11 @@ namespace Moritz.Algorithm.Tombeau1
 {
     internal class SopranoTrks : TrkSequence
     {
-        public SopranoTrks(List<Seq> seqs, IReadOnlyList<SopranoTemplate> sopranoTemplates, int channel)
+        public SopranoTrks(List<Seq> seqs, IReadOnlyList<SopranoTemplate> sopranoTemplates)
             : base()
         {
             List<Trk> tenorTrks = GetTenorTrks(seqs);
-            Trks = GetSopranoTrks(tenorTrks, sopranoTemplates, channel);
+            Trks = GetSopranoTrks(tenorTrks, sopranoTemplates);
         }
 
         private List<Trk> GetTenorTrks(List<Seq> seqs)
@@ -25,7 +25,7 @@ namespace Moritz.Algorithm.Tombeau1
             return tenorTrks;
         }
 
-        private IReadOnlyList<Trk> GetSopranoTrks(List<Trk> trk0s, IReadOnlyList<SopranoTemplate> sopranoTemplates, int channel)
+        private IReadOnlyList<Trk> GetSopranoTrks(List<Trk> trk0s, IReadOnlyList<SopranoTemplate> sopranoTemplates)
         {
             int nTrks = trk0s.Count;
 
@@ -46,7 +46,6 @@ namespace Moritz.Algorithm.Tombeau1
                 Trk trk0 = trk0s[i];
                 Trk trk1 = trk0.Clone();
 
-                trk1.MidiChannel = channel;
                 trk1.MsDuration = trk1MsDurations[i];
                 trk1.TransposeInGamut(12);
                 List<byte> velocityPerAbsolutePitch = trk0.Gamut.GetVelocityPerAbsolutePitch(25, true);

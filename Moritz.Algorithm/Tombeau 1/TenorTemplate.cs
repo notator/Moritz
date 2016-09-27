@@ -32,8 +32,8 @@ namespace Moritz.Algorithm.Tombeau1
 
             // 1000, 841, 707, 595 is (1000 / n( 2^(1 / 4) )  for n = 1..4
             // The actual durations are set such that MsDuration stays at 4000ms.
-            SetDurationsFromPitches(1000, 595, true);
-            SetVelocitiesFromDurations(75, 127);
+            //SetDurationsFromPitches(1000, 595, true);
+            //SetVelocitiesFromDurations(75, 127);
         }
     }
 }
