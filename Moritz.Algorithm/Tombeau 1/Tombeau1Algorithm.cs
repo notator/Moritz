@@ -373,6 +373,9 @@ namespace Moritz.Algorithm.Tombeau1
             //AltoTrks altoTrks = new AltoTrks(seqs, altoTemplates, MidiChannelIndexPerOutputVoice[1]);
             //AddTrksToSeqs(seqs, altoTrks);
 
+            //Adjust MidiChordDef alignments(maybe ignoring template boundaries), insert clef changes etc.
+            FinalizeSeqs(seqs);
+
             Seq mainSeq = new Seq(0, new List<Trk>() { new Trk(0) }, MidiChannelIndexPerOutputVoice);
             List<int> approximateBarlineMsPositions = new List<int>();
             GetMainSeqAndApproximateBarlineMsPositions(seqs, mainSeq, approximateBarlineMsPositions);
