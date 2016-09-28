@@ -355,25 +355,20 @@ namespace Moritz.Algorithm.Tombeau1
 
             List<Gamut> gamuts = GetGamuts();
 
-            IReadOnlyList<TenorTemplate> tenorTemplates = GetTenorTemplates(gamuts);
-            //IReadOnlyList<SopranoTemplate> sopranoTemplates = GetSopranoTemplates(gamuts);
-            //IReadOnlyList<BassTemplate> bassTemplates = GetBassTemplates(gamuts);
-            //IReadOnlyList<AltoTemplate> altoTemplates = GetAltoTemplates(gamuts);
-
             List<Seq> seqs = new List<Seq>();
-            TenorTrks tenorTrks = new TenorTrks(tenorTemplates);
+            TenorTrks tenorTrks = new TenorTrks(gamuts);
             AddTrksToSeqs(seqs, tenorTrks, MidiChannelIndexPerOutputVoice[2]);
 
-            //SopranoTrks sopranoTrks = new SopranoTrks(seqs, sopranoTemplates);
+            //SopranoTrks sopranoTrks = new SopranoTrks(seqs, gamuts);
             //AddTrksToSeqs(seqs, sopranoTrks, MidiChannelIndexPerOutputVoice[0]);
 
-            //BassTrks bassTrks = new BassTrks(seqs, bassTemplates);
+            //BassTrks bassTrks = new BassTrks(seqs, gamuts);
             //AddTrksToSeqs(seqs, bassTrks, MidiChannelIndexPerOutputVoice[3]);
 
-            //AltoTrks altoTrks = new AltoTrks(seqs, altoTemplates);
+            //AltoTrks altoTrks = new AltoTrks(seqs, gamuts);
             //AddTrksToSeqs(seqs, altoTrks, MidiChannelIndexPerOutputVoice[1]);
 
-            //Adjust MidiChordDef alignments(maybe ignoring template boundaries), insert clef changes etc.
+            //Possibly do global changes that affect all trks here (accel., rit, transpositions etc.)
             FinalizeSeqs(seqs);
 
             Seq mainSeq = new Seq(0, new List<Trk>() { new Trk(0) }, MidiChannelIndexPerOutputVoice);

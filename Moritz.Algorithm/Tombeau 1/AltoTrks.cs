@@ -7,75 +7,85 @@ namespace Moritz.Algorithm.Tombeau1
 {
     internal class AltoTrks : TrkSequence
     {
-        public AltoTrks(List<Seq> seqs, IReadOnlyList<AltoTemplate> altoTemplates)
+        public AltoTrks(List<Seq> seqs, IReadOnlyList<Gamut> gamuts)
             : base()
         {
-            List<Trk> trk0s = GetTrk0s(seqs);
-            Trks = GetAltoTrks(trk0s, altoTemplates);
+            List<Trk> tenorTrks = GetTrksInChannel(seqs, 2);
+            List<Trk> sopranoTrks = GetTrksInChannel(seqs, 0);
+            List<Trk> bassTrks = GetTrksInChannel(seqs, 3);
+            IReadOnlyList<AltoTemplate> altoTemplates = GetAltoTemplates(gamuts);
+
+            Trks = GetAltoTrks(tenorTrks, sopranoTrks, bassTrks, altoTemplates);
         }
 
-        private List<Trk> GetTrk0s(List<Seq> seqs)
+        /// <summary>
+        /// Sets up standard templates that will be used in the composition.
+        /// </summary>
+        private IReadOnlyList<AltoTemplate> GetAltoTemplates(IReadOnlyList<Gamut> gamuts)
         {
-            List<Trk> trk0s = new List<Trk>();
-            foreach(Seq seq in seqs)
+            List<AltoTemplate> altoTemplates = new List<AltoTemplate>();
+
+            for(int i = 0; i < gamuts.Count; ++i)
             {
-                trk0s.Add(seq.Trks[0]);
+                Gamut gamut = gamuts[i];
+                altoTemplates.Add(new AltoTemplate(gamut));
             }
-            return trk0s;
+            return altoTemplates;
         }
 
-        private IReadOnlyList<Trk> GetAltoTrks(List<Trk> trk0s, IReadOnlyList<AltoTemplate> altoTemplates)
+        private IReadOnlyList<Trk> GetAltoTrks(List<Trk> tenorTrks, List<Trk> sopranoTrks, List<Trk> bassTrks, IReadOnlyList<AltoTemplate> altoTemplates)
         {
-            Debug.Assert(trk0s.Count == altoTemplates.Count);
-
-            int nTrks = altoTemplates.Count;
-
             List<Trk> returnTrks = new List<Trk>();
-            for(int i = 0; i < nTrks; ++i)
-            {
-                Debug.Assert(trk0s[i].UniqueDefs.Count > 0);
 
-                Trk trk0 = trk0s[i];
-                Trk trkA = altoTemplates[0].Clone();
-                Trk trkB = altoTemplates[i].Clone();
+            //Debug.Assert(tenorTrks.Count == altoTemplates.Count);
 
-                trkB.MsPositionReContainer = 6000;
+            //int nTrks = altoTemplates.Count;
 
-                trkA.MsDuration = 3000;
-                trkB.MsDuration = 3000;
+            //for(int i = 0; i < nTrks; ++i)
+            //{
+            //    Debug.Assert(tenorTrks[i].UniqueDefs.Count > 0);
 
-                int indexToAlign = trkA.Count - 1;
-                int msPositionReContainer = trk0.UniqueDefs[15].MsPositionReFirstUD;
-                trkA.AlignObjectAtIndex(indexToAlign, msPositionReContainer);
+            //    Trk trk0 = tenorTrks[i];
+            //    Trk trkA = altoTemplates[0].Clone();
+            //    Trk trkB = altoTemplates[i].Clone();
 
-                indexToAlign = trkB.Count - 1;
-                msPositionReContainer = trk0.UniqueDefs[31].MsPositionReFirstUD;
-                trkB.AlignObjectAtIndex(indexToAlign, msPositionReContainer);
+            //    trkB.MsPositionReContainer = 6000;
 
-                byte newPitch = 47;
-                MidiChordDef mcd = new MidiChordDef(new List<byte>() { newPitch }, new List<byte>() { 127 }, 500, true);
-                Trk trkB1 = new Trk(trkB.MidiChannel, 0, new List<IUniqueDef>() { mcd });
+            //    trkA.MsDuration = 3000;
+            //    trkB.MsDuration = 3000;
 
-                trkB1.MsPositionReContainer = trkB.MsPositionReContainer + trkB.MsDuration + 500;
+            //    int indexToAlign = trkA.Count - 1;
+            //    int msPositionReContainer = trk0.UniqueDefs[15].MsPositionReFirstUD;
+            //    trkA.AlignObjectAtIndex(indexToAlign, msPositionReContainer);
 
-                trkB.Superimpose(trkB1);
+            //    indexToAlign = trkB.Count - 1;
+            //    msPositionReContainer = trk0.UniqueDefs[31].MsPositionReFirstUD;
+            //    trkB.AlignObjectAtIndex(indexToAlign, msPositionReContainer);
 
-                MidiChordDef trkmcd = trkB.ToMidiChordDef(2000);
+            //    byte newPitch = 47;
+            //    MidiChordDef mcd = new MidiChordDef(new List<byte>() { newPitch }, new List<byte>() { 127 }, 500, true);
+            //    Trk trkB1 = new Trk(trkB.MidiChannel, 0, new List<IUniqueDef>() { mcd });
 
-                Gamut gamut = (trk0.Gamut.Contains(newPitch)) ? trk0.Gamut : null;
+            //    trkB1.MsPositionReContainer = trkB.MsPositionReContainer + trkB.MsDuration + 500;
 
-                Trk trkC = trkmcd.ToTrk(3000, trkB.MidiChannel, gamut);
+            //    trkB.Superimpose(trkB1);
 
-                trkB.Insert(trkB.Count, trkmcd);
-                trkB.AddRange(trkC);
+            //    MidiChordDef trkmcd = trkB.ToMidiChordDef(2000);
 
-                Trk trk1 = trkA.Superimpose(trkB);
+            //    Gamut gamut = (trk0.Gamut.Contains(newPitch)) ? trk0.Gamut : null;
 
-                trk1.MsDuration = trk0.MsDuration;
-                trk1.MsPositionReContainer = 0;
+            //    Trk trkC = trkmcd.ToTrk(3000, trkB.MidiChannel, gamut);
+
+            //    trkB.Insert(trkB.Count, trkmcd);
+            //    trkB.AddRange(trkC);
+
+            //    Trk trk1 = trkA.Superimpose(trkB);
+
+            //    trk1.MsDuration = trk0.MsDuration;
+            //    trk1.MsPositionReContainer = 0;
                 
-                returnTrks.Add(trk1);
-            }
+            //    returnTrks.Add(trk1);
+            //}
 
             return returnTrks;
         }

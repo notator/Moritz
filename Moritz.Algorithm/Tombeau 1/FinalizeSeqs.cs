@@ -13,7 +13,7 @@ namespace Moritz.Algorithm.Tombeau1
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
         /// <summary>
-        /// Adjust MidiChordDef alignments (maybe ignoring template boundaries), insert clef changes etc.
+        /// Possibly do global changes that affect all trks here (accel., rit, transpositions etc.)
         /// </summary>
         /// <param name="seqs"></param>
         private void FinalizeSeqs(List<Seq> seqs)
