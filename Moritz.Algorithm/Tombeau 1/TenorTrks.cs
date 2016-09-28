@@ -12,7 +12,7 @@ namespace Moritz.Algorithm.Tombeau1
         {
             internal int nChordsPerSubTrk;
             internal int nSubTrks;
-            internal int msDuration;
+            internal int groupMsDuration;
             internal int permuteAxisNumber;
             internal int permuteContourNumber;
             internal List<int> relativeTranspositions;
@@ -30,21 +30,18 @@ namespace Moritz.Algorithm.Tombeau1
         private List<TransformationParameters> GetTransformationParametersList(IReadOnlyList<Gamut> gamuts)
         {
             List<TransformationParameters> rList = new List<Tombeau1.TenorTrks.TransformationParameters>();
-            List<int> nSubTrksPerTrk = new List<int>() { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 };
-            List<int> nChordsPerSubTrk = new List<int>() { 8, 7, 6, 5, 4, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 4, 5, 6, 7, 8 };
-            List<int> msDurations = new List<int>() { 13000, 11800, 10600, 9400, 8200, 7000, 8200, 9400, 10600, 11800, 13000, 13000, 11800, 10600, 9400, 8200, 7000, 8200, 9400, 10600, 11800, 13000};
-
+            
             for(int i = 0; i < gamuts.Count; ++i)
             {
                 Gamut gamut = gamuts[i];
                 TransformationParameters tps = new Tombeau1.TenorTrks.TransformationParameters();
-                tps.nChordsPerSubTrk = nChordsPerSubTrk[i];
-                tps.nSubTrks = nSubTrksPerTrk[i];
-                tps.msDuration = msDurations[i];
+                tps.nChordsPerSubTrk = 8;
+                tps.nSubTrks = 6;
+                tps.groupMsDuration = 2167;
                 tps.permuteAxisNumber = 1;
                 tps.permuteContourNumber = 7;
                 tps.relativeTranspositions = new List<int>() { 0, 2, 1, 2, 2, 2, 1 };
-                tps.velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(70, true);
+                tps.velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(30, true);
                 tps.transformationPercent = (i < 2) ? 0 : (i - 2) * 5;
                 Debug.Assert(tps.transformationPercent <= 100);
 
@@ -105,8 +102,6 @@ namespace Moritz.Algorithm.Tombeau1
 
         private Trk GetTenorSeqTrk(TenorTemplate tenorTemplate, TransformationParameters tps)
         {
-            //List<int> relativeTranspositions = new List<int>() { 2, 1, 2, 2, 2, 1 };
-            //Debug.Assert(nSubTrks <= relativeTranspositions.Count);
             List<int> relativeTranspositions = tps.relativeTranspositions;
             int nSubTrks = tps.nSubTrks;
             int permuteAxisNumber = tps.permuteAxisNumber;
@@ -119,7 +114,8 @@ namespace Moritz.Algorithm.Tombeau1
 
             
             subT.SetDurationsFromPitches(2000, 1000, true, 100);
-            subT.SetDurationsFromPitches(2000, 400, true, tps.transformationPercent);
+            subT.SetDurationsFromPitches(2000, 600, true, tps.transformationPercent);
+            subT.MsDuration = tps.groupMsDuration;
             subT.SetVelocitiesFromDurations(65, 127, 100);
             subT.SetVelocityPerAbsolutePitch(tps.velocityPerAbsolutePitch, tps.transformationPercent);
 
@@ -146,8 +142,6 @@ namespace Moritz.Algorithm.Tombeau1
 
                 trk0.AddRange(subTrk);
             }
-
-            trk0.MsDuration = tps.msDuration;
 
             return trk0;
         }

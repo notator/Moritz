@@ -11,8 +11,8 @@ namespace Moritz.Algorithm.Tombeau1
             : base(0, 0, new List<IUniqueDef>(), gamut)
         {
             int rootPitch = gamut.BasePitch + (4 * 12);
-            int nPitchesPerChord = 5;
-            int nOrnamentChords = 5;
+            int nPitchesPerChord = 6;
+            int nOrnamentChords = 3;
 
             int msDuration = 1000;
             int rootIndex = Gamut.IndexOf(rootPitch);
