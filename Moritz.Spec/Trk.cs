@@ -535,6 +535,7 @@ namespace Moritz.Spec
         /// 3. Sets the MsDuration of each MidiChordDef to (percent * the values found in the duration per pitch dictionary) plus
         ///   ((100-percent)percent * the original durations). Rest msDurations are left unchanged at this stage.
         /// 4. Resets the MsDuration of the Trk to its original value.
+        /// N.B. a Debug.Assert() fails if an attempt is made to set the msDuration of a BasicMidiChordDef to zero.
         /// </summary>
         /// <param name="durationForLowestPitch"></param>
         /// <param name="durationForHighestPitch"></param>

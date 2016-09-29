@@ -10,12 +10,12 @@ namespace Moritz.Algorithm.Tombeau1
     {
         internal class TransformationParameters
         {
-            internal int nChordsPerSubTrk;
+            internal int nChordsPerGrp;
             internal int nSubTrks;
             internal int groupMsDuration;
             internal int permuteAxisNumber;
             internal int permuteContourNumber;
-            internal List<int> relativeTranspositions;
+            internal List<int> transpositions;
             internal List<byte> velocityPerAbsolutePitch;
             internal double transformationPercent;
         }
@@ -24,7 +24,9 @@ namespace Moritz.Algorithm.Tombeau1
             : base()
         {
             List<TransformationParameters> transformationParametersList = GetTransformationParametersList(gamuts);
-            Trks = GetTenorSeqTrks(gamuts, transformationParametersList);
+
+            GrpLists = GetAllTenorGrps(gamuts, transformationParametersList);
+            Trks = GetTenorSeqTrks(GrpLists);
         }
 
         private List<TransformationParameters> GetTransformationParametersList(IReadOnlyList<Gamut> gamuts)
@@ -35,12 +37,12 @@ namespace Moritz.Algorithm.Tombeau1
             for(int i = 0; i < gamuts.Count; ++i)
             {
                 TransformationParameters tps = new Tombeau1.TenorTrks.TransformationParameters();
-                tps.nChordsPerSubTrk = 8;
+                tps.nChordsPerGrp = 8;
                 tps.nSubTrks = 6;
                 tps.groupMsDuration = 2167;
                 tps.permuteAxisNumber = 1;
                 tps.permuteContourNumber = 7;
-                tps.relativeTranspositions = new List<int>() { 0, 2, 1, 2, 2, 2, 1 };
+                tps.transpositions = new List<int>() { 0, 2, 3, 5, 7, 9, 10 };
                 tps.velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(30, true);
                 //tps.transformationPercent = (i < 2) ? 0 : (i - 2) * 5;
                 tps.transformationPercent = 100;
@@ -84,67 +86,85 @@ namespace Moritz.Algorithm.Tombeau1
         /// </summary>
         /// <param name="tenorTemplates"></param>
         /// <returns></returns>
-        private IReadOnlyList<Trk> GetTenorSeqTrks(IReadOnlyList<Gamut> gamuts, List<TransformationParameters> transformationParametersList)
+        private List<List<Grp>> GetAllTenorGrps(IReadOnlyList<Gamut> gamuts, List<TransformationParameters> transformationParametersList)
         {
-            List<Trk> seqTrks = new List<Trk>();
+            List<List<Grp>> allTenorGrps = new List<List<Grp>>();
 
             for(int i = 0; i < gamuts.Count; ++i)
             {
                 TransformationParameters tps = transformationParametersList[i];
-                TenorTemplate tenorTemplate = new TenorTemplate(gamuts[i], tps.nChordsPerSubTrk);
-                
-                Trk trk = GetTenorSeqTrk(tenorTemplate, transformationParametersList[i]);
+                Gamut gamut = gamuts[i];
+                Grp tenorGrp = new Grp(gamut, gamut.BasePitch + (4 * 12), 6, 1000, tps.nChordsPerGrp);
+                SetTenorGrp(tenorGrp, transformationParametersList[i]);
 
-                seqTrks.Add(trk);
+                List<Grp> tenorGrps = GetTenorGrps(tenorGrp, transformationParametersList[i]);
+
+                allTenorGrps.Add(tenorGrps);
             }
 
+            return allTenorGrps;
+        }
+
+        private void SetTenorGrp(Grp tenorGrp, TransformationParameters tps)
+        {
+            int nOrnamentChords = 3;
+            List<byte> ornamentShape = new List<byte>() { 0, 127, 0 };
+            for(int i = 0; i < tenorGrp.UniqueDefs.Count; ++i)
+            {
+                MidiChordDef mcd = tenorGrp.UniqueDefs[i] as MidiChordDef;
+                if(mcd != null && i == 2)
+                {
+                    mcd.SetOrnament(tenorGrp.Gamut, ornamentShape, nOrnamentChords);
+                }
+            }
+
+            tenorGrp.SetDurationsFromPitches(2000, 1000, true, 100);
+            tenorGrp.SetDurationsFromPitches(2000, 600, true, tps.transformationPercent);
+            tenorGrp.MsDuration = tps.groupMsDuration;
+            tenorGrp.SetVelocitiesFromDurations(65, 127, 100);
+            tenorGrp.SetVelocityPerAbsolutePitch(tps.velocityPerAbsolutePitch, tps.transformationPercent);
+        }
+
+        private List<Trk> GetTenorSeqTrks(List<List<Grp>> grpLists)
+        {
+            List<Trk> seqTrks = new List<Trk>();
+            foreach(List<Grp> grps in grpLists)
+            {
+                // the Trk's midiChannel is set later.
+                Trk trk0 = new Trk(0, 0, new List<IUniqueDef>(), grps[0].Gamut.Clone());
+                foreach(Grp grp in grps)
+                {
+                    trk0.AddRange(grp);
+                }
+                seqTrks.Add(trk0);
+            }
             return seqTrks;
         }
 
-        private Trk GetTenorSeqTrk(TenorTemplate tenorTemplate, TransformationParameters tps)
+        private List<Grp> GetTenorGrps(Grp grp, TransformationParameters tps)
         {
-            List<int> relativeTranspositions = tps.relativeTranspositions;
+            List<int> transpositions = tps.transpositions;
             int nSubTrks = tps.nSubTrks;
             int permuteAxisNumber = tps.permuteAxisNumber;
             int permuteContourNumber = tps.permuteContourNumber;
 
-            Debug.Assert(nSubTrks <= relativeTranspositions.Count);
+            Debug.Assert(nSubTrks <= transpositions.Count);
 
-            List<Trk> trk0SubTrks = new List<Trk>();
-            Trk subT = tenorTemplate;
-
-            
-            subT.SetDurationsFromPitches(2000, 1000, true, 100);
-            subT.SetDurationsFromPitches(2000, 600, true, tps.transformationPercent);
-            subT.MsDuration = tps.groupMsDuration;
-            subT.SetVelocitiesFromDurations(65, 127, 100);
-            subT.SetVelocityPerAbsolutePitch(tps.velocityPerAbsolutePitch, tps.transformationPercent);
+            List<Grp> grps = new List<Grp>();
 
             for(int i = 0; i < nSubTrks; ++i)
             {
-                Trk subTrk = subT.Clone();
-                subTrk.TransposeInGamut(relativeTranspositions[i]);
+                Grp tGrp = grp.Clone();
+                tGrp.TransposeInGamut(transpositions[i]);
 
                 if((i % 2) == 1)
                 {
-                    subTrk.Permute(1, 7);
+                    tGrp.Permute(1, 7);
                 }
 
-                trk0SubTrks.Add(subTrk);
-                subT = subTrk;
+                grps.Add(tGrp);
             }
-
-            // the Trk's midiChannel is set later.
-            Trk trk0 = new Trk(0, 0, new List<IUniqueDef>(), tenorTemplate.Gamut.Clone());
-            foreach(Trk subTrk in trk0SubTrks)
-            {
-                MidiChordDef mcd = (MidiChordDef)subTrk.UniqueDefs[subTrk.UniqueDefs.Count - 1];
-                mcd.BeamContinues = false;
-
-                trk0.AddRange(subTrk);
-            }
-
-            return trk0;
+            return (grps);
         }
-    }
+    }       
 }

@@ -7,12 +7,12 @@ namespace Moritz.Algorithm.Tombeau1
 {
     internal class BassTrks : TrkSequence
     {
-        public BassTrks(List<Seq> seqs, IReadOnlyList<Gamut> gamuts)
+        public BassTrks(List<Seq> seqs, List<Gamut> gamuts)
             : base()
         {
             List<Trk> tenorTrks = GetTrksInChannel(seqs, 2);
             List<Trk> sopranoTrks = GetTrksInChannel(seqs, 0);
-            IReadOnlyList<BassTemplate> bassTemplates = GetBassTemplates(gamuts);
+            List<BassTemplate> bassTemplates = GetBassTemplates(gamuts);
 
             Trks = GetBassTrks(tenorTrks, sopranoTrks, bassTemplates);
         }
@@ -20,7 +20,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// <summary>
         /// Sets up standard templates that will be used in the composition.
         /// </summary>
-        private IReadOnlyList<BassTemplate> GetBassTemplates(IReadOnlyList<Gamut> gamuts)
+        private List<BassTemplate> GetBassTemplates(List<Gamut> gamuts)
         {
             List<BassTemplate> bassTemplates = new List<BassTemplate>();
 
@@ -32,7 +32,7 @@ namespace Moritz.Algorithm.Tombeau1
             return bassTemplates;
         }
 
-        private IReadOnlyList<Trk> GetBassTrks(List<Trk> tenorTrks, List<Trk> sopranoTrks, IReadOnlyList<BassTemplate> bassTemplates)
+        private List<Trk> GetBassTrks(List<Trk> tenorTrks, List<Trk> sopranoTrks, List<BassTemplate> bassTemplates)
         {
             List<Trk> returnTrks = new List<Trk>();
 

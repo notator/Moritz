@@ -7,11 +7,11 @@ namespace Moritz.Algorithm.Tombeau1
 {
     internal class SopranoTrks : TrkSequence
     {
-        public SopranoTrks(List<Seq> seqs, IReadOnlyList<Gamut> gamuts)
+        public SopranoTrks(List<Seq> seqs, List<Gamut> gamuts)
             : base()
         {
             List<Trk> tenorTrks = GetTrksInChannel(seqs, 2);
-            IReadOnlyList<SopranoTemplate> sopranoTemplates = GetSopranoTemplates(gamuts);
+            List<SopranoTemplate> sopranoTemplates = GetSopranoTemplates(gamuts);
 
             Trks = GetSopranoTrks(tenorTrks, sopranoTemplates);
         }
@@ -19,7 +19,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// <summary>
         /// Sets up standard templates that will be used in the composition.
         /// </summary>
-        private IReadOnlyList<SopranoTemplate> GetSopranoTemplates(IReadOnlyList<Gamut> gamuts)
+        private List<SopranoTemplate> GetSopranoTemplates(List<Gamut> gamuts)
         {
             List<SopranoTemplate> sopranoTemplates = new List<SopranoTemplate>();
 
@@ -31,7 +31,7 @@ namespace Moritz.Algorithm.Tombeau1
             return sopranoTemplates;
         }
 
-        private IReadOnlyList<Trk> GetSopranoTrks(List<Trk> tenorTrks, IReadOnlyList<SopranoTemplate> sopranoTemplates)
+        private List<Trk> GetSopranoTrks(List<Trk> tenorTrks, List<SopranoTemplate> sopranoTemplates)
         {
             List<Trk> returnTrks = new List<Trk>();
 

@@ -33,6 +33,7 @@ namespace Moritz.Algorithm.Tombeau1
             return trks;
         }
 
-        protected IReadOnlyList<Trk> Trks = null;
+        protected List<List<Grp>> GrpLists = null;
+        protected List<Trk> Trks = null;
     }
 }

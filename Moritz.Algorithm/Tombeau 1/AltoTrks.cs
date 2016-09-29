@@ -7,13 +7,13 @@ namespace Moritz.Algorithm.Tombeau1
 {
     internal class AltoTrks : TrkSequence
     {
-        public AltoTrks(List<Seq> seqs, IReadOnlyList<Gamut> gamuts)
+        public AltoTrks(List<Seq> seqs, List<Gamut> gamuts)
             : base()
         {
             List<Trk> tenorTrks = GetTrksInChannel(seqs, 2);
             List<Trk> sopranoTrks = GetTrksInChannel(seqs, 0);
             List<Trk> bassTrks = GetTrksInChannel(seqs, 3);
-            IReadOnlyList<AltoTemplate> altoTemplates = GetAltoTemplates(gamuts);
+            List<AltoTemplate> altoTemplates = GetAltoTemplates(gamuts);
 
             Trks = GetAltoTrks(tenorTrks, sopranoTrks, bassTrks, altoTemplates);
         }
@@ -21,7 +21,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// <summary>
         /// Sets up standard templates that will be used in the composition.
         /// </summary>
-        private IReadOnlyList<AltoTemplate> GetAltoTemplates(IReadOnlyList<Gamut> gamuts)
+        private List<AltoTemplate> GetAltoTemplates(List<Gamut> gamuts)
         {
             List<AltoTemplate> altoTemplates = new List<AltoTemplate>();
 
@@ -33,7 +33,7 @@ namespace Moritz.Algorithm.Tombeau1
             return altoTemplates;
         }
 
-        private IReadOnlyList<Trk> GetAltoTrks(List<Trk> tenorTrks, List<Trk> sopranoTrks, List<Trk> bassTrks, IReadOnlyList<AltoTemplate> altoTemplates)
+        private List<Trk> GetAltoTrks(List<Trk> tenorTrks, List<Trk> sopranoTrks, List<Trk> bassTrks, List<AltoTemplate> altoTemplates)
         {
             List<Trk> returnTrks = new List<Trk>();
 

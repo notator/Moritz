@@ -50,7 +50,7 @@
     <Compile Include="Tombeau 1\GetGamuts.cs" />
     <Compile Include="Tombeau 1\FinalizeSeqs.cs" />
     <Compile Include="Tombeau 1\AltoTemplate.cs" />
-    <Compile Include="Tombeau 1\TenorTemplate.cs" />
+    <Compile Include="Tombeau 1\Grp.cs" />
     <Compile Include="Tombeau 1\BassTrks.cs" />
     <Compile Include="Tombeau 1\AltoTrks.cs" />
     <Compile Include="Tombeau 1\SopranoTrks.cs" />

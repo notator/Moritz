@@ -450,7 +450,18 @@ namespace Moritz.Spec
             {
                 bmcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, percent);
             }
+            CheckVelocityAndSetNotatedValues();
+        }
 
+        /// <summary>
+        /// If the BasicMidiChordDefs have no velocities greater than 0, both _notatedMidiPitches and _notatedMidiVelocities
+        /// are cleared. Otherwise they are set to the pitches and velocities of the first basicMidiChordDef to have a
+        /// velocity greater than 0. Usually BasicMidiChordDefs[0]. 
+        /// If function A can set a velocity to zero, then it must call this function, and NotatedMidiPitches must be checked
+        /// when function A returns. Usually, the MidiChordDef would then be replaced by a RestDef.
+        /// </summary>
+        private void CheckVelocityAndSetNotatedValues()
+        {
             BasicMidiChordDef firstBMCDwithNoteOn = null;
             #region get firstBMCDwithNoteOn
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
@@ -481,6 +492,7 @@ namespace Moritz.Spec
         #endregion SetVelocityPerAbsolutePitch
 
         /// <summary>
+        /// N.B. This function's behaviour wrt velocities should be changed to that of SetVelocityPerAbsolutePitch() -- see above.
         /// Sets all velocities in the MidiChordDef to a value related to its msDuration.
         /// If percent has its default value 100, the new velocity will be in the same proportion between velocityForMinMsDuration
         /// and velocityForMaxMsDuration as MsDuration is between msDurationRangeMin and msDurationRangeMax.
@@ -688,6 +700,7 @@ namespace Moritz.Spec
         }
 
         /// <summary>
+        /// N.B. This function's behaviour wrt velocities should be changed to that of SetVelocityPerAbsolutePitch() -- see below. 
         /// Multiplies the velocities in NotatedMidiVelocities, and all BasicMidiChordDef.Velocities by the argument factor.
         /// If a velocity would be less than 1, it is silently coerced to 1.
         /// If a velocity would be greater than 127, it is silently coerced to 127.
