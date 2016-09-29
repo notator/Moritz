@@ -422,6 +422,8 @@ namespace Moritz.Spec
 
         #region SetVelocityPerAbsolutePitch
         /// <summary>
+        /// If either NotatedMidiPitches and NotatedMIDIVelocities is empty when this function returns,
+        /// this MidiChordDef must be replaced by a RestDef.
         /// The first argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
         /// The second (optional) argument determines the proportion of the final velocity determined by this function.
         /// The other component is the existing velocity. If percent is 100.0, the existing velocity is replaced completely.
@@ -443,22 +445,37 @@ namespace Moritz.Spec
             Debug.Assert(percent >= 0 && percent <= 100);
             Debug.Assert(this.NotatedMidiPitches.Count == NotatedMidiVelocities.Count);
             #endregion conditions
-            double factorForNewValue = percent / 100;
-            double factorForOldValue = 1 - factorForNewValue;
-            for(int pitchIndex = 0; pitchIndex < NotatedMidiPitches.Count; ++pitchIndex)
-            {
-                byte oldVelocity = NotatedMidiVelocities[pitchIndex];
-
-                int absPitch = NotatedMidiPitches[pitchIndex] % 12;
-                byte newVelocity = velocityPerAbsolutePitch[absPitch];
-                int valueToSet = (int)Math.Round((oldVelocity * factorForOldValue) + (newVelocity * factorForNewValue));
-                Debug.Assert(valueToSet >= 0 && valueToSet <= 127);
-                NotatedMidiVelocities[pitchIndex] = M.MidiValue(valueToSet); 
-            }
 
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
-                bmcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+                bmcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, percent);
+            }
+
+            BasicMidiChordDef firstBMCDwithNoteOn = null;
+            #region get firstBMCDwithNoteOn
+            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+            {
+                foreach(byte velocity in bmcd.Velocities)
+                {
+                    if(velocity > 0)
+                    {
+                        firstBMCDwithNoteOn = bmcd;
+                        break;
+                    }
+                }
+                if(firstBMCDwithNoteOn != null)
+                {
+                    break;
+                }
+            }
+            #endregion get firstBMCDwithNoteOn
+
+            _notatedMidiPitches.Clear();
+            _notatedMidiVelocities.Clear();
+            if(firstBMCDwithNoteOn != null)
+            {
+                _notatedMidiPitches.AddRange(firstBMCDwithNoteOn.Pitches);
+                _notatedMidiVelocities.AddRange(firstBMCDwithNoteOn.Velocities);
             }
         }
         #endregion SetVelocityPerAbsolutePitch

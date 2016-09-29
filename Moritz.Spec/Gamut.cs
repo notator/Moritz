@@ -388,7 +388,7 @@ namespace Moritz.Spec
 
         /// <summary>
         /// The returned list contains 12 velocity values in range [0..127].
-        /// Pitches in the gamut are given velocities in range [1..127]. Other pitches are given velocity = 1.
+        /// Pitches in the gamut are given velocities in range [1..127]. Other pitches are given velocity = 0.
         /// The returned values are in order of absolute pitch, with C natural (absolute pitch 0) at position 0,
         /// C# (absolute pitch 1) at position 1, etc.
         /// The pitch at AbsolutePitchHierarchy[0] is given velocity=127.
@@ -428,7 +428,7 @@ namespace Moritz.Spec
             List<byte> velocityPerAbsPitch = new List<byte>();
             for(int i = 0; i < 12; ++i)
             {
-                velocityPerAbsPitch.Add(1); // default value
+                velocityPerAbsPitch.Add(0); // default value
             }
 
             for(int absPitchIndex = 0; absPitchIndex < NPitchesPerOctave ; ++absPitchIndex)

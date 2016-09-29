@@ -122,15 +122,38 @@ namespace Moritz.Spec
         /// <summary>
         /// The argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
         /// For example: If the MidiChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
-        /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc. 
+        /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc.
+        /// If a pitch would have velocity==0, it is removed.
+        /// If Pitches.Count (and Velocities.Count) becomes 0, pitch=0, velocity=0 is added.
         /// </summary>
         /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
-        public void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch)
+        public void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, double percent)
         {
+            double factorForNewValue = percent / 100;
+            double factorForOldValue = 1 - factorForNewValue;
             for(int pitchIndex = 0; pitchIndex < Pitches.Count; ++pitchIndex)
             {
+                byte oldVelocity = Velocities[pitchIndex];
+
                 int absPitch = Pitches[pitchIndex] % 12;
-                Velocities[pitchIndex] = velocityPerAbsolutePitch[absPitch];
+                byte newVelocity = velocityPerAbsolutePitch[absPitch];
+                int valueToSet = (int)Math.Round((oldVelocity * factorForOldValue) + (newVelocity * factorForNewValue));
+                Debug.Assert(valueToSet >= 0 && valueToSet <= 127);
+                Velocities[pitchIndex] = M.MidiValue(valueToSet);
+            }
+
+            for(int i = Pitches.Count - 1; i >= 0; --i)
+            {
+                if(Velocities[i] == 0)
+                {
+                    Pitches.RemoveAt(i);
+                    Velocities.RemoveAt(i);
+                }
+            }
+            if(Pitches.Count == 0)
+            {
+                Pitches.Add(0);
+                Velocities.Add(0);
             }
         }
 

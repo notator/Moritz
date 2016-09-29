@@ -30,10 +30,10 @@ namespace Moritz.Algorithm.Tombeau1
         private List<TransformationParameters> GetTransformationParametersList(IReadOnlyList<Gamut> gamuts)
         {
             List<TransformationParameters> rList = new List<Tombeau1.TenorTrks.TransformationParameters>();
-            
+
+            Gamut gamut = gamuts[0];
             for(int i = 0; i < gamuts.Count; ++i)
             {
-                Gamut gamut = gamuts[i];
                 TransformationParameters tps = new Tombeau1.TenorTrks.TransformationParameters();
                 tps.nChordsPerSubTrk = 8;
                 tps.nSubTrks = 6;
@@ -42,7 +42,8 @@ namespace Moritz.Algorithm.Tombeau1
                 tps.permuteContourNumber = 7;
                 tps.relativeTranspositions = new List<int>() { 0, 2, 1, 2, 2, 2, 1 };
                 tps.velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(30, true);
-                tps.transformationPercent = (i < 2) ? 0 : (i - 2) * 5;
+                //tps.transformationPercent = (i < 2) ? 0 : (i - 2) * 5;
+                tps.transformationPercent = 100;
                 Debug.Assert(tps.transformationPercent <= 100);
 
                 rList.Add(tps);

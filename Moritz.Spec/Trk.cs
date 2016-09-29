@@ -444,12 +444,16 @@ namespace Moritz.Spec
                 Debug.Assert(v >= 0 && v <= 127);
             }
             #endregion conditions
-            foreach(IUniqueDef iud in UniqueDefs)
+            for(int i = 0; i < UniqueDefs.Count; ++i)
             {
-                MidiChordDef mcd = iud as MidiChordDef;
+                MidiChordDef mcd = UniqueDefs[i] as MidiChordDef;
                 if(mcd != null)
                 {
                     mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, percent);
+                    if(mcd.NotatedMidiPitches.Count == 0)
+                    {
+                        Replace(i, new RestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
+                    }
                 }
             }
         }
