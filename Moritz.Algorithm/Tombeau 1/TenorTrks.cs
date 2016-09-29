@@ -11,8 +11,8 @@ namespace Moritz.Algorithm.Tombeau1
         internal class TransformationParameters
         {
             internal int nChordsPerGrp;
-            internal int nSubTrks;
-            internal int groupMsDuration;
+            internal int nGrpsPerGamut;
+            internal int grpMsDuration;
             internal int permuteAxisNumber;
             internal int permuteContourNumber;
             internal List<int> transpositions;
@@ -38,8 +38,8 @@ namespace Moritz.Algorithm.Tombeau1
             {
                 TransformationParameters tps = new Tombeau1.TenorTrks.TransformationParameters();
                 tps.nChordsPerGrp = 8;
-                tps.nSubTrks = 6;
-                tps.groupMsDuration = 2167;
+                tps.nGrpsPerGamut = 6;
+                tps.grpMsDuration = 2167;
                 tps.permuteAxisNumber = 1;
                 tps.permuteContourNumber = 7;
                 tps.transpositions = new List<int>() { 0, 2, 3, 5, 7, 9, 10 };
@@ -120,7 +120,7 @@ namespace Moritz.Algorithm.Tombeau1
 
             tenorGrp.SetDurationsFromPitches(2000, 1000, true, 100);
             tenorGrp.SetDurationsFromPitches(2000, 600, true, tps.transformationPercent);
-            tenorGrp.MsDuration = tps.groupMsDuration;
+            tenorGrp.MsDuration = tps.grpMsDuration;
             tenorGrp.SetVelocitiesFromDurations(65, 127, 100);
             tenorGrp.SetVelocityPerAbsolutePitch(tps.velocityPerAbsolutePitch, tps.transformationPercent);
         }
@@ -144,25 +144,25 @@ namespace Moritz.Algorithm.Tombeau1
         private List<Grp> GetTenorGrps(Grp grp, TransformationParameters tps)
         {
             List<int> transpositions = tps.transpositions;
-            int nSubTrks = tps.nSubTrks;
+            int nGrpsPerGamut = tps.nGrpsPerGamut;
             int permuteAxisNumber = tps.permuteAxisNumber;
             int permuteContourNumber = tps.permuteContourNumber;
 
-            Debug.Assert(nSubTrks <= transpositions.Count);
+            Debug.Assert(nGrpsPerGamut <= transpositions.Count);
 
             List<Grp> grps = new List<Grp>();
 
-            for(int i = 0; i < nSubTrks; ++i)
+            for(int i = 0; i < nGrpsPerGamut; ++i)
             {
-                Grp tGrp = grp.Clone();
-                tGrp.TransposeInGamut(transpositions[i]);
+                Grp localGrp = grp.Clone();
+                localGrp.TransposeInGamut(transpositions[i]);
 
                 if((i % 2) == 1)
                 {
-                    tGrp.Permute(1, 7);
+                    localGrp.Permute(1, 7);
                 }
 
-                grps.Add(tGrp);
+                grps.Add(localGrp);
             }
             return (grps);
         }
