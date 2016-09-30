@@ -79,7 +79,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// Inserts the trk's UniqueDefs in the list at the given index, and then
         /// resets the positions of all the uniqueDefs in the list.
         /// </summary>
-        public new void InsertRange(int index, Trk trk)
+        public override void InsertRange(int index, Trk trk)
         {
             base.InsertRange(index, trk);
             SetBeamEnd();
@@ -87,7 +87,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// <summary>
         /// Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
         /// </summary>
-        public new void Replace(int index, IUniqueDef replacementIUnique)
+        public override void Replace(int index, IUniqueDef replacementIUnique)
         {
             base.Replace(index, replacementIUnique);
             SetBeamEnd();
@@ -106,16 +106,73 @@ namespace Moritz.Algorithm.Tombeau1
         /// trk2's UniqueDefs are not cloned.
         /// </summary>
         /// <returns>this</returns>
-        public new Trk Superimpose(Trk trk2)
+        public override Trk Superimpose(Trk trk2)
         {
             Trk trk = base.Superimpose(trk2);
             SetBeamEnd();
-
             return trk;
         }
         #endregion Add, Remove, Insert, Replace objects in the Trk
 
-        public new void Permute(int axisNumber, int contourNumber)
+        #region Changing MidiChordDef attributes
+
+        /// <summary>
+        /// Preserves the MsDuration of the Trk as a whole by resetting it after doing the following:
+        /// 1. Creates a sorted list of the unique bottom or top pitches in all the MidiChordDefs in the Trk.
+        ///    The use of the bottom or top pitch is controlled by argument 3: useBottomPitch.
+        /// 2. Creates a duration per pitch dictionary, whereby durationPerPitch[lowestPitch] is durationForLowestPitch
+        ///    and durationPerPitch[lowestPitch] is durationForHighestPitch. The intermediate duration values are
+        ///    interpolated logarithmically.
+        /// 3. Sets the MsDuration of each MidiChordDef to (percent * the values found in the duration per pitch dictionary) plus
+        ///   ((100-percent)percent * the original durations). Rest msDurations are left unchanged at this stage.
+        /// 4. Resets the MsDuration of the Trk to its original value.
+        /// N.B. a Debug.Assert() fails if an attempt is made to set the msDuration of a BasicMidiChordDef to zero.
+        /// </summary>
+        /// <param name="durationForLowestPitch"></param>
+        /// <param name="durationForHighestPitch"></param>
+        public override void SetDurationsFromPitches(int durationForLowestPitch, int durationForHighestPitch, bool useBottomPitch, double percent = 100.0)
+        {
+            base.SetDurationsFromPitches(durationForLowestPitch, durationForHighestPitch, useBottomPitch, percent);
+            SetBeamEnd();
+        }
+
+        /// <summary>
+        /// Multiplies each velocity value in the MidiChordDefs
+        /// from beginIndex to (not including) endIndex by the argument factor.
+        /// </summary>
+        public override void AdjustVelocities(int beginIndex, int endIndex, double factor)
+        {
+            base.AdjustVelocities(beginIndex, endIndex, factor);
+            SetBeamEnd();
+        }
+        /// <summary>
+        /// Multiplies each velocity value in the MidiChordDefs by the argument factor.
+        /// </summary>
+        public override void AdjustVelocities(double factor)
+        {
+            base.AdjustVelocities(factor);
+            SetBeamEnd();
+        }
+
+        /// Creates a hairpin in the velocities from startMsPosition to endMsPosition (non-inclusive).
+        /// This function does NOT change velocities outside the range given in its arguments.
+        /// There must be at least two IUniqueDefs in the msPosition range given in the arguments.
+        /// The factors by which the velocities are multiplied change arithmetically:
+        /// The velocity of the first IUniqueDefs is multiplied by startFactor, and the velocity
+        /// of the last MidiChordDef in range by endFactor.
+        /// Can be used to create a diminueno or crescendo.
+        /// <param name="startMsPosition">MsPositionReFirstIUD</param>
+        /// <param name="endMsPosition">MsPositionReFirstIUD</param>
+        /// <param name="startFactor"></param>
+        /// <param name="endFactor"></param>
+        public override void AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
+        {
+            base.AdjustVelocitiesHairpin(startMsPosition, endMsPosition, startFactor, endFactor);
+            SetBeamEnd();
+        }
+        #endregion Changing MidiChordDef attributes
+
+        public override void Permute(int axisNumber, int contourNumber)
         {
             base.Permute(axisNumber, contourNumber);
             SetBeamEnd(); // the final MidiChordDef may have moved
@@ -125,13 +182,46 @@ namespace Moritz.Algorithm.Tombeau1
 
         /***********************/
         #region Trk functions that change the velocities in MidiChordDefs
-
-        public new void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, double percent = 100.0)
+        /// <summary>
+        /// The first argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
+        /// The second (optional) argument determines the proportion of the final velocity determined by this function.
+        /// The other component is the existing velocity. If percent is 100.0, the existing velocity is replaced completely.
+        /// For example: If the MidiChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
+        /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc.
+        /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef. 
+        /// </summary>
+        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
+        /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
+        public override void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, double percent = 100.0)
         {
             base.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, percent);
             SetBeamEnd(); // the final MidiChordDef may have been replaced by a RestDef
         }
-
+        /// <summary>
+        /// Sets the velocity of each MidiChordDef in the Trk (anti-)proportionally to its duration.
+        /// The (optional) percent argument determines the proportion of the final velocity for which this function is responsible.
+        /// The other component of the final velocity value is its existing velocity. If percent is 100.0, the existing velocity
+        /// is replaced completely.
+        /// N.B 1) Neither velocityForMinMsDuration nor velocityForMaxMsDuration can be zero! -- that would be a NoteOff.
+        /// and 2) velocityForMinMsDuration can be less than, equal to, or greater than velocityForMaxMsDuration.
+        /// </summary>
+        /// <param name="velocityForMinMsDuration">in range 1..127</param>
+        /// <param name="velocityForMaxMsDuration">in range 1..127</param>
+        public override void SetVelocitiesFromDurations(byte velocityForMinMsDuration, byte velocityForMaxMsDuration, double percent = 100.0)
+        {
+            base.SetVelocitiesFromDurations(velocityForMinMsDuration, velocityForMaxMsDuration, percent);
+            SetBeamEnd();
+        }
+        /// <summary>
+        /// The arguments are both in range [1..127].
+        /// This function calls MidiChordDef.SetVerticalVelocityGradient(rootVelocity, topVelocity)
+        /// on all the MidiChordDefs in the Trk. 
+        /// </summary>
+        public override void SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
+        {
+            base.SetVerticalVelocityGradient(rootVelocity, topVelocity);
+            SetBeamEnd();
+        }
         #endregion Trk functions that change the velocities in MidiChordDefs
         /***********************/
 

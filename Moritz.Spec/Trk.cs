@@ -128,14 +128,14 @@ namespace Moritz.Spec
         /// Inserts the trk's UniqueDefs in the list at the given index, and then
         /// resets the positions of all the uniqueDefs in the list.
         /// </summary>
-        public void InsertRange(int index, Trk trk)
+        public virtual void InsertRange(int index, Trk trk)
         {
             _InsertRange(index, trk);
         }
         /// <summary>
         /// Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
         /// </summary>
-        public void Replace(int index, IUniqueDef replacementIUnique)
+        public virtual void Replace(int index, IUniqueDef replacementIUnique)
         {
             Debug.Assert(replacementIUnique is MidiChordDef || replacementIUnique is RestDef);
             _Replace(index, replacementIUnique);
@@ -155,7 +155,7 @@ namespace Moritz.Spec
         /// trk2's UniqueDefs are not cloned.
         /// </summary>
         /// <returns>this</returns>
-        public Trk Superimpose(Trk trk2)
+        public virtual Trk Superimpose(Trk trk2)
         {
             Debug.Assert(MidiChannel == trk2.MidiChannel);
             if(this.Gamut != trk2.Gamut)
@@ -434,7 +434,7 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
         /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
-        public void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, double percent = 100.0)
+        public virtual void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, double percent = 100.0)
         {
             #region conditions
             Debug.Assert(velocityPerAbsolutePitch.Count == 12);
@@ -469,7 +469,7 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="velocityForMinMsDuration">in range 1..127</param>
         /// <param name="velocityForMaxMsDuration">in range 1..127</param>
-        public void SetVelocitiesFromDurations(byte velocityForMinMsDuration, byte velocityForMaxMsDuration, double percent = 100.0)
+        public virtual void SetVelocitiesFromDurations(byte velocityForMinMsDuration, byte velocityForMaxMsDuration, double percent = 100.0)
         {
             Debug.Assert(velocityForMinMsDuration >= 1 && velocityForMinMsDuration <= 127);
             Debug.Assert(velocityForMaxMsDuration >= 1 && velocityForMaxMsDuration <= 127);
@@ -505,7 +505,7 @@ namespace Moritz.Spec
         /// This function calls MidiChordDef.SetVerticalVelocityGradient(rootVelocity, topVelocity)
         /// on all the MidiChordDefs in the Trk. 
         /// </summary>
-        public void SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
+        public virtual void SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
         {
             #region conditions
             Debug.Assert(rootVelocity > 0 && rootVelocity <= 127);
@@ -539,7 +539,7 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="durationForLowestPitch"></param>
         /// <param name="durationForHighestPitch"></param>
-        public void SetDurationsFromPitches(int durationForLowestPitch, int durationForHighestPitch, bool useBottomPitch, double percent = 100.0)
+        public virtual void SetDurationsFromPitches(int durationForLowestPitch, int durationForHighestPitch, bool useBottomPitch, double percent = 100.0)
         {
             Debug.Assert(percent >= 0 && percent <= 100);
 
@@ -629,7 +629,7 @@ namespace Moritz.Spec
         /// Multiplies each velocity value in the MidiChordDefs
         /// from beginIndex to (not including) endIndex by the argument factor.
         /// </summary>
-        public void AdjustVelocities(int beginIndex, int endIndex, double factor)
+        public virtual void AdjustVelocities(int beginIndex, int endIndex, double factor)
         {
             CheckIndices(beginIndex, endIndex);
             for(int i = beginIndex; i < endIndex; ++i)
@@ -644,7 +644,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Multiplies each velocity value in the MidiChordDefs by the argument factor.
         /// </summary>
-        public void AdjustVelocities(double factor)
+        public virtual void AdjustVelocities(double factor)
         {
             foreach(MidiChordDef mcd in MidiChordDefs)
             {
@@ -663,7 +663,7 @@ namespace Moritz.Spec
         /// <param name="endMsPosition">MsPositionReFirstIUD</param>
         /// <param name="startFactor"></param>
         /// <param name="endFactor"></param>
-        public void AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
+        public virtual void AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
         {
             int beginIndex = FindIndexAtMsPositionReFirstIUD(startMsPosition);
             int endIndex = FindIndexAtMsPositionReFirstIUD(endMsPosition);
@@ -906,7 +906,7 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="axisNumber">A value greater than or equal to 1, and less than or equal to 12 An exception is thrown if this is not the case.</param>
         /// <param name="contourNumber">A value greater than or equal to 1, and less than or equal to 12. An exception is thrown if this is not the case.</param>
-        public void Permute(int axisNumber, int contourNumber)
+        public virtual void Permute(int axisNumber, int contourNumber)
         {
             Debug.Assert(!(contourNumber < 1 || contourNumber > 12), "contourNumber out of range 1..12");
             Debug.Assert(!(axisNumber < 1 || axisNumber > 12), "axisNumber out of range 1..12");
@@ -1402,7 +1402,7 @@ namespace Moritz.Spec
         #endregion Re-ordering the Trk's UniqueDefs
 
         #region Enumerators
-        private IEnumerable<MidiChordDef> MidiChordDefs
+        protected IEnumerable<MidiChordDef> MidiChordDefs
         {
             get
             {
