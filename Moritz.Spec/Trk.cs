@@ -1026,7 +1026,7 @@ namespace Moritz.Spec
         /// to UniqueDefs.Count.</para>
         /// <para>An Exception is thrown if any of these conditions is not met.</para>
         /// <para>If the partitions list contains only one value, this function returns silently without doing anything.</para></param>
-        public void PermutePartitions(int axisNumber, int contourNumber, List<int> partitionSizes)
+        public virtual void PermutePartitions(int axisNumber, int contourNumber, List<int> partitionSizes)
         {
             CheckPermutePartitionsArgs(axisNumber, contourNumber, partitionSizes);
 
@@ -1162,12 +1162,12 @@ namespace Moritz.Spec
 
         #region SortByRootNotatedPitch
 
-        public void SortRootNotatedPitchAscending()
+        public virtual void SortRootNotatedPitchAscending()
         {
             SortByRootNotatedPitch(true);
         }
 
-        public void SortRootNotatedPitchDescending()
+        public virtual void SortRootNotatedPitchDescending()
         {
             SortByRootNotatedPitch(false);
         }
@@ -1180,7 +1180,7 @@ namespace Moritz.Spec
         /// 4. The MidiChordDefs are sorted similarly.
         /// 5. Rests are re-inserted at their original positions.
         /// </summary>
-        private void SortByRootNotatedPitch(bool ascending)
+        protected void SortByRootNotatedPitch(bool ascending)
         {
             Debug.Assert(!(Container is Block), "Cannot sort inside a Block.");
 
@@ -1218,12 +1218,12 @@ namespace Moritz.Spec
 
         #region SortByVelocity
 
-        public void SortVelocityIncreasing()
+        public virtual void SortVelocityIncreasing()
         {
             SortByVelocity(true);
         }
 
-        public void SortVelocityDecreasing()
+        public virtual void SortVelocityDecreasing()
         {
             SortByVelocity(false);
         }
@@ -1236,7 +1236,7 @@ namespace Moritz.Spec
         /// 4. The MidiChordDefs are sorted similarly.
         /// 5. Rests are re-inserted at their original positions.
         /// </summary>
-        private void SortByVelocity(bool increasing)
+        protected void SortByVelocity(bool increasing)
         {
             Debug.Assert(!(Container is Block), "Cannot sort inside a Block.");
 

@@ -115,6 +115,48 @@ namespace Moritz.Algorithm.Tombeau1
         #endregion Add, Remove, Insert, Replace objects in the Trk
 
         #region Changing MidiChordDef attributes
+        #region Trk functions that change the velocities in MidiChordDefs
+        /// <summary>
+        /// The first argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
+        /// The second (optional) argument determines the proportion of the final velocity determined by this function.
+        /// The other component is the existing velocity. If percent is 100.0, the existing velocity is replaced completely.
+        /// For example: If the MidiChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
+        /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc.
+        /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef. 
+        /// </summary>
+        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
+        /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
+        public override void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, double percent = 100.0)
+        {
+            base.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, percent);
+            SetBeamEnd(); // the final MidiChordDef may have been replaced by a RestDef
+        }
+        /// <summary>
+        /// Sets the velocity of each MidiChordDef in the Trk (anti-)proportionally to its duration.
+        /// The (optional) percent argument determines the proportion of the final velocity for which this function is responsible.
+        /// The other component of the final velocity value is its existing velocity. If percent is 100.0, the existing velocity
+        /// is replaced completely.
+        /// N.B 1) Neither velocityForMinMsDuration nor velocityForMaxMsDuration can be zero! -- that would be a NoteOff.
+        /// and 2) velocityForMinMsDuration can be less than, equal to, or greater than velocityForMaxMsDuration.
+        /// </summary>
+        /// <param name="velocityForMinMsDuration">in range 1..127</param>
+        /// <param name="velocityForMaxMsDuration">in range 1..127</param>
+        public override void SetVelocitiesFromDurations(byte velocityForMinMsDuration, byte velocityForMaxMsDuration, double percent = 100.0)
+        {
+            base.SetVelocitiesFromDurations(velocityForMinMsDuration, velocityForMaxMsDuration, percent);
+            SetBeamEnd();
+        }
+        /// <summary>
+        /// The arguments are both in range [1..127].
+        /// This function calls MidiChordDef.SetVerticalVelocityGradient(rootVelocity, topVelocity)
+        /// on all the MidiChordDefs in the Trk. 
+        /// </summary>
+        public override void SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
+        {
+            base.SetVerticalVelocityGradient(rootVelocity, topVelocity);
+            SetBeamEnd();
+        }
+        #endregion Trk functions that change the velocities in MidiChordDefs
 
         /// <summary>
         /// Preserves the MsDuration of the Trk as a whole by resetting it after doing the following:
@@ -171,59 +213,53 @@ namespace Moritz.Algorithm.Tombeau1
             SetBeamEnd();
         }
         #endregion Changing MidiChordDef attributes
-
+        #region Re-ordering the UniqueDefs
         public override void Permute(int axisNumber, int contourNumber)
         {
             base.Permute(axisNumber, contourNumber);
-            SetBeamEnd(); // the final MidiChordDef may have moved
+            SetBeamEnd();
         }
-
+        /// <summary>
+        /// Re-orders up to 7 partitions in this Trk's UniqueDefs list. The content of each partition is not changed. The Trk's AxisIndex property is set.
+        /// <para>1. Creates partitions (lists of UniqueDefs) using the partitionSizes in the third argument.</para>  
+        /// <para>2. Re-orders the partitions according to the contour retrieved (from the static K.Contour[] array) using the axisNumber and contourNumber arguments.</para>
+        /// <para>3. Resets the UniqueDefs list to the concatenation of the re-ordered partitions.</para>
+        /// </summary>
+        /// <param name="axisNumber">A value greater than or equal to 1, and less than or equal to 12 An exception is thrown if this is not the case.</param>
+        /// <param name="contourNumber">A value greater than or equal to 1, and less than or equal to 12. An exception is thrown if this is not the case.</param>
+        /// <param name="partitionSizes">The number of UniqueDefs in each partition to be re-ordered.
+        /// <para>This partitionSizes list must contain 1..7 partition sizes. The sizes must all be greater than 0. The sum of all the sizes must be equal
+        /// to UniqueDefs.Count.</para>
+        /// <para>An Exception is thrown if any of these conditions is not met.</para>
+        /// <para>If the partitions list contains only one value, this function returns silently without doing anything.</para></param>
+        public override void PermutePartitions(int axisNumber, int contourNumber, List<int> partitionSizes)
+        {
+            base.PermutePartitions(axisNumber, contourNumber, partitionSizes);
+            SetBeamEnd();
+        }
+        public override void SortRootNotatedPitchAscending()
+        {
+            SortByRootNotatedPitch(true);
+            SetBeamEnd();
+        }
+        public override void SortRootNotatedPitchDescending()
+        {
+            SortByRootNotatedPitch(false);
+            SetBeamEnd();
+        }
+        public override void SortVelocityIncreasing()
+        {
+            SortByVelocity(true);
+            SetBeamEnd();
+        }
+        public override void SortVelocityDecreasing()
+        {
+            SortByVelocity(false);
+            SetBeamEnd();
+        }
+        #endregion Re-ordering the UniqueDefs
         #endregion Trk functions that change the sequence or number of MidiChordDefs
 
-        /***********************/
-        #region Trk functions that change the velocities in MidiChordDefs
-        /// <summary>
-        /// The first argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
-        /// The second (optional) argument determines the proportion of the final velocity determined by this function.
-        /// The other component is the existing velocity. If percent is 100.0, the existing velocity is replaced completely.
-        /// For example: If the MidiChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
-        /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc.
-        /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef. 
-        /// </summary>
-        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
-        /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
-        public override void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, double percent = 100.0)
-        {
-            base.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, percent);
-            SetBeamEnd(); // the final MidiChordDef may have been replaced by a RestDef
-        }
-        /// <summary>
-        /// Sets the velocity of each MidiChordDef in the Trk (anti-)proportionally to its duration.
-        /// The (optional) percent argument determines the proportion of the final velocity for which this function is responsible.
-        /// The other component of the final velocity value is its existing velocity. If percent is 100.0, the existing velocity
-        /// is replaced completely.
-        /// N.B 1) Neither velocityForMinMsDuration nor velocityForMaxMsDuration can be zero! -- that would be a NoteOff.
-        /// and 2) velocityForMinMsDuration can be less than, equal to, or greater than velocityForMaxMsDuration.
-        /// </summary>
-        /// <param name="velocityForMinMsDuration">in range 1..127</param>
-        /// <param name="velocityForMaxMsDuration">in range 1..127</param>
-        public override void SetVelocitiesFromDurations(byte velocityForMinMsDuration, byte velocityForMaxMsDuration, double percent = 100.0)
-        {
-            base.SetVelocitiesFromDurations(velocityForMinMsDuration, velocityForMaxMsDuration, percent);
-            SetBeamEnd();
-        }
-        /// <summary>
-        /// The arguments are both in range [1..127].
-        /// This function calls MidiChordDef.SetVerticalVelocityGradient(rootVelocity, topVelocity)
-        /// on all the MidiChordDefs in the Trk. 
-        /// </summary>
-        public override void SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
-        {
-            base.SetVerticalVelocityGradient(rootVelocity, topVelocity);
-            SetBeamEnd();
-        }
-        #endregion Trk functions that change the velocities in MidiChordDefs
-        /***********************/
 
         /// <summary>
         /// Sets BeamContinues to false on the final MidiChordDef, and true on all the others.
