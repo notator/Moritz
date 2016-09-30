@@ -6,8 +6,20 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-    internal class TrkSequence
+    internal abstract class TrkSequence
     {
+        internal class TransformationParameters
+        {
+            internal int nChordsPerGrp;
+            internal int nGrpsPerGamut;
+            internal int grpMsDuration;
+            internal int permuteAxisNumber;
+            internal int permuteContourNumber;
+            internal List<int> transpositions;
+            internal List<byte> velocityPerAbsolutePitch;
+            internal double transformationPercent;
+        }
+
         protected TrkSequence()
         {
         }
@@ -23,15 +35,7 @@ namespace Moritz.Algorithm.Tombeau1
 
         public int Count { get { return Trks.Count; } }
 
-        protected static List<Trk> GetTrksInChannel(List<Seq> seqs, int channel)
-        {
-            List<Trk> trks = new List<Trk>();
-            foreach(Seq seq in seqs)
-            {
-                trks.Add(seq.Trks[channel]);
-            }
-            return trks;
-        }
+        protected abstract List<Grp> GetTrkGrps(Grp grp, TransformationParameters tps);
 
         protected List<List<Grp>> GrpLists = null;
         protected List<Trk> Trks = null;

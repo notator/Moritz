@@ -359,14 +359,14 @@ namespace Moritz.Algorithm.Tombeau1
             TenorTrks tenorTrks = new TenorTrks(gamuts);
             AddTrksToSeqs(seqs, tenorTrks, MidiChannelIndexPerOutputVoice[2]);
 
-            //SopranoTrks sopranoTrks = new SopranoTrks(seqs, gamuts);
-            //AddTrksToSeqs(seqs, sopranoTrks, MidiChannelIndexPerOutputVoice[0]);
+            SopranoTrks sopranoTrks = new SopranoTrks(tenorTrks, gamuts);
+            AddTrksToSeqs(seqs, sopranoTrks, MidiChannelIndexPerOutputVoice[0]);
 
-            //BassTrks bassTrks = new BassTrks(seqs, gamuts);
-            //AddTrksToSeqs(seqs, bassTrks, MidiChannelIndexPerOutputVoice[3]);
+            BassTrks bassTrks = new BassTrks(sopranoTrks, tenorTrks, gamuts);
+            AddTrksToSeqs(seqs, bassTrks, MidiChannelIndexPerOutputVoice[3]);
 
-            //AltoTrks altoTrks = new AltoTrks(seqs, gamuts);
-            //AddTrksToSeqs(seqs, altoTrks, MidiChannelIndexPerOutputVoice[1]);
+            AltoTrks altoTrks = new AltoTrks(sopranoTrks, tenorTrks, bassTrks, gamuts);
+            AddTrksToSeqs(seqs, altoTrks, MidiChannelIndexPerOutputVoice[1]);
 
             //Possibly do global changes that affect all trks here (accel., rit, transpositions etc.)
             FinalizeSeqs(seqs);

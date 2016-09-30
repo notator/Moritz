@@ -8,18 +8,6 @@ namespace Moritz.Algorithm.Tombeau1
 {
     internal class TenorTrks : TrkSequence
     {
-        internal class TransformationParameters
-        {
-            internal int nChordsPerGrp;
-            internal int nGrpsPerGamut;
-            internal int grpMsDuration;
-            internal int permuteAxisNumber;
-            internal int permuteContourNumber;
-            internal List<int> transpositions;
-            internal List<byte> velocityPerAbsolutePitch;
-            internal double transformationPercent;
-        }
-
         public TenorTrks(IReadOnlyList<Gamut> gamuts)
             : base()
         {
@@ -97,7 +85,7 @@ namespace Moritz.Algorithm.Tombeau1
                 Grp tenorGrp = new Grp(gamut, gamut.BasePitch + (4 * 12), 6, 1000, tps.nChordsPerGrp);
                 SetTenorGrp(tenorGrp, transformationParametersList[i]);
 
-                List<Grp> tenorGrps = GetTenorGrps(tenorGrp, transformationParametersList[i]);
+                List<Grp> tenorGrps = GetTrkGrps(tenorGrp, transformationParametersList[i]);
 
                 allTenorGrps.Add(tenorGrps);
             }
@@ -141,7 +129,7 @@ namespace Moritz.Algorithm.Tombeau1
             return seqTrks;
         }
 
-        private List<Grp> GetTenorGrps(Grp grp, TransformationParameters tps)
+        protected override List<Grp> GetTrkGrps(Grp grp, TransformationParameters tps)
         {
             List<int> transpositions = tps.transpositions;
             int nGrpsPerGamut = tps.nGrpsPerGamut;

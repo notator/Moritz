@@ -7,87 +7,143 @@ namespace Moritz.Algorithm.Tombeau1
 {
     internal class BassTrks : TrkSequence
     {
-        public BassTrks(List<Seq> seqs, List<Gamut> gamuts)
+        public BassTrks(SopranoTrks sopranoTrks, TenorTrks tenorTrks, List<Gamut> gamuts)
             : base()
         {
-            List<Trk> tenorTrks = GetTrksInChannel(seqs, 2);
-            List<Trk> sopranoTrks = GetTrksInChannel(seqs, 0);
-            List<BassTemplate> bassTemplates = GetBassTemplates(gamuts);
+            List<TransformationParameters> transformationParametersList = GetTransformationParametersList(gamuts);
 
-            Trks = GetBassTrks(tenorTrks, sopranoTrks, bassTemplates);
+            GrpLists = GetAllBassGrps(gamuts, transformationParametersList);
+
+            Trks = GetBassTrks(sopranoTrks, tenorTrks, GrpLists);
         }
 
-        /// <summary>
-        /// Sets up standard templates that will be used in the composition.
-        /// </summary>
-        private List<BassTemplate> GetBassTemplates(List<Gamut> gamuts)
+        private List<TransformationParameters> GetTransformationParametersList(IReadOnlyList<Gamut> gamuts)
         {
-            List<BassTemplate> bassTemplates = new List<BassTemplate>();
+            List<TransformationParameters> rList = new List<TransformationParameters>();
+
+            Gamut gamut = gamuts[0];
+            for(int i = 0; i < gamuts.Count; ++i)
+            {
+                TransformationParameters tps = new TransformationParameters();
+                // TODO -- customise for bassGrps
+                tps.nChordsPerGrp = 8;
+                tps.nGrpsPerGamut = 6;
+                tps.grpMsDuration = 2167;
+                tps.permuteAxisNumber = 1;
+                tps.permuteContourNumber = 7;
+                tps.transpositions = new List<int>() { 0, 2, 3, 5, 7, 9, 10 };
+                tps.velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(30, true);
+                //tps.transformationPercent = (i < 2) ? 0 : (i - 2) * 5;
+                tps.transformationPercent = 100;
+                Debug.Assert(tps.transformationPercent <= 100);
+
+                rList.Add(tps);
+            }
+            return rList;
+        }
+
+        #region GetAllBassGrps
+        private List<List<Grp>> GetAllBassGrps(IReadOnlyList<Gamut> gamuts, List<TransformationParameters> transformationParametersList)
+        {
+            List<List<Grp>> allBassGrps = new List<List<Grp>>();
 
             for(int i = 0; i < gamuts.Count; ++i)
             {
+                TransformationParameters tps = transformationParametersList[i];
                 Gamut gamut = gamuts[i];
-                bassTemplates.Add(new BassTemplate(gamut));
+                Grp bassGrp = new Grp(gamut, gamut.BasePitch + (2 * 12), 6, 1000, tps.nChordsPerGrp);
+                SetBassGrp(bassGrp, transformationParametersList[i]);
+
+                List<Grp> tenorGrps = GetTrkGrps(bassGrp, transformationParametersList[i]);
+
+                allBassGrps.Add(tenorGrps);
             }
-            return bassTemplates;
+
+            return allBassGrps;
         }
-
-        private List<Trk> GetBassTrks(List<Trk> tenorTrks, List<Trk> sopranoTrks, List<BassTemplate> bassTemplates)
+        private void SetBassGrp(Grp bassGrp, TransformationParameters tps)
         {
-            List<Trk> returnTrks = new List<Trk>();
+            int nOrnamentChords = 5;
+            List<byte> ornamentShape = new List<byte>() { 0, 127, 0 };
 
-            //Debug.Assert(trk0s.Count == bassTemplates.Count);
+            for(int i = 0; i < bassGrp.UniqueDefs.Count; ++i)
+            {
+                MidiChordDef mcd = bassGrp.UniqueDefs[i] as MidiChordDef;
+                if(mcd != null && i == 2)
+                {
+                    mcd.SetOrnament(bassGrp.Gamut, ornamentShape, nOrnamentChords);
+                }
+            }
 
-            //int nTrks = bassTemplates.Count;
+            bassGrp.SetDurationsFromPitches(2000, 1000, true, 100);
+            bassGrp.SetDurationsFromPitches(2000, 600, true, tps.transformationPercent);
+            bassGrp.MsDuration = tps.grpMsDuration;
+            bassGrp.SetVelocitiesFromDurations(65, 127, 100);
+            bassGrp.SetVelocityPerAbsolutePitch(tps.velocityPerAbsolutePitch, tps.transformationPercent);
+        }
+        protected override List<Grp> GetTrkGrps(Grp grp, TransformationParameters tps)
+        {
+            List<int> transpositions = tps.transpositions;
+            int nGrpsPerGamut = tps.nGrpsPerGamut;
+            int permuteAxisNumber = tps.permuteAxisNumber;
+            int permuteContourNumber = tps.permuteContourNumber;
 
+            Debug.Assert(nGrpsPerGamut <= transpositions.Count);
 
-            //for(int i = 0; i < nTrks; ++i)
-            //{
-            //    Debug.Assert(trk0s[i].UniqueDefs.Count > 0);
+            List<Grp> grps = new List<Grp>();
 
-            //    Trk trk0 = trk0s[i];
-            //    Trk trkA = bassTemplates[0].Clone();
-            //    Trk trkB = bassTemplates[i].Clone();
+            for(int i = 0; i < nGrpsPerGamut; ++i)
+            {
+                Grp localGrp = grp.Clone();
+                localGrp.TransposeInGamut(transpositions[i]);
 
-            //    trkB.MsPositionReContainer = 6000;
+                if((i % 2) == 1)
+                {
+                    localGrp.Permute(1, 7);
+                }
 
-            //    trkA.MsDuration = 3000;
-            //    trkB.MsDuration = 3000;
+                grps.Add(localGrp);
+            }
+            return (grps);
+        }
+        #endregion GetAllBassGrps
 
-            //    int indexToAlign = trkA.Count - 1;
-            //    int msPositionReContainer = trk0.UniqueDefs[15].MsPositionReFirstUD;
-            //    trkA.AlignObjectAtIndex(indexToAlign, msPositionReContainer);
+        private List<Trk> GetBassTrks(SopranoTrks sopranoTrks, TenorTrks tenorTrks, List<List<Grp>> grpLists)
+        {
+            List<Trk> bassTrks = new List<Trk>();
+            int nTrks = tenorTrks.Count;
 
-            //    indexToAlign = trkB.Count - 1;
-            //    msPositionReContainer = trk0.UniqueDefs[31].MsPositionReFirstUD;
-            //    trkB.AlignObjectAtIndex(indexToAlign, msPositionReContainer);
+            // N.B. sopranoTrks and tenorTrks can be indexed to return a Trk! :-))
 
-            //    byte newPitch = 47;
-            //    MidiChordDef mcd = new MidiChordDef(new List<byte>() { newPitch }, new List<byte>() { 127 }, 500, true);
-            //    Trk trkB1 = new Trk(trkB.MidiChannel, 0, new List<IUniqueDef>() { mcd });
+            /*********** TODO customise for bass ********************/
+            List<int> trk1MsDurations = new List<int>()
+            { 11100, 11200, 11300, 11400, 11500, 11600, 11700, 11800, 11900, 12000, 12100, 12100,
+              12000, 11900, 11800, 11700, 11600, 11500, 11400, 11300, 11200, 11100 };
+            Debug.Assert(trk1MsDurations.Count == nTrks);
+            List<int> transformationPercents = new List<int>()
+            { 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+            Debug.Assert(transformationPercents.Count == nTrks);
 
-            //    trkB1.MsPositionReContainer = trkB.MsPositionReContainer + trkB.MsDuration + 500;
+            for(int i = 0; i < nTrks; ++i)
+            {
+                Debug.Assert(tenorTrks[i].UniqueDefs.Count > 0);
 
-            //    trkB.Superimpose(trkB1);
+                Trk trk0 = tenorTrks[i];
+                Trk trk1 = trk0.Clone();
 
-            //    MidiChordDef trkmcd = trkB.ToMidiChordDef(2000);
+                trk1.MsDuration = trk1MsDurations[i];
+                trk1.TransposeInGamut(12);
+                List<byte> velocityPerAbsolutePitch = trk0.Gamut.GetVelocityPerAbsolutePitch(25, true);
+                trk1.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, transformationPercents[i]);
+                int indexToAlign = trk1.Count - 1;
+                int msPositionReContainer = trk0.UniqueDefs[trk0.UniqueDefs.Count - 1].MsPositionReFirstUD;
+                trk1.AlignObjectAtIndex(indexToAlign, msPositionReContainer);
+                bassTrks.Add(trk1);
+            }
 
-            //    Gamut gamut = (trk0.Gamut.Contains(newPitch)) ? trk0.Gamut : null;
+            ((MidiChordDef)bassTrks[0][0]).PanMsbs = new List<byte>() { 0 };
 
-            //    Trk trkC = trkmcd.ToTrk(3000, trkB.MidiChannel, gamut);
-
-            //    trkB.Insert(trkB.Count, trkmcd);
-            //    trkB.AddRange(trkC);
-
-            //    Trk trk1 = trkA.Superimpose(trkB);
-
-            //    trk1.MsDuration = trk0.MsDuration;
-            //    trk1.MsPositionReContainer = 0;
-
-            //    returnTrks.Add(trk1);
-            //}
-
-            return returnTrks;
+            return bassTrks;
         }
     }
 }
