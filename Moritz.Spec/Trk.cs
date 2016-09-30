@@ -1489,7 +1489,7 @@ namespace Moritz.Spec
 
         public override string ToString()
         {
-            return ("Trk:" + " MsPositionReContainer=" + MsPositionReContainer.ToString() + " Count=" + Count.ToString());
+            return ($"Trk: MsDuration={MsDuration} MsPositionReContainer={MsPositionReContainer} Count={Count}");
         }
 
         public Gamut Gamut { get; protected set; }
@@ -1513,7 +1513,7 @@ namespace Moritz.Spec
         private int _axisIndex = 0;
 
         /// <summary>
-        /// The number of MidiChordDefs and RestDefs in this TrkDef
+        /// The number of MidiChordDefs and RestDefs in this Trk
         /// </summary>
         public int DurationsCount
 		{

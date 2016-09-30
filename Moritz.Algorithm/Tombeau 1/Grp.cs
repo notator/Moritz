@@ -260,6 +260,10 @@ namespace Moritz.Algorithm.Tombeau1
         #endregion Re-ordering the UniqueDefs
         #endregion Trk functions that change the sequence or number of MidiChordDefs
 
+        public override string ToString()
+        {
+            return ($"Grp: MsDuration={MsDuration} MsPositionReContainer={MsPositionReContainer} Count={Count}");
+        }
 
         /// <summary>
         /// Sets BeamContinues to false on the final MidiChordDef, and true on all the others.
