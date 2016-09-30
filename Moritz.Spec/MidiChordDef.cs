@@ -422,7 +422,7 @@ namespace Moritz.Spec
 
         #region SetVelocityPerAbsolutePitch
         /// <summary>
-        /// If either NotatedMidiPitches and NotatedMIDIVelocities is empty when this function returns,
+        /// NotatedMidiPitches and NotatedMIDIVelocities should be checked after calling this function: they can be empty!
         /// this MidiChordDef must be replaced by a RestDef.
         /// The first argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
         /// The second (optional) argument determines the proportion of the final velocity determined by this function.
@@ -700,32 +700,20 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// N.B. This function's behaviour wrt velocities should be changed to that of SetVelocityPerAbsolutePitch() -- see below. 
+        /// N.B. NotatedMidiPitches and NotatedMIDIVelocities should be checked after calling this function: they can be empty!
         /// Multiplies the velocities in NotatedMidiVelocities, and all BasicMidiChordDef.Velocities by the argument factor.
-        /// If a velocity would be less than 1, it is silently coerced to 1.
-        /// If a velocity would be greater than 127, it is silently coerced to 127.
+        /// If a resulting velocity is zero, the note is removed. If it would be greater than 127, it is silently coerced to 127.
         /// </summary>
-        /// <param name="factor"></param>
+        /// <param name="factor">greater than 0</param>
         public void AdjustVelocities(double factor)
 		{
-            for(int i=0; i< _notatedMidiVelocities.Count; ++i)
-            {
-                byte newVelocity = (byte)Math.Ceiling((_notatedMidiVelocities[i] * factor));
-                newVelocity = (newVelocity < 1) ? (byte)1 : newVelocity;
-                newVelocity = (newVelocity > 127) ? (byte)127 : newVelocity;
-                _notatedMidiVelocities[i] = newVelocity;
-            }
+            Debug.Assert(factor > 0.0);
 			foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
 			{
-				for(int i = 0; i < bmcd.Velocities.Count; ++i)
-				{
-					byte velocity = (byte)Math.Ceiling((bmcd.Velocities[i] * factor));
-                    velocity = (velocity < 1) ? (byte)1 : velocity;
-                    velocity = (velocity > 127) ? (byte)127 : velocity;
-                    bmcd.Velocities[i] = velocity;
-				}
-			}
-		}
+                bmcd.AdjustVelocities(factor);
+            }
+            CheckVelocityAndSetNotatedValues();
+        }
 
         /// <summary>
         /// Sets the number of values in NotatedMidiPitches, NotatedMidiVelocities, and all BasicMidiChordDef.Pitches and

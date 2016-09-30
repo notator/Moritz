@@ -158,6 +158,20 @@ namespace Moritz.Spec
         }
 
         /// <summary>
+        /// Individual velocities can be set to 0
+        /// </summary>
+        /// <param name="factor"></param>
+        internal void AdjustVelocities(double factor)
+        {
+            Debug.Assert(factor > 0.0);
+            for(int i = 0; i < Velocities.Count; ++i)
+            {
+                byte velocity = (byte)Math.Round((Velocities[i] * factor));
+                Velocities[i] = velocity; 
+            }
+        }
+
+        /// <summary>
         /// The arguments are both in range [1..127].
         /// If the basicMidiChordDef contains more than 1 note (=velocity), the velocities of the root and top notes in the
         /// chord are set to the argument values, and the other velocities are interpolated linearly. 

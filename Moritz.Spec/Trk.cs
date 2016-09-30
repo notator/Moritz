@@ -430,7 +430,8 @@ namespace Moritz.Spec
         /// The other component is the existing velocity. If percent is 100.0, the existing velocity is replaced completely.
         /// For example: If the MidiChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
         /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc.
-        /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef. 
+        /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef.
+        /// Notes that would have velocity==0 are removed. MidiChordDefs that have no notes are replaced by RestDefs.
         /// </summary>
         /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
         /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
@@ -539,7 +540,7 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="durationForLowestPitch"></param>
         /// <param name="durationForHighestPitch"></param>
-        public virtual void SetDurationsFromPitches(int durationForLowestPitch, int durationForHighestPitch, bool useBottomPitch, double percent = 100.0)
+        public void SetDurationsFromPitches(int durationForLowestPitch, int durationForHighestPitch, bool useBottomPitch, double percent = 100.0)
         {
             Debug.Assert(percent >= 0 && percent <= 100);
 
@@ -626,32 +627,48 @@ namespace Moritz.Spec
             }
         }
         /// <summary>
-        /// Multiplies each velocity value in the MidiChordDefs
-        /// from beginIndex to (not including) endIndex by the argument factor.
+        /// Multiplies each velocity value in the MidiChordDefs from beginIndex to (not including) endIndex by
+        /// the argument factor (which must be greater than zero).
+        /// N.B MidiChordDefs will be turned into RestDefs if all their notes are given zero velocity!
         /// </summary>
         public virtual void AdjustVelocities(int beginIndex, int endIndex, double factor)
         {
             CheckIndices(beginIndex, endIndex);
+            Debug.Assert(factor > 0.0);
             for(int i = beginIndex; i < endIndex; ++i)
             {
-                MidiChordDef iumdd = _uniqueDefs[i] as MidiChordDef;
-                if(iumdd != null)
+                MidiChordDef mcd = _uniqueDefs[i] as MidiChordDef;
+                if(mcd != null)
                 {
-                    iumdd.AdjustVelocities(factor);
+                    mcd.AdjustVelocities(factor);
+                    if(mcd.NotatedMidiPitches.Count == 0)
+                    {
+                        Replace(i, new RestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
+                    }
                 }
             }
         }
         /// <summary>
-        /// Multiplies each velocity value in the MidiChordDefs by the argument factor.
+        /// Multiplies each velocity value in the MidiChordDefs by the argument factor (must be greater than zero).
+        /// N.B MidiChordDefs will be turned into RestDefs if all their notes have zero velocity!
         /// </summary>
         public virtual void AdjustVelocities(double factor)
         {
-            foreach(MidiChordDef mcd in MidiChordDefs)
+            Debug.Assert(factor > 0.0);
+            for(int i = 0; i < UniqueDefs.Count; ++i)
             {
-                mcd.AdjustVelocities(factor);
+                MidiChordDef mcd = UniqueDefs[i] as MidiChordDef;
+                if(mcd != null)
+                {
+                    mcd.AdjustVelocities(factor);
+                    if(mcd.NotatedMidiPitches.Count == 0)
+                    {
+                        Replace(i, new RestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
+                    }
+                }
             }
         }
-
+        /// <summary>
         /// Creates a hairpin in the velocities from startMsPosition to endMsPosition (non-inclusive).
         /// This function does NOT change velocities outside the range given in its arguments.
         /// There must be at least two IUniqueDefs in the msPosition range given in the arguments.
@@ -659,6 +676,8 @@ namespace Moritz.Spec
         /// The velocity of the first IUniqueDefs is multiplied by startFactor, and the velocity
         /// of the last MidiChordDef in range by endFactor.
         /// Can be used to create a diminueno or crescendo.
+        /// N.B MidiChordDefs will be turned into RestDefs if all their notes have zero velocity!
+        /// </summary>
         /// <param name="startMsPosition">MsPositionReFirstIUD</param>
         /// <param name="endMsPosition">MsPositionReFirstIUD</param>
         /// <param name="startFactor"></param>
@@ -678,11 +697,15 @@ namespace Moritz.Spec
 
             for(int i = beginIndex; i < endIndex; ++i)
             {
-                MidiChordDef iumdd = _uniqueDefs[i] as MidiChordDef;
-                if(iumdd != null)
+                MidiChordDef mcd = _uniqueDefs[i] as MidiChordDef;
+                if(mcd != null)
                 {
-                    iumdd.AdjustVelocities(factor);
+                    mcd.AdjustVelocities(factor);
                     factor += factorIncrement;
+                }
+                if(mcd.NotatedMidiPitches.Count == 0)
+                {
+                    Replace(i, new RestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
                 }
             }
         }
