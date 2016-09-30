@@ -190,16 +190,6 @@ namespace Moritz.Algorithm.Tombeau1
             SetBeamEnd();
         }
         /// <summary>
-        /// The arguments are both in range [1..127].
-        /// This function calls MidiChordDef.SetVerticalVelocityGradient(rootVelocity, topVelocity)
-        /// on all the MidiChordDefs in the Trk. 
-        /// </summary>
-        public override void SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
-        {
-            base.SetVerticalVelocityGradient(rootVelocity, topVelocity);
-            SetBeamEnd();
-        }
-        /// <summary>
         /// Multiplies each velocity value in the MidiChordDefs
         /// from beginIndex to (not including) endIndex by the argument factor.
         /// </summary>

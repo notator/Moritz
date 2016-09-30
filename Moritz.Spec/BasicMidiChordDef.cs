@@ -172,7 +172,7 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// The arguments are both in range [1..127].
+        /// The arguments must both be in range [1..127].
         /// If the basicMidiChordDef contains more than 1 note (=velocity), the velocities of the root and top notes in the
         /// chord are set to the argument values, and the other velocities are interpolated linearly. 
         /// </summary>

@@ -511,7 +511,6 @@ namespace Moritz.Spec
         {
             Debug.Assert(_msDuration >= msDurationRangeMin && _msDuration <= msDurationRangeMax);
             Debug.Assert(msDurationRangeMin <= msDurationRangeMax);
-            // neither velocityForMinMsDuration nor velocityForMaxMsDuration can be zero!
             // velocityForMinMsDuration can be less than, equal to, or greater than velocityForMaxMsDuration
             Debug.Assert(velocityForMinMsDuration >= 1 && velocityForMinMsDuration <= 127);
             Debug.Assert(velocityForMaxMsDuration >= 1 && velocityForMaxMsDuration <= 127);
@@ -552,7 +551,7 @@ namespace Moritz.Spec
 
         #region SetVerticalVelocityGradient
         /// <summary>
-        /// The arguments are both in range [1..127].
+        /// The arguments must both be in range [1..127].
         /// This function changes the velocities in both the notated chord and the BasicChordDefs.
         /// The velocities of the root and top notes in the chord are set to the argument values, and the other velocities
         /// are interpolated linearly.

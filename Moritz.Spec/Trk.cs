@@ -425,6 +425,7 @@ namespace Moritz.Spec
 
         #region SetVelocityPerAbsolutePitch
         /// <summary>
+        /// N.B MidiChordDefs will be turned into RestDefs if all their notes have zero velocity!
         /// The first argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
         /// The second (optional) argument determines the proportion of the final velocity determined by this function.
         /// The other component is the existing velocity. If percent is 100.0, the existing velocity is replaced completely.
@@ -461,6 +462,7 @@ namespace Moritz.Spec
         #endregion SetVelocityPerAbsolutePitch
         #region SetVelocitiesFromDurations
         /// <summary>
+        /// The first two arguments must be in range [1..127].
         /// Sets the velocity of each MidiChordDef in the Trk (anti-)proportionally to its duration.
         /// The (optional) percent argument determines the proportion of the final velocity for which this function is responsible.
         /// The other component of the final velocity value is its existing velocity. If percent is 100.0, the existing velocity
@@ -502,11 +504,11 @@ namespace Moritz.Spec
         #endregion SetVelocitiesFromDurations
         #region SetVerticalVelocityGradient
         /// <summary>
-        /// The arguments are both in range [1..127].
+        /// The arguments must both be in range [1..127].
         /// This function calls MidiChordDef.SetVerticalVelocityGradient(rootVelocity, topVelocity)
         /// on all the MidiChordDefs in the Trk. 
         /// </summary>
-        public virtual void SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
+        public void SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
         {
             #region conditions
             Debug.Assert(rootVelocity > 0 && rootVelocity <= 127);
