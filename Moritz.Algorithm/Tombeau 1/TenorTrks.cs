@@ -31,9 +31,9 @@ namespace Moritz.Algorithm.Tombeau1
                 tps.permuteAxisNumber = 1;
                 tps.permuteContourNumber = 7;
                 tps.transpositions = new List<int>() { 0, 2, 3, 5, 7, 9, 10 };
-                tps.velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(30, true);
-                //tps.transformationPercent = (i < 2) ? 0 : (i - 2) * 5;
-                tps.transformationPercent = 100;
+                tps.velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(30, true);         
+                tps.transformationPercent = (i < 2) ? 0 : (i - 2) * 5;
+                //tps.transformationPercent = 100;
                 Debug.Assert(tps.transformationPercent <= 100);
 
                 rList.Add(tps);
@@ -110,23 +110,7 @@ namespace Moritz.Algorithm.Tombeau1
             tenorGrp.SetDurationsFromPitches(2000, 600, true, tps.transformationPercent);
             tenorGrp.MsDuration = tps.grpMsDuration;
             tenorGrp.SetVelocitiesFromDurations(65, 127, 100);
-            tenorGrp.SetVelocityPerAbsolutePitch(tps.velocityPerAbsolutePitch, tps.transformationPercent);
-        }
-
-        private List<Trk> GetTenorSeqTrks(List<List<Grp>> grpLists)
-        {
-            List<Trk> seqTrks = new List<Trk>();
-            foreach(List<Grp> grps in grpLists)
-            {
-                // the Trk's midiChannel is set later.
-                Trk trk0 = new Trk(0, 0, new List<IUniqueDef>(), grps[0].Gamut.Clone());
-                foreach(Grp grp in grps)
-                {
-                    trk0.AddRange(grp);
-                }
-                seqTrks.Add(trk0);
-            }
-            return seqTrks;
+            tenorGrp.SetVelocityPerAbsolutePitch(tps.velocityPerAbsolutePitch, 30, tps.transformationPercent);
         }
 
         protected override List<Grp> GetTrkGrps(Grp grp, TransformationParameters tps)
@@ -145,14 +129,31 @@ namespace Moritz.Algorithm.Tombeau1
                 Grp localGrp = grp.Clone();
                 localGrp.TransposeInGamut(transpositions[i]);
 
-                if((i % 2) == 1)
-                {
-                    localGrp.Permute(1, 7);
-                }
+                //if((i % 2) == 1)
+                //{
+                //    localGrp.Permute(1, 7);
+                //}
+                localGrp.Permute(1, i + 1);
 
                 grps.Add(localGrp);
             }
             return (grps);
+        }
+
+        private List<Trk> GetTenorSeqTrks(List<List<Grp>> grpLists)
+        {
+            List<Trk> seqTrks = new List<Trk>();
+            foreach(List<Grp> grps in grpLists)
+            {
+                // the Trk's midiChannel is set later.
+                Trk trk0 = new Trk(0, 0, new List<IUniqueDef>(), grps[0].Gamut.Clone());
+                foreach(Grp grp in grps)
+                {
+                    trk0.AddRange(grp);
+                }
+                seqTrks.Add(trk0);
+            }
+            return seqTrks;
         }
     }       
 }

@@ -422,29 +422,53 @@ namespace Moritz.Spec
 
         #region SetVelocityPerAbsolutePitch
         /// <summary>
-        /// NotatedMidiPitches and NotatedMIDIVelocities should be checked after calling this function: they can be empty!
-        /// this MidiChordDef must be replaced by a RestDef.
-        /// The first argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
-        /// The second (optional) argument determines the proportion of the final velocity determined by this function.
+        /// NotatedMidiPitches and NotatedMIDIVelocities should be checked after calling this function: they can be empty if minimumVelocity==0!
+        /// Argument 1 (gamutVelocityPerAbsolutePitch) contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
+        /// Argument 2 (minimumVelocity) is the used to raise the values in (a copy of) argument 1: minimumVelocity is
+        /// the value used wherever there is a value of 0 in argument 1. The other values are raised proportionally.
+        /// Argument 3 (optional) determines the proportion of the final velocity determined by this function.
         /// The other component is the existing velocity. If percent is 100.0, the existing velocity is replaced completely.
         /// For example: If the MidiChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
         /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc.
         /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef. 
         /// </summary>
-        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
+        /// <param name="gamutVelocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
+        /// <param name="minimumVelocity">In range 0..127</param>
         /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
-        public void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, double percent = 100.0)
+        public void SetVelocityPerAbsolutePitch(List<byte> gamutVelocityPerAbsolutePitch, byte minimumVelocity, double percent = 100.0)
         {
             #region conditions
-            Debug.Assert(velocityPerAbsolutePitch.Count == 12);
+            Debug.Assert(gamutVelocityPerAbsolutePitch.Count == 12);
             for(int i = 0; i < 12; ++i)
             {
-                int v = velocityPerAbsolutePitch[i];
+                int v = gamutVelocityPerAbsolutePitch[i];
                 Debug.Assert(v >= 0 && v <= 127);
             }
+            Debug.Assert(minimumVelocity >= 0 && minimumVelocity <= 127);
             Debug.Assert(percent >= 0 && percent <= 100);
             Debug.Assert(this.NotatedMidiPitches.Count == NotatedMidiVelocities.Count);
             #endregion conditions
+
+            List<byte> velocityPerAbsolutePitch = new List<byte>(gamutVelocityPerAbsolutePitch);
+            if(minimumVelocity > 0)
+            {
+                #region reset velocityPerAbsolutePitch
+                double tan = ((double)127 - minimumVelocity) / 127;
+                for(int i = 0; i < velocityPerAbsolutePitch.Count; ++i)
+                {
+                    byte value = velocityPerAbsolutePitch[i];
+                    if(value == 0)
+                    {
+                        value = minimumVelocity;
+                    }
+                    else
+                    {
+                        value = M.MidiValue((int)Math.Round((minimumVelocity + (value * tan))));                      
+                    }                   
+                    velocityPerAbsolutePitch[i] = value;
+                }
+                #endregion reset velocityPerAbsolutePitch
+            }
 
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {

@@ -425,18 +425,15 @@ namespace Moritz.Spec
 
         #region SetVelocityPerAbsolutePitch
         /// <summary>
-        /// N.B MidiChordDefs will be turned into RestDefs if all their notes have zero velocity!
-        /// The first argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
-        /// The second (optional) argument determines the proportion of the final velocity determined by this function.
-        /// The other component is the existing velocity. If percent is 100.0, the existing velocity is replaced completely.
-        /// For example: If the MidiChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
-        /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc.
-        /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef.
-        /// Notes that would have velocity==0 are removed. MidiChordDefs that have no notes are replaced by RestDefs.
+        /// The arguments are passed unchanged to MidiChordDef.SetVelocityPerAbsolutePitch(...) for each MidiChordDef in this Trk.
+        /// See the MidiChordDef documentation for details.
+        /// If minimumVelocity==0, the notes that would have been given velocity=0 are removed completely.
+        /// If this results in a MidiChordDef with no notes, it is replaced here by a restDef of the same MsDuration.
         /// </summary>
         /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
+        /// <param name="minimumVelocity">In range 0..127</param>
         /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
-        public virtual void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, double percent = 100.0)
+        public virtual void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, byte minimumVelocity, double percent = 100.0)
         {
             #region conditions
             Debug.Assert(velocityPerAbsolutePitch.Count == 12);
@@ -445,13 +442,14 @@ namespace Moritz.Spec
                 int v = velocityPerAbsolutePitch[i];
                 Debug.Assert(v >= 0 && v <= 127);
             }
+            Debug.Assert(minimumVelocity >= 0 && minimumVelocity <= 127);
             #endregion conditions
             for(int i = 0; i < UniqueDefs.Count; ++i)
             {
                 MidiChordDef mcd = UniqueDefs[i] as MidiChordDef;
                 if(mcd != null)
                 {
-                    mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, percent);
+                    mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, minimumVelocity, percent);
                     if(mcd.NotatedMidiPitches.Count == 0)
                     {
                         Replace(i, new RestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));

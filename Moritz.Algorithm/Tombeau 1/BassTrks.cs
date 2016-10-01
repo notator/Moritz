@@ -79,7 +79,7 @@ namespace Moritz.Algorithm.Tombeau1
             bassGrp.SetDurationsFromPitches(2000, 600, true, tps.transformationPercent);
             bassGrp.MsDuration = tps.grpMsDuration;
             bassGrp.SetVelocitiesFromDurations(65, 127, 100);
-            bassGrp.SetVelocityPerAbsolutePitch(tps.velocityPerAbsolutePitch, tps.transformationPercent);
+            bassGrp.SetVelocityPerAbsolutePitch(tps.velocityPerAbsolutePitch, 0, tps.transformationPercent);
         }
         protected override List<Grp> GetTrkGrps(Grp grp, TransformationParameters tps)
         {
@@ -134,7 +134,7 @@ namespace Moritz.Algorithm.Tombeau1
                 trk1.MsDuration = trk1MsDurations[i];
                 trk1.TransposeInGamut(12);
                 List<byte> velocityPerAbsolutePitch = trk0.Gamut.GetVelocityPerAbsolutePitch(25, true);
-                trk1.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, transformationPercents[i]);
+                trk1.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, 0, transformationPercents[i]);
                 int indexToAlign = trk1.Count - 1;
                 int msPositionReContainer = trk0.UniqueDefs[trk0.UniqueDefs.Count - 1].MsPositionReFirstUD;
                 trk1.AlignObjectAtIndex(indexToAlign, msPositionReContainer);
