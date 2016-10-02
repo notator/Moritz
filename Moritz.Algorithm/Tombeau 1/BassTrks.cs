@@ -26,8 +26,8 @@ namespace Moritz.Algorithm.Tombeau1
             {
                 TransformationParameters tps = new TransformationParameters();
                 // TODO -- customise for bassGrps
-                tps.nChordsPerGrp = 8;
-                tps.nGrpsPerGamut = 6;
+                tps.baseGrpNChords = 8;
+                tps.nGrpsPerPalette = 6;
                 tps.grpMsDuration = 2167;
                 tps.permuteAxisNumber = 1;
                 tps.permuteContourNumber = 7;
@@ -51,7 +51,7 @@ namespace Moritz.Algorithm.Tombeau1
             {
                 TransformationParameters tps = transformationParametersList[i];
                 Gamut gamut = gamuts[i];
-                Grp bassGrp = new Grp(gamut, gamut.BasePitch + (2 * 12), 6, 1000, tps.nChordsPerGrp);
+                Grp bassGrp = new Grp(gamut, gamut.BasePitch + (2 * 12), 6, 1000, tps.baseGrpNChords);
                 SetBassGrp(bassGrp, transformationParametersList[i]);
 
                 List<Grp> tenorGrps = GetTrkGrps(bassGrp, transformationParametersList[i]);
@@ -84,7 +84,7 @@ namespace Moritz.Algorithm.Tombeau1
         protected override List<Grp> GetTrkGrps(Grp grp, TransformationParameters tps)
         {
             List<int> transpositions = tps.transpositions;
-            int nGrpsPerGamut = tps.nGrpsPerGamut;
+            int nGrpsPerGamut = tps.nGrpsPerPalette;
             int permuteAxisNumber = tps.permuteAxisNumber;
             int permuteContourNumber = tps.permuteContourNumber;
 
