@@ -927,8 +927,8 @@ namespace Moritz.Spec
         /// If there are more than 7 UniqueDefs in the list, 7 partitions are automatically created and permuted recursively
         /// using the same contour.
         /// </summary>
-        /// <param name="axisNumber">A value greater than or equal to 1, and less than or equal to 12 An exception is thrown if this is not the case.</param>
-        /// <param name="contourNumber">A value greater than or equal to 1, and less than or equal to 12. An exception is thrown if this is not the case.</param>
+        /// <param name="axisNumber">A value in range 1..12 inclusive.</param>
+        /// <param name="contourNumber">A value in range 1..12 inclusive.</param>
         public virtual void Permute(int axisNumber, int contourNumber)
         {
             Debug.Assert(!(contourNumber < 1 || contourNumber > 12), "contourNumber out of range 1..12");
