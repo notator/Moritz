@@ -78,7 +78,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// This function is used while composing Grp palettes.
         /// It simply copies them (the Grp lists) to the output Trks.
         /// </summary>
-        protected List<Trk> GetGrpPaletteSeqTrks(List<List<Grp>> grpLists)
+        protected List<Trk> GetGrpPalettes(List<List<Grp>> grpLists)
         {
             List<Trk> seqTrks = new List<Trk>();
             foreach(List<Grp> grps in grpLists)

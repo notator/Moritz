@@ -19,10 +19,10 @@ namespace Moritz.Algorithm.Tombeau1
 
             Debug.Assert(GrpLists.Count == tombeau1Gamuts.Count);
 
-            bool composingGrps = true;
-            if(composingGrps)
+            bool displayGrpPalettes = true;
+            if(displayGrpPalettes)
             {
-                Trks = GetGrpPaletteSeqTrks(GrpLists);
+                Trks = GetGrpPalettes(GrpLists);
             }
             else
             {
@@ -35,6 +35,8 @@ namespace Moritz.Algorithm.Tombeau1
             // tps.gamut is the same for SATB, and is therefore set in the base class.
             List<TransformationParameters> tpsList = base.GetTransformationParametersList(tombeau1Gamuts);
             Debug.Assert(tpsList.Count == tombeau1Gamuts.Count);
+
+            //List<byte> tombeau1vps = tombeau1Gamuts[0].GetVelocityPerAbsolutePitch(10, 127, 3, true);
 
             for(int i = 0; i < tpsList.Count; ++i)
             {
@@ -50,9 +52,10 @@ namespace Moritz.Algorithm.Tombeau1
                 tps.permuteAxisNumber = 1;
                 tps.permuteContourNumber = 7;
                 tps.transpositions = new List<int>() { 0, 2, 3, 5, 7, 9, 10 };
-                tps.velocityPerAbsolutePitch = tps.gamut.GetVelocityPerAbsolutePitch(30, true);         
-                tps.transformationPercent = (i < 2) ? 0 : (i - 2) * 5;
-                //tps.transformationPercent = 100;
+                //tps.velocityPerAbsolutePitch = tombeau1vps;
+                tps.velocityPerAbsolutePitch = tps.gamut.GetVelocityPerAbsolutePitch(10, 127, 3, true);
+                //tps.transformationPercent = (i < 2) ? 0 : (i - 2) * 5;
+                tps.transformationPercent = 100;
                 Debug.Assert(tps.transformationPercent <= 100);
             }
             return tpsList;

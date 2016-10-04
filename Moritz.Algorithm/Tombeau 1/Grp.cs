@@ -162,10 +162,11 @@ namespace Moritz.Algorithm.Tombeau1
         /// <summary>
         /// The arguments are passed unchanged to MidiChordDef.SetVelocityPerAbsolutePitch(...) for each MidiChordDef in this Trk.
         /// See the MidiChordDef documentation for details.
-        /// If minimumVelocity==0, the notes that would have been given velocity=0 are removed completely.
-        /// If this results in a MidiChordDef with no notes, it is replaced here by a restDef of the same MsDuration.
+        /// If velocityPerAbsolutePitch contains values that are less than minimumVelocity, the velocities are increased proportionally.
+        /// If minimumVelocity==0, in both velocityPerAbsolutePitch and here, the notes that would have been given velocity=0 are removed
+        /// completely. If this results in a MidiChordDef with no notes, it is replaced here by a restDef of the same MsDuration.
         /// </summary>
-        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
+        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127]) in order of absolute pitch</param>
         /// <param name="minimumVelocity">In range 0..127</param>
         /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
         public override void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, byte minimumVelocity, double percent = 100.0)

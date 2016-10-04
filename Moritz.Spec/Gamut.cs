@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 
-using Moritz.Globals;
-
 namespace Moritz.Spec
 {
     /// <summary>
@@ -387,37 +385,48 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// The returned list contains 12 velocity values in range [0..127].
-        /// Pitches in the gamut are given velocities in range [1..127]. Other pitches are given velocity = 0.
+        /// The returned list contains 12 velocity values in range [0..127] that can be applied to pitches in any Trk or MidiChordDef
+        /// (using their SetVelocityPerAbsolutePitch(...) ) function, regardless of the gamut from which they have been constructed.
+        /// Pitches that are part of *this* gamut in the returned list are given velocities in range [minimumVelocity..maximumVelocity].
+        /// Other pitches are given velocity = minimumVelocity.
         /// The returned values are in order of absolute pitch, with C natural (absolute pitch 0) at position 0,
         /// C# (absolute pitch 1) at position 1, etc.
-        /// The pitch at AbsolutePitchHierarchy[0] is given velocity=127.
-        /// The pitch at AbsolutePitchHierarchy[NPitchesPerOctave - 1] is given minimumVelocity.
-        /// The velocities in between are scaled linearly or logarithmically, depending on the value of the second argument.
+        /// The velocities of the gamut's performing pitches are permuted according to a contour in a linear-negative field having
+        /// domain NPitchesPerOctave. The contour is found using the loudestPitchIndex.
+        /// The contour at loudestPitchIndex==0 is simply ascending (e.g. 1,2,3,4,5,6,7,8).
+        /// The contour at loudestPitchIndex==(NValuesPerOctave-1) is simply descending (e.g. 9,8,7,6,5,4,3,2,1).
+        /// So, in chords constructed from this gamut, loudestPitchIndex==0 results in a bottom-to-top == loud-quiet velocity gradient,
+        /// while loudestPitchIndex==(NValuesPerOctave-1) results in a top-to-bottom == loud-quiet gradient.
         /// </summary>
-        /// <param name="minimumVelocity">In range [1..127]. The velocity to be given to the pitch at AbsolutePitchHierarchy[NPitchesPerOctave - 1]</param>
-        public List<byte> GetVelocityPerAbsolutePitch(int minimumVelocity, bool isLinearGradient)
+        /// <param name="minimumVelocity">In range [0..127]. The minimum velocity to be given to any pitch.</param>
+        /// <param name="maximumVelocity">In range [0..127]. The maximum velocity to be given to any pitch.</param>
+        /// <param name="loudestPitchIndex">In range [0..(NPitchesPerOctave-1)].</param>
+        /// <param name="isLinearGradient">If false, velocity values are scaled logarithmically between minimumVelocity and maximumVelocity.</param>
+        public List<byte> GetVelocityPerAbsolutePitch(int minimumVelocity, int maximumVelocity, int loudestPitchIndex, bool isLinearGradient)
         {
-            Debug.Assert(minimumVelocity > 0 && minimumVelocity < 128);
+            Debug.Assert(minimumVelocity >= 0 && minimumVelocity <= 127);
+            Debug.Assert(maximumVelocity >= 0 && maximumVelocity <= 127);
+            Debug.Assert(minimumVelocity <= maximumVelocity);
+            Debug.Assert(loudestPitchIndex >= 0 && loudestPitchIndex <= (NPitchesPerOctave-1));
 
             List<double> velocities = new List<double>();
             if(NPitchesPerOctave == 1)
             {
-                velocities.Add(127);
+                velocities.Add(maximumVelocity);
             }
             else if(isLinearGradient)
             {
-                double velocityDiff = ((double)(127 - minimumVelocity)) / (NPitchesPerOctave - 1);
+                double velocityDiff = ((double)(maximumVelocity - minimumVelocity)) / (NPitchesPerOctave - 1);
                 for(int i = 0; i < NPitchesPerOctave; ++i)
                 {
-                    double vel = 127 - (i * velocityDiff);
+                    double vel = maximumVelocity - (i * velocityDiff);
                     velocities.Add(vel);
                 }
             }
             else
             {
-                double factor = ((double) Math.Pow(((double)minimumVelocity / 127), (((double)1) / (NPitchesPerOctave - 1))));
-                velocities.Add(127);
+                double factor = ((double) Math.Pow(((double)minimumVelocity / maximumVelocity), (((double)1) / (NPitchesPerOctave - 1))));
+                velocities.Add(maximumVelocity);
                 for(int i = 1; i < NPitchesPerOctave; ++i)
                 {
                     double vel = velocities[i - 1] * factor;
@@ -425,10 +434,15 @@ namespace Moritz.Spec
                 }
             }
 
+            if(NPitchesPerOctave > 1)
+            {
+                velocities = ContourVelocities(velocities, loudestPitchIndex);
+            }
+
             List<byte> velocityPerAbsPitch = new List<byte>();
             for(int i = 0; i < 12; ++i)
             {
-                velocityPerAbsPitch.Add(0); // default value
+                velocityPerAbsPitch.Add((byte)minimumVelocity); // default value
             }
 
             for(int absPitchIndex = 0; absPitchIndex < NPitchesPerOctave ; ++absPitchIndex)
@@ -436,12 +450,80 @@ namespace Moritz.Spec
                 int absPitch = AbsolutePitchHierarchy[absPitchIndex];
 
                 byte velocity = (byte) Math.Round(velocities[absPitchIndex]);
-                velocity = (velocity > 1) ? velocity : (byte)1;
+                velocity = (velocity >= 0) ? velocity : (byte)0;
                 velocity = (velocity <= 127) ? velocity : (byte)127;
 
                 velocityPerAbsPitch[absPitch] = velocity;
             }
             return velocityPerAbsPitch;
+        }
+
+        /// <summary>
+        /// Returns the values in the velocities list permuted linearly.
+        /// The velocites list can be of any length. loudestPitchIndex is always in range [0..(NPitchesPerOctave-1)].
+        /// If loudestPitchIndex==0, the list will be unchanged. If loudestPitchIndex==(NPitchesPerOctave-1), the list will be reversed.
+        /// </summary>
+        /// <param name="velocities">velocities.Count == NPitchesPerOctave.</param>
+        /// <param name="contourNumber">in range 1..12</param>
+        private List<double> ContourVelocities(List<double> velocities, int loudestPitchIndex)
+        {
+            Debug.Assert(velocities.Count == NPitchesPerOctave && NPitchesPerOctave > 1);
+            Debug.Assert(loudestPitchIndex >= 0 && loudestPitchIndex <= (NPitchesPerOctave - 1));
+
+            List<double> newVs = new List<double>();
+            List<int> contour = GetLinearNegativeContour(velocities.Count, loudestPitchIndex);
+            foreach(int val in contour)
+            {
+                newVs.Add(velocities[val - 1]);
+            }
+            return newVs;
+        }
+
+        /// <summary>
+        /// Returns a contour having count values, whose first value is (contourIndex+1). 
+        /// (as if from a linear-negative matrix containing count contours having domain=count).
+        /// </summary>
+        /// <param name="count">In range 2..12</param>
+        /// <param name="contourIndex">In range 0..(count-1)</param>
+        private List<int> GetLinearNegativeContour(int count, int contourIndex)
+        {
+            Debug.Assert(count >= 2 && count <= 12);
+            Debug.Assert(contourIndex >= 0 && contourIndex <= (count - 1));
+
+            int incrSign = 1; // results in a "linear-negative" contour (when contourIndex > 0, contour[1] < contour[0].
+            int absIncr = 0;
+            int val = contourIndex + 1;
+            int incr = absIncr * incrSign; 
+            int breakIndex = 0;
+           
+            List<int> contour = new List<int>();
+            for(int i = 0; i < count; ++i)
+            {
+                contour.Add(val);
+                incrSign *= -1;
+                absIncr += 1;
+                incr = absIncr * incrSign;
+                val += incr;
+                if(val > count || val < 1)
+                {
+                    breakIndex = i;
+                    break;
+                }
+
+            }
+            // increasing or decreasing end phase
+            if(breakIndex < count - 1)
+            {
+                int endIncr = (val > count) ? -1 : 1;
+                val -= incr;
+                val += endIncr;
+                while(++breakIndex < count)
+                {
+                    contour.Add(val);
+                    val += endIncr;
+                }
+            }
+            return contour;
         }
 
         #endregion public functions
