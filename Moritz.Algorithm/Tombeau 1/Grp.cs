@@ -8,15 +8,14 @@ namespace Moritz.Algorithm.Tombeau1
     public class Grp : Trk
     {
         #region constructors
-        public Grp(Gamut gamut, int rootPitch, int nPitchesPerChord, int msDurationPerChord, int nChords)
+        public Grp(Gamut gamut, int octave, int nPitchesPerChord, int msDurationPerChord, int nChords, double velocityFactor)
             : base(0, 0, new List<IUniqueDef>(), gamut)
         {
-            int rootIndex = Gamut.IndexOf(rootPitch);
-            Debug.Assert(rootIndex >= 0); 
-
             for(int i = 0; i < nChords; ++i)
             {
-                MidiChordDef mcd = new MidiChordDef(msDurationPerChord, Gamut, Gamut[rootIndex + i], nPitchesPerChord, null);
+                int rootNotatedPitch = gamut.AbsolutePitchHierarchy[i] + (12 * octave);
+                MidiChordDef mcd = new MidiChordDef(msDurationPerChord, gamut, rootNotatedPitch, nPitchesPerChord, null);
+                mcd.AdjustVelocities(velocityFactor);
                 _uniqueDefs.Add(mcd);
             }
 

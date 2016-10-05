@@ -8,24 +8,6 @@ namespace Moritz.Algorithm.Tombeau1
 {
     internal abstract class TrkSequence
     {
-        internal class TransformationParameters
-        {
-            internal Gamut gamut;
-
-            internal int baseGrpRootPitch;
-            internal int baseGrpNChords;
-            internal int baseGrpNPitchesPerChord;
-            internal int baseGrpMsDurationPerChord;
-
-            internal int nGrpsPerPalette;
-            internal int grpMsDuration;
-            internal int permuteAxisNumber;
-            internal int permuteContourNumber;
-            internal List<int> transpositions;
-            internal List<byte> velocityPerAbsolutePitch;
-            internal double transformationPercent;
-        }
-
         public Trk this[int index]
         {
             get
@@ -38,36 +20,17 @@ namespace Moritz.Algorithm.Tombeau1
         public int Count { get { return Trks.Count; } }
 
         /// <summary>
-        /// Returns a new list of TransformationParameters in which only the gamut field has been set.
-        /// The other fields must be set by derived classes.
-        /// </summary>
-        /// <param name="tombeau1Gamuts">The gamuts in use in Tombeau1</param>
-        protected virtual List<TransformationParameters> GetTransformationParametersList(IReadOnlyList<Gamut> tombeau1Gamuts)
-        {
-            List<TransformationParameters> tpsList = new List<TransformationParameters>();
-
-            for(int i = 0; i < tombeau1Gamuts.Count; ++i)
-            {
-                TransformationParameters tps = new TransformationParameters();
-                tps.gamut = tombeau1Gamuts[i];
-                
-                tpsList.Add(tps);
-            }
-            return tpsList;
-        }
-
-        /// <summary>
         /// Each GrpList will be a palette of Grps having the same gamut.
         /// </summary>
         /// <param name="tenorTemplates"></param>
         /// <returns></returns>
-        protected List<List<Grp>> GetGrpLists(List<TransformationParameters> tpsList)
+        protected List<List<Grp>> GetGrpLists()
         {
             List<List<Grp>> grpLists = new List<List<Grp>>();
 
-            for(int i = 0; i < tpsList.Count; ++i)
+            for(int i = 0; i < Gamut.RelativePitchHierarchiesCount; ++i)
             {
-                List<Grp> grpList = GetGrpList(tpsList[i]);
+                List<Grp> grpList = GetGrpList(i);
                 grpLists.Add(grpList);
             }
 
@@ -95,17 +58,10 @@ namespace Moritz.Algorithm.Tombeau1
         }
 
         /// <summary>
-        /// Called by the above GetGrpLists() function.
-        /// Creates a list of Grps having the same gamut.
-        /// Note that SATB might each use a different, but related, gamut.
-        /// For example, each having a different number of pitches per octave.
+        /// Called by the GetGrpLists() function.
+        /// Creates a list of Grps having the same relativePitchHierarchyIndex.
         /// </summary>
-        protected abstract List<Grp> GetGrpList(TransformationParameters tps);
-
-        /// <summary>
-        /// returns a Grp that is the basis for a list of Grps having the same gamut.
-        /// </summary>
-        protected abstract Grp GetBaseGrp(TransformationParameters tps);
+        protected abstract List<Grp> GetGrpList(int relativePitchHierarchyIndex);
 
         /// <summary>
         /// This is where the composition is actually done.

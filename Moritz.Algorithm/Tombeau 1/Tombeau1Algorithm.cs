@@ -353,22 +353,20 @@ namespace Moritz.Algorithm.Tombeau1
 
             /**********************************************/
 
-            List<Gamut> usedGamuts = GetUsedGamuts();
-
             List<Seq> seqs = new List<Seq>();
-            TenorTrks tenorTrks = new TenorTrks(usedGamuts);
+            TenorTrks tenorTrks = new TenorTrks();
             AddTrksToSeqs(seqs, tenorTrks, MidiChannelIndexPerOutputVoice[2]);
 
-            //SopranoTrks sopranoTrks = new SopranoTrks(tenorTrks, usedGamuts);
+            //SopranoTrks sopranoTrks = new SopranoTrks(tenorTrks);
             //AddTrksToSeqs(seqs, sopranoTrks, MidiChannelIndexPerOutputVoice[0]);
 
-            //BassTrks bassTrks = new BassTrks(sopranoTrks, tenorTrks, usedGamuts);
+            //BassTrks bassTrks = new BassTrks(sopranoTrks, tenorTrks);
             //AddTrksToSeqs(seqs, bassTrks, MidiChannelIndexPerOutputVoice[3]);
 
-            //AltoTrks altoTrks = new AltoTrks(sopranoTrks, tenorTrks, bassTrks, usedGamuts);
+            //AltoTrks altoTrks = new AltoTrks(sopranoTrks, tenorTrks, bassTrks);
             //AddTrksToSeqs(seqs, altoTrks, MidiChannelIndexPerOutputVoice[1]);
 
-            //Possibly do global changes that affect all trks here (accel., rit, transpositions etc.)
+            //Do global changes that affect all trks here (accel., rit, transpositions etc.)
             FinalizeSeqs(seqs);
 
             Seq mainSeq = new Seq(0, new List<Trk>() { new Trk(0) }, MidiChannelIndexPerOutputVoice);
@@ -380,25 +378,6 @@ namespace Moritz.Algorithm.Tombeau1
             List<List<VoiceDef>> bars = mainBlock.ConvertToBars();
 
             return bars;
-        }
-
-        private List<Gamut> GetUsedGamuts()
-        {
-            List<Gamut> gamuts = new List<Gamut>();
-            // The standard relative pitch hierarchies are in a circular matrix having 22 values.
-            // TODO: restrict this list to the gamuts that are actually going to be used in the piece.
-            List<int> usedPitchHierarchyIndices = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 };
-            for(int i = 0; i < usedPitchHierarchyIndices.Count; ++i)
-            {
-                int rphi = usedPitchHierarchyIndices[i];
-                int basePitch = 0;
-                int nPitchesPerOctave = 8;
-
-                Gamut gamut = new Gamut(rphi, basePitch, nPitchesPerOctave);
-                gamuts.Add(gamut);
-            }
-
-            return gamuts;
         }
 
         /// <summary>

@@ -529,6 +529,7 @@ namespace Moritz.Spec
         #endregion public functions
 
         #region public properties
+        public static int RelativePitchHierarchiesCount { get { return RelativePitchHierarchies.Count; } }
         public int RelativePitchHierarchyIndex { get; private set; }
         public int BasePitch { get; private set; }
         public int NPitchesPerOctave { get; private set; }
