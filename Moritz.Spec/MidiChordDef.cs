@@ -652,7 +652,7 @@ namespace Moritz.Spec
         /// In this case, they are silently coerced to the bottom or top notes of the gamut respectively.
         /// Duplicate top and bottom gamut pitches are removed.
         /// </summary>
-        public void TransposeInGamut(Gamut gamut, int steps)
+        public void TransposeStepsInGamut(Gamut gamut, int steps)
         {
             #region conditions
             Debug.Assert(gamut != null);
@@ -687,6 +687,25 @@ namespace Moritz.Spec
                 }
                 RemoveDuplicateNotes(pitches, velocities);
             }
+        }
+
+        /// <summary>
+        /// The rootPitch and all the pitches in all the MidiChordDef must be contained in the gamut.
+        /// Otherwise a Debug.Assert() fails.
+        /// Calculates the number of steps to transpose, and then calls TransposeStepsInGamut.
+        /// The rootPitch is the lowest pitch in any MidiChordDef.BasicMidiChordDefs[0] in the Trk.
+        /// </summary>
+        public void TransposeToRootInGamut(Gamut gamut, int rootPitch)
+        {
+            #region conditions
+            Debug.Assert(gamut != null);
+            Debug.Assert(gamut.Contains(rootPitch));
+            Debug.Assert(gamut.Contains(BasicMidiChordDefs[0].Pitches[0]));
+            #endregion conditions
+
+            int stepsToTranspose = gamut.IndexOf(rootPitch) - gamut.IndexOf(BasicMidiChordDefs[0].Pitches[0]);
+
+            TransposeStepsInGamut(gamut, stepsToTranspose);
         }
 
         private byte DoTranspose(byte initialValue, Gamut gamut, int steps)

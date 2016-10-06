@@ -75,7 +75,12 @@ namespace Moritz.Algorithm.Tombeau1
                 Gamut gamut = new Gamut(relativePitchHierarchyIndex, gamutBasePitch, nPitchesPerOctave);
                 int nChords = nPitchesPerOctave;
                 Grp grp = new Grp(gamut, tenorRootOctave, tenorPitchesPerChord, tenorMsDurationPerChord, nChords, velocityFactor);
-                grp.TransposeInGamut(gamut.AbsolutePitchHierarchy[i]);
+                int rootPitch = gamut.AbsolutePitchHierarchy[i];
+                if(gamut.Contains(rootPitch))
+                {
+                    grp.TransposeToRootInGamut(rootPitch + (tenorRootOctave * 12));
+                }
+                
                 grps.Add(grp);
 
                 nPitchesPerOctave--;

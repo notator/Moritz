@@ -352,11 +352,38 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="gamut"></param>
         /// <param name="stepsToTranspose"></param>
-        public void TransposeInGamut(int stepsToTranspose)
+        public void TransposeStepsInGamut(int stepsToTranspose)
         {
             foreach(MidiChordDef mcd in MidiChordDefs)
             {
-                mcd.TransposeInGamut(this.Gamut, stepsToTranspose);
+                mcd.TransposeStepsInGamut(this.Gamut, stepsToTranspose);
+            }
+        }
+
+        /// <summary>
+        /// The rootPitch and all the pitches in all the MidiChordDefs must be contained in the Trk's gamut.
+        /// Otherwise a Debug.Assert() fails.
+        /// Calculates the number of steps to transpose within the Trk's Gamut, and then calls TransposeStepsInGamut.
+        /// The rootPitch will be the lowest pitch in any MidiChordDef.BasicMidiChordDefs[0] in the Trk.
+        /// </summary>
+        /// <param name="gamut"></param>
+        /// <param name="rootPitch"></param>
+        public void TransposeToRootInGamut(int rootPitch)
+        {
+            Debug.Assert(Gamut != null && Gamut.Contains(rootPitch));
+
+            int currentLowestPitch = int.MaxValue;
+
+            foreach(MidiChordDef mcd in MidiChordDefs)
+            {
+                currentLowestPitch = (mcd.BasicMidiChordDefs[0].Pitches[0] < currentLowestPitch) ? mcd.BasicMidiChordDefs[0].Pitches[0] : currentLowestPitch;
+            }
+
+            int stepsToTranspose = Gamut.IndexOf(rootPitch) - Gamut.IndexOf(currentLowestPitch);
+
+            foreach(MidiChordDef mcd in MidiChordDefs)
+            {
+                mcd.TransposeStepsInGamut(this.Gamut, stepsToTranspose);
             }
         }
 
