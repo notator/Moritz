@@ -19,32 +19,16 @@ namespace Moritz.Algorithm.Tombeau1
 
         public int Count { get { return Trks.Count; } }
 
-        /// <summary>
-        /// Each GrpList will be a palette of Grps having the same gamut.
-        /// </summary>
-        /// <param name="tenorTemplates"></param>
-        /// <returns></returns>
-        protected List<List<Grp>> GetGrpLists()
-        {
-            List<List<Grp>> grpLists = new List<List<Grp>>();
-
-            for(int i = 0; i < Gamut.RelativePitchHierarchiesCount; ++i)
-            {
-                List<Grp> grpList = GetGrpList(i);
-                grpLists.Add(grpList);
-            }
-
-            return grpLists;
-        }
+        public List<List<Grp>> Palette = null;
 
         /// <summary>
-        /// This function is used while composing Grp palettes.
+        /// This function is used while composing palettes.
         /// It simply copies them (the Grp lists) to the output Trks.
         /// </summary>
-        protected List<Trk> GetGrpPalettes(List<List<Grp>> grpLists)
+        protected List<Trk> PaletteToTrks(List<List<Grp>> palette)
         {
             List<Trk> seqTrks = new List<Trk>();
-            foreach(List<Grp> grps in grpLists)
+            foreach(List<Grp> grps in palette)
             {
                 // the Trk's midiChannel is set later.
                 Trk trk0 = new Trk(0, 0, new List<IUniqueDef>(), grps[0].Gamut.Clone());
@@ -58,18 +42,10 @@ namespace Moritz.Algorithm.Tombeau1
         }
 
         /// <summary>
-        /// Called by the GetGrpLists() function.
-        /// Creates a list of Grps having the same relativePitchHierarchyIndex.
-        /// </summary>
-        protected abstract List<Grp> GetGrpList(int relativePitchHierarchyIndex);
-
-        /// <summary>
         /// This is where the composition is actually done.
-        /// The final sequence of Grps, possibly separated by RestDefs
+        /// Returns the final sequence of Grps, possibly separated by RestDefs
         /// </summary>
-        protected abstract List<Trk> GetTombeau1SeqTrks(List<List<Grp>> grpLists);
-
-        protected List<List<Grp>> GrpLists = null;
+        protected abstract List<Trk> GetTombeau1SeqTrks(List<List<Grp>> palette);
         protected List<Trk> Trks = null;
     }
 }

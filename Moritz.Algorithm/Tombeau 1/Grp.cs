@@ -252,7 +252,5 @@ namespace Moritz.Algorithm.Tombeau1
         {
             return ($"Grp: MsDuration={MsDuration} MsPositionReContainer={MsPositionReContainer} Count={Count}");
         }
-
-
     }
 }

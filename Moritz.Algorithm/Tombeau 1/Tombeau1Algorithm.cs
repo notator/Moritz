@@ -353,12 +353,14 @@ namespace Moritz.Algorithm.Tombeau1
 
             /**********************************************/
 
+            bool displayPalettes = true;
+
             List<Seq> seqs = new List<Seq>();
-            TenorTrks tenorTrks = new TenorTrks();
+            TenorTrks tenorTrks = new TenorTrks(displayPalettes);
             AddTrksToSeqs(seqs, tenorTrks, MidiChannelIndexPerOutputVoice[2]);
 
-            //SopranoTrks sopranoTrks = new SopranoTrks(tenorTrks);
-            //AddTrksToSeqs(seqs, sopranoTrks, MidiChannelIndexPerOutputVoice[0]);
+            SopranoTrks sopranoTrks = new SopranoTrks(tenorTrks, displayPalettes);
+            AddTrksToSeqs(seqs, sopranoTrks, MidiChannelIndexPerOutputVoice[0]);
 
             //BassTrks bassTrks = new BassTrks(sopranoTrks, tenorTrks);
             //AddTrksToSeqs(seqs, bassTrks, MidiChannelIndexPerOutputVoice[3]);

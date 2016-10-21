@@ -6,12 +6,12 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-    internal class TenorTrks : TrkSequence
+    internal class SopranoTrks : TrkSequence
     {
-        public TenorTrks(bool displayPalette)
+        public SopranoTrks(TenorTrks tenorTrks, bool displayPalette)
             : base()
         {
-            Palette = GetPalette();
+            Palette = GetPalette(tenorTrks.Palette);
 
             if(displayPalette)
             {
@@ -26,13 +26,13 @@ namespace Moritz.Algorithm.Tombeau1
         /// <summary>
         /// Each Grp in a GrpList has the same Gamut.
         /// </summary>
-        private List<List<Grp>> GetPalette()
+        private List<List<Grp>> GetPalette(List<List<Grp>> tenorPalette)
         {
             List<List<Grp>> grpLists = new List<List<Grp>>();
 
-            for(int i = 0; i < Gamut.RelativePitchHierarchiesCount; ++i)
+            for(int i = 0; i < tenorPalette.Count; ++i)
             {
-                List<Grp> grpList = GetGrpList(i);
+                List<Grp> grpList = GetGrpList(tenorPalette[i]);
                 grpLists.Add(grpList);
             }
 
@@ -40,34 +40,25 @@ namespace Moritz.Algorithm.Tombeau1
         }
 
         /// <summary>
-        /// Called by the GetPalette() function.
+        /// Called by the above GetGrpLists() function.
         /// Creates a list of Grps having the same relativePitchHierarchyIndex.
         /// </summary>
-        private List<Grp> GetGrpList(int relativePitchHierarchyIndex)
+        private List<Grp> GetGrpList(List<Grp> tenorGrps)
         {
-            const int nGrpsPerPalette = 7;
-            const int gamutBasePitch = 0;
-            const int tenorRootOctave = 4;
-            const int tenorPitchesPerChord = 6;
-            const int tenorMsDurationPerChord = 200;
-            const double velocityFactor = 0.5;
+            const int sopranoRootOctave = 6; // tenorRootOctave + 2
 
-            int nPitchesPerOctave = 12; // decreases during the loop
             List<Grp> grps = new List<Grp>();
-            for(int i = 0; i < nGrpsPerPalette; ++i)
+            for(int i = 0; i < tenorGrps.Count; ++i)
             {
-                Gamut gamut = new Gamut(relativePitchHierarchyIndex, gamutBasePitch, nPitchesPerOctave);
-                int nChords = nPitchesPerOctave;
-                Grp grp = new Grp(gamut, tenorRootOctave, tenorPitchesPerChord, tenorMsDurationPerChord, nChords, velocityFactor);
-                int rootPitch = gamut.AbsolutePitchHierarchy[i];
-                if(gamut.Contains(rootPitch))
+                Grp grp = tenorGrps[i].Clone();
+
+                int rootPitch = grp.Gamut.AbsolutePitchHierarchy[i];
+                if(grp.Gamut.Contains(rootPitch))
                 {
-                    grp.TransposeToRootInGamut(rootPitch + (tenorRootOctave * 12));
+                    grp.TransposeToRootInGamut(rootPitch + (sopranoRootOctave * 12));
                 }
                 
                 grps.Add(grp);
-
-                nPitchesPerOctave--;
             }
             return (grps);
         }
