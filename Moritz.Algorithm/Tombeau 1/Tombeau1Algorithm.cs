@@ -353,27 +353,30 @@ namespace Moritz.Algorithm.Tombeau1
 
             /**********************************************/
 
-            bool displayPalettes = true;
+            TenorGrps tenorGrps = new TenorGrps();
+            SopranoGrps sopranoGrps = new SopranoGrps(tenorGrps.Grps);
+            //BassGrps bassGrps = new BassGrps(sopranoGrps.Grps, tenorGrps.Grps);
+            //AltoGrps altoGrps = new AltoGrps(sopranoGrps.Grps, tenorGrps.Grps, bassGrps.Grps);
 
-            List<Seq> seqs = new List<Seq>();
-            TenorTrks tenorTrks = new TenorTrks(displayPalettes);
-            AddTrksToSeqs(seqs, tenorTrks, MidiChannelIndexPerOutputVoice[2]);
-
-            SopranoTrks sopranoTrks = new SopranoTrks(tenorTrks, displayPalettes);
-            AddTrksToSeqs(seqs, sopranoTrks, MidiChannelIndexPerOutputVoice[0]);
-
-            //BassTrks bassTrks = new BassTrks(sopranoTrks, tenorTrks);
-            //AddTrksToSeqs(seqs, bassTrks, MidiChannelIndexPerOutputVoice[3]);
-
-            //AltoTrks altoTrks = new AltoTrks(sopranoTrks, tenorTrks, bassTrks);
-            //AddTrksToSeqs(seqs, altoTrks, MidiChannelIndexPerOutputVoice[1]);
-
-            //Do global changes that affect all trks here (accel., rit, transpositions etc.)
-            FinalizeSeqs(seqs);
+            List<Seq> outputSeqs = new List<Seq>(); // The seqs that will be displayed (the score).
+            bool composingGrps = true;
+            if(composingGrps)
+            {
+                // add the Grps to the outputSeqs
+                AddGrpsToSeqs(outputSeqs, tenorGrps.Grps, MidiChannelIndexPerOutputVoice[2]);
+                AddGrpsToSeqs(outputSeqs, sopranoGrps.Grps, MidiChannelIndexPerOutputVoice[0]);
+                //AddGrpsToSeqs(seqs, bassGrps.Grps, MidiChannelIndexPerOutputVoice[3]);
+                //AddGrpsToSeqs(seqs, altoGrps.Grps, MidiChannelIndexPerOutputVoice[1]);
+            }
+            else
+            {
+                // Compose the piece in the outputSeqs
+                //ComposeSeqs(outputSeqs, sopranoGrps.Grps, altoGrps.Grps, tenorGrps.Grps, bassGrps.Grps, MidiChannelIndexPerOutputVoice);
+            }
 
             Seq mainSeq = new Seq(0, new List<Trk>() { new Trk(0) }, MidiChannelIndexPerOutputVoice);
             List<int> approximateBarlineMsPositions = new List<int>();
-            GetMainSeqAndApproximateBarlineMsPositions(seqs, mainSeq, approximateBarlineMsPositions);
+            GetMainSeqAndApproximateBarlineMsPositions(outputSeqs, mainSeq, approximateBarlineMsPositions);
 
             MainBlock mainBlock = new MainBlock(InitialClefPerChannel, mainSeq, approximateBarlineMsPositions);
 
@@ -441,27 +444,44 @@ namespace Moritz.Algorithm.Tombeau1
             return barlineMsPositionsReSeq;
         }
 
-        private void AddTrksToSeqs(List<Seq> seqs, TrkSequence trkSequence, int midiChannel)
+        private void AddGrpsToSeqs(List<Seq> seqs, List<List<Grp>> grps, int midiChannel)
         {
+            List<Trk> trks = GrpListsToTrks(grps, midiChannel);
             if(seqs.Count == 0)
             {
-                for(int i = 0; i < trkSequence.Count; ++i)
+                for(int i = 0; i < trks.Count; ++i)
                 {
-                    Trk trk = trkSequence[i];
-                    trk.MidiChannel = midiChannel;
-                    seqs.Add(new Seq(0, new List<Trk>() { trk }, MidiChannelIndexPerOutputVoice));
+                    seqs.Add(new Seq(0, new List<Trk>() { trks[i] }, MidiChannelIndexPerOutputVoice));
                 }
             }
             else
             {
-                Debug.Assert(seqs.Count == trkSequence.Count);
-                for(int i = 0; i < seqs.Count;  ++i)
+                Debug.Assert(seqs.Count == trks.Count);
+                for(int i = 0; i < trks.Count;  ++i)
                 {
-                    Trk trk = trkSequence[i];
-                    trk.MidiChannel = midiChannel;
+                    Trk trk = trks[i];
                     seqs[i].SetTrk(trk);
                 }
             }
+        }
+
+        /// <summary>
+        /// This function is used while composing palettes.
+        /// It simply converts its argument to a list of Trks having the same midiChannel.
+        /// </summary>
+        private List<Trk> GrpListsToTrks(List<List<Grp>> grpLists, int midiChannel)
+        {
+            List<Trk> seqTrks = new List<Trk>();
+            foreach(List<Grp> grps in grpLists)
+            {
+                Trk trk0 = new Trk(midiChannel, 0, new List<IUniqueDef>(), grps[0].Gamut.Clone());
+                foreach(Grp grp in grps)
+                {
+                    trk0.AddRange(grp);
+                }
+                seqTrks.Add(trk0);
+            }
+            return seqTrks;
         }
 
         #region private properties for use by Tombeau1Algorithm
