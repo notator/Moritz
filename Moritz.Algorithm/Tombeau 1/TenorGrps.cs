@@ -31,8 +31,39 @@ namespace Moritz.Algorithm.Tombeau1
             {
                 Gamut gamut = new Gamut(relativePitchHierarchyIndex, gamutBasePitch, domain);
 
-                Grp grp = new TenorPaletteGrp(gamut, domain);
-                grps.Add(grp);
+                TenorPaletteGrp tpg = new TenorPaletteGrp(gamut, domain);
+
+                #region begin test code 1 Shear and permute
+                //tpg.Shear(0, -1 * (gamut.NPitchesPerOctave));
+
+                //if(domain % 2 != 0)
+                //{
+                //    tpg.Permute(1, 7);
+                //}
+                #endregion end test code 1
+
+                #region begin test code 2 transpose to the same absolute root pitch
+                for(int iudIndex = 0; iudIndex < tpg.Count; ++iudIndex)
+                {
+                    tpg.TransposeChordDownToAbsolutePitch(iudIndex, 0);
+                }
+                #endregion end test code 2
+
+                #region begin test code 3, adjust velocities
+                //if(domain % 2 != 0)
+                //{
+                //    tpg.AdjustVelocities(0.5);
+                //}
+                #endregion
+
+                #region begin test code 4, adjust velocities
+                if(domain % 2 != 0 && tpg.Count > 1)
+                {
+                    tpg.AdjustVelocitiesHairpin(0, tpg.Count - 1, 0.5, 1.0);
+                }
+                #endregion
+
+                grps.Add(tpg);
             }
 
             return (grps);

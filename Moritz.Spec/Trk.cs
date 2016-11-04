@@ -352,7 +352,7 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="gamut"></param>
         /// <param name="stepsToTranspose"></param>
-        public void TransposeStepsInGamut(int stepsToTranspose)
+        public virtual void TransposeStepsInGamut(int stepsToTranspose)
         {
             foreach(MidiChordDef mcd in MidiChordDefs)
             {
@@ -645,13 +645,13 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Multiplies each expression value in the MidiChordDefs
-        /// from beginIndex to (not including) endIndex by the argument factor.
+        /// from beginIndex to (including) endIndex by the argument factor.
         /// </summary>
         public void AdjustExpression(int beginIndex, int endIndex, double factor)
         {
             CheckIndices(beginIndex, endIndex);
 
-            for(int i = beginIndex; i < endIndex; ++i)
+            for(int i = beginIndex; i <= endIndex; ++i)
             {
                 MidiChordDef iumdd = _uniqueDefs[i] as MidiChordDef;
                 if(iumdd != null)
@@ -671,7 +671,7 @@ namespace Moritz.Spec
             }
         }
         /// <summary>
-        /// Multiplies each velocity value in the MidiChordDefs from beginIndex to (not including) endIndex by
+        /// Multiplies each velocity value in the MidiChordDefs from beginIndex to endIndex by
         /// the argument factor (which must be greater than zero).
         /// N.B MidiChordDefs will be turned into RestDefs if all their notes are given zero velocity!
         /// </summary>
@@ -679,7 +679,7 @@ namespace Moritz.Spec
         {
             CheckIndices(beginIndex, endIndex);
             Debug.Assert(factor > 0.0);
-            for(int i = beginIndex; i < endIndex; ++i)
+            for(int i = beginIndex; i <= endIndex; ++i)
             {
                 MidiChordDef mcd = _uniqueDefs[i] as MidiChordDef;
                 if(mcd != null)
@@ -713,25 +713,24 @@ namespace Moritz.Spec
             }
         }
         /// <summary>
-        /// Creates a hairpin in the velocities from startMsPosition to endMsPosition (non-inclusive).
+        /// Creates a hairpin in the velocities from the IUniqueDef at beginIndex to the IUniqueDef at endIndex (inclusive).
         /// This function does NOT change velocities outside the range given in its arguments.
         /// There must be at least two IUniqueDefs in the msPosition range given in the arguments.
         /// The factors by which the velocities are multiplied change arithmetically:
-        /// The velocity of the first IUniqueDefs is multiplied by startFactor, and the velocity
-        /// of the last MidiChordDef in range by endFactor.
+        /// The velocity of the the IUniqueDef at beginIndex is multiplied by startFactor, and
+        /// the velocity of the the IUniqueDef at endIndex is multiplied by endFactor.
         /// Can be used to create a diminueno or crescendo.
         /// N.B MidiChordDefs will be turned into RestDefs if all their notes have zero velocity!
         /// </summary>
-        /// <param name="startMsPosition">MsPositionReFirstIUD</param>
-        /// <param name="endMsPosition">MsPositionReFirstIUD</param>
-        /// <param name="startFactor"></param>
-        /// <param name="endFactor"></param>
-        public virtual void AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
+        /// <param name="startIndex">index of start UniqueDef (range 0 to this.Count - 2)</param>
+        /// <param name="endIndex">index of end UniqueDef (range startIndex + 1 to this.Count - 1)</param>
+        /// <param name="startFactor">greater than or equal to 0</param>
+        /// <param name="endFactor">greater than or equal to 0</param>
+        public virtual void AdjustVelocitiesHairpin(int beginIndex, int endIndex, double startFactor, double endFactor)
         {
-            int beginIndex = FindIndexAtMsPositionReFirstIUD(startMsPosition);
-            int endIndex = FindIndexAtMsPositionReFirstIUD(endMsPosition);
+            CheckIndices(beginIndex, endIndex);
 
-            Debug.Assert(((beginIndex + 1) < endIndex) && (startFactor >= 0) && (endFactor >= 0) && (endIndex <= Count));
+            Debug.Assert(startFactor >= 0 && endFactor >= 0);
 
             int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
 
@@ -758,13 +757,10 @@ namespace Moritz.Spec
         /// Implemented using one pan value per MidiChordDef.
         /// This function does NOT change pan values outside the position range given in its arguments.
         /// </summary>
-        public void SetPanGliss(int startMsPosition, int endMsPosition, int startPanValue, int endPanValue)
+        public void SetPanGliss(int beginIndex, int endIndex, int startPanValue, int endPanValue)
         {
-            int beginIndex = FindIndexAtMsPositionReFirstIUD(startMsPosition);
-            int endIndex = FindIndexAtMsPositionReFirstIUD(endMsPosition);
-
-            Debug.Assert(((beginIndex + 1) < endIndex) && (startPanValue >= 0) && (startPanValue <= 127)
-                && (endPanValue >= 0) && (endPanValue <= 127) && (endIndex <= Count));
+            Debug.Assert(beginIndex < endIndex && endIndex < Count);
+            Debug.Assert(startPanValue >= 0 && startPanValue <= 127 && endPanValue >= 0 && endPanValue <= 127);
 
             int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
 
@@ -790,7 +786,7 @@ namespace Moritz.Spec
         {
             CheckIndices(beginIndex, endIndex);
 
-            for(int i = beginIndex; i < endIndex; ++i)
+            for(int i = beginIndex; i <= endIndex; ++i)
             {
                 MidiChordDef mcd = this[i] as MidiChordDef;
                 if(mcd != null)
@@ -801,14 +797,14 @@ namespace Moritz.Spec
         }
         /// <summary>
         /// Removes the pitchwheel commands (not the pitchwheelDeviations)
-        /// from chords in the range beginIndex to (not including) endIndex.
+        /// from chords in the range beginIndex to (including) endIndex.
         /// Rests in the range are not changed.
         /// </summary>
         public void RemoveScorePitchWheelCommands(int beginIndex, int endIndex)
         {
             CheckIndices(beginIndex, endIndex);
 
-            for(int i = beginIndex; i < endIndex; ++i)
+            for(int i = beginIndex; i <= endIndex; ++i)
             {
                 MidiChordDef iumdd = this[i] as MidiChordDef;
                 if(iumdd != null)
@@ -823,25 +819,25 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Creates an exponential change (per index) of pitchwheelDeviation from startMsPosition to endMsPosition,
+        /// Creates an exponential change (per index) of pitchwheelDeviation from beginIndex to endIndex,
         /// </summary>
         /// <param name="finale"></param>
-        protected void AdjustPitchWheelDeviations(int startMsPosition, int endMsPosition, int startPwd, int endPwd)
+        protected void AdjustPitchWheelDeviations(int beginIndex, int endIndex, int pwValueAtBeginIndex, int pwValueAtEndIndex)
         {
-            double furies1StartPwdValue = startPwd, furies1EndPwdValue = endPwd;
-            int beginIndex = FindIndexAtMsPositionReFirstIUD(startMsPosition);
-            int endIndex = FindIndexAtMsPositionReFirstIUD(endMsPosition);
+            Debug.Assert(beginIndex >= 0 && beginIndex < endIndex && endIndex < Count);
+            Debug.Assert(pwValueAtBeginIndex >= 0 && pwValueAtEndIndex >= 0);
+            Debug.Assert(pwValueAtBeginIndex <= 127 && pwValueAtEndIndex <= 127);
 
             int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
 
-            double pwdfactor = Math.Pow(furies1EndPwdValue / furies1StartPwdValue, (double)1 / (endIndex - beginIndex - nNonMidiChordDefs)); // f13.Count'th root of furies1EndPwdValue/furies1StartPwdValue -- the last pwd should be furies1EndPwdValue
+            double pwdfactor = Math.Pow(pwValueAtEndIndex / pwValueAtBeginIndex, (double)1 / (endIndex - beginIndex - nNonMidiChordDefs)); // f13.Count'th root of furies1EndPwdValue/furies1StartPwdValue -- the last pwd should be furies1EndPwdValue
 
             for(int i = beginIndex; i < endIndex; ++i)
             {
                 MidiChordDef umc = _uniqueDefs[i] as MidiChordDef;
                 if(umc != null)
                 {
-                    umc.PitchWheelDeviation = M.MidiValue((int)(furies1StartPwdValue * (Math.Pow(pwdfactor, i))));
+                    umc.PitchWheelDeviation = M.MidiValue((int)(pwValueAtBeginIndex * (Math.Pow(pwdfactor, i))));
                 }
             }
         }

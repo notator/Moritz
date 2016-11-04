@@ -123,8 +123,8 @@ namespace Moritz.Spec
         #region consistency
         protected void CheckIndices(int beginIndex, int endIndex)
         {
-            Debug.Assert(beginIndex >= 0 && beginIndex < _uniqueDefs.Count);
-            Debug.Assert(endIndex >= 0 && endIndex <= _uniqueDefs.Count);
+            Debug.Assert(endIndex >= 1 && endIndex < _uniqueDefs.Count, "Error: endIndex out of range.");
+            Debug.Assert(beginIndex < endIndex, "Error: endIndex must be greater than beginIndex");
         }
 
         protected void AssertVoiceDefConsistency()
@@ -233,7 +233,7 @@ namespace Moritz.Spec
         protected int GetNumberOfNonMidiOrInputChordDefs(int beginIndex, int endIndex)
         {
             int nNonMidiChordDefs = 0;
-            for(int i = beginIndex; i < endIndex; ++i)
+            for(int i = beginIndex; i <= endIndex; ++i)
             {
                 if(!(_uniqueDefs[i] is MidiChordDef) && !(_uniqueDefs[i] is InputChordDef))
                     nNonMidiChordDefs++;
@@ -288,7 +288,7 @@ namespace Moritz.Spec
 
         #region Transpose
         /// <summary>
-        /// Transpose all the IUniqueChordDefs from beginIndex to (not including) endIndex
+        /// Transpose all the IUniqueChordDefs from beginIndex to (including) endIndex
         /// up by the number of semitones given in the interval argument.
         /// IUniqueChordDefs are MidiChordDef, InputChordDef and CautionaryChordDef.
         /// Negative interval values transpose down.
@@ -299,7 +299,8 @@ namespace Moritz.Spec
         public void Transpose(int beginIndex, int endIndex, int interval)
         {
             CheckIndices(beginIndex, endIndex);
-            for(int i = beginIndex; i < endIndex; ++i)
+
+            for(int i = beginIndex; i <= endIndex; ++i)
             {
                 IUniqueChordDef iucd = _uniqueDefs[i] as IUniqueChordDef;
                 if(iucd != null)
@@ -370,22 +371,20 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Transposes the UniqueDefs from the beginIndex upto (but not including) endIndex
+        /// Transposes the UniqueDefs from the beginIndex upto (including) endIndex
         /// by an equally increasing amount, so that the final MidiChordDef or InputChordDef is transposed by glissInterval.
-        /// beginIndex must be less than endIndex.
         /// glissInterval can be negative.
         /// </summary>
         public void StepwiseGliss(int beginIndex, int endIndex, int glissInterval)
         {
             CheckIndices(beginIndex, endIndex);
-            Debug.Assert(beginIndex < endIndex);
 
             int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
 
             int nSteps = (endIndex - beginIndex - nNonMidiChordDefs);
             double interval = ((double)glissInterval) / nSteps;
             double step = interval;
-            for(int i = beginIndex; i < endIndex; ++i)
+            for(int i = beginIndex; i <= endIndex; ++i)
             {
                 MidiChordDef mcd = _uniqueDefs[i] as MidiChordDef;
                 InputChordDef icd = _uniqueDefs[i] as InputChordDef;
@@ -627,7 +626,7 @@ namespace Moritz.Spec
         }
         
         /// <summary>
-        /// Multiplies the MsDuration of each T from beginIndex to (not including) endIndex by factor.
+        /// Multiplies the MsDuration of each T from beginIndex to (including) endIndex by factor.
         /// If a MsDuration becomes less than minThreshold, the T (chord or rest) is removed.
         /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
@@ -641,7 +640,7 @@ namespace Moritz.Spec
             for(int i = 0; i < _uniqueDefs.Count; ++i)
             {
                 IUniqueDef iumdd = _uniqueDefs[i];
-                if(i >= beginIndex && i < endIndex && iumdd is T)
+                if(i >= beginIndex && i <= endIndex && iumdd is T)
                 {
                     iumdd.MsDuration = (int)((double)iumdd.MsDuration * factor);
                 }

@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Moritz.Spec;
-using Moritz.Globals;             
 
 namespace Moritz.Algorithm.Tombeau1
 {
@@ -198,72 +198,43 @@ namespace Moritz.Algorithm.Tombeau1
             SetBeamEnd();
         }
         #endregion UniqueDefs list order changers
-        #region Velocity changers 
-        /// <summary>
-        /// The arguments are passed unchanged to MidiChordDef.SetVelocityPerAbsolutePitch(...) for each MidiChordDef in this Trk.
-        /// See the MidiChordDef documentation for details.
-        /// If velocityPerAbsolutePitch contains values that are less than minimumVelocity, the velocities are increased proportionally.
-        /// If minimumVelocity==0, in both velocityPerAbsolutePitch and here, the notes that would have been given velocity=0 are removed
-        /// completely. If this results in a MidiChordDef with no notes, it is replaced here by a restDef of the same MsDuration.
-        /// </summary>
-        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127]) in order of absolute pitch</param>
-        /// <param name="minimumVelocity">In range 0..127</param>
-        /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
-        public override void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, byte minimumVelocity, double percent = 100.0)
-        {
-            base.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, minimumVelocity, percent);
-            SetBeamEnd(); // the final MidiChordDef may have been replaced by a RestDef
-        }
-        /// <summary>
-        /// Sets the velocity of each MidiChordDef in the Trk (anti-)proportionally to its duration.
-        /// The (optional) percent argument determines the proportion of the final velocity for which this function is responsible.
-        /// The other component of the final velocity value is its existing velocity. If percent is 100.0, the existing velocity
-        /// is replaced completely.
-        /// N.B 1) Neither velocityForMinMsDuration nor velocityForMaxMsDuration can be zero! -- that would be a NoteOff.
-        /// and 2) velocityForMinMsDuration can be less than, equal to, or greater than velocityForMaxMsDuration.
-        /// </summary>
-        /// <param name="velocityForMinMsDuration">in range 1..127</param>
-        /// <param name="velocityForMaxMsDuration">in range 1..127</param>
-        public override void SetVelocitiesFromDurations(byte velocityForMinMsDuration, byte velocityForMaxMsDuration, double percent = 100.0)
-        {
-            base.SetVelocitiesFromDurations(velocityForMinMsDuration, velocityForMaxMsDuration, percent);
-            SetBeamEnd();
-        }
-        /// <summary>
-        /// Multiplies each velocity value in the MidiChordDefs
-        /// from beginIndex to (not including) endIndex by the argument factor.
-        /// </summary>
-        public override void AdjustVelocities(int beginIndex, int endIndex, double factor)
-        {
-            base.AdjustVelocities(beginIndex, endIndex, factor);
-            SetBeamEnd();
-        }
-        /// <summary>
-        /// Multiplies each velocity value in the MidiChordDefs by the argument factor.
-        /// </summary>
-        public override void AdjustVelocities(double factor)
-        {
-            base.AdjustVelocities(factor);
-            SetBeamEnd();
-        }
-        /// Creates a hairpin in the velocities from startMsPosition to endMsPosition (non-inclusive).
-        /// This function does NOT change velocities outside the range given in its arguments.
-        /// There must be at least two IUniqueDefs in the msPosition range given in the arguments.
-        /// The factors by which the velocities are multiplied change arithmetically:
-        /// The velocity of the first IUniqueDefs is multiplied by startFactor, and the velocity
-        /// of the last MidiChordDef in range by endFactor.
-        /// Can be used to create a diminueno or crescendo.
-        /// <param name="startMsPosition">MsPositionReFirstIUD</param>
-        /// <param name="endMsPosition">MsPositionReFirstIUD</param>
-        /// <param name="startFactor"></param>
-        /// <param name="endFactor"></param>
-        public override void AdjustVelocitiesHairpin(int startMsPosition, int endMsPosition, double startFactor, double endFactor)
-        {
-            base.AdjustVelocitiesHairpin(startMsPosition, endMsPosition, startFactor, endFactor);
-            SetBeamEnd();
-        }
-        #endregion Velocity changers
         #endregion Overridden functions
+
+        /// <summary>
+        /// Shears the group vertically, maintaining the gamut and its velocities per absolute pitch.
+        /// The number of steps to transpose intermediate chords is calculated from startSteps and endSteps.
+        /// If there is only one chord in the Grp, it is transposed by startSteps.
+        /// </summary>
+        /// <param name="startSteps">The number of steps in the gamut to transpose the first chord</param>
+        /// <param name="endSteps">The number of steps in the gamut to transpose the last chord</param>
+        internal virtual void Shear(int startSteps, int endSteps)
+        {
+            if(Count == 1)
+            {
+                TransposeStepsInGamut(startSteps);
+            }
+            else
+            {
+                List<int> stepsList = new List<int>();
+
+                double incr = ((double)(endSteps - startSteps)) / (Count - 1);
+                double dSteps = startSteps;
+                for(int i = 0; i < _uniqueDefs.Count; ++i)
+                {
+                    stepsList.Add((int)Math.Round(dSteps));
+                    dSteps += incr;
+                }
+
+                for(int i = 0; i < _uniqueDefs.Count; ++i)
+                {
+                    MidiChordDef mcd = _uniqueDefs[i] as MidiChordDef;
+                    if(mcd != null)
+                    {
+                        mcd.TransposeStepsInGamut(Gamut, stepsList[i]);
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Sets BeamContinues to false on the final MidiChordDef, and true on all the others.
