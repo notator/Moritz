@@ -586,45 +586,61 @@ namespace Moritz.Spec
                     }
                 }
             }
-            pitches.Sort();
             #endregion get pitches
-            #region get durations
-            int nPitches = pitches.Count;
-            double factor = Math.Pow((((double)durationForHighestPitch) / durationForLowestPitch), (((double)1) / (nPitches - 1)));
-            List<int> msDurations = new List<int>();
-            double msDuration = durationForLowestPitch;
-            foreach(byte pitch in pitches)
+            if(pitches.Count == 1)
             {
-                msDurations.Add((int)Math.Round(msDuration));
-                msDuration *= factor;
-            }
-            Debug.Assert(msDurations.Count == nPitches);
-            Debug.Assert(msDurations[msDurations.Count - 1] == durationForHighestPitch);
-            #endregion get durations
-            #region get duration per pitch dictionary
-            Dictionary<byte, int> msDurPerPitch = new Dictionary<byte, int>();
-            for(int i = 0; i < nPitches; ++i)
-            {
-                msDurPerPitch.Add(pitches[i], msDurations[i]);
-            }
-            #endregion get get duration per pitch dictionary
-            #region set durations
-            double factorForNewValue = percent / 100.0;
-            double factorForOldValue = 1 - factorForNewValue;
-            int currentMsDuration = this.MsDuration;
-            foreach(IUniqueDef iud in _uniqueDefs)
-            {
-                MidiChordDef mcd = iud as MidiChordDef;
-                if(mcd != null)
+                int mcdMsDuration = (useBottomPitch == true) ? durationForLowestPitch : durationForHighestPitch;
+                foreach(IUniqueDef iud in _uniqueDefs)
                 {
-                    byte pitch = (useBottomPitch == true) ? mcd.NotatedMidiPitches[0] : mcd.NotatedMidiPitches[mcd.NotatedMidiPitches.Count - 1];
-                    int oldDuration = mcd.MsDuration;
-                    int durPerPitch = msDurPerPitch[pitch];
-                    mcd.MsDuration = (int)Math.Round((oldDuration * factorForOldValue) + (durPerPitch * factorForNewValue));
+                    MidiChordDef mcd = iud as MidiChordDef;
+                    if(mcd != null)
+                    {
+                        mcd.MsDuration = mcdMsDuration;
+                    }
                 }
             }
-            this.MsDuration = currentMsDuration;
-            #endregion set durations
+            else
+            {
+                Debug.Assert(pitches.Count > 1);
+                pitches.Sort();
+                #region get durations
+                int nPitches = pitches.Count;
+                double factor = Math.Pow((((double)durationForHighestPitch) / durationForLowestPitch), (((double)1) / (nPitches - 1)));
+                List<int> msDurations = new List<int>();
+                double msDuration = durationForLowestPitch;
+                foreach(byte pitch in pitches)
+                {
+                    msDurations.Add((int)Math.Round(msDuration));
+                    msDuration *= factor;
+                }
+                Debug.Assert(msDurations.Count == nPitches);
+                Debug.Assert(msDurations[msDurations.Count - 1] == durationForHighestPitch);
+                #endregion get durations
+                #region get duration per pitch dictionary
+                Dictionary<byte, int> msDurPerPitch = new Dictionary<byte, int>();
+                for(int i = 0; i < nPitches; ++i)
+                {
+                    msDurPerPitch.Add(pitches[i], msDurations[i]);
+                }
+                #endregion get get duration per pitch dictionary
+                #region set durations
+                double factorForNewValue = percent / 100.0;
+                double factorForOldValue = 1 - factorForNewValue;
+                int currentMsDuration = this.MsDuration;
+                foreach(IUniqueDef iud in _uniqueDefs)
+                {
+                    MidiChordDef mcd = iud as MidiChordDef;
+                    if(mcd != null)
+                    {
+                        byte pitch = (useBottomPitch == true) ? mcd.NotatedMidiPitches[0] : mcd.NotatedMidiPitches[mcd.NotatedMidiPitches.Count - 1];
+                        int oldDuration = mcd.MsDuration;
+                        int durPerPitch = msDurPerPitch[pitch];
+                        mcd.MsDuration = (int)Math.Round((oldDuration * factorForOldValue) + (durPerPitch * factorForNewValue));
+                    }
+                }
+                this.MsDuration = currentMsDuration;
+                #endregion set durations
+            }
         }
 
         /// <summary>

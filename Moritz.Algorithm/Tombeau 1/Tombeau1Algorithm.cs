@@ -354,7 +354,7 @@ namespace Moritz.Algorithm.Tombeau1
             /**********************************************/
 
             TenorGrps tenorGrps = new TenorGrps();
-            SopranoGrps sopranoGrps = new SopranoGrps(tenorGrps.Grps);
+            //SopranoGrps sopranoGrps = new SopranoGrps(tenorGrps.Grps);
             //BassGrps bassGrps = new BassGrps(sopranoGrps.Grps, tenorGrps.Grps);
             //AltoGrps altoGrps = new AltoGrps(sopranoGrps.Grps, tenorGrps.Grps, bassGrps.Grps);
 
@@ -364,7 +364,7 @@ namespace Moritz.Algorithm.Tombeau1
             {
                 // add the Grps to the outputSeqs
                 AddGrpsToSeqs(outputSeqs, tenorGrps.Grps, MidiChannelIndexPerOutputVoice[2]);
-                AddGrpsToSeqs(outputSeqs, sopranoGrps.Grps, MidiChannelIndexPerOutputVoice[0]);
+                //AddGrpsToSeqs(outputSeqs, sopranoGrps.Grps, MidiChannelIndexPerOutputVoice[0]);
                 //AddGrpsToSeqs(seqs, bassGrps.Grps, MidiChannelIndexPerOutputVoice[3]);
                 //AddGrpsToSeqs(seqs, altoGrps.Grps, MidiChannelIndexPerOutputVoice[1]);
             }
@@ -425,7 +425,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// <returns></returns>
         private List<int> GetBarlineMsPositionsReSeq(Seq seq)
         {
-            const int maxSystemMsDuration = 15000;
+            const int maxSystemMsDuration = 20000;
 
             List<int> barlineMsPositionsReSeq = new List<int>();
             int seqMsDuration = seq.MsDuration;

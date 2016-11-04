@@ -1,19 +1,60 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using Moritz.Spec;
-using Moritz.Globals;
+using Moritz.Globals;             
 
 namespace Moritz.Algorithm.Tombeau1
 {
     public class Grp : Trk
     {
         #region constructors
+        /// <param name="gamut">can not be null</param>
+        /// <param name="octave">must be greater than or equal to 0</param>
+        /// <param name="nPitchesPerChord">must be greater than 0</param>
+        /// <param name="msDurationPerChord">must be greater than 0</param>
+        /// <param name="nChords">must be greater than 0</param>
+        /// <param name="velocityFactor">must be greater than 0.0</param>
         public Grp(Gamut gamut, int octave, int nPitchesPerChord, int msDurationPerChord, int nChords, double velocityFactor)
-            : base(0, 0, new List<IUniqueDef>(), gamut)
+            : base(0, 0, new List<IUniqueDef>(), null)
         {
+            Debug.Assert(gamut != null);
+            Debug.Assert(octave >= 0);
+            Debug.Assert(nPitchesPerChord > 0);
+            Debug.Assert(msDurationPerChord > 0);
+            Debug.Assert(nChords > 0);
+            Debug.Assert(velocityFactor > 0.0);
+
+            Gamut = gamut;
+
             for(int i = 0; i < nChords; ++i)
             {
-                int rootNotatedPitch = gamut.AbsolutePitchHierarchy[i] + (12 * octave);
+                int rootNotatedPitch;
+                if(i == 0)
+                {
+                    rootNotatedPitch = gamut.AbsolutePitchHierarchy[i] + (12 * octave);
+                }
+                else
+                {
+                    List<byte> previousPitches = ((MidiChordDef)_uniqueDefs[i - 1]).BasicMidiChordDefs[0].Pitches;
+                    if(previousPitches.Count > 1)
+                    {
+                        rootNotatedPitch = previousPitches[1];
+                    }
+                    else
+                    {
+                        rootNotatedPitch = gamut.AbsolutePitchHierarchy[i];
+                        int topPitchInGamut = gamut[gamut.Count - 1];
+                        while(rootNotatedPitch < previousPitches[0])
+                        {
+                            rootNotatedPitch += 12;
+                            if(rootNotatedPitch > topPitchInGamut)
+                            {
+                                rootNotatedPitch = topPitchInGamut;
+                                break;
+                            }
+                        }
+                    }
+                }
                 MidiChordDef mcd = new MidiChordDef(msDurationPerChord, gamut, rootNotatedPitch, nPitchesPerChord, null);
                 mcd.AdjustVelocities(velocityFactor);
                 _uniqueDefs.Add(mcd);
