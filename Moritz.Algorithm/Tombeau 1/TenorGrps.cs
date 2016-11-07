@@ -27,6 +27,7 @@ namespace Moritz.Algorithm.Tombeau1
             const int gamutBasePitch = 0;
             List<Grp> grps = new List<Grp>();
 
+            Console.WriteLine("relativePitchHierarchyIndex=" + relativePitchHierarchyIndex.ToString());
             for(int domain = 12; domain >= 1; --domain) // domain is both Gamut.PitchesPerOctave and nChords per Grp
             {
                 Gamut gamut = new Gamut(relativePitchHierarchyIndex, gamutBasePitch, domain);
@@ -42,11 +43,11 @@ namespace Moritz.Algorithm.Tombeau1
                 //}
                 #endregion end test code 1
 
-                #region begin test code 2 transpose to the same absolute root pitch
-                for(int iudIndex = 0; iudIndex < tpg.Count; ++iudIndex)
-                {
-                    tpg.TransposeChordDownToAbsolutePitch(iudIndex, 0);
-                }
+                #region begin test code 2 transpose chords to the same absolute root pitch
+                //for(int iudIndex = 0; iudIndex < tpg.Count; ++iudIndex)
+                //{
+                //    tpg.TransposeChordDownToAbsolutePitch(iudIndex, 0);
+                //}
                 #endregion end test code 2
 
                 #region begin test code 3, adjust velocities
@@ -57,10 +58,10 @@ namespace Moritz.Algorithm.Tombeau1
                 #endregion
 
                 #region begin test code 4, adjust velocities
-                if(domain % 2 != 0 && tpg.Count > 1)
-                {
-                    tpg.AdjustVelocitiesHairpin(0, tpg.Count - 1, 0.5, 1.0);
-                }
+                //if(domain % 2 != 0 && tpg.Count > 1)
+                //{
+                //    tpg.AdjustVelocitiesHairpin(0, tpg.Count - 1, 0.5, 1.0);
+                //}
                 #endregion
 
                 grps.Add(tpg);

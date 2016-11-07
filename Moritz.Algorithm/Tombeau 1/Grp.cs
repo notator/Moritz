@@ -9,16 +9,16 @@ namespace Moritz.Algorithm.Tombeau1
     {
         #region constructors
         /// <param name="gamut">can not be null</param>
-        /// <param name="octave">must be greater than or equal to 0</param>
+        /// <param name="rootOctave">must be greater than or equal to 0</param>
         /// <param name="nPitchesPerChord">must be greater than 0</param>
         /// <param name="msDurationPerChord">must be greater than 0</param>
         /// <param name="nChords">must be greater than 0</param>
         /// <param name="velocityFactor">must be greater than 0.0</param>
-        public Grp(Gamut gamut, int octave, int nPitchesPerChord, int msDurationPerChord, int nChords, double velocityFactor)
+        public Grp(Gamut gamut, int rootOctave, int nPitchesPerChord, int msDurationPerChord, int nChords, double velocityFactor)
             : base(0, 0, new List<IUniqueDef>(), null)
         {
             Debug.Assert(gamut != null);
-            Debug.Assert(octave >= 0);
+            Debug.Assert(rootOctave >= 0);
             Debug.Assert(nPitchesPerChord > 0);
             Debug.Assert(msDurationPerChord > 0);
             Debug.Assert(nChords > 0);
@@ -31,7 +31,8 @@ namespace Moritz.Algorithm.Tombeau1
                 int rootNotatedPitch;
                 if(i == 0)
                 {
-                    rootNotatedPitch = gamut.AbsolutePitchHierarchy[i] + (12 * octave);
+                    rootNotatedPitch = gamut.AbsolutePitchHierarchy[i] + (12 * rootOctave);
+                    rootNotatedPitch = (rootNotatedPitch <= gamut.MaxPitch) ? rootNotatedPitch : gamut.MaxPitch;
                 }
                 else
                 {
@@ -43,13 +44,12 @@ namespace Moritz.Algorithm.Tombeau1
                     else
                     {
                         rootNotatedPitch = gamut.AbsolutePitchHierarchy[i];
-                        int topPitchInGamut = gamut[gamut.Count - 1];
                         while(rootNotatedPitch < previousPitches[0])
                         {
                             rootNotatedPitch += 12;
-                            if(rootNotatedPitch > topPitchInGamut)
+                            if(rootNotatedPitch > gamut.MaxPitch)
                             {
-                                rootNotatedPitch = topPitchInGamut;
+                                rootNotatedPitch = gamut.MaxPitch;
                                 break;
                             }
                         }

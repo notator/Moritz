@@ -10,11 +10,11 @@ namespace Moritz.Algorithm.Tombeau1
     internal class TenorPaletteGrp : Grp
     {
         public TenorPaletteGrp(Gamut gamut, int domain)
-            //rootOctave = 3;
+            //rootOctave = 4;
             //pitchesPerChord = 6;
             //msDurationPerChord = 200; // dummy, durations are set from pitches below in the ctor
             //velocityFactor = 0.5; // dummy, velocities are set from absolute pitches below in the ctor
-            : base(gamut, 3, 6, 200, domain, 0.5)
+            : base(gamut, 4, 6, 200, domain, 0.5)
         {
             _minimumVelocity = 20;
             _maximumVelocity = 127;
