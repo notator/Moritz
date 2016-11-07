@@ -25,12 +25,13 @@ namespace Moritz.Spec
             ThrowExceptionIfPitchHierarchyIsInvalid(absolutePitchHierarchy);
             #endregion condition
 
+            _absolutePitchHierarchy = new List<int>(absolutePitchHierarchy);
+            _list = GetGamutList(_absolutePitchHierarchy, nPitchesPerOctave);
+            
             RelativePitchHierarchyIndex = relativePitchHierarchyIndex;
             BasePitch = basePitch;
             NPitchesPerOctave = nPitchesPerOctave;
-
-            _absolutePitchHierarchy = new List<int>(absolutePitchHierarchy);
-            _list = GetGamutList(_absolutePitchHierarchy, NPitchesPerOctave);
+            MaxPitch = _list[_list.Count - 1];
         }
 
         #region private helper functions
@@ -530,9 +531,10 @@ namespace Moritz.Spec
 
         #region public properties
         public static int RelativePitchHierarchiesCount { get { return RelativePitchHierarchies.Count; } }
-        public int RelativePitchHierarchyIndex { get; private set; }
-        public int BasePitch { get; private set; }
-        public int NPitchesPerOctave { get; private set; }
+        public readonly int RelativePitchHierarchyIndex;
+        public readonly int BasePitch;
+        public readonly int NPitchesPerOctave;
+        public readonly int MaxPitch;
 
         /// <summary>
         /// A clone of the private list.
