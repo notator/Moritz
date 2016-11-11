@@ -586,10 +586,10 @@ namespace Moritz.Spec
         /// </summary>
         public void RemoveRests()
         {
-            AdjustMsDurations<RestDef>(0, _uniqueDefs.Count, 0);
+            AdjustMsDurations<RestDef>(0, _uniqueDefs.Count - 1, 0);
         }
         /// <summary>
-        /// Multiplies the MsDuration of each chord and rest from beginIndex to (not including) endIndex by factor.
+        /// Multiplies the MsDuration of each chord and rest from beginIndex to endIndex (inclusive) by factor.
         /// If a chord or rest's MsDuration becomes less than minThreshold, it is removed.
         /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
@@ -604,10 +604,10 @@ namespace Moritz.Spec
         /// </summary>
         public void AdjustMsDurations(double factor, int minThreshold = 100)
         {
-            AdjustMsDurations<DurationDef>(0, _uniqueDefs.Count, factor, minThreshold);
+            AdjustMsDurations<DurationDef>(0, _uniqueDefs.Count - 1, factor, minThreshold);
         }
         /// <summary>
-        /// Multiplies the MsDuration of each rest from beginIndex to (not including) endIndex by factor.
+        /// Multiplies the MsDuration of each rest from beginIndex to endIndex (inclusive) by factor.
         /// If a rest's MsDuration becomes less than minThreshold, it is removed.
         /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
@@ -622,11 +622,11 @@ namespace Moritz.Spec
         /// </summary>
         public void AdjustRestMsDurations(double factor, int minThreshold = 100)
         {
-            AdjustMsDurations<RestDef>(0, _uniqueDefs.Count, factor, minThreshold);
+            AdjustMsDurations<RestDef>(0, _uniqueDefs.Count - 1, factor, minThreshold);
         }
-        
+
         /// <summary>
-        /// Multiplies the MsDuration of each T from beginIndex to (including) endIndex by factor.
+        /// Multiplies the MsDuration of each T from beginIndex to endIndex (inclusive) by factor.
         /// If a MsDuration becomes less than minThreshold, the T (chord or rest) is removed.
         /// The total duration of this VoiceDef changes accordingly.
         /// </summary>

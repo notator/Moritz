@@ -268,7 +268,7 @@ namespace Moritz.Spec
 
         #region InputVoiceDef duration changers
         /// <summary>
-        /// Multiplies the MsDuration of each inputChordDef from beginIndex to (not including) endIndex by factor.
+        /// Multiplies the MsDuration of each inputChordDef from beginIndex to endIndex (inclusive) by factor.
         /// If a inputChordDef's MsDuration becomes less than minThreshold, it is removed.
         /// The total duration of this VoiceDef changes accordingly.
         /// </summary>
@@ -283,7 +283,7 @@ namespace Moritz.Spec
         /// </summary>
         public void AdjustChordMsDurations(double factor, int minThreshold = 100)
         {
-            AdjustMsDurations<InputChordDef>(0, _uniqueDefs.Count, factor, minThreshold);
+            AdjustMsDurations<InputChordDef>(0, _uniqueDefs.Count - 1, factor, minThreshold);
         }
         #endregion InputVoiceDef duration changers
     }

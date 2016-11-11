@@ -1,4 +1,3 @@
-
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -326,9 +325,9 @@ namespace Moritz.Spec
 
         #region Changing the Trk's duration
         /// <summary>
-        /// Multiplies the MsDuration of each midiChordDef from beginIndex to (not including) endIndex by factor.
+        /// Multiplies the MsDuration of each midiChordDef from beginIndex to endIndex (inclusive) by factor.
         /// If a midiChordDef's MsDuration becomes less than minThreshold, it is removed.
-        /// The total duration of this VoiceDef changes accordingly.
+        /// The total duration of this Trk changes accordingly.
         /// </summary>
         public void AdjustChordMsDurations(int beginIndex, int endIndex, double factor, int minThreshold = 100)
         {
@@ -337,11 +336,11 @@ namespace Moritz.Spec
         /// <summary>
         /// Multiplies the MsDuration of each midiChordDef in the UniqueDefs list by factor.
         /// If a midiChordDef's MsDuration becomes less than minThreshold, it is removed.
-        /// The total duration of this TrkDef changes accordingly.
+        /// The total duration of this Trk changes accordingly.
         /// </summary>
         public void AdjustChordMsDurations(double factor, int minThreshold = 100)
         {
-            AdjustMsDurations<MidiChordDef>(0, _uniqueDefs.Count, factor, minThreshold);
+            AdjustMsDurations<MidiChordDef>(0, _uniqueDefs.Count - 1, factor, minThreshold);
         }
         #endregion Changing the Trk's duration
 
@@ -753,13 +752,13 @@ namespace Moritz.Spec
             }
         }
         /// <summary>
-        /// Creates a moving pan from startPanValue at startMsPosition to endPanValue at endMsPosition.
+        /// Creates a moving pan from startPanValue at beginIndex to endPanValue at endIndex.
         /// Implemented using one pan value per MidiChordDef.
         /// This function does NOT change pan values outside the position range given in its arguments.
         /// </summary>
         public void SetPanGliss(int beginIndex, int endIndex, int startPanValue, int endPanValue)
         {
-            Debug.Assert(beginIndex < endIndex && endIndex < Count);
+            CheckIndices(beginIndex, endIndex);
             Debug.Assert(startPanValue >= 0 && startPanValue <= 127 && endPanValue >= 0 && endPanValue <= 127);
 
             int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
@@ -768,7 +767,7 @@ namespace Moritz.Spec
             int panValue = startPanValue;
             List<IUniqueDef> lmdds = _uniqueDefs;
 
-            for(int i = beginIndex; i < endIndex; ++i)
+            for(int i = beginIndex; i <= endIndex; ++i)
             {
                 MidiChordDef iumdd = _uniqueDefs[i] as MidiChordDef;
                 if(iumdd != null)
@@ -779,7 +778,7 @@ namespace Moritz.Spec
             }
         }
         /// <summary>
-        /// Sets the pitchwheelDeviation for MidiChordDefs in the range beginIndex to (not including) endindex.
+        /// Sets the pitchwheelDeviation for MidiChordDefs in the range beginIndex to endIndex inclusive.
         /// Rests in the range dont change.
         /// </summary>
         public void SetPitchWheelDeviation(int beginIndex, int endIndex, int deviation)
@@ -797,7 +796,7 @@ namespace Moritz.Spec
         }
         /// <summary>
         /// Removes the pitchwheel commands (not the pitchwheelDeviations)
-        /// from chords in the range beginIndex to (including) endIndex.
+        /// from chords in the range beginIndex to endIndex inclusive.
         /// Rests in the range are not changed.
         /// </summary>
         public void RemoveScorePitchWheelCommands(int beginIndex, int endIndex)
