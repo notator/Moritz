@@ -14,7 +14,7 @@ namespace Moritz.Spec
     /// </summary>
     public class Gamut
     {
-        #region constructor
+        #region constructors
         /// <summary>
         /// Gamuts are immutable!
         /// </summary>
@@ -165,31 +165,29 @@ namespace Moritz.Spec
         }
         #endregion private helper functions
 
-        #endregion constructor
-
-        /// <summary>
-        /// Returns the opposite Gamut.
-        /// This is the Gamut whose BasePitch and NPitchesPerOctave are the same,
-        /// but whose RelativePitchHierarchyIndex is at 180°.
-        /// </summary>
-        /// <returns></returns>
-        internal Gamut Opposite()
-        {
-            int newPitchHierarchyIndex = (RelativePitchHierarchyIndex + (RelativePitchHierarchies.Count / 2));
-            newPitchHierarchyIndex = (newPitchHierarchyIndex < RelativePitchHierarchies.Count) ?
-                newPitchHierarchyIndex : newPitchHierarchyIndex - RelativePitchHierarchies.Count;
-
-            Gamut oppositeGamut = new Gamut(newPitchHierarchyIndex, BasePitch, NPitchesPerOctave);
-
-            return oppositeGamut; 
-        }
+        #endregion constructors
 
         #region public functions
+        /// <summary>
+        /// returns 127 if i is greater than or equal to _list.Count.
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
         public int this[int i]
         {
             get
             {
-                return _list[i];
+                if(i >= _list.Count)
+                {
+                    Debug.Assert(false);
+                    // This is experimental code.
+                    // I was thinking of mapping Gamuts having the same NPitchesPerOctave but different Count values.
+                    return 127;
+                }
+                else
+                {
+                    return _list[i];
+                }
             }
         }
 

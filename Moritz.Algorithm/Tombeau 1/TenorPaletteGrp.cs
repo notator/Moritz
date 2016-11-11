@@ -9,12 +9,12 @@ namespace Moritz.Algorithm.Tombeau1
 {
     internal class TenorPaletteGrp : Grp
     {
-        public TenorPaletteGrp(Gamut gamut, int domain)
+        public TenorPaletteGrp(Gamut gamut)
             //rootOctave = 4;
             //pitchesPerChord = 6;
             //msDurationPerChord = 200; // dummy, durations are set from pitches below in the ctor
             //velocityFactor = 0.5; // dummy, velocities are set from absolute pitches below in the ctor
-            : base(gamut, 4, 6, 200, domain, 0.5)
+            : base(gamut, 4, 6, 200, gamut.NPitchesPerOctave, 0.5)
         {
             _minimumVelocity = 20;
             _maximumVelocity = 127;
@@ -51,6 +51,49 @@ namespace Moritz.Algorithm.Tombeau1
         {
             base.TransposeStepsInGamut(stepsToTranspose);
             SetVelocitiesForGamut();
+        }
+
+        /// <summary>
+        /// Returns a new, related TenorPaletteGrp whose Gamut has the new pitchHierarchyIndex % 22.
+        /// </summary>
+        /// <param name="pitchHierarchyIndex">the pitchHierarchyIndex of the returned TenorPaletteGrp's Gamut (will be treated % 22)</param>
+        internal TenorPaletteGrp RelatedPitchHierarchyGrp(int pitchHierarchyIndex)
+        {
+            pitchHierarchyIndex %= 22;
+            
+            Gamut gamut = new Gamut(pitchHierarchyIndex, Gamut.BasePitch, Gamut.NPitchesPerOctave);
+
+            TenorPaletteGrp newTenorPaletteGrp = new TenorPaletteGrp(gamut);
+
+            return newTenorPaletteGrp;
+        }
+        /// <summary>
+        /// Returns a new, related TenorPaletteGrp whose Gamut has the new basePitch % 12.
+        /// </summary>
+        /// <param name="basePitch">the basePitch of the returned TenorPaletteGrp's Gamut (will be treated % 12)</param>
+        internal TenorPaletteGrp RelatedBasePitchGrp(int basePitch)
+        {
+            basePitch %= 12;
+
+            Gamut gamut = new Gamut(Gamut.RelativePitchHierarchyIndex, basePitch, Gamut.NPitchesPerOctave);
+
+            TenorPaletteGrp newTenorPaletteGrp = new TenorPaletteGrp(gamut);
+
+            return newTenorPaletteGrp;
+        }
+        /// <summary>
+        /// Returns a new, related TenorPaletteGrp having the new domain % 12.
+        /// </summary>
+        /// <param name="domain">the the number of chords in the returned TenorPaletteGrp, and the nPitchesPerOctave of its Gamut (will be treated % 12)</param>
+        internal TenorPaletteGrp RelatedDomainGrp(int domain)
+        {
+            domain %= 12;
+
+            Gamut gamut = new Gamut(Gamut.RelativePitchHierarchyIndex, Gamut.BasePitch, domain);
+
+            TenorPaletteGrp newTenorPaletteGrp = new TenorPaletteGrp(gamut);
+
+            return newTenorPaletteGrp;
         }
 
         /// <summary>

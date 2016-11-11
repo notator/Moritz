@@ -207,7 +207,8 @@ namespace Moritz.Spec
             Debug.Assert(gamut != null);
             #endregion conditions
 
-            Gamut oppositeGamut = gamut.Opposite();
+            int relativePitchHierarchyIndex = (gamut.RelativePitchHierarchyIndex + 11) % 22;
+            Gamut oppositeGamut = new Gamut(relativePitchHierarchyIndex, gamut.BasePitch, gamut.NPitchesPerOctave);
             MidiChordDef oppositeMCD = (MidiChordDef)Clone();
 
             #region conditions

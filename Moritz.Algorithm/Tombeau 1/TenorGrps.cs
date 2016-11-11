@@ -27,12 +27,11 @@ namespace Moritz.Algorithm.Tombeau1
             const int gamutBasePitch = 0;
             List<Grp> grps = new List<Grp>();
 
-            Console.WriteLine("relativePitchHierarchyIndex=" + relativePitchHierarchyIndex.ToString());
-            for(int domain = 12; domain >= 1; --domain) // domain is both Gamut.PitchesPerOctave and nChords per Grp
+            for(int i = 0, domain = 12; domain >= 1; --domain, ++i) // domain is both Gamut.PitchesPerOctave and nChords per Grp
             {
                 Gamut gamut = new Gamut(relativePitchHierarchyIndex, gamutBasePitch, domain);
 
-                TenorPaletteGrp tpg = new TenorPaletteGrp(gamut, domain);
+                TenorPaletteGrp tpg = new TenorPaletteGrp(gamut);
 
                 #region begin test code 1 Shear and permute
                 //tpg.Shear(0, -1 * (gamut.NPitchesPerOctave));
@@ -61,6 +60,43 @@ namespace Moritz.Algorithm.Tombeau1
                 //if(domain % 2 != 0 && tpg.Count > 1)
                 //{
                 //    tpg.AdjustVelocitiesHairpin(0, tpg.Count - 1, 0.5, 1.0);
+                //}
+                #endregion
+
+                #region begin test code 5, related Grps
+                //if(domain % 2 != 0 && tpg.Count > 1)
+                //{
+                //    TenorPaletteGrp previousTpg = (TenorPaletteGrp)grps[i - 1];
+
+                //    //tpg = previousTpg.RelatedPitchHierarchyGrp(previousTpg.Gamut.RelativePitchHierarchyIndex + 11);
+                //    //tpg = previousTpg.RelatedBasePitchGrp(11);
+                //    tpg = previousTpg.RelatedDomainGrp(6);
+                //}
+                #endregion
+
+                #region begin test code 6, timeWarp
+                //if(domain % 2 != 0 && tpg.Count > 1)
+                //{
+                //    tpg.TimeWarp(new Envelope(new List<int>() { 4, 7, 2 }, 7, 7, tpg.Count), 20);
+                //}
+                #endregion
+
+                #region begin test code 7, SetPitchWheelSliders
+                //Envelope env = new Envelope(new List<int>() { 0,8 }, 8, 127, tpg.Count);
+                //tpg.SetPitchWheelSliders(env);
+                #endregion
+
+                #region begin test code 8, SetPanGliss
+                //if(tpg.Count > 1)
+                //{
+                //    if(domain % 2 != 0)
+                //    {
+                //        tpg.SetPanGliss(0, tpg.Count - 1, 127, 0);
+                //    }
+                //    else
+                //    {
+                //        tpg.SetPanGliss(0, tpg.Count - 1, 0, 127);
+                //    }
                 //}
                 #endregion
 
