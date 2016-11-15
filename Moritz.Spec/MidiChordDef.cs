@@ -17,25 +17,31 @@ namespace Moritz.Spec
         /// <summary>
         /// A MidiChordDef containing a single BasicMidiChordDef. Absent fields are set to 0 or null.
         /// The pitches argument is used to set both the NotatedMidiPitches and BasicMidiChordDefs[0].Pitches.
-        /// The velocities argument is used to set the NotatedMIDIVelocities and BasicMidiChordDefs[0].Velocities. 
+        /// The velocities argument is used to set the NotatedMIDIVelocities and BasicMidiChordDefs[0].Velocities.
+        /// Velocities must be in range 1..127.
         /// </summary>
+        /// <param name="pitches">in range 0..127</param>
+        /// <param name="velocities">In range 1..127</param>
+        /// <param name="msDuration">greater than zero</param>
+        /// <param name="hasChordOff"></param>
         public MidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff)
             : base(msDuration)
         {
             #region conditions
             Debug.Assert(pitches.Count == velocities.Count);
             foreach(byte pitch in pitches)
-                Debug.Assert(pitch == M.MidiValue((int)pitch), "Pitch out of range.");
+            {
+                AssertIsMidiValue(pitch);
+            }
             foreach(byte velocity in velocities)
-                Debug.Assert(velocity == M.MidiValue((int)velocity), "Velocity out of range.");
+            {
+                AssertIsVelocityValue(velocity);
+            }
             #endregion conditions
 
             _msPositionReFirstIUD = 0; // default value
             _hasChordOff = hasChordOff;
             _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
-
-            _notatedMidiPitches = pitches;
-            _notatedMidiVelocities = velocities;
 
             _ornamentNumberSymbol = 0;
 
@@ -45,6 +51,8 @@ namespace Moritz.Spec
             byte? patch = null;
 
             BasicMidiChordDefs.Add(new BasicMidiChordDef(msDuration, bank, patch, hasChordOff, pitches, velocities));
+
+            SetNotatedValuesFromFirstBMCD();
 
             CheckTotalDuration();
         }
@@ -99,7 +107,9 @@ namespace Moritz.Spec
         {
             Debug.Assert(rootMidiPitches.Count <= rootMidiVelocities.Count);
             foreach(byte pitch in rootMidiPitches)
-                Debug.Assert(pitch == M.MidiValue((int)pitch), "Pitch out of range.");
+            {
+                AssertIsMidiValue(pitch);
+            }
 
             _msPositionReFirstIUD = 0;
             _msDuration = msDuration;
@@ -256,13 +266,12 @@ namespace Moritz.Spec
             Debug.Assert(nPitchesToShiftArg >= 0);
             #endregion conditions
 
-            InvertPitches(NotatedMidiPitches, nPitchesToShiftArg);
-            RemoveDuplicateNotes(NotatedMidiPitches, NotatedMidiVelocities);
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
                 InvertPitches(bmcd.Pitches, nPitchesToShiftArg);
                 RemoveDuplicateNotes(bmcd.Pitches, bmcd.Velocities);
-            } 
+            }
+            SetNotatedValuesFromFirstBMCD();
         }
 
         private void InvertPitches(List<byte> pitches, int nPitchesToShiftArg)
@@ -423,18 +432,17 @@ namespace Moritz.Spec
 
         #region SetVelocityPerAbsolutePitch
         /// <summary>
-        /// NotatedMidiPitches and NotatedMIDIVelocities should be checked after calling this function: they can be empty if minimumVelocity==0!
-        /// Argument 1 (velocityPerAbsolutePitch) contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
-        /// Argument 2 (minimumVelocity) is the used to raise the values in (a copy of) argument 1: minimumVelocity is
-        /// the value used wherever there is a smaller value in argument 1. The other values are raised proportionally.
+        /// Argument 1 (velocityPerAbsolutePitch) contains a list of 12 velocity values (range [1..127] in order of absolute pitch.
+        /// Argument 2 (minimumVelocity) is the used to raise the values in (a copy of) argument 1: minimumVelocity is the value
+        /// used wherever there is a smaller value in argument 1. The other values are raised proportionally.
         /// Argument 3 (optional) determines the proportion of the final velocity determined by this function.
         /// The other component is the existing velocity. If percent is 100.0, the existing velocity is replaced completely.
         /// For example: If the MidiChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
         /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc.
         /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef. 
         /// </summary>
-        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
-        /// <param name="minimumVelocity">In range 0..127</param>
+        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [1..127] in order of absolute pitch</param>
+        /// <param name="minimumVelocity">In range 1..127</param>
         /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
         public void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, byte minimumVelocity, double percent = 100.0)
         {
@@ -443,15 +451,15 @@ namespace Moritz.Spec
             for(int i = 0; i < 12; ++i)
             {
                 int v = velocityPerAbsolutePitch[i];
-                Debug.Assert(v >= 0 && v <= 127);
+                AssertIsVelocityValue(v);
             }
-            Debug.Assert(minimumVelocity >= 0 && minimumVelocity <= 127);
+            AssertIsVelocityValue(minimumVelocity);
             Debug.Assert(percent >= 0 && percent <= 100);
             Debug.Assert(this.NotatedMidiPitches.Count == NotatedMidiVelocities.Count);
             #endregion conditions
 
             List<byte> localVelocityPerAbsolutePitch = new List<byte>(velocityPerAbsolutePitch);
-            if(minimumVelocity > 0)
+            if(minimumVelocity > 1)
             {
                 #region reset localVelocityPerAbsolutePitch
                 double tan = ((double)127 - minimumVelocity) / 127;
@@ -464,7 +472,7 @@ namespace Moritz.Spec
                     }
                     else
                     {
-                        value = M.MidiValue((int)Math.Round((minimumVelocity + (value * tan))));                      
+                        value = VelocityValue((int)Math.Round((minimumVelocity + (value * tan))));                      
                     }                   
                     localVelocityPerAbsolutePitch[i] = value;
                 }
@@ -475,43 +483,36 @@ namespace Moritz.Spec
             {
                 bmcd.SetVelocityPerAbsolutePitch(localVelocityPerAbsolutePitch, percent);
             }
-            CheckVelocityAndSetNotatedValues();
+            CheckAllBasicMidiChordDefVelocities();
+            SetNotatedValuesFromFirstBMCD();
         }
 
         /// <summary>
-        /// If the BasicMidiChordDefs have no velocities greater than 0, both _notatedMidiPitches and _notatedMidiVelocities
-        /// are cleared. Otherwise they are set to the pitches and velocities of the first basicMidiChordDef to have a
-        /// velocity greater than 0. Usually BasicMidiChordDefs[0]. 
-        /// If function A can set a velocity to zero, then it must call this function, and NotatedMidiPitches must be checked
-        /// when function A returns. Usually, the MidiChordDef would then be replaced by a RestDef.
+        /// Check that all velocities are in range 1..127. 
+        /// If a function can set velocities, then it should call this function.
+        /// It should probably also call SetNotatedValuesFromFirstBMCD().
         /// </summary>
-        private void CheckVelocityAndSetNotatedValues()
+        private void CheckAllBasicMidiChordDefVelocities()
         {
-            BasicMidiChordDef firstBMCDwithNoteOn = null;
-            #region get firstBMCDwithNoteOn
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
                 foreach(byte velocity in bmcd.Velocities)
                 {
-                    if(velocity > 0)
-                    {
-                        firstBMCDwithNoteOn = bmcd;
-                        break;
-                    }
-                }
-                if(firstBMCDwithNoteOn != null)
-                {
-                    break;
+                    AssertIsVelocityValue(velocity);
                 }
             }
-            #endregion get firstBMCDwithNoteOn
+        }
+
+        private void SetNotatedValuesFromFirstBMCD()
+        {
+            BasicMidiChordDef firstBMC = BasicMidiChordDefs[0];
 
             _notatedMidiPitches.Clear();
             _notatedMidiVelocities.Clear();
-            if(firstBMCDwithNoteOn != null)
+            if(firstBMC != null)
             {
-                _notatedMidiPitches.AddRange(firstBMCDwithNoteOn.Pitches);
-                _notatedMidiVelocities.AddRange(firstBMCDwithNoteOn.Velocities);
+                _notatedMidiPitches.AddRange(firstBMC.Pitches);
+                _notatedMidiVelocities.AddRange(firstBMC.Velocities);
             }
         }
         #endregion SetVelocityPerAbsolutePitch
@@ -521,7 +522,7 @@ namespace Moritz.Spec
         /// Sets all velocities in the MidiChordDef to a value related to its msDuration.
         /// If percent has its default value 100, the new velocity will be in the same proportion between velocityForMinMsDuration
         /// and velocityForMaxMsDuration as MsDuration is between msDurationRangeMin and msDurationRangeMax.
-        /// N.B 1) Neither velocityForMinMsDuration nor velocityForMaxMsDuration can be zero! -- that would be a NoteOff.
+        /// N.B 1) Both velocityForMinMsDuration and velocityForMaxMsDuration must be in range 1..127.
         /// and 2) velocityForMinMsDuration can be less than, equal to, or greater than velocityForMaxMsDuration
         /// The (optional) percent argument determines the proportion of the final velocity for which this function is responsible.
         /// The other component of the final velocity value is its existing velocity. If percent is 100.0, the existing velocity
@@ -537,8 +538,8 @@ namespace Moritz.Spec
             Debug.Assert(_msDuration >= msDurationRangeMin && _msDuration <= msDurationRangeMax);
             Debug.Assert(msDurationRangeMin <= msDurationRangeMax);
             // velocityForMinMsDuration can be less than, equal to, or greater than velocityForMaxMsDuration
-            Debug.Assert(velocityForMinMsDuration >= 1 && velocityForMinMsDuration <= 127);
-            Debug.Assert(velocityForMaxMsDuration >= 1 && velocityForMaxMsDuration <= 127);
+            AssertIsVelocityValue(velocityForMinMsDuration);
+            AssertIsVelocityValue(velocityForMaxMsDuration);
             Debug.Assert(percent >= 0 && percent <= 100);
 
             double factorForNewValue = percent / 100;
@@ -551,27 +552,21 @@ namespace Moritz.Spec
             {
                 double factor = ((double)(MsDuration - msDurationRangeMin)) / msDurationRange;
                 int increment = (int)(factor * velocityRange);
-                newVelocity = M.MidiValue(velocityForMinMsDuration + increment);
+                newVelocity = VelocityValue(velocityForMinMsDuration + increment);
             }
-            for(int i = 0; i < _notatedMidiVelocities.Count; ++i)
-            {
-                byte oldVelocity = _notatedMidiVelocities[i];
-                int valueToSet = (int)Math.Round((oldVelocity * factorForOldValue) + (newVelocity * factorForNewValue));
-                Debug.Assert(valueToSet >= 0 && valueToSet <= 127);
-                _notatedMidiVelocities[i] = M.MidiValue(valueToSet);
 
-            }
             for(int i = 0; i < BasicMidiChordDefs.Count; ++i)
             {
                 List<byte> bmcdVelocities = BasicMidiChordDefs[i].Velocities;
                 for(int j = 0; j < bmcdVelocities.Count; ++j)
                 {
                     byte oldVelocity = bmcdVelocities[j];
-                    int valueToSet = (int)Math.Round((oldVelocity * factorForOldValue) + (newVelocity * factorForNewValue));
-                    Debug.Assert(valueToSet >= 0 && valueToSet <= 127);
-                    bmcdVelocities[j] = M.MidiValue(valueToSet);
+                    byte valueToSet = VelocityValue((int)Math.Round((oldVelocity * factorForOldValue) + (newVelocity * factorForNewValue)));
+                    bmcdVelocities[j] = valueToSet;
                 }
             }
+
+            SetNotatedValuesFromFirstBMCD();
         }
 
         #region SetVerticalVelocityGradient
@@ -587,33 +582,73 @@ namespace Moritz.Spec
         public void SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
         {
             #region conditions
-            Debug.Assert(rootVelocity > 0 && rootVelocity <= 127);
-            Debug.Assert(topVelocity > 0 && topVelocity <= 127);
+            AssertIsVelocityValue(rootVelocity);
+            AssertIsVelocityValue(topVelocity);
             #endregion conditions
 
-            if(NotatedMidiVelocities.Count > 1)
+            List<byte> velocities0 = BasicMidiChordDefs[0].Velocities;
+            int nVelocities0 = velocities0.Count;
+            double increment = (((double)(topVelocity - rootVelocity)) / (nVelocities0 - 1));
+            double newVelocity = rootVelocity;
+            for(int velocityIndex = 0; velocityIndex < nVelocities0; ++velocityIndex)
             {
-                double increment = (((double)(topVelocity - rootVelocity)) / (NotatedMidiVelocities.Count - 1));
-                double newVelocity = rootVelocity;
-                for(int velocityIndex = 0; velocityIndex < NotatedMidiVelocities.Count; ++velocityIndex)
-                {
-                    NotatedMidiVelocities[velocityIndex] = M.MidiValue((int)Math.Round(newVelocity));
-                    newVelocity += increment;
-                }
+                byte newVel = (byte)Math.Round(newVelocity);
+                newVel = VelocityValue(newVel);
+                velocities0[velocityIndex] = newVel;
+                newVelocity += increment;
             }
 
-            double rootVelocityFactor = ((double)rootVelocity) / NotatedMidiVelocities[0];
+            double rootVelocityFactor = ((double)rootVelocity) / velocities0[0];
             double verticalVelocityFactor = ((double)topVelocity) / rootVelocity;
 
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
-                byte bmcdRootVelocity = M.MidiValue((int)(Math.Round(bmcd.Velocities[0] * rootVelocityFactor)));
-                byte bmcdTopVelocity = M.MidiValue((int)(Math.Round(bmcdRootVelocity * verticalVelocityFactor)));
+                byte bmcdRootVelocity = VelocityValue((int)(Math.Round(bmcd.Velocities[0] * rootVelocityFactor)));
+                byte bmcdTopVelocity = VelocityValue((int)(Math.Round(bmcdRootVelocity * verticalVelocityFactor)));
                 bmcd.SetVerticalVelocityGradient(bmcdRootVelocity, bmcdTopVelocity);
             }
+
+            SetNotatedValuesFromFirstBMCD();
+        }
+        #endregion SetVerticalVelocityGradient
+
+        #region utilities
+        /// <summary>
+        /// A Debug.Assert that fails if the argument is outside the range 0..127.
+        /// </summary>
+        private static void AssertIsMidiValue(int value)
+        {
+            Debug.Assert(value >= 0 && value <= 127);
         }
 
-        #endregion SetVerticalVelocityGradient
+        /// <summary>
+        /// A Debug.Assert that fails if the argument is outside the range 1..127.
+        /// </summary>
+        private static void AssertIsVelocityValue(int velocity)
+        {
+            Debug.Assert(velocity >= 1 && velocity <= 127);
+        }
+
+        /// <summary>
+        /// Returns the argument as a byte coerced to the range 0..127.
+        /// </summary>
+        private byte MidiValue(int value)
+        {
+            value = (value >= 0) ? value : 1;
+            value = (value <= 127) ? value : 127;
+            return (byte)value;
+        }
+
+        /// <summary>
+        /// Returns the argument as a byte coerced to the range 1..127.
+        /// </summary>
+        private byte VelocityValue(int velocity)
+        {
+            velocity = (velocity >= 1) ? velocity : 1;
+            velocity = (velocity <= 127) ? velocity : 127;
+            return (byte)velocity;
+        }
+        #endregion utilities
 
         #endregion Functions that use Envelopes 
 
@@ -627,22 +662,18 @@ namespace Moritz.Spec
         /// </summary>
         public void Transpose(int interval)
         {
-            for(int i = 0; i < _notatedMidiPitches.Count; ++i)
-            {
-                _notatedMidiPitches[i] = (byte)M.MidiValue(_notatedMidiPitches[i] + interval);
-            }
-            RemoveDuplicateNotes(_notatedMidiPitches, _notatedMidiVelocities);
-
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
                 List<byte> pitches = bmcd.Pitches;
                 List<byte> velocities = bmcd.Velocities;
                 for(int i = 0; i < pitches.Count; ++i)
                 {
-                    pitches[i] = (byte)M.MidiValue(pitches[i] + interval);
+                    pitches[i] = MidiValue(pitches[i] + interval);
                 }
                 RemoveDuplicateNotes(pitches, velocities);
             }
+
+            SetNotatedValuesFromFirstBMCD();
         }
 
         /// <summary>
@@ -657,10 +688,6 @@ namespace Moritz.Spec
         {
             #region conditions
             Debug.Assert(gamut != null);
-            foreach(int pitch in NotatedMidiPitches)
-            {
-                Debug.Assert(gamut.Contains(pitch));
-            }
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
                 foreach(int pitch in bmcd.Pitches)
@@ -673,11 +700,6 @@ namespace Moritz.Spec
             int bottomMostPitch = gamut[0];
             int topMostPitch = gamut[gamut.Count - 1];
 
-            for(int i = 0; i < NotatedMidiPitches.Count; ++i)
-            {
-                NotatedMidiPitches[i] = DoTranspose(NotatedMidiPitches[i], gamut, steps);
-            }
-            RemoveDuplicateNotes(_notatedMidiPitches, _notatedMidiVelocities);
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
                 List<byte> pitches = bmcd.Pitches;
@@ -688,13 +710,15 @@ namespace Moritz.Spec
                 }
                 RemoveDuplicateNotes(pitches, velocities);
             }
+
+            SetNotatedValuesFromFirstBMCD();
         }
 
         /// <summary>
-        /// The rootPitch and all the pitches in all the MidiChordDef must be contained in the gamut.
+        /// The rootPitch and all the pitches in the MidiChordDef must be contained in the gamut.
         /// Otherwise a Debug.Assert() fails.
         /// Calculates the number of steps to transpose, and then calls TransposeStepsInGamut.
-        /// The rootPitch is the lowest pitch in any MidiChordDef.BasicMidiChordDefs[0] in the Trk.
+        /// When this function returns, rootPitch is the lowest pitch in both BasicMidiChordDefs[0] and NotatedMidiPitches.
         /// </summary>
         public void TransposeToRootInGamut(Gamut gamut, int rootPitch)
         {
@@ -706,6 +730,7 @@ namespace Moritz.Spec
 
             int stepsToTranspose = gamut.IndexOf(rootPitch) - gamut.IndexOf(BasicMidiChordDefs[0].Pitches[0]);
 
+            // checks that all the pitches are in the gamut.
             TransposeStepsInGamut(gamut, stepsToTranspose);
         }
 
@@ -743,9 +768,10 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// N.B. NotatedMidiPitches and NotatedMIDIVelocities should be checked after calling this function: they can be empty!
         /// Multiplies the velocities in NotatedMidiVelocities, and all BasicMidiChordDef.Velocities by the argument factor.
-        /// If a resulting velocity is zero, the note is removed. If it would be greater than 127, it is silently coerced to 127.
+        /// The resulting velocities are in range 1..127.
+        /// If a resulting velocity would have been less than 1, it is silently coerced to 1.
+        /// If it would have been greater than 127, it is silently coerced to 127.
         /// </summary>
         /// <param name="factor">greater than 0</param>
         public void AdjustVelocities(double factor)
@@ -755,39 +781,29 @@ namespace Moritz.Spec
 			{
                 bmcd.AdjustVelocities(factor);
             }
-            CheckVelocityAndSetNotatedValues();
+            CheckAllBasicMidiChordDefVelocities();
+            SetNotatedValuesFromFirstBMCD();
         }
 
         /// <summary>
-        /// Sets the number of values in NotatedMidiPitches, NotatedMidiVelocities, and all BasicMidiChordDef.Pitches and
-        /// BasicMidiChordDef.Velocities to newDensity, by removing the upper pitches (and their velocities) as necessary.
-        /// Requires newDensity to be less than or equal to the current vertical density of all the chords to be changed.
+        /// Truncates the number of notes in all BasicMidiChordDefs by removing the upper notes as necessary.
+        /// If the original number of notes in a BasicMidiChordDef is less than newDensity, that bmcd is not changed.
         /// </summary>
+        /// <param name="newDensity">Must be greater than 0</param>
         public void SetVerticalDensity(int newDensity)
 		{
-            #region require
-            Debug.Assert(newDensity <= _notatedMidiPitches.Count); // if its equal, do nothing
-            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
-			{
-                Debug.Assert(newDensity <= bmcd.Pitches.Count);
-			}
-            #endregion require
+            Debug.Assert(newDensity > 0);
 
-            int nElementsToRemove = _notatedMidiPitches.Count - newDensity;
-            if(nElementsToRemove > 0)
-            {
-                _notatedMidiPitches.RemoveRange(newDensity, nElementsToRemove);
-                _notatedMidiVelocities.RemoveRange(newDensity, nElementsToRemove);
-			}
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
-                nElementsToRemove = bmcd.Pitches.Count - newDensity;
+                int nElementsToRemove = bmcd.Pitches.Count - newDensity;
                 if(nElementsToRemove > 0)
                 {
                     bmcd.Pitches.RemoveRange(newDensity, nElementsToRemove);
                     bmcd.Velocities.RemoveRange(newDensity, nElementsToRemove);
                 }
             }
+            SetNotatedValuesFromFirstBMCD();
         }
 
         #region IUniqueDef
@@ -807,38 +823,28 @@ namespace Moritz.Spec
         #endregion IUniqueChordDef
 
         /// <summary>
-        /// Returns a new Trk having msDuration and midiChannel, whose MidiChordDefs and RestDefs are created from this
-        /// MidiChordDef's BasicMidiChordDefs.
+        /// Returns a new Trk having msDuration and midiChannel, whose MidiChordDefs are created from this MidiChordDef's BasicMidiChordDefs.
         /// If a non-null gamut argument is given, a check is made (in the Trk constructor) to ensure that it contains
-        /// all the pitches (having velocity greater than 0) in this MidiChordDef.
+        /// all the pitches (having velocity greater than 1) in this MidiChordDef.
         /// Each new MidiChordDef has one BasicMidiChordDef, which is a copy of a BasicMidiChordDef from this MidiChordDef.
         /// The new MidiChordDef's notated pitches and velocities are the same as its BasicMidiChordDef's.
-        /// If the original BasicMidiChordDef has a solitary velocity=0, a RestDef is created.
-        /// The durations of the returned MidiChordDefs and RestDefs are in proportion to the durations of the original
-        /// BasicMidichordDefs.
+        /// The durations of the returned MidiChordDefs are in proportion to the durations of the original BasicMidichordDefs.
         /// This MidiChordDef is not changed by calling this function.
         /// </summary>
         /// <param name="msDuration">The duration of the returned Trk</param>
-        /// <param name="midiChannel">The duration of the returned Trk</param>
-        /// <param name="gamut">If defined, the gamut must contain all the pitches in this MidiChordDef -- except those that have velocity=0.</param>
+        /// <param name="midiChannel">The channel of the returned Trk</param>
+        /// <param name="gamut">If defined, the gamut must contain all the pitches in this MidiChordDef.</param>
         public Trk ToTrk(int msDuration, int midiChannel, Gamut gamut = null)
         {
             List<IUniqueDef> iuds = new List<IUniqueDef>();
             foreach(BasicMidiChordDef bmcd in this.BasicMidiChordDefs)
             {
-                if(bmcd.Velocities.Count == 1 && bmcd.Velocities[0] == 0)
-                {
-                    RestDef restDef = new RestDef(0, bmcd.MsDuration);
-                    iuds.Add(restDef);
-                }
-                else
-                {
-                    MidiChordDef mcd = new MidiChordDef(bmcd.Pitches, bmcd.Velocities, bmcd.MsDuration, bmcd.HasChordOff);
-                    mcd.BasicMidiChordDefs[0].BankIndex = bmcd.BankIndex;
-                    mcd.BasicMidiChordDefs[0].PatchIndex = bmcd.PatchIndex;
-                    mcd.BasicMidiChordDefs[0].HasChordOff = bmcd.HasChordOff;
-                    iuds.Add(mcd);
-                }
+                // this constructor checks that pitches are in range 0..127, and velocities are in range 1..127.
+                MidiChordDef mcd = new MidiChordDef(bmcd.Pitches, bmcd.Velocities, bmcd.MsDuration, bmcd.HasChordOff);
+                mcd.BasicMidiChordDefs[0].BankIndex = bmcd.BankIndex;
+                mcd.BasicMidiChordDefs[0].PatchIndex = bmcd.PatchIndex;
+                mcd.BasicMidiChordDefs[0].HasChordOff = bmcd.HasChordOff;
+                iuds.Add(mcd);
             }
 
             Trk trk = new Trk(midiChannel, 0, iuds, gamut); // checks and sets the trk.Gamut.
@@ -852,7 +858,7 @@ namespace Moritz.Spec
             List<byte> exprs = this.MidiChordSliderDefs.ExpressionMsbs;
             for(int i = 0; i < exprs.Count; ++i)
             {
-                exprs[i] = M.MidiValue((int)(exprs[i] * factor));
+                exprs[i] = MidiValue((int)(exprs[i] * factor));
             }
         }
 
@@ -885,7 +891,7 @@ namespace Moritz.Spec
                 pans.Clear();
                 for(int i = 0; i < value.Count; ++i)
                 {
-                    pans.Add(M.MidiValue((int)(value[i])));
+                    pans.Add(MidiValue((int)(value[i])));
                 }
             }
         }
@@ -895,7 +901,7 @@ namespace Moritz.Spec
             List<byte> modWheels = this.MidiChordSliderDefs.ModulationWheelMsbs;
             for(int i = 0; i < modWheels.Count; ++i)
             {
-                modWheels[i] = M.MidiValue((int)(modWheels[i] * factor));
+                modWheels[i] = MidiValue((int)(modWheels[i] * factor));
             }
         }
 
@@ -904,7 +910,7 @@ namespace Moritz.Spec
             List<byte> pitchWheels = this.MidiChordSliderDefs.PitchWheelMsbs;
             for(int i = 0; i < pitchWheels.Count; ++i)
             {
-                pitchWheels[i] = M.MidiValue((int)(pitchWheels[i] * factor));
+                pitchWheels[i] = MidiValue((int)(pitchWheels[i] * factor));
             }
         }
 
@@ -1036,6 +1042,7 @@ namespace Moritz.Spec
             for(int i = 0; i < msDurations.Count; ++i)
             {
                 b = bmcd[i];
+                // constructor checks that pitches are in range 0..127, and velocities are in range 1..127.
                 rList.Add(new BasicMidiChordDef(msDurations[i], b.BankIndex, b.PatchIndex, b.HasChordOff, b.Pitches, b.Velocities));
             }
 
@@ -1098,7 +1105,7 @@ namespace Moritz.Spec
                 else
                 {
                     int val = (int)value;
-                    _pitchWheelDeviation = M.MidiValue(val);
+                    _pitchWheelDeviation = MidiValue(val);
                 }
             }
         }
@@ -1121,11 +1128,11 @@ namespace Moritz.Spec
             set 
             {
                 // N.B. this value can be set even if value.Count != _notatedMidiVelocities.Count
-                // If the Count is changed, the _notatedMidiVelocities must subsequently be set to
-                // otherwise a Debug.Assert will fail when _notatedMidiVelocities are retrieved.
+                // If the Count is changed, the _notatedMidiVelocities must subsequently be reset,
+                // otherwise a Debug.Assert will fail when the _notatedMidiVelocities are retrieved.
                 foreach(byte pitch in value)
                 {
-                    Debug.Assert(pitch >= 0 && pitch <= 127);
+                    AssertIsMidiValue(pitch);
                 }
                 _notatedMidiPitches = new List<byte>(value);
             } 
@@ -1148,7 +1155,7 @@ namespace Moritz.Spec
                 Debug.Assert(value.Count == _notatedMidiPitches.Count);
                 foreach(byte velocity in value)
                 {
-                    Debug.Assert(velocity >= 0 && velocity <= 127);
+                    AssertIsVelocityValue(velocity);
                 }
                 _notatedMidiVelocities = new List<byte>(value);
             }

@@ -28,9 +28,9 @@ namespace Moritz.Spec
             Debug.Assert(PatchIndex == null || PatchIndex == M.MidiValue((int)PatchIndex), "Patch out of range.");
             Debug.Assert(Pitches.Count == Velocities.Count, "There must be the same number of pitches and velocities.");
             foreach(byte pitch in Pitches)
-                Debug.Assert(pitch == M.MidiValue((int)pitch), "Pitch out of range.");
+                Debug.Assert(pitch >= 0 && pitch <= 127);
             foreach(byte velocity in Velocities)
-                Debug.Assert(velocity == M.MidiValue((int)velocity), "velocity out of range.");       
+                AssertIsVelocityValue(velocity);     
             #endregion
         }
 
@@ -120,13 +120,11 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// The argument contains a list of 12 velocity values (range [0..127] in order of absolute pitch.
+        /// The argument contains a list of 12 velocity values (range [1..127] in order of absolute pitch.
         /// For example: If the MidiChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
         /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc.
-        /// If a pitch would have velocity==0, it is removed.
-        /// If Pitches.Count (and Velocities.Count) becomes 0, pitch=0, velocity=0 is added.
         /// </summary>
-        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
+        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [1..127] in order of absolute pitch</param>
         public void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, double percent)
         {
             double factorForNewValue = percent / 100;
@@ -137,28 +135,15 @@ namespace Moritz.Spec
 
                 int absPitch = Pitches[pitchIndex] % 12;
                 byte newVelocity = velocityPerAbsolutePitch[absPitch];
-                int valueToSet = (int)Math.Round((oldVelocity * factorForOldValue) + (newVelocity * factorForNewValue));
-                Debug.Assert(valueToSet >= 0 && valueToSet <= 127);
-                Velocities[pitchIndex] = M.MidiValue(valueToSet);
-            }
+                AssertIsVelocityValue(newVelocity);
 
-            for(int i = Pitches.Count - 1; i >= 0; --i)
-            {
-                if(Velocities[i] == 0)
-                {
-                    Pitches.RemoveAt(i);
-                    Velocities.RemoveAt(i);
-                }
-            }
-            if(Pitches.Count == 0)
-            {
-                Pitches.Add(0);
-                Velocities.Add(0);
+                byte velocity = (byte)Math.Round((oldVelocity * factorForOldValue) + (newVelocity * factorForNewValue));
+                Velocities[pitchIndex] = VelocityValue(velocity);
             }
         }
 
         /// <summary>
-        /// Individual velocities can be set to 0
+        /// Individual velocities will be set in the range 1..127
         /// </summary>
         /// <param name="factor"></param>
         internal void AdjustVelocities(double factor)
@@ -167,8 +152,26 @@ namespace Moritz.Spec
             for(int i = 0; i < Velocities.Count; ++i)
             {
                 byte velocity = (byte)Math.Round((Velocities[i] * factor));
-                Velocities[i] = velocity; 
+                Velocities[i] = VelocityValue(velocity); 
             }
+        }
+
+        /// <summary>
+        /// Returns the argument as a byte coerced to the range 1..127.
+        /// </summary>
+        private byte VelocityValue(int velocity)
+        {
+            velocity = (velocity >= 1) ? velocity : 1;
+            velocity = (velocity <= 127) ? velocity : 127;
+            return (byte)velocity;
+        }
+
+        /// <summary>
+        /// A Debug.Assert that fails if the argument is outside the range 1..127.
+        /// </summary>
+        private static void AssertIsVelocityValue(int velocity)
+        {
+            Debug.Assert(velocity >= 1 && velocity <= 127);
         }
 
         /// <summary>
@@ -179,8 +182,8 @@ namespace Moritz.Spec
         public void SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
         {
             #region conditions
-            Debug.Assert(rootVelocity > 0 && rootVelocity <= 127);
-            Debug.Assert(topVelocity > 0 && topVelocity <= 127);
+            AssertIsVelocityValue(rootVelocity);
+            AssertIsVelocityValue(topVelocity);
             #endregion conditions
             
             if(Velocities.Count > 1)
@@ -189,7 +192,7 @@ namespace Moritz.Spec
                 double newVelocity = rootVelocity;
                 for(int velocityIndex = 0; velocityIndex < Velocities.Count; ++velocityIndex)
                 {
-                    Velocities[velocityIndex] = M.MidiValue((int)Math.Round(newVelocity));
+                    Velocities[velocityIndex] = VelocityValue((int)Math.Round(newVelocity));
                     newVelocity += increment;
                 }
             }
