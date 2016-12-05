@@ -9,6 +9,10 @@ namespace Moritz.Algorithm.Tombeau1
 {
     internal class TenorPaletteGrp : Grp
     {
+        /// <summary>
+        /// An exception will be thrown if the gamut argument is null.
+        /// </summary>
+        /// <param name="gamut"></param>
         public TenorPaletteGrp(Gamut gamut)
             //rootOctave = 4;
             //pitchesPerChord = 6;
@@ -18,7 +22,7 @@ namespace Moritz.Algorithm.Tombeau1
         {
             _minimumVelocity = 20;
             _maximumVelocity = 127;
-            _velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(_minimumVelocity, _maximumVelocity, 0, true);
+            _velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(_minimumVelocity, _maximumVelocity);
 
             base.SetVelocityPerAbsolutePitch(_velocityPerAbsolutePitch, (byte)_minimumVelocity);
 
@@ -27,40 +31,20 @@ namespace Moritz.Algorithm.Tombeau1
             SetDurationsFromPitches(maxMsDuration, minMsDuration, true);
         }
 
-        /// <summary>
-        /// Shears the group vertically, maintaining the gamut and its velocities per absolute pitch.
-        /// The number of steps to transpose intermediate chords is calculated from startSteps and endSteps.
-        /// If there is only one chord in the Grp, it is transposed by startSteps.
-        /// </summary>
-        /// <param name="startSteps">The number of steps in the gamut to transpose the first chord</param>
-        /// <param name="endSteps">The number of steps in the gamut to transpose the last chord</param>
-        internal override void Shear(int startSteps, int endSteps)
-        {
-            base.Shear(startSteps, endSteps);
-            SetVelocitiesForGamut();
-        }
 
         #region transposition functions (new)
-        /// <summary>
-        /// All the pitches in all the MidiChordDefs must be contained in the gamut.
-        /// Otherwise a Debug.Assert() fails.
-        /// </summary>
-        /// <param name="gamut"></param>
-        /// <param name="stepsToTranspose"></param>
-        public override void TransposeStepsInGamut(int stepsToTranspose)
-        {
-            base.TransposeStepsInGamut(stepsToTranspose);
-            SetVelocitiesForGamut();
-        }
 
         /// <summary>
         /// Returns a new, related TenorPaletteGrp whose Gamut has the new pitchHierarchyIndex % 22.
+        /// Throws an exception if this.Gamut == null.
         /// </summary>
         /// <param name="pitchHierarchyIndex">the pitchHierarchyIndex of the returned TenorPaletteGrp's Gamut (will be treated % 22)</param>
         internal TenorPaletteGrp RelatedPitchHierarchyGrp(int pitchHierarchyIndex)
         {
             pitchHierarchyIndex %= 22;
-            
+
+            Debug.Assert(Gamut != null);
+
             Gamut gamut = new Gamut(pitchHierarchyIndex, Gamut.BasePitch, Gamut.NPitchesPerOctave);
 
             TenorPaletteGrp newTenorPaletteGrp = new TenorPaletteGrp(gamut);
@@ -69,11 +53,14 @@ namespace Moritz.Algorithm.Tombeau1
         }
         /// <summary>
         /// Returns a new, related TenorPaletteGrp whose Gamut has the new basePitch % 12.
+        /// Throws an exception if this.Gamut == null.
         /// </summary>
         /// <param name="basePitch">the basePitch of the returned TenorPaletteGrp's Gamut (will be treated % 12)</param>
         internal TenorPaletteGrp RelatedBasePitchGrp(int basePitch)
         {
             basePitch %= 12;
+
+            Debug.Assert(Gamut != null);
 
             Gamut gamut = new Gamut(Gamut.RelativePitchHierarchyIndex, basePitch, Gamut.NPitchesPerOctave);
 
@@ -196,13 +183,6 @@ namespace Moritz.Algorithm.Tombeau1
         /// <summary>
         /// Forbidden
         /// </summary>
-        public override void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, byte minimumVelocity, double percent = 100.0)
-        {
-            Debug.Assert(false, ForbiddenFunctionMsg);
-        }
-        /// <summary>
-        /// Forbidden
-        /// </summary>
         public override void SetVelocitiesFromDurations(byte velocityForMinMsDuration, byte velocityForMaxMsDuration, double percent = 100.0)
         {
             Debug.Assert(false, ForbiddenFunctionMsg);
@@ -245,7 +225,7 @@ namespace Moritz.Algorithm.Tombeau1
         }
         #endregion Overridden functions
 
-        private void SetVelocitiesForGamut()
+        public void SetVelocitiesForGamut()
         {
             base.SetVelocityPerAbsolutePitch(_velocityPerAbsolutePitch, _minimumVelocity);
         }

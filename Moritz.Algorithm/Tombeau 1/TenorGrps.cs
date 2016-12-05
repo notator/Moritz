@@ -34,12 +34,13 @@ namespace Moritz.Algorithm.Tombeau1
                 TenorPaletteGrp tpg = new TenorPaletteGrp(gamut);
 
                 #region begin test code 1 Shear and permute
-                //tpg.Shear(0, -1 * (gamut.NPitchesPerOctave));
+                tpg.Shear(0, -1 * (gamut.NPitchesPerOctave));
+                tpg.SetVelocitiesForGamut();
 
-                //if(domain % 2 != 0)
-                //{
-                //    tpg.Permute(1, 7);
-                //}
+                if(domain % 2 != 0)
+                {
+                    tpg.Permute(1, 7);
+                }
                 #endregion end test code 1
 
                 #region begin test code 2 transpose chords to the same absolute root pitch
@@ -67,7 +68,6 @@ namespace Moritz.Algorithm.Tombeau1
                 //if(domain % 2 != 0 && tpg.Count > 1)
                 //{
                 //    TenorPaletteGrp previousTpg = (TenorPaletteGrp)grps[i - 1];
-
                 //    //tpg = previousTpg.RelatedPitchHierarchyGrp(previousTpg.Gamut.RelativePitchHierarchyIndex + 11);
                 //    //tpg = previousTpg.RelatedBasePitchGrp(11);
                 //    tpg = previousTpg.RelatedDomainGrp(6);
@@ -97,6 +97,37 @@ namespace Moritz.Algorithm.Tombeau1
                 //    {
                 //        tpg.SetPanGliss(0, tpg.Count - 1, 0, 127);
                 //    }
+                //}
+                #endregion
+
+                #region begin test code 8, set inverse velocities
+                //if(domain % 2 != 0 && tpg.Count > 1)
+                //{
+                //    TenorPaletteGrp prevTpg = (TenorPaletteGrp)grps[i - 1];
+                //    Gamut prevGamut = prevTpg.Gamut;
+                //    tpg = new TenorPaletteGrp(prevGamut); // identical to prevTpg
+                //    // inverse velocityPerAbsolutePitch
+                //    List<byte> velocityPerAbsolutePitch = prevGamut.GetVelocityPerAbsolutePitch(20, 127, prevGamut.NPitchesPerOctave - 1);
+                //    tpg.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, 20);
+                //}
+                #endregion
+
+                #region begin test code 8, set Gamut (pitches
+                //if(domain % 2 != 0 && tpg.Count > 1)
+                //{
+                //    TenorPaletteGrp prevTpg = (TenorPaletteGrp)grps[i - 1];
+                //    Gamut prevGamut = prevTpg.Gamut;
+                //    tpg = new TenorPaletteGrp(prevGamut); // identical to prevTpg
+
+                //    int newRelativePitchHierarchyIndex = prevGamut.RelativePitchHierarchyIndex + 11;
+                //    int newBasePitch = prevGamut.BasePitch;
+                //    int newNPitchesPerOctave = 8;
+                //    Gamut gamut1 = new Gamut(newRelativePitchHierarchyIndex, newBasePitch, newNPitchesPerOctave);
+                //    tpg.Gamut = gamut1; // sets the pitches, velocities are still those of the original pitches.
+
+                //    // reverse the velocityperAbsolutePitch hierarchy re the prevGamut.
+                //    List<byte> velocityPerAbsolutePitch = prevGamut.GetVelocityPerAbsolutePitch(20, 127, prevGamut.NPitchesPerOctave - 1);
+                //    tpg.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, 20);
                 //}
                 #endregion
 

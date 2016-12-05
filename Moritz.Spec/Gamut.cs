@@ -18,8 +18,15 @@ namespace Moritz.Spec
         /// <summary>
         /// Gamuts are immutable!
         /// </summary>
+        /// <param name="relativePitchHierarchyIndex">Will be treated % 22 (Gamut.RelativePitchHierarchiesCount)</param>
+        /// <param name="basePitch">Will be treated % 12</param>
+        /// <param name="nPitchesPerOctave">Will be treated % 13</param>
         public Gamut(int relativePitchHierarchyIndex, int basePitch, int nPitchesPerOctave)
         {
+            relativePitchHierarchyIndex %= Gamut.RelativePitchHierarchiesCount;
+            basePitch %= 12;
+            nPitchesPerOctave %= 13;
+
             List<int> absolutePitchHierarchy = GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, basePitch);
             #region condition
             ThrowExceptionIfPitchHierarchyIsInvalid(absolutePitchHierarchy);
@@ -101,11 +108,6 @@ namespace Moritz.Spec
             return gamutList;
         }
 
-        public Gamut Clone()
-        {
-            return new Gamut(RelativePitchHierarchyIndex, BasePitch, NPitchesPerOctave);
-        }
-
         /// <summary>
         /// Throws an exception if the argument is invalid for any of the following reasons:
         /// 1. The argument may not be null or empty.
@@ -169,25 +171,13 @@ namespace Moritz.Spec
 
         #region public functions
         /// <summary>
-        /// returns 127 if i is greater than or equal to _list.Count.
+        /// returns the value in the gamut list at index i.
         /// </summary>
-        /// <param name="i"></param>
-        /// <returns></returns>
         public int this[int i]
         {
             get
             {
-                if(i >= _list.Count)
-                {
-                    Debug.Assert(false);
-                    // This is experimental code.
-                    // I was thinking of mapping Gamuts having the same NPitchesPerOctave but different Count values.
-                    return 127;
-                }
-                else
-                {
-                    return _list[i];
-                }
+                return _list[i];
             }
         }
 
@@ -199,13 +189,13 @@ namespace Moritz.Spec
         /// <summary>
         /// Returns true if the gamut.List contains all the pitches in the argument. Otherwise false. 
         /// </summary>
-        internal bool ContainsAllPitches(MidiChordDef mcd)
+        public bool ContainsAllPitches(MidiChordDef mcd)
         {
             foreach(BasicMidiChordDef bmcd in mcd.BasicMidiChordDefs)
             {
                 for(int i = 0; i < bmcd.Pitches.Count; ++i)
                 {
-                    if(bmcd.Velocities[i] > 0 && (this.Contains(bmcd.Pitches[i]) == false))
+                    if(this.Contains(bmcd.Pitches[i]) == false)
                     {
                         return false;
                     }
@@ -217,7 +207,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Returns true if the gamut.List contains all the pitches in the argument. Otherwise false. 
         /// </summary>
-        internal bool ContainsAllPitches(List<IUniqueDef> iuds)
+        public bool ContainsAllPitches(List<IUniqueDef> iuds)
         {
             foreach(IUniqueDef iud in iuds)
             {
@@ -384,27 +374,28 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// The returned list contains 12 velocity values in range [0..127] that can be applied to pitches in any Trk or MidiChordDef
+        /// The returned list contains 12 velocity values in range [1..127] that can be applied to pitches in any Trk or MidiChordDef
         /// (using their SetVelocityPerAbsolutePitch(...) ) function, regardless of the gamut from which they have been constructed.
         /// Pitches that are part of *this* gamut in the returned list are given velocities in range [minimumVelocity..maximumVelocity].
         /// Other pitches are given velocity = minimumVelocity.
-        /// The returned values are in order of absolute pitch, with C natural (absolute pitch 0) at position 0,
-        /// C# (absolute pitch 1) at position 1, etc.
+        /// The returned values are in order of absolute pitch, with C natural (absolute pitch 0) at position 0, C# (absolute pitch 1) at
+        /// position 1, etc.
         /// The velocities of the gamut's performing pitches are permuted according to a contour in a linear-negative field having
         /// domain NPitchesPerOctave. The contour is found using the loudestPitchIndex.
-        /// The contour at loudestPitchIndex==0 is simply ascending (e.g. 1,2,3,4,5,6,7,8).
+        /// The contour at loudestPitchIndex==0 (the default) is simply ascending (e.g. 1,2,3,4,5,6,7,8).
         /// The contour at loudestPitchIndex==(NValuesPerOctave-1) is simply descending (e.g. 9,8,7,6,5,4,3,2,1).
-        /// So, in chords constructed from this gamut, loudestPitchIndex==0 results in a bottom-to-top == loud-quiet velocity gradient,
-        /// while loudestPitchIndex==(NValuesPerOctave-1) results in a top-to-bottom == loud-quiet gradient.
+        /// So, in chords constructed from this gamut, loudestPitchIndex==0 results in a bottom-to-top (i.e. loud-quiet) velocity gradient with
+        /// respect to the gamut's absolute pitch hierarchy, while loudestPitchIndex==(NValuesPerOctave-1) results in a top-to-bottom (i.e. loud-quiet)
+        /// gradient with respect to the gamut's absolute pitch hierarchy.
         /// </summary>
-        /// <param name="minimumVelocity">In range [0..127]. The minimum velocity to be given to any pitch.</param>
-        /// <param name="maximumVelocity">In range [0..127]. The maximum velocity to be given to any pitch.</param>
+        /// <param name="minimumVelocity">In range [1..127]. The minimum velocity to be given to any pitch.</param>
+        /// <param name="maximumVelocity">In range [1..127]. The maximum velocity to be given to any pitch.</param>
         /// <param name="loudestPitchIndex">In range [0..(NPitchesPerOctave-1)].</param>
         /// <param name="isLinearGradient">If false, velocity values are scaled logarithmically between minimumVelocity and maximumVelocity.</param>
-        public List<byte> GetVelocityPerAbsolutePitch(int minimumVelocity, int maximumVelocity, int loudestPitchIndex, bool isLinearGradient)
+        public List<byte> GetVelocityPerAbsolutePitch(int minimumVelocity, int maximumVelocity, int loudestPitchIndex = 0, bool isLinearGradient = true)
         {
-            Debug.Assert(minimumVelocity >= 0 && minimumVelocity <= 127);
-            Debug.Assert(maximumVelocity >= 0 && maximumVelocity <= 127);
+            Debug.Assert(minimumVelocity >= 1 && minimumVelocity <= 127);
+            Debug.Assert(maximumVelocity >= 1 && maximumVelocity <= 127);
             Debug.Assert(minimumVelocity <= maximumVelocity);
             Debug.Assert(loudestPitchIndex >= 0 && loudestPitchIndex <= (NPitchesPerOctave-1));
 
@@ -449,7 +440,7 @@ namespace Moritz.Spec
                 int absPitch = AbsolutePitchHierarchy[absPitchIndex];
 
                 byte velocity = (byte) Math.Round(velocities[absPitchIndex]);
-                velocity = (velocity >= 0) ? velocity : (byte)0;
+                velocity = (velocity >= 1) ? velocity : (byte)1;
                 velocity = (velocity <= 127) ? velocity : (byte)127;
 
                 velocityPerAbsPitch[absPitch] = velocity;
@@ -556,7 +547,7 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="relativePitchHierarchyIndex">In range [0..21]</param>
         /// <param name="rootPitch">In range [0..127]</param>
-        private static List<int> GetAbsolutePitchHierarchy(int relativePitchHierarchyIndex, int rootPitch)
+        public static List<int> GetAbsolutePitchHierarchy(int relativePitchHierarchyIndex, int rootPitch)
         {
             if(RelativePitchHierarchies.Count != 22)
             {
@@ -629,6 +620,8 @@ namespace Moritz.Spec
             new List<int>(){ 0, 10,  7,  5,  4, 11,  2,  3,  9,  8,  1,  6 }, // 20
             new List<int>(){ 0,  7, 10,  4,  5,  2, 11,  9,  3,  1,  8,  6 }, // 21 
         };
+        private List<int> absolutePitchHierarchy;
+        private int v;
         #endregion Pitch Hierarchies
     }
 }

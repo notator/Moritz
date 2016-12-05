@@ -254,7 +254,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// <summary>
         /// Shears the group vertically, using TransposeStepsInGamut(steps).
         /// The vertical velocity sequence remains unchanged except when notes are removed because they are duplicates.
-        /// The number of steps to transpose intermediate chords is calculated from startSteps and endSteps.
+        /// The number of steps to transpose intermediate chords is calculated as a linear sequence from startSteps to endSteps.
         /// If there is only one chord in the Grp, it is transposed by startSteps.
         /// </summary>
         /// <param name="startSteps">The number of steps in the gamut to transpose the first chord</param>
@@ -263,14 +263,14 @@ namespace Moritz.Algorithm.Tombeau1
         {
             Debug.Assert(Gamut != null);
 
+            List<int> stepsList = new List<int>();
+
             if(Count == 1)
             {
-                TransposeStepsInGamut(startSteps);
+                stepsList.Add(startSteps);
             }
             else
             {
-                List<int> stepsList = new List<int>();
-
                 double incr = ((double)(endSteps - startSteps)) / (Count - 1);
                 double dSteps = startSteps;
                 for(int i = 0; i < _uniqueDefs.Count; ++i)
@@ -278,7 +278,29 @@ namespace Moritz.Algorithm.Tombeau1
                     stepsList.Add((int)Math.Round(dSteps));
                     dSteps += incr;
                 }
+            }
 
+            Shear(stepsList);
+        }
+
+        /// <summary>
+        /// Shears the group vertically, using TransposeStepsInGamut(steps).
+        /// The number of ints in the argument must equal the number of UniqueDefs in the Grp.
+        /// Each MidiChordDef in the UniqueDefs is transposed by the corresponding number of steps.
+        /// The vertical velocity sequence remains unchanged except when notes are removed because they are duplicates.
+        /// </summary>
+        /// <param name="stepsList">Each int is the number of steps to transpose the corresponding MidiChordDef.</param>
+        internal virtual void Shear(List<int> stepsList)
+        {
+            Debug.Assert(Gamut != null);
+            Debug.Assert(stepsList != null && stepsList.Count == this.Count);
+
+            if(Count == 1 && this[0] is MidiChordDef)
+            {
+                TransposeStepsInGamut(stepsList[0]);
+            }
+            else
+            {
                 for(int i = 0; i < _uniqueDefs.Count; ++i)
                 {
                     MidiChordDef mcd = _uniqueDefs[i] as MidiChordDef;
