@@ -680,6 +680,7 @@ namespace Moritz.Spec
         /// All the pitches in the MidiChordDef must be contained in the gamut.
         /// Transposes the pitches in NotatedMidiPitches, and all BasicMidiChordDef.Pitches by
         /// the number of steps in the gamut. Negative values transpose down.
+        /// The vertical velocity sequence remains unchanged except when notes are removed.
         /// It is not an error if Midi values would exceed the range of the gamut.
         /// In this case, they are silently coerced to the bottom or top notes of the gamut respectively.
         /// Duplicate top and bottom gamut pitches are removed.
@@ -716,7 +717,7 @@ namespace Moritz.Spec
 
         /// <summary>
         /// The rootPitch and all the pitches in the MidiChordDef must be contained in the gamut.
-        /// Otherwise a Debug.Assert() fails.
+        /// The vertical velocity sequence remains unchanged except when notes are removed because they are duplicates.
         /// Calculates the number of steps to transpose, and then calls TransposeStepsInGamut.
         /// When this function returns, rootPitch is the lowest pitch in both BasicMidiChordDefs[0] and NotatedMidiPitches.
         /// </summary>
@@ -833,8 +834,8 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="msDuration">The duration of the returned Trk</param>
         /// <param name="midiChannel">The channel of the returned Trk</param>
-        /// <param name="gamut">If defined, the gamut must contain all the pitches in this MidiChordDef.</param>
-        public Trk ToTrk(int msDuration, int midiChannel, Gamut gamut = null)
+        /// <param name="gamut">The gamut must contain all the pitches in this MidiChordDef.</param>
+        public Trk ToTrk(int msDuration, int midiChannel)
         {
             List<IUniqueDef> iuds = new List<IUniqueDef>();
             foreach(BasicMidiChordDef bmcd in this.BasicMidiChordDefs)
@@ -847,7 +848,7 @@ namespace Moritz.Spec
                 iuds.Add(mcd);
             }
 
-            Trk trk = new Trk(midiChannel, 0, iuds, gamut); // checks and sets the trk.Gamut.
+            Trk trk = new Trk(midiChannel, 0, iuds);
             trk.MsDuration = msDuration; // calls Trk.SetMsPositionsReFirstUD();
             
             return trk;

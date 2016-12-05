@@ -474,7 +474,7 @@ namespace Moritz.Algorithm.Tombeau1
             List<Trk> seqTrks = new List<Trk>();
             foreach(List<Grp> grps in grpLists)
             {
-                Trk trk0 = new Trk(midiChannel, 0, new List<IUniqueDef>(), grps[0].Gamut.Clone());
+                Trk trk0 = new Trk(midiChannel, 0, new List<IUniqueDef>());
                 foreach(Grp grp in grps)
                 {
                     trk0.AddRange(grp);

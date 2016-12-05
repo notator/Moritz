@@ -8,7 +8,7 @@ using Moritz.Globals;
 namespace Moritz.Spec
 {
     /// <summary>
-    /// In Seqs, Trks can contain any combination of RestDef, MidiChordDef and ClefChangeDef..
+    /// In Seqs, Trks can contain any combination of RestDef, MidiChordDef and ClefChangeDef.
     /// In Blocks, Trks can additionally contain CautionaryChordDefs.
     /// <para>All VoiceDef objects are IEnumerable, so that foreach loops can be used.</para>
     /// <para>For example:</para>
@@ -22,11 +22,9 @@ namespace Moritz.Spec
     public class Trk : VoiceDef
     {
         #region constructors
-        public Trk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds, Gamut gamut = null)
+        public Trk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
             : base(midiChannel, msPositionReContainer, iuds)
         {
-            Debug.Assert(gamut == null || gamut.ContainsAllPitches(iuds));
-            Gamut = gamut;
             // N.B. msPositionReContainer can be negative here. Seqs are normalised independently.
             AssertConsistentInSeq();
         }
@@ -46,12 +44,7 @@ namespace Moritz.Spec
         public Trk Clone()
         {
             List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
-            Gamut gamut = null;
-            if(this.Gamut != null)
-            {
-                gamut = this.Gamut.Clone();
-            }
-            Trk trk = new Trk(MidiChannel, MsPositionReContainer, clonedIUDs, gamut);
+            Trk trk = new Trk(MidiChannel, MsPositionReContainer, clonedIUDs);
             trk.Container = this.Container;
 
             return trk;
@@ -60,7 +53,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Also used by Clone() functions in subclasses
         /// </summary>
-        public List<IUniqueDef> GetUniqueDefsClone()
+        protected List<IUniqueDef> GetUniqueDefsClone()
         {
             List<IUniqueDef> clonedIUDs = new List<IUniqueDef>();
             foreach(IUniqueDef iu in _uniqueDefs)
@@ -157,10 +150,6 @@ namespace Moritz.Spec
         public virtual Trk Superimpose(Trk trk2)
         {
             Debug.Assert(MidiChannel == trk2.MidiChannel);
-            if(this.Gamut != trk2.Gamut)
-            {
-                Gamut = null;
-            }
 
             SuperimposeUniqueDefs(trk2);
 
@@ -345,46 +334,7 @@ namespace Moritz.Spec
         #endregion Changing the Trk's duration
 
         #region Changing MidiChordDef attributes
-        /// <summary>
-        /// All the pitches in all the MidiChordDefs must be contained in the gamut.
-        /// Otherwise a Debug.Assert() fails.
-        /// </summary>
-        /// <param name="gamut"></param>
-        /// <param name="stepsToTranspose"></param>
-        public virtual void TransposeStepsInGamut(int stepsToTranspose)
-        {
-            foreach(MidiChordDef mcd in MidiChordDefs)
-            {
-                mcd.TransposeStepsInGamut(this.Gamut, stepsToTranspose);
-            }
-        }
 
-        /// <summary>
-        /// The rootPitch and all the pitches in all the MidiChordDefs must be contained in the Trk's gamut.
-        /// Otherwise a Debug.Assert() fails.
-        /// Calculates the number of steps to transpose within the Trk's Gamut, and then calls TransposeStepsInGamut.
-        /// The rootPitch will be the lowest pitch in any MidiChordDef.BasicMidiChordDefs[0] in the Trk.
-        /// </summary>
-        /// <param name="gamut"></param>
-        /// <param name="rootPitch"></param>
-        public void TransposeToRootInGamut(int rootPitch)
-        {
-            Debug.Assert(Gamut != null && Gamut.Contains(rootPitch));
-
-            int currentLowestPitch = int.MaxValue;
-
-            foreach(MidiChordDef mcd in MidiChordDefs)
-            {
-                currentLowestPitch = (mcd.BasicMidiChordDefs[0].Pitches[0] < currentLowestPitch) ? mcd.BasicMidiChordDefs[0].Pitches[0] : currentLowestPitch;
-            }
-
-            int stepsToTranspose = Gamut.IndexOf(rootPitch) - Gamut.IndexOf(currentLowestPitch);
-
-            foreach(MidiChordDef mcd in MidiChordDefs)
-            {
-                mcd.TransposeStepsInGamut(this.Gamut, stepsToTranspose);
-            }
-        }
 
         #region Envelopes
 
@@ -454,11 +404,11 @@ namespace Moritz.Spec
         /// The arguments are passed unchanged to MidiChordDef.SetVelocityPerAbsolutePitch(...) for each MidiChordDef in this Trk.
         /// See the MidiChordDef documentation for details.
         /// If velocityPerAbsolutePitch contains values that are less than minimumVelocity, the velocities are increased proportionally.
-        /// If minimumVelocity==0, in both velocityPerAbsolutePitch and here, the notes that would have been given velocity=0 are removed
-        /// completely. If this results in a MidiChordDef with no notes, it is replaced here by a restDef of the same MsDuration.
+        /// If minimumVelocity==0, in both velocityPerAbsolutePitch and here, the notes that would have been given velocity=0 are given
+        /// velocity=1.
         /// </summary>
         /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
-        /// <param name="minimumVelocity">In range 0..127</param>
+        /// <param name="minimumVelocity">In range 1..127</param>
         /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
         public virtual void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, byte minimumVelocity, double percent = 100.0)
         {
@@ -1553,8 +1503,6 @@ namespace Moritz.Spec
         {
             return ($"Trk: MsDuration={MsDuration} MsPositionReContainer={MsPositionReContainer} Count={Count}");
         }
-
-        public Gamut Gamut { get; protected set; }
 
         /// <summary>
         /// This value is used by Seq.AlignTrkAxes(). It is set by the Permute functions, but can also be set manually.
