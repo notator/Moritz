@@ -249,8 +249,17 @@ namespace Moritz.Symbols
 			w.WriteAttributeString("xmlns", "xlink", null, "http://www.w3.org/1999/xlink");
 			w.WriteAttributeString("xmlns", "sodipodi", null, "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd");
 			w.WriteAttributeString("xmlns", "inkscape", null, "http://www.inkscape.org/namespaces/inkscape");
+
             w.WriteAttributeString("version", "1.1");
-            //w.WriteAttributeString("baseProfile", "full");
+
+            // The following data-scoreType attribute has been included because I think that all files that could be used as
+            // input for client applications should document their structure with this (standardized) svg attribute.
+            // The value happens here to be the same as for the "score" namespace above, but that is not necessarily so.
+            // The value is not checked by the Assistant Performer, because I know that the AP only plays scores that I give it.
+            // However, theoretically, anyone could write an app that uses this file, and they would need to be told the format
+            // in this standardized attribute. 
+            w.WriteAttributeString("data-scoreType", null, "http://www.james-ingram-act-two.de/open-source/svgScoreExtensions.html");
+
             w.WriteAttributeString("width", _pageFormat.ScreenRight.ToString()); // the intended screen display size (100%)
             w.WriteAttributeString("height", _pageFormat.ScreenBottom.ToString()); // the intended screen display size (100%)
             string viewBox = "0 0 " + _pageFormat.RightVBPX.ToString() + " " + _pageFormat.BottomVBPX.ToString();
