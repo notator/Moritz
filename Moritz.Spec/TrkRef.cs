@@ -24,7 +24,7 @@ namespace Moritz.Spec
 		{
 			MidiChannel = trkDef.MidiChannel;
 			_trkMsPosition = trkDef.MsPositionReContainer;
-			_trkNumMidiObjects = trkDef.DurationsCount; // includes MidiChordDef, RestDef
+			_trkNumMidiObjects = trkDef.DurationsCount; // includes MidiChordDef, MidiRestDef
 			TrkOptions = trkOptions;
 		}
 

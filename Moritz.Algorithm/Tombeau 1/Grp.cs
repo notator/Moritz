@@ -97,7 +97,7 @@ namespace Moritz.Algorithm.Tombeau1
         #region Overridden functions
         #region UniqueDefs list component changers
         /// <summary>
-        /// Appends a new MidiChordDef, RestDef, or ClefChangeDef to the end of the list.
+        /// Appends a new MidiChordDef, MidiRestDef, or ClefChangeDef to the end of the list.
         /// IUniqueDefs in Grps cannot be CautionaryChordDefs.
         /// Automatically sets the iUniqueDef's msPosition.
         /// Used by Block.PopBar(...), so accepts a CautionaryChordDef argument.
@@ -179,14 +179,14 @@ namespace Moritz.Algorithm.Tombeau1
             SetBeamEnd();
         }
         /// <summary> 
-        /// This function attempts to add all the non-RestDef UniqueDefs in trk2 to the calling Trk
+        /// This function attempts to add all the non-MidiRestDef UniqueDefs in trk2 to the calling Trk
         /// at the positions given by their MsPositionReFirstIUD added to trk2.MsPositionReContainer,
         /// whereby trk2.MsPositionReContainer is used with respect to the calling Trk's container.
         /// Before doing the superimposition, the calling Trk is given leading and trailing RestDefs
         /// so that trk2's uniqueDefs can be added at their original positions without any problem.
         /// These leading and trailing RestDefs are however removed before the function returns.
         /// The superimposed uniqueDefs will be placed at their original positions if they fit inside
-        /// a RestDef in the original Trk. A Debug.Assert() fails if this is not the case.
+        /// a MidiRestDef in the original Trk. A Debug.Assert() fails if this is not the case.
         /// To insert single uniqueDefs between existing uniqueDefs, use the function
         ///     Insert(index, iudToInsert).
         /// trk2's UniqueDefs are not cloned.

@@ -11,7 +11,7 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="absSeqMsPosition">Must be greater than or equal to zero.</param>
         /// <param name="trks">Each Trk must have a constructed UniqueDefs list which is either empty, or contains any
-        /// combination of RestDef or MidiChordDef. Each trk.MidiChannel must be unique and present in the
+        /// combination of MidiRestDef or MidiChordDef. Each trk.MidiChannel must be unique and present in the
         /// midiChannelIndexPerOutputVoice list. Not all the Seq's channels need to be given an explicit Trk in the trks
         /// argument. The seq will be given empty (default) Trks for the channels that are missing.
         /// The MsPositionReContainer field in each argument trk can have any value, but the Seq is Normalized
@@ -120,7 +120,7 @@ namespace Moritz.Spec
                     int trk2AbsStartMsPosition = absConcatMsPos + trk2.MsPositionReContainer;
                     if(trk1AbsEndMsPosition < trk2AbsStartMsPosition)
                     {
-                        trk1.Add(new RestDef(trk1.EndMsPositionReFirstIUD, trk2AbsStartMsPosition - trk1AbsEndMsPosition));
+                        trk1.Add(new MidiRestDef(trk1.EndMsPositionReFirstIUD, trk2AbsStartMsPosition - trk1AbsEndMsPosition));
                     }
                     trk1.AddRange(trk2);
                 }
@@ -183,13 +183,13 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Every Trk in _trks is either empty, or contains any combination of RestDef or MidiChordDef.
+        /// Every Trk in _trks is either empty, or contains any combination of MidiRestDef or MidiChordDef.
         /// There is always a trk having MsPositionReContainer == zero.
         /// </summary>
         private void AssertSeqConsistency()
         {
             Debug.Assert(_trks != null && _trks.Count > 0);
-            #region Every Trk in _trks is either empty, or contains any combination of MidiChordDef, RestDef or ClefChangeDef.
+            #region Every Trk in _trks is either empty, or contains any combination of MidiChordDef, MidiRestDef or ClefChangeDef.
             foreach(Trk trk in _trks)
             {
                 trk.AssertConsistentInSeq();

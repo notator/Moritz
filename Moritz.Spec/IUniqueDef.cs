@@ -8,8 +8,9 @@ namespace Moritz.Spec
     /// IUniqueDef is implemented by all objects that can be added to a VoiceDefs.UniqueDefs list.
     /// Currently (11.9.2014) these are:
     ///     MidiChordDef
+    ///     MidiRestDef
     ///     InputChordDef
-    ///     RestDef
+    ///     InputRestDef
     ///     CautionaryChordDef
     ///     ClefChangeDef
     /// These objects must implement DeepClone() so that VoiceDefs.DeepClone() can be implemented.

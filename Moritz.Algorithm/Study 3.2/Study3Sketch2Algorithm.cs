@@ -105,11 +105,11 @@ namespace Moritz.Algorithm.Study3Sketch2
             Debug.Assert(leadTrk != null);
             foreach(IUniqueDef tIud in leadTrk)
             {
-                RestDef tRestDef = tIud as RestDef;
+                MidiRestDef tRestDef = tIud as MidiRestDef;
                 MidiChordDef tmcd = tIud as MidiChordDef;
                 if(tRestDef != null)
                 {
-                    RestDef iRestDef = new RestDef(tRestDef.MsPositionReFirstUD, tRestDef.MsDuration);
+                    MidiRestDef iRestDef = new MidiRestDef(tRestDef.MsPositionReFirstUD, tRestDef.MsDuration);
                     ivd.Add(iRestDef);
                 }
                 else if(tmcd != null)
@@ -295,7 +295,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             {
                 IUniqueDef durationDef = palette.UniqueDurationDef(i);
                 durationDef.MsPositionReFirstUD = msPositionReFirstIUD;
-                RestDef restDef = new RestDef(msPositionReFirstIUD + durationDef.MsDuration, bar1ChordMsSeparation - durationDef.MsDuration);
+                MidiRestDef restDef = new MidiRestDef(msPositionReFirstIUD + durationDef.MsDuration, bar1ChordMsSeparation - durationDef.MsDuration);
                 msPositionReFirstIUD += bar1ChordMsSeparation;
                 trk.UniqueDefs.Add(durationDef);
                 trk.UniqueDefs.Add(restDef);
@@ -327,7 +327,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             {
                 if(restMsDuration > 0)
                 {
-                    RestDef restDef = new RestDef(0, restMsDuration);
+                    MidiRestDef restDef = new MidiRestDef(0, restMsDuration);
                     trk.Insert(0, restDef);
                 }
                 restMsDuration += 1500;
@@ -340,7 +340,7 @@ namespace Moritz.Algorithm.Study3Sketch2
                 int trkEndMsPosReBar = trk.EndMsPositionReFirstIUD;
                 if(maxMsPosReBar > trkEndMsPosReBar)
                 {
-                    RestDef restDef = new RestDef(trkEndMsPosReBar, maxMsPosReBar - trkEndMsPosReBar);
+                    MidiRestDef restDef = new MidiRestDef(trkEndMsPosReBar, maxMsPosReBar - trkEndMsPosReBar);
                     trk.Add(restDef);
                 }
             }

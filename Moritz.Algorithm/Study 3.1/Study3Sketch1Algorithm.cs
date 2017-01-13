@@ -85,7 +85,7 @@ namespace Moritz.Algorithm.Study3Sketch1
             {
                 IUniqueDef durationDef = palette.UniqueDurationDef(i);
                 durationDef.MsPositionReFirstUD = msPositionReFirstIUD;
-                RestDef restDef = new RestDef(msPositionReFirstIUD + durationDef.MsDuration, bar1ChordMsSeparation - durationDef.MsDuration);
+                MidiRestDef restDef = new MidiRestDef(msPositionReFirstIUD + durationDef.MsDuration, bar1ChordMsSeparation - durationDef.MsDuration);
                 msPositionReFirstIUD += bar1ChordMsSeparation;
                 trk.UniqueDefs.Add(durationDef);
                 trk.UniqueDefs.Add(restDef);
@@ -117,7 +117,7 @@ namespace Moritz.Algorithm.Study3Sketch1
             {
                 if(restMsDuration > 0)
                 {
-                    RestDef restDef = new RestDef(0, restMsDuration);
+                    MidiRestDef restDef = new MidiRestDef(0, restMsDuration);
                     trk.Insert(0, restDef);
                 }
                 restMsDuration += 1500;
@@ -130,7 +130,7 @@ namespace Moritz.Algorithm.Study3Sketch1
                 int trkEndMsPosReBar = trk.EndMsPositionReFirstIUD;
                 if(maxMsPosReBar > trkEndMsPosReBar)
                 {
-                    RestDef restDef = new RestDef(trkEndMsPosReBar, maxMsPosReBar - trkEndMsPosReBar);
+                    MidiRestDef restDef = new MidiRestDef(trkEndMsPosReBar, maxMsPosReBar - trkEndMsPosReBar);
                     trk.Add(restDef);
                 }
             }

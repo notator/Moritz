@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicMidiChordDef.cs" />
+    <Compile Include="MidiRestDef.cs" />
     <Compile Include="MainBlock.cs" />
     <Compile Include="Block.cs" />
     <Compile Include="CautionaryChordDef.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="IVoiceDefContainer.cs" />
     <Compile Include="Envelope.cs" />
     <Compile Include="NoteTrigger.cs" />
+    <Compile Include="InputRestDef.cs" />
     <Compile Include="Seq.cs" />
     <Compile Include="SeqRef.cs" />
     <Compile Include="TrkRef.cs" />

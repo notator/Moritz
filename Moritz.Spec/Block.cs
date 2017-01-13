@@ -261,20 +261,20 @@ namespace Moritz.Spec
                     int startRestMsDuration = voiceDef.MsPositionReContainer;
                     if(startRestMsDuration > 0)
                     {
-                        voiceDef.Insert(0, new RestDef(0, startRestMsDuration));
+                        voiceDef.Insert(0, new MidiRestDef(0, startRestMsDuration));
                     }
 
                     int endOfTrkMsPositionReFirstIUD = voiceDef.EndMsPositionReFirstIUD;
                     int endRestMsDuration = blockMsDuration - endOfTrkMsPositionReFirstIUD;
                     if(endRestMsDuration > 0)
                     {
-                        voiceDef.UniqueDefs.Add(new RestDef(endOfTrkMsPositionReFirstIUD, endRestMsDuration));
+                        voiceDef.UniqueDefs.Add(new MidiRestDef(endOfTrkMsPositionReFirstIUD, endRestMsDuration));
                     }
                     voiceDef.AgglomerateRests();
                 }
                 else
                 {
-                    voiceDef.Add(new RestDef(0, blockMsDuration));
+                    voiceDef.Add(new MidiRestDef(0, blockMsDuration));
                 }
 
                 voiceDef.MsPositionReContainer = 0;
@@ -284,8 +284,8 @@ namespace Moritz.Spec
 
         /// <summary>
         /// A non-empty Block must fulfill the following criteria:
-        /// The Trks may contain any combination of RestDef, MidiChordDef, CautionaryChordDef and ClefChangeDef.
-        /// The InputVoiceDefs may contain any combination of RestDef, InputChordDef, CautionaryChordDef and ClefChangeDef.
+        /// The Trks may contain any combination of MidiRestDef, MidiChordDef, CautionaryChordDef and ClefChangeDef.
+        /// The InputVoiceDefs may contain any combination of InputRestDef, InputChordDef, CautionaryChordDef and ClefChangeDef.
         /// <para>1. The first VoiceDef in a Block must be a Trk.</para>
         /// <para>2. Trks precede InputVoiceDefs (if any) in the _voiceDefs list.</para>
         /// <para>3. All voiceDefs start at MsPositionReContainer=0 and have the same MsDuration.</para>

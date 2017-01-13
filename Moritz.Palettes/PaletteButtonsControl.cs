@@ -236,7 +236,7 @@ namespace Moritz.Palettes
 
                     iud = palette.UniqueDurationDef(index);
 
-                    if(iud is RestDef)
+                    if(iud is MidiRestDef)
                     {
                         _midiEventDemoButtons[index].Hide();
                         this._restLabels[0].Select(); // just to deselect everything

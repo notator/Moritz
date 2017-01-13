@@ -307,8 +307,9 @@ namespace Moritz.Symbols
             NoteObject noteObject = null;
             CautionaryChordDef cautionaryChordDef = iud as CautionaryChordDef;
             MidiChordDef midiChordDef = iud as MidiChordDef;
+            MidiRestDef midiRestDef = iud as MidiRestDef;
             InputChordDef inputChordDef = iud as InputChordDef;
-            RestDef restDef = iud as RestDef;
+            InputRestDef inputRestDef = iud as InputRestDef;
             ClefChangeDef clefChangeDef = iud as ClefChangeDef;
 
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
@@ -326,7 +327,6 @@ namespace Moritz.Symbols
                 {
                     CautionaryInputChordSymbol cautionaryInputChordSymbol = new CautionaryInputChordSymbol(voice, cautionaryChordDef, absMsPosition, cautionaryFontHeight);
                     noteObject = cautionaryInputChordSymbol;
-
                 }
             }                
             else if(midiChordDef != null)
@@ -344,15 +344,20 @@ namespace Moritz.Symbols
                 }
                 noteObject = outputChordSymbol;
             }
+            else if(midiRestDef != null || cautionaryChordDef != null)
+            {
+                OutputRestSymbol outputRestSymbol = new OutputRestSymbol(voice, iud, absMsPosition, minimumCrotchetDuration, musicFontHeight);
+                noteObject = outputRestSymbol;
+            }
             else if(inputChordDef != null)
             {
                 InputChordSymbol inputChordSymbol = new InputChordSymbol(voice, inputChordDef, absMsPosition, minimumCrotchetDuration, musicFontHeight);
                 noteObject = inputChordSymbol;
             }
-            else if(restDef != null) 
+            else if(inputRestDef != null)
             {
-                RestSymbol restSymbol = new RestSymbol(voice, iud, absMsPosition, minimumCrotchetDuration, musicFontHeight);
-                noteObject = restSymbol;
+                InputRestSymbol inputRestSymbol = new InputRestSymbol(voice, inputRestDef, absMsPosition, minimumCrotchetDuration, musicFontHeight);
+                noteObject = inputRestSymbol;
             }
             else if(clefChangeDef != null)
             {

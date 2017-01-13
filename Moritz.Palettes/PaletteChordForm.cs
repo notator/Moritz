@@ -698,7 +698,7 @@ namespace Moritz.Palettes
                 Button midiEventDemoButton = sender as Button;
                 DurationDef durationDef = GetDurationDef();
                 MidiChordDef midiChordDef = durationDef as MidiChordDef;
-                RestDef restDef = durationDef as RestDef;
+                MidiRestDef restDef = durationDef as MidiRestDef;
 
                 if(midiChordDef != null)
                 {
@@ -725,7 +725,7 @@ namespace Moritz.Palettes
         }
 
         /// <summary>
-        /// Returns either a new RestDef or a new MidiChordDef
+        /// Returns either a new MidiRestDef or a new MidiChordDef
         /// In both cases, MsPosition is set to zero, Lyric is set to null.
         /// </summary>
         private DurationDef GetDurationDef()
@@ -744,7 +744,7 @@ namespace Moritz.Palettes
                     Debug.Assert(false);
                 }
                 Debug.Assert(msDuration > 0);
-                rval = new RestDef(0, msDuration);
+                rval = new MidiRestDef(0, msDuration);
             }
             else
             {

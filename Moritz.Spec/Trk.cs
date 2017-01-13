@@ -8,7 +8,7 @@ using Moritz.Globals;
 namespace Moritz.Spec
 {
     /// <summary>
-    /// In Seqs, Trks can contain any combination of RestDef, MidiChordDef and ClefChangeDef.
+    /// In Seqs, Trks can contain any combination of MidiRestDef, MidiChordDef and ClefChangeDef.
     /// In Blocks, Trks can additionally contain CautionaryChordDefs.
     /// <para>All VoiceDef objects are IEnumerable, so that foreach loops can be used.</para>
     /// <para>For example:</para>
@@ -66,36 +66,36 @@ namespace Moritz.Spec
 
         #endregion constructors
         /// <summary>
-        /// In seqs, trks can contain any combination of RestDef, MidiChordDef and ClefChangeDef.
+        /// In seqs, trks can contain any combination of MidiRestDef, MidiChordDef and ClefChangeDef.
         /// </summary>
         internal void AssertConsistentInSeq()
         {
             foreach(IUniqueDef iud in UniqueDefs)
             {
-                Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is ClefChangeDef);
+                Debug.Assert(iud is MidiChordDef || iud is MidiRestDef || iud is ClefChangeDef);
             }
         }
 
         /// <summary>
-        /// In blocks, trks can contain any combination of RestDef, MidiChordDef, ClefChangeDef and CautionaryChordDef.
+        /// In blocks, trks can contain any combination of MidiRestDef, MidiChordDef, ClefChangeDef and CautionaryChordDef.
         /// </summary>
         internal override void AssertConsistentInBlock()
         {
             foreach(IUniqueDef iud in UniqueDefs)
             {
-                Debug.Assert(iud is MidiChordDef || iud is RestDef || iud is ClefChangeDef || iud is CautionaryChordDef);
+                Debug.Assert(iud is MidiChordDef || iud is MidiRestDef || iud is ClefChangeDef || iud is CautionaryChordDef);
             }
         }
 
         #region Add, Remove, Insert, Replace objects in the Trk
         /// <summary>
-        /// Appends the new MidiChordDef, RestDef, CautionaryChordDef or ClefChangeDef to the end of the list.
+        /// Appends the new MidiChordDef, MidiRestDef, CautionaryChordDef or ClefChangeDef to the end of the list.
         /// Automatically sets the iUniqueDef's msPosition.
         /// Used by Block.PopBar(...), so accepts a CautionaryChordDef argument.
         /// </summary>
         public override void Add(IUniqueDef iUniqueDef)
         {
-            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is RestDef || iUniqueDef is CautionaryChordDef || iUniqueDef is ClefChangeDef);
+            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is MidiRestDef || iUniqueDef is CautionaryChordDef || iUniqueDef is ClefChangeDef);
             _Add(iUniqueDef);
         }
         /// <summary>
@@ -113,7 +113,7 @@ namespace Moritz.Spec
         /// </summary>
         public override void Insert(int index, IUniqueDef iUniqueDef)
         {
-            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is RestDef || iUniqueDef is ClefChangeDef);
+            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is MidiRestDef || iUniqueDef is ClefChangeDef);
             _Insert(index, iUniqueDef);
         }
         /// <summary>
@@ -129,19 +129,19 @@ namespace Moritz.Spec
         /// </summary>
         public virtual void Replace(int index, IUniqueDef replacementIUnique)
         {
-            Debug.Assert(replacementIUnique is MidiChordDef || replacementIUnique is RestDef);
+            Debug.Assert(replacementIUnique is MidiChordDef || replacementIUnique is MidiRestDef);
             _Replace(index, replacementIUnique);
         }
         #region Superimpose
         /// <summary> 
-        /// This function attempts to add all the non-RestDef UniqueDefs in trk2 to the calling Trk
+        /// This function attempts to add all the non-MidiRestDef UniqueDefs in trk2 to the calling Trk
         /// at the positions given by their MsPositionReFirstIUD added to trk2.MsPositionReContainer,
         /// whereby trk2.MsPositionReContainer is used with respect to the calling Trk's container.
         /// Before doing the superimposition, the calling Trk is given leading and trailing RestDefs
         /// so that trk2's uniqueDefs can be added at their original positions without any problem.
         /// These leading and trailing RestDefs are however removed before the function returns.
         /// The superimposed uniqueDefs will be placed at their original positions if they fit inside
-        /// a RestDef in the original Trk. A Debug.Assert() fails if this is not the case.
+        /// a MidiRestDef in the original Trk. A Debug.Assert() fails if this is not the case.
         /// To insert single uniqueDefs between existing uniqueDefs, call the function
         /// Trk.Insert(index, iudToInsert).
         /// trk2's UniqueDefs are not cloned.
@@ -207,7 +207,7 @@ namespace Moritz.Spec
                             currentIndex = trk2Index++;
                         }
                     }
-                } while(currentIndex < currentTrk.Count && currentTrk[currentIndex] is RestDef);
+                } while(currentIndex < currentTrk.Count && currentTrk[currentIndex] is MidiRestDef);
                 #endregion get next non-rest iud in either trk
 
                 if(currentIndex < currentTrk.Count)
@@ -218,7 +218,7 @@ namespace Moritz.Spec
                     if(iudToAdd.MsPositionReFirstUD > currentDuration)
                     {
                         int restMsDuration = iudToAdd.MsPositionReFirstUD - currentDuration;
-                        newUniqueDefs.Add(new RestDef(0, restMsDuration));
+                        newUniqueDefs.Add(new MidiRestDef(0, restMsDuration));
                         currentDuration += restMsDuration;
                     }
                     else if(iudToAdd.MsPositionReFirstUD < currentDuration)
@@ -247,23 +247,23 @@ namespace Moritz.Spec
             this.Trim();
             if(this.MsPositionReContainer > 0)
             {
-                this.Insert(0, new RestDef(0, this.MsPositionReContainer));
+                this.Insert(0, new MidiRestDef(0, this.MsPositionReContainer));
                 this.MsPositionReContainer = 0;
             }
             trk2.Trim();
             if(trk2.MsPositionReContainer > 0)
             {
-                trk2.Insert(0, new RestDef(0, trk2.MsPositionReContainer));
+                trk2.Insert(0, new MidiRestDef(0, trk2.MsPositionReContainer));
                 trk2.MsPositionReContainer = 0;
             }
             int lengthDiff = trk2.MsDuration - this.MsDuration;
             if(lengthDiff > 0)
             {
-                this.Add(new RestDef(0, lengthDiff));
+                this.Add(new MidiRestDef(0, lengthDiff));
             }
             else if(lengthDiff < 0)
             {
-                trk2.Add(new RestDef(0, -lengthDiff));
+                trk2.Add(new MidiRestDef(0, -lengthDiff));
             }
         }
 
@@ -276,7 +276,7 @@ namespace Moritz.Spec
             List<int> restIndicesToRemoveAtStart = new List<int>();
             for(int i = 0; i < UniqueDefs.Count; ++i)
             {
-                if(UniqueDefs[i] is RestDef)
+                if(UniqueDefs[i] is MidiRestDef)
                 {
                     restIndicesToRemoveAtStart.Add(i);
                 }
@@ -288,7 +288,7 @@ namespace Moritz.Spec
             List<int> restIndicesToRemoveAtEnd = new List<int>();
             for(int i = UniqueDefs.Count - 1; i >= 0; --i)
             {
-                if(UniqueDefs[i] is RestDef)
+                if(UniqueDefs[i] is MidiRestDef)
                 {
                     restIndicesToRemoveAtEnd.Add(i);
                 }
@@ -429,7 +429,7 @@ namespace Moritz.Spec
                     mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, minimumVelocity, percent);
                     if(mcd.NotatedMidiPitches.Count == 0)
                     {
-                        Replace(i, new RestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
+                        Replace(i, new MidiRestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
                     }
                 }
             }
@@ -636,7 +636,7 @@ namespace Moritz.Spec
                     mcd.AdjustVelocities(factor);
                     if(mcd.NotatedMidiPitches.Count == 0)
                     {
-                        Replace(i, new RestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
+                        Replace(i, new MidiRestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
                     }
                 }
             }
@@ -656,7 +656,7 @@ namespace Moritz.Spec
                     mcd.AdjustVelocities(factor);
                     if(mcd.NotatedMidiPitches.Count == 0)
                     {
-                        Replace(i, new RestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
+                        Replace(i, new MidiRestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
                     }
                 }
             }
@@ -697,7 +697,7 @@ namespace Moritz.Spec
                 }
                 if(mcd.NotatedMidiPitches.Count == 0)
                 {
-                    Replace(i, new RestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
+                    Replace(i, new MidiRestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
                 }
             }
         }
@@ -1343,7 +1343,7 @@ namespace Moritz.Spec
             List<KeyValuePair<int, IUniqueDef>> rests = new List<KeyValuePair<int, IUniqueDef>>();
             for(int i = iuds.Count - 1; i >= 0; --i)
             {
-                if(iuds[i] is RestDef)
+                if(iuds[i] is MidiRestDef)
                 {
                     rests.Add(new KeyValuePair<int, IUniqueDef>(i, iuds[i]));
                     iuds.RemoveAt(i);
@@ -1452,7 +1452,7 @@ namespace Moritz.Spec
             foreach(IUniqueDef iud in UniqueDefs)
             {
                 MidiChordDef mcd = iud as MidiChordDef;
-                RestDef restDef = iud as RestDef;
+                MidiRestDef restDef = iud as MidiRestDef;
 
                 if(mcd != null)
                 {
@@ -1532,7 +1532,7 @@ namespace Moritz.Spec
 				int count = 0;
 				foreach(IUniqueDef iud in _uniqueDefs)
 				{
-					if(iud is MidiChordDef || iud is RestDef)
+					if(iud is MidiChordDef || iud is MidiRestDef)
 					{
 						count++;
 					}

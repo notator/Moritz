@@ -8,7 +8,7 @@ using Moritz.Spec;
 
 namespace Moritz.Symbols
 {
-	internal class RestSymbol : DurationSymbol
+	internal abstract class RestSymbol : DurationSymbol
 	{
         public RestSymbol(Voice voice, IUniqueDef iumdd, int absMsPosition, int minimumCrotchetDurationMS, float fontHeight)
             : base(voice, iumdd.MsDuration, absMsPosition, minimumCrotchetDurationMS, fontHeight)
@@ -18,26 +18,6 @@ namespace Moritz.Symbols
                 Console.WriteLine("rest is CautionaryChordDef!");
             }
             LocalCautionaryChordDef = iumdd as CautionaryChordDef;
-        }
-
-        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
-        {
-            if(LocalCautionaryChordDef == null)
-            {
-				w.SvgStartGroup("rest");
-
-                Debug.Assert(_msDuration > 0);
-				if(staffIsVisible)
-				{
-					w.WriteAttributeString("score", "alignmentX", null, ((Metrics.Left + Metrics.Right) / 2).ToString(M.En_USNumberFormat));
-				}
-                w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
-
-                if(this.Metrics != null && staffIsVisible)
-                    this.Metrics.WriteSVG(w);
-
-                w.SvgEndGroup();
-            }
         }
 
 		public override string ToString()
@@ -81,8 +61,5 @@ namespace Moritz.Symbols
             get { return _msDuration; }
             set { _msDuration = value; } 
         }
-
-        public RestDef MidiRestDef { get { return _midiRestDef; } }
-        private RestDef _midiRestDef = null;
 	}
 }

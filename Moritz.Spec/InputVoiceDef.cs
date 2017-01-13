@@ -10,7 +10,7 @@ using Moritz.Globals;
 namespace Moritz.Spec
 {
     /// <summary>
-    /// During construction, InputVoiceDefs only contain InputChordDef and RestDef objects.
+    /// During construction, InputVoiceDefs only contain InputChordDef and InputRestDef objects.
     /// In Blocks, they may also contain CautionaryChordDef objects.
     /// <para></para>
     /// <para>This class is IEnumerable, so that foreach loops can be used.</para>
@@ -31,7 +31,7 @@ namespace Moritz.Spec
             foreach(IUniqueDef iud in UniqueDefs)
             {
                 // In blocks, inputChordDefs can also contain CautionaryChordDefs
-                Debug.Assert(iud is InputChordDef || iud is RestDef);
+                Debug.Assert(iud is InputChordDef || iud is InputRestDef);
             }
         }
 
@@ -66,7 +66,7 @@ namespace Moritz.Spec
             foreach(IUniqueDef iud in UniqueDefs)
             {
                 // In blocks, inputChordDefs can also contain CautionaryChordDefs
-                Debug.Assert(iud is InputChordDef || iud is RestDef || iud is CautionaryChordDef || iud is ClefChangeDef);
+                Debug.Assert(iud is InputChordDef || iud is InputRestDef || iud is CautionaryChordDef || iud is ClefChangeDef);
             }
         }
 
@@ -79,7 +79,7 @@ namespace Moritz.Spec
         /// <param name="iUniqueDef"></param>
         public override void Add(IUniqueDef iud)
         {
-            Debug.Assert(iud is InputChordDef || iud is RestDef || iud is CautionaryChordDef || iud is ClefChangeDef);
+            Debug.Assert(iud is InputChordDef || iud is InputRestDef || iud is CautionaryChordDef || iud is ClefChangeDef);
             _Add(iud);
         }
         /// <summary>
@@ -101,7 +101,7 @@ namespace Moritz.Spec
             int thisEndMsPositionReSeq = this.EndMsPositionReFirstIUD + this.MsPositionReContainer;
             if(inputVoiceDef.MsPositionReContainer > thisEndMsPositionReSeq)
             {
-                RestDef rest = new RestDef(this.EndMsPositionReFirstIUD, inputVoiceDef.MsPositionReContainer - thisEndMsPositionReSeq);
+                InputRestDef rest = new InputRestDef(this.EndMsPositionReFirstIUD, inputVoiceDef.MsPositionReContainer - thisEndMsPositionReSeq);
                 this.Add(rest);
             }
             _AddRange(inputVoiceDef);
@@ -113,7 +113,7 @@ namespace Moritz.Spec
         /// </summary>
         public override void Insert(int index, IUniqueDef iUniqueDef)
         {
-            Debug.Assert(iUniqueDef is InputChordDef || iUniqueDef is RestDef || iUniqueDef is CautionaryChordDef);
+            Debug.Assert(iUniqueDef is InputChordDef || iUniqueDef is InputRestDef || iUniqueDef is CautionaryChordDef);
             _Insert(index, iUniqueDef);
         }
         /// <summary>
@@ -131,7 +131,7 @@ namespace Moritz.Spec
         /// </summary>
         private void _InsertInRest(InputVoiceDef iVoiceDef)
         {
-            Debug.Assert(!(Container is Block), "Cannot Insert a Trk in a RestDef inside a Block.");
+            Debug.Assert(!(Container is Block), "Cannot Insert a Trk in a InputRestDef inside a Block.");
 
             int iLmddsStartMsPosReFirstIUD = iVoiceDef[0].MsPositionReFirstUD;
             int iLmddsEndMsPosReFirstIUD = iVoiceDef[iVoiceDef.Count - 1].MsPositionReFirstUD + iVoiceDef[iVoiceDef.Count - 1].MsDuration;
@@ -166,7 +166,7 @@ namespace Moritz.Spec
 
             for(int i = 0; i < lmdds.Count; ++i)
             {
-                RestDef umrd = lmdds[i] as RestDef;
+                InputRestDef umrd = lmdds[i] as InputRestDef;
                 if(umrd != null)
                 {
                     restStartMsPosReFirstIUD = lmdds[i].MsPositionReFirstUD;
@@ -206,14 +206,22 @@ namespace Moritz.Spec
         /// </summary>
         private List<IUniqueDef> GetReplacementList(IUniqueDef originalRest, VoiceDef iVoiceDef)
         {
-            Debug.Assert(originalRest is RestDef);
+            Debug.Assert(originalRest is InputRestDef || originalRest is MidiRestDef);
             Debug.Assert(iVoiceDef[0] is MidiChordDef || iVoiceDef[0] is InputChordDef);
             Debug.Assert(iVoiceDef[iVoiceDef.Count - 1] is MidiChordDef || iVoiceDef[iVoiceDef.Count - 1] is InputChordDef);
 
             List<IUniqueDef> rList = new List<IUniqueDef>();
             if(iVoiceDef[0].MsPositionReFirstUD > originalRest.MsPositionReFirstUD)
             {
-                RestDef rest1 = new RestDef(originalRest.MsPositionReFirstUD, iVoiceDef[0].MsPositionReFirstUD - originalRest.MsPositionReFirstUD);
+                RestDef rest1;
+                if(originalRest is MidiRestDef)
+                {
+                    rest1 = new MidiRestDef(originalRest.MsPositionReFirstUD, iVoiceDef[0].MsPositionReFirstUD - originalRest.MsPositionReFirstUD);
+                }
+                else
+                {
+                    rest1 = new InputRestDef(originalRest.MsPositionReFirstUD, iVoiceDef[0].MsPositionReFirstUD - originalRest.MsPositionReFirstUD);
+                }
                 rList.Add(rest1);
             }
             rList.AddRange(iVoiceDef.UniqueDefs);
@@ -221,7 +229,15 @@ namespace Moritz.Spec
             int originalRestEndMsPosReFirstIUD = originalRest.MsPositionReFirstUD + originalRest.MsDuration;
             if(originalRestEndMsPosReFirstIUD > iudEndMsPosReFirstIUD)
             {
-                RestDef rest2 = new RestDef(iudEndMsPosReFirstIUD, originalRestEndMsPosReFirstIUD - iudEndMsPosReFirstIUD);
+                RestDef rest2;
+                if(originalRest is MidiRestDef)
+                {
+                    rest2 = new MidiRestDef(iudEndMsPosReFirstIUD, originalRestEndMsPosReFirstIUD - iudEndMsPosReFirstIUD);
+                }
+                else
+                {
+                    rest2 = new InputRestDef(iudEndMsPosReFirstIUD, originalRestEndMsPosReFirstIUD - iudEndMsPosReFirstIUD);
+                }
                 rList.Add(rest2);
             }
 

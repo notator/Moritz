@@ -532,9 +532,17 @@ namespace Moritz.Spec
                 IUniqueDef iud = (mcd == null) ? (IUniqueDef)icd : (IUniqueDef)mcd;
                 if(iud != null)
                 {
-                    RestDef umrd = new RestDef(iud.MsPositionReFirstUD, iud.MsDuration);
+                    RestDef restDef;
+                    if(this is InputVoiceDef)
+                    {
+                        restDef = new InputRestDef(iud.MsPositionReFirstUD, iud.MsDuration);
+                    }
+                    else
+                    {
+                        restDef = new MidiRestDef(iud.MsPositionReFirstUD, iud.MsDuration);
+                    }
                     RemoveAt(i);
-                    Insert(i, umrd);
+                    Insert(i, restDef);
                 }
             }
 

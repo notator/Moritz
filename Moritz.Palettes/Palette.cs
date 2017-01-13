@@ -96,7 +96,7 @@ namespace Moritz.Palettes
         }
 
         /// <summary>
-        /// Returns either a new RestDef or a new MidiChordDef
+        /// Returns either a new MidiRestDef or a new MidiChordDef
         /// In both cases, MsPosition is set to zero, Lyric is set to null.
         /// </summary>
         private DurationDef GetDurationDef(int index)
@@ -109,7 +109,7 @@ namespace Moritz.Palettes
                 /// RestDefs are immutable, and have no MsPosition property.
                 /// UniqueRestDefs are mutable RestDefs with both MsPositon and MsDuration properties.
                 int restMsDuration = bcms.Durations[index];
-                rval = new RestDef(0, restMsDuration);
+                rval = new MidiRestDef(0, restMsDuration);
             }
             else
             {

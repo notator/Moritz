@@ -915,9 +915,11 @@ namespace Moritz.Spec
             }
         }
 
+
         /// <summary>
-        /// Note that, unlike Rests, MidiChordDefs do not have a msDuration attribute.
-        /// Their msDuration is deduced from the contained BasicMidiChords.
+        /// Note that neither OutputRests nor OutputChords have a msDuration attribute.
+        /// Their msDuration is deduced from the contained moment msDurations.
+        /// 
         /// Patch indices set in the BasicMidiChordDefs override those set in the main MidiChordDef.
         /// However, if BasicMidiChordDefs[0].PatchIndex is null, and this.Patch is set, BasicMidiChordDefs[0].PatchIndex is set to Patch.
         /// The same is true for Bank settings.  
@@ -925,9 +927,11 @@ namespace Moritz.Spec
         /// While constructing Tracks, the AssistantPerformer should monitor the current Bank and/or Patch, so that it can decide
         /// whether or not to actually construct and send bank and/or patch change messages.
         /// </summary>
+
+        #region old WriteSVG()
         public void WriteSvg(SvgWriter w)
         {
-            w.WriteStartElement("score", "midiChord", null);  
+            w.WriteStartElement("score", "midi", null);  
 
             Debug.Assert(BasicMidiChordDefs != null && BasicMidiChordDefs.Count > 0);
             
@@ -954,8 +958,9 @@ namespace Moritz.Spec
             if(MidiChordSliderDefs != null)
                 MidiChordSliderDefs.WriteSVG(w); // writes sliders element
 
-            w.WriteEndElement(); // score:midiChord
+            w.WriteEndElement(); // score:midi
         }
+        #endregion old WriteSVG()
 
         private static List<int> GetBasicMidiChordDurations(List<BasicMidiChordDef> ornamentChords)
         {

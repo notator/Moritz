@@ -11,23 +11,12 @@ namespace Moritz.Spec
     /// Each rest in an SVG file will be given an ID of the form "rest"+uniqueNumber, but
     /// Moritz does not actually use the ids, so they are not set in UniqueRestDefs.
     ///<summary>
-    public class RestDef : DurationDef, IUniqueDef
+    public abstract class RestDef : DurationDef, IUniqueDef
     {
         public RestDef(int msPositionReFirstIUD, int msDuration)
             : base(msDuration)
         {
             MsPositionReFirstUD = msPositionReFirstIUD;
-        }
-
-        public override string ToString()
-        {
-            return ("RestDef:" + " MsDuration=" + MsDuration.ToString() + " MsPositionReFirstIUD =" + MsPositionReFirstUD.ToString());
-        }
-
-        public override object Clone()
-        {
-            RestDef umrd = new RestDef(this.MsPositionReFirstUD, this.MsDuration);
-            return umrd;
         }
 
         /// <summary>

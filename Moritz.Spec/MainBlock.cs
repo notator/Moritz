@@ -95,7 +95,7 @@ namespace Moritz.Spec
                 Trk trk = mainSeq.Trks[i];
                 if(trk.MsDuration < blockMsDuration)
                 {
-                    trk.Add(new RestDef(0, blockMsDuration - trk.MsDuration));
+                    trk.Add(new MidiRestDef(0, blockMsDuration - trk.MsDuration));
                 }
                 trk.UniqueDefs.Insert(0, new ClefChangeDef(initialClefPerChannel[trk.MidiChannel], 0));
                 _voiceDefs.Add(trk);
@@ -194,13 +194,22 @@ namespace Moritz.Spec
                     {
                         int durationBeforeBarline = endBarlineAbsMsPosition - iudAbsStartPos;
                         int durationAfterBarline = iudAbsEndPos - endBarlineAbsMsPosition;
-                        if(iud is RestDef)
+                        if(iud is MidiRestDef)
                         {
                             // This is a rest. Split it.
-                            RestDef firstRestHalf = new RestDef(iudAbsStartPos, durationBeforeBarline);
+                            MidiRestDef firstRestHalf = new MidiRestDef(iudAbsStartPos, durationBeforeBarline);
                             poppedBarVoice.UniqueDefs.Add(firstRestHalf);
 
-                            RestDef secondRestHalf = new RestDef(endBarlineAbsMsPosition, durationAfterBarline);
+                            MidiRestDef secondRestHalf = new MidiRestDef(endBarlineAbsMsPosition, durationAfterBarline);
+                            remainingBarVoice.UniqueDefs.Add(secondRestHalf);
+                        }
+                        if(iud is InputRestDef)
+                        {
+                            // This is a rest. Split it.
+                            InputRestDef firstRestHalf = new InputRestDef(iudAbsStartPos, durationBeforeBarline);
+                            poppedBarVoice.UniqueDefs.Add(firstRestHalf);
+
+                            InputRestDef secondRestHalf = new InputRestDef(endBarlineAbsMsPosition, durationAfterBarline);
                             remainingBarVoice.UniqueDefs.Add(secondRestHalf);
                         }
                         else if(iud is CautionaryChordDef)
