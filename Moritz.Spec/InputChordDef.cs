@@ -90,24 +90,24 @@ namespace Moritz.Spec
         /// Writes the logical content of this InputChordDef
         /// </summary>
         /// <param name="w"></param>
-        public void WriteSvg(SvgWriter w)
+        public void WriteSVG(SvgWriter w)
         {
 			// we are inside a score:inputChord element
 			if(_ccSettings != null)
 			{
-				_ccSettings.WriteSvg(w);
+				_ccSettings.WriteSVG(w);
 			}
 
 			if(_trkOptions != null)
 			{
-				_trkOptions.WriteSvg(w, true);
+				_trkOptions.WriteSVG(w, true);
 			}
 
             w.WriteStartElement("score", "inputNotes", null);
 			
 			foreach(InputNoteDef ind in _inputNoteDefs)
 			{
-				ind.WriteSvg(w);
+				ind.WriteSVG(w);
 			}
 			w.WriteEndElement(); // score:inputNotes
         }

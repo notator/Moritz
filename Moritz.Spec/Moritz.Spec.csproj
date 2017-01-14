@@ -44,6 +44,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicMidiChordDef.cs" />
+    <Compile Include="CarryMsgs.cs" />
+    <Compile Include="MidiMsg.cs" />
     <Compile Include="MidiRestDef.cs" />
     <Compile Include="MainBlock.cs" />
     <Compile Include="Block.cs" />

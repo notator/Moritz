@@ -1,10 +1,10 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Moritz.Midi;
 using Moritz.Globals;
 using Moritz.Spec;
 using Moritz.Xml;
+using System;
 
 namespace Moritz.Symbols
 {
@@ -139,7 +139,17 @@ namespace Moritz.Symbols
             }
         }
 
+        /// <summary>
+        /// Dont use this function.
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="staffIsVisible"></param>
         public override void WriteSVG(SvgWriter w, bool staffIsVisible)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WriteSVG(SvgWriter w, bool staffIsVisible, int channel, CarryMsgs carryMsgs)
         {
             if(staffIsVisible && ChordMetrics.BeamBlock != null)
                 ChordMetrics.BeamBlock.WriteSVG(w);
@@ -150,7 +160,7 @@ namespace Moritz.Symbols
 				w.WriteAttributeString("score", "alignmentX", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
 			}
             
-            _midiChordDef.WriteSvg(w);
+            _midiChordDef.WriteSVG(w, channel, carryMsgs);
 
             if(staffIsVisible)
             {
@@ -161,7 +171,6 @@ namespace Moritz.Symbols
 
             w.SvgEndGroup();
         }
-
 
         public override string ToString()
         {

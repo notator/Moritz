@@ -25,13 +25,14 @@ namespace Moritz.Symbols
             Staff = staff;
         }
 
-		public abstract void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, int voiceNumber);
+		public abstract void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel);
 
         /// <summary>
         /// Writes out an SVG Voice
+        /// carryperChannel is null for InputVoices
         /// </summary>
         /// <param name="w"></param>
-        public virtual void WriteSVG(SvgWriter w, bool staffIsVisible)
+        public virtual void WriteSVG(SvgWriter w, bool staffIsVisible, List<CarryMsgs> carryMsgsPerChannel)
         {
             for(int i = 0; i < NoteObjects.Count; ++i)
             {
@@ -48,10 +49,27 @@ namespace Moritz.Symbols
 					barline.WriteSVG(w, top, bottom, barlineStrokeWidth, stafflineStrokeWidth, isLastNoteObject, false);
 				}
 
-                ChordSymbol chordSymbol = noteObject as ChordSymbol;
-                if(chordSymbol != null)
+                InputChordSymbol inputChordSymbol = noteObject as InputChordSymbol;
+                InputRestSymbol inputRestSymbol = noteObject as InputRestSymbol;
+                OutputChordSymbol outputChordSymbol = noteObject as OutputChordSymbol;
+                OutputRestSymbol outputRestSymbol = noteObject as OutputRestSymbol;
+                if(inputChordSymbol != null)
                 {
-                    chordSymbol.WriteSVG(w, staffIsVisible);
+                    inputChordSymbol.WriteSVG(w, staffIsVisible);
+                }
+                else if(inputRestSymbol != null)
+                {
+                    inputRestSymbol.WriteSVG(w, staffIsVisible);
+                }
+                if(outputChordSymbol != null)
+                {
+                    Debug.Assert(carryMsgsPerChannel != null);
+                    outputChordSymbol.WriteSVG(w, staffIsVisible, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
+                }
+                else if(outputRestSymbol != null)
+                {
+                    Debug.Assert(carryMsgsPerChannel != null);
+                    outputRestSymbol.WriteSVG(w, staffIsVisible, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
                 }
                 else
 				{

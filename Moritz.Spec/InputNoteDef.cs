@@ -35,24 +35,24 @@ namespace Moritz.Spec
 			NoteOff = new NoteOff(noteOn, null, null);
 		}
 
-		internal void WriteSvg(SvgWriter w)
+		internal void WriteSVG(SvgWriter w)
 		{
 			w.WriteStartElement("inputNote");
 			w.WriteAttributeString("notatedKey", _notatedMidiPitch.ToString());
 
 			if(TrkOptions != null)
 			{
-				TrkOptions.WriteSvg(w, false);
+				TrkOptions.WriteSVG(w, false);
 			}
 
 			if(NoteOn != null)
 			{
-				NoteOn.WriteSvg(w);
+				NoteOn.WriteSVG(w);
 			}
 
 			if(NoteOff != null)
 			{
-				NoteOff.WriteSvg(w);
+				NoteOff.WriteSVG(w);
 			}
 
 			w.WriteEndElement(); // score:inputNote N.B. This element can be empty!

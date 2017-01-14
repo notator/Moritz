@@ -5,10 +5,11 @@ using System.Diagnostics;
 using Moritz.Globals;
 using Moritz.Xml;
 using Moritz.Spec;
+using System.Collections.Generic;
 
 namespace Moritz.Symbols
 {
-	internal class OutputRestSymbol : RestSymbol
+    internal class OutputRestSymbol : RestSymbol
 	{
         public OutputRestSymbol(Voice voice, IUniqueDef iumdd, int absMsPosition, int minimumCrotchetDurationMS, float fontHeight)
             : base(voice, iumdd, absMsPosition, minimumCrotchetDurationMS, fontHeight)
@@ -29,7 +30,17 @@ namespace Moritz.Symbols
             }
         }
 
+        /// <summary>
+        /// Dont use this function, use the other WriteSVG().
+        /// </summary>
+        /// <param name="w"></param>
+        /// <param name="staffIsVisible"></param>
         public override void WriteSVG(SvgWriter w, bool staffIsVisible)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WriteSVG(SvgWriter w, bool staffIsVisible, int channel, CarryMsgs carryMsgs)
         {
             if(LocalCautionaryChordDef == null)
             {
@@ -41,7 +52,7 @@ namespace Moritz.Symbols
 					w.WriteAttributeString("score", "alignmentX", null, ((Metrics.Left + Metrics.Right) / 2).ToString(M.En_USNumberFormat));
 				}
 
-                _midiRestDef.WriteSvg(w);
+                _midiRestDef.WriteSVG(w, channel, carryMsgs);
 
                 if(this.Metrics != null && staffIsVisible)
                     this.Metrics.WriteSVG(w);

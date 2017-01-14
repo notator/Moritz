@@ -21,9 +21,9 @@ namespace Moritz.Spec
             ExpressionMsbs = expressionMsbs;
         }
 
-        public void WriteSVG(SvgWriter w)
+        public void WriteSVG(SvgWriter w, int channel)
         {
-            w.WriteStartElement("sliders");
+            w.WriteStartElement("envs"); // envelopes
 
             if(PitchWheelMsbs != null && PitchWheelMsbs.Count > 0 
                 && !(PitchWheelMsbs.Count == 1 && PitchWheelMsbs[0] == M.DefaultPitchWheel))
@@ -38,7 +38,7 @@ namespace Moritz.Spec
                 && !(ExpressionMsbs.Count == 1 && ExpressionMsbs[0] == M.DefaultExpression))
                 w.WriteAttributeString("expressionSlider", M.ByteListToString(ExpressionMsbs));
 
-            w.WriteEndElement();
+            w.WriteEndElement(); // end envs
         }
 
         /// <summary>

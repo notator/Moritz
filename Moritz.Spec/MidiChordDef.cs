@@ -507,13 +507,15 @@ namespace Moritz.Spec
         {
             BasicMidiChordDef firstBMC = BasicMidiChordDefs[0];
 
-            _notatedMidiPitches.Clear();
-            _notatedMidiVelocities.Clear();
-            if(firstBMC != null)
-            {
-                _notatedMidiPitches.AddRange(firstBMC.Pitches);
-                _notatedMidiVelocities.AddRange(firstBMC.Velocities);
-            }
+            //_notatedMidiPitches.Clear();
+            //_notatedMidiVelocities.Clear();
+            //if(firstBMC != null)
+            //{
+            //    _notatedMidiPitches.AddRange(firstBMC.Pitches);
+            //    _notatedMidiVelocities.AddRange(firstBMC.Velocities);
+            //}
+            _notatedMidiPitches = firstBMC.Pitches;
+            _notatedMidiVelocities = firstBMC.Velocities;
         }
         #endregion SetVelocityPerAbsolutePitch
 
@@ -915,11 +917,8 @@ namespace Moritz.Spec
             }
         }
 
-
-        /// <summary>
-        /// Note that neither OutputRests nor OutputChords have a msDuration attribute.
-        /// Their msDuration is deduced from the contained moment msDurations.
-        /// 
+        #region old WriteSVG()
+        /// <summary> 
         /// Patch indices set in the BasicMidiChordDefs override those set in the main MidiChordDef.
         /// However, if BasicMidiChordDefs[0].PatchIndex is null, and this.Patch is set, BasicMidiChordDefs[0].PatchIndex is set to Patch.
         /// The same is true for Bank settings.  
@@ -927,14 +926,49 @@ namespace Moritz.Spec
         /// While constructing Tracks, the AssistantPerformer should monitor the current Bank and/or Patch, so that it can decide
         /// whether or not to actually construct and send bank and/or patch change messages.
         /// </summary>
+        //public void WriteSVG(SvgWriter w)
+        //{
+        //    w.WriteStartElement("score", "midi", null);  
 
-        #region old WriteSVG()
-        public void WriteSvg(SvgWriter w)
+        //    Debug.Assert(BasicMidiChordDefs != null && BasicMidiChordDefs.Count > 0);
+
+        //    if(BasicMidiChordDefs[0].BankIndex == null && Bank != null)
+        //    {
+        //        BasicMidiChordDefs[0].BankIndex = Bank;
+        //    }
+        //    if(BasicMidiChordDefs[0].PatchIndex == null && Patch != null)
+        //    {
+        //        BasicMidiChordDefs[0].PatchIndex = Patch;
+        //    }
+        //    if(HasChordOff == false)
+        //        w.WriteAttributeString("hasChordOff", "0");
+        //    if(PitchWheelDeviation != null && PitchWheelDeviation != M.DefaultPitchWheelDeviation)
+        //        w.WriteAttributeString("pitchWheelDeviation", PitchWheelDeviation.ToString());
+        //    if(MinimumBasicMidiChordMsDuration != M.DefaultMinimumBasicMidiChordMsDuration)
+        //        w.WriteAttributeString("minBasicChordMsDuration", MinimumBasicMidiChordMsDuration.ToString());
+
+        //    w.WriteStartElement("basicChords");
+        //    foreach(BasicMidiChordDef basicMidiChord in BasicMidiChordDefs) // containing basic <midiChord> elements
+        //        basicMidiChord.WriteSVG(w);
+        //    w.WriteEndElement();
+
+        //    if(MidiChordSliderDefs != null)
+        //        MidiChordSliderDefs.WriteSVG(w); // writes sliders element
+
+        //    w.WriteEndElement(); // score:midi
+        //}
+        #endregion old WriteSVG()
+
+        /// <summary>
+        /// Note that neither OutputRests nor OutputChords have a msDuration attribute.
+        /// Their msDuration is deduced from the contained moment msDurations.
+        /// See: https://github.com/notator/Moritz/issues/2
+        /// </summary>
+        public void WriteSVG(SvgWriter w, int channel, CarryMsgs carryMsgs)
         {
-            w.WriteStartElement("score", "midi", null);  
-
+            #region set BasicMidiChordDefs[0] Bank, Patch and PitchWheelDeviation if necessary
             Debug.Assert(BasicMidiChordDefs != null && BasicMidiChordDefs.Count > 0);
-            
+
             if(BasicMidiChordDefs[0].BankIndex == null && Bank != null)
             {
                 BasicMidiChordDefs[0].BankIndex = Bank;
@@ -943,24 +977,40 @@ namespace Moritz.Spec
             {
                 BasicMidiChordDefs[0].PatchIndex = Patch;
             }
-            if(HasChordOff == false)
-                w.WriteAttributeString("hasChordOff", "0");
-            if(PitchWheelDeviation != null && PitchWheelDeviation != M.DefaultPitchWheelDeviation)
-                w.WriteAttributeString("pitchWheelDeviation", PitchWheelDeviation.ToString());
-            if(MinimumBasicMidiChordMsDuration != M.DefaultMinimumBasicMidiChordMsDuration)
-                w.WriteAttributeString("minBasicChordMsDuration", MinimumBasicMidiChordMsDuration.ToString());
+            if(BasicMidiChordDefs[0].PitchWheelDeviation == null && PitchWheelDeviation != null)
+            {
+                BasicMidiChordDefs[0].PitchWheelDeviation = PitchWheelDeviation;
+            }
+            #endregion
+            w.WriteStartElement("score", "midi", null);
 
-            w.WriteStartElement("basicChords");
-            foreach(BasicMidiChordDef basicMidiChord in BasicMidiChordDefs) // containing basic <midiChord> elements
-                basicMidiChord.WriteSVG(w);
-            w.WriteEndElement();
+            w.WriteStartElement("moments", null);
+
+            foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+            {
+                // writes a single moment element which may contain
+                // NoteOffs, bank, patch, pitchWheelDeviation, NoteOns 
+                bmcd.WriteSVG(w, channel, carryMsgs);
+            }
+
+            w.WriteEndElement(); // moments
 
             if(MidiChordSliderDefs != null)
-                MidiChordSliderDefs.WriteSVG(w); // writes sliders element
+            {
+                // writes the envs element
+                MidiChordSliderDefs.WriteSVG(w, channel);
+            }
+
+            /**************/
+            // I think these two can be deleted! Check if they are ever used!!
+            //if(HasChordOff == false)
+            //    w.WriteAttributeString("hasChordOff", "0");
+            //if(MinimumBasicMidiChordMsDuration != M.DefaultMinimumBasicMidiChordMsDuration)
+            //    w.WriteAttributeString("minBasicChordMsDuration", MinimumBasicMidiChordMsDuration.ToString());
+            /**************/
 
             w.WriteEndElement(); // score:midi
         }
-        #endregion old WriteSVG()
 
         private static List<int> GetBasicMidiChordDurations(List<BasicMidiChordDef> ornamentChords)
         {

@@ -22,17 +22,17 @@ namespace Moritz.Spec
 		/// SVG files contain voice definitions that contain MidiChordDefs and restDefs, but no Trks.
 		/// </summary>
 		/// <param name="w"></param>
-		internal void WriteSvg(Xml.SvgWriter w)
+		internal void WriteSVG(Xml.SvgWriter w)
 		{
 			w.WriteStartElement("seq");
 			if(TrkOptions != null)
 			{
-				TrkOptions.WriteSvg(w, false);
+				TrkOptions.WriteSVG(w, false);
 			}
 			Debug.Assert(TrkRefs != null && TrkRefs.Count > 0);
 			foreach(TrkRef trkRef in TrkRefs)
 			{
-				trkRef.WriteSvg(w);
+				trkRef.WriteSVG(w);
 			}
 			w.WriteEndElement(); // seq
 		}

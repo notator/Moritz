@@ -121,7 +121,7 @@ The <use> element is not overridden by attributes or content. Corrected the webs
 12.03.2012 rev58.183
 The score:sliders element is optional inside score:midichord elements because MidiChordDef.MidiChordSliderDefs
 is optional (can be null). Made appropriate changes to MidiChordDef(MidiChordDef, MsDuration) and
-MidiChordDef.WriteSvg(). Corrected website documentation.
+MidiChordDef.WriteSVG(). Corrected website documentation.
 
 
 08.03.2012 rev58.182
@@ -1365,7 +1365,7 @@ no MsPosition. LocalMidiDurationDefs are created by composition algorithms or by
 Some minor but important changes. About to set the number of stafflines per staff.
 
 13.07.2011 rev58.28
-Minor changes to KrystalPaletteForm. Decided not to add a stop button (too complicated). Reverted RestSymbol.WriteSvg()
+Minor changes to KrystalPaletteForm. Decided not to add a stop button (too complicated). Reverted RestSymbol.WriteSVG()
 to the last website version. (RestSymbols do not have attributes in SVG-MIDI files.)
 TODO:
 1. Check saving and playing a score! 

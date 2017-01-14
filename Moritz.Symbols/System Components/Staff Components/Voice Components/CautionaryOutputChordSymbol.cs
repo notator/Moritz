@@ -25,7 +25,7 @@ namespace Moritz.Symbols
                 w.SvgStartGroup("cautionaryChord");
                 w.SvgStartGroup(null);
 
-                this.ChordMetrics.WriteSvg(w);
+                this.ChordMetrics.WriteSVG(w);
 
                 w.SvgEndGroup();
                 w.SvgEndGroup();

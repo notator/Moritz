@@ -20,18 +20,18 @@ namespace Moritz.Spec
 			_trkOptions = trkOptions;
 		}
 
-		protected void WriteSvg(SvgWriter w, string elementName)
+		protected void WriteSVG(SvgWriter w, string elementName)
 		{
 			w.WriteStartElement(elementName); // "noteOn" or "noteOff"
 
 			if(_trkOptions != null)
 			{
-				_trkOptions.WriteSvg(w, false);
+				_trkOptions.WriteSVG(w, false);
 			}
 
 			if(_seqRef != null)
 			{
-				_seqRef.WriteSvg(w);
+				_seqRef.WriteSVG(w);
 			}
 
 			if(_trkOffs != null && _trkOffs.Count > 0)
@@ -78,9 +78,9 @@ namespace Moritz.Spec
 
 		}
 
-		public void WriteSvg(SvgWriter w)
+		public void WriteSVG(SvgWriter w)
 		{
-			WriteSvg(w, "noteOn");
+			WriteSVG(w, "noteOn");
 		}
 	}
 
@@ -103,9 +103,9 @@ namespace Moritz.Spec
 		{
 		}
 
-		public void WriteSvg(SvgWriter w)
+		public void WriteSVG(SvgWriter w)
 		{
-			WriteSvg(w, "noteOff");
+			WriteSVG(w, "noteOff");
 		}
 	}
 }

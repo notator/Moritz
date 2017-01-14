@@ -45,7 +45,7 @@ namespace Moritz.Spec
 			AddList(optList);
 		}
 
-        public void WriteSvg(SvgWriter w, bool writeScoreNamespace)
+        public void WriteSVG(SvgWriter w, bool writeScoreNamespace)
         {
 			if(writeScoreNamespace)
 			{

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 
 using Moritz.Xml;
+using Moritz.Spec;
 
 namespace Moritz.Symbols
 {
@@ -15,11 +16,11 @@ namespace Moritz.Symbols
         /// <summary>
         /// Writes out the stafflines and noteObjects of an OutputStaff.
         /// </summary>
-        public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber)
+        public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel)
         {
             w.SvgStartGroup("outputStaff");
 
-            base.WriteSVG(w, true, systemNumber, staffNumber);
+            base.WriteSVG(w, true, systemNumber, staffNumber, carryMsgsPerChannel);
 
             w.SvgEndGroup(); // outputStaff
         }
@@ -41,16 +42,12 @@ namespace Moritz.Symbols
         /// <summary>
         /// Writes out the (invisible) voices
         /// </summary>
-        public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber)
+        public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel)
         {
             w.SvgStartGroup("outputStaff");
             w.WriteAttributeString("score", "invisible", null, "1");
 
-			int voiceNumber = 1;
-            foreach(Voice voice in Voices)
-            {
-                voice.WriteSVG(w, false, systemNumber, staffNumber, voiceNumber++);
-            }
+            base.WriteSVG(w, false, systemNumber, staffNumber, carryMsgsPerChannel);
 
             w.SvgEndGroup(); // outputStaff
         }

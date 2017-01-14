@@ -19,17 +19,18 @@ namespace Moritz.Symbols
         {
             Score = score;
         }
+
         /// <summary>
         /// Writes out all the SVGSystem's staves. 
         /// </summary>
         /// <param name="w"></param>
-        public void WriteSVG(SvgWriter w, int systemNumber, PageFormat pageFormat)
+        public void WriteSVG(SvgWriter w, int systemNumber, PageFormat pageFormat, List<CarryMsgs> carryMsgsPerChannel)
         {
             w.SvgStartGroup("system");
 
             for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
             {
-                Staves[staffIndex].WriteSVG(w, systemNumber, staffIndex + 1);
+                Staves[staffIndex].WriteSVG(w, systemNumber, staffIndex + 1, carryMsgsPerChannel);
             }
 
             w.SvgStartGroup("staffConnectors");

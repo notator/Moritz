@@ -3,6 +3,7 @@ using System.Diagnostics;
 
 using Moritz.Globals;
 using Moritz.Xml;
+using Moritz.Spec;
 
 namespace Moritz.Symbols
 {
@@ -18,13 +19,14 @@ namespace Moritz.Symbols
             StafflineStemStrokeWidth = stafflineStemStrokeWidth;
         }
 
-        public abstract void WriteSVG(SvgWriter w, int systemNumber, int staffNumber);
+        public abstract void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel);
 
         /// <summary>
         /// staffIsVisble is the global pageFormat setting.
         /// Single, empty staves are also not displayed -- though their rest lengths are written in the score.
+        /// carryperChannel is null for InputStaves.
         /// </summary>
-        public virtual void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber)
+        public virtual void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel)
         {
             if(this.Metrics == null)
             {
@@ -50,7 +52,7 @@ namespace Moritz.Symbols
 			int voiceNumber = 1;
             foreach(Voice voice in Voices)
             {
-				voice.WriteSVG(w, staffIsVisible, systemNumber, staffNumber, voiceNumber++);
+				voice.WriteSVG(w, staffIsVisible, systemNumber, staffNumber, voiceNumber++, carryMsgsPerChannel);
             }
         }
 

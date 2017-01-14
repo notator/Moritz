@@ -18,7 +18,7 @@ namespace Moritz.Symbols
             _masterVolume = masterVolume;
         }
 
-		public override void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, int voiceNumber)
+		public override void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel)
         {
 			w.SvgStartGroup("outputVoice");
 
@@ -28,7 +28,7 @@ namespace Moritz.Symbols
                 w.WriteAttributeString("score", "masterVolume", null, MasterVolume.ToString());
             }
 
-            base.WriteSVG(w, staffIsVisible);
+            base.WriteSVG(w, staffIsVisible, carryMsgsPerChannel);
             w.SvgEndGroup(); // outputVoice
         }
 

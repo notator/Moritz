@@ -7,6 +7,7 @@ using System.Text;
 
 using Moritz.Globals;
 using Moritz.Xml;
+using Moritz.Spec;
 
 namespace Moritz.Symbols
 {
@@ -206,10 +207,19 @@ namespace Moritz.Symbols
 				WritePage1TitleAndAuthor(w, metadata);
 			}
 
+            List<CarryMsgs> carryMsgsPerChannel = new List<CarryMsgs>();
+            foreach(Staff staff in Systems[0].Staves)
+            {
+                foreach(Voice voice in staff.Voices)
+                {
+                    carryMsgsPerChannel.Add(new CarryMsgs());
+                }
+            }
+
 			int systemNumber = 1;
 			foreach(SvgSystem system in Systems)
 			{
-				system.WriteSVG(w, systemNumber++, _pageFormat);
+				system.WriteSVG(w, systemNumber++, _pageFormat, carryMsgsPerChannel);
 			}
 
 			w.WriteEndElement(); // end layer (for Inkscape)

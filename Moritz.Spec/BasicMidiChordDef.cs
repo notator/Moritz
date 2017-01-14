@@ -98,25 +98,94 @@ namespace Moritz.Spec
         }
         #endregion Inversion
 
-        public void WriteSVG(XmlWriter w)
+        /// <summary>
+        /// Writes a single moment element which may contain
+        /// NoteOffs, bank, patch, pitchWheelDeviation, NoteOns 
+        /// </summary>
+        public void WriteSVG(XmlWriter w, int channel, CarryMsgs carryMsgs)
         {
-            w.WriteStartElement("basicChord");
-
-            //if(writeMsPosition) // positions are not written to the midiDefs section of an SVG-MIDI file
-            //    w.WriteAttributeString("msPosition", MsPosition.ToString());
+            w.WriteStartElement("moment");
             w.WriteAttributeString("msDuration", _msDuration.ToString());
-            if(BankIndex != null && BankIndex != M.DefaultBankAndPatchIndex)
-                w.WriteAttributeString("bank", BankIndex.ToString());
-            if(PatchIndex != null)
-                w.WriteAttributeString("patch", PatchIndex.ToString());
-            if(HasChordOff == false)
-                w.WriteAttributeString("hasChordOff", "0");
-            if(Pitches != null)
-                w.WriteAttributeString("pitches", M.ByteListToString(Pitches));
-            if(Velocities != null)
-                w.WriteAttributeString("velocities", M.ByteListToString(Velocities));
 
-            w.WriteEndElement();
+            if(carryMsgs.Msgs.Count > 0)
+            {
+                carryMsgs.WriteSVG(w);
+                carryMsgs.Clear();
+            }
+
+            if(BankIndex != null)
+            {
+                w.WriteStartElement("bank");
+                // s="0xB0" is controlChange, channel 0, d1=bankChange, d2=bankNumber
+                MidiMsg mm = new MidiMsg(0xB0 + channel, 0, BankIndex);
+                mm.WriteSVG(w);
+                w.WriteEndElement(); // end of bank
+            }
+            if(PatchIndex != null)
+            {
+                w.WriteStartElement("patch");
+                // <msg s="0xC0" d1="14" /> // 0xC0 is patch change in channel 0, d1 is the patch.
+                MidiMsg mm = new MidiMsg(0xC0 + channel, (int)PatchIndex, null);
+                mm.WriteSVG(w);
+                w.WriteEndElement(); // end of patch
+            }
+            if(PitchWheelDeviation != null)
+            {
+                w.WriteStartElement("pitchWheelDeviation");
+                List<MidiMsg> pwdMessages = GetPitchWheelMessages(channel, (int) PitchWheelDeviation);
+                foreach(MidiMsg msg in pwdMessages)
+                {
+                    msg.WriteSVG(w);
+                }
+                w.WriteEndElement(); // end of pitchWheelDeviation
+            }
+
+            if(Pitches != null)
+            {
+                Debug.Assert(Velocities != null && Pitches.Count == Velocities.Count);
+                w.WriteStartElement("noteOns");
+                int status = 0x90 + channel; // NoteOn
+                for(int i = 0; i < Pitches.Count; ++i)
+                {
+                    MidiMsg mm = new MidiMsg(status, Pitches[i], Velocities[i]);
+                    mm.WriteSVG(w);
+                }
+                w.WriteEndElement(); // end of noteOns
+
+                if(HasChordOff)
+                {
+                    status = 0x80 + channel; // noteOff
+                    int data2 = 0x40; // default velocity for noteOff
+                    foreach(byte pitch in Pitches)
+                    {
+                        carryMsgs.Add(new MidiMsg(status, pitch, data2));
+                    }
+                }
+            }
+
+            if(PitchWheelDeviation != null)
+            {
+                List<MidiMsg> pwdMessages = GetPitchWheelMessages(channel, 2);
+                carryMsgs.AddRange(pwdMessages);
+            }
+
+            w.WriteEndElement(); // end of moment
+        }
+
+        private List<MidiMsg> GetPitchWheelMessages(int channel, int semitones)
+        {
+            List<MidiMsg> rList = new List<MidiMsg>();
+            int status = 0xB0 + channel;
+            MidiMsg mm1 = new MidiMsg(status, 0x65, 0); // CTL_REGISTERED_PARAMETER_COARSE, PITCHBEND_RANGE
+            rList.Add(mm1);
+            MidiMsg mm2 = new MidiMsg(status, 0x64, 0); // CTL_REGISTERED_PARAMETER_FINE, PITCHBEND_RANGE
+            rList.Add(mm2);
+            MidiMsg mm3 = new MidiMsg(status, 0x06, semitones); // CTL_DATA_ENTRY_COARSE, semitones
+            rList.Add(mm3);
+            MidiMsg mm4 = new MidiMsg(status, 0x26, 0); // CTL_DATA_ENTRY_FINE, cents
+            rList.Add(mm4);
+
+            return rList;
         }
 
         /// <summary>
@@ -207,6 +276,7 @@ namespace Moritz.Spec
         public List<byte> Velocities = new List<byte>();
         public byte? BankIndex = null; // optional. If null, bank commands are not sent
         public byte? PatchIndex = null; // optional. If null, patch commands are not sent
+        public byte? PitchWheelDeviation = null; // optional. If null, PitchWheelDeviation commands are not sent
         public bool HasChordOff = true;
     }
 }

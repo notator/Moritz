@@ -1,3 +1,5 @@
+
+using System.Collections.Generic;
 using Moritz.Xml;
 
 namespace Moritz.Spec
@@ -25,35 +27,25 @@ namespace Moritz.Spec
             return umrd;
         }
 
-        public void WriteSvg(SvgWriter w)
+        public void WriteSVG(SvgWriter w, int channel, CarryMsgs carryMsgs)
         {
             w.WriteStartElement("score", "midi", null);
 
-            //Debug.Assert(BasicMidiChordDefs != null && BasicMidiChordDefs.Count > 0);
+            w.WriteStartElement("moments");
+            w.WriteStartElement("moment");
+            w.WriteAttributeString("msDuration", _msDuration.ToString());
 
-            //if(BasicMidiChordDefs[0].BankIndex == null && Bank != null)
-            //{
-            //    BasicMidiChordDefs[0].BankIndex = Bank;
-            //}
-            //if(BasicMidiChordDefs[0].PatchIndex == null && Patch != null)
-            //{
-            //    BasicMidiChordDefs[0].PatchIndex = Patch;
-            //}
-            //if(HasChordOff == false)
-            //    w.WriteAttributeString("hasChordOff", "0");
-            //if(PitchWheelDeviation != null && PitchWheelDeviation != M.DefaultPitchWheelDeviation)
-            //    w.WriteAttributeString("pitchWheelDeviation", PitchWheelDeviation.ToString());
-            //if(MinimumBasicMidiChordMsDuration != M.DefaultMinimumBasicMidiChordMsDuration)
-            //    w.WriteAttributeString("minBasicChordMsDuration", MinimumBasicMidiChordMsDuration.ToString());
+            if(carryMsgs.Msgs.Count > 0)
+            {
+                carryMsgs.WriteSVG(w);
+                carryMsgs.Clear();
+            }
 
-            //w.WriteStartElement("basicChords");
-            //foreach(BasicMidiChordDef basicMidiChord in BasicMidiChordDefs) // containing basic <midiChord> elements
-            //    basicMidiChord.WriteSVG(w);
-            //w.WriteEndElement();
+            w.WriteEndElement(); // moment
+            w.WriteEndElement(); // moments
 
-            //if(MidiChordSliderDefs != null)
-            //    MidiChordSliderDefs.WriteSVG(w); // writes sliders element
-
+            // Moritz never writes an envs element here, but other applications might.
+             
             w.WriteEndElement(); // score:midi
         }
     }

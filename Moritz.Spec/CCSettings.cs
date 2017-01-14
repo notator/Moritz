@@ -43,19 +43,19 @@ namespace Moritz.Spec
 			_overrideSettings = overrideSettings;
 		}
 
-		public void WriteSvg(SvgWriter w)
+		public void WriteSVG(SvgWriter w)
 		{
 			w.WriteStartElement("score", "ccSettings", null);
 
 			if(_defaultSettings != null)
 			{
-				_defaultSettings.WriteSvg(w, "default");
+				_defaultSettings.WriteSVG(w, "default");
 			}
 			if(_overrideSettings != null)
 			{
 				foreach(TrackCCSettings tccs in _overrideSettings)
 				{
-					tccs.WriteSvg(w, "track");
+					tccs.WriteSVG(w, "track");
 				}
 			}
 			w.WriteEndElement(); // score:ccSettings
@@ -94,7 +94,7 @@ namespace Moritz.Spec
 			AddList(optList);
 		}
 
-		public void WriteSvg(SvgWriter w, string elementName)
+		public void WriteSVG(SvgWriter w, string elementName)
 		{
 			Debug.Assert((_pressureOption != CControllerType.undefined || _pressureVolumeOption == true)
 					|| (_modWheelOption != CControllerType.undefined || _modWheelVolumeOption == true)

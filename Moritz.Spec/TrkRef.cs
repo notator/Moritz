@@ -28,7 +28,7 @@ namespace Moritz.Spec
 			TrkOptions = trkOptions;
 		}
 
-        internal void WriteSvg(SvgWriter w)
+        internal void WriteSVG(SvgWriter w)
         {
             w.WriteStartElement("trkRef");
 			w.WriteAttributeString("midiChannel", MidiChannel.ToString());
@@ -36,7 +36,7 @@ namespace Moritz.Spec
 			w.WriteAttributeString("nMidiObjects", _trkNumMidiObjects.ToString());
 			if(TrkOptions != null)
 			{
-				TrkOptions.WriteSvg(w, false);
+				TrkOptions.WriteSVG(w, false);
 			}
             w.WriteEndElement(); // trk
         }

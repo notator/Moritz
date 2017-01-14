@@ -944,15 +944,15 @@ namespace Moritz.Symbols
 
         #region public interface
 
-        /// <summary>
-        /// This function is used by CautionaryChordSymbol.
-        /// I dont quite understand why.
-        /// </summary>
-        /// <param name="w"></param>
-        internal void WriteSvg(SvgWriter w)
-        {
-            WriteSVG(w); // should call the following function
-        }
+        ///// <summary>
+        ///// This function is used by CautionaryChordSymbol.
+        ///// I dont quite understand why.
+        ///// </summary>
+        ///// <param name="w"></param>
+        //internal void WriteSVG(SvgWriter w)
+        //{
+        //    WriteSVG(w); // should call the following function
+        //}
         public override void WriteSVG(SvgWriter w)
         {
             if(_stemMetrics != null)

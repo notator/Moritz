@@ -104,7 +104,7 @@ namespace Moritz.Symbols
 			}
             w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
 
-            _inputChordDef.WriteSvg(w);
+            _inputChordDef.WriteSVG(w);
 
 			w.SvgStartGroup("graphics");
             ChordMetrics.WriteSVG(w);
