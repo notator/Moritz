@@ -132,7 +132,7 @@ namespace Moritz.Spec
             if(PitchWheelDeviation != null)
             {
                 w.WriteStartElement("pitchWheelDeviation");
-                List<MidiMsg> pwdMessages = GetPitchWheelMessages(channel, (int) PitchWheelDeviation);
+                List<MidiMsg> pwdMessages = GetPitchWheelDeviationMessages(channel, (int) PitchWheelDeviation);
                 foreach(MidiMsg msg in pwdMessages)
                 {
                     msg.WriteSVG(w);
@@ -163,12 +163,6 @@ namespace Moritz.Spec
                 }
             }
 
-            if(PitchWheelDeviation != null)
-            {
-                List<MidiMsg> pwdMessages = GetPitchWheelMessages(channel, 2);
-                carryMsgs.AddRange(pwdMessages);
-            }
-
             w.WriteEndElement(); // end of moment
         }
 
@@ -178,7 +172,7 @@ namespace Moritz.Spec
         /// <param name="channel"></param>
         /// <param name="semitones"></param>
         /// <returns></returns>
-        private List<MidiMsg> GetPitchWheelMessages(int channel, int semitones)
+        private List<MidiMsg> GetPitchWheelDeviationMessages(int channel, int semitones)
         {
             List<MidiMsg> rList = new List<MidiMsg>();
             int status = 0xB0 + channel;

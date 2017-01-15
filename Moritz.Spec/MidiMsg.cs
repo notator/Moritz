@@ -31,6 +31,8 @@ namespace Moritz.Spec
             w.WriteEndElement(); // end of msg
         }
 
+        public override string ToString() => $"MidiMsg: Status={"0x" + _status.ToString("X")} Data1={_data1.ToString()} Data2={_data2.ToString()}";
+
         public int Status { get { return _status; } }
         public int Channel { get { return _status & 0xF; } }
         public int Data1 { get { return _data1; } }

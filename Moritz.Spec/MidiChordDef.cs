@@ -989,7 +989,7 @@ namespace Moritz.Spec
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
                 // writes a single moment element which may contain
-                // NoteOffs, bank, patch, pitchWheelDeviation, NoteOns 
+                // noteOffs, bank, patch, pitchWheelDeviation and noteOns elements 
                 bmcd.WriteSVG(w, channel, carryMsgs);
             }
 
