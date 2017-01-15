@@ -202,10 +202,10 @@ namespace Moritz.Algorithm.PianolaMusic
         /// The patch only needs to be set in the first chord in each voice,
         /// since it will be set by shunting if the Assistant Performer starts later.
         /// </summary>
-        private void SetPatch0InTheFirstChordInEachVoice(List<VoiceDef> bar)
+        private void SetPatch0InTheFirstChordInEachVoice(List<VoiceDef> bar1)
 		{
 			MidiChordDef midiChordDef = null;
-			foreach(VoiceDef voiceDef in bar)
+			foreach(VoiceDef voiceDef in bar1)
 			{
 				foreach(IUniqueDef iUniqueDef in voiceDef.UniqueDefs)
 				{
@@ -213,6 +213,7 @@ namespace Moritz.Algorithm.PianolaMusic
 					if(midiChordDef != null)
 					{
 						midiChordDef.Patch = 0;
+                        break;
 					}
 				}
 			}
