@@ -24,7 +24,6 @@ namespace Moritz.Symbols
 
             if(MasterVolume != null) // is non-null only in the first system
             {
-                w.WriteAttributeString("score", "midiChannel", null, MidiChannel.ToString());
                 w.WriteAttributeString("score", "masterVolume", null, MasterVolume.ToString());
             }
 
