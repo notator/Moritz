@@ -35,7 +35,7 @@ namespace Moritz.Spec
             w.WriteStartElement("moment");
             w.WriteAttributeString("msDuration", _msDuration.ToString());
 
-            if(carryMsgs.Msgs.Count > 0)
+            if(carryMsgs.Count > 0)
             {
                 carryMsgs.WriteSVG(w);
                 carryMsgs.Clear();

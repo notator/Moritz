@@ -37,7 +37,7 @@ namespace Moritz.Algorithm.Study1
 
 			List<List<VoiceDef>> bars = GetBars(track, nChordsPerSystem);
 
-			SetPatch0InAllChords(bars);
+			SetPatch0InTheFirstChord(bars[0][0]);
 
 			return bars;
 		}
@@ -227,27 +227,19 @@ namespace Moritz.Algorithm.Study1
 		}
 
 		/// <summary>
-		/// In other score algorithms, midiChordDef.Patch is always set. This is done here too, for consistency, even
-		/// though the patch does not change, and its therefore not necessary to reset the patch when restarting a performance.
-		/// If the midiChordDef.Patch is not set on every chord, and the performance starts from somewhere in the middle
-		/// after performing another piece, the channels will all have the wrong patch.
+		/// The patch only needs to be set in the first chord, since it will be set by shunting if the Assistant Performer starts later.
 		/// </summary>
 		/// <param name="bars"></param>
-		private void SetPatch0InAllChords(List<List<VoiceDef>> bars)
+		private void SetPatch0InTheFirstChord(VoiceDef voiceDef)
 		{
-			MidiChordDef midiChordDef = null;
-			foreach(List<VoiceDef> bar in bars)
+			MidiChordDef firstMidiChordDef = null;
+			foreach(IUniqueDef iUniqueDef in voiceDef.UniqueDefs)
 			{
-				foreach(VoiceDef voiceDef in bar)
+				firstMidiChordDef = iUniqueDef as MidiChordDef;
+				if(firstMidiChordDef != null)
 				{
-					foreach(IUniqueDef iUniqueDef in voiceDef.UniqueDefs)
-					{
-						midiChordDef = iUniqueDef as MidiChordDef;
-						if(midiChordDef != null)
-						{
-							midiChordDef.Patch = 0;
-						}
-					}
+					firstMidiChordDef.Patch = 0;
+                    break;
 				}
 			}
 		}

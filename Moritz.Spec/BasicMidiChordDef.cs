@@ -107,7 +107,7 @@ namespace Moritz.Spec
             w.WriteStartElement("moment");
             w.WriteAttributeString("msDuration", _msDuration.ToString());
 
-            if(carryMsgs.Msgs.Count > 0)
+            if(carryMsgs.Count > 0)
             {
                 carryMsgs.WriteSVG(w);
                 carryMsgs.Clear();
@@ -172,18 +172,24 @@ namespace Moritz.Spec
             w.WriteEndElement(); // end of moment
         }
 
+        /// <summary>
+        /// Moritz currently just sends the two COARSE messages to set the semitones value
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <param name="semitones"></param>
+        /// <returns></returns>
         private List<MidiMsg> GetPitchWheelMessages(int channel, int semitones)
         {
             List<MidiMsg> rList = new List<MidiMsg>();
             int status = 0xB0 + channel;
             MidiMsg mm1 = new MidiMsg(status, 0x65, 0); // CTL_REGISTERED_PARAMETER_COARSE, PITCHBEND_RANGE
             rList.Add(mm1);
-            MidiMsg mm2 = new MidiMsg(status, 0x64, 0); // CTL_REGISTERED_PARAMETER_FINE, PITCHBEND_RANGE
+            MidiMsg mm2 = new MidiMsg(status, 0x06, semitones); // CTL_DATA_ENTRY_COARSE, semitones
             rList.Add(mm2);
-            MidiMsg mm3 = new MidiMsg(status, 0x06, semitones); // CTL_DATA_ENTRY_COARSE, semitones
-            rList.Add(mm3);
-            MidiMsg mm4 = new MidiMsg(status, 0x26, 0); // CTL_DATA_ENTRY_FINE, cents
-            rList.Add(mm4);
+            //MidiMsg mm3 = new MidiMsg(status, 0x64, 0); // CTL_REGISTERED_PARAMETER_FINE, PITCHBEND_RANGE
+            //rList.Add(mm3);
+            //MidiMsg mm4 = new MidiMsg(status, 0x26, cents); // CTL_DATA_ENTRY_FINE, cents
+            //rList.Add(mm4);
 
             return rList;
         }

@@ -48,12 +48,19 @@ namespace Moritz.Spec
             }
         }
 
+        #region List functions
+        /// <summary>
+        /// Checks that all messages have the same channel.
+        /// </summary>
         public void Add(MidiMsg msg)
         {
             CheckChannel(msg);
             _msgs.Add(msg);
         }
 
+        /// <summary>
+        /// Checks that all messages have the same channel.
+        /// </summary>
         public void AddRange(List<MidiMsg> msgs)
         {
             foreach(MidiMsg msg in msgs)
@@ -62,13 +69,13 @@ namespace Moritz.Spec
             }
         }
 
-        /// <summary>
-        /// Checks that all messages have the same channel.
-        /// </summary>
         public void Clear()
         {
             _msgs.Clear();
         }
+
+        public int Count { get { return _msgs.Count; } }
+        #endregion
 
         /// <summary>
         /// Checks that the new msg has the same channel.
@@ -82,68 +89,79 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Calls Debug.Assert(false) if the first PitchWheelDeviation Msg
-        /// exists and is not followed by three messages that are consistent.
+        /// Calls Debug.Assert(false) if REGISTERED_PARAMETER_COARSE or REGISTERED_PARAMETER_FINE
+        /// are set to change the pitchWheel deviation, but are not followed by a corresponding message
+        /// that actually sets the value.
+        /// N.B. Moritz currently only sends the COARSE pair of messages, but I've left the check for
+        /// the FINE pair here, in case that changes.
         /// </summary>
         private void CheckPitchWheelDeviationMsgs()
         {
-            // A PitchWheelDeviation message group consists of the following four messages:
-            // They must all have:
-            // a) identical status bytes with high nibble 0xB, low nibble is channel
-            // b) data1 values identical to those given here (in the same order),
-            // c) the first two data2 bytes must be 0.
-            // The CTL_DATA_ENTRY_COARSE data2 value sets the semitones deviation.
-            // The CTL_DATA_ENTRY_Fine data2 value sets the cents deviation.
-            //< msg s = "0xB0", data1 = "0x65", data2 = "0" /> // CTL_REGISTERED_PARAMETER_COARSE
-            //< msg s = "0xB0", data1 = "0x64", data2 = "0" /> // CTL_REGISTERED_PARAMETER_FINE   
-            //< msg s = "0xB0", data1 = "0x06", data2 = "2" /> // CTL_DATA_ENTRY_COARSE, 2 semitones
-            //< msg s = "0xB0", data1 = "0x26", data2 = "0" /> // CTL_DATA_ENTRY_FINE, 0 cents
-            int msg1Index = -1;
+            // REGISTERED_PARAMETER_COARSE is set to change the pitchWheel deviation using the following messsage:
+            // <msg s = "0xB0", data1 = "0x65", data2 = "0" />
+            // REGISTERED_PARAMETER_FINE is set to change the pitchWheel deviation using the following messsage:
+            // <msg s = "0xB0", data1 = "0x64", data2 = "0" />
+            // Following the above messages, the following message uses DATA_ENTRY_COARSE to set the COARSE (semitones) deviation to 2
+            // <msg s = "0xB0", data1 = "0x06", data2 = "2" /> // data2 = semitones deviation
+            // and the following message uses CTL_DATA_ENTRY_FINE to set the FINE (cents) deviation to 0
+            // <msg s = "0xB0", data1 = "0x26", data2 = "0" /> // data2 = cents deviation  
+            int coarseMsg1Index = -1;
+            int fineMsg1Index = -1;
             for(int i = 0; i <_msgs.Count; ++i)
             {
                 MidiMsg msg = _msgs[i];
-                if((msg.Status & 0xF0) == 0xB0 && msg.Data1 == 0x65)
+                if((msg.Status & 0xF0) == 0xB0)
                 {
-                    msg1Index = i;
+                    if(msg.Data1 == 0x65)
+                    {
+                        coarseMsg1Index = i;
+                    }
+                    else if(msg.Data1 == 0x64)
+                    {
+                        fineMsg1Index = i;
+                    }
                     break;
                 }
             }
-            if(msg1Index >= 0)
+            if((coarseMsg1Index >= 0 && _msgs[coarseMsg1Index].Data2 != 0)
+            || (fineMsg1Index >= 0 && _msgs[fineMsg1Index].Data2 != 0))
             {
-                List<MidiMsg> pwdMsgs = new List<MidiMsg>();
-                for(int i = msg1Index; i < _msgs.Count; ++i)
+                Debug.Assert(false, "Data2 must be zero!");
+            }
+            if(coarseMsg1Index >= 0)
+            {
+                if(FindControlMsg(coarseMsg1Index, 0x06) == false)
                 {
-                    pwdMsgs.Add(_msgs[i]);
-                }
-
-                if(pwdMsgs.Count < 4)
-                {
-                    Debug.Assert(false, "Not enough pitchWheel deviation messages");
-                }
-                else
-                {
-                    MidiMsg msg1 = pwdMsgs[0];
-                    if(msg1.Data2 != 0)
-                    {
-                        Debug.Assert(false, "Error in first msg.");
-                    }
-                    MidiMsg msg2 = pwdMsgs[1];
-                    if(msg2.Status != msg1.Status || msg2.Data1 != 0x64 || msg2.Data2 != 0)
-                    {
-                        Debug.Assert(false, "Error in second msg.");
-                    }
-                    MidiMsg msg3 = pwdMsgs[2];
-                    if(msg3.Status != msg1.Status || msg3.Data1 != 0x06)
-                    {
-                        Debug.Assert(false, "Error in third msg.");
-                    }
-                    MidiMsg msg4 = pwdMsgs[3];
-                    if(msg4.Status != msg1.Status || msg4.Data1 != 0x26)
-                    {
-                        Debug.Assert(false, "Error in fourth msg.");
-                    }
+                    Debug.Assert(false, "Can't find coarseMsg2!");
                 }
             }
+            if(fineMsg1Index >= 0)
+            {
+                if(FindControlMsg(fineMsg1Index, 0x26) == false)
+                {
+                    Debug.Assert(false, "Can't find fineMsg2!");
+                }
+            }
+        }
+
+        private bool FindControlMsg(int msg1Index, int data2)
+        {
+            bool found = false;
+            if(msg1Index == _msgs.Count - 1)
+            {
+                Debug.Assert(false, "msg1 can't be the lst message in the list!");
+            }
+            int msg1Status = _msgs[msg1Index].Status;
+            for(int i = msg1Index + 1; i < _msgs.Count; ++i)
+            {
+                MidiMsg msg = _msgs[i];
+                if(msg.Status == msg1Status && msg.Data2 == data2)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            return found;
         }
 
         private bool IsNoteOffMsg(MidiMsg msg)
