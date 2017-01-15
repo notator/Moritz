@@ -19,6 +19,7 @@ namespace Moritz.Palettes
             BasicChordFormSettings bcfs = new BasicChordFormSettings();
             bcfs.Durations = M.StringToIntList(paletteForm.BasicChordControl.DurationsTextBox.Text, ',');
             bcfs.Velocities = M.StringToByteList(paletteForm.BasicChordControl.VelocitiesTextBox.Text, ',');
+            NormalizeVelocities(bcfs.Velocities);
             bcfs.MidiPitches = M.StringToByteList(paletteForm.BasicChordControl.MidiPitchesTextBox.Text, ',');
             bcfs.ChordOffs = M.StringToBoolList(paletteForm.BasicChordControl.ChordOffsTextBox.Text, ',');
             bcfs.ChordDensities = M.StringToByteList(paletteForm.BasicChordControl.ChordDensitiesTextBox.Text, ',');
@@ -64,6 +65,7 @@ namespace Moritz.Palettes
             BasicChordFormSettings bcfs = new BasicChordFormSettings();
             bcfs.Durations = M.StringToIntList(paletteChordForm.DurationTextBox.Text, ',');
             bcfs.Velocities = M.StringToByteList(paletteChordForm.VelocityTextBox.Text, ',');
+            NormalizeVelocities(bcfs.Velocities);
             bcfs.MidiPitches = M.StringToByteList(paletteChordForm.BaseMidiPitchTextBox.Text,  ',');
             bcfs.ChordOffs = M.StringToBoolList(paletteChordForm.ChordOffTextBox.Text, ',');
             bcfs.ChordDensities = M.StringToByteList(paletteChordForm.ChordDensityTextBox.Text, ',');
@@ -213,6 +215,14 @@ namespace Moritz.Palettes
                     basicMidiChordDefs);
             }
             return rval;
+        }
+
+        private void NormalizeVelocities(List<byte> velocities)
+        {
+            for(int i = 0; i < velocities.Count; ++i)
+            {
+                velocities[i] = (velocities[i] == 0) ? (byte) 1: velocities[i];
+            }
         }
 
         /// <summary>
@@ -371,6 +381,7 @@ namespace Moritz.Palettes
             bcs.Durations = M.StringToIntList(osf.BasicChordControl.DurationsTextBox.Text, ',');
             /// velocity increments
             bcs.Velocities = M.StringToByteList(osf.BasicChordControl.VelocitiesTextBox.Text, ',');
+            NormalizeVelocities(bcs.Velocities);
             /// transposition intervals
             bcs.MidiPitches = M.StringToByteList(osf.BasicChordControl.MidiPitchesTextBox.Text, ',');
             bcs.ChordOffs = M.StringToBoolList(osf.BasicChordControl.ChordOffsTextBox.Text, ',');
@@ -399,6 +410,14 @@ namespace Moritz.Palettes
             }
 
             OrnamentValues = osf.Ornaments;
+        }
+
+        private void NormalizeVelocities(List<byte> velocities)
+        {
+            for(int i = 0; i < velocities.Count; ++i)
+            {
+                velocities[i] = (velocities[i] == 0) ? (byte)1 : velocities[i];
+            }
         }
 
         /// <summary>
@@ -511,6 +530,7 @@ namespace Moritz.Palettes
                 if(vvFactor > 1.0F)
                     bottomVelocity = bottomVelocity / vvFactor;
                 float topVelocity = bottomVelocity * vvFactor;
+
                 float velocityDifference = (topVelocity - bottomVelocity) / ((float)(vDensity - 1));
                 float newVelocity = bottomVelocity;
                 for(int i = 0; i < vDensity; ++i)
@@ -522,7 +542,18 @@ namespace Moritz.Palettes
                     newVelocity = newVelocity > 127F ? 127F : newVelocity;
                 }
             }
+
+            NormalizeVelocities(midiVelocities);
+
             return midiVelocities;
+        }
+
+        private void NormalizeVelocities(List<byte> velocities)
+        {
+            for(int i = 0; i < velocities.Count; ++i)
+            {
+                velocities[i] = (velocities[i] == 0) ? (byte)1 : velocities[i];
+            }
         }
 
         public List<int> Durations;

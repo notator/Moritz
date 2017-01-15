@@ -49,11 +49,17 @@ namespace Moritz.Symbols
 					barline.WriteSVG(w, top, bottom, barlineStrokeWidth, stafflineStrokeWidth, isLastNoteObject, false);
 				}
 
+                CautionaryInputChordSymbol cautionaryInputChordSymbol = noteObject as CautionaryInputChordSymbol;
                 InputChordSymbol inputChordSymbol = noteObject as InputChordSymbol;
                 InputRestSymbol inputRestSymbol = noteObject as InputRestSymbol;
+                CautionaryOutputChordSymbol cautionaryOutputChordSymbol = noteObject as CautionaryOutputChordSymbol;
                 OutputChordSymbol outputChordSymbol = noteObject as OutputChordSymbol;
                 OutputRestSymbol outputRestSymbol = noteObject as OutputRestSymbol;
-                if(inputChordSymbol != null)
+                if(cautionaryInputChordSymbol != null)
+                {
+                    cautionaryInputChordSymbol.WriteSVG(w, staffIsVisible);
+                }
+                else if(inputChordSymbol != null)
                 {
                     inputChordSymbol.WriteSVG(w, staffIsVisible);
                 }
@@ -61,7 +67,11 @@ namespace Moritz.Symbols
                 {
                     inputRestSymbol.WriteSVG(w, staffIsVisible);
                 }
-                if(outputChordSymbol != null)
+                else if(cautionaryOutputChordSymbol != null)
+                {
+                    cautionaryOutputChordSymbol.WriteSVG(w, staffIsVisible);
+                }
+                else if(outputChordSymbol != null)
                 {
                     Debug.Assert(carryMsgsPerChannel != null);
                     outputChordSymbol.WriteSVG(w, staffIsVisible, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
