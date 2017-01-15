@@ -45,7 +45,7 @@ namespace Moritz.Algorithm.PianolaMusic
 
             List <List<VoiceDef>> bars = mainBlock.ConvertToBars();
 
-            SetPatch0InAllChords(bars);
+            SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
 			return bars;
 		}
@@ -198,27 +198,21 @@ namespace Moritz.Algorithm.PianolaMusic
 			return GetTrks(2, t3Pitches, 3, t4Pitches, durations);
 		}
 
-		/// <summary>
-		/// In other score algorithms, midiChordDef.Patch is always set. This is done here too, for consistency, even
-		/// though the patch does not change, and its therefore not necessary to reset the patch when restarting a performance.
-		/// If the midiChordDef.Patch is not set on every chord, and the performance starts from somewhere in the middle
-		/// after performing another piece, the channels will all have the wrong patch.
-		/// </summary>
-		/// <param name="bars"></param>
-		private void SetPatch0InAllChords(List<List<VoiceDef>> bars)
+        /// <summary>
+        /// The patch only needs to be set in the first chord in each voice,
+        /// since it will be set by shunting if the Assistant Performer starts later.
+        /// </summary>
+        private void SetPatch0InTheFirstChordInEachVoice(List<VoiceDef> bar)
 		{
 			MidiChordDef midiChordDef = null;
-			foreach(List<VoiceDef> bar in bars)
+			foreach(VoiceDef voiceDef in bar)
 			{
-				foreach(VoiceDef voiceDef in bar)
+				foreach(IUniqueDef iUniqueDef in voiceDef.UniqueDefs)
 				{
-					foreach(IUniqueDef iUniqueDef in voiceDef.UniqueDefs)
+					midiChordDef = iUniqueDef as MidiChordDef;
+					if(midiChordDef != null)
 					{
-						midiChordDef = iUniqueDef as MidiChordDef;
-						if(midiChordDef != null)
-						{
-							midiChordDef.Patch = 0;
-						}
+						midiChordDef.Patch = 0;
 					}
 				}
 			}

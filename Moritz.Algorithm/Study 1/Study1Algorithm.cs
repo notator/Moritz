@@ -229,7 +229,6 @@ namespace Moritz.Algorithm.Study1
 		/// <summary>
 		/// The patch only needs to be set in the first chord, since it will be set by shunting if the Assistant Performer starts later.
 		/// </summary>
-		/// <param name="bars"></param>
 		private void SetPatch0InTheFirstChord(VoiceDef voiceDef)
 		{
 			MidiChordDef firstMidiChordDef = null;
