@@ -752,9 +752,48 @@ namespace Moritz.Globals
         public readonly static string MoritzPerformanceOptionsExtension;
         public readonly static string MoritzKrystalScoreSettingsExtension;
 
-        public static readonly int DefaultMinimumBasicMidiChordMsDuration = 1;
-
         #region MIDI
+        /// <summary>
+        /// Commands
+        /// </summary>
+        public static readonly int CMD_NOTE_OFF_0x80 = 0x80;
+        public static readonly int CMD_NOTE_ON_0x90 = 0x90;
+        public static readonly int CMD_AFTERTOUCH_0xA0 = 0xA0;
+        public static readonly int CMD_CONTROL_CHANGE_0xB0 = 0xB0;
+        public static readonly int CMD_PATCH_CHANGE_0xC0 = 0xC0;
+        public static readonly int CMD_CHANNEL_PRESSURE_0xD0 = 0xD0;
+        public static readonly int CMD_PITCH_WHEEL_0xE0 = 0xE0;
+
+        /// <summary>
+        /// Control Numbers (These are just the ones Moritz uses.)
+        /// </summary>
+        public static readonly int CTL_BANK_CHANGE_0 = 0;
+        public static readonly int CTL_MODWHEEL_1 = 1;
+        public static readonly int CTL_PAN_10 = 10;
+        public static readonly int CTL_EXPRESSION_11 = 11;
+        public static readonly int CTL_REGISTEREDPARAMETER_COARSE_101 = 101;
+        public static readonly int CTL_REGISTEREDPARAMETER_FINE_100 = 100;
+        public static readonly int CTL_DATAENTRY_COARSE_6 = 6;
+        public static readonly int CTL_DATAENTRY_FINE_38 = 38;
+        public static readonly int SELECT_PITCHBEND_RANGE_0 = 0;
+        public static readonly int DEFAULT_NOTEOFF_VELOCITY_64 = 64;
+        /// <summary>
+        /// The following values are (supposed to be) set by AllControllersOff.
+        /// </summary>
+        public static readonly byte DEFAULT_BANKAndPATCH_0 = 0;
+        public static readonly byte DEFAULT_VOLUME_100 = 100;
+        public static readonly byte DEFAULT_EXPRESSION_127 = 127;
+        public static readonly byte DEFAULT_PITCHWHEELDEVIATION_2 = 2;
+        public static readonly byte DEFAULT_PITCHWHEEL_64 = 64;
+        public static readonly byte DEFAULT_PAN_64 = 64;
+        public static readonly byte DEFAULT_MODWHEEL_0 = 0;
+        /// <summary>
+        /// Constants that are set when palette fields are empty
+        /// </summary>
+        public static readonly bool DEFAULT_HAS_CHORDOFF_true = true;
+        public static readonly bool DEFAULT_CHORDREPEATS_false = false;
+        public static readonly int DEFAULT_ORNAMENT_MINIMUMDURATION_1 = 1;
+
         /// <summary>
         /// Called in the above constructor
         /// </summary>
@@ -813,23 +852,6 @@ namespace Moritz.Globals
         /// </summary>
         static public Dictionary<string, int> MidiPitchDict = new Dictionary<string, int>();
 
-        /// <summary>
-        /// The following values are (supposed to be) set by AllControllersOff.
-        /// These values are omitted from SVG-MIDI files since they are set by default when reading the files.
-        /// </summary>
-        public static readonly byte DefaultBankAndPatchIndex = 0;
-        public static readonly byte DefaultVolume = 100;
-        public static readonly byte DefaultExpression = 127;
-        public static readonly byte DefaultPitchWheelDeviation = 2;
-        public static readonly byte DefaultPitchWheel = 64;
-        public static readonly byte DefaultPan = 64;
-        public static readonly byte DefaultModulationWheel = 0;
-        /// <summary>
-        /// Constants that are set when palette fields are empty
-        /// </summary>
-        public static readonly bool DefaultHasChordOff = true;
-        public static readonly bool DefaultChordRepeats = false;
-        public static readonly int DefaultOrnamentMinimumDuration = 1;
         #endregion MIDI
     }
 

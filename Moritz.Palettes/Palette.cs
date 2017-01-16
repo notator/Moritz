@@ -116,14 +116,14 @@ namespace Moritz.Palettes
             else
             {
                 /// Create a new MidiChordDef (with msPosition=0, lyric=null) 
-                bool hasChordOff = BoolOrDefaultValue(bcms.ChordOffs, index, M.DefaultHasChordOff); // true
+                bool hasChordOff = BoolOrDefaultValue(bcms.ChordOffs, index, M.DEFAULT_HAS_CHORDOFF_true);
                 int duration = bcms.Durations[index];
                 List<byte> rootMidiPitches = bcms.MidiPitches[index];
                 List<byte> rootMidiVelocities = bcms.Velocities[index];
 
                 byte? bankIndex = ByteOrNull(_bankIndices, index);
                 byte? patchIndex = ByteOrNull(_patchIndices, index);
-                byte pitchwheelDeviation = ByteOrDefaultValue(_pitchwheelDeviations, index, M.DefaultPitchWheelDeviation); // 2
+                byte pitchwheelDeviation = ByteOrDefaultValue(_pitchwheelDeviations, index, M.DEFAULT_PITCHWHEELDEVIATION_2); // 2
                 List<byte> pitchwheelEnvelope = ListByte(_pitchwheelEnvelopes, index);
                 List<byte> panEnvelope = ListByte(_panEnvelopes, index);
                 List<byte> modulationWheelEnvelope = ListByte(_modulationWheelEnvelopes, index);
@@ -147,14 +147,14 @@ namespace Moritz.Palettes
                 else
                 {
                     ornamentNumber = _ornamentNumbers[index];
-                    int ornamentMinMsDuration = IntOrDefaultValue(_ornamentMinMsDurations, index, M.DefaultOrnamentMinimumDuration); // 1
+                    int ornamentMinMsDuration = IntOrDefaultValue(_ornamentMinMsDurations, index, M.DEFAULT_ORNAMENT_MINIMUMDURATION_1); // 1
 
                     List<int> ornamentValues = os.OrnamentValues[_ornamentNumbers[index] - 1];
 
                     for(int i = 0; i < ornamentValues.Count; ++i)
                     {
                         int oIndex = ornamentValues[i] - 1;
-                        bool oHasChordOff = BoolOrDefaultValue(os.BasicChordMidiSettings.ChordOffs, oIndex, M.DefaultHasChordOff);
+                        bool oHasChordOff = BoolOrDefaultValue(os.BasicChordMidiSettings.ChordOffs, oIndex, M.DEFAULT_HAS_CHORDOFF_true);
                         int oDuration = os.BasicChordMidiSettings.Durations[oIndex];
                         List<byte> oMidiPitches = os.BasicChordMidiSettings.MidiPitches[oIndex];
                         List<byte> oVelocities = os.BasicChordMidiSettings.Velocities[oIndex];

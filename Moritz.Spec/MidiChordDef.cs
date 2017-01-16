@@ -917,48 +917,6 @@ namespace Moritz.Spec
             }
         }
 
-        #region old WriteSVG()
-        /// <summary> 
-        /// Patch indices set in the BasicMidiChordDefs override those set in the main MidiChordDef.
-        /// However, if BasicMidiChordDefs[0].PatchIndex is null, and this.Patch is set, BasicMidiChordDefs[0].PatchIndex is set to Patch.
-        /// The same is true for Bank settings.  
-        /// The AssistantPerformer therefore only needs to look at BasicMidiChordDefs to find Bank and Patch changes.
-        /// While constructing Tracks, the AssistantPerformer should monitor the current Bank and/or Patch, so that it can decide
-        /// whether or not to actually construct and send bank and/or patch change messages.
-        /// </summary>
-        //public void WriteSVG(SvgWriter w)
-        //{
-        //    w.WriteStartElement("score", "midi", null);  
-
-        //    Debug.Assert(BasicMidiChordDefs != null && BasicMidiChordDefs.Count > 0);
-
-        //    if(BasicMidiChordDefs[0].BankIndex == null && Bank != null)
-        //    {
-        //        BasicMidiChordDefs[0].BankIndex = Bank;
-        //    }
-        //    if(BasicMidiChordDefs[0].PatchIndex == null && Patch != null)
-        //    {
-        //        BasicMidiChordDefs[0].PatchIndex = Patch;
-        //    }
-        //    if(HasChordOff == false)
-        //        w.WriteAttributeString("hasChordOff", "0");
-        //    if(PitchWheelDeviation != null && PitchWheelDeviation != M.DefaultPitchWheelDeviation)
-        //        w.WriteAttributeString("pitchWheelDeviation", PitchWheelDeviation.ToString());
-        //    if(MinimumBasicMidiChordMsDuration != M.DefaultMinimumBasicMidiChordMsDuration)
-        //        w.WriteAttributeString("minBasicChordMsDuration", MinimumBasicMidiChordMsDuration.ToString());
-
-        //    w.WriteStartElement("basicChords");
-        //    foreach(BasicMidiChordDef basicMidiChord in BasicMidiChordDefs) // containing basic <midiChord> elements
-        //        basicMidiChord.WriteSVG(w);
-        //    w.WriteEndElement();
-
-        //    if(MidiChordSliderDefs != null)
-        //        MidiChordSliderDefs.WriteSVG(w); // writes sliders element
-
-        //    w.WriteEndElement(); // score:midi
-        //}
-        #endregion old WriteSVG()
-
         /// <summary>
         /// Note that neither OutputRests nor OutputChords have a msDuration attribute.
         /// Their msDuration is deduced from the contained moment msDurations.
@@ -981,8 +939,8 @@ namespace Moritz.Spec
             {
                 BasicMidiChordDefs[0].PitchWheelDeviation = PitchWheelDeviation;
             }
-
             #endregion
+
             w.WriteStartElement("score", "midi", null);
 
             w.WriteStartElement("moments", null);
@@ -994,12 +952,12 @@ namespace Moritz.Spec
                 bmcd.WriteSVG(w, channel, carryMsgs);
             }
 
-            w.WriteEndElement(); // moments
+            w.WriteEndElement(); // end moments
 
             if(MidiChordSliderDefs != null)
             {
                 // writes the envs element
-                MidiChordSliderDefs.WriteSVG(w, channel);
+                MidiChordSliderDefs.WriteSVG(w, channel, this.MsDuration);
             }
 
             w.WriteEndElement(); // score:midi
@@ -1039,7 +997,7 @@ namespace Moritz.Spec
             List<MidiMsg> noteOffMsgs = new List<MidiMsg>();
             foreach(byte pitch in hangingPitches)
             {
-                MidiMsg mm = new MidiMsg(0x80 + channel, pitch, 0x40);
+                MidiMsg mm = new MidiMsg(M.CMD_NOTE_OFF_0x80 + channel, pitch, M.DEFAULT_NOTEOFF_VELOCITY_64);
                 noteOffMsgs.Add(mm);
             }
             return noteOffMsgs;

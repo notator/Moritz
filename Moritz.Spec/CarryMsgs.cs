@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System;
 
+using Moritz.Globals;
+
 namespace Moritz.Spec
 {
     /// <summary>
@@ -21,10 +23,10 @@ namespace Moritz.Spec
             if(_msgs.Count > 0)
             {
                 w.WriteStartElement("noteOffs");
-                foreach(MidiMsg mm in _msgs)
+                foreach(MidiMsg msg in _msgs)
                 {
-                    Debug.Assert(IsNoteOffMsg(mm));
-                    mm.WriteSVG(w);
+                    Debug.Assert(IsNoteOffMsg(msg));
+                    msg.WriteSVG(w);
                 }
                 w.WriteEndElement(); // end of noteOffs
             }
@@ -75,7 +77,7 @@ namespace Moritz.Spec
         private bool IsNoteOffMsg(MidiMsg msg)
         {
             int statusHighNibbble = msg.Status & 0xF0;
-            if(statusHighNibbble == 0x80 || (statusHighNibbble == 0x90 && msg.Data2 == 0))
+            if(statusHighNibbble == M.CMD_NOTE_OFF_0x80 || (statusHighNibbble == M.CMD_NOTE_ON_0x90 && msg.Data2 == 0))
             {
                 return true;
             }

@@ -116,16 +116,14 @@ namespace Moritz.Spec
             if(BankIndex != null)
             {
                 w.WriteStartElement("bank");
-                // s="0xB0" is controlChange, channel 0, d1=bankChange, d2=bankNumber
-                MidiMsg mm = new MidiMsg(0xB0 + channel, 0, BankIndex);
+                MidiMsg mm = new MidiMsg(M.CMD_CONTROL_CHANGE_0xB0 + channel, M.CTL_BANK_CHANGE_0, BankIndex);
                 mm.WriteSVG(w);
                 w.WriteEndElement(); // end of bank
             }
             if(PatchIndex != null)
             {
                 w.WriteStartElement("patch");
-                // <msg s="0xC0" d1="14" /> // 0xC0 is patch change in channel 0, d1 is the patch.
-                MidiMsg mm = new MidiMsg(0xC0 + channel, (int)PatchIndex, null);
+                MidiMsg mm = new MidiMsg(M.CMD_PATCH_CHANGE_0xC0 + channel, (int)PatchIndex, null);
                 mm.WriteSVG(w);
                 w.WriteEndElement(); // end of patch
             }
@@ -144,7 +142,7 @@ namespace Moritz.Spec
             {
                 Debug.Assert(Velocities != null && Pitches.Count == Velocities.Count);
                 w.WriteStartElement("noteOns");
-                int status = 0x90 + channel; // NoteOn
+                int status = M.CMD_NOTE_ON_0x90 + channel; // NoteOn
                 for(int i = 0; i < Pitches.Count; ++i)
                 {
                     MidiMsg mm = new MidiMsg(status, Pitches[i], Velocities[i]);
@@ -154,8 +152,8 @@ namespace Moritz.Spec
 
                 if(HasChordOff)
                 {
-                    status = 0x80 + channel; // noteOff
-                    int data2 = 0x40; // default velocity for noteOff
+                    status = M.CMD_NOTE_OFF_0x80 + channel;
+                    int data2 = M.DEFAULT_NOTEOFF_VELOCITY_64;
                     foreach(byte pitch in Pitches)
                     {
                         carryMsgs.Add(new MidiMsg(status, pitch, data2));
@@ -175,14 +173,14 @@ namespace Moritz.Spec
         private List<MidiMsg> GetPitchWheelDeviationMessages(int channel, int semitones)
         {
             List<MidiMsg> rList = new List<MidiMsg>();
-            int status = 0xB0 + channel;
-            MidiMsg mm1 = new MidiMsg(status, 0x65, 0); // CTL_REGISTERED_PARAMETER_COARSE, PITCHBEND_RANGE
+            int status = M.CMD_CONTROL_CHANGE_0xB0 + channel;
+            MidiMsg mm1 = new MidiMsg(status, M.CTL_REGISTEREDPARAMETER_COARSE_101, M.SELECT_PITCHBEND_RANGE_0);
             rList.Add(mm1);
-            MidiMsg mm2 = new MidiMsg(status, 0x06, semitones); // CTL_DATA_ENTRY_COARSE, semitones
+            MidiMsg mm2 = new MidiMsg(status, M.CTL_DATAENTRY_COARSE_6, semitones);
             rList.Add(mm2);
-            //MidiMsg mm3 = new MidiMsg(status, 0x64, 0); // CTL_REGISTERED_PARAMETER_FINE, PITCHBEND_RANGE
+            //MidiMsg mm3 = new MidiMsg(status, M.CTL_REGISTEREDPARAMETER_FINE_100, M.SELECT_PITCHBEND_RANGE_0);
             //rList.Add(mm3);
-            //MidiMsg mm4 = new MidiMsg(status, 0x26, cents); // CTL_DATA_ENTRY_FINE, cents
+            //MidiMsg mm4 = new MidiMsg(status, M.CTL_DATAENTRY_FINE_38, cents);
             //rList.Add(mm4);
 
             return rList;
