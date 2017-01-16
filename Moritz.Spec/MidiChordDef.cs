@@ -981,6 +981,7 @@ namespace Moritz.Spec
             {
                 BasicMidiChordDefs[0].PitchWheelDeviation = PitchWheelDeviation;
             }
+
             #endregion
             w.WriteStartElement("score", "midi", null);
 
@@ -1002,14 +1003,54 @@ namespace Moritz.Spec
             }
 
             /**************/
-            // I think these two can be deleted! Check if they are ever used!!
-            //if(HasChordOff == false)
-            //    w.WriteAttributeString("hasChordOff", "0");
-            //if(MinimumBasicMidiChordMsDuration != M.DefaultMinimumBasicMidiChordMsDuration)
-            //    w.WriteAttributeString("minBasicChordMsDuration", MinimumBasicMidiChordMsDuration.ToString());
+            // This can be deleted!
+            if(MinimumBasicMidiChordMsDuration != M.DefaultMinimumBasicMidiChordMsDuration)
+            {
+                w.WriteAttributeString("minBasicChordMsDuration", MinimumBasicMidiChordMsDuration.ToString());
+            }
             /**************/
 
             w.WriteEndElement(); // score:midi
+
+            if(HasChordOff)
+            {
+                List<byte> hangingPitches = GetHangingPitches(BasicMidiChordDefs);
+                if(hangingPitches.Count > 0)
+                {
+                    List<MidiMsg> noteOffMsgs = GetNoteOffMsgs(channel, hangingPitches);
+                    carryMsgs.AddRange(noteOffMsgs);
+                }
+            }
+        }
+
+        private List<byte> GetHangingPitches(List<BasicMidiChordDef> basicMidiChordDefs)
+        {
+            List<byte> hangingPitches = new List<byte>();
+            foreach(BasicMidiChordDef bmcd in basicMidiChordDefs)
+            {
+                if(!bmcd.HasChordOff)
+                {
+                    foreach(byte pitch in bmcd.Pitches)
+                    {
+                        if(!hangingPitches.Contains(pitch))
+                        {
+                            hangingPitches.Add(pitch);
+                        }
+                    }
+                }
+            }
+            return hangingPitches;
+        }
+
+        private List<MidiMsg> GetNoteOffMsgs(int channel, List<byte> hangingPitches)
+        {
+            List<MidiMsg> noteOffMsgs = new List<MidiMsg>();
+            foreach(byte pitch in hangingPitches)
+            {
+                MidiMsg mm = new MidiMsg(0x80 + channel, pitch, 0x40);
+                noteOffMsgs.Add(mm);
+            }
+            return noteOffMsgs;
         }
 
         private static List<int> GetBasicMidiChordDurations(List<BasicMidiChordDef> ornamentChords)
