@@ -81,13 +81,13 @@ namespace Moritz.Symbols
                 w.WriteStartElement("body");
                 w.WriteAttributeString("style", "text-align:center");
                 w.WriteStartElement("div");
-                w.WriteAttributeString("id", "centredReferenceDiv");
+                w.WriteAttributeString("class", "centredReferenceDiv");
                 string styleString = "position:relative; text-align: left; top: 0px; padding-top: 0px; margin-top: 0px; width: " + 
                     _pageFormat.ScreenRight.ToString() + "px; margin-left: auto; margin-right: auto;";
                 w.WriteAttributeString("style", styleString);
 
                 w.WriteStartElement("div");
-                w.WriteAttributeString("id", "svgPages");
+                w.WriteAttributeString("class", "svgPages");
                 w.WriteAttributeString("style", "line-height: 0px;");
 
                 foreach(string svgPagename in svgPagenames)

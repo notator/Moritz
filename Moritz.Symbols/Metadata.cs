@@ -40,12 +40,12 @@ namespace Moritz.Symbols
 			}
 
             w.WriteStartElement("title");
-			w.WriteAttributeString("id", "pageTitle");
+			w.WriteAttributeString("class", "pageTitle");
 			w.WriteString(pageTitle);
             w.WriteEndElement();
 
             w.WriteStartElement("metadata"); // Inkscape compatible
-			w.WriteAttributeString("id", "metadata");
+			w.WriteAttributeString("class", "metadata");
 			w.WriteStartElement("rdf", "RDF", null);
 			w.WriteStartElement("cc", "Work", null);
 			w.WriteAttributeString("rdf", "about", null, "");

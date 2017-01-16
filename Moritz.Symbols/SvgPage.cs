@@ -289,7 +289,7 @@ namespace Moritz.Symbols
 		{
 			//w.WriteAttributeString("score", "staffName", null, this.Staffname);
 			w.WriteAttributeString("inkscape", "groupmode", null, "layer");
-			w.WriteAttributeString("id", "layer" + layerNumber.ToString());
+			w.WriteAttributeString("class", "layer" + layerNumber.ToString());
 			w.WriteAttributeString("inkscape", "label", null, layerName);
 			w.WriteAttributeString("style", "display:inline");
 			if(insensitive == true)
@@ -310,7 +310,7 @@ namespace Moritz.Symbols
 			  new TextInfo(metadata.Author, titlesFontFamily, _pageFormat.Page1AuthorHeight,
 				  null, TextHorizAlign.right);
 			w.WriteStartElement("g");
-			w.WriteAttributeString("id", "titles");
+			w.WriteAttributeString("class", "titles");
 			w.SvgText("mainTitle", titleInfo, _pageFormat.Right / 2F, _pageFormat.Page1TitleY);
 			w.SvgText("author", authorInfo, _pageFormat.RightMarginPos, _pageFormat.Page1TitleY);
 			w.WriteEndElement(); // group
