@@ -1002,14 +1002,6 @@ namespace Moritz.Spec
                 MidiChordSliderDefs.WriteSVG(w, channel);
             }
 
-            /**************/
-            // This can be deleted!
-            if(MinimumBasicMidiChordMsDuration != M.DefaultMinimumBasicMidiChordMsDuration)
-            {
-                w.WriteAttributeString("minBasicChordMsDuration", MinimumBasicMidiChordMsDuration.ToString());
-            }
-            /**************/
-
             w.WriteEndElement(); // score:midi
 
             if(HasChordOff)
