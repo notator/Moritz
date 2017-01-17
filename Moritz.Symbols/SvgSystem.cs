@@ -27,8 +27,8 @@ namespace Moritz.Symbols
         public void WriteSVG(SvgWriter w, int systemNumber, PageFormat pageFormat, List<CarryMsgs> carryMsgsPerChannel)
         {
             w.SvgStartGroup("system");                                                
-            w.WriteAttributeString("score", "bbTop", this.Metrics.NotesTop.ToString());
-            w.WriteAttributeString("score", "bbBottom", this.Metrics.NotesBottom.ToString());
+            w.WriteAttributeString("score", "bbTop", null, this.Metrics.NotesTop.ToString());
+            w.WriteAttributeString("score", "bbBottom", null, this.Metrics.NotesBottom.ToString());
 
             for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
             {

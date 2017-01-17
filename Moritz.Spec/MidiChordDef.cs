@@ -997,8 +997,8 @@ namespace Moritz.Spec
             List<MidiMsg> noteOffMsgs = new List<MidiMsg>();
             foreach(byte pitch in hangingPitches)
             {
-                MidiMsg mm = new MidiMsg(M.CMD_NOTE_OFF_0x80 + channel, pitch, M.DEFAULT_NOTEOFF_VELOCITY_64);
-                noteOffMsgs.Add(mm);
+                MidiMsg msg = new MidiMsg(M.CMD_NOTE_OFF_0x80 + channel, pitch, M.DEFAULT_NOTEOFF_VELOCITY_64);
+                noteOffMsgs.Add(msg);
             }
             return noteOffMsgs;
         }

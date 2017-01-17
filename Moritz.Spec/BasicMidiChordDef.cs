@@ -116,15 +116,15 @@ namespace Moritz.Spec
             if(BankIndex != null)
             {
                 w.WriteStartElement("bank");
-                MidiMsg mm = new MidiMsg(M.CMD_CONTROL_CHANGE_0xB0 + channel, M.CTL_BANK_CHANGE_0, BankIndex);
-                mm.WriteSVG(w);
+                MidiMsg msg = new MidiMsg(M.CMD_CONTROL_CHANGE_0xB0 + channel, M.CTL_BANK_CHANGE_0, BankIndex);
+                msg.WriteSVG(w);
                 w.WriteEndElement(); // end of bank
             }
             if(PatchIndex != null)
             {
                 w.WriteStartElement("patch");
-                MidiMsg mm = new MidiMsg(M.CMD_PATCH_CHANGE_0xC0 + channel, (int)PatchIndex, null);
-                mm.WriteSVG(w);
+                MidiMsg msg = new MidiMsg(M.CMD_PATCH_CHANGE_0xC0 + channel, (int)PatchIndex, null);
+                msg.WriteSVG(w);
                 w.WriteEndElement(); // end of patch
             }
             if(PitchWheelDeviation != null)
@@ -145,8 +145,8 @@ namespace Moritz.Spec
                 int status = M.CMD_NOTE_ON_0x90 + channel; // NoteOn
                 for(int i = 0; i < Pitches.Count; ++i)
                 {
-                    MidiMsg mm = new MidiMsg(status, Pitches[i], Velocities[i]);
-                    mm.WriteSVG(w);
+                    MidiMsg msg = new MidiMsg(status, Pitches[i], Velocities[i]);
+                    msg.WriteSVG(w);
                 }
                 w.WriteEndElement(); // end of noteOns
 
