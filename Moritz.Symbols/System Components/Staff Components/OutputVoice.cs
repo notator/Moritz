@@ -21,7 +21,7 @@ namespace Moritz.Symbols
 		public override void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel)
         {
 			w.SvgStartGroup("outputVoice");
-            w.WriteAttributeString("score", "hasMidi", null, "true");
+            w.WriteAttributeString("score", "hasMidi", null, "hasMidi");
 
             if(MasterVolume != null) // is non-null only in the first system
             {
