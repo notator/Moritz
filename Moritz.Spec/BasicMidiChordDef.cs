@@ -113,29 +113,28 @@ namespace Moritz.Spec
                 carryMsgs.Clear();
             }
 
-            if(BankIndex != null)
+            if(BankIndex != null || PatchIndex != null || PitchWheelDeviation != null)
             {
-                w.WriteStartElement("bank");
-                MidiMsg msg = new MidiMsg(M.CMD_CONTROL_CHANGE_0xB0 + channel, M.CTL_BANK_CHANGE_0, BankIndex);
-                msg.WriteSVG(w);
-                w.WriteEndElement(); // end of bank
-            }
-            if(PatchIndex != null)
-            {
-                w.WriteStartElement("patch");
-                MidiMsg msg = new MidiMsg(M.CMD_PATCH_CHANGE_0xC0 + channel, (int)PatchIndex, null);
-                msg.WriteSVG(w);
-                w.WriteEndElement(); // end of patch
-            }
-            if(PitchWheelDeviation != null)
-            {
-                w.WriteStartElement("pitchWheelDeviation");
-                List<MidiMsg> pwdMessages = GetPitchWheelDeviationMessages(channel, (int) PitchWheelDeviation);
-                foreach(MidiMsg msg in pwdMessages)
+                w.WriteStartElement("switches");
+                if(BankIndex != null)
                 {
+                    MidiMsg msg = new MidiMsg(M.CMD_CONTROL_CHANGE_0xB0 + channel, M.CTL_BANK_CHANGE_0, BankIndex);
                     msg.WriteSVG(w);
                 }
-                w.WriteEndElement(); // end of pitchWheelDeviation
+                if(PatchIndex != null)
+                {
+                    MidiMsg msg = new MidiMsg(M.CMD_PATCH_CHANGE_0xC0 + channel, (int)PatchIndex, null);
+                    msg.WriteSVG(w);
+                }
+                if(PitchWheelDeviation != null)
+                {
+                    List<MidiMsg> pwdMessages = GetPitchWheelDeviationMessages(channel, (int) PitchWheelDeviation);
+                    foreach(MidiMsg msg in pwdMessages)
+                    {
+                        msg.WriteSVG(w);
+                    }
+                }
+                w.WriteEndElement(); // switches
             }
 
             if(Pitches != null)
@@ -174,14 +173,14 @@ namespace Moritz.Spec
         {
             List<MidiMsg> rList = new List<MidiMsg>();
             int status = M.CMD_CONTROL_CHANGE_0xB0 + channel;
-            MidiMsg mm1 = new MidiMsg(status, M.CTL_REGISTEREDPARAMETER_COARSE_101, M.SELECT_PITCHBEND_RANGE_0);
-            rList.Add(mm1);
-            MidiMsg mm2 = new MidiMsg(status, M.CTL_DATAENTRY_COARSE_6, semitones);
-            rList.Add(mm2);
-            //MidiMsg mm3 = new MidiMsg(status, M.CTL_REGISTEREDPARAMETER_FINE_100, M.SELECT_PITCHBEND_RANGE_0);
-            //rList.Add(mm3);
-            //MidiMsg mm4 = new MidiMsg(status, M.CTL_DATAENTRY_FINE_38, cents);
-            //rList.Add(mm4);
+            MidiMsg msg1 = new MidiMsg(status, M.CTL_REGISTEREDPARAMETER_COARSE_101, M.SELECT_PITCHBEND_RANGE_0);
+            rList.Add(msg1);
+            MidiMsg msg2 = new MidiMsg(status, M.CTL_DATAENTRY_COARSE_6, semitones);
+            rList.Add(msg2);
+            //MidiMsg msg3 = new MidiMsg(status, M.CTL_REGISTEREDPARAMETER_FINE_100, M.SELECT_PITCHBEND_RANGE_0);
+            //rList.Add(msg3);
+            //MidiMsg msg4 = new MidiMsg(status, M.CTL_DATAENTRY_FINE_38, cents);
+            //rList.Add(msg4);
 
             return rList;
         }
