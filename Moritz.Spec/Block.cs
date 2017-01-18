@@ -261,14 +261,28 @@ namespace Moritz.Spec
                     int startRestMsDuration = voiceDef.MsPositionReContainer;
                     if(startRestMsDuration > 0)
                     {
-                        voiceDef.Insert(0, new MidiRestDef(0, startRestMsDuration));
+                        if(voiceDef is InputVoiceDef)
+                        {
+                            voiceDef.Insert(0, new InputRestDef(0, startRestMsDuration));
+                        }
+                        else
+                        {
+                            voiceDef.Insert(0, new MidiRestDef(0, startRestMsDuration));
+                        }
                     }
 
                     int endOfTrkMsPositionReFirstIUD = voiceDef.EndMsPositionReFirstIUD;
                     int endRestMsDuration = blockMsDuration - endOfTrkMsPositionReFirstIUD;
                     if(endRestMsDuration > 0)
                     {
-                        voiceDef.UniqueDefs.Add(new MidiRestDef(endOfTrkMsPositionReFirstIUD, endRestMsDuration));
+                        if(voiceDef is InputVoiceDef)
+                        {
+                            voiceDef.UniqueDefs.Add(new InputRestDef(endOfTrkMsPositionReFirstIUD, endRestMsDuration));
+                        }
+                        else
+                        {
+                            voiceDef.UniqueDefs.Add(new MidiRestDef(endOfTrkMsPositionReFirstIUD, endRestMsDuration));
+                        }
                     }
                     voiceDef.AgglomerateRests();
                 }

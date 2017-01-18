@@ -73,7 +73,7 @@ namespace Moritz.Spec
 
         public override string ToString()
         {
-            return ("MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " MsDuration=" + MsDuration.ToString() + " InputChordDef");
+            return ("InputChordDef: MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " MsDuration=" + MsDuration.ToString());
         }
 
         /// <summary>

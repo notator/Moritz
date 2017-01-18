@@ -109,7 +109,7 @@ namespace Moritz.Algorithm.Study3Sketch2
                 MidiChordDef tmcd = tIud as MidiChordDef;
                 if(tRestDef != null)
                 {
-                    MidiRestDef iRestDef = new MidiRestDef(tRestDef.MsPositionReFirstUD, tRestDef.MsDuration);
+                    InputRestDef iRestDef = new InputRestDef(tRestDef.MsPositionReFirstUD, tRestDef.MsDuration);
                     ivd.Add(iRestDef);
                 }
                 else if(tmcd != null)
