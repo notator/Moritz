@@ -84,7 +84,15 @@ namespace Moritz.Algorithm.Study3Sketch2
 
             List<List<VoiceDef>> bars = mainBlock.ConvertToBars();
 
+            InsertClefChanges(bars);
+
             return bars;
+        }
+
+        protected override void InsertClefChanges(List<List<VoiceDef>> bars)
+        {
+            //VoiceDef voiceDef = bars[0][bars[0].Count - 1];
+            //voiceDef.InsertClefDef(5, "b");
         }
 
         private InputVoiceDef GetBar1InputVoiceDef(Seq bar1Seq)
@@ -131,8 +139,6 @@ namespace Moritz.Algorithm.Study3Sketch2
                     ivd.Add(icd);
                 }     
             }
-
-            //ivd.InsertClefDef(5, "b");
 
             return ivd;
         }

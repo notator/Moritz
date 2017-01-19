@@ -47,8 +47,16 @@ namespace Moritz.Algorithm.PianolaMusic
 
             SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
-			return bars;
+            InsertClefChanges(bars);
+
+            return bars;
 		}
+
+        protected override void InsertClefChanges(List<List<VoiceDef>> bars)
+        {
+            //VoiceDef voiceDef = bars[0][bars[0].Count - 1];
+            //voiceDef.InsertClefDef(5, "b");
+        }
 
         // Returns two lists of ints. The first is contains the durations of the upper track, the second the lower.
         private static List<List<int>> trackDurations(List<int> firstHalfUpperTrack)

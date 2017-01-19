@@ -154,6 +154,14 @@ namespace Moritz.Algorithm
         public abstract List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes);
 
         /// <summary>
+        /// This function standardizes the place where clef changes are added to the score.
+        /// It should always be called from DoAlgorithm() immediately before it returns.
+        /// This function is abstract as a reminder that it exists. It can be empty.
+        /// ClefDefs should be inserted using the voiceDef.InsertClefDef(index, clefType) function.
+        /// </summary>
+        protected abstract void InsertClefChanges(List<List<VoiceDef>> bars);
+
+        /// <summary>
         /// Sets InitialClefPerChannel to contain a clef for every channel (=voiceDef).
         /// Channels that will end up on a HiddenOutputStaff are also given a clef - even though it isn't going to be displayed.
         /// </summary>

@@ -39,10 +39,18 @@ namespace Moritz.Algorithm.Study1
 
 			SetPatch0InTheFirstChord(bars[0][0]);
 
-			return bars;
+            InsertClefChanges(bars);
+
+            return bars;
 		}
 
-		private List<int> GetNChordsPerSystem(int numberOfBars, int nChords)
+        protected override void InsertClefChanges(List<List<VoiceDef>> bars)
+        {
+            //VoiceDef voiceDef = bars[0][bars[0].Count - 1];
+            //voiceDef.InsertClefDef(5, "b");
+        }
+
+        private List<int> GetNChordsPerSystem(int numberOfBars, int nChords)
 		{
 			int nLocalChords = 0;
 			// total number of chords is 1219

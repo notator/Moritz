@@ -53,7 +53,15 @@ namespace Moritz.Algorithm.Study3Sketch1
 
             List<List<VoiceDef>> bars = mainBlock.ConvertToBars();
 
+            InsertClefChanges(bars);
+
             return bars;
+        }
+
+        protected override void InsertClefChanges(List<List<VoiceDef>> bars)
+        {
+            //VoiceDef voiceDef = bars[0][bars[0].Count - 1];
+            //voiceDef.InsertClefDef(5, "b");
         }
 
         #region CreateBar1Seq()

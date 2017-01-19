@@ -183,19 +183,23 @@ namespace Moritz.Spec
         }
         /// <summary>
         /// Inserts a ClefDef at the given index (which must be greater than 0).
-        /// If the index is equal to or greater than the number of chords, rests and ClefDefs in the voiceDef,
-        /// the ClefDef will be appended to the voiceDef.
-        /// Notes: 1) When changing clefs more than once in the same VoiceDef, it is easier to get the indices right if
-        ///           they are added backwards.
-        ///        2) if a ClefDef is defined here in front of an InputRestDef or OutputRestDef, the resulting SmallClef
-        ///           will be moved later so that it is placed immediately before the following ChordSymbol or the final
-        ///           barline on the staff.  
-        ///        3) The clefType must be one of the following strings "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"
+        /// <para>If a ClefDef is defined directly before a rest, the resulting SmallClef will be placed before the
+        /// following Chord or the bar's end barline.
+        /// </para>
+        /// <para>If the index is equal to or greater than the number of objects in the voiceDef, the ClefDef will be
+        /// placed before the final barline.
+        /// </para>
+        /// <para>
+        /// When changing clefs more than once in the same VoiceDef, it is easier to get the indices right if
+        /// they are added backwards.
+        /// </para>
         /// </summary>
+        /// <param name="index">Must be greater than 0</param>
+        /// <param name="clefType">One of the following strings: "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"</param>
         public void InsertClefDef(int index, string clefType)
         {
             #region check args
-            Debug.Assert(index >= 0);
+            Debug.Assert(index > 0, "Cannot insert a clef before the first chord or rest in the bar!");
 
             if(String.Equals(clefType, "t") == false
             && String.Equals(clefType, "t1") == false

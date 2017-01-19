@@ -45,7 +45,15 @@ namespace Moritz.Algorithm.Study2
                 bars.Add(bar);
             }
 
+            InsertClefChanges(bars);
+
             return bars;
+        }
+
+        protected override void InsertClefChanges(List<List<VoiceDef>> bars)
+        {
+            //VoiceDef voiceDef = bars[1][0];
+            //voiceDef.InsertClefDef(1, "b");
         }
 
         private List<VoiceDef> WriteTopStaff()
