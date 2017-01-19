@@ -113,7 +113,7 @@ namespace Moritz.Spec
         /// </summary>
         public override void Insert(int index, IUniqueDef iUniqueDef)
         {
-            Debug.Assert(iUniqueDef is InputChordDef || iUniqueDef is InputRestDef || iUniqueDef is CautionaryChordDef);
+            Debug.Assert(iUniqueDef is InputChordDef || iUniqueDef is InputRestDef || iUniqueDef is CautionaryChordDef || iUniqueDef is ClefDef);
             _Insert(index, iUniqueDef);
         }
         /// <summary>

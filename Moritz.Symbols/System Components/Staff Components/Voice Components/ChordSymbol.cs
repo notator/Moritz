@@ -19,7 +19,7 @@ namespace Moritz.Symbols
             // Beam is currently null. Create when necessary.
         }
 
-        public VerticalDir DefaultStemDirection(ClefSymbol clef)
+        public VerticalDir DefaultStemDirection(Clef clef)
         {
             Debug.Assert(this.HeadsTopDown.Count > 0);
             float gap = 32F; // dummy value

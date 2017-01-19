@@ -145,7 +145,7 @@ namespace Moritz.Symbols
                 foreach(NoteObject noteObject in voice.NoteObjects)
                 {
                     OutputChordSymbol chordSymbol = noteObject as OutputChordSymbol;
-                    ClefSymbol clef = noteObject as ClefSymbol;
+                    Clef clef = noteObject as Clef;
 					
                     if(chordSymbol != null)
                     {

@@ -83,7 +83,7 @@ namespace Moritz.Symbols
                                 }
                             }
                             #endregion
-                            voice.NoteObjects.Add(new ClefSymbol(voice, clefType, musicFontHeight));
+                            voice.NoteObjects.Add(new Clef(voice, clefType, musicFontHeight));
                         }
                         bool firstLmdd = true;
 
@@ -115,8 +115,8 @@ namespace Moritz.Symbols
                                 msPositionReVoiceDef += iud.MsDuration;
                             }
                             
-                            ClefChangeSymbol clefChangeSymbol = noteObject as ClefChangeSymbol;
-                            if(clefChangeSymbol != null)
+                            SmallClef smallClef = noteObject as SmallClef;
+                            if(smallClef != null)
                             {
                                 if(voiceIndex == 0)
                                     voice0ClefDefs.Add(iud as ClefDef);
@@ -126,7 +126,7 @@ namespace Moritz.Symbols
 
                             // Don't add initial clefs that are stipulated by the algorithm here!
                             // (They are the same as in the pageFormat -- see the Debug assertion above).
-                            if(!(clefChangeSymbol != null && iudIndex == 0))
+                            if(!(smallClef != null && iudIndex == 0))
                             {
                                 voice.NoteObjects.Add(noteObject);
                             }
@@ -143,7 +143,7 @@ namespace Moritz.Symbols
 
                     if(staff.Voices.Count == 2)
                     {
-                        InsertInvisibleClefChangeSymbols(staff.Voices, systemAbsMsPos, voice0ClefDefs, voice1ClefDefs);
+                        InsertInvisibleSmallClefs(staff.Voices, systemAbsMsPos, voice0ClefDefs, voice1ClefDefs);
 
                         CheckClefTypes(staff.Voices);
 
@@ -191,10 +191,10 @@ namespace Moritz.Symbols
         }
 
         /// <summary>
-        /// Insert invisible clefChangeSymbols into the other voice.
-        /// ClefChangeSymbols are used by the Notator when deciding how to notate chords.
+        /// Insert invisible smallClefs into the other voice.
+        /// SmallClefs are used by the Notator when deciding how to notate chords.
         /// </summary>
-        private void InsertInvisibleClefChangeSymbols(List<Voice> voices, int systemAbsMsPos, List<ClefDef> voice0ClefDefs, List<ClefDef> voice1ClefDefs)
+        private void InsertInvisibleSmallClefs(List<Voice> voices, int systemAbsMsPos, List<ClefDef> voice0ClefDefs, List<ClefDef> voice1ClefDefs)
         {
             Debug.Assert(voices.Count == 2);
             if(voice1ClefDefs.Count > 0)
@@ -213,8 +213,8 @@ namespace Moritz.Symbols
         private void CheckClefTypes(List<Voice> voices)
         {
             Debug.Assert(voices.Count == 2);
-            List<ClefSymbol> voice0Clefs = GetClefs(voices[0]);
-            List<ClefSymbol> voice1Clefs = GetClefs(voices[1]);
+            List<Clef> voice0Clefs = GetClefs(voices[0]);
+            List<Clef> voice1Clefs = GetClefs(voices[1]);
             Debug.Assert(voice0Clefs.Count == voice1Clefs.Count);
             for(int i = 0; i < voice0Clefs.Count; ++i)
             {
@@ -222,12 +222,12 @@ namespace Moritz.Symbols
             }
         }
 
-        private List<ClefSymbol> GetClefs(Voice voice)
+        private List<Clef> GetClefs(Voice voice)
         {
-            List<ClefSymbol> clefs = new List<ClefSymbol>();
+            List<Clef> clefs = new List<Clef>();
             foreach(NoteObject noteObject in voice.NoteObjects)
             {
-                ClefSymbol clef = noteObject as ClefSymbol;
+                Clef clef = noteObject as Clef;
                 if(clef != null)
                     clefs.Add(clef);
             }
@@ -239,17 +239,17 @@ namespace Moritz.Symbols
             foreach(ClefDef ccd in clefDefs)
             {
                 int absPos = systemAbsMsPos + ccd.MsPositionReFirstUD;
-                ClefChangeSymbol invisibleClefChangeSymbol = new ClefChangeSymbol(voice, ccd.ClefType, absPos, _pageFormat.CautionaryNoteheadsFontHeight);
-                invisibleClefChangeSymbol.IsVisible = false;
-                InsertInvisibleClefChangeInNoteObjects(voice, invisibleClefChangeSymbol);
+                SmallClef invisibleSmallClef = new SmallClef(voice, ccd.ClefType, absPos, _pageFormat.CautionaryNoteheadsFontHeight);
+                invisibleSmallClef.IsVisible = false;
+                InsertInvisibleClefChangeInNoteObjects(voice, invisibleSmallClef);
             }
         }
 
-        private void InsertInvisibleClefChangeInNoteObjects(Voice voice, ClefChangeSymbol invisibleClefChangeSymbol)
+        private void InsertInvisibleClefChangeInNoteObjects(Voice voice, SmallClef invisibleSmallClef)
         {
             Debug.Assert(!(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline));
 
-            int absMsPos = invisibleClefChangeSymbol.AbsMsPosition;
+            int absMsPos = invisibleSmallClef.AbsMsPosition;
             List<DurationSymbol> durationSymbols = new List<DurationSymbol>();
             foreach(DurationSymbol durationSymbol in voice.DurationSymbols)
             {
@@ -260,12 +260,12 @@ namespace Moritz.Symbols
 
             if(absMsPos <= durationSymbols[0].AbsMsPosition)
             {
-                InsertBeforeDS(voice.NoteObjects, durationSymbols[0], invisibleClefChangeSymbol);
+                InsertBeforeDS(voice.NoteObjects, durationSymbols[0], invisibleSmallClef);
             }
             else if(absMsPos > durationSymbols[durationSymbols.Count - 1].AbsMsPosition)
             {
                 // the noteObjects do not yet have a final barline (see Debug.Assert() above)
-                voice.NoteObjects.Add(invisibleClefChangeSymbol);
+                voice.NoteObjects.Add(invisibleSmallClef);
             }
             else
             {
@@ -274,21 +274,21 @@ namespace Moritz.Symbols
                 {
                     if(durationSymbols[i - 1].AbsMsPosition < absMsPos && durationSymbols[i].AbsMsPosition >= absMsPos)
                     {
-                        InsertBeforeDS(voice.NoteObjects, durationSymbols[i], invisibleClefChangeSymbol);
+                        InsertBeforeDS(voice.NoteObjects, durationSymbols[i], invisibleSmallClef);
                         break;
                     }
                 }
             }
         }
 
-        private void InsertBeforeDS(List<NoteObject> noteObjects, DurationSymbol insertBeforeDS, ClefChangeSymbol invisibleClefChangeSymbol)
+        private void InsertBeforeDS(List<NoteObject> noteObjects, DurationSymbol insertBeforeDS, SmallClef invisibleSmallClef)
         {
             for(int i = 0; i < noteObjects.Count; ++i)
             {
                 DurationSymbol durationSymbol = noteObjects[i] as DurationSymbol;
                 if(durationSymbol != null && durationSymbol == insertBeforeDS)
                 {
-                    noteObjects.Insert(i, invisibleClefChangeSymbol);
+                    noteObjects.Insert(i, invisibleSmallClef);
                     break;
                 }
             }

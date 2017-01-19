@@ -457,7 +457,7 @@ namespace Moritz.Symbols
                     Voice voice2 = system2.Staves[staffIndex].Voices[voiceIndex];
                     if(staffIsNotHidden)
                     {
-                        ClefSymbol voice2FirstClef = voice2.NoteObjects[0] as ClefSymbol;
+                        Clef voice2FirstClef = voice2.NoteObjects[0] as Clef;
                         Debug.Assert(voice2FirstClef != null && clefTypeAtEndOfStaff1 == voice2FirstClef.ClefType);
                         voice2.NoteObjects.Remove(voice2FirstClef);
                     }
@@ -478,13 +478,13 @@ namespace Moritz.Symbols
 
         private string FindClefTypeAtEndOfStaff1(Voice staff1voice0)
         {
-            ClefSymbol mainStaff1Clef = staff1voice0.NoteObjects[0] as ClefSymbol;
+            Clef mainStaff1Clef = staff1voice0.NoteObjects[0] as Clef;
             Debug.Assert(mainStaff1Clef != null);
 
             string clefTypeAtEndOfStaff1 = mainStaff1Clef.ClefType;
             foreach(NoteObject noteObject in staff1voice0.NoteObjects)
             {
-                ClefChangeSymbol ccs = noteObject as ClefChangeSymbol;
+                SmallClef ccs = noteObject as SmallClef;
                 if(ccs != null)
                 {
                     clefTypeAtEndOfStaff1 = ccs.ClefType;
@@ -636,7 +636,7 @@ namespace Moritz.Symbols
 
             SetSystemAbsEndMsPositions();
 
-            MoveRestClefChangesToEndsOfSystems();
+            NormalizeSmallClefPositions();
 
             FinalizeAccidentals();
             AddBarlineAtStartOfEachSystem();
@@ -669,9 +669,9 @@ namespace Moritz.Symbols
         }
 
         /// <summary>
-        /// If small ClefSigns have no following chord in their voice, they are moved before the final barline.
+        /// If SmallClefs are followed by a rest, they are moved in front of the following chord or the final barline.
         /// </summary>
-        private void MoveRestClefChangesToEndsOfSystems()
+        private void NormalizeSmallClefPositions()
         {
             foreach(SvgSystem system in Systems)
             {
@@ -681,7 +681,7 @@ namespace Moritz.Symbols
                     {
                         foreach(Voice voice in staff.Voices)
                         {
-                            MoveRestClefChangesToEndOfVoice(voice);
+                            MoveSmallClefsToNextChordOrFinalBarline(voice);
                         }
                     }
                 }
@@ -689,36 +689,42 @@ namespace Moritz.Symbols
         }
 
         /// <summary>
-        /// If a small ClefSymbol has no following chord in the voice, it is moved before the final barline.
+        /// If a SmallClef is followed by a rest, it is moved in front of the following chord or the final barline.
+        /// This function is called recursively, to move all the SmallClefs to their correct positions.
         /// </summary>
-        private void MoveRestClefChangesToEndOfVoice(Voice voice)
+        private void MoveSmallClefsToNextChordOrFinalBarline(Voice voice)
         {
-            bool restFound = false;
-            ClefSymbol smallClef = null;
+            bool chordFollows = false;
+            SmallClef smallClef = null;
             int smallClefIndex = -1;
+            Debug.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline);
+            int indexOfFollowingChordOrFinalBarline = voice.NoteObjects.Count - 1; // final barline
+
             for(int i = voice.NoteObjects.Count - 1; i >= 0; --i)
             {
-                if(voice.NoteObjects[i] is OutputChordSymbol)
+                if(voice.NoteObjects[i] is ChordSymbol)
                 {
-                    break;
+                    indexOfFollowingChordOrFinalBarline = i;
+                    chordFollows = true;
                 }
                 if(voice.NoteObjects[i] is RestSymbol)
                 {
-                    restFound = true;
+                    chordFollows = false;
                 }
-                ClefSymbol clef = voice.NoteObjects[i] as ClefSymbol;
-                if(clef != null && clef.FontHeight == _pageFormat.CautionaryNoteheadsFontHeight)
+                smallClef = voice.NoteObjects[i] as SmallClef;
+                if(smallClef != null)
                 {
-                    smallClef = clef;
                     smallClefIndex = i;
                     break;
                 }
             }
-            if(restFound && (smallClef != null))
-            {
+
+            if(smallClef != null && chordFollows == false)
+            {            
+                Debug.Assert(smallClefIndex < indexOfFollowingChordOrFinalBarline);
+                voice.NoteObjects.Insert(indexOfFollowingChordOrFinalBarline, smallClef);
                 voice.NoteObjects.RemoveAt(smallClefIndex);
-                Debug.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline);
-                voice.NoteObjects.Insert(voice.NoteObjects.Count - 1, smallClef);
+                MoveSmallClefsToNextChordOrFinalBarline(voice); // recursive function
             }
         }
 
@@ -880,7 +886,7 @@ namespace Moritz.Symbols
                     {
                         foreach(Voice voice in staff.Voices)
                         {
-                            if(voice.NoteObjects[0] is ClefSymbol)
+                            if(voice.NoteObjects[0] is Clef)
                             {
                                 voice.NoteObjects.Insert(1, new Barline(voice));
                             }

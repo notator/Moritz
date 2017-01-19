@@ -3,7 +3,7 @@ using Moritz.Xml;
 
 namespace Moritz.Symbols
 {
-	public class ClefSymbol : NoteObject
+	public class Clef : NoteObject
 	{
         /// <summary>
         /// Creates a new clef, of the type described, belonging to the given voice.
@@ -11,7 +11,7 @@ namespace Moritz.Symbols
         /// </summary>
         /// <param name="voice"></param>
         /// <param name="clefType"></param>
-        public ClefSymbol(Voice voice, string clefType, float fontHeight)
+        public Clef(Voice voice, string clefType, float fontHeight)
             : base(voice)
         {
             _clefType = clefType;
@@ -52,11 +52,11 @@ namespace Moritz.Symbols
 	}
 
     /// <summary>
-    /// A ClefChangeSymbol is a small clef symbol placed anywhere on a staff except at the beginning.
+    /// A SmallClef is a small clef symbol placed anywhere on a staff except at the beginning.
     /// </summary>
-    public class ClefChangeSymbol : ClefSymbol
+    public class SmallClef : Clef
     {
-        public ClefChangeSymbol(Voice voice, string clefType, int absMsPosition, float fontHeight)
+        public SmallClef(Voice voice, string clefType, int absMsPosition, float fontHeight)
             : base(voice, clefType, fontHeight)
         {
             _absMsPosition = absMsPosition;
@@ -65,18 +65,18 @@ namespace Moritz.Symbols
 
         public override string ToString()
         {
-            return "ClefChangeSymbol: " + _clefType;
+            return "SmallClef: " + _clefType;
         }
 
         /// <summary>
-        /// Writes this ClefChangeSymbol to the SVG file if both _isVisible is true.
+        /// Writes this SmallClef to the SVG file if both _isVisible is true.
         /// The character metrics have been set in SvgSystem.Justify()
         /// </summary>
         public override void WriteSVG(SvgWriter w, bool staffIsVisible)
         {
             if(_isVisible && staffIsVisible)
             {
-				w.SvgStartGroup("clefChange");
+				w.SvgStartGroup("smallClef");
                 base.WriteSVG(w, staffIsVisible);
                 w.SvgEndGroup();
             }

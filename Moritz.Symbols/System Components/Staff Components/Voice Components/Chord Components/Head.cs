@@ -68,7 +68,7 @@ namespace Moritz.Symbols
         /// <param name="headIndex"></param>
         /// <param name="?"></param>
         /// <param name="?"></param>
-        public float GetOriginY(ClefSymbol clef, float gap)
+        public float GetOriginY(Clef clef, float gap)
         {
             string[] alphabet = { "C", "D", "E", "F", "G", "A", "B" };
             float shiftFactor = 0F;

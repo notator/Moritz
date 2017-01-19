@@ -916,7 +916,7 @@ namespace Moritz.Symbols
 
 	internal class ClefMetrics : Metrics // defined objects in SVG
 	{
-		public ClefMetrics(ClefSymbol clef, float gap)
+		public ClefMetrics(Clef clef, float gap)
 			: base()
 		{
 			float trebleTop = -4.35F * gap;

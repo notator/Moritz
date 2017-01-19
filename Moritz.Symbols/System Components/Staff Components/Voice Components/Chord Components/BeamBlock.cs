@@ -8,7 +8,7 @@ namespace Moritz.Symbols
 {
     public class BeamBlock : Metrics
     {
-        public BeamBlock(ClefSymbol clef, List<ChordSymbol> chordsBeamedTogether, VerticalDir voiceStemDirection, float beamThickness, float strokeThickness)
+        public BeamBlock(Clef clef, List<ChordSymbol> chordsBeamedTogether, VerticalDir voiceStemDirection, float beamThickness, float strokeThickness)
             : base(null, 0, 0)
         {
             Chords = new List<ChordSymbol>(chordsBeamedTogether);
@@ -38,7 +38,7 @@ namespace Moritz.Symbols
         /// </summary>
         /// <param name="currentClef"></param>
         /// <param name="chordsBeamedTogether"></param>
-        private void SetBeamedGroupStemDirection(ClefSymbol currentClef, List<ChordSymbol> chordsBeamedTogether, VerticalDir voiceStemDirection)
+        private void SetBeamedGroupStemDirection(Clef currentClef, List<ChordSymbol> chordsBeamedTogether, VerticalDir voiceStemDirection)
         {
             Debug.Assert(chordsBeamedTogether.Count > 1);
             VerticalDir groupStemDirection = voiceStemDirection;
@@ -68,7 +68,7 @@ namespace Moritz.Symbols
             }
         }
 
-        private VerticalDir GetDirectionFromExtremes(ClefSymbol currentClef, List<ChordSymbol> chordsBeamedTogether)
+        private VerticalDir GetDirectionFromExtremes(Clef currentClef, List<ChordSymbol> chordsBeamedTogether)
         {
             float headMinTop = float.MaxValue;
             float headMaxBottom = float.MinValue;
@@ -92,7 +92,7 @@ namespace Moritz.Symbols
                 return VerticalDir.down;
         }
 
-        private float GetDefaultStemTipY(ClefSymbol currentClef, List<ChordSymbol> chordsBeamedTogether)
+        private float GetDefaultStemTipY(Clef currentClef, List<ChordSymbol> chordsBeamedTogether)
         {
             float headMinTop = float.MaxValue;
             float headMaxBottom = float.MinValue;

@@ -86,7 +86,7 @@ namespace Moritz.Symbols
             _nStafflines = voice.Staff.NumberOfStafflines;
             foreach(NoteObject noteObject in voice.NoteObjects)
             {
-                ClefSymbol cs = noteObject as ClefSymbol; 
+                Clef cs = noteObject as Clef; 
                 if(cs != null)
                     _clef = cs;
                 if(noteObject == rootObject)
@@ -2137,7 +2137,7 @@ namespace Moritz.Symbols
         private readonly float _gap = 0F;
         private int _nStafflines = 0;
         private float _staffOriginY = 0;
-        private ClefSymbol _clef = null;
+        private Clef _clef = null;
 
         private StemMetrics _stemMetrics = null;
         private FlagsBlockMetrics _flagsBlockMetrics = null;

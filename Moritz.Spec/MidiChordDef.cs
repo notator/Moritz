@@ -810,7 +810,7 @@ namespace Moritz.Spec
         }
 
         #region IUniqueDef
-        public override string ToString() => $"MidiChordDef: MsDuration={MsDuration} BasePitch={NotatedMidiPitches[0]} MsPositionReFirstIUD={MsPositionReFirstUD}";
+        public override string ToString() => $"MidiChordDef: MsPositionReFirstIUD={MsPositionReFirstUD} MsDuration={MsDuration} BasePitch={NotatedMidiPitches[0]}";
 
         /// <summary>
         /// Multiplies the MsDuration by the given factor.

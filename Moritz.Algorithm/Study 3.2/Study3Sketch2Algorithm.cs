@@ -132,6 +132,8 @@ namespace Moritz.Algorithm.Study3Sketch2
                 }     
             }
 
+            //ivd.InsertClefDef(5, "b");
+
             return ivd;
         }
 
@@ -279,6 +281,8 @@ namespace Moritz.Algorithm.Study3Sketch2
                 endBarlineMsPos = (endBarlineMsPos > trk.MsDuration) ? endBarlineMsPos : trk.MsDuration;
                 channel++;
             }
+
+            //bar[0].InsertClefDef(5, "t");
 
             Seq seq = new Seq(0, bar, MidiChannelIndexPerOutputVoice);
 

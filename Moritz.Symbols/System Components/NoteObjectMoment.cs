@@ -112,7 +112,7 @@ namespace Moritz.Symbols
                     Debug.Assert(AlignmentX == 0F);
                     if(index > 0)
                     {
-                        ClefSymbol clef = _noteObjects[index-1] as ClefSymbol;
+                        Clef clef = _noteObjects[index-1] as Clef;
                         if(clef != null)
                             clef.Metrics.Move(minBarlineOriginX - barline.Metrics.OriginX, 0);
                     }
@@ -122,9 +122,9 @@ namespace Moritz.Symbols
                 {
                     if(index > 0)
                     {
-                        ClefChangeSymbol clefChange = _noteObjects[index - 1] as ClefChangeSymbol;
-                        if(clefChange != null)
-                            clefChange.Metrics.Move(chordSymbol.Metrics.Left - clefChange.Metrics.Right + gap, 0);
+                        SmallClef smallClef = _noteObjects[index - 1] as SmallClef;
+                        if(smallClef != null)
+                            smallClef.Metrics.Move(chordSymbol.Metrics.Left - smallClef.Metrics.Right + gap, 0);
                     }
                 }
             }
@@ -139,7 +139,7 @@ namespace Moritz.Symbols
                 Debug.Assert(durationSymbol.AbsMsPosition == _absMsPosition);
                 Debug.Assert(durationSymbol.Voice.Staff == _noteObjects[0].Voice.Staff);
             }
-            if(noteObject is ClefSymbol)
+            if(noteObject is Clef)
             {
 
             }

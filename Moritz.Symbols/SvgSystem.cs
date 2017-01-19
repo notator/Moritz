@@ -505,7 +505,7 @@ namespace Moritz.Symbols
         {
             SortedDictionary<int, NoteObjectMoment> dict = new SortedDictionary<int, NoteObjectMoment>();
             Barline barline = null;
-            ClefSymbol clef = null;
+            Clef clef = null;
             foreach(Staff staff in Staves)
             {
                 foreach(Voice voice in staff.Voices)
@@ -517,8 +517,8 @@ namespace Moritz.Symbols
                         DurationSymbol durationSymbol = noteObject as DurationSymbol;
                         if(durationSymbol == null)
                         {
-                            if(noteObject is ClefSymbol)
-                                clef = noteObject as ClefSymbol;
+                            if(noteObject is Clef)
+                                clef = noteObject as Clef;
                             if(noteObject is Barline)
                                 barline = noteObject as Barline;
                         }
@@ -601,7 +601,7 @@ namespace Moritz.Symbols
         /// </summary>
         private void MoveClefsAndBarlines(float hairline)
         {
-            ClefSymbol clef = null;
+            Clef clef = null;
             Barline barline = null;
 
             foreach(Staff staff in Staves)
@@ -612,8 +612,8 @@ namespace Moritz.Symbols
                     {
                         foreach(NoteObject noteObject in voice.NoteObjects)
                         {
-                            if(noteObject is ClefSymbol)
-                                clef = noteObject as ClefSymbol;
+                            if(noteObject is Clef)
+                                clef = noteObject as Clef;
                             if(noteObject is Barline)
                                 barline = noteObject as Barline;
                             DurationSymbol durationSymbol = noteObject as DurationSymbol;

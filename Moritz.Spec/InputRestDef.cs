@@ -20,7 +20,7 @@ namespace Moritz.Spec
 
         public override string ToString()
         {
-            return ("InputRestDef:" + " MsDuration=" + MsDuration.ToString() + " MsPositionReFirstIUD =" + MsPositionReFirstUD.ToString());
+            return ("InputRestDef: MsPositionReFirstIUD = " + MsPositionReFirstUD.ToString() + " MsDuration=" + MsDuration.ToString());
         }
 
         public override object Clone()

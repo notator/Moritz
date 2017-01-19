@@ -182,15 +182,17 @@ namespace Moritz.Spec
             }
         }
         /// <summary>
-        /// If the index is equal to or greater than the number of chords, rests and clefChanges in the voiceDef,
-        /// the ClefChange will be appended to the voiceDef.
+        /// Inserts a ClefDef at the given index (which must be greater than 0).
+        /// If the index is equal to or greater than the number of chords, rests and ClefDefs in the voiceDef,
+        /// the ClefDef will be appended to the voiceDef.
         /// Notes: 1) When changing clefs more than once in the same VoiceDef, it is easier to get the indices right if
         ///           they are added backwards.
-        ///        2) if a ClefChange is defined here on a RestDef which has no MidiChordDef to its right on the staff,
-        ///           the resulting ClefSymbol will be placed immediately before the final barline on the staff.  
+        ///        2) if a ClefDef is defined here in front of an InputRestDef or OutputRestDef, the resulting SmallClef
+        ///           will be moved later so that it is placed immediately before the following ChordSymbol or the final
+        ///           barline on the staff.  
         ///        3) The clefType must be one of the following strings "t", "t1", "t2", "t3", "b", "b1", "b2", "b3"
         /// </summary>
-        public void InsertClefChange(int index, string clefType)
+        public void InsertClefDef(int index, string clefType)
         {
             #region check args
             Debug.Assert(index >= 0);
@@ -208,16 +210,8 @@ namespace Moritz.Spec
             }
             #endregion
 
-            if(index > _uniqueDefs.Count - 1)
-            {
-                ClefDef clefDef = new ClefDef(clefType, EndMsPositionReFirstIUD);
-                _uniqueDefs.Add(clefDef);
-            }
-            else
-            {
-                ClefDef clefDef = new ClefDef(clefType, _uniqueDefs[index].MsPositionReFirstUD);
-                _uniqueDefs.Insert(index, clefDef);
-            }
+            ClefDef clefDef = new ClefDef(clefType, 0);
+            _Insert(index, clefDef);
         }
         #endregion miscellaneous
 
@@ -710,7 +704,7 @@ namespace Moritz.Spec
 
         #endregion VoiceDef duration changers
 
-        internal void RemoveDuplicateClefChanges()
+        internal void RemoveDuplicateClefDefs()
         {
             if(_uniqueDefs.Count > 1)
             {

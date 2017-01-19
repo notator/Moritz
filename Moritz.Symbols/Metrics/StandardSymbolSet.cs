@@ -264,7 +264,7 @@ namespace Moritz.Symbols
         public override Metrics NoteObjectMetrics(Graphics graphics, NoteObject noteObject, VerticalDir voiceStemDirection, float gap, float strokeWidth)
         {
             Metrics returnMetrics = null;
-            ClefSymbol clef = noteObject as ClefSymbol;
+            Clef clef = noteObject as Clef;
             Barline barline = noteObject as Barline;
             CautionaryOutputChordSymbol cautionaryOutputChordSymbol = noteObject as CautionaryOutputChordSymbol;
             CautionaryInputChordSymbol cautionaryInputChordSymbol = noteObject as CautionaryInputChordSymbol;
@@ -361,8 +361,8 @@ namespace Moritz.Symbols
             }
             else if(clefDef != null)
             {
-                ClefChangeSymbol clefChangeSymbol = new ClefChangeSymbol(voice, clefDef.ClefType, absMsPosition, cautionaryFontHeight);
-                noteObject = clefChangeSymbol;
+                SmallClef smallClef = new SmallClef(voice, clefDef.ClefType, absMsPosition, cautionaryFontHeight);
+                noteObject = smallClef;
             }
 
             return noteObject;
@@ -488,7 +488,7 @@ namespace Moritz.Symbols
                     foreach(Voice voice in staff.Voices)
                     {
                         List<NoteObject> noteObjects = voice.NoteObjects;
-                        ClefSymbol firstClef = null;
+                        Clef firstClef = null;
                         ChordSymbol cautionaryChordSymbol = null;
                         CautionaryInputChordSymbol cautionaryInputChordSymbol = null;
                         CautionaryOutputChordSymbol cautionaryOutputChordSymbol = null;
@@ -497,7 +497,7 @@ namespace Moritz.Symbols
                         for(int index = 0; index < noteObjects.Count; ++index)
                         {
                             if(firstClef == null)
-                                firstClef = noteObjects[index] as ClefSymbol;
+                                firstClef = noteObjects[index] as Clef;
                             if(cautionaryInputChordSymbol == null)
                                 cautionaryChordSymbol = noteObjects[index] as CautionaryInputChordSymbol;
                             if(cautionaryOutputChordSymbol == null)

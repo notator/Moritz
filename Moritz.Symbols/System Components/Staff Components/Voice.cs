@@ -199,7 +199,7 @@ namespace Moritz.Symbols
         public void SetChordStemDirectionsAndCreateBeamBlocks(PageFormat pageFormat)
         {
             List<ChordSymbol> chordsBeamedTogether = new List<ChordSymbol>();
-            ClefSymbol currentClef = null;
+            Clef currentClef = null;
             bool breakGroup = false;
             ChordSymbol lastChord = null;
             foreach(ChordSymbol cs in ChordSymbols)
@@ -211,7 +211,7 @@ namespace Moritz.Symbols
                 CautionaryInputChordSymbol cautionaryInputChord = noteObject as CautionaryInputChordSymbol;
                 ChordSymbol chord = noteObject as ChordSymbol;
                 RestSymbol rest = noteObject as RestSymbol;
-                ClefSymbol clef = noteObject as ClefSymbol;
+                Clef clef = noteObject as Clef;
                 Barline barline = noteObject as Barline;
 
                 if(cautionaryOutputChord != null || cautionaryInputChord != null)

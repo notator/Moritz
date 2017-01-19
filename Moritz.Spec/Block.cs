@@ -237,7 +237,7 @@ namespace Moritz.Spec
                 vd1.Container = null;
                 vd2.Container = null;
                 vd1.AddRange(vd2);
-                vd1.RemoveDuplicateClefChanges();
+                vd1.RemoveDuplicateClefDefs();
                 vd1.AgglomerateRests();
                 vd1.Container = this;
             }
