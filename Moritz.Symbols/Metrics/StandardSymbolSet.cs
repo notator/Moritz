@@ -310,7 +310,7 @@ namespace Moritz.Symbols
             MidiRestDef midiRestDef = iud as MidiRestDef;
             InputChordDef inputChordDef = iud as InputChordDef;
             InputRestDef inputRestDef = iud as InputRestDef;
-            ClefChangeDef clefChangeDef = iud as ClefChangeDef;
+            ClefDef clefDef = iud as ClefDef;
 
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
             float cautionaryFontHeight = pageFormat.CautionaryNoteheadsFontHeight;
@@ -359,9 +359,9 @@ namespace Moritz.Symbols
                 InputRestSymbol inputRestSymbol = new InputRestSymbol(voice, inputRestDef, absMsPosition, minimumCrotchetDuration, musicFontHeight);
                 noteObject = inputRestSymbol;
             }
-            else if(clefChangeDef != null)
+            else if(clefDef != null)
             {
-                ClefChangeSymbol clefChangeSymbol = new ClefChangeSymbol(voice, clefChangeDef.ClefType, absMsPosition, cautionaryFontHeight);
+                ClefChangeSymbol clefChangeSymbol = new ClefChangeSymbol(voice, clefDef.ClefType, absMsPosition, cautionaryFontHeight);
                 noteObject = clefChangeSymbol;
             }
 

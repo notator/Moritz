@@ -14,7 +14,7 @@ namespace Moritz.Spec
         /// <para>The seq's Trks and the inputVoiceDefs (if any) are cast to VoiceDefs, and then padded at the beginning and end with rests
         /// so that they all start at the beginning of the Block and have the same duration.</para>
         /// <para>The Block's AbsMsPosition is set to the seq's AbsMsPosition.</para>
-        /// <para>There must be at least one MidiChordDef at the start of the Block (possibly following a ClefChangeDef), and
+        /// <para>There must be at least one MidiChordDef at the start of the Block (possibly following a ClefDef), and
         /// at least one MidiChordDef ends at its end.</para>
         /// <para>If an original voiceDef is empty or contains a single restDef, it will be altered to contain a single rest having the
         /// same duration as the other voiceDefs.</para>
@@ -298,17 +298,17 @@ namespace Moritz.Spec
 
         /// <summary>
         /// A non-empty Block must fulfill the following criteria:
-        /// The Trks may contain any combination of MidiRestDef, MidiChordDef, CautionaryChordDef and ClefChangeDef.
-        /// The InputVoiceDefs may contain any combination of InputRestDef, InputChordDef, CautionaryChordDef and ClefChangeDef.
+        /// The Trks may contain any combination of MidiRestDef, MidiChordDef, CautionaryChordDef and ClefDef.
+        /// The InputVoiceDefs may contain any combination of InputRestDef, InputChordDef, CautionaryChordDef and ClefDef.
         /// <para>1. The first VoiceDef in a Block must be a Trk.</para>
         /// <para>2. Trks precede InputVoiceDefs (if any) in the _voiceDefs list.</para>
         /// <para>3. All voiceDefs start at MsPositionReContainer=0 and have the same MsDuration.</para>
         /// <para>4. UniqueDef.MsPositionReFirstIUD attributes are all set correctly (starting at 0).</para>
         /// <para>5. A RestDef is never followed by another RestDef (RestDefs have been agglomerated).</para>
-        /// <para>6. In Blocks, Trk and InputVoiceDef objects can additionally contain CautionaryChordDefs and ClefChangeDefs (See Seq and InputVoiceDef).</para>
+        /// <para>6. In Blocks, Trk and InputVoiceDef objects can additionally contain CautionaryChordDefs and ClefDefs (See Seq and InputVoiceDef).</para>
         /// <para>7. There may not be more than 4 InputVoiceDefs</para>
         /// <para>8. If there are any barlines, they are in ascending order with no duplicates. And the final barline may not be beyond the end of the block.</para>
-        /// <para>9. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefChangeDef, or with a CautionaryChordDef.</para>
+        /// <para>9. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefDef, or with a CautionaryChordDef.</para>
         /// </summary> 
         protected void AssertNonEmptyBlockConsistency()
         {
@@ -381,7 +381,7 @@ namespace Moritz.Spec
             }
             #endregion
 
-            #region 6. In Blocks, Trk and InputVoiceDef objects can additionally contain CautionaryChordDefs and ClefChangeDefs (See Seq and InputVoiceDef).
+            #region 6. In Blocks, Trk and InputVoiceDef objects can additionally contain CautionaryChordDefs and ClefDefs (See Seq and InputVoiceDef).
             foreach(VoiceDef voiceDef in _voiceDefs)
             {
                 voiceDef.AssertConsistentInBlock();
@@ -413,21 +413,21 @@ namespace Moritz.Spec
             }
             #endregion 9. If there are any barlines, the final barline may not be beyond the end of the block.
 
-            #region 9. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefChangeDef, or with a CautionaryChordDef.
+            #region 9. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefDef, or with a CautionaryChordDef.
             bool hasCorrectBeginning = false;
             foreach(VoiceDef voiceDef in _voiceDefs)
             {
                 if(voiceDef is Trk)
                 {
                     if((voiceDef.UniqueDefs.Count > 0 && ((voiceDef.UniqueDefs[0] is MidiChordDef) || (voiceDef.UniqueDefs[0] is CautionaryChordDef)))
-                    || (voiceDef.UniqueDefs.Count > 1 && voiceDef.UniqueDefs[0] is ClefChangeDef && voiceDef.UniqueDefs[1] is MidiChordDef))
+                    || (voiceDef.UniqueDefs.Count > 1 && voiceDef.UniqueDefs[0] is ClefDef && voiceDef.UniqueDefs[1] is MidiChordDef))
                     {
                         hasCorrectBeginning = true;
                         break;
                     }
                 }
             }
-            Debug.Assert(hasCorrectBeginning, "At least one Trk must start with a MidiChordDef, possibly preceded by a ClefChangeDef");
+            Debug.Assert(hasCorrectBeginning, "At least one Trk must start with a MidiChordDef, possibly preceded by a ClefDef");
 
             #endregion
         }

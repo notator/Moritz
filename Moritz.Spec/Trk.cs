@@ -8,7 +8,7 @@ using Moritz.Globals;
 namespace Moritz.Spec
 {
     /// <summary>
-    /// In Seqs, Trks can contain any combination of MidiRestDef, MidiChordDef and ClefChangeDef.
+    /// In Seqs, Trks can contain any combination of MidiRestDef, MidiChordDef and ClefDef.
     /// In Blocks, Trks can additionally contain CautionaryChordDefs.
     /// <para>All VoiceDef objects are IEnumerable, so that foreach loops can be used.</para>
     /// <para>For example:</para>
@@ -66,36 +66,36 @@ namespace Moritz.Spec
 
         #endregion constructors
         /// <summary>
-        /// In seqs, trks can contain any combination of MidiRestDef, MidiChordDef and ClefChangeDef.
+        /// In seqs, trks can contain any combination of MidiRestDef, MidiChordDef and ClefDef.
         /// </summary>
         internal void AssertConsistentInSeq()
         {
             foreach(IUniqueDef iud in UniqueDefs)
             {
-                Debug.Assert(iud is MidiChordDef || iud is MidiRestDef || iud is ClefChangeDef);
+                Debug.Assert(iud is MidiChordDef || iud is MidiRestDef || iud is ClefDef);
             }
         }
 
         /// <summary>
-        /// In blocks, trks can contain any combination of MidiRestDef, MidiChordDef, ClefChangeDef and CautionaryChordDef.
+        /// In blocks, trks can contain any combination of MidiRestDef, MidiChordDef, ClefDef and CautionaryChordDef.
         /// </summary>
         internal override void AssertConsistentInBlock()
         {
             foreach(IUniqueDef iud in UniqueDefs)
             {
-                Debug.Assert(iud is MidiChordDef || iud is MidiRestDef || iud is ClefChangeDef || iud is CautionaryChordDef);
+                Debug.Assert(iud is MidiChordDef || iud is MidiRestDef || iud is ClefDef || iud is CautionaryChordDef);
             }
         }
 
         #region Add, Remove, Insert, Replace objects in the Trk
         /// <summary>
-        /// Appends the new MidiChordDef, MidiRestDef, CautionaryChordDef or ClefChangeDef to the end of the list.
+        /// Appends the new MidiChordDef, MidiRestDef, CautionaryChordDef or ClefDef to the end of the list.
         /// Automatically sets the iUniqueDef's msPosition.
         /// Used by Block.PopBar(...), so accepts a CautionaryChordDef argument.
         /// </summary>
         public override void Add(IUniqueDef iUniqueDef)
         {
-            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is MidiRestDef || iUniqueDef is CautionaryChordDef || iUniqueDef is ClefChangeDef);
+            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is MidiRestDef || iUniqueDef is CautionaryChordDef || iUniqueDef is ClefDef);
             _Add(iUniqueDef);
         }
         /// <summary>
@@ -113,7 +113,7 @@ namespace Moritz.Spec
         /// </summary>
         public override void Insert(int index, IUniqueDef iUniqueDef)
         {
-            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is MidiRestDef || iUniqueDef is ClefChangeDef);
+            Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is MidiRestDef || iUniqueDef is ClefDef);
             _Insert(index, iUniqueDef);
         }
         /// <summary>

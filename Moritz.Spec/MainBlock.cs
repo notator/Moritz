@@ -50,7 +50,7 @@ namespace Moritz.Spec
             {
                 int channel = block1.Trks[i].MidiChannel;
                 VoiceDef trk = new Trk(channel);
-                trk.Add(new ClefChangeDef(initialClefPerChannel[channel], 0));
+                trk.Add(new ClefDef(initialClefPerChannel[channel], 0));
                 _voiceDefs.Add(trk);
             }
 
@@ -58,7 +58,7 @@ namespace Moritz.Spec
             for(int i = 0; i < nInputVoiceDefs; ++i)
             {
                 VoiceDef inputVoiceDef = new InputVoiceDef(i);
-                inputVoiceDef.Add(new ClefChangeDef(initialClefPerChannel[inputVoiceIndex++], 0));
+                inputVoiceDef.Add(new ClefDef(initialClefPerChannel[inputVoiceIndex++], 0));
                 _voiceDefs.Add(inputVoiceDef);
             }
 
@@ -97,7 +97,7 @@ namespace Moritz.Spec
                 {
                     trk.Add(new MidiRestDef(0, blockMsDuration - trk.MsDuration));
                 }
-                trk.UniqueDefs.Insert(0, new ClefChangeDef(initialClefPerChannel[trk.MidiChannel], 0));
+                trk.UniqueDefs.Insert(0, new ClefDef(initialClefPerChannel[trk.MidiChannel], 0));
                 _voiceDefs.Add(trk);
             }
 
@@ -181,7 +181,7 @@ namespace Moritz.Spec
                     if(iudAbsStartPos >= endBarlineAbsMsPosition)
                     {
                         Debug.Assert(iudAbsEndPos <= currentBlockAbsEndPos);
-                        if(iud is ClefChangeDef && iudAbsStartPos == endBarlineAbsMsPosition)
+                        if(iud is ClefDef && iudAbsStartPos == endBarlineAbsMsPosition)
                         {
                             poppedBarVoice.UniqueDefs.Add(iud);
                         }

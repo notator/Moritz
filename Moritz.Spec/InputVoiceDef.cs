@@ -66,7 +66,7 @@ namespace Moritz.Spec
             foreach(IUniqueDef iud in UniqueDefs)
             {
                 // In blocks, inputChordDefs can also contain CautionaryChordDefs
-                Debug.Assert(iud is InputChordDef || iud is InputRestDef || iud is CautionaryChordDef || iud is ClefChangeDef);
+                Debug.Assert(iud is InputChordDef || iud is InputRestDef || iud is CautionaryChordDef || iud is ClefDef);
             }
         }
 
@@ -79,7 +79,7 @@ namespace Moritz.Spec
         /// <param name="iUniqueDef"></param>
         public override void Add(IUniqueDef iud)
         {
-            Debug.Assert(iud is InputChordDef || iud is InputRestDef || iud is CautionaryChordDef || iud is ClefChangeDef);
+            Debug.Assert(iud is InputChordDef || iud is InputRestDef || iud is CautionaryChordDef || iud is ClefDef);
             _Add(iud);
         }
         /// <summary>

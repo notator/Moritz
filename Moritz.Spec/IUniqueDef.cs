@@ -12,7 +12,7 @@ namespace Moritz.Spec
     ///     InputChordDef
     ///     InputRestDef
     ///     CautionaryChordDef
-    ///     ClefChangeDef
+    ///     ClefDef
     /// These objects must implement DeepClone() so that VoiceDefs.DeepClone() can be implemented.
     /// VoiceDefs is used for composition. When complete, the UniqueDefs list is transferred to
     /// Voice before the definitions are converted to the objects themselves.

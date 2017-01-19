@@ -53,7 +53,7 @@
     <Compile Include="CCSettings.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ClefChangeDef.cs" />
+    <Compile Include="ClefDef.cs" />
     <Compile Include="Gamut.cs" />
     <Compile Include="InputNoteDef.cs" />
     <Compile Include="IVoiceDefContainer.cs" />

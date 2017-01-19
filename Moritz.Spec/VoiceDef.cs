@@ -210,13 +210,13 @@ namespace Moritz.Spec
 
             if(index > _uniqueDefs.Count - 1)
             {
-                ClefChangeDef clefChangeDef = new ClefChangeDef(clefType, EndMsPositionReFirstIUD);
-                _uniqueDefs.Add(clefChangeDef);
+                ClefDef clefDef = new ClefDef(clefType, EndMsPositionReFirstIUD);
+                _uniqueDefs.Add(clefDef);
             }
             else
             {
-                ClefChangeDef clefChangeDef = new ClefChangeDef(clefType, _uniqueDefs[index].MsPositionReFirstUD);
-                _uniqueDefs.Insert(index, clefChangeDef);
+                ClefDef clefDef = new ClefDef(clefType, _uniqueDefs[index].MsPositionReFirstUD);
+                _uniqueDefs.Insert(index, clefDef);
             }
         }
         #endregion miscellaneous
@@ -225,7 +225,7 @@ namespace Moritz.Spec
 
         /// <summary>
         /// An object is a NonMidiOrInputChordDef if it is not a MidiChordDef and it is not an InputChordDef.
-        /// For example: a CautionaryChordDef, a RestDef or ClefChangeDef.
+        /// For example: a CautionaryChordDef, a RestDef or ClefDef.
         /// </summary>
         /// <param name="beginIndex"></param>
         /// <param name="endIndex"></param>
@@ -670,7 +670,7 @@ namespace Moritz.Spec
 
         /// <summary>
         /// An object is a NonDurationDef if it is not a DurationDef.
-        /// For example: a cautionaryChordDef or a clefChangeDef.
+        /// For example: a cautionaryChordDef or a clefDef.
         /// </summary>
         private int GetNumberOfNonDurationDefs(int beginIndex, int endIndex)
         {
@@ -717,14 +717,14 @@ namespace Moritz.Spec
                 for(int i = _uniqueDefs.Count - 1; i > 0; --i)
                 {
                     IUniqueDef iud1 = _uniqueDefs[i];
-                    if(iud1 is ClefChangeDef)
+                    if(iud1 is ClefDef)
                     {
                         for(int j = i - 1; j >= 0; --j)
                         {
                             IUniqueDef iud2 = _uniqueDefs[j];
-                            if(iud2 is ClefChangeDef)
+                            if(iud2 is ClefDef)
                             {
-                                if(string.Compare(((ClefChangeDef)iud1).ClefType, ((ClefChangeDef)iud2).ClefType) == 0) 
+                                if(string.Compare(((ClefDef)iud1).ClefType, ((ClefDef)iud2).ClefType) == 0) 
                                 {
                                     _uniqueDefs.RemoveAt(i);
                                 }

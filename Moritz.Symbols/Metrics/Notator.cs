@@ -43,8 +43,8 @@ namespace Moritz.Symbols
         {
             byte[] currentChannelVelocities = new byte[systems[0].Staves.Count];
 
-            List<ClefChangeDef> voice0ClefChangeDefs = new List<ClefChangeDef>();
-            List<ClefChangeDef> voice1ClefChangeDefs = new List<ClefChangeDef>();
+            List<ClefDef> voice0ClefDefs = new List<ClefDef>();
+            List<ClefDef> voice1ClefDefs = new List<ClefDef>();
 
             List<string> currentClefPerVisibleStaffList = new List<string>(_pageFormat.ClefsList);
 
@@ -62,8 +62,8 @@ namespace Moritz.Symbols
                     {
                         visibleStaffIndex++;
                     }
-                    voice0ClefChangeDefs.Clear();
-                    voice1ClefChangeDefs.Clear();
+                    voice0ClefDefs.Clear();
+                    voice1ClefDefs.Clear();
                     msPositionReVoiceDef = 0;
                     for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                     {
@@ -76,10 +76,10 @@ namespace Moritz.Symbols
                             #region A clef at the beginning of the first voiceDef (stipulated by the algorithm) must agree with the pageFormat clef.                           
                             if(voice.VoiceDef.UniqueDefs.Count > 0)
                             {
-                                ClefChangeDef clefChangeDef = voice.VoiceDef.UniqueDefs[0] as ClefChangeDef;
-                                if(clefChangeDef != null)
+                                ClefDef clefDef = voice.VoiceDef.UniqueDefs[0] as ClefDef;
+                                if(clefDef != null)
                                 {
-                                    Debug.Assert((string.Compare(clefType, clefChangeDef.ClefType) == 0), "The first clefs in the score (stipulated by the algorithm) must agree with the pageFormat clefs.");
+                                    Debug.Assert((string.Compare(clefType, clefDef.ClefType) == 0), "The first clefs in the score (stipulated by the algorithm) must agree with the pageFormat clefs.");
                                 }
                             }
                             #endregion
@@ -119,9 +119,9 @@ namespace Moritz.Symbols
                             if(clefChangeSymbol != null)
                             {
                                 if(voiceIndex == 0)
-                                    voice0ClefChangeDefs.Add(iud as ClefChangeDef);
+                                    voice0ClefDefs.Add(iud as ClefDef);
                                 else
-                                    voice1ClefChangeDefs.Add(iud as ClefChangeDef);
+                                    voice1ClefDefs.Add(iud as ClefDef);
                             }
 
                             // Don't add initial clefs that are stipulated by the algorithm here!
@@ -135,15 +135,15 @@ namespace Moritz.Symbols
                         }
                     }
 
-                    if(!(staff is HiddenOutputStaff) && (voice0ClefChangeDefs.Count > 0 || voice1ClefChangeDefs.Count > 0))
+                    if(!(staff is HiddenOutputStaff) && (voice0ClefDefs.Count > 0 || voice1ClefDefs.Count > 0))
                     {
                         // the main clef on this staff in the next system
-                        SetNextSystemClefType(currentClefPerVisibleStaffList, visibleStaffIndex, staffIndex, voice0ClefChangeDefs, voice1ClefChangeDefs);
+                        SetNextSystemClefType(currentClefPerVisibleStaffList, visibleStaffIndex, staffIndex, voice0ClefDefs, voice1ClefDefs);
                     }
 
                     if(staff.Voices.Count == 2)
                     {
-                        InsertInvisibleClefChangeSymbols(staff.Voices, systemAbsMsPos, voice0ClefChangeDefs, voice1ClefChangeDefs);
+                        InsertInvisibleClefChangeSymbols(staff.Voices, systemAbsMsPos, voice0ClefDefs, voice1ClefDefs);
 
                         CheckClefTypes(staff.Voices);
 
@@ -156,19 +156,19 @@ namespace Moritz.Symbols
             }
         }
 
-        private void SetNextSystemClefType(List<string> currentClefPerVisibleStaffList, int visibleStaffIndex, int staffIndex, List<ClefChangeDef> voice0ClefChangeDefs, List<ClefChangeDef> voice1ClefChangeDefs)
+        private void SetNextSystemClefType(List<string> currentClefPerVisibleStaffList, int visibleStaffIndex, int staffIndex, List<ClefDef> voice0ClefDefs, List<ClefDef> voice1ClefDefs)
         {
-            Debug.Assert(voice0ClefChangeDefs.Count > 0 || voice1ClefChangeDefs.Count > 0);
+            Debug.Assert(voice0ClefDefs.Count > 0 || voice1ClefDefs.Count > 0);
 
-            ClefChangeDef lastVoice0Def = null;
-            if(voice0ClefChangeDefs.Count > 0)
+            ClefDef lastVoice0Def = null;
+            if(voice0ClefDefs.Count > 0)
             {
-                lastVoice0Def = voice0ClefChangeDefs[voice0ClefChangeDefs.Count - 1];
+                lastVoice0Def = voice0ClefDefs[voice0ClefDefs.Count - 1];
             }
-            ClefChangeDef lastVoice1Def = null;
-            if(voice1ClefChangeDefs.Count > 0)
+            ClefDef lastVoice1Def = null;
+            if(voice1ClefDefs.Count > 0)
             {
-                lastVoice1Def = voice1ClefChangeDefs[voice1ClefChangeDefs.Count - 1];
+                lastVoice1Def = voice1ClefDefs[voice1ClefDefs.Count - 1];
             }
             string lastClefType = null;
             if(lastVoice0Def != null)
@@ -194,13 +194,13 @@ namespace Moritz.Symbols
         /// Insert invisible clefChangeSymbols into the other voice.
         /// ClefChangeSymbols are used by the Notator when deciding how to notate chords.
         /// </summary>
-        private void InsertInvisibleClefChangeSymbols(List<Voice> voices, int systemAbsMsPos, List<ClefChangeDef> voice0ClefChangeDefs, List<ClefChangeDef> voice1ClefChangeDefs)
+        private void InsertInvisibleClefChangeSymbols(List<Voice> voices, int systemAbsMsPos, List<ClefDef> voice0ClefDefs, List<ClefDef> voice1ClefDefs)
         {
             Debug.Assert(voices.Count == 2);
-            if(voice1ClefChangeDefs.Count > 0)
-                InsertInvisibleClefChanges(voices[0], systemAbsMsPos, voice1ClefChangeDefs);
-            if(voice0ClefChangeDefs.Count > 0)
-                InsertInvisibleClefChanges(voices[1], systemAbsMsPos, voice0ClefChangeDefs);
+            if(voice1ClefDefs.Count > 0)
+                InsertInvisibleClefChanges(voices[0], systemAbsMsPos, voice1ClefDefs);
+            if(voice0ClefDefs.Count > 0)
+                InsertInvisibleClefChanges(voices[1], systemAbsMsPos, voice0ClefDefs);
         }
 
         /// <summary>
@@ -234,9 +234,9 @@ namespace Moritz.Symbols
             return clefs;
         }
 
-        private void InsertInvisibleClefChanges(Voice voice, int systemAbsMsPos, List<ClefChangeDef> clefChangeDefs)
+        private void InsertInvisibleClefChanges(Voice voice, int systemAbsMsPos, List<ClefDef> clefDefs)
         {
-            foreach(ClefChangeDef ccd in clefChangeDefs)
+            foreach(ClefDef ccd in clefDefs)
             {
                 int absPos = systemAbsMsPos + ccd.MsPositionReFirstUD;
                 ClefChangeSymbol invisibleClefChangeSymbol = new ClefChangeSymbol(voice, ccd.ClefType, absPos, _pageFormat.CautionaryNoteheadsFontHeight);

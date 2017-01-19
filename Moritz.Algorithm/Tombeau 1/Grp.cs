@@ -97,7 +97,7 @@ namespace Moritz.Algorithm.Tombeau1
         #region Overridden functions
         #region UniqueDefs list component changers
         /// <summary>
-        /// Appends a new MidiChordDef, MidiRestDef, or ClefChangeDef to the end of the list.
+        /// Appends a new MidiChordDef, MidiRestDef, or ClefDef to the end of the list.
         /// IUniqueDefs in Grps cannot be CautionaryChordDefs.
         /// Automatically sets the iUniqueDef's msPosition.
         /// Used by Block.PopBar(...), so accepts a CautionaryChordDef argument.

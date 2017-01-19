@@ -187,7 +187,7 @@ namespace Moritz.Composer
 					}
 					foreach(IUniqueDef iud in voiceDef.UniqueDefs)
 					{
-						ClefChangeDef ccd = iud as ClefChangeDef;
+						ClefDef ccd = iud as ClefDef;
 						if(ccd != null)
 						{
 							if(visibleLowerVoiceIndices.Contains(voiceIndex))

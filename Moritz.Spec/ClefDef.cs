@@ -7,7 +7,7 @@ using Moritz.Globals;
 namespace Moritz.Spec
 {
     ///<summary>
-    /// A ClefChangeDef is a IUniqueDef which can be created while programming a score.
+    /// A ClefDef is a IUniqueDef which can be created while programming a score.
     /// It must be either be added to a voice.UniqueDefs list immediately before a MidiChordDef or MidiRestDef with which it
     /// shares the same MsPosition, or appended to the voice.UniqueDefs list (in which case it has the EndMsPositionReFirstIUD of
     /// the voiceDef (which does not contain barlines).
@@ -15,9 +15,9 @@ namespace Moritz.Spec
     /// a two-voice staff contain the same ClefSigns (see Notator.AddSymbolsToSystems(List<SvgSystem> systems)).
     /// (The ClefSigns may have different visibility in the two voices.)
     ///</summary>
-    public class ClefChangeDef : IUniqueDef
+    public class ClefDef : IUniqueDef
     {
-		public ClefChangeDef(string clefType, int msPositionReFirstIUD)
+		public ClefDef(string clefType, int msPositionReFirstIUD)
 			:base()
 		{
 			#region check args
@@ -42,21 +42,21 @@ namespace Moritz.Spec
 		#region IUniqueDef
 		public override string ToString()
         {
-            return ("MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " ClefType=" + _clefType + " ClefChangeDef");
+            return ("ClefDef: MsPositionReFirstIUD=" + MsPositionReFirstUD.ToString() + " ClefType=" + _clefType );
         }
 
         public void AdjustMsDuration(double factor) {}
 
         public object Clone()
         {
-            ClefChangeDef deepClone = new ClefChangeDef(_clefType, MsPositionReFirstUD);
+            ClefDef deepClone = new ClefDef(_clefType, MsPositionReFirstUD);
             return deepClone;
         }
 
         public int MsDuration { get { return 0; } set { throw new System.NotSupportedException(); } }
 		private int _msPositionReFirstIUD = -1;
 		/// <summary>
-		/// Care should be taken to ensure that ClefChangeDefs always have the same msPosition as the following MidiChordDef or MidiRestDef
+		/// Care should be taken to ensure that ClefDefs always have the same msPosition as the following MidiChordDef or MidiRestDef
 		/// </summary>
         public int MsPositionReFirstUD
         {
