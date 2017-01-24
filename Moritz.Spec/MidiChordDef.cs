@@ -943,7 +943,7 @@ namespace Moritz.Spec
 
             w.WriteStartElement("score", "midi", null);
 
-            w.WriteStartElement("moments", null);
+            w.WriteStartElement("moments");
 
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {

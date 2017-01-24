@@ -198,7 +198,10 @@ namespace Moritz.Symbols
 		private void WriteScoreLayer(SvgWriter w, int layerNumber, string layerName, int pageNumber, Metadata metadata)
 		{
 			w.WriteStartElement("g"); // start layer (for Inkscape)
-			WriteInkscapeLayerAttributes(w, layerNumber, layerName, true);
+
+            w.WriteAttributeString("score", "hasMidi", null, "hasMidi"); // This <g> element is the "systems" container
+
+            WriteInkscapeLayerAttributes(w, layerNumber, layerName, true);
 
 			w.SvgText("timeStamp", _infoTextInfo, 32, 80);
 
@@ -250,7 +253,7 @@ namespace Moritz.Symbols
         private void WriteSvgHeader(SvgWriter w)
         {
 			w.WriteAttributeString("xmlns", "http://www.w3.org/2000/svg");
-			w.WriteAttributeString("xmlns", "score", null, "http://www.james-ingram-act-two.de/open-source/svgScoreExtensions.html");
+			w.WriteAttributeString("xmlns", "score", null, "http://www.james-ingram-act-two.de/open-source/svgScoreNamespace.html");
 			w.WriteAttributeString("xmlns", "dc", null, "http://purl.org/dc/elements/1.1/");
 			w.WriteAttributeString("xmlns", "cc", null, "http://creativecommons.org/ns#");
 			w.WriteAttributeString("xmlns", "rdf", null, "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
@@ -268,7 +271,7 @@ namespace Moritz.Symbols
             // The value is not checked by the Assistant Performer, because I know that the AP only plays scores that I give it.
             // However, theoretically, anyone could write an app that uses this file, and they would need to be told the format
             // in this standardized attribute. 
-            w.WriteAttributeString("data-scoreType", null, "http://www.james-ingram-act-two.de/open-source/svgScoreExtensions.html");
+            w.WriteAttributeString("data-scoreType", null, "http://www.james-ingram-act-two.de/open-source/svgScoreNamespace.html");
 
             w.WriteAttributeString("width", _pageFormat.ScreenRight.ToString()); // the intended screen display size (100%)
             w.WriteAttributeString("height", _pageFormat.ScreenBottom.ToString()); // the intended screen display size (100%)

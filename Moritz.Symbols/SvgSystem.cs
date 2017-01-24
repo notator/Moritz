@@ -26,9 +26,11 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         public void WriteSVG(SvgWriter w, int systemNumber, PageFormat pageFormat, List<CarryMsgs> carryMsgsPerChannel)
         {
-            w.SvgStartGroup("system");                                                
-            w.WriteAttributeString("score", "bbTop", null, this.Metrics.NotesTop.ToString());
-            w.WriteAttributeString("score", "bbBottom", null, this.Metrics.NotesBottom.ToString());
+            w.SvgStartGroup("system");
+                                               
+            w.WriteAttributeString("score", "hasMidi", null, "hasMidi"); // this is a "system" container
+
+            WriteLeftToRightElement(w);
 
             for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
             {
@@ -42,6 +44,14 @@ namespace Moritz.Symbols
             w.SvgEndGroup(); // connectors
 
             w.SvgEndGroup(); // system
+        }
+
+        private void WriteLeftToRightElement(SvgWriter w)
+        {
+            w.WriteStartElement("score", "leftToRight", null);
+            w.WriteAttributeString("systemTop", this.Metrics.NotesTop.ToString());
+            w.WriteAttributeString("systemBottom", this.Metrics.NotesBottom.ToString());
+            w.WriteEndElement(); // leftToRight
         }
 
         private void WriteConnectors(SvgWriter w, int systemNumber, PageFormat pageFormat)

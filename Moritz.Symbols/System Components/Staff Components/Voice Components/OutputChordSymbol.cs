@@ -157,7 +157,7 @@ namespace Moritz.Symbols
 			w.SvgStartGroup("outputChord");
 			if(staffIsVisible)
 			{ 
-				w.WriteAttributeString("score", "alignmentX", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
+				w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
 			}
             
             _midiChordDef.WriteSVG(w, channel, carryMsgs);

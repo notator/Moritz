@@ -66,21 +66,21 @@ namespace Moritz.Spec
 		public ReadOnlyCollection<TrackCCSettings> OverrideSettings { get { return _overrideSettings.AsReadOnly(); } }
 		private List<TrackCCSettings> _overrideSettings = null;
 	}
-	/// TrackCCSettings are switches that are components of InputChordDef.ccSettings objects.
-	/// The Assistant Performer sets these values when the chord with which they are associated is performed.
-	/// The setting for each of the three continuous controlers persists until it is changed in a later
-	/// InputChordDef.ccSettings object.
-	/// TrackCCSettings can have CControllerType values (defined in an enum in this file).
-	/// The default options are:
-	///     pressure="undefined" -- not written to scores. Means "keep the current setting".
-	///     pitchWheel="undefined" -- not written to scores. Means "keep the current setting".
-	///     modulation="undefined" -- not written to scores. Means "keep the current setting".
-	/// To turn a controller off during a score, use the CControllerType.disabled setting.
-	/// The continuous controllers are disabled by default in the Assistant Performer.
-	/// 
-	/// See also: http://james-ingram-act-two.de/open-source/svgScoreExtensions.html
-	/// </summary>
-	public sealed class TrackCCSettings
+    /// TrackCCSettings are switches that are components of InputChordDef.ccSettings objects.
+    /// The Assistant Performer sets these values when the chord with which they are associated is performed.
+    /// The setting for each of the three continuous controlers persists until it is changed in a later
+    /// InputChordDef.ccSettings object.
+    /// TrackCCSettings can have CControllerType values (defined in an enum in this file).
+    /// The default options are:
+    ///     pressure="undefined" -- not written to scores. Means "keep the current setting".
+    ///     pitchWheel="undefined" -- not written to scores. Means "keep the current setting".
+    ///     modulation="undefined" -- not written to scores. Means "keep the current setting".
+    /// To turn a controller off during a score, use the CControllerType.disabled setting.
+    /// The continuous controllers are disabled by default in the Assistant Performer.
+    /// 
+    /// See also: http://james-ingram-act-two.de/open-source/svgScoreNamespace.html
+    /// </summary>
+    public sealed class TrackCCSettings
 	{
 		public TrackCCSettings(byte? midiChannel, CCSetting ccSetting)
 		{

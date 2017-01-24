@@ -100,7 +100,8 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Writes a single moment element which may contain
-        /// NoteOffs, bank, patch, pitchWheelDeviation, NoteOns 
+        /// NoteOffs, bank, patch, pitchWheelDeviation, NoteOns.
+        /// Moritz never writes SysEx messages.
         /// </summary>
         public void WriteSVG(XmlWriter w, int channel, CarryMsgs carryMsgs)
         {
@@ -128,11 +129,11 @@ namespace Moritz.Spec
                 }
                 if(PitchWheelDeviation != null)
                 {
-                    List<MidiMsg> pwdMessages = GetPitchWheelDeviationMessages(channel, (int) PitchWheelDeviation);
-                    foreach(MidiMsg msg in pwdMessages)
-                    {
-                        msg.WriteSVG(w);
-                    }
+                    w.WriteStartElement("pitchWheelDeviation");
+                    w.WriteAttributeString("channel", channel.ToString());
+                    w.WriteAttributeString("semitones", PitchWheelDeviation.ToString());
+                    w.WriteAttributeString("cents", "0");
+                    w.WriteEndElement();
                 }
                 w.WriteEndElement(); // switches
             }
@@ -161,28 +162,6 @@ namespace Moritz.Spec
             }
 
             w.WriteEndElement(); // end of moment
-        }
-
-        /// <summary>
-        /// Moritz currently just sends the two COARSE messages to set the semitones value
-        /// </summary>
-        /// <param name="channel"></param>
-        /// <param name="semitones"></param>
-        /// <returns></returns>
-        private List<MidiMsg> GetPitchWheelDeviationMessages(int channel, int semitones)
-        {
-            List<MidiMsg> rList = new List<MidiMsg>();
-            int status = M.CMD_CONTROL_CHANGE_0xB0 + channel;
-            MidiMsg msg1 = new MidiMsg(status, M.CTL_REGISTEREDPARAMETER_COARSE_101, M.SELECT_PITCHBEND_RANGE_0);
-            rList.Add(msg1);
-            MidiMsg msg2 = new MidiMsg(status, M.CTL_DATAENTRY_COARSE_6, semitones);
-            rList.Add(msg2);
-            //MidiMsg msg3 = new MidiMsg(status, M.CTL_REGISTEREDPARAMETER_FINE_100, M.SELECT_PITCHBEND_RANGE_0);
-            //rList.Add(msg3);
-            //MidiMsg msg4 = new MidiMsg(status, M.CTL_DATAENTRY_FINE_38, cents);
-            //rList.Add(msg4);
-
-            return rList;
         }
 
         /// <summary>
