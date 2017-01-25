@@ -21,13 +21,17 @@ namespace Moritz.Spec
 
         internal void WriteSVG(XmlWriter w)
         {
-            w.WriteStartElement("msg");
-            w.WriteAttributeString("s", "0x" + _status.ToString("X"));
-            w.WriteAttributeString("d1", _data1.ToString());
-            if(_data2 != null)
+            string mString = null;
+            if(_data2 == null)
             {
-                w.WriteAttributeString("d2", ((int)_data2).ToString());
+                mString = $"{_status.ToString("X")} {_data1.ToString()}";
             }
+            else
+            {
+                mString = $"{_status.ToString("X")} {_data1.ToString()} {_data2.ToString()}";
+            }
+            w.WriteStartElement("msg");
+            w.WriteAttributeString("m", mString );
             w.WriteEndElement(); // end of msg
         }
 

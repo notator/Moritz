@@ -129,11 +129,10 @@ namespace Moritz.Spec
                 }
                 if(PitchWheelDeviation != null)
                 {
-                    w.WriteStartElement("pitchWheelDeviation");
-                    w.WriteAttributeString("channel", channel.ToString());
-                    w.WriteAttributeString("semitones", PitchWheelDeviation.ToString());
-                    w.WriteAttributeString("cents", "0");
-                    w.WriteEndElement();
+                    MidiMsg msg1 = new MidiMsg(M.CMD_CONTROL_CHANGE_0xB0 + channel, M.CTL_REGISTEREDPARAMETER_COARSE_101, M.SELECT_PITCHBEND_RANGE_0);
+                    msg1.WriteSVG(w);
+                    MidiMsg msg2 = new MidiMsg(M.CMD_CONTROL_CHANGE_0xB0 + channel, M.CTL_DATAENTRY_COARSE_6, PitchWheelDeviation);
+                    msg2.WriteSVG(w);
                 }
                 w.WriteEndElement(); // switches
             }
