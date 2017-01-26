@@ -34,9 +34,6 @@ namespace Moritz.Algorithm
             if(channelCount > 16)
                 throw new ApplicationException("CompositionAlgorithm: There can not be more than 16 output voices.");
 
-            if(channelCount != MasterVolumePerOutputVoice.Count)
-                throw new ApplicationException("CompositionAlgorithm: Wrong number of master volumes");
-
             int previousChannelIndex = -1;
             for(int i = 0; i < channelCount; ++i)
             {
@@ -47,10 +44,6 @@ namespace Moritz.Algorithm
 
                 if(channelIndex < 0 || channelIndex > 15)
                     throw new ApplicationException("CompositionAlgorithm: midi channel out of range!");
-
-                int masterVolume = MasterVolumePerOutputVoice[i];
-                if(masterVolume < 0 || masterVolume > 127)
-                    throw new ApplicationException("CompositionAlgorithm: master volume out of range!");
             }
 
             // Midi input devices are identified by their midi channel, so there may not be more than 16 of them.
@@ -91,15 +84,6 @@ namespace Moritz.Algorithm
         /// a parameter in the .mkss file. 
         /// </summary>
         public abstract IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get; }
-
-        /// <summary>
-        /// Returns the master volume of each output voice in top to bottom order in the original algorithm.
-        /// These values are written once in the score (to each voice in the first system in the score).
-        /// These values must be in range [ 0..127 ].
-        /// A midi channel's voiceID (written into in the score, if there are input voices) is its position in this list.
-        /// According to Jeff Glatt, the Master Volume should be set to 90 by default.
-        /// </summary>
-        public abstract IReadOnlyList<int> MasterVolumePerOutputVoice { get; }
 
         /// <summary>
         /// Returns the number of inputVoices created by the algorithm.

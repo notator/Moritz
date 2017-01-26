@@ -19,7 +19,6 @@ namespace Moritz.Algorithm.Study3Sketch1
         }
 
         public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
-        public override IReadOnlyList<int> MasterVolumePerOutputVoice { get { return new List<int>() { 100, 100, 100, 100, 100, 100, 100, 100 }; } }
         public override int NumberOfInputVoices { get { return 0; } }
         public override int NumberOfBars { get { return 5; } }
 

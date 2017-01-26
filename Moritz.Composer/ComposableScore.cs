@@ -34,7 +34,7 @@ namespace Moritz.Composer
 
 			CheckBars(bars);
 
-			SetOutputVoiceChannelsAndMasterVolumes(bars[0]);
+			SetOutputVoiceChannels(bars[0]);
 
             CreateEmptySystems(bars, _pageFormat.VisibleInputVoiceIndicesPerStaff.Count); // one system per bar
 
@@ -104,26 +104,11 @@ namespace Moritz.Composer
         private void CheckOutputVoiceChannelsAndMasterVolumes(CompositionAlgorithm algorithm)
 		{
 			string errorString = null;
-			IReadOnlyList<int> masterVolumePerOutputVoice = algorithm.MasterVolumePerOutputVoice;
 			IReadOnlyList<int> midiChannelIndexPerOutputVoice = algorithm.MidiChannelIndexPerOutputVoice;
-			if(masterVolumePerOutputVoice.Count != midiChannelIndexPerOutputVoice.Count)
-			{
-				errorString = "There must be the same number of master volumes and midi channel indices.";
-			}
 			if(string.IsNullOrEmpty(errorString))
 			{
-				for(int i = 0; i < masterVolumePerOutputVoice.Count; ++i)
+				for(int i = 0; i < midiChannelIndexPerOutputVoice.Count; ++i)
 				{
-					if(masterVolumePerOutputVoice[i] <= 0)
-					{
-						errorString = "All master volumes must be > 0.";
-						break;
-					}
-					if(masterVolumePerOutputVoice[i] > 127)
-					{
-						errorString = "All master volumes must be < 128.";
-						break;
-					}
 					if(midiChannelIndexPerOutputVoice[i] < 0)
 					{
 						errorString = "All midi channel indices must be >= 0.";
@@ -306,16 +291,14 @@ namespace Moritz.Composer
 		/// This function should be called for all scores when the bars are complete.
 		/// The plausibility checks have been made.
 		/// </summary>
-		private void SetOutputVoiceChannelsAndMasterVolumes(List<VoiceDef> firstBar)
+		private void SetOutputVoiceChannels(List<VoiceDef> firstBar)
 		{
-			IReadOnlyList<int> masterVolumePerOutputVoice = _algorithm.MasterVolumePerOutputVoice;
 			IReadOnlyList<int> midiChannelIndexPerOutputVoice = _algorithm.MidiChannelIndexPerOutputVoice;
-			for(int i = 0; i < masterVolumePerOutputVoice.Count; ++i)
+			for(int i = 0; i < midiChannelIndexPerOutputVoice.Count; ++i)
 			{
 				Trk oVoice = firstBar[i] as Trk;
 				Debug.Assert(oVoice != null); // should be okay - the check has already been made
 				oVoice.MidiChannel = (byte)midiChannelIndexPerOutputVoice[i];
-				oVoice.MasterVolume = (byte)masterVolumePerOutputVoice[i];
 			}
 		}
 
@@ -361,7 +344,7 @@ namespace Moritz.Composer
                     {
                         Trk invisibleTrkDef = barDef[invisibleOutputVoiceIndex] as Trk;
                         HiddenOutputStaff hiddenOutputStaff = new HiddenOutputStaff(system);
-                        OutputVoice outputVoice = new OutputVoice(hiddenOutputStaff, invisibleTrkDef.MidiChannel, invisibleTrkDef.MasterVolume);
+                        OutputVoice outputVoice = new OutputVoice(hiddenOutputStaff, invisibleTrkDef.MidiChannel);
                         outputVoice.VoiceDef = invisibleTrkDef;
                         hiddenOutputStaff.Voices.Add(outputVoice);
                         system.Staves.Add(hiddenOutputStaff);
@@ -379,7 +362,7 @@ namespace Moritz.Composer
                     {
                         Trk trkDef = barDef[outputVoiceIndices[ovIndex]] as Trk;
                         Debug.Assert(trkDef != null);
-                        OutputVoice outputVoice = new OutputVoice(outputStaff, trkDef.MidiChannel, trkDef.MasterVolume);
+                        OutputVoice outputVoice = new OutputVoice(outputStaff, trkDef.MidiChannel);
                         outputVoice.VoiceDef = trkDef;
                         outputStaff.Voices.Add(outputVoice);
                     }
