@@ -19,6 +19,7 @@ namespace Moritz.Symbols
         public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel)
         {
             w.SvgStartGroup("inputStaff");
+            w.WriteAttributeString("score", "hasMidi", null, "false");
 
             base.WriteSVG(w, true, systemNumber, staffNumber, null); // carryMsgsPerChannel only for OutputStaff
 

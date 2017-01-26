@@ -199,7 +199,7 @@ namespace Moritz.Symbols
 		{
 			w.WriteStartElement("g"); // start layer (for Inkscape)
 
-            w.WriteAttributeString("score", "hasMidi", null, "hasMidi"); // This <g> element is the "systems" container
+            w.WriteAttributeString("score", "hasMidi", null, "true"); // This <g> element is the "systems" container
 
             WriteInkscapeLayerAttributes(w, layerNumber, layerName, true);
 

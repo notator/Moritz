@@ -28,7 +28,7 @@ namespace Moritz.Symbols
         {
             w.SvgStartGroup("system");
                                                
-            w.WriteAttributeString("score", "hasMidi", null, "hasMidi"); // this is a "system" container
+            w.WriteAttributeString("score", "hasMidi", null, "true"); // this is a "system" container
 
             WriteLeftToRightElement(w);
 
