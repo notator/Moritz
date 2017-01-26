@@ -957,7 +957,7 @@ namespace Moritz.Spec
             if(MidiChordSliderDefs != null)
             {
                 // writes the envs element
-                MidiChordSliderDefs.WriteSVG(w, channel, this.MsDuration);
+                MidiChordSliderDefs.WriteSVG(w, channel, this.MsDuration, carryMsgs);
             }
 
             w.WriteEndElement(); // score:midi

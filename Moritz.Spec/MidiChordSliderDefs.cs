@@ -22,38 +22,82 @@ namespace Moritz.Spec
             ExpressionMsbs = expressionMsbs;
         }
 
-        public void WriteSVG(SvgWriter w, int channel, int msDuration)
+        public void WriteSVG(SvgWriter w, int channel, int msDuration, CarryMsgs carryMsgs)
         {
-            w.WriteStartElement("envs"); // envelopes
-
-            if(PanMsbs != null && PanMsbs.Count > 0)
+            if(carryMsgs.IsStartOfEnvs)
             {
-                WriteCCEnv(w, channel, M.CTL_PAN_10, PanMsbs, msDuration);
+                PanMsbs = GetDefault(PanMsbs, 64);
+                ModulationWheelMsbs = GetDefault(ModulationWheelMsbs, 0);
+                ExpressionMsbs = GetDefault(ExpressionMsbs, 127);
+                PitchWheelMsbs = GetDefault(PitchWheelMsbs, 64);
+
+                carryMsgs.IsStartOfEnvs = false;
             }
 
-            if(ModulationWheelMsbs != null && ModulationWheelMsbs.Count > 0)
+            if(DoWriteControl(PanMsbs, carryMsgs.PanState)
+            || DoWriteControl(ModulationWheelMsbs, carryMsgs.ModWheelState)
+            || DoWriteControl(ExpressionMsbs, carryMsgs.ExpressionState)
+            || DoWriteControl(PitchWheelMsbs, carryMsgs.PitchWheelState))
             {
-                WriteCCEnv(w, channel, M.CTL_MODWHEEL_1, ModulationWheelMsbs, msDuration);
+                w.WriteStartElement("envs"); // envelopes
+
+                if(DoWriteControl(PanMsbs, carryMsgs.PanState))
+                {
+                    carryMsgs.PanState = WriteCCEnv(w, channel, M.CTL_PAN_10, PanMsbs, msDuration);
+                }
+
+                if(DoWriteControl(ModulationWheelMsbs, carryMsgs.ModWheelState))
+                {
+                    carryMsgs.ModWheelState = WriteCCEnv(w, channel, M.CTL_MODWHEEL_1, ModulationWheelMsbs, msDuration);
+                }
+
+                if(DoWriteControl(ExpressionMsbs, carryMsgs.ExpressionState))
+                {
+                    carryMsgs.ExpressionState = WriteCCEnv(w, channel, M.CTL_EXPRESSION_11, ExpressionMsbs, msDuration);
+                }
+
+                if(DoWriteControl(PitchWheelMsbs, carryMsgs.PitchWheelState))
+                {
+                    string statusString = null;
+                    w.WriteStartElement("env"); // envelope
+
+                    statusString = $"0x{(M.CMD_PITCH_WHEEL_0xE0 + channel).ToString("X")}";
+                    w.WriteAttributeString("s", statusString);
+
+                    carryMsgs.PitchWheelState = WriteD1AndD2VTs(w, PitchWheelMsbs, PitchWheelMsbs, msDuration);
+
+                    w.WriteEndElement(); // end env
+                }
+
+                w.WriteEndElement(); // end envs
             }
-            if(ExpressionMsbs != null && ExpressionMsbs.Count > 0)
+        }
+
+        /// <summary>
+        /// If the ctlValues are null or empty,
+        /// returns a List of ctlValues containg the single defaultCtlState.
+        /// </summary>
+        /// <returns></returns>
+        private List<byte> GetDefault(List<byte> ctlValues, int defaultCtlState)
+        {
+            if(ctlValues == null || ctlValues.Count == 0)
             {
-                WriteCCEnv(w, channel, M.CTL_EXPRESSION_11, ExpressionMsbs, msDuration);
+                ctlValues = new List<byte>();
+                ctlValues.Add((byte)defaultCtlState);
             }
+            return ctlValues;
+        }
 
-            if(PitchWheelMsbs != null && PitchWheelMsbs.Count > 0)
+        private bool DoWriteControl(List<byte> ctlValues, byte currentCtlState)
+        {
+            if(ctlValues != null && ((ctlValues.Count == 1 && ctlValues[0] != currentCtlState) || ctlValues.Count > 1 ))
             {
-                string statusString = null;
-                w.WriteStartElement("env"); // envelope
-
-                statusString = $"0x{(M.CMD_PITCH_WHEEL_0xE0 + channel).ToString("X")}";
-                w.WriteAttributeString("s", statusString);
-
-                WriteD1AndD2VTs(w, PitchWheelMsbs, PitchWheelMsbs, msDuration);
-
-                w.WriteEndElement(); // end env
+                return true;
             }
-
-            w.WriteEndElement(); // end envs
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -64,46 +108,67 @@ namespace Moritz.Spec
         /// <param name="d1">The controller number</param>
         /// <param name="d2s">The controller values</param>
         /// <param name="msDuration">The total duration of the envelope</param>
-        private void WriteCCEnv(SvgWriter w, int channel, int d1, List<byte> d2s, int msDuration)
+        /// <returns>The last controller value</returns>
+        private byte WriteCCEnv(SvgWriter w, int channel, int d1, List<byte> d2s, int msDuration)
         {
             string statusString = $"0x{(M.CMD_CONTROL_CHANGE_0xB0 + channel).ToString("X")}"; ;
             w.WriteStartElement("env"); // envelope
             w.WriteAttributeString("s", statusString);
             w.WriteAttributeString("d1", d1.ToString());
-            WriteD2VTs(w, d2s, msDuration);
+            byte lastControllerValue = WriteD2VTs(w, d2s, msDuration);
             w.WriteEndElement(); // end env
+
+            return lastControllerValue;
         }
 
         /// <summary>
-        /// Moritz envelopes disribute the d2s over the whole msDuration,
+        /// Moritz envelopes distribute the d2s over the whole msDuration,
         /// With the first d2 at position 0, the last d2 at msduration - 1.
         /// </summary>
         /// <param name="d2s"></param>
         /// <param name="msDuration"></param>
-        private void WriteD2VTs(SvgWriter w, List<byte> d2s, int msDuration)
+        /// <returns>The last controller value</returns>
+        private byte WriteD2VTs(SvgWriter w, List<byte> d2s, int msDuration)
         {
+            byte lastControllerValue = 0; // will always be changed
             List<int> msDurs = GetMsDurs(d2s.Count, msDuration);
             for(int i = 0; i < msDurs.Count; ++i)
             {
+                Debug.Assert(msDurs[i] > 0, "Moritz never writes controller values that would have to be carried to the next moment.");
                 w.WriteStartElement("vt"); // envelope
                 w.WriteAttributeString("d2", d2s[i].ToString());
                 w.WriteAttributeString("msDur", msDurs[i].ToString());
                 w.WriteEndElement(); // end vt
+
+                lastControllerValue = d2s[i];
             }
+            return lastControllerValue;
         }
 
-        private void WriteD1AndD2VTs(SvgWriter w, List<byte> d1s, List<byte> d2s, int msDuration)
+        /// <summary>
+        /// Moritz envelopes distribute the d2s over the whole msDuration,
+        /// With the first d2 at position 0, the last d2 at msduration - 1.
+        /// This function writes both d1 and d2
+        /// </summary>
+        /// <returns>The last controller value</returns>
+        private byte WriteD1AndD2VTs(SvgWriter w, List<byte> d1s, List<byte> d2s, int msDuration)
         {
             Debug.Assert(d1s.Count == d2s.Count);
+            byte lastControllerValue = 0; // will always be changed
             List<int> msDurs = GetMsDurs(d1s.Count, msDuration);
             for(int i = 0; i < msDurs.Count; ++i)
             {
+                Debug.Assert(msDurs[i] > 0, "Moritz never writes controller values that would have to be carried to the next moment.");
                 w.WriteStartElement("vt"); // envelope
                 w.WriteAttributeString("d1", d1s[i].ToString());
                 w.WriteAttributeString("d2", d2s[i].ToString());
                 w.WriteAttributeString("msDur", msDurs[i].ToString());
                 w.WriteEndElement(); // end vt
+
+                lastControllerValue = d2s[i];
             }
+
+            return lastControllerValue;
         }
 
         private List<int> GetMsDurs(int count, int msDuration)

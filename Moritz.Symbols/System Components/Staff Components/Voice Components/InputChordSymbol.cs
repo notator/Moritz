@@ -100,7 +100,7 @@ namespace Moritz.Symbols
 
 			if(staffIsVisible)
 			{
-				w.WriteAttributeString("score", "alignmentX", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
+				w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
 			}
             w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
 

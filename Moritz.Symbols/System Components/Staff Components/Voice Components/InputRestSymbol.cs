@@ -29,7 +29,7 @@ namespace Moritz.Symbols
                 Debug.Assert(_msDuration > 0);
 				if(staffIsVisible)
 				{
-					w.WriteAttributeString("score", "alignmentX", null, ((Metrics.Left + Metrics.Right) / 2).ToString(M.En_USNumberFormat));
+					w.WriteAttributeString("score", "alignment", null, ((Metrics.Left + Metrics.Right) / 2).ToString(M.En_USNumberFormat));
 				}
                 w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
 

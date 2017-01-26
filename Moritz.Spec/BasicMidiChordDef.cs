@@ -114,25 +114,38 @@ namespace Moritz.Spec
                 carryMsgs.Clear();
             }
 
-            if(BankIndex != null || PatchIndex != null || PitchWheelDeviation != null)
+            if(carryMsgs.IsStartOfSwitches)
+            {
+                BankIndex = GetValue(BankIndex, 0);
+                PatchIndex = GetValue(PatchIndex, 0);
+                PitchWheelDeviation = GetValue(PitchWheelDeviation, 2);
+                carryMsgs.IsStartOfSwitches = false;
+            }
+
+            if((BankIndex != null && BankIndex != carryMsgs.BankState)
+            || (PatchIndex != null && PatchIndex != carryMsgs.PatchState)
+            || (PitchWheelDeviation != null && PitchWheelDeviation != carryMsgs.PitchWheelDeviationState))
             {
                 w.WriteStartElement("switches");
-                if(BankIndex != null)
+                if(BankIndex != null && BankIndex != carryMsgs.BankState)
                 {
                     MidiMsg msg = new MidiMsg(M.CMD_CONTROL_CHANGE_0xB0 + channel, M.CTL_BANK_CHANGE_0, BankIndex);
                     msg.WriteSVG(w);
+                    carryMsgs.BankState = (byte) BankIndex;
                 }
-                if(PatchIndex != null)
+                if(PatchIndex != null && PatchIndex != carryMsgs.PatchState)
                 {
                     MidiMsg msg = new MidiMsg(M.CMD_PATCH_CHANGE_0xC0 + channel, (int)PatchIndex, null);
                     msg.WriteSVG(w);
+                    carryMsgs.PatchState = (byte) PatchIndex;
                 }
-                if(PitchWheelDeviation != null)
+                if(PitchWheelDeviation != null && PitchWheelDeviation != carryMsgs.PitchWheelDeviationState)
                 {
                     MidiMsg msg1 = new MidiMsg(M.CMD_CONTROL_CHANGE_0xB0 + channel, M.CTL_REGISTEREDPARAMETER_COARSE_101, M.SELECT_PITCHBEND_RANGE_0);
                     msg1.WriteSVG(w);
                     MidiMsg msg2 = new MidiMsg(M.CMD_CONTROL_CHANGE_0xB0 + channel, M.CTL_DATAENTRY_COARSE_6, PitchWheelDeviation);
                     msg2.WriteSVG(w);
+                    carryMsgs.PitchWheelDeviationState = (byte) PitchWheelDeviation;
                 }
                 w.WriteEndElement(); // switches
             }
@@ -161,6 +174,18 @@ namespace Moritz.Spec
             }
 
             w.WriteEndElement(); // end of moment
+        }
+
+        /// <summary>
+        /// If value is null return defaultValue, otherwise return value.
+        /// </summary>
+        private byte? GetValue(byte? value, byte defaultValue)
+        {
+            if(value == null)
+            {
+                value = defaultValue;
+            }
+            return value;
         }
 
         /// <summary>

@@ -8,9 +8,9 @@ using Moritz.Globals;
 namespace Moritz.Spec
 {
     /// <summary>
-    /// A simple class that is the list of noteOffs to be carried from one moment to the next.
-    /// This class exists so that its WriteSVG(w) function can be called by both
-    /// BasicMidiChordDef and MidiRestDef. 
+    /// A simple class that carries the contoller states and a list of noteOffs from one moment to the next.
+    /// This class's WriteSVG(w) function is called by both BasicMidiChordDef and MidiRestDef.
+    /// There is one CarryMsgs object per channel.
     /// </summary>
     public class CarryMsgs
     {
@@ -18,6 +18,10 @@ namespace Moritz.Spec
         {
         }
 
+        /// <summary>
+        /// Writes NoteOff messages carried from a previous moment
+        /// </summary>
+        /// <param name="w"></param>
         internal void WriteSVG(XmlWriter w)
         {
             if(_msgs.Count > 0)
@@ -90,5 +94,29 @@ namespace Moritz.Spec
 
         public IReadOnlyList<MidiMsg> Msgs { get { return _msgs; } }
         private List<MidiMsg> _msgs = new List<MidiMsg>();
+
+        /// <summary>
+        /// These two are true for the first moment in the score, otherwise false.
+        /// </summary>
+        internal bool IsStartOfEnvs = true;
+        internal bool IsStartOfSwitches = true;
+
+        // If an algorithm does not set the bank and patch for each channel at
+        // the start of the score, they are both set to 0.
+        internal byte BankState = 255;
+        internal byte PatchState = 255;
+        // If an algorithm does not set the states of the following controllers
+        // at the start of the score, they are explicitly set to the followings values:
+        // (These are the states that should be set by AllControllersOff)
+        //     ModWheelState = 0;
+        //     ExpressionState = 127;
+        //     PanState = 64;
+        //     PitchWheelState = 64;
+        //     PitchWheelDeviationState = 2;
+        internal byte ModWheelState = 255;
+        internal byte ExpressionState = 255;
+        internal byte PanState = 255;
+        internal byte PitchWheelState = 255;
+        internal byte PitchWheelDeviationState = 255;
     }
 }
