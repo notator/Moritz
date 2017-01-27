@@ -24,11 +24,11 @@ namespace Moritz.Spec
             string mString = null;
             if(_data2 == null)
             {
-                mString = $"{_status.ToString("X")} {_data1.ToString()}";
+                mString = $"0x{_status.ToString("X")} {_data1.ToString()}";
             }
             else
             {
-                mString = $"{_status.ToString("X")} {_data1.ToString()} {_data2.ToString()}";
+                mString = $"0x{_status.ToString("X")} {_data1.ToString()} {_data2.ToString()}";
             }
             w.WriteStartElement("msg");
             w.WriteAttributeString("m", mString );
