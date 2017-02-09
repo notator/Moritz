@@ -27,8 +27,6 @@ namespace Moritz.Symbols
         public void WriteSVG(SvgWriter w, int systemNumber, PageFormat pageFormat, List<CarryMsgs> carryMsgsPerChannel)
         {
             w.SvgStartGroup("system");
-                                               
-            w.WriteAttributeString("score", "hasMidi", null, "true"); // this is a "system" container
 
             WriteLeftToRightElement(w);
 

@@ -20,7 +20,6 @@ namespace Moritz.Symbols
 		public override void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel)
         {
 			w.SvgStartGroup("outputVoice");
-            w.WriteAttributeString("score", "hasMidi", null, "true"); // this is a "voice" container
 
             base.WriteSVG(w, staffIsVisible, carryMsgsPerChannel);
             w.SvgEndGroup(); // outputVoice

@@ -143,7 +143,7 @@ namespace Moritz.Symbols
 				WriteFrameLayer(w, layerNumber++, "frame", _pageFormat.Right, _pageFormat.Bottom);
 			}
 
-			WriteScoreLayer(w, layerNumber++, "score", _pageNumber, metadata);
+			WriteSystemsLayer(w, layerNumber++, "score", _pageNumber, metadata);
 
 			WriteEmptyLayer(w, layerNumber++, "user annotations", true);
 			#endregion layers
@@ -195,11 +195,9 @@ namespace Moritz.Symbols
 			WritePageSizedLayer(w, layerNumber, layerName, width, height, style);
 		}
 
-		private void WriteScoreLayer(SvgWriter w, int layerNumber, string layerName, int pageNumber, Metadata metadata)
+		private void WriteSystemsLayer(SvgWriter w, int layerNumber, string layerName, int pageNumber, Metadata metadata)
 		{
-			w.WriteStartElement("g"); // start layer (for Inkscape)
-
-            w.WriteAttributeString("score", "hasMidi", null, "true"); // This <g> element is the "systems" container
+            w.SvgStartGroup("systems");
 
             WriteInkscapeLayerAttributes(w, layerNumber, layerName, true);
 
