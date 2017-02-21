@@ -753,8 +753,6 @@ namespace Moritz.Spec
                     }
                 }
             }
-
-            AssertVoiceDefConsistency();
         }
 
         /// <summary>
