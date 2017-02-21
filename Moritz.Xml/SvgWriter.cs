@@ -17,7 +17,7 @@ namespace Moritz.Xml
         #region WriteSVG primitives
         /// <summary>
         /// Starts an SVG "g" element. End the group with WriteEndGroup().
-        /// If the argument is not nullOrEmpty, is it written as the value of a score:class attribute.
+        /// If the argument is not nullOrEmpty, is it written as the value of a class attribute.
         /// </summary>
         /// <param name="type">Can be null or empty or a class attribute</param
         public void SvgStartGroup(string type)
@@ -26,7 +26,7 @@ namespace Moritz.Xml
 
             if(!String.IsNullOrEmpty(type))
             {
-                _w.WriteAttributeString("score", "class", null, type); // this is an "outputVoice" container
+                _w.WriteAttributeString("class", type);
             }
         }
 

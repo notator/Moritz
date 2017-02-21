@@ -290,7 +290,7 @@ namespace Moritz.Symbols
 		{
 			//w.WriteAttributeString("score", "staffName", null, this.Staffname);
 			w.WriteAttributeString("inkscape", "groupmode", null, "layer");
-			w.WriteAttributeString("class", "layer" + layerNumber.ToString());
+			w.WriteAttributeString("id", "layer" + layerNumber.ToString());
 			w.WriteAttributeString("inkscape", "label", null, layerName);
 			w.WriteAttributeString("style", "display:inline");
 			if(insensitive == true)
