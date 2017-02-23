@@ -132,17 +132,58 @@ namespace Moritz.Spec
         {
             byte lastControllerValue = 0; // will always be changed
             List<int> msDurs = GetMsDurs(d2s.Count, msDuration);
+            Tuple<List<int>, List<byte>> rval = Agglommerate(msDurs, d2s);
+            msDurs = rval.Item1;
+            List<byte> agglommeratedD2s = rval.Item2;
             for(int i = 0; i < msDurs.Count; ++i)
             {
                 Debug.Assert(msDurs[i] > 0, "Moritz never writes controller values that would have to be carried to the next moment.");
                 w.WriteStartElement("vt"); // envelope
-                w.WriteAttributeString("d2", d2s[i].ToString());
+                w.WriteAttributeString("d2", agglommeratedD2s[i].ToString());
                 w.WriteAttributeString("msDur", msDurs[i].ToString());
                 w.WriteEndElement(); // end vt
 
                 lastControllerValue = d2s[i];
             }
             return lastControllerValue;
+        }
+
+        private Tuple<List<int>, List<byte>> Agglommerate(List<int> msDurs, List<byte> d2s)
+        {
+            Debug.Assert(msDurs.Count == d2s.Count);
+
+            List<byte> rD2s = new List<byte>(d2s);
+
+            for(int i = rD2s.Count - 1; i > 0; --i)
+            {
+                if(rD2s[i] == rD2s[i-1])
+                {
+                    msDurs[i - 1] += msDurs[i];
+                    msDurs.RemoveAt(i);
+                    rD2s.RemoveAt(i);
+                }
+            }
+            return new Tuple<List<int>, List<byte>>(msDurs, rD2s);
+        }
+
+        private Tuple<List<int>, List<byte>, List<byte>> Agglommerate(List<int> msDurs, List<byte> d1s, List<byte> d2s)
+        {
+            Debug.Assert(msDurs.Count == d1s.Count && msDurs.Count == d2s.Count);
+
+            List<byte> rD1s = new List<byte>(d1s);
+            List<byte> rD2s = new List<byte>(d2s);
+
+            for(int i = rD1s.Count - 1; i > 0; --i)
+            {
+                if(rD1s[i] == rD1s[i - 1] && rD2s[i] == rD2s[i - 1])
+                {
+                    msDurs[i - 1] += msDurs[i];
+                    msDurs.RemoveAt(i);
+                    rD1s.RemoveAt(i);
+                    rD2s.RemoveAt(i);
+                }
+            }
+            return new Tuple<List<int>, List<byte>, List<byte>>(msDurs, rD1s, rD2s);
         }
 
         /// <summary>
@@ -156,12 +197,16 @@ namespace Moritz.Spec
             Debug.Assert(d1s.Count == d2s.Count);
             byte lastControllerValue = 0; // will always be changed
             List<int> msDurs = GetMsDurs(d1s.Count, msDuration);
+            Tuple<List<int>, List<byte>, List<byte>> rVals = Agglommerate(msDurs, d1s, d2s);
+            msDurs = rVals.Item1;
+            List<byte> rD1s = rVals.Item2;
+            List<byte> rD2s = rVals.Item3;
             for(int i = 0; i < msDurs.Count; ++i)
             {
                 Debug.Assert(msDurs[i] > 0, "Moritz never writes controller values that would have to be carried to the next moment.");
                 w.WriteStartElement("vt"); // envelope
-                w.WriteAttributeString("d1", d1s[i].ToString());
-                w.WriteAttributeString("d2", d2s[i].ToString());
+                w.WriteAttributeString("d1", rD1s[i].ToString());
+                w.WriteAttributeString("d2", rD2s[i].ToString());
                 w.WriteAttributeString("msDur", msDurs[i].ToString());
                 w.WriteEndElement(); // end vt
 
