@@ -32,7 +32,6 @@ namespace Moritz.Spec
         {
             w.WriteStartElement("trkRef");
 			w.WriteAttributeString("midiChannel", MidiChannel.ToString());
-			w.WriteAttributeString("msPosition", _trkMsPosition.ToString());
 			w.WriteAttributeString("nMidiObjects", _trkNumMidiObjects.ToString());
 			if(TrkOptions != null)
 			{
