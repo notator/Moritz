@@ -147,6 +147,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             InputVoiceDef ivd = new InputVoiceDef(0, 0, new List<IUniqueDef>());
             ivd.MsPositionReContainer = bar2Seq.AbsMsPosition;
 
+            int inputChordDefMsDurations = 0;
             foreach(Trk trk in bar2Seq.Trks)
             {
                 MidiChordDef firstMidiChordDef = null;
@@ -163,10 +164,18 @@ namespace Moritz.Algorithm.Study3Sketch2
                         inputNoteDefs.Add(new InputNoteDef((byte)65, noteOn, null));
                         InputChordDef icd = new InputChordDef(firstMidiChordDef.MsPositionReFirstUD, 1500, inputNoteDefs, M.Dynamic.none, null);
                         ivd.Add(icd);
+                        inputChordDefMsDurations += icd.MsDuration;
                         break;
                     }
                 }
             }
+            int finalRestMsDuration = bar2Seq.MsDuration - inputChordDefMsDurations;
+            if(finalRestMsDuration > 0)
+            {
+                InputRestDef iRestDef = new InputRestDef(ivd.MsDuration, finalRestMsDuration);
+                ivd.Add(iRestDef);
+            }
+            Debug.Assert(ivd.MsDuration == bar2Seq.MsDuration);
 
             return ivd;
         }
