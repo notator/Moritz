@@ -122,10 +122,10 @@ namespace Moritz.Algorithm.Study3Sketch2
                 else if(tmcd != null)
                 {
                     List<TrkRef> trkRefs = new List<TrkRef>();
-                    
+                    TrkOptions trkOptions = new TrkOptions(new TrkOffControl(TrkOffOption.stopChord));
                     foreach(Trk trk in bar1Seq.Trks)
                     {
-                        trkRefs.Add(new TrkRef((byte)trk.MidiChannel, bar1Seq.AbsMsPosition + tmcd.MsPositionReFirstUD, 1, null));
+                        trkRefs.Add(new TrkRef((byte)trk.MidiChannel, bar1Seq.AbsMsPosition + tmcd.MsPositionReFirstUD, 1, trkOptions));
                     }
                     SeqRef seqRef = new SeqRef(trkRefs, null);
                     NoteOn noteOn = new NoteOn(seqRef);
@@ -151,13 +151,14 @@ namespace Moritz.Algorithm.Study3Sketch2
             foreach(Trk trk in bar2Seq.Trks)
             {
                 MidiChordDef firstMidiChordDef = null;
+                TrkOptions trkOptions = new TrkOptions(new TrkOffControl(TrkOffOption.stopChord));
                 foreach(IUniqueDef iud in trk.UniqueDefs)
                 {
                     firstMidiChordDef = iud as MidiChordDef;
                     if(firstMidiChordDef != null)
                     {
                         List<TrkRef> trkRefs = new List<TrkRef>();
-                        trkRefs.Add(new TrkRef((byte)trk.MidiChannel, bar2Seq.AbsMsPosition + firstMidiChordDef.MsPositionReFirstUD, 12, null));
+                        trkRefs.Add(new TrkRef((byte)trk.MidiChannel, bar2Seq.AbsMsPosition + firstMidiChordDef.MsPositionReFirstUD, 12, trkOptions));
                         SeqRef seqRef = new SeqRef(trkRefs, null);
                         NoteOn noteOn = new NoteOn(seqRef);
                         List<InputNoteDef> inputNoteDefs = new List<InputNoteDef>();
