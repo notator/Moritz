@@ -128,27 +128,24 @@ namespace Moritz.Symbols
 
             WriteSvgHeader(w);
 
-			WriteSodipodiNamedview(w);
-
 			metadata.WriteSVG(w, _pageNumber, _score.PageCount, _pageFormat.AboutLinkURL, nOutputVoices, nInputVoices);
 
             _score.WriteDefs(w);
 
 			#region layers
 
-			int layerNumber = 1;
-
 			if(_pageNumber > 0)
 			{ 
-				WriteFrameLayer(w, layerNumber++, "frame", _pageFormat.Right, _pageFormat.Bottom);
+				WriteFrameLayer(w, _pageFormat.Right, _pageFormat.Bottom);
 			}
 
-			WriteSystemsLayer(w, layerNumber++, "score", _pageNumber, metadata);
+			WriteSystemsLayer(w, _pageNumber, metadata);
 
-			WriteEmptyLayer(w, layerNumber++, "user annotations", true);
-			#endregion layers
+            w.WriteString("<!-- Annotations can be added here. The AssistantPerformer only looks at the \"systems\" group. -->");
 
-			w.WriteEndElement(); // close the svg element
+            #endregion layers
+
+            w.WriteEndElement(); // close the svg element
             w.WriteEndDocument();
         }
 
@@ -172,34 +169,28 @@ namespace Moritz.Symbols
 			}
 		}
 
-
-		private void WritePageSizedLayer(SvgWriter w, int layerNumber, string layerName, float width, float height, string style)
-		{
-			w.WriteStartElement("g"); // start layer (for Inkscape)
-			WriteInkscapeLayerAttributes(w, layerNumber, layerName, true);
-
-			w.WriteStartElement("rect");
-			w.WriteAttributeString("x", "0");
-			w.WriteAttributeString("y", "0");
-			w.WriteAttributeString("width", width.ToString(M.En_USNumberFormat));
-			w.WriteAttributeString("height", height.ToString(M.En_USNumberFormat));
-			w.WriteAttributeString("style", style);
-
-			w.WriteEndElement(); // rect
-			w.WriteEndElement(); // end layer2 (for Inkscape)
-		}
-
-		private void WriteFrameLayer(SvgWriter w, int layerNumber, string layerName, float width, float height)
+		private void WriteFrameLayer(SvgWriter w, float width, float height)
 		{
 			string style = "stroke:black; stroke-width:4; fill:#ffffff";
-			WritePageSizedLayer(w, layerNumber, layerName, width, height, style);
-		}
 
-		private void WriteSystemsLayer(SvgWriter w, int layerNumber, string layerName, int pageNumber, Metadata metadata)
+            w.SvgStartGroup("frame");
+
+            w.WriteStartElement("rect");
+            w.WriteAttributeString("x", "0");
+            w.WriteAttributeString("y", "0");
+            w.WriteAttributeString("width", width.ToString(M.En_USNumberFormat));
+            w.WriteAttributeString("height", height.ToString(M.En_USNumberFormat));
+            w.WriteAttributeString("style", style);
+            w.WriteEndElement(); // rect
+
+            w.WriteEndElement(); // end layer
+        }
+
+		private void WriteSystemsLayer(SvgWriter w, int pageNumber, Metadata metadata)
 		{
             w.SvgStartGroup("systems");
 
-            WriteInkscapeLayerAttributes(w, layerNumber, layerName, true);
+            //w.WriteAttributeString("style", "display:inline");
 
 			w.SvgText("timeStamp", _infoTextInfo, 32, 80);
 
@@ -223,79 +214,45 @@ namespace Moritz.Symbols
 				system.WriteSVG(w, systemNumber++, _pageFormat, carryMsgsPerChannel);
 			}
 
-			w.WriteEndElement(); // end layer (for Inkscape)
-		}
-
-		private void WriteEmptyLayer(SvgWriter w, int layerNumber, string layerName, bool locked)
-		{
-			w.WriteStartElement("g"); // start layer (for Inkscape)
-			WriteInkscapeLayerAttributes(w, layerNumber, layerName, locked);
-			w.WriteEndElement(); // end layer (for Inkscape)
-		}
-
-		/// <summary>
-		/// The presence of this element means that Inkscape opens the file at full screen size
-		/// with level2, the annotations, selected.
-		/// </summary>
-		/// <param name="w"></param>
-		private void WriteSodipodiNamedview(SvgWriter w)
-		{
-			string scoreLayerID = "layer2";
-
-			w.WriteStartElement("sodipodi", "namedview", null);
-			w.WriteAttributeString("inkscape", "window-maximized", null, "1");
-			w.WriteAttributeString("inkscape", "current-layer", null, scoreLayerID);
-			w.WriteEndElement(); // ends the sodipodi:namedview element
+			w.WriteEndElement(); // end layer
 		}
 
         private void WriteSvgHeader(SvgWriter w)
         {
 			w.WriteAttributeString("xmlns", "http://www.w3.org/2000/svg");
-			w.WriteAttributeString("xmlns", "score", null, "http://www.james-ingram-act-two.de/open-source/svgScoreNamespace.html");
-			w.WriteAttributeString("xmlns", "dc", null, "http://purl.org/dc/elements/1.1/");
+            // I think the following is redundant...
+            //w.WriteAttributeString("xmlns", "svg", null, "http://www.w3.org/2000/svg");
+            // Deleted the following, since it is only advisory, and I think the latest version is 2. See deprecated xlink below.
+            //w.WriteAttributeString("version", "1.1");
+
+            // Namespaces used for standard metadata
+            w.WriteAttributeString("xmlns", "dc", null, "http://purl.org/dc/elements/1.1/");
 			w.WriteAttributeString("xmlns", "cc", null, "http://creativecommons.org/ns#");
 			w.WriteAttributeString("xmlns", "rdf", null, "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-			w.WriteAttributeString("xmlns", "svg", null, "http://www.w3.org/2000/svg");
 
-			w.WriteAttributeString("xmlns", "xlink", null, "http://www.w3.org/1999/xlink");
-			w.WriteAttributeString("xmlns", "sodipodi", null, "http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd");
-			w.WriteAttributeString("xmlns", "inkscape", null, "http://www.inkscape.org/namespaces/inkscape");
+            // Namespace used for linking to svg defs (defined objects)
+            // N.B.: xlink is deprecated in SVG 2 
+			// w.WriteAttributeString("xmlns", "xlink", null, "http://www.w3.org/1999/xlink");
 
-            w.WriteAttributeString("version", "1.1");
+            // Standard definition of the "score" namespace.
+            // The file documents the additional attributes and elements available in the "score" namespace.
+            w.WriteAttributeString("xmlns", "score", null, "http://www.james-ingram-act-two.de/open-source/svgScoreNamespace.html");
 
-            // The following data-scoreType attribute has been included because I think that all files that could be used as
-            // input for client applications should document their structure with this (standardized) svg attribute.
-            // The value happens here to be the same as for the "score" namespace above, but that is not necessarily so.
-            // The value is not checked by the Assistant Performer, because I know that the AP only plays scores that I give it.
-            // However, theoretically, anyone could write an app that uses this file, and they would need to be told the format
-            // in this standardized attribute. 
-            w.WriteAttributeString("data-scoreType", null, "http://www.james-ingram-act-two.de/open-source/svgScoreNamespace.html");
+            // The file defines and documents all the element classes used in this particular scoreType.
+            // The definitions include information as to how the classes nest, and the directions in which they are read.
+            // For example:
+            // 1) in cmn_core files, systems are read from top to bottom on a page, and contain
+            //    staves that are read in parallel, left to right.
+            // 2) cmn_1950.html files might include elements having class="tupletBracket", but
+            //    cmn_core files don't. As with the score namespace, the file does not actually
+            //    need to be read by the client code in order to discover the scoreType. 
+            w.WriteAttributeString("data-scoreType", null, "http://www.james-ingram-act-two.de/open-source/cmn_core.html");
 
             w.WriteAttributeString("width", _pageFormat.ScreenRight.ToString()); // the intended screen display size (100%)
             w.WriteAttributeString("height", _pageFormat.ScreenBottom.ToString()); // the intended screen display size (100%)
             string viewBox = "0 0 " + _pageFormat.RightVBPX.ToString() + " " + _pageFormat.BottomVBPX.ToString();
             w.WriteAttributeString("viewBox", viewBox); // the size of SVG's internal drawing surface (800%)            
         }
-
-		/// <summary>
-		/// writes the following attributes:
-		///			inkscape:groupmode="layer"
-		///			id="layer1"
-		///			inkscape:label="moritz"
-		///			style="display:inline"
-		///			sodipodi:insensitive="true"
-		/// </summary>
-		/// <param name="w"></param>
-		private void WriteInkscapeLayerAttributes(SvgWriter w, int layerNumber, String layerName, bool insensitive )
-		{
-			//w.WriteAttributeString("score", "staffName", null, this.Staffname);
-			w.WriteAttributeString("inkscape", "groupmode", null, "layer");
-			w.WriteAttributeString("id", "layer" + layerNumber.ToString());
-			w.WriteAttributeString("inkscape", "label", null, layerName);
-			w.WriteAttributeString("style", "display:inline");
-			if(insensitive == true)
-				w.WriteAttributeString("sodipodi", "insensitive", null, "true");
-		}
 
 		/// <summary>
 		/// Adds the link, main title and the author to the first page.

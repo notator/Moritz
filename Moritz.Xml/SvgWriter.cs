@@ -19,14 +19,14 @@ namespace Moritz.Xml
         /// Starts an SVG "g" element. End the group with WriteEndGroup().
         /// If the argument is not nullOrEmpty, is it written as the value of a class attribute.
         /// </summary>
-        /// <param name="type">Can be null or empty or a class attribute</param
-        public void SvgStartGroup(string type)
+        /// <param name="className">Can be null or empty or a class attribute</param
+        public void SvgStartGroup(string className)
         {
             _w.WriteStartElement("g");
 
-            if(!String.IsNullOrEmpty(type))
+            if(!String.IsNullOrEmpty(className))
             {
-                _w.WriteAttributeString("class", type);
+                _w.WriteAttributeString("class", className);
             }
         }
 
