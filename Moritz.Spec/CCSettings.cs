@@ -138,7 +138,7 @@ namespace Moritz.Spec
 						// maximum speed is when durations = durations / speedDeviation
 						// minimum speed is when durations = durations * speedDeviation 
 						Debug.Assert(_speedDeviationOption != null && _speedDeviationOption >= 1);
-						w.WriteAttributeString("speedDeviation", ((float)_speedDeviationOption).ToString(M.En_USNumberFormat));
+						w.WriteAttributeString("speedDeviation", M.FloatToShortString((float)_speedDeviationOption));
 						break;
 				}
 			}

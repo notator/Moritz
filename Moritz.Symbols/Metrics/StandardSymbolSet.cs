@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using Moritz.Midi;
 using Moritz.Xml;
 using Moritz.Spec;
+using Moritz.Globals;
+using System;
 
 namespace Moritz.Symbols
 {
@@ -20,244 +22,166 @@ namespace Moritz.Symbols
         /// Writes this score's SVG defs element
         /// </summary>
         /// <param name="w"></param>
-        public override void WriteSymbolDefinitions(SvgWriter w)
+        public override void WriteSymbolDefinitions(SvgWriter w, float musicFontHeight, float cautionaryMusicFontHeight)
         {
-            WriteTrebleClefSymbolDef(w);
-            WriteTrebleClef8SymbolDef(w);
-            WriteTrebleClefMulti8SymbolDef(w, 2);
-            WriteTrebleClefMulti8SymbolDef(w, 3);
-            WriteBassClefSymbolDef(w);
-            WriteBassClef8SymbolDef(w);
-            WriteBassClefMulti8SymbolDef(w, 2);
-            WriteBassClefMulti8SymbolDef(w, 3);
+            WriteTrebleClefSymbolDef(w, "trebleClef", musicFontHeight);
+            WriteTrebleClefSymbolDef(w, "cautionaryTrebleClef", cautionaryMusicFontHeight);
+            WriteTrebleClef8SymbolDef(w, "trebleClef8", musicFontHeight);
+            WriteTrebleClef8SymbolDef(w, "cautionaryTrebleClef8", cautionaryMusicFontHeight);
+            WriteTrebleClefMulti8SymbolDef(w, 2, "trebleClef2x8", musicFontHeight);
+            WriteTrebleClefMulti8SymbolDef(w, 2, "cautionaryTrebleClef2x8", cautionaryMusicFontHeight);
+            WriteTrebleClefMulti8SymbolDef(w, 3, "trebleClef3x8", musicFontHeight);
+            WriteTrebleClefMulti8SymbolDef(w, 3, "cautionaryTrebleClef3x8", cautionaryMusicFontHeight);
+
+            WriteBassClefSymbolDef(w, "bassClef", musicFontHeight);
+            WriteBassClefSymbolDef(w, "cautionaryBassClef", cautionaryMusicFontHeight);
+            WriteBassClef8SymbolDef(w, "bassClef8", musicFontHeight);
+            WriteBassClef8SymbolDef(w, "cautionaryBassClef8", cautionaryMusicFontHeight);
+            WriteBassClefMulti8SymbolDef(w, 2, "bassClef2x8", musicFontHeight);
+            WriteBassClefMulti8SymbolDef(w, 2, "cautionaryBassClef2x8", cautionaryMusicFontHeight);
+            WriteBassClefMulti8SymbolDef(w, 3, "bassClef3x8", musicFontHeight);
+            WriteBassClefMulti8SymbolDef(w, 3, "cautionaryBassClef3x8", cautionaryMusicFontHeight);
+
             for(int i = 1; i < 6; i++)
             {
-                WriteRightFlagBlock(w, i);
-                WriteLeftFlagBlock(w, i);
+                WriteRightFlagBlock(w, i, musicFontHeight);
+                WriteLeftFlagBlock(w, i, musicFontHeight);
             }
         }
         #region symbol definitions
-        /// <summary>
-        /// [g id="trebleClef"]
-        ///   [text x="0" y="0" font-size="1px" font-family="CLicht"] &amp; [/text]
-        /// [/g]
-        /// </summary>
-        private void WriteTrebleClefSymbolDef(SvgWriter svgw)
-        {
-            svgw.WriteStartElement("g");
-            svgw.WriteAttributeString("id", "trebleClef");
-            svgw.WriteStartElement("text");
-            svgw.WriteAttributeString("x", "0");
-            svgw.WriteAttributeString("y", "0");
-            svgw.WriteAttributeString("font-size", "1px");
-            svgw.WriteAttributeString("font-family", "CLicht");
-            svgw.WriteString("&");
-            svgw.WriteEndElement(); // text
-            svgw.WriteEndElement(); // g
-        }
-        /// <summary>
-        /// [g id="trebleClef8"]
-        ///   [text x="0" y="0" font-size="1px" font-family="CLicht"] &amp; [/text]
-        ///   [text x="0.28" y="-1.17" font-size="0.66667px" font-family="CLicht"]•[/text]
-        /// [/g]
-        /// </summary>
-        private void WriteTrebleClef8SymbolDef(SvgWriter svgw)
-        {
-            svgw.WriteStartElement("g");
-            svgw.WriteAttributeString("id", "trebleClef8");
-            svgw.WriteStartElement("text");
-            svgw.WriteAttributeString("x", "0");
-            svgw.WriteAttributeString("y", "0");
-            svgw.WriteAttributeString("font-size", "1px");
-            svgw.WriteAttributeString("font-family", "CLicht");
-            svgw.WriteString("&");
-            svgw.WriteEndElement(); // text
-            svgw.WriteStartElement("text");
-            svgw.WriteAttributeString("x", "0.28");
-            svgw.WriteAttributeString("y", "-1.17");
-            svgw.WriteAttributeString("font-size", "0.67px");
-            svgw.WriteAttributeString("font-family", "CLicht");
-            svgw.WriteString("•");
-            svgw.WriteEndElement(); // text
-            svgw.WriteEndElement(); // g
-        }
-        /// <summary>
-		/// (the actual numbers have changed -- see function below)
-        /// [g id="trebleClef2x8"]
-        ///     [text x="0" y="0" font-size="1px" font-family="CLicht"]&amp;[/text]
-        ///     [text x="0.037" y="-1.17" font-size="0.67px" font-family="CLicht"]™[/text]
-        ///     [text x="0.252" y="-1.17" font-size="0.4px" font-family="Arial"]x[/text]
-        ///     [text x="0.441" y="-1.17" font-size="0.67px" font-family="CLicht"]•[/text]
-        /// [/g]
-        /// and
-		/// [g id="trebleClef3x8"]
-        ///     [text x="0" y="0" font-size="1px" font-family="CLicht"]&amp;[/text]
-        ///     [text x="0.037" y="-1.17" font-size="0.67px" font-family="CLicht"]£[/text]
-        ///     [text x="0.252" y="-1.17" font-size="0.4px" font-family="Arial"]x[/text]
-        ///     [text x="0.441" y="-1.17" font-size="0.67px" font-family="CLicht"]•[/text]
-        /// [/g]
-        /// </summary>
-        private void WriteTrebleClefMulti8SymbolDef(SvgWriter svgw, int octaveShift)
-        {
-            svgw.WriteStartElement("g");
-            svgw.WriteAttributeString("id", "trebleClef" + octaveShift.ToString() + "x8");
 
-            svgw.WriteStartElement("text");
-            svgw.WriteAttributeString("x", "0");
-            svgw.WriteAttributeString("y", "0");
-            svgw.WriteAttributeString("font-size", "1px");
-            svgw.WriteAttributeString("font-family", "CLicht");
-            svgw.WriteString("&");
-            svgw.WriteEndElement(); // text
-
-            svgw.WriteStartElement("text");
-            svgw.WriteAttributeString("x", "0.036");
-            svgw.WriteAttributeString("y", "-1.17");
-            svgw.WriteAttributeString("font-size", "0.67px");
-            svgw.WriteAttributeString("font-family", "CLicht");
+        #region clefs
+        #region helper functions
+        private void WriteClefText(SvgWriter w, string clefChar, float fontHeight)
+        {
+            w.WriteStartElement("text");
+            w.WriteAttributeString("x", "0");
+            w.WriteAttributeString("y", "0");
+            w.WriteAttributeString("font-family", "CLicht");
+            //w.WriteAttributeString("font-size", M.FloatToAttributeString(fontHeight) + "px");
+            w.WriteAttributeString("font-size", M.FloatToShortString(fontHeight));
+            w.WriteString(clefChar);
+            w.WriteEndElement(); // text
+        }
+        private void WriteNumberText(SvgWriter w, int octaveShift, float x1px, float y1px, float fontHeight)
+        {
+            w.WriteStartElement("text");
+            w.WriteAttributeString("x", M.FloatToShortString(x1px * fontHeight));
+            w.WriteAttributeString("y", M.FloatToShortString(y1px * fontHeight));
+            w.WriteAttributeString("font-size", M.FloatToShortString(0.67F * fontHeight));
+            w.WriteAttributeString("font-family", "CLicht");
             switch(octaveShift)
             {
                 case 2:
-                    svgw.WriteString("™");
+                    w.WriteString("™");
                     break;
                 case 3:
-                    svgw.WriteString("£");
+                    w.WriteString("£");
                     break;
             }
-            svgw.WriteEndElement(); // text
-
-            svgw.WriteStartElement("text");
-            svgw.WriteAttributeString("x", "0.252");
-            svgw.WriteAttributeString("y", "-1.17");
-            svgw.WriteAttributeString("font-size", "0.4px");
-            svgw.WriteAttributeString("font-family", "Arial");
-            svgw.WriteString("x");
-            svgw.WriteEndElement(); // text
-
-            svgw.WriteStartElement("text");
-            svgw.WriteAttributeString("x", "0.48");
-            svgw.WriteAttributeString("y", "-1.17");
-            svgw.WriteAttributeString("font-size", "0.67px");
-            svgw.WriteAttributeString("font-family", "CLicht");
-            svgw.WriteString("•");
-            svgw.WriteEndElement(); // text
-
-            svgw.WriteEndElement(); // g
+            w.WriteEndElement(); // text
         }
-        /// <summary>
-        /// [g id="bassClef"]
-        ///   [text x="0" y="0" font-size="1px" font-family="CLicht"]?[/text]
-        /// [/g]
-        /// </summary>
-        private void WriteBassClefSymbolDef(SvgWriter svgw)
+        private void WriteXText(SvgWriter w, float x1p, float y1p, float fontHeight)
         {
-            svgw.WriteStartElement("g");
-            svgw.WriteAttributeString("id", "bassClef");
-            svgw.WriteStartElement("text");
-            svgw.WriteAttributeString("x", "0");
-            svgw.WriteAttributeString("y", "0");
-            svgw.WriteAttributeString("font-size", "1px");
-            svgw.WriteAttributeString("font-family", "CLicht");
-            svgw.WriteString("?");
-            svgw.WriteEndElement(); // text
-            svgw.WriteEndElement(); // g
+            w.WriteStartElement("text");
+            w.WriteAttributeString("x", M.FloatToShortString(x1p * fontHeight));
+            w.WriteAttributeString("y", M.FloatToShortString(y1p * fontHeight));
+            w.WriteAttributeString("font-size", M.FloatToShortString(0.4F * fontHeight));
+            w.WriteAttributeString("font-family", "Arial");
+            w.WriteString("x");
+            w.WriteEndElement(); // text
         }
-        /// <summary>
-        /// [g id="bassClef8"]
-        ///    [text x="0" y="0" font-size="1px" font-family="CLicht"]?[/text]
-        ///    [text x="0.16" y="1.1" font-size="0.67px" font-family="CLicht"]•[/text]
-        /// [/g]
-        /// </summary>
-        private void WriteBassClef8SymbolDef(SvgWriter svgw)
+        private void Write8Text(SvgWriter w, float x1px, float y1px, float fontHeight)
         {
-            svgw.WriteStartElement("g");
-            svgw.WriteAttributeString("id", "bassClef8");
-            svgw.WriteStartElement("text");
-            svgw.WriteAttributeString("x", "0");
-            svgw.WriteAttributeString("y", "0");
-            svgw.WriteAttributeString("font-size", "1px");
-            svgw.WriteAttributeString("font-family", "CLicht");
-            svgw.WriteString("?");
-            svgw.WriteEndElement(); // text
-            svgw.WriteStartElement("text");
-            svgw.WriteAttributeString("x", "0.16");
-            svgw.WriteAttributeString("y", "1.1");
-            svgw.WriteAttributeString("font-size", "0.67px");
-            svgw.WriteAttributeString("font-family", "CLicht");
-            svgw.WriteString("•");
-            svgw.WriteEndElement(); // text
-            svgw.WriteEndElement(); // g
+            w.WriteStartElement("text");
+            w.WriteAttributeString("x", M.FloatToShortString(x1px * fontHeight));
+            w.WriteAttributeString("y", M.FloatToShortString(y1px * fontHeight));
+            w.WriteAttributeString("font-size", M.FloatToShortString(0.67F * fontHeight));
+            w.WriteAttributeString("font-family", "CLicht");
+            w.WriteString("•");
+            w.WriteEndElement(); // text
         }
-        /// <summary>
-		/// (The actual numbers have changed -- see function below.)
-        /// [g id="bassClef2x8"]
-        ///     [text x="0" y="0" font-size="1px" font-family="CLicht"]?[/text]
-        ///     [text x="0" y="1.1" font-size="0.67px" font-family="CLicht"]™[/text]
-        ///     [text x="0.215" y="1.1" font-size="0.4px" font-family="Arial"]x[/text]
-        ///     [text x="0.404" y="1.1" font-size="0.67px" font-family="CLicht"]•[/text]
-        /// [/g]
-        /// and
-        /// [g id="bassClef3x8"]
-        ///     [text x="0" y="0" font-size="1px" font-family="CLicht"]?[/text]
-        ///     [text x="0" y="1.1" font-size="0.67px" font-family="CLicht"]£[/text]
-        ///     [text x="0.194" y="1.1" font-size="0.4px" font-family="Arial"]x[/text]
-        ///     [text x="0.383" y="1.1" font-size="0.67px" font-family="CLicht"]•[/text]
-        /// [/g]
-        /// </summary>
-        private void WriteBassClefMulti8SymbolDef(SvgWriter svgw, int octaveShift)
+        #endregion
+        private void WriteTrebleClefSymbolDef(SvgWriter w, string ID, float fontHeight)
         {
-            svgw.WriteStartElement("g");
-            svgw.WriteAttributeString("id", "bassClef" + octaveShift.ToString() + "x8");
+            w.WriteStartElement("g");
+            w.WriteAttributeString("id", ID);
+            WriteClefText(w, "&", fontHeight);
+            w.WriteEndElement(); // g
+        }
+        private void WriteTrebleClef8SymbolDef(SvgWriter w, string ID, float fontHeight)
+        {
+            w.WriteStartElement("g");
+            w.WriteAttributeString("id", ID);
+            WriteClefText(w, "&", fontHeight);
+            Write8Text(w, 0.28F, -1.17F, fontHeight);
+            w.WriteEndElement(); // g
+        }
+        private void WriteTrebleClefMulti8SymbolDef(SvgWriter w, int octaveShift, string ID, float fontHeight)
+        {
+            w.WriteStartElement("g");
+            w.WriteAttributeString("id", ID);
 
-            svgw.WriteStartElement("text");
-            svgw.WriteAttributeString("x", "0");
-            svgw.WriteAttributeString("y", "0");
-            svgw.WriteAttributeString("font-size", "1px");
-            svgw.WriteAttributeString("font-family", "CLicht");
-            svgw.WriteString("?");
-            svgw.WriteEndElement(); // text
+            WriteClefText(w, "&", fontHeight);
+            WriteNumberText(w, octaveShift, 0.036F, -1.17F, fontHeight);
+            WriteXText(w, 0.252F, -1.17F, fontHeight);
+            Write8Text(w, 0.48F, -1.17F, fontHeight);
 
-            svgw.WriteStartElement("text");
-            svgw.WriteAttributeString("x", "0");
-            svgw.WriteAttributeString("y", "1.1");
-            svgw.WriteAttributeString("font-size", "0.67px");
-            svgw.WriteAttributeString("font-family", "CLicht");
-            switch(octaveShift)
+            w.WriteEndElement(); // g
+        }
+
+        private void WriteBassClefSymbolDef(SvgWriter w, string ID, float fontHeight)
+        {
+            w.WriteStartElement("g");
+            w.WriteAttributeString("id", ID);
+            WriteClefText(w, "?", fontHeight);
+            w.WriteEndElement(); // g
+        }
+        private void WriteBassClef8SymbolDef(SvgWriter w, string ID, float fontHeight)
+        {
+            w.WriteStartElement("g");
+            w.WriteAttributeString("id", ID);
+            WriteClefText(w, "?", fontHeight);
+            if(ID.Contains("cautionary"))
             {
-                case 2:
-                    svgw.WriteString("™");
-                    break;
-                case 3:
-                    svgw.WriteString("£");
-                    break;
+                Write8Text(w, 0.16F, 1.35F, fontHeight);
             }
-            svgw.WriteEndElement(); // text
-
-            svgw.WriteStartElement("text");
-            svgw.WriteAttributeString("x", "0.215");
-            svgw.WriteAttributeString("y", "1.1");
-            svgw.WriteAttributeString("font-size", "0.4px");
-            svgw.WriteAttributeString("font-family", "Arial");
-            svgw.WriteString("x");
-            svgw.WriteEndElement(); // text
-
-            svgw.WriteStartElement("text");
-            svgw.WriteAttributeString("x", "0.435");
-            svgw.WriteAttributeString("y", "1.1");
-            svgw.WriteAttributeString("font-size", "0.67px");
-            svgw.WriteAttributeString("font-family", "CLicht");
-            svgw.WriteString("•");
-            svgw.WriteEndElement(); // text
-
-            svgw.WriteEndElement(); // g
+            else
+            {
+                Write8Text(w, 0.16F, 1.1F, fontHeight);
+            }
+            w.WriteEndElement(); // g
         }
-        private void WriteRightFlagBlock(SvgWriter svgw, int nFlags)
+        private void WriteBassClefMulti8SymbolDef(SvgWriter w, int octaveShift, string ID, float fontHeight)
         {
-            svgw.WriteFlagBlock(nFlags, true);
+            w.WriteStartElement("g");
+            w.WriteAttributeString("id", ID);
+
+            WriteClefText(w, "?", fontHeight);
+            if(ID.Contains("cautionary"))
+            {
+                WriteNumberText(w, octaveShift, 0F, 1.35F, fontHeight);
+                WriteXText(w, 0.215F, 1.35F, fontHeight);
+                Write8Text(w, 0.435F, 1.35F, fontHeight);
+            }
+            else
+            {
+                WriteNumberText(w, octaveShift, 0F, 1.1F, fontHeight);
+                WriteXText(w, 0.215F, 1.1F, fontHeight);
+                Write8Text(w, 0.435F, 1.1F, fontHeight);
+            }
+
+            w.WriteEndElement(); // g
         }
-        private void WriteLeftFlagBlock(SvgWriter svgw, int nFlags)
+        #endregion
+
+        private void WriteRightFlagBlock(SvgWriter w, int nFlags, float fontHeight)
         {
-            svgw.WriteFlagBlock(nFlags, false);
+            w.WriteFlagBlock(nFlags, true, fontHeight);
+        }
+        private void WriteLeftFlagBlock(SvgWriter w, int nFlags, float fontHeight)
+        {
+            w.WriteFlagBlock(nFlags, false, fontHeight);
         }
         #endregion symbol definitions
 
@@ -313,7 +237,7 @@ namespace Moritz.Symbols
             ClefDef clefDef = iud as ClefDef;
 
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
-            float cautionaryFontHeight = pageFormat.CautionaryNoteheadsFontHeight;
+            float cautionaryFontHeight = pageFormat.CautionaryMusicFontHeight;
             int minimumCrotchetDuration = pageFormat.MinimumCrotchetDuration;
  
             if(cautionaryChordDef != null && firstDefInVoice)

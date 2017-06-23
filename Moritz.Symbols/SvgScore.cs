@@ -96,8 +96,8 @@ namespace Moritz.Symbols
                     w.WriteAttributeString("src", svgPagename);
                     w.WriteAttributeString("content-type", "image/svg+xml");
                     w.WriteAttributeString("class", "svgPage");
-                    w.WriteAttributeString("width", _pageFormat.ScreenRight.ToString());
-                    w.WriteAttributeString("height", _pageFormat.ScreenBottom.ToString());
+                    w.WriteAttributeString("width", M.FloatToShortString(_pageFormat.ScreenRight));
+                    w.WriteAttributeString("height", M.FloatToShortString(_pageFormat.ScreenBottom));
                     w.WriteEndElement();
                     w.WriteStartElement("br");
                     w.WriteEndElement();
@@ -170,15 +170,15 @@ namespace Moritz.Symbols
         {
             Debug.Assert(Notator != null);
 			w.SvgStartDefs(null);
-			WriteFontDefs(w);
-			Notator.SymbolSet.WriteSymbolDefinitions(w);
+			WriteStyle(w);
+			Notator.SymbolSet.WriteSymbolDefinitions(w, _pageFormat.MusicFontHeight, _pageFormat.CautionaryMusicFontHeight);
 			w.SvgEndDefs(); // end of defs
 		}
 
-		private void WriteFontDefs(SvgWriter w)
+		private void WriteStyle(SvgWriter w)
 		{
-			string fontDefs =
-			@"
+            string fontDefs =
+            @"
 			@font-face
 			{
 				font-family: 'CLicht';
@@ -212,17 +212,263 @@ namespace Moritz.Symbols
 				font-style: normal;
 			}
 		";
+            StringBuilder css = GetStyles(_pageFormat);
+            
 
-			w.WriteStartElement("style");
+            w.WriteStartElement("style");
 			w.WriteAttributeString("type", "text/css");
-			w.WriteString(fontDefs);
-			w.WriteEndElement();
+            w.WriteString(fontDefs);
+            w.WriteString(css.ToString());
+            w.WriteEndElement();
 		}
 
-		#endregion save multi-page score
+        private StringBuilder GetStyles(PageFormat pageFormat)
+        {
+            string timeStampFontSize = "72";
+            // FloatToAttributeString returns a string of minimum length with maximum 4 decimal places and a '.' decimal point.
+            string page1TitleHeight = M.FloatToShortString(pageFormat.Page1TitleHeight);
+            string page1AuthorHeight = M.FloatToShortString(pageFormat.Page1AuthorHeight);
+            string staffNameFontHeight = M.FloatToShortString(pageFormat.StaffNameFontHeight);
+            string musicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight);
+            string cautionaryMusicFontHeight = M.FloatToShortString(pageFormat.CautionaryMusicFontHeight);
 
-		#region save single svg score
-		public void SaveSingleSVGScore()
+            string ornamentFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * 0.55F);
+            string dynamicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * 0.75F);
+            string barNumberNumberFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * 0.51F);
+            string stafflineStemStrokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth);
+            string barlineStrokeWidth = M.FloatToShortString(pageFormat.BarlineStrokeWidth);
+            string thickEndBarlineStrokeWidth = M.FloatToShortString(pageFormat.BarlineStrokeWidth * 2);           
+            string noteheadExtenderStrokeWidth = M.FloatToShortString(pageFormat.NoteheadExtenderStrokeWidth);
+            string barNumberFrameStrokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth * 1.2F);
+
+            StringBuilder rval = new StringBuilder();
+            #region timeStamp, staffName (Arial)
+            StringBuilder fontFamilyArial = new StringBuilder(
+            @"
+            .timeStamp, .staffName, .barNumberNumber
+            {
+                font-family:Arial
+            }");
+            rval.Append(fontFamilyArial);
+
+            StringBuilder timeStamp = new StringBuilder(
+            $@"
+            .timeStamp
+            {{
+                font-size:{timeStampFontSize}px;
+            }}");
+            rval.Append(timeStamp);
+
+            StringBuilder textAnchorMiddle = new StringBuilder(
+            $@"
+            .staffName, .barNumberNumber
+            {{
+                text-anchor:middle;
+            }}");
+            rval.Append(textAnchorMiddle);
+
+
+            StringBuilder staffName = new StringBuilder(
+            $@"
+            .staffName
+            {{
+                font-size:{staffNameFontHeight}px;
+            }}");
+            rval.Append(staffName);
+
+            StringBuilder barNumberNumber = new StringBuilder(
+            $@"
+            .barNumberNumber
+            {{
+                font-size:{barNumberNumberFontHeight}px;
+            }}");
+            rval.Append(barNumberNumber);
+
+            #endregion
+
+            #region main title, author (Open Sans)
+            StringBuilder fontFamilyOpenSans = new StringBuilder(
+            @"
+            .mainTitle, .author
+            {
+                font-family:""Open Sans""
+            }");
+            rval.Append(fontFamilyOpenSans);
+
+            StringBuilder mainTitle = new StringBuilder(
+            $@"
+            .mainTitle
+            {{
+                text-anchor:middle;
+                font-size:{page1TitleHeight}px;
+            }}");
+            rval.Append(mainTitle);
+
+            StringBuilder author = new StringBuilder(
+            $@"
+            .author
+            {{
+                text-anchor:end;
+                font-size:{page1AuthorHeight}px;
+            }}");
+            rval.Append(author);
+            #endregion
+
+            #region music (CLicht)            
+            StringBuilder fontFamilyCLicht = new StringBuilder(
+            @"
+            .notehead, .accidental, .dynamic, .clefDef, .clefDefAuxNumber
+            {
+                font-family:CLicht
+            }");
+            rval.Append(fontFamilyCLicht);
+
+            StringBuilder fontSizeMusic = new StringBuilder(
+            $@"
+            .notehead, .accidental
+            {{
+                font-size:{musicFontHeight}px;
+            }}");
+            rval.Append(fontSizeMusic);
+
+            StringBuilder fontSizeDynamic = new StringBuilder(
+            $@"
+            .dynamic
+            {{
+                font-size:{dynamicFontHeight}px;
+            }}");
+            rval.Append(fontSizeDynamic);
+
+            StringBuilder fontSizeCautionaryMusic = new StringBuilder(
+            $@"
+            .cautionaryNotehead, .cautionaryAccidental
+            {{
+                font-size:{cautionaryMusicFontHeight}px;
+            }}");
+            rval.Append(fontSizeCautionaryMusic);
+
+            #endregion
+
+            #region Open Sans Condensed (ornament)
+
+            StringBuilder fontFamilyOpenSansCondensed = new StringBuilder(
+            $@"
+            .ornament
+            {{
+                font-family:""Open Sans Condensed"";
+                font-size:{ornamentFontHeight}px;
+                text-anchor:middle;
+
+            }}");
+            rval.Append(fontFamilyOpenSansCondensed);
+            #endregion
+
+            #region lines and paths
+
+            StringBuilder blackStroke = new StringBuilder(
+            @"
+            .staffline, .ledgerline, .stem, .noteExtender,
+            .barline, .staffConnector, .endBarlineLeft, .endBarlineLeftConnector, .endBarlineRight, .endBarlineRightConnector,
+            .cautionaryBracket, .beam, .barNumberFrame, .frame 
+            {
+                stroke:black
+            }");
+            rval.Append(blackStroke);
+
+            StringBuilder strokeWidthStafflineStem = new StringBuilder(
+            $@"
+            .staffline, .ledgerline, .stem, .beam, .cautionaryBracket, .frame
+            {{
+                stroke-width:{stafflineStemStrokeWidth}px;
+            }}");
+            rval.Append(strokeWidthStafflineStem);
+
+            StringBuilder barlineStaffConnectorStrokeWidth = new StringBuilder(
+            $@"
+            .barline, .staffConnector, .endBarlineLeft, .endBarlineLeftConnector
+            {{
+                stroke-width:{barlineStrokeWidth}px;
+            }}");
+            rval.Append(barlineStaffConnectorStrokeWidth);
+
+            StringBuilder endBarlineRightStrokeWidth = new StringBuilder(
+            $@"
+            .endBarlineRight, .endBarlineRightConnector
+            {{
+                stroke-width:{thickEndBarlineStrokeWidth}px;
+            }}");
+            rval.Append(endBarlineRightStrokeWidth);
+
+            StringBuilder noteExtender = new StringBuilder(
+            $@"
+            .noteExtender
+            {{
+                stroke-width:{noteheadExtenderStrokeWidth}px;
+            }}");
+            rval.Append(noteExtender);
+
+            StringBuilder barNumberFrame = new StringBuilder(
+            $@"
+            .barNumberFrame
+            {{
+                stroke-width:{barNumberFrameStrokeWidth}px;
+            }}");
+            rval.Append(barNumberFrame);
+
+            StringBuilder linecapRound = new StringBuilder(
+            @"
+            .stem
+            {
+                stroke-linecap:round
+            }");
+            rval.Append(linecapRound);
+
+            StringBuilder fillBlack = new StringBuilder(
+            $@"
+            .beam
+            {{
+                fill:black
+            }}");
+            rval.Append(fillBlack);
+
+            StringBuilder fillWhite = new StringBuilder(
+            $@"
+            .frame
+            {{
+                fill:white
+            }}");
+            rval.Append(fillWhite);
+
+            StringBuilder fillNone = new StringBuilder(
+            $@"
+            .cautionaryBracket, .barNumberFrame
+            {{
+                fill:none
+            }}");
+            rval.Append(fillNone);
+
+            StringBuilder beamBackground = new StringBuilder(
+            @"
+            .opaqueBeam
+            {
+                stroke:none;
+                fill:white;
+                opacity:0.65
+            }");
+            rval.Append(beamBackground);
+            #endregion
+
+            // newline at end of CSS
+            rval.Append(@"
+            ");
+
+            return rval;
+        }
+
+        #endregion save multi-page score
+
+        #region save single svg score
+        public void SaveSingleSVGScore()
 		{
 			string pageFilename = Path.GetFileNameWithoutExtension(FilePath) + " (scroll).svg";
 			string pagePath = Path.GetDirectoryName(FilePath) + @"\" + pageFilename;

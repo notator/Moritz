@@ -12,7 +12,7 @@ namespace Moritz.Symbols
         {
         }
 
-        public abstract void WriteSymbolDefinitions(SvgWriter w);
+        public abstract void WriteSymbolDefinitions(SvgWriter w, float musicFontHeight, float cautionaryMusicFontHeight);
         public abstract Metrics NoteObjectMetrics(Graphics graphics, NoteObject noteObject, VerticalDir voiceStemDirection, float gap, float storkeWidth);
         public abstract NoteObject GetNoteObject(Voice voice, int absMsPosition, IUniqueDef iud, bool firstLmddInVoice,
             ref byte currentVelocity, float musicFontHeight);

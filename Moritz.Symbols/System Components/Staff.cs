@@ -40,9 +40,7 @@ namespace Moritz.Symbols
                 float stafflineY = this.Metrics.StafflinesTop;
                 for(int staffLineIndex = 0; staffLineIndex < NumberOfStafflines; staffLineIndex++)
                 {
-					w.SvgLine(null, this.Metrics.StafflinesLeft, stafflineY,
-                                    this.Metrics.StafflinesRight, stafflineY,
-                                    "black", StafflineStemStrokeWidth, null);
+					w.SvgLine("staffline", this.Metrics.StafflinesLeft, stafflineY, this.Metrics.StafflinesRight, stafflineY);
 
                     if(staffLineIndex < (NumberOfStafflines - 1))
                         stafflineY += Gap;

@@ -996,24 +996,24 @@ namespace Krystals4ObjectLibrary
                 w.WriteString(K.GetStringOfUnsignedInts(_value));
                 w.WriteEndElement(); // value
                 w.WriteStartElement("from");
-                w.WriteAttributeString("angle", K.FloatToString(_fromAngle));
-                w.WriteAttributeString("radius", K.FloatToString(_fromRadius));
+                w.WriteAttributeString("angle", K.FloatToAttributeString(_fromAngle));
+                w.WriteAttributeString("radius", K.FloatToAttributeString(_fromRadius));
                 w.WriteEndElement(); // from
                 w.WriteStartElement("to");
-                w.WriteAttributeString("angle", K.FloatToString(_toAngle));
-                w.WriteAttributeString("radius", K.FloatToString(_toRadius));
+                w.WriteAttributeString("angle", K.FloatToAttributeString(_toAngle));
+                w.WriteAttributeString("radius", K.FloatToAttributeString(_toRadius));
                 w.WriteEndElement(); // to
                 if(_rotateAngle != 0f)
                 {
                     w.WriteStartElement("rotate");
-                    w.WriteAttributeString("angle", K.FloatToString(_rotateAngle));
+                    w.WriteAttributeString("angle", K.FloatToAttributeString(_rotateAngle));
                     w.WriteEndElement(); // rotate
                 }
                 if(_translateAngle != 0f || _translateRadius != 0f)
                 {
                     w.WriteStartElement("translate");
-                    w.WriteAttributeString("radius", K.FloatToString(_translateRadius));
-                    w.WriteAttributeString("angle", K.FloatToString(_translateAngle));
+                    w.WriteAttributeString("radius", K.FloatToAttributeString(_translateRadius));
+                    w.WriteAttributeString("angle", K.FloatToAttributeString(_translateAngle));
                     w.WriteEndElement(); // translate               
                 }
                 w.WriteEndElement(); // pointGroup

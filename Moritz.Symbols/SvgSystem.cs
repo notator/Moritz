@@ -6,6 +6,7 @@ using System.Windows.Forms;
 
 using Moritz.Xml;
 using Moritz.Spec;
+using Moritz.Globals;
 
 namespace Moritz.Symbols
 {
@@ -47,8 +48,8 @@ namespace Moritz.Symbols
         private void WriteLeftToRightElement(SvgWriter w)
         {
             w.WriteStartElement("score", "leftToRight", null);
-            w.WriteAttributeString("systemTop", this.Metrics.NotesTop.ToString());
-            w.WriteAttributeString("systemBottom", this.Metrics.NotesBottom.ToString());
+            w.WriteAttributeString("systemTop", M.FloatToShortString(this.Metrics.NotesTop));
+            w.WriteAttributeString("systemBottom", M.FloatToShortString(this.Metrics.NotesBottom));
             w.WriteEndElement(); // leftToRight
         }
 

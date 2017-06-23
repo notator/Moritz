@@ -43,6 +43,17 @@ namespace Moritz.Globals
         public static List<string> Clefs = new List<string>() { "t", "t1", "t2", "t3", "b", "b1", "b2", "b3", "n" };
 
         /// <summary>
+        /// Converts the value to a string, using as few decimal places as possible (maximum 4) and a '.' decimal point where necessary.
+        /// Use this whenever writing an attribute to SVG.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string FloatToShortString(float value)
+        {
+            return value.ToString("0.####", En_USNumberFormat);
+        }
+
+        /// <summary>
         /// Returns the names of all scores which have a .mkss file in
         /// the folders below the baseFolderPath(without the .mkss extension).
         /// </summary>

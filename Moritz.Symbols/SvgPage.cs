@@ -141,7 +141,7 @@ namespace Moritz.Symbols
 
 			WriteSystemsLayer(w, _pageNumber, metadata);
 
-            w.WriteString("<!-- Annotations can be added here. The AssistantPerformer only looks at the \"systems\" group. -->");
+            w.WriteComment(@" Annotations that are added here will be ignored by the AssistantPerformer. ");
 
             #endregion layers
 
@@ -171,19 +171,7 @@ namespace Moritz.Symbols
 
 		private void WriteFrameLayer(SvgWriter w, float width, float height)
 		{
-			string style = "stroke:black; stroke-width:4; fill:#ffffff";
-
-            w.SvgStartGroup("frame");
-
-            w.WriteStartElement("rect");
-            w.WriteAttributeString("x", "0");
-            w.WriteAttributeString("y", "0");
-            w.WriteAttributeString("width", width.ToString(M.En_USNumberFormat));
-            w.WriteAttributeString("height", height.ToString(M.En_USNumberFormat));
-            w.WriteAttributeString("style", style);
-            w.WriteEndElement(); // rect
-
-            w.WriteEndElement(); // end layer
+            w.SvgRect("frame", 0, 0, width, height);
         }
 
 		private void WriteSystemsLayer(SvgWriter w, int pageNumber, Metadata metadata)
@@ -248,14 +236,14 @@ namespace Moritz.Symbols
             //    need to be read by the client code in order to discover the scoreType. 
             w.WriteAttributeString("data-scoreType", null, "http://www.james-ingram-act-two.de/open-source/cmn_core.html");
 
-            w.WriteAttributeString("width", _pageFormat.ScreenRight.ToString()); // the intended screen display size (100%)
-            w.WriteAttributeString("height", _pageFormat.ScreenBottom.ToString()); // the intended screen display size (100%)
+            w.WriteAttributeString("width", M.FloatToShortString(_pageFormat.ScreenRight)); // the intended screen display size (100%)
+            w.WriteAttributeString("height", M.FloatToShortString(_pageFormat.ScreenBottom)); // the intended screen display size (100%)
             string viewBox = "0 0 " + _pageFormat.RightVBPX.ToString() + " " + _pageFormat.BottomVBPX.ToString();
             w.WriteAttributeString("viewBox", viewBox); // the size of SVG's internal drawing surface (800%)            
         }
 
 		/// <summary>
-		/// Adds the link, main title and the author to the first page.
+		/// Adds the main title and the author to the first page.
 		/// </summary>
 		protected void WritePage1TitleAndAuthor(SvgWriter w, Metadata metadata)
 		{

@@ -104,7 +104,7 @@ namespace Moritz.Symbols
         /// the normal font size on staves having Gap sized spaces (after experimenting with cLicht). 
         /// </summary>
         public float MusicFontHeight { get { return (Gap * 4) * 0.98F; } }
-        public float CautionaryNoteheadsFontHeight { get { return MusicFontHeight * 0.8F; } }
+        public float CautionaryMusicFontHeight { get { return MusicFontHeight * 0.8F; } }
         public float InputStavesSizeFactor { get { return 1.5F; } }
         public float BarlineStrokeWidth { get { return StafflineStemStrokeWidth * 2F; } }
         public float NoteheadExtenderStrokeWidth { get { return StafflineStemStrokeWidth * 3.4F; } }

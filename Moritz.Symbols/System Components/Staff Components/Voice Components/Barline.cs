@@ -55,22 +55,20 @@ namespace Moritz.Symbols
 			string barlineType;
             if(BarlineType == BarlineType.end)
             {
-				barlineType = isConnector ? null : "endBarlineLeft";
+				barlineType = isConnector ? "endBarlineLeftConnector" : "endBarlineLeft";
 				w.SvgLine(barlineType,
 					this.Metrics.OriginX - (singleBarlineStrokeWidth * 3F), topY,
-					this.Metrics.OriginX - (singleBarlineStrokeWidth * 3F), bottomY,
-                    "black", singleBarlineStrokeWidth, null);
+					this.Metrics.OriginX - (singleBarlineStrokeWidth * 3F), bottomY);
 
-				barlineType = isConnector ? null : "endBarlineRight";
+				barlineType = isConnector ? "endBarlineRightConnector" : "endBarlineRight";
 				w.SvgLine(barlineType,
                     this.Metrics.OriginX, topY,
-                    this.Metrics.OriginX, bottomY,
-                    "black", singleBarlineStrokeWidth * 2F, null);
+                    this.Metrics.OriginX, bottomY);
             }
             else
             {
-				barlineType = isConnector ? null : "barline";
-				w.SvgLine(barlineType, this.Metrics.OriginX, topY, this.Metrics.OriginX, bottomY, "black", singleBarlineStrokeWidth, null);
+				barlineType = isConnector ? "staffConnector" : "barline";
+				w.SvgLine(barlineType, this.Metrics.OriginX, topY, this.Metrics.OriginX, bottomY);
             }
         }
 

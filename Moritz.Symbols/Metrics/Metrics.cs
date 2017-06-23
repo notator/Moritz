@@ -236,7 +236,7 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-			w.SvgLine(null, _originX, _top, _originX, _bottom, "black", StrokeWidth, "round");
+			w.SvgLine("stem", _originX, _top, _originX, _bottom);
 		}
 
 		public object Clone()
@@ -289,7 +289,7 @@ namespace Moritz.Symbols
 		{
 			foreach(float y in Ys)
 			{
-				w.SvgLine(null, _left + _strokeWidth, y, _right - _strokeWidth, y, "black", _strokeWidth, null);
+				w.SvgLine("ledgerline", _left + _strokeWidth, y, _right - _strokeWidth, y);
 			}
 		}
 
@@ -317,7 +317,7 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-			w.SvgCautionaryBracket(null, _isLeftBracket, _top, _right, _bottom, _left, _strokeWidth);
+			w.SvgCautionaryBracket(_isLeftBracket, _top, _right, _bottom, _left);
 		}
 
 		private readonly bool _isLeftBracket;
@@ -372,7 +372,7 @@ namespace Moritz.Symbols
 		public override void WriteSVG(SvgWriter w)
 		{
 			if(_drawExtender)
-				w.SvgLine(null, _left, _originY, _right, _originY, _colorAttribute, _strokeWidth, "butt");
+				w.SvgLine("noteExtender", _left, _originY, _right, _originY);
 		}
 
         public string ColorAttribute { get { return _colorAttribute; } }
@@ -451,9 +451,9 @@ namespace Moritz.Symbols
 		public override void WriteSVG(SvgWriter w)
 		{
 			if(_stemDirection == VerticalDir.up)
-				w.SvgUseXY(null, _objectType, _left, _top, _fontHeight);
+				w.SvgUseXY("flag", _objectType, _left, _top, _fontHeight);
 			else
-				w.SvgUseXY(null, _objectType, _left, _bottom, _fontHeight);
+				w.SvgUseXY("flag", _objectType, _left, _bottom, _fontHeight);
 		}
 
 		private readonly float _fontHeight;
@@ -690,8 +690,8 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-			base.WriteSVG(w, "number");
-			w.SvgRect(null, _left, _top, _right - _left, _bottom - _top, "black", _strokeWidth, "none");
+			base.WriteSVG(w, "barNumberNumber");
+			w.SvgRect("barNumberFrame", _left, _top, _right - _left, _bottom - _top);
 		}
 
 		float _strokeWidth = 0;
@@ -766,9 +766,9 @@ namespace Moritz.Symbols
 		public override void WriteSVG(SvgWriter w)
 		{
 			w.WriteStartElement("text");
-            w.WriteAttributeString("x", _originX.ToString(M.En_USNumberFormat));
-            w.WriteAttributeString("y", _originY.ToString(M.En_USNumberFormat));
-			w.WriteAttributeString("font-size", _fontHeight.ToString(M.En_USNumberFormat));
+            w.WriteAttributeString("x", M.FloatToShortString(_originX));
+            w.WriteAttributeString("y", M.FloatToShortString(_originY));
+			w.WriteAttributeString("font-size", M.FloatToShortString(_fontHeight));
 			w.WriteAttributeString("font-family", "CLicht");
             if(! string.IsNullOrEmpty(_colorAttribute))
             {

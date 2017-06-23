@@ -978,9 +978,9 @@ namespace Moritz.Symbols
                 _lowerLedgerlineBlockMetrics.WriteSVG(w);
             }
             if(_ornamentMetrics != null)
-                _ornamentMetrics.WriteSVG(w);
+                _ornamentMetrics.WriteSVG(w, "ornament");
             if(_lyricMetrics != null)
-                _lyricMetrics.WriteSVG(w);
+                _lyricMetrics.WriteSVG(w, "lyric");
             if(_dynamicMetrics != null)
                 _dynamicMetrics.WriteSVG(w);
             if(_cautionaryBracketsMetrics != null)

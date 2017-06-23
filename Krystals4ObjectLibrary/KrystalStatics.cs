@@ -682,9 +682,9 @@ namespace Krystals4ObjectLibrary
         /// </summary>
         /// <param name="number"></param>
         /// <returns></returns>
-        public static string FloatToString(float number)
+        public static string FloatToAttributeString(float floatValue)
         {
-            return Convert.ToString(number, _numberFormat);
+            return floatValue.ToString("0.###", _numberFormat);
         }
         /// <summary>
         /// Convert a string to a float using the static en-US number format.
