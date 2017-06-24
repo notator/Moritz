@@ -319,7 +319,7 @@ namespace Moritz.Xml
         /// <param name="type">Can be null or empty or an id String</param>
         /// <param name="y">This element's y-coordinate.</param>
         /// <param name="objectToUse">(Do not include the leading '#'. It will be inserted automatically.)</param>
-        public void SvgUseXY(string type, string objectToUse, float x, float y, float fontSize)
+        public void SvgUseXY(string type, string objectToUse, float x, float y)
         {
             _w.WriteStartElement("use");
             if(!String.IsNullOrEmpty(type))

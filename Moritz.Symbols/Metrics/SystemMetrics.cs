@@ -4,7 +4,7 @@ namespace Moritz.Symbols
     internal class SystemMetrics : GroupMetrics
     {
         public SystemMetrics()
-            : base("system")
+            : base()
         {
 
         }
@@ -57,7 +57,7 @@ namespace Moritz.Symbols
     internal class StaffMetrics : GroupMetrics
     {
         public StaffMetrics(float left, float right, float height)
-            : base("staff")
+            : base()
         {
             _top = 0F;
             _right = right;

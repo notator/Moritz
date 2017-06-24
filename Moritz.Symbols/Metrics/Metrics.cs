@@ -12,17 +12,7 @@ namespace Moritz.Symbols
 	public abstract class Metrics
 	{
 		protected Metrics()
-			: this(null, 0F, 0F)
 		{
-		}
-
-		protected Metrics(string type, float originX, float originY)
-		{
-			if(!String.IsNullOrEmpty(type))
-				_objectType = type;
-
-			_originX = originX;
-			_originY = originY;
 		}
 
 		public virtual void Move(float dx, float dy)
@@ -74,11 +64,12 @@ namespace Moritz.Symbols
 			if(verticalOverlap && previousMetrics.Right > Left)
 			{
 				overlap = previousMetrics.Right - this.Left;
-				if(this._objectType == "b" || this._objectType == "n")
+                AccidentalMetrics aMetrics = this as AccidentalMetrics;
+                if(aMetrics != null && (aMetrics.CharacterString == "b" || aMetrics.CharacterString == "n"))
 				{
-					overlap -= ((this.Right - this.Left) * 0.15F);
-					overlap = overlap > 0F ? overlap : 0F;
-				}
+                    overlap -= ((this.Right - this.Left) * 0.15F);
+                    overlap = overlap > 0F ? overlap : 0F;
+                }
 			}
 
 			if(!verticalOverlap && this is RestMetrics && this.OriginX <= previousMetrics.Right)
@@ -184,11 +175,6 @@ namespace Moritz.Symbols
 		protected float _left = 0F;
 
 		/// <summary>
-		/// The object's unicode value or type (used when writing cLicht characters to the SVG file).
-		/// </summary>
-		public string ID_Type { get { return _objectType; } }
-		protected string _objectType = null;
-		/// <summary>
 		/// The actual position of the object's x-origin in the score.
 		/// This is the value written into the SvgScore.
 		/// </summary>
@@ -252,7 +238,6 @@ namespace Moritz.Symbols
 		public LedgerlineBlockMetrics(float left, float right, float strokeWidth)
 			: base()
 		{
-			_objectType = "ledgerlineBlock";
 			_left = left;
 			_right = right;
 			_strokeWidth = strokeWidth;
@@ -287,10 +272,13 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-			foreach(float y in Ys)
+            w.WriteStartElement("g");
+            w.WriteAttributeString("class", "ledgerlines");
+            foreach(float y in Ys)
 			{
 				w.SvgLine("ledgerline", _left + _strokeWidth, y, _right - _strokeWidth, y);
 			}
+            w.WriteEndElement();
 		}
 
 		private List<float> Ys = new List<float>();
@@ -301,7 +289,6 @@ namespace Moritz.Symbols
 		public CautionaryBracketMetrics(bool isLeftBracket, float top, float right, float bottom, float left, float strokeWidth)
 			: base()
 		{
-			_objectType = "cautionaryBracket";
 			_isLeftBracket = isLeftBracket;
 			_top = top;
 			_left = left;
@@ -380,7 +367,109 @@ namespace Moritz.Symbols
 		private readonly float _strokeWidth = 0F;
 		private readonly bool _drawExtender;
 	}
-	internal class FlagsBlockMetrics : Metrics
+    internal class BarlineMetrics : Metrics
+    {
+        public BarlineMetrics(Graphics graphics, Barline barline, float gap)
+            : base()
+        {
+            if(barline.BarlineType == BarlineType.end)
+                _left = -gap * 1.7F;
+            else
+                _left = -gap * 0.5F;
+            _originX = 0F;
+            _right = gap / 2F;
+
+            if(graphics != null && barline != null)
+            {
+                foreach(DrawObject drawObject in barline.DrawObjects)
+                {
+                    Text text = drawObject as Text;
+                    if(text != null)
+                    {
+                        Debug.Assert(text.TextInfo != null
+                        && (text is StaffNameText || text is FramedBarNumberText));
+
+                        if(text is StaffNameText)
+                        {
+                            _staffNameMetrics = new TextMetrics(graphics, text.TextInfo);
+                            // move the staffname vertically to the middle of this staff
+                            Staff staff = barline.Voice.Staff;
+                            float staffheight = staff.Gap * (staff.NumberOfStafflines - 1);
+                            float dy = (staffheight * 0.5F) + (gap * 0.8F);
+                            _staffNameMetrics.Move(0F, dy);
+                        }
+                        else if(text is FramedBarNumberText)
+                        {
+                            _barnumberMetrics = new BarnumberMetrics(graphics, text.TextInfo, text.FrameInfo);
+                            //_barnumberMetrics = new TextMetrics(graphics, null, text.TextInfo);
+                            // move the bar number above this barline
+                            float deltaY = (gap * 6F);
+                            _barnumberMetrics.Move(0F, -deltaY);
+                        }
+                    }
+                }
+            }
+        }
+
+        public override void Move(float dx, float dy)
+        {
+            base.Move(dx, dy);
+            if(_staffControlsGroupMetrics != null)
+                _staffControlsGroupMetrics.Move(dx, dy);
+            if(_barnumberMetrics != null)
+                _barnumberMetrics.Move(dx, dy);
+            if(_staffNameMetrics != null)
+                _staffNameMetrics.Move(dx, dy);
+        }
+
+        /// <summary>
+        /// Only writes the Barline's barnumber to the SVG file.
+        /// The barline itself is drawn when the system is complete.
+        /// </summary>
+        public override void WriteSVG(SvgWriter w)
+        {
+            if(_staffNameMetrics != null)
+            {
+                _staffNameMetrics.WriteSVG(w, "staffName");
+            }
+            if(_barnumberMetrics != null)
+            {
+                w.WriteStartElement("g");
+                w.WriteAttributeString("class", "barNumber");
+                _barnumberMetrics.WriteSVG(w); // writes the number and the frame
+                w.WriteEndElement(); // barnumber group
+            }
+        }
+
+        private GroupMetrics _staffControlsGroupMetrics = null;
+        public BarnumberMetrics BarnumberMetrics { get { return _barnumberMetrics; } }
+        private BarnumberMetrics _barnumberMetrics = null;
+        public TextMetrics StaffNameMetrics { get { return _staffNameMetrics; } }
+        private TextMetrics _staffNameMetrics = null;
+    }
+
+    /// <summary>
+    /// For objects that are defined in the SVG defs, and then "use"d.
+    /// </summary>
+    internal class MetricsForUse : Metrics
+    {
+        protected MetricsForUse()
+            : base()
+        {
+        }
+
+        public override void WriteSVG(SvgWriter w)
+        {
+            throw new NotImplementedException("MetricsForUse.WriteSVG(w) should never be called."); 
+        }
+
+        /// <summary>
+        /// The id of the object to Use (defined in the SVG [defs] element.
+        /// </summary>
+        public string UseID { get { return _useID; } }
+        protected string _useID = null;
+    }
+    internal class FlagsBlockMetrics : MetricsForUse
 	{
 		/// <summary>
 		/// Should be called with a duration class having a flag block
@@ -400,36 +489,36 @@ namespace Moritz.Symbols
 			{
 				case DurationClass.quaver:
 					if(_stemDirection == VerticalDir.up)
-						_objectType = "Right1Flag";
+						_useID = "Right1Flag";
 					else
-						_objectType = "Left1Flag";
+						_useID = "Left1Flag";
 					break;
 				case DurationClass.semiquaver:
 					if(_stemDirection == VerticalDir.up)
-						_objectType = "Right2Flags";
+						_useID = "Right2Flags";
 					else
-						_objectType = "Left2Flags";
+						_useID = "Left2Flags";
 					offset = 0.25F;
 					break;
 				case DurationClass.threeFlags:
 					if(_stemDirection == VerticalDir.up)
-						_objectType = "Right3Flags";
+						_useID = "Right3Flags";
 					else
-						_objectType = "Left3Flags";
+						_useID = "Left3Flags";
 					offset = 0.5F;
 					break;
 				case DurationClass.fourFlags:
 					if(_stemDirection == VerticalDir.up)
-						_objectType = "Right4Flags";
+						_useID = "Right4Flags";
 					else
-						_objectType = "Left4Flags";
+						_useID = "Left4Flags";
 					offset = 0.75F;
 					break;
 				case DurationClass.fiveFlags:
 					if(_stemDirection == VerticalDir.up)
-						_objectType = "Right5Flags";
+						_useID = "Right5Flags";
 					else
-						_objectType = "Left5Flags";
+						_useID = "Left5Flags";
 					offset = 1F;
 					break;
 				default:
@@ -451,101 +540,226 @@ namespace Moritz.Symbols
 		public override void WriteSVG(SvgWriter w)
 		{
 			if(_stemDirection == VerticalDir.up)
-				w.SvgUseXY("flag", _objectType, _left, _top, _fontHeight);
+				w.SvgUseXY("flag", _useID, _left, _top);
 			else
-				w.SvgUseXY("flag", _objectType, _left, _bottom, _fontHeight);
+				w.SvgUseXY("flag", _useID, _left, _bottom);
 		}
 
 		private readonly float _fontHeight;
 		private readonly VerticalDir _stemDirection;
 
 	}
-	internal class BarlineMetrics : Metrics
-	{
-		public BarlineMetrics(Graphics graphics, Barline barline, float gap)
-			: base()
-		{
-			_objectType = "barline";
-			if(barline.BarlineType == BarlineType.end)
-				_left = -gap * 1.7F;
-			else
-				_left = -gap * 0.5F;
-			_originX = 0F;
-			_right = gap / 2F;
+    internal class ClefMetrics : MetricsForUse // defined objects in SVG
+    {
+        public ClefMetrics(Clef clef, float gap)
+            : base()
+        {
+            float trebleTop = -4.35F * gap;
+            float trebleRight = 3.1F * gap;
+            float highTrebleTop = -5.9F * gap;
+            float trebleBottom = 2.7F * gap;
+            #region treble clefs
+            switch(clef.ClefType)
+            {
+                case "t":
+                    _useID = "trebleClef";
+                    _top = trebleTop;
+                    _right = trebleRight;
+                    _bottom = trebleBottom;
+                    break;
+                case "t1": // trebleClef8
+                    _useID = "trebleClef8";
+                    _top = highTrebleTop;
+                    _right = trebleRight;
+                    _bottom = trebleBottom;
+                    break;
+                case "t2": // trebleClef2x8
+                    _useID = "trebleClef2x8";
+                    _top = highTrebleTop;
+                    _right = trebleRight;
+                    _bottom = trebleBottom;
+                    break;
+                case "t3": // trebleClef3x8
+                    _useID = "trebleClef3x8";
+                    _top = highTrebleTop;
+                    _right = trebleRight;
+                    _bottom = trebleBottom;
+                    break;
+                default: // can be a bass clef ( see below)
+                    break;
+            }
 
-			if(graphics != null && barline != null)
-			{
-				foreach(DrawObject drawObject in barline.DrawObjects)
-				{
-					Text text = drawObject as Text;
-					if(text != null)
-					{
-						Debug.Assert(text.TextInfo != null
-						&& (text is StaffNameText || text is FramedBarNumberText));
+            if(_right > 0F)
+            {
+                Move(0F, 3 * gap);
+            }
+            #endregion treble clefs
 
-						if(text is StaffNameText)
-						{
-							_staffNameMetrics = new TextMetrics(graphics, null, text.TextInfo);
-							// move the staffname vertically to the middle of this staff
-							Staff staff = barline.Voice.Staff;
-							float staffheight = staff.Gap * (staff.NumberOfStafflines - 1);
-							float dy = (staffheight * 0.5F) + (gap * 0.8F);
-							_staffNameMetrics.Move(0F, dy);
-						}
-						else if(text is FramedBarNumberText)
-						{
-							_barnumberMetrics = new BarnumberMetrics(graphics, null, text.TextInfo, text.FrameInfo);
-							//_barnumberMetrics = new TextMetrics(graphics, null, text.TextInfo);
-							// move the bar number above this barline
-							float deltaY = (gap * 6F);
-							_barnumberMetrics.Move(0F, -deltaY);
-						}
-					}
-				}
-			}
-		}
+            if(!(_right > 0F))
+            {
+                float bassTop = -gap;
+                float bassRight = trebleRight;
+                float bassBottom = gap * 3F;
+                float lowBassBottom = gap * 4.5F;
+                #region bass clefs
+                switch(clef.ClefType)
+                {
+                    case "b":
+                        _useID = "bassClef";
+                        _top = bassTop;
+                        _right = bassRight;
+                        _bottom = bassBottom;
+                        break;
+                    case "b1": // bassClef8
+                        _useID = "bassClef8";
+                        _top = bassTop;
+                        _right = bassRight;
+                        _bottom = lowBassBottom;
+                        break;
+                    case "b2": // bassClef2x8
+                        _useID = "bassClef2x8";
+                        _top = bassTop;
+                        _right = bassRight;
+                        _bottom = lowBassBottom;
+                        break;
+                    case "b3": // bassClef3x8
+                        _useID = "bassClef3x8";
+                        _top = bassTop;
+                        _right = bassRight;
+                        _bottom = lowBassBottom;
+                        break;
+                    default:
+                        Debug.Assert(false, "Unknown clef type.");
+                        break;
+                }
+                if(_right > 0F)
+                {
+                    Move(0, gap);
+                }
 
-		public override void Move(float dx, float dy)
-		{
-			base.Move(dx, dy);
-			if(_staffControlsGroupMetrics != null)
-				_staffControlsGroupMetrics.Move(dx, dy);
-			if(_barnumberMetrics != null)
-				_barnumberMetrics.Move(dx, dy);
-			if(_staffNameMetrics != null)
-				_staffNameMetrics.Move(dx, dy);
-		}
+            }
+            #endregion
 
-		/// <summary>
-		/// Only writes the Barline's barnumber to the SVG file.
-		/// The barline itself is drawn when the system is complete.
-		/// </summary>
-		public override void WriteSVG(SvgWriter w)
-		{
-			if(_staffNameMetrics != null)
-			{
-				_staffNameMetrics.WriteSVG(w, "staffName");
-			}
-			if(_barnumberMetrics != null)
-			{
-				w.WriteStartElement("g");
-				w.WriteAttributeString("class", "barNumber");
-				_barnumberMetrics.WriteSVG(w); // writes the number and the frame
-				w.WriteEndElement(); // barnumber group
-			}
-		}
+            FontHeight = clef.FontHeight;
 
-		private GroupMetrics _staffControlsGroupMetrics = null;
-		public BarnumberMetrics BarnumberMetrics { get { return _barnumberMetrics; } }
-		private BarnumberMetrics _barnumberMetrics = null;
-		public TextMetrics StaffNameMetrics { get { return _staffNameMetrics; } }
-		private TextMetrics _staffNameMetrics = null;
-	}
+        }
+
+        public override void WriteSVG(SvgWriter w)
+        {
+            w.SvgUseXY("clef", _useID, _originX, _originY);
+        }
+
+        public readonly float FontHeight;
+    }
+    internal class SmallClefMetrics : MetricsForUse
+    {
+        public SmallClefMetrics(Clef clef, float gap)
+            : base()
+        {
+            float trebleTop = -4.35F * gap;
+            //float trebleRight = 3.1F * gap; // ordinary clefs
+            float trebleRight = 3.5F * gap; // cautionary clefs have proportionally more empty space on the right.
+            float highTrebleTop = -5.9F * gap;
+            float trebleBottom = 2.7F * gap;
+            #region treble clefs
+            switch(clef.ClefType)
+            {
+                case "t":
+                    _useID = "cautionaryTrebleClef";
+                    _top = trebleTop;
+                    _right = trebleRight;
+                    _bottom = trebleBottom;
+                    break;
+                case "t1": // trebleClef8
+                    _useID = "cautionaryTrebleClef8";
+                    _top = highTrebleTop;
+                    _right = trebleRight;
+                    _bottom = trebleBottom;
+                    break;
+                case "t2": // trebleClef2x8
+                    _useID = "cautionaryTrebleClef2x8";
+                    _top = highTrebleTop;
+                    _right = trebleRight;
+                    _bottom = trebleBottom;
+                    break;
+                case "t3": // trebleClef3x8
+                    _useID = "cautionaryTrebleClef3x8";
+                    _top = highTrebleTop;
+                    _right = trebleRight;
+                    _bottom = trebleBottom;
+                    break;
+                default: // can be a bass clef ( see below)
+                    break;
+            }
+
+            if(_right > 0F)
+            {
+                Move(0F, 3 * gap);
+            }
+            #endregion treble clefs
+
+            if(!(_right > 0F))
+            {
+                float bassTop = -gap;
+                float bassRight = trebleRight;
+                float bassBottom = gap * 3F;
+                //float lowBassBottom = gap * 4.5F;
+                float lowBassBottom = gap * 4.65F; // cautionary bass clef octaves are lower than for normal bass clefs
+                #region bass clefs
+                switch(clef.ClefType)
+                {
+                    case "b":
+                        _useID = "cautionaryBassClef";
+                        _top = bassTop;
+                        _right = bassRight;
+                        _bottom = bassBottom;
+                        break;
+                    case "b1": // bassClef8
+                        _useID = "cautionaryBassClef8";
+                        _top = bassTop;
+                        _right = bassRight;
+                        _bottom = lowBassBottom;
+                        break;
+                    case "b2": // bassClef2x8
+                        _useID = "cautionaryBassClef2x8";
+                        _top = bassTop;
+                        _right = bassRight;
+                        _bottom = lowBassBottom;
+                        break;
+                    case "b3": // bassClef3x8
+                        _useID = "cautionaryBassClef3x8";
+                        _top = bassTop;
+                        _right = bassRight;
+                        _bottom = lowBassBottom;
+                        break;
+                    default:
+                        Debug.Assert(false, "Unknown clef type.");
+                        break;
+                }
+                if(_right > 0F)
+                {
+                    Move(0, gap);
+                }
+
+            }
+            #endregion
+
+            FontHeight = clef.FontHeight;
+
+        }
+
+        public override void WriteSVG(SvgWriter w)
+        {
+            w.SvgUseXY("clef", _useID, _originX, _originY);
+        }
+
+        public readonly float FontHeight;
+    }
 
 	internal class TextMetrics : Metrics
 	{
-		public TextMetrics(Graphics graphics, string type, TextInfo textInfo)
-			: base(type, 0F, 0F)
+		public TextMetrics(Graphics graphics, TextInfo textInfo)
+			: base()
 		{
 			SetDefaultMetrics(graphics, textInfo);
 			_textInfo = textInfo;
@@ -638,11 +852,10 @@ namespace Moritz.Symbols
 
 		private readonly TextInfo _textInfo = null;
 	}
-
 	internal class LyricMetrics : TextMetrics, ICloneable
 	{
 		public LyricMetrics(float gap, Graphics graphics, TextInfo textInfo, bool isBelow)
-			: base(graphics, null, textInfo)
+			: base(graphics, textInfo)
 		{
 			float width = _right - _left;
 			float newWidth = width * 0.75F;
@@ -659,11 +872,10 @@ namespace Moritz.Symbols
 
 		public readonly bool IsBelow;
 	}
-
 	internal class OrnamentMetrics : TextMetrics, ICloneable
 	{
 		public OrnamentMetrics(float gap, Graphics graphics, TextInfo textInfo, bool isBelow)
-			: base(graphics, null, textInfo)
+			: base(graphics, textInfo)
 		{
 			IsBelow = isBelow;
 		}
@@ -674,13 +886,12 @@ namespace Moritz.Symbols
 
 		public readonly bool IsBelow;
 	}
-
 	internal class BarnumberMetrics : TextMetrics
 	{
-		public BarnumberMetrics(Graphics graphics, string ID_Type, TextInfo textInfo, FrameInfo frameInfo)
-			: base(graphics, ID_Type, textInfo)
+		public BarnumberMetrics(Graphics graphics, TextInfo textInfo, FrameInfo frameInfo)
+			: base(graphics, textInfo)
 		{
-			TextMetrics textMetrics = new TextMetrics(graphics, null, textInfo);
+			TextMetrics textMetrics = new TextMetrics(graphics, textInfo);
 			_top = textMetrics.Top - frameInfo.PaddingY;
 			_right = textMetrics.Right + frameInfo.PaddingX;
 			_bottom = textMetrics.Bottom + frameInfo.PaddingY;
@@ -699,16 +910,16 @@ namespace Moritz.Symbols
 
     internal class CLichtCharacterMetrics : Metrics
 	{
-		public CLichtCharacterMetrics(string name, bool isDynamic, float fontHeight, TextHorizAlign textHorizAlign)
+        /// <summary>
+        /// Used by DynamicMetrics
+        /// </summary>
+		public CLichtCharacterMetrics(string characterString, float fontHeight, TextHorizAlign textHorizAlign)
 			: base()
 		{
-			if(isDynamic)
-				_objectType = name;
-			else // clefs
-				_objectType = GetClichtCharacterString(name);
+			_characterString = characterString;
 
-			Debug.Assert(_objectType != null);
-			Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_objectType];
+			Debug.Assert(_characterString != null);
+			Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_characterString];
 
 			_originY = 0;
 			_top = m.Top * fontHeight;
@@ -723,13 +934,16 @@ namespace Moritz.Symbols
 			_textHorizAlign = textHorizAlign;
 		}
 
+        /// <summary>
+        /// Used by RestMetrics and HeadMetrics
+        /// </summary>
 		public CLichtCharacterMetrics(DurationClass durationClass, bool isRest, float fontHeight)
 			: base()
 		{
-			_objectType = GetClichtCharacterString(durationClass, isRest);
+			_characterString = GetClichtCharacterString(durationClass, isRest);
 
-			Debug.Assert(_objectType != null);
-			Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_objectType];
+			Debug.Assert(_characterString != null);
+			Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_characterString];
 
 			_originY = 0;
 			_top = m.Top * fontHeight;
@@ -743,13 +957,16 @@ namespace Moritz.Symbols
 			_fontHeight = fontHeight;
 		}
 
+        /// <summary>
+        /// Used by AccidentalMetrics
+        /// </summary>
 		public CLichtCharacterMetrics(Head head, float fontHeight)
 			: base()
 		{
-			_objectType = GetClichtCharacterString(head);
+			_characterString = GetClichtCharacterString(head);
 
-			Debug.Assert(_objectType != null);
-			Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_objectType];
+			Debug.Assert(_characterString != null);
+			Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_characterString];
 
 			_originY = 0;
 			_top = m.Top * fontHeight;
@@ -763,13 +980,17 @@ namespace Moritz.Symbols
 			_fontHeight = fontHeight;
 		}
 
-		public override void WriteSVG(SvgWriter w)
-		{
+        public override void WriteSVG(SvgWriter w)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WriteSVG(SvgWriter w, string type)
+        {
 			w.WriteStartElement("text");
+            w.WriteAttributeString("class", type);
             w.WriteAttributeString("x", M.FloatToShortString(_originX));
             w.WriteAttributeString("y", M.FloatToShortString(_originY));
-			w.WriteAttributeString("font-size", M.FloatToShortString(_fontHeight));
-			w.WriteAttributeString("font-family", "CLicht");
             if(! string.IsNullOrEmpty(_colorAttribute))
             {
                 w.WriteAttributeString("fill", _colorAttribute);
@@ -785,7 +1006,7 @@ namespace Moritz.Symbols
 					w.WriteAttributeString("text-anchor", "end");
 					break;
 			}
-			w.WriteString(_objectType); // e.g. Unicode character
+			w.WriteString(_characterString); // e.g. Unicode character
 			w.WriteEndElement();
 		}
 
@@ -907,113 +1128,15 @@ namespace Moritz.Symbols
 			return cLichtCharacterString;
 		}
 
+        public string CharacterString { get { return _characterString; } }
+        protected string _characterString = "";
 		public float FontHeight { get { return _fontHeight; } }
 		protected float _fontHeight;
 		protected TextHorizAlign _textHorizAlign = TextHorizAlign.left;
         public string ColorAttribute { get { return _colorAttribute; } }
         protected string _colorAttribute = "";
     }
-
-	internal class ClefMetrics : Metrics // defined objects in SVG
-	{
-		public ClefMetrics(Clef clef, float gap)
-			: base()
-		{
-			float trebleTop = -4.35F * gap;
-			float trebleRight = 3.1F * gap;
-			float highTrebleTop = -5.9F * gap;
-			float trebleBottom = 2.7F * gap;
-			#region treble clefs
-			switch(clef.ClefType)
-			{
-				case "t":
-					_objectType = "trebleClef";
-					_top = trebleTop;
-					_right = trebleRight;
-					_bottom = trebleBottom;
-					break;
-				case "t1": // trebleClef8
-					_objectType = "trebleClef8";
-					_top = highTrebleTop;
-					_right = trebleRight;
-					_bottom = trebleBottom;
-					break;
-				case "t2": // trebleClef2x8
-					_objectType = "trebleClef2x8";
-					_top = highTrebleTop;
-					_right = trebleRight;
-					_bottom = trebleBottom;
-					break;
-				case "t3": // trebleClef3x8
-					_objectType = "trebleClef3x8";
-					_top = highTrebleTop;
-					_right = trebleRight;
-					_bottom = trebleBottom;
-					break;
-				default: // can be a bass clef ( see below)
-					break;
-			}
-
-			if(_right > 0F)
-			{
-				Move(0F, 3 * gap);
-			}
-			#endregion treble clefs
-
-			if(!(_right > 0F))
-			{
-				float bassTop = -gap;
-				float bassRight = trebleRight;
-				float bassBottom = gap * 3F;
-				float lowBassBottom = gap * 4.5F;
-				#region bass clefs
-				switch(clef.ClefType)
-				{
-					case "b":
-						_objectType = "bassClef";
-						_top = bassTop;
-						_right = bassRight;
-						_bottom = bassBottom;
-						break;
-					case "b1": // bassClef8
-						_objectType = "bassClef8";
-						_top = bassTop;
-						_right = bassRight;
-						_bottom = lowBassBottom;
-						break;
-					case "b2": // bassClef2x8
-						_objectType = "bassClef2x8";
-						_top = bassTop;
-						_right = bassRight;
-						_bottom = lowBassBottom;
-						break;
-					case "b3": // bassClef3x8
-						_objectType = "bassClef3x8";
-						_top = bassTop;
-						_right = bassRight;
-						_bottom = lowBassBottom;
-						break;
-					default:
-						Debug.Assert(false, "Unknown clef type.");
-						break;
-				}
-				if(_right > 0F)
-				{
-					Move(0, gap);
-				}
-
-			}
-				#endregion
-
-			FontHeight = clef.FontHeight;
-
-		}
-
-		public override void WriteSVG(SvgWriter w) { }
-
-		public readonly float FontHeight;
-	}
-	internal class RestMetrics : CLichtCharacterMetrics
+    internal class RestMetrics : CLichtCharacterMetrics
 	{
 		public RestMetrics(Graphics graphics, RestSymbol rest, float gap, int numberOfStafflines, float ledgerlineStrokeWidth)
 			: base(rest.DurationClass, true, rest.FontHeight)
@@ -1088,7 +1211,7 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-			base.WriteSVG(w);
+			base.WriteSVG(w, "rest");
 			if(_ledgerline != null && _ledgerlineVisible)
 				_ledgerline.WriteSVG(w);
 			if(_durationControlMetrics != null)
@@ -1215,7 +1338,7 @@ namespace Moritz.Symbols
 			_top -= verticalPadding;
 			_bottom += verticalPadding;
 
-			switch(_objectType)
+			switch(_characterString)
 			{
 				case "b":
 					_left -= gap * 0.2F;
@@ -1254,7 +1377,7 @@ namespace Moritz.Symbols
 		/// <param name="topBoundary"></param>
 		/// <param name="bottomBoundary"></param>
 		public DynamicMetrics(float gap, TextInfo textInfo, bool isBelow)
-			: base(textInfo.Text, true, textInfo.FontHeight, TextHorizAlign.left)
+			: base(textInfo.Text, textInfo.FontHeight, TextHorizAlign.left)
 		{
 			// visually centre the "italic" dynamic characters
 			if(textInfo.Text == "p" || textInfo.Text == "f") // p, f
@@ -1284,29 +1407,14 @@ namespace Moritz.Symbols
 
 	public class GroupMetrics : Metrics
 	{
-		public GroupMetrics(string ID_Type)
+		public GroupMetrics()
 			: base()
 		{
-			_objectType = ID_Type;
-		}
-
-		public GroupMetrics(string ID_Type, Metrics metrics)
-			: base()
-		{
-			MetricsList.Add(metrics);
-
-			_objectType = ID_Type;
-			_originX = metrics.OriginX;
-			_originY = metrics.OriginY;
-			_top = metrics.Top;
-			_right = metrics.Right;
-			_bottom = metrics.Bottom;
-			_left = metrics.Left;
 		}
 
 		/// <summary>
 		/// Adds the metrics to the MetricsList and includes it in this object's boundary.
-		/// The boundary is used for collision checking. All objects which should move together with this object
+		/// The boundary is used for collision checking. All objects that should move together with this object
 		/// must be added to the MetricsList.
 		/// </summary>
 		/// <param name="metrics"></param>

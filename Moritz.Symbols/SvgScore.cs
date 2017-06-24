@@ -234,6 +234,7 @@ namespace Moritz.Symbols
 
             string ornamentFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * 0.55F);
             string dynamicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * 0.75F);
+            string lyricFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * 0.5F);
             string barNumberNumberFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * 0.51F);
             string stafflineStemStrokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth);
             string barlineStrokeWidth = M.FloatToShortString(pageFormat.BarlineStrokeWidth);
@@ -245,7 +246,7 @@ namespace Moritz.Symbols
             #region timeStamp, staffName (Arial)
             StringBuilder fontFamilyArial = new StringBuilder(
             @"
-            .timeStamp, .staffName, .barNumberNumber
+            .timeStamp, .staffName, .barNumberNumber, .lyric
             {
                 font-family:Arial
             }");
@@ -261,7 +262,7 @@ namespace Moritz.Symbols
 
             StringBuilder textAnchorMiddle = new StringBuilder(
             $@"
-            .staffName, .barNumberNumber
+            .staffName, .barNumberNumber, .lyric
             {{
                 text-anchor:middle;
             }}");
@@ -317,7 +318,7 @@ namespace Moritz.Symbols
             #region music (CLicht)            
             StringBuilder fontFamilyCLicht = new StringBuilder(
             @"
-            .notehead, .accidental, .dynamic, .clefDef, .clefDefAuxNumber
+            .notehead, .accidental, .rest, .dynamic
             {
                 font-family:CLicht
             }");
@@ -325,7 +326,7 @@ namespace Moritz.Symbols
 
             StringBuilder fontSizeMusic = new StringBuilder(
             $@"
-            .notehead, .accidental
+            .notehead, .accidental, .rest
             {{
                 font-size:{musicFontHeight}px;
             }}");
@@ -338,6 +339,14 @@ namespace Moritz.Symbols
                 font-size:{dynamicFontHeight}px;
             }}");
             rval.Append(fontSizeDynamic);
+
+            StringBuilder fontSizeLyric = new StringBuilder(
+            $@"
+            .lyric
+            {{
+                font-size:{lyricFontHeight}px;
+            }}");
+            rval.Append(fontSizeLyric);
 
             StringBuilder fontSizeCautionaryMusic = new StringBuilder(
             $@"
@@ -367,7 +376,7 @@ namespace Moritz.Symbols
 
             StringBuilder blackStroke = new StringBuilder(
             @"
-            .staffline, .ledgerline, .stem, .noteExtender,
+            .stafflines, .ledgerlines, .stem, .noteExtender,
             .barline, .staffConnector, .endBarlineLeft, .endBarlineLeftConnector, .endBarlineRight, .endBarlineRightConnector,
             .cautionaryBracket, .beam, .barNumberFrame, .frame 
             {
@@ -377,7 +386,7 @@ namespace Moritz.Symbols
 
             StringBuilder strokeWidthStafflineStem = new StringBuilder(
             $@"
-            .staffline, .ledgerline, .stem, .beam, .cautionaryBracket, .frame
+            .stafflines, .ledgerlines, .stem, .beam, .cautionaryBracket, .frame
             {{
                 stroke-width:{stafflineStemStrokeWidth}px;
             }}");

@@ -53,8 +53,22 @@ namespace Moritz.Algorithm.PianolaMusic
 
         protected override void InsertClefChanges(List<List<VoiceDef>> bars)
         {
-            //VoiceDef voiceDef = bars[0][bars[0].Count - 1];
+            // test code...
+            VoiceDef voiceDef = bars[0][0];
+
+            //MidiChordDef mcd1 = voiceDef[2] as MidiChordDef;
+            //mcd1.Lyric = "lyric1";
+            //MidiChordDef mcd2 = voiceDef[3] as MidiChordDef;
+            //mcd2.Lyric = "lyric2";
+            //MidiChordDef mcd3 = voiceDef[4] as MidiChordDef;
+            //mcd3.Lyric = "lyric3";
+
+            //voiceDef.InsertClefDef(6, "t2");
             //voiceDef.InsertClefDef(5, "b");
+            //voiceDef.InsertClefDef(3, "t");
+            //voiceDef.InsertClefDef(2, "b");
+
+            //bars[1][0].InsertClefDef(1, "b");
         }
 
         // Returns two lists of ints. The first is contains the durations of the upper track, the second the lower.

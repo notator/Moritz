@@ -21,12 +21,6 @@ namespace Moritz.Symbols
 
             _gap = gap;
 
-            // The _objectType is written to the SVG file as a group name, but is otherwise not used.
-            if(chord is CautionaryOutputChordSymbol)
-                _objectType = "cautionary chord";
-            else
-                _objectType = "chord";
-
             GetStaffParameters(chord); // sets _clef to the most recent clef, and _nStafflines.
 
             // For each component, find its characterID, deltaX and deltaY re the chord's origin.
@@ -299,7 +293,7 @@ namespace Moritz.Symbols
                 if(head.OriginY > topRange && head.OriginY < bottomRange && head.Overlaps(accidentalMetrics))
                 {
                     float extraHorizontalSpace = 0;
-                    if(accidentalMetrics.ID_Type == "b")
+                    if(accidentalMetrics.CharacterString == "b")
                         extraHorizontalSpace = accidentalMetrics.FontHeight * -0.03F;
 
                     accidentalMetrics.Move(head.Left - extraHorizontalSpace - accidentalMetrics.Right, 0);
@@ -335,11 +329,11 @@ namespace Moritz.Symbols
                 {
                     if(existingAccidental.OriginY < (accidental.OriginY - (_gap * 1.75)))
                     {
-                        if(accidental.ID_Type == "n")
+                        if(accidental.CharacterString == "n")
                             xDelta = accidental.FontHeight * -0.05F;
-                        else if(accidental.ID_Type == "b")
+                        else if(accidental.CharacterString == "b")
                             xDelta = accidental.FontHeight * -0.14F;
-                        //else if(accidental.ID_Type == "#")
+                        //else if(accidental.CharacterString == "#")
                         //    xDelta = accidental.FontHeight * 0.03F;
                     }
 
@@ -508,7 +502,7 @@ namespace Moritz.Symbols
         /// If the stem is up and the bottom of the flagBlock is too low, the flagBlock is moved up.
         /// If the stem is down and the top of the flagBlock is too high, the flagBlock is moved down.
         /// </summary>
-        private void SetFlagsPositionReNoteheads(List<HeadMetrics> topDownHeadsMetrics, Metrics flagsBlockMetrics, VerticalDir stemDirection, float stemThickness)
+        private void SetFlagsPositionReNoteheads(List<HeadMetrics> topDownHeadsMetrics, FlagsBlockMetrics flagsBlockMetrics, VerticalDir stemDirection, float stemThickness)
         {
             Debug.Assert(flagsBlockMetrics != null);
 
@@ -521,11 +515,11 @@ namespace Moritz.Symbols
             if(stemDirection == VerticalDir.up)
             {
                 deltaY = minDist - (innerNoteheadAlignmentY - flagsBlockMetrics.Bottom);
-                if(flagsBlockMetrics.ID_Type == "Right1Flag")
+                if(flagsBlockMetrics.UseID == "Right1Flag")
                     deltaY += _gap;
                 deltaY *= -1;
 
-                if(flagsBlockMetrics.ID_Type == "Right1Flag")
+                if(flagsBlockMetrics.UseID == "Right1Flag")
                 {
                     if((flagsBlockMetrics.Bottom + deltaY) > (_gap * 2.5F))
                     {
@@ -543,10 +537,10 @@ namespace Moritz.Symbols
             else // stem is down
             {
                 deltaY = minDist - (flagsBlockMetrics.Top - innerNoteheadAlignmentY);
-                if(flagsBlockMetrics.ID_Type == "Left1Flag")
+                if(flagsBlockMetrics.UseID == "Left1Flag")
                     deltaY += _gap;
 
-                if(flagsBlockMetrics.ID_Type == "Left1Flag")
+                if(flagsBlockMetrics.UseID == "Left1Flag")
                 {
                     if((flagsBlockMetrics.Top + deltaY) < (_gap * 1.5F))
                     {
@@ -962,12 +956,12 @@ namespace Moritz.Symbols
             if(_headsMetricsTopDown != null)
             {
                 foreach(HeadMetrics headMetrics in _headsMetricsTopDown)
-                    headMetrics.WriteSVG(w);
+                    headMetrics.WriteSVG(w, "notehead");
             }
             if(_topDownAccidentalsMetrics != null)
             {
                 foreach(AccidentalMetrics accidentalMetrics in _topDownAccidentalsMetrics)
-                    accidentalMetrics.WriteSVG(w);
+                    accidentalMetrics.WriteSVG(w, "accidental");
             }
             if(_upperLedgerlineBlockMetrics != null)
             {
@@ -982,7 +976,7 @@ namespace Moritz.Symbols
             if(_lyricMetrics != null)
                 _lyricMetrics.WriteSVG(w, "lyric");
             if(_dynamicMetrics != null)
-                _dynamicMetrics.WriteSVG(w);
+                _dynamicMetrics.WriteSVG(w, "dynamic");
             if(_cautionaryBracketsMetrics != null)
             {
                 foreach(CautionaryBracketMetrics cautionaryBracketMetrics in _cautionaryBracketsMetrics)
@@ -1193,8 +1187,8 @@ namespace Moritz.Symbols
         {
             HeadMetrics outerNotehead = FindOuterNotehead(topDownHeadsMetrics, stemDirection);
             HeadMetrics innerNotehead = FindInnerNotehead(topDownHeadsMetrics, stemDirection);
-            string noteheadID = outerNotehead.ID_Type;
-            NoteheadStemPositions_px nspPX = CLichtFontMetrics.ClichtNoteheadStemPositionsDictPX[noteheadID];
+            string characterString = outerNotehead.CharacterString;
+            NoteheadStemPositions_px nspPX = CLichtFontMetrics.ClichtNoteheadStemPositionsDictPX[characterString];
             float outerNoteheadAlignmentY = (outerNotehead.Bottom + outerNotehead.Top) / 2F;
             float innerNoteheadAlignmentY = (innerNotehead.Bottom + innerNotehead.Top) / 2F;
             float delta = _gap * 0.1F;
@@ -2040,7 +2034,7 @@ namespace Moritz.Symbols
         {
             foreach(AccidentalMetrics am in this._topDownAccidentalsMetrics)
             {
-                if(am.ID_Type == movedCloneAM.ID_Type && am.OriginY == movedCloneAM.OriginY)
+                if(am.CharacterString == movedCloneAM.CharacterString && am.OriginY == movedCloneAM.OriginY)
                 {
                     am.Move(movedCloneAM.OriginX - am.OriginX, 0F);
                 }

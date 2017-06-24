@@ -188,6 +188,7 @@ namespace Moritz.Symbols
         public override Metrics NoteObjectMetrics(Graphics graphics, NoteObject noteObject, VerticalDir voiceStemDirection, float gap, float strokeWidth)
         {
             Metrics returnMetrics = null;
+            SmallClef smallClef = noteObject as SmallClef;
             Clef clef = noteObject as Clef;
             Barline barline = noteObject as Barline;
             CautionaryOutputChordSymbol cautionaryOutputChordSymbol = noteObject as CautionaryOutputChordSymbol;
@@ -198,10 +199,15 @@ namespace Moritz.Symbols
             {
                 returnMetrics = new BarlineMetrics(graphics, barline, gap);
             }
+            else if(smallClef != null)
+            {
+                if(smallClef.ClefType != "n")
+                    returnMetrics = new SmallClefMetrics(clef, gap);
+            }
             else if(clef != null)
             {
                 if(clef.ClefType != "n")
-                    returnMetrics = new ClefMetrics(clef, gap);                    
+                    returnMetrics = new ClefMetrics(clef, gap);
             }
             else if(cautionaryOutputChordSymbol != null)
             {

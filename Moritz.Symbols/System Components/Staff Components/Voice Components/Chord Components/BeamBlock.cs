@@ -9,7 +9,7 @@ namespace Moritz.Symbols
     public class BeamBlock : Metrics
     {
         public BeamBlock(Clef clef, List<ChordSymbol> chordsBeamedTogether, VerticalDir voiceStemDirection, float beamThickness, float strokeThickness)
-            : base(null, 0, 0)
+            : base()
         {
             Chords = new List<ChordSymbol>(chordsBeamedTogether);
             SetBeamedGroupStemDirection(clef, chordsBeamedTogether, voiceStemDirection);

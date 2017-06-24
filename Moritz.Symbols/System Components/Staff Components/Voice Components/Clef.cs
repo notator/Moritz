@@ -29,7 +29,9 @@ namespace Moritz.Symbols
             {
                 ClefMetrics m = Metrics as ClefMetrics;
                 if(m != null)
-					w.SvgUseXY("clef", m.ID_Type, m.OriginX, m.OriginY, m.FontHeight);
+                {
+                    m.WriteSVG(w);
+                }
             }
         }
 
@@ -69,16 +71,16 @@ namespace Moritz.Symbols
         }
 
         /// <summary>
-        /// Writes this SmallClef to the SVG file if both _isVisible is true.
-        /// The character metrics have been set in SvgSystem.Justify()
+        /// Writes a clef to the SVG file.
+        /// The Character metrics have been set in SvgSystem.Justify()
         /// </summary>
         public override void WriteSVG(SvgWriter w, bool staffIsVisible)
         {
-            if(_isVisible && staffIsVisible)
+            if(this.Metrics != null && _isVisible && staffIsVisible)
             {
-				w.SvgStartGroup("smallClef");
-                base.WriteSVG(w, staffIsVisible);
-                w.SvgEndGroup();
+                SmallClefMetrics m = Metrics as SmallClefMetrics;
+                if(m != null)
+                     w.SvgUseXY("clef", m.UseID, m.OriginX, m.OriginY);
             }
         }
 
