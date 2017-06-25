@@ -47,10 +47,16 @@
     <Compile Include="Metrics\ChordMetrics.cs" />
     <Compile Include="Metrics\CLichtFontMetrics.cs" />
     <Compile Include="Metrics\Edge.cs" />
+    <Compile Include="Metrics\Metrics_Group.cs" />
+    <Compile Include="Metrics\Metrics_CLichtCharacters.cs" />
+    <Compile Include="Metrics\Metrics_Text.cs" />
+    <Compile Include="Metrics\Metrics_Lines.cs" />
+    <Compile Include="Metrics\Metrics_MetricsForUse.cs" />
     <Compile Include="Metrics\Metrics.cs" />
     <Compile Include="Metrics\Notator.cs" />
     <Compile Include="Metrics\StandardSymbolSet.cs" />
     <Compile Include="Metrics\SymbolSet.cs" />
+    <Compile Include="Metrics\StaffMetrics.cs" />
     <Compile Include="Metrics\SystemMetrics.cs" />
     <Compile Include="PageFormat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

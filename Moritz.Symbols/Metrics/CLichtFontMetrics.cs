@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Moritz.Xml;
 
 namespace Moritz.Symbols
 {
@@ -14,12 +15,30 @@ namespace Moritz.Symbols
         public float RightStemY_px;
     }
 
+
     /// <summary>
     /// To find the actual pixel dimensions of a character, multiply the values
     /// in the public dictionaries by the character's font size. 
     /// </summary>
     public static class CLichtFontMetrics
     {
+        /// <summary>
+        /// This class is used to construct the CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX dictionary.
+        /// </summary>
+        internal class CLichtGlyphBoxMetric : Metrics
+        {
+            public CLichtGlyphBoxMetric(float top, float right, float bottom, float left)
+                : base()
+            {
+                _top = top;
+                _right = right;
+                _bottom = bottom;
+                _left = left;
+            }
+
+            public override void WriteSVG(SvgWriter w) { }
+        }
+
         static CLichtFontMetrics()
         {
             float hScale = 3.4037F / 800F;

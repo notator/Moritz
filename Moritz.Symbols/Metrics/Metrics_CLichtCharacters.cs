@@ -1,0 +1,508 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.Windows.Forms;
+
+using Moritz.Globals;
+using Moritz.Xml;
+
+namespace Moritz.Symbols
+{
+    internal class CLichtCharacterMetrics : Metrics
+	{
+        /// <summary>
+        /// Used by DynamicMetrics
+        /// </summary>
+		public CLichtCharacterMetrics(string characterString, float fontHeight, TextHorizAlign textHorizAlign)
+			: base()
+		{
+			_characterString = characterString;
+
+			Debug.Assert(_characterString != null);
+			Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_characterString];
+
+			_originY = 0;
+			_top = m.Top * fontHeight;
+			_bottom = m.Bottom * fontHeight;
+
+			// move so that Left = 0.
+			_left = 0;
+			_right = (m.Right - m.Left) * fontHeight;
+			_originX = -m.Left * fontHeight;
+
+			_fontHeight = fontHeight;
+			_textHorizAlign = textHorizAlign;
+		}
+
+        /// <summary>
+        /// Used by RestMetrics and HeadMetrics
+        /// </summary>
+		public CLichtCharacterMetrics(DurationClass durationClass, bool isRest, float fontHeight)
+			: base()
+		{
+			_characterString = GetClichtCharacterString(durationClass, isRest);
+
+			Debug.Assert(_characterString != null);
+			Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_characterString];
+
+			_originY = 0;
+			_top = m.Top * fontHeight;
+			_bottom = m.Bottom * fontHeight;
+
+			// move so that Left = 0.
+			_left = 0;
+			_right = (m.Right - m.Left) * fontHeight;
+			_originX = -m.Left * fontHeight;
+
+			_fontHeight = fontHeight;
+		}
+
+        /// <summary>
+        /// Used by AccidentalMetrics
+        /// </summary>
+		public CLichtCharacterMetrics(Head head, float fontHeight)
+			: base()
+		{
+			_characterString = GetClichtCharacterString(head);
+
+			Debug.Assert(_characterString != null);
+			Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_characterString];
+
+			_originY = 0;
+			_top = m.Top * fontHeight;
+			_bottom = m.Bottom * fontHeight;
+
+			// move so that Left = 0.
+			_left = 0;
+			_right = (m.Right - m.Left) * fontHeight;
+			_originX = -m.Left * fontHeight;
+
+			_fontHeight = fontHeight;
+		}
+
+        public override void WriteSVG(SvgWriter w)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WriteSVG(SvgWriter w, string type)
+        {
+			w.WriteStartElement("text");
+            w.WriteAttributeString("class", type);
+            w.WriteAttributeString("x", M.FloatToShortString(_originX));
+            w.WriteAttributeString("y", M.FloatToShortString(_originY));
+            if(! string.IsNullOrEmpty(_colorAttribute))
+            {
+                w.WriteAttributeString("fill", _colorAttribute);
+            }
+			switch(_textHorizAlign)
+			{
+				case TextHorizAlign.left:
+					break;
+				case TextHorizAlign.center:
+					w.WriteAttributeString("text-anchor", "middle");
+					break;
+				case TextHorizAlign.right:
+					w.WriteAttributeString("text-anchor", "end");
+					break;
+			}
+			w.WriteString(_characterString); // e.g. Unicode character
+			w.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Clefs
+		/// </summary>
+		/// <param name="clefName">The Assistant Composer's name for the clef (e.g. "t1")</param>
+		/// <returns></returns>
+		private string GetClichtCharacterString(string clefName)
+		{
+			string cLichtCharacterString = null;
+			switch(clefName)
+			{
+				#region clefs
+				case "t": // trebleClef
+				case "t1": // trebleClef8
+				case "t2": // trebleClef2x8
+				case "t3": // trebleClef3x8
+					// N.B. t1, t2 and t3 are realised as <def> objects in combination with texts 8, 2x8 and 3x8.
+					// cLicht's trebleclefoctavaalt character is not used.
+					cLichtCharacterString = "&";
+					break;
+				case "b":
+				case "b1": // bassClef8
+				case "b2": // bassClef2x8
+				case "b3": // bassClef3x8
+					// N.B. b1, b2 and b3 are realised as <def> objects in combination with texts 8, 2x8 and 3x8.
+					// cLicht's bassclefoctavaalt character is not used.
+					cLichtCharacterString = "?";
+					break;
+				#endregion
+			}
+			return cLichtCharacterString;
+		}
+		/// <summary>
+		/// Rests and noteheads
+		/// </summary>
+		/// <param name="durationClass"></param>
+		/// <returns></returns>
+		private string GetClichtCharacterString(DurationClass durationClass, bool isRest)
+		{
+			string cLichtCharacterString = null;
+			if(isRest)
+			{
+				switch(durationClass)
+				{
+					#region rests
+					case DurationClass.breve:
+					case DurationClass.semibreve:
+						cLichtCharacterString = "∑";
+						break;
+					case DurationClass.minim:
+						cLichtCharacterString = "Ó";
+						break;
+					case DurationClass.crotchet:
+						cLichtCharacterString = "Œ";
+						break;
+					case DurationClass.quaver:
+						cLichtCharacterString = "‰";
+						break;
+					case DurationClass.semiquaver:
+						cLichtCharacterString = "≈";
+						break;
+					case DurationClass.threeFlags:
+						cLichtCharacterString = "®";
+						break;
+					case DurationClass.fourFlags:
+						cLichtCharacterString = "Ù";
+						break;
+					case DurationClass.fiveFlags:
+						cLichtCharacterString = "Â";
+						break;
+					#endregion
+				}
+			}
+			else
+			{
+				switch(durationClass)
+				{
+					case DurationClass.breve:
+						cLichtCharacterString = "›";
+						break;
+					case DurationClass.semibreve:
+						cLichtCharacterString = "w";
+						break;
+					case DurationClass.minim:
+						cLichtCharacterString = "˙";
+						break;
+					default:
+						cLichtCharacterString = "œ";
+						break;
+				}
+			}
+			return cLichtCharacterString;
+		}
+		/// <summary>
+		/// Accidentals
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		private string GetClichtCharacterString(Head head)
+		{
+			string cLichtCharacterString = null;
+			switch(head.Alteration)
+			{
+				case -1:
+					cLichtCharacterString = "b";
+					break;
+				case 0:
+					cLichtCharacterString = "n";
+					break;
+				case 1:
+					cLichtCharacterString = "#";
+					break;
+				default:
+					Debug.Assert(false, "unknown accidental type");
+					break;
+			}
+			return cLichtCharacterString;
+		}
+
+        public string CharacterString { get { return _characterString; } }
+        protected string _characterString = "";
+		public float FontHeight { get { return _fontHeight; } }
+		protected float _fontHeight;
+		protected TextHorizAlign _textHorizAlign = TextHorizAlign.left;
+        public string ColorAttribute { get { return _colorAttribute; } }
+        protected string _colorAttribute = "";
+    }
+    internal class RestMetrics : CLichtCharacterMetrics
+	{
+		public RestMetrics(Graphics graphics, RestSymbol rest, float gap, int numberOfStafflines, float ledgerlineStrokeWidth)
+			: base(rest.DurationClass, true, rest.FontHeight)
+		{
+			float dy = 0;
+			if(numberOfStafflines > 1)
+				dy = gap * (numberOfStafflines / 2);
+
+			_top = _top + dy;
+			_bottom += dy;
+			_originY += dy; // the staffline on which the rest is aligned
+			_ledgerlineStub = gap * 0.75F;
+			Move((Left - Right) / 2F, 0F); // centre the glyph horizontally
+			switch(rest.DurationClass)
+			{
+				case DurationClass.breve:
+				case DurationClass.semibreve:
+					Move(gap * -0.25F, 0F);
+					if(numberOfStafflines == 1)
+						Move(0F, gap);
+					_ledgerline = new LedgerlineBlockMetrics(Left - _ledgerlineStub, Right + _ledgerlineStub, ledgerlineStrokeWidth);
+					_ledgerline.AddLedgerline(_originY - gap, 0F);
+					_ledgerline.Move(gap * 0.17F, 0F);
+					_top -= (gap * 1.5F);
+					break;
+				case DurationClass.minim:
+					Move(gap * 0.18F, 0);
+					_ledgerline = new LedgerlineBlockMetrics(Left - _ledgerlineStub, Right + _ledgerlineStub - (gap * 0.3F), ledgerlineStrokeWidth);
+					_ledgerline.AddLedgerline(_originY, 0F);
+					_bottom += (gap * 1.5F);
+					break;
+				case DurationClass.quaver:
+					_top -= gap * 0.5F;
+					_bottom += gap * 0.5F;
+					break;
+				case DurationClass.semiquaver:
+					_top -= gap * 0.5F;
+					_bottom += gap * 0.5F;
+					break;
+				case DurationClass.threeFlags:
+					_top -= gap * 0.5F;
+					_right += gap * 0.2F;
+					_bottom += gap * 0.5F;
+					_left -= gap * 0.2F;
+					break;
+				case DurationClass.fourFlags:
+					_top -= gap * 0.5F;
+					_right += gap * 0.1F;
+					_bottom += gap * 1.25F;
+					_left -= gap * 0.1F;
+					_originY += gap;
+					break;
+				case DurationClass.fiveFlags:
+					_top -= gap * 1.5F;
+					_right += gap * 0.2F;
+					_bottom += gap * 1.25F;
+					_left -= gap * 0.2F;
+					_originY += gap;
+					break;
+			}
+
+		}
+
+		public override void Move(float dx, float dy)
+		{
+			base.Move(dx, dy);
+			if(_ledgerline != null)
+				_ledgerline.Move(dx, dy);
+			if(_durationControlMetrics != null)
+				_durationControlMetrics.Move(dx, dy);
+		}
+
+		public override void WriteSVG(SvgWriter w)
+		{
+			base.WriteSVG(w, "rest");
+			if(_ledgerline != null && _ledgerlineVisible)
+				_ledgerline.WriteSVG(w);
+			if(_durationControlMetrics != null)
+				_durationControlMetrics.WriteSVG(w);
+		}
+
+		/// <summary>
+		/// Ledgerlines exist in breve, semibreve and minim rests.
+		/// They are made visible when the rest is moved outside the staff on 2-voice staves.
+		/// </summary>
+		public bool LedgerlineVisible
+		{
+			set
+			{
+				if(_ledgerline != null && (!_ledgerlineVisible && value))
+				{
+					float width = _ledgerline.Right - _ledgerline.Left;
+					float padding = width * 0.05F;
+					_left -= (_ledgerlineStub + padding);
+					_right += _ledgerlineStub + padding;
+					_ledgerlineVisible = value;
+				}
+			}
+		}
+		private float _ledgerlineStub;
+		private bool _ledgerlineVisible = false;
+		private LedgerlineBlockMetrics _ledgerline = null;
+		private GroupMetrics _durationControlMetrics = null;
+	}
+	internal class HeadMetrics : CLichtCharacterMetrics
+	{
+		public HeadMetrics(ChordSymbol chord, Head head, float gapVBPX)
+			: base(chord.DurationClass, false, chord.FontHeight)
+		{
+			Move((Left - Right) / 2F, 0F); // centre horizontally
+
+			float horizontalPadding = chord.FontHeight * 0.04F;
+			_leftStemX = _left;
+			_rightStemX = _right;
+			_left -= horizontalPadding;
+			_right += horizontalPadding;
+            if(head != null && head.ColorAttribute != null)
+            {
+                _colorAttribute = head.ColorAttribute;
+            }
+		}
+
+		/// <summary>
+		/// Used when creating temporary heads for chord alignment purposes.
+		/// </summary>
+		public HeadMetrics(HeadMetrics otherHead, DurationClass durationClass)
+			: base(durationClass, false, otherHead.FontHeight)
+		{
+			// move to position of other head
+			Move(otherHead.OriginX - _originX, otherHead.OriginY - OriginY);
+
+			float horizontalPadding = otherHead.FontHeight * 0.04F;
+			_leftStemX = _left;
+			_rightStemX = _right;
+			_left -= horizontalPadding;
+			_right += horizontalPadding;
+		}
+
+		public object Clone()
+		{
+			return this.MemberwiseClone();
+		}
+
+		/// <summary>
+		/// Notehead metrics.Left and metrics.Right include horizontal padding,
+		/// so head overlaps cannot be checked using the standard Metrics.Overlaps function.
+		/// </summary>
+		public bool OverlapsHead(HeadMetrics otherHeadMetrics)
+		{
+			// See the above constructor. Sorry, I didnt want to save the value in every Head!
+			float thisHorizontalPadding = this._fontHeight * 0.04F;
+			float thisRealLeft = _left + thisHorizontalPadding;
+			float thisRealRight = _right - thisHorizontalPadding;
+
+			float otherHorizontalPadding = otherHeadMetrics.FontHeight * 0.04F;
+			float otherRealLeft = otherHeadMetrics.Left + thisHorizontalPadding;
+			float otherRealRight = otherHeadMetrics.Right - thisHorizontalPadding;
+
+			bool verticalOverlap = this.Bottom >= otherHeadMetrics.Top && this.Top <= otherHeadMetrics.Bottom;
+			bool horizontalOverlap = thisRealRight >= otherRealLeft && thisRealLeft <= otherRealRight;
+
+			return verticalOverlap && horizontalOverlap;
+		}
+		/// <summary>
+		/// Notehead metrics.Left and metrics.Right include horizontal padding,
+		/// so head overlaps cannot be checked using the standard Metrics.Overlaps function.
+		/// </summary>
+		public bool OverlapsStem(StemMetrics stemMetrics)
+		{
+			// See the above constructor. Sorry, I didnt want to save the value in every Head!
+			float thisHorizontalPadding = this._fontHeight * 0.04F;
+			float thisRealLeft = _left + thisHorizontalPadding;
+			float thisRealRight = _right - thisHorizontalPadding;
+
+			bool verticalOverlap = this.Bottom >= stemMetrics.Top && this.Top <= stemMetrics.Bottom;
+			bool horizontalOverlap = thisRealRight >= stemMetrics.Left && thisRealLeft <= stemMetrics.Right;
+
+			return verticalOverlap && horizontalOverlap;
+		}
+
+		public override void Move(float dx, float dy)
+		{
+			base.Move(dx, dy);
+			_leftStemX += dx;
+			_rightStemX += dx;
+		}
+
+		public float LeftStemX { get { return _leftStemX; } }
+		private float _leftStemX;
+        public float RightStemX { get { return _rightStemX; } }
+        private float _rightStemX;
+    }
+	internal class AccidentalMetrics : CLichtCharacterMetrics
+	{
+		public AccidentalMetrics(Head head, float fontHeight, float gap)
+			: base(head, fontHeight)
+		{
+			float verticalPadding = gap / 5;
+			_top -= verticalPadding;
+			_bottom += verticalPadding;
+
+			switch(_characterString)
+			{
+				case "b":
+					_left -= gap * 0.2F;
+					_right += gap * 0.2F;
+					break;
+				case "n":
+					_left -= gap * 0.2F;
+					_right += gap * 0.2F;
+					break;
+				case "#":
+					_left -= gap * 0.1F;
+					_right += gap * 0.1F;
+					break;
+			}
+            if(head != null && head.ColorAttribute != null)
+            {
+                _colorAttribute = head.ColorAttribute;
+            }
+        }
+
+		public object Clone()
+		{
+			return this.MemberwiseClone();
+		}
+
+	}
+	internal class DynamicMetrics : CLichtCharacterMetrics, ICloneable
+	{
+		/// <summary>
+		/// clichtDynamics: { "Ø", "∏", "π", "p", "P", "F", "f", "ƒ", "Ï", "Î" };
+		///                  pppp, ppp,  pp,  p,   mp,  mf,  f,   ff, fff, ffff
+		/// </summary>
+		/// <param name="gap"></param>
+		/// <param name="textInfo"></param>
+		/// <param name="isBelow"></param>
+		/// <param name="topBoundary"></param>
+		/// <param name="bottomBoundary"></param>
+		public DynamicMetrics(float gap, TextInfo textInfo, bool isBelow)
+			: base(textInfo.Text, textInfo.FontHeight, TextHorizAlign.left)
+		{
+			// visually centre the "italic" dynamic characters
+			if(textInfo.Text == "p" || textInfo.Text == "f") // p, f
+			{
+				Move(textInfo.FontHeight * 0.02F, 0F);
+			}
+			else if(textInfo.Text == "F") // mf
+			{
+				Move(textInfo.FontHeight * 0.1F, 0F);
+			}
+			else
+			{
+				Move(textInfo.FontHeight * 0.05F, 0F);
+			}
+			float dynamicWidth = Right - Left;
+			float moveLeftDelta = -(dynamicWidth / 2F) - (0.25F * gap); // "centre" italics
+			Move(moveLeftDelta, 0F);
+
+			IsBelow = isBelow;
+		}
+		public object Clone()
+		{
+			return this.MemberwiseClone();
+		}
+		public bool IsBelow;
+	}
+}
