@@ -54,8 +54,7 @@ namespace Moritz.Algorithm.PianolaMusic
         protected override void InsertClefChanges(List<List<VoiceDef>> bars)
         {
             // test code...
-            VoiceDef voiceDef = bars[0][0];
-
+            //VoiceDef voiceDef0 = bars[0][0];
             //MidiChordDef mcd1 = voiceDef[2] as MidiChordDef;
             //mcd1.Lyric = "lyric1";
             //MidiChordDef mcd2 = voiceDef[3] as MidiChordDef;
@@ -63,10 +62,15 @@ namespace Moritz.Algorithm.PianolaMusic
             //MidiChordDef mcd3 = voiceDef[4] as MidiChordDef;
             //mcd3.Lyric = "lyric3";
 
-            //voiceDef.InsertClefDef(6, "t2");
-            //voiceDef.InsertClefDef(5, "b");
-            //voiceDef.InsertClefDef(3, "t");
-            //voiceDef.InsertClefDef(2, "b");
+            //VoiceDef voiceDef1 = bars[0][1];
+            //bars[0][1].InsertClefDef(9, "b3");
+            //bars[0][1].InsertClefDef(8, "b2");
+            //bars[0][1].InsertClefDef(7, "b1");
+            //bars[0][1].InsertClefDef(6, "b");
+            //bars[0][1].InsertClefDef(5, "t3");
+            //bars[0][1].InsertClefDef(4, "t2");
+            //bars[0][1].InsertClefDef(3, "t1");
+            //bars[0][1].InsertClefDef(2, "t");
 
             //bars[1][0].InsertClefDef(1, "b");
         }
