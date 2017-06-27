@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Text;
 
 using Moritz.Midi;
 using Moritz.Xml;
@@ -24,23 +25,24 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         public override void WriteSymbolDefinitions(SvgWriter w, float musicFontHeight, float cautionaryMusicFontHeight)
         {
-            WriteTrebleClefSymbolDef(w, "trebleClef", musicFontHeight);
-            WriteTrebleClefSymbolDef(w, "cautionaryTrebleClef", cautionaryMusicFontHeight);
-            WriteTrebleClef8SymbolDef(w, "trebleClef8", musicFontHeight);
-            WriteTrebleClef8SymbolDef(w, "cautionaryTrebleClef8", cautionaryMusicFontHeight);
-            WriteTrebleClefMulti8SymbolDef(w, 2, "trebleClef2x8", musicFontHeight);
-            WriteTrebleClefMulti8SymbolDef(w, 2, "cautionaryTrebleClef2x8", cautionaryMusicFontHeight);
-            WriteTrebleClefMulti8SymbolDef(w, 3, "trebleClef3x8", musicFontHeight);
-            WriteTrebleClefMulti8SymbolDef(w, 3, "cautionaryTrebleClef3x8", cautionaryMusicFontHeight);
-
-            WriteBassClefSymbolDef(w, "bassClef", musicFontHeight);
-            WriteBassClefSymbolDef(w, "cautionaryBassClef", cautionaryMusicFontHeight);
-            WriteBassClef8SymbolDef(w, "bassClef8", musicFontHeight);
-            WriteBassClef8SymbolDef(w, "cautionaryBassClef8", cautionaryMusicFontHeight);
-            WriteBassClefMulti8SymbolDef(w, 2, "bassClef2x8", musicFontHeight);
-            WriteBassClefMulti8SymbolDef(w, 2, "cautionaryBassClef2x8", cautionaryMusicFontHeight);
-            WriteBassClefMulti8SymbolDef(w, 3, "bassClef3x8", musicFontHeight);
-            WriteBassClefMulti8SymbolDef(w, 3, "cautionaryBassClef3x8", cautionaryMusicFontHeight);
+            // treble clefs
+            WriteClefSymbolDef(w, true, false); // treble, normal
+            WriteClefSymbolDef(w, true, true); // treble, cautionary
+            WriteClef8SymbolDef(w, true, false, musicFontHeight); // treble, normal
+            WriteClef8SymbolDef(w, true, true, cautionaryMusicFontHeight); // treble, cautionary
+            WriteClefMulti8SymbolDef(w, true, false, 2, musicFontHeight); // treble, normal
+            WriteClefMulti8SymbolDef(w, true, true, 2, cautionaryMusicFontHeight);
+            WriteClefMulti8SymbolDef(w, true, false, 3, musicFontHeight); // treble, normal
+            WriteClefMulti8SymbolDef(w, true, true, 3, cautionaryMusicFontHeight); // treble, cautionary
+            // bass clefs
+            WriteClefSymbolDef(w, false, false); // bass, normal
+            WriteClefSymbolDef(w, false, true); // bass, cautionary
+            WriteClef8SymbolDef(w, false, false, musicFontHeight); // bass, normal
+            WriteClef8SymbolDef(w, false, true, cautionaryMusicFontHeight); // bass, cautionary
+            WriteClefMulti8SymbolDef(w, false, false, 2, musicFontHeight); // bass, normal
+            WriteClefMulti8SymbolDef(w, false, true, 2, cautionaryMusicFontHeight); // bass, cautionary
+            WriteClefMulti8SymbolDef(w, false, false, 3, musicFontHeight); // bass, normal
+            WriteClefMulti8SymbolDef(w, false, true, 3, cautionaryMusicFontHeight); // bass, cautionary
 
             for(int i = 1; i < 6; i++)
             {
@@ -51,126 +53,148 @@ namespace Moritz.Symbols
         #region symbol definitions
 
         #region clefs
-        #region helper functions
-        private void WriteClefText(SvgWriter w, string clefChar, float fontHeight)
+        private void WriteTextElement(SvgWriter w, string className, string innerText)
         {
             w.WriteStartElement("text");
-            w.WriteAttributeString("x", "0");
-            w.WriteAttributeString("y", "0");
-            w.WriteAttributeString("font-family", "CLicht");
-            //w.WriteAttributeString("font-size", M.FloatToAttributeString(fontHeight) + "px");
-            w.WriteAttributeString("font-size", M.FloatToShortString(fontHeight));
-            w.WriteString(clefChar);
-            w.WriteEndElement(); // text
+            w.WriteAttributeString("class", className);
+            w.WriteString(innerText);
+            w.WriteEndElement();
         }
-        private void WriteNumberText(SvgWriter w, int octaveShift, float x1px, float y1px, float fontHeight)
+        private void WriteTextElement(SvgWriter w, string className, float x, float y, string innerText)
         {
             w.WriteStartElement("text");
-            w.WriteAttributeString("x", M.FloatToShortString(x1px * fontHeight));
-            w.WriteAttributeString("y", M.FloatToShortString(y1px * fontHeight));
-            w.WriteAttributeString("font-size", M.FloatToShortString(0.67F * fontHeight));
-            w.WriteAttributeString("font-family", "CLicht");
-            switch(octaveShift)
+            w.WriteAttributeString("class", className);
+            w.WriteAttributeString("x", M.FloatToShortString(x));
+            w.WriteAttributeString("y", M.FloatToShortString(y));
+            w.WriteString(innerText);
+            w.WriteEndElement();
+        }
+        private void WriteClefSymbolDef(SvgWriter w, bool isTreble, bool isCautionary)
+        {
+            w.WriteStartElement("g");
+            if(isCautionary)
             {
-                case 2:
-                    w.WriteString("™");
-                    break;
-                case 3:
-                    w.WriteString("£");
-                    break;
-            }
-            w.WriteEndElement(); // text
-        }
-        private void WriteXText(SvgWriter w, float x1p, float y1p, float fontHeight)
-        {
-            w.WriteStartElement("text");
-            w.WriteAttributeString("x", M.FloatToShortString(x1p * fontHeight));
-            w.WriteAttributeString("y", M.FloatToShortString(y1p * fontHeight));
-            w.WriteAttributeString("font-size", M.FloatToShortString(0.4F * fontHeight));
-            w.WriteAttributeString("font-family", "Arial");
-            w.WriteString("x");
-            w.WriteEndElement(); // text
-        }
-        private void Write8Text(SvgWriter w, float x1px, float y1px, float fontHeight)
-        {
-            w.WriteStartElement("text");
-            w.WriteAttributeString("x", M.FloatToShortString(x1px * fontHeight));
-            w.WriteAttributeString("y", M.FloatToShortString(y1px * fontHeight));
-            w.WriteAttributeString("font-size", M.FloatToShortString(0.67F * fontHeight));
-            w.WriteAttributeString("font-family", "CLicht");
-            w.WriteString("•");
-            w.WriteEndElement(); // text
-        }
-        #endregion
-        private void WriteTrebleClefSymbolDef(SvgWriter w, string ID, float fontHeight)
-        {
-            w.WriteStartElement("g");
-            w.WriteAttributeString("id", ID);
-            WriteClefText(w, "&", fontHeight);
-            w.WriteEndElement(); // g
-        }
-        private void WriteTrebleClef8SymbolDef(SvgWriter w, string ID, float fontHeight)
-        {
-            w.WriteStartElement("g");
-            w.WriteAttributeString("id", ID);
-            WriteClefText(w, "&", fontHeight);
-            Write8Text(w, 0.28F, -1.17F, fontHeight);
-            w.WriteEndElement(); // g
-        }
-        private void WriteTrebleClefMulti8SymbolDef(SvgWriter w, int octaveShift, string ID, float fontHeight)
-        {
-            w.WriteStartElement("g");
-            w.WriteAttributeString("id", ID);
-
-            WriteClefText(w, "&", fontHeight);
-            WriteNumberText(w, octaveShift, 0.036F, -1.17F, fontHeight);
-            WriteXText(w, 0.252F, -1.17F, fontHeight);
-            Write8Text(w, 0.48F, -1.17F, fontHeight);
-
-            w.WriteEndElement(); // g
-        }
-
-        private void WriteBassClefSymbolDef(SvgWriter w, string ID, float fontHeight)
-        {
-            w.WriteStartElement("g");
-            w.WriteAttributeString("id", ID);
-            WriteClefText(w, "?", fontHeight);
-            w.WriteEndElement(); // g
-        }
-        private void WriteBassClef8SymbolDef(SvgWriter w, string ID, float fontHeight)
-        {
-            w.WriteStartElement("g");
-            w.WriteAttributeString("id", ID);
-            WriteClefText(w, "?", fontHeight);
-            if(ID.Contains("cautionary"))
-            {
-                Write8Text(w, 0.16F, 1.35F, fontHeight);
+                if(isTreble)
+                {
+                    w.WriteAttributeString("id", "cautionaryTrebleClef");
+                    WriteTextElement(w, "cautionaryClef", "&");
+                }
+                else
+                {
+                    w.WriteAttributeString("id", "cautionaryBassClef");
+                    WriteTextElement(w, "cautionaryClef", "?");
+                }
             }
             else
             {
-                Write8Text(w, 0.16F, 1.1F, fontHeight);
+                if(isTreble)
+                {
+                    w.WriteAttributeString("id", "trebleClef");
+                    WriteTextElement(w, "clef", "&");
+                }
+                else
+                {
+                    w.WriteAttributeString("id", "bassClef");
+                    WriteTextElement(w, "clef", "?");
+                }
             }
             w.WriteEndElement(); // g
         }
-        private void WriteBassClefMulti8SymbolDef(SvgWriter w, int octaveShift, string ID, float fontHeight)
+        private void WriteClef8SymbolDef(SvgWriter w, bool isTreble, bool isCautionary, float fontHeight)
         {
-            w.WriteStartElement("g");
-            w.WriteAttributeString("id", ID);
+            float x = isTreble ? (0.28F * fontHeight) : (0.16F * fontHeight);
+            float y = isTreble ? (-1.17F * fontHeight) : (1.1F * fontHeight);
 
-            WriteClefText(w, "?", fontHeight);
-            if(ID.Contains("cautionary"))
+            w.WriteStartElement("g");
+            if(isCautionary)
             {
-                WriteNumberText(w, octaveShift, 0F, 1.35F, fontHeight);
-                WriteXText(w, 0.215F, 1.35F, fontHeight);
-                Write8Text(w, 0.435F, 1.35F, fontHeight);
+                if(isTreble)
+                {
+                    w.WriteAttributeString("id", "cautionaryTrebleClef8");
+                    WriteTextElement(w, "cautionaryClef", "&");
+                    WriteTextElement(w, "cautionaryClefOctaveNumber", x, y, "•");
+                }
+                else
+                {
+                    y *= 1.2F;
+                    w.WriteAttributeString("id", "cautionaryBassClef8");
+                    WriteTextElement(w, "cautionaryClef", "?");
+                    WriteTextElement(w, "cautionaryClefOctaveNumber", x, y, "•");
+                }
             }
             else
             {
-                WriteNumberText(w, octaveShift, 0F, 1.1F, fontHeight);
-                WriteXText(w, 0.215F, 1.1F, fontHeight);
-                Write8Text(w, 0.435F, 1.1F, fontHeight);
-            }
+                if(isTreble)
+                {
+                    w.WriteAttributeString("id", "trebleClef8");
+                    WriteTextElement(w, "clef", "&");
+                    WriteTextElement(w, "clefOctaveNumber", x, y, "•");
+                }
+                else
+                {
+                    w.WriteAttributeString("id", "bassClef8");
+                    WriteTextElement(w, "clef", "?");
+                    WriteTextElement(w, "clefOctaveNumber", x, y, "•");
+                }
+            }           
+            w.WriteEndElement(); // g
+        }
+        private void WriteClefMulti8SymbolDef(SvgWriter w, bool isTreble, bool isCautionary, int octaveShift, float fontHeight)
+        {
+            float x1 = isTreble ? (0.036F * fontHeight) : 0;
+            float x2 = isTreble ? (0.252F * fontHeight) : (0.215F * fontHeight);
+            float x3 = isTreble ? (0.48F * fontHeight) : (0.435F * fontHeight);
+            float y = isTreble ? (-1.17F * fontHeight) : (1.1F * fontHeight);
 
+            string numberStr = (octaveShift == 2) ? "™" : "£";
+
+            string id;
+            string clefStr;
+            string clefChar = isTreble ? "&" : "?";
+            string clefOctaveNumberStr;
+            string clefXStr;
+            #region make strings
+            StringBuilder idSB = new StringBuilder();
+            if(isCautionary)
+            {
+                clefStr = "cautionaryClef";
+                clefOctaveNumberStr = "cautionaryClefOctaveNumber";
+                clefXStr = "cautionaryClefX";
+                if(isTreble)
+                {
+                    idSB.Append("cautionaryTrebleClef");
+                }
+                else
+                {
+                    y *= 1.2F;
+                    idSB.Append("cautionaryBassClef");
+                }
+            }
+            else
+            {                
+                clefStr = "clef";
+                clefOctaveNumberStr = "clefOctaveNumber";
+                clefXStr = "clefX";
+                if(isTreble)
+                {
+                    idSB.Append("trebleClef");
+                }
+                else
+                {
+                    idSB.Append("bassClef");
+                }
+            }
+            idSB.Append(octaveShift);
+            idSB.Append("x8");
+            id = idSB.ToString();
+            #endregion            
+
+            w.WriteStartElement("g");
+            w.WriteAttributeString("id", id);
+            WriteTextElement(w, clefStr, clefChar);
+            WriteTextElement(w, clefOctaveNumberStr, x1, y, numberStr);
+            WriteTextElement(w, clefXStr, x2, y, "x");
+            WriteTextElement(w, clefOctaveNumberStr, x3, y, "•");
             w.WriteEndElement(); // g
         }
         #endregion
@@ -243,7 +267,7 @@ namespace Moritz.Symbols
             ClefDef clefDef = iud as ClefDef;
 
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
-            float cautionaryFontHeight = pageFormat.CautionaryMusicFontHeight;
+            float cautionaryFontHeight = pageFormat.MusicFontHeight * pageFormat.CautionaryFactor;
             int minimumCrotchetDuration = pageFormat.MinimumCrotchetDuration;
  
             if(cautionaryChordDef != null && firstDefInVoice)

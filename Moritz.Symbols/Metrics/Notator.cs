@@ -240,7 +240,7 @@ namespace Moritz.Symbols
             foreach(ClefDef ccd in clefDefs)
             {
                 int absPos = systemAbsMsPos + ccd.MsPositionReFirstUD;
-                SmallClef invisibleSmallClef = new SmallClef(voice, ccd.ClefType, absPos, _pageFormat.CautionaryMusicFontHeight);
+                SmallClef invisibleSmallClef = new SmallClef(voice, ccd.ClefType, absPos, (_pageFormat.MusicFontHeight * _pageFormat.CautionaryFactor));
                 invisibleSmallClef.IsVisible = false;
                 InsertInvisibleClefChangeInNoteObjects(voice, invisibleSmallClef);
             }

@@ -171,7 +171,7 @@ namespace Moritz.Symbols
             Debug.Assert(Notator != null);
 			w.SvgStartDefs(null);
 			WriteStyle(w);
-			Notator.SymbolSet.WriteSymbolDefinitions(w, _pageFormat.MusicFontHeight, _pageFormat.CautionaryMusicFontHeight);
+			Notator.SymbolSet.WriteSymbolDefinitions(w, _pageFormat.MusicFontHeight, (_pageFormat.MusicFontHeight * _pageFormat.CautionaryFactor));
 			w.SvgEndDefs(); // end of defs
 		}
 
@@ -213,6 +213,11 @@ namespace Moritz.Symbols
 			}
 		";
             StringBuilder css = GetStyles(_pageFormat);
+            //if(_pageFormat.VisibleInputVoiceIndicesPerStaff.Count > 0)
+            //{
+            //    StringBuilder inputStyles = GetInputStyles(_pageFormat);
+            //    css.Append(inputStyles);
+            //}
             
 
             w.WriteStartElement("style");
@@ -224,253 +229,255 @@ namespace Moritz.Symbols
 
         private StringBuilder GetStyles(PageFormat pageFormat)
         {
-            string timeStampFontSize = "72";
-            // FloatToAttributeString returns a string of minimum length with maximum 4 decimal places and a '.' decimal point.
+            // FloatToShortString returns a string of minimum length with maximum 4 decimal places and a '.' decimal point.
+
+            // PageFormat values set in AssistantComposerForms
+            string stafflineStemStrokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth);
             string page1TitleHeight = M.FloatToShortString(pageFormat.Page1TitleHeight);
             string page1AuthorHeight = M.FloatToShortString(pageFormat.Page1AuthorHeight);
-            string staffNameFontHeight = M.FloatToShortString(pageFormat.StaffNameFontHeight);
-            string musicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight);
-            string cautionaryMusicFontHeight = M.FloatToShortString(pageFormat.CautionaryMusicFontHeight);
 
-            string ornamentFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * 0.55F);
-            string dynamicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * 0.75F);
-            string lyricFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * 0.5F);
-            string barNumberNumberFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * 0.51F);
-            string stafflineStemStrokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth);
+            #region Font heights defined as readonly fields in PageFormat
+            string timeStampFontHeight = M.FloatToShortString(pageFormat.TimeStampFontHeight);
+            string musicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight);
+            string cautionaryMusicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * pageFormat.CautionaryFactor);
+            string staffNameFontHeight = M.FloatToShortString(pageFormat.StaffNameFontHeight);
+            string barNumberNumberFontHeight = M.FloatToShortString(pageFormat.BarNumberNumberFontHeight);
+            string lyricFontHeight = M.FloatToShortString(pageFormat.LyricFontHeight);
+            string ornamentFontHeight = M.FloatToShortString(pageFormat.OrnamentFontHeight);
+            string dynamicFontHeight = M.FloatToShortString(pageFormat.DynamicFontHeight);
+            // clef accesories
+            string clefOctaveNumberFontHeight = M.FloatToShortString(pageFormat.ClefOctaveNumber);
+            string cautionaryClefOctaveNumberFontHeight = M.FloatToShortString(pageFormat.ClefOctaveNumber * pageFormat.CautionaryFactor);
+            string clefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight);
+            string cautionaryClefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight * pageFormat.CautionaryFactor);
+            #endregion
+            #region stroke widths defined as readonly fields in PageFormat
             string barlineStrokeWidth = M.FloatToShortString(pageFormat.BarlineStrokeWidth);
-            string thickEndBarlineStrokeWidth = M.FloatToShortString(pageFormat.BarlineStrokeWidth * 2);           
+            string thickBarlineStrokeWidth = M.FloatToShortString(pageFormat.ThickBarlineStrokeWidth);
             string noteheadExtenderStrokeWidth = M.FloatToShortString(pageFormat.NoteheadExtenderStrokeWidth);
             string barNumberFrameStrokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth * 1.2F);
+            #endregion
+            string opaqueBeamOpacity = M.FloatToShortString(pageFormat.OpaqueBeamOpacity);
 
+            List<string> classes;
+            List<string> values;
+            StringBuilder classDef;
             StringBuilder rval = new StringBuilder();
-            #region timeStamp, staffName (Arial)
-            StringBuilder fontFamilyArial = new StringBuilder(
-            @"
-            .timeStamp, .staffName, .barNumberNumber, .lyric
-            {
-                font-family:Arial
-            }");
-            rval.Append(fontFamilyArial);
+            #region Fonts
+            #region Arial
 
-            StringBuilder timeStamp = new StringBuilder(
-            $@"
-            .timeStamp
-            {{
-                font-size:{timeStampFontSize}px;
-            }}");
-            rval.Append(timeStamp);
+            classes = new List<string>() { "timeStamp", "staffName", "barNumberNumber", "lyric", "clefX", "cautionaryClefX" };
+            values = new List<string>() { $"font-family:{"Arial"}" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
-            StringBuilder textAnchorMiddle = new StringBuilder(
-            $@"
-            .staffName, .barNumberNumber, .lyric
-            {{
-                text-anchor:middle;
-            }}");
-            rval.Append(textAnchorMiddle);
+            classes = new List<string>() { "staffName", "barNumberNumber", "lyric" };
+            values = new List<string>() { "text-anchor:middle" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
+            classes = new List<string>() { "timeStamp" };
+            values = new List<string>() { $"font-size:{timeStampFontHeight}px" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
-            StringBuilder staffName = new StringBuilder(
-            $@"
-            .staffName
-            {{
-                font-size:{staffNameFontHeight}px;
-            }}");
-            rval.Append(staffName);
+            classes = new List<string>() { "staffName" };
+            values = new List<string>() { $"font-size:{staffNameFontHeight}px" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
-            StringBuilder barNumberNumber = new StringBuilder(
-            $@"
-            .barNumberNumber
-            {{
-                font-size:{barNumberNumberFontHeight}px;
-            }}");
-            rval.Append(barNumberNumber);
+            classes = new List<string>() { "barNumberNumber" };
+            values = new List<string>() { $"font-size:{barNumberNumberFontHeight}px" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
-            #endregion
+            classes = new List<string>() { "lyric" };
+            values = new List<string>() { $"font-size:{lyricFontHeight}px" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
-            #region main title, author (Open Sans)
-            StringBuilder fontFamilyOpenSans = new StringBuilder(
-            @"
-            .mainTitle, .author
-            {
-                font-family:""Open Sans""
-            }");
-            rval.Append(fontFamilyOpenSans);
+            classes = new List<string>() { "clefX" };
+            values = new List<string>() { $"font-size:{clefXFontHeight}px" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
-            StringBuilder mainTitle = new StringBuilder(
-            $@"
-            .mainTitle
-            {{
-                text-anchor:middle;
-                font-size:{page1TitleHeight}px;
-            }}");
-            rval.Append(mainTitle);
-
-            StringBuilder author = new StringBuilder(
-            $@"
-            .author
-            {{
-                text-anchor:end;
-                font-size:{page1AuthorHeight}px;
-            }}");
-            rval.Append(author);
-            #endregion
-
-            #region music (CLicht)            
-            StringBuilder fontFamilyCLicht = new StringBuilder(
-            @"
-            .notehead, .accidental, .rest, .dynamic
-            {
-                font-family:CLicht
-            }");
-            rval.Append(fontFamilyCLicht);
-
-            StringBuilder fontSizeMusic = new StringBuilder(
-            $@"
-            .notehead, .accidental, .rest
-            {{
-                font-size:{musicFontHeight}px;
-            }}");
-            rval.Append(fontSizeMusic);
-
-            StringBuilder fontSizeDynamic = new StringBuilder(
-            $@"
-            .dynamic
-            {{
-                font-size:{dynamicFontHeight}px;
-            }}");
-            rval.Append(fontSizeDynamic);
-
-            StringBuilder fontSizeLyric = new StringBuilder(
-            $@"
-            .lyric
-            {{
-                font-size:{lyricFontHeight}px;
-            }}");
-            rval.Append(fontSizeLyric);
-
-            StringBuilder fontSizeCautionaryMusic = new StringBuilder(
-            $@"
-            .cautionaryNotehead, .cautionaryAccidental
-            {{
-                font-size:{cautionaryMusicFontHeight}px;
-            }}");
-            rval.Append(fontSizeCautionaryMusic);
+            classes = new List<string>() { "cautionaryClefX" };
+            values = new List<string>() { $"font-size:{cautionaryClefXFontHeight}px" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
             #endregion
 
-            #region Open Sans Condensed (ornament)
+            #region Open Sans
 
-            StringBuilder fontFamilyOpenSansCondensed = new StringBuilder(
-            $@"
-            .ornament
-            {{
-                font-family:""Open Sans Condensed"";
-                font-size:{ornamentFontHeight}px;
-                text-anchor:middle;
+            classes = new List<string>() { "mainTitle", "author" };
+            values = new List<string>() { @"font-family:""Open Sans""" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
-            }}");
-            rval.Append(fontFamilyOpenSansCondensed);
+            classes = new List<string>() { "mainTitle" };
+            values = new List<string>() { $"font-size:{page1TitleHeight}px", "text-anchor:middle" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
+
+            classes = new List<string>() { "author" };
+            values = new List<string>() { $"font-size:{page1AuthorHeight}px", "text-anchor:end" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
+
             #endregion
+
+            #region CLicht
+            classes = new List<string>() { "clef", "notehead", "accidental", "rest",
+                                           "dynamic",
+                                           "cautionaryClef",
+                                           "clefOctaveNumber",
+                                           "cautionaryClefOctaveNumber" };
+            values = new List<string>() { $"font-family:CLicht" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
+
+            classes = new List<string>() { "clef", "notehead", "accidental", "rest" };
+            values = new List<string>() { $"font-size:{musicFontHeight}px" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
+
+            classes = new List<string>() { "dynamic" };
+            values = new List<string>() { $"font-size:{dynamicFontHeight}px" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
+
+            classes = new List<string>() { "cautionaryClef" };
+            values = new List<string>() { $"font-size:{cautionaryMusicFontHeight}px" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
+
+            classes = new List<string>() { "clefOctaveNumber" };
+            values = new List<string>() { $"font-size:{clefOctaveNumberFontHeight}px" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
+
+            classes = new List<string>() { "cautionaryClefOctaveNumber" };
+            values = new List<string>() { $"font-size:{cautionaryClefOctaveNumberFontHeight}px" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
+
+            #endregion
+
+            #region Open Sans Condensed
+
+            classes = new List<string>() { "ornament" };
+            values = new List<string>() { $@"font-family:""Open Sans Condensed""", $@"font-size:{ornamentFontHeight}px", "text-anchor:middle" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
+
+            #endregion
+            #endregion Fonts
 
             #region lines and paths
 
-            StringBuilder blackStroke = new StringBuilder(
-            @"
-            .stafflines, .ledgerlines, .stem, .noteExtender,
-            .barline, .staffConnector, .endBarlineLeft, .endBarlineLeftConnector, .endBarlineRight, .endBarlineRightConnector,
-            .cautionaryBracket, .beam, .barNumberFrame, .frame 
-            {
-                stroke:black
-            }");
-            rval.Append(blackStroke);
+            classes = new List<string>() { "stafflines", "ledgerlines", "stem", "beam", "cautionaryBracket", "frame", 
+                "barline", "staffConnector", "endBarlineLeft", "endBarlineLeftConnector",
+                "endBarlineRight", "endBarlineRightConnector",
+                "noteExtender", 
+                "barNumberFrame" };
+            values = new List<string>() { "stroke:black" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
-            StringBuilder strokeWidthStafflineStem = new StringBuilder(
-            $@"
-            .stafflines, .ledgerlines, .stem, .beam, .cautionaryBracket, .frame
-            {{
-                stroke-width:{stafflineStemStrokeWidth}px;
-            }}");
-            rval.Append(strokeWidthStafflineStem);
+            classes = new List<string>() { "stafflines", "ledgerlines", "stem", "beam", "cautionaryBracket", "frame" };
+            values = new List<string>() { $"stroke-width:{stafflineStemStrokeWidth}px" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
-            StringBuilder barlineStaffConnectorStrokeWidth = new StringBuilder(
-            $@"
-            .barline, .staffConnector, .endBarlineLeft, .endBarlineLeftConnector
-            {{
-                stroke-width:{barlineStrokeWidth}px;
-            }}");
-            rval.Append(barlineStaffConnectorStrokeWidth);
+            classes = new List<string>() { "barline", "staffConnector", "endBarlineLeft", "endBarlineLeftConnector" };
+            values = new List<string>() { $"stroke-width:{barlineStrokeWidth}px" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
-            StringBuilder endBarlineRightStrokeWidth = new StringBuilder(
-            $@"
-            .endBarlineRight, .endBarlineRightConnector
-            {{
-                stroke-width:{thickEndBarlineStrokeWidth}px;
-            }}");
-            rval.Append(endBarlineRightStrokeWidth);
+            classes = new List<string>() { "endBarlineRight", "endBarlineRightConnector" };
+            values = new List<string>() { $"stroke-width:{thickBarlineStrokeWidth}px" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
-            StringBuilder noteExtender = new StringBuilder(
-            $@"
-            .noteExtender
-            {{
-                stroke-width:{noteheadExtenderStrokeWidth}px;
-            }}");
-            rval.Append(noteExtender);
+            classes = new List<string>() { "noteExtender" };
+            values = new List<string>() { $"stroke-width:{noteheadExtenderStrokeWidth}px" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
-            StringBuilder barNumberFrame = new StringBuilder(
-            $@"
-            .barNumberFrame
-            {{
-                stroke-width:{barNumberFrameStrokeWidth}px;
-            }}");
-            rval.Append(barNumberFrame);
+            classes = new List<string>() { "barNumberFrame" };
+            values = new List<string>() { $"stroke-width:{barNumberFrameStrokeWidth}px" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
-            StringBuilder linecapRound = new StringBuilder(
-            @"
-            .stem
-            {
-                stroke-linecap:round
-            }");
-            rval.Append(linecapRound);
+            classes = new List<string>() { "beam" };
+            values = new List<string>() { "fill:black" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
-            StringBuilder fillBlack = new StringBuilder(
-            $@"
-            .beam
-            {{
-                fill:black
-            }}");
-            rval.Append(fillBlack);
+            classes = new List<string>() { "frame", "opaqueBeam" };
+            values = new List<string>() { "fill:white" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
-            StringBuilder fillWhite = new StringBuilder(
-            $@"
-            .frame
-            {{
-                fill:white
-            }}");
-            rval.Append(fillWhite);
+            classes = new List<string>() { "cautionaryBracket", "barNumberFrame" };
+            values = new List<string>() { "fill:none" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
-            StringBuilder fillNone = new StringBuilder(
-            $@"
-            .cautionaryBracket, .barNumberFrame
-            {{
-                fill:none
-            }}");
-            rval.Append(fillNone);
+            classes = new List<string>() { "stem" };
+            values = new List<string>() { "stroke-linecap:round" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
 
-            StringBuilder beamBackground = new StringBuilder(
-            @"
-            .opaqueBeam
-            {
-                stroke:none;
-                fill:white;
-                opacity:0.65
-            }");
-            rval.Append(beamBackground);
+            classes = new List<string>() { "opaqueBeam" };
+            values = new List<string>() { "stroke:none", $"opacity:{opaqueBeamOpacity}" };
+            classDef = GetCSS(classes, values);
+            rval.Append(classDef.ToString());
             #endregion
 
             // newline at end of CSS
             rval.Append(@"
             ");
 
+            return rval;
+        }
+
+        private StringBuilder GetCSS(List<string> classes, List<string> values)
+        {
+            StringBuilder classesSB = GetClassesSB(classes);
+            StringBuilder valuesSB = GetValuesSB(values); 
+            StringBuilder rval = new StringBuilder(
+            $@"
+            {classesSB.ToString()}
+            {{
+                {valuesSB.ToString()}
+            }}");
+            return rval;
+        }
+
+        private StringBuilder GetClassesSB(List<string> classes)
+        {
+            StringBuilder rval = new StringBuilder();
+            foreach(string className in classes)
+            {
+                rval.Append(".");
+                rval.Append(className);
+                rval.Append(", ");
+            }
+            rval.Remove(rval.Length - 2, 2);
+            return rval;
+        }
+
+        private StringBuilder GetValuesSB(List<string> values)
+        {
+            StringBuilder rval = new StringBuilder();
+            foreach(string val in values)
+            {
+                rval.Append(val);
+                rval.Append("; ");
+            }
+            rval.Remove(rval.Length - 2, 2);
             return rval;
         }
 
@@ -1058,7 +1065,7 @@ namespace Moritz.Symbols
             if(Metadata != null)
                 infoAtTopOfPageSB.AppendFormat(", " + Metadata.Date);
 
-            return new TextInfo(infoAtTopOfPageSB.ToString(), "Arial", 72F, TextHorizAlign.left);
+            return new TextInfo(infoAtTopOfPageSB.ToString(), "Arial", _pageFormat.TimeStampFontHeight, TextHorizAlign.left);
         }
 
 
@@ -1116,9 +1123,9 @@ namespace Moritz.Symbols
                     {
                         if(isFirstBarline && system != Systems[0])
                         {
-							FramedBarNumberText framedBarNumber = new FramedBarNumberText(this, barNumber.ToString(), _pageFormat.Gap, _pageFormat.StafflineStemStrokeWidth);
+                            FramedBarNumberText framedBarNumber = new FramedBarNumberText(this, barNumber.ToString(), _pageFormat.Gap, _pageFormat.StafflineStemStrokeWidth);
 
-							barline.DrawObjects.Add(framedBarNumber);
+                            barline.DrawObjects.Add(framedBarNumber);
                             isFirstBarline = false;
                         }
                         barNumber++;

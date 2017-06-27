@@ -79,8 +79,7 @@ namespace Moritz.Symbols
         public int MinimumCrotchetDuration;
         public bool BeamsCrossBarlines;
         #endregion
-        public float StafflineStemStrokeWidth;
-        public float Gap;
+
         /// <summary>
         /// The view box pixel distance between staves when they are not vertically justified.
         /// </summary>
@@ -99,16 +98,43 @@ namespace Moritz.Symbols
 
         public List<int> SystemStartBars = null;
         public int DefaultNumberOfBarsPerSystem { get { return 5; } }
-        public float StaffNameFontHeight { get { return Gap * 2.2F; } }
+
+        #region constants
+        public float CautionaryFactor { get { return 0.8F; } } // The relatve size of cautionary objects
+        public float OpaqueBeamOpacity { get { return 0.65F; } } // The opacity of opaque beams
+        #endregion
+
+        public float Gap;
+        #region font heights
         /// <summary>
         /// the normal font size on staves having Gap sized spaces (after experimenting with cLicht). 
         /// </summary>
         public float MusicFontHeight { get { return (Gap * 4) * 0.98F; } }
-        public float CautionaryMusicFontHeight { get { return MusicFontHeight * 0.8F; } }
-        public float InputStavesSizeFactor { get { return 1.5F; } }
+        /// Arial (new 26.06.2017)
+        public float TimeStampFontHeight { get { return Gap * 2.25F; } }
+        public float StaffNameFontHeight { get { return Gap * 2.2F; } }
+        public float BarNumberNumberFontHeight { get { return Gap * 1.9992F; } }
+        public float LyricFontHeight { get { return Gap * 1.96F; } }
+        public float ClefOctaveNumber { get { return Gap * 2.6264F; } }
+        public float ClefXFontHeight { get { return Gap * 1.568F; } }
+        /// Open Sans, Open Sans Condensed (new 26.06.2017)
+        public float OrnamentFontHeight { get { return Gap * 2.156F; } }
+        /// CLicht (new 26.06.2017)
+        public float DynamicFontHeight { get { return MusicFontHeight * 0.75F; } }
+        #endregion
+
+        #region stroke widths
+        public float StafflineStemStrokeWidth;
         public float BarlineStrokeWidth { get { return StafflineStemStrokeWidth * 2F; } }
         public float NoteheadExtenderStrokeWidth { get { return StafflineStemStrokeWidth * 3.4F; } }
+        /// new 26.06.2017
+        public float ThickBarlineStrokeWidth { get { return BarlineStrokeWidth * 2; } } // the right barlne at the end of the score.
+        public float BarNumberFrameStrokeWidth { get { return StafflineStemStrokeWidth * 1.2F; } }
+        #endregion
+
+        public float InputStavesSizeFactor { get { return 1.5F; } }
         public float BeamThickness { get { return Gap * 0.42F; } }
+
         #endregion
 
         #region derived properties

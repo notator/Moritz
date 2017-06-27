@@ -180,7 +180,7 @@ namespace Moritz.Symbols
 
             //w.WriteAttributeString("style", "display:inline");
 
-			w.SvgText("timeStamp", _infoTextInfo, 32, 80);
+			w.SvgText("timeStamp", _infoTextInfo, 32, _infoTextInfo.FontHeight);
 
 			if(pageNumber == 1 || pageNumber == 0)
 			{
