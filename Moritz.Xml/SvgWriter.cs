@@ -54,16 +54,15 @@ namespace Moritz.Xml
 		/// <summary>
 		/// Writes an SVG "line" element
 		/// </summary>
-		/// <param name="type">the line's class</param>
+		/// <param name="styleName">the line's CSS style name</param>
 		/// <param name="x1"></param>
 		/// <param name="y1"></param>
 		/// <param name="x2"></param>
 		/// <param name="y2"></param>
-		public void SvgLine(string type, float x1, float y1, float x2, float y2)
+		public void SvgLine(CSSClass cssClass, float x1, float y1, float x2, float y2)
 		{
 			_w.WriteStartElement("line");
-            Debug.Assert(!String.IsNullOrEmpty(type));
-		    _w.WriteAttributeString("class", type);
+		    _w.WriteAttributeString("class", cssClass.ToString());
 			_w.WriteAttributeString("x1", M.FloatToShortString(x1));
 			_w.WriteAttributeString("y1", M.FloatToShortString(y1));
 			_w.WriteAttributeString("x2", M.FloatToShortString(x2));
@@ -217,7 +216,7 @@ namespace Moritz.Xml
         /// <summary>
         /// A square bracket
         /// </summary>
-        public void SvgCautionaryBracket(bool isLeftBracket, float top, float right, float bottom, float left)
+        public void SvgCautionaryBracket(string styleName, bool isLeftBracket, float top, float right, float bottom, float left)
         {
             if(!isLeftBracket)
             {
@@ -231,7 +230,7 @@ namespace Moritz.Xml
             string bottomStr = bottom.ToString("0.###", M.En_USNumberFormat);
 
             _w.WriteStartElement("path");
-            _w.WriteAttributeString("class", "cautionaryBracket");
+            _w.WriteAttributeString("class", styleName);
             StringBuilder d = new StringBuilder();
             d.Append("M " + rightStr + "," + topStr + " ");
             d.Append("L " + leftStr + "," + topStr + " " +
@@ -264,69 +263,59 @@ namespace Moritz.Xml
 
             if(isOpaque)
             {
-                _w.WriteAttributeString("class", "opaqueBeam");
-                //_w.WriteAttributeString("fill", "white");
-                //_w.WriteAttributeString("opacity", opacity.ToString("0.###", M.En_USNumberFormat));
+                _w.WriteAttributeString("class", CSSClass.opaqueBeam.ToString());
             }
             else
             {
-                _w.WriteAttributeString("class", "beam");
-                //_w.WriteAttributeString("stroke", "black");
-                //_w.WriteAttributeString("stroke-width", strokeWidth.ToString("0.###", M.En_USNumberFormat) + "px");
-                //_w.WriteAttributeString("fill", "black");
+                _w.WriteAttributeString("class", CSSClass.beam.ToString());
             }
             _w.WriteAttributeString("d", dSB.ToString());
             _w.WriteEndElement(); // path
         }
 
-        public void SvgText(string type, TextInfo textInfo, float x, float y)
+        public void SvgText(CSSClass cssClass, string text, float x, float y)
         {
             _w.WriteStartElement("text");
-			if(!String.IsNullOrEmpty(type))
-			{
-				_w.WriteAttributeString("class", type);
-			}
+			_w.WriteAttributeString("class", cssClass.ToString());
             _w.WriteAttributeString("x", M.FloatToShortString(x));
             _w.WriteAttributeString("y", M.FloatToShortString(y));
-            if(String.IsNullOrEmpty(type))
-            {
-                switch(textInfo.TextHorizAlign)
-                {
-                    case TextHorizAlign.left:
-                        break;
-                    case TextHorizAlign.center:
-                        _w.WriteAttributeString("text-anchor", "middle");
-                        break;
-                    case TextHorizAlign.right:
-                        _w.WriteAttributeString("text-anchor", "end");
-                        break;
-                }
+            //if(String.IsNullOrEmpty(type))
+            //{
+            //    switch(textInfo.TextHorizAlign)
+            //    {
+            //        case TextHorizAlign.left:
+            //            break;
+            //        case TextHorizAlign.center:
+            //            _w.WriteAttributeString("text-anchor", "middle");
+            //            break;
+            //        case TextHorizAlign.right:
+            //            _w.WriteAttributeString("text-anchor", "end");
+            //            break;
+            //    }
 
-                _w.WriteAttributeString("font-size", M.FloatToShortString(textInfo.FontHeight));
-                _w.WriteAttributeString("font-family", textInfo.FontFamily);
-                if(textInfo.ColorString != null
-                    && !String.IsNullOrEmpty(textInfo.ColorString.String)
-                    && !textInfo.ColorString.IsBlack)
-                    _w.WriteAttributeString("fill", textInfo.ColorString.String);
-            }
-            _w.WriteString(textInfo.Text);
+            //    _w.WriteAttributeString("font-size", M.FloatToShortString(textInfo.FontHeight));
+            //    _w.WriteAttributeString("font-family", textInfo.FontFamily);
+            //    if(textInfo.ColorString != null
+            //        && !String.IsNullOrEmpty(textInfo.ColorString.String)
+            //        && !textInfo.ColorString.IsBlack)
+            //        _w.WriteAttributeString("fill", textInfo.ColorString.String);
+            //}
+            _w.WriteString(text);
             _w.WriteEndElement(); // text
         }
 
         /// <summary>
-        /// Writes an SVG "use" element, overriding its y-coordinate.
+        /// Writes an SVG "use" element, overriding its x- and y-coordinates.
         /// </summary>
-        /// <param name="type">Can be null or empty or an id String</param>
+        /// <param name="cssClass">Currently either CSSClass.clef or CSSClass.flag</param>
+        /// <param name="cssClass">Currently either CSSClass.clef or CSSClass.flag</param>
         /// <param name="y">This element's y-coordinate.</param>
-        /// <param name="objectToUse">(Do not include the leading '#'. It will be inserted automatically.)</param>
-        public void SvgUseXY(string type, string objectToUse, float x, float y)
+        /// <param name="idOfObjectToUse">(Do not include the leading '#'. It will be inserted automatically.)</param>
+        public void SvgUseXY(CSSClass cssClass, string idOfObjectToUse, float x, float y)
         {
             _w.WriteStartElement("use");
-            if(!String.IsNullOrEmpty(type))
-                _w.WriteAttributeString("class", type);
-            _w.WriteAttributeString("xlink", "href", null, "#" + objectToUse);
-            //_w.WriteAttributeString("x", M.FloatToAttributeString(x) + "px");
-            //_w.WriteAttributeString("y", M.FloatToAttributeString(y) + "px");
+            _w.WriteAttributeString("class", cssClass.ToString());
+            _w.WriteAttributeString("href", "#" + idOfObjectToUse);
             _w.WriteAttributeString("x", M.FloatToShortString(x));
             _w.WriteAttributeString("y", M.FloatToShortString(y));
             _w.WriteEndElement();

@@ -9,10 +9,54 @@ using Moritz.Xml;
 
 namespace Moritz.Symbols
 {
-	internal class StemMetrics : Metrics
+    public class LineStyle : Metrics
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cssClass"></param>
+        /// <param name="strokeWidthPixels"></param>
+        /// <param name="stroke">"none", "black", "white", "red" or a string of 6 hex characters</param>
+        /// <param name="fill">"none", "black", "white", "red" or a string of 6 hex characters</param>
+        /// <param name="lineCap"></param>
+        public LineStyle(CSSClass cssClass,
+            float strokeWidthPixels,
+            string stroke = "none", 
+            string fill = "none",
+            CSSLineCap lineCap = CSSLineCap.butt)
+            : base()
+        {
+            CSSClass = cssClass;
+            StrokeWidthPixels = strokeWidthPixels;
+            Stroke = stroke.ToString();
+            Fill = fill.ToString();
+            LineCap = lineCap.ToString();
+
+            if(!_cssClasses.Contains(cssClass))
+            {
+                _cssClasses.Add(cssClass);
+            }
+        }
+
+        public override void WriteSVG(SvgWriter w)
+        {
+            throw new NotImplementedException();
+        }
+
+        public readonly CSSClass CSSClass;
+        public readonly float StrokeWidthPixels = 0F;
+        public readonly string Stroke = "none"; // "none", "black", "white", "#333" etc
+        public readonly string Fill = "none"; // "none", "black", "white", "#333" etc
+        public readonly string LineCap = "butt"; // "butt", "round", "square" 
+
+        protected static List<CSSClass> _cssClasses = new List<CSSClass>();
+        public static IReadOnlyList<CSSClass> CSSClasses { get { return _cssClasses as IReadOnlyList<CSSClass>; } }
+    }
+ 
+	internal class StemMetrics : LineStyle
 	{
 		public StemMetrics(float top, float x, float bottom, float strokeWidth, VerticalDir verticalDir)
-			: base()
+			: base(CSSClass.stem, strokeWidth, "black")
 		{
 			_originX = x;
 			_originY = top;
@@ -26,7 +70,7 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-			w.SvgLine("stem", _originX, _top, _originX, _bottom);
+			w.SvgLine(CSSClass.stem, _originX, _top, _originX, _bottom);
 		}
 
 		public object Clone()
@@ -37,12 +81,19 @@ namespace Moritz.Symbols
 		public readonly VerticalDir VerticalDir;
 		public readonly float StrokeWidth;
 	}
-	internal class LedgerlineBlockMetrics : Metrics, ICloneable
-	{
-		public LedgerlineBlockMetrics(float left, float right, float strokeWidth)
-			: base()
+	internal class LedgerlineBlockMetrics : LineStyle, ICloneable
+	{      
+        public LedgerlineBlockMetrics(float left, float right, float strokeWidth)
+			: base(CSSClass.ledgerline, strokeWidth, "black")
 		{
-			_left = left;
+            /// The base class has deliberately been called with CSSClass.ledgerline (singular) here.
+            /// This is so that its less confusing later when comparing the usage with stafflines/staffline.
+            /// A ledgerline is always contained in a ledgerlines group.
+            /// A staffline is always contained in a stafflines group.
+            /// The CSS definition for ledgerlines is written if a ledgerline has been used.
+            /// The CSS definition for stafflines is written if a staffline has been used.
+
+            _left = left;
 			_right = right;
 			_strokeWidth = strokeWidth;
 		}
@@ -77,10 +128,10 @@ namespace Moritz.Symbols
 		public override void WriteSVG(SvgWriter w)
 		{
             w.WriteStartElement("g");
-            w.WriteAttributeString("class", "ledgerlines");
+            w.WriteAttributeString("class", CSSClass.ledgerlines.ToString());
             foreach(float y in Ys)
 			{
-				w.SvgLine("ledgerline", _left + _strokeWidth, y, _right - _strokeWidth, y);
+				w.SvgLine(CSSClass.ledgerline, _left + _strokeWidth, y, _right - _strokeWidth, y);
 			}
             w.WriteEndElement();
 		}
@@ -88,10 +139,10 @@ namespace Moritz.Symbols
 		private List<float> Ys = new List<float>();
 		private float _strokeWidth;
 	}
-	internal class CautionaryBracketMetrics : Metrics, ICloneable
+	internal class CautionaryBracketMetrics : LineStyle, ICloneable
 	{
 		public CautionaryBracketMetrics(bool isLeftBracket, float top, float right, float bottom, float left, float strokeWidth)
-			: base()
+			: base(CSSClass.cautionaryBracket, strokeWidth, "black")
 		{
 			_isLeftBracket = isLeftBracket;
 			_top = top;
@@ -108,19 +159,16 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-			w.SvgCautionaryBracket(_isLeftBracket, _top, _right, _bottom, _left);
+			w.SvgCautionaryBracket(CSSClass.cautionaryBracket.ToString(), _isLeftBracket, _top, _right, _bottom, _left);
 		}
 
 		private readonly bool _isLeftBracket;
 		private readonly float _strokeWidth;
 	}
-	/// <summary>
-	/// This class is only used when justifying staves and systems vertically.
-	/// </summary>
-	internal class StafflineMetrics : Metrics
+	internal class StafflineMetrics : LineStyle
 	{
 		public StafflineMetrics(float left, float right, float originY)
-			: base()
+			: base(CSSClass.staffline, 0F, "black")
 		{
 			_left = left;
 			_right = right;
@@ -129,16 +177,24 @@ namespace Moritz.Symbols
 			_originY = originY;
 		}
 
-		public override void WriteSVG(SvgWriter w) { }
+        /// <summary>
+        /// This function should never be called.
+        /// See Staff.WriteSVG(...).
+        /// </summary>
+        public override void WriteSVG(SvgWriter w)
+        {
+            throw new NotImplementedException();
+        }
 	}
 	/// <summary>
 	/// Notehead extender lines are used when chord symbols cross barlines.
 	/// </summary>
-	internal class NoteheadExtenderMetrics : Metrics
+	internal class NoteheadExtenderMetrics : LineStyle
 	{
-		public NoteheadExtenderMetrics(float left, float right, float originY, string colorAttribute, float strokeWidth, float gap, bool drawExtender)
-			: base()
-		{
+		public NoteheadExtenderMetrics(float left, float right, float originY, float strokeWidth, string strokeColor, float gap, bool drawExtender)
+			: base(CSSClass.noteExtender, strokeWidth, strokeColor)
+
+        {
 			_left = left;
 			_right = right;
 
@@ -152,10 +208,7 @@ namespace Moritz.Symbols
 			}
 
 			_originY = originY;
-            if(! string.IsNullOrEmpty(colorAttribute))
-            {
-                _colorAttribute = colorAttribute;
-            }
+            _strokeColor = strokeColor;
 			_strokeWidth = strokeWidth;
 			_drawExtender = drawExtender;
 		}
@@ -163,20 +216,27 @@ namespace Moritz.Symbols
 		public override void WriteSVG(SvgWriter w)
 		{
 			if(_drawExtender)
-				w.SvgLine("noteExtender", _left, _originY, _right, _originY);
+				w.SvgLine(CSSClass.noteExtender, _left, _originY, _right, _originY);
 		}
 
-        public string ColorAttribute { get { return _colorAttribute; } }
-        private readonly string _colorAttribute = "black";
+        public string StrokeColor { get { return _strokeColor; } }
+        private readonly string _strokeColor;
 		private readonly float _strokeWidth = 0F;
 		private readonly bool _drawExtender;
 	}
+
+    /// <summary>
+    /// Note that the existence of the six CSS barline classes in the score will be inferred
+    /// from the system structure, not from their existence in the static LineStyle dictionary.
+    /// The six CSS barline classes are defined as enum CSSBarlineClass in Barline.cs, and are currently:  
+    /// barline, staffConnector, endBarlineLeft, endBarlineLeftConnector, endBarlineRight and endBarlineRightConnector
+    /// </summary>
     internal class BarlineMetrics : Metrics
     {
         public BarlineMetrics(Graphics graphics, Barline barline, float gap)
             : base()
         {
-            if(barline.BarlineType == BarlineType.end)
+            if(barline.BarlineType == BarlineType.endDouble)
                 _left = -gap * 1.7F;
             else
                 _left = -gap * 0.5F;
@@ -195,7 +255,7 @@ namespace Moritz.Symbols
 
                         if(text is StaffNameText)
                         {
-                            _staffNameMetrics = new TextMetrics(graphics, text.TextInfo);
+                            _staffNameMetrics = new TextMetrics(CSSClass.staffName, graphics, text.TextInfo);
                             // move the staffname vertically to the middle of this staff
                             Staff staff = barline.Voice.Staff;
                             float staffheight = staff.Gap * (staff.NumberOfStafflines - 1);
@@ -227,19 +287,19 @@ namespace Moritz.Symbols
         }
 
         /// <summary>
-        /// Only writes the Barline's barnumber to the SVG file.
-        /// The barline itself is drawn when the system is complete.
+        /// Only writes the staffName and the barnumber (if they exist) to the SVG file.
+        /// The barline itself is drawn by Barline.WriteSvg(...) when the system is complete.
         /// </summary>
         public override void WriteSVG(SvgWriter w)
         {
             if(_staffNameMetrics != null)
             {
-                _staffNameMetrics.WriteSVG(w, "staffName");
+                _staffNameMetrics.WriteSVG(w, CSSClass.staffName);
             }
             if(_barnumberMetrics != null)
             {
                 w.WriteStartElement("g");
-                w.WriteAttributeString("class", "barNumber");
+                w.WriteAttributeString("class", CSSClass.barNumber.ToString());
                 _barnumberMetrics.WriteSVG(w); // writes the number and the frame
                 w.WriteEndElement(); // barnumber group
             }

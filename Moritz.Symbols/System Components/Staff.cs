@@ -36,11 +36,11 @@ namespace Moritz.Symbols
             {            
                 w.WriteAttributeString("score", "staffName", null, this.Staffname);
 
-                w.SvgStartGroup("stafflines");
+                w.SvgStartGroup(CSSClass.stafflines.ToString());
                 float stafflineY = this.Metrics.StafflinesTop;
                 for(int staffLineIndex = 0; staffLineIndex < NumberOfStafflines; staffLineIndex++)
                 {
-					w.SvgLine("staffline", this.Metrics.StafflinesLeft, stafflineY, this.Metrics.StafflinesRight, stafflineY);
+					w.SvgLine(CSSClass.staffline, this.Metrics.StafflinesLeft, stafflineY, this.Metrics.StafflinesRight, stafflineY);
 
                     if(staffLineIndex < (NumberOfStafflines - 1))
                         stafflineY += Gap;

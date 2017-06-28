@@ -175,7 +175,7 @@ namespace Moritz.Symbols
 			w.SvgEndDefs(); // end of defs
 		}
 
-		private void WriteStyle(SvgWriter w)
+        private void WriteStyle(SvgWriter w)
 		{
             string fontDefs =
             @"
@@ -229,6 +229,10 @@ namespace Moritz.Symbols
 
         private StringBuilder GetStyles(PageFormat pageFormat)
         {
+            List<CSSClass> usedLines = new List<CSSClass>(LineStyle.CSSClasses);
+            List<CSSClass> usedTexts = new List<CSSClass>(TextStyle.CSSClasses);
+            List<string> usedIDs = new List<string>(MetricsForUse.UsedIDs);
+
             // FloatToShortString returns a string of minimum length with maximum 4 decimal places and a '.' decimal point.
 
             // PageFormat values set in AssistantComposerForms
@@ -823,11 +827,11 @@ namespace Moritz.Symbols
                             Debug.Assert(voice.NoteObjects.Count > 0
                                 && !(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline));
 
-                            Barline barline = new Barline(voice);
+                            Barline barline;
                             if(systemIndex == Systems.Count - 1)
-                                barline.BarlineType = BarlineType.end;
+                                barline = new Barline(voice, BarlineType.endDouble);
                             else
-                                barline.BarlineType = BarlineType.single;
+                                barline = new Barline(voice, BarlineType.single);
 
                             voice.NoteObjects.Add(barline);
                         }
@@ -1150,11 +1154,11 @@ namespace Moritz.Symbols
                         {
                             if(voice.NoteObjects[0] is Clef)
                             {
-                                voice.NoteObjects.Insert(1, new Barline(voice));
+                                voice.NoteObjects.Insert(1, new Barline(voice, BarlineType.single));
                             }
                             else
                             {
-                                voice.NoteObjects.Insert(0, new Barline(voice));
+                                voice.NoteObjects.Insert(0, new Barline(voice, BarlineType.single));
                             }
                         }
                     }

@@ -80,7 +80,7 @@ namespace Moritz.Symbols
             {
                 SmallClefMetrics m = Metrics as SmallClefMetrics;
                 if(m != null)
-                     w.SvgUseXY("clef", m.UseID, m.OriginX, m.OriginY);
+                     w.SvgUseXY(CSSClass.clef, m.UseID, m.OriginX, m.OriginY);
             }
         }
 

@@ -264,7 +264,7 @@ namespace Moritz.Xml
 	public enum BarlineType 
 	{
 		single, 
-		end
+		endDouble
 	};
 
 	#endregion

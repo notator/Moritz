@@ -763,7 +763,7 @@ namespace Moritz.Symbols
                 if((x2s[i] - x1s[i]) > (gap / 2))
                 {
                     NoteheadExtenderMetrics nem =
-                        new NoteheadExtenderMetrics(x1s[i], x2s[i], ys[i], headMetrics[i].ColorAttribute, extenderStrokeWidth, gap, drawExtender);
+                        new NoteheadExtenderMetrics(x1s[i], x2s[i], ys[i], extenderStrokeWidth, headMetrics[i].ColorAttribute, gap, drawExtender);
 
                     noteheadExtendersMetrics.Add(nem);
                 }

@@ -956,12 +956,12 @@ namespace Moritz.Symbols
             if(_headsMetricsTopDown != null)
             {
                 foreach(HeadMetrics headMetrics in _headsMetricsTopDown)
-                    headMetrics.WriteSVG(w, "notehead");
+                    headMetrics.WriteSVG(w, CSSClass.notehead);
             }
             if(_topDownAccidentalsMetrics != null)
             {
                 foreach(AccidentalMetrics accidentalMetrics in _topDownAccidentalsMetrics)
-                    accidentalMetrics.WriteSVG(w, "accidental");
+                    accidentalMetrics.WriteSVG(w, CSSClass.accidental);
             }
             if(_upperLedgerlineBlockMetrics != null)
             {
@@ -972,11 +972,11 @@ namespace Moritz.Symbols
                 _lowerLedgerlineBlockMetrics.WriteSVG(w);
             }
             if(_ornamentMetrics != null)
-                _ornamentMetrics.WriteSVG(w, "ornament");
+                _ornamentMetrics.WriteSVG(w, CSSClass.ornament);
             if(_lyricMetrics != null)
-                _lyricMetrics.WriteSVG(w, "lyric");
+                _lyricMetrics.WriteSVG(w, CSSClass.lyric);
             if(_dynamicMetrics != null)
-                _dynamicMetrics.WriteSVG(w, "dynamic");
+                _dynamicMetrics.WriteSVG(w, CSSClass.dynamic);
             if(_cautionaryBracketsMetrics != null)
             {
                 foreach(CautionaryBracketMetrics cautionaryBracketMetrics in _cautionaryBracketsMetrics)

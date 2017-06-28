@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -24,11 +24,22 @@ namespace Moritz.Symbols
             throw new NotImplementedException("MetricsForUse.WriteSVG(w) should never be called."); 
         }
 
+        protected void SetUseID(string useID)
+        {
+            UseID = useID;
+            if(!_usedIDs.Contains(useID))
+            {
+                _usedIDs.Add(useID);
+            }
+        }
+
+        protected static List<string> _usedIDs = new List<string>();
+        public static IReadOnlyList<string> UsedIDs { get { return _usedIDs as IReadOnlyList<string>; } }
+
         /// <summary>
         /// The id of the object to Use (defined in the SVG [defs] element.
         /// </summary>
-        public string UseID { get { return _useID; } }
-        protected string _useID = null;
+        public string UseID { get; private set; }
     }
     internal class FlagsBlockMetrics : MetricsForUse
 	{
@@ -50,36 +61,36 @@ namespace Moritz.Symbols
 			{
 				case DurationClass.quaver:
 					if(_stemDirection == VerticalDir.up)
-						_useID = "Right1Flag";
+						SetUseID("Right1Flag");
 					else
-						_useID = "Left1Flag";
+						SetUseID("Left1Flag");
 					break;
 				case DurationClass.semiquaver:
 					if(_stemDirection == VerticalDir.up)
-						_useID = "Right2Flags";
+						SetUseID("Right2Flags");
 					else
-						_useID = "Left2Flags";
+						SetUseID("Left2Flags");
 					offset = 0.25F;
 					break;
 				case DurationClass.threeFlags:
 					if(_stemDirection == VerticalDir.up)
-						_useID = "Right3Flags";
+						SetUseID("Right3Flags");
 					else
-						_useID = "Left3Flags";
+						SetUseID("Left3Flags");
 					offset = 0.5F;
 					break;
 				case DurationClass.fourFlags:
 					if(_stemDirection == VerticalDir.up)
-						_useID = "Right4Flags";
+						SetUseID("Right4Flags");
 					else
-						_useID = "Left4Flags";
+						SetUseID("Left4Flags");
 					offset = 0.75F;
 					break;
 				case DurationClass.fiveFlags:
 					if(_stemDirection == VerticalDir.up)
-						_useID = "Right5Flags";
+						SetUseID("Right5Flags");
 					else
-						_useID = "Left5Flags";
+						SetUseID("Left5Flags");
 					offset = 1F;
 					break;
 				default:
@@ -101,9 +112,9 @@ namespace Moritz.Symbols
 		public override void WriteSVG(SvgWriter w)
 		{
 			if(_stemDirection == VerticalDir.up)
-				w.SvgUseXY("flag", _useID, _left, _top);
+				w.SvgUseXY(CSSClass.flag, UseID, _left, _top);
 			else
-				w.SvgUseXY("flag", _useID, _left, _bottom);
+				w.SvgUseXY(CSSClass.flag, UseID, _left, _bottom);
 		}
 
 		private readonly float _fontHeight;
@@ -123,25 +134,25 @@ namespace Moritz.Symbols
             switch(clef.ClefType)
             {
                 case "t":
-                    _useID = "trebleClef";
+                    SetUseID("trebleClef");
                     _top = trebleTop;
                     _right = trebleRight;
                     _bottom = trebleBottom;
                     break;
                 case "t1": // trebleClef8
-                    _useID = "trebleClef8";
+                    SetUseID("trebleClef8");
                     _top = highTrebleTop;
                     _right = trebleRight;
                     _bottom = trebleBottom;
                     break;
                 case "t2": // trebleClef2x8
-                    _useID = "trebleClef2x8";
+                    SetUseID("trebleClef2x8");
                     _top = highTrebleTop;
                     _right = trebleRight;
                     _bottom = trebleBottom;
                     break;
                 case "t3": // trebleClef3x8
-                    _useID = "trebleClef3x8";
+                    SetUseID("trebleClef3x8");
                     _top = highTrebleTop;
                     _right = trebleRight;
                     _bottom = trebleBottom;
@@ -166,25 +177,25 @@ namespace Moritz.Symbols
                 switch(clef.ClefType)
                 {
                     case "b":
-                        _useID = "bassClef";
+                        SetUseID("bassClef");
                         _top = bassTop;
                         _right = bassRight;
                         _bottom = bassBottom;
                         break;
                     case "b1": // bassClef8
-                        _useID = "bassClef8";
+                        SetUseID("bassClef8");
                         _top = bassTop;
                         _right = bassRight;
                         _bottom = lowBassBottom;
                         break;
                     case "b2": // bassClef2x8
-                        _useID = "bassClef2x8";
+                        SetUseID("bassClef2x8");
                         _top = bassTop;
                         _right = bassRight;
                         _bottom = lowBassBottom;
                         break;
                     case "b3": // bassClef3x8
-                        _useID = "bassClef3x8";
+                        SetUseID("bassClef3x8");
                         _top = bassTop;
                         _right = bassRight;
                         _bottom = lowBassBottom;
@@ -207,7 +218,7 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            w.SvgUseXY("clef", _useID, _originX, _originY);
+            w.SvgUseXY(CSSClass.clef, UseID, _originX, _originY);
         }
 
         public readonly float FontHeight;
@@ -226,25 +237,25 @@ namespace Moritz.Symbols
             switch(clef.ClefType)
             {
                 case "t":
-                    _useID = "cautionaryTrebleClef";
+                    SetUseID("cautionaryTrebleClef");
                     _top = trebleTop;
                     _right = trebleRight;
                     _bottom = trebleBottom;
                     break;
                 case "t1": // trebleClef8
-                    _useID = "cautionaryTrebleClef8";
+                    SetUseID("cautionaryTrebleClef8");
                     _top = highTrebleTop;
                     _right = trebleRight;
                     _bottom = trebleBottom;
                     break;
                 case "t2": // trebleClef2x8
-                    _useID = "cautionaryTrebleClef2x8";
+                    SetUseID("cautionaryTrebleClef2x8");
                     _top = highTrebleTop;
                     _right = trebleRight;
                     _bottom = trebleBottom;
                     break;
                 case "t3": // trebleClef3x8
-                    _useID = "cautionaryTrebleClef3x8";
+                    SetUseID("cautionaryTrebleClef3x8");
                     _top = highTrebleTop;
                     _right = trebleRight;
                     _bottom = trebleBottom;
@@ -270,25 +281,25 @@ namespace Moritz.Symbols
                 switch(clef.ClefType)
                 {
                     case "b":
-                        _useID = "cautionaryBassClef";
+                        SetUseID("cautionaryBassClef");
                         _top = bassTop;
                         _right = bassRight;
                         _bottom = bassBottom;
                         break;
                     case "b1": // bassClef8
-                        _useID = "cautionaryBassClef8";
+                        SetUseID("cautionaryBassClef8");
                         _top = bassTop;
                         _right = bassRight;
                         _bottom = lowBassBottom;
                         break;
                     case "b2": // bassClef2x8
-                        _useID = "cautionaryBassClef2x8";
+                        SetUseID("cautionaryBassClef2x8");
                         _top = bassTop;
                         _right = bassRight;
                         _bottom = lowBassBottom;
                         break;
                     case "b3": // bassClef3x8
-                        _useID = "cautionaryBassClef3x8";
+                        SetUseID("cautionaryBassClef3x8");
                         _top = bassTop;
                         _right = bassRight;
                         _bottom = lowBassBottom;
@@ -311,7 +322,7 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            w.SvgUseXY("clef", _useID, _originX, _originY);
+            w.SvgUseXY(CSSClass.clef, UseID, _originX, _originY);
         }
 
         public readonly float FontHeight;

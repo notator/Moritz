@@ -9,10 +9,10 @@ using Moritz.Xml;
 
 namespace Moritz.Symbols
 {
-	internal class TextMetrics : Metrics
+	internal class TextMetrics : TextStyle
 	{
-		public TextMetrics(Graphics graphics, TextInfo textInfo)
-			: base()
+		public TextMetrics(CSSClass cssClass, Graphics graphics, TextInfo textInfo)
+			: base(cssClass, textInfo.FontFamily, textInfo.FontHeight, textInfo.TextHorizAlign, textInfo.ColorString.String)
 		{
 			SetDefaultMetrics(graphics, textInfo);
 			_textInfo = textInfo;
@@ -20,12 +20,12 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-			WriteSVG(w, null);
+            throw new NotImplementedException();
 		}
 
-		internal virtual void WriteSVG(SvgWriter w, string type)
+		internal virtual void WriteSVG(SvgWriter w, CSSClass cssClass)
 		{
-			w.SvgText(type, _textInfo, _originX, _originY);
+			w.SvgText(cssClass, _textInfo.Text, _originX, _originY);
 		}
 
 		/// <summary>
@@ -108,7 +108,7 @@ namespace Moritz.Symbols
 	internal class LyricMetrics : TextMetrics, ICloneable
 	{
 		public LyricMetrics(float gap, Graphics graphics, TextInfo textInfo, bool isBelow)
-			: base(graphics, textInfo)
+			: base(CSSClass.lyric, graphics, textInfo)
 		{
 			float width = _right - _left;
 			float newWidth = width * 0.75F;
@@ -128,7 +128,7 @@ namespace Moritz.Symbols
 	internal class OrnamentMetrics : TextMetrics, ICloneable
 	{
 		public OrnamentMetrics(float gap, Graphics graphics, TextInfo textInfo, bool isBelow)
-			: base(graphics, textInfo)
+			: base(CSSClass.ornament, graphics, textInfo)
 		{
 			IsBelow = isBelow;
 		}
@@ -142,9 +142,9 @@ namespace Moritz.Symbols
 	internal class BarnumberMetrics : TextMetrics
 	{
 		public BarnumberMetrics(Graphics graphics, TextInfo textInfo, FrameInfo frameInfo)
-			: base(graphics, textInfo)
+			: base(CSSClass.barNumber, graphics, textInfo)
 		{
-			TextMetrics textMetrics = new TextMetrics(graphics, textInfo);
+			TextMetrics textMetrics = new TextMetrics(CSSClass.barNumber, graphics, textInfo);
 			_top = textMetrics.Top - frameInfo.PaddingY;
 			_right = textMetrics.Right + frameInfo.PaddingX;
 			_bottom = textMetrics.Bottom + frameInfo.PaddingY;
@@ -154,8 +154,8 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-			base.WriteSVG(w, "barNumberNumber");
-			w.SvgRect("barNumberFrame", _left, _top, _right - _left, _bottom - _top);
+			base.WriteSVG(w, CSSClass.barNumberNumber);
+			w.SvgRect(CSSClass.barNumberFrame.ToString(), _left, _top, _right - _left, _bottom - _top);
 		}
 
 		float _strokeWidth = 0;

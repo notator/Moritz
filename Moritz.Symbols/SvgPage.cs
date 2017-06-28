@@ -171,7 +171,7 @@ namespace Moritz.Symbols
 
 		private void WriteFrameLayer(SvgWriter w, float width, float height)
 		{
-            w.SvgRect("frame", 0, 0, width, height);
+            w.SvgRect(CSSClass.frame.ToString(), 0, 0, width, height);
         }
 
 		private void WriteSystemsLayer(SvgWriter w, int pageNumber, Metadata metadata)
@@ -180,7 +180,7 @@ namespace Moritz.Symbols
 
             //w.WriteAttributeString("style", "display:inline");
 
-			w.SvgText("timeStamp", _infoTextInfo, 32, _infoTextInfo.FontHeight);
+			w.SvgText(CSSClass.timeStamp, _infoTextInfo.Text, 32, _infoTextInfo.FontHeight);
 
 			if(pageNumber == 1 || pageNumber == 0)
 			{
@@ -257,8 +257,8 @@ namespace Moritz.Symbols
 				  null, TextHorizAlign.right);
 			w.WriteStartElement("g");
 			w.WriteAttributeString("class", "titles");
-			w.SvgText("mainTitle", titleInfo, _pageFormat.Right / 2F, _pageFormat.Page1TitleY);
-			w.SvgText("author", authorInfo, _pageFormat.RightMarginPos, _pageFormat.Page1TitleY);
+			w.SvgText(CSSClass.mainTitle, titleInfo.Text, _pageFormat.Right / 2F, _pageFormat.Page1TitleY);
+			w.SvgText(CSSClass.author, authorInfo.Text, _pageFormat.RightMarginPos, _pageFormat.Page1TitleY);
 			w.WriteEndElement(); // group
 		}
 

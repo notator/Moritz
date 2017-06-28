@@ -1,4 +1,7 @@
-using System.Drawing;
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 using Moritz.Globals;
 using Moritz.Xml;
@@ -52,23 +55,23 @@ namespace Moritz.Symbols
 				bottomY += halfStrokeWidth;
 			}
 
-			string barlineType;
-            if(BarlineType == BarlineType.end)
+			CSSClass barlineType;
+            if(BarlineType == BarlineType.endDouble)                                                
             {
-				barlineType = isConnector ? "endBarlineLeftConnector" : "endBarlineLeft";
+				barlineType = isConnector ? CSSClass.endBarlineLeftConnector : CSSClass.endBarlineLeft;
 				w.SvgLine(barlineType,
 					this.Metrics.OriginX - (singleBarlineStrokeWidth * 3F), topY,
 					this.Metrics.OriginX - (singleBarlineStrokeWidth * 3F), bottomY);
 
-				barlineType = isConnector ? "endBarlineRightConnector" : "endBarlineRight";
-				w.SvgLine(barlineType,
+				barlineType = isConnector ? CSSClass.endBarlineRightConnector : CSSClass.endBarlineRight;
+                w.SvgLine(barlineType,
                     this.Metrics.OriginX, topY,
                     this.Metrics.OriginX, bottomY);
             }
             else
             {
-				barlineType = isConnector ? "staffConnector" : "barline";
-				w.SvgLine(barlineType, this.Metrics.OriginX, topY, this.Metrics.OriginX, bottomY);
+				barlineType = isConnector ? CSSClass.staffConnector : CSSClass.barline;
+                w.SvgLine(barlineType, this.Metrics.OriginX, topY, this.Metrics.OriginX, bottomY);
             }
         }
 

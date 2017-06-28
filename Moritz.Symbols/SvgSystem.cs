@@ -190,7 +190,7 @@ namespace Moritz.Symbols
 
             // barlineWidths:  Key is a moment's msPosition. Value is the distance between the left edge 
             // of the barline and the AlignmentX of the moment which immediately follows it.
-            Dictionary<int, float> barlineWidths = GetBarlineWidths(moments, pageFormat.Gap);
+            Dictionary<int, float> barlineWidths = GetBarlineWidths(moments, pageFormat);
 
             DistributeProportionally(moments, barlineWidths, pageFormat, leftMargin);
 
@@ -475,13 +475,13 @@ namespace Moritz.Symbols
         /// <param name="moments"></param>
         /// <param name="gap"></param>
         /// <returns></returns>
-        private Dictionary<int, float> GetBarlineWidths(List<NoteObjectMoment> moments, float gap)
+        private Dictionary<int, float> GetBarlineWidths(List<NoteObjectMoment> moments, PageFormat pageFormat)
         {
             Dictionary<int, float> barlineWidths = new Dictionary<int, float>();
 
-            BarlineMetrics singleBarline = new BarlineMetrics(null, new Barline(Staves[0].Voices[0], BarlineType.single), gap);
+            BarlineMetrics singleBarline = new BarlineMetrics(null, new Barline(Staves[0].Voices[0], BarlineType.single), pageFormat.Gap);
             float singleBarlineLeftMargin = singleBarline.OriginX - singleBarline.Left;
-            BarlineMetrics endBarline = new BarlineMetrics(null, new Barline(Staves[0].Voices[0], BarlineType.end), gap);
+            BarlineMetrics endBarline = new BarlineMetrics(null, new Barline(Staves[0].Voices[0], BarlineType.endDouble), pageFormat.Gap);
             float endBarlineLeftMargin = endBarline.OriginX - endBarline.Left;
 
             Barline barline = null;

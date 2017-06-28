@@ -366,7 +366,7 @@ namespace Moritz.Symbols
                             {
                                 Debug.Assert(staffName.TextInfo != null);
 
-                                TextMetrics staffNameMetrics = new TextMetrics(graphics, staffName.TextInfo);
+                                TextMetrics staffNameMetrics = new TextMetrics(CSSClass.staffName, graphics, staffName.TextInfo);
                                 float nameWidth = staffNameMetrics.Right - staffNameMetrics.Left;
                                 maxNameWidth = (maxNameWidth > nameWidth) ? maxNameWidth : nameWidth;
                             }

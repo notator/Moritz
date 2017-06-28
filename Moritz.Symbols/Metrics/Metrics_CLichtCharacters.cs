@@ -2,20 +2,82 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 using Moritz.Globals;
 using Moritz.Xml;
 
 namespace Moritz.Symbols
 {
-    internal class CLichtCharacterMetrics : Metrics
+    public class TextStyle : Metrics
+    {
+        public TextStyle(CSSClass cssClass, string fontFamily, float fontHeight, TextHorizAlign textAnchor = TextHorizAlign.left, string fill = "black")
+            : base()
+        {
+            FontFamily = fontFamily;
+            FontHeight = fontHeight;
+            switch(textAnchor)
+            {
+                case (TextHorizAlign.left):
+                    TextAnchor = "left";
+                    break;
+                case (TextHorizAlign.center):
+                    TextAnchor = "middle";
+                    break;
+                case (TextHorizAlign.right):
+                    TextAnchor = "right";
+                    break;
+            }
+            if(fill == "#FFFFFF" || fill == "FFFFFF")
+            {
+                Fill = "white";
+            }
+            else if(fill == "#000000" || fill == "000000")
+            {
+                Fill = "black";
+            }
+            else if(fill == "none" || fill == "white" || fill == "black" || fill == "red")
+            {
+                Fill = fill;
+            }
+            else
+            {
+                if(fill[0] != '#')
+                {
+                    fill.Insert(0, "#");
+                }
+                Debug.Assert(Regex.IsMatch(fill, @"^#[0-9a-fA-F]{6}$"));
+                Fill = fill; // a string of the form "#AAAAAA"
+            }
+                  
+            if(!_cssClasses.Contains(cssClass))
+            {
+                _cssClasses.Add(cssClass);
+            }
+        }
+
+        public override void WriteSVG(SvgWriter w)
+        {
+            throw new NotImplementedException();
+        }
+
+        public readonly CSSClass CSSClass;
+        public readonly string FontFamily = ""; // "Arial", "CLicht", "Open Sans", "Open Sans Condensed"
+        public readonly float FontHeight = 0F;       
+        public readonly string TextAnchor; // "left", "middle", "right"
+        public readonly string Fill; // "none", "black", "white", "red", #AAAAAA" etc
+
+        protected static List<CSSClass> _cssClasses = new List<CSSClass>();
+        public static IReadOnlyList<CSSClass> CSSClasses { get { return _cssClasses as IReadOnlyList<CSSClass>; } }
+    }
+
+    internal class CLichtCharacterMetrics : TextStyle
 	{
         /// <summary>
         /// Used by DynamicMetrics
         /// </summary>
 		public CLichtCharacterMetrics(string characterString, float fontHeight, TextHorizAlign textHorizAlign)
-			: base()
+			: base(CSSClass.dynamic, "CLicht", fontHeight, textHorizAlign)
 		{
 			_characterString = characterString;
 
@@ -39,7 +101,7 @@ namespace Moritz.Symbols
         /// Used by RestMetrics and HeadMetrics
         /// </summary>
 		public CLichtCharacterMetrics(DurationClass durationClass, bool isRest, float fontHeight)
-			: base()
+			: base(isRest ? CSSClass.rest : CSSClass.notehead, "CLicht", fontHeight)
 		{
 			_characterString = GetClichtCharacterString(durationClass, isRest);
 
@@ -62,7 +124,7 @@ namespace Moritz.Symbols
         /// Used by AccidentalMetrics
         /// </summary>
 		public CLichtCharacterMetrics(Head head, float fontHeight)
-			: base()
+			: base(CSSClass.accidental, "CLicht", fontHeight)
 		{
 			_characterString = GetClichtCharacterString(head);
 
@@ -86,27 +148,27 @@ namespace Moritz.Symbols
             throw new NotImplementedException();
         }
 
-        public void WriteSVG(SvgWriter w, string type)
+        public void WriteSVG(SvgWriter w, CSSClass cssClass)
         {
 			w.WriteStartElement("text");
-            w.WriteAttributeString("class", type);
+            w.WriteAttributeString("class", cssClass.ToString());
             w.WriteAttributeString("x", M.FloatToShortString(_originX));
             w.WriteAttributeString("y", M.FloatToShortString(_originY));
             if(! string.IsNullOrEmpty(_colorAttribute))
             {
                 w.WriteAttributeString("fill", _colorAttribute);
             }
-			switch(_textHorizAlign)
-			{
-				case TextHorizAlign.left:
-					break;
-				case TextHorizAlign.center:
-					w.WriteAttributeString("text-anchor", "middle");
-					break;
-				case TextHorizAlign.right:
-					w.WriteAttributeString("text-anchor", "end");
-					break;
-			}
+			//switch(_textHorizAlign)
+			//{
+			//	case TextHorizAlign.left:
+			//		break;
+			//	case TextHorizAlign.center:
+			//		w.WriteAttributeString("text-anchor", "middle");
+			//		break;
+			//	case TextHorizAlign.right:
+			//		w.WriteAttributeString("text-anchor", "end");
+			//		break;
+			//}
 			w.WriteString(_characterString); // e.g. Unicode character
 			w.WriteEndElement();
 		}
@@ -231,7 +293,6 @@ namespace Moritz.Symbols
 
         public string CharacterString { get { return _characterString; } }
         protected string _characterString = "";
-		public float FontHeight { get { return _fontHeight; } }
 		protected float _fontHeight;
 		protected TextHorizAlign _textHorizAlign = TextHorizAlign.left;
         public string ColorAttribute { get { return _colorAttribute; } }
@@ -312,7 +373,7 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-			base.WriteSVG(w, "rest");
+            WriteSVG(w, CSSClass.rest);
 			if(_ledgerline != null && _ledgerlineVisible)
 				_ledgerline.WriteSVG(w);
 			if(_durationControlMetrics != null)
