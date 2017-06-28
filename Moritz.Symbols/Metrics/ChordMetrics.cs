@@ -938,30 +938,26 @@ namespace Moritz.Symbols
 
         #region public interface
 
-        ///// <summary>
-        ///// This function is used by CautionaryChordSymbol.
-        ///// I dont quite understand why.
-        ///// </summary>
-        ///// <param name="w"></param>
-        //internal void WriteSVG(SvgWriter w)
-        //{
-        //    WriteSVG(w); // should call the following function
-        //}
         public override void WriteSVG(SvgWriter w)
         {
+            throw new NotImplementedException();
+        }
+
+        public void WriteSVG(SvgWriter w, bool isCautionary)
+        {
             if(_stemMetrics != null)
-                _stemMetrics.WriteSVG(w);
+                _stemMetrics.WriteSVG(w, isCautionary);
             if(_flagsBlockMetrics != null)
-                _flagsBlockMetrics.WriteSVG(w);
+                _flagsBlockMetrics.WriteSVG(w, isCautionary);
             if(_headsMetricsTopDown != null)
             {
                 foreach(HeadMetrics headMetrics in _headsMetricsTopDown)
-                    headMetrics.WriteSVG(w, CSSClass.notehead);
+                    headMetrics.WriteSVG(w, CSSClass.notehead, isCautionary);
             }
             if(_topDownAccidentalsMetrics != null)
             {
                 foreach(AccidentalMetrics accidentalMetrics in _topDownAccidentalsMetrics)
-                    accidentalMetrics.WriteSVG(w, CSSClass.accidental);
+                    accidentalMetrics.WriteSVG(w, CSSClass.accidental, isCautionary);
             }
             if(_upperLedgerlineBlockMetrics != null)
             {
@@ -972,11 +968,32 @@ namespace Moritz.Symbols
                 _lowerLedgerlineBlockMetrics.WriteSVG(w);
             }
             if(_ornamentMetrics != null)
-                _ornamentMetrics.WriteSVG(w, CSSClass.ornament);
+            {
+                if(isCautionary)
+                {
+                    _ornamentMetrics.WriteSVG(w, CSSClass.cautionaryOrnament);
+                }
+                else
+                {
+                    _ornamentMetrics.WriteSVG(w, CSSClass.ornament);
+                }  
+            }
             if(_lyricMetrics != null)
-                _lyricMetrics.WriteSVG(w, CSSClass.lyric);
+            {
+                if(isCautionary)
+                {
+                    _lyricMetrics.WriteSVG(w, CSSClass.cautionaryLyric);
+                }
+                else
+                {
+                    _lyricMetrics.WriteSVG(w, CSSClass.lyric);
+                }
+                
+            }
+
             if(_dynamicMetrics != null)
-                _dynamicMetrics.WriteSVG(w, CSSClass.dynamic);
+                _dynamicMetrics.WriteSVG(w, CSSClass.dynamic, isCautionary);
+
             if(_cautionaryBracketsMetrics != null)
             {
                 foreach(CautionaryBracketMetrics cautionaryBracketMetrics in _cautionaryBracketsMetrics)

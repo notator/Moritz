@@ -17,11 +17,22 @@ namespace Moritz.Xml
 
         // Written with a CSS definition if the class exists in the static TextStyle.CSSClasses list.
         notehead,
+        accidental,
         rest,
         dynamic,
-        accidental,
         lyric,
         ornament,
+
+        cautionaryNotehead,
+        cautionaryAccidental,
+
+        // These are not used in any current score. 
+        cautionaryRest,
+        cautionaryDynamic,
+        cautionaryLyric,
+        cautionaryOrnament,
+        cautionaryStem,
+        cautionaryFlag
 
         #region clefs
         // If the static MetricsForUse.UsedIDs list contains any clef IDs (e.g. "trebleClef8"), they will be written to the defs.

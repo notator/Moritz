@@ -68,12 +68,19 @@ namespace Moritz.Symbols
 			StrokeWidth = strokeWidth;
 		}
 
-		public override void WriteSVG(SvgWriter w)
-		{
-			w.SvgLine(CSSClass.stem, _originX, _top, _originX, _bottom);
-		}
+        public override void WriteSVG(SvgWriter w)
+        {
+            throw new NotImplementedException();
+        }
 
-		public object Clone()
+        public void WriteSVG(SvgWriter w, bool isCautionary)
+        {
+            CSSClass stemClass = (isCautionary) ? CSSClass.cautionaryStem : CSSClass.stem;
+
+            w.SvgLine(stemClass, _originX, _top, _originX, _bottom);
+        }
+
+        public object Clone()
 		{
 			return this.MemberwiseClone();
 		}
@@ -213,11 +220,11 @@ namespace Moritz.Symbols
 			_drawExtender = drawExtender;
 		}
 
-		public override void WriteSVG(SvgWriter w)
-		{
-			if(_drawExtender)
-				w.SvgLine(CSSClass.noteExtender, _left, _originY, _right, _originY);
-		}
+        public override void WriteSVG(SvgWriter w)
+        {
+            if(_drawExtender)
+                w.SvgLine(CSSClass.noteExtender, _left, _originY, _right, _originY);
+        }
 
         public string StrokeColor { get { return _strokeColor; } }
         private readonly string _strokeColor;

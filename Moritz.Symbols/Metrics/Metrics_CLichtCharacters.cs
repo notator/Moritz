@@ -148,8 +148,29 @@ namespace Moritz.Symbols
             throw new NotImplementedException();
         }
 
-        public void WriteSVG(SvgWriter w, CSSClass cssClass)
+        public void WriteSVG(SvgWriter w, CSSClass cssClass, bool isCautionary)
         {
+            if(isCautionary)
+            {
+                switch(cssClass)
+                {
+                    case CSSClass.notehead:
+                        cssClass = CSSClass.cautionaryNotehead;
+                        break;
+                    case CSSClass.accidental:
+                        cssClass = CSSClass.cautionaryAccidental;
+                        break;
+                    case CSSClass.dynamic:
+                        cssClass = CSSClass.cautionaryDynamic;
+                        break;
+                    case CSSClass.rest:
+                        cssClass = CSSClass.cautionaryRest;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
 			w.WriteStartElement("text");
             w.WriteAttributeString("class", cssClass.ToString());
             w.WriteAttributeString("x", M.FloatToShortString(_originX));
@@ -371,9 +392,13 @@ namespace Moritz.Symbols
 				_durationControlMetrics.Move(dx, dy);
 		}
 
-		public override void WriteSVG(SvgWriter w)
-		{
-            WriteSVG(w, CSSClass.rest);
+        public override void WriteSVG(SvgWriter w)
+        {
+
+        }
+        public void WriteSVG(SvgWriter w, bool isCautionary)
+        {
+            WriteSVG(w, CSSClass.rest, isCautionary);
 			if(_ledgerline != null && _ledgerlineVisible)
 				_ledgerline.WriteSVG(w);
 			if(_durationControlMetrics != null)

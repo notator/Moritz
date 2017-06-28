@@ -109,12 +109,18 @@ namespace Moritz.Symbols
 			}
 		}
 
-		public override void WriteSVG(SvgWriter w)
-		{
+        public override void WriteSVG(SvgWriter w)
+        {
+            throw new NotImplementedException();
+        }
+        public void WriteSVG(SvgWriter w, bool isCautionary)
+        {
+            CSSClass flagClass = isCautionary ? CSSClass.cautionaryFlag : CSSClass.flag;
+
 			if(_stemDirection == VerticalDir.up)
-				w.SvgUseXY(CSSClass.flag, UseID, _left, _top);
+				w.SvgUseXY(flagClass, UseID, _left, _top);
 			else
-				w.SvgUseXY(CSSClass.flag, UseID, _left, _bottom);
+				w.SvgUseXY(flagClass, UseID, _left, _bottom);
 		}
 
 		private readonly float _fontHeight;
