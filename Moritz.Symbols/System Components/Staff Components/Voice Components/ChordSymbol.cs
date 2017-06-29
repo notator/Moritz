@@ -9,7 +9,7 @@ namespace Moritz.Symbols
 {
     public abstract class ChordSymbol : DurationSymbol
     {
-        public ChordSymbol(Voice voice, int msDuration, int absMsPosition, int minimumCrotchetDurationMS, bool beamContinues, float fontSize)
+        public ChordSymbol(Voice voice, int msDuration, int absMsPosition, int minimumCrotchetDurationMS, float fontSize, bool beamContinues)
             : base(voice,  msDuration, absMsPosition, minimumCrotchetDurationMS, fontSize)
         {            
             // note that all chord symbols have a stem! 

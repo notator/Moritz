@@ -3,6 +3,8 @@ namespace Moritz.Xml
     public enum CSSLineCap { butt, round, square };
     public enum CSSClass
     {
+        none, // This class exists for technical reasons, but it is never added to a used class list, so is never given a CSS definition!
+
         #region text
         // Always written on every page with a CSS definition
         timeStamp,
@@ -41,6 +43,8 @@ namespace Moritz.Xml
         inputRest,
         inputDynamic,
         inputLyric,
+        inputCautionaryNotehead,
+        inputCautionaryAccidental,
         // inputClefs (test changing clef on an inputVoice)
         inputClef,
         inputClefOctaveNumber,

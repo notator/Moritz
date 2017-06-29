@@ -96,8 +96,9 @@ namespace Moritz.Symbols
         private void SetHeadsMetrics(ChordSymbol chord, float ledgerlineStemStrokeWidth)
         {
             _headsMetricsTopDown = new List<HeadMetrics>();
+            CSSClass headClass = GetHeadClass(chord);
 
-            HeadMetrics hMetrics = new HeadMetrics(chord, null, _gap); // the head is horizontally aligned at 0 by default.
+            HeadMetrics hMetrics = new HeadMetrics(chord, null, _gap, headClass); // the head is horizontally aligned at 0 by default.
             float horizontalShift = hMetrics.RightStemX - hMetrics.LeftStemX - (ledgerlineStemStrokeWidth / 2F); // the distance to shift left or right if heads would collide
             float shiftRange = _gap * 0.75F;
 
@@ -126,7 +127,8 @@ namespace Moritz.Symbols
                             newHeadAlignX = 0;
                     }
 
-                    HeadMetrics headMetrics = new HeadMetrics(chord, head, _gap);
+                    CSSClass headClass1 = GetHeadClass(chord);
+                    HeadMetrics headMetrics = new HeadMetrics(chord, head, _gap, headClass1);
                     headMetrics.Move(newHeadAlignX, newHeadOriginY); // moves head.originY to headY
                     bottomUpMetrics.Add(headMetrics);
                 }
@@ -155,7 +157,8 @@ namespace Moritz.Symbols
                             newHeadAlignX = 0;
                     }
 
-                    HeadMetrics headMetrics = new HeadMetrics(chord, head, _gap);
+                    CSSClass headClass2 = GetHeadClass(chord);
+                    HeadMetrics headMetrics = new HeadMetrics(chord, head, _gap, headClass2);
                     headMetrics.Move(newHeadAlignX, newHeadOriginY); // moves head.originY to headY
                     _headsMetricsTopDown.Add(headMetrics);
                 }
@@ -163,6 +166,24 @@ namespace Moritz.Symbols
 
             Debug.Assert(_originX == 0F);
             Debug.Assert(_headsMetricsTopDown.Count == chord.HeadsTopDown.Count);
+        }
+
+        private CSSClass GetHeadClass(ChordSymbol chord)
+        {
+            CSSClass headClass = CSSClass.notehead; // OutputChordSymbol
+            if(chord is CautionaryOutputChordSymbol)
+            {
+                headClass = CSSClass.cautionaryNotehead;
+            }
+            else if(chord is CautionaryInputChordSymbol)
+            {
+                headClass = CSSClass.inputCautionaryNotehead;
+            }
+            else if(chord is InputChordSymbol)
+            {
+                headClass = CSSClass.inputNotehead;
+            }
+            return headClass;
         }
 
         private void CreateLedgerlineAndAccidentalMetrics(float fontHeight, List<Head> topDownHeads, List<HeadMetrics> topDownHeadsMetrics, float ledgerlineStemStrokeWidth)

@@ -50,7 +50,7 @@ namespace Moritz.Symbols
                 Fill = fill; // a string of the form "#AAAAAA"
             }
                   
-            if(!_cssClasses.Contains(cssClass))
+            if(cssClass != CSSClass.none && !_cssClasses.Contains(cssClass))
             {
                 _cssClasses.Add(cssClass);
             }
@@ -100,10 +100,10 @@ namespace Moritz.Symbols
         /// <summary>
         /// Used by RestMetrics and HeadMetrics
         /// </summary>
-		public CLichtCharacterMetrics(DurationClass durationClass, bool isRest, float fontHeight)
-			: base(isRest ? CSSClass.rest : CSSClass.notehead, "CLicht", fontHeight)
+		public CLichtCharacterMetrics(DurationClass durationClass, float fontHeight, CSSClass cssClass)
+			: base(cssClass, "CLicht", fontHeight)
 		{
-			_characterString = GetClichtCharacterString(durationClass, isRest);
+			_characterString = GetClichtCharacterString(durationClass, cssClass == CSSClass.rest);
 
 			Debug.Assert(_characterString != null);
 			Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_characterString];
@@ -323,7 +323,7 @@ namespace Moritz.Symbols
     internal class RestMetrics : CLichtCharacterMetrics
 	{
 		public RestMetrics(Graphics graphics, RestSymbol rest, float gap, int numberOfStafflines, float ledgerlineStrokeWidth)
-			: base(rest.DurationClass, true, rest.FontHeight)
+			: base(rest.DurationClass, rest.FontHeight, CSSClass.rest)
 		{
 			float dy = 0;
 			if(numberOfStafflines > 1)
@@ -427,8 +427,8 @@ namespace Moritz.Symbols
 	}
 	internal class HeadMetrics : CLichtCharacterMetrics
 	{
-		public HeadMetrics(ChordSymbol chord, Head head, float gapVBPX)
-			: base(chord.DurationClass, false, chord.FontHeight)
+		public HeadMetrics(ChordSymbol chord, Head head, float gapVBPX, CSSClass headClass)
+			: base(chord.DurationClass, chord.FontHeight, headClass)
 		{
 			Move((Left - Right) / 2F, 0F); // centre horizontally
 
@@ -447,7 +447,7 @@ namespace Moritz.Symbols
 		/// Used when creating temporary heads for chord alignment purposes.
 		/// </summary>
 		public HeadMetrics(HeadMetrics otherHead, DurationClass durationClass)
-			: base(durationClass, false, otherHead.FontHeight)
+			: base(durationClass, otherHead.FontHeight, CSSClass.none)
 		{
 			// move to position of other head
 			Move(otherHead.OriginX - _originX, otherHead.OriginY - OriginY);

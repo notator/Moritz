@@ -11,7 +11,7 @@ namespace Moritz.Symbols
     public class OutputChordSymbol : ChordSymbol
     {
         public OutputChordSymbol(Voice voice, MidiChordDef umcd, int absMsPosition, int minimumCrotchetDurationMS, float fontSize)
-            : base(voice, umcd.MsDuration, absMsPosition, minimumCrotchetDurationMS, umcd.BeamContinues, fontSize)
+            : base(voice, umcd.MsDuration, absMsPosition, minimumCrotchetDurationMS, fontSize, umcd.BeamContinues)
         {
             _midiChordDef = umcd;
 
@@ -33,10 +33,10 @@ namespace Moritz.Symbols
         }
 
         /// <summary>
-        /// used by CautonaryOutputChordSymbol
+        /// used by CautionaryOutputChordSymbol
         /// </summary>
         public OutputChordSymbol(Voice voice, int msDuration, int absMsPosition, int minimumCrotchetDurationMS, float fontSize)
-            : base(voice,  msDuration, absMsPosition, minimumCrotchetDurationMS, false, fontSize)
+            : base(voice, msDuration, absMsPosition, minimumCrotchetDurationMS, fontSize, false)
         {
 
         }
