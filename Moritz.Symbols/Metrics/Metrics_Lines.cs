@@ -70,14 +70,7 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            throw new NotImplementedException();
-        }
-
-        public void WriteSVG(SvgWriter w, bool isCautionary)
-        {
-            CSSClass stemClass = (isCautionary) ? CSSClass.cautionaryStem : CSSClass.stem;
-
-            w.SvgLine(stemClass, _originX, _top, _originX, _bottom);
+            w.SvgLine(CSSClass.stem, _originX, _top, _originX, _bottom);
         }
 
         public object Clone()

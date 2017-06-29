@@ -22,17 +22,40 @@ namespace Moritz.Xml
         dynamic,
         lyric,
         ornament,
-
+        // These are used in reminders at the beginnings of staves. 
         cautionaryNotehead,
         cautionaryAccidental,
 
-        // These are not used in any current score. 
-        cautionaryRest,
-        cautionaryDynamic,
-        cautionaryLyric,
-        cautionaryOrnament,
-        cautionaryStem,
-        cautionaryFlag
+        // These dont exist, because ordinary grace notes dont exist. 
+        //cautionaryRest,
+        //cautionaryDynamic,
+        //cautionaryLyric,
+        //cautionaryOrnament,
+        //cautionaryStem,
+        //cautionaryFlag,
+
+        #region input classes
+        // chord components
+        inputNotehead,
+        inputAccidental,
+        inputRest,
+        inputDynamic,
+        inputLyric,
+        // inputClefs (test changing clef on an inputVoice)
+        inputClef,
+        inputClefOctaveNumber,
+        inputClefX,
+        inputCautionaryClef,
+        inputCautionaryClefOctaveNumber,
+        inputCautionaryClefX,
+        // input lines
+        inputStafflines,
+        inputLedgerlines,
+        inputStem,
+        inputBeamBlock,
+        inputOpaqueBeam,
+        inputFlag,
+        #endregion
 
         #region clefs
         // If the static MetricsForUse.UsedIDs list contains any clef IDs (e.g. "trebleClef8"), they will be written to the defs.

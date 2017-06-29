@@ -55,7 +55,9 @@ namespace Moritz.Symbols
                 _midiRestDef.WriteSVG(w, channel, carryMsgs);
 
                 if(this.Metrics != null && staffIsVisible)
+                {
                     this.Metrics.WriteSVG(w);
+                }
 
                 w.SvgEndGroup();
             }

@@ -148,8 +148,11 @@ namespace Moritz.Symbols
             throw new NotImplementedException();
         }
 
-        public void WriteSVG(SvgWriter w, CSSClass cssClass, bool isCautionary)
+        public void WriteSVG(SvgWriter w, CSSClass cssClass, bool isCautionary = false)
         {
+            Debug.Assert(cssClass == CSSClass.notehead || cssClass == CSSClass.accidental
+                         || cssClass == CSSClass.dynamic || cssClass == CSSClass.rest);
+
             if(isCautionary)
             {
                 switch(cssClass)
@@ -161,12 +164,10 @@ namespace Moritz.Symbols
                         cssClass = CSSClass.cautionaryAccidental;
                         break;
                     case CSSClass.dynamic:
-                        cssClass = CSSClass.cautionaryDynamic;
+                        // CSSClass.cautionaryDynamic does not exist
                         break;
                     case CSSClass.rest:
-                        cssClass = CSSClass.cautionaryRest;
-                        break;
-                    default:
+                        // CSSClass.cautionaryRest does not exist
                         break;
                 }
             }
@@ -394,22 +395,18 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-
+            WriteSVG(w, CSSClass.rest, false);
+            if(_ledgerline != null && _ledgerlineVisible)
+                _ledgerline.WriteSVG(w);
+            if(_durationControlMetrics != null)
+                _durationControlMetrics.WriteSVG(w);
         }
-        public void WriteSVG(SvgWriter w, bool isCautionary)
-        {
-            WriteSVG(w, CSSClass.rest, isCautionary);
-			if(_ledgerline != null && _ledgerlineVisible)
-				_ledgerline.WriteSVG(w);
-			if(_durationControlMetrics != null)
-				_durationControlMetrics.WriteSVG(w);
-		}
 
-		/// <summary>
-		/// Ledgerlines exist in breve, semibreve and minim rests.
-		/// They are made visible when the rest is moved outside the staff on 2-voice staves.
-		/// </summary>
-		public bool LedgerlineVisible
+        /// <summary>
+        /// Ledgerlines exist in breve, semibreve and minim rests.
+        /// They are made visible when the rest is moved outside the staff on 2-voice staves.
+        /// </summary>
+        public bool LedgerlineVisible
 		{
 			set
 			{

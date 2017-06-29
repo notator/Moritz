@@ -946,9 +946,9 @@ namespace Moritz.Symbols
         public void WriteSVG(SvgWriter w, bool isCautionary)
         {
             if(_stemMetrics != null)
-                _stemMetrics.WriteSVG(w, isCautionary);
+                _stemMetrics.WriteSVG(w);
             if(_flagsBlockMetrics != null)
-                _flagsBlockMetrics.WriteSVG(w, isCautionary);
+                _flagsBlockMetrics.WriteSVG(w);
             if(_headsMetricsTopDown != null)
             {
                 foreach(HeadMetrics headMetrics in _headsMetricsTopDown)
@@ -969,30 +969,16 @@ namespace Moritz.Symbols
             }
             if(_ornamentMetrics != null)
             {
-                if(isCautionary)
-                {
-                    _ornamentMetrics.WriteSVG(w, CSSClass.cautionaryOrnament);
-                }
-                else
-                {
-                    _ornamentMetrics.WriteSVG(w, CSSClass.ornament);
-                }  
+                _ornamentMetrics.WriteSVG(w, CSSClass.ornament); 
             }
             if(_lyricMetrics != null)
             {
-                if(isCautionary)
-                {
-                    _lyricMetrics.WriteSVG(w, CSSClass.cautionaryLyric);
-                }
-                else
-                {
-                    _lyricMetrics.WriteSVG(w, CSSClass.lyric);
-                }
-                
+                _lyricMetrics.WriteSVG(w, CSSClass.lyric);
+               
             }
 
             if(_dynamicMetrics != null)
-                _dynamicMetrics.WriteSVG(w, CSSClass.dynamic, isCautionary);
+                _dynamicMetrics.WriteSVG(w, CSSClass.dynamic, false); // cautionary dynamics don't exist.
 
             if(_cautionaryBracketsMetrics != null)
             {
