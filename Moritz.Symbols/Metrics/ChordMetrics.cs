@@ -39,7 +39,8 @@ namespace Moritz.Symbols
             // if the chord is part of a beamGroup, the stem tips are all at one height here.
 
             // These objects are created with originX and originY at 0,0 (the chord's origin).
-            CreateLedgerlineAndAccidentalMetrics(chord.FontHeight, chord.HeadsTopDown, _headsMetricsTopDown, stemStrokeWidthVBPX);
+            CSSClass accidentalClass = GetAccidentalClass(chord);
+            CreateLedgerlineAndAccidentalMetrics(chord.FontHeight, chord.HeadsTopDown, _headsMetricsTopDown, stemStrokeWidthVBPX, accidentalClass);
 
             ChordSymbol cautionaryChordSymbol = chord as CautionaryOutputChordSymbol;
             if(cautionaryChordSymbol == null)
@@ -186,7 +187,25 @@ namespace Moritz.Symbols
             return headClass;
         }
 
-        private void CreateLedgerlineAndAccidentalMetrics(float fontHeight, List<Head> topDownHeads, List<HeadMetrics> topDownHeadsMetrics, float ledgerlineStemStrokeWidth)
+        private CSSClass GetAccidentalClass(ChordSymbol chord)
+        {
+            CSSClass accidentalClass = CSSClass.accidental; // OutputChordSymbol
+            if(chord is CautionaryOutputChordSymbol)
+            {
+                accidentalClass = CSSClass.cautionaryAccidental;
+            }
+            else if(chord is CautionaryInputChordSymbol)
+            {
+                accidentalClass = CSSClass.inputCautionaryAccidental;
+            }
+            else if(chord is InputChordSymbol)
+            {
+                accidentalClass = CSSClass.inputAccidental;
+            }
+            return accidentalClass;
+        }
+
+        private void CreateLedgerlineAndAccidentalMetrics(float fontHeight, List<Head> topDownHeads, List<HeadMetrics> topDownHeadsMetrics, float ledgerlineStemStrokeWidth, CSSClass accidentalClass)
         {
             float limbLength = (topDownHeadsMetrics[0].RightStemX - topDownHeadsMetrics[0].LeftStemX) / 2F; // change to taste later
             _upperLedgerlineBlockMetrics = CreateUpperLedgerlineBlock(topDownHeadsMetrics, limbLength, ledgerlineStemStrokeWidth);
@@ -199,7 +218,7 @@ namespace Moritz.Symbols
                 Head head = topDownHeads[i];
                 if(head.DisplayAccidental == DisplayAccidental.force)
                 {
-                    AccidentalMetrics accidentalMetrics = new AccidentalMetrics(head, fontHeight, _gap);
+                    AccidentalMetrics accidentalMetrics = new AccidentalMetrics(head, fontHeight, _gap, accidentalClass);
                     accidentalMetrics.Move(headMetrics.OriginX, headMetrics.OriginY);
                     MoveAccidentalLeft(accidentalMetrics, topDownHeadsMetrics, _stemMetrics,
                         _upperLedgerlineBlockMetrics, _lowerLedgerlineBlockMetrics,

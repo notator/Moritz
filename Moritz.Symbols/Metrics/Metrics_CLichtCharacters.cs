@@ -123,8 +123,8 @@ namespace Moritz.Symbols
         /// <summary>
         /// Used by AccidentalMetrics
         /// </summary>
-		public CLichtCharacterMetrics(Head head, float fontHeight)
-			: base(CSSClass.accidental, "CLicht", fontHeight)
+		public CLichtCharacterMetrics(Head head, float fontHeight, CSSClass cssClass)
+			: base(cssClass, "CLicht", fontHeight)
 		{
 			_characterString = GetClichtCharacterString(head);
 
@@ -515,8 +515,8 @@ namespace Moritz.Symbols
     }
 	internal class AccidentalMetrics : CLichtCharacterMetrics
 	{
-		public AccidentalMetrics(Head head, float fontHeight, float gap)
-			: base(head, fontHeight)
+		public AccidentalMetrics(Head head, float fontHeight, float gap, CSSClass cssClass)
+			: base(head, fontHeight, cssClass)
 		{
 			float verticalPadding = gap / 5;
 			_top -= verticalPadding;
