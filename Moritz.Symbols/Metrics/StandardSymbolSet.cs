@@ -76,13 +76,13 @@ namespace Moritz.Symbols
             {
                 if(isTreble)
                 {
-                    w.WriteAttributeString("id", "cautionaryTrebleClef");
-                    WriteTextElement(w, "cautionaryClef", "&");
+                    w.WriteAttributeString("id", "smallTrebleClef");
+                    WriteTextElement(w, "smallClef", "&");
                 }
                 else
                 {
-                    w.WriteAttributeString("id", "cautionaryBassClef");
-                    WriteTextElement(w, "cautionaryClef", "?");
+                    w.WriteAttributeString("id", "smallBassClef");
+                    WriteTextElement(w, "smallClef", "?");
                 }
             }
             else
@@ -110,16 +110,16 @@ namespace Moritz.Symbols
             {
                 if(isTreble)
                 {
-                    w.WriteAttributeString("id", "cautionaryTrebleClef8");
-                    WriteTextElement(w, "cautionaryClef", "&");
-                    WriteTextElement(w, "cautionaryClefOctaveNumber", x, y, "•");
+                    w.WriteAttributeString("id", "smallTrebleClef8");
+                    WriteTextElement(w, "smallClef", "&");
+                    WriteTextElement(w, "smallClefOctaveNumber", x, y, "•");
                 }
                 else
                 {
                     y *= 1.2F;
-                    w.WriteAttributeString("id", "cautionaryBassClef8");
-                    WriteTextElement(w, "cautionaryClef", "?");
-                    WriteTextElement(w, "cautionaryClefOctaveNumber", x, y, "•");
+                    w.WriteAttributeString("id", "smallBassClef8");
+                    WriteTextElement(w, "smallClef", "?");
+                    WriteTextElement(w, "smallClefOctaveNumber", x, y, "•");
                 }
             }
             else
@@ -157,17 +157,17 @@ namespace Moritz.Symbols
             StringBuilder idSB = new StringBuilder();
             if(isCautionary)
             {
-                clefStr = "cautionaryClef";
-                clefOctaveNumberStr = "cautionaryClefOctaveNumber";
-                clefXStr = "cautionaryClefX";
+                clefStr = "smallClef";
+                clefOctaveNumberStr = "smallClefOctaveNumber";
+                clefXStr = "smallClefX";
                 if(isTreble)
                 {
-                    idSB.Append("cautionaryTrebleClef");
+                    idSB.Append("smallTrebleClef");
                 }
                 else
                 {
                     y *= 1.2F;
-                    idSB.Append("cautionaryBassClef");
+                    idSB.Append("smallBassClef");
                 }
             }
             else
@@ -211,6 +211,8 @@ namespace Moritz.Symbols
 
         public override Metrics NoteObjectMetrics(Graphics graphics, NoteObject noteObject, VerticalDir voiceStemDirection, float gap, float strokeWidth)
         {
+            bool isInput = (noteObject.Voice is InputVoice);
+
             Metrics returnMetrics = null;
             SmallClef smallClef = noteObject as SmallClef;
             Clef clef = noteObject as Clef;
@@ -226,12 +228,12 @@ namespace Moritz.Symbols
             else if(smallClef != null)
             {
                 if(smallClef.ClefType != "n")
-                    returnMetrics = new SmallClefMetrics(clef, gap);
+                    returnMetrics = new SmallClefMetrics(clef, gap, isInput);
             }
             else if(clef != null)
             {
                 if(clef.ClefType != "n")
-                    returnMetrics = new ClefMetrics(clef, gap);
+                    returnMetrics = new ClefMetrics(clef, gap, isInput);
             }
             else if(cautionaryOutputChordSymbol != null)
             {
@@ -247,12 +249,23 @@ namespace Moritz.Symbols
             }
             else if(rest != null)
             {
+                CSSClass restClass = GetRestClass(rest);
                 // All rests are originally created on the centre line.
                 // They are moved vertically later, if they are on a 2-Voice staff.
-                returnMetrics = new RestMetrics(graphics, rest, gap, noteObject.Voice.Staff.NumberOfStafflines, strokeWidth);
+                returnMetrics = new RestMetrics(graphics, rest, gap, noteObject.Voice.Staff.NumberOfStafflines, strokeWidth, restClass);
             }
 
             return returnMetrics;
+        }
+
+        private CSSClass GetRestClass(RestSymbol rest)
+        {
+            CSSClass restClass = CSSClass.rest; // OutputChordSymbol
+            if(rest is InputRestSymbol)
+            {
+                restClass = CSSClass.inputRest;
+            }
+            return restClass;
         }
 
         public override NoteObject GetNoteObject(Voice voice, int absMsPosition, IUniqueDef iud, bool firstDefInVoice,
@@ -267,7 +280,7 @@ namespace Moritz.Symbols
             ClefDef clefDef = iud as ClefDef;
 
             PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
-            float cautionaryFontHeight = pageFormat.MusicFontHeight * pageFormat.CautionaryFactor;
+            float cautionaryFontHeight = pageFormat.MusicFontHeight * pageFormat.SmallFactor;
             int minimumCrotchetDuration = pageFormat.MinimumCrotchetDuration;
  
             if(cautionaryChordDef != null && firstDefInVoice)

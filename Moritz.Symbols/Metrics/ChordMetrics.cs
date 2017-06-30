@@ -56,12 +56,16 @@ namespace Moritz.Symbols
             {
                 bool dynamicIsBelow;
                 bool ornamentIsBelow;
-                _lyricMetrics = NewLyricMetrics(chord.Voice.StemDirection, graphics, gap);
+
+                CSSClass lyricClass = GetLyricClass(chord);
+                _lyricMetrics = NewLyricMetrics(chord.Voice.StemDirection, graphics, gap, lyricClass);
 
                 GetRelativePositions(chord.Voice.StemDirection, _lyricMetrics, out ornamentIsBelow, out dynamicIsBelow);
                 _ornamentMetrics = NewOrnamentMetrics(graphics, gap, ornamentIsBelow);
 
-                _dynamicMetrics = NewCLichtDynamicMetrics(gap, dynamicIsBelow);
+                CSSClass dynamicClass = GetDynamicClass(chord);
+
+                _dynamicMetrics = NewCLichtDynamicMetrics(gap, dynamicIsBelow, dynamicClass);
 
                 MoveAuxilliaries(chord.Stem.Direction, gap);
             }
@@ -178,7 +182,7 @@ namespace Moritz.Symbols
             }
             else if(chord is CautionaryInputChordSymbol)
             {
-                headClass = CSSClass.inputCautionaryNotehead;
+                throw new ApplicationException("Can I delete CautionaryInputChordSymbol?");
             }
             else if(chord is InputChordSymbol)
             {
@@ -196,13 +200,33 @@ namespace Moritz.Symbols
             }
             else if(chord is CautionaryInputChordSymbol)
             {
-                accidentalClass = CSSClass.inputCautionaryAccidental;
+                throw new ApplicationException("Can I delete CautionaryInputChordSymbol?");
             }
             else if(chord is InputChordSymbol)
             {
                 accidentalClass = CSSClass.inputAccidental;
             }
             return accidentalClass;
+        }
+
+        private CSSClass GetDynamicClass(ChordSymbol chord)
+        {
+            CSSClass dynamicClass = CSSClass.dynamic; // OutputChordSymbol
+            if(chord is InputChordSymbol)
+            {
+                dynamicClass = CSSClass.inputDynamic;
+            }
+            return dynamicClass;
+        }
+
+        private CSSClass GetLyricClass(ChordSymbol chord)
+        {
+            CSSClass lyricClass = CSSClass.lyric; // OutputChordSymbol
+            if(chord is InputChordSymbol)
+            {
+                lyricClass = CSSClass.inputLyric;
+            }
+            return lyricClass;
         }
 
         private void CreateLedgerlineAndAccidentalMetrics(float fontHeight, List<Head> topDownHeads, List<HeadMetrics> topDownHeadsMetrics, float ledgerlineStemStrokeWidth, CSSClass accidentalClass)
@@ -469,6 +493,7 @@ namespace Moritz.Symbols
         #region set stem and flags
         private void SetStemAndFlags(ChordSymbol chord, List<HeadMetrics> topDownHeadsMetrics, float stemThickness)
         {
+            bool isInput = chord is InputChordSymbol;
             DurationClass durationClass = chord.DurationClass;
             _flagsBlockMetrics = null;
             if(chord.BeamBlock == null
@@ -482,7 +507,8 @@ namespace Moritz.Symbols
                                                                 durationClass,
                                                                 chord.FontHeight,
                                                                 chord.Stem.Direction,
-                                                                stemThickness);
+                                                                stemThickness,
+                                                                isInput);
             }
 
             if(durationClass == DurationClass.minim
@@ -517,7 +543,7 @@ namespace Moritz.Symbols
         /// Returns null if the durationClass does not have a flagsBlock,
         /// otherwise returns the metrics for the flagsBlock attached to this chord, correctly positioned wrt the noteheads.
         /// </summary>
-        private FlagsBlockMetrics GetFlagsBlockMetrics(List<HeadMetrics> topDownHeadsMetrics, DurationClass durationClass, float fontSize, VerticalDir stemDirection, float stemThickness)
+        private FlagsBlockMetrics GetFlagsBlockMetrics(List<HeadMetrics> topDownHeadsMetrics, DurationClass durationClass, float fontSize, VerticalDir stemDirection, float stemThickness, bool isInput)
         {
             Debug.Assert(durationClass == DurationClass.quaver
                 || durationClass == DurationClass.semiquaver
@@ -525,7 +551,7 @@ namespace Moritz.Symbols
                 || durationClass == DurationClass.fourFlags
                 || durationClass == DurationClass.fiveFlags);
 
-            FlagsBlockMetrics flagsBlockMetrics = new FlagsBlockMetrics(durationClass, fontSize, stemDirection);
+            FlagsBlockMetrics flagsBlockMetrics = new FlagsBlockMetrics(durationClass, fontSize, stemDirection, isInput);
 
             if(flagsBlockMetrics != null)
             {
@@ -555,11 +581,11 @@ namespace Moritz.Symbols
             if(stemDirection == VerticalDir.up)
             {
                 deltaY = minDist - (innerNoteheadAlignmentY - flagsBlockMetrics.Bottom);
-                if(flagsBlockMetrics.UseID == "Right1Flag")
+                if(flagsBlockMetrics.UseID.Contains("ight1Flag")) // could be input staff
                     deltaY += _gap;
                 deltaY *= -1;
 
-                if(flagsBlockMetrics.UseID == "Right1Flag")
+                if(flagsBlockMetrics.UseID.Contains("ight1Flag")) // could be input staff
                 {
                     if((flagsBlockMetrics.Bottom + deltaY) > (_gap * 2.5F))
                     {
@@ -577,10 +603,10 @@ namespace Moritz.Symbols
             else // stem is down
             {
                 deltaY = minDist - (flagsBlockMetrics.Top - innerNoteheadAlignmentY);
-                if(flagsBlockMetrics.UseID == "Left1Flag")
+                if(flagsBlockMetrics.UseID.Contains("eft1Flag")) // could be input staff
                     deltaY += _gap;
 
-                if(flagsBlockMetrics.UseID == "Left1Flag")
+                if(flagsBlockMetrics.UseID.Contains("eft1Flag")) // could be input staff
                 {
                     if((flagsBlockMetrics.Top + deltaY) < (_gap * 1.5F))
                     {
@@ -751,7 +777,7 @@ namespace Moritz.Symbols
         /// <param name="gap"></param>
         /// <param name="lyricIsBelow"></param>
         /// <returns></returns>
-        private LyricMetrics NewLyricMetrics(VerticalDir voiceStemDirection, Graphics graphics, float gap)
+        private LyricMetrics NewLyricMetrics(VerticalDir voiceStemDirection, Graphics graphics, float gap, CSSClass lyricClass)
         {
             LyricText lyric = null;
             foreach(DrawObject drawObject in _drawObjects)
@@ -767,7 +793,7 @@ namespace Moritz.Symbols
                 bool lyricIsBelow = true; // voiceStemDirection == VerticalDir.none || voiceStemDirection == VerticalDir.down
                 if(voiceStemDirection == VerticalDir.up)
                     lyricIsBelow = false;
-                lyric.Metrics = new LyricMetrics(gap, graphics, lyric.TextInfo, lyricIsBelow);
+                lyric.Metrics = new LyricMetrics(gap, graphics, lyric.TextInfo, lyricIsBelow, lyricClass);
                 _lyricMetrics = (LyricMetrics)lyric.Metrics; 
             }
 
@@ -779,7 +805,7 @@ namespace Moritz.Symbols
         /// <param name="gap"></param>
         /// <param name="dynamicIsBelow"></param>
         /// <returns></returns>
-        private DynamicMetrics NewCLichtDynamicMetrics(float gap, bool dynamicIsBelow)
+        private DynamicMetrics NewCLichtDynamicMetrics(float gap, bool dynamicIsBelow, CSSClass dynamicClass)
         {
             List<string> clichtDynamics = new List<string>() { "Ø", "∏", "π", "p", "P", "F", "f", "ƒ", "Ï", "Î" };
             Text dynamicText = null;
@@ -802,7 +828,7 @@ namespace Moritz.Symbols
             _dynamicMetrics = null;
             if(dynamicText != null)
             {
-                dynamicText.Metrics = new DynamicMetrics(gap, dynamicText.TextInfo, dynamicIsBelow);
+                dynamicText.Metrics = new DynamicMetrics(gap, dynamicText.TextInfo, dynamicIsBelow, dynamicClass);
                 _dynamicMetrics = (DynamicMetrics)dynamicText.Metrics;
             }
 
@@ -983,57 +1009,58 @@ namespace Moritz.Symbols
             throw new NotImplementedException();
         }
 
-        public void WriteSVG(SvgWriter w, bool isCautionary)
+        public void WriteSVG(SvgWriter w, bool isCautionary, bool isInput)
         {
             if(_stemMetrics != null)
-                _stemMetrics.WriteSVG(w);
+                _stemMetrics.WriteSVG(w, isInput);
             if(_flagsBlockMetrics != null)
-                _flagsBlockMetrics.WriteSVG(w);
+                _flagsBlockMetrics.WriteSVG(w, isInput);
             if(_headsMetricsTopDown != null)
             {
                 foreach(HeadMetrics headMetrics in _headsMetricsTopDown)
-                    headMetrics.WriteSVG(w, CSSClass.notehead, isCautionary);
+                {
+                    headMetrics.WriteSVG(w, CSSClass.notehead, isCautionary, isInput);
+                }
             }
             if(_topDownAccidentalsMetrics != null)
             {
                 foreach(AccidentalMetrics accidentalMetrics in _topDownAccidentalsMetrics)
-                    accidentalMetrics.WriteSVG(w, CSSClass.accidental, isCautionary);
+                    accidentalMetrics.WriteSVG(w, CSSClass.accidental, isCautionary, isInput);
             }
             if(_upperLedgerlineBlockMetrics != null)
             {
-                _upperLedgerlineBlockMetrics.WriteSVG(w);
+                _upperLedgerlineBlockMetrics.WriteSVG(w, isInput);
             }
             if(_lowerLedgerlineBlockMetrics != null)
             {
-                _lowerLedgerlineBlockMetrics.WriteSVG(w);
+                _lowerLedgerlineBlockMetrics.WriteSVG(w, isInput);
             }
             if(_ornamentMetrics != null)
             {
-                _ornamentMetrics.WriteSVG(w, CSSClass.ornament); 
+                _ornamentMetrics.WriteSVG(w, CSSClass.ornament, false); // there are no input ornaments 
             }
             if(_lyricMetrics != null)
             {
-                _lyricMetrics.WriteSVG(w, CSSClass.lyric);
-               
+                _lyricMetrics.WriteSVG(w, CSSClass.lyric, isInput);               
             }
 
             if(_dynamicMetrics != null)
-                _dynamicMetrics.WriteSVG(w, CSSClass.dynamic, false); // cautionary dynamics don't exist.
+                _dynamicMetrics.WriteSVG(w, CSSClass.dynamic, false, isInput); // cautionary dynamics don't exist.
 
             if(_cautionaryBracketsMetrics != null)
             {
                 foreach(CautionaryBracketMetrics cautionaryBracketMetrics in _cautionaryBracketsMetrics)
-                    cautionaryBracketMetrics.WriteSVG(w);
+                    cautionaryBracketMetrics.WriteSVG(w, isInput);
             }
             if(NoteheadExtendersMetricsBefore != null)
             {
                 foreach(NoteheadExtenderMetrics nemb in NoteheadExtendersMetricsBefore)
-                    nemb.WriteSVG(w);
+                    nemb.WriteSVG(w, isInput);
             }
             if(NoteheadExtendersMetrics != null)
             {
                 foreach(NoteheadExtenderMetrics nem in NoteheadExtendersMetrics)
-                    nem.WriteSVG(w);
+                    nem.WriteSVG(w, isInput);
             }
         }
 
@@ -1127,7 +1154,9 @@ namespace Moritz.Symbols
                                                 thisDurationClass,
                                                 thisFontHeight,
                                                 _stemMetrics.VerticalDir,
-                                                _stemMetrics.StrokeWidth);
+                                                _stemMetrics.StrokeWidth,
+                                                false);
+
                 StemMetrics dummyStemMetrics =
                     DummyStemMetrics(otherHeadsMetrics, _stemMetrics.VerticalDir, thisFontHeight,
                         dummyFlagsBlockMetrics, null, _stemMetrics.StrokeWidth);

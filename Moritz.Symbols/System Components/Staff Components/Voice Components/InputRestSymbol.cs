@@ -34,7 +34,7 @@ namespace Moritz.Symbols
                 w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
 
                 if(this.Metrics != null && staffIsVisible)
-                    this.Metrics.WriteSVG(w);
+                    ((RestMetrics)this.Metrics).WriteSVG(w, true);
 
                 w.SvgEndGroup();
             }

@@ -38,7 +38,14 @@ namespace Moritz.Symbols
             {
 				NoteObject noteObject = NoteObjects[i];				
 				Barline barline = noteObject as Barline;
-				if(staffIsVisible && barline != null && barline.IsVisible)
+                CautionaryInputChordSymbol cautionaryInputChordSymbol = noteObject as CautionaryInputChordSymbol;
+                InputChordSymbol inputChordSymbol = noteObject as InputChordSymbol;
+                InputRestSymbol inputRestSymbol = noteObject as InputRestSymbol;
+                CautionaryOutputChordSymbol cautionaryOutputChordSymbol = noteObject as CautionaryOutputChordSymbol;
+                OutputChordSymbol outputChordSymbol = noteObject as OutputChordSymbol;
+                OutputRestSymbol outputRestSymbol = noteObject as OutputRestSymbol;
+
+                if(staffIsVisible && barline != null && barline.IsVisible)
 				{
 					bool isLastNoteObject = (i == (NoteObjects.Count - 1));
 					float top = Staff.Metrics.StafflinesTop;
@@ -49,13 +56,11 @@ namespace Moritz.Symbols
 					barline.WriteSVG(w, top, bottom, barlineStrokeWidth, stafflineStrokeWidth, isLastNoteObject, false);
 				}
 
-                CautionaryInputChordSymbol cautionaryInputChordSymbol = noteObject as CautionaryInputChordSymbol;
-                InputChordSymbol inputChordSymbol = noteObject as InputChordSymbol;
-                InputRestSymbol inputRestSymbol = noteObject as InputRestSymbol;
-                CautionaryOutputChordSymbol cautionaryOutputChordSymbol = noteObject as CautionaryOutputChordSymbol;
-                OutputChordSymbol outputChordSymbol = noteObject as OutputChordSymbol;
-                OutputRestSymbol outputRestSymbol = noteObject as OutputRestSymbol;
-                if(cautionaryInputChordSymbol != null)
+                if(barline != null)
+                {
+                    barline.WriteStaffNameAndBarNumberSVG(w, staffIsVisible, (barline.Voice is InputVoice));
+                }
+                else if(cautionaryInputChordSymbol != null)
                 {
                     cautionaryInputChordSymbol.WriteSVG(w, staffIsVisible);
                 }
@@ -81,10 +86,26 @@ namespace Moritz.Symbols
                     Debug.Assert(carryMsgsPerChannel != null);
                     outputRestSymbol.WriteSVG(w, staffIsVisible, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
                 }
-                else
+                else // clef
 				{
-					// if this is the first barline, the staff name and (maybe) barnumber will be written.
-                    noteObject.WriteSVG(w, staffIsVisible);
+                    // if this is the first barline, the staff name and (maybe) barnumber will be written.
+                    Clef clef = noteObject as Clef;
+                    SmallClef smallClef = noteObject as SmallClef;
+                    bool isInput = (noteObject.Voice is InputVoice);
+                    if(smallClef != null)
+                    {
+                        SmallClefMetrics scm = smallClef.Metrics as SmallClefMetrics;
+                        smallClef.WriteSVG(w, scm.UseID, scm.OriginX, scm.OriginY, staffIsVisible, isInput);
+                    }
+                    else if(clef != null)
+                    {
+                        ClefMetrics cm = clef.Metrics as ClefMetrics;
+                        clef.WriteSVG(w, cm.UseID, cm.OriginX, cm.OriginY, staffIsVisible, isInput);
+                    }
+                    else
+                    {
+                        noteObject.WriteSVG(w, staffIsVisible);
+                    }
 				}
             }
         }

@@ -1,3 +1,5 @@
+using System;
+using System.Text;
 
 using Moritz.Xml;
 
@@ -19,23 +21,25 @@ namespace Moritz.Symbols
             //CapellaColor = "000000"; -- default
         }
 
-        /// <summary>
-        /// Writes a clef to the SVG file.
-        /// The Character metrics have been set in SvgSystem.Justify()
-        /// </summary>
         public override void WriteSVG(SvgWriter w, bool staffIsVisible)
         {
-            if(this.Metrics != null && staffIsVisible)
+            throw new NotImplementedException();
+        }
+        /// <summary>
+        /// Writes a clef or smallClef to the SVG file.
+        /// The Character metrics have been set in SvgSystem.Justify()
+        /// </summary>
+        public void WriteSVG(SvgWriter w, string useID, float originX, float originY, bool staffIsVisible, bool isInput)
+        {
+            if(staffIsVisible)
             {
-                ClefMetrics m = Metrics as ClefMetrics;
-                if(m != null)
-                {
-                    m.WriteSVG(w);
-                }
+                CSSClass clefClass = isInput ? CSSClass.inputClef : CSSClass.clef;
+                    
+                w.SvgUseXY(clefClass, useID, originX, originY);
             }
         }
 
-		public override string ToString()
+        public override string ToString()
 		{
 			return "Clef: " + _clefType;
 		}
@@ -68,20 +72,6 @@ namespace Moritz.Symbols
         public override string ToString()
         {
             return "SmallClef: " + _clefType;
-        }
-
-        /// <summary>
-        /// Writes a clef to the SVG file.
-        /// The Character metrics have been set in SvgSystem.Justify()
-        /// </summary>
-        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
-        {
-            if(this.Metrics != null && _isVisible && staffIsVisible)
-            {
-                SmallClefMetrics m = Metrics as SmallClefMetrics;
-                if(m != null)
-                     w.SvgUseXY(CSSClass.clef, m.UseID, m.OriginX, m.OriginY);
-            }
         }
 
         public int AbsMsPosition { get { return _absMsPosition; } }

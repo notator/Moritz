@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+
 using Moritz.Xml;
 
 namespace Moritz.Symbols
@@ -36,7 +38,10 @@ namespace Moritz.Symbols
                 _left = left;
             }
 
-            public override void WriteSVG(SvgWriter w) { }
+            public override void WriteSVG(SvgWriter w)
+            {
+                throw new NotImplementedException(); 
+            }
         }
 
         static CLichtFontMetrics()

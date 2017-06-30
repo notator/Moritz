@@ -23,8 +23,22 @@ namespace Moritz.Symbols
             throw new NotImplementedException();
 		}
 
-		internal virtual void WriteSVG(SvgWriter w, CSSClass cssClass)
+		internal virtual void WriteSVG(SvgWriter w, CSSClass cssClass, bool isInput)
 		{
+            // cssClass can be lyric, staffName, barNumberNumber
+            // barNumberNumber never changes class.
+            if(isInput)
+            {
+                switch(cssClass)
+                {
+                    case CSSClass.lyric:
+                        cssClass = CSSClass.inputLyric;
+                        break;
+                    case CSSClass.staffName:
+                        cssClass = CSSClass.inputStaffName;
+                        break;
+                }
+            }
 			w.SvgText(cssClass, _textInfo.Text, _originX, _originY);
 		}
 
@@ -107,8 +121,8 @@ namespace Moritz.Symbols
 	}
 	internal class LyricMetrics : TextMetrics, ICloneable
 	{
-		public LyricMetrics(float gap, Graphics graphics, TextInfo textInfo, bool isBelow)
-			: base(CSSClass.lyric, graphics, textInfo)
+		public LyricMetrics(float gap, Graphics graphics, TextInfo textInfo, bool isBelow, CSSClass lyricClass)
+			: base(lyricClass, graphics, textInfo)
 		{
 			float width = _right - _left;
 			float newWidth = width * 0.75F;
@@ -154,8 +168,8 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-			base.WriteSVG(w, CSSClass.barNumberNumber);
-			w.SvgRect(CSSClass.barNumberFrame.ToString(), _left, _top, _right - _left, _bottom - _top);
+            base.WriteSVG(w, CSSClass.barNumberNumber, false);
+            w.SvgRect(CSSClass.barNumberFrame.ToString(), _left, _top, _right - _left, _bottom - _top);
 		}
 
 		float _strokeWidth = 0;

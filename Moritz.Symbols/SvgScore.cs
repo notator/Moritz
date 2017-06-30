@@ -171,7 +171,7 @@ namespace Moritz.Symbols
             Debug.Assert(Notator != null);
 			w.SvgStartDefs(null);
 			WriteStyle(w);
-			Notator.SymbolSet.WriteSymbolDefinitions(w, _pageFormat.MusicFontHeight, (_pageFormat.MusicFontHeight * _pageFormat.CautionaryFactor));
+			Notator.SymbolSet.WriteSymbolDefinitions(w, _pageFormat.MusicFontHeight, (_pageFormat.MusicFontHeight * _pageFormat.SmallFactor));
 			w.SvgEndDefs(); // end of defs
 		}
 
@@ -231,7 +231,8 @@ namespace Moritz.Symbols
         {
             List<CSSClass> usedLines = new List<CSSClass>(LineStyle.CSSClasses);
             List<CSSClass> usedTexts = new List<CSSClass>(TextStyle.CSSClasses);
-            List<string> usedIDs = new List<string>(MetricsForUse.UsedIDs);
+            List<string> usedClefIDs = new List<string>(MetricsForUse.UsedClefIDs);
+            List<string> usedFlagIDs = new List<string>(MetricsForUse.UsedFlagIDs);
 
             // FloatToShortString returns a string of minimum length with maximum 4 decimal places and a '.' decimal point.
 
@@ -243,7 +244,7 @@ namespace Moritz.Symbols
             #region Font heights defined as readonly fields in PageFormat
             string timeStampFontHeight = M.FloatToShortString(pageFormat.TimeStampFontHeight);
             string musicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight);
-            string cautionaryMusicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * pageFormat.CautionaryFactor);
+            string smallMusicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * pageFormat.SmallFactor);
             string staffNameFontHeight = M.FloatToShortString(pageFormat.StaffNameFontHeight);
             string barNumberNumberFontHeight = M.FloatToShortString(pageFormat.BarNumberNumberFontHeight);
             string lyricFontHeight = M.FloatToShortString(pageFormat.LyricFontHeight);
@@ -251,9 +252,9 @@ namespace Moritz.Symbols
             string dynamicFontHeight = M.FloatToShortString(pageFormat.DynamicFontHeight);
             // clef accesories
             string clefOctaveNumberFontHeight = M.FloatToShortString(pageFormat.ClefOctaveNumber);
-            string cautionaryClefOctaveNumberFontHeight = M.FloatToShortString(pageFormat.ClefOctaveNumber * pageFormat.CautionaryFactor);
+            string smallClefOctaveNumberFontHeight = M.FloatToShortString(pageFormat.ClefOctaveNumber * pageFormat.SmallFactor);
             string clefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight);
-            string cautionaryClefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight * pageFormat.CautionaryFactor);
+            string smallClefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight * pageFormat.SmallFactor);
             #endregion
             #region stroke widths defined as readonly fields in PageFormat
             string barlineStrokeWidth = M.FloatToShortString(pageFormat.BarlineStrokeWidth);
@@ -270,7 +271,7 @@ namespace Moritz.Symbols
             #region Fonts
             #region Arial
 
-            classes = new List<string>() { "timeStamp", "staffName", "barNumberNumber", "lyric", "clefX", "cautionaryClefX" };
+            classes = new List<string>() { "timeStamp", "staffName", "barNumberNumber", "lyric", "clefX", "smallClefX" };
             values = new List<string>() { $"font-family:{"Arial"}" };
             classDef = GetCSS(classes, values);
             rval.Append(classDef.ToString());
@@ -305,8 +306,8 @@ namespace Moritz.Symbols
             classDef = GetCSS(classes, values);
             rval.Append(classDef.ToString());
 
-            classes = new List<string>() { "cautionaryClefX" };
-            values = new List<string>() { $"font-size:{cautionaryClefXFontHeight}px" };
+            classes = new List<string>() { "smallClefX" };
+            values = new List<string>() { $"font-size:{smallClefXFontHeight}px" };
             classDef = GetCSS(classes, values);
             rval.Append(classDef.ToString());
 
@@ -334,9 +335,11 @@ namespace Moritz.Symbols
             #region CLicht
             classes = new List<string>() { "clef", "notehead", "accidental", "rest",
                                            "dynamic",
-                                           "cautionaryClef",
+                                           "cautionaryNotehead",
+                                           "cautionaryAccidental",
+                                           "smallClef",
                                            "clefOctaveNumber",
-                                           "cautionaryClefOctaveNumber" };
+                                           "smallClefOctaveNumber" };
             values = new List<string>() { $"font-family:CLicht" };
             classDef = GetCSS(classes, values);
             rval.Append(classDef.ToString());
@@ -351,8 +354,8 @@ namespace Moritz.Symbols
             classDef = GetCSS(classes, values);
             rval.Append(classDef.ToString());
 
-            classes = new List<string>() { "cautionaryClef" };
-            values = new List<string>() { $"font-size:{cautionaryMusicFontHeight}px" };
+            classes = new List<string>() { "smallClef", "cautionaryNotehead", "cautionaryAccidental", };
+            values = new List<string>() { $"font-size:{smallMusicFontHeight}px" };
             classDef = GetCSS(classes, values);
             rval.Append(classDef.ToString());
 
@@ -361,8 +364,8 @@ namespace Moritz.Symbols
             classDef = GetCSS(classes, values);
             rval.Append(classDef.ToString());
 
-            classes = new List<string>() { "cautionaryClefOctaveNumber" };
-            values = new List<string>() { $"font-size:{cautionaryClefOctaveNumberFontHeight}px" };
+            classes = new List<string>() { "smallClefOctaveNumber" };
+            values = new List<string>() { $"font-size:{smallClefOctaveNumberFontHeight}px" };
             classDef = GetCSS(classes, values);
             rval.Append(classDef.ToString());
 

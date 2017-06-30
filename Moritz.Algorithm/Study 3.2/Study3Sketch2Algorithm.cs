@@ -90,8 +90,8 @@ namespace Moritz.Algorithm.Study3Sketch2
 
         protected override void InsertClefChanges(List<List<VoiceDef>> bars)
         {
-            //VoiceDef voiceDef = bars[0][bars[0].Count - 1];
-            //voiceDef.InsertClefDef(5, "b");
+            VoiceDef voiceDef = bars[0][bars[0].Count - 1];
+            voiceDef.InsertClefDef(5, "t3");
         }
 
         private InputVoiceDef GetBar1InputVoiceDef(Seq bar1Seq)

@@ -336,9 +336,9 @@ namespace Moritz.Xml
         {
             StringBuilder type = new StringBuilder();
             if(rightFlag)
-                type.Append("Right");
+                type.Append("right");
             else
-                type.Append("Left");
+                type.Append("left");
             type.Append(nFlags);
             if(nFlags == 1)
                 type.Append("Flag");

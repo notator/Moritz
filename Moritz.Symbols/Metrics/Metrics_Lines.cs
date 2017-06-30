@@ -70,7 +70,14 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            w.SvgLine(CSSClass.stem, _originX, _top, _originX, _bottom);
+            throw new NotImplementedException();
+        }
+
+        public void WriteSVG(SvgWriter w, bool isInput)
+        {
+            CSSClass stemClass = isInput ? CSSClass.inputStem : CSSClass.stem;
+
+            w.SvgLine(stemClass, _originX, _top, _originX, _bottom);
         }
 
         public object Clone()
@@ -126,19 +133,32 @@ namespace Moritz.Symbols
 		}
 
 		public override void WriteSVG(SvgWriter w)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void WriteSVG(SvgWriter w, bool isInput)
 		{
+            CSSClass ledgerlinesClass = CSSClass.ledgerlines;
+            CSSClass ledgerlineClass = CSSClass.ledgerline;
+            if(isInput)
+            {
+                ledgerlinesClass = CSSClass.inputLedgerlines;
+                ledgerlineClass = CSSClass.inputLedgerline;
+            }
+
             w.WriteStartElement("g");
-            w.WriteAttributeString("class", CSSClass.ledgerlines.ToString());
+            w.WriteAttributeString("class", ledgerlinesClass.ToString());
             foreach(float y in Ys)
 			{
-				w.SvgLine(CSSClass.ledgerline, _left + _strokeWidth, y, _right - _strokeWidth, y);
+				w.SvgLine(ledgerlineClass, _left + _strokeWidth, y, _right - _strokeWidth, y);
 			}
             w.WriteEndElement();
 		}
 
 		private List<float> Ys = new List<float>();
 		private float _strokeWidth;
-	}
+    }
 	internal class CautionaryBracketMetrics : LineStyle, ICloneable
 	{
 		public CautionaryBracketMetrics(bool isLeftBracket, float top, float right, float bottom, float left, float strokeWidth)
@@ -157,8 +177,16 @@ namespace Moritz.Symbols
 			return this.MemberwiseClone();
 		}
 
-		public override void WriteSVG(SvgWriter w)
-		{
+        public override void WriteSVG(SvgWriter w)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WriteSVG(SvgWriter w, bool isInput)
+        {
+            // The performer's chords can't be broken across staves.
+            Debug.Assert(isInput == false, "Cautionary brackets cannot exist in input voices.");
+
 			w.SvgCautionaryBracket(CSSClass.cautionaryBracket.ToString(), _isLeftBracket, _top, _right, _bottom, _left);
 		}
 
@@ -215,6 +243,11 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
+            throw new NotImplementedException();
+        }
+
+        public void WriteSVG(SvgWriter w, bool isInput)
+        {
             if(_drawExtender)
                 w.SvgLine(CSSClass.noteExtender, _left, _originY, _right, _originY);
         }
@@ -255,7 +288,8 @@ namespace Moritz.Symbols
 
                         if(text is StaffNameText)
                         {
-                            _staffNameMetrics = new TextMetrics(CSSClass.staffName, graphics, text.TextInfo);
+                            CSSClass staffClass = (barline.Voice is InputVoice) ? CSSClass.inputStaffName : CSSClass.staffName;
+                            _staffNameMetrics = new TextMetrics(staffClass, graphics, text.TextInfo);
                             // move the staffname vertically to the middle of this staff
                             Staff staff = barline.Voice.Staff;
                             float staffheight = staff.Gap * (staff.NumberOfStafflines - 1);
@@ -286,15 +320,20 @@ namespace Moritz.Symbols
                 _staffNameMetrics.Move(dx, dy);
         }
 
+        public override void WriteSVG(SvgWriter w)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Only writes the staffName and the barnumber (if they exist) to the SVG file.
         /// The barline itself is drawn by Barline.WriteSvg(...) when the system is complete.
         /// </summary>
-        public override void WriteSVG(SvgWriter w)
+        public void WriteStaffNameAndBarNumberSVG(SvgWriter w, bool isInput)
         {
             if(_staffNameMetrics != null)
             {
-                _staffNameMetrics.WriteSVG(w, CSSClass.staffName);
+                _staffNameMetrics.WriteSVG(w, CSSClass.staffName, isInput);
             }
             if(_barnumberMetrics != null)
             {

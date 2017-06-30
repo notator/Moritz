@@ -49,7 +49,6 @@
     <Compile Include="MidiRestDef.cs" />
     <Compile Include="MainBlock.cs" />
     <Compile Include="Block.cs" />
-    <Compile Include="CautionaryChordDef.cs" />
     <Compile Include="CCSettings.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -62,6 +61,7 @@
     <Compile Include="InputRestDef.cs" />
     <Compile Include="Seq.cs" />
     <Compile Include="SeqRef.cs" />
+    <Compile Include="CautionaryChordDef.cs" />
     <Compile Include="TrkRef.cs" />
     <Compile Include="DurationDef.cs" />
     <Compile Include="InputChordDef.cs" />

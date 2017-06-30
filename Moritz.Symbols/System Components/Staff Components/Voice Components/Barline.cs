@@ -23,16 +23,21 @@ namespace Moritz.Symbols
             BarlineType = barlineType;
         }
 
+        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// This function only writes the staff name and barnumber to the SVG file (if they are present).
         /// The barline itself is drawn when the system (and staff edges) is complete.
         /// </summary>
-        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
+        public void WriteStaffNameAndBarNumberSVG(SvgWriter w, bool staffIsVisible, bool isInput)
         {
             BarlineMetrics barlineMetrics = Metrics as BarlineMetrics;
             if(barlineMetrics != null && staffIsVisible)
             {
-                barlineMetrics.WriteSVG(w);
+                barlineMetrics.WriteStaffNameAndBarNumberSVG(w, isInput);
             }
         }
 

@@ -56,7 +56,7 @@ namespace Moritz.Symbols
 
                 if(this.Metrics != null && staffIsVisible)
                 {
-                    this.Metrics.WriteSVG(w);
+                    ((RestMetrics)this.Metrics).WriteSVG(w, false);
                 }
 
                 w.SvgEndGroup();

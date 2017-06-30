@@ -6,125 +6,105 @@ namespace Moritz.Xml
         /// This class exists for technical reasons, but it is never used or added to a
         /// used class list, so is never given a CSS definition!
         none,
-         
+
         #region text
-        /// Always written on every page with a CSS definition
-        timeStamp,
-        staffName,
+        // (Recordings are in the TextStyle.CSSClasses list.)
 
-        /// Always written on the first page with a CSS definition
-        mainTitle,
-        author,
+        timeStamp,  // Written, not recorded but appears on every page.        
+       
+        mainTitle,  // Written, not recorded but always appears on first page
+        author,     // Written, not recorded but always appears on first page
+     
+        barNumberNumber,    // Written, not recorded, exists if barNumber is recorded.
 
-        /// Written with a CSS definition if there is more than one system (TextStyle.CSSClasses contains CSSClass.barNumber).
-        barNumberNumber, 
-
-        /// Written with a CSS definition if the class exists in the static TextStyle.CSSClasses list.
-        notehead,
-        accidental,
-        rest,
-        dynamic,
-        lyric,
-        ornament,
-        /// These are used in reminders at the beginnings of staves. 
-        cautionaryNotehead,
-        cautionaryAccidental,
-
-        /// These dont exist, because ordinary grace notes dont exist. 
-        ///cautionaryRest,
-        ///cautionaryDynamic,
-        ///cautionaryLyric,
-        ///cautionaryOrnament,
-        ///cautionaryStem,
-        ///cautionaryFlag,
+        staffName,  // Written, recorded.
+        notehead,   // Written, recorded.
+        accidental, // Written, recorded.
+        rest,       // Written, recorded.
+        dynamic,    // Written, recorded.
+        lyric,      // Written, recorded.
+        ornament,   // Written, recorded.
+ 
+        cautionaryNotehead,     // Written, recorded. (A reminder at the beginning of a staff.)
+        cautionaryAccidental,   // Written, recorded. (A reminder at the beginning of a staff.)
 
         #region input classes
         /// chord components
-        inputNotehead,
-        inputAccidental,
-        inputRest,
-        inputDynamic,
-        inputLyric,
-        inputCautionaryNotehead,
-        inputCautionaryAccidental,
-        /// inputClefs (test changing clef on an inputVoice)
+        inputNotehead, // written, recorded, not yet defined
+        inputAccidental, //  written, recorded, not yet defined
+        inputRest, //  written, recorded, not yet defined
+        inputDynamic,  //  written, recorded, not yet defined
+        inputLyric,  //  written, recorded, not yet defined
+        #region TODO
+        /// inputClefs (these are currently written as normal clefs.)
         inputClef,
         inputClefOctaveNumber,
         inputClefX,
-        inputCautionaryClef,
-        inputCautionaryClefOctaveNumber,
-        inputCautionaryClefX,
+        inputSmallClef,
+        inputSmallClefOctaveNumber,
+        inputSmallClefX,
+        #endregion
+        /// input texts
+        inputStaffName,     // written, recorded, not yet defined
         /// input lines
-        inputStafflines,
-        inputLedgerlines,
-        inputStem,
-        inputBeamBlock,
-        inputOpaqueBeam,
-        inputFlag,
+        inputStafflines,    // TODO (currently written as normal stafflines.)
+        inputStaffline,     // TODO (currently written as normal stafflines.)
+        inputLedgerlines,   // written, not recorded, not defined
+        inputLedgerline,    // written, not recorded, not defined
+        inputStem,          // written, not recorded, not defined
+        inputBeamBlock,     // TODO
+        inputBeam,          // TODO
+        inputOpaqueBeam,    // TODO
+        // inputFlags whose ID (e.g. "inputLeft3Flags") appears in the MetricsForUse.UsedIDs list will be written to the defs.
+        // inputFlags does not need a CSS definition because it uses path's default settings.
+        inputFlag,          // written and recorded.
         #endregion
 
         #region clefs
-        /// If the static MetricsForUse.UsedIDs list contains any clef IDs (e.g. "trebleClef8"), they will be written to the defs.
-        ///
-        /// Written with a CSS definition if any normal clef exists in the static TextStyle.UsedIDs list.
-        clef, // Clicht
-        /// Written with a CSS definition if any cautionary clef exists in the static TextStyle.UsedIDs list.
-        cautionaryClef, // CLicht
-        /// Written with a CSS definition if any normal octaved clef exists in the static TextStyle.UsedIDs list.
-        clefOctaveNumber, // CLicht
-        /// Written with a CSS definition if any cautionary octaved clef exists in the static TextStyle.UsedIDs list.
-        cautionaryClefOctaveNumber, // CLicht
-        /// Written with a CSS definition if any normal multiply octaved clef exists in the static TextStyle.UsedIDs list.
-        clefX, // Arial
-        /// Written with a CSS definition if any cautionary multiply octaved clef exists in the static TextStyle.UsedIDs list.
-        cautionaryClefX, // Arial
+        /// Clefs whose ID (e.g. "trebleClef8") appears in the MetricsForUse.UsedClefIDs list will be written to the defs.
+        /// The following classes are given CSS definitions if they exist in the defs clefs.
+        clef,   // Written, recorded. (A normal Clef)
+        smallClef,   // Written, recorded. (A clef change in a voice.)
+        clefOctaveNumber,    // Written, recorded. (the number(s) above or below a normal clef.)
+        smallClefOctaveNumber, // Written, recorded. (the number(s) above or below a small clef.)
+        clefX, // Written, recorded. (the 'x' above or below a normal clef.) (Arial)
+        smallClefX,  // Written, recorded. (the 'x' above or below a small clef.) (Arial)
         #endregion
         #endregion
 
         #region lines
-        /// Written with a CSS definition if LineStyle.CSSClasses contains CSSClass.staffline. This should always be the case.
-        stafflines,
+        // (Recordings are in the LineStyle.CSSClasses list.)
+        stafflines,      // written, recorded, defined
 
-        /// Written with a CSS definition if each exists.
-        /// The existence of each of the six CSS barline classes in the score can be inferred from the system structure.
-        /// These classes are only used in Barline.WriteSVG(...) and when writing the CSS definitions.
+        // These classes are all written in the score, but never recorded.
+        // Their existence can be inferred from the system structure. 
         barline, staffConnector,
         endBarlineLeft, endBarlineLeftConnector,
         endBarlineRight, endBarlineRightConnector,
 
-        /// Written with a CSS definition if there is more than one system (TextStyle.CSSClasses contains CSSClass.barNumber).
-        barNumberFrame,
+        barNumberFrame,    // Written, not recorded. Exists if barNumber is recorded (in Text recording).
 
-        /// Written with a CSS definition if the class exists in the static LineStyle.CSSClasses list.
-        ledgerlines,
-        stem,
-        beamBlock,
-        cautionaryBracket,
-        noteExtender,
+        ledgerlines,        // Written, not recorded. Exists (and is given a definition) if ledgerline has been recorded.
+        stem,               // Written, recorded, defined.
+        beamBlock,          // Written, recorded, defined.
+        cautionaryBracket,  // Written, recorded, defined.
+        noteExtender,       // Written, recorded, defined.
 
         /// Written with a (constant) CSS definition if the class beamBlock exists in the static LineStyle.CSSClasses list.
-        opaqueBeam,
-
-        /// Written without a CSS definition if beamBlock exists. The definition is inherited from beamBlock.
-        beam,
-
-        /// Written with a constant CSS definition if the frame exists
-        frame,
+        opaqueBeam,  // Written, not recorded. Exists if beamBlock is recorded (in Text recording).
+        beam,        // Written, not recorded, never defined. Exists if beamBlock is defined. Inherits the beamBlock definition.
+        frame,       // Written on non-scroll pages. Not recorded. Defined if it exists.
 
         /// Written without a CSS definition (a stafflines group always exists).
         /// (Every staffline is enclosed by a stafflines group whose class has a CSS definition.)
-        staffline,
-        /// Written without a CSS definition if a ledgerlines goup exists.
-        /// (Every ledgerline is enclosed by a ledgerlines group whose class has a CSS definition.)
-        ledgerline,
+        staffline,  // Written, recorded. If it exists, stafflines is defined, and staffline inherits from that.
+        ledgerline, // Written, recorded. If it exists, ledgerlines is defined, and ledgerline inherits from that.
 
-        /// Written without a CSS definition if there is more than one system.
-        /// The components (barNumberFrame and barNumberNumber) will have CSS defintions.
-        barNumber,
+        barNumber, // Written, recorded. Never defined. If it exists, barNumberNumber and barNumberFrame are defined.
 
-        /// If the static MetricsForUse.UsedIDs list contains any flag IDs, they will be written to the defs.
-        /// The flag CSS definition is not written because it only uses path with its default attributes.
-        flag
+        // Flags whose ID (e.g. "left3Flags") appears in the MetricsForUse.UsedIDs list will be written to the defs.
+        // Flag does not need a CSS definition because it uses path's default settings.
+        flag // written and recorded
 
         #endregion
     };

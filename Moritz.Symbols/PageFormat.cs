@@ -100,7 +100,7 @@ namespace Moritz.Symbols
         public int DefaultNumberOfBarsPerSystem { get { return 5; } }
 
         #region constants
-        public float CautionaryFactor { get { return 0.8F; } } // The relatve size of cautionary objects
+        public float SmallFactor { get { return 0.8F; } } // The relatve size of cautionary and small objects
         public float OpaqueBeamOpacity { get { return 0.65F; } } // The opacity of opaque beams
         #endregion
 
