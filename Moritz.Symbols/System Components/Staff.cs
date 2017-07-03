@@ -458,8 +458,9 @@ namespace Moritz.Symbols
 
         private void AdjustStemLengths(ChordSymbol upperChord, ChordSymbol lowerChord)
         {
-            upperChord.ChordMetrics.AdjustStemLengthAndFlagBlock(upperChord.DurationClass, upperChord.FontHeight, lowerChord.ChordMetrics.HeadsMetrics);
-            lowerChord.ChordMetrics.AdjustStemLengthAndFlagBlock(lowerChord.DurationClass, lowerChord.FontHeight, upperChord.ChordMetrics.HeadsMetrics);
+            bool isInput = (upperChord is InputChordSymbol);
+            upperChord.ChordMetrics.AdjustStemLengthAndFlagBlock(upperChord.DurationClass, upperChord.FontHeight, lowerChord.ChordMetrics.HeadsMetrics, isInput);
+            lowerChord.ChordMetrics.AdjustStemLengthAndFlagBlock(lowerChord.DurationClass, lowerChord.FontHeight, upperChord.ChordMetrics.HeadsMetrics, isInput);
         }
 
         /// <summary>
@@ -493,7 +494,7 @@ namespace Moritz.Symbols
                     {
                         foreach(ChordSymbol otherChord in enclosedChords)
                         {
-                            chord.ChordMetrics.AdjustStemLengthAndFlagBlock(chord.DurationClass, chord.FontHeight, otherChord.ChordMetrics.HeadsMetrics);
+                            chord.ChordMetrics.AdjustStemLengthAndFlagBlock(chord.DurationClass, chord.FontHeight, otherChord.ChordMetrics.HeadsMetrics, (chord is InputChordSymbol));
                         }
                     }
                     if(adjustVoiceIndex == 0)

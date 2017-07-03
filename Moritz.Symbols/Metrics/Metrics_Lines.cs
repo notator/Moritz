@@ -45,8 +45,8 @@ namespace Moritz.Symbols
  
 	internal class StemMetrics : LineStyle
 	{
-		public StemMetrics(float top, float x, float bottom, float strokeWidth, VerticalDir verticalDir)
-			: base(CSSClass.stem, strokeWidth, "black")
+		public StemMetrics(float top, float x, float bottom, float strokeWidth, VerticalDir verticalDir, bool isInput)
+			: base(isInput ? CSSClass.inputStem : CSSClass.stem, strokeWidth, "black")
 		{
 			_originX = x;
 			_originY = top;
@@ -60,14 +60,7 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            throw new NotImplementedException();
-        }
-
-        public void WriteSVG(SvgWriter w, bool isInput)
-        {
-            CSSClass stemClass = isInput ? CSSClass.inputStem : CSSClass.stem;
-
-            w.SvgLine(stemClass, _originX, _top, _originX, _bottom);
+            w.SvgLine(CSSClass, _originX, _top, _originX, _bottom);
         }
 
         public object Clone()

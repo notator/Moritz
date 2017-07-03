@@ -154,7 +154,7 @@ namespace Moritz.Symbols
             if(staffIsVisible && ChordMetrics.BeamBlock != null)
                 ChordMetrics.BeamBlock.WriteSVG(w, false);
 
-            w.SvgStartGroup(ChordMetrics.CSSClass.ToString()); // "chord" or "inputChord");
+            w.SvgStartGroup(ChordMetrics.CSSClass.ToString()); // "chord";
 			if(staffIsVisible)
 			{ 
 				w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
@@ -175,7 +175,7 @@ namespace Moritz.Symbols
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("output chord  ");
+            sb.Append("outputChord  ");
             sb.Append(InfoString);
             return sb.ToString();
         }

@@ -22,7 +22,7 @@ namespace Moritz.Symbols
         {
             if(Visible && staffIsVisible)
             {
-                w.SvgStartGroup("cautionaryChord");
+                w.SvgStartGroup(ChordMetrics.CSSClass.ToString()); // "cautionaryChord"
                 w.SvgStartGroup(null);
 
                 this.ChordMetrics.WriteSVG(w, true, false);
@@ -35,7 +35,7 @@ namespace Moritz.Symbols
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("cautionaryChord  ");
+            sb.Append("cautionaryOutputChord  ");
             sb.Append(InfoString);
             return sb.ToString();
         }

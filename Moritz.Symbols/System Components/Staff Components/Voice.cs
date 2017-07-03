@@ -68,10 +68,6 @@ namespace Moritz.Symbols
                 {
                     inputChordSymbol.WriteSVG(w, staffIsVisible);
                 }
-                else if(inputRestSymbol != null)
-                {
-                    inputRestSymbol.WriteSVG(w, staffIsVisible);
-                }
                 else if(cautionaryOutputChordSymbol != null)
                 {
                     cautionaryOutputChordSymbol.WriteSVG(w, staffIsVisible);
@@ -80,6 +76,10 @@ namespace Moritz.Symbols
                 {
                     Debug.Assert(carryMsgsPerChannel != null);
                     outputChordSymbol.WriteSVG(w, staffIsVisible, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
+                }
+                else if(inputRestSymbol != null)
+                {
+                    inputRestSymbol.WriteSVG(w, staffIsVisible);
                 }
                 else if(outputRestSymbol != null)
                 {

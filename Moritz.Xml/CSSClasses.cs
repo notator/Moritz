@@ -60,14 +60,28 @@ namespace Moritz.Xml
         inputOpaqueBeam,    // TODO
         #endregion
 
-        chord, inputChord, cautionaryChord, cautionaryInputChord,
+        //-------------------------------------------
+        #region recorded and used 03.07.2017
+        #region chord classes
+        chord, 
+        inputChord,
+        cautionaryChord,
+        cautionaryInputChord,
+        #endregion chord classes
+        #region chord components
+        stem, inputStem,
+        // flags and inputFlags whose ID (e.g. "inputLeft3Flags") has been recorded will be written to the defs.
+        // Neither needs a CSS definition because they use path's default settings.
+        flag, inputFlag,
+
+        #endregion chord components
+        #endregion recorded and used 03.07.2017
+        //===========================================
         #region chord components
         notehead,       // Used, recorded.
         inputNotehead,  // written, recorded, not yet defined
         accidental,     // Used, recorded.
         inputAccidental,//  written, recorded, not yet defined
-        stem,           // Used, recorded, defined.
-        inputStem,      // written, not recorded, not defined
         rest,           // Used, recorded.
         inputRest,      //  written, recorded, not yet defined
         dynamic,        // Used, recorded.
@@ -80,10 +94,7 @@ namespace Moritz.Xml
         inputLedgerline,    // written, not recorded, not defined
         // Flags whose ID (e.g. "left3Flags") appears in the MetricsForUse.UsedIDs list will be written to the defs.
         // Flag does not need a CSS definition because it uses path's default settings.
-        flag, // written and recorded
-        // inputFlags whose ID (e.g. "inputLeft3Flags") appears in the MetricsForUse.UsedIDs list will be written to the defs.
-        // inputFlags does not need a CSS definition because it uses path's default settings.
-        inputFlag,          // written and recorded.
+
         ornament,       // Used, recorded.
         noteExtender,       // Used, recorded, defined.
         cautionaryBracket,  // Used, recorded, defined.

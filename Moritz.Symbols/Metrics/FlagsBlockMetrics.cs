@@ -16,7 +16,7 @@ namespace Moritz.Symbols
         /// Should be called with a duration class having a flag block
         /// </summary>
         public FlagsBlockMetrics(DurationClass durationClass, float fontHeight, VerticalDir stemDirection, bool isInput)
-            : base(CSSClass.flag)
+            : base(isInput ? CSSClass.inputFlag : CSSClass.flag)
         {
 			_left = 0F;
 			_right = 0.31809F * fontHeight;
@@ -87,14 +87,7 @@ namespace Moritz.Symbols
         }
 
         public override void WriteSVG(SvgWriter w)
-        {
-            throw new NotImplementedException();
-        }
-        
-        public void WriteSVG(SvgWriter w, bool isInput)
-        {
-            CSSClass flagClass = isInput ? CSSClass.inputFlag : CSSClass.flag;
-
+        { 
             string flagIDString = _flagID.ToString();
 
             if(flagIDString.Contains("ight")) // stemDirection is up

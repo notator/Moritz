@@ -219,7 +219,8 @@ namespace Moritz.Symbols
             Barline barline = noteObject as Barline;
             CautionaryOutputChordSymbol cautionaryOutputChordSymbol = noteObject as CautionaryOutputChordSymbol;
             CautionaryInputChordSymbol cautionaryInputChordSymbol = noteObject as CautionaryInputChordSymbol;
-            ChordSymbol chord = noteObject as ChordSymbol;
+            ChordSymbol chordSymbol = noteObject as ChordSymbol;
+            InputChordSymbol inputChordSymbol = noteObject as InputChordSymbol;
             RestSymbol rest = noteObject as RestSymbol;
             if(barline != null)
             {
@@ -243,18 +244,21 @@ namespace Moritz.Symbols
                     returnMetrics = new ClefMetrics(clef, gap, cssClass, clefID);
                 }
             }
-            else if(cautionaryOutputChordSymbol != null)
-            {
-
-                returnMetrics = new ChordMetrics(graphics, cautionaryOutputChordSymbol, voiceStemDirection, gap, strokeWidth, CSSClass.cautionaryChord);
-            }
             else if(cautionaryInputChordSymbol != null)
             {
                 returnMetrics = new ChordMetrics(graphics, cautionaryInputChordSymbol, voiceStemDirection, gap, strokeWidth, CSSClass.cautionaryInputChord);
             }
-            else if(chord != null)
+            else if(cautionaryOutputChordSymbol != null)
             {
-                returnMetrics = new ChordMetrics(graphics, chord, voiceStemDirection, gap, strokeWidth, CSSClass.chord);
+                returnMetrics = new ChordMetrics(graphics, cautionaryOutputChordSymbol, voiceStemDirection, gap, strokeWidth, CSSClass.cautionaryChord);
+            }
+            else if(inputChordSymbol != null)
+            {
+                returnMetrics = new ChordMetrics(graphics, inputChordSymbol, voiceStemDirection, gap, strokeWidth, CSSClass.inputChord);
+            }
+            else if(chordSymbol != null)
+            {
+                returnMetrics = new ChordMetrics(graphics, chordSymbol, voiceStemDirection, gap, strokeWidth, CSSClass.chord);
             }
             else if(rest != null)
             {

@@ -519,7 +519,7 @@ namespace Moritz.Symbols
             || durationClass == DurationClass.fourFlags
             || durationClass == DurationClass.fiveFlags)
             {
-                _stemMetrics = NewStemMetrics(topDownHeadsMetrics, chord, _flagsBlockMetrics, stemThickness);
+                _stemMetrics = NewStemMetrics(topDownHeadsMetrics, chord, _flagsBlockMetrics, stemThickness, isInput);
             }
         }
 
@@ -1014,9 +1014,9 @@ namespace Moritz.Symbols
         public void WriteSVG(SvgWriter w, bool isCautionary, bool isInput)
         {
             if(_stemMetrics != null)
-                _stemMetrics.WriteSVG(w, isInput);
+                _stemMetrics.WriteSVG(w);
             if(_flagsBlockMetrics != null)
-                _flagsBlockMetrics.WriteSVG(w, isInput);
+                _flagsBlockMetrics.WriteSVG(w);
             if(_headsMetricsTopDown != null)
             {
                 foreach(HeadMetrics headMetrics in _headsMetricsTopDown)
@@ -1143,7 +1143,7 @@ namespace Moritz.Symbols
         /// is too close to the noteheads in the other chord, the stem tip (and flagsBlock) is moved outwards.
         /// FlagsBlockMetrics exist if the duration class is small enough, and the chord is not owned by a beamBlock.
         /// </summary>
-        public void AdjustStemLengthAndFlagBlock(DurationClass thisDurationClass, float thisFontHeight, List<HeadMetrics> otherHeadsMetrics)
+        public void AdjustStemLengthAndFlagBlock(DurationClass thisDurationClass, float thisFontHeight, List<HeadMetrics> otherHeadsMetrics, bool isInput)
         {
             if(_stemMetrics == null
             || (_stemMetrics.VerticalDir == VerticalDir.up && BottomHeadMetrics.Bottom <= otherHeadsMetrics[0].Top)
@@ -1157,11 +1157,11 @@ namespace Moritz.Symbols
                                                 thisFontHeight,
                                                 _stemMetrics.VerticalDir,
                                                 _stemMetrics.StrokeWidth,
-                                                false);
+                                                isInput);
 
                 StemMetrics dummyStemMetrics =
                     DummyStemMetrics(otherHeadsMetrics, _stemMetrics.VerticalDir, thisFontHeight,
-                        dummyFlagsBlockMetrics, null, _stemMetrics.StrokeWidth);
+                        dummyFlagsBlockMetrics, null, _stemMetrics.StrokeWidth, isInput);
 
                 if(_stemMetrics.VerticalDir == VerticalDir.up)
                 {
@@ -1184,7 +1184,7 @@ namespace Moritz.Symbols
             {
                 StemMetrics dummyStemMetrics =
                     DummyStemMetrics(otherHeadsMetrics, _stemMetrics.VerticalDir, thisFontHeight, null, null,
-                        _stemMetrics.StrokeWidth);
+                        _stemMetrics.StrokeWidth, isInput);
 
                 if(_stemMetrics.VerticalDir == VerticalDir.up)
                 {
@@ -1246,9 +1246,9 @@ namespace Moritz.Symbols
         /// <summary>
         /// Sets the stem. Pass flagsBlockMetrics=null for duration classes having no flags.
         /// </summary>
-        private StemMetrics NewStemMetrics(List<HeadMetrics> topDownHeadsMetrics, ChordSymbol chord, Metrics flagsBlockMetrics, float strokeWidth)
+        private StemMetrics NewStemMetrics(List<HeadMetrics> topDownHeadsMetrics, ChordSymbol chord, Metrics flagsBlockMetrics, float strokeWidth, bool isInput)
         {
-            return NewStemMetrics(topDownHeadsMetrics, chord.Stem.Direction, chord.FontHeight, flagsBlockMetrics, chord.BeamBlock, strokeWidth);
+            return NewStemMetrics(topDownHeadsMetrics, chord.Stem.Direction, chord.FontHeight, flagsBlockMetrics, chord.BeamBlock, strokeWidth, isInput);
         }
 
         private StemMetrics NewStemMetrics(
@@ -1257,7 +1257,8 @@ namespace Moritz.Symbols
             float fontHeight, 
             Metrics flagsBlockMetrics,
             BeamBlock beamBlock,
-            float strokeWidth)
+            float strokeWidth,
+            bool isInput)
         {
             HeadMetrics outerNotehead = FindOuterNotehead(topDownHeadsMetrics, stemDirection);
             HeadMetrics innerNotehead = FindInnerNotehead(topDownHeadsMetrics, stemDirection);
@@ -1319,7 +1320,7 @@ namespace Moritz.Symbols
                 }
             }
 
-            StemMetrics stemMetrics = new StemMetrics(top, x, bottom, strokeWidth, stemDirection);
+            StemMetrics stemMetrics = new StemMetrics(top, x, bottom, strokeWidth, stemDirection, isInput);
             return stemMetrics;
         }
 
@@ -1333,7 +1334,8 @@ namespace Moritz.Symbols
             float fontHeight,
             Metrics flagsBlockMetrics,
             BeamBlock beamBlock,
-            float strokeWidth)
+            float strokeWidth,
+            bool isInput)
         {
             List<HeadMetrics> tempTopDownHeadsMetrics = new List<HeadMetrics>();
             foreach(HeadMetrics headMetrics in otherChordTopDownHeadsMetrics)
@@ -1342,7 +1344,7 @@ namespace Moritz.Symbols
                 tempTopDownHeadsMetrics.Add(newHeadMetrics);
             }
 
-            return NewStemMetrics(tempTopDownHeadsMetrics, stemDirection, fontHeight, flagsBlockMetrics, beamBlock, strokeWidth);
+            return NewStemMetrics(tempTopDownHeadsMetrics, stemDirection, fontHeight, flagsBlockMetrics, beamBlock, strokeWidth, isInput);
         }
 
         public BeamBlock BeamBlock = null;
