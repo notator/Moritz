@@ -27,7 +27,7 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         public void WriteSVG(SvgWriter w, int systemNumber, PageFormat pageFormat, List<CarryMsgs> carryMsgsPerChannel)
         {
-            w.SvgStartGroup("system");
+            w.SvgStartGroup(this.Metrics.CSSClass.ToString());
 
             WriteLeftToRightElement(w);
 
@@ -253,7 +253,7 @@ namespace Moritz.Symbols
                 if(staff.ContainsAChordSymbol)
                 {
                     float staffHeight = staff.Gap * (staff.NumberOfStafflines - 1);
-                    staff.Metrics = new StaffMetrics(leftMarginPos, pageFormat.RightMarginPos, staffHeight);
+                    staff.Metrics = new StaffMetrics(leftMarginPos, pageFormat.RightMarginPos, staffHeight, staff is InputStaff);
 
                     for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                     {

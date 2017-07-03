@@ -30,7 +30,7 @@ namespace Moritz.Symbols
         internal class CLichtGlyphBoxMetric : Metrics
         {
             public CLichtGlyphBoxMetric(float top, float right, float bottom, float left)
-                : base()
+                : base(CSSClass.none)
             {
                 _top = top;
                 _right = right;

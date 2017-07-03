@@ -1986,6 +1986,12 @@ namespace Moritz.Composer
             GetKrystalsAndPalettes(out krystals, out palettes);
             PageFormat pageFormat = GetPageFormat();
             _algorithm.GetInitialClefPerChannel(pageFormat);
+
+            // These need clearing between creating different scores in one Moritz run.
+            Metrics.ClearCSSClasses();
+            ClefMetrics.ClearUsedClefIDsList();
+            FlagsBlockMetrics.ClearUsedFlagIDsList();
+
             ComposableScore score =
                 new KrystalPaletteScore(_scoreTitle,
                                         _algorithm,

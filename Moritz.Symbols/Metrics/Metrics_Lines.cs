@@ -24,18 +24,12 @@ namespace Moritz.Symbols
             string stroke = "none", 
             string fill = "none",
             CSSLineCap lineCap = CSSLineCap.butt)
-            : base()
+            : base(cssClass)
         {
-            CSSClass = cssClass;
             StrokeWidthPixels = strokeWidthPixels;
             Stroke = stroke.ToString();
             Fill = fill.ToString();
             LineCap = lineCap.ToString();
-
-            if(!_cssClasses.Contains(cssClass))
-            {
-                _cssClasses.Add(cssClass);
-            }
         }
 
         public override void WriteSVG(SvgWriter w)
@@ -43,14 +37,10 @@ namespace Moritz.Symbols
             throw new NotImplementedException();
         }
 
-        public readonly CSSClass CSSClass;
         public readonly float StrokeWidthPixels = 0F;
         public readonly string Stroke = "none"; // "none", "black", "white", "#333" etc
         public readonly string Fill = "none"; // "none", "black", "white", "#333" etc
         public readonly string LineCap = "butt"; // "butt", "round", "square" 
-
-        protected static List<CSSClass> _cssClasses = new List<CSSClass>();
-        public static IReadOnlyList<CSSClass> CSSClasses { get { return _cssClasses as IReadOnlyList<CSSClass>; } }
     }
  
 	internal class StemMetrics : LineStyle
@@ -267,7 +257,7 @@ namespace Moritz.Symbols
     internal class BarlineMetrics : Metrics
     {
         public BarlineMetrics(Graphics graphics, Barline barline, float gap)
-            : base()
+            : base(CSSClass.none)
         {
             if(barline.BarlineType == BarlineType.endDouble)
                 _left = -gap * 1.7F;

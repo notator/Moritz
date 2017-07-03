@@ -14,18 +14,18 @@ namespace Moritz.Symbols
     /// </summary>
 	public class GroupMetrics : Metrics
 	{
-		public GroupMetrics()
-			: base()
-		{
-		}
+        public GroupMetrics(CSSClass cssClass)
+            : base(cssClass)
+        {
+        }
 
-		/// <summary>
-		/// Adds the metrics to the MetricsList and includes it in this object's boundary.
-		/// The boundary is used for collision checking. All objects that should move together with this object
-		/// must be added to the MetricsList.
-		/// </summary>
-		/// <param name="metrics"></param>
-		public virtual void Add(Metrics metrics)
+        /// <summary>
+        /// Adds the metrics to the MetricsList and includes it in this object's boundary.
+        /// The boundary is used for collision checking. All objects that should move together with this object
+        /// must be added to the MetricsList.
+        /// </summary>
+        /// <param name="metrics"></param>
+        public virtual void Add(Metrics metrics)
 		{
 			MetricsList.Add(metrics);
 			ResetBoundary();
@@ -57,12 +57,13 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-			WriteSVG(w, null);
+            //WriteSVG(w, null);
+            throw new NotImplementedException();
 		}
 
 		public void WriteSVG(SvgWriter w, string id)
 		{
-			w.SvgStartGroup(null);
+			w.SvgStartGroup(CSSClass.ToString());
 			foreach(Metrics metrics in MetricsList)
 			{
 				metrics.WriteSVG(w);

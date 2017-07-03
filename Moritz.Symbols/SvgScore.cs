@@ -229,10 +229,9 @@ namespace Moritz.Symbols
 
         private StringBuilder GetStyles(PageFormat pageFormat)
         {
-            List<CSSClass> usedLines = new List<CSSClass>(LineStyle.CSSClasses);
-            List<CSSClass> usedTexts = new List<CSSClass>(TextStyle.CSSClasses);
-            List<string> usedClefIDs = new List<string>(MetricsForUse.UsedClefIDs);
-            List<string> usedFlagIDs = new List<string>(MetricsForUse.UsedFlagIDs);
+            List<CSSClass> usedCSSClasses = new List<CSSClass>(Metrics.CSSClasses);
+            List<ClefID> usedClefIDs = new List<ClefID>(ClefMetrics.UsedClefIDs);
+            List<FlagID> usedFlagIDs = new List<FlagID>(FlagsBlockMetrics.UsedFlagIDs);
 
             // FloatToShortString returns a string of minimum length with maximum 4 decimal places and a '.' decimal point.
 

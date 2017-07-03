@@ -12,7 +12,7 @@ namespace Moritz.Symbols
     public class TextStyle : Metrics
     {
         public TextStyle(CSSClass cssClass, string fontFamily, float fontHeight, TextHorizAlign textAnchor = TextHorizAlign.left, string fill = "black")
-            : base()
+            : base(cssClass)
         {
             FontFamily = fontFamily;
             FontHeight = fontHeight;
@@ -49,11 +49,6 @@ namespace Moritz.Symbols
                 Debug.Assert(Regex.IsMatch(fill, @"^#[0-9a-fA-F]{6}$"));
                 Fill = fill; // a string of the form "#AAAAAA"
             }
-                  
-            if(cssClass != CSSClass.none && !_cssClasses.Contains(cssClass))
-            {
-                _cssClasses.Add(cssClass);
-            }
         }
 
         public override void WriteSVG(SvgWriter w)
@@ -61,14 +56,15 @@ namespace Moritz.Symbols
             throw new NotImplementedException();
         }
 
-        public readonly CSSClass CSSClass;
         public readonly string FontFamily = ""; // "Arial", "CLicht", "Open Sans", "Open Sans Condensed"
         public readonly float FontHeight = 0F;       
         public readonly string TextAnchor; // "left", "middle", "right"
         public readonly string Fill; // "none", "black", "white", "red", #AAAAAA" etc
 
-        protected static List<CSSClass> _cssClasses = new List<CSSClass>();
-        public static IReadOnlyList<CSSClass> CSSClasses { get { return _cssClasses as IReadOnlyList<CSSClass>; } }
+        public static void ClearCSSClasses()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     internal class CLichtCharacterMetrics : TextStyle

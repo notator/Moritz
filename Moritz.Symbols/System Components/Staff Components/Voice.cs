@@ -95,12 +95,12 @@ namespace Moritz.Symbols
                     if(smallClef != null)
                     {
                         SmallClefMetrics scm = smallClef.Metrics as SmallClefMetrics;
-                        smallClef.WriteSVG(w, scm.UseID, scm.OriginX, scm.OriginY, staffIsVisible, isInput);
+                        smallClef.WriteSVG(w, scm.ClefID, scm.OriginX, scm.OriginY, staffIsVisible, isInput);
                     }
                     else if(clef != null)
                     {
                         ClefMetrics cm = clef.Metrics as ClefMetrics;
-                        clef.WriteSVG(w, cm.UseID, cm.OriginX, cm.OriginY, staffIsVisible, isInput);
+                        clef.WriteSVG(w, cm.ClefID, cm.OriginX, cm.OriginY, staffIsVisible, isInput);
                     }
                     else
                     {

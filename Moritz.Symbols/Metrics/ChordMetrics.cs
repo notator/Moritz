@@ -10,8 +10,8 @@ namespace Moritz.Symbols
 {
     internal class ChordMetrics : Metrics
     {
-        public ChordMetrics(System.Drawing.Graphics graphics, ChordSymbol chord, VerticalDir voiceStemDirection, float gap, float stemStrokeWidthVBPX)
-            : base()
+        public ChordMetrics(Graphics graphics, ChordSymbol chord, VerticalDir voiceStemDirection, float gap, float stemStrokeWidthVBPX, CSSClass chordClass)
+            : base(chordClass)
         {
             _top = float.MaxValue;
             _right = float.MinValue;
@@ -578,14 +578,16 @@ namespace Moritz.Symbols
             float minDist = _gap * 1.8F; // constant found by experiment
             float deltaX = 0;
             float deltaY = 0;
+            string flagIDString = flagsBlockMetrics.FlagID.ToString();
             if(stemDirection == VerticalDir.up)
             {
                 deltaY = minDist - (innerNoteheadAlignmentY - flagsBlockMetrics.Bottom);
-                if(flagsBlockMetrics.UseID.Contains("ight1Flag")) // could be input staff
+                
+                if(flagIDString.Contains("ight1Flag")) // could be input staff
                     deltaY += _gap;
                 deltaY *= -1;
 
-                if(flagsBlockMetrics.UseID.Contains("ight1Flag")) // could be input staff
+                if(flagIDString.Contains("ight1Flag")) // could be input staff
                 {
                     if((flagsBlockMetrics.Bottom + deltaY) > (_gap * 2.5F))
                     {
@@ -603,10 +605,10 @@ namespace Moritz.Symbols
             else // stem is down
             {
                 deltaY = minDist - (flagsBlockMetrics.Top - innerNoteheadAlignmentY);
-                if(flagsBlockMetrics.UseID.Contains("eft1Flag")) // could be input staff
+                if(flagIDString.Contains("eft1Flag")) // could be input staff
                     deltaY += _gap;
 
-                if(flagsBlockMetrics.UseID.Contains("eft1Flag")) // could be input staff
+                if(flagIDString.Contains("eft1Flag")) // could be input staff
                 {
                     if((flagsBlockMetrics.Top + deltaY) < (_gap * 1.5F))
                     {

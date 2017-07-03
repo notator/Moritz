@@ -228,24 +228,33 @@ namespace Moritz.Symbols
             else if(smallClef != null)
             {
                 if(smallClef.ClefType != "n")
-                    returnMetrics = new SmallClefMetrics(clef, gap, isInput);
+                {
+                    CSSClass cssClass = isInput ? CSSClass.inputClef : CSSClass.clef;
+                    ClefID smallClefID = GetSmallClefID(clef, isInput);
+                    returnMetrics = new SmallClefMetrics(clef, gap, cssClass, smallClefID);
+                }
             }
             else if(clef != null)
             {
                 if(clef.ClefType != "n")
-                    returnMetrics = new ClefMetrics(clef, gap, isInput);
+                {
+                    CSSClass cssClass = isInput ? CSSClass.inputClef : CSSClass.clef;
+                    ClefID clefID = GetClefID(clef, isInput);
+                    returnMetrics = new ClefMetrics(clef, gap, cssClass, clefID);
+                }
             }
             else if(cautionaryOutputChordSymbol != null)
             {
-                returnMetrics = new ChordMetrics(graphics, cautionaryOutputChordSymbol, voiceStemDirection, gap, strokeWidth);
+
+                returnMetrics = new ChordMetrics(graphics, cautionaryOutputChordSymbol, voiceStemDirection, gap, strokeWidth, CSSClass.cautionaryChord);
             }
             else if(cautionaryInputChordSymbol != null)
             {
-                returnMetrics = new ChordMetrics(graphics, cautionaryInputChordSymbol, voiceStemDirection, gap, strokeWidth);
+                returnMetrics = new ChordMetrics(graphics, cautionaryInputChordSymbol, voiceStemDirection, gap, strokeWidth, CSSClass.cautionaryInputChord);
             }
             else if(chord != null)
             {
-                returnMetrics = new ChordMetrics(graphics, chord, voiceStemDirection, gap, strokeWidth);
+                returnMetrics = new ChordMetrics(graphics, chord, voiceStemDirection, gap, strokeWidth, CSSClass.chord);
             }
             else if(rest != null)
             {
@@ -256,6 +265,82 @@ namespace Moritz.Symbols
             }
 
             return returnMetrics;
+        }
+
+        private ClefID GetSmallClefID(Clef clef, bool isInput)
+        {
+            ClefID clefID = ClefID.none;
+
+            switch(clef.ClefType)
+            {
+                case "t":
+                    clefID = isInput ? ClefID.inputSmallTrebleClef : ClefID.smallTrebleClef;
+                    break;
+                case "t1": // trebleClef8
+                    clefID = isInput ? ClefID.inputSmallTrebleClef8 : ClefID.smallTrebleClef8;
+                    break;
+                case "t2": // trebleClef2x8
+                    clefID = isInput ? ClefID.inputSmallTrebleClef2x8 : ClefID.smallTrebleClef2x8;
+                    break;
+                case "t3": // trebleClef3x8
+                    clefID = isInput ? ClefID.inputSmallTrebleClef3x8 : ClefID.smallTrebleClef3x8;
+                    break;
+                case "b":
+                    clefID = isInput ? ClefID.inputSmallBassClef : ClefID.smallBassClef;
+                    break;
+                case "b1": // bassClef8
+                    clefID = isInput ? ClefID.inputSmallBassClef8 : ClefID.smallBassClef8;
+                    break;
+                case "b2": // bassClef2x8
+                    clefID = isInput ? ClefID.inputSmallBassClef2x8 : ClefID.smallBassClef2x8;
+                    break;
+                case "b3": // bassClef3x8
+                    clefID = isInput ? ClefID.inputSmallBassClef3x8 : ClefID.smallBassClef3x8;
+                    break;
+                default:
+                    Debug.Assert(false, "Unknown clef type.");
+                    break;
+            }
+
+            return clefID;
+        }
+
+        private ClefID GetClefID(Clef clef, bool isInput)
+        {
+            ClefID clefID = ClefID.none;
+
+            switch(clef.ClefType)
+            {
+                case "t":
+                    clefID = isInput ? ClefID.inputTrebleClef : ClefID.trebleClef;
+                    break;
+                case "t1": // trebleClef8
+                    clefID = isInput ? ClefID.inputTrebleClef8 : ClefID.trebleClef8;
+                    break;
+                case "t2": // trebleClef2x8
+                    clefID = isInput ? ClefID.inputTrebleClef2x8 : ClefID.trebleClef2x8;
+                    break;
+                case "t3": // trebleClef3x8
+                    clefID = isInput ? ClefID.inputTrebleClef3x8 : ClefID.trebleClef3x8;
+                    break;
+                case "b":
+                    clefID = isInput ? ClefID.inputBassClef : ClefID.bassClef;
+                    break;
+                case "b1": // bassClef8
+                    clefID = isInput ? ClefID.inputBassClef8 : ClefID.bassClef8;
+                    break;
+                case "b2": // bassClef2x8
+                    clefID = isInput ? ClefID.inputBassClef2x8 : ClefID.bassClef2x8;
+                    break;
+                case "b3": // bassClef3x8
+                    clefID = isInput ? ClefID.inputBassClef3x8 : ClefID.bassClef3x8;
+                    break;
+                default:
+                    Debug.Assert(false, "Unknown clef type.");
+                    break;
+            }
+
+            return clefID;
         }
 
         private CSSClass GetRestClass(RestSymbol rest)

@@ -49,9 +49,10 @@
     <Compile Include="Metrics\Edge.cs" />
     <Compile Include="Metrics\Metrics_Group.cs" />
     <Compile Include="Metrics\Metrics_CLichtCharacters.cs" />
+    <Compile Include="Metrics\FlagsBlockMetrics.cs" />
     <Compile Include="Metrics\Metrics_Text.cs" />
     <Compile Include="Metrics\Metrics_Lines.cs" />
-    <Compile Include="Metrics\Metrics_MetricsForUse.cs" />
+    <Compile Include="Metrics\ClefMetrics.cs" />
     <Compile Include="Metrics\Metrics.cs" />
     <Compile Include="Metrics\Notator.cs" />
     <Compile Include="Metrics\StandardSymbolSet.cs" />

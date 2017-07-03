@@ -40,6 +40,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ColorString.cs" />
+    <Compile Include="ClefID.cs" />
+    <Compile Include="FlagID.cs" />
     <Compile Include="CSSClasses.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

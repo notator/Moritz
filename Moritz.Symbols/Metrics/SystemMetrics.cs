@@ -1,10 +1,11 @@
-﻿
+﻿using Moritz.Xml;
+
 namespace Moritz.Symbols
 {
     internal class SystemMetrics : GroupMetrics
     {
         public SystemMetrics()
-            : base()
+            : base(CSSClass.system)
         {
 
         }

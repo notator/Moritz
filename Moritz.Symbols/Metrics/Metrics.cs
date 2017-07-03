@@ -11,11 +11,21 @@ namespace Moritz.Symbols
 {
 	public abstract class Metrics
 	{
-		protected Metrics()
-		{
-		}
+        protected Metrics(CSSClass cssClass)
+        {
+            _cssClass = cssClass;
+            if(!_cssClasses.Contains(cssClass))
+            {
+                _cssClasses.Add(cssClass);
+            }
+        }
 
-		public virtual void Move(float dx, float dy)
+        public static void ClearCSSClasses()
+        {
+            _cssClasses.Clear();
+        }
+
+        public virtual void Move(float dx, float dy)
 		{
 			_left += dx;
 			_top += dy;
@@ -186,5 +196,11 @@ namespace Moritz.Symbols
 		/// </summary>
 		public float OriginY { get { return _originY; } }
 		protected float _originY = 0F;
+
+        public CSSClass CSSClass { get { return _cssClass; } }
+        private CSSClass _cssClass = CSSClass.none;
+
+        private static List<CSSClass> _cssClasses = new List<CSSClass>();
+        public static IReadOnlyList<CSSClass> CSSClasses { get { return _cssClasses as IReadOnlyList<CSSClass>; } }
     }
 }
