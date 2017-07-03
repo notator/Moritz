@@ -38,10 +38,9 @@ namespace Moritz.Symbols
             {
 				NoteObject noteObject = NoteObjects[i];				
 				Barline barline = noteObject as Barline;
-                CautionaryInputChordSymbol cautionaryInputChordSymbol = noteObject as CautionaryInputChordSymbol;
                 InputChordSymbol inputChordSymbol = noteObject as InputChordSymbol;
                 InputRestSymbol inputRestSymbol = noteObject as InputRestSymbol;
-                CautionaryOutputChordSymbol cautionaryOutputChordSymbol = noteObject as CautionaryOutputChordSymbol;
+                CautionaryChordSymbol cautionaryChordSymbol = noteObject as CautionaryChordSymbol;
                 OutputChordSymbol outputChordSymbol = noteObject as OutputChordSymbol;
                 OutputRestSymbol outputRestSymbol = noteObject as OutputRestSymbol;
 
@@ -60,17 +59,13 @@ namespace Moritz.Symbols
                 {
                     barline.WriteStaffNameAndBarNumberSVG(w, staffIsVisible, (barline.Voice is InputVoice));
                 }
-                else if(cautionaryInputChordSymbol != null)
-                {
-                    cautionaryInputChordSymbol.WriteSVG(w, staffIsVisible);
-                }
                 else if(inputChordSymbol != null)
                 {
                     inputChordSymbol.WriteSVG(w, staffIsVisible);
                 }
-                else if(cautionaryOutputChordSymbol != null)
+                else if(cautionaryChordSymbol != null)
                 {
-                    cautionaryOutputChordSymbol.WriteSVG(w, staffIsVisible);
+                    cautionaryChordSymbol.WriteSVG(w, staffIsVisible);
                 }
                 else if(outputChordSymbol != null)
                 {
@@ -228,14 +223,13 @@ namespace Moritz.Symbols
 
             foreach(NoteObject noteObject in NoteObjects)
             {
-                CautionaryOutputChordSymbol cautionaryOutputChord = noteObject as CautionaryOutputChordSymbol;
-                CautionaryInputChordSymbol cautionaryInputChord = noteObject as CautionaryInputChordSymbol;
+                CautionaryChordSymbol cautionaryChord = noteObject as CautionaryChordSymbol;
                 ChordSymbol chord = noteObject as ChordSymbol;
                 RestSymbol rest = noteObject as RestSymbol;
                 Clef clef = noteObject as Clef;
                 Barline barline = noteObject as Barline;
 
-                if(cautionaryOutputChord != null || cautionaryInputChord != null)
+                if(cautionaryChord != null)
                     continue;
 
                 if(chord != null)

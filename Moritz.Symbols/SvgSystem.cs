@@ -1130,7 +1130,7 @@ namespace Moritz.Symbols
                         (((visibleStaffIndex == 0) || !barlineContinuesDownList[visibleStaffIndex - 1]) // there is no grouped staff above
                             && (!barlineContinuesDownList[visibleStaffIndex])); // there is no grouped staff below 
 
-                    if((noteObjects[i] is CautionaryOutputChordSymbol || noteObjects[i] is CautionaryInputChordSymbol)
+                    if((noteObjects[i] is CautionaryChordSymbol)
                     && !isSingleStaffGroup)
                     {                           
                         Barline barline = noteObjects[i - 1] as Barline;
@@ -1160,7 +1160,7 @@ namespace Moritz.Symbols
                         Barline barline = noteObjects[noteObjects.Count - 1] as Barline;
                         DurationSymbol durationSymbol = nextSystem.Staves[staffIndex].Voices[0].FirstDurationSymbol;
                         if(barline != null
-                        && (durationSymbol is CautionaryOutputChordSymbol || durationSymbol is CautionaryInputChordSymbol))
+                        && (durationSymbol is CautionaryChordSymbol))
                         {
                             barline.IsVisible = false;
                         }

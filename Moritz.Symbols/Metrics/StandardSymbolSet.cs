@@ -217,8 +217,7 @@ namespace Moritz.Symbols
             SmallClef smallClef = noteObject as SmallClef;
             Clef clef = noteObject as Clef;
             Barline barline = noteObject as Barline;
-            CautionaryOutputChordSymbol cautionaryOutputChordSymbol = noteObject as CautionaryOutputChordSymbol;
-            CautionaryInputChordSymbol cautionaryInputChordSymbol = noteObject as CautionaryInputChordSymbol;
+            CautionaryChordSymbol cautionaryChordSymbol = noteObject as CautionaryChordSymbol;
             ChordSymbol chordSymbol = noteObject as ChordSymbol;
             InputChordSymbol inputChordSymbol = noteObject as InputChordSymbol;
             RestSymbol rest = noteObject as RestSymbol;
@@ -244,13 +243,9 @@ namespace Moritz.Symbols
                     returnMetrics = new ClefMetrics(clef, gap, cssClass, clefID);
                 }
             }
-            else if(cautionaryInputChordSymbol != null)
+            else if(cautionaryChordSymbol != null)
             {
-                returnMetrics = new ChordMetrics(graphics, cautionaryInputChordSymbol, voiceStemDirection, gap, strokeWidth, CSSClass.cautionaryInputChord);
-            }
-            else if(cautionaryOutputChordSymbol != null)
-            {
-                returnMetrics = new ChordMetrics(graphics, cautionaryOutputChordSymbol, voiceStemDirection, gap, strokeWidth, CSSClass.cautionaryChord);
+                returnMetrics = new ChordMetrics(graphics, cautionaryChordSymbol, voiceStemDirection, gap, strokeWidth, CSSClass.cautionaryChord);
             }
             else if(inputChordSymbol != null)
             {
@@ -374,16 +369,8 @@ namespace Moritz.Symbols
  
             if(cautionaryChordDef != null && firstDefInVoice)
             {
-                if(cautionaryChordDef.NotatedMidiVelocities != null)
-                {
-                    CautionaryOutputChordSymbol cautionaryOutputChordSymbol = new CautionaryOutputChordSymbol(voice, cautionaryChordDef, absMsPosition, cautionaryFontHeight);
-                    noteObject = cautionaryOutputChordSymbol;
-                }
-                else
-                {
-                    CautionaryInputChordSymbol cautionaryInputChordSymbol = new CautionaryInputChordSymbol(voice, cautionaryChordDef, absMsPosition, cautionaryFontHeight);
-                    noteObject = cautionaryInputChordSymbol;
-                }
+                CautionaryChordSymbol cautionaryChordSymbol = new CautionaryChordSymbol(voice, cautionaryChordDef, absMsPosition, cautionaryFontHeight);
+                noteObject = cautionaryChordSymbol;
             }                
             else if(midiChordDef != null)
             {
@@ -546,18 +533,15 @@ namespace Moritz.Symbols
                         List<NoteObject> noteObjects = voice.NoteObjects;
                         Clef firstClef = null;
                         ChordSymbol cautionaryChordSymbol = null;
-                        CautionaryInputChordSymbol cautionaryInputChordSymbol = null;
-                        CautionaryOutputChordSymbol cautionaryOutputChordSymbol = null;
+                        CautionaryChordSymbol cautionaryOutputChordSymbol = null;
                         ChordSymbol firstChord = null;
                         RestSymbol firstRest = null;
                         for(int index = 0; index < noteObjects.Count; ++index)
                         {
                             if(firstClef == null)
                                 firstClef = noteObjects[index] as Clef;
-                            if(cautionaryInputChordSymbol == null)
-                                cautionaryChordSymbol = noteObjects[index] as CautionaryInputChordSymbol;
                             if(cautionaryOutputChordSymbol == null)
-                                cautionaryChordSymbol = noteObjects[index] as CautionaryOutputChordSymbol;
+                                cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
                             if(firstChord == null)
                                 firstChord = noteObjects[index] as ChordSymbol;
                             if(firstRest == null)
@@ -650,7 +634,7 @@ namespace Moritz.Symbols
             {
                 NoteObject noteObject = noteObjects[i];
                 if(firstCautionaryChordSymbolFound == false
-                && (noteObject is CautionaryOutputChordSymbol || noteObject is CautionaryInputChordSymbol))
+                && (noteObject is CautionaryChordSymbol))
                 {
                     firstCautionaryChordSymbolFound = true;
                     continue;
@@ -658,16 +642,10 @@ namespace Moritz.Symbols
 
                 if(firstCautionaryChordSymbolFound)
                 {
-                    CautionaryOutputChordSymbol followingOutputCautionary = noteObject as CautionaryOutputChordSymbol;
-                    if(followingOutputCautionary != null)
+                    CautionaryChordSymbol followingCautionary = noteObject as CautionaryChordSymbol;
+                    if(followingCautionary != null)
                     {
-                        followingOutputCautionary.Visible = false;
-                        continue;
-                    }
-                    CautionaryInputChordSymbol followingInputCautionary = noteObject as CautionaryInputChordSymbol;
-                    if(followingInputCautionary != null)
-                    {
-                        followingInputCautionary.Visible = false;
+                        followingCautionary.Visible = false;
                         continue;
                     }
 
@@ -713,17 +691,12 @@ namespace Moritz.Symbols
                                 {
                                     while(index < noteObjects.Count)
                                     {
-                                        CautionaryOutputChordSymbol cautionaryOutputChordSymbol = noteObjects[index] as CautionaryOutputChordSymbol;
-                                        CautionaryInputChordSymbol cautionaryInputChordSymbol = noteObjects[index] as CautionaryInputChordSymbol;
+                                        CautionaryChordSymbol cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
                                         ChordSymbol chord2 = noteObjects[index] as ChordSymbol;
                                         RestSymbol rest2 = noteObjects[index] as RestSymbol;
-                                        if(cautionaryOutputChordSymbol != null)
+                                        if(cautionaryChordSymbol != null)
                                         {
-                                            cautionaryOutputChordSymbol.Visible = false;
-                                        }
-                                        else if(cautionaryInputChordSymbol != null)
-                                        {
-                                            cautionaryInputChordSymbol.Visible = false;
+                                            cautionaryChordSymbol.Visible = false;
                                         }
                                         else if(chord2 != null)
                                         {
@@ -788,22 +761,15 @@ namespace Moritz.Symbols
                         List<NoteObject> noteObjects = voice.NoteObjects;
                         ChordSymbol lastChord = null;
                         RestSymbol lastRest = null;
-                        CautionaryOutputChordSymbol cautionaryOutputChordsymbol = null;
-                        CautionaryInputChordSymbol cautionaryInputChordsymbol = null;
+                        CautionaryChordSymbol cautionaryChordSymbol = null;
                         for(int index = noteObjects.Count - 1; index >= 0; --index)
                         {
                             lastChord = noteObjects[index] as ChordSymbol;
                             lastRest = noteObjects[index] as RestSymbol;
-                            cautionaryOutputChordsymbol = noteObjects[index] as CautionaryOutputChordSymbol;
-                            cautionaryInputChordsymbol = noteObjects[index] as CautionaryInputChordSymbol;
-                            if(cautionaryOutputChordsymbol != null)
+                            cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
+                            if(cautionaryChordSymbol != null)
                             {
-                                cautionaryOutputChordsymbol.Visible = false;
-                                // a CautionaryChordSymbol is a ChordSymbol, but we have not found a real one yet. 
-                            }
-                            else if(cautionaryInputChordsymbol != null)
-                            {
-                                cautionaryInputChordsymbol.Visible = false;
+                                cautionaryChordSymbol.Visible = false;
                                 // a CautionaryChordSymbol is a ChordSymbol, but we have not found a real one yet. 
                             }
                             else if(lastChord != null || lastRest != null)
@@ -836,7 +802,7 @@ namespace Moritz.Symbols
             bool firstDurationSymbolIsCautionary = false;
             foreach(NoteObject noteObject in voiceOnNextSystem.NoteObjects)
             {
-                if(noteObject is CautionaryOutputChordSymbol || noteObject is CautionaryInputChordSymbol)
+                if(noteObject is CautionaryChordSymbol)
                 {
                     firstDurationSymbolIsCautionary = true;
                     break;

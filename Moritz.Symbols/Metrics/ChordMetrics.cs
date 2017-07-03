@@ -42,12 +42,7 @@ namespace Moritz.Symbols
             CSSClass accidentalClass = GetAccidentalClass(chord);
             CreateLedgerlineAndAccidentalMetrics(chord.FontHeight, chord.HeadsTopDown, _headsMetricsTopDown, stemStrokeWidthVBPX, accidentalClass);
 
-            ChordSymbol cautionaryChordSymbol = chord as CautionaryOutputChordSymbol;
-            if(cautionaryChordSymbol == null)
-            {
-                cautionaryChordSymbol = chord as CautionaryInputChordSymbol;
-
-            }
+            ChordSymbol cautionaryChordSymbol = chord as CautionaryChordSymbol;
             if(cautionaryChordSymbol != null)
             {
                 CreateCautionaryBracketsMetrics(cautionaryChordSymbol);
@@ -176,13 +171,9 @@ namespace Moritz.Symbols
         private CSSClass GetHeadClass(ChordSymbol chord)
         {
             CSSClass headClass = CSSClass.notehead; // OutputChordSymbol
-            if(chord is CautionaryOutputChordSymbol)
+            if(chord is CautionaryChordSymbol)
             {
                 headClass = CSSClass.cautionaryNotehead;
-            }
-            else if(chord is CautionaryInputChordSymbol)
-            {
-                throw new ApplicationException("Can I delete CautionaryInputChordSymbol?");
             }
             else if(chord is InputChordSymbol)
             {
@@ -194,13 +185,9 @@ namespace Moritz.Symbols
         private CSSClass GetAccidentalClass(ChordSymbol chord)
         {
             CSSClass accidentalClass = CSSClass.accidental; // OutputChordSymbol
-            if(chord is CautionaryOutputChordSymbol)
+            if(chord is CautionaryChordSymbol)
             {
                 accidentalClass = CSSClass.cautionaryAccidental;
-            }
-            else if(chord is CautionaryInputChordSymbol)
-            {
-                throw new ApplicationException("Can I delete CautionaryInputChordSymbol?");
             }
             else if(chord is InputChordSymbol)
             {

@@ -590,11 +590,11 @@ namespace Moritz.Symbols
         private void AdjustLowerChordXPosition(ChordSymbol upperChord, ChordSymbol lowerChord)
         {
             Debug.Assert(upperChord.AbsMsPosition == lowerChord.AbsMsPosition);
-            if(!(upperChord is CautionaryOutputChordSymbol || upperChord is CautionaryInputChordSymbol))
+            if(!(upperChord is CautionaryChordSymbol))
             {
                 Debug.Assert(upperChord.Stem.Direction == VerticalDir.up);
             }
-            if(!(lowerChord is CautionaryOutputChordSymbol || lowerChord is CautionaryInputChordSymbol))
+            if(!(lowerChord is CautionaryChordSymbol))
             {
                 Debug.Assert(lowerChord.Stem.Direction == VerticalDir.down);
             }

@@ -6,13 +6,12 @@ using Moritz.Spec;
 
 namespace Moritz.Symbols
 {
-    internal class CautionaryInputChordSymbol : InputChordSymbol
+    internal class CautionaryChordSymbol : OutputChordSymbol
     {
-        //(Voice voice, InputChordDef umcd, int absMsPosition, int minimumCrotchetDurationMS, float fontSize)
-        public CautionaryInputChordSymbol(Voice voice, CautionaryChordDef lccd, int absMsPosition, float fontSize)
+        public CautionaryChordSymbol(Voice voice, CautionaryChordDef lccd, int absMsPosition, float fontSize)
             : base(voice, lccd.MsDuration, absMsPosition, 600, fontSize)
         {
-            SetNoteheadPitches(lccd.NotatedMidiPitches);
+            SetNoteheadPitchesAndVelocities(lccd.NotatedMidiPitches, lccd.NotatedMidiVelocities);
 
             _durationClass = DurationClass.cautionary;
             _msDuration = 0;
@@ -23,10 +22,10 @@ namespace Moritz.Symbols
         {
             if(Visible && staffIsVisible)
             {
-                w.SvgStartGroup(ChordMetrics.CSSClass.ToString()); // "cautionaryInputChord"
+                w.SvgStartGroup(ChordMetrics.CSSClass.ToString()); // "cautionaryChord"
                 w.SvgStartGroup(null);
 
-                this.ChordMetrics.WriteSVG(w, true, true);
+                this.ChordMetrics.WriteSVG(w, true, false);
 
                 w.SvgEndGroup();
                 w.SvgEndGroup();
@@ -36,7 +35,7 @@ namespace Moritz.Symbols
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("cautionaryInputChord  ");
+            sb.Append("cautionaryOutputChord  ");
             sb.Append(InfoString);
             return sb.ToString();
         }
