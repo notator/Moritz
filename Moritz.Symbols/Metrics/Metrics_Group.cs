@@ -57,12 +57,6 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-            //WriteSVG(w, null);
-            throw new NotImplementedException();
-		}
-
-		public void WriteSVG(SvgWriter w, string id)
-		{
 			w.SvgStartGroup(CSSClass.ToString());
 			foreach(Metrics metrics in MetricsList)
 			{

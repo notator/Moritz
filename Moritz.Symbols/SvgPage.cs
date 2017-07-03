@@ -176,7 +176,7 @@ namespace Moritz.Symbols
 
 		private void WriteSystemsLayer(SvgWriter w, int pageNumber, Metadata metadata)
 		{
-            w.SvgStartGroup("systems");
+            w.SvgStartGroup(CSSClass.systems.ToString());
 
             //w.WriteAttributeString("style", "display:inline");
 
@@ -256,7 +256,7 @@ namespace Moritz.Symbols
 			  new TextInfo(metadata.Author, titlesFontFamily, _pageFormat.Page1AuthorHeight,
 				  null, TextHorizAlign.right);
 			w.WriteStartElement("g");
-			w.WriteAttributeString("class", "titles");
+			w.WriteAttributeString("class", CSSClass.titles.ToString());
 			w.SvgText(CSSClass.mainTitle, titleInfo.Text, _pageFormat.Right / 2F, _pageFormat.Page1TitleY);
 			w.SvgText(CSSClass.author, authorInfo.Text, _pageFormat.RightMarginPos, _pageFormat.Page1TitleY);
 			w.WriteEndElement(); // group
