@@ -1990,7 +1990,7 @@ namespace Moritz.Composer
             // These need clearing between creating different scores in one Moritz run.
             Metrics.ClearCSSClasses();
             ClefMetrics.ClearUsedClefIDsList();
-            FlagsBlockMetrics.ClearUsedFlagIDsList();
+            FlagsMetrics.ClearUsedFlagIDsList();
 
             ComposableScore score =
                 new KrystalPaletteScore(_scoreTitle,

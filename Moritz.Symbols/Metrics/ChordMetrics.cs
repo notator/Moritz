@@ -497,7 +497,7 @@ namespace Moritz.Symbols
         {
             bool isInput = chord is InputChordSymbol;
             DurationClass durationClass = chord.DurationClass;
-            _flagsBlockMetrics = null;
+            _flagsMetrics = null;
             if(chord.BeamBlock == null
             && (durationClass == DurationClass.quaver
                 || durationClass == DurationClass.semiquaver
@@ -505,7 +505,7 @@ namespace Moritz.Symbols
                 || durationClass == DurationClass.fourFlags
                 || durationClass == DurationClass.fiveFlags))
             {
-                _flagsBlockMetrics = GetFlagsBlockMetrics(topDownHeadsMetrics,
+                _flagsMetrics = GetFlagsMetrics(topDownHeadsMetrics,
                                                                 durationClass,
                                                                 chord.FontHeight,
                                                                 chord.Stem.Direction,
@@ -521,7 +521,7 @@ namespace Moritz.Symbols
             || durationClass == DurationClass.fourFlags
             || durationClass == DurationClass.fiveFlags)
             {
-                _stemMetrics = NewStemMetrics(topDownHeadsMetrics, chord, _flagsBlockMetrics, stemThickness, isInput);
+                _stemMetrics = NewStemMetrics(topDownHeadsMetrics, chord, _flagsMetrics, stemThickness, isInput);
             }
         }
 
@@ -545,7 +545,7 @@ namespace Moritz.Symbols
         /// Returns null if the durationClass does not have a flagsBlock,
         /// otherwise returns the metrics for the flagsBlock attached to this chord, correctly positioned wrt the noteheads.
         /// </summary>
-        private FlagsBlockMetrics GetFlagsBlockMetrics(List<HeadMetrics> topDownHeadsMetrics, DurationClass durationClass, float fontSize, VerticalDir stemDirection, float stemThickness, bool isInput)
+        private FlagsMetrics GetFlagsMetrics(List<HeadMetrics> topDownHeadsMetrics, DurationClass durationClass, float fontSize, VerticalDir stemDirection, float stemThickness, bool isInput)
         {
             Debug.Assert(durationClass == DurationClass.quaver
                 || durationClass == DurationClass.semiquaver
@@ -553,15 +553,15 @@ namespace Moritz.Symbols
                 || durationClass == DurationClass.fourFlags
                 || durationClass == DurationClass.fiveFlags);
 
-            FlagsBlockMetrics flagsBlockMetrics = new FlagsBlockMetrics(durationClass, fontSize, stemDirection, isInput);
+            FlagsMetrics flagsMetrics = new FlagsMetrics(durationClass, fontSize, stemDirection, isInput);
 
-            if(flagsBlockMetrics != null)
+            if(flagsMetrics != null)
             {
                 // flagsMetrics contains a metrics for the flags block with the outermost point at OriginX=0, BaselineY=0
                 // Now move the flagblock so that is positioned correctly wrt the noteheads.
-                SetFlagsPositionReNoteheads(topDownHeadsMetrics, flagsBlockMetrics, stemDirection, stemThickness);
+                SetFlagsPositionReNoteheads(topDownHeadsMetrics, flagsMetrics, stemDirection, stemThickness);
             }
-            return flagsBlockMetrics;
+            return flagsMetrics;
         }
         /// <summary>
         /// The flagBlock is moved to the correct x-position wrt noteheads.
@@ -570,9 +570,9 @@ namespace Moritz.Symbols
         /// If the stem is up and the bottom of the flagBlock is too low, the flagBlock is moved up.
         /// If the stem is down and the top of the flagBlock is too high, the flagBlock is moved down.
         /// </summary>
-        private void SetFlagsPositionReNoteheads(List<HeadMetrics> topDownHeadsMetrics, FlagsBlockMetrics flagsBlockMetrics, VerticalDir stemDirection, float stemThickness)
+        private void SetFlagsPositionReNoteheads(List<HeadMetrics> topDownHeadsMetrics, FlagsMetrics flagsMetrics, VerticalDir stemDirection, float stemThickness)
         {
-            Debug.Assert(flagsBlockMetrics != null);
+            Debug.Assert(flagsMetrics != null);
 
             HeadMetrics outerNoteheadMetrics = FindOuterNotehead(topDownHeadsMetrics, stemDirection);
             HeadMetrics innerNoteheadMetrics = FindInnerNotehead(topDownHeadsMetrics, stemDirection);
@@ -580,10 +580,10 @@ namespace Moritz.Symbols
             float minDist = _gap * 1.8F; // constant found by experiment
             float deltaX = 0;
             float deltaY = 0;
-            string flagIDString = flagsBlockMetrics.FlagID.ToString();
+            string flagIDString = flagsMetrics.FlagID.ToString();
             if(stemDirection == VerticalDir.up)
             {
-                deltaY = minDist - (innerNoteheadAlignmentY - flagsBlockMetrics.Bottom);
+                deltaY = minDist - (innerNoteheadAlignmentY - flagsMetrics.Bottom);
                 
                 if(flagIDString.Contains("ight1Flag")) // could be input staff
                     deltaY += _gap;
@@ -591,41 +591,41 @@ namespace Moritz.Symbols
 
                 if(flagIDString.Contains("ight1Flag")) // could be input staff
                 {
-                    if((flagsBlockMetrics.Bottom + deltaY) > (_gap * 2.5F))
+                    if((flagsMetrics.Bottom + deltaY) > (_gap * 2.5F))
                     {
-                        deltaY = (_gap * 2.5F) - flagsBlockMetrics.Bottom;
+                        deltaY = (_gap * 2.5F) - flagsMetrics.Bottom;
                     }
                 }
                 else // other right flag types
-                    if((flagsBlockMetrics.Bottom + deltaY) > (_gap * 3.5F))
+                    if((flagsMetrics.Bottom + deltaY) > (_gap * 3.5F))
                     {
-                        deltaY = (_gap * 3.5F) - flagsBlockMetrics.Bottom;
+                        deltaY = (_gap * 3.5F) - flagsMetrics.Bottom;
                     }
 
                 deltaX = outerNoteheadMetrics.RightStemX - (stemThickness / 2F);
             }
             else // stem is down
             {
-                deltaY = minDist - (flagsBlockMetrics.Top - innerNoteheadAlignmentY);
+                deltaY = minDist - (flagsMetrics.Top - innerNoteheadAlignmentY);
                 if(flagIDString.Contains("eft1Flag")) // could be input staff
                     deltaY += _gap;
 
                 if(flagIDString.Contains("eft1Flag")) // could be input staff
                 {
-                    if((flagsBlockMetrics.Top + deltaY) < (_gap * 1.5F))
+                    if((flagsMetrics.Top + deltaY) < (_gap * 1.5F))
                     {
-                        deltaY = (_gap * 1.5F) - flagsBlockMetrics.Top;
+                        deltaY = (_gap * 1.5F) - flagsMetrics.Top;
                     }
                 }
                 else // other left flag types
-                    if((flagsBlockMetrics.Top + deltaY) < (_gap * 0.5F))
+                    if((flagsMetrics.Top + deltaY) < (_gap * 0.5F))
                     {
-                        deltaY = (_gap * 0.5F) - flagsBlockMetrics.Top;
+                        deltaY = (_gap * 0.5F) - flagsMetrics.Top;
                     }
 
                 deltaX = outerNoteheadMetrics.LeftStemX + (stemThickness / 2F);
             }
-            flagsBlockMetrics.Move(deltaX, deltaY);
+            flagsMetrics.Move(deltaX, deltaY);
             // the flagsBlockMetrics is added to either this.MetricsList or this.PostJustificationMetrics in a later function.
         }
 
@@ -962,8 +962,8 @@ namespace Moritz.Symbols
 
             if(_stemMetrics != null)
                 SetBoundary(_stemMetrics);
-            if(_flagsBlockMetrics != null)
-                SetBoundary(_flagsBlockMetrics);
+            if(_flagsMetrics != null)
+                SetBoundary(_flagsMetrics);
             if(_headsMetricsTopDown != null)
             {
                 foreach(HeadMetrics headMetric in _headsMetricsTopDown)
@@ -1012,8 +1012,8 @@ namespace Moritz.Symbols
         {
             if(_stemMetrics != null)
                 _stemMetrics.WriteSVG(w);
-            if(_flagsBlockMetrics != null)
-                _flagsBlockMetrics.WriteSVG(w);
+            if(_flagsMetrics != null)
+                _flagsMetrics.WriteSVG(w);
             if(_headsMetricsTopDown != null)
             {
                 foreach(HeadMetrics headMetrics in _headsMetricsTopDown)
@@ -1069,8 +1069,8 @@ namespace Moritz.Symbols
 
             if(_stemMetrics != null)
                 _stemMetrics.Move(dx, dy);
-            if(_flagsBlockMetrics != null)
-                _flagsBlockMetrics.Move(dx, dy);
+            if(_flagsMetrics != null)
+                _flagsMetrics.Move(dx, dy);
             if(_headsMetricsTopDown != null)
             {
                 foreach(HeadMetrics headMetric in _headsMetricsTopDown)
@@ -1147,9 +1147,9 @@ namespace Moritz.Symbols
             || (_stemMetrics.VerticalDir == VerticalDir.down && TopHeadMetrics.Top >= otherHeadsMetrics[otherHeadsMetrics.Count -1].Bottom))
                 return;
 
-            if(_flagsBlockMetrics != null)
+            if(_flagsMetrics != null)
             {
-                FlagsBlockMetrics dummyFlagsBlockMetrics = GetFlagsBlockMetrics(otherHeadsMetrics,
+                FlagsMetrics dummyFlagsMetrics = GetFlagsMetrics(otherHeadsMetrics,
                                                 thisDurationClass,
                                                 thisFontHeight,
                                                 _stemMetrics.VerticalDir,
@@ -1158,14 +1158,14 @@ namespace Moritz.Symbols
 
                 StemMetrics dummyStemMetrics =
                     DummyStemMetrics(otherHeadsMetrics, _stemMetrics.VerticalDir, thisFontHeight,
-                        dummyFlagsBlockMetrics, null, _stemMetrics.StrokeWidth, isInput);
+                        dummyFlagsMetrics, null, _stemMetrics.StrokeWidth, isInput);
 
                 if(_stemMetrics.VerticalDir == VerticalDir.up)
                 {
                     if(dummyStemMetrics.Top < _stemMetrics.Top)
                     {
                         MoveOuterStemTip(dummyStemMetrics.Top, _stemMetrics.VerticalDir);
-                        _flagsBlockMetrics.Move(0F, dummyStemMetrics.Top - _flagsBlockMetrics.Top); 
+                        _flagsMetrics.Move(0F, dummyStemMetrics.Top - _flagsMetrics.Top); 
                     }
                 }
                 else
@@ -1173,7 +1173,7 @@ namespace Moritz.Symbols
                     if(dummyStemMetrics.Bottom > _stemMetrics.Bottom)
                     {
                         MoveOuterStemTip(dummyStemMetrics.Bottom, _stemMetrics.VerticalDir);
-                        _flagsBlockMetrics.Move(0F, dummyStemMetrics.Bottom - _flagsBlockMetrics.Bottom);
+                        _flagsMetrics.Move(0F, dummyStemMetrics.Bottom - _flagsMetrics.Bottom);
                     }
                 }
             }
@@ -1543,12 +1543,12 @@ namespace Moritz.Symbols
             }
             #endregion
             #region _flagsBlockMetrics
-            if(_flagsBlockMetrics != null)
+            if(_flagsMetrics != null)
             {
                 if(topEdge != null)
-                    topEdge.Add(_flagsBlockMetrics);
+                    topEdge.Add(_flagsMetrics);
                 else
-                    bottomEdge.Add(_flagsBlockMetrics);
+                    bottomEdge.Add(_flagsMetrics);
             }
             #endregion
             #region _topDownHeadsMetrics
@@ -1722,9 +1722,9 @@ namespace Moritz.Symbols
             }
             #endregion
             #region _flagsBlockMetrics
-            if(_flagsBlockMetrics != null)
+            if(_flagsMetrics != null)
             {
-                overlap = followingMetrics.OverlapWidth(_flagsBlockMetrics);
+                overlap = followingMetrics.OverlapWidth(_flagsMetrics);
                 maxOverlapWidth = maxOverlapWidth > overlap ? maxOverlapWidth : overlap;
             }
             #endregion
@@ -1811,9 +1811,9 @@ namespace Moritz.Symbols
             }
             #endregion
             #region _flagsBlockMetrics
-            if(_flagsBlockMetrics != null)
+            if(_flagsMetrics != null)
             {
-                overlap = _flagsBlockMetrics.OverlapWidth(previousAnchorageSymbol);
+                overlap = _flagsMetrics.OverlapWidth(previousAnchorageSymbol);
                 maxOverlapWidth = maxOverlapWidth > overlap ? maxOverlapWidth : overlap;
             }
             #endregion
@@ -1908,9 +1908,9 @@ namespace Moritz.Symbols
             }
             #endregion
             #region _flagsBlockMetrics
-            if(_flagsBlockMetrics != null)
+            if(_flagsMetrics != null)
             {
-                overlap = _flagsBlockMetrics.OverlapHeight(metrics, padding);
+                overlap = _flagsMetrics.OverlapHeight(metrics, padding);
                 if(overlap != 0F)
                     maxOverlapHeight = maxOverlapHeight > overlap ? maxOverlapHeight : overlap;
             }
@@ -2207,7 +2207,7 @@ namespace Moritz.Symbols
         private Clef _clef = null;
 
         private StemMetrics _stemMetrics = null;
-        private FlagsBlockMetrics _flagsBlockMetrics = null;
+        private FlagsMetrics _flagsMetrics = null;
         private List<HeadMetrics> _headsMetricsTopDown = null; // heads are always in top->bottom order
         private List<AccidentalMetrics> _topDownAccidentalsMetrics = null; // accidentals are always in top->bottom order
         private LedgerlineBlockMetrics _upperLedgerlineBlockMetrics = null;

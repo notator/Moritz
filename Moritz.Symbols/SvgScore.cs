@@ -231,7 +231,7 @@ namespace Moritz.Symbols
         {
             List<CSSClass> usedCSSClasses = new List<CSSClass>(Metrics.CSSClasses);
             List<ClefID> usedClefIDs = new List<ClefID>(ClefMetrics.UsedClefIDs);
-            List<FlagID> usedFlagIDs = new List<FlagID>(FlagsBlockMetrics.UsedFlagIDs);
+            List<FlagID> usedFlagIDs = new List<FlagID>(FlagsMetrics.UsedFlagIDs);
 
             // FloatToShortString returns a string of minimum length with maximum 4 decimal places and a '.' decimal point.
 

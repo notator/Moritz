@@ -10,12 +10,12 @@ using Moritz.Xml;
 
 namespace Moritz.Symbols
 {
-    public class FlagsBlockMetrics : Metrics
+    public class FlagsMetrics : Metrics
     {
         /// <summary>
         /// Should be called with a duration class having a flag block
         /// </summary>
-        public FlagsBlockMetrics(DurationClass durationClass, float fontHeight, VerticalDir stemDirection, bool isInput)
+        public FlagsMetrics(DurationClass durationClass, float fontHeight, VerticalDir stemDirection, bool isInput)
             : base(isInput ? CSSClass.inputFlag : CSSClass.flag)
         {
 			_left = 0F;
