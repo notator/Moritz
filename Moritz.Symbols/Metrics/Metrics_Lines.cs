@@ -73,8 +73,8 @@ namespace Moritz.Symbols
 	}
 	internal class LedgerlineBlockMetrics : LineStyle, ICloneable
 	{      
-        public LedgerlineBlockMetrics(float left, float right, float strokeWidth)
-			: base(CSSClass.ledgerline, strokeWidth, "black")
+        public LedgerlineBlockMetrics(float left, float right, float strokeWidth, CSSClass ledgerlinesClass)
+			: base(ledgerlinesClass, strokeWidth, "black")
 		{
             /// The base class has deliberately been called with CSSClass.ledgerline (singular) here.
             /// This is so that its less confusing later when comparing the usage with stafflines/staffline.
@@ -117,21 +117,10 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
         {
-            throw new NotImplementedException();
-        }
-
-        internal void WriteSVG(SvgWriter w, bool isInput)
-		{
-            CSSClass ledgerlinesClass = CSSClass.ledgerlines;
-            CSSClass ledgerlineClass = CSSClass.ledgerline;
-            if(isInput)
-            {
-                ledgerlinesClass = CSSClass.inputLedgerlines;
-                ledgerlineClass = CSSClass.inputLedgerline;
-            }
+            CSSClass ledgerlineClass = (CSSClass == CSSClass.inputLedgerlines) ? CSSClass.inputLedgerline : CSSClass.ledgerline;
 
             w.WriteStartElement("g");
-            w.WriteAttributeString("class", ledgerlinesClass.ToString());
+            w.WriteAttributeString("class", CSSClass.ToString());
             foreach(float y in Ys)
 			{
 				w.SvgLine(ledgerlineClass, _left + _strokeWidth, y, _right - _strokeWidth, y);
@@ -162,15 +151,7 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            throw new NotImplementedException();
-        }
-
-        public void WriteSVG(SvgWriter w, bool isInput)
-        {
-            // The performer's chords can't be broken across staves.
-            Debug.Assert(isInput == false, "Cautionary brackets cannot exist in input voices.");
-
-			w.SvgCautionaryBracket(CSSClass.cautionaryBracket.ToString(), _isLeftBracket, _top, _right, _bottom, _left);
+			w.SvgCautionaryBracket(CSSClass.ToString(), _isLeftBracket, _top, _right, _bottom, _left);
 		}
 
 		private readonly bool _isLeftBracket;
@@ -226,13 +207,8 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            throw new NotImplementedException();
-        }
-
-        public void WriteSVG(SvgWriter w, bool isInput)
-        {
             if(_drawExtender)
-                w.SvgLine(CSSClass.noteExtender, _left, _originY, _right, _originY);
+                w.SvgLine(CSSClass, _left, _originY, _right, _originY);
         }
 
         public string StrokeColor { get { return _strokeColor; } }
@@ -316,14 +292,11 @@ namespace Moritz.Symbols
         {
             if(_staffNameMetrics != null)
             {
-                _staffNameMetrics.WriteSVG(w, CSSClass.staffName, isInput);
+                _staffNameMetrics.WriteSVG(w);
             }
             if(_barnumberMetrics != null)
             {
-                w.WriteStartElement("g");
-                w.WriteAttributeString("class", CSSClass.barNumber.ToString());
-                _barnumberMetrics.WriteSVG(w); // writes the number and the frame
-                w.WriteEndElement(); // barnumber group
+                _barnumberMetrics.WriteSVG(w);
             }
         }
 

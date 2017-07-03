@@ -107,7 +107,7 @@ namespace Moritz.Symbols
             _inputChordDef.WriteSVG(w);
 
 			w.SvgStartGroup("graphics");
-            ChordMetrics.WriteSVG(w, false, true);
+            ChordMetrics.WriteSVG(w);
             w.SvgEndGroup();
 
             w.SvgEndGroup();

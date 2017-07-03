@@ -24,7 +24,7 @@ namespace Moritz.Symbols
         {
             if(LocalCautionaryChordDef == null)
             {
-				w.SvgStartGroup("inputRest");
+				w.SvgStartGroup(Metrics.CSSClass.ToString());  // "inputRest"
 
                 Debug.Assert(_msDuration > 0);
 				if(staffIsVisible)
@@ -34,7 +34,7 @@ namespace Moritz.Symbols
                 w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
 
                 if(this.Metrics != null && staffIsVisible)
-                    ((RestMetrics)this.Metrics).WriteSVG(w, true);
+                    ((RestMetrics)this.Metrics).WriteSVG(w);
 
                 w.SvgEndGroup();
             }

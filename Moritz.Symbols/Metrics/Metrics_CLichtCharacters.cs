@@ -60,11 +60,6 @@ namespace Moritz.Symbols
         public readonly float FontHeight = 0F;       
         public readonly string TextAnchor; // "left", "middle", "right"
         public readonly string Fill; // "none", "black", "white", "red", #AAAAAA" etc
-
-        public static void ClearCSSClasses()
-        {
-            throw new NotImplementedException();
-        }
     }
 
     internal class CLichtCharacterMetrics : TextStyle
@@ -141,73 +136,14 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            throw new NotImplementedException();
-        }
-
-        public void WriteSVG(SvgWriter w, CSSClass cssClass, bool isCautionary, bool isInput)
-        {
-            Debug.Assert(cssClass == CSSClass.notehead || cssClass == CSSClass.accidental
-                         || cssClass == CSSClass.dynamic || cssClass == CSSClass.rest);
-
-            // there are no grace or reminder chords in input voices
-            Debug.Assert((isCautionary == true && isInput == true) == false);
-
-            if(isCautionary)
-            {
-                switch(cssClass)
-                {
-                    case CSSClass.notehead:
-                        cssClass = CSSClass.cautionaryNotehead;
-                        break;
-                    case CSSClass.accidental:
-                        cssClass = CSSClass.cautionaryAccidental;
-                        break;
-                    case CSSClass.dynamic:
-                        // CSSClass.cautionaryDynamic does not exist
-                        break;
-                    case CSSClass.rest:
-                        // CSSClass.cautionaryRest does not exist
-                        break;
-                }
-            }
-            else if(isInput)
-            {
-                switch(cssClass)
-                {
-                    case CSSClass.notehead:
-                        cssClass = CSSClass.inputNotehead;
-                        break;
-                    case CSSClass.accidental:
-                        cssClass = CSSClass.inputAccidental;
-                        break;
-                    case CSSClass.dynamic:
-                        cssClass = CSSClass.inputDynamic;
-                        break;
-                    case CSSClass.rest:
-                        cssClass = CSSClass.inputRest;
-                        break;
-                }
-            }
-
             w.WriteStartElement("text");
-            w.WriteAttributeString("class", cssClass.ToString());
+            w.WriteAttributeString("class", CSSClass.ToString());
             w.WriteAttributeString("x", M.FloatToShortString(_originX));
             w.WriteAttributeString("y", M.FloatToShortString(_originY));
             if(! string.IsNullOrEmpty(_colorAttribute))
             {
                 w.WriteAttributeString("fill", _colorAttribute);
             }
-			//switch(_textHorizAlign)
-			//{
-			//	case TextHorizAlign.left:
-			//		break;
-			//	case TextHorizAlign.center:
-			//		w.WriteAttributeString("text-anchor", "middle");
-			//		break;
-			//	case TextHorizAlign.right:
-			//		w.WriteAttributeString("text-anchor", "end");
-			//		break;
-			//}
 			w.WriteString(_characterString); // e.g. Unicode character
 			w.WriteEndElement();
 		}
@@ -351,6 +287,7 @@ namespace Moritz.Symbols
 			_originY += dy; // the staffline on which the rest is aligned
 			_ledgerlineStub = gap * 0.75F;
 			Move((Left - Right) / 2F, 0F); // centre the glyph horizontally
+            CSSClass llBlockClass = (restClass == CSSClass.rest) ? CSSClass.ledgerlines : CSSClass.inputLedgerlines;
 			switch(rest.DurationClass)
 			{
 				case DurationClass.breve:
@@ -358,14 +295,14 @@ namespace Moritz.Symbols
 					Move(gap * -0.25F, 0F);
 					if(numberOfStafflines == 1)
 						Move(0F, gap);
-					_ledgerlineBlockMetrics = new LedgerlineBlockMetrics(Left - _ledgerlineStub, Right + _ledgerlineStub, ledgerlineStrokeWidth);
+					_ledgerlineBlockMetrics = new LedgerlineBlockMetrics(Left - _ledgerlineStub, Right + _ledgerlineStub, ledgerlineStrokeWidth, llBlockClass);
 					_ledgerlineBlockMetrics.AddLedgerline(_originY - gap, 0F);
 					_ledgerlineBlockMetrics.Move(gap * 0.17F, 0F);
 					_top -= (gap * 1.5F);
 					break;
 				case DurationClass.minim:
 					Move(gap * 0.18F, 0);
-					_ledgerlineBlockMetrics = new LedgerlineBlockMetrics(Left - _ledgerlineStub, Right + _ledgerlineStub - (gap * 0.3F), ledgerlineStrokeWidth);
+					_ledgerlineBlockMetrics = new LedgerlineBlockMetrics(Left - _ledgerlineStub, Right + _ledgerlineStub - (gap * 0.3F), ledgerlineStrokeWidth, llBlockClass);
 					_ledgerlineBlockMetrics.AddLedgerline(_originY, 0F);
 					_bottom += (gap * 1.5F);
 					break;
@@ -401,27 +338,35 @@ namespace Moritz.Symbols
 
 		}
 
-		public override void Move(float dx, float dy)
+        public override void Move(float dx, float dy)
 		{
 			base.Move(dx, dy);
 			if(_ledgerlineBlockMetrics != null)
 				_ledgerlineBlockMetrics.Move(dx, dy);
-			if(_durationControlMetrics != null)
-				_durationControlMetrics.Move(dx, dy);
 		}
 
         public override void WriteSVG(SvgWriter w)
         {
-            throw new NotImplementedException();
-        }
+            w.WriteStartElement("g");
+            w.WriteAttributeString("class", "graphics");
 
-        public void WriteSVG(SvgWriter w, bool isInput)
-        {
-            WriteSVG(w, CSSClass.rest, false, isInput); // there are no cautionary rests
+            w.WriteStartElement("text");
+            // Rests dont need to (re)write their class!
+            w.WriteAttributeString("x", M.FloatToShortString(_originX));
+            w.WriteAttributeString("y", M.FloatToShortString(_originY));
+            if(!string.IsNullOrEmpty(_colorAttribute))
+            {
+                w.WriteAttributeString("fill", _colorAttribute);
+            }
+            w.WriteString(_characterString); // e.g. Unicode character
+            w.WriteEndElement();
+
             if(_ledgerlineBlockMetrics != null && _ledgerlineVisible)
-                _ledgerlineBlockMetrics.WriteSVG(w, isInput);
-            if(_durationControlMetrics != null)
-                _durationControlMetrics.WriteSVG(w);
+            {
+                _ledgerlineBlockMetrics.WriteSVG(w);
+            }
+
+            w.WriteEndElement(); // g graphics
         }
 
         /// <summary>
@@ -445,7 +390,6 @@ namespace Moritz.Symbols
 		private float _ledgerlineStub;
 		private bool _ledgerlineVisible = false;
 		private LedgerlineBlockMetrics _ledgerlineBlockMetrics = null;
-		private GroupMetrics _durationControlMetrics = null;
 	}
 	internal class HeadMetrics : CLichtCharacterMetrics
 	{

@@ -37,10 +37,8 @@ namespace Moritz.Symbols
                 SetStemAndFlags(chord, _headsMetricsTopDown, stemStrokeWidthVBPX);
 
             // if the chord is part of a beamGroup, the stem tips are all at one height here.
-
             // These objects are created with originX and originY at 0,0 (the chord's origin).
-            CSSClass accidentalClass = GetAccidentalClass(chord);
-            CreateLedgerlineAndAccidentalMetrics(chord.FontHeight, chord.HeadsTopDown, _headsMetricsTopDown, stemStrokeWidthVBPX, accidentalClass);
+            CreateLedgerlineAndAccidentalMetrics(chord.FontHeight, chord.HeadsTopDown, _headsMetricsTopDown, stemStrokeWidthVBPX, chordClass);
 
             ChordSymbol cautionaryChordSymbol = chord as CautionaryChordSymbol;
             if(cautionaryChordSymbol != null)
@@ -182,14 +180,14 @@ namespace Moritz.Symbols
             return headClass;
         }
 
-        private CSSClass GetAccidentalClass(ChordSymbol chord)
+        private CSSClass GetAccidentalClass(CSSClass chordClass)
         {
-            CSSClass accidentalClass = CSSClass.accidental; // OutputChordSymbol
-            if(chord is CautionaryChordSymbol)
+            CSSClass accidentalClass = CSSClass.accidental; // chordClass == chord
+            if(chordClass == CSSClass.cautionaryChord)
             {
                 accidentalClass = CSSClass.cautionaryAccidental;
             }
-            else if(chord is InputChordSymbol)
+            else if(chordClass == CSSClass.inputChord)
             {
                 accidentalClass = CSSClass.inputAccidental;
             }
@@ -216,11 +214,13 @@ namespace Moritz.Symbols
             return lyricClass;
         }
 
-        private void CreateLedgerlineAndAccidentalMetrics(float fontHeight, List<Head> topDownHeads, List<HeadMetrics> topDownHeadsMetrics, float ledgerlineStemStrokeWidth, CSSClass accidentalClass)
+        private void CreateLedgerlineAndAccidentalMetrics(float fontHeight, List<Head> topDownHeads, List<HeadMetrics> topDownHeadsMetrics, float ledgerlineStemStrokeWidth, CSSClass chordClass)
         {
             float limbLength = (topDownHeadsMetrics[0].RightStemX - topDownHeadsMetrics[0].LeftStemX) / 2F; // change to taste later
-            _upperLedgerlineBlockMetrics = CreateUpperLedgerlineBlock(topDownHeadsMetrics, limbLength, ledgerlineStemStrokeWidth);
-            _lowerLedgerlineBlockMetrics = CreateLowerLedgerlineBlock(topDownHeadsMetrics, limbLength, ledgerlineStemStrokeWidth);
+
+            CSSClass llsClass = GetLedgerlinesClass(chordClass);
+            _upperLedgerlineBlockMetrics = CreateUpperLedgerlineBlock(topDownHeadsMetrics, limbLength, ledgerlineStemStrokeWidth, llsClass);
+            _lowerLedgerlineBlockMetrics = CreateLowerLedgerlineBlock(topDownHeadsMetrics, limbLength, ledgerlineStemStrokeWidth, llsClass);
 
             List<AccidentalMetrics> existingAccidentalsMetrics = new List<AccidentalMetrics>();
             for(int i = 0; i < topDownHeads.Count; i++)
@@ -229,6 +229,7 @@ namespace Moritz.Symbols
                 Head head = topDownHeads[i];
                 if(head.DisplayAccidental == DisplayAccidental.force)
                 {
+                    CSSClass accidentalClass = GetAccidentalClass(chordClass);
                     AccidentalMetrics accidentalMetrics = new AccidentalMetrics(head, fontHeight, _gap, accidentalClass);
                     accidentalMetrics.Move(headMetrics.OriginX, headMetrics.OriginY);
                     MoveAccidentalLeft(accidentalMetrics, topDownHeadsMetrics, _stemMetrics,
@@ -240,6 +241,20 @@ namespace Moritz.Symbols
                     this._topDownAccidentalsMetrics.Add(accidentalMetrics);
                 }
             }
+        }
+
+        private CSSClass GetLedgerlinesClass(CSSClass chordClass)
+        {
+            CSSClass llClass = CSSClass.ledgerlines; // chordClass == chord
+            if(chordClass == CSSClass.cautionaryChord)
+            {
+                llClass = CSSClass.ledgerlines; // N.B. cautionaryLedgerlines does not exist.
+            }
+            else if(chordClass == CSSClass.inputChord)
+            {
+                llClass = CSSClass.inputLedgerlines;
+            }
+            return llClass;
         }
 
         private void CreateCautionaryBracketsMetrics(ChordSymbol chord)
@@ -407,7 +422,7 @@ namespace Moritz.Symbols
                 accidentalM.Move(ledgerlineBlockM.Left - accidentalM.Right, 0F);
         }
 
-        private LedgerlineBlockMetrics CreateUpperLedgerlineBlock(List<HeadMetrics> topDownHeadsMetrics, float limbLength, float strokeWidth)
+        private LedgerlineBlockMetrics CreateUpperLedgerlineBlock(List<HeadMetrics> topDownHeadsMetrics, float limbLength, float strokeWidth, CSSClass ledgerlinesClass)
         {
             Debug.Assert(topDownHeadsMetrics != null);
             #region upper ledgerline block
@@ -427,7 +442,7 @@ namespace Moritz.Symbols
             LedgerlineBlockMetrics upperLedgerlineBlockMetrics = null;
             if(topHeadMetrics.OriginY < -(_gap * 0.75F))
             {
-                upperLedgerlineBlockMetrics = new LedgerlineBlockMetrics(left, right, strokeWidth); // contains no ledgerlines
+                upperLedgerlineBlockMetrics = new LedgerlineBlockMetrics(left, right, strokeWidth, ledgerlinesClass); // contains no ledgerlines
 
                 float topLedgerlineY = topHeadMetrics.OriginY;
                 if((topLedgerlineY % _gap) < 0)
@@ -442,7 +457,7 @@ namespace Moritz.Symbols
             #endregion upper ledgerline block
             return upperLedgerlineBlockMetrics;
         }
-        private LedgerlineBlockMetrics CreateLowerLedgerlineBlock(List<HeadMetrics> topDownHeadsMetrics, float limbLength, float strokeWidth)
+        private LedgerlineBlockMetrics CreateLowerLedgerlineBlock(List<HeadMetrics> topDownHeadsMetrics, float limbLength, float strokeWidth, CSSClass ledgerlinesClass)
         {
             Debug.Assert(topDownHeadsMetrics != null);
             float minLeftX = float.MaxValue;
@@ -461,7 +476,7 @@ namespace Moritz.Symbols
             LedgerlineBlockMetrics lowerLedgerlineBlockMetrics = null;
             if(bottomHeadMetrics.OriginY > (_gap * 4.75))
             {
-                lowerLedgerlineBlockMetrics = new LedgerlineBlockMetrics(leftX, rightX, strokeWidth); // contains no ledgerlines
+                lowerLedgerlineBlockMetrics = new LedgerlineBlockMetrics(leftX, rightX, strokeWidth, ledgerlinesClass); // contains no ledgerlines
 
                 float bottomLedgerlineY = bottomHeadMetrics.OriginY;
                 if((bottomLedgerlineY % _gap) > 0)
@@ -817,7 +832,7 @@ namespace Moritz.Symbols
             _dynamicMetrics = null;
             if(dynamicText != null)
             {
-                dynamicText.Metrics = new DynamicMetrics(gap, dynamicText.TextInfo, dynamicIsBelow, dynamicClass);
+                dynamicText.Metrics = new  DynamicMetrics(gap, dynamicText.TextInfo, dynamicIsBelow, dynamicClass);
                 _dynamicMetrics = (DynamicMetrics)dynamicText.Metrics;
             }
 
@@ -995,11 +1010,6 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            throw new NotImplementedException();
-        }
-
-        public void WriteSVG(SvgWriter w, bool isCautionary, bool isInput)
-        {
             if(_stemMetrics != null)
                 _stemMetrics.WriteSVG(w);
             if(_flagsBlockMetrics != null)
@@ -1008,48 +1018,48 @@ namespace Moritz.Symbols
             {
                 foreach(HeadMetrics headMetrics in _headsMetricsTopDown)
                 {
-                    headMetrics.WriteSVG(w, CSSClass.notehead, isCautionary, isInput);
+                    headMetrics.WriteSVG(w);
                 }
             }
             if(_topDownAccidentalsMetrics != null)
             {
                 foreach(AccidentalMetrics accidentalMetrics in _topDownAccidentalsMetrics)
-                    accidentalMetrics.WriteSVG(w, CSSClass.accidental, isCautionary, isInput);
+                    accidentalMetrics.WriteSVG(w);
             }
             if(_upperLedgerlineBlockMetrics != null)
             {
-                _upperLedgerlineBlockMetrics.WriteSVG(w, isInput);
+                _upperLedgerlineBlockMetrics.WriteSVG(w);
             }
             if(_lowerLedgerlineBlockMetrics != null)
             {
-                _lowerLedgerlineBlockMetrics.WriteSVG(w, isInput);
+                _lowerLedgerlineBlockMetrics.WriteSVG(w);
             }
             if(_ornamentMetrics != null)
             {
-                _ornamentMetrics.WriteSVG(w, CSSClass.ornament, false); // there are no input ornaments 
+                _ornamentMetrics.WriteSVG(w); // there are no cautionary or input ornaments 
             }
             if(_lyricMetrics != null)
             {
-                _lyricMetrics.WriteSVG(w, CSSClass.lyric, isInput);               
+                _lyricMetrics.WriteSVG(w);               
             }
 
             if(_dynamicMetrics != null)
-                _dynamicMetrics.WriteSVG(w, CSSClass.dynamic, false, isInput); // cautionary dynamics don't exist.
+                _dynamicMetrics.WriteSVG(w); // cautionary dynamics don't exist.
 
             if(_cautionaryBracketsMetrics != null)
             {
                 foreach(CautionaryBracketMetrics cautionaryBracketMetrics in _cautionaryBracketsMetrics)
-                    cautionaryBracketMetrics.WriteSVG(w, isInput);
+                    cautionaryBracketMetrics.WriteSVG(w);
             }
             if(NoteheadExtendersMetricsBefore != null)
             {
                 foreach(NoteheadExtenderMetrics nemb in NoteheadExtendersMetricsBefore)
-                    nemb.WriteSVG(w, isInput);
+                    nemb.WriteSVG(w);
             }
             if(NoteheadExtendersMetrics != null)
             {
                 foreach(NoteheadExtenderMetrics nem in NoteheadExtendersMetrics)
-                    nem.WriteSVG(w, isInput);
+                    nem.WriteSVG(w);
             }
         }
 
@@ -2181,7 +2191,7 @@ namespace Moritz.Symbols
             }
             if(top != float.MaxValue)
             {
-                ledgerlineBlockMetrics = new LedgerlineBlockMetrics(left, right, staffLineStemStrokeWidth);
+                ledgerlineBlockMetrics = new LedgerlineBlockMetrics(left, right, staffLineStemStrokeWidth, lbm1.CSSClass);
                 ledgerlineBlockMetrics.SetTop(top);
                 ledgerlineBlockMetrics.SetBottom(bottom);
             }

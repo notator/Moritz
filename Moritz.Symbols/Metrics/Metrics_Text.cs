@@ -20,26 +20,7 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-            throw new NotImplementedException();
-		}
-
-		internal virtual void WriteSVG(SvgWriter w, CSSClass cssClass, bool isInput)
-		{
-            // cssClass can be lyric, staffName, barNumberNumber
-            // barNumberNumber never changes class.
-            if(isInput)
-            {
-                switch(cssClass)
-                {
-                    case CSSClass.lyric:
-                        cssClass = CSSClass.inputLyric;
-                        break;
-                    case CSSClass.staffName:
-                        cssClass = CSSClass.inputStaffName;
-                        break;
-                }
-            }
-			w.SvgText(cssClass, _textInfo.Text, _originX, _originY);
+			w.SvgText(CSSClass, _textInfo.Text, _originX, _originY);
 		}
 
 		/// <summary>
@@ -153,25 +134,36 @@ namespace Moritz.Symbols
 
 		public readonly bool IsBelow;
 	}
-	internal class BarnumberMetrics : TextMetrics
+	internal class BarnumberMetrics : GroupMetrics
 	{
 		public BarnumberMetrics(Graphics graphics, TextInfo textInfo, FrameInfo frameInfo)
-			: base(CSSClass.barNumber, graphics, textInfo)
+			: base(CSSClass.barNumber)
 		{
-			TextMetrics textMetrics = new TextMetrics(CSSClass.barNumber, graphics, textInfo);
-			_top = textMetrics.Top - frameInfo.PaddingY;
-			_right = textMetrics.Right + frameInfo.PaddingX;
-			_bottom = textMetrics.Bottom + frameInfo.PaddingY;
-			_left = textMetrics.Left - frameInfo.PaddingX;
+            _barNumberNumberMetrics = new TextMetrics(CSSClass.barNumberNumber, graphics, textInfo);
+            _number = textInfo.Text;
+			_top = _barNumberNumberMetrics.Top - frameInfo.PaddingY;
+			_right = _barNumberNumberMetrics.Right + frameInfo.PaddingX;
+			_bottom = _barNumberNumberMetrics.Bottom + frameInfo.PaddingY;
+			_left = _barNumberNumberMetrics.Left - frameInfo.PaddingX;
 			_strokeWidth = frameInfo.StrokeWidth;
 		}
 
-		public override void WriteSVG(SvgWriter w)
+        public override void Move(float dx, float dy)
+        {
+            base.Move(dx, dy);
+            _barNumberNumberMetrics.Move(dx, dy);
+        }
+
+        public override void WriteSVG(SvgWriter w)
 		{
-            base.WriteSVG(w, CSSClass.barNumberNumber, false);
+            w.SvgStartGroup(CSSClass.ToString());
+            w.SvgText(CSSClass.barNumberNumber, _number, _barNumberNumberMetrics.OriginX, _barNumberNumberMetrics.OriginY);
             w.SvgRect(CSSClass.barNumberFrame.ToString(), _left, _top, _right - _left, _bottom - _top);
+            w.SvgEndGroup();
 		}
 
-		float _strokeWidth = 0;
+        TextMetrics _barNumberNumberMetrics = null;
+        string _number;
+        float _strokeWidth = 0;
 	}
 }
