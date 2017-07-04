@@ -299,7 +299,7 @@ namespace Moritz.Symbols
                                 beamStrokeThickness *= pageFormat.InputStavesSizeFactor;
                             }
                             chordsBeamedTogether[0].BeamBlock =
-                                new BeamBlock(currentClef, chordsBeamedTogether, this.StemDirection, beamThickness, beamStrokeThickness);
+                                new BeamBlock(currentClef, chordsBeamedTogether, this.StemDirection, beamThickness, beamStrokeThickness, this is InputVoice);
                         }
                     }
                     chordsBeamedTogether.Clear();

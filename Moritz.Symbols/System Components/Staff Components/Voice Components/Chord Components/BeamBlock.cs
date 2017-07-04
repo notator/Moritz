@@ -8,8 +8,8 @@ namespace Moritz.Symbols
 {
     public class BeamBlock : LineStyle
     {
-        public BeamBlock(Clef clef, List<ChordSymbol> chordsBeamedTogether, VerticalDir voiceStemDirection, float beamThickness, float strokeThickness)
-            : base(CSSClass.beamBlock, strokeThickness, "black", "black")
+        public BeamBlock(Clef clef, List<ChordSymbol> chordsBeamedTogether, VerticalDir voiceStemDirection, float beamThickness, float strokeThickness, bool isInput)
+            : base(isInput ? CSSClass.inputBeamBlock : CSSClass.beamBlock, strokeThickness, "black", "black")
         {
             Chords = new List<ChordSymbol>(chordsBeamedTogether);
             SetBeamedGroupStemDirection(clef, chordsBeamedTogether, voiceStemDirection);
@@ -1087,14 +1087,9 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            throw new NotImplementedException();
-        }
+            bool isInput = (CSSClass == CSSClass.inputBeamBlock);
 
-        public void WriteSVG(SvgWriter w, bool isInput)
-        {
-            CSSClass beamClass = isInput ? CSSClass.inputBeamBlock : CSSClass.beamBlock;
-
-            w.SvgStartGroup(beamClass.ToString());
+            w.SvgStartGroup(CSSClass.ToString());
             foreach(Beam beam in Beams)
             {
                 if(!(beam is QuaverBeam))
@@ -1111,9 +1106,10 @@ namespace Moritz.Symbols
                         topLeft = beam.LeftTopY - _beamThickness;
                         topRight = beam.RightTopY - _beamThickness;
                     }
-                    w.SvgBeam(beam.LeftX, beam.RightX, topLeft, topRight, _beamThickness * 1.5F, true);
+                    
+                    w.SvgBeam(beam.LeftX, beam.RightX, topLeft, topRight, _beamThickness * 1.5F, true, isInput);
                 }
-                w.SvgBeam(beam.LeftX, beam.RightX, beam.LeftTopY, beam.RightTopY, _beamThickness, false);
+                w.SvgBeam(beam.LeftX, beam.RightX, beam.LeftTopY, beam.RightTopY, _beamThickness, false, isInput);
             }
             w.SvgEndGroup();
         }

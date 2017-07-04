@@ -229,7 +229,7 @@ namespace Moritz.Symbols
             {
                 if(smallClef.ClefType != "n")
                 {
-                    CSSClass cssClass = isInput ? CSSClass.inputClef : CSSClass.clef;
+                    CSSClass cssClass = isInput ? CSSClass.inputSmallClef : CSSClass.smallClef;
                     ClefID smallClefID = GetSmallClefID(clef, isInput);
                     returnMetrics = new SmallClefMetrics(clef, gap, cssClass, smallClefID);
                 }

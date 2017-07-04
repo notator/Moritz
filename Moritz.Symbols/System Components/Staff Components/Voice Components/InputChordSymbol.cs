@@ -92,7 +92,7 @@ namespace Moritz.Symbols
         public override void WriteSVG(SvgWriter w, bool staffIsVisible)
         {
             if(ChordMetrics.BeamBlock != null)
-                ChordMetrics.BeamBlock.WriteSVG(w, true);
+                ChordMetrics.BeamBlock.WriteSVG(w);
 
             w.SvgStartGroup(ChordMetrics.CSSClass.ToString()); // "inputChord";
 

@@ -20,7 +20,19 @@ namespace Moritz.Xml
         staff, inputStaff, // recorded and used
         stafflines, inputStafflines, // used but not recorded, inherits definition
         staffline, inputStaffline, // used but not recorded, inherits definition
-        voice, inputVoice, // used, but has no Metrics, so is never defined
+        voice, inputVoice, // used, but has no Metrics, inherits definition from staff or inputStaff
+
+        #region clefs
+        /// Clefs whose ID (e.g. "trebleClef8") is recorded in the ClefMetrics.UsedClefIDs list will be written to the defs.
+        clef, inputClef,    // Used, recorded. (A normal clef at the beginning of a staff)
+        smallClef, inputSmallClef,  // Used, recorded. (A clef change in a voice.)
+        /// The following classes are not recorded, but will be defined if they are used by the recorded clefs.
+        /// These classes are used in the SVG defs element.
+        clefOctaveNumber, inputClefOctaveNumber,   // A number above or below a normal clef.
+        smallClefOctaveNumber, inputSmallClefOctaveNumber, // A number above or below a small clef.
+        clefX, inputClefX,      // The 'x' above or below a normal clef. (Arial)
+        smallClefX, inputSmallClefX, // The 'x' above or below a small clef. (Arial)
+        #endregion
 
         #region barNumbers
         barNumber,      // recorded and used but never defined. If it exists, both barNumberNumber and barNumberFrame must be defined.
@@ -38,7 +50,7 @@ namespace Moritz.Xml
         #region chord components
         stem, inputStem,
         // flags and inputFlags whose ID (e.g. "inputLeft3Flags") has been recorded in FlagIDs will be written to the defs.
-        // Neither needs a CSS definition because they use path's default settings.
+        // Neither needs a CSS definition because they use path's default settings (unless path is re-classed for beams!).
         flag, inputFlag,
         notehead, inputNotehead, cautionaryNotehead,
         accidental, inputAccidental, cautionaryAccidental,
@@ -54,38 +66,21 @@ namespace Moritz.Xml
         #region rest
         rest, inputRest,
         #endregion rest
+
+        #region beams
+        beamBlock,      // Used, recorded, defined if used.
+        inputBeamBlock, // Used, recorded, defined if used.
+        beam,           // Used, not recorded. Inherits the beamBlock definition.
+        inputBeam,      // Used, not recorded. Inherits the inputBeamBlock definition.
+        opaqueBeam,     // Used, not recorded. Defined if beamBlock is recorded.
+        inputOpaqueBeam, // Used, not recorded. Defined if inputBeamBlock is recorded.
+        #endregion
         #endregion complete (recorded and used 03.07.2017)
 
         //===========================================
 
-        #region clefs
-        /// Clefs whose ID (e.g. "trebleClef8") appears in the ClefMetrics.UsedClefIDs list will be written to the defs.
-        /// The following classes are given CSS definitions if they exist in the UsedClefIDs.
-        clef,   // Used, recorded. (A normal Clef)
-        smallClef,   // Used, recorded. (A clef change in a voice.)
-        clefOctaveNumber,    // Used, recorded. (the number(s) above or below a normal clef.)
-        smallClefOctaveNumber, // Used, recorded. (the number(s) above or below a small clef.)
-        clefX, // Used, recorded. (the 'x' above or below a normal clef.) (Arial)
-        smallClefX,  // Used, recorded. (the 'x' above or below a small clef.) (Arial)
-        #region TODO
-        /// inputClefs (these are currently written as normal clefs.)
-        inputClef,
-        inputClefOctaveNumber,
-        inputClefX,
-        inputSmallClef,
-        inputSmallClefOctaveNumber,
-        inputSmallClefX,
-        #endregion
-        #endregion
-        #region beams
-        beamBlock,      // Used, recorded, defined.
-        inputBeamBlock, // TODO
-        beam,           // Used, not recorded, never defined. Exists if beamBlock is defined. Inherits the beamBlock definition.
-        inputBeam,      // TODO
-        /// Used with a (constant) CSS definition if the class beamBlock exists in the static LineStyle.CSSClasses list.
-        opaqueBeam,  // Used, not recorded. Exists if beamBlock is recorded (in Text recording).
-        inputOpaqueBeam,    // TODO
-        #endregion
+
+
         #region barlines
         // These classes are all written in the score, but never recorded.
         // Their existence can be inferred from the system structure. 

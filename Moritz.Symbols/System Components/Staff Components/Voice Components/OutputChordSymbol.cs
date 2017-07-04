@@ -152,7 +152,7 @@ namespace Moritz.Symbols
         public void WriteSVG(SvgWriter w, bool staffIsVisible, int channel, CarryMsgs carryMsgs)
         {
             if(staffIsVisible && ChordMetrics.BeamBlock != null)
-                ChordMetrics.BeamBlock.WriteSVG(w, false);
+                ChordMetrics.BeamBlock.WriteSVG(w);
 
             w.SvgStartGroup(ChordMetrics.CSSClass.ToString()); // "chord";
 			if(staffIsVisible)
