@@ -36,7 +36,7 @@ namespace Moritz.Symbols
                 Staves[staffIndex].WriteSVG(w, systemNumber, staffIndex + 1, carryMsgsPerChannel);
             }
 
-            w.SvgStartGroup("staffConnectors");
+            w.SvgStartGroup(CSSClass.staffConnectors.ToString());
 
             WriteConnectors(w, systemNumber, pageFormat);
 
@@ -58,6 +58,7 @@ namespace Moritz.Symbols
             List<bool> barlineContinuesDownList = pageFormat.BarlineContinuesDownList;
             int topVisibleStaffIndex = TopUnHiddenStaffIndex();
             Debug.Assert(barlineContinuesDownList[barlineContinuesDownList.Count - 1] == false);
+            EndBarline endBarline = null;
             Barline barline = null;
             bool isFirstBarline = true;
 
@@ -101,8 +102,9 @@ namespace Moritz.Symbols
                             for(int i = 0; i < voice.NoteObjects.Count; ++i)
                             {
                                 NoteObject noteObject = voice.NoteObjects[i];
+                                endBarline = noteObject as EndBarline;
                                 barline = noteObject as Barline;
-                                if(barline != null)
+                                if(barline != null || endBarline != null)
                                 {
                                     // draw grouping barlines between staves
                                     if(barlineContinuesDownList[staffIndex - topVisibleStaffIndex] || isFirstBarline)
@@ -110,7 +112,15 @@ namespace Moritz.Symbols
                                         float top = bottomEdge.YatX(barline.Metrics.OriginX);
                                         float bottom = topEdge.YatX(barline.Metrics.OriginX);
                                         bool isLastNoteObject = (i == (voice.NoteObjects.Count - 1));
-                                        barline.WriteSVG(w, top, bottom, pageFormat.BarlineStrokeWidth, pageFormat.StafflineStemStrokeWidth, isLastNoteObject, true);
+                                        if(endBarline != null)
+                                        {
+                                            endBarline.WriteSVG(w, top, bottom, pageFormat.StafflineStemStrokeWidth, isLastNoteObject);
+                                        }
+                                        else
+                                        {
+                                            barline.WriteSVG(w, top, bottom, pageFormat.StafflineStemStrokeWidth, isLastNoteObject);
+                                        }
+
                                         isFirstBarline = false;
                                     }
                                 }
@@ -264,7 +274,7 @@ namespace Moritz.Symbols
                         for(int nIndex = 0; nIndex < staff.Voices[voiceIndex].NoteObjects.Count; nIndex++)
                         {
                             NoteObject noteObject = staff.Voices[voiceIndex].NoteObjects[nIndex];
-                            noteObject.Metrics = Score.Notator.SymbolSet.NoteObjectMetrics(graphics, noteObject, voice.StemDirection, staff.Gap, staff.StafflineStemStrokeWidth);
+                            noteObject.Metrics = Score.Notator.SymbolSet.NoteObjectMetrics(graphics, noteObject, voice.StemDirection, staff.Gap, pageFormat);
 
                             if(noteObject.Metrics != null)
                                 staff.Metrics.Add(noteObject.Metrics);
@@ -478,11 +488,6 @@ namespace Moritz.Symbols
         private Dictionary<int, float> GetBarlineWidths(List<NoteObjectMoment> moments, PageFormat pageFormat)
         {
             Dictionary<int, float> barlineWidths = new Dictionary<int, float>();
-
-            BarlineMetrics singleBarline = new BarlineMetrics(null, new Barline(Staves[0].Voices[0], BarlineType.single), pageFormat.Gap);
-            float singleBarlineLeftMargin = singleBarline.OriginX - singleBarline.Left;
-            BarlineMetrics endBarline = new BarlineMetrics(null, new Barline(Staves[0].Voices[0], BarlineType.endDouble), pageFormat.Gap);
-            float endBarlineLeftMargin = endBarline.OriginX - endBarline.Left;
 
             Barline barline = null;
             int absMsPos = 0;

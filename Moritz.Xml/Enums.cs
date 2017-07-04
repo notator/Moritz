@@ -260,14 +260,6 @@ namespace Moritz.Xml
 	/// </summary>
 	public enum Articulation { staccato, tenuto, staccatissimo, normalAccent, strongAccent, weakBeat, strongBeat };
 
-	#region ExplicitBarlines
-	public enum BarlineType 
-	{
-		single, 
-		endDouble
-	};
-
-	#endregion
 	/// <summary>
 	/// Attribute of (head.alter)"display". Specifies if and how an accidental should be displayed.
 	/// CapXML values:

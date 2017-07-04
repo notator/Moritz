@@ -160,8 +160,9 @@ namespace Moritz.Symbols
                         Add(noteObject.Metrics);
                     }
 
-					Barline barline = noteObject as Barline;
-					if(barline!= null)
+                    EndBarline endBarline = noteObject as EndBarline;
+                    Barline barline = noteObject as Barline;
+                    if(barline!= null && endBarline == null)
 					{
 						BarlineMetrics barlineMetrics = barline.Metrics as BarlineMetrics;
 						if(barlineMetrics.BarnumberMetrics != null)

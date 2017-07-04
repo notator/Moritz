@@ -7,7 +7,6 @@ namespace Moritz.Xml
     /// </summary>
     public enum CSSClass
     {
-        #region complete (recorded and used 03.07.2017)
         none,    // Exists and is recorded, but is never used as an element class and never given a CSS definition!
         frame,       // Used and defined on non-scroll pages. Not recorded.
         timeStamp,  // Used and defined on every page. Not recorded.
@@ -21,6 +20,8 @@ namespace Moritz.Xml
         stafflines, inputStafflines, // used but not recorded, inherits definition
         staffline, inputStaffline, // used but not recorded, inherits definition
         voice, inputVoice, // used, but has no Metrics, inherits definition from staff or inputStaff
+
+        graphics, // all event symbol graphics are contained in a graphics group. Never defined? CLicht?
 
         #region clefs
         /// Clefs whose ID (e.g. "trebleClef8") is recorded in the ClefMetrics.UsedClefIDs list will be written to the defs.
@@ -75,19 +76,13 @@ namespace Moritz.Xml
         opaqueBeam,     // Used, not recorded. Defined if beamBlock is recorded.
         inputOpaqueBeam, // Used, not recorded. Defined if inputBeamBlock is recorded.
         #endregion
-        #endregion complete (recorded and used 03.07.2017)
-
-        //===========================================
-
-
 
         #region barlines
-        // These classes are all written in the score, but never recorded.
-        // Their existence can be inferred from the system structure. 
-        barline, staffConnector,
-        endBarlineLeft, endBarlineLeftConnector,
-        endBarlineRight, endBarlineRightConnector,
-        #endregion
+        barline, // always used, recorded and defined. A normal barline and endBarline component.
+        endBarline, // always used and recorded. A barline + thickBarline group. Never defined.
+        thickBarline, // always used and recorded. An endBarline component. Always defined.
+        staffConnectors, // A group of barline (and maybe endBarline) in a system. Never defined. 
+        #endregion barlines
     };
 
     public enum CSSLineCap { butt, round, square };

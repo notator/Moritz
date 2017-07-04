@@ -9,7 +9,7 @@ using Moritz.Xml;
 
 namespace Moritz.Symbols
 {
-    public class LineStyle : Metrics
+    public class LineMetrics : Metrics
     {
         /// <summary>
         /// 
@@ -19,7 +19,7 @@ namespace Moritz.Symbols
         /// <param name="stroke">"none", "black", "white", "red" or a string of 6 hex characters</param>
         /// <param name="fill">"none", "black", "white", "red" or a string of 6 hex characters</param>
         /// <param name="lineCap"></param>
-        public LineStyle(CSSClass cssClass,
+        public LineMetrics(CSSClass cssClass,
             float strokeWidthPixels,
             string stroke = "none", 
             string fill = "none",
@@ -43,7 +43,7 @@ namespace Moritz.Symbols
         public readonly string LineCap = "butt"; // "butt", "round", "square" 
     }
  
-	internal class StemMetrics : LineStyle
+	internal class StemMetrics : LineMetrics
 	{
 		public StemMetrics(float top, float x, float bottom, float strokeWidth, VerticalDir verticalDir, bool isInput)
 			: base(isInput ? CSSClass.inputStem : CSSClass.stem, strokeWidth, "black")
@@ -71,7 +71,7 @@ namespace Moritz.Symbols
 		public readonly VerticalDir VerticalDir;
 		public readonly float StrokeWidth;
 	}
-	internal class LedgerlineBlockMetrics : LineStyle, ICloneable
+	internal class LedgerlineBlockMetrics : LineMetrics, ICloneable
 	{      
         public LedgerlineBlockMetrics(float left, float right, float strokeWidth, CSSClass ledgerlinesClass)
 			: base(ledgerlinesClass, strokeWidth, "black")
@@ -131,7 +131,7 @@ namespace Moritz.Symbols
 		private List<float> Ys = new List<float>();
 		private float _strokeWidth;
     }
-	internal class CautionaryBracketMetrics : LineStyle, ICloneable
+	internal class CautionaryBracketMetrics : LineMetrics, ICloneable
 	{
 		public CautionaryBracketMetrics(bool isLeftBracket, float top, float right, float bottom, float left, float strokeWidth)
 			: base(CSSClass.cautionaryBracket, strokeWidth, "black")
@@ -157,7 +157,7 @@ namespace Moritz.Symbols
 		private readonly bool _isLeftBracket;
 		private readonly float _strokeWidth;
 	}
-	internal class StafflineMetrics : LineStyle
+	internal class StafflineMetrics : LineMetrics
 	{
 		public StafflineMetrics(float left, float right, float originY)
 			: base(CSSClass.staffline, 0F, "black")
@@ -181,7 +181,7 @@ namespace Moritz.Symbols
 	/// <summary>
 	/// Notehead extender lines are used when chord symbols cross barlines.
 	/// </summary>
-	internal class NoteheadExtenderMetrics : LineStyle
+	internal class NoteheadExtenderMetrics : LineMetrics
 	{
 		public NoteheadExtenderMetrics(float left, float right, float originY, float strokeWidth, string strokeColor, float gap, bool drawExtender)
 			: base(CSSClass.noteExtender, strokeWidth, strokeColor)
@@ -217,23 +217,14 @@ namespace Moritz.Symbols
 		private readonly bool _drawExtender;
 	}
 
-    /// <summary>
-    /// Note that the existence of the six CSS barline classes in the score will be inferred
-    /// from the system structure, not from their existence in the static LineStyle dictionary.
-    /// The six CSS barline classes are defined as enum CSSBarlineClass in Barline.cs, and are currently:  
-    /// barline, staffConnector, endBarlineLeft, endBarlineLeftConnector, endBarlineRight and endBarlineRightConnector
-    /// </summary>
-    internal class BarlineMetrics : Metrics
+    internal class BarlineMetrics : LineMetrics
     {
-        public BarlineMetrics(Graphics graphics, Barline barline, float gap)
-            : base(CSSClass.none)
+        public BarlineMetrics(Graphics graphics, Barline barline, float strokeWidth, float gap)
+            : base(CSSClass.barline, strokeWidth, "black")
         {
-            if(barline.BarlineType == BarlineType.endDouble)
-                _left = -gap * 1.7F;
-            else
-                _left = -gap * 0.5F;
             _originX = 0F;
-            _right = gap / 2F;
+            _left = -(strokeWidth / 2F);
+            _right = strokeWidth / 2F;
 
             if(graphics != null && barline != null)
             {
@@ -279,6 +270,9 @@ namespace Moritz.Symbols
                 _staffNameMetrics.Move(dx, dy);
         }
 
+        /// <summary>
+        /// Barline.WriteSVG(...) is used instead
+        /// </summary>
         public override void WriteSVG(SvgWriter w)
         {
             throw new NotImplementedException();
@@ -305,5 +299,32 @@ namespace Moritz.Symbols
         private BarnumberMetrics _barnumberMetrics = null;
         public TextMetrics StaffNameMetrics { get { return _staffNameMetrics; } }
         private TextMetrics _staffNameMetrics = null;
+    }
+
+    internal class EndBarlineMetrics : GroupMetrics
+    {
+        public EndBarlineMetrics(float thinStrokeWidth, float thickStrokeWidth)
+            : base(CSSClass.endBarline)
+        {
+            LeftLine = new LineMetrics(CSSClass.barline, thinStrokeWidth, "black");
+            RightLine = new LineMetrics(CSSClass.thickBarline, thickStrokeWidth, "black");
+
+            LeftLine.Move(-(thinStrokeWidth * 3F), 0);
+
+            Add(LeftLine);
+            Add(RightLine);
+            Move(-(thickStrokeWidth / 2F), 0);
+        }
+
+        /// <summary>
+        /// EndBarline.WriteSVG(...) is used instead
+        /// </summary>
+        public override void WriteSVG(SvgWriter w)
+        {
+            throw new NotImplementedException();
+        }
+
+        public LineMetrics LeftLine;
+        public LineMetrics RightLine;
     }
 }

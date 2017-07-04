@@ -164,7 +164,7 @@ namespace Moritz.Symbols
 
             if(staffIsVisible)
             {
-				w.SvgStartGroup("graphics");
+				w.SvgStartGroup(CSSClass.graphics.ToString());
                 ChordMetrics.WriteSVG(w);
                 w.SvgEndGroup();
             }

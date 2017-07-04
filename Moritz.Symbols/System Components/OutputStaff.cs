@@ -44,7 +44,7 @@ namespace Moritz.Symbols
         /// </summary>
         public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel)
         {
-            w.SvgStartGroup("outputStaff");
+            w.SvgStartGroup(CSSClass.staff.ToString());
             w.WriteAttributeString("score", "invisible", null, "invisible");
 
             base.WriteSVG(w, false, systemNumber, staffNumber, carryMsgsPerChannel);

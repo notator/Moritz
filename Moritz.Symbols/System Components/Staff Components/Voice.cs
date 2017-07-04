@@ -36,15 +36,16 @@ namespace Moritz.Symbols
         {
             for(int i = 0; i < NoteObjects.Count; ++i)
             {
-				NoteObject noteObject = NoteObjects[i];				
-				Barline barline = noteObject as Barline;
+				NoteObject noteObject = NoteObjects[i];
+                EndBarline endBarline = noteObject as EndBarline;
+                Barline barline = noteObject as Barline;
                 InputChordSymbol inputChordSymbol = noteObject as InputChordSymbol;
                 InputRestSymbol inputRestSymbol = noteObject as InputRestSymbol;
                 CautionaryChordSymbol cautionaryChordSymbol = noteObject as CautionaryChordSymbol;
                 OutputChordSymbol outputChordSymbol = noteObject as OutputChordSymbol;
                 OutputRestSymbol outputRestSymbol = noteObject as OutputRestSymbol;
 
-                if(staffIsVisible && barline != null && barline.IsVisible)
+                if(staffIsVisible && (barline != null && barline.IsVisible) || (endBarline != null && endBarline.IsVisible))
 				{
 					bool isLastNoteObject = (i == (NoteObjects.Count - 1));
 					float top = Staff.Metrics.StafflinesTop;
@@ -52,8 +53,15 @@ namespace Moritz.Symbols
 					PageFormat pageFormat = Staff.SVGSystem.Score.PageFormat;
 					float barlineStrokeWidth = pageFormat.BarlineStrokeWidth;
 					float stafflineStrokeWidth = pageFormat.StafflineStemStrokeWidth;
-					barline.WriteSVG(w, top, bottom, barlineStrokeWidth, stafflineStrokeWidth, isLastNoteObject, false);
-				}
+                    if(endBarline != null)
+                    {
+                        endBarline.WriteSVG(w, top, bottom, stafflineStrokeWidth, isLastNoteObject);
+                    }
+                    else
+                    {
+                        barline.WriteSVG(w, top, bottom, stafflineStrokeWidth, isLastNoteObject);
+                    }
+                }
 
                 if(barline != null)
                 {

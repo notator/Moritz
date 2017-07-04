@@ -17,16 +17,6 @@ namespace Moritz.Symbols
             : base(voice)
         {
         }
-        public Barline(Voice voice, BarlineType barlineType)
-            : base(voice)
-        {
-            BarlineType = barlineType;
-        }
-
-        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
-        {
-            throw new NotImplementedException();
-        }
 
         /// <summary>
         /// This function only writes the staff name and barnumber to the SVG file (if they are present).
@@ -41,6 +31,11 @@ namespace Moritz.Symbols
             }
         }
 
+        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Writes out an SVG Barline.
         /// May be called twice per staff.barline:
@@ -49,47 +44,66 @@ namespace Moritz.Symbols
         ///        (if the staff's lower neighbour is in the same group)
         /// </summary>
         /// <param name="w"></param>
-        public void WriteSVG(SvgWriter w, float topStafflineY, float bottomStafflineY, float singleBarlineStrokeWidth, float stafflineStrokeWidth, bool isLastNoteObject, bool isConnector)
+        public virtual void WriteSVG(SvgWriter w, float topStafflineY, float bottomStafflineY, float stafflineStrokeWidth, bool isLastNoteObject)
         {
 			float topY = topStafflineY;
 			float bottomY = bottomStafflineY;
-			if(isLastNoteObject && !isConnector)
+			if(isLastNoteObject)
 			{
-				float halfStrokeWidth = (stafflineStrokeWidth / 2);
-				topY -= halfStrokeWidth;
-				bottomY += halfStrokeWidth;
+				float halfStafflineWidth = (stafflineStrokeWidth / 2);
+				topY -= halfStafflineWidth;
+				bottomY += halfStafflineWidth;
 			}
 
-			CSSClass barlineType;
-            if(BarlineType == BarlineType.endDouble)                                                
-            {
-				barlineType = isConnector ? CSSClass.endBarlineLeftConnector : CSSClass.endBarlineLeft;
-				w.SvgLine(barlineType,
-					this.Metrics.OriginX - (singleBarlineStrokeWidth * 3F), topY,
-					this.Metrics.OriginX - (singleBarlineStrokeWidth * 3F), bottomY);
-
-				barlineType = isConnector ? CSSClass.endBarlineRightConnector : CSSClass.endBarlineRight;
-                w.SvgLine(barlineType,
-                    this.Metrics.OriginX, topY,
-                    this.Metrics.OriginX, bottomY);
-            }
-            else
-            {
-				barlineType = isConnector ? CSSClass.staffConnector : CSSClass.barline;
-                w.SvgLine(barlineType, this.Metrics.OriginX, topY, this.Metrics.OriginX, bottomY);
-            }
+            w.SvgLine(CSSClass.barline, this.Metrics.OriginX, topY, this.Metrics.OriginX, bottomY);
         }
 
         public override string ToString()
 		{
-			string type = M.GetEnumDescription(BarlineType);
-			return "Barline: " + type;
+			return "barline: ";
 		}
-
-		public BarlineType BarlineType = BarlineType.single; // default
         /// <summary>
         /// Default is true
         /// </summary>
         public bool IsVisible = true;
 	}
+
+    public class EndBarline : Barline
+    {
+        public EndBarline(Voice voice)
+            : base(voice)
+        {
+
+        }
+
+        /// <summary>
+        /// Writes out an SVG endBarline.
+        /// May be called twice per staff.barline:
+        ///     1. for the range between top and bottom stafflines (if Barline.Visible is true)
+        ///     2. for the range between the staff's lower edge and the next staff's upper edge
+        ///        (if the staff's lower neighbour is in the same group)
+        /// </summary>
+        /// <param name="w"></param>
+        public override void WriteSVG(SvgWriter w, float topStafflineY, float bottomStafflineY, float stafflineStrokeWidth, bool unused)
+        {
+            float halfStafflineThickness = (stafflineStrokeWidth / 2);
+
+            float topY = topStafflineY - halfStafflineThickness;
+            float bottomY = bottomStafflineY + halfStafflineThickness;
+
+            float leftLineOriginX = ((EndBarlineMetrics) Metrics).LeftLine.OriginX;
+            w.SvgStartGroup(CSSClass.endBarline.ToString());
+            w.SvgLine(CSSClass.barline, leftLineOriginX, topY, leftLineOriginX, bottomY);
+
+            float rightLineOriginX = ((EndBarlineMetrics) Metrics).RightLine.OriginX;
+            w.SvgLine(CSSClass.thickBarline, rightLineOriginX, topY, rightLineOriginX, bottomY);
+            w.SvgEndGroup();            
+        }
+
+
+        public override string ToString()
+        {
+            return "endBarline: ";
+        }
+    }
 }

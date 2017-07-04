@@ -209,21 +209,27 @@ namespace Moritz.Symbols
         }
         #endregion symbol definitions
 
-        public override Metrics NoteObjectMetrics(Graphics graphics, NoteObject noteObject, VerticalDir voiceStemDirection, float gap, float strokeWidth)
+        public override Metrics NoteObjectMetrics(Graphics graphics, NoteObject noteObject, VerticalDir voiceStemDirection, float gap, PageFormat pageFormat)
         {
             bool isInput = (noteObject.Voice is InputVoice);
+            float strokeWidth = pageFormat.StafflineStemStrokeWidth;
 
             Metrics returnMetrics = null;
             SmallClef smallClef = noteObject as SmallClef;
             Clef clef = noteObject as Clef;
+            EndBarline endBarline = noteObject as EndBarline;
             Barline barline = noteObject as Barline;
             CautionaryChordSymbol cautionaryChordSymbol = noteObject as CautionaryChordSymbol;
             ChordSymbol chordSymbol = noteObject as ChordSymbol;
             InputChordSymbol inputChordSymbol = noteObject as InputChordSymbol;
             RestSymbol rest = noteObject as RestSymbol;
-            if(barline != null)
+            if(endBarline != null)
             {
-                returnMetrics = new BarlineMetrics(graphics, barline, gap);
+                returnMetrics = new EndBarlineMetrics(pageFormat.BarlineStrokeWidth, pageFormat.ThickBarlineStrokeWidth);
+            }
+            else if(barline != null)
+            {
+                returnMetrics = new BarlineMetrics(graphics, barline, pageFormat.BarlineStrokeWidth, gap);
             }
             else if(smallClef != null)
             {

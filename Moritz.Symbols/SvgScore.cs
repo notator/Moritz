@@ -797,7 +797,7 @@ namespace Moritz.Symbols
                             if(systemIndex > 0)
                             {
                                 Voice voiceInPreviousSystem = Systems[systemIndex - 1].Staves[staffIndex].Voices[voiceIndex];
-                                voiceInPreviousSystem.NoteObjects.Add(new Barline(voiceInPreviousSystem, barline.BarlineType));
+                                voiceInPreviousSystem.NoteObjects.Add(new Barline(voiceInPreviousSystem));
                             }
                             voice.NoteObjects.Remove(barline);
                         }
@@ -831,9 +831,9 @@ namespace Moritz.Symbols
 
                             Barline barline;
                             if(systemIndex == Systems.Count - 1)
-                                barline = new Barline(voice, BarlineType.endDouble);
+                                barline = new EndBarline(voice);
                             else
-                                barline = new Barline(voice, BarlineType.single);
+                                barline = new Barline(voice);
 
                             voice.NoteObjects.Add(barline);
                         }
@@ -1156,11 +1156,11 @@ namespace Moritz.Symbols
                         {
                             if(voice.NoteObjects[0] is Clef)
                             {
-                                voice.NoteObjects.Insert(1, new Barline(voice, BarlineType.single));
+                                voice.NoteObjects.Insert(1, new Barline(voice));
                             }
                             else
                             {
-                                voice.NoteObjects.Insert(0, new Barline(voice, BarlineType.single));
+                                voice.NoteObjects.Insert(0, new Barline(voice));
                             }
                         }
                     }

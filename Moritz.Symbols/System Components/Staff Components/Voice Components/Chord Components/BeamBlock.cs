@@ -6,7 +6,7 @@ using Moritz.Xml;
 
 namespace Moritz.Symbols
 {
-    public class BeamBlock : LineStyle
+    public class BeamBlock : LineMetrics
     {
         public BeamBlock(Clef clef, List<ChordSymbol> chordsBeamedTogether, VerticalDir voiceStemDirection, float beamThickness, float strokeThickness, bool isInput)
             : base(isInput ? CSSClass.inputBeamBlock : CSSClass.beamBlock, strokeThickness, "black", "black")
