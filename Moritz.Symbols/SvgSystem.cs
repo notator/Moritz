@@ -102,8 +102,7 @@ namespace Moritz.Symbols
                             for(int i = 0; i < voice.NoteObjects.Count; ++i)
                             {
                                 NoteObject noteObject = voice.NoteObjects[i];
-                                endBarline = noteObject as EndBarline;
-                                barline = noteObject as Barline;
+                                barline = noteObject as Barline; // EndBarline is also a Barline
                                 if(barline != null || endBarline != null)
                                 {
                                     // draw grouping barlines between staves
@@ -112,15 +111,7 @@ namespace Moritz.Symbols
                                         float top = bottomEdge.YatX(barline.Metrics.OriginX);
                                         float bottom = topEdge.YatX(barline.Metrics.OriginX);
                                         bool isLastNoteObject = (i == (voice.NoteObjects.Count - 1));
-                                        if(endBarline != null)
-                                        {
-                                            endBarline.WriteSVG(w, top, bottom, pageFormat.StafflineStemStrokeWidth, isLastNoteObject);
-                                        }
-                                        else
-                                        {
-                                            barline.WriteSVG(w, top, bottom, pageFormat.StafflineStemStrokeWidth, isLastNoteObject);
-                                        }
-
+                                        barline.WriteSVG(w, top, bottom, pageFormat.StafflineStemStrokeWidth, isLastNoteObject);
                                         isFirstBarline = false;
                                     }
                                 }

@@ -22,7 +22,7 @@ namespace Moritz.Symbols
         /// This function only writes the staff name and barnumber to the SVG file (if they are present).
         /// The barline itself is drawn when the system (and staff edges) is complete.
         /// </summary>
-        public void WriteStaffNameAndBarNumberSVG(SvgWriter w, bool staffIsVisible, bool isInput)
+        public virtual void WriteStaffNameAndBarNumberSVG(SvgWriter w, bool staffIsVisible, bool isInput)
         {
             BarlineMetrics barlineMetrics = Metrics as BarlineMetrics;
             if(barlineMetrics != null && staffIsVisible)
@@ -77,6 +77,11 @@ namespace Moritz.Symbols
         }
 
         /// <summary>
+        /// EndBarline never has an attached staff name or bar number, so this function does nothing.
+        /// </summary>
+        public override void WriteStaffNameAndBarNumberSVG(SvgWriter w, bool staffIsVisible, bool isInput) { }
+
+        /// <summary>
         /// Writes out an SVG endBarline.
         /// May be called twice per staff.barline:
         ///     1. for the range between top and bottom stafflines (if Barline.Visible is true)
@@ -99,7 +104,6 @@ namespace Moritz.Symbols
             w.SvgLine(CSSClass.thickBarline, rightLineOriginX, topY, rightLineOriginX, bottomY);
             w.SvgEndGroup();            
         }
-
 
         public override string ToString()
         {
