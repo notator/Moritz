@@ -45,7 +45,6 @@ namespace Moritz.Xml
         chord,
         inputChord,
         cautionaryChord,
-        cautionaryInputChord,
         #endregion chord classes
 
         #region chord components
