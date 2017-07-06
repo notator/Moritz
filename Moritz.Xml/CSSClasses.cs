@@ -48,9 +48,8 @@ namespace Moritz.Xml
         #endregion chord classes
 
         #region chord components
-        stem, inputStem, // inputStem inherits stroke-width from inputStaff
+        stem, inputStem, // stem inherits from line. inputStem is defined if recorded.
         // flags and inputFlags whose ID (e.g. "inputLeft3Flags") has been recorded in FlagIDs will be written to the defs.
-        // Neither needs a CSS definition because they use path's default settings (unless path is re-classed for beams!).
         flag, inputFlag,
         notehead, inputNotehead, cautionaryNotehead,
         accidental, inputAccidental, cautionaryAccidental,
@@ -68,11 +67,11 @@ namespace Moritz.Xml
         #endregion rest
 
         #region beams
-        beamBlock,      // Used, recorded, defined if used.
-        inputBeamBlock, // Used, recorded, defined if used.
-        beam,           // Used, not recorded. Inherits the beamBlock definition.
-        inputBeam,      // Used, not recorded. Inherits the inputBeamBlock definition.
+        beamBlock,      // Used, recorded, not defined.
+        beam,           // Used, not recorded. Inherits the path definition.
         opaqueBeam,     // Used, not recorded. Defined if beamBlock is recorded.
+        inputBeamBlock, // Used, recorded, not defined.
+        inputBeam,      // Used, not recorded. Defined if inputBeamBlock is recorded.
         inputOpaqueBeam, // Used, not recorded. Defined if inputBeamBlock is recorded.
         #endregion
 

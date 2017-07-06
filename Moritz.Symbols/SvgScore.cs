@@ -241,39 +241,6 @@ namespace Moritz.Symbols
                 stylesSB.Append(InputLineStyles(pageFormat, usedCSSClasses));
             }
 
-            #region old1
-            //// PageFormat values set in AssistantComposerForms
-            //string stafflineStemStrokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth);
-            //string page1TitleHeight = M.FloatToShortString(pageFormat.Page1TitleHeight);
-            //string page1AuthorHeight = M.FloatToShortString(pageFormat.Page1AuthorHeight);
-
-            //#region Font heights defined as readonly fields in PageFormat
-            //string timeStampFontHeight = M.FloatToShortString(pageFormat.TimeStampFontHeight);
-            //string musicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight);
-            //string smallMusicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * pageFormat.SmallFactor);
-            //string staffNameFontHeight = M.FloatToShortString(pageFormat.StaffNameFontHeight);
-            //string barNumberNumberFontHeight = M.FloatToShortString(pageFormat.BarNumberNumberFontHeight);
-            //string lyricFontHeight = M.FloatToShortString(pageFormat.LyricFontHeight);
-            //string ornamentFontHeight = M.FloatToShortString(pageFormat.OrnamentFontHeight);
-            //string dynamicFontHeight = M.FloatToShortString(pageFormat.DynamicFontHeight);
-            //// clef accesories
-            //string clefOctaveNumberFontHeight = M.FloatToShortString(pageFormat.ClefOctaveNumber);
-            //string smallClefOctaveNumberFontHeight = M.FloatToShortString(pageFormat.ClefOctaveNumber * pageFormat.SmallFactor);
-            //string clefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight);
-            //string smallClefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight * pageFormat.SmallFactor);
-            //#endregion
-            //#region stroke widths defined as readonly fields in PageFormat
-            //string barlineStrokeWidth = M.FloatToShortString(pageFormat.BarlineStrokeWidth);
-            //string thickBarlineStrokeWidth = M.FloatToShortString(pageFormat.ThickBarlineStrokeWidth);
-            //string noteheadExtenderStrokeWidth = M.FloatToShortString(pageFormat.NoteheadExtenderStrokeWidth);
-            //string barNumberFrameStrokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth * 1.2F);
-            //#endregion
-            //string opaqueBeamOpacity = M.FloatToShortString(pageFormat.OpaqueBeamOpacity);
-            #endregion old1
-
-            stylesSB.Append(@"
-            ");
-
             return stylesSB;
         }
 
@@ -453,12 +420,32 @@ namespace Moritz.Symbols
 
             return rval;
         }
+        private bool OctavedLargeInputClefExists(List<ClefID> usedClefIDs)
+        {
+            bool rval = usedClefIDs.Contains(ClefID.inputTrebleClef8)
+            || usedClefIDs.Contains(ClefID.inputBassClef8)
+            || usedClefIDs.Contains(ClefID.inputTrebleClef2x8)
+            || usedClefIDs.Contains(ClefID.inputBassClef2x8)
+            || usedClefIDs.Contains(ClefID.inputTrebleClef3x8)
+            || usedClefIDs.Contains(ClefID.inputBassClef3x8);
+
+            return rval;
+        }
         private bool LargeClefXExists(List<ClefID> usedClefIDs)
         {
             bool rval = usedClefIDs.Contains(ClefID.trebleClef2x8)
             || usedClefIDs.Contains(ClefID.bassClef2x8)
             || usedClefIDs.Contains(ClefID.trebleClef3x8)
             || usedClefIDs.Contains(ClefID.bassClef3x8);
+
+            return rval;
+        }
+        private bool LargeInputClefXExists(List<ClefID> usedClefIDs)
+        {
+            bool rval = usedClefIDs.Contains(ClefID.inputTrebleClef2x8)
+            || usedClefIDs.Contains(ClefID.inputBassClef2x8)
+            || usedClefIDs.Contains(ClefID.inputTrebleClef3x8)
+            || usedClefIDs.Contains(ClefID.inputBassClef3x8);
 
             return rval;
         }
@@ -473,12 +460,32 @@ namespace Moritz.Symbols
 
             return rval;
         }
+        private bool OctavedSmallInputClefExists(List<ClefID> usedClefIDs)
+        {
+            bool rval = usedClefIDs.Contains(ClefID.inputSmallTrebleClef8)
+            || usedClefIDs.Contains(ClefID.inputSmallBassClef8)
+            || usedClefIDs.Contains(ClefID.inputSmallTrebleClef2x8)
+            || usedClefIDs.Contains(ClefID.inputSmallBassClef2x8)
+            || usedClefIDs.Contains(ClefID.inputSmallTrebleClef3x8)
+            || usedClefIDs.Contains(ClefID.inputSmallBassClef3x8);
+
+            return rval;
+        }
         private bool SmallClefXExists(List<ClefID> usedClefIDs)
         {
             bool rval = usedClefIDs.Contains(ClefID.smallTrebleClef2x8)
             || usedClefIDs.Contains(ClefID.smallBassClef2x8)
             || usedClefIDs.Contains(ClefID.smallTrebleClef3x8)
             || usedClefIDs.Contains(ClefID.smallBassClef3x8);
+
+            return rval;
+        }
+        private bool SmallInputClefXExists(List<ClefID> usedClefIDs)
+        {
+            bool rval = usedClefIDs.Contains(ClefID.inputSmallTrebleClef2x8)
+            || usedClefIDs.Contains(ClefID.inputSmallBassClef2x8)
+            || usedClefIDs.Contains(ClefID.inputSmallTrebleClef3x8)
+            || usedClefIDs.Contains(ClefID.inputSmallBassClef3x8);
 
             return rval;
         }
@@ -582,10 +589,81 @@ namespace Moritz.Symbols
         #region input font styles
         private StringBuilder InputFontStyles(PageFormat pageFormat, int pageNumber, List<CSSClass> usedCSSClasses, List<ClefID> usedClefIDs)
         {
-            float inputSizeFactor = pageFormat.InputStavesSizeFactor;
-            StringBuilder styles = new StringBuilder();
+            float inputFactor = pageFormat.InputStavesSizeFactor;
+            StringBuilder fontStyles = new StringBuilder();
+            #region CLicht
+            //text
+            //{
+            //    font-family:CLicht
+            //    font-size:125.44px
+            //}
+            string clicht = "CLicht";
+            string musicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * inputFactor);
+            StringBuilder standardTextType = TextType(".inputRest, .inputNotehead, .inputAccidental", clicht, musicFontHeight, "");
+            fontStyles.Append(standardTextType);
 
-            return styles;
+            if(usedCSSClasses.Contains(CSSClass.dynamic))
+            {
+                string dynamicFontHeight = M.FloatToShortString(pageFormat.DynamicFontHeight * inputFactor);
+                StringBuilder dynamicSize = TextType(".inputDynamic", clicht, dynamicFontHeight, "");
+                fontStyles.Append(dynamicSize);
+            }
+
+            if(usedCSSClasses.Contains(CSSClass.inputSmallClef))
+            {
+                string smallMusicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * pageFormat.SmallFactor * inputFactor);
+                StringBuilder smallMusicFontSize = TextType(".inputSmallClef", clicht, smallMusicFontHeight, "");
+                fontStyles.Append(smallMusicFontSize);
+            }
+
+            if(OctavedLargeInputClefExists(usedClefIDs))
+            {
+                string clefOctaveNumberFontSize = M.FloatToShortString(pageFormat.ClefOctaveNumber * inputFactor);
+                StringBuilder clefOctaveNumberStyle = TextType(".inputClefOctaveNumber", clicht, clefOctaveNumberFontSize, "");
+                fontStyles.Append(clefOctaveNumberStyle);
+            }
+
+            if(OctavedSmallInputClefExists(usedClefIDs))
+            {
+                string smallClefOctaveNumberFontSize = M.FloatToShortString(pageFormat.ClefOctaveNumber * pageFormat.SmallFactor * inputFactor);
+                StringBuilder smallClefOctaveNumberStyle = TextType(".smallClefOctaveNumber", clicht, smallClefOctaveNumberFontSize, "");
+                fontStyles.Append(smallClefOctaveNumberStyle);
+            }
+            #endregion CLicht
+
+            #region Arial
+            string Arial = "Arial";
+
+            if(LargeInputClefXExists(usedClefIDs))
+            {
+                string clefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight * inputFactor);
+                StringBuilder clefXStyle = TextType(".inputClefX", Arial, clefXFontHeight, "");
+                fontStyles.Append(clefXStyle);
+            }
+
+            if(SmallInputClefXExists(usedClefIDs))
+            {
+                string smallClefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight * pageFormat.SmallFactor * inputFactor);
+                StringBuilder smallClefXStyle = TextType(".inputSmallClefX", Arial, smallClefXFontHeight, "");
+                fontStyles.Append(smallClefXStyle);
+            }
+
+            if(usedCSSClasses.Contains(CSSClass.inputStaffName))
+            {
+                string staffNameFontHeight = M.FloatToShortString(pageFormat.StaffNameFontHeight * inputFactor);
+                StringBuilder staffNameHeight = TextType(".inputStaffName", Arial, staffNameFontHeight, "middle");
+                fontStyles.Append(staffNameHeight);
+            }
+
+            if(usedCSSClasses.Contains(CSSClass.inputLyric))
+            {
+                string lyricFontHeight = M.FloatToShortString(pageFormat.LyricFontHeight * inputFactor);
+                StringBuilder lyricHeight = TextType(".inputLyric", Arial, lyricFontHeight, "middle");
+                fontStyles.Append(lyricHeight);
+            }
+            #endregion Arial
+
+            return fontStyles;
         }
         #endregion input font styles
         #region input line styles
@@ -595,7 +673,7 @@ namespace Moritz.Symbols
             StringBuilder lineStyles = new StringBuilder();
 
             string standardInputStrokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth * inputSizeFactor);
-            lineStyles.Append($@".inputStaff
+            lineStyles.Append($@".inputStaffline, .inputLedgerline, .inputBeam 
             {{
                 stroke-width:{standardInputStrokeWidth}px
             }}
@@ -605,25 +683,15 @@ namespace Moritz.Symbols
             {
                 lineStyles.Append($@".inputStem
             {{
-                stroke-linecap:round 
+                stroke-width:{standardInputStrokeWidth}px;
+                stroke-linecap:round
             }}
             ");
-            }
-
-            
-            if(usedCSSClasses.Contains(CSSClass.inputBeamBlock))
-            {
-                // standardInputStrokeWidth is inherited from inputStaff 
-
-                //    lineStyles.Append($@".inputBeamBlock
-                //{{
-                //    stroke-width:{standardInputStrokeWidth}px
-                //}}
-                //");
 
                 lineStyles.Append($@".inputOpaqueBeam
             {{
                 stroke:white;
+                stroke-width:{standardInputStrokeWidth}px
                 fill:white;
                 opacity:0.65
             }}

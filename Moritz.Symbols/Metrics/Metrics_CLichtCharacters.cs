@@ -351,7 +351,7 @@ namespace Moritz.Symbols
             w.WriteAttributeString("class", "graphics");
 
             w.WriteStartElement("text");
-            // Rests dont need to (re)write their class!
+            w.WriteAttributeString("class", CSSClass.ToString()); // Rewrite the class, otherwise it will still have the default text class!
             w.WriteAttributeString("x", M.FloatToShortString(_originX));
             w.WriteAttributeString("y", M.FloatToShortString(_originY));
             if(!string.IsNullOrEmpty(_colorAttribute))
