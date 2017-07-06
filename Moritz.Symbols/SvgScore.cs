@@ -231,7 +231,15 @@ namespace Moritz.Symbols
             #endregion fontDefs string
             StringBuilder stylesSB = new StringBuilder(fontDefs);
             stylesSB.Append(FontStyles(pageFormat, pageNumber, usedCSSClasses, usedClefIDs));
-            //stylesSB.Append(LineStyles(pageFormat, usedCSSClasses, usedFlagIDs));
+            if(usedCSSClasses.Contains(CSSClass.inputStaff))
+            {
+                stylesSB.Append(InputFontStyles(pageFormat, pageNumber, usedCSSClasses, usedClefIDs));
+            }
+            stylesSB.Append(LineStyles(pageFormat, usedCSSClasses, pageNumber));
+            if(usedCSSClasses.Contains(CSSClass.inputStaff))
+            {
+                stylesSB.Append(InputLineStyles(pageFormat, usedCSSClasses));
+            }
 
             #region old1
             //// PageFormat values set in AssistantComposerForms
@@ -475,6 +483,156 @@ namespace Moritz.Symbols
             return rval;
         }
         #endregion font styles
+
+        #region line styles
+
+        private StringBuilder LineStyles(PageFormat pageFormat, List<CSSClass> usedCSSClasses, int pageNumber)
+        {
+            StringBuilder lineStyles = new StringBuilder();
+            
+            string strokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth);
+            lineStyles.Append($@"line, path, rect
+            {{
+                stroke:black;
+                stroke-width:{strokeWidth}px;
+                fill:black
+            }}
+            ");
+
+            strokeWidth = M.FloatToShortString(pageFormat.BarlineStrokeWidth);
+            lineStyles.Append($@".barline
+            {{
+                stroke-width:{strokeWidth}px
+            }}
+            ");
+
+            strokeWidth = M.FloatToShortString(pageFormat.ThickBarlineStrokeWidth);
+            lineStyles.Append($@".thickBarline
+            {{
+                stroke-width:{strokeWidth}px
+            }}
+            ");
+
+            if(usedCSSClasses.Contains(CSSClass.noteExtender))
+            {
+                strokeWidth = M.FloatToShortString(pageFormat.NoteheadExtenderStrokeWidth);
+                lineStyles.Append($@".noteExtender
+            {{
+                stroke-width:{strokeWidth}px
+            }}
+            ");
+            }
+
+            if(usedCSSClasses.Contains(CSSClass.barNumber))
+            {
+                strokeWidth = M.FloatToShortString(pageFormat.BarNumberFrameStrokeWidth);
+                lineStyles.Append($@".barNumberFrame
+            {{
+                stroke-width:{strokeWidth}px;
+                fill:none
+            }}
+            ");
+            }
+
+            if(usedCSSClasses.Contains(CSSClass.cautionaryBracket))
+            {
+                lineStyles.Append($@".cautionaryBracket
+            {{
+                fill:none                
+            }}
+            ");
+            }
+
+            if(pageNumber > 0) // pageNumber is 0 for scroll
+            {
+                strokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth);
+                lineStyles.Append($@".frame
+            {{
+                stroke-width:{strokeWidth}px;
+                fill:none                
+            }}
+            ");
+            }
+
+            if(usedCSSClasses.Contains(CSSClass.stem))
+            {
+                lineStyles.Append($@".stem
+            {{
+                stroke-linecap:round                
+            }}
+            ");
+            }
+
+            if(usedCSSClasses.Contains(CSSClass.beamBlock))
+            {
+                lineStyles.Append($@".opaqueBeam
+            {{
+                stroke:white;
+                fill:white;
+                opacity:0.65                
+            }}
+            ");
+            }
+
+            return lineStyles;
+        }
+
+        #endregion line styles
+
+        #region input font styles
+        private StringBuilder InputFontStyles(PageFormat pageFormat, int pageNumber, List<CSSClass> usedCSSClasses, List<ClefID> usedClefIDs)
+        {
+            float inputSizeFactor = pageFormat.InputStavesSizeFactor;
+            StringBuilder styles = new StringBuilder();
+
+            return styles;
+        }
+        #endregion input font styles
+        #region input line styles
+        private StringBuilder InputLineStyles(PageFormat pageFormat, List<CSSClass> usedCSSClasses)
+        {
+            float inputSizeFactor = pageFormat.InputStavesSizeFactor;
+            StringBuilder lineStyles = new StringBuilder();
+
+            string standardInputStrokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth * inputSizeFactor);
+            lineStyles.Append($@".inputStaff
+            {{
+                stroke-width:{standardInputStrokeWidth}px
+            }}
+            ");
+
+            if(usedCSSClasses.Contains(CSSClass.inputStem))
+            {
+                lineStyles.Append($@".inputStem
+            {{
+                stroke-linecap:round 
+            }}
+            ");
+            }
+
+            
+            if(usedCSSClasses.Contains(CSSClass.inputBeamBlock))
+            {
+                // standardInputStrokeWidth is inherited from inputStaff 
+
+                //    lineStyles.Append($@".inputBeamBlock
+                //{{
+                //    stroke-width:{standardInputStrokeWidth}px
+                //}}
+                //");
+
+                lineStyles.Append($@".inputOpaqueBeam
+            {{
+                stroke:white;
+                fill:white;
+                opacity:0.65
+            }}
+            ");
+            } // end of if(usedCSSClasses.Contains(CSSClass.inputBeamBlock))
+
+            return lineStyles;
+        }
+        #endregion input line styles
 
         #endregion save multi-page score
 

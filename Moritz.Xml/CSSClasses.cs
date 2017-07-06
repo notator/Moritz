@@ -16,7 +16,7 @@ namespace Moritz.Xml
         systems, // Used and defined on every page. Not recorded.
         system, // Used and defined on every page. Not recorded.
         staffName, inputStaffName, // recorded and used
-        staff, inputStaff, // recorded and used
+        staff, inputStaff, // recorded and used. Input definition inherited by inputStaffLines, inputLedgerlines and inputStems
         stafflines, inputStafflines, // used but not recorded, inherits definition
         staffline, inputStaffline, // used but not recorded, inherits definition
         voice, inputVoice, // used, but has no Metrics, inherits definition from staff or inputStaff
@@ -48,13 +48,13 @@ namespace Moritz.Xml
         #endregion chord classes
 
         #region chord components
-        stem, inputStem,
+        stem, inputStem, // inputStem inherits stroke-width from inputStaff
         // flags and inputFlags whose ID (e.g. "inputLeft3Flags") has been recorded in FlagIDs will be written to the defs.
         // Neither needs a CSS definition because they use path's default settings (unless path is re-classed for beams!).
         flag, inputFlag,
         notehead, inputNotehead, cautionaryNotehead,
         accidental, inputAccidental, cautionaryAccidental,
-        ledgerlines, inputLedgerlines,   // there are no cautionaryLedgerlines
+        ledgerlines, inputLedgerlines,   // there are no cautionaryLedgerlines. inputLedgerlines inherit definition from inputStaff.
         ledgerline, inputLedgerline,    // used, but not recorded, and not defined. These classes inherit definition from the enclosing ledgerlines group (or line defined in system?)
         ornament,       // there are no input or cautionary ornaments
         lyric, inputLyric,   // there are no cautionaryLyrics
