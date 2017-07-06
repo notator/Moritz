@@ -166,19 +166,35 @@ namespace Moritz.Symbols
             }
         }
 
-        public void WriteDefs(SvgWriter w)
+        public void WriteDefs(SvgWriter w, int pageNumber)
         {
             Debug.Assert(Notator != null);
 			w.SvgStartDefs(null);
-			WriteStyle(w);
+			WriteStyle(w, pageNumber);
 			Notator.SymbolSet.WriteSymbolDefinitions(w, _pageFormat.MusicFontHeight, (_pageFormat.MusicFontHeight * _pageFormat.SmallFactor));
 			w.SvgEndDefs(); // end of defs
 		}
 
-        private void WriteStyle(SvgWriter w)
+        private void WriteStyle(SvgWriter w, int pageNumber)
 		{
+            StringBuilder css = GetStyles(_pageFormat, pageNumber);
+
+            w.WriteStartElement("style");
+			w.WriteAttributeString("type", "text/css");
+            w.WriteString(css.ToString());
+            w.WriteEndElement();
+		}
+
+        private StringBuilder GetStyles(PageFormat pageFormat, int pageNumber)
+        {
+
+            List<CSSClass> usedCSSClasses = new List<CSSClass>(Metrics.CSSClasses) as List<CSSClass>;
+            List<ClefID> usedClefIDs = new List<ClefID>(ClefMetrics.UsedClefIDs) as List<ClefID>;
+            List<FlagID> usedFlagIDs = new List<FlagID>(FlagsMetrics.UsedFlagIDs) as List<FlagID>;
+
             string fontDefs =
-            @"
+            #region fontDefs string
+@"
 			@font-face
 			{
 				font-family: 'CLicht';
@@ -212,280 +228,253 @@ namespace Moritz.Symbols
 				font-style: normal;
 			}
 		";
-            StringBuilder css = GetStyles(_pageFormat);
-            //if(_pageFormat.VisibleInputVoiceIndicesPerStaff.Count > 0)
-            //{
-            //    StringBuilder inputStyles = GetInputStyles(_pageFormat);
-            //    css.Append(inputStyles);
-            //}
-            
+            #endregion fontDefs string
+            StringBuilder stylesSB = new StringBuilder(fontDefs);
+            stylesSB.Append(FontStyles(pageFormat, pageNumber, usedCSSClasses, usedClefIDs));
+            //stylesSB.Append(LineStyles(pageFormat, usedCSSClasses, usedFlagIDs));
 
-            w.WriteStartElement("style");
-			w.WriteAttributeString("type", "text/css");
-            w.WriteString(fontDefs);
-            w.WriteString(css.ToString());
-            w.WriteEndElement();
-		}
+            #region old1
+            //// PageFormat values set in AssistantComposerForms
+            //string stafflineStemStrokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth);
+            //string page1TitleHeight = M.FloatToShortString(pageFormat.Page1TitleHeight);
+            //string page1AuthorHeight = M.FloatToShortString(pageFormat.Page1AuthorHeight);
 
-        private StringBuilder GetStyles(PageFormat pageFormat)
+            //#region Font heights defined as readonly fields in PageFormat
+            //string timeStampFontHeight = M.FloatToShortString(pageFormat.TimeStampFontHeight);
+            //string musicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight);
+            //string smallMusicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * pageFormat.SmallFactor);
+            //string staffNameFontHeight = M.FloatToShortString(pageFormat.StaffNameFontHeight);
+            //string barNumberNumberFontHeight = M.FloatToShortString(pageFormat.BarNumberNumberFontHeight);
+            //string lyricFontHeight = M.FloatToShortString(pageFormat.LyricFontHeight);
+            //string ornamentFontHeight = M.FloatToShortString(pageFormat.OrnamentFontHeight);
+            //string dynamicFontHeight = M.FloatToShortString(pageFormat.DynamicFontHeight);
+            //// clef accesories
+            //string clefOctaveNumberFontHeight = M.FloatToShortString(pageFormat.ClefOctaveNumber);
+            //string smallClefOctaveNumberFontHeight = M.FloatToShortString(pageFormat.ClefOctaveNumber * pageFormat.SmallFactor);
+            //string clefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight);
+            //string smallClefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight * pageFormat.SmallFactor);
+            //#endregion
+            //#region stroke widths defined as readonly fields in PageFormat
+            //string barlineStrokeWidth = M.FloatToShortString(pageFormat.BarlineStrokeWidth);
+            //string thickBarlineStrokeWidth = M.FloatToShortString(pageFormat.ThickBarlineStrokeWidth);
+            //string noteheadExtenderStrokeWidth = M.FloatToShortString(pageFormat.NoteheadExtenderStrokeWidth);
+            //string barNumberFrameStrokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth * 1.2F);
+            //#endregion
+            //string opaqueBeamOpacity = M.FloatToShortString(pageFormat.OpaqueBeamOpacity);
+            #endregion old1
+
+            stylesSB.Append(@"
+            ");
+
+            return stylesSB;
+        }
+
+        #region font styles
+
+        private StringBuilder FontStyles(PageFormat pageFormat, int pageNumber, List<CSSClass> usedCSSClasses, List<ClefID> usedClefIDs)
         {
-            List<CSSClass> usedCSSClasses = new List<CSSClass>(Metrics.CSSClasses);
-            List<ClefID> usedClefIDs = new List<ClefID>(ClefMetrics.UsedClefIDs);
-            List<FlagID> usedFlagIDs = new List<FlagID>(FlagsMetrics.UsedFlagIDs);
-
-            // FloatToShortString returns a string of minimum length with maximum 4 decimal places and a '.' decimal point.
-
-            // PageFormat values set in AssistantComposerForms
-            string stafflineStemStrokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth);
-            string page1TitleHeight = M.FloatToShortString(pageFormat.Page1TitleHeight);
-            string page1AuthorHeight = M.FloatToShortString(pageFormat.Page1AuthorHeight);
-
-            #region Font heights defined as readonly fields in PageFormat
-            string timeStampFontHeight = M.FloatToShortString(pageFormat.TimeStampFontHeight);
-            string musicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight);
-            string smallMusicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * pageFormat.SmallFactor);
-            string staffNameFontHeight = M.FloatToShortString(pageFormat.StaffNameFontHeight);
-            string barNumberNumberFontHeight = M.FloatToShortString(pageFormat.BarNumberNumberFontHeight);
-            string lyricFontHeight = M.FloatToShortString(pageFormat.LyricFontHeight);
-            string ornamentFontHeight = M.FloatToShortString(pageFormat.OrnamentFontHeight);
-            string dynamicFontHeight = M.FloatToShortString(pageFormat.DynamicFontHeight);
-            // clef accesories
-            string clefOctaveNumberFontHeight = M.FloatToShortString(pageFormat.ClefOctaveNumber);
-            string smallClefOctaveNumberFontHeight = M.FloatToShortString(pageFormat.ClefOctaveNumber * pageFormat.SmallFactor);
-            string clefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight);
-            string smallClefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight * pageFormat.SmallFactor);
-            #endregion
-            #region stroke widths defined as readonly fields in PageFormat
-            string barlineStrokeWidth = M.FloatToShortString(pageFormat.BarlineStrokeWidth);
-            string thickBarlineStrokeWidth = M.FloatToShortString(pageFormat.ThickBarlineStrokeWidth);
-            string noteheadExtenderStrokeWidth = M.FloatToShortString(pageFormat.NoteheadExtenderStrokeWidth);
-            string barNumberFrameStrokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth * 1.2F);
-            #endregion
-            string opaqueBeamOpacity = M.FloatToShortString(pageFormat.OpaqueBeamOpacity);
-
-            List<string> classes;
-            List<string> values;
-            StringBuilder classDef;
-            StringBuilder rval = new StringBuilder();
-            #region Fonts
-            #region Arial
-
-            classes = new List<string>() { "timeStamp", "staffName", "barNumberNumber", "lyric", "clefX", "smallClefX" };
-            values = new List<string>() { $"font-family:{"Arial"}" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "staffName", "barNumberNumber", "lyric" };
-            values = new List<string>() { "text-anchor:middle" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "timeStamp" };
-            values = new List<string>() { $"font-size:{timeStampFontHeight}px" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "staffName" };
-            values = new List<string>() { $"font-size:{staffNameFontHeight}px" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "barNumberNumber" };
-            values = new List<string>() { $"font-size:{barNumberNumberFontHeight}px" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "lyric" };
-            values = new List<string>() { $"font-size:{lyricFontHeight}px" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "clefX" };
-            values = new List<string>() { $"font-size:{clefXFontHeight}px" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "smallClefX" };
-            values = new List<string>() { $"font-size:{smallClefXFontHeight}px" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            #endregion
-
-            #region Open Sans
-
-            classes = new List<string>() { "mainTitle", "author" };
-            values = new List<string>() { @"font-family:""Open Sans""" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "mainTitle" };
-            values = new List<string>() { $"font-size:{page1TitleHeight}px", "text-anchor:middle" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "author" };
-            values = new List<string>() { $"font-size:{page1AuthorHeight}px", "text-anchor:end" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            #endregion
-
+            StringBuilder fontStyles = new StringBuilder();
+            #region text
             #region CLicht
-            classes = new List<string>() { "clef", "notehead", "accidental", "rest",
-                                           "dynamic",
-                                           "cautionaryNotehead",
-                                           "cautionaryAccidental",
-                                           "smallClef",
-                                           "clefOctaveNumber",
-                                           "smallClefOctaveNumber" };
-            values = new List<string>() { $"font-family:CLicht" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
+            //text
+            //{
+            //    font-family:CLicht
+            //    font-size:125.44px
+            //}
+            string musicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight);
+            StringBuilder standardTextType = TextType("    text", "CLicht", musicFontHeight, "");
+            fontStyles.Append(standardTextType);
 
-            classes = new List<string>() { "clef", "notehead", "accidental", "rest" };
-            values = new List<string>() { $"font-size:{musicFontHeight}px" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
+            if(usedCSSClasses.Contains(CSSClass.dynamic))
+            {
+                string dynamicFontHeight = M.FloatToShortString(pageFormat.DynamicFontHeight);
+                StringBuilder dynamicSize = TextType(".dynamic", "", dynamicFontHeight, "");
+                fontStyles.Append(dynamicSize);
+            }
 
-            classes = new List<string>() { "dynamic" };
-            values = new List<string>() { $"font-size:{dynamicFontHeight}px" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
+            StringBuilder smallClasses = new StringBuilder();
+            if(usedCSSClasses.Contains(CSSClass.smallClef))
+            {
+                smallClasses.Append(".smallClef, ");
+            }
+            if(usedCSSClasses.Contains(CSSClass.cautionaryNotehead))
+            {
+                smallClasses.Append(".cautionaryNotehead, ");
+            }
+            if(usedCSSClasses.Contains(CSSClass.cautionaryAccidental))
+            {
+                smallClasses.Append(".cautionaryAccidental, ");
+            }
+            if(smallClasses.Length > 0)
+            {
+                smallClasses.Remove(smallClasses.Length - 2, 2);
+                string smallMusicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * pageFormat.SmallFactor);
+                StringBuilder smallMusicFontSize = TextType(smallClasses.ToString(), "", smallMusicFontHeight, "");
+                fontStyles.Append(smallMusicFontSize);
+            }
 
-            classes = new List<string>() { "smallClef", "cautionaryNotehead", "cautionaryAccidental", };
-            values = new List<string>() { $"font-size:{smallMusicFontHeight}px" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
+            if(OctavedLargeClefExists(usedClefIDs))
+            {
+                string clefOctaveNumberFontSize = M.FloatToShortString(pageFormat.ClefOctaveNumber);
+                StringBuilder clefOctaveNumberStyle = TextType(".clefOctaveNumber", "", clefOctaveNumberFontSize, "");
+                fontStyles.Append(clefOctaveNumberStyle);
+            }
 
-            classes = new List<string>() { "clefOctaveNumber" };
-            values = new List<string>() { $"font-size:{clefOctaveNumberFontHeight}px" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
+            if(OctavedSmallClefExists(usedClefIDs))
+            {
+                string smallClefOctaveNumberFontSize = M.FloatToShortString(pageFormat.ClefOctaveNumber * pageFormat.SmallFactor);
+                StringBuilder smallClefOctaveNumberStyle = TextType(".smallClefOctaveNumber", "", smallClefOctaveNumberFontSize, "");
+                fontStyles.Append(smallClefOctaveNumberStyle);
+            }
+            #endregion CLicht
 
-            classes = new List<string>() { "smallClefOctaveNumber" };
-            values = new List<string>() { $"font-size:{smallClefOctaveNumberFontHeight}px" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
+            #region Open Sans        
+            if(pageNumber < 2) // pageNumber is 0 for scroll score.
+            {
+                string openSans = "\"Open Sans\"";
+                string page1TitleHeight = M.FloatToShortString(pageFormat.Page1TitleHeight);
+                StringBuilder mainTitleType = TextType(".mainTitle", openSans, page1TitleHeight, "middle");
+                fontStyles.Append(mainTitleType);
 
-            #endregion
+                string page1AuthorHeight = M.FloatToShortString(pageFormat.Page1AuthorHeight);
+                StringBuilder authorType = TextType(".author", openSans, page1AuthorHeight, "end");
+                fontStyles.Append(authorType);
+            } // end if(pageNumber < 2)
+            #endregion Open Sans
+
+            #region Arial
+            string arial = "Arial";
+            string timeStampHeight = M.FloatToShortString(pageFormat.TimeStampFontHeight);
+            StringBuilder timeStampType = TextType(".timeStamp", arial, timeStampHeight, "");
+            fontStyles.Append(timeStampType);
+
+            if(LargeClefXExists(usedClefIDs))
+            {
+                string clefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight);
+                StringBuilder clefXStyle = TextType(".clefX", arial, clefXFontHeight, "");
+                fontStyles.Append(clefXStyle);
+            }
+
+            if(SmallClefXExists(usedClefIDs))
+            {
+                string smallClefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight * pageFormat.SmallFactor);
+                StringBuilder smallClefXStyle = TextType(".smallClefX", arial, smallClefXFontHeight, "");
+                fontStyles.Append(smallClefXStyle);
+            }
+
+            if(usedCSSClasses.Contains(CSSClass.staffName))
+            {
+                string staffNameFontHeight = M.FloatToShortString(pageFormat.StaffNameFontHeight);
+                StringBuilder staffNameHeight = TextType(".staffName", arial, staffNameFontHeight, "middle");
+                fontStyles.Append(staffNameHeight);
+            }
+
+            if(usedCSSClasses.Contains(CSSClass.barNumber))
+            {
+                string barNumberNumberFontHeight = M.FloatToShortString(pageFormat.BarNumberNumberFontHeight);
+                StringBuilder barNumberNumberHeight = TextType(".barNumberNumber", arial, barNumberNumberFontHeight, "middle");
+                fontStyles.Append(barNumberNumberHeight);
+            }
+
+            if(usedCSSClasses.Contains(CSSClass.lyric))
+            {
+                string lyricFontHeight = M.FloatToShortString(pageFormat.LyricFontHeight);
+                StringBuilder lyricHeight = TextType(".lyric", arial, lyricFontHeight, "middle");
+                fontStyles.Append(lyricHeight);
+            }
+            #endregion Arial
 
             #region Open Sans Condensed
+            if(usedCSSClasses.Contains(CSSClass.ornament))
+            {
+                string openSansCondensed = "\"Open Sans Condensed\"";
+                string ornamentFontHeight = M.FloatToShortString(pageFormat.OrnamentFontHeight);
+                StringBuilder ornamentType = TextType(".ornament", openSansCondensed, ornamentFontHeight, "middle");
+                fontStyles.Append(ornamentType);
+            }
+            #endregion Open Sans Condensed
+            #endregion text
 
-            classes = new List<string>() { "ornament" };
-            values = new List<string>() { $@"font-family:""Open Sans Condensed""", $@"font-size:{ornamentFontHeight}px", "text-anchor:middle" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
+            return fontStyles;
+        }
 
-            #endregion
-            #endregion Fonts
+        private StringBuilder TextType(string element, string fontFamily, string fontSize, string textAnchor)
+        {
+            StringBuilder local = new StringBuilder();
+            if(!String.IsNullOrEmpty(fontFamily))
+            {
+                local.Append($@"font-family:{fontFamily}");
+                if(!String.IsNullOrEmpty(fontSize) || !String.IsNullOrEmpty(textAnchor))
+                {
+                    local.Append($@";
+                ");
+                }
+            }
+            if(!String.IsNullOrEmpty(fontSize))
+            {
+                local.Append($@"font-size:{fontSize}px");
+                if(!String.IsNullOrEmpty(textAnchor))
+                {
+                    local.Append($@";
+                ");
+                }
+            }
+            if(!String.IsNullOrEmpty(textAnchor))
+            {
+                local.Append($@"text-anchor:{textAnchor}");
+            }
 
-            #region lines and paths
-
-            classes = new List<string>() { "stafflines", "ledgerlines", "stem", "beam", "cautionaryBracket", "frame", 
-                "barline", "staffConnector", "endBarlineLeft", "endBarlineLeftConnector",
-                "endBarlineRight", "endBarlineRightConnector",
-                "noteExtender", 
-                "barNumberFrame" };
-            values = new List<string>() { "stroke:black" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "stafflines", "ledgerlines", "stem", "beam", "cautionaryBracket", "frame" };
-            values = new List<string>() { $"stroke-width:{stafflineStemStrokeWidth}px" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "barline", "staffConnector", "endBarlineLeft", "endBarlineLeftConnector" };
-            values = new List<string>() { $"stroke-width:{barlineStrokeWidth}px" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "endBarlineRight", "endBarlineRightConnector" };
-            values = new List<string>() { $"stroke-width:{thickBarlineStrokeWidth}px" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "noteExtender" };
-            values = new List<string>() { $"stroke-width:{noteheadExtenderStrokeWidth}px" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "barNumberFrame" };
-            values = new List<string>() { $"stroke-width:{barNumberFrameStrokeWidth}px" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "beam" };
-            values = new List<string>() { "fill:black" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "frame", "opaqueBeam" };
-            values = new List<string>() { "fill:white" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "cautionaryBracket", "barNumberFrame" };
-            values = new List<string>() { "fill:none" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "stem" };
-            values = new List<string>() { "stroke-linecap:round" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-
-            classes = new List<string>() { "opaqueBeam" };
-            values = new List<string>() { "stroke:none", $"opacity:{opaqueBeamOpacity}" };
-            classDef = GetCSS(classes, values);
-            rval.Append(classDef.ToString());
-            #endregion
-
-            // newline at end of CSS
-            rval.Append(@"
+            StringBuilder rval = new StringBuilder(
+            $@"{element}
+            {{
+                {local.ToString()}
+            }}
             ");
 
             return rval;
         }
 
-        private StringBuilder GetCSS(List<string> classes, List<string> values)
+        private bool OctavedLargeClefExists(List<ClefID> usedClefIDs)
         {
-            StringBuilder classesSB = GetClassesSB(classes);
-            StringBuilder valuesSB = GetValuesSB(values); 
-            StringBuilder rval = new StringBuilder(
-            $@"
-            {classesSB.ToString()}
-            {{
-                {valuesSB.ToString()}
-            }}");
-            return rval;
-        }
+            bool rval = usedClefIDs.Contains(ClefID.trebleClef8)
+            || usedClefIDs.Contains(ClefID.bassClef8)
+            || usedClefIDs.Contains(ClefID.trebleClef2x8)
+            || usedClefIDs.Contains(ClefID.bassClef2x8)
+            || usedClefIDs.Contains(ClefID.trebleClef3x8)
+            || usedClefIDs.Contains(ClefID.bassClef3x8);
 
-        private StringBuilder GetClassesSB(List<string> classes)
-        {
-            StringBuilder rval = new StringBuilder();
-            foreach(string className in classes)
-            {
-                rval.Append(".");
-                rval.Append(className);
-                rval.Append(", ");
-            }
-            rval.Remove(rval.Length - 2, 2);
             return rval;
         }
+        private bool LargeClefXExists(List<ClefID> usedClefIDs)
+        {
+            bool rval = usedClefIDs.Contains(ClefID.trebleClef2x8)
+            || usedClefIDs.Contains(ClefID.bassClef2x8)
+            || usedClefIDs.Contains(ClefID.trebleClef3x8)
+            || usedClefIDs.Contains(ClefID.bassClef3x8);
 
-        private StringBuilder GetValuesSB(List<string> values)
-        {
-            StringBuilder rval = new StringBuilder();
-            foreach(string val in values)
-            {
-                rval.Append(val);
-                rval.Append("; ");
-            }
-            rval.Remove(rval.Length - 2, 2);
             return rval;
         }
+        private bool OctavedSmallClefExists(List<ClefID> usedClefIDs)
+        {
+            bool rval = usedClefIDs.Contains(ClefID.smallTrebleClef8)
+            || usedClefIDs.Contains(ClefID.smallBassClef8)
+            || usedClefIDs.Contains(ClefID.smallTrebleClef2x8)
+            || usedClefIDs.Contains(ClefID.smallBassClef2x8)
+            || usedClefIDs.Contains(ClefID.smallTrebleClef3x8)
+            || usedClefIDs.Contains(ClefID.smallBassClef3x8);
+
+            return rval;
+        }
+        private bool SmallClefXExists(List<ClefID> usedClefIDs)
+        {
+            bool rval = usedClefIDs.Contains(ClefID.smallTrebleClef2x8)
+            || usedClefIDs.Contains(ClefID.smallBassClef2x8)
+            || usedClefIDs.Contains(ClefID.smallTrebleClef3x8)
+            || usedClefIDs.Contains(ClefID.smallBassClef3x8);
+
+            return rval;
+        }
+        #endregion font styles
 
         #endregion save multi-page score
 

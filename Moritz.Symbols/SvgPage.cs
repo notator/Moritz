@@ -130,7 +130,7 @@ namespace Moritz.Symbols
 
 			metadata.WriteSVG(w, _pageNumber, _score.PageCount, _pageFormat.AboutLinkURL, nOutputVoices, nInputVoices);
 
-            _score.WriteDefs(w);
+            _score.WriteDefs(w, _pageNumber);
 
 			#region layers
 
