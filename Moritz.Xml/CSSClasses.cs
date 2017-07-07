@@ -16,9 +16,9 @@ namespace Moritz.Xml
         systems, // Used and defined on every page. Not recorded.
         system, // Used and defined on every page. Not recorded.
         staffName, inputStaffName, // recorded and used
-        staff, inputStaff, // recorded and used. Input definition inherited by inputStaffLines, inputLedgerlines and inputStems
-        stafflines, inputStafflines, // used but not recorded, inherits definition
-        staffline, inputStaffline, // used but not recorded, inherits definition
+        staff, inputStaff, // recorded and used. Not defined.
+        stafflines, inputStafflines, // used but not recorded. Not defined.
+        staffline, inputStaffline, // used but not recorded. Defined if staff/inputStaff exists
         voice, inputVoice, // used, but has no Metrics, inherits definition from staff or inputStaff
 
         graphics, // all event symbol graphics are contained in a graphics group. Never defined? CLicht?
@@ -48,13 +48,13 @@ namespace Moritz.Xml
         #endregion chord classes
 
         #region chord components
-        stem, inputStem, // stem inherits from line. inputStem is defined if recorded.
+        stem, inputStem, // used and recorded. Defined if they exist.
         // flags and inputFlags whose ID (e.g. "inputLeft3Flags") has been recorded in FlagIDs will be written to the defs.
-        flag, inputFlag,
+        flag, inputFlag, // path classes used in defs. Defined if flags or input flags exist.
         notehead, inputNotehead, cautionaryNotehead,
         accidental, inputAccidental, cautionaryAccidental,
-        ledgerlines, inputLedgerlines,   // there are no cautionaryLedgerlines. inputLedgerlines inherit definition from inputStaff.
-        ledgerline, inputLedgerline,    // used, but not recorded, and not defined. These classes inherit definition from the enclosing ledgerlines group (or line defined in system?)
+        ledgerlines, inputLedgerlines,   // recorded and used. There are no cautionaryLedgerlines.
+        ledgerline, inputLedgerline,    // used, but not recorded. Defined if ledgerlines/inputLedgerlines exist.
         ornament,       // there are no input or cautionary ornaments
         lyric, inputLyric,   // there are no cautionaryLyrics
         dynamic, inputDynamic,   // there are no cautionaryDynamics
@@ -68,11 +68,11 @@ namespace Moritz.Xml
 
         #region beams
         beamBlock,      // Used, recorded, not defined.
-        beam,           // Used, not recorded. Inherits the path definition.
-        opaqueBeam,     // Used, not recorded. Defined if beamBlock is recorded.
+        beam,           // Used, not recorded. Defined if beamBlock exists.
+        opaqueBeam,     // Used, not recorded. Defined if beamBlock exists.
         inputBeamBlock, // Used, recorded, not defined.
-        inputBeam,      // Used, not recorded. Defined if inputBeamBlock is recorded.
-        inputOpaqueBeam, // Used, not recorded. Defined if inputBeamBlock is recorded.
+        inputBeam,      // Used, not recorded. Defined if inputBeamBlock exists.
+        inputOpaqueBeam, // Used, not recorded. Defined if inputBeamBlock exists.
         #endregion
 
         #region barlines

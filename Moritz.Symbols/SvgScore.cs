@@ -235,13 +235,42 @@ namespace Moritz.Symbols
             {
                 stylesSB.Append(InputFontStyles(pageFormat, pageNumber, usedCSSClasses, usedClefIDs));
             }
-            stylesSB.Append(LineStyles(pageFormat, usedCSSClasses, pageNumber));
+            bool defineFlagStyle = HasFlag(usedFlagIDs);
+            stylesSB.Append(LineStyles(pageFormat, usedCSSClasses, pageNumber, defineFlagStyle));
             if(usedCSSClasses.Contains(CSSClass.inputStaff))
             {
-                stylesSB.Append(InputLineStyles(pageFormat, usedCSSClasses));
+                bool defineInputFlagStyle = HasInputFlag(usedFlagIDs);
+                stylesSB.Append(InputLineStyles(pageFormat, usedCSSClasses, defineInputFlagStyle));
             }
 
             return stylesSB;
+        }
+
+        private bool HasFlag(List<FlagID> usedFlagIDs)
+        {
+            bool rval = false;
+            foreach(FlagID flagID in usedFlagIDs)
+            {
+                if((flagID.ToString().StartsWith("input")) == false)
+                {
+                    rval = true;
+                    break;
+                }
+            }
+            return rval;
+        }
+        private bool HasInputFlag(List<FlagID> usedFlagIDs)
+        {
+            bool rval = false;
+            foreach(FlagID flagID in usedFlagIDs)
+            {
+                if(flagID.ToString().StartsWith("input"))
+                {
+                    rval = true;
+                    break;
+                }
+            }
+            return rval;
         }
 
         #region font styles
@@ -372,6 +401,84 @@ namespace Moritz.Symbols
 
             return fontStyles;
         }
+        private StringBuilder InputFontStyles(PageFormat pageFormat, int pageNumber, List<CSSClass> usedCSSClasses, List<ClefID> usedClefIDs)
+        {
+            float inputFactor = pageFormat.InputStavesSizeFactor;
+            StringBuilder fontStyles = new StringBuilder();
+            #region CLicht
+            //text
+            //{
+            //    font-family:CLicht
+            //    font-size:125.44px
+            //}
+            string clicht = "CLicht";
+            string musicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * inputFactor);
+            StringBuilder standardTextType = TextType(".inputRest, .inputNotehead, .inputAccidental", clicht, musicFontHeight, "");
+            fontStyles.Append(standardTextType);
+
+            if(usedCSSClasses.Contains(CSSClass.dynamic))
+            {
+                string dynamicFontHeight = M.FloatToShortString(pageFormat.DynamicFontHeight * inputFactor);
+                StringBuilder dynamicSize = TextType(".inputDynamic", clicht, dynamicFontHeight, "");
+                fontStyles.Append(dynamicSize);
+            }
+
+            if(usedCSSClasses.Contains(CSSClass.inputSmallClef))
+            {
+                string smallMusicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * pageFormat.SmallFactor * inputFactor);
+                StringBuilder smallMusicFontSize = TextType(".inputSmallClef", clicht, smallMusicFontHeight, "");
+                fontStyles.Append(smallMusicFontSize);
+            }
+
+            if(OctavedLargeInputClefExists(usedClefIDs))
+            {
+                string clefOctaveNumberFontSize = M.FloatToShortString(pageFormat.ClefOctaveNumber * inputFactor);
+                StringBuilder clefOctaveNumberStyle = TextType(".inputClefOctaveNumber", clicht, clefOctaveNumberFontSize, "");
+                fontStyles.Append(clefOctaveNumberStyle);
+            }
+
+            if(OctavedSmallInputClefExists(usedClefIDs))
+            {
+                string smallClefOctaveNumberFontSize = M.FloatToShortString(pageFormat.ClefOctaveNumber * pageFormat.SmallFactor * inputFactor);
+                StringBuilder smallClefOctaveNumberStyle = TextType(".smallClefOctaveNumber", clicht, smallClefOctaveNumberFontSize, "");
+                fontStyles.Append(smallClefOctaveNumberStyle);
+            }
+            #endregion CLicht
+
+            #region Arial
+            string Arial = "Arial";
+
+            if(LargeInputClefXExists(usedClefIDs))
+            {
+                string clefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight * inputFactor);
+                StringBuilder clefXStyle = TextType(".inputClefX", Arial, clefXFontHeight, "");
+                fontStyles.Append(clefXStyle);
+            }
+
+            if(SmallInputClefXExists(usedClefIDs))
+            {
+                string smallClefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight * pageFormat.SmallFactor * inputFactor);
+                StringBuilder smallClefXStyle = TextType(".inputSmallClefX", Arial, smallClefXFontHeight, "");
+                fontStyles.Append(smallClefXStyle);
+            }
+
+            if(usedCSSClasses.Contains(CSSClass.inputStaffName))
+            {
+                string staffNameFontHeight = M.FloatToShortString(pageFormat.StaffNameFontHeight * inputFactor);
+                StringBuilder staffNameHeight = TextType(".inputStaffName", Arial, staffNameFontHeight, "middle");
+                fontStyles.Append(staffNameHeight);
+            }
+
+            if(usedCSSClasses.Contains(CSSClass.inputLyric))
+            {
+                string lyricFontHeight = M.FloatToShortString(pageFormat.LyricFontHeight * inputFactor);
+                StringBuilder lyricHeight = TextType(".inputLyric", Arial, lyricFontHeight, "middle");
+                fontStyles.Append(lyricHeight);
+            }
+            #endregion Arial
+
+            return fontStyles;
+        }
 
         private StringBuilder TextType(string element, string fontFamily, string fontSize, string textAnchor)
         {
@@ -493,13 +600,14 @@ namespace Moritz.Symbols
         #endregion font styles
 
         #region line styles
-
-        private StringBuilder LineStyles(PageFormat pageFormat, List<CSSClass> usedCSSClasses, int pageNumber)
+        private StringBuilder LineStyles(PageFormat pageFormat, List<CSSClass> usedCSSClasses, int pageNumber, bool defineFlagStyle)
         {
             StringBuilder lineStyles = new StringBuilder();
             
             string strokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth);
-            lineStyles.Append($@"line, path, rect
+            StringBuilder standardLineClasses = GetStandardLineClasses(usedCSSClasses, defineFlagStyle);
+            //".staffline, .ledgerline, .stem, .beam, .flag
+            lineStyles.Append($@"{standardLineClasses.ToString()}
             {{
                 stroke:black;
                 stroke-width:{strokeWidth}px;
@@ -507,9 +615,19 @@ namespace Moritz.Symbols
             }}
             ");
 
+            if(usedCSSClasses.Contains(CSSClass.stem))
+            {
+                lineStyles.Append($@".stem
+            {{
+                stroke-linecap:round                
+            }}
+            ");
+            }
+
             strokeWidth = M.FloatToShortString(pageFormat.BarlineStrokeWidth);
             lineStyles.Append($@".barline
             {{
+                stroke:black;
                 stroke-width:{strokeWidth}px
             }}
             ");
@@ -562,20 +680,13 @@ namespace Moritz.Symbols
             ");
             }
 
-            if(usedCSSClasses.Contains(CSSClass.stem))
-            {
-                lineStyles.Append($@".stem
-            {{
-                stroke-linecap:round                
-            }}
-            ");
-            }
-
+            strokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth);
             if(usedCSSClasses.Contains(CSSClass.beamBlock))
             {
                 lineStyles.Append($@".opaqueBeam
             {{
                 stroke:white;
+                stroke-width:{strokeWidth}px;
                 fill:white;
                 opacity:0.65                
             }}
@@ -584,99 +695,19 @@ namespace Moritz.Symbols
 
             return lineStyles;
         }
-
-        #endregion line styles
-
-        #region input font styles
-        private StringBuilder InputFontStyles(PageFormat pageFormat, int pageNumber, List<CSSClass> usedCSSClasses, List<ClefID> usedClefIDs)
-        {
-            float inputFactor = pageFormat.InputStavesSizeFactor;
-            StringBuilder fontStyles = new StringBuilder();
-            #region CLicht
-            //text
-            //{
-            //    font-family:CLicht
-            //    font-size:125.44px
-            //}
-            string clicht = "CLicht";
-            string musicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * inputFactor);
-            StringBuilder standardTextType = TextType(".inputRest, .inputNotehead, .inputAccidental", clicht, musicFontHeight, "");
-            fontStyles.Append(standardTextType);
-
-            if(usedCSSClasses.Contains(CSSClass.dynamic))
-            {
-                string dynamicFontHeight = M.FloatToShortString(pageFormat.DynamicFontHeight * inputFactor);
-                StringBuilder dynamicSize = TextType(".inputDynamic", clicht, dynamicFontHeight, "");
-                fontStyles.Append(dynamicSize);
-            }
-
-            if(usedCSSClasses.Contains(CSSClass.inputSmallClef))
-            {
-                string smallMusicFontHeight = M.FloatToShortString(pageFormat.MusicFontHeight * pageFormat.SmallFactor * inputFactor);
-                StringBuilder smallMusicFontSize = TextType(".inputSmallClef", clicht, smallMusicFontHeight, "");
-                fontStyles.Append(smallMusicFontSize);
-            }
-
-            if(OctavedLargeInputClefExists(usedClefIDs))
-            {
-                string clefOctaveNumberFontSize = M.FloatToShortString(pageFormat.ClefOctaveNumber * inputFactor);
-                StringBuilder clefOctaveNumberStyle = TextType(".inputClefOctaveNumber", clicht, clefOctaveNumberFontSize, "");
-                fontStyles.Append(clefOctaveNumberStyle);
-            }
-
-            if(OctavedSmallInputClefExists(usedClefIDs))
-            {
-                string smallClefOctaveNumberFontSize = M.FloatToShortString(pageFormat.ClefOctaveNumber * pageFormat.SmallFactor * inputFactor);
-                StringBuilder smallClefOctaveNumberStyle = TextType(".smallClefOctaveNumber", clicht, smallClefOctaveNumberFontSize, "");
-                fontStyles.Append(smallClefOctaveNumberStyle);
-            }
-            #endregion CLicht
-
-            #region Arial
-            string Arial = "Arial";
-
-            if(LargeInputClefXExists(usedClefIDs))
-            {
-                string clefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight * inputFactor);
-                StringBuilder clefXStyle = TextType(".inputClefX", Arial, clefXFontHeight, "");
-                fontStyles.Append(clefXStyle);
-            }
-
-            if(SmallInputClefXExists(usedClefIDs))
-            {
-                string smallClefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight * pageFormat.SmallFactor * inputFactor);
-                StringBuilder smallClefXStyle = TextType(".inputSmallClefX", Arial, smallClefXFontHeight, "");
-                fontStyles.Append(smallClefXStyle);
-            }
-
-            if(usedCSSClasses.Contains(CSSClass.inputStaffName))
-            {
-                string staffNameFontHeight = M.FloatToShortString(pageFormat.StaffNameFontHeight * inputFactor);
-                StringBuilder staffNameHeight = TextType(".inputStaffName", Arial, staffNameFontHeight, "middle");
-                fontStyles.Append(staffNameHeight);
-            }
-
-            if(usedCSSClasses.Contains(CSSClass.inputLyric))
-            {
-                string lyricFontHeight = M.FloatToShortString(pageFormat.LyricFontHeight * inputFactor);
-                StringBuilder lyricHeight = TextType(".inputLyric", Arial, lyricFontHeight, "middle");
-                fontStyles.Append(lyricHeight);
-            }
-            #endregion Arial
-
-            return fontStyles;
-        }
-        #endregion input font styles
-        #region input line styles
-        private StringBuilder InputLineStyles(PageFormat pageFormat, List<CSSClass> usedCSSClasses)
+        private StringBuilder InputLineStyles(PageFormat pageFormat, List<CSSClass> usedCSSClasses, bool defineInputFlagStyle)
         {
             float inputSizeFactor = pageFormat.InputStavesSizeFactor;
             StringBuilder lineStyles = new StringBuilder();
 
             string standardInputStrokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth * inputSizeFactor);
-            lineStyles.Append($@".inputStaffline, .inputLedgerline, .inputBeam 
+            StringBuilder standardInputLineClasses = GetStandardInputLineClasses(usedCSSClasses, defineInputFlagStyle);
+            //".inputStaffline, .inputLedgerline, .inputStem, .inputBeam, .inputFlag
+            lineStyles.Append($@"{standardInputLineClasses.ToString()} 
             {{
-                stroke-width:{standardInputStrokeWidth}px
+                stroke:black;
+                stroke-width:{standardInputStrokeWidth}px;
+                fill:black
             }}
             ");
 
@@ -684,15 +715,17 @@ namespace Moritz.Symbols
             {
                 lineStyles.Append($@".inputStem
             {{
-                stroke-width:{standardInputStrokeWidth}px;
                 stroke-linecap:round
             }}
             ");
+            }
 
+            if(usedCSSClasses.Contains(CSSClass.inputBeamBlock))
+            {
                 lineStyles.Append($@".inputOpaqueBeam
             {{
                 stroke:white;
-                stroke-width:{standardInputStrokeWidth}px
+                stroke-width:{standardInputStrokeWidth}px;
                 fill:white;
                 opacity:0.65
             }}
@@ -701,7 +734,69 @@ namespace Moritz.Symbols
 
             return lineStyles;
         }
-        #endregion input line styles
+        private StringBuilder GetStandardLineClasses(List<CSSClass> usedCSSClasses, bool defineFlagStyle)
+        {
+            //.staffline, .ledgerline, .stem, .beam
+            StringBuilder rval = new StringBuilder();
+            if(usedCSSClasses.Contains(CSSClass.staff))
+            {
+                ExtendRval(rval, ".staffline");
+            }
+            if(usedCSSClasses.Contains(CSSClass.ledgerlines))
+            {
+                ExtendRval(rval, ".ledgerline");
+            }
+            if(usedCSSClasses.Contains(CSSClass.stem))
+            {
+                ExtendRval(rval, ".stem");
+            }
+            if(usedCSSClasses.Contains(CSSClass.beamBlock))
+            {
+                ExtendRval(rval, ".beam");
+            }
+            if(defineFlagStyle)
+            {
+                ExtendRval(rval, ".flag");
+            }
+
+            return rval;
+        }
+        private StringBuilder GetStandardInputLineClasses(List<CSSClass> usedCSSClasses, bool defineInputFlagStyle)
+        {
+            //.inputStaffline, .inputLedgerline, .inputStem, .inputBeam
+            StringBuilder rval = new StringBuilder();
+            if(usedCSSClasses.Contains(CSSClass.inputStaff))
+            {
+                ExtendRval(rval, ".inputStaffline");
+            }
+            if(usedCSSClasses.Contains(CSSClass.inputLedgerlines))
+            {
+                ExtendRval(rval, ".inputLedgerline");
+            }
+            if(usedCSSClasses.Contains(CSSClass.inputStem))
+            {
+                ExtendRval(rval, ".inputStem");
+            }
+            if(usedCSSClasses.Contains(CSSClass.inputBeamBlock))
+            {
+                ExtendRval(rval, ".inputBeam");
+            }
+            if(defineInputFlagStyle)
+            {
+                ExtendRval(rval, ".inputFlag");
+            }
+
+            return rval;
+        }
+        private void ExtendRval(StringBuilder rval, string className)
+        {
+            if(rval.Length > 0)
+            {
+                rval.Append(", ");
+            }
+            rval.Append(className);
+        }
+        #endregion line styles
 
         #endregion save multi-page score
 
@@ -729,7 +824,6 @@ namespace Moritz.Symbols
         protected string _filename = "";
         public string Filename { get { return _filename; } }
         #endregion
-
 
         /// <summary>
         /// Adds the staff name to the first barline of each visible staff in the score.
