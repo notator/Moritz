@@ -420,35 +420,6 @@ namespace Moritz.Symbols
 
             return rval;
         }
-        private bool OctavedLargeInputClefExists(List<ClefID> usedClefIDs)
-        {
-            bool rval = usedClefIDs.Contains(ClefID.inputTrebleClef8)
-            || usedClefIDs.Contains(ClefID.inputBassClef8)
-            || usedClefIDs.Contains(ClefID.inputTrebleClef2x8)
-            || usedClefIDs.Contains(ClefID.inputBassClef2x8)
-            || usedClefIDs.Contains(ClefID.inputTrebleClef3x8)
-            || usedClefIDs.Contains(ClefID.inputBassClef3x8);
-
-            return rval;
-        }
-        private bool LargeClefXExists(List<ClefID> usedClefIDs)
-        {
-            bool rval = usedClefIDs.Contains(ClefID.trebleClef2x8)
-            || usedClefIDs.Contains(ClefID.bassClef2x8)
-            || usedClefIDs.Contains(ClefID.trebleClef3x8)
-            || usedClefIDs.Contains(ClefID.bassClef3x8);
-
-            return rval;
-        }
-        private bool LargeInputClefXExists(List<ClefID> usedClefIDs)
-        {
-            bool rval = usedClefIDs.Contains(ClefID.inputTrebleClef2x8)
-            || usedClefIDs.Contains(ClefID.inputBassClef2x8)
-            || usedClefIDs.Contains(ClefID.inputTrebleClef3x8)
-            || usedClefIDs.Contains(ClefID.inputBassClef3x8);
-
-            return rval;
-        }
         private bool OctavedSmallClefExists(List<ClefID> usedClefIDs)
         {
             bool rval = usedClefIDs.Contains(ClefID.smallTrebleClef8)
@@ -457,6 +428,17 @@ namespace Moritz.Symbols
             || usedClefIDs.Contains(ClefID.smallBassClef2x8)
             || usedClefIDs.Contains(ClefID.smallTrebleClef3x8)
             || usedClefIDs.Contains(ClefID.smallBassClef3x8);
+
+            return rval;
+        }
+        private bool OctavedLargeInputClefExists(List<ClefID> usedClefIDs)
+        {
+            bool rval = usedClefIDs.Contains(ClefID.inputTrebleClef8)
+            || usedClefIDs.Contains(ClefID.inputBassClef8)
+            || usedClefIDs.Contains(ClefID.inputTrebleClef2x8)
+            || usedClefIDs.Contains(ClefID.inputBassClef2x8)
+            || usedClefIDs.Contains(ClefID.inputTrebleClef3x8)
+            || usedClefIDs.Contains(ClefID.inputBassClef3x8);
 
             return rval;
         }
@@ -471,12 +453,31 @@ namespace Moritz.Symbols
 
             return rval;
         }
+
+        private bool LargeClefXExists(List<ClefID> usedClefIDs)
+        {
+            bool rval = usedClefIDs.Contains(ClefID.trebleClef2x8)
+            || usedClefIDs.Contains(ClefID.bassClef2x8)
+            || usedClefIDs.Contains(ClefID.trebleClef3x8)
+            || usedClefIDs.Contains(ClefID.bassClef3x8);
+
+            return rval;
+        }
         private bool SmallClefXExists(List<ClefID> usedClefIDs)
         {
             bool rval = usedClefIDs.Contains(ClefID.smallTrebleClef2x8)
             || usedClefIDs.Contains(ClefID.smallBassClef2x8)
             || usedClefIDs.Contains(ClefID.smallTrebleClef3x8)
             || usedClefIDs.Contains(ClefID.smallBassClef3x8);
+
+            return rval;
+        }
+        private bool LargeInputClefXExists(List<ClefID> usedClefIDs)
+        {
+            bool rval = usedClefIDs.Contains(ClefID.inputTrebleClef2x8)
+            || usedClefIDs.Contains(ClefID.inputBassClef2x8)
+            || usedClefIDs.Contains(ClefID.inputTrebleClef3x8)
+            || usedClefIDs.Contains(ClefID.inputBassClef3x8);
 
             return rval;
         }
