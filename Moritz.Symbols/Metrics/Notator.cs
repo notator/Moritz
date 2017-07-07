@@ -69,7 +69,7 @@ namespace Moritz.Symbols
                     {
                         Voice voice = staff.Voices[voiceIndex];
                         voice.VoiceDef.AgglomerateRests();
-                        float musicFontHeight = (voice is OutputVoice) ? _pageFormat.MusicFontHeight : _pageFormat.MusicFontHeight * _pageFormat.InputStavesSizeFactor;
+                        float musicFontHeight = (voice is OutputVoice) ? _pageFormat.MusicFontHeight : _pageFormat.MusicFontHeight * _pageFormat.InputSizeFactor;
                         if(!(staff is HiddenOutputStaff))
                         {
                             Debug.Assert(currentClefPerVisibleStaffList[visibleStaffIndex] != null);
@@ -240,7 +240,7 @@ namespace Moritz.Symbols
             foreach(ClefDef ccd in clefDefs)
             {
                 int absPos = systemAbsMsPos + ccd.MsPositionReFirstUD;
-                SmallClef invisibleSmallClef = new SmallClef(voice, ccd.ClefType, absPos, (_pageFormat.MusicFontHeight * _pageFormat.SmallFactor));
+                SmallClef invisibleSmallClef = new SmallClef(voice, ccd.ClefType, absPos, (_pageFormat.MusicFontHeight * _pageFormat.SmallSizeFactor));
                 invisibleSmallClef.IsVisible = false;
                 InsertInvisibleClefChangeInNoteObjects(voice, invisibleSmallClef);
             }

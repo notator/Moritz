@@ -100,7 +100,7 @@ namespace Moritz.Symbols
         public int DefaultNumberOfBarsPerSystem { get { return 5; } }
 
         #region constants
-        public float SmallFactor { get { return 0.8F; } } // The relatve size of cautionary and small objects
+        public float SmallSizeFactor { get { return 0.8F; } } // The relatve size of cautionary and small objects
         public float OpaqueBeamOpacity { get { return 0.65F; } } // The opacity of opaque beams
         #endregion
 
@@ -115,7 +115,7 @@ namespace Moritz.Symbols
         public float StaffNameFontHeight { get { return Gap * 2.2F; } }
         public float BarNumberNumberFontHeight { get { return Gap * 1.9992F; } }
         public float LyricFontHeight { get { return Gap * 1.96F; } }
-        public float ClefOctaveNumber { get { return Gap * 2.6264F; } }
+        public float ClefOctaveNumberHeight { get { return Gap * 2.6264F; } }
         public float ClefXFontHeight { get { return Gap * 1.568F; } }
         /// Open Sans, Open Sans Condensed (new 26.06.2017)
         public float OrnamentFontHeight { get { return Gap * 2.156F; } }
@@ -132,7 +132,7 @@ namespace Moritz.Symbols
         public float BarNumberFrameStrokeWidth { get { return StafflineStemStrokeWidth * 1.2F; } }
         #endregion
 
-        public float InputStavesSizeFactor { get { return 1.5F; } }
+        public float InputSizeFactor { get { return 1.5F; } }
         public float BeamThickness { get { return Gap * 0.42F; } }
 
         #endregion

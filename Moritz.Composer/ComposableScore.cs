@@ -410,8 +410,8 @@ namespace Moritz.Composer
                     int staffNameIndex = nPrintedOutputStaves + staffIndex;
                     string staffname = StaffName(i, staffNameIndex);
 
-                    float gap = _pageFormat.Gap * _pageFormat.InputStavesSizeFactor;
-                    float stafflineStemStrokeWidth = _pageFormat.StafflineStemStrokeWidth * _pageFormat.InputStavesSizeFactor;
+                    float gap = _pageFormat.Gap * _pageFormat.InputSizeFactor;
+                    float stafflineStemStrokeWidth = _pageFormat.StafflineStemStrokeWidth * _pageFormat.InputSizeFactor;
                     InputStaff inputStaff = new InputStaff(system, staffname, _pageFormat.StafflinesPerStaff[staffIndex], gap, stafflineStemStrokeWidth);
 
                     List<byte> inputVoiceIndices = _pageFormat.VisibleInputVoiceIndicesPerStaff[staffIndex];

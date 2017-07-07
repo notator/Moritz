@@ -294,8 +294,8 @@ namespace Moritz.Symbols
                             float beamStrokeThickness = pageFormat.StafflineStemStrokeWidth;
                             if(this is InputVoice)
                             {
-                                beamThickness *= pageFormat.InputStavesSizeFactor;
-                                beamStrokeThickness *= pageFormat.InputStavesSizeFactor;
+                                beamThickness *= pageFormat.InputSizeFactor;
+                                beamStrokeThickness *= pageFormat.InputSizeFactor;
                             }
                             chordsBeamedTogether[0].BeamBlock =
                                 new BeamBlock(currentClef, chordsBeamedTogether, this.StemDirection, beamThickness, beamStrokeThickness, this is InputVoice);
