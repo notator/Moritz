@@ -34,15 +34,18 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         public virtual void WriteSVG(SvgWriter w, bool staffIsVisible, List<CarryMsgs> carryMsgsPerChannel)
         {
-            Barline firstBarline = null;
-            for(int i = 0; i < NoteObjects.Count; ++i)
+            if(staffIsVisible)
             {
-                firstBarline = NoteObjects[i] as Barline;
-                if(firstBarline != null)
-                    break;
+                Barline firstBarline = null;
+                for(int i = 0; i < NoteObjects.Count; ++i)
+                {
+                    firstBarline = NoteObjects[i] as Barline;
+                    if(firstBarline != null)
+                        break;
+                }
+                Debug.Assert(firstBarline != null);
+                firstBarline.WriteStaffNameAndBarNumberSVG(w, staffIsVisible, (firstBarline.Voice is InputVoice));
             }
-            Debug.Assert(firstBarline != null);
-            firstBarline.WriteStaffNameAndBarNumberSVG(w, staffIsVisible, (firstBarline.Voice is InputVoice));
 
             for(int i = 0; i < NoteObjects.Count; ++i)
             {
