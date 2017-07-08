@@ -18,8 +18,16 @@ namespace Moritz.Symbols
         public FlagsMetrics(DurationClass durationClass, float fontHeight, VerticalDir stemDirection, bool isInput)
             : base(isInput ? CSSClass.inputFlag : CSSClass.flag)
         {
-			_left = 0F;
-			_right = 0.31809F * fontHeight;
+			_left = 0F;           
+            
+            // (0.31809F * fontHeight) is maximum x in the flag def.
+            _right = (0.31809F * fontHeight);
+            if(stemDirection == VerticalDir.up)
+            {
+                float rightPadding = (0.06F * fontHeight);
+                _right += rightPadding;
+            }
+            
 			_originX = 0F;
 			_originY = 0F;
 

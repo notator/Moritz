@@ -57,27 +57,27 @@ namespace Moritz.Algorithm.PianolaMusic
         protected override void InsertClefChanges(List<List<VoiceDef>> bars)
         {
             // test code...
-            VoiceDef voiceDef1 = bars[0][1];
-            voiceDef1.InsertClefDef(9, "b3");
-            voiceDef1.InsertClefDef(8, "b2");
-            voiceDef1.InsertClefDef(7, "b1");
-            voiceDef1.InsertClefDef(6, "b");
-            voiceDef1.InsertClefDef(5, "t3");
-            voiceDef1.InsertClefDef(4, "t2");
-            voiceDef1.InsertClefDef(3, "t1");
-            voiceDef1.InsertClefDef(2, "t");
+            //VoiceDef voiceDef1 = bars[0][1];
+            //voiceDef1.InsertClefDef(9, "b3");
+            //voiceDef1.InsertClefDef(8, "b2");
+            //voiceDef1.InsertClefDef(7, "b1");
+            //voiceDef1.InsertClefDef(6, "b");
+            //voiceDef1.InsertClefDef(5, "t3");
+            //voiceDef1.InsertClefDef(4, "t2");
+            //voiceDef1.InsertClefDef(3, "t1");
+            //voiceDef1.InsertClefDef(2, "t");
         }
 
         protected void InsertLyrics(List<List<VoiceDef>> bars)
         {
             // test code...
-            VoiceDef voiceDef0 = bars[0][0];
-            MidiChordDef mcd1 = voiceDef0[2] as MidiChordDef;
-            mcd1.Lyric = "lyric1";
-            MidiChordDef mcd2 = voiceDef0[3] as MidiChordDef;
-            mcd2.Lyric = "lyric2";
-            MidiChordDef mcd3 = voiceDef0[4] as MidiChordDef;
-            mcd3.Lyric = "lyric3";
+            //VoiceDef voiceDef0 = bars[0][0];
+            //MidiChordDef mcd1 = voiceDef0[2] as MidiChordDef;
+            //mcd1.Lyric = "lyric1";
+            //MidiChordDef mcd2 = voiceDef0[3] as MidiChordDef;
+            //mcd2.Lyric = "lyric2";
+            //MidiChordDef mcd3 = voiceDef0[4] as MidiChordDef;
+            //mcd3.Lyric = "lyric3";
         }
 
         // Returns two lists of ints. The first is contains the durations of the upper track, the second the lower.

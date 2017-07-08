@@ -18,11 +18,14 @@ namespace Moritz.Symbols
         /// </summary>
         public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel)
         {
-            w.SvgStartGroup(this.Metrics.CSSClass.ToString());    // "staff"
+            if(this.Metrics != null) // Metrics is null for invisible OutputStaffs
+            {
+                w.SvgStartGroup(this.Metrics.CSSClass.ToString());    // "staff"
 
-            base.WriteSVG(w, true, systemNumber, staffNumber, carryMsgsPerChannel);
+                base.WriteSVG(w, true, systemNumber, staffNumber, carryMsgsPerChannel);
 
-            w.SvgEndGroup(); // outputStaff
+                w.SvgEndGroup(); // outputStaff
+            }
         }
     }
 

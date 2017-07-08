@@ -2,6 +2,7 @@
 using System.Xml;
 using System.Text;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 using Moritz.Globals;
 
@@ -281,27 +282,6 @@ namespace Moritz.Xml
 			_w.WriteAttributeString("class", cssClass.ToString());
             _w.WriteAttributeString("x", M.FloatToShortString(x));
             _w.WriteAttributeString("y", M.FloatToShortString(y));
-            //if(String.IsNullOrEmpty(type))
-            //{
-            //    switch(textInfo.TextHorizAlign)
-            //    {
-            //        case TextHorizAlign.left:
-            //            break;
-            //        case TextHorizAlign.center:
-            //            _w.WriteAttributeString("text-anchor", "middle");
-            //            break;
-            //        case TextHorizAlign.right:
-            //            _w.WriteAttributeString("text-anchor", "end");
-            //            break;
-            //    }
-
-            //    _w.WriteAttributeString("font-size", M.FloatToShortString(textInfo.FontHeight));
-            //    _w.WriteAttributeString("font-family", textInfo.FontFamily);
-            //    if(textInfo.ColorString != null
-            //        && !String.IsNullOrEmpty(textInfo.ColorString.String)
-            //        && !textInfo.ColorString.IsBlack)
-            //        _w.WriteAttributeString("fill", textInfo.ColorString.String);
-            //}
             _w.WriteString(text);
             _w.WriteEndElement(); // text
         }
@@ -334,26 +314,9 @@ namespace Moritz.Xml
         ///     [path d="M 0,1    0,1.12096 0.31809,1.2467 Q 0.299,1.20 0.31809,1.1257" /]
         /// [/g]
         /// </summary>
-        public void WriteFlagBlock(int nFlags, bool rightFlag, float fontHeight)
+        public void WriteFlagBlock(StringBuilder type, int nFlags, bool rightFlag, float fontHeight)
         {
-            StringBuilder type = new StringBuilder();
-            if(rightFlag)
-                type.Append("right");
-            else
-                type.Append("left");
-            type.Append(nFlags);
-            if(nFlags == 1)
-                type.Append("Flag");
-            else
-                type.Append("Flags");
-
-            string id = type.ToString();
-
-            _w.WriteStartElement("g");
-
-            if(!String.IsNullOrEmpty(id))
-                _w.WriteAttributeString("id", id);
-
+            string id = type.ToString();       
             string x1 = "0";
             string x2 = "0";
             string x3 = M.FloatToShortString(0.31809F * fontHeight);
@@ -367,6 +330,9 @@ namespace Moritz.Xml
             float y4 = sign * 0.2F * fontHeight;
             float y5 = sign * 0.1257F * fontHeight;
             float flagOffset = sign * 0.25F * fontHeight;
+
+            _w.WriteStartElement("g");
+            _w.WriteAttributeString("id", id);
 
             for(float flagIndex = 0; flagIndex < nFlags; flagIndex++)
             {
@@ -384,8 +350,6 @@ namespace Moritz.Xml
             }
 
             _w.WriteEndElement();
-
-        }
-
+        } 
     }
 }

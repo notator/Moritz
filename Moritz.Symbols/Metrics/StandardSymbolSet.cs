@@ -25,6 +25,12 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         public override void WriteSymbolDefinitions(SvgWriter w, PageFormat pageFormat)
         {
+            WriteClefDefinitions(w, pageFormat);
+            WriteFlagDefinitions(w, pageFormat);
+        }
+
+        private void WriteClefDefinitions(SvgWriter w, PageFormat pageFormat)
+        {
             List<ClefID> uc = new List<ClefID>(ClefMetrics.UsedClefIDs) as List<ClefID>;
 
             float normalHeight = pageFormat.MusicFontHeight;
@@ -106,12 +112,6 @@ namespace Moritz.Symbols
                 WriteClefMulti8SymbolDef(w, false, false, true, 3, inputHeight); // bass, normal, input, 3
             if(uc.Contains(ClefID.inputSmallBassClef3x8))
                 WriteClefMulti8SymbolDef(w, false, true, true, 3, inputSmallHeight); // bass, small, input, 3
-
-            for(int i = 1; i < 6; i++)
-            {
-                WriteRightFlagBlock(w, i, normalHeight);
-                WriteLeftFlagBlock(w, i, normalHeight);
-            }
         }
         #region symbol definitions
 
@@ -363,13 +363,79 @@ namespace Moritz.Symbols
         }
         #endregion
 
-        private void WriteRightFlagBlock(SvgWriter w, int nFlags, float fontHeight)
+        private void WriteFlagDefinitions(SvgWriter w, PageFormat pageFormat)
         {
-            w.WriteFlagBlock(nFlags, true, fontHeight);
+            List<FlagID> usedIDs = new List<FlagID>(FlagsMetrics.UsedFlagIDs);
+            List<string> usedFlagIDs = new List<string>();
+            foreach(FlagID flagID in usedIDs)
+            {
+                usedFlagIDs.Add(flagID.ToString());
+            }
+
+            float normalHeight = pageFormat.MusicFontHeight;
+
+            for(int i = 1; i < 6; i++)
+            {
+                WriteLeftFlagBlock(w, i, normalHeight, false, usedFlagIDs);
+            }
+            for(int i = 1; i < 6; i++)
+            {
+                WriteRightFlagBlock(w, i, normalHeight, false, usedFlagIDs);
+            }
+
+            float inputHeight = normalHeight * pageFormat.InputSizeFactor;
+            for(int i = 1; i < 6; i++)
+            {
+                WriteLeftFlagBlock(w, i, inputHeight, true, usedFlagIDs);
+            }
+            for(int i = 1; i < 6; i++)
+            {
+                WriteRightFlagBlock(w, i, inputHeight, true, usedFlagIDs);
+            }
         }
-        private void WriteLeftFlagBlock(SvgWriter w, int nFlags, float fontHeight)
+
+        private void WriteRightFlagBlock(SvgWriter w, int nFlags, float fontHeight, bool isInput, List<string> usedFlagIDs)
         {
-            w.WriteFlagBlock(nFlags, false, fontHeight);
+            StringBuilder id = GetFlagID(true, nFlags, isInput);
+            if(usedFlagIDs.Contains(id.ToString()))
+            {
+                w.WriteFlagBlock(id, nFlags, true, fontHeight);
+            }
+        }
+
+        private void WriteLeftFlagBlock(SvgWriter w, int nFlags, float fontHeight, bool isInput, List<string> usedFlagIDs)
+        {
+            StringBuilder id = GetFlagID(false, nFlags, isInput);
+            if(usedFlagIDs.Contains(id.ToString()))
+            {
+                w.WriteFlagBlock(id, nFlags, false, fontHeight);
+            }
+        }
+
+        private StringBuilder GetFlagID(bool isRight, int nFlags, bool isInput)
+        {
+            StringBuilder type = new StringBuilder();
+            if(isInput)
+            {
+                if(isRight)
+                    type.Append("inputRight");
+                else
+                    type.Append("inputLeft");
+            }
+            else
+            {
+                if(isRight)
+                    type.Append("right");
+                else
+                    type.Append("left");
+            }
+            type.Append(nFlags);
+            if(nFlags == 1)
+                type.Append("Flag");
+            else
+                type.Append("Flags");
+
+            return type;
         }
         #endregion symbol definitions
 

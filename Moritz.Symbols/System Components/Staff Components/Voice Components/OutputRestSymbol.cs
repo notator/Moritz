@@ -44,13 +44,16 @@ namespace Moritz.Symbols
         {
             if(LocalCautionaryChordDef == null)
             {
-				w.SvgStartGroup(Metrics.CSSClass.ToString()); // "outputRest"
-
                 Debug.Assert(_msDuration > 0);
 				if(staffIsVisible)
 				{
-					w.WriteAttributeString("score", "alignment", null, ((Metrics.Left + Metrics.Right) / 2).ToString(M.En_USNumberFormat));
+                    w.SvgStartGroup(Metrics.CSSClass.ToString()); // "outputRest"
+                    w.WriteAttributeString("score", "alignment", null, ((Metrics.Left + Metrics.Right) / 2).ToString(M.En_USNumberFormat));
 				}
+                else
+                {
+                    w.SvgStartGroup("outputRest"); // Metrics is null
+                }
 
                 _midiRestDef.WriteSVG(w, channel, carryMsgs);
 
