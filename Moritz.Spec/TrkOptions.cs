@@ -31,7 +31,7 @@ namespace Moritz.Spec
 	///     speed=1 -- performed durations are the msDurations written in the score.
 	///     trkOff="undefined" -- performed noteOff messages have no affect on the trk (trks play to completion, as written in the score).
 	///     
-	/// See also: http://james-ingram-act-two.de/open-source/svgScoreNamespace.html
+	/// See also: http://james-ingram-act-two.de/open-source/svgScoreExtensions.html
     /// </summary>
     public sealed class TrkOptions
     {

@@ -78,7 +78,7 @@ namespace Moritz.Spec
     /// To turn a controller off during a score, use the CControllerType.disabled setting.
     /// The continuous controllers are disabled by default in the Assistant Performer.
     /// 
-    /// See also: http://james-ingram-act-two.de/open-source/svgScoreNamespace.html
+    /// See also: http://james-ingram-act-two.de/open-source/svgScoreExtensions.html
     /// </summary>
     public sealed class TrackCCSettings
 	{

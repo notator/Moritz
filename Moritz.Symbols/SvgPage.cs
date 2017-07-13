@@ -224,7 +224,7 @@ namespace Moritz.Symbols
 
             // Standard definition of the "score" namespace.
             // The file documents the additional attributes and elements available in the "score" namespace.
-            w.WriteAttributeString("xmlns", "score", null, "http://www.james-ingram-act-two.de/open-source/svgScoreNamespace.html");
+            w.WriteAttributeString("xmlns", "score", null, "http://www.james-ingram-act-two.de/open-source/svgScoreExtensions.html");
 
             // The file defines and documents all the element classes used in this particular scoreType.
             // The definitions include information as to how the classes nest, and the directions in which they are read.
