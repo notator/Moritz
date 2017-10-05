@@ -22,7 +22,7 @@ namespace Moritz.Symbols
         {
             if(Visible && staffIsVisible)
             {
-                w.SvgStartGroup(ChordMetrics.CSSClass.ToString()); // "cautionaryChord"
+                w.SvgStartGroup(ChordMetrics.CSSObjectClass.ToString()); // "cautionaryChord"
                 w.SvgStartGroup(null);
 
                 this.ChordMetrics.WriteSVG(w);

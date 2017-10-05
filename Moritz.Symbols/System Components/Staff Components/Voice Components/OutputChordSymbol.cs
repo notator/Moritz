@@ -93,7 +93,7 @@ namespace Moritz.Symbols
             }
         }
 
-        internal void SetNoteheadColors()
+        internal void SetNoteheadColorClasses()
         {
             foreach(Head head in HeadsTopDown)
             {
@@ -102,40 +102,40 @@ namespace Moritz.Symbols
                 int velocity = head.MidiVelocity;
                 if(velocity > M.MaxMidiVelocity[M.Dynamic.ff])
                 {
-                    head.ColorAttribute = M.NoteheadColors[M.Dynamic.fff]; // fff    
+                    head.ColorClass = CSSClass.fffColor;    
                 }
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.f])
                 {
-                    head.ColorAttribute = M.NoteheadColors[M.Dynamic.ff]; // ff
+                    head.ColorClass = CSSClass.ffColor;
                 }
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.mf])
                 {
-                    head.ColorAttribute = M.NoteheadColors[M.Dynamic.f]; // f
-                }
+                    head.ColorClass = CSSClass.fColor;
+				}
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.mp])
                 {
-                    head.ColorAttribute = M.NoteheadColors[M.Dynamic.mf]; // mf
-                }
+                    head.ColorClass = CSSClass.mfColor;
+				}
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.p])
                 {
-                    head.ColorAttribute = M.NoteheadColors[M.Dynamic.mp]; // mp
-                }
+                    head.ColorClass = CSSClass.mpColor;
+				}
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.pp])
                 {
-                    head.ColorAttribute = M.NoteheadColors[M.Dynamic.p]; // p
-                }
+                    head.ColorClass = CSSClass.pColor;
+				}
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.ppp])
                 {
-                    head.ColorAttribute = M.NoteheadColors[M.Dynamic.pp]; // pp
-                }
+                    head.ColorClass = CSSClass.ppColor;
+				}
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.pppp])
                 {
-                    head.ColorAttribute = M.NoteheadColors[M.Dynamic.ppp]; // ppp
-                }
+                    head.ColorClass = CSSClass.pppColor;
+				}
                 else // > 0 
                 {
-                    head.ColorAttribute = M.NoteheadColors[M.Dynamic.pppp]; // pppp
-                }
+                    head.ColorClass = CSSClass.ppppColor;
+				}
             }
         }
 
@@ -156,7 +156,7 @@ namespace Moritz.Symbols
 
             if(staffIsVisible)
 			{
-                w.SvgStartGroup(ChordMetrics.CSSClass.ToString()); // "chord"; 
+                w.SvgStartGroup(ChordMetrics.CSSObjectClass.ToString()); // "chord"; 
                 w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
 			}
             else

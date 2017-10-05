@@ -276,24 +276,58 @@ namespace Moritz.Xml
             _w.WriteEndElement(); // path
         }
 
-        public void SvgText(CSSClass cssClass, string text, float x, float y)
-        {
-            _w.WriteStartElement("text");
+		public void SvgText(CSSClass cssClass, string text, float x, float y)
+		{
+			_w.WriteStartElement("text");
 			_w.WriteAttributeString("class", cssClass.ToString());
-            _w.WriteAttributeString("x", M.FloatToShortString(x));
-            _w.WriteAttributeString("y", M.FloatToShortString(y));
-            _w.WriteString(text);
-            _w.WriteEndElement(); // text
-        }
+			_w.WriteAttributeString("x", M.FloatToShortString(x));
+			_w.WriteAttributeString("y", M.FloatToShortString(y));
+			_w.WriteString(text);
+			_w.WriteEndElement(); // text
+		}
 
-        /// <summary>
-        /// Writes an SVG "use" element, overriding its x- and y-coordinates.
-        /// </summary>
-        /// <param name="cssClass">Currently either CSSClass.clef or CSSClass.flag</param>
-        /// <param name="cssClass">Currently either CSSClass.clef or CSSClass.flag</param>
-        /// <param name="y">This element's y-coordinate.</param>
-        /// <param name="idOfObjectToUse">(Do not include the leading '#'. It will be inserted automatically.)</param>
-        public void SvgUseXY(CSSClass cssClass, string idOfObjectToUse, float x, float y)
+		// Currently used only by HeadMetrics (to write coloured noteheads).
+		public void SvgText(List<CSSClass> cssClasses, string text, float x, float y)
+		{
+			string classesString = ClassListToString(cssClasses);
+
+			_w.WriteStartElement("text");
+			if(!String.IsNullOrEmpty(classesString))
+			{
+				_w.WriteAttributeString("class", classesString);
+			}
+			_w.WriteAttributeString("x", M.FloatToShortString(x));
+			_w.WriteAttributeString("y", M.FloatToShortString(y));
+			_w.WriteString(text);
+			_w.WriteEndElement(); // text
+		}
+
+		private string ClassListToString(List<CSSClass> cssClasses)
+		{
+			if(cssClasses == null || cssClasses.Count == 0)
+			{
+				return null;
+			}
+
+			StringBuilder sb = new StringBuilder();
+			foreach(CSSClass cssClass in cssClasses)
+			{
+				sb.Append(cssClass.ToString());
+				sb.Append(" ");
+			}
+			sb.Remove(sb.Length - 1, 1);
+
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Writes an SVG "use" element, overriding its x- and y-coordinates.
+		/// </summary>
+		/// <param name="cssClass">Currently either CSSClass.clef or CSSClass.flag</param>
+		/// <param name="cssClass">Currently either CSSClass.clef or CSSClass.flag</param>
+		/// <param name="y">This element's y-coordinate.</param>
+		/// <param name="idOfObjectToUse">(Do not include the leading '#'. It will be inserted automatically.)</param>
+		public void SvgUseXY(CSSClass cssClass, string idOfObjectToUse, float x, float y)
         {
             _w.WriteStartElement("use");
             _w.WriteAttributeString("class", cssClass.ToString());
@@ -350,6 +384,19 @@ namespace Moritz.Xml
             }
 
             _w.WriteEndElement();
-        } 
-    }
+        }
+
+		public static readonly Dictionary<CSSClass, string> CSSClassColorDict = new Dictionary<CSSClass, string>()
+		{
+			{ CSSClass.fffColor, M.NoteheadColors[M.Dynamic.fff] },
+			{ CSSClass.ffColor, M.NoteheadColors[M.Dynamic.ff] },
+			{ CSSClass.fColor, M.NoteheadColors[M.Dynamic.f] },
+			{ CSSClass.mfColor, M.NoteheadColors[M.Dynamic.mf] },
+			{ CSSClass.mpColor, M.NoteheadColors[M.Dynamic.mp] },
+			{ CSSClass.pColor, M.NoteheadColors[M.Dynamic.p] },
+			{ CSSClass.ppColor, M.NoteheadColors[M.Dynamic.pp] },
+			{ CSSClass.pppColor, M.NoteheadColors[M.Dynamic.ppp] },
+			{ CSSClass.ppppColor, M.NoteheadColors[M.Dynamic.pppp] }
+		};
+	}
 }

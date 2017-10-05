@@ -11,18 +11,39 @@ namespace Moritz.Symbols
 {
 	public abstract class Metrics
 	{
-        protected Metrics(CSSClass cssClass)
+		protected Metrics(CSSClass cssClass)
+		{
+			_cssClassList = new List<CSSClass>() { cssClass }; 
+			if(!_usedCSSClasses.Contains(cssClass))
+			{
+				_usedCSSClasses.Add(cssClass);
+			}
+		}
+
+		protected Metrics(List<CSSClass> cssClassList)
         {
-            _cssClass = cssClass;
-            if(!_cssClasses.Contains(cssClass))
-            {
-                _cssClasses.Add(cssClass);
-            }
+            _cssClassList = cssClassList;
+			foreach(CSSClass cssClass in cssClassList)
+			{
+				if(!_usedCSSClasses.Contains(cssClass))
+				{
+					_usedCSSClasses.Add(cssClass);
+				}
+			}
         }
 
-        public static void ClearCSSClasses()
+		protected void AddCSSClass(CSSClass colorClass)
+		{
+			_cssClassList.Add(colorClass);
+			if(!_usedCSSClasses.Contains(colorClass))
+			{
+				_usedCSSClasses.Add(colorClass);
+			}
+		}
+
+		public static void ClearCSSClasses()
         {
-            _cssClasses.Clear();
+            _usedCSSClasses.Clear();
         }
 
         public virtual void Move(float dx, float dy)
@@ -197,10 +218,12 @@ namespace Moritz.Symbols
 		public float OriginY { get { return _originY; } }
 		protected float _originY = 0F;
 
-        public CSSClass CSSClass { get { return _cssClass; } }
-        private CSSClass _cssClass = CSSClass.none;
 
-        private static List<CSSClass> _cssClasses = new List<CSSClass>();
-        public static IReadOnlyList<CSSClass> CSSClasses { get { return _cssClasses as IReadOnlyList<CSSClass>; } }
+		public IReadOnlyList<CSSClass> CSSClassList	{ get{ return _cssClassList as IReadOnlyList<CSSClass>; } }
+		protected List<CSSClass> _cssClassList = null; // must be set by constructors
+		public CSSClass CSSObjectClass {  get { return CSSClassList[0]; } }
+
+        private static List<CSSClass> _usedCSSClasses = new List<CSSClass>();
+        public static IReadOnlyList<CSSClass> UsedCSSClasses { get { return _usedCSSClasses as IReadOnlyList<CSSClass>; } }
     }
 }

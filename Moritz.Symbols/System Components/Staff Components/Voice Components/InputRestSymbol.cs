@@ -24,7 +24,7 @@ namespace Moritz.Symbols
         {
             if(LocalCautionaryChordDef == null)
             {
-				w.SvgStartGroup(Metrics.CSSClass.ToString());  // "inputRest"
+				w.SvgStartGroup(Metrics.CSSObjectClass.ToString());  // "inputRest"
 
                 Debug.Assert(_msDuration > 0);
 				if(staffIsVisible)

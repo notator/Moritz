@@ -99,9 +99,9 @@ namespace Moritz.Symbols
             string flagIDString = _flagID.ToString();
 
             if(flagIDString.Contains("ight")) // stemDirection is up
-                w.SvgUseXY(CSSClass, flagIDString, _left, _top);
+                w.SvgUseXY(CSSObjectClass, flagIDString, _left, _top);
             else
-                w.SvgUseXY(CSSClass, flagIDString, _left, _bottom);
+                w.SvgUseXY(CSSObjectClass, flagIDString, _left, _bottom);
         }
 
         public FlagID FlagID { get { return _flagID; } private set { _flagID = value; } }

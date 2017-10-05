@@ -136,16 +136,7 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            w.WriteStartElement("text");
-            w.WriteAttributeString("class", CSSClass.ToString());
-            w.WriteAttributeString("x", M.FloatToShortString(_originX));
-            w.WriteAttributeString("y", M.FloatToShortString(_originY));
-            if(! string.IsNullOrEmpty(_colorAttribute))
-            {
-                w.WriteAttributeString("fill", _colorAttribute);
-            }
-			w.WriteString(_characterString); // e.g. Unicode character
-			w.WriteEndElement();
+			w.SvgText(CSSObjectClass, _characterString, _originX, _originY);
 		}
 
 		/// <summary>
@@ -270,8 +261,6 @@ namespace Moritz.Symbols
         protected string _characterString = "";
 		protected float _fontHeight;
 		protected TextHorizAlign _textHorizAlign = TextHorizAlign.left;
-        public string ColorAttribute { get { return _colorAttribute; } }
-        protected string _colorAttribute = "";
     }
     internal class RestMetrics : CLichtCharacterMetrics
 	{
@@ -350,16 +339,7 @@ namespace Moritz.Symbols
             w.WriteStartElement("g");
             w.WriteAttributeString("class", "graphics");
 
-            w.WriteStartElement("text");
-            w.WriteAttributeString("class", CSSClass.ToString()); // Rewrite the class, otherwise it will still have the default text class!
-            w.WriteAttributeString("x", M.FloatToShortString(_originX));
-            w.WriteAttributeString("y", M.FloatToShortString(_originY));
-            if(!string.IsNullOrEmpty(_colorAttribute))
-            {
-                w.WriteAttributeString("fill", _colorAttribute);
-            }
-            w.WriteString(_characterString); // e.g. Unicode character
-            w.WriteEndElement();
+			w.SvgText(CSSObjectClass, _characterString, _originX, _originY);
 
             if(_ledgerlineBlockMetrics != null && _ledgerlineVisible)
             {
@@ -403,9 +383,9 @@ namespace Moritz.Symbols
 			_rightStemX = _right;
 			_left -= horizontalPadding;
 			_right += horizontalPadding;
-            if(head != null && head.ColorAttribute != null)
+            if(head != null && head.ColorClass != CSSClass.black) // black is the default
             {
-                _colorAttribute = head.ColorAttribute;
+				AddCSSClass(head.ColorClass);
             }
 		}
 
@@ -474,6 +454,11 @@ namespace Moritz.Symbols
 			_rightStemX += dx;
 		}
 
+		public override void WriteSVG(SvgWriter w)
+		{
+			w.SvgText(_cssClassList, _characterString, _originX, _originY);
+		}
+
 		public float LeftStemX { get { return _leftStemX; } }
 		private float _leftStemX;
         public float RightStemX { get { return _rightStemX; } }
@@ -503,15 +488,20 @@ namespace Moritz.Symbols
 					_right += gap * 0.1F;
 					break;
 			}
-            if(head != null && head.ColorAttribute != null)
+            if(head != null && head.ColorClass != CSSClass.black)
             {
-                _colorAttribute = head.ColorAttribute;
+				_cssClassList.Add(head.ColorClass);    
             }
         }
 
 		public object Clone()
 		{
 			return this.MemberwiseClone();
+		}
+
+		public override void WriteSVG(SvgWriter w)
+		{
+			w.SvgText(_cssClassList, _characterString, _originX, _originY);
 		}
 
 	}

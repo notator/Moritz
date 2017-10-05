@@ -60,7 +60,7 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            w.SvgLine(CSSClass, _originX, _top, _originX, _bottom);
+            w.SvgLine(CSSObjectClass, _originX, _top, _originX, _bottom);
         }
 
         public object Clone()
@@ -117,10 +117,10 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
         {
-            CSSClass ledgerlineClass = (CSSClass == CSSClass.inputLedgerlines) ? CSSClass.inputLedgerline : CSSClass.ledgerline;
+            CSSClass ledgerlineClass = (CSSObjectClass == CSSClass.inputLedgerlines) ? CSSClass.inputLedgerline : CSSClass.ledgerline;
 
             w.WriteStartElement("g");
-            w.WriteAttributeString("class", CSSClass.ToString());
+            w.WriteAttributeString("class", CSSObjectClass.ToString());
             foreach(float y in Ys)
 			{
 				w.SvgLine(ledgerlineClass, _left + _strokeWidth, y, _right - _strokeWidth, y);
@@ -151,7 +151,7 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-			w.SvgCautionaryBracket(CSSClass.ToString(), _isLeftBracket, _top, _right, _bottom, _left);
+			w.SvgCautionaryBracket(CSSObjectClass.ToString(), _isLeftBracket, _top, _right, _bottom, _left);
 		}
 
 		private readonly bool _isLeftBracket;
@@ -208,7 +208,7 @@ namespace Moritz.Symbols
         public override void WriteSVG(SvgWriter w)
         {
             if(_drawExtender)
-                w.SvgLine(CSSClass, _left, _originY, _right, _originY);
+                w.SvgLine(CSSObjectClass, _left, _originY, _right, _originY);
         }
 
         public string StrokeColor { get { return _strokeColor; } }

@@ -20,7 +20,7 @@ namespace Moritz.Symbols
         {
             if(this.Metrics != null) // Metrics is null for invisible OutputStaffs
             {
-                w.SvgStartGroup(this.Metrics.CSSClass.ToString());    // "staff"
+                w.SvgStartGroup(this.Metrics.CSSObjectClass.ToString());    // "staff"
 
                 base.WriteSVG(w, true, systemNumber, staffNumber, carryMsgsPerChannel);
 

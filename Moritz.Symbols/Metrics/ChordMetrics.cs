@@ -94,9 +94,9 @@ namespace Moritz.Symbols
         private void SetHeadsMetrics(ChordSymbol chord, float ledgerlineStemStrokeWidth)
         {
             _headsMetricsTopDown = new List<HeadMetrics>();
-            CSSClass headClass = GetHeadClass(chord);
+            CSSClass mainHeadClass = GetMainHeadClass(chord);
 
-            HeadMetrics hMetrics = new HeadMetrics(chord, null, _gap, headClass); // the head is horizontally aligned at 0 by default.
+            HeadMetrics hMetrics = new HeadMetrics(chord, null, _gap, mainHeadClass); // the head is horizontally aligned at 0 by default.
             float horizontalShift = hMetrics.RightStemX - hMetrics.LeftStemX - (ledgerlineStemStrokeWidth / 2F); // the distance to shift left or right if heads would collide
             float shiftRange = _gap * 0.75F;
 
@@ -125,8 +125,8 @@ namespace Moritz.Symbols
                             newHeadAlignX = 0;
                     }
 
-                    CSSClass headClass1 = GetHeadClass(chord);
-                    HeadMetrics headMetrics = new HeadMetrics(chord, head, _gap, headClass1);
+                    CSSClass mainHeadClass1 = GetMainHeadClass(chord);
+                    HeadMetrics headMetrics = new HeadMetrics(chord, head, _gap, mainHeadClass1);
                     headMetrics.Move(newHeadAlignX, newHeadOriginY); // moves head.originY to headY
                     bottomUpMetrics.Add(headMetrics);
                 }
@@ -155,7 +155,7 @@ namespace Moritz.Symbols
                             newHeadAlignX = 0;
                     }
 
-                    CSSClass headClass2 = GetHeadClass(chord);
+                    CSSClass headClass2 = GetMainHeadClass(chord);
                     HeadMetrics headMetrics = new HeadMetrics(chord, head, _gap, headClass2);
                     headMetrics.Move(newHeadAlignX, newHeadOriginY); // moves head.originY to headY
                     _headsMetricsTopDown.Add(headMetrics);
@@ -166,7 +166,7 @@ namespace Moritz.Symbols
             Debug.Assert(_headsMetricsTopDown.Count == chord.HeadsTopDown.Count);
         }
 
-        private CSSClass GetHeadClass(ChordSymbol chord)
+        private CSSClass GetMainHeadClass(ChordSymbol chord)
         {
             CSSClass headClass = CSSClass.notehead; // OutputChordSymbol
             if(chord is CautionaryChordSymbol)
@@ -2191,7 +2191,7 @@ namespace Moritz.Symbols
             }
             if(top != float.MaxValue)
             {
-                ledgerlineBlockMetrics = new LedgerlineBlockMetrics(left, right, staffLineStemStrokeWidth, lbm1.CSSClass);
+                ledgerlineBlockMetrics = new LedgerlineBlockMetrics(left, right, staffLineStemStrokeWidth, lbm1.CSSObjectClass);
                 ledgerlineBlockMetrics.SetTop(top);
                 ledgerlineBlockMetrics.SetBottom(bottom);
             }

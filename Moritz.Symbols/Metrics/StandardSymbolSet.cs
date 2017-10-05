@@ -614,7 +614,7 @@ namespace Moritz.Symbols
 
                 if(this._coloredVelocities == true)
                 {
-                    outputChordSymbol.SetNoteheadColors();
+                    outputChordSymbol.SetNoteheadColorClasses();
                 }
                 else if(midiChordDef.NotatedMidiVelocities[0] != currentVelocity)
                 {
@@ -1066,8 +1066,12 @@ namespace Moritz.Symbols
             {
                 if((x2s[i] - x1s[i]) > (gap / 2))
                 {
+					IReadOnlyList<CSSClass> headClasses = headMetrics[i].CSSClassList;
+					CSSClass cssColorClass = (headClasses.Count > 1) ? headClasses[1] : CSSClass.black;
+					string strokeColorString = (cssColorClass == CSSClass.black) ? "#000000" : SvgWriter.CSSClassColorDict[cssColorClass];
+
                     NoteheadExtenderMetrics nem =
-                        new NoteheadExtenderMetrics(x1s[i], x2s[i], ys[i], extenderStrokeWidth, headMetrics[i].ColorAttribute, gap, drawExtender);
+                        new NoteheadExtenderMetrics(x1s[i], x2s[i], ys[i], extenderStrokeWidth, strokeColorString, gap, drawExtender);
 
                     noteheadExtendersMetrics.Add(nem);
                 }
@@ -1203,5 +1207,5 @@ namespace Moritz.Symbols
         }
 
         private readonly bool _coloredVelocities;
-    }
+	}
 }

@@ -8,7 +8,6 @@ using System.Windows.Forms;
 
 using Moritz.Globals;
 using Moritz.Xml;
-using Moritz.Spec;
 
 namespace Moritz.Symbols
 {
@@ -188,7 +187,7 @@ namespace Moritz.Symbols
         private StringBuilder GetStyles(PageFormat pageFormat, int pageNumber)
         {
 
-            List<CSSClass> usedCSSClasses = new List<CSSClass>(Metrics.CSSClasses) as List<CSSClass>;
+            List<CSSClass> usedCSSClasses = new List<CSSClass>(Metrics.UsedCSSClasses) as List<CSSClass>;
             List<ClefID> usedClefIDs = new List<ClefID>(ClefMetrics.UsedClefIDs) as List<ClefID>;
             List<FlagID> usedFlagIDs = new List<FlagID>(FlagsMetrics.UsedFlagIDs) as List<FlagID>;
 
@@ -301,7 +300,10 @@ namespace Moritz.Symbols
             StringBuilder fontSizeStyle = TextStyle(standardSizeClasses.ToString(), "", musicFontHeight, "");
             fontStyles.Append(fontSizeStyle);
 
-            if(usedCSSClasses.Contains(CSSClass.dynamic))
+			StringBuilder colorStyles = GetColorStyles(usedCSSClasses);
+			fontStyles.Append(colorStyles);
+
+			if(usedCSSClasses.Contains(CSSClass.dynamic))
             {
                 string dynamicFontHeight = M.FloatToShortString(pageFormat.DynamicFontHeight);
                 fontSizeStyle = TextStyle("." + CSSClass.dynamic.ToString(), "", dynamicFontHeight, "");
@@ -445,7 +447,44 @@ namespace Moritz.Symbols
             return fontStyles;
         }
 
-        private StringBuilder GetExistingClichtClasses(List<CSSClass> usedCSSClasses, List<ClefID> usedClefIDs)
+		private StringBuilder GetColorStyles(List<CSSClass> usedCSSClasses)
+		{
+			StringBuilder rval = new StringBuilder();
+			rval.Append(FillDefinition(CSSClass.fffColor, usedCSSClasses));
+			rval.Append(FillDefinition(CSSClass.ffColor, usedCSSClasses));
+			rval.Append(FillDefinition(CSSClass.fColor, usedCSSClasses));
+			rval.Append(FillDefinition(CSSClass.mfColor, usedCSSClasses));
+			rval.Append(FillDefinition(CSSClass.mpColor, usedCSSClasses));
+			rval.Append(FillDefinition(CSSClass.pColor, usedCSSClasses));
+			rval.Append(FillDefinition(CSSClass.ppColor, usedCSSClasses));
+			rval.Append(FillDefinition(CSSClass.pppColor, usedCSSClasses));
+			rval.Append(FillDefinition(CSSClass.ppppColor, usedCSSClasses));
+
+			return rval;
+		}
+
+		/// <summary>
+		/// Returns an empty StringBuilder if the cssColorClass is not in the usedCSSClasses
+		/// </summary>
+		private StringBuilder FillDefinition(CSSClass cssColorClass, List<CSSClass> usedCSSClasses)
+		{
+			StringBuilder def = new StringBuilder();
+			if(usedCSSClasses.Contains(cssColorClass))
+			{
+				def.Append("." + cssColorClass.ToString());
+				def.Append(@"
+			{");
+				def.Append($@"
+			    fill:{SvgWriter.CSSClassColorDict[cssColorClass]}");
+				def.Append(@"
+			}
+			");
+			}
+
+			return def;
+		}
+
+		private StringBuilder GetExistingClichtClasses(List<CSSClass> usedCSSClasses, List<ClefID> usedClefIDs)
         {
             //.rest, .inputRest, .notehead, .accidental,
             //.cautionaryNotehead, .cautionaryAccidental,

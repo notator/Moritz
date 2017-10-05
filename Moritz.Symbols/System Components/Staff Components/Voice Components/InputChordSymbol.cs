@@ -94,7 +94,7 @@ namespace Moritz.Symbols
             if(ChordMetrics.BeamBlock != null)
                 ChordMetrics.BeamBlock.WriteSVG(w);
 
-            w.SvgStartGroup(ChordMetrics.CSSClass.ToString()); // "inputChord";
+            w.SvgStartGroup(ChordMetrics.CSSObjectClass.ToString()); // "inputChord";
 
             Debug.Assert(_msDuration > 0);
 

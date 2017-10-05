@@ -1087,9 +1087,9 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            bool isInput = (CSSClass == CSSClass.inputBeamBlock);
+            bool isInput = (CSSObjectClass == CSSClass.inputBeamBlock);
 
-            w.SvgStartGroup(CSSClass.ToString());
+            w.SvgStartGroup(CSSObjectClass.ToString());
             foreach(Beam beam in Beams)
             {
                 if(!(beam is QuaverBeam))

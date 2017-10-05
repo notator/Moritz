@@ -20,7 +20,7 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-			w.SvgText(CSSClass, _textInfo.Text, _originX, _originY);
+			w.SvgText(CSSObjectClass, _textInfo.Text, _originX, _originY);
 		}
 
 		/// <summary>
@@ -156,7 +156,7 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
 		{
-            w.SvgStartGroup(CSSClass.ToString());
+            w.SvgStartGroup(CSSObjectClass.ToString());
             w.SvgText(CSSClass.barNumberNumber, _number, _barNumberNumberMetrics.OriginX, _barNumberNumberMetrics.OriginY);
             w.SvgRect(CSSClass.barNumberFrame.ToString(), _left, _top, _right - _left, _bottom - _top);
             w.SvgEndGroup();

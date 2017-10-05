@@ -358,7 +358,7 @@ namespace Moritz.Algorithm.Tombeau1
             AltoGrps altoGrps = new AltoGrps(sopranoGrps.Grps, tenorGrps.Grps, bassGrps.Grps);
 
             List<Seq> outputSeqs = new List<Seq>(); // The seqs that will be displayed (the score).
-            bool composingGrps = false;
+            bool composingGrps = true;
             if(composingGrps)
             {
                 // add the Grps to the outputSeqs

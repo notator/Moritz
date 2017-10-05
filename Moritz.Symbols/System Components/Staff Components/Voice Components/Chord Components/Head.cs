@@ -223,16 +223,15 @@ namespace Moritz.Symbols
             }
         }
 
-        public string ColorAttribute
+        public CSSClass ColorClass
         {
             get { return _colorAttribute; }
             internal set
             {
-                Debug.Assert(Regex.IsMatch(value, @"^#[0-9a-fA-F]{6}$"));
                 _colorAttribute = value;
             }
         }
-        private string _colorAttribute = ""; // default is black
+        private CSSClass _colorAttribute = CSSClass.black; // default is black
 
         /// <summary>
         /// Specifies if and how the accidental should be displayed. Meanings:

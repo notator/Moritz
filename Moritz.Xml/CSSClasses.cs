@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using Moritz.Globals;
+using System.ComponentModel;
+
 namespace Moritz.Xml
 {
     /// <summary>
@@ -88,7 +92,26 @@ namespace Moritz.Xml
         thickBarline, // always used and recorded. An endBarline component. Always defined. Container:endBarline
         staffConnectors, // A group of barline (and maybe endBarline) in a system. Never defined. Container:system. 
         #endregion barlines
-    };
+
+		#region colours
+		transparent, // no colour
+		black,
+		white,
+		red,
+		#region Tombeau 1 notehead subclasses
+		// The actual colours (written to the CSS *definitions* in the score) are defined in MoritzStatics.NoteheadColors
+		fffColor,
+		ffColor,
+		fColor,
+		mfColor,
+		mpColor,
+		pColor,
+		ppColor,
+		pppColor,
+		ppppColor
+		#endregion Tombeau 1 notehead subclasses
+		#endregion colours
+	};
 
     public enum CSSLineCap { butt, round, square };
 }

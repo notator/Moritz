@@ -47,7 +47,7 @@ namespace Moritz.Symbols
                 Debug.Assert(_msDuration > 0);
 				if(staffIsVisible)
 				{
-                    w.SvgStartGroup(Metrics.CSSClass.ToString()); // "outputRest"
+                    w.SvgStartGroup(Metrics.CSSObjectClass.ToString()); // "outputRest"
                     w.WriteAttributeString("score", "alignment", null, ((Metrics.Left + Metrics.Right) / 2).ToString(M.En_USNumberFormat));
 				}
                 else
