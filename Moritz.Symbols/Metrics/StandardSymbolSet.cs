@@ -878,8 +878,7 @@ namespace Moritz.Symbols
 
                 if(firstCautionaryChordSymbolFound)
                 {
-                    CautionaryChordSymbol followingCautionary = noteObject as CautionaryChordSymbol;
-                    if(followingCautionary != null)
+                    if(noteObject is CautionaryChordSymbol followingCautionary)
                     {
                         followingCautionary.Visible = false;
                         continue;
@@ -894,8 +893,7 @@ namespace Moritz.Symbols
 
                 if(noteObjectToReturn != null) // a ChordSymbol or a RestSymbol (not a CautionaryChordSymbol)
                 {
-                    Barline barline = noteObjects[i - 1] as Barline;
-                    if(barline != null)
+                    if(noteObjects[i - 1] is Barline barline)
                         noteObjectToReturn = barline;
                     break;
                 }
@@ -916,8 +914,7 @@ namespace Moritz.Symbols
                         {
                             // noteObjects.Count - 1 because index is immediately incremented when a continuing 
                             // chord or rest is found, and it should always be less than noteObjects.Count.
-                            ChordSymbol chord1 = noteObjects[index] as ChordSymbol;
-                            if(chord1 != null)
+                            if(noteObjects[index] is ChordSymbol chord1)
                             {
                                 List<float> x1s = GetX1sFromChord1(chord1.ChordMetrics, hairlinePadding);
                                 List<float> x2s = null;
@@ -957,8 +954,7 @@ namespace Moritz.Symbols
                                         if(hasContinuingBeamBlock)
                                             Debug.Assert(true);
 
-                                        Barline barline = noteObjects[index - 1] as Barline;
-                                        if(barline != null)
+                                        if(noteObjects[index - 1] is Barline barline)
                                         {
                                             float x2 = barline.Metrics.OriginX;
                                             x2s = GetEqualFloats(x2, x1s.Count);

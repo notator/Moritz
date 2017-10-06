@@ -230,8 +230,7 @@ namespace Moritz.Symbols
             {
                 foreach(DrawObject drawObject in barline.DrawObjects)
                 {
-                    Text text = drawObject as Text;
-                    if(text != null)
+                    if(drawObject is Text text)
                     {
                         Debug.Assert(text.TextInfo != null
                         && (text is StaffNameText || text is FramedBarNumberText));

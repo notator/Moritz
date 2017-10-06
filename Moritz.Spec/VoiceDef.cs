@@ -87,7 +87,7 @@ namespace Moritz.Spec
             {
                 _uniqueDefs = uniqueDefs;
             }
-            private IEnumerator getEnumerator()
+            private IEnumerator GetEnumerator()
             {
                 return (IEnumerator)this;
             }
@@ -174,8 +174,7 @@ namespace Moritz.Spec
         {
             for(int index = 0; index < _uniqueDefs.Count; ++index)
             {
-                IUniqueSplittableChordDef lmcd = _uniqueDefs[index] as IUniqueSplittableChordDef;
-                if(lmcd != null)
+                if(_uniqueDefs[index] is IUniqueSplittableChordDef lmcd)
                 {
                     lmcd.Lyric = index.ToString();
                 }
@@ -260,8 +259,7 @@ namespace Moritz.Spec
             int msPos = 0;
             foreach(IUniqueDef iud in UniqueDefs)
             {
-                DurationDef dd = iud as DurationDef;
-                if(dd != null)
+                if(iud is DurationDef dd)
                 {
                     durationDefs.Add(dd);
                     originalPositions.Add(msPos);
@@ -300,8 +298,7 @@ namespace Moritz.Spec
 
             for(int i = beginIndex; i <= endIndex; ++i)
             {
-                IUniqueChordDef iucd = _uniqueDefs[i] as IUniqueChordDef;
-                if(iucd != null)
+                if(_uniqueDefs[i] is IUniqueChordDef iucd)
                 {
                     iucd.Transpose(interval);
                 }
@@ -326,8 +323,7 @@ namespace Moritz.Spec
         {
             foreach(IUniqueDef iud in _uniqueDefs)
             {
-                IUniqueChordDef iucd = iud as IUniqueChordDef;
-                if(iucd != null)
+                if(iud is IUniqueChordDef iucd)
                 {
                     List<byte> midiPitches = iucd.NotatedMidiPitches;
                     for(int i = 0; i < midiPitches.Count; ++i)
@@ -356,8 +352,7 @@ namespace Moritz.Spec
                 {
                     if(_uniqueDefs[j].MsPositionReFirstUD >= currentMsPosReFirstIUD)
                     {
-                        IUniqueChordDef iucd = _uniqueDefs[j] as IUniqueChordDef;
-                        if(iucd != null)
+                        if(_uniqueDefs[j] is IUniqueChordDef iucd)
                         {
                             iucd.Transpose(transposition);
                         }

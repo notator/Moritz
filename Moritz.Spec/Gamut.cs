@@ -211,8 +211,7 @@ namespace Moritz.Spec
         {
             foreach(IUniqueDef iud in iuds)
             {
-                MidiChordDef mcd = iud as MidiChordDef;
-                if(mcd != null && ContainsAllPitches(mcd) == false)
+                if(iud is MidiChordDef mcd && ContainsAllPitches(mcd) == false)
                 {
                     return false;                    
                 }
@@ -285,8 +284,7 @@ namespace Moritz.Spec
             Debug.Assert(nPitches > 0 && nPitches <= 12);
             Debug.Assert(_list.Contains(rootPitch));
 
-            List<int> pitches = new List<int>();
-            pitches.Add(rootPitch);
+            List<int> pitches = new List<int>() { rootPitch };
 
             if(nPitches > 1)
             {

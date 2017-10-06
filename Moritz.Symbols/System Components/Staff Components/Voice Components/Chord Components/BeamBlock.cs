@@ -732,8 +732,7 @@ namespace Moritz.Symbols
                 float dy = width * tanAlpha;
                 foreach(Beam beam in Beams)
                 {
-                    IBeamStub beamStub = beam as IBeamStub;
-                    if(beamStub != null)
+                    if(beam is IBeamStub beamStub)
                     {
                         beamStub.ShearBeamStub(shearAxis, tanAlpha, stemX);
                     }

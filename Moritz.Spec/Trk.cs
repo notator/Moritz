@@ -44,8 +44,7 @@ namespace Moritz.Spec
         public Trk Clone()
         {
             List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
-            Trk trk = new Trk(MidiChannel, MsPositionReContainer, clonedIUDs);
-            trk.Container = this.Container;
+            Trk trk = new Trk(MidiChannel, MsPositionReContainer, clonedIUDs) { Container = this.Container };
 
             return trk;
         }
@@ -374,8 +373,7 @@ namespace Moritz.Spec
         {
             foreach(IUniqueDef iud in UniqueDefs)
             {
-                MidiChordDef mcd = iud as MidiChordDef;
-                if(mcd != null)
+                if(iud is MidiChordDef mcd)
                 {
                     int startMsPos = mcd.MsPositionReFirstUD;
                     int endMsPos = startMsPos + mcd.MsDuration;
@@ -423,8 +421,7 @@ namespace Moritz.Spec
             #endregion conditions
             for(int i = 0; i < UniqueDefs.Count; ++i)
             {
-                MidiChordDef mcd = UniqueDefs[i] as MidiChordDef;
-                if(mcd != null)
+                if(UniqueDefs[i] is MidiChordDef mcd)
                 {
                     mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, minimumVelocity, percent);
                     if(mcd.NotatedMidiPitches.Count == 0)
@@ -457,9 +454,8 @@ namespace Moritz.Spec
 
             #region find msDurationRangeMin and msDurationRangeMax 
             foreach(IUniqueDef iud in _uniqueDefs)
-            {
-                MidiChordDef mcd = iud as MidiChordDef;
-                if(mcd != null)
+            { 
+                if(iud is MidiChordDef mcd)
                 {
                     msDurationRangeMin = (msDurationRangeMin < mcd.MsDuration) ? msDurationRangeMin : mcd.MsDuration;
                     msDurationRangeMax = (msDurationRangeMax > mcd.MsDuration) ? msDurationRangeMax : mcd.MsDuration;
@@ -469,8 +465,7 @@ namespace Moritz.Spec
 
             foreach(IUniqueDef iud in _uniqueDefs)
             {
-                MidiChordDef mcd = iud as MidiChordDef;
-                if(mcd != null)
+                if(iud is MidiChordDef mcd)
                 {
                     mcd.SetVelocityFromDuration(msDurationRangeMin, msDurationRangeMax, velocityForMinMsDuration, velocityForMaxMsDuration, percent);
                 }
@@ -492,8 +487,7 @@ namespace Moritz.Spec
 
             foreach(IUniqueDef iud in UniqueDefs)
             {
-                MidiChordDef mcd = iud as MidiChordDef;
-                if(mcd != null)
+                if(iud is MidiChordDef mcd)
                 {
                     mcd.SetVerticalVelocityGradient(rootVelocity, topVelocity);
                 }
@@ -525,9 +519,8 @@ namespace Moritz.Spec
             #region get pitches
             foreach(IUniqueDef iud in _uniqueDefs)
             {
-                MidiChordDef mcd = iud as MidiChordDef;
-                if(mcd != null)
-                {
+				if(iud is MidiChordDef mcd)
+				{
                     byte pitch = (useBottomPitch == true) ? mcd.NotatedMidiPitches[0] : mcd.NotatedMidiPitches[mcd.NotatedMidiPitches.Count - 1];
                     if(!pitches.Contains(pitch))
                     {
@@ -541,9 +534,8 @@ namespace Moritz.Spec
                 int mcdMsDuration = (useBottomPitch == true) ? durationForLowestPitch : durationForHighestPitch;
                 foreach(IUniqueDef iud in _uniqueDefs)
                 {
-                    MidiChordDef mcd = iud as MidiChordDef;
-                    if(mcd != null)
-                    {
+					if(iud is MidiChordDef mcd)
+					{
                         mcd.MsDuration = mcdMsDuration;
                     }
                 }
@@ -578,9 +570,8 @@ namespace Moritz.Spec
                 int currentMsDuration = this.MsDuration;
                 foreach(IUniqueDef iud in _uniqueDefs)
                 {
-                    MidiChordDef mcd = iud as MidiChordDef;
-                    if(mcd != null)
-                    {
+					if(iud is MidiChordDef mcd)
+					{
                         byte pitch = (useBottomPitch == true) ? mcd.NotatedMidiPitches[0] : mcd.NotatedMidiPitches[mcd.NotatedMidiPitches.Count - 1];
                         int oldDuration = mcd.MsDuration;
                         int durPerPitch = msDurPerPitch[pitch];
@@ -602,9 +593,8 @@ namespace Moritz.Spec
 
             for(int i = beginIndex; i <= endIndex; ++i)
             {
-                MidiChordDef iumdd = _uniqueDefs[i] as MidiChordDef;
-                if(iumdd != null)
-                {
+				if(_uniqueDefs[i] is MidiChordDef iumdd)
+				{
                     iumdd.AdjustExpression(factor);
                 }
             }
@@ -630,8 +620,7 @@ namespace Moritz.Spec
             Debug.Assert(factor > 0.0);
             for(int i = beginIndex; i <= endIndex; ++i)
             {
-                MidiChordDef mcd = _uniqueDefs[i] as MidiChordDef;
-                if(mcd != null)
+                if(_uniqueDefs[i] is MidiChordDef mcd)
                 {
                     mcd.AdjustVelocities(factor);
                     if(mcd.NotatedMidiPitches.Count == 0)
@@ -650,8 +639,7 @@ namespace Moritz.Spec
             Debug.Assert(factor > 0.0);
             for(int i = 0; i < UniqueDefs.Count; ++i)
             {
-                MidiChordDef mcd = UniqueDefs[i] as MidiChordDef;
-                if(mcd != null)
+                if(UniqueDefs[i] is MidiChordDef mcd)
                 {
                     mcd.AdjustVelocities(factor);
                     if(mcd.NotatedMidiPitches.Count == 0)
@@ -719,8 +707,7 @@ namespace Moritz.Spec
 
             for(int i = beginIndex; i <= endIndex; ++i)
             {
-                MidiChordDef iumdd = _uniqueDefs[i] as MidiChordDef;
-                if(iumdd != null)
+                if(_uniqueDefs[i] is MidiChordDef iumdd)
                 {
                     iumdd.PanMsbs = new List<byte>() { (byte)panValue };
                     panValue += (int)increment;
@@ -737,8 +724,7 @@ namespace Moritz.Spec
 
             for(int i = beginIndex; i <= endIndex; ++i)
             {
-                MidiChordDef mcd = this[i] as MidiChordDef;
-                if(mcd != null)
+                if(this[i] is MidiChordDef mcd)
                 {
                     mcd.PitchWheelDeviation = M.MidiValue(deviation);
                 }
@@ -755,14 +741,9 @@ namespace Moritz.Spec
 
             for(int i = beginIndex; i <= endIndex; ++i)
             {
-                MidiChordDef iumdd = this[i] as MidiChordDef;
-                if(iumdd != null)
+                if(this[i] is MidiChordDef umcd)
                 {
-                    MidiChordDef umcd = iumdd as MidiChordDef;
-                    if(umcd != null)
-                    {
-                        umcd.MidiChordSliderDefs.PitchWheelMsbs = new List<byte>();
-                    }
+                    umcd.MidiChordSliderDefs.PitchWheelMsbs = new List<byte>();
                 }
             }
         }
@@ -783,8 +764,7 @@ namespace Moritz.Spec
 
             for(int i = beginIndex; i < endIndex; ++i)
             {
-                MidiChordDef umc = _uniqueDefs[i] as MidiChordDef;
-                if(umc != null)
+                if(_uniqueDefs[i] is MidiChordDef umc)
                 {
                     umc.PitchWheelDeviation = M.MidiValue((int)(pwValueAtBeginIndex * (Math.Pow(pwdfactor, i))));
                 }
@@ -1420,8 +1400,7 @@ namespace Moritz.Spec
             {
                 foreach(IUniqueDef iud in _uniqueDefs)
                 {
-                    MidiChordDef midiChordDef = iud as MidiChordDef;
-                    if(midiChordDef != null)
+                    if(iud is MidiChordDef midiChordDef)
                         yield return midiChordDef;
                 }
             }
@@ -1492,9 +1471,10 @@ namespace Moritz.Spec
             List<byte> rootMidiVelocities = new List<byte>(basicMidiChordDefs[0].Velocities);
 
             MidiChordDef returnMCD = new MidiChordDef(totalDuration, pitchWheelDeviation, hasChordOff, rootMidiPitches, rootMidiVelocities,
-                                                        nMidiChordDefs, midiChordSliderDefs, basicMidiChordDefs);
+														nMidiChordDefs, midiChordSliderDefs, basicMidiChordDefs)
+			{ MsDuration = msDuration };
 
-            returnMCD.MsDuration = msDuration;
+            //returnMCD.MsDuration = msDuration;
 
             return returnMCD;
         }

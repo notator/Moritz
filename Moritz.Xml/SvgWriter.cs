@@ -114,7 +114,7 @@ namespace Moritz.Xml
             _w.WriteAttributeString("width", M.FloatToShortString(width));
             _w.WriteAttributeString("height", M.FloatToShortString(height));
 
-            StringBuilder styleSB = getStyleStringBuilder(strokeColor, strokeWidth, fillColor, null);
+            StringBuilder styleSB = GetStyleStringBuilder(strokeColor, strokeWidth, fillColor, null);
             if(styleSB.Length > 0)
                 WriteAttributeString("style", styleSB.ToString());
 
@@ -141,7 +141,7 @@ namespace Moritz.Xml
 			WriteAttributeString("cy", M.FloatToShortString(cy));
 			WriteAttributeString("r", M.FloatToShortString(r));
 
-			StringBuilder styleSB = getStyleStringBuilder(strokeColor, strokeWidth, fillColorOrNull, null);
+			StringBuilder styleSB = GetStyleStringBuilder(strokeColor, strokeWidth, fillColorOrNull, null);
 			if(styleSB.Length > 0)
 				WriteAttributeString("style", styleSB.ToString());
 
@@ -171,7 +171,7 @@ namespace Moritz.Xml
 			WriteAttributeString("rx", M.FloatToShortString(rx));
 			WriteAttributeString("ry", M.FloatToShortString(ry));
 
-			StringBuilder styleSB = getStyleStringBuilder(strokeColor, strokeWidth, fillColor, null);
+			StringBuilder styleSB = GetStyleStringBuilder(strokeColor, strokeWidth, fillColor, null);
 			if(styleSB.Length > 0)
 				WriteAttributeString("style", styleSB.ToString());
 
@@ -187,7 +187,7 @@ namespace Moritz.Xml
 		/// <param name="fillColorOrNull">If null, fill is not set.  '#000000' is black</param>
 		/// <param name="linecapStringOrNull">If null, lineCap is not set. Other values are: 'butt', 'round' and 'square'</param>
 		/// <returns>A style string</returns>
-		private StringBuilder getStyleStringBuilder(string strokeColorOrNull, float strokeWidth, string fillColorOrNull, string linecapStringOrNull)
+		private StringBuilder GetStyleStringBuilder(string strokeColorOrNull, float strokeWidth, string fillColorOrNull, string linecapStringOrNull)
 		{
 			StringBuilder rval = new StringBuilder();
 			string strokeWidthString = strokeWidth.ToString("0.###", M.En_USNumberFormat);

@@ -14,16 +14,13 @@ namespace Moritz.Symbols
         public OutputRestSymbol(Voice voice, IUniqueDef iumdd, int absMsPosition, int minimumCrotchetDurationMS, float fontHeight)
             : base(voice, iumdd, absMsPosition, minimumCrotchetDurationMS, fontHeight)
         {
-            CautionaryChordDef ccd = iumdd as CautionaryChordDef;
-            MidiRestDef mrd = iumdd as MidiRestDef;
-
-            if(mrd != null)
+            if(iumdd is MidiRestDef mrd)
             {
                 _midiRestDef = mrd;
             }
 
-            // This needs testing!!
-            if(ccd != null)
+			// This needs testing!!
+			if(iumdd is CautionaryChordDef ccd)
             {
                 Console.WriteLine("rest is CautionaryChordDef!");
                 LocalCautionaryChordDef = ccd;

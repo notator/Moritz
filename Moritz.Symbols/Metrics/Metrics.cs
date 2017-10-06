@@ -75,8 +75,7 @@ namespace Moritz.Symbols
 			if(verticalOverlap && previousMetrics.Right > Left)
 			{
 				overlap = previousMetrics.Right - this.Left;
-                AccidentalMetrics aMetrics = this as AccidentalMetrics;
-                if(aMetrics != null && (aMetrics.CharacterString == "b" || aMetrics.CharacterString == "n"))
+                if(this is AccidentalMetrics aMetrics && (aMetrics.CharacterString == "b" || aMetrics.CharacterString == "n"))
 				{
                     overlap -= ((this.Right - this.Left) * 0.15F);
                     overlap = overlap > 0F ? overlap : 0F;
@@ -102,8 +101,7 @@ namespace Moritz.Symbols
 		{
 			float overlap = float.MinValue;
 
-			OutputChordSymbol chord = previousAS as OutputChordSymbol;
-			if(chord != null)
+			if(previousAS is OutputChordSymbol chord)
 			{
 				overlap = chord.ChordMetrics.OverlapWidth(this);
 			}

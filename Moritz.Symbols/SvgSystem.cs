@@ -323,7 +323,7 @@ namespace Moritz.Symbols
         private Dictionary<int, float> JustifyTopVoicesHorizontally(List<NoteObjectMoment> systemMoments, Dictionary<int, float> barlineWidths, 
             HashSet<int> nonCompressibleSystemMomentPositions, float hairline)
         {
-            Dictionary<int, float> overlaps = new Dictionary<int, float>(); ;
+            Dictionary<int, float> overlaps = new Dictionary<int, float>();
             List<NoteObjectMoment> moments = null;
             bool success = true;
             do
@@ -372,7 +372,7 @@ namespace Moritz.Symbols
             List<NoteObjectMoment> systemMoments, Dictionary<int, float> barlineWidths,
             HashSet<int> nonCompressibleSystemMomentPositions, float hairline)
         {
-            Dictionary<int, float> overlaps = new Dictionary<int, float>(); ;
+            Dictionary<int, float> overlaps = new Dictionary<int, float>();
             List<NoteObjectMoment> moments = null;
             bool success = true;
             do
@@ -621,9 +621,8 @@ namespace Moritz.Symbols
                                 clef = noteObject as Clef;
                             if(noteObject is Barline)
                                 barline = noteObject as Barline;
-                            DurationSymbol durationSymbol = noteObject as DurationSymbol;
 
-                            if(durationSymbol != null)
+                            if(noteObject is DurationSymbol durationSymbol)
                             {
                                 if(barline != null)
                                 {
@@ -1038,8 +1037,8 @@ namespace Moritz.Symbols
             {
                 verticalOverlap = chordMetrics.OverlapHeight(barnumberMetrics, gap);
             }
-            RestMetrics restMetrics = durationSymbol.Metrics as RestMetrics;
-            if(restMetrics != null)
+
+            if(durationSymbol.Metrics is RestMetrics restMetrics)
             {
                 verticalOverlap = restMetrics.OverlapHeight(barnumberMetrics, gap);
                 if(verticalOverlap > 0)
@@ -1077,11 +1076,9 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject noteObject in staff.Voices[0].NoteObjects)
                 {
-                    Barline firstBarline = noteObject as Barline;
-                    if(firstBarline != null)
+                    if(noteObject is Barline firstBarline)
                     {
-                        BarlineMetrics barlineMetrics = firstBarline.Metrics as BarlineMetrics;
-                        if(barlineMetrics != null)
+                        if(firstBarline.Metrics is BarlineMetrics barlineMetrics)
                         {
                             TextMetrics staffNameMetrics = barlineMetrics.StaffNameMetrics;
                             if(staffNameMetrics != null)

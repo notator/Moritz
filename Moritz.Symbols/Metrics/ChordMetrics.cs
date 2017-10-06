@@ -47,13 +47,10 @@ namespace Moritz.Symbols
             }
             else
             {
-                bool dynamicIsBelow;
-                bool ornamentIsBelow;
-
                 CSSObjectClass lyricClass = GetLyricClass(chord);
                 _lyricMetrics = NewLyricMetrics(chord.Voice.StemDirection, graphics, gap, lyricClass);
 
-                GetRelativePositions(chord.Voice.StemDirection, _lyricMetrics, out ornamentIsBelow, out dynamicIsBelow);
+                GetRelativePositions(chord.Voice.StemDirection, _lyricMetrics, out bool ornamentIsBelow, out bool dynamicIsBelow);
                 _ornamentMetrics = NewOrnamentMetrics(graphics, gap, ornamentIsBelow);
 
                 CSSObjectClass dynamicClass = GetDynamicClass(chord);
@@ -78,8 +75,7 @@ namespace Moritz.Symbols
             _nStafflines = voice.Staff.NumberOfStafflines;
             foreach(NoteObject noteObject in voice.NoteObjects)
             {
-                Clef cs = noteObject as Clef; 
-                if(cs != null)
+                if(noteObject is Clef cs)
                     _clef = cs;
                 if(noteObject == rootObject)
                     break;
@@ -263,8 +259,7 @@ namespace Moritz.Symbols
             float gap = pageFormat.Gap;
             float padding = pageFormat.StafflineStemStrokeWidth;
             float strokeWidth = pageFormat.StafflineStemStrokeWidth;
-            float top, left, bottom, right;
-            GetAccidentalsAndHeadsBox(out top, out right, out bottom, out left, gap, padding);
+            GetAccidentalsAndHeadsBox(out float top, out float right, out float bottom, out float left, gap, padding);
             float leftBracketLeft = left - (gap / 2F);
             float rightBracketRight = right + (gap / 2F);
             // the left bracket
@@ -272,9 +267,7 @@ namespace Moritz.Symbols
             // the right bracket
             CautionaryBracketMetrics rightBracketMetrics = new CautionaryBracketMetrics(false, top, rightBracketRight, bottom, right, strokeWidth);
 
-            _cautionaryBracketsMetrics = new List<CautionaryBracketMetrics>();
-            this._cautionaryBracketsMetrics.Add(leftBracketMetrics);
-            this._cautionaryBracketsMetrics.Add(rightBracketMetrics);
+            _cautionaryBracketsMetrics = new List<CautionaryBracketMetrics>() { leftBracketMetrics, rightBracketMetrics };
         }
 
         private void GetAccidentalsAndHeadsBox(out float top, out float right, out float bottom, out float left,
@@ -681,9 +674,7 @@ namespace Moritz.Symbols
         /// </summary
         private void MoveAuxilliaries(VerticalDir stemDirection, float gap, float upperBeamPadding, float lowerBeamPadding)
         {
-            float topBoundary;
-            float bottomBoundary;
-            GetTopAndBottomBounds(stemDirection, out topBoundary, out bottomBoundary);
+            GetTopAndBottomBounds(stemDirection, out float topBoundary, out float bottomBoundary);
 
             topBoundary -= upperBeamPadding;
             bottomBoundary += lowerBeamPadding;
@@ -756,8 +747,7 @@ namespace Moritz.Symbols
             Text ornamentText = null;
             foreach(DrawObject drawObject in _drawObjects)
             {
-                Text text = drawObject as Text;
-                if(text != null)
+                if(drawObject is Text text)
                 {
                     if(text.TextInfo.Text[0] == '~')
                     {
@@ -815,8 +805,7 @@ namespace Moritz.Symbols
             Text dynamicText = null;
             foreach(DrawObject drawObject in _drawObjects)
             {
-                Text text = drawObject as Text;
-                if(text != null)
+                if(drawObject is Text text)
                 {
                     Debug.Assert(text.TextInfo != null);
                     Debug.Assert(!String.IsNullOrEmpty(text.TextInfo.Text));
@@ -1214,9 +1203,7 @@ namespace Moritz.Symbols
         {
             if(_lyricMetrics != null)
             {
-                bool ornamentIsBelow;
-                bool dynamicIsBelow;
-                GetRelativePositions(voiceStemDirection, _lyricMetrics, out ornamentIsBelow, out dynamicIsBelow);
+                GetRelativePositions(voiceStemDirection, _lyricMetrics, out bool ornamentIsBelow, out bool dynamicIsBelow);
                 float delta = 0F;
                 if(_lyricMetrics.IsBelow)
                 {
@@ -2034,8 +2021,7 @@ namespace Moritz.Symbols
             }
             else
             {
-                _topDownAccidentalsMetrics = new List<AccidentalMetrics>();
-                _topDownAccidentalsMetrics.Add(newAccidentalMetrics);
+                _topDownAccidentalsMetrics = new List<AccidentalMetrics>() { newAccidentalMetrics };
             }
         }
 

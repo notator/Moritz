@@ -206,8 +206,7 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject noteObject in Voices[voiceIndex].NoteObjects)
                 {
-                    RestSymbol rest = noteObject as RestSymbol;
-                    if(rest != null)
+                    if(noteObject is RestSymbol rest)
                     {
                         RestMetrics metrics = (RestMetrics)rest.Metrics;
                         if(voiceIndex == 0)
@@ -248,14 +247,12 @@ namespace Moritz.Symbols
             // both rests are moved in gap steps outwards until they no longer overlap.
             foreach(NoteObject topObject in upperObjects)
             {
-                RestSymbol topRest = topObject as RestSymbol;
-                if(topRest != null)
+                if(topObject is RestSymbol topRest)
                 {
                     RestMetrics upperRestMetrics = topRest.Metrics as RestMetrics;
                     foreach(NoteObject lowerObject in lowerObjects)
                     {
-                        RestSymbol lowerRestSymbol = lowerObject as RestSymbol;
-                        if(lowerRestSymbol != null)
+                        if(lowerObject is RestSymbol lowerRestSymbol)
                         {
                             if(topRest.AbsMsPosition < lowerRestSymbol.AbsMsPosition)
                                 break;
@@ -315,13 +312,11 @@ namespace Moritz.Symbols
             // Move rests in the bottom voice down by gap increments if they are synchronous with an overlapping chord in the top voice. 
             foreach(NoteObject restObject in restObjects)
             {
-                RestSymbol restSymbol = restObject as RestSymbol;
-                if(restSymbol != null)
+                if(restObject is RestSymbol restSymbol)
                 {
                     foreach(NoteObject chordObject in chordObjects)
                     {
-                        OutputChordSymbol chordSymbol = chordObject as OutputChordSymbol;
-                        if(chordSymbol != null)
+                        if(chordObject is OutputChordSymbol chordSymbol)
                         {
                             if(chordSymbol.AbsMsPosition > restSymbol.AbsMsPosition)
                                 break;
@@ -790,8 +785,7 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject noteObject in voice.NoteObjects)
                 {
-                    DurationSymbol symbol = noteObject as DurationSymbol;
-                    if(symbol != null && symbol is Type)
+                    if(noteObject is DurationSymbol symbol && symbol is Type)
                     {
                         Debug.Assert(symbol.AbsMsPosition >= 0,
                              "Symbol.MsPosition must be set before calling this funcion!");

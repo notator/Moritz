@@ -32,16 +32,16 @@ namespace Moritz.Symbols
 
         private void SetScoreMetadata(string scoreTitleName, string keywords, string comment)
         {
-            Metadata = new Metadata();
-
-            /// The Metadata.MainTitle is the large title displayed at the top centre of page 1
-            /// of the score. It is also the name of the folder inside the standard Moritz scores folder
-            /// used for saving all the scores components.
-            Metadata.MainTitle = scoreTitleName;
-			Metadata.Keywords = keywords;
-			Metadata.Comment = comment;
-
-			Metadata.Date = M.NowString;
+			/// The Metadata.MainTitle is the large title displayed at the top centre of page 1
+			/// of the score. It is also the name of the folder inside the standard Moritz scores folder
+			/// used for saving all the scores components.
+			Metadata = new Metadata
+			{
+				MainTitle = scoreTitleName,
+				Keywords = keywords,
+				Comment = comment,
+				Date = M.NowString
+			};
 		}
 
         protected virtual byte MidiChannel(int staffIndex) { throw new NotImplementedException(); }
@@ -60,13 +60,16 @@ namespace Moritz.Symbols
                 File.Delete(FilePath);
             }
 
-            XmlWriterSettings settings = new XmlWriterSettings();
-            settings.Indent = true;
-            settings.IndentChars = ("\t");
-            settings.CloseOutput = true;
-            settings.NewLineOnAttributes = true;
-            settings.NamespaceHandling = NamespaceHandling.OmitDuplicates;
-            settings.Encoding = Encoding.GetEncoding("utf-8");
+            XmlWriterSettings settings = new XmlWriterSettings
+			{
+				Indent = true,
+				IndentChars = ("\t"),
+				CloseOutput = true,
+				NewLineOnAttributes = true,
+				NamespaceHandling = NamespaceHandling.OmitDuplicates,
+				Encoding = Encoding.GetEncoding("utf-8")
+			};
+
 
             using(XmlWriter w = XmlWriter.Create(FilePath, settings))
             {
@@ -151,13 +154,15 @@ namespace Moritz.Symbols
                 File.Delete(pagePath);
             }
 
-            XmlWriterSettings settings = new XmlWriterSettings();
-            settings.Indent = true;
-            settings.IndentChars = ("\t");
-            settings.CloseOutput = true;
-            settings.NewLineOnAttributes = true;
-            settings.NamespaceHandling = NamespaceHandling.OmitDuplicates;
-            settings.Encoding = Encoding.GetEncoding("utf-8");
+            XmlWriterSettings settings = new XmlWriterSettings
+			{
+				Indent = true,
+				IndentChars = ("\t"),
+				CloseOutput = true,
+				NewLineOnAttributes = true,
+				NamespaceHandling = NamespaceHandling.OmitDuplicates,
+				Encoding = Encoding.GetEncoding("utf-8")
+			};
 
             using(SvgWriter w = new SvgWriter(pagePath, settings))
             {
@@ -973,8 +978,7 @@ namespace Moritz.Symbols
                     {
                         foreach(NoteObject noteObject in staff.Voices[0].NoteObjects)
                         {
-                            Barline firstBarline = noteObject as Barline;
-                            if(firstBarline != null)
+                            if(noteObject is Barline firstBarline)
                             {
                                 float fontHeight = _pageFormat.StaffNameFontHeight;
 
@@ -1196,12 +1200,10 @@ namespace Moritz.Symbols
             string clefTypeAtEndOfStaff1 = mainStaff1Clef.ClefType;
             foreach(NoteObject noteObject in staff1voice0.NoteObjects)
             {
-                SmallClef ccs = noteObject as SmallClef;
-                if(ccs != null)
+                if(noteObject is SmallClef smallClef)
                 {
-                    clefTypeAtEndOfStaff1 = ccs.ClefType;
-                }
-
+                    clefTypeAtEndOfStaff1 = smallClef.ClefType;
+                } 
             }
             return clefTypeAtEndOfStaff1;
         }
@@ -1365,8 +1367,7 @@ namespace Moritz.Symbols
                 List<NoteObject> noteObjects = system.Staves[0].Voices[0].NoteObjects;
                 foreach(NoteObject noteObject in noteObjects)
                 {
-                    DurationSymbol ds = noteObject as DurationSymbol;
-                    if(ds != null)
+                    if(noteObject is DurationSymbol ds)
                     {
                         totalMsDuration += ds.MsDuration;
                     }
@@ -1568,8 +1569,7 @@ namespace Moritz.Symbols
                 bool isFirstBarline = true;
                 for(int i = 0; i < barnumberVoice.NoteObjects.Count - 1; i++)
                 {
-                    Barline barline = barnumberVoice.NoteObjects[i] as Barline;
-                    if(barline != null)
+                    if(barnumberVoice.NoteObjects[i] is Barline barline)
                     {
                         if(isFirstBarline && system != Systems[0])
                         {

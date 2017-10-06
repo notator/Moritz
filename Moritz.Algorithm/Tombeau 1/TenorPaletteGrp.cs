@@ -95,8 +95,7 @@ namespace Moritz.Algorithm.Tombeau1
             Debug.Assert(absolutePitch >= 0 && absolutePitch <= 127);
             Debug.Assert(Gamut.Contains(absolutePitch));
 
-            MidiChordDef mcd = UniqueDefs[iudIndex] as MidiChordDef;
-            if(mcd != null)
+            if(UniqueDefs[iudIndex] is MidiChordDef mcd)
             {
                 int octave = mcd.BasicMidiChordDefs[0].Pitches[0] / 12;
                 if(octave > 0 && down || (octave < 8) && (down == false))
