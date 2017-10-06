@@ -12,8 +12,8 @@ namespace Moritz.Symbols
 {
     public class ClefMetrics : Metrics // defined objects in SVG
     {
-        public ClefMetrics(Clef clef, float gap, CSSClass cssClass, ClefID clefID)
-            : base(cssClass)
+        public ClefMetrics(Clef clef, float gap, CSSObjectClass cssClefClass, ClefID clefID)
+            : base(cssClefClass)
         {
             float trebleTop = -4.35F * gap;
             float trebleRight = 3.1F * gap;
@@ -117,7 +117,7 @@ namespace Moritz.Symbols
     }
     internal class SmallClefMetrics : ClefMetrics
     {
-        public SmallClefMetrics(Clef clef, float gap, CSSClass cssClass, ClefID clefID)
+        public SmallClefMetrics(Clef clef, float gap, CSSObjectClass cssClass, ClefID clefID)
             : base(clef, gap, cssClass, clefID)
         {
             _right = 3.5F * gap; // small clefs have proportionally more empty space on the right.

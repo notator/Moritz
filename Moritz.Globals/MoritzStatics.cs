@@ -698,7 +698,10 @@ namespace Moritz.Globals
             { "Tabloid", new PaperSize(279F, 432F)},
         };
 
-        public enum Dynamic
+		/// <summary>
+		/// Note that Moritz does not use M.Dynamic.ffff even though it is defined in CLicht.
+		/// </summary>
+		public enum Dynamic
         {
             none, pppp, ppp, pp, p, mp, mf, f, ff, fff, ffff
         }
@@ -706,7 +709,7 @@ namespace Moritz.Globals
         /// <summary>
         /// The key is one of the following strings: "fff", "ff", "f", "mf", "mp", "p", "pp", "ppp", "pppp".
         /// The value is used to determine Moritz' transcription of velocity -> dynamic symbol.
-        /// Note that Moritz does not use M.Dynamic.ffff although it is defined in CLicht.
+        /// Note that Moritz does not use M.Dynamic.ffff even though it is defined in CLicht.
         /// </summary>
         public static Dictionary<M.Dynamic, byte> MaxMidiVelocity = new Dictionary<M.Dynamic, byte>()
         {
@@ -722,11 +725,12 @@ namespace Moritz.Globals
             { M.Dynamic.pppp, 15}
         };
 
-        /// <summary>
-        /// The key is one of the following strings: "ffff", "fff", "ff", "f", "mf", "mp", "p", "pp", "ppp", "pppp".
-        /// The value is a string containing the equivalent CLicht character.
-        /// </summary>
-        public static Dictionary<M.Dynamic, string> CLichtDynamicsCharacters = new Dictionary<M.Dynamic, string>()
+		/// <summary>
+		/// The key is one of the following strings: "ffff", "fff", "ff", "f", "mf", "mp", "p", "pp", "ppp", "pppp".
+		/// The value is a string containing the equivalent CLicht character.
+		/// Note that Moritz does not use M.Dynamic.ffff even though it is defined in CLicht.
+		/// </summary>
+		public static Dictionary<M.Dynamic, string> CLichtDynamicsCharacters = new Dictionary<M.Dynamic, string>()
         {
             { M.Dynamic.ffff, "Î"}, // unused by Moritz (see M.MaxMidiVelocity)
             { M.Dynamic.fff, "Ï"},
@@ -738,23 +742,6 @@ namespace Moritz.Globals
             { M.Dynamic.pp, "π"},
             { M.Dynamic.ppp, "∏"},
             { M.Dynamic.pppp, "Ø"}
-        };
-
-        /// <summary>
-        /// Note that Moritz does not use M.Dynamic.ffff although it is defined in CLicht.
-        /// (These colours were found using a separate, self-written program.)
-        /// </summary>
-        public static readonly Dictionary<M.Dynamic, string> NoteheadColors = new Dictionary<M.Dynamic, string>()
-        {
-            { M.Dynamic.fff, "#FF0000" },
-            { M.Dynamic.ff, "#D50055" },
-            { M.Dynamic.f, "#B5007E" },
-            { M.Dynamic.mf, "#8800B5" }, 
-            { M.Dynamic.mp, "#0000CA" }, 
-            { M.Dynamic.p, "#0069A8" },
-            { M.Dynamic.pp, "#008474" },
-            { M.Dynamic.ppp, "#009F28" },
-            { M.Dynamic.pppp,"#00CA00" }
         };  
 
         public readonly static Preferences Preferences;

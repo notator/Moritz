@@ -465,7 +465,7 @@ namespace Moritz.Symbols
             {
                 if(smallClef.ClefType != "n")
                 {
-                    CSSClass cssClass = isInput ? CSSClass.inputSmallClef : CSSClass.smallClef;
+                    CSSObjectClass cssClass = isInput ? CSSObjectClass.inputSmallClef : CSSObjectClass.smallClef;
                     ClefID smallClefID = GetSmallClefID(clef, isInput);
                     returnMetrics = new SmallClefMetrics(clef, gap, cssClass, smallClefID);
                 }
@@ -474,26 +474,26 @@ namespace Moritz.Symbols
             {
                 if(clef.ClefType != "n")
                 {
-                    CSSClass cssClass = isInput ? CSSClass.inputClef : CSSClass.clef;
+                    CSSObjectClass cssClass = isInput ? CSSObjectClass.inputClef : CSSObjectClass.clef;
                     ClefID clefID = GetClefID(clef, isInput);
                     returnMetrics = new ClefMetrics(clef, gap, cssClass, clefID);
                 }
             }
             else if(cautionaryChordSymbol != null)
             {
-                returnMetrics = new ChordMetrics(graphics, cautionaryChordSymbol, voiceStemDirection, gap, strokeWidth, CSSClass.cautionaryChord);
+                returnMetrics = new ChordMetrics(graphics, cautionaryChordSymbol, voiceStemDirection, gap, strokeWidth, CSSObjectClass.cautionaryChord);
             }
             else if(inputChordSymbol != null)
             {
-                returnMetrics = new ChordMetrics(graphics, inputChordSymbol, voiceStemDirection, gap, strokeWidth, CSSClass.inputChord);
+                returnMetrics = new ChordMetrics(graphics, inputChordSymbol, voiceStemDirection, gap, strokeWidth, CSSObjectClass.inputChord);
             }
             else if(chordSymbol != null)
             {
-                returnMetrics = new ChordMetrics(graphics, chordSymbol, voiceStemDirection, gap, strokeWidth, CSSClass.chord);
+                returnMetrics = new ChordMetrics(graphics, chordSymbol, voiceStemDirection, gap, strokeWidth, CSSObjectClass.chord);
             }
             else if(rest != null)
             {
-                CSSClass restClass = GetRestClass(rest);
+                CSSObjectClass restClass = GetRestClass(rest);
                 // All rests are originally created on the centre line.
                 // They are moved vertically later, if they are on a 2-Voice staff.
                 returnMetrics = new RestMetrics(graphics, rest, gap, noteObject.Voice.Staff.NumberOfStafflines, strokeWidth, restClass);
@@ -578,12 +578,12 @@ namespace Moritz.Symbols
             return clefID;
         }
 
-        private CSSClass GetRestClass(RestSymbol rest)
+        private CSSObjectClass GetRestClass(RestSymbol rest)
         {
-            CSSClass restClass = CSSClass.rest; // OutputChordSymbol
+            CSSObjectClass restClass = CSSObjectClass.rest; // OutputChordSymbol
             if(rest is InputRestSymbol)
             {
-                restClass = CSSClass.inputRest;
+                restClass = CSSObjectClass.inputRest;
             }
             return restClass;
         }
@@ -1066,9 +1066,7 @@ namespace Moritz.Symbols
             {
                 if((x2s[i] - x1s[i]) > (gap / 2))
                 {
-					IReadOnlyList<CSSClass> headClasses = headMetrics[i].CSSClassList;
-					CSSClass cssColorClass = (headClasses.Count > 1) ? headClasses[1] : CSSClass.black;
-					string strokeColorString = (cssColorClass == CSSClass.black) ? "#000000" : SvgWriter.CSSClassColorDict[cssColorClass];
+					string strokeColorString = M.GetEnumDescription(headMetrics[i].CSSColorClass);
 
                     NoteheadExtenderMetrics nem =
                         new NoteheadExtenderMetrics(x1s[i], x2s[i], ys[i], extenderStrokeWidth, strokeColorString, gap, drawExtender);

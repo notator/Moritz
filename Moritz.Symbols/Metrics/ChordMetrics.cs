@@ -10,7 +10,7 @@ namespace Moritz.Symbols
 {
     internal class ChordMetrics : Metrics
     {
-        public ChordMetrics(Graphics graphics, ChordSymbol chord, VerticalDir voiceStemDirection, float gap, float stemStrokeWidthVBPX, CSSClass chordClass)
+        public ChordMetrics(Graphics graphics, ChordSymbol chord, VerticalDir voiceStemDirection, float gap, float stemStrokeWidthVBPX, CSSObjectClass chordClass)
             : base(chordClass)
         {
             _top = float.MaxValue;
@@ -50,13 +50,13 @@ namespace Moritz.Symbols
                 bool dynamicIsBelow;
                 bool ornamentIsBelow;
 
-                CSSClass lyricClass = GetLyricClass(chord);
+                CSSObjectClass lyricClass = GetLyricClass(chord);
                 _lyricMetrics = NewLyricMetrics(chord.Voice.StemDirection, graphics, gap, lyricClass);
 
                 GetRelativePositions(chord.Voice.StemDirection, _lyricMetrics, out ornamentIsBelow, out dynamicIsBelow);
                 _ornamentMetrics = NewOrnamentMetrics(graphics, gap, ornamentIsBelow);
 
-                CSSClass dynamicClass = GetDynamicClass(chord);
+                CSSObjectClass dynamicClass = GetDynamicClass(chord);
 
                 _dynamicMetrics = NewCLichtDynamicMetrics(gap, dynamicIsBelow, dynamicClass);
 
@@ -94,7 +94,7 @@ namespace Moritz.Symbols
         private void SetHeadsMetrics(ChordSymbol chord, float ledgerlineStemStrokeWidth)
         {
             _headsMetricsTopDown = new List<HeadMetrics>();
-            CSSClass mainHeadClass = GetMainHeadClass(chord);
+            CSSObjectClass mainHeadClass = GetMainHeadClass(chord);
 
             HeadMetrics hMetrics = new HeadMetrics(chord, null, _gap, mainHeadClass); // the head is horizontally aligned at 0 by default.
             float horizontalShift = hMetrics.RightStemX - hMetrics.LeftStemX - (ledgerlineStemStrokeWidth / 2F); // the distance to shift left or right if heads would collide
@@ -125,7 +125,7 @@ namespace Moritz.Symbols
                             newHeadAlignX = 0;
                     }
 
-                    CSSClass mainHeadClass1 = GetMainHeadClass(chord);
+                    CSSObjectClass mainHeadClass1 = GetMainHeadClass(chord);
                     HeadMetrics headMetrics = new HeadMetrics(chord, head, _gap, mainHeadClass1);
                     headMetrics.Move(newHeadAlignX, newHeadOriginY); // moves head.originY to headY
                     bottomUpMetrics.Add(headMetrics);
@@ -155,7 +155,7 @@ namespace Moritz.Symbols
                             newHeadAlignX = 0;
                     }
 
-                    CSSClass headClass2 = GetMainHeadClass(chord);
+                    CSSObjectClass headClass2 = GetMainHeadClass(chord);
                     HeadMetrics headMetrics = new HeadMetrics(chord, head, _gap, headClass2);
                     headMetrics.Move(newHeadAlignX, newHeadOriginY); // moves head.originY to headY
                     _headsMetricsTopDown.Add(headMetrics);
@@ -166,59 +166,59 @@ namespace Moritz.Symbols
             Debug.Assert(_headsMetricsTopDown.Count == chord.HeadsTopDown.Count);
         }
 
-        private CSSClass GetMainHeadClass(ChordSymbol chord)
+        private CSSObjectClass GetMainHeadClass(ChordSymbol chord)
         {
-            CSSClass headClass = CSSClass.notehead; // OutputChordSymbol
+            CSSObjectClass headClass = CSSObjectClass.notehead; // OutputChordSymbol
             if(chord is CautionaryChordSymbol)
             {
-                headClass = CSSClass.cautionaryNotehead;
+                headClass = CSSObjectClass.cautionaryNotehead;
             }
             else if(chord is InputChordSymbol)
             {
-                headClass = CSSClass.inputNotehead;
+                headClass = CSSObjectClass.inputNotehead;
             }
             return headClass;
         }
 
-        private CSSClass GetAccidentalClass(CSSClass chordClass)
+        private CSSObjectClass GetAccidentalClass(CSSObjectClass chordClass)
         {
-            CSSClass accidentalClass = CSSClass.accidental; // chordClass == chord
-            if(chordClass == CSSClass.cautionaryChord)
+            CSSObjectClass accidentalClass = CSSObjectClass.accidental; // chordClass == chord
+            if(chordClass == CSSObjectClass.cautionaryChord)
             {
-                accidentalClass = CSSClass.cautionaryAccidental;
+                accidentalClass = CSSObjectClass.cautionaryAccidental;
             }
-            else if(chordClass == CSSClass.inputChord)
+            else if(chordClass == CSSObjectClass.inputChord)
             {
-                accidentalClass = CSSClass.inputAccidental;
+                accidentalClass = CSSObjectClass.inputAccidental;
             }
             return accidentalClass;
         }
 
-        private CSSClass GetDynamicClass(ChordSymbol chord)
+        private CSSObjectClass GetDynamicClass(ChordSymbol chord)
         {
-            CSSClass dynamicClass = CSSClass.dynamic; // OutputChordSymbol
+            CSSObjectClass dynamicClass = CSSObjectClass.dynamic; // OutputChordSymbol
             if(chord is InputChordSymbol)
             {
-                dynamicClass = CSSClass.inputDynamic;
+                dynamicClass = CSSObjectClass.inputDynamic;
             }
             return dynamicClass;
         }
 
-        private CSSClass GetLyricClass(ChordSymbol chord)
+        private CSSObjectClass GetLyricClass(ChordSymbol chord)
         {
-            CSSClass lyricClass = CSSClass.lyric; // OutputChordSymbol
+            CSSObjectClass lyricClass = CSSObjectClass.lyric; // OutputChordSymbol
             if(chord is InputChordSymbol)
             {
-                lyricClass = CSSClass.inputLyric;
+                lyricClass = CSSObjectClass.inputLyric;
             }
             return lyricClass;
         }
 
-        private void CreateLedgerlineAndAccidentalMetrics(float fontHeight, List<Head> topDownHeads, List<HeadMetrics> topDownHeadsMetrics, float ledgerlineStemStrokeWidth, CSSClass chordClass)
+        private void CreateLedgerlineAndAccidentalMetrics(float fontHeight, List<Head> topDownHeads, List<HeadMetrics> topDownHeadsMetrics, float ledgerlineStemStrokeWidth, CSSObjectClass chordClass)
         {
             float limbLength = (topDownHeadsMetrics[0].RightStemX - topDownHeadsMetrics[0].LeftStemX) / 2F; // change to taste later
 
-            CSSClass llsClass = GetLedgerlinesClass(chordClass);
+            CSSObjectClass llsClass = GetLedgerlinesClass(chordClass);
             _upperLedgerlineBlockMetrics = CreateUpperLedgerlineBlock(topDownHeadsMetrics, limbLength, ledgerlineStemStrokeWidth, llsClass);
             _lowerLedgerlineBlockMetrics = CreateLowerLedgerlineBlock(topDownHeadsMetrics, limbLength, ledgerlineStemStrokeWidth, llsClass);
 
@@ -229,7 +229,7 @@ namespace Moritz.Symbols
                 Head head = topDownHeads[i];
                 if(head.DisplayAccidental == DisplayAccidental.force)
                 {
-                    CSSClass accidentalClass = GetAccidentalClass(chordClass);
+                    CSSObjectClass accidentalClass = GetAccidentalClass(chordClass);
                     AccidentalMetrics accidentalMetrics = new AccidentalMetrics(head, fontHeight, _gap, accidentalClass);
                     accidentalMetrics.Move(headMetrics.OriginX, headMetrics.OriginY);
                     MoveAccidentalLeft(accidentalMetrics, topDownHeadsMetrics, _stemMetrics,
@@ -243,16 +243,16 @@ namespace Moritz.Symbols
             }
         }
 
-        private CSSClass GetLedgerlinesClass(CSSClass chordClass)
+        private CSSObjectClass GetLedgerlinesClass(CSSObjectClass chordClass)
         {
-            CSSClass llClass = CSSClass.ledgerlines; // chordClass == chord
-            if(chordClass == CSSClass.cautionaryChord)
+            CSSObjectClass llClass = CSSObjectClass.ledgerlines; // chordClass == chord
+            if(chordClass == CSSObjectClass.cautionaryChord)
             {
-                llClass = CSSClass.ledgerlines; // N.B. cautionaryLedgerlines does not exist.
+                llClass = CSSObjectClass.ledgerlines; // N.B. cautionaryLedgerlines does not exist.
             }
-            else if(chordClass == CSSClass.inputChord)
+            else if(chordClass == CSSObjectClass.inputChord)
             {
-                llClass = CSSClass.inputLedgerlines;
+                llClass = CSSObjectClass.inputLedgerlines;
             }
             return llClass;
         }
@@ -422,7 +422,7 @@ namespace Moritz.Symbols
                 accidentalM.Move(ledgerlineBlockM.Left - accidentalM.Right, 0F);
         }
 
-        private LedgerlineBlockMetrics CreateUpperLedgerlineBlock(List<HeadMetrics> topDownHeadsMetrics, float limbLength, float strokeWidth, CSSClass ledgerlinesClass)
+        private LedgerlineBlockMetrics CreateUpperLedgerlineBlock(List<HeadMetrics> topDownHeadsMetrics, float limbLength, float strokeWidth, CSSObjectClass ledgerlinesClass)
         {
             Debug.Assert(topDownHeadsMetrics != null);
             #region upper ledgerline block
@@ -457,7 +457,7 @@ namespace Moritz.Symbols
             #endregion upper ledgerline block
             return upperLedgerlineBlockMetrics;
         }
-        private LedgerlineBlockMetrics CreateLowerLedgerlineBlock(List<HeadMetrics> topDownHeadsMetrics, float limbLength, float strokeWidth, CSSClass ledgerlinesClass)
+        private LedgerlineBlockMetrics CreateLowerLedgerlineBlock(List<HeadMetrics> topDownHeadsMetrics, float limbLength, float strokeWidth, CSSObjectClass ledgerlinesClass)
         {
             Debug.Assert(topDownHeadsMetrics != null);
             float minLeftX = float.MaxValue;
@@ -781,7 +781,7 @@ namespace Moritz.Symbols
         /// <param name="gap"></param>
         /// <param name="lyricIsBelow"></param>
         /// <returns></returns>
-        private LyricMetrics NewLyricMetrics(VerticalDir voiceStemDirection, Graphics graphics, float gap, CSSClass lyricClass)
+        private LyricMetrics NewLyricMetrics(VerticalDir voiceStemDirection, Graphics graphics, float gap, CSSObjectClass lyricClass)
         {
             LyricText lyric = null;
             foreach(DrawObject drawObject in _drawObjects)
@@ -809,7 +809,7 @@ namespace Moritz.Symbols
         /// <param name="gap"></param>
         /// <param name="dynamicIsBelow"></param>
         /// <returns></returns>
-        private DynamicMetrics NewCLichtDynamicMetrics(float gap, bool dynamicIsBelow, CSSClass dynamicClass)
+        private DynamicMetrics NewCLichtDynamicMetrics(float gap, bool dynamicIsBelow, CSSObjectClass dynamicClass)
         {
             List<string> clichtDynamics = new List<string>() { "Ø", "∏", "π", "p", "P", "F", "f", "ƒ", "Ï", "Î" };
             Text dynamicText = null;

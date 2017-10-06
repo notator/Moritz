@@ -102,39 +102,39 @@ namespace Moritz.Symbols
                 int velocity = head.MidiVelocity;
                 if(velocity > M.MaxMidiVelocity[M.Dynamic.ff])
                 {
-                    head.ColorClass = CSSClass.fffColor;    
+                    head.ColorClass = CSSColorClass.fffColor;    
                 }
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.f])
                 {
-                    head.ColorClass = CSSClass.ffColor;
+                    head.ColorClass = CSSColorClass.ffColor;
                 }
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.mf])
                 {
-                    head.ColorClass = CSSClass.fColor;
+                    head.ColorClass = CSSColorClass.fColor;
 				}
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.mp])
                 {
-                    head.ColorClass = CSSClass.mfColor;
+                    head.ColorClass = CSSColorClass.mfColor;
 				}
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.p])
                 {
-                    head.ColorClass = CSSClass.mpColor;
+                    head.ColorClass = CSSColorClass.mpColor;
 				}
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.pp])
                 {
-                    head.ColorClass = CSSClass.pColor;
+                    head.ColorClass = CSSColorClass.pColor;
 				}
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.ppp])
                 {
-                    head.ColorClass = CSSClass.ppColor;
+                    head.ColorClass = CSSColorClass.ppColor;
 				}
                 else if(velocity > M.MaxMidiVelocity[M.Dynamic.pppp])
                 {
-                    head.ColorClass = CSSClass.pppColor;
+                    head.ColorClass = CSSColorClass.pppColor;
 				}
                 else // > 0 
                 {
-                    head.ColorClass = CSSClass.ppppColor;
+                    head.ColorClass = CSSColorClass.ppppColor;
 				}
             }
         }
@@ -168,7 +168,7 @@ namespace Moritz.Symbols
 
             if(staffIsVisible)
             {
-				w.SvgStartGroup(CSSClass.graphics.ToString());
+				w.SvgStartGroup(CSSObjectClass.graphics.ToString());
                 ChordMetrics.WriteSVG(w);
                 w.SvgEndGroup();
             }

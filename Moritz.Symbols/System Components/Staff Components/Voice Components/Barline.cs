@@ -55,7 +55,7 @@ namespace Moritz.Symbols
 				bottomY += halfStafflineWidth;
 			}
 
-            w.SvgLine(CSSClass.barline, this.Metrics.OriginX, topY, this.Metrics.OriginX, bottomY);
+            w.SvgLine(CSSObjectClass.barline, this.Metrics.OriginX, topY, this.Metrics.OriginX, bottomY);
         }
 
         public override string ToString()
@@ -97,11 +97,11 @@ namespace Moritz.Symbols
             float bottomY = bottomStafflineY + halfStafflineThickness;
 
             float leftLineOriginX = ((EndBarlineMetrics) Metrics).LeftLine.OriginX;
-            w.SvgStartGroup(CSSClass.endBarline.ToString());
-            w.SvgLine(CSSClass.barline, leftLineOriginX, topY, leftLineOriginX, bottomY);
+            w.SvgStartGroup(CSSObjectClass.endBarline.ToString());
+            w.SvgLine(CSSObjectClass.barline, leftLineOriginX, topY, leftLineOriginX, bottomY);
 
             float rightLineOriginX = ((EndBarlineMetrics) Metrics).RightLine.OriginX;
-            w.SvgLine(CSSClass.thickBarline, rightLineOriginX, topY, rightLineOriginX, bottomY);
+            w.SvgLine(CSSObjectClass.thickBarline, rightLineOriginX, topY, rightLineOriginX, bottomY);
             w.SvgEndGroup();            
         }
 

@@ -11,7 +11,7 @@ namespace Moritz.Symbols
 {
 	internal class TextMetrics : TextStyle
 	{
-		public TextMetrics(CSSClass cssClass, Graphics graphics, TextInfo textInfo)
+		public TextMetrics(CSSObjectClass cssClass, Graphics graphics, TextInfo textInfo)
 			: base(cssClass, textInfo.FontFamily, textInfo.FontHeight, textInfo.TextHorizAlign, textInfo.ColorString.String)
 		{
 			SetDefaultMetrics(graphics, textInfo);
@@ -102,7 +102,7 @@ namespace Moritz.Symbols
 	}
 	internal class LyricMetrics : TextMetrics, ICloneable
 	{
-		public LyricMetrics(float gap, Graphics graphics, TextInfo textInfo, bool isBelow, CSSClass lyricClass)
+		public LyricMetrics(float gap, Graphics graphics, TextInfo textInfo, bool isBelow, CSSObjectClass lyricClass)
 			: base(lyricClass, graphics, textInfo)
 		{
 			float width = _right - _left;
@@ -123,7 +123,7 @@ namespace Moritz.Symbols
 	internal class OrnamentMetrics : TextMetrics, ICloneable
 	{
 		public OrnamentMetrics(float gap, Graphics graphics, TextInfo textInfo, bool isBelow)
-			: base(CSSClass.ornament, graphics, textInfo)
+			: base(CSSObjectClass.ornament, graphics, textInfo)
 		{
 			IsBelow = isBelow;
 		}
@@ -137,9 +137,9 @@ namespace Moritz.Symbols
 	internal class BarnumberMetrics : GroupMetrics
 	{
 		public BarnumberMetrics(Graphics graphics, TextInfo textInfo, FrameInfo frameInfo)
-			: base(CSSClass.barNumber)
+			: base(CSSObjectClass.barNumber)
 		{
-            _barNumberNumberMetrics = new TextMetrics(CSSClass.barNumberNumber, graphics, textInfo);
+            _barNumberNumberMetrics = new TextMetrics(CSSObjectClass.barNumberNumber, graphics, textInfo);
             _number = textInfo.Text;
 			_top = _barNumberNumberMetrics.Top - frameInfo.PaddingY;
 			_right = _barNumberNumberMetrics.Right + frameInfo.PaddingX;
@@ -157,8 +157,8 @@ namespace Moritz.Symbols
         public override void WriteSVG(SvgWriter w)
 		{
             w.SvgStartGroup(CSSObjectClass.ToString());
-            w.SvgText(CSSClass.barNumberNumber, _number, _barNumberNumberMetrics.OriginX, _barNumberNumberMetrics.OriginY);
-            w.SvgRect(CSSClass.barNumberFrame.ToString(), _left, _top, _right - _left, _bottom - _top);
+            w.SvgText(CSSObjectClass.barNumberNumber, _number, _barNumberNumberMetrics.OriginX, _barNumberNumberMetrics.OriginY);
+            w.SvgRect(CSSObjectClass.barNumberFrame.ToString(), _left, _top, _right - _left, _bottom - _top);
             w.SvgEndGroup();
 		}
 

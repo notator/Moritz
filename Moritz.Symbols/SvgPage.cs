@@ -171,16 +171,16 @@ namespace Moritz.Symbols
 
 		private void WriteFrameLayer(SvgWriter w, float width, float height)
 		{
-            w.SvgRect(CSSClass.frame.ToString(), 0, 0, width, height);
+            w.SvgRect(CSSObjectClass.frame.ToString(), 0, 0, width, height);
         }
 
 		private void WriteSystemsLayer(SvgWriter w, int pageNumber, Metadata metadata)
 		{
-            w.SvgStartGroup(CSSClass.systems.ToString());
+            w.SvgStartGroup(CSSObjectClass.systems.ToString());
 
             //w.WriteAttributeString("style", "display:inline");
 
-			w.SvgText(CSSClass.timeStamp, _infoTextInfo.Text, 32, _infoTextInfo.FontHeight);
+			w.SvgText(CSSObjectClass.timeStamp, _infoTextInfo.Text, 32, _infoTextInfo.FontHeight);
 
 			if(pageNumber == 1 || pageNumber == 0)
 			{
@@ -256,9 +256,9 @@ namespace Moritz.Symbols
 			  new TextInfo(metadata.Author, titlesFontFamily, _pageFormat.Page1AuthorHeight,
 				  null, TextHorizAlign.right);
 			w.WriteStartElement("g");
-			w.WriteAttributeString("class", CSSClass.titles.ToString());
-			w.SvgText(CSSClass.mainTitle, titleInfo.Text, _pageFormat.Right / 2F, _pageFormat.Page1TitleY);
-			w.SvgText(CSSClass.author, authorInfo.Text, _pageFormat.RightMarginPos, _pageFormat.Page1TitleY);
+			w.WriteAttributeString("class", CSSObjectClass.titles.ToString());
+			w.SvgText(CSSObjectClass.mainTitle, titleInfo.Text, _pageFormat.Right / 2F, _pageFormat.Page1TitleY);
+			w.SvgText(CSSObjectClass.author, authorInfo.Text, _pageFormat.RightMarginPos, _pageFormat.Page1TitleY);
 			w.WriteEndElement(); // group
 		}
 

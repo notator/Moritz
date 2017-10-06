@@ -5,7 +5,7 @@ namespace Moritz.Symbols
     internal class StaffMetrics : GroupMetrics
     {
         public StaffMetrics(float left, float right, float height, bool isInput)
-            : base(isInput ? CSSClass.inputStaff : CSSClass.staff)
+            : base(isInput ? CSSObjectClass.inputStaff : CSSObjectClass.staff)
         {
             _top = 0F;
             _right = right;

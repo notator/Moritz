@@ -11,39 +11,19 @@ namespace Moritz.Symbols
 {
 	public abstract class Metrics
 	{
-		protected Metrics(CSSClass cssClass)
+		protected Metrics(CSSObjectClass cssObjectClass)
 		{
-			_cssClassList = new List<CSSClass>() { cssClass }; 
-			if(!_usedCSSClasses.Contains(cssClass))
+			_cssObjectClass = cssObjectClass; 
+			if(!_usedCSSObjectClasses.Contains(cssObjectClass))
 			{
-				_usedCSSClasses.Add(cssClass);
+				_usedCSSObjectClasses.Add(cssObjectClass);
 			}
 		}
 
-		protected Metrics(List<CSSClass> cssClassList)
+		public static void ClearUsedCSSClasses()
         {
-            _cssClassList = cssClassList;
-			foreach(CSSClass cssClass in cssClassList)
-			{
-				if(!_usedCSSClasses.Contains(cssClass))
-				{
-					_usedCSSClasses.Add(cssClass);
-				}
-			}
-        }
-
-		protected void AddCSSClass(CSSClass colorClass)
-		{
-			_cssClassList.Add(colorClass);
-			if(!_usedCSSClasses.Contains(colorClass))
-			{
-				_usedCSSClasses.Add(colorClass);
-			}
-		}
-
-		public static void ClearCSSClasses()
-        {
-            _usedCSSClasses.Clear();
+            _usedCSSObjectClasses.Clear();
+			_usedCSSColorClasses.Clear();
         }
 
         public virtual void Move(float dx, float dy)
@@ -219,11 +199,26 @@ namespace Moritz.Symbols
 		protected float _originY = 0F;
 
 
-		public IReadOnlyList<CSSClass> CSSClassList	{ get{ return _cssClassList as IReadOnlyList<CSSClass>; } }
-		protected List<CSSClass> _cssClassList = null; // must be set by constructors
-		public CSSClass CSSObjectClass {  get { return CSSClassList[0]; } }
+		public CSSObjectClass CSSObjectClass { get => _cssObjectClass; }
+		private CSSObjectClass _cssObjectClass;
+		public CSSColorClass CSSColorClass
+		{ 
+			get => _cssColorClass;
+			protected set
+			{
+				_cssColorClass = value;
+				if(!_usedCSSColorClasses.Contains(value))
+				{
+					_usedCSSColorClasses.Add(value);
+				}
+			}
+		}
+		private CSSColorClass _cssColorClass = CSSColorClass.none;
 
-        private static List<CSSClass> _usedCSSClasses = new List<CSSClass>();
-        public static IReadOnlyList<CSSClass> UsedCSSClasses { get { return _usedCSSClasses as IReadOnlyList<CSSClass>; } }
-    }
+		public static IReadOnlyList<CSSObjectClass> UsedCSSObjectClasses { get => _usedCSSObjectClasses as IReadOnlyList<CSSObjectClass>; }
+		private static List<CSSObjectClass> _usedCSSObjectClasses = new List<CSSObjectClass>();
+		public static IReadOnlyList<CSSColorClass> UsedCSSColorClasses { get => _usedCSSColorClasses as IReadOnlyList<CSSColorClass>; }
+		private static List<CSSColorClass> _usedCSSColorClasses = new List<CSSColorClass>();
+	}
 }
+			    

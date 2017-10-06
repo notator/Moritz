@@ -33,7 +33,7 @@ namespace Moritz.Symbols
         {
             if(staffIsVisible)
             {
-                CSSClass clefClass = isInput ? CSSClass.inputClef : CSSClass.clef;
+                CSSObjectClass clefClass = isInput ? CSSObjectClass.inputClef : CSSObjectClass.clef;
                     
                 w.SvgUseXY(clefClass, clefOrSmallClefID.ToString(), originX, originY);
             }

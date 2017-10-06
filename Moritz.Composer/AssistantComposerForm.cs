@@ -1988,7 +1988,7 @@ namespace Moritz.Composer
             _algorithm.GetInitialClefPerChannel(pageFormat);
 
             // These need clearing between creating different scores in one Moritz run.
-            Metrics.ClearCSSClasses();
+            Metrics.ClearUsedCSSClasses();
             ClefMetrics.ClearUsedClefIDsList();
             FlagsMetrics.ClearUsedFlagIDsList();
 

@@ -36,7 +36,7 @@ namespace Moritz.Symbols
                 Staves[staffIndex].WriteSVG(w, systemNumber, staffIndex + 1, carryMsgsPerChannel);
             }
 
-            w.SvgStartGroup(CSSClass.staffConnectors.ToString());
+            w.SvgStartGroup(CSSObjectClass.staffConnectors.ToString());
 
             WriteConnectors(w, systemNumber, pageFormat);
 

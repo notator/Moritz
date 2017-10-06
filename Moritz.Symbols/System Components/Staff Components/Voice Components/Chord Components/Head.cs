@@ -223,15 +223,15 @@ namespace Moritz.Symbols
             }
         }
 
-        public CSSClass ColorClass
+        public CSSColorClass ColorClass
         {
-            get { return _colorAttribute; }
+            get { return _colorClass; }
             internal set
             {
-                _colorAttribute = value;
+                _colorClass = value;
             }
         }
-        private CSSClass _colorAttribute = CSSClass.black; // default is black
+        private CSSColorClass _colorClass = CSSColorClass.black; // default is black
 
         /// <summary>
         /// Specifies if and how the accidental should be displayed. Meanings:

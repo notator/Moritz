@@ -14,17 +14,17 @@ namespace Moritz.Symbols
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="cssClass"></param>
+        /// <param name="csslineClass"></param>
         /// <param name="strokeWidthPixels"></param>
         /// <param name="stroke">"none", "black", "white", "red" or a string of 6 hex characters</param>
         /// <param name="fill">"none", "black", "white", "red" or a string of 6 hex characters</param>
         /// <param name="lineCap"></param>
-        public LineMetrics(CSSClass cssClass,
+        public LineMetrics(CSSObjectClass csslineClass,
             float strokeWidthPixels,
             string stroke = "none", 
             string fill = "none",
             CSSLineCap lineCap = CSSLineCap.butt)
-            : base(cssClass)
+            : base(csslineClass)
         {
             StrokeWidthPixels = strokeWidthPixels;
             Stroke = stroke.ToString();
@@ -46,7 +46,7 @@ namespace Moritz.Symbols
 	internal class StemMetrics : LineMetrics
 	{
 		public StemMetrics(float top, float x, float bottom, float strokeWidth, VerticalDir verticalDir, bool isInput)
-			: base(isInput ? CSSClass.inputStem : CSSClass.stem, strokeWidth, "black")
+			: base(isInput ? CSSObjectClass.inputStem : CSSObjectClass.stem, strokeWidth, "black")
 		{
 			_originX = x;
 			_originY = top;
@@ -73,7 +73,7 @@ namespace Moritz.Symbols
 	}
 	internal class LedgerlineBlockMetrics : LineMetrics, ICloneable
 	{      
-        public LedgerlineBlockMetrics(float left, float right, float strokeWidth, CSSClass ledgerlinesClass)
+        public LedgerlineBlockMetrics(float left, float right, float strokeWidth, CSSObjectClass ledgerlinesClass)
 			: base(ledgerlinesClass, strokeWidth, "black")
 		{
             /// The base class has deliberately been called with CSSClass.ledgerline (singular) here.
@@ -117,7 +117,7 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
         {
-            CSSClass ledgerlineClass = (CSSObjectClass == CSSClass.inputLedgerlines) ? CSSClass.inputLedgerline : CSSClass.ledgerline;
+            CSSObjectClass ledgerlineClass = (CSSObjectClass == CSSObjectClass.inputLedgerlines) ? CSSObjectClass.inputLedgerline : CSSObjectClass.ledgerline;
 
             w.WriteStartElement("g");
             w.WriteAttributeString("class", CSSObjectClass.ToString());
@@ -134,7 +134,7 @@ namespace Moritz.Symbols
 	internal class CautionaryBracketMetrics : LineMetrics, ICloneable
 	{
 		public CautionaryBracketMetrics(bool isLeftBracket, float top, float right, float bottom, float left, float strokeWidth)
-			: base(CSSClass.cautionaryBracket, strokeWidth, "black")
+			: base(CSSObjectClass.cautionaryBracket, strokeWidth, "black")
 		{
 			_isLeftBracket = isLeftBracket;
 			_top = top;
@@ -160,7 +160,7 @@ namespace Moritz.Symbols
 	internal class StafflineMetrics : LineMetrics
 	{
 		public StafflineMetrics(float left, float right, float originY)
-			: base(CSSClass.staffline, 0F, "black")
+			: base(CSSObjectClass.staffline, 0F, "black")
 		{
 			_left = left;
 			_right = right;
@@ -184,7 +184,7 @@ namespace Moritz.Symbols
 	internal class NoteheadExtenderMetrics : LineMetrics
 	{
 		public NoteheadExtenderMetrics(float left, float right, float originY, float strokeWidth, string strokeColor, float gap, bool drawExtender)
-			: base(CSSClass.noteExtender, strokeWidth, strokeColor)
+			: base(CSSObjectClass.noteExtender, strokeWidth, strokeColor)
 
         {
 			_left = left;
@@ -220,7 +220,7 @@ namespace Moritz.Symbols
     internal class BarlineMetrics : LineMetrics
     {
         public BarlineMetrics(Graphics graphics, Barline barline, float strokeWidth, float gap)
-            : base(CSSClass.barline, strokeWidth, "black")
+            : base(CSSObjectClass.barline, strokeWidth, "black")
         {
             _originX = 0F;
             _left = -(strokeWidth / 2F);
@@ -238,7 +238,7 @@ namespace Moritz.Symbols
 
                         if(text is StaffNameText)
                         {
-                            CSSClass staffClass = (barline.Voice is InputVoice) ? CSSClass.inputStaffName : CSSClass.staffName;
+                            CSSObjectClass staffClass = (barline.Voice is InputVoice) ? CSSObjectClass.inputStaffName : CSSObjectClass.staffName;
                             _staffNameMetrics = new TextMetrics(staffClass, graphics, text.TextInfo);
                             // move the staffname vertically to the middle of this staff
                             Staff staff = barline.Voice.Staff;
@@ -304,10 +304,10 @@ namespace Moritz.Symbols
     internal class EndBarlineMetrics : GroupMetrics
     {
         public EndBarlineMetrics(float thinStrokeWidth, float thickStrokeWidth)
-            : base(CSSClass.endBarline)
+            : base(CSSObjectClass.endBarline)
         {
-            LeftLine = new LineMetrics(CSSClass.barline, thinStrokeWidth, "black");
-            RightLine = new LineMetrics(CSSClass.thickBarline, thickStrokeWidth, "black");
+            LeftLine = new LineMetrics(CSSObjectClass.barline, thinStrokeWidth, "black");
+            RightLine = new LineMetrics(CSSObjectClass.thickBarline, thickStrokeWidth, "black");
 
             LeftLine.Move(-(thinStrokeWidth * 3F), 0);
 

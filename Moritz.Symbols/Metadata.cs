@@ -44,8 +44,8 @@ namespace Moritz.Symbols
 			w.WriteString(pageTitle);
             w.WriteEndElement();
 
-            w.WriteStartElement(CSSClass.metadata.ToString()); // Inkscape compatible
-			w.WriteAttributeString("class", CSSClass.metadata.ToString());
+            w.WriteStartElement(CSSObjectClass.metadata.ToString()); // Inkscape compatible
+			w.WriteAttributeString("class", CSSObjectClass.metadata.ToString());
 			w.WriteStartElement("rdf", "RDF", null);
 			w.WriteStartElement("cc", "Work", null);
 			w.WriteAttributeString("rdf", "about", null, "");

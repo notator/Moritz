@@ -16,7 +16,7 @@ namespace Moritz.Symbols
         /// Should be called with a duration class having a flag block
         /// </summary>
         public FlagsMetrics(DurationClass durationClass, float fontHeight, VerticalDir stemDirection, bool isInput)
-            : base(isInput ? CSSClass.inputFlag : CSSClass.flag)
+            : base(isInput ? CSSObjectClass.inputFlag : CSSObjectClass.flag)
         {
 			_left = 0F;           
             

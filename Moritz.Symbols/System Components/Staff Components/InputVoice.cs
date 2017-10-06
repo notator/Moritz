@@ -20,7 +20,7 @@ namespace Moritz.Symbols
         /// </summary>
         public override void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> unused)
         {
-			w.SvgStartGroup(CSSClass.inputVoice.ToString());
+			w.SvgStartGroup(CSSObjectClass.inputVoice.ToString());
 
             if(MidiChannel >= 0 && MidiChannel <= 15)
             {

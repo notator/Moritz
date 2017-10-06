@@ -14,8 +14,8 @@ namespace Moritz.Symbols
     /// </summary>
 	public class GroupMetrics : Metrics
 	{
-        public GroupMetrics(CSSClass cssClass)
-            : base(cssClass)
+        public GroupMetrics(CSSObjectClass cssGroupClass)
+            : base(cssGroupClass)
         {
         }
 

@@ -11,8 +11,8 @@ namespace Moritz.Symbols
 {
     public class TextStyle : Metrics
     {
-        public TextStyle(CSSClass cssClass, string fontFamily, float fontHeight, TextHorizAlign textAnchor = TextHorizAlign.left, string fill = "black")
-            : base(cssClass)
+        public TextStyle(CSSObjectClass cssTextClass, string fontFamily, float fontHeight, TextHorizAlign textAnchor = TextHorizAlign.left, string fill = "black")
+            : base(cssTextClass)
         {
             FontFamily = fontFamily;
             FontHeight = fontHeight;
@@ -67,7 +67,7 @@ namespace Moritz.Symbols
         /// <summary>
         /// Used by DynamicMetrics
         /// </summary>
-		public CLichtCharacterMetrics(string characterString, float fontHeight, TextHorizAlign textHorizAlign, CSSClass dynamicClass)
+		public CLichtCharacterMetrics(string characterString, float fontHeight, TextHorizAlign textHorizAlign, CSSObjectClass dynamicClass)
 			: base(dynamicClass, "CLicht", fontHeight, textHorizAlign)
 		{
 			_characterString = characterString;
@@ -91,10 +91,10 @@ namespace Moritz.Symbols
         /// <summary>
         /// Used by RestMetrics and HeadMetrics
         /// </summary>
-		public CLichtCharacterMetrics(DurationClass durationClass, float fontHeight, CSSClass cssClass)
+		public CLichtCharacterMetrics(DurationClass durationClass, float fontHeight, CSSObjectClass cssClass)
 			: base(cssClass, "CLicht", fontHeight)
 		{
-			_characterString = GetClichtCharacterString(durationClass, (cssClass == CSSClass.rest || cssClass == CSSClass.inputRest));
+			_characterString = GetClichtCharacterString(durationClass, (cssClass == CSSObjectClass.rest || cssClass == CSSObjectClass.inputRest));
 
 			Debug.Assert(_characterString != null);
 			Metrics m = CLichtFontMetrics.CLichtGlyphBoundingBoxesDictPX[_characterString];
@@ -114,7 +114,7 @@ namespace Moritz.Symbols
         /// <summary>
         /// Used by AccidentalMetrics
         /// </summary>
-		public CLichtCharacterMetrics(Head head, float fontHeight, CSSClass cssClass)
+		public CLichtCharacterMetrics(Head head, float fontHeight, CSSObjectClass cssClass)
 			: base(cssClass, "CLicht", fontHeight)
 		{
 			_characterString = GetClichtCharacterString(head);
@@ -264,7 +264,7 @@ namespace Moritz.Symbols
     }
     internal class RestMetrics : CLichtCharacterMetrics
 	{
-		public RestMetrics(Graphics graphics, RestSymbol rest, float gap, int numberOfStafflines, float ledgerlineStrokeWidth, CSSClass restClass)
+		public RestMetrics(Graphics graphics, RestSymbol rest, float gap, int numberOfStafflines, float ledgerlineStrokeWidth, CSSObjectClass restClass)
 			: base(rest.DurationClass, rest.FontHeight, restClass)
 		{
 			float dy = 0;
@@ -276,7 +276,7 @@ namespace Moritz.Symbols
 			_originY += dy; // the staffline on which the rest is aligned
 			_ledgerlineStub = gap * 0.75F;
 			Move((Left - Right) / 2F, 0F); // centre the glyph horizontally
-            CSSClass llBlockClass = (restClass == CSSClass.rest) ? CSSClass.ledgerlines : CSSClass.inputLedgerlines;
+            CSSObjectClass llBlockClass = (restClass == CSSObjectClass.rest) ? CSSObjectClass.ledgerlines : CSSObjectClass.inputLedgerlines;
 			switch(rest.DurationClass)
 			{
 				case DurationClass.breve:
@@ -373,7 +373,7 @@ namespace Moritz.Symbols
 	}
 	internal class HeadMetrics : CLichtCharacterMetrics
 	{
-		public HeadMetrics(ChordSymbol chord, Head head, float gapVBPX, CSSClass headClass)
+		public HeadMetrics(ChordSymbol chord, Head head, float gapVBPX, CSSObjectClass headClass)
 			: base(chord.DurationClass, chord.FontHeight, headClass)
 		{
 			Move((Left - Right) / 2F, 0F); // centre horizontally
@@ -383,9 +383,9 @@ namespace Moritz.Symbols
 			_rightStemX = _right;
 			_left -= horizontalPadding;
 			_right += horizontalPadding;
-            if(head != null && head.ColorClass != CSSClass.black) // black is the default
+            if(head != null)
             {
-				AddCSSClass(head.ColorClass);
+				CSSColorClass = head.ColorClass;
             }
 		}
 
@@ -393,7 +393,7 @@ namespace Moritz.Symbols
 		/// Used when creating temporary heads for chord alignment purposes.
 		/// </summary>
 		public HeadMetrics(HeadMetrics otherHead, DurationClass durationClass)
-			: base(durationClass, otherHead.FontHeight, CSSClass.none)
+			: base(durationClass, otherHead.FontHeight, CSSObjectClass.none)
 		{
 			// move to position of other head
 			Move(otherHead.OriginX - _originX, otherHead.OriginY - OriginY);
@@ -456,7 +456,7 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-			w.SvgText(_cssClassList, _characterString, _originX, _originY);
+			w.SvgText(CSSObjectClass, CSSColorClass, _characterString, _originX, _originY);
 		}
 
 		public float LeftStemX { get { return _leftStemX; } }
@@ -466,7 +466,7 @@ namespace Moritz.Symbols
     }
 	internal class AccidentalMetrics : CLichtCharacterMetrics
 	{
-		public AccidentalMetrics(Head head, float fontHeight, float gap, CSSClass cssClass)
+		public AccidentalMetrics(Head head, float fontHeight, float gap, CSSObjectClass cssClass)
 			: base(head, fontHeight, cssClass)
 		{
 			float verticalPadding = gap / 5;
@@ -488,9 +488,9 @@ namespace Moritz.Symbols
 					_right += gap * 0.1F;
 					break;
 			}
-            if(head != null && head.ColorClass != CSSClass.black)
+            if(head != null)
             {
-				_cssClassList.Add(head.ColorClass);    
+				CSSColorClass = head.ColorClass;    
             }
         }
 
@@ -501,7 +501,7 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w)
 		{
-			w.SvgText(_cssClassList, _characterString, _originX, _originY);
+			w.SvgText(CSSObjectClass, CSSColorClass, _characterString, _originX, _originY);
 		}
 
 	}
@@ -516,7 +516,7 @@ namespace Moritz.Symbols
 		/// <param name="isBelow"></param>
 		/// <param name="topBoundary"></param>
 		/// <param name="bottomBoundary"></param>
-		public DynamicMetrics(float gap, TextInfo textInfo, bool isBelow, CSSClass dynamicClass)
+		public DynamicMetrics(float gap, TextInfo textInfo, bool isBelow, CSSObjectClass dynamicClass)
 			: base(textInfo.Text, textInfo.FontHeight, TextHorizAlign.left, dynamicClass)
 		{
 			// visually centre the "italic" dynamic characters

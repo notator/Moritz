@@ -36,8 +36,8 @@ namespace Moritz.Symbols
             {            
                 w.WriteAttributeString("score", "staffName", null, this.Staffname);
 
-                CSSClass stafflinesClass = (Metrics.CSSObjectClass == CSSClass.inputStaff) ? CSSClass.inputStafflines : CSSClass.stafflines;
-                CSSClass stafflineClass = (Metrics.CSSObjectClass == CSSClass.inputStaff) ? CSSClass.inputStaffline : CSSClass.staffline;
+                CSSObjectClass stafflinesClass = (Metrics.CSSObjectClass == CSSObjectClass.inputStaff) ? CSSObjectClass.inputStafflines : CSSObjectClass.stafflines;
+                CSSObjectClass stafflineClass = (Metrics.CSSObjectClass == CSSObjectClass.inputStaff) ? CSSObjectClass.inputStaffline : CSSObjectClass.staffline;
 
                 w.SvgStartGroup(stafflinesClass.ToString());
                 float stafflineY = this.Metrics.StafflinesTop;

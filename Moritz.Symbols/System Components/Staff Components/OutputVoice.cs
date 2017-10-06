@@ -19,7 +19,7 @@ namespace Moritz.Symbols
 
 		public override void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel)
         {
-			w.SvgStartGroup(CSSClass.voice.ToString());
+			w.SvgStartGroup(CSSObjectClass.voice.ToString());
 
             base.WriteSVG(w, staffIsVisible, carryMsgsPerChannel);
             w.SvgEndGroup(); // outputVoice

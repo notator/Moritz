@@ -9,7 +9,7 @@ namespace Moritz.Symbols
     public class BeamBlock : LineMetrics
     {
         public BeamBlock(Clef clef, List<ChordSymbol> chordsBeamedTogether, VerticalDir voiceStemDirection, float beamThickness, float strokeThickness, bool isInput)
-            : base(isInput ? CSSClass.inputBeamBlock : CSSClass.beamBlock, strokeThickness, "black", "black")
+            : base(isInput ? CSSObjectClass.inputBeamBlock : CSSObjectClass.beamBlock, strokeThickness, "black", "black")
         {
             Chords = new List<ChordSymbol>(chordsBeamedTogether);
             SetBeamedGroupStemDirection(clef, chordsBeamedTogether, voiceStemDirection);
@@ -1087,7 +1087,7 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-            bool isInput = (CSSObjectClass == CSSClass.inputBeamBlock);
+            bool isInput = (CSSObjectClass == CSSObjectClass.inputBeamBlock);
 
             w.SvgStartGroup(CSSObjectClass.ToString());
             foreach(Beam beam in Beams)
