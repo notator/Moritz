@@ -668,7 +668,7 @@ namespace Moritz.Spec
         /// The factors by which the velocities are multiplied change arithmetically:
         /// The velocity of the the IUniqueDef at beginIndex is multiplied by startFactor, and
         /// the velocity of the the IUniqueDef at endIndex is multiplied by endFactor.
-        /// Can be used to create a diminueno or crescendo.
+        /// Can be used to create a diminueno or crescendo, or (using multiple calls) hairpins.
         /// N.B MidiChordDefs will be turned into RestDefs if all their notes have zero velocity!
         /// </summary>
         /// <param name="startIndex">index of start UniqueDef (range 0 to this.Count - 2)</param>
@@ -683,11 +683,11 @@ namespace Moritz.Spec
 
             int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
 
-            double factorIncrement = (endFactor - startFactor) / (endIndex - beginIndex - nNonMidiChordDefs - 1);
+            double factorIncrement = (endFactor - startFactor) / (endIndex - beginIndex - nNonMidiChordDefs);
             double factor = startFactor;
             List<IUniqueDef> lmdds = _uniqueDefs;
 
-            for(int i = beginIndex; i < endIndex; ++i)
+            for(int i = beginIndex; i <= endIndex; ++i)
             {
                 MidiChordDef mcd = _uniqueDefs[i] as MidiChordDef;
                 if(mcd != null)

@@ -620,8 +620,7 @@ namespace Moritz.Spec
             new List<int>(){ 0, 10,  7,  5,  4, 11,  2,  3,  9,  8,  1,  6 }, // 20
             new List<int>(){ 0,  7, 10,  4,  5,  2, 11,  9,  3,  1,  8,  6 }, // 21 
         };
-        private List<int> absolutePitchHierarchy;
-        private int v;
+
         #endregion Pitch Hierarchies
     }
 }
