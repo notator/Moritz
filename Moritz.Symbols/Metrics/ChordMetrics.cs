@@ -801,8 +801,10 @@ namespace Moritz.Symbols
         /// <returns></returns>
         private DynamicMetrics NewCLichtDynamicMetrics(float gap, bool dynamicIsBelow, CSSObjectClass dynamicClass)
         {
-            List<string> clichtDynamics = new List<string>() { "Ø", "∏", "π", "p", "P", "F", "f", "ƒ", "Ï", "Î" };
-            Text dynamicText = null;
+			List<string> clichtDynamics = new List<string>();
+			clichtDynamics.AddRange(M.CLichtDynamicsCharacters.Values);
+
+			Text dynamicText = null;
             foreach(DrawObject drawObject in _drawObjects)
             {
                 if(drawObject is Text text)

@@ -703,7 +703,7 @@ namespace Moritz.Globals
 		/// </summary>
 		public enum Dynamic
         {
-            none, pppp, ppp, pp, p, mp, mf, f, ff, fff, ffff
+            none, pppp, ppp, pp, p, mp, mf, f, ff, fff
         }
 
         /// <summary>
@@ -726,13 +726,12 @@ namespace Moritz.Globals
         };
 
 		/// <summary>
-		/// The key is one of the following strings: "ffff", "fff", "ff", "f", "mf", "mp", "p", "pp", "ppp", "pppp".
+		/// The key is one of the following strings: "fff", "ff", "f", "mf", "mp", "p", "pp", "ppp", "pppp".
 		/// The value is a string containing the equivalent CLicht character.
 		/// Note that Moritz does not use M.Dynamic.ffff even though it is defined in CLicht.
 		/// </summary>
 		public static Dictionary<M.Dynamic, string> CLichtDynamicsCharacters = new Dictionary<M.Dynamic, string>()
         {
-            { M.Dynamic.ffff, "Î"}, // unused by Moritz (see M.MaxMidiVelocity)
             { M.Dynamic.fff, "Ï"},
             { M.Dynamic.ff, "ƒ"},
             { M.Dynamic.f, "f"},
