@@ -39,7 +39,7 @@ namespace Moritz.Algorithm.Tombeau1
                 int steps = 4;
                 ((MidiChordDef)grp.UniqueDefs[0]).TransposeStepsInGamut(grp.Gamut, steps);
 
-				grp.AdjustChordMsDurations(10);
+				//grp.AdjustChordMsDurations(10); 
 
                 grps.Add(grp);
             }
