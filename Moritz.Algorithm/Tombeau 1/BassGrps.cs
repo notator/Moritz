@@ -34,10 +34,12 @@ namespace Moritz.Algorithm.Tombeau1
                 grp.SortRootNotatedPitchAscending();
 
                 int rootPitch = ((MidiChordDef)grp.UniqueDefs[0]).NotatedMidiPitches[0];
-                grp.TransposeToRootInGamut(rootPitch + (relativeSopranoRootOctave * 12));
+                grp.TransposeToRootInGamut(rootPitch -48 + (relativeSopranoRootOctave * 12));
 
                 int steps = 4;
                 ((MidiChordDef)grp.UniqueDefs[0]).TransposeStepsInGamut(grp.Gamut, steps);
+
+				grp.AdjustChordMsDurations(10);
 
                 grps.Add(grp);
             }

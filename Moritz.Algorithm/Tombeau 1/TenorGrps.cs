@@ -58,11 +58,11 @@ namespace Moritz.Algorithm.Tombeau1
 				#endregion
 
 				#region begin test code 4, adjust velocities
-				if(domain % 2 != 0 && tpg.Count > 1)
-				{
-					tpg.AdjustVelocitiesHairpin(0, (tpg.Count - 1) / 2, 0.5, 1.0);
-					tpg.AdjustVelocitiesHairpin((tpg.Count - 1) / 2, tpg.Count - 1, 1.0, 0.5);
-				}
+				//if(domain % 2 != 0 && tpg.Count > 1)
+				//{
+				//	tpg.AdjustVelocitiesHairpin(0, (tpg.Count - 1) / 2, 0.5, 1.0);
+				//	tpg.AdjustVelocitiesHairpin((tpg.Count - 1) / 2, tpg.Count - 1, 1.0, 0.5);
+				//}
 				#endregion
 
 				#region begin test code 5, related Grps
