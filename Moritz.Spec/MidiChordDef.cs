@@ -112,7 +112,6 @@ namespace Moritz.Spec
             }
 
             _msPositionReFirstIUD = 0;
-            _msDuration = msDuration;
             _pitchWheelDeviation = pitchWheelDeviation;
             _hasChordOff = hasChordOff;
             _notatedMidiPitches = rootMidiPitches;
@@ -126,10 +125,91 @@ namespace Moritz.Spec
             CheckTotalDuration();
         }
 
-        /// <summary>
-        /// private constructor -- used by Clone()
-        /// </summary>
-        private MidiChordDef()
+		/// <summary>
+		/// Returns a new, ornamented MidiChordDef having msDuration, whose BasicMidiChordDefs are created from the MidiChordDefs
+		/// and RestDefs in the iUniqueDefs argument. Condition: The first iUniqueDef in the iUnqueDefs must be a MidiChordDef.
+		/// BasicMidiChordDefs created from MidiChordDefs are the MidiChordDef's BasicMidiChordDef[0].
+		/// BasicMidiChordDefs created from RestDefs have a single (un-notated) pitch (=0) and velocity=0.
+		/// The durations of the returned BasicMidiChordDefs are in proportion to the durations of the MidiChordDefs and RestDefs
+		/// in the iUniqueDefs. 
+		/// This function makes a deep clone of all the required attributes in the iUniqueDefs.
+		/// </summary>
+		/// <param name="msDuration">The duration of the returned MidiChordDef</param>
+		public MidiChordDef(int msDuration, List<IUniqueDef> iUniqueDefs)
+			:base(msDuration)
+		{
+			Debug.Assert(iUniqueDefs[0] is MidiChordDef);
+
+			MidiChordDef mcd0 = iUniqueDefs[0] as MidiChordDef;
+
+			_msPositionReFirstIUD = 0;
+			_pitchWheelDeviation = mcd0.PitchWheelDeviation;
+			_hasChordOff = mcd0.HasChordOff;
+			_notatedMidiPitches = new List<byte>(mcd0.NotatedMidiPitches);
+			_notatedMidiVelocities = new List<byte>(mcd0.NotatedMidiVelocities);
+
+			this.OrnamentNumberSymbol = int.MaxValue; // an un-numbered ornament symbol (currently "*" -- October 2017).
+
+			MidiChordSliderDefs mcsd = mcd0.MidiChordSliderDefs;
+			MidiChordSliderDefs = new MidiChordSliderDefs(mcsd.PitchWheelMsbs, mcsd.PanMsbs, mcsd.ModulationWheelMsbs, mcsd.ExpressionMsbs);
+
+			#region construct BasicMidiChordDefs
+			List<BasicMidiChordDef> basicMidiChordDefs = new List<BasicMidiChordDef>();
+			int bmcMsDuration = 0;
+			byte? bmcBank = null;
+			byte? bmcPatch = null;
+			bool bmcHasChordOff = true;
+			int nMidiChordDefs = 0;
+			List<int> iudMsDurations = new List<int>();
+			foreach(IUniqueDef iud in iUniqueDefs)
+			{
+				if(iud is MidiChordDef || iud is MidiRestDef)
+				{
+					iudMsDurations.Add(iud.MsDuration);
+				}
+			}
+			List<int> bmcdMsDurations = M.IntDivisionSizes(msDuration, iudMsDurations);
+
+			int i = 0;
+			foreach(IUniqueDef iud in iUniqueDefs)
+			{
+				List<byte> bmcPitches = null;
+				List<byte> bmcVelocities = null;
+				if(iud is MidiChordDef mcd)
+				{
+					bmcBank = mcd.BasicMidiChordDefs[0].BankIndex;
+					bmcPatch = mcd.BasicMidiChordDefs[0].PatchIndex;
+					bmcHasChordOff = mcd.BasicMidiChordDefs[0].HasChordOff;
+					bmcPitches = new List<byte>(mcd.BasicMidiChordDefs[0].Pitches);
+					bmcVelocities = new List<byte>(mcd.BasicMidiChordDefs[0].Velocities);
+					bmcMsDuration = bmcdMsDurations[i++];
+					nMidiChordDefs++;
+				}
+
+				if(iud is MidiRestDef restDef)
+				{
+					bmcBank = null;
+					bmcPatch = null;
+					bmcHasChordOff = false;
+					bmcPitches = new List<byte>() { 0 };
+					bmcVelocities = new List<byte>() { 0 };
+					bmcMsDuration = bmcdMsDurations[i++];
+				}
+
+				if(bmcPitches != null)
+				{
+					var basicMidiChordDef = new BasicMidiChordDef(bmcMsDuration, bmcBank, bmcPatch, bmcHasChordOff, bmcPitches, bmcVelocities);
+					basicMidiChordDefs.Add(basicMidiChordDef);
+				}
+			}
+			#endregion
+
+			CheckTotalDuration();
+		}
+		/// <summary>
+		/// private constructor -- used by Clone()
+		/// </summary>
+		private MidiChordDef()
             : base(0)
         {
         }

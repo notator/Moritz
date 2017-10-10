@@ -21,7 +21,16 @@ namespace Moritz.Symbols
 
             if(umcd.OrnamentNumberSymbol != 0)
             {
-				OrnamentText ornamentText = new OrnamentText(this, "~" + umcd.OrnamentNumberSymbol.ToString(), FontHeight);
+				string ornamentString;
+				if(umcd.OrnamentNumberSymbol == int.MaxValue)
+				{
+					ornamentString = "*";
+				}
+				else
+				{
+					ornamentString = "~" + umcd.OrnamentNumberSymbol.ToString();
+				}
+				OrnamentText ornamentText = new OrnamentText(this, ornamentString, FontHeight);
 				DrawObjects.Add(ornamentText);
             }
 

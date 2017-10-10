@@ -313,7 +313,7 @@ namespace Moritz.Spec
 
         #region Changing the Trk's duration
         /// <summary>
-        /// Multiplies the MsDuration of each midiChordDef from beginIndex to endIndex (inclusive) by factor.
+        /// Multiplies the MsDuration of each midiChordDef from beginIndex to endIndex (exclusive) by factor.
         /// If a midiChordDef's MsDuration becomes less than minThreshold, it is removed.
         /// The total duration of this Trk changes accordingly.
         /// </summary>
@@ -328,7 +328,7 @@ namespace Moritz.Spec
         /// </summary>
         public void AdjustChordMsDurations(double factor, int minThreshold = 100)
         {
-            AdjustMsDurations<MidiChordDef>(0, _uniqueDefs.Count - 1, factor, minThreshold);
+            AdjustMsDurations<MidiChordDef>(0, _uniqueDefs.Count, factor, minThreshold);
         }
         #endregion Changing the Trk's duration
 
@@ -585,19 +585,20 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Multiplies each expression value in the MidiChordDefs
-        /// from beginIndex to (including) endIndex by the argument factor.
+        /// from beginIndex to (excluding) endIndex by the argument factor.
         /// </summary>
         public void AdjustExpression(int beginIndex, int endIndex, double factor)
         {
-            CheckIndices(beginIndex, endIndex);
-
-            for(int i = beginIndex; i <= endIndex; ++i)
-            {
-				if(_uniqueDefs[i] is MidiChordDef iumdd)
+			if(CheckIndices(beginIndex, endIndex))
+			{
+				for(int i = beginIndex; i < endIndex; ++i)
 				{
-                    iumdd.AdjustExpression(factor);
-                }
-            }
+					if(_uniqueDefs[i] is MidiChordDef iumdd)
+					{
+						iumdd.AdjustExpression(factor);
+					}
+				}
+			}
         }
         /// <summary>
         /// Multiplies each expression value in the UniqueDefs by the argument factor.
@@ -610,25 +611,27 @@ namespace Moritz.Spec
             }
         }
         /// <summary>
-        /// Multiplies each velocity value in the MidiChordDefs from beginIndex to endIndex by
+        /// Multiplies each velocity value in the MidiChordDefs from beginIndex to (exclusive) endIndex by
         /// the argument factor (which must be greater than zero).
         /// N.B MidiChordDefs will be turned into RestDefs if all their notes are given zero velocity!
         /// </summary>
         public virtual void AdjustVelocities(int beginIndex, int endIndex, double factor)
         {
-            CheckIndices(beginIndex, endIndex);
-            Debug.Assert(factor > 0.0);
-            for(int i = beginIndex; i <= endIndex; ++i)
-            {
-                if(_uniqueDefs[i] is MidiChordDef mcd)
-                {
-                    mcd.AdjustVelocities(factor);
-                    if(mcd.NotatedMidiPitches.Count == 0)
-                    {
-                        Replace(i, new MidiRestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
-                    }
-                }
-            }
+			if(CheckIndices(beginIndex, endIndex))
+			{
+				Debug.Assert(factor > 0.0);
+				for(int i = beginIndex; i < endIndex; ++i)
+				{
+					if(_uniqueDefs[i] is MidiChordDef mcd)
+					{
+						mcd.AdjustVelocities(factor);
+						if(mcd.NotatedMidiPitches.Count == 0)
+						{
+							Replace(i, new MidiRestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
+						}
+					}
+				}
+			}
         }
         /// <summary>
         /// Multiplies each velocity value in the MidiChordDefs by the argument factor (must be greater than zero).
@@ -650,7 +653,7 @@ namespace Moritz.Spec
             }
         }
         /// <summary>
-        /// Creates a hairpin in the velocities from the IUniqueDef at beginIndex to the IUniqueDef at endIndex (inclusive).
+        /// Creates a hairpin in the velocities from the IUniqueDef at beginIndex to the IUniqueDef at endIndex - 1 (inclusive).
         /// This function does NOT change velocities outside the range given in its arguments.
         /// There must be at least two IUniqueDefs in the msPosition range given in the arguments.
         /// The factors by which the velocities are multiplied change arithmetically:
@@ -665,70 +668,79 @@ namespace Moritz.Spec
         /// <param name="endFactor">greater than or equal to 0</param>
         public virtual void AdjustVelocitiesHairpin(int beginIndex, int endIndex, double startFactor, double endFactor)
         {
-            CheckIndices(beginIndex, endIndex);
+			if(CheckIndices(beginIndex, endIndex))
+			{				
+				Debug.Assert(startFactor >= 0 && endFactor >= 0);
+				int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
+				int steps = endIndex - 1 - beginIndex - nNonMidiChordDefs;
+				if(steps > 0)
+				{
+					double factorIncrement = (endFactor - startFactor) / steps;
+					double factor = startFactor;
+					List<IUniqueDef> lmdds = _uniqueDefs;
 
-            Debug.Assert(startFactor >= 0 && endFactor >= 0);
-
-            int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
-
-            double factorIncrement = (endFactor - startFactor) / (endIndex - beginIndex - nNonMidiChordDefs);
-            double factor = startFactor;
-            List<IUniqueDef> lmdds = _uniqueDefs;
-
-            for(int i = beginIndex; i <= endIndex; ++i)
-            {
-                MidiChordDef mcd = _uniqueDefs[i] as MidiChordDef;
-                if(mcd != null)
-                {
-                    mcd.AdjustVelocities(factor);
-                    factor += factorIncrement;
-                }
-                if(mcd.NotatedMidiPitches.Count == 0)
-                {
-                    Replace(i, new MidiRestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
-                }
-            }
+					for(int i = beginIndex; i < endIndex; ++i)
+					{
+						MidiChordDef mcd = _uniqueDefs[i] as MidiChordDef;
+						if(mcd != null)
+						{
+							mcd.AdjustVelocities(factor);
+							factor += factorIncrement;
+						}
+						if(mcd.NotatedMidiPitches.Count == 0)
+						{
+							Replace(i, new MidiRestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
+						}
+					}
+				}
+			}
         }
         /// <summary>
-        /// Creates a moving pan from startPanValue at beginIndex to endPanValue at endIndex.
+        /// Creates a moving pan from startPanValue at beginIndex to endPanValue at endIndex -1.
         /// Implemented using one pan value per MidiChordDef.
         /// This function does NOT change pan values outside the position range given in its arguments.
         /// </summary>
         public void SetPanGliss(int beginIndex, int endIndex, int startPanValue, int endPanValue)
         {
-            CheckIndices(beginIndex, endIndex);
-            Debug.Assert(startPanValue >= 0 && startPanValue <= 127 && endPanValue >= 0 && endPanValue <= 127);
+			if(CheckIndices(beginIndex, endIndex))
+			{
+				Debug.Assert(startPanValue >= 0 && startPanValue <= 127 && endPanValue >= 0 && endPanValue <= 127);
 
-            int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
+				int nNonMidiChordDefs = GetNumberOfNonMidiOrInputChordDefs(beginIndex, endIndex);
+				int steps = (endIndex - 1 - beginIndex - nNonMidiChordDefs);
+				if(steps > 0)
+				{
+					double increment = ((double)(endPanValue - startPanValue)) / steps;
+					int panValue = startPanValue;
+					List<IUniqueDef> lmdds = _uniqueDefs;
 
-            double increment = ((double)(endPanValue - startPanValue)) / (endIndex - beginIndex - nNonMidiChordDefs);
-            int panValue = startPanValue;
-            List<IUniqueDef> lmdds = _uniqueDefs;
-
-            for(int i = beginIndex; i <= endIndex; ++i)
-            {
-                if(_uniqueDefs[i] is MidiChordDef iumdd)
-                {
-                    iumdd.PanMsbs = new List<byte>() { (byte)panValue };
-                    panValue += (int)increment;
-                }
-            }
+					for(int i = beginIndex; i < endIndex; ++i)
+					{
+						if(_uniqueDefs[i] is MidiChordDef iumdd)
+						{
+							iumdd.PanMsbs = new List<byte>() { (byte)panValue };
+							panValue += (int)increment;
+						}
+					}
+				}
+			}
         }
         /// <summary>
-        /// Sets the pitchwheelDeviation for MidiChordDefs in the range beginIndex to endIndex inclusive.
+        /// Sets the pitchwheelDeviation for MidiChordDefs in the range beginIndex to endIndex (exclusive).
         /// Rests in the range dont change.
         /// </summary>
         public void SetPitchWheelDeviation(int beginIndex, int endIndex, int deviation)
         {
-            CheckIndices(beginIndex, endIndex);
-
-            for(int i = beginIndex; i <= endIndex; ++i)
-            {
-                if(this[i] is MidiChordDef mcd)
-                {
-                    mcd.PitchWheelDeviation = M.MidiValue(deviation);
-                }
-            }
+			if(CheckIndices(beginIndex, endIndex))
+			{
+				for(int i = beginIndex; i < endIndex; ++i)
+				{
+					if(this[i] is MidiChordDef mcd)
+					{
+						mcd.PitchWheelDeviation = M.MidiValue(deviation);
+					}
+				}
+			}
         }
         /// <summary>
         /// Removes the pitchwheel commands (not the pitchwheelDeviations)
@@ -737,15 +749,16 @@ namespace Moritz.Spec
         /// </summary>
         public void RemoveScorePitchWheelCommands(int beginIndex, int endIndex)
         {
-            CheckIndices(beginIndex, endIndex);
-
-            for(int i = beginIndex; i <= endIndex; ++i)
-            {
-                if(this[i] is MidiChordDef umcd)
-                {
-                    umcd.MidiChordSliderDefs.PitchWheelMsbs = new List<byte>();
-                }
-            }
+			if(CheckIndices(beginIndex, endIndex))
+			{
+				for(int i = beginIndex; i < endIndex; ++i)
+				{
+					if(this[i] is MidiChordDef umcd)
+					{
+						umcd.MidiChordSliderDefs.PitchWheelMsbs = new List<byte>();
+					}
+				}
+			}
         }
 
         /// <summary>
@@ -1406,78 +1419,6 @@ namespace Moritz.Spec
             }
         }
         #endregion
-
-        /// <summary>
-        /// Returns a new MidiChordDef having msDuration, whose BasicMidiChordDefs are created from the MidiChordDefs and RestDefs in the Trk.
-        /// BasicMidiChordDefs created from MidiChordDefs are the MidiChordDef's BasicMidiChordDef[0].
-        /// BasicMidiChordDefs created from RestDefs have a single pitch (=0) and velocity=0.
-        /// The durations of the returned BasicMidiChordDefs are in proportion to the durations of the MidiChordDefs and RestDefs in the Trk. 
-        /// The Trk (which must contain at least one MidiChordDef) is not changed by calling this function.
-        /// </summary>
-        /// <param name="msDuration">The duration of the returned MidiChordDef</param>
-        public MidiChordDef ToMidiChordDef(int msDuration)
-        {
-            List<BasicMidiChordDef> basicMidiChordDefs = new List<BasicMidiChordDef>();
-            int bmcMsDuration = 0;
-            byte? bmcBank = null;
-            byte? bmcPatch = null;
-            bool bmcHasChordOff = true;
-            List<byte> restPitch = new List<byte>() { 0 };
-            List<byte> restVelocity = new List<byte>() { 0 };
-            List<byte> bmcPitches = null;
-            List<byte> bmcVelocities = null;
-            int totalDuration = 0;
-            int nMidiChordDefs = 0;
-            foreach(IUniqueDef iud in UniqueDefs)
-            {
-                MidiChordDef mcd = iud as MidiChordDef;
-                MidiRestDef restDef = iud as MidiRestDef;
-
-                if(mcd != null)
-                {
-                    bmcBank = mcd.BasicMidiChordDefs[0].BankIndex;
-                    bmcPatch = mcd.BasicMidiChordDefs[0].PatchIndex;
-                    bmcHasChordOff = mcd.BasicMidiChordDefs[0].HasChordOff;
-                    bmcPitches = mcd.BasicMidiChordDefs[0].Pitches;
-                    bmcVelocities = mcd.BasicMidiChordDefs[0].Velocities;
-                    bmcMsDuration = mcd.MsDuration;
-                    nMidiChordDefs++;
-                }
-                else if(restDef != null)
-                {
-                    bmcBank = null;
-                    bmcPatch = null;
-                    bmcHasChordOff = false;
-                    bmcPitches = restPitch;
-                    bmcVelocities = restVelocity;
-                    bmcMsDuration = restDef.MsDuration;
-                }
-
-                if(iud is DurationDef)
-                {
-                    var basicMidiChordDef = new BasicMidiChordDef(bmcMsDuration, bmcBank, bmcPatch, bmcHasChordOff, bmcPitches, bmcVelocities);
-                    totalDuration += bmcMsDuration;
-                    basicMidiChordDefs.Add(basicMidiChordDef);
-                }
-            }
-
-            Debug.Assert(nMidiChordDefs > 0, "Error: The original Trk must contain at least one MidiChordDef.");
-
-            const byte pitchWheelDeviation = 2;
-            const bool hasChordOff = true;
-            const MidiChordSliderDefs midiChordSliderDefs = null;
-
-            List<byte> rootMidiPitches = new List<byte>(basicMidiChordDefs[0].Pitches);
-            List<byte> rootMidiVelocities = new List<byte>(basicMidiChordDefs[0].Velocities);
-
-            MidiChordDef returnMCD = new MidiChordDef(totalDuration, pitchWheelDeviation, hasChordOff, rootMidiPitches, rootMidiVelocities,
-														nMidiChordDefs, midiChordSliderDefs, basicMidiChordDefs)
-			{ MsDuration = msDuration };
-
-            //returnMCD.MsDuration = msDuration;
-
-            return returnMCD;
-        }
 
         public override string ToString()
         {
