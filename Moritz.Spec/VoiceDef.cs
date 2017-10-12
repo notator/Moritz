@@ -240,7 +240,7 @@ namespace Moritz.Spec
         protected int GetNumberOfNonMidiOrInputChordDefs(int beginIndex, int endIndex)
         {
             int nNonMidiChordDefs = 0;
-            for(int i = beginIndex; i <= endIndex; ++i)
+            for(int i = beginIndex; i < endIndex; ++i)
             {
                 if(!(_uniqueDefs[i] is MidiChordDef) && !(_uniqueDefs[i] is InputChordDef))
                     nNonMidiChordDefs++;
