@@ -32,6 +32,7 @@ namespace Moritz.Algorithm.Tombeau1
             Debug.Assert(velocityFactor > 0.0);
 
             _gamut = gamut;
+			_rootOctave = rootOctave;
 
             for(int i = 0; i < nChords; ++i)
             {
@@ -87,8 +88,10 @@ namespace Moritz.Algorithm.Tombeau1
         public new Grp Clone()
         {
             List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
-            Grp grp = new Grp(Gamut, this.MidiChannel, this.MsPositionReContainer, clonedIUDs);
-            grp.Container = this.Container;
+			Grp grp = new Grp(Gamut, this.MidiChannel, this.MsPositionReContainer, clonedIUDs)
+			{
+				Container = this.Container
+			};
 
             return grp;
         }
@@ -118,8 +121,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// <param name="iUniqueDef"></param>
         private void AssertPitches(IUniqueDef iUniqueDef)
         {            
-            MidiChordDef mcd = iUniqueDef as MidiChordDef;
-            if(mcd != null)
+            if(iUniqueDef is MidiChordDef mcd)
             {
                 Debug.Assert(_gamut.ContainsAllPitches(mcd));
             }
@@ -303,8 +305,7 @@ namespace Moritz.Algorithm.Tombeau1
             {
                 for(int i = 0; i < _uniqueDefs.Count; ++i)
                 {
-                    MidiChordDef mcd = _uniqueDefs[i] as MidiChordDef;
-                    if(mcd != null)
+                    if(_uniqueDefs[i] is MidiChordDef mcd)
                     {
                         mcd.TransposeStepsInGamut(_gamut, stepsList[i]);
                     }
@@ -374,8 +375,7 @@ namespace Moritz.Algorithm.Tombeau1
                 _gamut = value;
                 for(int i = 0; i < this.UniqueDefs.Count; ++i)
                 {
-                    MidiChordDef mcd = UniqueDefs[i] as MidiChordDef;
-                    if(mcd != null)
+                    if(UniqueDefs[i] is MidiChordDef mcd)
                     {
                         List<BasicMidiChordDef> bmcds = mcd.BasicMidiChordDefs;
                         for(int j = 0; j < bmcds.Count; ++j)
@@ -410,6 +410,8 @@ namespace Moritz.Algorithm.Tombeau1
             }
         }
         protected Gamut _gamut;
+		protected readonly int _rootOctave;
+
         /// <summary>
         /// Returns the index of a pitch in the same octave as the pitch at pitchIndexInOldGamut.
         /// </summary>
@@ -459,8 +461,7 @@ namespace Moritz.Algorithm.Tombeau1
             bool isFinalChord = true;
             for(int i = _uniqueDefs.Count - 1; i >= 0; --i)
             {
-                MidiChordDef mcd = _uniqueDefs[i] as MidiChordDef;
-                if(mcd != null)
+                if(_uniqueDefs[i] is MidiChordDef mcd)
                 {
                     if(isFinalChord)
                     {

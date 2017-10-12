@@ -87,8 +87,7 @@ namespace Moritz.Spec
             #region check for an existing InputVoiceDef having the same MidiChannel
             foreach(VoiceDef voiceDef in _voiceDefs)
             {
-                InputVoiceDef existingInputVoiceDef = voiceDef as InputVoiceDef;
-                if(existingInputVoiceDef != null)
+                if(voiceDef is InputVoiceDef existingInputVoiceDef)
                 {
                     Debug.Assert(existingInputVoiceDef.MidiChannel != ivd.MidiChannel, "Error: An InputVoiceDef with the same MidiChannel already exists.");
                 }
@@ -521,8 +520,7 @@ namespace Moritz.Spec
 
             foreach(VoiceDef voiceDef in _voiceDefs)
             {
-                Trk trk = voiceDef as Trk;
-                if(trk != null)
+                if(voiceDef is Trk trk)
                 {
                     trk.SetPitchWheelSliders(pitchWheelValuesPerMsPosition);
                 }
@@ -618,8 +616,7 @@ namespace Moritz.Spec
                 List<Trk> trks = new List<Trk>();
                 foreach(VoiceDef voiceDef in _voiceDefs)
                 {
-                    Trk trk = voiceDef as Trk;
-                    if(trk != null)
+                    if(voiceDef is Trk trk)
                     {
                         trks.Add(trk);
                     }
@@ -635,8 +632,7 @@ namespace Moritz.Spec
                 List<InputVoiceDef> inputVoiceDefs = new List<InputVoiceDef>();
                 foreach(VoiceDef voiceDef in _voiceDefs)
                 {
-                    InputVoiceDef inputVoiceDef = voiceDef as InputVoiceDef;
-                    if(inputVoiceDef != null)
+                    if(voiceDef is InputVoiceDef inputVoiceDef)
                     {
                         inputVoiceDefs.Add(inputVoiceDef);
                     }

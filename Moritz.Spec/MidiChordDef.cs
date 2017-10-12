@@ -224,31 +224,33 @@ namespace Moritz.Spec
             Debug.Assert(_msDuration == sumDurations);
         }
 
-        #region Clone
-        /// <summary>
-        /// A deep clone!
-        /// </summary>
-        /// <returns></returns>
-        public override object Clone()
-        {
-            MidiChordDef rval = new MidiChordDef();
+		#region Clone
+		/// <summary>
+		/// A deep clone!
+		/// </summary>
+		/// <returns></returns>
+		public override object Clone()
+		{
+			MidiChordDef rval = new MidiChordDef()
+			{
+				MsPositionReFirstUD = this.MsPositionReFirstUD,
+				// rval.MsDuration must be set after setting BasicMidiChordDefs See below.
+				Bank = this.Bank,
+				Patch = this.Patch,
+				PitchWheelDeviation = this.PitchWheelDeviation,
+				HasChordOff = this.HasChordOff,
+				BeamContinues = this.BeamContinues,
+				Lyric = this.Lyric,
+				MinimumBasicMidiChordMsDuration = MinimumBasicMidiChordMsDuration, // required when changing a midiChord's duration
+				NotatedMidiPitches = _notatedMidiPitches, // a clone of the displayed notehead pitches
+				NotatedMidiVelocities = _notatedMidiVelocities, // a clone of the displayed notehead velocities
 
-            rval.MsPositionReFirstUD = this.MsPositionReFirstUD;
-            // rval.MsDuration must be set after setting BasicMidiChordDefs See below.
-            rval.Bank = this.Bank;
-            rval.Patch = this.Patch;
-            rval.PitchWheelDeviation = this.PitchWheelDeviation;
-            rval.HasChordOff = this.HasChordOff;
-            rval.BeamContinues = this.BeamContinues;
-            rval.Lyric = this.Lyric;
-            rval.MinimumBasicMidiChordMsDuration = MinimumBasicMidiChordMsDuration; // required when changing a midiChord's duration
-            rval.NotatedMidiPitches = _notatedMidiPitches; // a clone of the displayed notehead pitches
-            rval.NotatedMidiVelocities = _notatedMidiVelocities; // a clone of the displayed notehead velocities
+				// rval.MidiVelocity must be set after setting BasicMidiChordDefs See below.
+				OrnamentNumberSymbol = this.OrnamentNumberSymbol, // the displayed ornament number
 
-            // rval.MidiVelocity must be set after setting BasicMidiChordDefs See below.
-            rval.OrnamentNumberSymbol = this.OrnamentNumberSymbol; // the displayed ornament number
+				MidiChordSliderDefs = null
+			};
 
-			rval.MidiChordSliderDefs = null;
 			MidiChordSliderDefs m = this.MidiChordSliderDefs;
 			if(m != null)
 			{
@@ -257,26 +259,26 @@ namespace Moritz.Spec
 				List<byte> modulationWheelMsbs = NewListByteOrNull(m.ModulationWheelMsbs);
 				List<byte> expressionMsbs = NewListByteOrNull(m.ExpressionMsbs);
 				if(pitchWheelMsbs != null || panMsbs != null || modulationWheelMsbs != null || expressionMsbs != null)
-					rval.MidiChordSliderDefs = new MidiChordSliderDefs(pitchWheelMsbs, panMsbs, modulationWheelMsbs, expressionMsbs);					
+					rval.MidiChordSliderDefs = new MidiChordSliderDefs(pitchWheelMsbs, panMsbs, modulationWheelMsbs, expressionMsbs);
 			}
 
-            List<BasicMidiChordDef> newBs = new List<BasicMidiChordDef>();
-            foreach(BasicMidiChordDef b in BasicMidiChordDefs)
-            {
-                List<byte> pitches = new List<byte>(b.Pitches);
-                List<byte> velocities = new List<byte>(b.Velocities);
-                newBs.Add(new BasicMidiChordDef(b.MsDuration, b.BankIndex, b.PatchIndex, b.HasChordOff, pitches, velocities));
-            }
-            rval.BasicMidiChordDefs = newBs;
-            rval.MsDuration = this.MsDuration;
+			List<BasicMidiChordDef> newBs = new List<BasicMidiChordDef>();
+			foreach(BasicMidiChordDef b in BasicMidiChordDefs)
+			{
+				List<byte> pitches = new List<byte>(b.Pitches);
+				List<byte> velocities = new List<byte>(b.Velocities);
+				newBs.Add(new BasicMidiChordDef(b.MsDuration, b.BankIndex, b.PatchIndex, b.HasChordOff, pitches, velocities));
+			}
+			rval.BasicMidiChordDefs = newBs;
+			rval.MsDuration = this.MsDuration;
 
-           return rval;
-        }
+			return rval;
+		}
 
-        /// <summary>
-        /// Used by Clone(). Returns null if listToClone is null, otherwise returns a clone of the listToClone.
-        /// </summary>
-        private List<byte> NewListByteOrNull(List<byte> listToClone)
+		/// <summary>
+		/// Used by Clone(). Returns null if listToClone is null, otherwise returns a clone of the listToClone.
+		/// </summary>
+		private List<byte> NewListByteOrNull(List<byte> listToClone)
         {
             List<byte> newListByte = null;
             if(listToClone != null)
@@ -930,8 +932,10 @@ namespace Moritz.Spec
                 iuds.Add(mcd);
             }
 
-            Trk trk = new Trk(midiChannel, 0, iuds);
-            trk.MsDuration = msDuration; // calls Trk.SetMsPositionsReFirstUD();
+            Trk trk = new Trk(midiChannel, 0, iuds)
+			{
+				MsDuration = msDuration	// calls Trk.SetMsPositionsReFirstUD();
+			};
             
             return trk;
         }
