@@ -12,6 +12,8 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
+		enum CompositionType { onlyBassGrps, allGrps, composition };
+
 		public Tombeau1Algorithm()
             : base()
         {
@@ -30,8 +32,8 @@ namespace Moritz.Algorithm.Tombeau1
             _krystals = krystals;
             _palettes = palettes;
 
-            #region main comment (thoughts etc.)
-            /*********************************************************************************************
+			#region main comment (thoughts etc.)
+			/*********************************************************************************************
 			Think Nancarrow.
             Think Bach, Brückner, Reich. Repeating/changing, fairly fast groups of chords with harmonic support... and ornaments...
             Think Study 1: background/foreground, depth.
@@ -104,15 +106,15 @@ namespace Moritz.Algorithm.Tombeau1
                The info in *outputChords* is the info that could go in a MIDI file, and vice versa.
 
             ****************************************************************************/
-            #endregion main comment (thoughts etc.)
-            #region MoritzStatics functions
-            /***************************************************************************
+			#endregion main comment (thoughts etc.)
+			#region MoritzStatics functions
+			/***************************************************************************
             public static Moritz.Statics functions relating to pitch hierarchies and velocities:
                 GetAbsolutePitchHierarchy(int relativePitchHierarchyIndex, int rootPitch)
             ***************************************************************************/
-            #endregion MoritzStatics functions
-            #region Envelope functions
-            /***************************************************************************
+			#endregion MoritzStatics functions
+			#region Envelope functions
+			/***************************************************************************
             public Envelope functions that have been implemented:
                 constructors:
                 Envelope(List<byte> inputValues, int inputDomain, int domain, int count)
@@ -127,9 +129,9 @@ namespace Moritz.Algorithm.Tombeau1
                 TimeWarp(List<int> originalMsPositions, double distortion)
                 GetValuePerMsPosition(List<int> msPositions) // Returns a dictionary in which: Key is one of the positions in msPositions, Value is the envelope value at that msPosition.
             ***************************************************************************/
-            #endregion Envelope functions
-            #region Gamut functions
-            /***************************************************************************
+			#endregion Envelope functions
+			#region Gamut functions
+			/***************************************************************************
             public Gamut functions and properties that have been implemented:
                 (Gamut is immutable)
                 constructor:
@@ -153,9 +155,9 @@ namespace Moritz.Algorithm.Tombeau1
                 List {get;} // a copy of the private list.
                 Count {get;}            
 			***************************************************************************/
-            #endregion Gamut functions
-            #region MidiChordDef functions
-            /***************************************************************************            
+			#endregion Gamut functions
+			#region MidiChordDef functions
+			/***************************************************************************            
             public MidiChordDef functions that have been implemented and are especially relevant to this project:
                 constructors:
                 SIMPLE MidiChordDefs (containing a single BasicMidiChordDef):
@@ -194,9 +196,9 @@ namespace Moritz.Algorithm.Tombeau1
 
                 Gamut {get; set;} // The Gamut can only be set (or changed) if all the pitches in the MidiChordDef are in the new Gamut.
             ***************************************************************************/
-            #endregion MidiChordDef functions
-            #region Trk functions
-            /***************************************************************************            
+			#endregion MidiChordDef functions
+			#region Trk functions
+			/***************************************************************************            
             public Trk functions that have been implemented and are especially relevant to this project:
             constructors:
                 Trk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
@@ -280,9 +282,9 @@ namespace Moritz.Algorithm.Tombeau1
                 MasterVolume // Algorithms must set this value in the first Trk in each midiChannel in the score. (Default is null.)
 
             ***************************************************************************/
-            #endregion Trk functions
-            #region Seq functions
-            /***************************************************************************            
+			#endregion Trk functions
+			#region Seq functions
+			/***************************************************************************            
             public Seq functions that have been implemented and are especially relevant to this project:
                 constructors:
                 Seq(int absSeqMsPosition, List<Trk> trks, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
@@ -318,9 +320,9 @@ namespace Moritz.Algorithm.Tombeau1
                 MidiChannelIndexPerOutputVoice { get; }
 
             ***************************************************************************/
-            #endregion Seq functions
-            #region Block functions
-            /***************************************************************************            
+			#endregion Seq functions
+			#region Block functions
+			/***************************************************************************            
             public Block functions that have been implemented and are especially relevant to this project:
                 constructors:
                 Block(Seq seq, List<int> rightBarlineMsPositions)
@@ -348,30 +350,43 @@ namespace Moritz.Algorithm.Tombeau1
                 InputVoiceDefs { get; }
 
             ***************************************************************************/
-            #endregion Block functions
+			#endregion Block functions
 
-            /**********************************************/
+			/**********************************************/
 
-            TenorGrps tenorGrps = new TenorGrps();
-            SopranoGrps sopranoGrps = new SopranoGrps(tenorGrps.Grps);
-            BassGrps bassGrps = new BassGrps(sopranoGrps.Grps, tenorGrps.Grps);
-            AltoGrps altoGrps = new AltoGrps(sopranoGrps.Grps, tenorGrps.Grps, bassGrps.Grps);
+			BassGrps bassGrps = new BassGrps(2);
+			SopranoGrps sopranoGrps = new SopranoGrps(6, bassGrps.ComposedGrps);
+            AltoGrps altoGrps = new AltoGrps(5, sopranoGrps.ComposedGrps, bassGrps.ComposedGrps);
+			TenorGrps tenorGrps = new TenorGrps(4, sopranoGrps.ComposedGrps, altoGrps.ComposedGrps, bassGrps.ComposedGrps);
 
-            List<Seq> outputSeqs = new List<Seq>(); // The seqs that will be displayed (the score).
-            bool composingGrps = true;
-            if(composingGrps)
+			List<Seq> outputSeqs = new List<Seq>(); // The seqs that will be displayed (the score).
+
+			CompositionType compositionType = CompositionType.onlyBassGrps;
+
+            switch(compositionType)
             {
-                // add the Grps to the outputSeqs
-                AddGrpsToSeqs(outputSeqs, tenorGrps.Grps, MidiChannelIndexPerOutputVoice[2]);
-                //AddGrpsToSeqs(outputSeqs, sopranoGrps.Grps, MidiChannelIndexPerOutputVoice[0]);
-                //AddGrpsToSeqs(seqs, bassGrps.Grps, MidiChannelIndexPerOutputVoice[3]);
-                //AddGrpsToSeqs(seqs, altoGrps.Grps, MidiChannelIndexPerOutputVoice[1]);
-            }
-            else
-            {
-                // Compose the piece in the outputSeqs
-                ComposeSeqs(outputSeqs, sopranoGrps.Grps, altoGrps.Grps, tenorGrps.Grps, bassGrps.Grps, MidiChannelIndexPerOutputVoice);
-            }
+				case CompositionType.onlyBassGrps:
+				{
+					AddGrpsToSeqs(outputSeqs, bassGrps, MidiChannelIndexPerOutputVoice[3]);
+					List<int> barlinePositions = bassGrps.ComposedBarlinePositions();
+					break;
+				}
+				case CompositionType.allGrps:
+				{
+					//add the Grps to the outputSeqs
+					AddGrpsToSeqs(outputSeqs, tenorGrps, MidiChannelIndexPerOutputVoice[2]);
+					AddGrpsToSeqs(outputSeqs, sopranoGrps, MidiChannelIndexPerOutputVoice[0]);
+					AddGrpsToSeqs(outputSeqs, bassGrps, MidiChannelIndexPerOutputVoice[3]);
+					AddGrpsToSeqs(outputSeqs, altoGrps, MidiChannelIndexPerOutputVoice[1]);
+					break;
+				}
+				case CompositionType.composition:
+				{
+					// Compose the piece in the outputSeqs
+					ComposeSeqs(outputSeqs, sopranoGrps, altoGrps, tenorGrps, bassGrps, MidiChannelIndexPerOutputVoice);
+					break;
+				}
+			}
 
             Seq mainSeq = new Seq(0, new List<Trk>() { new Trk(0) }, MidiChannelIndexPerOutputVoice);
             List<int> approximateBarlineMsPositions = new List<int>();
@@ -451,9 +466,11 @@ namespace Moritz.Algorithm.Tombeau1
             return barlineMsPositionsReSeq;
         }
 
-        private void AddGrpsToSeqs(List<Seq> seqs, List<List<Grp>> grps, int midiChannel)
+        private void AddGrpsToSeqs(List<Seq> seqs, PaletteGrps paletteGrps, int midiChannel)
         {
-            List<Trk> trks = GrpListsToTrks(grps, midiChannel);
+			List<List<PaletteGrp>> grps = paletteGrps.ComposedGrpsClone();
+
+			List<Trk> trks = GrpListsToTrks(grps, midiChannel);
             if(seqs.Count == 0)
             {
                 for(int i = 0; i < trks.Count; ++i)
@@ -476,10 +493,10 @@ namespace Moritz.Algorithm.Tombeau1
         /// This function is used while composing palettes.
         /// It simply converts its argument to a list of Trks having the same midiChannel.
         /// </summary>
-        private List<Trk> GrpListsToTrks(List<List<Grp>> grpLists, int midiChannel)
+        private List<Trk> GrpListsToTrks(List<List<PaletteGrp>> grpLists, int midiChannel)
         {
             List<Trk> seqTrks = new List<Trk>();
-            foreach(List<Grp> grps in grpLists)
+            foreach(List<PaletteGrp> grps in grpLists)
             {
                 Trk trk = GrpListToTrk(grps, midiChannel);
                 seqTrks.Add(trk);
@@ -490,7 +507,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// <summary>
         /// This function simply converts its argument to a Trk having the given midiChannel.
         /// </summary>
-        private Trk GrpListToTrk(List<Grp> grpList, int midiChannel)
+        private Trk GrpListToTrk(List<PaletteGrp> grpList, int midiChannel)
         {
             Trk trk = new Trk(midiChannel, 0, new List<IUniqueDef>());
             foreach(Grp grp in grpList)

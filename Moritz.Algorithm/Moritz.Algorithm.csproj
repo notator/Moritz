@@ -47,11 +47,12 @@
     <Compile Include="Study 3.1\Study3Sketch1Algorithm.cs" />
     <Compile Include="Study 3.2\Study3Sketch2Algorithm.cs" />
     <Compile Include="Tombeau 1\AltoGrps.cs" />
+    <Compile Include="Tombeau 1\PaletteGrps.cs" />
     <Compile Include="Tombeau 1\ComposeSeqs.cs" />
     <Compile Include="Tombeau 1\Grp.cs" />
     <Compile Include="Tombeau 1\BassGrps.cs" />
     <Compile Include="Tombeau 1\SopranoGrps.cs" />
-    <Compile Include="Tombeau 1\TenorPaletteGrp.cs" />
+    <Compile Include="Tombeau 1\PaletteGrp.cs" />
     <Compile Include="Tombeau 1\TenorGrps.cs" />
     <Compile Include="Tombeau 1\Tombeau1Algorithm.cs" />
   </ItemGroup>

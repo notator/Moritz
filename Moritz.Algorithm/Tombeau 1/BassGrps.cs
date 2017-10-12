@@ -6,77 +6,169 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-    internal class BassGrps
+	#region available Trk and Grp transformations
+	// Add();
+	// AddRange();
+	// AdjustChordMsDurations();
+	// AdjustExpression();
+	// AdjustVelocities();
+	// AdjustVelocitiesHairpin();
+	// AlignObjectAtIndex();
+	// CreateAccel();
+	// FindIndexAtMsPositionReFirstIUD();
+	// Insert();
+	// InsertRange();
+	// Permute();
+	// Remove();
+	// RemoveAt();
+	// RemoveBetweenMsPositions();
+	// RemoveRange();
+	// RemoveScorePitchWheelCommands();
+	// Replace();
+	// SetDurationsFromPitches();
+	// SetPanGliss(0, subT.MsDuration, 0, 127);
+	// SetPitchWheelDeviation();
+	// SetPitchWheelSliders();
+	// SetVelocitiesFromDurations();
+	// SetVelocityPerAbsolutePitch();
+	// TimeWarp();
+	// Translate();
+	// Transpose();
+	// TransposeStepsInGamut();
+	// TransposeToRootInGamut();
+	#endregion available Trk and Grp transformations
+
+	internal class BassGrps : PaletteGrps
     {
-        public BassGrps(List<List<Grp>> sopranoGrps, List<List<Grp>> tenorGrps)
-        {
-            for(int i = 0; i < tenorGrps.Count; ++i)
-            {
-                List<Grp> grpList = GetGrpList(tenorGrps[i]);
-                Grps.Add(grpList);
-            }
-        }
+		public BassGrps(int rootOctave)
+			: base(rootOctave, 9, 78000)
+		{
+			for(int i = 0; i < BaseGrps.Count; ++i)
+			{
+				IReadOnlyList<PaletteGrp> baseGrps = BaseGrps[i];
 
-        public List<List<Grp>> Grps = new List<List<Grp>>();
+				List<PaletteGrp> grps = Compose(baseGrps);
 
-        /// <summary>
-        /// Each returned Grp has the same Gamut as the parallel tenorGrp.
-        /// </summary>
-        private List<Grp> GetGrpList(List<Grp> tenorGrps)
-        {
-            const int relativeSopranoRootOctave = 3; // tenorRootOctave + 3
+				_composedGrps.Add(grps);
+			}
+		}
 
-            List<Grp> grps = new List<Grp>();
-            for(int i = 0; i < tenorGrps.Count; ++i)
-            {
-                Grp grp = tenorGrps[i].Clone();
+		protected override List<PaletteGrp> Compose(IReadOnlyList<PaletteGrp> baseGrps)
+		{
+			var pGrps = new List<PaletteGrp>(baseGrps);
 
-                grp.SortRootNotatedPitchAscending();
+			for(int index = 0; index < pGrps.Count; ++index)
+			{
+				PaletteGrp pGrp = pGrps[index];
 
-                int rootPitch = ((MidiChordDef)grp.UniqueDefs[0]).NotatedMidiPitches[0];
-                grp.TransposeToRootInGamut(rootPitch -48 + (relativeSopranoRootOctave * 12));
+				if(pGrp.UniqueDefs[0] is MidiChordDef firstMcd && pGrp.UniqueDefs[pGrp.UniqueDefs.Count - 1] is MidiChordDef lastMcd)
+				{
+					while(lastMcd.NotatedMidiPitches[0] > (firstMcd.NotatedMidiPitches[0] + 24))
+					{
+						pGrp.Shear(0, -1 * (pGrp.Gamut.NPitchesPerOctave));
+					}
 
-                int steps = 4;
-                ((MidiChordDef)grp.UniqueDefs[0]).TransposeStepsInGamut(grp.Gamut, steps);
+					while(lastMcd.NotatedMidiPitches[0] % 12 != (firstMcd.NotatedMidiPitches[0] % 12))
+					{
+						pGrp.Shear(0, -1);
+					}
+				}
 
-				//grp.AdjustChordMsDurations(10); 
+				pGrp.SetVelocitiesForGamut();
 
-                grps.Add(grp);
-            }
-            return (grps);
-        }
+				if(index % 2 != 0 && pGrp.Count > 1)
+				{
+					pGrp.Permute(1, 7);
+					pGrp.AdjustVelocitiesHairpin(0, pGrp.Count / 2, 0.5, 1.0);
+					pGrp.AdjustVelocitiesHairpin(pGrp.Count / 2, pGrp.Count, 1.0, 0.5);
+				}
 
-        #region available Trk and Grp transformations
-        // Add();
-        // AddRange();
-        // AdjustChordMsDurations();
-        // AdjustExpression();
-        // AdjustVelocities();
-        // AdjustVelocitiesHairpin();
-        // AlignObjectAtIndex();
-        // CreateAccel();
-        // FindIndexAtMsPositionReFirstIUD();
-        // Insert();
-        // InsertRange();
-        // Permute();
-        // Remove();
-        // RemoveAt();
-        // RemoveBetweenMsPositions();
-        // RemoveRange();
-        // RemoveScorePitchWheelCommands();
-        // Replace();
-        // SetDurationsFromPitches();
-        // SetPanGliss(0, subT.MsDuration, 0, 127);
-        // SetPitchWheelDeviation();
-        // SetPitchWheelSliders();
-        // SetVelocitiesFromDurations();
-        // SetVelocityPerAbsolutePitch();
-        // TimeWarp();
-        // Translate();
-        // Transpose();
-        // TransposeStepsInGamut();
-        // TransposeToRootInGamut();
-        #endregion available Trk and Grp transformations
+				pGrp.AdjustChordMsDurations(factor: 5);
 
-    }
+				#region begin test code 2 transpose chords to the same absolute root pitch
+				//for(int iudIndex = 0; iudIndex < g.Count; ++iudIndex)
+				//{
+				//    g.TransposeChordDownToAbsolutePitch(iudIndex, 0);
+				//}
+				#endregion end test code 2
+
+				#region begin test code 3, adjust velocities
+				//if(domain % 2 != 0)
+				//{
+				//    g.AdjustVelocities(0.5);
+				//}
+				#endregion
+
+				#region begin test code 5, related Grps
+				//if(domain % 2 != 0 && g.Count > 1)
+				//{
+				//    TenorPaletteGrp previousTpg = (TenorPaletteGrp)grps[i - 1];
+				//    //g = previousTpg.RelatedPitchHierarchyGrp(previousTpg.Gamut.RelativePitchHierarchyIndex + 11);
+				//    //g = previousTpg.RelatedBasePitchGrp(11);
+				//    g = previousTpg.RelatedDomainGrp(6);
+				//}
+				#endregion
+
+				#region begin test code 6, timeWarp
+				//if(domain % 2 != 0 && g.Count > 1)
+				//{
+				//	g.TimeWarp(new Envelope(new List<int>() { 4, 6, 2 }, 7, 7, g.Count), 20);
+				//}
+				#endregion
+
+				#region begin test code 7, SetPitchWheelSliders
+				//Envelope env = new Envelope(new List<int>() { 0,8 }, 8, 127, g.Count);
+				//g.SetPitchWheelSliders(env);
+				#endregion
+
+				#region begin test code 8, SetPanGliss
+				//if(g.Count > 1)
+				//{
+				//    if(domain % 2 != 0)
+				//    {
+				//        g.SetPanGliss(0, g.Count - 1, 127, 0);
+				//    }
+				//    else
+				//    {
+				//        g.SetPanGliss(0, g.Count - 1, 0, 127);
+				//    }
+				//}
+				#endregion
+
+				#region begin test code 8, set inverse velocities
+				//if(domain % 2 != 0 && g.Count > 1)
+				//{
+				//    TenorPaletteGrp prevTpg = (TenorPaletteGrp)grps[i - 1];
+				//    Gamut prevGamut = prevTpg.Gamut;
+				//    g = new TenorPaletteGrp(prevGamut); // identical to prevTpg
+				//    // inverse velocityPerAbsolutePitch
+				//    List<byte> velocityPerAbsolutePitch = prevGamut.GetVelocityPerAbsolutePitch(20, 127, prevGamut.NPitchesPerOctave - 1);
+				//    g.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, 20);
+				//}
+				#endregion
+
+				#region begin test code 8, set Gamut (pitches
+				//if(domain % 2 != 0 && g.Count > 1)
+				//{
+				//    TenorPaletteGrp prevTpg = (TenorPaletteGrp)grps[i - 1];
+				//    Gamut prevGamut = prevTpg.Gamut;
+				//    g = new TenorPaletteGrp(prevGamut); // identical to prevTpg
+
+				//    int newRelativePitchHierarchyIndex = prevGamut.RelativePitchHierarchyIndex + 11;
+				//    int newBasePitch = prevGamut.BasePitch;
+				//    int newNPitchesPerOctave = 8;
+				//    Gamut gamut1 = new Gamut(newRelativePitchHierarchyIndex, newBasePitch, newNPitchesPerOctave);
+				//    g.Gamut = gamut1; // sets the pitches, velocities are still those of the original pitches.
+
+				//    // reverse the velocityperAbsolutePitch hierarchy re the prevGamut.
+				//    List<byte> velocityPerAbsolutePitch = prevGamut.GetVelocityPerAbsolutePitch(20, 127, prevGamut.NPitchesPerOctave - 1);
+				//    g.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, 20);
+				//}
+				#endregion
+
+			}
+			return pGrps;
+		}
+
+	}
 }

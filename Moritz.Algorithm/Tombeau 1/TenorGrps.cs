@@ -6,18 +6,20 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-    internal class TenorGrps
+    internal class TenorGrps : PaletteGrps
     {
-        public TenorGrps()
+        public TenorGrps(int rootOctave, IReadOnlyList<IReadOnlyList<Grp>> sopranoGrps,	IReadOnlyList<IReadOnlyList<Grp>> altoGrps, IReadOnlyList<IReadOnlyList<Grp>> bassGrps)
+			: base(rootOctave, 9, 79000)
         {
-            for(int i = 0; i < Gamut.RelativePitchHierarchiesCount; ++i)
-            {
-                List<Grp> grpList = GetTenorPaletteGrpList(i);
-                Grps.Add(grpList);
-            }
-        }
+			for(int i = 0; i < BaseGrps.Count; ++i)
+			{
+				IReadOnlyList<PaletteGrp> baseGrps = BaseGrps[i];
 
-        public List<List<Grp>> Grps = new List<List<Grp>>();
+				List<PaletteGrp> grps = Compose(baseGrps); // default Compose...
+
+				_composedGrps.Add(grps);
+			}
+		}
 
         /// <summary>
         /// Creates a list of TenorPaletteGrps, each of which has the same relativePitchHierarchyIndex.
@@ -31,10 +33,13 @@ namespace Moritz.Algorithm.Tombeau1
             {
                 Gamut gamut = new Gamut(relativePitchHierarchyIndex, gamutBasePitch, domain);
 
-                TenorPaletteGrp tpg = new TenorPaletteGrp(gamut);
+                PaletteGrp tpg = new PaletteGrp(gamut, 3);
+				int minMsDuration = 200;
+				int maxMsDuration = 300;
+				tpg.SetDurationsFromPitches(maxMsDuration, minMsDuration, true);
 
-                #region begin test code 1 Shear and permute
-                tpg.Shear(0, -1 * (gamut.NPitchesPerOctave));
+				#region begin test code 1 Shear and permute
+				tpg.Shear(0, -1 * (gamut.NPitchesPerOctave));
                 tpg.SetVelocitiesForGamut();
 
                 if(domain % 2 != 0)
@@ -137,5 +142,7 @@ namespace Moritz.Algorithm.Tombeau1
 
             return (grps);
         }
-    }       
+
+
+	}       
 }

@@ -7,28 +7,24 @@ using Moritz.Globals;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-    internal class TenorPaletteGrp : Grp
+    internal class PaletteGrp : Grp
     {
         /// <summary>
         /// An exception will be thrown if the gamut argument is null.
         /// </summary>
         /// <param name="gamut"></param>
-        public TenorPaletteGrp(Gamut gamut)
-            //rootOctave = 3;
+        public PaletteGrp(Gamut gamut, int rootOctave)
             //pitchesPerChord = 6;
             //msDurationPerChord = 200; // dummy, durations are set from pitches below in the ctor
             //velocityFactor = 0.5; // dummy, velocities are set from absolute pitches below in the ctor
-            : base(gamut, 3, 6, 200, gamut.NPitchesPerOctave, 0.5)
+            : base(gamut, rootOctave, 6, 200, gamut.NPitchesPerOctave, 0.5)
         {
             _minimumVelocity = 20;
             _maximumVelocity = 127;
+			
             _velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(_minimumVelocity, _maximumVelocity);
 
-            base.SetVelocityPerAbsolutePitch(_velocityPerAbsolutePitch, (byte)_minimumVelocity);
-
-            int minMsDuration = 200;
-            int maxMsDuration = 300;
-            SetDurationsFromPitches(maxMsDuration, minMsDuration, true);
+            base.SetVelocityPerAbsolutePitch(_velocityPerAbsolutePitch, _minimumVelocity);
         }
 
 
@@ -39,7 +35,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// Throws an exception if this.Gamut == null.
         /// </summary>
         /// <param name="pitchHierarchyIndex">the pitchHierarchyIndex of the returned TenorPaletteGrp's Gamut (will be treated % 22)</param>
-        internal TenorPaletteGrp RelatedPitchHierarchyGrp(int pitchHierarchyIndex)
+        internal PaletteGrp RelatedPitchHierarchyGrp(int pitchHierarchyIndex)
         {
             pitchHierarchyIndex %= 22;
 
@@ -47,16 +43,16 @@ namespace Moritz.Algorithm.Tombeau1
 
             Gamut gamut = new Gamut(pitchHierarchyIndex, Gamut.BasePitch, Gamut.NPitchesPerOctave);
 
-            TenorPaletteGrp newTenorPaletteGrp = new TenorPaletteGrp(gamut);
+            PaletteGrp paletteGrp = new PaletteGrp(gamut, _rootOctave);
 
-            return newTenorPaletteGrp;
+            return paletteGrp;
         }
         /// <summary>
         /// Returns a new, related TenorPaletteGrp whose Gamut has the new basePitch % 12.
         /// Throws an exception if this.Gamut == null.
         /// </summary>
         /// <param name="basePitch">the basePitch of the returned TenorPaletteGrp's Gamut (will be treated % 12)</param>
-        internal TenorPaletteGrp RelatedBasePitchGrp(int basePitch)
+        internal PaletteGrp RelatedBasePitchGrp(int basePitch)
         {
             basePitch %= 12;
 
@@ -64,23 +60,23 @@ namespace Moritz.Algorithm.Tombeau1
 
             Gamut gamut = new Gamut(Gamut.RelativePitchHierarchyIndex, basePitch, Gamut.NPitchesPerOctave);
 
-            TenorPaletteGrp newTenorPaletteGrp = new TenorPaletteGrp(gamut);
+            PaletteGrp paletteGrp = new PaletteGrp(gamut, _rootOctave);
 
-            return newTenorPaletteGrp;
+            return paletteGrp;
         }
         /// <summary>
         /// Returns a new, related TenorPaletteGrp having the new domain % 12.
         /// </summary>
         /// <param name="domain">the the number of chords in the returned TenorPaletteGrp, and the nPitchesPerOctave of its Gamut (will be treated % 12)</param>
-        internal TenorPaletteGrp RelatedDomainGrp(int domain)
+        internal PaletteGrp RelatedDomainGrp(int domain)
         {
             domain %= 12;
 
             Gamut gamut = new Gamut(Gamut.RelativePitchHierarchyIndex, Gamut.BasePitch, domain);
 
-            TenorPaletteGrp newTenorPaletteGrp = new TenorPaletteGrp(gamut);
+            PaletteGrp paletteGrp = new PaletteGrp(gamut, _rootOctave);
 
-            return newTenorPaletteGrp;
+            return paletteGrp;
         }
 
         /// <summary>
