@@ -55,7 +55,9 @@ namespace Moritz.Algorithm.Tombeau1
 		}
 
 		/// <summary>
-		/// The returned list contains the positions of both the first barline (msPos=0) and the final barline.
+		/// The returned list contains the positions of all the (suggested) barlines.
+		/// The compulsory first barline (at msPosition=0) is NOT included in the returned list.
+		/// The compulsory final barline (at the end of the final PaletteGrp) IS included in the returned list.
 		/// All the returned barline positions are at the boundaries of composed PaletteGrps.
 		/// A barline is returned at the end of each list of PaletteGrp (i.e. gamut), with intermediate
 		/// barlines such that bars have durations that are as equal as possible.
@@ -75,7 +77,7 @@ namespace Moritz.Algorithm.Tombeau1
 				return maxBarLength;
 			}
 
-			List<int> barlinePositions = new List<int>() { 0 };
+			List<int> barlinePositions = new List<int>() { 0 }; // removed later
 			List<int> pGrpsEndMsPositions = new List<int>();
 			List<int> intermedateBarlinePositions = new List<int>();
 
@@ -113,6 +115,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 			barlinePositions.AddRange(intermedateBarlinePositions);
 			barlinePositions.Sort();
+			barlinePositions.RemoveAt(0); // Remove the first barline (at msPosition == 0).
 
 			return barlinePositions;
 		}

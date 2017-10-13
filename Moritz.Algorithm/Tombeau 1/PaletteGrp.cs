@@ -14,10 +14,10 @@ namespace Moritz.Algorithm.Tombeau1
         /// </summary>
         /// <param name="gamut"></param>
         public PaletteGrp(Gamut gamut, int rootOctave)
-            //pitchesPerChord = 6;
+            //pitchesPerChord = 5;
             //msDurationPerChord = 200; // dummy, durations are set from pitches below in the ctor
             //velocityFactor = 0.5; // dummy, velocities are set from absolute pitches below in the ctor
-            : base(gamut, rootOctave, 6, 200, gamut.NPitchesPerOctave, 0.5)
+            : base(gamut, rootOctave, 5, 200, gamut.NPitchesPerOctave, 0.5)
         {
             _minimumVelocity = 20;
             _maximumVelocity = 127;

@@ -63,10 +63,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 				if(pGrp.UniqueDefs[0] is MidiChordDef firstMcd && pGrp.UniqueDefs[pGrp.UniqueDefs.Count - 1] is MidiChordDef lastMcd)
 				{
-					while(lastMcd.NotatedMidiPitches[0] > (firstMcd.NotatedMidiPitches[0] + 24))
-					{
-						pGrp.Shear(0, -1 * (pGrp.Gamut.NPitchesPerOctave));
-					}
+					pGrp.Shear(0, -1 * (pGrp.Gamut.NPitchesPerOctave));
 
 					while(lastMcd.NotatedMidiPitches[0] % 12 != (firstMcd.NotatedMidiPitches[0] % 12))
 					{
@@ -76,11 +73,21 @@ namespace Moritz.Algorithm.Tombeau1
 
 				pGrp.SetVelocitiesForGamut();
 
-				if(index % 2 != 0 && pGrp.Count > 1)
+				double minHairpin = 0.5;
+				double maxHairpin = 1.3;
+				if(pGrp.Count > 1)
 				{
-					pGrp.Permute(1, 7);
-					pGrp.AdjustVelocitiesHairpin(0, pGrp.Count / 2, 0.5, 1.0);
-					pGrp.AdjustVelocitiesHairpin(pGrp.Count / 2, pGrp.Count, 1.0, 0.5);
+					if(index % 2 != 0)
+					{
+						pGrp.Permute(1, 7);
+						pGrp.AdjustVelocitiesHairpin(0, pGrp.Count / 3, minHairpin, maxHairpin);
+						pGrp.AdjustVelocitiesHairpin(pGrp.Count / 3, pGrp.Count, maxHairpin, minHairpin);
+					}
+					else
+					{
+						pGrp.AdjustVelocitiesHairpin(0, (pGrp.Count * 2) / 3, minHairpin, maxHairpin);
+						pGrp.AdjustVelocitiesHairpin((pGrp.Count * 2) / 3, pGrp.Count, maxHairpin, minHairpin);
+					}
 				}
 
 				pGrp.AdjustChordMsDurations(factor: 5);

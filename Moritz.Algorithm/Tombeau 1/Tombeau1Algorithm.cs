@@ -363,12 +363,14 @@ namespace Moritz.Algorithm.Tombeau1
 
 			CompositionType compositionType = CompositionType.onlyBassGrps;
 
-            switch(compositionType)
+			List<int> barlineMsPositions = null;
+
+			switch(compositionType)
             {
 				case CompositionType.onlyBassGrps:
 				{
 					AddGrpsToSeqs(outputSeqs, bassGrps, MidiChannelIndexPerOutputVoice[3]);
-					List<int> barlinePositions = bassGrps.ComposedBarlinePositions();
+					barlineMsPositions = bassGrps.ComposedBarlinePositions();
 					break;
 				}
 				case CompositionType.allGrps:
@@ -388,11 +390,9 @@ namespace Moritz.Algorithm.Tombeau1
 				}
 			}
 
-            Seq mainSeq = new Seq(0, new List<Trk>() { new Trk(0) }, MidiChannelIndexPerOutputVoice);
-            List<int> approximateBarlineMsPositions = new List<int>();
-            GetMainSeqAndApproximateBarlineMsPositions(outputSeqs, mainSeq, approximateBarlineMsPositions);
+            Seq mainSeq = GetMainSeq(outputSeqs);
 
-            MainBlock mainBlock = new MainBlock(InitialClefPerChannel, mainSeq, approximateBarlineMsPositions);
+            MainBlock mainBlock = new MainBlock(InitialClefPerChannel, mainSeq, barlineMsPositions);
 
             List<List<VoiceDef>> bars = mainBlock.ConvertToBars();
 
@@ -408,62 +408,19 @@ namespace Moritz.Algorithm.Tombeau1
         }
 
         /// <summary>
-        /// Sets mainSeq (to the concatenation of the seqs), and approxBarlineMsPositions (re mainSeq).
-        /// The approximate barlineMsPositions are made precise later, by positioning them on the nearest
-        /// completion of a chord or rest, inside the MainBlock constructor. 
+        /// Returns a new seq that is the concatenation of the argument seqs. 
         /// </summary>
         /// <param name="seqs">A sequence of Seqs</param>
-        /// <param name="mainSeq">An empty Seq</param>
-        /// <param name="approxBarlineMsPositions">an empty List of ints</param>
-        private void GetMainSeqAndApproximateBarlineMsPositions(List<Seq> seqs, Seq mainSeq, List<int> approxBarlineMsPositions)
+        private Seq GetMainSeq(List<Seq> seqs)
         {
-            foreach(Trk trk in mainSeq.Trks)
-            {
-                Debug.Assert(trk.UniqueDefs.Count == 0);
-            }
-            Debug.Assert(approxBarlineMsPositions != null && approxBarlineMsPositions.Count == 0);
+			Seq rSeq = new Seq(0, new List<Trk>() { new Trk(0) }, MidiChannelIndexPerOutputVoice);
 
             for(int i = 0; i < seqs.Count; ++i)
             {
-                Seq seq = seqs[i];
-                int seqMsDuration = seq.MsDuration;
-                int mainSeqMsDuration = mainSeq.MsDuration;
-                List<int> barlineMsPositionsReSeq = GetBarlineMsPositionsReSeq(seq);
-                foreach(int barlineMsPositionReSeq in barlineMsPositionsReSeq)
-                {
-                    approxBarlineMsPositions.Add(mainSeqMsDuration + barlineMsPositionReSeq);
-                }
-
-                mainSeq.Concat(seq);
+				rSeq.Concat(seqs[i]);
             }
-        }
 
-        /// <summary>
-        /// Barlines are placed at the end of each seq. If the seq is longer than maxSystemMsDuration,
-        /// it is split into two bars (recursively until the bars are shorter than maxSystemMsDuration).
-        /// maxSystemMsDuration is a constant that can be changed inside this function.
-        /// </summary>
-        /// <param name="seq"></param>
-        /// <returns></returns>
-        private List<int> GetBarlineMsPositionsReSeq(Seq seq)
-        {
-            const int maxSystemMsDuration = 20000;
-
-            List<int> barlineMsPositionsReSeq = new List<int>();
-            int seqMsDuration = seq.MsDuration;
-            int barMsDuration = seqMsDuration;
-            while(barMsDuration > maxSystemMsDuration)
-            {
-                barMsDuration /= 2;
-            }
-            int barMsPosition = barMsDuration;
-            while(barMsPosition < seqMsDuration)
-            {
-                barlineMsPositionsReSeq.Add(barMsPosition);
-                barMsPosition += barMsDuration;
-            }
-            barlineMsPositionsReSeq.Add(seqMsDuration);
-            return barlineMsPositionsReSeq;
+			return rSeq;
         }
 
         private void AddGrpsToSeqs(List<Seq> seqs, PaletteGrps paletteGrps, int midiChannel)
