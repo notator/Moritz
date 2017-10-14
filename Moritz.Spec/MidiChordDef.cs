@@ -1240,7 +1240,7 @@ namespace Moritz.Spec
                 }
             }
         }
-        public byte? _pitchWheelDeviation = null;
+        private byte? _pitchWheelDeviation = null;
         public bool HasChordOff { get { return _hasChordOff; } set { _hasChordOff = value; } }
         private bool _hasChordOff = true;
         public bool BeamContinues { get { return _beamContinues; } set { _beamContinues = value; } }
