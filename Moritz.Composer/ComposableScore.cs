@@ -172,8 +172,7 @@ namespace Moritz.Composer
 					}
 					foreach(IUniqueDef iud in voiceDef.UniqueDefs)
 					{
-						ClefDef ccd = iud as ClefDef;
-						if(ccd != null)
+						if(iud is ClefDef ccd)
 						{
 							if(visibleLowerVoiceIndices.Contains(voiceIndex))
 							{
@@ -249,13 +248,11 @@ namespace Moritz.Composer
 
 				foreach(VoiceDef voice in bar)
 				{
-					InputVoiceDef ivd = voice as InputVoiceDef;
-					if(ivd != null)
+					if(voice is InputVoiceDef ivd)
 					{
 						foreach(IUniqueDef iud in ivd.UniqueDefs)
 						{
-							InputChordDef icd = iud as InputChordDef;
-							if(icd != null && icd.CCSettings != null)
+							if(iud is InputChordDef icd && icd.CCSettings != null)
 							{
 								int msPos = icd.MsPositionReFirstUD;
 								if(ccSettingsMsPositions.Contains(msPos))
@@ -340,12 +337,14 @@ namespace Moritz.Composer
                 #region create invisible staves
                 if(invisibleOutputVoiceIndices.Count > 0)
                 {
-                    foreach(byte invisibleOutputVoiceIndex in invisibleOutputVoiceIndices)
-                    {
-                        Trk invisibleTrkDef = barDef[invisibleOutputVoiceIndex] as Trk;
-                        HiddenOutputStaff hiddenOutputStaff = new HiddenOutputStaff(system);
-                        OutputVoice outputVoice = new OutputVoice(hiddenOutputStaff, invisibleTrkDef.MidiChannel);
-                        outputVoice.VoiceDef = invisibleTrkDef;
+					foreach(byte invisibleOutputVoiceIndex in invisibleOutputVoiceIndices)
+					{
+						Trk invisibleTrkDef = barDef[invisibleOutputVoiceIndex] as Trk;
+						HiddenOutputStaff hiddenOutputStaff = new HiddenOutputStaff(system);
+						OutputVoice outputVoice = new OutputVoice(hiddenOutputStaff, invisibleTrkDef.MidiChannel)
+						{
+							VoiceDef = invisibleTrkDef
+						};
                         hiddenOutputStaff.Voices.Add(outputVoice);
                         system.Staves.Add(hiddenOutputStaff);
                     }
@@ -362,8 +361,10 @@ namespace Moritz.Composer
                     {
                         Trk trkDef = barDef[outputVoiceIndices[ovIndex]] as Trk;
                         Debug.Assert(trkDef != null);
-                        OutputVoice outputVoice = new OutputVoice(outputStaff, trkDef.MidiChannel);
-                        outputVoice.VoiceDef = trkDef;
+                        OutputVoice outputVoice = new OutputVoice(outputStaff, trkDef.MidiChannel)
+						{
+							VoiceDef = trkDef
+						};
                         outputStaff.Voices.Add(outputVoice);
                     }
                     SetStemDirections(outputStaff);
@@ -419,8 +420,10 @@ namespace Moritz.Composer
                     {
                         InputVoiceDef inputVoiceDef = barDef[inputVoiceIndices[ivIndex] + _algorithm.MidiChannelIndexPerOutputVoice.Count] as InputVoiceDef;
                         Debug.Assert(inputVoiceDef != null);
-                        InputVoice inputVoice = new InputVoice(inputStaff);
-                        inputVoice.VoiceDef = inputVoiceDef;
+                        InputVoice inputVoice = new InputVoice(inputStaff)
+						{
+							VoiceDef = inputVoiceDef
+						};
                         inputStaff.Voices.Add(inputVoice);
                     }
                     SetStemDirections(inputStaff);

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
@@ -41,7 +39,7 @@ namespace Moritz.Algorithm.Tombeau1
 	internal class BassGrps : PaletteGrps
     {
 		public BassGrps(int rootOctave)
-			: base(rootOctave, 9, 78000)
+			: base(rootOctave, 0, 9, 78000)
 		{
 			for(int i = 0; i < BaseGrps.Count; ++i)
 			{
@@ -56,11 +54,13 @@ namespace Moritz.Algorithm.Tombeau1
 		protected override List<PaletteGrp> Compose(IReadOnlyList<PaletteGrp> baseGrps)
 		{
 			var pGrps = new List<PaletteGrp>(baseGrps);
+			pGrps.RemoveRange(pGrps.Count - 2, 2);
 
 			for(int index = 0; index < pGrps.Count; ++index)
 			{
 				PaletteGrp pGrp = pGrps[index];
 
+				#region current version
 				if(pGrp.UniqueDefs[0] is MidiChordDef firstMcd && pGrp.UniqueDefs[pGrp.UniqueDefs.Count - 1] is MidiChordDef lastMcd)
 				{
 					pGrp.Shear(0, -1 * (pGrp.Gamut.NPitchesPerOctave));
@@ -71,7 +71,7 @@ namespace Moritz.Algorithm.Tombeau1
 					}
 				}
 
-				pGrp.SetVelocitiesForGamut();
+				pGrp.SetVelocityPerAbsolutePitch(_rootGamut);
 
 				double minHairpin = 0.5;
 				double maxHairpin = 1.3;
@@ -90,7 +90,8 @@ namespace Moritz.Algorithm.Tombeau1
 					}
 				}
 
-				pGrp.AdjustChordMsDurations(factor: 5);
+				//pGrp.AdjustChordMsDurations(factor: 5);
+				#endregion current version
 
 				#region begin test code 2 transpose chords to the same absolute root pitch
 				//for(int iudIndex = 0; iudIndex < g.Count; ++iudIndex)
@@ -176,6 +177,5 @@ namespace Moritz.Algorithm.Tombeau1
 			}
 			return pGrps;
 		}
-
 	}
 }

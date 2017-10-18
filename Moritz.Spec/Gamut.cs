@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
+using System.Text;
 
 namespace Moritz.Spec
 {
@@ -41,13 +42,60 @@ namespace Moritz.Spec
             MaxPitch = _list[_list.Count - 1];
         }
 
-        #region private helper functions
-        /// <summary>
-        /// A pitchHierarchy.Count must be 12.
-        /// Each value must be in range [0..11] and occur only once (no duplicates).
-        /// </summary>
-        /// <param name="pitchHierarchy"></param>
-        private void ThrowExceptionIfPitchHierarchyIsInvalid(List<int> pitchHierarchy)
+		public List<GamutProximity> FindRelatedGamuts()
+		{
+			var rval = new List<GamutProximity>();
+
+			for(int gamutRPHIndex = 0; gamutRPHIndex < Gamut.RelativePitchHierarchiesCount; ++gamutRPHIndex)
+			{
+				for(int gamutRPHBasePitch = 0; gamutRPHBasePitch < 12; ++gamutRPHBasePitch)
+				{
+					Gamut gamut2 = new Gamut(gamutRPHIndex, gamutRPHBasePitch, this.NPitchesPerOctave);
+					GamutProximity gamutProximity = GetGamutProximity(gamut2);
+					rval.Add(gamutProximity);
+				}
+			}
+
+			for(int i = 0; i < rval.Count; ++i)
+			{
+				rval.Sort((a, b) => a.Proximity.CompareTo(b.Proximity));
+			}
+
+			return rval;
+		}
+
+		private GamutProximity GetGamutProximity(Gamut gamut)
+		{
+			Debug.Assert(NPitchesPerOctave == gamut.NPitchesPerOctave);
+			int GetProximity()
+			{
+				int proximity2 = 0;
+				for(int index1 = 0; index1 < 12; ++index1)
+				{
+					int pitch = AbsolutePitchHierarchy[index1];
+					int index2 = gamut.AbsolutePitchHierarchy.FindIndex(a => a == pitch);
+					int minIndex = (index1 <= index2) ? index1 : index2;
+					int maxIndex = (index1 > index2) ? index1 : index2;
+
+					int p = (maxIndex - minIndex + 1) * (minIndex + maxIndex);
+
+					proximity2 += p;
+				}
+				return proximity2;
+			}
+			int proximity = GetProximity();
+			GamutProximity rval = new GamutProximity(gamut, proximity);
+
+			return rval;
+		}
+
+		#region private helper functions
+		/// <summary>
+		/// A pitchHierarchy.Count must be 12.
+		/// Each value must be in range [0..11] and occur only once (no duplicates).
+		/// </summary>
+		/// <param name="pitchHierarchy"></param>
+		private void ThrowExceptionIfPitchHierarchyIsInvalid(List<int> pitchHierarchy)
         {
             Debug.Assert(pitchHierarchy.Count == 12);
             List<bool> presence = new List<bool>();
@@ -390,7 +438,7 @@ namespace Moritz.Spec
         /// <param name="maximumVelocity">In range [1..127]. The maximum velocity to be given to any pitch.</param>
         /// <param name="loudestPitchIndex">In range [0..(NPitchesPerOctave-1)].</param>
         /// <param name="isLinearGradient">If false, velocity values are scaled logarithmically between minimumVelocity and maximumVelocity.</param>
-        public List<byte> GetVelocityPerAbsolutePitch(int minimumVelocity, int maximumVelocity, int loudestPitchIndex = 0, bool isLinearGradient = true)
+        public List<byte> GetVelocityPerAbsolutePitch(int minimumVelocity = 20, int maximumVelocity = 127, int loudestPitchIndex = 0, bool isLinearGradient = true)
         {
             Debug.Assert(minimumVelocity >= 1 && minimumVelocity <= 127);
             Debug.Assert(maximumVelocity >= 1 && maximumVelocity <= 127);
@@ -514,10 +562,60 @@ namespace Moritz.Spec
             return contour;
         }
 
-        #endregion public functions
+		public (List<byte> commonAbsPitches, List<byte> otherAbsPitchesInThisGamut, List<byte> otherAbsPitchesInArgGamut)
+			GetCommonAbsolutePitches(Gamut gamut2)
+		{
+			var commonAbsPitches = new List<byte>();
+			var otherAbsPitchesInThisGamut = new List<byte>();
+			var otherAbsPitchesInArgGamut = new List<byte>();
 
-        #region public properties
-        public static int RelativePitchHierarchiesCount { get { return RelativePitchHierarchies.Count; } }
+			List<int> shortG1AbsPH = new List<int>();
+			List<int> shortG2AbsPH = new List<int>();
+
+			for(int i = 0; i < NPitchesPerOctave; ++i)
+			{
+				shortG1AbsPH.Add(this.AbsolutePitchHierarchy[i]);
+				shortG2AbsPH.Add(gamut2.AbsolutePitchHierarchy[i]);
+			}
+
+			for(int i = 0; i < NPitchesPerOctave; ++i)
+			{
+				int pitchG2 = shortG2AbsPH[i];
+				if(shortG1AbsPH.Contains(pitchG2))
+				{
+					commonAbsPitches.Add((byte)(pitchG2));
+				}
+				else
+				{
+					otherAbsPitchesInArgGamut.Add((byte)(pitchG2));
+				}
+			}
+			for(int i = 0; i < NPitchesPerOctave; ++i)
+			{
+				int pitchG1 = shortG1AbsPH[i];
+				if(!commonAbsPitches.Contains((byte)pitchG1))
+				{
+					otherAbsPitchesInThisGamut.Add((byte)(pitchG1));
+				}
+			}
+			return (commonAbsPitches, otherAbsPitchesInThisGamut, otherAbsPitchesInArgGamut);
+		}
+
+		public override string ToString()
+		{
+			const string nums = "0123456789AB";
+			StringBuilder sb = new StringBuilder();
+			foreach(int i in _absolutePitchHierarchy)
+			{
+				sb.Append(nums[i]);
+			}
+			return $" Hierarchy={sb.ToString()}, index={RelativePitchHierarchyIndex}, basePitch={BasePitch}, nPitchesPerOctave={NPitchesPerOctave}";
+		}
+
+		#endregion public functions
+
+		#region public properties
+		public static int RelativePitchHierarchiesCount { get { return RelativePitchHierarchies.Count; } }
         public readonly int RelativePitchHierarchyIndex;
         public readonly int BasePitch;
         public readonly int NPitchesPerOctave;

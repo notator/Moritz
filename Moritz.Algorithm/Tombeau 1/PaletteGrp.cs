@@ -18,24 +18,32 @@ namespace Moritz.Algorithm.Tombeau1
             //msDurationPerChord = 200; // dummy, durations are set from pitches below in the ctor
             //velocityFactor = 0.5; // dummy, velocities are set from absolute pitches below in the ctor
             : base(gamut, rootOctave, 5, 200, gamut.NPitchesPerOctave, 0.5)
-        {
-            _minimumVelocity = 20;
-            _maximumVelocity = 127;
-			
-            _velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch(_minimumVelocity, _maximumVelocity);
+        {			
+            var velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch();
 
-            base.SetVelocityPerAbsolutePitch(_velocityPerAbsolutePitch, _minimumVelocity);
+            base.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
         }
 
+		/// <summary>
+		/// The IUniqueDefs are cloned, the other attributes (including the Gamut) are not.
+		/// </summary>
+		public new PaletteGrp Clone
+		{
+			get
+			{
+				return new PaletteGrp(this.Gamut, _rootOctave);
+			}
+		}
 
-        #region transposition functions (new)
 
-        /// <summary>
-        /// Returns a new, related TenorPaletteGrp whose Gamut has the new pitchHierarchyIndex % 22.
-        /// Throws an exception if this.Gamut == null.
-        /// </summary>
-        /// <param name="pitchHierarchyIndex">the pitchHierarchyIndex of the returned TenorPaletteGrp's Gamut (will be treated % 22)</param>
-        internal PaletteGrp RelatedPitchHierarchyGrp(int pitchHierarchyIndex)
+		#region transposition functions (new)
+
+		/// <summary>
+		/// Returns a new, related PaletteGrp whose Gamut has the new pitchHierarchyIndex % 22.
+		/// Throws an exception if this.Gamut == null.
+		/// </summary>
+		/// <param name="pitchHierarchyIndex">the pitchHierarchyIndex of the returned PaletteGrp's Gamut (will be treated % 22)</param>
+		internal PaletteGrp RelatedPitchHierarchyGrp(int pitchHierarchyIndex)
         {
             pitchHierarchyIndex %= 22;
 
@@ -48,10 +56,10 @@ namespace Moritz.Algorithm.Tombeau1
             return paletteGrp;
         }
         /// <summary>
-        /// Returns a new, related TenorPaletteGrp whose Gamut has the new basePitch % 12.
+        /// Returns a new, related PaletteGrp whose Gamut has the new basePitch % 12.
         /// Throws an exception if this.Gamut == null.
         /// </summary>
-        /// <param name="basePitch">the basePitch of the returned TenorPaletteGrp's Gamut (will be treated % 12)</param>
+        /// <param name="basePitch">the basePitch of the returned PaletteGrp's Gamut (will be treated % 12)</param>
         internal PaletteGrp RelatedBasePitchGrp(int basePitch)
         {
             basePitch %= 12;
@@ -65,9 +73,9 @@ namespace Moritz.Algorithm.Tombeau1
             return paletteGrp;
         }
         /// <summary>
-        /// Returns a new, related TenorPaletteGrp having the new domain % 12.
+        /// Returns a new, related PaletteGrp having the new domain % 12.
         /// </summary>
-        /// <param name="domain">the the number of chords in the returned TenorPaletteGrp, and the nPitchesPerOctave of its Gamut (will be treated % 12)</param>
+        /// <param name="domain">the the number of chords in the returned PaletteGrp, and the nPitchesPerOctave of its Gamut (will be treated % 12)</param>
         internal PaletteGrp RelatedDomainGrp(int domain)
         {
             domain %= 12;
@@ -99,7 +107,8 @@ namespace Moritz.Algorithm.Tombeau1
                     octave = (down) ? octave - 1 : octave + 1;
                     int rootPitch = M.MidiValue((octave * 12) + absolutePitch);
                     mcd.TransposeToRootInGamut(Gamut, rootPitch);
-                    base.SetVelocityPerAbsolutePitch(_velocityPerAbsolutePitch, _minimumVelocity, 100);
+
+                    base.SetVelocityPerAbsolutePitch(_currentVelocityPerAbsolutePitch);
                 }
             }
         }
@@ -126,13 +135,13 @@ namespace Moritz.Algorithm.Tombeau1
         #region Overridden functions
 
         // N.B.: Grp UniqueDefs list order changers are explicitly allowed
-        private static string ForbiddenFunctionMsg = "this function should never be called on a TenorPaletteGrp.";
+        private static string ForbiddenFunctionMsg = "this function should never be called on a PaletteGrp.";
 
-        #region UniqueDefs list changers (forbidden)
-        /// <summary>
-        /// Forbidden
-        /// </summary>
-        public override void Add(IUniqueDef iUniqueDef)
+		#region UniqueDefs list changers (forbidden)
+		/// <summary>
+		/// Forbidden
+		/// </summary>
+		public override void Add(IUniqueDef iUniqueDef)
         {
             Debug.Assert(false, ForbiddenFunctionMsg);
         }
@@ -218,15 +227,12 @@ namespace Moritz.Algorithm.Tombeau1
         {
             base.AdjustVelocitiesHairpin(startIndex, endIndex, startFactor, endFactor);
         }
-        #endregion Overridden functions
+		#endregion Overridden functions
 
-        public void SetVelocitiesForGamut()
-        {
-            base.SetVelocityPerAbsolutePitch(_velocityPerAbsolutePitch, _minimumVelocity);
-        }
-
-        private readonly List<byte> _velocityPerAbsolutePitch;
-        private readonly byte _minimumVelocity;
-        private readonly byte _maximumVelocity;
+		public void SetVelocityPerAbsolutePitch(Gamut gamut)
+		{
+			var velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch();
+			base.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+		}
     }
 }

@@ -408,7 +408,7 @@ namespace Moritz.Spec
         /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
         /// <param name="minimumVelocity">In range 1..127</param>
         /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
-        public virtual void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, byte minimumVelocity, double percent = 100.0)
+        public virtual void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, byte minimumVelocity = 20, double percent = 100.0)
         {
             #region conditions
             Debug.Assert(velocityPerAbsolutePitch.Count == 12);
@@ -418,7 +418,8 @@ namespace Moritz.Spec
                 Debug.Assert(v >= 0 && v <= 127);
             }
             Debug.Assert(minimumVelocity >= 0 && minimumVelocity <= 127);
-            #endregion conditions
+			#endregion conditions
+			_currentVelocityPerAbsolutePitch = new List<byte>(velocityPerAbsolutePitch);
             for(int i = 0; i < UniqueDefs.Count; ++i)
             {
                 if(UniqueDefs[i] is MidiChordDef mcd)
@@ -1477,5 +1478,8 @@ namespace Moritz.Spec
                 base.MsPositionReContainer = value; // can be negative
             }
         }
+
+		//public List<byte> _velocityPerAbsolutePitch { get; private set; }
+		protected List<byte> _currentVelocityPerAbsolutePitch;
 	}
 }

@@ -9,7 +9,7 @@ namespace Moritz.Algorithm.Tombeau1
     internal class TenorGrps : PaletteGrps
     {
         public TenorGrps(int rootOctave, IReadOnlyList<IReadOnlyList<Grp>> sopranoGrps,	IReadOnlyList<IReadOnlyList<Grp>> altoGrps, IReadOnlyList<IReadOnlyList<Grp>> bassGrps)
-			: base(rootOctave, 9, 79000)
+			: base(rootOctave, 0, 9, 79000)
         {
 			for(int i = 0; i < BaseGrps.Count; ++i)
 			{
@@ -40,7 +40,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 				#region begin test code 1 Shear and permute
 				tpg.Shear(0, -1 * (gamut.NPitchesPerOctave));
-                tpg.SetVelocitiesForGamut();
+                tpg.SetVelocityPerAbsolutePitch(gamut);
 
                 if(domain % 2 != 0)
                 {

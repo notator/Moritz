@@ -81,32 +81,35 @@ namespace Moritz.Algorithm.Tombeau1
             _gamut = gamut;
             SetBeamEnd();
         }
-        
-        /// <summary>
-        /// The IUniqueDefs are cloned, the other attributes (including the Gamut) are not.
-        /// </summary>
-        public new Grp Clone()
-        {
-            List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
-			Grp grp = new Grp(Gamut, this.MidiChannel, this.MsPositionReContainer, clonedIUDs)
+
+		/// <summary>
+		/// The IUniqueDefs are cloned, the other attributes (including the Gamut) are not.
+		/// </summary>
+		public new Grp Clone
+		{
+			get
 			{
-				Container = this.Container
-			};
+				List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
+				Grp grp = new Grp(Gamut, this.MidiChannel, this.MsPositionReContainer, clonedIUDs)
+				{
+					Container = this.Container
+				};
 
-            return grp;
-        }
-        #endregion constructors
+				return grp;
+			}
+		}
+		#endregion constructors
 
-        #region Overridden functions
-        #region UniqueDefs list component changers
-        /// <summary>
-        /// Appends a new MidiChordDef, MidiRestDef, or ClefDef to the end of the list.
-        /// IUniqueDefs in Grps cannot be CautionaryChordDefs.
-        /// Automatically sets the iUniqueDef's msPosition.
-        /// Used by Block.PopBar(...), so accepts a CautionaryChordDef argument.
-        /// CautionaryChordDefs are however not allowed in Grps.
-        /// </summary>
-        public override void Add(IUniqueDef iUniqueDef)
+		#region Overridden functions
+		#region UniqueDefs list component changers
+		/// <summary>
+		/// Appends a new MidiChordDef, MidiRestDef, or ClefDef to the end of the list.
+		/// IUniqueDefs in Grps cannot be CautionaryChordDefs.
+		/// Automatically sets the iUniqueDef's msPosition.
+		/// Used by Block.PopBar(...), so accepts a CautionaryChordDef argument.
+		/// CautionaryChordDefs are however not allowed in Grps.
+		/// </summary>
+		public override void Add(IUniqueDef iUniqueDef)
         {
             Debug.Assert(_gamut != null);
             AssertPitches(iUniqueDef);

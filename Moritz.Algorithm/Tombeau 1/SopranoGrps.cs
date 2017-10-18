@@ -9,7 +9,7 @@ namespace Moritz.Algorithm.Tombeau1
     internal class SopranoGrps : PaletteGrps
     {
 		public SopranoGrps(int rootOctave, IReadOnlyList<IReadOnlyList<Grp>> bassGrps)
-			: base(rootOctave, 9, 79000)
+			: base(rootOctave, 0, 9, 79000)
         {
 			for(int i = 0; i < BaseGrps.Count; ++i)
 			{

@@ -8,14 +8,89 @@ namespace Moritz.Algorithm.Tombeau1
 {
     internal class PaletteGrps
     {
-		protected PaletteGrps(int rootOctave, int basePitch, int barLengthMsDurationLimit)
+		protected PaletteGrps(int rootOctave, int relativePitchHierarchyIndex, int basePitch, int barLengthMsDurationLimit)
 		{
-			for(int i = 0; i < Gamut.RelativePitchHierarchiesCount; ++i)
+			int nPitchesPerOctave = 12;
+			_rootGamut = new Gamut(relativePitchHierarchyIndex, basePitch, nPitchesPerOctave);
+			List<GamutProximity> gamutProximities = _rootGamut.FindRelatedGamuts();
+
+			int maxIndex = gamutProximities.Count - 1;
+			int indexInc = maxIndex / 11;
+			List<int> gamutIndices = new List<int>()
 			{
-				List<PaletteGrp> paletteGrps = GetPaletteGrpList(rootOctave, basePitch, i);
+				0,
+				indexInc,
+				2 * indexInc,
+				3 * indexInc,
+				4 * indexInc,
+				5 * indexInc,
+				6 * indexInc,
+				7 * indexInc,
+				8 * indexInc,
+				9 * indexInc,
+				10 * indexInc,
+				maxIndex};
+
+			var baseGamuts = new List<Gamut>();
+			for(int i = 0; i < gamutIndices.Count; i++)
+			{
+				Gamut gamut = FindBaseGamut(gamutProximities, basePitch, gamutIndices[i]);
+				var common = _rootGamut.GetCommonAbsolutePitches(gamut);
+				Console.WriteLine($"nPitchesPerOctave={nPitchesPerOctave } commonAbsPitches.Count={common.commonAbsPitches.Count} relHierIndex={gamut.RelativePitchHierarchyIndex}");
+				baseGamuts.Add(gamut);
+			}
+
+			foreach(var gamut in baseGamuts)
+			{
+				List<PaletteGrp> paletteGrps = GetPaletteGrpList(rootOctave, gamut.BasePitch, gamut.RelativePitchHierarchyIndex);
 				_baseGrps.Add(paletteGrps as IReadOnlyList<PaletteGrp>);
 			}
+
 			_barLengthMsDurationLimit = barLengthMsDurationLimit;
+		}
+
+		// Find the nearest Gamut to startIndex having BasePitch = basePitch.
+		private Gamut FindBaseGamut(List<GamutProximity> gamutProximities, int basePitch, int startIndex)
+		{
+			Gamut rval = null;
+			int? index1 = null;
+			for(int index = startIndex; index >= 0; --index)
+			{
+				if(gamutProximities[index].Gamut.BasePitch == basePitch)
+				{
+					index1 = index;
+					break;
+				}
+			}
+			int? index2 = null;
+			for(int index = startIndex + 1; index < gamutProximities.Count; ++index)
+			{
+				if(gamutProximities[index].Gamut.BasePitch == basePitch)
+				{
+					index2 = index;
+					break;
+				}
+
+			}
+			if(index1 == null)
+			{
+				if(index2 != null)
+				{
+					rval = gamutProximities[(int)index2].Gamut;
+				}
+			}
+			if(index2 == null)
+			{
+				if(index1 != null)
+				{
+					rval = gamutProximities[(int)index1].Gamut;
+				}
+			}
+			else // neither index1 nor index2 is null
+			{
+				rval = ((startIndex - index1) < (index2 - startIndex)) ? gamutProximities[(int)index1].Gamut : gamutProximities[(int)index2].Gamut;
+			}
+			return rval;
 		}
 
 		/// <summary>
@@ -32,7 +107,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 				PaletteGrp tpg = new PaletteGrp(gamut, rootOctave);
 				int minMsDuration = 230;
-				int maxMsDuration = 350;
+				int maxMsDuration = 380;
 				tpg.SetDurationsFromPitches(maxMsDuration, minMsDuration, true);
 
 				tpg.SortRootNotatedPitchAscending();
@@ -127,6 +202,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 		internal IReadOnlyList<IReadOnlyList<PaletteGrp>> ComposedGrps { get => _composedGrps as IReadOnlyList<IReadOnlyList<PaletteGrp>>; }
 		protected List<IReadOnlyList<PaletteGrp>> _composedGrps = new List<IReadOnlyList<PaletteGrp>>();
+		protected readonly Gamut _rootGamut;
 
 		internal List<List<PaletteGrp>> ComposedGrpsClone()
 		{
