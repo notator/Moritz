@@ -23,6 +23,5 @@ namespace Moritz.Spec
 
 		public int Proximity { get => _proximity; }
 		private int _proximity = 0;
-
 	}
 }
