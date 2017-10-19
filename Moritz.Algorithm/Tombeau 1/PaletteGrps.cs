@@ -15,7 +15,7 @@ namespace Moritz.Algorithm.Tombeau1
 			List<GamutProximity> gamutProximities = _rootGamut.FindRelatedGamuts();
 
 			int maxIndex = gamutProximities.Count - 1;
-			int indexInc = maxIndex / 11;
+			int indexInc = maxIndex / 12;
 			List<int> gamutIndices = new List<int>()
 			{
 				0,
@@ -29,12 +29,15 @@ namespace Moritz.Algorithm.Tombeau1
 				8 * indexInc,
 				9 * indexInc,
 				10 * indexInc,
-				maxIndex};
+				11 * indexInc,
+				maxIndex
+			};
 
 			var baseGamuts = new List<Gamut>();
 			for(int i = 0; i < gamutIndices.Count; i++)
 			{
 				Gamut gamut = FindBaseGamut(gamutProximities, basePitch, gamutIndices[i]);
+				gamutProximities = gamut.FindRelatedGamuts();
 				var common = _rootGamut.GetCommonAbsolutePitches(gamut);
 				Console.WriteLine($"nPitchesPerOctave={nPitchesPerOctave } commonAbsPitches.Count={common.commonAbsPitches.Count} relHierIndex={gamut.RelativePitchHierarchyIndex}");
 				baseGamuts.Add(gamut);

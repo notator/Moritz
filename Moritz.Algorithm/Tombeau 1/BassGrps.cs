@@ -43,7 +43,13 @@ namespace Moritz.Algorithm.Tombeau1
 		{
 			for(int i = 0; i < BaseGrps.Count; ++i)
 			{
-				IReadOnlyList<PaletteGrp> baseGrps = BaseGrps[i];
+				List<PaletteGrp> baseGrps = new List<PaletteGrp>(BaseGrps[i]);
+				baseGrps.RemoveRange(baseGrps.Count - 2, 2);
+
+				if(i % 2 == 1)
+				{
+					baseGrps.Reverse();
+				}
 
 				List<PaletteGrp> grps = Compose(baseGrps);
 
@@ -54,7 +60,7 @@ namespace Moritz.Algorithm.Tombeau1
 		protected override List<PaletteGrp> Compose(IReadOnlyList<PaletteGrp> baseGrps)
 		{
 			var pGrps = new List<PaletteGrp>(baseGrps);
-			pGrps.RemoveRange(pGrps.Count - 2, 2);
+
 
 			for(int index = 0; index < pGrps.Count; ++index)
 			{
@@ -75,18 +81,27 @@ namespace Moritz.Algorithm.Tombeau1
 
 				double minHairpin = 0.5;
 				double maxHairpin = 1.3;
+				int indexMax;
 				if(pGrp.Count > 1)
 				{
 					if(index % 2 != 0)
 					{
 						pGrp.Permute(1, 7);
-						pGrp.AdjustVelocitiesHairpin(0, pGrp.Count / 3, minHairpin, maxHairpin);
-						pGrp.AdjustVelocitiesHairpin(pGrp.Count / 3, pGrp.Count, maxHairpin, minHairpin);
+						indexMax = pGrp.Count / 3;
+						if(indexMax > 0 && indexMax < pGrp.Count)
+						{
+							pGrp.AdjustVelocitiesHairpin(0, indexMax, minHairpin, maxHairpin);
+							pGrp.AdjustVelocitiesHairpin(indexMax, pGrp.Count, maxHairpin, minHairpin);
+						}
 					}
 					else
 					{
-						pGrp.AdjustVelocitiesHairpin(0, (pGrp.Count * 2) / 3, minHairpin, maxHairpin);
-						pGrp.AdjustVelocitiesHairpin((pGrp.Count * 2) / 3, pGrp.Count, maxHairpin, minHairpin);
+						indexMax = (pGrp.Count * 2) / 3;
+						if(indexMax > 0 && indexMax < pGrp.Count)
+						{
+							pGrp.AdjustVelocitiesHairpin(0, indexMax, minHairpin, maxHairpin);
+							pGrp.AdjustVelocitiesHairpin((pGrp.Count * 2) / 3, pGrp.Count, maxHairpin, minHairpin);
+						}
 					}
 				}
 
