@@ -22,12 +22,10 @@ namespace Moritz.Composer
 
         /// <summary>
         /// Called by the derived class after setting _algorithm and Notator.
-        /// Returns false if it fails for some reason. Otherwise true.
+        /// Returns false if systems cannot be fit vertically on the page. Otherwise true.
         /// </summary>
         protected bool CreateScore(List<Krystal> krystals, List<Palette> palettes)
         {
-            bool success = true;
-
 			CheckOutputVoiceChannelsAndMasterVolumes(_algorithm);
 
             List<List<VoiceDef>> bars = _algorithm.DoAlgorithm(krystals, palettes);
@@ -38,7 +36,8 @@ namespace Moritz.Composer
 
             CreateEmptySystems(bars, _pageFormat.VisibleInputVoiceIndicesPerStaff.Count); // one system per bar
 
-            if(_pageFormat.ChordSymbolType != "none") // set by AudioButtonsControl
+			bool success = true;
+			if(_pageFormat.ChordSymbolType != "none") // set by AudioButtonsControl
             {
                 Notator.ConvertVoiceDefsToNoteObjects(this.Systems);
 
@@ -47,11 +46,8 @@ namespace Moritz.Composer
                 /// The systems do not yet contain Metrics info.
                 /// The systems are given Metrics inside the following function then justified internally,
                 /// both horizontally and vertically.
-                success = Notator.CreateMetricsAndJustifySystems(this.Systems);
-                if(success)
-                {
-                    success = CreatePages();
-                }
+                Notator.CreateMetricsAndJustifySystems(this.Systems);
+                success = CreatePages();
             }
             return success;
         }

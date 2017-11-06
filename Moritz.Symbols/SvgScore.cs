@@ -1441,7 +1441,11 @@ namespace Moritz.Symbols
             }
         }
 
-        protected bool CreatePages()
+		/// <summary>
+		/// Puts up a Warning MessageBox, and returns false if systems cannot be fit
+		/// vertically on the page. Otherwise true.
+		/// </summary>
+		protected bool CreatePages()
         {
             bool success = true;
             int pageNumber = 1;
@@ -1454,7 +1458,7 @@ namespace Moritz.Symbols
                 {
                     MessageBox.Show("The systems are too high for the page height.\n\n" +
                         "Reduce the height of the systems, or increase the page height.",
-                        "Problem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        "Height Problem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     success = false;
                     break;
                 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
@@ -39,7 +40,7 @@ namespace Moritz.Algorithm.Tombeau1
 	internal class BassGrps : PaletteGrps
     {
 		public BassGrps(int rootOctave)
-			: base(rootOctave, 0, 9, 78000)
+			: base(rootOctave, 0, 9)
 		{
 			for(int i = 0; i < BaseGrps.Count; ++i)
 			{
@@ -191,6 +192,80 @@ namespace Moritz.Algorithm.Tombeau1
 
 			}
 			return pGrps;
+		}
+
+		/// <summary>
+		/// The compulsory first barline (at msPosition=0) is NOT included in the returned list.
+		/// The compulsory final barline (at the end of the final PaletteGrp) IS included in the returned list.
+		/// There is a barline at the end of each list of PaletteGrp (i.e. gamut).
+		/// All the returned barline positions are at the boundaries of composed PaletteGrps.
+		/// </summary>
+		internal List<int> BarlinePositions()
+		{
+			List<int> barlinePositions = new List<int>() { 0 }; // entry is removed just before this function returns
+
+			int endMsPos = 0;
+			for(int i = 0; i < _composedGrps.Count; ++i)
+			{
+				IReadOnlyList<PaletteGrp> gamut = _composedGrps[i];
+				for(int j = 0; j < gamut.Count; j++)
+				{
+					PaletteGrp pGrp = gamut[j];
+					endMsPos += pGrp.MsDuration;
+				}				
+				barlinePositions.Add(endMsPos);
+			}
+
+			#region insert intermediate barline positions
+			//List<int> intermediateBarlinePositions = new List<int>();
+			//SplitGamut(barlinePositions, 1, intermediateBarlinePositions);
+			//SplitGamut(barlinePositions, 10, intermediateBarlinePositions);
+			//SplitGamut(barlinePositions, 12, intermediateBarlinePositions);
+			//foreach(int b in intermediateBarlinePositions)
+			//{
+			//	barlinePositions.Add(b);
+			//}
+			#endregion
+
+			barlinePositions.Remove(0); 
+			barlinePositions.Sort();
+			
+			Debug.Assert(barlinePositions[0] != 0);
+
+			return barlinePositions;
+		}
+
+		private void SplitGamut(List<int> barlinePositions, int gamutNumber, List<int> intermediateBarlinePositions)
+		{
+			Debug.Assert(barlinePositions[0] == 0);
+			int msPos = barlinePositions[gamutNumber - 1] + ((barlinePositions[gamutNumber] - barlinePositions[gamutNumber - 1]) / 2); // end barline msPosition for gamut 1, divided by 2
+			int barlineMsPos = PaletteGrpEndMsPosFollowingMsPos(msPos);
+			intermediateBarlinePositions.Add(barlineMsPos);
+		}
+
+		private int PaletteGrpEndMsPosFollowingMsPos(int msPos)
+		{
+			int endMsPos = 0;
+			int rval = 0;
+			for(int i = 0; i < _composedGrps.Count; ++i)
+			{
+				IReadOnlyList<PaletteGrp> gamut = _composedGrps[i];
+				for(int j = 0; j < gamut.Count; j++)
+				{
+					PaletteGrp pGrp = gamut[j];
+					endMsPos += pGrp.MsDuration;
+					if(endMsPos >= msPos)
+					{
+						rval = endMsPos;
+						break;
+					}
+				}
+				if(rval > 0)
+				{
+					break;
+				}
+			}
+			return rval;
 		}
 	}
 }

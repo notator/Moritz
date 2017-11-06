@@ -370,7 +370,7 @@ namespace Moritz.Algorithm.Tombeau1
 				case CompositionType.onlyBassGrps:
 				{
 					AddGrpsToSeqs(outputSeqs, bassGrps, MidiChannelIndexPerOutputVoice[3]);
-					barlineMsPositions = bassGrps.ComposedBarlinePositions();
+					barlineMsPositions = bassGrps.BarlinePositions();
 					break;
 				}
 				case CompositionType.allGrps:

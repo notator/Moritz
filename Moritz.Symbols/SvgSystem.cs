@@ -167,13 +167,16 @@ namespace Moritz.Symbols
         /// <summary>
         /// All the objects in this SvgSystem are given Metrics which are then moved to their
         /// final positions within the SvgSystem.
-        /// When this function returns, all the contained, drawable objects have their correct
-        /// relative positions. They are actually drawn when the SvgSystem has been moved to 
-        /// its final position on the page.
-        /// If the function can't squash everything into the given width, it returns false.
-        /// Otherwise it returns true.
+        /// When this function returns, all the contained, drawable objects have their final
+        /// relative positions within the sysrtem. They are actually drawn when the SvgSystem
+		/// has been moved to its final position on the page.
+		/// If there are any remaining overlapping symbols in the system, they are reported in the
+		/// returned list of Tuples (this list can be empty). The Tuple members are:
+		///     item1: system number
+		///     item2: the number of remaining overlaps (in top or lower voices)
+		///     item3: "top" or "lower", saying in which voices the overlaps are.
         /// </summary>
-        public bool MakeGraphics(Graphics graphics, int systemNumber, PageFormat pageFormat, float leftMargin)
+        public List<Tuple<int, int, string>> MakeGraphics(Graphics graphics, int systemNumber, PageFormat pageFormat, float leftMargin)
         {
             if(Metrics == null)
                 CreateMetrics(graphics, pageFormat, leftMargin);
@@ -189,55 +192,45 @@ namespace Moritz.Symbols
 
             List<NoteObjectMoment> moments = MomentSymbols(pageFormat.Gap);
 
-            // barlineWidths:  Key is a moment's msPosition. Value is the distance between the left edge 
-            // of the barline and the AlignmentX of the moment which immediately follows it.
-            Dictionary<int, float> barlineWidths = GetBarlineWidths(moments, pageFormat);
+			SymbolSet symbolSet = Score.Notator.SymbolSet;
 
-            DistributeProportionally(moments, barlineWidths, pageFormat, leftMargin);
+			// barlineWidths:  Key is a moment's msPosition. Value is the distance between the left edge 
+			// of the barline and the AlignmentX of the moment which immediately follows it.
+			Dictionary<int, float> barlineWidths = GetBarlineWidths(moments, pageFormat);
 
-            // The moments have now been distributed proportionally within each bar, but no checking has
-            // been done for overlapping noteObject Metrics.
+			DistributeProportionally(moments, barlineWidths, pageFormat, leftMargin);
 
-            SymbolSet symbolSet = Score.Notator.SymbolSet;
-            // SymbolSet is an abstract root class, and the functions called on symbolSet are virtual.
-            // Usually they only do something when symbolSet is a StandardSymbolSet.
-            symbolSet.AdjustRestsVertically(Staves);
-            symbolSet.SetBeamedStemLengths(Staves); // see the comment next to the function
+			// The moments have now been distributed proportionally within each bar, but no checking has
+			// been done for overlapping noteObject Metrics.
 
-			bool success = JustifyHorizontally(moments, barlineWidths, pageFormat.StafflineStemStrokeWidth);
-			if(success)
-			{
-				symbolSet.FinalizeBeamBlocks(Staves);
-                symbolSet.AlignLyrics(Staves);
-                SvgSystem nextSystem = null;
-                if(systemNumber < this.Score.Systems.Count)
-                {
-                    nextSystem = this.Score.Systems[systemNumber];
-                }
-                symbolSet.AddNoteheadExtenderLines(Staves, pageFormat.RightMarginPos, pageFormat.Gap,
-                    pageFormat.NoteheadExtenderStrokeWidth, pageFormat.StafflineStemStrokeWidth, nextSystem);
+			// SymbolSet is an abstract root class, and the functions called on symbolSet are virtual.
+			// Usually they only do something when symbolSet is a StandardSymbolSet.
+			symbolSet.AdjustRestsVertically(Staves);
+			symbolSet.SetBeamedStemLengths(Staves); // see the comment next to the function
 
-                SetBarlineVisibility(pageFormat.BarlineContinuesDownList);
+			List<Tuple<int, int, string>> overlapsInfoList = JustifyHorizontally(systemNumber, moments, barlineWidths, pageFormat.StafflineStemStrokeWidth);
 
-                JustifyVertically(pageFormat.Right, pageFormat.Gap);
+			symbolSet.FinalizeBeamBlocks(Staves);
+            symbolSet.AlignLyrics(Staves);
+            SvgSystem nextSystem = null;
+            if(systemNumber < this.Score.Systems.Count)
+            {
+                nextSystem = this.Score.Systems[systemNumber];
+            }
+            symbolSet.AddNoteheadExtenderLines(Staves, pageFormat.RightMarginPos, pageFormat.Gap,
+                pageFormat.NoteheadExtenderStrokeWidth, pageFormat.StafflineStemStrokeWidth, nextSystem);
 
-                AdjustBarnumberVertically(pageFormat.Gap);
+            SetBarlineVisibility(pageFormat.BarlineContinuesDownList);
 
-				AlignStaffnamesInLeftMargin(leftMargin, pageFormat.Gap);
+            JustifyVertically(pageFormat.Right, pageFormat.Gap);
 
-				ResetStaffMetricsBoundaries();
-			}
-			else
-			{
-				string msg =
-					"There was not enough horizontal space for all the symbols in\n\n" +
-					"                         system number " + systemNumber.ToString() + ".\n\n" +
-					"Possible solutions:\n" +
-					"    Reduce the number of bars in the system.\n" +
-					"    Set a smaller gap size for the score.";
-				MessageBox.Show(msg, "Problem", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-			}
-			return success;
+            AdjustBarnumberVertically(pageFormat.Gap);
+
+			AlignStaffnamesInLeftMargin(leftMargin, pageFormat.Gap);
+
+			ResetStaffMetricsBoundaries();
+
+			return overlapsInfoList;
         }
 
         private float CreateMetrics(Graphics graphics, PageFormat pageFormat, float leftMarginPos)
@@ -293,40 +286,53 @@ namespace Moritz.Symbols
             return (this.Metrics.Bottom - this.Metrics.Top);
         }
 
-        /// <summary>
-        /// When this function completes, all NoteObjects have their horizontal Metrics set to
-        /// their final display positions.
-        /// If successful, no NoteObject will overlap, and the function returns true.
-        /// Otherwise there are overlaps, and the function returns false.
-        /// </summary>
-        /// <param name="pageFormat"></param>
-        private bool JustifyHorizontally(List<NoteObjectMoment> systemMoments, Dictionary<int, float> barlineWidths, float hairline)
+		/// <summary> 
+		/// The horizontal Metrics of all the NoteObjects are set to their final display positions.
+		/// Returns a list of Tuples, which is empty if there were no remaining overlapping symbols.
+		/// If there are Tuples in the list, they contain:
+		///     item1: system number
+		///     item2: the number of remaining overlaps (in top or lower voices)
+		///     item3: "top" or "lower", saying in which voices the overlaps are.
+		/// </summary>
+		/// <param name="pageFormat"></param>
+		private List<Tuple<int, int, string>> JustifyHorizontally(int systemNumber, List<NoteObjectMoment> systemMoments, Dictionary<int, float> barlineWidths, float hairline)
         {
-            HashSet<int> nonCompressibleSystemMomentPositions = new HashSet<int>();
-            Dictionary<int, float> overlaps = null; // msPos, overlap with following msPos in staff
+			var overlaps = new Dictionary<int, float>();
+			var rval = new List<Tuple<int, int, string>>();
+
+			HashSet<int> nonCompressibleSystemMomentPositions = new HashSet<int>();
             bool lowerVoiceMoved = false;
             do
             {
                 overlaps = JustifyTopVoicesHorizontally(systemMoments, barlineWidths, nonCompressibleSystemMomentPositions, hairline);
+				if(overlaps.Count > 0)
+				{
+					rval.Add(Tuple.Create(systemNumber, overlaps.Count, "top"));
+				}
 
-                if(overlaps.Count == 0 && LowerVoicesExist)
+				if(LowerVoicesExist)
                 {
                     lowerVoiceMoved = false;
-                    overlaps = JustifyLowerVoicesHorizontally(ref lowerVoiceMoved, systemMoments, barlineWidths, nonCompressibleSystemMomentPositions, hairline); 
-                }
+                    overlaps = JustifyLowerVoicesHorizontally(ref lowerVoiceMoved, systemMoments, barlineWidths, nonCompressibleSystemMomentPositions, hairline);
+					if(overlaps.Count > 0)
+					{
+						rval.Add(Tuple.Create(systemNumber, overlaps.Count, "lower"));
+					}
+				}
 
             } while(lowerVoiceMoved);
 
-            return overlaps.Count == 0;
-        }
+			return rval;
+		}
 
-        private Dictionary<int, float> JustifyTopVoicesHorizontally(List<NoteObjectMoment> systemMoments, Dictionary<int, float> barlineWidths, 
+		private Dictionary<int, float> JustifyTopVoicesHorizontally(List<NoteObjectMoment> systemMoments, Dictionary<int, float> barlineWidths, 
             HashSet<int> nonCompressibleSystemMomentPositions, float hairline)
         {
             Dictionary<int, float> overlaps = new Dictionary<int, float>();
             List<NoteObjectMoment> moments = null;
-            bool success = true;
-            do
+			bool allStavesRedistributed = true;
+			bool staffRedistributed = false;
+			do
             {
                 foreach(Staff staff in this.Staves)
                 {
@@ -338,15 +344,12 @@ namespace Moritz.Symbols
                         if(overlaps.Count == 0)
                             continue;
 
-                        success = RedistributeMoments(systemMoments, barlineWidths, nonCompressibleSystemMomentPositions,
-                            moments, overlaps);
-                        // success is false if there was not enough horizontal space available to remove the overlaps.
-                        if(!success)
-                            break;
-                    }
+                        staffRedistributed = RedistributeMoments(systemMoments, barlineWidths, nonCompressibleSystemMomentPositions, moments, overlaps);
+						allStavesRedistributed = (staffRedistributed == false) ? false : allStavesRedistributed;
+					}
                 }
 
-            } while(overlaps.Count > 0 && success);
+            } while(overlaps.Count > 0 && allStavesRedistributed);
 
             return overlaps;
         }
@@ -374,8 +377,8 @@ namespace Moritz.Symbols
         {
             Dictionary<int, float> overlaps = new Dictionary<int, float>();
             List<NoteObjectMoment> moments = null;
-            bool success = true;
-            do
+			bool redistributed = false;
+			do
             {
                 foreach(Staff staff in this.Staves)
                 {
@@ -395,15 +398,11 @@ namespace Moritz.Symbols
                             continue;
 
                         lowerVoiceMoved = true;
-                        success = RedistributeMoments(systemMoments, barlineWidths, nonCompressibleSystemMomentPositions,
-                            moments, overlaps);
-                        // success is false if there was not enough horizontal space available to remove the overlaps.
-                        if(!success)
-                            break;
+						redistributed = RedistributeMoments(systemMoments, barlineWidths, nonCompressibleSystemMomentPositions, moments, overlaps);
                     }
                 }
 
-            } while(overlaps.Count > 0 && success);
+            } while(overlaps.Count > 0 && redistributed);
 
             return overlaps;
         }
@@ -735,9 +734,7 @@ namespace Moritz.Symbols
         }
 
         /// <summary>
-        /// Returns true if the redistribution was successful, otherwise false.
-        /// The redistribution will be unsuccessful if there is not enough horizontal 
-        /// space available to remove the overlaps in the current staff.
+        /// Redistributes the moments horizontally (regardless of any overlaps).
         /// </summary>
         private bool RedistributeMoments(List<NoteObjectMoment> systemMoments, Dictionary<int, float> barlineWidths,
             HashSet<int> nonCompressibleSystemMomentPositions,
@@ -750,32 +747,34 @@ namespace Moritz.Symbols
 
             Dictionary<int, float> systemMomentWidthsWithoutBarlines = GetExistingWidthsWithoutBarlines(systemMoments, barlineWidths);
 
-            /// The factor by which to compress all those moment widths which are to be compressed.
-            float compressionFactor = CompressionFactor(systemMomentWidthsWithoutBarlines, nonCompressibleSystemMomentPositions, staffOverlaps);
+			/// The factor by which to compress all those moment widths which are to be compressed.
+			float compressionFactor = CompressionFactor(systemMomentWidthsWithoutBarlines, nonCompressibleSystemMomentPositions, staffOverlaps);
 
-            bool hasBeenRedistributed = false;
-            if(compressionFactor > 0)
-            {
-                /// widthFactors contains the factor by which to multiply the existing width of each system moment.
-                Dictionary<int, float> widthFactors =
-                    WidthFactors(systemMoments, staffMoments, staffOverlaps, barlineWidths, nonCompressibleSystemMomentPositions, compressionFactor);
+			/// If compressionFactor is less than or equal to 0, the moments will overlap
+			/// in the resulting score (and a warning message will be displayed).
+			if(compressionFactor > 0)
+			{
+				/// widthFactors contains the factor by which to multiply the existing width of each system moment.
+				Dictionary<int, float> widthFactors =
+					WidthFactors(systemMoments, staffMoments, staffOverlaps, barlineWidths, nonCompressibleSystemMomentPositions, compressionFactor);
 
-                for(int i = 1; i < systemMoments.Count; ++i)
-                {
-                    int sysMomentMsPos = systemMoments[i - 1].AbsMsPosition;
-                    float existingWidth = systemMomentWidthsWithoutBarlines[sysMomentMsPos];
-                    float alignmentX = systemMoments[i - 1].AlignmentX + (existingWidth * widthFactors[sysMomentMsPos]);
+				for(int i = 1; i < systemMoments.Count; ++i)
+				{
+					int sysMomentMsPos = systemMoments[i - 1].AbsMsPosition;
+					float existingWidth = systemMomentWidthsWithoutBarlines[sysMomentMsPos];
+					float alignmentX = systemMoments[i - 1].AlignmentX + (existingWidth * widthFactors[sysMomentMsPos]);
 
-                    if(barlineWidths.ContainsKey(systemMoments[i].AbsMsPosition))
-                        alignmentX += barlineWidths[systemMoments[i].AbsMsPosition];
+					if(barlineWidths.ContainsKey(systemMoments[i].AbsMsPosition))
+						alignmentX += barlineWidths[systemMoments[i].AbsMsPosition];
 
-                    systemMoments[i].MoveToAlignmentX(alignmentX);
-                }
-
-                hasBeenRedistributed = true; 
-            }
-
-            return hasBeenRedistributed;
+					systemMoments[i].MoveToAlignmentX(alignmentX);
+				}
+				return true;
+			}
+			else
+			{
+				return false;
+			}
         }
 
         private Dictionary<int, float> GetExistingWidthsWithoutBarlines(
@@ -840,6 +839,8 @@ namespace Moritz.Symbols
 
         /// <summary>
         /// The factor by which to compress those moment widths which are to be compressed.
+		/// If the returned value is less than or equal to zero, it will not be used (see
+		/// the calling function).
         /// </summary>
         private float CompressionFactor(Dictionary<int, float> systemMomentWidthsWithoutBarlines, HashSet<int> nonCompressibleSystemMomentPositions, Dictionary<int, float> staffOverlaps)
         {
@@ -1272,7 +1273,7 @@ namespace Moritz.Symbols
         public List<Staff> Staves = new List<Staff>();
         internal SystemMetrics Metrics = null;
 
-        public SvgScore Score; // containing score
-        
-    }
+		public SvgScore Score; // the containing score
+
+	}
 }

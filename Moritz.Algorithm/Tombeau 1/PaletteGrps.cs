@@ -8,7 +8,7 @@ namespace Moritz.Algorithm.Tombeau1
 {
     internal class PaletteGrps
     {
-		protected PaletteGrps(int rootOctave, int relativePitchHierarchyIndex, int basePitch, int barLengthMsDurationLimit)
+		protected PaletteGrps(int rootOctave, int relativePitchHierarchyIndex, int basePitch)
 		{
 			int nPitchesPerOctave = 12;
 			_rootGamut = new Gamut(relativePitchHierarchyIndex, basePitch, nPitchesPerOctave);
@@ -48,8 +48,6 @@ namespace Moritz.Algorithm.Tombeau1
 				List<PaletteGrp> paletteGrps = GetPaletteGrpList(rootOctave, gamut.BasePitch, gamut.RelativePitchHierarchyIndex);
 				_baseGrps.Add(paletteGrps as IReadOnlyList<PaletteGrp>);
 			}
-
-			_barLengthMsDurationLimit = barLengthMsDurationLimit;
 		}
 
 		// Find the nearest Gamut to startIndex having BasePitch = basePitch.
@@ -132,73 +130,6 @@ namespace Moritz.Algorithm.Tombeau1
 			return cgs;
 		}
 
-		/// <summary>
-		/// The returned list contains the positions of all the (suggested) barlines.
-		/// The compulsory first barline (at msPosition=0) is NOT included in the returned list.
-		/// The compulsory final barline (at the end of the final PaletteGrp) IS included in the returned list.
-		/// All the returned barline positions are at the boundaries of composed PaletteGrps.
-		/// A barline is returned at the end of each list of PaletteGrp (i.e. gamut), with intermediate
-		/// barlines such that bars have durations that are as equal as possible.
-		/// All bars will have a duration less than _barLengthMsDurationLimit.
-		/// _barLengthMsDurationLimit is a readonly int, set using a PaletteGrps constructor argument.
-		/// </summary>
-		internal List<int> ComposedBarlinePositions()
-		{
-			int GetMaxBarLength(int availableMsDur)
-			{
-				int maxBarLength = int.MaxValue;
-				int divisor = 1;
-				while(maxBarLength > _barLengthMsDurationLimit)
-				{
-					maxBarLength = availableMsDur / divisor++;
-				}
-				return maxBarLength;
-			}
-
-			List<int> barlinePositions = new List<int>() { 0 }; // removed later
-			List<int> pGrpsEndMsPositions = new List<int>();
-			List<int> intermedateBarlinePositions = new List<int>();
-
-			int endMsPos = 0;
-			for(int i = 0; i < _composedGrps.Count; ++i)
-			{
-				IReadOnlyList<PaletteGrp> gamut = _composedGrps[i];
-				pGrpsEndMsPositions.Clear();
-				foreach(PaletteGrp pGrp in gamut)
-				{
-					endMsPos += pGrp.MsDuration;
-					pGrpsEndMsPositions.Add(endMsPos);
-				}
-
-				int maxBarLength = GetMaxBarLength(endMsPos - barlinePositions[i]);
-
-				int potentialBarlineMsPos = barlinePositions[i] + maxBarLength;
-				for(int j = 0; j < pGrpsEndMsPositions.Count - 1; ++j)
-				{
-					int pos1 = pGrpsEndMsPositions[j];
-					int pos2 = pGrpsEndMsPositions[j + 1];
-					if(potentialBarlineMsPos >= pos1 && potentialBarlineMsPos < pos2)
-					{
-						intermedateBarlinePositions.Add(pos1);
-						potentialBarlineMsPos = pos1 + GetMaxBarLength(endMsPos - pos1);
-						if(potentialBarlineMsPos >= endMsPos)
-						{
-							break;
-						}
-					}
-				}
-
-				barlinePositions.Add(endMsPos);
-			}
-
-			barlinePositions.AddRange(intermedateBarlinePositions);
-			barlinePositions.Sort();
-			barlinePositions.RemoveAt(0); // Remove the first barline (at msPosition == 0).
-
-			return barlinePositions;
-		}
-
-		private readonly int _barLengthMsDurationLimit;
 
 		internal IReadOnlyList<IReadOnlyList<PaletteGrp>> BaseGrps { get => _baseGrps as IReadOnlyList<IReadOnlyList<PaletteGrp>>; }
 		private List<IReadOnlyList<PaletteGrp>> _baseGrps = new List<IReadOnlyList<PaletteGrp>>();

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Krystals4ObjectLibrary", "Krystals4ObjectLibrary\Krystals4ObjectLibrary.csproj", "{383E2844-41A4-488F-A683-D3EAE9AF4AF5}"
 EndProject
@@ -33,19 +33,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz.Composer", "Moritz.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Moritz", "Moritz\Moritz.csproj", "{EBE4F5D3-5F81-40BF-B0FD-997A771CF655}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "local website files", "local website files", "{2A69A6E5-7B95-4D24-9471-496D9BC7D349}"
-	ProjectSection(SolutionItems) = preProject
-		..\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores\Pianola Music\Pianola Music (scroll) - with inkscape.svg = ..\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores\Pianola Music\Pianola Music (scroll) - with inkscape.svg
-		..\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores\Pianola Music\PianolaMusicEdit.svg = ..\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores\Pianola Music\PianolaMusicEdit.svg
-		..\MyWebsite\james-ingram-act-two\open-source\assistantPerformer\svgScoreExtensions.htm = ..\MyWebsite\james-ingram-act-two\open-source\assistantPerformer\svgScoreExtensions.htm
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "xml schemas", "xml schemas", "{A83268F2-0E3F-4A66-8B46-5713A4EC3469}"
 	ProjectSection(SolutionItems) = preProject
 		..\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\krystals.xsd = ..\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\krystals.xsd
 		..\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\moritzKrystalScore.xsd = ..\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\moritzKrystalScore.xsd
 		..\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\moritzPerformanceOptions.xsd = ..\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\moritzPerformanceOptions.xsd
 		..\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\moritzPreferences.xsd = ..\MyWebsite\james-ingram-act-two\open-source\XMLSchemas\moritzPreferences.xsd
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AssistantPerformerTestSite", "AssistantPerformerTestSite", "{D0D4A71B-25C8-4E9B-A39C-35E93FD86B07}"
+	ProjectSection(SolutionItems) = preProject
+		..\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\assistantPerformer.html = ..\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\assistantPerformer.html
 	EndProjectSection
 EndProject
 Global
@@ -182,7 +180,7 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{A83268F2-0E3F-4A66-8B46-5713A4EC3469} = {2A69A6E5-7B95-4D24-9471-496D9BC7D349}
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C578192E-FBF8-4374-AB9E-02138268D07F}
 	EndGlobalSection
 EndGlobal

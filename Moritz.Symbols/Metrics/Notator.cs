@@ -5,6 +5,8 @@ using System;
 
 using Moritz.Xml;
 using Moritz.Spec;
+using System.Text;
+using System.Windows.Forms;
 
 namespace Moritz.Symbols
 {
@@ -317,17 +319,15 @@ namespace Moritz.Symbols
 
         /// <summary>
         /// The systems do not yet contain Metrics info.
-        /// They are given Metrics and justified horizontally and vertically (internally) 
-        /// inside system.RealizeGraphics().
-        /// Returns false if the score can't be justified horizontally
-        /// or a single system will not fit vertially on a page.
-        /// In these cases, a MessageBox is displayed (explaining the reason for the failure)
-        /// by the inner function that discovers the error.
+        /// Puts up a Warning Message Box if there are overlapping symbols after the score has been justified horizontally.
         /// </summary>
-        public bool CreateMetricsAndJustifySystems(List<SvgSystem> systems)
+        public void CreateMetricsAndJustifySystems(List<SvgSystem> systems)
         {
-            bool success = true;
-            using(Image image = new Bitmap(1, 1))
+			// set when there are overlaps...
+			List<Tuple<int, int, string>> overlaps;
+			List<Tuple<int, int, string>> allOverlaps = new List<Tuple<int, int, string>>();
+
+			using(Image image = new Bitmap(1, 1))
             {
                 using(Graphics graphics = Graphics.FromImage(image)) // used for measuring strings
                 {
@@ -339,16 +339,42 @@ namespace Moritz.Symbols
                     for(int sysIndex = 0; sysIndex < systems.Count; ++sysIndex)
                     {
                         float leftMargin = (sysIndex == 0) ? system1LeftMarginPos : otherSystemsLeftMarginPos;
-                        success = systems[sysIndex].MakeGraphics(graphics, sysIndex + 1, _pageFormat, leftMargin);
-                        if(!success)
-                            break;
+                        overlaps = systems[sysIndex].MakeGraphics(graphics, sysIndex + 1, _pageFormat, leftMargin);
+						foreach(Tuple<int, int, string> overlap in overlaps)
+						{
+							allOverlaps.Add(overlap);
+						}
                     }
                 }
             }
-            return success;
+			if(allOverlaps.Count > 0)
+			{
+				WarnAboutOverlaps(allOverlaps);
+			}
         }
 
-        private float GetLeftMarginPos(SvgSystem system, Graphics graphics, PageFormat pageFormat)
+		private void WarnAboutOverlaps(List<Tuple<int, int, string>> allOverlaps)
+		{
+			string msg1 = "There was not enough horizontal space for all the symbols in\n" +
+						  "the following systems:\n";
+			string msg2Spacer = "      ";
+			string msg3 = "\n" +
+						  "Possible solutions:\n" +
+						  "    Reduce the number of bars in the system(s).\n" +
+						  "    Set a smaller gap size for the score.";
+
+			StringBuilder sb = new StringBuilder();
+			sb.Append(msg1);
+			foreach(Tuple<int, int, string> t in allOverlaps)
+			{
+				sb.Append($"{msg2Spacer}System number: {t.Item1} -- ({t.Item2} overlaps in {t.Item3} voices)\n");
+			}
+			sb.Append(msg3);
+
+			MessageBox.Show(sb.ToString(), "Overlap(s) Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+		}
+
+		private float GetLeftMarginPos(SvgSystem system, Graphics graphics, PageFormat pageFormat)
         {
             float leftMarginPos = pageFormat.LeftMarginPos;
             float maxNameWidth = 0;
