@@ -11,35 +11,35 @@ namespace Moritz.Algorithm.Tombeau1
     /// </summary>
     public class Grp : Trk
     {
-        #region constructors
-        /// <summary>
-        /// Grp objects own unique IUniqueDefs, but can share Gamuts. The Gamut may not be null.
-        /// </summary>
-        /// <param name="gamut">can not be null</param>
-        /// <param name="rootOctave">must be greater than or equal to 0</param>
-        /// <param name="nPitchesPerChord">must be greater than 0</param>
-        /// <param name="msDurationPerChord">must be greater than 0</param>
-        /// <param name="nChords">must be greater than 0</param>
-        /// <param name="velocityFactor">must be greater than 0.0</param>
-        public Grp(Gamut gamut, int rootOctave, int nPitchesPerChord, int msDurationPerChord, int nChords, double velocityFactor)
+		#region constructors
+		/// <summary>
+		/// Grp objects own unique IUniqueDefs, but can share Gamuts. The Gamut may not be null.
+		/// </summary>
+		/// <param name="gamut">can not be null</param>
+		/// <param name="rootOctave">must be greater than or equal to 0</param>
+		/// <param name="nChords">must be greater than 0</param>
+		/// <param name="nPitchesPerChord">must be greater than 0</param>
+		/// <param name="msDurationPerChord">must be greater than 0</param>
+		/// <param name="velocityFactor">must be greater than 0.0</param>
+		public Grp(Gamut gamut, int rootOctave, int nChords, int nPitchesPerChord, int msDurationPerChord, double velocityFactor)
             : base(0, 0, new List<IUniqueDef>())
         {
             Debug.Assert(gamut != null);
             Debug.Assert(rootOctave >= 0);
-            Debug.Assert(nPitchesPerChord > 0);
-            Debug.Assert(msDurationPerChord > 0);
-            Debug.Assert(nChords > 0);
+			Debug.Assert(nChords > 0);
+			Debug.Assert(nPitchesPerChord > 0);
+			Debug.Assert(msDurationPerChord > 0);
             Debug.Assert(velocityFactor > 0.0);
 
-            _gamut = gamut;
-			_rootOctave = rootOctave;
+			_gamut = gamut;
+			RootOctave = rootOctave;
 
             for(int i = 0; i < nChords; ++i)
             {
                 int rootNotatedPitch;
                 if(i == 0)
                 {
-                    rootNotatedPitch = gamut.AbsolutePitchHierarchy[i] + (12 * rootOctave);
+                    rootNotatedPitch = gamut.Mode.AbsolutePitchHierarchy[i] + (12 * rootOctave);
                     rootNotatedPitch = (rootNotatedPitch <= gamut.MaxPitch) ? rootNotatedPitch : gamut.MaxPitch;
                 }
                 else
@@ -51,7 +51,7 @@ namespace Moritz.Algorithm.Tombeau1
                     }
                     else
                     {
-                        rootNotatedPitch = gamut.AbsolutePitchHierarchy[i];
+                        rootNotatedPitch = gamut.Mode.AbsolutePitchHierarchy[i];
                         while(rootNotatedPitch < previousPitches[0])
                         {
                             rootNotatedPitch += 12;
@@ -68,7 +68,11 @@ namespace Moritz.Algorithm.Tombeau1
                 _uniqueDefs.Add(mcd);
             }
 
-            SetBeamEnd();
+			var velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch();
+
+			base.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+
+			SetBeamEnd();
         }
 
         /// <summary>
@@ -413,7 +417,7 @@ namespace Moritz.Algorithm.Tombeau1
             }
         }
         protected Gamut _gamut;
-		protected readonly int _rootOctave;
+		public readonly int RootOctave;
 
         /// <summary>
         /// Returns the index of a pitch in the same octave as the pitch at pitchIndexInOldGamut.

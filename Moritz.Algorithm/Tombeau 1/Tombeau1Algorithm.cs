@@ -12,7 +12,7 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-		enum CompositionType { onlyBassGrps, allGrps, composition };
+		enum CompositionType { onlyVoice1, twoVoices, threeVoices, fourVoices };
 
 		public Tombeau1Algorithm()
             : base()
@@ -354,45 +354,69 @@ namespace Moritz.Algorithm.Tombeau1
 
 			/**********************************************/
 
-			BassGrps bassGrps = new BassGrps(2);
-			SopranoGrps sopranoGrps = new SopranoGrps(6, bassGrps.ComposedGrps);
-            AltoGrps altoGrps = new AltoGrps(5, sopranoGrps.ComposedGrps, bassGrps.ComposedGrps);
-			TenorGrps tenorGrps = new TenorGrps(4, sopranoGrps.ComposedGrps, altoGrps.ComposedGrps, bassGrps.ComposedGrps);
-
 			List<Seq> outputSeqs = new List<Seq>(); // The seqs that will be displayed (the score).
-
-			CompositionType compositionType = CompositionType.onlyBassGrps;
-
-			List<int> barlineMsPositions = null;
+			CompositionType compositionType = CompositionType.onlyVoice1;
+			
+			Voice1 voice1 = new Voice1();
+			Voice2 voice2 = null;
+			Voice3 voice3 = null;
+			Voice4 voice4 = null;
 
 			switch(compositionType)
             {
-				case CompositionType.onlyBassGrps:
+				case CompositionType.onlyVoice1:
 				{
-					AddGrpsToSeqs(outputSeqs, bassGrps, MidiChannelIndexPerOutputVoice[3]);
-					barlineMsPositions = bassGrps.BarlinePositions();
+					AddGrpsToSeqs(outputSeqs, voice1, MidiChannelIndexPerOutputVoice[3]);
 					break;
 				}
-				case CompositionType.allGrps:
+				#region other compositionTypes
+				case CompositionType.twoVoices:
 				{
-					//add the Grps to the outputSeqs
-					AddGrpsToSeqs(outputSeqs, tenorGrps, MidiChannelIndexPerOutputVoice[2]);
-					AddGrpsToSeqs(outputSeqs, sopranoGrps, MidiChannelIndexPerOutputVoice[0]);
-					AddGrpsToSeqs(outputSeqs, bassGrps, MidiChannelIndexPerOutputVoice[3]);
-					AddGrpsToSeqs(outputSeqs, altoGrps, MidiChannelIndexPerOutputVoice[1]);
+					voice1.AdjustForTwoVoices();
+					voice2 = new Voice2(voice1); 
+					// The channels determine the top-bottom order of the staves in the score.
+					AddGrpsToSeqs(outputSeqs, voice2, MidiChannelIndexPerOutputVoice[0]);
+					AddGrpsToSeqs(outputSeqs, voice1, MidiChannelIndexPerOutputVoice[1]);
 					break;
 				}
-				case CompositionType.composition:
+				case CompositionType.threeVoices:
 				{
-					// Compose the piece in the outputSeqs
-					ComposeSeqs(outputSeqs, sopranoGrps, altoGrps, tenorGrps, bassGrps, MidiChannelIndexPerOutputVoice);
+					voice1.AdjustForThreeVoices();
+					voice2 = new Voice2(voice1);
+					voice2.AdjustForThreeVoices();
+					voice3 = new Voice3(voice1, voice2);
+					// The channels determine the top-bottom order of the staves in the score.
+					AddGrpsToSeqs(outputSeqs, voice3, MidiChannelIndexPerOutputVoice[0]);
+					AddGrpsToSeqs(outputSeqs, voice2, MidiChannelIndexPerOutputVoice[1]);
+					AddGrpsToSeqs(outputSeqs, voice1, MidiChannelIndexPerOutputVoice[2]);
 					break;
 				}
+				case CompositionType.fourVoices:
+				{
+					voice1.AdjustForFourVoices();
+					voice2 = new Voice2(voice1);
+					voice2.AdjustForFourVoices();
+					voice3 = new Voice3(voice1, voice2);
+					voice3.AdjustForFourVoices();
+					voice4 = new Voice4(voice1, voice2, voice3);
+					// The channels determine the top-bottom order of the staves in the score.
+					AddGrpsToSeqs(outputSeqs, voice4, MidiChannelIndexPerOutputVoice[0]);
+					AddGrpsToSeqs(outputSeqs, voice3, MidiChannelIndexPerOutputVoice[1]);
+					AddGrpsToSeqs(outputSeqs, voice2, MidiChannelIndexPerOutputVoice[2]);
+					AddGrpsToSeqs(outputSeqs, voice1, MidiChannelIndexPerOutputVoice[3]);
+					break;
+				}
+				#endregion
 			}
 
-            Seq mainSeq = GetMainSeq(outputSeqs);
+			List<int> barlineMsPositions = GetBarlinePositions(voice1, voice2, voice3, voice4);
 
-            MainBlock mainBlock = new MainBlock(InitialClefPerChannel, mainSeq, barlineMsPositions);
+			//Do global changes that affect all trks here (accel., rit, transpositions etc.)
+			FinalizeSeqs(outputSeqs);
+
+			Seq mainSeq = GetMainSeq(outputSeqs);
+
+			MainBlock mainBlock = new MainBlock(InitialClefPerChannel, mainSeq, barlineMsPositions);
 
             List<List<VoiceDef>> bars = mainBlock.ConvertToBars();
 
@@ -401,7 +425,176 @@ namespace Moritz.Algorithm.Tombeau1
             return bars;
         }
 
-        protected override void InsertClefChanges(List<List<VoiceDef>> bars)
+		#region available Trk and Grp transformations
+		// Add();
+		// AddRange();
+		// AdjustChordMsDurations();
+		// AdjustExpression();
+		// AdjustVelocities();
+		// AdjustVelocitiesHairpin();
+		// AlignObjectAtIndex();
+		// CreateAccel();
+		// FindIndexAtMsPositionReFirstIUD();
+		// Insert();
+		// InsertRange();
+		// Permute();
+		// Remove();
+		// RemoveAt();
+		// RemoveBetweenMsPositions();
+		// RemoveRange();
+		// RemoveScorePitchWheelCommands();
+		// Replace();
+		// SetDurationsFromPitches();
+		// SetPanGliss(0, subT.MsDuration, 0, 127);
+		// SetPitchWheelDeviation();
+		// SetPitchWheelSliders();
+		// SetVelocitiesFromDurations();
+		// SetVelocityPerAbsolutePitch();
+		// TimeWarp();
+		// Translate();
+		// Transpose();
+		// TransposeStepsInGamut();
+		// TransposeToRootInGamut();
+		#endregion available Trk and Grp transformations
+
+		/// <summary>
+		/// The compulsory first barline (at msPosition=0) is NOT included in the returned list.
+		/// The compulsory final barline (at the end of the final ModeSegment) IS included in the returned list.
+		/// There is a barline at the end of each voice1 modeSegment.
+		/// All the returned barline positions are unique, and in ascending order.
+		/// </summary>
+		private List<int> GetBarlinePositions(Voice1 voice1, Voice2 voice2, Voice3 voice3, Voice4 voice4)
+		{
+			List<int> barlinePositions = new List<int>() { 0 }; // entry is removed just before this function returns
+
+			List<int> voice1BarlinePositions = Voice1BarlinePositions(voice1);
+			barlinePositions.AddRange(voice1BarlinePositions);
+			if(voice2 != null)
+			{
+				List<int> voice2BarlinePositions = Voice2BarlinePositions(voice2);
+				barlinePositions.AddRange(voice2BarlinePositions);
+			}
+			if(voice3 != null)
+			{
+				List<int> voice3BarlinePositions = Voice3BarlinePositions(voice3);
+				barlinePositions.AddRange(voice3BarlinePositions);
+			}
+			if(voice4 != null)
+			{
+				List<int> voice4BarlinePositions = Voice4BarlinePositions(voice4);
+				barlinePositions.AddRange(voice4BarlinePositions);
+			}
+
+			RemoveDuplicates(barlinePositions);
+			barlinePositions.Remove(0);
+			barlinePositions.Sort();			
+
+			Debug.Assert(barlinePositions[0] != 0);
+
+			return barlinePositions;
+		}
+
+		private List<int> Voice1BarlinePositions(Voice1 voice1)
+		{
+			List<int> v1BarlinePositions = new List<int>();
+
+			var msValuesListList = voice1.MsValuesOfComposedGrps;
+
+			for(int i = 0; i < msValuesListList.Count; ++i)
+			{
+				var msValuesList = msValuesListList[i];
+				MsValues lastMsValues = msValuesList[msValuesList.Count - 1];
+
+				v1BarlinePositions.Add(lastMsValues.EndMsPosition);
+			}
+
+			#region insert intermediate barline positions
+			List<int> midBarlinePositions = new List<int>
+			{
+				MidBarlineMsPos(msValuesListList, 1),
+				MidBarlineMsPos(msValuesListList, 10),
+				MidBarlineMsPos(msValuesListList, 12)
+			};
+			foreach(int b in midBarlinePositions)
+			{
+				v1BarlinePositions.Add(b);
+			}
+			#endregion
+
+			return v1BarlinePositions;
+		}
+
+		private List<int> Voice2BarlinePositions(Voice2 voice2)
+		{
+			throw new NotImplementedException();
+		}
+
+		private List<int> Voice3BarlinePositions(Voice3 voice3)
+		{
+			throw new NotImplementedException();
+		}
+
+		private List<int> Voice4BarlinePositions(Voice4 voice4)
+		{
+			throw new NotImplementedException();
+		}
+
+		private void RemoveDuplicates(List<int> barlinePositions)
+		{
+			for(int i = barlinePositions.Count - 1; i > 0; --i)
+			{
+				int iPos = barlinePositions[i];
+				for(int j = i - 1; j >= 0; j--)
+				{
+					if(iPos == barlinePositions[j])
+					{
+						barlinePositions.RemoveAt(i);
+						break;
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Returns the smallest Grp msPosition greater than the middle msPosition of the ModeSegment.
+		/// </summary>
+		private int MidBarlineMsPos(IReadOnlyList<IReadOnlyList<MsValues>> msValuesListList, int ModeSegmentNumber)
+		{
+			Debug.Assert(ModeSegmentNumber > 0);
+			int thisModeSegmentIndex = ModeSegmentNumber - 1;
+			IReadOnlyList<MsValues> thisList = msValuesListList[thisModeSegmentIndex];
+
+			int thisListEndMsPos = thisList[thisList.Count - 1].EndMsPosition;
+			int prevListEndMsPos = 0;
+			if(ModeSegmentNumber > 1)
+			{
+				int prevGamutIndex = ModeSegmentNumber - 2;
+				IReadOnlyList<MsValues> prevList = msValuesListList[prevGamutIndex];
+				prevListEndMsPos = prevList[prevList.Count - 1].EndMsPosition;
+			}
+
+			int midMsPos = prevListEndMsPos + ((thisListEndMsPos - prevListEndMsPos) / 2); // end barline msPosition for ModeSegment 1, divided by 2
+			int barlineMsPos = -1;
+			foreach(MsValues msValues in thisList)
+			{
+				if(msValues.MsPosition > midMsPos)
+				{
+					barlineMsPos = msValues.MsPosition;
+					break;
+				}
+			}
+			return barlineMsPos;
+		}
+
+		/// <summary>
+		/// Possibly do global changes that affect all trks here (accel., rit, transpositions etc.)
+		/// </summary>
+		private void FinalizeSeqs(List<Seq> outputSeqs)
+		{
+
+		}
+
+		protected override void InsertClefChanges(List<List<VoiceDef>> bars)
         {
             //VoiceDef voiceDef = bars[0][bars[0].Count - 1];
             //voiceDef.InsertClefDef(5, "b");
@@ -423,11 +616,9 @@ namespace Moritz.Algorithm.Tombeau1
 			return rSeq;
         }
 
-        private void AddGrpsToSeqs(List<Seq> seqs, PaletteGrps paletteGrps, int midiChannel)
+        private void AddGrpsToSeqs(List<Seq> seqs, Tombeau1Voice voice, int midiChannel)
         {
-			List<List<PaletteGrp>> grps = paletteGrps.ComposedGrpsClone();
-
-			List<Trk> trks = GrpListsToTrks(grps, midiChannel);
+			List<Trk> trks = GrpListsToTrks(voice.ComposedModeSegments, midiChannel);
             if(seqs.Count == 0)
             {
                 for(int i = 0; i < trks.Count; ++i)
@@ -450,12 +641,12 @@ namespace Moritz.Algorithm.Tombeau1
         /// This function is used while composing palettes.
         /// It simply converts its argument to a list of Trks having the same midiChannel.
         /// </summary>
-        private List<Trk> GrpListsToTrks(List<List<PaletteGrp>> grpLists, int midiChannel)
+        private List<Trk> GrpListsToTrks(IReadOnlyList<ModeSegment> grpLists, int midiChannel)
         {
             List<Trk> seqTrks = new List<Trk>();
-            foreach(List<PaletteGrp> grps in grpLists)
+            foreach(ModeSegment grps in grpLists)
             {
-                Trk trk = GrpListToTrk(grps, midiChannel);
+                Trk trk = GrpListToTrk(grps.Grps, midiChannel);
                 seqTrks.Add(trk);
             }
             return seqTrks;
@@ -464,7 +655,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// <summary>
         /// This function simply converts its argument to a Trk having the given midiChannel.
         /// </summary>
-        private Trk GrpListToTrk(List<PaletteGrp> grpList, int midiChannel)
+        private Trk GrpListToTrk(IReadOnlyList<Grp> grpList, int midiChannel)
         {
             Trk trk = new Trk(midiChannel, 0, new List<IUniqueDef>());
             foreach(Grp grp in grpList)

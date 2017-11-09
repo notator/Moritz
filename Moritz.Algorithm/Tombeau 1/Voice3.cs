@@ -6,19 +6,12 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-    internal class SopranoGrps : PaletteGrps
-    {
-		public SopranoGrps(int rootOctave, IReadOnlyList<IReadOnlyList<Grp>> bassGrps)
-			: base(rootOctave, 0, 9)
-        {
-			for(int i = 0; i < BaseGrps.Count; ++i)
-			{
-				IReadOnlyList<PaletteGrp> baseGrps = BaseGrps[i];
-
-				List<PaletteGrp> grps = Compose(baseGrps); // default Compose...
-
-				_composedGrps.Add(grps);
-			}
+	internal class Voice3 : Tombeau1Voice
+	{
+		public Voice3(Voice1 voice1, Voice2 voice2)
+			: base()
+		{
+			_composedModeSegments = Compose(voice1, voice2);
 		}
 
 		#region available Trk and Grp transformations
@@ -53,5 +46,14 @@ namespace Moritz.Algorithm.Tombeau1
 		// TransposeToRootInGamut();
 		#endregion available Trk and Grp transformations
 
+		private List<ModeSegment> Compose(Voice1 voice1, Voice2 voice2)
+		{ 
+			throw new NotImplementedException();
+		}
+
+		internal void AdjustForFourVoices()
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

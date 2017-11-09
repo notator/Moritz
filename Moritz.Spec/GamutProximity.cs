@@ -5,6 +5,9 @@ using System;
 
 namespace Moritz.Spec
 {
+	/// <summary>
+	/// A helper class storing a Gamut and its proximity to another Gamut.
+	/// </summary>
 	public class GamutProximity
 	{
 		public GamutProximity(Gamut gamut, int proximity)

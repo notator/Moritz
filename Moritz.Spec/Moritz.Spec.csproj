@@ -61,6 +61,8 @@
     <Compile Include="InputNoteDef.cs" />
     <Compile Include="IVoiceDefContainer.cs" />
     <Compile Include="Envelope.cs" />
+    <Compile Include="Mode.cs" />
+    <Compile Include="MsValues.cs" />
     <Compile Include="NoteTrigger.cs" />
     <Compile Include="InputRestDef.cs" />
     <Compile Include="Seq.cs" />
