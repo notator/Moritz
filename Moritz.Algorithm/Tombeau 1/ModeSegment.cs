@@ -8,27 +8,27 @@ using Moritz.Spec;
 namespace Moritz.Algorithm.Tombeau1
 {
 	/// <summary>
-	/// A (mutable) List of Grp objects, each of which has the same Mode.
+	/// A (mutable) List of GamutTrk objects, each of which has the same Mode.
 	/// </summary>
 	internal class ModeSegment
 	{
 		public ModeSegment()
 		{
-			_grps = new List<Grp>();
+			_gamutTrks = new List<GamutTrk>();
 		}
 
-		public ModeSegment(IReadOnlyList<Grp> grps)
+		public ModeSegment(IReadOnlyList<GamutTrk> gamutTrks)
 		{
-			Debug.Assert(grps.Count > 0);
+			Debug.Assert(gamutTrks.Count > 0);
 
-			_mode = new Mode(grps[0].Gamut.Mode.AbsolutePitchHierarchy);
+			_mode = new Mode(gamutTrks[0].Gamut.Mode.AbsolutePitchHierarchy);
 
-			foreach(Grp grp in grps)
+			foreach(GamutTrk gamutTrk in gamutTrks)
 			{
-				CheckAbsPitchHierarchy(_mode, grp.Gamut.Mode);
+				CheckAbsPitchHierarchy(_mode, gamutTrk.Gamut.Mode);
 			}
 
-			_grps = new List<Grp>(grps);
+			_gamutTrks = new List<GamutTrk>(gamutTrks);
 		}
 
 		/// <summary>
@@ -38,60 +38,60 @@ namespace Moritz.Algorithm.Tombeau1
 		public ModeSegment Clone()
 		{
 			ModeSegment clone = new ModeSegment();
-			foreach(Grp grp in _grps)
+			foreach(GamutTrk gamutTrk in _gamutTrks)
 			{
-				clone.Add(grp.Clone);
+				clone.Add(gamutTrk.Clone);
 			}
 			return clone;
 		}
 
-		public Grp this[int i] {	get => _grps[i]; }
+		public GamutTrk this[int i] {	get => _gamutTrks[i]; }
 
-		public int Count { get => _grps.Count; }
+		public int Count { get => _gamutTrks.Count; }
 
 		private void CheckAbsPitchHierarchy(Mode mode, Mode newMode )
 		{
 			if(mode.Equals(newMode) == false)
 			{
-				Debug.Assert(false, "All Grps in a ModeSegment must have the same Mode.AbsolutePitchHierarchy");
+				Debug.Assert(false, "All GamutTrks in a ModeSegment must have the same Mode.AbsolutePitchHierarchy");
 			}
 		}
 
-		public void Add(Grp grp)
+		public void Add(GamutTrk gamutTrk)
 		{
-			Debug.Assert(grp != null);
+			Debug.Assert(gamutTrk != null);
 
-			if(_grps.Count > 0) // Grps can also be removed, so check.
+			if(_gamutTrks.Count > 0) // GamutTrks can also be removed, so check.
 			{
-				CheckAbsPitchHierarchy(_mode, grp.Gamut.Mode);
+				CheckAbsPitchHierarchy(_mode, gamutTrk.Gamut.Mode);
 			}
 			else
 			{
-				_mode = new Mode(grp.Gamut.Mode.AbsolutePitchHierarchy);
+				_mode = new Mode(gamutTrk.Gamut.Mode.AbsolutePitchHierarchy);
 			}
-			_grps.Add(grp);  			
+			_gamutTrks.Add(gamutTrk);  			
 		}
 
-		public void Remove(Grp grp)
+		public void Remove(GamutTrk gamutTrk)
 		{
-			_grps.Remove(grp);
+			_gamutTrks.Remove(gamutTrk);
 		}
 		public void RemoveAt(int index)
 		{
-			_grps.RemoveAt(index);
+			_gamutTrks.RemoveAt(index);
 		}
 		public void RemoveRange(int startIndex, int nItems)
 		{
-			_grps.RemoveRange(startIndex, nItems);
+			_gamutTrks.RemoveRange(startIndex, nItems);
 		}
 		public void Reverse()
 		{
-			_grps.Reverse();
+			_gamutTrks.Reverse();
 		}
 
 		public new string ToString()
 		{
-			int count = _grps.Count;
+			int count = _gamutTrks.Count;
 			if(count > 0)
 			{
 				return $"Count={count.ToString()} Mode={_mode.ToString()}";
@@ -102,9 +102,9 @@ namespace Moritz.Algorithm.Tombeau1
 			}
 		}
 
-		public IReadOnlyList<Grp> Grps { get => _grps as IReadOnlyList<Grp>; }
+		public IReadOnlyList<GamutTrk> GamutTrks { get => _gamutTrks as IReadOnlyList<GamutTrk>; }
 		
-		private List<Grp> _grps = null;
+		private List<GamutTrk> _gamutTrks = null;
 		private Mode _mode { get; set; }
 	}
 

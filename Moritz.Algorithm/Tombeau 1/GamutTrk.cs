@@ -6,14 +6,14 @@ using Moritz.Spec;
 namespace Moritz.Algorithm.Tombeau1
 {
     /// <summary>
-    /// A Grp is a Trk with a Gamut. The Gamut may not be null, and can be shared with other Grps.
-    /// In other words, Grps do not own their Gamuts.
+    /// A GamutTrk is a Trk with a Gamut. The Gamut may not be null, and can be shared with other GamutTrks.
+    /// In other words, GamutTrks do not own their Gamuts.
     /// </summary>
-    public class Grp : Trk
+    public class GamutTrk : Trk
     {
 		#region constructors
 		/// <summary>
-		/// Grp objects own unique IUniqueDefs, but can share Gamuts. The Gamut may not be null.
+		/// GamutTrk objects own unique IUniqueDefs, but can share Gamuts. The Gamut may not be null.
 		/// </summary>
 		/// <param name="gamut">can not be null</param>
 		/// <param name="rootOctave">must be greater than or equal to 0</param>
@@ -21,7 +21,7 @@ namespace Moritz.Algorithm.Tombeau1
 		/// <param name="nPitchesPerChord">must be greater than 0</param>
 		/// <param name="msDurationPerChord">must be greater than 0</param>
 		/// <param name="velocityFactor">must be greater than 0.0</param>
-		public Grp(Gamut gamut, int rootOctave, int nChords, int nPitchesPerChord, int msDurationPerChord, double velocityFactor)
+		public GamutTrk(Gamut gamut, int rootOctave, int nChords, int nPitchesPerChord, int msDurationPerChord, double velocityFactor)
             : base(0, 0, new List<IUniqueDef>())
         {
             Debug.Assert(gamut != null);
@@ -78,7 +78,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// <summary>
         /// Used by Clone.
         /// </summary>
-        public Grp(Gamut gamut, int midiChannel, int msPositionReContainer, List<IUniqueDef> clonedIUDs)
+        public GamutTrk(Gamut gamut, int midiChannel, int msPositionReContainer, List<IUniqueDef> clonedIUDs)
             : base(midiChannel, msPositionReContainer, clonedIUDs)
         {
             Debug.Assert(gamut != null && gamut.ContainsAllPitches(clonedIUDs));
@@ -89,17 +89,17 @@ namespace Moritz.Algorithm.Tombeau1
 		/// <summary>
 		/// The IUniqueDefs are cloned, the other attributes (including the Gamut) are not.
 		/// </summary>
-		public new Grp Clone
+		public new GamutTrk Clone
 		{
 			get
 			{
 				List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
-				Grp grp = new Grp(Gamut, this.MidiChannel, this.MsPositionReContainer, clonedIUDs)
+				GamutTrk gamutTrk = new GamutTrk(Gamut, this.MidiChannel, this.MsPositionReContainer, clonedIUDs)
 				{
 					Container = this.Container
 				};
 
-				return grp;
+				return gamutTrk;
 			}
 		}
 		#endregion constructors
@@ -108,10 +108,10 @@ namespace Moritz.Algorithm.Tombeau1
 		#region UniqueDefs list component changers
 		/// <summary>
 		/// Appends a new MidiChordDef, MidiRestDef, or ClefDef to the end of the list.
-		/// IUniqueDefs in Grps cannot be CautionaryChordDefs.
+		/// IUniqueDefs in GamutTrks cannot be CautionaryChordDefs.
 		/// Automatically sets the iUniqueDef's msPosition.
 		/// Used by Block.PopBar(...), so accepts a CautionaryChordDef argument.
-		/// CautionaryChordDefs are however not allowed in Grps.
+		/// CautionaryChordDefs are however not allowed in GamutTrks.
 		/// </summary>
 		public override void Add(IUniqueDef iUniqueDef)
         {
@@ -134,7 +134,7 @@ namespace Moritz.Algorithm.Tombeau1
             }
             if(iUniqueDef is CautionaryChordDef)
             {
-                Debug.Assert(false, "Grps cannot contain CautionaryChordDefs");
+                Debug.Assert(false, "GamutTrks cannot contain CautionaryChordDefs");
             }
         }
 
@@ -264,7 +264,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// Shears the group vertically, using TransposeStepsInGamut(steps).
         /// The vertical velocity sequence remains unchanged except when notes are removed because they are duplicates.
         /// The number of steps to transpose intermediate chords is calculated as a linear sequence from startSteps to endSteps.
-        /// If there is only one chord in the Grp, it is transposed by startSteps.
+        /// If there is only one chord in the GamutTrk, it is transposed by startSteps.
         /// </summary>
         /// <param name="startSteps">The number of steps in the gamut to transpose the first chord</param>
         /// <param name="endSteps">The number of steps in the gamut to transpose the last chord</param>
@@ -294,7 +294,7 @@ namespace Moritz.Algorithm.Tombeau1
 
         /// <summary>
         /// Shears the group vertically, using TransposeStepsInGamut(steps).
-        /// The number of ints in the argument must equal the number of UniqueDefs in the Grp.
+        /// The number of ints in the argument must equal the number of UniqueDefs in the GamutTrk.
         /// Each MidiChordDef in the UniqueDefs is transposed by the corresponding number of steps.
         /// The vertical velocity sequence remains unchanged except when notes are removed because they are duplicates.
         /// </summary>
@@ -321,7 +321,7 @@ namespace Moritz.Algorithm.Tombeau1
         }
 
         /// <summary>
-        /// All the pitches in all the MidiChordDefs must be contained in this Grp's Gamut.
+        /// All the pitches in all the MidiChordDefs must be contained in this GamutTrk's Gamut.
         /// The vertical velocity sequence remains unchanged except when notes are removed because they are duplicates.
         /// </summary>
         /// <param name="stepsToTranspose"></param>
@@ -363,7 +363,7 @@ namespace Moritz.Algorithm.Tombeau1
 
         #region Gamut
         /// <summary>
-        /// When the Gamut is set after the original Grp has been constructed, pitches are mapped to pitches in the same
+        /// When the Gamut is set after the original GamutTrk has been constructed, pitches are mapped to pitches in the same
         /// octave in the new Gamut. The velocities will be those of the original pitches.
         /// Note that there may be less pitches per chord after setting the Gamut in this way, since duplicate pitches
         /// will have been removed.
@@ -485,7 +485,7 @@ namespace Moritz.Algorithm.Tombeau1
 
         public override string ToString()
         {
-            return ($"Grp: MsDuration={MsDuration} MsPositionReContainer={MsPositionReContainer} Count={Count}");
+            return ($"GamutTrk: MsDuration={MsDuration} MsPositionReContainer={MsPositionReContainer} Count={Count}");
         }
     }
 }

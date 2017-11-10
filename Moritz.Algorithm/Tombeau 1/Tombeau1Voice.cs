@@ -12,7 +12,7 @@ namespace Moritz.Algorithm.Tombeau1
 		{
 		}
 
-		public IReadOnlyList<IReadOnlyList<MsValues>> MsValuesOfComposedGrps
+		public IReadOnlyList<IReadOnlyList<MsValues>> MsValuesOfComposedGamutTrks
 		{
 			get
 			{
@@ -56,11 +56,11 @@ namespace Moritz.Algorithm.Tombeau1
 						var iUniqueDefsList = new List<MsValues>();
 						modeSegmentList.Add(iUniqueDefsList);
 
-						Grp pGrp = modeSegment[j];
-						for(int k = 0; k < pGrp.Count; k++)
+						GamutTrk pGamutTrk = modeSegment[j];
+						for(int k = 0; k < pGamutTrk.Count; k++)
 						{
-							iUniqueDefsList.Add(new MsValues(msPos, pGrp[k].MsDuration));
-							msPos += pGrp[k].MsDuration;
+							iUniqueDefsList.Add(new MsValues(msPos, pGamutTrk[k].MsDuration));
+							msPos += pGamutTrk[k].MsDuration;
 						}
 					}
 				}

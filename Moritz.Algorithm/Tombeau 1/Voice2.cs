@@ -14,7 +14,7 @@ namespace Moritz.Algorithm.Tombeau1
 			_composedModeSegments = Compose(voice1);
 		}
 
-		#region available Trk and Grp transformations
+		#region available Trk and GamutTrk transformations
 		// Add();
 		// AddRange();
 		// AdjustChordMsDurations();
@@ -44,22 +44,22 @@ namespace Moritz.Algorithm.Tombeau1
 		// Transpose();
 		// TransposeStepsInGamut();
 		// TransposeToRootInGamut();
-		#endregion available Trk and Grp transformations
+		#endregion available Trk and GamutTrk transformations
 
 		#region old code
 		//    /// <summary>
-		//    /// Creates a list of TenorPaletteGrps, each of which has the same relativePitchHierarchyIndex.
+		//    /// Creates a list of TenorPaletteGamutTrks, each of which has the same relativePitchHierarchyIndex.
 		//    /// </summary>
-		//    private List<Grp> GetTenorPaletteGrpList(int relativePitchHierarchyIndex)
+		//    private List<GamutTrk> GetTenorPaletteGamutTrkList(int relativePitchHierarchyIndex)
 		//    {
 		//        const int gamutBasePitch = 0;
-		//        List<Grp> grps = new List<Grp>();
+		//        List<GamutTrk> gamutTrks = new List<GamutTrk>();
 
-		//        for(int i = 0, domain = 12; domain >= 1; --domain, ++i) // domain is both Gamut.PitchesPerOctave and nChords per Grp
+		//        for(int i = 0, domain = 12; domain >= 1; --domain, ++i) // domain is both Gamut.PitchesPerOctave and nChords per GamutTrk
 		//        {
 		//            Gamut gamut = new Gamut(relativePitchHierarchyIndex, gamutBasePitch, domain);
 
-		//            PaletteGrp tpg = new PaletteGrp(gamut, 3);
+		//            PaletteGamutTrk tpg = new PaletteGamutTrk(gamut, 3);
 		//int minMsDuration = 200;
 		//int maxMsDuration = 300;
 		//tpg.SetDurationsFromPitches(maxMsDuration, minMsDuration, true);
@@ -96,13 +96,13 @@ namespace Moritz.Algorithm.Tombeau1
 		////}
 		//#endregion
 
-		//#region begin test code 5, related Grps
+		//#region begin test code 5, related GamutTrks
 		////if(domain % 2 != 0 && tpg.Count > 1)
 		////{
-		////    TenorPaletteGrp previousTpg = (TenorPaletteGrp)grps[i - 1];
-		////    //tpg = previousTpg.RelatedPitchHierarchyGrp(previousTpg.Gamut.RelativePitchHierarchyIndex + 11);
-		////    //tpg = previousTpg.RelatedBasePitchGrp(11);
-		////    tpg = previousTpg.RelatedDomainGrp(6);
+		////    TenorPaletteGamutTrk previousTpg = (TenorPaletteGamutTrk)gamutTrks[i - 1];
+		////    //tpg = previousTpg.RelatedPitchHierarchyGamutTrk(previousTpg.Gamut.RelativePitchHierarchyIndex + 11);
+		////    //tpg = previousTpg.RelatedBasePitchGamutTrk(11);
+		////    tpg = previousTpg.RelatedDomainGamutTrk(6);
 		////}
 		//#endregion
 
@@ -135,9 +135,9 @@ namespace Moritz.Algorithm.Tombeau1
 		//#region begin test code 8, set inverse velocities
 		////if(domain % 2 != 0 && tpg.Count > 1)
 		////{
-		////    TenorPaletteGrp prevTpg = (TenorPaletteGrp)grps[i - 1];
+		////    TenorPaletteGamutTrk prevTpg = (TenorPaletteGamutTrk)gamutTrks[i - 1];
 		////    Gamut prevGamut = prevTpg.Gamut;
-		////    tpg = new TenorPaletteGrp(prevGamut); // identical to prevTpg
+		////    tpg = new TenorPaletteGamutTrk(prevGamut); // identical to prevTpg
 		////    // inverse velocityPerAbsolutePitch
 		////    List<byte> velocityPerAbsolutePitch = prevGamut.GetVelocityPerAbsolutePitch(20, 127, prevGamut.NPitchesPerOctave - 1);
 		////    tpg.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, 20);
@@ -147,9 +147,9 @@ namespace Moritz.Algorithm.Tombeau1
 		//#region begin test code 8, set Gamut (pitches
 		////if(domain % 2 != 0 && tpg.Count > 1)
 		////{
-		////    TenorPaletteGrp prevTpg = (TenorPaletteGrp)grps[i - 1];
+		////    TenorPaletteGamutTrk prevTpg = (TenorPaletteGamutTrk)gamutTrks[i - 1];
 		////    Gamut prevGamut = prevTpg.Gamut;
-		////    tpg = new TenorPaletteGrp(prevGamut); // identical to prevTpg
+		////    tpg = new TenorPaletteGamutTrk(prevGamut); // identical to prevTpg
 
 		////    int newRelativePitchHierarchyIndex = prevGamut.RelativePitchHierarchyIndex + 11;
 		////    int newBasePitch = prevGamut.BasePitch;
@@ -163,10 +163,10 @@ namespace Moritz.Algorithm.Tombeau1
 		////}
 		//#endregion
 
-		//grps.Add(tpg);
+		//gamutTrks.Add(tpg);
 		//        }
 
-		//        return (grps);
+		//        return (gamutTrks);
 		//    }
 		#endregion
 

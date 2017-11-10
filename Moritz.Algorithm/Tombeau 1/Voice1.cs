@@ -5,7 +5,7 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-	#region available Trk and Grp transformations
+	#region available Trk and GamutTrk transformations
 	// Add();
 	// AddRange();
 	// AdjustChordMsDurations();
@@ -35,7 +35,7 @@ namespace Moritz.Algorithm.Tombeau1
 	// Transpose();
 	// TransposeStepsInGamut();
 	// TransposeToRootInGamut();
-	#endregion available Trk and Grp transformations
+	#endregion available Trk and GamutTrk transformations
 
 	internal class Voice1 : Tombeau1Voice
     {
@@ -144,31 +144,31 @@ namespace Moritz.Algorithm.Tombeau1
 		}
 
 		/// <summary>
-		/// The returned ModeSegment contains Grp objects that all have the same Gamut.Mode.AbsolutePitchHierarchy.
+		/// The returned ModeSegment contains GamutTrk objects that all have the same Gamut.Mode.AbsolutePitchHierarchy.
 		/// </summary>
 		private ModeSegment GetBasicModeSegment(int rootOctave, int gamutBasePitch, int relativePitchHierarchyIndex)
 		{
 			//const int gamutBasePitch = 9;
-			var grps = new List<Grp>();
+			var gamutTrks = new List<GamutTrk>();
 
-			for(int i = 0, nPitchesPerOctave = 12; nPitchesPerOctave >= 1; --nPitchesPerOctave, ++i) // domain is both Gamut.PitchesPerOctave and nChords per Grp
+			for(int i = 0, nPitchesPerOctave = 12; nPitchesPerOctave >= 1; --nPitchesPerOctave, ++i) // domain is both Gamut.PitchesPerOctave and nChords per GamutTrk
 			{
 				Gamut gamut = new Gamut(relativePitchHierarchyIndex, gamutBasePitch, nPitchesPerOctave);
 
 				//pitchesPerChord = 5;
 				//msDurationPerChord = 200;
 				//velocityFactor = 0.5;
-				Grp grp = new Grp(gamut, rootOctave, gamut.NPitchesPerOctave, 5, 200, 0.5);
+				GamutTrk gamutTrk = new GamutTrk(gamut, rootOctave, gamut.NPitchesPerOctave, 5, 200, 0.5);
 				int minMsDuration = 230;
 				int maxMsDuration = 380;
-				grp.SetDurationsFromPitches(maxMsDuration, minMsDuration, true);
+				gamutTrk.SetDurationsFromPitches(maxMsDuration, minMsDuration, true);
 
-				grp.SortRootNotatedPitchAscending();
+				gamutTrk.SortRootNotatedPitchAscending();
 
-				grps.Add(grp);
+				gamutTrks.Add(gamutTrk);
 			}
 
-			ModeSegment basicModeSegment = new ModeSegment(grps);
+			ModeSegment basicModeSegment = new ModeSegment(gamutTrks);
 
 			return (basicModeSegment);
 		}
@@ -179,49 +179,49 @@ namespace Moritz.Algorithm.Tombeau1
 
 			for(int index = 0; index < pModeSegment.Count; ++index)
 			{
-				Grp grp = pModeSegment[index];
+				GamutTrk gamutTrk = pModeSegment[index];
 
 				#region current version
-				if(grp.UniqueDefs[0] is MidiChordDef firstMcd && grp.UniqueDefs[grp.UniqueDefs.Count - 1] is MidiChordDef lastMcd)
+				if(gamutTrk.UniqueDefs[0] is MidiChordDef firstMcd && gamutTrk.UniqueDefs[gamutTrk.UniqueDefs.Count - 1] is MidiChordDef lastMcd)
 				{
-					grp.Shear(0, -1 * (grp.Gamut.NPitchesPerOctave));
+					gamutTrk.Shear(0, -1 * (gamutTrk.Gamut.NPitchesPerOctave));
 
 					while(lastMcd.NotatedMidiPitches[0] % 12 != (firstMcd.NotatedMidiPitches[0] % 12))
 					{
-						grp.Shear(0, -1);
+						gamutTrk.Shear(0, -1);
 					}
 				}
 
 				var velocityPerAbsolutePitch = RootGamut.GetVelocityPerAbsolutePitch();
-				grp.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+				gamutTrk.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
 
 				double minHairpin = 0.5;
 				double maxHairpin = 1.3;
 				int indexMax;
-				if(grp.Count > 1)
+				if(gamutTrk.Count > 1)
 				{
 					if(index % 2 != 0)
 					{
-						grp.Permute(1, 7);
-						indexMax = grp.Count / 3;
-						if(indexMax > 0 && indexMax < grp.Count)
+						gamutTrk.Permute(1, 7);
+						indexMax = gamutTrk.Count / 3;
+						if(indexMax > 0 && indexMax < gamutTrk.Count)
 						{
-							grp.AdjustVelocitiesHairpin(0, indexMax, minHairpin, maxHairpin);
-							grp.AdjustVelocitiesHairpin(indexMax, grp.Count, maxHairpin, minHairpin);
+							gamutTrk.AdjustVelocitiesHairpin(0, indexMax, minHairpin, maxHairpin);
+							gamutTrk.AdjustVelocitiesHairpin(indexMax, gamutTrk.Count, maxHairpin, minHairpin);
 						}
 					}
 					else
 					{
-						indexMax = (grp.Count * 2) / 3;
-						if(indexMax > 0 && indexMax < grp.Count)
+						indexMax = (gamutTrk.Count * 2) / 3;
+						if(indexMax > 0 && indexMax < gamutTrk.Count)
 						{
-							grp.AdjustVelocitiesHairpin(0, indexMax, minHairpin, maxHairpin);
-							grp.AdjustVelocitiesHairpin((grp.Count * 2) / 3, grp.Count, maxHairpin, minHairpin);
+							gamutTrk.AdjustVelocitiesHairpin(0, indexMax, minHairpin, maxHairpin);
+							gamutTrk.AdjustVelocitiesHairpin((gamutTrk.Count * 2) / 3, gamutTrk.Count, maxHairpin, minHairpin);
 						}
 					}
 				}
 
-				//grp.AdjustChordMsDurations(factor: 5);
+				//gamutTrk.AdjustChordMsDurations(factor: 5);
 				#endregion current version
 
 				#region begin test code 2 transpose chords to the same absolute root pitch
@@ -238,20 +238,20 @@ namespace Moritz.Algorithm.Tombeau1
 				//}
 				#endregion
 
-				#region begin test code 5, related Grps
+				#region begin test code 5, related GamutTrks
 				//if(domain % 2 != 0 && g.Count > 1)
 				//{
-				//    TenorPaletteGrp previousTpg = (TenorPaletteGrp)grps[i - 1];
-				//    //g = previousTpg.RelatedPitchHierarchyGrp(previousTpg.Gamut.RelativePitchHierarchyIndex + 11);
-				//    //g = previousTpg.RelatedBasePitchGrp(11);
-				//    g = previousTpg.RelatedDomainGrp(6);
+				//    TenorPaletteGamutTrk previousTpg = (TenorPaletteGamutTrk)gamutTrks[i - 1];
+				//    //g = previousTpg.RelatedPitchHierarchyGamutTrk(previousTpg.Gamut.RelativePitchHierarchyIndex + 11);
+				//    //g = previousTpg.RelatedBasePitchGamutTrk(11);
+				//    g = previousTpg.RelatedDomainGamutTrk(6);
 				//}
 				#endregion
 
 				#region begin test code 6, timeWarp
-				//if(grp.Count > 1)
+				//if(gamutTrk.Count > 1)
 				//{
-				//	grp.TimeWarp(new Envelope(new List<byte>() { 4, 7, 2 }, 7, 7, grp.Count), 20);
+				//	gamutTrk.TimeWarp(new Envelope(new List<byte>() { 4, 7, 2 }, 7, 7, gamutTrk.Count), 20);
 				//}
 				#endregion
 
@@ -277,9 +277,9 @@ namespace Moritz.Algorithm.Tombeau1
 				#region begin test code 8, set inverse velocities
 				//if(domain % 2 != 0 && g.Count > 1)
 				//{
-				//    TenorPaletteGrp prevTpg = (TenorPaletteGrp)grps[i - 1];
+				//    TenorPaletteGamutTrk prevTpg = (TenorPaletteGamutTrk)gamutTrks[i - 1];
 				//    Gamut prevGamut = prevTpg.Gamut;
-				//    g = new TenorPaletteGrp(prevGamut); // identical to prevTpg
+				//    g = new TenorPaletteGamutTrk(prevGamut); // identical to prevTpg
 				//    // inverse velocityPerAbsolutePitch
 				//    List<byte> velocityPerAbsolutePitch = prevGamut.GetVelocityPerAbsolutePitch(20, 127, prevGamut.NPitchesPerOctave - 1);
 				//    g.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, 20);
@@ -289,9 +289,9 @@ namespace Moritz.Algorithm.Tombeau1
 				#region begin test code 8, set Gamut (pitches
 				//if(domain % 2 != 0 && g.Count > 1)
 				//{
-				//    TenorPaletteGrp prevTpg = (TenorPaletteGrp)grps[i - 1];
+				//    TenorPaletteGamutTrk prevTpg = (TenorPaletteGamutTrk)gamutTrks[i - 1];
 				//    Gamut prevGamut = prevTpg.Gamut;
-				//    g = new TenorPaletteGrp(prevGamut); // identical to prevTpg
+				//    g = new TenorPaletteGamutTrk(prevGamut); // identical to prevTpg
 
 				//    int newRelativePitchHierarchyIndex = prevGamut.RelativePitchHierarchyIndex + 11;
 				//    int newBasePitch = prevGamut.BasePitch;

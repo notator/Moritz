@@ -366,7 +366,7 @@ namespace Moritz.Algorithm.Tombeau1
             {
 				case CompositionType.onlyVoice1:
 				{
-					AddGrpsToSeqs(outputSeqs, voice1, MidiChannelIndexPerOutputVoice[3]);
+					AddGamutTrksToSeqs(outputSeqs, voice1, MidiChannelIndexPerOutputVoice[3]);
 					break;
 				}
 				#region other compositionTypes
@@ -375,8 +375,8 @@ namespace Moritz.Algorithm.Tombeau1
 					voice1.AdjustForTwoVoices();
 					voice2 = new Voice2(voice1); 
 					// The channels determine the top-bottom order of the staves in the score.
-					AddGrpsToSeqs(outputSeqs, voice2, MidiChannelIndexPerOutputVoice[0]);
-					AddGrpsToSeqs(outputSeqs, voice1, MidiChannelIndexPerOutputVoice[1]);
+					AddGamutTrksToSeqs(outputSeqs, voice2, MidiChannelIndexPerOutputVoice[0]);
+					AddGamutTrksToSeqs(outputSeqs, voice1, MidiChannelIndexPerOutputVoice[1]);
 					break;
 				}
 				case CompositionType.threeVoices:
@@ -386,9 +386,9 @@ namespace Moritz.Algorithm.Tombeau1
 					voice2.AdjustForThreeVoices();
 					voice3 = new Voice3(voice1, voice2);
 					// The channels determine the top-bottom order of the staves in the score.
-					AddGrpsToSeqs(outputSeqs, voice3, MidiChannelIndexPerOutputVoice[0]);
-					AddGrpsToSeqs(outputSeqs, voice2, MidiChannelIndexPerOutputVoice[1]);
-					AddGrpsToSeqs(outputSeqs, voice1, MidiChannelIndexPerOutputVoice[2]);
+					AddGamutTrksToSeqs(outputSeqs, voice3, MidiChannelIndexPerOutputVoice[0]);
+					AddGamutTrksToSeqs(outputSeqs, voice2, MidiChannelIndexPerOutputVoice[1]);
+					AddGamutTrksToSeqs(outputSeqs, voice1, MidiChannelIndexPerOutputVoice[2]);
 					break;
 				}
 				case CompositionType.fourVoices:
@@ -400,10 +400,10 @@ namespace Moritz.Algorithm.Tombeau1
 					voice3.AdjustForFourVoices();
 					voice4 = new Voice4(voice1, voice2, voice3);
 					// The channels determine the top-bottom order of the staves in the score.
-					AddGrpsToSeqs(outputSeqs, voice4, MidiChannelIndexPerOutputVoice[0]);
-					AddGrpsToSeqs(outputSeqs, voice3, MidiChannelIndexPerOutputVoice[1]);
-					AddGrpsToSeqs(outputSeqs, voice2, MidiChannelIndexPerOutputVoice[2]);
-					AddGrpsToSeqs(outputSeqs, voice1, MidiChannelIndexPerOutputVoice[3]);
+					AddGamutTrksToSeqs(outputSeqs, voice4, MidiChannelIndexPerOutputVoice[0]);
+					AddGamutTrksToSeqs(outputSeqs, voice3, MidiChannelIndexPerOutputVoice[1]);
+					AddGamutTrksToSeqs(outputSeqs, voice2, MidiChannelIndexPerOutputVoice[2]);
+					AddGamutTrksToSeqs(outputSeqs, voice1, MidiChannelIndexPerOutputVoice[3]);
 					break;
 				}
 				#endregion
@@ -425,7 +425,7 @@ namespace Moritz.Algorithm.Tombeau1
             return bars;
         }
 
-		#region available Trk and Grp transformations
+		#region available Trk and GamutTrk transformations
 		// Add();
 		// AddRange();
 		// AdjustChordMsDurations();
@@ -455,7 +455,7 @@ namespace Moritz.Algorithm.Tombeau1
 		// Transpose();
 		// TransposeStepsInGamut();
 		// TransposeToRootInGamut();
-		#endregion available Trk and Grp transformations
+		#endregion available Trk and GamutTrk transformations
 
 		/// <summary>
 		/// The compulsory first barline (at msPosition=0) is NOT included in the returned list.
@@ -498,7 +498,7 @@ namespace Moritz.Algorithm.Tombeau1
 		{
 			List<int> v1BarlinePositions = new List<int>();
 
-			var msValuesListList = voice1.MsValuesOfComposedGrps;
+			var msValuesListList = voice1.MsValuesOfComposedGamutTrks;
 
 			for(int i = 0; i < msValuesListList.Count; ++i)
 			{
@@ -556,7 +556,7 @@ namespace Moritz.Algorithm.Tombeau1
 		}
 
 		/// <summary>
-		/// Returns the smallest Grp msPosition greater than the middle msPosition of the ModeSegment.
+		/// Returns the smallest GamutTrk msPosition greater than the middle msPosition of the ModeSegment.
 		/// </summary>
 		private int MidBarlineMsPos(IReadOnlyList<IReadOnlyList<MsValues>> msValuesListList, int ModeSegmentNumber)
 		{
@@ -616,9 +616,9 @@ namespace Moritz.Algorithm.Tombeau1
 			return rSeq;
         }
 
-        private void AddGrpsToSeqs(List<Seq> seqs, Tombeau1Voice voice, int midiChannel)
+        private void AddGamutTrksToSeqs(List<Seq> seqs, Tombeau1Voice voice, int midiChannel)
         {
-			List<Trk> trks = GrpListsToTrks(voice.ComposedModeSegments, midiChannel);
+			List<Trk> trks = GamutTrkListsToTrks(voice.ComposedModeSegments, midiChannel);
             if(seqs.Count == 0)
             {
                 for(int i = 0; i < trks.Count; ++i)
@@ -641,12 +641,12 @@ namespace Moritz.Algorithm.Tombeau1
         /// This function is used while composing palettes.
         /// It simply converts its argument to a list of Trks having the same midiChannel.
         /// </summary>
-        private List<Trk> GrpListsToTrks(IReadOnlyList<ModeSegment> grpLists, int midiChannel)
+        private List<Trk> GamutTrkListsToTrks(IReadOnlyList<ModeSegment> modeSegmentList, int midiChannel)
         {
             List<Trk> seqTrks = new List<Trk>();
-            foreach(ModeSegment grps in grpLists)
+            foreach(ModeSegment gamutTrks in modeSegmentList)
             {
-                Trk trk = GrpListToTrk(grps.Grps, midiChannel);
+                Trk trk = GamutTrkListToTrk(gamutTrks.GamutTrks, midiChannel);
                 seqTrks.Add(trk);
             }
             return seqTrks;
@@ -655,12 +655,12 @@ namespace Moritz.Algorithm.Tombeau1
         /// <summary>
         /// This function simply converts its argument to a Trk having the given midiChannel.
         /// </summary>
-        private Trk GrpListToTrk(IReadOnlyList<Grp> grpList, int midiChannel)
+        private Trk GamutTrkListToTrk(IReadOnlyList<GamutTrk> gamutTrkList, int midiChannel)
         {
             Trk trk = new Trk(midiChannel, 0, new List<IUniqueDef>());
-            foreach(Grp grp in grpList)
+            foreach(GamutTrk gamutTrk in gamutTrkList)
             {
-                trk.AddRange(grp);
+                trk.AddRange(gamutTrk);
             }
 
             return trk;
