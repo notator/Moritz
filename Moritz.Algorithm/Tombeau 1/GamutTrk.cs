@@ -21,52 +21,18 @@ namespace Moritz.Algorithm.Tombeau1
 		/// <param name="nPitchesPerChord">must be greater than 0</param>
 		/// <param name="msDurationPerChord">must be greater than 0</param>
 		/// <param name="velocityFactor">must be greater than 0.0</param>
-		public GamutTrk(Gamut gamut, int rootOctave, int nChords, int nPitchesPerChord, int msDurationPerChord, double velocityFactor)
-            : base(0, 0, new List<IUniqueDef>())
+		public GamutTrk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iudList, Gamut gamut, int rootOctave)
+            : base(midiChannel, msPositionReContainer, iudList)
         {
             Debug.Assert(gamut != null);
             Debug.Assert(rootOctave >= 0);
-			Debug.Assert(nChords > 0);
-			Debug.Assert(nPitchesPerChord > 0);
-			Debug.Assert(msDurationPerChord > 0);
-            Debug.Assert(velocityFactor > 0.0);
+			foreach(IUniqueDef iud in iudList)
+			{
+				AssertPitches(gamut, iud);
+			}
 
 			_gamut = gamut;
 			RootOctave = rootOctave;
-
-            for(int i = 0; i < nChords; ++i)
-            {
-                int rootNotatedPitch;
-                if(i == 0)
-                {
-                    rootNotatedPitch = gamut.Mode.AbsolutePitchHierarchy[i] + (12 * rootOctave);
-                    rootNotatedPitch = (rootNotatedPitch <= gamut.MaxPitch) ? rootNotatedPitch : gamut.MaxPitch;
-                }
-                else
-                {
-                    List<byte> previousPitches = ((MidiChordDef)_uniqueDefs[i - 1]).BasicMidiChordDefs[0].Pitches;
-                    if(previousPitches.Count > 1)
-                    {
-                        rootNotatedPitch = previousPitches[1];
-                    }
-                    else
-                    {
-                        rootNotatedPitch = gamut.Mode.AbsolutePitchHierarchy[i];
-                        while(rootNotatedPitch < previousPitches[0])
-                        {
-                            rootNotatedPitch += 12;
-                            if(rootNotatedPitch > gamut.MaxPitch)
-                            {
-                                rootNotatedPitch = gamut.MaxPitch;
-                                break;
-                            }
-                        }
-                    }
-                }
-                MidiChordDef mcd = new MidiChordDef(msDurationPerChord, gamut, rootNotatedPitch, nPitchesPerChord, null);
-                mcd.AdjustVelocities(velocityFactor);
-                _uniqueDefs.Add(mcd);
-            }
 
 			var velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch();
 
@@ -116,7 +82,7 @@ namespace Moritz.Algorithm.Tombeau1
 		public override void Add(IUniqueDef iUniqueDef)
         {
             Debug.Assert(_gamut != null);
-            AssertPitches(iUniqueDef);
+            AssertPitches(_gamut, iUniqueDef);
             base.Add(iUniqueDef);
             SetBeamEnd();
         }
@@ -126,11 +92,11 @@ namespace Moritz.Algorithm.Tombeau1
         /// or if the iUniqueDef is a CautionaryChordDef.
         /// </summary>
         /// <param name="iUniqueDef"></param>
-        private void AssertPitches(IUniqueDef iUniqueDef)
+        private void AssertPitches(Gamut gamut, IUniqueDef iUniqueDef)
         {            
             if(iUniqueDef is MidiChordDef mcd)
             {
-                Debug.Assert(_gamut.ContainsAllPitches(mcd));
+                Debug.Assert(gamut.ContainsAllPitches(mcd));
             }
             if(iUniqueDef is CautionaryChordDef)
             {
@@ -147,8 +113,8 @@ namespace Moritz.Algorithm.Tombeau1
             Debug.Assert(_gamut != null);
             foreach(IUniqueDef iud in voiceDef.UniqueDefs)
             {
-                AssertPitches(iud);
-            }
+				AssertPitches(_gamut, iud);
+			}
             base.AddRange(voiceDef);
             SetBeamEnd();
         }
@@ -159,8 +125,8 @@ namespace Moritz.Algorithm.Tombeau1
         public override void Insert(int index, IUniqueDef iUniqueDef)
         {
             Debug.Assert(_gamut != null);
-            AssertPitches(iUniqueDef);
-            base.Insert(index, iUniqueDef);
+			AssertPitches(_gamut, iUniqueDef);
+			base.Insert(index, iUniqueDef);
             SetBeamEnd();
         }
         /// <summary>
@@ -172,8 +138,8 @@ namespace Moritz.Algorithm.Tombeau1
             Debug.Assert(_gamut != null);
             foreach(IUniqueDef iud in trk.UniqueDefs)
             {
-                AssertPitches(iud);
-            }
+				AssertPitches(_gamut, iud);
+			}
             base.InsertRange(index, trk);
             SetBeamEnd();
         }
@@ -183,7 +149,7 @@ namespace Moritz.Algorithm.Tombeau1
         public override void Replace(int index, IUniqueDef replacementIUnique)
         {
             Debug.Assert(_gamut != null);
-            AssertPitches(replacementIUnique);
+            AssertPitches(_gamut, replacementIUnique);
             base.Replace(index, replacementIUnique);
             SetBeamEnd();
         }
@@ -206,12 +172,13 @@ namespace Moritz.Algorithm.Tombeau1
             Debug.Assert(_gamut != null);
             foreach(IUniqueDef iud in trk2.UniqueDefs)
             {
-                AssertPitches(iud);
+                AssertPitches(_gamut, iud);
             }
             Trk trk = base.Superimpose(trk2);
             SetBeamEnd();
             return trk;
         }
+
         #endregion UniqueDefs list component changers
         #region UniqueDefs list order changers
         public override void Permute(int axisNumber, int contourNumber)

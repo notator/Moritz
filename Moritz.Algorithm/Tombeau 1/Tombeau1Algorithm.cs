@@ -357,7 +357,7 @@ namespace Moritz.Algorithm.Tombeau1
 			List<Seq> outputSeqs = new List<Seq>(); // The seqs that will be displayed (the score).
 			CompositionType compositionType = CompositionType.onlyVoice1;
 			
-			Voice1 voice1 = new Voice1();
+			Voice1 voice1 = new Voice1(MidiChannelIndexPerOutputVoice[3]);
 			Voice2 voice2 = null;
 			Voice3 voice3 = null;
 			Voice4 voice4 = null;
@@ -366,44 +366,44 @@ namespace Moritz.Algorithm.Tombeau1
             {
 				case CompositionType.onlyVoice1:
 				{
-					AddGamutTrksToSeqs(outputSeqs, voice1, MidiChannelIndexPerOutputVoice[3]);
+					AddComposedModeSegmentsToSeqs(outputSeqs, voice1);
 					break;
 				}
 				#region other compositionTypes
 				case CompositionType.twoVoices:
 				{
 					voice1.AdjustForTwoVoices();
-					voice2 = new Voice2(voice1); 
+					voice2 = new Voice2(MidiChannelIndexPerOutputVoice[2], voice1); 
 					// The channels determine the top-bottom order of the staves in the score.
-					AddGamutTrksToSeqs(outputSeqs, voice2, MidiChannelIndexPerOutputVoice[0]);
-					AddGamutTrksToSeqs(outputSeqs, voice1, MidiChannelIndexPerOutputVoice[1]);
+					AddComposedModeSegmentsToSeqs(outputSeqs, voice2);
+					AddComposedModeSegmentsToSeqs(outputSeqs, voice1);
 					break;
 				}
 				case CompositionType.threeVoices:
 				{
 					voice1.AdjustForThreeVoices();
-					voice2 = new Voice2(voice1);
+					voice2 = new Voice2(MidiChannelIndexPerOutputVoice[2], voice1);
 					voice2.AdjustForThreeVoices();
-					voice3 = new Voice3(voice1, voice2);
+					voice3 = new Voice3(MidiChannelIndexPerOutputVoice[1], voice1, voice2);
 					// The channels determine the top-bottom order of the staves in the score.
-					AddGamutTrksToSeqs(outputSeqs, voice3, MidiChannelIndexPerOutputVoice[0]);
-					AddGamutTrksToSeqs(outputSeqs, voice2, MidiChannelIndexPerOutputVoice[1]);
-					AddGamutTrksToSeqs(outputSeqs, voice1, MidiChannelIndexPerOutputVoice[2]);
+					AddComposedModeSegmentsToSeqs(outputSeqs, voice3);
+					AddComposedModeSegmentsToSeqs(outputSeqs, voice2);
+					AddComposedModeSegmentsToSeqs(outputSeqs, voice1);
 					break;
 				}
 				case CompositionType.fourVoices:
 				{
 					voice1.AdjustForFourVoices();
-					voice2 = new Voice2(voice1);
+					voice2 = new Voice2(MidiChannelIndexPerOutputVoice[2], voice1);
 					voice2.AdjustForFourVoices();
-					voice3 = new Voice3(voice1, voice2);
+					voice3 = new Voice3(MidiChannelIndexPerOutputVoice[1], voice1, voice2);
 					voice3.AdjustForFourVoices();
-					voice4 = new Voice4(voice1, voice2, voice3);
+					voice4 = new Voice4(MidiChannelIndexPerOutputVoice[0], voice1, voice2, voice3);
 					// The channels determine the top-bottom order of the staves in the score.
-					AddGamutTrksToSeqs(outputSeqs, voice4, MidiChannelIndexPerOutputVoice[0]);
-					AddGamutTrksToSeqs(outputSeqs, voice3, MidiChannelIndexPerOutputVoice[1]);
-					AddGamutTrksToSeqs(outputSeqs, voice2, MidiChannelIndexPerOutputVoice[2]);
-					AddGamutTrksToSeqs(outputSeqs, voice1, MidiChannelIndexPerOutputVoice[3]);
+					AddComposedModeSegmentsToSeqs(outputSeqs, voice4);
+					AddComposedModeSegmentsToSeqs(outputSeqs, voice3);
+					AddComposedModeSegmentsToSeqs(outputSeqs, voice2);
+					AddComposedModeSegmentsToSeqs(outputSeqs, voice1);
 					break;
 				}
 				#endregion
@@ -616,9 +616,9 @@ namespace Moritz.Algorithm.Tombeau1
 			return rSeq;
         }
 
-        private void AddGamutTrksToSeqs(List<Seq> seqs, Tombeau1Voice voice, int midiChannel)
+        private void AddComposedModeSegmentsToSeqs(List<Seq> seqs, Tombeau1Voice voice)
         {
-			List<Trk> trks = GamutTrkListsToTrks(voice.ComposedModeSegments, midiChannel);
+			List<Trk> trks = GamutTrkListsToTrks(voice.ComposedModeSegments, voice.MidiChannel);
             if(seqs.Count == 0)
             {
                 for(int i = 0; i < trks.Count; ++i)

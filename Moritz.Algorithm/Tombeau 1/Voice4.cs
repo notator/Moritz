@@ -8,8 +8,8 @@ namespace Moritz.Algorithm.Tombeau1
 {
     internal class Voice4 : Tombeau1Voice
     {
-        public Voice4(Voice1 voice1, Voice2 voice2, Voice3 voice3)
-			: base()
+        public Voice4(int midiChannel, Voice1 voice1, Voice2 voice2, Voice3 voice3)
+			: base(midiChannel)
         {
 			_composedModeSegments = Compose(voice1, voice2, voice3);
 		}

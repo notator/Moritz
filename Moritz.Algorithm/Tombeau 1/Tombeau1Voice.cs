@@ -6,9 +6,10 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-    internal class Tombeau1Voice
+     internal class Tombeau1Voice : Trk
     {
-		public Tombeau1Voice()
+		public Tombeau1Voice(int midiChannel)
+			: base(midiChannel)
 		{
 		}
 

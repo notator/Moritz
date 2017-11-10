@@ -39,8 +39,8 @@ namespace Moritz.Algorithm.Tombeau1
 
 	internal class Voice1 : Tombeau1Voice
     {
-		public Voice1()
-			: base()
+		public Voice1(int midiChannel)
+			: base(midiChannel)
 		{
 			int relativePitchHierarchyIndex = 0;
 			int basePitch = 9;
@@ -48,7 +48,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 			RootGamut = new Gamut(relativePitchHierarchyIndex, basePitch, nPitchesPerOctave);
 
-			_composedModeSegments = GetBasicModeSegments(12);
+			_composedModeSegments = GetBasicModeSegments(20);
 		 }
 
 		private List<ModeSegment> GetBasicModeSegments(int nModeSegments)
@@ -75,10 +75,12 @@ namespace Moritz.Algorithm.Tombeau1
 
 			int rootOctave = 2;
 			List<ModeSegment> basicModeSegments = new List<ModeSegment>();
+			int msPositionReContainer = 0;
 			foreach(var gamut in baseGamuts)
 			{
-				ModeSegment modeSegment = GetBasicModeSegment(rootOctave, gamut.BasePitch, gamut.RelativePitchHierarchyIndex);
+				ModeSegment modeSegment = GetBasicModeSegment(msPositionReContainer, rootOctave, gamut.BasePitch, gamut.RelativePitchHierarchyIndex);
 				basicModeSegments.Add(modeSegment);
+				msPositionReContainer += modeSegment.MsDuration;
 			}
 
 			for(int i = 0; i < basicModeSegments.Count; ++i)
@@ -146,19 +148,22 @@ namespace Moritz.Algorithm.Tombeau1
 		/// <summary>
 		/// The returned ModeSegment contains GamutTrk objects that all have the same Gamut.Mode.AbsolutePitchHierarchy.
 		/// </summary>
-		private ModeSegment GetBasicModeSegment(int rootOctave, int gamutBasePitch, int relativePitchHierarchyIndex)
+		private ModeSegment GetBasicModeSegment(int modeSegmentMsPositionReContainer, int rootOctave, int gamutBasePitch, int relativePitchHierarchyIndex)
 		{
 			//const int gamutBasePitch = 9;
 			var gamutTrks = new List<GamutTrk>();
-
+			int msPositionReContainer = 0;
 			for(int i = 0, nPitchesPerOctave = 12; nPitchesPerOctave >= 1; --nPitchesPerOctave, ++i) // domain is both Gamut.PitchesPerOctave and nChords per GamutTrk
 			{
 				Gamut gamut = new Gamut(relativePitchHierarchyIndex, gamutBasePitch, nPitchesPerOctave);
 
+				GamutTrk gamutTrk = new GamutTrk(this.MidiChannel, msPositionReContainer, new List<IUniqueDef>(), gamut, rootOctave);
+
+				int nChords = nPitchesPerOctave;
 				//pitchesPerChord = 5;
-				//msDurationPerChord = 200;
-				//velocityFactor = 0.5;
-				GamutTrk gamutTrk = new GamutTrk(gamut, rootOctave, gamut.NPitchesPerOctave, 5, 200, 0.5);
+				//totalMsDuration = 1000;
+				AddMidiChordDefs(gamutTrk, nChords, 5, nChords * 200);
+
 				int minMsDuration = 230;
 				int maxMsDuration = 380;
 				gamutTrk.SetDurationsFromPitches(maxMsDuration, minMsDuration, true);
@@ -166,11 +171,64 @@ namespace Moritz.Algorithm.Tombeau1
 				gamutTrk.SortRootNotatedPitchAscending();
 
 				gamutTrks.Add(gamutTrk);
+
+				msPositionReContainer += gamutTrk.MsDuration;
 			}
 
-			ModeSegment basicModeSegment = new ModeSegment(gamutTrks);
+			ModeSegment basicModeSegment = new ModeSegment(this.MidiChannel, modeSegmentMsPositionReContainer, gamutTrks);
 
 			return (basicModeSegment);
+		}
+
+		/// <summary>
+		/// Clears the current IUniquedefs list, then adds nChords MidiChordDefs
+		/// </summary>
+		/// <param name="nChords"></param>
+		/// <param name="nPitchesPerChord"></param>
+		/// <param name="totalMsDuration"></param>
+		public void AddMidiChordDefs(GamutTrk gamutTrk, int nChords, int nPitchesPerChord, int totalMsDuration)
+		{
+			Debug.Assert(nChords > 0);
+			Debug.Assert(nPitchesPerChord > 0);
+			int msDurationPerChord = totalMsDuration / nChords;
+			Debug.Assert(msDurationPerChord > 0);
+
+			List<IUniqueDef> uniqueDefs = gamutTrk.UniqueDefs;
+			Gamut gamut = gamutTrk.Gamut;
+			for(int i = 0; i < nChords; ++i)
+			{
+				int rootNotatedPitch;
+				if(i == 0)
+				{
+					rootNotatedPitch = gamut.Mode.AbsolutePitchHierarchy[i] + (12 * gamutTrk.RootOctave);
+					rootNotatedPitch = (rootNotatedPitch <= gamut.MaxPitch) ? rootNotatedPitch : gamut.MaxPitch;
+				}
+				else
+				{
+					List<byte> previousPitches = ((MidiChordDef)uniqueDefs[i - 1]).BasicMidiChordDefs[0].Pitches;
+					if(previousPitches.Count > 1)
+					{
+						rootNotatedPitch = previousPitches[1];
+					}
+					else
+					{
+						rootNotatedPitch = gamut.Mode.AbsolutePitchHierarchy[i];
+						while(rootNotatedPitch < previousPitches[0])
+						{
+							rootNotatedPitch += 12;
+							if(rootNotatedPitch > gamut.MaxPitch)
+							{
+								rootNotatedPitch = gamut.MaxPitch;
+								break;
+							}
+						}
+					}
+				}
+				MidiChordDef mcd = new MidiChordDef(msDurationPerChord, gamut, rootNotatedPitch, nPitchesPerChord, null);
+				uniqueDefs.Add(mcd);
+			}
+
+			gamutTrk.MsDuration = totalMsDuration;
 		}
 
 		protected ModeSegment Compose(ModeSegment paletteModeSegment)
