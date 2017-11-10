@@ -48,22 +48,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 			RootGamut = new Gamut(relativePitchHierarchyIndex, basePitch, nPitchesPerOctave);
 
-			List<ModeSegment> basicModeSegments = GetBasicModeSegments(12);
-
-			for(int i = 0; i < basicModeSegments.Count; ++i)
-			{
-				ModeSegment modeSegment = new ModeSegment(basicModeSegments[i].Grps);
-				modeSegment.RemoveRange(modeSegment.Count - 2, 2);
-
-				if(i % 2 == 1)
-				{
-					modeSegment.Reverse();
-				}
-
-				ModeSegment composedModeSegment = Compose(modeSegment);
-
-				_composedModeSegments.Add(composedModeSegment);
-			}
+			_composedModeSegments = GetBasicModeSegments(12);
 		 }
 
 		private List<ModeSegment> GetBasicModeSegments(int nModeSegments)
@@ -94,6 +79,19 @@ namespace Moritz.Algorithm.Tombeau1
 			{
 				ModeSegment modeSegment = GetBasicModeSegment(rootOctave, gamut.BasePitch, gamut.RelativePitchHierarchyIndex);
 				basicModeSegments.Add(modeSegment);
+			}
+
+			for(int i = 0; i < basicModeSegments.Count; ++i)
+			{
+				ModeSegment modeSegment = basicModeSegments[i];
+				modeSegment.RemoveRange(modeSegment.Count - 4, 4);
+
+				if(i % 2 == 1)
+				{
+					modeSegment.Reverse();
+				}
+
+				basicModeSegments[i] = Compose(modeSegment);
 			}
 
 			return basicModeSegments;
