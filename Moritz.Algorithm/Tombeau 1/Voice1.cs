@@ -48,7 +48,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 			RootGamut = new Gamut(relativePitchHierarchyIndex, basePitch, nPitchesPerOctave);
 
-			_composedModeSegments = GetBasicModeSegments(20);
+			_modeSegments = GetBasicModeSegments(20);
 		 }
 
 		private List<ModeSegment> GetBasicModeSegments(int nModeSegments)

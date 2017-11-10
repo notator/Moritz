@@ -618,7 +618,7 @@ namespace Moritz.Algorithm.Tombeau1
 
         private void AddComposedModeSegmentsToSeqs(List<Seq> seqs, Tombeau1Voice voice)
         {
-			List<Trk> trks = GamutTrkListsToTrks(voice.ComposedModeSegments, voice.MidiChannel);
+			List<Trk> trks = GamutTrkListsToTrks(voice.ModeSegments, voice.MidiChannel);
             if(seqs.Count == 0)
             {
                 for(int i = 0; i < trks.Count; ++i)
@@ -644,9 +644,9 @@ namespace Moritz.Algorithm.Tombeau1
         private List<Trk> GamutTrkListsToTrks(IReadOnlyList<ModeSegment> modeSegmentList, int midiChannel)
         {
             List<Trk> seqTrks = new List<Trk>();
-            foreach(ModeSegment gamutTrks in modeSegmentList)
+            foreach(ModeSegment modeSegment in modeSegmentList)
             {
-                Trk trk = GamutTrkListToTrk(gamutTrks.GamutTrks, midiChannel);
+                Trk trk = GamutTrkListToTrk(modeSegment.GamutTrks, midiChannel);
                 seqTrks.Add(trk);
             }
             return seqTrks;

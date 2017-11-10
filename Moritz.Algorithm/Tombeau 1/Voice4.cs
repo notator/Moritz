@@ -11,7 +11,7 @@ namespace Moritz.Algorithm.Tombeau1
         public Voice4(int midiChannel, Voice1 voice1, Voice2 voice2, Voice3 voice3)
 			: base(midiChannel)
         {
-			_composedModeSegments = Compose(voice1, voice2, voice3);
+			_modeSegments = Compose(voice1, voice2, voice3);
 		}
 
 		#region available Trk and GamutTrk transformations

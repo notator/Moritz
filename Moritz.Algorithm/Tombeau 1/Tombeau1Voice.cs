@@ -17,16 +17,16 @@ namespace Moritz.Algorithm.Tombeau1
 		{
 			get
 			{
-				Debug.Assert(_composedModeSegments != null && _composedModeSegments.Count > 0);
+				Debug.Assert(_modeSegments != null && _modeSegments.Count > 0);
 
 				var msPlaces = new List<List<MsValues>>();
 				int msPos = 0;
-				for(int i = 0; i < _composedModeSegments.Count; ++i)
+				for(int i = 0; i < _modeSegments.Count; ++i)
 				{
 					var msPlacesPerGamut = new List<MsValues>();
 					msPlaces.Add(msPlacesPerGamut);
 
-					ModeSegment modeSegment = _composedModeSegments[i];
+					ModeSegment modeSegment = _modeSegments[i];
 					for(int j = 0; j < modeSegment.Count; j++)
 					{
 
@@ -42,16 +42,16 @@ namespace Moritz.Algorithm.Tombeau1
 		{
 			get
 			{
-				Debug.Assert(_composedModeSegments != null && _composedModeSegments.Count > 0);
+				Debug.Assert(_modeSegments != null && _modeSegments.Count > 0);
 
 				int msPos = 0;
 				var rVal = new List<List<List<MsValues>>>();
-				for(int i = 0; i < _composedModeSegments.Count; ++i)
+				for(int i = 0; i < _modeSegments.Count; ++i)
 				{
 					var modeSegmentList = new List<List<MsValues>>();
 					rVal.Add(modeSegmentList);
 
-					ModeSegment modeSegment = _composedModeSegments[i];
+					ModeSegment modeSegment = _modeSegments[i];
 					for(int j = 0; j < modeSegment.Count; j++)
 					{
 						var iUniqueDefsList = new List<MsValues>();
@@ -69,7 +69,7 @@ namespace Moritz.Algorithm.Tombeau1
 			}
 		}
 
-		internal List<ModeSegment> ComposedModeSegments { get => _composedModeSegments; }
-		protected List<ModeSegment> _composedModeSegments = new List<ModeSegment>();
+		internal List<ModeSegment> ModeSegments { get => _modeSegments; }
+		protected List<ModeSegment> _modeSegments = new List<ModeSegment>();
 	}
 }
