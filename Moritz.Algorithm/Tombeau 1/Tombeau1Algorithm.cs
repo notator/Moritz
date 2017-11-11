@@ -354,7 +354,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 			/**********************************************/
 
-			List<Seq> outputSeqs = new List<Seq>(); // The seqs that will be displayed (the score).
+			Seq mainSeq = new Seq(0, new List<Trk>(), MidiChannelIndexPerOutputVoice);
 			CompositionType compositionType = CompositionType.onlyVoice1;
 			
 			Voice1 voice1 = new Voice1(MidiChannelIndexPerOutputVoice[3]);
@@ -366,17 +366,22 @@ namespace Moritz.Algorithm.Tombeau1
             {
 				case CompositionType.onlyVoice1:
 				{
-					AddComposedModeSegmentsToSeqs(outputSeqs, voice1);
+					#region test code
+					IReadOnlyList<IReadOnlyList<MsValues>> msValuesOfGamutTrks = voice1.GetMsValuesOfGamutTrks();
+					IReadOnlyList<IReadOnlyList<IReadOnlyList<MsValues>>> msValuesOfIUniqueDefs = voice1.GetMsValuesOfIUniqueDefs();
+					#endregion
+
+					voice1.AddToSeq(mainSeq);	 	
 					break;
 				}
 				#region other compositionTypes
 				case CompositionType.twoVoices:
 				{
 					voice1.AdjustForTwoVoices();
-					voice2 = new Voice2(MidiChannelIndexPerOutputVoice[2], voice1); 
-					// The channels determine the top-bottom order of the staves in the score.
-					AddComposedModeSegmentsToSeqs(outputSeqs, voice2);
-					AddComposedModeSegmentsToSeqs(outputSeqs, voice1);
+					voice2 = new Voice2(MidiChannelIndexPerOutputVoice[2], voice1);
+					// The voice midiChannels determine the top-bottom order of the staves in the score.
+					voice2.AddToSeq(mainSeq);
+					voice1.AddToSeq(mainSeq);
 					break;
 				}
 				case CompositionType.threeVoices:
@@ -385,10 +390,10 @@ namespace Moritz.Algorithm.Tombeau1
 					voice2 = new Voice2(MidiChannelIndexPerOutputVoice[2], voice1);
 					voice2.AdjustForThreeVoices();
 					voice3 = new Voice3(MidiChannelIndexPerOutputVoice[1], voice1, voice2);
-					// The channels determine the top-bottom order of the staves in the score.
-					AddComposedModeSegmentsToSeqs(outputSeqs, voice3);
-					AddComposedModeSegmentsToSeqs(outputSeqs, voice2);
-					AddComposedModeSegmentsToSeqs(outputSeqs, voice1);
+					// The voice midiChannels determine the top-bottom order of the staves in the score.
+					voice1.AddToSeq(mainSeq);
+					voice2.AddToSeq(mainSeq);
+					voice3.AddToSeq(mainSeq);
 					break;
 				}
 				case CompositionType.fourVoices:
@@ -399,11 +404,11 @@ namespace Moritz.Algorithm.Tombeau1
 					voice3 = new Voice3(MidiChannelIndexPerOutputVoice[1], voice1, voice2);
 					voice3.AdjustForFourVoices();
 					voice4 = new Voice4(MidiChannelIndexPerOutputVoice[0], voice1, voice2, voice3);
-					// The channels determine the top-bottom order of the staves in the score.
-					AddComposedModeSegmentsToSeqs(outputSeqs, voice4);
-					AddComposedModeSegmentsToSeqs(outputSeqs, voice3);
-					AddComposedModeSegmentsToSeqs(outputSeqs, voice2);
-					AddComposedModeSegmentsToSeqs(outputSeqs, voice1);
+					// The voice midiChannels determine the top-bottom order of the staves in the score.
+					voice1.AddToSeq(mainSeq);
+					voice2.AddToSeq(mainSeq);
+					voice3.AddToSeq(mainSeq);
+					voice4.AddToSeq(mainSeq);
 					break;
 				}
 				#endregion
@@ -411,10 +416,8 @@ namespace Moritz.Algorithm.Tombeau1
 
 			List<int> barlineMsPositions = GetBarlinePositions(voice1, voice2, voice3, voice4);
 
-			//Do global changes that affect all trks here (accel., rit, transpositions etc.)
-			FinalizeSeqs(outputSeqs);
-
-			Seq mainSeq = GetMainSeq(outputSeqs);
+			//Do global changes that affect the whole piece here (accel., rit, transpositions etc.)
+			FinalizeMainSeq(mainSeq);
 
 			MainBlock mainBlock = new MainBlock(InitialClefPerChannel, mainSeq, barlineMsPositions);
 
@@ -467,21 +470,21 @@ namespace Moritz.Algorithm.Tombeau1
 		{
 			List<int> barlinePositions = new List<int>() { 0 }; // entry is removed just before this function returns
 
-			List<int> voice1BarlinePositions = Voice1BarlinePositions(voice1);
+			List<int> voice1BarlinePositions = voice1.BarlineMsPositions();
 			barlinePositions.AddRange(voice1BarlinePositions);
 			if(voice2 != null)
 			{
-				List<int> voice2BarlinePositions = Voice2BarlinePositions(voice2);
+				List<int> voice2BarlinePositions = voice2.BarlineMsPositions();
 				barlinePositions.AddRange(voice2BarlinePositions);
 			}
 			if(voice3 != null)
 			{
-				List<int> voice3BarlinePositions = Voice3BarlinePositions(voice3);
+				List<int> voice3BarlinePositions = voice3.BarlineMsPositions();
 				barlinePositions.AddRange(voice3BarlinePositions);
 			}
 			if(voice4 != null)
 			{
-				List<int> voice4BarlinePositions = Voice4BarlinePositions(voice4);
+				List<int> voice4BarlinePositions = voice4.BarlineMsPositions();
 				barlinePositions.AddRange(voice4BarlinePositions);
 			}
 
@@ -492,51 +495,6 @@ namespace Moritz.Algorithm.Tombeau1
 			Debug.Assert(barlinePositions[0] != 0);
 
 			return barlinePositions;
-		}
-
-		private List<int> Voice1BarlinePositions(Voice1 voice1)
-		{
-			List<int> v1BarlinePositions = new List<int>();
-
-			var msValuesListList = voice1.MsValuesOfComposedGamutTrks;
-
-			for(int i = 0; i < msValuesListList.Count; ++i)
-			{
-				var msValuesList = msValuesListList[i];
-				MsValues lastMsValues = msValuesList[msValuesList.Count - 1];
-
-				v1BarlinePositions.Add(lastMsValues.EndMsPosition);
-			}
-
-			#region insert intermediate barline positions
-			List<int> midBarlinePositions = new List<int>
-			{
-				MidBarlineMsPos(msValuesListList, 1),
-				MidBarlineMsPos(msValuesListList, 10),
-				MidBarlineMsPos(msValuesListList, 12)
-			};
-			foreach(int b in midBarlinePositions)
-			{
-				v1BarlinePositions.Add(b);
-			}
-			#endregion
-
-			return v1BarlinePositions;
-		}
-
-		private List<int> Voice2BarlinePositions(Voice2 voice2)
-		{
-			throw new NotImplementedException();
-		}
-
-		private List<int> Voice3BarlinePositions(Voice3 voice3)
-		{
-			throw new NotImplementedException();
-		}
-
-		private List<int> Voice4BarlinePositions(Voice4 voice4)
-		{
-			throw new NotImplementedException();
 		}
 
 		private void RemoveDuplicates(List<int> barlinePositions)
@@ -556,40 +514,9 @@ namespace Moritz.Algorithm.Tombeau1
 		}
 
 		/// <summary>
-		/// Returns the smallest GamutTrk msPosition greater than the middle msPosition of the ModeSegment.
+		/// Possibly do global changes that affect the whole piece here (accel., rit, transpositions etc.)
 		/// </summary>
-		private int MidBarlineMsPos(IReadOnlyList<IReadOnlyList<MsValues>> msValuesListList, int ModeSegmentNumber)
-		{
-			Debug.Assert(ModeSegmentNumber > 0);
-			int thisModeSegmentIndex = ModeSegmentNumber - 1;
-			IReadOnlyList<MsValues> thisList = msValuesListList[thisModeSegmentIndex];
-
-			int thisListEndMsPos = thisList[thisList.Count - 1].EndMsPosition;
-			int prevListEndMsPos = 0;
-			if(ModeSegmentNumber > 1)
-			{
-				int prevGamutIndex = ModeSegmentNumber - 2;
-				IReadOnlyList<MsValues> prevList = msValuesListList[prevGamutIndex];
-				prevListEndMsPos = prevList[prevList.Count - 1].EndMsPosition;
-			}
-
-			int midMsPos = prevListEndMsPos + ((thisListEndMsPos - prevListEndMsPos) / 2); // end barline msPosition for ModeSegment 1, divided by 2
-			int barlineMsPos = -1;
-			foreach(MsValues msValues in thisList)
-			{
-				if(msValues.MsPosition > midMsPos)
-				{
-					barlineMsPos = msValues.MsPosition;
-					break;
-				}
-			}
-			return barlineMsPos;
-		}
-
-		/// <summary>
-		/// Possibly do global changes that affect all trks here (accel., rit, transpositions etc.)
-		/// </summary>
-		private void FinalizeSeqs(List<Seq> outputSeqs)
+		private void FinalizeMainSeq(Seq mainSeq)
 		{
 
 		}
@@ -598,72 +525,6 @@ namespace Moritz.Algorithm.Tombeau1
         {
             //VoiceDef voiceDef = bars[0][bars[0].Count - 1];
             //voiceDef.InsertClefDef(5, "b");
-        }
-
-        /// <summary>
-        /// Returns a new seq that is the concatenation of the argument seqs. 
-        /// </summary>
-        /// <param name="seqs">A sequence of Seqs</param>
-        private Seq GetMainSeq(List<Seq> seqs)
-        {
-			Seq rSeq = new Seq(0, new List<Trk>() { new Trk(0) }, MidiChannelIndexPerOutputVoice);
-
-            for(int i = 0; i < seqs.Count; ++i)
-            {
-				rSeq.Concat(seqs[i]);
-            }
-
-			return rSeq;
-        }
-
-        private void AddComposedModeSegmentsToSeqs(List<Seq> seqs, Tombeau1Voice voice)
-        {
-			List<Trk> trks = GamutTrkListsToTrks(voice.ModeSegments, voice.MidiChannel);
-            if(seqs.Count == 0)
-            {
-                for(int i = 0; i < trks.Count; ++i)
-                {
-                    seqs.Add(new Seq(0, new List<Trk>() { trks[i] }, MidiChannelIndexPerOutputVoice));
-                }
-            }
-            else
-            {
-                Debug.Assert(seqs.Count == trks.Count);
-                for(int i = 0; i < trks.Count;  ++i)
-                {
-                    Trk trk = trks[i];
-                    seqs[i].SetTrk(trk);
-                }
-            }
-        }
-
-        /// <summary>
-        /// This function is used while composing palettes.
-        /// It simply converts its argument to a list of Trks having the same midiChannel.
-        /// </summary>
-        private List<Trk> GamutTrkListsToTrks(IReadOnlyList<ModeSegment> modeSegmentList, int midiChannel)
-        {
-            List<Trk> seqTrks = new List<Trk>();
-            foreach(ModeSegment modeSegment in modeSegmentList)
-            {
-                Trk trk = GamutTrkListToTrk(modeSegment.GamutTrks, midiChannel);
-                seqTrks.Add(trk);
-            }
-            return seqTrks;
-        }
-
-        /// <summary>
-        /// This function simply converts its argument to a Trk having the given midiChannel.
-        /// </summary>
-        private Trk GamutTrkListToTrk(IReadOnlyList<GamutTrk> gamutTrkList, int midiChannel)
-        {
-            Trk trk = new Trk(midiChannel, 0, new List<IUniqueDef>());
-            foreach(GamutTrk gamutTrk in gamutTrkList)
-            {
-                trk.AddRange(gamutTrk);
-            }
-
-            return trk;
         }
 
         #region private properties for use by Tombeau1Algorithm

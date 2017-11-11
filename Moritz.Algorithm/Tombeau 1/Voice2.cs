@@ -184,5 +184,10 @@ namespace Moritz.Algorithm.Tombeau1
 		{
 			throw new NotImplementedException();
 		}
+
+		public override List<int> BarlineMsPositions()
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

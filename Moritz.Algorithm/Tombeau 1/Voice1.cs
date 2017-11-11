@@ -48,10 +48,10 @@ namespace Moritz.Algorithm.Tombeau1
 
 			RootGamut = new Gamut(relativePitchHierarchyIndex, basePitch, nPitchesPerOctave);
 
-			_modeSegments = GetBasicModeSegments(20);
+			_modeSegments = GetModeSegments(20);
 		 }
 
-		private List<ModeSegment> GetBasicModeSegments(int nModeSegments)
+		private List<ModeSegment> GetModeSegments(int nModeSegments)
 		{
 			List<GamutProximity> gamutProximities = RootGamut.FindRelatedGamuts();
 
@@ -74,18 +74,18 @@ namespace Moritz.Algorithm.Tombeau1
 			}
 
 			int rootOctave = 2;
-			List<ModeSegment> basicModeSegments = new List<ModeSegment>();
+			List<ModeSegment> modeSegments = new List<ModeSegment>();
 			int msPositionReContainer = 0;
 			foreach(var gamut in baseGamuts)
 			{
 				ModeSegment modeSegment = GetBasicModeSegment(msPositionReContainer, rootOctave, gamut.BasePitch, gamut.RelativePitchHierarchyIndex);
-				basicModeSegments.Add(modeSegment);
+				modeSegments.Add(modeSegment);
 				msPositionReContainer += modeSegment.MsDuration;
 			}
 
-			for(int i = 0; i < basicModeSegments.Count; ++i)
+			for(int i = 0; i < modeSegments.Count; ++i)
 			{
-				ModeSegment modeSegment = basicModeSegments[i];
+				ModeSegment modeSegment = modeSegments[i];
 				modeSegment.RemoveRange(modeSegment.Count - 4, 4);
 
 				if(i % 2 == 1)
@@ -93,10 +93,21 @@ namespace Moritz.Algorithm.Tombeau1
 					modeSegment.Reverse();
 				}
 
-				basicModeSegments[i] = Compose(modeSegment);
-			}
+				modeSegments[i] = Compose(modeSegment);
 
-			return basicModeSegments;
+				SetModeSegmentMsPositionsReContainer(modeSegments);
+			} 
+			return modeSegments;
+		}
+
+		private void SetModeSegmentMsPositionsReContainer(List<ModeSegment> modeSegments)
+		{
+			int msPos = 0;
+			foreach(ModeSegment modeSegment in modeSegments)
+			{
+				modeSegment.MsPositionReContainer = msPos;
+				msPos += modeSegment.MsDuration;
+			}
 		}
 
 		/// <summary>
@@ -380,6 +391,36 @@ namespace Moritz.Algorithm.Tombeau1
 		internal void AdjustForFourVoices()
 		{
 			throw new NotImplementedException();
+		}
+
+		public override List<int> BarlineMsPositions()
+		{
+			List<int> v1BarlinePositions = new List<int>();
+
+			var msValuesListList = GetMsValuesOfGamutTrks();
+
+			for(int i = 0; i < msValuesListList.Count; ++i)
+			{
+				var msValuesList = msValuesListList[i];
+				MsValues lastMsValues = msValuesList[msValuesList.Count - 1];
+
+				v1BarlinePositions.Add(lastMsValues.EndMsPosition);
+			}
+
+			#region insert intermediate barline positions
+			List<int> midBarlinePositions = new List<int>
+			{
+				MidBarlineMsPos(msValuesListList, 1),
+				MidBarlineMsPos(msValuesListList, 10),
+				MidBarlineMsPos(msValuesListList, 12)
+			};
+			foreach(int b in midBarlinePositions)
+			{
+				v1BarlinePositions.Add(b);
+			}
+			#endregion
+
+			return v1BarlinePositions;
 		}
 
 		public Gamut RootGamut { get; }

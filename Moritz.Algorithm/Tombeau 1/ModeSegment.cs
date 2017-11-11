@@ -95,6 +95,21 @@ namespace Moritz.Algorithm.Tombeau1
 			_gamutTrks.RemoveRange(startIndex, nItems);
 			SetMsPositionsReThisModeSegment();
 		}
+
+		/// <summary>
+		/// Returns a single Trk containing all the IUniqueDefs in the GamtTrks.
+		/// </summary>
+		internal Trk ToTrk()
+		{
+			Trk trk = new Trk(this.MidiChannel, this.MsPositionReContainer, new List<IUniqueDef>());
+			foreach(GamutTrk gamutTrk in this.GamutTrks)
+			{
+				trk.AddRange(gamutTrk);
+			}
+
+			return trk;
+		}
+
 		public void Reverse()
 		{
 			_gamutTrks.Reverse();
@@ -106,7 +121,7 @@ namespace Moritz.Algorithm.Tombeau1
 			int count = _gamutTrks.Count;
 			if(count > 0)
 			{
-				return $"Count={count.ToString()} Mode={_mode.ToString()}";
+				return $"Count={count.ToString()} Mode={_mode.ToString()} MsPositionReContainer={MsPositionReContainer}";
 			}
 			else
 			{
