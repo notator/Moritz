@@ -5,11 +5,13 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-    /// <summary>
-    /// A GamutGrpTrk is a Trk with a Gamut. The Gamut may not be null, and can be shared with other GamutGrpTrks.
-    /// In other words, GamutGrpTrks do not own their Gamuts.
-    /// </summary>
-    public class GamutGrpTrk : Trk
+	/// <summary>
+	/// A GamutGrpTrk is a Trk with a Gamut. The Gamut may not be null, and can be shared with other GamutGrpTrks.
+	/// In other words, GamutGrpTrks do not own their Gamuts.
+	/// GamutGrpTrk objects can only contain MidiChordDef and MidiRestDef objects.
+	/// This is because they are eventually concatenated to a single Trk which is added to a Seq.
+	/// </summary>
+	public class GamutGrpTrk : Trk
     {
 		#region constructors
 		/// <summary>
@@ -24,15 +26,13 @@ namespace Moritz.Algorithm.Tombeau1
 		public GamutGrpTrk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iudList, Gamut gamut, int rootOctave)
             : base(midiChannel, msPositionReContainer, iudList)
         {
-            Debug.Assert(gamut != null);
-            Debug.Assert(rootOctave >= 0);
+			_gamut = gamut; // _gamut is checked by AssertConsistency(iud) below.
+			RootOctave = rootOctave; // RootOctave is checked by AssertConsistency(iud) below.
+
 			foreach(IUniqueDef iud in iudList)
 			{
-				AssertPitches(gamut, iud);
+				AssertConsistency(iud);
 			}
-
-			_gamut = gamut;
-			RootOctave = rootOctave;
 
 			var velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch();
 
@@ -81,28 +81,32 @@ namespace Moritz.Algorithm.Tombeau1
 		/// </summary>
 		public override void Add(IUniqueDef iUniqueDef)
         {
-            Debug.Assert(_gamut != null);
-            AssertPitches(_gamut, iUniqueDef);
+            AssertConsistency(iUniqueDef);
             base.Add(iUniqueDef);
             SetBeamEnd();
         }
 
-        /// <summary>
-        /// A Debug.Assert fails if the iUniqueDef is a MidichordDef containing pitches that are not in the gamut
-        /// or if the iUniqueDef is a CautionaryChordDef.
-        /// </summary>
-        /// <param name="iUniqueDef"></param>
-        private void AssertPitches(Gamut gamut, IUniqueDef iUniqueDef)
-        {            
-            if(iUniqueDef is MidiChordDef mcd)
+		/// <summary>
+		/// A Debug.Assert fails
+		/// 1. if the iUniqueDef is neither a MidiChordDef nor a MidiRestDef.
+		/// 2. if _gamut is null.
+		/// 3. if the iUniqueDef is a MidiChordDef containing pitches that are not in _gamut.
+		/// 4. if RootOctave < 0.
+		/// </summary>
+		/// <param name="iUniqueDef"></param>
+		private void AssertConsistency(IUniqueDef iUniqueDef)
+        {
+			if(!(iUniqueDef is MidiChordDef || iUniqueDef is MidiRestDef))
+			{
+				Debug.Assert(false, "GamutGrpTrks can only contain MidiChordDef and MidiRestDef objects.");
+			}
+			Debug.Assert(_gamut != null, "_gamut must be set.");
+			if(iUniqueDef is MidiChordDef mcd)
             {
-                Debug.Assert(gamut.ContainsAllPitches(mcd));
+                Debug.Assert(_gamut.ContainsAllPitches(mcd));
             }
-            if(iUniqueDef is CautionaryChordDef)
-            {
-                Debug.Assert(false, "GamutGrpTrks cannot contain CautionaryChordDefs");
-            }
-        }
+			Debug.Assert(RootOctave >= 0, "Root Octave must be >= 0");
+		}
 
         /// <summary>
         /// Adds the argument's UniqueDefs to the end of this Trk.
@@ -110,10 +114,9 @@ namespace Moritz.Algorithm.Tombeau1
         /// </summary>
         public override void AddRange(VoiceDef voiceDef)
         {
-            Debug.Assert(_gamut != null);
             foreach(IUniqueDef iud in voiceDef.UniqueDefs)
             {
-				AssertPitches(_gamut, iud);
+				AssertConsistency(iud);
 			}
             base.AddRange(voiceDef);
             SetBeamEnd();
@@ -124,8 +127,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// </summary>
         public override void Insert(int index, IUniqueDef iUniqueDef)
         {
-            Debug.Assert(_gamut != null);
-			AssertPitches(_gamut, iUniqueDef);
+			AssertConsistency(iUniqueDef);
 			base.Insert(index, iUniqueDef);
             SetBeamEnd();
         }
@@ -135,10 +137,9 @@ namespace Moritz.Algorithm.Tombeau1
         /// </summary>
         public override void InsertRange(int index, Trk trk)
         {
-            Debug.Assert(_gamut != null);
             foreach(IUniqueDef iud in trk.UniqueDefs)
             {
-				AssertPitches(_gamut, iud);
+				AssertConsistency(iud);
 			}
             base.InsertRange(index, trk);
             SetBeamEnd();
@@ -148,8 +149,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// </summary>
         public override void Replace(int index, IUniqueDef replacementIUnique)
         {
-            Debug.Assert(_gamut != null);
-            AssertPitches(_gamut, replacementIUnique);
+            AssertConsistency(replacementIUnique);
             base.Replace(index, replacementIUnique);
             SetBeamEnd();
         }
@@ -169,10 +169,9 @@ namespace Moritz.Algorithm.Tombeau1
         /// <returns>this</returns>
         public override Trk Superimpose(Trk trk2)
         {
-            Debug.Assert(_gamut != null);
             foreach(IUniqueDef iud in trk2.UniqueDefs)
             {
-                AssertPitches(_gamut, iud);
+                AssertConsistency(iud);
             }
             Trk trk = base.Superimpose(trk2);
             SetBeamEnd();

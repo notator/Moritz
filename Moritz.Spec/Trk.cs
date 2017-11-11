@@ -8,8 +8,8 @@ using Moritz.Globals;
 namespace Moritz.Spec
 {
     /// <summary>
-    /// In Seqs, Trks can contain any combination of MidiRestDef, MidiChordDef and ClefDef.
-    /// In Blocks, Trks can additionally contain CautionaryChordDefs.
+    /// In Seqs, Trks can contain any combination of MidiRestDef and MidiChordDef.
+    /// In Blocks, Trks can additionally contain CautionaryChordDefs and ClefDefs.
     /// <para>All VoiceDef objects are IEnumerable, so that foreach loops can be used.</para>
     /// <para>For example:</para>
     /// <para>foreach(IUniqueDef iumdd in trk) { ... }</para>
@@ -65,13 +65,13 @@ namespace Moritz.Spec
 
         #endregion constructors
         /// <summary>
-        /// In seqs, trks can contain any combination of MidiRestDef, MidiChordDef and ClefDef.
+        /// In seqs, trks can contain any combination of MidiRestDef and MidiChordDef.
         /// </summary>
         internal void AssertConsistentInSeq()
         {
             foreach(IUniqueDef iud in UniqueDefs)
             {
-                Debug.Assert(iud is MidiChordDef || iud is MidiRestDef || iud is ClefDef);
+                Debug.Assert(iud is MidiChordDef || iud is MidiRestDef);
             }
         }
 
@@ -90,13 +90,13 @@ namespace Moritz.Spec
         /// <summary>
         /// Appends the new MidiChordDef, MidiRestDef, CautionaryChordDef or ClefDef to the end of the list.
         /// Automatically sets the iUniqueDef's msPosition.
-        /// Used by Block.PopBar(...), so accepts a CautionaryChordDef argument.
+        /// Used by Block.PopBar(...), so accepts CautionaryChordDef and ClefDef arguments.
         /// </summary>
         public override void Add(IUniqueDef iUniqueDef)
         {
             Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is MidiRestDef || iUniqueDef is CautionaryChordDef || iUniqueDef is ClefDef);
             _Add(iUniqueDef);
-        }
+		}
         /// <summary>
         /// Adds the argument's UniqueDefs to the end of this Trk.
         /// Sets the MsPositions of the appended UniqueDefs.
