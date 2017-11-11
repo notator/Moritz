@@ -14,7 +14,7 @@ namespace Moritz.Algorithm.Tombeau1
 			_modeSegments = Compose(voice1, voice2);
 		}
 
-		#region available Trk and GamutTrk transformations
+		#region available Trk and GamutGrpTrk transformations
 		// Add();
 		// AddRange();
 		// AdjustChordMsDurations();
@@ -44,7 +44,7 @@ namespace Moritz.Algorithm.Tombeau1
 		// Transpose();
 		// TransposeStepsInGamut();
 		// TransposeToRootInGamut();
-		#endregion available Trk and GamutTrk transformations
+		#endregion available Trk and GamutGrpTrk transformations
 
 		private List<ModeSegment> Compose(Voice1 voice1, Voice2 voice2)
 		{ 

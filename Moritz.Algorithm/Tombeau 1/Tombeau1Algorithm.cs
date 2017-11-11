@@ -428,7 +428,7 @@ namespace Moritz.Algorithm.Tombeau1
             return bars;
         }
 
-		#region available Trk and GamutTrk transformations
+		#region available Trk and GamutGrpTrk transformations
 		// Add();
 		// AddRange();
 		// AdjustChordMsDurations();
@@ -458,7 +458,7 @@ namespace Moritz.Algorithm.Tombeau1
 		// Transpose();
 		// TransposeStepsInGamut();
 		// TransposeToRootInGamut();
-		#endregion available Trk and GamutTrk transformations
+		#endregion available Trk and GamutGrpTrk transformations
 
 		/// <summary>
 		/// The compulsory first barline (at msPosition=0) is NOT included in the returned list.

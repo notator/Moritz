@@ -54,7 +54,7 @@ namespace Moritz.Algorithm.Tombeau1
 					var msValuesList = new List<MsValues>();
 					msValuesListList.Add(msValuesList);
 
-					GamutTrk pGamutTrk = modeSegment[j];
+					GamutGrpTrk pGamutTrk = modeSegment[j];
 					int gamutTrkMsPosition = modeSegmentMsPosition + pGamutTrk.MsPositionReContainer;
 					for(int k = 0; k < pGamutTrk.Count; k++)
 					{
@@ -86,7 +86,7 @@ namespace Moritz.Algorithm.Tombeau1
 		public abstract List<int> BarlineMsPositions();
 
 		/// <summary>
-		/// Returns the smallest GamutTrk msPosition greater than the middle msPosition of the ModeSegment.
+		/// Returns the smallest GamutGrpTrk msPosition greater than the middle msPosition of the ModeSegment.
 		/// </summary>
 		protected int MidBarlineMsPos(IReadOnlyList<IReadOnlyList<MsValues>> msValuesListList, int ModeSegmentNumber)
 		{

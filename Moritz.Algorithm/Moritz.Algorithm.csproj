@@ -52,7 +52,7 @@
     <Compile Include="Tombeau 1\Tombeau1Voice.cs" />
     <Compile Include="Tombeau 1\ModeSegment.cs" />
     <Compile Include="Tombeau 1\Voice3.cs" />
-    <Compile Include="Tombeau 1\GamutTrk.cs" />
+    <Compile Include="Tombeau 1\GamutGrpTrk.cs" />
     <Compile Include="Tombeau 1\Voice1.cs" />
     <Compile Include="Tombeau 1\Voice2.cs" />
     <Compile Include="Tombeau 1\Voice4.cs" />

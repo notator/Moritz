@@ -14,7 +14,7 @@ namespace Moritz.Algorithm.Tombeau1
 			_modeSegments = Compose(voice1);
 		}
 
-		#region available Trk and GamutTrk transformations
+		#region available Trk and GamutGrpTrk transformations
 		// Add();
 		// AddRange();
 		// AdjustChordMsDurations();
@@ -44,18 +44,18 @@ namespace Moritz.Algorithm.Tombeau1
 		// Transpose();
 		// TransposeStepsInGamut();
 		// TransposeToRootInGamut();
-		#endregion available Trk and GamutTrk transformations
+		#endregion available Trk and GamutGrpTrk transformations
 
 		#region old code
 		//    /// <summary>
 		//    /// Creates a list of TenorPaletteGamutTrks, each of which has the same relativePitchHierarchyIndex.
 		//    /// </summary>
-		//    private List<GamutTrk> GetTenorPaletteGamutTrkList(int relativePitchHierarchyIndex)
+		//    private List<GamutGrpTrk> GetTenorPaletteGamutTrkList(int relativePitchHierarchyIndex)
 		//    {
 		//        const int gamutBasePitch = 0;
-		//        List<GamutTrk> gamutTrks = new List<GamutTrk>();
+		//        List<GamutGrpTrk> gamutGrpTrks = new List<GamutGrpTrk>();
 
-		//        for(int i = 0, domain = 12; domain >= 1; --domain, ++i) // domain is both Gamut.PitchesPerOctave and nChords per GamutTrk
+		//        for(int i = 0, domain = 12; domain >= 1; --domain, ++i) // domain is both Gamut.PitchesPerOctave and nChords per GamutGrpTrk
 		//        {
 		//            Gamut gamut = new Gamut(relativePitchHierarchyIndex, gamutBasePitch, domain);
 
@@ -96,10 +96,10 @@ namespace Moritz.Algorithm.Tombeau1
 		////}
 		//#endregion
 
-		//#region begin test code 5, related GamutTrks
+		//#region begin test code 5, related GamutGrpTrks
 		////if(domain % 2 != 0 && tpg.Count > 1)
 		////{
-		////    TenorPaletteGamutTrk previousTpg = (TenorPaletteGamutTrk)gamutTrks[i - 1];
+		////    TenorPaletteGamutTrk previousTpg = (TenorPaletteGamutTrk)gamutGrpTrks[i - 1];
 		////    //tpg = previousTpg.RelatedPitchHierarchyGamutTrk(previousTpg.Gamut.RelativePitchHierarchyIndex + 11);
 		////    //tpg = previousTpg.RelatedBasePitchGamutTrk(11);
 		////    tpg = previousTpg.RelatedDomainGamutTrk(6);
@@ -135,7 +135,7 @@ namespace Moritz.Algorithm.Tombeau1
 		//#region begin test code 8, set inverse velocities
 		////if(domain % 2 != 0 && tpg.Count > 1)
 		////{
-		////    TenorPaletteGamutTrk prevTpg = (TenorPaletteGamutTrk)gamutTrks[i - 1];
+		////    TenorPaletteGamutTrk prevTpg = (TenorPaletteGamutTrk)gamutGrpTrks[i - 1];
 		////    Gamut prevGamut = prevTpg.Gamut;
 		////    tpg = new TenorPaletteGamutTrk(prevGamut); // identical to prevTpg
 		////    // inverse velocityPerAbsolutePitch
@@ -147,7 +147,7 @@ namespace Moritz.Algorithm.Tombeau1
 		//#region begin test code 8, set Gamut (pitches
 		////if(domain % 2 != 0 && tpg.Count > 1)
 		////{
-		////    TenorPaletteGamutTrk prevTpg = (TenorPaletteGamutTrk)gamutTrks[i - 1];
+		////    TenorPaletteGamutTrk prevTpg = (TenorPaletteGamutTrk)gamutGrpTrks[i - 1];
 		////    Gamut prevGamut = prevTpg.Gamut;
 		////    tpg = new TenorPaletteGamutTrk(prevGamut); // identical to prevTpg
 
@@ -163,10 +163,10 @@ namespace Moritz.Algorithm.Tombeau1
 		////}
 		//#endregion
 
-		//gamutTrks.Add(tpg);
+		//gamutGrpTrks.Add(tpg);
 		//        }
 
-		//        return (gamutTrks);
+		//        return (gamutGrpTrks);
 		//    }
 		#endregion
 

@@ -5,7 +5,7 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-	#region available Trk and GamutTrk transformations
+	#region available Trk and GamutGrpTrk transformations
 	// Add();
 	// AddRange();
 	// AdjustChordMsDurations();
@@ -35,7 +35,7 @@ namespace Moritz.Algorithm.Tombeau1
 	// Transpose();
 	// TransposeStepsInGamut();
 	// TransposeToRootInGamut();
-	#endregion available Trk and GamutTrk transformations
+	#endregion available Trk and GamutGrpTrk transformations
 
 	internal class Voice1 : Tombeau1Voice
     {
@@ -157,36 +157,36 @@ namespace Moritz.Algorithm.Tombeau1
 		}
 
 		/// <summary>
-		/// The returned ModeSegment contains GamutTrk objects that all have the same Gamut.Mode.AbsolutePitchHierarchy.
+		/// The returned ModeSegment contains GamutGrpTrk objects that all have the same Gamut.Mode.AbsolutePitchHierarchy.
 		/// </summary>
 		private ModeSegment GetBasicModeSegment(int modeSegmentMsPositionReContainer, int rootOctave, int gamutBasePitch, int relativePitchHierarchyIndex)
 		{
 			//const int gamutBasePitch = 9;
-			var gamutTrks = new List<GamutTrk>();
+			var gamutGrpTrks = new List<GamutGrpTrk>();
 			int msPositionReContainer = 0;
-			for(int i = 0, nPitchesPerOctave = 12; nPitchesPerOctave >= 1; --nPitchesPerOctave, ++i) // domain is both Gamut.PitchesPerOctave and nChords per GamutTrk
+			for(int i = 0, nPitchesPerOctave = 12; nPitchesPerOctave >= 1; --nPitchesPerOctave, ++i) // domain is both Gamut.PitchesPerOctave and nChords per GamutGrpTrk
 			{
 				Gamut gamut = new Gamut(relativePitchHierarchyIndex, gamutBasePitch, nPitchesPerOctave);
 
-				GamutTrk gamutTrk = new GamutTrk(this.MidiChannel, msPositionReContainer, new List<IUniqueDef>(), gamut, rootOctave);
+				GamutGrpTrk gamutGrpTrk = new GamutGrpTrk(this.MidiChannel, msPositionReContainer, new List<IUniqueDef>(), gamut, rootOctave);
 
 				int nChords = nPitchesPerOctave;
 				//pitchesPerChord = 5;
 				//totalMsDuration = 1000;
-				AddMidiChordDefs(gamutTrk, nChords, 5, nChords * 200);
+				AddMidiChordDefs(gamutGrpTrk, nChords, 5, nChords * 200);
 
 				int minMsDuration = 230;
 				int maxMsDuration = 380;
-				gamutTrk.SetDurationsFromPitches(maxMsDuration, minMsDuration, true);
+				gamutGrpTrk.SetDurationsFromPitches(maxMsDuration, minMsDuration, true);
 
-				gamutTrk.SortRootNotatedPitchAscending();
+				gamutGrpTrk.SortRootNotatedPitchAscending();
 
-				gamutTrks.Add(gamutTrk);
+				gamutGrpTrks.Add(gamutGrpTrk);
 
-				msPositionReContainer += gamutTrk.MsDuration;
+				msPositionReContainer += gamutGrpTrk.MsDuration;
 			}
 
-			ModeSegment basicModeSegment = new ModeSegment(this.MidiChannel, modeSegmentMsPositionReContainer, gamutTrks);
+			ModeSegment basicModeSegment = new ModeSegment(this.MidiChannel, modeSegmentMsPositionReContainer, gamutGrpTrks);
 
 			return (basicModeSegment);
 		}
@@ -197,21 +197,21 @@ namespace Moritz.Algorithm.Tombeau1
 		/// <param name="nChords"></param>
 		/// <param name="nPitchesPerChord"></param>
 		/// <param name="totalMsDuration"></param>
-		public void AddMidiChordDefs(GamutTrk gamutTrk, int nChords, int nPitchesPerChord, int totalMsDuration)
+		public void AddMidiChordDefs(GamutGrpTrk gamutGrpTrk, int nChords, int nPitchesPerChord, int totalMsDuration)
 		{
 			Debug.Assert(nChords > 0);
 			Debug.Assert(nPitchesPerChord > 0);
 			int msDurationPerChord = totalMsDuration / nChords;
 			Debug.Assert(msDurationPerChord > 0);
 
-			List<IUniqueDef> uniqueDefs = gamutTrk.UniqueDefs;
-			Gamut gamut = gamutTrk.Gamut;
+			List<IUniqueDef> uniqueDefs = gamutGrpTrk.UniqueDefs;
+			Gamut gamut = gamutGrpTrk.Gamut;
 			for(int i = 0; i < nChords; ++i)
 			{
 				int rootNotatedPitch;
 				if(i == 0)
 				{
-					rootNotatedPitch = gamut.Mode.AbsolutePitchHierarchy[i] + (12 * gamutTrk.RootOctave);
+					rootNotatedPitch = gamut.Mode.AbsolutePitchHierarchy[i] + (12 * gamutGrpTrk.RootOctave);
 					rootNotatedPitch = (rootNotatedPitch <= gamut.MaxPitch) ? rootNotatedPitch : gamut.MaxPitch;
 				}
 				else
@@ -239,7 +239,7 @@ namespace Moritz.Algorithm.Tombeau1
 				uniqueDefs.Add(mcd);
 			}
 
-			gamutTrk.MsDuration = totalMsDuration;
+			gamutGrpTrk.MsDuration = totalMsDuration;
 		}
 
 		protected ModeSegment Compose(ModeSegment paletteModeSegment)
@@ -248,49 +248,49 @@ namespace Moritz.Algorithm.Tombeau1
 
 			for(int index = 0; index < pModeSegment.Count; ++index)
 			{
-				GamutTrk gamutTrk = pModeSegment[index];
+				GamutGrpTrk gamutGrpTrk = pModeSegment[index];
 
 				#region current version
-				if(gamutTrk.UniqueDefs[0] is MidiChordDef firstMcd && gamutTrk.UniqueDefs[gamutTrk.UniqueDefs.Count - 1] is MidiChordDef lastMcd)
+				if(gamutGrpTrk.UniqueDefs[0] is MidiChordDef firstMcd && gamutGrpTrk.UniqueDefs[gamutGrpTrk.UniqueDefs.Count - 1] is MidiChordDef lastMcd)
 				{
-					gamutTrk.Shear(0, -1 * (gamutTrk.Gamut.NPitchesPerOctave));
+					gamutGrpTrk.Shear(0, -1 * (gamutGrpTrk.Gamut.NPitchesPerOctave));
 
 					while(lastMcd.NotatedMidiPitches[0] % 12 != (firstMcd.NotatedMidiPitches[0] % 12))
 					{
-						gamutTrk.Shear(0, -1);
+						gamutGrpTrk.Shear(0, -1);
 					}
 				}
 
 				var velocityPerAbsolutePitch = RootGamut.GetVelocityPerAbsolutePitch();
-				gamutTrk.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+				gamutGrpTrk.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
 
 				double minHairpin = 0.5;
 				double maxHairpin = 1.3;
 				int indexMax;
-				if(gamutTrk.Count > 1)
+				if(gamutGrpTrk.Count > 1)
 				{
 					if(index % 2 != 0)
 					{
-						gamutTrk.Permute(1, 7);
-						indexMax = gamutTrk.Count / 3;
-						if(indexMax > 0 && indexMax < gamutTrk.Count)
+						gamutGrpTrk.Permute(1, 7);
+						indexMax = gamutGrpTrk.Count / 3;
+						if(indexMax > 0 && indexMax < gamutGrpTrk.Count)
 						{
-							gamutTrk.AdjustVelocitiesHairpin(0, indexMax, minHairpin, maxHairpin);
-							gamutTrk.AdjustVelocitiesHairpin(indexMax, gamutTrk.Count, maxHairpin, minHairpin);
+							gamutGrpTrk.AdjustVelocitiesHairpin(0, indexMax, minHairpin, maxHairpin);
+							gamutGrpTrk.AdjustVelocitiesHairpin(indexMax, gamutGrpTrk.Count, maxHairpin, minHairpin);
 						}
 					}
 					else
 					{
-						indexMax = (gamutTrk.Count * 2) / 3;
-						if(indexMax > 0 && indexMax < gamutTrk.Count)
+						indexMax = (gamutGrpTrk.Count * 2) / 3;
+						if(indexMax > 0 && indexMax < gamutGrpTrk.Count)
 						{
-							gamutTrk.AdjustVelocitiesHairpin(0, indexMax, minHairpin, maxHairpin);
-							gamutTrk.AdjustVelocitiesHairpin((gamutTrk.Count * 2) / 3, gamutTrk.Count, maxHairpin, minHairpin);
+							gamutGrpTrk.AdjustVelocitiesHairpin(0, indexMax, minHairpin, maxHairpin);
+							gamutGrpTrk.AdjustVelocitiesHairpin((gamutGrpTrk.Count * 2) / 3, gamutGrpTrk.Count, maxHairpin, minHairpin);
 						}
 					}
 				}
 
-				//gamutTrk.AdjustChordMsDurations(factor: 5);
+				//gamutGrpTrk.AdjustChordMsDurations(factor: 5);
 				#endregion current version
 
 				#region begin test code 2 transpose chords to the same absolute root pitch
@@ -307,10 +307,10 @@ namespace Moritz.Algorithm.Tombeau1
 				//}
 				#endregion
 
-				#region begin test code 5, related GamutTrks
+				#region begin test code 5, related GamutGrpTrks
 				//if(domain % 2 != 0 && g.Count > 1)
 				//{
-				//    TenorPaletteGamutTrk previousTpg = (TenorPaletteGamutTrk)gamutTrks[i - 1];
+				//    TenorPaletteGamutTrk previousTpg = (TenorPaletteGamutTrk)gamutGrpTrks[i - 1];
 				//    //g = previousTpg.RelatedPitchHierarchyGamutTrk(previousTpg.Gamut.RelativePitchHierarchyIndex + 11);
 				//    //g = previousTpg.RelatedBasePitchGamutTrk(11);
 				//    g = previousTpg.RelatedDomainGamutTrk(6);
@@ -318,9 +318,9 @@ namespace Moritz.Algorithm.Tombeau1
 				#endregion
 
 				#region begin test code 6, timeWarp
-				//if(gamutTrk.Count > 1)
+				//if(gamutGrpTrk.Count > 1)
 				//{
-				//	gamutTrk.TimeWarp(new Envelope(new List<byte>() { 4, 7, 2 }, 7, 7, gamutTrk.Count), 20);
+				//	gamutGrpTrk.TimeWarp(new Envelope(new List<byte>() { 4, 7, 2 }, 7, 7, gamutGrpTrk.Count), 20);
 				//}
 				#endregion
 
@@ -346,7 +346,7 @@ namespace Moritz.Algorithm.Tombeau1
 				#region begin test code 8, set inverse velocities
 				//if(domain % 2 != 0 && g.Count > 1)
 				//{
-				//    TenorPaletteGamutTrk prevTpg = (TenorPaletteGamutTrk)gamutTrks[i - 1];
+				//    TenorPaletteGamutTrk prevTpg = (TenorPaletteGamutTrk)gamutGrpTrks[i - 1];
 				//    Gamut prevGamut = prevTpg.Gamut;
 				//    g = new TenorPaletteGamutTrk(prevGamut); // identical to prevTpg
 				//    // inverse velocityPerAbsolutePitch
@@ -358,7 +358,7 @@ namespace Moritz.Algorithm.Tombeau1
 				#region begin test code 8, set Gamut (pitches
 				//if(domain % 2 != 0 && g.Count > 1)
 				//{
-				//    TenorPaletteGamutTrk prevTpg = (TenorPaletteGamutTrk)gamutTrks[i - 1];
+				//    TenorPaletteGamutTrk prevTpg = (TenorPaletteGamutTrk)gamutGrpTrks[i - 1];
 				//    Gamut prevGamut = prevTpg.Gamut;
 				//    g = new TenorPaletteGamutTrk(prevGamut); // identical to prevTpg
 
@@ -408,16 +408,16 @@ namespace Moritz.Algorithm.Tombeau1
 			}
 
 			#region insert intermediate barline positions
-			List<int> midBarlinePositions = new List<int>
-			{
-				MidBarlineMsPos(msValuesListList, 1),
-				MidBarlineMsPos(msValuesListList, 10),
-				MidBarlineMsPos(msValuesListList, 12)
-			};
-			foreach(int b in midBarlinePositions)
-			{
-				v1BarlinePositions.Add(b);
-			}
+			//List<int> midBarlinePositions = new List<int>
+			//{
+			//	MidBarlineMsPos(msValuesListList, 1),
+			//	MidBarlineMsPos(msValuesListList, 10),
+			//	MidBarlineMsPos(msValuesListList, 12)
+			//};
+			//foreach(int b in midBarlinePositions)
+			//{
+			//	v1BarlinePositions.Add(b);
+			//}
 			#endregion
 
 			return v1BarlinePositions;
