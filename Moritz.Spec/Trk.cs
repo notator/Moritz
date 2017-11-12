@@ -8,9 +8,10 @@ using Moritz.Globals;
 namespace Moritz.Spec
 {
     /// <summary>
+	/// Trks are "OutputVoiceDefs".
     /// In Seqs, Trks can contain any combination of MidiRestDef and MidiChordDef.
     /// In Blocks, Trks can additionally contain CautionaryChordDefs and ClefDefs.
-    /// <para>All VoiceDef objects are IEnumerable, so that foreach loops can be used.</para>
+    /// <para>Trks are, like all VoiceDef objects, IEnumerable, so that foreach loops can be used.</para>
     /// <para>For example:</para>
     /// <para>foreach(IUniqueDef iumdd in trk) { ... }</para>
     /// <para>An Enumerator for MidiChordDefs is also defined so that</para>

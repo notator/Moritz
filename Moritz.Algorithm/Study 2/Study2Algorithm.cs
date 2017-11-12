@@ -28,23 +28,25 @@ namespace Moritz.Algorithm.Study2
             _krystals = krystals;
             _palettes = palettes;
 
-            List<VoiceDef> sequentialStaff1Bars = WriteTopStaff();
-            List<VoiceDef> sequentialStaff2Bars = WriteLowerStaff(2, sequentialStaff1Bars);
-            List<VoiceDef> sequentialStaff3Bars = WriteLowerStaff(3, sequentialStaff1Bars);
+            List<Trk> sequentialStaff1Bars = WriteTopStaff();
+            List<Trk> sequentialStaff2Bars = WriteLowerStaff(2, sequentialStaff1Bars);
+            List<Trk> sequentialStaff3Bars = WriteLowerStaff(3, sequentialStaff1Bars);
             Debug.Assert((sequentialStaff1Bars.Count == sequentialStaff2Bars.Count) 
                       && (sequentialStaff1Bars.Count == sequentialStaff3Bars.Count));
 
             List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
             for(int barIndex = 0; barIndex < sequentialStaff1Bars.Count; ++barIndex)
             {
-                List<VoiceDef> bar = new List<VoiceDef>();
-                bar.Add(sequentialStaff1Bars[barIndex]);
-                bar.Add(sequentialStaff2Bars[barIndex]);
-                bar.Add(sequentialStaff3Bars[barIndex]);
-                bars.Add(bar);
+				List<VoiceDef> bar = new List<VoiceDef>
+				{
+					sequentialStaff1Bars[barIndex],
+					sequentialStaff2Bars[barIndex],
+					sequentialStaff3Bars[barIndex]
+				};
+				bars.Add(bar);
             }
 
-            InsertClefChanges(bars);
+			InsertClefChanges(bars);
 
             return bars;
         }
@@ -55,17 +57,17 @@ namespace Moritz.Algorithm.Study2
             //voiceDef.InsertClefDef(1, "b");
         }
 
-        private List<VoiceDef> WriteTopStaff()
+        private List<Trk> WriteTopStaff()
         {
-            List<VoiceDef> consecutiveBars = new List<VoiceDef>();
+            List<Trk> consecutiveBars = new List<Trk>();
             List<List<int>> dcValuesPerTopStaffBar = _krystals[0].GetValues(_krystals[0].Level);
             int msPosition = 0;
             for(int barIndex = 0; barIndex < dcValuesPerTopStaffBar.Count; barIndex++)
             {
-                VoiceDef voice = new Trk(0, 0, new List<IUniqueDef>());
+                Trk trk = new Trk(0, 0, new List<IUniqueDef>());
                 List<int> sequence = dcValuesPerTopStaffBar[barIndex];
-                WriteDurationSymbolsForStrandInTopStaff(voice, barIndex, sequence, ref msPosition);
-                consecutiveBars.Add(voice);
+                WriteDurationSymbolsForStrandInTopStaff(trk, barIndex, sequence, ref msPosition);
+                consecutiveBars.Add(trk);
             }
             return consecutiveBars;
         }
@@ -83,9 +85,9 @@ namespace Moritz.Algorithm.Study2
             }
         }
 
-        private List<VoiceDef> WriteLowerStaff(int staffNumber, List<VoiceDef> topStaffBars)
+        private List<Trk> WriteLowerStaff(int staffNumber, List<Trk> topStaffBars)
         {
-            List<VoiceDef> consecutiveBars = new List<VoiceDef>();
+            List<Trk> consecutiveBars = new List<Trk>();
             Krystal krystal = _krystals[staffNumber - 1];
             Palette palette = _palettes[staffNumber - 1];
             List<List<int>> strandValuesList = krystal.GetValues(krystal.Level);
@@ -93,12 +95,12 @@ namespace Moritz.Algorithm.Study2
 
             for(int barIndex = 0; barIndex < strandValuesList.Count; barIndex++)
             {
-                VoiceDef topStaffVoice =  topStaffBars[barIndex];
-				VoiceDef newVoice = new Trk(staffNumber-1, 0, new List<IUniqueDef>());
-                int currentMsPositionReFirstIUD = topStaffVoice.UniqueDefs[0].MsPositionReFirstUD;
+                Trk topStaffTrk =  topStaffBars[barIndex];
+				Trk newTrk = new Trk(staffNumber-1, 0, new List<IUniqueDef>());
+                int currentMsPositionReFirstIUD = topStaffTrk.UniqueDefs[0].MsPositionReFirstUD;
 
                 List<int> lowerStaffValueSequence = strandValuesList[barIndex];
-                List<int> lowerStaffMsDurations = LowerStaffMsDurations(topStaffVoice, lowerStaffValueSequence.Count);
+                List<int> lowerStaffMsDurations = LowerStaffMsDurations(topStaffTrk, lowerStaffValueSequence.Count);
                 for(int valueIndex = 0; valueIndex < lowerStaffValueSequence.Count; valueIndex++)
                 {
                     int value = lowerStaffValueSequence[valueIndex];
@@ -106,10 +108,10 @@ namespace Moritz.Algorithm.Study2
                     noteDef.MsDuration = lowerStaffMsDurations[valueIndex];
                     noteDef.MsPositionReFirstUD = currentMsPositionReFirstIUD;
                     currentMsPositionReFirstIUD += noteDef.MsDuration; 
-                    newVoice.UniqueDefs.Add(noteDef);
+                    newTrk.UniqueDefs.Add(noteDef);
                 }
 
-                consecutiveBars.Add(newVoice);
+                consecutiveBars.Add(newTrk);
             }
             return consecutiveBars;
         }

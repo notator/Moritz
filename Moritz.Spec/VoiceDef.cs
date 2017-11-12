@@ -9,20 +9,12 @@ using Moritz.Globals;
 
 namespace Moritz.Spec
 {
-    /// <summary>
-    /// A temporal sequence of IUniqueDef objects.
-    /// <para>(IUniqueDef is implemented by all Unique...Defs that will eventually be converted to NoteObjects.)</para>
-    /// <para></para>
-    /// <para>This class is IEnumerable, so that foreach loops can be used.</para>
-    /// <para>For example:</para>
-    /// <para>foreach(IUniqueDef iumdd in voiceDef) { ... }</para>
-    /// <para>An Enumerator for MidiChordDefs is also defined so that</para>
-    /// <para>foreach(MidiChordDef mcd in voiceDef.MidiChordDefs) { ... }</para>
-    /// <para>can also be used.</para>
-    /// <para>This class is also indexable, as in:</para>
-    /// <para>IUniqueDef iu = this[index];</para>
-    /// </summary>
-    public abstract class VoiceDef : IEnumerable
+	/// <summary>
+	/// The base class for Trk and InputVoiceDef.
+	/// <para>VoiceDef classes are IEnumerable (foreach loops can be used).</para>
+	/// <para>They are also indexable (IUniqueDef iu = this[index])</para>
+	/// </summary>
+	public abstract class VoiceDef : IEnumerable
     {
         #region constructors
 
