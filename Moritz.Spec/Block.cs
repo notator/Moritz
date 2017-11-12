@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Moritz.Spec
 {
-    public class Block : IVoiceDefContainer
+    public class Block : ITrksContainer
     {
         protected Block() { } // called by MainBlock constructor
 

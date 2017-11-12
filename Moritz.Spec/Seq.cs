@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Moritz.Spec
 {
-	public class Seq : IVoiceDefContainer
+	public class Seq : ITrksContainer
 	{
         /// <summary>
         /// trks.Count must be less than or equal to midiChannelIndexPerOutputVoice.Count. (See trks parameter comment.)

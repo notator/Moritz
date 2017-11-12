@@ -59,7 +59,7 @@
     <Compile Include="ClefDef.cs" />
     <Compile Include="Gamut.cs" />
     <Compile Include="InputNoteDef.cs" />
-    <Compile Include="IVoiceDefContainer.cs" />
+    <Compile Include="ITrksContainer.cs" />
     <Compile Include="Envelope.cs" />
     <Compile Include="Mode.cs" />
     <Compile Include="MsValues.cs" />
