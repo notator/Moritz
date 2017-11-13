@@ -21,7 +21,7 @@ namespace Moritz.Algorithm.PianolaMusic
 		public override int NumberOfInputVoices { get { return 0; } }
 
 		// Neither the krystals, nor the palettes argument is used.
-		public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+		public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
 		{
 			List<Trk> tracks1and6 = GetTracks1and6();
 			List<Trk> tracks2and5 = GetTracks2and5();
@@ -31,30 +31,37 @@ namespace Moritz.Algorithm.PianolaMusic
 			List<Trk> trks = new List<Trk>() { tracks1and6[0], tracks2and5[0], tracks3and4[0], tracks3and4[1], tracks2and5[1], tracks1and6[1] };
 			Debug.Assert(trks.Count == MidiChannelIndexPerOutputVoice.Count);
 
-            Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
-            double approxBarMsDuration = ((double)seq.MsDuration / 8);
-            List<int> approxBarlineMsPositions = new List<int>();
-            for(int barnumber = 1; barnumber < 9; ++barnumber)
-            {
-                approxBarlineMsPositions.Add((int)Math.Round(approxBarMsDuration * barnumber));
-            }
-            Block block = new Block(seq, approxBarlineMsPositions);
+			Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
 
-            MainBlock mainBlock = new MainBlock(InitialClefPerChannel, new List<Block>() { block });
+			List<int> barlineMsPositions = GetBarlineMsPositions(seq);
 
-            List <List<VoiceDef>> bars = mainBlock.ConvertToBars();
+			List<Bar> bars = seq.GetBars(barlineMsPositions);
 
-            SetPatch0InTheFirstChordInEachVoice(bars[0]);
+			SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
-            #region test code
-            InsertClefChanges(bars);
-            InsertLyrics(bars);
-            #endregion
+			#region test code
+			InsertClefChanges(bars);
+			InsertLyrics(bars);
+			#endregion
 
-            return bars;
+			return bars;
 		}
 
-        protected override void InsertClefChanges(List<List<VoiceDef>> bars)
+		private static List<int> GetBarlineMsPositions(Seq seq)
+		{
+			int barMsDuration = (seq.MsDuration / 8);
+			Debug.Assert(barMsDuration * 8 == seq.MsDuration);
+
+			List<int> barlineMsPositions = new List<int>();
+			for(int barnumber = 1; barnumber < 9; ++barnumber)
+			{
+				barlineMsPositions.Add(barMsDuration * barnumber);
+			}
+
+			return barlineMsPositions;
+		}
+
+		protected override void InsertClefChanges(List<Bar> bars)
         {
             // test code...
             //VoiceDef voiceDef1 = bars[0][1];
@@ -68,7 +75,7 @@ namespace Moritz.Algorithm.PianolaMusic
             //voiceDef1.InsertClefDef(2, "t");
         }
 
-        protected void InsertLyrics(List<List<VoiceDef>> bars)
+        protected void InsertLyrics(List<Bar> bars)
         {
             // test code...
             //VoiceDef voiceDef0 = bars[0][0];
@@ -232,10 +239,10 @@ namespace Moritz.Algorithm.PianolaMusic
         /// The patch only needs to be set in the first chord in each voice,
         /// since it will be set by shunting if the Assistant Performer starts later.
         /// </summary>
-        private void SetPatch0InTheFirstChordInEachVoice(List<VoiceDef> bar1)
+        private void SetPatch0InTheFirstChordInEachVoice(Bar bar1)
 		{
 			MidiChordDef midiChordDef = null;
-			foreach(VoiceDef voiceDef in bar1)
+			foreach(VoiceDef voiceDef in bar1.VoiceDefs)
 			{
 				foreach(IUniqueDef iUniqueDef in voiceDef.UniqueDefs)
 				{

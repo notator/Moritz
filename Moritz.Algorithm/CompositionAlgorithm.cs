@@ -135,7 +135,7 @@ namespace Moritz.Algorithm
         /// Algorithms simply set the InputVoice references to OutputVoices (voiceIDs) by using their index
         /// in the default bar layout being created.
         /// </summary>
-        public abstract List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes);
+        public abstract List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes);
 
         /// <summary>
         /// This function standardizes the place where clef changes are added to the score.
@@ -143,7 +143,7 @@ namespace Moritz.Algorithm
         /// This function is abstract as a reminder that it exists. It can be empty.
         /// ClefDefs should be inserted using the voiceDef.InsertClefDef(index, clefType) function.
         /// </summary>
-        protected abstract void InsertClefChanges(List<List<VoiceDef>> bars);
+        protected abstract void InsertClefChanges(List<Bar> bars);
 
         /// <summary>
         /// Sets InitialClefPerChannel to contain a clef for every channel (=voiceDef).

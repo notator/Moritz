@@ -47,12 +47,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicMidiChordDef.cs" />
+    <Compile Include="Bar.cs" />
     <Compile Include="CarryMsgs.cs" />
     <Compile Include="GamutProximity.cs" />
     <Compile Include="MidiMsg.cs" />
     <Compile Include="MidiRestDef.cs" />
-    <Compile Include="MainBlock.cs" />
-    <Compile Include="Block.cs" />
     <Compile Include="CCSettings.cs">
       <SubType>Code</SubType>
     </Compile>

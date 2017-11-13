@@ -30,15 +30,34 @@ namespace Moritz.Spec
 
             AssertVoiceDefConsistency();
         }
-        #endregion constructors
+		#endregion constructors
 
-        #region public indexer & enumerator
-        /// <summary>
-        /// Indexer. Allows individual UniqueDefs to be accessed using array notation on the VoiceDef.
-        /// Automatically resets the MsPositions of all UniqueDefs in the list.
-        /// e.g. iumdd = voiceDef[3].
-        /// </summary>
-        public IUniqueDef this[int i]
+		internal void SetToRange(VoiceDef argVoiceDef, int startMsPosReSeq, int endMsPosReSeq)
+		{
+			_uniqueDefs.Clear();
+			foreach(IUniqueDef iud in argVoiceDef)
+			{
+				int msPos = iud.MsPositionReFirstUD;
+				if(msPos < startMsPosReSeq)
+				{
+					continue;
+				}
+				if(msPos >= endMsPosReSeq)
+				{
+					break;
+				}
+				_uniqueDefs.Add(iud);
+			}
+			SetMsPositionsReFirstUD();
+		}
+
+		#region public indexer & enumerator
+		/// <summary>
+		/// Indexer. Allows individual UniqueDefs to be accessed using array notation on the VoiceDef.
+		/// Automatically resets the MsPositions of all UniqueDefs in the list.
+		/// e.g. iumdd = voiceDef[3].
+		/// </summary>
+		public IUniqueDef this[int i]
         {
             get
             {
@@ -405,7 +424,7 @@ namespace Moritz.Spec
         public abstract void Add(IUniqueDef iUniqueDef);
         protected void _Add(IUniqueDef iUniqueDef)
         {
-            Debug.Assert(!(Container is Block), "Cannot Add IUniqueDefs inside a Block.");
+            Debug.Assert(!(Container is Bar), "Cannot Add IUniqueDefs inside a Bar.");
 
             if(_uniqueDefs.Count > 0)
 			{
@@ -423,7 +442,7 @@ namespace Moritz.Spec
         public abstract void AddRange(VoiceDef voiceDef);
         protected void _AddRange(VoiceDef voiceDef)
         {
-            Debug.Assert(!(Container is Block), "Cannot AddRange of VoiceDefs inside a Block.");
+            Debug.Assert(!(Container is Bar), "Cannot AddRange of VoiceDefs inside a Block.");
 
             _uniqueDefs.AddRange(voiceDef.UniqueDefs);
             SetMsPositionsReFirstUD();
@@ -434,7 +453,7 @@ namespace Moritz.Spec
         public abstract void Insert(int index, IUniqueDef iUniqueDef);
         protected void _Insert(int index, IUniqueDef iUniqueDef)
         {
-            Debug.Assert(!(Container is Block && iUniqueDef.MsDuration > 0), "Cannot Insert IUniqueDefs that have msDuration inside a Block.");
+            Debug.Assert(!(Container is Bar && iUniqueDef.MsDuration > 0), "Cannot Insert IUniqueDefs that have msDuration inside a Bar.");
 
             _uniqueDefs.Insert(index, iUniqueDef);
             SetMsPositionsReFirstUD();
@@ -443,7 +462,7 @@ namespace Moritz.Spec
         }
         protected void _InsertRange(int index, VoiceDef voiceDef)
         {
-            Debug.Assert(!(Container is Block), "Cannot Insert range of IUniqueDefs inside a Block.");
+            Debug.Assert(!(Container is Bar), "Cannot Insert range of IUniqueDefs inside a Bar.");
 
             _uniqueDefs.InsertRange(index, voiceDef.UniqueDefs);
             SetMsPositionsReFirstUD();
@@ -508,7 +527,7 @@ namespace Moritz.Spec
         /// </summary>
         protected void _Replace(int index, IUniqueDef replacementIUnique)
         {
-            Debug.Assert(!(Container is Block), "Cannot Replace IUniqueDefs inside a Block.");
+            Debug.Assert(!(Container is Bar), "Cannot Replace IUniqueDefs inside a Block.");
 
             Debug.Assert(index >= 0 && index < _uniqueDefs.Count);
             _uniqueDefs.RemoveAt(index);
@@ -640,7 +659,7 @@ namespace Moritz.Spec
         /// </summary>
         protected void AdjustMsDurations<T>(int beginIndex, int endIndex, double factor, int minThreshold = 100)
         {
-            Debug.Assert(!(Container is Block), "Cannot AdjustChordMsDurations inside a Block.");
+            Debug.Assert(!(Container is Bar), "Cannot AdjustChordMsDurations inside a Bar.");
 
 			if(CheckIndices(beginIndex, endIndex))
 			{

@@ -23,7 +23,7 @@ namespace Moritz.Algorithm.Study2
         /// <summary>
         /// See CompositionAlgorithm.DoAlgorithm()
         /// </summary>
-        public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+        public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
         {
             _krystals = krystals;
             _palettes = palettes;
@@ -34,24 +34,31 @@ namespace Moritz.Algorithm.Study2
             Debug.Assert((sequentialStaff1Bars.Count == sequentialStaff2Bars.Count) 
                       && (sequentialStaff1Bars.Count == sequentialStaff3Bars.Count));
 
-            List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
+            List<Bar> bars = new List<Bar>();
+			int seqBarAbsMsPosition = 0;
             for(int barIndex = 0; barIndex < sequentialStaff1Bars.Count; ++barIndex)
             {
-				List<VoiceDef> bar = new List<VoiceDef>
+				List<Trk> trks = new List<Trk>()
 				{
 					sequentialStaff1Bars[barIndex],
 					sequentialStaff2Bars[barIndex],
 					sequentialStaff3Bars[barIndex]
 				};
+				Seq seq = new Seq(seqBarAbsMsPosition, trks, MidiChannelIndexPerOutputVoice);
+
+				Bar bar = new Bar(seq);
+
 				bars.Add(bar);
-            }
+
+				seqBarAbsMsPosition += seq.MsDuration;
+			}
 
 			InsertClefChanges(bars);
 
             return bars;
         }
 
-        protected override void InsertClefChanges(List<List<VoiceDef>> bars)
+        protected override void InsertClefChanges(List<Bar> bars)
         {
             //VoiceDef voiceDef = bars[1][0];
             //voiceDef.InsertClefDef(1, "b");

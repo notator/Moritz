@@ -30,7 +30,7 @@ namespace Moritz.Algorithm.Study3Sketch2
         /// <summary>
         /// See CompositionAlgorithm.DoAlgorithm()
         /// </summary>
-        public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+        public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
         {
             _krystals = krystals;
             _palettes = palettes;
@@ -77,18 +77,16 @@ namespace Moritz.Algorithm.Study3Sketch2
 
             List<InputVoiceDef> inputVoiceDefs = new List<InputVoiceDef>() { ivd };
 
-            List<Block> blockList = new List<Block>() { new Block(mainSeq, barlineMsPositions, inputVoiceDefs) };
+			Bar mainBar = new Bar(mainSeq, inputVoiceDefs);
 
-            MainBlock mainBlock = new MainBlock(InitialClefPerChannel, blockList);
+			List<Bar> bars = mainBar.GetBars(barlineMsPositions, MidiChannelIndexPerOutputVoice);
 
-            List<List<VoiceDef>> bars = mainBlock.ConvertToBars();
-
-            InsertClefChanges(bars);
+			InsertClefChanges(bars);
 
             return bars;
         }
 
-        protected override void InsertClefChanges(List<List<VoiceDef>> bars)
+        protected override void InsertClefChanges(List<Bar> bars)
         {
             // test code
             //VoiceDef voiceDef = bars[0][bars[0].Count - 1];

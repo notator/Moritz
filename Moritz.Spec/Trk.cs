@@ -32,17 +32,16 @@ namespace Moritz.Spec
 
         /// <summary>
         /// A Trk with msPositionReContainer=0 and an empty UniqueDefs list.
-        /// This constructor is used by Block.PopBar(...).
         /// </summary>
         public Trk(int midiChannel)
             : base(midiChannel, 0, new List<IUniqueDef>())
         {
         }
 
-        /// <summary>
-        /// Returns a deep clone of this Trk.
-        /// </summary>
-        public Trk Clone()
+		/// <summary>
+		/// Returns a deep clone of this Trk.
+		/// </summary>
+		public Trk Clone()
         {
             List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
             Trk trk = new Trk(MidiChannel, MsPositionReContainer, clonedIUDs) { Container = this.Container };
@@ -91,7 +90,7 @@ namespace Moritz.Spec
         /// <summary>
         /// Appends the new MidiChordDef, MidiRestDef, CautionaryChordDef or ClefDef to the end of the list.
         /// Automatically sets the iUniqueDef's msPosition.
-        /// Used by Block.PopBar(...), so accepts CautionaryChordDef and ClefDef arguments.
+        /// N.B. Can be used to Add CautionaryChordDef and ClefDef arguments.
         /// </summary>
         public override void Add(IUniqueDef iUniqueDef)
         {
@@ -368,7 +367,7 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Also used by Trks in Seq and Block
+        /// Also used by Trks in Seq and Bar
         /// </summary>
         public void SetPitchWheelSliders(Dictionary<int, int> pitchWheelValuesPerMsPosition)
         {
@@ -1189,7 +1188,7 @@ namespace Moritz.Spec
         /// </summary>
         protected void SortByRootNotatedPitch(bool ascending)
         {
-            Debug.Assert(!(Container is Block), "Cannot sort inside a Block.");
+            Debug.Assert(!(Container is Bar), "Cannot sort inside a Bar.");
 
             List<IUniqueDef> localIUDs = new List<IUniqueDef>(UniqueDefs);
             // Remove any rests from localIUDs, and store them (the rests), with their original indices,
@@ -1245,7 +1244,7 @@ namespace Moritz.Spec
         /// </summary>
         protected void SortByVelocity(bool increasing)
         {
-            Debug.Assert(!(Container is Block), "Cannot sort inside a Block.");
+            Debug.Assert(!(Container is Bar), "Cannot sort inside a Bar.");
 
             List<IUniqueDef> localIUDs = new List<IUniqueDef>(UniqueDefs);
             // Remove any rests from localIUDs, and store them (the rests), with their original indices,
@@ -1475,12 +1474,15 @@ namespace Moritz.Spec
             }
             set
             {
-                Debug.Assert(!(Container is Block), "Cannot set MsPosReContainer inside a Block.");
+                Debug.Assert(!(Container is Bar), "Cannot set MsPosReContainer inside a Bar.");
                 base.MsPositionReContainer = value; // can be negative
             }
         }
 
 		//public List<byte> _velocityPerAbsolutePitch { get; private set; }
 		protected List<byte> _currentVelocityPerAbsolutePitch;
+		private Trk trk;
+		private int startMsPos;
+		private int endMsPos;
 	}
 }

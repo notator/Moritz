@@ -23,7 +23,7 @@ namespace Moritz.Algorithm.Study1
 		public override int NumberOfInputVoices { get { return 0; } }
 
 		// Neither the krystals, nor the palettes argument is used.
-		public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+		public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
 		{
 			byte[] trackChordNumbers = GetTrackChordNumbers();
 			byte[] trackRootPitches = GetTrackRootPitches();
@@ -34,16 +34,16 @@ namespace Moritz.Algorithm.Study1
 
 			List<int> nChordsPerSystem = GetNChordsPerSystem(NumberOfBars, trackChordNumbers.GetLength(0));
 
-			List<List<VoiceDef>> bars = GetBars(track, nChordsPerSystem);
+			List<Bar> bars = GetBars(track, nChordsPerSystem);
 
-			SetPatch0InTheFirstChord(bars[0][0]);
+			SetPatch0InTheFirstChord(bars[0].VoiceDefs[0]);
 
             InsertClefChanges(bars);
 
             return bars;
 		}
 
-        protected override void InsertClefChanges(List<List<VoiceDef>> bars)
+        protected override void InsertClefChanges(List<Bar> bars)
         {
             //VoiceDef voiceDef = bars[0][bars[0].Count - 1];
             //voiceDef.InsertClefDef(5, "b");
@@ -203,31 +203,24 @@ namespace Moritz.Algorithm.Study1
 			return chordMsDurations;  
 		}
 
-		private List<List<VoiceDef>> GetBars(Trk track, List<int> nChordsPerSystem)
+		private List<Bar> GetBars(Trk mainTrack, List<int> nChordsPerSystem)
 		{
-			List<Trk> consecutiveBars = new List<Trk>();
-			// barlineMsPositions will contain both msPos=0 and the position of the final barline
-			List<int> barlineMsPositions = new List<int>() { 0 };
-
-			int trackIndex = 0;
-			int msPositionReContainer = 0;
+			int mainTrackIndex = 0;
+			int absSeqMsPosition = 0;
+			IUniqueDef lastUID = null;
+			List<Bar> bars = new List<Bar>();
 			foreach(int nChords in nChordsPerSystem)
 			{
-				Trk trk = new Trk(0, msPositionReContainer, new List<IUniqueDef>());
-				for(int i = 0; i < nChords; ++i)
+				Trk trk = new Trk(0, 0, new List<IUniqueDef>());
+				for(int i = 0; i < nChords; i++)
 				{
-					trk.Add(track[trackIndex++]);					
+					lastUID = mainTrack[mainTrackIndex++];
+					trk.Add(lastUID);
 				}
-				msPositionReContainer = trk.EndMsPositionReFirstIUD;
-				barlineMsPositions.Add(msPositionReContainer);
-				consecutiveBars.Add(trk);
-			}
-
-			List<List<VoiceDef>> bars = new List<List<VoiceDef>>();
-			foreach(Trk trk in consecutiveBars)
-			{
-				List<VoiceDef> bar = new List<VoiceDef>() { trk };
+				Seq seq = new Seq(absSeqMsPosition, new List<Trk>() { trk }, MidiChannelIndexPerOutputVoice);
+				Bar bar = new Bar(seq);
 				bars.Add(bar);
+				absSeqMsPosition = lastUID.MsPositionReFirstUD + lastUID.MsDuration;
 			}
 
 			return bars;

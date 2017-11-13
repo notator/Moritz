@@ -36,15 +36,6 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// An InputVoiceDef with msPositionReContainer=0 and an empty UniqueDefs list.
-        /// This constructor is used by Block.PopBar(...).
-        /// </summary>
-        public InputVoiceDef(int midiChannel)
-            : base(midiChannel, 0, new List<IUniqueDef>())
-        {
-        }
-
-        /// <summary>
         /// Returns a deep clone of this InputVoiceDef.
         /// </summary>
         public InputVoiceDef Clone()
@@ -74,7 +65,6 @@ namespace Moritz.Spec
         /// <summary>
         /// Appends the new iUniqueDef to the end of the list. Sets the MsPosition of the iUniqueDef re the first iUniqueDef in the list.
         /// Automatically sets the iUniqueDef's msPosition.
-        /// Used by Block.PopBar(...), so accepts a CautionaryChordDef argument.
         /// </summary>
         /// <param name="iUniqueDef"></param>
         public override void Add(IUniqueDef iud)
@@ -131,7 +121,7 @@ namespace Moritz.Spec
         /// </summary>
         private void _InsertInRest(InputVoiceDef iVoiceDef)
         {
-            Debug.Assert(!(Container is Block), "Cannot Insert a Trk in a InputRestDef inside a Block.");
+            Debug.Assert(!(Container is Bar), "Cannot Insert a Trk in a InputRestDef inside a Bar.");
 
             int iLmddsStartMsPosReFirstIUD = iVoiceDef[0].MsPositionReFirstUD;
             int iLmddsEndMsPosReFirstIUD = iVoiceDef[iVoiceDef.Count - 1].MsPositionReFirstUD + iVoiceDef[iVoiceDef.Count - 1].MsDuration;

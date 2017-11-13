@@ -28,7 +28,7 @@ namespace Moritz.Composer
         {
 			CheckOutputVoiceChannelsAndMasterVolumes(_algorithm);
 
-            List<List<VoiceDef>> bars = _algorithm.DoAlgorithm(krystals, palettes);
+            List<Bar> bars = _algorithm.DoAlgorithm(krystals, palettes);
 
 			CheckBars(bars);
 
@@ -52,13 +52,13 @@ namespace Moritz.Composer
             return success;
         }
 
-        private Dictionary<int, string> GetUpperVoiceClefDict(List<List<VoiceDef>> bars, PageFormat _pageFormat, List<int> visibleLowerVoiceIndices)
+        private Dictionary<int, string> GetUpperVoiceClefDict(Bar bar1, PageFormat _pageFormat, List<int> visibleLowerVoiceIndices)
         {
             int nVisibleOutputStaves = _pageFormat.VisibleOutputVoiceIndicesPerStaff.Count;
             int nVisibleInputStaves = _pageFormat.VisibleInputVoiceIndicesPerStaff.Count;
             Debug.Assert(_pageFormat.ClefsList.Count == nVisibleOutputStaves + nVisibleInputStaves);
 
-            int nTrks = GetNumberOfTrks(bars[0]);
+			int nTrks = bar1.Trks.Count;
 
             Dictionary<int, string> upperVoiceClefDict = new Dictionary<int, string>();
             int clefIndex = 0;
@@ -82,7 +82,7 @@ namespace Moritz.Composer
                     visibleLowerVoiceIndices.Add(nTrks + visibleInputVoiceIndicesPerStaff[1]);
                 }
             }
-            for(int i = 0; i < bars[0].Count; ++i)
+            for(int i = 0; i < bar1.VoiceDefs.Count; ++i)
             {
                 if(!upperVoiceClefDict.ContainsKey(i))
                 {
@@ -120,7 +120,7 @@ namespace Moritz.Composer
 			Debug.Assert(string.IsNullOrEmpty(errorString), "Error in algorithm definition: \n\n" + errorString);
 		}
 
-		private void CheckBars(List<List<VoiceDef>> bars)
+		private void CheckBars(List<Bar> bars)
 		{
             string errorString = null;
 			if(bars.Count == 0)
@@ -136,30 +136,31 @@ namespace Moritz.Composer
 			Debug.Assert(string.IsNullOrEmpty(errorString), errorString);
 		}
 		#region private to CheckBars(...)
-		private string BasicChecks(List<List<VoiceDef>> bars)
+		private string BasicChecks(List<Bar> bars)
         {
 			string errorString = null;
             List<int> visibleLowerVoiceIndices = new List<int>();
-            Dictionary<int, string> upperVoiceClefDict = GetUpperVoiceClefDict(bars, _pageFormat, /*sets*/ visibleLowerVoiceIndices);
+            Dictionary<int, string> upperVoiceClefDict = GetUpperVoiceClefDict(bars[0], _pageFormat, /*sets*/ visibleLowerVoiceIndices);
 
             for(int barIndex = 0; barIndex < bars.Count; ++barIndex)
 			{
-				List<VoiceDef> bar = bars[barIndex];
+				Bar bar = bars[barIndex];
+				IReadOnlyList<VoiceDef> voiceDefs = bar.VoiceDefs;
 				string barNumber = (barIndex + 1).ToString();
 				 
-				if(bar.Count == 0)
+				if(voiceDefs.Count == 0)
 				{
 					errorString = "Bar " + barNumber + " contains no voices.";
 					break;
 				}
-				if(!(bar[0] is Trk))
+				if(!(voiceDefs[0] is Trk))
 				{
 					errorString = "The top (first) voice in every bar must be an output voice.";
 					break;
 				}
-				for(int voiceIndex = 0; voiceIndex < bar.Count; ++voiceIndex)
+				for(int voiceIndex = 0; voiceIndex < voiceDefs.Count; ++voiceIndex)
 				{
-					VoiceDef voiceDef = bar[voiceIndex];
+					VoiceDef voiceDef = voiceDefs[voiceIndex];
 					string voiceNumber = (voiceIndex + 1).ToString();
 					if(voiceDef.UniqueDefs.Count == 0)
 					{
@@ -191,19 +192,6 @@ namespace Moritz.Composer
 			return errorString;
 		}
 
-        private int GetNumberOfTrks(List<VoiceDef> voiceDefs)
-        {
-            int nTrks = 0;
-            foreach(VoiceDef voiceDef in voiceDefs)
-            {
-                if(voiceDef is Trk)
-                {
-                    nTrks++;
-                }
-            }
-            return nTrks;
-        }
-
         private int NOutputVoices(List<VoiceDef> bar1)
 		{
 			int nOutputVoices = 0;
@@ -233,16 +221,16 @@ namespace Moritz.Composer
 		/// <summary>
 		/// Synchronous continuous controller settings (ccSettings) are not allowed.
 		/// </summary>
-		private string CheckCCSettings(List<List<VoiceDef>> voiceDefsPerSystemPerBar)
+		private string CheckCCSettings(List<Bar> bars)
 		{
 			string errorString = null;
 			List<InputVoiceDef> ivds = new List<InputVoiceDef>();
 			List<int> ccSettingsMsPositions = new List<int>();
-			foreach(List<VoiceDef> bar in voiceDefsPerSystemPerBar)
+			foreach(Bar bar in bars)
 			{
 				ccSettingsMsPositions.Clear();
 
-				foreach(VoiceDef voice in bar)
+				foreach(VoiceDef voice in bar.VoiceDefs)
 				{
 					if(voice is InputVoiceDef ivd)
 					{
@@ -284,12 +272,12 @@ namespace Moritz.Composer
 		/// This function should be called for all scores when the bars are complete.
 		/// The plausibility checks have been made.
 		/// </summary>
-		private void SetOutputVoiceChannels(List<VoiceDef> firstBar)
+		private void SetOutputVoiceChannels(Bar firstBar)
 		{
 			IReadOnlyList<int> midiChannelIndexPerOutputVoice = _algorithm.MidiChannelIndexPerOutputVoice;
 			for(int i = 0; i < midiChannelIndexPerOutputVoice.Count; ++i)
 			{
-				Trk oVoice = firstBar[i] as Trk;
+				Trk oVoice = firstBar.VoiceDefs[i] as Trk;
 				Debug.Assert(oVoice != null); // should be okay - the check has already been made
 				oVoice.MidiChannel = (byte)midiChannelIndexPerOutputVoice[i];
 			}
@@ -306,36 +294,36 @@ namespace Moritz.Composer
         /// The InputVoices are arranged according to _pageFormat.InputVoiceIndicesPerStaff.
         /// OutputVoices are given a midi channel allocated from top to bottom in the printed score.
         /// </summary>
-        public void CreateEmptySystems(List<List<VoiceDef>> barDefsInOneSystem, int numberOfVisibleInputStaves)
+        public void CreateEmptySystems(List<Bar> bars, int numberOfVisibleInputStaves)
         {
-            foreach(List<VoiceDef> barVoiceDefs in barDefsInOneSystem)
+            foreach(Bar bar in bars)
             {
                 SvgSystem system = new SvgSystem(this);
                 this.Systems.Add(system);
             }
 
-            CreateEmptyOutputStaves(barDefsInOneSystem, numberOfVisibleInputStaves);
-            CreateEmptyInputStaves(barDefsInOneSystem);
+            CreateEmptyOutputStaves(bars[0], numberOfVisibleInputStaves);
+            CreateEmptyInputStaves(bars[0]);
         }
 
-        private void CreateEmptyOutputStaves(List<List<VoiceDef>> barDefsInOneSystem, int numberOfVisibleInputStaves)
+        private void CreateEmptyOutputStaves(Bar bar1, int numberOfVisibleInputStaves)
         {
             int nVisibleOutputStaves = _pageFormat.VisibleOutputVoiceIndicesPerStaff.Count;
             List<byte> invisibleOutputVoiceIndices = new List<byte>();
             if(numberOfVisibleInputStaves > 0 )
-                invisibleOutputVoiceIndices = InvisibleOutputVoiceIndices(_pageFormat.VisibleOutputVoiceIndicesPerStaff, barDefsInOneSystem[0]);
+                invisibleOutputVoiceIndices = InvisibleOutputVoiceIndices(_pageFormat.VisibleOutputVoiceIndicesPerStaff, bar1.Trks);
 
             for(int i = 0; i < Systems.Count; i++)
             {
                 SvgSystem system = Systems[i];
-                List<VoiceDef> barDef = barDefsInOneSystem[i];
+                IReadOnlyList<VoiceDef> voiceDefs = bar1.VoiceDefs;
 
                 #region create invisible staves
                 if(invisibleOutputVoiceIndices.Count > 0)
                 {
 					foreach(byte invisibleOutputVoiceIndex in invisibleOutputVoiceIndices)
 					{
-						Trk invisibleTrkDef = barDef[invisibleOutputVoiceIndex] as Trk;
+						Trk invisibleTrkDef = voiceDefs[invisibleOutputVoiceIndex] as Trk;
 						HiddenOutputStaff hiddenOutputStaff = new HiddenOutputStaff(system);
 						OutputVoice outputVoice = new OutputVoice(hiddenOutputStaff, invisibleTrkDef.MidiChannel)
 						{
@@ -355,7 +343,7 @@ namespace Moritz.Composer
                     List<byte> outputVoiceIndices = _pageFormat.VisibleOutputVoiceIndicesPerStaff[printedStaffIndex];
                     for(int ovIndex = 0; ovIndex < outputVoiceIndices.Count; ++ovIndex)
                     {
-                        Trk trkDef = barDef[outputVoiceIndices[ovIndex]] as Trk;
+                        Trk trkDef = voiceDefs[outputVoiceIndices[ovIndex]] as Trk;
                         Debug.Assert(trkDef != null);
                         OutputVoice outputVoice = new OutputVoice(outputStaff, trkDef.MidiChannel)
 						{
@@ -369,7 +357,7 @@ namespace Moritz.Composer
             }
         }
 
-        private List<byte> InvisibleOutputVoiceIndices(List<List<byte>> visibleOutputVoiceIndicesPerStaff, List<VoiceDef> voiceDefs)
+        private List<byte> InvisibleOutputVoiceIndices(List<List<byte>> visibleOutputVoiceIndicesPerStaff, IReadOnlyList<Trk> trks)
         {
             List<byte> visibleOutputVoiceIndices = new List<byte>();
             foreach(List<byte> voiceIndices in visibleOutputVoiceIndicesPerStaff)
@@ -377,21 +365,17 @@ namespace Moritz.Composer
                 visibleOutputVoiceIndices.AddRange(voiceIndices);
             }
             List<byte> invisibleOutputVoiceIndices = new List<byte>();
-            for(byte voiceIndex = 0; voiceIndex < voiceDefs.Count; ++voiceIndex)
+            for(byte trkIndex = 0; trkIndex < trks.Count; ++trkIndex)
             {
-                if(voiceDefs[voiceIndex] is Trk)
+                if(!visibleOutputVoiceIndices.Contains(trkIndex))
                 {
-                    if(!visibleOutputVoiceIndices.Contains(voiceIndex))
-                    {
-                        invisibleOutputVoiceIndices.Add(voiceIndex);
-                    }
+                    invisibleOutputVoiceIndices.Add(trkIndex);
                 }
-                else break;
             }
             return invisibleOutputVoiceIndices;
         }
 
-        private void CreateEmptyInputStaves(List<List<VoiceDef>> barDefsInOneSystem)
+        private void CreateEmptyInputStaves(Bar bar1)
         {
             int nPrintedOutputStaves = _pageFormat.VisibleOutputVoiceIndicesPerStaff.Count;
             int nPrintedInputStaves = _pageFormat.VisibleInputVoiceIndicesPerStaff.Count;
@@ -400,7 +384,7 @@ namespace Moritz.Composer
             for(int i = 0; i < Systems.Count; i++)
             {
                 SvgSystem system = Systems[i];
-                List<VoiceDef> barDef = barDefsInOneSystem[i];
+				IReadOnlyList<VoiceDef> voiceDefs = bar1.VoiceDefs;
 
                 for(int staffIndex = 0; staffIndex < nPrintedInputStaves; staffIndex++)
                 {
@@ -414,7 +398,7 @@ namespace Moritz.Composer
                     List<byte> inputVoiceIndices = _pageFormat.VisibleInputVoiceIndicesPerStaff[staffIndex];
                     for(int ivIndex = 0; ivIndex < inputVoiceIndices.Count; ++ivIndex)
                     {
-                        InputVoiceDef inputVoiceDef = barDef[inputVoiceIndices[ivIndex] + _algorithm.MidiChannelIndexPerOutputVoice.Count] as InputVoiceDef;
+                        InputVoiceDef inputVoiceDef = voiceDefs[inputVoiceIndices[ivIndex] + _algorithm.MidiChannelIndexPerOutputVoice.Count] as InputVoiceDef;
                         Debug.Assert(inputVoiceDef != null);
                         InputVoice inputVoice = new InputVoice(inputStaff)
 						{

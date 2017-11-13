@@ -58,7 +58,7 @@ namespace Moritz.Spec
             AssertSeqConsistency();
         }
 
-        public Seq Clone()
+		public Seq Clone()
         {
             List<Trk> trks = new List<Trk>();
             for(int i = 0; i < _trks.Count; ++i)
@@ -162,10 +162,83 @@ namespace Moritz.Spec
             Normalize();
         }
 
-        /// <summary>
-        /// Every Trk.MidiChannel is parallel to the indices in midiChannelIndexPerOutputVoice.
-        /// </summary>
-        private void AssertChannelConsistency(IReadOnlyList<int> midiChannelIndexPerOutputVoice)
+		/// Uses the argument barline msPositions as the EndBarlines of the returned bars (which don't contain barlines). 
+		/// An exception is thrown if:
+		///    1) the first argument value is less than or equal to 0.
+		///    2) the argument contains duplicate msPositions.
+		///    3) the argument is not in ascending order.
+		///    4) a Trk.MsPositionReContainer is not 0.
+		///    5) an msPosition is not the endMsPosition of any IUniqueDef in the seq.
+		public List<Bar> GetBars(List<int> barlineMsPositionsReSeq)
+		{
+			CheckBarlineMsPositions(barlineMsPositionsReSeq);
+
+			List<Bar> bars = new List<Bar>();
+			int startMsPos = 0;
+			foreach(int endMsPos in barlineMsPositionsReSeq)
+			{
+				Bar bar = new Bar(this, null, startMsPos, endMsPos);
+				bars.Add(bar);
+				startMsPos = endMsPos;
+			}
+
+			return bars;
+		}
+
+		/// <summary>
+		/// An exception is thrown if:
+		///    1) the first argument value is less than or equal to 0.
+		///    2) the argument contains duplicate msPositions.
+		///    3) the argument is not in ascending order.
+		///    4) a Trk.MsPositionReContainer is not 0.
+		///    5) an msPosition is not the endMsPosition of any IUniqueDef in the seq.
+		/// </summary>
+		private void CheckBarlineMsPositions(IReadOnlyList<int> barlineMsPositionsReSeq)
+		{
+			Debug.Assert(barlineMsPositionsReSeq[0] > 0, "The first msPosition must be greater than 0.");
+
+			int msDuration = this.MsDuration;
+			for(int i = 0; i < barlineMsPositionsReSeq.Count; ++i)
+			{
+				int msPosition = barlineMsPositionsReSeq[i];
+				Debug.Assert(msPosition <= this.MsDuration);
+				for(int j = i + 1; j < barlineMsPositionsReSeq.Count; ++j)
+				{
+					Debug.Assert(msPosition != barlineMsPositionsReSeq[j], "Error: Duplicate barline msPositions.");
+				}
+			}
+
+			int currentMsPos = -1;
+			foreach(int msPosition in barlineMsPositionsReSeq)
+			{
+				Debug.Assert(msPosition > currentMsPos, "Value out of order.");
+				currentMsPos = msPosition;
+				bool found = false;
+				foreach(Trk trk in Trks)
+				{
+					Debug.Assert(trk.MsPositionReContainer == 0);
+					foreach(IUniqueDef iud in trk.UniqueDefs)
+					{
+						if(msPosition == (iud.MsPositionReFirstUD + iud.MsDuration))
+						{
+							found = true;
+							break;
+						}
+					}
+					if(found)
+					{
+						break;
+					}
+					
+				}
+				Debug.Assert(found, "Error: barline must be at the endMsPosition of at least one IUniqueDef.");
+			}
+		}
+
+		/// <summary>
+		/// Every Trk.MidiChannel is parallel to the indices in midiChannelIndexPerOutputVoice.
+		/// </summary>
+		private void AssertChannelConsistency(IReadOnlyList<int> midiChannelIndexPerOutputVoice)
         {
             Debug.Assert(_trks != null && _trks.Count > 0);
             int nTrks = 0;
@@ -429,8 +502,9 @@ namespace Moritz.Spec
         private List<Trk> _trks = new List<Trk>();
 
 		private int _absMsPosition;
+		private List<int> _barlineMsPositionsReSeq;
 
-        public int AbsMsPosition
+		public int AbsMsPosition
 		{	
 			get	{ return _absMsPosition; }
 			set

@@ -27,7 +27,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// <summary>
         /// See CompositionAlgorithm.DoAlgorithm()
         /// </summary>
-        public override List<List<VoiceDef>> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
+        public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
         {
             _krystals = krystals;
             _palettes = palettes;
@@ -419,9 +419,7 @@ namespace Moritz.Algorithm.Tombeau1
 			//Do global changes that affect the whole piece here (accel., rit, transpositions etc.)
 			FinalizeMainSeq(mainSeq);
 
-			MainBlock mainBlock = new MainBlock(InitialClefPerChannel, mainSeq, barlineMsPositions);
-
-            List<List<VoiceDef>> bars = mainBlock.ConvertToBars();
+            List<Bar> bars = mainSeq.GetBars(barlineMsPositions);
 
             InsertClefChanges(bars);
 
@@ -521,7 +519,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 		}
 
-		protected override void InsertClefChanges(List<List<VoiceDef>> bars)
+		protected override void InsertClefChanges(List<Bar> bars)
         {
             //VoiceDef voiceDef = bars[0][bars[0].Count - 1];
             //voiceDef.InsertClefDef(5, "b");
