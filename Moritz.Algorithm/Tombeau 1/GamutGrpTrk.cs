@@ -6,10 +6,21 @@ using Moritz.Spec;
 namespace Moritz.Algorithm.Tombeau1
 {
 	/// <summary>
-	/// A GamutGrpTrk is a Trk with a Gamut. The Gamut may not be null, and can be shared with other GamutGrpTrks.
-	/// In other words, GamutGrpTrks do not own their Gamuts.
-	/// GamutGrpTrk objects can only contain MidiChordDef and MidiRestDef objects.
-	/// This is because they are eventually concatenated to a single Trk which is added to a Seq.
+	/// A GamutGrpTrk is a Trk with a Gamut.
+	/// The Gamut may not be null, and can be shared with other GamutGrpTrks.
+	/// In other words, GamutGrpTrks do not own their Gamuts. 
+	/// Beaming: BeamContinues is set to false on the final MidiChordDef.
+	/// (Beams break automatically, even if MidiChordDef.BeamContinues is true,
+	/// if the following symbol is a rest or has no beam.) 
+	/// The following conditions are checked whenever the IUniqueDefs list is changed
+	/// (If a check fails, an exception is thrown.):
+	/// 1. Gamut may not be null.
+	/// 2. RootOctave must be greater than or equal to 0.
+	/// 3. The first iUniqueDef must be a MidiChordDef.
+	/// 4. The GamutGrpTrk can only contain MidiChordDef and MidiRestDef objects.
+	/// 5. The MidiChordDefs can only contain pitches that are in the Gamut.
+	/// 6. The GamutGrpTrk may not contain consecutive MidiRestDefs
+	/// 7. All MidiChordDef.BeamContinues properties are true, except the last, which is false.
 	/// </summary>
 	public class GamutGrpTrk : Trk
     {
@@ -17,40 +28,28 @@ namespace Moritz.Algorithm.Tombeau1
 		/// <summary>
 		/// GamutGrpTrk objects own unique IUniqueDefs, but can share Gamuts. The Gamut may not be null.
 		/// </summary>
+		/// <param name="midiChannel"></param>
+		/// <param name="msPositionReContainer"></param>
+		/// <param name="iudList"></param>
 		/// <param name="gamut">can not be null</param>
 		/// <param name="rootOctave">must be greater than or equal to 0</param>
-		/// <param name="nChords">must be greater than 0</param>
-		/// <param name="nPitchesPerChord">must be greater than 0</param>
-		/// <param name="msDurationPerChord">must be greater than 0</param>
-		/// <param name="velocityFactor">must be greater than 0.0</param>
 		public GamutGrpTrk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iudList, Gamut gamut, int rootOctave)
             : base(midiChannel, msPositionReContainer, iudList)
         {
-			_gamut = gamut; // _gamut is checked by AssertConsistency(iud) below.
-			RootOctave = rootOctave; // RootOctave is checked by AssertConsistency(iud) below.
-
-			foreach(IUniqueDef iud in iudList)
-			{
-				AssertConsistency(iud);
-			}
+			_gamut = gamut; // _gamut is checked by AssertConsistency() below.
+			RootOctave = rootOctave; // RootOctave is checked by AssertConsistency() below.
 
 			var velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch();
 
 			base.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
 
-			SetBeamEnd();
-        }
+			if(iudList.Count > 0)
+			{
+				SetBeamEnd();
+			}
 
-        /// <summary>
-        /// Used by Clone.
-        /// </summary>
-        public GamutGrpTrk(Gamut gamut, int midiChannel, int msPositionReContainer, List<IUniqueDef> clonedIUDs)
-            : base(midiChannel, msPositionReContainer, clonedIUDs)
-        {
-            Debug.Assert(gamut != null && gamut.ContainsAllPitches(clonedIUDs));
-            _gamut = gamut;
-            SetBeamEnd();
-        }
+			AssertConsistency();
+		}
 
 		/// <summary>
 		/// The IUniqueDefs are cloned, the other attributes (including the Gamut) are not.
@@ -60,7 +59,7 @@ namespace Moritz.Algorithm.Tombeau1
 			get
 			{
 				List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
-				GamutGrpTrk gamutGrpTrk = new GamutGrpTrk(Gamut, this.MidiChannel, this.MsPositionReContainer, clonedIUDs)
+				GamutGrpTrk gamutGrpTrk = new GamutGrpTrk(this.MidiChannel, this.MsPositionReContainer, clonedIUDs, Gamut, RootOctave)
 				{
 					Container = this.Container
 				};
@@ -70,42 +69,76 @@ namespace Moritz.Algorithm.Tombeau1
 		}
 		#endregion constructors
 
+		/// <summary>
+		/// The following conditions are checked (If a check fails, an exception is thrown.):
+		/// 1. Gamut may not be null.
+		/// 2. RootOctave must be greater than or equal to 0.
+		/// 3. The first iUniqueDef must be a MidiChordDef.
+		/// 4. The GamutGrpTrk can only contain MidiChordDef and MidiRestDef objects.
+		/// 5. The MidiChordDefs can only contain pitches that are in the Gamut.
+		/// 6. The GamutGrpTrk may not contain consecutive MidiRestDefs
+		/// 7. All MidiChordDef.BeamContinues properties are true, except the last, which is false.
+		/// </summary>
+		private void AssertConsistency()
+		{
+			Debug.Assert(Gamut != null, "Gamut must be set.");
+			Debug.Assert(RootOctave >= 0, "Root Octave must be >= 0");
+			if(_uniqueDefs.Count > 0)
+			{
+				Debug.Assert(_uniqueDefs[0] is MidiChordDef, "The first IUniqueDef must be a MidiChordDef.");
+			}
+
+			bool prevIudIsRest = false;
+			MidiChordDef lastMidiChordDef = null;
+
+			foreach(IUniqueDef iud in _uniqueDefs)
+			{
+				if(!(iud is MidiChordDef || iud is MidiRestDef))
+				{
+					Debug.Assert(false, "Illegal type.");
+				}
+
+				if(iud is MidiChordDef mcd)
+				{
+					Debug.Assert(_gamut.ContainsAllPitches(mcd), "Illegal pitches.");
+					prevIudIsRest = false;
+					lastMidiChordDef = mcd;
+				}
+				else
+				{
+					Debug.Assert(prevIudIsRest == false, "Consecutive MidiRestDefs are illegal.");
+					prevIudIsRest = true;
+				}
+			}
+
+			foreach(IUniqueDef iud in _uniqueDefs)
+			{
+				if(iud is MidiChordDef mcd)
+				{
+					if(mcd != lastMidiChordDef)
+					{
+						Debug.Assert(mcd.BeamContinues == true, "BeamContinues must only be false on the final MidiChordDef.");
+					}
+					else
+					{
+						Debug.Assert(mcd.BeamContinues == false, "BeamContinues must be false on the final MidiChordDef.");
+					}
+				}
+			}
+		}
+
 		#region Overridden functions
 		#region UniqueDefs list component changers
 		/// <summary>
-		/// Appends a new MidiChordDef, MidiRestDef, or ClefDef to the end of the list.
-		/// IUniqueDefs in GamutGrpTrks cannot be CautionaryChordDefs.
+		/// Appends a new MidiChordDef or MidiRestDef to the end of the list.
+		/// IUniqueDefs in GamutGrpTrks cannot be ClefDefs or CautionaryChordDefs.
 		/// Automatically sets the iUniqueDef's msPosition.
-		/// Used by Block.PopBar(...), so accepts a CautionaryChordDef argument.
-		/// CautionaryChordDefs are however not allowed in GamutGrpTrks.
 		/// </summary>
 		public override void Add(IUniqueDef iUniqueDef)
-        {
-            AssertConsistency(iUniqueDef);
+        {            
             base.Add(iUniqueDef);
             SetBeamEnd();
-        }
-
-		/// <summary>
-		/// A Debug.Assert fails
-		/// 1. if the iUniqueDef is neither a MidiChordDef nor a MidiRestDef.
-		/// 2. if _gamut is null.
-		/// 3. if the iUniqueDef is a MidiChordDef containing pitches that are not in _gamut.
-		/// 4. if RootOctave < 0.
-		/// </summary>
-		/// <param name="iUniqueDef"></param>
-		private void AssertConsistency(IUniqueDef iUniqueDef)
-        {
-			if(!(iUniqueDef is MidiChordDef || iUniqueDef is MidiRestDef))
-			{
-				Debug.Assert(false, "GamutGrpTrks can only contain MidiChordDef and MidiRestDef objects.");
-			}
-			Debug.Assert(_gamut != null, "_gamut must be set.");
-			if(iUniqueDef is MidiChordDef mcd)
-            {
-                Debug.Assert(_gamut.ContainsAllPitches(mcd));
-            }
-			Debug.Assert(RootOctave >= 0, "Root Octave must be >= 0");
+			AssertConsistency();
 		}
 
         /// <summary>
@@ -114,45 +147,51 @@ namespace Moritz.Algorithm.Tombeau1
         /// </summary>
         public override void AddRange(VoiceDef voiceDef)
         {
-            foreach(IUniqueDef iud in voiceDef.UniqueDefs)
-            {
-				AssertConsistency(iud);
-			}
             base.AddRange(voiceDef);
             SetBeamEnd();
-        }
-        /// <summary>
-        /// Inserts the iUniqueDef in the list at the given index, and then
-        /// resets the positions of all the uniqueDefs in the list.
-        /// </summary>
-        public override void Insert(int index, IUniqueDef iUniqueDef)
+			AssertConsistency();
+		}
+
+		/// <summary>
+		/// Sets the current IUniqueDefs list to the argument, then sets the MidiChordDef.BeamContinues properties
+		/// and checks that the GamutGrptrk is consistent. (The argument may not contain consecutive rests, etc.)
+		/// </summary>
+		internal void SetIUniqueDefs(List<IUniqueDef> iUniqueDefs)
+		{
+			_uniqueDefs = iUniqueDefs;
+			SetBeamEnd();
+			AssertConsistency();
+		}
+
+		/// <summary>
+		/// Inserts the iUniqueDef in the list at the given index, and then
+		/// resets the positions of all the uniqueDefs in the list.
+		/// </summary>
+		public override void Insert(int index, IUniqueDef iUniqueDef)
         {
-			AssertConsistency(iUniqueDef);
 			base.Insert(index, iUniqueDef);
             SetBeamEnd();
-        }
+			AssertConsistency();
+		}
         /// <summary>
         /// Inserts the trk's UniqueDefs in the list at the given index, and then
         /// resets the positions of all the uniqueDefs in the list.
         /// </summary>
         public override void InsertRange(int index, Trk trk)
         {
-            foreach(IUniqueDef iud in trk.UniqueDefs)
-            {
-				AssertConsistency(iud);
-			}
             base.InsertRange(index, trk);
             SetBeamEnd();
-        }
+			AssertConsistency();
+		}
         /// <summary>
         /// Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
         /// </summary>
         public override void Replace(int index, IUniqueDef replacementIUnique)
         {
-            AssertConsistency(replacementIUnique);
             base.Replace(index, replacementIUnique);
             SetBeamEnd();
-        }
+			AssertConsistency();
+		}
         /// <summary> 
         /// This function attempts to add all the non-MidiRestDef UniqueDefs in trk2 to the calling Trk
         /// at the positions given by their MsPositionReFirstIUD added to trk2.MsPositionReContainer,
@@ -169,13 +208,10 @@ namespace Moritz.Algorithm.Tombeau1
         /// <returns>this</returns>
         public override Trk Superimpose(Trk trk2)
         {
-            foreach(IUniqueDef iud in trk2.UniqueDefs)
-            {
-                AssertConsistency(iud);
-            }
             Trk trk = base.Superimpose(trk2);
             SetBeamEnd();
-            return trk;
+			AssertConsistency();
+			return trk;
         }
 
         #endregion UniqueDefs list component changers
@@ -184,7 +220,8 @@ namespace Moritz.Algorithm.Tombeau1
         {
             base.Permute(axisNumber, contourNumber);
             SetBeamEnd();
-        }
+			AssertConsistency();
+		}
         /// <summary>
         /// Re-orders up to 7 partitions in this Trk's UniqueDefs list. The content of each partition is not changed. The Trk's AxisIndex property is set.
         /// <para>1. Creates partitions (lists of UniqueDefs) using the partitionSizes in the third argument.</para>  
@@ -202,27 +239,32 @@ namespace Moritz.Algorithm.Tombeau1
         {
             base.PermutePartitions(axisNumber, contourNumber, partitionSizes);
             SetBeamEnd();
-        }
+			AssertConsistency();
+		}
         public override void SortRootNotatedPitchAscending()
         {
             SortByRootNotatedPitch(true);
             SetBeamEnd();
-        }
+			AssertConsistency();
+		}
         public override void SortRootNotatedPitchDescending()
         {
             SortByRootNotatedPitch(false);
             SetBeamEnd();
-        }
+			AssertConsistency();
+		}
         public override void SortVelocityIncreasing()
         {
             SortByVelocity(true);
             SetBeamEnd();
-        }
+			AssertConsistency();
+		}
         public override void SortVelocityDecreasing()
         {
             SortByVelocity(false);
             SetBeamEnd();
-        }
+			AssertConsistency();
+		}
         #endregion UniqueDefs list order changers
         #endregion Overridden functions
 
@@ -256,7 +298,8 @@ namespace Moritz.Algorithm.Tombeau1
             }
 
             Shear(stepsList);
-        }
+			AssertConsistency();
+		}
 
         /// <summary>
         /// Shears the group vertically, using TransposeStepsInGamut(steps).
@@ -298,7 +341,8 @@ namespace Moritz.Algorithm.Tombeau1
             {
                 mcd.TransposeStepsInGamut(_gamut, stepsToTranspose);
             }
-        }
+			AssertConsistency();
+		}
 
         /// <summary>
         /// The rootPitch and all the pitches in all the MidiChordDefs must be contained in the Trk's gamut.
@@ -325,7 +369,8 @@ namespace Moritz.Algorithm.Tombeau1
             {
                 mcd.TransposeStepsInGamut(_gamut, stepsToTranspose);
             }
-        }
+			AssertConsistency();
+		}
 
         #region Gamut
         /// <summary>
@@ -380,7 +425,8 @@ namespace Moritz.Algorithm.Tombeau1
                         mcd.NotatedMidiVelocities = new List<byte>(mcd.BasicMidiChordDefs[0].Velocities);
                     }
                 }
-            }
+				AssertConsistency();
+			}
         }
         protected Gamut _gamut;
 		public readonly int RootOctave;
@@ -427,26 +473,23 @@ namespace Moritz.Algorithm.Tombeau1
         #endregion Gamut
 
         /// <summary>
-        /// Sets BeamContinues to false on the final MidiChordDef, and true on all the others.
+        /// Sets BeamContinues to true on all MidiChordDefs, except the last, which is set to true.
         /// </summary>
         private void SetBeamEnd()
         {
-            bool isFinalChord = true;
-            for(int i = _uniqueDefs.Count - 1; i >= 0; --i)
-            {
-                if(_uniqueDefs[i] is MidiChordDef mcd)
-                {
-                    if(isFinalChord)
-                    {
-                        mcd.BeamContinues = false;
-                        isFinalChord = false;
-                    }
-                    else
-                    {
-                        mcd.BeamContinues = true;
-                    }
-                }
+			MidiChordDef finalMCD = null;
+			foreach(IUniqueDef iud in _uniqueDefs)
+			{
+				if(iud is MidiChordDef mcd)
+				{
+					mcd.BeamContinues = true;
+					finalMCD = mcd;
+				}
             }
+			if(finalMCD != null)
+			{
+				finalMCD.BeamContinues = false;
+			}
         }
 
         public override string ToString()

@@ -171,9 +171,10 @@ namespace Moritz.Algorithm.Tombeau1
 				GamutGrpTrk gamutGrpTrk = new GamutGrpTrk(this.MidiChannel, msPositionReContainer, new List<IUniqueDef>(), gamut, rootOctave);
 
 				int nChords = nPitchesPerOctave;
-				//pitchesPerChord = 5;
-				//totalMsDuration = 1000;
-				AddMidiChordDefs(gamutGrpTrk, nChords, 5, nChords * 200);
+				int pitchesPerChord = 5;
+				int totalMsDuration = nChords * 200;
+				List<IUniqueDef> iUniqueDefs = GetIUniqueDefs(gamutGrpTrk.Gamut, gamutGrpTrk.RootOctave, nChords, pitchesPerChord, totalMsDuration);
+				gamutGrpTrk.SetIUniqueDefs(iUniqueDefs);
 
 				int minMsDuration = 230;
 				int maxMsDuration = 380;
@@ -192,26 +193,22 @@ namespace Moritz.Algorithm.Tombeau1
 		}
 
 		/// <summary>
-		/// Clears the current IUniquedefs list, then adds nChords MidiChordDefs
+		/// Composes an IUniqueDefs list using gamut and rootOctave.
 		/// </summary>
-		/// <param name="nChords"></param>
-		/// <param name="nPitchesPerChord"></param>
-		/// <param name="totalMsDuration"></param>
-		public void AddMidiChordDefs(GamutGrpTrk gamutGrpTrk, int nChords, int nPitchesPerChord, int totalMsDuration)
+		public List<IUniqueDef> GetIUniqueDefs(Gamut gamut, int rootOctave, int nChords, int nPitchesPerChord, int totalMsDuration)
 		{
 			Debug.Assert(nChords > 0);
 			Debug.Assert(nPitchesPerChord > 0);
 			int msDurationPerChord = totalMsDuration / nChords;
 			Debug.Assert(msDurationPerChord > 0);
 
-			List<IUniqueDef> uniqueDefs = gamutGrpTrk.UniqueDefs;
-			Gamut gamut = gamutGrpTrk.Gamut;
+			List<IUniqueDef> uniqueDefs = new List<IUniqueDef>();
 			for(int i = 0; i < nChords; ++i)
 			{
 				int rootNotatedPitch;
 				if(i == 0)
 				{
-					rootNotatedPitch = gamut.Mode.AbsolutePitchHierarchy[i] + (12 * gamutGrpTrk.RootOctave);
+					rootNotatedPitch = gamut.Mode.AbsolutePitchHierarchy[i] + (12 * rootOctave);
 					rootNotatedPitch = (rootNotatedPitch <= gamut.MaxPitch) ? rootNotatedPitch : gamut.MaxPitch;
 				}
 				else
@@ -239,16 +236,19 @@ namespace Moritz.Algorithm.Tombeau1
 				uniqueDefs.Add(mcd);
 			}
 
-			gamutGrpTrk.MsDuration = totalMsDuration;
+			Trk tempTrk = new Trk(0, 0, uniqueDefs)
+			{
+				MsDuration = totalMsDuration // correct rounding errors
+			};
+
+			return tempTrk.UniqueDefs;
 		}
 
-		protected ModeSegment Compose(ModeSegment paletteModeSegment)
+		protected ModeSegment Compose(ModeSegment modeSegment)
 		{
-			var pModeSegment = paletteModeSegment.Clone();
-
-			for(int index = 0; index < pModeSegment.Count; ++index)
+			for(int index = 0; index < modeSegment.Count; ++index)
 			{
-				GamutGrpTrk gamutGrpTrk = pModeSegment[index];
+				GamutGrpTrk gamutGrpTrk = modeSegment[index];
 
 				#region current version
 				if(gamutGrpTrk.UniqueDefs[0] is MidiChordDef firstMcd && gamutGrpTrk.UniqueDefs[gamutGrpTrk.UniqueDefs.Count - 1] is MidiChordDef lastMcd)
@@ -292,6 +292,11 @@ namespace Moritz.Algorithm.Tombeau1
 
 				//gamutGrpTrk.AdjustChordMsDurations(factor: 5);
 				#endregion current version
+
+				#region test code 1 insert a rest
+				modeSegment[index].Insert(1, new MidiRestDef(0, 200));
+				modeSegment.SetMsPositionsReThisModeSegment();
+				#endregion
 
 				#region begin test code 2 transpose chords to the same absolute root pitch
 				//for(int iudIndex = 0; iudIndex < g.Count; ++iudIndex)
@@ -375,7 +380,7 @@ namespace Moritz.Algorithm.Tombeau1
 				#endregion
 
 			}
-			return pModeSegment;
+			return modeSegment;
 		}
 
 		internal void AdjustForTwoVoices()

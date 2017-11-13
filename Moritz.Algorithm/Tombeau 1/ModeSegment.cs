@@ -175,7 +175,7 @@ namespace Moritz.Algorithm.Tombeau1
 			}
 		}
 
-		private void SetMsPositionsReThisModeSegment()
+		internal void SetMsPositionsReThisModeSegment()
 		{
 			int msPos = 0;
 			foreach(GamutGrpTrk gamutGrpTrk in _gamutGrpTrks)
