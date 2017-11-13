@@ -790,7 +790,7 @@ namespace Moritz.Spec
             }
         }
 
-        public IVoiceDefContainer Container = null;
+        public ITrksContainer Container = null;
 
         public int Count { get { return _uniqueDefs.Count; } }
 
