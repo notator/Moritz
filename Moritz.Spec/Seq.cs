@@ -6,28 +6,42 @@ namespace Moritz.Spec
 {
 	public class Seq : ITrksContainer
 	{
-        /// <summary>
-        /// trks.Count must be less than or equal to midiChannelIndexPerOutputVoice.Count. (See trks parameter comment.)
-        /// </summary>
-        /// <param name="absSeqMsPosition">Must be greater than or equal to zero.</param>
-        /// <param name="trks">Each Trk must have a constructed UniqueDefs list which is either empty, or contains any
-        /// combination of MidiRestDef or MidiChordDef. Each trk.MidiChannel must be unique and present in the
-        /// midiChannelIndexPerOutputVoice list. Not all the Seq's channels need to be given an explicit Trk in the trks
-        /// argument. The seq will be given empty (default) Trks for the channels that are missing.
-        /// The MsPositionReContainer field in each argument trk can have any value, but the Seq is Normalized
-        /// by this constructor.</param>
-        /// <param name="barlineMsPositionsReSeq">Can be null or empty. All barlineMsPositions must be unique, in ascending order, and less than or equal to the final msDuration of the Seq.</param>
-        /// <param name="midiChannelIndexPerOutputVoice">The Seq will contain one trk for each channel in this list.</param>
-        public Seq(int absSeqMsPosition, List<Trk> trks, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
+		/// <summary>
+		/// trks.Count must be less than or equal to midiChannelIndexPerOutputVoice.Count. (See trks parameter comment.)
+		/// </summary>
+		/// <param name="absSeqMsPosition">Must be greater than or equal to zero.</param>
+		/// <param name="trks">Each Trk must have a constructed UniqueDefs list which is either empty, or contains any
+		/// combination of MidiRestDef or MidiChordDef. Each trk.MidiChannel must be unique and present in the
+		/// midiChannelIndexPerOutputVoice list. Each trk.MsPositionReContainer must be 0. All trk.UniqueDef.MsPositionReFirstUD
+		/// values must be set correctly.
+		/// <para>Not all the Seq's channels need to be given an explicit Trk in the trks argument. The seq will be given empty
+		/// (default) Trks for the channels that are missing.</para>
+		/// </param>
+		/// <param name="barlineMsPositionsReSeq">Can be null or empty. All barlineMsPositions must be unique, in ascending order, and less than or equal to the final msDuration of the Seq.</param>
+		/// <param name="midiChannelIndexPerOutputVoice">The Seq will contain one trk for each channel in this list.</param>
+		public Seq(int absSeqMsPosition, List<Trk> trks, IReadOnlyList<int> midiChannelIndexPerOutputVoice)
         {
             #region conditions
             Debug.Assert(absSeqMsPosition >= 0);
             for(int i = 0; i < trks.Count - 1; ++i)
             {
-                for(int j = i + 1; j < trks.Count; ++j)
-                {
-                    Debug.Assert(trks[i].MidiChannel != trks[j].MidiChannel);
-                }
+				Trk trk = trks[i];
+				for(int j = i + 1; j < trks.Count; ++j)
+				{
+					Debug.Assert(trk.MidiChannel != trks[j].MidiChannel);
+				}
+				bool trkChannelFound = false;
+				foreach(int ovChannel in midiChannelIndexPerOutputVoice)
+				{
+					if(trk.MidiChannel == ovChannel)
+					{
+						trkChannelFound = true;
+						break;
+					}
+				}
+				Debug.Assert(trkChannelFound);
+				Debug.Assert(trk.MsPositionReContainer == 0);
+				trk.AssertConsistentInSeq();
             }
             #endregion conditions
 
@@ -52,11 +66,36 @@ namespace Moritz.Spec
                 _trks.Add(newTrk);
             }
 
-            Normalize();
-
-            AssertChannelConsistency(midiChannelIndexPerOutputVoice);
-            AssertSeqConsistency();
+            AssertConsistentInBar();
         }
+
+		public int NearestAbsUIDMsPosition(int approxAbsMsPosition)
+		{
+			int nearestAbsUIDMsPosition = 0;
+			int diff = int.MaxValue;
+			foreach(Trk trk in Trks)
+			{
+				for(int uidIndex = 0; uidIndex < trk.Count; ++uidIndex)
+				{
+					int absPos = this.AbsMsPosition + trk[uidIndex].MsPositionReFirstUD;
+					int localDiff = Math.Abs(approxAbsMsPosition - absPos);
+					if(localDiff < diff)
+					{
+						diff = localDiff;
+						nearestAbsUIDMsPosition = absPos;
+					}
+					if(diff == 0)
+					{
+						break;
+					}
+				}
+				if(diff == 0)
+				{
+					break;
+				}
+			}
+			return nearestAbsUIDMsPosition;
+		}
 
 		public Seq Clone()
         {
@@ -132,7 +171,7 @@ namespace Moritz.Spec
                 trk.AgglomerateRests();
             }
 
-            AssertSeqConsistency();
+            AssertConsistentInBar();
 
             return this;
         }
@@ -159,31 +198,7 @@ namespace Moritz.Spec
 
             Debug.Assert(found == true, "Illegal channel");
 
-            Normalize();
         }
-
-		/// Uses the argument barline msPositions as the EndBarlines of the returned bars (which don't contain barlines). 
-		/// An exception is thrown if:
-		///    1) the first argument value is less than or equal to 0.
-		///    2) the argument contains duplicate msPositions.
-		///    3) the argument is not in ascending order.
-		///    4) a Trk.MsPositionReContainer is not 0.
-		///    5) an msPosition is not the endMsPosition of any IUniqueDef in the seq.
-		public List<Bar> GetBars(List<int> barlineMsPositionsReSeq)
-		{
-			CheckBarlineMsPositions(barlineMsPositionsReSeq);
-
-			List<Bar> bars = new List<Bar>();
-			int startMsPos = 0;
-			foreach(int endMsPos in barlineMsPositionsReSeq)
-			{
-				Bar bar = new Bar(this, null, startMsPos, endMsPos);
-				bars.Add(bar);
-				startMsPos = endMsPos;
-			}
-
-			return bars;
-		}
 
 		/// <summary>
 		/// An exception is thrown if:
@@ -255,38 +270,30 @@ namespace Moritz.Spec
             Debug.Assert(nTrks == midiChannelIndexPerOutputVoice.Count);
         }
 
-        /// <summary>
-        /// Every Trk in _trks is either empty, or contains any combination of MidiRestDef or MidiChordDef.
-        /// There is always a trk having MsPositionReContainer == zero.
-        /// </summary>
-        private void AssertSeqConsistency()
+		/// <summary>
+		/// AbsMsPosition is greater than or equal 0.
+		/// There is at least one Trk in _trks.
+		/// All Trk.MidiChannel values are unique per trk.
+		/// All Trk.MsPositionReContainer values are 0.
+		/// All Trks have the same MsDuration.
+		/// All Trks contain only MidiRestDef or MidiChordDef objects.
+		/// All Trk.UniqueDef.MsPositionReFirstUD values are set correctly.
+		/// </summary>
+		internal void AssertConsistentInBar()
         {
-            Debug.Assert(_trks != null && _trks.Count > 0);
-            #region Every Trk in _trks is either empty, or contains any combination of MidiChordDef and MidiRestDef objects.
-            foreach(Trk trk in _trks)
-            {
-                trk.AssertConsistentInSeq();
-            }
-            #endregion
-        }
+			Debug.Assert(AbsMsPosition >= 0);
+			Debug.Assert(_trks != null && _trks.Count > 0);
 
-        /// <summary>
-        /// Shifts the Trks so that the earliest trk.MsPositionReContainer is 0.
-        /// </summary>
-        public void Normalize()
-        {
-            int minMsPositionReContainer = int.MaxValue;
+			List<int> midiChannels = new List<int>();
+			int thisMsDuration = MsDuration;
             foreach(Trk trk in _trks)
             {
-                minMsPositionReContainer = (minMsPositionReContainer < trk.MsPositionReContainer) ? minMsPositionReContainer : trk.MsPositionReContainer;
+                trk.AssertConsistentInSeq(); // N.B. AssertConsistentInSeq() !
+				Debug.Assert(trk.MsDuration == thisMsDuration);
+				Debug.Assert(midiChannels.Contains(trk.MidiChannel) == false);
+				midiChannels.Add(trk.MidiChannel);
             }
-            if(minMsPositionReContainer != 0)
-            {
-                foreach(Trk trk in _trks)
-                {
-                    trk.MsPositionReContainer -= minMsPositionReContainer;
-                }
-            }
+
         }
 
         #region sort functions
@@ -324,7 +331,8 @@ namespace Moritz.Spec
         /// Aligns the Trk UniqueDefs whose indices are given in the argument.
         /// The argument.Count must be equal to the number of trks in the Seq, and in order of the trks in the seq's _trks list.
         /// Each alignmentPosition must be a valid UniqueDef index in its trk.
-        /// The Seq is normalized at the end of this function. Its msDuration changes automatically.
+        /// The Seq is normalized at the end of this function by adding rests at the beginnings and ends of trks as necessary.
+		/// The seq's msDuration changes automatically.
         /// </summary>
         public void AlignTrkUniqueDefs(List<int> indicesToAlign)
         {
@@ -356,10 +364,9 @@ namespace Moritz.Spec
                 Trk trk = _trks[i];
                 trk.MsPositionReContainer = newMsPositionsReContainer[i] - minMsPositionReContainer;
             }
+			
 
-            Normalize();
-
-            AssertSeqConsistency();
+            AssertConsistentInBar();
         }
 
         public void AlignTrkAxes()
@@ -386,9 +393,8 @@ namespace Moritz.Spec
                 Trk trk = _trks[i];
                 trk.MsPositionReContainer += msShifts[i];
             }
-            Normalize();
 
-            AssertSeqConsistency();
+            AssertConsistentInBar();
         }
 
         /// <summary>
@@ -416,7 +422,7 @@ namespace Moritz.Spec
         /// <param name="distortion"></param>
         public void TimeWarp(Envelope envelope, double distortion)
         {
-            AssertSeqConsistency();
+            AssertConsistentInBar();
             int originalMsDuration = MsDuration;
             List<int> originalMsPositions = GetMsPositions();
             Dictionary<int, int> warpDict = new Dictionary<int, int>();
@@ -449,7 +455,7 @@ namespace Moritz.Spec
 
             Debug.Assert(originalMsDuration == MsDuration);
 
-            AssertSeqConsistency();
+            AssertConsistentInBar();
         }
 
         /// <summary>
@@ -502,8 +508,6 @@ namespace Moritz.Spec
         private List<Trk> _trks = new List<Trk>();
 
 		private int _absMsPosition;
-		private List<int> _barlineMsPositionsReSeq;
-
 		public int AbsMsPosition
 		{	
 			get	{ return _absMsPosition; }
@@ -522,18 +526,8 @@ namespace Moritz.Spec
 		{ 
 			get
 			{
-				AssertSeqConsistency();  // there is a trk that begins at msPosition==0.
-				int msDuration = 0;
-				foreach(Trk trk in _trks)
-				{
-					if(trk.UniqueDefs.Count > 0)
-					{
-						IUniqueDef lastIUD = trk.UniqueDefs[trk.UniqueDefs.Count - 1];
-						int endMsPosReSeq = trk.MsPositionReContainer + lastIUD.MsPositionReFirstUD + lastIUD.MsDuration;
-						msDuration = (msDuration < endMsPosReSeq) ? endMsPosReSeq : msDuration;
-					}
-				}
-				return msDuration;
+				Debug.Assert(_trks != null && _trks.Count > 0);
+				return _trks[0].MsDuration;
 			}
 			set
 			{

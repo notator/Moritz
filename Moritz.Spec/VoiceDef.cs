@@ -48,7 +48,7 @@ namespace Moritz.Spec
 				}
 				_uniqueDefs.Add(iud);
 			}
-			SetMsPositionsReFirstUD();
+			//SetMsPositionsReFirstUD();
 		}
 
 		#region public indexer & enumerator
@@ -148,24 +148,27 @@ namespace Moritz.Spec
 			}
         }
 
-        protected void AssertVoiceDefConsistency()
+		/// <summary>
+		/// MidiChannel is in range [0..15].
+		/// There is at least one IUniqueDef in the UniqueDefs list.
+		/// All UniqueDef.MsPositionReFirstUD values are correct.
+		/// </summary>
+		protected void AssertVoiceDefConsistency()
         {
             Debug.Assert(MidiChannel >= 0 && MidiChannel <= 15);
             Debug.Assert(UniqueDefs != null);
             if(UniqueDefs.Count > 0)
             {
-                Debug.Assert(UniqueDefs[0].MsPositionReFirstUD == 0);
-
-                for(int i = 1; i < UniqueDefs.Count; ++i)
-                {
-                    IUniqueDef prevIUD = UniqueDefs[i - 1];
-                    int msPosition = prevIUD.MsPositionReFirstUD + prevIUD.MsDuration;
-                    Debug.Assert(UniqueDefs[i].MsPositionReFirstUD == msPosition);
-                }
-            }
+				int msPos = 0;
+				foreach(IUniqueDef iud in UniqueDefs)
+				{
+					Debug.Assert(iud.MsPositionReFirstUD == msPos, "Error in iUniqueDef.MsPositionReFirstUD");
+					msPos += iud.MsDuration;
+				}
+			}
         }
 
-        internal abstract void AssertConsistentInBlock();
+        internal abstract void AssertConsistentInBar();
         #endregion consistency
 
         #region  miscellaneous

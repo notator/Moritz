@@ -31,11 +31,13 @@ namespace Moritz.Algorithm.PianolaMusic
 			List<Trk> trks = new List<Trk>() { tracks1and6[0], tracks2and5[0], tracks3and4[0], tracks3and4[1], tracks2and5[1], tracks1and6[1] };
 			Debug.Assert(trks.Count == MidiChannelIndexPerOutputVoice.Count);
 
-			Seq seq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
+			Seq mainSeq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
 
-			List<int> barlineMsPositions = GetBarlineMsPositions(seq);
+			List<int> barlineMsPositions = GetBarlineMsPositions(mainSeq);
 
-			List<Bar> bars = seq.GetBars(barlineMsPositions);
+			Bar mainBar = new Bar(mainSeq, null, InitialClefPerChannel);
+
+			List<Bar> bars = mainBar.GetBars(barlineMsPositions);
 
 			SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
@@ -49,14 +51,19 @@ namespace Moritz.Algorithm.PianolaMusic
 
 		private static List<int> GetBarlineMsPositions(Seq seq)
 		{
-			int barMsDuration = (seq.MsDuration / 8);
-			Debug.Assert(barMsDuration * 8 == seq.MsDuration);
+			int nBars = 8;
+			int approxBarMsDuration = (seq.MsDuration / nBars);
+			Debug.Assert(approxBarMsDuration * 8 == seq.MsDuration);
 
 			List<int> barlineMsPositions = new List<int>();
-			for(int barnumber = 1; barnumber < 9; ++barnumber)
+
+			for(int barNumber = 1; barNumber < nBars; ++barNumber)
 			{
-				barlineMsPositions.Add(barMsDuration * barnumber);
+				int approxBarMsPosition = approxBarMsDuration * barNumber;
+				int barMsPosition = seq.NearestAbsUIDMsPosition(approxBarMsPosition);				
+				barlineMsPositions.Add(barMsPosition);
 			}
+			barlineMsPositions.Add(seq.MsDuration + seq.AbsMsPosition);
 
 			return barlineMsPositions;
 		}

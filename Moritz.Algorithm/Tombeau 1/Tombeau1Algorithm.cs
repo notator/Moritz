@@ -419,7 +419,9 @@ namespace Moritz.Algorithm.Tombeau1
 			//Do global changes that affect the whole piece here (accel., rit, transpositions etc.)
 			FinalizeMainSeq(mainSeq);
 
-            List<Bar> bars = mainSeq.GetBars(barlineMsPositions);
+			Bar mainBar = new Bar(mainSeq, null, InitialClefPerChannel);
+
+			List<Bar> bars = mainBar.GetBars(barlineMsPositions);
 
             InsertClefChanges(bars);
 

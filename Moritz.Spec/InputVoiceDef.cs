@@ -50,16 +50,18 @@ namespace Moritz.Spec
             ivd.Container = this.Container; 
             return ivd;
         }
-        #endregion constructors
+		#endregion constructors
 
-        internal override void AssertConsistentInBlock()
+		internal override void AssertConsistentInBar()
         {
             foreach(IUniqueDef iud in UniqueDefs)
             {
                 // In blocks, inputChordDefs can also contain CautionaryChordDefs
                 Debug.Assert(iud is InputChordDef || iud is InputRestDef || iud is CautionaryChordDef || iud is ClefDef);
             }
-        }
+			Debug.Assert(MsPositionReContainer == 0);
+			AssertVoiceDefConsistency();
+		}
 
         #region Count changers
         /// <summary>

@@ -26,7 +26,6 @@ namespace Moritz.Spec
         public Trk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
             : base(midiChannel, msPositionReContainer, iuds)
         {
-            // N.B. msPositionReContainer can be negative here. Seqs are normalised independently.
             AssertConsistentInSeq();
         }
 
@@ -63,27 +62,36 @@ namespace Moritz.Spec
             return clonedIUDs;
         }
 
-        #endregion constructors
-        /// <summary>
-        /// In seqs, trks can contain any combination of MidiRestDef and MidiChordDef.
-        /// </summary>
-        internal void AssertConsistentInSeq()
-        {
-            foreach(IUniqueDef iud in UniqueDefs)
-            {
-                Debug.Assert(iud is MidiChordDef || iud is MidiRestDef);
-            }
-        }
+		#endregion constructors
+		private void AssertBasicTrkConsistency()
+		{
+			Debug.Assert(MsPositionReContainer == 0);
+			AssertVoiceDefConsistency();
 
-        /// <summary>
-        /// In blocks, trks can contain any combination of MidiRestDef, MidiChordDef, ClefDef and CautionaryChordDef.
-        /// </summary>
-        internal override void AssertConsistentInBlock()
+		}
+		/// <summary>
+		/// In seqs, trks can contain any combination of MidiRestDef and MidiChordDef.
+		/// trk.MsPositionReContainer ==  0. VoiceDefs
+		/// </summary>
+		internal void AssertConsistentInSeq()
+		{
+			foreach(IUniqueDef iud in UniqueDefs)
+			{
+				Debug.Assert(iud is MidiChordDef || iud is MidiRestDef);
+			}
+			AssertBasicTrkConsistency();
+		}
+
+		/// <summary>
+		/// In bars, trks can contain any combination of MidiRestDef, MidiChordDef, ClefDef and CautionaryChordDef.
+		/// </summary>
+		internal override void AssertConsistentInBar()
         {
             foreach(IUniqueDef iud in UniqueDefs)
             {
                 Debug.Assert(iud is MidiChordDef || iud is MidiRestDef || iud is ClefDef || iud is CautionaryChordDef);
             }
+			AssertBasicTrkConsistency();
         }
 
         #region Add, Remove, Insert, Replace objects in the Trk
@@ -1463,26 +1471,7 @@ namespace Moritz.Spec
 			}
 		}
 
-        /// <summary>
-        /// Setting this Property cannot lead to the minimum MsPositionReContainer in the Seq being greater than zero.
-        /// </summary>
-        public override int MsPositionReContainer
-        {
-            get
-            {
-                return base.MsPositionReContainer;
-            }
-            set
-            {
-                Debug.Assert(!(Container is Bar), "Cannot set MsPosReContainer inside a Bar.");
-                base.MsPositionReContainer = value; // can be negative
-            }
-        }
-
 		//public List<byte> _velocityPerAbsolutePitch { get; private set; }
 		protected List<byte> _currentVelocityPerAbsolutePitch;
-		private Trk trk;
-		private int startMsPos;
-		private int endMsPos;
 	}
 }

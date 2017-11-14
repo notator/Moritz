@@ -47,7 +47,9 @@ namespace Moritz.Algorithm.Study3Sketch1
             mainSeq.Concat(bar2Seq);
             mainSeq.Concat(bars345Seq);
 
-			List<Bar> bars = mainSeq.GetBars(barlineMsPositions);
+			Bar mainBar = new Bar(mainSeq, null, InitialClefPerChannel);
+
+			List<Bar> bars = mainBar.GetBars(barlineMsPositions);
 
             InsertClefChanges(bars);
 

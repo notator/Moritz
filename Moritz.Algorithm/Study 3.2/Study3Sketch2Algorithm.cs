@@ -77,9 +77,9 @@ namespace Moritz.Algorithm.Study3Sketch2
 
             List<InputVoiceDef> inputVoiceDefs = new List<InputVoiceDef>() { ivd };
 
-			Bar mainBar = new Bar(mainSeq, inputVoiceDefs);
+			Bar mainBar = new Bar(mainSeq, inputVoiceDefs, InitialClefPerChannel);
 
-			List<Bar> bars = mainBar.GetBars(barlineMsPositions, MidiChannelIndexPerOutputVoice);
+			List<Bar> bars = mainBar.GetBars(barlineMsPositions);
 
 			InsertClefChanges(bars);
 
