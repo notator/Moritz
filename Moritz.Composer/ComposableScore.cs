@@ -302,21 +302,21 @@ namespace Moritz.Composer
                 this.Systems.Add(system);
             }
 
-            CreateEmptyOutputStaves(bars[0], numberOfVisibleInputStaves);
-            CreateEmptyInputStaves(bars[0]);
+            CreateEmptyOutputStaves(bars, numberOfVisibleInputStaves);
+            CreateEmptyInputStaves(bars);
         }
 
-        private void CreateEmptyOutputStaves(Bar bar1, int numberOfVisibleInputStaves)
+        private void CreateEmptyOutputStaves(List<Bar> bars, int numberOfVisibleInputStaves)
         {
             int nVisibleOutputStaves = _pageFormat.VisibleOutputVoiceIndicesPerStaff.Count;
             List<byte> invisibleOutputVoiceIndices = new List<byte>();
             if(numberOfVisibleInputStaves > 0 )
-                invisibleOutputVoiceIndices = InvisibleOutputVoiceIndices(_pageFormat.VisibleOutputVoiceIndicesPerStaff, bar1.Trks);
+                invisibleOutputVoiceIndices = InvisibleOutputVoiceIndices(_pageFormat.VisibleOutputVoiceIndicesPerStaff, bars[0].Trks);
 
             for(int i = 0; i < Systems.Count; i++)
             {
                 SvgSystem system = Systems[i];
-                IReadOnlyList<VoiceDef> voiceDefs = bar1.VoiceDefs;
+                IReadOnlyList<VoiceDef> voiceDefs = bars[i].VoiceDefs;
 
                 #region create invisible staves
                 if(invisibleOutputVoiceIndices.Count > 0)
@@ -375,7 +375,7 @@ namespace Moritz.Composer
             return invisibleOutputVoiceIndices;
         }
 
-        private void CreateEmptyInputStaves(Bar bar1)
+        private void CreateEmptyInputStaves(List<Bar> bars)
         {
             int nPrintedOutputStaves = _pageFormat.VisibleOutputVoiceIndicesPerStaff.Count;
             int nPrintedInputStaves = _pageFormat.VisibleInputVoiceIndicesPerStaff.Count;
@@ -384,7 +384,7 @@ namespace Moritz.Composer
             for(int i = 0; i < Systems.Count; i++)
             {
                 SvgSystem system = Systems[i];
-				IReadOnlyList<VoiceDef> voiceDefs = bar1.VoiceDefs;
+				IReadOnlyList<VoiceDef> voiceDefs = bars[i].VoiceDefs;
 
                 for(int staffIndex = 0; staffIndex < nPrintedInputStaves; staffIndex++)
                 {

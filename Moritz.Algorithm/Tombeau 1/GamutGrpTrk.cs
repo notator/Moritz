@@ -79,8 +79,10 @@ namespace Moritz.Algorithm.Tombeau1
 		/// 6. The GamutGrpTrk may not contain consecutive MidiRestDefs
 		/// 7. All MidiChordDef.BeamContinues properties are true, except the last, which is false.
 		/// </summary>
-		private void AssertConsistency()
+		public override void AssertConsistency()
 		{
+			base.AssertConsistency();
+
 			Debug.Assert(Gamut != null, "Gamut must be set.");
 			Debug.Assert(RootOctave >= 0, "Root Octave must be >= 0");
 			if(_uniqueDefs.Count > 0)

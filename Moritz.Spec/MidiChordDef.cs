@@ -1219,7 +1219,10 @@ namespace Moritz.Spec
             }
         }
 
-        public byte? Bank { get { return _bank; } set { _bank = value; } }
+		public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
+		private int? _msDurationToNextBarline = null;
+
+		public byte? Bank { get { return _bank; } set { _bank = value; } }
         private byte? _bank = null;
         public byte? Patch { get { return _patch; } set { _patch = value; } }
         private byte? _patch = null;
@@ -1298,10 +1301,6 @@ namespace Moritz.Spec
 
         public MidiChordSliderDefs MidiChordSliderDefs = null;
         public List<BasicMidiChordDef> BasicMidiChordDefs = new List<BasicMidiChordDef>();
-
-        public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
-
-        private int? _msDurationToNextBarline = null;
 
         #endregion properties
     }

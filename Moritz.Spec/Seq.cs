@@ -41,7 +41,7 @@ namespace Moritz.Spec
 				}
 				Debug.Assert(trkChannelFound);
 				Debug.Assert(trk.MsPositionReContainer == 0);
-				trk.AssertConsistentInSeq();
+				trk.AssertConsistency();
             }
             #endregion conditions
 
@@ -66,23 +66,23 @@ namespace Moritz.Spec
                 _trks.Add(newTrk);
             }
 
-            AssertConsistentInBar();
+            AssertConsistency();
         }
 
-		public int NearestAbsUIDMsPosition(int approxAbsMsPosition)
+		private int NearestAbsUIDEndMsPosition(int approxAbsMsPosition)
 		{
-			int nearestAbsUIDMsPosition = 0;
+			int nearestAbsUIDEndMsPosition = 0;
 			int diff = int.MaxValue;
 			foreach(Trk trk in Trks)
 			{
 				for(int uidIndex = 0; uidIndex < trk.Count; ++uidIndex)
 				{
-					int absPos = this.AbsMsPosition + trk[uidIndex].MsPositionReFirstUD;
-					int localDiff = Math.Abs(approxAbsMsPosition - absPos);
+					int absEndPos = this.AbsMsPosition + trk[uidIndex].MsPositionReFirstUD + trk[uidIndex].MsDuration;
+					int localDiff = Math.Abs(approxAbsMsPosition - absEndPos);
 					if(localDiff < diff)
 					{
 						diff = localDiff;
-						nearestAbsUIDMsPosition = absPos;
+						nearestAbsUIDEndMsPosition = absEndPos;
 					}
 					if(diff == 0)
 					{
@@ -94,7 +94,7 @@ namespace Moritz.Spec
 					break;
 				}
 			}
-			return nearestAbsUIDMsPosition;
+			return nearestAbsUIDEndMsPosition;
 		}
 
 		public Seq Clone()
@@ -171,7 +171,7 @@ namespace Moritz.Spec
                 trk.AgglomerateRests();
             }
 
-            AssertConsistentInBar();
+            AssertConsistency();
 
             return this;
         }
@@ -279,7 +279,7 @@ namespace Moritz.Spec
 		/// All Trks contain only MidiRestDef or MidiChordDef objects.
 		/// All Trk.UniqueDef.MsPositionReFirstUD values are set correctly.
 		/// </summary>
-		internal void AssertConsistentInBar()
+		public void AssertConsistency()
         {
 			Debug.Assert(AbsMsPosition >= 0);
 			Debug.Assert(_trks != null && _trks.Count > 0);
@@ -288,16 +288,43 @@ namespace Moritz.Spec
 			int thisMsDuration = MsDuration;
             foreach(Trk trk in _trks)
             {
-                trk.AssertConsistentInSeq(); // N.B. AssertConsistentInSeq() !
+                trk.AssertConsistency();
 				Debug.Assert(trk.MsDuration == thisMsDuration);
 				Debug.Assert(midiChannels.Contains(trk.MidiChannel) == false);
 				midiChannels.Add(trk.MidiChannel);
             }
-
         }
 
-        #region sort functions
-        public void SortVelocityIncreasing()
+		/// <summary>
+		/// Returns nBars barlineMsPositions.
+		/// The Bars are as equal in duration as possible, with each barline being at the end of at least one IUniqueDef.
+		/// The returned list contains no duplicates (A Debug.Assertion fails otherwise).
+		/// </summary>
+		/// <returns></returns>
+		public List<int> GetBalancedBarlineMsPositions(int nBars)
+		{
+			int msDuration = MsDuration;
+			int approxBarMsDuration = (msDuration / nBars);
+			Debug.Assert(approxBarMsDuration * 8 == msDuration);
+
+			List<int> barlineMsPositions = new List<int>();
+
+			for(int barNumber = 1; barNumber <= nBars; ++barNumber)
+			{
+				int approxBarMsPosition = approxBarMsDuration * barNumber;
+				int barMsPosition = NearestAbsUIDEndMsPosition(approxBarMsPosition);
+					
+				Debug.Assert(barlineMsPositions.Contains(barMsPosition) == false);
+
+				barlineMsPositions.Add(barMsPosition);
+			}
+			Debug.Assert(barlineMsPositions[barlineMsPositions.Count - 1] == this.MsDuration);
+
+			return barlineMsPositions;
+		}
+
+		#region sort functions
+		public void SortVelocityIncreasing()
         {
             foreach(Trk trk in Trks)
             {
@@ -365,8 +392,7 @@ namespace Moritz.Spec
                 trk.MsPositionReContainer = newMsPositionsReContainer[i] - minMsPositionReContainer;
             }
 			
-
-            AssertConsistentInBar();
+            AssertConsistency();
         }
 
         public void AlignTrkAxes()
@@ -394,7 +420,7 @@ namespace Moritz.Spec
                 trk.MsPositionReContainer += msShifts[i];
             }
 
-            AssertConsistentInBar();
+            AssertConsistency();
         }
 
         /// <summary>
@@ -422,7 +448,7 @@ namespace Moritz.Spec
         /// <param name="distortion"></param>
         public void TimeWarp(Envelope envelope, double distortion)
         {
-            AssertConsistentInBar();
+            AssertConsistency();
             int originalMsDuration = MsDuration;
             List<int> originalMsPositions = GetMsPositions();
             Dictionary<int, int> warpDict = new Dictionary<int, int>();
@@ -455,7 +481,7 @@ namespace Moritz.Spec
 
             Debug.Assert(originalMsDuration == MsDuration);
 
-            AssertConsistentInBar();
+            AssertConsistency();
         }
 
         /// <summary>

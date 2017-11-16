@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Krystals4ObjectLibrary;
 using Moritz.Palettes;
@@ -47,23 +48,63 @@ namespace Moritz.Algorithm.Study3Sketch1
             mainSeq.Concat(bar2Seq);
             mainSeq.Concat(bars345Seq);
 
-			Bar mainBar = new Bar(mainSeq, null, InitialClefPerChannel);
+			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
 
-			List<Bar> bars = mainBar.GetBars(barlineMsPositions);
-
-            InsertClefChanges(bars);
-
-            return bars;
+			return bars;
         }
 
-        protected override void InsertClefChanges(List<Bar> bars)
-        {
-            //VoiceDef voiceDef = bars[0][bars[0].Count - 1];
-            //voiceDef.InsertClefDef(5, "b");
-        }
+		/// <summary>
+		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
+		/// The dictionary contains the index at which the clef will be inserted in the VoiceDef's IUniquedefs,
+		/// and the clef ID string ("t", "t1", "b3" etc.).
+		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
+		/// the existing IUniqueDefs before which the clef will be inserted.
+		/// The SortedDictionaries should not contain tne initial clefs per voicedef - those will be included
+		/// automatically.
+		/// Note that a CautionaryChordDef counts as an IUniqueDef at the beginning of a bar, and that clefs
+		/// cannot be inserted in front of them.
+		/// </summary>
+		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars)
+		{
+			return null;
+			// test code...
+			//VoiceDef voiceDef1 = bars[0][1];
+			//voiceDef1.InsertClefDef(9, "b3");
+			//voiceDef1.InsertClefDef(8, "b2");
+			//voiceDef1.InsertClefDef(7, "b1");
+			//voiceDef1.InsertClefDef(6, "b");
+			//voiceDef1.InsertClefDef(5, "t3");
+			//voiceDef1.InsertClefDef(4, "t2");
+			//voiceDef1.InsertClefDef(3, "t1");
+			//voiceDef1.InsertClefDef(2, "t");
+		}
 
-        #region CreateBar1Seq()
-        private Seq CreateBar1Seq()
+		/// <summary>
+		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
+		/// The dictionary contains the index of the IUniqueDef in the barat which the clef will be inserted in the VoiceDef's IUniquedefs,
+		/// and the clef ID string ("t", "t1", "b3" etc.).
+		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
+		/// the existing IUniqueDefs before which the clef will be inserted.
+		/// The SortedDictionaries should not contain tne initial clefs per voicedef - those will be included
+		/// automatically.
+		/// Note that both Clefs and a CautionaryChordDef at the beginning of a bar count as IUniqueDefs for
+		/// indexing purposes, and that lyrics cannot be attached to them.
+		/// </summary>
+		protected override List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars)
+		{
+			return null;
+			// test code...
+			//VoiceDef voiceDef0 = bars[0][0];
+			//MidiChordDef mcd1 = voiceDef0[2] as MidiChordDef;
+			//mcd1.Lyric = "lyric1";
+			//MidiChordDef mcd2 = voiceDef0[3] as MidiChordDef;
+			//mcd2.Lyric = "lyric2";
+			//MidiChordDef mcd3 = voiceDef0[4] as MidiChordDef;
+			//mcd3.Lyric = "lyric3";
+		}
+
+		#region CreateBar1Seq()
+		private Seq CreateBar1Seq()
         {
             List<Trk> bar = new List<Trk>();
 

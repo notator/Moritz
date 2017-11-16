@@ -7,6 +7,7 @@ using Krystals4ObjectLibrary;
 using Moritz.Palettes;
 using Moritz.Spec;
 using Moritz.Globals;
+using System;
 
 namespace Moritz.Algorithm.Study1
 {
@@ -25,73 +26,94 @@ namespace Moritz.Algorithm.Study1
 		// Neither the krystals, nor the palettes argument is used.
 		public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
 		{
-			byte[] trackChordNumbers = GetTrackChordNumbers();
-			byte[] trackRootPitches = GetTrackRootPitches();
+			List<byte> trackChordNumbers = GetTrackChordNumbers();
+			List<byte> trackRootPitches = GetTrackRootPitches();
 
-			Debug.Assert(trackChordNumbers.GetLength(0) == trackRootPitches.GetLength(0));
+			Debug.Assert(trackChordNumbers.Count == trackRootPitches.Count);
 
 			Trk track = GetTrack(trackChordNumbers, trackRootPitches);
+			Seq mainSeq = new Seq(0, new List<Trk>() { track }, MidiChannelIndexPerOutputVoice);
+			List<int> barlineMsPositions = mainSeq.GetBalancedBarlineMsPositions(NumberOfBars);
 
-			List<int> nChordsPerSystem = GetNChordsPerSystem(NumberOfBars, trackChordNumbers.GetLength(0));
-
-			List<Bar> bars = GetBars(track, nChordsPerSystem);
+			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
 
 			SetPatch0InTheFirstChord(bars[0].VoiceDefs[0]);
-
-            InsertClefChanges(bars);
 
             return bars;
 		}
 
-        protected override void InsertClefChanges(List<Bar> bars)
-        {
-            //VoiceDef voiceDef = bars[0][bars[0].Count - 1];
-            //voiceDef.InsertClefDef(5, "b");
-        }
-
-        private List<int> GetNChordsPerSystem(int numberOfBars, int nChords)
+		/// <summary>
+		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
+		/// The dictionary contains the index at which the clef will be inserted in the VoiceDef's IUniquedefs,
+		/// and the clef ID string ("t", "t1", "b3" etc.).
+		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
+		/// the existing IUniqueDefs before which the clef will be inserted.
+		/// The SortedDictionaries should not contain tne initial clefs per voicedef - those will be included
+		/// automatically.
+		/// Note that a CautionaryChordDef counts as an IUniqueDef at the beginning of a bar, and that clefs
+		/// cannot be inserted in front of them.
+		/// </summary>
+		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars)
 		{
-			int nLocalChords = 0;
-			// total number of chords is 1219
-			List<int> nChordsInSystemPerSystem = new List<int>();
-			for(int i = 0; i < numberOfBars; ++i)
-			{
-				nChordsInSystemPerSystem.Add(18);
-				nLocalChords += 18;
-			}
-			for(int i = 28; i < 33; ++i)
-			{
-				nChordsInSystemPerSystem[i] = 17;
-				nLocalChords -= 1;
-
-			}
-
-			Debug.Assert(nChordsInSystemPerSystem.Count == numberOfBars);
-			Debug.Assert(nLocalChords == nChords);
-
-			return (nChordsInSystemPerSystem);
+			return null;
+			// test code...
+			//VoiceDef voiceDef1 = bars[0][1];
+			//voiceDef1.InsertClefDef(9, "b3");
+			//voiceDef1.InsertClefDef(8, "b2");
+			//voiceDef1.InsertClefDef(7, "b1");
+			//voiceDef1.InsertClefDef(6, "b");
+			//voiceDef1.InsertClefDef(5, "t3");
+			//voiceDef1.InsertClefDef(4, "t2");
+			//voiceDef1.InsertClefDef(3, "t1");
+			//voiceDef1.InsertClefDef(2, "t");
 		}
 
-		private byte[] GetTrackChordNumbers()
+		/// <summary>
+		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
+		/// The dictionary contains the index of the IUniqueDef in the barat which the clef will be inserted in the VoiceDef's IUniquedefs,
+		/// and the clef ID string ("t", "t1", "b3" etc.).
+		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
+		/// the existing IUniqueDefs before which the clef will be inserted.
+		/// The SortedDictionaries should not contain tne initial clefs per voicedef - those will be included
+		/// automatically.
+		/// Note that both Clefs and a CautionaryChordDef at the beginning of a bar count as IUniqueDefs for
+		/// indexing purposes, and that lyrics cannot be attached to them.
+		/// </summary>
+		protected override List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars)
+		{
+			return null;
+			// test code...
+			//VoiceDef voiceDef0 = bars[0][0];
+			//MidiChordDef mcd1 = voiceDef0[2] as MidiChordDef;
+			//mcd1.Lyric = "lyric1";
+			//MidiChordDef mcd2 = voiceDef0[3] as MidiChordDef;
+			//mcd2.Lyric = "lyric2";
+			//MidiChordDef mcd3 = voiceDef0[4] as MidiChordDef;
+			//mcd3.Lyric = "lyric3";
+		}
+
+		private List<byte> GetTrackChordNumbers()
 		{
 			byte[] bytes = File.ReadAllBytes(@"D:\Visual Studio\Projects\Moritz\Moritz.Algorithm\Study 1\A4chordNumbers");
-			return bytes;
+			var rval = new List<byte>(bytes);
+			return rval;
 		}
 
-		private byte[] GetTrackRootPitches()
+		private List<byte> GetTrackRootPitches()
 		{
 			byte[] bytes = File.ReadAllBytes(@"D:\Visual Studio\Projects\Moritz\Moritz.Algorithm\Study 1\A4pitches");
-			return bytes;
+			var rval = new List<byte>(bytes);
+			return rval;
 		}
 
-		private Trk GetTrack(byte[] trackChordNumbers, byte[] trackRootPitches)
+		private Trk GetTrack(List<byte> trackChordNumbers, List<byte> trackRootPitches)
 		{
 			Trk track = new Trk(0, 0, new List<IUniqueDef>());
 			List<List<byte>> chordIntervals = GetChordIntervals();
 			List<byte> chordVelocities = GetChordVelocities();
 			List<int> chordDurations = GetChordMsDurations();
 			
-			int nChords = trackChordNumbers.GetLength(0);
+			int nChords = trackChordNumbers.Count;
 			int chordMsPosition = 0;
 			for(int i = 0; i < nChords; ++i)
 			{
@@ -202,30 +224,6 @@ namespace Moritz.Algorithm.Study1
 
 			return chordMsDurations;  
 		}
-
-		private List<Bar> GetBars(Trk mainTrack, List<int> nChordsPerSystem)
-		{
-			int mainTrackIndex = 0;
-			int absSeqMsPosition = 0;
-			IUniqueDef lastUID = null;
-			List<Bar> bars = new List<Bar>();
-			foreach(int nChords in nChordsPerSystem)
-			{
-				Trk trk = new Trk(0, 0, new List<IUniqueDef>());
-				for(int i = 0; i < nChords; i++)
-				{
-					lastUID = mainTrack[mainTrackIndex++];
-					trk.Add(lastUID);
-				}
-				Seq seq = new Seq(absSeqMsPosition, new List<Trk>() { trk }, MidiChannelIndexPerOutputVoice);
-				Bar bar = new Bar(seq);
-				bars.Add(bar);
-				absSeqMsPosition = lastUID.MsPositionReFirstUD + lastUID.MsDuration;
-			}
-
-			return bars;
-		}
-
 		/// <summary>
 		/// The patch only needs to be set in the first chord, since it will be set by shunting if the Assistant Performer starts later.
 		/// </summary>

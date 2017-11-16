@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 using Krystals4ObjectLibrary;
@@ -34,8 +35,9 @@ namespace Moritz.Algorithm.Study2
             Debug.Assert((sequentialStaff1Bars.Count == sequentialStaff2Bars.Count) 
                       && (sequentialStaff1Bars.Count == sequentialStaff3Bars.Count));
 
-            List<Bar> bars = new List<Bar>();
-			int seqBarAbsMsPosition = 0;
+			List<Seq> seqs = new List<Seq>();
+			List<int> barlineMsPositions = new List<int>();
+			int seqAbsMsPosition = 0;
             for(int barIndex = 0; barIndex < sequentialStaff1Bars.Count; ++barIndex)
             {
 				List<Trk> trks = new List<Trk>()
@@ -44,27 +46,76 @@ namespace Moritz.Algorithm.Study2
 					sequentialStaff2Bars[barIndex],
 					sequentialStaff3Bars[barIndex]
 				};
-				Seq seq = new Seq(seqBarAbsMsPosition, trks, MidiChannelIndexPerOutputVoice);
+				Seq seq = new Seq(seqAbsMsPosition, trks, MidiChannelIndexPerOutputVoice);
 
-				Bar bar = new Bar(seq);
+				seqs.Add(seq);
 
-				bars.Add(bar);
-
-				seqBarAbsMsPosition += seq.MsDuration;
+				seqAbsMsPosition += seq.MsDuration;
+				barlineMsPositions.Add(seqAbsMsPosition);
 			}
 
-			InsertClefChanges(bars);
+			Seq mainSeq = seqs[0];
+			for(int i = 1; i < seqs.Count; i++)
+			{
+				mainSeq.Concat(seqs[i]);
+			}
 
-            return bars;
+			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
+
+			return bars;
         }
 
-        protected override void InsertClefChanges(List<Bar> bars)
-        {
-            //VoiceDef voiceDef = bars[1][0];
-            //voiceDef.InsertClefDef(1, "b");
-        }
+		/// <summary>
+		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
+		/// The dictionary contains the index at which the clef will be inserted in the VoiceDef's IUniquedefs,
+		/// and the clef ID string ("t", "t1", "b3" etc.).
+		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
+		/// the existing IUniqueDefs before which the clef will be inserted.
+		/// The SortedDictionaries should not contain tne initial clefs per voicedef - those will be included
+		/// automatically.
+		/// Note that a CautionaryChordDef counts as an IUniqueDef at the beginning of a bar, and that clefs
+		/// cannot be inserted in front of them.
+		/// </summary>
+		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars)
+		{
+			return null;
+			// test code...
+			//VoiceDef voiceDef1 = bars[0][1];
+			//voiceDef1.InsertClefDef(9, "b3");
+			//voiceDef1.InsertClefDef(8, "b2");
+			//voiceDef1.InsertClefDef(7, "b1");
+			//voiceDef1.InsertClefDef(6, "b");
+			//voiceDef1.InsertClefDef(5, "t3");
+			//voiceDef1.InsertClefDef(4, "t2");
+			//voiceDef1.InsertClefDef(3, "t1");
+			//voiceDef1.InsertClefDef(2, "t");
+		}
 
-        private List<Trk> WriteTopStaff()
+		/// <summary>
+		/// This function returns null or  a SortedDictionary per VoiceDef in each bar.
+		/// The dictionary contains the index of the IUniqueDef in the barat which the clef will be inserted in the VoiceDef's IUniquedefs,
+		/// and the clef ID string ("t", "t1", "b3" etc.).
+		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
+		/// the existing IUniqueDefs before which the clef will be inserted.
+		/// The SortedDictionaries should not contain tne initial clefs per voicedef - those will be included
+		/// automatically.
+		/// Note that both Clefs and a CautionaryChordDef at the beginning of a bar count as IUniqueDefs for
+		/// indexing purposes, and that lyrics cannot be attached to them.
+		/// </summary>
+		protected override List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars)
+		{
+			return null;
+			// test code...
+			//VoiceDef voiceDef0 = bars[0][0];
+			//MidiChordDef mcd1 = voiceDef0[2] as MidiChordDef;
+			//mcd1.Lyric = "lyric1";
+			//MidiChordDef mcd2 = voiceDef0[3] as MidiChordDef;
+			//mcd2.Lyric = "lyric2";
+			//MidiChordDef mcd3 = voiceDef0[4] as MidiChordDef;
+			//mcd3.Lyric = "lyric3";
+		}
+
+		private List<Trk> WriteTopStaff()
         {
             List<Trk> consecutiveBars = new List<Trk>();
             List<List<int>> dcValuesPerTopStaffBar = _krystals[0].GetValues(_krystals[0].Level);

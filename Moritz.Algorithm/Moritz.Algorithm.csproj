@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MainBar.cs" />
     <Compile Include="CompositionAlgorithm.cs" />
     <Compile Include="Pianola Music\PianolaMusicAlgorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

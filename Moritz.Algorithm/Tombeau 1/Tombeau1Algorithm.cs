@@ -419,13 +419,12 @@ namespace Moritz.Algorithm.Tombeau1
 			//Do global changes that affect the whole piece here (accel., rit, transpositions etc.)
 			FinalizeMainSeq(mainSeq);
 
-			Bar mainBar = new Bar(mainSeq, null, InitialClefPerChannel);
+			//MainBar mainBar = new Bar(mainSeq, null, InitialClefPerVoiceDef);
 
-			List<Bar> bars = mainBar.GetBars(barlineMsPositions);
+			//List<Bar> bars = mainBar.GetBars(barlineMsPositions);
+			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
 
-            InsertClefChanges(bars);
-
-            return bars;
+			return bars;
         }
 
 		#region available Trk and GamutGrpTrk transformations
@@ -521,21 +520,65 @@ namespace Moritz.Algorithm.Tombeau1
 
 		}
 
-		protected override void InsertClefChanges(List<Bar> bars)
-        {
-            //VoiceDef voiceDef = bars[0][bars[0].Count - 1];
-            //voiceDef.InsertClefDef(5, "b");
-        }
+		/// <summary>
+		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
+		/// The dictionary contains the index at which the clef will be inserted in the VoiceDef's IUniquedefs,
+		/// and the clef ID string ("t", "t1", "b3" etc.).
+		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
+		/// the existing IUniqueDefs before which the clef will be inserted.
+		/// The SortedDictionaries should not contain tne initial clefs per voicedef - those will be included
+		/// automatically.
+		/// Note that a CautionaryChordDef counts as an IUniqueDef at the beginning of a bar, and that clefs
+		/// cannot be inserted in front of them.
+		/// </summary>
+		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars)
+		{
+			return null;
+			// test code...
+			//VoiceDef voiceDef1 = bars[0][1];
+			//voiceDef1.InsertClefDef(9, "b3");
+			//voiceDef1.InsertClefDef(8, "b2");
+			//voiceDef1.InsertClefDef(7, "b1");
+			//voiceDef1.InsertClefDef(6, "b");
+			//voiceDef1.InsertClefDef(5, "t3");
+			//voiceDef1.InsertClefDef(4, "t2");
+			//voiceDef1.InsertClefDef(3, "t1");
+			//voiceDef1.InsertClefDef(2, "t");
+		}
 
-        #region private properties for use by Tombeau1Algorithm
-        #region envelopes
-        /// <summary>
-        /// If domain is null, the returned shape will come from the _sliderShapesLong list. 
-        /// </summary>
-        /// <param name="domain">null, or in range 2..7</param>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        private IReadOnlyList<byte> SliderShape(int? domain, int index)
+		/// <summary>
+		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
+		/// The dictionary contains the index of the IUniqueDef in the barat which the clef will be inserted in the VoiceDef's IUniquedefs,
+		/// and the clef ID string ("t", "t1", "b3" etc.).
+		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
+		/// the existing IUniqueDefs before which the clef will be inserted.
+		/// The SortedDictionaries should not contain tne initial clefs per voicedef - those will be included
+		/// automatically.
+		/// Note that both Clefs and a CautionaryChordDef at the beginning of a bar count as IUniqueDefs for
+		/// indexing purposes, and that lyrics cannot be attached to them.
+		/// </summary>
+		protected override List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars)
+		{
+			return null;
+			// test code...
+			//VoiceDef voiceDef0 = bars[0][0];
+			//MidiChordDef mcd1 = voiceDef0[2] as MidiChordDef;
+			//mcd1.Lyric = "lyric1";
+			//MidiChordDef mcd2 = voiceDef0[3] as MidiChordDef;
+			//mcd2.Lyric = "lyric2";
+			//MidiChordDef mcd3 = voiceDef0[4] as MidiChordDef;
+			//mcd3.Lyric = "lyric3";
+		}
+
+		#region private properties for use by Tombeau1Algorithm
+		#region envelopes
+		/// <summary>
+		/// If domain is null, the returned shape will come from the _sliderShapesLong list. 
+		/// </summary>
+		/// <param name="domain">null, or in range 2..7</param>
+		/// <param name="index"></param>
+		/// <returns></returns>
+		private IReadOnlyList<byte> SliderShape(int? domain, int index)
         {
             if(domain != null)
             {

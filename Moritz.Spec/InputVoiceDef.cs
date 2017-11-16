@@ -52,15 +52,36 @@ namespace Moritz.Spec
         }
 		#endregion constructors
 
-		internal override void AssertConsistentInBar()
+		/// <summary>
+		/// When this function is called, VoiceDef.AssertConsistency() is called (see documentation there), then
+		/// the following are checked:
+		/// 1. MidiChannels are in range [0..3]
+		/// 2. The Container is either null or a Bar.
+		/// 3. If the Container is null, the UniqueDefs can contain any combination of InputChordDef and InputRestDef.
+		///    If the Container is a Bar, the UniqueDefs can also contain ClefDef and CautionaryChordDef objects.
+		/// </summary>
+		public override void AssertConsistency()
         {
-            foreach(IUniqueDef iud in UniqueDefs)
-            {
-                // In blocks, inputChordDefs can also contain CautionaryChordDefs
-                Debug.Assert(iud is InputChordDef || iud is InputRestDef || iud is CautionaryChordDef || iud is ClefDef);
-            }
-			Debug.Assert(MsPositionReContainer == 0);
-			AssertVoiceDefConsistency();
+			base.AssertConsistency();
+
+			Debug.Assert(MidiChannel >= 0 && MidiChannel <= 3);	 // max 4 input channels
+
+			Debug.Assert(Container == null || Container is Bar);
+
+			if(Container is Bar)
+			{
+				foreach(IUniqueDef iud in UniqueDefs)
+				{
+					Debug.Assert(iud is InputChordDef || iud is InputRestDef || iud is CautionaryChordDef || iud is ClefDef);
+				}
+			}
+			else // during construction
+			{
+				foreach(IUniqueDef iud in UniqueDefs)
+				{
+					Debug.Assert(iud is InputChordDef || iud is InputRestDef);
+				}
+			}
 		}
 
         #region Count changers
@@ -141,7 +162,7 @@ namespace Moritz.Spec
                 Debug.Assert(false, "Can't find a rest spanning the chord!");
             }
 
-            AssertVoiceDefConsistency();
+            AssertConsistency();
         }
         #region _InsertInRest() implementation
         /// <summary>

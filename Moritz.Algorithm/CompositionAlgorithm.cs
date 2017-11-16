@@ -137,19 +137,138 @@ namespace Moritz.Algorithm
         /// </summary>
         public abstract List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes);
 
-        /// <summary>
-        /// This function standardizes the place where clef changes are added to the score.
-        /// It should always be called from DoAlgorithm() immediately before it returns.
-        /// This function is abstract as a reminder that it exists. It can be empty.
-        /// ClefDefs should be inserted using the voiceDef.InsertClefDef(index, clefType) function.
-        /// </summary>
-        protected abstract void InsertClefChanges(List<Bar> bars);
+		/// <summary>
+		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
+		/// The dictionary contains the index at which the clef will be inserted in the VoiceDef's IUniquedefs,
+		/// and the clef ID string ("t", "t1", "b3" etc.).
+		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
+		/// the existing IUniqueDefs before which the clef will be inserted.
+		/// The SortedDictionaries should not contain tne initial clefs per voicedef - those will be included
+		/// automatically.
+		/// Note that a CautionaryChordDef counts as an IUniqueDef at the beginning of a bar, and that clefs
+		/// cannot be inserted in front of them.
+		/// </summary>
+		protected abstract List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars);
 
-        /// <summary>
-        /// Sets InitialClefPerChannel to contain a clef for every channel (=voiceDef).
-        /// Channels that will end up on a HiddenOutputStaff are also given a clef - even though it isn't going to be displayed.
-        /// </summary>
-        public void GetInitialClefPerChannel(PageFormat pageFormat)
+		/// <summary>
+		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
+		/// The dictionary contains the index of the IUniqueDef in the barat which the clef will be inserted in the VoiceDef's IUniquedefs,
+		/// and the clef ID string ("t", "t1", "b3" etc.).
+		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
+		/// the existing IUniqueDefs before which the clef will be inserted.
+		/// The SortedDictionaries should not contain tne initial clefs per voicedef - those will be included
+		/// automatically.
+		/// Note that both Clefs and a CautionaryChordDef at the beginning of a bar count as IUniqueDefs for
+		/// indexing purposes, and that lyrics cannot be attached to them.
+		/// </summary>
+		protected abstract List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars);
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="mainSeq">A Seq containing all the output IUniqueDefs in the composition.</param>
+		/// <param name="inputVoiceDefs">Can be null, or contains all the input IUniqueDefs in the composition.</param>
+		/// <param name="barlineMsPositions">All the barline msPositions (except the first).</param>
+		/// <param name="clefChangesPerBar">Can be null.</param>
+		/// <param name="lyricsPerBar">Can be null.</param>
+		/// <returns>A list of Bars</returns>
+		protected List<Bar> GetBars(Seq mainSeq, List<InputVoiceDef> inputVoiceDefs, List<int> barlineMsPositions, List<List<SortedDictionary<int, string>>> clefChangesPerBar, List<List<SortedDictionary<int, string>>> lyricsPerBar)
+		{
+			MainBar mainBar = new MainBar(mainSeq, inputVoiceDefs, InitialClefPerVoiceDef);
+
+			List<Bar> bars = mainBar.GetBars(barlineMsPositions);
+
+			if(clefChangesPerBar != null)
+			{
+				InsertClefChangesInBars(bars, clefChangesPerBar);
+			}
+			if(lyricsPerBar != null)
+			{
+				AddLyricsToBars(bars, lyricsPerBar);
+			}
+
+			return bars;
+		}
+
+		private void InsertClefChangesInBars(List<Bar> bars, List<List<SortedDictionary<int, string>>> clefChangesPerBar)
+		{
+			Debug.Assert(bars.Count == clefChangesPerBar.Count);
+
+			for(int i = 0; i < bars.Count; i++)
+			{
+				List<VoiceDef> barVoiceDefs = bars[i].VoiceDefs;
+				List<SortedDictionary<int, string>> clefChangesPerVoiceDef = clefChangesPerBar[i];
+				Debug.Assert(barVoiceDefs.Count == clefChangesPerVoiceDef.Count);
+				for(int voiceDefIndex = 0; voiceDefIndex < barVoiceDefs.Count; voiceDefIndex++)
+				{
+					VoiceDef voiceDef = barVoiceDefs[voiceDefIndex];
+					SortedDictionary<int, string> clefChanges = clefChangesPerVoiceDef[voiceDefIndex];
+					InsertClefChangesInVoiceDef(voiceDef, clefChanges);
+				}
+			}
+		}
+
+		private static void InsertClefChangesInVoiceDef(VoiceDef voiceDef, SortedDictionary<int, string> clefChanges)
+		{
+			List<int> reversedKeys = new List<int>();
+			foreach(int key in clefChanges.Keys)
+			{
+				reversedKeys.Add(key);
+			}
+			reversedKeys.Reverse();
+
+			foreach(int key in reversedKeys)
+			{
+				string clef = clefChanges[key];
+				voiceDef.InsertClefDef(key, clef);
+			}
+		}
+
+		private void AddLyricsToBars(List<Bar> bars, List<List<SortedDictionary<int, string>>> lyricsPerBar)
+		{
+			Debug.Assert(bars.Count == lyricsPerBar.Count);
+
+			for(int i = 0; i < bars.Count; i++)
+			{
+				List<VoiceDef> barVoiceDefs = bars[i].VoiceDefs;
+				List<SortedDictionary<int, string>> lyricsPerVoiceDef = lyricsPerBar[i];
+				Debug.Assert(barVoiceDefs.Count == lyricsPerVoiceDef.Count);
+				for(int voiceDefIndex = 0; voiceDefIndex < barVoiceDefs.Count; voiceDefIndex++)
+				{
+					VoiceDef voiceDef = barVoiceDefs[voiceDefIndex];
+					SortedDictionary<int, string> lyrics = lyricsPerVoiceDef[voiceDefIndex];
+					AddLyricsToVoiceDef(voiceDef, lyrics);
+				}
+			}
+		}
+
+		private static void AddLyricsToVoiceDef(VoiceDef voiceDef, SortedDictionary<int, string> lyrics)
+		{
+			foreach(int key in lyrics.Keys)
+			{
+				IUniqueDef iud = voiceDef[key];
+				string lyric = lyrics[key];
+
+				if(iud is MidiChordDef mcd)
+				{
+					mcd.Lyric = lyric;
+				}
+				else if(iud is InputChordDef icd)
+				{
+					icd.Lyric = lyric;
+				}
+				else
+				{
+					Debug.Assert(false);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Returns a clef for every VoiceDef (top to bottom in score).
+		/// Channels that will end up on a HiddenOutputStaff are also given a clef - even though it isn't going to be displayed.
+		/// </summary>
+		public void GetInitialClefPerVoiceDef(PageFormat pageFormat)
         {
             List<string> pageFormatClefsList = pageFormat.ClefsList;
             List<List<byte>> visibleOutputVoiceIndicesPerStaff = pageFormat.VisibleOutputVoiceIndicesPerStaff;
@@ -186,13 +305,12 @@ namespace Moritz.Algorithm
                     initialClefs[firstInputClefIndex + index] = pageFormatClefsList[pageFormatClefsListIndex++];
                 }
             }
-            
-            InitialClefPerChannel = initialClefs;
-        }
 
-        public List<string> InitialClefPerChannel = null;
+			InitialClefPerVoiceDef = initialClefs;
+		}
 
-        protected List<Krystal> _krystals;
+		public List<string> InitialClefPerVoiceDef = null;
+		protected List<Krystal> _krystals;
         protected List<Palette> _palettes;       
     }
 }

@@ -26,7 +26,7 @@ namespace Moritz.Spec
         public Trk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
             : base(midiChannel, msPositionReContainer, iuds)
         {
-            AssertConsistentInSeq();
+            AssertConsistency();
         }
 
         /// <summary>
@@ -63,36 +63,38 @@ namespace Moritz.Spec
         }
 
 		#endregion constructors
-		private void AssertBasicTrkConsistency()
-		{
-			Debug.Assert(MsPositionReContainer == 0);
-			AssertVoiceDefConsistency();
-
-		}
 		/// <summary>
-		/// In seqs, trks can contain any combination of MidiRestDef and MidiChordDef.
-		/// trk.MsPositionReContainer ==  0. VoiceDefs
+		/// When this function is called, VoiceDef.AssertConsistency() is called (see documentation there), then
+		/// the following are checked:
+		/// 1. MidiChannels are in range [0..15]
+		/// 2. The Container is either null, a Seq or a Bar.
+		/// 3. If the Container is a Seq, the UniqueDefs contain any combination of MidiRestDef and MidiChordDef.
+		///    If the Container is a Bar, the UniqueDefs can also contain ClefDef and CautionaryChordDef objects.
 		/// </summary>
-		internal void AssertConsistentInSeq()
+		public override void AssertConsistency()
 		{
-			foreach(IUniqueDef iud in UniqueDefs)
+			base.AssertConsistency();
+
+			Debug.Assert(MidiChannel >= 0 && MidiChannel <= 15);
+
+			Debug.Assert(Container == null || Container is Seq || Container is Bar);
+
+			if(Container == null || Container is Seq)
 			{
-				Debug.Assert(iud is MidiChordDef || iud is MidiRestDef);
+				foreach(IUniqueDef iud in UniqueDefs)
+				{
+					Debug.Assert(iud is MidiChordDef || iud is MidiRestDef);
+				}
 			}
-			AssertBasicTrkConsistency();
+			else if(Container is Bar)
+			{
+				foreach(IUniqueDef iud in UniqueDefs)
+				{
+					Debug.Assert(iud is MidiChordDef || iud is MidiRestDef || iud is ClefDef || iud is CautionaryChordDef);
+				}
+			}
 		}
 
-		/// <summary>
-		/// In bars, trks can contain any combination of MidiRestDef, MidiChordDef, ClefDef and CautionaryChordDef.
-		/// </summary>
-		internal override void AssertConsistentInBar()
-        {
-            foreach(IUniqueDef iud in UniqueDefs)
-            {
-                Debug.Assert(iud is MidiChordDef || iud is MidiRestDef || iud is ClefDef || iud is CautionaryChordDef);
-            }
-			AssertBasicTrkConsistency();
-        }
 
         #region Add, Remove, Insert, Replace objects in the Trk
         /// <summary>
@@ -160,7 +162,7 @@ namespace Moritz.Spec
 
             SuperimposeUniqueDefs(trk2);
 
-            AssertConsistentInSeq();
+            AssertConsistency();
 
             return this;
         }
@@ -851,7 +853,7 @@ namespace Moritz.Spec
             }
             #endregion
 
-            AssertVoiceDefConsistency();
+            AssertConsistency();
         }
         /// <summary>
         /// Debug.Assert fails if
@@ -974,7 +976,7 @@ namespace Moritz.Spec
             if(uniqueDefs == _uniqueDefs)
             {
                 AxisIndex = _uniqueDefs.FindIndex(u => (u == axisUniqueDef));
-                AssertVoiceDefConsistency();
+                AssertConsistency();
             }
         }
         /// <summary>
@@ -1066,7 +1068,7 @@ namespace Moritz.Spec
 
             AxisIndex = _uniqueDefs.FindIndex(u => (u == axisUniqueDef));
 
-            AssertVoiceDefConsistency();
+            AssertConsistency();
         }
 
         /// <summary>
