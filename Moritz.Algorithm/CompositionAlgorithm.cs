@@ -163,14 +163,106 @@ namespace Moritz.Algorithm
 		/// </summary>
 		protected abstract List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars);
 
-		protected List<int> GetBarlinePositions(Seq mainSeq, List<double> approximateBarlineMsPositions)
+		/// <summary>
+		/// If inputVoiceDefs != null, then barlines will be fit to the inputVoices (compulsory), else
+		/// the barlines will be fit to the
+		/// </summary>
+		/// <param name="mainSeq"></param>
+		/// <param name="inputVoiceDefs">can be null</param>
+		/// <param name="approximateBarlineMsPositions"></param>
+		/// <returns></returns>
+		protected List<int> GetBarlinePositions(IReadOnlyList<Trk> trks, IReadOnlyList<InputVoiceDef> inputVoiceDefs, List<double> approximateBarlineMsPositions)
 		{
 			List<int> barlineMsPositions = new List<int>();
+
+			List<VoiceDef> voiceDefs = null;
+			if(inputVoiceDefs != null)
+			{
+				voiceDefs = new List<VoiceDef>(inputVoiceDefs);
+			}
+			else
+			{
+				voiceDefs = new List<VoiceDef>(trks);
+			}
 			foreach(double approxMsPos in approximateBarlineMsPositions)
 			{
-				int barlineMsPos = mainSeq.NearestAbsUIDEndMsPosition(approxMsPos);
+				int barlineMsPos = 0;
+				barlineMsPos = NearestAbsUIDEndMsPosition(voiceDefs, approxMsPos);
+				
 				barlineMsPositions.Add(barlineMsPos);
 			}
+			return barlineMsPositions;
+		}
+
+		private int NearestAbsUIDEndMsPosition(List<VoiceDef> voiceDefs, double approxAbsMsPosition)
+		{
+			int nearestAbsUIDEndMsPosition = 0;
+			double diff = double.MaxValue;
+			foreach(VoiceDef voiceDef in voiceDefs)
+			{
+				for(int uidIndex = 0; uidIndex < voiceDef.Count; ++uidIndex)
+				{
+					IUniqueDef iud = voiceDef[uidIndex];
+					int absEndPos = iud.MsPositionReFirstUD + iud.MsDuration;
+					double localDiff = Math.Abs(approxAbsMsPosition - absEndPos);
+					if(localDiff < diff)
+					{
+						diff = localDiff;
+						nearestAbsUIDEndMsPosition = absEndPos;
+					}
+					if(diff == 0)
+					{
+						break;
+					}
+				}
+				if(diff == 0)
+				{
+					break;
+				}
+			}
+			return nearestAbsUIDEndMsPosition;
+		}
+
+		/// <summary>
+		/// Returns nBars barlineMsPositions.
+		/// The Bars are as equal in duration as possible, with each barline being at the end of at least one IUniqueDef.
+		/// The returned list contains no duplicates (A Debug.Assertion fails otherwise).
+		/// </summary>
+		/// <returns></returns>
+		/// <param name="trks"></param>
+		/// <param name="inputVoiceDefs">Can be null</param>
+		/// <param name="nBars"></param>
+		/// <returns></returns>
+		public List<int> GetBalancedBarlineMsPositions(IReadOnlyList<Trk> trks, IReadOnlyList<InputVoiceDef> inputVoiceDefs, int nBars)
+		{
+			List<VoiceDef> voiceDefs = null;
+			if(inputVoiceDefs != null)
+			{
+				voiceDefs = new List<VoiceDef>(inputVoiceDefs);
+			}
+			else
+			{
+				voiceDefs = new List<VoiceDef>(trks);
+			}
+
+			int msDuration = voiceDefs[0].MsDuration;
+
+			double approxBarMsDuration = (((double)msDuration) / nBars);
+			Debug.Assert(approxBarMsDuration * nBars == msDuration);
+
+			List<int> barlineMsPositions = new List<int>();
+
+			for(int barNumber = 1; barNumber <= nBars; ++barNumber)
+			{
+				double approxBarMsPosition = approxBarMsDuration * barNumber;
+				int barMsPosition = NearestAbsUIDEndMsPosition(voiceDefs, approxBarMsPosition);
+
+				Debug.Assert(barlineMsPositions.Contains(barMsPosition) == false);
+
+				barlineMsPositions.Add(barMsPosition);
+			}
+			Debug.Assert(barlineMsPositions[barlineMsPositions.Count - 1] == msDuration);
+
 			return barlineMsPositions;
 		}
 

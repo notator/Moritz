@@ -35,20 +35,11 @@ namespace Moritz.Algorithm.Study3Sketch2
             _krystals = krystals;
             _palettes = palettes;
 
-            List<int> barlineMsPositions = new List<int>();
+			Seq bar1Seq = CreateBar1Seq();
+			Seq bar2Seq = CreateBar2Seq();
+			Seq bars345Seq = bar2Seq.Clone();
 
-            Seq bar1Seq = CreateBar1Seq();
-            barlineMsPositions.Add(bar1Seq.MsDuration);
-
-            Seq bar2Seq = CreateBar2Seq();
-            barlineMsPositions.Add(bar1Seq.MsDuration + bar2Seq.MsDuration);
-
-            Seq bars345Seq = bar2Seq.Clone();
-            barlineMsPositions.Add(bar1Seq.MsDuration + bar2Seq.MsDuration + 5950);
-            barlineMsPositions.Add(bar1Seq.MsDuration + bar2Seq.MsDuration + 10500);
-            barlineMsPositions.Add(bar1Seq.MsDuration + bar2Seq.MsDuration + bars345Seq.MsDuration);
-
-            /****************************************************************************************
+			/****************************************************************************************
 			* This score is liable to be recompiled when other things change in the SVG-MIDI file format,
 			* so its default version should be kept simple.
 			* The default CC settings are set in the first InputChordDef in bar 1, but setting trkOptions
@@ -57,7 +48,7 @@ namespace Moritz.Algorithm.Study3Sketch2
 			* the following functions, and the comment at the top of TrkOptions.cs.
 			*****************************************************************************************/
 
-            InputVoiceDef bar1InputVoiceDef = GetBar1InputVoiceDef(bar1Seq);
+			InputVoiceDef bar1InputVoiceDef = GetBar1InputVoiceDef(bar1Seq);
             SetTrackCCSettings(bar1InputVoiceDef);
 			SetBar1PerformanceOptions(bar1InputVoiceDef);
 
@@ -67,15 +58,24 @@ namespace Moritz.Algorithm.Study3Sketch2
             InputVoiceDef bars345InputVoiceDef = GetBar345InputVoiceDef(bars345Seq);
             SetBar345PerformanceOptions(bars345InputVoiceDef);
 
-            InputVoiceDef ivd = bar1InputVoiceDef;
+			var approximateBarlineMsPositions = new List<double>();
+			approximateBarlineMsPositions.Add(bar1InputVoiceDef.MsDuration);
+			approximateBarlineMsPositions.Add(bar1InputVoiceDef.MsDuration + bar2InputVoiceDef.MsDuration);
+			approximateBarlineMsPositions.Add(bar1InputVoiceDef.MsDuration + bar2InputVoiceDef.MsDuration + 5950);
+			approximateBarlineMsPositions.Add(bar1InputVoiceDef.MsDuration + bar2InputVoiceDef.MsDuration + 10500);
+			approximateBarlineMsPositions.Add(bar1InputVoiceDef.MsDuration + bar2InputVoiceDef.MsDuration + bars345InputVoiceDef.MsDuration);
+
+			InputVoiceDef ivd = bar1InputVoiceDef;
             ivd.Concat(bar2InputVoiceDef);
             ivd.Concat(bars345InputVoiceDef);
 
-            Seq mainSeq = bar1Seq;
-            mainSeq.Concat(bar2Seq);
-            mainSeq.Concat(bars345Seq);
+			Seq mainSeq = bar1Seq;
+			mainSeq.Concat(bar2Seq);
+			mainSeq.Concat(bars345Seq);
 
-            List<InputVoiceDef> inputVoiceDefs = new List<InputVoiceDef>() { ivd };
+			List<int> barlineMsPositions = GetBarlinePositions(mainSeq.Trks, new List<InputVoiceDef>() { ivd }, approximateBarlineMsPositions);
+
+			List<InputVoiceDef> inputVoiceDefs = new List<InputVoiceDef>() { ivd };
 
 			List<Bar> bars = GetBars(mainSeq, inputVoiceDefs, barlineMsPositions, null, null);
 

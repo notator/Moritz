@@ -33,7 +33,7 @@ namespace Moritz.Algorithm.PianolaMusic
 
 			Seq mainSeq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
 			List<InputVoiceDef> inputVoiceDefs = new List<InputVoiceDef>();
-			List<int> barlineMsPositions = mainSeq.GetBalancedBarlineMsPositions(8);
+			List<int> barlineMsPositions = GetBalancedBarlineMsPositions(mainSeq.Trks, null, 8);
 			List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count);
 			List<List<SortedDictionary<int, string>>> lyricsPerBar = GetLyricsPerBar(barlineMsPositions.Count);
 

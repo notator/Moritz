@@ -33,7 +33,7 @@ namespace Moritz.Algorithm.Study1
 
 			Trk track = GetTrack(trackChordNumbers, trackRootPitches);
 			Seq mainSeq = new Seq(0, new List<Trk>() { track }, MidiChannelIndexPerOutputVoice);
-			List<int> barlineMsPositions = mainSeq.GetBalancedBarlineMsPositions(NumberOfBars);
+			List<int> barlineMsPositions = GetBalancedBarlineMsPositions(mainSeq.Trks, null, NumberOfBars);
 
 			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
 

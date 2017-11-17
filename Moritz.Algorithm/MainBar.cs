@@ -240,7 +240,8 @@ namespace Moritz.Algorithm
 		///    2) the argument contains duplicate msPositions.
 		///    3) the argument is not in ascending order.
 		///    4) a VoiceDef.MsPositionReContainer is not 0.
-		///    5) an msPosition is not the endMsPosition of any IUniqueDef in the bar.
+		///    5) if the bar contains InputVoiceDefs, an msPosition is not the endMsPosition of any IUniqueDef in the InputVoiceDefs
+		///       else if an msPosition is not the endMsPosition of any IUniqueDef in the Trks.
 		/// </summary>
 		private void CheckBarlineMsPositions(IReadOnlyList<int> barlineMsPositionsReThisBar)
 		{
@@ -263,9 +264,20 @@ namespace Moritz.Algorithm
 				Debug.Assert(msPosition > currentMsPos, "Value out of order.");
 				currentMsPos = msPosition;
 				bool found = false;
-				foreach(VoiceDef voiceDef in VoiceDefs)
+				bool inputVoiceDefFound = false;
+				for(int i = _voiceDefs.Count - 1; i >= 0; --i)
 				{
+					VoiceDef voiceDef = _voiceDefs[i];
+
 					Debug.Assert(voiceDef.MsPositionReContainer == 0);
+					if(voiceDef is InputVoiceDef)
+					{
+						inputVoiceDefFound = true;
+					}
+					if(voiceDef is Trk && inputVoiceDefFound)
+					{
+						break;
+					}
 					foreach(IUniqueDef iud in voiceDef.UniqueDefs)
 					{
 						if(msPosition == (iud.MsPositionReFirstUD + iud.MsDuration))
@@ -279,7 +291,14 @@ namespace Moritz.Algorithm
 						break;
 					}
 				}
-				Debug.Assert(found == true, "Error: barline must be at the endMsPosition of at least one IUniqueDef.");
+				if(inputVoiceDefFound)
+				{
+					Debug.Assert(found, "Error: barline must be at the endMsPosition of at least one IUniqueDef in an InputVoiceDef.");
+				}
+				else
+				{
+					Debug.Assert(found, "Error: barline must be at the endMsPosition of at least one IUniqueDef in a Trk.");
+				}
 			}
 		}
 

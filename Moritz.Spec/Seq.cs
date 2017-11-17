@@ -69,34 +69,6 @@ namespace Moritz.Spec
             AssertConsistency();
         }
 
-		public int NearestAbsUIDEndMsPosition(double approxAbsMsPosition)
-		{
-			int nearestAbsUIDEndMsPosition = 0;
-			double diff = double.MaxValue;
-			foreach(Trk trk in Trks)
-			{
-				for(int uidIndex = 0; uidIndex < trk.Count; ++uidIndex)
-				{
-					int absEndPos = this.AbsMsPosition + trk[uidIndex].MsPositionReFirstUD + trk[uidIndex].MsDuration;
-					double localDiff = Math.Abs(approxAbsMsPosition - absEndPos);
-					if(localDiff < diff)
-					{
-						diff = localDiff;
-						nearestAbsUIDEndMsPosition = absEndPos;
-					}
-					if(diff == 0)
-					{
-						break;
-					}
-				}
-				if(diff == 0)
-				{
-					break;
-				}
-			}
-			return nearestAbsUIDEndMsPosition;
-		}
-
 		public Seq Clone()
         {
             List<Trk> trks = new List<Trk>();
@@ -294,34 +266,6 @@ namespace Moritz.Spec
 				midiChannels.Add(trk.MidiChannel);
             }
         }
-
-		/// <summary>
-		/// Returns nBars barlineMsPositions.
-		/// The Bars are as equal in duration as possible, with each barline being at the end of at least one IUniqueDef.
-		/// The returned list contains no duplicates (A Debug.Assertion fails otherwise).
-		/// </summary>
-		/// <returns></returns>
-		public List<int> GetBalancedBarlineMsPositions(int nBars)
-		{
-			int msDuration = MsDuration;
-			double approxBarMsDuration = (((double)msDuration) / nBars);
-			Debug.Assert(approxBarMsDuration * nBars == msDuration);
-
-			List<int> barlineMsPositions = new List<int>();
-
-			for(int barNumber = 1; barNumber <= nBars; ++barNumber)
-			{
-				double approxBarMsPosition = approxBarMsDuration * barNumber;
-				int barMsPosition = NearestAbsUIDEndMsPosition(approxBarMsPosition);
-					
-				Debug.Assert(barlineMsPositions.Contains(barMsPosition) == false);
-
-				barlineMsPositions.Add(barMsPosition);
-			}
-			Debug.Assert(barlineMsPositions[barlineMsPositions.Count - 1] == this.MsDuration);
-
-			return barlineMsPositions;
-		}
 
 		#region sort functions
 		public void SortVelocityIncreasing()

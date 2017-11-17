@@ -48,7 +48,7 @@ namespace Moritz.Algorithm.Study3Sketch1
             mainSeq.Concat(bar2Seq);
             mainSeq.Concat(bars345Seq);
 
-			List<int> barlineMsPositions = GetBarlinePositions(mainSeq, approximateBarlineMsPositions);
+			List<int> barlineMsPositions = GetBarlinePositions(mainSeq.Trks, null, approximateBarlineMsPositions);
 
 			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
 
