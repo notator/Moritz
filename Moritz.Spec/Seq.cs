@@ -69,16 +69,16 @@ namespace Moritz.Spec
             AssertConsistency();
         }
 
-		private int NearestAbsUIDEndMsPosition(int approxAbsMsPosition)
+		private int NearestAbsUIDEndMsPosition(double approxAbsMsPosition)
 		{
 			int nearestAbsUIDEndMsPosition = 0;
-			int diff = int.MaxValue;
+			double diff = double.MaxValue;
 			foreach(Trk trk in Trks)
 			{
 				for(int uidIndex = 0; uidIndex < trk.Count; ++uidIndex)
 				{
 					int absEndPos = this.AbsMsPosition + trk[uidIndex].MsPositionReFirstUD + trk[uidIndex].MsDuration;
-					int localDiff = Math.Abs(approxAbsMsPosition - absEndPos);
+					double localDiff = Math.Abs(approxAbsMsPosition - absEndPos);
 					if(localDiff < diff)
 					{
 						diff = localDiff;
@@ -304,14 +304,14 @@ namespace Moritz.Spec
 		public List<int> GetBalancedBarlineMsPositions(int nBars)
 		{
 			int msDuration = MsDuration;
-			int approxBarMsDuration = (msDuration / nBars);
-			Debug.Assert(approxBarMsDuration * 8 == msDuration);
+			double approxBarMsDuration = (((double)msDuration) / nBars);
+			Debug.Assert(approxBarMsDuration * nBars == msDuration);
 
 			List<int> barlineMsPositions = new List<int>();
 
 			for(int barNumber = 1; barNumber <= nBars; ++barNumber)
 			{
-				int approxBarMsPosition = approxBarMsDuration * barNumber;
+				double approxBarMsPosition = approxBarMsDuration * barNumber;
 				int barMsPosition = NearestAbsUIDEndMsPosition(approxBarMsPosition);
 					
 				Debug.Assert(barlineMsPositions.Contains(barMsPosition) == false);
