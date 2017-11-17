@@ -35,35 +35,52 @@ namespace Moritz.Algorithm.Study2
             Debug.Assert((sequentialStaff1Bars.Count == sequentialStaff2Bars.Count) 
                       && (sequentialStaff1Bars.Count == sequentialStaff3Bars.Count));
 
-			List<Seq> seqs = new List<Seq>();
-			List<int> barlineMsPositions = new List<int>();
-			int seqAbsMsPosition = 0;
-            for(int barIndex = 0; barIndex < sequentialStaff1Bars.Count; ++barIndex)
-            {
-				List<Trk> trks = new List<Trk>()
+			List<int> barlineMsPositions = GetBarlinePositions(sequentialStaff1Bars);
+
+			Trk mainTrk1 = GetMainTrk(sequentialStaff1Bars);
+			Trk mainTrk2 = GetMainTrk(sequentialStaff2Bars);
+			Trk mainTrk3 = GetMainTrk(sequentialStaff3Bars);
+
+			List<Trk> trks = new List<Trk>()
 				{
-					sequentialStaff1Bars[barIndex],
-					sequentialStaff2Bars[barIndex],
-					sequentialStaff3Bars[barIndex]
+					mainTrk1,
+					mainTrk2,
+					mainTrk3
 				};
-				Seq seq = new Seq(seqAbsMsPosition, trks, MidiChannelIndexPerOutputVoice);
 
-				seqs.Add(seq);
-
-				seqAbsMsPosition += seq.MsDuration;
-				barlineMsPositions.Add(seqAbsMsPosition);
-			}
-
-			Seq mainSeq = seqs[0];
-			for(int i = 1; i < seqs.Count; i++)
-			{
-				mainSeq.Concat(seqs[i]);
-			}
+			Seq mainSeq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
 
 			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
 
 			return bars;
         }
+
+		/// <summary>
+		/// Returns the concatenation of the argument Trks, with rests agglommerated.
+		/// </summary>
+		/// <param name="trkSequence"></param>
+		/// <returns></returns>
+		private Trk GetMainTrk(List<Trk> trkSequence)
+		{
+			Trk mainTrk = new Trk(trkSequence[0].MidiChannel);
+			foreach(Trk trk in trkSequence)
+			{
+				mainTrk.AddRange(trk); // agglommerates rests
+			}
+			return mainTrk;
+		}
+
+		private List<int> GetBarlinePositions(List<Trk> sequentialStaff1Bars)
+		{
+			var barlinePositions = new List<int>();
+			int msPos = 0;
+			foreach(Trk trk in sequentialStaff1Bars)
+			{
+				msPos += trk.MsDuration;
+				barlinePositions.Add(msPos);
+			}
+			return barlinePositions;
+		}
 
 		/// <summary>
 		/// This function returns null or a SortedDictionary per VoiceDef in each bar.

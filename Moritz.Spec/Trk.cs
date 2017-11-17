@@ -107,11 +107,12 @@ namespace Moritz.Spec
             Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is MidiRestDef || iUniqueDef is CautionaryChordDef || iUniqueDef is ClefDef);
             _Add(iUniqueDef);
 		}
-        /// <summary>
-        /// Adds the argument's UniqueDefs to the end of this Trk.
-        /// Sets the MsPositions of the appended UniqueDefs.
-        /// </summary>
-        public override void AddRange(VoiceDef trk)
+		/// <summary>
+		/// Adds the argument's UniqueDefs to the end of this Trk.
+		/// Sets the MsPositions of the appended UniqueDefs.
+		/// This function automatically agglommerates rests.
+		/// </summary>
+		public override void AddRange(VoiceDef trk)
         {
             Debug.Assert(trk is Trk);
             _AddRange(trk);

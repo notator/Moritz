@@ -95,21 +95,23 @@ namespace Moritz.Spec
             Debug.Assert(iud is InputChordDef || iud is InputRestDef || iud is CautionaryChordDef || iud is ClefDef);
             _Add(iud);
         }
-        /// <summary>
-        /// Adds the argument to the end of this VoiceDef.
-        /// Sets the MsPositions of the appended UniqueDefs re the first iUniqueDef in the list.
-        /// </summary>
-        public override void AddRange(VoiceDef inputVoiceDef)
+		/// <summary>
+		/// Adds the argument to the end of this VoiceDef.
+		/// Sets the MsPositions of the appended UniqueDefs re the first iUniqueDef in the list.
+		/// This function automatically agglommerates rests.
+		/// </summary>
+		public override void AddRange(VoiceDef inputVoiceDef)
         {
             Debug.Assert(inputVoiceDef is InputVoiceDef);
             _AddRange(inputVoiceDef);
         }
 
-        /// <summary>
-        /// Adds the argument to the end of this VoiceDef.
-        /// Sets the MsPositions of the appended UniqueDefs.
-        /// </summary>
-        public void Concat(InputVoiceDef inputVoiceDef)
+		/// <summary>
+		/// Adds the argument to the end of this VoiceDef.
+		/// Sets the MsPositions of the appended UniqueDefs.
+		/// This function automatically agglommerates rests.
+		/// </summary>
+		public void Concat(InputVoiceDef inputVoiceDef)
         {
             int thisEndMsPositionReSeq = this.EndMsPositionReFirstIUD + this.MsPositionReContainer;
             if(inputVoiceDef.MsPositionReContainer > thisEndMsPositionReSeq)

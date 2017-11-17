@@ -449,11 +449,18 @@ namespace Moritz.Spec
             AssertConsistency();
         }
         public abstract void AddRange(VoiceDef voiceDef);
+
+		/// <summary>
+		/// This function automatically agglommerates rests.
+		/// </summary>
         protected void _AddRange(VoiceDef voiceDef)
         {
             Debug.Assert(!(Container is Bar), "Cannot AddRange of VoiceDefs inside a Block.");
 
             _uniqueDefs.AddRange(voiceDef.UniqueDefs);
+
+			AgglomerateRests();
+
             SetMsPositionsReFirstUD();
 
             AssertConsistency();
