@@ -163,6 +163,17 @@ namespace Moritz.Algorithm
 		/// </summary>
 		protected abstract List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars);
 
+		protected List<int> GetBarlinePositions(Seq mainSeq, List<double> approximateBarlineMsPositions)
+		{
+			List<int> barlineMsPositions = new List<int>();
+			foreach(double approxMsPos in approximateBarlineMsPositions)
+			{
+				int barlineMsPos = mainSeq.NearestAbsUIDEndMsPosition(approxMsPos);
+				barlineMsPositions.Add(barlineMsPos);
+			}
+			return barlineMsPositions;
+		}
+
 		/// <summary>
 		/// 
 		/// </summary>

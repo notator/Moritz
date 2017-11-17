@@ -6,10 +6,7 @@ namespace Moritz.Spec
 {
     public class Bar : ITrksContainer
     {
-		/// <summary>
-		/// All constructors in this class are protected. Bars can only be created by subclasses.
-		/// </summary>
-		protected Bar()
+		public Bar()
 		{
 		}
 
@@ -18,7 +15,7 @@ namespace Moritz.Spec
 		/// <para>A Bar contains a list of voiceDefs, that can be of either kind: Trk or InputVoiceDef. A Seq only contains Trks.
 		/// Bars do not contain barlines. They are implicit, at the beginning and end of the Bar. 
 		/// This contructor uses its arguments' voiceDefs directly, so, if the arguments need to be used again, pass a clone.</para>
-		/// <para>Seq.AssertConsistentInBar and all inputVoiceDef.AssertConsistentInBar functions must succeed (see their definitions).</para>
+		/// <para>Seq.AssertConsistency and all inputVoiceDef.AssertConsistency functions must succeed (see their definitions).</para>
 		/// <para>The Bar's AbsMsPosition is set to the seq's AbsMsPosition. If initialClefPerChannel is not null, the initial ClefDef is
 		/// inserted at the beginning of each voice.</para>
 		/// <para>When complete, this constructor calls the bar.AssertConsistency() function (see that its documentation).</para>
@@ -93,16 +90,16 @@ namespace Moritz.Spec
 
 
 		/// <summary>
-		/// Trk.AssertConsistentInBar() is called on each VoiceDef that is a Trk.
-		/// InputVoiceDef.AssertConsistentInBar() is called on each VoiceDef that is an InputVoiceDef.
+		/// Trk.AssertConsistency() is called on each VoiceDef that is a Trk.
+		/// InputVoiceDef.AssertConsistency() is called on each VoiceDef that is an InputVoiceDef.
 		/// Then the following checks ae also made:
 		/// <para>1. The first VoiceDef in a Bar must be a Trk.</para>
 		/// <para>2. All Trks must precede InputVoiceDefs (if any) in the _voiceDefs list.</para>
 		/// <para>3. All voiceDefs have the same MsDuration.</para>
 		/// <para>4. There may not be more than 4 InputVoiceDefs</para>
-		/// <para>5. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefDef. At least one Trk must end with a MidiChordDef.</para>
+		/// <para>5. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefDef.</para>
 		/// </summary> 
-		protected void AssertConsistency()
+		public virtual void AssertConsistency()
         {
 			#region trk and inputVoiceDef consistent in bar
 			foreach(VoiceDef voiceDef in _voiceDefs)
@@ -155,30 +152,20 @@ namespace Moritz.Spec
             Debug.Assert((nInputVoiceDefs <= 4), "There may not be more than 4 InputVoiceDefs.");
 			#endregion
 
-			#region 5. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefDef. At least one Trk must end with a MidiChordDef.
+			#region 5. At least one Trk must start with a MidiChordDef, possibly preceded by a ClefDef.
 			IReadOnlyList<Trk> trks = Trks;
 			bool startFound = false;
-			bool endFound = false;
 			foreach(Trk trk in trks)
 			{
 				List<IUniqueDef> iuds = trk.UniqueDefs;
 				IUniqueDef firstIud = iuds[0];
-				IUniqueDef lastIud = iuds[iuds.Count - 1];
 				if(firstIud is MidiChordDef || (iuds.Count > 1 && firstIud is ClefDef && iuds[1] is MidiChordDef))
 				{
 					startFound = true;
-				}
-				if(lastIud is MidiChordDef)
-				{
-					endFound = true;
-				}
-				if(startFound && endFound)
-				{
 					break;
 				} 				
 			}
 			Debug.Assert(startFound, "MidiChordDef not found at start.");
-			Debug.Assert(endFound, "MidiChordDef not found at end.");
 			#endregion
 		}
 
@@ -274,7 +261,7 @@ namespace Moritz.Spec
 
         #endregion envelopes
 
-        protected void SetMsPositionsReFirstUD()
+        public void SetMsPositionsReFirstUD()
         {
             foreach(VoiceDef voiceDef in _voiceDefs)
             {

@@ -69,7 +69,7 @@ namespace Moritz.Spec
             AssertConsistency();
         }
 
-		private int NearestAbsUIDEndMsPosition(double approxAbsMsPosition)
+		public int NearestAbsUIDEndMsPosition(double approxAbsMsPosition)
 		{
 			int nearestAbsUIDEndMsPosition = 0;
 			double diff = double.MaxValue;

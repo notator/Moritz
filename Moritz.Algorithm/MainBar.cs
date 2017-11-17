@@ -5,12 +5,12 @@ using Moritz.Spec;
 
 namespace Moritz.Algorithm
 {
-    public class MainBar : Bar
-    {
+	public class MainBar : Bar
+	{
 		/// <summary>
 		/// Used only by functions in this class.
 		/// </summary>
-        private MainBar()
+		private MainBar()
 			: base()
 		{
 		}
@@ -29,13 +29,36 @@ namespace Moritz.Algorithm
 		public MainBar(Seq seq, IReadOnlyList<InputVoiceDef> inputVoiceDefs, List<string> initialClefPerChannel)
 			: base(seq, inputVoiceDefs, initialClefPerChannel)
 		{
-			AssertConsistency(initialClefPerChannel);
+			AssertConsistency();
 		}
 
-		private void AssertConsistency(List<string> initialClefPerChannel)
+		/// <summary>
+		/// 1. base.AssertConsistency() is called. (The base Bar must be consistent.)
+		/// 2. AbsMsPosition must be 0.
+		/// 3. InitialClefPerChannel != null && InitialClefPerChannel.Count == VoiceDefs.Count.
+		/// 4. At least one Trk must end with a MidiChordDef.
+		/// </summary> 
+		public override void AssertConsistency()
 		{
+			base.AssertConsistency();
 			Debug.Assert(AbsMsPosition == 0);
-			Debug.Assert(InitialClefPerChannel != null);
+			Debug.Assert(InitialClefPerChannel != null && InitialClefPerChannel.Count == VoiceDefs.Count);
+
+			#region At least one Trk must end with a MidiChordDef.
+			IReadOnlyList<Trk> trks = Trks;
+			bool endFound = false;
+			foreach(Trk trk in trks)
+			{
+				List<IUniqueDef> iuds = trk.UniqueDefs;
+				IUniqueDef lastIud = iuds[iuds.Count - 1];
+				if(lastIud is MidiChordDef)
+				{
+					endFound = true;
+					break;
+				}
+			}
+			Debug.Assert(endFound, "MidiChordDef not found at end.");
+			#endregion
 		}
 
 		/// Converts this MainBar to a list of bars, consuming this bar's voiceDefs.
@@ -61,19 +84,23 @@ namespace Moritz.Algorithm
 
 			List<Bar> bars = new List<Bar>();
 			int totalDurationBeforePop = this.MsDuration;
+			Bar remainingBar = (Bar)this;
 			foreach(int barMsDuration in barMsDurations)
 			{
-				Bar poppedBar = PopBar(barMsDuration);
+				Tuple<Bar,Bar> rTuple = PopBar(remainingBar, barMsDuration);
+				Bar poppedBar = rTuple.Item1;
+				remainingBar = rTuple.Item2; // null after the last pop.
+
 				Debug.Assert(poppedBar.MsDuration == barMsDuration);
-				if(poppedBar != this)
+				if(remainingBar != null)
 				{
-					Debug.Assert(poppedBar.MsDuration + this.MsDuration == totalDurationBeforePop);
+					Debug.Assert(poppedBar.MsDuration + remainingBar.MsDuration == totalDurationBeforePop);
+					totalDurationBeforePop = remainingBar.MsDuration;
 				}
 				else
 				{
 					Debug.Assert(poppedBar.MsDuration == totalDurationBeforePop);
 				}
-				totalDurationBeforePop = this.MsDuration;
 
 				bars.Add(poppedBar);
 			}
@@ -82,30 +109,32 @@ namespace Moritz.Algorithm
 		}
 
 		/// <summary>
-		/// Creates a bar containing a list of voiceDefs containing the IUniqueDefs that
-		/// begin within barDuration, and removes these IUniqueDefs from the current bar.
+		/// Returns a Tuple in which Item1 is the popped bar, Item2 is the remaining part of the input bar.
+		/// The popped bar has a list of voiceDefs containing the IUniqueDefs that
+		/// begin within barDuration. These IUniqueDefs are removed from the current bar before returning it as Item2.
 		/// MidiRestDefs and MidiChordDefs are split as necessary, so that when this
 		/// function returns, both the popped bar and the current bar contain voiceDefs
 		/// having the same msDuration. i.e.: Both the popped bar and the remaining bar "add up".
 		/// </summary>
-		/// <param name="barMsDuration"></param>
+		/// <param name ="bar">The bar fron which the bar is popped.</param>
+		/// <param name="barMsDuration">The duration of the popped bar.</param>
 		/// <returns>The popped bar</returns>
-		private MainBar PopBar(int barMsDuration)
+		private Tuple<Bar, Bar> PopBar(Bar bar, int barMsDuration)
 		{
 			Debug.Assert(barMsDuration > 0);
 
-			if(barMsDuration == this.MsDuration)
+			if(barMsDuration == bar.MsDuration)
 			{
-				return this;
+				return new Tuple<Bar, Bar>(bar, null);
 			}
 
-			MainBar poppedBar = new MainBar();
-			MainBar remainingBar = new MainBar() ;
+			Bar poppedBar = new Bar();
+			Bar remainingBar = new Bar() ;
 			int thisMsDuration = this.MsDuration;
 
 			VoiceDef poppedBarVoice;
 			VoiceDef remainingBarVoice;
-			foreach(VoiceDef voiceDef in _voiceDefs)
+			foreach(VoiceDef voiceDef in bar.VoiceDefs)
 			{
 				Trk outputVoice = voiceDef as Trk;
 				InputVoiceDef inputVoice = voiceDef as InputVoiceDef;
@@ -165,14 +194,14 @@ namespace Moritz.Algorithm
 						else if(iud is CautionaryChordDef)
 						{
 							Debug.Assert(false, "There shouldnt be any cautionary chords here.");
-							// This is a cautionary chord. Set the position of the following barline, and
-							// Add a CautionaryChordDef at the beginning of the following bar.
-							iud.MsDuration = barMsDuration - iudStartPos;
-							poppedBarVoice.UniqueDefs.Add(iud);
+							//// This is a cautionary chord. Set the position of the following barline, and
+							//// Add a CautionaryChordDef at the beginning of the following bar.
+							//iud.MsDuration = barMsDuration - iudStartPos;
+							//poppedBarVoice.UniqueDefs.Add(iud);
 
-							Debug.Assert(remainingBarVoice.UniqueDefs.Count == 0);
-							CautionaryChordDef secondLmdd = new CautionaryChordDef((IUniqueChordDef)iud, 0, durationAfterBarline);
-							remainingBarVoice.UniqueDefs.Add(secondLmdd);
+							//Debug.Assert(remainingBarVoice.UniqueDefs.Count == 0);
+							//CautionaryChordDef secondLmdd = new CautionaryChordDef((IUniqueChordDef)iud, 0, durationAfterBarline);
+							//remainingBarVoice.UniqueDefs.Add(secondLmdd);
 						}
 						else if(iud is MidiChordDef || iud is InputChordDef)
 						{
@@ -193,16 +222,16 @@ namespace Moritz.Algorithm
 				}
 			}
 
-			this._voiceDefs = remainingBar.VoiceDefs;
-			poppedBar.AbsMsPosition = this.AbsMsPosition;
-			this.AbsMsPosition += barMsDuration;
-
-			SetMsPositionsReFirstUD();
-
-			AssertConsistency();
+			poppedBar.AbsMsPosition = remainingBar.AbsMsPosition;
 			poppedBar.AssertConsistency();
+			if(remainingBar != null)
+			{
+				remainingBar.AbsMsPosition += barMsDuration;
+				remainingBar.SetMsPositionsReFirstUD();
+				remainingBar.AssertConsistency();
+			}
 
-			return poppedBar;
+			return new Tuple<Bar, Bar>(poppedBar, remainingBar);
 		}
 
 		/// <summary>

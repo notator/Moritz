@@ -31,22 +31,24 @@ namespace Moritz.Algorithm.Study3Sketch1
             _krystals = krystals;
             _palettes = palettes;
 
-            List<int> barlineMsPositions = new List<int>();
+            var approximateBarlineMsPositions = new List<double>();
 
             Seq bar1Seq = CreateBar1Seq();
-            barlineMsPositions.Add(bar1Seq.MsDuration);
+            approximateBarlineMsPositions.Add(bar1Seq.MsDuration);
 
             Seq bar2Seq = CreateBar2Seq();
-            barlineMsPositions.Add(bar1Seq.MsDuration + bar2Seq.MsDuration);
+            approximateBarlineMsPositions.Add(bar1Seq.MsDuration + bar2Seq.MsDuration);
 
             Seq bars345Seq = bar2Seq.Clone();
-            barlineMsPositions.Add(bar1Seq.MsDuration + bar2Seq.MsDuration + 5950);
-            barlineMsPositions.Add(bar1Seq.MsDuration + bar2Seq.MsDuration + 10500);
-            barlineMsPositions.Add(bar1Seq.MsDuration + bar2Seq.MsDuration + bars345Seq.MsDuration);
+            approximateBarlineMsPositions.Add(bar1Seq.MsDuration + bar2Seq.MsDuration + 5950);
+            approximateBarlineMsPositions.Add(bar1Seq.MsDuration + bar2Seq.MsDuration + 10500);
+            approximateBarlineMsPositions.Add(bar1Seq.MsDuration + bar2Seq.MsDuration + bars345Seq.MsDuration);
 
-            Seq mainSeq = bar1Seq;
+			Seq mainSeq = bar1Seq;
             mainSeq.Concat(bar2Seq);
             mainSeq.Concat(bars345Seq);
+
+			List<int> barlineMsPositions = GetBarlinePositions(mainSeq, approximateBarlineMsPositions);
 
 			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
 
