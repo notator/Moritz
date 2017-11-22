@@ -419,9 +419,6 @@ namespace Moritz.Algorithm.Tombeau1
 			//Do global changes that affect the whole piece here (accel., rit, transpositions etc.)
 			FinalizeMainSeq(mainSeq);
 
-			//MainBar mainBar = new Bar(mainSeq, null, InitialClefPerVoiceDef);
-
-			//List<Bar> bars = mainBar.GetBars(barlineMsPositions);
 			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
 
 			return bars;
