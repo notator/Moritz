@@ -164,8 +164,8 @@ namespace Moritz.Algorithm
 		protected abstract List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars);
 
 		/// <summary>
-		/// If inputVoiceDefs != null, then barlines will be fit to the inputVoices (compulsory), else
-		/// the barlines will be fit to the
+		/// If inputVoiceDefs != null, then barlines will be fit to the InputChordDefs in the inputVoices,
+		/// otherwise they will be fit to the MidiChordDefs in the trks.
 		/// </summary>
 		/// <param name="mainSeq"></param>
 		/// <param name="inputVoiceDefs">can be null</param>

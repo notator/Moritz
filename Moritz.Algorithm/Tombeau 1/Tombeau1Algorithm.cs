@@ -513,11 +513,12 @@ namespace Moritz.Algorithm.Tombeau1
 		}
 
 		/// <summary>
-		/// Possibly do global changes that affect the whole piece here (accel., rit, transpositions etc.)
+		/// Pad empty Trks with a single MidiRestDef.
+		/// Also, do other global changes that affect the whole piece here (accel., rit, transpositions etc.).
 		/// </summary>
 		private void FinalizeMainSeq(Seq mainSeq)
 		{
-
+			mainSeq.PadEmptyTrks();
 		}
 
 		/// <summary>

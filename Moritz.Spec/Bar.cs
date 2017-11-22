@@ -14,7 +14,7 @@ namespace Moritz.Spec
 		/// All constructors in this class are protected, so Bars can only be created by subclasses.
 		/// <para>A Bar contains a list of voiceDefs, that can be of either kind: Trk or InputVoiceDef. A Seq only contains Trks.
 		/// Bars do not contain barlines. They are implicit, at the beginning and end of the Bar. 
-		/// This contructor uses its arguments' voiceDefs directly, so, if the arguments need to be used again, pass a clone.</para>
+		/// This constructor uses its arguments' voiceDefs directly, so, if the arguments need to be used again, pass a clone.</para>
 		/// <para>Seq.AssertConsistency and all inputVoiceDef.AssertConsistency functions must succeed (see their definitions).</para>
 		/// <para>The Bar's AbsMsPosition is set to the seq's AbsMsPosition. If initialClefPerChannel is not null, the initial ClefDef is
 		/// inserted at the beginning of each voice.</para>
@@ -39,9 +39,11 @@ namespace Moritz.Spec
 			InitialClefPerChannel = initialClefPerChannel;
 
 			int clefIndex = 0;
+			int msDuration = seq.MsDuration;
 			foreach(Trk trk in seq.Trks)
             {
                 trk.Container = this;
+				Debug.Assert(trk.MsDuration == msDuration); // cannot be 0 here.
 				trk.Insert(0, new ClefDef(initialClefPerChannel[trk.MidiChannel], 0));
                 _voiceDefs.Add(trk);
 				clefIndex++;
@@ -52,6 +54,7 @@ namespace Moritz.Spec
                 foreach(InputVoiceDef ivd in inputVoiceDefs)
                 {
                     ivd.Container = this;
+					Debug.Assert(ivd.MsDuration == msDuration);
 					ivd.Insert(0, new ClefDef(initialClefPerChannel[clefIndex++], 0));
 					_voiceDefs.Add(ivd);
                 }

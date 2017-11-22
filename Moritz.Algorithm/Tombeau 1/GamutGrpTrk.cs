@@ -36,8 +36,8 @@ namespace Moritz.Algorithm.Tombeau1
 		public GamutGrpTrk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iudList, Gamut gamut, int rootOctave)
             : base(midiChannel, msPositionReContainer, iudList)
         {
-			_gamut = gamut; // _gamut is checked by AssertConsistency() below.
-			RootOctave = rootOctave; // RootOctave is checked by AssertConsistency() below.
+			_gamut = gamut; // _gamut is checked by AssertGamutGrpTrkConsistency() below.
+			RootOctave = rootOctave; // RootOctave is checked by AssertGamutGrpTrkConsistency() below.
 
 			var velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch();
 
@@ -48,7 +48,7 @@ namespace Moritz.Algorithm.Tombeau1
 				SetBeamEnd();
 			}
 
-			AssertConsistency();
+			AssertGamutGrpTrkConsistency();
 		}
 
 		/// <summary>
@@ -79,9 +79,9 @@ namespace Moritz.Algorithm.Tombeau1
 		/// 6. The GamutGrpTrk may not contain consecutive MidiRestDefs
 		/// 7. All MidiChordDef.BeamContinues properties are true, except the last, which is false.
 		/// </summary>
-		public override void AssertConsistency()
+		private void AssertGamutGrpTrkConsistency()
 		{
-			base.AssertConsistency();
+			base.AssertConsistency(); // also checks consecutive rests.
 
 			Debug.Assert(Gamut != null, "Gamut must be set.");
 			Debug.Assert(RootOctave >= 0, "Root Octave must be >= 0");
@@ -90,7 +90,6 @@ namespace Moritz.Algorithm.Tombeau1
 				Debug.Assert(_uniqueDefs[0] is MidiChordDef, "The first IUniqueDef must be a MidiChordDef.");
 			}
 
-			bool prevIudIsRest = false;
 			MidiChordDef lastMidiChordDef = null;
 
 			foreach(IUniqueDef iud in _uniqueDefs)
@@ -103,13 +102,7 @@ namespace Moritz.Algorithm.Tombeau1
 				if(iud is MidiChordDef mcd)
 				{
 					Debug.Assert(_gamut.ContainsAllPitches(mcd), "Illegal pitches.");
-					prevIudIsRest = false;
 					lastMidiChordDef = mcd;
-				}
-				else
-				{
-					Debug.Assert(prevIudIsRest == false, "Consecutive MidiRestDefs are illegal.");
-					prevIudIsRest = true;
 				}
 			}
 
@@ -140,7 +133,7 @@ namespace Moritz.Algorithm.Tombeau1
         {            
             base.Add(iUniqueDef);
             SetBeamEnd();
-			AssertConsistency();
+			AssertGamutGrpTrkConsistency();
 		}
 
         /// <summary>
@@ -151,7 +144,7 @@ namespace Moritz.Algorithm.Tombeau1
         {
             base.AddRange(voiceDef);
             SetBeamEnd();
-			AssertConsistency();
+			AssertGamutGrpTrkConsistency();
 		}
 
 		/// <summary>
@@ -162,7 +155,7 @@ namespace Moritz.Algorithm.Tombeau1
 		{
 			_uniqueDefs = iUniqueDefs;
 			SetBeamEnd();
-			AssertConsistency();
+			AssertGamutGrpTrkConsistency();
 		}
 
 		/// <summary>
@@ -173,7 +166,7 @@ namespace Moritz.Algorithm.Tombeau1
         {
 			base.Insert(index, iUniqueDef);
             SetBeamEnd();
-			AssertConsistency();
+			AssertGamutGrpTrkConsistency();
 		}
         /// <summary>
         /// Inserts the trk's UniqueDefs in the list at the given index, and then
@@ -183,7 +176,7 @@ namespace Moritz.Algorithm.Tombeau1
         {
             base.InsertRange(index, trk);
             SetBeamEnd();
-			AssertConsistency();
+			AssertGamutGrpTrkConsistency();
 		}
         /// <summary>
         /// Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
@@ -192,7 +185,7 @@ namespace Moritz.Algorithm.Tombeau1
         {
             base.Replace(index, replacementIUnique);
             SetBeamEnd();
-			AssertConsistency();
+			AssertGamutGrpTrkConsistency();
 		}
         /// <summary> 
         /// This function attempts to add all the non-MidiRestDef UniqueDefs in trk2 to the calling Trk
@@ -212,7 +205,7 @@ namespace Moritz.Algorithm.Tombeau1
         {
             Trk trk = base.Superimpose(trk2);
             SetBeamEnd();
-			AssertConsistency();
+			AssertGamutGrpTrkConsistency();
 			return trk;
         }
 
@@ -222,7 +215,7 @@ namespace Moritz.Algorithm.Tombeau1
         {
             base.Permute(axisNumber, contourNumber);
             SetBeamEnd();
-			AssertConsistency();
+			AssertGamutGrpTrkConsistency();
 		}
         /// <summary>
         /// Re-orders up to 7 partitions in this Trk's UniqueDefs list. The content of each partition is not changed. The Trk's AxisIndex property is set.
@@ -241,31 +234,31 @@ namespace Moritz.Algorithm.Tombeau1
         {
             base.PermutePartitions(axisNumber, contourNumber, partitionSizes);
             SetBeamEnd();
-			AssertConsistency();
+			AssertGamutGrpTrkConsistency();
 		}
         public override void SortRootNotatedPitchAscending()
         {
             SortByRootNotatedPitch(true);
             SetBeamEnd();
-			AssertConsistency();
+			AssertGamutGrpTrkConsistency();
 		}
         public override void SortRootNotatedPitchDescending()
         {
             SortByRootNotatedPitch(false);
             SetBeamEnd();
-			AssertConsistency();
+			AssertGamutGrpTrkConsistency();
 		}
         public override void SortVelocityIncreasing()
         {
             SortByVelocity(true);
             SetBeamEnd();
-			AssertConsistency();
+			AssertGamutGrpTrkConsistency();
 		}
         public override void SortVelocityDecreasing()
         {
             SortByVelocity(false);
             SetBeamEnd();
-			AssertConsistency();
+			AssertGamutGrpTrkConsistency();
 		}
         #endregion UniqueDefs list order changers
         #endregion Overridden functions
@@ -300,7 +293,7 @@ namespace Moritz.Algorithm.Tombeau1
             }
 
             Shear(stepsList);
-			AssertConsistency();
+			AssertGamutGrpTrkConsistency();
 		}
 
         /// <summary>
@@ -343,7 +336,7 @@ namespace Moritz.Algorithm.Tombeau1
             {
                 mcd.TransposeStepsInGamut(_gamut, stepsToTranspose);
             }
-			AssertConsistency();
+			AssertGamutGrpTrkConsistency();
 		}
 
         /// <summary>
@@ -371,7 +364,7 @@ namespace Moritz.Algorithm.Tombeau1
             {
                 mcd.TransposeStepsInGamut(_gamut, stepsToTranspose);
             }
-			AssertConsistency();
+			AssertGamutGrpTrkConsistency();
 		}
 
         #region Gamut
@@ -427,7 +420,7 @@ namespace Moritz.Algorithm.Tombeau1
                         mcd.NotatedMidiVelocities = new List<byte>(mcd.BasicMidiChordDefs[0].Velocities);
                     }
                 }
-				AssertConsistency();
+				AssertGamutGrpTrkConsistency();
 			}
         }
         protected Gamut _gamut;

@@ -150,7 +150,7 @@ namespace Moritz.Spec
 
 		public virtual void AssertConsistency()
 		{
-			Debug.Assert(MsPositionReContainer == 0);
+			Debug.Assert(MsPositionReContainer >= 0);
 			Debug.Assert(UniqueDefs != null);
 			bool restFound = false;
 			foreach(IUniqueDef iud in UniqueDefs)
@@ -455,7 +455,7 @@ namespace Moritz.Spec
 		/// </summary>
         protected void _AddRange(VoiceDef voiceDef)
         {
-            Debug.Assert(!(Container is Bar), "Cannot AddRange of VoiceDefs inside a Block.");
+            Debug.Assert(!(Container is Bar), "Cannot AddRange of VoiceDefs inside a Bar.");
 
             _uniqueDefs.AddRange(voiceDef.UniqueDefs);
 
@@ -543,7 +543,7 @@ namespace Moritz.Spec
         /// </summary>
         protected void _Replace(int index, IUniqueDef replacementIUnique)
         {
-            Debug.Assert(!(Container is Bar), "Cannot Replace IUniqueDefs inside a Block.");
+            Debug.Assert(!(Container is Bar), "Cannot Replace IUniqueDefs inside a Bar.");
 
             Debug.Assert(index >= 0 && index < _uniqueDefs.Count);
             _uniqueDefs.RemoveAt(index);
@@ -831,7 +831,7 @@ namespace Moritz.Spec
 
         private int _msPositionReContainer = 0;
         /// <summary>
-        /// The msPosition of the first note or rest in the UniqueDefs list re the start of the containing Seq or Block.
+        /// The msPosition of the first note or rest in the UniqueDefs list re the start of the containing Seq or Bar.
         /// The msPositions of the IUniqueDefs in the Trk are re the first IUniqueDef in the list, so the first IUniqueDef.MsPositionReFirstUID is always 0;
         /// </summary>
         public virtual int MsPositionReContainer
@@ -842,6 +842,7 @@ namespace Moritz.Spec
             }
             set
             {
+				Debug.Assert(value >= 0);
                 _msPositionReContainer = value;
             }
         }

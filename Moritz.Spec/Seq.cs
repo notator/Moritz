@@ -173,6 +173,22 @@ namespace Moritz.Spec
         }
 
 		/// <summary>
+		/// Set empty Trks to contain a single MidiRestDef having the msDuration of the other Trks.
+		/// </summary>
+		public void PadEmptyTrks()
+		{
+			int msDuration = MsDuration; // Getting this value checks that all trk msDurations are either 0, or the same.
+
+			foreach(Trk trk in Trks)
+			{
+				if(trk.UniqueDefs.Count == 0)
+				{
+					trk.Add(new MidiRestDef(0, msDuration));
+				}
+			}
+		}
+
+		/// <summary>
 		/// An exception is thrown if:
 		///    1) the first argument value is less than or equal to 0.
 		///    2) the argument contains duplicate msPositions.
@@ -247,7 +263,7 @@ namespace Moritz.Spec
 		/// There is at least one Trk in _trks.
 		/// All Trk.MidiChannel values are unique per trk.
 		/// All Trk.MsPositionReContainer values are 0.
-		/// All Trks have the same MsDuration.
+		/// All Trks either have the same MsDuration or have msDuration=0.
 		/// All Trks contain only MidiRestDef or MidiChordDef objects.
 		/// All Trk.UniqueDef.MsPositionReFirstUD values are set correctly.
 		/// </summary>
@@ -261,7 +277,8 @@ namespace Moritz.Spec
             foreach(Trk trk in _trks)
             {
                 trk.AssertConsistency();
-				Debug.Assert(trk.MsDuration == thisMsDuration);
+				int trkMsDuration = trk.MsDuration;
+				Debug.Assert(trkMsDuration == thisMsDuration || trkMsDuration == 0);
 				Debug.Assert(midiChannels.Contains(trk.MidiChannel) == false);
 				midiChannels.Add(trk.MidiChannel);
             }
@@ -491,13 +508,27 @@ namespace Moritz.Spec
 		/// <summary>
 		/// The duration between the beginning of the first UniqueDef in the Seq and the end of the last UniqueDef in the Seq.
 		/// Setting this value stretches or compresses the msDurations of all the trks and their contained UniqueDefs.
+		/// Getting this value checks that all trk msDurations either 0, or the same.
 		/// </summary>
 		public virtual int MsDuration
 		{ 
 			get
 			{
 				Debug.Assert(_trks != null && _trks.Count > 0);
-				return _trks[0].MsDuration;
+				int msDuration = 0;
+				foreach(Trk trk in _trks)
+				{
+					int trkMsDur = trk.MsDuration;
+					if(msDuration == 0 && trkMsDur > 0)
+					{
+						msDuration = trkMsDur;
+					}
+					if(msDuration > 0)
+					{
+						Debug.Assert(trkMsDur == 0 || trkMsDur == msDuration);
+					}
+				}
+				return msDuration;
 			}
 			set
 			{
@@ -537,5 +568,5 @@ namespace Moritz.Spec
                 return channels;
             }
         }
-    }
+	}
 }
