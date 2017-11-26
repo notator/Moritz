@@ -30,7 +30,7 @@ namespace Moritz.Spec
 
             List<int> absolutePitchHierarchy = GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, basePitch);
             #region condition
-            ThrowExceptionIfPitchHierarchyIsInvalid(absolutePitchHierarchy);
+            AssertPitchHierarchyValidity(absolutePitchHierarchy);
             #endregion condition
 
             _mode = new Mode(absolutePitchHierarchy);
@@ -105,7 +105,7 @@ namespace Moritz.Spec
 		/// Each value must be in range [0..11] and occur only once (no duplicates).
 		/// </summary>
 		/// <param name="pitchHierarchy"></param>
-		private void ThrowExceptionIfPitchHierarchyIsInvalid(List<int> pitchHierarchy)
+		private void AssertPitchHierarchyValidity(List<int> pitchHierarchy)
         {
             Debug.Assert(pitchHierarchy.Count == 12);
             List<bool> presence = new List<bool>();
@@ -635,7 +635,7 @@ namespace Moritz.Spec
         private List<int> _list;
 
         public int Count { get { return _list.Count; } }
-        #endregion public interface
+        #endregion public properties
 
         #region Pitch Hierarchies
         /// <summary>

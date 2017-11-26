@@ -5,7 +5,7 @@ using System.Text;
 namespace Moritz.Spec
 {
 	/// <summary>
-	/// A Mode is an immutable class, contaning a list of absolute pitches (C=0, C#=1, D=2 etc.)
+	/// A Mode is an immutable class, containing a list of absolute pitches (C=0, C#=1, D=2 etc.)
 	/// in order of importance, whereby not all absolute pitches need to be included.
 	/// Modes can used, for example, to determine the loudness of particular pitches.
 	/// </summary>

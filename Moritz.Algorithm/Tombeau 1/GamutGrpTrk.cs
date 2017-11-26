@@ -90,8 +90,6 @@ namespace Moritz.Algorithm.Tombeau1
 				Debug.Assert(_uniqueDefs[0] is MidiChordDef, "The first IUniqueDef must be a MidiChordDef.");
 			}
 
-			MidiChordDef lastMidiChordDef = null;
-
 			foreach(IUniqueDef iud in _uniqueDefs)
 			{
 				if(!(iud is MidiChordDef || iud is MidiRestDef))
@@ -102,10 +100,10 @@ namespace Moritz.Algorithm.Tombeau1
 				if(iud is MidiChordDef mcd)
 				{
 					Debug.Assert(_gamut.ContainsAllPitches(mcd), "Illegal pitches.");
-					lastMidiChordDef = mcd;
 				}
 			}
 
+			MidiChordDef lastMidiChordDef = LastMidiChordDef;
 			foreach(IUniqueDef iud in _uniqueDefs)
 			{
 				if(iud is MidiChordDef mcd)
@@ -423,7 +421,36 @@ namespace Moritz.Algorithm.Tombeau1
 				AssertGamutGrpTrkConsistency();
 			}
         }
-        protected Gamut _gamut;
+
+		public MidiChordDef LastMidiChordDef
+		{
+			get
+			{
+				MidiChordDef lastMidiChordDef= null;
+				for(int i = _uniqueDefs.Count - 1; i >= 0; i--)
+				{
+					if( _uniqueDefs[i] is MidiChordDef mcd)
+					{
+						lastMidiChordDef = mcd;
+						break;
+					} 
+				}
+				return lastMidiChordDef;
+			}
+		}
+
+		public MidiChordDef FirstMidiChordDef
+		{ 
+			get
+			{
+				MidiChordDef firstMidiChordDef = _uniqueDefs[0] as MidiChordDef;
+				Debug.Assert(firstMidiChordDef != null);
+				return firstMidiChordDef;
+
+			}
+		}
+
+		protected Gamut _gamut;
 		public readonly int RootOctave;
 
         /// <summary>

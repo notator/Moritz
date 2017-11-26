@@ -86,7 +86,6 @@ namespace Moritz.Algorithm.Tombeau1
 			for(int i = 0; i < modeSegments.Count; ++i)
 			{
 				ModeSegment modeSegment = modeSegments[i];
-				modeSegment.RemoveRange(modeSegment.Count - 4, 4);
 
 				if(i % 2 == 1)
 				{
@@ -161,16 +160,17 @@ namespace Moritz.Algorithm.Tombeau1
 		/// </summary>
 		private ModeSegment GetBasicModeSegment(int modeSegmentMsPositionReContainer, int rootOctave, int gamutBasePitch, int relativePitchHierarchyIndex)
 		{
-			//const int gamutBasePitch = 9;
+			const int maxChordsPerGamutGrpTrk = 12;
+			const int minChordsPerGamutGrpTrk = 4;
 			var gamutGrpTrks = new List<GamutGrpTrk>();
 			int msPositionReContainer = 0;
-			for(int i = 0, nPitchesPerOctave = 12; nPitchesPerOctave >= 1; --nPitchesPerOctave, ++i) // domain is both Gamut.PitchesPerOctave and nChords per GamutGrpTrk
+			for(int nChords = maxChordsPerGamutGrpTrk; nChords >= minChordsPerGamutGrpTrk; --nChords)
 			{
+				int nPitchesPerOctave = nChords;
 				Gamut gamut = new Gamut(relativePitchHierarchyIndex, gamutBasePitch, nPitchesPerOctave);
 
 				GamutGrpTrk gamutGrpTrk = new GamutGrpTrk(this.MidiChannel, msPositionReContainer, new List<IUniqueDef>(), gamut, rootOctave);
 
-				int nChords = nPitchesPerOctave;
 				int pitchesPerChord = 5;
 				int totalMsDuration = nChords * 200;
 				List<IUniqueDef> iUniqueDefs = GetIUniqueDefs(gamutGrpTrk.Gamut, gamutGrpTrk.RootOctave, nChords, pitchesPerChord, totalMsDuration);
@@ -250,8 +250,11 @@ namespace Moritz.Algorithm.Tombeau1
 			{
 				GamutGrpTrk gamutGrpTrk = modeSegment[index];
 
+				MidiChordDef lastMcd = gamutGrpTrk.LastMidiChordDef;
+				MidiChordDef firstMcd = gamutGrpTrk.FirstMidiChordDef;
+
 				#region current version
-				if(gamutGrpTrk.UniqueDefs[0] is MidiChordDef firstMcd && gamutGrpTrk.UniqueDefs[gamutGrpTrk.UniqueDefs.Count - 1] is MidiChordDef lastMcd)
+				if(firstMcd != lastMcd)
 				{
 					gamutGrpTrk.Shear(0, -1 * (gamutGrpTrk.Gamut.NPitchesPerOctave));
 
@@ -290,12 +293,11 @@ namespace Moritz.Algorithm.Tombeau1
 					}
 				}
 
-				//gamutGrpTrk.AdjustChordMsDurations(factor: 5);
 				#endregion current version
 
 				#region test code 1 insert a rest
-				modeSegment[index].Insert(1, new MidiRestDef(0, 200));
-				modeSegment.SetMsPositionsReThisModeSegment();
+				//modeSegment[index].Insert(1, new MidiRestDef(0, 200));
+				//modeSegment.SetMsPositionsReThisModeSegment();
 				#endregion
 
 				#region begin test code 2 transpose chords to the same absolute root pitch
