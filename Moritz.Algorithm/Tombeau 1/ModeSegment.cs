@@ -9,7 +9,7 @@ using Moritz.Spec;
 namespace Moritz.Algorithm.Tombeau1
 {
 	/// <summary>
-	/// A (mutable) List of GamutGrpTrk objects, each of which has the same Mode and MidiChannel.
+	/// A (mutable) List of ModeGrpTrk objects, each of which has the same Mode and MidiChannel.
 	/// </summary>
 	internal class ModeSegment
 	{
@@ -17,82 +17,82 @@ namespace Moritz.Algorithm.Tombeau1
 		{
 			MsPositionReContainer = 0;
 			MidiChannel = midiChannel;
-			_gamutGrpTrks = new List<GamutGrpTrk>();
+			_ModeGrpTrks = new List<ModeGrpTrk>();
 		}
 
-		public ModeSegment(int midiChannel, int msPositionReContainer, IReadOnlyList<GamutGrpTrk> gamutGrpTrks)
+		public ModeSegment(int midiChannel, int msPositionReContainer, IReadOnlyList<ModeGrpTrk> ModeGrpTrks)
 		{
 			Debug.Assert(midiChannel >= 0 && midiChannel <= 15);
 			Debug.Assert(msPositionReContainer >= 0);
-			Debug.Assert(gamutGrpTrks.Count > 0);
+			Debug.Assert(ModeGrpTrks.Count > 0);
 
 			MsPositionReContainer = msPositionReContainer;
 			MidiChannel = midiChannel;
-			_modeOld = new ModeOld(gamutGrpTrks[0].Gamut.ModeOld.AbsolutePitchHierarchy);
+			_modeOld = new ModeOld(ModeGrpTrks[0].Mode.ModeOld.AbsolutePitchHierarchy);
 
-			foreach(GamutGrpTrk gamutGrpTrk in gamutGrpTrks)
+			foreach(ModeGrpTrk ModeGrpTrk in ModeGrpTrks)
 			{
-				AssertConsistency(MidiChannel, _modeOld, gamutGrpTrk);
+				AssertConsistency(MidiChannel, _modeOld, ModeGrpTrk);
 			}
 
-			_gamutGrpTrks = new List<GamutGrpTrk>(gamutGrpTrks);
+			_ModeGrpTrks = new List<ModeGrpTrk>(ModeGrpTrks);
 		}
 
 		/// <summary>
-		/// Note that gamuts are not cloned in the contained ModeSegment objects.
+		/// Note that modes are not cloned in the contained ModeSegment objects.
 		/// </summary>
 		/// <returns></returns>
 		public ModeSegment Clone()
 		{
 			ModeSegment clone = new ModeSegment(this.MidiChannel);
-			foreach(GamutGrpTrk gamutGrpTrk in _gamutGrpTrks)
+			foreach(ModeGrpTrk ModeGrpTrk in _ModeGrpTrks)
 			{
-				clone.Add(gamutGrpTrk.Clone);
+				clone.Add(ModeGrpTrk.Clone);
 			}
 			return clone;
 		}
 
-		public GamutGrpTrk this[int i] {	get => _gamutGrpTrks[i]; }
+		public ModeGrpTrk this[int i] {	get => _ModeGrpTrks[i]; }
 
-		public int Count { get => _gamutGrpTrks.Count; }
+		public int Count { get => _ModeGrpTrks.Count; }
 
-		private void AssertConsistency(int midiChannel, ModeOld modeOld, GamutGrpTrk gamutGrpTrk)
+		private void AssertConsistency(int midiChannel, ModeOld modeOld, ModeGrpTrk ModeGrpTrk)
 		{
-			Debug.Assert(modeOld.Equals(gamutGrpTrk.Gamut.ModeOld), "All GamutGrpTrks in a ModeSegment must have the same Mode.AbsolutePitchHierarchy");
-			Debug.Assert(midiChannel == gamutGrpTrk.MidiChannel, "All GamutGrpTrks in a ModeSegment must have the same MidiChannel");
+			Debug.Assert(modeOld.Equals(ModeGrpTrk.Mode.ModeOld), "All ModeGrpTrks in a ModeSegment must have the same Mode.AbsolutePitchHierarchy");
+			Debug.Assert(midiChannel == ModeGrpTrk.MidiChannel, "All ModeGrpTrks in a ModeSegment must have the same MidiChannel");
 		}
 
-		public void Add(GamutGrpTrk gamutGrpTrk)
+		public void Add(ModeGrpTrk ModeGrpTrk)
 		{
-			Debug.Assert(gamutGrpTrk != null);
+			Debug.Assert(ModeGrpTrk != null);
 
-			if(_gamutGrpTrks.Count > 0) // GamutGrpTrks can also be removed, so check.
+			if(_ModeGrpTrks.Count > 0) // ModeGrpTrks can also be removed, so check.
 			{
-				AssertConsistency(MidiChannel, _modeOld, gamutGrpTrk);
-				GamutGrpTrk lastGGT = _gamutGrpTrks[_gamutGrpTrks.Count - 1];
-				gamutGrpTrk.MsPositionReContainer = lastGGT.MsPositionReContainer + lastGGT.MsDuration;
+				AssertConsistency(MidiChannel, _modeOld, ModeGrpTrk);
+				ModeGrpTrk lastGGT = _ModeGrpTrks[_ModeGrpTrks.Count - 1];
+				ModeGrpTrk.MsPositionReContainer = lastGGT.MsPositionReContainer + lastGGT.MsDuration;
 			}
 			else
 			{
-				_modeOld = new ModeOld(gamutGrpTrk.Gamut.ModeOld.AbsolutePitchHierarchy);
-				gamutGrpTrk.MsPositionReContainer = 0;
+				_modeOld = new ModeOld(ModeGrpTrk.Mode.ModeOld.AbsolutePitchHierarchy);
+				ModeGrpTrk.MsPositionReContainer = 0;
 			}
-			_gamutGrpTrks.Add(gamutGrpTrk);  			
+			_ModeGrpTrks.Add(ModeGrpTrk);  			
 		}
 
-		public void Remove(GamutGrpTrk gamutGrpTrk)
+		public void Remove(ModeGrpTrk ModeGrpTrk)
 		{
-			_gamutGrpTrks.Remove(gamutGrpTrk);
+			_ModeGrpTrks.Remove(ModeGrpTrk);
 			SetMsPositionsReThisModeSegment();
 		}
 		public void RemoveAt(int index)
 		{
-			_gamutGrpTrks.RemoveAt(index);
+			_ModeGrpTrks.RemoveAt(index);
 			SetMsPositionsReThisModeSegment();
 		}
 		public void RemoveRange(int startIndex, int nItems)
 		{
-			_gamutGrpTrks.RemoveRange(startIndex, nItems);
+			_ModeGrpTrks.RemoveRange(startIndex, nItems);
 			SetMsPositionsReThisModeSegment();
 		}
 
@@ -102,9 +102,9 @@ namespace Moritz.Algorithm.Tombeau1
 		internal Trk ToTrk()
 		{
 			Trk trk = new Trk(this.MidiChannel, this.MsPositionReContainer, new List<IUniqueDef>());
-			foreach(GamutGrpTrk gamutGrpTrk in this.GamutGrpTrks)
+			foreach(ModeGrpTrk ModeGrpTrk in this.ModeGrpTrks)
 			{
-				trk.AddRange(gamutGrpTrk);
+				trk.AddRange(ModeGrpTrk);
 			}
 
 			return trk;
@@ -112,13 +112,13 @@ namespace Moritz.Algorithm.Tombeau1
 
 		public void Reverse()
 		{
-			_gamutGrpTrks.Reverse();
+			_ModeGrpTrks.Reverse();
 			SetMsPositionsReThisModeSegment();
 		}
 
 		public new string ToString()
 		{
-			int count = _gamutGrpTrks.Count;
+			int count = _ModeGrpTrks.Count;
 			if(count > 0)
 			{
 				return $"Count={count.ToString()} Mode={_modeOld.ToString()} MsPositionReContainer={MsPositionReContainer}";
@@ -130,15 +130,15 @@ namespace Moritz.Algorithm.Tombeau1
 		}
 
 		public int MsPositionReContainer = 0;
-		public IReadOnlyList<GamutGrpTrk> GamutGrpTrks { get => _gamutGrpTrks as IReadOnlyList<GamutGrpTrk>; }
+		public IReadOnlyList<ModeGrpTrk> ModeGrpTrks { get => _ModeGrpTrks as IReadOnlyList<ModeGrpTrk>; }
 		public int MsDuration
 		{ 
 			get
 			{
 				int rval = 0;
-				foreach(GamutGrpTrk gamutGrpTrk in _gamutGrpTrks)
+				foreach(ModeGrpTrk ModeGrpTrk in _ModeGrpTrks)
 				{
-					rval += gamutGrpTrk.MsDuration;
+					rval += ModeGrpTrk.MsDuration;
 				}
 				return rval;
 			}
@@ -149,9 +149,9 @@ namespace Moritz.Algorithm.Tombeau1
 				int msDuration = value;
 
 				List<int> relativeDurations = new List<int>();
-				foreach(GamutGrpTrk gamutGrpTrk in _gamutGrpTrks)
+				foreach(ModeGrpTrk ModeGrpTrk in _ModeGrpTrks)
 				{
-					relativeDurations.Add(gamutGrpTrk.MsDuration);
+					relativeDurations.Add(ModeGrpTrk.MsDuration);
 				}
 
 				List<int> newDurations = M.IntDivisionSizes(msDuration, relativeDurations);
@@ -159,12 +159,12 @@ namespace Moritz.Algorithm.Tombeau1
 				Debug.Assert(newDurations.Count == relativeDurations.Count);
 				int i = 0;
 				int newTotal = 0;
-				foreach(GamutGrpTrk gamutGrpTrk in _gamutGrpTrks)
+				foreach(ModeGrpTrk ModeGrpTrk in _ModeGrpTrks)
 				{
-					if(gamutGrpTrk.MsDuration > 0)
+					if(ModeGrpTrk.MsDuration > 0)
 					{
-						gamutGrpTrk.MsDuration = newDurations[i];
-						newTotal += gamutGrpTrk.MsDuration;
+						ModeGrpTrk.MsDuration = newDurations[i];
+						newTotal += ModeGrpTrk.MsDuration;
 						++i;
 					}
 				}
@@ -178,15 +178,15 @@ namespace Moritz.Algorithm.Tombeau1
 		internal void SetMsPositionsReThisModeSegment()
 		{
 			int msPos = 0;
-			foreach(GamutGrpTrk gamutGrpTrk in _gamutGrpTrks)
+			foreach(ModeGrpTrk ModeGrpTrk in _ModeGrpTrks)
 			{
-				gamutGrpTrk.MsPositionReContainer = msPos;
-				msPos += gamutGrpTrk.MsDuration;
+				ModeGrpTrk.MsPositionReContainer = msPos;
+				msPos += ModeGrpTrk.MsDuration;
 			}
 		}
 
 		private readonly int MidiChannel;
-		private List<GamutGrpTrk> _gamutGrpTrks = null;
+		private List<ModeGrpTrk> _ModeGrpTrks = null;
 		private ModeOld _modeOld = null;
 	}
 

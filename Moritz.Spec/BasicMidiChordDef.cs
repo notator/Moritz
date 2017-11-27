@@ -39,13 +39,13 @@ namespace Moritz.Spec
         /// Note that the number of pitches returned can be less than nPitches. Pitches that would be higher than 127 are
         /// simply not added to the returned list.
         /// All pitches are given velocity = 127.
-        /// The pitches are found using the function gamut.GetChord(rootPitch, density). See that function for further documentation.
+        /// The pitches are found using the function mode.GetChord(rootPitch, density). See that function for further documentation.
         /// </summary>
         /// <param name="msDuration">The duration</param>
-        /// <param name="gamut"></param>
+        /// <param name="mode"></param>
         /// <param name="rootPitch">The lowest pitch</param>
         /// <param name="density">The number of pitches. The actual number created can be smaller.</param>
-        public BasicMidiChordDef(int msDuration, Gamut gamut, int rootPitch, int density)
+        public BasicMidiChordDef(int msDuration, Mode mode, int rootPitch, int density)
         {
             #region conditions
             Debug.Assert(density > 0 && density <= 12);
@@ -55,7 +55,7 @@ namespace Moritz.Spec
 
             _msDuration = msDuration; // read-only!
 
-            Pitches = gamut.GetChord(rootPitch, density);
+            Pitches = mode.GetChord(rootPitch, density);
             var newVelocities = new List<byte>();
             foreach(byte pitch in Pitches) // can be less than nPitchesPerChord
             {

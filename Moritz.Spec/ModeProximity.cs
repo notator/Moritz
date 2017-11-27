@@ -6,23 +6,23 @@ using System;
 namespace Moritz.Spec
 {
 	/// <summary>
-	/// A helper class storing a Gamut and its proximity to another Gamut.
+	/// A helper class storing a Mode and its proximity to another Mode.
 	/// </summary>
-	public class GamutProximity
+	public class ModeProximity
 	{
-		public GamutProximity(Gamut gamut, int proximity)
+		public ModeProximity(Mode mode, int proximity)
 		{
-			_gamut = gamut;
+			_mode = mode;
 			_proximity = proximity;
 		}
 
 		public override string ToString()
 		{
-			return $"Gamut: {_gamut.ToString()} proximity={_proximity}";
+			return $"Mode: {_mode.ToString()} proximity={_proximity}";
 		}
 
-		public Gamut Gamut { get => _gamut; }
-		private Gamut _gamut;
+		public Mode Mode { get => _mode; }
+		private Mode _mode;
 
 		public int Proximity { get => _proximity; }
 		private int _proximity = 0;

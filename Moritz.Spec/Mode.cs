@@ -7,24 +7,24 @@ using System.Text;
 namespace Moritz.Spec
 {
     /// <summary>
-    /// A Gamut contains/is a list of absolute pitch numbers in an ascending order scale.
+    /// A Mode contains/is a list of absolute pitch numbers in an ascending order scale.
     /// All the values are different and in range [0..127].
-    /// <para>Gamut.List[0] == absolutePitchHierarchy[0] % 12 (restricted to range [0..11]).</para>
-    /// <para>Each absolute pitch exists at all possible octaves above Gamut.List[0].
-    /// (So each octave range in the gamut contains the same absolute pitches.)</para>
+    /// <para>Mode.List[0] == absolutePitchHierarchy[0] % 12 (restricted to range [0..11]).</para>
+    /// <para>Each absolute pitch exists at all possible octaves above Mode.List[0].
+    /// (So each octave range in the mode contains the same absolute pitches.)</para>
     /// </summary>
-    public class Gamut
+    public class Mode
     {
         #region constructors
         /// <summary>
-        /// Gamuts are immutable!
+        /// Modes are immutable!
         /// </summary>
-        /// <param name="relativePitchHierarchyIndex">Will be treated % 22 (Gamut.RelativePitchHierarchiesCount)</param>
+        /// <param name="relativePitchHierarchyIndex">Will be treated % 22 (Mode.RelativePitchHierarchiesCount)</param>
         /// <param name="basePitch">Will be treated % 12</param>
         /// <param name="nPitchesPerOctave">Will be treated % 13</param>
-        public Gamut(int relativePitchHierarchyIndex, int basePitch, int nPitchesPerOctave)
+        public Mode(int relativePitchHierarchyIndex, int basePitch, int nPitchesPerOctave)
         {
-            relativePitchHierarchyIndex %= Gamut.RelativePitchHierarchiesCount;
+            relativePitchHierarchyIndex %= Mode.RelativePitchHierarchiesCount;
             basePitch %= 12;
             nPitchesPerOctave %= 13;
 
@@ -34,7 +34,7 @@ namespace Moritz.Spec
             #endregion condition
 
             _modeOld = new ModeOld(absolutePitchHierarchy);
-            _list = GetGamutList(absolutePitchHierarchy, nPitchesPerOctave);
+            _list = GetModeList(absolutePitchHierarchy, nPitchesPerOctave);
             
             RelativePitchHierarchyIndex = relativePitchHierarchyIndex;
             BasePitch = basePitch;
@@ -43,21 +43,21 @@ namespace Moritz.Spec
         }
 
 		/// <summary>
-		/// Returns 264 GamutProximity objects containing all the possible Gamuts
-		/// with their proximities to this Gamut. The returned list is sorted by proximity.
+		/// Returns 264 ModeProximity objects containing all the possible Modes
+		/// with their proximities to this Mode. The returned list is sorted by proximity.
 		/// </summary>
 		/// <returns></returns>
-		public List<GamutProximity> FindRelatedGamuts()
+		public List<ModeProximity> FindRelatedModes()
 		{
-			var rval = new List<GamutProximity>();
+			var rval = new List<ModeProximity>();
 
-			for(int gamutRPHIndex = 0; gamutRPHIndex < Gamut.RelativePitchHierarchiesCount; ++gamutRPHIndex)
+			for(int modeRPHIndex = 0; modeRPHIndex < Mode.RelativePitchHierarchiesCount; ++modeRPHIndex)
 			{
-				for(int gamutRPHBasePitch = 0; gamutRPHBasePitch < 12; ++gamutRPHBasePitch)
+				for(int modeRPHBasePitch = 0; modeRPHBasePitch < 12; ++modeRPHBasePitch)
 				{
-					Gamut gamut2 = new Gamut(gamutRPHIndex, gamutRPHBasePitch, this.NPitchesPerOctave);
-					GamutProximity gamutProximity = GetGamutProximity(gamut2);
-					rval.Add(gamutProximity);
+					Mode mode2 = new Mode(modeRPHIndex, modeRPHBasePitch, this.NPitchesPerOctave);
+					ModeProximity modeProximity = GetModeProximity(mode2);
+					rval.Add(modeProximity);
 				}
 			}
 
@@ -69,21 +69,21 @@ namespace Moritz.Spec
 			return rval;
 		}
 
-		private GamutProximity GetGamutProximity(Gamut otherGamut)
+		private ModeProximity GetModeProximity(Mode otherMode)
 		{
-			Debug.Assert(this.NPitchesPerOctave == otherGamut.NPitchesPerOctave);
+			Debug.Assert(this.NPitchesPerOctave == otherMode.NPitchesPerOctave);
 
-			int proximity = GetProximity(otherGamut);
-			GamutProximity rval = new GamutProximity(otherGamut, proximity);
+			int proximity = GetProximity(otherMode);
+			ModeProximity rval = new ModeProximity(otherMode, proximity);
 
 			return rval;
 		}
 
-		private int GetProximity(Gamut otherGamut)
+		private int GetProximity(Mode otherMode)
 		{
 			int proximity = 0;
 			var thisAbsolutePitchHierarchy = new List<int>(this.ModeOld.AbsolutePitchHierarchy);
-			var otherAbsolutePitchHierarchy = new List<int>(otherGamut.ModeOld.AbsolutePitchHierarchy);
+			var otherAbsolutePitchHierarchy = new List<int>(otherMode.ModeOld.AbsolutePitchHierarchy);
 			// N.B. test ALL pitches in the hierarchies, not just the first NPitchesPerOctave in thisAbsolutePitchHierarchy.
 			for(int index1 = 0; index1 < 12; ++index1)
 			{
@@ -127,7 +127,7 @@ namespace Moritz.Spec
             }
         }
 
-        private List<int> GetGamutList(IReadOnlyList<int> absolutePitchHierarchy, int nPitchesPerOctave)
+        private List<int> GetModeList(IReadOnlyList<int> absolutePitchHierarchy, int nPitchesPerOctave)
         {
             int rootPitch = absolutePitchHierarchy[0];
 
@@ -138,7 +138,7 @@ namespace Moritz.Spec
             }
             sortedBasePitches.Sort();
 
-            List<int> gamutList = new List<int>();
+            List<int> modeList = new List<int>();
             int rphIndex = 0;
             int octave = 0;
             while(true)
@@ -151,7 +151,7 @@ namespace Moritz.Spec
 
                 if(pitch >= rootPitch)
                 {
-                    gamutList.Add(pitch);
+                    modeList.Add(pitch);
                 }
 
                 if(rphIndex >= sortedBasePitches.Count)
@@ -161,47 +161,47 @@ namespace Moritz.Spec
                 }
             }
 
-            ThrowExceptionIfGamutListIsInvalid(gamutList);
+            ThrowExceptionIfModeListIsInvalid(modeList);
 
-            return gamutList;
+            return modeList;
         }
 
         /// <summary>
         /// Throws an exception if the argument is invalid for any of the following reasons:
         /// 1. The argument may not be null or empty.
         /// 2. All the values must be different, in ascending order, and in range [0..127].
-        /// 3. Each absolute pitch exists at all possible octaves in the gamut.
-        /// (So each octave range in the gamut contains the same absolute pitches.)
+        /// 3. Each absolute pitch exists at all possible octaves in the mode.
+        /// (So each octave range in the mode contains the same absolute pitches.)
         /// </summary>
-        private void ThrowExceptionIfGamutListIsInvalid(List<int> gamutList)
+        private void ThrowExceptionIfModeListIsInvalid(List<int> modeList)
         {
-            if(gamutList == null || !gamutList.Any())
+            if(modeList == null || !modeList.Any())
             {
-                throw new ArgumentNullException($"The {nameof(gamutList)} argument is null or empty.");
+                throw new ArgumentNullException($"The {nameof(modeList)} argument is null or empty.");
             }
-            if(gamutList[0] % 12 != ModeOld.AbsolutePitchHierarchy[0])
+            if(modeList[0] % 12 != ModeOld.AbsolutePitchHierarchy[0])
             {
-                throw new ArgumentException($"The lowest pitch in a gamutList must always be equal to {nameof(ModeOld)}[0].");
+                throw new ArgumentException($"The lowest pitch in a modeList must always be equal to {nameof(ModeOld)}[0].");
             }
-            for(int i = 1; i < gamutList.Count; ++i)
+            for(int i = 1; i < modeList.Count; ++i)
             {
-                if(gamutList[i] < 0 || gamutList[i] > 127)
+                if(modeList[i] < 0 || modeList[i] > 127)
                 {
-                    throw new ArgumentException($"{nameof(gamutList)}[{i}] is out of range.");
+                    throw new ArgumentException($"{nameof(modeList)}[{i}] is out of range.");
                 }
-                if(gamutList[i] <= gamutList[i - 1])
+                if(modeList[i] <= modeList[i - 1])
                 {
-                    throw new ArgumentException($"{nameof(gamutList)} must be in ascending order.");
+                    throw new ArgumentException($"{nameof(modeList)} must be in ascending order.");
                 }
             }
 
             #region check pitch consistency
             List<int> basePitches = new List<int>();
             int pitchIndex = 0;
-            int octaveAboveBasePitch = gamutList[0] + 12;
-            while(pitchIndex < gamutList.Count && gamutList[pitchIndex] < octaveAboveBasePitch)
+            int octaveAboveBasePitch = modeList[0] + 12;
+            while(pitchIndex < modeList.Count && modeList[pitchIndex] < octaveAboveBasePitch)
             {
-                basePitches.Add(gamutList[pitchIndex++]); 
+                basePitches.Add(modeList[pitchIndex++]); 
             }
             int pitchCount = 0;
             foreach(int pitch in basePitches)
@@ -209,17 +209,17 @@ namespace Moritz.Spec
                 int pitchOctave = pitch;
                 while(pitchOctave < 128)
                 {
-                    if(!gamutList.Contains(pitchOctave))
+                    if(!modeList.Contains(pitchOctave))
                     {
-                        throw new Exception($"Missing pitch in gamut list.");
+                        throw new Exception($"Missing pitch in mode list.");
                     }
                     pitchCount += 1;
                     pitchOctave += 12;
                 }
             }
-            if(gamutList.Count > pitchCount)
+            if(modeList.Count > pitchCount)
             {
-                throw new Exception($"Unknown pitch in gamut list.");
+                throw new Exception($"Unknown pitch in mode list.");
             }
             #endregion check pitch consistency
         }
@@ -229,7 +229,7 @@ namespace Moritz.Spec
 
         #region public functions
         /// <summary>
-        /// returns the value in the gamut list at index i.
+        /// returns the value in the mode list at index i.
         /// </summary>
         public int this[int i]
         {
@@ -245,7 +245,7 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Returns true if the gamut.List contains all the pitches in the argument. Otherwise false. 
+        /// Returns true if the mode.List contains all the pitches in the argument. Otherwise false. 
         /// </summary>
         public bool ContainsAllPitches(MidiChordDef mcd)
         {
@@ -263,7 +263,7 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// Returns true if the gamut.List contains all the pitches in the argument. Otherwise false. 
+        /// Returns true if the mode.List contains all the pitches in the argument. Otherwise false. 
         /// </summary>
         public bool ContainsAllPitches(List<IUniqueDef> iuds)
         {
@@ -287,14 +287,14 @@ namespace Moritz.Spec
 
         /// <summary>
         /// The returned list contains a list of pitches, one pitch per envelope.Original.Count.
-        /// Throws an exception if firstPitch is not in the gamut.List.
-        /// Pitches that would be lower or higher than any pitch in the gamut are silently coerced to
+        /// Throws an exception if firstPitch is not in the mode.List.
+        /// Pitches that would be lower or higher than any pitch in the mode are silently coerced to
         /// the lowest or highest values respectively.
         /// </summary>
         /// <param name="firstPitch">Will be the first pitch in the returned list.</param>
         internal List<int> PitchSequence(int firstPitch, Envelope envelope)
         {
-            Debug.Assert(_list.Contains(firstPitch), $"{nameof(firstPitch)} is not in gamut.");
+            Debug.Assert(_list.Contains(firstPitch), $"{nameof(firstPitch)} is not in mode.");
 
             List<int> pitchSequence = new List<int>();
             if(envelope == null)
@@ -305,8 +305,8 @@ namespace Moritz.Spec
             {
                 List<int> envOriginal = envelope.Original; // clone
                 int firstIndexInEnvelope = envOriginal[0];
-                int indexOfFirstPitchInGamut = IndexOf(firstPitch);
-                int indexDiff = indexOfFirstPitchInGamut - firstIndexInEnvelope;
+                int indexOfFirstPitchInMode = IndexOf(firstPitch);
+                int indexDiff = indexOfFirstPitchInMode - firstIndexInEnvelope;
 
                 List<int> indices = envOriginal;
                 for(int i = 0; i < indices.Count; ++i)
@@ -432,18 +432,18 @@ namespace Moritz.Spec
 
         /// <summary>
         /// The returned list contains 12 velocity values in range [1..127] that can be applied to pitches in any Trk or MidiChordDef
-        /// (using their SetVelocityPerAbsolutePitch(...) ) function, regardless of the gamut from which they have been constructed.
-        /// Pitches that are part of *this* gamut in the returned list are given velocities in range [minimumVelocity..maximumVelocity].
+        /// (using their SetVelocityPerAbsolutePitch(...) ) function, regardless of the mode from which they have been constructed.
+        /// Pitches that are part of *this* mode in the returned list are given velocities in range [minimumVelocity..maximumVelocity].
         /// Other pitches are given velocity = minimumVelocity.
         /// The returned values are in order of absolute pitch, with C natural (absolute pitch 0) at position 0, C# (absolute pitch 1) at
         /// position 1, etc.
-        /// The velocities of the gamut's performing pitches are permuted according to a contour in a linear-negative field having
+        /// The velocities of the mode's performing pitches are permuted according to a contour in a linear-negative field having
         /// domain NPitchesPerOctave. The contour is found using the loudestPitchIndex.
         /// The contour at loudestPitchIndex==0 (the default) is simply ascending (e.g. 1,2,3,4,5,6,7,8).
         /// The contour at loudestPitchIndex==(NValuesPerOctave-1) is simply descending (e.g. 9,8,7,6,5,4,3,2,1).
-        /// So, in chords constructed from this gamut, loudestPitchIndex==0 results in a bottom-to-top (i.e. loud-quiet) velocity gradient with
-        /// respect to the gamut's absolute pitch hierarchy, while loudestPitchIndex==(NValuesPerOctave-1) results in a top-to-bottom (i.e. loud-quiet)
-        /// gradient with respect to the gamut's absolute pitch hierarchy.
+        /// So, in chords constructed from this mode, loudestPitchIndex==0 results in a bottom-to-top (i.e. loud-quiet) velocity gradient with
+        /// respect to the mode's absolute pitch hierarchy, while loudestPitchIndex==(NValuesPerOctave-1) results in a top-to-bottom (i.e. loud-quiet)
+        /// gradient with respect to the mode's absolute pitch hierarchy.
         /// </summary>
         /// <param name="minimumVelocity">In range [1..127]. The minimum velocity to be given to any pitch.</param>
         /// <param name="maximumVelocity">In range [1..127]. The maximum velocity to be given to any pitch.</param>
@@ -573,12 +573,12 @@ namespace Moritz.Spec
             return contour;
         }
 
-		public (List<byte> commonAbsPitches, List<byte> otherAbsPitchesInThisGamut, List<byte> otherAbsPitchesInArgGamut)
-			GetCommonAbsolutePitches(Gamut gamut2)
+		public (List<byte> commonAbsPitches, List<byte> otherAbsPitchesInThisMode, List<byte> otherAbsPitchesInArgMode)
+			GetCommonAbsolutePitches(Mode mode2)
 		{
 			var commonAbsPitches = new List<byte>();
-			var otherAbsPitchesInThisGamut = new List<byte>();
-			var otherAbsPitchesInArgGamut = new List<byte>();
+			var otherAbsPitchesInThisMode = new List<byte>();
+			var otherAbsPitchesInArgMode = new List<byte>();
 
 			List<int> shortG1AbsPH = new List<int>();
 			List<int> shortG2AbsPH = new List<int>();
@@ -586,7 +586,7 @@ namespace Moritz.Spec
 			for(int i = 0; i < NPitchesPerOctave; ++i)
 			{
 				shortG1AbsPH.Add(this.ModeOld.AbsolutePitchHierarchy[i]);
-				shortG2AbsPH.Add(gamut2.ModeOld.AbsolutePitchHierarchy[i]);
+				shortG2AbsPH.Add(mode2.ModeOld.AbsolutePitchHierarchy[i]);
 			}
 
 			for(int i = 0; i < NPitchesPerOctave; ++i)
@@ -598,7 +598,7 @@ namespace Moritz.Spec
 				}
 				else
 				{
-					otherAbsPitchesInArgGamut.Add((byte)(pitchG2));
+					otherAbsPitchesInArgMode.Add((byte)(pitchG2));
 				}
 			}
 			for(int i = 0; i < NPitchesPerOctave; ++i)
@@ -606,10 +606,10 @@ namespace Moritz.Spec
 				int pitchG1 = shortG1AbsPH[i];
 				if(!commonAbsPitches.Contains((byte)pitchG1))
 				{
-					otherAbsPitchesInThisGamut.Add((byte)(pitchG1));
+					otherAbsPitchesInThisMode.Add((byte)(pitchG1));
 				}
 			}
-			return (commonAbsPitches, otherAbsPitchesInThisGamut, otherAbsPitchesInArgGamut);
+			return (commonAbsPitches, otherAbsPitchesInThisMode, otherAbsPitchesInArgMode);
 		}
 
 		public override string ToString()

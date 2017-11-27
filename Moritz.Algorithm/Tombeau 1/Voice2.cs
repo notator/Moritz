@@ -14,7 +14,7 @@ namespace Moritz.Algorithm.Tombeau1
 			_modeSegments = Compose(voice1);
 		}
 
-		#region available Trk and GamutGrpTrk transformations
+		#region available Trk and ModeGrpTrk transformations
 		// Add();
 		// AddRange();
 		// AdjustChordMsDurations();
@@ -42,31 +42,31 @@ namespace Moritz.Algorithm.Tombeau1
 		// TimeWarp();
 		// Translate();
 		// Transpose();
-		// TransposeStepsInGamut();
-		// TransposeToRootInGamut();
-		#endregion available Trk and GamutGrpTrk transformations
+		// TransposeStepsInMode();
+		// TransposeToRootInMode();
+		#endregion available Trk and ModeGrpTrk transformations
 
 		#region old code
 		//    /// <summary>
-		//    /// Creates a list of TenorPaletteGamutTrks, each of which has the same relativePitchHierarchyIndex.
+		//    /// Creates a list of TenorPaletteModeTrks, each of which has the same relativePitchHierarchyIndex.
 		//    /// </summary>
-		//    private List<GamutGrpTrk> GetTenorPaletteGamutTrkList(int relativePitchHierarchyIndex)
+		//    private List<ModeGrpTrk> GetTenorPaletteModeTrkList(int relativePitchHierarchyIndex)
 		//    {
-		//        const int gamutBasePitch = 0;
-		//        List<GamutGrpTrk> gamutGrpTrks = new List<GamutGrpTrk>();
+		//        const int modeBasePitch = 0;
+		//        List<ModeGrpTrk> ModeGrpTrks = new List<ModeGrpTrk>();
 
-		//        for(int i = 0, domain = 12; domain >= 1; --domain, ++i) // domain is both Gamut.PitchesPerOctave and nChords per GamutGrpTrk
+		//        for(int i = 0, domain = 12; domain >= 1; --domain, ++i) // domain is both Mode.PitchesPerOctave and nChords per ModeGrpTrk
 		//        {
-		//            Gamut gamut = new Gamut(relativePitchHierarchyIndex, gamutBasePitch, domain);
+		//            Mode mode = new Mode(relativePitchHierarchyIndex, modeBasePitch, domain);
 
-		//            PaletteGamutTrk tpg = new PaletteGamutTrk(gamut, 3);
+		//            PaletteModeTrk tpg = new PaletteModeTrk(mode, 3);
 		//int minMsDuration = 200;
 		//int maxMsDuration = 300;
 		//tpg.SetDurationsFromPitches(maxMsDuration, minMsDuration, true);
 
 		//#region begin test code 1 Shear and permute
-		//tpg.Shear(0, -1 * (gamut.NPitchesPerOctave));
-		//            tpg.SetVelocityPerAbsolutePitch(gamut);
+		//tpg.Shear(0, -1 * (mode.NPitchesPerOctave));
+		//            tpg.SetVelocityPerAbsolutePitch(mode);
 
 		//            if(domain % 2 != 0)
 		//            {
@@ -96,13 +96,13 @@ namespace Moritz.Algorithm.Tombeau1
 		////}
 		//#endregion
 
-		//#region begin test code 5, related GamutGrpTrks
+		//#region begin test code 5, related ModeGrpTrks
 		////if(domain % 2 != 0 && tpg.Count > 1)
 		////{
-		////    TenorPaletteGamutTrk previousTpg = (TenorPaletteGamutTrk)gamutGrpTrks[i - 1];
-		////    //tpg = previousTpg.RelatedPitchHierarchyGamutTrk(previousTpg.Gamut.RelativePitchHierarchyIndex + 11);
-		////    //tpg = previousTpg.RelatedBasePitchGamutTrk(11);
-		////    tpg = previousTpg.RelatedDomainGamutTrk(6);
+		////    TenorPaletteModeTrk previousTpg = (TenorPaletteModeTrk)ModeGrpTrks[i - 1];
+		////    //tpg = previousTpg.RelatedPitchHierarchyModeTrk(previousTpg.Mode.RelativePitchHierarchyIndex + 11);
+		////    //tpg = previousTpg.RelatedBasePitchModeTrk(11);
+		////    tpg = previousTpg.RelatedDomainModeTrk(6);
 		////}
 		//#endregion
 
@@ -135,38 +135,38 @@ namespace Moritz.Algorithm.Tombeau1
 		//#region begin test code 8, set inverse velocities
 		////if(domain % 2 != 0 && tpg.Count > 1)
 		////{
-		////    TenorPaletteGamutTrk prevTpg = (TenorPaletteGamutTrk)gamutGrpTrks[i - 1];
-		////    Gamut prevGamut = prevTpg.Gamut;
-		////    tpg = new TenorPaletteGamutTrk(prevGamut); // identical to prevTpg
+		////    TenorPaletteModeTrk prevTpg = (TenorPaletteModeTrk)ModeGrpTrks[i - 1];
+		////    Mode prevMode = prevTpg.Mode;
+		////    tpg = new TenorPaletteModeTrk(prevMode); // identical to prevTpg
 		////    // inverse velocityPerAbsolutePitch
-		////    List<byte> velocityPerAbsolutePitch = prevGamut.GetVelocityPerAbsolutePitch(20, 127, prevGamut.NPitchesPerOctave - 1);
+		////    List<byte> velocityPerAbsolutePitch = prevMode.GetVelocityPerAbsolutePitch(20, 127, prevMode.NPitchesPerOctave - 1);
 		////    tpg.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, 20);
 		////}
 		//#endregion
 
-		//#region begin test code 8, set Gamut (pitches
+		//#region begin test code 8, set Mode (pitches
 		////if(domain % 2 != 0 && tpg.Count > 1)
 		////{
-		////    TenorPaletteGamutTrk prevTpg = (TenorPaletteGamutTrk)gamutGrpTrks[i - 1];
-		////    Gamut prevGamut = prevTpg.Gamut;
-		////    tpg = new TenorPaletteGamutTrk(prevGamut); // identical to prevTpg
+		////    TenorPaletteModeTrk prevTpg = (TenorPaletteModeTrk)ModeGrpTrks[i - 1];
+		////    Mode prevMode = prevTpg.Mode;
+		////    tpg = new TenorPaletteModeTrk(prevMode); // identical to prevTpg
 
-		////    int newRelativePitchHierarchyIndex = prevGamut.RelativePitchHierarchyIndex + 11;
-		////    int newBasePitch = prevGamut.BasePitch;
+		////    int newRelativePitchHierarchyIndex = prevMode.RelativePitchHierarchyIndex + 11;
+		////    int newBasePitch = prevMode.BasePitch;
 		////    int newNPitchesPerOctave = 8;
-		////    Gamut gamut1 = new Gamut(newRelativePitchHierarchyIndex, newBasePitch, newNPitchesPerOctave);
-		////    tpg.Gamut = gamut1; // sets the pitches, velocities are still those of the original pitches.
+		////    Mode mode1 = new Mode(newRelativePitchHierarchyIndex, newBasePitch, newNPitchesPerOctave);
+		////    tpg.Mode = mode1; // sets the pitches, velocities are still those of the original pitches.
 
-		////    // reverse the velocityperAbsolutePitch hierarchy re the prevGamut.
-		////    List<byte> velocityPerAbsolutePitch = prevGamut.GetVelocityPerAbsolutePitch(20, 127, prevGamut.NPitchesPerOctave - 1);
+		////    // reverse the velocityperAbsolutePitch hierarchy re the prevMode.
+		////    List<byte> velocityPerAbsolutePitch = prevMode.GetVelocityPerAbsolutePitch(20, 127, prevMode.NPitchesPerOctave - 1);
 		////    tpg.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, 20);
 		////}
 		//#endregion
 
-		//gamutGrpTrks.Add(tpg);
+		//ModeGrpTrks.Add(tpg);
 		//        }
 
-		//        return (gamutGrpTrks);
+		//        return (ModeGrpTrks);
 		//    }
 		#endregion
 

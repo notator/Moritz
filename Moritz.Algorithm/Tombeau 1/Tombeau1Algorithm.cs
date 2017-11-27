@@ -130,12 +130,12 @@ namespace Moritz.Algorithm.Tombeau1
                 GetValuePerMsPosition(List<int> msPositions) // Returns a dictionary in which: Key is one of the positions in msPositions, Value is the envelope value at that msPosition.
             ***************************************************************************/
 			#endregion Envelope functions
-			#region Gamut functions
+			#region Mode functions
 			/***************************************************************************
-            public Gamut functions and properties that have been implemented:
-                (Gamut is immutable)
+            public Mode functions and properties that have been implemented:
+                (Mode is immutable)
                 constructor:
-                Gamut(List<int> absolutePitchHierarchy, int nPitchesPerOctave)
+                Mode(List<int> absolutePitchHierarchy, int nPitchesPerOctave)
 
                 Clone()
                 Conjugate()
@@ -148,14 +148,14 @@ namespace Moritz.Algorithm.Tombeau1
 
                 GetVelocityPerAbsolutePitch(int minimumVelocity)
 
-                Gamut[i] { get; }
+                Mode[i] { get; }
                 IndexOf(int pitch)
                 NPitchesPerOctave { get; }
                 AbsolutePitchHierarchy  { get; } // a copy of the private list.
                 List {get;} // a copy of the private list.
                 Count {get;}            
 			***************************************************************************/
-			#endregion Gamut functions
+			#endregion Mode functions
 			#region MidiChordDef functions
 			/***************************************************************************            
             public MidiChordDef functions that have been implemented and are especially relevant to this project:
@@ -163,12 +163,12 @@ namespace Moritz.Algorithm.Tombeau1
                 SIMPLE MidiChordDefs (containing a single BasicMidiChordDef):
                     MidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff)
                 ORNAMENTS
-                    MidiChordDef(int msDuration, Gamut gamut, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null)    
+                    MidiChordDef(int msDuration, Mode mode, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null)    
                 PALETTE MidiChordDefs (MidiChordDefs created from palettes):    
                     MidiChordDef(int msDuration, byte pitchWheelDeviation, bool hasChordOff, List<byte> rootMidiPitches, List<byte> rootMidiVelocities, int ornamentNumberSymbol, MidiChordSliderDefs midiChordSliderDefs, List<BasicMidiChordDef> basicMidiChordDefs)
                     
                 Clone()
-                Conjugate() // requires MidiChordDef.Gamut to be set.
+                Conjugate() // requires MidiChordDef.Mode to be set.
 
                 TimeWarp(Envelope envelope, double distortion) // Changes the msPositions of the BasicMidiChordDefs without changing the length of the MidiChordDef.
                 MsDuration {get; set;} // set changes the durations of contained BasicMidiChordDefs
@@ -177,9 +177,9 @@ namespace Moritz.Algorithm.Tombeau1
                 SetVerticalDensity(int newDensity)
                 GetNoteCombination(MidiChordDef mcd1, MidiChordDef mcd2, MidiChordPitchOperator midiChordPitchOperator) // a static function
                 
-                Invert(int nPitchesToShift) // shifts the lower pitches up one octave. The pitches stay in the Gamut, if any.
-                Transpose(int interval) // sets Gamut to null
-                Transpose(Gamut gamut, int steps)
+                Invert(int nPitchesToShift) // shifts the lower pitches up one octave. The pitches stay in the Mode, if any.
+                Transpose(int interval) // sets Mode to null
+                Transpose(Mode mode, int steps)
 
                 SetVelocityPerAbsolutePitch(List<int> velocityPerAbsolutePitch)
                 SetVerticalVelocityGradient(byte rootVelocity, byte topVelocity)
@@ -194,7 +194,7 @@ namespace Moritz.Algorithm.Tombeau1
                 AdjustModulationWheel(double factor)
                 AdjustExpression(double factor)
 
-                Gamut {get; set;} // The Gamut can only be set (or changed) if all the pitches in the MidiChordDef are in the new Gamut.
+                Mode {get; set;} // The Mode can only be set (or changed) if all the pitches in the MidiChordDef are in the new Mode.
             ***************************************************************************/
 			#endregion MidiChordDef functions
 			#region Trk functions
@@ -367,7 +367,7 @@ namespace Moritz.Algorithm.Tombeau1
 				case CompositionType.onlyVoice1:
 				{
 					#region test code
-					IReadOnlyList<IReadOnlyList<MsValues>> msValuesOfGamutTrks = voice1.GetMsValuesOfGamutTrks();
+					IReadOnlyList<IReadOnlyList<MsValues>> msValuesOfModeTrks = voice1.GetMsValuesOfModeTrks();
 					IReadOnlyList<IReadOnlyList<IReadOnlyList<MsValues>>> msValuesOfIUniqueDefs = voice1.GetMsValuesOfIUniqueDefs();
 					#endregion
 
@@ -424,7 +424,7 @@ namespace Moritz.Algorithm.Tombeau1
 			return bars;
         }
 
-		#region available Trk and GamutGrpTrk transformations
+		#region available Trk and ModeGrpTrk transformations
 		// Add();
 		// AddRange();
 		// AdjustChordMsDurations();
@@ -452,9 +452,9 @@ namespace Moritz.Algorithm.Tombeau1
 		// TimeWarp();
 		// Translate();
 		// Transpose();
-		// TransposeStepsInGamut();
-		// TransposeToRootInGamut();
-		#endregion available Trk and GamutGrpTrk transformations
+		// TransposeStepsInMode();
+		// TransposeToRootInMode();
+		#endregion available Trk and ModeGrpTrk transformations
 
 		/// <summary>
 		/// The compulsory first barline (at msPosition=0) is NOT included in the returned list.

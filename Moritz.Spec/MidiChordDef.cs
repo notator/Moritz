@@ -62,22 +62,22 @@ namespace Moritz.Spec
         /// The notated pitch and the pitch of BasicMidiChordDefs[0] are set to rootNotatedPitch.
         /// The notated velocity of all pitches is set to 127.
         /// The root pitches of the BasicMidiChordDefs begin with rootNotatedPitch, and follow the ornamentEnvelope, using
-        /// the ornamentEnvelope's values as indices in the gamut. Their durations are as equal as possible, to give the
+        /// the ornamentEnvelope's values as indices in the mode. Their durations are as equal as possible, to give the
         /// overall msDuration. If ornamentEnvelope is null, a single, one-note BasicMidiChordDef will be created.
-        /// This constructor uses Gamut.GetChord(rootNotatedPitch, nPitchesPerChord) which returns pitches that are
+        /// This constructor uses Mode.GetChord(rootNotatedPitch, nPitchesPerChord) which returns pitches that are
         /// vertically spaced differently according to the absolute height of the rootNotatedPitch. The number of pitches
-        /// in a chord may also be less than nPitchesPerChord (see gamut.GetChord(...) ).
-        /// An exception is thrown if rootNotatedPitch is not in the gamut.
+        /// in a chord may also be less than nPitchesPerChord (see mode.GetChord(...) ).
+        /// An exception is thrown if rootNotatedPitch is not in the mode.
         /// </summary>        
         /// <param name="msDuration">The duration of this MidiChordDef</param>
-        /// <param name="gamut">The gamut containing all the pitches.</param>
+        /// <param name="mode">The mode containing all the pitches.</param>
         /// <param name="rootNotatedPitch">The lowest notated pitch. Also the lowest pitch of BasicMidiChordDefs[0].</param>
         /// <param name="nPitchesPerChord">The chord density (some chords may have less pitches).</param>
         /// <param name="ornamentEnvelope">The ornament definition.</param>
-        public MidiChordDef(int msDuration, Gamut gamut, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null)
+        public MidiChordDef(int msDuration, Mode mode, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null)
             : base(msDuration) 
         {
-            NotatedMidiPitches = gamut.GetChord(rootNotatedPitch, nPitchesPerChord);
+            NotatedMidiPitches = mode.GetChord(rootNotatedPitch, nPitchesPerChord);
             var nmVelocities = new List<byte>();
             foreach(byte pitch in NotatedMidiPitches) // can be less than nPitchesPerChord
             {
@@ -86,7 +86,7 @@ namespace Moritz.Spec
             NotatedMidiVelocities = nmVelocities;
 
             // Sets BasicMidiChords. If ornamentEnvelope == null, BasicMidiChords[0] is set to the NotatedMidiChord.
-            SetOrnament(gamut, ornamentEnvelope);
+            SetOrnament(mode, ornamentEnvelope);
         }
 
         /// <summary>
@@ -289,44 +289,44 @@ namespace Moritz.Spec
 
         #region Opposite
         /// <summary>
-        /// 1. Creates a new, opposite gamut from the argument Gamut (see Gamut.Opposite()).
-        /// 2. Clones this MidiChordDef, and replaces the clone's pitches by the equivalent pitches in the opposite Gamut.
+        /// 1. Creates a new, opposite mode from the argument Mode (see Mode.Opposite()).
+        /// 2. Clones this MidiChordDef, and replaces the clone's pitches by the equivalent pitches in the opposite Mode.
         /// 3. Returns the clone.
         /// </summary>
-        public MidiChordDef Opposite(Gamut gamut)
+        public MidiChordDef Opposite(Mode mode)
         {
             #region conditions
-            Debug.Assert(gamut != null);
+            Debug.Assert(mode != null);
             #endregion conditions
 
-            int relativePitchHierarchyIndex = (gamut.RelativePitchHierarchyIndex + 11) % 22;
-            Gamut oppositeGamut = new Gamut(relativePitchHierarchyIndex, gamut.BasePitch, gamut.NPitchesPerOctave);
+            int relativePitchHierarchyIndex = (mode.RelativePitchHierarchyIndex + 11) % 22;
+            Mode oppositeMode = new Mode(relativePitchHierarchyIndex, mode.BasePitch, mode.NPitchesPerOctave);
             MidiChordDef oppositeMCD = (MidiChordDef)Clone();
 
             #region conditions
-            Debug.Assert(gamut[0] == oppositeGamut[0]);
-            Debug.Assert(gamut.NPitchesPerOctave == oppositeGamut.NPitchesPerOctave);
-            // N.B. it is not necessarily true that gamut.Count == oppositeGamut.Count.
+            Debug.Assert(mode[0] == oppositeMode[0]);
+            Debug.Assert(mode.NPitchesPerOctave == oppositeMode.NPitchesPerOctave);
+            // N.B. it is not necessarily true that mode.Count == oppositeMode.Count.
             #endregion conditions
 
-            // Substitute the oppositeMCD's pitches by the equivalent pitches in the oppositeGamut.
-            OppositePitches(gamut, oppositeGamut, oppositeMCD.NotatedMidiPitches);
+            // Substitute the oppositeMCD's pitches by the equivalent pitches in the oppositeMode.
+            OppositePitches(mode, oppositeMode, oppositeMCD.NotatedMidiPitches);
             foreach(BasicMidiChordDef bmcd in oppositeMCD.BasicMidiChordDefs)
             {
-                OppositePitches(gamut, oppositeGamut, bmcd.Pitches);
+                OppositePitches(mode, oppositeMode, bmcd.Pitches);
             }
 
             return oppositeMCD;
         }
 
-        private void OppositePitches(Gamut gamut, Gamut oppositeGamut, List<byte> pitches)
+        private void OppositePitches(Mode mode, Mode oppositeMode, List<byte> pitches)
         {
             for(int i = 0; i < pitches.Count; ++i)
             {
-                int pitchIndex = gamut.IndexOf(pitches[i]);
-                // N.B. it is not necessarily true that gamut.Count == oppositeGamut.Count.
-                pitchIndex = (pitchIndex < oppositeGamut.Count) ? pitchIndex : oppositeGamut.Count - 1;
-                pitches[i] = (byte)oppositeGamut[pitchIndex];
+                int pitchIndex = mode.IndexOf(pitches[i]);
+                // N.B. it is not necessarily true that mode.Count == oppositeMode.Count.
+                pitchIndex = (pitchIndex < oppositeMode.Count) ? pitchIndex : oppositeMode.Count - 1;
+                pitches[i] = (byte)oppositeMode[pitchIndex];
             }
         }
         #endregion Opposite
@@ -339,7 +339,7 @@ namespace Moritz.Spec
         /// 3. The pitch list is resorted to be in ascending order.
         /// Notes:
         /// a) Velocities do not change. They remain in the same order as they were before this function was called.
-        /// b) The pitches thereby remain part of the Gamut, if there is one. 
+        /// b) The pitches thereby remain part of the Mode, if there is one. 
         /// </summary>
         /// <returns></returns>
         public void Invert(int nPitchesToShiftArg)
@@ -424,32 +424,32 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="ornamentShape"></param>
         /// <param name="nOrnamentChords"></param>
-        public void SetOrnament(Gamut gamut, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
+        public void SetOrnament(Mode mode, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
         {
-            int nPitchesPerOctave = gamut.NPitchesPerOctave;
+            int nPitchesPerOctave = mode.NPitchesPerOctave;
             Envelope ornamentEnvelope = new Envelope(ornamentShape, 127, nPitchesPerOctave, nOrnamentChords);
-            SetOrnament(gamut, ornamentEnvelope);
+            SetOrnament(mode, ornamentEnvelope);
         }
 
         /// <summary>
         /// Sets an ornament having the shape and number of elements in the ornamentEnvelope.
         /// If ornamentEnvelope == null, BasicMidiChords[0] is set to the NotatedMidiChord.
         /// using the NotatedMidiPitches as the first chord.
-        /// Uses the current Gamut.
+        /// Uses the current Mode.
         /// Replaces any existing ornament.
         /// Sets the OrnamentNumberSymbol to the number of BasicMidiChordDefs.
         /// </summary>
         /// <param name="ornamentEnvelope"></param>
-        public void SetOrnament(Gamut gamut, Envelope ornamentEnvelope)
+        public void SetOrnament(Mode mode, Envelope ornamentEnvelope)
         {
-            Debug.Assert(gamut != null);
-            List<int> basicMidiChordRootPitches = gamut.PitchSequence(_notatedMidiPitches[0], ornamentEnvelope);
+            Debug.Assert(mode != null);
+            List<int> basicMidiChordRootPitches = mode.PitchSequence(_notatedMidiPitches[0], ornamentEnvelope);
             // If ornamentEnvelope is null, basicMidiChordRootPitches will only contain rootNotatedpitch.
 
             BasicMidiChordDefs = new List<BasicMidiChordDef>();
             foreach(int rootPitch in basicMidiChordRootPitches)
             {
-                BasicMidiChordDef bmcd = new BasicMidiChordDef(1000, gamut, rootPitch, _notatedMidiPitches.Count);
+                BasicMidiChordDef bmcd = new BasicMidiChordDef(1000, mode, rootPitch, _notatedMidiPitches.Count);
                 BasicMidiChordDefs.Add(bmcd);
             }
             this.MsDuration = _msDuration; // resets the BasicMidiChordDef msDurations.
@@ -761,29 +761,29 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// All the pitches in the MidiChordDef must be contained in the gamut.
+        /// All the pitches in the MidiChordDef must be contained in the mode.
         /// Transposes the pitches in NotatedMidiPitches, and all BasicMidiChordDef.Pitches by
-        /// the number of steps in the gamut. Negative values transpose down.
+        /// the number of steps in the mode. Negative values transpose down.
         /// The vertical velocity sequence remains unchanged except when notes are removed.
-        /// It is not an error if Midi values would exceed the range of the gamut.
-        /// In this case, they are silently coerced to the bottom or top notes of the gamut respectively.
-        /// Duplicate top and bottom gamut pitches are removed.
+        /// It is not an error if Midi values would exceed the range of the mode.
+        /// In this case, they are silently coerced to the bottom or top notes of the mode respectively.
+        /// Duplicate top and bottom mode pitches are removed.
         /// </summary>
-        public void TransposeStepsInGamut(Gamut gamut, int steps)
+        public void TransposeStepsInMode(Mode mode, int steps)
         {
             #region conditions
-            Debug.Assert(gamut != null);
+            Debug.Assert(mode != null);
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
                 foreach(int pitch in bmcd.Pitches)
                 {
-                    Debug.Assert(gamut.Contains(pitch));
+                    Debug.Assert(mode.Contains(pitch));
                 }
             }
             #endregion conditions
 
-            int bottomMostPitch = gamut[0];
-            int topMostPitch = gamut[gamut.Count - 1];
+            int bottomMostPitch = mode[0];
+            int topMostPitch = mode[mode.Count - 1];
 
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
@@ -791,7 +791,7 @@ namespace Moritz.Spec
                 List<byte> velocities = bmcd.Velocities;
                 for(int i = 0; i < pitches.Count; ++i)
                 {
-                    pitches[i] = DoTranspose(pitches[i], gamut, steps);
+                    pitches[i] = DoTranspose(pitches[i], mode, steps);
                 }
                 RemoveDuplicateNotes(pitches, velocities);
             }
@@ -800,33 +800,33 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// The rootPitch and all the pitches in the MidiChordDef must be contained in the gamut.
+        /// The rootPitch and all the pitches in the MidiChordDef must be contained in the mode.
         /// The vertical velocity sequence remains unchanged except when notes are removed because they are duplicates.
-        /// Calculates the number of steps to transpose, and then calls TransposeStepsInGamut.
+        /// Calculates the number of steps to transpose, and then calls TransposeStepsInMode.
         /// When this function returns, rootPitch is the lowest pitch in both BasicMidiChordDefs[0] and NotatedMidiPitches.
         /// </summary>
-        public void TransposeToRootInGamut(Gamut gamut, int rootPitch)
+        public void TransposeToRootInMode(Mode mode, int rootPitch)
         {
             #region conditions
-            Debug.Assert(gamut != null);
-            Debug.Assert(gamut.Contains(rootPitch));
-            Debug.Assert(gamut.Contains(BasicMidiChordDefs[0].Pitches[0]));
+            Debug.Assert(mode != null);
+            Debug.Assert(mode.Contains(rootPitch));
+            Debug.Assert(mode.Contains(BasicMidiChordDefs[0].Pitches[0]));
             #endregion conditions
 
-            int stepsToTranspose = gamut.IndexOf(rootPitch) - gamut.IndexOf(BasicMidiChordDefs[0].Pitches[0]);
+            int stepsToTranspose = mode.IndexOf(rootPitch) - mode.IndexOf(BasicMidiChordDefs[0].Pitches[0]);
 
-            // checks that all the pitches are in the gamut.
-            TransposeStepsInGamut(gamut, stepsToTranspose);
+            // checks that all the pitches are in the mode.
+            TransposeStepsInMode(mode, stepsToTranspose);
         }
 
-        private byte DoTranspose(byte initialValue, Gamut gamut, int steps)
+        private byte DoTranspose(byte initialValue, Mode mode, int steps)
         {
-            int index = gamut.IndexOf(initialValue);
+            int index = mode.IndexOf(initialValue);
             int newIndex = index + steps;
             newIndex = (newIndex >= 0) ? newIndex : 0;
-            newIndex = (newIndex < gamut.Count) ? newIndex : gamut.Count - 1;
+            newIndex = (newIndex < mode.Count) ? newIndex : mode.Count - 1;
 
-            return (byte)gamut[newIndex];
+            return (byte)mode[newIndex];
         }
 
         private void RemoveDuplicateNotes(List<byte> pitches, List<byte> velocities)
@@ -909,7 +909,7 @@ namespace Moritz.Spec
 
         /// <summary>
         /// Returns a new Trk having msDuration and midiChannel, whose MidiChordDefs are created from this MidiChordDef's BasicMidiChordDefs.
-        /// If a non-null gamut argument is given, a check is made (in the Trk constructor) to ensure that it contains
+        /// If a non-null mode argument is given, a check is made (in the Trk constructor) to ensure that it contains
         /// all the pitches (having velocity greater than 1) in this MidiChordDef.
         /// Each new MidiChordDef has one BasicMidiChordDef, which is a copy of a BasicMidiChordDef from this MidiChordDef.
         /// The new MidiChordDef's notated pitches and velocities are the same as its BasicMidiChordDef's.
@@ -918,7 +918,6 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="msDuration">The duration of the returned Trk</param>
         /// <param name="midiChannel">The channel of the returned Trk</param>
-        /// <param name="gamut">The gamut must contain all the pitches in this MidiChordDef.</param>
         public Trk ToTrk(int msDuration, int midiChannel)
         {
             List<IUniqueDef> iuds = new List<IUniqueDef>();

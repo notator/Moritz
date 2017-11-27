@@ -6,40 +6,40 @@ using Moritz.Spec;
 namespace Moritz.Algorithm.Tombeau1
 {
 	/// <summary>
-	/// A GamutGrpTrk is a Trk with a Gamut.
-	/// The Gamut may not be null, and can be shared with other GamutGrpTrks.
-	/// In other words, GamutGrpTrks do not own their Gamuts. 
+	/// A ModeGrpTrk is a Trk with a Mode.
+	/// The Mode may not be null, and can be shared with other ModeGrpTrks.
+	/// In other words, ModeGrpTrks do not own their Modes. 
 	/// Beaming: BeamContinues is set to false on the final MidiChordDef.
 	/// (Beams break automatically, even if MidiChordDef.BeamContinues is true,
 	/// if the following symbol is a rest or has no beam.) 
 	/// The following conditions are checked whenever the IUniqueDefs list is changed
 	/// (If a check fails, an exception is thrown.):
-	/// 1. Gamut may not be null.
+	/// 1. Mode may not be null.
 	/// 2. RootOctave must be greater than or equal to 0.
 	/// 3. The first iUniqueDef must be a MidiChordDef.
-	/// 4. The GamutGrpTrk can only contain MidiChordDef and MidiRestDef objects.
-	/// 5. The MidiChordDefs can only contain pitches that are in the Gamut.
-	/// 6. The GamutGrpTrk may not contain consecutive MidiRestDefs
+	/// 4. The ModeGrpTrk can only contain MidiChordDef and MidiRestDef objects.
+	/// 5. The MidiChordDefs can only contain pitches that are in the Mode.
+	/// 6. The ModeGrpTrk may not contain consecutive MidiRestDefs
 	/// 7. All MidiChordDef.BeamContinues properties are true, except the last, which is false.
 	/// </summary>
-	public class GamutGrpTrk : Trk
+	public class ModeGrpTrk : Trk
     {
 		#region constructors
 		/// <summary>
-		/// GamutGrpTrk objects own unique IUniqueDefs, but can share Gamuts. The Gamut may not be null.
+		/// ModeGrpTrk objects own unique IUniqueDefs, but can share Modes. The Mode may not be null.
 		/// </summary>
 		/// <param name="midiChannel"></param>
 		/// <param name="msPositionReContainer"></param>
 		/// <param name="iudList"></param>
-		/// <param name="gamut">can not be null</param>
+		/// <param name="mode">can not be null</param>
 		/// <param name="rootOctave">must be greater than or equal to 0</param>
-		public GamutGrpTrk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iudList, Gamut gamut, int rootOctave)
+		public ModeGrpTrk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iudList, Mode mode, int rootOctave)
             : base(midiChannel, msPositionReContainer, iudList)
         {
-			_gamut = gamut; // _gamut is checked by AssertGamutGrpTrkConsistency() below.
-			RootOctave = rootOctave; // RootOctave is checked by AssertGamutGrpTrkConsistency() below.
+			_mode = mode; // _mode is checked by AssertModeGrpTrkConsistency() below.
+			RootOctave = rootOctave; // RootOctave is checked by AssertModeGrpTrkConsistency() below.
 
-			var velocityPerAbsolutePitch = gamut.GetVelocityPerAbsolutePitch();
+			var velocityPerAbsolutePitch = mode.GetVelocityPerAbsolutePitch();
 
 			base.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
 
@@ -48,42 +48,42 @@ namespace Moritz.Algorithm.Tombeau1
 				SetBeamEnd();
 			}
 
-			AssertGamutGrpTrkConsistency();
+			AssertModeGrpTrkConsistency();
 		}
 
 		/// <summary>
-		/// The IUniqueDefs are cloned, the other attributes (including the Gamut) are not.
+		/// The IUniqueDefs are cloned, the other attributes (including the Mode) are not.
 		/// </summary>
-		public new GamutGrpTrk Clone
+		public new ModeGrpTrk Clone
 		{
 			get
 			{
 				List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
-				GamutGrpTrk gamutGrpTrk = new GamutGrpTrk(this.MidiChannel, this.MsPositionReContainer, clonedIUDs, Gamut, RootOctave)
+				ModeGrpTrk ModeGrpTrk = new ModeGrpTrk(this.MidiChannel, this.MsPositionReContainer, clonedIUDs, Mode, RootOctave)
 				{
 					Container = this.Container
 				};
 
-				return gamutGrpTrk;
+				return ModeGrpTrk;
 			}
 		}
 		#endregion constructors
 
 		/// <summary>
 		/// The following conditions are checked (If a check fails, an exception is thrown.):
-		/// 1. Gamut may not be null.
+		/// 1. Mode may not be null.
 		/// 2. RootOctave must be greater than or equal to 0.
 		/// 3. The first iUniqueDef must be a MidiChordDef.
-		/// 4. The GamutGrpTrk can only contain MidiChordDef and MidiRestDef objects.
-		/// 5. The MidiChordDefs can only contain pitches that are in the Gamut.
-		/// 6. The GamutGrpTrk may not contain consecutive MidiRestDefs
+		/// 4. The ModeGrpTrk can only contain MidiChordDef and MidiRestDef objects.
+		/// 5. The MidiChordDefs can only contain pitches that are in the Mode.
+		/// 6. The ModeGrpTrk may not contain consecutive MidiRestDefs
 		/// 7. All MidiChordDef.BeamContinues properties are true, except the last, which is false.
 		/// </summary>
-		private void AssertGamutGrpTrkConsistency()
+		private void AssertModeGrpTrkConsistency()
 		{
 			base.AssertConsistency(); // also checks consecutive rests.
 
-			Debug.Assert(Gamut != null, "Gamut must be set.");
+			Debug.Assert(Mode != null, "Mode must be set.");
 			Debug.Assert(RootOctave >= 0, "Root Octave must be >= 0");
 			if(_uniqueDefs.Count > 0)
 			{
@@ -99,7 +99,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 				if(iud is MidiChordDef mcd)
 				{
-					Debug.Assert(_gamut.ContainsAllPitches(mcd), "Illegal pitches.");
+					Debug.Assert(_mode.ContainsAllPitches(mcd), "Illegal pitches.");
 				}
 			}
 
@@ -124,14 +124,14 @@ namespace Moritz.Algorithm.Tombeau1
 		#region UniqueDefs list component changers
 		/// <summary>
 		/// Appends a new MidiChordDef or MidiRestDef to the end of the list.
-		/// IUniqueDefs in GamutGrpTrks cannot be ClefDefs or CautionaryChordDefs.
+		/// IUniqueDefs in ModeGrpTrks cannot be ClefDefs or CautionaryChordDefs.
 		/// Automatically sets the iUniqueDef's msPosition.
 		/// </summary>
 		public override void Add(IUniqueDef iUniqueDef)
         {            
             base.Add(iUniqueDef);
             SetBeamEnd();
-			AssertGamutGrpTrkConsistency();
+			AssertModeGrpTrkConsistency();
 		}
 
         /// <summary>
@@ -142,18 +142,18 @@ namespace Moritz.Algorithm.Tombeau1
         {
             base.AddRange(voiceDef);
             SetBeamEnd();
-			AssertGamutGrpTrkConsistency();
+			AssertModeGrpTrkConsistency();
 		}
 
 		/// <summary>
 		/// Sets the current IUniqueDefs list to the argument, then sets the MidiChordDef.BeamContinues properties
-		/// and checks that the GamutGrptrk is consistent. (The argument may not contain consecutive rests, etc.)
+		/// and checks that the ModeGrpTrk is consistent. (The argument may not contain consecutive rests, etc.)
 		/// </summary>
 		internal void SetIUniqueDefs(List<IUniqueDef> iUniqueDefs)
 		{
 			_uniqueDefs = iUniqueDefs;
 			SetBeamEnd();
-			AssertGamutGrpTrkConsistency();
+			AssertModeGrpTrkConsistency();
 		}
 
 		/// <summary>
@@ -164,7 +164,7 @@ namespace Moritz.Algorithm.Tombeau1
         {
 			base.Insert(index, iUniqueDef);
             SetBeamEnd();
-			AssertGamutGrpTrkConsistency();
+			AssertModeGrpTrkConsistency();
 		}
         /// <summary>
         /// Inserts the trk's UniqueDefs in the list at the given index, and then
@@ -174,7 +174,7 @@ namespace Moritz.Algorithm.Tombeau1
         {
             base.InsertRange(index, trk);
             SetBeamEnd();
-			AssertGamutGrpTrkConsistency();
+			AssertModeGrpTrkConsistency();
 		}
         /// <summary>
         /// Removes the iUniqueDef at index from the list, and then inserts the replacement at the same index.
@@ -183,7 +183,7 @@ namespace Moritz.Algorithm.Tombeau1
         {
             base.Replace(index, replacementIUnique);
             SetBeamEnd();
-			AssertGamutGrpTrkConsistency();
+			AssertModeGrpTrkConsistency();
 		}
         /// <summary> 
         /// This function attempts to add all the non-MidiRestDef UniqueDefs in trk2 to the calling Trk
@@ -203,7 +203,7 @@ namespace Moritz.Algorithm.Tombeau1
         {
             Trk trk = base.Superimpose(trk2);
             SetBeamEnd();
-			AssertGamutGrpTrkConsistency();
+			AssertModeGrpTrkConsistency();
 			return trk;
         }
 
@@ -213,7 +213,7 @@ namespace Moritz.Algorithm.Tombeau1
         {
             base.Permute(axisNumber, contourNumber);
             SetBeamEnd();
-			AssertGamutGrpTrkConsistency();
+			AssertModeGrpTrkConsistency();
 		}
         /// <summary>
         /// Re-orders up to 7 partitions in this Trk's UniqueDefs list. The content of each partition is not changed. The Trk's AxisIndex property is set.
@@ -232,46 +232,46 @@ namespace Moritz.Algorithm.Tombeau1
         {
             base.PermutePartitions(axisNumber, contourNumber, partitionSizes);
             SetBeamEnd();
-			AssertGamutGrpTrkConsistency();
+			AssertModeGrpTrkConsistency();
 		}
         public override void SortRootNotatedPitchAscending()
         {
             SortByRootNotatedPitch(true);
             SetBeamEnd();
-			AssertGamutGrpTrkConsistency();
+			AssertModeGrpTrkConsistency();
 		}
         public override void SortRootNotatedPitchDescending()
         {
             SortByRootNotatedPitch(false);
             SetBeamEnd();
-			AssertGamutGrpTrkConsistency();
+			AssertModeGrpTrkConsistency();
 		}
         public override void SortVelocityIncreasing()
         {
             SortByVelocity(true);
             SetBeamEnd();
-			AssertGamutGrpTrkConsistency();
+			AssertModeGrpTrkConsistency();
 		}
         public override void SortVelocityDecreasing()
         {
             SortByVelocity(false);
             SetBeamEnd();
-			AssertGamutGrpTrkConsistency();
+			AssertModeGrpTrkConsistency();
 		}
         #endregion UniqueDefs list order changers
         #endregion Overridden functions
 
         /// <summary>
-        /// Shears the group vertically, using TransposeStepsInGamut(steps).
+        /// Shears the group vertically, using TransposeStepsInMode(steps).
         /// The vertical velocity sequence remains unchanged except when notes are removed because they are duplicates.
         /// The number of steps to transpose intermediate chords is calculated as a linear sequence from startSteps to endSteps.
-        /// If there is only one chord in the GamutGrpTrk, it is transposed by startSteps.
+        /// If there is only one chord in the ModeGrpTrk, it is transposed by startSteps.
         /// </summary>
-        /// <param name="startSteps">The number of steps in the gamut to transpose the first chord</param>
-        /// <param name="endSteps">The number of steps in the gamut to transpose the last chord</param>
+        /// <param name="startSteps">The number of steps in the mode to transpose the first chord</param>
+        /// <param name="endSteps">The number of steps in the mode to transpose the last chord</param>
         internal virtual void Shear(int startSteps, int endSteps)
         {
-            Debug.Assert(Gamut != null);
+            Debug.Assert(Mode != null);
 
             List<int> stepsList = new List<int>();
 
@@ -291,24 +291,24 @@ namespace Moritz.Algorithm.Tombeau1
             }
 
             Shear(stepsList);
-			AssertGamutGrpTrkConsistency();
+			AssertModeGrpTrkConsistency();
 		}
 
         /// <summary>
-        /// Shears the group vertically, using TransposeStepsInGamut(steps).
-        /// The number of ints in the argument must equal the number of UniqueDefs in the GamutGrpTrk.
+        /// Shears the group vertically, using TransposeStepsInMode(steps).
+        /// The number of ints in the argument must equal the number of UniqueDefs in the ModeGrpTrk.
         /// Each MidiChordDef in the UniqueDefs is transposed by the corresponding number of steps.
         /// The vertical velocity sequence remains unchanged except when notes are removed because they are duplicates.
         /// </summary>
         /// <param name="stepsList">Each int is the number of steps to transpose the corresponding MidiChordDef.</param>
         internal virtual void Shear(List<int> stepsList)
         {
-            Debug.Assert(Gamut != null);
+            Debug.Assert(Mode != null);
             Debug.Assert(stepsList != null && stepsList.Count == this.Count);
 
             if(Count == 1 && this[0] is MidiChordDef)
             {
-                TransposeStepsInGamut(stepsList[0]);
+                TransposeStepsInMode(stepsList[0]);
             }
             else
             {
@@ -316,38 +316,37 @@ namespace Moritz.Algorithm.Tombeau1
                 {
                     if(_uniqueDefs[i] is MidiChordDef mcd)
                     {
-                        mcd.TransposeStepsInGamut(_gamut, stepsList[i]);
+                        mcd.TransposeStepsInMode(_mode, stepsList[i]);
                     }
                 }
             }
         }
 
         /// <summary>
-        /// All the pitches in all the MidiChordDefs must be contained in this GamutGrpTrk's Gamut.
+        /// All the pitches in all the MidiChordDefs must be contained in this ModeGrpTrk's Mode.
         /// The vertical velocity sequence remains unchanged except when notes are removed because they are duplicates.
         /// </summary>
         /// <param name="stepsToTranspose"></param>
-        public virtual void TransposeStepsInGamut(int stepsToTranspose)
+        public virtual void TransposeStepsInMode(int stepsToTranspose)
         {
-            Debug.Assert(_gamut != null);
+            Debug.Assert(_mode != null);
             foreach(MidiChordDef mcd in MidiChordDefs)
             {
-                mcd.TransposeStepsInGamut(_gamut, stepsToTranspose);
+                mcd.TransposeStepsInMode(_mode, stepsToTranspose);
             }
-			AssertGamutGrpTrkConsistency();
+			AssertModeGrpTrkConsistency();
 		}
 
         /// <summary>
-        /// The rootPitch and all the pitches in all the MidiChordDefs must be contained in the Trk's gamut.
-        /// Calculates the number of steps to transpose within the Trk's Gamut, and then calls TransposeStepsInGamut.
+        /// The rootPitch and all the pitches in all the MidiChordDefs must be contained in the Trk's mode.
+        /// Calculates the number of steps to transpose within the Trk's Mode, and then calls TransposeStepsInMode.
         /// The rootPitch will be the lowest pitch in any MidiChordDef.BasicMidiChordDefs[0] in the Trk.
         /// The vertical velocity sequence remains unchanged except when notes are removed because they are duplicates.
         /// </summary>
-        /// <param name="gamut"></param>
         /// <param name="rootPitch"></param>
-        public void TransposeToRootInGamut(int rootPitch)
+        public void TransposeToRootInMode(int rootPitch)
         {
-            Debug.Assert(_gamut != null && _gamut.Contains(rootPitch));
+            Debug.Assert(_mode != null && _mode.Contains(rootPitch));
 
             int currentLowestPitch = int.MaxValue;
 
@@ -356,34 +355,34 @@ namespace Moritz.Algorithm.Tombeau1
                 currentLowestPitch = (mcd.BasicMidiChordDefs[0].Pitches[0] < currentLowestPitch) ? mcd.BasicMidiChordDefs[0].Pitches[0] : currentLowestPitch;
             }
 
-            int stepsToTranspose = _gamut.IndexOf(rootPitch) - _gamut.IndexOf(currentLowestPitch);
+            int stepsToTranspose = _mode.IndexOf(rootPitch) - _mode.IndexOf(currentLowestPitch);
 
             foreach(MidiChordDef mcd in MidiChordDefs)
             {
-                mcd.TransposeStepsInGamut(_gamut, stepsToTranspose);
+                mcd.TransposeStepsInMode(_mode, stepsToTranspose);
             }
-			AssertGamutGrpTrkConsistency();
+			AssertModeGrpTrkConsistency();
 		}
 
-        #region Gamut
+        #region Mode
         /// <summary>
-        /// When the Gamut is set after the original GamutGrpTrk has been constructed, pitches are mapped to pitches in the same
-        /// octave in the new Gamut. The velocities will be those of the original pitches.
-        /// Note that there may be less pitches per chord after setting the Gamut in this way, since duplicate pitches
+        /// When the Mode is set after the original ModeGrpTrk has been constructed, pitches are mapped to pitches in the same
+        /// octave in the new Mode. The velocities will be those of the original pitches.
+        /// Note that there may be less pitches per chord after setting the Mode in this way, since duplicate pitches
         /// will have been removed.
         /// </summary>
-        public Gamut Gamut
+        public Mode Mode
         {
             get
             {
-                Debug.Assert(_gamut != null);
-                return _gamut;
+                Debug.Assert(_mode != null);
+                return _mode;
             }
             set
             {
                 Debug.Assert(value != null);
-                Gamut oldGamut = _gamut;
-                _gamut = value;
+                Mode oldMode = _mode;
+                _mode = value;
                 for(int i = 0; i < this.UniqueDefs.Count; ++i)
                 {
                     if(UniqueDefs[i] is MidiChordDef mcd)
@@ -398,9 +397,9 @@ namespace Moritz.Algorithm.Tombeau1
                             List<byte> newVelocities = new List<byte>();
                             for(int k = 0; k < oldPitches.Count; ++k)
                             {
-                                int pitchIndexInOldGamut = oldGamut.IndexOf(oldPitches[k]);
-                                int pitchIndexInNewGamut = GetPitchIndexInNewGamut(oldGamut, _gamut, pitchIndexInOldGamut);
-                                byte newPitch = (byte)_gamut[pitchIndexInNewGamut];
+                                int pitchIndexInOldMode = oldMode.IndexOf(oldPitches[k]);
+                                int pitchIndexInNewMode = GetPitchIndexInNewMode(oldMode, _mode, pitchIndexInOldMode);
+                                byte newPitch = (byte)_mode[pitchIndexInNewMode];
                                 if(newPitches.Count == 0 || newPitch != newPitches[newPitches.Count - 1])
                                 {
                                     byte oldVelocity = oldVelocities[k];
@@ -418,7 +417,7 @@ namespace Moritz.Algorithm.Tombeau1
                         mcd.NotatedMidiVelocities = new List<byte>(mcd.BasicMidiChordDefs[0].Velocities);
                     }
                 }
-				AssertGamutGrpTrkConsistency();
+				AssertModeGrpTrkConsistency();
 			}
         }
 
@@ -450,24 +449,24 @@ namespace Moritz.Algorithm.Tombeau1
 			}
 		}
 
-		protected Gamut _gamut;
+		protected Mode _mode;
 		public readonly int RootOctave;
 
         /// <summary>
-        /// Returns the index of a pitch in the same octave as the pitch at pitchIndexInOldGamut.
+        /// Returns the index of a pitch in the same octave as the pitch at pitchIndexInOldMode.
         /// </summary>
-        /// <param name="oldGamut">may not be null</param>
-        /// <param name="newGamut">may not be null</param>
-        /// <param name="pitchIndexInOldGamut"></param>
+        /// <param name="oldMode">may not be null</param>
+        /// <param name="newMode">may not be null</param>
+        /// <param name="pitchIndexInOldMode"></param>
         /// <returns></returns>
-        private int GetPitchIndexInNewGamut(Gamut oldGamut, Gamut newGamut, int pitchIndexInOldGamut)
+        private int GetPitchIndexInNewMode(Mode oldMode, Mode newMode, int pitchIndexInOldMode)
         {
-            Debug.Assert(oldGamut != null && newGamut != null);
+            Debug.Assert(oldMode != null && newMode != null);
 
-            int oldNPitchesPerOctave = oldGamut.NPitchesPerOctave;
-            int octave = pitchIndexInOldGamut / oldNPitchesPerOctave;
-            int oldPitchIndexInOctave = pitchIndexInOldGamut - (octave * oldNPitchesPerOctave);
-            int newNPitchesPerOctave = newGamut.NPitchesPerOctave;
+            int oldNPitchesPerOctave = oldMode.NPitchesPerOctave;
+            int octave = pitchIndexInOldMode / oldNPitchesPerOctave;
+            int oldPitchIndexInOctave = pitchIndexInOldMode - (octave * oldNPitchesPerOctave);
+            int newNPitchesPerOctave = newMode.NPitchesPerOctave;
 
             // find the minimum angular distance between the oldPitchIndexInOctave and any newPitchIndexInOctave
             double oldRadians = oldPitchIndexInOctave * ((2 * Math.PI) / oldNPitchesPerOctave);
@@ -488,11 +487,11 @@ namespace Moritz.Algorithm.Tombeau1
             }
 
             int newPitchIndex = newPitchIndexInOctave + (octave * newNPitchesPerOctave);
-            newPitchIndex = (newPitchIndex < newGamut.Count) ? newPitchIndex : newGamut.Count - 1;
+            newPitchIndex = (newPitchIndex < newMode.Count) ? newPitchIndex : newMode.Count - 1;
 
             return newPitchIndex;
         }
-        #endregion Gamut
+        #endregion Mode
 
         /// <summary>
         /// Sets BeamContinues to true on all MidiChordDefs, except the last, which is set to true.
@@ -516,7 +515,7 @@ namespace Moritz.Algorithm.Tombeau1
 
         public override string ToString()
         {
-            return ($"GamutGrpTrk: MsDuration={MsDuration} MsPositionReContainer={MsPositionReContainer} Count={Count}");
+            return ($"ModeGrpTrk: MsDuration={MsDuration} MsPositionReContainer={MsPositionReContainer} Count={Count}");
         }
     }
 }
