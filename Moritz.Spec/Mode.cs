@@ -125,26 +125,10 @@ namespace Moritz.Spec
         #endregion constructors
 
         #region public functions
-        ///// <summary>
-        ///// returns the value in the mode list at index i.
-        ///// </summary>
-        //public int this[int i]
-        //{
-        //    get
-        //    {
-        //        return Gamut[i];
-        //    }
-        //}
-
-        //public bool Contains(int pitch)
-        //{
-        //    return Gamut.Contains(pitch);
-        //}
-
 		/// <summary>
 		/// Modes are equal if their AbsolutePitchHierarchies are identical.
 		/// </summary>
-		public bool Equals(Mode otherMode)
+		public bool HasSameAbsolutePitchHierarchy(Mode otherMode)
 		{
 			bool equals = true;
 			IReadOnlyList<int> absH = this.AbsolutePitchHierarchy;

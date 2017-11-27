@@ -58,7 +58,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 		private void AssertConsistency(int midiChannel, Mode mode, ModeGrpTrk ModeGrpTrk)
 		{
-			Debug.Assert(mode.Equals(ModeGrpTrk.Mode), "All ModeGrpTrks in a ModeSegment must have the same Mode.AbsolutePitchHierarchy");
+			Debug.Assert(mode.HasSameAbsolutePitchHierarchy(ModeGrpTrk.Mode), "All ModeGrpTrks in a ModeSegment must have the same Mode.AbsolutePitchHierarchy");
 			Debug.Assert(midiChannel == ModeGrpTrk.MidiChannel, "All ModeGrpTrks in a ModeSegment must have the same MidiChannel");
 		}
 
