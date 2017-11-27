@@ -60,7 +60,7 @@
     <Compile Include="InputNoteDef.cs" />
     <Compile Include="ITrksContainer.cs" />
     <Compile Include="Envelope.cs" />
-    <Compile Include="Mode.cs" />
+    <Compile Include="ModeOld.cs" />
     <Compile Include="MsValues.cs" />
     <Compile Include="NoteTrigger.cs" />
     <Compile Include="InputRestDef.cs" />

@@ -33,7 +33,7 @@ namespace Moritz.Spec
             AssertPitchHierarchyValidity(absolutePitchHierarchy);
             #endregion condition
 
-            _mode = new Mode(absolutePitchHierarchy);
+            _modeOld = new ModeOld(absolutePitchHierarchy);
             _list = GetGamutList(absolutePitchHierarchy, nPitchesPerOctave);
             
             RelativePitchHierarchyIndex = relativePitchHierarchyIndex;
@@ -82,8 +82,8 @@ namespace Moritz.Spec
 		private int GetProximity(Gamut otherGamut)
 		{
 			int proximity = 0;
-			var thisAbsolutePitchHierarchy = new List<int>(this.Mode.AbsolutePitchHierarchy);
-			var otherAbsolutePitchHierarchy = new List<int>(otherGamut.Mode.AbsolutePitchHierarchy);
+			var thisAbsolutePitchHierarchy = new List<int>(this.ModeOld.AbsolutePitchHierarchy);
+			var otherAbsolutePitchHierarchy = new List<int>(otherGamut.ModeOld.AbsolutePitchHierarchy);
 			// N.B. test ALL pitches in the hierarchies, not just the first NPitchesPerOctave in thisAbsolutePitchHierarchy.
 			for(int index1 = 0; index1 < 12; ++index1)
 			{
@@ -179,9 +179,9 @@ namespace Moritz.Spec
             {
                 throw new ArgumentNullException($"The {nameof(gamutList)} argument is null or empty.");
             }
-            if(gamutList[0] % 12 != Mode.AbsolutePitchHierarchy[0])
+            if(gamutList[0] % 12 != ModeOld.AbsolutePitchHierarchy[0])
             {
-                throw new ArgumentException($"The lowest pitch in a gamutList must always be equal to {nameof(Mode)}[0].");
+                throw new ArgumentException($"The lowest pitch in a gamutList must always be equal to {nameof(ModeOld)}[0].");
             }
             for(int i = 1; i < gamutList.Count; ++i)
             {
@@ -347,7 +347,7 @@ namespace Moritz.Spec
             if(nPitches > 1)
             {
                 int absRootPitch = rootPitch % 12;
-				var absolutePitchHierarchy = new List<int>(Mode.AbsolutePitchHierarchy);
+				var absolutePitchHierarchy = new List<int>(ModeOld.AbsolutePitchHierarchy);
 				int rootIndex = absolutePitchHierarchy.IndexOf(absRootPitch);
                 int maxIndex = rootIndex + nPitches;
                 maxIndex = (maxIndex < NPitchesPerOctave) ? maxIndex : NPitchesPerOctave;
@@ -494,7 +494,7 @@ namespace Moritz.Spec
 
             for(int absPitchIndex = 0; absPitchIndex < NPitchesPerOctave ; ++absPitchIndex)
             {
-                int absPitch = Mode.AbsolutePitchHierarchy[absPitchIndex];
+                int absPitch = ModeOld.AbsolutePitchHierarchy[absPitchIndex];
 
                 byte velocity = (byte) Math.Round(velocities[absPitchIndex]);
                 velocity = (velocity >= 1) ? velocity : (byte)1;
@@ -585,8 +585,8 @@ namespace Moritz.Spec
 
 			for(int i = 0; i < NPitchesPerOctave; ++i)
 			{
-				shortG1AbsPH.Add(this.Mode.AbsolutePitchHierarchy[i]);
-				shortG2AbsPH.Add(gamut2.Mode.AbsolutePitchHierarchy[i]);
+				shortG1AbsPH.Add(this.ModeOld.AbsolutePitchHierarchy[i]);
+				shortG2AbsPH.Add(gamut2.ModeOld.AbsolutePitchHierarchy[i]);
 			}
 
 			for(int i = 0; i < NPitchesPerOctave; ++i)
@@ -614,7 +614,7 @@ namespace Moritz.Spec
 
 		public override string ToString()
 		{
-			return $" Mode={_mode.ToString()}, index={RelativePitchHierarchyIndex}, basePitch={BasePitch}, nPitchesPerOctave={NPitchesPerOctave}";
+			return $" Mode={_modeOld.ToString()}, index={RelativePitchHierarchyIndex}, basePitch={BasePitch}, nPitchesPerOctave={NPitchesPerOctave}";
 		}
 
 		#endregion public functions
@@ -626,8 +626,8 @@ namespace Moritz.Spec
         public readonly int NPitchesPerOctave;
         public readonly int MaxPitch;
 
-        public Mode Mode { get => _mode; }
-		private Mode _mode = null;
+        public ModeOld ModeOld { get => _modeOld; }
+		private ModeOld _modeOld = null;
         /// <summary>
         /// A clone of the private list.
         /// </summary>

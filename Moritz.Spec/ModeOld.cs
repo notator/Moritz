@@ -5,14 +5,14 @@ using System.Text;
 namespace Moritz.Spec
 {
 	/// <summary>
-	/// A Mode is an immutable class, containing a list of absolute pitches (C=0, C#=1, D=2 etc.)
+	/// A ModeOld is an immutable class, containing a list of absolute pitches (C=0, C#=1, D=2 etc.)
 	/// in order of importance, whereby not all absolute pitches need to be included.
-	/// Modes can used, for example, to determine the loudness of particular pitches.
+	/// ModeOlds can used, for example, to determine the loudness of particular pitches.
 	/// </summary>
-	public class Mode
+	public class ModeOld
 	{
 		/// <param name="absolutePitchHierarchy">Count in range [1..12], items in range [0..11]</param>
-		public Mode(IReadOnlyList<int> absolutePitchHierarchy)
+		public ModeOld(IReadOnlyList<int> absolutePitchHierarchy)
 		{
 			#region plausibility checks
 			int count = absolutePitchHierarchy.Count;
@@ -30,13 +30,13 @@ namespace Moritz.Spec
 		}
 
 		/// <summary>
-		/// Modes are equal if their absolutePitchHierarchies are identical.
+		/// ModeOlds are equal if their absolutePitchHierarchies are identical.
 		/// </summary>
-		public bool Equals(Mode otherMode)
+		public bool Equals(ModeOld otherModeOld)
 		{
 			bool equals = true;
 			IReadOnlyList<int> absH = this.AbsolutePitchHierarchy;
-			IReadOnlyList<int> otherAbsH = otherMode.AbsolutePitchHierarchy;
+			IReadOnlyList<int> otherAbsH = otherModeOld.AbsolutePitchHierarchy;
 			int count = absH.Count;
 
 			if(count != otherAbsH.Count)

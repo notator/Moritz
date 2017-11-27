@@ -208,7 +208,7 @@ namespace Moritz.Algorithm.Tombeau1
 				int rootNotatedPitch;
 				if(i == 0)
 				{
-					rootNotatedPitch = gamut.Mode.AbsolutePitchHierarchy[i] + (12 * rootOctave);
+					rootNotatedPitch = gamut.ModeOld.AbsolutePitchHierarchy[i] + (12 * rootOctave);
 					rootNotatedPitch = (rootNotatedPitch <= gamut.MaxPitch) ? rootNotatedPitch : gamut.MaxPitch;
 				}
 				else
@@ -220,7 +220,7 @@ namespace Moritz.Algorithm.Tombeau1
 					}
 					else
 					{
-						rootNotatedPitch = gamut.Mode.AbsolutePitchHierarchy[i];
+						rootNotatedPitch = gamut.ModeOld.AbsolutePitchHierarchy[i];
 						while(rootNotatedPitch < previousPitches[0])
 						{
 							rootNotatedPitch += 12;
