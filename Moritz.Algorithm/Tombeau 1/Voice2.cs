@@ -42,8 +42,8 @@ namespace Moritz.Algorithm.Tombeau1
 		// TimeWarp();
 		// Translate();
 		// Transpose();
-		// TransposeStepsInMode();
-		// TransposeToRootInMode();
+		// TransposeStepsInModeGamut();
+		// TransposeToRootInModeGamut();
 		#endregion available Trk and ModeGrpTrk transformations
 
 		#region old code

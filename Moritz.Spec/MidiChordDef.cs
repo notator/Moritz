@@ -324,7 +324,7 @@ namespace Moritz.Spec
         {
             for(int i = 0; i < pitches.Count; ++i)
             {
-                int pitchIndex = mode.IndexOf(pitches[i]);
+                int pitchIndex = mode.IndexInGamut(pitches[i]);
 				int oppositeModeGamutCount = oppositeMode.Gamut.Count;
 				// N.B. it is not necessarily true that mode.Count == oppositeMode.Count.
 				pitchIndex = (pitchIndex < oppositeModeGamutCount) ? pitchIndex : oppositeModeGamutCount - 1;
@@ -771,7 +771,7 @@ namespace Moritz.Spec
         /// In this case, they are silently coerced to the bottom or top notes of the mode respectively.
         /// Duplicate top and bottom mode pitches are removed.
         /// </summary>
-        public void TransposeStepsInMode(Mode mode, int steps)
+        public void TransposeStepsInModeGamut(Mode mode, int steps)
         {
             #region conditions
             Debug.Assert(mode != null);
@@ -793,7 +793,7 @@ namespace Moritz.Spec
                 List<byte> velocities = bmcd.Velocities;
                 for(int i = 0; i < pitches.Count; ++i)
                 {
-                    pitches[i] = DoTranspose(pitches[i], mode, steps);
+                    pitches[i] = TransposedPitchInModeGamut(pitches[i], mode, steps);
                 }
                 RemoveDuplicateNotes(pitches, velocities);
             }
@@ -802,12 +802,12 @@ namespace Moritz.Spec
         }
 
         /// <summary>
-        /// The rootPitch and all the pitches in the MidiChordDef must be contained in the mode.
+        /// The rootPitch and all the pitches in the MidiChordDef must be contained in the mode's Gamut.
         /// The vertical velocity sequence remains unchanged except when notes are removed because they are duplicates.
-        /// Calculates the number of steps to transpose, and then calls TransposeStepsInMode.
+        /// Calculates the number of steps to transpose, and then calls TransposeStepsInModeGamut.
         /// When this function returns, rootPitch is the lowest pitch in both BasicMidiChordDefs[0] and NotatedMidiPitches.
         /// </summary>
-        public void TransposeToRootInMode(Mode mode, int rootPitch)
+        public void TransposeToRootInModeGamut(Mode mode, int rootPitch)
         {
             #region conditions
             Debug.Assert(mode != null);
@@ -815,15 +815,15 @@ namespace Moritz.Spec
             Debug.Assert(mode.Gamut.Contains(BasicMidiChordDefs[0].Pitches[0]));
             #endregion conditions
 
-            int stepsToTranspose = mode.IndexOf(rootPitch) - mode.IndexOf(BasicMidiChordDefs[0].Pitches[0]);
+            int stepsToTranspose = mode.IndexInGamut(rootPitch) - mode.IndexInGamut(BasicMidiChordDefs[0].Pitches[0]);
 
             // checks that all the pitches are in the mode.
-            TransposeStepsInMode(mode, stepsToTranspose);
+            TransposeStepsInModeGamut(mode, stepsToTranspose);
         }
 
-        private byte DoTranspose(byte initialValue, Mode mode, int steps)
+        private byte TransposedPitchInModeGamut(byte initialPitch, Mode mode, int steps)
         {
-            int index = mode.IndexOf(initialValue);
+            int index = mode.IndexInGamut(initialPitch);
             int newIndex = index + steps;
 			int modeGamutCount = mode.Gamut.Count;
 

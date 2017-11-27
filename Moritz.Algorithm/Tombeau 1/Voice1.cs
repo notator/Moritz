@@ -33,8 +33,8 @@ namespace Moritz.Algorithm.Tombeau1
 	// TimeWarp();
 	// Translate();
 	// Transpose();
-	// TransposeStepsInMode();
-	// TransposeToRootInMode();
+	// TransposeStepsInModeGamut();
+	// TransposeToRootInModeGamut();
 	#endregion available Trk and ModeGrpTrk transformations
 
 	internal class Voice1 : Tombeau1Voice

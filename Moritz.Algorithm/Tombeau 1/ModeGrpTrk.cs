@@ -263,7 +263,7 @@ namespace Moritz.Algorithm.Tombeau1
         #endregion Overridden functions
 
         /// <summary>
-        /// Shears the group vertically, using TransposeStepsInMode(steps).
+        /// Shears the group vertically, using TransposeStepsInModeGamut(steps).
         /// The vertical velocity sequence remains unchanged except when notes are removed because they are duplicates.
         /// The number of steps to transpose intermediate chords is calculated as a linear sequence from startSteps to endSteps.
         /// If there is only one chord in the ModeGrpTrk, it is transposed by startSteps.
@@ -296,7 +296,7 @@ namespace Moritz.Algorithm.Tombeau1
 		}
 
         /// <summary>
-        /// Shears the group vertically, using TransposeStepsInMode(steps).
+        /// Shears the group vertically, using TransposeStepsInModeGamut(steps).
         /// The number of ints in the argument must equal the number of UniqueDefs in the ModeGrpTrk.
         /// Each MidiChordDef in the UniqueDefs is transposed by the corresponding number of steps.
         /// The vertical velocity sequence remains unchanged except when notes are removed because they are duplicates.
@@ -309,7 +309,7 @@ namespace Moritz.Algorithm.Tombeau1
 
             if(Count == 1 && this[0] is MidiChordDef)
             {
-                TransposeStepsInMode(stepsList[0]);
+                TransposeStepsInModeGamut(stepsList[0]);
             }
             else
             {
@@ -317,7 +317,7 @@ namespace Moritz.Algorithm.Tombeau1
                 {
                     if(_uniqueDefs[i] is MidiChordDef mcd)
                     {
-                        mcd.TransposeStepsInMode(_mode, stepsList[i]);
+                        mcd.TransposeStepsInModeGamut(_mode, stepsList[i]);
                     }
                 }
             }
@@ -328,24 +328,24 @@ namespace Moritz.Algorithm.Tombeau1
         /// The vertical velocity sequence remains unchanged except when notes are removed because they are duplicates.
         /// </summary>
         /// <param name="stepsToTranspose"></param>
-        public virtual void TransposeStepsInMode(int stepsToTranspose)
+        public virtual void TransposeStepsInModeGamut(int stepsToTranspose)
         {
             Debug.Assert(_mode != null);
             foreach(MidiChordDef mcd in MidiChordDefs)
             {
-                mcd.TransposeStepsInMode(_mode, stepsToTranspose);
+                mcd.TransposeStepsInModeGamut(_mode, stepsToTranspose);
             }
 			AssertModeGrpTrkConsistency();
 		}
 
         /// <summary>
-        /// The rootPitch and all the pitches in all the MidiChordDefs must be contained in the Trk's mode.
-        /// Calculates the number of steps to transpose within the Trk's Mode, and then calls TransposeStepsInMode.
+        /// The rootPitch and all the pitches in all the MidiChordDefs must be contained in the Trk's mode.Gamut.
+        /// Calculates the number of steps to transpose within the Trk's Mode, and then calls TransposeStepsInModeGamut.
         /// The rootPitch will be the lowest pitch in any MidiChordDef.BasicMidiChordDefs[0] in the Trk.
         /// The vertical velocity sequence remains unchanged except when notes are removed because they are duplicates.
         /// </summary>
         /// <param name="rootPitch"></param>
-        public void TransposeToRootInMode(int rootPitch)
+        public void TransposeToRootInModeGamut(int rootPitch)
         {
             Debug.Assert(_mode != null && _mode.Gamut.Contains(rootPitch));
 
@@ -356,11 +356,11 @@ namespace Moritz.Algorithm.Tombeau1
                 currentLowestPitch = (mcd.BasicMidiChordDefs[0].Pitches[0] < currentLowestPitch) ? mcd.BasicMidiChordDefs[0].Pitches[0] : currentLowestPitch;
             }
 
-            int stepsToTranspose = _mode.IndexOf(rootPitch) - _mode.IndexOf(currentLowestPitch);
+            int stepsToTranspose = _mode.IndexInGamut(rootPitch) - _mode.IndexInGamut(currentLowestPitch);
 
             foreach(MidiChordDef mcd in MidiChordDefs)
             {
-                mcd.TransposeStepsInMode(_mode, stepsToTranspose);
+                mcd.TransposeStepsInModeGamut(_mode, stepsToTranspose);
             }
 			AssertModeGrpTrkConsistency();
 		}
@@ -398,7 +398,7 @@ namespace Moritz.Algorithm.Tombeau1
                             List<byte> newVelocities = new List<byte>();
                             for(int k = 0; k < oldPitches.Count; ++k)
                             {
-                                int pitchIndexInOldMode = oldMode.IndexOf(oldPitches[k]);
+                                int pitchIndexInOldMode = oldMode.IndexInGamut(oldPitches[k]);
                                 int pitchIndexInNewMode = GetPitchIndexInNewMode(oldMode, _mode, pitchIndexInOldMode);
                                 byte newPitch = (byte)_mode.Gamut[pitchIndexInNewMode];
                                 if(newPitches.Count == 0 || newPitch != newPitches[newPitches.Count - 1])

@@ -186,8 +186,14 @@ namespace Moritz.Spec
         /// <summary>
         /// Returns -1 if pitch is not found.
         /// </summary>
-        public int IndexOf(int pitch)
+        public int IndexInGamut(int pitch)
         {
+			if(_gamut == null)
+			{
+				IReadOnlyList<int> gamut = Gamut; // evaluates _gamut
+			}
+			Debug.Assert(_gamut != null && _gamut.Count > 0);
+
             return _gamut.IndexOf(pitch);
         }
 
@@ -211,7 +217,7 @@ namespace Moritz.Spec
             {
                 List<int> envOriginal = envelope.Original; // clone
                 int firstIndexInEnvelope = envOriginal[0];
-                int indexOfFirstPitchInMode = IndexOf(firstPitch);
+                int indexOfFirstPitchInMode = IndexInGamut(firstPitch);
                 int indexDiff = indexOfFirstPitchInMode - firstIndexInEnvelope;
 
                 List<int> indices = envOriginal;
