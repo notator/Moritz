@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
@@ -346,7 +347,7 @@ namespace Moritz.Algorithm.Tombeau1
         /// <param name="rootPitch"></param>
         public void TransposeToRootInMode(int rootPitch)
         {
-            Debug.Assert(_mode != null && _mode.Contains(rootPitch));
+            Debug.Assert(_mode != null && _mode.Gamut.Contains(rootPitch));
 
             int currentLowestPitch = int.MaxValue;
 
@@ -399,7 +400,7 @@ namespace Moritz.Algorithm.Tombeau1
                             {
                                 int pitchIndexInOldMode = oldMode.IndexOf(oldPitches[k]);
                                 int pitchIndexInNewMode = GetPitchIndexInNewMode(oldMode, _mode, pitchIndexInOldMode);
-                                byte newPitch = (byte)_mode[pitchIndexInNewMode];
+                                byte newPitch = (byte)_mode.Gamut[pitchIndexInNewMode];
                                 if(newPitches.Count == 0 || newPitch != newPitches[newPitches.Count - 1])
                                 {
                                     byte oldVelocity = oldVelocities[k];

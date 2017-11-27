@@ -125,21 +125,21 @@ namespace Moritz.Spec
         #endregion constructors
 
         #region public functions
-        /// <summary>
-        /// returns the value in the mode list at index i.
-        /// </summary>
-        public int this[int i]
-        {
-            get
-            {
-                return Gamut[i];
-            }
-        }
+        ///// <summary>
+        ///// returns the value in the mode list at index i.
+        ///// </summary>
+        //public int this[int i]
+        //{
+        //    get
+        //    {
+        //        return Gamut[i];
+        //    }
+        //}
 
-        public bool Contains(int pitch)
-        {
-            return Gamut.Contains(pitch);
-        }
+        //public bool Contains(int pitch)
+        //{
+        //    return Gamut.Contains(pitch);
+        //}
 
 		/// <summary>
 		/// Modes are equal if their AbsolutePitchHierarchies are identical.
@@ -175,7 +175,7 @@ namespace Moritz.Spec
             {
                 for(int i = 0; i < bmcd.Pitches.Count; ++i)
                 {
-                    if(this.Contains(bmcd.Pitches[i]) == false)
+                    if(this.Gamut.Contains(bmcd.Pitches[i]) == false)
                     {
                         return false;
                     }

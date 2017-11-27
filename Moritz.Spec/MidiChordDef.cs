@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using Moritz.Globals;
 using Moritz.Xml;
+using System.Linq;
 
 namespace Moritz.Spec
 {
@@ -304,7 +305,7 @@ namespace Moritz.Spec
             MidiChordDef oppositeMCD = (MidiChordDef)Clone();
 
             #region conditions
-            Debug.Assert(mode[0] == oppositeMode[0]);
+            Debug.Assert(mode.Gamut[0] == oppositeMode.Gamut[0]);
             Debug.Assert(mode.NPitchesPerOctave == oppositeMode.NPitchesPerOctave);
             // N.B. it is not necessarily true that mode.Count == oppositeMode.Count.
             #endregion conditions
@@ -326,7 +327,7 @@ namespace Moritz.Spec
                 int pitchIndex = mode.IndexOf(pitches[i]);
                 // N.B. it is not necessarily true that mode.Count == oppositeMode.Count.
                 pitchIndex = (pitchIndex < oppositeMode.Count) ? pitchIndex : oppositeMode.Count - 1;
-                pitches[i] = (byte)oppositeMode[pitchIndex];
+                pitches[i] = (byte)oppositeMode.Gamut[pitchIndex];
             }
         }
         #endregion Opposite
@@ -777,13 +778,13 @@ namespace Moritz.Spec
             {
                 foreach(int pitch in bmcd.Pitches)
                 {
-                    Debug.Assert(mode.Contains(pitch));
+                    Debug.Assert(mode.Gamut.Contains(pitch));
                 }
             }
             #endregion conditions
 
-            int bottomMostPitch = mode[0];
-            int topMostPitch = mode[mode.Count - 1];
+            int bottomMostPitch = mode.Gamut[0];
+            int topMostPitch = mode.Gamut[mode.Gamut.Count - 1];
 
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
@@ -809,8 +810,8 @@ namespace Moritz.Spec
         {
             #region conditions
             Debug.Assert(mode != null);
-            Debug.Assert(mode.Contains(rootPitch));
-            Debug.Assert(mode.Contains(BasicMidiChordDefs[0].Pitches[0]));
+            Debug.Assert(mode.Gamut.Contains(rootPitch));
+            Debug.Assert(mode.Gamut.Contains(BasicMidiChordDefs[0].Pitches[0]));
             #endregion conditions
 
             int stepsToTranspose = mode.IndexOf(rootPitch) - mode.IndexOf(BasicMidiChordDefs[0].Pitches[0]);
@@ -826,7 +827,7 @@ namespace Moritz.Spec
             newIndex = (newIndex >= 0) ? newIndex : 0;
             newIndex = (newIndex < mode.Count) ? newIndex : mode.Count - 1;
 
-            return (byte)mode[newIndex];
+            return (byte)mode.Gamut[newIndex];
         }
 
         private void RemoveDuplicateNotes(List<byte> pitches, List<byte> velocities)
