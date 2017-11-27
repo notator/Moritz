@@ -28,11 +28,11 @@ namespace Moritz.Algorithm.Tombeau1
 
 			MsPositionReContainer = msPositionReContainer;
 			MidiChannel = midiChannel;
-			_modeOld = new ModeOld(ModeGrpTrks[0].Mode.ModeOld.AbsolutePitchHierarchy);
+			_mode = ModeGrpTrks[0].Mode;
 
 			foreach(ModeGrpTrk ModeGrpTrk in ModeGrpTrks)
 			{
-				AssertConsistency(MidiChannel, _modeOld, ModeGrpTrk);
+				AssertConsistency(MidiChannel, _mode, ModeGrpTrk);
 			}
 
 			_ModeGrpTrks = new List<ModeGrpTrk>(ModeGrpTrks);
@@ -56,9 +56,9 @@ namespace Moritz.Algorithm.Tombeau1
 
 		public int Count { get => _ModeGrpTrks.Count; }
 
-		private void AssertConsistency(int midiChannel, ModeOld modeOld, ModeGrpTrk ModeGrpTrk)
+		private void AssertConsistency(int midiChannel, Mode mode, ModeGrpTrk ModeGrpTrk)
 		{
-			Debug.Assert(modeOld.Equals(ModeGrpTrk.Mode.ModeOld), "All ModeGrpTrks in a ModeSegment must have the same Mode.AbsolutePitchHierarchy");
+			Debug.Assert(mode.Equals(ModeGrpTrk.Mode), "All ModeGrpTrks in a ModeSegment must have the same Mode.AbsolutePitchHierarchy");
 			Debug.Assert(midiChannel == ModeGrpTrk.MidiChannel, "All ModeGrpTrks in a ModeSegment must have the same MidiChannel");
 		}
 
@@ -68,13 +68,13 @@ namespace Moritz.Algorithm.Tombeau1
 
 			if(_ModeGrpTrks.Count > 0) // ModeGrpTrks can also be removed, so check.
 			{
-				AssertConsistency(MidiChannel, _modeOld, ModeGrpTrk);
+				AssertConsistency(MidiChannel, _mode, ModeGrpTrk);
 				ModeGrpTrk lastGGT = _ModeGrpTrks[_ModeGrpTrks.Count - 1];
 				ModeGrpTrk.MsPositionReContainer = lastGGT.MsPositionReContainer + lastGGT.MsDuration;
 			}
 			else
 			{
-				_modeOld = new ModeOld(ModeGrpTrk.Mode.ModeOld.AbsolutePitchHierarchy);
+				_mode = ModeGrpTrk.Mode;
 				ModeGrpTrk.MsPositionReContainer = 0;
 			}
 			_ModeGrpTrks.Add(ModeGrpTrk);  			
@@ -121,7 +121,7 @@ namespace Moritz.Algorithm.Tombeau1
 			int count = _ModeGrpTrks.Count;
 			if(count > 0)
 			{
-				return $"Count={count.ToString()} Mode={_modeOld.ToString()} MsPositionReContainer={MsPositionReContainer}";
+				return $"Count={count.ToString()} Mode={_mode.ToString()} MsPositionReContainer={MsPositionReContainer}";
 			}
 			else
 			{
@@ -187,7 +187,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 		private readonly int MidiChannel;
 		private List<ModeGrpTrk> _ModeGrpTrks = null;
-		private ModeOld _modeOld = null;
+		private Mode _mode = null;
 	}
 
 

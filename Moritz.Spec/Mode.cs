@@ -6,40 +6,35 @@ using System.Text;
 
 namespace Moritz.Spec
 {
-    /// <summary>
-    /// A Mode contains/is a list of absolute pitch numbers in an ascending order scale.
-    /// All the values are different and in range [0..127].
-    /// <para>Mode.List[0] == absolutePitchHierarchy[0] % 12 (restricted to range [0..11]).</para>
-    /// <para>Each absolute pitch exists at all possible octaves above Mode.List[0].
-    /// (So each octave range in the mode contains the same absolute pitches.)</para>
-    /// </summary>
-    public class Mode
+	public class Mode
     {
-        #region constructors
-        /// <summary>
-        /// Modes are immutable!
-        /// </summary>
-        /// <param name="relativePitchHierarchyIndex">Will be treated % 22 (Mode.RelativePitchHierarchiesCount)</param>
-        /// <param name="basePitch">Will be treated % 12</param>
-        /// <param name="nPitchesPerOctave">Will be treated % 13</param>
-        public Mode(int relativePitchHierarchyIndex, int basePitch, int nPitchesPerOctave)
+		#region constructors
+		/// <summary>
+		/// A Mode is an immutable class, containing a list of absolute pitches (C=0, C#=1, D=2 etc.)
+		/// in order of importance, whereby not all absolute pitches need to be included.
+		/// ModeOlds can used, for example, to determine the loudness of particular pitches.
+		/// A Mode.Gamut is a list of absolute pitch numbers in an ascending order scale, whereby all the values
+		/// are different and in range [0..127].
+		/// <para>Mode.Gamut[0] == absolutePitchHierarchy[0] % 12 (restricted to range [0..11]).</para>
+		/// <para>Each absolute pitch in the Mode exists at all possible octaves above Mode.Gamut[0].
+		/// (So each octave range in the gamut contains the same absolute pitches.)</para>
+		/// </summary>
+		/// <param name="relativePitchHierarchyIndex">Will be treated % 22 (Mode.RelativePitchHierarchiesCount)</param>
+		/// <param name="basePitch">Will be treated % 12</param>
+		/// <param name="nPitchesPerOctave">Will be treated % 13</param>
+		public Mode(int relativePitchHierarchyIndex, int basePitch, int nPitchesPerOctave)
         {
             relativePitchHierarchyIndex %= Mode.RelativePitchHierarchiesCount;
             basePitch %= 12;
             nPitchesPerOctave %= 13;
 
-            List<int> absolutePitchHierarchy = GetAbsolutePitchHierarchy(relativePitchHierarchyIndex, basePitch);
-            #region condition
-            AssertPitchHierarchyValidity(absolutePitchHierarchy);
-            #endregion condition
+            SetAbsolutePitchHierarchy(relativePitchHierarchyIndex, basePitch);
 
-            _modeOld = new ModeOld(absolutePitchHierarchy);
-            _list = GetModeList(absolutePitchHierarchy, nPitchesPerOctave);
+			_gamut = null; // will be lazily evaluated
             
             RelativePitchHierarchyIndex = relativePitchHierarchyIndex;
             BasePitch = basePitch;
             NPitchesPerOctave = nPitchesPerOctave;
-            MaxPitch = _list[_list.Count - 1];
         }
 
 		/// <summary>
@@ -82,8 +77,8 @@ namespace Moritz.Spec
 		private int GetProximity(Mode otherMode)
 		{
 			int proximity = 0;
-			var thisAbsolutePitchHierarchy = new List<int>(this.ModeOld.AbsolutePitchHierarchy);
-			var otherAbsolutePitchHierarchy = new List<int>(otherMode.ModeOld.AbsolutePitchHierarchy);
+			var thisAbsolutePitchHierarchy = new List<int>(this.AbsolutePitchHierarchy);
+			var otherAbsolutePitchHierarchy = new List<int>(otherMode.AbsolutePitchHierarchy);
 			// N.B. test ALL pitches in the hierarchies, not just the first NPitchesPerOctave in thisAbsolutePitchHierarchy.
 			for(int index1 = 0; index1 < 12; ++index1)
 			{
@@ -104,17 +99,16 @@ namespace Moritz.Spec
 		/// A pitchHierarchy.Count must be 12.
 		/// Each value must be in range [0..11] and occur only once (no duplicates).
 		/// </summary>
-		/// <param name="pitchHierarchy"></param>
-		private void AssertPitchHierarchyValidity(List<int> pitchHierarchy)
+		private void AssertAbsolutePitchHierarchyValidity()
         {
-            Debug.Assert(pitchHierarchy.Count == 12);
+            Debug.Assert(AbsolutePitchHierarchy.Count == 12);
             List<bool> presence = new List<bool>();
             for(int i = 0; i < 12; ++i)
             {
                 presence.Add(false);
             }
 
-            foreach(int value in pitchHierarchy)
+            foreach(int value in AbsolutePitchHierarchy)
             {
                 Debug.Assert(value >= 0 && value <= 11);
                 Debug.Assert(presence[value] == false);
@@ -125,103 +119,6 @@ namespace Moritz.Spec
             {
                 Debug.Assert(presence[i] == true);
             }
-        }
-
-        private List<int> GetModeList(IReadOnlyList<int> absolutePitchHierarchy, int nPitchesPerOctave)
-        {
-            int rootPitch = absolutePitchHierarchy[0];
-
-            List<int> sortedBasePitches = new List<int>();
-            for(int i = 0; i < nPitchesPerOctave; ++i)
-            {
-                sortedBasePitches.Add(absolutePitchHierarchy[i]);
-            }
-            sortedBasePitches.Sort();
-
-            List<int> modeList = new List<int>();
-            int rphIndex = 0;
-            int octave = 0;
-            while(true)
-            {
-                int pitch = sortedBasePitches[rphIndex++] + (octave * 12);
-                if(pitch > 127)
-                {
-                    break;
-                }
-
-                if(pitch >= rootPitch)
-                {
-                    modeList.Add(pitch);
-                }
-
-                if(rphIndex >= sortedBasePitches.Count)
-                {
-                    rphIndex = 0;
-                    octave++;
-                }
-            }
-
-            ThrowExceptionIfModeListIsInvalid(modeList);
-
-            return modeList;
-        }
-
-        /// <summary>
-        /// Throws an exception if the argument is invalid for any of the following reasons:
-        /// 1. The argument may not be null or empty.
-        /// 2. All the values must be different, in ascending order, and in range [0..127].
-        /// 3. Each absolute pitch exists at all possible octaves in the mode.
-        /// (So each octave range in the mode contains the same absolute pitches.)
-        /// </summary>
-        private void ThrowExceptionIfModeListIsInvalid(List<int> modeList)
-        {
-            if(modeList == null || !modeList.Any())
-            {
-                throw new ArgumentNullException($"The {nameof(modeList)} argument is null or empty.");
-            }
-            if(modeList[0] % 12 != ModeOld.AbsolutePitchHierarchy[0])
-            {
-                throw new ArgumentException($"The lowest pitch in a modeList must always be equal to {nameof(ModeOld)}[0].");
-            }
-            for(int i = 1; i < modeList.Count; ++i)
-            {
-                if(modeList[i] < 0 || modeList[i] > 127)
-                {
-                    throw new ArgumentException($"{nameof(modeList)}[{i}] is out of range.");
-                }
-                if(modeList[i] <= modeList[i - 1])
-                {
-                    throw new ArgumentException($"{nameof(modeList)} must be in ascending order.");
-                }
-            }
-
-            #region check pitch consistency
-            List<int> basePitches = new List<int>();
-            int pitchIndex = 0;
-            int octaveAboveBasePitch = modeList[0] + 12;
-            while(pitchIndex < modeList.Count && modeList[pitchIndex] < octaveAboveBasePitch)
-            {
-                basePitches.Add(modeList[pitchIndex++]); 
-            }
-            int pitchCount = 0;
-            foreach(int pitch in basePitches)
-            {
-                int pitchOctave = pitch;
-                while(pitchOctave < 128)
-                {
-                    if(!modeList.Contains(pitchOctave))
-                    {
-                        throw new Exception($"Missing pitch in mode list.");
-                    }
-                    pitchCount += 1;
-                    pitchOctave += 12;
-                }
-            }
-            if(modeList.Count > pitchCount)
-            {
-                throw new Exception($"Unknown pitch in mode list.");
-            }
-            #endregion check pitch consistency
         }
         #endregion private helper functions
 
@@ -235,19 +132,44 @@ namespace Moritz.Spec
         {
             get
             {
-                return _list[i];
+                return Gamut[i];
             }
         }
 
         public bool Contains(int pitch)
         {
-            return _list.Contains(pitch);
+            return Gamut.Contains(pitch);
         }
 
-        /// <summary>
-        /// Returns true if the mode.List contains all the pitches in the argument. Otherwise false. 
-        /// </summary>
-        public bool ContainsAllPitches(MidiChordDef mcd)
+		/// <summary>
+		/// Modes are equal if their AbsolutePitchHierarchies are identical.
+		/// </summary>
+		public bool Equals(Mode otherMode)
+		{
+			bool equals = true;
+			IReadOnlyList<int> absH = this.AbsolutePitchHierarchy;
+			IReadOnlyList<int> otherAbsH = otherMode.AbsolutePitchHierarchy;
+			int count = absH.Count;
+
+			if(count != otherAbsH.Count)
+			{
+				equals = false;
+			}
+			for(int i = 0; i < count; i++)
+			{
+				if(absH[i] != otherAbsH[i])
+				{
+					equals = false;
+					break;
+				}
+			}
+			return equals;
+		}
+
+		/// <summary>
+		/// Returns true if the mode.List contains all the pitches in the argument. Otherwise false. 
+		/// </summary>
+		public bool ContainsAllPitches(MidiChordDef mcd)
         {
             foreach(BasicMidiChordDef bmcd in mcd.BasicMidiChordDefs)
             {
@@ -282,7 +204,7 @@ namespace Moritz.Spec
         /// </summary>
         public int IndexOf(int pitch)
         {
-            return _list.IndexOf(pitch);
+            return _gamut.IndexOf(pitch);
         }
 
         /// <summary>
@@ -294,7 +216,7 @@ namespace Moritz.Spec
         /// <param name="firstPitch">Will be the first pitch in the returned list.</param>
         internal List<int> PitchSequence(int firstPitch, Envelope envelope)
         {
-            Debug.Assert(_list.Contains(firstPitch), $"{nameof(firstPitch)} is not in mode.");
+            Debug.Assert(_gamut.Contains(firstPitch), $"{nameof(firstPitch)} is not in mode.");
 
             List<int> pitchSequence = new List<int>();
             if(envelope == null)
@@ -318,7 +240,7 @@ namespace Moritz.Spec
 
                 foreach(int index in indices)
                 {
-                    pitchSequence.Add(_list[index]);
+                    pitchSequence.Add(_gamut[index]);
                 }
             }
 
@@ -340,14 +262,14 @@ namespace Moritz.Spec
         public List<byte> GetChord(int rootPitch, int nPitches)
         {
             Debug.Assert(nPitches > 0 && nPitches <= 12);
-            Debug.Assert(_list.Contains(rootPitch));
+            Debug.Assert(Gamut.Contains(rootPitch));
 
             List<int> pitches = new List<int>() { rootPitch };
 
             if(nPitches > 1)
             {
                 int absRootPitch = rootPitch % 12;
-				var absolutePitchHierarchy = new List<int>(ModeOld.AbsolutePitchHierarchy);
+				var absolutePitchHierarchy = new List<int>(AbsolutePitchHierarchy);
 				int rootIndex = absolutePitchHierarchy.IndexOf(absRootPitch);
                 int maxIndex = rootIndex + nPitches;
                 maxIndex = (maxIndex < NPitchesPerOctave) ? maxIndex : NPitchesPerOctave;
@@ -494,7 +416,7 @@ namespace Moritz.Spec
 
             for(int absPitchIndex = 0; absPitchIndex < NPitchesPerOctave ; ++absPitchIndex)
             {
-                int absPitch = ModeOld.AbsolutePitchHierarchy[absPitchIndex];
+                int absPitch = AbsolutePitchHierarchy[absPitchIndex];
 
                 byte velocity = (byte) Math.Round(velocities[absPitchIndex]);
                 velocity = (velocity >= 1) ? velocity : (byte)1;
@@ -585,8 +507,8 @@ namespace Moritz.Spec
 
 			for(int i = 0; i < NPitchesPerOctave; ++i)
 			{
-				shortG1AbsPH.Add(this.ModeOld.AbsolutePitchHierarchy[i]);
-				shortG2AbsPH.Add(mode2.ModeOld.AbsolutePitchHierarchy[i]);
+				shortG1AbsPH.Add(AbsolutePitchHierarchy[i]);
+				shortG2AbsPH.Add(mode2.AbsolutePitchHierarchy[i]);
 			}
 
 			for(int i = 0; i < NPitchesPerOctave; ++i)
@@ -614,7 +536,14 @@ namespace Moritz.Spec
 
 		public override string ToString()
 		{
-			return $" Mode={_modeOld.ToString()}, index={RelativePitchHierarchyIndex}, basePitch={BasePitch}, nPitchesPerOctave={NPitchesPerOctave}";
+			const string nums = "0123456789AB";
+			StringBuilder aph = new StringBuilder();
+			foreach(int i in AbsolutePitchHierarchy)
+			{
+				aph.Append(nums[i]);
+			}
+		
+			return $"AbsPitchHierarchy={aph.ToString()}, rphIndex={RelativePitchHierarchyIndex}, basePitch={BasePitch}, nPitchesPerOctave={NPitchesPerOctave}";
 		}
 
 		#endregion public functions
@@ -624,27 +553,138 @@ namespace Moritz.Spec
         public readonly int RelativePitchHierarchyIndex;
         public readonly int BasePitch;
         public readonly int NPitchesPerOctave;
-        public readonly int MaxPitch;
+        public int MaxPitch
+		{
+			get
+			{
+				if(_maxPitch > 0)
+				{
+					return _maxPitch;
+				}
+				// lazy evaluation
+				int topBasePitch = BasePitch;
+				while(topBasePitch < 115)
+				{
+					topBasePitch += 12;
+				}
+				List<int> topOctavePitches = new List<int>();
+				List<int> relativePitchHierarchy = RelativePitchHierarchies[this.RelativePitchHierarchyIndex];
+				for(int pitchAbove = 0; pitchAbove < NPitchesPerOctave; ++pitchAbove)
+				{
+					// topOctavePitches can be > 127.
+					topOctavePitches.Add(topBasePitch + relativePitchHierarchy[pitchAbove]);
+				}
+				foreach(int pitch in topOctavePitches)
+				{
+					_maxPitch = (_maxPitch < pitch && pitch <= 127) ? pitch : _maxPitch;
+				}
+				return _maxPitch;
+			}
+		}
+		private int _maxPitch = 0;
+		public IReadOnlyList<int> AbsolutePitchHierarchy { get; private set; }
+        public IReadOnlyList<int> Gamut
+		{
+			get
+			{
+				if(_gamut != null)
+				{
+					return _gamut as IReadOnlyList<int>;
+				}
+				// lazy evaluation
+				int rootPitch = AbsolutePitchHierarchy[0];
 
-        public ModeOld ModeOld { get => _modeOld; }
-		private ModeOld _modeOld = null;
-        /// <summary>
-        /// A clone of the private list.
-        /// </summary>
-        public List<int> List { get { return new List<int>(_list); } }
-        private List<int> _list;
+				List<int> sortedBasePitches = new List<int>();
+				for(int i = 0; i < NPitchesPerOctave; ++i)
+				{
+					sortedBasePitches.Add(AbsolutePitchHierarchy[i]);
+				}
+				sortedBasePitches.Sort();
 
-        public int Count { get { return _list.Count; } }
-        #endregion public properties
+				_gamut = new List<int>();
+				int rphIndex = 0;
+				int octave = 0;
+				while(true)
+				{
+					int pitch = sortedBasePitches[rphIndex++] + (octave * 12);
+					if(pitch > 127)
+					{
+						break;
+					}
 
-        #region Pitch Hierarchies
-        /// <summary>
-        /// Returns a list that contains the sums of absoluteValue(rootPitch) + RelativePitchHierarchies[index].
-        /// If a value would be greater than 11, value = value - 12, so that all values are in range [0..11].
-        /// </summary>
-        /// <param name="relativePitchHierarchyIndex">In range [0..21]</param>
-        /// <param name="rootPitch">In range [0..127]</param>
-        public static List<int> GetAbsolutePitchHierarchy(int relativePitchHierarchyIndex, int rootPitch)
+					if(pitch >= rootPitch)
+					{
+						_gamut.Add(pitch);
+					}
+
+					if(rphIndex >= sortedBasePitches.Count)
+					{
+						rphIndex = 0;
+						octave++;
+					}
+				}
+
+				AssertGamutValidity();
+
+				return _gamut as IReadOnlyList<int>;
+			}
+		}
+
+		/// <summary>
+		/// Throws an exception if _gamut is invalid for any of the following reasons:
+		/// 1. _gamut is null or empty.
+		/// 2. All the values must be different, in ascending order, and in range [0..127].
+		/// 3. Each absolute pitch exists at all possible octaves above the base pitch.
+		/// </summary>
+		private void AssertGamutValidity()
+		{
+			Debug.Assert(_gamut != null && _gamut.Count > 0, $"{nameof(_gamut)} is null or empty.");
+			Debug.Assert(_gamut[0] % 12 == AbsolutePitchHierarchy[0], $"The lowest pitch in {nameof(_gamut)} must always be equal to {nameof(AbsolutePitchHierarchy)}[0].");
+
+			for(int i = 1; i < _gamut.Count; ++i)
+			{
+				Debug.Assert(_gamut[i] >= 0 && _gamut[i] <= 127, $"{nameof(_gamut)}[{i}] is out of range.");
+				Debug.Assert(_gamut[i] > _gamut[i - 1], $"{nameof(_gamut)} values must be in ascending order.");
+			}
+
+			#region check pitch consistency
+			List<int> basePitches = new List<int>();
+			int pitchIndex = 0;
+			int octaveAboveBasePitch = _gamut[0] + 12;
+			while(pitchIndex < _gamut.Count && _gamut[pitchIndex] < octaveAboveBasePitch)
+			{
+				basePitches.Add(_gamut[pitchIndex++]);
+			}
+			int pitchCount = 0;
+			foreach(int pitch in basePitches)
+			{
+				int pitchOctave = pitch;
+				while(pitchOctave < 128)
+				{
+					Debug.Assert(_gamut.Contains(pitchOctave), $"Missing pitch in {nameof(_gamut)}");
+					pitchCount += 1;
+					pitchOctave += 12;
+				}
+			}
+			Debug.Assert(_gamut.Count == pitchCount, $"Unknown pitch in {nameof(_gamut)}.");
+			#endregion check pitch consistency
+		}
+
+        private List<int> _gamut = null;
+
+        public int Count { get { return _gamut.Count; } }
+
+
+		#endregion public properties
+
+		#region Pitch Hierarchies
+		/// <summary>
+		/// Sets AbsolutePitchHierarchy to contain the sums of absoluteValue(rootPitch) + RelativePitchHierarchies[index].
+		/// If a value would be greater than 11, value = value - 12, so that all values are in range [0..11].
+		/// </summary>
+		/// <param name="relativePitchHierarchyIndex">In range [0..21]</param>
+		/// <param name="rootPitch">In range [0..127]</param>
+		private void SetAbsolutePitchHierarchy(int relativePitchHierarchyIndex, int rootPitch)
         {
             if(RelativePitchHierarchies.Count != 22)
             {
@@ -667,32 +707,37 @@ namespace Moritz.Spec
                 absolutePitchHierarchy[i] += absRootPitch;
                 absolutePitchHierarchy[i] = (absolutePitchHierarchy[i] > 11) ? absolutePitchHierarchy[i] - 12 : absolutePitchHierarchy[i];
             }
-            return absolutePitchHierarchy;
-        }
 
-        /// <summary>
-        /// This series of RelativePitchHierarchies is derived from the "most consonant" hierarchy at index 0:
-        ///                    0, 7, 4, 10, 2, 5, 9, 11, 1, 3, 6, 8
-        /// which has been deduced from the harmonic series as follows (decimals rounded to 3 figures):
-        /// 
-        ///              absolute   equal              harmonic:     absolute         closest
-        ///              pitch:  temperament                         harmonic    equal temperament
-        ///                        factor:                           factor:       absolute pitch:
-        ///                0:       1.000       |          1   ->   1/1  = 1.000  ->     0:
-        ///                1:       1.059       |          3   ->   3/2  = 1.500  ->     7:
-        ///                2:       1.122       |          5   ->   5/4  = 1.250  ->     4:
-        ///                3:       1.189       |          7   ->   7/4  = 1.750  ->     10:
-        ///                4:       1.260       |          9   ->   9/8  = 1.125  ->     2:
-        ///                5:       1.335       |         11   ->  11/8  = 1.375  ->     5:
-        ///                6:       1.414       |         13   ->  13/8  = 1.625  ->     9:
-        ///                7:       1.498       |         15   ->  15/8  = 1.875  ->     11:
-        ///                8:       1.587       |         17   ->  17/16 = 1.063  ->     1:
-        ///                9:       1.682       |         19   ->  19/16 = 1.187  ->     3:
-        ///                10:      1.782       |         21   ->  21/16 = 1.313  ->     
-        ///                11:      1.888       |         23   ->  23/16 = 1.438  ->     6:
-        ///                                     |         25   ->  25/16 = 1.563  ->     8:
-        /// </summary>
-        private static List<List<int>> RelativePitchHierarchies = new List<List<int>>()
+			AbsolutePitchHierarchy = absolutePitchHierarchy;
+
+			#region condition
+			AssertAbsolutePitchHierarchyValidity();
+			#endregion condition
+		}
+
+		/// <summary>
+		/// This series of RelativePitchHierarchies is derived from the "most consonant" hierarchy at index 0:
+		///                    0, 7, 4, 10, 2, 5, 9, 11, 1, 3, 6, 8
+		/// which has been deduced from the harmonic series as follows (decimals rounded to 3 figures):
+		/// 
+		///              absolute   equal              harmonic:     absolute         closest
+		///              pitch:  temperament                         harmonic    equal temperament
+		///                        factor:                           factor:       absolute pitch:
+		///                0:       1.000       |          1   ->   1/1  = 1.000  ->     0:
+		///                1:       1.059       |          3   ->   3/2  = 1.500  ->     7:
+		///                2:       1.122       |          5   ->   5/4  = 1.250  ->     4:
+		///                3:       1.189       |          7   ->   7/4  = 1.750  ->     10:
+		///                4:       1.260       |          9   ->   9/8  = 1.125  ->     2:
+		///                5:       1.335       |         11   ->  11/8  = 1.375  ->     5:
+		///                6:       1.414       |         13   ->  13/8  = 1.625  ->     9:
+		///                7:       1.498       |         15   ->  15/8  = 1.875  ->     11:
+		///                8:       1.587       |         17   ->  17/16 = 1.063  ->     1:
+		///                9:       1.682       |         19   ->  19/16 = 1.187  ->     3:
+		///                10:      1.782       |         21   ->  21/16 = 1.313  ->     
+		///                11:      1.888       |         23   ->  23/16 = 1.438  ->     6:
+		///                                     |         25   ->  25/16 = 1.563  ->     8:
+		/// </summary>
+		private static List<List<int>> RelativePitchHierarchies = new List<List<int>>()
         {
             new List<int>(){ 0,  7,  4, 10,  2,  5,  9, 11,  1,  3,  6,  8 }, //  0
             new List<int>(){ 0,  4,  7,  2, 10,  9,  5,  1, 11,  6,  3,  8 }, //  1
