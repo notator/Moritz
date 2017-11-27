@@ -9,7 +9,7 @@ using Moritz.Spec;
 namespace Moritz.Algorithm.Tombeau1
 {
 	/// <summary>
-	/// A (mutable) List of ModeGrpTrk objects, each of which has the same Mode and MidiChannel.
+	/// A (mutable) List of ModeGrpTrk objects, each of which has the same Mode.AbsolutePitchHierarchy and MidiChannel.
 	/// </summary>
 	internal class ModeSegment
 	{

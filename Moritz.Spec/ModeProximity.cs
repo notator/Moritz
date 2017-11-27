@@ -18,7 +18,7 @@ namespace Moritz.Spec
 
 		public override string ToString()
 		{
-			return $"Mode: {_mode.ToString()} proximity={_proximity}";
+			return $"Mode: {_mode.ToString()}, proximity={_proximity}";
 		}
 
 		public Mode Mode { get => _mode; }

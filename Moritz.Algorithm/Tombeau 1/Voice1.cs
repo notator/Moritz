@@ -209,7 +209,7 @@ namespace Moritz.Algorithm.Tombeau1
 				if(i == 0)
 				{
 					rootNotatedPitch = mode.AbsolutePitchHierarchy[i] + (12 * rootOctave);
-					rootNotatedPitch = (rootNotatedPitch <= mode.MaxPitch) ? rootNotatedPitch : mode.MaxPitch;
+					rootNotatedPitch = (rootNotatedPitch <= mode.MaxGamutPitch) ? rootNotatedPitch : mode.MaxGamutPitch;
 				}
 				else
 				{
@@ -224,9 +224,9 @@ namespace Moritz.Algorithm.Tombeau1
 						while(rootNotatedPitch < previousPitches[0])
 						{
 							rootNotatedPitch += 12;
-							if(rootNotatedPitch > mode.MaxPitch)
+							if(rootNotatedPitch > mode.MaxGamutPitch)
 							{
-								rootNotatedPitch = mode.MaxPitch;
+								rootNotatedPitch = mode.MaxGamutPitch;
 								break;
 							}
 						}

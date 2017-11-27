@@ -545,13 +545,13 @@ namespace Moritz.Spec
         public readonly int RelativePitchHierarchyIndex;
         public readonly int BasePitch;
         public readonly int NPitchesPerOctave;
-        public int MaxPitch
+        public int MaxGamutPitch
 		{
 			get
 			{
-				if(_maxPitch > 0)
+				if(_maxGamutPitch > 0)
 				{
-					return _maxPitch;
+					return _maxGamutPitch;
 				}
 				// lazy evaluation
 				int topBasePitch = BasePitch;
@@ -568,12 +568,12 @@ namespace Moritz.Spec
 				}
 				foreach(int pitch in topOctavePitches)
 				{
-					_maxPitch = (_maxPitch < pitch && pitch <= 127) ? pitch : _maxPitch;
+					_maxGamutPitch = (_maxGamutPitch < pitch && pitch <= 127) ? pitch : _maxGamutPitch;
 				}
-				return _maxPitch;
+				return _maxGamutPitch;
 			}
 		}
-		private int _maxPitch = 0;
+		private int _maxGamutPitch = 0;
 		public IReadOnlyList<int> AbsolutePitchHierarchy { get; private set; }
         public IReadOnlyList<int> Gamut
 		{
@@ -617,6 +617,8 @@ namespace Moritz.Spec
 				}
 
 				AssertGamutValidity();
+
+				Debug.Assert(MaxGamutPitch == _gamut[_gamut.Count - 1]);
 
 				return _gamut as IReadOnlyList<int>;
 			}
