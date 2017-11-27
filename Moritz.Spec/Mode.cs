@@ -215,11 +215,13 @@ namespace Moritz.Spec
                 int indexDiff = indexOfFirstPitchInMode - firstIndexInEnvelope;
 
                 List<int> indices = envOriginal;
-                for(int i = 0; i < indices.Count; ++i)
+				int gamutCount = Gamut.Count;
+
+				for(int i = 0; i < indices.Count; ++i)
                 {
                     indices[i] += indexDiff;
                     indices[i] = (indices[i] < 0) ? 0 : indices[i];
-                    indices[i] = (indices[i] >= this.Count) ? this.Count - 1 : indices[i];
+                    indices[i] = (indices[i] >= gamutCount) ? gamutCount - 1 : indices[i];
                 }
 
                 foreach(int index in indices)
@@ -655,9 +657,6 @@ namespace Moritz.Spec
 		}
 
         private List<int> _gamut = null;
-
-        public int Count { get { return _gamut.Count; } }
-
 
 		#endregion public properties
 

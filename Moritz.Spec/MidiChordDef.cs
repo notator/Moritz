@@ -325,8 +325,9 @@ namespace Moritz.Spec
             for(int i = 0; i < pitches.Count; ++i)
             {
                 int pitchIndex = mode.IndexOf(pitches[i]);
-                // N.B. it is not necessarily true that mode.Count == oppositeMode.Count.
-                pitchIndex = (pitchIndex < oppositeMode.Count) ? pitchIndex : oppositeMode.Count - 1;
+				int oppositeModeGamutCount = oppositeMode.Gamut.Count;
+				// N.B. it is not necessarily true that mode.Count == oppositeMode.Count.
+				pitchIndex = (pitchIndex < oppositeModeGamutCount) ? pitchIndex : oppositeModeGamutCount - 1;
                 pitches[i] = (byte)oppositeMode.Gamut[pitchIndex];
             }
         }
@@ -824,8 +825,10 @@ namespace Moritz.Spec
         {
             int index = mode.IndexOf(initialValue);
             int newIndex = index + steps;
-            newIndex = (newIndex >= 0) ? newIndex : 0;
-            newIndex = (newIndex < mode.Count) ? newIndex : mode.Count - 1;
+			int modeGamutCount = mode.Gamut.Count;
+
+			newIndex = (newIndex >= 0) ? newIndex : 0;
+            newIndex = (newIndex < modeGamutCount) ? newIndex : modeGamutCount - 1;
 
             return (byte)mode.Gamut[newIndex];
         }

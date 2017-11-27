@@ -488,7 +488,9 @@ namespace Moritz.Algorithm.Tombeau1
             }
 
             int newPitchIndex = newPitchIndexInOctave + (octave * newNPitchesPerOctave);
-            newPitchIndex = (newPitchIndex < newMode.Count) ? newPitchIndex : newMode.Count - 1;
+			int newModeGamutCount = newMode.Gamut.Count;
+
+			newPitchIndex = (newPitchIndex < newModeGamutCount) ? newPitchIndex : newModeGamutCount - 1;
 
             return newPitchIndex;
         }
