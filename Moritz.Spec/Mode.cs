@@ -42,7 +42,7 @@ namespace Moritz.Spec
 		/// with their proximities to this Mode. The returned list is sorted by proximity.
 		/// </summary>
 		/// <returns></returns>
-		public List<ModeProximity> FindRelatedModes()
+		public List<ModeProximity> GetModeProximities()
 		{
 			var rval = new List<ModeProximity>();
 

@@ -53,7 +53,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 		private List<ModeSegment> GetModeSegments(int nModeSegments)
 		{
-			List<ModeProximity> modeProximities = RootMode.FindRelatedModes();
+			List<ModeProximity> modeProximities = RootMode.GetModeProximities();
 
 			int maxIndex = modeProximities.Count - 1;
 			int indexInc = maxIndex / nModeSegments;
@@ -68,7 +68,7 @@ namespace Moritz.Algorithm.Tombeau1
 			for(int i = 0; i < nModeSegments; i++)
 			{
 				Mode mode = FindBaseMode(modeProximities, RootMode.BasePitch, modeIndices[i]);
-				modeProximities = mode.FindRelatedModes();
+				//modeProximities = mode.GetModeProximities();
 				baseModes.Add(mode);
 			}
 
@@ -160,7 +160,7 @@ namespace Moritz.Algorithm.Tombeau1
 		private ModeSegment GetBasicModeSegment(int modeSegmentMsPositionReContainer, int rootOctave, int basePitch, int relativePitchHierarchyIndex)
 		{
 			const int maxChordsPerModeGrpTrk = 12;
-			const int minChordsPerModeGrpTrk = 4;
+			const int minChordsPerModeGrpTrk = 3;
 			var ModeGrpTrks = new List<ModeGrpTrk>();
 			int msPositionReContainer = 0;
 			for(int nChords = maxChordsPerModeGrpTrk; nChords >= minChordsPerModeGrpTrk; --nChords)
