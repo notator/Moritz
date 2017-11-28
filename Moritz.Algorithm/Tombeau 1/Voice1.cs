@@ -69,7 +69,6 @@ namespace Moritz.Algorithm.Tombeau1
 			{
 				Mode mode = FindBaseMode(modeProximities, RootMode.BasePitch, modeIndices[i]);
 				modeProximities = mode.FindRelatedModes();
-				var common = RootMode.GetCommonAbsolutePitches(mode);
 				baseModes.Add(mode);
 			}
 

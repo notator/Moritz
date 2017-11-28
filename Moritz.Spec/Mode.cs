@@ -432,7 +432,7 @@ namespace Moritz.Spec
             Debug.Assert(loudestPitchIndex >= 0 && loudestPitchIndex <= (NPitchesPerOctave - 1));
 
             List<double> newVs = new List<double>();
-            List<int> contour = GetLinearNegativeContour(velocities.Count, loudestPitchIndex);
+            List<int> contour = GetLinearNegativeVelocityContour(velocities.Count, loudestPitchIndex);
             foreach(int val in contour)
             {
                 newVs.Add(velocities[val - 1]);
@@ -446,7 +446,7 @@ namespace Moritz.Spec
         /// </summary>
         /// <param name="count">In range 2..12</param>
         /// <param name="contourIndex">In range 0..(count-1)</param>
-        private List<int> GetLinearNegativeContour(int count, int contourIndex)
+        private List<int> GetLinearNegativeVelocityContour(int count, int contourIndex)
         {
             Debug.Assert(count >= 2 && count <= 12);
             Debug.Assert(contourIndex >= 0 && contourIndex <= (count - 1));
@@ -487,43 +487,72 @@ namespace Moritz.Spec
             return contour;
         }
 
-		public (List<byte> commonAbsPitches, List<byte> otherAbsPitchesInThisMode, List<byte> otherAbsPitchesInArgMode)
-			GetCommonAbsolutePitches(Mode mode2)
+		/// <summary>
+		/// Compares this mode with any other mode.
+		/// Returns three lists containing
+		/// 1. the absolute pitches (range [0..11]) that occur per octave in both mode.Gamuts,
+		/// 2. the absolute pitches (range [0..11]) that occur per octave in this mode.Gamut, but not in mode2.Gamut,
+		/// 3. the absolute pitches (range [0..11]) that occur per octave in mode2.Gamut, but not in this mode.Gamut. 
+		/// </summary>
+		/// <param name="mode2">The mode to be compared.</param>
+		/// <returns></returns>
+		public (List<byte> commonAbsPitchesPerOctave, List<byte> otherAbsPitchesPerOctaveInThisMode, List<byte> otherAbsPitchesPerOctaveInMode2)
+			GetCommonAbsolutePitchesPerOctave(Mode mode2)
 		{
-			var commonAbsPitches = new List<byte>();
-			var otherAbsPitchesInThisMode = new List<byte>();
-			var otherAbsPitchesInArgMode = new List<byte>();
+			var commonAbsPitchesPerOctave = new List<byte>();
+			var otherAbsPitchesPerOctaveInThisMode = new List<byte>();
+			var otherAbsPitchesPerOctaveInMode2 = new List<byte>();
 
-			List<int> shortG1AbsPH = new List<int>();
-			List<int> shortG2AbsPH = new List<int>();
+			List<int> shortM1AbsPH = new List<int>();
+			List<int> shortM2AbsPH = new List<int>();
 
 			for(int i = 0; i < NPitchesPerOctave; ++i)
 			{
-				shortG1AbsPH.Add(AbsolutePitchHierarchy[i]);
-				shortG2AbsPH.Add(mode2.AbsolutePitchHierarchy[i]);
+				shortM1AbsPH.Add(AbsolutePitchHierarchy[i]);
 			}
 
-			for(int i = 0; i < NPitchesPerOctave; ++i)
+			for(int i = 0; i < mode2.NPitchesPerOctave; ++i)
 			{
-				int pitchG2 = shortG2AbsPH[i];
-				if(shortG1AbsPH.Contains(pitchG2))
+				shortM2AbsPH.Add(mode2.AbsolutePitchHierarchy[i]);
+			}
+
+			int commonCount = (NPitchesPerOctave < mode2.NPitchesPerOctave) ? NPitchesPerOctave : mode2.NPitchesPerOctave;
+
+			for(int i = 0; i < commonCount; ++i)
+			{
+				int pitchM2 = shortM2AbsPH[i];
+				if(shortM1AbsPH.Contains(pitchM2))
 				{
-					commonAbsPitches.Add((byte)(pitchG2));
+					commonAbsPitchesPerOctave.Add((byte)(pitchM2));
 				}
 				else
 				{
-					otherAbsPitchesInArgMode.Add((byte)(pitchG2));
+					otherAbsPitchesPerOctaveInMode2.Add((byte)(pitchM2));
 				}
-			}
-			for(int i = 0; i < NPitchesPerOctave; ++i)
-			{
-				int pitchG1 = shortG1AbsPH[i];
-				if(!commonAbsPitches.Contains((byte)pitchG1))
+
+				int pitchM1 = shortM1AbsPH[i];
+				if(!commonAbsPitchesPerOctave.Contains((byte)pitchM1))
 				{
-					otherAbsPitchesInThisMode.Add((byte)(pitchG1));
+					otherAbsPitchesPerOctaveInThisMode.Add((byte)(pitchM1));
 				}
 			}
-			return (commonAbsPitches, otherAbsPitchesInThisMode, otherAbsPitchesInArgMode);
+			for(int i = commonCount; i < NPitchesPerOctave; ++i)
+			{
+				int pitchM1 = shortM1AbsPH[i];
+				Debug.Assert(!commonAbsPitchesPerOctave.Contains((byte)pitchM1));
+				otherAbsPitchesPerOctaveInThisMode.Add((byte)(pitchM1));
+			}
+
+			for(int i = commonCount; i < mode2.NPitchesPerOctave; ++i)
+			{
+				int pitchM2 = shortM2AbsPH[i];
+				Debug.Assert(!commonAbsPitchesPerOctave.Contains((byte)pitchM2));
+				otherAbsPitchesPerOctaveInMode2.Add((byte)(pitchM2));
+			}
+
+			Console.WriteLine(value: $"commonCount={commonAbsPitchesPerOctave.Count}, otherThisCount={otherAbsPitchesPerOctaveInThisMode.Count}, otherMode2Count={otherAbsPitchesPerOctaveInMode2.Count}.");
+
+			return (commonAbsPitchesPerOctave, otherAbsPitchesPerOctaveInThisMode, otherAbsPitchesPerOctaveInMode2);
 		}
 
 		public override string ToString()
