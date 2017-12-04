@@ -412,34 +412,23 @@ namespace Moritz.Spec
         /// <summary>
         /// The arguments are passed unchanged to MidiChordDef.SetVelocityPerAbsolutePitch(...) for each MidiChordDef in this Trk.
         /// See the MidiChordDef documentation for details.
-        /// If velocityPerAbsolutePitch contains values that are less than minimumVelocity, the velocities are increased proportionally.
-        /// If minimumVelocity==0, in both velocityPerAbsolutePitch and here, the notes that would have been given velocity=0 are given
-        /// velocity=1.
         /// </summary>
-        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [0..127] in order of absolute pitch</param>
-        /// <param name="minimumVelocity">In range 1..127</param>
-        /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
-        public virtual void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, byte minimumVelocity = 20, double percent = 100.0)
+        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [1..127] in order of absolute pitch</param>
+        public virtual void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch)
         {
             #region conditions
             Debug.Assert(velocityPerAbsolutePitch.Count == 12);
             for(int i = 0; i < 12; ++i)
             {
-                int v = velocityPerAbsolutePitch[i];
-                Debug.Assert(v >= 0 && v <= 127);
+                M.AssertIsVelocityValue(velocityPerAbsolutePitch[i]);
             }
-            Debug.Assert(minimumVelocity >= 0 && minimumVelocity <= 127);
 			#endregion conditions
-			_currentVelocityPerAbsolutePitch = new List<byte>(velocityPerAbsolutePitch);
             for(int i = 0; i < UniqueDefs.Count; ++i)
             {
                 if(UniqueDefs[i] is MidiChordDef mcd)
                 {
-                    mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, minimumVelocity, percent);
-                    if(mcd.NotatedMidiPitches.Count == 0)
-                    {
-                        Replace(i, new MidiRestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
-                    }
+                    mcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+					Debug.Assert(mcd.NotatedMidiPitches.Count > 0);
                 }
             }
         }
@@ -1473,8 +1462,5 @@ namespace Moritz.Spec
 				return count;
 			}
 		}
-
-		//public List<byte> _velocityPerAbsolutePitch { get; private set; }
-		protected List<byte> _currentVelocityPerAbsolutePitch;
 	}
 }

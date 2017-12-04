@@ -13,48 +13,30 @@ namespace Moritz.Algorithm.Tombeau1
 	/// </summary>
 	internal class ModeSegment
 	{
-		public ModeSegment(int midiChannel)
-		{
-			MsPositionReContainer = 0;
-			MidiChannel = midiChannel;
-			_ModeGrpTrks = new List<ModeGrpTrk>();
-		}
+		//public ModeSegment(int midiChannel)
+		//{
+		//	MsPositionReContainer = 0;
+		//	MidiChannel = midiChannel;
+		//	_modeGrpTrks = new List<ModeGrpTrk>();
+		//}
 
-		public ModeSegment(int midiChannel, int msPositionReContainer, IReadOnlyList<ModeGrpTrk> ModeGrpTrks)
+		public ModeSegment(int midiChannel, int msPositionReContainer, IReadOnlyList<ModeGrpTrk> modeGrpTrks)
 		{
 			Debug.Assert(midiChannel >= 0 && midiChannel <= 15);
 			Debug.Assert(msPositionReContainer >= 0);
-			Debug.Assert(ModeGrpTrks.Count > 0);
+			Debug.Assert(modeGrpTrks.Count > 0);
 
 			MsPositionReContainer = msPositionReContainer;
 			MidiChannel = midiChannel;
-			_mode = ModeGrpTrks[0].Mode;
+			_mode = modeGrpTrks[0].Mode;
 
-			foreach(ModeGrpTrk ModeGrpTrk in ModeGrpTrks)
+			foreach(ModeGrpTrk ModeGrpTrk in modeGrpTrks)
 			{
 				AssertConsistency(MidiChannel, _mode, ModeGrpTrk);
 			}
 
-			_ModeGrpTrks = new List<ModeGrpTrk>(ModeGrpTrks);
+			_modeGrpTrks = new List<ModeGrpTrk>(modeGrpTrks);
 		}
-
-		/// <summary>
-		/// Note that modes are not cloned in the contained ModeSegment objects.
-		/// </summary>
-		/// <returns></returns>
-		public ModeSegment Clone()
-		{
-			ModeSegment clone = new ModeSegment(this.MidiChannel);
-			foreach(ModeGrpTrk ModeGrpTrk in _ModeGrpTrks)
-			{
-				clone.Add(ModeGrpTrk.Clone);
-			}
-			return clone;
-		}
-
-		public ModeGrpTrk this[int i] {	get => _ModeGrpTrks[i]; }
-
-		public int Count { get => _ModeGrpTrks.Count; }
 
 		private void AssertConsistency(int midiChannel, Mode mode, ModeGrpTrk ModeGrpTrk)
 		{
@@ -62,38 +44,104 @@ namespace Moritz.Algorithm.Tombeau1
 			Debug.Assert(midiChannel == ModeGrpTrk.MidiChannel, "All ModeGrpTrks in a ModeSegment must have the same MidiChannel");
 		}
 
-		public void Add(ModeGrpTrk ModeGrpTrk)
-		{
-			Debug.Assert(ModeGrpTrk != null);
+		//public void Add(ModeGrpTrk ModeGrpTrk)
+		//{
+		//	Debug.Assert(ModeGrpTrk != null);
 
-			if(_ModeGrpTrks.Count > 0) // ModeGrpTrks can also be removed, so check.
-			{
-				AssertConsistency(MidiChannel, _mode, ModeGrpTrk);
-				ModeGrpTrk lastGGT = _ModeGrpTrks[_ModeGrpTrks.Count - 1];
-				ModeGrpTrk.MsPositionReContainer = lastGGT.MsPositionReContainer + lastGGT.MsDuration;
-			}
-			else
-			{
-				_mode = ModeGrpTrk.Mode;
-				ModeGrpTrk.MsPositionReContainer = 0;
-			}
-			_ModeGrpTrks.Add(ModeGrpTrk);  			
+		//	if(_modeGrpTrks.Count > 0) // ModeGrpTrks can also be removed, so check.
+		//	{
+		//		AssertConsistency(MidiChannel, _mode, ModeGrpTrk);
+		//		ModeGrpTrk lastMGT = _modeGrpTrks[_modeGrpTrks.Count - 1];
+		//		ModeGrpTrk.MsPositionReContainer = lastMGT.MsPositionReContainer + lastMGT.MsDuration;
+		//	}
+		//	else
+		//	{
+		//		_mode = ModeGrpTrk.Mode;
+		//		ModeGrpTrk.MsPositionReContainer = 0;
+		//	}
+		//	_modeGrpTrks.Add(ModeGrpTrk);  			
+		//}
+
+		//public void Remove(ModeGrpTrk ModeGrpTrk)
+		//{
+		//	_ModeGrpTrks.Remove(ModeGrpTrk);
+		//	SetMsPositionsReThisModeSegment();
+		//}
+		//public void RemoveAt(int index)
+		//{
+		//	_ModeGrpTrks.RemoveAt(index);
+		//	SetMsPositionsReThisModeSegment();
+		//}
+		//public void RemoveRange(int startIndex, int nItems)
+		//{
+		//	_ModeGrpTrks.RemoveRange(startIndex, nItems);
+		//	SetMsPositionsReThisModeSegment();
+		//}
+
+		/// <summary>
+		/// The TimeWarp is at the level of the IUniqueDefs (treated as a single sequence).
+		/// See Trk.TimeWarp(...).
+		/// </summary>
+		/// <param name="envelope"></param>
+		/// <param name="distortion"></param>
+		internal void TimeWarpIUDs(Envelope envelope, double distortion)
+		{
+			Trk tempAllIUDsTrk = TempAllIUDsTrk;
+			int trkDuration = tempAllIUDsTrk.MsDuration;
+
+			envelope.SetCount(tempAllIUDsTrk.Count);
+			tempAllIUDsTrk.TimeWarp(envelope, distortion);
+
+			Debug.Assert(trkDuration == tempAllIUDsTrk.MsDuration);
+
+			ResetRelativeMsPositions();
 		}
 
-		public void Remove(ModeGrpTrk ModeGrpTrk)
+		/// <summary>
+		/// The TimeWarp is at the level of the ModeGrpTrks (each has its own warp factor).
+		/// </summary>
+		/// <param name="envelope"></param>
+		/// <param name="distortion"></param>
+		internal void TimeWarpModeGrpTrks(Envelope envelope, double distortion)
 		{
-			_ModeGrpTrks.Remove(ModeGrpTrk);
-			SetMsPositionsReThisModeSegment();
+			envelope.SetCount(_modeGrpTrks.Count);  // nModeGrpTrks
+			double factor = distortion / envelope.Domain;
+			int originalMsDuration = this.MsDuration;
+
+			for(int i = 0; i < _modeGrpTrks.Count; i++)
+			{
+				ModeGrpTrk mgt = _modeGrpTrks[i];
+				int msDuration = ((int)(mgt.MsDuration * (envelope.Original[i] * factor)));
+				mgt.MsDuration = msDuration;
+			}
+
+			this.MsDuration = originalMsDuration;
+
+			ResetRelativeMsPositions();
 		}
-		public void RemoveAt(int index)
+
+		private void ResetRelativeMsPositions()
 		{
-			_ModeGrpTrks.RemoveAt(index);
 			SetMsPositionsReThisModeSegment();
+			foreach(ModeGrpTrk mgt in _modeGrpTrks)
+			{
+				mgt.SetMsPositionsReFirstUD();
+				mgt.AssertConsistency();
+			}
 		}
-		public void RemoveRange(int startIndex, int nItems)
+
+		private Trk TempAllIUDsTrk
 		{
-			_ModeGrpTrks.RemoveRange(startIndex, nItems);
-			SetMsPositionsReThisModeSegment();
+			get
+			{
+				List<IUniqueDef> allIUDs = new List<IUniqueDef>();
+				foreach(ModeGrpTrk mgt in _modeGrpTrks)
+				{
+					allIUDs.AddRange(mgt.UniqueDefs);
+				}
+				Trk allIUDsTrk = new Trk(this.MidiChannel, 0, allIUDs);
+				return allIUDsTrk;
+			}
 		}
 
 		/// <summary>
@@ -102,9 +150,9 @@ namespace Moritz.Algorithm.Tombeau1
 		internal Trk ToTrk()
 		{
 			Trk trk = new Trk(this.MidiChannel, this.MsPositionReContainer, new List<IUniqueDef>());
-			foreach(ModeGrpTrk ModeGrpTrk in this.ModeGrpTrks)
+			foreach(ModeGrpTrk mgt in _modeGrpTrks)
 			{
-				trk.AddRange(ModeGrpTrk);
+				trk.AddRange(mgt);
 			}
 
 			return trk;
@@ -112,13 +160,35 @@ namespace Moritz.Algorithm.Tombeau1
 
 		public void Reverse()
 		{
-			_ModeGrpTrks.Reverse();
+			_modeGrpTrks.Reverse();
 			SetMsPositionsReThisModeSegment();
+		}
+
+		public int IUDCount
+		{
+			get
+			{
+				int iudCount = 0;
+				foreach(ModeGrpTrk mgt in this._modeGrpTrks)
+				{
+					iudCount += mgt.Count;
+				}
+				return iudCount;
+			}
+		}
+		internal void SetMsPositionsReThisModeSegment()
+		{
+			int msPos = 0;
+			foreach(ModeGrpTrk mgt in _modeGrpTrks)
+			{
+				mgt.MsPositionReContainer = msPos;
+				msPos += mgt.MsDuration;
+			}
 		}
 
 		public new string ToString()
 		{
-			int count = _ModeGrpTrks.Count;
+			int count = _modeGrpTrks.Count;
 			if(count > 0)
 			{
 				return $"Count={count.ToString()} Mode={_mode.ToString()} MsPositionReContainer={MsPositionReContainer}";
@@ -130,15 +200,16 @@ namespace Moritz.Algorithm.Tombeau1
 		}
 
 		public int MsPositionReContainer = 0;
-		public IReadOnlyList<ModeGrpTrk> ModeGrpTrks { get => _ModeGrpTrks as IReadOnlyList<ModeGrpTrk>; }
+		public IReadOnlyList<ModeGrpTrk> ModeGrpTrks { get => _modeGrpTrks as IReadOnlyList<ModeGrpTrk>; }
+		private List<ModeGrpTrk> _modeGrpTrks = null;
 		public int MsDuration
 		{ 
 			get
 			{
 				int rval = 0;
-				foreach(ModeGrpTrk ModeGrpTrk in _ModeGrpTrks)
+				foreach(ModeGrpTrk mgt in _modeGrpTrks)
 				{
-					rval += ModeGrpTrk.MsDuration;
+					rval += mgt.MsDuration;
 				}
 				return rval;
 			}
@@ -149,9 +220,9 @@ namespace Moritz.Algorithm.Tombeau1
 				int msDuration = value;
 
 				List<int> relativeDurations = new List<int>();
-				foreach(ModeGrpTrk ModeGrpTrk in _ModeGrpTrks)
+				foreach(ModeGrpTrk mgt in _modeGrpTrks)
 				{
-					relativeDurations.Add(ModeGrpTrk.MsDuration);
+					relativeDurations.Add(mgt.MsDuration);
 				}
 
 				List<int> newDurations = M.IntDivisionSizes(msDuration, relativeDurations);
@@ -159,12 +230,12 @@ namespace Moritz.Algorithm.Tombeau1
 				Debug.Assert(newDurations.Count == relativeDurations.Count);
 				int i = 0;
 				int newTotal = 0;
-				foreach(ModeGrpTrk ModeGrpTrk in _ModeGrpTrks)
+				foreach(ModeGrpTrk mgt in _modeGrpTrks)
 				{
-					if(ModeGrpTrk.MsDuration > 0)
+					if(mgt.MsDuration > 0)
 					{
-						ModeGrpTrk.MsDuration = newDurations[i];
-						newTotal += ModeGrpTrk.MsDuration;
+						mgt.MsDuration = newDurations[i];
+						newTotal += mgt.MsDuration;
 						++i;
 					}
 				}
@@ -175,20 +246,7 @@ namespace Moritz.Algorithm.Tombeau1
 			}
 		}
 
-		internal void SetMsPositionsReThisModeSegment()
-		{
-			int msPos = 0;
-			foreach(ModeGrpTrk ModeGrpTrk in _ModeGrpTrks)
-			{
-				ModeGrpTrk.MsPositionReContainer = msPos;
-				msPos += ModeGrpTrk.MsDuration;
-			}
-		}
-
-		private readonly int MidiChannel;
-		private List<ModeGrpTrk> _ModeGrpTrks = null;
+		private readonly int MidiChannel;		
 		private Mode _mode = null;
 	}
-
-
 }

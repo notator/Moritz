@@ -24,13 +24,14 @@ namespace Moritz.Algorithm.Tombeau1
 				var msValuesPerModeTrk = new List<MsValues>();
 				msValuesListList.Add(msValuesPerModeTrk);
 				ModeSegment modeSegment = _modeSegments[i];
+				IReadOnlyList<ModeGrpTrk> modeGrpTrks = modeSegment.ModeGrpTrks;
 				int modeSegmentMsPosition = modeSegment.MsPositionReContainer;
-				for(int j = 0; j < modeSegment.Count; j++)
+				for(int j = 0; j < modeGrpTrks.Count; j++)
 				{
-					Debug.Assert(msPos == modeSegmentMsPosition + modeSegment[j].MsPositionReContainer);
+					Debug.Assert(msPos == modeSegmentMsPosition + modeGrpTrks[j].MsPositionReContainer);
 
-					msValuesPerModeTrk.Add(new MsValues(msPos, modeSegment[j].MsDuration));
-					msPos += modeSegment[j].MsDuration;
+					msValuesPerModeTrk.Add(new MsValues(msPos, modeGrpTrks[j].MsDuration));
+					msPos += modeGrpTrks[j].MsDuration;
 				}
 			}
 			return msValuesListList;
@@ -48,13 +49,14 @@ namespace Moritz.Algorithm.Tombeau1
 				msValuesListListList.Add(msValuesListList);
 
 				ModeSegment modeSegment = _modeSegments[i];
+				IReadOnlyList<ModeGrpTrk> modeGrpTrks = modeSegment.ModeGrpTrks;
 				int modeSegmentMsPosition = modeSegment.MsPositionReContainer;
-				for(int j = 0; j < modeSegment.Count; j++)
+				for(int j = 0; j < modeGrpTrks.Count; j++)
 				{
 					var msValuesList = new List<MsValues>();
 					msValuesListList.Add(msValuesList);
 
-					ModeGrpTrk pModeGrpTrk = modeSegment[j];
+					ModeGrpTrk pModeGrpTrk = modeGrpTrks[j];
 					int modeTrkMsPosition = modeSegmentMsPosition + pModeGrpTrk.MsPositionReContainer;
 					for(int k = 0; k < pModeGrpTrk.Count; k++)
 					{

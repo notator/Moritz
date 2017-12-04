@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using System.Text;
+using Moritz.Globals;
 
 namespace Moritz.Spec
 {
@@ -93,38 +94,9 @@ namespace Moritz.Spec
 			}
 			return proximity;
 		}
+		#endregion constructors
 
-		#region private helper functions
-		/// <summary>
-		/// A pitchHierarchy.Count must be 12.
-		/// Each value must be in range [0..11] and occur only once (no duplicates).
-		/// </summary>
-		private void AssertAbsolutePitchHierarchyValidity()
-        {
-            Debug.Assert(AbsolutePitchHierarchy.Count == 12);
-            List<bool> presence = new List<bool>();
-            for(int i = 0; i < 12; ++i)
-            {
-                presence.Add(false);
-            }
-
-            foreach(int value in AbsolutePitchHierarchy)
-            {
-                Debug.Assert(value >= 0 && value <= 11);
-                Debug.Assert(presence[value] == false);
-                presence[value] = true;
-            }
-
-            for(int i = 0; i < 12; ++i)
-            {
-                Debug.Assert(presence[i] == true);
-            }
-        }
-        #endregion private helper functions
-
-        #endregion constructors
-
-        #region public functions
+		#region public functions
 		/// <summary>
 		/// Modes are equal if their AbsolutePitchHierarchies are identical.
 		/// </summary>
@@ -163,21 +135,6 @@ namespace Moritz.Spec
                     {
                         return false;
                     }
-                }
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Returns true if the mode.List contains all the pitches in the argument. Otherwise false. 
-        /// </summary>
-        public bool ContainsAllPitches(List<IUniqueDef> iuds)
-        {
-            foreach(IUniqueDef iud in iuds)
-            {
-                if(iud is MidiChordDef mcd && ContainsAllPitches(mcd) == false)
-                {
-                    return false;                    
                 }
             }
             return true;
@@ -344,215 +301,127 @@ namespace Moritz.Spec
             return minimumInterval;
         }
 
-        /// <summary>
-        /// The returned list contains 12 velocity values in range [1..127] that can be applied to pitches in any Trk or MidiChordDef
-        /// (using their SetVelocityPerAbsolutePitch(...) ) function, regardless of the mode from which they have been constructed.
-        /// Pitches that are part of *this* mode in the returned list are given velocities in range [minimumVelocity..maximumVelocity].
-        /// Other pitches are given velocity = minimumVelocity.
-        /// The returned values are in order of absolute pitch, with C natural (absolute pitch 0) at position 0, C# (absolute pitch 1) at
-        /// position 1, etc.
-        /// The velocities of the mode's performing pitches are permuted according to a contour in a linear-negative field having
-        /// domain NPitchesPerOctave. The contour is found using the loudestPitchIndex.
-        /// The contour at loudestPitchIndex==0 (the default) is simply ascending (e.g. 1,2,3,4,5,6,7,8).
-        /// The contour at loudestPitchIndex==(NValuesPerOctave-1) is simply descending (e.g. 9,8,7,6,5,4,3,2,1).
-        /// So, in chords constructed from this mode, loudestPitchIndex==0 results in a bottom-to-top (i.e. loud-quiet) velocity gradient with
-        /// respect to the mode's absolute pitch hierarchy, while loudestPitchIndex==(NValuesPerOctave-1) results in a top-to-bottom (i.e. loud-quiet)
-        /// gradient with respect to the mode's absolute pitch hierarchy.
-        /// </summary>
-        /// <param name="minimumVelocity">In range [1..127]. The minimum velocity to be given to any pitch.</param>
-        /// <param name="maximumVelocity">In range [1..127]. The maximum velocity to be given to any pitch.</param>
-        /// <param name="loudestPitchIndex">In range [0..(NPitchesPerOctave-1)].</param>
-        /// <param name="isLinearGradient">If false, velocity values are scaled logarithmically between minimumVelocity and maximumVelocity.</param>
-        public List<byte> GetVelocityPerAbsolutePitch(int minimumVelocity = 20, int maximumVelocity = 127, int loudestPitchIndex = 0, bool isLinearGradient = true)
-        {
-            Debug.Assert(minimumVelocity >= 1 && minimumVelocity <= 127);
-            Debug.Assert(maximumVelocity >= 1 && maximumVelocity <= 127);
-            Debug.Assert(minimumVelocity <= maximumVelocity);
-            Debug.Assert(loudestPitchIndex >= 0 && loudestPitchIndex <= (NPitchesPerOctave-1));
-
-            List<double> velocities = new List<double>();
-            if(NPitchesPerOctave == 1)
-            {
-                velocities.Add(maximumVelocity);
-            }
-            else if(isLinearGradient)
-            {
-                double velocityDiff = ((double)(maximumVelocity - minimumVelocity)) / (NPitchesPerOctave - 1);
-                for(int i = 0; i < NPitchesPerOctave; ++i)
-                {
-                    double vel = maximumVelocity - (i * velocityDiff);
-                    velocities.Add(vel);
-                }
-            }
-            else
-            {
-                double factor = ((double) Math.Pow(((double)minimumVelocity / maximumVelocity), (((double)1) / (NPitchesPerOctave - 1))));
-                velocities.Add(maximumVelocity);
-                for(int i = 1; i < NPitchesPerOctave; ++i)
-                {
-                    double vel = velocities[i - 1] * factor;
-                    velocities.Add(vel);
-                }
-            }
-
-            if(NPitchesPerOctave > 1)
-            {
-                velocities = ContourVelocities(velocities, loudestPitchIndex);
-            }
-
-            List<byte> velocityPerAbsPitch = new List<byte>();
-            for(int i = 0; i < 12; ++i)
-            {
-                velocityPerAbsPitch.Add((byte)minimumVelocity); // default value
-            }
-
-            for(int absPitchIndex = 0; absPitchIndex < NPitchesPerOctave ; ++absPitchIndex)
-            {
-                int absPitch = AbsolutePitchHierarchy[absPitchIndex];
-
-                byte velocity = (byte) Math.Round(velocities[absPitchIndex]);
-                velocity = (velocity >= 1) ? velocity : (byte)1;
-                velocity = (velocity <= 127) ? velocity : (byte)127;
-
-                velocityPerAbsPitch[absPitch] = velocity;
-            }
-            return velocityPerAbsPitch;
-        }
-
-        /// <summary>
-        /// Returns the values in the velocities list permuted linearly.
-        /// The velocites list can be of any length. loudestPitchIndex is always in range [0..(NPitchesPerOctave-1)].
-        /// If loudestPitchIndex==0, the list will be unchanged. If loudestPitchIndex==(NPitchesPerOctave-1), the list will be reversed.
-        /// </summary>
-        /// <param name="velocities">velocities.Count == NPitchesPerOctave.</param>
-        /// <param name="contourNumber">in range 1..12</param>
-        private List<double> ContourVelocities(List<double> velocities, int loudestPitchIndex)
-        {
-            Debug.Assert(velocities.Count == NPitchesPerOctave && NPitchesPerOctave > 1);
-            Debug.Assert(loudestPitchIndex >= 0 && loudestPitchIndex <= (NPitchesPerOctave - 1));
-
-            List<double> newVs = new List<double>();
-            List<int> contour = GetLinearNegativeVelocityContour(velocities.Count, loudestPitchIndex);
-            foreach(int val in contour)
-            {
-                newVs.Add(velocities[val - 1]);
-            }
-            return newVs;
-        }
-
-        /// <summary>
-        /// Returns a contour having count values, whose first value is (contourIndex+1). 
-        /// (as if from a linear-negative matrix containing count contours having domain=count).
-        /// </summary>
-        /// <param name="count">In range 2..12</param>
-        /// <param name="contourIndex">In range 0..(count-1)</param>
-        private List<int> GetLinearNegativeVelocityContour(int count, int contourIndex)
-        {
-            Debug.Assert(count >= 2 && count <= 12);
-            Debug.Assert(contourIndex >= 0 && contourIndex <= (count - 1));
-
-            int incrSign = 1; // results in a "linear-negative" contour (when contourIndex > 0, contour[1] < contour[0].
-            int absIncr = 0;
-            int val = contourIndex + 1;
-            int incr = absIncr * incrSign; 
-            int breakIndex = 0;
-           
-            List<int> contour = new List<int>();
-            for(int i = 0; i < count; ++i)
-            {
-                contour.Add(val);
-                incrSign *= -1;
-                absIncr += 1;
-                incr = absIncr * incrSign;
-                val += incr;
-                if(val > count || val < 1)
-                {
-                    breakIndex = i;
-                    break;
-                }
-
-            }
-            // increasing or decreasing end phase
-            if(breakIndex < count - 1)
-            {
-                int endIncr = (val > count) ? -1 : 1;
-                val -= incr;
-                val += endIncr;
-                while(++breakIndex < count)
-                {
-                    contour.Add(val);
-                    val += endIncr;
-                }
-            }
-            return contour;
-        }
+		private static void AssertVelocityPerAbsolutePitchValidity(IReadOnlyList<byte> velocityPerAbsolutePitch)
+		{
+			Debug.Assert(velocityPerAbsolutePitch.Count == 12);
+			
+			foreach(byte velocity in velocityPerAbsolutePitch)
+			{
+				M.AssertIsVelocityValue(velocity);
+				Console.Write($"{velocity}, ");
+			}
+			Console.WriteLine();
+		}
 
 		/// <summary>
-		/// Compares this mode with any other mode.
-		/// Returns three lists containing
-		/// 1. the absolute pitches (range [0..11]) that occur per octave in both mode.Gamuts,
-		/// 2. the absolute pitches (range [0..11]) that occur per octave in this mode.Gamut, but not in mode2.Gamut,
-		/// 3. the absolute pitches (range [0..11]) that occur per octave in mode2.Gamut, but not in this mode.Gamut. 
+		/// Returns a new DefaultVelocityPerAbsolutePitch list containing 12 velocity values in range [1..127].
+		/// These can be applied to pitches in any Trk or MidiChordDef (using their SetVelocityPerAbsolutePitch(...) ) function,
+		/// regardless of the mode from which they have been constructed.
+		/// Pitches that are part of *this* mode in the returned list are given velocities in range [1..127].
+		/// Other pitches are given velocity = 1.
+		/// The returned Velocity values are:
+		/// 1. in range [1..127].
+		/// 2. in a linear progression per AbsolutePitchHierarchy value.
+		/// 3. sorted, so that the velocity for C natural (absolute pitch 0) is at position 0, C# (absolute pitch 1) is at position 1, etc.
 		/// </summary>
-		/// <param name="mode2">The mode to be compared.</param>
-		/// <returns></returns>
-		public (List<byte> commonAbsPitchesPerOctave, List<byte> otherAbsPitchesPerOctaveInThisMode, List<byte> otherAbsPitchesPerOctaveInMode2)
-			GetCommonAbsolutePitchesPerOctave(Mode mode2)
+		public List<byte> GetDefaultVelocityPerAbsolutePitch()
 		{
-			var commonAbsPitchesPerOctave = new List<byte>();
-			var otherAbsPitchesPerOctaveInThisMode = new List<byte>();
-			var otherAbsPitchesPerOctaveInMode2 = new List<byte>();
-
-			List<int> shortM1AbsPH = new List<int>();
-			List<int> shortM2AbsPH = new List<int>();
-
-			for(int i = 0; i < NPitchesPerOctave; ++i)
+			const int maximumVelocity = 127;
+			const int minimumVelocity = 1;
+			List<double> velocities = new List<double>();
+			if(NPitchesPerOctave == 1)
 			{
-				shortM1AbsPH.Add(AbsolutePitchHierarchy[i]);
+				velocities.Add(maximumVelocity);
 			}
-
-			for(int i = 0; i < mode2.NPitchesPerOctave; ++i)
+			else // linear gradient
 			{
-				shortM2AbsPH.Add(mode2.AbsolutePitchHierarchy[i]);
-			}
-
-			int commonCount = (NPitchesPerOctave < mode2.NPitchesPerOctave) ? NPitchesPerOctave : mode2.NPitchesPerOctave;
-
-			for(int i = 0; i < commonCount; ++i)
-			{
-				int pitchM2 = shortM2AbsPH[i];
-				if(shortM1AbsPH.Contains(pitchM2))
+				double velocityDiff = ((double)(maximumVelocity - minimumVelocity)) / (NPitchesPerOctave - 1);
+				for(int i = 0; i < NPitchesPerOctave; ++i)
 				{
-					commonAbsPitchesPerOctave.Add((byte)(pitchM2));
-				}
-				else
-				{
-					otherAbsPitchesPerOctaveInMode2.Add((byte)(pitchM2));
-				}
-
-				int pitchM1 = shortM1AbsPH[i];
-				if(!commonAbsPitchesPerOctave.Contains((byte)pitchM1))
-				{
-					otherAbsPitchesPerOctaveInThisMode.Add((byte)(pitchM1));
+					double vel = maximumVelocity - (i * velocityDiff);
+					velocities.Add(vel);
 				}
 			}
-			for(int i = commonCount; i < NPitchesPerOctave; ++i)
+
+			List<byte> velocityPerAbsPitch = new List<byte>();
+			for(int i = 0; i < 12; ++i)
 			{
-				int pitchM1 = shortM1AbsPH[i];
-				Debug.Assert(!commonAbsPitchesPerOctave.Contains((byte)pitchM1));
-				otherAbsPitchesPerOctaveInThisMode.Add((byte)(pitchM1));
+				velocityPerAbsPitch.Add((byte)minimumVelocity); // default value 1
 			}
 
-			for(int i = commonCount; i < mode2.NPitchesPerOctave; ++i)
+			for(int absPitchIndex = 0; absPitchIndex < NPitchesPerOctave; ++absPitchIndex)
 			{
-				int pitchM2 = shortM2AbsPH[i];
-				Debug.Assert(!commonAbsPitchesPerOctave.Contains((byte)pitchM2));
-				otherAbsPitchesPerOctaveInMode2.Add((byte)(pitchM2));
+				int absPitch = AbsolutePitchHierarchy[absPitchIndex];
+
+				byte velocity = (byte)Math.Round(velocities[absPitchIndex]);
+				velocity = M.VelocityValue(velocity);
+				velocityPerAbsPitch[absPitch] = velocity;
+			}
+			return velocityPerAbsPitch;
+		}
+
+		/// <summary>
+		/// Returns a new VelocityPerAbsolutePitch list containing 12 velocity values in range [1..127].
+		/// If power greater than 0, weakens the higher velocities less than the lower velocities.
+		/// If power less than 0, strengthens the lower velocities more than the higher velocities.
+		/// If power equals 0, leaves the velocities unchanged.
+		/// </summary>
+		/// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [1..127] in order of absolute pitch</param>
+		/// <param name="power">In range [-1..1]. (1 gives maximum emphasis to high velocities.)</param>
+		public static List<byte> SetVelocityPerAbsolutePitchGradient(IReadOnlyList<byte> velocityPerAbsolutePitch, double power)
+		{
+			AssertVelocityPerAbsolutePitchValidity(velocityPerAbsolutePitch);
+			Debug.Assert(power >= -1 && power <= 1);
+
+			List<byte> rval = new List<byte>();
+			for(int i = 0; i < velocityPerAbsolutePitch.Count; i++)
+			{
+				byte velocity = velocityPerAbsolutePitch[i];
+				double factor = Math.Pow(((double)velocity / 127), power);
+				byte newVelocity = (byte)Math.Round(velocity * factor);
+				newVelocity = M.VelocityValue(newVelocity);
+				rval.Add(newVelocity);
 			}
 
-			Console.WriteLine(value: $"commonCount={commonAbsPitchesPerOctave.Count}, otherThisCount={otherAbsPitchesPerOctaveInThisMode.Count}, otherMode2Count={otherAbsPitchesPerOctaveInMode2.Count}.");
+			AssertVelocityPerAbsolutePitchValidity(rval);
 
-			return (commonAbsPitchesPerOctave, otherAbsPitchesPerOctaveInThisMode, otherAbsPitchesPerOctaveInMode2);
+			return rval;
+		}
+
+		/// <summary>
+		/// Returns a new VelocityPerAbsolutePitch list containing 12 velocity values in range [1..127].
+		/// Spreads the current range of the velocityPerAbsolutePitch list over the range [minVelocity..maxVelocity].
+		/// If the all the values in the input list	are the same, they are changed to the value of maxVelocity.
+		/// </summary>
+		public static List<byte> SetVelocityPerAbsolutePitchRange(IReadOnlyList<byte> velocityPerAbsolutePitch, byte minVelocity, byte maxVelocity)
+		{
+			AssertVelocityPerAbsolutePitchValidity(velocityPerAbsolutePitch);
+			Debug.Assert(minVelocity <= maxVelocity);
+
+			List<byte> rval = new List<byte>();
+			byte minVel = byte.MaxValue;
+			byte maxVel = byte.MinValue;
+			foreach(byte value in velocityPerAbsolutePitch)
+			{
+				minVel = (minVel < value) ? minVel : value;
+				maxVel = (maxVel > value) ? maxVel : value;
+			}
+			if(maxVel == minVel)
+			{
+				for(int i = 0; i < velocityPerAbsolutePitch.Count; i++)
+				{
+					rval.Add(maxVelocity);
+				} 
+			}
+			double factor = ((double)maxVelocity - minVelocity) / (maxVel - minVel);
+			for(int i = 0; i < velocityPerAbsolutePitch.Count; i++)
+			{
+				byte newVelocity = (byte)Math.Round(minVelocity + ((velocityPerAbsolutePitch[i] - minVel) * factor));
+				newVelocity = M.VelocityValue(newVelocity);
+				rval.Add(newVelocity);
+			}
+			AssertVelocityPerAbsolutePitchValidity(rval);
+			return rval;
 		}
 
 		public override string ToString()
@@ -574,7 +443,8 @@ namespace Moritz.Spec
         public readonly int RelativePitchHierarchyIndex;
         public readonly int BasePitch;
         public readonly int NPitchesPerOctave;
-        public int MaxGamutPitch
+
+		public int MaxGamutPitch
 		{
 			get
 			{
@@ -653,6 +523,37 @@ namespace Moritz.Spec
 			}
 		}
 
+        private List<int> _gamut = null;
+
+		#endregion public properties
+
+		#region private helper functions
+		/// <summary>
+		/// A pitchHierarchy.Count must be 12.
+		/// Each value must be in range [0..11] and occur only once (no duplicates).
+		/// </summary>
+		private void AssertAbsolutePitchHierarchyValidity()
+		{
+			Debug.Assert(AbsolutePitchHierarchy.Count == 12);
+			List<bool> presence = new List<bool>();
+			for(int i = 0; i < 12; ++i)
+			{
+				presence.Add(false);
+			}
+
+			foreach(int value in AbsolutePitchHierarchy)
+			{
+				Debug.Assert(value >= 0 && value <= 11);
+				Debug.Assert(presence[value] == false);
+				presence[value] = true;
+			}
+
+			for(int i = 0; i < 12; ++i)
+			{
+				Debug.Assert(presence[i] == true);
+			}
+		}
+
 		/// <summary>
 		/// Throws an exception if _gamut is invalid for any of the following reasons:
 		/// 1. _gamut is null or empty.
@@ -692,10 +593,7 @@ namespace Moritz.Spec
 			Debug.Assert(_gamut.Count == pitchCount, $"Unknown pitch in {nameof(_gamut)}.");
 			#endregion check pitch consistency
 		}
-
-        private List<int> _gamut = null;
-
-		#endregion public properties
+		#endregion private helper functions
 
 		#region Pitch Hierarchies
 		/// <summary>

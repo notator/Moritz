@@ -516,19 +516,13 @@ namespace Moritz.Spec
 
         #region SetVelocityPerAbsolutePitch
         /// <summary>
-        /// Argument 1 (velocityPerAbsolutePitch) contains a list of 12 velocity values (range [1..127] in order of absolute pitch.
-        /// Argument 2 (minimumVelocity) is the used to raise the values in (a copy of) argument 1: minimumVelocity is the value
-        /// used wherever there is a smaller value in argument 1. The other values are raised proportionally.
-        /// Argument 3 (optional) determines the proportion of the final velocity determined by this function.
-        /// The other component is the existing velocity. If percent is 100.0, the existing velocity is replaced completely.
+        /// The velocityPerAbsolutePitch argument contains a list of 12 velocity values (range [1..127] in order of absolute pitch.
         /// For example: If the MidiChordDef contains one or more C#s, they will be given velocity velocityPerAbsolutePitch[1].
         /// Middle-C is midi pitch 60 (60 % 12 == absolute pitch 0), middle-C# is midi pitch 61 (61 % 12 == absolute pitch 1), etc.
         /// This function applies equally to all the BasicMidiChordDefs in this MidiChordDef. 
         /// </summary>
         /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [1..127] in order of absolute pitch</param>
-        /// <param name="minimumVelocity">In range 1..127</param>
-        /// <param name="percent">In range 0..100. The proportion of the final velocity value that comes from this function.</param>
-        public void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch, byte minimumVelocity, double percent = 100.0)
+        public void SetVelocityPerAbsolutePitch(IReadOnlyList<byte> velocityPerAbsolutePitch)
         {
             #region conditions
             Debug.Assert(velocityPerAbsolutePitch.Count == 12);
@@ -537,35 +531,12 @@ namespace Moritz.Spec
                 int v = velocityPerAbsolutePitch[i];
                 AssertIsVelocityValue(v);
             }
-            AssertIsVelocityValue(minimumVelocity);
-            Debug.Assert(percent >= 0 && percent <= 100);
             Debug.Assert(this.NotatedMidiPitches.Count == NotatedMidiVelocities.Count);
             #endregion conditions
 
-            List<byte> localVelocityPerAbsolutePitch = new List<byte>(velocityPerAbsolutePitch);
-            if(minimumVelocity > 1)
-            {
-                #region reset localVelocityPerAbsolutePitch
-                double tan = ((double)127 - minimumVelocity) / 127;
-                for(int i = 0; i < localVelocityPerAbsolutePitch.Count; ++i)
-                {
-                    byte value = localVelocityPerAbsolutePitch[i];
-                    if(value < minimumVelocity)
-                    {
-                        value = minimumVelocity;
-                    }
-                    else
-                    {
-                        value = VelocityValue((int)Math.Round((minimumVelocity + (value * tan))));                      
-                    }                   
-                    localVelocityPerAbsolutePitch[i] = value;
-                }
-                #endregion reset localVelocityPerAbsolutePitch
-            }
-
             foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
             {
-                bmcd.SetVelocityPerAbsolutePitch(localVelocityPerAbsolutePitch, percent);
+                bmcd.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
             }
             CheckAllBasicMidiChordDefVelocities();
             SetNotatedValuesFromFirstBMCD();
@@ -856,30 +827,49 @@ namespace Moritz.Spec
             Debug.Assert(pitches.Count == velocities.Count);
         }
 
-        /// <summary>
-        /// Multiplies the velocities in NotatedMidiVelocities, and all BasicMidiChordDef.Velocities by the argument factor.
-        /// The resulting velocities are in range 1..127.
-        /// If a resulting velocity would have been less than 1, it is silently coerced to 1.
-        /// If it would have been greater than 127, it is silently coerced to 127.
-        /// </summary>
-        /// <param name="factor">greater than 0</param>
-        public void AdjustVelocities(double factor)
+		/// <summary>
+		/// Multiplies the velocities in NotatedMidiVelocities, and all BasicMidiChordDef.Velocities by the argument factor.
+		/// The resulting velocities are in range 1..127.
+		/// If a resulting velocity would have been less than 1, it is silently coerced to 1.
+		/// If it would have been greater than 127, it is silently coerced to 127.
+		/// </summary>
+		/// <param name="factor">greater than 0</param>
+		public void AdjustVelocities(double factor)
 		{
-            Debug.Assert(factor > 0.0);
+			Debug.Assert(factor > 0.0);
 			foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
 			{
-                bmcd.AdjustVelocities(factor);
-            }
-            CheckAllBasicMidiChordDefVelocities();
-            SetNotatedValuesFromFirstBMCD();
-        }
+				bmcd.AdjustVelocities(factor);
+			}
+			CheckAllBasicMidiChordDefVelocities();
+			SetNotatedValuesFromFirstBMCD();
+		}
 
-        /// <summary>
-        /// Truncates the number of notes in all BasicMidiChordDefs by removing the upper notes as necessary.
-        /// If the original number of notes in a BasicMidiChordDef is less than newDensity, that bmcd is not changed.
-        /// </summary>
-        /// <param name="newDensity">Must be greater than 0</param>
-        public void SetVerticalDensity(int newDensity)
+		/// <summary>
+		/// Velocities having originalVelocity are changed to newVelocity.
+		/// Velocity values above originalVelocity are changed proportionally with max possible velocity at 127.
+		/// Velocity values below originalVelocity are changed proportionally with min possible velocity at 1.
+		/// </summary>
+		/// <param name="factor">greater than 0</param>
+		public void AdjustVelocities(byte originalVelocity, byte newVelocity)
+		{
+			AssertIsVelocityValue(originalVelocity);
+			AssertIsVelocityValue(newVelocity);
+
+			foreach(BasicMidiChordDef bmcd in BasicMidiChordDefs)
+			{
+				bmcd.AdjustVelocities(originalVelocity, newVelocity);
+			}
+			CheckAllBasicMidiChordDefVelocities();
+			SetNotatedValuesFromFirstBMCD();
+		}
+
+		/// <summary>
+		/// Truncates the number of notes in all BasicMidiChordDefs by removing the upper notes as necessary.
+		/// If the original number of notes in a BasicMidiChordDef is less than newDensity, that bmcd is not changed.
+		/// </summary>
+		/// <param name="newDensity">Must be greater than 0</param>
+		public void SetVerticalDensity(int newDensity)
 		{
             Debug.Assert(newDensity > 0);
 

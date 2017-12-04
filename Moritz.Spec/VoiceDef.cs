@@ -183,7 +183,7 @@ namespace Moritz.Spec
         /// Uses all the MsDuration attributes, and _msPosition as origin.
         /// This function must be called at the end of any function that changes the _uniqueDefs list.
         /// </summary>
-        protected void SetMsPositionsReFirstUD()
+        public void SetMsPositionsReFirstUD()
         {
             if(_uniqueDefs.Count > 0)
             {
@@ -268,61 +268,61 @@ namespace Moritz.Spec
             return nNonMidiChordDefs;
         }
 
-        #region Envelopes
-        /// <summary>
-        /// See Envelope.TimeWarp() for a description of the arguments.
-        /// </summary>
-        /// <param name="envelope"></param>
-        /// <param name="distortion"></param>
-        public void TimeWarp(Envelope envelope, double distortion)
-        {
-            #region requirements
-            Debug.Assert(distortion >= 1);
-            Debug.Assert(_uniqueDefs.Count > 0);
-            #endregion
+		#region Envelopes
+		/// <summary>
+		/// See Envelope.TimeWarp() for a description of the arguments.
+		/// </summary>
+		/// <param name="envelope"></param>
+		/// <param name="distortion"></param>
+		public void TimeWarp(Envelope envelope, double distortion)
+		{
+			#region requirements
+			Debug.Assert(distortion >= 1);
+			Debug.Assert(_uniqueDefs.Count > 0);
+			#endregion
 
-            int originalMsDuration = MsDuration;
+			int originalMsDuration = MsDuration;
 
-            #region 1. create a List of ints containing the msPositions of the DurationDefs plus the end msPosition of the final DurationDef.
-            List<DurationDef> durationDefs = new List<DurationDef>();
-            List<int> originalPositions = new List<int>();
-            int msPos = 0;
-            foreach(IUniqueDef iud in UniqueDefs)
-            {
-                if(iud is DurationDef dd)
-                {
-                    durationDefs.Add(dd);
-                    originalPositions.Add(msPos);
-                    msPos += dd.MsDuration;
-                }
-            }
-            originalPositions.Add(msPos); // end position of duration to warp.
-            #endregion
-            List<int> newPositions = envelope.TimeWarp(originalPositions, distortion);
+			#region 1. create a List of ints containing the msPositions of the DurationDefs plus the end msPosition of the final DurationDef.
+			List<DurationDef> durationDefs = new List<DurationDef>();
+			List<int> originalPositions = new List<int>();
+			int msPos = 0;
+			foreach(IUniqueDef iud in UniqueDefs)
+			{
+				if(iud is DurationDef dd)
+				{
+					durationDefs.Add(dd);
+					originalPositions.Add(msPos);
+					msPos += dd.MsDuration;
+				}
+			}
+			originalPositions.Add(msPos); // end position of duration to warp.
+			#endregion
+			List<int> newPositions = envelope.TimeWarp(originalPositions, distortion);
 
-            for(int i = 0; i < durationDefs.Count; ++i)
-            {
-                DurationDef dd = durationDefs[i];
-                dd.MsDuration = newPositions[i + 1] - newPositions[i];
-            }
+			for(int i = 0; i < durationDefs.Count; ++i)
+			{
+				DurationDef dd = durationDefs[i];
+				dd.MsDuration = newPositions[i + 1] - newPositions[i];
+			}
 
-            SetMsPositionsReFirstUD();
+			SetMsPositionsReFirstUD();
 
-            AssertConsistency();
-        }
-        #endregion Envelopes
+			AssertConsistency();
+		}
+		#endregion Envelopes
 
-        #region Transpose
-        /// <summary>
-        /// Transpose all the IUniqueChordDefs from beginIndex to (excluding) endIndex
-        /// up by the number of semitones given in the interval argument.
-        /// IUniqueChordDefs are MidiChordDef, InputChordDef and CautionaryChordDef.
-        /// Negative interval values transpose down.
-        /// It is not an error if Midi pitch values would exceed the range 0..127.
-        /// In this case, they are silently coerced to 0 or 127 respectively.
-        /// </summary>
-        /// <param name="interval"></param>
-        public void Transpose(int beginIndex, int endIndex, int interval)
+		#region Transpose
+		/// <summary>
+		/// Transpose all the IUniqueChordDefs from beginIndex to (excluding) endIndex
+		/// up by the number of semitones given in the interval argument.
+		/// IUniqueChordDefs are MidiChordDef, InputChordDef and CautionaryChordDef.
+		/// Negative interval values transpose down.
+		/// It is not an error if Midi pitch values would exceed the range 0..127.
+		/// In this case, they are silently coerced to 0 or 127 respectively.
+		/// </summary>
+		/// <param name="interval"></param>
+		public void Transpose(int beginIndex, int endIndex, int interval)
         {
 			if(CheckIndices(beginIndex, endIndex))
 			{

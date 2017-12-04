@@ -82,6 +82,8 @@ namespace Moritz.Algorithm.Tombeau1
 				msPositionReContainer += modeSegment.MsDuration;
 			}
 
+			List<Envelope> warpEnvelopes = GetModeSegmentWarpEnvelopes(modeSegments);
+
 			for(int i = 0; i < modeSegments.Count; ++i)
 			{
 				ModeSegment modeSegment = modeSegments[i];
@@ -91,11 +93,56 @@ namespace Moritz.Algorithm.Tombeau1
 					modeSegment.Reverse();
 				}
 
-				modeSegments[i] = Compose(modeSegment);
+				AdjustModeGrpTrks(modeSegment);
+
+				modeSegment.TimeWarpIUDs(warpEnvelopes[i], distortion: (i / 2) + 1.1);
 
 				SetModeSegmentMsPositionsReContainer(modeSegments);
 			} 
 			return modeSegments;
+		}
+
+		private List<Envelope> GetModeSegmentWarpEnvelopes(List<ModeSegment> modeSegments)
+		{
+			List<List<byte>> byteLists = new List<List<byte>>()
+			{
+				new List<byte>() { 4, 7, 4 },
+				new List<byte>() { 4, 7, 4 },
+
+				new List<byte>() { 4, 7, 4 },
+				new List<byte>() { 4, 7, 4 },
+
+				new List<byte>() { 3, 7, 3 },
+				new List<byte>() { 3, 7, 3 },
+
+				new List<byte>() { 3, 7, 3 },
+				new List<byte>() { 3, 7, 4 },
+
+				new List<byte>() { 4, 3, 7, 3 },
+				new List<byte>() { 4, 7, 4, 3 },
+
+				new List<byte>() { 4, 7, 4, 7 },
+				new List<byte>() { 7, 4, 7, 4 },
+
+				new List<byte>() { 3, 4, 7, 4 },
+				new List<byte>() { 4, 7, 4, 3 },
+
+				new List<byte>() { 4, 5, 7, 3 },
+				new List<byte>() { 3, 7, 5, 4 },
+
+				new List<byte>() { 3, 6, 4, 5, 7 },
+				new List<byte>() { 7, 5, 4, 6, 3 },
+
+				new List<byte>() { 4, 7, 4 },
+				new List<byte>() { 4, 7 }
+			};
+			Debug.Assert(byteLists.Count == modeSegments.Count);
+			var rval = new List<Envelope>();
+			for(int i = 0; i < modeSegments.Count; i++)
+			{
+				rval.Add(new Envelope(byteLists[i], 7, 127, modeSegments[i].IUDCount));
+			}
+			return rval;
 		}
 
 		private void SetModeSegmentMsPositionsReContainer(List<ModeSegment> modeSegments)
@@ -167,8 +214,12 @@ namespace Moritz.Algorithm.Tombeau1
 			{
 				int nPitchesPerOctave = nChords;
 				Mode mode = new Mode(relativePitchHierarchyIndex, basePitch, nPitchesPerOctave);
-
 				ModeGrpTrk ModeGrpTrk = new ModeGrpTrk(this.MidiChannel, msPositionReContainer, new List<IUniqueDef>(), mode, rootOctave);
+
+				var velocityPerAbsolutePitch = mode.GetDefaultVelocityPerAbsolutePitch();
+				velocityPerAbsolutePitch = Mode.SetVelocityPerAbsolutePitchGradient(velocityPerAbsolutePitch, 1);
+				velocityPerAbsolutePitch = Mode.SetVelocityPerAbsolutePitchRange(velocityPerAbsolutePitch, 20, 127);
+				ModeGrpTrk.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
 
 				int pitchesPerChord = 5;
 				int totalMsDuration = nChords * 200;
@@ -243,12 +294,13 @@ namespace Moritz.Algorithm.Tombeau1
 			return tempTrk.UniqueDefs;
 		}
 
-		protected ModeSegment Compose(ModeSegment modeSegment)
+		protected void AdjustModeGrpTrks(ModeSegment modeSegment)
 		{
-			for(int index = 0; index < modeSegment.Count; ++index)
+			IReadOnlyList<ModeGrpTrk> modeGrpTrks = modeSegment.ModeGrpTrks;
+			for(int index = 0; index < modeGrpTrks.Count; ++index)
 			{
-				ModeGrpTrk ModeGrpTrk = modeSegment[index];
-
+				ModeGrpTrk ModeGrpTrk = modeGrpTrks[index];
+																								   
 				MidiChordDef lastMcd = ModeGrpTrk.LastMidiChordDef;
 				MidiChordDef firstMcd = ModeGrpTrk.FirstMidiChordDef;
 
@@ -263,7 +315,12 @@ namespace Moritz.Algorithm.Tombeau1
 					}
 				}
 
-				var velocityPerAbsolutePitch = RootMode.GetVelocityPerAbsolutePitch();
+				//var velocityPerAbsolutePitch = RootMode.GetVelocityPerAbsolutePitch();
+
+				Mode mode = ModeGrpTrk.Mode;
+				var velocityPerAbsolutePitch = mode.GetDefaultVelocityPerAbsolutePitch();
+				velocityPerAbsolutePitch = Mode.SetVelocityPerAbsolutePitchGradient(velocityPerAbsolutePitch, 1);
+				velocityPerAbsolutePitch = Mode.SetVelocityPerAbsolutePitchRange(velocityPerAbsolutePitch, 20, 127);
 				ModeGrpTrk.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
 
 				double minHairpin = 0.5;
@@ -324,10 +381,10 @@ namespace Moritz.Algorithm.Tombeau1
 				#endregion
 
 				#region begin test code 6, timeWarp
-				//if(ModeGrpTrk.Count > 1)
-				//{
-				//	ModeGrpTrk.TimeWarp(new Envelope(new List<byte>() { 4, 7, 2 }, 7, 7, ModeGrpTrk.Count), 20);
-				//}
+				if(ModeGrpTrk.Count > 1)
+				{
+					ModeGrpTrk.TimeWarp(new Envelope(new List<byte>() { 4, 7, 2 }, 7, 7, ModeGrpTrk.Count), distortion: 4);
+				}
 				#endregion
 
 				#region begin test code 7, SetPitchWheelSliders
@@ -381,7 +438,6 @@ namespace Moritz.Algorithm.Tombeau1
 				#endregion
 
 			}
-			return modeSegment;
 		}
 
 		internal void AdjustForTwoVoices()

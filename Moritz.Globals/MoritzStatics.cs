@@ -646,7 +646,25 @@ namespace Moritz.Globals
             return (byte)rval;
         }
 
-        public static Color TextBoxErrorColor = Color.FromArgb(255, 220, 220);
+		/// <summary>
+		/// Returns the argument as a byte coerced to the range 1..127.
+		/// </summary>
+		public static byte VelocityValue(int velocity)
+		{
+			velocity = (velocity >= 1) ? velocity : 1;
+			velocity = (velocity <= 127) ? velocity : 127;
+			return (byte)velocity;
+		}
+
+		/// <summary>
+		/// A Debug.Assert that fails if the argument is outside the range 1..127.
+		/// </summary>
+		public static void AssertIsVelocityValue(int velocity)
+		{
+			Debug.Assert(velocity >= 1 && velocity <= 127);
+		}
+
+		public static Color TextBoxErrorColor = Color.FromArgb(255, 220, 220);
         public static Color GreenButtonColor = Color.FromArgb(215, 225, 215);
         public static Color LightGreenButtonColor = Color.FromArgb(205, 240, 205);
 

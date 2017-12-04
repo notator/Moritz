@@ -40,8 +40,7 @@ namespace Moritz.Algorithm.Tombeau1
 			_mode = mode; // _mode is checked by AssertModeGrpTrkConsistency() below.
 			RootOctave = rootOctave; // RootOctave is checked by AssertModeGrpTrkConsistency() below.
 
-			var velocityPerAbsolutePitch = mode.GetVelocityPerAbsolutePitch();
-
+			var velocityPerAbsolutePitch = mode.GetDefaultVelocityPerAbsolutePitch();
 			base.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
 
 			if(iudList.Count > 0)
