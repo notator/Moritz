@@ -87,15 +87,25 @@ namespace Moritz.Algorithm.Tombeau1
 			for(int i = 0; i < modeSegments.Count; ++i)
 			{
 				ModeSegment modeSegment = modeSegments[i];
+				Envelope envelope = warpEnvelopes[i];
+
+				int oShortestMsDuration = modeSegment.ShortestIUDMsDuration;
 
 				if(i % 2 == 1)
 				{
 					modeSegment.Reverse();
 				}
 
-				AdjustModeGrpTrks(modeSegment);
+				AdjustModeGrpTrks(modeSegment, envelope);
 
-				modeSegment.TimeWarpIUDs(warpEnvelopes[i], distortion: (i / 2) + 1.1);
+				modeSegment.TimeWarpIUDs(envelope, distortion: (i / 2) + 1.2);
+
+				int newShortestMsDuration = modeSegment.ShortestIUDMsDuration;
+
+				double factor = ((double)oShortestMsDuration) / newShortestMsDuration;
+				Debug.WriteLine($"factor={factor}");
+
+				modeSegment.MsDuration =  (int)(modeSegment.MsDuration * factor);
 
 				SetModeSegmentMsPositionsReContainer(modeSegments);
 			} 
@@ -106,41 +116,41 @@ namespace Moritz.Algorithm.Tombeau1
 		{
 			List<List<byte>> byteLists = new List<List<byte>>()
 			{
-				new List<byte>() { 4, 7, 4 },
-				new List<byte>() { 4, 7, 4 },
+				new List<byte>() { 73, 127, 73 },
+				new List<byte>() { 73, 127, 73 },
 
-				new List<byte>() { 4, 7, 4 },
-				new List<byte>() { 4, 7, 4 },
+				new List<byte>() { 73, 127, 73 },
+				new List<byte>() { 73, 127, 73 },
 
-				new List<byte>() { 3, 7, 3 },
-				new List<byte>() { 3, 7, 3 },
+				new List<byte>() { 54, 127, 54 },
+				new List<byte>() { 54, 127, 54 },
 
-				new List<byte>() { 3, 7, 3 },
-				new List<byte>() { 3, 7, 4 },
+				new List<byte>() { 54, 127, 54 },
+				new List<byte>() { 54, 127, 73 },
 
-				new List<byte>() { 4, 3, 7, 3 },
-				new List<byte>() { 4, 7, 4, 3 },
+				new List<byte>() { 73, 54, 127, 54 },
+				new List<byte>() { 73, 127, 73, 54 },
 
-				new List<byte>() { 4, 7, 4, 7 },
-				new List<byte>() { 7, 4, 7, 4 },
+				new List<byte>() { 73, 127, 73, 127 },
+				new List<byte>() { 127, 73, 127, 73 },
 
-				new List<byte>() { 3, 4, 7, 4 },
-				new List<byte>() { 4, 7, 4, 3 },
+				new List<byte>() { 54, 73, 127, 73 },
+				new List<byte>() { 73, 127, 73, 54 },
 
-				new List<byte>() { 4, 5, 7, 3 },
-				new List<byte>() { 3, 7, 5, 4 },
+				new List<byte>() { 73, 91, 127, 54 },
+				new List<byte>() { 54, 127, 91, 73 },
 
-				new List<byte>() { 3, 6, 4, 5, 7 },
-				new List<byte>() { 7, 5, 4, 6, 3 },
+				new List<byte>() { 54, 109, 73, 91, 127 },
+				new List<byte>() { 127, 91, 73, 109, 54 },
 
-				new List<byte>() { 4, 7, 4 },
-				new List<byte>() { 4, 7 }
+				new List<byte>() { 73, 127, 73 },
+				new List<byte>() { 73, 127 }
 			};
 			Debug.Assert(byteLists.Count == modeSegments.Count);
 			var rval = new List<Envelope>();
 			for(int i = 0; i < modeSegments.Count; i++)
 			{
-				rval.Add(new Envelope(byteLists[i], 7, 127, modeSegments[i].IUDCount));
+				rval.Add(new Envelope(byteLists[i], 127, 127, modeSegments[i].IUDCount));
 			}
 			return rval;
 		}
@@ -294,7 +304,7 @@ namespace Moritz.Algorithm.Tombeau1
 			return tempTrk.UniqueDefs;
 		}
 
-		protected void AdjustModeGrpTrks(ModeSegment modeSegment)
+		protected void AdjustModeGrpTrks(ModeSegment modeSegment, Envelope envelope)
 		{
 			IReadOnlyList<ModeGrpTrk> modeGrpTrks = modeSegment.ModeGrpTrks;
 			for(int index = 0; index < modeGrpTrks.Count; ++index)
@@ -319,7 +329,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 				Mode mode = ModeGrpTrk.Mode;
 				var velocityPerAbsolutePitch = mode.GetDefaultVelocityPerAbsolutePitch();
-				velocityPerAbsolutePitch = Mode.SetVelocityPerAbsolutePitchGradient(velocityPerAbsolutePitch, 1);
+				//velocityPerAbsolutePitch = Mode.SetVelocityPerAbsolutePitchGradient(velocityPerAbsolutePitch, 1);
 				velocityPerAbsolutePitch = Mode.SetVelocityPerAbsolutePitchRange(velocityPerAbsolutePitch, 20, 127);
 				ModeGrpTrk.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
 

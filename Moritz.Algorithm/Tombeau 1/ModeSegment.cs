@@ -86,7 +86,7 @@ namespace Moritz.Algorithm.Tombeau1
 		/// <param name="distortion"></param>
 		internal void TimeWarpIUDs(Envelope envelope, double distortion)
 		{
-			Trk tempAllIUDsTrk = TempAllIUDsTrk;
+			Trk tempAllIUDsTrk = this.ToTrk();
 			int trkDuration = tempAllIUDsTrk.MsDuration;
 
 			envelope.SetCount(tempAllIUDsTrk.Count);
@@ -130,7 +130,7 @@ namespace Moritz.Algorithm.Tombeau1
 			}
 		}
 
-		private Trk TempAllIUDsTrk
+		private List<IUniqueDef> AllIUDs
 		{
 			get
 			{
@@ -139,13 +139,26 @@ namespace Moritz.Algorithm.Tombeau1
 				{
 					allIUDs.AddRange(mgt.UniqueDefs);
 				}
-				Trk allIUDsTrk = new Trk(this.MidiChannel, 0, allIUDs);
-				return allIUDsTrk;
+				return allIUDs;
+			}
+		}
+
+		public int ShortestIUDMsDuration
+		{
+			get
+			{
+				List<IUniqueDef> allIUDs = AllIUDs;
+				int shortestMsDuration = int.MaxValue;
+				foreach(IUniqueDef iud in allIUDs)
+				{
+					shortestMsDuration = (shortestMsDuration < iud.MsDuration) ? shortestMsDuration : iud.MsDuration; 
+				}
+				return shortestMsDuration;
 			}
 		}
 
 		/// <summary>
-		/// Returns a single Trk containing all the IUniqueDefs in the GamtTrks.
+		/// Returns a single Trk containing all the IUniqueDefs in the _modeGrpTrks.
 		/// </summary>
 		internal Trk ToTrk()
 		{

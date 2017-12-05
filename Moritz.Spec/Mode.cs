@@ -308,9 +308,7 @@ namespace Moritz.Spec
 			foreach(byte velocity in velocityPerAbsolutePitch)
 			{
 				M.AssertIsVelocityValue(velocity);
-				Console.Write($"{velocity}, ");
 			}
-			Console.WriteLine();
 		}
 
 		/// <summary>
