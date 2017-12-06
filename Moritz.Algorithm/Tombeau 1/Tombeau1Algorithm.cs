@@ -349,14 +349,14 @@ namespace Moritz.Algorithm.Tombeau1
             ***************************************************************************/
 			#endregion Block functions
 
-			Envelope envelope = _krystals[0].ToEnvelope(1, 127);
+			Envelope mainEnvelope = _krystals[0].ToEnvelope(1, 127); // 1..127 is convenient for Velocities
 
 			/**********************************************/
 
 			Seq mainSeq = new Seq(0, new List<Trk>(), MidiChannelIndexPerOutputVoice);
 			CompositionType compositionType = CompositionType.onlyVoice1;
 			
-			Voice1 voice1 = new Voice1(MidiChannelIndexPerOutputVoice[3]);
+			Voice1 voice1 = new Voice1(MidiChannelIndexPerOutputVoice[3], mainEnvelope);
 			Voice2 voice2 = null;
 			Voice3 voice3 = null;
 			Voice4 voice4 = null;

@@ -40,7 +40,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 	internal class Voice1 : Tombeau1Voice
     {
-		public Voice1(int midiChannel)
+		public Voice1(int midiChannel, Envelope mainEnvelope)
 			: base(midiChannel)
 		{
 			int relativePitchHierarchyIndex = 0;
@@ -49,10 +49,10 @@ namespace Moritz.Algorithm.Tombeau1
 
 			RootMode = new Mode(relativePitchHierarchyIndex, basePitch, nPitchesPerOctave);
 
-			_modeSegments = GetModeSegments(20);
+			_modeSegments = GetModeSegments(20, mainEnvelope);
 		 }
 
-		private List<ModeSegment> GetModeSegments(int nModeSegments)
+		private List<ModeSegment> GetModeSegments(int nModeSegments, Envelope mainEnvelope)
 		{
 			List<ModeProximity> modeProximities = RootMode.GetModeProximities();
 			List<int> modeIndices = GetModeIndices(nModeSegments, modeProximities);
@@ -69,8 +69,17 @@ namespace Moritz.Algorithm.Tombeau1
 				{
 					modeSegment.Reverse();
 				}
+				modeSegments.Add(modeSegment);
 
-				Envelope envelope = GetModeSegmentEnvelope(i);
+				SetModeSegmentMsPositionsReContainer(modeSegments);
+			}
+
+			List<Envelope> envelopes = GetEnvelopePerModeSegment(modeSegments, mainEnvelope);
+
+			for(int i = 0; i < nModeSegments; i++)
+			{
+				ModeSegment modeSegment = modeSegments[i];
+				Envelope envelope = envelopes[i];
 
 				AdjustPitches(modeSegment, envelope);
 
@@ -78,11 +87,31 @@ namespace Moritz.Algorithm.Tombeau1
 
 				AdjustVelocities(modeSegment, envelope);
 
-				modeSegments.Add(modeSegment);
-
 				SetModeSegmentMsPositionsReContainer(modeSegments);
 			}
+
 			return modeSegments;
+		}
+
+		private List<Envelope> GetEnvelopePerModeSegment(List<ModeSegment> modeSegments, Envelope mainEnvelope)
+		{
+			int nAllIUDs = 0;
+			foreach(ModeSegment modeSegment in modeSegments)
+			{
+				nAllIUDs += modeSegment.IUDCount;
+			}
+			List<Envelope> envelopes = new List<Envelope>();
+			mainEnvelope.SetCount(nAllIUDs);
+			int startIndex = 0;
+			for(int i = 0; i < modeSegments.Count; i++)
+			{
+				int nValuesToCopy = modeSegments[1].IUDCount;
+				List<int> values = mainEnvelope.Original.GetRange(startIndex, nValuesToCopy);
+				startIndex += nValuesToCopy;
+				Envelope env = new Envelope(values, mainEnvelope.Domain, mainEnvelope.Domain, values.Count);
+				envelopes.Add(env);
+			}
+			return envelopes;
 		}
 
 		private static void AdjustDurations(ModeSegment modeSegment, Envelope envelope, double timeWarpDistortion)
@@ -110,46 +139,6 @@ namespace Moritz.Algorithm.Tombeau1
 			}
 			modeIndices[nModeSegments - 1] = maxIndex; // correct any rounding error.
 			return modeIndices;
-		}
-
-		private Envelope GetModeSegmentEnvelope(int modeSegmentIndex)
-		{
-			List<List<byte>> byteLists = new List<List<byte>>()
-			{
-				new List<byte>() { 73, 127, 73 },
-				new List<byte>() { 73, 127, 73 },
-
-				new List<byte>() { 73, 127, 73 },
-				new List<byte>() { 73, 127, 73 },
-
-				new List<byte>() { 54, 127, 54 },
-				new List<byte>() { 54, 127, 54 },
-
-				new List<byte>() { 54, 127, 54 },
-				new List<byte>() { 54, 127, 73 },
-
-				new List<byte>() { 73, 54, 127, 54 },
-				new List<byte>() { 73, 127, 73, 54 },
-
-				new List<byte>() { 73, 127, 73, 127 },
-				new List<byte>() { 127, 73, 127, 73 },
-
-				new List<byte>() { 54, 73, 127, 73 },
-				new List<byte>() { 73, 127, 73, 54 },
-
-				new List<byte>() { 73, 91, 127, 54 },
-				new List<byte>() { 54, 127, 91, 73 },
-
-				new List<byte>() { 54, 109, 73, 91, 127 },
-				new List<byte>() { 127, 91, 73, 109, 54 },
-
-				new List<byte>() { 73, 127, 73 },
-				new List<byte>() { 73, 127 }
-			};
-			int dummyCount = 20;
-			Debug.Assert(byteLists.Count > modeSegmentIndex);
-			Envelope envelope = new Envelope(byteLists[modeSegmentIndex], 127, 127, dummyCount);
-			return envelope;
 		}
 
 		private void SetModeSegmentMsPositionsReContainer(List<ModeSegment> modeSegments)
