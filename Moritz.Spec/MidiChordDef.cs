@@ -1,18 +1,18 @@
 using System;
-using System.Diagnostics;
 using System.Collections.Generic;
-
+using System.Diagnostics;
+using System.Linq;
+using Krystals4ObjectLibrary;
 using Moritz.Globals;
 using Moritz.Xml;
-using System.Linq;
 
 namespace Moritz.Spec
 {
-    ///<summary>
-    /// A MidiChordDef can either be saved and retrieved from voices in an SVG file, or
-    /// retrieved from a palette (whereby the pallete makes a deep clone of its contained values).
-    ///</summary>
-    public class MidiChordDef : DurationDef, IUniqueSplittableChordDef
+	///<summary>
+	/// A MidiChordDef can either be saved and retrieved from voices in an SVG file, or
+	/// retrieved from a palette (whereby the pallete makes a deep clone of its contained values).
+	///</summary>
+	public class MidiChordDef : DurationDef, IUniqueSplittableChordDef
     {
         #region constructors
         /// <summary>
@@ -429,7 +429,7 @@ namespace Moritz.Spec
         public void SetOrnament(Mode mode, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
         {
             int nPitchesPerOctave = mode.NPitchesPerOctave;
-            Envelope ornamentEnvelope = new Envelope(ornamentShape, 127, nPitchesPerOctave, nOrnamentChords);
+			Envelope ornamentEnvelope = new Envelope(new List<byte>(ornamentShape), 127, nPitchesPerOctave, nOrnamentChords);
             SetOrnament(mode, ornamentEnvelope);
         }
 

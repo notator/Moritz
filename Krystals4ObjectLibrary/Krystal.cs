@@ -1,21 +1,21 @@
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
-using System.Text;
 using System.Diagnostics;
-using System.Xml;
 using System.IO;
+using System.Text;
+using System.Windows.Forms;
+using System.Xml;
 
 namespace Krystals4ObjectLibrary
 {
-    #region helper classes
-    /// <summary>
-    /// The struct returned by the Enumerable property Krystal.LeveledValues.
-    /// Each value in the krystal is returned with its level.
-    /// The first value in each strand has the strand's level.
-    /// All other values have a level equal to the krystal's level + 1.
-    /// </summary>
-    public struct LeveledValue
+	#region helper classes
+	/// <summary>
+	/// The struct returned by the Enumerable property Krystal.LeveledValues.
+	/// Each value in the krystal is returned with its level.
+	/// The first value in each strand has the strand's level.
+	/// All other values have a level equal to the krystal's level + 1.
+	/// </summary>
+	public struct LeveledValue
     {
         public int level;
         public int value;
@@ -229,14 +229,42 @@ namespace Krystals4ObjectLibrary
             }
             return isPermutableAtLevel;
         }
-        #endregion public functions
-        #region protected functions
-        /// <summary>
-        /// Finds an identical, already saved krystal
-        /// </summary>
-        /// <param name="nameIntro">one of "ck", "lk", "mk", "xk", "sk"</param>
-        /// <returns></returns>
-        protected string GetNameOfEquivalentSavedKrystal(string nameIntro)
+
+		/// <summary>
+		/// Returns the flat krystal values, spread over the range [minEnvValue..maxEnvValue],
+		/// as an Envelope.
+		/// </summary>
+		/// <param name="minEnvValue"></param>
+		/// <param name="maxEnvValue"></param>
+		/// <returns></returns>
+		public Envelope ToEnvelope(int minEnvValue, int maxEnvValue)
+		{
+			List<int> substituteValues = new List<int>();
+			double incr = ((double)(maxEnvValue - minEnvValue)) / (MaxValue - MinValue);
+			for(int i = (int)MinValue; i < (MaxValue + 1); i++)
+			{
+				substituteValues.Add((int) Math.Round(minEnvValue + (incr * (i - 1))));
+			}
+
+			List<int> kValues = GetValues(1)[0];
+
+			for(int i = 0; i < kValues.Count; i++)
+			{
+				kValues[i] = substituteValues[kValues[i] - 1];
+			}
+
+			Envelope envelope = new Envelope(kValues, maxEnvValue, maxEnvValue, kValues.Count);
+
+			return envelope;
+		}
+		#endregion public functions
+		#region protected functions
+		/// <summary>
+		/// Finds an identical, already saved krystal
+		/// </summary>
+		/// <param name="nameIntro">one of "ck", "lk", "mk", "xk", "sk"</param>
+		/// <returns></returns>
+		protected string GetNameOfEquivalentSavedKrystal(string nameIntro)
         {
             Debug.Assert(_name == "" || _name == K.UntitledKrystalName);
             string newName = "";

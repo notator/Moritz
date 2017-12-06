@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 
 using Krystals4ObjectLibrary;
-
-using Moritz.Globals;
 using Moritz.Palettes;
 using Moritz.Spec;
 
@@ -352,6 +349,8 @@ namespace Moritz.Algorithm.Tombeau1
             ***************************************************************************/
 			#endregion Block functions
 
+			Envelope envelope = _krystals[0].ToEnvelope(1, 127);
+
 			/**********************************************/
 
 			Seq mainSeq = new Seq(0, new List<Trk>(), MidiChannelIndexPerOutputVoice);
@@ -423,6 +422,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 			return bars;
         }
+
 
 		#region available Trk and ModeGrpTrk transformations
 		// Add();

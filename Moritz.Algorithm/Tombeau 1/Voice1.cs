@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Krystals4ObjectLibrary;
 using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1

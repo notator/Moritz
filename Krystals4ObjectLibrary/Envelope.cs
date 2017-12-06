@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
-using System.Diagnostics;
-
-namespace Moritz.Spec
+namespace Krystals4ObjectLibrary
 {
-    public class Envelope
+	public class Envelope
 	{
         #region constructors
         /// <summary> 
@@ -22,7 +21,7 @@ namespace Moritz.Spec
         /// <param name="inputDomain">Greater than or equal to 0</param>
         /// <param name="domain">Greater than or equal to 0</param>
         /// <param name="count">Greater than 0</param>
-        public Envelope(IReadOnlyList<byte> inputValues, int inputDomain, int domain, int count)
+        public Envelope(List<byte> inputValues, int inputDomain, int domain, int count)
         {
             #region conditions
             List<int> inputBytesAsInts = new List<int>();
