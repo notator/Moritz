@@ -50,7 +50,22 @@ namespace Moritz.Algorithm.Tombeau1
 			RootMode = new Mode(relativePitchHierarchyIndex, basePitch, nPitchesPerOctave);
 
 			_modeSegments = GetModeSegments(20, mainEnvelope);
+
+			GlobalAdjustments();
 		 }
+
+		private void GlobalAdjustments()
+		{
+			foreach(ModeSegment modeSegment in _modeSegments)
+			{
+				foreach(ModeGrpTrk modeGrpTrk in modeSegment.ModeGrpTrks)
+				{
+					/// raise the velocities globally in the whole piece
+					modeGrpTrk.AdjustVelocities(0, modeGrpTrk.Count, 20, 55);
+				}
+			}
+
+		}
 
 		private List<ModeSegment> GetModeSegments(int nModeSegments, Envelope mainEnvelope)
 		{

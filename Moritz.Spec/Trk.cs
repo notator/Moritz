@@ -611,34 +611,54 @@ namespace Moritz.Spec
                 mcd.AdjustExpression(factor);
             }
         }
-        /// <summary>
-        /// Multiplies each velocity value in the MidiChordDefs from beginIndex to (exclusive) endIndex by
-        /// the argument factor (which must be greater than zero).
-        /// N.B MidiChordDefs will be turned into RestDefs if all their notes are given zero velocity!
-        /// </summary>
-        public virtual void AdjustVelocities(int beginIndex, int endIndex, double factor)
+		/// <summary>
+		/// Multiplies each velocity value in the MidiChordDefs from beginIndex to (exclusive) endIndex by
+		/// the argument factor (which must be greater than zero).
+		/// The resulting velocities are in range 1..127.
+		/// If a resulting velocity would have been less than 1, it is silently coerced to 1.
+		/// If it would have been greater than 127, it is silently coerced to 127.
+		/// </summary>
+		public virtual void AdjustVelocities(int beginIndex, int nonInclusiveEndIndex, double factor)
         {
-			if(CheckIndices(beginIndex, endIndex))
+			if(CheckIndices(beginIndex, nonInclusiveEndIndex))
 			{
 				Debug.Assert(factor > 0.0);
-				for(int i = beginIndex; i < endIndex; ++i)
+				for(int i = beginIndex; i < nonInclusiveEndIndex; ++i)
 				{
 					if(_uniqueDefs[i] is MidiChordDef mcd)
 					{
 						mcd.AdjustVelocities(factor);
-						if(mcd.NotatedMidiPitches.Count == 0)
-						{
-							Replace(i, new MidiRestDef(mcd.MsPositionReFirstUD, mcd.MsDuration));
-						}
 					}
 				}
 			}
         }
-        /// <summary>
-        /// Multiplies each velocity value in the MidiChordDefs by the argument factor (must be greater than zero).
-        /// N.B MidiChordDefs will be turned into RestDefs if all their notes have zero velocity!
-        /// </summary>
-        public virtual void AdjustVelocities(double factor)
+
+		/// <summary>
+		/// Calls MidiChordDef.AdjustVelocities(byte originalVelocity, byte newVelocity) on each MidiChordDef
+		/// in range beginIndex to (exclusive) endIndex.
+		/// The resulting velocities are in range 1..127.
+		/// Velocities having originalVelocity are changed to newVelocity.
+		/// Velocity values above originalVelocity are changed proportionally with max possible velocity at 127.
+		/// Velocity values below originalVelocity are changed proportionally with min possible velocity at 1.
+		/// </summary>
+		public void AdjustVelocities(int beginIndex, int nonInclusiveEndIndex, byte originalVelocity, byte newVelocity)
+		{
+			if(CheckIndices(beginIndex, nonInclusiveEndIndex))
+			{
+				for(int i = beginIndex; i < nonInclusiveEndIndex; ++i)
+				{
+					if(_uniqueDefs[i] is MidiChordDef mcd)
+					{
+						mcd.AdjustVelocities(originalVelocity, newVelocity);
+					}
+				}
+			}
+		}
+		/// <summary>
+		/// Multiplies each velocity value in the MidiChordDefs by the argument factor (must be greater than zero).
+		/// N.B MidiChordDefs will be turned into RestDefs if all their notes have zero velocity!
+		/// </summary>
+		public virtual void AdjustVelocities(double factor)
         {
             Debug.Assert(factor > 0.0);
             for(int i = 0; i < UniqueDefs.Count; ++i)

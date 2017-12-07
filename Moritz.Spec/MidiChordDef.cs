@@ -561,14 +561,6 @@ namespace Moritz.Spec
         private void SetNotatedValuesFromFirstBMCD()
         {
             BasicMidiChordDef firstBMC = BasicMidiChordDefs[0];
-
-            //_notatedMidiPitches.Clear();
-            //_notatedMidiVelocities.Clear();
-            //if(firstBMC != null)
-            //{
-            //    _notatedMidiPitches.AddRange(firstBMC.Pitches);
-            //    _notatedMidiVelocities.AddRange(firstBMC.Velocities);
-            //}
             _notatedMidiPitches = firstBMC.Pitches;
             _notatedMidiVelocities = firstBMC.Velocities;
         }
