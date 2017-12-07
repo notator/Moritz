@@ -56,7 +56,31 @@ namespace Moritz.Algorithm.Tombeau1
 		{
 			List<ModeProximity> modeProximities = RootMode.GetModeProximities();
 			List<int> modeIndices = GetModeIndices(nModeSegments, modeProximities);
+			List<ModeSegment> modeSegments = GetGasicModeSegments(nModeSegments, modeProximities, modeIndices);
 
+			List<Envelope> envelopesPerModeSegmentIUDs = GetEnvelopePerModeSegmentIUDs(modeSegments, mainEnvelope);
+			List<Envelope> envelopesPerModeSegmentModeGrpTrks = GetEnvelopePerModeSegmentModeGrpTrks(modeSegments, mainEnvelope);
+
+			for(int i = 0; i < nModeSegments; i++)
+			{
+				ModeSegment modeSegment = modeSegments[i];
+				Envelope iudsEnvelope = envelopesPerModeSegmentIUDs[i];
+				Envelope modeGrpTrksEnvelope = envelopesPerModeSegmentModeGrpTrks[i];
+
+				AdjustPitches(modeSegment, modeGrpTrksEnvelope);
+
+				AdjustDurations(modeSegment, iudsEnvelope, timeWarpDistortion: ((double)i / 1.5) + 5);
+
+				AdjustVelocities(modeSegment, iudsEnvelope);
+
+				SetModeSegmentMsPositionsReContainer(modeSegments);
+			}
+
+			return modeSegments;
+		}
+
+		private List<ModeSegment> GetGasicModeSegments(int nModeSegments, List<ModeProximity> modeProximities, List<int> modeIndices)
+		{
 			int rootOctave = 2;
 			List<ModeSegment> modeSegments = new List<ModeSegment>();
 
@@ -74,26 +98,22 @@ namespace Moritz.Algorithm.Tombeau1
 				SetModeSegmentMsPositionsReContainer(modeSegments);
 			}
 
-			List<Envelope> envelopes = GetEnvelopePerModeSegment(modeSegments, mainEnvelope);
+			#region remove last ModeGrpTrk in last modeSegment
+			ModeSegment lastModeSegment = modeSegments[modeSegments.Count - 1];
+			int midiChannel = lastModeSegment.ModeGrpTrks[0].MidiChannel;
+			int msPos = lastModeSegment.MsPositionReContainer;
+			List<ModeGrpTrk> lastModeGrpTrks = new List<ModeGrpTrk>(lastModeSegment.ModeGrpTrks);
+			lastModeGrpTrks.RemoveAt(lastModeGrpTrks.Count - 1);
+			ModeSegment newLastModeSegment = new ModeSegment(midiChannel, msPos, lastModeGrpTrks);
 
-			for(int i = 0; i < nModeSegments; i++)
-			{
-				ModeSegment modeSegment = modeSegments[i];
-				Envelope envelope = envelopes[i];
-
-				AdjustPitches(modeSegment, envelope);
-
-				AdjustDurations(modeSegment, envelope, timeWarpDistortion: ((double)i / 1.5) + 5);
-
-				AdjustVelocities(modeSegment, envelope);
-
-				SetModeSegmentMsPositionsReContainer(modeSegments);
-			}
+			modeSegments.Remove(lastModeSegment);
+			modeSegments.Add(newLastModeSegment);
+			#endregion
 
 			return modeSegments;
 		}
 
-		private List<Envelope> GetEnvelopePerModeSegment(List<ModeSegment> modeSegments, Envelope mainEnvelope)
+		private List<Envelope> GetEnvelopePerModeSegmentIUDs(List<ModeSegment> modeSegments, Envelope mainEnvelope)
 		{
 			int nAllIUDs = 0;
 			foreach(ModeSegment modeSegment in modeSegments)
@@ -101,28 +121,65 @@ namespace Moritz.Algorithm.Tombeau1
 				nAllIUDs += modeSegment.IUDCount;
 			}
 			List<Envelope> envelopes = new List<Envelope>();
-			mainEnvelope.SetCount(nAllIUDs);
+			Envelope mainEnvelopeClone = mainEnvelope.Clone();
+			mainEnvelopeClone.SetCount(nAllIUDs);
 			int startIndex = 0;
 			for(int i = 0; i < modeSegments.Count; i++)
 			{
-				int nValuesToCopy = modeSegments[1].IUDCount;
-				List<int> values = mainEnvelope.Original.GetRange(startIndex, nValuesToCopy);
+				int nValuesToCopy = modeSegments[i].IUDCount;
+				List<int> values = mainEnvelopeClone.Original.GetRange(startIndex, nValuesToCopy);
 				startIndex += nValuesToCopy;
-				Envelope env = new Envelope(values, mainEnvelope.Domain, mainEnvelope.Domain, values.Count);
+				Envelope env = new Envelope(values, mainEnvelopeClone.Domain, mainEnvelopeClone.Domain, values.Count);
 				envelopes.Add(env);
 			}
 			return envelopes;
 		}
 
+		private List<Envelope> GetEnvelopePerModeSegmentModeGrpTrks(List<ModeSegment> modeSegments, Envelope mainEnvelope)
+		{
+			int nAllModeGrpTrks = 0;
+			foreach(ModeSegment modeSegment in modeSegments)
+			{
+				nAllModeGrpTrks += modeSegment.ModeGrpTrks.Count;
+			}
+			List<Envelope> envelopes = new List<Envelope>();
+			Envelope allModeGrpTrksEnvelope = new Envelope(mainEnvelope.Original, mainEnvelope.Domain, 11, nAllModeGrpTrks);
+			List<int> allValues = GetSubstitution(allModeGrpTrksEnvelope.Original);
+			int startIndex = 0;
+			for(int i = 0; i < modeSegments.Count; i++)
+			{
+				int nValuesToCopy = modeSegments[i].ModeGrpTrks.Count;
+				List<int> values = allValues.GetRange(startIndex, nValuesToCopy);
+				startIndex += nValuesToCopy;
+				Envelope env = new Envelope(values, allModeGrpTrksEnvelope.Domain, 11, values.Count);
+				envelopes.Add(env);
+			}
+			return envelopes;
+		}
+
+		private List<int> GetSubstitution(List<int> original)
+		{
+			var rval = new List<int>();
+			List<int> from = new List<int>() { 6, 7, 5, 8, 4, 9, 3, 10, 2, 11, 1, 0 };
+			List<int> to = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+			foreach(int val in original)
+			{
+				int index = from.IndexOf(val);
+				rval.Add(to[index]);
+			}
+
+			return rval;
+		}
+
 		private static void AdjustDurations(ModeSegment modeSegment, Envelope envelope, double timeWarpDistortion)
 		{
-			int oShortestMsDuration = modeSegment.ShortestIUDMsDuration;
+			int originalShortestMsDuration = modeSegment.ShortestIUDMsDuration;
 
 			modeSegment.TimeWarpIUDs(envelope, timeWarpDistortion);
 
 			int newShortestMsDuration = modeSegment.ShortestIUDMsDuration;
 
-			double factor = ((double)oShortestMsDuration) / newShortestMsDuration;
+			double factor = ((double)originalShortestMsDuration) / newShortestMsDuration;
 			Debug.WriteLine($"factor={factor}");
 
 			modeSegment.MsDuration = (int)(modeSegment.MsDuration * factor);
@@ -285,28 +342,53 @@ namespace Moritz.Algorithm.Tombeau1
 			return tempTrk.UniqueDefs;
 		}
 
-		protected void AdjustPitches(ModeSegment modeSegment, Envelope envelope)
+		protected void AdjustPitches(ModeSegment modeSegment, Envelope modeGrpTrksEnvelope)
 		{
 			IReadOnlyList<ModeGrpTrk> modeGrpTrks = modeSegment.ModeGrpTrks;
+			Debug.Assert(modeGrpTrks.Count == modeGrpTrksEnvelope.Original.Count);
+			var absPitchHierarchy = modeGrpTrks[0].Mode.AbsolutePitchHierarchy;
+			var absPitchList = modeGrpTrksEnvelope.Original;
+
 			for(int index = 0; index < modeGrpTrks.Count; ++index)
 			{
-				ModeGrpTrk ModeGrpTrk = modeGrpTrks[index];
+				ModeGrpTrk modeGrpTrk = modeGrpTrks[index];
+				int nPitchesPerOctave = modeGrpTrk.Mode.NPitchesPerOctave;
+				int absPitchIndex = (int) Math.Floor((double)absPitchList[index] * nPitchesPerOctave / 12);
+				Debug.Assert(absPitchIndex < nPitchesPerOctave);
 
-				MidiChordDef lastMcd = ModeGrpTrk.LastMidiChordDef;
-				MidiChordDef firstMcd = ModeGrpTrk.FirstMidiChordDef;
+				MidiChordDef lastMcd = modeGrpTrk.LastMidiChordDef;
+				MidiChordDef firstMcd = modeGrpTrk.FirstMidiChordDef;
+
+				byte toPitch = (byte) absPitchHierarchy[absPitchIndex];
+				#region check toPitch
+				bool found = false;
+				foreach(int val in modeGrpTrk.Mode.Gamut)
+				{
+					if(toPitch == val || (toPitch + 12) == val)
+					{
+						found = true;
+						break;	
+					}
+				}
+				Debug.Assert(found);
+				#endregion
+
 				if(firstMcd != lastMcd)
 				{
-					ModeGrpTrk.Shear(0, -1 * (ModeGrpTrk.Mode.NPitchesPerOctave));
+					modeGrpTrk.Shear(0, -1 * (modeGrpTrk.Mode.NPitchesPerOctave));
 
-					while(lastMcd.NotatedMidiPitches[0] % 12 != (firstMcd.NotatedMidiPitches[0] % 12))
+					while(lastMcd.NotatedMidiPitches[0] % 12 != toPitch)
 					{
-						ModeGrpTrk.Shear(0, -1);
+						Debug.Assert(lastMcd.NotatedMidiPitches[0] > toPitch);
+
+						Debug.WriteLine($"apIndex={absPitchIndex}, p={lastMcd.NotatedMidiPitches[0]}, pMod12={lastMcd.NotatedMidiPitches[0] % 12}, to={toPitch}");
+						modeGrpTrk.Shear(0, -1);
 					}
 				}
 
 				if(index % 2 != 0)
 				{
-					ModeGrpTrk.Permute(1, 7);
+					modeGrpTrk.Permute(1, 7);
 				}
 
 				#region test code
@@ -402,32 +484,33 @@ namespace Moritz.Algorithm.Tombeau1
 		protected void AdjustVelocities(ModeSegment modeSegment, Envelope envelope)
 		{
 			IReadOnlyList<ModeGrpTrk> modeGrpTrks = modeSegment.ModeGrpTrks;
+			double minHairpin = 0.5;
+			double maxHairpin = 1.3;
+			ModeGrpTrk modeGrpTrk = null;
 			for(int index = 0; index < modeGrpTrks.Count; ++index)
 			{
-				ModeGrpTrk ModeGrpTrk = modeGrpTrks[index];
-				Mode mode = ModeGrpTrk.Mode;
+				modeGrpTrk = modeGrpTrks[index];
+				Mode mode = modeGrpTrk.Mode;
 				var velocityPerAbsolutePitch = mode.GetDefaultVelocityPerAbsolutePitch();
 				//velocityPerAbsolutePitch = Mode.SetVelocityPerAbsolutePitchGradient(velocityPerAbsolutePitch, 1);
 				velocityPerAbsolutePitch = Mode.SetVelocityPerAbsolutePitchRange(velocityPerAbsolutePitch, 20, 127);
-				ModeGrpTrk.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
+				modeGrpTrk.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
 
-				double minHairpin = 0.5;
-				double maxHairpin = 1.3;
 				int indexMax;
-				if(ModeGrpTrk.Count > 1)
+				if(modeGrpTrk.Count > 1)
 				{
 					if(index % 2 != 0)
 					{
-						indexMax = ModeGrpTrk.Count / 3;
+						indexMax = modeGrpTrk.Count / 3;
 					}
 					else
 					{
-						indexMax = (ModeGrpTrk.Count * 2) / 3;
+						indexMax = (modeGrpTrk.Count * 2) / 3;
 					}
-					if(indexMax > 0 && indexMax < ModeGrpTrk.Count)
+					if(indexMax > 0 && indexMax < modeGrpTrk.Count)
 					{
-						ModeGrpTrk.AdjustVelocitiesHairpin(0, indexMax, minHairpin, maxHairpin);
-						ModeGrpTrk.AdjustVelocitiesHairpin(indexMax, ModeGrpTrk.Count, maxHairpin, minHairpin);
+						modeGrpTrk.AdjustVelocitiesHairpin(0, indexMax, minHairpin, maxHairpin);
+						modeGrpTrk.AdjustVelocitiesHairpin(indexMax, modeGrpTrk.Count, maxHairpin, minHairpin);
 					}
 				}
 
