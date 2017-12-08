@@ -40,7 +40,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 	internal class Voice1 : Tombeau1Voice
     {
-		public Voice1(int midiChannel, Envelope mainEnvelope)
+		public Voice1(int midiChannel, Envelope centredEnvelope, Envelope basedEnvelope)
 			: base(midiChannel)
 		{
 			int relativePitchHierarchyIndex = 0;
@@ -49,9 +49,9 @@ namespace Moritz.Algorithm.Tombeau1
 
 			RootMode = new Mode(relativePitchHierarchyIndex, basePitch, nPitchesPerOctave);
 
-			_modeSegments = GetModeSegments(20, mainEnvelope);
+			_modeSegments = GetModeSegments(20, centredEnvelope, basedEnvelope);
 
-			GlobalAdjustments();
+			//GlobalAdjustments();
 		 }
 
 		private void GlobalAdjustments()
@@ -67,26 +67,26 @@ namespace Moritz.Algorithm.Tombeau1
 
 		}
 
-		private List<ModeSegment> GetModeSegments(int nModeSegments, Envelope mainEnvelope)
+		private List<ModeSegment> GetModeSegments(int nModeSegments, Envelope centredEnvelope, Envelope basedEnvelope)
 		{
 			List<ModeProximity> modeProximities = RootMode.GetModeProximities();
 			List<int> modeIndices = GetModeIndices(nModeSegments, modeProximities);
-			List<ModeSegment> modeSegments = GetGasicModeSegments(nModeSegments, modeProximities, modeIndices);
+			List<ModeSegment> modeSegments = GetBasicModeSegments(nModeSegments, modeProximities, modeIndices);
 
-			List<Envelope> envelopesPerModeSegmentIUDs = GetEnvelopePerModeSegmentIUDs(modeSegments, mainEnvelope);
-			List<Envelope> envelopesPerModeSegmentModeGrpTrks = GetEnvelopePerModeSegmentModeGrpTrks(modeSegments, mainEnvelope);
+			List<Envelope> velocityPerIUDEnvelopePerModeSegment = GetVelocityPerIUDEnvelopesPerModeSegment(modeSegments, centredEnvelope);
+			List<Envelope> absPitchPerModeGrpTrkEnvelopePerModeSegment = GetAbsPitchPerModeGrpTrkEnvelopesPerModeSegment(modeSegments, basedEnvelope);
 
 			for(int i = 0; i < nModeSegments; i++)
 			{
 				ModeSegment modeSegment = modeSegments[i];
-				Envelope iudsEnvelope = envelopesPerModeSegmentIUDs[i];
-				Envelope modeGrpTrksEnvelope = envelopesPerModeSegmentModeGrpTrks[i];
+				Envelope velocityPerIUDEnvelope = velocityPerIUDEnvelopePerModeSegment[i];
+				Envelope absPitchPerModeGrpTrkEnvelope = absPitchPerModeGrpTrkEnvelopePerModeSegment[i];
 
-				AdjustPitches(modeSegment, modeGrpTrksEnvelope);
+				AdjustPitches(modeSegment, absPitchPerModeGrpTrkEnvelope);
 
-				AdjustDurations(modeSegment, iudsEnvelope, timeWarpDistortion: ((double)i / 1.5) + 5);
+				AdjustDurations(modeSegment, velocityPerIUDEnvelope, timeWarpDistortion: ((double)i / 1.5) + 5);
 
-				AdjustVelocities(modeSegment, iudsEnvelope);
+				AdjustVelocities(modeSegment, velocityPerIUDEnvelope);
 
 				SetModeSegmentMsPositionsReContainer(modeSegments);
 			}
@@ -94,7 +94,7 @@ namespace Moritz.Algorithm.Tombeau1
 			return modeSegments;
 		}
 
-		private List<ModeSegment> GetGasicModeSegments(int nModeSegments, List<ModeProximity> modeProximities, List<int> modeIndices)
+		private List<ModeSegment> GetBasicModeSegments(int nModeSegments, List<ModeProximity> modeProximities, List<int> modeIndices)
 		{
 			int rootOctave = 2;
 			List<ModeSegment> modeSegments = new List<ModeSegment>();
@@ -128,29 +128,57 @@ namespace Moritz.Algorithm.Tombeau1
 			return modeSegments;
 		}
 
-		private List<Envelope> GetEnvelopePerModeSegmentIUDs(List<ModeSegment> modeSegments, Envelope mainEnvelope)
+		/// <summary>
+		/// The returned envelopes have range [1..127]
+		/// </summary>
+		private List<Envelope> GetVelocityPerIUDEnvelopesPerModeSegment(List<ModeSegment> modeSegments, Envelope centredEnvelope)
 		{
 			int nAllIUDs = 0;
 			foreach(ModeSegment modeSegment in modeSegments)
 			{
 				nAllIUDs += modeSegment.IUDCount;
 			}
+
 			List<Envelope> envelopes = new List<Envelope>();
-			Envelope mainEnvelopeClone = mainEnvelope.Clone();
-			mainEnvelopeClone.SetCount(nAllIUDs);
+			int domain = centredEnvelope.Domain;
+			Envelope envelopeClone = centredEnvelope.Clone();
+			envelopeClone.SetCount(nAllIUDs);
+			Debug.Assert(domain > 0); // 0 --> 1 below.
+			List<int> allValues = envelopeClone.Original;
+			for(int i = 0; i < allValues.Count; i++)
+			{
+				int val = allValues[i];
+				allValues[i] = (val == 0) ? 1 : val;
+			}
+
 			int startIndex = 0;
 			for(int i = 0; i < modeSegments.Count; i++)
 			{
 				int nValuesToCopy = modeSegments[i].IUDCount;
-				List<int> values = mainEnvelopeClone.Original.GetRange(startIndex, nValuesToCopy);
+				List<int> values = allValues.GetRange(startIndex, nValuesToCopy);
 				startIndex += nValuesToCopy;
-				Envelope env = new Envelope(values, mainEnvelopeClone.Domain, mainEnvelopeClone.Domain, values.Count);
+				Envelope env = new Envelope(values, domain, domain, values.Count);
 				envelopes.Add(env);
 			}
+
+			#region check range
+			foreach(Envelope envelope in envelopes)
+			{
+				foreach(int val in envelope.Original)
+				{
+					Debug.Assert(val >= 1 && val <= 127);
+				}
+			}
+			#endregion
+
 			return envelopes;
 		}
 
-		private List<Envelope> GetEnvelopePerModeSegmentModeGrpTrks(List<ModeSegment> modeSegments, Envelope mainEnvelope)
+		/// <summary>
+		/// The returned envelopes have range [0..11]
+		/// </summary>
+		/// <returns></returns>
+		private List<Envelope> GetAbsPitchPerModeGrpTrkEnvelopesPerModeSegment(List<ModeSegment> modeSegments, Envelope basedEnvelope)
 		{
 			int nAllModeGrpTrks = 0;
 			foreach(ModeSegment modeSegment in modeSegments)
@@ -158,8 +186,8 @@ namespace Moritz.Algorithm.Tombeau1
 				nAllModeGrpTrks += modeSegment.ModeGrpTrks.Count;
 			}
 			List<Envelope> envelopes = new List<Envelope>();
-			Envelope allModeGrpTrksEnvelope = new Envelope(mainEnvelope.Original, mainEnvelope.Domain, 11, nAllModeGrpTrks);
-			List<int> allValues = GetSubstitution(allModeGrpTrksEnvelope.Original);
+			Envelope allModeGrpTrksEnvelope = new Envelope(basedEnvelope.Original, basedEnvelope.Domain, 11, nAllModeGrpTrks);
+			List<int> allValues = allModeGrpTrksEnvelope.Original;
 			int startIndex = 0;
 			for(int i = 0; i < modeSegments.Count; i++)
 			{
@@ -169,21 +197,18 @@ namespace Moritz.Algorithm.Tombeau1
 				Envelope env = new Envelope(values, allModeGrpTrksEnvelope.Domain, 11, values.Count);
 				envelopes.Add(env);
 			}
-			return envelopes;
-		}
 
-		private List<int> GetSubstitution(List<int> original)
-		{
-			var rval = new List<int>();
-			List<int> from = new List<int>() { 6, 7, 5, 8, 4, 9, 3, 10, 2, 11, 1, 0 };
-			List<int> to = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
-			foreach(int val in original)
+			#region check range
+			foreach(Envelope envelope in envelopes)
 			{
-				int index = from.IndexOf(val);
-				rval.Add(to[index]);
+				foreach(int val in envelope.Original)
+				{
+					Debug.Assert(val >= 0 && val <= 11);
+				}
 			}
+			#endregion
 
-			return rval;
+			return envelopes;
 		}
 
 		private static void AdjustDurations(ModeSegment modeSegment, Envelope envelope, double timeWarpDistortion)

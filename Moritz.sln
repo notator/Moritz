@@ -46,13 +46,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AssistantPerformerTestSite"
 		..\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\assistantPerformer.html = ..\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\assistantPerformer.html
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{2E53FEDE-7EAA-4F9D-970E-F4F0CEF038B7}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\Tombeau1 images\xk3(7.7.16)-1.krys.png = ..\..\Tombeau1 images\xk3(7.7.16)-1.krys.png
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewFolder1", "NewFolder1", "{56A548F0-502D-472C-AC10-D5855B0132BB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -186,9 +179,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{56A548F0-502D-472C-AC10-D5855B0132BB} = {2E53FEDE-7EAA-4F9D-970E-F4F0CEF038B7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C578192E-FBF8-4374-AB9E-02138268D07F}
