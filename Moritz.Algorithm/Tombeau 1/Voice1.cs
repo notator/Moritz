@@ -382,12 +382,12 @@ namespace Moritz.Algorithm.Tombeau1
 			return tempTrk.UniqueDefs;
 		}
 
-		protected void AdjustPitches(ModeSegment modeSegment, Envelope modeGrpTrksEnvelope)
+		protected void AdjustPitches(ModeSegment modeSegment, Envelope absPitchPerModeGrpTrkEnvelope)
 		{
 			IReadOnlyList<ModeGrpTrk> modeGrpTrks = modeSegment.ModeGrpTrks;
-			Debug.Assert(modeGrpTrks.Count == modeGrpTrksEnvelope.Original.Count);
+			Debug.Assert(modeGrpTrks.Count == absPitchPerModeGrpTrkEnvelope.Original.Count);
 			var absPitchHierarchy = modeGrpTrks[0].Mode.AbsolutePitchHierarchy;
-			var absPitchList = modeGrpTrksEnvelope.Original;
+			var absPitchList = absPitchPerModeGrpTrkEnvelope.Original;
 
 			for(int index = 0; index < modeGrpTrks.Count; ++index)
 			{
