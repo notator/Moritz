@@ -80,15 +80,17 @@ namespace Moritz.Algorithm.Tombeau1
 		/// The TimeWarp is at the level of the IUniqueDefs (treated as a single sequence).
 		/// See Trk.TimeWarp(...).
 		/// </summary>
-		/// <param name="envelope"></param>
+		/// <param name="timeWarpPerIUDEnvelope"></param>
 		/// <param name="distortion"></param>
-		internal void TimeWarpIUDs(Envelope envelope, double distortion)
+		internal void TimeWarpIUDs(Envelope timeWarpPerIUDEnvelope, double distortion)
 		{
 			Trk tempAllIUDsTrk = this.ToTrk();
 			int trkDuration = tempAllIUDsTrk.MsDuration;
 
-			envelope.SetCount(tempAllIUDsTrk.Count);
-			tempAllIUDsTrk.TimeWarp(envelope, distortion);
+			Envelope timeWarpEnvClone = timeWarpPerIUDEnvelope.Clone();
+
+			timeWarpEnvClone.SetCount(tempAllIUDsTrk.Count);
+			tempAllIUDsTrk.TimeWarp(timeWarpEnvClone, distortion);
 
 			Debug.Assert(trkDuration == tempAllIUDsTrk.MsDuration);
 
