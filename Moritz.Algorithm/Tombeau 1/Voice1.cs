@@ -40,7 +40,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 	internal class Voice1 : Tombeau1Voice
     {
-		public Voice1(int midiChannel, Envelope centredEnvelope, Envelope basedEnvelope)
+		public Voice1(Tombeau1Algorithm.Tombeau1Type tombeau1Type, int midiChannel, Envelope centredEnvelope, Envelope basedEnvelope)
 			: base(midiChannel)
 		{
 			int relativePitchHierarchyIndex = 0;
@@ -49,9 +49,9 @@ namespace Moritz.Algorithm.Tombeau1
 
 			RootMode = new Mode(relativePitchHierarchyIndex, basePitch, nPitchesPerOctave);
 
-			_modeSegments = GetModeSegments(20, centredEnvelope, basedEnvelope);
+			_modeSegments = GetModeSegments(tombeau1Type, centredEnvelope, basedEnvelope);
 
-			//GlobalAdjustments();
+			GlobalAdjustments();
 		 }
 
 		private void GlobalAdjustments()
@@ -67,11 +67,13 @@ namespace Moritz.Algorithm.Tombeau1
 
 		}
 
-		private List<ModeSegment> GetModeSegments(int nModeSegments, Envelope centredEnvelope, Envelope basedEnvelope)
+		private List<ModeSegment> GetModeSegments(Tombeau1Algorithm.Tombeau1Type tombeau1Type, Envelope centredEnvelope, Envelope basedEnvelope)
 		{
+			int nModeSegments = tombeau1Type.NModeSegments;
 			List<ModeProximity> modeProximities = RootMode.GetModeProximities();
 			List<int> modeIndices = GetModeIndices(nModeSegments, modeProximities);
-			List<ModeSegment> modeSegments = GetBasicModeSegments(nModeSegments, modeProximities, modeIndices);
+
+			List<ModeSegment> modeSegments = GetBasicModeSegments(tombeau1Type, modeProximities, modeIndices);
 
   			List<Envelope> timeWarpPerIUDEnvelopePerModeSegment = GetTimeWarpPerIUDEnvelopesPerModeSegment(modeSegments, centredEnvelope);
 			List<Envelope> absPitchPerModeGrpTrkEnvelopePerModeSegment = GetAbsPitchPerModeGrpTrkEnvelopesPerModeSegment(modeSegments, basedEnvelope);
@@ -94,15 +96,18 @@ namespace Moritz.Algorithm.Tombeau1
 			return modeSegments;
 		}
 
-		private List<ModeSegment> GetBasicModeSegments(int nModeSegments, List<ModeProximity> modeProximities, List<int> modeIndices)
+		private List<ModeSegment> GetBasicModeSegments(Tombeau1Algorithm.Tombeau1Type tombeau1Type, List<ModeProximity> modeProximities, List<int> modeIndices)
 		{
+			int nModeSegments = tombeau1Type.NModeSegments;
+			int maxChordsPerModeGrpTrk = tombeau1Type.MaxChordsPerModeGrpTrk;
+			int nModeGrpTrksPerModeSegment = tombeau1Type.NModeGrpTrksPerModeSegment;
 			int rootOctave = 2;
 			List<ModeSegment> modeSegments = new List<ModeSegment>();
 
 			for(int i = 0; i < nModeSegments; i++)
 			{
 				Mode mode = FindBaseMode(modeProximities, RootMode.BasePitch, modeIndices[i]);
-				ModeSegment modeSegment = GetBasicModeSegment(rootOctave, mode.BasePitch, mode.RelativePitchHierarchyIndex);
+				ModeSegment modeSegment = GetBasicModeSegment(maxChordsPerModeGrpTrk, nModeGrpTrksPerModeSegment, rootOctave, mode.BasePitch, mode.RelativePitchHierarchyIndex);
 
 				if(i % 2 == 1)
 				{
@@ -295,16 +300,15 @@ namespace Moritz.Algorithm.Tombeau1
 		}
 
 		/// <summary>
-		/// The returned ModeSegment contains ModeGrpTrk objects that all have the same Mode.Mode.AbsolutePitchHierarchy.
+		/// The returned ModeSegment contains nModeGrpTrks ModeGrpTrk objects that all have the same Mode.Mode.AbsolutePitchHierarchy.
 		/// </summary>
-		private ModeSegment GetBasicModeSegment(int rootOctave, int basePitch, int relativePitchHierarchyIndex)
+		private ModeSegment GetBasicModeSegment(int maxChordsPerModeGrpTrk, int nModeGrpTrks, int rootOctave, int basePitch, int relativePitchHierarchyIndex)
 		{
-			const int maxChordsPerModeGrpTrk = 12;
-			const int minChordsPerModeGrpTrk = 3;
 			var ModeGrpTrks = new List<ModeGrpTrk>();
 			int msPositionReContainer = 0;
-			for(int nChords = maxChordsPerModeGrpTrk; nChords >= minChordsPerModeGrpTrk; --nChords)
+			for(int i = 0; i < nModeGrpTrks; i++)
 			{
+				int nChords = maxChordsPerModeGrpTrk - i;
 				int nPitchesPerOctave = nChords;
 				Mode mode = new Mode(relativePitchHierarchyIndex, basePitch, nPitchesPerOctave);
 				ModeGrpTrk ModeGrpTrk = new ModeGrpTrk(this.MidiChannel, msPositionReContainer, new List<IUniqueDef>(), mode, rootOctave);
