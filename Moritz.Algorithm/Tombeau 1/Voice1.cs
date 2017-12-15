@@ -651,7 +651,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 		internal void AdjustForTwoVoices()
 		{
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
 		}
 
 		internal void AdjustForThreeVoices()

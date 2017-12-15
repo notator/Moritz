@@ -369,8 +369,8 @@ namespace Moritz.Algorithm.Tombeau1
 
 			/**********************************************/
 
-			Seq mainSeq = new Seq(0, new List<Trk>(), MidiChannelIndexPerOutputVoice);
-			CompositionType compositionType = CompositionType.onlyVoice1;
+			     Seq mainSeq = new Seq(0, new List<Trk>(), MidiChannelIndexPerOutputVoice);
+			CompositionType compositionType = CompositionType.twoVoices;
 
 			// shortVersion1 (5' 55" @40% speed)
 			Tombeau1Type shortVersion1 = new Tombeau1Type(nModeSegments: 8, nModeGrpTrksPerModeSegment: 6, maxChordsPerModeGrpTrk: 10);
@@ -402,7 +402,7 @@ namespace Moritz.Algorithm.Tombeau1
 				case CompositionType.twoVoices:
 				{
 					voice1.AdjustForTwoVoices();
-					voice2 = new Voice2(MidiChannelIndexPerOutputVoice[2], voice1);
+					voice2 = new Voice2(MidiChannelIndexPerOutputVoice[2], voice1, centredEnvelope, basedEnvelope);
 					// The voice midiChannels determine the top-bottom order of the staves in the score.
 					voice2.AddToSeq(mainSeq);
 					voice1.AddToSeq(mainSeq);
