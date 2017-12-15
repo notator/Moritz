@@ -97,8 +97,8 @@ namespace Moritz.Spec
         /// </summary>
         public MidiChordDef(
             int msDuration, // the total duration (this should be the sum of the durations of the basicMidiChordDefs)
-            byte pitchWheelDeviation, // default is M.DefaultPitchWheelDeviation (=2)
-            bool hasChordOff, // default is M.DefaultHasChordOff (=true)
+            byte pitchWheelDeviation, // should be set to the default value: M.DEFAULT_PITCHWHEELDEVIATION_2 if unsure.
+			bool hasChordOff, // default is M.DefaultHasChordOff (=true)
             List<byte> rootMidiPitches, // the pitches defined in the root chord settings (displayed, by default, in the score).
             List<byte> rootMidiVelocities, // the velocities defined in the root chord settings (displayed, by default, in the score).
             int ornamentNumberSymbol, // is 0 when there is no ornament

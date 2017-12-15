@@ -1,17 +1,17 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
+using Krystals4ObjectLibrary;
+using Moritz.Globals;
 using Moritz.Spec;
 
 namespace Moritz.Algorithm.Tombeau1
 {
-    internal class Voice2 : Tombeau1Voice
+	internal class Voice2 : Tombeau1Voice
     {
-		public Voice2(int midiChannel, Voice1 voice1)
+		public Voice2(int midiChannel, Voice1 voice1, Envelope centredEnvelope, Envelope basedEnvelope)
 			: base(midiChannel)
         {
-			_modeSegments = Compose(voice1);
+			_modeSegments = Compose(voice1, centredEnvelope, basedEnvelope);
 		}
 
 		#region available Trk and ModeGrpTrk transformations
@@ -46,133 +46,10 @@ namespace Moritz.Algorithm.Tombeau1
 		// TransposeToRootInModeGamut();
 		#endregion available Trk and ModeGrpTrk transformations
 
-		#region old code
-		//    /// <summary>
-		//    /// Creates a list of TenorPaletteModeTrks, each of which has the same relativePitchHierarchyIndex.
-		//    /// </summary>
-		//    private List<ModeGrpTrk> GetTenorPaletteModeTrkList(int relativePitchHierarchyIndex)
-		//    {
-		//        const int modeBasePitch = 0;
-		//        List<ModeGrpTrk> ModeGrpTrks = new List<ModeGrpTrk>();
-
-		//        for(int i = 0, domain = 12; domain >= 1; --domain, ++i) // domain is both Mode.PitchesPerOctave and nChords per ModeGrpTrk
-		//        {
-		//            Mode mode = new Mode(relativePitchHierarchyIndex, modeBasePitch, domain);
-
-		//            PaletteModeTrk tpg = new PaletteModeTrk(mode, 3);
-		//int minMsDuration = 200;
-		//int maxMsDuration = 300;
-		//tpg.SetDurationsFromPitches(maxMsDuration, minMsDuration, true);
-
-		//#region begin test code 1 Shear and permute
-		//tpg.Shear(0, -1 * (mode.NPitchesPerOctave));
-		//            tpg.SetVelocityPerAbsolutePitch(mode);
-
-		//            if(domain % 2 != 0)
-		//            {
-		//                tpg.Permute(1, 7);
-		//            }
-		//#endregion end test code 1
-
-		//#region begin test code 2 transpose chords to the same absolute root pitch
-		////for(int iudIndex = 0; iudIndex < tpg.Count; ++iudIndex)
-		////{
-		////    tpg.TransposeChordDownToAbsolutePitch(iudIndex, 0);
-		////}
-		//#endregion end test code 2
-
-		//#region begin test code 3, adjust velocities
-		////if(domain % 2 != 0)
-		////{
-		////    tpg.AdjustVelocities(0.5);
-		////}
-		//#endregion
-
-		//#region begin test code 4, adjust velocities
-		////if(domain % 2 != 0 && tpg.Count > 1)
-		////{
-		////	tpg.AdjustVelocitiesHairpin(0, (tpg.Count - 1) / 2, 0.5, 1.0);
-		////	tpg.AdjustVelocitiesHairpin((tpg.Count - 1) / 2, tpg.Count - 1, 1.0, 0.5);
-		////}
-		//#endregion
-
-		//#region begin test code 5, related ModeGrpTrks
-		////if(domain % 2 != 0 && tpg.Count > 1)
-		////{
-		////    TenorPaletteModeTrk previousTpg = (TenorPaletteModeTrk)ModeGrpTrks[i - 1];
-		////    //tpg = previousTpg.RelatedPitchHierarchyModeTrk(previousTpg.Mode.RelativePitchHierarchyIndex + 11);
-		////    //tpg = previousTpg.RelatedBasePitchModeTrk(11);
-		////    tpg = previousTpg.RelatedDomainModeTrk(6);
-		////}
-		//#endregion
-
-		//#region begin test code 6, timeWarp
-		////if(domain % 2 != 0 && tpg.Count > 1)
-		////{
-		////    tpg.TimeWarp(new Envelope(new List<int>() { 4, 7, 2 }, 7, 7, tpg.Count), 20);
-		////}
-		//#endregion
-
-		//#region begin test code 7, SetPitchWheelSliders
-		////Envelope env = new Envelope(new List<int>() { 0,8 }, 8, 127, tpg.Count);
-		////tpg.SetPitchWheelSliders(env);
-		//#endregion
-
-		//#region begin test code 8, SetPanGliss
-		////if(tpg.Count > 1)
-		////{
-		////    if(domain % 2 != 0)
-		////    {
-		////        tpg.SetPanGliss(0, tpg.Count - 1, 127, 0);
-		////    }
-		////    else
-		////    {
-		////        tpg.SetPanGliss(0, tpg.Count - 1, 0, 127);
-		////    }
-		////}
-		//#endregion
-
-		//#region begin test code 8, set inverse velocities
-		////if(domain % 2 != 0 && tpg.Count > 1)
-		////{
-		////    TenorPaletteModeTrk prevTpg = (TenorPaletteModeTrk)ModeGrpTrks[i - 1];
-		////    Mode prevMode = prevTpg.Mode;
-		////    tpg = new TenorPaletteModeTrk(prevMode); // identical to prevTpg
-		////    // inverse velocityPerAbsolutePitch
-		////    List<byte> velocityPerAbsolutePitch = prevMode.GetVelocityPerAbsolutePitch(20, 127, prevMode.NPitchesPerOctave - 1);
-		////    tpg.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, 20);
-		////}
-		//#endregion
-
-		//#region begin test code 8, set Mode (pitches
-		////if(domain % 2 != 0 && tpg.Count > 1)
-		////{
-		////    TenorPaletteModeTrk prevTpg = (TenorPaletteModeTrk)ModeGrpTrks[i - 1];
-		////    Mode prevMode = prevTpg.Mode;
-		////    tpg = new TenorPaletteModeTrk(prevMode); // identical to prevTpg
-
-		////    int newRelativePitchHierarchyIndex = prevMode.RelativePitchHierarchyIndex + 11;
-		////    int newBasePitch = prevMode.BasePitch;
-		////    int newNPitchesPerOctave = 8;
-		////    Mode mode1 = new Mode(newRelativePitchHierarchyIndex, newBasePitch, newNPitchesPerOctave);
-		////    tpg.Mode = mode1; // sets the pitches, velocities are still those of the original pitches.
-
-		////    // reverse the velocityperAbsolutePitch hierarchy re the prevMode.
-		////    List<byte> velocityPerAbsolutePitch = prevMode.GetVelocityPerAbsolutePitch(20, 127, prevMode.NPitchesPerOctave - 1);
-		////    tpg.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch, 20);
-		////}
-		//#endregion
-
-		//ModeGrpTrks.Add(tpg);
-		//        }
-
-		//        return (ModeGrpTrks);
-		//    }
-		#endregion
-
-		private List<ModeSegment> Compose(Voice1 voice1)
+		private List<ModeSegment> Compose(Voice1 voice1, Envelope centredEnvelope, Envelope basedEnvelope)
 		{
-			throw new NotImplementedException();
+			List<ModeSegment> voice2ModeSegments = new List<ModeSegment>();
+			return voice2ModeSegments;
 		}
 
 		internal void AdjustForThreeVoices()
@@ -187,7 +64,8 @@ namespace Moritz.Algorithm.Tombeau1
 
 		public override List<int> BarlineMsPositions()
 		{
-			throw new NotImplementedException();
+			var voice2BarlinePositions = new List<int>();
+			return voice2BarlinePositions;
 		}
 	}
 }

@@ -3,15 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Moritz.Spec;
+using Krystals4ObjectLibrary;
 
 namespace Moritz.Algorithm.Tombeau1
 {
     internal class Voice4 : Tombeau1Voice
     {
-        public Voice4(int midiChannel, Voice1 voice1, Voice2 voice2, Voice3 voice3)
+        public Voice4(int midiChannel, Voice1 voice1, Voice2 voice2, Voice3 voice3, Envelope centredEnvelope, Envelope basedEnvelope)
 			: base(midiChannel)
         {
-			_modeSegments = Compose(voice1, voice2, voice3);
+			_modeSegments = Compose(voice1, voice2, voice3, centredEnvelope, basedEnvelope);
 		}
 
 		public override List<int> BarlineMsPositions()
@@ -51,7 +52,7 @@ namespace Moritz.Algorithm.Tombeau1
 		// TransposeToRootInModeGamut();
 		#endregion available Trk and ModeGrpTrk transformations
 
-		private List<ModeSegment> Compose(Voice1 voice1, Voice2 voice2, Voice3 voice3)
+		private List<ModeSegment> Compose(Voice1 voice1, Voice2 voice2, Voice3 voice3, Envelope centredEnvelope, Envelope basedEnvelope)
 		{
 			throw new NotImplementedException();
 		}

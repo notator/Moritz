@@ -72,6 +72,8 @@ namespace Moritz.Algorithm.Tombeau1
 
 		internal void AddToSeq(Seq seq)
 		{
+			Debug.Assert(_modeSegments.Count > 0);
+
 			List<Trk> trkList = ModeSegmentListToTrkList();
 			Trk trk = new Trk(trkList[0].MidiChannel);
 			foreach(Trk t in trkList)
