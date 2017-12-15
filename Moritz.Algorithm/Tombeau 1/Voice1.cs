@@ -243,16 +243,6 @@ namespace Moritz.Algorithm.Tombeau1
 			return modeIndices;
 		}
 
-		private void SetModeSegmentMsPositionsReContainer(List<ModeSegment> modeSegments)
-		{
-			int msPos = 0;
-			foreach(ModeSegment modeSegment in modeSegments)
-			{
-				modeSegment.MsPositionReContainer = msPos;
-				msPos += modeSegment.MsDuration;
-			}
-		}
-
 		/// <summary>
 		/// Find the nearest Mode to startIndex having BasePitch = basePitch.
 		/// </summary>
@@ -668,7 +658,7 @@ namespace Moritz.Algorithm.Tombeau1
 		{
 			List<int> v1BarlinePositions = new List<int>();
 
-			var msValuesListList = GetMsValuesOfModeTrks();
+			var msValuesListList = GetMsValuesOfModeGrpTrks();
 
 			for(int i = 0; i < msValuesListList.Count; ++i)
 			{

@@ -391,8 +391,8 @@ namespace Moritz.Algorithm.Tombeau1
 				case CompositionType.onlyVoice1:
 				{
 					#region test code
-					IReadOnlyList<IReadOnlyList<MsValues>> msValuesOfModeTrks = voice1.GetMsValuesOfModeTrks();
-					IReadOnlyList<IReadOnlyList<IReadOnlyList<MsValues>>> msValuesOfIUniqueDefs = voice1.GetMsValuesOfIUniqueDefs();
+					//IReadOnlyList<IReadOnlyList<MsValues>> msValuesOfModeTrks = voice1.GetMsValuesOfModeTrks();
+					//IReadOnlyList<IReadOnlyList<IReadOnlyList<MsValues>>> msValuesOfIUniqueDefs = voice1.GetMsValuesOfIUniqueDefs();
 					#endregion
 
 					voice1.AddToSeq(mainSeq);	 	

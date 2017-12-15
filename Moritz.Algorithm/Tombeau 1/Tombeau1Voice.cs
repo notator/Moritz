@@ -13,7 +13,7 @@ namespace Moritz.Algorithm.Tombeau1
 		{
 		}
 
-		public IReadOnlyList<IReadOnlyList<MsValues>> GetMsValuesOfModeTrks()
+		public IReadOnlyList<IReadOnlyList<MsValues>> GetMsValuesOfModeGrpTrks()
 		{
 			Debug.Assert(_modeSegments != null && _modeSegments.Count > 0);
 
@@ -118,6 +118,16 @@ namespace Moritz.Algorithm.Tombeau1
 				}
 			}
 			return barlineMsPos;
+		}
+
+		protected void SetModeSegmentMsPositionsReContainer(List<ModeSegment> modeSegments)
+		{
+			int msPos = 0;
+			foreach(ModeSegment modeSegment in modeSegments)
+			{
+				modeSegment.MsPositionReContainer = msPos;
+				msPos += modeSegment.MsDuration;
+			}
 		}
 
 		/// <summary>
