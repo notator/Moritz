@@ -44,12 +44,12 @@ namespace Moritz.Symbols
                 Debug.Assert(_msDuration > 0);
 				if(staffIsVisible)
 				{
-                    w.SvgStartGroup(Metrics.CSSObjectClass.ToString()); // "outputRest"
+                    w.SvgStartGroup(Metrics.CSSObjectClass.ToString()); // "rest"
                     w.WriteAttributeString("score", "alignment", null, ((Metrics.Left + Metrics.Right) / 2).ToString(M.En_USNumberFormat));
 				}
                 else
                 {
-                    w.SvgStartGroup("outputRest"); // Metrics is null
+                    w.SvgStartGroup("rest"); // Metrics is null
                 }
 
                 _midiRestDef.WriteSVG(w, channel, carryMsgs);
