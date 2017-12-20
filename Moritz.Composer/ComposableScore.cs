@@ -318,7 +318,7 @@ namespace Moritz.Composer
                 SvgSystem system = Systems[i];
                 IReadOnlyList<VoiceDef> voiceDefs = bars[i].VoiceDefs;
 
-                #region create invisible staves
+                #region create hidden staves
                 if(invisibleOutputVoiceIndices.Count > 0)
                 {
 					foreach(byte invisibleOutputVoiceIndex in invisibleOutputVoiceIndices)
@@ -333,7 +333,7 @@ namespace Moritz.Composer
                         system.Staves.Add(hiddenOutputStaff);
                     }
                 }
-                #endregion create invisible staves
+                #endregion create hidden staves
 
                 for(int printedStaffIndex = 0; printedStaffIndex < nVisibleOutputStaves; printedStaffIndex++)
                 {

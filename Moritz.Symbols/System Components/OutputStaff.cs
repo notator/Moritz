@@ -18,22 +18,24 @@ namespace Moritz.Symbols
         /// </summary>
         public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel)
         {
-            if(this.Metrics != null) // Metrics is null for invisible OutputStaffs
-            {
-                w.SvgStartGroup(this.Metrics.CSSObjectClass.ToString());    // "staff"
+			w.SvgStartGroup(CSSObjectClass.staff.ToString()); // "staff"
 
-                base.WriteSVG(w, true, systemNumber, staffNumber, carryMsgsPerChannel);
+			// if this.Metrics != null, the staff is invisible (but MIDI info is still written).
+			if(this.Metrics == null)
+			{
+				w.WriteAttributeString("score", "invisible", null, "invisible");
+			}
 
-                w.SvgEndGroup(); // outputStaff
-            }
+			base.WriteSVG(w, this.Metrics != null, systemNumber, staffNumber, carryMsgsPerChannel);
+
+            w.SvgEndGroup(); // outputStaff
         }
     }
 
     /// <summary>
     /// An HiddenOutputStaff is invisible in all systems, regardless of its content.
     /// Such output staves are defined using PageFormat.VisibleOutputVoiceIndicesPerStaff.
-    /// <para>Note also that individual staves are only printed if they contain at least one ChordSymbol.
-    /// (i.e. An InputStaff or OutputStaff will be invisible if its IsEmpty property is true.)</para>
+    /// <para>Note also that individual staves will also be invisible if they only contain a rest.</para>
     /// </summary>
     public class HiddenOutputStaff : OutputStaff
     {

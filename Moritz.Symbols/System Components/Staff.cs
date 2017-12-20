@@ -19,14 +19,18 @@ namespace Moritz.Symbols
             StafflineStemStrokeWidth = stafflineStemStrokeWidth;
         }
 
+		/// <summary>
+		/// Function defined by OutputStaff and HiddenOutputStaff
+		/// </summary>
         public abstract void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel);
 
-        /// <summary>
-        /// staffIsVisble is the global pageFormat setting.
-        /// Single, empty staves are also not displayed -- though their rest lengths are written in the score.
-        /// carryperChannel is null for InputStaves.
-        /// </summary>
-        public virtual void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel)
+		/// <summary>
+		/// A staff can be made invisible globally using the PageFormat.VisibleOutputVoiceIndicesPerStaff and
+		/// PageFormat.VisibleInputVoiceIndicesPerStaff properties. Such staves have the HiddenOutputStaff class.
+		/// Single staves that contain no ChordSymbols are also invisible -- though the rest msDuration(s) are written in the score.
+		/// carryMsgsPerChannel is null for InputStaves.
+		/// </summary>
+		public virtual void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel)
         {
             if(this.Metrics == null)
             {

@@ -56,78 +56,70 @@ namespace Moritz.Symbols
                 CautionaryChordSymbol cautionaryChordSymbol = noteObject as CautionaryChordSymbol;
                 OutputChordSymbol outputChordSymbol = noteObject as OutputChordSymbol;
                 OutputRestSymbol outputRestSymbol = noteObject as OutputRestSymbol;
+				Clef clef = noteObject as Clef;
+				SmallClef smallClef = noteObject as SmallClef;
 
-                if(staffIsVisible && (barline != null && barline.IsVisible))
+				if(barline != null)
 				{
-					bool isLastNoteObject = (i == (NoteObjects.Count - 1));
-					float top = Staff.Metrics.StafflinesTop;
-					float bottom = Staff.Metrics.StafflinesBottom;
-					PageFormat pageFormat = Staff.SVGSystem.Score.PageFormat;
-					float barlineStrokeWidth = pageFormat.BarlineStrokeWidth;
-					float stafflineStrokeWidth = pageFormat.StafflineStemStrokeWidth;
-                    barline.WriteSVG(w, top, bottom, stafflineStrokeWidth, isLastNoteObject);
-                }
-                if(barline != null)
-                {
-                    // have moved the call to this function to the start of the voice.
-                    //barline.WriteStaffNameAndBarNumberSVG(w, staffIsVisible, (barline.Voice is InputVoice));
-                }
-                else if(inputChordSymbol != null)
-                {
-                    inputChordSymbol.WriteSVG(w, staffIsVisible);
-                }
-                else if(cautionaryChordSymbol != null)
-                {
-                    cautionaryChordSymbol.WriteSVG(w, staffIsVisible);
-                }
-                else if(outputChordSymbol != null)
-                {
-                    Debug.Assert(carryMsgsPerChannel != null);
-                    outputChordSymbol.WriteSVG(w, staffIsVisible, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
-                }
-                else if(inputRestSymbol != null)
-                {
-                    inputRestSymbol.WriteSVG(w, staffIsVisible);
-                }
-                else if(outputRestSymbol != null)
-                {
-                    Debug.Assert(carryMsgsPerChannel != null);
-                    outputRestSymbol.WriteSVG(w, staffIsVisible, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
-                }
-                else // clef
-				{
-                    // if this is the first barline, the staff name and (maybe) barnumber will be written.
-                    Clef clef = noteObject as Clef;
-                    SmallClef smallClef = noteObject as SmallClef;
-                    bool isInput = (noteObject.Voice is InputVoice);
-                    if(smallClef != null)
-                    {
-                        SmallClefMetrics scm = smallClef.Metrics as SmallClefMetrics;
-                        smallClef.WriteSVG(w, scm.ClefID, scm.OriginX, scm.OriginY, staffIsVisible, isInput);
-                    }
-                    else if(clef != null)
-                    {
-                        ClefMetrics cm = clef.Metrics as ClefMetrics;
-                        clef.WriteSVG(w, cm.ClefID, cm.OriginX, cm.OriginY, staffIsVisible, isInput);
-                    }
-                    else
-                    {
-                        noteObject.WriteSVG(w, staffIsVisible);
-                    }
+					if(staffIsVisible && barline.IsVisible)
+					{
+						bool isLastNoteObject = (i == (NoteObjects.Count - 1));
+						float top = Staff.Metrics.StafflinesTop;
+						float bottom = Staff.Metrics.StafflinesBottom;
+						PageFormat pageFormat = Staff.SVGSystem.Score.PageFormat;
+						float barlineStrokeWidth = pageFormat.BarlineStrokeWidth;
+						float stafflineStrokeWidth = pageFormat.StafflineStemStrokeWidth;
+						barline.WriteSVG(w, top, bottom, stafflineStrokeWidth, isLastNoteObject);
+					}
 				}
-            }
-        }
+				else if(inputChordSymbol != null)
+				{
+					inputChordSymbol.WriteSVG(w, staffIsVisible);
+				}
+				else if(cautionaryChordSymbol != null)
+				{
+					cautionaryChordSymbol.WriteSVG(w, staffIsVisible);
+				}
+				else if(outputChordSymbol != null)
+				{
+					Debug.Assert(carryMsgsPerChannel != null);
+					outputChordSymbol.WriteSVG(w, staffIsVisible, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
+				}
+				else if(inputRestSymbol != null)
+				{
+					inputRestSymbol.WriteSVG(w, staffIsVisible);
+				}
+				else if(outputRestSymbol != null)
+				{
+					Debug.Assert(carryMsgsPerChannel != null);
+					outputRestSymbol.WriteSVG(w, staffIsVisible, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
+				}
+				else if(clef != null) // clef
+				{
+					if(clef.Metrics != null)
+					{
+						// if this is the first barline, the staff name and (maybe) barnumber will be written.
+						bool isInput = (noteObject.Voice is InputVoice);
+						ClefMetrics cm = clef.Metrics as ClefMetrics;
+						clef.WriteSVG(w, cm.ClefID, cm.OriginX, cm.OriginY, staffIsVisible, isInput);
+					}
+				}
+				else if(smallClef != null)
+				{
+					if(smallClef.Metrics != null)
+					{
+						bool isInput = (noteObject.Voice is InputVoice);
+						SmallClefMetrics scm = smallClef.Metrics as SmallClefMetrics;
+						smallClef.WriteSVG(w, scm.ClefID, scm.OriginX, scm.OriginY, staffIsVisible, isInput);
+					}
+				}
+				else
+				{
+					throw new ApplicationException("Unknown noteObject type.");
+				}
+			}
+		}
 
-        /// <summary>
-        /// A voice is empty if it contains no NoteObjects.
-        /// </summary>
-        public bool IsEmpty
-        {
-            get
-            {
-                return NoteObjects.Count == 0;
-            }
-        }
         /// <summary>
         /// Returns null if the last noteObject on this voice's noteObject list is not a Barline.
         /// </summary>

@@ -163,15 +163,11 @@ namespace Moritz.Symbols
             if(staffIsVisible && ChordMetrics.BeamBlock != null)
                 ChordMetrics.BeamBlock.WriteSVG(w);
 
-            if(staffIsVisible)
-			{
-                w.SvgStartGroup(ChordMetrics.CSSObjectClass.ToString()); // "chord"; 
+			w.SvgStartGroup(CSSObjectClass.chord.ToString()); // "chord"
+			if(staffIsVisible)
+			{ 
                 w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
 			}
-            else
-            {
-                w.SvgStartGroup("chord");  // ChordMetrics is null
-            }
             
             _midiChordDef.WriteSVG(w, channel, carryMsgs);
 
