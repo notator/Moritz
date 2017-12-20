@@ -26,8 +26,9 @@ namespace Moritz.Symbols
 
 		/// <summary>
 		/// A staff can be made invisible globally using the PageFormat.VisibleOutputVoiceIndicesPerStaff and
-		/// PageFormat.VisibleInputVoiceIndicesPerStaff properties. Such staves have the HiddenOutputStaff class.
-		/// Single staves that contain no ChordSymbols are also invisible -- though the rest msDuration(s) are written in the score.
+		/// PageFormat.VisibleInputVoiceIndicesPerStaff properties.
+		/// Such staves have the HiddenOutputStaff class.
+		/// Single staves that contain no ChordSymbols are also invisible -- though their rest msDuration(s) are written into the score.
 		/// carryMsgsPerChannel is null for InputStaves.
 		/// </summary>
 		public virtual void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel)
