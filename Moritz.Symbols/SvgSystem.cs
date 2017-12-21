@@ -27,7 +27,7 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         public void WriteSVG(SvgWriter w, int systemNumber, PageFormat pageFormat, List<CarryMsgs> carryMsgsPerChannel)
         {
-            w.SvgStartGroup(this.Metrics.CSSObjectClass.ToString());
+            w.SvgStartGroup(this.Metrics.CSSObjectClass.ToString()); // "system"
 
             WriteLeftToRightElement(w);
 

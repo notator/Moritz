@@ -1,18 +1,17 @@
-using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
-using System.Collections.Generic;
-
 using Krystals4ObjectLibrary;
+using Moritz.Algorithm;
+using Moritz.Globals;
+using Moritz.Palettes;
 using Moritz.Spec;
 using Moritz.Symbols;
-using Moritz.Palettes;
-using Moritz.Algorithm;
 using Moritz.Xml;
 
 namespace Moritz.Composer
 {
-    public partial class ComposableScore : SvgScore
+	public partial class ComposableScore : SvgScore
     {
         public ComposableScore(string folder, string scoreTitleName, CompositionAlgorithm algorithm, string keywords, string comment, PageFormat pageFormat)
             : base(folder, scoreTitleName, keywords, comment, pageFormat)
@@ -49,10 +48,13 @@ namespace Moritz.Composer
                 Notator.CreateMetricsAndJustifySystems(this.Systems);
                 success = CreatePages();
             }
+
+			CheckSystems(this.Systems);
+
             return success;
         }
 
-        private Dictionary<int, string> GetUpperVoiceClefDict(Bar bar1, PageFormat _pageFormat, List<int> visibleLowerVoiceIndices)
+		private Dictionary<int, string> GetUpperVoiceClefDict(Bar bar1, PageFormat _pageFormat, List<int> visibleLowerVoiceIndices)
         {
             int nVisibleOutputStaves = _pageFormat.VisibleOutputVoiceIndicesPerStaff.Count;
             int nVisibleInputStaves = _pageFormat.VisibleInputVoiceIndicesPerStaff.Count;
@@ -267,6 +269,83 @@ namespace Moritz.Composer
 		}
 
 		#endregion
+
+		private void CheckSystems(List<SvgSystem> systems)
+		{
+			#region check that all systems have at least one visible staff
+			for(int systemIndex = 0; systemIndex < systems.Count; systemIndex++)
+			{
+				var staves = systems[systemIndex].Staves;
+				bool foundVisibleStaff = false;
+				for(int staffIndex = 0; staffIndex < staves.Count; staffIndex++)
+				{
+					var staff = staves[staffIndex];
+					if(staff.ContainsAChordSymbol)
+					{
+						foundVisibleStaff = true;
+						break;
+					}
+
+				}
+				Debug.Assert(foundVisibleStaff, $"System {systemIndex + 1} has no visible staff.");
+			}
+			#endregion
+			#region check that all tracks are visible in at least one system. 
+			var trackVisibilities = new List<bool>();
+			foreach(var staff in systems[0].Staves)
+			{
+				foreach(var voice in staff.Voices)
+				{
+					trackVisibilities.Add(false);
+				}
+			}
+
+			for(int systemIndex = 0; systemIndex < systems.Count; systemIndex++)
+			{
+				var trackIndex = 0;
+				var staves = systems[systemIndex].Staves;
+				for(int staffIndex = 0; staffIndex < staves.Count; staffIndex++)
+				{
+					var voices = staves[staffIndex].Voices;
+					foreach(var voice in voices)
+					{
+						if(voice.ContainsAChordSymbol)
+						{
+							trackVisibilities[trackIndex] = true;
+						}
+						trackIndex++;
+					} 
+				}
+			}
+			var invisibleTracks = new List<int>();
+
+			for(int trackIndex = 0; trackIndex < trackVisibilities.Count; trackIndex++)
+			{
+				if(trackVisibilities[trackIndex] == false)
+				{
+					invisibleTracks.Add(trackIndex);
+				} 
+			}
+			
+			if(invisibleTracks.Count > 0)
+			{
+				string iTracksStr = M.IntListToString(invisibleTracks, ", ");
+				string msg;
+				string title;
+				if(invisibleTracks.Count == 1)
+				{
+					title = "Invisible Track Warning";
+					msg = $"Track (i.e. MidiChannel) {iTracksStr} contains no chord symbols, and is therefore never visible."; 
+				}
+				else
+				{
+					title = "Invisible Track(s) Warning";
+					msg = $"The following Tracks (i.e. MidiChannels) contain no chord symbols, and are therefore never visible: \n\n\t{iTracksStr}";
+				}
+				MessageBox.Show(msg, title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+			}
+			#endregion
+		}
 
 		/// <summary>
 		/// This function should be called for all scores when the bars are complete.

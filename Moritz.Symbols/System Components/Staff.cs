@@ -72,18 +72,7 @@ namespace Moritz.Symbols
                 bool containsAChordSymbol = false;
                 foreach(Voice voice in this.Voices)
                 {
-                    foreach(NoteObject noteObject in voice.NoteObjects)
-                    {
-                        if(noteObject is ChordSymbol)
-                        {
-                            containsAChordSymbol = true;
-                            break;
-                        }
-                    }
-                    if(containsAChordSymbol == true)
-                    {
-                        break;
-                    }
+					containsAChordSymbol = voice.ContainsAChordSymbol;
                 }
                 return containsAChordSymbol;
             }

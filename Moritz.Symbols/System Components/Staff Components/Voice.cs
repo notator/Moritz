@@ -120,10 +120,27 @@ namespace Moritz.Symbols
 			}
 		}
 
-        /// <summary>
-        /// Returns null if the last noteObject on this voice's noteObject list is not a Barline.
-        /// </summary>
-        public Barline FinalBarline
+		public bool ContainsAChordSymbol
+		{
+			get
+			{
+				bool containsAChordSymbol = false;
+				foreach(NoteObject noteObject in NoteObjects)
+				{
+					if(noteObject is ChordSymbol)
+					{
+						containsAChordSymbol = true;
+						break;
+					}
+				}
+				return containsAChordSymbol;
+			}
+		}
+
+		/// <summary>
+		/// Returns null if the last noteObject on this voice's noteObject list is not a Barline.
+		/// </summary>
+		public Barline FinalBarline
         {
             get
             {
