@@ -270,6 +270,13 @@ namespace Moritz.Composer
 
 		#endregion
 
+		/// <summary>
+		/// Check that
+		/// 1. Every system has at least one visible staff (error is fatal)
+		/// 2. Every track is visible in at least one system (error is  warning)
+		/// 3. Each track index (top to bottom) is the same as its MidiChannel (error is fatal)
+		/// </summary>
+		/// <param name="systems"></param>
 		private void CheckSystems(List<SvgSystem> systems)
 		{
 			#region check that all systems have at least one visible staff
@@ -290,7 +297,7 @@ namespace Moritz.Composer
 				Debug.Assert(foundVisibleStaff, $"System {systemIndex + 1} has no visible staff.");
 			}
 			#endregion
-			#region check that all tracks are visible in at least one system. 
+			#region check that all tracks are visible in at least one system, and that track index (top to bottom) equals track MidiChannel. 
 			var trackVisibilities = new List<bool>();
 			foreach(var staff in systems[0].Staves)
 			{
@@ -299,6 +306,8 @@ namespace Moritz.Composer
 					trackVisibilities.Add(false);
 				}
 			}
+
+			var trackMidiChannels = new List<int>();
 
 			for(int systemIndex = 0; systemIndex < systems.Count; systemIndex++)
 			{
@@ -314,6 +323,8 @@ namespace Moritz.Composer
 							trackVisibilities[trackIndex] = true;
 						}
 						trackIndex++;
+
+						trackMidiChannels.Add(voice.MidiChannel);
 					} 
 				}
 			}
@@ -324,7 +335,8 @@ namespace Moritz.Composer
 				if(trackVisibilities[trackIndex] == false)
 				{
 					invisibleTracks.Add(trackIndex);
-				} 
+				}
+				Debug.Assert(trackIndex == trackMidiChannels[trackIndex], "Track index and MidiChannel must be identical.");
 			}
 			
 			if(invisibleTracks.Count > 0)
@@ -335,12 +347,12 @@ namespace Moritz.Composer
 				if(invisibleTracks.Count == 1)
 				{
 					title = "Invisible Track Warning";
-					msg = $"Track (i.e. MidiChannel) {iTracksStr} contains no chord symbols, and is therefore never visible."; 
+					msg = $"Track (= MidiChannel) {iTracksStr} contains no chord symbols,\nand is therefore never visible."; 
 				}
 				else
 				{
 					title = "Invisible Track(s) Warning";
-					msg = $"The following Tracks (i.e. MidiChannels) contain no chord symbols, and are therefore never visible: \n\n\t{iTracksStr}";
+					msg = $"The following Tracks (i.e. MidiChannels) contain no chord symbols,\nand are therefore never visible:\n\n\t{iTracksStr}";
 				}
 				MessageBox.Show(msg, title, MessageBoxButtons.OK, MessageBoxIcon.Warning);
 			}
