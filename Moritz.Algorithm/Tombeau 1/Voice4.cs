@@ -15,11 +15,6 @@ namespace Moritz.Algorithm.Tombeau1
 			_modeSegments = Compose(voice1, voice2, voice3, centredEnvelope, basedEnvelope);
 		}
 
-		public override List<int> BarlineMsPositions()
-		{
-			throw new NotImplementedException();
-		}
-
 		#region available Trk and ModeGrpTrk transformations
 		// Add();
 		// AddRange();

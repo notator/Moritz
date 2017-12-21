@@ -370,7 +370,7 @@ namespace Moritz.Algorithm.Tombeau1
 			/**********************************************/
 
 			Seq mainSeq = new Seq(0, new List<Trk>(), MidiChannelIndexPerOutputVoice);
-			CompositionType compositionType = CompositionType.twoVoices;
+			CompositionType compositionType = CompositionType.threeVoices;
 
 			// shortVersion1 (5' 55" @40% speed)
 			Tombeau1Type shortVersion1 = new Tombeau1Type(nModeSegments: 8, nModeGrpTrksPerModeSegment: 6, maxChordsPerModeGrpTrk: 10);
@@ -378,10 +378,12 @@ namespace Moritz.Algorithm.Tombeau1
 			Tombeau1Type shortVersion2 = new Tombeau1Type(nModeSegments: 10, nModeGrpTrksPerModeSegment: 6, maxChordsPerModeGrpTrk: 10);
 			// shortVersion3 (9' 45" @40% speed)
 			Tombeau1Type shortVersion3 = new Tombeau1Type(nModeSegments: 10, nModeGrpTrksPerModeSegment: 6, maxChordsPerModeGrpTrk: 12);
+			// fibonacciVersion (' " @40% speed)
+			Tombeau1Type shortVersion4 = new Tombeau1Type(nModeSegments: 12, nModeGrpTrksPerModeSegment: 6, maxChordsPerModeGrpTrk: 12);
 			// long version (27' 20" @ 40% speed)
 			Tombeau1Type longVersion = new Tombeau1Type(nModeSegments: 20, nModeGrpTrksPerModeSegment: 10, maxChordsPerModeGrpTrk: 12);
 
-			Voice1 voice1 = new Voice1(shortVersion3, MidiChannelIndexPerOutputVoice[3], centredEnvelope, basedEnvelope);
+			Voice1 voice1 = new Voice1(shortVersion4, MidiChannelIndexPerOutputVoice[3], centredEnvelope, basedEnvelope);
 			Voice2 voice2 = null;
 			Voice3 voice3 = null;
 			Voice4 voice4 = null;

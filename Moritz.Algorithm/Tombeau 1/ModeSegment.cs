@@ -36,6 +36,19 @@ namespace Moritz.Algorithm.Tombeau1
 			_modeGrpTrks = new List<ModeGrpTrk>(modeGrpTrks);
 		}
 
+		internal ModeSegment Clone()
+		{
+			var clonedModeGrpTrks = new List<ModeGrpTrk>();
+			foreach(var modeGrpTrk in _modeGrpTrks)
+			{
+				ModeGrpTrk mgtClone = modeGrpTrk.Clone();
+				clonedModeGrpTrks.Add(mgtClone);
+			}
+			var modeSegment = new ModeSegment(MidiChannel, MsPositionReContainer, clonedModeGrpTrks);
+
+			return modeSegment;
+		}
+
 		private void AssertConsistency(int midiChannel, Mode mode, ModeGrpTrk ModeGrpTrk)
 		{
 			Debug.Assert(mode.HasSameAbsolutePitchHierarchy(ModeGrpTrk.Mode), "All ModeGrpTrks in a ModeSegment must have the same Mode.AbsolutePitchHierarchy");

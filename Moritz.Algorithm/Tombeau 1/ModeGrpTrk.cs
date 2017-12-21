@@ -54,18 +54,15 @@ namespace Moritz.Algorithm.Tombeau1
 		/// <summary>
 		/// The IUniqueDefs are cloned, the other attributes (including the Mode) are not.
 		/// </summary>
-		public new ModeGrpTrk Clone
+		public new ModeGrpTrk Clone()
 		{
-			get
+			List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
+			ModeGrpTrk ModeGrpTrk = new ModeGrpTrk(this.MidiChannel, this.MsPositionReContainer, clonedIUDs, Mode, RootOctave)
 			{
-				List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
-				ModeGrpTrk ModeGrpTrk = new ModeGrpTrk(this.MidiChannel, this.MsPositionReContainer, clonedIUDs, Mode, RootOctave)
-				{
-					Container = this.Container
-				};
+				Container = this.Container
+			};
 
-				return ModeGrpTrk;
-			}
+			return ModeGrpTrk;
 		}
 		#endregion constructors
 
@@ -73,7 +70,7 @@ namespace Moritz.Algorithm.Tombeau1
 		/// The following conditions are checked (If a check fails, an exception is thrown.):
 		/// 1. Mode may not be null.
 		/// 2. RootOctave must be greater than or equal to 0.
-		/// 3. The first iUniqueDef must be a MidiChordDef.
+		/// 3. If there is more than one iUniqueDef, the first must be a MidiChordDef.
 		/// 4. The ModeGrpTrk can only contain MidiChordDef and MidiRestDef objects.
 		/// 5. The MidiChordDefs can only contain pitches that are in the Mode.
 		/// 6. The ModeGrpTrk may not contain consecutive MidiRestDefs
@@ -85,9 +82,9 @@ namespace Moritz.Algorithm.Tombeau1
 
 			Debug.Assert(Mode != null, "Mode must be set.");
 			Debug.Assert(RootOctave >= 0, "Root Octave must be >= 0");
-			if(_uniqueDefs.Count > 0)
+			if(_uniqueDefs.Count > 1)
 			{
-				Debug.Assert(_uniqueDefs[0] is MidiChordDef, "The first IUniqueDef must be a MidiChordDef.");
+				Debug.Assert(_uniqueDefs[0] is MidiChordDef, "If there is more than one iUniqueDef, the first must be a MidiChordDef.");
 			}
 
 			foreach(IUniqueDef iud in _uniqueDefs)

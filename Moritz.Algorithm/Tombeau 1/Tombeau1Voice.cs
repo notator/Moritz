@@ -86,8 +86,11 @@ namespace Moritz.Algorithm.Tombeau1
 		/// <summary>
 		/// The barline msPositions contributed by a specific voice.
 		/// </summary>
-		/// <returns></returns>
-		public abstract List<int> BarlineMsPositions();
+		public virtual List<int> BarlineMsPositions()
+		{
+			var voice2BarlinePositions = new List<int>();
+			return voice2BarlinePositions;
+		}
 
 		/// <summary>
 		/// Returns the smallest ModeGrpTrk msPosition greater than the middle msPosition of the ModeSegment.

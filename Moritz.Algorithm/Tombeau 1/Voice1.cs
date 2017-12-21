@@ -73,16 +73,17 @@ namespace Moritz.Algorithm.Tombeau1
 			List<ModeProximity> modeProximities = RootMode.GetModeProximities();
 			List<int> modeIndices = GetModeIndices(nModeSegments, modeProximities);
 
+			BasicModeSegments = GetBasicModeSegments(tombeau1Type, modeProximities, modeIndices);
 			List<ModeSegment> modeSegments = GetBasicModeSegments(tombeau1Type, modeProximities, modeIndices);
 
-  			List<Envelope> timeWarpPerIUDEnvelopePerModeSegment = GetTimeWarpPerIUDEnvelopesPerModeSegment(modeSegments, centredEnvelope);
-			List<Envelope> absPitchPerModeGrpTrkEnvelopePerModeSegment = GetAbsPitchPerModeGrpTrkEnvelopesPerModeSegment(modeSegments, basedEnvelope);
+			TimeWarpPerIUDEnvelopePerModeSegment = GetTimeWarpPerIUDEnvelopesPerModeSegment(BasicModeSegments, centredEnvelope);
+			AbsPitchPerModeGrpTrkEnvelopePerModeSegment = GetAbsPitchPerModeGrpTrkEnvelopesPerModeSegment(BasicModeSegments, basedEnvelope);
 
 			for(int i = 0; i < nModeSegments; i++)
 			{
 				ModeSegment modeSegment = modeSegments[i];
-				Envelope timeWarpPerIUDEnvelope = timeWarpPerIUDEnvelopePerModeSegment[i];
-				Envelope absPitchPerModeGrpTrkEnvelope = absPitchPerModeGrpTrkEnvelopePerModeSegment[i];
+				Envelope timeWarpPerIUDEnvelope = TimeWarpPerIUDEnvelopePerModeSegment[i];
+				Envelope absPitchPerModeGrpTrkEnvelope = AbsPitchPerModeGrpTrkEnvelopePerModeSegment[i];
 
 				AdjustPitches(modeSegment, absPitchPerModeGrpTrkEnvelope);
 
@@ -232,14 +233,23 @@ namespace Moritz.Algorithm.Tombeau1
 
 		private static List<int> GetModeIndices(int nModeSegments, List<ModeProximity> modeProximities)
 		{
-			int maxIndex = modeProximities.Count - 1;
-			int indexInc = maxIndex / nModeSegments;
+			int nModeProximities = modeProximities.Count;
 			List<int> modeIndices = new List<int>();
-			for(int i = 0; i < nModeSegments; i++)
+
+			int fib1 = 1;
+			int fib2 = 2;
+			modeIndices.Add(fib1 - 1);
+			modeIndices.Add(fib2 - 1);
+			int nIndices = nModeSegments - 2;
+			if(nIndices > 0)
 			{
-				modeIndices.Add(i * indexInc);
+				for(int i = 0; i < nIndices; i++)
+				{
+					fib1 = modeIndices[i] + 1;
+					fib2 = modeIndices[i + 1] + 1;
+					modeIndices.Add((fib1 + fib2 - 1) % nModeProximities);
+				}
 			}
-			modeIndices[nModeSegments - 1] = maxIndex; // correct any rounding error.
 			return modeIndices;
 		}
 
@@ -646,7 +656,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 		internal void AdjustForThreeVoices()
 		{
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
 		}
 
 		internal void AdjustForFourVoices()
@@ -685,5 +695,8 @@ namespace Moritz.Algorithm.Tombeau1
 		}
 
 		public Mode RootMode { get; }
+		public List<ModeSegment> BasicModeSegments { get; private set; }
+		public List<Envelope> TimeWarpPerIUDEnvelopePerModeSegment { get; private set; }
+		public List<Envelope> AbsPitchPerModeGrpTrkEnvelopePerModeSegment { get; private set; }
 	}
 }

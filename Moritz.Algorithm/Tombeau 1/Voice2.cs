@@ -81,7 +81,7 @@ namespace Moritz.Algorithm.Tombeau1
 		{
 			var modeGrpTrks = new List<ModeGrpTrk>();
 
-			ModeGrpTrk v1ModeGrpTrk0 = v1ModeSegments[0].ModeGrpTrks[0];
+			ModeGrpTrk v1ModeGrpTrk0 = v1ModeSegments[modeSegmentIndex].ModeGrpTrks[0];
 			Mode mode = v1ModeGrpTrk0.Mode;
 			List<IUniqueDef> iuds = new List<IUniqueDef>();
 			
@@ -92,7 +92,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 			ModeGrpTrk v2ModeGrpTrk = new ModeGrpTrk(MidiChannel, 0, iuds, mode, 8);
 			v2ModeGrpTrk.Shear(0, 36);
-			v2ModeGrpTrk.CreateAccel(0, v2ModeGrpTrk.Count, 0.2);
+			v2ModeGrpTrk.CreateAccel(0, v2ModeGrpTrk.Count, 0.02);
 			var velocityPerAbsolutePitch = mode.GetDefaultVelocityPerAbsolutePitch();
 			velocityPerAbsolutePitch = Mode.SetVelocityPerAbsolutePitchRange(velocityPerAbsolutePitch, 10, 64);
 			v2ModeGrpTrk.SetVelocityPerAbsolutePitch(velocityPerAbsolutePitch);
@@ -108,18 +108,12 @@ namespace Moritz.Algorithm.Tombeau1
 
 		internal void AdjustForThreeVoices()
 		{
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
 		}
 
 		internal void AdjustForFourVoices()
 		{
-			throw new NotImplementedException();
-		}
-
-		public override List<int> BarlineMsPositions()
-		{
-			var voice2BarlinePositions = new List<int>();
-			return voice2BarlinePositions;
+			//throw new NotImplementedException();
 		}
 	}
 }
