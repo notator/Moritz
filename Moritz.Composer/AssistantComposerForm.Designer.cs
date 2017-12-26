@@ -507,8 +507,7 @@ namespace Moritz.Composer
             this.StaffGroupsHelpLabel.Name = "StaffGroupsHelpLabel";
             this.StaffGroupsHelpLabel.Size = new System.Drawing.Size(147, 42);
             this.StaffGroupsHelpLabel.TabIndex = 167;
-            this.StaffGroupsHelpLabel.Text = "integer values (total = x).\r\nstaff groups cannot contain\r\nboth input and output s" +
-    "taves.";
+            this.StaffGroupsHelpLabel.Text = "integer values (total = x).\r\nstaff groups cannot contain\r\nboth input and output staves.";
             // 
             // StaffGroupsLabel
             // 
