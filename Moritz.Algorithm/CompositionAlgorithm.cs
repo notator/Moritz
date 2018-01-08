@@ -42,7 +42,7 @@ namespace Moritz.Algorithm
 				if(channelIndex < 0 || channelIndex > 15)
 					throw new ApplicationException("CompositionAlgorithm: midi channel out of range!");
 				
-				if(channelIndex != 9) // 9 is percussion channel
+				if(channelIndex != 9) // 9 is the percussion channel, which can be allocated to any voice.
 				{
 					if(channelIndex != (previousChannelIndex + 1))
 					{
@@ -54,7 +54,7 @@ namespace Moritz.Algorithm
 
             // Moritz assumes a single Midi input device playing on input channel 0, and a maximum of 4 InputVoices that respond to that channel.
             // Input Voices having the same channel are agglomerated at load time by the Assistant Performer.
-            if(NumberOfInputVoices < 0 || NumberOfInputVoices > 4)
+            if(MidiChannelIndexPerInputVoice < 0 || MidiChannelIndexPerInputVoice > 4)
                 throw new ApplicationException("CompositionAlgorithm: Invalid number of InputVoices!");
 
             if(NumberOfBars <= 0)
@@ -79,30 +79,40 @@ namespace Moritz.Algorithm
         }
 
 		/// <summary>
-		/// Returns a midi channel for each output voice (in top-bottom voice order in the score).
-		/// Each midi channel (in range [0..15]) can can only be used once, and (apart from channel index 9 -- the percussion channel),
-		/// must be allocated in top-bottom order. Channel index 9 can be associated (once) with any voice.
+		/// Defines the midi channel index for each output voice, in the top to bottom order of the output voices in each system.
+		/// This list may not be empty.
+		/// Each midi channel (in range [0..15]) can can only be used once, and (apart from channel index 9 -- the percussion
+		/// channel), must be allocated contiguously in top-bottom order starting at channel index 0.
+		/// Channel index 9 can be allocated (once) at any voice index.
 		/// Notes:
-		/// Midi channels are always allocated to tracks (voices) in this top-bottom order, even when the track (voice) is invisible.
-		/// (The Assistant Performer's tracks control can distinguish between visible and invisible tracks, and display their
-		/// buttons differently.)
-		/// The visibility of voices, and their association with staves, is controlled using an input field in the Assistant
-		/// Composer's main dialog window.
-		/// Moritz provides midi message information (including channel info) associated with particular output tracks, so that
-		/// the Assistant Performer can use this information at score load-time. Thereafter, the Assistant Performer simply refers
-		/// to each track using its (real, top-bottom) index. Moritz also uses the track indices in the references to tracks in the
-		/// input notes that it creates. This means that the Assistant Performer should never have to refer to midi channels at run-time.
-		/// The AP could, provide track-channel info to users if necessary, but I think this could be done simply by using descriptive
-		/// staff names in the score.
+		/// Midi channels are always allocated to tracks (voices) in this top-bottom order. Contrary to previous versions of
+		/// Moritz, the channel order cannot be changed, and all tracks are always visible.
+		/// The association of voices with staves continues to be controlled using an input field in the Assistant Composer's
+		/// main dialog.
+		/// Moritz provides complete midi message information (including the midi channel info) for each output track, so
+		/// the Assistant Performer can use this information at load time to create binary midi messages that are associated
+		/// with each track.
+		/// This means
+		/// 1. that the Assistant Performer can ignore the channel info at run time, and simply refer to tracks by their index.
+		/// 2. that Moritz can use the track indices (rather than midi channels) in the references to tracks in the input
+		///    notes that it creates. That should simplify the code considerably re previous Moritz versions.
+		/// The AP could provide track-channel info to users if necessary, but I think this could initially be done simply
+		/// by using descriptive staff names in the score.
 		/// </summary>
 		public abstract IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get; }
 
 		/// <summary>
-		/// The number of InputVoices created by the algorithm.
-		/// Moritz assumes a single Midi input device playing on input channel 0, and a maximum of 4 InputVoices that respond to that channel.
-		/// Input Voices having the same channel are agglomerated at load time by the Assistant Performer.
+		/// Defines the midi channel index for each input voice, in the top to bottom order of the input voices in each system.
+		/// This list can be empty, in which case there will be no input voices.
+		/// Input voices are rendered larger than, and placed below, output voices in scores.
+		/// 1. Currently, only midi input channels 0 and 1 are allowed. (These channels could be sent by a single,
+		///    split keyboard.)
+		/// 2. Each input midi channel can be used once or twice, but the channels must be in numerical order.
+		///    (The possible alternatives are: {0,1}, {0,0,1}, {0,1,1} and {0,0,1,1}.)
+		/// At load time, the Assistant Performer agglomerates input voices having the same midi input channel into a
+		/// single input sequence.
 		/// </summary>
-		public abstract int NumberOfInputVoices { get; }
+		public abstract IReadOnlyList<int> MidiChannelIndexPerInputVoice { get; }
 
         /// <summary>
         /// Returns the number of bars (=bar definitions) created by the algorithm.

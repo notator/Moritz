@@ -46,7 +46,7 @@ namespace Moritz.Composer
 
             Debug.Assert(_algorithm != null);
 
-            _outputVoiceIndices = GetOutputVoiceIndices(_algorithm.MidiChannelIndexPerOutputVoice.Count);
+            _outputVoiceIndices = GetOutputVoiceIndices(_algorithm.MidiChannelIndexPerOutputVoice);
                 
             GetSelectedSettings();
 
@@ -126,12 +126,12 @@ namespace Moritz.Composer
             ShowSelectedPaletteButton.Enabled = false;
         }
         #endregion DeselectAll
-        private List<byte> GetOutputVoiceIndices(int nOutputVoices)
+        private List<byte> GetOutputVoiceIndices(IReadOnlyList<int> MidiChannelIndexPerOutputVoice)
         {
             List<byte> rval = new List<byte>();
-            for(byte i = 0; i < nOutputVoices; ++i)
+            for(byte i = 0; i < MidiChannelIndexPerOutputVoice.Count; ++i)
             {
-                rval.Add(i);
+                rval.Add((byte)MidiChannelIndexPerOutputVoice[i]);
             }
             return rval;
         }
@@ -139,7 +139,7 @@ namespace Moritz.Composer
         {
 			LoadSettings();
 
-            SetVoiceIndicesHelpLabel(_algorithm.MidiChannelIndexPerOutputVoice.Count, _algorithm.NumberOfInputVoices);
+            SetVoiceIndicesHelpLabel(_algorithm.MidiChannelIndexPerOutputVoice, _algorithm.MidiChannelIndexPerInputVoice);
             SetSystemStartBarsHelpLabel(_algorithm.NumberOfBars);
 
             VoiceIndicesPerStaffTextBox_Leave(null, null); // sets _numberOfOutputStaves _numberOfStaves
@@ -148,16 +148,17 @@ namespace Moritz.Composer
                 (SavedState)KrystalsGroupBox.Tag, (SavedState)PalettesGroupBox.Tag);
         }
         #region helpers
-        private void SetVoiceIndicesHelpLabel(int nOutputVoices, int nInputVoices)
+        private void SetVoiceIndicesHelpLabel(IReadOnlyList<int> midiChannelIndexPerOutputVoice, int nInputVoices)
         {
-            Debug.Assert(nOutputVoices > 0);
-            StringBuilder sb = new StringBuilder();
-            for(int i = 0; i < nOutputVoices; ++i)
+            Debug.Assert(midiChannelIndexPerOutputVoice.Count > 0);
+			StringBuilder sb = new StringBuilder();
+            for(int i = 0; i < midiChannelIndexPerOutputVoice.Count; ++i)
             {
                 sb.Append(", ");
-                sb.Append(i.ToString());
+                sb.Append(midiChannelIndexPerOutputVoice[i].ToString());
             }
             sb.Remove(0, 2);
+			
             if(nInputVoices > 0)
             {
                 sb.Append(" | ");
@@ -527,7 +528,7 @@ namespace Moritz.Composer
             catch(Exception ex)
             {
                 string msg = "Exception message:\n\n" + ex.Message;
-                MessageBox.Show(msg, "Error reading krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show(msg, "Error reading krystal score settings", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         #endregion GroupBox confirm and revert buttons
@@ -970,7 +971,7 @@ namespace Moritz.Composer
             }
             if(!error && inputIndexLists.Count > 0)
             {
-                List<byte> inputVoiceIndices = InputVoiceIndices(_algorithm.NumberOfInputVoices);
+                List<byte> inputVoiceIndices = InputVoiceIndices(_algorithm.MidiChannelIndexPerInputVoice);
                 error = CheckVoiceIndices(inputIndexLists, inputVoiceIndices);
             }
 
@@ -1335,9 +1336,9 @@ namespace Moritz.Composer
             if(_numberOfStaves == 1)
             {
                 this.ClefsPerStaffHelpLabel.Text = "1 clef\n" +
-                                                   "available clefs: " + clefsSB.ToString();
+												   "available clefs: " + clefsSB.ToString();
                 this.StafflinesPerStaffHelpLabel.Text = "1 integer\n" +
-                                                    "standard clefs must have 5 lines";
+													"standard clefs must have 5 lines";
                 this.StaffGroupsHelpLabel.Text = "must be 1";
                 this.LongStaffNamesHelpLabel.Text = "1 name (for first system)";
                 this.ShortStaffNamesHelpLabel.Text = "1 name (for other systems)";
@@ -1345,11 +1346,11 @@ namespace Moritz.Composer
             else
             {
                 this.ClefsPerStaffHelpLabel.Text = _numberOfStaves.ToString() + " clefs separated by commas.\n" +
-                                                    "available clefs: " + clefsSB.ToString();
+													"available clefs: " + clefsSB.ToString();
                 this.StafflinesPerStaffHelpLabel.Text = _numberOfStaves.ToString() + " integers separated by commas.\n" +
-                                                    "standard clefs must have 5 lines";
+													"standard clefs must have 5 lines";
                 this.StaffGroupsHelpLabel.Text = "integers (whose total is " + _numberOfStaves.ToString() + ")\n" +
-                                                "staff groups cannot contain both\ninput and output staves.";
+												"staff groups cannot contain both\ninput and output staves.";
                 this.LongStaffNamesHelpLabel.Text = _numberOfStaves.ToString() + " names (for first system)";
                 this.ShortStaffNamesHelpLabel.Text = _numberOfStaves.ToString() + " names (for other systems)";
             }
@@ -1362,63 +1363,54 @@ namespace Moritz.Composer
             this.LongStaffNamesHelpLabel.Text = "";
             this.ShortStaffNamesHelpLabel.Text = "";
         }
-        #endregion
-        private void VoiceIndicesPerStaffHelp_MouseClick(object sender, MouseEventArgs e)
-        {
-            if(e.Button == System.Windows.Forms.MouseButtons.Right)
-            {
-                string mainText =
-                "Composition algorithms create output and input voices without deciding on the layout for a particular " +
-                "score. Many different layouts are possible using the same logical information. (Output voices are " +
-                "always created, but input voices do not necessarily exist.)\n\n" +
+		#endregion
+		private void VoiceIndicesPerStaffHelp_MouseClick(object sender, MouseEventArgs e)
+		{
+			if(e.Button == System.Windows.Forms.MouseButtons.Right)
+			{
+				string mainText =
+				"Each entry in all input fields in this dialog must be given in top to\n" +
+				"bottom order of the staff and voice layout.\n\n" +
 
-                "Each algorithm presents the voices it creates in the top-bottom order of a default layout. Voices are " +
-                "therefore identified in this dialog using their default index.\n" +
-                "(The default top output voice has index 0, as does the default top input voice.)\n" +
-                "The available output and input voice indices are displayed in a help text above this input field. " +
-                "Entering the help string as it stands will therefore create a score showing all the composed voices, " +
-                "with one voice per staff, in the default order in which they were originally composed.\n\n" +
+				"The string entered in this input field controls the number of voices per\n" +
+				"staff (maximum 2) and hence staves per system.\n" +
+				"The help text above this field shows the midi channels created by the\n" +
+				"algorithm, in the order they will appear (top to bottom) in each system\n" +
+				"of the score. All these channels must be present in the input string, in\n" +
+				"the order given in the help text. (There are no 'invisible' channels.)\n" +
+				"The input string can have either one or two parts. The first controls\n" +
+				"the output voices, the second controls the input voices. If present,\n" +
+				"input voices are separated from output voices by a '|' character in the\n" +
+				"help text. If present in the help text, the '|' must also be included in\n" +
+				"the input string.\n\n" +
 
-                "The string entered in this input field controls both the number of staves per system, and the " +
-                "top-bottom order of the voices to be displayed.\n" +
-                "It can have either one or two parts. The first controls the output voices, the second controls the " +
-                "input voices. If present, the input voices are separated from the output voices by a '|' character. " +
-                "Either of these parts can be empty, but not both: there must be at least one visible output or input " +
-                "voice in the score.\n\n" +
+				"There can be either one or two voices per (output or input) staff.\n" +
+				"Voices on the same staff are separated by a ':' character.\n" +
+				"Staves are separated by a ',' character. White space is ignored.\n\n" +
 
-                "There can be either one or two voices per staff. Voices on the same staff are separated by a ':'. " +
-                "Staves are separated by a ','. White space is ignored.\n" +
-                "For example, if an algorithm creates four output and two input voices, the help text would be: '0, 1, " +
-                "2, 3 | 0, 1', and some possible score formatting strings are:\n" +
-                "     '2'      One output staff per system. The staff shows output voice index 2.\n" +
-                "     '|0'     One input staff per system. The staff shows input voice index 0.\n" +
-                "     '1, 3 , 2 | 0:1'  Three visible output staves and one input staff per system. The input staff " +
-                "has two input voices.\n" +
-                "The numbers can be in any order, but must be selected from those given in the help text. The order " +
-                "determines the top-bottom order of the visible voices in the final score.\n\n" +
+				"The percussion channel (output channel index 9):\n" +
+				"If an algorithm creates a track having midi channel 9 (the percussion\n" +
+				"channel), it can do so at any track (=voice) index. Other tracks will be\n" +
+				"given unique midi channels in ascending order, starting with midi\n" +
+				"channel 0 at the top of each system. The percussion track (channel 9)\n" +
+				"must be the only track (=voice) on its staff.\n\n" +
 
-                "The score is always printed with output staves above any input staves. Output staves are smaller than " +
-                "input staves.\n\n" +
+				"Input voices:\n" +
+				"1. Currently, Moritz only supports the use of midi input channels 0\n" +
+				"    and 1. (These channels could be sent by a single, split keyboard.)\n" +
+				"2. Each input midi channel can be assiged to one or two voices\n" +
+				"3. Each input staff can have one or two voices, but these voices must\n" +
+				"    have the same midi input channel.\n" +
+				"4. At load time, the Assistant Performer agglomerates input voices\n" +
+				"    having the same midi input channel into a single input sequence.\n";
 
-                "If there are any visible input staves, then all the output voices that are not entered in this input " +
-                "field will automatically be included on invisible staves in the score's file. These invisible output " +
-                "staves contain midi information, referenced by notes in the input voices, but no graphics. They are " +
-                "currently written in a single block above the topmost visible staff in the file.\n\n" +
-                
-                "A note on midi channels:\n" +
-                "Algorithms compose output voices complete with their midi channel (and master volume initialization " +
-                "value). This allows them to stipulate the standard midi percussion channel (channel index 9) if they " +
-                "want to.\n" +
-                "The midi channel and master volume values are therefore fixed attributes of particular voices, and " +
-                "move with them when the voices are re-ordered.\n\n";
+				MessageBox.Show(mainText, "Help for the 'voices per staff' input field", MessageBoxButtons.OK);
+			}
+		}
+		#endregion notation groupBox
 
-                MessageBox.Show(mainText, "Help for the 'voices per staff' input field", MessageBoxButtons.OK);
-            }
-        }
-        #endregion notation groupBox
-
-        #region krystals groupBox
-        private void KrystalsListBox_SelectedIndexChanged(object sender, EventArgs e)
+		#region krystals groupBox
+		private void KrystalsListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if(KrystalsListBox.SelectedIndex >= 0)
             {
@@ -1496,10 +1488,10 @@ namespace Moritz.Composer
             if(KrystalsListBox.SelectedIndex >= 0)
             {
                 Krystal selectedKrystal = KrystalsListBox.SelectedItem as Krystal;
-                string msg = "The krystal\n\n     " + selectedKrystal.Name +
-                    "\n\nwill be removed from this score.\n" +
-                    "It will not be deleted from the main krystals folder.\n\n" +
-                    "Proceed?\n\n";
+                string msg = "The krystal\n\n     " + selectedKrystal.Name + 
+					"\n\nwill be removed from this score.\n" +
+					"It will not be deleted from the main krystals folder.\n\n" +
+					"Proceed?\n\n";
                 DialogResult proceed = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if(proceed == DialogResult.Yes)
                 {
@@ -1602,7 +1594,7 @@ namespace Moritz.Composer
             {
                 string toDelete = PalettesListBox.Items[selectedIndex].ToString();
                 string msg = toDelete + " will be deleted completely.\n\n" +
-                    "Proceed?\n\n";
+					"Proceed?\n\n";
                 DialogResult proceed = MessageBox.Show(msg, "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if(proceed == DialogResult.Yes)
                 {

@@ -24,7 +24,7 @@ namespace Moritz.Algorithm.Study3Sketch2
         }
 
         public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
-        public override int NumberOfInputVoices { get { return 1; } }  
+        public override int MidiChannelIndexPerInputVoice { get { return 1; } }  
         public override int NumberOfBars { get { return 5; } }
 
         /// <summary>
