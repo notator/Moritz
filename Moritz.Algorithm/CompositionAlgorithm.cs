@@ -9,18 +9,18 @@ using Moritz.Symbols;
 
 namespace Moritz.Algorithm
 {
-    /// <summary>
-    /// A CompositionAlgorithm is special to a particular composition.
-    /// When called, the DoAlgorithm() function returns a list of VoiceDef lists,
-    /// whereby each contained VoiceDef list is the definition of a bar (a bar is
-    /// a place where a system can be broken).
-    /// Algorithms don't control the page format, how many bars per system there
-    /// are, or the shapes of the symbols. Those things are set for a particular
-    /// score in an .mkss file using the Assistant Composer's main form.
-    /// The VoiceDefs returned from DoAlgorithm() are converted to real Voices
-    /// (containing real NoteObjects) later, using the options set an .mkss file. 
-    /// </summary>
-    public abstract class CompositionAlgorithm
+	/// <summary>
+	/// A CompositionAlgorithm is special to a particular composition.
+	/// When called, the DoAlgorithm() function returns a list of VoiceDef lists,
+	/// whereby each contained VoiceDef list is the definition of a bar (a bar is
+	/// a place where a system can be broken).
+	/// Algorithms don't control the page format, how many bars per system there
+	/// are, or the shapes of the symbols. Those things are set for a particular
+	/// score in an .mkss file using the Assistant Composer's main form.
+	/// The VoiceDefs returned from DoAlgorithm() are converted to real Voices
+	/// (containing real NoteObjects) later, using the options set in an .mkss file. 
+	/// </summary>
+	public abstract class CompositionAlgorithm
     {
         protected CompositionAlgorithm()
         {
@@ -28,32 +28,36 @@ namespace Moritz.Algorithm
 
         protected void CheckParameters()
         {
-            int channelCount = MidiChannelIndexPerOutputVoice.Count;
-            if(channelCount < 1)
+            int outputChannelCount = MidiChannelIndexPerOutputVoice.Count;
+            if(outputChannelCount < 1)
                 throw new ApplicationException("CompositionAlgorithm: There must be at least one output voice!");
-            if(channelCount > 16)
-                throw new ApplicationException("CompositionAlgorithm: There can not be more than 16 output voices.");
+            if(outputChannelCount > 16)
+                throw new ApplicationException("CompositionAlgorithm: There cannot be more than 16 output voices.");
 
             int previousChannelIndex = -1;
-            for(int i = 0; i < channelCount; ++i)
+            for(int i = 0; i < outputChannelCount; ++i)
             {
-                int channelIndex = MidiChannelIndexPerOutputVoice[i];
-                if(channelIndex <= previousChannelIndex)
-                    throw new ApplicationException("CompositionAlgorithm: midi channels must be unique and in ascending order (but need not be contiguous)!");
-                previousChannelIndex = channelIndex;
+				int channelIndex = MidiChannelIndexPerOutputVoice[i];
 
-                if(channelIndex < 0 || channelIndex > 15)
-                    throw new ApplicationException("CompositionAlgorithm: midi channel out of range!");
+				if(channelIndex < 0 || channelIndex > 15)
+					throw new ApplicationException("CompositionAlgorithm: midi channel out of range!");
+				
+				if(channelIndex != 9) // 9 is percussion channel
+				{
+					if(channelIndex != (previousChannelIndex + 1))
+					{
+						throw new ApplicationException("CompositionAlgorithm: (non-percussion) midi channels must be unique and in ascending order!");
+					}
+					previousChannelIndex = channelIndex;
+				}
             }
 
-            // Midi input devices are identified by their midi channel, so there may not be more than 16 of them.
-            // InputVoices can share the same midi input channel (a device can play more than one voice), so there
-            // is no upper limit to the number of InputVoices.
+            // Moritz assumes a single Midi input device playing on input channel 0, and a maximum of 4 InputVoices that respond to that channel.
             // Input Voices having the same channel are agglomerated at load time by the Assistant Performer.
-            if(NumberOfInputVoices < 0)
-                throw new ApplicationException("CompositionAlgorithm: There can not be a negative number of input voices!");
+            if(NumberOfInputVoices < 0 || NumberOfInputVoices > 4)
+                throw new ApplicationException("CompositionAlgorithm: Invalid number of InputVoices!");
 
-            if(NumberOfBars == 0)
+            if(NumberOfBars <= 0)
                 throw new ApplicationException("CompositionAlgorithm: There must be at least one bar!");
 
         }
@@ -74,21 +78,31 @@ namespace Moritz.Algorithm
             return rval;
         }
 
-        /// <summary>
-        /// Returns a midi channel for each output voice.
-        /// These midi channels must always be in ascending order, starting at 0.
-        /// Not every channel has to exist, so that the standard midi percussion channel (channelIndex 9) can be used or omitted.
-        /// These values must be in range [ 0..15 ] are written once to each voice in the score file (in the first system).
-        /// A midi channel's voiceID (written into in the score, if there are input voices) is its position in this list.
-        /// The top to bottom printed order of the voices in the score (and whether the voices are printed at all) is determined by
-        /// a parameter in the .mkss file. 
-        /// </summary>
-        public abstract IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get; }
+		/// <summary>
+		/// Returns a midi channel for each output voice (in top-bottom voice order in the score).
+		/// Each midi channel (in range [0..15]) can can only be used once, and (apart from channel index 9 -- the percussion channel),
+		/// must be allocated in top-bottom order. Channel index 9 can be associated (once) with any voice.
+		/// Notes:
+		/// Midi channels are always allocated to tracks (voices) in this top-bottom order, even when the track (voice) is invisible.
+		/// (The Assistant Performer's tracks control can distinguish between visible and invisible tracks, and display their
+		/// buttons differently.)
+		/// The visibility of voices, and their association with staves, is controlled using an input field in the Assistant
+		/// Composer's main dialog window.
+		/// Moritz provides midi message information (including channel info) associated with particular output tracks, so that
+		/// the Assistant Performer can use this information at score load-time. Thereafter, the Assistant Performer simply refers
+		/// to each track using its (real, top-bottom) index. Moritz also uses the track indices in the references to tracks in the
+		/// input notes that it creates. This means that the Assistant Performer should never have to refer to midi channels at run-time.
+		/// The AP could, provide track-channel info to users if necessary, but I think this could be done simply by using descriptive
+		/// staff names in the score.
+		/// </summary>
+		public abstract IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get; }
 
-        /// <summary>
-        /// Returns the number of inputVoices created by the algorithm.
-        /// </summary>
-        public abstract int NumberOfInputVoices { get; }
+		/// <summary>
+		/// The number of InputVoices created by the algorithm.
+		/// Moritz assumes a single Midi input device playing on input channel 0, and a maximum of 4 InputVoices that respond to that channel.
+		/// Input Voices having the same channel are agglomerated at load time by the Assistant Performer.
+		/// </summary>
+		public abstract int NumberOfInputVoices { get; }
 
         /// <summary>
         /// Returns the number of bars (=bar definitions) created by the algorithm.
@@ -373,43 +387,7 @@ namespace Moritz.Algorithm
 		/// </summary>
 		public void GetInitialClefPerVoiceDef(PageFormat pageFormat)
         {
-            List<string> pageFormatClefsList = pageFormat.ClefsList;
-            List<List<byte>> visibleOutputVoiceIndicesPerStaff = pageFormat.VisibleOutputVoiceIndicesPerStaff;
-            List<List<byte>> visibleInputVoiceIndicesPerStaff = pageFormat.VisibleInputVoiceIndicesPerStaff;
-
-            List<string> initialClefs = new List<string>();
-            #region fill initialClefs to the right length, just so that it can be indexed.
-            for(int i = 0; i < this.MidiChannelIndexPerOutputVoice.Count; ++i)
-            {
-                initialClefs.Add("t");
-            }
-            for(int i = 0; i < this.NumberOfInputVoices; ++i)
-            {
-                initialClefs.Add("t");
-            }
-            #endregion
-
-            int pageFormatClefsListIndex = 0;
-            for(int i = 0; i < visibleOutputVoiceIndicesPerStaff.Count; ++i)
-            {
-                List<byte> voiceIndices = visibleOutputVoiceIndicesPerStaff[i];
-                foreach(byte index in voiceIndices)
-                {
-                    initialClefs[index] = pageFormatClefsList[pageFormatClefsListIndex++];
-                }
-            }
-
-            int firstInputClefIndex = this.MidiChannelIndexPerOutputVoice.Count;
-            for(int i = 0; i < visibleInputVoiceIndicesPerStaff.Count; ++i)
-            {
-                List<byte> inputVoiceIndices = visibleInputVoiceIndicesPerStaff[i];
-                foreach(byte index in inputVoiceIndices)
-                {
-                    initialClefs[firstInputClefIndex + index] = pageFormatClefsList[pageFormatClefsListIndex++];
-                }
-            }
-
-			InitialClefPerVoiceDef = initialClefs;
+			InitialClefPerVoiceDef = pageFormat.ClefsList;
 		}
 
 		public List<string> InitialClefPerVoiceDef = null;
