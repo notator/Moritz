@@ -29,7 +29,7 @@ namespace Moritz.Algorithm
         protected void CheckParameters()
         {
 			#region check output channels
-            int outputChannelCount = MidiChannelIndexPerOutputVoice.Count;
+            int outputChannelCount = MidiChannelPerOutputVoice.Count;
             if(outputChannelCount < 1)
                 throw new ApplicationException("CompositionAlgorithm: There must be at least one output voice!");
             if(outputChannelCount > 16)
@@ -38,7 +38,7 @@ namespace Moritz.Algorithm
             int previousChannelIndex = -1;
             for(int i = 0; i < outputChannelCount; ++i)
             {
-				int channelIndex = MidiChannelIndexPerOutputVoice[i];
+				int channelIndex = MidiChannelPerOutputVoice[i];
 
 				if(channelIndex < 0 || channelIndex > 15)
 					throw new ApplicationException("CompositionAlgorithm: midi channel out of range!");
@@ -54,10 +54,10 @@ namespace Moritz.Algorithm
             }
 			#endregion
 			#region check input channels
-			// See the comment on the definition of MidiChannelIndexPerInputVoice.
-			if(MidiChannelIndexPerInputVoice != null)
+			// See the comment on the definition of MidiChannelPerInputVoice.
+			if(MidiChannelPerInputVoice != null)
 			{
-				var mcipiv = MidiChannelIndexPerInputVoice;
+				var mcipiv = MidiChannelPerInputVoice;
 				if(mcipiv.Count == 0 || mcipiv[0] != 0)
 				{
 					throw new ApplicationException("CompositionAlgorithm: the first input channel must be 0!");
@@ -75,7 +75,7 @@ namespace Moritz.Algorithm
 					{
 						throw new ApplicationException("CompositionAlgorithm: input channel out of range!");
 					}
-					if(channel != prevChannel || channel != (prevChannel + 1))
+					if(channel != prevChannel && channel != (prevChannel + 1))
 					{
 						throw new ApplicationException("CompositionAlgorithm: input channels must be in numerical order!");
 					}
@@ -136,7 +136,7 @@ namespace Moritz.Algorithm
 		/// The AP could provide track-channel info to users if necessary, but I think this could initially be done simply
 		/// by using descriptive staff names in the score.
 		/// </summary>
-		public abstract IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get; }
+		public abstract IReadOnlyList<int> MidiChannelPerOutputVoice { get; }
 
 		/// <summary>
 		/// Defines the midi channel index for each input voice, in the top to bottom order of the input voices in each system.
@@ -150,7 +150,7 @@ namespace Moritz.Algorithm
 		/// At load time, the Assistant Performer agglomerates input voices having the same midi input channel into a
 		/// single input sequence.
 		/// </summary>
-		public abstract IReadOnlyList<int> MidiChannelIndexPerInputVoice { get; }
+		public abstract IReadOnlyList<int> MidiChannelPerInputVoice { get; }
 
         /// <summary>
         /// Returns the number of bars (=bar definitions) created by the algorithm.
@@ -177,7 +177,7 @@ namespace Moritz.Algorithm
         /// The chord definitions in TrkDef.UniqueDefs must be MidiChordDefs.
         /// The chord definitions in InputVoice.UniqueDefs must be InputChordDefs.
         /// Algorithms declare the number of output and input voices they construct by defining the
-        /// MidiChannelIndexPerOutputVoice and NumberOfInputVoices properties (see above).
+        /// MidiChannelPerOutputVoice and NumberOfInputVoices properties (see above).
         /// For convenience in the Assistant Composer, the number of bars is also returned (in the
         /// NumberOfBars property).
         /// If one or more InputVoices are defined, then an TrkOptions object must be created, given
@@ -188,7 +188,7 @@ namespace Moritz.Algorithm
         /// created. Each VoiceID is its index in the original bars created by the algorithm. (The top-bottom 
         /// order of these voices in the final score is set using the Assistant Composer's layout options.)
         /// An algorithm associates each voice (voiceID) with a particular midi channel by setting the
-        /// MidiChannelIndexPerOutputVoice property in the top to bottom order of the voices in the bars being
+        /// MidiChannelPerOutputVoice property in the top to bottom order of the voices in the bars being
         /// created. This rigmarole allows algorithms to stipulate the standard midi percussion channel (channel
         /// index 9).
         /// An OutputVoice's midiChannel, voiceID (and masterVolume) are written only to each voice in the first

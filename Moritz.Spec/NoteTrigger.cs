@@ -91,7 +91,7 @@ namespace Moritz.Spec
 		{
 			foreach(TrkRef tr in noteOn.SeqRef.TrkRefs)
 			{
-				_trkOffs.Add(tr.MidiChannel);
+				_trkOffs.Add(tr.TrkIndex);
 			}
 		}
 

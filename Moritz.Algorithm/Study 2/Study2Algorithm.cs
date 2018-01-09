@@ -17,8 +17,8 @@ namespace Moritz.Algorithm.Study2
             CheckParameters();
         }
 
-        public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2 }; } }
-        public override IReadOnlyList<int> MidiChannelIndexPerInputVoice { get { return null; } }
+        public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0, 1, 2 }; } }
+        public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
         public override int NumberOfBars { get { return 74; } }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Moritz.Algorithm.Study2
 					mainTrk3
 				};
 
-			Seq mainSeq = new Seq(0, trks, MidiChannelIndexPerOutputVoice);
+			Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
 
 			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
 

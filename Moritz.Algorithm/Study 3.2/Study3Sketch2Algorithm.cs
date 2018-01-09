@@ -23,8 +23,8 @@ namespace Moritz.Algorithm.Study3Sketch2
             CheckParameters();
         }
 
-        public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
-        public override IReadOnlyList<int> MidiChannelIndexPerInputVoice { get { return new List<int>() { 0 }; } }  
+        public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
+        public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return new List<int>() { 0 }; } }  
         public override int NumberOfBars { get { return 5; } }
 
         /// <summary>
@@ -137,38 +137,29 @@ namespace Moritz.Algorithm.Study3Sketch2
             InputVoiceDef ivd = new InputVoiceDef(0, 0, new List<IUniqueDef>());
             ivd.MsPositionReContainer = bar1Seq.AbsMsPosition;
 
-            Trk leadTrk = null;
-            foreach(Trk trk in bar1Seq.Trks)
+            Trk trk0 = bar1Seq.Trks[0];
+
+            foreach(IUniqueDef tIud in trk0)
             {
-                if(trk.MidiChannel == 0)
+                MidiRestDef restDef = tIud as MidiRestDef;
+                MidiChordDef chordDef = tIud as MidiChordDef;
+                if(restDef != null)
                 {
-                    leadTrk = trk;
-                    break;
-                }
-                
-            }
-            Debug.Assert(leadTrk != null);
-            foreach(IUniqueDef tIud in leadTrk)
-            {
-                MidiRestDef tRestDef = tIud as MidiRestDef;
-                MidiChordDef tmcd = tIud as MidiChordDef;
-                if(tRestDef != null)
-                {
-                    InputRestDef iRestDef = new InputRestDef(tRestDef.MsPositionReFirstUD, tRestDef.MsDuration);
+                    InputRestDef iRestDef = new InputRestDef(restDef.MsPositionReFirstUD, restDef.MsDuration);
                     ivd.Add(iRestDef);
                 }
-                else if(tmcd != null)
+                else if(chordDef != null)
                 {
                     List<TrkRef> trkRefs = new List<TrkRef>();
                     TrkOptions trkOptions = new TrkOptions(new TrkOffControl(TrkOffOption.stopChord));
-                    foreach(Trk trk in bar1Seq.Trks)
+					for(int tIndex = 0; tIndex < bar1Seq.Trks.Count; ++tIndex)
                     {
-                        trkRefs.Add(new TrkRef((byte)trk.MidiChannel, bar1Seq.AbsMsPosition + tmcd.MsPositionReFirstUD, 1, trkOptions));
+                        trkRefs.Add(new TrkRef(tIndex, bar1Seq.AbsMsPosition + chordDef.MsPositionReFirstUD, 1, trkOptions));
                     }
                     SeqRef seqRef = new SeqRef(trkRefs, null);
                     NoteOn noteOn = new NoteOn(seqRef);
                     List<InputNoteDef> inputNoteDefs = new List<InputNoteDef>();
-                    foreach(byte notatedMidiPitch in tmcd.NotatedMidiPitches)
+                    foreach(byte notatedMidiPitch in chordDef.NotatedMidiPitches)
                     {                      
                         inputNoteDefs.Add(new InputNoteDef((byte)(notatedMidiPitch + 36), noteOn, null));
                     }
@@ -337,7 +328,7 @@ namespace Moritz.Algorithm.Study3Sketch2
 
             //bar[0].InsertClefDef(5, "t");
 
-            Seq seq = new Seq(0, bar, MidiChannelIndexPerOutputVoice);
+            Seq seq = new Seq(0, bar, MidiChannelPerOutputVoice);
 
             return seq;
         }
@@ -402,7 +393,7 @@ namespace Moritz.Algorithm.Study3Sketch2
                 }
             }
 
-            Seq seq = new Seq(0, bar, MidiChannelIndexPerOutputVoice);
+            Seq seq = new Seq(0, bar, MidiChannelPerOutputVoice);
 
             return seq;
         }

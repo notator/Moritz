@@ -46,17 +46,17 @@ namespace Moritz.Composer
 
             Debug.Assert(_algorithm != null);
 
-			_outputVoiceIndices = GetVoiceIndices(_algorithm.MidiChannelIndexPerOutputVoice);
-			if(_algorithm.MidiChannelIndexPerInputVoice != null)
+			_outputMIDIChannels = GetVoiceIndices(_algorithm.MidiChannelPerOutputVoice);
+			if(_algorithm.MidiChannelPerInputVoice != null)
 			{
-				_inputVoiceIndices = GetVoiceIndices(_algorithm.MidiChannelIndexPerInputVoice);
+				_inputMIDIChannels = GetVoiceIndices(_algorithm.MidiChannelPerInputVoice);
 			}
 
 			GetSelectedSettings();
 
             if(VoiceIndicesPerStaffTextBox.Text == "")
             {
-                SetDefaultVoiceIndicesPerStaff(_algorithm.MidiChannelIndexPerOutputVoice.Count);
+                SetDefaultVoiceIndicesPerStaff(_algorithm.MidiChannelPerOutputVoice.Count);
             }
         }
         #region called from ctor
@@ -145,7 +145,7 @@ namespace Moritz.Composer
         {
 			LoadSettings();
 
-            SetVoiceIndicesHelpLabel(_algorithm.MidiChannelIndexPerOutputVoice, _algorithm.MidiChannelIndexPerInputVoice);
+            SetVoiceIndicesHelpLabel(_algorithm.MidiChannelPerOutputVoice, _algorithm.MidiChannelPerInputVoice);
             SetSystemStartBarsHelpLabel(_algorithm.NumberOfBars);
 
             VoiceIndicesPerStaffTextBox_Leave(null, null); // sets _numberOfOutputStaves _numberOfStaves
@@ -935,8 +935,8 @@ namespace Moritz.Composer
             bool error = false;
 
             string[] outInStrings = VoiceIndicesPerStaffTextBox.Text.Split('|');
-            List<List<byte>> outputIndexLists = new List<List<byte>>();
-            List<List<byte>> inputIndexLists = new List<List<byte>>();
+            List<List<byte>> outputMIDIChannelsPerStaff = new List<List<byte>>();
+            List<List<byte>> inputMIDIChannelsPerStaff = new List<List<byte>>();
             outInStrings[0] = outInStrings[0].Trim();
             if(outInStrings.Length > 1)
                 outInStrings[1] = outInStrings[1].Trim();
@@ -945,17 +945,17 @@ namespace Moritz.Composer
             {
                 try
                 {
-                    outputIndexLists = M.StringToByteLists(outInStrings[0]);
+                    outputMIDIChannelsPerStaff = M.StringToByteLists(outInStrings[0]);
                 }
                 catch
                 {
                     error = true;
                 }
             }
-			foreach(List<byte> staffList in outputIndexLists)
+			foreach(List<byte> staffMIDIChannels in outputMIDIChannelsPerStaff)
 			{
 				// a percussion channel must have its own staff.
-				if(staffList.Contains((byte) 9) && staffList.Count > 1)
+				if(staffMIDIChannels.Contains((byte) 9) && staffMIDIChannels.Count > 1)
 				{
 					error = true;
 				}
@@ -964,7 +964,7 @@ namespace Moritz.Composer
             {
                 try
                 {
-                    inputIndexLists = M.StringToByteLists(outInStrings[1]);
+                    inputMIDIChannelsPerStaff = M.StringToByteLists(outInStrings[1]);
                 }
                 catch
                 {
@@ -972,27 +972,27 @@ namespace Moritz.Composer
                 }
             }
 
-			if(outputIndexLists.Count == 0)
+			if(outputMIDIChannelsPerStaff.Count == 0)
 			{
 				error = true;
 			}
-			if(!error && inputIndexLists.Count == 0 && _inputVoiceIndices != null)
+			if(!error && inputMIDIChannelsPerStaff.Count == 0 && _inputMIDIChannels != null)
 			{
 				error = true;
 			}
-			if(!error && outputIndexLists.Count > 0)
+			if(!error && outputMIDIChannelsPerStaff.Count > 0)
             {
-                error = CheckVoiceIndices(outputIndexLists, _outputVoiceIndices);
+                error = CheckMIDIChannelIndices(outputMIDIChannelsPerStaff, _outputMIDIChannels);
             }
-			if(!error && inputIndexLists.Count > 0)
+			if(!error && inputMIDIChannelsPerStaff.Count > 0)
 			{
-				if(_inputVoiceIndices == null)
+				if(_inputMIDIChannels == null)
 				{
 					error = true;
 				}
 				else
 				{
-					error = CheckVoiceIndices(inputIndexLists, _inputVoiceIndices);
+					error = CheckMIDIChannelIndices(inputMIDIChannelsPerStaff, _inputMIDIChannels);
 				}
             }
 
@@ -1003,46 +1003,46 @@ namespace Moritz.Composer
             }
             else
             {
-                _visibleOutputVoiceIndicesPerStaff = outputIndexLists;
-                _visibleInputVoiceIndicesPerStaff = inputIndexLists;
+                _outputMIDIChannelsPerStaff = outputMIDIChannelsPerStaff;
+                _inputMIDIChannelsPerStaff = inputMIDIChannelsPerStaff; // cannot be null, but can be empty
                 EnableStaffDependentControls(true);
-                VoiceIndicesPerStaffTextBox.Text = NormalizedVoiceIndicesString(outputIndexLists, inputIndexLists);
+                VoiceIndicesPerStaffTextBox.Text = NormalizedVoiceIndicesString(outputMIDIChannelsPerStaff, inputMIDIChannelsPerStaff);
                 M.SetTextBoxErrorColorIfNotOkay(VoiceIndicesPerStaffTextBox, true);
             }
             SetGroupBoxIsUnconfirmed(NotationGroupBox, ConfirmNotationButton, RevertNotationButton);
         }
 
-        private bool CheckVoiceIndices(List<List<byte>> voiceIndexLists, List<byte> availableIndices)
+        private bool CheckMIDIChannelIndices(List<List<byte>> midiChannelsPerStaff, List<byte> availableMIDIChannels)
         {
-			Debug.Assert(availableIndices != null);
+			Debug.Assert(availableMIDIChannels != null);
 
             bool error = false;
-			var flatIndices = new List<byte>();
+			var flatMIDIChannels = new List<byte>();
 			#region get flat indices
-			foreach(List<byte> voiceIndicesPerStaff in voiceIndexLists)
+			foreach(List<byte> midiChannels in midiChannelsPerStaff)
 			{
-				if(voiceIndicesPerStaff.Count == 0 || voiceIndicesPerStaff.Count > 2)
+				if(midiChannels.Count == 0 || midiChannels.Count > 2)
 				{
 					error = true;
 					break;
 				}
-				foreach(var index in voiceIndicesPerStaff)
+				foreach(var index in midiChannels)
 				{
-					flatIndices.Add(index);
+					flatMIDIChannels.Add(index);
 				}
 			}
 			#endregion
 			if(error == false)
 			{ 
-				if(error == false && flatIndices.Count != availableIndices.Count)
+				if(error == false && flatMIDIChannels.Count != availableMIDIChannels.Count)
 				{
 					error = true;
 				}
 				else
 				{
-					for(var i = 0; i < availableIndices.Count; ++i)
+					for(var i = 0; i < availableMIDIChannels.Count; ++i)
 					{
-						if(flatIndices[i] != availableIndices[i])
+						if(flatMIDIChannels[i] != availableMIDIChannels[i])
 						{
 							error = true;
 							break;
@@ -1133,17 +1133,14 @@ namespace Moritz.Composer
             {
                 List<byte> bytes = M.StringToByteList(StaffGroupsTextBox.Text, ',');
                 int sum = 0;
-                bool outputOK = false;
                 foreach(byte b in bytes)
                 {
                     sum += (int)b;
-                    if(sum == _visibleOutputVoiceIndicesPerStaff.Count
-                        || (_visibleOutputVoiceIndicesPerStaff.Count == 0 && sum == _visibleInputVoiceIndicesPerStaff.Count))
-                        outputOK = true;
                 }
-                    
-                if(! outputOK || sum != _numberOfStaves)
-                    M.SetTextBoxErrorColorIfNotOkay(StaffGroupsTextBox, false);
+				if(sum != _numberOfStaves)
+				{
+					M.SetTextBoxErrorColorIfNotOkay(StaffGroupsTextBox, false);
+				}
             }
             SetGroupBoxIsUnconfirmed(NotationGroupBox, ConfirmNotationButton, RevertNotationButton);
         }
@@ -2120,9 +2117,9 @@ namespace Moritz.Composer
             pageFormat.DefaultDistanceBetweenStaves = int.Parse(MinimumGapsBetweenStavesTextBox.Text) * pageFormat.Gap;
             pageFormat.DefaultDistanceBetweenSystems = int.Parse(MinimumGapsBetweenSystemsTextBox.Text) * pageFormat.Gap;
 
-            pageFormat.VisibleOutputVoiceIndicesPerStaff = _visibleOutputVoiceIndicesPerStaff; // one value per output staff
-            pageFormat.VisibleInputVoiceIndicesPerStaff = _visibleInputVoiceIndicesPerStaff; // one value per input staff
-            pageFormat.ClefsList = M.StringToStringList(this.ClefsPerStaffTextBox.Text, ',');
+            pageFormat.OutputMIDIChannelsPerStaff = _outputMIDIChannelsPerStaff; // one channels list per output staff
+            pageFormat.InputMIDIChannelsPerStaff = _inputMIDIChannelsPerStaff; // one channels list per input staff
+			pageFormat.ClefsList = M.StringToStringList(this.ClefsPerStaffTextBox.Text, ',');
             pageFormat.StafflinesPerStaff = M.StringToIntList(this.StafflinesPerStaffTextBox.Text, ',');
             pageFormat.StaffGroups = M.StringToIntList(this.StaffGroupsTextBox.Text, ',');
 
@@ -2165,22 +2162,17 @@ namespace Moritz.Composer
         #endregion editing
         #region score creation
         CompositionAlgorithm _algorithm = null;
-		private List<byte> _outputVoiceIndices = null;
-		private List<byte> _inputVoiceIndices = null;
-		private List<List<byte>> _visibleOutputVoiceIndicesPerStaff; // set in OutputVoiceIndicesPerStaffTextBox_Leave
-        private List<List<byte>> _visibleInputVoiceIndicesPerStaff; // set in InputVoiceIndicesPerStaffTextBox_Leave
+		private List<byte> _outputMIDIChannels = null;
+		private List<byte> _inputMIDIChannels = null;
+		private List<List<byte>> _outputMIDIChannelsPerStaff = null; // always set in VoiceIndicesPerStaffTextBox_Leave (cannot be empty)
+        private List<List<byte>> _inputMIDIChannelsPerStaff = null; // always set in VoiceIndicesPerStaffTextBox_Leave (can be empty)
         private int _numberOfStaves
         {
             get
             {
-                if(_visibleOutputVoiceIndicesPerStaff != null && _visibleInputVoiceIndicesPerStaff != null)
-                {
-                    return _visibleOutputVoiceIndicesPerStaff.Count + _visibleInputVoiceIndicesPerStaff.Count;
-                }
-                else
-                {
-                    return 0;
-                }
+				Debug.Assert(_outputMIDIChannelsPerStaff != null && _outputMIDIChannelsPerStaff.Count > 0 && _inputMIDIChannelsPerStaff != null);
+				var nStaves = _outputMIDIChannelsPerStaff.Count + _inputMIDIChannelsPerStaff.Count; // _inputVoiceIndicesPerStaff.Count can be 0.
+				return nStaves;
             }
         }
         public PageFormat PageFormat = null;

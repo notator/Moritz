@@ -78,7 +78,7 @@ namespace Moritz.Spec
                 trks.Add(_trks[i].Clone());
             }
 
-            Seq clone = new Seq(_absMsPosition, trks, MidiChannelIndexPerOutputVoice);
+            Seq clone = new Seq(_absMsPosition, trks, MidiChannelPerOutputVoice);
 
             return clone;
         }
@@ -102,7 +102,7 @@ namespace Moritz.Spec
             Debug.Assert(_trks.Count == seq2.Trks.Count);
             Debug.Assert(this.IsNormalized);
             Debug.Assert(seq2.IsNormalized);
-            AssertChannelConsistency(seq2.MidiChannelIndexPerOutputVoice);
+            AssertChannelConsistency(seq2.MidiChannelPerOutputVoice);
             #endregion
 
             int nTrks = _trks.Count;
@@ -557,7 +557,7 @@ namespace Moritz.Spec
 			}
 		}
 
-        public IReadOnlyList<int> MidiChannelIndexPerOutputVoice
+        public IReadOnlyList<int> MidiChannelPerOutputVoice
         {
             get
             {

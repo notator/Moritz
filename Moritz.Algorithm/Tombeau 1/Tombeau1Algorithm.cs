@@ -32,8 +32,8 @@ namespace Moritz.Algorithm.Tombeau1
             CheckParameters();
         }
 
-        public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3 }; } }
-		public override IReadOnlyList<int> MidiChannelIndexPerInputVoice { get { return null; } }
+        public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3 }; } }
+		public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
         public override int NumberOfBars { get { return 50; } }
 
         /// <summary>
@@ -329,7 +329,7 @@ namespace Moritz.Algorithm.Tombeau1
                 Trks { get; }
                 AbsMsPosition { get; set; }
                 MsDuration { get; set; } // Setting this value stretches or compresses the msDurations of all the trks and their contained UniqueDefs.
-                MidiChannelIndexPerOutputVoice { get; }
+                MidiChannelPerOutputVoice { get; }
 
             ***************************************************************************/
 			#endregion Seq functions
@@ -369,7 +369,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 			/**********************************************/
 
-			Seq mainSeq = new Seq(0, new List<Trk>(), MidiChannelIndexPerOutputVoice);
+			Seq mainSeq = new Seq(0, new List<Trk>(), MidiChannelPerOutputVoice);
 			CompositionType compositionType = CompositionType.threeVoices;
 
 			// shortVersion1 (5' 55" @40% speed)
@@ -383,7 +383,7 @@ namespace Moritz.Algorithm.Tombeau1
 			// long version (27' 20" @ 40% speed)
 			Tombeau1Type longVersion = new Tombeau1Type(nModeSegments: 20, nModeGrpTrksPerModeSegment: 10, maxChordsPerModeGrpTrk: 12);
 
-			Voice1 voice1 = new Voice1(shortVersion4, MidiChannelIndexPerOutputVoice[3], centredEnvelope, basedEnvelope);
+			Voice1 voice1 = new Voice1(shortVersion4, MidiChannelPerOutputVoice[3], centredEnvelope, basedEnvelope);
 			Voice2 voice2 = null;
 			Voice3 voice3 = null;
 			Voice4 voice4 = null;
@@ -404,7 +404,7 @@ namespace Moritz.Algorithm.Tombeau1
 				case CompositionType.twoVoices:
 				{
 					voice1.AdjustForTwoVoices();
-					voice2 = new Voice2(MidiChannelIndexPerOutputVoice[2], voice1, centredEnvelope, basedEnvelope);
+					voice2 = new Voice2(MidiChannelPerOutputVoice[2], voice1, centredEnvelope, basedEnvelope);
 					// The voice midiChannels determine the top-bottom order of the staves in the score.
 					voice2.AddToSeq(mainSeq);
 					voice1.AddToSeq(mainSeq);
@@ -413,9 +413,9 @@ namespace Moritz.Algorithm.Tombeau1
 				case CompositionType.threeVoices:
 				{
 					voice1.AdjustForThreeVoices();
-					voice2 = new Voice2(MidiChannelIndexPerOutputVoice[2], voice1, centredEnvelope, basedEnvelope);
+					voice2 = new Voice2(MidiChannelPerOutputVoice[2], voice1, centredEnvelope, basedEnvelope);
 					voice2.AdjustForThreeVoices();
-					voice3 = new Voice3(MidiChannelIndexPerOutputVoice[1], voice1, voice2, centredEnvelope, basedEnvelope);
+					voice3 = new Voice3(MidiChannelPerOutputVoice[1], voice1, voice2, centredEnvelope, basedEnvelope);
 					// The voice midiChannels determine the top-bottom order of the staves in the score.
 					voice1.AddToSeq(mainSeq);
 					voice2.AddToSeq(mainSeq);
@@ -425,11 +425,11 @@ namespace Moritz.Algorithm.Tombeau1
 				case CompositionType.fourVoices:
 				{
 					voice1.AdjustForFourVoices();
-					voice2 = new Voice2(MidiChannelIndexPerOutputVoice[2], voice1, centredEnvelope, basedEnvelope);
+					voice2 = new Voice2(MidiChannelPerOutputVoice[2], voice1, centredEnvelope, basedEnvelope);
 					voice2.AdjustForFourVoices();
-					voice3 = new Voice3(MidiChannelIndexPerOutputVoice[1], voice1, voice2, centredEnvelope, basedEnvelope);
+					voice3 = new Voice3(MidiChannelPerOutputVoice[1], voice1, voice2, centredEnvelope, basedEnvelope);
 					voice3.AdjustForFourVoices();
-					voice4 = new Voice4(MidiChannelIndexPerOutputVoice[0], voice1, voice2, voice3, centredEnvelope, basedEnvelope);
+					voice4 = new Voice4(MidiChannelPerOutputVoice[0], voice1, voice2, voice3, centredEnvelope, basedEnvelope);
 					// The voice midiChannels determine the top-bottom order of the staves in the score.
 					voice1.AddToSeq(mainSeq);
 					voice2.AddToSeq(mainSeq);
