@@ -28,6 +28,7 @@ namespace Moritz.Algorithm
 
         protected void CheckParameters()
         {
+			#region check output channels
             int outputChannelCount = MidiChannelIndexPerOutputVoice.Count;
             if(outputChannelCount < 1)
                 throw new ApplicationException("CompositionAlgorithm: There must be at least one output voice!");
@@ -51,11 +52,47 @@ namespace Moritz.Algorithm
 					previousChannelIndex = channelIndex;
 				}
             }
-
-            // Moritz assumes a single Midi input device playing on input channel 0, and a maximum of 4 InputVoices that respond to that channel.
-            // Input Voices having the same channel are agglomerated at load time by the Assistant Performer.
-            if(MidiChannelIndexPerInputVoice < 0 || MidiChannelIndexPerInputVoice > 4)
-                throw new ApplicationException("CompositionAlgorithm: Invalid number of InputVoices!");
+			#endregion
+			#region check input channels
+			// See the comment on the definition of MidiChannelIndexPerInputVoice.
+			if(MidiChannelIndexPerInputVoice != null)
+			{
+				var mcipiv = MidiChannelIndexPerInputVoice;
+				if(mcipiv.Count == 0 || mcipiv[0] != 0)
+				{
+					throw new ApplicationException("CompositionAlgorithm: the first input channel must be 0!");
+				}
+				if(mcipiv.Count > 4)
+				{
+					throw new ApplicationException("CompositionAlgorithm: too many input voices!");
+				}
+				int channel0Count = 0;
+				int channel1Count = 0;
+				var prevChannel = -1;
+				foreach(var channel in mcipiv)
+				{
+					if(channel < 0 || channel > 1)
+					{
+						throw new ApplicationException("CompositionAlgorithm: input channel out of range!");
+					}
+					if(channel != prevChannel || channel != (prevChannel + 1))
+					{
+						throw new ApplicationException("CompositionAlgorithm: input channels must be in numerical order!");
+					}
+					prevChannel = channel;
+					channel0Count = (channel == 0) ? channel0Count + 1 : channel0Count;
+					channel1Count = (channel == 1) ? channel1Count + 1 : channel1Count;
+				}
+				if(channel0Count < 1 || channel0Count > 2)
+				{
+					throw new ApplicationException("CompositionAlgorithm: input channel 0 must occur 1 or 2 times.");
+				}
+				if(channel1Count != 0 && channel1Count > 2)
+				{
+					throw new ApplicationException("CompositionAlgorithm: input channel 1 may occur 0, 1 or 2 times.");
+				}
+			}
+			#endregion
 
             if(NumberOfBars <= 0)
                 throw new ApplicationException("CompositionAlgorithm: There must be at least one bar!");
@@ -103,12 +140,13 @@ namespace Moritz.Algorithm
 
 		/// <summary>
 		/// Defines the midi channel index for each input voice, in the top to bottom order of the input voices in each system.
-		/// This list can be empty, in which case there will be no input voices.
+		/// This list can be null, in which case there will be no input voices.
 		/// Input voices are rendered larger than, and placed below, output voices in scores.
 		/// 1. Currently, only midi input channels 0 and 1 are allowed. (These channels could be sent by a single,
 		///    split keyboard.)
-		/// 2. Each input midi channel can be used once or twice, but the channels must be in numerical order.
-		///    (The possible alternatives are: {0,1}, {0,0,1}, {0,1,1} and {0,0,1,1}.)
+		/// 2. The first channel must be 0 with subsequent channels in numerical order.
+		///    Channel 0 can be used once or twice. Channel 1 can be missing or used once or twice.
+		///    (The possible alternatives are: {0}, {0,1}, {0,0,1}, {0,1,1} and {0,0,1,1}.)
 		/// At load time, the Assistant Performer agglomerates input voices having the same midi input channel into a
 		/// single input sequence.
 		/// </summary>

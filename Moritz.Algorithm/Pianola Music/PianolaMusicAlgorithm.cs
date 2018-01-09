@@ -18,7 +18,7 @@ namespace Moritz.Algorithm.PianolaMusic
 
         public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get{	return new List<int>() { 0, 1, 2, 3, 4, 5 }; }}
 		public override int NumberOfBars { get{	return 8; }}
-		public override int MidiChannelIndexPerInputVoice { get { return 0; } }
+		public override IReadOnlyList<int> MidiChannelIndexPerInputVoice { get { return null; } }
 
 		// Neither the krystals, nor the palettes argument is used.
 		public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)

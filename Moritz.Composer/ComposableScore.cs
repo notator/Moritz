@@ -25,22 +25,24 @@ namespace Moritz.Composer
         /// </summary>
         protected bool CreateScore(List<Krystal> krystals, List<Palette> palettes)
         {
-			CheckOutputVoiceChannelsAndMasterVolumes(_algorithm);
 
             List<Bar> bars = _algorithm.DoAlgorithm(krystals, palettes);
 
 			CheckBars(bars);
 
-			SetOutputVoiceChannels(bars[0]);
-
-            CreateEmptySystems(bars, _pageFormat.VisibleInputVoiceIndicesPerStaff.Count); // one system per bar
+            List<int> outputMidiChannelSubstitutions = CreateEmptySystems(bars, _pageFormat.VisibleInputVoiceIndicesPerStaff.Count); // one system per bar
 
 			bool success = true;
 			if(_pageFormat.ChordSymbolType != "none") // set by AudioButtonsControl
             {
                 Notator.ConvertVoiceDefsToNoteObjects(this.Systems);
 
-                FinalizeSystemStructure(); // adds barlines, joins bars to create systems, etc.
+				if(_algorithm.MidiChannelIndexPerInputVoice != null)
+				{
+					AdjustOutputVoiceRefs(this.Systems, outputMidiChannelSubstitutions);
+				}
+
+				FinalizeSystemStructure(); // adds barlines, joins bars to create systems, etc.
 
                 /// The systems do not yet contain Metrics info.
                 /// The systems are given Metrics inside the following function then justified internally,
@@ -96,32 +98,6 @@ namespace Moritz.Composer
             return upperVoiceClefDict;
         }
 
-        /// <summary>
-        /// This function should be called before running the algorithm.
-        /// </summary>
-        private void CheckOutputVoiceChannelsAndMasterVolumes(CompositionAlgorithm algorithm)
-		{
-			string errorString = null;
-			IReadOnlyList<int> midiChannelIndexPerOutputVoice = algorithm.MidiChannelIndexPerOutputVoice;
-			if(string.IsNullOrEmpty(errorString))
-			{
-				for(int i = 0; i < midiChannelIndexPerOutputVoice.Count; ++i)
-				{
-					if(midiChannelIndexPerOutputVoice[i] < 0)
-					{
-						errorString = "All midi channel indices must be >= 0.";
-						break;
-					}
-					if(midiChannelIndexPerOutputVoice[i] > 15)
-					{
-						errorString = "All midi channel indices must be < 16.";
-						break;
-					}
-				}
-			}
-			Debug.Assert(string.IsNullOrEmpty(errorString), "Error in algorithm definition: \n\n" + errorString);
-		}
-
 		private void CheckBars(List<Bar> bars)
 		{
             string errorString = null;
@@ -149,10 +125,10 @@ namespace Moritz.Composer
 				Bar bar = bars[barIndex];
 				IReadOnlyList<VoiceDef> voiceDefs = bar.VoiceDefs;
 				string barNumber = (barIndex + 1).ToString();
-				 
+
 				if(voiceDefs.Count == 0)
 				{
-					errorString = "Bar " + barNumber + " contains no voices.";
+					errorString = $"Bar {barNumber} contains no voices.";
 					break;
 				}
 				if(!(voiceDefs[0] is Trk))
@@ -166,7 +142,7 @@ namespace Moritz.Composer
 					string voiceNumber = (voiceIndex + 1).ToString();
 					if(voiceDef.UniqueDefs.Count == 0)
 					{
-						errorString = "Voice number " + voiceNumber + " in Bar " + barNumber + " has an empty UniqueDefs list.";
+						errorString = $"Voice number {voiceNumber} in Bar {barNumber} has an empty UniqueDefs list.";
 						break;
 					}
 					foreach(IUniqueDef iud in voiceDef.UniqueDefs)
@@ -175,13 +151,13 @@ namespace Moritz.Composer
 						{
 							if(visibleLowerVoiceIndices.Contains(voiceIndex))
 							{
-								errorString = "Voice number " + voiceNumber + " is a lower voice on a staff, and contains a clef change.\n" +
+								errorString = $"Voice number {voiceNumber} is a lower voice on a staff, and contains a clef change.\n" + 
 								"Clefs should only be changed in the staff's top voice.";
 								break;
 							}
 							else if(!(barIndex == 0) && (upperVoiceClefDict.ContainsKey(voiceIndex) && upperVoiceClefDict[voiceIndex] == ccd.ClefType))
 							{
-								errorString = "Voice number " + voiceNumber + " has an unnecessary clef change in or after bar " + barNumber + ".";
+								errorString = $"Voice number {voiceNumber} has an unnecessary clef change in or after bar {barNumber}.";
 								break;
 							}
                             upperVoiceClefDict[voiceIndex] = ccd.ClefType; // a clef at the start of the first bar overrides the pageFormat.
@@ -272,43 +248,45 @@ namespace Moritz.Composer
 
 		/// <summary>
 		/// Check that
-		/// 1. Every system has at least one visible staff (error is fatal)
-		/// 2. Every track is visible in at least one system (error is  warning)
-		/// 3. Each track index (top to bottom) is the same as its MidiChannel (error is fatal)
+		/// 1. Every system has at least one visible (output or input) staff (error is fatal)
+		/// 2. Every output track is visible in at least one system (error is  warning)
+		/// 3. Each output track index (top to bottom) is the same as its MidiChannel (error is fatal)
 		/// </summary>
 		/// <param name="systems"></param>
 		private void CheckSystems(List<SvgSystem> systems)
 		{
-			#region check that all systems have at least one visible staff
+			#region check that all systems have at least one visible (output or input) staff
 			for(int systemIndex = 0; systemIndex < systems.Count; systemIndex++)
 			{
 				var staves = systems[systemIndex].Staves;
-				bool foundVisibleStaff = false;
+				bool foundVisibleOutputStaff = false;
 				for(int staffIndex = 0; staffIndex < staves.Count; staffIndex++)
 				{
 					var staff = staves[staffIndex];
 					if(staff.ContainsAChordSymbol)
 					{
-						foundVisibleStaff = true;
+						foundVisibleOutputStaff = true;
 						break;
 					}
 
 				}
-				Debug.Assert(foundVisibleStaff, $"System {systemIndex + 1} has no visible staff.");
+				Debug.Assert(foundVisibleOutputStaff, $"System {systemIndex + 1} has no visible (output or input) staff.");
 			}
 			#endregion
-			#region check that all tracks are visible in at least one system, and that track index (top to bottom) equals track MidiChannel. 
-			var trackVisibilities = new List<bool>();
+			#region check that all output tracks are visible in at least one system, and that the track's index (top to bottom) equals its MidiChannel. 
+			var outoutTrackVisibilities = new List<bool>();
 			foreach(var staff in systems[0].Staves)
 			{
 				foreach(var voice in staff.Voices)
 				{
-					trackVisibilities.Add(false);
+					if(voice is OutputVoice)
+					{
+						outoutTrackVisibilities.Add(false);
+					}
 				}
 			}
 
-			var trackMidiChannels = new List<int>();
-
+			var outputTrackMidiChannels = new List<int>();
 			for(int systemIndex = 0; systemIndex < systems.Count; systemIndex++)
 			{
 				var trackIndex = 0;
@@ -318,33 +296,37 @@ namespace Moritz.Composer
 					var voices = staves[staffIndex].Voices;
 					foreach(var voice in voices)
 					{
-						if(voice.ContainsAChordSymbol)
+						if(voice is OutputVoice)
 						{
-							trackVisibilities[trackIndex] = true;
-						}
-						trackIndex++;
+							if(voice.ContainsAChordSymbol)
+							{
+								outoutTrackVisibilities[trackIndex] = true;
+							}
+							trackIndex++;
 
-						trackMidiChannels.Add(voice.MidiChannel);
+							outputTrackMidiChannels.Add(voice.MidiChannel);
+						}
+						else break;
 					} 
 				}
 			}
-			var invisibleTracks = new List<int>();
+			var invisibleOutputTracks = new List<int>();
 
-			for(int trackIndex = 0; trackIndex < trackVisibilities.Count; trackIndex++)
+			for(int trackIndex = 0; trackIndex < outoutTrackVisibilities.Count; trackIndex++)
 			{
-				if(trackVisibilities[trackIndex] == false)
+				if(outoutTrackVisibilities[trackIndex] == false)
 				{
-					invisibleTracks.Add(trackIndex);
+					invisibleOutputTracks.Add(trackIndex);
 				}
-				Debug.Assert(trackIndex == trackMidiChannels[trackIndex], "Track index and MidiChannel must be identical.");
+				Debug.Assert(trackIndex == outputTrackMidiChannels[trackIndex], "Track index and MidiChannel must be identical.");
 			}
 			
-			if(invisibleTracks.Count > 0)
+			if(invisibleOutputTracks.Count > 0)
 			{
-				string iTracksStr = M.IntListToString(invisibleTracks, ", ");
+				string iTracksStr = M.IntListToString(invisibleOutputTracks, ", ");
 				string msg;
 				string title;
-				if(invisibleTracks.Count == 1)
+				if(invisibleOutputTracks.Count == 1)
 				{
 					title = "Invisible Track Warning";
 					msg = $"Track (= MidiChannel) {iTracksStr} contains no chord symbols,\nand is therefore never visible."; 
@@ -359,21 +341,6 @@ namespace Moritz.Composer
 			#endregion
 		}
 
-		/// <summary>
-		/// This function should be called for all scores when the bars are complete.
-		/// The plausibility checks have been made.
-		/// </summary>
-		private void SetOutputVoiceChannels(Bar firstBar)
-		{
-			IReadOnlyList<int> midiChannelIndexPerOutputVoice = _algorithm.MidiChannelIndexPerOutputVoice;
-			for(int i = 0; i < midiChannelIndexPerOutputVoice.Count; ++i)
-			{
-				Trk oVoice = firstBar.VoiceDefs[i] as Trk;
-				Debug.Assert(oVoice != null); // should be okay - the check has already been made
-				oVoice.MidiChannel = (byte)midiChannelIndexPerOutputVoice[i];
-			}
-		}
-
         /// <summary>
         /// Creates one System per bar (=list of VoiceDefs) in the argument.
         /// The Systems are complete with staves and voices of the correct type:
@@ -385,7 +352,7 @@ namespace Moritz.Composer
         /// The InputVoices are arranged according to _pageFormat.InputVoiceIndicesPerStaff.
         /// OutputVoices are given a midi channel allocated from top to bottom in the printed score.
         /// </summary>
-        public void CreateEmptySystems(List<Bar> bars, int numberOfVisibleInputStaves)
+        public List<int> CreateEmptySystems(List<Bar> bars, int numberOfVisibleInputStaves)
         {
             foreach(Bar bar in bars)
             {
@@ -393,25 +360,30 @@ namespace Moritz.Composer
                 this.Systems.Add(system);
             }
 
-            CreateEmptyOutputStaves(bars, numberOfVisibleInputStaves);
+            List<int> outputMidiChannelSubstitutions = CreateEmptyOutputStaves(bars, numberOfVisibleInputStaves);
             CreateEmptyInputStaves(bars);
-        }
 
-        private void CreateEmptyOutputStaves(List<Bar> bars, int numberOfVisibleInputStaves)
+			return outputMidiChannelSubstitutions; // needed after InputStaves have been filled with NoteObjects
+		}
+
+        private List<int> CreateEmptyOutputStaves(List<Bar> bars, int numberOfVisibleInputStaves)
         {
             int nVisibleOutputStaves = _pageFormat.VisibleOutputVoiceIndicesPerStaff.Count;
+
             List<byte> invisibleOutputVoiceIndices = new List<byte>();
             if(numberOfVisibleInputStaves > 0 )
                 invisibleOutputVoiceIndices = InvisibleOutputVoiceIndices(_pageFormat.VisibleOutputVoiceIndicesPerStaff, bars[0].Trks);
 
-            for(int i = 0; i < Systems.Count; i++)
-            {
-                SvgSystem system = Systems[i];
-                IReadOnlyList<VoiceDef> voiceDefs = bars[i].VoiceDefs;
+			List<int> outputMidiChannelSubstitutions = null;
 
-                #region create hidden staves
-                if(invisibleOutputVoiceIndices.Count > 0)
-                {
+			for(int systemIndex = 0; systemIndex < Systems.Count; systemIndex++)
+            {
+                SvgSystem system = Systems[systemIndex];
+                IReadOnlyList<VoiceDef> voiceDefs = bars[systemIndex].VoiceDefs;
+
+				#region create hidden staves
+				if(invisibleOutputVoiceIndices.Count > 0)
+				{
 					foreach(byte invisibleOutputVoiceIndex in invisibleOutputVoiceIndices)
 					{
 						Trk invisibleTrkDef = voiceDefs[invisibleOutputVoiceIndex] as Trk;
@@ -420,18 +392,19 @@ namespace Moritz.Composer
 						{
 							VoiceDef = invisibleTrkDef
 						};
-                        hiddenOutputStaff.Voices.Add(outputVoice);
-                        system.Staves.Add(hiddenOutputStaff);
-                    }
-                }
-                #endregion create hidden staves
+						hiddenOutputStaff.Voices.Add(outputVoice);
+						system.Staves.Add(hiddenOutputStaff);
+					}
+				}
+				#endregion create hidden staves
 
-                for(int printedStaffIndex = 0; printedStaffIndex < nVisibleOutputStaves; printedStaffIndex++)
+				#region create visible staves
+				for(int visibleStaffIndex = 0; visibleStaffIndex < nVisibleOutputStaves; visibleStaffIndex++)
                 {
-                    string staffname = StaffName(i, printedStaffIndex);
-                    OutputStaff outputStaff = new OutputStaff(system, staffname, _pageFormat.StafflinesPerStaff[printedStaffIndex], _pageFormat.Gap, _pageFormat.StafflineStemStrokeWidth);
+                    string staffname = StaffName(systemIndex, visibleStaffIndex);
+                    OutputStaff outputStaff = new OutputStaff(system, staffname, _pageFormat.StafflinesPerStaff[visibleStaffIndex], _pageFormat.Gap, _pageFormat.StafflineStemStrokeWidth);
 
-                    List<byte> outputVoiceIndices = _pageFormat.VisibleOutputVoiceIndicesPerStaff[printedStaffIndex];
+                    List<byte> outputVoiceIndices = _pageFormat.VisibleOutputVoiceIndicesPerStaff[visibleStaffIndex];
                     for(int ovIndex = 0; ovIndex < outputVoiceIndices.Count; ++ovIndex)
                     {
                         Trk trkDef = voiceDefs[outputVoiceIndices[ovIndex]] as Trk;
@@ -445,10 +418,70 @@ namespace Moritz.Composer
                     SetStemDirections(outputStaff);
                     system.Staves.Add(outputStaff);
                 }
-            }
-        }
+				#endregion
 
-        private List<byte> InvisibleOutputVoiceIndices(List<List<byte>> visibleOutputVoiceIndicesPerStaff, IReadOnlyList<Trk> trks)
+				if(systemIndex == 0) // set outputMidiChannelSubstitutions list (to be returned).
+				{
+					outputMidiChannelSubstitutions = GetOutputMidiChannelSubstitutions(system);
+				}
+
+				#region set visible and invisible outputVoice.MidiChannels in top to bottom order (except percussion channel index 9)
+				foreach(Staff staff in system.Staves)
+				{
+					if(staff is OutputStaff outputStaff)
+					{
+						foreach(var voice in outputStaff.Voices)
+						{
+							var outputVoice = voice as OutputVoice;
+
+							outputVoice.MidiChannel = outputMidiChannelSubstitutions[outputVoice.MidiChannel];
+						}
+					}
+				}
+				#endregion
+			}
+			return outputMidiChannelSubstitutions;
+		}
+
+		/// <summary>
+		/// Substituting MIDI channels using the returned list, will result in midi channels being in top-bottom order, starting at 0,
+		/// -- except for the percussion channel (index 9) which will be at the index set in the Assistant Composer's dialog. 
+		/// </summary>
+		/// <param name="system"></param>
+		/// <returns></returns>
+		private static List<int> GetOutputMidiChannelSubstitutions(SvgSystem system)
+		{
+			List<int> outputMidiChannelSubstitutions = new List<int>();
+			for(int i = 0; i < 16; i++)
+			{
+				outputMidiChannelSubstitutions.Add(i); // including channel index 9 --> channel index 9
+			}
+
+			int midiChannel = 0;
+			foreach(Staff staff in system.Staves)
+			{
+				if(staff is OutputStaff outputStaff)
+				{
+					foreach(var voice in outputStaff.Voices)
+					{
+						var outputVoice = voice as OutputVoice;
+						if(midiChannel == 9)
+						{
+							midiChannel++;
+						}
+						if(outputVoice.MidiChannel != 9)
+						{
+							outputMidiChannelSubstitutions[outputVoice.MidiChannel] = midiChannel++;
+						}						
+					}
+				}
+				else break;
+			}
+
+			return outputMidiChannelSubstitutions;
+		}
+
+		private List<byte> InvisibleOutputVoiceIndices(List<List<byte>> visibleOutputVoiceIndicesPerStaff, IReadOnlyList<Trk> trks)
         {
             List<byte> visibleOutputVoiceIndices = new List<byte>();
             foreach(List<byte> voiceIndices in visibleOutputVoiceIndicesPerStaff)
@@ -491,11 +524,11 @@ namespace Moritz.Composer
                     {
                         InputVoiceDef inputVoiceDef = voiceDefs[inputVoiceIndices[ivIndex] + _algorithm.MidiChannelIndexPerOutputVoice.Count] as InputVoiceDef;
                         Debug.Assert(inputVoiceDef != null);
-                        InputVoice inputVoice = new InputVoice(inputStaff)
+						InputVoice inputVoice = new InputVoice(inputStaff)
 						{
 							VoiceDef = inputVoiceDef
 						};
-                        inputStaff.Voices.Add(inputVoice);
+						inputStaff.Voices.Add(inputVoice);
                     }
                     SetStemDirections(inputStaff);
                     system.Staves.Add(inputStaff);
@@ -503,7 +536,54 @@ namespace Moritz.Composer
             }
         }
 
-        private string StaffName(int systemIndex, int staffIndex)
+		private void AdjustOutputVoiceRefs(List<SvgSystem> systems, List<int> outputMidiChannelSubstitutions)
+		{
+			Debug.Assert(_algorithm.MidiChannelIndexPerInputVoice != null);
+
+			foreach(var system in systems)
+			{
+				foreach(var staff in system.Staves)
+				{
+					if(staff is InputStaff inputStaff)
+					{
+						foreach(var voice in inputStaff.Voices)
+						{
+							if(voice is InputVoice inputVoice)
+							{
+								DoMidiChannelSubstitution(inputVoice, outputMidiChannelSubstitutions);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		private void DoMidiChannelSubstitution(InputVoice inputVoice, List<int> outputMidiChannelSubstitutions)
+		{
+			foreach(var noteObject in inputVoice.NoteObjects)
+			{
+				if(noteObject is InputChordSymbol ics)
+				{
+					var inputNoteDefs = ics.InputChordDef.InputNoteDefs;
+					foreach(var inputNoteDef in inputNoteDefs)
+					{
+						var noteOnTrkRefs = inputNoteDef.NoteOn.SeqRef.TrkRefs; // each TrkRef has a midiChannel
+						foreach(var trkRef in noteOnTrkRefs)
+						{
+							trkRef.MidiChannel = outputMidiChannelSubstitutions[trkRef.MidiChannel];
+						}
+
+						var noteOffTrkOffs = inputNoteDef.NoteOff.TrkOffs; // trkOffs is a list of midiChannels
+						for(int index = 0; index < noteOffTrkOffs.Count; index++)
+						{
+							noteOffTrkOffs[index] = outputMidiChannelSubstitutions[noteOffTrkOffs[index]];
+						}
+					}
+				}
+			}
+		}
+
+		private string StaffName(int systemIndex, int staffIndex)
         {
             if(systemIndex == 0)
             {

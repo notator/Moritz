@@ -33,7 +33,7 @@ namespace Moritz.Algorithm.Tombeau1
         }
 
         public override IReadOnlyList<int> MidiChannelIndexPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3 }; } }
-		public override int MidiChannelIndexPerInputVoice { get { return 0; } }
+		public override IReadOnlyList<int> MidiChannelIndexPerInputVoice { get { return null; } }
         public override int NumberOfBars { get { return 50; } }
 
         /// <summary>
