@@ -588,7 +588,7 @@ namespace Moritz.Symbols
             return restClass;
         }
 
-        public override NoteObject GetNoteObject(Voice voice, int absMsPosition, IUniqueDef iud, bool firstDefInVoice,
+        public override NoteObject GetNoteObject(Voice voice, int absMsPosition, IUniqueDef iud, int iudIndex,
             ref byte currentVelocity, float musicFontHeight)
         {
             NoteObject noteObject = null;
@@ -603,7 +603,7 @@ namespace Moritz.Symbols
             float cautionaryFontHeight = pageFormat.MusicFontHeight * pageFormat.SmallSizeFactor;
             int minimumCrotchetDuration = pageFormat.MinimumCrotchetDuration;
  
-            if(cautionaryChordDef != null && firstDefInVoice)
+            if(cautionaryChordDef != null && iudIndex == 1)
             {
                 CautionaryChordSymbol cautionaryChordSymbol = new CautionaryChordSymbol(voice, cautionaryChordDef, absMsPosition, cautionaryFontHeight);
                 noteObject = cautionaryChordSymbol;
@@ -640,8 +640,16 @@ namespace Moritz.Symbols
             }
             else if(clefDef != null)
             {
-                SmallClef smallClef = new SmallClef(voice, clefDef.ClefType, absMsPosition, cautionaryFontHeight);
-                noteObject = smallClef;
+				if (iudIndex == 0)
+				{
+					Clef clef = new Clef(voice, clefDef.ClefType, musicFontHeight);
+					noteObject = clef;
+				}
+				else
+				{
+					SmallClef smallClef = new SmallClef(voice, clefDef.ClefType, absMsPosition, cautionaryFontHeight);
+					noteObject = smallClef;
+				}
             }
 
             return noteObject;
@@ -709,42 +717,39 @@ namespace Moritz.Symbols
         {
             foreach(Staff staff in staves)
             {
-                if(!(staff is HiddenOutputStaff))
+				for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                 {
-                    for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
-                    {
-                        VerticalDir voiceStemDirection = VerticalDir.none;
-                        if(staff.Voices.Count > 1)
-                        {   // 2-Voice staff
-                            if(voiceIndex == 0)
-                                voiceStemDirection = VerticalDir.up; // top voice
-                            else
-                                voiceStemDirection = VerticalDir.down; // bottom voice
-                        }
+                    VerticalDir voiceStemDirection = VerticalDir.none;
+                    if(staff.Voices.Count > 1)
+                    {   // 2-Voice staff
+                        if(voiceIndex == 0)
+                            voiceStemDirection = VerticalDir.up; // top voice
+                        else
+                            voiceStemDirection = VerticalDir.down; // bottom voice
+                    }
 
-                        float lyricMaxTop = float.MinValue;
-                        float lyricMinBottom = float.MaxValue;
+                    float lyricMaxTop = float.MinValue;
+                    float lyricMinBottom = float.MaxValue;
+                    foreach(ChordSymbol chordSymbol in staff.Voices[voiceIndex].ChordSymbols)
+                    {
+                        Metrics lyricMetrics = chordSymbol.ChordMetrics.LyricMetrics;
+                        if(lyricMetrics != null)
+                        {
+                            lyricMaxTop = (lyricMaxTop > lyricMetrics.Top) ? lyricMaxTop : lyricMetrics.Top;
+                            lyricMinBottom = (lyricMinBottom < lyricMetrics.Bottom) ? lyricMinBottom : lyricMetrics.Bottom;
+                        }
+                    }
+                    if(lyricMaxTop != float.MinValue)
+                    {   // the voice has lyrics
+                        if(voiceStemDirection == VerticalDir.none || voiceStemDirection == VerticalDir.down)
+                        {
+                            // the lyrics are below the staff
+                            float lyricMinTop = staff.Metrics.StafflinesBottom + (staff.SVGSystem.Score.PageFormat.Gap * 1.5F);
+                            lyricMaxTop = lyricMaxTop > lyricMinTop ? lyricMaxTop : lyricMinTop;
+                        }
                         foreach(ChordSymbol chordSymbol in staff.Voices[voiceIndex].ChordSymbols)
                         {
-                            Metrics lyricMetrics = chordSymbol.ChordMetrics.LyricMetrics;
-                            if(lyricMetrics != null)
-                            {
-                                lyricMaxTop = (lyricMaxTop > lyricMetrics.Top) ? lyricMaxTop : lyricMetrics.Top;
-                                lyricMinBottom = (lyricMinBottom < lyricMetrics.Bottom) ? lyricMinBottom : lyricMetrics.Bottom;
-                            }
-                        }
-                        if(lyricMaxTop != float.MinValue)
-                        {   // the voice has lyrics
-                            if(voiceStemDirection == VerticalDir.none || voiceStemDirection == VerticalDir.down)
-                            {
-                                // the lyrics are below the staff
-                                float lyricMinTop = staff.Metrics.StafflinesBottom + (staff.SVGSystem.Score.PageFormat.Gap * 1.5F);
-                                lyricMaxTop = lyricMaxTop > lyricMinTop ? lyricMaxTop : lyricMinTop;
-                            }
-                            foreach(ChordSymbol chordSymbol in staff.Voices[voiceIndex].ChordSymbols)
-                            {
-                                chordSymbol.ChordMetrics.MoveAuxilliariesToLyricHeight(voiceStemDirection, lyricMaxTop, lyricMinBottom);
-                            }
+                            chordSymbol.ChordMetrics.MoveAuxilliariesToLyricHeight(voiceStemDirection, lyricMaxTop, lyricMinBottom);
                         }
                     }
                 }
@@ -762,59 +767,56 @@ namespace Moritz.Symbols
         {
             foreach(Staff staff in staves)
             {
-                if(!(staff is HiddenOutputStaff))
+                foreach(Voice voice in staff.Voices)
                 {
-                    foreach(Voice voice in staff.Voices)
+                    List<NoteObject> noteObjects = voice.NoteObjects;
+                    Clef firstClef = null;
+                    ChordSymbol cautionaryChordSymbol = null;
+                    CautionaryChordSymbol cautionaryOutputChordSymbol = null;
+                    ChordSymbol firstChord = null;
+                    RestSymbol firstRest = null;
+                    for(int index = 0; index < noteObjects.Count; ++index)
                     {
-                        List<NoteObject> noteObjects = voice.NoteObjects;
-                        Clef firstClef = null;
-                        ChordSymbol cautionaryChordSymbol = null;
-                        CautionaryChordSymbol cautionaryOutputChordSymbol = null;
-                        ChordSymbol firstChord = null;
-                        RestSymbol firstRest = null;
-                        for(int index = 0; index < noteObjects.Count; ++index)
+                        if(firstClef == null)
+                            firstClef = noteObjects[index] as Clef;
+                        if(cautionaryOutputChordSymbol == null)
+                            cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
+                        if(firstChord == null)
+                            firstChord = noteObjects[index] as ChordSymbol;
+                        if(firstRest == null)
+                            firstRest = noteObjects[index] as RestSymbol;
+
+                        if(firstClef != null
+                        && (cautionaryChordSymbol != null || firstChord != null || firstRest != null))
+                            break;
+                    }
+
+                    if(firstClef != null && cautionaryChordSymbol != null)
+                    {
+                        // create brackets
+                        List<CautionaryBracketMetrics> cbMetrics = cautionaryChordSymbol.ChordMetrics.CautionaryBracketsMetrics;
+                        Debug.Assert(cbMetrics.Count == 2);
+                        Metrics clefMetrics = firstClef.Metrics;
+
+                        // extender left of cautionary
+                        List<float> ys = cautionaryChordSymbol.ChordMetrics.HeadsOriginYs;
+                        List<float> x1s = GetEqualFloats(clefMetrics.Right - (hairlinePadding * 2), ys.Count);
+                        List<float> x2s = GetEqualFloats(cbMetrics[0].Left, ys.Count);
+                        for(int i = 0; i < x2s.Count; ++i)
                         {
-                            if(firstClef == null)
-                                firstClef = noteObjects[index] as Clef;
-                            if(cautionaryOutputChordSymbol == null)
-                                cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
-                            if(firstChord == null)
-                                firstChord = noteObjects[index] as ChordSymbol;
-                            if(firstRest == null)
-                                firstRest = noteObjects[index] as RestSymbol;
-
-                            if(firstClef != null
-                            && (cautionaryChordSymbol != null || firstChord != null || firstRest != null))
-                                break;
-                        }
-
-                        if(firstClef != null && cautionaryChordSymbol != null)
-                        {
-                            // create brackets
-                            List<CautionaryBracketMetrics> cbMetrics = cautionaryChordSymbol.ChordMetrics.CautionaryBracketsMetrics;
-                            Debug.Assert(cbMetrics.Count == 2);
-                            Metrics clefMetrics = firstClef.Metrics;
-
-                            // extender left of cautionary
-                            List<float> ys = cautionaryChordSymbol.ChordMetrics.HeadsOriginYs;
-                            List<float> x1s = GetEqualFloats(clefMetrics.Right - (hairlinePadding * 2), ys.Count);
-                            List<float> x2s = GetEqualFloats(cbMetrics[0].Left, ys.Count);
-                            for(int i = 0; i < x2s.Count; ++i)
+                            if((x2s[i] - x1s[i]) < gap)
                             {
-                                if((x2s[i] - x1s[i]) < gap)
-                                {
-                                    x1s[i] = x2s[i] - gap;
-                                }
+                                x1s[i] = x2s[i] - gap;
                             }
-                            cautionaryChordSymbol.ChordMetrics.NoteheadExtendersMetricsBefore =
-                                CreateExtenders(x1s, x2s, ys, cautionaryChordSymbol.ChordMetrics.HeadsMetrics, extenderStrokeWidth, gap, true);
-
-                            // extender right of cautionary
-                            x1s = GetEqualFloats(cbMetrics[1].Right, ys.Count);
-                            x2s = GetCautionaryRightExtenderX2s(cautionaryChordSymbol, voice.NoteObjects, x1s, ys, hairlinePadding);
-                            cautionaryChordSymbol.ChordMetrics.NoteheadExtendersMetrics =
-                                CreateExtenders(x1s, x2s, ys, cautionaryChordSymbol.ChordMetrics.HeadsMetrics, extenderStrokeWidth, gap, true);
                         }
+                        cautionaryChordSymbol.ChordMetrics.NoteheadExtendersMetricsBefore =
+                            CreateExtenders(x1s, x2s, ys, cautionaryChordSymbol.ChordMetrics.HeadsMetrics, extenderStrokeWidth, gap, true);
+
+                        // extender right of cautionary
+                        x1s = GetEqualFloats(cbMetrics[1].Right, ys.Count);
+                        x2s = GetCautionaryRightExtenderX2s(cautionaryChordSymbol, voice.NoteObjects, x1s, ys, hairlinePadding);
+                        cautionaryChordSymbol.ChordMetrics.NoteheadExtendersMetrics =
+                            CreateExtenders(x1s, x2s, ys, cautionaryChordSymbol.ChordMetrics.HeadsMetrics, extenderStrokeWidth, gap, true);
                     }
                 }
             }
@@ -904,76 +906,73 @@ namespace Moritz.Symbols
         {
             foreach(Staff staff in staves)
             {
-                if(!(staff is HiddenOutputStaff))
+                foreach(Voice voice in staff.Voices)
                 {
-                    foreach(Voice voice in staff.Voices)
+                    List<NoteObject> noteObjects = voice.NoteObjects;
+                    int index = 0;
+                    while(index < noteObjects.Count - 1)
                     {
-                        List<NoteObject> noteObjects = voice.NoteObjects;
-                        int index = 0;
-                        while(index < noteObjects.Count - 1)
+                        // noteObjects.Count - 1 because index is immediately incremented when a continuing 
+                        // chord or rest is found, and it should always be less than noteObjects.Count.
+                        if(noteObjects[index] is ChordSymbol chord1)
                         {
-                            // noteObjects.Count - 1 because index is immediately incremented when a continuing 
-                            // chord or rest is found, and it should always be less than noteObjects.Count.
-                            if(noteObjects[index] is ChordSymbol chord1)
+                            List<float> x1s = GetX1sFromChord1(chord1.ChordMetrics, hairlinePadding);
+                            List<float> x2s = null;
+                            List<float> ys = null;
+                            ++index;
+                            if(chord1.MsDurationToNextBarline != null)
                             {
-                                List<float> x1s = GetX1sFromChord1(chord1.ChordMetrics, hairlinePadding);
-                                List<float> x2s = null;
-                                List<float> ys = null;
-                                ++index;
-                                if(chord1.MsDurationToNextBarline != null)
+                                while(index < noteObjects.Count)
                                 {
-                                    while(index < noteObjects.Count)
+                                    CautionaryChordSymbol cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
+                                    ChordSymbol chord2 = noteObjects[index] as ChordSymbol;
+                                    RestSymbol rest2 = noteObjects[index] as RestSymbol;
+                                    if(cautionaryChordSymbol != null)
                                     {
-                                        CautionaryChordSymbol cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
-                                        ChordSymbol chord2 = noteObjects[index] as ChordSymbol;
-                                        RestSymbol rest2 = noteObjects[index] as RestSymbol;
-                                        if(cautionaryChordSymbol != null)
-                                        {
-                                            cautionaryChordSymbol.Visible = false;
-                                        }
-                                        else if(chord2 != null)
-                                        {
-                                            ys = chord1.ChordMetrics.HeadsOriginYs;
-                                            x2s = GetX2sFromChord2(ys, chord2.ChordMetrics, hairlinePadding);
-                                            break;
-                                        }
-                                        else if(rest2 != null)
-                                        {
-                                            float x2 = rest2.Metrics.Left - hairlinePadding;
-                                            ys = chord1.ChordMetrics.HeadsOriginYs;
-                                            x2s = GetEqualFloats(x2, x1s.Count);
-                                            break;
-                                        }
-                                        ++index;
+                                        cautionaryChordSymbol.Visible = false;
                                     }
-
-                                    if(x2s != null && ys != null)
+                                    else if(chord2 != null)
                                     {
-                                        bool hasContinuingBeamBlock =
-                                            ((chord1.BeamBlock != null) && (chord1.BeamBlock.Chords[chord1.BeamBlock.Chords.Count - 1] != chord1));
-                                        if(hasContinuingBeamBlock)
-                                            Debug.Assert(true);
-
-                                        if(noteObjects[index - 1] is Barline barline)
-                                        {
-                                            float x2 = barline.Metrics.OriginX;
-                                            x2s = GetEqualFloats(x2, x1s.Count);
-                                        }
-                                        bool drawExtender = false;
-                                        if(chord1.DurationClass > DurationClass.semiquaver)
-                                            drawExtender = true;
-                                        if(chord1.DurationClass < DurationClass.crotchet && hasContinuingBeamBlock)
-                                            drawExtender = false;
-
-                                        chord1.ChordMetrics.NoteheadExtendersMetrics =
-                                            CreateExtenders(x1s, x2s, ys, chord1.ChordMetrics.HeadsMetrics, extenderStrokeWidth, gap, drawExtender);
+                                        ys = chord1.ChordMetrics.HeadsOriginYs;
+                                        x2s = GetX2sFromChord2(ys, chord2.ChordMetrics, hairlinePadding);
+                                        break;
                                     }
+                                    else if(rest2 != null)
+                                    {
+                                        float x2 = rest2.Metrics.Left - hairlinePadding;
+                                        ys = chord1.ChordMetrics.HeadsOriginYs;
+                                        x2s = GetEqualFloats(x2, x1s.Count);
+                                        break;
+                                    }
+                                    ++index;
+                                }
+
+                                if(x2s != null && ys != null)
+                                {
+                                    bool hasContinuingBeamBlock =
+                                        ((chord1.BeamBlock != null) && (chord1.BeamBlock.Chords[chord1.BeamBlock.Chords.Count - 1] != chord1));
+                                    if(hasContinuingBeamBlock)
+                                        Debug.Assert(true);
+
+                                    if(noteObjects[index - 1] is Barline barline)
+                                    {
+                                        float x2 = barline.Metrics.OriginX;
+                                        x2s = GetEqualFloats(x2, x1s.Count);
+                                    }
+                                    bool drawExtender = false;
+                                    if(chord1.DurationClass > DurationClass.semiquaver)
+                                        drawExtender = true;
+                                    if(chord1.DurationClass < DurationClass.crotchet && hasContinuingBeamBlock)
+                                        drawExtender = false;
+
+                                    chord1.ChordMetrics.NoteheadExtendersMetrics =
+                                        CreateExtenders(x1s, x2s, ys, chord1.ChordMetrics.HeadsMetrics, extenderStrokeWidth, gap, drawExtender);
                                 }
                             }
-                            else
-                            {
-                                ++index;
-                            }
+                        }
+                        else
+                        {
+                            ++index;
                         }
                     }
                 }
@@ -985,45 +984,42 @@ namespace Moritz.Symbols
             for(int staffIndex = 0; staffIndex < staves.Count; ++staffIndex)
             {
                 Staff staff = staves[staffIndex];
-                if(!(staff is HiddenOutputStaff))
+                for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                 {
-                    for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
+                    Voice voice = staff.Voices[voiceIndex];
+                    List<NoteObject> noteObjects = voice.NoteObjects;
+                    ChordSymbol lastChord = null;
+                    RestSymbol lastRest = null;
+                    CautionaryChordSymbol cautionaryChordSymbol = null;
+                    for(int index = noteObjects.Count - 1; index >= 0; --index)
                     {
-                        Voice voice = staff.Voices[voiceIndex];
-                        List<NoteObject> noteObjects = voice.NoteObjects;
-                        ChordSymbol lastChord = null;
-                        RestSymbol lastRest = null;
-                        CautionaryChordSymbol cautionaryChordSymbol = null;
-                        for(int index = noteObjects.Count - 1; index >= 0; --index)
+                        lastChord = noteObjects[index] as ChordSymbol;
+                        lastRest = noteObjects[index] as RestSymbol;
+                        cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
+                        if(cautionaryChordSymbol != null)
                         {
-                            lastChord = noteObjects[index] as ChordSymbol;
-                            lastRest = noteObjects[index] as RestSymbol;
-                            cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
-                            if(cautionaryChordSymbol != null)
-                            {
-                                cautionaryChordSymbol.Visible = false;
-                                // a CautionaryChordSymbol is a ChordSymbol, but we have not found a real one yet. 
-                            }
-                            else if(lastChord != null || lastRest != null)
-                                break;
+                            cautionaryChordSymbol.Visible = false;
+                            // a CautionaryChordSymbol is a ChordSymbol, but we have not found a real one yet. 
                         }
+                        else if(lastChord != null || lastRest != null)
+                            break;
+                    }
 
-                        if(lastChord != null && lastChord.MsDurationToNextBarline != null)
+                    if(lastChord != null && lastChord.MsDurationToNextBarline != null)
+                    {
+                        List<float> x1s = GetX1sFromChord1(lastChord.ChordMetrics, hairlinePadding);
+                        List<float> x2s;
+                        List<float> ys = lastChord.ChordMetrics.HeadsOriginYs;
+                        if(nextSystem != null && FirstDurationSymbolOnNextSystemIsCautionary(nextSystem.Staves[staffIndex].Voices[voiceIndex]))
                         {
-                            List<float> x1s = GetX1sFromChord1(lastChord.ChordMetrics, hairlinePadding);
-                            List<float> x2s;
-                            List<float> ys = lastChord.ChordMetrics.HeadsOriginYs;
-                            if(nextSystem != null && FirstDurationSymbolOnNextSystemIsCautionary(nextSystem.Staves[staffIndex].Voices[voiceIndex]))
-                            {
-                                x2s = GetEqualFloats(rightMarginPos + gap, x1s.Count);
-                            }
-                            else
-                            {
-                                x2s = GetEqualFloats(rightMarginPos, x1s.Count);
-                            }
-                            lastChord.ChordMetrics.NoteheadExtendersMetrics =
-                                CreateExtenders(x1s, x2s, ys, lastChord.ChordMetrics.HeadsMetrics, extenderStrokeWidth, gap, true);
+                            x2s = GetEqualFloats(rightMarginPos + gap, x1s.Count);
                         }
+                        else
+                        {
+                            x2s = GetEqualFloats(rightMarginPos, x1s.Count);
+                        }
+                        lastChord.ChordMetrics.NoteheadExtendersMetrics =
+                            CreateExtenders(x1s, x2s, ys, lastChord.ChordMetrics.HeadsMetrics, extenderStrokeWidth, gap, true);
                     }
                 }
             }
@@ -1161,17 +1157,14 @@ namespace Moritz.Symbols
         {
             foreach(Staff staff in staves)
             {
-                if(!(staff is HiddenOutputStaff))
+                foreach(Voice voice in staff.Voices)
                 {
-                    foreach(Voice voice in staff.Voices)
-                    {
-                        voice.FinalizeBeamBlocks();
-                    }
-                    if(staff.Voices.Count == 2)
-                    {
-                        staff.AdjustStemAndBeamBlockHeights(0);
-                        staff.AdjustStemAndBeamBlockHeights(1);
-                    }
+                    voice.FinalizeBeamBlocks();
+                }
+                if(staff.Voices.Count == 2)
+                {
+                    staff.AdjustStemAndBeamBlockHeights(0);
+                    staff.AdjustStemAndBeamBlockHeights(1);
                 }
             }
         }
@@ -1190,12 +1183,9 @@ namespace Moritz.Symbols
             FinalizeBeamBlocks(staves);
             foreach(Staff staff in staves)
             {
-                if(!(staff is HiddenOutputStaff))
+                foreach(Voice voice in staff.Voices)
                 {
-                    foreach(Voice voice in staff.Voices)
-                    {
-                        voice.RemoveBeamBlockBeams();
-                    }
+                    voice.RemoveBeamBlockBeams();
                 }
             }
         }

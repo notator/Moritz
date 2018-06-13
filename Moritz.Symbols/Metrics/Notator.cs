@@ -37,58 +37,33 @@ namespace Moritz.Symbols
 
         /// <summary>
         /// There is still one system per bar.
-        /// In each system, the staff list begins with HiddenOutputStaff objects (if any), followed by OutputStaff objects,
-        /// followed by InputStaff objects. InputStaffs are never hidden.
+        /// In each system, the staff list contains OutputStaff objects followed by InputStaff objects.
+		/// Each VoiceDef contains ClefDefs. The first is converted to a Clef, later ones to SmallClefs.
+		/// An Exception will be thrown if a SmallClefDef is found on the lower voiceDef in a staf in the systems input.
+		/// Small clefs (if there are any) are copied from the top to the bottom voice (if there is one) on each staff.
         /// </summary>
         /// <param name="systems"></param>
         public void ConvertVoiceDefsToNoteObjects(List<SvgSystem> systems)
         {
             byte[] currentChannelVelocities = new byte[systems[0].Staves.Count];
+			var topVoiceSmallClefs = new List<SmallClef>();
 
-            List<ClefDef> voice0ClefDefs = new List<ClefDef>();
-            List<ClefDef> voice1ClefDefs = new List<ClefDef>();
-
-            List<string> currentClefPerVisibleStaffList = new List<string>(_pageFormat.ClefsList);
-
-            int systemAbsMsPos = 0;
+			int systemAbsMsPos = 0;
             for(int systemIndex = 0; systemIndex < systems.Count; ++systemIndex)
             {
                 SvgSystem system = systems[systemIndex];
                 system.AbsStartMsPosition = systemAbsMsPos;
-                int visibleStaffIndex = -1;
                 int msPositionReVoiceDef = 0;
                 for(int staffIndex = 0; staffIndex < system.Staves.Count; ++staffIndex)
                 {
                     Staff staff = system.Staves[staffIndex];
-                    if(!(staff is HiddenOutputStaff))
-                    {
-                        visibleStaffIndex++;
-                    }
-                    voice0ClefDefs.Clear();
-                    voice1ClefDefs.Clear();
                     msPositionReVoiceDef = 0;
-                    for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
+					topVoiceSmallClefs.Clear();
+					for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                     {
                         Voice voice = staff.Voices[voiceIndex];
                         voice.VoiceDef.AgglomerateRests();
                         float musicFontHeight = (voice is OutputVoice) ? _pageFormat.MusicFontHeight : _pageFormat.MusicFontHeight * _pageFormat.InputSizeFactor;
-                        if(!(staff is HiddenOutputStaff))
-                        {
-                            Debug.Assert(currentClefPerVisibleStaffList[visibleStaffIndex] != null);
-                            string clefType = currentClefPerVisibleStaffList[visibleStaffIndex];
-                            #region A clef at the beginning of the first voiceDef (stipulated by the algorithm) must agree with the pageFormat clef.                           
-                            if(voice.VoiceDef.UniqueDefs.Count > 0)
-                            {
-                                ClefDef clefDef = voice.VoiceDef.UniqueDefs[0] as ClefDef;
-                                if(clefDef != null)
-                                {
-                                    Debug.Assert((string.Compare(clefType, clefDef.ClefType) == 0), "The first clefs in the score (stipulated by the algorithm) must agree with the pageFormat clefs.");
-                                }
-                            }
-                            #endregion
-                            voice.NoteObjects.Add(new Clef(voice, clefType, musicFontHeight));
-                        }
-                        bool firstLmdd = true;
 
                         if (staff is InputStaff)
                         {
@@ -100,55 +75,51 @@ namespace Moritz.Symbols
                             }
                         }
                         msPositionReVoiceDef = 0;
-                        for(int iudIndex = 0; iudIndex < voice.VoiceDef.UniqueDefs.Count; ++ iudIndex)
+						List<IUniqueDef> iuds = voice.VoiceDef.UniqueDefs;
+						Debug.Assert(iuds[0] is ClefDef);
+
+						for (int iudIndex = 0; iudIndex < iuds.Count; ++ iudIndex)
                         {
-                            IUniqueDef iud = voice.VoiceDef.UniqueDefs[iudIndex];
+							IUniqueDef iud = voice.VoiceDef.UniqueDefs[iudIndex];
                             int absMsPosition = systemAbsMsPos + msPositionReVoiceDef;
 
                             NoteObject noteObject =
-                                SymbolSet.GetNoteObject(voice, absMsPosition, iud, firstLmdd, ref currentChannelVelocities[staffIndex], musicFontHeight);
+                                SymbolSet.GetNoteObject(voice, absMsPosition, iud, iudIndex, ref currentChannelVelocities[staffIndex], musicFontHeight);
 
-                            IUniqueSplittableChordDef iscd = iud as IUniqueSplittableChordDef;
-                            if(iscd != null && iscd.MsDurationToNextBarline != null)
-                            {
-                                msPositionReVoiceDef += (int)iscd.MsDurationToNextBarline;
-                            }
-                            else
-                            {
-                                msPositionReVoiceDef += iud.MsDuration;
-                            }
-                            
-                            SmallClef smallClef = noteObject as SmallClef;
-                            if(smallClef != null)
-                            {
-                                if(voiceIndex == 0)
-                                    voice0ClefDefs.Add(iud as ClefDef);
-                                else
-                                    voice1ClefDefs.Add(iud as ClefDef);
-                            }
+							if(noteObject is SmallClef smallClef)
+							{
+								if(voiceIndex == 0)
+								{
+									if(staff.Voices.Count > 1)
+									{
+										topVoiceSmallClefs.Add(smallClef);
+									}
+								}
+								else
+								{
+									throw new Exception("SmallClefs may not be defined for a lower voice. They will be copied from the top voice");
+								}
+							}
 
-                            // Don't add initial clefs that are stipulated by the algorithm here!
-                            // (They are the same as in the pageFormat -- see the Debug assertion above).
-                            if(!(smallClef != null && iudIndex == 0))
-                            {
-                                voice.NoteObjects.Add(noteObject);
-                            }
+							if(iud is IUniqueSplittableChordDef iscd && iscd.MsDurationToNextBarline != null)
+							{
+								msPositionReVoiceDef += (int)iscd.MsDurationToNextBarline;
+							}
+							else
+							{
+								msPositionReVoiceDef += iud.MsDuration;
+							}
 
-                            firstLmdd = false;
+							voice.NoteObjects.Add(noteObject);
                         }
-                    }
-
-                    if(!(staff is HiddenOutputStaff) && (voice0ClefDefs.Count > 0 || voice1ClefDefs.Count > 0))
-                    {
-                        // the main clef on this staff in the next system
-                        SetNextSystemClefType(currentClefPerVisibleStaffList, visibleStaffIndex, staffIndex, voice0ClefDefs, voice1ClefDefs);
                     }
 
                     if(staff.Voices.Count == 2)
                     {
-                        InsertInvisibleSmallClefs(staff.Voices, systemAbsMsPos, voice0ClefDefs, voice1ClefDefs);
-
-                        CheckClefTypes(staff.Voices);
+						if(topVoiceSmallClefs.Count > 0)
+						{
+							AddSmallClefsToLowerVoice(staff.Voices[1], topVoiceSmallClefs);
+						}                        
 
                         StandardSymbolSet standardSymbolSet = SymbolSet as StandardSymbolSet;
                         if(standardSymbolSet != null)
@@ -159,94 +130,15 @@ namespace Moritz.Symbols
             }
         }
 
-        private void SetNextSystemClefType(List<string> currentClefPerVisibleStaffList, int visibleStaffIndex, int staffIndex, List<ClefDef> voice0ClefDefs, List<ClefDef> voice1ClefDefs)
-        {
-            Debug.Assert(voice0ClefDefs.Count > 0 || voice1ClefDefs.Count > 0);
-
-            ClefDef lastVoice0Def = null;
-            if(voice0ClefDefs.Count > 0)
-            {
-                lastVoice0Def = voice0ClefDefs[voice0ClefDefs.Count - 1];
-            }
-            ClefDef lastVoice1Def = null;
-            if(voice1ClefDefs.Count > 0)
-            {
-                lastVoice1Def = voice1ClefDefs[voice1ClefDefs.Count - 1];
-            }
-            string lastClefType = null;
-            if(lastVoice0Def != null)
-            {
-                if((lastVoice1Def == null) || (lastVoice0Def.MsPositionReFirstUD > lastVoice1Def.MsPositionReFirstUD))
-                {
-                    lastClefType = lastVoice0Def.ClefType;
-                }
-            }
-
-            if(lastVoice1Def != null)
-            {
-                if((lastVoice0Def == null) || (lastVoice1Def.MsPositionReFirstUD >= lastVoice0Def.MsPositionReFirstUD))
-                {
-                    lastClefType = lastVoice1Def.ClefType;
-                }
-            }
-
-            currentClefPerVisibleStaffList[visibleStaffIndex] = lastClefType;
-        }
-
-        /// <summary>
-        /// Insert invisible smallClefs into the other voice.
-        /// SmallClefs are used by the Notator when deciding how to notate chords.
-        /// </summary>
-        private void InsertInvisibleSmallClefs(List<Voice> voices, int systemAbsMsPos, List<ClefDef> voice0ClefDefs, List<ClefDef> voice1ClefDefs)
-        {
-            Debug.Assert(voices.Count == 2);
-            if(voice1ClefDefs.Count > 0)
-                InsertInvisibleClefChanges(voices[0], systemAbsMsPos, voice1ClefDefs);
-            if(voice0ClefDefs.Count > 0)
-                InsertInvisibleClefChanges(voices[1], systemAbsMsPos, voice0ClefDefs);
-        }
-
-        /// <summary>
-        /// Check that both voices really do contain the same clefsTypes.
-        /// This becomes very important later on. It is assumed (e.g.) in
-        ///     SvgScore.JoinToPreviousSystem(int systemIndex)
-        /// and
-        ///     ChordMetrics.GetStaffParameters(NoteObject rootObject) 
-        /// </summary>
-        private void CheckClefTypes(List<Voice> voices)
-        {
-            Debug.Assert(voices.Count == 2);
-            List<Clef> voice0Clefs = GetClefs(voices[0]);
-            List<Clef> voice1Clefs = GetClefs(voices[1]);
-            Debug.Assert(voice0Clefs.Count == voice1Clefs.Count);
-            for(int i = 0; i < voice0Clefs.Count; ++i)
-            {
-                Debug.Assert(voice0Clefs[i].ClefType == voice1Clefs[i].ClefType);
-            }
-        }
-
-        private List<Clef> GetClefs(Voice voice)
-        {
-            List<Clef> clefs = new List<Clef>();
-            foreach(NoteObject noteObject in voice.NoteObjects)
-            {
-                Clef clef = noteObject as Clef;
-                if(clef != null)
-                    clefs.Add(clef);
-            }
-            return clefs;
-        }
-
-        private void InsertInvisibleClefChanges(Voice voice, int systemAbsMsPos, List<ClefDef> clefDefs)
-        {
-            foreach(ClefDef ccd in clefDefs)
-            {
-                int absPos = systemAbsMsPos + ccd.MsPositionReFirstUD;
-                SmallClef invisibleSmallClef = new SmallClef(voice, ccd.ClefType, absPos, (_pageFormat.MusicFontHeight * _pageFormat.SmallSizeFactor));
-                invisibleSmallClef.IsVisible = false;
-                InsertInvisibleClefChangeInNoteObjects(voice, invisibleSmallClef);
-            }
-        }
+		private void AddSmallClefsToLowerVoice(Voice voice, List<SmallClef> clefsInTopStaff)
+		{
+			foreach(SmallClef smallClef in clefsInTopStaff)
+			{
+				SmallClef invisibleSmallClef = new SmallClef(voice, smallClef.ClefType, smallClef.AbsMsPosition, 0.01F);
+				invisibleSmallClef.IsVisible = false;
+				InsertInvisibleClefChangeInNoteObjects(voice, invisibleSmallClef);
+			}
+		}
 
         private void InsertInvisibleClefChangeInNoteObjects(Voice voice, SmallClef invisibleSmallClef)
         {

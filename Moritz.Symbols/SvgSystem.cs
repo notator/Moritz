@@ -56,13 +56,12 @@ namespace Moritz.Symbols
         private void WriteConnectors(SvgWriter w, int systemNumber, PageFormat pageFormat)
         {
             List<bool> barlineContinuesDownList = pageFormat.BarlineContinuesDownList;
-            int topVisibleStaffIndex = TopUnHiddenStaffIndex();
             Debug.Assert(barlineContinuesDownList[barlineContinuesDownList.Count - 1] == false);
             EndBarline endBarline = null;
             Barline barline = null;
             bool isFirstBarline = true;
 
-            for(int staffIndex = topVisibleStaffIndex; staffIndex < Staves.Count; staffIndex++)
+            for(int staffIndex = 0; staffIndex < Staves.Count; staffIndex++)
             {
                 Staff staff = Staves[staffIndex];
                 if(staff.Metrics != null)
@@ -106,7 +105,7 @@ namespace Moritz.Symbols
                                 if(barline != null || endBarline != null)
                                 {
                                     // draw grouping barlines between staves
-                                    if(barlineContinuesDownList[staffIndex - topVisibleStaffIndex] || isFirstBarline)
+                                    if(barlineContinuesDownList[staffIndex] || isFirstBarline)
                                     {
                                         float top = bottomEdge.YatX(barline.Metrics.OriginX);
                                         float bottom = topEdge.YatX(barline.Metrics.OriginX);
@@ -121,46 +120,6 @@ namespace Moritz.Symbols
                     #endregion
                 }
             }
-        }
-
-        /// <summary>
-        /// The index of the top staff that is not a HiddenOutputStaff.
-        /// The returned index may be of an OutputStaff or an InputStaff.
-        /// Note that an OutputStaff that contains no chords will also be hidden.
-        /// </summary>
-        private int TopUnHiddenStaffIndex()
-        {
-            int rval = 0;
-            for(int i = 0; i < Staves.Count; ++i)
-            {
-                Staff staff = Staves[i];
-                if(!(staff is HiddenOutputStaff))
-                {
-                    rval = i;
-                    break;
-                }
-            }
-            return rval;
-        }
-
-        /// <summary>
-        /// The index of the top staff that is not a HiddenOutputStaff and whose Metrics property is not null.
-        /// The returned index may be of an OutputStaff containing chord(s) or an InputStaff.
-        /// Note that an OutputStaff that contains no chords has Metrics == null.
-        /// </summary>
-        private int BarnumberStaffIndex()
-        {
-            int rval = 0;
-            for(int i = 0; i < Staves.Count; ++i)
-            {
-                Staff staff = Staves[i];
-                if(!(staff is HiddenOutputStaff) && staff.Metrics != null)
-                {
-                    rval = i;
-                    break;
-                }
-            }
-            return rval;
         }
 
         #region make graphics
@@ -237,50 +196,44 @@ namespace Moritz.Symbols
         {           
             this.Metrics = new SystemMetrics();
             List<NoteObject> NoteObjectsToRemove = new List<NoteObject>();
-            int topUnHiddenStaffIndex = TopUnHiddenStaffIndex();
-            for(int staffIndex = topUnHiddenStaffIndex; staffIndex < Staves.Count; ++staffIndex)
+            for(int staffIndex = 0; staffIndex < Staves.Count; ++staffIndex)
             {
                 Staff staff = Staves[staffIndex];
-                Debug.Assert(!(staff is HiddenOutputStaff));
 
-                // Staves that contain no chords will be invisible. Their Metrics attribute is null.
-                if(staff.ContainsAChordSymbol)
+                float staffHeight = staff.Gap * (staff.NumberOfStafflines - 1);
+                staff.Metrics = new StaffMetrics(leftMarginPos, pageFormat.RightMarginPos, staffHeight, staff is InputStaff);
+
+                for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
                 {
-                    float staffHeight = staff.Gap * (staff.NumberOfStafflines - 1);
-                    staff.Metrics = new StaffMetrics(leftMarginPos, pageFormat.RightMarginPos, staffHeight, staff is InputStaff);
+                    Voice voice = staff.Voices[voiceIndex];
 
-                    for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; ++voiceIndex)
+                    voice.SetChordStemDirectionsAndCreateBeamBlocks(pageFormat);
+
+                    for(int nIndex = 0; nIndex < staff.Voices[voiceIndex].NoteObjects.Count; nIndex++)
                     {
-                        Voice voice = staff.Voices[voiceIndex];
+                        NoteObject noteObject = staff.Voices[voiceIndex].NoteObjects[nIndex];
+                        noteObject.Metrics = Score.Notator.SymbolSet.NoteObjectMetrics(graphics, noteObject, voice.StemDirection, staff.Gap, pageFormat);
 
-                        voice.SetChordStemDirectionsAndCreateBeamBlocks(pageFormat);
-
-                        for(int nIndex = 0; nIndex < staff.Voices[voiceIndex].NoteObjects.Count; nIndex++)
-                        {
-                            NoteObject noteObject = staff.Voices[voiceIndex].NoteObjects[nIndex];
-                            noteObject.Metrics = Score.Notator.SymbolSet.NoteObjectMetrics(graphics, noteObject, voice.StemDirection, staff.Gap, pageFormat);
-
-                            if(noteObject.Metrics != null)
-                                staff.Metrics.Add(noteObject.Metrics);
-                            else
-                                NoteObjectsToRemove.Add(noteObject);
-                        }
-
-                        foreach(NoteObject noteObject in NoteObjectsToRemove)
-                            staff.Voices[voiceIndex].NoteObjects.Remove(noteObject);
-                        NoteObjectsToRemove.Clear();
+                        if(noteObject.Metrics != null)
+                            staff.Metrics.Add(noteObject.Metrics);
+                        else
+                            NoteObjectsToRemove.Add(noteObject);
                     }
 
-                    if(staff.Voices.Count > 1)
-                    {
-                        Debug.Assert(Score.Notator.SymbolSet is StandardSymbolSet);
-                        // Other symbol sets do not support multi voice staves.
-                        staff.AdjustTwoPartChords();
-                    }
-
-                    staff.Metrics.Move(0f, pageFormat.DefaultDistanceBetweenStaves * (staffIndex - topUnHiddenStaffIndex));
-                    this.Metrics.Add(staff.Metrics);
+                    foreach(NoteObject noteObject in NoteObjectsToRemove)
+                        staff.Voices[voiceIndex].NoteObjects.Remove(noteObject);
+                    NoteObjectsToRemove.Clear();
                 }
+
+                if(staff.Voices.Count > 1)
+                {
+                    Debug.Assert(Score.Notator.SymbolSet is StandardSymbolSet);
+                    // Other symbol sets do not support multi voice staves.
+                    staff.AdjustTwoPartChords();
+                }
+
+                staff.Metrics.Move(0f, pageFormat.DefaultDistanceBetweenStaves * staffIndex);
+                this.Metrics.Add(staff.Metrics);
             }
 
             return (this.Metrics.Bottom - this.Metrics.Top);
@@ -336,17 +289,14 @@ namespace Moritz.Symbols
             {
                 foreach(Staff staff in this.Staves)
                 {
-                    if(!(staff is HiddenOutputStaff))
-                    {
-                        moments = GetVoiceMoments(staff.Voices[0], systemMoments);
-                        if(moments.Count > 1)
-                            overlaps = GetOverlaps(moments, hairline);
-                        if(overlaps.Count == 0)
-                            continue;
+                    moments = GetVoiceMoments(staff.Voices[0], systemMoments);
+                    if(moments.Count > 1)
+                        overlaps = GetOverlaps(moments, hairline);
+                    if(overlaps.Count == 0)
+                        continue;
 
-                        staffRedistributed = RedistributeMoments(systemMoments, barlineWidths, nonCompressibleSystemMomentPositions, moments, overlaps);
-						allStavesRedistributed = (staffRedistributed == false) ? false : allStavesRedistributed;
-					}
+                    staffRedistributed = RedistributeMoments(systemMoments, barlineWidths, nonCompressibleSystemMomentPositions, moments, overlaps);
+					allStavesRedistributed = (staffRedistributed == false) ? false : allStavesRedistributed;
                 }
 
             } while(overlaps.Count > 0 && allStavesRedistributed);
@@ -610,7 +560,7 @@ namespace Moritz.Symbols
 
             foreach(Staff staff in Staves)
             {
-                if(!(staff is HiddenOutputStaff) && staff.Metrics != null)
+                if(staff.Metrics != null)
                 {
                     foreach(Voice voice in staff.Voices)
                     {
@@ -967,7 +917,7 @@ namespace Moritz.Symbols
         /// </summary>
         private void AdjustBarnumberVertically(float gap)
         {
-            Voice barnumberVoice = VoiceForBarnumber();
+			Voice barnumberVoice = this.Staves[0].Voices[0];
             Barline barline = null;
             DurationSymbol firstDSInVoice0 = null;
             DurationSymbol secondDSInVoice0 = null;
@@ -1101,7 +1051,7 @@ namespace Moritz.Symbols
         {
             foreach(Staff staff in Staves)
             {
-                if(!(staff is HiddenOutputStaff) && staff.Metrics != null)
+                if(staff.Metrics != null)
                 {
                     staff.Metrics.ResetBoundary();
                 }
@@ -1111,18 +1061,16 @@ namespace Moritz.Symbols
         private void SetBarlineVisibility(List<bool> barlineContinuesDownList)
         {
             // set the visibility of all but the last barline
-            int topVisibleStaffIndex = TopUnHiddenStaffIndex();
-            for(int staffIndex = topVisibleStaffIndex; staffIndex < Staves.Count; ++staffIndex)
+            for(int staffIndex = 0; staffIndex < Staves.Count; ++staffIndex)
             {
                 Staff staff = Staves[staffIndex];
                 Voice voice = staff.Voices[0];
                 List<NoteObject> noteObjects = voice.NoteObjects;
-                int visibleStaffIndex = staffIndex - topVisibleStaffIndex;
                 for(int i = 0; i < noteObjects.Count; ++i)
                 {
                     bool isSingleStaffGroup =
-                        (((visibleStaffIndex == 0) || !barlineContinuesDownList[visibleStaffIndex - 1]) // there is no grouped staff above
-                            && (!barlineContinuesDownList[visibleStaffIndex])); // there is no grouped staff below 
+                        (((staffIndex == 0) || !barlineContinuesDownList[staffIndex - 1]) // there is no grouped staff above
+                            && (!barlineContinuesDownList[staffIndex])); // there is no grouped staff below 
 
                     if((noteObjects[i] is CautionaryChordSymbol)
                     && !isSingleStaffGroup)
@@ -1148,27 +1096,22 @@ namespace Moritz.Symbols
             {
                 for(int staffIndex = 0; staffIndex < Staves.Count; ++staffIndex)
                 {
-                    if(!(Staves[staffIndex] is HiddenOutputStaff))
-                    {
-                        List<NoteObject> noteObjects = Staves[staffIndex].Voices[0].NoteObjects;
-                        Barline barline = noteObjects[noteObjects.Count - 1] as Barline;
-                        DurationSymbol durationSymbol = nextSystem.Staves[staffIndex].Voices[0].FirstDurationSymbol;
-                        if(barline != null
-                        && (durationSymbol is CautionaryChordSymbol))
-                        {
-                            barline.IsVisible = false;
-                        }
-                    }
-                }
+                    List<NoteObject> noteObjects = Staves[staffIndex].Voices[0].NoteObjects;
+					DurationSymbol durationSymbol = nextSystem.Staves[staffIndex].Voices[0].FirstDurationSymbol;
+					if (noteObjects[noteObjects.Count - 1] is Barline barline
+					&& (durationSymbol is CautionaryChordSymbol))
+					{
+						barline.IsVisible = false;
+					}
+				}
             }
         }
         private void JustifyVertically(float pageWidth, float gap)
         {
-            int barnumberStaffIndex = BarnumberStaffIndex();
-            float stafflinesTop = Staves[barnumberStaffIndex].Metrics.StafflinesTop;
+            float stafflinesTop = Staves[0].Metrics.StafflinesTop;
             if(stafflinesTop != 0)
             {
-                for(int i = barnumberStaffIndex; i < Staves.Count; ++i)
+                for(int i = 0; i < Staves.Count; ++i)
                 {
                     Staff staff = Staves[i];
                     if(staff.Metrics != null)
@@ -1178,45 +1121,40 @@ namespace Moritz.Symbols
                 }
             }
 
-            Debug.Assert(Staves[barnumberStaffIndex].Metrics.StafflinesTop == 0);
-            if((barnumberStaffIndex + 1) < Staves.Count)// There must be at least one visible staff (an InputStaff).
+            Debug.Assert(Staves[0].Metrics.StafflinesTop == 0);
+            for(int i = 1; i < Staves.Count; ++i)
             {
-                for(int i = (barnumberStaffIndex + 1); i < Staves.Count; ++i)
+                if(Staves[i].Metrics != null)
                 {
-                    if(Staves[i].Metrics != null)
+                    //BottomEdge bottomEdge = new BottomEdge(Staves[i - 1], 0F, pageWidth, gap);
+                    BottomEdge bottomEdge = GetBottomEdge(i - 1, 0, pageWidth, gap);
+                    if(bottomEdge != null)
                     {
-                        //BottomEdge bottomEdge = new BottomEdge(Staves[i - 1], 0F, pageWidth, gap);
-                        BottomEdge bottomEdge = GetBottomEdge(i - 1, barnumberStaffIndex, pageWidth, gap);
-                        if(bottomEdge != null)
+                        TopEdge topEdge = new TopEdge(Staves[i], 0F, pageWidth);
+                        float separation = topEdge.DistanceToEdgeAbove(bottomEdge);
+                        float dy = gap - separation;
+                        // limit stafflineHeight to multiples of pageFormat.Gap so that stafflines
+                        // are not displayed as thick grey lines.
+                        dy = dy - (dy % gap) + gap; // the minimum space bewteen stafflines is gap pixels.
+                        if(dy > 0F)
                         {
-                            TopEdge topEdge = new TopEdge(Staves[i], 0F, pageWidth);
-                            float separation = topEdge.DistanceToEdgeAbove(bottomEdge);
-                            float dy = gap - separation;
-                            // limit stafflineHeight to multiples of pageFormat.Gap so that stafflines
-                            // are not displayed as thick grey lines.
-                            dy = dy - (dy % gap) + gap; // the minimum space bewteen stafflines is gap pixels.
-                            if(dy > 0F)
+                            for(int j = i; j < Staves.Count; ++j)
                             {
-                                for(int j = i; j < Staves.Count; ++j)
+                                if(Staves[j].Metrics != null)
                                 {
-                                    if(Staves[j].Metrics != null)
-                                    {
-                                        Staves[j].Metrics.Move(0F, dy);
-                                    }
+                                    Staves[j].Metrics.Move(0F, dy);
                                 }
-                                this.Metrics.StafflinesBottom += dy;
                             }
+                            this.Metrics.StafflinesBottom += dy;
                         }
                     }
                 }
             }
+
             this.Metrics = new SystemMetrics();
             foreach(Staff staff in Staves)
             {
-                if(!(staff is HiddenOutputStaff) && staff.Metrics != null)
-                {
-                    this.Metrics.Add(staff.Metrics);
-                }
+                this.Metrics.Add(staff.Metrics);
             }
             Debug.Assert(this.Metrics.StafflinesTop == 0);
         }
@@ -1227,7 +1165,7 @@ namespace Moritz.Symbols
             for(int i = upperStaffIndex; i >= topVisibleStaffIndex; --i)
             {
                 Staff staff = Staves[i];
-                if(!(staff is HiddenOutputStaff) && staff.Metrics != null)
+                if(staff.Metrics != null)
                 {
                     bottomEdge = new BottomEdge(staff, 0F, pageWidth, gap);
                     break;
@@ -1242,28 +1180,13 @@ namespace Moritz.Symbols
             for(int i = lowerStaffIndex; i < Staves.Count; ++i)
             {
                 Staff staff = Staves[i];
-                if(!(staff is HiddenOutputStaff) && staff.Metrics != null)
+                if(staff.Metrics != null)
                 {
                     topEdge = new TopEdge(staff, 0F, pageWidth);
                     break;
                 }
             }
             return topEdge;
-        }
-
-        internal Voice VoiceForBarnumber()
-        {
-            Voice rval = null;
-            for(int i = 0; i < Staves.Count; ++i)
-            {
-                Staff staff = Staves[i];
-                if(!(staff is HiddenOutputStaff) && staff.ContainsAChordSymbol) // cant use Metrics test here, because Metrics havent been set yet!
-                {
-                    rval = staff.Voices[0];
-                    break;
-                }
-            }
-            return rval;
         }
         #endregion
 

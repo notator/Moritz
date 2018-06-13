@@ -2156,7 +2156,8 @@ namespace Moritz.Symbols
             float right = float.MaxValue;
             float bottom = float.MaxValue;
             float left = float.MaxValue;
-            if(lbm1 != null && lbm2 != null)
+
+			if (lbm1 != null && lbm2 != null)
             {
                 top = lbm1.Top < lbm2.Top ? lbm1.Top : lbm2.Top;
                 right = lbm1.Right > lbm2.Right ? lbm1.Right : lbm2.Right;
@@ -2169,17 +2170,17 @@ namespace Moritz.Symbols
                 right = lbm1.Right;
                 bottom = lbm1.Bottom;
                 left = lbm1.Left;
-            }
+			}
             else if(lbm2 != null)
             {
                 top = lbm2.Top;
                 right = lbm2.Right;
                 bottom = lbm2.Bottom;
                 left = lbm2.Left;
-            }
+			}
             if(top != float.MaxValue)
             {
-                ledgerlineBlockMetrics = new LedgerlineBlockMetrics(left, right, staffLineStemStrokeWidth, lbm1.CSSObjectClass);
+                ledgerlineBlockMetrics = new LedgerlineBlockMetrics(left, right, staffLineStemStrokeWidth, CSSObjectClass.ledgerlines);
                 ledgerlineBlockMetrics.SetTop(top);
                 ledgerlineBlockMetrics.SetBottom(bottom);
             }

@@ -62,22 +62,6 @@ namespace Moritz.Symbols
             }
         }
 
-        /// <summary>
-        /// Returns true if the staff contains at least one ChordSymbol. Otherwise false.
-        /// </summary>
-        public bool ContainsAChordSymbol
-        {
-            get
-            {
-                bool containsAChordSymbol = false;
-                foreach(Voice voice in this.Voices)
-                {
-					containsAChordSymbol = voice.ContainsAChordSymbol;
-                }
-                return containsAChordSymbol;
-            }
-        }
-
         #region composition
         /// <summary>
         /// Sets the visibility of naturals in all the chords on this multi-bar staff.

@@ -31,30 +31,4 @@ namespace Moritz.Symbols
             w.SvgEndGroup(); // outputStaff
         }
     }
-
-    /// <summary>
-    /// An HiddenOutputStaff is invisible in all systems, regardless of its content.
-    /// Such output staves are defined using PageFormat.VisibleOutputVoiceIndicesPerStaff.
-    /// <para>Note also that individual staves will also be invisible if they only contain a rest.</para>
-    /// </summary>
-    public class HiddenOutputStaff : OutputStaff
-    {
-        public HiddenOutputStaff(SvgSystem svgSystem)
-            : base(svgSystem, "", 1, 1, 1) // These default values will never be used.
-        {
-        }
-
-        /// <summary>
-        /// Writes out the (invisible) voices
-        /// </summary>
-        public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel)
-        {
-            w.SvgStartGroup(CSSObjectClass.staff.ToString());
-            w.WriteAttributeString("score", "invisible", null, "invisible");
-
-            base.WriteSVG(w, false, systemNumber, staffNumber, carryMsgsPerChannel);
-
-            w.SvgEndGroup(); // outputStaff
-        }
-    }
 }

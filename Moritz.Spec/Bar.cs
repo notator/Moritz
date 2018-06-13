@@ -23,7 +23,7 @@ namespace Moritz.Spec
 		/// </summary>
 		/// <param name="seq">Cannot be null, and must have Trks</param>
 		/// <param name="inputVoiceDefs">This list can be null or empty</param>
-		protected Bar(Seq seq, IReadOnlyList<InputVoiceDef> inputVoiceDefs = null, List<string> initialClefPerChannel = null )
+		protected Bar(Seq seq, IReadOnlyList<InputVoiceDef> inputVoiceDefs )
         {
 			#region conditions
             seq.AssertConsistency();
@@ -37,7 +37,6 @@ namespace Moritz.Spec
 			#endregion
 
 			AbsMsPosition = seq.AbsMsPosition;
-			InitialClefPerChannel = initialClefPerChannel;
 
 			int clefIndex = 0;
 			int msDuration = seq.MsDuration;
@@ -45,7 +44,6 @@ namespace Moritz.Spec
             {
                 trk.Container = this;
 				Debug.Assert(trk.MsDuration == msDuration); // cannot be 0 here.
-				trk.Insert(0, new ClefDef(initialClefPerChannel[trk.MidiChannel], 0));
                 _voiceDefs.Add(trk);
 				clefIndex++;
             }
@@ -56,7 +54,6 @@ namespace Moritz.Spec
                 {
                     ivd.Container = this;
 					Debug.Assert(ivd.MsDuration == msDuration);
-					ivd.Insert(0, new ClefDef(initialClefPerChannel[clefIndex++], 0));
 					_voiceDefs.Add(ivd);
                 }
             }
@@ -373,6 +370,5 @@ namespace Moritz.Spec
 			}
 		}
         protected List<VoiceDef> _voiceDefs = new List<VoiceDef>();
-		protected IReadOnlyList<string> InitialClefPerChannel = null;
 	}
 }

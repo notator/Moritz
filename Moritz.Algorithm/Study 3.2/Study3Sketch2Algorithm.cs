@@ -88,7 +88,7 @@ namespace Moritz.Algorithm.Study3Sketch2
 		/// and the clef ID string ("t", "t1", "b3" etc.).
 		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
 		/// the existing IUniqueDefs before which the clef will be inserted.
-		/// The SortedDictionaries should not contain tne initial clefs per voicedef - those will be included
+		/// The SortedDictionaries should not contain the initial clefs per voiceDef - those will be included
 		/// automatically.
 		/// Note that a CautionaryChordDef counts as an IUniqueDef at the beginning of a bar, and that clefs
 		/// cannot be inserted in front of them.

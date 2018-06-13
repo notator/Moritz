@@ -89,9 +89,10 @@ namespace Moritz.Symbols
         /// </summary>
         public float DefaultDistanceBetweenSystems;
         public List<List<byte>> OutputMIDIChannelsPerStaff = null;
-        public List<List<byte>> InputMIDIChannelsPerStaff = null;        
-        public List<string> ClefsList = null;
-        public List<int> StafflinesPerStaff = null;
+        public List<List<byte>> InputMIDIChannelsPerStaff = null;
+		public List<string> ClefPerStaff = null;
+		public List<string> InitialClefPerMIDIChannel = null;
+		public List<int> StafflinesPerStaff = null;
         public List<int> StaffGroups = null;
         public List<string> LongStaffNames = null;
         public List<string> ShortStaffNames = null;

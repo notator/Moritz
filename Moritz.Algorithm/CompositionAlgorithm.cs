@@ -205,7 +205,7 @@ namespace Moritz.Algorithm
 		/// and the clef ID string ("t", "t1", "b3" etc.).
 		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
 		/// the existing IUniqueDefs before which the clef will be inserted.
-		/// The SortedDictionaries should not contain tne initial clefs per voicedef - those will be included
+		/// The SortedDictionaries should not contain the initial clefs per voiceDef - those will be included
 		/// automatically.
 		/// Note that a CautionaryChordDef counts as an IUniqueDef at the beginning of a bar, and that clefs
 		/// cannot be inserted in front of them.
@@ -339,7 +339,7 @@ namespace Moritz.Algorithm
 		/// <returns>A list of Bars</returns>
 		protected List<Bar> GetBars(Seq mainSeq, List<InputVoiceDef> inputVoiceDefs, List<int> barlineMsPositions, List<List<SortedDictionary<int, string>>> clefChangesPerBar, List<List<SortedDictionary<int, string>>> lyricsPerBar)
 		{
-			MainBar mainBar = new MainBar(mainSeq, inputVoiceDefs, InitialClefPerVoiceDef);
+			MainBar mainBar = new MainBar(mainSeq, inputVoiceDefs);
 
 			List<Bar> bars = mainBar.GetBars(barlineMsPositions);
 
@@ -429,16 +429,6 @@ namespace Moritz.Algorithm
 			}
 		}
 
-		/// <summary>
-		/// Returns a clef for every VoiceDef (top to bottom in score).
-		/// Channels that will end up on a HiddenOutputStaff are also given a clef - even though it isn't going to be displayed.
-		/// </summary>
-		public void GetInitialClefPerVoiceDef(PageFormat pageFormat)
-        {
-			InitialClefPerVoiceDef = pageFormat.ClefsList;
-		}
-
-		public List<string> InitialClefPerVoiceDef = null;
 		protected List<Krystal> _krystals;
         protected List<Palette> _palettes;
 
@@ -463,8 +453,8 @@ namespace Moritz.Algorithm
 			/// <param name="seq">Cannot be null, and must have Trks</param>
 			/// <param name="inputVoiceDefs">This list can be null or empty</param>
 			/// <param name="initialClefPerChannel">Cannot be null. Count must be seq.Trks.Count + inputVoiceDefs.Count</param>>
-			public MainBar(Seq seq, IReadOnlyList<InputVoiceDef> inputVoiceDefs, List<string> initialClefPerChannel)
-				: base(seq, inputVoiceDefs, initialClefPerChannel)
+			public MainBar(Seq seq, IReadOnlyList<InputVoiceDef> inputVoiceDefs)
+				: base(seq, inputVoiceDefs)
 			{
 				AssertConsistency();
 			}
@@ -472,14 +462,13 @@ namespace Moritz.Algorithm
 			/// <summary>
 			/// 1. base.AssertConsistency() is called. (The base Bar must be consistent.)
 			/// 2. AbsMsPosition must be 0.
-			/// 3. InitialClefPerChannel != null && InitialClefPerChannel.Count == VoiceDefs.Count.
+			/// 3. InitialClefPerChannel == null || InitialClefPerChannel.Count == VoiceDefs.Count.
 			/// 4. At least one Trk must end with a MidiChordDef.
 			/// </summary> 
 			public override void AssertConsistency()
 			{
 				base.AssertConsistency();
 				Debug.Assert(AbsMsPosition == 0);
-				Debug.Assert(InitialClefPerChannel != null && InitialClefPerChannel.Count == VoiceDefs.Count);
 
 				#region At least one Trk must end with a MidiChordDef.
 				IReadOnlyList<Trk> trks = Trks;

@@ -974,22 +974,19 @@ namespace Moritz.Symbols
                 for(int staffIndex = 0; staffIndex < system.Staves.Count; staffIndex++)
                 {
                     Staff staff = system.Staves[staffIndex];
-                    if(!(staff is HiddenOutputStaff))
+                    foreach(NoteObject noteObject in staff.Voices[0].NoteObjects)
                     {
-                        foreach(NoteObject noteObject in staff.Voices[0].NoteObjects)
+                        if(noteObject is Barline firstBarline)
                         {
-                            if(noteObject is Barline firstBarline)
-                            {
-                                float fontHeight = _pageFormat.StaffNameFontHeight;
+                            float fontHeight = _pageFormat.StaffNameFontHeight;
 
-                                if(staff is InputStaff)
-                                {
-                                    fontHeight *= _pageFormat.InputSizeFactor;
-                                }
-								StaffNameText staffNameText = new StaffNameText(firstBarline, staff.Staffname, fontHeight);
-                                firstBarline.DrawObjects.Add(staffNameText);
-                                break;
+                            if(staff is InputStaff)
+                            {
+                                fontHeight *= _pageFormat.InputSizeFactor;
                             }
+							StaffNameText staffNameText = new StaffNameText(firstBarline, staff.Staffname, fontHeight);
+                            firstBarline.DrawObjects.Add(staffNameText);
+                            break;
                         }
                     }
                 }
@@ -1006,62 +1003,59 @@ namespace Moritz.Symbols
             {
                 foreach(Staff staff in system.Staves)
                 {
-                    if(!(staff is HiddenOutputStaff))
+                    foreach(Voice voice in staff.Voices)
                     {
-                        foreach(Voice voice in staff.Voices)
+                        Debug.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline);
+                        // contains lists of consecutive rest indices
+                        List<List<int>> restIndexLists = new List<List<int>>();
+                        #region find the consecutive rests
+                        List<int> consecutiveRestIndexList = new List<int>();
+                        for(int i = 0; i < voice.NoteObjects.Count - 1; i++)
                         {
-                            Debug.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline);
-                            // contains lists of consecutive rest indices
-                            List<List<int>> restIndexLists = new List<List<int>>();
-                            #region find the consecutive rests
-                            List<int> consecutiveRestIndexList = new List<int>();
-                            for(int i = 0; i < voice.NoteObjects.Count - 1; i++)
-                            {
-                                Debug.Assert(!(voice.NoteObjects[i] is Barline));
+                            Debug.Assert(!(voice.NoteObjects[i] is Barline));
 
-                                RestSymbol rest1 = voice.NoteObjects[i] as RestSymbol;
-                                RestSymbol rest2 = voice.NoteObjects[i + 1] as RestSymbol;
-                                if(rest1 != null && rest2 != null)
-                                {
-                                    if(!consecutiveRestIndexList.Contains(i))
-                                    {
-                                        consecutiveRestIndexList.Add(i);
-                                    }
-                                    consecutiveRestIndexList.Add(i + 1);
-                                }
-                                else
-                                {
-                                    if(consecutiveRestIndexList != null && consecutiveRestIndexList.Count > 0)
-                                    {
-                                        restIndexLists.Add(consecutiveRestIndexList);
-                                        consecutiveRestIndexList = new List<int>();
-                                    }
-                                }
-                            }
-                            #endregion
-                            #region replace the consecutive rests
-                            if(restIndexLists.Count > 0)
+                            RestSymbol rest1 = voice.NoteObjects[i] as RestSymbol;
+                            RestSymbol rest2 = voice.NoteObjects[i + 1] as RestSymbol;
+                            if(rest1 != null && rest2 != null)
                             {
-                                for(int i = restIndexLists.Count - 1; i >= 0; i--)
+                                if(!consecutiveRestIndexList.Contains(i))
                                 {
-                                    List<int> consecutiveRestIndices = restIndexLists[i];
-                                    int msDuration = 0;
-                                    RestSymbol rest = null;
-                                    // remove all but the first rest
-                                    for(int j = consecutiveRestIndices.Count - 1; j > 0; j--)
-                                    {
-                                        rest = voice.NoteObjects[consecutiveRestIndices[j]] as RestSymbol;
-                                        Debug.Assert(rest != null);
-                                        msDuration += rest.MsDuration;
-                                        voice.NoteObjects.RemoveAt(consecutiveRestIndices[j]);
-                                    }
-                                    rest = voice.NoteObjects[consecutiveRestIndices[0]] as RestSymbol;
-                                    msDuration += rest.MsDuration;
-                                    rest.MsDuration = msDuration;
+                                    consecutiveRestIndexList.Add(i);
+                                }
+                                consecutiveRestIndexList.Add(i + 1);
+                            }
+                            else
+                            {
+                                if(consecutiveRestIndexList != null && consecutiveRestIndexList.Count > 0)
+                                {
+                                    restIndexLists.Add(consecutiveRestIndexList);
+                                    consecutiveRestIndexList = new List<int>();
                                 }
                             }
-                            #endregion
                         }
+                        #endregion
+                        #region replace the consecutive rests
+                        if(restIndexLists.Count > 0)
+                        {
+                            for(int i = restIndexLists.Count - 1; i >= 0; i--)
+                            {
+                                List<int> consecutiveRestIndices = restIndexLists[i];
+                                int msDuration = 0;
+                                RestSymbol rest = null;
+                                // remove all but the first rest
+                                for(int j = consecutiveRestIndices.Count - 1; j > 0; j--)
+                                {
+                                    rest = voice.NoteObjects[consecutiveRestIndices[j]] as RestSymbol;
+                                    Debug.Assert(rest != null);
+                                    msDuration += rest.MsDuration;
+                                    voice.NoteObjects.RemoveAt(consecutiveRestIndices[j]);
+                                }
+                                rest = voice.NoteObjects[consecutiveRestIndices[0]] as RestSymbol;
+                                msDuration += rest.MsDuration;
+                                rest.MsDuration = msDuration;
+                            }
+                        }
+                        #endregion
                     }
                 }
             }
@@ -1076,111 +1070,101 @@ namespace Moritz.Symbols
         /// </summary>
         public void SetSystemsToBeginAtBars(List<int> barNumbers)
         {
-            List<int> barIndices = new List<int>();
-            if(barNumbers == null || barNumbers.Count == 0)
+			Debug.Assert(barNumbers != null);
+            if(barNumbers.Count == 0)
             {
-                int barIndex = 0;
-                while(barIndex < Systems.Count)
+                int barNumber = 1;
+                while(barNumber <= Systems.Count)
                 {
-                    barIndices.Add(barIndex);
-                    barIndex += _pageFormat.DefaultNumberOfBarsPerSystem;
-                }
-            }
-            else
-            {
-                foreach(int barNumber in barNumbers)
-                {
-                    barIndices.Add(barNumber - 1);
+                    barNumbers.Add(barNumber);
+                    barNumber += _pageFormat.DefaultNumberOfBarsPerSystem;
                 }
             }
 
-            Debug.Assert(barIndices.Contains(0));
-            // barIndices beyond the end of the score are silently ignored.
+            Debug.Assert(barNumbers[0] == 1);
 
-            List<int> systemIndices = new List<int>();
-            for(int i = 0; i < Systems.Count; i++)
+            // barNumbers beyond the end of the score are silently ignored.
+            List<int> systemStartBarIndices = new List<int>();
+            for(int i = 1; i <= Systems.Count; i++)
             {
-                if(!barIndices.Contains(i))
-                    systemIndices.Add(i);
+                if(barNumbers.Contains(i))
+                    systemStartBarIndices.Add(i-1);
             }
 
-            DoJoinSystems(systemIndices);
+            DoJoinSystems(systemStartBarIndices);
         }
-        /// <summary>
-        /// The systemNumbers are the current numbers of the systems which are to be joined to the following system.
-        /// All systemNumbers must be greater than 0 and less than the current Systems.Count.
-        /// No systemNumbers may be repeated.
-        /// </summary>
-        public void JoinSystems(params int[] systemNumbers)
+		///// <summary>
+		///// The systemNumbers are the current numbers of the systems which are to be joined to the following system.
+		///// All systemNumbers must be greater than 0 and less than the current Systems.Count.
+		///// No systemNumbers may be repeated.
+		///// </summary>
+		//public void JoinSystems(params int[] systemNumbers)
+		//{
+		//    List<int> systemNums = new List<int>(systemNumbers);
+		//    systemNums.Sort();
+
+		//    #region conditions
+		//    Debug.Assert(systemNums.Count > 0 && systemNums[0] > 0);
+		//    for(int i = 1; i < systemNums.Count; i++)
+		//    {
+		//        Debug.Assert(
+		//            systemNums[i] > 0
+		//            && systemNums[i] != systemNums[i - 1]
+		//            && systemNums[i] < Systems.Count);
+		//    }
+		//    #endregion
+
+		//    DoJoinSystems(systemNums);
+		//}
+		///// <summary>
+		///// Joins systems so as to put barsPerSystem bars on each system.
+		///// </summary>
+		///// <param name="barsPerSystem"></param>
+		//protected void SetBarsPerSystem(int barsPerSystem)
+		//{
+		//    List<int> systemIndices = new List<int>();
+		//    for(int i = 1; i < Systems.Count; i++)
+		//        systemIndices.Add(i);
+		//    for(int i = barsPerSystem; i < Systems.Count; i += barsPerSystem)
+		//        systemIndices.Remove(i);
+
+		//    DoJoinSystems(systemIndices);
+		//}
+
+		#region private for JoinSystems() and SetBarsPerSystem()
+		/// <summary>
+		/// Copies Systems[systemIndex+1]'s content to the end of Systems[systemIndex] (taking account of clefs),
+		/// then removes Systems[systemIndex+1] from the Systems list.
+		/// </summary>
+		/// <param name="barlineIndex"></param>
+		private void JoinNextSystemToSystem(int systemIndex)
         {
-            List<int> systemNums = new List<int>(systemNumbers);
-            systemNums.Sort();
-
-            #region conditions
-            Debug.Assert(systemNums.Count > 0 && systemNums[0] > 0);
-            for(int i = 1; i < systemNums.Count; i++)
-            {
-                Debug.Assert(
-                    systemNums[i] > 0
-                    && systemNums[i] != systemNums[i - 1]
-                    && systemNums[i] < Systems.Count);
-            }
-            #endregion
-
-            DoJoinSystems(systemNums);
-        }
-        /// <summary>
-        /// Joins systems so as to put barsPerSystem bars on each system.
-        /// </summary>
-        /// <param name="barsPerSystem"></param>
-        protected void SetBarsPerSystem(int barsPerSystem)
-        {
-            List<int> systemIndices = new List<int>();
-            for(int i = 1; i < Systems.Count; i++)
-                systemIndices.Add(i);
-            for(int i = barsPerSystem; i < Systems.Count; i += barsPerSystem)
-                systemIndices.Remove(i);
-
-            DoJoinSystems(systemIndices);
-        }
-
-        #region private for JoinSystems() and SetBarsPerSystem()
-        /// <summary>
-        /// Copies Systems[systemIndex]'s content to the end of the previous system (taking account of clefs),
-        /// then removes Systems[systemIndex] from the Systems list.
-        /// </summary>
-        /// <param name="barlineIndex"></param>
-        private void JoinToPreviousSystem(int systemIndex)
-        {
-            Debug.Assert(Systems.Count > 1 && Systems.Count > systemIndex);
-            SvgSystem system1 = Systems[systemIndex - 1];
-            SvgSystem system2 = Systems[systemIndex];
+            Debug.Assert(Systems.Count > 1 && Systems.Count > systemIndex + 1);
+            SvgSystem system1 = Systems[systemIndex];
+            SvgSystem system2 = Systems[systemIndex+1];
             Debug.Assert(system1.Staves.Count == system2.Staves.Count);
+			foreach (Staff staff in system2.Staves)
+			{
+				foreach (Voice voice in staff.Voices)
+				{
+					Debug.Assert(voice.NoteObjects[0] is Clef);
+				}
+			}
 
-            for(int staffIndex = 0; staffIndex < system2.Staves.Count; staffIndex++)
+			for (int staffIndex = 0; staffIndex < system2.Staves.Count; staffIndex++)
             {
-                bool staffIsNotHidden = !(system1.Staves[staffIndex] is HiddenOutputStaff);
-                string clefTypeAtEndOfStaff1 = null;
-                if(staffIsNotHidden)
-                {
-                    // If a staff has two voices, both contain the same clefTypes (some clefs may be invisible).
-                    clefTypeAtEndOfStaff1 = FindClefTypeAtEndOfStaff1(system1.Staves[staffIndex].Voices[0]);
-                }
+                //string clefTypeAtEndOfStaff1 = null;
+                //clefTypeAtEndOfStaff1 = FindClefTypeAtEndOfStaff1(system1.Staves[staffIndex].Voices[0]);
 
                 for(int voiceIndex = 0; voiceIndex < system2.Staves[staffIndex].Voices.Count; voiceIndex++)
                 {
                     Voice voice1 = system1.Staves[staffIndex].Voices[voiceIndex];
                     Voice voice2 = system2.Staves[staffIndex].Voices[voiceIndex];
-                    if(staffIsNotHidden)
-                    {
-                        Clef voice2FirstClef = voice2.NoteObjects[0] as Clef;
-                        Debug.Assert(voice2FirstClef != null && clefTypeAtEndOfStaff1 == voice2FirstClef.ClefType);
-                        voice2.NoteObjects.Remove(voice2FirstClef);
-                    }
-
+					Debug.Assert(voice2.NoteObjects[0] is Clef);
+					voice2.NoteObjects.RemoveAt(0);
                     try
                     {
-                        voice1.AppendNoteObjects(voice2.NoteObjects);
+						voice1.AppendNoteObjects(voice2.NoteObjects);
                     }
                     catch(Exception ex)
                     {
@@ -1192,30 +1176,40 @@ namespace Moritz.Symbols
             system2 = null;
         }
 
-        private string FindClefTypeAtEndOfStaff1(Voice staff1voice0)
-        {
-            Clef mainStaff1Clef = staff1voice0.NoteObjects[0] as Clef;
-            Debug.Assert(mainStaff1Clef != null);
+        //private string FindClefTypeAtEndOfStaff1(Voice staff1voice0)
+        //{
+        //    Clef mainStaff1Clef = staff1voice0.NoteObjects[0] as Clef;
+        //    Debug.Assert(mainStaff1Clef != null);
 
-            string clefTypeAtEndOfStaff1 = mainStaff1Clef.ClefType;
-            foreach(NoteObject noteObject in staff1voice0.NoteObjects)
-            {
-                if(noteObject is SmallClef smallClef)
-                {
-                    clefTypeAtEndOfStaff1 = smallClef.ClefType;
-                } 
-            }
-            return clefTypeAtEndOfStaff1;
-        }
+        //    string clefTypeAtEndOfStaff1 = mainStaff1Clef.ClefType;
+        //    foreach(NoteObject noteObject in staff1voice0.NoteObjects)
+        //    {
+        //        if(noteObject is SmallClef smallClef)
+        //        {
+        //            clefTypeAtEndOfStaff1 = smallClef.ClefType;
+        //        } 
+        //    }
+        //    return clefTypeAtEndOfStaff1;
+        //}
 
-        private void DoJoinSystems(List<int> systemIndices)
+        private void DoJoinSystems(List<int> systemStartBarIndices)
         {
-            for(int i = 0; i < systemIndices.Count; i++)
+            for(int systemIndex = 0; systemIndex < systemStartBarIndices.Count; systemIndex++)
             {
-                int s = systemIndices[i];
-                JoinToPreviousSystem(s);
-                for(int j = i; j < systemIndices.Count; j++)
-                    systemIndices[j]--;
+				int nBarsToJoin;
+				if (systemIndex == systemStartBarIndices.Count - 1)
+				{
+					nBarsToJoin = Systems.Count - systemIndex - 1;
+				}
+				else
+				{
+					nBarsToJoin = systemStartBarIndices[systemIndex + 1] - systemStartBarIndices[systemIndex] - 1;
+				}
+
+				for(int b = 0; b < nBarsToJoin; ++b)
+				{
+					JoinNextSystemToSystem(systemIndex);
+				}
             }
             MoveInitialBarlinesToPreviousSystem();
         }
@@ -1268,21 +1262,18 @@ namespace Moritz.Symbols
             {
                 foreach(Staff staff in Systems[systemIndex].Staves)
                 {
-                    if(!(staff is HiddenOutputStaff))
+                    foreach(Voice voice in staff.Voices)
                     {
-                        foreach(Voice voice in staff.Voices)
-                        {
-                            Debug.Assert(voice.NoteObjects.Count > 0
-                                && !(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline));
+                        Debug.Assert(voice.NoteObjects.Count > 0
+                            && !(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline));
 
-                            Barline barline;
-                            if(systemIndex == Systems.Count - 1)
-                                barline = new EndBarline(voice);
-                            else
-                                barline = new Barline(voice);
+                        Barline barline;
+                        if(systemIndex == Systems.Count - 1)
+                            barline = new EndBarline(voice);
+                        else
+                            barline = new Barline(voice);
 
-                            voice.NoteObjects.Add(barline);
-                        }
+                        voice.NoteObjects.Add(barline);
                     }
                 }
             }
@@ -1338,6 +1329,10 @@ namespace Moritz.Symbols
                 for(int i = 0; i < system.Staves.Count; ++i)
                 {
                     Debug.Assert(system.Staves[i].Voices.Count == nVoices[i]);
+					foreach(Voice voice in system.Staves[i].Voices)
+					{
+						Debug.Assert(voice.NoteObjects[0] is Clef);
+					}
                 }
             }
             #endregion preconditions
@@ -1381,39 +1376,37 @@ namespace Moritz.Symbols
             }
         }
 
-        /// <summary>
-        /// If SmallClefs are followed by a rest, they are moved in front of the following chord or the final barline.
-        /// </summary>
-        private void NormalizeSmallClefPositions()
-        {
-            foreach(SvgSystem system in Systems)
-            {
-                foreach(Staff staff in system.Staves)
-                {
-                    if(!(staff is HiddenOutputStaff))
-                    {
-                        foreach(Voice voice in staff.Voices)
-                        {
-                            MoveSmallClefsToNextChordOrFinalBarline(voice);
-                        }
-                    }
-                }
-            }
-        }
+		/// <summary>
+		/// If SmallClefs are followed by a rest, they are moved in front of the following chord or the final barline.
+		/// </summary>
+		private void NormalizeSmallClefPositions()
+		{
+			foreach(SvgSystem system in Systems)
+			{
+				foreach(Staff staff in system.Staves)
+				{
+					foreach(Voice voice in staff.Voices)
+					{
+						MoveSmallClefsToNextChordOrFinalBarline(voice);
+					}
+				}
+			}
+		}
 
-        /// <summary>
-        /// If a SmallClef is followed by a rest, it is moved in front of the following chord or the final barline.
-        /// This function is called recursively, to move all the SmallClefs to their correct positions.
-        /// </summary>
-        private void MoveSmallClefsToNextChordOrFinalBarline(Voice voice)
+		/// <summary>
+		/// If a SmallClef is followed by a rest, it is moved in front of the following chord or the final barline.
+		/// This function is called recursively, to move all the SmallClefs to their correct positions.
+		/// </summary>
+		private void MoveSmallClefsToNextChordOrFinalBarline(Voice voice)
         {
             bool chordFollows = false;
             SmallClef smallClef = null;
             int smallClefIndex = -1;
-            Debug.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline);
-            int indexOfFollowingChordOrFinalBarline = voice.NoteObjects.Count - 1; // final barline
+			Debug.Assert(voice.NoteObjects[0] is Clef);
+			Debug.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline);
+			int indexOfFollowingChordOrFinalBarline = voice.NoteObjects.Count - 1; // final barline
 
-            for(int i = voice.NoteObjects.Count - 1; i >= 0; --i)
+            for(int i = voice.NoteObjects.Count - 1; i > 0; --i)
             {
                 if(voice.NoteObjects[i] is ChordSymbol)
                 {
@@ -1547,15 +1540,12 @@ namespace Moritz.Symbols
         {
             for(int staffIndex = 0; staffIndex < Systems[0].Staves.Count; staffIndex++)
             {
-                if(!(Systems[0].Staves[staffIndex] is HiddenOutputStaff))
+                NoteObjectMoment previousStaffMoment = null;
+                foreach(SvgSystem system in Systems)
                 {
-                    NoteObjectMoment previousStaffMoment = null;
-                    foreach(SvgSystem system in Systems)
+                    Staff staff = system.Staves[staffIndex];
                     {
-                        Staff staff = system.Staves[staffIndex];
-                        {
-                            previousStaffMoment = staff.FinalizeAccidentals(previousStaffMoment);
-                        }
+                        previousStaffMoment = staff.FinalizeAccidentals(previousStaffMoment);
                     }
                 }
             }
@@ -1569,7 +1559,7 @@ namespace Moritz.Symbols
             int barNumber = 1;
             foreach(SvgSystem system in Systems)
             {
-                Voice barnumberVoice = system.VoiceForBarnumber();
+                Voice barnumberVoice = system.Staves[0].Voices[0];
                 bool isFirstBarline = true;
                 for(int i = 0; i < barnumberVoice.NoteObjects.Count - 1; i++)
                 {
@@ -1598,18 +1588,15 @@ namespace Moritz.Symbols
             {
                 foreach(Staff staff in system.Staves)
                 {
-                    if(!(staff is HiddenOutputStaff))
+                    foreach(Voice voice in staff.Voices)
                     {
-                        foreach(Voice voice in staff.Voices)
+                        if(voice.NoteObjects[0] is Clef)
                         {
-                            if(voice.NoteObjects[0] is Clef)
-                            {
-                                voice.NoteObjects.Insert(1, new Barline(voice));
-                            }
-                            else
-                            {
-                                voice.NoteObjects.Insert(0, new Barline(voice));
-                            }
+                            voice.NoteObjects.Insert(1, new Barline(voice));
+                        }
+                        else
+                        {
+                            voice.NoteObjects.Insert(0, new Barline(voice));
                         }
                     }
                 }

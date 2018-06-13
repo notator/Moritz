@@ -248,13 +248,12 @@ namespace Moritz.Spec
             int nTrks = 0;
             for(int i = 0; i < _trks.Count; ++i)
             {
-                Trk trk = _trks[i] as Trk;
-                if(trk != null)
-                {
-                    nTrks++;
-                    Debug.Assert(trk.MidiChannel == midiChannelIndexPerOutputVoice[i], "All trk.MidiChannels must correspond.");
-                }
-            }
+				if (_trks[i] is Trk trk)
+				{
+					nTrks++;
+					Debug.Assert(trk.MidiChannel == midiChannelIndexPerOutputVoice[i], "All trk.MidiChannels must correspond.");
+				}
+			}
 
             Debug.Assert(nTrks == midiChannelIndexPerOutputVoice.Count);
         }

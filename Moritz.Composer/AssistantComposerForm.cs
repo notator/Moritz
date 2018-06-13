@@ -2004,7 +2004,6 @@ namespace Moritz.Composer
             List<Palette> palettes = null;
             GetKrystalsAndPalettes(out krystals, out palettes);
             PageFormat pageFormat = GetPageFormat();
-            _algorithm.GetInitialClefPerVoiceDef(pageFormat);
 
             // These need clearing between creating different scores in one Moritz run.
             Metrics.ClearUsedCSSClasses();
@@ -2119,21 +2118,77 @@ namespace Moritz.Composer
 
             pageFormat.OutputMIDIChannelsPerStaff = _outputMIDIChannelsPerStaff; // one channels list per output staff
             pageFormat.InputMIDIChannelsPerStaff = _inputMIDIChannelsPerStaff; // one channels list per input staff
-			pageFormat.ClefsList = M.StringToStringList(this.ClefsPerStaffTextBox.Text, ',');
-            pageFormat.StafflinesPerStaff = M.StringToIntList(this.StafflinesPerStaffTextBox.Text, ',');
+			pageFormat.ClefPerStaff = M.StringToStringList(this.ClefsPerStaffTextBox.Text, ',');
+			pageFormat.InitialClefPerMIDIChannel = GetClefPerMIDIChannel(pageFormat);
+
+			pageFormat.StafflinesPerStaff = M.StringToIntList(this.StafflinesPerStaffTextBox.Text, ',');
             pageFormat.StaffGroups = M.StringToIntList(this.StaffGroupsTextBox.Text, ',');
 
             pageFormat.LongStaffNames = M.StringToStringList(this.LongStaffNamesTextBox.Text, ',');
             pageFormat.ShortStaffNames = M.StringToStringList(this.ShortStaffNamesTextBox.Text, ',');
             pageFormat.SystemStartBars = M.StringToIntList(SystemStartBarsTextBox.Text, ',');
         }
-        #endregion helpers
-        #endregion
-        #endregion create score
 
-        #region private variables
-        #region Brushes
-        SolidBrush _systemHighlightBrush = new SolidBrush(SystemColors.Highlight);
+		/// <summary>
+		/// Returns a clef for each VoiceDef (=MIDI Channel) in the system.
+		/// The pageFormat.ClefsList has one clef per staff. Each staff can have either one or two VoiceDefs. 
+		/// </summary>
+		public List<string> GetClefPerMIDIChannel(PageFormat pageFormat)
+		{
+			List<string> clefPerMidiChannel = new List<string>();
+			int staffIndex = 0;
+			for (; staffIndex < pageFormat.OutputMIDIChannelsPerStaff.Count; staffIndex++)
+			{
+				string clef = pageFormat.ClefPerStaff[staffIndex];
+				clefPerMidiChannel.Add(clef);
+				if (pageFormat.OutputMIDIChannelsPerStaff[staffIndex].Count > 1)
+				{
+					Debug.Assert(pageFormat.OutputMIDIChannelsPerStaff[index: staffIndex].Count == 2);
+					clefPerMidiChannel.Add(clef);
+				}
+			}
+			Debug.Assert(pageFormat.InputMIDIChannelsPerStaff.Count < 3);
+			int endIndex = staffIndex + pageFormat.InputMIDIChannelsPerStaff.Count;
+			for (; staffIndex < endIndex; staffIndex++)
+			{
+				string clef = pageFormat.ClefPerStaff[staffIndex];
+				clefPerMidiChannel.Add(clef);
+			}
+
+			return clefPerMidiChannel;
+		}
+
+		public List<List<string>> GetClefListPerVoicePerInputStaff(PageFormat pageFormat)
+		{
+			return GetClefListPerVoicePerStaff(pageFormat, pageFormat.InputMIDIChannelsPerStaff, pageFormat.OutputMIDIChannelsPerStaff.Count);
+		}
+
+		public List<List<string>> GetClefListPerVoicePerStaff(PageFormat pageFormat, List<List<byte>> midiChannelsPerStaff, int initialStaffIndex)
+		{ 
+			List<List<string>> clefListPerVoicePerStaff = new List<List<string>>();
+			int startIndex = initialStaffIndex;
+			int endIndex = midiChannelsPerStaff.Count + initialStaffIndex;
+			for (int staffIndex = startIndex; staffIndex < endIndex; staffIndex++)
+			{
+				List<string> clefList = new List<string>();
+				clefListPerVoicePerStaff.Add(clefList);
+				string clef = pageFormat.ClefPerStaff[staffIndex];
+				for (int n = midiChannelsPerStaff[staffIndex].Count; n > 0; --n)
+				{
+					clefList.Add(clef);
+				}
+			}
+
+			return clefListPerVoicePerStaff;
+		}
+
+		#endregion helpers
+		#endregion
+		#endregion create score
+
+		#region private variables
+		#region Brushes
+		SolidBrush _systemHighlightBrush = new SolidBrush(SystemColors.Highlight);
         SolidBrush _whiteBrush = new SolidBrush(Color.White);
         SolidBrush _blackBrush = new SolidBrush(Color.Black);
         #endregion Brushes
