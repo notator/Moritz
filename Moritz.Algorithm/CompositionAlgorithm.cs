@@ -583,9 +583,8 @@ namespace Moritz.Algorithm
 				VoiceDef remainingBarVoice;
 				foreach(VoiceDef voiceDef in bar.VoiceDefs)
 				{
-					Trk outputVoice = voiceDef as Trk;
 					InputVoiceDef inputVoice = voiceDef as InputVoiceDef;
-					if(outputVoice != null)
+					if(voiceDef is Trk outputVoice)
 					{
 						poppedBarVoice = new Trk(outputVoice.MidiChannel) { Container = poppedBar };
 						poppedBar.VoiceDefs.Add(poppedBarVoice);
