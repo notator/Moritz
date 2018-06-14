@@ -52,7 +52,9 @@ namespace Moritz.Algorithm.Study3Sketch1
 
 			List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count, mainSeq.Trks.Count);
 
-			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, clefChangesPerBar, null);
+			List<List<SortedDictionary<int, string>>> lyricsPerBar = GetLyricsPerBar(barlineMsPositions.Count, mainSeq.Trks.Count);
+
+			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, clefChangesPerBar, lyricsPerBar);
 
 			return bars;
         }
@@ -77,7 +79,7 @@ namespace Moritz.Algorithm.Study3Sketch1
 		{
 			return null;
 
-			//var clefChangesPerBar = GetEmptyClefChangesPerBar(nBars, nVoicesPerBar);
+			//var clefChangesPerBar = GetEmptyStringExtrasPerBar(nBars, nVoicesPerBar);
 
 			//SortedDictionary<int, string> voiceDef0Bar0 = clefChangesPerBar[0][0];
 			//voiceDef0Bar0.Add(9, "b3");
@@ -96,26 +98,24 @@ namespace Moritz.Algorithm.Study3Sketch1
 
 		/// <summary>
 		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
-		/// The dictionary contains the index of the IUniqueDef in the barat which the clef will be inserted in the VoiceDef's IUniquedefs,
-		/// and the clef ID string ("t", "t1", "b3" etc.).
-		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
-		/// the existing IUniqueDefs before which the clef will be inserted.
-		/// The SortedDictionaries should not contain tne initial clefs per voicedef - those will be included
-		/// automatically.
-		/// Note that both Clefs and a CautionaryChordDef at the beginning of a bar count as IUniqueDefs for
-		/// indexing purposes, and that lyrics cannot be attached to them.
+		/// The dictionary contains the index of the IUniqueDef in the bar to which the associated lyric string
+		/// will be attached. The index begins at 0 at the beginning of each bar (immediately after the barline).
+		/// Lyrics may not be attached to a voice if there are two voices on the staff.
 		/// </summary>
-		protected override List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars)
+		protected override List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars, int nVoicesPerBar)
 		{
-			return null;
-			// test code...
-			//VoiceDef voiceDef0 = bars[0][0];
-			//MidiChordDef mcd1 = voiceDef0[2] as MidiChordDef;
-			//mcd1.Lyric = "lyric1";
-			//MidiChordDef mcd2 = voiceDef0[3] as MidiChordDef;
-			//mcd2.Lyric = "lyric2";
-			//MidiChordDef mcd3 = voiceDef0[4] as MidiChordDef;
-			//mcd3.Lyric = "lyric3";
+			//return null;
+
+			var lyricsPerBar = GetEmptyStringExtrasPerBar(nBars, nVoicesPerBar);
+
+			SortedDictionary<int, string> voiceDef0Bar0 = lyricsPerBar[0][0];
+			voiceDef0Bar0.Add(9, "lyric9");
+			voiceDef0Bar0.Add(8, "lyric8");
+			voiceDef0Bar0.Add(6, "lyric6");
+			voiceDef0Bar0.Add(4, "lyric4");
+			voiceDef0Bar0.Add(2, "lyric2");
+
+			return lyricsPerBar;
 		}
 
 		#region CreateBar1Seq()

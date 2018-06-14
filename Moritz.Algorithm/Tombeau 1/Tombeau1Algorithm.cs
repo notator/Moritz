@@ -570,16 +570,11 @@ namespace Moritz.Algorithm.Tombeau1
 
 		/// <summary>
 		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
-		/// The dictionary contains the index of the IUniqueDef in the barat which the clef will be inserted in the VoiceDef's IUniquedefs,
-		/// and the clef ID string ("t", "t1", "b3" etc.).
-		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
-		/// the existing IUniqueDefs before which the clef will be inserted.
-		/// The SortedDictionaries should not contain tne initial clefs per voicedef - those will be included
-		/// automatically.
-		/// Note that both Clefs and a CautionaryChordDef at the beginning of a bar count as IUniqueDefs for
-		/// indexing purposes, and that lyrics cannot be attached to them.
+		/// The dictionary contains the index of the IUniqueDef in the bar to which the associated lyric string
+		/// will be attached. The index begins at 0 at the beginning of each bar (immediately after the barline).
+		/// Lyrics may not be attached to a voice if there are two voices on the staff.
 		/// </summary>
-		protected override List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars)
+		protected override List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars, int nVoicesPerBar)
 		{
 			return null;
 			// test code...
