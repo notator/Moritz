@@ -49,9 +49,11 @@ namespace Moritz.Symbols
             #endregion conditions;
 
             Dictionary<float, HLine> lines = new Dictionary<float, HLine>();
-            List<float> allXs = new List<float>();
-            allXs.Add(Left);
-            allXs.AddRange(Xs);
+			List<float> allXs = new List<float>
+			{
+				Left
+			};
+			allXs.AddRange(Xs);
             allXs.Add(Right);
             for(int i = 1; i < allXs.Count; ++i)
             {
@@ -144,25 +146,23 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject noteObject in voice.NoteObjects)
                 {
-                    OutputChordSymbol chordSymbol = noteObject as OutputChordSymbol;
-                    Clef clef = noteObject as Clef;
-					
-                    if(chordSymbol != null)
-                    {
-                        chordSymbol.ChordMetrics.AddToEdge(this);
-                    }
-                    else if(clef != null && clef.ClefType != "n")
-                    {
-                        Add(clef.Metrics);
-                    }
-                    else
-                    {
-                        Add(noteObject.Metrics);
-                    }
+					Clef clef = noteObject as Clef;
 
-                    EndBarline endBarline = noteObject as EndBarline;
-                    Barline barline = noteObject as Barline;
-                    if(barline!= null && endBarline == null)
+					if(noteObject is OutputChordSymbol chordSymbol)
+					{
+						chordSymbol.ChordMetrics.AddToEdge(this);
+					}
+					else if(clef != null && clef.ClefType != "n")
+					{
+						Add(clef.Metrics);
+					}
+					else
+					{
+						Add(noteObject.Metrics);
+					}
+
+					EndBarline endBarline = noteObject as EndBarline;
+					if(noteObject is Barline barline && endBarline == null)
 					{
 						BarlineMetrics barlineMetrics = barline.Metrics as BarlineMetrics;
 						if(barlineMetrics.BarnumberMetrics != null)
@@ -172,9 +172,9 @@ namespace Moritz.Symbols
 						if(barlineMetrics.StaffNameMetrics != null)
 						{
 							Add(barlineMetrics.StaffNameMetrics);
-						}					
-					}					
-                }
+						}
+					}
+				}
             }
         }
 

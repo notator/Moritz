@@ -246,6 +246,6 @@ namespace Moritz.Symbols
 
         private string _pitch;
         private int _alteration = 0;
-        private int _midiVelocity;
+        private readonly int _midiVelocity;
     }
 }

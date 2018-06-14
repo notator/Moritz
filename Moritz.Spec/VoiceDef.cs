@@ -412,9 +412,8 @@ namespace Moritz.Spec
 					double step = interval;
 					for(int i = beginIndex; i < endIndex; ++i)
 					{
-						MidiChordDef mcd = _uniqueDefs[i] as MidiChordDef;
 						InputChordDef icd = _uniqueDefs[i] as InputChordDef;
-						IUniqueChordDef iucd = (mcd == null) ? (IUniqueChordDef)icd : (IUniqueChordDef)mcd;
+						IUniqueChordDef iucd = (!(_uniqueDefs[i] is MidiChordDef mcd)) ? (IUniqueChordDef)icd : (IUniqueChordDef)mcd;
 						if(iucd != null)
 						{
 							iucd.Transpose((int)Math.Round(interval));
@@ -562,10 +561,9 @@ namespace Moritz.Spec
 
             for(int i = beginIndex; i < endIndex; ++i)
             {
-                MidiChordDef mcd = this[i] as MidiChordDef;
-                InputChordDef icd = this[i] as InputChordDef;
-                IUniqueDef iud = (mcd == null) ? (IUniqueDef)icd : (IUniqueDef)mcd;
-                if(iud != null)
+				InputChordDef icd = this[i] as InputChordDef;
+				IUniqueDef iud = (!(this[i] is MidiChordDef mcd)) ? (IUniqueDef)icd : (IUniqueDef)mcd;
+				if(iud != null)
                 {
                     RestDef restDef;
                     if(this is InputVoiceDef)

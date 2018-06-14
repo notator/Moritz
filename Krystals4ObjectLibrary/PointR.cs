@@ -19,7 +19,7 @@ namespace Krystals4ObjectLibrary
         //}
         #endregion
         #region Public Methods
-        public void shift(float radius, float degrees) // perhaps this should be called translate
+        public void Shift(float radius, float degrees) // perhaps this should be called translate
         {
             float newX, newY;
             PointR shiftVector = new PointR(radius, degrees);

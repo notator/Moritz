@@ -112,9 +112,11 @@ namespace Moritz.Palettes
 
         private void ConnectBasicChordControl()
         {
-            _bcc = new BasicChordControl(SetDialogState);
-            _bcc.Location = new Point(22, 14);
-            Controls.Add(_bcc);
+			_bcc = new BasicChordControl(SetDialogState)
+			{
+				Location = new Point(22, 14)
+			};
+			Controls.Add(_bcc);
             _bcc.TabIndex = 5;
         }
         private void ConnectPaletteButtonsControl(int domain, string audioFolder)
@@ -594,26 +596,28 @@ namespace Moritz.Palettes
 
         private List<TextBox> GetAllTextBoxes()
         {
-            List<TextBox> allTextBoxes = new List<TextBox>();
-            allTextBoxes.Add(_bcc.ChordDensitiesTextBox);
-            allTextBoxes.Add(_bcc.DurationsTextBox);
-            allTextBoxes.Add(_bcc.MidiPitchesTextBox);
-            allTextBoxes.Add(_bcc.VelocitiesTextBox);
-            allTextBoxes.Add(_bcc.ChordOffsTextBox);
-            allTextBoxes.Add(_bcc.RootInversionTextBox);
-            allTextBoxes.Add(_bcc.InversionIndicesTextBox);
-            allTextBoxes.Add(_bcc.VerticalVelocityFactorsTextBox);
-            
-            allTextBoxes.Add(BankIndicesTextBox);
-            allTextBoxes.Add(PatchIndicesTextBox);
-            allTextBoxes.Add(PitchwheelDeviationsTextBox);
-            allTextBoxes.Add(PitchwheelEnvelopesTextBox);
-            allTextBoxes.Add(PanEnvelopesTextBox);           
-            allTextBoxes.Add(ModulationWheelEnvelopesTextBox);
-            allTextBoxes.Add(ExpressionEnvelopesTextBox);
-            allTextBoxes.Add(OrnamentNumbersTextBox);
-            allTextBoxes.Add(MinMsDurationsTextBox);
-            return allTextBoxes;
+			List<TextBox> allTextBoxes = new List<TextBox>
+			{
+				_bcc.ChordDensitiesTextBox,
+				_bcc.DurationsTextBox,
+				_bcc.MidiPitchesTextBox,
+				_bcc.VelocitiesTextBox,
+				_bcc.ChordOffsTextBox,
+				_bcc.RootInversionTextBox,
+				_bcc.InversionIndicesTextBox,
+				_bcc.VerticalVelocityFactorsTextBox,
+
+				BankIndicesTextBox,
+				PatchIndicesTextBox,
+				PitchwheelDeviationsTextBox,
+				PitchwheelEnvelopesTextBox,
+				PanEnvelopesTextBox,
+				ModulationWheelEnvelopesTextBox,
+				ExpressionEnvelopesTextBox,
+				OrnamentNumbersTextBox,
+				MinMsDurationsTextBox
+			};
+			return allTextBoxes;
         }
 
         private void EnableMainParameters()

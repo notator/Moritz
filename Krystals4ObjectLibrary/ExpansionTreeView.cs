@@ -195,7 +195,7 @@ namespace Krystals4ObjectLibrary
 		#endregion public functions
 		#region private variables
 		private readonly TreeView _treeView;
-		private List<StrandNode> _strandNodeList;
+		private readonly List<StrandNode> _strandNodeList;
 		#endregion private variables
 	}
 }

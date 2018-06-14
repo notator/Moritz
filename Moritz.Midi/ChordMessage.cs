@@ -82,14 +82,16 @@ namespace Moritz.Midi
 		protected List<ChannelMessage> GetChannelMessages(ChannelCommand noteOnOff)
 		{
 			List<ChannelMessage> messages = new List<ChannelMessage>();
-			ChannelMessageBuilder builder = new ChannelMessageBuilder();
-			builder.MidiChannel = this.Channel;
+			ChannelMessageBuilder builder = new ChannelMessageBuilder
+			{
+				MidiChannel = this.Channel,
 
-            //foreach(MidiControl midiControl in this.MidiControls)
-            //{
-            //    messages.AddRange(midiControl.ChannelMessages);
-            //}
-			builder.Command = noteOnOff;
+				//foreach(MidiControl midiControl in this.MidiControls)
+				//{
+				//    messages.AddRange(midiControl.ChannelMessages);
+				//}
+				Command = noteOnOff
+			};
 			foreach(NoteMessage midiNote in _notes)
 			{
 				builder.Data1 = midiNote.Pitch;
@@ -144,10 +146,12 @@ namespace Moritz.Midi
 		{
 			// All notes in a ChordOn must have the same channel.
 			Debug.Assert(note is NoteOn && ((_notes.Count == 0) || (note.Channel == _notes[0].Channel)));
-			NoteOn newNote = new NoteOn();
-			newNote.Channel = note.Channel;
-			newNote.Pitch = note.Pitch;
-			newNote.Velocity = note.Velocity;
+			NoteOn newNote = new NoteOn
+			{
+				Channel = note.Channel,
+				Pitch = note.Pitch,
+				Velocity = note.Velocity
+			};
 			_notes.Add(newNote);
 		}
 
@@ -193,10 +197,12 @@ namespace Moritz.Midi
 		{
 			// All notes in a ChordOff must have the same channel.
 			Debug.Assert(note is NoteOff && ((_notes.Count == 0) || (note.Channel == _notes[0].Channel)));
-			NoteOff noteOff = new NoteOff();
-			noteOff.Channel = note.Channel;
-			noteOff.Pitch = note.Pitch;
-			noteOff.Velocity = 64;
+			NoteOff noteOff = new NoteOff
+			{
+				Channel = note.Channel,
+				Pitch = note.Pitch,
+				Velocity = 64
+			};
 			_notes.Add(noteOff);
 		}
         

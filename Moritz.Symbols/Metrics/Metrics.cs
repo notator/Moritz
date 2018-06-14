@@ -198,7 +198,7 @@ namespace Moritz.Symbols
 
 
 		public CSSObjectClass CSSObjectClass { get => _cssObjectClass; }
-		private CSSObjectClass _cssObjectClass;
+		private readonly CSSObjectClass _cssObjectClass;
 		public CSSColorClass CSSColorClass
 		{ 
 			get => _cssColorClass;

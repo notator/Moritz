@@ -96,12 +96,14 @@ namespace Krystals4ObjectLibrary
             }
             else if(!equivalentExists)
             {
-                XmlWriterSettings settings = new XmlWriterSettings();
-                settings.Indent = true;
-                settings.IndentChars = ("\t");
-                settings.CloseOutput = true;
+				XmlWriterSettings settings = new XmlWriterSettings
+				{
+					Indent = true,
+					IndentChars = ("\t"),
+					CloseOutput = true
+				};
 
-                using(XmlWriter w = XmlWriter.Create(pathname, settings))
+				using(XmlWriter w = XmlWriter.Create(pathname, settings))
                 {
                     w.WriteStartDocument();
                     w.WriteComment("created: " + K.Now);
@@ -128,11 +130,10 @@ namespace Krystals4ObjectLibrary
         /// <returns></returns>
         public int CompareTo(object other)
         {
-            Modulator otherModulator = other as Modulator;
-            if(otherModulator == null)
-                throw new ArgumentException();
+			if(!(other is Modulator otherModulator))
+				throw new ArgumentException();
 
-            bool modulatorsAreEquivalent = false;
+			bool modulatorsAreEquivalent = false;
             if(this.XDim == otherModulator.XDim
             && this.YDim == otherModulator.YDim)
             {

@@ -160,7 +160,7 @@ namespace Moritz.Midi
         private BankControl _bank = null;
         private PatchControl _patch = null;
         private PitchWheelDeviation _pitchWheelDeviation = null;
-        private List<BasicMidiChord> _basicMidiChords = new List<BasicMidiChord>();     
+        private readonly List<BasicMidiChord> _basicMidiChords = new List<BasicMidiChord>();     
         private MidiChordSlider _pitchWheelSlider = null;
         private MidiChordSlider _panSlider = null;
         private MidiChordSlider _modulationWheelSlider = null;

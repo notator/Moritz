@@ -79,14 +79,14 @@ namespace Moritz.Globals.IODevices
         {
             inputDevices = null;
             List<InputDevice> devices = new List<InputDevice>();
-            UInt32 numberOfInDevices = Functions.midiInGetNumDevs();
+            UInt32 numberOfInDevices = Functions.MidiInGetNumDevs();
 
             if(numberOfInDevices > 0)
             {
                 for(Int32 i = 0 ; i < numberOfInDevices ; i++)
                 {
                     MIDIINCAPS caps = new MIDIINCAPS();
-                    if(Functions.midiInGetDevCaps(i, ref caps, (UInt32) Marshal.SizeOf(caps)) == Constants.MMSYSERR_NOERROR)
+                    if(Functions.MidiInGetDevCaps(i, ref caps, (UInt32) Marshal.SizeOf(caps)) == Constants.MMSYSERR_NOERROR)
                     {
                         devices.Add(new InputDevice(i, caps));
                     }

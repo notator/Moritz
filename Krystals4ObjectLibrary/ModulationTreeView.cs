@@ -19,8 +19,10 @@ namespace Krystals4ObjectLibrary
 			if(modulationKrystal.Level == 1) // line krystal
 			{
 				_treeView.BeginUpdate();
-				TreeNode root = new TreeNode();
-				root.Text = "1: m1";
+				TreeNode root = new TreeNode
+				{
+					Text = "1: m1"
+				};
 				_treeView.Nodes.Add(root);
 				foreach(ModulationNode modulationNode in _modulationNodeList)
 				{

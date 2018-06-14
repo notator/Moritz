@@ -1156,7 +1156,7 @@ namespace Moritz.Spec
 
             return axisIndices[domain - 1, axisNumber - 1];
         }
-        private static int[,] axisIndices =
+        private static readonly int[,] axisIndices =
         {
             {0,0,0,0,0,0,0,0,0,0,0,0}, // domain 1
             {0,0,0,0,0,0,0,0,0,0,0,0}, // domain 2

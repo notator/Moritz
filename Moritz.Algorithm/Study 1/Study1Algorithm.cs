@@ -126,8 +126,10 @@ namespace Moritz.Algorithm.Study1
 			List<byte> pitches = GetPitches(relativePitch, chordIntervals);
 			List<byte> velocities = GetVelocities(chordVelocity, chordIntervals.Count() + 1);
 
-			IUniqueDef mcd = new MidiChordDef(pitches, velocities, chordDuration, true);
-            mcd.MsPositionReFirstUD = msPosition;
+			IUniqueDef mcd = new MidiChordDef(pitches, velocities, chordDuration, true)
+			{
+				MsPositionReFirstUD = msPosition
+			};
 
 			return mcd;
 		}
@@ -160,59 +162,65 @@ namespace Moritz.Algorithm.Study1
 
 		List<List<byte>> GetChordIntervals()
 		{
-			List<List<byte>> chords = new List<List<byte>>();
-			// The numbers are the number of semitones between neighbouring notes in the chord.
-			chords.Add(new List<byte>() { }); // chordNumber 1 (density 1)
-			chords.Add(new List<byte>() { 4 }); // chordNumber 2 (density 2)
-			chords.Add(new List<byte>() { 4, 3 }); // chordNumber 3	 (density 3)
-			chords.Add(new List<byte>() { 3, 4, 2 }); // chordNumber 4 (density 4)
-			chords.Add(new List<byte>() { 3, 2, 4, 1 }); // chordNumber 5 (density 5)
-			chords.Add(new List<byte>() { 2, 3, 1, 4, 5 }); // chordNumber 6  (density 6)
-			chords.Add(new List<byte>() { 2, 1, 3, 4, 5, 7 }); // chordNumber 7 (density 7)
-			chords.Add(new List<byte>() { 1, 2, 3, 4, 5, 7, 12 }); // chordNumber 8 (density 8)
+			List<List<byte>> chords = new List<List<byte>>
+			{
+				// The numbers are the number of semitones between neighbouring notes in the chord.
+				new List<byte>() { }, // chordNumber 1 (density 1)
+				new List<byte>() { 4 }, // chordNumber 2 (density 2)
+				new List<byte>() { 4, 3 }, // chordNumber 3	 (density 3)
+				new List<byte>() { 3, 4, 2 }, // chordNumber 4 (density 4)
+				new List<byte>() { 3, 2, 4, 1 }, // chordNumber 5 (density 5)
+				new List<byte>() { 2, 3, 1, 4, 5 }, // chordNumber 6  (density 6)
+				new List<byte>() { 2, 1, 3, 4, 5, 7 }, // chordNumber 7 (density 7)
+				new List<byte>() { 1, 2, 3, 4, 5, 7, 12 } // chordNumber 8 (density 8)
+			};
 
 			return chords;
 		}
 
 		List<byte> GetChordVelocities()
 		{
-			List<byte> velocities = new List<byte>();
-            // velocities from the original composition (see About Study 1)
-            //velocities.Add(127);
-            //velocities.Add(103);
-            //velocities.Add(84);
-            //velocities.Add(67);
-            //velocities.Add(55);
-            //velocities.Add(44);
-            //velocities.Add(36);
-            //velocities.Add(29);
+			List<byte> velocities = new List<byte>
+			{
+				// velocities from the original composition (see About Study 1)
+				//velocities.Add(127);
+				//velocities.Add(103);
+				//velocities.Add(84);
+				//velocities.Add(67);
+				//velocities.Add(55);
+				//velocities.Add(44);
+				//velocities.Add(36);
+				//velocities.Add(29);
 
-            // Max value per duration symbol (March 2016)
-            // See Moritz.Symbols/System Components/Staff Components/VoiceComponents/AnchorageSymbol.cs.AddDynamic(...)
-            velocities.Add(M.MaxMidiVelocity[M.Dynamic.fff]);   // 127
-            velocities.Add(M.MaxMidiVelocity[M.Dynamic.ff]);    // 113
-            velocities.Add(M.MaxMidiVelocity[M.Dynamic.f]);     // 99
-            velocities.Add(M.MaxMidiVelocity[M.Dynamic.mf]);    // 85
-            velocities.Add(M.MaxMidiVelocity[M.Dynamic.mp]);    // 71
-            velocities.Add(M.MaxMidiVelocity[M.Dynamic.p]);     // 57
-            velocities.Add(M.MaxMidiVelocity[M.Dynamic.pp]);    // 43
-            velocities.Add(M.MaxMidiVelocity[M.Dynamic.ppp]);   // 29
+				// Max value per duration symbol (March 2016)
+				// See Moritz.Symbols/System Components/Staff Components/VoiceComponents/AnchorageSymbol.cs.AddDynamic(...)
+				M.MaxMidiVelocity[M.Dynamic.fff],   // 127
+				M.MaxMidiVelocity[M.Dynamic.ff],    // 113
+				M.MaxMidiVelocity[M.Dynamic.f],     // 99
+				M.MaxMidiVelocity[M.Dynamic.mf],    // 85
+				M.MaxMidiVelocity[M.Dynamic.mp],    // 71
+				M.MaxMidiVelocity[M.Dynamic.p],     // 57
+				M.MaxMidiVelocity[M.Dynamic.pp],    // 43
+				M.MaxMidiVelocity[M.Dynamic.ppp]   // 29
+			};
 
-            return velocities;
+			return velocities;
 		}
 
 		private List<int> GetChordMsDurations()
 		{
 			double baseMsDuration = (1000 * 60) / 250; // 250 beats per minute
-			List<int> chordMsDurations = new List<int>();
-			chordMsDurations.Add((int)(baseMsDuration)); // chordNumber 1 (density 1)
-			chordMsDurations.Add((int)(baseMsDuration * 8 / 9)); // chordNumber 2 (density 2)
-			chordMsDurations.Add((int)(baseMsDuration * 8 / 10)); // chordNumber 3 (density 3)
-			chordMsDurations.Add((int)(baseMsDuration * 8 / 11)); // chordNumber 4 (density 4)
-			chordMsDurations.Add((int)(baseMsDuration * 8 / 12)); // chordNumber 5 (density 5)
-			chordMsDurations.Add((int)(baseMsDuration * 8 / 13)); // chordNumber 6 (density 6)
-			chordMsDurations.Add((int)(baseMsDuration * 8 / 14)); // chordNumber 7 (density 7)
-			chordMsDurations.Add((int)(baseMsDuration * 8 / 15)); // chordNumber 8 (density 8)
+			List<int> chordMsDurations = new List<int>
+			{
+				(int)(baseMsDuration), // chordNumber 1 (density 1)
+				(int)(baseMsDuration * 8 / 9), // chordNumber 2 (density 2)
+				(int)(baseMsDuration * 8 / 10), // chordNumber 3 (density 3)
+				(int)(baseMsDuration * 8 / 11), // chordNumber 4 (density 4)
+				(int)(baseMsDuration * 8 / 12), // chordNumber 5 (density 5)
+				(int)(baseMsDuration * 8 / 13), // chordNumber 6 (density 6)
+				(int)(baseMsDuration * 8 / 14), // chordNumber 7 (density 7)
+				(int)(baseMsDuration * 8 / 15) // chordNumber 8 (density 8)
+			};
 
 			return chordMsDurations;  
 		}

@@ -129,7 +129,7 @@ namespace Moritz.Symbols
 		}
 
 		private List<float> Ys = new List<float>();
-		private float _strokeWidth;
+		private readonly float _strokeWidth;
     }
 	internal class CautionaryBracketMetrics : LineMetrics, ICloneable
 	{

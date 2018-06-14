@@ -447,24 +447,23 @@ namespace Moritz.Symbols
             Metrics returnMetrics = null;
             SmallClef smallClef = noteObject as SmallClef;
             Clef clef = noteObject as Clef;
-            EndBarline endBarline = noteObject as EndBarline;
-            Barline barline = noteObject as Barline;
-            CautionaryChordSymbol cautionaryChordSymbol = noteObject as CautionaryChordSymbol;
+			Barline barline = noteObject as Barline;
+			CautionaryChordSymbol cautionaryChordSymbol = noteObject as CautionaryChordSymbol;
             ChordSymbol chordSymbol = noteObject as ChordSymbol;
             InputChordSymbol inputChordSymbol = noteObject as InputChordSymbol;
             RestSymbol rest = noteObject as RestSymbol;
-            if(endBarline != null)
-            {
-                returnMetrics = new EndBarlineMetrics(pageFormat.BarlineStrokeWidth, pageFormat.ThickBarlineStrokeWidth);
-            }
-            else if(barline != null)
-            {
-                returnMetrics = new BarlineMetrics(graphics, barline, pageFormat.BarlineStrokeWidth, gap);
-            }
-            else if(smallClef != null)
-            {
-                if(smallClef.ClefType != "n")
-                {
+			if(noteObject is EndBarline endBarline)
+			{
+				returnMetrics = new EndBarlineMetrics(pageFormat.BarlineStrokeWidth, pageFormat.ThickBarlineStrokeWidth);
+			}
+			else if(barline != null)
+			{
+				returnMetrics = new BarlineMetrics(graphics, barline, pageFormat.BarlineStrokeWidth, gap);
+			}
+			else if(smallClef != null)
+			{
+				if(smallClef.ClefType != "n")
+				{
 					if(smallClef.IsVisible)
 					{
 						CSSObjectClass cssClass = isInput ? CSSObjectClass.inputSmallClef : CSSObjectClass.smallClef;
@@ -475,38 +474,38 @@ namespace Moritz.Symbols
 					{
 						returnMetrics = null;
 					}
-                }
-            }
-            else if(clef != null)
-            {
-                if(clef.ClefType != "n")
-                {
-                    CSSObjectClass cssClass = isInput ? CSSObjectClass.inputClef : CSSObjectClass.clef;
-                    ClefID clefID = GetClefID(clef, isInput);
-                    returnMetrics = new ClefMetrics(clef, gap, cssClass, clefID);
-                }
-            }
-            else if(cautionaryChordSymbol != null)
-            {
-                returnMetrics = new ChordMetrics(graphics, cautionaryChordSymbol, voiceStemDirection, gap, strokeWidth, CSSObjectClass.cautionaryChord);
-            }
-            else if(inputChordSymbol != null)
-            {
-                returnMetrics = new ChordMetrics(graphics, inputChordSymbol, voiceStemDirection, gap, strokeWidth, CSSObjectClass.inputChord);
-            }
-            else if(chordSymbol != null)
-            {
-                returnMetrics = new ChordMetrics(graphics, chordSymbol, voiceStemDirection, gap, strokeWidth, CSSObjectClass.chord);
-            }
-            else if(rest != null)
-            {
-                CSSObjectClass restClass = GetRestClass(rest);
-                // All rests are originally created on the centre line.
-                // They are moved vertically later, if they are on a 2-Voice staff.
-                returnMetrics = new RestMetrics(graphics, rest, gap, noteObject.Voice.Staff.NumberOfStafflines, strokeWidth, restClass);
-            }
+				}
+			}
+			else if(clef != null)
+			{
+				if(clef.ClefType != "n")
+				{
+					CSSObjectClass cssClass = isInput ? CSSObjectClass.inputClef : CSSObjectClass.clef;
+					ClefID clefID = GetClefID(clef, isInput);
+					returnMetrics = new ClefMetrics(clef, gap, cssClass, clefID);
+				}
+			}
+			else if(cautionaryChordSymbol != null)
+			{
+				returnMetrics = new ChordMetrics(graphics, cautionaryChordSymbol, voiceStemDirection, gap, strokeWidth, CSSObjectClass.cautionaryChord);
+			}
+			else if(inputChordSymbol != null)
+			{
+				returnMetrics = new ChordMetrics(graphics, inputChordSymbol, voiceStemDirection, gap, strokeWidth, CSSObjectClass.inputChord);
+			}
+			else if(chordSymbol != null)
+			{
+				returnMetrics = new ChordMetrics(graphics, chordSymbol, voiceStemDirection, gap, strokeWidth, CSSObjectClass.chord);
+			}
+			else if(rest != null)
+			{
+				CSSObjectClass restClass = GetRestClass(rest);
+				// All rests are originally created on the centre line.
+				// They are moved vertically later, if they are on a 2-Voice staff.
+				returnMetrics = new RestMetrics(graphics, rest, gap, noteObject.Voice.Staff.NumberOfStafflines, strokeWidth, restClass);
+			}
 
-            return returnMetrics;
+			return returnMetrics;
         }
 
         private ClefID GetSmallClefID(Clef clef, bool isInput)
@@ -833,35 +832,34 @@ namespace Moritz.Symbols
         {
             List<float> x2s = new List<float>();
             NoteObject no2 = GetFollowingChordRestOrBarlineSymbol(noteObjects);
-            Barline barline = no2 as Barline;
-            ChordSymbol chord2 = no2 as ChordSymbol;
-            RestSymbol rest2 = no2 as RestSymbol;
-            if(barline != null)
-            {
-                float x2 = barline.Metrics.OriginX;
-                x2s = GetEqualFloats(x2, x1s.Count);
-            }
-            else if(chord2 != null)
-            {
-                x2s = GetX2sFromChord2(ys, chord2.ChordMetrics, hairlinePadding);
-            }
-            else if(rest2 != null)
-            {
-                float x2 = rest2.Metrics.Left - hairlinePadding;
-                x2s = GetEqualFloats(x2, x1s.Count);
-            }
-            else // no2 == null
-            {
-                Debug.Assert(no2 == null);
-                // This voice has no further chords or rests,
-                // so draw extenders to the right margin.
-                // extend to the right margin
-                PageFormat pageFormat = cautionaryChordSymbol1.Voice.Staff.SVGSystem.Score.PageFormat;
-                float rightMarginPos = pageFormat.RightMarginPos;
-                float gap = pageFormat.Gap;
-                x2s = GetEqualFloats(rightMarginPos + gap, ys.Count);
-            }
-            return x2s;
+			ChordSymbol chord2 = no2 as ChordSymbol;
+			RestSymbol rest2 = no2 as RestSymbol;
+			if(no2 is Barline barline)
+			{
+				float x2 = barline.Metrics.OriginX;
+				x2s = GetEqualFloats(x2, x1s.Count);
+			}
+			else if(chord2 != null)
+			{
+				x2s = GetX2sFromChord2(ys, chord2.ChordMetrics, hairlinePadding);
+			}
+			else if(rest2 != null)
+			{
+				float x2 = rest2.Metrics.Left - hairlinePadding;
+				x2s = GetEqualFloats(x2, x1s.Count);
+			}
+			else // no2 == null
+			{
+				Debug.Assert(no2 == null);
+				// This voice has no further chords or rests,
+				// so draw extenders to the right margin.
+				// extend to the right margin
+				PageFormat pageFormat = cautionaryChordSymbol1.Voice.Staff.SVGSystem.Score.PageFormat;
+				float rightMarginPos = pageFormat.RightMarginPos;
+				float gap = pageFormat.Gap;
+				x2s = GetEqualFloats(rightMarginPos + gap, ys.Count);
+			}
+			return x2s;
         }
         /// <summary>
         /// Returns the first chordSymbol or restSymbol after the first cautionaryChordSymbol.
@@ -931,27 +929,26 @@ namespace Moritz.Symbols
                             {
                                 while(index < noteObjects.Count)
                                 {
-                                    CautionaryChordSymbol cautionaryChordSymbol = noteObjects[index] as CautionaryChordSymbol;
-                                    ChordSymbol chord2 = noteObjects[index] as ChordSymbol;
-                                    RestSymbol rest2 = noteObjects[index] as RestSymbol;
-                                    if(cautionaryChordSymbol != null)
-                                    {
-                                        cautionaryChordSymbol.Visible = false;
-                                    }
-                                    else if(chord2 != null)
-                                    {
-                                        ys = chord1.ChordMetrics.HeadsOriginYs;
-                                        x2s = GetX2sFromChord2(ys, chord2.ChordMetrics, hairlinePadding);
-                                        break;
-                                    }
-                                    else if(rest2 != null)
-                                    {
-                                        float x2 = rest2.Metrics.Left - hairlinePadding;
-                                        ys = chord1.ChordMetrics.HeadsOriginYs;
-                                        x2s = GetEqualFloats(x2, x1s.Count);
-                                        break;
-                                    }
-                                    ++index;
+									ChordSymbol chord2 = noteObjects[index] as ChordSymbol;
+									RestSymbol rest2 = noteObjects[index] as RestSymbol;
+									if(noteObjects[index] is CautionaryChordSymbol cautionaryChordSymbol)
+									{
+										cautionaryChordSymbol.Visible = false;
+									}
+									else if(chord2 != null)
+									{
+										ys = chord1.ChordMetrics.HeadsOriginYs;
+										x2s = GetX2sFromChord2(ys, chord2.ChordMetrics, hairlinePadding);
+										break;
+									}
+									else if(rest2 != null)
+									{
+										float x2 = rest2.Metrics.Left - hairlinePadding;
+										ys = chord1.ChordMetrics.HeadsOriginYs;
+										x2s = GetEqualFloats(x2, x1s.Count);
+										break;
+									}
+									++index;
                                 }
 
                                 if(x2s != null && ys != null)

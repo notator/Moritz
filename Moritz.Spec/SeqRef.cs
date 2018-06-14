@@ -55,7 +55,7 @@ namespace Moritz.Spec
 			{
 				_trkRefs = trkRefs;
 			}
-			private IEnumerator getEnumerator()
+			private IEnumerator GetEnumerator()
 			{
 				return (IEnumerator)this;
 			}

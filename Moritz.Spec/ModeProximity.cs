@@ -25,6 +25,6 @@ namespace Moritz.Spec
 		private Mode _mode;
 
 		public int Proximity { get => _proximity; }
-		private int _proximity = 0;
+		private readonly int _proximity = 0;
 	}
 }

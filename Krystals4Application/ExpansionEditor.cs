@@ -511,10 +511,12 @@ namespace Krystals4Application
                         testPoint = pointGroup.WindowsPixelCoordinates[pointIndex];
                         if (mouseR.Contains(testPoint))
                         {
-                            ExpansionFieldPointInfo ppi = new ExpansionFieldPointInfo();
-                            ppi.location = testPoint;
-                            ppi.isPlanet = true;
-                            if (!inputPlanets || pointGroup.Value[0] == _strandNodeList[(int)(pointIndex + pointGroup.StartMoment - 1)].strandPoint)
+							ExpansionFieldPointInfo ppi = new ExpansionFieldPointInfo
+							{
+								location = testPoint,
+								isPlanet = true
+							};
+							if (!inputPlanets || pointGroup.Value[0] == _strandNodeList[(int)(pointIndex + pointGroup.StartMoment - 1)].strandPoint)
                                 ppi.isUsed = true;
                             else ppi.isUsed = false;
                             if (inputPlanets)
@@ -548,11 +550,13 @@ namespace Krystals4Application
                     testPoint = pointGroups[pgi].WindowsPixelCoordinates[pointIndex];
                     if (mouseR.Contains(testPoint))
                     {
-                        ExpansionFieldPointInfo ppi = new ExpansionFieldPointInfo();
-                        ppi.location = testPoint;
-                        ppi.isPlanet = false;
-                        ppi.isUsed = true;
-                        if (inputGroup)
+						ExpansionFieldPointInfo ppi = new ExpansionFieldPointInfo
+						{
+							location = testPoint,
+							isPlanet = false,
+							isUsed = true
+						};
+						if (inputGroup)
                         {
                             ppi.comboBoxName = "Input Group " + (pgi + 1).ToString();
                             ppi.isInput = true;
@@ -1015,18 +1019,19 @@ namespace Krystals4Application
         /// <returns>A path to a file to be replaced, or an empty string if the dialog is cancelled.</returns>
         public string GetExpansionKrystalFilepathFromReplaceFileDialog()
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
+			SaveFileDialog saveFileDialog = new SaveFileDialog
+			{
+				InitialDirectory = @"D:\krystals\krystals",
+				Filter = K.DialogFilter,
+				FilterIndex = (int)K.DialogFilterIndex.expansion + 1,
+				Title = "Replace krystal",
+				RestoreDirectory = true,
+				SupportMultiDottedExtensions = true,
+				AddExtension = true,
+				OverwritePrompt = false // suppresses the standard "file exists" warning
+			};
 
-            saveFileDialog.InitialDirectory = @"D:\krystals\krystals";
-            saveFileDialog.Filter = K.DialogFilter;
-            saveFileDialog.FilterIndex = (int) K.DialogFilterIndex.expansion + 1;
-            saveFileDialog.Title = "Replace krystal";
-            saveFileDialog.RestoreDirectory = true;
-            saveFileDialog.SupportMultiDottedExtensions = true;
-            saveFileDialog.AddExtension = true;
-            saveFileDialog.OverwritePrompt = false; // suppresses the standard "file exists" warning
-
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+			if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 return saveFileDialog.FileName;
             else return "";
         }
@@ -2480,9 +2485,9 @@ namespace Krystals4Application
                 #region private variables
                 private float _centreY; // is scaled and centred
                 private float _centreX; // is scaled and centred
-                private bool _isInput;
-                private bool _isUsed;
-                private string _pointValue; // the label
+                private readonly bool _isInput;
+                private readonly bool _isUsed;
+                private readonly string _pointValue; // the label
                 private float _scale;
                 private float _fieldPanelCentreX;
                 private float _fieldPanelCentreY;

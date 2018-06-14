@@ -340,8 +340,8 @@ namespace Krystals4ObjectLibrary
         #region private variables
         private List<uint> _redundantModifierXInputValues = new List<uint>();
         private List<uint> _redundantModifierYInputValues = new List<uint>();
-        private string _xInputFilename;
-        private string _yInputFilename;
+        private readonly string _xInputFilename;
+        private readonly string _yInputFilename;
         //private string _modulatorFilename;
         private ModulationInputKrystal _xInputKrystal;
         private ModulationInputKrystal _yInputKrystal;

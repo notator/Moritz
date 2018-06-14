@@ -2206,7 +2206,7 @@ namespace Moritz.Symbols
         private LyricMetrics _lyricMetrics = null;
         private DynamicMetrics _dynamicMetrics = null;
 
-        private List<DrawObject> _drawObjects;
+        private readonly List<DrawObject> _drawObjects;
         #endregion private variables
     }
 }

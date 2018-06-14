@@ -39,10 +39,9 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject no in this.NoteObjects)
                 {
-                    InputChordSymbol inputChordSymbol = no as InputChordSymbol;
-                    if(inputChordSymbol != null)
-                        yield return inputChordSymbol;
-                }
+					if(no is InputChordSymbol inputChordSymbol)
+						yield return inputChordSymbol;
+				}
             }
         }
 

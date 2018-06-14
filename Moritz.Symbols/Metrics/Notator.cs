@@ -176,13 +176,12 @@ namespace Moritz.Symbols
         {
             for(int i = 0; i < noteObjects.Count; ++i)
             {
-                DurationSymbol durationSymbol = noteObjects[i] as DurationSymbol;
-                if(durationSymbol != null && durationSymbol == insertBeforeDS)
-                {
-                    noteObjects.Insert(i, invisibleSmallClef);
-                    break;
-                }
-            }
+				if(noteObjects[i] is DurationSymbol durationSymbol && durationSymbol == insertBeforeDS)
+				{
+					noteObjects.Insert(i, invisibleSmallClef);
+					break;
+				}
+			}
         }
 
         /// <summary>
@@ -270,24 +269,22 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject noteObject in staff.Voices[0].NoteObjects)
                 {
-                    Barline firstBarline = noteObject as Barline;
-                    if(firstBarline != null)
-                    {
-                        foreach(DrawObject drawObject in firstBarline.DrawObjects)
-                        {
-							StaffNameText staffName = drawObject as StaffNameText;
-                            if(staffName != null)
-                            {
-                                Debug.Assert(staffName.TextInfo != null);
+					if(noteObject is Barline firstBarline)
+					{
+						foreach(DrawObject drawObject in firstBarline.DrawObjects)
+						{
+							if(drawObject is StaffNameText staffName)
+							{
+								Debug.Assert(staffName.TextInfo != null);
 
-                                TextMetrics staffNameMetrics = new TextMetrics(CSSObjectClass.staffName, graphics, staffName.TextInfo);
-                                float nameWidth = staffNameMetrics.Right - staffNameMetrics.Left;
-                                maxNameWidth = (maxNameWidth > nameWidth) ? maxNameWidth : nameWidth;
-                            }
-                        }
-                        break;
-                    }
-                }
+								TextMetrics staffNameMetrics = new TextMetrics(CSSObjectClass.staffName, graphics, staffName.TextInfo);
+								float nameWidth = staffNameMetrics.Right - staffNameMetrics.Left;
+								maxNameWidth = (maxNameWidth > nameWidth) ? maxNameWidth : nameWidth;
+							}
+						}
+						break;
+					}
+				}
             }
             leftMarginPos = maxNameWidth + (pageFormat.Gap * 2.0F);
             leftMarginPos = (leftMarginPos > pageFormat.LeftMarginPos) ? leftMarginPos : pageFormat.LeftMarginPos;

@@ -104,10 +104,12 @@ namespace Moritz.Globals
 
 		public void Save()
 		{
-			XmlWriterSettings settings = new XmlWriterSettings(); // not disposable
-			settings.Indent = true;
-			settings.IndentChars = ("\t");
-			settings.CloseOutput = true;
+			XmlWriterSettings settings = new XmlWriterSettings
+			{
+				Indent = true,
+				IndentChars = ("\t"),
+				CloseOutput = true
+			}; // not disposable
 			using(XmlWriter w = XmlWriter.Create(LocalMoritzPreferencesPath, settings))
 			{
 				w.WriteStartDocument();

@@ -163,7 +163,7 @@ namespace Moritz.Symbols
 		}
 
         TextMetrics _barNumberNumberMetrics = null;
-        string _number;
-        float _strokeWidth = 0;
+		readonly string _number;
+		readonly float _strokeWidth = 0;
 	}
 }

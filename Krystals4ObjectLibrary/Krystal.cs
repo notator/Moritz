@@ -135,11 +135,10 @@ namespace Krystals4ObjectLibrary
         /// <returns></returns>
         public int CompareTo(object other)
         {
-            Krystal otherKrystal = other as Krystal;
-            if(otherKrystal == null)
-                throw new ArgumentException();
+			if(!(other is Krystal otherKrystal))
+				throw new ArgumentException();
 
-            bool isEquivalent = false;
+			bool isEquivalent = false;
             if(this.Shape == otherKrystal.Shape
             && this.Strands.Count == otherKrystal.Strands.Count
             && this.Level == otherKrystal.Level
@@ -306,11 +305,13 @@ namespace Krystals4ObjectLibrary
         }
         protected XmlWriter BeginSaveKrystal()
         {
-            XmlWriterSettings settings = new XmlWriterSettings();
-            settings.Indent = true;
-            settings.IndentChars = ("\t");
-            settings.CloseOutput = true;
-            string namePath = K.KrystalsFolder + @"\" + _name;
+			XmlWriterSettings settings = new XmlWriterSettings
+			{
+				Indent = true,
+				IndentChars = ("\t"),
+				CloseOutput = true
+			};
+			string namePath = K.KrystalsFolder + @"\" + _name;
             XmlWriter w = XmlWriter.Create(namePath, settings);
             w.WriteStartDocument();
             w.WriteComment("created: " + K.Now);
@@ -546,9 +547,11 @@ namespace Krystals4ObjectLibrary
             _level = 0;
             _minValue = _maxValue = value;
             _numValues = 1;
-            List<uint> valueList = new List<uint>();
-            valueList.Add(value);
-            Strand strand = new Strand(0, valueList);
+			List<uint> valueList = new List<uint>
+			{
+				value
+			};
+			Strand strand = new Strand(0, valueList);
             _strands.Add(strand);
         }
         #region overridden functions

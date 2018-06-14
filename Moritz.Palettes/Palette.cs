@@ -16,10 +16,12 @@ namespace Moritz.Palettes
         {
             Name = paletteForm.PaletteName;
 
-            BasicChordFormSettings bcfs = new BasicChordFormSettings();
-            bcfs.Durations = M.StringToIntList(paletteForm.BasicChordControl.DurationsTextBox.Text, ',');
-            bcfs.Velocities = M.StringToByteList(paletteForm.BasicChordControl.VelocitiesTextBox.Text, ',');
-            NormalizeVelocities(bcfs.Velocities);
+			BasicChordFormSettings bcfs = new BasicChordFormSettings
+			{
+				Durations = M.StringToIntList(paletteForm.BasicChordControl.DurationsTextBox.Text, ','),
+				Velocities = M.StringToByteList(paletteForm.BasicChordControl.VelocitiesTextBox.Text, ',')
+			};
+			NormalizeVelocities(bcfs.Velocities);
             bcfs.MidiPitches = M.StringToByteList(paletteForm.BasicChordControl.MidiPitchesTextBox.Text, ',');
             bcfs.ChordOffs = M.StringToBoolList(paletteForm.BasicChordControl.ChordOffsTextBox.Text, ',');
             bcfs.ChordDensities = M.StringToByteList(paletteForm.BasicChordControl.ChordDensitiesTextBox.Text, ',');
@@ -62,10 +64,12 @@ namespace Moritz.Palettes
         /// <param name="paletteChordForm"></param>
         public Palette(PaletteChordForm paletteChordForm)
         {
-            BasicChordFormSettings bcfs = new BasicChordFormSettings();
-            bcfs.Durations = M.StringToIntList(paletteChordForm.DurationTextBox.Text, ',');
-            bcfs.Velocities = M.StringToByteList(paletteChordForm.VelocityTextBox.Text, ',');
-            NormalizeVelocities(bcfs.Velocities);
+			BasicChordFormSettings bcfs = new BasicChordFormSettings
+			{
+				Durations = M.StringToIntList(paletteChordForm.DurationTextBox.Text, ','),
+				Velocities = M.StringToByteList(paletteChordForm.VelocityTextBox.Text, ',')
+			};
+			NormalizeVelocities(bcfs.Velocities);
             bcfs.MidiPitches = M.StringToByteList(paletteChordForm.BaseMidiPitchTextBox.Text,  ',');
             bcfs.ChordOffs = M.StringToBoolList(paletteChordForm.ChordOffTextBox.Text, ',');
             bcfs.ChordDensities = M.StringToByteList(paletteChordForm.ChordDensityTextBox.Text, ',');
@@ -292,21 +296,21 @@ namespace Moritz.Palettes
         }
 
         private BasicChordMidiSettings _basicChordMidiSettings;
-        private List<byte> _bankIndices;
-        private List<byte> _patchIndices;
-        private List<byte> _pitchwheelDeviations;
-        private List<List<byte>> _pitchwheelEnvelopes;
-        private List<List<byte>> _panEnvelopes;
-        private List<List<byte>> _modulationWheelEnvelopes;
-        private List<List<byte>> _expressionEnvelopes;
+        private readonly List<byte> _bankIndices;
+        private readonly List<byte> _patchIndices;
+        private readonly List<byte> _pitchwheelDeviations;
+        private readonly List<List<byte>> _pitchwheelEnvelopes;
+        private readonly List<List<byte>> _panEnvelopes;
+        private readonly List<List<byte>> _modulationWheelEnvelopes;
+        private readonly List<List<byte>> _expressionEnvelopes;
 
-        private List<int> _ornamentNumbers;
-        private List<int> _ornamentMinMsDurations;
-        private OrnamentSettings _ornamentSettings;
+        private readonly List<int> _ornamentNumbers;
+        private readonly List<int> _ornamentMinMsDurations;
+        private readonly OrnamentSettings _ornamentSettings;
 
         private List<DurationDef> _durationDefs = new List<DurationDef>();
 
-        private bool _isPercussionPalette;
+        private readonly bool _isPercussionPalette;
         public bool IsPercussionPalette { get { return _isPercussionPalette; } }
 
         public int Count { get { return _durationDefs.Count; } }
@@ -323,13 +327,12 @@ namespace Moritz.Palettes
         /// </summary>
         public MidiChordDef MidiChordDef(int index)
         {
-            MidiChordDef midiChordDef = _durationDefs[index].Clone() as MidiChordDef;
-            if(midiChordDef == null)
-            {
-                throw new ApplicationException("The indexed object was not a MidiChordDef.");
-            }
+			if(!(_durationDefs[index].Clone() is MidiChordDef midiChordDef))
+			{
+				throw new ApplicationException("The indexed object was not a MidiChordDef.");
+			}
 
-            return midiChordDef;
+			return midiChordDef;
         }
 
         public Trk NewTrk(int midiChannel, int msPositionReContainer, List<int> sequence)
@@ -376,12 +379,14 @@ namespace Moritz.Palettes
             OrnamentsForm osf = paletteform.OrnamentsForm;
             Debug.Assert(osf != null && osf.Ornaments != null);
 
-            BasicChordFormSettings bcs = new BasicChordFormSettings();
-            /// relative durations
-            bcs.Durations = M.StringToIntList(osf.BasicChordControl.DurationsTextBox.Text, ',');
-            /// velocity increments
-            bcs.Velocities = M.StringToByteList(osf.BasicChordControl.VelocitiesTextBox.Text, ',');
-            NormalizeVelocities(bcs.Velocities);
+			BasicChordFormSettings bcs = new BasicChordFormSettings
+			{
+				/// relative durations
+				Durations = M.StringToIntList(osf.BasicChordControl.DurationsTextBox.Text, ','),
+				/// velocity increments
+				Velocities = M.StringToByteList(osf.BasicChordControl.VelocitiesTextBox.Text, ',')
+			};
+			NormalizeVelocities(bcs.Velocities);
             /// transposition intervals
             bcs.MidiPitches = M.StringToByteList(osf.BasicChordControl.MidiPitchesTextBox.Text, ',');
             bcs.ChordOffs = M.StringToBoolList(osf.BasicChordControl.ChordOffsTextBox.Text, ',');
@@ -503,9 +508,11 @@ namespace Moritz.Palettes
 
             byte rootPitch = rootPitches[chordIndex];
             int nUpperPitches = densities[chordIndex] - 1;
-            List<byte> midiPitches = new List<byte>();
-            midiPitches.Add(rootPitch);
-            for(int p = 0; p < nUpperPitches; p++)
+			List<byte> midiPitches = new List<byte>
+			{
+				rootPitch
+			};
+			for(int p = 0; p < nUpperPitches; p++)
             {
                 byte newpitch = M.MidiValue(midiPitches[p] + primeIntervals[p]);
                 midiPitches.Add(newpitch);

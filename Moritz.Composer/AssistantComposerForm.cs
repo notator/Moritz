@@ -63,23 +63,24 @@ namespace Moritz.Composer
 
 		private List<TextBox> GetAllTextBoxes()
         {
-            List<TextBox> textBoxes = new List<TextBox>();
+			List<TextBox> textBoxes = new List<TextBox>
+			{
+				MinimumGapsBetweenStavesTextBox,
+				MinimumGapsBetweenSystemsTextBox,
+				MinimumCrotchetDurationTextBox,
 
-            textBoxes.Add(MinimumGapsBetweenStavesTextBox);
-            textBoxes.Add(MinimumGapsBetweenSystemsTextBox);
-            textBoxes.Add(MinimumCrotchetDurationTextBox);
-
-            textBoxes.Add(VoiceIndicesPerStaffTextBox);
-            textBoxes.Add(ClefsPerStaffTextBox);
-            textBoxes.Add(StafflinesPerStaffTextBox);
-            textBoxes.Add(StaffGroupsTextBox);
+				VoiceIndicesPerStaffTextBox,
+				ClefsPerStaffTextBox,
+				StafflinesPerStaffTextBox,
+				StaffGroupsTextBox,
 
 
-            textBoxes.Add(LongStaffNamesTextBox);
-            textBoxes.Add(ShortStaffNamesTextBox);
+				LongStaffNamesTextBox,
+				ShortStaffNamesTextBox,
 
-            textBoxes.Add(SystemStartBarsTextBox);
-            return textBoxes;
+				SystemStartBarsTextBox
+			};
+			return textBoxes;
         }
         private void ClearListBoxes()
         {
@@ -279,29 +280,28 @@ namespace Moritz.Composer
         }
         private void DoSelectionColor(object sender, DrawItemEventArgs e)
         {
-            ListBox listBox = sender as ListBox;
-            Graphics g = e.Graphics;
+			Graphics g = e.Graphics;
 
-            if(listBox != null && listBox.Items.Count > e.Index)
-            {
-                string text = listBox.Items[e.Index].ToString();
-                Point textOrigin = new Point(e.Bounds.Left, e.Bounds.Top);
+			if(sender is ListBox listBox && listBox.Items.Count > e.Index)
+			{
+				string text = listBox.Items[e.Index].ToString();
+				Point textOrigin = new Point(e.Bounds.Left, e.Bounds.Top);
 
-                e.DrawBackground();
+				e.DrawBackground();
 
-                if(listBox.SelectedIndex == e.Index)
-                {
-                    g.FillRectangle(_systemHighlightBrush, e.Bounds);
-                    g.DrawString(text, e.Font, _whiteBrush, textOrigin);
-                }
-                else
-                {
-                    g.FillRectangle(_whiteBrush, e.Bounds);
-                    g.DrawString(text, e.Font, _blackBrush, textOrigin);
-                }
-                e.DrawFocusRectangle();
-            }
-        }
+				if(listBox.SelectedIndex == e.Index)
+				{
+					g.FillRectangle(_systemHighlightBrush, e.Bounds);
+					g.DrawString(text, e.Font, _whiteBrush, textOrigin);
+				}
+				else
+				{
+					g.FillRectangle(_whiteBrush, e.Bounds);
+					g.DrawString(text, e.Font, _blackBrush, textOrigin);
+				}
+				e.DrawFocusRectangle();
+			}
+		}
         #endregion control helpers
 
         #region AssistantComposer form state
@@ -1502,14 +1502,13 @@ namespace Moritz.Composer
         }
         private void ShowSelectedKrystalButton_Click(object sender, EventArgs e)
         {
-            Krystal krystal = this.KrystalsListBox.SelectedItem as Krystal;
-            if(krystal != null)
-            {
-                _krystalBrowser =
-                    new Moritz.Krystals.KrystalBrowser(krystal, M.Preferences.LocalMoritzKrystalsFolder, null);
-                _krystalBrowser.Show();
-            }
-        }
+			if(this.KrystalsListBox.SelectedItem is Krystal krystal)
+			{
+				_krystalBrowser =
+					new Moritz.Krystals.KrystalBrowser(krystal, M.Preferences.LocalMoritzKrystalsFolder, null);
+				_krystalBrowser.Show();
+			}
+		}
         private void RemoveSelectedKrystalButton_Click(object sender, EventArgs e)
         {
             if(KrystalsListBox.SelectedIndex >= 0)
@@ -1534,12 +1533,11 @@ namespace Moritz.Composer
                 List<Krystal> allKrystals = new List<Krystal>();
                 foreach(object o in KrystalsListBox.Items)
                 {
-                    Krystal krystal = o as Krystal;
-                    if(krystal != null)
-                    {
-                        allKrystals.Add(krystal);
-                    }
-                }
+					if(o is Krystal krystal)
+					{
+						allKrystals.Add(krystal);
+					}
+				}
                 return allKrystals;
             }
         }
@@ -1898,13 +1896,15 @@ namespace Moritz.Composer
 
             M.CreateDirectoryIfItDoesNotExist(this._settingsFolderPath);
 
-            #region do the save
-            XmlWriterSettings settings = new XmlWriterSettings();
-            settings.Indent = true;
-            settings.IndentChars = ("\t");
-            settings.NewLineOnAttributes = true;
-            settings.CloseOutput = false;
-            using(XmlWriter w = XmlWriter.Create(_settingsPath, settings))
+			#region do the save
+			XmlWriterSettings settings = new XmlWriterSettings
+			{
+				Indent = true,
+				IndentChars = ("\t"),
+				NewLineOnAttributes = true,
+				CloseOutput = false
+			};
+			using(XmlWriter w = XmlWriter.Create(_settingsPath, settings))
             {
                 w.WriteStartDocument();
                 w.WriteComment("file created: " + M.NowString);
@@ -1962,14 +1962,13 @@ namespace Moritz.Composer
 
                 foreach(object o in KrystalsListBox.Items)
                 {
-                    Krystal krystal = o as Krystal;
-                    if(krystal != null)
-                    {
-                        w.WriteStartElement("krystal");
-                        w.WriteAttributeString("name", krystal.Name);
-                        w.WriteEndElement();// krystal
-                    }
-                }
+					if(o is Krystal krystal)
+					{
+						w.WriteStartElement("krystal");
+						w.WriteAttributeString("name", krystal.Name);
+						w.WriteEndElement();// krystal
+					}
+				}
                 w.WriteEndElement(); // krystals
             }
             SetGroupBoxIsSaved(KrystalsGroupBox, ConfirmKrystalsListButton, RevertKrystalsListButton,
@@ -2000,10 +1999,8 @@ namespace Moritz.Composer
         /// </summary>
         private void CreateSVGScore()
         {
-            List<Krystal> krystals = null;
-            List<Palette> palettes = null;
-            GetKrystalsAndPalettes(out krystals, out palettes);
-            PageFormat pageFormat = GetPageFormat();
+			GetKrystalsAndPalettes(out List<Krystal> krystals, out List<Palette> palettes);
+			PageFormat pageFormat = GetPageFormat();
 
             // These need clearing between creating different scores in one Moritz run.
             Metrics.ClearUsedCSSClasses();

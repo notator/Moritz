@@ -30,16 +30,15 @@ namespace Moritz.Symbols
 			base.ResetBoundary();
 			foreach(Metrics metrics in MetricsList)
 			{
-				BarlineMetrics barlineMetrics = metrics as BarlineMetrics;
-				if(barlineMetrics != null)
+				if(metrics is BarlineMetrics barlineMetrics)
 				{
-					expandMetrics(barlineMetrics.BarnumberMetrics);
-					expandMetrics(barlineMetrics.StaffNameMetrics);
+					ExpandMetrics(barlineMetrics.BarnumberMetrics);
+					ExpandMetrics(barlineMetrics.StaffNameMetrics);
 				}
 			}
 		}
 
-		private void expandMetrics(Metrics metrics)
+		private void ExpandMetrics(Metrics metrics)
 		{
 			if(metrics != null)
 			{
@@ -57,9 +56,9 @@ namespace Moritz.Symbols
         private float _stafflinesBottom = 0F;
 
         public float StafflinesLeft { get { return _stafflinesLeft; } }
-        private float _stafflinesLeft = 0F;
+        private readonly float _stafflinesLeft = 0F;
 
         public float StafflinesRight { get { return _stafflinesRight; } }
-        private float _stafflinesRight = 0F;
+        private readonly float _stafflinesRight = 0F;
     }
 }

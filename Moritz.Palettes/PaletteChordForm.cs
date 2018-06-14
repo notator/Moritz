@@ -147,13 +147,15 @@ namespace Moritz.Palettes
 
         private void CreateAudioSampleButton(int x, int y, int i)
         {
-            Button b = new Button();
-            b.Location = new System.Drawing.Point(x, y);
-            b.Size = new System.Drawing.Size(27, 24);
-            b.Image = _paletteForm.PaletteButtonsControl.AudioSampleButtons[i].Image;
-            b.UseVisualStyleBackColor = false;
+			Button b = new Button
+			{
+				Location = new System.Drawing.Point(x, y),
+				Size = new System.Drawing.Size(27, 24),
+				Image = _paletteForm.PaletteButtonsControl.AudioSampleButtons[i].Image,
+				UseVisualStyleBackColor = false
+			};
 
-            b.MouseDown += new MouseEventHandler(AudioSampleButton_MouseDown);
+			b.MouseDown += new MouseEventHandler(AudioSampleButton_MouseDown);
 
             this.Controls.Add(b);
             _audioSampleButtons.Add(b);
@@ -395,26 +397,27 @@ namespace Moritz.Palettes
         }
         private List<TextBox> AllTextBoxes()
         {
-            List<TextBox> allTextBoxes = new List<TextBox>();
+			List<TextBox> allTextBoxes = new List<TextBox>
+			{
+				this.DurationTextBox,
+				this.VelocityTextBox,
+				this.BaseMidiPitchTextBox,
+				this.ChordOffTextBox,
+				this.ChordDensityTextBox,
+				this.InversionIndexTextBox,
+				this.VerticalVelocityFactorTextBox,
+				this.BankIndexTextBox,
+				this.PatchIndexTextBox,
+				this.PitchwheelDeviationTextBox,
+				this.PitchwheelEnvelopeTextBox,
+				this.PanEnvelopeTextBox,
+				this.ModulationWheelEnvelopeTextBox,
+				this.ExpressionEnvelopeTextBox,
+				this.OrnamentNumberTextBox,
+				this.MinMsDurationTextBox
+			};
 
-            allTextBoxes.Add(this.DurationTextBox);
-            allTextBoxes.Add(this.VelocityTextBox);
-            allTextBoxes.Add(this.BaseMidiPitchTextBox);
-            allTextBoxes.Add(this.ChordOffTextBox);
-            allTextBoxes.Add(this.ChordDensityTextBox);
-            allTextBoxes.Add(this.InversionIndexTextBox);
-            allTextBoxes.Add(this.VerticalVelocityFactorTextBox);
-            allTextBoxes.Add(this.BankIndexTextBox);
-            allTextBoxes.Add(this.PatchIndexTextBox);
-            allTextBoxes.Add(this.PitchwheelDeviationTextBox);
-            allTextBoxes.Add(this.PitchwheelEnvelopeTextBox);
-            allTextBoxes.Add(this.PanEnvelopeTextBox);
-            allTextBoxes.Add(this.ModulationWheelEnvelopeTextBox);
-            allTextBoxes.Add(this.ExpressionEnvelopeTextBox);
-            allTextBoxes.Add(this.OrnamentNumberTextBox);
-            allTextBoxes.Add(this.MinMsDurationTextBox);
-
-            return allTextBoxes;
+			return allTextBoxes;
         }
 
         private void SaveAndCloseButton_Click(object sender, EventArgs e)
@@ -697,31 +700,30 @@ namespace Moritz.Palettes
             {
                 Button midiEventDemoButton = sender as Button;
                 DurationDef durationDef = GetDurationDef();
-                MidiChordDef midiChordDef = durationDef as MidiChordDef;
-                MidiRestDef restDef = durationDef as MidiRestDef;
+				MidiRestDef restDef = durationDef as MidiRestDef;
 
-                if(midiChordDef != null)
-                {
-                    int midiChannel = 0;
-                    Sanford.Multimedia.Midi.OutputDevice outputDevice = M.Preferences.CurrentMultimediaMidiOutputDevice;
-                    if(_paletteForm.IsPercussionPalette)
-                    {
-                        midiChannel = 9;
-                        outputDevice = M.Preferences.GetMidiOutputDevice("Microsoft GS Wavetable Synth");
-                    }
-                    MidiChord midiChord = new MidiChord(midiChannel, midiChordDef, outputDevice);
-                    midiChord.Send(); //sends in this thread (blocks the current thread -- keeping the button selected)
-                }
-                else
-                {
-                    midiEventDemoButton.Hide();
-                    Refresh(); // shows "rest" behind button
-                    Debug.Assert(restDef != null);
-                    Thread.Sleep(restDef.MsDuration);
-                    midiEventDemoButton.Show();
-                    Refresh();
-                }
-            }
+				if(durationDef is MidiChordDef midiChordDef)
+				{
+					int midiChannel = 0;
+					Sanford.Multimedia.Midi.OutputDevice outputDevice = M.Preferences.CurrentMultimediaMidiOutputDevice;
+					if(_paletteForm.IsPercussionPalette)
+					{
+						midiChannel = 9;
+						outputDevice = M.Preferences.GetMidiOutputDevice("Microsoft GS Wavetable Synth");
+					}
+					MidiChord midiChord = new MidiChord(midiChannel, midiChordDef, outputDevice);
+					midiChord.Send(); //sends in this thread (blocks the current thread -- keeping the button selected)
+				}
+				else
+				{
+					midiEventDemoButton.Hide();
+					Refresh(); // shows "rest" behind button
+					Debug.Assert(restDef != null);
+					Thread.Sleep(restDef.MsDuration);
+					midiEventDemoButton.Show();
+					Refresh();
+				}
+			}
         }
 
         /// <summary>
