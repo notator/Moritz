@@ -119,12 +119,11 @@ namespace Moritz.Symbols
 						if(topVoiceSmallClefs.Count > 0)
 						{
 							AddSmallClefsToLowerVoice(staff.Voices[1], topVoiceSmallClefs);
-						}                        
+						}
 
-                        StandardSymbolSet standardSymbolSet = SymbolSet as StandardSymbolSet;
-                        if(standardSymbolSet != null)
-                            standardSymbolSet.ForceNaturalsInSynchronousChords(staff);
-                    }
+						if(SymbolSet is StandardSymbolSet standardSymbolSet)
+							standardSymbolSet.ForceNaturalsInSynchronousChords(staff);
+					}
                 }
                 systemAbsMsPos += msPositionReVoiceDef;
             }
@@ -134,16 +133,16 @@ namespace Moritz.Symbols
 		{
 			foreach(SmallClef smallClef in clefsInTopStaff)
 			{
-				SmallClef invisibleSmallClef = new SmallClef(voice, smallClef.ClefType, smallClef.AbsMsPosition, 0.01F);
-				invisibleSmallClef.IsVisible = false;
+				SmallClef invisibleSmallClef = new SmallClef(voice, smallClef.ClefType, smallClef.AbsMsPosition, 0.01F)
+				{
+					IsVisible = false
+				};
 				InsertInvisibleClefChangeInNoteObjects(voice, invisibleSmallClef);
 			}
 		}
 
         private void InsertInvisibleClefChangeInNoteObjects(Voice voice, SmallClef invisibleSmallClef)
         {
-            Debug.Assert(!(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline));
-
             int absMsPos = invisibleSmallClef.AbsMsPosition;
             List<DurationSymbol> durationSymbols = new List<DurationSymbol>();
             foreach(DurationSymbol durationSymbol in voice.DurationSymbols)
@@ -151,25 +150,22 @@ namespace Moritz.Symbols
                 durationSymbols.Add(durationSymbol);
             }
 
-            Debug.Assert(durationSymbols.Count > 0);
+			Debug.Assert(!(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline));
+			Debug.Assert(durationSymbols.Count > 0);
+			Debug.Assert(absMsPos > durationSymbols[0].AbsMsPosition);
 
-            if(absMsPos <= durationSymbols[0].AbsMsPosition)
-            {
-                InsertBeforeDS(voice.NoteObjects, durationSymbols[0], invisibleSmallClef);
-            }
-            else if(absMsPos > durationSymbols[durationSymbols.Count - 1].AbsMsPosition)
+            if(absMsPos > durationSymbols[durationSymbols.Count - 1].AbsMsPosition)
             {
                 // the noteObjects do not yet have a final barline (see Debug.Assert() above)
                 voice.NoteObjects.Add(invisibleSmallClef);
             }
             else
             {
-                Debug.Assert(durationSymbols.Count > 1);
-                for(int i = 1; i < durationSymbols.Count; ++i)
+                for(int i = durationSymbols.Count - 2; i >= 0; --i)
                 {
-                    if(durationSymbols[i - 1].AbsMsPosition < absMsPos && durationSymbols[i].AbsMsPosition >= absMsPos)
+                    if(durationSymbols[i].AbsMsPosition < absMsPos)
                     {
-                        InsertBeforeDS(voice.NoteObjects, durationSymbols[i], invisibleSmallClef);
+                        InsertBeforeDS(voice.NoteObjects, durationSymbols[i + 1], invisibleSmallClef);
                         break;
                     }
                 }

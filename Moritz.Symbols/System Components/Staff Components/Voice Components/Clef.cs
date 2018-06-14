@@ -69,13 +69,10 @@ namespace Moritz.Symbols
             _isVisible = true;
         }
 
-        public override string ToString()
-        {
-            return "SmallClef: " + _clefType;
-        }
+		public override string ToString() => "SmallClef: " + _clefType + " absMsPos=" + _absMsPosition;
 
-        public int AbsMsPosition { get { return _absMsPosition; } }
-        private int _absMsPosition;
+		public int AbsMsPosition { get { return _absMsPosition; } }
+        private readonly int _absMsPosition;
 
         public bool IsVisible { get { return _isVisible; } set { _isVisible = value; } }
         private bool _isVisible;

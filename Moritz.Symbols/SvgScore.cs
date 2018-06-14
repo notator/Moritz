@@ -1345,7 +1345,7 @@ namespace Moritz.Symbols
 
             SetSystemAbsEndMsPositions();
 
-            NormalizeSmallClefPositions();
+            NormalizeSmallClefs();
 
             FinalizeAccidentals();
             AddBarlineAtStartOfEachSystem();
@@ -1377,62 +1377,87 @@ namespace Moritz.Symbols
         }
 
 		/// <summary>
-		/// If SmallClefs are followed by a rest, they are moved in front of the following chord or the final barline.
+		/// If a SmallClefs is followed by a rest, it is moved after the rest.
+		/// Then if a SmallClef is followed by another SmallClef:
+		///    in top voices, an alert message is displayed,
+		///    in lower voices, the first SmallClef is silently removed.
 		/// </summary>
-		private void NormalizeSmallClefPositions()
+		private void NormalizeSmallClefs()
 		{
-			foreach(SvgSystem system in Systems)
+			for(int i = 0; i < Systems.Count; ++i)
 			{
-				foreach(Staff staff in system.Staves)
+				SvgSystem system = Systems[i];
+				for(int j = 0; j < system.Staves.Count; ++j)
 				{
-					foreach(Voice voice in staff.Voices)
+					Staff staff = system.Staves[j];
+					for(int k = 0; k < staff.Voices.Count; ++k)
 					{
-						MoveSmallClefsToNextChordOrFinalBarline(voice);
+						Voice voice = staff.Voices[k];
+						MoveSmallClefsToFollowRests(voice, i, j, k);
+						RemoveFirstOfConsecutiveSmallClefs(voice, i, j, k);
 					}
 				}
 			}
 		}
 
 		/// <summary>
-		/// If a SmallClef is followed by a rest, it is moved in front of the following chord or the final barline.
-		/// This function is called recursively, to move all the SmallClefs to their correct positions.
+		/// If a SmallClef is followed by a rest, it is moved after that rest.
+		/// This function is called recursively in case there are consecutive rests.
+		/// Any consecutive SmallClefs are left untouched.
 		/// </summary>
-		private void MoveSmallClefsToNextChordOrFinalBarline(Voice voice)
-        {
-            bool chordFollows = false;
-            SmallClef smallClef = null;
-            int smallClefIndex = -1;
-			Debug.Assert(voice.NoteObjects[0] is Clef);
-			Debug.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline);
-			int indexOfFollowingChordOrFinalBarline = voice.NoteObjects.Count - 1; // final barline
+		private void MoveSmallClefsToFollowRests(Voice voice, int systemIndex, int staffIndex, int voiceIndex)
+		{
+			List<NoteObject> noteObjects = voice.NoteObjects;
+			Debug.Assert(noteObjects[0] is Clef);
+			Debug.Assert(noteObjects[noteObjects.Count - 1] is Barline);
 
-            for(int i = voice.NoteObjects.Count - 1; i > 0; --i)
+			for(int i = noteObjects.Count - 1; i > 0; --i)
             {
-                if(voice.NoteObjects[i] is ChordSymbol)
+                if(noteObjects[i] is RestSymbol && noteObjects[i-1] is SmallClef smallClef)
                 {
-                    indexOfFollowingChordOrFinalBarline = i;
-                    chordFollows = true;
-                }
-                if(voice.NoteObjects[i] is RestSymbol)
-                {
-                    chordFollows = false;
-                }
-                smallClef = voice.NoteObjects[i] as SmallClef;
-                if(smallClef != null)
-                {
-                    smallClefIndex = i;
-                    break;
-                }
-            }
-
-            if(smallClef != null && chordFollows == false)
-            {            
-                Debug.Assert(smallClefIndex < indexOfFollowingChordOrFinalBarline);
-                voice.NoteObjects.Insert(indexOfFollowingChordOrFinalBarline, smallClef);
-                voice.NoteObjects.RemoveAt(smallClefIndex);
-                MoveSmallClefsToNextChordOrFinalBarline(voice); // recursive function
+					if(voiceIndex == 0)
+					{
+						MessageBox.Show($"A SmallClef (type:{smallClef.ClefType}) has been moved to follow a rest.\n" +
+									$"   systemIndex:{systemIndex} staffIndex:{staffIndex} voiceIndex:{voiceIndex}", "Warning");
+					}
+					noteObjects.Insert(i + 1, smallClef); 
+					noteObjects.RemoveAt(i - 1);
+					MoveSmallClefsToFollowRests(voice, systemIndex, staffIndex, voiceIndex); // recursive function
+				}
             }
         }
+
+		/// <summary>
+		/// The first of consecutive SmallClefs is removed.
+		/// </summary>
+		/// <param name="voice"></param>
+		private void RemoveFirstOfConsecutiveSmallClefs(Voice voice, int systemIndex, int staffIndex, int voiceIndex)
+		{
+			List<SmallClef> clefsToRemove = new List<SmallClef>();
+			List<NoteObject> noteObjects = voice.NoteObjects;
+			if(noteObjects.Count > 1)
+			{
+				for(int i = 0; i < noteObjects.Count - 2; ++i)
+				{
+					if(noteObjects[i] is SmallClef smallClef && noteObjects[i + 1] is SmallClef)
+					{
+						if(voiceIndex == 0)
+						{
+							MessageBox.Show($"Removing a redundant SmallClef (type:{smallClef.ClefType}).\n" +
+										$"   systemIndex:{systemIndex} staffIndex:{staffIndex} voiceIndex:{voiceIndex}", "Warning");
+						}
+						clefsToRemove.Add(smallClef);
+					}
+				}
+			}
+			if(clefsToRemove.Count > 0)
+			{
+				foreach(SmallClef smallClef in clefsToRemove)
+				{
+					noteObjects.Remove(smallClef);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Puts up a Warning MessageBox, and returns false if systems cannot be fit

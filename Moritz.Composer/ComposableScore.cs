@@ -26,13 +26,13 @@ namespace Moritz.Composer
         /// </summary>
         protected bool CreateScore(List<Krystal> krystals, List<Palette> palettes)
         { 
-            List<Bar> bars = _algorithm.DoAlgorithm(krystals, palettes);
-
-			InsertInitialClefDefs(bars, _pageFormat.InitialClefPerMIDIChannel);
+            List<Bar> bars = _algorithm.DoAlgorithm(krystals, palettes);	
 
 			CheckBars(bars);
 
-            CreateEmptySystems(bars); // one system per bar
+			InsertInitialClefDefs(bars, _pageFormat.InitialClefPerMIDIChannel);
+
+			CreateEmptySystems(bars); // one system per bar
 
 			bool success = true;
 			if(_pageFormat.ChordSymbolType != "none") // set by AudioButtonsControl
@@ -83,48 +83,6 @@ namespace Moritz.Composer
 			}
 		}
 
-		//private Dictionary<int, string> GetUpperVoiceClefDict(Bar bar1, PageFormat _pageFormat, List<int> visibleLowerVoiceIndices)
-		//{
-		//	int nOutputStaves = _pageFormat.OutputMIDIChannelsPerStaff.Count;
-		//	int nInputStaves = _pageFormat.InputMIDIChannelsPerStaff.Count;
-		//	Debug.Assert(_pageFormat.ClefPerStaff.Count == nOutputStaves + nInputStaves);
-
-		//	int nTrks = bar1.Trks.Count;
-
-		//	Dictionary<int, string> upperVoiceClefDict = new Dictionary<int, string>();
-		//	int clefIndex = 0;
-		//	#region get upperVoiceClefs and visibleLowerVoiceIndices
-		//	for (int i = 0; i < nOutputStaves; ++i)
-		//	{
-		//		List<byte> outputMIDIChannelsPerStaff = _pageFormat.OutputMIDIChannelsPerStaff[i];
-		//		upperVoiceClefDict.Add(outputMIDIChannelsPerStaff[0], _pageFormat.ClefPerStaff[clefIndex++]);
-		//		if (outputMIDIChannelsPerStaff.Count > 1)
-		//		{
-		//			visibleLowerVoiceIndices.Add(outputMIDIChannelsPerStaff[1]);
-		//		}
-
-		//	}
-		//	for (int i = 0; i < nInputStaves; ++i)
-		//	{
-		//		List<byte> visibleInputVoiceIndicesPerStaff = _pageFormat.InputMIDIChannelsPerStaff[i];
-		//		upperVoiceClefDict.Add(nTrks + visibleInputVoiceIndicesPerStaff[0], _pageFormat.ClefPerStaff[clefIndex++]);
-		//		if (visibleInputVoiceIndicesPerStaff.Count > 1)
-		//		{
-		//			visibleLowerVoiceIndices.Add(nTrks + visibleInputVoiceIndicesPerStaff[1]);
-		//		}
-		//	}
-		//	for (int i = 0; i < bar1.VoiceDefs.Count; ++i)
-		//	{
-		//		if (!upperVoiceClefDict.ContainsKey(i))
-		//		{
-		//			upperVoiceClefDict.Add(i, "noClef");
-		//		}
-		//	}
-		//	#endregion
-
-		//	return upperVoiceClefDict;
-		//}
-
 		private void CheckBars(List<Bar> bars)
 		{
             string errorString = null;
@@ -163,6 +121,7 @@ namespace Moritz.Composer
 					errorString = "The top (first) voice in every bar must be an output voice.";
 					break;
 				}
+
 				for(int voiceIndex = 0; voiceIndex < voiceDefs.Count; ++voiceIndex)
 				{
 					VoiceDef voiceDef = voiceDefs[voiceIndex];
@@ -172,32 +131,52 @@ namespace Moritz.Composer
 						errorString = $"Voice number {voiceNumber} in Bar {barNumber} has an empty UniqueDefs list.";
 						break;
 					}
-					//foreach (IUniqueDef iud in voiceDef.UniqueDefs)
-					//{
-					//	if (iud is ClefDef ccd)
-					//	{
-					//		if (visibleLowerVoiceIndices.Contains(voiceIndex))
-					//		{
-					//			errorString = $"Voice number {voiceNumber} is a lower voice on a staff, and contains a clef change.\n" +
-					//			"Clefs should only be changed in the staff's top voice.";
-					//			break;
-					//		}
-					//		else if (!(barIndex == 0) && (upperVoiceClefDict.ContainsKey(voiceIndex) && upperVoiceClefDict[voiceIndex] == ccd.ClefType))
-					//		{
-					//			errorString = $"Voice number {voiceNumber} has an unnecessary clef change in or after bar {barNumber}.";
-					//			break;
-					//		}
-					//		upperVoiceClefDict[voiceIndex] = ccd.ClefType; // a clef at the start of the first bar overrides the pageFormat.
-					//	}
-					//}
 				}
+
+				errorString = CheckThatLowerVoicesHaveNoSmallClefs(voiceDefs);
+
 				if(!string.IsNullOrEmpty(errorString))
 					break;
 			}
 			return errorString;
 		}
 
-        private int NOutputVoices(List<VoiceDef> bar1)
+		private string CheckThatLowerVoicesHaveNoSmallClefs(IReadOnlyList<VoiceDef> voiceDefs)
+		{
+			string errorString = "";
+			List<int> lowerVoiceIndices = new List<int>();
+			int voiceIndex = 0;
+			List<List<byte>> outputChPerStaff = _pageFormat.OutputMIDIChannelsPerStaff;
+			List<List<byte>> inputChPerStaff = _pageFormat.InputMIDIChannelsPerStaff;
+			for(int staffIndex = 0; staffIndex < outputChPerStaff.Count; ++staffIndex)
+			{
+				if(outputChPerStaff[staffIndex].Count > 1)
+				{
+					voiceIndex++;
+					lowerVoiceIndices.Add(voiceIndex);
+				}
+				voiceIndex++;
+			}
+
+			foreach(int lowerVoiceIndex in lowerVoiceIndices)
+			{
+				var uniqueDefs = voiceDefs[lowerVoiceIndex].UniqueDefs;
+				foreach(IUniqueDef iud in uniqueDefs)
+				{
+					if(iud is ClefDef)
+					{
+						errorString = "Small Clefs may not be defined for lower voices on a staff.";
+						break;
+					}
+				}
+				if(!string.IsNullOrEmpty(errorString))
+					break;
+			}
+
+			return errorString;
+		}
+
+		private int NOutputVoices(List<VoiceDef> bar1)
 		{
 			int nOutputVoices = 0;
 			foreach(VoiceDef voiceDef in bar1)

@@ -465,9 +465,16 @@ namespace Moritz.Symbols
             {
                 if(smallClef.ClefType != "n")
                 {
-                    CSSObjectClass cssClass = isInput ? CSSObjectClass.inputSmallClef : CSSObjectClass.smallClef;
-                    ClefID smallClefID = GetSmallClefID(clef, isInput);
-                    returnMetrics = new SmallClefMetrics(clef, gap, cssClass, smallClefID);
+					if(smallClef.IsVisible)
+					{
+						CSSObjectClass cssClass = isInput ? CSSObjectClass.inputSmallClef : CSSObjectClass.smallClef;
+						ClefID smallClefID = GetSmallClefID(clef, isInput);
+						returnMetrics = new SmallClefMetrics(clef, gap, cssClass, smallClefID);
+					}
+					else
+					{
+						returnMetrics = null;
+					}
                 }
             }
             else if(clef != null)

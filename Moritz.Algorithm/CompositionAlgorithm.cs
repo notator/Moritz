@@ -201,7 +201,10 @@ namespace Moritz.Algorithm
 
 		/// <summary>
 		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
-		/// The dictionary contains the index at which the clef will be inserted in the VoiceDef's IUniquedefs,
+		/// An empty clefChanges list of the returned type can be
+		///     1. created by calling the protected function GetEmptyClefChangesPerBar(int nBars, int nVoicesPerBar) and
+		///     2. populated with code such as clefChanges[barIndex][voiceIndex].Add(9, "t3"). 
+		/// The dictionary contains the index at which the clef will be inserted in the VoiceDef's IUniqueDefs,
 		/// and the clef ID string ("t", "t1", "b3" etc.).
 		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
 		/// the existing IUniqueDefs before which the clef will be inserted.
@@ -209,8 +212,10 @@ namespace Moritz.Algorithm
 		/// automatically.
 		/// Note that a CautionaryChordDef counts as an IUniqueDef at the beginning of a bar, and that clefs
 		/// cannot be inserted in front of them.
+		/// Clefs should not be inserted here in the lower of two voices in a staff. Lower voices automatically have the
+		/// SmallClefs that are defined for the upper voice.
 		/// </summary>
-		protected abstract List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars);
+		protected abstract List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar);
 
 		/// <summary>
 		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
@@ -224,6 +229,24 @@ namespace Moritz.Algorithm
 		/// indexing purposes, and that lyrics cannot be attached to them.
 		/// </summary>
 		protected abstract List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars);
+
+		protected List<List<SortedDictionary<int, string>>> GetEmptyClefChangesPerBar(int nBars, int nVoicesPerBar)
+		{
+			var rval = new List<List<SortedDictionary<int, string>>>();
+			for(int barIndex = 0; barIndex < nBars; ++barIndex )
+			{
+				var voiceDefs = new List<SortedDictionary<int, string>>();
+				rval.Add(voiceDefs);
+				for(int voiceIndex = 0; voiceIndex < nVoicesPerBar; ++voiceIndex)
+				{
+					var clefDict = new SortedDictionary<int, string>();
+					voiceDefs.Add(clefDict);
+				}
+			}
+
+			// populate the clef changes dicts for example with code like: rval[0][0].Add(9, "t3");
+			return rval;
+		}
 
 		/// <summary>
 		/// If inputVoiceDefs != null, then barlines will be fit to the InputChordDefs in the inputVoices,
@@ -366,9 +389,12 @@ namespace Moritz.Algorithm
 				Debug.Assert(barVoiceDefs.Count == clefChangesPerVoiceDef.Count);
 				for(int voiceDefIndex = 0; voiceDefIndex < barVoiceDefs.Count; voiceDefIndex++)
 				{
-					VoiceDef voiceDef = barVoiceDefs[voiceDefIndex];
 					SortedDictionary<int, string> clefChanges = clefChangesPerVoiceDef[voiceDefIndex];
-					InsertClefChangesInVoiceDef(voiceDef, clefChanges);
+					if(clefChanges.Count > 0)
+					{
+						VoiceDef voiceDef = barVoiceDefs[voiceDefIndex];
+						InsertClefChangesInVoiceDef(voiceDef, clefChanges);
+					}
 				}
 			}
 		}

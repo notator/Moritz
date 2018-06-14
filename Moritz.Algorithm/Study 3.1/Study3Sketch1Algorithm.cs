@@ -50,14 +50,19 @@ namespace Moritz.Algorithm.Study3Sketch1
 
 			List<int> barlineMsPositions = GetBarlinePositions(mainSeq.Trks, null, approximateBarlineMsPositions);
 
-			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, null, null);
+			List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count, mainSeq.Trks.Count);
+
+			List<Bar> bars = GetBars(mainSeq, null, barlineMsPositions, clefChangesPerBar, null);
 
 			return bars;
         }
 
 		/// <summary>
 		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
-		/// The dictionary contains the index at which the clef will be inserted in the VoiceDef's IUniquedefs,
+		/// An empty clefChanges list of the returned type can be
+		///     1. created by calling the protected function GetEmptyClefChangesPerBar(int nBars, int nVoicesPerBar) and
+		///     2. populated with code such as clefChanges[barIndex][voiceIndex].Add(9, "t3"). 
+		/// The dictionary contains the index at which the clef will be inserted in the VoiceDef's IUniqueDefs,
 		/// and the clef ID string ("t", "t1", "b3" etc.).
 		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
 		/// the existing IUniqueDefs before which the clef will be inserted.
@@ -65,21 +70,28 @@ namespace Moritz.Algorithm.Study3Sketch1
 		/// automatically.
 		/// Note that a CautionaryChordDef counts as an IUniqueDef at the beginning of a bar, and that clefs
 		/// cannot be inserted in front of them.
+		/// Clefs should not be inserted here in the lower of two voices in a staff. Lower voices automatically have the
+		/// SmallClefs that are defined for the upper voice.
 		/// </summary>
-		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars)
+		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
 		{
 			return null;
 
-			// test code...
-			//VoiceDef voiceDef1 = bars[0].VoiceDefs[1];
-			//voiceDef1.InsertClefDef(9, "b3");
-			//voiceDef1.InsertClefDef(8, "b2");
-			//voiceDef1.InsertClefDef(7, "b1");
-			//voiceDef1.InsertClefDef(6, "b");
-			//voiceDef1.InsertClefDef(5, "t3");
-			//voiceDef1.InsertClefDef(4, "t2");
-			//voiceDef1.InsertClefDef(3, "t1");
-			//voiceDef1.InsertClefDef(2, "t");
+			//var clefChangesPerBar = GetEmptyClefChangesPerBar(nBars, nVoicesPerBar);
+
+			//SortedDictionary<int, string> voiceDef0Bar0 = clefChangesPerBar[0][0];
+			//voiceDef0Bar0.Add(9, "b3");
+			//voiceDef0Bar0.Add(8, "b2");
+			//voiceDef0Bar0.Add(6, "b");
+			//voiceDef0Bar0.Add(4, "t2");
+			//voiceDef0Bar0.Add(2, "t");
+
+			//// The following were redundant in this score, since they only apply to rests!
+			//// voiceDef0Bar0.Add(7, "b1");
+			//// voiceDef0Bar0.Add(5, "t3");
+			//// voiceDef0Bar0.Add(3, "t1");
+
+			//return clefChangesPerBar;
 		}
 
 		/// <summary>

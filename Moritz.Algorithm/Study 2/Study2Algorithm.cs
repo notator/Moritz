@@ -84,7 +84,10 @@ namespace Moritz.Algorithm.Study2
 
 		/// <summary>
 		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
-		/// The dictionary contains the index at which the clef will be inserted in the VoiceDef's IUniquedefs,
+		/// An empty clefChanges list of the returned type can be
+		///     1. created by calling the protected function GetEmptyClefChangesPerBar(int nBars, int nVoicesPerBar) and
+		///     2. populated with code such as clefChanges[barIndex][voiceIndex].Add(9, "t3"). 
+		/// The dictionary contains the index at which the clef will be inserted in the VoiceDef's IUniqueDefs,
 		/// and the clef ID string ("t", "t1", "b3" etc.).
 		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
 		/// the existing IUniqueDefs before which the clef will be inserted.
@@ -92,20 +95,14 @@ namespace Moritz.Algorithm.Study2
 		/// automatically.
 		/// Note that a CautionaryChordDef counts as an IUniqueDef at the beginning of a bar, and that clefs
 		/// cannot be inserted in front of them.
+		/// Clefs should not be inserted here in the lower of two voices in a staff. Lower voices automatically have the
+		/// SmallClefs that are defined for the upper voice.
 		/// </summary>
-		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars)
+		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
 		{
 			return null;
 			// test code...
-			//VoiceDef voiceDef1 = bars[0][1];
-			//voiceDef1.InsertClefDef(9, "b3");
-			//voiceDef1.InsertClefDef(8, "b2");
-			//voiceDef1.InsertClefDef(7, "b1");
-			//voiceDef1.InsertClefDef(6, "b");
-			//voiceDef1.InsertClefDef(5, "t3");
-			//voiceDef1.InsertClefDef(4, "t2");
-			//voiceDef1.InsertClefDef(3, "t1");
-			//voiceDef1.InsertClefDef(2, "t");
+			// see Study3Sketch1Algorithm
 		}
 
 		/// <summary>
