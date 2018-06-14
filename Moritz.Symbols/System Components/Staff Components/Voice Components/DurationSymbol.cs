@@ -59,7 +59,7 @@ namespace Moritz.Symbols
             {
                 StringBuilder sb = new StringBuilder();
                 sb.Append("staff=" + Voice.Staff.Staffname + " ");
-                sb.Append("msPos=" + this.AbsMsPosition.ToString() + " ");
+                sb.Append("absMsPos=" + this.AbsMsPosition.ToString() + " ");
                 sb.Append("msDur=" + this.MsDuration.ToString());
                 return sb.ToString();
             }

@@ -61,14 +61,8 @@ namespace Moritz.Symbols
             }
         }
 
-		public override string ToString()
-		{
-			StringBuilder sb = new StringBuilder();
-			sb.Append("inputRest   ");
-			sb.Append(InfoString);
-			return sb.ToString();
-		}
+		public override string ToString() => "outputRest " + InfoString;
 
-        MidiRestDef _midiRestDef = null;
+		MidiRestDef _midiRestDef = null;
     }
 }

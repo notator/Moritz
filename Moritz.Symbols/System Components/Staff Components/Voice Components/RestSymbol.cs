@@ -20,14 +20,6 @@ namespace Moritz.Symbols
             LocalCautionaryChordDef = iumdd as CautionaryChordDef;
         }
 
-		public override string ToString()
-		{
-			StringBuilder sb = new StringBuilder();
-			sb.Append("rest   ");
-			sb.Append(InfoString);
-			return sb.ToString();
-		}
-
 		#region display attributes
         /// <summary>
         /// If LocalizedCautionaryChordDef is set:

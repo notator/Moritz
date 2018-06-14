@@ -20,7 +20,7 @@ namespace Moritz.Symbols
             LocalCautionaryChordDef = iumdd as CautionaryChordDef;
         }
 
-        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
+		public override void WriteSVG(SvgWriter w, bool staffIsVisible)
         {
             if(LocalCautionaryChordDef == null)
             {
@@ -40,13 +40,7 @@ namespace Moritz.Symbols
             }
         }
 
-		public override string ToString()
-		{
-			StringBuilder sb = new StringBuilder();
-			sb.Append("inputRest   ");
-			sb.Append(InfoString);
-			return sb.ToString();
-		}
+		public override string ToString() => "inputRest " + InfoString;
 
 	}
 }
