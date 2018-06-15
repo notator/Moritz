@@ -14,8 +14,8 @@ namespace Krystals4ObjectLibrary
             }
             public Strand Strand { get { return _strand; } }
             public int OriginalMomentNumber { get { return _originalMomentNumber; } }
-            private Strand _strand = null;
-            private int _originalMomentNumber = 0;
+            private readonly Strand _strand = null;
+            private readonly int _originalMomentNumber = 0;
         }
         /// <summary>
         /// The level of the first Strand in the first StrandObj is smaller than the level of any other Strand
@@ -28,7 +28,7 @@ namespace Krystals4ObjectLibrary
             }
 
             public List<StrandObj> StrandObjs { get { return _strandObjs; } }
-            private List<StrandObj> _strandObjs  = new List<StrandObj>();
+            private readonly List<StrandObj> _strandObjs  = new List<StrandObj>();
             // The level of the first strand (before this SuperStrand is permuted).
             public uint TopLevel { get { return _topLevel; } }
             protected uint _topLevel = 0;
@@ -156,7 +156,7 @@ namespace Krystals4ObjectLibrary
 
             public List<InnerSuperStrand> InnerSuperStrands { get { return _innerSuperStrands; } }
             public uint PermutationLevel { get { return _permutationLevel; } }
-            private uint _permutationLevel = 0;
+            private readonly uint _permutationLevel = 0;
             private List<InnerSuperStrand> _innerSuperStrands  = new List<InnerSuperStrand>();
         }
 

@@ -27,22 +27,23 @@ namespace Moritz.Composer
         }
         private List<TextBox> GetAllTextBoxes()
         {
-            List<TextBox> textBoxes = new List<TextBox>();
+			List<TextBox> textBoxes = new List<TextBox>
+			{
+				BottomMarginTextBox,
+				TopMarginPage1TextBox,
+				TopMarginOtherPagesTextBox,
+				RightMarginTextBox,
+				LeftMarginTextBox,
+				Page1TitleYTextBox,
+				Page1TitleHeightTextBox,
+				Page1AuthorHeightTextBox,
+				AboutLinkTextTextBox,
+				AboutLinkURLTextBox,
+				MetadataCommentTextBox,
+				MetadataKeywordsTextBox
+			};
 
-            textBoxes.Add(BottomMarginTextBox);
-            textBoxes.Add(TopMarginPage1TextBox);
-            textBoxes.Add(TopMarginOtherPagesTextBox);
-            textBoxes.Add(RightMarginTextBox);
-            textBoxes.Add(LeftMarginTextBox);
-            textBoxes.Add(Page1TitleYTextBox);
-            textBoxes.Add(Page1TitleHeightTextBox);
-            textBoxes.Add(Page1AuthorHeightTextBox);
-            textBoxes.Add(AboutLinkTextTextBox);
-            textBoxes.Add(AboutLinkURLTextBox);
-            textBoxes.Add(MetadataCommentTextBox);
-            textBoxes.Add(MetadataKeywordsTextBox);
-
-            return textBoxes;
+			return textBoxes;
         }
 
         private void SetDefaultValues()

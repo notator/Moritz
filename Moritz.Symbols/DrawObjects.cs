@@ -90,7 +90,7 @@ namespace Moritz.Symbols
 
         // attributes
         public TextInfo TextInfo { get { return _textInfo; } }
-        private TextInfo _textInfo = null;
+        private readonly TextInfo _textInfo = null;
         public FrameInfo FrameInfo { get { return _frameInfo; } }
         protected FrameInfo _frameInfo = null;
     }

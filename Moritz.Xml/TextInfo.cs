@@ -27,21 +27,21 @@ namespace Moritz.Xml
         }
 
         public string FontFamily { get { return _fontFamily; } }
-        private string _fontFamily = null;
+        private readonly string _fontFamily = null;
         
         public string Text { get { return _text; } }
-        private string _text = null;
+        private readonly string _text = null;
 
         public float FontHeight { get { return _fontHeight; } }
-        private float _fontHeight = 0F;
+        private readonly float _fontHeight = 0F;
 
         public TextHorizAlign TextHorizAlign { get { return _textHorizAlign; } }
-        private TextHorizAlign _textHorizAlign = 0F;
+        private readonly TextHorizAlign _textHorizAlign = 0F;
 
         /// <summary>
 		/// A string of 6 Hex digits (RRGGBB).
 		/// </summary>
         public ColorString ColorString { get { return _colorString; } }
-        private ColorString _colorString = null; 
+        private readonly ColorString _colorString = null; 
     }
 }

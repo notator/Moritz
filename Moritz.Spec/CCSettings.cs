@@ -182,38 +182,31 @@ namespace Moritz.Spec
 			Debug.Assert(optList.Count > 0, "Empty TrackCCSettings list.");
 			foreach(CCSetting opt in optList)
 			{
-				PressureControl pcto = opt as PressureControl;
-				if(pcto != null)
+				if(opt is PressureControl pcto)
 				{
 					Add(pcto);
 				}
-				ModWheelControl mwcto = opt as ModWheelControl;
-				if(mwcto != null)
+				if(opt is ModWheelControl mwcto)
 				{
 					Add(mwcto);
 				}
-				PressureVolumeControl pvto = opt as PressureVolumeControl;
-				if(pvto != null)
+				if(opt is PressureVolumeControl pvto)
 				{
 					Add(pvto);
 				}
-				ModWheelVolumeControl mwvto = opt as ModWheelVolumeControl;
-				if(mwvto != null)
+				if(opt is ModWheelVolumeControl mwvto)
 				{
 					Add(mwvto);
 				}
-				PitchWheelPitchControl pwpito = opt as PitchWheelPitchControl;
-				if(pwpito != null)
+				if(opt is PitchWheelPitchControl pwpito)
 				{
 					Add(pwpito);
 				}
-				PitchWheelPanControl pwpato = opt as PitchWheelPanControl;
-				if(pwpato != null)
+				if(opt is PitchWheelPanControl pwpato)
 				{
 					Add(pwpato);
 				}
-				PitchWheelSpeedControl pwsto = opt as PitchWheelSpeedControl;
-				if(pwsto != null)
+				if(opt is PitchWheelSpeedControl pwsto)
 				{
 					Add(pwsto);
 				}
@@ -337,7 +330,7 @@ namespace Moritz.Spec
 			_controllerType = controllerType;
 		}
 		public CControllerType ControllerType { get { return _controllerType; } }
-		private CControllerType _controllerType;
+		private readonly CControllerType _controllerType;
 	}
 	public class PressureControl : ControllerCCSetting
 	{
@@ -365,9 +358,9 @@ namespace Moritz.Spec
 			_maximumVolume = maxVolume;
 		}
 		public byte MinimumVolume { get { return _minimumVolume; } }
-		private byte _minimumVolume;
+		private readonly byte _minimumVolume;
 		public byte MaximumVolume { get { return _maximumVolume; } }
-		private byte _maximumVolume;
+		private readonly byte _maximumVolume;
 	}
 	public class ModWheelVolumeControl : CCSetting
 	{
@@ -380,9 +373,9 @@ namespace Moritz.Spec
 			_maximumVolume = maxVolume;
 		}
 		public byte MinimumVolume { get { return _minimumVolume; } }
-		private byte _minimumVolume;
+		private readonly byte _minimumVolume;
 		public byte MaximumVolume { get { return _maximumVolume; } }
-		private byte _maximumVolume;
+		private readonly byte _maximumVolume;
 	}
 
 	public enum PitchWheelOption
@@ -403,7 +396,7 @@ namespace Moritz.Spec
 			_pitchWheelDeviation = deviation;
 		}
 		public byte PitchWheelDeviation { get { return _pitchWheelDeviation; } }
-		private byte _pitchWheelDeviation;
+		private readonly byte _pitchWheelDeviation;
 	}
 	public class PitchWheelPanControl : PitchWheelControl
 	{
@@ -414,7 +407,7 @@ namespace Moritz.Spec
 			_panOriginOption = origin;
 		}
 		public byte PanOriginOption { get { return _panOriginOption; } }
-		private byte _panOriginOption;
+		private readonly byte _panOriginOption;
 	}
 	public class PitchWheelSpeedControl : PitchWheelControl
 	{
@@ -424,6 +417,6 @@ namespace Moritz.Spec
 			_speedDeviationOption = maxFactor;
 		}
 		public float SpeedDeviationOption { get { return _speedDeviationOption; } }
-		private float _speedDeviationOption;
+		private readonly float _speedDeviationOption;
 	}
 }

@@ -56,10 +56,12 @@ namespace Moritz.Palettes
 
         private void ConnectBasicChordControl()
         {
-            _bcc = new BasicChordControl(SetDialogState);
-            _bcc.Location = new Point(0, 25);
-            _bcc.BorderStyle = BorderStyle.None;
-            this.TopPanel.Controls.Add(_bcc);
+			_bcc = new BasicChordControl(SetDialogState)
+			{
+				Location = new Point(0, 25),
+				BorderStyle = BorderStyle.None
+			};
+			this.TopPanel.Controls.Add(_bcc);
             TopPanel.TabIndex = 0;
             _bcc.TabIndex = 1;
 
@@ -223,44 +225,46 @@ namespace Moritz.Palettes
 
         private List<TextBox> GetNonOrnamentTextBoxes()
         {
-            List<TextBox> textBoxes = new List<TextBox>();
+			List<TextBox> textBoxes = new List<TextBox>
+			{
+				NumBasicChordDefsTextBox,
+				_bcc.DurationsTextBox,
+				_bcc.VelocitiesTextBox,
+				_bcc.MidiPitchesTextBox,
+				_bcc.ChordOffsTextBox,
+				_bcc.ChordDensitiesTextBox,
+				_bcc.RootInversionTextBox,
+				_bcc.InversionIndicesTextBox,
+				_bcc.VerticalVelocityFactorsTextBox,
+				BankIndicesTextBox,
+				PatchIndicesTextBox,
+				NumberOfOrnamentsTextBox
+			};
 
-            textBoxes.Add(NumBasicChordDefsTextBox);
-            textBoxes.Add(_bcc.DurationsTextBox);
-            textBoxes.Add(_bcc.VelocitiesTextBox);
-            textBoxes.Add(_bcc.MidiPitchesTextBox);
-            textBoxes.Add(_bcc.ChordOffsTextBox);
-            textBoxes.Add(_bcc.ChordDensitiesTextBox);
-            textBoxes.Add(_bcc.RootInversionTextBox);
-            textBoxes.Add(_bcc.InversionIndicesTextBox);
-            textBoxes.Add(_bcc.VerticalVelocityFactorsTextBox);
-            textBoxes.Add(BankIndicesTextBox);
-            textBoxes.Add(PatchIndicesTextBox);
-            textBoxes.Add(NumberOfOrnamentsTextBox);
-
-            return textBoxes;
+			return textBoxes;
         }
 
         /************/
 
         private List<TextBox> Get12OrnamentTextBoxes()
         {
-            List<TextBox> textBoxes = new List<TextBox>();
+			List<TextBox> textBoxes = new List<TextBox>
+			{
+				this.Ornament1TextBox,
+				this.Ornament2TextBox,
+				this.Ornament3TextBox,
+				this.Ornament4TextBox,
+				this.Ornament5TextBox,
+				this.Ornament6TextBox,
+				this.Ornament7TextBox,
+				this.Ornament8TextBox,
+				this.Ornament9TextBox,
+				this.Ornament10TextBox,
+				this.Ornament11TextBox,
+				this.Ornament12TextBox
+			};
 
-            textBoxes.Add(this.Ornament1TextBox);
-            textBoxes.Add(this.Ornament2TextBox);
-            textBoxes.Add(this.Ornament3TextBox);
-            textBoxes.Add(this.Ornament4TextBox);
-            textBoxes.Add(this.Ornament5TextBox);
-            textBoxes.Add(this.Ornament6TextBox);
-            textBoxes.Add(this.Ornament7TextBox);
-            textBoxes.Add(this.Ornament8TextBox);
-            textBoxes.Add(this.Ornament9TextBox);
-            textBoxes.Add(this.Ornament10TextBox);
-            textBoxes.Add(this.Ornament11TextBox);
-            textBoxes.Add(this.Ornament12TextBox);
-
-            return textBoxes;
+			return textBoxes;
         }
 
         /************/
@@ -425,7 +429,7 @@ namespace Moritz.Palettes
         {
             TextBox textBox = sender as TextBox;
             M.LeaveIntRangeTextBox(textBox, false, (uint)1, 1, 12, SetDialogState);
-            _ornaments = (_ornaments == null) ? new List<List<int>>() : _ornaments;
+            _ornaments = _ornaments ?? new List<List<int>>();
             if(textBox.BackColor != M.TextBoxErrorColor)
             {
                 int numberOfOrnaments = int.Parse(textBox.Text);

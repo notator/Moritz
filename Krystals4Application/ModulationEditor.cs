@@ -230,14 +230,12 @@ namespace Krystals4Application
 		private void NewButton_Click(object sender, EventArgs e)
 		{
 			this.Close(); // see FormClosing event handler above
-			if(EventHandler != null)
-				EventHandler(this, new ModulationEditorEventArgs(ModulationEditorMessage.New));
+			EventHandler?.Invoke(this, new ModulationEditorEventArgs(ModulationEditorMessage.New));
 		}
 		private void OpenButton_Click(object sender, EventArgs e)
 		{
 			this.Close(); // see FormClosing event handler above
-			if(EventHandler != null)
-				EventHandler(this, new ModulationEditorEventArgs(ModulationEditorMessage.Open));
+			EventHandler?.Invoke(this, new ModulationEditorEventArgs(ModulationEditorMessage.Open));
 		}
         private void ModulateButton_Click(object sender, EventArgs e)
         {

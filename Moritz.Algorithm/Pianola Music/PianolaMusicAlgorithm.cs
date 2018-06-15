@@ -35,9 +35,8 @@ namespace Moritz.Algorithm.PianolaMusic
 			List<InputVoiceDef> inputVoiceDefs = new List<InputVoiceDef>();
 			List<int> barlineMsPositions = GetBalancedBarlineMsPositions(mainSeq.Trks, null, 8);
 			List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count, mainSeq.Trks.Count);
-			List<List<SortedDictionary<int, string>>> lyricsPerBar = GetLyricsPerBar(barlineMsPositions.Count);
 
-			List<Bar> bars = GetBars(mainSeq, inputVoiceDefs, barlineMsPositions, clefChangesPerBar, lyricsPerBar);
+			List<Bar> bars = GetBars(mainSeq, inputVoiceDefs, barlineMsPositions, clefChangesPerBar, null);
 
 			SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
@@ -45,54 +44,15 @@ namespace Moritz.Algorithm.PianolaMusic
 		}
 
 		/// <summary>
-		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
-		/// An empty clefChanges list of the returned type can be
-		///     1. created by calling the protected function GetEmptyClefChangesPerBar(int nBars, int nVoicesPerBar) and
-		///     2. populated with code such as clefChanges[barIndex][voiceIndex].Add(9, "t3"). 
-		/// The dictionary contains the index at which the clef will be inserted in the VoiceDef's IUniqueDefs,
-		/// and the clef ID string ("t", "t1", "b3" etc.).
-		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
-		/// the existing IUniqueDefs before which the clef will be inserted.
-		/// The SortedDictionaries should not contain the initial clefs per voiceDef - those will be included
-		/// automatically.
-		/// Note that a CautionaryChordDef counts as an IUniqueDef at the beginning of a bar, and that clefs
-		/// cannot be inserted in front of them.
-		/// Clefs should not be inserted here in the lower of two voices in a staff. Lower voices automatically have the
-		/// SmallClefs that are defined for the upper voice.
+		/// See summary and example code on abstract definition in CompositionAlogorithm.cs
 		/// </summary>
 		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
 		{
-			return null;
-			// test code...
-			// see Study3Sketch1Algorithm
-		}
-
-		/// <summary>
-		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
-		/// The dictionary contains the index of the IUniqueDef in the barat which the clef will be inserted in the VoiceDef's IUniquedefs,
-		/// and the clef ID string ("t", "t1", "b3" etc.).
-		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
-		/// the existing IUniqueDefs before which the clef will be inserted.
-		/// The SortedDictionaries should not contain tne initial clefs per voicedef - those will be included
-		/// automatically.
-		/// Note that both Clefs and a CautionaryChordDef at the beginning of a bar count as IUniqueDefs for
-		/// indexing purposes, and that lyrics cannot be attached to them.
-		/// </summary>
-		protected override List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars)
-		{
-			return null;
-			// test code...
-			//VoiceDef voiceDef0 = bars[0][0];
-			//MidiChordDef mcd1 = voiceDef0[2] as MidiChordDef;
-			//mcd1.Lyric = "lyric1";
-			//MidiChordDef mcd2 = voiceDef0[3] as MidiChordDef;
-			//mcd2.Lyric = "lyric2";
-			//MidiChordDef mcd3 = voiceDef0[4] as MidiChordDef;
-			//mcd3.Lyric = "lyric3";
+			return null;			
 		}
 
         // Returns two lists of ints. The first is contains the durations of the upper track, the second the lower.
-        private static List<List<int>> trackDurations(List<int> firstHalfUpperTrack)
+        private static List<List<int>> TrackDurations(List<int> firstHalfUpperTrack)
 		{
 			List<int> secondHalfUpperTrack = new List<int>(firstHalfUpperTrack);
 			secondHalfUpperTrack.Reverse();
@@ -103,14 +63,16 @@ namespace Moritz.Algorithm.PianolaMusic
 			List<int> upperTrackDurations = new List<int>(firstHalfUpperTrack);
 			upperTrackDurations.AddRange(secondHalfUpperTrack);
 
-			List<List<int>> rval = new List<List<int>>();
-			rval.Add(upperTrackDurations);
-			rval.Add(lowerTrackDurations);
+			List<List<int>> rval = new List<List<int>>
+			{
+				upperTrackDurations,
+				lowerTrackDurations
+			};
 
 			return rval;
 		}
 
-		private static List<int> trackPitches(List<int> first24Pitches)
+		private static List<int> TrackPitches(List<int> first24Pitches)
 		{
 			List<int> pitches = new List<int>(first24Pitches);
 			pitches.AddRange(first24Pitches);
@@ -138,8 +100,10 @@ namespace Moritz.Algorithm.PianolaMusic
 			{
 				List<byte> pitchesArg = new List<byte>() { (byte)pitches[i] };
 				int msDuration = durations[i] * durationFactor;
-                MidiChordDef midiChordDef = new MidiChordDef(pitchesArg, velocities, msDuration, true);
-                midiChordDef.MsPositionReFirstUD = msPosition;
+				MidiChordDef midiChordDef = new MidiChordDef(pitchesArg, velocities, msDuration, true)
+				{
+					MsPositionReFirstUD = msPosition
+				};
 				defs.Add(midiChordDef);
 				msPosition += msDuration;
 			}
@@ -154,9 +118,11 @@ namespace Moritz.Algorithm.PianolaMusic
 			List<IUniqueDef> t6MidiChordDefs = GetMidiChordDefs(lowerTrackPitches, durations[1]);
 			Trk trk6 = new Trk((byte)lowerChannel, 0, t6MidiChordDefs);
 
-			List<Trk> trks = new List<Trk>();
-			trks.Add(trk1);
-			trks.Add(trk6);
+			List<Trk> trks = new List<Trk>
+			{
+				trk1,
+				trk6
+			};
 
 			return trks;
 		}
@@ -168,11 +134,11 @@ namespace Moritz.Algorithm.PianolaMusic
 			List<int> first24Track1Pitches = new List<int>()
 				{ 20, 33, 59, 66, 46, 79, 85, 52, 72, 65, 39, 26,
 				  26, 85, 59, 52, 72, 39, 33, 66, 46, 65, 79, 20 };
-			List<int> t1Pitches = trackPitches(first24Track1Pitches);
+			List<int> t1Pitches = TrackPitches(first24Track1Pitches);
 			List<int> first24Track6Pitches = new List<int>()
 				{ 87, 28, 42, 61, 41, 74, 68, 35, 55, 48, 22, 81,
 				  81, 68, 42, 35, 55, 22, 28, 61, 41, 48, 74, 87 };
-			List<int> t6Pitches = trackPitches(first24Track6Pitches);
+			List<int> t6Pitches = TrackPitches(first24Track6Pitches);
 			#endregion pitches
 
 			#region durations
@@ -181,7 +147,7 @@ namespace Moritz.Algorithm.PianolaMusic
 				  11, 12, 2, 9, 1, 10, 4, 7, 3, 8, 6, 5,
 				  9, 12, 18, 3, 15, 6, 24, 33, 21, 36, 30, 27,
 				  80, 90, 110, 60, 100, 70, 10, 40, 120, 50, 30, 20 };
-			List<List<int>> durations = trackDurations(first48Track1Durations);
+			List<List<int>> durations = TrackDurations(first48Track1Durations);
 			#endregion durations
 
 			return GetTrks(0, t1Pitches, 5, t6Pitches, durations);
@@ -193,12 +159,12 @@ namespace Moritz.Algorithm.PianolaMusic
 			List<int> first24Track2Pitches = new List<int>()
 			{ 70, 57, 31, 24, 44, 83, 89, 50, 18, 37, 63, 76,
 			  76, 89, 31, 50, 18, 63, 57, 24, 44, 37, 83, 70 };
-			List<int> t2Pitches = trackPitches(first24Track2Pitches);
+			List<int> t2Pitches = TrackPitches(first24Track2Pitches);
 
 			List<int> first24Track5Pitches = new List<int>()
 			{ 37, 24, 70, 63, 83, 50, 44, 89, 57, 76, 18, 31,
 			  31, 44, 70, 89, 57, 18, 24, 63, 83, 76, 50, 37 };
-			List<int> t5Pitches = trackPitches(first24Track5Pitches);
+			List<int> t5Pitches = TrackPitches(first24Track5Pitches);
 			#endregion pitches
 
 			#region durations
@@ -207,7 +173,7 @@ namespace Moritz.Algorithm.PianolaMusic
 			  35, 40, 50, 25, 45, 30, 60, 15, 55, 20, 10, 5,
 			  77, 88, 110, 55, 99, 66, 132, 33, 121, 44, 22, 11,
 			  8, 10, 14, 4, 12, 6, 18, 24, 16, 2, 22, 20 };
-			List<List<int>> durations = trackDurations(first48Track2Durations);
+			List<List<int>> durations = TrackDurations(first48Track2Durations);
 			#endregion durations
 
 			return GetTrks(1, t2Pitches, 4, t5Pitches, durations);
@@ -219,12 +185,12 @@ namespace Moritz.Algorithm.PianolaMusic
 			List<int> first24Track3Pitches = new List<int>()
 			{ 42, 55, 81, 28, 68, 41, 35, 74, 22, 87, 61, 48,
 			  48, 35, 81, 74, 22, 61, 55, 28, 68, 87, 41, 42 };
-			List<int> t3Pitches = trackPitches(first24Track3Pitches);
+			List<int> t3Pitches = TrackPitches(first24Track3Pitches);
 
 			List<int> first24Track4Pitches = new List<int>()
 			{ 65, 66, 20, 39, 79, 52, 46, 85, 33, 26, 72, 59,
 			  59, 46, 20, 85, 33, 72, 66, 39, 79, 26, 52, 65 };
-			List<int> t4Pitches = trackPitches(first24Track4Pitches);
+			List<int> t4Pitches = TrackPitches(first24Track4Pitches);
 			#endregion pitches
 
 			#region durations
@@ -233,7 +199,7 @@ namespace Moritz.Algorithm.PianolaMusic
 			  81, 90, 108, 63, 99, 72, 18, 45, 9, 54, 36, 27,
 			  35, 42, 56, 21, 49, 28, 70, 7, 63, 14, 84, 77,
 			  36, 42, 54, 24, 48, 30, 66, 12, 60, 18, 6, 72 };
-			List<List<int>> durations = trackDurations(first48Track3Durations);
+			List<List<int>> durations = TrackDurations(first48Track3Durations);
 			#endregion durations
 
 			return GetTrks(2, t3Pitches, 3, t4Pitches, durations);

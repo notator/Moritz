@@ -73,7 +73,7 @@ namespace Moritz.Globals
         public string URL { get { return WindowsMediaPlayer.URL; } set { WindowsMediaPlayer.URL = value; } }
 
         private WindowsMediaPlayer WindowsMediaPlayer;
-        private HasStoppedEventHandler HasStopped;
+        private readonly HasStoppedEventHandler HasStopped;
     }
 
     public delegate void HasStoppedEventHandler();

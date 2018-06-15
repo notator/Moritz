@@ -15,22 +15,22 @@ namespace Moritz.Symbols
         }
 
         public TextFrameType FrameType { get { return _frameType; } }
-        private TextFrameType _frameType = TextFrameType.none;
+        private readonly TextFrameType _frameType = TextFrameType.none;
         
         public float PaddingX { get { return _paddingX; } }
-        private float _paddingX = 0F;
+        private readonly float _paddingX = 0F;
 
         public float PaddingY { get { return _paddingY; } }
-        private float _paddingY = 0F;
+        private readonly float _paddingY = 0F;
 
         public float StrokeWidth { get { return _strokeWidth; } }
-        private float _strokeWidth = 0F;
+        private readonly float _strokeWidth = 0F;
 
         /// <summary>
         /// A string of 6 Hex digits (RRGGBB).
         /// </summary>
         public ColorString ColorString { get { return _colorString; } }
-        private ColorString _colorString = null; 
+        private readonly ColorString _colorString = null; 
 
     }
 }

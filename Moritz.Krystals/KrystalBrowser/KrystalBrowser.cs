@@ -108,62 +108,61 @@ namespace Moritz.Krystals
             _ancestorsTreeView.AfterSelect += new TreeViewEventHandler(this.AncestorsTreeView_AfterSelect);
             this.splitContainer2.Panel1.Controls.Add(_ancestorsTreeView);
 
-            ConstantKrystal ck = _krystal as ConstantKrystal;
-            LineKrystal lk = _krystal as LineKrystal;
-            ExpansionKrystal xk = _krystal as ExpansionKrystal;
+			LineKrystal lk = _krystal as LineKrystal;
+			ExpansionKrystal xk = _krystal as ExpansionKrystal;
             ShapedExpansionKrystal sk = _krystal as ShapedExpansionKrystal;
             ModulationKrystal mk = _krystal as ModulationKrystal;
             PermutationKrystal pk = _krystal as PermutationKrystal;
 
-            if(ck != null)
-            {
-                this.BasicData.Text = string.Format("Constant Krystal: {0}   Level: {1}   Value: {2}",
-                    _krystal.Name, _krystal.Level.ToString(), _krystal.MaxValue.ToString());
-                SetForConstantKrystal();
-            }
-            else if(lk != null)
-            {
-                this.BasicData.Text = string.Format("Line Krystal: {0}    Level: {1}    Range of Values: {2}..{3}",
-                    _krystal.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
-                SetForLineKrystal();
-            }
-            else if(xk != null)
-            {
-                this.BasicData.Text = string.Format("Expansion Krystal: {0}   Expander: {1}   Level: {2}   Range of Values: {3}..{4}",
-                    _krystal.Name, xk.Expander.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
-                SetForExpansionKrystal(xk);
-            }
-            else if(sk != null)
-            {
-                this.BasicData.Text = string.Format("Shaped Expansion Krystal: {0}   Expander: {1}   Level: {2}   Range of Values: {3}..{4}",
-                    _krystal.Name, sk.Expander.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
-                SetForShapedExpansionKrystal(sk);
-            }
-            else if(mk != null)
-            {
-                this.BasicData.Text = string.Format("Modulation Krystal: {0}   Modulator: {1}   Level: {2}   Range of Values: {3}..{4}",
-                    _krystal.Name, mk.Modulator.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
-                SetForModulationKrystal(mk);
-            }
-            else if(pk != null)
-            {
-                string sortFirstString;
-                if(pk.SortFirst)
-                    sortFirstString = "true";
-                else
-                    sortFirstString = "false";
+			if(_krystal is ConstantKrystal ck)
+			{
+				this.BasicData.Text = string.Format("Constant Krystal: {0}   Level: {1}   Value: {2}",
+					_krystal.Name, _krystal.Level.ToString(), _krystal.MaxValue.ToString());
+				SetForConstantKrystal();
+			}
+			else if(lk != null)
+			{
+				this.BasicData.Text = string.Format("Line Krystal: {0}    Level: {1}    Range of Values: {2}..{3}",
+					_krystal.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
+				SetForLineKrystal();
+			}
+			else if(xk != null)
+			{
+				this.BasicData.Text = string.Format("Expansion Krystal: {0}   Expander: {1}   Level: {2}   Range of Values: {3}..{4}",
+					_krystal.Name, xk.Expander.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
+				SetForExpansionKrystal(xk);
+			}
+			else if(sk != null)
+			{
+				this.BasicData.Text = string.Format("Shaped Expansion Krystal: {0}   Expander: {1}   Level: {2}   Range of Values: {3}..{4}",
+					_krystal.Name, sk.Expander.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
+				SetForShapedExpansionKrystal(sk);
+			}
+			else if(mk != null)
+			{
+				this.BasicData.Text = string.Format("Modulation Krystal: {0}   Modulator: {1}   Level: {2}   Range of Values: {3}..{4}",
+					_krystal.Name, mk.Modulator.Name, _krystal.Level.ToString(), _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
+				SetForModulationKrystal(mk);
+			}
+			else if(pk != null)
+			{
+				string sortFirstString;
+				if(pk.SortFirst)
+					sortFirstString = "true";
+				else
+					sortFirstString = "false";
 
-                this.BasicData.Text = string.Format("Permutation Krystal: {0}   Level: {1}   pLevel: {2}   sortFirst: {3}   Range of Values: {4}..{5}",
-                    _krystal.Name, _krystal.Level.ToString(), pk.PermutationLevel.ToString(), sortFirstString, _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
-                SetForPermutationKrystal(pk);
-            }
-            else // _krystal == null
-            {
-                this.BasicData.Text = "";
-                SetForNoKrystal();
-            }
+				this.BasicData.Text = string.Format("Permutation Krystal: {0}   Level: {1}   pLevel: {2}   sortFirst: {3}   Range of Values: {4}..{5}",
+					_krystal.Name, _krystal.Level.ToString(), pk.PermutationLevel.ToString(), sortFirstString, _krystal.MinValue.ToString(), _krystal.MaxValue.ToString());
+				SetForPermutationKrystal(pk);
+			}
+			else // _krystal == null
+			{
+				this.BasicData.Text = "";
+				SetForNoKrystal();
+			}
 
-            if(_krystal != null)
+			if(_krystal != null)
             {
                 if(_selectedTreeView == null || _selectedTreeView.Equals(this._krystalFamilyTreeView) == false)
                     SelectNodeInFamilyTree(_krystal.Name);
@@ -407,14 +406,13 @@ namespace Moritz.Krystals
                 _previouslySelectedAncestorsNode.ForeColor = Color.FromKnownColor(System.Drawing.KnownColor.Black);
             }
 
-            AncestorsNode n = this._ancestorsTreeView.Nodes[0] as AncestorsNode;
-            if(n != null)
-            {
-                _previouslySelectedAncestorsNode = n;
-                n.BackColor = Color.FromKnownColor(System.Drawing.KnownColor.Highlight);
-                n.ForeColor = Color.FromKnownColor(System.Drawing.KnownColor.Window);
-            }
-        }
+			if(this._ancestorsTreeView.Nodes[0] is AncestorsNode n)
+			{
+				_previouslySelectedAncestorsNode = n;
+				n.BackColor = Color.FromKnownColor(System.Drawing.KnownColor.Highlight);
+				n.ForeColor = Color.FromKnownColor(System.Drawing.KnownColor.Window);
+			}
+		}
 
         private KrystalFamily _krystalFamily = null;
         private Krystal _krystal = null;

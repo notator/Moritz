@@ -45,7 +45,7 @@ namespace Moritz.Spec
 		}
 
 		public int MsPosition { get { return _trkMsPosition; } }
-        private int _trkMsPosition;
+        private readonly int _trkMsPosition;
 
 		private int _trkNumMidiObjects;
 		public TrkOptions TrkOptions = null;

@@ -133,25 +133,24 @@ namespace Krystals4ObjectLibrary
             int[] contour;
             for(int strandIndex = 0 ; strandIndex < _strands.Count ; strandIndex++)
             {
-                ContouredStrandNode contouredStrandNode = contouredStrandNodeList[strandIndex] as ContouredStrandNode;
-                if(contouredStrandNode != null
-                    && contouredStrandNode.strandDensity > 1
-                    && contouredStrandNode.strandDensity <= 7)
-                {
-                    int density = contouredStrandNode.strandDensity;
-                    contour = K.Contour(density, contouredStrandNode.strandContour, contouredStrandNode.strandAxis);
-                    _strands[strandIndex].Values.Sort();
-                    tempList.Clear();
-                    for(int j = 0 ; j < density ; j++)
-                    {
-                        tempList.Add(_strands[strandIndex].Values[contour[j]-1]);
-                    }
-                    for(int j = 0 ; j < density ; j++)
-                    {
-                        _strands[strandIndex].Values[j] = tempList[j];
-                    }
-                }
-            }
+				if(contouredStrandNodeList[strandIndex] is ContouredStrandNode contouredStrandNode
+					&& contouredStrandNode.strandDensity > 1
+					&& contouredStrandNode.strandDensity <= 7)
+				{
+					int density = contouredStrandNode.strandDensity;
+					contour = K.Contour(density, contouredStrandNode.strandContour, contouredStrandNode.strandAxis);
+					_strands[strandIndex].Values.Sort();
+					tempList.Clear();
+					for(int j = 0; j < density; j++)
+					{
+						tempList.Add(_strands[strandIndex].Values[contour[j] - 1]);
+					}
+					for(int j = 0; j < density; j++)
+					{
+						_strands[strandIndex].Values[j] = tempList[j];
+					}
+				}
+			}
         }
 
         #region private TrammelMark class

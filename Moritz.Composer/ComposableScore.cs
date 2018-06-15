@@ -144,19 +144,8 @@ namespace Moritz.Composer
 		private string CheckThatLowerVoicesHaveNoSmallClefs(IReadOnlyList<VoiceDef> voiceDefs)
 		{
 			string errorString = "";
-			List<int> lowerVoiceIndices = new List<int>();
-			int voiceIndex = 0;
-			List<List<byte>> outputChPerStaff = _pageFormat.OutputMIDIChannelsPerStaff;
-			List<List<byte>> inputChPerStaff = _pageFormat.InputMIDIChannelsPerStaff;
-			for(int staffIndex = 0; staffIndex < outputChPerStaff.Count; ++staffIndex)
-			{
-				if(outputChPerStaff[staffIndex].Count > 1)
-				{
-					voiceIndex++;
-					lowerVoiceIndices.Add(voiceIndex);
-				}
-				voiceIndex++;
-			}
+
+			List<int> lowerVoiceIndices = GetOutputAndInputLowerVoiceIndices();
 
 			foreach(int lowerVoiceIndex in lowerVoiceIndices)
 			{
@@ -174,6 +163,37 @@ namespace Moritz.Composer
 			}
 
 			return errorString;
+		}
+
+		private List<int> GetOutputAndInputLowerVoiceIndices()
+		{
+			List<int> lowerVoiceIndices = new List<int>();
+			int voiceIndex = 0;
+			
+			List<List<byte>> outputChPerStaff = _pageFormat.OutputMIDIChannelsPerStaff;
+
+			for(int staffIndex = 0; staffIndex < outputChPerStaff.Count; ++staffIndex)
+			{
+				if(outputChPerStaff[staffIndex].Count > 1)
+				{
+					voiceIndex++;
+					lowerVoiceIndices.Add(voiceIndex);
+				}
+				voiceIndex++;
+			}
+			List<List<byte>> inputChPerStaff = _pageFormat.InputMIDIChannelsPerStaff;
+			int nStaves = inputChPerStaff.Count + outputChPerStaff.Count;
+			for(int staffIndex = 0; staffIndex < inputChPerStaff.Count; ++staffIndex)
+			{
+				if(inputChPerStaff[staffIndex].Count > 1)
+				{
+					voiceIndex++;
+					lowerVoiceIndices.Add(voiceIndex);
+				}
+				voiceIndex++;
+			}
+
+			return lowerVoiceIndices;
 		}
 
 		private int NOutputVoices(List<VoiceDef> bar1)

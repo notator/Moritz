@@ -38,9 +38,11 @@ namespace Krystals4Application
                 if (constantKrystalFilepath.Length > 0)
                 {
                     ConstantKrystal constantKrystal = new ConstantKrystal(constantKrystalFilepath);
-                    NewConstantKrystalDialog dlg = new NewConstantKrystalDialog();
-                    dlg.Text = constantKrystal.Name;
-                    dlg.SetButtons();
+					NewConstantKrystalDialog dlg = new NewConstantKrystalDialog
+					{
+						Text = constantKrystal.Name
+					};
+					dlg.SetButtons();
                     dlg.ConstantKrystalValue = constantKrystal.MaxValue.ToString();
                     dlg.Show();
                 }
@@ -75,9 +77,11 @@ namespace Krystals4Application
                 if (lineKrystalFilepath.Length > 0)
                 {
                     LineKrystal lineKrystal = new LineKrystal(lineKrystalFilepath);
-                    NewLineKrystalDialog dlg = new NewLineKrystalDialog();
-                    dlg.Text = lineKrystal.Name;
-                    dlg.SetButtons();
+					NewLineKrystalDialog dlg = new NewLineKrystalDialog
+					{
+						Text = lineKrystal.Name
+					};
+					dlg.SetButtons();
                     dlg.LineKrystalValue = K.GetStringOfUnsignedInts(lineKrystal.Strands[0].Values);
                     dlg.Show();
                 }
@@ -182,9 +186,11 @@ namespace Krystals4Application
                                                    kd.YInputFilepath,
                                                    kd.ModulatorFilepath);
 
-                    ModulationEditor editor = new ModulationEditor(mKrystal);
-                    editor.EventHandler = new ModulationEditor.ModulationEditorEventHandler(HandleModulationEditorEvents);
-                    editor.Show();
+					ModulationEditor editor = new ModulationEditor(mKrystal)
+					{
+						EventHandler = new ModulationEditor.ModulationEditorEventHandler(HandleModulationEditorEvents)
+					};
+					editor.Show();
                 }
             }
         }
@@ -197,9 +203,11 @@ namespace Krystals4Application
                 {
                     ModulationKrystal outputKrystal = new ModulationKrystal(modulatedKrystalFilepath);
 
-                    ModulationEditor editor = new ModulationEditor(outputKrystal);
-                    editor.EventHandler = new ModulationEditor.ModulationEditorEventHandler(HandleModulationEditorEvents);
-                    editor.Show();
+					ModulationEditor editor = new ModulationEditor(outputKrystal)
+					{
+						EventHandler = new ModulationEditor.ModulationEditorEventHandler(HandleModulationEditorEvents)
+					};
+					editor.Show();
                 }
             }
             catch (ApplicationException ae)

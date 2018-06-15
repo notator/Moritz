@@ -55,16 +55,20 @@ namespace Krystals4ObjectLibrary
             string allConstants = "ck*.krys";
             foreach(FileInfo f in dir.GetFiles(allConstants))
             {
-                Dependency d = new Dependency();
-                d.Name = f.Name;
-                _dependencyList.Add(d);
+				Dependency d = new Dependency
+				{
+					Name = f.Name
+				};
+				_dependencyList.Add(d);
             }
             string allLines = "lk*.krys";
             foreach(FileInfo f in dir.GetFiles(allLines))
             {
-                Dependency d = new Dependency();
-                d.Name = f.Name;
-                _dependencyList.Add(d);
+				Dependency d = new Dependency
+				{
+					Name = f.Name
+				};
+				_dependencyList.Add(d);
             }
 
             #region add expansions to the _unknownParentsList
@@ -74,9 +78,11 @@ namespace Krystals4ObjectLibrary
             {
                 string path = K.KrystalsFolder + @"\" +  f.Name;
                 xk = new ExpansionKrystal(path);
-                Dependency d = new Dependency();
-                d.Name = f.Name;
-                if(xk != null)
+				Dependency d = new Dependency
+				{
+					Name = f.Name
+				};
+				if(xk != null)
                 {
                     d.Input1 = xk.DensityInputFilename;
                     d.Input2 = xk.PointsInputFilename;
@@ -93,9 +99,11 @@ namespace Krystals4ObjectLibrary
             {
                 string path = K.KrystalsFolder + @"\" +  f.Name;
                 sk = new ShapedExpansionKrystal(path);
-                Dependency d = new Dependency();
-                d.Name = f.Name;
-                if(sk != null)
+				Dependency d = new Dependency
+				{
+					Name = f.Name
+				};
+				if(sk != null)
                 {
                     d.Input1 = sk.DensityInputFilename;
                     d.Input2 = sk.PointsInputFilename;
@@ -114,9 +122,11 @@ namespace Krystals4ObjectLibrary
             {
                 string path = K.KrystalsFolder + @"\" + f.Name;
                 mk = new ModulationKrystal(path);
-                Dependency d = new Dependency();
-                d.Name = f.Name;
-                if(mk != null)
+				Dependency d = new Dependency
+				{
+					Name = f.Name
+				};
+				if(mk != null)
                 {
                     d.Input1 = mk.XInputFilename;
                     d.Input2 = mk.YInputFilename;
@@ -132,9 +142,11 @@ namespace Krystals4ObjectLibrary
             {
                 string path = K.KrystalsFolder + @"\" + f.Name;
                 pk = new PermutationKrystal(path);
-                Dependency d = new Dependency();
-                d.Name = f.Name;
-                if(pk != null)
+				Dependency d = new Dependency
+				{
+					Name = f.Name
+				};
+				if(pk != null)
                 {
                     d.Input1 = pk.SourceInputFilename;
                     d.Input2 = pk.AxisInputFilename;

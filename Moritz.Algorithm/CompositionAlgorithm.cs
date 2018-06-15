@@ -215,22 +215,59 @@ namespace Moritz.Algorithm
 		/// Clefs should not be inserted here in the lower of two voices in a staff. Lower voices automatically have the
 		/// SmallClefs that are defined for the upper voice.
 		/// </summary>
+		/// <example>
+		/// Example for Study3Sketch1Algorithm
+		/// var clefChangesPerBar = GetEmptyStringExtrasPerBar(nBars, nVoicesPerBar);
+		///
+		/// SortedDictionary;lt;int, string&gt; voiceDef0Bar0 = clefChangesPerBar[0][0];
+		/// voiceDef0Bar0.Add(9, "b3");
+		/// voiceDef0Bar0.Add(8, "b2");
+		/// voiceDef0Bar0.Add(6, "b");
+		/// voiceDef0Bar0.Add(4, "t2");
+		/// voiceDef0Bar0.Add(2, "t");
+		///
+		/// The following were redundant in this score, since they only apply to rests!
+		/// voiceDef0Bar0.Add(7, "b1");
+		/// voiceDef0Bar0.Add(5, "t3");
+		/// voiceDef0Bar0.Add(3, "t1");
+		///
+		/// return clefChangesPerBar;
+		/// </example>
 		protected abstract List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar);
 
 		/// <summary>
+		/// Lyrics can simply be attached to MidiChordDefs or InputChordDefs earlier in the algorithm, but this function
+		/// provides the possibility of adding them all in one place.
 		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
-		/// The dictionary contains the index of the IUniqueDef in the barat which the clef will be inserted in the VoiceDef's IUniquedefs,
-		/// and the clef ID string ("t", "t1", "b3" etc.).
-		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
-		/// the existing IUniqueDefs before which the clef will be inserted.
-		/// The SortedDictionaries should not contain tne initial clefs per voicedef - those will be included
-		/// automatically.
-		/// Note that both Clefs and a CautionaryChordDef at the beginning of a bar count as IUniqueDefs for
-		/// indexing purposes, and that lyrics cannot be attached to them.
+		/// The SortedDictionary contains the index of the MidiChordDef or InputChordDef in the bar to which the associated
+		/// lyric string will be attached. The index is of MidiChordDefs or InputChordDefs only, beginning with 0 for
+		/// the first MidiChordDef or InptChordDef in the bar.
+		/// Lyrics that are attached to top voices on a staff will, like dynamics, be automatically placed above the staff.
 		/// </summary>
-		protected abstract List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars);
+		/// <returns>null or a SortedDictionary per VoiceDef per bar</returns>
+		/// <example>
+		/// Example for Study3Sketch1Algorithm
+		/// var lyricsPerBar = GetEmptyStringExtrasPerBar(nBars, nVoicesPerBar);
+		///
+		/// SortedDictionary&lt;int, string&gt; bar2VoiceDef1 = lyricsPerBar[1][0]; // Bar 2 Voice 1.
+		/// bar2VoiceDef1.Add(9, "lyric9");
+		/// bar2VoiceDef1.Add(8, "lyric8");
+		/// bar2VoiceDef1.Add(6, "lyric6");
+		/// bar2VoiceDef1.Add(4, "lyric4");
+		/// bar2VoiceDef1.Add(2, "lyric2");
+		///
+		/// SortedDictionary&lt;int, string&gt; bar2VoiceDef2 = lyricsPerBar[1][1]; // Bar 2 Voice 2.
+		/// bar2VoiceDef2.Add(9, "lyric9a");
+		/// bar2VoiceDef2.Add(8, "lyric8a");
+		/// bar2VoiceDef2.Add(6, "lyric6a");
+		/// bar2VoiceDef2.Add(4, "lyric4a");
+		/// bar2VoiceDef2.Add(2, "lyric2a");
+		///
+		/// return lyricsPerBar;
+		/// </example>
+		protected virtual List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars, int nVoicesPerBar) { return null; }
 
-		protected List<List<SortedDictionary<int, string>>> GetEmptyClefChangesPerBar(int nBars, int nVoicesPerBar)
+		protected List<List<SortedDictionary<int, string>>> GetEmptyStringExtrasPerBar(int nBars, int nVoicesPerBar)
 		{
 			var rval = new List<List<SortedDictionary<int, string>>>();
 			for(int barIndex = 0; barIndex < nBars; ++barIndex )
@@ -435,22 +472,40 @@ namespace Moritz.Algorithm
 
 		private static void AddLyricsToVoiceDef(VoiceDef voiceDef, SortedDictionary<int, string> lyrics)
 		{
-			foreach(int key in lyrics.Keys)
+			if(lyrics.Count > 0)
 			{
-				IUniqueDef iud = voiceDef[key];
-				string lyric = lyrics[key];
-
-				if(iud is MidiChordDef mcd)
+				if(voiceDef is Trk)
 				{
-					mcd.Lyric = lyric;
-				}
-				else if(iud is InputChordDef icd)
-				{
-					icd.Lyric = lyric;
+					var mcds = new List<MidiChordDef>();
+					foreach(IUniqueDef iud in voiceDef.UniqueDefs)
+					{
+						if(iud is MidiChordDef mcd)
+						{
+							mcds.Add(mcd);
+						}
+					}
+					Debug.Assert(lyrics.Count <= mcds.Count);
+					foreach(int key in lyrics.Keys)
+					{
+						mcds[key].Lyric = lyrics[key];
+					}
 				}
 				else
 				{
-					Debug.Assert(false);
+					Debug.Assert(voiceDef is InputVoiceDef);
+					var icds = new List<InputChordDef>();
+					foreach(IUniqueDef iud in voiceDef.UniqueDefs)
+					{
+						if(iud is InputChordDef icd)
+						{
+							icds.Add(icd);
+						}
+					}
+					Debug.Assert(lyrics.Count <= icds.Count);
+					foreach(int key in lyrics.Keys)
+					{
+						icds[key].Lyric = lyrics[key];
+					}
 				}
 			}
 		}
@@ -588,9 +643,8 @@ namespace Moritz.Algorithm
 				VoiceDef remainingBarVoice;
 				foreach(VoiceDef voiceDef in bar.VoiceDefs)
 				{
-					Trk outputVoice = voiceDef as Trk;
 					InputVoiceDef inputVoice = voiceDef as InputVoiceDef;
-					if(outputVoice != null)
+					if(voiceDef is Trk outputVoice)
 					{
 						poppedBarVoice = new Trk(outputVoice.MidiChannel) { Container = poppedBar };
 						poppedBar.VoiceDefs.Add(poppedBarVoice);

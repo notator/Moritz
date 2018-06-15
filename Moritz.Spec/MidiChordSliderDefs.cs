@@ -82,9 +82,11 @@ namespace Moritz.Spec
         {
             if(ctlValues == null || ctlValues.Count == 0)
             {
-                ctlValues = new List<byte>();
-                ctlValues.Add((byte)defaultCtlState);
-            }
+				ctlValues = new List<byte>
+				{
+					(byte)defaultCtlState
+				};
+			}
             return ctlValues;
         }
 

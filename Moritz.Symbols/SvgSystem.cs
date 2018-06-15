@@ -468,37 +468,36 @@ namespace Moritz.Symbols
                     #region foreach noteObject
                     foreach(NoteObject noteObject in voice.NoteObjects)
                     {
-                        DurationSymbol durationSymbol = noteObject as DurationSymbol;
-                        if(durationSymbol == null)
-                        {
-                            if(noteObject is Clef)
-                                clef = noteObject as Clef;
-                            if(noteObject is Barline)
-                                barline = noteObject as Barline;
-                        }
-                        else
-                        {
-                            key = durationSymbol.AbsMsPosition;
+						if(!(noteObject is DurationSymbol durationSymbol))
+						{
+							if(noteObject is Clef)
+								clef = noteObject as Clef;
+							if(noteObject is Barline)
+								barline = noteObject as Barline;
+						}
+						else
+						{
+							key = durationSymbol.AbsMsPosition;
 
 							if(!dict.ContainsKey(key))
-                            {
-                                dict.Add(key, new NoteObjectMoment(durationSymbol.AbsMsPosition));
-                            }
+							{
+								dict.Add(key, new NoteObjectMoment(durationSymbol.AbsMsPosition));
+							}
 
-                            if(clef != null)
-                            {
-                                dict[key].Add(clef);
-                                clef = null;
-                            }
-                            if(barline != null)
-                            {
-                                dict[key].Add(barline);
-                                barline = null;
-                            }
+							if(clef != null)
+							{
+								dict[key].Add(clef);
+								clef = null;
+							}
+							if(barline != null)
+							{
+								dict[key].Add(barline);
+								barline = null;
+							}
 
-                            dict[key].Add(durationSymbol);
-                        }
-                    }
+							dict[key].Add(durationSymbol);
+						}
+					}
                     #endregion
 
                     if(clef != null) // final clef
@@ -982,14 +981,13 @@ namespace Moritz.Symbols
         /// <param name="gap"></param>
         private void RemoveCollision(BarnumberMetrics barnumberMetrics, DurationSymbol durationSymbol, float gap)
         {
-            ChordMetrics chordMetrics = durationSymbol.Metrics as ChordMetrics;
-            float verticalOverlap = 0F;
-            if(chordMetrics != null)
-            {
-                verticalOverlap = chordMetrics.OverlapHeight(barnumberMetrics, gap);
-            }
+			float verticalOverlap = 0F;
+			if(durationSymbol.Metrics is ChordMetrics chordMetrics)
+			{
+				verticalOverlap = chordMetrics.OverlapHeight(barnumberMetrics, gap);
+			}
 
-            if(durationSymbol.Metrics is RestMetrics restMetrics)
+			if(durationSymbol.Metrics is RestMetrics restMetrics)
             {
                 verticalOverlap = restMetrics.OverlapHeight(barnumberMetrics, gap);
                 if(verticalOverlap > 0)

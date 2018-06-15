@@ -24,12 +24,11 @@ namespace Moritz.Symbols
         /// </summary>
         public virtual void WriteStaffNameAndBarNumberSVG(SvgWriter w, bool staffIsVisible, bool isInput)
         {
-            BarlineMetrics barlineMetrics = Metrics as BarlineMetrics;
-            if(barlineMetrics != null && staffIsVisible)
-            {
-                barlineMetrics.WriteStaffNameAndBarNumberSVG(w, isInput);
-            }
-        }
+			if(Metrics is BarlineMetrics barlineMetrics && staffIsVisible)
+			{
+				barlineMetrics.WriteStaffNameAndBarNumberSVG(w, isInput);
+			}
+		}
 
         public override void WriteSVG(SvgWriter w, bool staffIsVisible)
         {

@@ -50,16 +50,15 @@ namespace Moritz.Symbols
             for(int i = 0; i < NoteObjects.Count; ++i)
             {
 				NoteObject noteObject = NoteObjects[i];
-                Barline barline = noteObject as Barline;
-                InputChordSymbol inputChordSymbol = noteObject as InputChordSymbol;
-                InputRestSymbol inputRestSymbol = noteObject as InputRestSymbol;
+				InputChordSymbol inputChordSymbol = noteObject as InputChordSymbol;
+				InputRestSymbol inputRestSymbol = noteObject as InputRestSymbol;
                 CautionaryChordSymbol cautionaryChordSymbol = noteObject as CautionaryChordSymbol;
                 OutputChordSymbol outputChordSymbol = noteObject as OutputChordSymbol;
                 OutputRestSymbol outputRestSymbol = noteObject as OutputRestSymbol;
 				Clef clef = noteObject as Clef;
 				SmallClef smallClef = noteObject as SmallClef;
 
-				if(barline != null)
+				if(noteObject is Barline barline)
 				{
 					if(staffIsVisible && barline.IsVisible)
 					{
@@ -245,16 +244,15 @@ namespace Moritz.Symbols
 
             foreach(NoteObject noteObject in NoteObjects)
             {
-                CautionaryChordSymbol cautionaryChord = noteObject as CautionaryChordSymbol;
-                ChordSymbol chord = noteObject as ChordSymbol;
-                RestSymbol rest = noteObject as RestSymbol;
+				ChordSymbol chord = noteObject as ChordSymbol;
+				RestSymbol rest = noteObject as RestSymbol;
                 Clef clef = noteObject as Clef;
                 Barline barline = noteObject as Barline;
 
-                if(cautionaryChord != null)
-                    continue;
+				if(noteObject is CautionaryChordSymbol cautionaryChord)
+					continue;
 
-                if(chord != null)
+				if(chord != null)
                 {
                     if(chord.DurationClass == DurationClass.cautionary
                     || chord.DurationClass == DurationClass.breve
@@ -381,10 +379,9 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject noteObject in NoteObjects)
                 {
-                    AnchorageSymbol iHasDrawObjects = noteObject as AnchorageSymbol;
-                    if(iHasDrawObjects != null)
-                        yield return iHasDrawObjects;
-                }
+					if(noteObject is AnchorageSymbol iHasDrawObjects)
+						yield return iHasDrawObjects;
+				}
             }
         }
         public IEnumerable DurationSymbols
@@ -393,10 +390,9 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject noteObject in NoteObjects)
                 {
-                    DurationSymbol durationSymbol = noteObject as DurationSymbol;
-                    if(durationSymbol != null)
-                        yield return durationSymbol;
-                }
+					if(noteObject is DurationSymbol durationSymbol)
+						yield return durationSymbol;
+				}
             }
         }
         public IEnumerable ChordSymbols
@@ -405,10 +401,9 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject noteObject in NoteObjects)
                 {
-                    ChordSymbol chordSymbol = noteObject as ChordSymbol;
-                    if(chordSymbol != null)
-                        yield return chordSymbol;
-                }
+					if(noteObject is ChordSymbol chordSymbol)
+						yield return chordSymbol;
+				}
             }
         }
         public IEnumerable RestSymbols
@@ -417,10 +412,9 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject noteObject in NoteObjects)
                 {
-                    RestSymbol restSymbol = noteObject as RestSymbol;
-                    if(restSymbol != null)
-                        yield return restSymbol;
-                }
+					if(noteObject is RestSymbol restSymbol)
+						yield return restSymbol;
+				}
             }
         }
 
@@ -434,7 +428,7 @@ namespace Moritz.Symbols
         #endregion
         #region element fields
         public List<NoteObject> NoteObjects { get { return _noteObjects; } }
-        private List<NoteObject> _noteObjects = new List<NoteObject>();
+        private readonly List<NoteObject> _noteObjects = new List<NoteObject>();
         #endregion
         #endregion
         #region moritz-specific fields

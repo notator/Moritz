@@ -1014,25 +1014,24 @@ namespace Moritz.Symbols
                         {
                             Debug.Assert(!(voice.NoteObjects[i] is Barline));
 
-                            RestSymbol rest1 = voice.NoteObjects[i] as RestSymbol;
-                            RestSymbol rest2 = voice.NoteObjects[i + 1] as RestSymbol;
-                            if(rest1 != null && rest2 != null)
-                            {
-                                if(!consecutiveRestIndexList.Contains(i))
-                                {
-                                    consecutiveRestIndexList.Add(i);
-                                }
-                                consecutiveRestIndexList.Add(i + 1);
-                            }
-                            else
-                            {
-                                if(consecutiveRestIndexList != null && consecutiveRestIndexList.Count > 0)
-                                {
-                                    restIndexLists.Add(consecutiveRestIndexList);
-                                    consecutiveRestIndexList = new List<int>();
-                                }
-                            }
-                        }
+							RestSymbol rest2 = voice.NoteObjects[i + 1] as RestSymbol;
+							if(voice.NoteObjects[i] is RestSymbol rest1 && rest2 != null)
+							{
+								if(!consecutiveRestIndexList.Contains(i))
+								{
+									consecutiveRestIndexList.Add(i);
+								}
+								consecutiveRestIndexList.Add(i + 1);
+							}
+							else
+							{
+								if(consecutiveRestIndexList != null && consecutiveRestIndexList.Count > 0)
+								{
+									restIndexLists.Add(consecutiveRestIndexList);
+									consecutiveRestIndexList = new List<int>();
+								}
+							}
+						}
                         #endregion
                         #region replace the consecutive rests
                         if(restIndexLists.Count > 0)

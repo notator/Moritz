@@ -46,9 +46,11 @@ namespace Moritz.Spec
                 IUniqueDef clone = (IUniqueDef) iu.Clone();
                 clonedLmdds.Add(clone);
             }
-            var ivd = new InputVoiceDef(this.MidiChannel, this.MsPositionReContainer, clonedLmdds);
-            ivd.Container = this.Container; 
-            return ivd;
+			var ivd = new InputVoiceDef(this.MidiChannel, this.MsPositionReContainer, clonedLmdds)
+			{
+				Container = this.Container
+			};
+			return ivd;
         }
 		#endregion constructors
 
@@ -181,23 +183,22 @@ namespace Moritz.Spec
 
             for(int i = 0; i < lmdds.Count; ++i)
             {
-                InputRestDef umrd = lmdds[i] as InputRestDef;
-                if(umrd != null)
-                {
-                    restStartMsPosReFirstIUD = lmdds[i].MsPositionReFirstUD;
-                    restEndMsPosReFirstIUD = lmdds[i].MsPositionReFirstUD + lmdds[i].MsDuration;
+				if(lmdds[i] is InputRestDef umrd)
+				{
+					restStartMsPosReFirstIUD = lmdds[i].MsPositionReFirstUD;
+					restEndMsPosReFirstIUD = lmdds[i].MsPositionReFirstUD + lmdds[i].MsDuration;
 
-                    if(startMsPos >= restStartMsPosReFirstIUD && endMsPos <= restEndMsPosReFirstIUD)
-                    {
-                        index = i;
-                        break;
-                    }
-                    if(startMsPos < restStartMsPosReFirstIUD)
-                    {
-                        break;
-                    }
-                }
-            }
+					if(startMsPos >= restStartMsPosReFirstIUD && endMsPos <= restEndMsPosReFirstIUD)
+					{
+						index = i;
+						break;
+					}
+					if(startMsPos < restStartMsPosReFirstIUD)
+					{
+						break;
+					}
+				}
+			}
 
             return index;
         }

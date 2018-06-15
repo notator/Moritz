@@ -180,11 +180,13 @@ namespace Krystals4ObjectLibrary
 
             if(!equivalentExists && (File.Exists(pathname) == false || overwrite))
             {
-                XmlWriterSettings settings = new XmlWriterSettings();
-                settings.Indent = true;
-                settings.IndentChars = ("\t");
-                settings.CloseOutput = true;
-                string namePath = K.ExpansionOperatorsFolder + @"\" + _name;
+				XmlWriterSettings settings = new XmlWriterSettings
+				{
+					Indent = true,
+					IndentChars = ("\t"),
+					CloseOutput = true
+				};
+				string namePath = K.ExpansionOperatorsFolder + @"\" + _name;
                 using(XmlWriter w = XmlWriter.Create(namePath, settings))
                 {
                     w.WriteStartDocument();
@@ -235,11 +237,10 @@ namespace Krystals4ObjectLibrary
         /// <returns></returns>
         public int CompareTo(object other)
         {
-            Expander otherExpander = other as Expander;
-            if(otherExpander == null)
-                throw new ArgumentException();
+			if(!(other is Expander otherExpander))
+				throw new ArgumentException();
 
-            bool inputGametesAreEquivalent = false;
+			bool inputGametesAreEquivalent = false;
             bool outputGametesAreEquivalent = false;
             Expander thisIN = this;
             Expander thisOUT = this;
@@ -583,10 +584,12 @@ namespace Krystals4ObjectLibrary
             _expansionDensityInputKrystal = expansionDensityInputKrystal;
             for(int i = 0 ; i < startMoments.Count ; i++)
             {
-                PointGroup sp = new PointGroup(planetValue);
-                sp.Shape = K.PointGroupShape.spiral; // default value for planet subpaths
-                sp.StartMoment = startMoments[i];
-                if(i < startMoments.Count - 1)
+				PointGroup sp = new PointGroup(planetValue)
+				{
+					Shape = K.PointGroupShape.spiral, // default value for planet subpaths
+					StartMoment = startMoments[i]
+				};
+				if(i < startMoments.Count - 1)
                     sp.Count = startMoments[i + 1] - startMoments[i];
                 else sp.Count = expansionDensityInputKrystal.NumValues - startMoments[i] + 1;
                 this.AddSubpath(sp);
@@ -1027,12 +1030,14 @@ namespace Krystals4ObjectLibrary
         /// <returns>The cloned point group.</returns>
         public PointGroup Clone()
         {
-            PointGroup p = new PointGroup();
-            p.Shape = _shape;
-            p.Count = _count;
-            p.StartMoment = _startMoment; // not stored in XML
-            p.Color = _color;
-            foreach(uint v in _value)
+			PointGroup p = new PointGroup
+			{
+				Shape = _shape,
+				Count = _count,
+				StartMoment = _startMoment, // not stored in XML
+				Color = _color
+			};
+			foreach(uint v in _value)
                 p.Value.Add(v);
             p.FromRadius = _fromRadius;
             p.FromAngle = _fromAngle;
@@ -1079,7 +1084,7 @@ namespace Krystals4ObjectLibrary
                         float a = p.FromAngle + (angleDistanceFactor * (relPos[i + firstPointIndex] - relPos[firstPointIndex]));
                         a += p.RotateAngle;
                         PointR rp = new PointR(p.FromRadius, a);
-                        rp.shift(p.TranslateRadius, p.TranslateAngle);
+                        rp.Shift(p.TranslateRadius, p.TranslateAngle);
                         userRadialCoordinates.Add(rp);
                     }
                     break;
@@ -1094,7 +1099,7 @@ namespace Krystals4ObjectLibrary
                         float a = p.FromAngle + (distanceFactorA * (relPos[i + firstPointIndex] - relPos[firstPointIndex]));
                         a += p.RotateAngle;
                         PointR rp = new PointR(r, a);
-                        rp.shift(p.TranslateRadius, p.TranslateAngle);
+                        rp.Shift(p.TranslateRadius, p.TranslateAngle);
                         userRadialCoordinates.Add(rp);
                     }
                     break;
@@ -1102,9 +1107,9 @@ namespace Krystals4ObjectLibrary
                 #region straight line
                 case K.PointGroupShape.straightLine:
                     PointR startPR = new PointR(p.FromRadius, p.FromAngle + p.RotateAngle);
-                    startPR.shift(p.TranslateRadius, p.TranslateAngle);
+                    startPR.Shift(p.TranslateRadius, p.TranslateAngle);
                     PointR endPR = new PointR(p.ToRadius, p.ToAngle + p.RotateAngle);
-                    endPR.shift(p.TranslateRadius, p.TranslateAngle);
+                    endPR.Shift(p.TranslateRadius, p.TranslateAngle);
                     float startX = startPR.X;
                     float startY = startPR.Y;
                     float endX = endPR.X;
@@ -1160,7 +1165,7 @@ namespace Krystals4ObjectLibrary
                     for(int i = 0 ; i < this.Count ; i++)
                     {
                         PointR rp = new PointR(this.FromRadius, this.FromAngle + (angleDelta * i) + this.RotateAngle);
-                        rp.shift(this.TranslateRadius, this.TranslateAngle);
+                        rp.Shift(this.TranslateRadius, this.TranslateAngle);
                         userRadialCoordinates.Add(rp);
                     }
                     break;
@@ -1174,15 +1179,15 @@ namespace Krystals4ObjectLibrary
                     {
                         PointR rp = new PointR(this.FromRadius + (radiusDelta * i),
                                                 this.FromAngle + (angleDelta * i) + this.RotateAngle);
-                        rp.shift(this.TranslateRadius, this.TranslateAngle);
+                        rp.Shift(this.TranslateRadius, this.TranslateAngle);
                         userRadialCoordinates.Add(rp);
                     }
                     break;
                 case K.PointGroupShape.straightLine:
                     PointR startPR = new PointR(this.FromRadius, this.FromAngle + this.RotateAngle);
-                    startPR.shift(this.TranslateRadius, this.TranslateAngle);
+                    startPR.Shift(this.TranslateRadius, this.TranslateAngle);
                     PointR endPR = new PointR(this.ToRadius, this.ToAngle + this.RotateAngle);
-                    endPR.shift(this.TranslateRadius, this.TranslateAngle);
+                    endPR.Shift(this.TranslateRadius, this.TranslateAngle);
                     float startX = startPR.X;
                     float startY = startPR.Y;
                     float endX = endPR.X;

@@ -45,7 +45,7 @@ namespace Krystals4ObjectLibrary
         #endregion Properties
         #region private variables
         private uint _level;
-        private List<uint> _values = new List<uint>();
+        private readonly List<uint> _values = new List<uint>();
         #endregion private variables
     }
 }

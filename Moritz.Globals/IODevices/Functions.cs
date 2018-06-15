@@ -39,7 +39,7 @@ namespace Moritz.Globals.IODevices
         /// </summary>
         /// <returns></returns>
         [DllImport("winmm.dll")]
-        internal static extern UInt32 midiInGetNumDevs();
+        internal static extern UInt32 MidiInGetNumDevs();
 
         /// <summary>
         /// Queries a specified MIDI input device to determine its capabilities.
@@ -53,6 +53,6 @@ namespace Moritz.Globals.IODevices
         /// <param name="cbMidiOutCaps">Size, in bytes, of the MIDIINCAPS structure.</param>
         /// <returns>Result of the operation.</returns>
         [DllImport("winmm.dll")]
-        internal static extern UInt32 midiInGetDevCaps(Int32 uDeviceID, ref MIDIINCAPS lpMidiInCaps, UInt32 cbMidiInCaps);
+        internal static extern UInt32 MidiInGetDevCaps(Int32 uDeviceID, ref MIDIINCAPS lpMidiInCaps, UInt32 cbMidiInCaps);
     }
 }

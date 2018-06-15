@@ -67,6 +67,6 @@ namespace Moritz.Midi
         protected int _msPosition = 0;
         protected int _msDuration = 0;
         protected int _channelIndex = -1;
-        private int _startTimeMilliseconds = -1; // error value
+        private readonly int _startTimeMilliseconds = -1; // error value
     }
 }

@@ -93,23 +93,19 @@ namespace Moritz.Spec
 		{
 			foreach(TrkOption opt in optList)
 			{
-				PedalControl pto = opt as PedalControl;
-				if(pto != null)
+				if(opt is PedalControl pto)
 				{
 					Add(pto);
 				}
-				SpeedControl sc = opt as SpeedControl;
-				if(sc != null)
+				if(opt is SpeedControl sc)
 				{
 					Add(sc);
 				}
-				TrkOffControl toto = opt as TrkOffControl;
-				if(toto != null)
+				if(opt is TrkOffControl toto)
 				{
 					Add(toto);
 				}
-				VelocityTrkOption vto = opt as VelocityTrkOption;
-				if(vto != null)
+				if(opt is VelocityTrkOption vto)
 				{
 					Add(vto);
 				}
@@ -176,7 +172,7 @@ namespace Moritz.Spec
 		}
 		
 		public PedalOption PedalOption {get{return _pedalOption;}}
-		private PedalOption _pedalOption;
+		private readonly PedalOption _pedalOption;
 	}
 
 	public class SpeedControl:TrkOption
@@ -188,7 +184,7 @@ namespace Moritz.Spec
 			_speedFactor = speedFactor;
 		}
 		public float SpeedFactor { get { return _speedFactor; } }
-		private float _speedFactor;
+		private readonly float _speedFactor;
 	}
 
 	public enum TrkOffOption
@@ -207,7 +203,7 @@ namespace Moritz.Spec
 		}
 
 		public TrkOffOption TrkOffOption { get { return _trkOffOption; } }
-		private TrkOffOption _trkOffOption;
+		private readonly TrkOffOption _trkOffOption;
 	}
 
 	public enum VelocityOption
@@ -228,9 +224,9 @@ namespace Moritz.Spec
 		}
 
 		public VelocityOption VelocityOption { get { return _velocityOption; } }
-		private VelocityOption _velocityOption;
+		private readonly VelocityOption _velocityOption;
 		public byte MinimumVelocity { get { return _minVelocity; } }
-		private byte _minVelocity;
+		private readonly byte _minVelocity;
 	}
 	public class VelocityScaledControl : VelocityTrkOption
 	{

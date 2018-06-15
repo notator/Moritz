@@ -367,7 +367,7 @@ namespace Moritz.Symbols
 				}
 			}
 		}
-		private float _ledgerlineStub;
+		private readonly float _ledgerlineStub;
 		private bool _ledgerlineVisible = false;
 		private LedgerlineBlockMetrics _ledgerlineBlockMetrics = null;
 	}
