@@ -60,62 +60,43 @@ namespace Moritz.Algorithm.Study3Sketch1
         }
 
 		/// <summary>
-		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
-		/// An empty clefChanges list of the returned type can be
-		///     1. created by calling the protected function GetEmptyClefChangesPerBar(int nBars, int nVoicesPerBar) and
-		///     2. populated with code such as clefChanges[barIndex][voiceIndex].Add(9, "t3"). 
-		/// The dictionary contains the index at which the clef will be inserted in the VoiceDef's IUniqueDefs,
-		/// and the clef ID string ("t", "t1", "b3" etc.).
-		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
-		/// the existing IUniqueDefs before which the clef will be inserted.
-		/// The SortedDictionaries should not contain the initial clefs per voiceDef - those will be included
-		/// automatically.
-		/// Note that a CautionaryChordDef counts as an IUniqueDef at the beginning of a bar, and that clefs
-		/// cannot be inserted in front of them.
-		/// Clefs should not be inserted here in the lower of two voices in a staff. Lower voices automatically have the
-		/// SmallClefs that are defined for the upper voice.
+		/// See summary and example code on abstract definition in CompositionAlogorithm.cs
 		/// </summary>
 		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
 		{
 			return null;
-
-			//var clefChangesPerBar = GetEmptyStringExtrasPerBar(nBars, nVoicesPerBar);
-
-			//SortedDictionary<int, string> voiceDef0Bar0 = clefChangesPerBar[0][0];
-			//voiceDef0Bar0.Add(9, "b3");
-			//voiceDef0Bar0.Add(8, "b2");
-			//voiceDef0Bar0.Add(6, "b");
-			//voiceDef0Bar0.Add(4, "t2");
-			//voiceDef0Bar0.Add(2, "t");
-
-			//// The following were redundant in this score, since they only apply to rests!
-			//// voiceDef0Bar0.Add(7, "b1");
-			//// voiceDef0Bar0.Add(5, "t3");
-			//// voiceDef0Bar0.Add(3, "t1");
-
-			//return clefChangesPerBar;
 		}
 
 		/// <summary>
+		/// Lyrics can be attached to MidiChordDefs or InputChordDefs earlier in the algorithm, but this function
+		/// provides the possibility of adding them all in one place.
 		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
-		/// The dictionary contains the index of the IUniqueDef in the bar to which the associated lyric string
-		/// will be attached. The index begins at 0 at the beginning of each bar (immediately after the barline).
-		/// Lyrics may not be attached to a voice if there are two voices on the staff.
+		/// The dictionary contains the index of the MidiChordDef or InputChordDef in the bar to which the associated
+		/// lyric string will be attached. The index is of MidiChordDefs or InputChordDefs only, beginning with 0 for
+		/// the first MidiChordDef or InptChordDef in the bar.
+		/// Lyrics that are attached to top voices on a staff will, like dynamics, be automatically placed above the staff.
 		/// </summary>
 		protected override List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars, int nVoicesPerBar)
 		{
-			//return null;
-
 			var lyricsPerBar = GetEmptyStringExtrasPerBar(nBars, nVoicesPerBar);
-
-			SortedDictionary<int, string> voiceDef0Bar0 = lyricsPerBar[0][0];
-			voiceDef0Bar0.Add(9, "lyric9");
-			voiceDef0Bar0.Add(8, "lyric8");
-			voiceDef0Bar0.Add(6, "lyric6");
-			voiceDef0Bar0.Add(4, "lyric4");
-			voiceDef0Bar0.Add(2, "lyric2");
+			
+			SortedDictionary<int, string> bar2VoiceDef1 = lyricsPerBar[1][0]; // Bar 2 Voice 1.
+			bar2VoiceDef1.Add(9, "lyric9");
+			bar2VoiceDef1.Add(8, "lyric8");
+			bar2VoiceDef1.Add(6, "lyric6");
+			bar2VoiceDef1.Add(4, "lyric4");
+			bar2VoiceDef1.Add(2, "lyric2");
+			
+			SortedDictionary<int, string> bar2VoiceDef2 = lyricsPerBar[1][1]; // Bar 2 Voice 2.
+			bar2VoiceDef2.Add(9, "lyric9a");
+			bar2VoiceDef2.Add(8, "lyric8a");
+			bar2VoiceDef2.Add(6, "lyric6a");
+			bar2VoiceDef2.Add(4, "lyric4a");
+			bar2VoiceDef2.Add(2, "lyric2a");
 
 			return lyricsPerBar;
+
+			// return null;
 		}
 
 		#region CreateBar1Seq()

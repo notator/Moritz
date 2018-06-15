@@ -43,45 +43,11 @@ namespace Moritz.Algorithm.Study1
 		}
 
 		/// <summary>
-		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
-		/// An empty clefChanges list of the returned type can be
-		///     1. created by calling the protected function GetEmptyClefChangesPerBar(int nBars, int nVoicesPerBar) and
-		///     2. populated with code such as clefChanges[barIndex][voiceIndex].Add(9, "t3"). 
-		/// The dictionary contains the index at which the clef will be inserted in the VoiceDef's IUniqueDefs,
-		/// and the clef ID string ("t", "t1", "b3" etc.).
-		/// Clefs will be inserted in reverse order of the Sorted dictionary, so that the indices are those of
-		/// the existing IUniqueDefs before which the clef will be inserted.
-		/// The SortedDictionaries should not contain the initial clefs per voiceDef - those will be included
-		/// automatically.
-		/// Note that a CautionaryChordDef counts as an IUniqueDef at the beginning of a bar, and that clefs
-		/// cannot be inserted in front of them.
-		/// Clefs should not be inserted here in the lower of two voices in a staff. Lower voices automatically have the
-		/// SmallClefs that are defined for the upper voice.
+		/// See summary and example code on abstract definition in CompositionAlogorithm.cs
 		/// </summary>
 		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
 		{
 			return null;
-			// test code...
-			// see Study3Sketch1Algorithm
-		}
-
-		/// <summary>
-		/// This function returns null or a SortedDictionary per VoiceDef in each bar.
-		/// The dictionary contains the index of the IUniqueDef in the bar to which the associated lyric string
-		/// will be attached. The index begins at 0 at the beginning of each bar (immediately after the barline).
-		/// Lyrics may not be attached to a voice if there are two voices on the staff.
-		/// </summary>
-		protected override List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars, int nVoicesPerBar)
-		{
-			return null;
-			// test code...
-			//VoiceDef voiceDef0 = bars[0][0];
-			//MidiChordDef mcd1 = voiceDef0[2] as MidiChordDef;
-			//mcd1.Lyric = "lyric1";
-			//MidiChordDef mcd2 = voiceDef0[3] as MidiChordDef;
-			//mcd2.Lyric = "lyric2";
-			//MidiChordDef mcd3 = voiceDef0[4] as MidiChordDef;
-			//mcd3.Lyric = "lyric3";
 		}
 
 		private List<byte> GetTrackChordNumbers()
