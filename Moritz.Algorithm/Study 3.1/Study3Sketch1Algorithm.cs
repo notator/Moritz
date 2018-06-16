@@ -78,25 +78,25 @@ namespace Moritz.Algorithm.Study3Sketch1
 		/// </summary>
 		protected override List<List<SortedDictionary<int, string>>> GetLyricsPerBar(int nBars, int nVoicesPerBar)
 		{
-			var lyricsPerBar = GetEmptyStringExtrasPerBar(nBars, nVoicesPerBar);
+			//var lyricsPerBar = GetEmptyStringExtrasPerBar(nBars, nVoicesPerBar);
 			
-			SortedDictionary<int, string> bar2VoiceDef1 = lyricsPerBar[1][0]; // Bar 2 Voice 1.
-			bar2VoiceDef1.Add(9, "lyric9");
-			bar2VoiceDef1.Add(8, "lyric8");
-			bar2VoiceDef1.Add(6, "lyric6");
-			bar2VoiceDef1.Add(4, "lyric4");
-			bar2VoiceDef1.Add(2, "lyric2");
+			//SortedDictionary<int, string> bar2VoiceDef1 = lyricsPerBar[1][0]; // Bar 2 Voice 1.
+			//bar2VoiceDef1.Add(9, "lyric9");
+			//bar2VoiceDef1.Add(8, "lyric8");
+			//bar2VoiceDef1.Add(6, "lyric6");
+			//bar2VoiceDef1.Add(4, "lyric4");
+			//bar2VoiceDef1.Add(2, "lyric2");
 			
-			SortedDictionary<int, string> bar2VoiceDef2 = lyricsPerBar[1][1]; // Bar 2 Voice 2.
-			bar2VoiceDef2.Add(9, "lyric9a");
-			bar2VoiceDef2.Add(8, "lyric8a");
-			bar2VoiceDef2.Add(6, "lyric6a");
-			bar2VoiceDef2.Add(4, "lyric4a");
-			bar2VoiceDef2.Add(2, "lyric2a");
+			//SortedDictionary<int, string> bar2VoiceDef2 = lyricsPerBar[1][1]; // Bar 2 Voice 2.
+			//bar2VoiceDef2.Add(9, "lyric9a");
+			//bar2VoiceDef2.Add(8, "lyric8a");
+			//bar2VoiceDef2.Add(6, "lyric6a");
+			//bar2VoiceDef2.Add(4, "lyric4a");
+			//bar2VoiceDef2.Add(2, "lyric2a");
 
-			return lyricsPerBar;
+			//return lyricsPerBar;
 
-			// return null;
+			return null;
 		}
 
 		#region CreateBar1Seq()
