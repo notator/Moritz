@@ -910,31 +910,39 @@ namespace Moritz.Symbols
             }
             Debug.Assert(qBeam != null);
 
-            float heightDiff = qBeam.LeftTopY - qBeam.RightTopY; // N.B. old bug. This value should be positive!
+			List<HLine> outerEdge = new List<HLine>();
+			float hlineY = 0F;
+			if(_stemDirection == VerticalDir.up)
+				hlineY = qBeam.LeftTopY;
+			else
+				hlineY = qBeam.LeftTopY + _beamThickness;
 
-            float stepHeight = (_beamThickness * 0.2F);
-            int nSteps = (int)(heightDiff / stepHeight);
-            if(nSteps < 0)
-                nSteps *= -1;
-            stepHeight = heightDiff / nSteps;
-            float stepWidth = (_right - _left) / nSteps;
+			float heightDiff = qBeam.LeftTopY - qBeam.RightTopY;
+			//float heightDiff = qBeam.RightTopY - qBeam.LeftTopY;
+			float stepHeight = (_beamThickness * 0.2F);
+			int nSteps = (int) Math.Round(heightDiff / stepHeight);
+			if(nSteps == 0)
+			{
+				outerEdge.Add(new HLine(_left, _right, hlineY));
+			}
+			else
+			{
+				if(nSteps < 0)
+					nSteps *= -1;
+				stepHeight = heightDiff / nSteps;
 
-            float left = _left;
-            float top = 0F;
-            if(_stemDirection == VerticalDir.up)
-                top = qBeam.LeftTopY;
-            else
-                top = qBeam.LeftTopY + _beamThickness;
+				float stepWidth = (_right - _left) / nSteps;
+				float left = _left;
+				float tanAlpha = stepHeight / stepWidth;
 
-            float tanAlpha = stepHeight / stepWidth;
+				for(int i = 0; i < nSteps; i++)
+				{
+					outerEdge.Add(new HLine(left, left + stepWidth, hlineY));
+					left += stepWidth;
+					hlineY -= (stepWidth * tanAlpha);
+				}
+			}
 
-            List<HLine> outerEdge = new List<HLine>();
-            for(int i = 0; i < nSteps; i++)
-            {
-                outerEdge.Add(new HLine(left, left + stepWidth, top));
-                left += stepWidth;
-                top -= (stepWidth * tanAlpha);
-            }
             return outerEdge;
         }
 

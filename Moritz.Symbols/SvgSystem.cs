@@ -107,7 +107,7 @@ namespace Moritz.Symbols
                                     // draw grouping barlines between staves
                                     if(barlineContinuesDownList[staffIndex] || isFirstBarline)
                                     {
-                                        float top = bottomEdge.YatX(barline.Metrics.OriginX);
+                                        float top = bottomEdge.YatX(barline.Metrics.OriginX) - pageFormat.StafflineStemStrokeWidth;
                                         float bottom = topEdge.YatX(barline.Metrics.OriginX);
                                         bool isLastNoteObject = (i == (voice.NoteObjects.Count - 1));
                                         barline.WriteSVG(w, top, bottom, pageFormat.StafflineStemStrokeWidth, isLastNoteObject);

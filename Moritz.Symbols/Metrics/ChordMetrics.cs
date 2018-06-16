@@ -1637,7 +1637,7 @@ namespace Moritz.Symbols
             #region BeamBlock
             if(BeamBlock != null)
             {
-                List<HLine> hLines = this.BeamBlock.OuterEdge();
+                List<HLine> hLines = BeamBlock.OuterEdge();
                 if(topEdge != null)
                 {
                     foreach(HLine hLine in hLines)
