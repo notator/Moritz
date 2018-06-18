@@ -29,17 +29,18 @@ namespace Moritz.Algorithm.Study2
             _krystals = krystals;
             _palettes = palettes;
 
-            List<Trk> sequentialStaff1Bars = WriteTopStaff();
-            List<Trk> sequentialStaff2Bars = WriteLowerStaff(2, sequentialStaff1Bars);
-            List<Trk> sequentialStaff3Bars = WriteLowerStaff(3, sequentialStaff1Bars);
-            Debug.Assert((sequentialStaff1Bars.Count == sequentialStaff2Bars.Count) 
-                      && (sequentialStaff1Bars.Count == sequentialStaff3Bars.Count));
+            List<Trk> sequentialMainStaffBars = WriteMainStaff();
+            List<Trk> sequentialStaff2Bars = WriteOtherStaff(2, sequentialMainStaffBars);
+            List<Trk> sequentialStaff1Bars = WriteOtherStaff(1, sequentialMainStaffBars);
+            Debug.Assert((sequentialMainStaffBars.Count == sequentialStaff2Bars.Count) 
+                      && (sequentialMainStaffBars.Count == sequentialStaff1Bars.Count));
 
-			List<int> barlineMsPositions = GetBarlinePositions(sequentialStaff1Bars);
+			List<int> barlineMsPositions = GetBarlinePositions(sequentialMainStaffBars);
 
 			Trk mainTrk1 = GetMainTrk(sequentialStaff1Bars);
 			Trk mainTrk2 = GetMainTrk(sequentialStaff2Bars);
-			Trk mainTrk3 = GetMainTrk(sequentialStaff3Bars);
+			Trk mainTrk3 = GetMainTrk(sequentialMainStaffBars);
+
 
 			List<Trk> trks = new List<Trk>()
 				{
@@ -90,14 +91,14 @@ namespace Moritz.Algorithm.Study2
 			return null;
 		}
 
-		private List<Trk> WriteTopStaff()
+		private List<Trk> WriteMainStaff()
         {
             List<Trk> consecutiveBars = new List<Trk>();
             List<List<int>> dcValuesPerTopStaffBar = _krystals[0].GetValues(_krystals[0].Level);
             int msPosition = 0;
             for(int barIndex = 0; barIndex < dcValuesPerTopStaffBar.Count; barIndex++)
             {
-                Trk trk = new Trk(0, 0, new List<IUniqueDef>());
+                Trk trk = new Trk(2, 0, new List<IUniqueDef>());
                 List<int> sequence = dcValuesPerTopStaffBar[barIndex];
                 WriteDurationSymbolsForStrandInTopStaff(trk, barIndex, sequence, ref msPosition);
                 consecutiveBars.Add(trk);
@@ -118,18 +119,18 @@ namespace Moritz.Algorithm.Study2
             }
         }
 
-        private List<Trk> WriteLowerStaff(int staffNumber, List<Trk> topStaffBars)
+        private List<Trk> WriteOtherStaff(int staffNumber, List<Trk> topStaffBars)
         {
             List<Trk> consecutiveBars = new List<Trk>();
-            Krystal krystal = _krystals[staffNumber - 1];
-            Palette palette = _palettes[staffNumber - 1];
+			Krystal krystal = _krystals[(staffNumber == 2) ? 1 : 2];
+            Palette palette = _palettes[(staffNumber == 2) ? 1 : 2];
             List<List<int>> strandValuesList = krystal.GetValues(krystal.Level);
             Debug.Assert(topStaffBars.Count == strandValuesList.Count);
 
             for(int barIndex = 0; barIndex < strandValuesList.Count; barIndex++)
             {
                 Trk topStaffTrk =  topStaffBars[barIndex];
-				Trk newTrk = new Trk(staffNumber-1, 0, new List<IUniqueDef>());
+				Trk newTrk = new Trk((staffNumber == 2) ? 1 : 0, 0, new List<IUniqueDef>());
                 int currentMsPositionReFirstIUD = topStaffTrk.UniqueDefs[0].MsPositionReFirstUD;
 
                 List<int> lowerStaffValueSequence = strandValuesList[barIndex];
