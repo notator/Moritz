@@ -99,9 +99,9 @@ namespace Moritz.Algorithm.Study3Sketch2
 				MsPositionReContainer = bar1Seq.AbsMsPosition
 			};
 
-			Trk trk0 = bar1Seq.Trks[0];
+			Trk trk7 = bar1Seq.Trks[7];
 
-            foreach(IUniqueDef tIud in trk0)
+            foreach(IUniqueDef tIud in trk7)
             {
 				MidiChordDef chordDef = tIud as MidiChordDef;
 				if(tIud is MidiRestDef restDef)
@@ -140,9 +140,11 @@ namespace Moritz.Algorithm.Study3Sketch2
 			};
 
 			int inputChordDefMsDurations = 0;
-            foreach(Trk trk in bar2Seq.Trks)
+			for(int trkIndex = bar2Seq.Trks.Count - 1; trkIndex >= 0; --trkIndex)
             {
-                MidiChordDef firstMidiChordDef = null;
+				Trk trk = bar2Seq.Trks[trkIndex];
+
+				MidiChordDef firstMidiChordDef = null;
                 TrkOptions trkOptions = new TrkOptions(new TrkOffControl(TrkOffOption.stopChord));
                 foreach(IUniqueDef iud in trk.UniqueDefs)
                 {
@@ -282,15 +284,15 @@ namespace Moritz.Algorithm.Study3Sketch2
         {
             List<Trk> bar = new List<Trk>();
 
-            byte channel = 0;
-            int endBarlineMsPos = 0;
+			byte channel = (byte)(_palettes.Count - 1);
+			int endBarlineMsPos = 0;
             foreach(Palette palette in _palettes)
             {
                 Trk trk = new Trk(channel, 0, new List<IUniqueDef>());
                 bar.Add(trk);
                 WriteVoiceMidiDurationDefs1(trk, palette);
                 endBarlineMsPos = (endBarlineMsPos > trk.MsDuration) ? endBarlineMsPos : trk.MsDuration;
-                channel++;
+                channel--;
             }
 
             //bar[0].InsertClefDef(5, "t");
@@ -325,14 +327,14 @@ namespace Moritz.Algorithm.Study3Sketch2
         {
             List<Trk> bar = new List<Trk>();
 
-            byte channel = 0;
-            foreach(Palette palette in _palettes)
+			byte channel = (byte)(_palettes.Count - 1);
+			foreach(Palette palette in _palettes)
             {
                 Trk trk = palette.NewTrk(channel);
                 trk.MsPositionReContainer = 0;
                 trk.MsDuration = 6000; // stretches or compresses the trk duration to 6000ms
                 bar.Add(trk);
-                ++channel;
+                channel--;
             }
 
             int maxMsPosReBar = 0;

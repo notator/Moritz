@@ -104,13 +104,13 @@ namespace Moritz.Algorithm.Study3Sketch1
         {
             List<Trk> bar = new List<Trk>();
 
-            byte channel = 0;
+            byte channel = (byte)(_palettes.Count - 1);
             foreach(Palette palette in _palettes)
             {
                 Trk trk = new Trk(channel, 0, new List<IUniqueDef>());
                 bar.Add(trk);
                 WriteVoiceMidiDurationDefs1(trk, palette);
-                channel++;
+                channel--;
             }
 
             Seq seq = new Seq(0, bar, MidiChannelPerOutputVoice);
@@ -143,14 +143,14 @@ namespace Moritz.Algorithm.Study3Sketch1
         {
             List<Trk> bar = new List<Trk>();
 
-            byte channel = 0;
-            foreach(Palette palette in _palettes)
+			byte channel = (byte)(_palettes.Count - 1);
+			foreach(Palette palette in _palettes)
             {
                 Trk trk = palette.NewTrk(channel);
                 trk.MsPositionReContainer = 0;
                 trk.MsDuration = 6000; // stretches or compresses the trk duration to 6000ms
                 bar.Add(trk);
-                ++channel;
+                channel--;
             }
 
             int maxMsPosReBar = 0;
