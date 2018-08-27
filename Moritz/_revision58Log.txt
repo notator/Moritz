@@ -58,17 +58,17 @@ Minor correction to Moritz' About dialog.
 24.06.2012 rev58.193
 Finally got Scores displaying in Firefox. In response to an answer at the SVG forum, I have removed "www." from all
 the URLs having to do SVG files and fonts:
-Moritz now writes the fontsStyleSheet's address as http://james-ingram-act-two.de/fontsStyleSheet.css
+Moritz now writes the fontsStyleSheet's address as https://james-ingram-act-two.de/fontsStyleSheet.css
 in both SvgScore.WriteHTMLScoreHead() and SvgPage.WriteSvgPageHeader().
 The @font-face file on my website no longer uses 'www.' either. It now contains:
 	/*---------------------------------------------------------------------*/
 	@font-face {
 		font-family: 'CLicht';
-		src: url('http://james-ingram-act-two.de/fonts/clicht_plain-webfont.eot'); /* IE9 Compat Modes */	
-		src: url('http://james-ingram-act-two.de/fonts/clicht_plain-webfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
-		url('http://james-ingram-act-two.de/fonts/clicht_plain-webfont.woff') format('woff'), /* Modern Browsers */ 
-		url('http://james-ingram-act-two.de/fonts/clicht_plain-webfont.ttf') format('truetype'), /* Safari, Android, iOS */ 
-		url('http://james-ingram-act-two.de/fonts/clicht_plain-webfont.svg#webfontl9D2oOyX') format('svg'); /* Legacy iOS */
+		src: url('https://james-ingram-act-two.de/fonts/clicht_plain-webfont.eot'); /* IE9 Compat Modes */	
+		src: url('https://james-ingram-act-two.de/fonts/clicht_plain-webfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+		url('https://james-ingram-act-two.de/fonts/clicht_plain-webfont.woff') format('woff'), /* Modern Browsers */ 
+		url('https://james-ingram-act-two.de/fonts/clicht_plain-webfont.ttf') format('truetype'), /* Safari, Android, iOS */ 
+		url('https://james-ingram-act-two.de/fonts/clicht_plain-webfont.svg#webfontl9D2oOyX') format('svg'); /* Legacy iOS */
 		font-weight: normal;
 		font-style: normal;
 	}
@@ -137,7 +137,7 @@ really added correctly.
 
 06.03.2012 rev58.180
 In SvgPage.WriteSvgPageHeader() moved xmlns score to
-http://www.james-ingram-act-two.de/open-source/svgScoreExtensions.html
+https://www.james-ingram-act-two.de/open-source/svgScoreExtensions.html
 
 06.03.2012 rev58.179
 The "chord", "midi" and "graphics" elements associated with ChordSymbols are now saved with three ids having 
@@ -195,7 +195,7 @@ moritz folder will be copied to repository/examples.
 (inside Moritz' solution folder) containing Multimedia.dll, Multimedia.Midi.dll and a README.txt containing
 the copyright notice and notes about the various Toolkit versions. Moritz' projects refer to these .dlls.
 This should make keeping a Tortoise repository simpler. The full V4 Toolkit code can be added on demand.
-2. Moved the XMLSchemas folder online to http://james-ingram-act-two.de/moritz/XMLSchemas. That's the best 
+2. Moved the XMLSchemas folder online to https://james-ingram-act-two.de/moritz/XMLSchemas. That's the best 
 place for it! removed it from Preferences and from the "_user files" folder.
 
 25.02.2012 rev58.171
@@ -1283,10 +1283,10 @@ website Moritz version).(See the same function in StandardChordNotator.cs)
 Implemented the following solution for the (Firefox) @fontface problem (Firefox was not finding CLicht)
 by changing Moritz' score writing functions appropriately. Tested (locally) and working for Studies 3b2 and 3b3.:
 1. In fontStyleSheet.css, changed the local (smiley) option to point to the local (.woff) font file in the fonts directory. 
-1. Moved the fonts folder in the website from "compositions" to the http://www.james-ingram-act-two.de folder (1 folder up).
-2. Put fontStyleSheet.css in http://www.james-ingram-act-two.de too.
+1. Moved the fonts folder in the website from "compositions" to the https://www.james-ingram-act-two.de folder (1 folder up).
+2. Put fontStyleSheet.css in https://www.james-ingram-act-two.de too.
 3. Deleted compositions/fontStyleSheet.css and compositions/study2/fontStyleSheet.css from both local and online sites.
-4. Used absolute addressing (http://www.james-ingram-act-two.de/fontsStyleSheet.css) to address the style sheet in all
+4. Used absolute addressing (https://www.james-ingram-act-two.de/fontsStyleSheet.css) to address the style sheet in all
    the Study 2b2 and 2b3 .svg and .html files.
 The scores of Studies 2b2 and 2b3 have been tested and are now working with this scheme both locally and online.
 

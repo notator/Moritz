@@ -267,7 +267,7 @@ namespace Moritz
 			this.OnlineXMLSchemasFolderInfoLabel.Name = "OnlineXMLSchemasFolderInfoLabel";
 			this.OnlineXMLSchemasFolderInfoLabel.Size = new System.Drawing.Size(287, 13);
 			this.OnlineXMLSchemasFolderInfoLabel.TabIndex = 2;
-			this.OnlineXMLSchemasFolderInfoLabel.Text = "http://james-ingram-act-two.de/open-source/XMLSchemas";
+			this.OnlineXMLSchemasFolderInfoLabel.Text = "https://james-ingram-act-two.de/open-source/XMLSchemas";
 			// 
 			// MidiOutputDeviceLabel
 			// 

@@ -224,7 +224,7 @@ namespace Moritz.Symbols
 
             // Standard definition of the "score" namespace.
             // The file documents the additional attributes and elements available in the "score" namespace.
-            w.WriteAttributeString("xmlns", "score", null, "http://www.james-ingram-act-two.de/open-source/svgScoreExtensions.html");
+            w.WriteAttributeString("xmlns", "score", null, "https://www.james-ingram-act-two.de/open-source/svgScoreExtensions.html");
 
             // The file defines and documents all the element classes used in this particular scoreType.
             // The definitions include information as to how the classes nest, and the directions in which they are read.
@@ -234,7 +234,7 @@ namespace Moritz.Symbols
             // 2) cmn_1950.html files might include elements having class="tupletBracket", but
             //    cmn_core files don't. As with the score namespace, the file does not actually
             //    need to be read by the client code in order to discover the scoreType. 
-            w.WriteAttributeString("data-scoreType", null, "http://www.james-ingram-act-two.de/open-source/cmn_core.html");
+            w.WriteAttributeString("data-scoreType", null, "https://www.james-ingram-act-two.de/open-source/cmn_core.html");
 
             w.WriteAttributeString("width", M.FloatToShortString(_pageFormat.ScreenRight)); // the intended screen display size (100%)
             w.WriteAttributeString("height", M.FloatToShortString(_pageFormat.ScreenBottom)); // the intended screen display size (100%)

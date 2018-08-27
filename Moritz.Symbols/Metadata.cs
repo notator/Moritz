@@ -75,7 +75,7 @@ namespace Moritz.Symbols
 			w.WriteEndElement(); // ends the dc:creator element
 
 			w.WriteStartElement("dc", "source", null);
-			w.WriteString("Website: http://www.james-ingram-act-two.de");
+			w.WriteString("Website: https://www.james-ingram-act-two.de");
 			w.WriteEndElement(); // ends the dc:source element
 
 			if(!string.IsNullOrEmpty(Keywords))
@@ -108,7 +108,7 @@ namespace Moritz.Symbols
 			w.WriteEndElement(); // ends the dc:description element
 
 			string contributor = "Originally created using Assistant Composer software:" +
-							"\nhttp://james-ingram-act-two.de/moritz3/assistantComposer/assistantComposer.html" +
+							"\nhttps://james-ingram-act-two.de/moritz3/assistantComposer/assistantComposer.html" +
 							"\nAnnotations, if there are any, have been made using Inkscape.";
 			w.WriteStartElement("dc", "contributor", null);
 			w.WriteStartElement("cc", "Agent", null);

@@ -41,7 +41,7 @@ namespace Moritz
 			try
 			{
 				WebsiteLinkLabel.LinkVisited = true;
-                System.Diagnostics.Process.Start("http://james-ingram-act-two.de/impressum/curriculumVitae.html");
+                System.Diagnostics.Process.Start("https://james-ingram-act-two.de/impressum/curriculumVitae.html");
 			}
 			catch
 			{
@@ -55,11 +55,11 @@ namespace Moritz
 			try
 			{
 				LeslieSanfordLinkLabel.LinkVisited = true;
-				System.Diagnostics.Process.Start("http://www.codeproject.com/KB/audio-video/MIDIToolkit.aspx");
+				System.Diagnostics.Process.Start("https://www.codeproject.com/KB/audio-video/MIDIToolkit.aspx");
 			}
 			catch
 			{
-                string msg = "Unable to open http://www.codeproject.com/KB/audio-video/MIDIToolkit.aspx";
+                string msg = "Unable to open https://www.codeproject.com/KB/audio-video/MIDIToolkit.aspx";
  				MessageBox.Show(msg, "error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 			}
 

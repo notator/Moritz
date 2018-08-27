@@ -174,7 +174,7 @@ namespace Moritz.Globals
 		public string LocalMoritzScoresFolder { get { return LocalMoritzFolderLocation + @"\Visual Studio\Projects\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores"; } }
 		#endregion folders in the LocalMoritzFolder
 		#region online folders
-		public string OnlineXMLSchemasFolder { get { return "http://james-ingram-act-two.de/open-source/XMLSchemas"; } }
+		public string OnlineXMLSchemasFolder { get { return "https://james-ingram-act-two.de/open-source/XMLSchemas"; } }
 		#endregion online folders
 
 		/// <summary>
