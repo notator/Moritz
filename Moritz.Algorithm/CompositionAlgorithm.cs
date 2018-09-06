@@ -99,7 +99,9 @@ namespace Moritz.Algorithm
 
         }
 
-        protected Palette GetPaletteByName(string paletteName)
+		public virtual ScoreData SetScoreData(List<Bar> bars) { return null; }
+
+		protected Palette GetPaletteByName(string paletteName)
         {
             Debug.Assert(_palettes != null && _palettes.Count > 0);
             Palette rval = null;

@@ -115,7 +115,7 @@ namespace Moritz.Symbols
         /// Writes this page.
         /// </summary>
         /// <param name="w"></param>
-        public void WriteSVG(SvgWriter w, Metadata metadata)
+        public void WriteSVG(SvgWriter w, Metadata metadata, bool isSinglePageScore)
         {
 			int nOutputVoices = 0;
 			int nInputVoices = 0;
@@ -131,6 +131,11 @@ namespace Moritz.Symbols
 			metadata.WriteSVG(w, _pageNumber, _score.PageCount, _pageFormat.AboutLinkURL, nOutputVoices, nInputVoices);
 
             _score.WriteDefs(w, _pageNumber);
+
+			if(isSinglePageScore)
+			{
+				_score.WriteScoreData(w);
+			}
 
 			#region layers
 

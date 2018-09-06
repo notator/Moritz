@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 using Krystals4ObjectLibrary;
 using Moritz.Palettes;
 using Moritz.Spec;
+using Moritz.Symbols;
 
 namespace Moritz.Algorithm.Tombeau1
 {
@@ -450,6 +452,34 @@ namespace Moritz.Algorithm.Tombeau1
 			return bars;
         }
 
+		public override ScoreData SetScoreData(List<Bar> bars)
+		{
+			ScoreCoordinates startCs = new ScoreCoordinates(bars, 0, 3, 0);
+			ScoreCoordinates endCs = new ScoreCoordinates(bars, 0, 3, 12);
+			RegionDef rd1 = new RegionDef('a', startCs, endCs);
+
+			startCs = new ScoreCoordinates(bars, 0, 3, 5);
+			endCs = new ScoreCoordinates(bars, 0, 3, 15);
+			RegionDef rd2 = new RegionDef('b', startCs, endCs);
+
+
+			startCs = new ScoreCoordinates(bars, 0, 3, 8);
+			endCs = new ScoreCoordinates(bars, 0, 3, 30);
+			RegionDef rd3 = new RegionDef('c', startCs, endCs);
+
+			startCs = new ScoreCoordinates(bars, 0, 3, 5);
+			//endCs = new ScoreCoordinates(bars); // sets msPos to msPosition of final barline
+			endCs = new ScoreCoordinates(bars, 4, 3, 0);
+			RegionDef rd4 = new RegionDef('d', startCs, endCs);
+
+			List<RegionDef> regionDefs = new List<RegionDef>() { rd1, rd2, rd3, rd4 };
+
+			Regions regions = new Regions(regionDefs, "adbca");
+
+			ScoreData scoreData = new ScoreData(regions);
+
+			return scoreData;
+		}
 
 		#region available Trk and ModeGrpTrk transformations
 		// Add();

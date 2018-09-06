@@ -138,16 +138,25 @@ namespace Moritz.Symbols
 
                 pageFilenames.Add(pageFilename);
 
-                SaveSVGPage(pagePath, page, this.Metadata);
+                SaveSVGPage(pagePath, page, this.Metadata, false);
                 pageNumber++;
             }
 
             return pageFilenames;
         }
-        /// <summary>
-        /// Writes an SVG file containing one page of the score.
-        /// </summary>
-        public void SaveSVGPage(string pagePath, SvgPage page, Metadata metadata)
+
+		internal void WriteScoreData(SvgWriter w)
+		{
+			if(_scoreData != null)
+			{
+				this._scoreData.WriteSVG(w);
+			}
+		}
+
+		/// <summary>
+		/// Writes an SVG file containing one page of the score.
+		/// </summary>
+		public void SaveSVGPage(string pagePath, SvgPage page, Metadata metadata, bool isSinglePageScore)
         {
             if(File.Exists(pagePath))
             {
@@ -166,7 +175,7 @@ namespace Moritz.Symbols
 
             using(SvgWriter w = new SvgWriter(pagePath, settings))
             {
-                page.WriteSVG(w, metadata);
+                page.WriteSVG(w, metadata, isSinglePageScore);
             }
         }
 
@@ -179,7 +188,7 @@ namespace Moritz.Symbols
 			w.SvgEndDefs(); // end of defs
 		}
 
-        private void WriteStyle(SvgWriter w, int pageNumber)
+		private void WriteStyle(SvgWriter w, int pageNumber)
 		{
             StringBuilder css = GetStyles(_pageFormat, pageNumber);
 
@@ -949,7 +958,7 @@ namespace Moritz.Symbols
 
 			SvgPage singlePage = new SvgPage(this, _pageFormat, 0, infoTextInfo, this.Systems, true);
 
-			SaveSVGPage(pagePath, singlePage, this.Metadata);
+			SaveSVGPage(pagePath, singlePage, this.Metadata, true);
 		}
 
 
@@ -1634,6 +1643,8 @@ namespace Moritz.Symbols
         protected PageFormat _pageFormat = null;
 
         public Notator Notator = null;
+
+		protected ScoreData _scoreData = null;
 
         /// <summary>
         /// Needed while creating the PerformanceOptionsDialog

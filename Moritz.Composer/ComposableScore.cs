@@ -30,6 +30,8 @@ namespace Moritz.Composer
 
 			CheckBars(bars);
 
+			this._scoreData = _algorithm.SetScoreData(bars);
+
 			InsertInitialClefDefs(bars, _pageFormat.InitialClefPerMIDIChannel);
 
 			CreateEmptySystems(bars); // one system per bar
