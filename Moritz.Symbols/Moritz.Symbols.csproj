@@ -64,7 +64,7 @@
     <Compile Include="Metrics\SystemMetrics.cs" />
     <Compile Include="PageFormat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScoreCoordinates.cs" />
+    <Compile Include="BarlinesMsPositions.cs" />
     <Compile Include="ScoreData.cs" />
     <Compile Include="Regions.cs" />
     <Compile Include="SvgPage.cs" />

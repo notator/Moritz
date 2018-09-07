@@ -442,7 +442,7 @@ namespace Moritz.Algorithm.Tombeau1
 				#endregion
 			}
 
-			List<int> barlineMsPositions = GetBarlinePositions(voice1, voice2, voice3, voice4);
+			List<int> barlineMsPositions = GetBarlinePositions(voice1);
 
 			//Do global changes that affect the whole piece here (accel., rit, transpositions etc.)
 			FinalizeMainSeq(mainSeq);
@@ -454,23 +454,16 @@ namespace Moritz.Algorithm.Tombeau1
 
 		public override ScoreData SetScoreData(List<Bar> bars)
 		{
-			ScoreCoordinates startCs = new ScoreCoordinates(bars, 0, 3, 0);
-			ScoreCoordinates endCs = new ScoreCoordinates(bars, 0, 3, 12);
-			RegionDef rd1 = new RegionDef('a', startCs, endCs);
+			BarlinesMsPositions b1 = new BarlinesMsPositions(bars, 0);
+			BarlinesMsPositions b2 = new BarlinesMsPositions(bars, 1);
+			BarlinesMsPositions b3 = new BarlinesMsPositions(bars, 10);
+			BarlinesMsPositions b4 = new BarlinesMsPositions(bars, 15);
+			BarlinesMsPositions b5 = new BarlinesMsPositions(bars, 30);
 
-			startCs = new ScoreCoordinates(bars, 0, 3, 5);
-			endCs = new ScoreCoordinates(bars, 0, 3, 15);
-			RegionDef rd2 = new RegionDef('b', startCs, endCs);
-
-
-			startCs = new ScoreCoordinates(bars, 0, 3, 8);
-			endCs = new ScoreCoordinates(bars, 0, 3, 30);
-			RegionDef rd3 = new RegionDef('c', startCs, endCs);
-
-			startCs = new ScoreCoordinates(bars, 0, 3, 5);
-			//endCs = new ScoreCoordinates(bars); // sets msPos to msPosition of final barline
-			endCs = new ScoreCoordinates(bars, 4, 3, 0);
-			RegionDef rd4 = new RegionDef('d', startCs, endCs);
+			RegionDef rd1 = new RegionDef('a', b1, b1);
+			RegionDef rd2 = new RegionDef('b', b3, b4);
+			RegionDef rd3 = new RegionDef('c', b2, b4);
+			RegionDef rd4 = new RegionDef('d', b1, b5);
 
 			List<RegionDef> regionDefs = new List<RegionDef>() { rd1, rd2, rd3, rd4 };
 
@@ -519,33 +512,19 @@ namespace Moritz.Algorithm.Tombeau1
 		/// There is a barline at the end of each voice1 modeSegment.
 		/// All the returned barline positions are unique, and in ascending order.
 		/// </summary>
-		private List<int> GetBarlinePositions(Voice1 voice1, Voice2 voice2, Voice3 voice3, Voice4 voice4)
+		private List<int> GetBarlinePositions(Tombeau1Voice voice1)
 		{
-			List<int> barlinePositions = new List<int>() { 0 }; // entry is removed just before this function returns
+			var msValuesListList = voice1.GetMsValuesOfModeGrpTrks();
 
-			List<int> voice1BarlinePositions = voice1.BarlineMsPositions();
-			barlinePositions.AddRange(voice1BarlinePositions);
-			if(voice2 != null)
-			{
-				List<int> voice2BarlinePositions = voice2.BarlineMsPositions();
-				barlinePositions.AddRange(voice2BarlinePositions);
-			}
-			if(voice3 != null)
-			{
-				List<int> voice3BarlinePositions = voice3.BarlineMsPositions();
-				barlinePositions.AddRange(voice3BarlinePositions);
-			}
-			if(voice4 != null)
-			{
-				List<int> voice4BarlinePositions = voice4.BarlineMsPositions();
-				barlinePositions.AddRange(voice4BarlinePositions);
-			}
+			List<int> barlinePositions = new List<int>(); // entry is removed just before this function returns
 
-			RemoveDuplicates(barlinePositions);
-			barlinePositions.Remove(0);
-			barlinePositions.Sort();			
-
-			Debug.Assert(barlinePositions[0] != 0);
+			foreach(IReadOnlyList<MsValues> msValuesList in msValuesListList)
+			{
+				foreach(MsValues msValues in msValuesList)
+				{
+					barlinePositions.Add(msValues.EndMsPosition);
+				}
+			}
 
 			return barlinePositions;
 		}

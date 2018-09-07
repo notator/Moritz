@@ -664,36 +664,6 @@ namespace Moritz.Algorithm.Tombeau1
 			throw new NotImplementedException();
 		}
 
-		public override List<int> BarlineMsPositions()
-		{
-			List<int> v1BarlinePositions = new List<int>();
-
-			var msValuesListList = GetMsValuesOfModeGrpTrks();
-
-			for(int i = 0; i < msValuesListList.Count; ++i)
-			{
-				var msValuesList = msValuesListList[i];
-				MsValues lastMsValues = msValuesList[msValuesList.Count - 1];
-
-				v1BarlinePositions.Add(lastMsValues.EndMsPosition);
-			}
-
-			#region insert intermediate barline positions
-			//List<int> midBarlinePositions = new List<int>
-			//{
-			//	MidBarlineMsPos(msValuesListList, 1),
-			//	MidBarlineMsPos(msValuesListList, 10),
-			//	MidBarlineMsPos(msValuesListList, 12)
-			//};
-			//foreach(int b in midBarlinePositions)
-			//{
-			//	v1BarlinePositions.Add(b);
-			//}
-			#endregion
-
-			return v1BarlinePositions;
-		}
-
 		public Mode RootMode { get; }
 		public List<ModeSegment> BasicModeSegments { get; private set; }
 		public List<Envelope> TimeWarpPerIUDEnvelopePerModeSegment { get; private set; }
