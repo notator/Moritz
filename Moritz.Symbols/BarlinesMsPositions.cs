@@ -9,12 +9,13 @@ namespace Moritz.Symbols
 	public class BarlinesMsPositions
 	{
 		/// <summary>
-		/// Saves the barIndex and the msPositions of the bar's enclosing Barlines.
+		/// Saves the indices and msPositions of the bar's enclosing Barlines.
 		/// </summary>
 		public BarlinesMsPositions(List<Bar> bars, int barIndex)
 		{
 			Debug.Assert(barIndex >= 0 && barIndex < bars.Count);
-			this.barIndex = barIndex;
+			this.leftBarlineIndex = barIndex;
+			this.rightBarlineIndex = barIndex + 1;
 
 			leftBarlineMsPos = 0;
 			for(int i = 0; i < barIndex; ++i)
@@ -24,8 +25,9 @@ namespace Moritz.Symbols
 			rightBarlineMsPos = leftBarlineMsPos + bars[barIndex].MsDuration;
 		}
 
-		public readonly int barIndex;
+		public readonly int leftBarlineIndex;
 		public readonly int leftBarlineMsPos;
+		public readonly int rightBarlineIndex;
 		public readonly int rightBarlineMsPos;
 	}
 }

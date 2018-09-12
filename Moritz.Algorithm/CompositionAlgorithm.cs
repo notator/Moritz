@@ -99,7 +99,7 @@ namespace Moritz.Algorithm
 
         }
 
-		public virtual ScoreData SetScoreData(List<Bar> bars) { return null; }
+		public virtual ScoreData SetScoreRegionsData(List<Bar> bars) { return null; }
 
 		protected Palette GetPaletteByName(string paletteName)
         {

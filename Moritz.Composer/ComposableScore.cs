@@ -30,7 +30,7 @@ namespace Moritz.Composer
 
 			CheckBars(bars);
 
-			this._scoreData = _algorithm.SetScoreData(bars);
+			this._scoreData = _algorithm.SetScoreRegionsData(bars);
 
 			InsertInitialClefDefs(bars, _pageFormat.InitialClefPerMIDIChannel);
 

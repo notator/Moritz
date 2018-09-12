@@ -45,6 +45,6 @@ namespace Moritz.Symbols
 			w.WriteEndElement(); // end "score:scoreData"           
 		}
 
-		private readonly Regions regions;
+		public readonly Regions regions;
 	}
 }
