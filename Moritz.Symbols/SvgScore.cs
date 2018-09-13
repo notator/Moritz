@@ -147,9 +147,9 @@ namespace Moritz.Symbols
 
 		internal void WriteScoreData(SvgWriter w)
 		{
-			if(_scoreData != null)
+			if(ScoreData != null)
 			{
-				this._scoreData.WriteSVG(w);
+				this.ScoreData.WriteSVG(w);
 			}
 		}
 
@@ -1359,7 +1359,11 @@ namespace Moritz.Symbols
             AddBarlineAtStartOfEachSystem();
 
             AddBarNumbers();
-            SetStaffNames();
+
+			AddRegionStartInfo();
+			AddRegionEndInfo();
+
+			SetStaffNames();
         }
 
         private void SetSystemAbsEndMsPositions()
@@ -1585,18 +1589,18 @@ namespace Moritz.Symbols
         }
 
         /// <summary>
-        /// Adds a bar number to the first Barline in the top visible voice of each system except the first.
+        /// Adds a bar number to the first Barline in the top voice of each system except the first.
         /// </summary>
         private void AddBarNumbers()
         {
             int barNumber = 1;
             foreach(SvgSystem system in Systems)
             {
-                Voice barnumberVoice = system.Staves[0].Voices[0];
+                Voice topVoice = system.Staves[0].Voices[0];
                 bool isFirstBarline = true;
-                for(int i = 0; i < barnumberVoice.NoteObjects.Count - 1; i++)
+                for(int i = 0; i < topVoice.NoteObjects.Count - 1; i++)
                 {
-                    if(barnumberVoice.NoteObjects[i] is Barline barline)
+                    if(topVoice.NoteObjects[i] is Barline barline)
                     {
                         if(isFirstBarline && system != Systems[0])
                         {
@@ -1611,11 +1615,107 @@ namespace Moritz.Symbols
             }
         }
 
-        /// <summary>
-        /// Inserts a barline at the start of the first bar in each voice in each staff in each system.
-        /// If the first Noteobject in the voice is a clef, the barline is inserted after the clef.
-        /// </summary>
-        private void AddBarlineAtStartOfEachSystem()
+		/// <summary>
+		/// Adds a FramedRegionStartText to each Barline that is the start of one or more regions.
+		/// Such regionStart info is left-aligned to the barline, so is never added to the *final* barline on a system
+		/// </summary>
+		private void AddRegionStartInfo()
+		{
+			SortedDictionary<int,List<string>> regionStartData = ScoreData.Regions.barlineStartRegionsDict;
+
+			var regionStartDataBarIndices = new List<int>(regionStartData.Keys);
+			int lastRegionStartBarIndex = regionStartDataBarIndices[regionStartDataBarIndices.Count - 1];
+
+			int barlineIndex = 0;
+			List<Barline> barlines = new List<Barline>();
+			foreach(SvgSystem system in Systems)
+			{
+				Voice topVoice = system.Staves[0].Voices[0];
+				barlines.Clear();
+				for(int i = 0; i < topVoice.NoteObjects.Count; i++)
+				{					
+					if(topVoice.NoteObjects[i] is Barline barline)
+					{
+						barlines.Add(barline);
+					}
+				}
+				barlines.RemoveAt(barlines.Count - 1); // ignore the final barline on the voice (system)
+
+				foreach(Barline barline in barlines)
+				{
+					if(regionStartDataBarIndices.Contains(barlineIndex))
+					{
+						FramedRegionStartText frst = new FramedRegionStartText(this, regionStartData[barlineIndex], _pageFormat.Gap, _pageFormat.StafflineStemStrokeWidth);
+						barline.DrawObjects.Add(frst);
+					}
+					barlineIndex++;
+					if(barlineIndex > lastRegionStartBarIndex)
+					{
+						break;
+					}
+				}
+
+				if(barlineIndex > lastRegionStartBarIndex)
+				{
+					break;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Adds a FramedRegionEndText to each Barline that is the end of one or more regions.
+		/// Such regionEnd info is right-aligned to the barline, so is never added to the *first* barline on a system
+		/// </summary>
+		private void AddRegionEndInfo()
+		{
+			SortedDictionary<int, List<string>> regionEndData = ScoreData.Regions.barlineRegionLinksDict;
+
+			var regionEndDataBarIndices = new List<int>(regionEndData.Keys);
+			int lastRegionEndBarIndex = regionEndDataBarIndices[regionEndDataBarIndices.Count - 1];
+
+			int barlineIndex = 0;
+			List<Barline> barlines = new List<Barline>();
+			foreach(SvgSystem system in Systems)
+			{
+				Voice topVoice = system.Staves[0].Voices[0];
+				barlines.Clear();
+				for(int i = 0; i < topVoice.NoteObjects.Count; i++)
+				{
+					if(topVoice.NoteObjects[i] is Barline barline)
+					{
+						barlines.Add(barline);
+					}
+				}
+
+				barlines.RemoveAt(0); // ignore the first barline on the voice (system)
+
+				foreach(Barline barline in barlines)
+				{
+					if(regionEndDataBarIndices.Contains(barlineIndex))
+					{
+						FramedRegionEndText fret = new FramedRegionEndText(this, regionEndData[barlineIndex], _pageFormat.Gap, _pageFormat.StafflineStemStrokeWidth);
+						barline.DrawObjects.Add(fret);
+					}
+					barlineIndex++;
+					if(barlineIndex > lastRegionEndBarIndex)
+					{
+						break;
+					}
+				}
+
+				if(barlineIndex > lastRegionEndBarIndex)
+				{
+					break;
+				}
+			}
+
+		}
+
+		/// <summary>
+		/// Inserts a barline at the start of the first bar in each voice in each staff in each system.
+		/// If the first Noteobject in the voice is a clef, the barline is inserted after the clef.
+		/// </summary>
+		private void AddBarlineAtStartOfEachSystem()
         {
             foreach(SvgSystem system in Systems)
             {
@@ -1644,7 +1744,7 @@ namespace Moritz.Symbols
 
         public Notator Notator = null;
 
-		protected ScoreData _scoreData = null;
+		protected ScoreData ScoreData = null;
 
         /// <summary>
         /// Needed while creating the PerformanceOptionsDialog
