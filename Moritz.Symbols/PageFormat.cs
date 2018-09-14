@@ -114,8 +114,9 @@ namespace Moritz.Symbols
         /// Arial (new 26.06.2017)
         public float TimeStampFontHeight { get { return Gap * 2.25F; } }
         public float StaffNameFontHeight { get { return Gap * 2.2F; } }
-        public float BarNumberNumberFontHeight { get { return Gap * 1.9992F; } }
-        public float LyricFontHeight { get { return Gap * 1.96F; } }
+		public float BarNumberNumberFontHeight { get { return Gap * 1.9992F; } }
+		public float RegionInfoStringFontHeight { get { return Gap * 3F; } }
+		public float LyricFontHeight { get { return Gap * 1.96F; } }
         public float ClefOctaveNumberHeight { get { return Gap * 2.6264F; } }
         public float ClefXFontHeight { get { return Gap * 1.568F; } }
         /// Open Sans, Open Sans Condensed (new 26.06.2017)
@@ -131,9 +132,10 @@ namespace Moritz.Symbols
         /// new 26.06.2017
         public float ThickBarlineStrokeWidth { get { return BarlineStrokeWidth * 2; } } // the right barlne at the end of the score.
         public float BarNumberFrameStrokeWidth { get { return StafflineStemStrokeWidth * 1.2F; } }
-        #endregion
+		public float RegionInfoFrameStrokeWidth { get { return BarNumberFrameStrokeWidth * 1.5F; } }
+		#endregion
 
-        public float InputSizeFactor { get { return 1.5F; } }
+		public float InputSizeFactor { get { return 1.5F; } }
         public float BeamThickness { get { return Gap * 0.42F; } }
 
         #endregion

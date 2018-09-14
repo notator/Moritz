@@ -18,19 +18,24 @@ namespace Moritz.Symbols
         {
         }
 
-        /// <summary>
-        /// This function only writes the staff name and barnumber to the SVG file (if they are present).
-        /// The barline itself is drawn when the system (and staff edges) is complete.
-        /// </summary>
-        public virtual void WriteStaffNameAndBarNumberSVG(SvgWriter w, bool staffIsVisible, bool isInput)
-        {
-			if(Metrics is BarlineMetrics barlineMetrics && staffIsVisible)
+		/// <summary>
+		/// This function only writes the staff name and barnumber to the SVG file (if they are present).
+		/// The barline itself is drawn when the system (and staff edges) is complete.
+		/// </summary>
+		public virtual void WriteDrawObjectsSVG(SvgWriter w)
+		{
+			if(Metrics is BarlineMetrics barlineMetrics)
 			{
-				barlineMetrics.WriteStaffNameAndBarNumberSVG(w, isInput);
+				barlineMetrics.WriteDrawObjectsSVG(w);
+			}
+			else if(Metrics is EndBarlineMetrics endBarlineMetrics)
+			{
+				endBarlineMetrics.WriteDrawObjectsSVG(w);
 			}
 		}
 
-        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
+
+		public override void WriteSVG(SvgWriter w, bool staffIsVisible)
         {
             throw new NotImplementedException();
         }
@@ -75,10 +80,10 @@ namespace Moritz.Symbols
 
         }
 
-        /// <summary>
-        /// EndBarline never has an attached staff name or bar number, so this function does nothing.
-        /// </summary>
-        public override void WriteStaffNameAndBarNumberSVG(SvgWriter w, bool staffIsVisible, bool isInput) { }
+        ///// <summary>
+        ///// EndBarline never has an attached staff name or bar number, so this function does nothing.
+        ///// </summary>
+        //public override void WriteDrawObjectsSVG(SvgWriter w) { }
 
         /// <summary>
         /// Writes out an SVG endBarline.
@@ -90,23 +95,32 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         public override void WriteSVG(SvgWriter w, float topStafflineY, float bottomStafflineY, float stafflineStrokeWidth, bool unused)
         {
-            float halfStafflineThickness = (stafflineStrokeWidth / 2);
+			if(Metrics is EndBarlineMetrics endBarlineMetrics)
+			{
+				float halfStafflineThickness = (stafflineStrokeWidth / 2);
 
-            float topY = topStafflineY - halfStafflineThickness;
-            float bottomY = bottomStafflineY + halfStafflineThickness;
+				float topY = topStafflineY - halfStafflineThickness;
+				float bottomY = bottomStafflineY + halfStafflineThickness;
 
-            float leftLineOriginX = ((EndBarlineMetrics) Metrics).LeftLine.OriginX;
-            w.SvgStartGroup(CSSObjectClass.endBarline.ToString());
-            w.SvgLine(CSSObjectClass.barline, leftLineOriginX, topY, leftLineOriginX, bottomY);
+				float leftLineOriginX = endBarlineMetrics.LeftLine.OriginX;
+				w.SvgStartGroup(CSSObjectClass.endBarline.ToString());
+				w.SvgLine(CSSObjectClass.barline, leftLineOriginX, topY, leftLineOriginX, bottomY);
 
-            float rightLineOriginX = ((EndBarlineMetrics) Metrics).RightLine.OriginX;
-            w.SvgLine(CSSObjectClass.thickBarline, rightLineOriginX, topY, rightLineOriginX, bottomY);
-            w.SvgEndGroup();            
+				float rightLineOriginX = endBarlineMetrics.RightLine.OriginX;
+				w.SvgLine(CSSObjectClass.thickBarline, rightLineOriginX, topY, rightLineOriginX, bottomY);
+				w.SvgEndGroup();
+
+				if(endBarlineMetrics.FramedRegionEndTextMetrics != null)
+				{
+					endBarlineMetrics.FramedRegionEndTextMetrics.WriteSVG(w);
+				}
+			}
+
         }
 
         public override string ToString()
         {
             return "endBarline: ";
         }
-    }
+	}
 }

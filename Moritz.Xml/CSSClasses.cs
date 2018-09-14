@@ -56,6 +56,15 @@ namespace Moritz.Xml
 		barNumberNumber, // Container:barNumber
 		#endregion barNumbers
 
+		#region regionInfo
+		framedRegionInfo, // Container: The first voice in a system.
+					// not recorded, but is used if its contents are used. Must be defined if regionInfoString exists.
+		regionInfoString,	// Container: regionInfo
+							// recorded and used if regionInfo exists
+		regionInfoFrame,    // Container: regionInfo
+							// recorded and used if regionInfo exists
+		#endregion regionInfo
+
 		#region chord classes
 		chord, // Container:voice
 		inputChord, // Container:inputVoice

@@ -176,7 +176,7 @@ namespace Moritz.Symbols
 
 		private void WriteFrameLayer(SvgWriter w, float width, float height)
 		{
-            w.SvgRect(CSSObjectClass.frame.ToString(), 0, 0, width, height);
+            w.SvgRect(CSSObjectClass.frame, 0, 0, width, height);
         }
 
 		private void WriteSystemsLayer(SvgWriter w, int pageNumber, Metadata metadata)

@@ -416,14 +416,20 @@ namespace Moritz.Symbols
                 StringBuilder lyricHeight = TextStyle("." + CSSObjectClass.inputLyric.ToString(), "", lyricFontHeight, "middle");
                 fontStyles.Append(lyricHeight);
             }
-            if(usedCSSObjectClasses.Contains(CSSObjectClass.barNumber))
-            {
-                string barNumberNumberFontHeight = M.FloatToShortString(pageFormat.BarNumberNumberFontHeight);
-                StringBuilder barNumberNumberHeight = TextStyle("." + CSSObjectClass.barNumberNumber.ToString(), "", barNumberNumberFontHeight, "middle");
-                fontStyles.Append(barNumberNumberHeight);
-            }
+			if(usedCSSObjectClasses.Contains(CSSObjectClass.barNumber))
+			{
+				string barNumberNumberFontHeight = M.FloatToShortString(pageFormat.BarNumberNumberFontHeight);
+				StringBuilder barNumberNumberHeight = TextStyle("." + CSSObjectClass.barNumberNumber.ToString(), "", barNumberNumberFontHeight, "middle");
+				fontStyles.Append(barNumberNumberHeight);
+			}
+			if(usedCSSObjectClasses.Contains(CSSObjectClass.framedRegionInfo))
+			{
+				string regionInfoStringFontHeight = M.FloatToShortString(pageFormat.RegionInfoStringFontHeight);
+				StringBuilder regionInfoHeight = TextStyle("." + CSSObjectClass.regionInfoString.ToString(), "", regionInfoStringFontHeight, "middle");
+				fontStyles.Append(regionInfoHeight);
+			}
 
-            if(ClefXExists(usedClefIDs))
+			if(ClefXExists(usedClefIDs))
             {
                 string clefXFontHeight = M.FloatToShortString(pageFormat.ClefXFontHeight);
                 StringBuilder clefXStyle = TextStyle("." + CSSObjectClass.clefX.ToString(), "", clefXFontHeight, "");
@@ -578,7 +584,7 @@ namespace Moritz.Symbols
             //.timeStamp,
             //.staffName, .inputStaffName,
             //.lyric, .inputLyric,
-            //.barNumberNumber,
+            //.barNumberNumber, 
             //.clefX, .smallClefX, .inputClefX, .inputSmallClefX
 
             // timestamp is not recorded, but exists on every page
@@ -588,11 +594,15 @@ namespace Moritz.Symbols
             ExtendRvalWith(rval, usedCSSClasses, CSSObjectClass.inputStaffName);
             ExtendRvalWith(rval, usedCSSClasses, CSSObjectClass.lyric);
             ExtendRvalWith(rval, usedCSSClasses, CSSObjectClass.inputLyric);
-            if(usedCSSClasses.Contains(CSSObjectClass.barNumber))
-            {
-                ExtendRval(rval, "." + CSSObjectClass.barNumberNumber.ToString());
-            }
-            if(ClefXExists(usedClefIDs))
+			if(usedCSSClasses.Contains(CSSObjectClass.barNumber))
+			{
+				ExtendRval(rval, "." + CSSObjectClass.barNumberNumber.ToString());
+			}
+			if(usedCSSClasses.Contains(CSSObjectClass.framedRegionInfo))
+			{
+				ExtendRval(rval, "." + CSSObjectClass.regionInfoString.ToString());
+			}
+			if(ClefXExists(usedClefIDs))
             {
                 ExtendRval(rval, "." + CSSObjectClass.clefX.ToString());
             }
@@ -799,19 +809,31 @@ namespace Moritz.Symbols
             ");
             }
 
-            if(usedCSSClasses.Contains(CSSObjectClass.barNumber))
-            {
-                strokeWidth = M.FloatToShortString(pageFormat.BarNumberFrameStrokeWidth);
-                lineStyles.Append($@".barNumberFrame
+			if(usedCSSClasses.Contains(CSSObjectClass.barNumber))
+			{
+				strokeWidth = M.FloatToShortString(pageFormat.BarNumberFrameStrokeWidth);
+				lineStyles.Append($@".barNumberFrame
             {{
                 stroke:black;
                 stroke-width:{strokeWidth}px;
                 fill:none
             }}
             ");
-            }
+			}
 
-            if(usedCSSClasses.Contains(CSSObjectClass.cautionaryBracket))
+			if(usedCSSClasses.Contains(CSSObjectClass.framedRegionInfo))
+			{
+				strokeWidth = M.FloatToShortString(pageFormat.RegionInfoFrameStrokeWidth);
+				lineStyles.Append($@".regionInfoFrame
+            {{
+                stroke:black;
+                stroke-width:{strokeWidth}px;
+                fill:none
+            }}
+            ");
+			}
+
+			if(usedCSSClasses.Contains(CSSObjectClass.cautionaryBracket))
             {
                 strokeWidth = M.FloatToShortString(pageFormat.StafflineStemStrokeWidth);
                 lineStyles.Append($@".cautionaryBracket
@@ -1673,7 +1695,7 @@ namespace Moritz.Symbols
 			var regionEndDataBarIndices = new List<int>(regionEndData.Keys);
 			int lastRegionEndBarIndex = regionEndDataBarIndices[regionEndDataBarIndices.Count - 1];
 
-			int barlineIndex = 0;
+			int barlineIndex = 1; // the first barline is going to be ignored. 
 			List<Barline> barlines = new List<Barline>();
 			foreach(SvgSystem system in Systems)
 			{

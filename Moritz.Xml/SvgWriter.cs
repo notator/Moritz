@@ -79,145 +79,59 @@ namespace Moritz.Xml
         /// <param name="top"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        public void SvgRect(string type, float left, float top, float width, float height)
+        public void SvgRect(CSSObjectClass cssClass, float left, float top, float width, float height)
         {
             _w.WriteStartElement("rect");
-            Debug.Assert(!String.IsNullOrEmpty(type));
-            _w.WriteAttributeString("class", type);
-            _w.WriteAttributeString("x", M.FloatToShortString(left));
+			_w.WriteAttributeString("class", cssClass.ToString());
+			_w.WriteAttributeString("x", M.FloatToShortString(left));
             _w.WriteAttributeString("y", M.FloatToShortString(top));
             _w.WriteAttributeString("width", M.FloatToShortString(width));
             _w.WriteAttributeString("height", M.FloatToShortString(height));
             _w.WriteEndElement(); // rect
         }
 
-        /// <summary>
-        /// Writes an SVG "rect" element. This function is deprecated. Use the one above with CSS instead.
-        /// </summary>
-        /// <param name="type">Not written if null or empty</param>
-        /// <param name="left"></param>
-        /// <param name="top"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="strokeColor">Not written if null or empty</param>
-        /// <param name="strokeWidth">Must be >= 0</param>
-        /// <param name="fillColor">Not written if null or empty</param>
-        public void SvgRect(string type, float left, float top, float width, float height,
-            string strokeColor, float strokeWidth, string fillColor)
-        {
-            Debug.Assert(strokeWidth > 0F);
-            _w.WriteStartElement("rect");
-            if(!String.IsNullOrEmpty(type))
-                _w.WriteAttributeString("class", type);
-            _w.WriteAttributeString("x", M.FloatToShortString(left));
-            _w.WriteAttributeString("y", M.FloatToShortString(top));
-            _w.WriteAttributeString("width", M.FloatToShortString(width));
-            _w.WriteAttributeString("height", M.FloatToShortString(height));
-
-            StringBuilder styleSB = GetStyleStringBuilder(strokeColor, strokeWidth, fillColor, null);
-            if(styleSB.Length > 0)
-                WriteAttributeString("style", styleSB.ToString());
-
-            _w.WriteEndElement(); // rect
-        }
-
-        /// <summary>
-        /// Writes an SVG "circle" element. Deprecated. See SvgRect usage.
-        /// </summary>
-        /// <param name="type">Not written if null or empty</param>
-        /// <param name="cx"></param>
-        /// <param name="cy"></param>
-        /// <param name="r"></param>
-        /// <param name="strokeColor">Not written if null or empty</param>
-        /// <param name="strokeWidth">Must be >= 0</param>
-        /// <param name="fillColorOrNull">Not written if null or empty</param>
-        public void SvgCircle(string type, float cx, float cy, float r,
-			string strokeColor, float strokeWidth, string fillColorOrNull)
+		/// <summary>
+		/// Writes an SVG "circle" element having a class that has a CSS definiton elsewhere.
+		/// </summary>
+		/// <param name="type">Not written if null or empty</param>
+		/// <param name="cx"></param>
+		/// <param name="cy"></param>
+		/// <param name="r"></param>
+		public void SvgCircle(CSSObjectClass cssClass, float cx, float cy, float r)
 		{
 			WriteStartElement("circle");
-			if(!String.IsNullOrEmpty(type))
-				_w.WriteAttributeString("class", type);
+			_w.WriteAttributeString("class", cssClass.ToString());
 			WriteAttributeString("cx", M.FloatToShortString(cx));
 			WriteAttributeString("cy", M.FloatToShortString(cy));
 			WriteAttributeString("r", M.FloatToShortString(r));
 
-			StringBuilder styleSB = GetStyleStringBuilder(strokeColor, strokeWidth, fillColorOrNull, null);
-			if(styleSB.Length > 0)
-				WriteAttributeString("style", styleSB.ToString());
-
 			WriteEndElement(); // circle
 		}
 
-        /// <summary>
-        /// Writes an SVG "ellipse" element. Deprecated. See SvgRect usage.
-        /// </summary>
-        /// <param name="type">Not written if null or empty</param>
-        /// <param name="cx"></param>
-        /// <param name="cy"></param>
-        /// <param name="rx"></param>
-        /// <param name="ry"></param>
-        /// <param name="strokeColour">Not written if null or empty</param>
-        /// <param name="strokeWidth">Must be >= 0</param>
-        /// <param name="fillColor">Not written if null or empty</param>
-        /// <remarks>Note that Inkscape may turn this into a circle if rx == ry.</remarks>
-        public void SvgEllipse(string type, float cx, float cy, float rx, float ry,
-			string strokeColor, float strokeWidth, string fillColor)
+		/// <summary>
+		/// Writes an SVG "ellipse" element having a class that has a CSS definiton elsewhere.
+		/// </summary>
+		/// <param name="type">Not written if null or empty</param>
+		/// <param name="cx"></param>
+		/// <param name="cy"></param>
+		/// <param name="rx"></param>
+		/// <param name="ry"></param>
+		public void SvgEllipse(CSSObjectClass cssClass, float cx, float cy, float rx, float ry)
 		{
 			WriteStartElement("ellipse");
-			if(!String.IsNullOrEmpty(type))
-				_w.WriteAttributeString("class", type);
+			WriteAttributeString("class", cssClass.ToString());
 			WriteAttributeString("cx", M.FloatToShortString(cx));
 			WriteAttributeString("cy", M.FloatToShortString(cy));
 			WriteAttributeString("rx", M.FloatToShortString(rx));
 			WriteAttributeString("ry", M.FloatToShortString(ry));
 
-			StringBuilder styleSB = GetStyleStringBuilder(strokeColor, strokeWidth, fillColor, null);
-			if(styleSB.Length > 0)
-				WriteAttributeString("style", styleSB.ToString());
-
 			WriteEndElement(); // ellipse
-		}
-
-		/// <summary>
-		/// Returns a Stringbuilder containing a style string.
-        /// This function is deprecated. Use a defined class with CSS instead.
-		/// </summary>
-		/// <param name="strokeColorOrNull">If null, stroke is not set. '#000000' is black</param>
-		/// <param name="strokeWidth">Must be >= 0</param>
-		/// <param name="fillColorOrNull">If null, fill is not set.  '#000000' is black</param>
-		/// <param name="linecapStringOrNull">If null, lineCap is not set. Other values are: 'butt', 'round' and 'square'</param>
-		/// <returns>A style string</returns>
-		private StringBuilder GetStyleStringBuilder(string strokeColorOrNull, float strokeWidth, string fillColorOrNull, string linecapStringOrNull)
-		{
-			StringBuilder rval = new StringBuilder();
-			string strokeWidthString = strokeWidth.ToString("0.###", M.En_USNumberFormat);
-
-			Debug.Assert(strokeWidth >= 0);
-			Debug.Assert(linecapStringOrNull == null
-				|| (string.Compare(linecapStringOrNull.ToString(), "butt") == 0)
-				|| (string.Compare(linecapStringOrNull.ToString(), "round") == 0)
-				|| (string.Compare(linecapStringOrNull.ToString(), "square") == 0));
-
-			if(!String.IsNullOrEmpty(strokeColorOrNull))
-				rval.Append("stroke:" + strokeColorOrNull + "; ");
-
-			rval.Append("stroke-width:" + strokeWidthString + "px; ");
-
-			if(!String.IsNullOrEmpty(fillColorOrNull))
-				rval.Append("fill:" + fillColorOrNull + "; ");
-			if(!String.IsNullOrEmpty(linecapStringOrNull))
-				rval.Append("stroke-linecap:" + linecapStringOrNull + "; ");
-
-			if(rval.Length > 0)
-				rval.Remove(rval.Length - 2, 2);
-
-			return rval;
 		}
 
         /// <summary>
         /// A square bracket
         /// </summary>
-        public void SvgCautionaryBracket(string styleName, bool isLeftBracket, float top, float right, float bottom, float left)
+        public void SvgCautionaryBracket(CSSObjectClass cssClass, bool isLeftBracket, float top, float right, float bottom, float left)
         {
             if(!isLeftBracket)
             {
@@ -231,7 +145,7 @@ namespace Moritz.Xml
             string bottomStr = bottom.ToString("0.###", M.En_USNumberFormat);
 
             _w.WriteStartElement("path");
-            _w.WriteAttributeString("class", styleName);
+            _w.WriteAttributeString("class", cssClass.ToString());
             StringBuilder d = new StringBuilder();
             d.Append("M " + rightStr + "," + topStr + " ");
             d.Append("L " + leftStr + "," + topStr + " " +

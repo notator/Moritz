@@ -454,7 +454,7 @@ namespace Moritz.Symbols
             RestSymbol rest = noteObject as RestSymbol;
 			if(noteObject is EndBarline endBarline)
 			{
-				returnMetrics = new EndBarlineMetrics(pageFormat.BarlineStrokeWidth, pageFormat.ThickBarlineStrokeWidth);
+				returnMetrics = new EndBarlineMetrics(graphics, endBarline, pageFormat.BarlineStrokeWidth, pageFormat.ThickBarlineStrokeWidth, gap);
 			}
 			else if(barline != null)
 			{

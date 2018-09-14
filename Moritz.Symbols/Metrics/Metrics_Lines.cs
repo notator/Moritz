@@ -151,7 +151,7 @@ namespace Moritz.Symbols
 
         public override void WriteSVG(SvgWriter w)
         {
-			w.SvgCautionaryBracket(CSSObjectClass.ToString(), _isLeftBracket, _top, _right, _bottom, _left);
+			w.SvgCautionaryBracket(CSSObjectClass, _isLeftBracket, _top, _right, _bottom, _left);
 		}
 
 		private readonly bool _isLeftBracket;
@@ -228,7 +228,10 @@ namespace Moritz.Symbols
 
             if(graphics != null && barline != null)
             {
-                foreach(DrawObject drawObject in barline.DrawObjects)
+				float barlineTopToRegionInfoBottom = gap * 5F;
+				float barlineTopToBarnumberBottom = gap * 6F;
+
+				foreach(DrawObject drawObject in barline.DrawObjects)
                 {
                     if(drawObject is Text text)
                     {
@@ -248,13 +251,30 @@ namespace Moritz.Symbols
                         else if(text is FramedBarNumberText)
                         {
                             _barnumberMetrics = new BarnumberMetrics(graphics, text.TextInfo, text.FrameInfo);
-                            //_barnumberMetrics = new TextMetrics(graphics, null, text.TextInfo);
                             // move the bar number above this barline
-                            float deltaY = (gap * 6F);
-                            _barnumberMetrics.Move(0F, -deltaY);
+                            _barnumberMetrics.Move(0F, -barlineTopToBarnumberBottom);
                         }
                     }
-                }
+					else if(drawObject is TextList textList)
+					{
+						Debug.Assert(textList is FramedRegionStartText || textList is FramedRegionEndText);
+						
+						if(textList is FramedRegionStartText framedRegionStartText)
+						{
+							_framedRegionStartTextMetrics = new FramedRegionInfoMetrics(graphics, framedRegionStartText.Texts, framedRegionStartText.FrameInfo);
+							// move the regionInfo above this barline, and align its left edge with the barline
+							FramedRegionInfoMetrics frstm = _framedRegionStartTextMetrics;
+							frstm.Move(0, -barlineTopToRegionInfoBottom);
+						}
+						else if(textList is FramedRegionEndText framedRegionEndText)
+						{
+							_framedRegionEndTextMetrics = new FramedRegionInfoMetrics(graphics, framedRegionEndText.Texts, framedRegionEndText.FrameInfo);
+							// move the regionInfo above this barline, and align its right edge with the barline
+							FramedRegionInfoMetrics fretm = _framedRegionEndTextMetrics;
+							fretm.Move(0, -barlineTopToRegionInfoBottom);
+						}
+					}
+				}
             }
         }
 
@@ -265,9 +285,13 @@ namespace Moritz.Symbols
                 _staffControlsGroupMetrics.Move(dx, dy);
             if(_barnumberMetrics != null)
                 _barnumberMetrics.Move(dx, dy);
-            if(_staffNameMetrics != null)
-                _staffNameMetrics.Move(dx, dy);
-        }
+			if(_staffNameMetrics != null)
+				_staffNameMetrics.Move(dx, dy);
+			if(this._framedRegionStartTextMetrics != null)
+				_framedRegionStartTextMetrics.Move(dx, dy);
+			if(this._framedRegionEndTextMetrics != null)
+				_framedRegionEndTextMetrics.Move(dx, dy);
+		}
 
         /// <summary>
         /// Barline.WriteSVG(...) is used instead
@@ -278,31 +302,44 @@ namespace Moritz.Symbols
         }
 
         /// <summary>
-        /// Only writes the staffName and the barnumber (if they exist) to the SVG file.
-        /// The barline itself is drawn by Barline.WriteSvg(...) when the system is complete.
+        /// Writes any DrawObjects attached to the barline to the SVG file.
         /// </summary>
-        public void WriteStaffNameAndBarNumberSVG(SvgWriter w, bool isInput)
+        public void WriteDrawObjectsSVG(SvgWriter w)
         {
             if(_staffNameMetrics != null)
             {
                 _staffNameMetrics.WriteSVG(w);
             }
-            if(_barnumberMetrics != null)
-            {
-                _barnumberMetrics.WriteSVG(w);
-            }
-        }
+			if(_barnumberMetrics != null)
+			{
+				_barnumberMetrics.WriteSVG(w);
+			}
+			if(_framedRegionStartTextMetrics != null)
+			{
+				_framedRegionStartTextMetrics.WriteSVG(w);
+			}
+			if(_framedRegionEndTextMetrics != null)
+			{
+				_framedRegionEndTextMetrics.WriteSVG(w);
+			}
+		}
 
         private GroupMetrics _staffControlsGroupMetrics = null;
-        public BarnumberMetrics BarnumberMetrics { get { return _barnumberMetrics; } }
-        private BarnumberMetrics _barnumberMetrics = null;
-        public TextMetrics StaffNameMetrics { get { return _staffNameMetrics; } }
+		public FramedRegionInfoMetrics FramedRegionStartTextMetrics { get { return _framedRegionStartTextMetrics; } }
+		private FramedRegionInfoMetrics _framedRegionStartTextMetrics = null;
+		public FramedRegionInfoMetrics FramedRegionEndTextMetrics { get { return _framedRegionEndTextMetrics; } }
+		private FramedRegionInfoMetrics _framedRegionEndTextMetrics = null;
+
+		public BarnumberMetrics BarnumberMetrics { get { return _barnumberMetrics; } }
+		private BarnumberMetrics _barnumberMetrics = null;
+		public TextMetrics StaffNameMetrics { get { return _staffNameMetrics; } }
         private TextMetrics _staffNameMetrics = null;
     }
 
     internal class EndBarlineMetrics : GroupMetrics
     {
-        public EndBarlineMetrics(float thinStrokeWidth, float thickStrokeWidth)
+
+		public EndBarlineMetrics(Graphics graphics, EndBarline endBarline, float thinStrokeWidth, float thickStrokeWidth, float gap)
             : base(CSSObjectClass.endBarline)
         {
             LeftLine = new LineMetrics(CSSObjectClass.barline, thinStrokeWidth, "black");
@@ -313,7 +350,29 @@ namespace Moritz.Symbols
             Add(LeftLine);
             Add(RightLine);
             Move(-(thickStrokeWidth / 2F), 0);
-        }
+
+			if(graphics != null && endBarline != null)
+			{
+				float barlineTopToRegionInfoBottom = gap * 5F;
+				float barlineTopToBarnumberBottom = gap * 6F;
+
+				foreach(DrawObject drawObject in endBarline.DrawObjects)
+				{
+					if(drawObject is TextList textList)
+					{
+						Debug.Assert(textList is FramedRegionEndText);
+
+						if(textList is FramedRegionEndText framedRegionEndText)
+						{
+							_framedRegionEndTextMetrics = new FramedRegionInfoMetrics(graphics, framedRegionEndText.Texts, framedRegionEndText.FrameInfo);
+							// move the regionInfo above this barline, and align its right edge with the right barline
+							FramedRegionInfoMetrics fretm = _framedRegionEndTextMetrics;
+							fretm.Move(0, -barlineTopToRegionInfoBottom);
+						}
+					}
+				}
+			}
+		}
 
         /// <summary>
         /// EndBarline.WriteSVG(...) is used instead
@@ -323,7 +382,18 @@ namespace Moritz.Symbols
             throw new NotImplementedException();
         }
 
-        public LineMetrics LeftLine;
+		internal void WriteDrawObjectsSVG(SvgWriter w)
+		{
+			if(_framedRegionEndTextMetrics != null)
+			{
+				_framedRegionEndTextMetrics.WriteSVG(w);
+			}
+		}
+
+		public LineMetrics LeftLine;
         public LineMetrics RightLine;
-    }
+
+		public FramedRegionInfoMetrics FramedRegionEndTextMetrics { get { return _framedRegionEndTextMetrics; } }
+		private FramedRegionInfoMetrics _framedRegionEndTextMetrics = null;
+	}
 }

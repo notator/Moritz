@@ -136,16 +136,15 @@ namespace Moritz.Symbols
 	}
 	internal class BarnumberMetrics : GroupMetrics
 	{
-		public BarnumberMetrics(Graphics graphics, TextInfo textInfo, FrameInfo frameInfo)
+		public BarnumberMetrics(Graphics graphics, TextInfo textInfo, FramePadding framePadding)
 			: base(CSSObjectClass.barNumber)
 		{
             _barNumberNumberMetrics = new TextMetrics(CSSObjectClass.barNumberNumber, graphics, textInfo);
             _number = textInfo.Text;
-			_top = _barNumberNumberMetrics.Top - frameInfo.PaddingY;
-			_right = _barNumberNumberMetrics.Right + frameInfo.PaddingX;
-			_bottom = _barNumberNumberMetrics.Bottom + frameInfo.PaddingY;
-			_left = _barNumberNumberMetrics.Left - frameInfo.PaddingX;
-			_strokeWidth = frameInfo.StrokeWidth;
+			_top = _barNumberNumberMetrics.Top - framePadding.Top;
+			_right = _barNumberNumberMetrics.Right + framePadding.Right;
+			_bottom = _barNumberNumberMetrics.Bottom + framePadding.Bottom;
+			_left = _barNumberNumberMetrics.Left - framePadding.Left;
 		}
 
         public override void Move(float dx, float dy)
@@ -158,12 +157,103 @@ namespace Moritz.Symbols
 		{
             w.SvgStartGroup(CSSObjectClass.ToString());
             w.SvgText(CSSObjectClass.barNumberNumber, _number, _barNumberNumberMetrics.OriginX, _barNumberNumberMetrics.OriginY);
-            w.SvgRect(CSSObjectClass.barNumberFrame.ToString(), _left, _top, _right - _left, _bottom - _top);
+            w.SvgRect(CSSObjectClass.barNumberFrame, _left, _top, _right - _left, _bottom - _top);
             w.SvgEndGroup();
 		}
 
         TextMetrics _barNumberNumberMetrics = null;
 		readonly string _number;
-		readonly float _strokeWidth = 0;
+	}
+
+	// FramedRegionInfoMetrics(graphics, framedRegionEndText.Texts, framedRegionEndText.FrameInfo)
+	internal class FramedRegionInfoMetrics : GroupMetrics
+	{
+		public FramedRegionInfoMetrics(Graphics graphics, List<Text> texts, FramePadding framePadding)
+			: base(CSSObjectClass.framedRegionInfo)
+		{
+			float maxWidth = 0F;
+			float nextTop = 0F;
+			
+
+			foreach(Text text in texts)
+			{
+				TextMetrics tm = new TextMetrics(CSSObjectClass.regionInfoString, graphics, text.TextInfo);
+				tm.Move(-tm.Left, -tm.Top);
+				float width = tm.Right - tm.Left;
+				maxWidth = (maxWidth > width) ? maxWidth : width;
+				tm.Move(0, nextTop);
+				nextTop = tm.Top + ((tm.Bottom - tm.Top) * 1.5F);
+
+				_textMetrics.Add(tm);
+				_textStrings.Add(text.TextInfo.Text);
+			}
+
+			bool alignRight = (texts[0].TextInfo.TextHorizAlign != TextHorizAlign.left);
+			if(alignRight)
+			{
+				foreach(TextMetrics tm in _textMetrics)
+				{
+					float deltaX = maxWidth - (tm.Right - tm.Left);
+					tm.Move(deltaX, 0);
+
+					// move tm.OriginX so that the text is right aligned (OriginX is used by WriteSVG())
+					deltaX = (tm.Right - tm.Left) / 2;
+					tm.Move(-deltaX, 0);
+				}
+			}
+			else // align left
+			{
+				foreach(TextMetrics tm in _textMetrics)
+				{ 
+					// move tm.OriginX so that the text is left aligned (OriginX is used by WriteSVG())
+					float deltaX = (tm.Right - tm.Left) / 2;
+					tm.Move(deltaX, 0);
+				}
+			}
+
+			_top = 0 - framePadding.Top;
+			_right = maxWidth + framePadding.Right;
+			_bottom = _textMetrics[_textMetrics.Count -1].Bottom + framePadding.Bottom;
+			_left = 0 - framePadding.Left;
+
+			switch(texts[0].TextInfo.TextHorizAlign)
+			{
+				case TextHorizAlign.left:
+					Move(-_left, -_bottom); // set the origin to the bottom left corner
+					break;
+				case TextHorizAlign.center:
+					Move(-((_left + _right) / 2), -_bottom); // set the origin to the middle of the bottom edge
+					break;
+				case TextHorizAlign.right:
+					Move(-_right, -_bottom); // set the origin to the bottom right corner
+					break;
+			}			
+		}
+
+		public override void Move(float dx, float dy)
+		{
+			base.Move(dx, dy);
+			foreach(TextMetrics tm in _textMetrics)
+			{
+				tm.Move(dx, dy);
+			}
+		}
+
+		public override void WriteSVG(SvgWriter w)
+		{
+			w.SvgStartGroup(CSSObjectClass.ToString());
+			for(int i = 0; i < _textMetrics.Count; ++i)
+			{
+				TextMetrics textMetrics = _textMetrics[i];
+				string textString = _textStrings[i];
+				w.SvgText(CSSObjectClass.regionInfoString, textString, textMetrics.OriginX, textMetrics.OriginY);
+			}
+			
+			w.SvgRect(CSSObjectClass.regionInfoFrame, _left, _top, _right - _left, _bottom - _top);
+			w.SvgEndGroup();
+		}
+
+		List<TextMetrics> _textMetrics = new List<TextMetrics>();
+		List<string> _textStrings = new List<string>();
 	}
 }

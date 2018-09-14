@@ -34,19 +34,6 @@ namespace Moritz.Symbols
         /// <param name="w"></param>
         public virtual void WriteSVG(SvgWriter w, bool staffIsVisible, List<CarryMsgs> carryMsgsPerChannel)
         {
-            if(staffIsVisible)
-            {
-                Barline firstBarline = null;
-                for(int i = 0; i < NoteObjects.Count; ++i)
-                {
-                    firstBarline = NoteObjects[i] as Barline;
-                    if(firstBarline != null)
-                        break;
-                }
-                Debug.Assert(firstBarline != null);
-                firstBarline.WriteStaffNameAndBarNumberSVG(w, staffIsVisible, (firstBarline.Voice is InputVoice));
-            }
-
             for(int i = 0; i < NoteObjects.Count; ++i)
             {
 				NoteObject noteObject = NoteObjects[i];
@@ -69,6 +56,8 @@ namespace Moritz.Symbols
 						float barlineStrokeWidth = pageFormat.BarlineStrokeWidth;
 						float stafflineStrokeWidth = pageFormat.StafflineStemStrokeWidth;
 						barline.WriteSVG(w, top, bottom, stafflineStrokeWidth, isLastNoteObject);
+						//barline.WriteDrawObjectsSVG(w, staffIsVisible, (firstBarline.Voice is InputVoice));
+						barline.WriteDrawObjectsSVG(w);
 					}
 				}
 				else if(inputChordSymbol != null)

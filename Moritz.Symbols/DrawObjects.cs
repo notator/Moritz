@@ -74,16 +74,13 @@ namespace Moritz.Symbols
 					case TextFrameType.none:
 						break;
 					case TextFrameType.rectangle:
-						w.SvgRect("rectangle", Metrics.Left, Metrics.Top, Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top,
-							_frameInfo.ColorString.String, _frameInfo.StrokeWidth, "none");
+						w.SvgRect(CSSObjectClass.regionInfoFrame, Metrics.Left, Metrics.Top, Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top);
 						break;
 					case TextFrameType.ellipse:
-						w.SvgEllipse("ellipse", Metrics.Left, Metrics.Top, (Metrics.Right - Metrics.Left) / 2, (Metrics.Bottom - Metrics.Top) / 2,
-							_frameInfo.ColorString.String, _frameInfo.StrokeWidth, "none");
+						w.SvgEllipse(CSSObjectClass.regionInfoFrame, Metrics.Left, Metrics.Top, (Metrics.Right - Metrics.Left) / 2, ((Metrics.Bottom - Metrics.Top) / 2));
 						break;
 					case TextFrameType.circle:
-						w.SvgCircle("circle", Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top, ((Metrics.Right - Metrics.Left) / 2),
-							_frameInfo.ColorString.String, _frameInfo.StrokeWidth, "none");
+						w.SvgCircle(CSSObjectClass.regionInfoFrame, Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top, ((Metrics.Right - Metrics.Left) / 2));
 						break;
 				}
 			}
@@ -92,8 +89,8 @@ namespace Moritz.Symbols
 		// attributes
 		public TextInfo TextInfo { get { return _textInfo; } }
 		private readonly TextInfo _textInfo = null;
-		public FrameInfo FrameInfo { get { return _frameInfo; } }
-		protected FrameInfo _frameInfo = null;
+		public FramePadding FrameInfo { get { return _frameInfo; } }
+		protected FramePadding _frameInfo = null;
 	}
 
 	internal class StaffNameText : Text
@@ -121,7 +118,7 @@ namespace Moritz.Symbols
 
 			float strokeWidth = stafflinethickness * 1.2F;
 
-			_frameInfo = new FrameInfo(TextFrameType.rectangle, paddingX, paddingY, strokeWidth, new ColorString("000000"));
+			_frameInfo = new FramePadding(TextFrameType.rectangle, paddingY, paddingX, paddingY, paddingX);
 		}
 
 		public override string ToString()
@@ -147,6 +144,11 @@ namespace Moritz.Symbols
 			//w.SvgText(TextInfo, Metrics as TextMetrics); // does not work with DynamicMetrics
 			if(Metrics != null)
 				Metrics.WriteSVG(w);
+
+			foreach(Text text in Texts)
+			{
+				w.SvgText(CSSObjectClass.regionInfoString, text.TextInfo.Text, Metrics.Left, Metrics.Bottom);
+			}
 			if(_frameInfo != null)
 			{
 				switch(_frameInfo.FrameType)
@@ -154,24 +156,21 @@ namespace Moritz.Symbols
 					case TextFrameType.none:
 						break;
 					case TextFrameType.rectangle:
-						w.SvgRect("rectangle", Metrics.Left, Metrics.Top, Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top,
-							_frameInfo.ColorString.String, _frameInfo.StrokeWidth, "none");
+						w.SvgRect(CSSObjectClass.regionInfoFrame, Metrics.Left, Metrics.Top, Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top);
 						break;
 					case TextFrameType.ellipse:
-						w.SvgEllipse("ellipse", Metrics.Left, Metrics.Top, (Metrics.Right - Metrics.Left) / 2, (Metrics.Bottom - Metrics.Top) / 2,
-							_frameInfo.ColorString.String, _frameInfo.StrokeWidth, "none");
+						w.SvgEllipse(CSSObjectClass.regionInfoFrame, Metrics.Left, Metrics.Top, (Metrics.Right - Metrics.Left) / 2, (Metrics.Bottom - Metrics.Top) / 2);
 						break;
 					case TextFrameType.circle:
-						w.SvgCircle("circle", Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top, ((Metrics.Right - Metrics.Left) / 2),
-							_frameInfo.ColorString.String, _frameInfo.StrokeWidth, "none");
+						w.SvgCircle(CSSObjectClass.regionInfoFrame, Metrics.Right - Metrics.Left, Metrics.Bottom - Metrics.Top, ((Metrics.Right - Metrics.Left) / 2));
 						break;
 				}
 			}
 		}
 
-		protected readonly List<Text> Texts = new List<Text>();
-		public FrameInfo FrameInfo { get { return _frameInfo; } }
-		protected FrameInfo _frameInfo = null;
+		public readonly List<Text> Texts = new List<Text>();
+		public FramePadding FrameInfo { get { return _frameInfo; } }
+		protected FramePadding _frameInfo = null;
 	}
 
 	internal class FramedMultilineText : TextList
@@ -179,21 +178,12 @@ namespace Moritz.Symbols
 		public FramedMultilineText(object container, List<string> textStrings, float gap, float stafflinethickness, TextHorizAlign hAlign)
 			: base(container, textStrings, gap, stafflinethickness, hAlign)
 		{
-			float paddingX = 22F;
-			foreach(string text in textStrings)
-			{
-				if(text.Length > 1)
-				{
-					paddingX = 10F;
-					break;
-				}
-			}
+			float paddingTop = 34F;
+			float paddingRight = 21F;
+			float paddingBottom = 23F;
+			float paddingLeft = 21F;
 
-			float paddingY = 22F;
-
-			float strokeWidth = stafflinethickness * 2F;
-
-			_frameInfo = new FrameInfo(TextFrameType.rectangle, paddingX, paddingY, strokeWidth, new ColorString("FF0000"));
+			_frameInfo = new FramePadding(TextFrameType.rectangle, paddingTop, paddingRight, paddingBottom, paddingLeft);
 		}
 
 		protected string StringList()
@@ -208,8 +198,6 @@ namespace Moritz.Symbols
 
 			return sb.ToString();
 		}
-
-
 	}
 
 	internal class FramedRegionStartText : FramedMultilineText
