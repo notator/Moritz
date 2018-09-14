@@ -816,7 +816,7 @@ namespace Moritz.Symbols
             {{
                 stroke:black;
                 stroke-width:{strokeWidth}px;
-                fill:none
+                fill:#EEEEFF
             }}
             ");
 			}
@@ -828,7 +828,7 @@ namespace Moritz.Symbols
             {{
                 stroke:black;
                 stroke-width:{strokeWidth}px;
-                fill:none
+                fill:#FFFFDD
             }}
             ");
 			}
@@ -1382,8 +1382,11 @@ namespace Moritz.Symbols
 
             AddBarNumbers();
 
-			AddRegionStartInfo();
-			AddRegionEndInfo();
+			if(this.ScoreData != null)
+			{
+				AddRegionStartInfo();
+				AddRegionEndInfo();
+			}
 
 			SetStaffNames();
         }

@@ -156,8 +156,8 @@ namespace Moritz.Symbols
         public override void WriteSVG(SvgWriter w)
 		{
             w.SvgStartGroup(CSSObjectClass.ToString());
-            w.SvgText(CSSObjectClass.barNumberNumber, _number, _barNumberNumberMetrics.OriginX, _barNumberNumberMetrics.OriginY);
-            w.SvgRect(CSSObjectClass.barNumberFrame, _left, _top, _right - _left, _bottom - _top);
+			w.SvgRect(CSSObjectClass.barNumberFrame, _left, _top, _right - _left, _bottom - _top);
+			w.SvgText(CSSObjectClass.barNumberNumber, _number, _barNumberNumberMetrics.OriginX, _barNumberNumberMetrics.OriginY);
             w.SvgEndGroup();
 		}
 
@@ -242,14 +242,16 @@ namespace Moritz.Symbols
 		public override void WriteSVG(SvgWriter w)
 		{
 			w.SvgStartGroup(CSSObjectClass.ToString());
+
+			w.SvgRect(CSSObjectClass.regionInfoFrame, _left, _top, _right - _left, _bottom - _top);
+
 			for(int i = 0; i < _textMetrics.Count; ++i)
 			{
 				TextMetrics textMetrics = _textMetrics[i];
 				string textString = _textStrings[i];
 				w.SvgText(CSSObjectClass.regionInfoString, textString, textMetrics.OriginX, textMetrics.OriginY);
-			}
-			
-			w.SvgRect(CSSObjectClass.regionInfoFrame, _left, _top, _right - _left, _bottom - _top);
+			}			
+
 			w.SvgEndGroup();
 		}
 

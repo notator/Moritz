@@ -183,7 +183,7 @@ namespace Moritz.Symbols
 
             JustifyVertically(pageFormat.Right, pageFormat.Gap);
 
-            AdjustBarnumberVertically(pageFormat.Gap);
+            AdjustBarlineDrawObjectsVertically(pageFormat.Gap);
 
 			AlignStaffnamesInLeftMargin(leftMargin, pageFormat.Gap);
 
@@ -906,117 +906,231 @@ namespace Moritz.Symbols
             return widthFactors;
         }
 
+		///// <summary>
+		///// The barlines' DrawObjects are currently at their default (lowest) positions.
+		///// Now, if they currently collide with some other NoteObject on the same staff,
+		///// they are moved vertically away from the system until they dont.
+		///// Barnumber boxes are moved outside region info boxes, if necessary.
+		///// </summary>
+		//private void AdjustBarlineDrawObjectsVertically(float gap)
+		//{
+		//	Voice barlineVoice = this.Staves[0].Voices[0];
+		//	Barline barline = null;
+		//	DurationSymbol firstDSInVoice0 = null;
+		//	DurationSymbol secondDSInVoice0 = null;
+		//	foreach(NoteObject noteObject in barlineVoice.NoteObjects)
+		//	{
+		//		if(barline == null)
+		//			barline = noteObject as Barline;
+		//		if(firstDSInVoice0 == null)
+		//			firstDSInVoice0 = noteObject as DurationSymbol;
+		//		else if(firstDSInVoice0 != null && secondDSInVoice0 == null)
+		//			secondDSInVoice0 = noteObject as DurationSymbol;
+		//		if(barline != null && firstDSInVoice0 != null && secondDSInVoice0 != null)
+		//			break;
+		//	}
+		//	Debug.Assert(barline != null && firstDSInVoice0 != null); // secondDSInVoice0 can be null if there is only one DS!
 
+		//	DurationSymbol firstDSInVoice1 = null;
+		//	DurationSymbol secondDSInVoice1 = null;
+		//	Staff topVisibleStaff = barlineVoice.Staff;
+		//	if(topVisibleStaff.Voices.Count == 2)
+		//	{
+		//		foreach(NoteObject noteObject in topVisibleStaff.Voices[1].NoteObjects)
+		//		{
+		//			if(firstDSInVoice1 == null)
+		//				firstDSInVoice1 = noteObject as DurationSymbol;
+		//			else if(firstDSInVoice1 != null && secondDSInVoice1 == null)
+		//				secondDSInVoice1 = noteObject as DurationSymbol;
 
-        /// <summary>
-        /// The barnumber is currently at its default position.
-        /// Now, if it currently collides with part of the following chord,
-        /// (or, if the first duration symbol is a rest, the chord after that)
-        /// move it vertically away from the system until it does not.
-        /// </summary>
-        private void AdjustBarnumberVertically(float gap)
-        {
-			Voice barnumberVoice = this.Staves[0].Voices[0];
-            Barline barline = null;
-            DurationSymbol firstDSInVoice0 = null;
-            DurationSymbol secondDSInVoice0 = null;
-            foreach(NoteObject noteObject in barnumberVoice.NoteObjects)
-            {
-                if(barline == null)
-                    barline = noteObject as Barline;
-                if(firstDSInVoice0 == null)
-                    firstDSInVoice0 = noteObject as DurationSymbol;
-                else if(firstDSInVoice0 != null && secondDSInVoice0 == null)
-                    secondDSInVoice0 = noteObject as DurationSymbol;
-                if(barline != null && firstDSInVoice0 != null && secondDSInVoice0 != null)
-                    break;
-            }
-            Debug.Assert(barline != null && firstDSInVoice0 != null); // secondDSInVoice0 can be null if there is only one DS!
+		//			if(firstDSInVoice1 != null && secondDSInVoice1 != null)
+		//				break;
+		//		}
+		//		Debug.Assert(firstDSInVoice1 != null); // secondDSInVoice0 can be null if there is only one DS!
+		//	}
 
-            DurationSymbol firstDSInVoice1 = null;
-            DurationSymbol secondDSInVoice1 = null;
-            Staff topVisibleStaff = barnumberVoice.Staff;
-            if(topVisibleStaff.Voices.Count == 2)
-            {
-                foreach(NoteObject noteObject in topVisibleStaff.Voices[1].NoteObjects)
-                {
-                    if(firstDSInVoice1 == null)
-                        firstDSInVoice1 = noteObject as DurationSymbol;
-                    else if(firstDSInVoice1 != null && secondDSInVoice1 == null)
-                        secondDSInVoice1 = noteObject as DurationSymbol;
+		//	BarlineMetrics barlineMetrics = barline.Metrics as BarlineMetrics;
+		//	BarnumberMetrics barnumberMetrics = barlineMetrics.BarnumberMetrics;
 
-                    if(firstDSInVoice1 != null && secondDSInVoice1 != null)
-                        break;
-                }
-                Debug.Assert(firstDSInVoice1 != null); // secondDSInVoice0 can be null if there is only one DS!
-            }
+		//	if(barnumberMetrics != null)
+		//	{
+		//		RemoveCollision(barnumberMetrics, firstDSInVoice0, gap);
+		//		if(firstDSInVoice0 is RestSymbol && secondDSInVoice0 != null)
+		//			RemoveCollision(barnumberMetrics, secondDSInVoice0, gap);
 
-            BarlineMetrics barlineMetrics = barline.Metrics as BarlineMetrics;
-            BarnumberMetrics barnumberMetrics = barlineMetrics.BarnumberMetrics;
+		//		if(topVisibleStaff.Voices.Count == 2)
+		//		{
+		//			RemoveCollision(barnumberMetrics, firstDSInVoice1, gap);
+		//			if(firstDSInVoice1 is RestSymbol && secondDSInVoice1 != null)
+		//				RemoveCollision(barnumberMetrics, secondDSInVoice1, gap);
+		//			// the barnumber may now collide with the first DurationSymbol in Voice0...
+		//			RemoveCollision(barnumberMetrics, firstDSInVoice0, gap);
+		//			if(firstDSInVoice0 is RestSymbol && secondDSInVoice0 != null)
+		//				RemoveCollision(barnumberMetrics, secondDSInVoice0, gap);
+		//		}
+		//	}
+		//}
 
-            if(barnumberMetrics != null)
-            {
-                RemoveCollision(barnumberMetrics, firstDSInVoice0, gap);
-                if(firstDSInVoice0 is RestSymbol && secondDSInVoice0 != null)
-                    RemoveCollision(barnumberMetrics, secondDSInVoice0, gap);
+		/// <summary>
+		/// The barlines' DrawObjects are currently at their default (lowest) positions.
+		/// Now, if they currently collide with some other NoteObject on the same staff,
+		/// they are moved vertically away from the system until they dont.
+		/// Barnumber boxes are moved outside region info boxes, if necessary.
+		/// </summary>
+		private void AdjustBarlineDrawObjectsVertically(float gap)
+		{
+			List<NoteObject> noteObjects0 = this.Staves[0].Voices[0].NoteObjects;
+			List<NoteObject> noteObjects1 = (this.Staves[0].Voices.Count > 1) ? this.Staves[0].Voices[1].NoteObjects : null;
 
-                if(topVisibleStaff.Voices.Count == 2)
-                {
-                    RemoveCollision(barnumberMetrics, firstDSInVoice1, gap);
-                    if(firstDSInVoice1 is RestSymbol && secondDSInVoice1 != null)
-                        RemoveCollision(barnumberMetrics, secondDSInVoice1, gap);
-                    // the barnumber may now collide with the first DurationSymbol in Voice0...
-                    RemoveCollision(barnumberMetrics, firstDSInVoice0, gap);
-                    if(firstDSInVoice0 is RestSymbol && secondDSInVoice0 != null)
-                        RemoveCollision(barnumberMetrics, secondDSInVoice0, gap);
-                }
-            }
-        }
+			foreach(NoteObject noteObject in noteObjects0)
+			{
+				if(noteObject is Barline barline)
+				{
+					RemoveCollisions(barline, noteObjects0, gap);
+					if(noteObjects1 != null)
+					{
+						RemoveCollisions(barline, noteObjects1, gap);
+					}
+				}
+			}
+		}
 
-        /// <summary>
-        /// If there is a collision between them, move the barnumber above the first duration symbol in the voice.
-        /// </summary>
-        /// <param name="barnumberMetrics"></param>
-        /// <param name="durationSymbolMetrics"></param>
-        /// <param name="gap"></param>
-        private void RemoveCollision(BarnumberMetrics barnumberMetrics, DurationSymbol durationSymbol, float gap)
+		private void RemoveCollisions(Barline barline, List<NoteObject> fixedNoteObjects, float gap)
+		{
+			if(barline.Metrics is BarlineMetrics barlineMetrics)
+			{
+				BarnumberMetrics barnumberMetrics = barlineMetrics.BarnumberMetrics;
+				FramedRegionInfoMetrics regionStartTextMetrics = barlineMetrics.FramedRegionStartTextMetrics;
+				FramedRegionInfoMetrics regionEndTextMetrics = barlineMetrics.FramedRegionEndTextMetrics;
+
+				MoveDrawObjectAboveDurationSymbols(regionStartTextMetrics, fixedNoteObjects, gap);
+				MoveDrawObjectAboveDurationSymbols(regionEndTextMetrics, fixedNoteObjects, gap);
+				MoveDrawObjectAboveDurationSymbols(barnumberMetrics, fixedNoteObjects, gap);
+
+				MoveBarnumberAboveRegionBox(barnumberMetrics, regionStartTextMetrics, gap);
+				MoveBarnumberAboveRegionBox(barnumberMetrics, regionEndTextMetrics, gap);
+			}
+			else if(barline.Metrics is EndBarlineMetrics endBarlineMetrics)
+			{
+				FramedRegionInfoMetrics regionEndTextMetrics = endBarlineMetrics.FramedRegionEndTextMetrics;
+
+				MoveDrawObjectAboveDurationSymbols(regionEndTextMetrics, fixedNoteObjects, gap);
+			}
+			else
+			{
+				throw new ApplicationException();
+			}
+		}
+
+		private void MoveBarnumberAboveRegionBox(BarnumberMetrics barnumberMetrics, FramedRegionInfoMetrics regionInfoMetrics, float gap)
+		{
+			if(barnumberMetrics != null && regionInfoMetrics != null)
+			{
+				float overlap = barnumberMetrics.Bottom - regionInfoMetrics.Top;
+				float shift = 0F;
+				if(overlap > 0)
+				{
+					shift = overlap + (gap / 2);
+				}
+				else if(overlap > -(gap/2))
+				{
+					shift = barnumberMetrics.Bottom - (regionInfoMetrics.Top - (gap / 2));
+				}
+				if(shift > 0)
+				{
+					barnumberMetrics.Move(0, -shift);
+				}
+			}
+		}
+
+		private void MoveDrawObjectAboveDurationSymbols(GroupMetrics drawObjectMetrics, List<NoteObject> fixedNoteObjects, float gap)
+		{
+			if(drawObjectMetrics != null)
+			{
+				foreach(NoteObject fixedNoteObject in fixedNoteObjects)
+				{
+					if(fixedNoteObject is DurationSymbol)
+					{
+						int overlaps = OverlapsHorizontally(drawObjectMetrics, fixedNoteObject);
+						if(overlaps == 0)
+						{
+							MoveDrawObjectAboveDurationSymbol(drawObjectMetrics, fixedNoteObject, gap);
+						}
+						else if(overlaps == 1)
+						{
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// returns
+		/// -1 if metrics is entirely to the left of the fixedNoteObject;
+		/// 0 if metrics overlaps the fixedNoteObject;
+		/// 1 if metrics is entirely to the right of the fixedNoteObject;
+		/// </summary>
+		/// <returns></returns>
+		private int OverlapsHorizontally(Metrics metrics, NoteObject fixedNoteObject)
+		{
+			int rval = 0;
+			Metrics fixedMetrics = fixedNoteObject.Metrics;
+			if(metrics.Right < fixedMetrics.Left)
+			{
+				rval = -1;
+			}
+			else if(metrics.Left > fixedMetrics.Right)
+			{
+				rval = 1;
+			}
+			return rval;
+		}
+
+		/// <summary>
+		/// Move the drawObject above the fixedNoteObject if it is not already.
+		/// </summary>
+		/// <param name="drawObjectMetrics"></param>
+		/// <param name="durationSymbolMetrics"></param>
+		/// <param name="gap"></param>
+		private void MoveDrawObjectAboveDurationSymbol(GroupMetrics drawObjectMetrics, NoteObject fixedNoteObject, float gap)
         {
 			float verticalOverlap = 0F;
-			if(durationSymbol.Metrics is ChordMetrics chordMetrics)
+			if(fixedNoteObject.Metrics is ChordMetrics chordMetrics)
 			{
-				verticalOverlap = chordMetrics.OverlapHeight(barnumberMetrics, gap);
+				verticalOverlap = chordMetrics.OverlapHeight(drawObjectMetrics, gap);
 			}
-
-			if(durationSymbol.Metrics is RestMetrics restMetrics)
-            {
-                verticalOverlap = restMetrics.OverlapHeight(barnumberMetrics, gap);
-                if(verticalOverlap > 0)
-                {
-                    // fine tuning
-                    // compare with the extra padding given to these symbols in the RestMetrics constructor.
-                    switch(durationSymbol.DurationClass)
-                    {
-                        case DurationClass.breve:
-                        case DurationClass.semibreve:
-                        case DurationClass.minim:
-                        case DurationClass.crotchet:
-                        case DurationClass.quaver:
-                        case DurationClass.semiquaver:
-                            break;
-                        case DurationClass.threeFlags:
-                            verticalOverlap -= gap;
-                            break;
-                        case DurationClass.fourFlags:
-                            verticalOverlap -= gap * 2F;
-                            break;
-                        case DurationClass.fiveFlags:
-                            verticalOverlap -= gap * 2.5F;
-                            break;
-                    }
-                }
-            }
-            if(verticalOverlap > 0)
-                barnumberMetrics.Move(0F, -(verticalOverlap + gap));
+			else if(fixedNoteObject.Metrics is RestMetrics restMetrics)
+			{
+				verticalOverlap = restMetrics.OverlapHeight(drawObjectMetrics, gap);
+				if(verticalOverlap > 0 && fixedNoteObject is ChordSymbol chordSymbol) 
+				{
+					Debug.Assert(false, "Strange Code: Can a ChordSymbol have RestMetrics???");
+					// fine tuning
+					// compare with the extra padding given to these symbols in the RestMetrics constructor.
+					switch(chordSymbol.DurationClass)
+					{
+						case DurationClass.breve:
+						case DurationClass.semibreve:
+						case DurationClass.minim:
+						case DurationClass.crotchet:
+						case DurationClass.quaver:
+						case DurationClass.semiquaver:
+							break;
+						case DurationClass.threeFlags:
+							verticalOverlap -= gap;
+							break;
+						case DurationClass.fourFlags:
+							verticalOverlap -= gap * 2F;
+							break;
+						case DurationClass.fiveFlags:
+							verticalOverlap -= gap * 2.5F;
+							break;
+					}
+				}
+			}
+			if(verticalOverlap > 0)
+				drawObjectMetrics.Move(0F, -(verticalOverlap + gap));
         }
 
         private void AlignStaffnamesInLeftMargin(float leftMarginPos, float gap)

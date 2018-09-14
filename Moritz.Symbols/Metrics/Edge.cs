@@ -164,14 +164,24 @@ namespace Moritz.Symbols
 					EndBarline endBarline = noteObject as EndBarline;
 					if(noteObject is Barline barline && endBarline == null)
 					{
-						BarlineMetrics barlineMetrics = barline.Metrics as BarlineMetrics;
-						if(barlineMetrics.BarnumberMetrics != null)
+						if(barline.Metrics is BarlineMetrics barlineMetrics)
 						{
-							Add(barlineMetrics.BarnumberMetrics);
-						}
-						if(barlineMetrics.StaffNameMetrics != null)
-						{
-							Add(barlineMetrics.StaffNameMetrics);
+							if(barlineMetrics.StaffNameMetrics != null)
+							{
+								Add(barlineMetrics.StaffNameMetrics);
+							}
+							if(barlineMetrics.FramedRegionStartTextMetrics != null)
+							{
+								Add(barlineMetrics.FramedRegionStartTextMetrics);
+							}
+							if(barlineMetrics.FramedRegionEndTextMetrics != null)
+							{
+								Add(barlineMetrics.FramedRegionEndTextMetrics);
+							}
+							if(barlineMetrics.StaffNameMetrics != null)
+							{
+								Add(barlineMetrics.StaffNameMetrics);
+							}
 						}
 					}
 				}

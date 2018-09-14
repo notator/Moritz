@@ -228,8 +228,8 @@ namespace Moritz.Symbols
 
             if(graphics != null && barline != null)
             {
-				float barlineTopToRegionInfoBottom = gap * 5F;
-				float barlineTopToBarnumberBottom = gap * 6F;
+				float minimumBarlineTopToRegionInfoBottom = gap * 3F;
+				float minimumBarlineTopToBarnumberBottom = gap * 6F;
 
 				foreach(DrawObject drawObject in barline.DrawObjects)
                 {
@@ -252,7 +252,7 @@ namespace Moritz.Symbols
                         {
                             _barnumberMetrics = new BarnumberMetrics(graphics, text.TextInfo, text.FrameInfo);
                             // move the bar number above this barline
-                            _barnumberMetrics.Move(0F, -barlineTopToBarnumberBottom);
+                            _barnumberMetrics.Move(0F, -minimumBarlineTopToBarnumberBottom);
                         }
                     }
 					else if(drawObject is TextList textList)
@@ -264,14 +264,14 @@ namespace Moritz.Symbols
 							_framedRegionStartTextMetrics = new FramedRegionInfoMetrics(graphics, framedRegionStartText.Texts, framedRegionStartText.FrameInfo);
 							// move the regionInfo above this barline, and align its left edge with the barline
 							FramedRegionInfoMetrics frstm = _framedRegionStartTextMetrics;
-							frstm.Move(0, -barlineTopToRegionInfoBottom);
+							frstm.Move(0, -minimumBarlineTopToRegionInfoBottom);
 						}
 						else if(textList is FramedRegionEndText framedRegionEndText)
 						{
 							_framedRegionEndTextMetrics = new FramedRegionInfoMetrics(graphics, framedRegionEndText.Texts, framedRegionEndText.FrameInfo);
 							// move the regionInfo above this barline, and align its right edge with the barline
 							FramedRegionInfoMetrics fretm = _framedRegionEndTextMetrics;
-							fretm.Move(0, -barlineTopToRegionInfoBottom);
+							fretm.Move(0, -minimumBarlineTopToRegionInfoBottom);
 						}
 					}
 				}

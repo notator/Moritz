@@ -69,7 +69,7 @@ namespace Moritz.Symbols
 
 			for(int i = 0; i < regionDefSeq.Count; ++i)
 			{
-				string regionLink = (i < regionDefSeq.Count - 1) ? regionDefSeq[i].name + "➔" + regionDefSeq[i + 1].name : regionDefSeq[i].name;
+				string regionLink = (i < regionDefSeq.Count - 1) ? regionDefSeq[i].name + "➔" + regionDefSeq[i + 1].name : regionDefSeq[i].name + " end";
 				int barIndex = regionDefSeq[i].endBarIndex;
 				if(!rval.ContainsKey(barIndex))
 				{
