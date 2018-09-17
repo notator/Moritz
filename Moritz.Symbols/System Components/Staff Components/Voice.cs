@@ -47,18 +47,17 @@ namespace Moritz.Symbols
 
 				if(noteObject is Barline barline)
 				{
-					if(staffIsVisible && barline.IsVisible)
+					bool isLastNoteObject = (i == (NoteObjects.Count - 1));
+					float top = Staff.Metrics.StafflinesTop;
+					float bottom = Staff.Metrics.StafflinesBottom;
+					PageFormat pageFormat = Staff.SVGSystem.Score.PageFormat;
+					float barlineStrokeWidth = pageFormat.BarlineStrokeWidth;
+					float stafflineStrokeWidth = pageFormat.StafflineStemStrokeWidth;
+					if(barline.IsVisible)
 					{
-						bool isLastNoteObject = (i == (NoteObjects.Count - 1));
-						float top = Staff.Metrics.StafflinesTop;
-						float bottom = Staff.Metrics.StafflinesBottom;
-						PageFormat pageFormat = Staff.SVGSystem.Score.PageFormat;
-						float barlineStrokeWidth = pageFormat.BarlineStrokeWidth;
-						float stafflineStrokeWidth = pageFormat.StafflineStemStrokeWidth;
 						barline.WriteSVG(w, top, bottom, stafflineStrokeWidth, isLastNoteObject);
-						//barline.WriteDrawObjectsSVG(w, staffIsVisible, (firstBarline.Voice is InputVoice));
-						barline.WriteDrawObjectsSVG(w);
 					}
+					barline.WriteDrawObjectsSVG(w);
 				}
 				else if(inputChordSymbol != null)
 				{

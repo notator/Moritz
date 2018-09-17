@@ -32,6 +32,8 @@ namespace Moritz.Symbols
 			{
 				if(metrics is BarlineMetrics barlineMetrics)
 				{
+					ExpandMetrics(barlineMetrics.FramedRegionStartTextMetrics);
+					ExpandMetrics(barlineMetrics.FramedRegionEndTextMetrics);
 					ExpandMetrics(barlineMetrics.BarnumberMetrics);
 					ExpandMetrics(barlineMetrics.StaffNameMetrics);
 				}

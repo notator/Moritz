@@ -298,7 +298,7 @@ namespace Moritz.Symbols
         /// </summary>
         public override void WriteSVG(SvgWriter w)
         {
-            throw new NotImplementedException();
+            throw new ApplicationException();
         }
 
         /// <summary>
@@ -338,7 +338,6 @@ namespace Moritz.Symbols
 
     internal class EndBarlineMetrics : GroupMetrics
     {
-
 		public EndBarlineMetrics(Graphics graphics, EndBarline endBarline, float thinStrokeWidth, float thickStrokeWidth, float gap)
             : base(CSSObjectClass.endBarline)
         {

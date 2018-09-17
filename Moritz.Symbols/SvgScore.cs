@@ -816,7 +816,7 @@ namespace Moritz.Symbols
             {{
                 stroke:black;
                 stroke-width:{strokeWidth}px;
-                fill:#EEEEFF
+                fill:none
             }}
             ");
 			}
@@ -828,7 +828,7 @@ namespace Moritz.Symbols
             {{
                 stroke:black;
                 stroke-width:{strokeWidth}px;
-                fill:#FFFFDD
+                fill:#FFFFEE
             }}
             ");
 			}
@@ -1282,7 +1282,7 @@ namespace Moritz.Symbols
         /// There is currently one bar per System. 
         /// All Duration Symbols have been constructed in voice.NoteObjects.
         /// There are no barlines in the score yet.
-        /// Add a barline to each Voice in the staff, adding a double bar to the final system
+        /// Add a barline to each Voice in the staff, adding an EndBarline to the final bar (=system)
         /// </summary>
         /// <param name="barlineType"></param>
         /// <param name="systemNumbers"></param>
