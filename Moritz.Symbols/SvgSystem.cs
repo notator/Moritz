@@ -1030,11 +1030,11 @@ namespace Moritz.Symbols
 				float shift = 0F;
 				if(overlap > 0)
 				{
-					shift = overlap + (gap / 2);
+					shift = overlap + gap;
 				}
-				else if(overlap > -(gap/2))
+				else if(overlap > -gap)
 				{
-					shift = barnumberMetrics.Bottom - (regionInfoMetrics.Top - (gap / 2));
+					shift = barnumberMetrics.Bottom - (regionInfoMetrics.Top - gap);
 				}
 				if(shift > 0)
 				{
