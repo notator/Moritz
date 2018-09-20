@@ -65,7 +65,7 @@ namespace Moritz.Symbols
 		public float OverlapWidth(Metrics previousMetrics)
 		{
 			bool verticalOverlap = true;
-			if(!(this is BarlineMetrics))
+			if(!(this is Barline_LineMetrics))
 			{
 				if((previousMetrics.Top > Bottom) || (previousMetrics.Bottom < Top))
 					verticalOverlap = false;

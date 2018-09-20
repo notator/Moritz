@@ -452,13 +452,10 @@ namespace Moritz.Symbols
             ChordSymbol chordSymbol = noteObject as ChordSymbol;
             InputChordSymbol inputChordSymbol = noteObject as InputChordSymbol;
             RestSymbol rest = noteObject as RestSymbol;
-			if(noteObject is EndBarline endBarline)
+			if(barline != null)
 			{
-				returnMetrics = new EndBarlineMetrics(graphics, endBarline, pageFormat.BarlineStrokeWidth, pageFormat.ThickBarlineStrokeWidth, gap);
-			}
-			else if(barline != null)
-			{
-				returnMetrics = new BarlineMetrics(graphics, barline, pageFormat.BarlineStrokeWidth, gap);
+				barline.CreateMetrics(graphics);
+				returnMetrics = barline.Barline_LineMetrics;
 			}
 			else if(smallClef != null)
 			{
@@ -834,7 +831,7 @@ namespace Moritz.Symbols
             NoteObject no2 = GetFollowingChordRestOrBarlineSymbol(noteObjects);
 			ChordSymbol chord2 = no2 as ChordSymbol;
 			RestSymbol rest2 = no2 as RestSymbol;
-			if(no2 is Barline barline)
+			if(no2 is NormalBarline barline)
 			{
 				float x2 = barline.Metrics.OriginX;
 				x2s = GetEqualFloats(x2, x1s.Count);
@@ -900,7 +897,7 @@ namespace Moritz.Symbols
 
                 if(noteObjectToReturn != null) // a ChordSymbol or a RestSymbol (not a CautionaryChordSymbol)
                 {
-                    if(noteObjects[i - 1] is Barline barline)
+                    if(noteObjects[i - 1] is NormalBarline barline)
                         noteObjectToReturn = barline;
                     break;
                 }
@@ -958,7 +955,7 @@ namespace Moritz.Symbols
                                     if(hasContinuingBeamBlock)
                                         Debug.Assert(true);
 
-                                    if(noteObjects[index - 1] is Barline barline)
+                                    if(noteObjects[index - 1] is NormalBarline barline)
                                     {
                                         float x2 = barline.Metrics.OriginX;
                                         x2s = GetEqualFloats(x2, x1s.Count);

@@ -47,6 +47,8 @@ namespace Moritz.Xml
 		smallClefX, inputSmallClefX, // The 'x' above or below a small clef. (Arial) Container:clef/inputClef.
 		#endregion
 
+		#region drawObjects
+		drawObjects,
 		#region barNumbers
 		// recorded and used but never defined. If it exists, both barNumberNumber and barNumberFrame must be defined.
 		barNumber, // Container: The first voice in a system, but not in the first system in the score.
@@ -64,6 +66,7 @@ namespace Moritz.Xml
 		regionInfoFrame,    // Container: regionInfo
 							// recorded and used if regionInfo exists
 		#endregion regionInfo
+		#endregion drawObjects
 
 		#region chord classes
 		chord, // Container:voice
@@ -101,9 +104,11 @@ namespace Moritz.Xml
 
 		#region barlines
 		barline, // always used, recorded and defined. A normal barline and endBarline component. Container:voice/inputVoice
-		endBarline, // always used and recorded. A barline + thickBarline group. Never defined. Container:voice/inputVoice
 		thickBarline, // always used and recorded. An endBarline component. Always defined. Container:endBarline
-		staffConnectors, // A group of barline (and maybe endBarline) in a system. Never defined. Container:system. 
+		staffConnectors, // A group of barline (and maybe endBarline) in a system. Never defined. Container:system.
+		startRegionBarline,
+		endRegionBarline,
+		endAndStartRegionBarline,
 		#endregion barlines
 	};
 

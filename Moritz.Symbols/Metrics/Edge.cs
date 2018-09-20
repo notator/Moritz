@@ -68,7 +68,7 @@ namespace Moritz.Symbols
         public float Right;
         public float Y;
     }
-    internal abstract class HorizontalEdge
+    public abstract class HorizontalEdge
     {
         /// <summary>
         /// A sequence of HLines (horizontal line segments) ordered from left to right horizontally.
@@ -120,7 +120,7 @@ namespace Moritz.Symbols
                     }
                 }
             }
-            Debug.Assert(y != float.MaxValue);
+             Debug.Assert(y != float.MaxValue);
             return y;
         }
         
@@ -161,28 +161,9 @@ namespace Moritz.Symbols
 						Add(noteObject.Metrics);
 					}
 
-					EndBarline endBarline = noteObject as EndBarline;
-					if(noteObject is Barline barline && endBarline == null)
+					if(noteObject is Barline barline)
 					{
-						if(barline.Metrics is BarlineMetrics barlineMetrics)
-						{
-							if(barlineMetrics.StaffNameMetrics != null)
-							{
-								Add(barlineMetrics.StaffNameMetrics);
-							}
-							if(barlineMetrics.FramedRegionStartTextMetrics != null)
-							{
-								Add(barlineMetrics.FramedRegionStartTextMetrics);
-							}
-							if(barlineMetrics.FramedRegionEndTextMetrics != null)
-							{
-								Add(barlineMetrics.FramedRegionEndTextMetrics);
-							}
-							if(barlineMetrics.StaffNameMetrics != null)
-							{
-								Add(barlineMetrics.StaffNameMetrics);
-							}
-						}
+						barline.AddMetricsToEdge(this);						
 					}
 				}
             }
@@ -196,7 +177,7 @@ namespace Moritz.Symbols
         public List<HLine> Lines = new List<HLine>();
     }
 
-    internal class TopEdge : HorizontalEdge
+    public class TopEdge : HorizontalEdge
     {
         /// <summary>
         /// The top edge of a staff.
@@ -439,7 +420,7 @@ namespace Moritz.Symbols
             return allXs;
         }
     }
-    internal class BottomEdge : HorizontalEdge
+    public class BottomEdge : HorizontalEdge
     {
         /// <summary>
         /// The bottom edge of a staff.

@@ -50,14 +50,11 @@ namespace Moritz.Symbols
 					bool isLastNoteObject = (i == (NoteObjects.Count - 1));
 					float top = Staff.Metrics.StafflinesTop;
 					float bottom = Staff.Metrics.StafflinesBottom;
-					PageFormat pageFormat = Staff.SVGSystem.Score.PageFormat;
-					float barlineStrokeWidth = pageFormat.BarlineStrokeWidth;
-					float stafflineStrokeWidth = pageFormat.StafflineStemStrokeWidth;
 					if(barline.IsVisible)
 					{
-						barline.WriteSVG(w, top, bottom, stafflineStrokeWidth, isLastNoteObject);
+						barline.WriteSVG(w, top, bottom, isLastNoteObject);
 					}
-					barline.WriteDrawObjectsSVG(w);
+					barline.WriteDrawObjectsSVG(w); 
 				}
 				else if(inputChordSymbol != null)
 				{
@@ -127,26 +124,26 @@ namespace Moritz.Symbols
 		/// <summary>
 		/// Returns null if the last noteObject on this voice's noteObject list is not a Barline.
 		/// </summary>
-		public Barline FinalBarline
+		public NormalBarline FinalBarline
         {
             get
             {
-                Barline finalBarline = this.NoteObjects[NoteObjects.Count - 1] as Barline;
+                NormalBarline finalBarline = this.NoteObjects[NoteObjects.Count - 1] as NormalBarline;
                 return finalBarline;
             }
         }
         /// <summary>
         /// Returns the first barline to occur before any durationSymbols, or null if no such barline exists.
         /// </summary>
-        public Barline InitialBarline
+        public NormalBarline InitialBarline
         {
             get
             {
-                Barline initialBarline = null;
+                NormalBarline initialBarline = null;
                 foreach(NoteObject noteObject in NoteObjects)
                 {
-                    initialBarline = noteObject as Barline;
-                    if(noteObject is DurationSymbol || noteObject is Barline)
+                    initialBarline = noteObject as NormalBarline;
+                    if(noteObject is DurationSymbol || noteObject is NormalBarline)
                         break;
                 }
                 return initialBarline;
@@ -235,7 +232,7 @@ namespace Moritz.Symbols
 				ChordSymbol chord = noteObject as ChordSymbol;
 				RestSymbol rest = noteObject as RestSymbol;
                 Clef clef = noteObject as Clef;
-                Barline barline = noteObject as Barline;
+                NormalBarline barline = noteObject as NormalBarline;
 
 				if(noteObject is CautionaryChordSymbol cautionaryChord)
 					continue;

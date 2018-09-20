@@ -20,15 +20,13 @@ namespace Moritz.Symbols
         {
         }
 
-        public List<DrawObject> DrawObjects { get { return _drawObjects; } set { _drawObjects = value; } }
+		public List<DrawObject> DrawObjects { get; set; } = new List<DrawObject>();
 
-        private List<DrawObject> _drawObjects = new List<DrawObject>();
-      
-        /// <summary>
-        /// This field is set to true (while creating a MidiScore for performance) if a specific
-        /// dynamic has been attached to this anchorageSymbol..
-        /// </summary>
-        public bool HasExplicitDynamic = false;
+		/// <summary>
+		/// This field is set to true (while creating a MidiScore for performance) if a specific
+		/// dynamic has been attached to this anchorageSymbol..
+		/// </summary>
+		public bool HasExplicitDynamic = false;
 
         public void AddDynamic(byte midiVelocity, byte currentVelocity)
         {
@@ -38,7 +36,7 @@ namespace Moritz.Symbols
             if(String.Compare(newDynamicString, currentDynamicString) != 0)
             {
                 DynamicText dynamicText = new DynamicText(this, newDynamicString, FontHeight);
-                this._drawObjects.Add(dynamicText);
+                this.DrawObjects.Add(dynamicText);
             }
         }
 

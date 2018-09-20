@@ -25,7 +25,7 @@ namespace Moritz.Symbols
 
 		public abstract void WriteSVG(SvgWriter w);
 
-		public readonly object Container;
+		public object Container;
 
 		/// <summary>
 		/// Set when this drawObject is inside a Transposable drawObject
@@ -54,7 +54,7 @@ namespace Moritz.Symbols
 		private string _enharmonicNote = "";
 	}
 
-	internal class Text : DrawObject
+	public class Text : DrawObject
 	{
 		public Text(object container, string text, string fontName, float fontHeight, TextHorizAlign align)
 			: base(container)

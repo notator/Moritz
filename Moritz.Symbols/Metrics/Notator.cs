@@ -150,7 +150,7 @@ namespace Moritz.Symbols
                 durationSymbols.Add(durationSymbol);
             }
 
-			Debug.Assert(!(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline));
+			Debug.Assert(!(voice.NoteObjects[voice.NoteObjects.Count - 1] is NormalBarline));
 			Debug.Assert(durationSymbols.Count > 0);
 			Debug.Assert(absMsPos > durationSymbols[0].AbsMsPosition);
 
@@ -269,7 +269,7 @@ namespace Moritz.Symbols
             {
                 foreach(NoteObject noteObject in staff.Voices[0].NoteObjects)
                 {
-					if(noteObject is Barline firstBarline)
+					if(noteObject is NormalBarline firstBarline)
 					{
 						foreach(DrawObject drawObject in firstBarline.DrawObjects)
 						{

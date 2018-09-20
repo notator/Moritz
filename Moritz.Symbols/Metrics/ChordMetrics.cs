@@ -527,7 +527,7 @@ namespace Moritz.Symbols
             {
                 if(noteObjects[i] == chord)
                 {
-                    nextNoteObjectIsABarline = (noteObjects[i + 1] is Barline);
+                    nextNoteObjectIsABarline = (noteObjects[i + 1] is NormalBarline);
                     break;
                 }
             }

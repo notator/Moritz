@@ -2,7 +2,7 @@
 
 namespace Moritz.Symbols
 {
-    internal class StaffMetrics : GroupMetrics
+    public class StaffMetrics : GroupMetrics
     {
         public StaffMetrics(float left, float right, float height, bool isInput)
             : base(isInput ? CSSObjectClass.inputStaff : CSSObjectClass.staff)
@@ -25,20 +25,10 @@ namespace Moritz.Symbols
             _stafflinesBottom += dy;
         }
 
-		public override void ResetBoundary()
-		{
-			base.ResetBoundary();
-			foreach(Metrics metrics in MetricsList)
-			{
-				if(metrics is BarlineMetrics barlineMetrics)
-				{
-					ExpandMetrics(barlineMetrics.FramedRegionStartTextMetrics);
-					ExpandMetrics(barlineMetrics.FramedRegionEndTextMetrics);
-					ExpandMetrics(barlineMetrics.BarnumberMetrics);
-					ExpandMetrics(barlineMetrics.StaffNameMetrics);
-				}
-			}
-		}
+		//public override void ResetBoundary()
+		//{
+		//	base.ResetBoundary();
+		//}
 
 		private void ExpandMetrics(Metrics metrics)
 		{

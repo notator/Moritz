@@ -9,7 +9,7 @@ using Moritz.Xml;
 
 namespace Moritz.Symbols
 {
-	internal class TextMetrics : TextStyle
+	public class TextMetrics : TextStyle
 	{
 		public TextMetrics(CSSObjectClass cssClass, Graphics graphics, TextInfo textInfo)
 			: base(cssClass, textInfo.FontFamily, textInfo.FontHeight, textInfo.TextHorizAlign, textInfo.ColorString.String)
@@ -100,6 +100,15 @@ namespace Moritz.Symbols
 
 		private readonly TextInfo _textInfo = null;
 	}
+
+	public class StaffNameMetrics : TextMetrics
+	{
+		public StaffNameMetrics(CSSObjectClass staffClass, Graphics graphics, TextInfo textInfo)
+			: base(staffClass, graphics, textInfo)
+		{
+		}
+	}
+
 	internal class LyricMetrics : TextMetrics, ICloneable
 	{
 		public LyricMetrics(float gap, Graphics graphics, TextInfo textInfo, bool isBelow, CSSObjectClass lyricClass)
@@ -134,7 +143,7 @@ namespace Moritz.Symbols
 
 		public readonly bool IsBelow;
 	}
-	internal class BarnumberMetrics : GroupMetrics
+	public class BarnumberMetrics : GroupMetrics
 	{
 		public BarnumberMetrics(Graphics graphics, TextInfo textInfo, FramePadding framePadding)
 			: base(CSSObjectClass.barNumber)
@@ -166,7 +175,7 @@ namespace Moritz.Symbols
 	}
 
 	// FramedRegionInfoMetrics(graphics, framedRegionEndText.Texts, framedRegionEndText.FrameInfo)
-	internal class FramedRegionInfoMetrics : GroupMetrics
+	public class FramedRegionInfoMetrics : GroupMetrics
 	{
 		public FramedRegionInfoMetrics(Graphics graphics, List<Text> texts, FramePadding framePadding)
 			: base(CSSObjectClass.framedRegionInfo)

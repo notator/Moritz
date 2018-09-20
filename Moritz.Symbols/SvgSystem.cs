@@ -57,7 +57,6 @@ namespace Moritz.Symbols
         {
             List<bool> barlineContinuesDownList = pageFormat.BarlineContinuesDownList;
             Debug.Assert(barlineContinuesDownList[barlineContinuesDownList.Count - 1] == false);
-            EndBarline endBarline = null;
             Barline barline = null;
             bool isFirstBarline = true;
 
@@ -101,8 +100,8 @@ namespace Moritz.Symbols
                             for(int i = 0; i < voice.NoteObjects.Count; ++i)
                             {
                                 NoteObject noteObject = voice.NoteObjects[i];
-                                barline = noteObject as Barline; // EndBarline is also a Barline
-                                if(barline != null || endBarline != null)
+                                barline = noteObject as Barline;
+                                if(barline != null)
                                 {
                                     // draw grouping barlines between staves
                                     if(barlineContinuesDownList[staffIndex] || isFirstBarline)
@@ -110,7 +109,7 @@ namespace Moritz.Symbols
                                         float top = bottomEdge.YatX(barline.Metrics.OriginX) - pageFormat.StafflineStemStrokeWidth;
                                         float bottom = topEdge.YatX(barline.Metrics.OriginX);
                                         bool isLastNoteObject = (i == (voice.NoteObjects.Count - 1));
-                                        barline.WriteSVG(w, top, bottom, pageFormat.StafflineStemStrokeWidth, isLastNoteObject);
+                                        barline.WriteSVG(w, top, bottom, isLastNoteObject);
                                         isFirstBarline = false;
                                     }
                                 }
@@ -140,12 +139,17 @@ namespace Moritz.Symbols
             if(Metrics == null)
                 CreateMetrics(graphics, pageFormat, leftMargin);
 
-            // All noteObject metrics are now on the left edge of the page.
-            // Chords are aligned on the left edge of the page, with accidentals etc further to 
-            // the left. If two standard chords are synchronous in two voices of the same staff,
-            // and the noteheads would overlap, the lower chord will have been been moved slightly
-            // left or right. The two chords are at their final positions relative to each other.
-			// Barnumbers are aligned centred at a default position just above the first barline
+			// All noteObject metrics are now on the left edge of the page.
+			// Chords are aligned on the left edge of the page, with accidentals etc further to 
+			// the left. If two standard chords are synchronous in two voices of the same staff,
+			// and the noteheads would overlap, the lower chord will have been been moved slightly
+			// left or right. The two chords are at their final positions relative to each other.
+			// Barlines are currently aligned with their main line on the left edge of the page.
+			// Barlines' DrawObjects are currently aligned on the left edge of the page with their
+			// OriginY at 0 (barNumbers and staffNames are centred, regionStartTexts are left-aligned,
+			// and regionEndTexts are right-aligned to the edge of the page). These drawObjects are 
+			// are moved to their correct X- and Y- positions after all the DurationObjects and
+			// Barlines have been moved to their final positions on the staff.
 
             MoveClefsAndBarlines(pageFormat.StafflineStemStrokeWidth);
 
@@ -181,11 +185,10 @@ namespace Moritz.Symbols
 
             SetBarlineVisibility(pageFormat.BarlineContinuesDownList);
 
-            JustifyVertically(pageFormat.Right, pageFormat.Gap);
-
-            AdjustBarlineDrawObjectsVertically(pageFormat.Gap);
-
+			SetBarlineFramedTextsMetricsPosition();
 			AlignStaffnamesInLeftMargin(leftMargin, pageFormat.Gap);
+
+			JustifyVertically(pageFormat.Right, pageFormat.Gap);
 
 			ResetStaffMetricsBoundaries();
 
@@ -195,7 +198,6 @@ namespace Moritz.Symbols
         private float CreateMetrics(Graphics graphics, PageFormat pageFormat, float leftMarginPos)
         {           
             this.Metrics = new SystemMetrics();
-            List<NoteObject> NoteObjectsToRemove = new List<NoteObject>();
             for(int staffIndex = 0; staffIndex < Staves.Count; ++staffIndex)
             {
                 Staff staff = Staves[staffIndex];
@@ -214,15 +216,13 @@ namespace Moritz.Symbols
                         NoteObject noteObject = staff.Voices[voiceIndex].NoteObjects[nIndex];
                         noteObject.Metrics = Score.Notator.SymbolSet.NoteObjectMetrics(graphics, noteObject, voice.StemDirection, staff.Gap, pageFormat);
 
-                        if(noteObject.Metrics != null)
-                            staff.Metrics.Add(noteObject.Metrics);
-                        else
-                            NoteObjectsToRemove.Add(noteObject);
+						Debug.Assert(noteObject.Metrics != null);
+						staff.Metrics.Add(noteObject.Metrics);
+						if(noteObject is Barline barline)
+						{
+							barline.AddAncilliaryMetricsTo(staff.Metrics);
+						}
                     }
-
-                    foreach(NoteObject noteObject in NoteObjectsToRemove)
-                        staff.Voices[voiceIndex].NoteObjects.Remove(noteObject);
-                    NoteObjectsToRemove.Clear();
                 }
 
                 if(staff.Voices.Count > 1)
@@ -578,7 +578,7 @@ namespace Moritz.Symbols
 
                                     if(clef != null)
                                     {
-                                        clef.Metrics.Move(barline.Metrics.OriginX - clef.Metrics.Right - hairline, 0F); // clefs have a space on the right
+                                        clef.Metrics.Move(barline.Metrics.Left - clef.Metrics.Right - hairline, 0F); // clefs have a space on the right
                                     }
                                 }
                                 else if(clef != null)
@@ -591,7 +591,7 @@ namespace Moritz.Symbols
                             }
                             else if(barline != null && clef != null)
                             {
-                                clef.Metrics.Move(barline.Metrics.OriginX - clef.Metrics.Right - hairline, 0F); // clefs have a space on the right
+                                clef.Metrics.Move(barline.Metrics.Left - clef.Metrics.Right - hairline, 0F); // clefs have a space on the right
                             }
                         }
                     }
@@ -972,12 +972,15 @@ namespace Moritz.Symbols
 		//}
 
 		/// <summary>
-		/// The barlines' DrawObjects are currently at their default (lowest) positions.
+		/// Each FramedTextsMetrics' OriginX and OriginY values are 0 when this function is called.
+		/// First, align their OriginX with their barline's OriginX, then move them up
+		/// until they either do not collide with other objects or are at their default
+		/// (lowest) positions.
 		/// Now, if they currently collide with some other NoteObject on the same staff,
 		/// they are moved vertically away from the system until they dont.
 		/// Barnumber boxes are moved outside region info boxes, if necessary.
 		/// </summary>
-		private void AdjustBarlineDrawObjectsVertically(float gap)
+		private void SetBarlineFramedTextsMetricsPosition()
 		{
 			List<NoteObject> noteObjects0 = this.Staves[0].Voices[0].NoteObjects;
 			List<NoteObject> noteObjects1 = (this.Staves[0].Voices.Count > 1) ? this.Staves[0].Voices[1].NoteObjects : null;
@@ -986,152 +989,14 @@ namespace Moritz.Symbols
 			{
 				if(noteObject is Barline barline)
 				{
-					RemoveCollisions(barline, noteObjects0, gap);
+					barline.AlignFramedTextsXY(noteObjects0);
 					if(noteObjects1 != null)
 					{
-						RemoveCollisions(barline, noteObjects1, gap);
+						barline.AlignFramedTextsXY(noteObjects1);
 					}
 				}
 			}
 		}
-
-		private void RemoveCollisions(Barline barline, List<NoteObject> fixedNoteObjects, float gap)
-		{
-			if(barline.Metrics is BarlineMetrics barlineMetrics)
-			{
-				BarnumberMetrics barnumberMetrics = barlineMetrics.BarnumberMetrics;
-				FramedRegionInfoMetrics regionStartTextMetrics = barlineMetrics.FramedRegionStartTextMetrics;
-				FramedRegionInfoMetrics regionEndTextMetrics = barlineMetrics.FramedRegionEndTextMetrics;
-
-				MoveDrawObjectAboveDurationSymbols(regionStartTextMetrics, fixedNoteObjects, gap);
-				MoveDrawObjectAboveDurationSymbols(regionEndTextMetrics, fixedNoteObjects, gap);
-				MoveDrawObjectAboveDurationSymbols(barnumberMetrics, fixedNoteObjects, gap);
-
-				MoveBarnumberAboveRegionBox(barnumberMetrics, regionStartTextMetrics, gap);
-				MoveBarnumberAboveRegionBox(barnumberMetrics, regionEndTextMetrics, gap);
-			}
-			else if(barline.Metrics is EndBarlineMetrics endBarlineMetrics)
-			{
-				FramedRegionInfoMetrics regionEndTextMetrics = endBarlineMetrics.FramedRegionEndTextMetrics;
-
-				MoveDrawObjectAboveDurationSymbols(regionEndTextMetrics, fixedNoteObjects, gap);
-			}
-			else
-			{
-				throw new ApplicationException();
-			}
-		}
-
-		private void MoveBarnumberAboveRegionBox(BarnumberMetrics barnumberMetrics, FramedRegionInfoMetrics regionInfoMetrics, float gap)
-		{
-			if(barnumberMetrics != null && regionInfoMetrics != null)
-			{
-				float overlap = barnumberMetrics.Bottom - regionInfoMetrics.Top;
-				float shift = 0F;
-				if(overlap > 0)
-				{
-					shift = overlap + gap;
-				}
-				else if(overlap > -gap)
-				{
-					shift = barnumberMetrics.Bottom - (regionInfoMetrics.Top - gap);
-				}
-				if(shift > 0)
-				{
-					barnumberMetrics.Move(0, -shift);
-				}
-			}
-		}
-
-		private void MoveDrawObjectAboveDurationSymbols(GroupMetrics drawObjectMetrics, List<NoteObject> fixedNoteObjects, float gap)
-		{
-			if(drawObjectMetrics != null)
-			{
-				foreach(NoteObject fixedNoteObject in fixedNoteObjects)
-				{
-					if(fixedNoteObject is DurationSymbol)
-					{
-						int overlaps = OverlapsHorizontally(drawObjectMetrics, fixedNoteObject);
-						if(overlaps == 0)
-						{
-							MoveDrawObjectAboveDurationSymbol(drawObjectMetrics, fixedNoteObject, gap);
-						}
-						else if(overlaps == 1)
-						{
-							break;
-						}
-					}
-				}
-			}
-		}
-
-		/// <summary>
-		/// returns
-		/// -1 if metrics is entirely to the left of the fixedNoteObject;
-		/// 0 if metrics overlaps the fixedNoteObject;
-		/// 1 if metrics is entirely to the right of the fixedNoteObject;
-		/// </summary>
-		/// <returns></returns>
-		private int OverlapsHorizontally(Metrics metrics, NoteObject fixedNoteObject)
-		{
-			int rval = 0;
-			Metrics fixedMetrics = fixedNoteObject.Metrics;
-			if(metrics.Right < fixedMetrics.Left)
-			{
-				rval = -1;
-			}
-			else if(metrics.Left > fixedMetrics.Right)
-			{
-				rval = 1;
-			}
-			return rval;
-		}
-
-		/// <summary>
-		/// Move the drawObject above the fixedNoteObject if it is not already.
-		/// </summary>
-		/// <param name="drawObjectMetrics"></param>
-		/// <param name="durationSymbolMetrics"></param>
-		/// <param name="gap"></param>
-		private void MoveDrawObjectAboveDurationSymbol(GroupMetrics drawObjectMetrics, NoteObject fixedNoteObject, float gap)
-        {
-			float verticalOverlap = 0F;
-			if(fixedNoteObject.Metrics is ChordMetrics chordMetrics)
-			{
-				verticalOverlap = chordMetrics.OverlapHeight(drawObjectMetrics, gap);
-			}
-			else if(fixedNoteObject.Metrics is RestMetrics restMetrics)
-			{
-				verticalOverlap = restMetrics.OverlapHeight(drawObjectMetrics, gap);
-				if(verticalOverlap > 0 && fixedNoteObject is ChordSymbol chordSymbol) 
-				{
-					Debug.Assert(false, "Strange Code: Can a ChordSymbol have RestMetrics???");
-					// fine tuning
-					// compare with the extra padding given to these symbols in the RestMetrics constructor.
-					switch(chordSymbol.DurationClass)
-					{
-						case DurationClass.breve:
-						case DurationClass.semibreve:
-						case DurationClass.minim:
-						case DurationClass.crotchet:
-						case DurationClass.quaver:
-						case DurationClass.semiquaver:
-							break;
-						case DurationClass.threeFlags:
-							verticalOverlap -= gap;
-							break;
-						case DurationClass.fourFlags:
-							verticalOverlap -= gap * 2F;
-							break;
-						case DurationClass.fiveFlags:
-							verticalOverlap -= gap * 2.5F;
-							break;
-					}
-				}
-			}
-			if(verticalOverlap > 0)
-				drawObjectMetrics.Move(0F, -(verticalOverlap + gap));
-        }
 
         private void AlignStaffnamesInLeftMargin(float leftMarginPos, float gap)
         {
@@ -1141,18 +1006,13 @@ namespace Moritz.Symbols
                 {
                     if(noteObject is Barline firstBarline)
                     {
-                        if(firstBarline.Metrics is BarlineMetrics barlineMetrics)
+                        StaffNameMetrics staffNameMetrics = firstBarline.StaffNameMetrics;
+                        if(staffNameMetrics != null)
                         {
-                            TextMetrics staffNameMetrics = barlineMetrics.StaffNameMetrics;
-                            if(staffNameMetrics != null)
-                            {
-                                // The staffName is currently centred on the barline.
-                                // Now move it into the centre of the left margin.
-                                float alignX = leftMarginPos / 2F;
-                                float deltaX = alignX - barlineMetrics.OriginX + gap;
-                                staffNameMetrics.Move(deltaX, 0F);
-                            }
-						}
+                            float alignX = leftMarginPos / 2F;
+                            float deltaX = alignX - staffNameMetrics.OriginX + gap;
+                            staffNameMetrics.Move(deltaX, 0F);
+                        }
                         break;
                     }
                 }
@@ -1210,7 +1070,7 @@ namespace Moritz.Symbols
                 {
                     List<NoteObject> noteObjects = Staves[staffIndex].Voices[0].NoteObjects;
 					DurationSymbol durationSymbol = nextSystem.Staves[staffIndex].Voices[0].FirstDurationSymbol;
-					if (noteObjects[noteObjects.Count - 1] is Barline barline
+					if (noteObjects[noteObjects.Count - 1] is NormalBarline barline
 					&& (durationSymbol is CautionaryChordSymbol))
 					{
 						barline.IsVisible = false;
