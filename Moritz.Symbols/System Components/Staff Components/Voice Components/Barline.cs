@@ -104,7 +104,7 @@ namespace Moritz.Symbols
 
 		protected void MoveFramedTextAboveDurationSymbols(Metrics drawObjectMetrics, List<NoteObject> fixedNoteObjects)
 		{
-			if(drawObjectMetrics != null)
+			if(drawObjectMetrics != null) 
 			{
 				foreach(NoteObject fixedNoteObject in fixedNoteObjects)
 				{
@@ -115,7 +115,7 @@ namespace Moritz.Symbols
 						{
 							MoveDrawObjectAboveDurationSymbol(drawObjectMetrics, fixedNoteObject);
 						}
-						else if(overlaps == 1)
+						else if(overlaps == -1)
 						{
 							break;
 						}

@@ -417,7 +417,7 @@ namespace Moritz.Algorithm.Tombeau1
 					voice1.AdjustForThreeVoices();
 					voice2 = new Voice2(MidiChannelPerOutputVoice[2], voice1, centredEnvelope, basedEnvelope);
 					voice2.AdjustForThreeVoices();
-					voice3 = new Voice3(MidiChannelPerOutputVoice[1], voice1, voice2, centredEnvelope, basedEnvelope);
+					voice3 = new Voice3(MidiChannelPerOutputVoice[0], voice1, voice2, centredEnvelope, basedEnvelope);
 					// The voice midiChannels determine the top-bottom order of the staves in the score.
 					voice1.AddToSeq(mainSeq);
 					voice2.AddToSeq(mainSeq);
