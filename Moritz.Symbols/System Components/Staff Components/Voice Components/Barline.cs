@@ -102,27 +102,40 @@ namespace Moritz.Symbols
 			}
 		}
 
-		protected void MoveFramedTextAboveDurationSymbols(Metrics drawObjectMetrics, List<NoteObject> fixedNoteObjects)
+		protected void MoveFramedTextAboveNoteObjects(Metrics framedTextMetrics, List<NoteObject> fixedNoteObjects)
 		{
-			if(drawObjectMetrics != null) 
+			if(framedTextMetrics != null) 
 			{
-				foreach(NoteObject fixedNoteObject in fixedNoteObjects)
+				foreach(NoteObject noteObject in fixedNoteObjects)
 				{
-					if(fixedNoteObject is DurationSymbol)
+					int overlaps = OverlapsHorizontally(framedTextMetrics, noteObject);
+					if(overlaps == 0)
 					{
-						int overlaps = OverlapsHorizontally(drawObjectMetrics, fixedNoteObject);
-						if(overlaps == 0)
+						MoveFramedTextAboveNoteObject(framedTextMetrics, noteObject);
+					}
+					else if(overlaps == 1) // noteObject is left of framedText
+					{
+						if(noteObject is ChordSymbol chordSymbol)
 						{
-							MoveDrawObjectAboveDurationSymbol(drawObjectMetrics, fixedNoteObject);
+							if(chordSymbol.Stem.Direction == VerticalDir.up && chordSymbol.BeamBlock != null)
+							{
+								MoveFramedTextAboveBeamBlock(framedTextMetrics, chordSymbol.BeamBlock);
+							}
+							else if(chordSymbol.ChordMetrics.NoteheadExtendersMetrics != null)
+							{
+								MoveFramedTextAboveNoteheadExtenders(framedTextMetrics, chordSymbol.ChordMetrics.NoteheadExtendersMetrics);
+
+							}
 						}
-						else if(overlaps == -1)
-						{
-							break;
-						}
+					}
+					else if(overlaps == -1) // noteObject is right of framed text, so we need look no further in these noteObjects.
+					{
+						break;
 					}
 				}
 			}
 		}
+
 		/// <summary>
 		/// returns
 		/// -1 if metrics is entirely to the left of the fixedNoteObject;
@@ -145,49 +158,53 @@ namespace Moritz.Symbols
 			return rval;
 		}
 		/// <summary>
-		/// Move the drawObject above the fixedNoteObject if it is not already.
+		/// Move framedTextMetrics above the fixedNoteObject if it is not already.
 		/// </summary>
-		/// <param name="drawObjectMetrics"></param>
-		/// <param name="durationSymbolMetrics"></param>
-		/// <param name="gap"></param>
-		private void MoveDrawObjectAboveDurationSymbol(Metrics drawObjectMetrics, NoteObject fixedNoteObject)
+		private void MoveFramedTextAboveNoteObject(Metrics framedTextMetrics, NoteObject fixedNoteObject)
 		{
 			float verticalOverlap = 0F;
 			if(fixedNoteObject.Metrics is ChordMetrics chordMetrics)
 			{
-				verticalOverlap = chordMetrics.OverlapHeight(drawObjectMetrics, Gap);
+				verticalOverlap = chordMetrics.OverlapHeight(framedTextMetrics, Gap);
 			}
 			else if(fixedNoteObject.Metrics is RestMetrics restMetrics)
 			{
-				verticalOverlap = restMetrics.OverlapHeight(drawObjectMetrics, Gap);
-				if(verticalOverlap > 0 && fixedNoteObject is ChordSymbol chordSymbol)
-				{
-					Debug.Assert(false, "Strange Code: Can a ChordSymbol have RestMetrics???");
-					// fine tuning
-					// compare with the extra padding given to these symbols in the RestMetrics constructor.
-					switch(chordSymbol.DurationClass)
-					{
-						case DurationClass.breve:
-						case DurationClass.semibreve:
-						case DurationClass.minim:
-						case DurationClass.crotchet:
-						case DurationClass.quaver:
-						case DurationClass.semiquaver:
-							break;
-						case DurationClass.threeFlags:
-							verticalOverlap -= Gap;
-							break;
-						case DurationClass.fourFlags:
-							verticalOverlap -= Gap * 2F;
-							break;
-						case DurationClass.fiveFlags:
-							verticalOverlap -= Gap * 2.5F;
-							break;
-					}
-				}
+				verticalOverlap = restMetrics.OverlapHeight(framedTextMetrics, Gap);
 			}
+			else if(!(fixedNoteObject is Barline))
+			{
+				verticalOverlap = fixedNoteObject.Metrics.Top - framedTextMetrics.Bottom;
+				verticalOverlap = (verticalOverlap < Gap) ? Gap : verticalOverlap;
+			}
+
 			if(verticalOverlap > 0)
-				drawObjectMetrics.Move(0F, -(verticalOverlap + Gap));
+			{
+				framedTextMetrics.Move(0F, -(verticalOverlap + Gap));
+			}
+		}
+
+		private void MoveFramedTextAboveBeamBlock(Metrics framedTextMetrics, BeamBlock beamBlock)
+		{
+			float verticalOverlap = beamBlock.OverlapHeight(framedTextMetrics, Gap);
+			if(verticalOverlap > 0)
+			{
+				framedTextMetrics.Move(0F, -(verticalOverlap + Gap));
+			}
+		}
+
+		private void MoveFramedTextAboveNoteheadExtenders(Metrics framedTextMetrics, List<NoteheadExtenderMetrics> noteheadExtendersMetrics)
+		{
+			NoteheadExtenderMetrics topExtender = noteheadExtendersMetrics[0];
+			for(int i = 1; i < noteheadExtendersMetrics.Count; ++i)
+			{
+				topExtender = (topExtender.Top < noteheadExtendersMetrics[i].Top) ? topExtender : noteheadExtendersMetrics[i];
+			}
+			float verticalOverlap = topExtender.Top - framedTextMetrics.Bottom;
+			if(verticalOverlap > 0)
+			{
+				verticalOverlap = (verticalOverlap < (2 * Gap)) ? (2 * Gap) : verticalOverlap;
+				framedTextMetrics.Move(0F, -(verticalOverlap));
+			}
 		}
 
 		/// <summary>
@@ -316,7 +333,7 @@ namespace Moritz.Symbols
 			#region alignX
 			base.AlignBarnumberX();
 			#endregion
-			MoveFramedTextAboveDurationSymbols(BarnumberMetrics, fixedNoteObjects);
+			MoveFramedTextAboveNoteObjects(BarnumberMetrics, fixedNoteObjects);
 		}
 
 		public override void CreateMetrics(Graphics graphics)
@@ -405,8 +422,8 @@ namespace Moritz.Symbols
 
 			MoveFramedTextBottomToDefaultPosition(FramedRegionStartTextMetrics);
 
-			MoveFramedTextAboveDurationSymbols(FramedRegionStartTextMetrics, fixedNoteObjects);
-			MoveFramedTextAboveDurationSymbols(BarnumberMetrics, fixedNoteObjects);
+			MoveFramedTextAboveNoteObjects(FramedRegionStartTextMetrics, fixedNoteObjects);
+			MoveFramedTextAboveNoteObjects(BarnumberMetrics, fixedNoteObjects);
 
 			MoveBarnumberAboveRegionBox(BarnumberMetrics, FramedRegionStartTextMetrics);
 		}
@@ -516,8 +533,8 @@ namespace Moritz.Symbols
 
 			MoveFramedTextBottomToDefaultPosition(FramedRegionEndTextMetrics);
 
-			MoveFramedTextAboveDurationSymbols(FramedRegionEndTextMetrics, fixedNoteObjects);
-			MoveFramedTextAboveDurationSymbols(BarnumberMetrics, fixedNoteObjects);
+			MoveFramedTextAboveNoteObjects(FramedRegionEndTextMetrics, fixedNoteObjects);
+			MoveFramedTextAboveNoteObjects(BarnumberMetrics, fixedNoteObjects);
 
 			MoveBarnumberAboveRegionBox(BarnumberMetrics, FramedRegionEndTextMetrics);
 		}
@@ -646,9 +663,9 @@ namespace Moritz.Symbols
 			MoveFramedTextBottomToDefaultPosition(FramedRegionStartTextMetrics);
 			MoveFramedTextBottomToDefaultPosition(FramedRegionEndTextMetrics);
 
-			MoveFramedTextAboveDurationSymbols(FramedRegionStartTextMetrics, fixedNoteObjects);
-			MoveFramedTextAboveDurationSymbols(FramedRegionEndTextMetrics, fixedNoteObjects);
-			MoveFramedTextAboveDurationSymbols(BarnumberMetrics, fixedNoteObjects);
+			MoveFramedTextAboveNoteObjects(FramedRegionStartTextMetrics, fixedNoteObjects);
+			MoveFramedTextAboveNoteObjects(FramedRegionEndTextMetrics, fixedNoteObjects);
+			MoveFramedTextAboveNoteObjects(BarnumberMetrics, fixedNoteObjects);
 
 			MoveBarnumberAboveRegionBox(BarnumberMetrics, FramedRegionStartTextMetrics);
 			MoveBarnumberAboveRegionBox(BarnumberMetrics, FramedRegionEndTextMetrics);
