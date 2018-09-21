@@ -43,11 +43,11 @@ namespace Moritz.Symbols
 				{
 					CSSObjectClass staffClass = (Voice is InputVoice) ? CSSObjectClass.inputStaffName : CSSObjectClass.staffName;
 					StaffNameMetrics = new StaffNameMetrics(staffClass, graphics, staffNameText.TextInfo);
-					//// move the staffname vertically to the middle of this staff
-					//Staff staff = Voice.Staff;
-					//float staffheight = staff.Gap * (staff.NumberOfStafflines - 1);
-					//float dy = (staffheight * 0.5F) + (gap * 0.8F);
-					//StaffnameMetrics.Move(0F, dy);
+					// move the staffname vertically to the middle of this staff
+					StaffMetrics staffMetrics = Voice.Staff.Metrics;
+					float staffheight = staffMetrics.StafflinesBottom - staffMetrics.StafflinesTop;
+					float dy = (staffheight * 0.5F) + (Gap * 0.8F);
+					StaffNameMetrics.Move(0F, dy);
 				}
 				if(drawObject is FramedBarNumberText framedBarNumberText)
 				{
