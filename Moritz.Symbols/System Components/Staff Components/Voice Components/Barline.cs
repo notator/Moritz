@@ -37,6 +37,7 @@ namespace Moritz.Symbols
 
 		protected void SetCommonMetrics(Graphics graphics, List<DrawObject> drawObjects)
 		{
+			StaffMetrics staffMetrics = Voice.Staff.Metrics;
 			foreach(DrawObject drawObject in DrawObjects)
 			{
 				if(drawObject is StaffNameText staffNameText)
@@ -44,7 +45,6 @@ namespace Moritz.Symbols
 					CSSObjectClass staffClass = (Voice is InputVoice) ? CSSObjectClass.inputStaffName : CSSObjectClass.staffName;
 					StaffNameMetrics = new StaffNameMetrics(staffClass, graphics, staffNameText.TextInfo);
 					// move the staffname vertically to the middle of this staff
-					StaffMetrics staffMetrics = Voice.Staff.Metrics;
 					float staffheight = staffMetrics.StafflinesBottom - staffMetrics.StafflinesTop;
 					float dy = (staffheight * 0.5F) + (Gap * 0.8F);
 					StaffNameMetrics.Move(0F, dy);
@@ -52,8 +52,8 @@ namespace Moritz.Symbols
 				if(drawObject is FramedBarNumberText framedBarNumberText)
 				{
 					BarnumberMetrics = new BarnumberMetrics(graphics, framedBarNumberText.TextInfo, framedBarNumberText.FrameInfo);
-					//// move the bar number above this barline
-					//_barnumberMetrics.Move(0F, -minimumBarlineTopToBarnumberBottom);
+					// move the bar number to its default (=lowest) position above this staff.
+					BarnumberMetrics.Move(0F, staffMetrics.StafflinesTop - BarnumberMetrics.Bottom - (Gap * 3));
 				}
 			}
 		}
@@ -191,10 +191,11 @@ namespace Moritz.Symbols
 		}
 
 		/// <summary>
-		/// This function only writes the staff name, barnumber and region info to the SVG file (if they are present).
+		/// This virtual function writes the staff name and barnumber to the SVG file (if they are present).
+		/// Overrides write the region info (if present).
 		/// The barline itself is drawn when the system (and staff edges) is complete.
 		/// </summary>
-		public void WriteDrawObjectsSVG(SvgWriter w)
+		public virtual void WriteDrawObjectsSVG(SvgWriter w)
 		{
 			if(StaffNameMetrics != null)
 			{
@@ -362,6 +363,19 @@ namespace Moritz.Symbols
 			w.SvgLine(CSSObjectClass.barline, thinRightLineOriginX, topY, thinRightLineOriginX, bottomY);
 			w.SvgEndGroup();
 		}
+		/// <summary>
+		/// This function writes the staff name, barnumber and region info to the SVG file (if they are present).
+		/// The barline itself is drawn when the system (and staff edges) is complete.
+		/// </summary>
+		public override void WriteDrawObjectsSVG(SvgWriter w)
+		{
+			base.WriteDrawObjectsSVG(w);
+
+			if(FramedRegionStartTextMetrics != null)
+			{
+				FramedRegionStartTextMetrics.WriteSVG(w);
+			}
+		}
 
 		public override void AddMetricsToEdge(HorizontalEdge horizontalEdge)
 		{
@@ -460,6 +474,19 @@ namespace Moritz.Symbols
 			w.SvgLine(CSSObjectClass.thickBarline, thickRightLineOriginX, topY, thickRightLineOriginX, bottomY);
 			w.SvgEndGroup();
 		}
+		/// <summary>
+		/// This function writes the staff name, barnumber and region info to the SVG file (if they are present).
+		/// The barline itself is drawn when the system (and staff edges) is complete.
+		/// </summary>
+		public override void WriteDrawObjectsSVG(SvgWriter w)
+		{
+			base.WriteDrawObjectsSVG(w);
+
+			if(FramedRegionEndTextMetrics != null)
+			{
+				FramedRegionEndTextMetrics.WriteSVG(w);
+			}
+		}
 
 		public override void AddMetricsToEdge(HorizontalEdge horizontalEdge)
 		{
@@ -486,6 +513,9 @@ namespace Moritz.Symbols
 				FramedRegionEndTextMetrics.Move(originX - FramedRegionEndTextMetrics.Right, 0);
 			}
 			#endregion
+
+			MoveFramedTextBottomToDefaultPosition(FramedRegionEndTextMetrics);
+
 			MoveFramedTextAboveDurationSymbols(FramedRegionEndTextMetrics, fixedNoteObjects);
 			MoveFramedTextAboveDurationSymbols(BarnumberMetrics, fixedNoteObjects);
 
@@ -559,6 +589,24 @@ namespace Moritz.Symbols
 
 			w.SvgEndGroup();
 		}
+		/// <summary>
+		/// This function writes the staff name, barnumber and region info to the SVG file (if they are present).
+		/// The barline itself is drawn when the system (and staff edges) is complete.
+		/// </summary>
+		public override void WriteDrawObjectsSVG(SvgWriter w)
+		{
+			base.WriteDrawObjectsSVG(w);
+
+			if(FramedRegionEndTextMetrics != null)
+			{
+				FramedRegionEndTextMetrics.WriteSVG(w);
+			}
+
+			if(FramedRegionStartTextMetrics != null)
+			{
+				FramedRegionStartTextMetrics.WriteSVG(w);
+			}
+		}
 
 		public override void AddMetricsToEdge(HorizontalEdge horizontalEdge)
 		{
@@ -594,6 +642,9 @@ namespace Moritz.Symbols
 				FramedRegionStartTextMetrics.Move(originX - FramedRegionStartTextMetrics.Left, 0);
 			}
 			#endregion
+
+			MoveFramedTextBottomToDefaultPosition(FramedRegionStartTextMetrics);
+			MoveFramedTextBottomToDefaultPosition(FramedRegionEndTextMetrics);
 
 			MoveFramedTextAboveDurationSymbols(FramedRegionStartTextMetrics, fixedNoteObjects);
 			MoveFramedTextAboveDurationSymbols(FramedRegionEndTextMetrics, fixedNoteObjects);
