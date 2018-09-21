@@ -39,16 +39,16 @@ namespace Moritz.Symbols
         /// returns the first Barline in this NoteObjectMoment,
         /// or null if there is no barline.
         /// </summary>
-        public NormalBarline Barline
+        public Barline Barline
         {
             get
             {
-                NormalBarline barline = null;
+                Barline barline = null;
                 foreach(NoteObject noteObject in NoteObjects)
                 {
-                    if(noteObject is NormalBarline)
+                    if(noteObject is Barline)
                     {
-                        barline = noteObject as NormalBarline;
+                        barline = noteObject as Barline;
                         break;
                     }
                 }
@@ -99,13 +99,13 @@ namespace Moritz.Symbols
             float minBarlineOriginX = float.MaxValue;
             foreach(NoteObject noteObject in _noteObjects)
             {
-				if(noteObject is NormalBarline b && b.Metrics != null && b.Metrics.OriginX < minBarlineOriginX)
+				if(noteObject is Barline b && b.Metrics != null && b.Metrics.OriginX < minBarlineOriginX)
 					minBarlineOriginX = b.Metrics.OriginX;
 			}
             for(int index = 0; index < _noteObjects.Count; index++)
             {
 				ChordSymbol chordSymbol = _noteObjects[index] as ChordSymbol;
-				if(_noteObjects[index] is NormalBarline barline && barline.Metrics != null)
+				if(_noteObjects[index] is Barline barline && barline.Metrics != null)
 				{
 					Debug.Assert(AlignmentX == 0F);
 					if(index > 0)
