@@ -187,10 +187,9 @@ namespace Moritz.Symbols
 
 			SetBarlineFramedTextsMetricsPosition();
 			AlignStaffnamesInLeftMargin(leftMargin, pageFormat.Gap);
+			ResetStaffMetricsBoundaries();
 
 			JustifyVertically(pageFormat.Right, pageFormat.Gap);
-
-			ResetStaffMetricsBoundaries();
 
 			return overlapsInfoList;
         }
