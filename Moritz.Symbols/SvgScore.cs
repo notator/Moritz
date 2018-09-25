@@ -1451,8 +1451,17 @@ namespace Moritz.Symbols
 			int barlineMsPos = 0;
 			if(i > 0 && i == noteObjects.Count - 1)
 			{
-				DurationSymbol ds = noteObjects[i - 1] as DurationSymbol;
-				barlineMsPos = ds.AbsMsPosition + ds.MsDuration;
+				DurationSymbol prevDurationSymbol = noteObjects[i - 1] as DurationSymbol;
+				Debug.Assert(prevDurationSymbol != null);
+				if((prevDurationSymbol is RestSymbol restSymbol)
+				|| (prevDurationSymbol is ChordSymbol cSymbol && cSymbol.MsDurationToNextBarline == null))
+				{
+					barlineMsPos = prevDurationSymbol.AbsMsPosition + prevDurationSymbol.MsDuration;
+				}
+				else if(prevDurationSymbol is ChordSymbol chordSymbol)
+				{
+					barlineMsPos = chordSymbol.AbsMsPosition + ((int)chordSymbol.MsDurationToNextBarline);
+				}
 			}
 			else
 			{
