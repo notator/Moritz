@@ -548,8 +548,7 @@ namespace Moritz.Symbols
         }
 
         /// <summary>
-        /// Moves clefs and barlines to the left of the following duration symbols, leaving a hairline gap between the symbols.
-        /// If the first durationSymbol at the start of the staff is a cautionary, the distance from the clef to the barline is gap.
+        /// Moves clefs and barlines to the left of the following duration symbols.
         /// </summary>
         private void MoveClefsAndBarlines(float hairline)
         {
@@ -571,9 +570,23 @@ namespace Moritz.Symbols
 
                             if(noteObject is DurationSymbol durationSymbol)
                             {
-                                if(barline != null)
+								float barlineToDSPadding = hairline; // 4
+								if(durationSymbol is RestSymbol restSymbol)
+								{
+									barlineToDSPadding = hairline * 8; // 32
+								}
+								else if(durationSymbol is ChordSymbol chordSymbol)
+								{
+									ChordMetrics chordMetrics = chordSymbol.ChordMetrics;
+									if(chordMetrics.AccidentalsMetrics == null)
+										barlineToDSPadding = hairline * 8; // 32
+									if(chordMetrics.CautionaryBracketsMetrics.Count > 0)
+										barlineToDSPadding = hairline * 4; // 16
+								}
+
+								if(barline != null)
                                 {
-                                    barline.Metrics.Move(durationSymbol.Metrics.Left - barline.Metrics.Right - hairline, 0F);
+									barline.Metrics.Move(durationSymbol.Metrics.Left - barline.Metrics.Right - barlineToDSPadding, 0F);
 
                                     if(clef != null)
                                     {
