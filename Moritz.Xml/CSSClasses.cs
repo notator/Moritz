@@ -103,8 +103,9 @@ namespace Moritz.Xml
 		#endregion
 
 		#region barlines
-		barline, // always used, recorded and defined. A normal barline and endBarline component. Container:voice/inputVoice
-		thickBarline, // always used and recorded. An endBarline component. Always defined. Container:endBarline
+		normalBarline, // always used, recorded and defined. A normal barline and endBarline component. Container:voice/inputVoice
+		thinBarline, // a double-bar component. Always defined. Container:regionStartbarline etc.
+		thickBarline, // a double-bar component. Always defined. Container:regionStartbarline etc.
 		staffConnectors, // A group of barline (and maybe endBarline) in a system. Never defined. Container:system.
 		startRegionBarline,
 		endRegionBarline,

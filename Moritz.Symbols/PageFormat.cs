@@ -127,11 +127,11 @@ namespace Moritz.Symbols
 
         #region stroke widths
         public float StafflineStemStrokeWidth;
-        public float BarlineStrokeWidth { get { return StafflineStemStrokeWidth * 2F; } }
-        public float NoteheadExtenderStrokeWidth { get { return StafflineStemStrokeWidth * 3.4F; } }
-        /// new 26.06.2017
-        public float ThickBarlineStrokeWidth { get { return BarlineStrokeWidth * 2; } } // the right barlne at the end of the score.
-        public float BarNumberFrameStrokeWidth { get { return StafflineStemStrokeWidth * 1.2F; } }
+        public float NormalBarlineStrokeWidth { get { return StafflineStemStrokeWidth * 2F; } }
+		public float ThinBarlineStrokeWidth { get { return NormalBarlineStrokeWidth / 2; } } // a component of double barlines.
+		public float ThickBarlineStrokeWidth { get { return NormalBarlineStrokeWidth * 2; } } // a component of double barlines.
+		public float NoteheadExtenderStrokeWidth { get { return StafflineStemStrokeWidth * 3.4F; } }
+		public float BarNumberFrameStrokeWidth { get { return StafflineStemStrokeWidth * 1.2F; } }
 		public float RegionInfoFrameStrokeWidth { get { return BarNumberFrameStrokeWidth * 1.5F; } }
 		#endregion
 

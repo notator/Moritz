@@ -13,10 +13,22 @@ namespace Moritz.Symbols
 	{
 		protected Metrics(CSSObjectClass cssObjectClass)
 		{
-			_cssObjectClass = cssObjectClass; 
+			_cssObjectClass = cssObjectClass;
 			if(!_usedCSSObjectClasses.Contains(cssObjectClass))
 			{
 				_usedCSSObjectClasses.Add(cssObjectClass);
+			}
+		}
+
+		protected Metrics(CSSObjectClass cssObjectClass1, CSSObjectClass cssObjectClass2)
+		{
+			if(!_usedCSSObjectClasses.Contains(cssObjectClass1))
+			{
+				_usedCSSObjectClasses.Add(cssObjectClass1);
+			}
+			if(!_usedCSSObjectClasses.Contains(cssObjectClass2))
+			{
+				_usedCSSObjectClasses.Add(cssObjectClass2);
 			}
 		}
 

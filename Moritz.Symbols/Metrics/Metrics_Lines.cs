@@ -219,8 +219,9 @@ namespace Moritz.Symbols
 
 	internal class Barline_LineMetrics : Metrics
 	{
-		public Barline_LineMetrics(float leftReOriginX, float rightReOriginX)
-			: base(CSSObjectClass.barline)
+		public Barline_LineMetrics(float leftReOriginX, float rightReOriginX,
+			CSSObjectClass lineClass1 = CSSObjectClass.normalBarline, CSSObjectClass lineClass2 = CSSObjectClass.normalBarline)
+			: base(lineClass1, lineClass2)
 		{
 			_originX = 0F;
 			_left = leftReOriginX; // for a normal, thin barline: -(strokeWidth / 2F);
