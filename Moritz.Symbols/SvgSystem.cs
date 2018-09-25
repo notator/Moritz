@@ -106,7 +106,7 @@ namespace Moritz.Symbols
                                     // draw grouping barlines between staves
                                     if(barlineContinuesDownList[staffIndex] || isFirstBarline)
                                     {
-                                        float top = bottomEdge.YatX(barline.Metrics.OriginX) - pageFormat.StafflineStemStrokeWidth;
+                                        float top = bottomEdge.YatX(barline.Metrics.OriginX);
                                         float bottom = topEdge.YatX(barline.Metrics.OriginX);
                                         bool isLastNoteObject = (i == (voice.NoteObjects.Count - 1));
                                         barline.WriteSVG(w, top, bottom, isLastNoteObject);
@@ -1082,7 +1082,7 @@ namespace Moritz.Symbols
                 {
                     List<NoteObject> noteObjects = Staves[staffIndex].Voices[0].NoteObjects;
 					DurationSymbol durationSymbol = nextSystem.Staves[staffIndex].Voices[0].FirstDurationSymbol;
-					if (noteObjects[noteObjects.Count - 1] is NormalBarline barline
+					if (noteObjects[noteObjects.Count - 1] is Barline barline
 					&& (durationSymbol is CautionaryChordSymbol))
 					{
 						barline.IsVisible = false;
