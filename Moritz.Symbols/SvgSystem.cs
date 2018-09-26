@@ -924,71 +924,6 @@ namespace Moritz.Symbols
             return widthFactors;
         }
 
-		///// <summary>
-		///// The barlines' DrawObjects are currently at their default (lowest) positions.
-		///// Now, if they currently collide with some other NoteObject on the same staff,
-		///// they are moved vertically away from the system until they dont.
-		///// Barnumber boxes are moved outside region info boxes, if necessary.
-		///// </summary>
-		//private void AdjustBarlineDrawObjectsVertically(float gap)
-		//{
-		//	Voice barlineVoice = this.Staves[0].Voices[0];
-		//	Barline barline = null;
-		//	DurationSymbol firstDSInVoice0 = null;
-		//	DurationSymbol secondDSInVoice0 = null;
-		//	foreach(NoteObject noteObject in barlineVoice.NoteObjects)
-		//	{
-		//		if(barline == null)
-		//			barline = noteObject as Barline;
-		//		if(firstDSInVoice0 == null)
-		//			firstDSInVoice0 = noteObject as DurationSymbol;
-		//		else if(firstDSInVoice0 != null && secondDSInVoice0 == null)
-		//			secondDSInVoice0 = noteObject as DurationSymbol;
-		//		if(barline != null && firstDSInVoice0 != null && secondDSInVoice0 != null)
-		//			break;
-		//	}
-		//	Debug.Assert(barline != null && firstDSInVoice0 != null); // secondDSInVoice0 can be null if there is only one DS!
-
-		//	DurationSymbol firstDSInVoice1 = null;
-		//	DurationSymbol secondDSInVoice1 = null;
-		//	Staff topVisibleStaff = barlineVoice.Staff;
-		//	if(topVisibleStaff.Voices.Count == 2)
-		//	{
-		//		foreach(NoteObject noteObject in topVisibleStaff.Voices[1].NoteObjects)
-		//		{
-		//			if(firstDSInVoice1 == null)
-		//				firstDSInVoice1 = noteObject as DurationSymbol;
-		//			else if(firstDSInVoice1 != null && secondDSInVoice1 == null)
-		//				secondDSInVoice1 = noteObject as DurationSymbol;
-
-		//			if(firstDSInVoice1 != null && secondDSInVoice1 != null)
-		//				break;
-		//		}
-		//		Debug.Assert(firstDSInVoice1 != null); // secondDSInVoice0 can be null if there is only one DS!
-		//	}
-
-		//	BarlineMetrics barlineMetrics = barline.Metrics as BarlineMetrics;
-		//	BarnumberMetrics barnumberMetrics = barlineMetrics.BarnumberMetrics;
-
-		//	if(barnumberMetrics != null)
-		//	{
-		//		RemoveCollision(barnumberMetrics, firstDSInVoice0, gap);
-		//		if(firstDSInVoice0 is RestSymbol && secondDSInVoice0 != null)
-		//			RemoveCollision(barnumberMetrics, secondDSInVoice0, gap);
-
-		//		if(topVisibleStaff.Voices.Count == 2)
-		//		{
-		//			RemoveCollision(barnumberMetrics, firstDSInVoice1, gap);
-		//			if(firstDSInVoice1 is RestSymbol && secondDSInVoice1 != null)
-		//				RemoveCollision(barnumberMetrics, secondDSInVoice1, gap);
-		//			// the barnumber may now collide with the first DurationSymbol in Voice0...
-		//			RemoveCollision(barnumberMetrics, firstDSInVoice0, gap);
-		//			if(firstDSInVoice0 is RestSymbol && secondDSInVoice0 != null)
-		//				RemoveCollision(barnumberMetrics, secondDSInVoice0, gap);
-		//		}
-		//	}
-		//}
-
 		/// <summary>
 		/// Each FramedTextsMetrics' OriginX and OriginY values are 0 when this function is called.
 		/// First, align their OriginX with their barline's OriginX, then move them up
@@ -1000,17 +935,17 @@ namespace Moritz.Symbols
 		/// </summary>
 		private void SetBarlineFramedTextsMetricsPosition()
 		{
-			List<NoteObject> noteObjects0 = this.Staves[0].Voices[0].NoteObjects;
-			List<NoteObject> noteObjects1 = (this.Staves[0].Voices.Count > 1) ? this.Staves[0].Voices[1].NoteObjects : null;
+			List<NoteObject> voice0NoteObjects = this.Staves[0].Voices[0].NoteObjects;
+			List<NoteObject> voice1NoteObjects = (this.Staves[0].Voices.Count > 1) ? this.Staves[0].Voices[1].NoteObjects : null;
 
-			foreach(NoteObject noteObject in noteObjects0)
+			foreach(NoteObject noteObject in voice0NoteObjects)
 			{
 				if(noteObject is Barline barline)
 				{
-					barline.AlignFramedTextsXY(noteObjects0);
-					if(noteObjects1 != null)
+					barline.AlignFramedTextsXY(voice0NoteObjects);
+					if(voice1NoteObjects != null)
 					{
-						barline.AlignFramedTextsXY(noteObjects1);
+						barline.AlignFramedTextsXY(voice1NoteObjects);
 					}
 				}
 			}

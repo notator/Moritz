@@ -124,7 +124,6 @@ namespace Moritz.Symbols
 							else if(chordSymbol.ChordMetrics.NoteheadExtendersMetrics != null)
 							{
 								MoveFramedTextAboveNoteheadExtenders(framedTextMetrics, chordSymbol.ChordMetrics.NoteheadExtendersMetrics);
-
 							}
 						}
 					}
@@ -162,47 +161,53 @@ namespace Moritz.Symbols
 		/// </summary>
 		private void MoveFramedTextAboveNoteObject(Metrics framedTextMetrics, NoteObject fixedNoteObject)
 		{
+			float padding = Gap * 1.5F;
 			float verticalOverlap = 0F;
 			if(fixedNoteObject.Metrics is ChordMetrics chordMetrics)
 			{
-				verticalOverlap = chordMetrics.OverlapHeight(framedTextMetrics, Gap);
+				verticalOverlap = chordMetrics.OverlapHeight(framedTextMetrics, padding);
 			}
 			else if(fixedNoteObject.Metrics is RestMetrics restMetrics)
 			{
-				verticalOverlap = restMetrics.OverlapHeight(framedTextMetrics, Gap);
+				verticalOverlap = restMetrics.OverlapHeight(framedTextMetrics, padding);
 			}
 			else if(!(fixedNoteObject is Barline))
 			{
-				verticalOverlap = fixedNoteObject.Metrics.Top - framedTextMetrics.Bottom;
-				verticalOverlap = (verticalOverlap < Gap) ? Gap : verticalOverlap;
+				verticalOverlap = fixedNoteObject.Metrics.OverlapHeight(framedTextMetrics, padding);
 			}
 
 			if(verticalOverlap > 0)
 			{
-				framedTextMetrics.Move(0F, -(verticalOverlap + Gap));
+				verticalOverlap = (verticalOverlap > padding) ? verticalOverlap : padding;
+				framedTextMetrics.Move(0F, -verticalOverlap);
 			}
 		}
 
 		private void MoveFramedTextAboveBeamBlock(Metrics framedTextMetrics, BeamBlock beamBlock)
 		{
-			float verticalOverlap = beamBlock.OverlapHeight(framedTextMetrics, Gap);
+			float padding = Gap * 1.5F;
+
+			float verticalOverlap = beamBlock.OverlapHeight(framedTextMetrics, padding);
 			if(verticalOverlap > 0)
 			{
-				framedTextMetrics.Move(0F, -(verticalOverlap + Gap));
+				verticalOverlap = (verticalOverlap > padding) ? verticalOverlap : padding;
+				framedTextMetrics.Move(0F, -verticalOverlap );
 			}
 		}
 
 		private void MoveFramedTextAboveNoteheadExtenders(Metrics framedTextMetrics, List<NoteheadExtenderMetrics> noteheadExtendersMetrics)
 		{
-			NoteheadExtenderMetrics topExtender = noteheadExtendersMetrics[0];
+			float padding = Gap * 1.5F;
+			int indexOfTopExtender = 0;
 			for(int i = 1; i < noteheadExtendersMetrics.Count; ++i)
 			{
-				topExtender = (topExtender.Top < noteheadExtendersMetrics[i].Top) ? topExtender : noteheadExtendersMetrics[i];
+				indexOfTopExtender = (noteheadExtendersMetrics[indexOfTopExtender].Top < noteheadExtendersMetrics[i].Top) ? indexOfTopExtender : i;
 			}
-			float verticalOverlap = topExtender.Top - framedTextMetrics.Bottom;
+			NoteheadExtenderMetrics topExtender = noteheadExtendersMetrics[indexOfTopExtender];
+			float verticalOverlap = topExtender.OverlapHeight(framedTextMetrics, padding);
 			if(verticalOverlap > 0)
 			{
-				verticalOverlap = (verticalOverlap < (2 * Gap)) ? (2 * Gap) : verticalOverlap;
+				verticalOverlap = (verticalOverlap > padding) ? verticalOverlap : padding;
 				framedTextMetrics.Move(0F, -(verticalOverlap));
 			}
 		}
@@ -650,7 +655,11 @@ namespace Moritz.Symbols
 		internal override void AlignFramedTextsXY(List<NoteObject> fixedNoteObjects)
 		{
 			#region alignX
-			base.AlignBarnumberX();
+
+			// An EndAndStartRegionBarline cannot be at the start of a system,
+			// so it can't have a barnumber, and there's no reason to call base.AlignBarnumberX();
+			Debug.Assert(BarnumberMetrics == null);
+
 			float originX = Barline_LineMetrics.OriginX;
 			if(FramedRegionEndTextMetrics != null)
 			{
@@ -668,9 +677,6 @@ namespace Moritz.Symbols
 			MoveFramedTextAboveNoteObjects(FramedRegionStartTextMetrics, fixedNoteObjects);
 			MoveFramedTextAboveNoteObjects(FramedRegionEndTextMetrics, fixedNoteObjects);
 			MoveFramedTextAboveNoteObjects(BarnumberMetrics, fixedNoteObjects);
-
-			MoveBarnumberAboveRegionBox(BarnumberMetrics, FramedRegionStartTextMetrics);
-			MoveBarnumberAboveRegionBox(BarnumberMetrics, FramedRegionEndTextMetrics);
 		}
 
 		public override void CreateMetrics(Graphics graphics)

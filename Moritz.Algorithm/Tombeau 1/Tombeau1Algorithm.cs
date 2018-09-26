@@ -455,15 +455,15 @@ namespace Moritz.Algorithm.Tombeau1
 		public override ScoreData SetScoreRegionsData(List<Bar> bars)
 		{
 			BarBarlinesData bar0 = new BarBarlinesData(bars, 0);
-			BarBarlinesData bar1 = new BarBarlinesData(bars, 1);
-			BarBarlinesData bar6 = new BarBarlinesData(bars, 6);
+			//BarBarlinesData bar1 = new BarBarlinesData(bars, 1);
+			BarBarlinesData bar5 = new BarBarlinesData(bars, 5);
 			BarBarlinesData bar10 = new BarBarlinesData(bars, 10);
 			BarBarlinesData bar15 = new BarBarlinesData(bars, 15);
 			BarBarlinesData bar30 = new BarBarlinesData(bars, 30);
 
-			RegionDef rd1 = new RegionDef("A", bar0.LeftBarline, bar0.RightBarline);
-			RegionDef rd2 = new RegionDef("B", bar1.LeftBarline, bar30.RightBarline);
-			RegionDef rd3 = new RegionDef("C", bar6.LeftBarline, bar15.RightBarline);
+			RegionDef rd1 = new RegionDef("A", bar0.LeftBarline, bar5.RightBarline);
+			RegionDef rd2 = new RegionDef("B", bar5.RightBarline, bar30.RightBarline);
+			RegionDef rd3 = new RegionDef("C", bar5.RightBarline, bar15.RightBarline);
 			RegionDef rd4 = new RegionDef("D", bar10.LeftBarline, bar15.RightBarline);
 
 			List<RegionDef> regionDefs = new List<RegionDef>() { rd1, rd2, rd3, rd4 };

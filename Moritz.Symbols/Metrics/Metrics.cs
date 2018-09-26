@@ -126,8 +126,8 @@ namespace Moritz.Symbols
 
 		/// <summary>
 		/// If the padded argument overlaps this metrics horizontally, 
-		/// and this.Top is smaller than paddedArgument.Bottom,
-		/// this.Bottom - paddedArgument.Right is returned. 
+		/// and this.Top is smaller than (=above) paddedArgument.Bottom,
+		/// then paddedArgument.Bottom - this.Top (a positive value) is returned. 
 		/// Otherwise 0F is returned.
 		/// </summary>
 		/// <param name="arg"></param>
