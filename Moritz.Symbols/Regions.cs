@@ -98,7 +98,9 @@ namespace Moritz.Symbols
 			{
 				string uniqueName = uniqueNames[i];
 				RegionDef brd = FindBaseRegionDef(regionDefs, regionSequence[i]);
-				RegionDef uniqueRegionDef = new RegionDef(uniqueName, brd.startBarIndex, brd.startMsPos, brd.endBarIndex, brd.endMsPos);
+				Tuple<int, int> startBarData = new Tuple<int, int>(brd.startBarIndex, brd.startMsPos);
+				Tuple<int, int> endBarData = new Tuple<int, int>(brd.endBarIndex, brd.endMsPos);
+				RegionDef uniqueRegionDef = new RegionDef(uniqueName, startBarData, endBarData);
 				regionDefSeq.Add(uniqueRegionDef);
 			}
 			return regionDefSeq;

@@ -191,7 +191,7 @@ namespace Moritz.Symbols
 				float width = tm.Right - tm.Left;
 				maxWidth = (maxWidth > width) ? maxWidth : width;
 				tm.Move(0, nextTop);
-				nextTop = tm.Top + ((tm.Bottom - tm.Top) * 1.5F);
+				nextTop = tm.Top + ((tm.Bottom - tm.Top) * 1.7F);
 
 				_textMetrics.Add(tm);
 				_textStrings.Add(text.TextInfo.Text);

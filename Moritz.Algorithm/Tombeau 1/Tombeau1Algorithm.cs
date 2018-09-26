@@ -454,17 +454,17 @@ namespace Moritz.Algorithm.Tombeau1
 
 		public override ScoreData SetScoreRegionsData(List<Bar> bars)
 		{
-			BarlinesMsPositions b0 = new BarlinesMsPositions(bars, 0);
-			BarlinesMsPositions b1 = new BarlinesMsPositions(bars, 1);
-			BarlinesMsPositions b6 = new BarlinesMsPositions(bars, 6);
-			BarlinesMsPositions b10 = new BarlinesMsPositions(bars, 10);
-			BarlinesMsPositions b15 = new BarlinesMsPositions(bars, 15);
-			BarlinesMsPositions b30 = new BarlinesMsPositions(bars, 30);
+			BarBarlinesData bar0 = new BarBarlinesData(bars, 0);
+			BarBarlinesData bar1 = new BarBarlinesData(bars, 1);
+			BarBarlinesData bar6 = new BarBarlinesData(bars, 6);
+			BarBarlinesData bar10 = new BarBarlinesData(bars, 10);
+			BarBarlinesData bar15 = new BarBarlinesData(bars, 15);
+			BarBarlinesData bar30 = new BarBarlinesData(bars, 30);
 
-			RegionDef rd1 = new RegionDef("A", b0.leftBarlineIndex, b0.leftBarlineMsPos, b0.rightBarlineIndex, b0.rightBarlineMsPos);
-			RegionDef rd2 = new RegionDef("B", b1.leftBarlineIndex, b1.leftBarlineMsPos, b30.rightBarlineIndex, b30.rightBarlineMsPos);
-			RegionDef rd3 = new RegionDef("C", b6.leftBarlineIndex, b6.leftBarlineMsPos, b15.rightBarlineIndex, b15.rightBarlineMsPos);
-			RegionDef rd4 = new RegionDef("D", b10.leftBarlineIndex, b10.leftBarlineMsPos, b15.rightBarlineIndex, b15.rightBarlineMsPos);
+			RegionDef rd1 = new RegionDef("A", bar0.LeftBarline, bar0.RightBarline);
+			RegionDef rd2 = new RegionDef("B", bar1.LeftBarline, bar30.RightBarline);
+			RegionDef rd3 = new RegionDef("C", bar6.LeftBarline, bar15.RightBarline);
+			RegionDef rd4 = new RegionDef("D", bar10.LeftBarline, bar15.RightBarline);
 
 			List<RegionDef> regionDefs = new List<RegionDef>() { rd1, rd2, rd3, rd4 };
 

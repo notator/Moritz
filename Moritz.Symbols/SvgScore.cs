@@ -845,7 +845,7 @@ namespace Moritz.Symbols
             {{
                 stroke:black;
                 stroke-width:{strokeWidth}px;
-                fill:#FFFFEE
+                fill:none
             }}
             ");
 			}

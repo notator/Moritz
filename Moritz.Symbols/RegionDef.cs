@@ -13,16 +13,15 @@ namespace Moritz.Symbols
 		/// <summary>
 		/// A region in the score that will be played as a continuous sequence.
 		/// </summary>
-		public RegionDef(string name, int startBarIndex, int startMsPos, int endBarIndex, int endMsPos)
+		public RegionDef(string name, Tuple<int, int> startBarline, Tuple<int, int> endBarline)
 		{
+			this.name = name;
+			startBarIndex = startBarline.Item1;
+			startMsPos = startBarline.Item2;
+			endBarIndex = endBarline.Item1;
+			endMsPos = endBarline.Item2;
 			Debug.Assert(startBarIndex >= 0 && endBarIndex > startBarIndex);
 			Debug.Assert(startMsPos >= 0 && endMsPos > startMsPos);
-
-			this.name = name;
-			this.startBarIndex = startBarIndex;
-			this.startMsPos = startMsPos;
-			this.endBarIndex = endBarIndex;
-			this.endMsPos = endMsPos;
 		}
 
 		public void WriteSVG(SvgWriter w)
