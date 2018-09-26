@@ -1508,7 +1508,10 @@ namespace Moritz.Symbols
 				{
 					rval = CSSObjectClass.endAndStartRegionBarline;
 				}
-				rval = CSSObjectClass.startRegionBarline;
+				else
+				{
+					rval = CSSObjectClass.startRegionBarline;
+				}
 			}
 			else if(hasEndRegionInfo)
 			{
@@ -1837,7 +1840,7 @@ namespace Moritz.Symbols
 				barlines.Clear();
 				for(int i = 0; i < topVoice.NoteObjects.Count; i++)
 				{
-					if(topVoice.NoteObjects[i] is NormalBarline barline)
+					if(topVoice.NoteObjects[i] is Barline barline)
 					{
 						barlines.Add(barline);
 					}
@@ -1864,7 +1867,6 @@ namespace Moritz.Symbols
 					break;
 				}
 			}
-
 		}
 
 		/// <summary>
