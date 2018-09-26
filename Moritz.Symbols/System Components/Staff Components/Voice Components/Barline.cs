@@ -712,4 +712,55 @@ namespace Moritz.Symbols
 		public FramedRegionInfoMetrics FramedRegionEndTextMetrics = null;
 	}
 
+	/// <summary>
+	/// A barline whose 2 lines are (left to right) thin then thick. OriginX is the thick line's x-coordinate.
+	/// This barline type is used for the final barline in a score if the final barline is not an EndRegionBarline.
+	/// </summary>
+	public class EndOfScoreBarline : Barline
+	{
+		public EndOfScoreBarline(Voice voice, List<DrawObject> drawObjects)
+			: base(voice)
+		{
+			SetDrawObjects(drawObjects);
+		}
+
+		/// <summary>
+		/// Writes out the barline's vertical line(s).
+		/// May be called twice per staff.barline:
+		///     1. for the range between top and bottom stafflines (if Barline.Visible is true)
+		///     2. for the range between the staff's lower edge and the next staff's upper edge
+		///        (if the staff's lower neighbour is in the same group)
+		/// </summary>
+		/// <param name="w"></param>
+		public override void WriteSVG(SvgWriter w, float topStafflineY, float bottomStafflineY, bool isEndOfSystem)
+		{
+			float topY = TopY(topStafflineY, isEndOfSystem);
+			float bottomY = BottomY(bottomStafflineY, isEndOfSystem);
+
+			float thinLeftLineOriginX = Barline_LineMetrics.OriginX - (ThickStrokeWidth / 2) - DoubleBarPadding - (ThinStrokeWidth / 2F);
+			w.SvgStartGroup(CSSObjectClass.endOfScoreBarline.ToString());
+			w.SvgLine(CSSObjectClass.thinBarline, thinLeftLineOriginX, topY, thinLeftLineOriginX, bottomY);
+
+			float thickRightLineOriginX = Barline_LineMetrics.OriginX;
+			w.SvgLine(CSSObjectClass.thickBarline, thickRightLineOriginX, topY, thickRightLineOriginX, bottomY);
+			w.SvgEndGroup();
+		}
+		/// <summary>
+		/// These functions do nothing. This barline type has no DrawObjects (staff name, barnumber, region info).
+		/// </summary>
+		public override void WriteDrawObjectsSVG(SvgWriter w){}
+		public override void AddMetricsToEdge(HorizontalEdge horizontalEdge){}
+		internal override void AlignFramedTextsXY(List<NoteObject> fixedNoteObjects){}
+		internal override void AddAncilliaryMetricsTo(StaffMetrics staffMetrics){}
+
+		public override void CreateMetrics(Graphics graphics)
+		{
+			float leftEdge = -((ThickStrokeWidth / 2F) + DoubleBarPadding + ThinStrokeWidth);
+			float rightEdge = (ThickStrokeWidth / 2F);
+			Barline_LineMetrics = new Barline_LineMetrics(leftEdge, rightEdge, CSSObjectClass.thinBarline, CSSObjectClass.thickBarline);
+		}
+
+		public override string ToString() { return "endOfScoreBarline: "; }
+	}
+
 }

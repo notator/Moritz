@@ -1410,12 +1410,14 @@ namespace Moritz.Symbols
 				#region set msPosBarlineClassDict
 				msPosBarlineClassDict.Clear();
 				List<NoteObject> noteObjects = system.Staves[0].Voices[0].NoteObjects;
+				bool isLastSystem = (system == Systems[Systems.Count - 1]);
 				for(int i = 0; i < noteObjects.Count; ++i)
 				{
 					if(noteObjects[i] is NormalBarline normalBarline)
 					{
+						bool isLastBarlineInScore = (isLastSystem && (i == noteObjects.Count - 1));
 						int barlineMsPos = BarlineMsPos(noteObjects, i);
-						CSSObjectClass barlineClass = GetBarlineClass(normalBarline.DrawObjects);
+						CSSObjectClass barlineClass = GetBarlineClass(normalBarline.DrawObjects, isLastBarlineInScore);
 						msPosBarlineClassDict.Add(barlineMsPos, barlineClass);
 					}
 				}
@@ -1444,6 +1446,9 @@ namespace Moritz.Symbols
 										break;
 									case CSSObjectClass.endAndStartRegionBarline:
 										voice.NoteObjects[i] = new EndAndStartRegionBarline(voice, normalBarline.DrawObjects);
+										break;
+									case CSSObjectClass.endOfScoreBarline:
+										voice.NoteObjects[i] = new EndOfScoreBarline(voice, normalBarline.DrawObjects);
 										break;
 								}
 							}
@@ -1479,7 +1484,7 @@ namespace Moritz.Symbols
 			return barlineMsPos;
 		}
 
-		private CSSObjectClass GetBarlineClass(List<DrawObject> drawObjects)
+		private CSSObjectClass GetBarlineClass(List<DrawObject> drawObjects, bool isLastBarlineInScore)
 		{
 			bool hasStartRegionInfo = false;
 			bool hasEndRegionInfo = false;
@@ -1508,6 +1513,10 @@ namespace Moritz.Symbols
 			else if(hasEndRegionInfo)
 			{
 				rval = CSSObjectClass.endRegionBarline;
+			}
+			else if(isLastBarlineInScore)
+			{
+				rval = CSSObjectClass.endOfScoreBarline;
 			}
 
 			return rval;
