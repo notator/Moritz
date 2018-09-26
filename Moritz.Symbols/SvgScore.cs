@@ -1513,11 +1513,11 @@ namespace Moritz.Symbols
 					rval = CSSObjectClass.startRegionBarline;
 				}
 			}
-			else if(hasEndRegionInfo)
+			else if(hasEndRegionInfo && !isLastBarlineInScore)
 			{
 				rval = CSSObjectClass.endRegionBarline;
 			}
-			else if(isLastBarlineInScore)
+			else if(isLastBarlineInScore) // can, but need not have EndRegionInfo
 			{
 				rval = CSSObjectClass.endOfScoreBarline;
 			}

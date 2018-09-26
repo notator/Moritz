@@ -1,9 +1,7 @@
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using Moritz.Globals;
 using Moritz.Xml;
 
 namespace Moritz.Symbols
@@ -522,11 +520,6 @@ namespace Moritz.Symbols
 			AddBasicMetricsToEdge(horizontalEdge);
 		}
 
-		public override string ToString()
-		{
-			return "endRegionBarline: ";
-		}
-
 		internal override void AlignFramedTextsXY(List<NoteObject> fixedNoteObjects)
 		{
 			#region alignX
@@ -544,6 +537,15 @@ namespace Moritz.Symbols
 			MoveFramedTextAboveNoteObjects(BarnumberMetrics, fixedNoteObjects);
 
 			MoveBarnumberAboveRegionBox(BarnumberMetrics, FramedRegionEndTextMetrics);
+		}
+
+		internal override void AddAncilliaryMetricsTo(StaffMetrics staffMetrics)
+		{
+			base.AddAncilliaryMetricsTo(staffMetrics);
+			if(FramedRegionEndTextMetrics != null)
+			{
+				staffMetrics.Add(FramedRegionEndTextMetrics);
+			}
 		}
 
 		public override void CreateMetrics(Graphics graphics)
@@ -564,13 +566,9 @@ namespace Moritz.Symbols
 			}
 		}
 
-		internal override void AddAncilliaryMetricsTo(StaffMetrics staffMetrics)
+		public override string ToString()
 		{
-			base.AddAncilliaryMetricsTo(staffMetrics);
-			if(FramedRegionEndTextMetrics != null)
-			{
-				staffMetrics.Add(FramedRegionEndTextMetrics);
-			}
+			return "endRegionBarline: ";
 		}
 
 		public FramedRegionInfoMetrics FramedRegionEndTextMetrics = null;
@@ -719,15 +717,14 @@ namespace Moritz.Symbols
 	}
 
 	/// <summary>
-	/// A barline whose 2 lines are (left to right) thin then thick. OriginX is the thick line's x-coordinate.
-	/// This barline type is used for the final barline in a score if the final barline is not an EndRegionBarline.
+	/// A barline whose 2 lines are (left to right) normal then thick. OriginX is the thick line's x-coordinate.
+	/// This barline type is always used for the final barline in a score. It can have FramedEndRegionInfo.
 	/// </summary>
-	public class EndOfScoreBarline : Barline
+	public class EndOfScoreBarline : EndRegionBarline
 	{
 		public EndOfScoreBarline(Voice voice, List<DrawObject> drawObjects)
-			: base(voice)
+			: base(voice, drawObjects)
 		{
-			SetDrawObjects(drawObjects);
 		}
 
 		/// <summary>
@@ -743,27 +740,26 @@ namespace Moritz.Symbols
 			float topY = TopY(topStafflineY, isEndOfSystem);
 			float bottomY = BottomY(bottomStafflineY, isEndOfSystem);
 
-			float thinLeftLineOriginX = Barline_LineMetrics.OriginX - (ThickStrokeWidth / 2) - DoubleBarPadding - (ThinStrokeWidth / 2F);
+			float normalLeftLineOriginX = Barline_LineMetrics.OriginX - (ThickStrokeWidth / 2) - DoubleBarPadding - (NormalStrokeWidth / 2F);
 			w.SvgStartGroup(CSSObjectClass.endOfScoreBarline.ToString());
-			w.SvgLine(CSSObjectClass.thinBarline, thinLeftLineOriginX, topY, thinLeftLineOriginX, bottomY);
+			w.SvgLine(CSSObjectClass.normalBarline, normalLeftLineOriginX, topY, normalLeftLineOriginX, bottomY);
 
 			float thickRightLineOriginX = Barline_LineMetrics.OriginX;
 			w.SvgLine(CSSObjectClass.thickBarline, thickRightLineOriginX, topY, thickRightLineOriginX, bottomY);
 			w.SvgEndGroup();
 		}
-		/// <summary>
-		/// These functions do nothing. This barline type has no DrawObjects (staff name, barnumber, region info).
-		/// </summary>
-		public override void WriteDrawObjectsSVG(SvgWriter w){}
-		public override void AddMetricsToEdge(HorizontalEdge horizontalEdge){}
-		internal override void AlignFramedTextsXY(List<NoteObject> fixedNoteObjects){}
-		internal override void AddAncilliaryMetricsTo(StaffMetrics staffMetrics){}
+
+		// The following functions are inherited from EndRegionBarline.
+		// public override void WriteDrawObjectsSVG(SvgWriter w)
+		// public override void AddMetricsToEdge(HorizontalEdge horizontalEdge)
+		// internal override void AlignFramedTextsXY(List<NoteObject> fixedNoteObjects)
+		// internal override void AddAncilliaryMetricsTo(StaffMetrics staffMetrics)
 
 		public override void CreateMetrics(Graphics graphics)
 		{
-			float leftEdge = -((ThickStrokeWidth / 2F) + DoubleBarPadding + ThinStrokeWidth);
+			float leftEdge = -((ThickStrokeWidth / 2F) + DoubleBarPadding + NormalStrokeWidth);
 			float rightEdge = (ThickStrokeWidth / 2F);
-			Barline_LineMetrics = new Barline_LineMetrics(leftEdge, rightEdge, CSSObjectClass.thinBarline, CSSObjectClass.thickBarline);
+			Barline_LineMetrics = new Barline_LineMetrics(leftEdge, rightEdge, CSSObjectClass.normalBarline, CSSObjectClass.thickBarline);
 		}
 
 		public override string ToString() { return "endOfScoreBarline: "; }
