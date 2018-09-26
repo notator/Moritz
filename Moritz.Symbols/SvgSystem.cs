@@ -573,7 +573,7 @@ namespace Moritz.Symbols
 								float barlineToDSPadding = hairline; // 4
 								if(durationSymbol is RestSymbol restSymbol)
 								{
-									barlineToDSPadding = hairline * 8; // 32
+									barlineToDSPadding = hairline * 8; // 32									
 								}
 								else if(durationSymbol is ChordSymbol chordSymbol)
 								{
@@ -584,9 +584,15 @@ namespace Moritz.Symbols
 										barlineToDSPadding = hairline * 4; // 16
 								}
 
+								float barlineRight = 0;
+								if(!(durationSymbol is CautionaryChordSymbol ccs && ccs.Visible == false))
+								{
+									barlineRight = durationSymbol.Metrics.Left - barlineToDSPadding;
+								}
+
 								if(barline != null)
                                 {
-									barline.Metrics.Move(durationSymbol.Metrics.Left - barline.Metrics.Right - barlineToDSPadding, 0F);
+									barline.Metrics.Move(barlineRight - barline.Metrics.Right, 0F);
 
                                     if(clef != null)
                                     {

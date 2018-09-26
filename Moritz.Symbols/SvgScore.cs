@@ -1024,7 +1024,7 @@ namespace Moritz.Symbols
                     Staff staff = system.Staves[staffIndex];
                     foreach(NoteObject noteObject in staff.Voices[0].NoteObjects)
                     {
-                        if(noteObject is NormalBarline firstBarline)
+                        if(noteObject is Barline firstBarline)
                         {
                             float fontHeight = _pageFormat.StaffNameFontHeight;
 
@@ -1053,14 +1053,14 @@ namespace Moritz.Symbols
                 {
                     foreach(Voice voice in staff.Voices)
                     {
-                        Debug.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is NormalBarline);
+                        Debug.Assert(voice.NoteObjects[voice.NoteObjects.Count - 1] is Barline);
                         // contains lists of consecutive rest indices
                         List<List<int>> restIndexLists = new List<List<int>>();
                         #region find the consecutive rests
                         List<int> consecutiveRestIndexList = new List<int>();
                         for(int i = 0; i < voice.NoteObjects.Count - 1; i++)
                         {
-                            Debug.Assert(!(voice.NoteObjects[i] is NormalBarline));
+                            Debug.Assert(!(voice.NoteObjects[i] is Barline));
 
 							RestSymbol rest2 = voice.NoteObjects[i + 1] as RestSymbol;
 							if(voice.NoteObjects[i] is RestSymbol rest1 && rest2 != null)
@@ -1139,44 +1139,34 @@ namespace Moritz.Symbols
             }
 
             DoJoinSystems(systemStartBarIndices);
+
+			SetCautionaryChordSymbolVisibility();
         }
-		///// <summary>
-		///// The systemNumbers are the current numbers of the systems which are to be joined to the following system.
-		///// All systemNumbers must be greater than 0 and less than the current Systems.Count.
-		///// No systemNumbers may be repeated.
-		///// </summary>
-		//public void JoinSystems(params int[] systemNumbers)
-		//{
-		//    List<int> systemNums = new List<int>(systemNumbers);
-		//    systemNums.Sort();
 
-		//    #region conditions
-		//    Debug.Assert(systemNums.Count > 0 && systemNums[0] > 0);
-		//    for(int i = 1; i < systemNums.Count; i++)
-		//    {
-		//        Debug.Assert(
-		//            systemNums[i] > 0
-		//            && systemNums[i] != systemNums[i - 1]
-		//            && systemNums[i] < Systems.Count);
-		//    }
-		//    #endregion
-
-		//    DoJoinSystems(systemNums);
-		//}
-		///// <summary>
-		///// Joins systems so as to put barsPerSystem bars on each system.
-		///// </summary>
-		///// <param name="barsPerSystem"></param>
-		//protected void SetBarsPerSystem(int barsPerSystem)
-		//{
-		//    List<int> systemIndices = new List<int>();
-		//    for(int i = 1; i < Systems.Count; i++)
-		//        systemIndices.Add(i);
-		//    for(int i = barsPerSystem; i < Systems.Count; i += barsPerSystem)
-		//        systemIndices.Remove(i);
-
-		//    DoJoinSystems(systemIndices);
-		//}
+		private void SetCautionaryChordSymbolVisibility()
+		{
+			foreach(SvgSystem system in Systems)
+			{
+				foreach(Staff staff in system.Staves)
+				{
+					foreach(Voice voice in staff.Voices)
+					{
+						bool visible = true;
+						foreach(NoteObject noteObject in voice.NoteObjects)
+						{
+							if(noteObject is CautionaryChordSymbol ccs)
+							{
+								ccs.Visible = visible;
+							}
+							else if(noteObject is OutputChordSymbol ocs)
+							{
+								visible = false;
+							}
+						}
+					}
+				}
+			}
+		}
 
 		#region private for JoinSystems() and SetBarsPerSystem()
 		/// <summary>
@@ -1278,13 +1268,14 @@ namespace Moritz.Symbols
                     for(int voiceIndex = 0; voiceIndex < staff.Voices.Count; voiceIndex++)
                     {
                         Voice voice = staff.Voices[voiceIndex];
-                        NormalBarline barline = voice.InitialBarline;
+                        Barline barline = voice.InitialBarline;
                         if(barline != null)
                         {
                             if(systemIndex > 0)
                             {
                                 Voice voiceInPreviousSystem = Systems[systemIndex - 1].Staves[staffIndex].Voices[voiceIndex];
-                                voiceInPreviousSystem.NoteObjects.Add(new NormalBarline(voiceInPreviousSystem));
+								// yes: add a NormalBarline here
+								voiceInPreviousSystem.NoteObjects.Add(new NormalBarline(voiceInPreviousSystem));
                             }
                             voice.NoteObjects.Remove(barline);
                         }
@@ -1297,7 +1288,7 @@ namespace Moritz.Symbols
 
         /// <summary>
         /// There is currently one bar per System. 
-        /// All Duration Symbols have been constructed in voice.NoteObjects.
+        /// All Duration Symbols have been constructed in voice.NoteObjects (possibly including CautionaryChordSymbols at the beginnings of staves).
         /// There are no barlines in the score yet.
         /// Add a NormalBarline to each Voice.
         /// </summary>
@@ -1386,7 +1377,7 @@ namespace Moritz.Symbols
 
 			ReplaceConsecutiveRestsInBars(_pageFormat.MinimumCrotchetDuration);
 
-            SetSystemsToBeginAtBars(_pageFormat.SystemStartBars); // 2. join the bars into systems according to the user's options,
+            SetSystemsToBeginAtBars(_pageFormat.SystemStartBars); // 2. join the bars into systems according to the user's options.
 
 			SetSystemAbsEndMsPositions();
 
@@ -1464,7 +1455,7 @@ namespace Moritz.Symbols
 
 		private int BarlineMsPos(List<NoteObject> noteObjects, int i)
 		{
-			Debug.Assert(noteObjects[i] is NormalBarline);
+			Debug.Assert(noteObjects[i] is Barline);
 			int barlineMsPos = 0;
 			if(i > 0 && i == noteObjects.Count - 1)
 			{
@@ -1577,7 +1568,7 @@ namespace Moritz.Symbols
 		{
 			List<NoteObject> noteObjects = voice.NoteObjects;
 			Debug.Assert(noteObjects[0] is Clef);
-			Debug.Assert(noteObjects[noteObjects.Count - 1] is NormalBarline);
+			Debug.Assert(noteObjects[noteObjects.Count - 1] is Barline);
 
 			for(int i = noteObjects.Count - 1; i > 0; --i)
             {
@@ -1756,7 +1747,7 @@ namespace Moritz.Symbols
                 bool isFirstBarline = true;
                 for(int i = 0; i < topVoice.NoteObjects.Count - 1; i++)
                 {
-                    if(topVoice.NoteObjects[i] is NormalBarline barline)
+                    if(topVoice.NoteObjects[i] is Barline barline)
                     {
                         if(isFirstBarline && system != Systems[0])
                         {
@@ -1783,7 +1774,7 @@ namespace Moritz.Symbols
 			int lastRegionStartBarIndex = regionStartDataBarIndices[regionStartDataBarIndices.Count - 1];
 
 			int barlineIndex = 0;
-			List<NormalBarline> barlines = new List<NormalBarline>();
+			List<Barline> barlines = new List<Barline>();
 			foreach(SvgSystem system in Systems)
 			{
 				Voice topVoice = system.Staves[0].Voices[0];
@@ -1797,7 +1788,7 @@ namespace Moritz.Symbols
 				}
 				barlines.RemoveAt(barlines.Count - 1); // ignore the final barline on the voice (system)
 
-				foreach(NormalBarline barline in barlines)
+				foreach(Barline barline in barlines)
 				{
 					if(regionStartDataBarIndices.Contains(barlineIndex))
 					{
@@ -1830,7 +1821,7 @@ namespace Moritz.Symbols
 			int lastRegionEndBarIndex = regionEndDataBarIndices[regionEndDataBarIndices.Count - 1];
 
 			int barlineIndex = 1; // the first barline is going to be ignored. 
-			List<NormalBarline> barlines = new List<NormalBarline>();
+			List<Barline> barlines = new List<Barline>();
 			foreach(SvgSystem system in Systems)
 			{
 				Voice topVoice = system.Staves[0].Voices[0];
@@ -1845,7 +1836,7 @@ namespace Moritz.Symbols
 
 				barlines.RemoveAt(0); // ignore the first barline on the voice (system)
 
-				foreach(NormalBarline barline in barlines)
+				foreach(Barline barline in barlines)
 				{
 					if(regionEndDataBarIndices.Contains(barlineIndex))
 					{

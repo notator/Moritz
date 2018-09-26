@@ -831,7 +831,7 @@ namespace Moritz.Symbols
             NoteObject no2 = GetFollowingChordRestOrBarlineSymbol(noteObjects);
 			ChordSymbol chord2 = no2 as ChordSymbol;
 			RestSymbol rest2 = no2 as RestSymbol;
-			if(no2 is NormalBarline barline)
+			if(no2 is Barline barline)
 			{
 				float x2 = barline.Metrics.OriginX;
 				x2s = GetEqualFloats(x2, x1s.Count);
@@ -897,7 +897,7 @@ namespace Moritz.Symbols
 
                 if(noteObjectToReturn != null) // a ChordSymbol or a RestSymbol (not a CautionaryChordSymbol)
                 {
-                    if(noteObjects[i - 1] is NormalBarline barline)
+                    if(noteObjects[i - 1] is Barline barline)
                         noteObjectToReturn = barline;
                     break;
                 }
@@ -955,7 +955,7 @@ namespace Moritz.Symbols
                                     if(hasContinuingBeamBlock)
                                         Debug.Assert(true);
 
-                                    if(noteObjects[index - 1] is NormalBarline barline)
+                                    if(noteObjects[index - 1] is Barline barline)
                                     {
                                         float x2 = barline.Metrics.OriginX;
                                         x2s = GetEqualFloats(x2, x1s.Count);

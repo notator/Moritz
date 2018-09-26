@@ -518,22 +518,6 @@ namespace Moritz.Symbols
             }
         }
 
-        private bool NextNoteObjectIsABarline(OutputChordSymbol chord)
-        {
-            bool nextNoteObjectIsABarline = false;
-            List<NoteObject> noteObjects = chord.Voice.NoteObjects;
-
-            for(int i = 0; i < noteObjects.Count - 1; ++i)
-            {
-                if(noteObjects[i] == chord)
-                {
-                    nextNoteObjectIsABarline = (noteObjects[i + 1] is NormalBarline);
-                    break;
-                }
-            }
-            return nextNoteObjectIsABarline;
-        }
-
         /// <summary>
         /// Returns null if the durationClass does not have a flagsBlock,
         /// otherwise returns the metrics for the flagsBlock attached to this chord, correctly positioned wrt the noteheads.

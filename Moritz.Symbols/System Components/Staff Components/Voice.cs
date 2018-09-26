@@ -121,29 +121,18 @@ namespace Moritz.Symbols
 			}
 		}
 
-		/// <summary>
-		/// Returns null if the last noteObject on this voice's noteObject list is not a Barline.
-		/// </summary>
-		public NormalBarline FinalBarline
-        {
-            get
-            {
-                NormalBarline finalBarline = this.NoteObjects[NoteObjects.Count - 1] as NormalBarline;
-                return finalBarline;
-            }
-        }
         /// <summary>
         /// Returns the first barline to occur before any durationSymbols, or null if no such barline exists.
         /// </summary>
-        public NormalBarline InitialBarline
+        public Barline InitialBarline
         {
             get
             {
-                NormalBarline initialBarline = null;
+                Barline initialBarline = null;
                 foreach(NoteObject noteObject in NoteObjects)
                 {
-                    initialBarline = noteObject as NormalBarline;
-                    if(noteObject is DurationSymbol || noteObject is NormalBarline)
+                    initialBarline = noteObject as Barline;
+                    if(noteObject is DurationSymbol || noteObject is Barline)
                         break;
                 }
                 return initialBarline;
@@ -232,7 +221,7 @@ namespace Moritz.Symbols
 				ChordSymbol chord = noteObject as ChordSymbol;
 				RestSymbol rest = noteObject as RestSymbol;
                 Clef clef = noteObject as Clef;
-                NormalBarline barline = noteObject as NormalBarline;
+                Barline barline = noteObject as Barline;
 
 				if(noteObject is CautionaryChordSymbol cautionaryChord)
 					continue;
