@@ -13,15 +13,15 @@ namespace Moritz.Symbols
 		/// <summary>
 		/// A region in the score that will be played as a continuous sequence.
 		/// </summary>
-		public RegionDef(string name, Tuple<int, int> startBarline, Tuple<int, int> endBarline)
+		public RegionDef(string name, (int index, int msPosition) startBarline, (int index, int msPosition) endBarline)
 		{
 			this.name = name;
-			startBarIndex = startBarline.Item1;
-			startMsPos = startBarline.Item2;
-			endBarIndex = endBarline.Item1;
-			endMsPos = endBarline.Item2;
-			Debug.Assert(startBarIndex >= 0 && endBarIndex > startBarIndex);
-			Debug.Assert(startMsPos >= 0 && endMsPos > startMsPos);
+			startBarlineIndex = startBarline.index;
+			startBarlineMsPos = startBarline.msPosition;
+			endBarlineIndex = endBarline.index;
+			endBarlineMsPos = endBarline.msPosition;
+			Debug.Assert(startBarlineIndex >= 0 && endBarlineIndex > startBarlineIndex);
+			Debug.Assert(startBarlineMsPos >= 0 && endBarlineMsPos > startBarlineMsPos);
 		}
 
 		public void WriteSVG(SvgWriter w)
@@ -29,17 +29,17 @@ namespace Moritz.Symbols
 			w.WriteStartElement("regionDef");
 			w.WriteAttributeString("class", "regionDef");
 			w.WriteAttributeString("name", name);
-			w.WriteAttributeString("fromStartOfBar", (startBarIndex + 1).ToString());
-			w.WriteAttributeString("startMsPos", startMsPos.ToString());
-			w.WriteAttributeString("toEndOfBar", (endBarIndex + 1).ToString());
-			w.WriteAttributeString("endMsPos", endMsPos.ToString());
+			w.WriteAttributeString("fromStartOfBar", (startBarlineIndex + 1).ToString());
+			w.WriteAttributeString("startMsPos", startBarlineMsPos.ToString());
+			w.WriteAttributeString("toEndOfBar", (endBarlineIndex + 1).ToString());
+			w.WriteAttributeString("endMsPos", endBarlineMsPos.ToString());
 			w.WriteEndElement();
 		}
 
 		public readonly string name;
-		public readonly int startBarIndex;
-		public readonly int startMsPos;
-		public readonly int endBarIndex;
-		public readonly int endMsPos;
+		public readonly int startBarlineIndex;
+		public readonly int startBarlineMsPos;
+		public readonly int endBarlineIndex;
+		public readonly int endBarlineMsPos;
 	}
 }

@@ -14,7 +14,7 @@ namespace Moritz.Symbols
 		{
 			Debug.Assert(!(basicRegionDefs == null || basicRegionDefs.Count == 0));
 			Debug.Assert(!String.IsNullOrEmpty(regionSequence));
-			Debug.Assert(basicRegionDefs[0].startMsPos == 0);
+ 			Debug.Assert(basicRegionDefs[0].startBarlineMsPos == 0);
 
 			for(int i = 0; i < basicRegionDefs.Count - 1; ++i)
 			{
@@ -25,7 +25,7 @@ namespace Moritz.Symbols
 
 				for(int j = i + 1; j < basicRegionDefs.Count; ++j)
 				{
-					Debug.Assert(basicRegionDefs[i].startMsPos <= basicRegionDefs[j].startMsPos,
+					Debug.Assert(basicRegionDefs[i].startBarlineMsPos <= basicRegionDefs[j].startBarlineMsPos,
 						"RegionDef startMsPositions may be the same, but must otherwise be in chronological order.");
 					Debug.Assert(basicRegionDefs[i].name.CompareTo(basicRegionDefs[j].name) < 0,
 						"The RegionDefs names must all be different and in alphabetical order here.");
@@ -49,14 +49,14 @@ namespace Moritz.Symbols
 
 			foreach(RegionDef rd in regionDefSeq)
 			{
-				int barIndex = rd.startBarIndex;
-				if(!rval.ContainsKey(barIndex))
+				int barlineIndex = rd.startBarlineIndex;
+				if(!rval.ContainsKey(barlineIndex))
 				{
-					rval.Add(barIndex, new List<string>() { rd.name });
+					rval.Add(barlineIndex, new List<string>() { rd.name });
 				}
 				else
 				{
-					rval[barIndex].Add(rd.name);
+					rval[barlineIndex].Add(rd.name);
 				}
 			}
 
@@ -70,14 +70,14 @@ namespace Moritz.Symbols
 			for(int i = 0; i < regionDefSeq.Count; ++i)
 			{
 				string regionLink = (i < regionDefSeq.Count - 1) ? regionDefSeq[i].name + "➔" + regionDefSeq[i + 1].name : regionDefSeq[i].name + " end";
-				int barIndex = regionDefSeq[i].endBarIndex;
-				if(!rval.ContainsKey(barIndex))
+				int barlineIndex = regionDefSeq[i].endBarlineIndex;
+				if(!rval.ContainsKey(barlineIndex))
 				{
-					rval.Add(barIndex, new List<string>() { regionLink });
+					rval.Add(barlineIndex, new List<string>() { regionLink });
 				}
 				else
 				{
-					rval[barIndex].Add(regionLink);
+					rval[barlineIndex].Add(regionLink);
 				}
 			}
 
@@ -98,9 +98,9 @@ namespace Moritz.Symbols
 			{
 				string uniqueName = uniqueNames[i];
 				RegionDef brd = FindBaseRegionDef(regionDefs, regionSequence[i]);
-				Tuple<int, int> startBarData = new Tuple<int, int>(brd.startBarIndex, brd.startMsPos);
-				Tuple<int, int> endBarData = new Tuple<int, int>(brd.endBarIndex, brd.endMsPos);
-				RegionDef uniqueRegionDef = new RegionDef(uniqueName, startBarData, endBarData);
+				var startBarData = (index:brd.startBarlineIndex, msPosition: brd.startBarlineMsPos);
+				var endBarlineData = (index: brd.endBarlineIndex, msPosition: brd.endBarlineMsPos);
+				RegionDef uniqueRegionDef = new RegionDef(uniqueName, startBarData, endBarlineData);
 				regionDefSeq.Add(uniqueRegionDef);
 			}
 			return regionDefSeq;
