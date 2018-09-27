@@ -760,6 +760,15 @@ namespace Moritz.Symbols
 			float leftEdge = -((ThickStrokeWidth / 2F) + DoubleBarPadding + NormalStrokeWidth);
 			float rightEdge = (ThickStrokeWidth / 2F);
 			Barline_LineMetrics = new Barline_LineMetrics(leftEdge, rightEdge, CSSObjectClass.normalBarline, CSSObjectClass.thickBarline);
+
+			foreach(DrawObject drawObject in DrawObjects)
+			{
+				if(drawObject is FramedRegionEndText frst)
+				{
+					FramedRegionEndTextMetrics = new FramedRegionInfoMetrics(graphics, frst.Texts, frst.FrameInfo);
+					break;
+				}
+			}
 		}
 
 		public override string ToString() { return "endOfScoreBarline: "; }
