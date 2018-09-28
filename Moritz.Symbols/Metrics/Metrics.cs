@@ -230,5 +230,44 @@ namespace Moritz.Symbols
 		public static IReadOnlyList<CSSColorClass> UsedCSSColorClasses { get => _usedCSSColorClasses as IReadOnlyList<CSSColorClass>; }
 		private static List<CSSColorClass> _usedCSSColorClasses = new List<CSSColorClass>();
 	}
+
+	public class PaddedMetrics : Metrics
+	{
+		public PaddedMetrics(Metrics embeddedMetrics, float topPadding, float rightPadding, float bottomPadding, float leftPadding)
+			: base(embeddedMetrics.CSSObjectClass)
+		{
+			_top = embeddedMetrics.Top - topPadding;
+			_right = embeddedMetrics.Right + rightPadding;
+			_bottom = embeddedMetrics.Bottom + bottomPadding;
+			_left = embeddedMetrics.Left - leftPadding;
+			_originX = embeddedMetrics.OriginX;
+			_originY = embeddedMetrics.OriginY;
+
+			TopPadding = topPadding;
+			RightPadding = rightPadding;
+			BottomPadding = bottomPadding;
+			LeftPadding = leftPadding;
+
+			EmbeddedMetrics = embeddedMetrics; 
+		}
+
+		public override void WriteSVG(SvgWriter w)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void Move(float dx, float dy)
+		{
+			base.Move(dx, dy);
+			EmbeddedMetrics.Move(dx, dy);
+		}
+
+		public float TopPadding { get; }
+		public float RightPadding { get; }
+		public float BottomPadding { get; }
+		public float LeftPadding { get; }
+
+		private Metrics EmbeddedMetrics { get; }		
+	}
 }
 			    
