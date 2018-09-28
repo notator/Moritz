@@ -70,23 +70,12 @@ namespace Moritz.Symbols
 		}
 
 		protected void MoveBarnumberAboveRegionBox(BarnumberMetrics barnumberMetrics, FramedRegionInfoMetrics regionInfoMetrics)
-		{
+		{			
 			if(barnumberMetrics != null && regionInfoMetrics != null)
 			{
-				float overlap = barnumberMetrics.Bottom - regionInfoMetrics.Top;
-				float shift = 0F;
-				if(overlap > 0)
-				{
-					shift = overlap + Gap;
-				}
-				else if(overlap > -Gap)
-				{
-					shift = barnumberMetrics.Bottom - (regionInfoMetrics.Top - Gap);
-				}
-				if(shift > 0)
-				{
-					barnumberMetrics.Move(0, -shift);
-				}
+				float padding = Gap * 1.5F;
+				float shift = barnumberMetrics.Bottom - regionInfoMetrics.Top + padding;
+				barnumberMetrics.Move(0, -shift);
 			}
 		}
 
@@ -104,12 +93,16 @@ namespace Moritz.Symbols
 		{
 			if(framedTextMetrics != null) 
 			{
+				float bottomPadding = Gap * 1.5F;
+				float xPadding = Gap * 4;
+				PaddedMetrics paddedMetrics = new PaddedMetrics(framedTextMetrics, 0F, xPadding, bottomPadding, xPadding);
+
 				foreach(NoteObject noteObject in fixedNoteObjects)
 				{
-					int overlaps = OverlapsHorizontally(framedTextMetrics, noteObject);
+					int overlaps = OverlapsHorizontally(paddedMetrics, noteObject);
 					if(overlaps == 0)
 					{
-						MoveFramedTextAboveNoteObject(framedTextMetrics, noteObject);
+						MovePaddedMetricsAboveNoteObject(paddedMetrics, noteObject);
 					}
 					else if(overlaps == 1) // noteObject is left of framedText
 					{
@@ -155,29 +148,28 @@ namespace Moritz.Symbols
 			return rval;
 		}
 		/// <summary>
-		/// Move framedTextMetrics above the fixedNoteObject if it is not already.
+		/// Move paddedMetrics above the fixedNoteObject if it is not already.
 		/// </summary>
-		private void MoveFramedTextAboveNoteObject(Metrics framedTextMetrics, NoteObject fixedNoteObject)
+		private void MovePaddedMetricsAboveNoteObject(PaddedMetrics paddedMetrics, NoteObject fixedNoteObject)
 		{
-			float padding = Gap * 1.5F;
 			float verticalOverlap = 0F;
 			if(fixedNoteObject.Metrics is ChordMetrics chordMetrics)
 			{
-				verticalOverlap = chordMetrics.OverlapHeight(framedTextMetrics, padding);
+				verticalOverlap = chordMetrics.OverlapHeight(paddedMetrics, 0F);
 			}
 			else if(fixedNoteObject.Metrics is RestMetrics restMetrics)
 			{
-				verticalOverlap = restMetrics.OverlapHeight(framedTextMetrics, padding);
+				verticalOverlap = restMetrics.OverlapHeight(paddedMetrics, 0F);
 			}
 			else if(!(fixedNoteObject is Barline))
 			{
-				verticalOverlap = fixedNoteObject.Metrics.OverlapHeight(framedTextMetrics, padding);
+				verticalOverlap = fixedNoteObject.Metrics.OverlapHeight(paddedMetrics, 0F);
 			}
 
 			if(verticalOverlap > 0)
 			{
-				verticalOverlap = (verticalOverlap > padding) ? verticalOverlap : padding;
-				framedTextMetrics.Move(0F, -verticalOverlap);
+				verticalOverlap = (verticalOverlap > paddedMetrics.BottomPadding) ? verticalOverlap : paddedMetrics.BottomPadding;
+				paddedMetrics.Move(0F, -verticalOverlap);				
 			}
 		}
 
