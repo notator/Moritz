@@ -17,11 +17,11 @@ namespace Moritz.Symbols
 		{
 			this.name = name;
 			startBarlineIndex = startBarline.index;
-			startBarlineMsPos = startBarline.msPosition;
+			startBarlineMsPosInScore = startBarline.msPosition;
 			endBarlineIndex = endBarline.index;
-			endBarlineMsPos = endBarline.msPosition;
+			endBarlineMsPosInScore = endBarline.msPosition;
 			Debug.Assert(startBarlineIndex >= 0 && endBarlineIndex > startBarlineIndex);
-			Debug.Assert(startBarlineMsPos >= 0 && endBarlineMsPos > startBarlineMsPos);
+			Debug.Assert(startBarlineMsPosInScore >= 0 && endBarlineMsPosInScore > startBarlineMsPosInScore);
 		}
 
 		public void WriteSVG(SvgWriter w)
@@ -30,16 +30,16 @@ namespace Moritz.Symbols
 			w.WriteAttributeString("class", "regionDef");
 			w.WriteAttributeString("name", name);
 			w.WriteAttributeString("fromStartOfBar", (startBarlineIndex + 1).ToString());
-			w.WriteAttributeString("startMsPos", startBarlineMsPos.ToString());
+			w.WriteAttributeString("startMsPosInScore", startBarlineMsPosInScore.ToString());
 			w.WriteAttributeString("toEndOfBar", (endBarlineIndex + 1).ToString());
-			w.WriteAttributeString("endMsPos", endBarlineMsPos.ToString());
+			w.WriteAttributeString("endMsPosInScore", endBarlineMsPosInScore.ToString());
 			w.WriteEndElement();
 		}
 
 		public readonly string name;
 		public readonly int startBarlineIndex;
-		public readonly int startBarlineMsPos;
+		public readonly int startBarlineMsPosInScore;
 		public readonly int endBarlineIndex;
-		public readonly int endBarlineMsPos;
+		public readonly int endBarlineMsPosInScore;
 	}
 }

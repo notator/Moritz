@@ -14,7 +14,7 @@ namespace Moritz.Symbols
 		{
 			Debug.Assert(!(basicRegionDefs == null || basicRegionDefs.Count == 0));
 			Debug.Assert(!String.IsNullOrEmpty(regionSequence));
- 			Debug.Assert(basicRegionDefs[0].startBarlineMsPos == 0);
+ 			Debug.Assert(basicRegionDefs[0].startBarlineMsPosInScore == 0);
 
 			for(int i = 0; i < basicRegionDefs.Count - 1; ++i)
 			{
@@ -25,7 +25,7 @@ namespace Moritz.Symbols
 
 				for(int j = i + 1; j < basicRegionDefs.Count; ++j)
 				{
-					Debug.Assert(basicRegionDefs[i].startBarlineMsPos <= basicRegionDefs[j].startBarlineMsPos,
+					Debug.Assert(basicRegionDefs[i].startBarlineMsPosInScore <= basicRegionDefs[j].startBarlineMsPosInScore,
 						"RegionDef startMsPositions may be the same, but must otherwise be in chronological order.");
 					Debug.Assert(basicRegionDefs[i].name.CompareTo(basicRegionDefs[j].name) < 0,
 						"The RegionDefs names must all be different and in alphabetical order here.");
@@ -98,8 +98,8 @@ namespace Moritz.Symbols
 			{
 				string uniqueName = uniqueNames[i];
 				RegionDef brd = FindBaseRegionDef(regionDefs, regionSequence[i]);
-				var startBarData = (index:brd.startBarlineIndex, msPosition: brd.startBarlineMsPos);
-				var endBarlineData = (index: brd.endBarlineIndex, msPosition: brd.endBarlineMsPos);
+				var startBarData = (index:brd.startBarlineIndex, msPosition: brd.startBarlineMsPosInScore);
+				var endBarlineData = (index: brd.endBarlineIndex, msPosition: brd.endBarlineMsPosInScore);
 				RegionDef uniqueRegionDef = new RegionDef(uniqueName, startBarData, endBarlineData);
 				regionDefSeq.Add(uniqueRegionDef);
 			}
