@@ -163,7 +163,7 @@ namespace Moritz.Symbols
 		}
 
 		/// <summary>
-		/// Writes a regions element
+		/// Writes a regionSequence element
 		/// </summary>
 		public void WriteSVG(SvgWriter w)
 		{
@@ -184,7 +184,7 @@ namespace Moritz.Symbols
 
 		/// <summary>
 		/// int is a barline index, List of string is the list of regionLinks for this barline, in chronological order.
-		/// A regionLink is a string of the form currentregionName->nextregionName (e.g. "A->D" or "B->A1", "A1end" etc.)
+		/// A regionLink is a string of the form currentregionName->nextregionName (e.g. "A->D" or "B->A1", "A1 end" etc.)
 		/// </summary>
 		public readonly SortedDictionary<int, List<string>> barlineRegionLinksDict = null;
 
