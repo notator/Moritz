@@ -10,9 +10,9 @@ namespace Moritz.Symbols
 {
 	public class ScoreData
 	{
-		public ScoreData(Regions regions)
+		public ScoreData(RegionSequence regionSequence)
 		{
-			this.Regions = regions;
+			this.RegionSequence = regionSequence;
 		}
 
 		/// <summary>
@@ -40,11 +40,11 @@ namespace Moritz.Symbols
 		{
 			w.WriteStartElement("score","scoreData", null);
 
-			Regions.WriteSVG(w);
+			RegionSequence.WriteSVG(w);
 
 			w.WriteEndElement(); // end "score:scoreData"           
 		}
 
-		public readonly Regions Regions;
+		public readonly RegionSequence RegionSequence;
 	}
 }

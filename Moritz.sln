@@ -44,6 +44,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AssistantPerformerTestSite", "AssistantPerformerTestSite", "{D0D4A71B-25C8-4E9B-A39C-35E93FD86B07}"
 	ProjectSection(SolutionItems) = preProject
 		..\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\assistantPerformer.html = ..\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\assistantPerformer.html
+		..\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores\Tombeau 1\Tombeau 1 (scroll).svg = ..\MyWebsite\james-ingram-act-two\open-source\assistantPerformerTestSite\scores\Tombeau 1\Tombeau 1 (scroll).svg
 	EndProjectSection
 EndProject
 Global

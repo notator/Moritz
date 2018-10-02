@@ -1780,7 +1780,7 @@ namespace Moritz.Symbols
 		/// </summary>
 		private void AddRegionStartInfo()
 		{
-			SortedDictionary<int,List<string>> regionStartData = ScoreData.Regions.barlineStartRegionsDict;
+			SortedDictionary<int,List<string>> regionStartData = ScoreData.RegionSequence.barlineStartRegionsDict;
 
 			var regionStartDataBarIndices = new List<int>(regionStartData.Keys);
 			int lastRegionStartBarIndex = regionStartDataBarIndices[regionStartDataBarIndices.Count - 1];
@@ -1827,7 +1827,7 @@ namespace Moritz.Symbols
 		/// </summary>
 		private void AddRegionEndInfo()
 		{
-			SortedDictionary<int, List<string>> regionEndData = ScoreData.Regions.barlineRegionLinksDict;
+			SortedDictionary<int, List<string>> regionEndData = ScoreData.RegionSequence.barlineRegionLinksDict;
 
 			var regionEndDataBarIndices = new List<int>(regionEndData.Keys);
 			int lastRegionEndBarIndex = regionEndDataBarIndices[regionEndDataBarIndices.Count - 1];

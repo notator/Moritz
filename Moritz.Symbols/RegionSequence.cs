@@ -8,13 +8,14 @@ using Moritz.Xml;
 
 namespace Moritz.Symbols
 {
-	public class Regions
+	public class RegionSequence
 	{
-		public Regions(IReadOnlyList<RegionDef> basicRegionDefs, string regionSequence)
+		public RegionSequence(IReadOnlyList<RegionDef> basicRegionDefs, string regionSequence)
 		{
+			#region check arguments
 			Debug.Assert(!(basicRegionDefs == null || basicRegionDefs.Count == 0));
 			Debug.Assert(!String.IsNullOrEmpty(regionSequence));
- 			Debug.Assert(basicRegionDefs[0].startBarlineMsPosInScore == 0);
+			Debug.Assert(basicRegionDefs[0].startBarlineMsPosInScore == 0);
 
 			for(int i = 0; i < basicRegionDefs.Count - 1; ++i)
 			{
@@ -31,19 +32,17 @@ namespace Moritz.Symbols
 						"The RegionDefs names must all be different and in alphabetical order here.");
 				}
 			}
+			#endregion
 
 			List<string> baseNames = GetBaseNames(basicRegionDefs);
 			List<string> uniqueNames = GetUniqueNames(baseNames, regionSequence);
-			List<RegionDef> regionDefSeq = GetUniqueRegionDefSequence(basicRegionDefs, regionSequence, uniqueNames);
 
+			this.regionDefSeq = GetRegionDefSequence(basicRegionDefs, regionSequence, uniqueNames);
 			this.barlineStartRegionsDict = GetBarlineStartRegionsDict(regionDefSeq);
 			this.barlineRegionLinksDict = GetBarlineRegionLinksDict(regionDefSeq);
-
-			this.regionDefs = basicRegionDefs;
-			this.regionSequence = regionSequence;
 		}
 
-		private SortedDictionary<int, List<string>> GetBarlineStartRegionsDict(List<RegionDef> regionDefSeq)
+		private SortedDictionary<int, List<string>> GetBarlineStartRegionsDict(IReadOnlyList<RegionDef> regionDefSeq)
 		{
 			var rval = new SortedDictionary<int, List<string>>();
 
@@ -63,7 +62,7 @@ namespace Moritz.Symbols
 			return rval;
 		}
 
-		private SortedDictionary<int, List<string>> GetBarlineRegionLinksDict(List<RegionDef> regionDefSeq)
+		private SortedDictionary<int, List<string>> GetBarlineRegionLinksDict(IReadOnlyList<RegionDef> regionDefSeq)
 		{
 			var rval = new SortedDictionary<int, List<string>>();
 
@@ -91,14 +90,14 @@ namespace Moritz.Symbols
 		/// <param name="regionSequence"></param>
 		/// <param name="uniqueNames"></param>
 		/// <returns></returns>
-		private static List<RegionDef> GetUniqueRegionDefSequence(IReadOnlyList<RegionDef> regionDefs, string regionSequence, List<string> uniqueNames)
+		private static List<RegionDef> GetRegionDefSequence(IReadOnlyList<RegionDef> regionDefs, string regionSequence, List<string> uniqueNames)
 		{
 			List<RegionDef> regionDefSeq = new List<RegionDef>();
 			for(int i = 0; i < regionSequence.Length; ++i)
 			{
 				string uniqueName = uniqueNames[i];
 				RegionDef brd = FindBaseRegionDef(regionDefs, regionSequence[i]);
-				var startBarData = (index:brd.startBarlineIndex, msPosition: brd.startBarlineMsPosInScore);
+				var startBarData = (index: brd.startBarlineIndex, msPosition: brd.startBarlineMsPosInScore);
 				var endBarlineData = (index: brd.endBarlineIndex, msPosition: brd.endBarlineMsPosInScore);
 				RegionDef uniqueRegionDef = new RegionDef(uniqueName, startBarData, endBarlineData);
 				regionDefSeq.Add(uniqueRegionDef);
@@ -111,7 +110,7 @@ namespace Moritz.Symbols
 			RegionDef rval = null;
 			foreach(RegionDef rd in regionDefs)
 			{
-				if(string.Compare(rd.name, c.ToString()) == 0 )
+				if(string.Compare(rd.name, c.ToString()) == 0)
 				{
 					rval = rd;
 					break;
@@ -168,21 +167,14 @@ namespace Moritz.Symbols
 		/// </summary>
 		public void WriteSVG(SvgWriter w)
 		{
-			w.WriteStartElement("regions");
+			w.WriteStartElement("regionSequence");
 
-			w.WriteStartElement("defs");
-			foreach(RegionDef regionDef in regionDefs)
+			foreach(RegionDef regionDef in regionDefSeq)
 			{
 				regionDef.WriteSVG(w);
 			}
-			w.WriteEndElement();
 
-			w.WriteStartElement("regionSequence");
-			w.WriteAttributeString("class", "regionSequence");
-			w.WriteAttributeString("sequence", regionSequence);
-			w.WriteEndElement();
-
-			w.WriteEndElement(); // end regions            
+			w.WriteEndElement(); // end regionSequence            
 		}
 
 		/// <summary>
@@ -196,7 +188,6 @@ namespace Moritz.Symbols
 		/// </summary>
 		public readonly SortedDictionary<int, List<string>> barlineRegionLinksDict = null;
 
-		private readonly IReadOnlyList<RegionDef> regionDefs;
-		private readonly string regionSequence;
+		private readonly IReadOnlyList<RegionDef> regionDefSeq;
 	}
 }

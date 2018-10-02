@@ -472,9 +472,9 @@ namespace Moritz.Algorithm.Tombeau1
 
 			List<RegionDef> regionDefs = new List<RegionDef>() { rd1, rd2, rd3, rd4 };
 
-			Regions regions = new Regions(regionDefs, "ABCAD");
+			RegionSequence regionSequence = new RegionSequence(regionDefs, "ABCAD");
 
-			ScoreData scoreData = new ScoreData(regions);
+			ScoreData scoreData = new ScoreData(regionSequence);
 
 			return scoreData;
 		}
