@@ -21,7 +21,7 @@ namespace Moritz.Symbols
             //CapellaColor = "000000"; -- default
         }
 
-        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
+        public override void WriteSVG(SvgWriter w)
         {
             throw new NotImplementedException();
         }
@@ -29,14 +29,10 @@ namespace Moritz.Symbols
         /// Writes a clef or smallClef to the SVG file.
         /// The Character metrics have been set in SvgSystem.Justify()
         /// </summary>
-        public void WriteSVG(SvgWriter w, ClefID clefOrSmallClefID, float originX, float originY, bool staffIsVisible, bool isInput)
+        public void WriteSVG(SvgWriter w, ClefID clefOrSmallClefID, float originX, float originY, bool isInput)
         {
-            if(staffIsVisible)
-            {
-                CSSObjectClass clefClass = isInput ? CSSObjectClass.inputClef : CSSObjectClass.clef;
-                    
-                w.SvgUseXY(clefClass, clefOrSmallClefID.ToString(), originX, originY);
-            }
+            CSSObjectClass clefClass = isInput ? CSSObjectClass.inputClef : CSSObjectClass.clef;                    
+            w.SvgUseXY(clefClass, clefOrSmallClefID.ToString(), originX, originY);
         }
 
         public override string ToString()

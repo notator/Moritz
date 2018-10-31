@@ -18,9 +18,9 @@ namespace Moritz.Symbols
             Stem.Draw = false;
         }
 
-        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
+        public override void WriteSVG(SvgWriter w)
         {
-            if(Visible && staffIsVisible)
+            if(Visible)
             {
                 w.SvgStartGroup(ChordMetrics.CSSObjectClass.ToString()); // "cautionaryChord"
                 w.SvgStartGroup(null);

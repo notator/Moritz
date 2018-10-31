@@ -20,20 +20,17 @@ namespace Moritz.Symbols
             LocalCautionaryChordDef = iumdd as CautionaryChordDef;
         }
 
-		public override void WriteSVG(SvgWriter w, bool staffIsVisible)
+		public override void WriteSVG(SvgWriter w)
         {
             if(LocalCautionaryChordDef == null)
             {
 				w.SvgStartGroup(Metrics.CSSObjectClass.ToString());  // "inputRest"
 
                 Debug.Assert(_msDuration > 0);
-				if(staffIsVisible)
-				{
-					w.WriteAttributeString("score", "alignment", null, ((Metrics.Left + Metrics.Right) / 2).ToString(M.En_USNumberFormat));
-				}
+				w.WriteAttributeString("score", "alignment", null, ((Metrics.Left + Metrics.Right) / 2).ToString(M.En_USNumberFormat));
                 w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
 
-                if(this.Metrics != null && staffIsVisible)
+                if(this.Metrics != null)
                     ((RestMetrics)this.Metrics).WriteSVG(w);
 
                 w.SvgEndGroup();

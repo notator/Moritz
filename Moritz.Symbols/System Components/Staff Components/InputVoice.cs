@@ -18,7 +18,7 @@ namespace Moritz.Symbols
         /// <summary>
         /// Writes out the noteObjects, and possibly the performanceOptions for an InputVoice.
         /// </summary>
-        public override void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> unused)
+        public override void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> unused)
         {
 			w.SvgStartGroup(CSSObjectClass.inputVoice.ToString());
 
@@ -28,7 +28,7 @@ namespace Moritz.Symbols
                 w.WriteAttributeString("score", "midiChannel", null, MidiChannel.ToString());
             }
 
-            base.WriteSVG(w, true, null); // input voices are always visible, and dont carry messages
+            base.WriteSVG(w, null); // input voices dont carry messages
 
             w.SvgEndGroup(); // inputVoice
         }

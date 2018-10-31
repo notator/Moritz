@@ -26,7 +26,7 @@ namespace Moritz.Symbols
 				w.WriteAttributeString("score", "invisible", null, "invisible");
 			}
 
-			base.WriteSVG(w, this.Metrics != null, systemNumber, staffNumber, carryMsgsPerChannel);
+			base.WriteSVG(w, systemNumber, staffNumber, carryMsgsPerChannel);
 
             w.SvgEndGroup(); // outputStaff
         }

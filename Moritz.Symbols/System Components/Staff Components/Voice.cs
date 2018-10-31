@@ -25,14 +25,14 @@ namespace Moritz.Symbols
             Staff = staff;
         }
 
-		public abstract void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel);
+		public abstract void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, int voiceNumber, List<CarryMsgs> carryMsgsPerChannel);
 
         /// <summary>
         /// Writes out an SVG Voice
         /// carryperChannel is null for InputVoices
         /// </summary>
         /// <param name="w"></param>
-        public virtual void WriteSVG(SvgWriter w, bool staffIsVisible, List<CarryMsgs> carryMsgsPerChannel)
+        public virtual void WriteSVG(SvgWriter w, List<CarryMsgs> carryMsgsPerChannel)
         {
             for(int i = 0; i < NoteObjects.Count; ++i)
             {
@@ -58,25 +58,25 @@ namespace Moritz.Symbols
 				}
 				else if(inputChordSymbol != null)
 				{
-					inputChordSymbol.WriteSVG(w, staffIsVisible);
+					inputChordSymbol.WriteSVG(w);
 				}
 				else if(cautionaryChordSymbol != null)
 				{
-					cautionaryChordSymbol.WriteSVG(w, staffIsVisible);
+					cautionaryChordSymbol.WriteSVG(w);
 				}
 				else if(outputChordSymbol != null)
 				{
 					Debug.Assert(carryMsgsPerChannel != null);
-					outputChordSymbol.WriteSVG(w, staffIsVisible, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
+					outputChordSymbol.WriteSVG(w, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
 				}
 				else if(inputRestSymbol != null)
 				{
-					inputRestSymbol.WriteSVG(w, staffIsVisible);
+					inputRestSymbol.WriteSVG(w);
 				}
 				else if(outputRestSymbol != null)
 				{
 					Debug.Assert(carryMsgsPerChannel != null);
-					outputRestSymbol.WriteSVG(w, staffIsVisible, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
+					outputRestSymbol.WriteSVG(w, this.MidiChannel, carryMsgsPerChannel[this.MidiChannel]);
 				}
 				else if(clef != null) // clef
 				{
@@ -85,7 +85,7 @@ namespace Moritz.Symbols
 						// if this is the first barline, the staff name and (maybe) barnumber will be written.
 						bool isInput = (noteObject.Voice is InputVoice);
 						ClefMetrics cm = clef.Metrics as ClefMetrics;
-						clef.WriteSVG(w, cm.ClefID, cm.OriginX, cm.OriginY, staffIsVisible, isInput);
+						clef.WriteSVG(w, cm.ClefID, cm.OriginX, cm.OriginY, isInput);
 					}
 				}
 				else if(smallClef != null)
@@ -94,7 +94,7 @@ namespace Moritz.Symbols
 					{
 						bool isInput = (noteObject.Voice is InputVoice);
 						SmallClefMetrics scm = smallClef.Metrics as SmallClefMetrics;
-						smallClef.WriteSVG(w, scm.ClefID, scm.OriginX, scm.OriginY, staffIsVisible, isInput);
+						smallClef.WriteSVG(w, scm.ClefID, scm.OriginX, scm.OriginY, isInput);
 					}
 				}
 				else

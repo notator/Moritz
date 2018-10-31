@@ -20,45 +20,30 @@ namespace Moritz.Symbols
         }
 
 		/// <summary>
-		/// Function defined by OutputStaff and HiddenOutputStaff
-		/// </summary>
-        public abstract void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel);
-
-		/// <summary>
-		/// A staff can be made invisible globally using the PageFormat.VisibleOutputVoiceIndicesPerStaff and
-		/// PageFormat.VisibleInputVoiceIndicesPerStaff properties.
-		/// Such staves have the HiddenOutputStaff class.
-		/// Single staves that contain no ChordSymbols are also invisible -- though their rest msDuration(s) are written into the score.
 		/// carryMsgsPerChannel is null for InputStaves.
 		/// </summary>
-		public virtual void WriteSVG(SvgWriter w, bool staffIsVisible, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel)
-        {
-            if(this.Metrics == null)
+		public virtual void WriteSVG(SvgWriter w, int systemNumber, int staffNumber, List<CarryMsgs> carryMsgsPerChannel)
+        {            
+            w.WriteAttributeString("score", "staffName", null, this.Staffname);
+
+            CSSObjectClass stafflinesClass = (Metrics.CSSObjectClass == CSSObjectClass.inputStaff) ? CSSObjectClass.inputStafflines : CSSObjectClass.stafflines;
+            CSSObjectClass stafflineClass = (Metrics.CSSObjectClass == CSSObjectClass.inputStaff) ? CSSObjectClass.inputStaffline : CSSObjectClass.staffline;
+
+            w.SvgStartGroup(stafflinesClass.ToString());
+            float stafflineY = this.Metrics.StafflinesTop;
+            for(int staffLineIndex = 0; staffLineIndex < NumberOfStafflines; staffLineIndex++)
             {
-                staffIsVisible = false;
+				w.SvgLine(stafflineClass, this.Metrics.StafflinesLeft, stafflineY, this.Metrics.StafflinesRight, stafflineY);
+
+                if(staffLineIndex < (NumberOfStafflines - 1))
+                    stafflineY += Gap;
             }
-            if(staffIsVisible)
-            {            
-                w.WriteAttributeString("score", "staffName", null, this.Staffname);
-
-                CSSObjectClass stafflinesClass = (Metrics.CSSObjectClass == CSSObjectClass.inputStaff) ? CSSObjectClass.inputStafflines : CSSObjectClass.stafflines;
-                CSSObjectClass stafflineClass = (Metrics.CSSObjectClass == CSSObjectClass.inputStaff) ? CSSObjectClass.inputStaffline : CSSObjectClass.staffline;
-
-                w.SvgStartGroup(stafflinesClass.ToString());
-                float stafflineY = this.Metrics.StafflinesTop;
-                for(int staffLineIndex = 0; staffLineIndex < NumberOfStafflines; staffLineIndex++)
-                {
-					w.SvgLine(stafflineClass, this.Metrics.StafflinesLeft, stafflineY, this.Metrics.StafflinesRight, stafflineY);
-
-                    if(staffLineIndex < (NumberOfStafflines - 1))
-                        stafflineY += Gap;
-                }
-                w.SvgEndGroup();
-            }
+            w.SvgEndGroup();
+ 
 			int voiceNumber = 1;
             foreach(Voice voice in Voices)
             {
-				voice.WriteSVG(w, staffIsVisible, systemNumber, staffNumber, voiceNumber++, carryMsgsPerChannel);
+				voice.WriteSVG(w, systemNumber, staffNumber, voiceNumber++, carryMsgsPerChannel);
             }
         }
 

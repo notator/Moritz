@@ -152,31 +152,24 @@ namespace Moritz.Symbols
         /// Dont use this function.
         /// </summary>
         /// <param name="w"></param>
-        /// <param name="staffIsVisible"></param>
-        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
+        public override void WriteSVG(SvgWriter w)
         {
             throw new NotImplementedException();
         }
 
-        public void WriteSVG(SvgWriter w, bool staffIsVisible, int channel, CarryMsgs carryMsgs)
+        public void WriteSVG(SvgWriter w, int channel, CarryMsgs carryMsgs)
         {
-            if(staffIsVisible && ChordMetrics.BeamBlock != null)
+            if(ChordMetrics.BeamBlock != null)
                 ChordMetrics.BeamBlock.WriteSVG(w);
 
 			w.SvgStartGroup(CSSObjectClass.chord.ToString()); // "chord"
-			if(staffIsVisible)
-			{ 
-                w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
-			}
+			w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
             
             _midiChordDef.WriteSVG(w, channel, carryMsgs);
 
-            if(staffIsVisible)
-            {
-				w.SvgStartGroup(CSSObjectClass.graphics.ToString());
-                ChordMetrics.WriteSVG(w);
-                w.SvgEndGroup();
-            }
+            w.SvgStartGroup(CSSObjectClass.graphics.ToString());
+            ChordMetrics.WriteSVG(w);
+            w.SvgEndGroup();
 
             w.SvgEndGroup(); // "chord"
         }

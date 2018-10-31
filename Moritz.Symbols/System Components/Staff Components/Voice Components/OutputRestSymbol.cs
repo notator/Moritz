@@ -31,13 +31,12 @@ namespace Moritz.Symbols
         /// Dont use this function, use the other WriteSVG().
         /// </summary>
         /// <param name="w"></param>
-        /// <param name="staffIsVisible"></param>
-        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
+        public override void WriteSVG(SvgWriter w)
         {
             throw new NotImplementedException();
         }
 
-        public void WriteSVG(SvgWriter w, bool staffIsVisible, int channel, CarryMsgs carryMsgs)
+        public void WriteSVG(SvgWriter w, int channel, CarryMsgs carryMsgs)
         {
             if(LocalCautionaryChordDef == null)
             {
@@ -45,14 +44,11 @@ namespace Moritz.Symbols
 
 				w.SvgStartGroup(CSSObjectClass.rest.ToString()); // "rest"
 
-				if(staffIsVisible)
-				{
-                    w.WriteAttributeString("score", "alignment", null, ((Metrics.Left + Metrics.Right) / 2).ToString(M.En_USNumberFormat));
-				}
+                w.WriteAttributeString("score", "alignment", null, ((Metrics.Left + Metrics.Right) / 2).ToString(M.En_USNumberFormat));
 
                 _midiRestDef.WriteSVG(w, channel, carryMsgs);
 
-                if(this.Metrics != null && staffIsVisible)
+                if(this.Metrics != null)
                 {
                     ((RestMetrics)this.Metrics).WriteSVG(w);
                 }

@@ -89,7 +89,7 @@ namespace Moritz.Symbols
             }
         }
 
-        public override void WriteSVG(SvgWriter w, bool staffIsVisible)
+        public override void WriteSVG(SvgWriter w)
         {
             if(ChordMetrics.BeamBlock != null)
                 ChordMetrics.BeamBlock.WriteSVG(w);
@@ -98,10 +98,7 @@ namespace Moritz.Symbols
 
             Debug.Assert(_msDuration > 0);
 
-			if(staffIsVisible)
-			{
-				w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
-			}
+			w.WriteAttributeString("score", "alignment", null, ChordMetrics.OriginX.ToString(M.En_USNumberFormat));
             w.WriteAttributeString("score", "msDuration", null, _msDuration.ToString());
 
             _inputChordDef.WriteSVG(w);

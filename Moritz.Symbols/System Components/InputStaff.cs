@@ -20,7 +20,7 @@ namespace Moritz.Symbols
         {
             w.SvgStartGroup(Metrics.CSSObjectClass.ToString()); // "inputStaff"
 
-            base.WriteSVG(w, true, systemNumber, staffNumber, null); // carryMsgsPerChannel only for OutputStaff
+            base.WriteSVG(w, systemNumber, staffNumber, null); // carryMsgsPerChannel only for OutputStaff
 
             w.SvgEndGroup(); // InputStaff
         }

@@ -24,7 +24,7 @@ namespace Moritz.Symbols
 		/// Call the other WriteSVG(...) function to write the barline's vertical line(s),
 		/// and WriteDrawObjectsSVG(...) to write any DrawObjects. 
 		/// </summary>
-		public override void WriteSVG(SvgWriter w, bool staffIsVisible)
+		public override void WriteSVG(SvgWriter w)
 		{
 			throw new ApplicationException();
 		}
