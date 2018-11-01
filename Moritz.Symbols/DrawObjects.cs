@@ -178,10 +178,10 @@ namespace Moritz.Symbols
 		public FramedMultilineText(object container, List<string> textStrings, float gap, float stafflinethickness, TextHorizAlign hAlign)
 			: base(container, textStrings, gap, stafflinethickness, hAlign)
 		{
-			float paddingTop = 34F;
-			float paddingRight = 21F;
-			float paddingBottom = 23F;
-			float paddingLeft = 21F;
+			float paddingTop = 40F;
+			float paddingRight = 26F;
+			float paddingBottom = 30F;
+			float paddingLeft = 26F;
 
 			_frameInfo = new FramePadding(TextFrameType.rectangle, paddingTop, paddingRight, paddingBottom, paddingLeft);
 		}
@@ -205,7 +205,6 @@ namespace Moritz.Symbols
 		public FramedRegionStartText(object container, List<string> textStrings, float gap, float stafflinethickness)
 			: base(container, textStrings, gap, stafflinethickness, TextHorizAlign.left)
 		{
-
 		}
 
 		public override string ToString()
@@ -214,13 +213,30 @@ namespace Moritz.Symbols
 		}
 	}
 
-
 	internal class FramedRegionEndText : FramedMultilineText
 	{
 		public FramedRegionEndText(object container, List<string> textStrings, float gap, float stafflinethickness)
 			: base(container, textStrings, gap, stafflinethickness, TextHorizAlign.right)
 		{
+			foreach(string text in textStrings)
+			{
+				if(text.Contains("➔"))
+				{
+					TextFrameType frameType = _frameInfo.FrameType;
+					float paddingTop = _frameInfo.Top;
+					float paddingRight = _frameInfo.Right + 15F; // compensate for missing arrow width
+					float paddingBottom = _frameInfo.Bottom;
+					float paddingLeft = _frameInfo.Left + 15F; // compensate for missing arrow width
 
+					_frameInfo = new FramePadding(frameType, paddingTop, paddingRight, paddingBottom, paddingLeft);
+
+					break;
+				}
+				else
+				{
+					Debug.Assert(text.Contains("end"));
+				}
+			}			
 		}
 
 		public override string ToString()
