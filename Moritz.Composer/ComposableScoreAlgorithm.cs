@@ -9,6 +9,7 @@ using Moritz.Algorithm.Study3Sketch1;
 using Moritz.Algorithm.Study3Sketch2;
 //using Moritz.Algorithm.SongSix;
 using Moritz.Algorithm.Tombeau1;
+using Moritz.Algorithm.ErratumMusical;
 
 namespace Moritz.Composer
 {
@@ -48,11 +49,14 @@ namespace Moritz.Composer
                 case "Study 3 sketch 2":
                     algorithm = new Study3Sketch2Algorithm();
                     break;
-                //case "Song Six":
-                //	algorithm = new SongSixAlgorithm();
-                //	break;
-                case "Tombeau 1":
+				//case "Song Six":
+				//	algorithm = new SongSixAlgorithm();
+				//	break;
+				case "Tombeau 1":
 					algorithm = new Tombeau1Algorithm();
+					break;
+				case "Erratum Musical":
+					algorithm = new ErratumMusicalAlgorithm();
 					break;
 				default:
                     MessageBox.Show("Error in ComposableScoreAlgorithm.cs:\n\n" +
