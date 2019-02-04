@@ -2073,7 +2073,9 @@ namespace Moritz.Composer
         private void SetTitleSizeAndPosition(PageFormat pageFormat)
         {
             DimensionsAndMetadataForm damf = _dimensionsAndMetadataForm;
-            pageFormat.Page1TitleHeight = damf.TitleHeight * pageFormat.ViewBoxMagnification;
+			pageFormat.Page1Title = damf.Page1Title;
+			pageFormat.Page1Author = damf.Page1Author;
+			pageFormat.Page1TitleHeight = damf.TitleHeight * pageFormat.ViewBoxMagnification;
             pageFormat.Page1AuthorHeight = damf.AuthorHeight * pageFormat.ViewBoxMagnification;
             pageFormat.Page1TitleY = damf.TitleY * pageFormat.ViewBoxMagnification;
         }

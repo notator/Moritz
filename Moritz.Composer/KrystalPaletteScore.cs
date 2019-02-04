@@ -11,10 +11,10 @@ namespace Moritz.Composer
     public class KrystalPaletteScore : ComposableScore
     {
 
-        public KrystalPaletteScore(string scoreTitleName, CompositionAlgorithm algorithm, PageFormat pageFormat,
+        public KrystalPaletteScore(string scoreFolderName, CompositionAlgorithm algorithm, PageFormat pageFormat,
             List<Krystal> krystals, List<Palette> palettes, string folder,
             string keywords, string comment)
-            : base(folder, scoreTitleName, algorithm, keywords, comment, pageFormat)
+            : base(folder, scoreFolderName, algorithm, keywords, comment, pageFormat)
         {
             Notator = new Notator(pageFormat);
 

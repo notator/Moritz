@@ -255,10 +255,10 @@ namespace Moritz.Symbols
 			string titlesFontFamily = "Open Sans";
 
 			TextInfo titleInfo =
-				new TextInfo(metadata.MainTitle, titlesFontFamily, _pageFormat.Page1TitleHeight,
+				new TextInfo(metadata.Page1Title, titlesFontFamily, _pageFormat.Page1TitleHeight,
 					null, TextHorizAlign.center);
 			TextInfo authorInfo =
-			  new TextInfo(metadata.Author, titlesFontFamily, _pageFormat.Page1AuthorHeight,
+			  new TextInfo(metadata.Page1Author, titlesFontFamily, _pageFormat.Page1AuthorHeight,
 				  null, TextHorizAlign.right);
 			w.WriteStartElement("g");
 			w.WriteAttributeString("class", CSSObjectClass.titles.ToString());

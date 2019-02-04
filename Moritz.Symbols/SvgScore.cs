@@ -13,36 +13,30 @@ namespace Moritz.Symbols
 {
     public class SvgScore
     {
-        public SvgScore(string folder, string scoreTitleName, string keywords, string comment, PageFormat pageFormat)
+        public SvgScore(string folder, string scoreFolderName, string keywords, string comment, PageFormat pageFormat)
         {
             _pageFormat = pageFormat;
-            SetFilePathAndMetadata(folder, scoreTitleName, keywords, comment);
+            SetFilePathAndMetadata(folder, scoreFolderName, pageFormat, keywords, comment);
         }
 
-        private void SetFilePathAndMetadata(string folder, string scoreTitleName, string keywords, string comment)
+        private void SetFilePathAndMetadata(string folder, string scoreFolderName, PageFormat pageFormat, string keywords, string comment)
         {
-            if(!String.IsNullOrEmpty(scoreTitleName))
+            if(!String.IsNullOrEmpty(scoreFolderName))
             {
                 M.CreateDirectoryIfItDoesNotExist(folder);
-                this._filename = scoreTitleName + ".html";
+                this._filename = scoreFolderName + ".html";
                 FilePath = folder + @"\" + _filename;
-                SetScoreMetadata(scoreTitleName, keywords, comment);
-            }
-        }
 
-        private void SetScoreMetadata(string scoreTitleName, string keywords, string comment)
-        {
-			/// The Metadata.MainTitle is the large title displayed at the top centre of page 1
-			/// of the score. It is also the name of the folder inside the standard Moritz scores folder
-			/// used for saving all the scores components.
-			Metadata = new Metadata
-			{
-				MainTitle = scoreTitleName,
-				Keywords = keywords,
-				Comment = comment,
-				Date = M.NowString
-			};
-		}
+				Metadata = new Metadata
+				{
+					Page1Title = String.IsNullOrEmpty(pageFormat.Page1Title) ? scoreFolderName : pageFormat.Page1Title,
+					Page1Author = String.IsNullOrEmpty(pageFormat.Page1Author) ? "James Ingram" : pageFormat.Page1Author,
+					Keywords = keywords,
+					Comment = comment,
+					Date = M.NowString
+				};
+			}
+        }
 
         protected virtual byte MidiChannel(int staffIndex) { throw new NotImplementedException(); }
 

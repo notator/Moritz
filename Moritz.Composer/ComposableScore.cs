@@ -14,8 +14,8 @@ namespace Moritz.Composer
 {
 	public partial class ComposableScore : SvgScore
     {
-        public ComposableScore(string folder, string scoreTitleName, CompositionAlgorithm algorithm, string keywords, string comment, PageFormat pageFormat)
-            : base(folder, scoreTitleName, keywords, comment, pageFormat)
+        public ComposableScore(string folder, string scoreFolderName, CompositionAlgorithm algorithm, string keywords, string comment, PageFormat pageFormat)
+            : base(folder, scoreFolderName, keywords, comment, pageFormat)
         {
             _algorithm = algorithm;
         }

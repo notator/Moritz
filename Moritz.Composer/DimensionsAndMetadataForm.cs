@@ -34,6 +34,8 @@ namespace Moritz.Composer
 				TopMarginOtherPagesTextBox,
 				RightMarginTextBox,
 				LeftMarginTextBox,
+				Page1TitleTextBox,
+				Page1AuthorTextBox,
 				Page1TitleYTextBox,
 				Page1TitleHeightTextBox,
 				Page1AuthorHeightTextBox,
@@ -51,8 +53,10 @@ namespace Moritz.Composer
             this.PaperSizeComboBox.Text = "A3";
             this.LandscapeCheckBox.Checked = false;
 
-            this.Page1TitleHeightTextBox.Text = "32";
-            this.Page1AuthorHeightTextBox.Text = "16";
+			this.Page1TitleTextBox.Text = "";
+			this.Page1AuthorTextBox.Text = "";
+			this.Page1TitleHeightTextBox.Text = "32";
+			this.Page1AuthorHeightTextBox.Text = "16";
             this.Page1TitleYTextBox.Text = "50";
 
             this.TopMarginPage1TextBox.Text = "90";
@@ -93,8 +97,10 @@ namespace Moritz.Composer
         private void GetMetadata(XmlReader r)
         {
             Debug.Assert(r.Name == "metadata");
-            #region default values
-            this.MetadataKeywordsTextBox.Text = "";
+			#region default values
+			this.Page1TitleTextBox.Text = "";
+			this.Page1AuthorTextBox.Text = "";
+			this.MetadataKeywordsTextBox.Text = "";
             this.MetadataCommentTextBox.Text = "";
             #endregion
             int count = r.AttributeCount;
@@ -103,10 +109,17 @@ namespace Moritz.Composer
                 r.MoveToAttribute(i);
                 switch(r.Name)
                 {
-                    case "keywords":
-                        this.MetadataKeywordsTextBox.Text = r.Value;
-                        break;
-                    case "comment":
+					case "page1Title":
+						this.Page1TitleTextBox.Text = r.Value;
+						break;
+					case "page1Author":
+						this.Page1AuthorTextBox.Text = r.Value;
+						break;
+
+					case "keywords":
+						this.MetadataKeywordsTextBox.Text = r.Value;
+						break;
+					case "comment":
                         this.MetadataCommentTextBox.Text = r.Value;
                         break;
                 }
@@ -115,7 +128,7 @@ namespace Moritz.Composer
         }
         private void GetWebsiteLinks(XmlReader r)
         {
-            Debug.Assert(r.Name == "metadata");
+            //Debug.Assert(r.Name == "metadata");
             M.ReadToXmlElementTag(r, "websiteLink");
             int count = r.AttributeCount;
             for(int i = 0; i < count; i++)
@@ -241,9 +254,15 @@ namespace Moritz.Composer
         private void WriteMetadata(XmlWriter w)
         {
             w.WriteStartElement("metadata");
-            if(!String.IsNullOrEmpty(MetadataKeywordsTextBox.Text))
-                w.WriteAttributeString("keywords", this.MetadataKeywordsTextBox.Text);
-            if(!String.IsNullOrEmpty(MetadataCommentTextBox.Text))
+
+			if(!String.IsNullOrEmpty(Page1TitleTextBox.Text))
+				w.WriteAttributeString("page1Title", this.Page1TitleTextBox.Text);
+			if(!String.IsNullOrEmpty(Page1AuthorTextBox.Text))
+				w.WriteAttributeString("page1Author", this.Page1AuthorTextBox.Text);
+
+			if(!String.IsNullOrEmpty(MetadataKeywordsTextBox.Text))
+				w.WriteAttributeString("keywords", this.MetadataKeywordsTextBox.Text);
+			if(!String.IsNullOrEmpty(MetadataCommentTextBox.Text))
                 w.WriteAttributeString("comment", this.MetadataCommentTextBox.Text);
 
             w.WriteStartElement("websiteLink");
@@ -363,11 +382,19 @@ namespace Moritz.Composer
 			M.SetTextBoxErrorColorIfNotOkay(textBox, okay);
 		}
 
-        private void AboutLinkTextTextBox_Leave(object sender, EventArgs e)
-        {
-            SetSettingsHaveChanged();
-        }
-        private void AboutLinkURLTextBox_Leave(object sender, EventArgs e)
+		private void Page1TitleTextBox_Leave(object sender, EventArgs e)
+		{
+			SetSettingsHaveChanged();
+		}
+		private void Page1AuthorTextBox_Leave(object sender, EventArgs e)
+		{
+			SetSettingsHaveChanged();
+		}
+		private void AboutLinkTextTextBox_Leave(object sender, EventArgs e)
+		{
+			SetSettingsHaveChanged();
+		}
+		private void AboutLinkURLTextBox_Leave(object sender, EventArgs e)
         {
             SetSettingsHaveChanged();
         }
@@ -466,7 +493,10 @@ namespace Moritz.Composer
         public string PaperSize { get { return PaperSizeComboBox.Text; } }
         public bool Landscape { get { return LandscapeCheckBox.Checked; } }
 
-        public float TitleHeight { get { return float.Parse(Page1TitleHeightTextBox.Text, M.En_USNumberFormat); } }
+		public string Page1Title { get { return Page1TitleTextBox.Text; } }
+		public string Page1Author { get { return Page1AuthorTextBox.Text; } }
+
+		public float TitleHeight { get { return float.Parse(Page1TitleHeightTextBox.Text, M.En_USNumberFormat); } }
         public float AuthorHeight { get { return float.Parse(Page1AuthorHeightTextBox.Text, M.En_USNumberFormat); } }
         public float TitleY { get { return float.Parse(Page1TitleYTextBox.Text, M.En_USNumberFormat); } }
 

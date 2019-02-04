@@ -33,9 +33,11 @@ namespace Moritz.Symbols
         public int BottomVBPX = 0;
         public readonly float HorizontalPixelsPerMillimeter = 3.4037F; // on my computer (December 2010).
         public readonly float VerticalPixelsPerMillimeter = 2.9464F; // on my computer (December 2010).
-        #endregion
+		#endregion
 
-        #region title size and position
+		#region page 1 titles
+		public string Page1Title;
+		public string Page1Author;
         public float Page1ScreenTitleY { get { return Page1TitleY / ViewBoxMagnification; } }
         public float Page1TitleHeight;
         public float Page1AuthorHeight;

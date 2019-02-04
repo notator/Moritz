@@ -27,16 +27,16 @@ namespace Moritz.Symbols
 		/// <param name="nScorePages"></param>
 		public void WriteSVG(SvgWriter w, int pageNumber, int nScorePages, string aboutThePieceLinkURL, int nOutputVoices, int nInputVoices)
         {
-			Debug.Assert(!String.IsNullOrEmpty(MainTitle));
+			Debug.Assert(!String.IsNullOrEmpty(Page1Title));
 
 			string pageTitle;
 			if(pageNumber == 0)
 			{
-				pageTitle = MainTitle + " (scroll)";
+				pageTitle = Page1Title + " (scroll)";
 			}
 			else
 			{
-				pageTitle = MainTitle + ", page " + pageNumber.ToString() + " of " + nScorePages.ToString();
+				pageTitle = Page1Title + ", page " + pageNumber.ToString() + " of " + nScorePages.ToString();
 			}
 
             w.WriteStartElement("title");
@@ -123,10 +123,10 @@ namespace Moritz.Symbols
 			w.WriteEndElement(); // ends the metadata element            
         }
  
-        public string MainTitle = "";
+        public string Page1Title = "";
 		public string Comment = "";
 		public string Keywords = "";
-		public string Author = "James Ingram";
+		public string Page1Author = "";
 		public string Date = "";
 	}
 
