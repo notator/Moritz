@@ -108,15 +108,15 @@ namespace Moritz.Algorithm.ErratumMusical
 		// Neither the krystals, nor the palettes argument is used.
 		public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
 		{
-			List<Trk> trks = new List<Trk>() { GetTrack() };
+			List<int> endBarlinePositions = new List<int>();
+			List<Trk> trks = new List<Trk>() { GetTrack(out endBarlinePositions) };
 
 			Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
 			List<InputVoiceDef> inputVoiceDefs = new List<InputVoiceDef>();
 
-			List<int> barlineMsPositions = GetBalancedBarlineMsPositions(mainSeq.Trks, null, 8);
-			List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(barlineMsPositions.Count, mainSeq.Trks.Count);
+			List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(endBarlinePositions.Count, mainSeq.Trks.Count);
 
-			List<Bar> bars = GetBars(mainSeq, inputVoiceDefs, barlineMsPositions, clefChangesPerBar, null);
+			List<Bar> bars = GetBars(mainSeq, inputVoiceDefs, endBarlinePositions, clefChangesPerBar, null);
 
 			SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
@@ -154,22 +154,32 @@ namespace Moritz.Algorithm.ErratumMusical
 			return defs;
 		}
 
-		private Trk GetTrk(List<byte> pitches, List<byte> velocities, List<int> durations)
+		private Trk GetTrk(List<byte> pitches, List<byte> velocities, List<int> durations, int finalRestDuration)
 		{
 			Trk trk = new Trk(0);
 			List<IUniqueDef> midiChordDefs = GetMidiChordDefs(pitches, velocities, durations);
 			trk.UniqueDefs.AddRange(midiChordDefs);
 
+			if(finalRestDuration > 0)
+			{
+				MidiRestDef midiRestDef = new MidiRestDef(0, finalRestDuration);
+				trk.Add(midiRestDef);
+			}
+
 			return trk;
 		}
 
 		// Returns a Trk containing EM_I to EM_VIII in sequence
-		private Trk GetTrack()
+		private Trk GetTrack(out List<int> endBarlinePositions)
 		{
 			// 85 durations (longLow to shortHigh)
 			IReadOnlyList<int> durations = Durations(); 
-			IReadOnlyList<List<M.Dynamic>> pitchDynamicPerSelection = GetPitchDynamicPerSelection(erratumMusicalGraphPitches);  
+			IReadOnlyList<List<M.Dynamic>> pitchDynamicPerSelection = GetPitchDynamicPerSelection(erratumMusicalGraphPitches);
+			IReadOnlyList<int> finalRestMsDurations = new List<int>() { 2000, 2450, 2200, 1900, 2600, 2400, 2500, 0 };
+			Debug.Assert(finalRestMsDurations.Count == (erratumMusicalGraphPitches.Count));
 
+			endBarlinePositions = new List<int>();
+			int endBarlinePosition = 0;
 			Trk allSelectionsTrk = new Trk(0);
 			for(int i = 0; i < erratumMusicalGraphPitches.Count; ++i)
 			{
@@ -179,7 +189,9 @@ namespace Moritz.Algorithm.ErratumMusical
 				List<int> pitchDurations = GetPitchDurations(graphPitches, durations);
 				List<byte> midiPitches = Transposition(graphPitches); // returns the real (transposed) MIDI pitch values.
 
-				Trk selectionTrk = GetTrk(midiPitches, velocities, pitchDurations);
+				Trk selectionTrk = GetTrk(midiPitches, velocities, pitchDurations, finalRestMsDurations[i]);
+				endBarlinePosition += selectionTrk.MsDuration;
+				endBarlinePositions.Add(endBarlinePosition);				
 
 				allSelectionsTrk.AddRange(selectionTrk);
 				//MidiRestDef midiRestDef = new MidiRestDef(0, 1000);
@@ -266,7 +278,7 @@ namespace Moritz.Algorithm.ErratumMusical
 			return dynamics;
 		}
 
-		// red pitches have M.Dynamic.ff
+		// red pitches have M.Dynamic.fff
 		// green pitches have M.Dynamic.f
 		// other (=blue) pitches have M.Dynamic.p
 		private static List<M.Dynamic> GetDynamics(IReadOnlyList<byte> graphPitches, List<byte> redPitches, List<byte> greenPitches)
@@ -277,7 +289,7 @@ namespace Moritz.Algorithm.ErratumMusical
 			{
 				if(redPitches.Contains(graphPitch))
 				{
-					dynamics.Add(M.Dynamic.ff);
+					dynamics.Add(M.Dynamic.fff);
 				}
 				else if(greenPitches.Contains(graphPitch))
 				{
@@ -325,7 +337,7 @@ namespace Moritz.Algorithm.ErratumMusical
 		/// </summary>
 		private IReadOnlyList<int> Durations()
 		{
-			const int longestMsDuration = 200; 
+			const int longestMsDuration = 350; 
 			double factor = Math.Pow(2.0, ((double)1 / 85)); // 1,0081880126197191971720292366177
 
 			List<double> dDurations = new List<double>();
