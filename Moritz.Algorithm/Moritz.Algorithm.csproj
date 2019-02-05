@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompositionAlgorithm.cs" />
+    <Compile Include="ThreeCrashes\ThreeCrashes.cs" />
     <Compile Include="ErratumMusical\ErratumMusical.cs" />
     <Compile Include="Pianola Music\PianolaMusicAlgorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

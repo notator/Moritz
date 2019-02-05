@@ -58,6 +58,9 @@ namespace Moritz.Composer
 				case "Erratum Musical":
 					algorithm = new ErratumMusicalAlgorithm();
 					break;
+				case "Three Crashes":
+					algorithm = new ThreeCrashesAlgorithm();
+					break;
 				default:
                     MessageBox.Show("Error in ComposableScoreAlgorithm.cs:\n\n" +
                                     "Score title not found in switch in ComposableSvgScore.Algorithm(...).\n" +
