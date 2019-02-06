@@ -7,7 +7,7 @@ using Moritz.Globals;
 using Moritz.Palettes;
 using Moritz.Spec;
 
-namespace Moritz.Algorithm.ErratumMusical
+namespace Moritz.Algorithm.ThreeCrashes
 {
     public class ThreeCrashesAlgorithm : CompositionAlgorithm
 	{
@@ -18,10 +18,11 @@ namespace Moritz.Algorithm.ErratumMusical
         }
 
         public override IReadOnlyList<int> MidiChannelPerOutputVoice { get{	return new List<int>() { 0, 1, 2 }; }}
-		public override int NumberOfBars { get{	return 8; }}
+		public override int NumberOfBars { get{	return 11; }}
 		public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
 
-		// crashes 1-3 contain 85 values each -- not the 89 values described in the online analysis.
+		private readonly int nKeyboardPitches = 85;
+		// crashes 1-3 contain nKeyboardPitches values each -- not the 89 values described in the online analysis.
 		private static readonly IReadOnlyList<IReadOnlyList<byte>> crashAWagons = new List<List<byte>>()
 		{
 			new List<byte>() // Wagon A1, 17 values
@@ -34,7 +35,7 @@ namespace Moritz.Algorithm.ErratumMusical
 			{14, 18, 26, 30, 33, 35, 43, 44, 45, 50, 51, 52, 61, 63, 76, 81, 84 },
 			new List<byte>() // Wagon A5, 17 values
 			{ 2,  3,  6,  7,  8,  9, 12, 16, 22, 31, 41, 53, 67, 70, 71, 75, 83 },
-			new List<byte>() // All A Wagons interspersed, 85 values
+			new List<byte>() // All A Wagons interspersed, nKeyboardPitches values
 			{10, 19,  1, 14,  2, 13, 20,  4, 18,  3,
 			 17, 24,  5, 26,  6, 27, 25, 11, 30,  7,
 			 29, 32, 15, 33,  8, 37, 34, 21, 35,  9,
@@ -57,7 +58,7 @@ namespace Moritz.Algorithm.ErratumMusical
 			{ 1,  8, 17, 19, 21, 28, 36, 50, 51, 54, 57, 62, 75, 80 },
 			new List<byte>() // Wagon B5, 11 values
 			{ 5, 11, 18, 23, 27, 33, 38, 40, 45, 47, 55 },
-			new List<byte>() // All B Wagons interspersed, 85 values
+			new List<byte>() // All B Wagons interspersed, nKeyboardPitches values
 			{ 2,  3,  9,  1,  5,  4,  6, 10,  8, 11,
 			 15,  7, 13, 17, 18, 20, 12, 14, 19, 23,
 			 26, 16, 24, 21, 27, 32, 22, 25, 28, 33,
@@ -80,7 +81,7 @@ namespace Moritz.Algorithm.ErratumMusical
 			{ 6, 12, 17, 18, 56, 58, 59, 64, 71, 79, 80 },
 			new List<byte>() // Wagon C5, 5 values
 			{ 22, 23, 27, 42, 73 },
-			new List<byte>() // All C Wagons interspersed, 85 values
+			new List<byte>() // All C Wagons interspersed, nKeyboardPitches values
 			{ 1,  8,  2,  6, 22,  4,  9,  3, 12, 23,
 			  5, 10, 11, 17, 27,  7, 13, 16, 18, 42,
 			 14, 15, 21, 56, 73, 20, 19, 25, 58, 30,
@@ -92,12 +93,47 @@ namespace Moritz.Algorithm.ErratumMusical
 			 75, 76, 77, 78, 82 }
 		};
 
+		private static readonly List<List<int>> basicVelocityIndexPerWagonPerAngPos = new List<List<int>>()
+			{
+				new List<int>() {0,2,4,6,8,9,7,5,3,1}, // wagonIndex 0
+				new List<int>() {3,3,4,5,7,7,6,5,4,2}, // wagonIndex 1
+				new List<int>() {5,5,5,5,5,5,5,5,5,5}, // wagonIndex 2
+				new List<int>() {7,7,6,5,3,3,4,5,6,8}, // wagonIndex 3
+				new List<int>() {9,7,5,3,1,0,2,4,6,8}  // wagonIndex 4
+			};
+		private static readonly List<byte> basicVelocities = new List<byte>() { 28, 39, 50, 61, 72, 83, 94, 105, 116, 127 }; 
+
 		// Neither the krystals, nor the palettes argument is used.
 		public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
 		{
-			Trk crashATrk = GetCrashTrack(crashAWagons);
-			Trk crashBTrk = GetCrashTrack(crashBWagons);
-			Trk crashCTrk = GetCrashTrack(crashCWagons);
+			List<Trk> crashATrks = GetElevenCrashTracks(0, crashAWagons, 0); // angular position in range [0..10]
+			List<Trk> crashBTrks = GetElevenCrashTracks(1, crashBWagons, 3); // angular position in range [0..10]
+			List<Trk> crashCTrks = GetElevenCrashTracks(2, crashCWagons, 7); // angular position in range [0..10]
+
+			// do warps and other transformations here.
+
+			// add other tracks (short bent lines) here.
+
+			Trk crashATrk = Concat(crashATrks);
+			Trk crashBTrk = Concat(crashBTrks);
+			Trk crashCTrk = Concat(crashCTrks);
+
+			///*******************************************/
+			//// temp code
+			//Trk crashATrk = new Trk(0);
+			//Trk crashCTrk = new Trk(2);
+			//MidiRestDef mrd = new MidiRestDef(0, crashBTrk.MsDuration);
+			//crashATrk.Add((IUniqueDef)mrd.Clone());
+			//crashCTrk.Add((IUniqueDef)mrd.Clone());
+			///*******************************************/
+
+			//IReadOnlyList<int> finalRestMsDurations = new List<int>() { 2000, 2450, 2200, 1900, 2600 };
+			//Debug.Assert(finalRestMsDurations.Count == (crashWagons.Count));
+			//if(finalRestDuration > 0)
+			//{
+			//	MidiRestDef midiRestDef = new MidiRestDef(0, finalRestDuration);
+			//	trk.Add(midiRestDef);
+			//}
 
 
 			List<Trk> trks = new List<Trk>() { crashATrk, crashBTrk, crashCTrk };
@@ -106,7 +142,7 @@ namespace Moritz.Algorithm.ErratumMusical
 
 			List<InputVoiceDef> inputVoiceDefs = new List<InputVoiceDef>();
 
-			List<int> endBarlinePositions = GetBalancedBarlineMsPositions(trks, null, 10);
+			List<int> endBarlinePositions = GetBalancedBarlineMsPositions(trks, null, 11);
 
 			List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(endBarlinePositions.Count, mainSeq.Trks.Count);
 
@@ -115,6 +151,61 @@ namespace Moritz.Algorithm.ErratumMusical
 			SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
 			return bars;
+		}
+
+		private Trk Concat(List<Trk> crashTrks)
+		{
+			Debug.Assert(crashTrks.Count == 11);
+
+			Trk crashTrk = new Trk(crashTrks[0].MidiChannel);
+
+			foreach(Trk trk in crashTrks)
+			{
+				crashTrk.AddRange(trk);
+			}
+			return crashTrk;
+		}
+
+		/// <summary>
+		/// Adds cloned IUniqueDefs from crashTrks to the returned Trk.
+		/// Does not change crashTrks.
+		/// <returns></returns>
+		private Trk Intersperse(IReadOnlyList<Trk> crashTrks, IReadOnlyList<IReadOnlyList<byte>> crashWagons)
+		{
+			int nWagons = crashWagons.Count - 1;
+			Trk trk = new Trk(crashTrks[0].MidiChannel);
+			IReadOnlyList<byte> interspersedValues = crashWagons[nWagons]; // (!)
+			foreach(byte value in interspersedValues)
+			{
+				int wagonIndex = -1;
+				int valueIndex = -1;
+				for(int i = 0; i < nWagons; ++i)
+				{
+					IReadOnlyList<byte> crashWagon = crashWagons[i];
+					for(int j = 0; j < crashWagon.Count; ++j)
+					{
+						byte val = crashWagon[j];
+						if(val == value)
+						{
+							valueIndex = j;
+							wagonIndex = i;
+							break;
+						}
+					}
+					if(wagonIndex != -1)
+					{
+						break;
+					}
+				}
+				if(wagonIndex == -1)
+				{
+					throw new ApplicationException("Couldn't find the wagon!");
+				}
+				IUniqueDef iud = (IUniqueDef) crashTrks[wagonIndex].UniqueDefs[valueIndex].Clone();
+				trk.Add(iud);
+			}
+
+			return trk;
 		}
 
 		/// <summary>
@@ -127,13 +218,12 @@ namespace Moritz.Algorithm.ErratumMusical
 
 		private List<IUniqueDef> GetMidiChordDefs(List<byte> pitches, List<byte> velocities, List<int> msDurations)
 		{
-			Debug.Assert(pitches.Count == 85);
-			Debug.Assert(velocities.Count == 85);
-			Debug.Assert(msDurations.Count == 85);
+			Debug.Assert(pitches.Count == velocities.Count);
+			Debug.Assert(msDurations.Count == velocities.Count);
 
 			List<IUniqueDef> defs = new List<IUniqueDef>();
 			int msPosition = 0;
-			for(int i = 0; i < 85; ++i)
+			for(int i = 0; i < pitches.Count; ++i)
 			{
 				List<byte> pitchesArg = new List<byte>() { pitches[i] };
 				List<byte> velocitiesArg = new List<byte>() { velocities[i] };
@@ -148,161 +238,80 @@ namespace Moritz.Algorithm.ErratumMusical
 			return defs;
 		}
 
-		private Trk GetTrk(List<byte> pitches, List<byte> velocities, List<int> durations, int finalRestDuration)
+		private Trk GetWagonTrk(int midiChannel, List<byte> pitches, List<byte> velocities, List<int> durations)
 		{
-			Trk trk = new Trk(0);
+			Trk trk = new Trk(midiChannel);
 			List<IUniqueDef> midiChordDefs = GetMidiChordDefs(pitches, velocities, durations);
 			trk.UniqueDefs.AddRange(midiChordDefs);
-
-			if(finalRestDuration > 0)
-			{
-				MidiRestDef midiRestDef = new MidiRestDef(0, finalRestDuration);
-				trk.Add(midiRestDef);
-			}
 
 			return trk;
 		}
 
-		// Returns a Trk constructed from the crashWagons
-		private Trk GetCrashTrack(IReadOnlyList<IReadOnlyList<byte>> crashWagons)
+		/// <summary>
+		/// Returns a sequence of eleven Trks, each having nKeyboardPitches notes. The first and last Trks are at angularPosition.
+		/// Assumes that the observer is at the centre of the circle around which the crash moves with constant velocity,
+		/// so global durations and velocity are the same for each Trk.
+		/// As the crash moves round the circle, the pan value and relative velocity of the wagons changes. 
+		/// </summary>
+		/// <param name="midiChannel"></param>
+		/// <param name="crashWagons"></param>
+		/// <param name="angularPosition"></param>
+		/// <returns></returns>
+		private List<Trk> GetElevenCrashTracks(int midiChannel, IReadOnlyList<IReadOnlyList<byte>> crashWagons, int angularPosition)
 		{
-			// 85 durations (longLow to shortHigh)
-			IReadOnlyList<int> durations = Durations(); 
-			IReadOnlyList<List<M.Dynamic>> pitchDynamicPerSelection = GetPitchDynamicPerSelection(crashWagons);
-			IReadOnlyList<int> finalRestMsDurations = new List<int>() { 2000, 2450, 2200, 1900, 2600, 2400, 2500, 0 };
-			Debug.Assert(finalRestMsDurations.Count == (crashWagons.Count));
+			List<Trk> crashTrks = new List<Trk>();
 
-			Trk allSelectionsTrk = new Trk(0);
-			for(int i = 0; i < crashWagons.Count; ++i)
+			for(int i = 0; i < 11; ++i)
 			{
-				IReadOnlyList<byte> graphPitches = crashWagons[i];
-				List<M.Dynamic> pitchDynamics = pitchDynamicPerSelection[i];
-				List<byte> velocities = GetVelocities(pitchDynamics); // the values in each sub-selection (=wagon) have the same velocity.
-				List<int> pitchDurations = GetPitchDurations(graphPitches, durations);
-				List<byte> midiPitches = Transposition(graphPitches); // returns the real (transposed) MIDI pitch values.
+				int angularPos = (angularPosition + i) % 10; // in range [0..10]
+				List<Trk> wagonTrks = new List<Trk>();
 
-				Trk selectionTrk = GetTrk(midiPitches, velocities, pitchDurations, finalRestMsDurations[i]);				
+				for(int wagonIndex = 0; wagonIndex < crashWagons.Count - 1; ++wagonIndex)
+				{
+					IReadOnlyList<byte> wagonValues = crashWagons[wagonIndex];
+					List<byte> velocities = GetBasicVelocities(wagonIndex, angularPos, wagonValues.Count);
+					List<int> pitchDurations = GetBasicPitchDurations(wagonValues);
+					List<byte> midiPitches = GetBasicMidiPitches(wagonValues);
 
-				allSelectionsTrk.AddRange(selectionTrk);
-				//MidiRestDef midiRestDef = new MidiRestDef(0, 1000);
-				//allSelectionsTrk.Add(midiRestDef);
+					Trk wagonTrk = GetWagonTrk(midiChannel, midiPitches, velocities, pitchDurations);
+
+					wagonTrks.Add(wagonTrk);
+				}
+
+				Trk crashTrk = Intersperse(wagonTrks, crashWagons);
+
+				Debug.Assert(crashTrk.Count == nKeyboardPitches);
+
+				crashTrks.Add(crashTrk);
 			}
-			//allSelectionsTrk.RemoveAt(allSelectionsTrk.Count - 1);
-
-			return allSelectionsTrk;
+			return crashTrks;
 		}
 
-		private List<byte> GetVelocities(List<M.Dynamic> pitchDynamics)
+		private List<byte> GetBasicVelocities(int wagonIndex, int angularPos, int wagonValuesCount)
 		{
+			List<int> basicVelocityIndexPerAngPos = basicVelocityIndexPerWagonPerAngPos[wagonIndex];
+			int velocityIndex = basicVelocityIndexPerAngPos[angularPos];
+			byte velocity = basicVelocities[velocityIndex];
 			List<byte> velocities = new List<byte>();
-			foreach(M.Dynamic dynamic in pitchDynamics)
+			for(int i=0; i < wagonValuesCount; ++i)
 			{
-				velocities.Add(M.MaxMidiVelocity[dynamic]);
+				velocities.Add(velocity);
 			}
 			return velocities;
 		}
 
-		#region getting dynamics
-		private IReadOnlyList<List<M.Dynamic>> GetPitchDynamicPerSelection(IReadOnlyList<IReadOnlyList<byte>> erratumMusicalGraphPitches)
+
+		private List<int> GetBasicPitchDurations(IReadOnlyList<byte> wagonValues)
 		{
-			List<List<M.Dynamic>> rval = new List<List<M.Dynamic>>();   
-			for(int i = 0; i < erratumMusicalGraphPitches.Count; ++i)
-			{
-				IReadOnlyList<byte> selectionGraphPitches = erratumMusicalGraphPitches[i];
-				List<M.Dynamic> dynamics = GetDynamics(i + 1, selectionGraphPitches);
-				rval.Add(dynamics);
-			}
+			// nKeyboardPitches durations (longLow to shortHigh)
+			IReadOnlyList<int> basicDurations = BasicDurations();
 
-			return rval as IReadOnlyList<List<M.Dynamic>>;
-		}
-
-		/// <summary>
-		/// The values in each sub-selection (=wagon =colour) have the same dynamic.
-		/// The dynamic can be used to determine both the colour and velocity of the pitch
-		/// </summary>
-		private List<M.Dynamic> GetDynamics(int selectionNumber, IReadOnlyList<byte> selectionGraphPitches)
-		{
-			List<byte> redPitches = new List<byte>();
-			List<byte> greenPitches = new List<byte>();
-
-			switch(selectionNumber)
-			{
-				case 1:
-					redPitches.AddRange(new List<byte>() { 10, 35 });
-					greenPitches.AddRange(new List<byte>() { 83, 67, 82, 64, 57, 31, 19, 59, 28, 20, 11, 3, 85, 9, 51, 1, 32, 73, 66, 70, 29, 74, 75, 40, 14, 41, 33, 65 });
-					break;
-				case 2:
-					//redPitches.AddRange(new List<byte>() {  });
-					greenPitches.AddRange(new List<byte>() { 56, 84, 58, 39, 16, 2, 6, 28, 4, 1, 79, 36, 40, 57, 68, 25, 19, 38, 13, 10, 61, 72, 41, 54, 67 });
-					break;
-				case 3:
-					redPitches.AddRange(new List<byte>() { 6, 60 });
-					greenPitches.AddRange(new List<byte>() { 2, 3, 4, 5, 12, 15, 17, 19, 34, 37, 68, 73, 78, 80 });
-					break;
-				case 4:
-					//redPitches.AddRange(new List<byte>() { });
-					greenPitches.AddRange(new List<byte>() { 2, 16, 18, 24, 28, 35, 37, 38, 47, 61, 62, 83 });
-					break;
-				case 5:
-					//redPitches.AddRange(new List<byte>() { });
-					greenPitches.AddRange(new List<byte>() { 2, 22, 26, 34, 56, 83 });
-					break;
-				case 6:
-					//redPitches.AddRange(new List<byte>() { });
-					greenPitches.AddRange(new List<byte>() { 2, 5, 8, 20, 26, 27, 62, 67, 72, 75, 83 });
-					break;
-				case 7:
-					//redPitches.AddRange(new List<byte>() { });
-					greenPitches.AddRange(new List<byte>() { 3, 5, 19, 23, 28, 33, 36, 38, 41, 44, 48, 51, 52, 58, 68, 70, 74, 76, 79, 80, 84, 85 });
-					break;
-				case 8:
-					//redPitches.AddRange(new List<byte>() { });
-					greenPitches.AddRange(new List<byte>() { 6, 10, 19, 43, 65, 73, 74, 77, 82, 83 });
-					break;
-				default:
-					throw new ApplicationException("selectionNumber must be in range [1..8].");
-			}
-
-			List<M.Dynamic> dynamics = GetDynamics(selectionGraphPitches, redPitches, greenPitches);
-
-			return dynamics;
-		}
-
-		// red pitches have M.Dynamic.fff
-		// green pitches have M.Dynamic.f
-		// other (=blue) pitches have M.Dynamic.p
-		private static List<M.Dynamic> GetDynamics(IReadOnlyList<byte> graphPitches, List<byte> redPitches, List<byte> greenPitches)
-		{
-			List<M.Dynamic> dynamics = new List<M.Dynamic>();
-
-			foreach(byte graphPitch in graphPitches)
-			{
-				if(redPitches.Contains(graphPitch))
-				{
-					dynamics.Add(M.Dynamic.fff);
-				}
-				else if(greenPitches.Contains(graphPitch))
-				{
-					dynamics.Add(M.Dynamic.f);
-				}
-				else
-				{
-					dynamics.Add(M.Dynamic.p); // blue pitches
-				}
-			}
-
-			return dynamics;
-		}
-		#endregion
-
-		private List<int> GetPitchDurations(IReadOnlyList<byte> graphPitches, IReadOnlyList<int> durations)
-		{
-			Debug.Assert(graphPitches.Count == 85 && durations.Count == 85);
+			Debug.Assert(wagonValues.Count <= nKeyboardPitches && basicDurations.Count == nKeyboardPitches);
 			List<int> pitchDurations = new List<int>();
-			foreach(byte pitch in graphPitches)
+			foreach(byte pitch in wagonValues)
 			{
-				Debug.Assert(pitch >= 1 && pitch <= 85);
-				pitchDurations.Add(durations[pitch - 1]);
+				Debug.Assert(pitch >= 1 && pitch <= nKeyboardPitches);
+				pitchDurations.Add(basicDurations[pitch - 1]);
 			}
 			return pitchDurations;
 		}
@@ -310,31 +319,31 @@ namespace Moritz.Algorithm.ErratumMusical
 		/// <summary>
 		/// returns the real (transposed) MIDI pitch values.
 		/// </summary>
-		private List<byte> Transposition(IReadOnlyList<byte> graphPitches)
+		private List<byte> GetBasicMidiPitches(IReadOnlyList<byte> wagonValues)
 		{
-			byte transposition = (byte)((127 - 85) / 2); // 21 -- puts the range in middle of the MIDI range
+			byte transposition = (byte)((127 - nKeyboardPitches) / 2); // 21 -- puts the range in middle of the MIDI range
 			List<byte> midiPitches = new List<byte>();
-			foreach(byte pitch in graphPitches)
+			foreach(byte value in wagonValues)
 			{
-				midiPitches.Add((byte)(pitch + transposition));
+				midiPitches.Add((byte)(value + transposition));
 			}
 			return midiPitches;
 		}
 
 		/// <summary>
-		/// returns a list of ms durations by pitch index (in relation 85th root of 2).
+		/// returns a list of ms durations by pitch index (in relation nKeyboardPitchesth root of 2).
 		/// The top (=last) value is nearly half the bottom (=first) value;
 		/// </summary>
-		private IReadOnlyList<int> Durations()
+		private IReadOnlyList<int> BasicDurations()
 		{
 			const int longestMsDuration = 350; 
-			double factor = Math.Pow(2.0, ((double)1 / 85)); // 1,0081880126197191971720292366177
+			double factor = Math.Pow(2.0, ((double)1 / nKeyboardPitches));
 
 			List<double> dDurations = new List<double>();
 			List<int> durations = new List<int>();
 			dDurations.Add(longestMsDuration);
 			durations.Add(longestMsDuration);
-			for(int i = 1; i < 85; ++i)
+			for(int i = 1; i < nKeyboardPitches; ++i)
 			{
 				double dDuration = dDurations[dDurations.Count - 1] / factor;
 				dDurations.Add(dDuration);

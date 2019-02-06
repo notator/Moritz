@@ -10,6 +10,7 @@ using Moritz.Algorithm.Study3Sketch2;
 //using Moritz.Algorithm.SongSix;
 using Moritz.Algorithm.Tombeau1;
 using Moritz.Algorithm.ErratumMusical;
+using Moritz.Algorithm.ThreeCrashes;
 
 namespace Moritz.Composer
 {
