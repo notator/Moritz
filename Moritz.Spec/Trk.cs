@@ -753,12 +753,15 @@ namespace Moritz.Spec
 				}
 			}
         }
-        /// <summary>
-        /// Sets the pitchwheelDeviation for MidiChordDefs in the range beginIndex to endIndex (exclusive).
-        /// Rests in the range dont change.
-        /// </summary>
-        public void SetPitchWheelDeviation(int beginIndex, int endIndex, int deviation)
+		/// <summary>
+		/// Sets the pitchwheelDeviation for MidiChordDefs in the defined range.
+		/// Rests in the range dont change.
+		/// </summary>
+		/// <param name="beginIndex">The index at which to start setting pitchWheelDeviations</param>
+		/// <param name="count">The number of IUniqueDefs to set (among these, only MidiChordDefs will be set)</param>
+		public void SetPitchWheelDeviation(int beginIndex, int count, int deviation)
         {
+			int endIndex = beginIndex + count;
 			if(CheckIndices(beginIndex, endIndex))
 			{
 				for(int i = beginIndex; i < endIndex; ++i)
