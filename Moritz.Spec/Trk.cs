@@ -716,13 +716,19 @@ namespace Moritz.Spec
 				}
 			}
         }
-        /// <summary>
-        /// Creates a moving pan from startPanValue at beginIndex to endPanValue at endIndex -1.
-        /// Implemented using one pan value per MidiChordDef.
-        /// This function does NOT change pan values outside the position range given in its arguments.
-        /// </summary>
-        public void SetPanGliss(int beginIndex, int endIndex, int startPanValue, int endPanValue)
+		/// <summary>
+		/// Creates a moving pan from startPanValue at beginIndex to endPanValue at (beginIndex + count - 1).
+		/// (In other words, it sets count MidiChordDefs.)
+		/// Implemented using one pan value per MidiChordDef.
+		/// This function does NOT change pan values outside the position range given in its arguments.
+		/// </summary>
+		/// <param name="beginIndex">The index at which to start setting pan values</param>
+		/// <param name="count">The number of IUniqueDefs to set (among these, only MidiChordDefs will be set)</param>
+		/// <param name="startPanValue">The MSB of the initial pan value (in range 0..127)</param>
+		/// <param name="endPanValue">The MSB of the final pan value (in range 0..127)</param>
+		public void SetPanGliss(int beginIndex, int count, int startPanValue, int endPanValue)
         {
+			int endIndex = beginIndex + count;
 			if(CheckIndices(beginIndex, endIndex))
 			{
 				Debug.Assert(startPanValue >= 0 && startPanValue <= 127 && endPanValue >= 0 && endPanValue <= 127);
@@ -732,15 +738,16 @@ namespace Moritz.Spec
 				if(steps > 0)
 				{
 					double increment = ((double)(endPanValue - startPanValue)) / steps;
-					int panValue = startPanValue;
+					double panValue = startPanValue;
 					List<IUniqueDef> lmdds = _uniqueDefs;
 
 					for(int i = beginIndex; i < endIndex; ++i)
 					{
 						if(_uniqueDefs[i] is MidiChordDef iumdd)
 						{
-							iumdd.PanMsbs = new List<byte>() { (byte)panValue };
-							panValue += (int)increment;
+							byte panMsb = (byte) Math.Round(panValue);
+							iumdd.PanMsbs = new List<byte>() { panMsb };
+							panValue += increment;
 						}
 					}
 				}
