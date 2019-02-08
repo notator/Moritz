@@ -702,14 +702,8 @@ namespace Moritz.Algorithm
 							else if(iud is CautionaryChordDef)
 							{
 								Debug.Assert(false, "There shouldnt be any cautionary chords here.");
-								//// This is a cautionary chord. Set the position of the following barline, and
-								//// Add a CautionaryChordDef at the beginning of the following bar.
-								//iud.MsDuration = barMsDuration - iudStartPos;
-								//poppedBarVoice.UniqueDefs.Add(iud);
-
-								//Debug.Assert(remainingBarVoice.UniqueDefs.Count == 0);
-								//CautionaryChordDef secondLmdd = new CautionaryChordDef((IUniqueChordDef)iud, 0, durationAfterBarline);
-								//remainingBarVoice.UniqueDefs.Add(secondLmdd);
+								// This error can happen if an attempt is made to set barlines too close together,
+								// i.e. (I think) if an attempt is made to create a bar that contains nothing... 
 							}
 							else if(iud is MidiChordDef || iud is InputChordDef)
 							{
