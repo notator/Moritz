@@ -18,7 +18,7 @@ namespace Moritz.Algorithm.ThreeCrashes
         }
 
         public override IReadOnlyList<int> MidiChannelPerOutputVoice { get{	return new List<int>() { 0, 1, 2 }; }}
-		public override int NumberOfBars { get{	return 30; }}
+		public override int NumberOfBars { get{	return 27; }}
 		public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
 
 		private readonly int nKeyboardPitches = 85;
@@ -114,19 +114,19 @@ namespace Moritz.Algorithm.ThreeCrashes
 
 			// code alternatives: use while testing
 			///*********************************************/
-			//List<Trk> crashATrks = GetElevenCrashTracks(0, crashAWagons, 0); // angular position in range [0..10]
-			//List<Trk> crashCTrks = GetElevenCrashTracks(2, crashCWagons, 7); // angular position in range [0..10]
-			//Trk crashATrk = Concat(crashATrks);
-			//Trk crashCTrk = Concat(crashCTrks);
-			//int msDuration = crashBTrk.MsDuration;
-			//crashATrk.MsDuration = msDuration;
-			//crashCTrk.MsDuration = msDuration;
+			List<Trk> crashATrks = GetElevenCrashTrks(0, crashAWagons, 0); // angular position in range [0..10]
+			List<Trk> crashCTrks = GetElevenCrashTrks(2, crashCWagons, 7); // angular position in range [0..10]
+			Trk crashATrk = Concat(crashATrks);
+			Trk crashCTrk = Concat(crashCTrks);
+			int msDuration = crashBTrk.MsDuration;
+			crashATrk.MsDuration = msDuration;
+			crashCTrk.MsDuration = msDuration;
 			///*******************************************/
-			Trk crashATrk = new Trk(0);
-			Trk crashCTrk = new Trk(2);
-			MidiRestDef mrd = new MidiRestDef(0, crashBTrk.MsDuration);
-			crashATrk.Add((IUniqueDef)mrd.Clone());
-			crashCTrk.Add((IUniqueDef)mrd.Clone());
+			//Trk crashATrk = new Trk(0);
+			//Trk crashCTrk = new Trk(2);
+			//MidiRestDef mrd = new MidiRestDef(0, crashBTrk.MsDuration);
+			//crashATrk.Add((IUniqueDef)mrd.Clone());
+			//crashCTrk.Add((IUniqueDef)mrd.Clone());
 			///*******************************************/
 
 			// add other tracks (short bent lines) here.
@@ -146,7 +146,11 @@ namespace Moritz.Algorithm.ThreeCrashes
 
 			List<InputVoiceDef> inputVoiceDefs = new List<InputVoiceDef>();
 
-			List<int> endBarlinePositions = GetBalancedBarlineMsPositions(trks, null, NumberOfBars);
+			//List<int> endBarlinePositions = GetBalancedBarlineMsPositions(trks, null, NumberOfBars);
+
+			List<int> endBarlinePositions = GetEndBarlineMsPositions(trks);
+
+			Debug.Assert(NumberOfBars == endBarlinePositions.Count); // change NumberOfBars to match endBarlinePositions.Count! 
 
 			List<List<SortedDictionary<int, string>>> clefChangesPerBar = GetClefChangesPerBar(endBarlinePositions.Count, mainSeq.Trks.Count);
 
@@ -155,6 +159,39 @@ namespace Moritz.Algorithm.ThreeCrashes
 			SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
 			return bars;
+		}
+
+		private List<int> GetEndBarlineMsPositions(List<Trk> trks)
+		{
+			List<int> endBarlinePositions = new List<int>();
+
+			foreach(Trk trk in trks)
+			{
+				byte previousPitch = 0;
+				foreach(IUniqueDef iud in trk.UniqueDefs)
+				{
+					if(iud is MidiChordDef mcd)
+					{
+						byte pitch = mcd.NotatedMidiPitches[0];
+						if(previousPitch - pitch > 60)
+						{
+							endBarlinePositions.Add(iud.MsPositionReFirstUD);
+						}
+						previousPitch = pitch;
+					}
+				}
+				endBarlinePositions.Add(trk.MsDuration);
+			}
+			endBarlinePositions.Sort();
+			// remove duplicates and barlines that are closer than 1000ms to the previous one
+			for(int i = endBarlinePositions.Count - 1; i > 0; --i)
+			{
+				if(endBarlinePositions[i] - endBarlinePositions[i - 1] <= 1000)
+				{
+					endBarlinePositions.RemoveAt(i);
+				}
+			}
+			return endBarlinePositions;
 		}
 
 		private Trk Concat(List<Trk> crashTrks)
