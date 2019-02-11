@@ -321,6 +321,11 @@ namespace Moritz.Algorithm.ThreeCrashes
 
 				Trk crashTrk = Intersperse(wagonTrks, crashWagons);
 
+				if(crashTrk.UniqueDefs[crashTrk.UniqueDefs.Count - 1] is MidiChordDef lastMCD)
+				{
+					lastMCD.BeamContinues = false;
+				}
+
 				if(i < 10) // the final crashTrk does not rotate
 				{
 					crashTrk = SetPan(crashTrk, angularPosition);
@@ -498,8 +503,6 @@ namespace Moritz.Algorithm.ThreeCrashes
 					mcd.NotatedMidiVelocities[0] = bmcd.Velocities[0];
 				}
 			}
-
-			return crashTrk;
 
 			return crashTrk;
 		}
