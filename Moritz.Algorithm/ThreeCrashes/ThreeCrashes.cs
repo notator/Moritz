@@ -63,7 +63,7 @@ namespace Moritz.Algorithm.ThreeCrashes
 			{ 22, 23, 27, 42, 73 }
 		};
 
-		private static readonly IReadOnlyList<IReadOnlyList<byte>> elevenListsRandom1to85 = new List<List<byte>>()
+		private static readonly IReadOnlyList<IReadOnlyList<byte>> random1to85Lists = new List<List<byte>>()
 		{
 			new List<byte>()
 			{ 50,  1, 12, 49, 55, 34, 60,  3, 13,  7, 84,  8, 66, 45, 22, 83, 36, 10, 63, 31, 28, 53,  4, 38, 30,
@@ -114,12 +114,7 @@ namespace Moritz.Algorithm.ThreeCrashes
 			{ 47, 11, 84, 23, 46, 64, 17, 38, 77, 71, 25, 83, 18, 66, 21, 54,  7, 73, 52, 81, 67, 45, 10, 55, 68,
 			   2,  9, 35, 12, 37, 72, 26, 30, 33, 69, 61, 50,  4, 24, 80, 43, 79,  5,  8, 51, 22, 82, 65, 14, 63,
 			  27, 29, 16, 28, 19, 58, 74, 76, 20, 13, 85,  3, 15, 60, 62,  1, 49, 40, 41, 44, 34, 57, 56, 70, 36,
-			  42, 78, 32, 75, 31, 39, 48,  6, 59, 53 },
-			new List<byte>()
-			{ 74, 70, 31, 81, 23, 38, 64,  3, 63,  5,  4, 45,  7, 84, 58, 12, 56, 59, 30, 77, 78, 76, 28,  2, 33,
-			  35, 50, 34, 67, 46, 53, 18, 69, 54, 20, 11, 80, 47, 60, 62, 40, 19, 66,  8, 24, 73, 36, 15, 22, 71,
-			  48, 68, 13, 21,  6, 17, 27, 57, 72, 49, 65, 26, 41,  1, 39, 25, 52, 55, 82, 32,  9, 37, 61, 44, 10,
-			  83, 75, 42, 14, 43, 16, 51, 85, 29, 79 }
+			  42, 78, 32, 75, 31, 39, 48,  6, 59, 53 }
 		};
 
 		private static readonly List<List<int>> basicVelocityIndexPerWagonPerAngPos = new List<List<int>>()
@@ -362,48 +357,6 @@ namespace Moritz.Algorithm.ThreeCrashes
 		}
 
 		/// <summary>
-		/// Adds cloned IUniqueDefs from crashTrks to the returned Trk.
-		/// Does not change crashTrks.
-		/// <returns></returns>
-		private Trk Intersperse(IReadOnlyList<Trk> crashTrks, IReadOnlyList<IReadOnlyList<byte>> crashWagons)
-		{
-			int nWagons = crashWagons.Count - 1;
-			Trk trk = new Trk(crashTrks[0].MidiChannel);
-			IReadOnlyList<byte> interspersedValues = crashWagons[nWagons]; // (!)
-			foreach(byte value in interspersedValues)
-			{
-				int wagonIndex = -1;
-				int valueIndex = -1;
-				for(int i = 0; i < nWagons; ++i)
-				{
-					IReadOnlyList<byte> crashWagon = crashWagons[i];
-					for(int j = 0; j < crashWagon.Count; ++j)
-					{
-						byte val = crashWagon[j];
-						if(val == value)
-						{
-							valueIndex = j;
-							wagonIndex = i;
-							break;
-						}
-					}
-					if(wagonIndex != -1)
-					{
-						break;
-					}
-				}
-				if(wagonIndex == -1)
-				{
-					throw new ApplicationException("Couldn't find the wagon!");
-				}
-				IUniqueDef iud = (IUniqueDef) crashTrks[wagonIndex].UniqueDefs[valueIndex].Clone();
-				trk.Add(iud);
-			}
-
-			return trk;
-		}
-
-		/// <summary>
 		/// See summary and example code on abstract definition in CompositionAlogorithm.cs
 		/// </summary>
 		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
@@ -461,7 +414,7 @@ namespace Moritz.Algorithm.ThreeCrashes
 				int angularPosition = (initialAngularPosition + i) % 10; // in range [0..10]
 				List<Trk> wagonTrks = new List<Trk>();
 
-				for(int wagonIndex = 0; wagonIndex < crashWagons.Count - 1; ++wagonIndex)
+				for(int wagonIndex = 0; wagonIndex < crashWagons.Count; ++wagonIndex)
 				{
 					IReadOnlyList<byte> wagonValues = crashWagons[wagonIndex];
 					List<byte> velocities = GetBasicVelocities(wagonIndex, angularPosition, wagonValues.Count);
@@ -473,7 +426,7 @@ namespace Moritz.Algorithm.ThreeCrashes
 					wagonTrks.Add(wagonTrk);
 				}
 
-				Trk crashTrk = Intersperse(wagonTrks, crashWagons);
+				Trk crashTrk = Intersperse(wagonTrks, random1to85Lists[angularPosition]);
 
 				if(i < 10) // the final crashTrk does not rotate
 				{
@@ -487,6 +440,56 @@ namespace Moritz.Algorithm.ThreeCrashes
 				crashTrks.Add(crashTrk);
 			}
 			return crashTrks;
+		}
+
+		/// <summary>
+		/// Adds cloned IUniqueDefs from wagonTrks to the returned Trk.
+		/// </summary>
+		private Trk Intersperse(List<Trk> wagonTrks, IReadOnlyList<byte> random1to85List)
+		{
+			List<List<byte>> iudIndicesList = new List<List<byte>>();
+			int indexInRandomList = 0;
+			foreach(Trk trk in wagonTrks)
+			{				
+				List<byte> iudIndices = new List<byte>();
+				for(int i = 0; i < trk.Count; ++i)
+				{
+					iudIndices.Add((byte)(random1to85List[indexInRandomList++] - 1));
+				}
+				iudIndices.Sort();
+				iudIndicesList.Add(iudIndices);
+			}
+
+			Trk rval = GetInterspersedTrk(wagonTrks, iudIndicesList);
+
+			return rval;
+		}
+
+		/// <summary>
+		/// The IUniqueDefs in each wagonTrk are in ascending order.
+		/// The iudIndices are also in ascending order in each list of byte.
+		/// </summary>
+		/// <param name="wagonTrks"></param>
+		/// <param name="iudIndicesList"></param>
+		/// <returns></returns>
+		private Trk GetInterspersedTrk(List<Trk> wagonTrks, List<List<byte>> iudIndicesList)
+		{
+			Trk rval = new Trk(wagonTrks[0].MidiChannel);
+
+			for(byte iudIndex = 0; iudIndex < 85; ++iudIndex)
+			{
+				for(int wtIndex = 0; wtIndex < iudIndicesList.Count; ++wtIndex)
+				{
+					List<byte> iudIndices = iudIndicesList[wtIndex];
+					int index = iudIndices.IndexOf(iudIndex);
+					if(index >= 0)
+					{
+						rval.Add((IUniqueDef)wagonTrks[wtIndex][index].Clone());
+						break;
+					}
+				} 
+			}
+			return rval;			
 		}
 
 		private List<Trk> GetWagonTrks(int midiChannel, IReadOnlyList<IReadOnlyList<byte>> crashWagons)
