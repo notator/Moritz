@@ -112,7 +112,13 @@ namespace Moritz.Algorithm.ThreeCrashes
 			List<Trk> crashATrks = GetElevenCrashTrks(0, crashAWagons, 0); // angular position in range [0..10]
 			List<Trk> crashBTrks = GetElevenCrashTrks(1, crashBWagons, 3); // angular position in range [0..10]	
 			List<Trk> crashCTrks = GetElevenCrashTrks(2, crashCWagons, 7); // angular position in range [0..10]
-			
+
+			crashCTrks = ReverseIndividualTrks(crashCTrks);
+
+			SetBeamEnds(crashATrks);
+			SetBeamEnds(crashBTrks);
+			SetBeamEnds(crashCTrks);
+
 			List<IUniqueDef> firstATrkUIDs = GetFirstTrkUIDs(crashATrks); // these IUniqueDefs track the msPosition of the eleven A trks
 			List<IUniqueDef> firstBTrkUIDs = GetFirstTrkUIDs(crashBTrks); // these IUniqueDefs track the msPosition of the eleven B trks
 			List<IUniqueDef> firstCTrkUIDs = GetFirstTrkUIDs(crashCTrks); // these IUniqueDefs track the msPosition of the eleven C trks
@@ -135,16 +141,6 @@ namespace Moritz.Algorithm.ThreeCrashes
 
 			///*******************************************/
 
-			// add other tracks (short bent lines) here.
-
-			//IReadOnlyList<int> finalRestMsDurations = new List<int>() { 2000, 2450, 2200, 1900, 2600 };
-			//Debug.Assert(finalRestMsDurations.Count == (crashWagons.Count));
-			//if(finalRestDuration > 0)
-			//{
-			//	MidiRestDef midiRestDef = new MidiRestDef(0, finalRestDuration);
-			//	trk.Add(midiRestDef);
-			//}
-
 			List<Trk> trks = new List<Trk>() { crashATrk, crashBTrk, crashCTrk, aWagonsTrk, bWagonsTrk, cWagonsTrk };
 
 			Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
@@ -153,7 +149,7 @@ namespace Moritz.Algorithm.ThreeCrashes
 
 			//List<int> endBarlinePositions = GetBalancedBarlineMsPositions(trks, null, NumberOfBars);
 
-			List<int> endBarlinePositions = GetEndBarlineMsPositions(trks);
+			List<int> endBarlinePositions = GetEndBarlineMsPositions(firstATrkUIDs, firstBTrkUIDs, firstCTrkUIDs, msDuration);
 
 			Debug.Assert(NumberOfBars == endBarlinePositions.Count); // change NumberOfBars to match endBarlinePositions.Count! 
 
@@ -164,6 +160,35 @@ namespace Moritz.Algorithm.ThreeCrashes
 			SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
 			return bars;
+		}
+
+		private void SetBeamEnds(List<Trk> crashTrks)
+		{
+			foreach(Trk crashTrk in crashTrks)
+			{
+				if(crashTrk.UniqueDefs[crashTrk.UniqueDefs.Count - 1] is MidiChordDef lastMCD)
+				{
+					lastMCD.BeamContinues = false;
+				}
+			}
+		}
+
+		private List<Trk> ReverseIndividualTrks(List<Trk> crashTrks)
+		{
+			List<Trk> reversedTrks = new List<Trk>();
+			int midiChannel = crashTrks[0].MidiChannel;
+
+			foreach(Trk trk in crashTrks)
+			{
+				Trk newTrk = new Trk(midiChannel);
+				for(int i = trk.UniqueDefs.Count - 1; i >= 0; --i)
+				{
+					newTrk.Add((IUniqueDef)trk.UniqueDefs[i].Clone());
+				}
+				reversedTrks.Add(newTrk);
+			}
+
+			return reversedTrks;
 		}
 
 		private List<IUniqueDef> GetFirstTrkUIDs(List<Trk> crashATrks)
@@ -181,9 +206,19 @@ namespace Moritz.Algorithm.ThreeCrashes
 			Trk trk = new Trk(wagonTrkList[0].MidiChannel);
 			List<IUniqueDef> firstWagonTrkIUDs = new List<IUniqueDef>();
 
+			List<int> trkPanPositions = GetWagonTrkPanPositions(wagonTrkList, firstCrashTrkIUDs);
+
 			for(int i = wagonTrkList.Count - 1; i >=0; --i)
 			{
 				Trk wTrk = wagonTrkList[i];
+				int panPos = trkPanPositions[i];
+				foreach(IUniqueDef wTrkIud in wTrk.UniqueDefs)
+				{
+					if(wTrkIud is MidiChordDef mcd)
+					{
+						mcd.PanMsbs = new List<byte>() { (byte)panPos };
+					}
+				}
 				IUniqueDef iud = wTrk[0];
 				for(int j= wTrk.Count - 1; j >= 0; --j)
 				{
@@ -228,28 +263,51 @@ namespace Moritz.Algorithm.ThreeCrashes
 			return rval;
 		}
 
-		private List<int> GetEndBarlineMsPositions(List<Trk> trks)
+
+		private List<int> GetWagonTrkPanPositions(List<Trk> wagonTrkList, List<IUniqueDef> firstCrashTrkIUDs)
+		{
+			List<int> rval = new List<int>();
+
+			for(int i = 0; i < wagonTrkList.Count; ++i)
+			{
+				int crashTrkIndex = ((i * 2) + 1);
+				Debug.Assert(crashTrkIndex < firstCrashTrkIUDs.Count);
+				MidiChordDef mcd = firstCrashTrkIUDs[crashTrkIndex] as MidiChordDef;
+				rval.Add(mcd.PanMsbs[0]);
+			}
+			return rval;
+		}
+
+		private List<int> GetEndBarlineMsPositions(List<IUniqueDef> firstATrkUIDs, List<IUniqueDef> firstBTrkUIDs, List<IUniqueDef> firstCTrkUIDs, int msDuration)
 		{
 			List<int> endBarlinePositions = new List<int>();
 
-			foreach(Trk trk in trks)
+			foreach(IUniqueDef iud in firstATrkUIDs)
 			{
-				byte previousPitch = 0;
-				foreach(IUniqueDef iud in trk.UniqueDefs)
+				if(iud.MsPositionReFirstUD > 0)
 				{
-					if(iud is MidiChordDef mcd)
-					{
-						byte pitch = mcd.NotatedMidiPitches[0];
-						if(previousPitch - pitch > 60)
-						{
-							endBarlinePositions.Add(iud.MsPositionReFirstUD);
-						}
-						previousPitch = pitch;
-					}
+					endBarlinePositions.Add(iud.MsPositionReFirstUD);
 				}
-				endBarlinePositions.Add(trk.MsDuration);
 			}
+			foreach(IUniqueDef iud in firstBTrkUIDs)
+			{
+				if(iud.MsPositionReFirstUD > 0)
+				{
+					endBarlinePositions.Add(iud.MsPositionReFirstUD);
+				}
+			}
+			foreach(IUniqueDef iud in firstCTrkUIDs)
+			{
+				if(iud.MsPositionReFirstUD > 0)
+				{
+					endBarlinePositions.Add(iud.MsPositionReFirstUD);
+				}
+			}
+
+			endBarlinePositions.Add(msDuration);
+
 			endBarlinePositions.Sort();
+
 			// remove duplicates and barlines that are closer than 1000ms to the previous one
 			for(int i = endBarlinePositions.Count - 1; i > 0; --i)
 			{
@@ -387,11 +445,6 @@ namespace Moritz.Algorithm.ThreeCrashes
 				}
 
 				Trk crashTrk = Intersperse(wagonTrks, crashWagons);
-
-				if(crashTrk.UniqueDefs[crashTrk.UniqueDefs.Count - 1] is MidiChordDef lastMCD)
-				{
-					lastMCD.BeamContinues = false;
-				}
 
 				if(i < 10) // the final crashTrk does not rotate
 				{
