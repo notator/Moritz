@@ -17,11 +17,13 @@ namespace Moritz.Algorithm.ThreeCrashes
             CheckParameters();
         }
 
-        public override IReadOnlyList<int> MidiChannelPerOutputVoice { get{	return new List<int>() { 0, 1, 2, 3, 4, 5 }; }}
-		public override int NumberOfBars { get{	return 27; }}
+        public override IReadOnlyList<int> MidiChannelPerOutputVoice { get{	return new List<int>() { 0, 1, 2 }; }}
+		public override int NumberOfBars { get{	return 28; }}
 		public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
 
-		private readonly int nKeyboardPitches = 85;
+		private static readonly int nKeyboardPitches = 85;
+		private readonly int transposition = (byte)((127 - nKeyboardPitches) / 2); // 21 -- puts the range in middle of the MIDI range
+
 		// crashes 1-3 contain nKeyboardPitches values each -- not the 89 values described in the online analysis.
 		private static readonly IReadOnlyList<IReadOnlyList<byte>> crashAWagons = new List<List<byte>>()
 		{
@@ -129,6 +131,8 @@ namespace Moritz.Algorithm.ThreeCrashes
 		// c.f. MoritzStatics.cs/MaxMidiVelocity: -- 9 dynamic ranges, equally spaced from [0..15] (=pppp) to [113..127] (=fff) --. 
 		private static readonly List<byte> basicVelocities = new List<byte>() { 28, 39, 50, 61, 72, 83, 94, 105, 116, 127 }; 
 
+		/****************************************************************************************/
+
 		// Neither the krystals, nor the palettes argument is used.
 		public override List<Bar> DoAlgorithm(List<Krystal> krystals, List<Palette> palettes)
 		{
@@ -137,7 +141,9 @@ namespace Moritz.Algorithm.ThreeCrashes
 			List<Trk> crashBTrks = GetElevenCrashTrks(1, crashBWagons, 3); // angular position in range [0..10]	
 			List<Trk> crashCTrks = GetElevenCrashTrks(2, crashCWagons, 7); // angular position in range [0..10]
 
-			crashCTrks = ReverseIndividualTrks(crashCTrks);
+			crashATrks = ReverseAlternateTrks(crashATrks, false);
+			crashBTrks = ReverseAlternateTrks(crashBTrks, false);
+			crashCTrks = ReverseAlternateTrks(crashCTrks, true);
 
 			SetBeamEnds(crashATrks);
 			SetBeamEnds(crashBTrks);
@@ -150,22 +156,14 @@ namespace Moritz.Algorithm.ThreeCrashes
 			Trk crashATrk = Concat(crashATrks);
 			Trk crashBTrk = Concat(crashBTrks);
 			Trk crashCTrk = Concat(crashCTrks);
-			int msDuration = crashBTrk.MsDuration;
-			crashATrk.MsDuration = msDuration;
+
+			int msDuration = crashATrk.MsDuration;
+			crashBTrk.MsDuration = msDuration;
 			crashCTrk.MsDuration = msDuration;
-			///*******************************************/
-			///The following wagonTrks will be played in some way (fast) at various points in the piece...  
-			List<Trk> aWagonTrkList = GetWagonTrks(3, crashAWagons);
-			List<Trk> bWagonTrkList = GetWagonTrks(4, crashBWagons);
-			List<Trk> cWagonTrkList = GetWagonTrks(5, crashCWagons);
-
-			Trk aWagonsTrk = SetWagonsTrk(aWagonTrkList, firstATrkUIDs, msDuration);
-			Trk bWagonsTrk = SetWagonsTrk(bWagonTrkList, firstBTrkUIDs, msDuration);
-			Trk cWagonsTrk = SetWagonsTrk(cWagonTrkList, firstCTrkUIDs, msDuration);
 
 			///*******************************************/
 
-			List<Trk> trks = new List<Trk>() { crashATrk, crashBTrk, crashCTrk, aWagonsTrk, bWagonsTrk, cWagonsTrk };
+			List<Trk> trks = new List<Trk>() { crashATrk, crashBTrk, crashCTrk };
 
 			Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
 
@@ -184,184 +182,6 @@ namespace Moritz.Algorithm.ThreeCrashes
 			SetPatch0InTheFirstChordInEachVoice(bars[0]);
 
 			return bars;
-		}
-
-		private void SetBeamEnds(List<Trk> crashTrks)
-		{
-			foreach(Trk crashTrk in crashTrks)
-			{
-				if(crashTrk.UniqueDefs[crashTrk.UniqueDefs.Count - 1] is MidiChordDef lastMCD)
-				{
-					lastMCD.BeamContinues = false;
-				}
-			}
-		}
-
-		private List<Trk> ReverseIndividualTrks(List<Trk> crashTrks)
-		{
-			List<Trk> reversedTrks = new List<Trk>();
-			int midiChannel = crashTrks[0].MidiChannel;
-
-			foreach(Trk trk in crashTrks)
-			{
-				Trk newTrk = new Trk(midiChannel);
-				for(int i = trk.UniqueDefs.Count - 1; i >= 0; --i)
-				{
-					newTrk.Add((IUniqueDef)trk.UniqueDefs[i].Clone());
-				}
-				reversedTrks.Add(newTrk);
-			}
-
-			return reversedTrks;
-		}
-
-		private List<IUniqueDef> GetFirstTrkUIDs(List<Trk> crashATrks)
-		{
-			List<IUniqueDef> firstTrkUIDs = new List<IUniqueDef>();
-			foreach(Trk trk in crashATrks)
-			{
-				firstTrkUIDs.Add(trk.UniqueDefs[0]);
-			}
-			return firstTrkUIDs;
-		}
-
-		private Trk SetWagonsTrk(List<Trk> wagonTrkList, List<IUniqueDef> firstCrashTrkIUDs, int msDuration)
-		{
-			Trk trk = new Trk(wagonTrkList[0].MidiChannel);
-			List<IUniqueDef> firstWagonTrkIUDs = new List<IUniqueDef>();
-
-			List<int> trkPanPositions = GetWagonTrkPanPositions(wagonTrkList, firstCrashTrkIUDs);
-
-			for(int i = wagonTrkList.Count - 1; i >=0; --i)
-			{
-				Trk wTrk = wagonTrkList[i];
-				int panPos = trkPanPositions[i];
-				foreach(IUniqueDef wTrkIud in wTrk.UniqueDefs)
-				{
-					if(wTrkIud is MidiChordDef mcd)
-					{
-						mcd.PanMsbs = new List<byte>() { (byte)panPos };
-					}
-				}
-				IUniqueDef iud = wTrk[0];
-				for(int j= wTrk.Count - 1; j >= 0; --j)
-				{
-					trk.Insert(0, wTrk[j]);
-				}
-				firstWagonTrkIUDs.Insert(0, iud);
-			}
-
-			List<int> trkMsPositions = GetWagonTrkMsPositions(wagonTrkList, firstCrashTrkIUDs);
-
-			for(int i = 0; i < firstWagonTrkIUDs.Count; ++i)
-			{
-				IUniqueDef iud = firstWagonTrkIUDs[i];
-				int iudMsPos = iud.MsPositionReFirstUD;
-				int trkMsPos = trkMsPositions[i];
-				int insertRestMsDuration = trkMsPos - iudMsPos;
-				if(insertRestMsDuration > 0)
-				{
-					int index = trk.UniqueDefs.IndexOf(iud);
-					MidiRestDef imrd = new MidiRestDef(0, insertRestMsDuration);
-					trk.Insert(index, imrd);
-				}
-			}
-
-			int finalRestDuration = msDuration - trk.MsDuration;
-			MidiRestDef fmrd = new MidiRestDef(0, finalRestDuration);
-			trk.Add(fmrd);
-
-			return trk;
-		}
-
-		private List<int> GetWagonTrkMsPositions(List<Trk> wagonTrkList, List<IUniqueDef> firstCrashTrkIUDs)
-		{
-			List<int> rval = new List<int>();
-
-			for(int i = 0; i < wagonTrkList.Count; ++i)
-			{
-				int crashTrkIndex = ((i * 2) + 1);
-				Debug.Assert(crashTrkIndex < firstCrashTrkIUDs.Count);
-				rval.Add(firstCrashTrkIUDs[crashTrkIndex].MsPositionReFirstUD);
-			}
-			return rval;
-		}
-
-
-		private List<int> GetWagonTrkPanPositions(List<Trk> wagonTrkList, List<IUniqueDef> firstCrashTrkIUDs)
-		{
-			List<int> rval = new List<int>();
-
-			for(int i = 0; i < wagonTrkList.Count; ++i)
-			{
-				int crashTrkIndex = ((i * 2) + 1);
-				Debug.Assert(crashTrkIndex < firstCrashTrkIUDs.Count);
-				MidiChordDef mcd = firstCrashTrkIUDs[crashTrkIndex] as MidiChordDef;
-				rval.Add(mcd.PanMsbs[0]);
-			}
-			return rval;
-		}
-
-		private List<int> GetEndBarlineMsPositions(List<IUniqueDef> firstATrkUIDs, List<IUniqueDef> firstBTrkUIDs, List<IUniqueDef> firstCTrkUIDs, int msDuration)
-		{
-			List<int> endBarlinePositions = new List<int>();
-
-			foreach(IUniqueDef iud in firstATrkUIDs)
-			{
-				if(iud.MsPositionReFirstUD > 0)
-				{
-					endBarlinePositions.Add(iud.MsPositionReFirstUD);
-				}
-			}
-			foreach(IUniqueDef iud in firstBTrkUIDs)
-			{
-				if(iud.MsPositionReFirstUD > 0)
-				{
-					endBarlinePositions.Add(iud.MsPositionReFirstUD);
-				}
-			}
-			foreach(IUniqueDef iud in firstCTrkUIDs)
-			{
-				if(iud.MsPositionReFirstUD > 0)
-				{
-					endBarlinePositions.Add(iud.MsPositionReFirstUD);
-				}
-			}
-
-			endBarlinePositions.Add(msDuration);
-
-			endBarlinePositions.Sort();
-
-			// remove duplicates and barlines that are closer than 1000ms to the previous one
-			for(int i = endBarlinePositions.Count - 1; i > 0; --i)
-			{
-				if(endBarlinePositions[i] - endBarlinePositions[i - 1] <= 1000)
-				{
-					endBarlinePositions.RemoveAt(i);
-				}
-			}
-			return endBarlinePositions;
-		}
-
-		private Trk Concat(List<Trk> crashTrks)
-		{
-			Debug.Assert(crashTrks.Count == 11);
-
-			Trk crashTrk = new Trk(crashTrks[0].MidiChannel);
-
-			foreach(Trk trk in crashTrks)
-			{
-				crashTrk.AddRange(trk);
-			}
-			return crashTrk;
-		}
-
-		/// <summary>
-		/// See summary and example code on abstract definition in CompositionAlogorithm.cs
-		/// </summary>
-		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
-		{
-			return null;			
 		}
 
 		private List<IUniqueDef> GetMidiChordDefs(List<byte> pitches, List<byte> velocities, List<int> msDurations)
@@ -386,15 +206,8 @@ namespace Moritz.Algorithm.ThreeCrashes
 			return defs;
 		}
 
-		private Trk GetWagonTrk(int midiChannel, List<byte> pitches, List<byte> velocities, List<int> durations)
-		{
-			Trk trk = new Trk(midiChannel);
-			List<IUniqueDef> midiChordDefs = GetMidiChordDefs(pitches, velocities, durations);
-			trk.UniqueDefs.AddRange(midiChordDefs);
-
-			return trk;
-		}
-
+		#region GetElevenCrashTracks
+		
 		/// <summary>
 		/// Returns a sequence of eleven Trks, each having nKeyboardPitches notes. The first and last Trks are at angularPosition.
 		/// Assumes that the observer is at the centre of the circle around which the crash moves with constant velocity,
@@ -428,18 +241,87 @@ namespace Moritz.Algorithm.ThreeCrashes
 
 				Trk crashTrk = Intersperse(wagonTrks, random1to85Lists[angularPosition]);
 
-				if(i < 10) // the final crashTrk does not rotate
-				{
-					crashTrk = SetPan(crashTrk, angularPosition);
-				}
+				crashTrk = SetPan(crashTrk, angularPosition);
 				crashTrk = SetVelocities(crashTrk, angularPosition, minFactor:0.3);
-				crashTrk = SetDuration(crashTrk, angularPosition, maxFactor: 3);
+				crashTrk = SetDuration(crashTrk, angularPosition, maxFactor: 3.5); // was 3
 
 				Debug.Assert(crashTrk.Count == nKeyboardPitches);
 
 				crashTrks.Add(crashTrk);
 			}
 			return crashTrks;
+		}
+
+		private List<byte> GetBasicVelocities(int wagonIndex, int angularPos, int wagonValuesCount)
+		{
+			List<int> basicVelocityIndexPerAngPos = basicVelocityIndexPerWagonPerAngPos[wagonIndex];
+			int velocityIndex = basicVelocityIndexPerAngPos[angularPos];
+			byte velocity = basicVelocities[velocityIndex];
+			List<byte> velocities = new List<byte>();
+			for(int i = 0; i < wagonValuesCount; ++i)
+			{
+				velocities.Add(velocity);
+			}
+			return velocities;
+		}
+
+		private List<int> GetBasicPitchDurations(IReadOnlyList<byte> wagonValues)
+		{
+			// nKeyboardPitches durations (longLow to shortHigh)
+			IReadOnlyList<int> basicDurations = BasicDurations();
+
+			Debug.Assert(wagonValues.Count <= nKeyboardPitches && basicDurations.Count == nKeyboardPitches);
+			List<int> pitchDurations = new List<int>();
+			foreach(byte pitch in wagonValues)
+			{
+				Debug.Assert(pitch >= 1 && pitch <= nKeyboardPitches);
+				pitchDurations.Add(basicDurations[pitch - 1]);
+			}
+			return pitchDurations;
+		}
+
+		/// <summary>
+		/// returns the real (transposed) MIDI pitch values.
+		/// </summary>
+		private List<byte> GetBasicMidiPitches(IReadOnlyList<byte> wagonValues)
+		{
+			List<byte> midiPitches = new List<byte>();
+			foreach(byte value in wagonValues)
+			{
+				midiPitches.Add((byte)(value + transposition));
+			}
+			return midiPitches;
+		}
+
+		/// <summary>
+		/// returns a list of ms durations by pitch index (in relation nKeyboardPitchesth root of 2).
+		/// The top (=last) value is nearly half the bottom (=first) value;
+		/// </summary>
+		private IReadOnlyList<int> BasicDurations()
+		{
+			const int longestMsDuration = 350;
+			double factor = Math.Pow(2.0, ((double)1 / nKeyboardPitches));
+
+			List<double> dDurations = new List<double>();
+			List<int> durations = new List<int>();
+			dDurations.Add(longestMsDuration);
+			durations.Add(longestMsDuration);
+			for(int i = 1; i < nKeyboardPitches; ++i)
+			{
+				double dDuration = dDurations[dDurations.Count - 1] / factor;
+				dDurations.Add(dDuration);
+				durations.Add((int)dDuration);
+			}
+			return durations as IReadOnlyList<int>;
+		}
+
+		private Trk GetWagonTrk(int midiChannel, List<byte> pitches, List<byte> velocities, List<int> durations)
+		{
+			Trk trk = new Trk(midiChannel);
+			List<IUniqueDef> midiChordDefs = GetMidiChordDefs(pitches, velocities, durations);
+			trk.UniqueDefs.AddRange(midiChordDefs);
+
+			return trk;
 		}
 
 		/// <summary>
@@ -492,130 +374,70 @@ namespace Moritz.Algorithm.ThreeCrashes
 			return rval;			
 		}
 
-		private List<Trk> GetWagonTrks(int midiChannel, IReadOnlyList<IReadOnlyList<byte>> crashWagons)
-		{
-			List<Trk> wagonTrks = new List<Trk>();
-
-			for(int wagonIndex = 0; wagonIndex < crashWagons.Count - 1; ++wagonIndex)
-			{
-				IReadOnlyList<byte> wagonValues = crashWagons[wagonIndex];
-				List<byte> velocities = GetBasicVelocities(wagonIndex, 0, wagonValues.Count); // angular position 0
-				List<int> pitchDurations = GetBasicPitchDurations(wagonValues);
-				List<byte> midiPitches = GetBasicMidiPitches(wagonValues);
-
-				Trk wagonTrk = GetWagonTrk(midiChannel, midiPitches, velocities, pitchDurations);
-
-				wagonTrks.Add(wagonTrk);
-			}
-			return wagonTrks;
-		}
-
 		private Trk SetPan(Trk crashTrk, int angularPosition)
 		{
 			Debug.Assert(0 <= angularPosition && angularPosition < 11);
-			const int left = 0;
-			const int halfLeft = 24; // 64 * (3/8);
-			const int centre = 64;
-			const int halfRight = 79; // 127 * (5/8);
-			const int right = 127;
+
+			const double angle = Math.PI / 10;
+
+			int left = 0;
+			int twoThirdsLeft = 64 - ((int) (Math.Abs(64 * Math.Sin(angle * 3))));
+			int thirdLeft = 64 - ((int)(Math.Abs(64 * Math.Sin(angle))));
+			int thirdRight = 64 + ((int)(Math.Abs(64 * Math.Sin(angle))));
+			int twoThirdsRight = 64 + ((int)(Math.Abs(64 * Math.Sin(angle * 3)))); ;
+			int right = 127;
 
 			int startPanValue = 0;
 			int endPanValue = 0;
 			switch(angularPosition)
 			{
 				case 0:
-					startPanValue = centre;
-					endPanValue = halfLeft;
+					startPanValue = thirdRight;
+					endPanValue = thirdLeft;
 					break;
 				case 1:
-					startPanValue = halfLeft;
-					endPanValue = left;
+					startPanValue = thirdLeft;
+					endPanValue = twoThirdsLeft;
 					break;
 				case 2:
-					startPanValue = left;
+					startPanValue = twoThirdsLeft;
 					endPanValue = left;
 					break;
 				case 3:
 					startPanValue = left;
-					endPanValue = halfLeft;
+					endPanValue = twoThirdsLeft;
 					break;
 				case 4:
-					startPanValue = halfLeft;
-					endPanValue = centre;
+					startPanValue = twoThirdsLeft;
+					endPanValue = thirdLeft;
 					break;
 				case 5:
-					startPanValue = centre;
-					endPanValue = halfRight;
+					startPanValue = thirdLeft;
+					endPanValue = thirdRight;
 					break;
 				case 6:
-					startPanValue = halfRight;
-					endPanValue = right;
+					startPanValue = thirdRight;
+					endPanValue = twoThirdsRight;
 					break;
 				case 7:
-					startPanValue = right;
+					startPanValue = twoThirdsRight;
 					endPanValue = right;
 					break;
 				case 8:
 					startPanValue = right;
-					endPanValue = halfRight;
+					endPanValue = twoThirdsRight;
 					break;
 				case 9:
-					startPanValue = halfRight;
-					endPanValue = centre;
+					startPanValue = twoThirdsRight;
+					endPanValue = thirdRight;
 					break;
 				case 10:
-					startPanValue = centre;
-					endPanValue = centre;
+					startPanValue = thirdRight;
+					endPanValue = thirdLeft;
 					break;
 			}
 
 			crashTrk.SetPanGliss(0, crashTrk.Count, startPanValue, endPanValue);
-
-			return crashTrk;
-		}
-
-		private Trk SetDuration(Trk crashTrk, int angularPosition, double maxFactor)
-		{
-			Debug.Assert(0 <= angularPosition && angularPosition < 11);
-
-			double factor = Math.Pow(maxFactor, 0.2);
-			double factor0 = 1;
-			double factor1 = factor;
-			double factor2 = factor1 * factor;
-			double factor3 = factor2 * factor;
-			double factor4 = factor3 * factor;
-			double factor5 = factor4 * factor;
-
-			double warpFactor = 0;
-
-			switch(angularPosition)
-			{
-				case 0:
-				case 10:
-					warpFactor = factor0;
-					break;
-				case 1:
-				case 9:
-					warpFactor = factor1;
-					break;
-				case 2:
-				case 8:
-					warpFactor = factor2;
-					break;
-				case 3:
-				case 7:
-					warpFactor = factor3;
-					break;
-				case 4:
-				case 6:
-					warpFactor = factor4;
-					break;
-				case 5:
-					warpFactor = factor5;
-					break;
-			}
-
-			crashTrk.MsDuration = (int)(crashTrk.MsDuration * warpFactor);
 
 			return crashTrk;
 		}
@@ -677,68 +499,164 @@ namespace Moritz.Algorithm.ThreeCrashes
 			return crashTrk;
 		}
 
-		private List<byte> GetBasicVelocities(int wagonIndex, int angularPos, int wagonValuesCount)
+		private Trk SetDuration(Trk crashTrk, int angularPosition, double maxFactor)
 		{
-			List<int> basicVelocityIndexPerAngPos = basicVelocityIndexPerWagonPerAngPos[wagonIndex];
-			int velocityIndex = basicVelocityIndexPerAngPos[angularPos];
-			byte velocity = basicVelocities[velocityIndex];
-			List<byte> velocities = new List<byte>();
-			for(int i=0; i < wagonValuesCount; ++i)
+			Debug.Assert(0 <= angularPosition && angularPosition < 11);
+
+			double factor = Math.Pow(maxFactor, 0.2);
+			double factor0 = 1;
+			double factor1 = factor;
+			double factor2 = factor1 * factor;
+			double factor3 = factor2 * factor;
+			double factor4 = factor3 * factor;
+			double factor5 = factor4 * factor;
+
+			double warpFactor = 0;
+
+			switch(angularPosition)
 			{
-				velocities.Add(velocity);
+				case 0:
+				case 10:
+					warpFactor = factor0;
+					break;
+				case 1:
+				case 9:
+					warpFactor = factor1;
+					break;
+				case 2:
+				case 8:
+					warpFactor = factor2;
+					break;
+				case 3:
+				case 7:
+					warpFactor = factor3;
+					break;
+				case 4:
+				case 6:
+					warpFactor = factor4;
+					break;
+				case 5:
+					warpFactor = factor5;
+					break;
 			}
-			return velocities;
+
+			crashTrk.MsDuration = (int)(crashTrk.MsDuration * warpFactor);
+
+			return crashTrk;
 		}
 
-		private List<int> GetBasicPitchDurations(IReadOnlyList<byte> wagonValues)
-		{
-			// nKeyboardPitches durations (longLow to shortHigh)
-			IReadOnlyList<int> basicDurations = BasicDurations();
+		#endregion GetElevenCrashTracks
 
-			Debug.Assert(wagonValues.Count <= nKeyboardPitches && basicDurations.Count == nKeyboardPitches);
-			List<int> pitchDurations = new List<int>();
-			foreach(byte pitch in wagonValues)
+		private List<Trk> ReverseAlternateTrks(List<Trk> crashTrks, bool reverseFirstTrk)
+		{
+			List<Trk> reversedTrks = new List<Trk>();
+			int midiChannel = crashTrks[0].MidiChannel;
+			bool doReverse = reverseFirstTrk;
+
+			foreach(Trk trk in crashTrks)
 			{
-				Debug.Assert(pitch >= 1 && pitch <= nKeyboardPitches);
-				pitchDurations.Add(basicDurations[pitch - 1]);
+				if(doReverse)
+				{
+					Trk newTrk = new Trk(midiChannel);
+					for(int i = trk.UniqueDefs.Count - 1; i >= 0; --i)
+					{
+						newTrk.Add((IUniqueDef)trk.UniqueDefs[i].Clone());
+					}
+					reversedTrks.Add(newTrk);
+				}
+				else
+				{
+					reversedTrks.Add(trk);
+				}
+				doReverse = !doReverse;
 			}
-			return pitchDurations;
+
+			return reversedTrks;
+		}
+
+		private void SetBeamEnds(List<Trk> crashTrks)
+		{
+			foreach(Trk crashTrk in crashTrks)
+			{
+				if(crashTrk.UniqueDefs[crashTrk.UniqueDefs.Count - 1] is MidiChordDef lastMCD)
+				{
+					lastMCD.BeamContinues = false;
+				}
+			}
+		}
+
+		private List<IUniqueDef> GetFirstTrkUIDs(List<Trk> crashATrks)
+		{
+			List<IUniqueDef> firstTrkUIDs = new List<IUniqueDef>();
+			foreach(Trk trk in crashATrks)
+			{
+				firstTrkUIDs.Add(trk.UniqueDefs[0]);
+			}
+			return firstTrkUIDs;
+		}
+
+		private Trk Concat(List<Trk> crashTrks)
+		{
+			Debug.Assert(crashTrks.Count == 11);
+
+			Trk crashTrk = new Trk(crashTrks[0].MidiChannel);
+
+			foreach(Trk trk in crashTrks)
+			{
+				crashTrk.AddRange(trk);
+			}
+			return crashTrk;
+		}
+
+		/*********************************/
+
+		private List<int> GetEndBarlineMsPositions(List<IUniqueDef> firstATrkUIDs, List<IUniqueDef> firstBTrkUIDs, List<IUniqueDef> firstCTrkUIDs, int msDuration)
+		{
+			List<int> endBarlinePositions = new List<int>();
+
+			foreach(IUniqueDef iud in firstATrkUIDs)
+			{
+				if(iud.MsPositionReFirstUD > 0)
+				{
+					endBarlinePositions.Add(iud.MsPositionReFirstUD);
+				}
+			}
+			foreach(IUniqueDef iud in firstBTrkUIDs)
+			{
+				if(iud.MsPositionReFirstUD > 0)
+				{
+					endBarlinePositions.Add(iud.MsPositionReFirstUD);
+				}
+			}
+			foreach(IUniqueDef iud in firstCTrkUIDs)
+			{
+				if(iud.MsPositionReFirstUD > 0)
+				{
+					endBarlinePositions.Add(iud.MsPositionReFirstUD);
+				}
+			}
+
+			endBarlinePositions.Add(msDuration);
+
+			endBarlinePositions.Sort();
+
+			// remove duplicates and barlines that are closer than 1000ms to the previous one
+			for(int i = endBarlinePositions.Count - 1; i > 0; --i)
+			{
+				if(endBarlinePositions[i] - endBarlinePositions[i - 1] <= 1000)
+				{
+					endBarlinePositions.RemoveAt(i);
+				}
+			}
+			return endBarlinePositions;
 		}
 
 		/// <summary>
-		/// returns the real (transposed) MIDI pitch values.
+		/// See summary and example code on abstract definition in CompositionAlogorithm.cs
 		/// </summary>
-		private List<byte> GetBasicMidiPitches(IReadOnlyList<byte> wagonValues)
+		protected override List<List<SortedDictionary<int, string>>> GetClefChangesPerBar(int nBars, int nVoicesPerBar)
 		{
-			byte transposition = (byte)((127 - nKeyboardPitches) / 2); // 21 -- puts the range in middle of the MIDI range
-			List<byte> midiPitches = new List<byte>();
-			foreach(byte value in wagonValues)
-			{
-				midiPitches.Add((byte)(value + transposition));
-			}
-			return midiPitches;
-		}
-
-		/// <summary>
-		/// returns a list of ms durations by pitch index (in relation nKeyboardPitchesth root of 2).
-		/// The top (=last) value is nearly half the bottom (=first) value;
-		/// </summary>
-		private IReadOnlyList<int> BasicDurations()
-		{
-			const int longestMsDuration = 350; 
-			double factor = Math.Pow(2.0, ((double)1 / nKeyboardPitches));
-
-			List<double> dDurations = new List<double>();
-			List<int> durations = new List<int>();
-			dDurations.Add(longestMsDuration);
-			durations.Add(longestMsDuration);
-			for(int i = 1; i < nKeyboardPitches; ++i)
-			{
-				double dDuration = dDurations[dDurations.Count - 1] / factor;
-				dDurations.Add(dDuration);
-				durations.Add((int)dDuration);
-			}
-			return durations as IReadOnlyList<int>;
+			return null;
 		}
 
 		/// <summary>
