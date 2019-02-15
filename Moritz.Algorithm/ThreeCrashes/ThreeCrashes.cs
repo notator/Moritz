@@ -18,7 +18,7 @@ namespace Moritz.Algorithm.ThreeCrashes
         }
 
         public override IReadOnlyList<int> MidiChannelPerOutputVoice { get{	return new List<int>() { 0, 1, 2 }; }}
-		public override int NumberOfBars { get{	return 28; }}
+		public override int NumberOfBars { get{	return 27; }}
 		public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
 
 		private static readonly int nKeyboardPitches = 85;
@@ -243,7 +243,7 @@ namespace Moritz.Algorithm.ThreeCrashes
 
 				crashTrk = SetPan(crashTrk, angularPosition);
 				crashTrk = SetVelocities(crashTrk, angularPosition, minFactor:0.3);
-				crashTrk = SetDuration(crashTrk, angularPosition, maxFactor: 3.5); // was 3
+				crashTrk = SetDuration(crashTrk, angularPosition, maxFactor: 3);
 
 				Debug.Assert(crashTrk.Count == nKeyboardPitches);
 
