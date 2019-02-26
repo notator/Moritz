@@ -152,10 +152,13 @@ namespace Moritz.Spec
 			this.OrnamentNumberSymbol = int.MaxValue; // an un-numbered ornament symbol (currently "*" -- October 2017).
 
 			MidiChordSliderDefs mcsd = mcd0.MidiChordSliderDefs;
-			MidiChordSliderDefs = new MidiChordSliderDefs(mcsd.PitchWheelMsbs, mcsd.PanMsbs, mcsd.ModulationWheelMsbs, mcsd.ExpressionMsbs);
+			if(mcsd != null)
+			{
+				MidiChordSliderDefs = new MidiChordSliderDefs(mcsd.PitchWheelMsbs, mcsd.PanMsbs, mcsd.ModulationWheelMsbs, mcsd.ExpressionMsbs);
+			}
 
 			#region construct BasicMidiChordDefs
-			List<BasicMidiChordDef> basicMidiChordDefs = new List<BasicMidiChordDef>();
+			this.BasicMidiChordDefs = new List<BasicMidiChordDef>();
 			int bmcMsDuration = 0;
 			byte? bmcBank = null;
 			byte? bmcPatch = null;
@@ -200,7 +203,7 @@ namespace Moritz.Spec
 				if(bmcPitches != null)
 				{
 					var basicMidiChordDef = new BasicMidiChordDef(bmcMsDuration, bmcBank, bmcPatch, bmcHasChordOff, bmcPitches, bmcVelocities);
-					basicMidiChordDefs.Add(basicMidiChordDef);
+					BasicMidiChordDefs.Add(basicMidiChordDef);
 				}
 			}
 			#endregion
