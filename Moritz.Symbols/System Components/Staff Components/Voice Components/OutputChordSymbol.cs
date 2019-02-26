@@ -24,7 +24,7 @@ namespace Moritz.Symbols
 				string ornamentString;
 				if(umcd.OrnamentNumberSymbol == int.MaxValue)
 				{
-					ornamentString = "*";
+					ornamentString = "~"; // "*";
 				}
 				else
 				{

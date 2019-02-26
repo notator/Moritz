@@ -51,7 +51,8 @@ namespace Moritz.Symbols
                 _lyricMetrics = NewLyricMetrics(chord.Voice.StemDirection, graphics, gap, lyricClass);
 
                 GetRelativePositions(chord.Voice.StemDirection, _lyricMetrics, out bool ornamentIsBelow, out bool dynamicIsBelow);
-                _ornamentMetrics = NewOrnamentMetrics(graphics, gap, ornamentIsBelow);
+
+                _ornamentMetrics = NewOrnamentMetrics(graphics, ornamentIsBelow);
 
                 CSSObjectClass dynamicClass = GetDynamicClass(chord);
 
@@ -726,28 +727,23 @@ namespace Moritz.Symbols
             SetExternalBoundary();
         }
 
-        private OrnamentMetrics NewOrnamentMetrics(Graphics graphics, float gap, bool ornamentIsBelow)
+        private OrnamentMetrics NewOrnamentMetrics(Graphics graphics, bool ornamentIsBelow)
         {
-            Text ornamentText = null;
+			_ornamentMetrics = null;
+
             foreach(DrawObject drawObject in _drawObjects)
             {
-                if(drawObject is Text text)
+                if(drawObject is OrnamentText ornamentText)
                 {
-                    if(text.TextInfo.Text[0] == '~')
-                    {
-                        ornamentText = text;
-                        break;
-                    }
+					ornamentText.Metrics = new OrnamentMetrics(graphics, ornamentText.TextInfo, ornamentIsBelow);
+					_ornamentMetrics = (OrnamentMetrics)ornamentText.Metrics;
+					break;
                 }
             }
-            _ornamentMetrics = null;
-            if(ornamentText != null)
-            {
-                ornamentText.Metrics = new OrnamentMetrics(gap, graphics, ornamentText.TextInfo, ornamentIsBelow);
-               _ornamentMetrics = (OrnamentMetrics)ornamentText.Metrics;
-            }
+
             return _ornamentMetrics;
         }
+
         /// <summary>
         /// returns null if there is no lyric in the _drawObjects
         /// </summary>

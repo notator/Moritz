@@ -49,7 +49,46 @@ namespace Moritz.Algorithm.Tombeau1
 
 		private List<ModeSegment> Compose(Voice1 voice1, Voice2 voice2, Voice3 voice3, Envelope centredEnvelope, Envelope basedEnvelope)
 		{
-			throw new NotImplementedException();
+			List<ModeSegment> rval = new List<ModeSegment>();
+			foreach(ModeSegment ms in voice2.ModeSegments)
+			{
+				ModeGrpTrk newMgt = null;
+				foreach(ModeGrpTrk mgt in ms.ModeGrpTrks)
+				{
+					int restDuration = 0;
+					int ornamentDuration = 0;
+					List<IUniqueDef> mcds = new List<IUniqueDef>();
+					foreach(var iud in mgt.UniqueDefs)
+					{
+						if(iud is MidiChordDef)
+						{
+							mcds.Add(iud); // no need to clone here - will be cloned in new MidiChordDef.
+							ornamentDuration += iud.MsDuration;
+						}
+						else
+						{
+							restDuration = iud.MsDuration;
+							break;
+						}
+					}
+
+					MidiChordDef ornamentDef = new MidiChordDef(ornamentDuration, mcds); // clones mcds
+					MidiRestDef restDef = new MidiRestDef(ornamentDuration, restDuration);
+
+					List<IUniqueDef> ornamentPlusRest = new List<IUniqueDef>() { ornamentDef, restDef };
+
+					newMgt = new ModeGrpTrk(MidiChannel, 0, ornamentPlusRest, mgt.Mode, mgt.RootOctave);
+
+					Debug.Assert(mgt.MsDuration == newMgt.MsDuration);
+				}
+				var modeSegment = new ModeSegment(MidiChannel, 0, new List<ModeGrpTrk>() { newMgt });
+				rval.Add(modeSegment);
+			}
+
+			SetModeSegmentMsPositionsReContainer(rval);
+
+			return rval;
+
 		}
 	}       
 }

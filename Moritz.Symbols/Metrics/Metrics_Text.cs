@@ -131,7 +131,7 @@ namespace Moritz.Symbols
 	}
 	internal class OrnamentMetrics : TextMetrics, ICloneable
 	{
-		public OrnamentMetrics(float gap, Graphics graphics, TextInfo textInfo, bool isBelow)
+		public OrnamentMetrics(Graphics graphics, TextInfo textInfo, bool isBelow)
 			: base(CSSObjectClass.ornament, graphics, textInfo)
 		{
 			IsBelow = isBelow;

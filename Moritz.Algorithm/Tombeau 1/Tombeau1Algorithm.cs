@@ -372,7 +372,7 @@ namespace Moritz.Algorithm.Tombeau1
 			/**********************************************/
 
 			Seq mainSeq = new Seq(0, new List<Trk>(), MidiChannelPerOutputVoice);
-			CompositionType compositionType = CompositionType.threeVoices;
+			CompositionType compositionType = CompositionType.fourVoices;
 
 			// shortVersion1 (5' 55" @40% speed)
 			Tombeau1Type shortVersion1 = new Tombeau1Type(nModeSegments: 8, nModeGrpTrksPerModeSegment: 6, maxChordsPerModeGrpTrk: 10);

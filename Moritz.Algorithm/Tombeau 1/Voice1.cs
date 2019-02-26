@@ -661,7 +661,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 		internal void AdjustForFourVoices()
 		{
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
 		}
 
 		public Mode RootMode { get; }
