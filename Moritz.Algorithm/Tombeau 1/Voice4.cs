@@ -50,8 +50,12 @@ namespace Moritz.Algorithm.Tombeau1
 		private List<ModeSegment> Compose(Voice1 voice1, Voice2 voice2, Voice3 voice3, Envelope centredEnvelope, Envelope basedEnvelope)
 		{
 			List<ModeSegment> rval = new List<ModeSegment>();
+			int unicode = 97; // 'a';
+
 			foreach(ModeSegment ms in voice2.ModeSegments)
 			{
+				string idChar = ((char)unicode++).ToString();
+
 				ModeGrpTrk newMgt = null;
 				foreach(ModeGrpTrk mgt in ms.ModeGrpTrks)
 				{
@@ -72,7 +76,7 @@ namespace Moritz.Algorithm.Tombeau1
 						}
 					}
 
-					MidiChordDef ornamentDef = new MidiChordDef(ornamentDuration, mcds); // clones mcds
+					MidiChordDef ornamentDef = new MidiChordDef(ornamentDuration, mcds, idChar); // clones mcds
 					MidiRestDef restDef = new MidiRestDef(ornamentDuration, restDuration);
 
 					List<IUniqueDef> ornamentPlusRest = new List<IUniqueDef>() { ornamentDef, restDef };

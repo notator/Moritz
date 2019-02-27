@@ -121,10 +121,11 @@ namespace Moritz.Symbols
 		public float LyricFontHeight { get { return Gap * 1.96F; } }
         public float ClefOctaveNumberHeight { get { return Gap * 2.6264F; } }
         public float ClefXFontHeight { get { return Gap * 1.568F; } }
-        /// Open Sans, Open Sans Condensed (new 26.06.2017)
-        public float OrnamentFontHeight { get { return Gap * 2.156F; } }
-        /// CLicht (new 26.06.2017)
-        public float DynamicFontHeight { get { return MusicFontHeight * 0.75F; } }
+		/// Open Sans, Open Sans Condensed (new 26.06.2017)
+		public float NumericOrnamentFontHeight { get { return Gap * 2.156F; } }
+		public float GenericOrnamentFontHeight { get { return Gap * 2.156F; } }
+		/// CLicht (new 26.06.2017)
+		public float DynamicFontHeight { get { return MusicFontHeight * 0.75F; } }
         #endregion
 
         #region stroke widths

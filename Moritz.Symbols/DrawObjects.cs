@@ -247,9 +247,11 @@ namespace Moritz.Symbols
 
 	#endregion
 
-	internal class OrnamentText : Text
+	internal class GenericOrnamentText : Text
 	{
-		public OrnamentText(object container, string text, float chordFontHeight)
+		// N.B. The chordFontHeight argument is not actually used to display the text.
+		// The PageFormat.GenericOrnamentFontHeight value is used instead.
+		public GenericOrnamentText(object container, string text, float chordFontHeight)
 			: base(container, text, "Open Sans Condensed", chordFontHeight * 0.55F, TextHorizAlign.center)
 		{
 		}
@@ -257,6 +259,21 @@ namespace Moritz.Symbols
 		public override string ToString()
 		{
 			return "ornament: " + TextInfo.Text;
+		}
+	}
+
+	internal class NumericOrnamentText : Text
+	{
+		// N.B. The chordFontHeight argument is not actually used to display the text.
+		// The PageFormat.NumericOrnamentFontHeight value is used instead.
+		public NumericOrnamentText(object container, string text, float chordFontHeight)
+			: base(container, text, "Open Sans Condensed", chordFontHeight * 0.55F, TextHorizAlign.center)
+		{
+		}
+
+		public override string ToString()
+		{
+			return "numeric ornament: " + TextInfo.Text;
 		}
 	}
 

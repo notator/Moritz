@@ -664,22 +664,23 @@ namespace Moritz.Symbols
             topBoundary -= upperBeamPadding;
             bottomBoundary += lowerBeamPadding;
 
-            // These are moved to a position relative to the outer stem tip or notehead.
-            if(_ornamentMetrics != null)
-                MoveOrnamentMetrics(gap, ref topBoundary, ref bottomBoundary);
-            if(_lyricMetrics != null)
+			// These are moved to a position relative to the outer stem tip or notehead.
+			if(_ornamentMetrics is NumericOrnamentMetrics nom)
+			{
+				MoveMetrics(_ornamentMetrics, nom.IsBelow, ref topBoundary, (gap * 0.6F), ref bottomBoundary, (gap * 0.4F));
+			}
+			else if(_ornamentMetrics is GenericOrnamentMetrics om)
+			{
+				// N.B. topPadding is greater than for numericOrnamentMetrics,
+				// to accomodate lower case characters that extend below the baseline. (e.g. 'g') 
+				MoveMetrics(_ornamentMetrics, om.IsBelow, ref topBoundary, (gap * 0.75F), ref bottomBoundary, (gap * 0.4F));
+			}
+			if(_lyricMetrics != null)
                 MoveLyricMetrics(gap, ref topBoundary, ref bottomBoundary);
             if(_dynamicMetrics != null)
                 MoveDynamicMetrics(gap, ref topBoundary, ref bottomBoundary);
         }
-        /// <summary>
-        /// Moves the ornament to its correct position wrt the topBoundary or bottomBoundary.
-        /// Does nothing if ornamentMetrics is null.
-        /// </summary>
-        private void MoveOrnamentMetrics(float gap, ref float topBoundary, ref float bottomBoundary)
-        {
-            MoveMetrics(_ornamentMetrics, _ornamentMetrics.IsBelow, ref topBoundary, (gap * 0.6F), ref bottomBoundary, (gap * 0.4F));
-        }
+
         /// <summary>
         /// Moves the lyric to its correct position wrt the topBoundary or bottomBoundary.
         /// Does nothing if lyricMetrics is null.
@@ -727,19 +728,25 @@ namespace Moritz.Symbols
             SetExternalBoundary();
         }
 
-        private OrnamentMetrics NewOrnamentMetrics(Graphics graphics, bool ornamentIsBelow)
+        private TextMetrics NewOrnamentMetrics(Graphics graphics, bool ornamentIsBelow)
         {
 			_ornamentMetrics = null;
 
             foreach(DrawObject drawObject in _drawObjects)
             {
-                if(drawObject is OrnamentText ornamentText)
-                {
-					ornamentText.Metrics = new OrnamentMetrics(graphics, ornamentText.TextInfo, ornamentIsBelow);
-					_ornamentMetrics = (OrnamentMetrics)ornamentText.Metrics;
+				if(drawObject is NumericOrnamentText numericOrnamentText)
+				{
+					numericOrnamentText.Metrics = new NumericOrnamentMetrics(graphics, numericOrnamentText.TextInfo, ornamentIsBelow);
+					_ornamentMetrics = (NumericOrnamentMetrics)numericOrnamentText.Metrics;
 					break;
-                }
-            }
+				}
+				else if(drawObject is GenericOrnamentText ornamentText)
+				{
+					ornamentText.Metrics = new GenericOrnamentMetrics(graphics, ornamentText.TextInfo, ornamentIsBelow);
+					_ornamentMetrics = (GenericOrnamentMetrics)ornamentText.Metrics;
+					break;
+				}
+			}
 
             return _ornamentMetrics;
         }
@@ -2182,7 +2189,7 @@ namespace Moritz.Symbols
         private LedgerlineBlockMetrics _upperLedgerlineBlockMetrics = null;
         private LedgerlineBlockMetrics _lowerLedgerlineBlockMetrics = null;
         private List<CautionaryBracketMetrics> _cautionaryBracketsMetrics = null;
-        private OrnamentMetrics _ornamentMetrics = null;
+        private TextMetrics _ornamentMetrics = null;
         private LyricMetrics _lyricMetrics = null;
         private DynamicMetrics _dynamicMetrics = null;
 

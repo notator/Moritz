@@ -129,10 +129,24 @@ namespace Moritz.Symbols
 
 		public readonly bool IsBelow;
 	}
-	internal class OrnamentMetrics : TextMetrics, ICloneable
+	internal class GenericOrnamentMetrics : TextMetrics, ICloneable
 	{
-		public OrnamentMetrics(Graphics graphics, TextInfo textInfo, bool isBelow)
-			: base(CSSObjectClass.ornament, graphics, textInfo)
+		public GenericOrnamentMetrics(Graphics graphics, TextInfo textInfo, bool isBelow)
+			: base(CSSObjectClass.genericOrnament, graphics, textInfo)
+		{
+			IsBelow = isBelow;
+		}
+		public object Clone()
+		{
+			return this.MemberwiseClone();
+		}
+
+		public readonly bool IsBelow;
+	}
+	internal class NumericOrnamentMetrics : TextMetrics, ICloneable
+	{
+		public NumericOrnamentMetrics(Graphics graphics, TextInfo textInfo, bool isBelow)
+			: base(CSSObjectClass.numericOrnament, graphics, textInfo)
 		{
 			IsBelow = isBelow;
 		}

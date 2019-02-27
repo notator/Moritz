@@ -447,20 +447,27 @@ namespace Moritz.Symbols
 				StringBuilder inputSmallClefXStyle = TextStyle("." + CSSObjectClass.inputSmallClefX.ToString(), "", smallClefXFontHeight, "");
                 fontStyles.Append(inputSmallClefXStyle);
             }
-            #endregion Arial
+			#endregion Arial
 
-            #region Open Sans Condensed (ornament)
-            if(usedCSSObjectClasses.Contains(CSSObjectClass.ornament))
-            {
-                string openSansCondensed = "\"Open Sans Condensed\"";
-                string ornamentFontHeight = M.FloatToShortString(pageFormat.OrnamentFontHeight);
-				StringBuilder ornamentType = TextStyle("." + CSSObjectClass.ornament.ToString(), openSansCondensed, ornamentFontHeight, "middle");
-                fontStyles.Append(ornamentType);
-            }
-            #endregion Open Sans Condensed (ornament)
-            #endregion text
+			#region Open Sans Condensed (ornament)
+			if(usedCSSObjectClasses.Contains(CSSObjectClass.numericOrnament))
+			{
+				string openSansCondensed = "\"Open Sans Condensed\"";
+				string numericOrnamentFontHeight = M.FloatToShortString(pageFormat.NumericOrnamentFontHeight);
+				StringBuilder ornamentType = TextStyle("." + CSSObjectClass.numericOrnament.ToString(), openSansCondensed, numericOrnamentFontHeight, "middle");
+				fontStyles.Append(ornamentType);
+			}
+			if(usedCSSObjectClasses.Contains(CSSObjectClass.genericOrnament))
+			{
+				string openSansCondensed = "\"Open Sans Condensed\"";
+				string genericOrnamentFontHeight = M.FloatToShortString(pageFormat.GenericOrnamentFontHeight);
+				StringBuilder ornamentType = TextStyle("." + CSSObjectClass.genericOrnament.ToString(), openSansCondensed, genericOrnamentFontHeight, "middle");
+				fontStyles.Append(ornamentType);
+			}
+			#endregion Open Sans Condensed (ornament)
+			#endregion text
 
-            return fontStyles;
+			return fontStyles;
         }
 
 		private StringBuilder GetColorStyles(List<CSSColorClass> usedCSSColorClasses)

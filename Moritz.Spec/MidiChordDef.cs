@@ -40,11 +40,11 @@ namespace Moritz.Spec
             }
             #endregion conditions
 
-            _msPositionReFirstIUD = 0; // default value
-            _hasChordOff = hasChordOff;
-            _minimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
+            MsPositionReFirstUD = 0; // default value
+            HasChordOff = hasChordOff;
+            MinimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 
-            _ornamentNumberSymbol = 0;
+            OrnamentID = null;
 
             MidiChordSliderDefs = null;
 
@@ -101,7 +101,7 @@ namespace Moritz.Spec
 			bool hasChordOff, // default is M.DefaultHasChordOff (=true)
             List<byte> rootMidiPitches, // the pitches defined in the root chord settings (displayed, by default, in the score).
             List<byte> rootMidiVelocities, // the velocities defined in the root chord settings (displayed, by default, in the score).
-            int ornamentNumberSymbol, // is 0 when there is no ornament
+            int ornamentIDNumber, // the number used to identify the ornament (to the right of the tilde). 0 means that there is no ornament
             MidiChordSliderDefs midiChordSliderDefs, // can be null or contain empty lists
             List<BasicMidiChordDef> basicMidiChordDefs)
             : base(msDuration)
@@ -112,13 +112,13 @@ namespace Moritz.Spec
                 AssertIsMidiValue(pitch);
             }
 
-            _msPositionReFirstIUD = 0;
+            MsPositionReFirstUD = 0;
             _pitchWheelDeviation = pitchWheelDeviation;
-            _hasChordOff = hasChordOff;
+            HasChordOff = hasChordOff;
             _notatedMidiPitches = rootMidiPitches;
             _notatedMidiVelocities = rootMidiVelocities;
 
-            _ornamentNumberSymbol = ornamentNumberSymbol;
+            OrnamentID = ornamentIDNumber.ToString();
 
             MidiChordSliderDefs = midiChordSliderDefs;
             BasicMidiChordDefs = basicMidiChordDefs;
@@ -136,20 +136,22 @@ namespace Moritz.Spec
 		/// This function makes a deep clone of all the required attributes in the iUniqueDefs.
 		/// </summary>
 		/// <param name="msDuration">The duration of the returned MidiChordDef</param>
-		public MidiChordDef(int msDuration, List<IUniqueDef> iUniqueDefs)
+		/// <param name="iUniqueDefs">See function summary.</param>
+		/// <param name="ornamentID">Usually a single character. Will be appended to a tilde, and added to the chord symbol - usually above.</param>
+		public MidiChordDef(int msDuration, List<IUniqueDef> iUniqueDefs, string ornamentID)
 			:base(msDuration)
 		{
 			Debug.Assert(iUniqueDefs[0] is MidiChordDef);
 
 			MidiChordDef mcd0 = iUniqueDefs[0] as MidiChordDef;
 
-			_msPositionReFirstIUD = 0;
+			MsPositionReFirstUD = 0;
 			_pitchWheelDeviation = mcd0.PitchWheelDeviation;
-			_hasChordOff = mcd0.HasChordOff;
+			HasChordOff = mcd0.HasChordOff;
 			_notatedMidiPitches = new List<byte>(mcd0.NotatedMidiPitches);
 			_notatedMidiVelocities = new List<byte>(mcd0.NotatedMidiVelocities);
 
-			this.OrnamentNumberSymbol = int.MaxValue; // an un-numbered ornament symbol (currently "*" -- October 2017).
+			this.OrnamentID = ornamentID; // usually a single character. Will be appended to a tilde, and added to the chord symbol - usually above.
 
 			MidiChordSliderDefs mcsd = mcd0.MidiChordSliderDefs;
 			if(mcsd != null)
@@ -250,7 +252,7 @@ namespace Moritz.Spec
 				NotatedMidiVelocities = _notatedMidiVelocities, // a clone of the displayed notehead velocities
 
 				// rval.MidiVelocity must be set after setting BasicMidiChordDefs See below.
-				OrnamentNumberSymbol = this.OrnamentNumberSymbol, // the displayed ornament number
+				OrnamentID = this.OrnamentID, // the displayed ornament ID (without the tilde)
 
 				MidiChordSliderDefs = null
 			};
@@ -419,7 +421,7 @@ namespace Moritz.Spec
                 {
                     BasicMidiChordDef bmcd = BasicMidiChordDefs[i];
                     bmcd.MsDuration = newPositions[i + 1] - newPositions[i];
-                    Debug.Assert(_minimumBasicMidiChordMsDuration <= bmcd.MsDuration);
+                    Debug.Assert(MinimumBasicMidiChordMsDuration <= bmcd.MsDuration);
                 }
             }
         }
@@ -442,7 +444,9 @@ namespace Moritz.Spec
         /// using the NotatedMidiPitches as the first chord.
         /// Uses the current Mode.
         /// Replaces any existing ornament.
-        /// Sets the OrnamentNumberSymbol to the number of BasicMidiChordDefs.
+        /// Sets OrnamentID to the number of BasicMidiChordDefs. 
+		/// Note, however, that OrnamentID is a public string attribute, that can be set at any time
+		/// (usually to a single character).
         /// </summary>
         /// <param name="ornamentEnvelope"></param>
         public void SetOrnament(Mode mode, Envelope ornamentEnvelope)
@@ -461,7 +465,7 @@ namespace Moritz.Spec
 
             if(basicMidiChordRootPitches.Count > 1)
             {
-                _ornamentNumberSymbol = basicMidiChordRootPitches.Count;
+                OrnamentID = basicMidiChordRootPitches.Count.ToString();
             }
         }
 
@@ -1182,12 +1186,10 @@ namespace Moritz.Spec
             }
         }
 
-        /****************************************************************************/
+		/****************************************************************************/
 
-        public int MsPositionReFirstUD { get { return _msPositionReFirstIUD; } set { _msPositionReFirstIUD = value; } }
-        private int _msPositionReFirstIUD = 0;
-
-        public override int MsDuration
+		public int MsPositionReFirstUD { get; set; } = 0;
+		public override int MsDuration
         {
             get
             {
@@ -1202,19 +1204,14 @@ namespace Moritz.Spec
                     sumDurations += bcd;
                 if(_msDuration != sumDurations)
                 {
-                    BasicMidiChordDefs = FitToDuration(BasicMidiChordDefs, _msDuration, _minimumBasicMidiChordMsDuration);
+                    BasicMidiChordDefs = FitToDuration(BasicMidiChordDefs, _msDuration, MinimumBasicMidiChordMsDuration);
                 }
             }
         }
-
-		public int? MsDurationToNextBarline { get { return _msDurationToNextBarline; } set { _msDurationToNextBarline = value; } }
-		private int? _msDurationToNextBarline = null;
-
-		public byte? Bank { get { return _bank; } set { _bank = value; } }
-        private byte? _bank = null;
-        public byte? Patch { get { return _patch; } set { _patch = value; } }
-        private byte? _patch = null;
-        public byte? PitchWheelDeviation
+		public int? MsDurationToNextBarline { get; set; } = null;
+		public byte? Bank { get; set; } = null;
+		public byte? Patch { get; set; } = null;
+		public byte? PitchWheelDeviation
         {
             get
             {
@@ -1232,19 +1229,16 @@ namespace Moritz.Spec
             }
         }
         private byte? _pitchWheelDeviation = null;
-        public bool HasChordOff { get { return _hasChordOff; } set { _hasChordOff = value; } }
-        private bool _hasChordOff = true;
-        public bool BeamContinues { get { return _beamContinues; } set { _beamContinues = value; } }
-        private bool _beamContinues = true;
-        public string Lyric { get { return _lyric; } set { _lyric = value; } }
-        private string _lyric = null; 
-        public int MinimumBasicMidiChordMsDuration { get { return _minimumBasicMidiChordMsDuration; } set { _minimumBasicMidiChordMsDuration = value; } }
-        private int _minimumBasicMidiChordMsDuration = 1;
-        /// <summary>
-        /// This NotatedMidiPitches field is used when displaying the chord's noteheads.
-        /// Setting this field creates a clone of the supplied list, and does not affect the pitches in the BasicMidiChordDefs.
-        /// </summary>
-        public List<byte> NotatedMidiPitches
+		public bool HasChordOff { get; set; } = true;
+		public bool BeamContinues { get; set; } = true;
+		public string Lyric { get; set; } = null;
+		public int MinimumBasicMidiChordMsDuration { get; set; } = 1;
+
+		/// <summary>
+		/// This NotatedMidiPitches field is used when displaying the chord's noteheads.
+		/// Setting this field creates a clone of the supplied list, and does not affect the pitches in the BasicMidiChordDefs.
+		/// </summary>
+		public List<byte> NotatedMidiPitches
         { 
             get { return _notatedMidiPitches; } 
             set 
@@ -1284,10 +1278,9 @@ namespace Moritz.Spec
         }
         private List<byte> _notatedMidiVelocities = null;
 
-        public int OrnamentNumberSymbol { get { return _ornamentNumberSymbol; } set { _ornamentNumberSymbol = value; } }
-        private int _ornamentNumberSymbol = 0;
+		public string OrnamentID { get; set; } = null;
 
-        public MidiChordSliderDefs MidiChordSliderDefs = null;
+		public MidiChordSliderDefs MidiChordSliderDefs = null;
         public List<BasicMidiChordDef> BasicMidiChordDefs = new List<BasicMidiChordDef>();
 
         #endregion properties
