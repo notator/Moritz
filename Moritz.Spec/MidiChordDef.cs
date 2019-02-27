@@ -129,7 +129,7 @@ namespace Moritz.Spec
 		/// <summary>
 		/// Returns a new, ornamented MidiChordDef having msDuration, whose BasicMidiChordDefs are created from the MidiChordDefs
 		/// and RestDefs in the iUniqueDefs argument. Condition: The first iUniqueDef in the iUnqueDefs must be a MidiChordDef.
-		/// BasicMidiChordDefs created from MidiChordDefs are the MidiChordDef's BasicMidiChordDef[0].
+		/// BasicMidiChordDefs created from MidiChordDefs are that MidiChordDef's BasicMidiChordDef[0].
 		/// BasicMidiChordDefs created from RestDefs have a single (un-notated) pitch (=0) and velocity=0.
 		/// The durations of the returned BasicMidiChordDefs are in proportion to the durations of the MidiChordDefs and RestDefs
 		/// in the iUniqueDefs. 
@@ -137,7 +137,7 @@ namespace Moritz.Spec
 		/// </summary>
 		/// <param name="msDuration">The duration of the returned MidiChordDef</param>
 		/// <param name="iUniqueDefs">See function summary.</param>
-		/// <param name="ornamentID">Usually a single character. Will be appended to a tilde, and added to the chord symbol - usually above.</param>
+		/// <param name="ornamentID">Usually a single character. Will be appended to a tilde, and added (usually above) to the chord symbol.</param>
 		public MidiChordDef(int msDuration, List<IUniqueDef> iUniqueDefs, string ornamentID)
 			:base(msDuration)
 		{
