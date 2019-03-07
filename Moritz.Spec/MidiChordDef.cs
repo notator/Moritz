@@ -75,7 +75,7 @@ namespace Moritz.Spec
         /// <param name="rootNotatedPitch">The lowest notated pitch. Also the lowest pitch of BasicMidiChordDefs[0].</param>
         /// <param name="nPitchesPerChord">The chord density (some chords may have less pitches).</param>
         /// <param name="ornamentEnvelope">The ornament definition.</param>
-        public MidiChordDef(int msDuration, Mode mode, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null)
+        public MidiChordDef(int msDuration, Mode mode, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null, string ornamentID = null)
             : base(msDuration) 
         {
             NotatedMidiPitches = mode.GetChord(rootNotatedPitch, nPitchesPerChord);
@@ -87,7 +87,7 @@ namespace Moritz.Spec
             NotatedMidiVelocities = nmVelocities;
 
             // Sets BasicMidiChords. If ornamentEnvelope == null, BasicMidiChords[0] is set to the NotatedMidiChord.
-            SetOrnament(mode, ornamentEnvelope);
+            SetOrnament(mode, ornamentEnvelope, ornamentID);
         }
 
         /// <summary>
@@ -118,7 +118,10 @@ namespace Moritz.Spec
             _notatedMidiPitches = rootMidiPitches;
             _notatedMidiVelocities = rootMidiVelocities;
 
-            OrnamentID = ornamentIDNumber.ToString();
+			if(ornamentIDNumber > 0)
+			{
+				OrnamentID = ornamentIDNumber.ToString();
+			}
 
             MidiChordSliderDefs = midiChordSliderDefs;
             BasicMidiChordDefs = basicMidiChordDefs;
@@ -426,16 +429,19 @@ namespace Moritz.Spec
             }
         }
 
-        /// <summary>
-        /// Calls the other SetOrnament function
-        /// </summary>
-        /// <param name="ornamentShape"></param>
-        /// <param name="nOrnamentChords"></param>
-        public void SetOrnament(Mode mode, IReadOnlyList<byte> ornamentShape, int nOrnamentChords)
+		/// <summary>
+		/// Calls the other SetOrnament function
+		/// </summary>
+		/// <param name="mode"></param>
+		/// <param name="ornamentShape"></param>
+		/// <param name="nOrnamentChords"></param>
+		/// <param name="ornamentID">The string that will follow the tilde. Cannot be null or empty.</param>
+		public void SetOrnament(Mode mode, IReadOnlyList<byte> ornamentShape, int nOrnamentChords, string ornamentID)
         {
+			Debug.Assert(!String.IsNullOrEmpty(ornamentID));
             int nPitchesPerOctave = mode.NPitchesPerOctave;
 			Envelope ornamentEnvelope = new Envelope(new List<byte>(ornamentShape), 127, nPitchesPerOctave, nOrnamentChords);
-            SetOrnament(mode, ornamentEnvelope);
+            SetOrnament(mode, ornamentEnvelope, ornamentID);
         }
 
         /// <summary>
@@ -444,14 +450,15 @@ namespace Moritz.Spec
         /// using the NotatedMidiPitches as the first chord.
         /// Uses the current Mode.
         /// Replaces any existing ornament.
-        /// Sets OrnamentID to the number of BasicMidiChordDefs. 
-		/// Note, however, that OrnamentID is a public string attribute, that can be set at any time
+        /// Sets OrnamentID to ornamentID, but note that OrnamentID is a public string attribute, that can be set at any time
 		/// (usually to a single character).
         /// </summary>
         /// <param name="ornamentEnvelope"></param>
-        public void SetOrnament(Mode mode, Envelope ornamentEnvelope)
+        public void SetOrnament(Mode mode, Envelope ornamentEnvelope = null, string ornamentID = null)
         {
             Debug.Assert(mode != null);
+			Debug.Assert((ornamentEnvelope == null && ornamentID == null) || (ornamentEnvelope != null && ornamentID != null));
+
             List<int> basicMidiChordRootPitches = mode.PitchSequence(_notatedMidiPitches[0], ornamentEnvelope);
             // If ornamentEnvelope is null, basicMidiChordRootPitches will only contain rootNotatedpitch.
 
@@ -465,7 +472,7 @@ namespace Moritz.Spec
 
             if(basicMidiChordRootPitches.Count > 1)
             {
-                OrnamentID = basicMidiChordRootPitches.Count.ToString();
+                OrnamentID = ornamentID;
             }
         }
 

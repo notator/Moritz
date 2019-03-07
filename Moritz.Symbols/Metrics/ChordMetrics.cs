@@ -665,14 +665,10 @@ namespace Moritz.Symbols
             bottomBoundary += lowerBeamPadding;
 
 			// These are moved to a position relative to the outer stem tip or notehead.
-			if(_ornamentMetrics is NumericOrnamentMetrics nom)
+			if(_ornamentMetrics is OrnamentMetrics om)
 			{
-				MoveMetrics(_ornamentMetrics, nom.IsBelow, ref topBoundary, (gap * 0.6F), ref bottomBoundary, (gap * 0.4F));
-			}
-			else if(_ornamentMetrics is GenericOrnamentMetrics om)
-			{
-				// N.B. topPadding is greater than for numericOrnamentMetrics,
-				// to accomodate lower case characters that extend below the baseline. (e.g. 'g') 
+				// N.B. topPadding was (gap * 0.6F) for numericOrnamentMetrics (now deleted).
+				// Here it is (gap * 0.75F) to accomodate lower case characters that extend below the baseline (e.g. 'g').
 				MoveMetrics(_ornamentMetrics, om.IsBelow, ref topBoundary, (gap * 0.75F), ref bottomBoundary, (gap * 0.4F));
 			}
 			if(_lyricMetrics != null)
@@ -734,16 +730,10 @@ namespace Moritz.Symbols
 
             foreach(DrawObject drawObject in _drawObjects)
             {
-				if(drawObject is NumericOrnamentText numericOrnamentText)
+				if(drawObject is OrnamentText ornamentText)
 				{
-					numericOrnamentText.Metrics = new NumericOrnamentMetrics(graphics, numericOrnamentText.TextInfo, ornamentIsBelow);
-					_ornamentMetrics = (NumericOrnamentMetrics)numericOrnamentText.Metrics;
-					break;
-				}
-				else if(drawObject is GenericOrnamentText ornamentText)
-				{
-					ornamentText.Metrics = new GenericOrnamentMetrics(graphics, ornamentText.TextInfo, ornamentIsBelow);
-					_ornamentMetrics = (GenericOrnamentMetrics)ornamentText.Metrics;
+					ornamentText.Metrics = new OrnamentMetrics(graphics, ornamentText.TextInfo, ornamentIsBelow);
+					_ornamentMetrics = (OrnamentMetrics)ornamentText.Metrics;
 					break;
 				}
 			}

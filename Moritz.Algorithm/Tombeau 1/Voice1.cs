@@ -374,7 +374,7 @@ namespace Moritz.Algorithm.Tombeau1
 						}
 					}
 				}
-				MidiChordDef mcd = new MidiChordDef(msDurationPerChord, mode, rootNotatedPitch, nPitchesPerChord, null);
+				MidiChordDef mcd = new MidiChordDef(msDurationPerChord, mode, rootNotatedPitch, nPitchesPerChord, null, null);
 				uniqueDefs.Add(mcd);
 			}
 

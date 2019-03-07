@@ -19,24 +19,12 @@ namespace Moritz.Symbols
 
             SetNoteheadPitchesAndVelocities(umcd.NotatedMidiPitches, umcd.NotatedMidiVelocities);
 
-            if(! string.IsNullOrEmpty(umcd.OrnamentID))
+            if(! String.IsNullOrEmpty(umcd.OrnamentID))
             {
-				string ornamentString = "~" + umcd.OrnamentID;
-				// int.TryParse only returns true here if umcd.OrnamentID contains nothing but integer characters.
-				// A string such as "1a" will therefore result in a genericOrnament.  
-				if(int.TryParse(umcd.OrnamentID, out int value))
-				{
-					if(value > 0)
-					{
-						NumericOrnamentText numericOrnamentText = new NumericOrnamentText(this, ornamentString, FontHeight); // The fontHeight argument is actually never used!
-						DrawObjects.Add(numericOrnamentText);
-					}
-				}
-				else
-				{ 
-					GenericOrnamentText genericOrnamentText = new GenericOrnamentText(this, ornamentString, FontHeight * 2.0F); // The fontHeight argument is actually never used!
-					DrawObjects.Add(genericOrnamentText);
-				}
+				// if umcd.OrnamentID is null or empty, there will be no ornamentString DrawObject
+				string ornamentString = "~" + umcd.OrnamentID;   
+				OrnamentText ornamentText = new OrnamentText(this, ornamentString, FontHeight * 2.0F); // The fontHeight argument is actually never used!
+				DrawObjects.Add(ornamentText);
             }
 
             if(umcd.Lyric != null)

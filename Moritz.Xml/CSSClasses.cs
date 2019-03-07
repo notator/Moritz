@@ -82,7 +82,7 @@ namespace Moritz.Xml
 		accidental, inputAccidental, cautionaryAccidental, // Container:chord/inputChord/cautionaryChord
 		ledgerlines, inputLedgerlines,   // recorded and used. There are no cautionaryLedgerlines. Container:chord/cautionaryChord and inputChord
 		ledgerline, inputLedgerline,    // used, but not recorded. Defined if ledgerlines/inputLedgerlines exist. Container: ledgerlines/inputLedgerlines
-		genericOrnament, numericOrnament,       // Container:chord. There are no input or cautionary ornaments
+		ornament,       // Container:chord. There are no input or cautionary ornaments
 		lyric, inputLyric,   // Container:chord/inputChord. There are no cautionaryLyrics
 		dynamic, inputDynamic,   // Container:chord/inputChord. There are no cautionaryDynamics
 		cautionaryBracket,  // Container:chord/cautionaryChord. There are no inputCautionaryBrackets
