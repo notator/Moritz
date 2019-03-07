@@ -1285,7 +1285,7 @@ namespace Moritz.Spec
         }
         private List<byte> _notatedMidiVelocities = null;
 
-		public string OrnamentID { get; set; } = null;
+		public string OrnamentID { get; private set; } = null;
 
 		public MidiChordSliderDefs MidiChordSliderDefs = null;
         public List<BasicMidiChordDef> BasicMidiChordDefs = new List<BasicMidiChordDef>();

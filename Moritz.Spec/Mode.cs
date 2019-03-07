@@ -14,7 +14,7 @@ namespace Moritz.Spec
 		/// <summary>
 		/// A Mode is an immutable class, containing a list of absolute pitches (C=0, C#=1, D=2 etc.)
 		/// in order of importance, whereby not all absolute pitches need to be included.
-		/// ModeOlds can used, for example, to determine the loudness of particular pitches.
+		/// Modes can used, for example, to determine the loudness of particular pitches.
 		/// A Mode.Gamut is a list of absolute pitch numbers in an ascending order scale, whereby all the values
 		/// are different and in range [0..127].
 		/// <para>Mode.Gamut[0] == absolutePitchHierarchy[0] % 12 (restricted to range [0..11]).</para>
