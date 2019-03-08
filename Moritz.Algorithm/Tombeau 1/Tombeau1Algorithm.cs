@@ -177,7 +177,7 @@ namespace Moritz.Algorithm.Tombeau1
                 SIMPLE MidiChordDefs (containing a single BasicMidiChordDef):
                     MidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff)
                 ORNAMENTS
-                    MidiChordDef(int msDuration, Mode mode, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null)    
+                    MidiChordDef(int msDuration, Mode mode, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null, string ornamentID = null)    
                 PALETTE MidiChordDefs (MidiChordDefs created from palettes):    
                     MidiChordDef(int msDuration, byte pitchWheelDeviation, bool hasChordOff, List<byte> rootMidiPitches, List<byte> rootMidiVelocities, int ornamentNumberSymbol, MidiChordSliderDefs midiChordSliderDefs, List<BasicMidiChordDef> basicMidiChordDefs)
                     
@@ -219,6 +219,7 @@ namespace Moritz.Algorithm.Tombeau1
                 Trk(int midiChannel)
 
                 Clone()
+				ConcatCloneAt(VoiceDef trk2, int msPositionReTrk) // Appends __clones__ of the IUniqueDefs in trk2 at msPositionReTrk this Trk. (c.f. AddRange(VoiceDef trk)).
  
                 this[i] { get; set; } // indexer (set sets MsPositionsReFirstUD in whole Trk
                 uniqueDefs // enumerator

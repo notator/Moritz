@@ -48,10 +48,10 @@ namespace Moritz.Spec
             return trk;
         }
 
-        /// <summary>
-        /// Also used by Clone() functions in subclasses
-        /// </summary>
-        protected List<IUniqueDef> GetUniqueDefsClone()
+		/// <summary>
+		/// Also used by Clone() functions in subclasses
+		/// </summary>
+		protected List<IUniqueDef> GetUniqueDefsClone()
         {
             List<IUniqueDef> clonedIUDs = new List<IUniqueDef>();
             foreach(IUniqueDef iu in _uniqueDefs)
@@ -108,7 +108,7 @@ namespace Moritz.Spec
             _Add(iUniqueDef);
 		}
 		/// <summary>
-		/// Adds the argument's UniqueDefs to the end of this Trk.
+		/// Moves the argument's UniqueDefs to the end of this Trk _without_cloning_them_.
 		/// Sets the MsPositions of the appended UniqueDefs.
 		/// This function automatically agglommerates rests.
 		/// </summary>
@@ -117,11 +117,52 @@ namespace Moritz.Spec
             Debug.Assert(trk is Trk);
             _AddRange(trk);
         }
-        /// <summary>
-        /// Inserts the iUniqueDef in the list at the given index, and then
-        /// resets the positions of all the uniqueDefs in the list.
-        /// </summary>
-        public override void Insert(int index, IUniqueDef iUniqueDef)
+
+		/// <summary>
+		/// Appends **clones** of the trk2.UniqueDefs after the end of this trk's UniqueDefs at msPositionReThisTrk, inserting a rest as necessary.
+		/// To simply concatenate trk2 with this trk, pass this trk's MsDuration as the second argument.
+		/// An exception will be thrown if msPositionReThisTrk is less than the current duration of this trk.
+		/// Any rests that result from this operation are silently agglommerated.
+		/// The MsPositionReFirstUD values in the concatenated IUniqueDefs are automatically adjusted for this trk. 
+		/// </summary>
+		public void ConcatCloneAt(Trk trk2, int msPositionReThisTrk)
+		{
+			Debug.Assert(MsDuration <= msPositionReThisTrk);
+			if(msPositionReThisTrk > MsDuration)
+			{
+				int msDuration = (msPositionReThisTrk - MsDuration);
+				IUniqueDef lastIud = _uniqueDefs[_uniqueDefs.Count - 1];
+				if(lastIud is MidiRestDef finalRestDef) // Trks are "OutputVoiceDefs" so cannot contain InputRestDefs.
+				{
+					lastIud.MsDuration += msDuration;
+				}
+				else
+				{
+					MidiRestDef midiRestDef = new MidiRestDef(0, msDuration);
+					this.Add(midiRestDef);
+				}
+			}
+
+			foreach(IUniqueDef iu2 in trk2.UniqueDefs)
+			{
+				IUniqueDef lastIud = _uniqueDefs[_uniqueDefs.Count - 1];
+				IUniqueDef clonedIUD = (IUniqueDef)iu2.Clone();
+				if(lastIud is RestDef finalRestDef && clonedIUD is RestDef restDef2)
+				{
+					finalRestDef.MsDuration += restDef2.MsDuration;
+				}
+				else
+				{
+					this._Add(clonedIUD);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Inserts the iUniqueDef in the list at the given index, and then
+		/// resets the positions of all the uniqueDefs in the list.
+		/// </summary>
+		public override void Insert(int index, IUniqueDef iUniqueDef)
         {
             Debug.Assert(iUniqueDef is MidiChordDef || iUniqueDef is MidiRestDef || iUniqueDef is ClefDef);
             _Insert(index, iUniqueDef);
@@ -584,11 +625,11 @@ namespace Moritz.Spec
             }
         }
 
-        /// <summary>
-        /// Multiplies each expression value in the MidiChordDefs
-        /// from beginIndex to (excluding) endIndex by the argument factor.
-        /// </summary>
-        public void AdjustExpression(int beginIndex, int endIndex, double factor)
+		/// <summary>
+		/// Multiplies each expression value in the MidiChordDefs
+		/// from beginIndex to (excluding) endIndex by the argument factor.
+		/// </summary>
+		public void AdjustExpression(int beginIndex, int endIndex, double factor)
         {
 			if(CheckIndices(beginIndex, endIndex))
 			{

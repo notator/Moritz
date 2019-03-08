@@ -448,11 +448,11 @@ namespace Moritz.Spec
             AssertConsistency();
         }
         public abstract void AddRange(VoiceDef voiceDef);
-
 		/// <summary>
-		/// This function automatically agglommerates rests.
+		/// This function __moves__ the voiceDef's UniqueDefs to the end of this voiceDef's UniqueDefs _without_cloning_them_ (c.f. Trk.ConcatCloneAt(...) ).
+		/// Rests are automatically agglommerated.
 		/// </summary>
-        protected void _AddRange(VoiceDef voiceDef)
+		protected void _AddRange(VoiceDef voiceDef)
         {
             Debug.Assert(!(Container is Bar), "Cannot AddRange of VoiceDefs inside a Bar.");
 
@@ -465,7 +465,7 @@ namespace Moritz.Spec
             AssertConsistency();
         }
 
-        public abstract void Insert(int index, IUniqueDef iUniqueDef);
+		public abstract void Insert(int index, IUniqueDef iUniqueDef);
         protected void _Insert(int index, IUniqueDef iUniqueDef)
         {
             Debug.Assert(!(Container is Bar && iUniqueDef.MsDuration > 0), "Cannot Insert IUniqueDefs that have msDuration inside a Bar.");
