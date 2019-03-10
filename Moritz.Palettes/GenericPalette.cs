@@ -11,26 +11,14 @@ using Moritz.Spec;
 namespace Moritz.Palettes
 {
 	/// <summary>
-	/// Every Palette contains a readonly list of objects that can only be retrieved by index.
-	/// Every object returned by the indexer is a _clone_ of the object in the list.
-	/// The readonly list must be set once by the derived constructor using the SetValues(values) function.
-	
+ 	/// Every Palette contains a private list of objects that can only be retrieved using the protected GetClonedValueAt(int index) function.
+	/// The list must be set in the derived constructor using the SetValues(values) function.	
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	public class Palette<T> where T : ICloneable
+	public abstract class Palette<T> where T : ICloneable
 	{
 		public int Count
 		{
 			get => _values.Count;
-		}
-
-		/// <summary>
-		/// This protected indexer returns a clone of the object in the private _values list.
-		/// It must be called by a public accessor function in the derived class.
-		/// </summary>
-		protected T this[int index]
-		{
-			get => (T)_values[index].Clone();
 		}
 
 		/// <summary>
@@ -48,7 +36,13 @@ namespace Moritz.Palettes
 			}
 		}
 
-
+		/// <summary>
+		/// Use this protected accessor function in derived classes to retrieve values from the private _values list.
+		/// </summary>
+		protected T GetClonedValueAt(int index)
+		{
+			return (T) _values[index].Clone();
+		}
 
 		private IReadOnlyList<T> _values = null;
 	}
@@ -65,7 +59,7 @@ namespace Moritz.Palettes
 		/// </summary>
 		public Trk GetTrk(int index, int midiChannel)
 		{
-			Trk trk = this[index];
+			Trk trk = GetClonedValueAt(index);
 			trk.MidiChannel = midiChannel;
 
 			return trk;

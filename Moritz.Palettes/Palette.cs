@@ -106,7 +106,7 @@ namespace Moritz.Palettes
 
 		public IUniqueDef GetIUniqueDef(int index)
 		{
-			return this[index];
+			return GetClonedValueAt(index);
 		}
 
         /// <summary>
@@ -326,7 +326,7 @@ namespace Moritz.Palettes
         /// </summary>
         public MidiChordDef MidiChordDef(int index)
         {
-			if(!(this[index] is MidiChordDef midiChordDef))
+			if(!(GetClonedValueAt(index) is MidiChordDef midiChordDef))
 			{
 				throw new ApplicationException("The indexed object was not a MidiChordDef.");
 			}
@@ -342,7 +342,7 @@ namespace Moritz.Palettes
             {
                 Debug.Assert((value > 0 && value <= this.Count), "Illegal argument: value out of range in sequence");
 
-                IUniqueDef iumdd = this[value - 1];
+                IUniqueDef iumdd = GetClonedValueAt(value - 1);
                 iumdd.MsPositionReFirstUD = msPositionReFirstIUD;
                 msPositionReFirstIUD += iumdd.MsDuration;
                 iuds.Add(iumdd);
