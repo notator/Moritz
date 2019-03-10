@@ -65,4 +65,22 @@ namespace Moritz.Palettes
 			return trk;
 		}
 	}
+
+	public class EnvelopePalette : Palette<Envelope>
+	{
+		public EnvelopePalette(List<Envelope> envelopes)
+		{
+			SetValues(envelopes);
+		}
+
+		/// <summary>
+		/// Returns a clone of the envelope at index.
+		/// </summary>
+		public Envelope GetEnvelope(int index)
+		{
+			Envelope envelope = GetClonedValueAt(index);
+
+			return envelope;
+		}
+	}
 }

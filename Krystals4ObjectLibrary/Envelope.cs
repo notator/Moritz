@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Krystals4ObjectLibrary
 {
-	public class Envelope
+	public class Envelope : ICloneable
 	{
         #region constructors
         /// <summary> 
@@ -91,7 +91,7 @@ namespace Krystals4ObjectLibrary
 
         #endregion constructors
 
-        public Envelope Clone()
+        public object Clone()
         {
             Envelope clone = new Envelope(_original, _domain, _domain, _original.Count );
             return clone;
@@ -250,7 +250,7 @@ namespace Krystals4ObjectLibrary
         /// <returns></returns>
         public Dictionary<int, int> GetValuePerMsPosition(List<int> msPositions)
         {
-            Envelope envelope = Clone();
+            Envelope envelope = Clone() as Envelope;
             envelope.SetCount(msPositions.Count);
             List<int> pitchWheelValues = envelope.Original;
 
