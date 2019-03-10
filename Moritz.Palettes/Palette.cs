@@ -48,14 +48,14 @@ namespace Moritz.Palettes
                 _ornamentSettings = new OrnamentSettings(paletteForm);
             }
 
-			var vals = new List<IUniqueDef>();
+			var values = new List<IUniqueDef>();
 			for(int chordIndex = 0; chordIndex < _basicChordMidiSettings.Durations.Count; ++chordIndex)
             {
 				IUniqueDef dd = GetDurationDef(chordIndex);
-                vals.Add(dd);
+                values.Add(dd);
             }
 
-			_values = vals as IReadOnlyList<IUniqueDef>;
+			SetValues(values);
 
             _isPercussionPalette = paletteForm.IsPercussionPalette;
         }
@@ -101,8 +101,13 @@ namespace Moritz.Palettes
             }
 
 			IUniqueDef dd = GetDurationDef(0);
-			_values = new List<IUniqueDef>() { dd } as IReadOnlyList<IUniqueDef>;
+			SetValues(new List<IUniqueDef>() { dd });
         }
+
+		public IUniqueDef GetIUniqueDef(int index)
+		{
+			return this[index];
+		}
 
         /// <summary>
         /// Returns either a new MidiRestDef or a new MidiChordDef

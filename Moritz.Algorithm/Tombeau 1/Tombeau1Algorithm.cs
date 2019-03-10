@@ -46,13 +46,25 @@ namespace Moritz.Algorithm.Tombeau1
             _krystals = krystals;
             _palettes = palettes;
 
-			//TrkPalette trkPallet = new TrkPalette(new List<Trk>());
+			/** begin test code **/
+			List<Trk> values = new List<Trk>();
+			for(int i = 0; i < 10; i++)
+			{
+				values.Add(new Trk(0));
+			}
+
+			TrkPalette trkPalette = new TrkPalette(values);
+
+			Trk trk1 = trkPalette.GetTrk(5, 6);
+			/** end test code **/
 
 			#region main comment (thoughts etc.)
 			/*********************************************************************************************
-			Think Nancarrow.
-            Think Bach, Brückner, Reich. Repeating/changing, fairly fast groups of chords with harmonic support... and ornaments...
-            Think Study 1: background/foreground, depth.
+			Think Nancarrow: Mechanical Piano music... outside the notation system... outside the management system...
+			Think Webern Piano Variations. Phrases, envelope counterpoint...
+			Think Study 1: background/foreground, depth.
+            Think BacH, Brückner, Reich. Repeating/changing, fairly fast groups of chords with harmonic support... and ornaments...
+            
 
 			The following parameters can be controlled using the Resident Sf2 Synth:
 			    Commands:    preset, pitchwheel
@@ -77,6 +89,8 @@ namespace Moritz.Algorithm.Tombeau1
 			** Thinking about templates and the structural levels:
 			   First create a set of Template1: Envelopes, Durations, MidiChordDefs, Trks etc. that can be
                used as the basis for similar objects in the piece. This includes MidiChordDefs created from pallets.
+			   A new TrkPalette class will be used to organize Trk relations. These relations should include Envelope
+			   relationships. Possibly also create an EnvelopePalette class...
 			   Trks in the piece may be derived fairly simply from templates, but they may also be influenced by
                their containing Seqs.
 			   How do notes/chords relate horizontally inside a trk? How do they relate vertically inside a seq?
@@ -117,7 +131,7 @@ namespace Moritz.Algorithm.Tombeau1
 
             ** The concept of InputChords is still a bit hazy. Why should they ever have more than one notehead?...
                But I can compose Tombeau 1(that doesn't have inputChords) before worrying about that...
-               Also, *annotations* that are instructions to performers (hairpins spring to mind).
+               Also, *annotations* that are instructions to performers (hairpins, accel., rit. spring to mind).
                Conventional dynamic symbols are, I think, meant for *performers*, so should only be attached to inputChords...
                The info in *outputChords* is the info that could go in a MIDI file, and vice versa.
 
