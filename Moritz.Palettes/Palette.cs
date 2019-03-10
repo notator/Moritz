@@ -10,11 +10,11 @@ using Moritz.Spec;
 
 namespace Moritz.Palettes
 {
-    public class Palette
+    public class Palette : Palette<IUniqueDef>
     {
         public Palette(PaletteForm paletteForm)
         {
-            Name = paletteForm.PaletteName;
+			Name = paletteForm.PaletteName;
 
 			BasicChordFormSettings bcfs = new BasicChordFormSettings
 			{
@@ -48,11 +48,14 @@ namespace Moritz.Palettes
                 _ornamentSettings = new OrnamentSettings(paletteForm);
             }
 
-            for(int chordIndex = 0; chordIndex < _basicChordMidiSettings.Durations.Count; ++chordIndex)
+			var vals = new List<IUniqueDef>();
+			for(int chordIndex = 0; chordIndex < _basicChordMidiSettings.Durations.Count; ++chordIndex)
             {
-                DurationDef dd = GetDurationDef(chordIndex);
-                _durationDefs.Add(dd);
+				IUniqueDef dd = GetDurationDef(chordIndex);
+                vals.Add(dd);
             }
+
+			_values = vals as IReadOnlyList<IUniqueDef>;
 
             _isPercussionPalette = paletteForm.IsPercussionPalette;
         }
@@ -97,15 +100,15 @@ namespace Moritz.Palettes
                 _ornamentSettings = new OrnamentSettings(paletteChordForm.PaletteForm);
             }
 
-            DurationDef dd = GetDurationDef(0);
-            _durationDefs.Add(dd);
+			IUniqueDef dd = GetDurationDef(0);
+			_values = new List<IUniqueDef>() { dd } as IReadOnlyList<IUniqueDef>;
         }
 
         /// <summary>
         /// Returns either a new MidiRestDef or a new MidiChordDef
         /// In both cases, MsPosition is set to zero, Lyric is set to null.
         /// </summary>
-        private DurationDef GetDurationDef(int index)
+        private IUniqueDef GetDurationDef(int index)
         {
             DurationDef rval = null;
             BasicChordMidiSettings bcms = _basicChordMidiSettings;
@@ -218,7 +221,7 @@ namespace Moritz.Palettes
                     midiChordSliderDefs,
                     basicMidiChordDefs);
             }
-            return rval;
+            return (IUniqueDef) rval;
         }
 
         private void NormalizeVelocities(List<byte> velocities)
@@ -307,27 +310,18 @@ namespace Moritz.Palettes
         private readonly List<int> _ornamentNumbers;
         private readonly List<int> _ornamentMinMsDurations;
         private readonly OrnamentSettings _ornamentSettings;
-
-        private List<DurationDef> _durationDefs = new List<DurationDef>();
-
-        private readonly bool _isPercussionPalette;
+		private readonly bool _isPercussionPalette;
         public bool IsPercussionPalette { get { return _isPercussionPalette; } }
-
-        public int Count { get { return _durationDefs.Count; } }
 
         public string Name { get; private set; }
 
-        public IUniqueDef UniqueDurationDef(int index)
-        {
-            return (IUniqueDef) _durationDefs[index].Clone();
-        }
         /// <summary>
         /// Returns a MidiChordDef if the object at index is a MidiChordDef,
         /// otherwise throws an exception.
         /// </summary>
         public MidiChordDef MidiChordDef(int index)
         {
-			if(!(_durationDefs[index].Clone() is MidiChordDef midiChordDef))
+			if(!(this[index] is MidiChordDef midiChordDef))
 			{
 				throw new ApplicationException("The indexed object was not a MidiChordDef.");
 			}
@@ -343,7 +337,7 @@ namespace Moritz.Palettes
             {
                 Debug.Assert((value > 0 && value <= this.Count), "Illegal argument: value out of range in sequence");
 
-                IUniqueDef iumdd = this.UniqueDurationDef(value - 1);
+                IUniqueDef iumdd = this[value - 1];
                 iumdd.MsPositionReFirstUD = msPositionReFirstIUD;
                 msPositionReFirstIUD += iumdd.MsDuration;
                 iuds.Add(iumdd);

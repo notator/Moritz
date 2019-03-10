@@ -20,7 +20,7 @@ namespace Moritz.Spec
     /// <para>This class is also indexable, as in:</para>
     /// <para>IUniqueDef iu = trk[index];</para>
     /// </summary>
-    public class Trk : VoiceDef
+    public class Trk : VoiceDef, ICloneable
     {
         #region constructors
         public Trk(int midiChannel, int msPositionReContainer, List<IUniqueDef> iuds)
@@ -40,7 +40,7 @@ namespace Moritz.Spec
 		/// <summary>
 		/// Returns a deep clone of this Trk.
 		/// </summary>
-		public Trk Clone()
+		public object Clone()
         {
             List<IUniqueDef> clonedIUDs = GetUniqueDefsClone();
             Trk trk = new Trk(MidiChannel, MsPositionReContainer, clonedIUDs) { Container = this.Container };

@@ -17,14 +17,14 @@ namespace Moritz.Spec
     /// VoiceDefs is used for composition. When complete, the UniqueDefs list is transferred to
     /// Voice before the definitions are converted to the objects themselves.
     ///</summary>
-    public interface IUniqueDef
+    public interface IUniqueDef : System.ICloneable
     {
         string ToString();
 
         /// <summary>
         /// Returns a deep clone (a unique object)
         /// </summary>
-        object Clone();
+        new object Clone();
 
         void AdjustMsDuration(double factor);
 

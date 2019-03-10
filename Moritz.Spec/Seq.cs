@@ -75,7 +75,7 @@ namespace Moritz.Spec
             List<Trk> trks = new List<Trk>();
             for(int i = 0; i < _trks.Count; ++i)
             {
-                trks.Add(_trks[i].Clone());
+                trks.Add((Trk)_trks[i].Clone());
             }
 
             Seq clone = new Seq(_absMsPosition, trks, MidiChannelPerOutputVoice);

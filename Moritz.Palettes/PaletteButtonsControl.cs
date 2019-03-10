@@ -240,7 +240,7 @@ namespace Moritz.Palettes
 						}
 					}
 
-					iud = palette.UniqueDurationDef(index);
+					iud = palette[index];
 
 					if(iud is MidiRestDef)
 					{

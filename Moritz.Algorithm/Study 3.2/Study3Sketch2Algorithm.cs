@@ -310,7 +310,7 @@ namespace Moritz.Algorithm.Study3Sketch2
             int bar1ChordMsSeparation = 1500;
             for(int i = 0; i < palette.Count; ++i)
             {
-                IUniqueDef durationDef = palette.UniqueDurationDef(i);
+                IUniqueDef durationDef = palette[i];
                 durationDef.MsPositionReFirstUD = msPositionReFirstIUD;
                 MidiRestDef restDef = new MidiRestDef(msPositionReFirstIUD + durationDef.MsDuration, bar1ChordMsSeparation - durationDef.MsDuration);
                 msPositionReFirstIUD += bar1ChordMsSeparation;

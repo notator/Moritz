@@ -46,6 +46,8 @@ namespace Moritz.Algorithm.Tombeau1
             _krystals = krystals;
             _palettes = palettes;
 
+			//TrkPalette trkPallet = new TrkPalette(new List<Trk>());
+
 			#region main comment (thoughts etc.)
 			/*********************************************************************************************
 			Think Nancarrow.

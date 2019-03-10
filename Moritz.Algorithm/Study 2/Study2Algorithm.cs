@@ -112,7 +112,7 @@ namespace Moritz.Algorithm.Study2
             for(int valueIndex = 0; valueIndex < originalStrandValues.Count; valueIndex++)
             {
                 int value = originalStrandValues[valueIndex];
-                IUniqueDef noteDef = palette.UniqueDurationDef(value - 1);
+                IUniqueDef noteDef = palette[value - 1];
                 noteDef.MsPositionReFirstUD = msPositionReFirstIUD;
                 msPositionReFirstIUD += noteDef.MsDuration;
                 voice.UniqueDefs.Add(noteDef);
@@ -138,7 +138,7 @@ namespace Moritz.Algorithm.Study2
                 for(int valueIndex = 0; valueIndex < lowerStaffValueSequence.Count; valueIndex++)
                 {
                     int value = lowerStaffValueSequence[valueIndex];
-                    IUniqueDef noteDef = palette.UniqueDurationDef(value - 1);
+                    IUniqueDef noteDef = palette[value - 1];
                     noteDef.MsDuration = lowerStaffMsDurations[valueIndex];
                     noteDef.MsPositionReFirstUD = currentMsPositionReFirstIUD;
                     currentMsPositionReFirstIUD += noteDef.MsDuration; 

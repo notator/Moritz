@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IPaletteFormsHostForm.cs" />
+    <Compile Include="GenericPalette.cs" />
     <Compile Include="PaletteButtonsControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
