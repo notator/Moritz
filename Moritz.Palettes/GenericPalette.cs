@@ -83,4 +83,22 @@ namespace Moritz.Palettes
 			return envelope;
 		}
 	}
+
+	public class MidiChordDefPalette : Palette<MidiChordDef>
+	{
+		public MidiChordDefPalette(List<MidiChordDef> midiChordDefs)
+		{
+			SetValues(midiChordDefs);
+		}
+
+		/// <summary>
+		/// Returns a clone of the envelope at index.
+		/// </summary>
+		public MidiChordDef GetEnvelope(int index)
+		{
+			MidiChordDef midiChordDef = GetClonedValueAt(index);
+
+			return midiChordDef;
+		}
+	}
 }
