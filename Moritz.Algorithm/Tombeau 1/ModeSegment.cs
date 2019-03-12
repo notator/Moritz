@@ -100,7 +100,7 @@ namespace Moritz.Algorithm.Tombeau1
 			Trk tempAllIUDsTrk = this.ToTrk();
 			int trkDuration = tempAllIUDsTrk.MsDuration;
 
-			Envelope timeWarpEnvClone = timeWarpPerIUDEnvelope.Clone();
+			Envelope timeWarpEnvClone = (Envelope) timeWarpPerIUDEnvelope.Clone();
 
 			timeWarpEnvClone.SetCount(tempAllIUDsTrk.Count);
 			tempAllIUDsTrk.TimeWarp(timeWarpEnvClone, distortion);
