@@ -73,8 +73,8 @@ namespace Moritz.Algorithm.Tombeau1
 			List<ModeProximity> modeProximities = RootMode.GetModeProximities();
 			List<int> modeIndices = GetModeIndices(nModeSegments, modeProximities);
 
-			BasicModeSegments = GetBasicModeSegments(tombeau1Type, modeProximities, modeIndices);
 			List<ModeSegment> modeSegments = GetBasicModeSegments(tombeau1Type, modeProximities, modeIndices);
+			BasicModeSegments = modeSegments;
 
 			TimeWarpPerIUDEnvelopePerModeSegment = GetTimeWarpPerIUDEnvelopesPerModeSegment(BasicModeSegments, centredEnvelope);
 			AbsPitchPerModeGrpTrkEnvelopePerModeSegment = GetAbsPitchPerModeGrpTrkEnvelopesPerModeSegment(BasicModeSegments, basedEnvelope);
@@ -147,7 +147,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 			List<Envelope> timeWarpEnvelopes = new List<Envelope>();
 			int domain = centredEnvelope.Domain;
-			Envelope envelopeClone = centredEnvelope.Clone();
+			Envelope envelopeClone = (Envelope) centredEnvelope.Clone();
 			envelopeClone.SetCount(nAllIUDs);
 			Debug.Assert(domain > 0); // 0 --> 1 below.
 			List<int> allValues = envelopeClone.Original;
@@ -355,7 +355,7 @@ namespace Moritz.Algorithm.Tombeau1
 				}
 				else
 				{
-					List<byte> previousPitches = ((MidiChordDef)uniqueDefs[i - 1]).BasicMidiChordDefs[0].Pitches;
+					List<byte> previousPitches = ((MidiChordDef)uniqueDefs[i - 1]).FirstBasicDurationDef.Pitches;
 					if(previousPitches.Count > 1)
 					{
 						rootNotatedPitch = previousPitches[1];

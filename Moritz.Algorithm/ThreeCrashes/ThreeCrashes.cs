@@ -486,9 +486,8 @@ namespace Moritz.Algorithm.ThreeCrashes
 
 			foreach(IUniqueDef iud in crashTrk.UniqueDefs)
 			{
-				if(iud is MidiChordDef mcd)
+				if(iud is MidiChordDef mcd && mcd.BasicDurationDefs[0] is BasicMidiChordDef bmcd)
 				{
-					BasicMidiChordDef bmcd = mcd.BasicMidiChordDefs[0];
 					byte originalVelocity = bmcd.Velocities[0];
 					byte newVelocity = (byte)Math.Round(originalVelocity * warpFactor);
 					bmcd.AdjustVelocities(originalVelocity, newVelocity);

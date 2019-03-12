@@ -7,15 +7,34 @@ using Moritz.Globals;
 
 namespace Moritz.Spec
 {
-    public class BasicMidiChordDef
-    {
-        public BasicMidiChordDef()
-        {
-        }
+	public abstract class BasicDurationDef
+	{
+		public BasicDurationDef(int msDuration)
+		{
+			//Debug.Assert(msDuration > 0, "msDuration out of range");
+			if(msDuration <= 0)
+			{
+				throw new ApplicationException("msDuration out of range");
+			}
 
+			MsDuration = msDuration;
+		}
+		public int MsDuration { get; set; }
+	}
+
+	public class BasicMidiRestDef : BasicDurationDef
+	{
+		public BasicMidiRestDef(int msDuration)
+			:base(msDuration)
+		{
+		}
+	}
+
+	public class BasicMidiChordDef : BasicDurationDef
+    {
         public BasicMidiChordDef(int msDuration, byte? bank, byte? patch, bool hasChordOff, List<byte> pitches, List<byte> velocities)
+			:base(msDuration)
         {
-            _msDuration = msDuration; // read-only!
             BankIndex = bank;
             PatchIndex = patch;
             HasChordOff = hasChordOff;
@@ -23,7 +42,6 @@ namespace Moritz.Spec
             Velocities = new List<byte>(velocities);
 
             #region check values
-            Debug.Assert(_msDuration > 0, "msDuration out of range");
             Debug.Assert(BankIndex == null || BankIndex == M.MidiValue((int)BankIndex), "Bank out of range.");
             Debug.Assert(PatchIndex == null || PatchIndex == M.MidiValue((int)PatchIndex), "Patch out of range.");
             Debug.Assert(Pitches.Count == Velocities.Count, "There must be the same number of pitches and velocities.");
@@ -46,16 +64,18 @@ namespace Moritz.Spec
         /// <param name="rootPitch">The lowest pitch</param>
         /// <param name="density">The number of pitches. The actual number created can be smaller.</param>
         public BasicMidiChordDef(int msDuration, Mode mode, int rootPitch, int density)
-        {
-            #region conditions
-            Debug.Assert(density > 0 && density <= 12);
-            Debug.Assert(rootPitch >= 0 && rootPitch <= 127);
-            Debug.Assert(msDuration > 0);
-            #endregion conditions
+			: base(msDuration)
+		{
+			#region conditions
+			//Debug.Assert(density > 0 && density <= 12);
+			//Debug.Assert(rootPitch >= 0 && rootPitch <= 127);
+			if(density < 1 || density > 12 || rootPitch < 0 || rootPitch > 127)
+			{
+				throw new ApplicationException();
+			}
+			#endregion conditions
 
-            _msDuration = msDuration; // read-only!
-
-            Pitches = mode.GetChord(rootPitch, density);
+			Pitches = mode.GetChord(rootPitch, density);
             var newVelocities = new List<byte>();
             foreach(byte pitch in Pitches) // can be less than nPitchesPerChord
             {
@@ -64,14 +84,24 @@ namespace Moritz.Spec
             Velocities = newVelocities;
         }
 
-        #region Inversion
-        /// <summary>
-        /// Creates a BasicMidiChordDef having the original base pitch,
-        /// but in which the top-bottom order of the prime intervals is reversed. 
-        /// Velocities remain in the same order, bottom to top. They are not inverted. 
-        /// </summary>
-        /// <returns></returns>
-        public BasicMidiChordDef Inversion()
+		internal void AssertConsistency()
+		{
+			//Debug.Assert(Pitches != null && Pitches.Count > 0);
+			//Debug.Assert(Velocities != null && Velocities.Count == Pitches.Count);
+			if(Pitches == null || Pitches.Count == 0 || Velocities == null || Velocities.Count != Pitches.Count)
+			{
+				throw new ApplicationException();
+			}
+		}
+
+		#region Inversion
+		/// <summary>
+		/// Creates a BasicMidiChordDef having the original base pitch,
+		/// but in which the top-bottom order of the prime intervals is reversed. 
+		/// Velocities remain in the same order, bottom to top. They are not inverted. 
+		/// </summary>
+		/// <returns></returns>
+		public BasicMidiChordDef Inversion()
         {
             List<byte> pitches = Pitches; // default if Pitches.Count == 1
 
@@ -92,7 +122,7 @@ namespace Moritz.Spec
                 }
             }
 
-            BasicMidiChordDef invertedBMCD = new BasicMidiChordDef(_msDuration, BankIndex, PatchIndex, HasChordOff, pitches, Velocities);
+            BasicMidiChordDef invertedBMCD = new BasicMidiChordDef(MsDuration, BankIndex, PatchIndex, HasChordOff, pitches, Velocities);
 
             return invertedBMCD;
         }
@@ -106,7 +136,7 @@ namespace Moritz.Spec
         public void WriteSVG(XmlWriter w, int channel, CarryMsgs carryMsgs)
         {
             w.WriteStartElement("moment");
-            w.WriteAttributeString("msDuration", _msDuration.ToString());
+            w.WriteAttributeString("msDuration", MsDuration.ToString());
 
             if(carryMsgs.Count > 0)
             {
@@ -273,9 +303,6 @@ namespace Moritz.Spec
         }
 
         public override string ToString() => $"BasicMidiChordDef: MsDuration={MsDuration.ToString()} BasePitch={Pitches[0]} ";
-
-        public int MsDuration { get { return _msDuration; } set { _msDuration = value; } }
-        private int _msDuration = 0;
 
         public List<byte> Pitches = new List<byte>();
         public List<byte> Velocities = new List<byte>();

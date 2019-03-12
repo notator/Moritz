@@ -630,8 +630,15 @@ namespace Moritz.Globals
             }
 
             int intSum = 0;
-            foreach(int i in intDivisionSizes)
-                intSum += i;
+			foreach(int i in intDivisionSizes)
+			{
+				//Debug.Assert(i >= 0);
+				if(i < 0)
+				{
+					throw new ApplicationException();
+				}
+				intSum += i;
+			}
             Debug.Assert(intSum <= total);
             if(intSum < total)
             {

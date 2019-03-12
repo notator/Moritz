@@ -128,7 +128,7 @@ namespace Moritz.Spec
 		/// </summary>
 		public bool ContainsAllPitches(MidiChordDef mcd)
         {
-            foreach(BasicMidiChordDef bmcd in mcd.BasicMidiChordDefs)
+            foreach(BasicMidiChordDef bmcd in mcd.BasicDurationDefs)
             {
                 for(int i = 0; i < bmcd.Pitches.Count; ++i)
                 {
