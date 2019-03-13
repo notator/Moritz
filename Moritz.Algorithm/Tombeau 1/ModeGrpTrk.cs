@@ -349,7 +349,8 @@ namespace Moritz.Algorithm.Tombeau1
 
             foreach(MidiChordDef mcd in MidiChordDefs)
             {
-                currentLowestPitch = (mcd.BasicMidiChordDefs[0].Pitches[0] < currentLowestPitch) ? mcd.BasicMidiChordDefs[0].Pitches[0] : currentLowestPitch;
+				int lowestPitch = mcd.FirstBasicDurationDef.Pitches[0];
+				currentLowestPitch = (lowestPitch < currentLowestPitch) ? lowestPitch : currentLowestPitch;
             }
 
             int stepsToTranspose = _mode.IndexInGamut(rootPitch) - _mode.IndexInGamut(currentLowestPitch);
@@ -410,8 +411,8 @@ namespace Moritz.Algorithm.Tombeau1
                             bmcd.Velocities.AddRange(newVelocities);
                         }
                         mcd.NotatedMidiPitches.Clear();
-                        mcd.NotatedMidiPitches.AddRange(mcd.BasicMidiChordDefs[0].Pitches);
-                        mcd.NotatedMidiVelocities = new List<byte>(mcd.BasicMidiChordDefs[0].Velocities);
+                        mcd.NotatedMidiPitches.AddRange(mcd.FirstBasicDurationDef.Pitches);
+                        mcd.NotatedMidiVelocities = new List<byte>(mcd.FirstBasicDurationDef.Velocities);
                     }
                 }
 				AssertModeGrpTrkConsistency();

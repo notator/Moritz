@@ -428,9 +428,11 @@ namespace Moritz.Symbols
         {
             get
             {
-                ChordMetrics chordMetrics = Metrics as ChordMetrics;
-                Debug.Assert(chordMetrics != null);
-                return chordMetrics;
+				if(!(Metrics is ChordMetrics chordMetrics))
+				{
+					throw new ApplicationException();
+				}
+				return chordMetrics;
             }
         }
         public Stem Stem = null; // defaults

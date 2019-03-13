@@ -1,40 +1,47 @@
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
 
-using Sanford.Multimedia.Midi;
-using Moritz.Spec;
+using System;
+using System.Collections.Generic;
+using System.Threading;
 using Moritz.Globals;
+using Moritz.Spec;
+using Sanford.Multimedia.Midi;
 
 namespace Moritz.Midi
 {
-    /// <summary>
-    /// MidiChords are used to perform MidiChordDefs defined in palettes.
-    /// </summary>
-    public class MidiChord : MidiDurationSymbol
+	/// <summary>
+	/// MidiChords are used to perform MidiChordDefs defined in palettes.
+	/// </summary>
+	public class MidiChord : MidiDurationSymbol
     {
         public MidiChord(int channel, MidiChordDef midiChordDef, OutputDevice midiOutputDevice)
             :base(channel, 0, midiChordDef.MsDuration)
         {
             _midiOutputDevice = midiOutputDevice;
 
-            List<BasicMidiChordDef> basicMidiChordDefs = midiChordDef.BasicMidiChordDefs;
-            Debug.Assert(basicMidiChordDefs.Count > 0);
-            List<int> realBasicMidiChordDurations = M.IntDivisionSizes(MsDuration, midiChordDef.BasicChordDurations);
+            List<BasicDurationDef> basicDurationDefs = midiChordDef.BasicDurationDefs;
+			//Debug.Assert(basicDurationDefs.Count > 0);
+			if(basicDurationDefs.Count < 1)
+			{
+				throw new ApplicationException();
+			}
+			List<int> realBasicMidiChordDurations = M.IntDivisionSizes(MsDuration, midiChordDef.BasicDurations);
 
             var notesToStop = new SortedSet<byte>();
             int i = 0;
-            foreach(BasicMidiChordDef basicMidiChordDef in midiChordDef.BasicMidiChordDefs)
+            foreach(BasicDurationDef basicDurationDef in midiChordDef.BasicDurationDefs)
             {
-                this._basicMidiChords.Add(new BasicMidiChord(channel, this, basicMidiChordDef, realBasicMidiChordDurations[i++]));
-                if(basicMidiChordDef.HasChordOff)
-                {
-                    foreach(byte note in basicMidiChordDef.Pitches)
-                    {
-                        if(!notesToStop.Contains(note))
-                            notesToStop.Add(note);
-                    }
-                }
+				if(basicDurationDef is BasicMidiChordDef basicMidiChordDef)
+				{
+					this._basicMidiChords.Add(new BasicMidiChord(channel, this, basicMidiChordDef, realBasicMidiChordDurations[i++]));
+					if(basicMidiChordDef.HasChordOff)
+					{
+						foreach(byte note in basicMidiChordDef.Pitches)
+						{
+							if(!notesToStop.Contains(note))
+								notesToStop.Add(note);
+						}
+					}
+				}
             }
 
             if(midiChordDef.Bank != null)
