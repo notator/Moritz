@@ -147,7 +147,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 			List<Envelope> timeWarpEnvelopes = new List<Envelope>();
 			int domain = centredEnvelope.Domain;
-			Envelope envelopeClone = (Envelope) centredEnvelope.Clone();
+			Envelope envelopeClone = (Envelope)centredEnvelope.Clone();
 			envelopeClone.SetCount(nAllIUDs);
 			Debug.Assert(domain > 0); // 0 --> 1 below.
 			List<int> allValues = envelopeClone.Original;
