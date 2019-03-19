@@ -92,9 +92,9 @@ namespace Moritz.Palettes
 		}
 
 		/// <summary>
-		/// Returns a clone of the envelope at index.
+		/// Returns a clone of the MidiChordDef at index.
 		/// </summary>
-		public MidiChordDef GetEnvelope(int index)
+		public MidiChordDef GetMidiChordDef(int index)
 		{
 			MidiChordDef midiChordDef = GetClonedValueAt(index);
 
