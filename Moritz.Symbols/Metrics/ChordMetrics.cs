@@ -724,7 +724,7 @@ namespace Moritz.Symbols
             SetExternalBoundary();
         }
 
-        private TextMetrics NewOrnamentMetrics(Graphics graphics, bool ornamentIsBelow)
+        private OrnamentMetrics NewOrnamentMetrics(Graphics graphics, bool ornamentIsBelow)
         {
 			_ornamentMetrics = null;
 
@@ -2179,7 +2179,7 @@ namespace Moritz.Symbols
         private LedgerlineBlockMetrics _upperLedgerlineBlockMetrics = null;
         private LedgerlineBlockMetrics _lowerLedgerlineBlockMetrics = null;
         private List<CautionaryBracketMetrics> _cautionaryBracketsMetrics = null;
-        private TextMetrics _ornamentMetrics = null;
+        private OrnamentMetrics _ornamentMetrics = null;
         private LyricMetrics _lyricMetrics = null;
         private DynamicMetrics _dynamicMetrics = null;
 
