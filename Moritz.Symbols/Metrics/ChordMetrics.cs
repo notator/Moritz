@@ -665,23 +665,26 @@ namespace Moritz.Symbols
             bottomBoundary += lowerBeamPadding;
 
 			// These are moved to a position relative to the outer stem tip or notehead.
-			if(_ornamentMetrics is OrnamentMetrics om)
-			{
-				// N.B. topPadding was (gap * 0.6F) for numericOrnamentMetrics (now deleted).
-				// Here it is (gap * 0.75F) to accomodate lower case characters that extend below the baseline (e.g. 'g').
-				MoveMetrics(_ornamentMetrics, om.IsBelow, ref topBoundary, (gap * 0.75F), ref bottomBoundary, (gap * 0.4F));
-			}
+			if(_ornamentMetrics != null)
+				MoveOrnamentMetrics(gap, ref topBoundary, ref bottomBoundary);
 			if(_lyricMetrics != null)
-                MoveLyricMetrics(gap, ref topBoundary, ref bottomBoundary);
-            if(_dynamicMetrics != null)
+				MoveLyricMetrics(gap, ref topBoundary, ref bottomBoundary);
+			if(_dynamicMetrics != null)
                 MoveDynamicMetrics(gap, ref topBoundary, ref bottomBoundary);
         }
 
-        /// <summary>
-        /// Moves the lyric to its correct position wrt the topBoundary or bottomBoundary.
-        /// Does nothing if lyricMetrics is null.
-        /// </summary>
-        private void MoveLyricMetrics(float gap, ref float topBoundary, ref float bottomBoundary)
+		private void MoveOrnamentMetrics(float gap, ref float topBoundary, ref float bottomBoundary)
+		{
+			// N.B. topPadding was (gap * 0.6F) for numericOrnamentMetrics (now deleted).
+			// Here it is (gap * 0.8F) to accomodate lower case characters that extend below the baseline (e.g. 'g').
+			MoveMetrics(_ornamentMetrics, _ornamentMetrics.IsBelow, ref topBoundary, (gap * 0.8F), ref bottomBoundary, (gap * 0.4F));
+		}
+
+		/// <summary>
+		/// Moves the lyric to its correct position wrt the topBoundary or bottomBoundary.
+		/// Does nothing if lyricMetrics is null.
+		/// </summary>
+		private void MoveLyricMetrics(float gap, ref float topBoundary, ref float bottomBoundary)
         {
             MoveMetrics(_lyricMetrics, _lyricMetrics.IsBelow, ref topBoundary, (gap * 0.6F), ref bottomBoundary, (gap * 0.4F));
         }
@@ -705,7 +708,7 @@ namespace Moritz.Symbols
         }
         /// <summary>
         /// If isBelow, metrics.Top is moved to bottomBoundary + bottomPadding and bottomBoundary is then set to metrics.Bottom
-        /// otherwise metrics.Bottom is moved to topBoundary - topPadding ans topBoundary is then set to metrics.Top.
+        /// otherwise metrics.Bottom is moved to topBoundary - topPadding and topBoundary is then set to metrics.Top.
         /// Does nothing if metrics is null.
         /// </summary>
         private void MoveMetrics(Metrics metrics, bool isBelow,
