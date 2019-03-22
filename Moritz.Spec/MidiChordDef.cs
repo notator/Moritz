@@ -44,7 +44,7 @@ namespace Moritz.Spec
             HasChordOff = hasChordOff;
             MinimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 
-            OrnamentID = null;
+            OrnamentText = null;
 
             MidiChordSliderDefs = null;
 
@@ -75,7 +75,7 @@ namespace Moritz.Spec
         /// <param name="rootNotatedPitch">The lowest notated pitch. Also the lowest pitch of BasicMidiChordDefs[0].</param>
         /// <param name="nPitchesPerChord">The chord density (some chords may have less pitches).</param>
         /// <param name="ornamentEnvelope">The ornament definition.</param>
-        public MidiChordDef(int msDuration, Mode mode, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null, string ornamentID = null)
+        public MidiChordDef(int msDuration, Mode mode, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null, string ornamentText = null)
             : base(msDuration) 
         {
             NotatedMidiPitches = mode.GetChord(rootNotatedPitch, nPitchesPerChord);
@@ -87,7 +87,7 @@ namespace Moritz.Spec
             NotatedMidiVelocities = nmVelocities;
 
             // Sets BasicMidiChords. If ornamentEnvelope == null, BasicMidiChords[0] is set to the NotatedMidiChord.
-            SetOrnament(mode, ornamentEnvelope, ornamentID);
+            SetOrnament(mode, ornamentEnvelope, ornamentText);
 
 			AssertConsistency(this);
 		}
@@ -103,7 +103,7 @@ namespace Moritz.Spec
 			bool hasChordOff, // default is M.DefaultHasChordOff (=true)
             List<byte> rootMidiPitches, // the pitches defined in the root chord settings (displayed, by default, in the score).
             List<byte> rootMidiVelocities, // the velocities defined in the root chord settings (displayed, by default, in the score).
-            int ornamentIDNumber, // the number used to identify the ornament (to the right of the tilde). 0 means that there is no ornament
+            int ornamentNumber, // the number used to identify the ornament (to the right of the tilde). 0 means that there is no ornament
             MidiChordSliderDefs midiChordSliderDefs, // can be null or contain empty lists
             List<BasicMidiChordDef> basicMidiChordDefs)
             : base(msDuration)
@@ -120,9 +120,9 @@ namespace Moritz.Spec
             _notatedMidiPitches = rootMidiPitches;
             _notatedMidiVelocities = rootMidiVelocities;
 
-			if(ornamentIDNumber > 0)
+			if(ornamentNumber > 0)
 			{
-				OrnamentID = ornamentIDNumber.ToString();
+				OrnamentText = ornamentNumber.ToString();
 			}
 
             MidiChordSliderDefs = midiChordSliderDefs;
@@ -145,8 +145,8 @@ namespace Moritz.Spec
 		/// </summary>
 		/// <param name="msDuration">The duration of the returned MidiChordDef</param>
 		/// <param name="iUniqueDefs">See function summary.</param>
-		/// <param name="ornamentID">Usually a single character. Will be appended to a tilde, and added (usually above) to the chord symbol.</param>
-		public MidiChordDef(int msDuration, List<IUniqueDef> iUniqueDefs, string ornamentID)
+		/// <param name="ornamentText">Usually a single character. Will be appended to a tilde, and added (usually above) to the chord symbol.</param>
+		public MidiChordDef(int msDuration, List<IUniqueDef> iUniqueDefs, string ornamentText)
 			:base(msDuration)
 		{
 			if(!(iUniqueDefs[0] is MidiChordDef))
@@ -162,7 +162,7 @@ namespace Moritz.Spec
 			_notatedMidiPitches = new List<byte>(mcd0.NotatedMidiPitches);
 			_notatedMidiVelocities = new List<byte>(mcd0.NotatedMidiVelocities);
 
-			this.OrnamentID = ornamentID; // usually a single character. Will be appended to a tilde, and added to the chord symbol - usually above.
+			this.OrnamentText = ornamentText; // usually a single character. Will be appended to a tilde, and added to the chord symbol - usually above.
 
 			MidiChordSliderDefs mcsd = mcd0.MidiChordSliderDefs;
 			if(mcsd != null)
@@ -252,7 +252,7 @@ namespace Moritz.Spec
 				NotatedMidiVelocities = _notatedMidiVelocities, // a clone of the displayed notehead velocities
 
 				// rval.MidiVelocity must be set after setting BasicMidiChordDefs See below.
-				OrnamentID = this.OrnamentID, // the displayed ornament ID (without the tilde)
+				OrnamentText = this.OrnamentText, // the displayed ornament Text (without the tilde)
 
 				MidiChordSliderDefs = null
 			};
@@ -482,13 +482,13 @@ namespace Moritz.Spec
 		/// <param name="mode"></param>
 		/// <param name="ornamentShape"></param>
 		/// <param name="nOrnamentChords"></param>
-		/// <param name="ornamentID">The string that will follow the tilde. Cannot be null or empty.</param>
-		public void SetOrnament(Mode mode, IReadOnlyList<byte> ornamentShape, int nOrnamentChords, string ornamentID)
+		/// <param name="ornamentText">The string that will follow the tilde. Cannot be null or empty.</param>
+		public void SetOrnament(Mode mode, IReadOnlyList<byte> ornamentShape, int nOrnamentChords, string ornamentText)
         {
-			Debug.Assert(!String.IsNullOrEmpty(ornamentID));
+			Debug.Assert(!String.IsNullOrEmpty(ornamentText));
             int nPitchesPerOctave = mode.NPitchesPerOctave;
 			Envelope ornamentEnvelope = new Envelope(new List<byte>(ornamentShape), 127, nPitchesPerOctave, nOrnamentChords);
-            SetOrnament(mode, ornamentEnvelope, ornamentID);
+            SetOrnament(mode, ornamentEnvelope, ornamentText);
         }
 
         /// <summary>
@@ -497,14 +497,14 @@ namespace Moritz.Spec
         /// If ornamentEnvelope == null, BasicMidiChords[0] is set to the NotatedMidiChord using the NotatedMidiPitches as the first chord.
         /// Uses the current Mode.
         /// Replaces any existing ornament.
-        /// Sets OrnamentID to ornamentID, but note that OrnamentID is a public string attribute, that can be set at any time
+        /// Sets OrnamentText to ornamentText. Note that OrnamentText is a property that has a private setter.
 		/// (usually to a single character).
         /// </summary>
         /// <param name="ornamentEnvelope"></param>
-        public void SetOrnament(Mode mode, Envelope ornamentEnvelope = null, string ornamentID = null)
+        public void SetOrnament(Mode mode, Envelope ornamentEnvelope = null, string ornamentText = null)
         {
             Debug.Assert(mode != null);
-			Debug.Assert((ornamentEnvelope == null && ornamentID == null) || (ornamentEnvelope != null && ornamentID != null));
+			Debug.Assert((ornamentEnvelope == null && ornamentText == null) || (ornamentEnvelope != null && ornamentText != null));
 
             List<int> basicMidiChordRootPitches = mode.PitchSequence(_notatedMidiPitches[0], ornamentEnvelope);
             // If ornamentEnvelope is null, basicMidiChordRootPitches will only contain rootNotatedpitch.
@@ -519,7 +519,7 @@ namespace Moritz.Spec
 
             if(basicMidiChordRootPitches.Count > 1)
             {
-                OrnamentID = ornamentID;
+                OrnamentText = ornamentText;
             }
         }
 
@@ -1425,8 +1425,10 @@ namespace Moritz.Spec
         }
         private List<byte> _notatedMidiVelocities = null;
 
-		public string OrnamentID { get; private set; } = null;
-
+		/// <summary>
+		/// If not null, this string is printed after a tilde, above or below the chord.
+		/// </summary>
+		public string OrnamentText { get; private set; } = null;
 
 		public MidiChordSliderDefs MidiChordSliderDefs = null;
         public List<BasicDurationDef> BasicDurationDefs = new List<BasicDurationDef>();

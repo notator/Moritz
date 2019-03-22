@@ -193,7 +193,7 @@ namespace Moritz.Algorithm.Tombeau1
                 SIMPLE MidiChordDefs (containing a single BasicMidiChordDef):
                     MidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff)
                 ORNAMENTS
-                    MidiChordDef(int msDuration, Mode mode, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null, string ornamentID = null)    
+                    MidiChordDef(int msDuration, Mode mode, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null, string ornamentText = null)    
                 PALETTE MidiChordDefs (MidiChordDefs created from palettes):    
                     MidiChordDef(int msDuration, byte pitchWheelDeviation, bool hasChordOff, List<byte> rootMidiPitches, List<byte> rootMidiVelocities, int ornamentNumberSymbol, MidiChordSliderDefs midiChordSliderDefs, List<BasicMidiChordDef> basicMidiChordDefs)
                     

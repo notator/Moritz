@@ -675,9 +675,10 @@ namespace Moritz.Symbols
 
 		private void MoveOrnamentMetrics(float gap, ref float topBoundary, ref float bottomBoundary)
 		{
-			// N.B. topPadding was (gap * 0.6F) for numericOrnamentMetrics (now deleted).
-			// Here it is (gap * 0.8F) to accomodate lower case characters that extend below the baseline (e.g. 'g').
-			MoveMetrics(_ornamentMetrics, _ornamentMetrics.IsBelow, ref topBoundary, (gap * 0.8F), ref bottomBoundary, (gap * 0.4F));
+			// N.B. topPadding was (gap * 0.6F) bottomPadding was (gap * 0.4F).
+			// These have both been increased, to (gap * 0.75F) and (gap * 0.55F).
+			// (The topPadding has to be big enough to accomodate lower case characters that extend below the baseline (e.g. 'g').)
+			MoveMetrics(_ornamentMetrics, _ornamentMetrics.IsBelow, ref topBoundary, (gap * 0.75F), ref bottomBoundary, (gap * 0.55F));
 		}
 
 		/// <summary>

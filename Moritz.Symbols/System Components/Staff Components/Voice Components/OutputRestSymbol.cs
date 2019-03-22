@@ -11,8 +11,8 @@ namespace Moritz.Symbols
 {
     internal class OutputRestSymbol : RestSymbol
 	{
-        public OutputRestSymbol(Voice voice, IUniqueDef iumdd, int absMsPosition, int minimumCrotchetDurationMS, float fontHeight)
-            : base(voice, iumdd, absMsPosition, minimumCrotchetDurationMS, fontHeight)
+        public OutputRestSymbol(Voice voice, IUniqueDef iumdd, int absMsPosition, PageFormat pageFormat)
+			: base(voice, iumdd, absMsPosition, pageFormat.MinimumCrotchetDuration, pageFormat.MusicFontHeight)
         {
             if(iumdd is MidiRestDef mrd)
             {

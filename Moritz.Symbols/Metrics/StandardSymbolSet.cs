@@ -592,7 +592,7 @@ namespace Moritz.Symbols
         }
 
         public override NoteObject GetNoteObject(Voice voice, int absMsPosition, IUniqueDef iud, int iudIndex,
-            ref byte currentVelocity, float musicFontHeight)
+            ref byte currentVelocity, PageFormat pageFormat)
         {
             NoteObject noteObject = null;
             CautionaryChordDef cautionaryChordDef = iud as CautionaryChordDef;
@@ -602,18 +602,14 @@ namespace Moritz.Symbols
             InputRestDef inputRestDef = iud as InputRestDef;
             ClefDef clefDef = iud as ClefDef;
 
-            PageFormat pageFormat = voice.Staff.SVGSystem.Score.PageFormat;
-            float cautionaryFontHeight = pageFormat.MusicFontHeight * pageFormat.SmallSizeFactor;
-            int minimumCrotchetDuration = pageFormat.MinimumCrotchetDuration;
- 
-            if(cautionaryChordDef != null && iudIndex == 1)
+			if(cautionaryChordDef != null && iudIndex == 1)
             {
-                CautionaryChordSymbol cautionaryChordSymbol = new CautionaryChordSymbol(voice, cautionaryChordDef, absMsPosition, cautionaryFontHeight);
+				CautionaryChordSymbol cautionaryChordSymbol = new CautionaryChordSymbol(voice, cautionaryChordDef, absMsPosition, pageFormat);
                 noteObject = cautionaryChordSymbol;
             }                
             else if(midiChordDef != null)
             {
-                OutputChordSymbol outputChordSymbol = new OutputChordSymbol(voice, midiChordDef, absMsPosition, minimumCrotchetDuration, musicFontHeight);
+                OutputChordSymbol outputChordSymbol = new OutputChordSymbol(voice, midiChordDef, absMsPosition, pageFormat);
 
                 if(this._coloredVelocities == true)
                 {
@@ -628,29 +624,29 @@ namespace Moritz.Symbols
             }
             else if(midiRestDef != null || cautionaryChordDef != null)
             {
-                OutputRestSymbol outputRestSymbol = new OutputRestSymbol(voice, iud, absMsPosition, minimumCrotchetDuration, musicFontHeight);
+                OutputRestSymbol outputRestSymbol = new OutputRestSymbol(voice, iud, absMsPosition, pageFormat);
                 noteObject = outputRestSymbol;
             }
             else if(inputChordDef != null)
             {
-                InputChordSymbol inputChordSymbol = new InputChordSymbol(voice, inputChordDef, absMsPosition, minimumCrotchetDuration, musicFontHeight);
-                noteObject = inputChordSymbol;
+				InputChordSymbol inputChordSymbol = new InputChordSymbol(voice, inputChordDef, absMsPosition, pageFormat);
+				noteObject = inputChordSymbol;
             }
             else if(inputRestDef != null)
             {
-                InputRestSymbol inputRestSymbol = new InputRestSymbol(voice, inputRestDef, absMsPosition, minimumCrotchetDuration, musicFontHeight);
+                InputRestSymbol inputRestSymbol = new InputRestSymbol(voice, inputRestDef, absMsPosition, pageFormat);
                 noteObject = inputRestSymbol;
             }
             else if(clefDef != null)
             {
 				if (iudIndex == 0)
 				{
-					Clef clef = new Clef(voice, clefDef.ClefType, musicFontHeight);
+					Clef clef = new Clef(voice, clefDef.ClefType, pageFormat.MusicFontHeight);
 					noteObject = clef;
 				}
 				else
-				{
-					SmallClef smallClef = new SmallClef(voice, clefDef.ClefType, absMsPosition, cautionaryFontHeight);
+				{ 
+					SmallClef smallClef = new SmallClef(voice, clefDef.ClefType, absMsPosition, pageFormat);
 					noteObject = smallClef;
 				}
             }

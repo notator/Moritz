@@ -11,8 +11,8 @@ namespace Moritz.Symbols
 {
     public class InputChordSymbol : ChordSymbol
     {
-        public InputChordSymbol(Voice voice, InputChordDef umcd, int absMsPosition, int minimumCrotchetDurationMS, float fontSize)
-            : base(voice, umcd.MsDuration, absMsPosition, minimumCrotchetDurationMS, fontSize, umcd.BeamContinues)
+        public InputChordSymbol(Voice voice, InputChordDef umcd, int absMsPosition, PageFormat pageFormat)
+            : base(voice, umcd.MsDuration, absMsPosition, pageFormat.MinimumCrotchetDuration, pageFormat.MusicFontHeight * pageFormat.InputSizeFactor, umcd.BeamContinues)
         {
             _inputChordDef = umcd;
 

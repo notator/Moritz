@@ -53,24 +53,47 @@ namespace Moritz.Symbols
 		protected string _clefType;
 	}
 
-    /// <summary>
-    /// A SmallClef is a small clef symbol placed anywhere on a staff except at the beginning.
-    /// </summary>
-    public class SmallClef : Clef
-    {
-        public SmallClef(Voice voice, string clefType, int absMsPosition, float fontHeight)
-            : base(voice, clefType, fontHeight)
-        {
-            _absMsPosition = absMsPosition;
-            _isVisible = true;
-        }
+	/// <summary>
+	/// A SmallClef is a small clef symbol placed anywhere on a staff except at the beginning.
+	/// </summary>
+	public class SmallClef : Clef
+	{
+		public SmallClef(Voice voice, string clefType, int absMsPosition, PageFormat pageFormat)
+			: base(voice, clefType, pageFormat.MusicFontHeight * pageFormat.SmallSizeFactor)
+		{
+			_absMsPosition = absMsPosition;
+			_isVisible = true;
+		}
 
 		public override string ToString() => "SmallClef: " + _clefType + " absMsPos=" + _absMsPosition;
 
 		public int AbsMsPosition { get { return _absMsPosition; } }
-        private readonly int _absMsPosition;
+		private readonly int _absMsPosition;
 
-        public bool IsVisible { get { return _isVisible; } set { _isVisible = value; } }
-        private bool _isVisible;
-    }
+		public bool IsVisible { get { return _isVisible; } set { _isVisible = value; } }
+		private bool _isVisible;
+	}
+
+
+	/// <summary>
+	/// An InvisibleSmallClef is a small, invisible clef symbol in the lower voice on a staff,
+	/// at an absMsPosition of an ordinary SmallClef in the top voice.
+	/// </summary>
+	public class InvisibleSmallClef : Clef
+	{
+		public InvisibleSmallClef(Voice voice, string clefType, int absMsPosition)
+			: base(voice, clefType, 0.01F)
+		{
+			_absMsPosition = absMsPosition;
+			_isVisible = true;
+		}
+
+		public override string ToString() => "InvisibleSmallClef: " + _clefType + " absMsPos=" + _absMsPosition;
+
+		public int AbsMsPosition { get { return _absMsPosition; } }
+		private readonly int _absMsPosition;
+
+		public bool IsVisible { get { return _isVisible; } set { _isVisible = value; } }
+		private bool _isVisible;
+	}
 }

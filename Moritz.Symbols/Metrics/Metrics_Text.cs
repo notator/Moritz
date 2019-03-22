@@ -134,12 +134,6 @@ namespace Moritz.Symbols
 		public OrnamentMetrics(Graphics graphics, TextInfo textInfo, bool isBelow)
 			: base(CSSObjectClass.ornament, graphics, textInfo)
 		{
-			float width = _right - _left;
-			float newWidth = width * 0.5F;
-			float widthMargin = (width - newWidth) / 2.0F;
-			_left += widthMargin;
-			_right -= widthMargin;
-
 			IsBelow = isBelow;
 		}
 		public object Clone()

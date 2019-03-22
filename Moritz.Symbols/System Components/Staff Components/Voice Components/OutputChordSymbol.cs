@@ -10,8 +10,8 @@ namespace Moritz.Symbols
 {
     public class OutputChordSymbol : ChordSymbol
     {
-        public OutputChordSymbol(Voice voice, MidiChordDef umcd, int absMsPosition, int minimumCrotchetDurationMS, float fontSize)
-            : base(voice, umcd.MsDuration, absMsPosition, minimumCrotchetDurationMS, fontSize, umcd.BeamContinues)
+        public OutputChordSymbol(Voice voice, MidiChordDef umcd, int absMsPosition, PageFormat pageFormat)
+            : base(voice, umcd.MsDuration, absMsPosition, pageFormat.MinimumCrotchetDuration, pageFormat.MusicFontHeight, umcd.BeamContinues)
         {
             _midiChordDef = umcd;
 
@@ -19,11 +19,11 @@ namespace Moritz.Symbols
 
             SetNoteheadPitchesAndVelocities(umcd.NotatedMidiPitches, umcd.NotatedMidiVelocities);
 
-            if(! String.IsNullOrEmpty(umcd.OrnamentID))
+            if(! String.IsNullOrEmpty(umcd.OrnamentText))
             {
-				// if umcd.OrnamentID is null or empty, there will be no ornamentString DrawObject
-				string ornamentString = "~" + umcd.OrnamentID;   
-				OrnamentText ornamentText = new OrnamentText(this, ornamentString, FontHeight * 2.0F); // The fontHeight argument is actually never used!
+				// if umcd.OrnamentText is null or empty, there will be no ornamentString DrawObject
+				string ornamentString = String.Concat('~', umcd.OrnamentText);   
+				OrnamentText ornamentText = new OrnamentText(this, ornamentString, pageFormat.OrnamentFontHeight);
 				DrawObjects.Add(ornamentText);
             }
 

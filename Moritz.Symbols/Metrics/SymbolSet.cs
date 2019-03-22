@@ -15,7 +15,7 @@ namespace Moritz.Symbols
         public abstract void WriteSymbolDefinitions(SvgWriter w, PageFormat pageFormat);
         public abstract Metrics NoteObjectMetrics(Graphics graphics, NoteObject noteObject, VerticalDir voiceStemDirection, float gap, PageFormat pageFormat);
         public abstract NoteObject GetNoteObject(Voice voice, int absMsPosition, IUniqueDef iud, int iudIndexInVoice,
-            ref byte currentVelocity, float musicFontHeight);
+            ref byte currentVelocity, PageFormat pageformat);
 
         /// <summary>
         /// In the StandardSymbolSet, this adjusts the vertical positions of synchronous rests in two-voice staves

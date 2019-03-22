@@ -63,7 +63,6 @@ namespace Moritz.Symbols
                     {
                         Voice voice = staff.Voices[voiceIndex];
                         voice.VoiceDef.AgglomerateRests();
-                        float musicFontHeight = (voice is OutputVoice) ? _pageFormat.MusicFontHeight : _pageFormat.MusicFontHeight * _pageFormat.InputSizeFactor;
 
                         if (staff is InputStaff)
                         {
@@ -84,7 +83,7 @@ namespace Moritz.Symbols
                             int absMsPosition = systemAbsMsPos + msPositionReVoiceDef;
 
                             NoteObject noteObject =
-                                SymbolSet.GetNoteObject(voice, absMsPosition, iud, iudIndex, ref currentChannelVelocities[staffIndex], musicFontHeight);
+                                SymbolSet.GetNoteObject(voice, absMsPosition, iud, iudIndex, ref currentChannelVelocities[staffIndex], _pageFormat);
 
 							if(noteObject is SmallClef smallClef)
 							{
@@ -133,7 +132,7 @@ namespace Moritz.Symbols
 		{
 			foreach(SmallClef smallClef in clefsInTopStaff)
 			{
-				SmallClef invisibleSmallClef = new SmallClef(voice, smallClef.ClefType, smallClef.AbsMsPosition, 0.01F)
+				InvisibleSmallClef invisibleSmallClef = new InvisibleSmallClef(voice, smallClef.ClefType, smallClef.AbsMsPosition)
 				{
 					IsVisible = false
 				};
@@ -141,7 +140,7 @@ namespace Moritz.Symbols
 			}
 		}
 
-        private void InsertInvisibleClefChangeInNoteObjects(Voice voice, SmallClef invisibleSmallClef)
+        private void InsertInvisibleClefChangeInNoteObjects(Voice voice, InvisibleSmallClef invisibleSmallClef)
         {
             int absMsPos = invisibleSmallClef.AbsMsPosition;
             List<DurationSymbol> durationSymbols = new List<DurationSymbol>();
@@ -172,7 +171,7 @@ namespace Moritz.Symbols
             }
         }
 
-        private void InsertBeforeDS(List<NoteObject> noteObjects, DurationSymbol insertBeforeDS, SmallClef invisibleSmallClef)
+        private void InsertBeforeDS(List<NoteObject> noteObjects, DurationSymbol insertBeforeDS, InvisibleSmallClef invisibleSmallClef)
         {
             for(int i = 0; i < noteObjects.Count; ++i)
             {

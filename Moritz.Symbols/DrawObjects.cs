@@ -249,10 +249,8 @@ namespace Moritz.Symbols
 
 	internal class OrnamentText : Text
 	{
-		// N.B. The chordFontHeight argument is not actually used to display the text.
-		// The PageFormat.OrnamentFontHeight value is used instead.
-		public OrnamentText(object container, string text, float chordFontHeight)
-			: base(container, text, "Open Sans Condensed", chordFontHeight * 0.55F, TextHorizAlign.center)
+		public OrnamentText(object container, string text, float ornamentFontHeight)
+			: base(container, text, "Open Sans Condensed", ornamentFontHeight, TextHorizAlign.center)
 		{
 		}
 

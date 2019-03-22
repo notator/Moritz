@@ -10,8 +10,8 @@ namespace Moritz.Symbols
 {
 	internal class InputRestSymbol : RestSymbol
 	{
-        public InputRestSymbol(Voice voice, IUniqueDef iumdd, int absMsPosition, int minimumCrotchetDurationMS, float fontHeight)
-            : base(voice, iumdd, absMsPosition, minimumCrotchetDurationMS, fontHeight)
+        public InputRestSymbol(Voice voice, IUniqueDef iumdd, int absMsPosition, PageFormat pageFormat)
+            : base(voice, iumdd, absMsPosition, pageFormat.MinimumCrotchetDuration, pageFormat.MusicFontHeight * pageFormat.InputSizeFactor)
         {
             if(iumdd is CautionaryChordDef)
             {
