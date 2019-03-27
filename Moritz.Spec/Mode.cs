@@ -38,63 +38,6 @@ namespace Moritz.Spec
             BasePitch = basePitch;
             NPitchesPerOctave = nPitchesPerOctave;
         }
-
-		/// <summary>
-		/// Returns 264 ModeProximity objects containing all the possible Modes
-		/// with their proximities to this Mode. The returned list is sorted by proximity.
-		/// </summary>
-		/// <returns></returns>
-		public List<ModeProximity> GetModeProximities()
-		{
-			var rval = new List<ModeProximity>();
-
-			for(int modeRPHIndex = 0; modeRPHIndex < Mode.RelativePitchHierarchiesCount; ++modeRPHIndex)
-			{
-				for(int modeRPHBasePitch = 0; modeRPHBasePitch < 12; ++modeRPHBasePitch)
-				{
-					Mode mode2 = new Mode(modeRPHIndex, modeRPHBasePitch, this.NPitchesPerOctave);
-					ModeProximity modeProximity = GetModeProximity(mode2);
-					rval.Add(modeProximity);
-				}
-			}
-
-			for(int i = 0; i < rval.Count; ++i)
-			{
-				rval.Sort((a, b) => a.Proximity.CompareTo(b.Proximity));
-			}
-
-			return rval;
-		}
-
-		private ModeProximity GetModeProximity(Mode otherMode)
-		{
-			Debug.Assert(this.NPitchesPerOctave == otherMode.NPitchesPerOctave);
-
-			int proximity = GetProximity(otherMode);
-			ModeProximity rval = new ModeProximity(otherMode, proximity);
-
-			return rval;
-		}
-
-		private int GetProximity(Mode otherMode)
-		{
-			int proximity = 0;
-			var thisAbsolutePitchHierarchy = new List<int>(this.AbsolutePitchHierarchy);
-			var otherAbsolutePitchHierarchy = new List<int>(otherMode.AbsolutePitchHierarchy);
-			// N.B. test ALL pitches in the hierarchies, not just the first NPitchesPerOctave in thisAbsolutePitchHierarchy.
-			for(int index1 = 0; index1 < 12; ++index1)
-			{
-				int pitch = thisAbsolutePitchHierarchy[index1];
-				int index2 = otherAbsolutePitchHierarchy.FindIndex(a => a == pitch);
-				int minIndex = (index1 <= index2) ? index1 : index2;
-				int maxIndex = (index1 > index2) ? index1 : index2;
-
-				int p = (maxIndex - minIndex + 1) * (minIndex + maxIndex);
-
-				proximity += p;
-			}
-			return proximity;
-		}
 		#endregion constructors
 
 		#region public functions
@@ -423,6 +366,33 @@ namespace Moritz.Spec
 			return rval;
 		}
 
+		/// <summary>
+		/// Returns 264 ModeProximity objects containing all the possible Modes
+		/// with their proximities to this Mode. The returned list is sorted by proximity.
+		/// </summary>
+		/// <returns></returns>
+		public List<ModeProximity> GetModeProximities()
+		{
+			var rval = new List<ModeProximity>();
+
+			for(int modeRPHIndex = 0; modeRPHIndex < Mode.RelativePitchHierarchiesCount; ++modeRPHIndex)
+			{
+				for(int modeRPHBasePitch = 0; modeRPHBasePitch < 12; ++modeRPHBasePitch)
+				{
+					Mode mode2 = new Mode(modeRPHIndex, modeRPHBasePitch, this.NPitchesPerOctave);
+					ModeProximity modeProximity = GetModeProximity(mode2);
+					rval.Add(modeProximity);
+				}
+			}
+
+			for(int i = 0; i < rval.Count; ++i)
+			{
+				rval.Sort((a, b) => a.Proximity.CompareTo(b.Proximity));
+			}
+
+			return rval;
+		}
+
 		public override string ToString()
 		{
 			const string nums = "0123456789AB";
@@ -527,6 +497,36 @@ namespace Moritz.Spec
 		#endregion public properties
 
 		#region private helper functions
+		private ModeProximity GetModeProximity(Mode otherMode)
+		{
+			Debug.Assert(this.NPitchesPerOctave == otherMode.NPitchesPerOctave);
+
+			int proximity = GetProximity(otherMode);
+			ModeProximity rval = new ModeProximity(otherMode, proximity);
+
+			return rval;
+		}
+
+		private int GetProximity(Mode otherMode)
+		{
+			int proximity = 0;
+			var thisAbsolutePitchHierarchy = new List<int>(this.AbsolutePitchHierarchy);
+			var otherAbsolutePitchHierarchy = new List<int>(otherMode.AbsolutePitchHierarchy);
+			// N.B. test ALL pitches in the hierarchies, not just the first NPitchesPerOctave in thisAbsolutePitchHierarchy.
+			for(int index1 = 0; index1 < 12; ++index1)
+			{
+				int pitch = thisAbsolutePitchHierarchy[index1];
+				int index2 = otherAbsolutePitchHierarchy.FindIndex(a => a == pitch);
+				int minIndex = (index1 <= index2) ? index1 : index2;
+				int maxIndex = (index1 > index2) ? index1 : index2;
+
+				int p = (maxIndex - minIndex + 1) * (minIndex + maxIndex);
+
+				proximity += p;
+			}
+			return proximity;
+		}
+
 		/// <summary>
 		/// A pitchHierarchy.Count must be 12.
 		/// Each value must be in range [0..11] and occur only once (no duplicates).
