@@ -682,4 +682,221 @@ namespace Moritz.Spec
 
         #endregion Pitch Hierarchies
     }
+
+	/// <summary>
+	/// This class implements the "pitch class set" defined by Allen Forte in "The Structure of Atonal Music".
+	/// In that book, a "pitch class set" must contain between 3 and 9 pitch classes.
+	/// </summary>
+	public abstract class PitchClassSet
+	{
+		/// <summary>
+		/// A PitchClassSet contains a protected UnorderedPitchClasses attribute, which is constructed as follows:
+		/// 1. The argument is cloned.
+		/// 2. All the ints in the clone are set to their equivalents in mod 12.
+		/// 3. All the ints that are duplicates of previous ints are removed.
+		/// 4. The result is asigned to the UnorderedPitchClasses attribute.
+		/// 5. An exception is thrown if the result contains less than 3 or more than 9 pitch classes.
+		/// </summary>
+		/// <param name="pitches">Any number of unordered, unrestricted integers. These will be reduced to an unordered list of unique pitch classes in range [0..11].</param>
+		public PitchClassSet(List<int> pitches)
+		{
+			var clone = new List<int>(pitches);
+			for(int i = 0; i < clone.Count; ++i)
+			{
+				clone[i] %= 12;
+			}
+			var pitchClasses = new List<int>();
+			foreach(int val in clone)
+			{
+				if(!pitchClasses.Contains(val))
+				{
+					pitchClasses.Add(val);
+				}
+			}
+
+			UnorderedPitchClasses = pitchClasses;
+		}
+
+		/// <summary>
+		/// An unordered list of between 3 and 9 unique pitch classes (in range [0..11])
+		/// </summary>
+		protected IReadOnlyList<int> UnorderedPitchClasses
+		{
+			get { return _unorderedPitchClasses; }
+			private set
+			{
+				var pitchClasses = value;
+				#region assertions
+				if(pitchClasses.Count < 3 || pitchClasses.Count > 9)
+				{
+					throw new ApplicationException("According to Allen Forte, a pitch class set must contain between 3 and 9 pitch classes.");
+				}
+				foreach(int pitch in pitchClasses)
+				{
+					if(pitch < 0 || pitch > 11)
+					{
+						throw new ApplicationException();
+					}
+				}
+				// Test uniqueness
+				for(int i = 1; i < pitchClasses.Count; ++i)
+				{
+					int pitch1 = pitchClasses[i - 1];
+					for(int j = i; j < pitchClasses.Count; ++j)
+					{
+						if(pitch1 == pitchClasses[j])
+						{
+							throw new ApplicationException();
+						}
+					}
+				}
+				#endregion
+				_unorderedPitchClasses = value;
+			}
+		}
+		private IReadOnlyList<int> _unorderedPitchClasses;
+		 
+	}
+
+	public class OrderedPCSet : PitchClassSet
+	{
+		/// <param name="pitches">Any number of unordered, unrestricted integers. These will first be reduced to an unordered list of unique pitch classes in range [0..11].</param>
+		public OrderedPCSet(List<int> pitches)
+			: base(pitches)
+		{
+			NormalForm = GetNormalForm(UnorderedPitchClasses);
+		}
+
+		/// <summary>
+		/// See "The Structure of Atonal Music" page 4.
+		/// </summary>
+		/// <param name="unorderedPitchClasses">An unordered list of between 3 and 9 unique pitch classes in range [0..11]</param>
+		/// <returns></returns>
+		private IReadOnlyList<int> GetNormalForm(IReadOnlyList<int> unorderedPitchClasses)
+		{
+			List<int> upcList = new List<int>(unorderedPitchClasses);
+			upcList.Sort();
+			List<List<int>> rotations = new List<List<int>>();
+			rotations.Add(upcList);
+			#region get rotations
+			for(int i = 1; i < unorderedPitchClasses.Count; ++i)
+			{
+				var prevRotation = rotations[i - 1];
+				var rotation = new List<int>();
+				for(int j = 1; j < prevRotation.Count; ++j)
+				{
+					rotation.Add(prevRotation[j]);
+				}
+				rotation.Add(prevRotation[0] + 12);
+				rotations.Add(rotation);
+			}
+			#endregion get rotations
+
+			int lastIndex = rotations[0].Count - 1;
+			List<int> minSpanIndices = GetMinSpanIndices(rotations, lastIndex); // testing the last value against the first
+
+			if(minSpanIndices.Count > 1)
+			{
+				// test the 2nd, 3rd etc value against the first
+				int indexToCompare = 1;
+				while(minSpanIndices.Count > 1 && indexToCompare < lastIndex)
+				{
+					minSpanIndices = GetMinSpanIndices(rotations, indexToCompare);
+					indexToCompare++;
+				}
+			}
+
+			List<int> normalForm = null;
+			if(minSpanIndices.Count > 1)
+			{
+				// Forte says "select one ordering arbitrarily" here.
+				// I've decided to select the one with the lowest value in the 1st position
+				int minValue = int.MaxValue;
+				int index = 0;
+				for(int i = 0; i < rotations.Count; ++i)
+				{
+					if(rotations[i][0] < minValue)
+					{
+						minValue = rotations[i][0];
+						index = i;
+					}
+				}
+				normalForm = rotations[index];
+			}
+			else
+			{
+				normalForm = rotations[minSpanIndices[0]];
+			}
+
+			return normalForm;
+		}
+
+		private static List<int> GetMinSpanIndices(List<List<int>> rotations, int indexToCompare)
+		{
+			int minSpan = int.MaxValue;
+			List<int> minSpanIndices = new List<int>();
+
+			for(int i = 0; i < rotations.Count; ++i)
+			{
+				List<int> rotation = rotations[i];
+				int span = rotation[indexToCompare] - rotation[0];
+				if(span < minSpan)
+				{
+					minSpanIndices.Clear();
+					minSpanIndices.Add(i);
+				}
+				if(span == minSpan)
+				{
+					minSpanIndices.Add(i);
+				}
+				minSpan = (span < minSpan) ? span : minSpan;
+			}
+
+			return minSpanIndices;
+		}
+
+		/// <summary>
+		/// NormalForm contains 1 to 12 ordered values
+		/// </summary>
+		public IReadOnlyList<int> NormalForm
+		{
+			get
+			{
+				return _normalForm;
+			}
+			private set
+			{
+				if(value.Count == 0 || value.Count > 12)
+				{
+					throw new ApplicationException();
+				}
+				foreach(int i in value)
+				{
+					if(i < 0 || i > 23)
+					{
+						throw new ApplicationException();
+					}
+				}
+				for(int i = 1; i < value.Count; i++)
+				{
+					if(value[i - 1] >= value[i])
+					{
+						throw new ApplicationException();
+					}
+				}
+				_normalForm = value;
+			}
+		}
+		private IReadOnlyList<int> _normalForm;
+
+	}
+
+	public class UnOrderedPCSet : PitchClassSet
+	{
+		/// <param name="pitches">Any number of unordered, unrestricted integers. These will be reduced to an unordered list of unique pitch classes in range [0..11].</param>
+		public UnOrderedPCSet(List<int> pitches)
+			: base(pitches)
+		{
+		}
+	}
 }

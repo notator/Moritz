@@ -47,15 +47,22 @@ namespace Moritz.Algorithm.Tombeau1
             _palettes = palettes;
 
 			/** begin test code **/
-			List<Trk> values = new List<Trk>();
-			for(int i = 0; i < 10; i++)
-			{
-				values.Add(new Trk(0));
-			}
+			#region test code 1
+			//List<Trk> values = new List<Trk>();
+			//for(int i = 0; i < 10; i++)
+			//{
+			//	values.Add(new Trk(0));
+			//}
 
-			TrkPalette trkPalette = new TrkPalette(values);
+			//TrkPalette trkPalette = new TrkPalette(values);
 
-			Trk trk1 = trkPalette.GetTrk(5, 6);
+			//Trk trk1 = trkPalette.GetTrk(5, 6);
+			#endregion test code 1
+			#region test code 2
+			List<int> pitches = new List<int>() { 0, 10, 134, 2, 17 };
+			OrderedPCSet opc = new OrderedPCSet(pitches);
+			#endregion test code 2
+
 			/** end test code **/
 
 			#region main comment (thoughts etc.)
