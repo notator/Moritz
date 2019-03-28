@@ -687,18 +687,26 @@ namespace Moritz.Spec
 	/// This class implements the "pitch class set" defined by Allen Forte in "The Structure of Atonal Music".
 	/// In that book, a "pitch class set" must contain between 3 and 9 pitch classes.
 	/// </summary>
-	public abstract class PitchClassSet
+	public class PitchClassSet
 	{
 		/// <summary>
-		/// A PitchClassSet contains a protected UnorderedPitchClasses attribute, which is constructed as follows:
+		/// Each PitchClassSet contains a protected UnorderedPitchClasses attribute, which is constructed as follows:
 		/// 1. The argument is cloned.
-		/// 2. All the ints in the clone are set to their equivalents in mod 12.
+		/// 2. All the ints in the clone are set to their mod 12 equivalents.
 		/// 3. All the ints that are duplicates of previous ints are removed.
 		/// 4. The result is asigned to the UnorderedPitchClasses attribute.
 		/// 5. An exception is thrown if the result contains less than 3 or more than 9 pitch classes.
 		/// </summary>
-		/// <param name="pitches">Any number of unordered, unrestricted integers. These will be reduced to an unordered list of unique pitch classes in range [0..11].</param>
+		/// <param name="pitches">Any number of unordered, unrestricted integers. These will first be reduced to an unordered list of unique pitch classes in range [0..11].</param>
 		public PitchClassSet(List<int> pitches)
+		{
+			SetUnorderedPitchClasses(pitches);
+			SetNormalForm(UnorderedPitchClasses);
+			SetPrimeForm(NormalForm);
+			SetPrimeInversion(PrimeForm);
+		}
+
+		private void SetUnorderedPitchClasses(List<int> pitches)
 		{
 			var clone = new List<int>(pitches);
 			for(int i = 0; i < clone.Count; ++i)
@@ -717,54 +725,36 @@ namespace Moritz.Spec
 			UnorderedPitchClasses = pitchClasses;
 		}
 
-		/// <summary>
-		/// An unordered list of between 3 and 9 unique pitch classes (in range [0..11])
-		/// </summary>
-		protected IReadOnlyList<int> UnorderedPitchClasses
+		public bool IsEquivalentTo(PitchClassSet otherSet)
 		{
-			get { return _unorderedPitchClasses; }
-			private set
+			bool isEquivalent = false;
+			bool primeFormsAreEqual = true;
+			for(int i = 0; i < PrimeForm.Count; ++i)
 			{
-				var pitchClasses = value;
-				#region assertions
-				if(pitchClasses.Count < 3 || pitchClasses.Count > 9)
+				if(PrimeForm[i] != otherSet.PrimeForm[i])
 				{
-					throw new ApplicationException("According to Allen Forte, a pitch class set must contain between 3 and 9 pitch classes.");
+					primeFormsAreEqual = false;
+					break;
 				}
-				foreach(int pitch in pitchClasses)
-				{
-					if(pitch < 0 || pitch > 11)
-					{
-						throw new ApplicationException();
-					}
-				}
-				// Test uniqueness
-				for(int i = 1; i < pitchClasses.Count; ++i)
-				{
-					int pitch1 = pitchClasses[i - 1];
-					for(int j = i; j < pitchClasses.Count; ++j)
-					{
-						if(pitch1 == pitchClasses[j])
-						{
-							throw new ApplicationException();
-						}
-					}
-				}
-				#endregion
-				_unorderedPitchClasses = value;
 			}
-		}
-		private IReadOnlyList<int> _unorderedPitchClasses;
-		 
-	}
-
-	public class OrderedPCSet : PitchClassSet
-	{
-		/// <param name="pitches">Any number of unordered, unrestricted integers. These will first be reduced to an unordered list of unique pitch classes in range [0..11].</param>
-		public OrderedPCSet(List<int> pitches)
-			: base(pitches)
-		{
-			NormalForm = GetNormalForm(UnorderedPitchClasses);
+			if(primeFormsAreEqual)
+			{
+				isEquivalent = true;
+			}
+			else
+			{
+				bool primeFormIsEqualToOtherInversion = true;
+				for(int i = 0; i < PrimeForm.Count; ++i)
+				{
+					if(PrimeForm[i] != otherSet.PrimeInversion[i])
+					{
+						primeFormIsEqualToOtherInversion = false;
+						break;
+					}
+				}
+				isEquivalent = primeFormIsEqualToOtherInversion;
+			}
+			return isEquivalent;
 		}
 
 		/// <summary>
@@ -772,7 +762,7 @@ namespace Moritz.Spec
 		/// </summary>
 		/// <param name="unorderedPitchClasses">An unordered list of between 3 and 9 unique pitch classes in range [0..11]</param>
 		/// <returns></returns>
-		private IReadOnlyList<int> GetNormalForm(IReadOnlyList<int> unorderedPitchClasses)
+		private void SetNormalForm(IReadOnlyList<int> unorderedPitchClasses)
 		{
 			List<int> upcList = new List<int>(unorderedPitchClasses);
 			upcList.Sort();
@@ -828,9 +818,8 @@ namespace Moritz.Spec
 				normalForm = rotations[minSpanIndices[0]];
 			}
 
-			return normalForm;
+			NormalForm = normalForm;
 		}
-
 		private static List<int> GetMinSpanIndices(List<List<int>> rotations, int indexToCompare)
 		{
 			int minSpan = int.MaxValue;
@@ -855,8 +844,63 @@ namespace Moritz.Spec
 			return minSpanIndices;
 		}
 
+		private void SetPrimeForm(IReadOnlyList<int> normalForm)
+		{
+			var primeForm = new List<int>();
+			int first = normalForm[0];
+			foreach(int val in normalForm)
+			{
+				primeForm.Add(val - first);
+			}
+			PrimeForm = primeForm;
+		}
+
+		private void SetPrimeInversion(IReadOnlyList<int> primeForm)
+		{
+			List<int> primeInversion = new List<int>();
+			foreach(int val in primeForm)
+			{
+				if(val == 0)
+				{
+					primeInversion.Add(0);
+				}
+				else
+				{
+					primeInversion.Add(12 - (val % 12));
+				}
+			}
+			primeInversion.Sort();
+			PrimeInversion = primeInversion;
+		}
+
 		/// <summary>
-		/// NormalForm contains 1 to 12 ordered values
+		/// This function is used when checking assignments to NormalForm, PrimeForm and PrimeInversion.
+		/// </summary>
+		/// <param name="intList"></param>
+		private void AssertConsistency(IReadOnlyList<int> intList, int maxVal)
+		{
+			if(intList == null || intList.Count < 3 || intList.Count > 9)
+			{
+				throw new ApplicationException("According to Allen Forte, a pitch class set must contain between 3 and 9 pitch classes.");
+			}
+			foreach(int i in intList)
+			{
+				if(i < 0 || i > maxVal)
+				{
+					throw new ApplicationException();
+				}
+			}
+			for(int i = 1; i < intList.Count; i++)
+			{
+				if(intList[i - 1] >= intList[i])
+				{
+					throw new ApplicationException();
+				}
+			}
+		}
+
+		/// <summary>
+		/// NormalForm contains an ordered list of between 3 to 9 unique, ordered integers, each of which is in range [0..23]
 		/// </summary>
 		public IReadOnlyList<int> NormalForm
 		{
@@ -866,37 +910,97 @@ namespace Moritz.Spec
 			}
 			private set
 			{
-				if(value.Count == 0 || value.Count > 12)
-				{
-					throw new ApplicationException();
-				}
-				foreach(int i in value)
-				{
-					if(i < 0 || i > 23)
-					{
-						throw new ApplicationException();
-					}
-				}
-				for(int i = 1; i < value.Count; i++)
-				{
-					if(value[i - 1] >= value[i])
-					{
-						throw new ApplicationException();
-					}
-				}
+				var val = value;
+				AssertConsistency(val, 23);
 				_normalForm = value;
 			}
 		}
 		private IReadOnlyList<int> _normalForm;
 
-	}
-
-	public class UnOrderedPCSet : PitchClassSet
-	{
-		/// <param name="pitches">Any number of unordered, unrestricted integers. These will be reduced to an unordered list of unique pitch classes in range [0..11].</param>
-		public UnOrderedPCSet(List<int> pitches)
-			: base(pitches)
+		/// <summary>
+		/// PrimeForm is NormalForm transposed down by Transposition so that PrimeForm[0] is 0.
+		/// </summary>
+		public IReadOnlyList<int> PrimeForm
 		{
+			get
+			{
+				return _primeForm;
+			}
+			private set
+			{
+				var val = value;
+
+				AssertConsistency(val, 11);
+				if(val[0] != 0)
+				{
+					throw new ApplicationException();
+				}
+				_primeForm = value;
+			}
 		}
+		private IReadOnlyList<int> _primeForm;
+
+		/// <summary>
+		/// PrimeInversion is PrimeForm mapped 0 to 0, 1 to 11, 2 to 10 etc. and then sorted into ascending order.
+		/// </summary>
+		public IReadOnlyList<int> PrimeInversion
+		{
+			get { return _primeInversion; }
+			private set
+			{
+				var val = value;
+				AssertConsistency(val, 11);
+				if(val[0] != 0)
+				{
+					throw new ApplicationException();
+				}
+				_primeInversion = value;
+			}
+		}
+		private IReadOnlyList<int> _primeInversion;
+
+		/// <summary>
+		/// An unordered list of between 3 and 9 unique pitch classes (in range [0..11])
+		/// </summary>
+		protected IReadOnlyList<int> UnorderedPitchClasses
+		{
+			get { return _unorderedPitchClasses; }
+			private set
+			{
+				var pitchClasses = value;
+				#region assertions
+				if(pitchClasses.Count < 3 || pitchClasses.Count > 9)
+				{
+					throw new ApplicationException("According to Allen Forte, a pitch class set must contain between 3 and 9 pitch classes.");
+				}
+				foreach(int pitch in pitchClasses)
+				{
+					if(pitch < 0 || pitch > 11)
+					{
+						throw new ApplicationException();
+					}
+				}
+				// Test uniqueness
+				for(int i = 1; i < pitchClasses.Count; ++i)
+				{
+					int pitch1 = pitchClasses[i - 1];
+					for(int j = i; j < pitchClasses.Count; ++j)
+					{
+						if(pitch1 == pitchClasses[j])
+						{
+							throw new ApplicationException();
+						}
+					}
+				}
+				#endregion
+				_unorderedPitchClasses = value;
+			}
+		}
+		private IReadOnlyList<int> _unorderedPitchClasses;
+
+		/// <summary>
+		/// The transposition of NormalForm with respect to PrimeForm
+		/// </summary>
+		public int Transposition { get { return NormalForm[0]; } }
 	}
 }
