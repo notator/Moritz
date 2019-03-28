@@ -860,14 +860,7 @@ namespace Moritz.Spec
 			List<int> primeInversion = new List<int>();
 			foreach(int val in primeForm)
 			{
-				if(val == 0)
-				{
-					primeInversion.Add(0);
-				}
-				else
-				{
-					primeInversion.Add(12 - (val % 12));
-				}
+				primeInversion.Add((12 - val) % 12);
 			}
 			primeInversion.Sort();
 			PrimeInversion = primeInversion;
