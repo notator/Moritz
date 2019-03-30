@@ -691,80 +691,121 @@ namespace Moritz.Spec
 	{
 		/// <summary>
 		/// The argument is cloned before being used.
-		/// The NormalForm, BaseForm, BaseInversionForm and BestNormalOrder attributes are set.
+		/// The NormalForm, PrimeForm, PrimeInversionForm and BestNormalOrder attributes are set.
 		/// The BestNormalOrder is the form to be found in Forte's pitch class set tables. 
 		/// </summary>
 		/// <param name="pitches">Any number of unordered, unrestricted integers.</param>
 		public PitchClassSet(List<int> pitches)
 		{
-			NormalForm = GetSortedPitchClasses(pitches);
-			BaseForm = GetBaseForm(NormalForm);
-			BaseInversionForm = GetBaseInversionForm(BaseForm);
-			BestNormalOrder = GetBestNormalOrder(BaseForm, BaseInversionForm);
+			NormalForm = GetPitchClasses(pitches);
+			PrimeForm = GetPrimeForm(NormalForm);
+			PrimeInversionForm = GetPrimeInversionForm(PrimeForm);
+			RootForm = GetBestForm(PrimeForm, PrimeInversionForm);
 		}
 
-		private IReadOnlyList<int> GetBestNormalOrder(IReadOnlyList<int> baseForm, IReadOnlyList<int> baseInversionForm)
+		/// <summary>
+		/// Returns either the list1 or list2 depending on which is "best" according to Forte's algorithm (p.4).
+		/// Both lists must be the same length and in ascending order.
+		/// </summary>
+		/// <param name="list1">Can be a rotated list of pitches containing values greater than 11</param>
+		/// <param name="list2">Can be a rotated list of pitches containing values greater than 11</param>
+		/// <returns></returns>
+		private IReadOnlyList<int> GetBestForm(IReadOnlyList<int> list1, IReadOnlyList<int> list2)
 		{
-			if(baseForm.Count != baseInversionForm.Count)
+			int count = list1.Count;
+			#region preconditions
+			if(count != list2.Count)
 			{
 				throw new ApplicationException();
 			}
-			int count = baseForm.Count;
-			if(baseForm[count - 1] != baseInversionForm[count - 1])
+			for(int i = 1; i < count; i++)
 			{
-				throw new ApplicationException();
+				if((list1[i - 1] >= list1[i]) || (list2[i - 1] >= list2[i]))
+				{
+					throw new ApplicationException();
+				}
 			}
+			#endregion
 
-			IReadOnlyList<int> rval = baseForm;
+			IReadOnlyList<int> rval = list1; // default
 
-			for(int i = 1; i < count; ++i)
+			int firstForm1 = list1[0];
+			int firstForm2 = list2[0];
+			int diff = (list1[count-1] - firstForm1) - (list2[count-1] - firstForm2);
+			if(diff == 0)
 			{
-				int diff = baseForm[i] - baseInversionForm[i];
-				if(diff < 0)
+				for(int i = 1; i < count; ++i)
 				{
-					break;
+					diff = (list1[i] - firstForm1) - (list2[i] - firstForm2);
+					if(diff < 0)
+					{
+						break;
+					}
+					else if(diff > 0)
+					{
+						rval = list2;
+						break;
+					}
 				}
-				else if(diff > 0)
-				{
-					rval = baseInversionForm;
-					break;
-				}
+
+			}
+			else if(diff > 0)
+			{
+				rval = list2;
 			}
 
 			return rval;
 		}
 
-		/// <summary>
-		/// 1. convert all ints to pitch classes (%=12)
-		/// 2. remove duplicates.
-		/// 3. sort and return the result.
-		/// An exception will be thrown if the returned list would have less than 3 or more than 9 values.
+		/// <summary> 
+		/// Returns the pitch classes present in the pitchesArg argument (in the order in which they first occur).
+		/// The argument can contain any number of positive ints (including 0).
+		/// An exception will be thrown if the argument contains negative values or
+		/// if the returned list would have less than 3 or more than 9 values.
 		/// </summary>
-		private List<int> GetSortedPitchClasses(IReadOnlyList<int> pitches)
+		/// <param name="pitchesArg">Any number of ints representing pitches. Negative ints will be ignored. Duplicate pitch classes will be removed.</param>
+		private List<int> GetPitchClasses(IReadOnlyList<int> pitchesArg)
 		{
-			var allPitchClasses = new List<int>(pitches);
-			for(int i = 0; i < allPitchClasses.Count; ++i)
+			#region precondition
+			for(int i = 0; i < pitchesArg.Count; ++i)
 			{
-				allPitchClasses[i] %= 12;
-			}
-			var sortedPitchClasses = new List<int>();
-			foreach(int val in allPitchClasses)
-			{
-				if(!sortedPitchClasses.Contains(val))
+				if(pitchesArg[i] < 0)
 				{
-					sortedPitchClasses.Add(val);
+					throw new ApplicationException();
+				}
+			}
+			#endregion
+
+			var pitches = new List<int>(pitchesArg);
+
+			for(int i = 0; i < pitches.Count; ++i)
+			{
+				pitches[i] %= 12;
+			}
+
+			var pitchClasses = new List<int>();
+			foreach(int val in pitches)
+			{
+				if(!pitchClasses.Contains(val))
+				{
+					pitchClasses.Add(val);
 				}
 			}
 
-			sortedPitchClasses.Sort();
+			#region postcondition
+			if(pitchClasses.Count < 3 || pitchClasses.Count > 9)
+			{
+				throw new ApplicationException();
+			}
+			#endregion
 
-			return sortedPitchClasses;
+			return pitchClasses;
 		}
 
 		/// <summary>
 		/// See "The Structure of Atonal Music" page 4.
 		/// The returned list contains the rotation of the argument's pitch classes which will be used to construct
-		/// the BaseForm and BaseInversion.
+		/// the PrimeForm and PrimeInversion.
 		/// This is a list of between 3 and 9 unique integers,
 		/// each of which represents a unique absolute pitch. C=0, C#=1 etc.
 		/// The numbers may be in any octave, and are in ascending order.
@@ -836,8 +877,6 @@ namespace Moritz.Spec
 				smallestSpan = rotations[minSpanIndices[0]];
 			}
 
-			AssertBasicConsistency(smallestSpan);
-
 			return smallestSpan;
 		}
 		private static List<int> GetMinSpanIndices(List<List<int>> rotations, int indexToCompare)
@@ -865,14 +904,16 @@ namespace Moritz.Spec
 		}
 
 		/// <summary>
-		/// The BaseForm is created by subtracting the first value in smallestSpan from each value, and adding 12 when/if the result is negative.
-		/// The result is a list in which the first value is 0, and the intervallic relations in smallestSpan are preserved.
+		/// The PrimeForm is created by finding the rotation of the normalForm with the smallest span,
+		/// then subtracting the first value in smallestSpan from each value, and adding 12 when/if the result is negative.
+		/// The result is a list in which the first value is 0, the values are in ascending order, and the intervallic
+		/// relations in smallestSpan are preserved.
 		/// </summary>
-		private List<int> GetBaseForm(IReadOnlyList<int> originalList)
+		private List<int> GetPrimeForm(IReadOnlyList<int> normalForm)
 		{
-			List<int> smallestSpan = GetSmallestSpan(originalList);
+			List<int> smallestSpan = GetSmallestSpan(normalForm);
 
-			var baseForm = new List<int>();
+			var primeForm = new List<int>();
 			int first = smallestSpan[0];
 			foreach(int val in smallestSpan)
 			{
@@ -881,49 +922,28 @@ namespace Moritz.Spec
 				{
 					baseVal += 12;
 				}
-				baseForm.Add(baseVal);
+				primeForm.Add(baseVal);
 			}
 			
-			return baseForm;
+			return primeForm;
 		}
 
-		private List<int> GetBaseInversionForm(IReadOnlyList<int> baseForm)
+		private List<int> GetPrimeInversionForm(IReadOnlyList<int> primeForm)
 		{
 			List<int> inversion = new List<int>();
-			for(int i = 0; i < baseForm.Count; ++i)
+			for(int i = 0; i < primeForm.Count; ++i)
 			{
-				inversion.Add((12 - baseForm[i]) % 12);
+				inversion.Add((12 - primeForm[i]) % 12);
 			}
 
-			List<int> baseInversion = GetBaseForm(inversion);
+			List<int> primeInversion = GetPrimeForm(inversion);
 
-			return baseInversion;
+			return primeInversion;
 		}
 
 		/// <summary>
-		/// This function is used when checking assignments to NormalForm, BaseForm and BaseInversion.
-		/// It ensures that the intList contains between 3 and 9 integers, and that the values are in ascending order.
-		/// </summary>
-		/// <param name="intList"></param>
-		private void AssertBasicConsistency(IReadOnlyList<int> intList)
-		{
-			if(intList == null || intList.Count < 3 || intList.Count > 9)
-			{
-				throw new ApplicationException("According to Allen Forte, a pitch class set must contain between 3 and 9 pitch classes.");
-			}
-			for(int i = 1; i < intList.Count; i++)
-			{
-				if(intList[i - 1] >= intList[i])
-				{
-					throw new ApplicationException();
-				}
-			}
-		}
-
-		/// <summary>
-		/// NormalForm contains a list of between 3 and 9 unique integers,
-		/// each of which represents a unique absolute pitch. C=0, C#=1 etc.
-		/// The numbers are in range [0..11] and in ascending order
+		/// NormalForm contains an unordered list of between 3 and 9 unique integers in range [0..11].
+		/// C=0, C#=1 etc.
 		/// </summary>
 		public IReadOnlyList<int> NormalForm
 		{
@@ -933,62 +953,88 @@ namespace Moritz.Spec
 			}
 			private set
 			{
-				var val = value;
-				AssertBasicConsistency(val);
-				foreach(int v in val)
-				{
-					if(v < 0 || v > 11)
-					{
-						throw new ApplicationException();
-					}
-				}
+				CheckNormalConsistency(value);
 				_normalForm = value;
 			}
 		}
 		private IReadOnlyList<int> _normalForm;
 
 		/// <summary>
-		/// BaseForm is NormalForm transposed down by Transposition so that BaseForm[0] is 0.
+		/// This function ensures that
+		/// 1. the argument contains between 3 and 9 integers,
+		/// 2. the values are in range [0..11] (in any order)
 		/// </summary>
-		public IReadOnlyList<int> BaseForm
+		private void CheckNormalConsistency(IReadOnlyList<int> normalForm)
+		{
+			if(normalForm == null || normalForm.Count < 3 || normalForm.Count > 9)
+			{
+				throw new ApplicationException("According to Allen Forte, a pitch class set must contain between 3 and 9 pitch classes.");
+			}
+			foreach(int v in normalForm)
+			{
+				if(v < 0 || v > 11)
+				{
+					throw new ApplicationException();
+				}
+			}
+		}
+
+		/// <summary>
+		/// This function is used when checking assignments to PrimeForm and PrimeInversion.
+		/// It ensures that
+		/// 1. the primeList contains between 3 and 9 integers,
+		/// 2. the values are in range [0..11]
+		/// 3. the first value in the primeList is 0
+		/// 4. the values are in ascending order.
+		/// </summary>
+		private void CheckPrimeConsistency(IReadOnlyList<int> primeList)
+		{
+			CheckNormalConsistency(primeList);
+
+			if(primeList[0] != 0)
+			{
+				throw new ApplicationException();
+			}
+			for(int i = 1; i < primeList.Count; i++)
+			{
+				if(primeList[i - 1] >= primeList[i])
+				{
+					throw new ApplicationException();
+				}
+			}
+		}
+
+		/// <summary>
+		/// PrimeForm is NormalForm transposed down by Transposition so that PrimeForm[0] is 0.
+		/// </summary>
+		public IReadOnlyList<int> PrimeForm
 		{
 			get
 			{
-				return _baseForm;
+				return _primeForm;
 			}
 			private set
 			{
-				var val = value;
-
-				AssertBasicConsistency(val);
-				if(val[0] != 0)
-				{
-					throw new ApplicationException();
-				}
-				_baseForm = value;
+				CheckPrimeConsistency(value);
+				_primeForm = value;
 			}
 		}
-		private IReadOnlyList<int> _baseForm;
+		private IReadOnlyList<int> _primeForm;
 
 		/// <summary>
-		/// BaseInversion is the inversion of BaseForm with the least wide span.
+		/// PrimeInversion is the inversion of PrimeForm with the least wide span.
 		/// </summary>
-		public IReadOnlyList<int> BaseInversionForm
+		public IReadOnlyList<int> PrimeInversionForm
 		{
-			get { return _baseInversionForm; }
+			get { return _primeInversionForm; }
 			private set
 			{
-				var val = value;
-				AssertBasicConsistency(val);
-				if(val[0] != 0)
-				{
-					throw new ApplicationException();
-				}
-				_baseInversionForm = value;
+				CheckPrimeConsistency(value);
+				_primeInversionForm = value;
 			}
 		}
-		private IReadOnlyList<int> _baseInversionForm;
+		private IReadOnlyList<int> _primeInversionForm;
 
-		public IReadOnlyList<int> BestNormalOrder {	get; private set; }
+		public IReadOnlyList<int> RootForm {	get; private set; }
 	}
 }
