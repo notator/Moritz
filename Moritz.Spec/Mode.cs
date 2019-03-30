@@ -691,16 +691,62 @@ namespace Moritz.Spec
 	{
 		/// <summary>
 		/// The argument is cloned before being used.
-		/// The NormalForm, PrimeForm, PrimeInversionForm and BestNormalOrder attributes are set.
-		/// The BestNormalOrder is the form to be found in Forte's pitch class set tables. 
+		/// The NormalForm, PrimeForm, PrimeInversionForm and RootForm attributes are set.
+		/// The RootForm is the "best" of either PrimeForm or PrimeInversionForm.
+		/// RootForm is the form to be found in Forte's pitch class set tables. 
 		/// </summary>
 		/// <param name="pitches">Any number of unordered, unrestricted integers.</param>
-		public PitchClassSet(List<int> pitches)
+		public PitchClassSet(IReadOnlyList<int> pitches)
 		{
 			NormalForm = GetPitchClasses(pitches);
 			PrimeForm = GetPrimeForm(NormalForm);
 			PrimeInversionForm = GetPrimeInversionForm(PrimeForm);
 			RootForm = GetBestForm(PrimeForm, PrimeInversionForm);
+		}
+
+		/// <summary> 
+		/// Returns the pitch classes present in the pitchesArg argument (in order of their first occurrence).
+		/// The argument can contain any number of positive ints (including 0).
+		/// An exception will be thrown if the argument contains negative values or
+		/// if the returned list would have less than 3 or more than 9 values.
+		/// </summary>
+		/// <param name="pitchesArg">Any number of positive ints representing pitches. Duplicate pitch classes will be removed.</param>
+		private List<int> GetPitchClasses(IReadOnlyList<int> pitchesArg)
+		{
+			#region precondition
+			for(int i = 0; i < pitchesArg.Count; ++i)
+			{
+				if(pitchesArg[i] < 0)
+				{
+					throw new ApplicationException();
+				}
+			}
+			#endregion
+
+			var pitches = new List<int>(pitchesArg);
+
+			for(int i = 0; i < pitches.Count; ++i)
+			{
+				pitches[i] %= 12;
+			}
+
+			var pitchClasses = new List<int>();
+			foreach(int val in pitches)
+			{
+				if(!pitchClasses.Contains(val))
+				{
+					pitchClasses.Add(val);
+				}
+			}
+
+			#region postcondition
+			if(pitchClasses.Count < 3 || pitchClasses.Count > 9)
+			{
+				throw new ApplicationException();
+			}
+			#endregion
+
+			return pitchClasses;
 		}
 
 		/// <summary>
@@ -757,62 +803,14 @@ namespace Moritz.Spec
 			return rval;
 		}
 
-		/// <summary> 
-		/// Returns the pitch classes present in the pitchesArg argument (in the order in which they first occur).
-		/// The argument can contain any number of positive ints (including 0).
-		/// An exception will be thrown if the argument contains negative values or
-		/// if the returned list would have less than 3 or more than 9 values.
-		/// </summary>
-		/// <param name="pitchesArg">Any number of ints representing pitches. Negative ints will be ignored. Duplicate pitch classes will be removed.</param>
-		private List<int> GetPitchClasses(IReadOnlyList<int> pitchesArg)
-		{
-			#region precondition
-			for(int i = 0; i < pitchesArg.Count; ++i)
-			{
-				if(pitchesArg[i] < 0)
-				{
-					throw new ApplicationException();
-				}
-			}
-			#endregion
-
-			var pitches = new List<int>(pitchesArg);
-
-			for(int i = 0; i < pitches.Count; ++i)
-			{
-				pitches[i] %= 12;
-			}
-
-			var pitchClasses = new List<int>();
-			foreach(int val in pitches)
-			{
-				if(!pitchClasses.Contains(val))
-				{
-					pitchClasses.Add(val);
-				}
-			}
-
-			#region postcondition
-			if(pitchClasses.Count < 3 || pitchClasses.Count > 9)
-			{
-				throw new ApplicationException();
-			}
-			#endregion
-
-			return pitchClasses;
-		}
-
 		/// <summary>
 		/// See "The Structure of Atonal Music" page 4.
-		/// The returned list contains the rotation of the argument's pitch classes which will be used to construct
-		/// the PrimeForm and PrimeInversion.
-		/// This is a list of between 3 and 9 unique integers,
-		/// each of which represents a unique absolute pitch. C=0, C#=1 etc.
-		/// The numbers may be in any octave, and are in ascending order.
+		/// The returned list contains the "best" rotation of the argument's pitch classes.
+		/// The values in the returned list are in ascending order, and may be in any octave.
 		/// </summary>
 		/// <param name="normalForm">An ordered list of between 3 and 9 unique pitch classes in range [0..11]</param>
-		/// <returns>The argument in the rotation with smallest span.</returns>
-		private List<int> GetSmallestSpan(IReadOnlyList<int> normalForm)
+		/// <returns>The best rotation (according to Forte's algorithm).</returns>
+		private IReadOnlyList<int> GetBestRotation(IReadOnlyList<int> normalForm)
 		{
 			#region get rotations
 			// pitch classes are in range [0..11]
@@ -841,81 +839,28 @@ namespace Moritz.Spec
 			}
 			#endregion get rotations
 
-			int lastIndex = rotations[0].Count - 1;
-			List<int> minSpanIndices = GetMinSpanIndices(rotations, lastIndex); // testing the last value against the first
-
-			if(minSpanIndices.Count > 1)
+			IReadOnlyList<int> rval = rotations[0];
+			for(int i = 1; i < rotations.Count; ++i)
 			{
-				// test the 2nd, 3rd etc value against the first
-				int indexToCompare = 1;
-				while(minSpanIndices.Count > 1 && indexToCompare < lastIndex)
-				{
-					minSpanIndices = GetMinSpanIndices(rotations, indexToCompare);
-					indexToCompare++;
-				}
+				rval = GetBestForm(rval, rotations[i]);
 			}
 
-			List<int> smallestSpan = null;
-			if(minSpanIndices.Count > 1)
-			{
-				// Forte says "select one ordering arbitrarily" here.
-				// I've decided to select the one with the lowest value in the 1st position
-				int minValue = int.MaxValue;
-				int index = 0;
-				for(int i = 0; i < rotations.Count; ++i)
-				{
-					if(rotations[i][0] < minValue)
-					{
-						minValue = rotations[i][0];
-						index = i;
-					}
-				}
-				smallestSpan = rotations[index];
-			}
-			else
-			{
-				smallestSpan = rotations[minSpanIndices[0]];
-			}
-
-			return smallestSpan;
-		}
-		private static List<int> GetMinSpanIndices(List<List<int>> rotations, int indexToCompare)
-		{
-			int minSpan = int.MaxValue;
-			List<int> minSpanIndices = new List<int>();
-
-			for(int i = 0; i < rotations.Count; ++i)
-			{
-				List<int> rotation = rotations[i];
-				int span = rotation[indexToCompare] - rotation[0];
-				if(span < minSpan)
-				{
-					minSpanIndices.Clear();
-					minSpanIndices.Add(i);
-				}
-				if(span == minSpan)
-				{
-					minSpanIndices.Add(i);
-				}
-				minSpan = (span < minSpan) ? span : minSpan;
-			}
-
-			return minSpanIndices;
+			return rval;
 		}
 
 		/// <summary>
-		/// The PrimeForm is created by finding the rotation of the normalForm with the smallest span,
-		/// then subtracting the first value in smallestSpan from each value, and adding 12 when/if the result is negative.
+		/// The PrimeForm is created by finding the "best" rotation of the normalForm (according to Forte's algorithm for "best"),
+		/// then subtracting the first value in bestRotation from each value, and adding 12 when/if the result is negative.
 		/// The result is a list in which the first value is 0, the values are in ascending order, and the intervallic
-		/// relations in smallestSpan are preserved.
+		/// relations in bestRotation are preserved.
 		/// </summary>
-		private List<int> GetPrimeForm(IReadOnlyList<int> normalForm)
+		private IReadOnlyList<int> GetPrimeForm(IReadOnlyList<int> normalForm)
 		{
-			List<int> smallestSpan = GetSmallestSpan(normalForm);
+			IReadOnlyList<int> bestRotation = GetBestRotation(normalForm);
 
 			var primeForm = new List<int>();
-			int first = smallestSpan[0];
-			foreach(int val in smallestSpan)
+			int first = bestRotation[0];
+			foreach(int val in bestRotation)
 			{
 				int baseVal = val - first;
 				while(baseVal < 0)
@@ -928,7 +873,7 @@ namespace Moritz.Spec
 			return primeForm;
 		}
 
-		private List<int> GetPrimeInversionForm(IReadOnlyList<int> primeForm)
+		private IReadOnlyList<int> GetPrimeInversionForm(IReadOnlyList<int> primeForm)
 		{
 			List<int> inversion = new List<int>();
 			for(int i = 0; i < primeForm.Count; ++i)
@@ -936,28 +881,10 @@ namespace Moritz.Spec
 				inversion.Add((12 - primeForm[i]) % 12);
 			}
 
-			List<int> primeInversion = GetPrimeForm(inversion);
+			IReadOnlyList<int> primeInversion = GetPrimeForm(inversion);
 
 			return primeInversion;
 		}
-
-		/// <summary>
-		/// NormalForm contains an unordered list of between 3 and 9 unique integers in range [0..11].
-		/// C=0, C#=1 etc.
-		/// </summary>
-		public IReadOnlyList<int> NormalForm
-		{
-			get
-			{
-				return _normalForm;
-			}
-			private set
-			{
-				CheckNormalConsistency(value);
-				_normalForm = value;
-			}
-		}
-		private IReadOnlyList<int> _normalForm;
 
 		/// <summary>
 		/// This function ensures that
@@ -968,7 +895,7 @@ namespace Moritz.Spec
 		{
 			if(normalForm == null || normalForm.Count < 3 || normalForm.Count > 9)
 			{
-				throw new ApplicationException("According to Allen Forte, a pitch class set must contain between 3 and 9 pitch classes.");
+				throw new ApplicationException("Allen Forte's pitch class sets contain between 3 and 9 pitch classes.");
 			}
 			foreach(int v in normalForm)
 			{
@@ -1005,7 +932,25 @@ namespace Moritz.Spec
 		}
 
 		/// <summary>
-		/// PrimeForm is NormalForm transposed down by Transposition so that PrimeForm[0] is 0.
+		/// NormalForm contains an unordered list of between 3 and 9 unique integers in range [0..11].
+		/// C=0, C#=1 etc.
+		/// </summary>
+		public IReadOnlyList<int> NormalForm
+		{
+			get
+			{
+				return _normalForm;
+			}
+			private set
+			{
+				CheckNormalConsistency(value);
+				_normalForm = value;
+			}
+		}
+		private IReadOnlyList<int> _normalForm;
+
+		/// <summary>
+		/// PrimeForm is the best rotation of a NormalForm, transposed so that PrimeForm[0] is 0 and put into ascending order.
 		/// </summary>
 		public IReadOnlyList<int> PrimeForm
 		{
@@ -1022,7 +967,7 @@ namespace Moritz.Spec
 		private IReadOnlyList<int> _primeForm;
 
 		/// <summary>
-		/// PrimeInversion is the inversion of PrimeForm with the least wide span.
+		/// PrimeInversion is the best rotation of PrimeForm's inversion, transposed so that PrimeInversionForm[0] is 0 and put into ascending order..
 		/// </summary>
 		public IReadOnlyList<int> PrimeInversionForm
 		{
@@ -1035,6 +980,10 @@ namespace Moritz.Spec
 		}
 		private IReadOnlyList<int> _primeInversionForm;
 
-		public IReadOnlyList<int> RootForm {	get; private set; }
+		/// <summary>
+		/// RootForm is the "best" of either PrimeForm or PrimeInvertedForm.
+		/// RootForm is the pitch class set used in Forte's Appendix 1.
+		/// </summary>
+		public IReadOnlyList<int> RootForm { get; private set; }
 	}
 }

@@ -59,8 +59,11 @@ namespace Moritz.Algorithm.Tombeau1
 			//Trk trk1 = trkPalette.GetTrk(5, 6);
 			#endregion test code 1
 			#region test code 2
-			List<int> pitches = new List<int>() { 0, 10, 134, 2, 17 };
-			//List<int> pitches = new List<int>() { 3,5,9,6,0};
+			//List<int> pitches = new List<int>() { 0, 10, 134, 2, 17 };
+			//List<int> pitches = new List<int>() { 3, 5, 9, 6, 0 };
+			//List<int> pitches = new List<int>() { 6, 7, 9, 0, 1, 2, 3 };
+			//List<int> pitches = new List<int>() { 10, 2, 4, 8, 6, 0 };
+			List<int> pitches = new List<int>() { 0,1,3,5,6,9 };
 			PitchClassSet opc = new PitchClassSet(pitches);
 			#endregion test code 2
 
