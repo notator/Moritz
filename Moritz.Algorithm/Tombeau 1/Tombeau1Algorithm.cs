@@ -64,8 +64,71 @@ namespace Moritz.Algorithm.Tombeau1
 			//List<int> pitches = new List<int>() { 6, 7, 9, 0, 1, 2, 3 };
 			//List<int> pitches = new List<int>() { 10, 2, 4, 8, 6, 0 };
 			//List<int> pitches = new List<int>() { 0, 1, 3, 5, 6, 9 };
-			List<int> pitches = new List<int>() { 9, 6, 5, 3, 0, 1 };
-			PitchClassSet opc = new PitchClassSet(pitches);
+			List<int> pitches1 = new List<int>() { 9, 6, 5, 3, 0, 1 };
+			PitchClassSet opc1 = new PitchClassSet(pitches1);
+			List<int> pitches2 = new List<int>() { 5, 6, 3 };
+			PitchClassSet opc2 = new PitchClassSet(pitches2);
+			List<int> pitches3 = new List<int>() { 5,6,9,1,0,3 };
+			PitchClassSet opc3 = new PitchClassSet(pitches3);
+
+			HashSet<int> s1 = opc1.NormalForm;
+			s1.IntersectWith(opc2.NormalForm);
+
+			if(opc1.NormalForm.SetEquals(opc3.NormalForm))
+			{
+				Console.WriteLine("yes");
+			}
+
+			HashSet<int> opc1N = opc1.NormalForm;
+			if(s1.IsProperSubsetOf(opc1N))
+			{
+				Console.WriteLine("yes");
+			}
+
+			if(s1.IsSubsetOf(opc1N))
+			{
+				Console.WriteLine("yes");
+			}
+
+			if(opc1N.IsProperSupersetOf(s1))
+			{
+				Console.WriteLine("yes");
+			}
+
+			if(opc1N.IsSupersetOf(s1))
+			{
+				Console.WriteLine("yes");
+			}
+
+			if(opc1N.IsSupersetOf(s1))
+			{
+				Console.WriteLine("yes");
+			}
+
+
+			HashSet<int> s2 = new HashSet<int>() { 5, 2 };
+
+			if(opc1N.Overlaps(s2))
+			{
+				Console.WriteLine("yes");
+			}
+
+			opc1N.UnionWith(s2);
+
+			opc1N.IntersectWith(s2);
+
+			if(opc1N.SetEquals(s2))
+			{
+				Console.WriteLine("yes");
+			}
+
+			PitchClassSet opc4 = new PitchClassSet(new List<int>(opc1N));
+
+			//if(opc1.NormalForm.IntersectWith(opc2.NormalForm))
+			//{
+			//	Console.WriteLine("yes");
+			//}
+
 			#endregion test code 2
 
 			/** end test code **/
