@@ -63,7 +63,8 @@ namespace Moritz.Algorithm.Tombeau1
 			//List<int> pitches = new List<int>() { 3, 5, 9, 6, 0 };
 			//List<int> pitches = new List<int>() { 6, 7, 9, 0, 1, 2, 3 };
 			//List<int> pitches = new List<int>() { 10, 2, 4, 8, 6, 0 };
-			List<int> pitches = new List<int>() { 0,1,3,5,6,9 };
+			//List<int> pitches = new List<int>() { 0, 1, 3, 5, 6, 9 };
+			List<int> pitches = new List<int>() { 9, 6, 5, 3, 0, 1 };
 			PitchClassSet opc = new PitchClassSet(pitches);
 			#endregion test code 2
 
