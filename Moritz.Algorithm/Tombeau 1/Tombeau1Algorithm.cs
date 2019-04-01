@@ -122,7 +122,7 @@ namespace Moritz.Algorithm.Tombeau1
 				Console.WriteLine("yes");
 			}
 
-			PitchClassSet opc4 = new PitchClassSet(new List<int>(opc1N));
+			PitchClassSet opc4 = new PitchClassSet(opc1N);
 
 			//if(opc1.NormalForm.IntersectWith(opc2.NormalForm))
 			//{

@@ -695,43 +695,43 @@ namespace Moritz.Spec
 		/// The BestPrimeForm is the "best" of either PrimeForm or PrimeInversionForm.
 		/// "best" is defined by Allen Forte's Algorithm, coded in the GetBestForm(form1, form2) function in this class. 
 		/// </summary>
-		/// <param name="pitches">Any number of unordered, unrestricted integers.</param>
-		public PitchClassSet(IReadOnlyList<int> pitches)
+		/// <param name="pitches">A List of int or a HashSet of int containing any number of non-negative integers (the order is unimportant).</param>
+		public PitchClassSet(ICollection<int> pitchesArg)
 		{
-			NormalForm = GetPitchClasses(pitches);
-			PrimeForm = GetPrimeForm(NormalForm);
-			PrimeInversionForm = GetPrimeInversionForm(PrimeForm);
-			BestPrimeForm = GetBestForm(PrimeForm, PrimeInversionForm);
+			_normalForm = GetSortedPitchClasses(pitchesArg);
+			_primeForm = GetPrimeForm(_normalForm);
+			_primeInversionForm = GetPrimeInversionForm(_primeForm);
+			_bestPrimeForm = GetBestForm(_primeForm, _primeInversionForm);
 		}
 
 		/// <summary> 
-		/// Returns a HashSet containing the pitch classes present in the pitchesArg argument.
-		/// The argument can contain any number of positive ints (including 0).
+		/// Returns an IReadOnlyList of int containing the pitch classes present in the pitchesArg argument, sorted into ascending order.
+		/// The argument can contain any number of non-negative ints.
 		/// Duplicate pitch classes in the argument will be silently ignored.
 		/// An exception will be thrown if the argument contains negative values or
 		/// if the returned list would have less than 3 or more than 9 values.
 		/// </summary>
-		/// <param name="pitchesArg">Any number of positive ints representing pitches. Duplicate pitch classes will be ignored.</param>
-		private HashSet<int> GetPitchClasses(IReadOnlyList<int> pitchesArg)
+		/// <param name="pitchesArg">A List of int or a HashSet of int containing any number of non-negative integers (the order is unimportant).</param>
+		private IReadOnlyList<int> GetSortedPitchClasses(ICollection<int> pitchesArg)
 		{
+			var pitches = new List<int>(pitchesArg);
+
 			#region precondition
 			for(int i = 0; i < pitchesArg.Count; ++i)
 			{
-				if(pitchesArg[i] < 0)
+				if(pitches[i] < 0)
 				{
 					throw new ApplicationException();
 				}
 			}
 			#endregion
 
-			var pitches = new List<int>(pitchesArg);
-
 			for(int i = 0; i < pitches.Count; ++i)
 			{
 				pitches[i] %= 12;
 			}
 
-			var pitchClassSet = new HashSet<int>();
+			var pitchClassSet = new List<int>();
 			foreach(int val in pitches)
 			{
 				if(!pitchClassSet.Contains(val))
@@ -740,8 +740,10 @@ namespace Moritz.Spec
 				}
 			}
 
+			pitchClassSet.Sort();
+
 			#region postcondition
-			CheckNormalConsistency(pitchClassSet);
+			CheckBasicConsistency(pitchClassSet);
 			#endregion
 
 			return pitchClassSet;
@@ -808,7 +810,7 @@ namespace Moritz.Spec
 		/// </summary>
 		/// <param name="normalForm">An ordered list of between 3 and 9 unique pitch classes in range [0..11]</param>
 		/// <returns>The "best" rotation (according to Forte's algorithm).</returns>
-		private IReadOnlyList<int> GetBestRotation(HashSet<int> normalForm)
+		private IReadOnlyList<int> GetBestRotation(IReadOnlyList<int> normalForm)
 		{
 			#region get rotations
 			// pitch classes are in range [0..11]
@@ -852,7 +854,7 @@ namespace Moritz.Spec
 		/// The result is a list in which the first value is 0, the values are in ascending order, and the intervallic
 		/// relations in bestRotation are preserved.
 		/// </summary>
-		private IReadOnlyList<int> GetPrimeForm(HashSet<int> normalForm)
+		private IReadOnlyList<int> GetPrimeForm(IReadOnlyList<int> normalForm)
 		{
 			IReadOnlyList<int> bestRotation = GetBestRotation(normalForm);
 
@@ -867,13 +869,15 @@ namespace Moritz.Spec
 				}
 				primeForm.Add(baseVal);
 			}
-			
+
+			CheckPrimeConsistency(primeForm);
+
 			return primeForm;
 		}
 
 		private IReadOnlyList<int> GetPrimeInversionForm(IReadOnlyList<int> primeForm)
 		{
-			var inversion = new HashSet<int>();
+			var inversion = new List<int>();
 			for(int i = 0; i < primeForm.Count; ++i)
 			{
 				inversion.Add((12 - primeForm[i]) % 12);
@@ -887,9 +891,10 @@ namespace Moritz.Spec
 		/// <summary>
 		/// This function ensures that
 		/// 1. the argument contains between 3 and 9 integers,
-		/// 2. the values are in range [0..11] (in any order)
+		/// 2. the values are in range [0..11]
+		/// 3. the values are in ascending order.
 		/// </summary>
-		private void CheckNormalConsistency(HashSet<int> normalForm)
+		private void CheckBasicConsistency(IReadOnlyList<int> normalForm)
 		{
 			if(normalForm == null || normalForm.Count < 3 || normalForm.Count > 9)
 			{
@@ -898,6 +903,13 @@ namespace Moritz.Spec
 			foreach(int v in normalForm)
 			{
 				if(v < 0 || v > 11)
+				{
+					throw new ApplicationException();
+				}
+			}
+			for(int i = 1; i < normalForm.Count; i++)
+			{
+				if(normalForm[i - 1] >= normalForm[i])
 				{
 					throw new ApplicationException();
 				}
@@ -914,24 +926,8 @@ namespace Moritz.Spec
 		/// </summary>
 		private void CheckPrimeConsistency(IReadOnlyList<int> primeList)
 		{
-			if(primeList == null || primeList.Count < 3 || primeList.Count > 9)
-			{
-				throw new ApplicationException("Allen Forte's pitch class sets contain between 3 and 9 pitch classes.");
-			}
-			foreach(int v in primeList)
-			{
-				if(v < 0 || v > 11)
-				{
-					throw new ApplicationException();
-				}
-			}
-			for(int i = 1; i < primeList.Count; i++)
-			{
-				if(primeList[i - 1] >= primeList[i])
-				{
-					throw new ApplicationException();
-				}
-			}
+			CheckBasicConsistency(primeList);
+
 			if(primeList[0] != 0)
 			{
 				throw new ApplicationException();
@@ -939,8 +935,11 @@ namespace Moritz.Spec
 		}
 
 		/// <summary>
-		/// NormalForm contains a HashSet of between 3 and 9 integers in range [0..11] (C=0, C#=1 etc.)
-		/// A HashSet is eqivalent to a mathematical "set", and has corresponding set functions.
+		/// NormalForm returns a new HashSet containing between 3 and 9 integers in range [0..11].
+		/// The integers represent pitches (C=0, C#=1 etc.). None of the pitches is obligatory.
+		/// The order of values in a HashSet is functionally irrelevant, but to ease debugging,
+		/// the returned HashSet is constructed with its values in ascending order.
+		/// A HashSet is equivalent to a mathematical "set", and has corresponding set functions.
 		/// </summary>
 		public HashSet<int> NormalForm
 		{
@@ -948,13 +947,8 @@ namespace Moritz.Spec
 			{
 				return new HashSet<int>(_normalForm);
 			}
-			private set
-			{
-				CheckNormalConsistency(value);
-				_normalForm = value;
-			}
 		}
-		private HashSet<int> _normalForm;
+		private readonly IReadOnlyList<int> _normalForm;
 
 		/// <summary>
 		/// PrimeForm is the "best" rotation of a NormalForm, transposed so that PrimeForm[0] is 0.
@@ -966,13 +960,8 @@ namespace Moritz.Spec
 			{
 				return new List<int>(_primeForm);
 			}
-			private set
-			{
-				CheckPrimeConsistency(value);
-				_primeForm = value;
-			}
 		}
-		private IReadOnlyList<int> _primeForm;
+		private readonly IReadOnlyList<int> _primeForm;
 
 		/// <summary>
 		/// PrimeInversionForm is the "best" rotation of PrimeForm's inversion, transposed so that PrimeInversionForm[0] is 0.
@@ -981,13 +970,8 @@ namespace Moritz.Spec
 		public IReadOnlyList<int> PrimeInversionForm
 		{
 			get { return new List<int>(_primeInversionForm); }
-			private set
-			{
-				CheckPrimeConsistency(value);
-				_primeInversionForm = value;
-			}
 		}
-		private IReadOnlyList<int> _primeInversionForm;
+		private readonly IReadOnlyList<int> _primeInversionForm;
 
 		/// <summary>
 		/// BestPrimeForm is the "best" of either PrimeForm or PrimeInvertedForm.
@@ -996,12 +980,7 @@ namespace Moritz.Spec
 		public IReadOnlyList<int> BestPrimeForm
 		{
 			get { return new List<int>(_bestPrimeForm); }
-			private set
-			{
-				CheckPrimeConsistency(value);
-				_bestPrimeForm = value;
-			}
 		}
-		private IReadOnlyList<int> _bestPrimeForm;
+		private readonly IReadOnlyList<int> _bestPrimeForm;
 	}
 }
