@@ -683,6 +683,28 @@ namespace Moritz.Spec
         #endregion Pitch Hierarchies
     }
 
+	public class PitchClassRec
+	{
+		public PitchClassRec(HashSet<int> bestPrimeForm, string intervalVectorStr, string zPairName)
+		{
+			BestPrimeForm = bestPrimeForm;
+
+			List<int> intervalVector = new List<int>();
+			for(int i = 0; i < intervalVectorStr.Length; ++i)
+			{
+				string c = intervalVectorStr[i].ToString();
+				Int32.TryParse(c, out int number);
+				intervalVector.Add(number);
+			}
+
+			IntervalVector = intervalVector;
+			ZPairName = zPairName;
+		}
+		public readonly HashSet<int> BestPrimeForm;
+		public readonly IReadOnlyList<int> IntervalVector;
+		public readonly string ZPairName;
+	}
+
 	/// <summary>
 	/// This class implements the "pitch class set" defined by Allen Forte in "The Structure of Atonal Music".
 	/// In that book, a "pitch class set" must contain between 3 and 9 pitch classes.
@@ -701,7 +723,20 @@ namespace Moritz.Spec
 			_normalForm = GetSortedPitchClasses(pitchesArg);
 			_primeForm = GetPrimeForm(_normalForm);
 			_primeInversionForm = GetPrimeInversionForm(_primeForm);
-			_bestPrimeForm = GetBestForm(_primeForm, _primeInversionForm);
+			_bestPrimeForm = new HashSet<int>(GetBestForm(_primeForm, _primeInversionForm));
+
+			foreach(KeyValuePair<string, PitchClassRec> record in FortePitchClassSets)
+			{
+				if(record.Value.BestPrimeForm.SetEquals(_bestPrimeForm))
+				{
+					this.Name = record.Key;
+					break;
+				}
+			}
+			if(string.IsNullOrEmpty(Name))
+			{
+				throw new ApplicationException("PitchClassSet not found in Allen Forte's PitchClassSet list.");
+			}
 		}
 
 		/// <summary> 
@@ -977,10 +1012,245 @@ namespace Moritz.Spec
 		/// BestPrimeForm is the "best" of either PrimeForm or PrimeInvertedForm.
 		/// BestPrimeForm is the pitch class set used in Forte's Appendix 1.
 		/// </summary>
-		public IReadOnlyList<int> BestPrimeForm
+		public HashSet<int> BestPrimeForm
 		{
-			get { return new List<int>(_bestPrimeForm); }
+			get { return new HashSet<int>(_bestPrimeForm); }
 		}
-		private readonly IReadOnlyList<int> _bestPrimeForm;
+		private readonly HashSet<int> _bestPrimeForm;
+
+		public string Name { get; private set; } = "";
+
+		public static Dictionary<string, PitchClassRec> FortePitchClassSets = new Dictionary<string, PitchClassRec>()
+		{
+			/* 3 complete 01.04.2019 */
+			{ "3_1(12)",	new PitchClassRec( new HashSet<int>(){0,1,2}, "210000", "")},
+			{ "3_2",		new PitchClassRec( new HashSet<int>(){0,1,3}, "111000", "")},
+			{ "3_3",		new PitchClassRec( new HashSet<int>(){0,1,4}, "101100", "")},
+			{ "3_4",		new PitchClassRec( new HashSet<int>(){0,1,5}, "100110", "")},
+			{ "3_5",		new PitchClassRec( new HashSet<int>(){0,1,6}, "100011", "")},
+			{ "3_6(12)",	new PitchClassRec( new HashSet<int>(){0,2,4}, "020100", "")},
+			{ "3_7",		new PitchClassRec( new HashSet<int>(){0,2,5}, "011010", "")},
+			{ "3_8",		new PitchClassRec( new HashSet<int>(){0,2,6}, "010101", "")},
+			{ "3_9(12)",	new PitchClassRec( new HashSet<int>(){0,2,7}, "010020", "")},
+			{ "3_10(12)",	new PitchClassRec( new HashSet<int>(){0,3,6}, "002001", "")},
+			{ "3_11",       new PitchClassRec( new HashSet<int>(){0,3,7}, "001110", "")},
+			{ "3_12(4)",    new PitchClassRec( new HashSet<int>(){0,4,8}, "000300", "")},
+
+			/////////////////////////////////////////////////////////////////////////////////
+			/* 4 complete 01.04.2019 */
+			{ "4_1(12)",    new PitchClassRec( new HashSet<int>(){0,1,2,3}, "321000", "") },
+			{ "4_2",		new PitchClassRec( new HashSet<int>(){0,1,2,4}, "221100", "") },
+			{ "4_3(12)",    new PitchClassRec( new HashSet<int>(){0,1,3,4}, "212100", "") },
+			{ "4_4",		new PitchClassRec( new HashSet<int>(){0,1,2,5}, "211110", "") },
+			{ "4_5",		new PitchClassRec( new HashSet<int>(){0,1,2,6}, "210111", "") },
+			{ "4_6(12)",    new PitchClassRec( new HashSet<int>(){0,1,2,7}, "210021", "") },
+			{ "4_7(12)",    new PitchClassRec( new HashSet<int>(){0,1,4,5}, "201210", "") },
+			{ "4_8(12)",    new PitchClassRec( new HashSet<int>(){0,1,5,6}, "200121", "") },
+			{ "4_9(6)",		new PitchClassRec( new HashSet<int>(){0,1,6,7}, "200022", "") },
+			{ "4_10(12)",	new PitchClassRec( new HashSet<int>(){0,2,3,5}, "122010", "") },
+			{ "4_11",		new PitchClassRec( new HashSet<int>(){0,1,3,5}, "121110", "") },
+			{ "4_12",		new PitchClassRec( new HashSet<int>(){0,2,3,6}, "112101", "") },
+			{ "4_13",		new PitchClassRec( new HashSet<int>(){0,1,3,6}, "112011", "") },
+			{ "4_14",		new PitchClassRec( new HashSet<int>(){0,2,3,7}, "111120", "") },
+			{ "4_Z15",		new PitchClassRec( new HashSet<int>(){0,1,4,6}, "111111", "4_Z29") },
+			{ "4_16",		new PitchClassRec( new HashSet<int>(){0,1,5,7}, "110121", "") },
+			{ "4_17(12)",	new PitchClassRec( new HashSet<int>(){0,3,4,7}, "102210", "") },
+			{ "4_18",		new PitchClassRec( new HashSet<int>(){0,1,4,7}, "102111", "") },
+			{ "4_19",		new PitchClassRec( new HashSet<int>(){0,1,4,8}, "101310", "") },
+			{ "4_20(12)",	new PitchClassRec( new HashSet<int>(){0,2,5,8}, "101220", "") },
+			{ "4_21(12)",	new PitchClassRec( new HashSet<int>(){0,2,4,6}, "030201", "") },
+			{ "4_22",		new PitchClassRec( new HashSet<int>(){0,2,4,7}, "021120", "") },
+			{ "4_23(12)",	new PitchClassRec( new HashSet<int>(){0,2,5,7}, "021030", "") },
+			{ "4_24(12)",	new PitchClassRec( new HashSet<int>(){0,2,4,8}, "020301", "") },
+			{ "4_25(6)",	new PitchClassRec( new HashSet<int>(){0,2,6,8}, "020202", "") },
+			{ "4_26(12)",	new PitchClassRec( new HashSet<int>(){0,3,5,8}, "012120", "") },
+			{ "4_27",		new PitchClassRec( new HashSet<int>(){0,2,5,8}, "012111", "") },
+			{ "4_28(3)",	new PitchClassRec( new HashSet<int>(){0,3,6,9}, "004002", "") },
+			{ "4_Z29",      new PitchClassRec( new HashSet<int>(){0,1,3,7}, "111111", "4_Z15") },
+
+			/////////////////////////////////////////////////////////////////////////////////
+			/* 5 complete 01.04.2019 */
+			{ "5_1(12)",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4}, "432100", "") },
+			{ "5_2",		new PitchClassRec( new HashSet<int>(){0,1,2,3,5}, "332110", "") },
+			{ "5_3",		new PitchClassRec( new HashSet<int>(){0,1,2,4,5}, "322210", "") },
+			{ "5_4",		new PitchClassRec( new HashSet<int>(){0,1,2,3,6}, "322111", "") },
+			{ "5_5",		new PitchClassRec( new HashSet<int>(){0,1,2,3,7}, "321121", "") },
+			{ "5_6",		new PitchClassRec( new HashSet<int>(){0,1,2,5,6}, "311221", "") },
+			{ "5_7",		new PitchClassRec( new HashSet<int>(){0,1,2,6,7}, "310132", "") },
+			{ "5_8(12)",	new PitchClassRec( new HashSet<int>(){0,2,3,4,6}, "232201", "") },
+			{ "5_9",		new PitchClassRec( new HashSet<int>(){0,1,2,4,6}, "231211", "") },
+			{ "5_10",		new PitchClassRec( new HashSet<int>(){0,1,3,4,6}, "223111", "") },
+			{ "5_11",		new PitchClassRec( new HashSet<int>(){0,2,3,4,7}, "222220", "") },
+			{ "5_Z12(12)",	new PitchClassRec( new HashSet<int>(){0,1,3,5,6}, "222121", "5_Z36") },
+			{ "5_13",		new PitchClassRec( new HashSet<int>(){0,1,2,4,8}, "221311", "") },
+			{ "5_14",		new PitchClassRec( new HashSet<int>(){0,1,2,5,7}, "221131", "") },
+			{ "5_15(12)",	new PitchClassRec( new HashSet<int>(){0,1,2,6,8}, "220222", "") },
+			{ "5_16",		new PitchClassRec( new HashSet<int>(){0,1,3,4,7}, "213211", "") },
+			{ "5_Z17(12)",	new PitchClassRec( new HashSet<int>(){0,1,3,4,8}, "212320", "5_Z37(12)") },
+			{ "5_Z18",		new PitchClassRec( new HashSet<int>(){0,1,4,5,7}, "212221", "5_Z38") },
+			{ "5_19",		new PitchClassRec( new HashSet<int>(){0,1,3,6,7}, "212122", "") },
+			{ "5_20",		new PitchClassRec( new HashSet<int>(){0,1,3,7,8}, "211231", "") },
+			{ "5_21",		new PitchClassRec( new HashSet<int>(){0,1,4,5,8}, "202420", "") },
+			{ "5_22(12)",	new PitchClassRec( new HashSet<int>(){0,1,4,7,8}, "202321", "") },
+			{ "5_23",		new PitchClassRec( new HashSet<int>(){0,2,3,5,7}, "132130", "") },
+			{ "5_24",		new PitchClassRec( new HashSet<int>(){0,1,3,5,7}, "131221", "") },
+			{ "5_25",		new PitchClassRec( new HashSet<int>(){0,2,3,5,8}, "123121", "") },
+			{ "5_26",		new PitchClassRec( new HashSet<int>(){0,2,4,5,8}, "122311", "") },
+			{ "5_27",		new PitchClassRec( new HashSet<int>(){0,1,3,5,8}, "122230", "") },
+			{ "5_28",		new PitchClassRec( new HashSet<int>(){0,2,3,6,8}, "122212", "") },
+			{ "5_29",		new PitchClassRec( new HashSet<int>(){0,1,3,6,8}, "122131", "") },
+			{ "5_30",		new PitchClassRec( new HashSet<int>(){0,1,4,6,8}, "121321", "") },
+			{ "5_31",		new PitchClassRec( new HashSet<int>(){0,1,3,6,9}, "114112", "") },
+			{ "5_32",		new PitchClassRec( new HashSet<int>(){0,1,4,6,9}, "113221", "") },
+			{ "5_33(12)",	new PitchClassRec( new HashSet<int>(){0,2,4,6,8}, "040402", "") },
+			{ "5_34(12)",	new PitchClassRec( new HashSet<int>(){0,2,4,6,9}, "032221", "") },
+			{ "5_35(12)",	new PitchClassRec( new HashSet<int>(){0,2,4,7,9}, "032140", "") },
+			{ "5_Z36",		new PitchClassRec( new HashSet<int>(){0,1,2,4,7}, "222121", "5_Z12(12)") },
+			{ "5_Z37(12)",	new PitchClassRec( new HashSet<int>(){0,3,4,5,8}, "212320", "5_Z17(12)") },
+			{ "5_Z38",      new PitchClassRec( new HashSet<int>(){0,1,2,5,8}, "212221", "5_Z18") },
+
+			/////////////////////////////////////////////////////////////////////////////////
+			/* 6 complete 01.04.2019 */
+			{ "6_1(12)",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,5}, "543210", "") },
+			{ "6_2",		new PitchClassRec( new HashSet<int>(){0,1,2,3,4,6}, "443211", "") },
+			{ "6_Z3",		new PitchClassRec( new HashSet<int>(){0,1,2,3,5,6}, "433221", "6_Z36") },
+			{ "6_Z4(12)",	new PitchClassRec( new HashSet<int>(){0,1,2,4,5,6}, "432321", "6_Z37(12)") },
+			{ "6_5",		new PitchClassRec( new HashSet<int>(){0,1,2,3,6,7}, "422232", "") },
+			{ "6_Z6(12)",	new PitchClassRec( new HashSet<int>(){0,1,2,5,6,7}, "421242", "6_Z38(12)") },
+			{ "6_7(6)",		new PitchClassRec( new HashSet<int>(){0,1,2,6,7,8}, "420243", "") },
+			{ "6_8(12)",	new PitchClassRec( new HashSet<int>(){0,2,3,4,5,7}, "343230", "") },
+			{ "6_9",		new PitchClassRec( new HashSet<int>(){0,1,2,3,5,7}, "342231", "") },
+			{ "6_Z10",		new PitchClassRec( new HashSet<int>(){0,1,3,4,5,7}, "333321", "6_Z39") },
+			{ "6_Z11",		new PitchClassRec( new HashSet<int>(){0,1,2,4,5,7}, "333231", "6_Z40") },
+			{ "6_Z12",		new PitchClassRec( new HashSet<int>(){0,1,2,4,6,7}, "332232", "6_Z41") },
+			{ "6_Z13(12)",	new PitchClassRec( new HashSet<int>(){0,1,3,4,6,7}, "324222", "6_Z42(12)") },
+			{ "6_14",		new PitchClassRec( new HashSet<int>(){0,1,3,4,5,8}, "323430", "") },
+			{ "6_15",		new PitchClassRec( new HashSet<int>(){0,1,2,4,5,8}, "323421", "") },
+			{ "6_16",		new PitchClassRec( new HashSet<int>(){0,1,4,5,6,8}, "322431", "") },
+			{ "6_Z17",		new PitchClassRec( new HashSet<int>(){0,1,2,4,7,8}, "322332", "6_Z43") },
+			{ "6_18",		new PitchClassRec( new HashSet<int>(){0,1,2,5,7,8}, "322242", "") },
+			{ "6_Z19",		new PitchClassRec( new HashSet<int>(){0,1,3,4,7,8}, "313431", "6_Z44") },
+			{ "6_20(4)",	new PitchClassRec( new HashSet<int>(){0,1,4,5,8,9}, "303630", "") },
+			{ "6_21",		new PitchClassRec( new HashSet<int>(){0,2,3,4,6,8}, "242412", "") },
+			{ "6_22",		new PitchClassRec( new HashSet<int>(){0,1,2,4,6,8}, "241422", "") },
+			{ "6_Z23(12)",	new PitchClassRec( new HashSet<int>(){0,2,3,5,6,8}, "234222", "6_Z45(12)") },
+			{ "6_Z24",		new PitchClassRec( new HashSet<int>(){0,1,3,4,6,8}, "233331", "6_Z46") },
+			{ "6_Z25",		new PitchClassRec( new HashSet<int>(){0,1,3,5,6,8}, "233241", "6_Z47") },
+			{ "6_Z26(12)",	new PitchClassRec( new HashSet<int>(){0,1,3,5,7,8}, "232341", "6_Z48(12)") },
+			{ "6_27",		new PitchClassRec( new HashSet<int>(){0,1,3,4,6,9}, "225222", "") },
+			{ "6_Z28(12)",	new PitchClassRec( new HashSet<int>(){0,1,3,5,6,9}, "224322", "6_Z49(12)") },
+			{ "6_Z29(12)",	new PitchClassRec( new HashSet<int>(){0,1,3,6,8,9}, "224232", "6_Z50(12)") },
+			{ "6_30(12)",	new PitchClassRec( new HashSet<int>(){0,1,3,6,7,9}, "224223", "") },
+			{ "6_31",		new PitchClassRec( new HashSet<int>(){0,1,3,5,8,9}, "223431", "") },
+			{ "6_32(12)",	new PitchClassRec( new HashSet<int>(){0,2,4,5,7,9}, "143250", "") },
+			{ "6_33",		new PitchClassRec( new HashSet<int>(){0,2,3,5,7,9}, "143241", "") },
+			{ "6_34",		new PitchClassRec( new HashSet<int>(){0,1,3,5,7,9}, "142422", "") },
+			{ "6_35(2)",	new PitchClassRec( new HashSet<int>(){0,2,4,6,8,10},"060603", "") },
+
+			// The following all have Z-relations
+			{ "6_Z36",		new PitchClassRec( new HashSet<int>(){0,1,2,3,4,7}, "433221", "6_Z3") },
+			{ "6_Z37(12)",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,8}, "432321", "6_Z4(12)") },
+			{ "6_Z38(12)",	new PitchClassRec( new HashSet<int>(){0,1,2,3,7,8}, "421242", "6_Z6(12)") },
+			{ "6_Z39",		new PitchClassRec( new HashSet<int>(){0,2,3,4,5,8}, "333321", "6_Z10") },
+			{ "6_Z40",		new PitchClassRec( new HashSet<int>(){0,1,2,3,5,8}, "333231", "6_Z11") },
+			{ "6_Z41",		new PitchClassRec( new HashSet<int>(){0,1,2,3,6,8}, "332232", "6_Z12") },
+			{ "6_Z42(12)",	new PitchClassRec( new HashSet<int>(){0,1,2,3,6,9}, "324222", "6_Z13(12)") },
+			{ "6_Z43",		new PitchClassRec( new HashSet<int>(){0,1,2,5,6,8}, "322332", "6_Z17") },
+			{ "6_Z44",		new PitchClassRec( new HashSet<int>(){0,1,2,5,6,9}, "313431", "6_Z19") },
+			{ "6_Z45(12)",	new PitchClassRec( new HashSet<int>(){0,2,3,4,6,9}, "234222", "6_Z23(12)") },
+			{ "6_Z46",		new PitchClassRec( new HashSet<int>(){0,1,2,4,6,9}, "233331", "6_Z24") },
+			{ "6_Z47",		new PitchClassRec( new HashSet<int>(){0,1,2,4,7,9}, "233241", "6_Z25") },
+			{ "6_Z48(12)",	new PitchClassRec( new HashSet<int>(){0,1,2,5,7,9}, "232341", "6_Z26(12)") },
+			{ "6_Z49(12)",	new PitchClassRec( new HashSet<int>(){0,1,3,4,7,9}, "224322", "6_Z28(12)") },
+			{ "6_Z50(12)",	new PitchClassRec( new HashSet<int>(){0,1,4,6,7,9}, "224232", "6_Z29(12)") },
+
+			/////////////////////////////////////////////////////////////////////////////////
+			/* 7 complete 01.04.2019 */
+			{ "7_1",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,5,6}, "654321", "") },
+			{ "7_2",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,5,7}, "554331", "") },
+			{ "7_3",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,5,8}, "544431", "") },
+			{ "7_4",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,6,7}, "544332", "") },
+			{ "7_5",	new PitchClassRec( new HashSet<int>(){0,1,2,3,5,6,7}, "543342", "") },
+			{ "7_6",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,7,8}, "533442", "") },
+			{ "7_7",	new PitchClassRec( new HashSet<int>(){0,1,2,3,6,7,8}, "532353", "") },
+			{ "7_8",	new PitchClassRec( new HashSet<int>(){0,2,3,4,5,6,8}, "454422", "") },
+			{ "7_9",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,6,8}, "453432", "") },
+			{ "7_10",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,6,9}, "445332", "") },
+			{ "7_11",	new PitchClassRec( new HashSet<int>(){0,1,3,4,5,6,8}, "444441", "") },
+			{ "7_Z12",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,7,9}, "444342", "7_Z36") },
+			{ "7_13",	new PitchClassRec( new HashSet<int>(){0,1,2,4,5,6,8}, "443532", "") },
+			{ "7_14",	new PitchClassRec( new HashSet<int>(){0,1,2,3,5,7,8}, "443352", "") },
+			{ "7_15",	new PitchClassRec( new HashSet<int>(){0,1,2,4,6,7,8}, "442443", "") },
+			{ "7_16",	new PitchClassRec( new HashSet<int>(){0,1,2,3,5,6,9}, "435432", "") },
+			{ "7_Z17",	new PitchClassRec( new HashSet<int>(){0,1,2,4,5,6,9}, "434541", "7_Z37") },
+			{ "7_Z18",	new PitchClassRec( new HashSet<int>(){0,1,2,3,5,8,9}, "434442", "7_Z38") },
+			{ "7_19",	new PitchClassRec( new HashSet<int>(){0,1,2,3,6,7,9}, "434343", "") },																  
+			{ "7_20",	new PitchClassRec( new HashSet<int>(){0,1,2,4,7,8,9}, "433452", "") },
+			{ "7_21",	new PitchClassRec( new HashSet<int>(){0,1,2,4,5,8,9}, "424641", "") },
+			{ "7_22",	new PitchClassRec( new HashSet<int>(){0,1,2,5,6,8,9}, "424542", "") },
+			{ "7_23",	new PitchClassRec( new HashSet<int>(){0,2,3,4,5,7,9}, "354351", "") },
+			{ "7_24",	new PitchClassRec( new HashSet<int>(){0,1,2,3,5,7,9}, "353442", "") },
+			{ "7_25",	new PitchClassRec( new HashSet<int>(){0,2,3,4,6,7,9}, "345342", "") },
+			{ "7_26",	new PitchClassRec( new HashSet<int>(){0,1,3,4,5,7,9}, "344532", "") },
+			{ "7_27",	new PitchClassRec( new HashSet<int>(){0,1,2,4,5,7,9}, "344451", "") },
+			{ "7_28",	new PitchClassRec( new HashSet<int>(){0,1,3,5,6,7,9}, "344433", "") },
+			{ "7_29",	new PitchClassRec( new HashSet<int>(){0,1,2,4,6,7,9}, "344352", "") },																  
+			{ "7_30",	new PitchClassRec( new HashSet<int>(){0,1,2,4,6,8,9}, "343542", "") },
+			{ "7_31",	new PitchClassRec( new HashSet<int>(){0,1,3,4,6,7,9}, "336333", "") },
+			{ "7_32",	new PitchClassRec( new HashSet<int>(){0,1,3,4,6,8,9}, "335442", "") },
+			{ "7_33",	new PitchClassRec( new HashSet<int>(){0,1,2,4,6,8,10},"262623", "") },
+			{ "7_34",	new PitchClassRec( new HashSet<int>(){0,1,3,4,6,8,10},"254442", "") },
+			{ "7_35",	new PitchClassRec( new HashSet<int>(){0,1,3,5,6,8,10},"254361", "") },
+			{ "7_Z36",	new PitchClassRec( new HashSet<int>(){0,1,2,3,5,6,8}, "444342", "7_Z12") },
+			{ "7_Z37",	new PitchClassRec( new HashSet<int>(){0,1,3,4,5,7,8}, "434541", "7_Z17") },
+			{ "7_Z38",	new PitchClassRec( new HashSet<int>(){0,1,2,4,5,7,8}, "434442", "7_Z18") },
+			
+			/////////////////////////////////////////////////////////////////////////////////
+			/* 8 complete 01.04.2019 */
+			{ "8_1",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,5,6,7}, "765442", "") },
+			{ "8_2",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,5,6,8}, "665542", "") },
+			{ "8_3",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,5,6,9}, "656542", "") },
+			{ "8_4",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,5,7,8}, "655552", "") },
+			{ "8_5",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,6,7,8}, "654553", "") },
+			{ "8_6",	new PitchClassRec( new HashSet<int>(){0,1,2,3,5,6,7,8}, "654463", "") },
+			{ "8_7",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,5,8,9}, "645652", "") },
+			{ "8_8",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,7,8,9}, "644563", "") },
+			{ "8_9",	new PitchClassRec( new HashSet<int>(){0,1,2,3,6,7,8,9}, "644464", "") },
+			{ "8_10",	new PitchClassRec( new HashSet<int>(){0,2,3,4,5,6,7,9}, "566452", "") },
+			{ "8_11",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,5,7,9}, "565552", "") },
+			{ "8_12",	new PitchClassRec( new HashSet<int>(){0,1,3,4,5,6,7,9}, "556543", "") },
+			{ "8_13",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,6,7,9}, "556453", "") },
+			{ "8_14",	new PitchClassRec( new HashSet<int>(){0,1,2,4,5,6,7,9}, "555562", "") },
+			{ "8_Z15",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,6,8,9}, "555553", "8_Z29") },
+			{ "8_16",	new PitchClassRec( new HashSet<int>(){0,1,2,3,5,7,8,9}, "554563", "") },
+			{ "8_17",	new PitchClassRec( new HashSet<int>(){0,1,3,4,5,6,8,9}, "546652", "") },
+			{ "8_18",	new PitchClassRec( new HashSet<int>(){0,1,2,3,5,6,8,9}, "546553", "") },
+			{ "8_19",	new PitchClassRec( new HashSet<int>(){0,1,2,4,5,6,8,9}, "545752", "") },
+			{ "8_20",	new PitchClassRec( new HashSet<int>(){0,1,2,4,5,7,8,9}, "545662", "") },
+			{ "8_21",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,6,8,10},"474643", "") },
+			{ "8_22",	new PitchClassRec( new HashSet<int>(){0,1,2,3,5,6,8,10},"465562", "") },
+			{ "8_23",	new PitchClassRec( new HashSet<int>(){0,1,2,3,5,7,8,10},"465472", "") },
+			{ "8_24",	new PitchClassRec( new HashSet<int>(){0,1,2,4,5,6,8,10},"464743", "") },
+			{ "8_25",	new PitchClassRec( new HashSet<int>(){0,1,2,4,6,7,8,10},"464644", "") },
+			{ "8_26",	new PitchClassRec( new HashSet<int>(){0,1,2,4,5,7,9,10},"456562", "") },
+			{ "8_27",	new PitchClassRec( new HashSet<int>(){0,1,2,4,5,7,8,10},"456553", "") },
+			{ "8_28",	new PitchClassRec( new HashSet<int>(){0,1,3,4,6,7,9,10},"448444", "") },
+			{ "8_Z29",	new PitchClassRec( new HashSet<int>(){0,1,2,3,5,6,7,9}, "555553", "8_Z15") },
+						
+			/////////////////////////////////////////////////////////////////////////////////
+			/* 9 complete 01.04.2019 */
+			{ "9_1",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,5,6,7,8},	"876663", "") },
+			{ "9_2",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,5,6,7,9},	"777663", "") },
+			{ "9_3",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,5,6,8,9},	"767763", "") },
+			{ "9_4",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,5,7,8,9},	"766773", "") },
+			{ "9_5",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,6,7,8,9},	"766674", "") },
+			{ "9_6",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,5,6,8,10},	"686763", "") },
+			{ "9_7",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,6,7,8,10},	"677673", "") },
+			{ "9_8",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,6,7,8,10},	"676764", "") },
+			{ "9_9",	new PitchClassRec( new HashSet<int>(){0,1,2,3,5,6,7,8,10},	"676683", "") },
+			{ "9_10",	new PitchClassRec( new HashSet<int>(){0,1,2,3,4,6,7,9,10},	"668664", "") },
+			{ "9_11",	new PitchClassRec( new HashSet<int>(){0,1,2,3,5,6,7,9,10},	"667773", "") },
+			{ "9_12",	new PitchClassRec( new HashSet<int>(){0,1,2,4,5,6,8,9,10},	"666963", "") }
+		};
 	}
 }
