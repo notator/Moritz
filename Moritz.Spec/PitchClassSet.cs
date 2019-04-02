@@ -38,12 +38,12 @@ namespace Moritz.Spec
 	{
 		/// <summary>
 		/// The argument is cloned before being used.
-		/// The NormalForm, PrimeForm, PrimeInversionForm and BestPrimeForm attributes are set.
-		/// The BestPrimeForm is the "best" of either PrimeForm or PrimeInversionForm.
+		/// The NormalForm, PrimeForm, PrimeRoot, PrimeInversionForm and ForteName attributes are set.
+		/// The ForteName is found as containing the "best" of either PrimeForm or PrimeInversionForm.
 		/// "best" is defined by Allen Forte's Algorithm, coded in the GetBestForm(form1, form2) function in this class. 
 		/// </summary>
 		/// <param name="pitches">A List of int or a HashSet of int containing any number of non-negative integers (the order is unimportant).</param>
-		public PitchClassSet(IReadOnlyCollection<int> pitchesArg)
+		public PitchClassSet(ICollection<int> pitchesArg)
 		{
 			_normalForm = GetPitchClassSet(pitchesArg);
 
@@ -74,7 +74,7 @@ namespace Moritz.Spec
 		/// if the returned HashSet would have less than 3 or more than 9 values.
 		/// </summary>
 		/// <param name="pitchesArg">A List of int or a HashSet of int containing any number of non-negative integers (the order is unimportant).</param>
-		private HashSet<int> GetPitchClassSet(IReadOnlyCollection<int> pitchesArg)
+		private HashSet<int> GetPitchClassSet(ICollection<int> pitchesArg)
 		{
 			var pitches = new List<int>(pitchesArg);
 

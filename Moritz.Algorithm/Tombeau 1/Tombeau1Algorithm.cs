@@ -59,17 +59,30 @@ namespace Moritz.Algorithm.Tombeau1
 			//Trk trk1 = trkPalette.GetTrk(5, 6);
 			#endregion test code 1
 			#region test code 2
-			//List<int> pitches = new List<int>() { 0, 10, 134, 2, 17 };
-			//List<int> pitches = new List<int>() { 3, 5, 9, 6, 0 };
-			//List<int> pitches = new List<int>() { 6, 7, 9, 0, 1, 2, 3 };
-			//List<int> pitches = new List<int>() { 10, 2, 4, 8, 6, 0 };
-			//List<int> pitches = new List<int>() { 0, 1, 3, 5, 6, 9 };
+
 			List<int> pitches1 = new List<int>() { 9, 6, 5, 3, 0, 1 };
 			PitchClassSet opc1 = new PitchClassSet(pitches1);
 			List<int> pitches2 = new List<int>() { 5, 6, 3 };
 			PitchClassSet opc2 = new PitchClassSet(pitches2);
 			List<int> pitches3 = new List<int>() { 5,6,9,1,0,3 };
 			PitchClassSet opc3 = new PitchClassSet(pitches3);
+
+			List<int> pitches4 = new List<int>() { 0, 10, 134, 2, 17 };
+			PitchClassSet opc4 = new PitchClassSet(pitches4);
+			List<int> pitches5 = new List<int>() { 3, 5, 9, 6, 0 };
+			PitchClassSet opc5 = new PitchClassSet(pitches5);
+			List<int> pitches6 = new List<int>() { 6, 7, 9, 0, 1, 2, 3 };
+			PitchClassSet opc6 = new PitchClassSet(pitches6);
+			List<int> pitches7 = new List<int>() { 10, 2, 4, 8, 6, 0 };
+			PitchClassSet opc7 = new PitchClassSet(pitches7);
+			List<int> pitches8 = new List<int>() { 0, 1, 3, 5, 6, 9 };
+			PitchClassSet opc8 = new PitchClassSet(pitches8);
+
+			HashSet<int> h = opc8.NormalForm;
+			h.UnionWith(opc6.NormalForm);
+			h.IntersectWith(opc5.NormalForm);
+			PitchClassSet opc_h = new PitchClassSet(h);
+
 
 			HashSet<int> s1 = opc1.NormalForm;
 			s1.IntersectWith(opc2.NormalForm);
