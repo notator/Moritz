@@ -720,8 +720,6 @@ namespace Moritz.Spec
 		/// <param name="pitches">A List of int or a HashSet of int containing any number of non-negative integers (the order is unimportant).</param>
 		public PitchClassSet(IReadOnlyCollection<int> pitchesArg)
 		{
-			CheckIntervalVectors();
-
 			_normalForm = GetPitchClassSet(pitchesArg);
 
 			if(_normalForm.Count < 3 || _normalForm.Count > 9)
@@ -740,51 +738,6 @@ namespace Moritz.Spec
 			HashSet<int> bestPrimeForm = new HashSet<int>(GetBestForm(_primeForm, _primeInversionForm));
 
 			ForteName = GetName(bestPrimeForm);
-		}
-
-		private void CheckIntervalVectors()
-		{
-			List<int> GetVector(IReadOnlyList<int> primeForm)
-			{
-				List<int> v = new List<int>();
-				for(int i = 0; i < 6; ++i )
-				{
-					v.Add(0);
-				}
-				for(int i = 0; i < primeForm.Count - 1; ++i)
-				{
-					for(int j = i + 1; j < primeForm.Count; j++)	
-					{
-						int diff = Math.Abs(primeForm[i] - primeForm[j]);
-						diff = (diff > 6) ? Math.Abs(12 - diff) : diff;
-						v[diff - 1]++;
-					}
-				}
-
-				return v;
-			}
-
-			foreach(KeyValuePair<string, FortePitchClassRec> record in FortePitchClassSets)
-			{
-				FortePitchClassRec rc = record.Value;
-				List<int> primeForm = new List<int>(rc.PrimeForm);
-
-				List<int> vector = GetVector(primeForm);
-
-				IReadOnlyList<int> Fvector = rc.IntervalVector;
-				for(int i = 0; i < Fvector.Count; ++i)
-				{
-					if(vector[i] != Fvector[i])
-					{
-						StringBuilder sb = new StringBuilder();
-						foreach(int val in vector)
-						{
-							sb.Append(val.ToString());
-						}
-						Console.WriteLine(record.Key + ": " + sb.ToString());
-					}
-				}
-			}
 		}
 
 		/// <summary>
