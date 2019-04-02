@@ -49,6 +49,7 @@
     <Compile Include="BasicMidiChordDef.cs" />
     <Compile Include="Bar.cs" />
     <Compile Include="CarryMsgs.cs" />
+    <Compile Include="PitchClassSet.cs" />
     <Compile Include="ModeProximity.cs" />
     <Compile Include="MidiMsg.cs" />
     <Compile Include="MidiRestDef.cs" />
