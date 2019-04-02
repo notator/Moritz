@@ -720,6 +720,8 @@ namespace Moritz.Spec
 		/// <param name="pitches">A List of int or a HashSet of int containing any number of non-negative integers (the order is unimportant).</param>
 		public PitchClassSet(IReadOnlyCollection<int> pitchesArg)
 		{
+			CheckIntervalVectors();
+
 			_normalForm = GetPitchClassSet(pitchesArg);
 
 			if(_normalForm.Count < 3 || _normalForm.Count > 9)
@@ -738,6 +740,51 @@ namespace Moritz.Spec
 			HashSet<int> bestPrimeForm = new HashSet<int>(GetBestForm(_primeForm, _primeInversionForm));
 
 			ForteName = GetName(bestPrimeForm);
+		}
+
+		private void CheckIntervalVectors()
+		{
+			List<int> GetVector(IReadOnlyList<int> primeForm)
+			{
+				List<int> v = new List<int>();
+				for(int i = 0; i < 6; ++i )
+				{
+					v.Add(0);
+				}
+				for(int i = 0; i < primeForm.Count - 1; ++i)
+				{
+					for(int j = i + 1; j < primeForm.Count; j++)	
+					{
+						int diff = Math.Abs(primeForm[i] - primeForm[j]);
+						diff = (diff > 6) ? Math.Abs(12 - diff) : diff;
+						v[diff - 1]++;
+					}
+				}
+
+				return v;
+			}
+
+			foreach(KeyValuePair<string, FortePitchClassRec> record in FortePitchClassSets)
+			{
+				FortePitchClassRec rc = record.Value;
+				List<int> primeForm = new List<int>(rc.PrimeForm);
+
+				List<int> vector = GetVector(primeForm);
+
+				IReadOnlyList<int> Fvector = rc.IntervalVector;
+				for(int i = 0; i < Fvector.Count; ++i)
+				{
+					if(vector[i] != Fvector[i])
+					{
+						StringBuilder sb = new StringBuilder();
+						foreach(int val in vector)
+						{
+							sb.Append(val.ToString());
+						}
+						Console.WriteLine(record.Key + ": " + sb.ToString());
+					}
+				}
+			}
 		}
 
 		/// <summary>
@@ -1069,7 +1116,7 @@ namespace Moritz.Spec
 			{ "4_17(12)",	new FortePitchClassRec( new HashSet<int>(){0,3,4,7}, "102210", "") },
 			{ "4_18",		new FortePitchClassRec( new HashSet<int>(){0,1,4,7}, "102111", "") },
 			{ "4_19",		new FortePitchClassRec( new HashSet<int>(){0,1,4,8}, "101310", "") },
-			{ "4_20(12)",	new FortePitchClassRec( new HashSet<int>(){0,2,5,8}, "101220", "") },
+			{ "4_20(12)",	new FortePitchClassRec( new HashSet<int>(){0,1,5,8}, "101220", "") },
 			{ "4_21(12)",	new FortePitchClassRec( new HashSet<int>(){0,2,4,6}, "030201", "") },
 			{ "4_22",		new FortePitchClassRec( new HashSet<int>(){0,2,4,7}, "021120", "") },
 			{ "4_23(12)",	new FortePitchClassRec( new HashSet<int>(){0,2,5,7}, "021030", "") },
@@ -1256,7 +1303,7 @@ namespace Moritz.Spec
 			{ "9_4",	new FortePitchClassRec( new HashSet<int>(){0,1,2,3,4,5,7,8,9},	"766773", "") },
 			{ "9_5",	new FortePitchClassRec( new HashSet<int>(){0,1,2,3,4,6,7,8,9},	"766674", "") },
 			{ "9_6",	new FortePitchClassRec( new HashSet<int>(){0,1,2,3,4,5,6,8,10},	"686763", "") },
-			{ "9_7",	new FortePitchClassRec( new HashSet<int>(){0,1,2,3,4,6,7,8,10},	"677673", "") },
+			{ "9_7",	new FortePitchClassRec( new HashSet<int>(){0,1,2,3,4,5,7,8,10},	"677673", "") },
 			{ "9_8",	new FortePitchClassRec( new HashSet<int>(){0,1,2,3,4,6,7,8,10},	"676764", "") },
 			{ "9_9",	new FortePitchClassRec( new HashSet<int>(){0,1,2,3,5,6,7,8,10},	"676683", "") },
 			{ "9_10",	new FortePitchClassRec( new HashSet<int>(){0,1,2,3,4,6,7,9,10},	"668664", "") },
