@@ -740,75 +740,6 @@ namespace Moritz.Spec
 			ForteName = GetName(bestPrimeForm);
 		}
 
-		/// <summary>
-		/// See "The Structure of Atonal Music" page 4.
-		/// The returned list contains the "best" rotation of the argument's pitch classes.
-		/// The values in the returned list are in ascending order, and may be in any octave.
-		/// </summary>
-		/// <param name="normalForm">An ordered list of between 3 and 9 unique pitch classes in range [0..11]</param>
-		/// <returns>The "best" rotation (according to Forte's algorithm).</returns>
-		private IReadOnlyList<int> GetBestRotation(HashSet<int> normalForm)
-		{
-			#region get rotations
-			// pitch classes are in range [0..11]
-			// absolute pitches are pitch classes + 12 per octave.
-			// rotations contain absolute pitches in ascending order
-			List<int> rotation1 = new List<int>(normalForm);
-			rotation1.Sort();
-			List<List<int>> rotations = new List<List<int>>();
-			rotations.Add(rotation1);
-
-			for(int i = 1; i < rotation1.Count; ++i)
-			{
-				var prevRotation = rotations[i - 1];
-				var rotation = new List<int>();
-				for(int j = 1; j < prevRotation.Count; ++j)
-				{
-					rotation.Add(prevRotation[j]);
-				}
-				int absPitch = prevRotation[0];
-				while(absPitch < rotation[rotation.Count - 1])
-				{
-					absPitch += 12;
-				}
-				rotation.Add(absPitch);
-				rotations.Add(rotation);
-			}
-			#endregion get rotations
-
-			IReadOnlyList<int> rval = rotations[0];
-			for(int i = 1; i < rotations.Count; ++i)
-			{
-				rval = GetBestForm(rval, rotations[i]);
-			}
-
-			return rval;
-		}
-
-		/// <summary>
-		/// The PrimeForm is created by subtracting the first value in bestRotation from each value, and adding 12 when/if the result is negative.
-		/// The result is a list in which the first value is 0, the values are in ascending order, and the intervallic
-		/// relations in bestRotation are preserved.
-		/// </summary>
-		private IReadOnlyList<int> GetPrimeForm(IReadOnlyList<int> bestRotation)
-		{
-			var primeForm = new List<int>();
-			int first = bestRotation[0];
-			foreach(int val in bestRotation)
-			{
-				int baseVal = val - first;
-				while(baseVal < 0)
-				{
-					baseVal += 12;
-				}
-				primeForm.Add(baseVal);
-			}
-
-			CheckPrimeConsistency(primeForm);
-
-			return primeForm;
-		}
-
 		/// <summary> 
 		/// Returns a HashSet of int containing the pitch classes present in the pitchesArg argument.
 		/// The HashSet is constructed with the values in ascending order for debugging purposes.
@@ -856,7 +787,52 @@ namespace Moritz.Spec
 		}
 
 		/// <summary>
-		/// Returns either the list1 or list2 depending on which is "best" according to Forte's algorithm (p.4).
+		/// See "The Structure of Atonal Music" page 4.
+		/// The returned list contains the "best" rotation of the argument's pitch classes.
+		/// The values in the returned list are in ascending order, and may be in any octave.
+		/// </summary>
+		/// <param name="normalForm">A HashSet containing between 3 and 9 unique pitch classes in range [0..11]</param>
+		/// <returns>The "best" rotation (according to Forte's algorithm).</returns>
+		private IReadOnlyList<int> GetBestRotation(HashSet<int> normalForm)
+		{
+			#region get rotations
+			// pitch classes are in range [0..11]
+			// absolute pitches are pitch classes + 12 per octave.
+			// rotations contain absolute pitches in ascending order
+			List<int> rotation1 = new List<int>(normalForm);
+			rotation1.Sort();
+			List<List<int>> rotations = new List<List<int>>();
+			rotations.Add(rotation1);
+
+			for(int i = 1; i < rotation1.Count; ++i)
+			{
+				var prevRotation = rotations[i - 1];
+				var rotation = new List<int>();
+				for(int j = 1; j < prevRotation.Count; ++j)
+				{
+					rotation.Add(prevRotation[j]);
+				}
+				int absPitch = prevRotation[0];
+				while(absPitch < rotation[rotation.Count - 1])
+				{
+					absPitch += 12;
+				}
+				rotation.Add(absPitch);
+				rotations.Add(rotation);
+			}
+			#endregion get rotations
+
+			IReadOnlyList<int> rval = rotations[0];
+			for(int i = 1; i < rotations.Count; ++i)
+			{
+				rval = GetBestForm(rval, rotations[i]);
+			}
+
+			return rval;
+		}
+
+		/// <summary>
+		/// Returns either list1 or list2 depending on which is "best" according to Forte's algorithm (p.4).
 		/// Both lists must be the same length and in ascending order.
 		/// </summary>
 		/// <param name="list1">Can be a rotated list of pitches containing values greater than 11</param>
@@ -883,7 +859,7 @@ namespace Moritz.Spec
 
 			int firstForm1 = list1[0];
 			int firstForm2 = list2[0];
-			int diff = (list1[count-1] - firstForm1) - (list2[count-1] - firstForm2);
+			int diff = (list1[count - 1] - firstForm1) - (list2[count - 1] - firstForm2);
 			if(diff == 0)
 			{
 				for(int i = 1; i < count; ++i)
@@ -909,6 +885,35 @@ namespace Moritz.Spec
 			return rval;
 		}
 
+		/// <summary>
+		/// The PrimeForm is created by subtracting the first value in bestRotation from each value, and adding 12
+		/// when/if the result is negative. The result is a list in which the first value is 0, the values are in
+		/// range [0..11], in ascending order, and the intervallic relations in bestRotation are preserved.
+		/// </summary>
+		private IReadOnlyList<int> GetPrimeForm(IReadOnlyList<int> bestRotation)
+		{
+			var primeForm = new List<int>();
+			int first = bestRotation[0];
+			foreach(int val in bestRotation)
+			{
+				int baseVal = val - first;
+				while(baseVal < 0)
+				{
+					baseVal += 12;
+				}
+				primeForm.Add(baseVal);
+			}
+
+			CheckPrimeConsistency(primeForm);
+
+			return primeForm;
+		}
+
+		/// <summary>
+		/// The primeForm of the bestRotation of the inversion of the argument.
+		/// </summary>
+		/// <param name="primeForm"></param>
+		/// <returns></returns>
 		private IReadOnlyList<int> GetPrimeInversionForm(IReadOnlyList<int> primeForm)
 		{
 			var inversion = new HashSet<int>();
@@ -923,6 +928,9 @@ namespace Moritz.Spec
 			return primeInversion;
 		}
 
+		/// <summary>
+		/// The name (=key) of the FortePitchClassRec having the given primeForm in the FortePitchClassSets Dictionary. 
+		/// </summary>
 		private string GetName(HashSet<int> bestPrimeForm)
 		{
 			string name = "";
@@ -936,7 +944,7 @@ namespace Moritz.Spec
 			}
 			if(string.IsNullOrEmpty(name))
 			{
-				throw new ApplicationException("PitchClassSet not found in Allen Forte's PitchClassSet list.");
+				throw new ApplicationException("PitchClassSet not found in the FortePitchClassSets Dictionary.");
 			}
 			return name;
 		}
@@ -983,8 +991,8 @@ namespace Moritz.Spec
 
 		/// <summary>
 		/// NormalForm returns a new HashSet containing between 3 and 9 integers in range [0..11].
-		/// The integers represent pitches (C=0, C#=1 etc.). None of the pitches is obligatory.
-		/// The order of values in a HashSet is functionally irrelevant, but to ease debugging,
+		/// The integers represent absolute pitches (C=0, C#=1 etc.). None of the pitches is obligatory.
+		/// The order of values in a HashSet is functionally irrelevant but, to ease debugging,
 		/// the returned HashSet is constructed with its values in ascending order.
 		/// A HashSet is equivalent to a mathematical "set", and has corresponding set functions.
 		/// </summary>
@@ -992,20 +1000,23 @@ namespace Moritz.Spec
 		private HashSet<int> _normalForm;
 
 		/// <summary>
-		/// PrimeForm is the "best" rotation of a NormalForm, transposed so that PrimeForm[0] is 0.
-		/// Rotations are in ascending order, so PrimeForm is too.
+		/// PrimeForm is the "best" rotation of the NormalForm, transposed so that PrimeForm[0] is 0.
+		/// All rotations are in ascending order, so PrimeForm is too.
 		/// </summary>
 		public HashSet<int> PrimeForm {	get	{ return new HashSet<int>(_primeForm); } }
 		private IReadOnlyList<int> _primeForm;
 
 		/// <summary>
-		/// PrimeInversionForm is the "best" rotation of PrimeForm's inversion, transposed so that PrimeInversionForm[0] is 0.
+		/// The bestRotation of the inversion of the PrimeForm, transposed so that PrimeInversionForm[0] is 0.
 		/// Rotations are in ascending order, so PrimeInversionForm is too.
 		/// </summary>
 		public HashSet<int> PrimeInversionForm { get { return new HashSet<int>(_primeInversionForm); } }
 		private IReadOnlyList<int> _primeInversionForm;
 
 		public string ForteName { get; private set; }
+		/// <summary>
+		/// The first value in the "best" rotation of NormalForm. 
+		/// </summary>
 		public int PrimeRoot { get; private set; }
 
 		public HashSet<int> FortePrimeForm
