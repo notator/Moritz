@@ -61,38 +61,53 @@ namespace Moritz.Algorithm.Tombeau1
 			#region test code 2
 
 			List<int> pitches1 = new List<int>() { 9, 6, 5, 3, 0, 1 };
-			PitchClassSet opc1 = new PitchClassSet(pitches1);
+			FortePitchClassSet opc1 = new FortePitchClassSet(pitches1);
 			List<int> pitches2 = new List<int>() { 5, 6, 3 };
-			PitchClassSet opc2 = new PitchClassSet(pitches2);
+			FortePitchClassSet opc2 = new FortePitchClassSet(pitches2);
 			List<int> pitches3 = new List<int>() { 5,6,9,1,0,3 };
-			PitchClassSet opc3 = new PitchClassSet(pitches3);
+			FortePitchClassSet opc3 = new FortePitchClassSet(pitches3);
 
 			List<int> pitches4 = new List<int>() { 0, 10, 134, 2, 17 };
-			PitchClassSet opc4 = new PitchClassSet(pitches4);
+			FortePitchClassSet opc4 = new FortePitchClassSet(pitches4);
 			List<int> pitches5 = new List<int>() { 3, 5, 9, 6, 0 };
-			PitchClassSet opc5 = new PitchClassSet(pitches5);
+			FortePitchClassSet opc5 = new FortePitchClassSet(pitches5);
 			List<int> pitches6 = new List<int>() { 6, 7, 9, 0, 1, 2, 3 };
-			PitchClassSet opc6 = new PitchClassSet(pitches6);
+			FortePitchClassSet opc6 = new FortePitchClassSet(pitches6);
 			List<int> pitches7 = new List<int>() { 10, 2, 4, 8, 6, 0 };
-			PitchClassSet opc7 = new PitchClassSet(pitches7);
+			FortePitchClassSet opc7 = new FortePitchClassSet(pitches7);
 			List<int> pitches8 = new List<int>() { 0, 1, 3, 5, 6, 9 };
-			PitchClassSet opc8 = new PitchClassSet(pitches8);
+			FortePitchClassSet opc8 = new FortePitchClassSet(pitches8);
 
-			HashSet<int> h = opc8.NormalForm;
-			h.UnionWith(opc6.NormalForm);
-			h.IntersectWith(opc5.NormalForm);
-			PitchClassSet opc_h = new PitchClassSet(h);
+			var pitches9 = new HashSet<int>() { 3, 5, 9, 6, 1 };
+			FortePitchClassSet opc9 = new FortePitchClassSet(pitches9);
 
+			HashSet<int> h = opc2.PitchClasses(0);
+			HashSet<int> g = opc2.PitchClasses(1);
+			HashSet<int> k = opc2.PitchClasses(2);
+			HashSet<int> l = opc2.PitchClasses(4);
+			HashSet<int> m = opc2.PitchClasses(11);
+			HashSet<int> n = opc2.PitchClasses(-2);
 
-			HashSet<int> s1 = opc1.NormalForm;
-			s1.IntersectWith(opc2.NormalForm);
+			HashSet<int> ih = opc2.InvertedPitchClasses(0);
+			HashSet<int> ig = opc2.InvertedPitchClasses(1);
+			HashSet<int> ik = opc2.InvertedPitchClasses(2);
+			HashSet<int> il = opc2.InvertedPitchClasses(4);
+			HashSet<int> im = opc2.InvertedPitchClasses(11);
+			HashSet<int> io = opc2.InvertedPitchClasses(-2);
 
-			if(opc1.NormalForm.SetEquals(opc3.NormalForm))
+			h.UnionWith(opc6.PitchClasses(0));
+			h.IntersectWith(opc5.PitchClasses(0));
+			FortePitchClassSet opc_h = new FortePitchClassSet(h);
+
+			HashSet<int> s1 = opc1.PitchClasses(0);
+			s1.IntersectWith(opc2.PitchClasses(0));
+
+			if(opc1.PitchClasses(0).SetEquals(opc3.PitchClasses(0)))
 			{
 				Console.WriteLine("yes");
 			}
 
-			HashSet<int> opc1N = opc1.NormalForm;
+			HashSet<int> opc1N = opc1.PitchClasses(0);
 			if(s1.IsProperSubsetOf(opc1N))
 			{
 				Console.WriteLine("yes");
@@ -135,7 +150,7 @@ namespace Moritz.Algorithm.Tombeau1
 				Console.WriteLine("yes");
 			}
 
-			//if(opc1.NormalForm.IntersectWith(opc2.NormalForm))
+			//if(opc1.PitchClasses().IntersectWith(opc2.PitchClasses()))
 			//{
 			//	Console.WriteLine("yes");
 			//}

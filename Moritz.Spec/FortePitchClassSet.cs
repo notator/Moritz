@@ -34,37 +34,38 @@ namespace Moritz.Spec
 	/// This class implements the "pitch class set" defined by Allen Forte in "The Structure of Atonal Music".
 	/// In that book, a "pitch class set" must contain between 3 and 9 pitch classes.
 	/// </summary>
-	public class PitchClassSet
+	public class FortePitchClassSet
 	{
 		/// <summary>
 		/// The argument is cloned before being used.
-		/// The NormalForm, PrimeForm, PrimeRoot, PrimeInversionForm and ForteName attributes are set.
+		/// The PrimeForm, PrimeRoot, PrimeInversionForm and ForteName attributes are set.
 		/// The ForteName is found as containing the "best" of either PrimeForm or PrimeInversionForm.
 		/// "best" is defined by Allen Forte's Algorithm, coded in the GetBestForm(form1, form2) function in this class. 
 		/// </summary>
 		/// <param name="pitches">A List of int or a HashSet of int containing any number of non-negative integers (the order is unimportant).</param>
-		public PitchClassSet(ICollection<int> pitchesArg)
+		public FortePitchClassSet(ICollection<int> pitchesArg)
 		{
-			_normalForm = GetPitchClassSet(pitchesArg);
+			HashSet<int> basicPitchClassesSet = GetBasicPitchClassSet(pitchesArg);
 
-			if(_normalForm.Count < 3 || _normalForm.Count > 9)
+			if(basicPitchClassesSet.Count < 3 || basicPitchClassesSet.Count > 9)
 			{
-				throw new ApplicationException("Cannot create a PitchClassSet containing less than 3 or more than 9 pitch classes.");
+				throw new ApplicationException("Cannot create a FortePitchClassSet containing less than 3 or more than 9 pitch classes.");
 			}
 
-			IReadOnlyList<int> bestRotation = GetBestRotation(_normalForm);
-			PrimeRoot = bestRotation[0];
+			IReadOnlyList<int> bestRotation = GetBestRotation(basicPitchClassesSet);
+			_rootPitchClass = bestRotation[0];
 
 			// _primeForm is an IReadOnlyList, PrimeForm is a HashSet.
 			_primeForm = GetPrimeForm(bestRotation);
 			// _primeInversionForm is an IReadOnlyList, PrimeInversionForm is a HashSet.
 			_primeInversionForm = GetPrimeInversionForm(_primeForm);
 
-			HashSet<int> bestPrimeForm = new HashSet<int>(GetBestForm(_primeForm, _primeInversionForm));
+			FortePrimeForm = new HashSet<int>(GetBestForm(_primeForm, _primeInversionForm));
 
-			ForteName = GetName(bestPrimeForm);
+			ForteName = GetName(FortePrimeForm);
 		}
 
+		#region functions called by the constructor
 		/// <summary> 
 		/// Returns a HashSet of int containing the pitch classes present in the pitchesArg argument.
 		/// The HashSet is constructed with the values in ascending order for debugging purposes.
@@ -74,7 +75,7 @@ namespace Moritz.Spec
 		/// if the returned HashSet would have less than 3 or more than 9 values.
 		/// </summary>
 		/// <param name="pitchesArg">A List of int or a HashSet of int containing any number of non-negative integers (the order is unimportant).</param>
-		private HashSet<int> GetPitchClassSet(ICollection<int> pitchesArg)
+		private HashSet<int> GetBasicPitchClassSet(ICollection<int> pitchesArg)
 		{
 			var pitches = new List<int>(pitchesArg);
 
@@ -269,7 +270,7 @@ namespace Moritz.Spec
 			}
 			if(string.IsNullOrEmpty(name))
 			{
-				throw new ApplicationException("PitchClassSet not found in the FortePitchClassSets Dictionary.");
+				throw new ApplicationException("FortePitchClassSet not found in the FortePitchClassSets Dictionary.");
 			}
 			return name;
 		}
@@ -314,44 +315,22 @@ namespace Moritz.Spec
 			}
 		}
 
-		/// <summary>
-		/// NormalForm returns a new HashSet containing between 3 and 9 integers in range [0..11].
-		/// The integers represent absolute pitches (C=0, C#=1 etc.). None of the pitches is obligatory.
-		/// The order of values in a HashSet is functionally irrelevant but, to ease debugging,
-		/// the returned HashSet is constructed with its values in ascending order.
-		/// A HashSet is equivalent to a mathematical "set", and has corresponding set functions.
-		/// </summary>
-		public HashSet<int> NormalForm { get { return new HashSet<int>(_normalForm); } }
-		private HashSet<int> _normalForm;
+		#endregion
 
+		#region set by the constructor
 		/// <summary>
-		/// PrimeForm is the "best" rotation of the NormalForm, transposed so that PrimeForm[0] is 0.
-		/// All rotations are in ascending order, so PrimeForm is too.
+		/// The returned pitch classes are in normal order, i.e. in range 0..11 in ascending order.
+		/// The first value is always 0.
+		/// These values are independent of the transposition of the pitch classes used to construct this FortePitchClassSet,
 		/// </summary>
-		public HashSet<int> PrimeForm {	get	{ return new HashSet<int>(_primeForm); } }
-		private IReadOnlyList<int> _primeForm;
-
+		public HashSet<int> PrimeForm { get { return new HashSet<int>(_primeForm); } }
 		/// <summary>
-		/// The bestRotation of the inversion of the PrimeForm, transposed so that PrimeInversionForm[0] is 0.
+		/// The "best" Rotation of the inversion of the PrimeForm, transposed so that PrimeInversionForm[0] is 0.
 		/// Rotations are in ascending order, so PrimeInversionForm is too.
 		/// </summary>
 		public HashSet<int> PrimeInversionForm { get { return new HashSet<int>(_primeInversionForm); } }
-		private IReadOnlyList<int> _primeInversionForm;
-
+		public HashSet<int> FortePrimeForm { get; private set; }
 		public string ForteName { get; private set; }
-		/// <summary>
-		/// The first value in the "best" rotation of NormalForm. 
-		/// </summary>
-		public int PrimeRoot { get; private set; }
-
-		public HashSet<int> FortePrimeForm
-		{
-			get
-			{
-				FortePitchClassRecord pcr = FortePitchClassSets[ForteName];
-				return new HashSet<int>(pcr.PrimeForm);
-			}
-		}
 		public IReadOnlyList<int> IntervalVector
 		{
 			get
@@ -369,6 +348,74 @@ namespace Moritz.Spec
 			}
 		}
 
+		#region private variables set by the constructor 
+		/// <summary>
+		/// The transposition of the original pitches used to construct this FortePitchClassSet re the PrimeForm.
+		/// </summary>
+		private readonly int _rootPitchClass;
+		/// <summary>
+		/// Used by public HashSet PrimeForm.
+		/// </summary>
+		private readonly IReadOnlyList<int> _primeForm;
+		/// <summary>
+		/// Used by public HashSet PrimeInversionForm.
+		/// </summary>
+		private readonly IReadOnlyList<int> _primeInversionForm;
+		#endregion
+
+		#endregion
+
+		#region public functions
+		/// <summary> 
+		/// Returns the PrimeForm of this FortePitchClassSet transposed by the argument.
+		/// The transposition is relative to the original pitches used to construct this FortePitchClassSet.
+		/// The returned pitch classes are in normal order, i.e. in range 0..11 in ascending order.
+		/// </summary>
+		/// <param name="transposition">Any positive or negative int.</param>
+		public HashSet<int> PitchClasses(int transposition)
+		{
+			return _pitchClasses(PrimeForm, transposition);
+		}
+		/// <summary> 
+		/// Returns the PrimeInversionForm transposed by the argument.
+		/// The transposition is relative to the original pitches used to construct this FortePitchClassSet.
+		/// The returned pitch classes are in normal order, i.e. in range 0..11 in ascending order.
+		/// </summary>
+		/// <param name="transposition">Any positive or negative int.</param>
+		public HashSet<int> InvertedPitchClasses(int transposition)
+		{
+			return _pitchClasses(PrimeInversionForm, transposition);
+		}
+		/// <summary>
+		/// Code used by both of the above.
+		/// The returned pitch classes are in normal order, i.e. in range 0..11 in ascending order.
+		/// </summary>
+		/// <param name="transposition"></param>
+		private HashSet<int> _pitchClasses(HashSet<int> primeForm, int transposition)
+		{
+			List<int> pitchClasses = new List<int>();
+
+			int transpRePrimeForm = _rootPitchClass + transposition;
+
+			foreach(int primePitchClass in primeForm)
+			{
+				int pitchClass = (primePitchClass + transpRePrimeForm) % 12;
+				while(pitchClass < 0)
+				{
+					pitchClass += 12;
+				}
+				pitchClasses.Add(pitchClass);
+			}
+			pitchClasses.Sort();
+
+			return new HashSet<int>(pitchClasses);
+		}
+		#endregion
+
+		/// <summary>
+		/// This static dictionary contains information copied from Appendix 1 of Allen Forte's book.
+		/// I have added the names of the Z-related FortePitchClassSets, so that they are easy to find when linking.
+		/// </summary>
 		public static Dictionary<string, FortePitchClassRecord> FortePitchClassSets = new Dictionary<string, FortePitchClassRecord>()
 		{
 			{ "3_1(12)",	new FortePitchClassRecord( new HashSet<int>(){0,1,2}, "210000", "")},
