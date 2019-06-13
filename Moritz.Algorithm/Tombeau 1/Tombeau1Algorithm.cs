@@ -46,125 +46,13 @@ namespace Moritz.Algorithm.Tombeau1
             _krystals = krystals;
             _palettes = palettes;
 
-			/** begin test code **/
-			#region test code 1
-			//List<Trk> values = new List<Trk>();
-			//for(int i = 0; i < 10; i++)
-			//{
-			//	values.Add(new Trk(0));
-			//}
-
-			//TrkPalette trkPalette = new TrkPalette(values);
-
-			//Trk trk1 = trkPalette.GetTrk(5, 6);
-			#endregion test code 1
-			#region test code 2
-
-			List<int> pitches1 = new List<int>() { 9, 6, 5, 3, 0, 1 };
-			FortePitchClassSet opc1 = new FortePitchClassSet(pitches1);
-			List<int> pitches2 = new List<int>() { 5, 6, 3 };
-			FortePitchClassSet opc2 = new FortePitchClassSet(pitches2);
-			List<int> pitches3 = new List<int>() { 5,6,9,1,0,3 };
-			FortePitchClassSet opc3 = new FortePitchClassSet(pitches3);
-
-			List<int> pitches4 = new List<int>() { 0, 10, 134, 2, 17 };
-			FortePitchClassSet opc4 = new FortePitchClassSet(pitches4);
-			List<int> pitches5 = new List<int>() { 3, 5, 9, 6, 0 };
-			FortePitchClassSet opc5 = new FortePitchClassSet(pitches5);
-			List<int> pitches6 = new List<int>() { 6, 7, 9, 0, 1, 2, 3 };
-			FortePitchClassSet opc6 = new FortePitchClassSet(pitches6);
-			List<int> pitches7 = new List<int>() { 10, 2, 4, 8, 6, 0 };
-			FortePitchClassSet opc7 = new FortePitchClassSet(pitches7);
-			List<int> pitches8 = new List<int>() { 0, 1, 3, 5, 6, 9 };
-			FortePitchClassSet opc8 = new FortePitchClassSet(pitches8);
-
-			var pitches9 = new HashSet<int>() { 3, 5, 9, 6, 1 };
-			FortePitchClassSet opc9 = new FortePitchClassSet(pitches9);
-
-			HashSet<int> h = opc2.PitchClasses(0);
-			HashSet<int> g = opc2.PitchClasses(1);
-			HashSet<int> k = opc2.PitchClasses(2);
-			HashSet<int> l = opc2.PitchClasses(4);
-			HashSet<int> m = opc2.PitchClasses(11);
-			HashSet<int> n = opc2.PitchClasses(-2);
-
-			HashSet<int> ih = opc2.InvertedPitchClasses(0);
-			HashSet<int> ig = opc2.InvertedPitchClasses(1);
-			HashSet<int> ik = opc2.InvertedPitchClasses(2);
-			HashSet<int> il = opc2.InvertedPitchClasses(4);
-			HashSet<int> im = opc2.InvertedPitchClasses(11);
-			HashSet<int> io = opc2.InvertedPitchClasses(-2);
-
-			h.UnionWith(opc6.PitchClasses(0));
-			h.IntersectWith(opc5.PitchClasses(0));
-			FortePitchClassSet opc_h = new FortePitchClassSet(h);
-
-			HashSet<int> s1 = opc1.PitchClasses(0);
-			s1.IntersectWith(opc2.PitchClasses(0));
-
-			if(opc1.PitchClasses(0).SetEquals(opc3.PitchClasses(0)))
-			{
-				Console.WriteLine("yes");
-			}
-
-			HashSet<int> opc1N = opc1.PitchClasses(0);
-			if(s1.IsProperSubsetOf(opc1N))
-			{
-				Console.WriteLine("yes");
-			}
-
-			if(s1.IsSubsetOf(opc1N))
-			{
-				Console.WriteLine("yes");
-			}
-
-			if(opc1N.IsProperSupersetOf(s1))
-			{
-				Console.WriteLine("yes");
-			}
-
-			if(opc1N.IsSupersetOf(s1))
-			{
-				Console.WriteLine("yes");
-			}
-
-			if(opc1N.IsSupersetOf(s1))
-			{
-				Console.WriteLine("yes");
-			}
-
-
-			HashSet<int> s2 = new HashSet<int>() { 5, 2 };
-
-			if(opc1N.Overlaps(s2))
-			{
-				Console.WriteLine("yes");
-			}
-
-			opc1N.UnionWith(s2);
-
-			opc1N.IntersectWith(s2);
-
-			if(opc1N.SetEquals(s2))
-			{
-				Console.WriteLine("yes");
-			}
-
-			//if(opc1.PitchClasses().IntersectWith(opc2.PitchClasses()))
-			//{
-			//	Console.WriteLine("yes");
-			//}
-
-			#endregion test code 2
-
-			/** end test code **/
-
 			#region main comment (thoughts etc.)
 			/*********************************************************************************************
 			Think Nancarrow: Mechanical Piano music... outside the notation system... outside the management system...
 			Think Webern Piano Variations. Phrases, envelope counterpoint...
 			Think Study 1: background/foreground, depth.
             Think Bach , Brückner, Reich. Repeating/changing, fairly fast groups of chords with harmonic support... and ornaments...
+			Think Wagner: (especially Tristan) Parts moving by (possibly microtonal) step to recognisable harmonies...
             
 
 			The following parameters can be controlled using the Resident Sf2 Synth:
