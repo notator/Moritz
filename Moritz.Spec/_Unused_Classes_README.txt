@@ -17,10 +17,6 @@ It was referenced only by Tombeau 1, and those references have been deleted.
 I've come to the conclusion that its not a good idea to use FortePitchClassSets as a compositional strategy.
 Compositions are about relations bewteen _particular_ pitch sets in a _particular_ composition, not about pitch sets _in_general_.
 A composition has to create relations that are perceptible _in_a_particular_context_, so the context can't be ignored by the
-analysis. Composing is the expression and clarification of a particular _context_.
+analysis. Composing is the creation and clarification of a particular _context_.
 
-Modes might be useful later, when looking for chord relations to use, but I'm currently more interested in the following approach:
-
-Instead of using Modes in Tombeau 1, I want to implement something like "passing notes" in voices that link particular, freely chosen,
-recognizable harmonies. To be recognisable, harmonies have to be both clearly recognizable and perceptibly repeated! Better to choose
-particular harmonies by ear than rely on some theoretical distance... We'll see.
+Modes may come in useful later. But see the comments in Tombeau1Algorithm.cs.

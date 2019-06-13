@@ -51,13 +51,6 @@
     <Compile Include="Study 2\Study2Algorithm.cs" />
     <Compile Include="Study 3.1\Study3Sketch1Algorithm.cs" />
     <Compile Include="Study 3.2\Study3Sketch2Algorithm.cs" />
-    <Compile Include="Tombeau 1\Tombeau1Voice.cs" />
-    <Compile Include="Tombeau 1\ModeSegment.cs" />
-    <Compile Include="Tombeau 1\Voice3.cs" />
-    <Compile Include="Tombeau 1\ModeGrpTrk.cs" />
-    <Compile Include="Tombeau 1\Voice1.cs" />
-    <Compile Include="Tombeau 1\Voice2.cs" />
-    <Compile Include="Tombeau 1\Voice4.cs" />
     <Compile Include="Tombeau 1\Tombeau1Algorithm.cs" />
   </ItemGroup>
   <ItemGroup>
