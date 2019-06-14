@@ -382,29 +382,44 @@ namespace Moritz.Spec
         {
             AdjustMsDurations<MidiChordDef>(0, _uniqueDefs.Count, factor, minThreshold);
         }
-        #endregion Changing the Trk's duration
+		#endregion Changing the Trk's duration
 
-        #region Changing MidiChordDef attributes
+		#region Changing MidiChordDef attributes
 
 
-        #region Envelopes
+		#region Envelopes
 
-        public void SetPitchWheelSliders(Envelope envelope)
-        {
-            #region condition
-            if(envelope.Domain != 127)
-            {
-                throw new ArgumentException($"{nameof(envelope.Domain)} must be 127.");
-            }
-            #endregion condition
+		public void SetPitchWheelSliders(Envelope envelope)
+		{
+			#region condition
+			if(envelope.Domain != 127)
+			{
+				throw new ArgumentException($"{nameof(envelope.Domain)} must be 127.");
+			}
+			#endregion condition
 
-            List<int> msPositions = GetMsPositions();
+			List<int> msPositions = GetMsPositions();
 
-            Dictionary<int, int> pitchWheelValuesPerMsPosition = envelope.GetValuePerMsPosition(msPositions);
+			Dictionary<int, int> pitchWheelValuesPerMsPosition = envelope.GetValuePerMsPosition(msPositions);
 
-            SetPitchWheelSliders(pitchWheelValuesPerMsPosition);
-        }
-        private List<int> GetMsPositions()
+			SetPitchWheelSliders(pitchWheelValuesPerMsPosition);
+		}
+		public void SetPanSliders(Envelope envelope)
+		{
+			#region condition
+			if(envelope.Domain != 127)
+			{
+				throw new ArgumentException($"{nameof(envelope.Domain)} must be 127.");
+			}
+			#endregion condition
+
+			List<int> msPositions = GetMsPositions();
+
+			Dictionary<int, int> panValuesPerMsPosition = envelope.GetValuePerMsPosition(msPositions);
+
+			SetPanSliders(panValuesPerMsPosition);
+		}
+		private List<int> GetMsPositions()
         {
             int originalMsDuration = MsDuration;
 
@@ -418,44 +433,73 @@ namespace Moritz.Spec
             return originalMsPositions;
         }
 
-        /// <summary>
-        /// Also used by Trks in Seq and Bar
-        /// </summary>
-        public void SetPitchWheelSliders(Dictionary<int, int> pitchWheelValuesPerMsPosition)
-        {
-            foreach(IUniqueDef iud in UniqueDefs)
-            {
-                if(iud is MidiChordDef mcd)
-                {
-                    int startMsPos = mcd.MsPositionReFirstUD;
-                    int endMsPos = startMsPos + mcd.MsDuration;
-                    List<int> mcdEnvelope = new List<int>();
-                    foreach(int msPos in pitchWheelValuesPerMsPosition.Keys)
-                    {
-                        if(msPos >= startMsPos)
-                        {
-                            if(msPos <= endMsPos)
-                            {
-                                mcdEnvelope.Add(pitchWheelValuesPerMsPosition[msPos]);
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    mcd.SetPitchWheelEnvelope(new Envelope(mcdEnvelope, 127, 127, mcdEnvelope.Count));
-                }
-            }
-        }
+		/// <summary>
+		/// Also used by Trks in Seq and Bar
+		/// </summary>
+		public void SetPitchWheelSliders(Dictionary<int, int> pitchWheelValuesPerMsPosition)
+		{
+			foreach(IUniqueDef iud in UniqueDefs)
+			{
+				if(iud is MidiChordDef mcd)
+				{
+					int startMsPos = mcd.MsPositionReFirstUD;
+					int endMsPos = startMsPos + mcd.MsDuration;
+					List<int> mcdEnvelope = new List<int>();
+					foreach(int msPos in pitchWheelValuesPerMsPosition.Keys)
+					{
+						if(msPos >= startMsPos)
+						{
+							if(msPos <= endMsPos)
+							{
+								mcdEnvelope.Add(pitchWheelValuesPerMsPosition[msPos]);
+							}
+							else
+							{
+								break;
+							}
+						}
+					}
+					mcd.SetPitchWheelEnvelope(new Envelope(mcdEnvelope, 127, 127, mcdEnvelope.Count));
+				}
+			}
+		}
+		public void SetPanSliders(Dictionary<int, int> panValuesPerMsPosition)
+		{
+			foreach(IUniqueDef iud in UniqueDefs)
+			{
+				if(iud is MidiChordDef mcd)
+				{
+					int startMsPos = mcd.MsPositionReFirstUD;
+					int endMsPos = startMsPos + mcd.MsDuration;
+					List<int> mcdEnvelope = new List<int>();
+					foreach(int msPos in panValuesPerMsPosition.Keys)
+					{
+						if(msPos >= startMsPos)
+						{
+							if(msPos <= endMsPos)
+							{
+								mcdEnvelope.Add(panValuesPerMsPosition[msPos]);
+							}
+							else
+							{
+								break;
+							}
+						}
+					}
+					mcd.SetPanEnvelope(new Envelope(mcdEnvelope, 127, 127, mcdEnvelope.Count));
+				}
+			}
+		}
+		#endregion Envelopes
 
-        #region SetVelocityPerAbsolutePitch
-        /// <summary>
-        /// The arguments are passed unchanged to MidiChordDef.SetVelocityPerAbsolutePitch(...) for each MidiChordDef in this Trk.
-        /// See the MidiChordDef documentation for details.
-        /// </summary>
-        /// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [1..127] in order of absolute pitch</param>
-        public virtual void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch)
+		#region velocities
+		#region SetVelocityPerAbsolutePitch
+		/// <summary>
+		/// The arguments are passed unchanged to MidiChordDef.SetVelocityPerAbsolutePitch(...) for each MidiChordDef in this Trk.
+		/// See the MidiChordDef documentation for details.
+		/// </summary>
+		/// <param name="velocityPerAbsolutePitch">A list of 12 velocity values (range [1..127] in order of absolute pitch</param>
+		public virtual void SetVelocityPerAbsolutePitch(List<byte> velocityPerAbsolutePitch)
         {
             #region conditions
             Debug.Assert(velocityPerAbsolutePitch.Count == 12);
@@ -536,24 +580,25 @@ namespace Moritz.Spec
             }
         }
 
-        #endregion SetVerticalVelocityGradient
-        #endregion Envelopes
+		#endregion SetVerticalVelocityGradient
+		#endregion
 
-        /// <summary>
-        /// Preserves the MsDuration of the Trk as a whole by resetting it after doing the following:
-        /// 1. Creates a sorted list of the unique bottom or top pitches in all the MidiChordDefs in the Trk.
-        ///    The use of the bottom or top pitch is controlled by argument 3: useBottomPitch.
-        /// 2. Creates a duration per pitch dictionary, whereby durationPerPitch[lowestPitch] is durationForLowestPitch
-        ///    and durationPerPitch[lowestPitch] is durationForHighestPitch. The intermediate duration values are
-        ///    interpolated logarithmically.
-        /// 3. Sets the MsDuration of each MidiChordDef to (percent * the values found in the duration per pitch dictionary) plus
-        ///   ((100-percent)percent * the original durations). Rest msDurations are left unchanged at this stage.
-        /// 4. Resets the MsDuration of the Trk to its original value.
-        /// N.B. a Debug.Assert() fails if an attempt is made to set the msDuration of a BasicMidiChordDef to zero.
-        /// </summary>
-        /// <param name="durationForLowestPitch"></param>
-        /// <param name="durationForHighestPitch"></param>
-        public void SetDurationsFromPitches(int durationForLowestPitch, int durationForHighestPitch, bool useBottomPitch, double percent = 100.0)
+
+		/// <summary>
+		/// Preserves the MsDuration of the Trk as a whole by resetting it after doing the following:
+		/// 1. Creates a sorted list of the unique bottom or top pitches in all the MidiChordDefs in the Trk.
+		///    The use of the bottom or top pitch is controlled by argument 3: useBottomPitch.
+		/// 2. Creates a duration per pitch dictionary, whereby durationPerPitch[lowestPitch] is durationForLowestPitch
+		///    and durationPerPitch[lowestPitch] is durationForHighestPitch. The intermediate duration values are
+		///    interpolated logarithmically.
+		/// 3. Sets the MsDuration of each MidiChordDef to (percent * the values found in the duration per pitch dictionary) plus
+		///   ((100-percent)percent * the original durations). Rest msDurations are left unchanged at this stage.
+		/// 4. Resets the MsDuration of the Trk to its original value.
+		/// N.B. a Debug.Assert() fails if an attempt is made to set the msDuration of a BasicMidiChordDef to zero.
+		/// </summary>
+		/// <param name="durationForLowestPitch"></param>
+		/// <param name="durationForHighestPitch"></param>
+		public void SetDurationsFromPitches(int durationForLowestPitch, int durationForHighestPitch, bool useBottomPitch, double percent = 100.0)
         {
             Debug.Assert(percent >= 0 && percent <= 100);
 

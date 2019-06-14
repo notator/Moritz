@@ -114,15 +114,39 @@ namespace Moritz.Algorithm.Tombeau1
 
 			Instead of using Modes in Tombeau 1, I want to implement something like "passing notes" in voices that link particular,
 			freely chosen, recognizable harmonies. To be recognisable, harmonies have to be both clearly recognizable and perceptibly
-			repeated! Better to choose particular harmonies by ear than rely on some theoretical distance... We'll see.
+			repeated! Better to choose particular, memorable harmonies by ear than rely on some theoretical distance...
 			
-			The first thing to do is create a specialized Trk class (ChainTrk) that contains IUniqueDefs that move stepwise,
-			according to some envelope, between start and end pitches.
+			Create three things:
+			1.	a specialized Trk class (ChainTrk) that contains IUniqueDefs that move stepwise, according to some envelope,
+				between start and end pitches.
 					a) the start and end pitches must be defined - even if they are not actually performed
 					b) the pitch envelope is freely definable, and may exceed the range defined by the target pitches
 						(the pitches in the chains may be microtonal).
 					c) the duration envelope is freely definable.
-					d) it should be possible to replace any MidiChordDef in a Chain by a MidiRestDef.
+					d) it should be possible to replace any MidiChordDef, or sequence of MidiChordDefs, in a Chain by a MidiRestDef
+					   or an ornamented MidiChordDef.
+					   -- if current MidiChordDefs are too short to display, they can be agglommerated using the following,
+					   constructor (that already exists):
+							MidiChordDef(int msDuration, List<IUniqueDef> iUniqueDefs, string ornamentText)
+		    
+			2.	a MidiChordDefPalette of chords that will be used as anchor points in the piece. The pitches in these chords will
+				be used as the end-points of the ChainTrks.
+				Possibly use a second instument (say an organ or clarinet) quietly in the background, to underline the harmonic
+				progression... That would mean creating a new SoundFont for the ResidentSf2Synth to load.
+
+			3.	a basic chord progression that will later be joined by chainTrks. This basic chord progression could be the subject
+				of a set of variations and transformations. It could, for example, be repeated, made polyphonic and/or varied in
+				some way. It could also be organized by krystal (i.e. a single sequence, selected by krystal, from the
+				MidiChordDefPalette for the whole piece). However, I want to use the repeat capability (maybe in addition)...
+				So:
+					a) Construct the main, outer Harmonic progression using up to 7 pitches per chord.
+					b) Construct the main Seq using the harmonic progression in a). Note that each Trk MidiChordDef might have more
+					   than one pitch, but that the ChainTrk can only consist of a single MidiChordDef sequence. Can ChainTrks be
+					   powerful enough to do that? In particular, can they be constructed with different chord structures at the
+					   beginning and end?
+					c) To make the progression polyphonic, introduce intermediary harmonic knots, linking some Trks at some points.
+					   The "intermediary" chords can be closely related to the other harmonies/intervals...
+				
 
             ****************************************************************************/
 			#endregion main comment (thoughts etc.)
