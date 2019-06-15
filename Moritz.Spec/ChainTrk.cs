@@ -7,32 +7,30 @@ using Moritz.Globals;
 
 namespace Moritz.Spec
 {
-	class ChainTrk : Trk
+	public class ChainTrk : Trk
 	{
 		/// <summary>
 		/// Constructs a Trk having midiChannel and msDuration, containing MidiChordDefs having the relativeDurations.
 		/// The constructed MidiChordDefs each have only one BasicMidiChordDef (i.e. they are not ornaments).
-		/// The first MidiChordDef will be startMCD.BasicMidiChordDefs[0].
-		/// The final MidiChordDef will be close to (but not the same as) targetMCD.BasicMidiChordDefs[0].
-		/// The noteIndexLinks list contains pairs of indices. Each pair defines the start and end points of a chain:
-		/// Each pair of indices links a note index in the startMCD with a note index in the targetMCD.
-		/// If the noteIndexLinks list is null, then startMCD and targetMCD must have the same
-		/// number of notes, and the chains link all the corresponding note indices.
-		/// Note: PitchWheel and Pan envelopes can subsequently be set using the existing Trk functions:
-		///     SetPitchWheelSliders(Envelope envelope) and SetPanSliders(Envelope envelope)
+		/// All notes are constructed with (default) velocity 100.
+		/// (After construction, use Trk functions to set Velocity, PitchWheel, Pan envelopes etc.)
+		/// The number of MidiChordDefs will be the number of relativeDurations.
+		/// The pitches in the first MidiChordDef will be the unique values in startPitches.
+		/// The pitches in the final MidiChordDef will be close to (but not the same as) the targetPitches that are in range [0..127].
+		/// The number of values in startPitches and targetPitches must be the same.
+		/// Inside each startPitch and targetPitch list, values may repeat and be in any order.
+		/// A chain is constructed for each startPitch-targetPitch pair in which target pitch is in range [0..127].
+		/// Pitches are normalized in each chord, so that they are in ascending order with no duplicates.
 		/// </summary>
 		/// <param name="midiChannel"></param>
 		/// <param name="msDuration"></param>
 		/// <param name="relativeDurations"></param>
-		/// <param name="startMCD"></param>
-		/// <param name="targetMCD"></param>
+		/// <param name="startPitches">Range [0..127], in any order, repeated values are allowed.</param>
+		/// <param name="targetPitches">Range [-1..127], in any order, repeated values are allowed.</param>
 		/// <param name="pitchEnv">Start and end values must be the same, the lowest value must be 0</param>
-		/// <param name="velocityEnv">Start and end values must be the same, the lowest value must be 0</param>
-		/// <param name="noteIndexLinks">The note indices in the startMCD.BasicMidiChordDefs[0] and targetMCD.BasicMidiChordDefs[0]</param>
 		public ChainTrk(int midiChannel, int msDuration, List<int> relativeDurations,
-			MidiChordDef startMCD, MidiChordDef targetMCD,
-			Envelope pitchEnv, Envelope velocityEnv,			
-			List<Tuple<int,int>> noteIndexLinks )
+			List<int> startPitches, List<int> targetPitches,
+			Envelope pitchEnv )
 			: base(midiChannel)
 		{
 			#region local functions
@@ -41,7 +39,12 @@ namespace Moritz.Spec
 				var orig = env.Original;
 				if(orig[0] != orig[orig.Count - 1])
 				{
-					throw new ApplicationException("The envelope's start and end values must be the same.");
+					throw new ApplicationException("pitchEnv's start and end values must be the same.");
+				}
+
+				if(orig.Count != (relativeDurations.Count + 1))
+				{
+					throw new ApplicationException("pitchEnv's Count must be relativeDurations.Count + 1.");
 				}
 
 				var zeroFound = false;
@@ -55,104 +58,34 @@ namespace Moritz.Spec
 				}
 				if(zeroFound == false)
 				{
-					throw new ApplicationException("The lowest envelope value must be zero.");
+					throw new ApplicationException("pitchEnv's lowest value must be zero.");
 				}
 
-			}
-			void RemoveDuplicatePitches(List<List<byte>> pitchVals, List<List<byte>> velocityVals)
-			{
-				Debug.Assert(pitchVals.Count == velocityVals.Count);
-				for(int i = 0; i < pitchVals.Count; i++)
-				{
-					var mcdPitches = pitchVals[i];
-					var mcdVelocities = velocityVals[i];
-					Debug.Assert(mcdPitches.Count == mcdVelocities.Count);
-					if(mcdPitches.Count > 1)
-					{
-						for(int j = mcdPitches.Count - 1; j >= 0; j--)
-						{
-							for(int k = j - 1; k >= 0; k--)
-							{
-								if(mcdPitches[j] == mcdPitches[k])
-								{
-									mcdPitches.RemoveAt(j);
-									mcdVelocities.RemoveAt(j);
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-			void SortPitches(List<List<byte>> pitchVals, List<List<byte>> velocityVals)
-			{
-				for(int i = 0; i < pitchVals.Count; i++)
-				{
-					var mcdPitches = pitchVals[i];
-					var mcdVelocities = velocityVals[i];
-					if(mcdPitches.Count > 1)
-					{
-						var unSortedPitches = new List<byte>(mcdPitches);
-						mcdPitches.Sort();
-						var unsortedVelocities = new List<byte>(mcdVelocities);
-
-						for(int j = 0; j < mcdPitches.Count; j++)
-						{
-							var originalIndex = unSortedPitches.IndexOf(mcdPitches[j]);
-							mcdVelocities[j] = unsortedVelocities[originalIndex];
-						}
-					}
-				}
 			}
 			#endregion
 
-			#region check pitchEnv and velocityEnv
+			#region argument checks
+			Debug.Assert(startPitches.Count == targetPitches.Count);
+			for(int i = 0; i < startPitches.Count; i++)
+			{
+				Debug.Assert(startPitches[i] >= 0 && startPitches[i] <= 127);
+				Debug.Assert(targetPitches[i] >= -1 && targetPitches[i] <= 127);
+			}
 			CheckEnvelope(pitchEnv);
-			CheckEnvelope(velocityEnv);
 			#endregion
-
-			var startBMCD = startMCD.BasicMidiChordDefs[0];
-			var targetBMCD = targetMCD.BasicMidiChordDefs[0];
-
-			#region check/set noteIndexLinks
-			if(noteIndexLinks == null)
-			{
-				Debug.Assert(startBMCD.Pitches.Count == targetBMCD.Pitches.Count);
-				noteIndexLinks = new List<Tuple<int, int>>();
-				for(int i = 0; i < startBMCD.Pitches.Count; i++)
-				{
-					noteIndexLinks.Add(new Tuple<int, int>(i, i));
-				}
-			}
-			else
-			{
-				foreach(var pair in noteIndexLinks)
-				{
-					Debug.Assert(pair.Item1 < startBMCD.Pitches.Count);
-					Debug.Assert(pair.Item2 < targetBMCD.Pitches.Count);
-				}
-			}
-			#endregion
-
-			var pitchLinks = new Dictionary<int, int>(); // contains <start,target> pairs
-			var velocityLinks = new Dictionary<int, int>(); // contains <start,target> pairs
-			foreach(var pair in noteIndexLinks)
-			{
-				pitchLinks.Add(startBMCD.Pitches[pair.Item1], targetBMCD.Pitches[pair.Item2]);
-				velocityLinks.Add(startBMCD.Velocities[pair.Item1], targetBMCD.Velocities[pair.Item2]);
-			}
 
 			var nMidiChordDefs = relativeDurations.Count;
 
-			List<List<byte>> pitchValues = GetValues(pitchEnv, nMidiChordDefs, pitchLinks);
-			List<List<byte>> velocityValues = GetValues(velocityEnv, nMidiChordDefs, velocityLinks);
-			RemoveDuplicatePitches(pitchValues, velocityValues);
-			SortPitches(pitchValues, velocityValues);
+			List<List<byte>> pitchValuesPerMCD = GetPitchesPerMCD(pitchEnv, nMidiChordDefs, startPitches, targetPitches);
 
 			for(int i = 0; i < relativeDurations.Count; i++)
 			{
-				var pitches = pitchValues[i];
-				var velocities = velocityValues[i];
+				List<byte> pitches = pitchValuesPerMCD[i];
+				var velocities = new List<byte>();
+				foreach(var pitch in pitches)
+				{
+					velocities.Add(100);
+				}
 				var msDur = relativeDurations[i];
 				var mcd = new MidiChordDef(pitches, velocities, msDur, true);
 				this.UniqueDefs.Add(mcd);
@@ -163,22 +96,37 @@ namespace Moritz.Spec
 			//this.AgglommerateOrnaments(); // define this in Trk.
 		}
 
-
-
 		/// <summary>
 		/// Returns one list per midiChordDef.
 		/// The envelope is first created flat, with its first value equal to 0,
-		/// then sheared by the distance between the values in the dictionary.
-		/// The first value does not change
+		/// then sheared by the distance between the values in the start and target pitches lists.
+		/// The first value does not change.
 		/// </summary>
-		/// <param name="paramEnv"></param>
+		/// <param name="pitchEnv"></param>
 		/// <param name="nMidiChordDefs"></param>
-		/// <param name="shearEnds"></param>
+		/// <param name="chainEndsList"></param>
 		/// <returns></returns>
-		private List<List<byte>> GetValues(Envelope paramEnv, int nMidiChordDefs, Dictionary<int, int> shearEnds)
+		private List<List<byte>> GetPitchesPerMCD(Envelope pitchEnv, int nMidiChordDefs, List<int> startPitches, List<int> targetPitches)
 		{
-			paramEnv.SetCount(nMidiChordDefs + 1);
-			var envelope = paramEnv.Original;
+			// remove duplicates and sort
+			List<byte> NormalizePitches(List<byte> pitches)
+			{
+				List<byte> returnedPitches = new List<byte>();
+				for(int i = 0; i < pitches.Count; i++)
+				{
+					if(!returnedPitches.Contains(pitches[i]))
+					{
+						returnedPitches.Add(pitches[i]);
+					}
+				}
+				returnedPitches.Sort();
+
+				return returnedPitches;
+			}
+
+			var envelope = pitchEnv.Original;
+			Debug.Assert(envelope.Count == nMidiChordDefs + 1);
+
 			var firstEnvelopeVal = envelope[0];
 			for(int i = 0; i < envelope.Count; i++)
 			{
@@ -186,36 +134,56 @@ namespace Moritz.Spec
 			}
 
 			var shearListsPerChain = new List<List<int>>();
-			foreach(var chainEnds in shearEnds)
+			for(int i = 0; i < startPitches.Count; i++)
 			{
-				var shearIncrement = ((double)chainEnds.Value - chainEnds.Key) / nMidiChordDefs;
-				var shearIncrementPerMCD = new List<int>();
-				double increment = 0;
-				for(int i = 0; i < nMidiChordDefs; i++)
+				if(targetPitches[i] >= 0)
 				{
-					shearIncrementPerMCD.Add((int)Math.Round(increment));
-					increment += shearIncrement;
+					var shearIncrement = ((double)targetPitches[i] - startPitches[i]) / nMidiChordDefs;
+					var shearIncrementPerMCD = new List<int>();
+					double increment = 0;
+					for(int j = 0; j < nMidiChordDefs; j++)
+					{
+						shearIncrementPerMCD.Add((int)Math.Round(increment));
+						increment += shearIncrement;
+					}
+					shearListsPerChain.Add(shearIncrementPerMCD);
 				}
-				shearListsPerChain.Add(shearIncrementPerMCD);
+				else
+				{
+					shearListsPerChain.Add(null);
+				}
 			}
 
 			List<List<byte>> rval = new List<List<byte>>();
-			for(int i = 0; i < nMidiChordDefs; i++)
+			for(int chordIndex = 0; chordIndex < nMidiChordDefs; chordIndex++)
 			{
-				var mcdValues = new List<byte>();
-				var j = 0;
-				foreach(var chainEnds in shearEnds)
-				{
-					var startVal = chainEnds.Key;
-					var envVal = envelope[i];
-					double shearIncrement = shearListsPerChain[j][i];
-					mcdValues.Add((byte)Math.Round(startVal + envVal + shearIncrement));
-					j++;
-				}
-				rval.Add(mcdValues);
-			}
+				var pitches = new List<byte>();
 
+				for(int pitchIndex = 0; pitchIndex < shearListsPerChain.Count; pitchIndex++)
+				{
+					if(chordIndex == 0)
+					{
+						pitches.Add((byte)startPitches[pitchIndex]);
+					}
+					else
+					{
+						var shearListPerChord = shearListsPerChain[pitchIndex];
+						if(shearListPerChord != null)
+						{
+							var startVal = startPitches[pitchIndex];
+							var envVal = envelope[chordIndex];
+							double shearIncrement = shearListPerChord[chordIndex];
+							byte pitch = M.MidiValue((int)Math.Round(startVal + envVal + shearIncrement));
+							pitches.Add(pitch);
+						}
+					}
+				}
+
+				pitches = NormalizePitches(pitches);
+				rval.Add(pitches);
+			}
 			return rval;
+
 		}
 	}
 }

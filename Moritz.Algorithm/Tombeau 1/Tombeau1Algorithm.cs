@@ -401,7 +401,15 @@ namespace Moritz.Algorithm.Tombeau1
 
 			/**********************************************/
 
-			List<IUniqueDef> trk0iuds = new List<IUniqueDef>();
+			var relativeDurations = new List<int>() { 1, 2, 3 };
+			var startPitches = new List<int>() { 60, 64, 68, 71, 75 };
+			var targetPitches = new List<int>() { -1, 68, 71, -1, 68 };
+			var pitchEnv = new Envelope(new List<int>() { 0, 4, 2, 0 }, 4, 4, relativeDurations.Count + 1);
+			var chainTrk = new ChainTrk(0, 10000, relativeDurations, startPitches, targetPitches, pitchEnv);
+
+			/**********************************************/
+
+			List <IUniqueDef> trk0iuds = new List<IUniqueDef>();
 			for(int i = 0; i < 50; i++)
 			{
 				trk0iuds.Add(new MidiChordDef(new List<byte>() { 64 }, new List<byte>() { 64 }, 5000, true));
