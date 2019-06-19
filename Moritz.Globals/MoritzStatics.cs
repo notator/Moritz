@@ -668,6 +668,20 @@ namespace Moritz.Globals
         }
 
 		/// <summary>
+		/// Returns a list of byte values equal to the int values in the argument.
+		/// Silently coerces values to MidiValues (in range [0..127].
+		/// </summary>
+		public static List<byte> MidiList(List<int> intValues)
+		{
+			var bytesList = new List<byte>();
+			foreach(var intValue in intValues )
+			{
+				bytesList.Add(MidiValue(intValue));
+			}
+			return bytesList;
+		}
+
+		/// <summary>
 		/// Returns the argument as a byte coerced to the range 1..127.
 		/// </summary>
 		public static byte VelocityValue(int velocity)
@@ -819,7 +833,7 @@ namespace Moritz.Globals
         public static readonly byte DEFAULT_BANKAndPATCH_0 = 0;
         public static readonly byte DEFAULT_VOLUME_100 = 100;
         public static readonly byte DEFAULT_EXPRESSION_127 = 127;
-        public static readonly byte DEFAULT_PITCHWHEELDEVIATION_2 = 2;
+		public static readonly byte DEFAULT_PITCHWHEELDEVIATION_2 = 2;
         public static readonly byte DEFAULT_PITCHWHEEL_64 = 64;
         public static readonly byte DEFAULT_PAN_64 = 64;
         public static readonly byte DEFAULT_MODWHEEL_0 = 0;
