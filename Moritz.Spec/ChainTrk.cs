@@ -26,7 +26,7 @@ namespace Moritz.Spec
 		/// <param name="msDuration"></param>
 		/// <param name="relativeDurations"></param>
 		/// <param name="startPitches">Range [0..127], in any order, repeated values are allowed.</param>
-		/// <param name="targetPitches">Range [-1..127], in any order, repeated values are allowed.</param>
+		/// <param name="targetPitches">Range [0..127] or int.MaxValue or byte.MaxValue, in any order, repeated values are allowed.</param>
 		/// <param name="pitchEnv">Start and end values must be the same, the lowest value must be 0</param>
 		public ChainTrk(int midiChannel, int msDuration, List<int> relativeDurations,
 			List<int> startPitches, List<int> targetPitches,
@@ -69,7 +69,7 @@ namespace Moritz.Spec
 			for(int i = 0; i < startPitches.Count; i++)
 			{
 				Debug.Assert(startPitches[i] >= 0 && startPitches[i] <= 127);
-				Debug.Assert(targetPitches[i] >= -1 && targetPitches[i] <= 127);
+				Debug.Assert((targetPitches[i] >= 0 && targetPitches[i] <= 127) || targetPitches[i] == int.MaxValue || targetPitches[i] == byte.MaxValue);
 			}
 			CheckEnvelope(pitchEnv);
 			#endregion
@@ -136,7 +136,7 @@ namespace Moritz.Spec
 			var shearListsPerChain = new List<List<int>>();
 			for(int i = 0; i < startPitches.Count; i++)
 			{
-				if(targetPitches[i] >= 0)
+				if(targetPitches[i] >= 0 && targetPitches[i] <= 127)
 				{
 					var shearIncrement = ((double)targetPitches[i] - startPitches[i]) / nMidiChordDefs;
 					var shearIncrementPerMCD = new List<int>();
