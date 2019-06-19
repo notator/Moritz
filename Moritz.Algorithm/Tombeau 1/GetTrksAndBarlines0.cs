@@ -12,74 +12,34 @@ namespace Moritz.Algorithm.Tombeau1
 {
 	public partial class Tombeau1Algorithm : CompositionAlgorithm
 	{
-		private void GetTrksAndBarlines0(out List<Trk> trks, out List<int> barlineMsPositions )
+		private void GetTrksAndBarlines0(out List<Trk> trks, out List<int> barlineMsPositions, out List<List<int>> targetChords)
 		{
 			#region constants
 			var availableBarDurations = new List<int>()
 			{
 				2000, 2151, 2331, 2548, 2811, 3113, 3533, 4033, 4670, 5490, 6565, 8000
 			};
-			//var availableRelativeDurations = new List<List<int>>()
-			//{
-			//	_durations1,
-			//	_durations2,
-			//	_durations3,
-			//	_durations4,
-			//	_durations5,
-			//	_durations6,
-			//	_durations7,
-			//	_durations8,
-			//	_durations9,
-			//	_durations10,
-			//	_durations11,
-			//	_durations12 
-			//};
-
 			List<int> chordsRoot = new List<int>() { 54, 57, 59, 63, 65 }; // f#, a, b, d#, f
-			List<List<int>> targetChords = GetChords(chordsRoot);
-
-			//List<int> chords6root = new List<int>() { 54, 57, 59, 63, 65, 70 }; // f#, a, b, d#, f, a#
-			//List<List<int>> chords6 = GetChords(chords6root);
-
-			/**********************************************/
+			targetChords = GetChords(chordsRoot);
 			#endregion
 
 			Envelope centredEnvelope = _krystals[0].ToEnvelope(0, availableBarDurations.Count - 1); // values distributed around 11, gradually becoming more eccentric
 			centredEnvelope.SetCount(targetChords.Count);
 			List<int> barIndices = centredEnvelope.Original;
 
-			Envelope basedEnvelope = _krystals[1].ToEnvelope(0, 127); // values increase gradually from 0 to 127, becoming more eccentric.
-
-
-			var relativeDurations = new List<int>() { 3, 2, 1, 1 };
-			//var startPitches = new List<int>() { 60, 64, 68, 71, 75 };
-			//var targetPitches = new List<int>() { int.MaxValue, 68, 71, int.MaxValue, 68 };
-
 			barlineMsPositions = new List<int>();
 			Trk trk0 = new Trk(0);
-			//ChainTrk chainTrk = null;
-			Trk newBar = null;
-
 			for(int i = 0; i < targetChords.Count; i++)
 			{
 				var startPitches = targetChords[i];
-				//var targetPitches = targetChords[i];
 				var msDuration = availableBarDurations[barIndices[i]];
-				//var relativeDurations = availableRelativeDurations[barDurationIndices[i]];
 
-				//var pitchEnv = new Envelope(new List<int>() { 0, 4, 3, 2, 0 }, 4, 4, relativeDurations.Count + 1);
-				//chainTrk = new ChainTrk(0, msDuration, relativeDurations, startPitches, targetPitches, pitchEnv);
-				//trk0.ConcatCloneAt(chainTrk, trk0.MsDuration);
-
-				newBar = new Trk(0);
 				List<byte> startVelocities = new List<byte>();
 				foreach(var pitch in startPitches)
 				{
 					startVelocities.Add((byte)100);
 				}
-				newBar.Add(new MidiChordDef(M.MidiList(startPitches), startVelocities, msDuration, true));
-
-				trk0.ConcatCloneAt(newBar, trk0.MsDuration);
+				trk0.Add(new MidiChordDef(M.MidiList(startPitches), startVelocities, msDuration, true));
 
 				barlineMsPositions.Add(trk0.MsDuration);
 			}

@@ -30,6 +30,12 @@ namespace Moritz.Algorithm.Tombeau1
 			_krystals = krystals;
 			_palettes = palettes;
 
+			/*************************/
+			/*  note these functions */
+			//Envelope basedEnvelope = _krystals[1].ToEnvelope(0, 127); // values increase gradually from 0 to 127, becoming more eccentric.
+			//Envelope centredEnvelope = _krystals[0].ToEnvelope(0, 127); // values distributed around 11, gradually becoming more eccentric
+			/*************************/
+
 			#region main comment (thoughts etc.)
 			/*********************************************************************************************
 			Think Nancarrow: Mechanical Piano music... outside the notation system... outside the management system...
@@ -397,7 +403,7 @@ namespace Moritz.Algorithm.Tombeau1
             ***************************************************************************/
 			#endregion Block functions
 
-			GetTrksAndBarlines0(out List<Trk> trks, out List<int> barlineMsPositions);
+			GetTrksAndBarlines0(out List<Trk> trks, out List<int> barlineMsPositions, out List<List<int>> targetChords);
 
 			Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
 
