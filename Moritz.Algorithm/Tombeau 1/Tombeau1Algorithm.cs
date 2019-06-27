@@ -403,7 +403,8 @@ namespace Moritz.Algorithm.Tombeau1
             ***************************************************************************/
 			#endregion Block functions
 
-			GetTrksAndBarlines0(out List<Trk> trks, out List<int> barlineMsPositions, out List<List<int>> targetChords);
+			//GetTrksAndBarlines0(out List<Trk> trks, out List<int> barlineMsPositions, out List<List<int>> targetChords);
+			GetTrksAndBarlines1(out List<Trk> trks, out List<int> barlineMsPositions, out List<List<int>> targetChords);
 
 			Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
 
