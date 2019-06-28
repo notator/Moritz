@@ -20,7 +20,7 @@ namespace Moritz.Algorithm.Tombeau1
 
 		public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3 }; } }
 		public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
-		public override int NumberOfBars { get { return 50; } }
+		public override int NumberOfBars { get { return 120; } }
 
 		/// <summary>
 		/// See CompositionAlgorithm.DoAlgorithm()
@@ -424,19 +424,21 @@ namespace Moritz.Algorithm.Tombeau1
 			// The finalBarline has also been added to the Dictionary, so
 			// msPosPerBarlineIndexDict.Count is 1 + bars.Count.
 			var barline0 = msPosPerBarlineIndexDict[0];
-			var barline4 = msPosPerBarlineIndexDict[4];
-			var barline16 = msPosPerBarlineIndexDict[16];
-			var barline32 = msPosPerBarlineIndexDict[32];
+			var barline24 = msPosPerBarlineIndexDict[24];
+			var barline48 = msPosPerBarlineIndexDict[48];
+			var barline72 = msPosPerBarlineIndexDict[72];
+			var barline96 = msPosPerBarlineIndexDict[96];
 			var finalBarline = msPosPerBarlineIndexDict[msPosPerBarlineIndexDict.Count - 1];
 
-			RegionDef rd1 = new RegionDef("A", barline0, barline4);
-			RegionDef rd2 = new RegionDef("B", barline4, barline32);
-			RegionDef rd3 = new RegionDef("C", barline4, barline16);
-			RegionDef rd4 = new RegionDef("D", barline32, finalBarline);
+			RegionDef rd1 = new RegionDef("A", barline0, barline24);
+			RegionDef rd2 = new RegionDef("B", barline24, barline72);
+			RegionDef rd3 = new RegionDef("C", barline24, barline48);
+			RegionDef rd4 = new RegionDef("D", barline72, finalBarline);
+			RegionDef rd5 = new RegionDef("E", barline96, finalBarline);
 
-			List<RegionDef> regionDefs = new List<RegionDef>() { rd1, rd2, rd3, rd4 };
+			List<RegionDef> regionDefs = new List<RegionDef>() { rd1, rd2, rd3, rd4, rd5 };
 
-			RegionSequence regionSequence = new RegionSequence(regionDefs, "ABCAD");
+			RegionSequence regionSequence = new RegionSequence(regionDefs, "ABCADEA");
 
 			ScoreData scoreData = new ScoreData(regionSequence);
 
