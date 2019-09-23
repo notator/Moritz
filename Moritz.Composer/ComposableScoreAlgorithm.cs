@@ -11,6 +11,7 @@ using Moritz.Algorithm.Study3Sketch2;
 using Moritz.Algorithm.Tombeau1;
 using Moritz.Algorithm.ErratumMusical;
 using Moritz.Algorithm.ThreeCrashes;
+using Moritz.Algorithm.Study4;
 
 namespace Moritz.Composer
 {
@@ -61,6 +62,9 @@ namespace Moritz.Composer
 					break;
 				case "Three Crashes":
 					algorithm = new ThreeCrashesAlgorithm();
+					break;
+				case "Study 4":
+					algorithm = new Study4Algorithm();
 					break;
 				default:
                     MessageBox.Show("Error in ComposableScoreAlgorithm.cs:\n\n" +
