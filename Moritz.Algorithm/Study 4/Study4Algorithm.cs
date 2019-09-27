@@ -442,16 +442,19 @@ namespace Moritz.Algorithm.Study4
 			var barline21 = msPosPerBarlineIndexDict[21];
 			var finalBarline = msPosPerBarlineIndexDict[msPosPerBarlineIndexDict.Count - 1];
 
+			// The following regions can be redefined later to express the existing logic better.
 			RegionDef rd1 = new RegionDef("A", barline0, barline1);
-			RegionDef rd2 = new RegionDef("B", barline0, barline3);
-			RegionDef rd3 = new RegionDef("C", barline0, barline6);
-			RegionDef rd4 = new RegionDef("D", barline3, barline10);
-			RegionDef rd5 = new RegionDef("E", barline6, barline15);
-			RegionDef rd6 = new RegionDef("F", barline15, finalBarline);
+			RegionDef rd2 = new RegionDef("B", barline1, barline3);
+			RegionDef rd3 = new RegionDef("C", barline3, barline6);
+			RegionDef rd4 = new RegionDef("D", barline6, barline10);
+			RegionDef rd5 = new RegionDef("E", barline10, barline15);
+			RegionDef rd6 = new RegionDef("F", barline15, barline21);
+			RegionDef rd7 = new RegionDef("G", barline21, finalBarline);
 
-			List<RegionDef> regionDefs = new List<RegionDef>() { rd1, rd2, rd3, rd4, rd5 };
+			List<RegionDef> regionDefs = new List<RegionDef>() { rd1, rd2, rd3, rd4, rd5, rd6, rd7 };
 
-			RegionSequence regionSequence = new RegionSequence(regionDefs, "ABCDEAFA");
+			// Temporary definition. Redefine this definition and the RegionDefs later.
+			RegionSequence regionSequence = new RegionSequence(regionDefs, "ABABCABCDABCDEFG");
 
 			ScoreData scoreData = new ScoreData(regionSequence);
 
