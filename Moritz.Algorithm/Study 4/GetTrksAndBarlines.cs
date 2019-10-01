@@ -133,8 +133,10 @@ namespace Moritz.Algorithm.Study4
 				2000, 2151, 2331, 2548, 2811, 3113, 3533, 4033, 4670, 5490, 6565, 8000
 			};
 
-		//See notebook 1. October 2019
-		// These values describe modi that evolve by step, rather in the way that Tristan's harmonies evolve... 
+		// See notebook 1. October 2019
+		// These values describe modi that evolve by step, rather in the way that Tristan's harmonies evolve...
+		// Interesting that the concepts 'chord' and 'mode' are getting confused here. There's something fundamental about that...
+		// Has to do with smearing time... (Think carefully about this.)
 		private static IReadOnlyList<List<int>> absPitchesPerStrandValuePerBar = new List<List<int>>()
 			{
 				new List<int>() {0, 2, 3, 5, 8, 9,11}, // bar 1
