@@ -454,6 +454,7 @@ namespace Moritz.Algorithm.Study4
 			List<RegionDef> regionDefs = new List<RegionDef>() { rd1, rd2, rd3, rd4, rd5, rd6, rd7 };
 
 			// Temporary definition. Redefine this definition and the RegionDefs later.
+			// There should be a minimum number of RegionDefs (for the actually performed sequence).
 			RegionSequence regionSequence = new RegionSequence(regionDefs, "ABABCABCDABCDEFG");
 
 			ScoreData scoreData = new ScoreData(regionSequence);
