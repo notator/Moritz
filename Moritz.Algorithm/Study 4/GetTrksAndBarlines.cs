@@ -133,43 +133,43 @@ namespace Moritz.Algorithm.Study4
 				2000, 2151, 2331, 2548, 2811, 3113, 3533, 4033, 4670, 5490, 6565, 8000
 			};
 
-		//See notebook 25-27 Sept.2019
+		//See notebook 1. October 2019
 		// These values describe modi that evolve by step, rather in the way that Tristan's harmonies evolve... 
 		private static IReadOnlyList<List<int>> absPitchesPerStrandValuePerBar = new List<List<int>>()
 			{
 				new List<int>() {0, 2, 3, 5, 8, 9,11}, // bar 1
 
-				new List<int>() {9, 3, 6, 0, 1, 4,10}, // bar 2
-				new List<int>() {5, 7, 5, 1, 4, 7, 8}, // bar 3
-								    
+				new List<int>() {3, 9, 0, 6, 7,10, 4},  // bar 2
+				new List<int>() {2, 9, 2, 4, 7,10, 5},  // bar 3
+								 
 				new List<int>() {1,10, 4, 2, 7,11, 5}, // bar 4
-				new List<int>() {1, 8, 6, 3, 7, 7, 5}, // bar 5
-				new List<int>() {2, 6, 8, 4, 8, 4, 5}, // bar 6
-								       
-				new List<int>() {2, 3,11, 6, 8, 0, 5}, // bar 7
-				new List<int>() {3, 4,10, 6, 6, 0, 5}, // bar 8
-				new List<int>() {5, 4, 9, 5, 5, 0, 4}, // bar 9
-				new List<int>() {7, 5, 8, 5, 3, 0, 4}, // bar 10
-								       
+				new List<int>() {11,10,4, 1, 6, 9, 6}, // bar 5
+				new List<int>() {9, 9, 5, 1, 4, 8, 9}, // bar 6
+								 
+				new List<int>() {8, 9, 5, 0, 2, 6,11},  // bar 7
+				new List<int>() {8, 8, 5, 1, 2, 4, 0}, // bar 8
+				new List<int>() {8, 8, 6, 2, 1, 3, 1}, // bar 9
+				new List<int>() {9, 7, 6, 3, 1, 2, 2}, // bar 10
+								 
 				new List<int>() {9, 6, 7, 4, 1, 0, 3}, // bar 11
-				new List<int>() {8, 6, 7, 3, 2, 1, 3}, // bar 12
-				new List<int>() {7, 7, 8, 3, 3, 2, 3}, // bar 13
-				new List<int>() {6, 7, 9, 2, 3, 4, 2}, // bar 14
-				new List<int>() {5, 8, 9, 1, 4, 6, 2}, // bar 15
+				new List<int>() {9, 5, 7, 5, 1, 0, 4}, // bar 12
+				new List<int>() {9, 5, 6, 5, 0, 0, 5}, // bar 13
+				new List<int>() {10,4, 5, 6, 0, 1, 6},  // bar 14
+				new List<int>() {10,3, 5, 6,11, 1, 7}, // bar 15
 
-				new List<int>() {4, 8,10, 1, 5, 7, 2}, // bar 16
-				new List<int>() {4, 8, 9, 2, 5, 7, 3}, // bar 17
-				new List<int>() {4, 8, 9, 2, 4, 8, 4}, // bar 18
-				new List<int>() {3, 8, 8, 3, 4, 9, 5}, // bar 19
-				new List<int>() {3, 8, 7, 4, 3,10, 6}, // bar 20
-				new List<int>() {3, 8, 7, 4, 3,10, 8}, // bar 21
+				new List<int>() {10,2, 4, 7,11, 1, 8}, // bar 16
+				new List<int>() {11,3, 4, 7,11, 1, 8}, // bar 17
+				new List<int>() {0, 4, 5, 6, 0, 0, 8}, // bar 18
+				new List<int>() {0, 5, 5, 6, 0, 0, 8}, // bar 19
+				new List<int>() {1, 6, 5, 6, 1, 0, 9}, // bar 20
+				new List<int>() {2, 7, 6, 5, 1,11, 9},  // bar 21
 								       	  	 	   
 				new List<int>() {3, 8, 6, 5, 2,11, 9}, // bar 22
 				new List<int>() {3, 7, 6, 5, 3,11, 9}, // bar 23
-				new List<int>() {2, 6, 5, 5, 4,10,10}, // bar 24
-				new List<int>() {2, 5, 5, 5, 4,10,10}, // bar 25
-				new List<int>() {1, 4, 4, 5, 5,10,10}, // bar 26
-				new List<int>() {1, 4, 4, 5, 6, 9,10}, // bar 27
+				new List<int>() {2, 6, 5, 5, 4,11,10}, // bar 24
+				new List<int>() {2, 6, 5, 5, 4,10,10}, // bar 25
+				new List<int>() {1, 5, 4, 5, 5,10,10}, // bar 26
+				new List<int>() {1, 4, 4, 5, 6,10,10}, // bar 27
 				new List<int>() {0, 3, 3, 5, 7, 9,11}, // bar 28
 			};
 
