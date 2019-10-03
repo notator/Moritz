@@ -45,6 +45,7 @@
     <Compile Include="CompositionAlgorithm.cs" />
     <Compile Include="Study 4\GetTrksAndBarlines.cs" />
     <Compile Include="Study 4\Study4Algorithm.cs" />
+    <Compile Include="Study 4\Mode.cs" />
     <Compile Include="ThreeCrashes\ThreeCrashes.cs" />
     <Compile Include="ErratumMusical\ErratumMusical.cs" />
     <Compile Include="Pianola Music\PianolaMusicAlgorithm.cs" />
