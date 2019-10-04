@@ -37,7 +37,7 @@ namespace Moritz.Algorithm.Study4
 				var pitch = pitchWeight.Key;
 				var weight = pitchWeight.Value;
 				Debug.Assert(pitch >= 0 && pitch <= 11);
-				Debug.Assert(weight >= 0 && weight <= 127);
+				Debug.Assert(weight > 0 && weight <= 127); // weight 0 is not allowed here!
 			}
 
 			_absolutePitchWeightDict = new Dictionary<int, int>(absPitchWeightDict);
@@ -109,14 +109,139 @@ namespace Moritz.Algorithm.Study4
 		/// in my paper notebook from 25 Sept to 1 Oct 2019.
 		/// </summary>
 		/// <param name="targetMode"></param>
-		/// <param name="pitchVectors">Each entry contains an absolute pitch in this Study4.Mode, and</param>
+		/// <param name="pitchVectorsData">Each entry contains an absolute pitch in this Study4.Mode, and</param>
 		/// <param name="steps">An integer greater than 1</param>
 		/// <returns>A list of steps Study4.Modes, beginning with this Study4.Mode and not including the target.</returns>
-		public List<Mode> GetModeVector(Mode targetMode, Dictionary<int,int> pitchVectors, int steps)
+		public List<Mode> GetModeVector(Mode targetMode, Dictionary<int,int> pitchVectorsData, int steps)
 		{
+			List<List<KeyValuePair<int, int>>> singlePitchVectorsList = new List<List<KeyValuePair<int, int>>>();
+			foreach(KeyValuePair<int, int> pitchVectorData in pitchVectorsData)
+			{
+				List<KeyValuePair<int, int>> singlePitchVector = GetSinglePitchVector(targetMode, pitchVectorData, steps);
+				singlePitchVectorsList.Add(singlePitchVector);
+			}
+
+			List<List<KeyValuePair<int, int>>> modeDataList = GetModeDataList(steps, singlePitchVectorsList);
+
+			List<Dictionary<int, int>> absPitchWeightDictList = new List<Dictionary<int, int>>();
+			foreach(var modeData in modeDataList)
+			{
+				Dictionary<int, int> absPitchWeightDict = new Dictionary<int, int>();
+				foreach(var absPitchWeight in modeData)
+				{
+					absPitchWeightDict.Add(absPitchWeight.Key, absPitchWeight.Value);
+				}
+				absPitchWeightDictList.Add(absPitchWeightDict);
+			}
+
+
 			List<Mode> rval = new List<Mode>();
+			foreach(var absPitchWeightDict in absPitchWeightDictList)
+			{
+				Mode mode = new Mode(absPitchWeightDict);
+				rval.Add(mode);
+			}
 
 			return rval;
+		}
+
+		// returns a list having Count == steps.
+		private List<KeyValuePair<int, int>> GetSinglePitchVector(Mode targetMode, KeyValuePair<int, int> pitchVectorData, int steps)
+		{
+			int startPitch = pitchVectorData.Key;
+			int startWeight;
+			if(!AbsolutePitchWeightDict.TryGetValue(startPitch, out startWeight))
+			{
+				startWeight = 0;
+			}
+
+			int endPitch = pitchVectorData.Value;
+			int endWeight;
+			if(!targetMode.AbsolutePitchWeightDict.TryGetValue(endPitch, out endWeight))
+			{
+				endWeight = 0;
+			}
+
+			int pitchIncr = endPitch - startPitch;
+			pitchIncr = (pitchIncr <= 6) ? pitchIncr : pitchIncr - 12;
+			double pitchIncrPerStep = ((double)pitchIncr) / steps;
+			double weightIncrPerStep = ((double)(endWeight - startWeight)) / steps;
+
+			List<KeyValuePair<int, int>> singlePitchVector = new List<KeyValuePair<int, int>>();
+			double dPitch = startPitch;
+			double dWeight = startWeight;
+			for(int i = 0; i < steps; ++i)
+			{
+				int iPitch = (int)Math.Round(dPitch);
+				int iWeight = (int)Math.Round(dWeight);
+				iPitch = (iPitch >= 0) ? iPitch : iPitch + 12;
+				iPitch = (iPitch < 12) ? iPitch : iPitch - 12;
+				iWeight = (iWeight >= 0) ? iWeight : 0;
+				iWeight = (iWeight <= 127) ? iWeight : 127;				
+
+				var kvp = new KeyValuePair<int, int>(iPitch, iWeight);
+				singlePitchVector.Add(kvp);
+
+				dPitch += pitchIncrPerStep;
+				dPitch = (pitchIncrPerStep < 0 && dPitch < 0) ? dPitch + 12 : dPitch;
+				dPitch = (pitchIncrPerStep > 0 && dPitch > 11.5F) ? dPitch - 12 : dPitch;
+
+				dWeight += weightIncrPerStep;
+			}
+
+			return singlePitchVector;
+		}
+
+		private static List<List<KeyValuePair<int, int>>> GetModeDataList(int steps, List<List<KeyValuePair<int, int>>> singlePitchVectorsList)
+		{
+			List<List<KeyValuePair<int, int>>> modeDatas = new List<List<KeyValuePair<int, int>>>();
+			for(int step = 0; step < steps; ++step)
+			{
+				List<KeyValuePair<int, int>> modeData = new List<KeyValuePair<int, int>>();
+				for(int i = 0; i < singlePitchVectorsList.Count; ++i)
+				{
+					var entry = singlePitchVectorsList[i][step];
+					if(entry.Value > 0) // weights must be > 0 in Modes
+					{
+						modeData.Add(singlePitchVectorsList[i][step]);
+					}
+					else
+					{
+
+					}
+				}
+				// now remove duplicates
+				List<KeyValuePair<int, int>> toRemove = new List<KeyValuePair<int, int>>();
+				for(int i = 0; i < modeData.Count; ++i)
+				{
+					var kvpI = modeData[i];
+					for(int j = i + 1; j < modeData.Count; ++j)
+					{
+						var kvpJ = modeData[j];
+						if(kvpI.Key == kvpJ.Key)
+						{
+							int weightI = kvpI.Value;
+							int weightJ = kvpJ.Value;
+							if(weightJ > weightI)
+							{
+								toRemove.Add(kvpI);
+							}
+							else
+							{
+								toRemove.Add(kvpJ);
+							}
+						}
+					}
+					foreach(var kvp in toRemove)
+					{
+						modeData.Remove(kvp);
+					}
+				}
+
+				modeDatas.Add(modeData);
+			}
+
+			return modeDatas;
 		}
 
 		#endregion constructors
