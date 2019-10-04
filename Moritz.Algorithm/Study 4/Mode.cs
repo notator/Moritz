@@ -10,23 +10,24 @@ using Moritz.Symbols;
 
 namespace Moritz.Algorithm.Study4
 {
+	/// <summary>
+	/// A Study4.Mode is an immutable class, containing:
+	///    1. AbsolutePitchWeightDict: an IReadOnlyDictionary whose KeyValuePairs contain
+	///       Key: an absolute pitch (in range [0..11] C=0, C#=1, D=2 etc.) and
+	///       Value: a weight (in range [0..127]).
+	///    2. AbsolutePitches: an IReadonlyList of absolute pitches (in range [0..11]) in order of weight.
+	///    3. Gamut: a list of unique absolute pitch numbers in an ascending order scale (range [0..127]).
+	///       Each absolute pitch in the Mode exists at all possible octaves above Mode.Gamut[0].
+	///       (Each octave range in the gamut contains the same absolute pitches.)
+	/// <para>Mode.Gamut[0] == Mode.AbsolutePitches[0] (range [0..11]).</para> 
+	/// Not all absolute pitches need to be included in the Mode.
+	/// The pitches' weights can be used, for example, to determine their relative velocities, durations etc.
+	/// </summary>
 	public class Mode
 	{
 		#region constructors
-		/// <summary>
-		/// A Study4.Mode is an immutable class, containing:
-		///    1. AbsolutePitchWeightDict: an IReadOnlyDictionary whose KeyValuePairs contain
-		///       Key: an absolute pitch (in range [0..11] C=0, C#=1, D=2 etc.) and
-		///       Value: a weight (in range [0..127]).
-		///    2. AbsolutePitches: an IReadonlyList of absolute pitches (in range [0..11]) in order of weight.
-		///    3. Gamut: a list of unique absolute pitch numbers in an ascending order scale (range [0..127]).
-		///       Each absolute pitch in the Mode exists at all possible octaves above Mode.Gamut[0].
-		///       (Each octave range in the gamut contains the same absolute pitches.)
-		/// <para>Mode.Gamut[0] == Mode.AbsolutePitches[0] (range [0..11]).</para> 
-		/// Not all absolute pitches need to be included in the Mode.
-		/// The pitches' weights can be used, for example, to determine their relative velocities, durations etc.
-		/// </summary>
-		/// <param name="absPitchWeightList">Keys must be in range [0..11], Values must be in range [0..127], Count must be in range [1..12]</param>
+		
+		/// <param name="absPitchWeightDict">Keys must be in range [0..11], Values must be in range [0..127], Count must be in range [1..12]</param>
 		public Mode(Dictionary<int,int> absPitchWeightDict)
 		{
 			Debug.Assert(absPitchWeightDict.Count >= 1 && absPitchWeightDict.Count <= 12);
@@ -111,7 +112,7 @@ namespace Moritz.Algorithm.Study4
 		/// <param name="pitchVectors">Each entry contains an absolute pitch in this Study4.Mode, and</param>
 		/// <param name="steps">An integer greater than 1</param>
 		/// <returns>A list of steps Study4.Modes, beginning with this Study4.Mode and not including the target.</returns>
-		public List<Mode> ModeVector(Mode targetMode, Dictionary<int,int> pitchVectors, int steps)
+		public List<Mode> GetModeVector(Mode targetMode, Dictionary<int,int> pitchVectors, int steps)
 		{
 			List<Mode> rval = new List<Mode>();
 
@@ -160,7 +161,7 @@ namespace Moritz.Algorithm.Study4
 			#endregion check pitch consistency
 		}
 
-		public IReadOnlyDictionary<int, int> AbsolutePitchWeight { get { return _absolutePitchWeightDict; } }
+		public IReadOnlyDictionary<int, int> AbsolutePitchWeightDict { get { return _absolutePitchWeightDict; } }
 		private readonly Dictionary<int, int> _absolutePitchWeightDict; // is set in ctor
 		public IReadOnlyList<int> AbsolutePitchHierarchy { get { return _absolutePitchHierarchy; } }
 		private readonly List<int> _absolutePitchHierarchy;  // is set in ctor

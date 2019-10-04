@@ -38,7 +38,7 @@ namespace Moritz.Algorithm.Study4
 			*    lk1(7)-12.krys
 			* Each krystal is the hierarchy (=p) input for the kystal above.
 			* These krystals can be viewed by clicking the "show selected krystal" button in the Study 4 settings dialog.
-			*****************************************/ 
+			*****************************************/
 
 			#region Thoughts about Tombeau 1...
 			/*********************************************************************************************
@@ -413,6 +413,42 @@ namespace Moritz.Algorithm.Study4
 
             ***************************************************************************/
 			#endregion Block functions
+
+			#region Mode tests
+			Dictionary<int, int> absPitchWeightDict1 = new Dictionary<int, int>()
+			{
+				{0, 64 },
+				{4,120 },
+				{2, 30 },
+				{11,93 }
+			};
+			Mode testMode1 = new Mode(absPitchWeightDict1);
+			var pwDict1 = testMode1.AbsolutePitchWeightDict;
+			var absPitches1 = testMode1.AbsolutePitchHierarchy;
+
+			Dictionary<int, int> absPitchWeightDict2 = new Dictionary<int, int>()
+			{
+				{7, 64 },
+				{0, 64 },
+				{11,120 },
+				{9, 30 },
+				{6, 93 }
+			};
+			Mode testMode2 = new Mode(absPitchWeightDict2);
+			var pwDict2 = testMode2.AbsolutePitchWeightDict;
+			var absPitches2 = testMode2.AbsolutePitchHierarchy;
+
+			Dictionary<int, int> pitchVectors = new Dictionary<int, int>()
+			{
+				{ 0,11 },
+				{ 4, 6 },
+				{ 2, 9 },
+				{ 11,6 },
+				{ 3, 7 }
+			};
+			var modeVector = testMode1.GetModeVector(testMode2, pitchVectors, 6);
+
+			#endregion mode Tests
 
 			GetTrksAndBarlines(out List<Trk> trks, out List<int> barlineMsPositions, out List<List<int>> targetChords);
 
