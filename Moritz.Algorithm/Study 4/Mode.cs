@@ -112,24 +112,28 @@ namespace Moritz.Algorithm.Study4
 		/// <param name="pitchVectorsData">Each entry contains an absolute pitch in this Study4.Mode, and</param>
 		/// <param name="steps">An integer greater than 1</param>
 		/// <returns>A list of steps Study4.Modes, beginning with this Study4.Mode and not including the target.</returns>
-		public List<Mode> GetModeVector(Mode targetMode, Dictionary<int,int> pitchVectorsData, int steps)
+		public List<Mode> GetModeVector(Mode targetMode, List<Tuple<int, int>> pitchVectorsData, int steps)
 		{
-			List<List<KeyValuePair<int, int>>> singlePitchVectorsList = new List<List<KeyValuePair<int, int>>>();
-			foreach(KeyValuePair<int, int> pitchVectorData in pitchVectorsData)
+			List<List<Tuple<int, int>>> singlePitchVectorsList = new List<List<Tuple<int, int>>>();
+			foreach(Tuple<int, int> pitchVectorData in pitchVectorsData)
 			{
-				List<KeyValuePair<int, int>> singlePitchVector = GetSinglePitchVector(targetMode, pitchVectorData, steps);
+				List<Tuple<int, int>> singlePitchVector = GetSinglePitchVector(targetMode, pitchVectorData, steps);
 				singlePitchVectorsList.Add(singlePitchVector);
 			}
 
-			List<List<KeyValuePair<int, int>>> modeDataList = GetModeDataList(steps, singlePitchVectorsList);
+			List<List<Tuple<int, int>>> modeDataList = GetModeDataList(steps, singlePitchVectorsList);
 
 			List<Dictionary<int, int>> absPitchWeightDictList = new List<Dictionary<int, int>>();
 			foreach(var modeData in modeDataList)
 			{
 				Dictionary<int, int> absPitchWeightDict = new Dictionary<int, int>();
-				foreach(var absPitchWeight in modeData)
+				for(int absPitch = 0; absPitch < 12; ++absPitch)
 				{
-					absPitchWeightDict.Add(absPitchWeight.Key, absPitchWeight.Value);
+					int? maxWeight = GetMaxWeight(modeData, absPitch);
+					if(maxWeight != null)
+					{
+						absPitchWeightDict.Add(absPitch, (int)maxWeight);
+					}
 				}
 				absPitchWeightDictList.Add(absPitchWeightDict);
 			}
@@ -145,17 +149,39 @@ namespace Moritz.Algorithm.Study4
 			return rval;
 		}
 
-		// returns a list having Count == steps.
-		private List<KeyValuePair<int, int>> GetSinglePitchVector(Mode targetMode, KeyValuePair<int, int> pitchVectorData, int steps)
+		private int? GetMaxWeight(List<Tuple<int, int>> modeData, int absPitch)
 		{
-			int startPitch = pitchVectorData.Key;
+			int? rval = null;
+			foreach(var tuple in modeData)
+			{
+				if(tuple.Item1 == absPitch)
+				{
+					int weight = tuple.Item2;
+					if(rval == null)
+					{
+						rval = weight;
+					}
+					else
+					{
+						rval = (rval > weight) ? rval : weight;
+					}
+				}
+			}
+
+			return rval;
+		}
+
+		// returns a list having Count == steps.
+		private List<Tuple<int, int>> GetSinglePitchVector(Mode targetMode, Tuple<int, int> pitchVectorData, int steps)
+		{
+			int startPitch = pitchVectorData.Item1;
 			int startWeight;
 			if(!AbsolutePitchWeightDict.TryGetValue(startPitch, out startWeight))
 			{
 				startWeight = 0;
 			}
 
-			int endPitch = pitchVectorData.Value;
+			int endPitch = pitchVectorData.Item2;
 			int endWeight;
 			if(!targetMode.AbsolutePitchWeightDict.TryGetValue(endPitch, out endWeight))
 			{
@@ -167,7 +193,7 @@ namespace Moritz.Algorithm.Study4
 			double pitchIncrPerStep = ((double)pitchIncr) / steps;
 			double weightIncrPerStep = ((double)(endWeight - startWeight)) / steps;
 
-			List<KeyValuePair<int, int>> singlePitchVector = new List<KeyValuePair<int, int>>();
+			List<Tuple<int, int>> singlePitchVector = new List<Tuple<int, int>>();
 			double dPitch = startPitch;
 			double dWeight = startWeight;
 			for(int i = 0; i < steps; ++i)
@@ -179,7 +205,7 @@ namespace Moritz.Algorithm.Study4
 				iWeight = (iWeight >= 0) ? iWeight : 0;
 				iWeight = (iWeight <= 127) ? iWeight : 127;				
 
-				var kvp = new KeyValuePair<int, int>(iPitch, iWeight);
+				var kvp = new Tuple<int, int>(iPitch, iWeight);
 				singlePitchVector.Add(kvp);
 
 				dPitch += pitchIncrPerStep;
@@ -192,49 +218,18 @@ namespace Moritz.Algorithm.Study4
 			return singlePitchVector;
 		}
 
-		private static List<List<KeyValuePair<int, int>>> GetModeDataList(int steps, List<List<KeyValuePair<int, int>>> singlePitchVectorsList)
+		private static List<List<Tuple<int, int>>> GetModeDataList(int steps, List<List<Tuple<int, int>>> singlePitchVectorsList)
 		{
-			List<List<KeyValuePair<int, int>>> modeDatas = new List<List<KeyValuePair<int, int>>>();
+			List<List<Tuple<int, int>>> modeDatas = new List<List<Tuple<int, int>>>();
 			for(int step = 0; step < steps; ++step)
 			{
-				List<KeyValuePair<int, int>> modeData = new List<KeyValuePair<int, int>>();
+				List<Tuple<int, int>> modeData = new List<Tuple<int, int>>();
 				for(int i = 0; i < singlePitchVectorsList.Count; ++i)
 				{
 					var entry = singlePitchVectorsList[i][step];
-					if(entry.Value > 0) // weights must be > 0 in Modes
+					if(entry.Item2 > 0) // weights must be > 0 in Modes
 					{
 						modeData.Add(singlePitchVectorsList[i][step]);
-					}
-					else
-					{
-
-					}
-				}
-				// now remove duplicates
-				List<KeyValuePair<int, int>> toRemove = new List<KeyValuePair<int, int>>();
-				for(int i = 0; i < modeData.Count; ++i)
-				{
-					var kvpI = modeData[i];
-					for(int j = i + 1; j < modeData.Count; ++j)
-					{
-						var kvpJ = modeData[j];
-						if(kvpI.Key == kvpJ.Key)
-						{
-							int weightI = kvpI.Value;
-							int weightJ = kvpJ.Value;
-							if(weightJ > weightI)
-							{
-								toRemove.Add(kvpI);
-							}
-							else
-							{
-								toRemove.Add(kvpJ);
-							}
-						}
-					}
-					foreach(var kvp in toRemove)
-					{
-						modeData.Remove(kvp);
 					}
 				}
 

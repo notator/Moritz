@@ -414,19 +414,17 @@ namespace Moritz.Algorithm.Study4
             ***************************************************************************/
 			#endregion Block functions
 
-			#region Mode tests
-			Dictionary<int, int> absPitchWeightDict1 = new Dictionary<int, int>()
+			#region Mode test1
+			Dictionary<int, int> test1_StartAbsPitchWeightDict = new Dictionary<int, int>()
 			{
 				{0, 64 },
 				{4,120 },
 				{2, 30 },
 				{11,93 }
 			};
-			Mode testMode1 = new Mode(absPitchWeightDict1);
-			var pwDict1 = testMode1.AbsolutePitchWeightDict;
-			var absPitches1 = testMode1.AbsolutePitchHierarchy;
+			Mode test1_StartMode = new Mode(test1_StartAbsPitchWeightDict);
 
-			Dictionary<int, int> absPitchWeightDict2 = new Dictionary<int, int>()
+			Dictionary<int, int> test1_TargetAbsPitchWeightDict = new Dictionary<int, int>()
 			{
 				{7, 64 },
 				{0, 64 },
@@ -434,21 +432,50 @@ namespace Moritz.Algorithm.Study4
 				{9, 30 },
 				{6, 93 }
 			};
-			Mode testMode2 = new Mode(absPitchWeightDict2);
-			var pwDict2 = testMode2.AbsolutePitchWeightDict;
-			var absPitches2 = testMode2.AbsolutePitchHierarchy;
+			Mode test1_TargetMode = new Mode(test1_TargetAbsPitchWeightDict);
 
-			Dictionary<int, int> pitchVectors = new Dictionary<int, int>()
+			List<Tuple<int, int>> test1_PitchVectors = new List<Tuple<int, int>>()
 			{
-				{ 0,11 },
-				{ 4, 6 },
-				{ 2, 9 },
-				{ 11,6 },
-				{ 3, 7 }
+				new Tuple<int,int>( 0,11 ),
+				new Tuple<int,int>( 4, 6 ),
+				new Tuple<int,int>( 2, 9 ),
+				new Tuple<int,int>( 11,6 ),
+				new Tuple<int,int>( 3, 7 )
 			};
-			var modeVector = testMode1.GetModeVector(testMode2, pitchVectors, 6);
+			var test1_ModeVector = test1_StartMode.GetModeVector(test1_TargetMode, test1_PitchVectors, 6);
 
-			#endregion mode Tests
+			#endregion mode test1
+
+			#region Mode test2
+			Dictionary<int, int> test2_StartAbsPitchWeightDict = new Dictionary<int, int>()
+			{
+				{1, 100 },
+				{5, 100 }
+			};
+			Mode test2_StartMode = new Mode(test2_StartAbsPitchWeightDict);
+
+			Dictionary<int, int> test2_TargetAbsPitchWeightDict = new Dictionary<int, int>()
+			{
+				{7, 50 },
+				{8, 50 },
+				{9, 50 }
+			};
+			Mode test2_TargetMode = new Mode(test2_TargetAbsPitchWeightDict);
+
+			List<Tuple<int, int>> test2_PitchVectors = new List<Tuple<int, int>>()
+			{
+				new Tuple<int,int>( 0,11 ),
+				new Tuple<int,int>( 5,7 ),
+				new Tuple<int,int>( 5,10 ),
+				new Tuple<int,int>( 5,2 ),
+				new Tuple<int,int>( 6,7 ),
+				new Tuple<int,int>( 8,7 ),
+				new Tuple<int,int>( 1,9 ),
+				new Tuple<int,int>( 1,3 )
+			};
+			var test2_ModeVector = test2_StartMode.GetModeVector(test2_TargetMode, test2_PitchVectors, 4);
+
+			#endregion mode test2
 
 			GetTrksAndBarlines(out List<Trk> trks, out List<int> barlineMsPositions, out List<List<int>> targetChords);
 
