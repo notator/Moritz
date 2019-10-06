@@ -436,10 +436,10 @@ namespace Moritz.Algorithm.Study4
 
 			List<Tuple<int, int>> test1_PitchVectors = new List<Tuple<int, int>>()
 			{
-				new Tuple<int,int>( 0,11 ),
+				new Tuple<int,int>(12,11 ),
 				new Tuple<int,int>( 4, 6 ),
-				new Tuple<int,int>( 2, 9 ),
-				new Tuple<int,int>( 11,6 ),
+				new Tuple<int,int>(14, 9 ),
+				new Tuple<int,int>(11, 6 ),
 				new Tuple<int,int>( 3, 7 )
 			};
 			var test1_ModeVector = test1_StartMode.GetModeVector(test1_TargetMode, test1_PitchVectors, 6);
@@ -464,18 +464,46 @@ namespace Moritz.Algorithm.Study4
 
 			List<Tuple<int, int>> test2_PitchVectors = new List<Tuple<int, int>>()
 			{
-				new Tuple<int,int>( 0,11 ),
+				new Tuple<int,int>( 12,11 ),
 				new Tuple<int,int>( 5,7 ),
 				new Tuple<int,int>( 5,10 ),
 				new Tuple<int,int>( 5,2 ),
 				new Tuple<int,int>( 6,7 ),
 				new Tuple<int,int>( 8,7 ),
-				new Tuple<int,int>( 1,9 ),
+				new Tuple<int,int>( 13,9 ),
 				new Tuple<int,int>( 1,3 )
 			};
 			var test2_ModeVector = test2_StartMode.GetModeVector(test2_TargetMode, test2_PitchVectors, 4);
 
 			#endregion mode test2
+
+			#region Mode test3
+
+			Dictionary<int, int> test3_StartAbsPitchWeightDict = new Dictionary<int, int>()
+			{
+				{1, 100 },
+				{2, 100 },
+				{3, 100 }
+			};
+			Mode test3_StartMode = new Mode(test3_StartAbsPitchWeightDict);
+
+			Dictionary<int, int> test3_TargetAbsPitchWeightDict = new Dictionary<int, int>()
+			{
+				{7, 50 },
+				{8, 50 },
+				{9, 50 }
+			};
+			Mode test3_TargetMode = new Mode(test3_TargetAbsPitchWeightDict);
+
+			List<Tuple<int, int>> test3_PitchVectors = new List<Tuple<int, int>>()
+			{
+				new Tuple<int,int>( 1,7 ),
+				new Tuple<int,int>( 14,8 ),
+				new Tuple<int,int>( 3,9 )
+			};
+			List<Mode> test3_ModeVector = test3_StartMode.GetModeVector(test3_TargetMode, test3_PitchVectors, 4);
+
+			#endregion mode test3
 
 			GetTrksAndBarlines(out List<Trk> trks, out List<int> barlineMsPositions, out List<List<int>> targetChords);
 
