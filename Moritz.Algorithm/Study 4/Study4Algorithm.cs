@@ -505,6 +505,13 @@ namespace Moritz.Algorithm.Study4
 
 			#endregion mode test3
 
+			#region test4 transposition
+
+			Mode test3_StartMode_Clone = test3_StartMode.Clone() as Mode;
+			test3_StartMode_Clone.Transpose(5);
+
+			#endregion test4
+
 			GetTrksAndBarlines(out List<Trk> trks, out List<int> barlineMsPositions, out List<List<int>> targetChords);
 
 			Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);

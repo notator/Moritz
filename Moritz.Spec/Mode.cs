@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace Moritz.Spec
 {
 	/// <summary>
-	/// A Mode is an immutable class, containing:
+	/// A Mode is a cloneable class, containing:
 	///    1. AbsolutePitchWeightDict: an IReadOnlyDictionary whose KeyValuePairs contain
 	///       Key: an absolute pitch (in range [0..11] C=0, C#=1, D=2 etc.) and
 	///       Value: a weight (in range [0..127]).
@@ -17,7 +17,7 @@ namespace Moritz.Spec
 	/// Not all absolute pitches need to be included in the Mode.
 	/// The pitches' weights can be used, for example, to determine their relative velocities, durations etc.
 	/// </summary>
-	public class Mode
+	public class Mode : ICloneable
 	{
 		#region constructors
 		
@@ -37,6 +37,11 @@ namespace Moritz.Spec
 			_absolutePitchWeightDict = new Dictionary<int, int>(absPitchWeightDict);
 			_absolutePitchHierarchy = GetAbsPitchesSortedbyWeight(absPitchWeightDict);
 			// Gamut is constructed lazily.
+		}
+
+		public object Clone()
+		{
+			return (new Mode(_absolutePitchWeightDict));
 		}
 
 		/// <summary>
@@ -71,6 +76,22 @@ namespace Moritz.Spec
 		}
 
 		#endregion constructors
+
+		/// <summary>
+		/// Transposes this Mode.
+		/// </summary>
+		/// <param name="transposition">in range [0..11]</param>
+		public void Transpose(int transposition)
+		{
+			Dictionary<int, int> absolutePitchWeightDict = new Dictionary<int, int>();
+			foreach(var pitchWeight in _absolutePitchWeightDict)
+			{
+				absolutePitchWeightDict.Add((pitchWeight.Key + transposition) % 12, pitchWeight.Value);
+			}
+			_absolutePitchWeightDict = absolutePitchWeightDict;
+			_absolutePitchHierarchy = GetAbsPitchesSortedbyWeight(_absolutePitchWeightDict);
+			_gamut = null; // will be lazily evaluated
+		}
 
 		#region GetModeVector() function
 		/// <summary>
@@ -286,9 +307,9 @@ namespace Moritz.Spec
 		}
 
 		public IReadOnlyDictionary<int, int> AbsolutePitchWeightDict { get { return _absolutePitchWeightDict; } }
-		private readonly Dictionary<int, int> _absolutePitchWeightDict; // is set in ctor
+		private Dictionary<int, int> _absolutePitchWeightDict; // is set in ctor
 		public IReadOnlyList<int> AbsolutePitchHierarchy { get { return _absolutePitchHierarchy; } }
-		private readonly List<int> _absolutePitchHierarchy;  // is set in ctor
+		private List<int> _absolutePitchHierarchy;  // is set in ctor
 		public IReadOnlyList<int> Gamut
 		{
 			get
