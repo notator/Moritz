@@ -75,7 +75,7 @@ namespace Moritz.Spec
         /// <param name="rootNotatedPitch">The lowest notated pitch. Also the lowest pitch of BasicMidiChordDefs[0].</param>
         /// <param name="nPitchesPerChord">The chord density (some chords may have less pitches).</param>
         /// <param name="ornamentEnvelope">The ornament definition.</param>
-        public MidiChordDef(int msDuration, Mode mode, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null, string ornamentText = null)
+        public MidiChordDef(int msDuration, _oldMode mode, int rootNotatedPitch, int nPitchesPerChord, Envelope ornamentEnvelope = null, string ornamentText = null)
             : base(msDuration) 
         {
             NotatedMidiPitches = mode.GetChord(rootNotatedPitch, nPitchesPerChord);
@@ -349,14 +349,14 @@ namespace Moritz.Spec
         /// 2. Clones this MidiChordDef, and replaces the clone's pitches by the equivalent pitches in the opposite Mode.
         /// 3. Returns the clone.
         /// </summary>
-        public MidiChordDef Opposite(Mode mode)
+        public MidiChordDef Opposite(_oldMode mode)
         {
             #region conditions
             Debug.Assert(mode != null);
             #endregion conditions
 
             int relativePitchHierarchyIndex = (mode.RelativePitchHierarchyIndex + 11) % 22;
-            Mode oppositeMode = new Mode(relativePitchHierarchyIndex, mode.BasePitch, mode.NPitchesPerOctave);
+            _oldMode oppositeMode = new _oldMode(relativePitchHierarchyIndex, mode.BasePitch, mode.NPitchesPerOctave);
             MidiChordDef oppositeMCD = (MidiChordDef)Clone();
 
             #region conditions
@@ -375,7 +375,7 @@ namespace Moritz.Spec
             return oppositeMCD;
         }
 
-        private void OppositePitches(Mode mode, Mode oppositeMode, List<byte> pitches)
+        private void OppositePitches(_oldMode mode, _oldMode oppositeMode, List<byte> pitches)
         {
             for(int i = 0; i < pitches.Count; ++i)
             {
@@ -483,7 +483,7 @@ namespace Moritz.Spec
 		/// <param name="ornamentShape"></param>
 		/// <param name="nOrnamentChords"></param>
 		/// <param name="ornamentText">The string that will follow the tilde. Cannot be null or empty.</param>
-		public void SetOrnament(Mode mode, IReadOnlyList<byte> ornamentShape, int nOrnamentChords, string ornamentText)
+		public void SetOrnament(_oldMode mode, IReadOnlyList<byte> ornamentShape, int nOrnamentChords, string ornamentText)
         {
 			Debug.Assert(!String.IsNullOrEmpty(ornamentText));
             int nPitchesPerOctave = mode.NPitchesPerOctave;
@@ -501,7 +501,7 @@ namespace Moritz.Spec
 		/// (usually to a single character).
         /// </summary>
         /// <param name="ornamentEnvelope"></param>
-        public void SetOrnament(Mode mode, Envelope ornamentEnvelope = null, string ornamentText = null)
+        public void SetOrnament(_oldMode mode, Envelope ornamentEnvelope = null, string ornamentText = null)
         {
             Debug.Assert(mode != null);
 			Debug.Assert((ornamentEnvelope == null && ornamentText == null) || (ornamentEnvelope != null && ornamentText != null));
@@ -804,7 +804,7 @@ namespace Moritz.Spec
         /// In this case, they are silently coerced to the bottom or top notes of the mode respectively.
         /// Duplicate top and bottom mode pitches are removed.
         /// </summary>
-        public void TransposeStepsInModeGamut(Mode mode, int steps)
+        public void TransposeStepsInModeGamut(_oldMode mode, int steps)
         {
             #region conditions
             Debug.Assert(mode != null);
@@ -840,7 +840,7 @@ namespace Moritz.Spec
         /// Calculates the number of steps to transpose, and then calls TransposeStepsInModeGamut.
         /// When this function returns, rootPitch is the lowest pitch in both BasicMidiChordDefs[0] and NotatedMidiPitches.
         /// </summary>
-        public void TransposeToRootInModeGamut(Mode mode, int rootPitch)
+        public void TransposeToRootInModeGamut(_oldMode mode, int rootPitch)
         {
 			AssertConsistency(this);
 			BasicMidiChordDef bmcd = BasicDurationDefs[0] as BasicMidiChordDef;
@@ -857,7 +857,7 @@ namespace Moritz.Spec
             TransposeStepsInModeGamut(mode, stepsToTranspose);
         }
 
-        private byte TransposedPitchInModeGamut(byte initialPitch, Mode mode, int steps)
+        private byte TransposedPitchInModeGamut(byte initialPitch, _oldMode mode, int steps)
         {
             int index = mode.IndexInGamut(initialPitch);
             int newIndex = index + steps;

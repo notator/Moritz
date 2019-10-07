@@ -63,7 +63,7 @@ namespace Moritz.Spec
         /// <param name="mode"></param>
         /// <param name="rootPitch">The lowest pitch</param>
         /// <param name="density">The number of pitches. The actual number created can be smaller.</param>
-        public BasicMidiChordDef(int msDuration, Mode mode, int rootPitch, int density)
+        public BasicMidiChordDef(int msDuration, _oldMode mode, int rootPitch, int density)
 			: base(msDuration)
 		{
 			#region conditions

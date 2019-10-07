@@ -442,7 +442,7 @@ namespace Moritz.Algorithm.Study4
 				new Tuple<int,int>(11, 6 ),
 				new Tuple<int,int>( 3, 7 )
 			};
-			var test1_ModeVector = GetModeVector(test1_StartMode, test1_TargetMode, test1_PitchVectors, 6);
+			var test1_ModeVector = test1_StartMode.GetModeVector(test1_TargetMode, test1_PitchVectors, 6);
 
 			#endregion mode test1
 
@@ -473,7 +473,7 @@ namespace Moritz.Algorithm.Study4
 				new Tuple<int,int>( 13,9 ),
 				new Tuple<int,int>( 1,3 )
 			};
-			var test2_ModeVector = GetModeVector(test2_StartMode, test2_TargetMode, test2_PitchVectors, 4);
+			var test2_ModeVector = test2_StartMode.GetModeVector(test2_TargetMode, test2_PitchVectors, 4);
 
 			#endregion mode test2
 
@@ -501,7 +501,7 @@ namespace Moritz.Algorithm.Study4
 				new Tuple<int,int>( 14,8 ),
 				new Tuple<int,int>( 3,9 )
 			};
-			List<Mode> test3_ModeVector = GetModeVector(test3_StartMode, test3_TargetMode, test3_PitchVectors, 4);
+			List<Mode> test3_ModeVector = test3_StartMode.GetModeVector(test3_TargetMode, test3_PitchVectors, 4);
 
 			#endregion mode test3
 

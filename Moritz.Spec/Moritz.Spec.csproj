@@ -51,14 +51,15 @@
     <Compile Include="CarryMsgs.cs" />
     <Compile Include="ChainTrk.cs" />
     <Compile Include="FortePitchClassSet.cs" />
-    <Compile Include="ModeProximity.cs" />
+    <Compile Include="Mode.cs" />
+    <Compile Include="_oldModeProximity.cs" />
     <Compile Include="MidiMsg.cs" />
     <Compile Include="MidiRestDef.cs" />
     <Compile Include="CCSettings.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ClefDef.cs" />
-    <Compile Include="Mode.cs" />
+    <Compile Include="_oldMode.cs" />
     <Compile Include="InputNoteDef.cs" />
     <Compile Include="ITrksContainer.cs" />
     <Compile Include="MsValues.cs" />
