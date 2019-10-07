@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompositionAlgorithm.cs" />
+    <Compile Include="Study 4\GetModeVector.cs" />
     <Compile Include="Study 4\GetTrksAndBarlines.cs" />
     <Compile Include="Study 4\Study4Algorithm.cs" />
     <Compile Include="Study 4\Mode.cs" />
