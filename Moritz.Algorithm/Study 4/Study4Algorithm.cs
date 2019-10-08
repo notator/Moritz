@@ -512,6 +512,56 @@ namespace Moritz.Algorithm.Study4
 
 			#endregion test4
 
+			#region test 5
+			/// <summary>
+			/// This series of RelativePitchHierarchies is derived from the "most consonant" hierarchy at index 0:
+			///                    0, 7, 4, 10, 2, 5, 9, 11, 1, 3, 6, 8
+			/// which has been deduced from the harmonic series as follows (decimals rounded to 3 figures):
+			/// 
+			///              absolute   equal              harmonic:     absolute         closest
+			///              pitch:  temperament                         harmonic    equal temperament
+			///                        factor:                           factor:       absolute pitch:
+			///                0:       1.000       |          1   ->   1/1  = 1.000  ->     0:
+			///                1:       1.059       |          3   ->   3/2  = 1.500  ->     7:
+			///                2:       1.122       |          5   ->   5/4  = 1.250  ->     4:
+			///                3:       1.189       |          7   ->   7/4  = 1.750  ->     10:
+			///                4:       1.260       |          9   ->   9/8  = 1.125  ->     2:
+			///                5:       1.335       |         11   ->  11/8  = 1.375  ->     5:
+			///                6:       1.414       |         13   ->  13/8  = 1.625  ->     9:
+			///                7:       1.498       |         15   ->  15/8  = 1.875  ->     11:
+			///                8:       1.587       |         17   ->  17/16 = 1.063  ->     1:
+			///                9:       1.682       |         19   ->  19/16 = 1.187  ->     3:
+			///                10:      1.782       |         21   ->  21/16 = 1.313  ->     
+			///                11:      1.888       |         23   ->  23/16 = 1.438  ->     6:
+			///                                     |         25   ->  25/16 = 1.563  ->     8:
+			/// </summary>
+			Dictionary<int, int> test5_Mode1AbsPitchWeightDict = new Dictionary<int, int>()
+			{
+				// The first 7 of the above hierarchy, weighted from ff to ppp (see Moritz.Globals)			
+				{ 0, 113}, // ff
+				{ 7, 99}, // f
+				{ 4, 85}, // mf
+				{ 10,71}, // mp
+				{ 2, 57}, // p
+				{ 5, 43}, // pp
+				{ 9, 29}  // ppp
+			};
+			Mode mode1 = new Mode(test5_Mode1AbsPitchWeightDict);
+			Mode mode2 = mode1.Clone() as Mode;
+			mode2.Transpose(7);
+			Mode mode3 = mode2.Clone() as Mode;
+			mode3.Transpose(7);
+			Mode mode4 = mode3.Clone() as Mode;
+			mode4.Transpose(7);
+			Mode mode5 = mode4.Clone() as Mode;
+			mode5.Transpose(7);
+			Mode mode6 = mode5.Clone() as Mode;
+			mode6.Transpose(7);
+			Mode mode7 = mode6.Clone() as Mode;
+			mode7.Transpose(7);
+
+			#endregion test 5
+
 			GetTrksAndBarlines(out List<Trk> trks, out List<int> barlineMsPositions, out List<List<int>> targetChords);
 
 			Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
