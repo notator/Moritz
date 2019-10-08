@@ -12,7 +12,7 @@ namespace Moritz.Algorithm.Study4
 {
 	public partial class Study4Algorithm : CompositionAlgorithm
 	{
-		private void GetTrksAndBarlines(out List<Trk> trks, out List<int> barlineMsPositions, out List<List<int>> targetChords)
+		private void GetTrksAndBarlines(List<Mode> modesPerBar, out List<Trk> trks, out List<int> barlineMsPositions)
 		{
 			Krystal k4 = _krystals[0];
 			Krystal k3 = _krystals[1];
@@ -26,7 +26,7 @@ namespace Moritz.Algorithm.Study4
 			List<List<List<int>>> strandChordProgressionPerBar = GetStrandChordProgressionPerBar(trk0AbsPitchesPerStrandPerBar);
 
 			barlineMsPositions = new List<int>();
-			targetChords = new List<List<int>>();
+			List<List<int>> targetChords = new List<List<int>>();
 			Trk trk0 = new Trk(0);
 			//for(int i = 0; i < targetChords.Count; i++)
 			//{
