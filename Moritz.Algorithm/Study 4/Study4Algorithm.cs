@@ -56,8 +56,18 @@ namespace Moritz.Algorithm.Study4
 			return bars;
 		}
 
+		/// <summary>
+		/// 08.10.2019: GetModesPerBar() returns 55 bars.
+		/// Regions begin at the following bar numbers:
+		///   1, 2, 6, 12, 20, 30, 42
+		/// (See paper notebook 7th October 2019)
+		/// </summary>
+		/// <param name="bars"></param>
+		/// <returns></returns>
 		public override ScoreData SetScoreRegionsData(List<Bar> bars)
 		{
+			Debug.Assert(bars.Count == 55); // 08.10.2019
+
 			Dictionary<int, (int index, int msPosition)> msPosPerBarlineIndexDict = GetMsPosPerBarlineIndexDict(bars);
 
 			// Each barline is the left barline of the bar with the same index.
@@ -65,27 +75,27 @@ namespace Moritz.Algorithm.Study4
 			// msPosPerBarlineIndexDict.Count is 1 + bars.Count.
 			var barline0 = msPosPerBarlineIndexDict[0];
 			var barline1 = msPosPerBarlineIndexDict[1];
-			var barline3 = msPosPerBarlineIndexDict[3];
-			var barline6 = msPosPerBarlineIndexDict[6];
-			var barline10 = msPosPerBarlineIndexDict[10];
-			var barline15 = msPosPerBarlineIndexDict[15];
-			var barline21 = msPosPerBarlineIndexDict[21];
+			var barline5 = msPosPerBarlineIndexDict[5];
+			var barline11 = msPosPerBarlineIndexDict[11];
+			var barline19 = msPosPerBarlineIndexDict[19];
+			var barline29 = msPosPerBarlineIndexDict[29];
+			var barline41 = msPosPerBarlineIndexDict[41];
 			var finalBarline = msPosPerBarlineIndexDict[msPosPerBarlineIndexDict.Count - 1];
 
 			// The following regions can be redefined later to express the existing logic better.
 			RegionDef rd1 = new RegionDef("A", barline0, barline1);
-			RegionDef rd2 = new RegionDef("B", barline1, barline3);
-			RegionDef rd3 = new RegionDef("C", barline3, barline6);
-			RegionDef rd4 = new RegionDef("D", barline6, barline10);
-			RegionDef rd5 = new RegionDef("E", barline10, barline15);
-			RegionDef rd6 = new RegionDef("F", barline15, barline21);
-			RegionDef rd7 = new RegionDef("G", barline21, finalBarline);
+			RegionDef rd2 = new RegionDef("B", barline1, barline5);
+			RegionDef rd3 = new RegionDef("C", barline5, barline11);
+			RegionDef rd4 = new RegionDef("D", barline11, barline19);
+			RegionDef rd5 = new RegionDef("E", barline19, barline29);
+			RegionDef rd6 = new RegionDef("F", barline29, barline41);
+			RegionDef rd7 = new RegionDef("G", barline41, finalBarline);
 
 			List<RegionDef> regionDefs = new List<RegionDef>() { rd1, rd2, rd3, rd4, rd5, rd6, rd7 };
 
-			// Temporary definition. Redefine this definition and the RegionDefs later.
-			// There should be a minimum number of RegionDefs (for the actually performed sequence).
-			RegionSequence regionSequence = new RegionSequence(regionDefs, "ABABCABCDABCDEFG");
+			// Temporary definition. Redefine the sequence later, when the actual bar content is known.
+			// Regions can repeat in any order since they all begin with, and end pointing at, the same Mode.
+			RegionSequence regionSequence = new RegionSequence(regionDefs, "ABCDEFA");
 
 			ScoreData scoreData = new ScoreData(regionSequence);
 
