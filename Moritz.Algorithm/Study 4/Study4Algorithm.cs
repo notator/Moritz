@@ -42,9 +42,9 @@ namespace Moritz.Algorithm.Study4
 
 			Tests();
 
-			List<Mode> modesPerBar = GetModesPerBar();
+			ModeVector study4ModeVector = GetStudy4ModeVector();
 
-			GetTrksAndBarlines(modesPerBar, out List<Trk> trks, out List<int> barlineMsPositions);
+			GetTrksAndBarlines(study4ModeVector, out List<Trk> trks, out List<int> barlineMsPositions);
 
 			Seq mainSeq = new Seq(0, trks, MidiChannelPerOutputVoice);
 
@@ -57,7 +57,8 @@ namespace Moritz.Algorithm.Study4
 		}
 
 		/// <summary>
-		/// 08.10.2019: GetModesPerBar() returns 55 bars.
+		/// 10.10.2019: GetStudy4ModeVector() returns 55 Modes.
+		/// There is going to be 1 Mode per bar, so there will be 55 bars.
 		/// Regions begin at the following bar numbers:
 		///   1, 2, 6, 12, 20, 30, 42
 		/// (See paper notebook 7th October 2019)

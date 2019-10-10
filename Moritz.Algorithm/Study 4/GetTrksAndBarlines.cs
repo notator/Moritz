@@ -12,7 +12,7 @@ namespace Moritz.Algorithm.Study4
 {
 	public partial class Study4Algorithm : CompositionAlgorithm
 	{
-		private void GetTrksAndBarlines(List<Mode> modesPerBar, out List<Trk> trks, out List<int> barlineMsPositions)
+		private void GetTrksAndBarlines(ModeVector modeVector, out List<Trk> trks, out List<int> barlineMsPositions)
 		{
 			Krystal k4 = _krystals[0];
 			Krystal k3 = _krystals[1];

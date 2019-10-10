@@ -37,7 +37,8 @@ namespace Moritz.Algorithm.Study4
 			};
 			Mode test1_TargetMode = new Mode(test1_TargetAbsPitchWeightDict);
 
-			List<Tuple<int, int>> test1_PitchVectors = new List<Tuple<int, int>>()
+			//All ints (both pitches and weights) are in range [0..127]
+			List<Tuple<int, int>> test1_PitchVectorsData = new List<Tuple<int, int>>()
 			{
 				new Tuple<int,int>(12,11 ),
 				new Tuple<int,int>( 4, 6 ),
@@ -45,7 +46,7 @@ namespace Moritz.Algorithm.Study4
 				new Tuple<int,int>(11, 6 ),
 				new Tuple<int,int>( 3, 7 )
 			};
-			var test1_ModeVector = test1_StartMode.GetModeVector(test1_TargetMode, test1_PitchVectors, 6);
+			var test1_ModeVector = new ModeVector(test1_StartMode, test1_TargetMode, test1_PitchVectorsData, 6);
 
 			#endregion mode test1
 
@@ -65,7 +66,7 @@ namespace Moritz.Algorithm.Study4
 			};
 			Mode test2_TargetMode = new Mode(test2_TargetAbsPitchWeightDict);
 
-			List<Tuple<int, int>> test2_PitchVectors = new List<Tuple<int, int>>()
+			List<Tuple<int, int>> test2_PitchVectorsData = new List<Tuple<int, int>>()
 			{
 				new Tuple<int,int>( 12,11 ),
 				new Tuple<int,int>( 5,7 ),
@@ -76,7 +77,7 @@ namespace Moritz.Algorithm.Study4
 				new Tuple<int,int>( 13,9 ),
 				new Tuple<int,int>( 1,3 )
 			};
-			var test2_ModeVector = test2_StartMode.GetModeVector(test2_TargetMode, test2_PitchVectors, 4);
+			var test2_ModeVector = new ModeVector(test2_StartMode, test2_TargetMode, test2_PitchVectorsData, 4);
 
 			#endregion mode test2
 
@@ -98,13 +99,13 @@ namespace Moritz.Algorithm.Study4
 			};
 			Mode test3_TargetMode = new Mode(test3_TargetAbsPitchWeightDict);
 
-			List<Tuple<int, int>> test3_PitchVectors = new List<Tuple<int, int>>()
+			List<Tuple<int, int>> test3_PitchVectorsData = new List<Tuple<int, int>>()
 			{
 				new Tuple<int,int>( 1,7 ),
 				new Tuple<int,int>( 14,8 ),
 				new Tuple<int,int>( 3,9 )
 			};
-			List<Mode> test3_ModeVector = test3_StartMode.GetModeVector(test3_TargetMode, test3_PitchVectors, 4);
+			var test3_ModeVector = new ModeVector(test3_StartMode, test3_TargetMode, test3_PitchVectorsData, 4);
 
 			#endregion mode test3
 
