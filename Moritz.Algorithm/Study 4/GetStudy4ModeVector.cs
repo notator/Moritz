@@ -218,6 +218,15 @@ namespace Moritz.Algorithm.Study4
 				modeVector = modeVector.Concat(modeVectors[i]);
 			}
 
+			foreach(var pitchVector in modeVector.PitchVectors)
+			{
+				pitchVector.GetRange(out int minPitch1, out int maxPitch1);
+				pitchVector.MinimizePitchIntervals();
+				pitchVector.GetRange(out int minPitch2, out int maxPitch2);
+				pitchVector.SetOctave(60);
+				pitchVector.GetRange(out int minPitch3, out int maxPitch3);
+			}
+
 			return modeVector;
 		}
 	}
