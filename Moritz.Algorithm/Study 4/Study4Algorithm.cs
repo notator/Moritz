@@ -18,9 +18,9 @@ namespace Moritz.Algorithm.Study4
 			CheckParameters();
 		}
 
-		public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3 }; } }
+		public override IReadOnlyList<int> MidiChannelPerOutputVoice { get { return new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7 }; } }
 		public override IReadOnlyList<int> MidiChannelPerInputVoice { get { return null; } }
-		public override int NumberOfBars { get { return 120; } }
+		public override int NumberOfBars { get { return 55; } }
 
 		/// <summary>
 		/// See CompositionAlgorithm.DoAlgorithm()
@@ -96,7 +96,7 @@ namespace Moritz.Algorithm.Study4
 
 			// Temporary definition. Redefine the sequence later, when the actual bar content is known.
 			// Regions can repeat in any order since they all begin with, and end pointing at, the same Mode.
-			RegionSequence regionSequence = new RegionSequence(regionDefs, "ABCDEFA");
+			RegionSequence regionSequence = new RegionSequence(regionDefs, "ABCDEFGA");
 
 			ScoreData scoreData = new ScoreData(regionSequence);
 
