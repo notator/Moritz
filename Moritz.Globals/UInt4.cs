@@ -7,18 +7,17 @@ namespace Moritz.Globals
 {
 	//
 	// Summary:
-	//     Represents a 7-bit unsigned integer (range 0..127)
-	// Adapted from the definition of System.UInt16.
-	// See also Moritz.Globals.UInt4 -- which is an edited copy of this struct.
-	public struct UInt7 : IComparable, IFormattable, IComparable<int>, IEquatable<int>
+	//     Represents an unsigned integer (limited to range 0..11)
+	// This is a copy of Moritz.Globals.UInt7 with UInt7 changed to UInt4, and MaxValue set to 11.
+	public struct UInt4 : IComparable, IFormattable, IComparable<int>, IEquatable<int>
 	{
 		//
 		// Summary:
-		//     Represents the largest possible value of Moritz.Globals.UInt7. This field is constant.
-		public const int MaxValue = 127;
+		//     Represents the largest possible value of Moritz.Globals.UInt4. This field is constant.
+		public const int MaxValue = 11;
 		//
 		// Summary:
-		//     Represents the smallest possible value of Moritz.Globals.UInt7. This field is constant.
+		//     Represents the smallest possible value of Moritz.Globals.UInt4. This field is constant.
 		public const int MinValue = 0;
 
 		public int Int { get; }
@@ -27,7 +26,7 @@ namespace Moritz.Globals
 		/// An exception is thrown if argument value is less than MinValue or greater than MaxValue.
 		/// </summary>
 		/// <param name="value"></param>
-		public UInt7(int value)
+		public UInt4(int value)
 		{
 			if( value < MinValue || value > MaxValue)
 			{
@@ -36,22 +35,22 @@ namespace Moritz.Globals
 			Int = value;
 		}
 
-		public static explicit operator int(UInt7 v) => v.Int;
-		public static explicit operator UInt7(int value) => new UInt7(value);
+		public static explicit operator int(UInt4 v) => v.Int;
+		public static explicit operator UInt4(int value) => new UInt4(value);
 
-		public static UInt7 operator +(UInt7 a, UInt7 b) => new UInt7(a.Int + b.Int);
-		public static UInt7 operator *(UInt7 a, UInt7 b) => new UInt7(a.Int * b.Int);
-		public static UInt7 operator %(UInt7 a, UInt7 b) => new UInt7(a.Int % b.Int);
-		public static bool operator ==(UInt7 a, UInt7 b) => a.Int == b.Int;
-		public static bool operator !=(UInt7 a, UInt7 b) => a.Int != b.Int;
-		public static bool operator >=(UInt7 a, UInt7 b) => a.Int >= b.Int;
-		public static bool operator <=(UInt7 a, UInt7 b) => a.Int <= b.Int;
-		public static bool operator >(UInt7 a, UInt7 b) => a.Int > b.Int;
-		public static bool operator <(UInt7 a, UInt7 b) => a.Int < b.Int;
+		public static UInt4 operator +(UInt4 a, UInt4 b) => new UInt4(a.Int + b.Int);
+		public static UInt4 operator *(UInt4 a, UInt4 b) => new UInt4(a.Int * b.Int);
+		public static UInt4 operator %(UInt4 a, UInt4 b) => new UInt4(a.Int % b.Int);
+		public static bool operator ==(UInt4 a, UInt4 b) => a.Int == b.Int;
+		public static bool operator !=(UInt4 a, UInt4 b) => a.Int != b.Int;
+		public static bool operator >=(UInt4 a, UInt4 b) => a.Int >= b.Int;
+		public static bool operator <=(UInt4 a, UInt4 b) => a.Int <= b.Int;
+		public static bool operator >(UInt4 a, UInt4 b) => a.Int > b.Int;
+		public static bool operator <(UInt4 a, UInt4 b) => a.Int < b.Int;
 
 		//
 		// Summary:
-		//     Returns a value indicating whether this instance is equal to a specified Moritz.Globals.UInt7
+		//     Returns a value indicating whether this instance is equal to a specified Moritz.Globals.UInt4
 		//     value.
 		//
 		// Parameters:
@@ -60,7 +59,7 @@ namespace Moritz.Globals
 		//
 		// Returns:
 		//     true if value is an int that has the same value as this instance; otherwise, false.
-		public bool Equals(UInt7 other) => other.Int == Int;
+		public bool Equals(UInt4 other) => other.Int == Int;
 		//
 		// Summary:
 		//     Returns a value indicating whether this instance is equal to a specified int
@@ -112,16 +111,16 @@ namespace Moritz.Globals
 		//
 		// Exceptions:
 		//   T:System.ArgumentException:
-		//     value is not a Moritz.Globals.UInt7.
+		//     value is not a Moritz.Globals.UInt4.
 		public int CompareTo(object obj)
 		{
-			if(! (obj is UInt7))
+			if(! (obj is UInt4))
 			{
 				throw new ArgumentException();
 			}
 			else
 			{
-				int argInt = ((UInt7)obj).Int;
+				int argInt = ((UInt4)obj).Int;
 				return Int.CompareTo(argInt);
 			}
 		}
@@ -159,9 +158,9 @@ namespace Moritz.Globals
 		//     s is not in a format compliant with style.
 		//
 		//   T:System.OverflowException:
-		//     s represents a number that is less than Moritz.Globals.UInt7.MinValue or greater than
-		//     Moritz.Globals.UInt7.MaxValue. -or-s includes non-zero, fractional digits.
-		public static UInt7 Parse(string s, NumberStyles style, IFormatProvider provider)
+		//     s represents a number that is less than Moritz.Globals.UInt4.MinValue or greater than
+		//     Moritz.Globals.UInt4.MaxValue. -or-s includes non-zero, fractional digits.
+		public static UInt4 Parse(string s, NumberStyles style, IFormatProvider provider)
 		{
 			throw new NotImplementedException();
 		}
@@ -189,8 +188,8 @@ namespace Moritz.Globals
 		//     s is not in the correct format.
 		//
 		//   T:System.OverflowException:
-		//     s represents a number less than Moritz.Globals.UInt7.MinValue or greater than Moritz.Globals.UInt7.MaxValue.
-		public static UInt7 Parse(string s, IFormatProvider provider)
+		//     s represents a number less than Moritz.Globals.UInt4.MinValue or greater than Moritz.Globals.UInt4.MaxValue.
+		public static UInt4 Parse(string s, IFormatProvider provider)
 		{
 			throw new NotImplementedException();
 		}
@@ -217,8 +216,8 @@ namespace Moritz.Globals
 		//     s is not in the correct format.
 		//
 		//   T:System.OverflowException:
-		//     s represents a number less than Moritz.Globals.UInt7.MinValue or greater than Moritz.Globals.UInt7.MaxValue.
-		public static UInt7 Parse(string s)
+		//     s represents a number less than Moritz.Globals.UInt4.MinValue or greater than Moritz.Globals.UInt4.MaxValue.
+		public static UInt4 Parse(string s)
 		{
 			throw new NotImplementedException();
 		}
@@ -252,10 +251,10 @@ namespace Moritz.Globals
 		//     s is not in a format compliant with style.
 		//
 		//   T:System.OverflowException:
-		//     s represents a number less than Moritz.Globals.UInt7.MinValue or greater than Moritz.Globals.UInt7.MaxValue.
+		//     s represents a number less than Moritz.Globals.UInt4.MinValue or greater than Moritz.Globals.UInt4.MaxValue.
 		//     -or-s includes non-zero, fractional digits.
 		
-		public static UInt7 Parse(string s, NumberStyles style)
+		public static UInt4 Parse(string s, NumberStyles style)
 		{
 			throw new NotImplementedException();
 		}
@@ -274,12 +273,12 @@ namespace Moritz.Globals
 		//     equivalent to the number contained in s, if the conversion succeeded, or zero
 		//     if the conversion failed. The conversion fails if the s parameter is null or
 		//     System.String.Empty, is not in the correct format. , or represents a number less
-		//     than Moritz.Globals.UInt7.MinValue or greater than Moritz.Globals.UInt7.MaxValue. This parameter
+		//     than Moritz.Globals.UInt4.MinValue or greater than Moritz.Globals.UInt4.MaxValue. This parameter
 		//     is passed uninitialized; any value originally supplied in result will be overwritten.
 		//
 		// Returns:
 		//     true if s was converted successfully; otherwise, false.
-		public static bool TryParse(string s, out UInt7 result)
+		public static bool TryParse(string s, out UInt4 result)
 		{
 			throw new NotImplementedException();
 		}
@@ -305,8 +304,8 @@ namespace Moritz.Globals
 		//     When this method returns, contains the 7-bit unsigned integer value equivalent
 		//     to the number contained in s, if the conversion succeeded, or zero if the conversion
 		//     failed. The conversion fails if the s parameter is null or System.String.Empty,
-		//     is not in a format compliant with style, or represents a number less than Moritz.Globals.UInt7.MinValue
-		//     or greater than Moritz.Globals.UInt7.MaxValue. This parameter is passed uninitialized;
+		//     is not in a format compliant with style, or represents a number less than Moritz.Globals.UInt4.MinValue
+		//     or greater than Moritz.Globals.UInt4.MaxValue. This parameter is passed uninitialized;
 		//     any value originally supplied in result will be overwritten.
 		//
 		// Returns:
@@ -317,7 +316,7 @@ namespace Moritz.Globals
 		//     style is not a System.Globalization.NumberStyles value. -or-style is not a combination
 		//     of System.Globalization.NumberStyles.AllowHexSpecifier and System.Globalization.NumberStyles.HexNumber
 		//     values.
-		public static bool TryParse(string s, NumberStyles style, IFormatProvider provider, out UInt7 result)
+		public static bool TryParse(string s, NumberStyles style, IFormatProvider provider, out UInt4 result)
 		{
 			throw new NotImplementedException();
 		}

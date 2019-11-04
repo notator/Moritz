@@ -69,8 +69,8 @@ namespace Moritz.Spec
 
 			foreach(var absPitchWeightDict in absPitchWeightDictList)
 			{
-				Mode mode = new Mode(absPitchWeightDict);
-				_modes.Add(mode);
+				//Mode mode = new Mode(absPitchWeightDict);
+				//_modes.Add(mode);
 			}
 		}
 

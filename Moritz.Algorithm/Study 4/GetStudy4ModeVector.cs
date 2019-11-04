@@ -51,7 +51,7 @@ namespace Moritz.Algorithm.Study4
 				{ 5, 43}, // pp
 				{ 9, 29}  // ppp
 			};
-			Mode mode1 = new Mode(mode1AbsPitchWeightDict);
+			Mode mode1 = new Mode(0, 0, new HashSet<int>() { 0, 7, 4, 10, 2, 5, 9 });
 			Mode mode2 = mode1.Clone() as Mode;
 			mode2.Transpose(7);
 			Mode mode3 = mode2.Clone() as Mode;
