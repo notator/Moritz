@@ -17,7 +17,7 @@ namespace Moritz.Algorithm.Study4
 		/// </summary>
 		public void Tests()
 		{
-			#region Mode test1
+			#region Gamut test1
 			HashSet<int> absPitchSet1_Start = new HashSet<int>() { 0, 4, 2, 11 };
 			Gamut test1_StartGamut = new Gamut(0, 0, absPitchSet1_Start);
 
@@ -35,7 +35,7 @@ namespace Moritz.Algorithm.Study4
 			};
 			var test1_GamutVector = new GamutVector(test1_StartGamut, test1_TargetGamut, test1_PitchVectorsData, 6);
 
-			#endregion mode test1
+			#endregion Gamut test1
 
 			#region Gamut test2
 			Dictionary<int, int> test2_StartAbsPitchWeightDict = new Dictionary<int, int>()

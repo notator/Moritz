@@ -91,8 +91,23 @@ namespace Moritz.Spec
 			AssertPitchWeightsValidity();
 		}
 
+		/// <summary>
+		/// The dictionary keys must be in range 0..11, the values must be in range 0..127
+		/// </summary>
+		/// <param name="absPitchWeightDict"></param>
 		public Gamut(Dictionary<int, int> absPitchWeightDict)
 		{
+			#region conditions
+			foreach(var key in absPitchWeightDict.Keys)
+			{
+				Debug.Assert(key >= 0 && key <= 11);
+			}
+			foreach(var value in absPitchWeightDict.Values)
+			{
+				Debug.Assert(value >= 0 && value <= 127);
+			}
+			#endregion conditions
+
 			var pitchWeights = new List<PitchWeight>();
 			for(int relPitch = 0; relPitch <= UInt7.MaxValue; ++relPitch)
 			{

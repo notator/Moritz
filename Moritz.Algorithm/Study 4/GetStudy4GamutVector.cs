@@ -40,7 +40,7 @@ namespace Moritz.Algorithm.Study4
 			///                11:      1.888       |         23   ->  23/16 = 1.438  ->     6:
 			///                                     |         25   ->  25/16 = 1.563  ->     8:
 			/// </summary>
-			Dictionary<int, int> mode1AbsPitchWeightDict = new Dictionary<int, int>()
+			Dictionary<int, int> gamut1AbsPitchWeightDict = new Dictionary<int, int>()
 			{
 				// The first 7 of the above hierarchy, weighted from ff to ppp (see Moritz.Globals)			
 				{ 0, 113}, // ff
@@ -51,7 +51,7 @@ namespace Moritz.Algorithm.Study4
 				{ 5, 43}, // pp
 				{ 9, 29}  // ppp
 			};
-			Gamut gamut1 = new Gamut(0, 0, new HashSet<int>() { 0, 7, 4, 10, 2, 5, 9 });
+			Gamut gamut1 = new Gamut(gamut1AbsPitchWeightDict);
 			Gamut gamut2 = gamut1.Clone() as Gamut;
 			gamut2.Transpose(7);
 			Gamut gamut3 = gamut2.Clone() as Gamut;

@@ -57,8 +57,8 @@ namespace Moritz.Algorithm.Study4
 		}
 
 		/// <summary>
-		/// 10.10.2019: GetStudy4GamutVector() returns 55 Modes.
-		/// There is going to be 1 Mode per bar, so there will be 55 bars.
+		/// 10.10.2019: GetStudy4GamutVector() returns 55 Gamuts.
+		/// There is going to be 1 Gamut per bar, so there will be 55 bars.
 		/// Regions begin at the following bar numbers:
 		///   1, 2, 6, 12, 20, 30, 42
 		/// (See paper notebook 7th October 2019)
@@ -95,7 +95,7 @@ namespace Moritz.Algorithm.Study4
 			List<RegionDef> regionDefs = new List<RegionDef>() { rd1, rd2, rd3, rd4, rd5, rd6, rd7 };
 
 			// Temporary definition. Redefine the sequence later, when the actual bar content is known.
-			// Regions can repeat in any order since they all begin with, and end pointing at, the same Mode.
+			// Regions can repeat in any order since they all begin with, and end pointing at, the same Gamut.
 			RegionSequence regionSequence = new RegionSequence(regionDefs, "ABCDEFGA");
 
 			ScoreData scoreData = new ScoreData(regionSequence);
@@ -160,13 +160,13 @@ namespace Moritz.Algorithm.Study4
 
 		/// <summary>
 		/// The compulsory first barline (at msPosition=0) is NOT included in the returned list.
-		/// The compulsory final barline (at the end of the final ModeSegment) IS included in the returned list.
-		/// There is a barline at the end of each voice1 modeSegment.
+		/// The compulsory final barline (at the end of the final GamutSegment) IS included in the returned list.
+		/// There is a barline at the end of each voice1 gamutSegment.
 		/// All the returned barline positions are unique, and in ascending order.
 		/// </summary>
 		private List<int> GetBarlinePositions(List<IUniqueDef> trk0iuds)
 		{
-			//var msValuesListList = voice1.GetMsValuesOfModeGrpTrks();
+			//var msValuesListList = voice1.GetMsValuesOfGamutGrpTrks();
 
 			List<int> barlinePositions = new List<int>();
 			int currentPosition = 0;
