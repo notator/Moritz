@@ -51,6 +51,18 @@ namespace Moritz.Globals
 
 		//
 		// Summary:
+		//     Returns a value indicating whether this instance is equal to an object other than an int or UInt4
+		//     value.
+		//
+		// Parameters:
+		//   obj:
+		//     An object to compare to this instance.
+		//
+		// Returns:
+		//     true if value is an int that has the same value as this instance; otherwise, false.
+		public override bool Equals(object other) => false;
+		//
+		// Summary:
 		//     Returns a value indicating whether this instance is equal to a specified Moritz.Globals.UInt7
 		//     value.
 		//

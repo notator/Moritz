@@ -13,10 +13,10 @@ namespace Moritz.Algorithm.Study4
 	public partial class Study4Algorithm : CompositionAlgorithm
 	{
 		/// <summary>
-		/// Returns the ModeVector for the whole of Study 4
+		/// Returns the GamutVector for the whole of Study 4
 		/// </summary>
 		/// <returns></returns>
-		ModeVector GetStudy4ModeVector()
+		GamutVector GetStudy4GamutVector()
 		{
 			/// <summary>
 			/// This series of RelativePitchHierarchies is derived from the "most consonant" hierarchy at index 0:
@@ -51,19 +51,19 @@ namespace Moritz.Algorithm.Study4
 				{ 5, 43}, // pp
 				{ 9, 29}  // ppp
 			};
-			Mode mode1 = new Mode(0, 0, new HashSet<int>() { 0, 7, 4, 10, 2, 5, 9 });
-			Mode mode2 = mode1.Clone() as Mode;
-			mode2.Transpose(7);
-			Mode mode3 = mode2.Clone() as Mode;
-			mode3.Transpose(7);
-			Mode mode4 = mode3.Clone() as Mode;
-			mode4.Transpose(7);
-			Mode mode5 = mode4.Clone() as Mode;
-			mode5.Transpose(7);
-			Mode mode6 = mode5.Clone() as Mode;
-			mode6.Transpose(7);
-			Mode mode7 = mode6.Clone() as Mode;
-			mode7.Transpose(7);
+			Gamut gamut1 = new Gamut(0, 0, new HashSet<int>() { 0, 7, 4, 10, 2, 5, 9 });
+			Gamut gamut2 = gamut1.Clone() as Gamut;
+			gamut2.Transpose(7);
+			Gamut gamut3 = gamut2.Clone() as Gamut;
+			gamut3.Transpose(7);
+			Gamut gamut4 = gamut3.Clone() as Gamut;
+			gamut4.Transpose(7);
+			Gamut gamut5 = gamut4.Clone() as Gamut;
+			gamut5.Transpose(7);
+			Gamut gamut6 = gamut5.Clone() as Gamut;
+			gamut6.Transpose(7);
+			Gamut gamut7 = gamut6.Clone() as Gamut;
+			gamut7.Transpose(7);
 
 			List<Tuple<int, int>> region1PitchVectorsData = new List<Tuple<int, int>>()
 			{
@@ -196,29 +196,29 @@ namespace Moritz.Algorithm.Study4
 				new Tuple<int,int>( 11,7),
 			};
 
-			List<ModeVector> modeVectors = new List<ModeVector>();
-
-			//modeVectors.Add(new ModeVector(mode1, mode1, region1PitchVectorsData, 1));
-			modeVectors.Add(new ModeVector(mode1, mode2, region21PitchVectorsData, 2));
-			modeVectors.Add(new ModeVector(mode2, mode1, region22PitchVectorsData, 2));
-			modeVectors.Add(new ModeVector(mode1, mode3, region31PitchVectorsData, 3));
-			modeVectors.Add(new ModeVector(mode3, mode1, region32PitchVectorsData, 3));
-			modeVectors.Add(new ModeVector(mode1, mode4, region41PitchVectorsData, 4));
-			modeVectors.Add(new ModeVector(mode4, mode1, region42PitchVectorsData, 4));
-			modeVectors.Add(new ModeVector(mode1, mode5, region51PitchVectorsData, 5));
-			modeVectors.Add(new ModeVector(mode5, mode1, region52PitchVectorsData, 5));
-			modeVectors.Add(new ModeVector(mode1, mode6, region61PitchVectorsData, 6));
-			modeVectors.Add(new ModeVector(mode6, mode1, region62PitchVectorsData, 6));
-			modeVectors.Add(new ModeVector(mode1, mode7, region71PitchVectorsData, 7));
-			modeVectors.Add(new ModeVector(mode7, mode1, region72PitchVectorsData, 7));
-
-			ModeVector modeVector = modeVectors[0];
-			for(int i= 1; i < modeVectors.Count; ++i)
+			List<GamutVector> gamutVectors = new List<GamutVector>
 			{
-				modeVector = modeVector.Concat(modeVectors[i]);
+				new GamutVector(gamut1, gamut2, region21PitchVectorsData, 2),
+				new GamutVector(gamut2, gamut1, region22PitchVectorsData, 2),
+				new GamutVector(gamut1, gamut3, region31PitchVectorsData, 3),
+				new GamutVector(gamut3, gamut1, region32PitchVectorsData, 3),
+				new GamutVector(gamut1, gamut4, region41PitchVectorsData, 4),
+				new GamutVector(gamut4, gamut1, region42PitchVectorsData, 4),
+				new GamutVector(gamut1, gamut5, region51PitchVectorsData, 5),
+				new GamutVector(gamut5, gamut1, region52PitchVectorsData, 5),
+				new GamutVector(gamut1, gamut6, region61PitchVectorsData, 6),
+				new GamutVector(gamut6, gamut1, region62PitchVectorsData, 6),
+				new GamutVector(gamut1, gamut7, region71PitchVectorsData, 7),
+				new GamutVector(gamut7, gamut1, region72PitchVectorsData, 7)
+			};
+
+			GamutVector gamutVector = gamutVectors[0];
+			for(int i= 1; i < gamutVectors.Count; ++i)
+			{
+				gamutVector = gamutVector.Concat(gamutVectors[i]);
 			}
 
-			foreach(var pitchVector in modeVector.PitchVectors)
+			foreach(var pitchVector in gamutVector.PitchVectors)
 			{
 				pitchVector.GetRange(out int minPitch1, out int maxPitch1);
 				pitchVector.MinimizePitchIntervals();
@@ -227,7 +227,7 @@ namespace Moritz.Algorithm.Study4
 				pitchVector.GetRange(out int minPitch3, out int maxPitch3);
 			}
 
-			return modeVector;
+			return gamutVector;
 		}
 	}
 }

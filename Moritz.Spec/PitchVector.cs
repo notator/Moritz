@@ -14,16 +14,16 @@ namespace Moritz.Spec
 		/// The PitchWeights list, which has a minimum Count of 1, does not contain the target.
 		/// Both start and end pitches All pitches and weights are in range 0..127.
 		/// </summary>
-		/// <param name="startMode"></param>
-		/// <param name="targetMode"></param>
+		/// <param name="startGamut"></param>
+		/// <param name="targetGamut"></param>
 		/// <param name="pitchVector">All ints (both start and end pitches) are in range [0..127]</param>
 		/// <param name="steps">An integer greater than 1</param>
-		public PitchVector(Mode startMode, Mode targetMode, Tuple<UInt7, UInt7> pitchVector, int steps)
+		public PitchVector(Gamut startGamut, Gamut targetGamut, Tuple<UInt7, UInt7> pitchVector, int steps)
 		{
 			Debug.Assert(steps > 1);
 			int startPitch = pitchVector.Item1.Int;
 			int startWeight = 1;
-			foreach(var pitchWeight in startMode.Gamut)
+			foreach(var pitchWeight in startGamut.PitchWeights)
 			{
 				if(pitchWeight.Pitch.Int == startPitch)
 				{
@@ -34,7 +34,7 @@ namespace Moritz.Spec
 
 			int endPitch = pitchVector.Item2.Int;
 			int endWeight = 1;
-			foreach(var pitchWeight in targetMode.Gamut)
+			foreach(var pitchWeight in targetGamut.PitchWeights)
 			{
 				if(pitchWeight.Pitch.Int == endPitch)
 				{

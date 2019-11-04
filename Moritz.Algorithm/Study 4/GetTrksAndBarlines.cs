@@ -12,7 +12,7 @@ namespace Moritz.Algorithm.Study4
 {
 	public partial class Study4Algorithm : CompositionAlgorithm
 	{
-		private void GetTrksAndBarlines(ModeVector modeVector, out List<Trk> trks, out List<int> barlineMsPositions)
+		private void GetTrksAndBarlines(GamutVector modeVector, out List<Trk> trks, out List<int> barlineMsPositions)
 		{
 			const int barChordDuration = 1000; //ms
 			trks = GetTrks(modeVector.PitchVectors, barChordDuration);
