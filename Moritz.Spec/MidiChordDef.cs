@@ -14,33 +14,53 @@ namespace Moritz.Spec
 	///</summary>
 	public class MidiChordDef : DurationDef, IUniqueSplittableChordDef
     {
-        #region constructors
-        /// <summary>
-        /// A MidiChordDef containing a single BasicMidiChordDef. Absent fields are set to 0 or null.
-        /// The pitches argument is used to set both the NotatedMidiPitches and BasicMidiChordDefs[0].Pitches.
-        /// The velocities argument is used to set the NotatedMIDIVelocities and BasicMidiChordDefs[0].Velocities.
-        /// Velocities must be in range 1..127.
-        /// </summary>
-        /// <param name="pitches">in range 0..127</param>
-        /// <param name="velocities">In range 1..127</param>
-        /// <param name="msDuration">greater than zero</param>
-        /// <param name="hasChordOff"></param>
-        public MidiChordDef(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff)
-            : base(msDuration)
-        {
-            #region conditions
-            Debug.Assert(pitches.Count == velocities.Count);
-            foreach(byte pitch in pitches)
-            {
-                AssertIsMidiValue(pitch);
-            }
-            foreach(byte velocity in velocities)
-            {
-                AssertIsVelocityValue(velocity);
-            }
-            #endregion conditions
+		public MidiChordDef(List<UInt7> pitches, List<UInt7> velocities, int msDuration, bool hasChordOff)
+			: base(msDuration)
+		{
+			List<byte> bPitches = new List<byte>();
+			foreach(var pitch in pitches)
+			{
+				bPitches.Add((byte)pitch);
+			}
+			List<byte> bVelocities = new List<byte>();
+			foreach(var velocity in velocities)
+			{
+				bVelocities.Add((byte)velocity);
+			}
+			ConstructorCompletion(bPitches, bVelocities, msDuration, hasChordOff);
 
-            MsPositionReFirstUD = 0; // default value
+		}
+		#region constructors
+		/// <summary>
+		/// A MidiChordDef containing a single BasicMidiChordDef. Absent fields are set to 0 or null.
+		/// The pitches argument is used to set both the NotatedMidiPitches and BasicMidiChordDefs[0].Pitches.
+		/// The velocities argument is used to set the NotatedMIDIVelocities and BasicMidiChordDefs[0].Velocities.
+		/// Velocities must be in range 1..127.
+		/// </summary>
+		/// <param name="pitches">in range 0..127</param>
+		/// <param name="velocities">In range 1..127</param>
+		/// <param name="msDuration">greater than zero</param>
+		/// <param name="hasChordOff"></param>
+		public MidiChordDef(List<byte> bPitches, List<byte> bVelocities, int msDuration, bool hasChordOff)
+			: base(msDuration)
+		{
+			#region conditions
+			Debug.Assert(bPitches.Count == bVelocities.Count);
+			foreach(byte pitch in bPitches)
+			{
+				AssertIsMidiValue(pitch);
+			}
+			foreach(byte velocity in bVelocities)
+			{
+				AssertIsVelocityValue(velocity);
+			}
+			#endregion conditions
+			ConstructorCompletion(bPitches, bVelocities, msDuration, hasChordOff);
+		}
+
+		private void ConstructorCompletion(List<byte> pitches, List<byte> velocities, int msDuration, bool hasChordOff)
+		{ 
+			MsPositionReFirstUD = 0; // default value
             HasChordOff = hasChordOff;
             MinimumBasicMidiChordMsDuration = 1; // not used (this is not an ornament)
 

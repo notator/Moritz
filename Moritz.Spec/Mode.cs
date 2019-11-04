@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Moritz.Globals;
 
 namespace Moritz.Spec
 {
@@ -8,21 +9,21 @@ namespace Moritz.Spec
 	/// A Mode is a cloneable class, containing:
 	///    1. AbsolutePitchWeightDict: an IReadOnlyDictionary whose KeyValuePairs contain
 	///       Key: an absolute pitch (in range [0..11] C=0, C#=1, D=2 etc.) and
-	///       Value: a weight (in range [0..127]).
-	///    2. AbsolutePitches: an IReadonlyList of absolute pitches (in range [0..11]) in order of weight.
-	///    3. Gamut: a list of unique absolute pitch numbers in an ascending order scale (range [0..127]).
-	///       Each absolute pitch in the Mode exists at all possible octaves above Mode.Gamut[0].
+	///       Value: a weight (in range [1..127]) -- zero weight is not allowed.
+	///    2. Gamut: a readonly list of PitchWeight objects (structs), in ascending order of their absolute pitch numbers (range [0..127]).
+	///       Each absolute pitch in the Gamut exists at all possible octaves above Mode.Gamut[0].
 	///       (Each octave range in the gamut contains the same absolute pitches.)
-	/// <para>Mode.Gamut[0] == Mode.AbsolutePitches[0] (range [0..11]).</para> 
+	///       The Gamut is initially constructed with each instance of an absolute pitch having the weight
+	///       it has in the absPitchWeightDict argument.
+	///       Gamut is a readonly attribute, but the weights may be changed later using dedicated Mode functions.
 	/// Not all absolute pitches need to be included in the Mode.
-	/// The pitches' weights can be used, for example, to determine their relative velocities, durations etc.
+	/// The Gamut pitches' weights can be used, for example, to determine their relative velocities, durations etc.
 	/// </summary>
 	public class Mode : ICloneable
 	{
 		#region constructors
-		
-		/// <param name="absPitchWeightDict">Keys must be in range [0..11], Values must be in range [0..127], Count must be in range [1..12]</param>
-		public Mode(Dictionary<int,int> absPitchWeightDict)
+		/// <param name="absPitchWeightDict">Keys must be in range [0..11], Values must be in range [1..127], Count must be in range [1..12]</param>
+		public Mode(Dictionary<int, int> absPitchWeightDict)
 		{
 			Debug.Assert(absPitchWeightDict.Count >= 1 && absPitchWeightDict.Count <= 12);
 
@@ -30,24 +31,78 @@ namespace Moritz.Spec
 			{
 				var pitch = pitchWeight.Key;
 				var weight = pitchWeight.Value;
-				Debug.Assert(pitch >= 0 && pitch <= 11);
-				Debug.Assert(weight > 0 && weight <= 127); // weight 0 is not allowed here!
+				if(pitch < 0 || pitch > 127)
+				{
+					throw new ApplicationException("Illegal pitch.");
+				}
+				if(weight < 1 || pitch > 127) // weight 0 is not allowed here!
+				{
+					throw new ApplicationException("Illegal weight.");
+				}
 			}
 
-			_absolutePitchWeightDict = new Dictionary<int, int>(absPitchWeightDict);
-			_absolutePitchHierarchy = GetAbsPitchesSortedbyWeight(absPitchWeightDict);
-			// Gamut is constructed lazily.
+			Gamut = GetGamut(absPitchWeightDict);
 		}
 
-		public object Clone()
+		public Mode(List<PitchWeight> gamut)
 		{
-			return (new Mode(_absolutePitchWeightDict));
+			Gamut = new List<PitchWeight>(gamut);
+		}
+
+		public object Clone() => new Mode(Gamut);
+
+		/// <summary>
+		/// Called by constructor.
+		/// Returns the Mode's original Gamut (which can be changed by other Mode functions).
+		/// Sets all relative values of each absolute pitch to the same weight.
+		/// </summary>
+		/// <returns></returns>
+		private List<PitchWeight> GetGamut(IReadOnlyDictionary<int, int> absPitchWeightDict)
+		{
+			List<PitchWeight> absPitchWeightsByWeight = GetAbsPitchWeightsByWeight(absPitchWeightDict);
+			int rootPitch = (int) absPitchWeightsByWeight[0].Pitch;
+
+			List<UInt7> sortedBasePitches = new List<UInt7>();
+			foreach(var pitchWeight in absPitchWeightsByWeight)
+			{
+				sortedBasePitches.Add(pitchWeight.Pitch);
+			}
+			sortedBasePitches.Sort();
+
+			var gamut = new List<PitchWeight>();
+			int rphIndex = 0;
+			int octave = 0;
+			while(true)
+			{
+				int pitch = (int) sortedBasePitches[rphIndex++] + (octave * 12);
+				if(pitch > 127)
+				{
+					break;
+				}
+
+				if(pitch >= rootPitch)
+				{
+					int weight = absPitchWeightDict[(pitch % 12)];
+					gamut.Add(new PitchWeight(pitch, weight));
+				}
+
+				if(rphIndex >= sortedBasePitches.Count)
+				{
+					rphIndex = 0;
+					octave++;
+				}
+			}
+
+			AssertGamutValidity(gamut);
+
+			return gamut;
 		}
 
 		/// <summary>
+		/// Returns _absPitchWeightsByWeight (pitchWeights sorted by weight)
 		/// Pitches that have the same weight are returned in the unpredictable order returned by the Dictionary.
 		/// </summary>
-		private List<int> GetAbsPitchesSortedbyWeight(IReadOnlyDictionary<int, int> absPitchWeightDict)
+		private List<PitchWeight> GetAbsPitchWeightsByWeight(IReadOnlyDictionary<int, int> absPitchWeightDict)
 		{
 			List<int> weights = new List<int>();
 			foreach(var kv in absPitchWeightDict)
@@ -57,129 +112,93 @@ namespace Moritz.Spec
 			weights.Sort(); // small->large
 			weights.Reverse(); // large->small
 
-			List<int> absPitches = new List<int>();
+			var absPitchWeightsByWeight = new List<PitchWeight>();
+			List<int> usedKeys = new List<int>();
 
 			for(int i = 0; i < weights.Count; ++i)
 			{
 				int weight = weights[i];
 				foreach(var kv in absPitchWeightDict)
 				{
-					if(kv.Value == weight && !absPitches.Contains(kv.Key))
+					if(kv.Value == weight && !usedKeys.Contains(kv.Key))
 					{
-						absPitches.Add(kv.Key);
+						usedKeys.Add(kv.Key);
+						absPitchWeightsByWeight.Add(new PitchWeight(kv.Key, kv.Value));
 						break;
 					}
 				}
 			}
-
-			return absPitches;
+			return absPitchWeightsByWeight;
 		}
 
 		#endregion constructors
 
 		/// <summary>
-		/// Transposes this Mode.
+		/// Transposes the pitches in this Mode up or down.
+		/// The pitches in AbsolutePitchWeightDict are treated Mod 12 (stay in range 0..11)  
+		/// Gamut Pitches less than 0 or greater than 127 are silently clipped.
 		/// </summary>
-		/// <param name="transposition">in range [0..11]</param>
+		/// <param name="transposition"></param>
 		public void Transpose(int transposition)
 		{
-			Dictionary<int, int> absolutePitchWeightDict = new Dictionary<int, int>();
-			foreach(var pitchWeight in _absolutePitchWeightDict)
+			var newGamut = new List<PitchWeight>();
+			foreach(var pitchWeight in Gamut)
 			{
-				absolutePitchWeightDict.Add((pitchWeight.Key + transposition) % 12, pitchWeight.Value);
+				int newPitch = pitchWeight.Pitch.Int + transposition;
+				if(newPitch >= 0 && newPitch <= 127)
+				{
+					newGamut.Add(new PitchWeight(newPitch, (int) pitchWeight.Weight));
+				}				
 			}
-			_absolutePitchWeightDict = absolutePitchWeightDict;
-			_absolutePitchHierarchy = GetAbsPitchesSortedbyWeight(_absolutePitchWeightDict);
-			_gamut = null; // will be lazily evaluated
+			Gamut = newGamut;			
+		}
+
+		private void AssertGamutValidity()
+		{
+			AssertGamutValidity(Gamut);
 		}
 
 		/// <summary>
-		/// Throws an exception if _gamut is invalid for any of the following reasons:
-		/// 1. _gamut is null or empty.
-		/// 2. All the values must be different, in ascending order, and in range [0..127].
+		/// Throws an exception if Gamut is invalid for any of the following reasons:
+		/// 1. Gamut is null or empty.
+		/// 2. All the pitch values must be different, in ascending order, and in range [0..127].
 		/// 3. Each absolute pitch exists at all possible octaves above the base pitch.
 		/// </summary>
-		private void AssertGamutValidity()
+		private void AssertGamutValidity(List<PitchWeight> gamut)
 		{
-			Debug.Assert(_gamut != null && _gamut.Count > 0, $"{nameof(_gamut)} is null or empty.");
-			Debug.Assert(_gamut[0] % 12 == AbsolutePitchHierarchy[0], $"The lowest pitch in {nameof(_gamut)} must always be equal to {nameof(AbsolutePitchHierarchy)}[0].");
+			Debug.Assert(gamut != null && gamut.Count > 0, $"{nameof(gamut)} is null or empty.");
 
-			for(int i = 1; i < _gamut.Count; ++i)
+			for(int i = 1; i < gamut.Count; ++i)
 			{
-				Debug.Assert(_gamut[i] >= 0 && _gamut[i] <= 127, $"{nameof(_gamut)}[{i}] is out of range.");
-				Debug.Assert(_gamut[i] > _gamut[i - 1], $"{nameof(_gamut)} values must be in ascending order.");
+				Debug.Assert(gamut[i].Pitch > gamut[i - 1].Pitch, $"{nameof(gamut)} values must be in ascending pitch order.");
 			}
 
 			#region check pitch consistency
 			List<int> basePitches = new List<int>();
-			int pitchIndex = 0;
-			int octaveAboveBasePitch = _gamut[0] + 12;
-			while(pitchIndex < _gamut.Count && _gamut[pitchIndex] < octaveAboveBasePitch)
+			int pitchWeightIndex = 0;
+			UInt7 octaveAboveBasePitch = gamut[0].Pitch + (UInt7)12;
+			while(pitchWeightIndex < gamut.Count && gamut[pitchWeightIndex].Pitch < octaveAboveBasePitch)
 			{
-				basePitches.Add(_gamut[pitchIndex++]);
+				basePitches.Add(gamut[pitchWeightIndex++].Pitch.Int);
 			}
-			int pitchCount = 0;
+			int pitchWeightCount = 0;
 			foreach(int pitch in basePitches)
 			{
 				int pitchOctave = pitch;
 				while(pitchOctave < 128)
 				{
-					Debug.Assert(_gamut.Contains(pitchOctave), $"Missing pitch in {nameof(_gamut)}");
-					pitchCount += 1;
+					if(gamut.FindIndex(x => x.Pitch == (UInt7) pitchOctave) < 0)
+					{
+						throw new ApplicationException($"Missing pitch in {nameof(gamut)}");
+					}
+					pitchWeightCount += 1;
 					pitchOctave += 12;
 				}
 			}
-			Debug.Assert(_gamut.Count == pitchCount, $"Unknown pitch in {nameof(_gamut)}.");
+			Debug.Assert(gamut.Count == pitchWeightCount, $"Unknown pitch in {nameof(gamut)}.");
 			#endregion check pitch consistency
 		}
 
-		public IReadOnlyDictionary<int, int> AbsolutePitchWeightDict { get { return _absolutePitchWeightDict; } }
-		private Dictionary<int, int> _absolutePitchWeightDict; // is set in ctor
-		public IReadOnlyList<int> AbsolutePitchHierarchy { get { return _absolutePitchHierarchy; } }
-		private List<int> _absolutePitchHierarchy;  // is set in ctor
-		public IReadOnlyList<int> Gamut
-		{
-			get
-			{
-				if(_gamut != null)
-				{
-					return _gamut as IReadOnlyList<int>;
-				}
-				// lazy evaluation
-				int rootPitch = AbsolutePitchHierarchy[0];
-
-				List<int> sortedBasePitches = new List<int>(AbsolutePitchHierarchy);
-				sortedBasePitches.Sort();
-
-				_gamut = new List<int>();
-				int rphIndex = 0;
-				int octave = 0;
-				while(true)
-				{
-					int pitch = sortedBasePitches[rphIndex++] + (octave * 12);
-					if(pitch > 127)
-					{
-						break;
-					}
-
-					if(pitch >= rootPitch)
-					{
-						_gamut.Add(pitch);
-					}
-
-					if(rphIndex >= sortedBasePitches.Count)
-					{
-						rphIndex = 0;
-						octave++;
-					}
-				}
-
-				AssertGamutValidity();
-
-				return _gamut as IReadOnlyList<int>;
-			}
-		}
-		private List<int> _gamut = null; // will be lazily evaluated
-
+		public List<PitchWeight> Gamut { get; set; }
 	}
 }

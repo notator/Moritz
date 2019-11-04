@@ -51,6 +51,7 @@
     <Compile Include="CarryMsgs.cs" />
     <Compile Include="ChainTrk.cs" />
     <Compile Include="FortePitchClassSet.cs" />
+    <Compile Include="PitchWeight.cs" />
     <Compile Include="PitchVector.cs" />
     <Compile Include="ModeVector.cs" />
     <Compile Include="Mode.cs" />

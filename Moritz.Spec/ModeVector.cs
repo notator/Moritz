@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Moritz.Globals;
 
 namespace Moritz.Spec
 {
@@ -49,12 +50,18 @@ namespace Moritz.Spec
 		/// <returns>A list of steps Modes, beginning with this Mode and not including the target.</returns>
 		public ModeVector(Mode startMode, Mode targetMode, List<Tuple<int, int>> pitchVectorsData, int steps)
 		{
+			Debug.Assert(startMode != null && targetMode != null);
+			Debug.Assert(pitchVectorsData != null && pitchVectorsData.Count >= 1);
+			Debug.Assert(steps > 1);
+
 			foreach(Tuple<int, int> pitchVectorData in pitchVectorsData)
 			{
 				Debug.Assert(pitchVectorData.Item1 >= 0 && pitchVectorData.Item1 <= 127);
 				Debug.Assert(pitchVectorData.Item2 >= 0 && pitchVectorData.Item2 <= 127);
 
-				PitchVector singlePitchVector = new PitchVector(startMode, targetMode, pitchVectorData, steps);
+				Tuple<UInt7, UInt7> pitchVector = new Tuple<UInt7, UInt7>((UInt7)pitchVectorData.Item1, (UInt7)pitchVectorData.Item2);
+
+				PitchVector singlePitchVector = new PitchVector(startMode, targetMode, pitchVector, steps);
 				_pitchVectors.Add(singlePitchVector);
 			}
 
@@ -74,22 +81,15 @@ namespace Moritz.Spec
 		}
 
 		#region constructor helpers
-		private int? GetMaxWeight(List<Tuple<int, int>> modeData, int absPitch)
+		private int GetMaxWeight(List<PitchWeight> modeData, int absPitch)
 		{
-			int? rval = null;
-			foreach(var tuple in modeData)
+			int rval = 1;
+			foreach(var pitchWeight in modeData)
 			{
-				if(tuple.Item1 == absPitch)
+				if(pitchWeight.Pitch.Int == absPitch)
 				{
-					int weight = tuple.Item2;
-					if(rval == null)
-					{
-						rval = weight;
-					}
-					else
-					{
-						rval = (rval > weight) ? rval : weight;
-					}
+					int weight = pitchWeight.Weight.Int;
+					rval = (rval > weight) ? rval : weight;
 				}
 			}
 
@@ -103,16 +103,16 @@ namespace Moritz.Spec
 		/// <param name="pitchVectors">All the pitches and weights are in range [0..127]</param>
 		private List<Dictionary<int, int>> GetAbsPitchWeightDictList(IReadOnlyList<PitchVector> pitchVectors, int steps)
 		{
-			List<List<Tuple<int, int>>> modeDatas = new List<List<Tuple<int, int>>>();
+			List<List<PitchWeight>> modeDatas = new List<List<PitchWeight>>();
 			for(int step = 0; step < steps; ++step)
 			{
-				List<Tuple<int, int>> modeData = new List<Tuple<int, int>>();
-				for(int i = 0; i < pitchVectors.Count; ++i)
+				List<PitchWeight> modeData = new List<PitchWeight>();
+				foreach(var pitchVector in pitchVectors)
 				{
-					Tuple<int, int> entry = pitchVectors[i].PitchWeights[step];
-					var absolutePitch = entry.Item1 % 12; // for Mode
-					var weight = entry.Item2;
-					modeData.Add(new Tuple<int, int>(absolutePitch, weight));
+					PitchWeight entry = pitchVector.PitchWeights[step];
+					var absolutePitch = entry.Pitch.Int % 12; // for Mode
+					var weight = entry.Weight.Int;
+					modeData.Add(new PitchWeight(absolutePitch, weight));
 				}
 
 				modeDatas.Add(modeData);
@@ -127,11 +127,8 @@ namespace Moritz.Spec
 				Dictionary<int, int> absPitchWeightDict = new Dictionary<int, int>();
 				for(int absPitch = 0; absPitch < 12; ++absPitch)
 				{
-					int? maxWeight = GetMaxWeight(modeData, absPitch);
-					if(maxWeight != null && maxWeight > 0)
-					{
-						absPitchWeightDict.Add(absPitch, (int)maxWeight);
-					}
+					int maxWeight = GetMaxWeight(modeData, absPitch);
+					absPitchWeightDict.Add(absPitch, maxWeight);
 				}
 				absPitchWeightDictList.Add(absPitchWeightDict);
 			}
@@ -156,13 +153,15 @@ namespace Moritz.Spec
 		public ModeVector Concat(ModeVector concatenatedModeVector)
 		{
 			Debug.Assert(PitchVectors.Count == concatenatedModeVector.PitchVectors.Count);
-			foreach(PitchVector pitchVector in PitchVectors)
+			for(int i = 0; i < PitchVectors.Count; ++i)
 			{
+				PitchVector pitchVector = PitchVectors[i];
+				UInt7 targetPitch = pitchVector.TargetPitchWeight.Pitch;
 				bool found = false;
 				foreach(PitchVector cPitchVector in concatenatedModeVector.PitchVectors)
 				{
-					// just compare absolute pitches
-					if(pitchVector.TargetPitchWeight.Item1 % 12 == cPitchVector.PitchWeights[0].Item1 % 12)
+					UInt7 linkedPitch = cPitchVector.PitchWeights[0].Pitch;
+					if(targetPitch == linkedPitch)
 					{
 						found = true;
 						break;
@@ -178,10 +177,10 @@ namespace Moritz.Spec
 			List<PitchVector> pitchVectors = new List<PitchVector>();
 			foreach(PitchVector pitchVector in PitchVectors)
 			{
-				List<Tuple<int, int>> pitchWeights = new List<Tuple<int, int>>();
+				List<PitchWeight> pitchWeights = new List<PitchWeight>();
 				foreach(PitchVector cPitchVector in concatenatedModeVector.PitchVectors)
 				{
-					if(pitchVector.TargetPitchWeight.Item1 % 12 == cPitchVector.PitchWeights[0].Item1 % 12)
+					if(pitchVector.TargetPitchWeight.Pitch.Int % 12 == cPitchVector.PitchWeights[0].Pitch.Int % 12)
 					{
 						pitchWeights.AddRange(pitchVector.PitchWeights);
 						pitchWeights.AddRange(cPitchVector.PitchWeights);

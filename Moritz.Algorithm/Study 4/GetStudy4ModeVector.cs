@@ -117,7 +117,7 @@ namespace Moritz.Algorithm.Study4
 			};
 			List<Tuple<int, int>> region41PitchVectorsData = new List<Tuple<int, int>>()
 			{
-				new Tuple<int,int>( 0,1),
+				new Tuple<int,int>( 0,0),
 				new Tuple<int,int>( 14,9),
 				new Tuple<int,int>( 4,4),
 				new Tuple<int,int>( 5,2),
@@ -137,7 +137,7 @@ namespace Moritz.Algorithm.Study4
 			};
 			List<Tuple<int, int>> region51PitchVectorsData = new List<Tuple<int, int>>()
 			{
-				new Tuple<int,int>(0,2 ),
+				new Tuple<int,int>( 0,2 ),
 				new Tuple<int,int>( 14,11),
 				new Tuple<int,int>( 4,8),
 				new Tuple<int,int>( 5,1),
@@ -157,7 +157,7 @@ namespace Moritz.Algorithm.Study4
 			};
 			List<Tuple<int, int>> region61PitchVectorsData = new List<Tuple<int, int>>()
 			{
-				new Tuple<int,int>(0,1 ),
+				new Tuple<int,int>( 0,1),
 				new Tuple<int,int>( 2,3),
 				new Tuple<int,int>( 4,9),
 				new Tuple<int,int>( 5,6),
@@ -188,7 +188,7 @@ namespace Moritz.Algorithm.Study4
 			List<Tuple<int, int>> region72PitchVectorsData = new List<Tuple<int, int>>()
 			{
 				new Tuple<int,int>( 1,5),
-				new Tuple<int,int>( 3,0),
+				new Tuple<int,int>( 3,1),
 				new Tuple<int,int>( 16,10),
 				new Tuple<int,int>( 6,9),
 				new Tuple<int,int>( 8,4),
@@ -198,7 +198,7 @@ namespace Moritz.Algorithm.Study4
 
 			List<ModeVector> modeVectors = new List<ModeVector>();
 
-			modeVectors.Add(new ModeVector(mode1, mode1, region1PitchVectorsData, 1));
+			//modeVectors.Add(new ModeVector(mode1, mode1, region1PitchVectorsData, 1));
 			modeVectors.Add(new ModeVector(mode1, mode2, region21PitchVectorsData, 2));
 			modeVectors.Add(new ModeVector(mode2, mode1, region22PitchVectorsData, 2));
 			modeVectors.Add(new ModeVector(mode1, mode3, region31PitchVectorsData, 3));

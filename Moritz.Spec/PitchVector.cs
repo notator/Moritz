@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Moritz.Globals;
 
 namespace Moritz.Spec
 {
@@ -10,29 +11,39 @@ namespace Moritz.Spec
 	{
 		#region constructors
 		/// <summary>
-		/// Contains a list of pitchWeights and their target pitchWeight.
-		/// The list, which has a minimum Count of 1, does not contain the target.
-		/// All pitches and weights are in range 0..127.
+		/// The PitchWeights list, which has a minimum Count of 1, does not contain the target.
+		/// Both start and end pitches All pitches and weights are in range 0..127.
 		/// </summary>
 		/// <param name="startMode"></param>
 		/// <param name="targetMode"></param>
-		/// <param name="pitchVectorData">All ints (both pitches and weights) are in range [0..127]</param>
+		/// <param name="pitchVector">All ints (both start and end pitches) are in range [0..127]</param>
 		/// <param name="steps">An integer greater than 1</param>
-		public PitchVector(Mode startMode, Mode targetMode, Tuple<int, int> pitchVectorData, int steps)
+		public PitchVector(Mode startMode, Mode targetMode, Tuple<UInt7, UInt7> pitchVector, int steps)
 		{
-			int startPitch = pitchVectorData.Item1;
-			int startWeight;
-			if(!startMode.AbsolutePitchWeightDict.TryGetValue((startPitch % 12), out startWeight))
+			Debug.Assert(steps > 1);
+			int startPitch = pitchVector.Item1.Int;
+			int startWeight = 1;
+			foreach(var pitchWeight in startMode.Gamut)
 			{
-				startWeight = 0; // default value
+				if(pitchWeight.Pitch.Int == startPitch)
+				{
+					startWeight = pitchWeight.Weight.Int;
+					break;
+				}
 			}
 
-			int endPitch = pitchVectorData.Item2;
-			int endWeight;
-			if(!targetMode.AbsolutePitchWeightDict.TryGetValue((endPitch % 12), out endWeight))
+			int endPitch = pitchVector.Item2.Int;
+			int endWeight = 1;
+			foreach(var pitchWeight in targetMode.Gamut)
 			{
-				endWeight = 0; // default value
+				if(pitchWeight.Pitch.Int == endPitch)
+				{
+					endWeight = pitchWeight.Weight.Int;
+					break;
+				}
 			}
+
+			TargetPitchWeight = new PitchWeight(endPitch, endWeight);
 
 			double pitchIncrPerStep = ((double)endPitch - startPitch) / steps;
 			double weightIncrPerStep = ((double)(endWeight - startWeight)) / steps;
@@ -43,44 +54,25 @@ namespace Moritz.Spec
 			for(int i = 0; i < steps; ++i)
 			{
 				iPitch = (int)Math.Round(dPitch);
-				iPitch = (iPitch >= 0) ? iPitch : 0;
-				iPitch = (iPitch <= 127) ? iPitch : 127;
-
 				iWeight = (int)Math.Round(dWeight);
-				iWeight = (iWeight >= 0) ? iWeight : 0;
-				iWeight = (iWeight <= 127) ? iWeight : 127;
-
-				var kvp = new Tuple<int, int>(iPitch, iWeight);
+				iWeight = (iWeight == 0) ? 1 : iWeight;
+				var kvp = new PitchWeight(iPitch, iWeight);
 				_pitchWeights.Add(kvp);
 
 				dPitch += pitchIncrPerStep;
 				dWeight += weightIncrPerStep;
 			}
-
-			iPitch = (int)Math.Round(dPitch);
-			iPitch = (iPitch >= 0) ? iPitch : 0;
-			iPitch = (iPitch <= 127) ? iPitch : 127;
-
-			iWeight = (int)Math.Round(dWeight);
-			iWeight = (iWeight >= 0) ? iWeight : 0;
-			iWeight = (iWeight <= 127) ? iWeight : 127;
-
-			_targetPitchWeight = new Tuple<int, int>(iPitch, iWeight);
-
-			AssertPitchWeightConsistency();
 		}
 
 		/// <summary>
 		/// Contains a list of pitchWeights and their target pitchWeight.
 		/// The list does not contain the target.
-		/// All pitches and weights are in range 0..127.
+		/// All pitches are in range 0..127, weights are in range 1..127.
 		/// </summary>
-		public PitchVector(List<Tuple<int, int>> pitchWeights, Tuple<int, int> targetPitchWeight)
+		public PitchVector(List<PitchWeight> pitchWeights, PitchWeight targetPitchWeight)
 		{
 			_pitchWeights = pitchWeights;
-			_targetPitchWeight = targetPitchWeight;
-
-			AssertPitchWeightConsistency();
+			TargetPitchWeight = targetPitchWeight;
 		}
 
 		/// <summary>
@@ -118,8 +110,8 @@ namespace Moritz.Spec
 			{
 				for(int i = 0; i < _pitchWeights.Count; ++i)
 				{
-					int newPitch = _pitchWeights[i].Item1 + transposition;
-					_pitchWeights[i] = new Tuple<int, int>(newPitch, _pitchWeights[i].Item2);
+					int newPitch = _pitchWeights[i].Pitch.Int + transposition;
+					_pitchWeights[i] = new PitchWeight(newPitch, _pitchWeights[i].Weight.Int);
 				}
 			}
 		}
@@ -130,8 +122,8 @@ namespace Moritz.Spec
 			minPitch = int.MaxValue;
 			foreach(var pitchWeight in _pitchWeights)
 			{
-				minPitch = (minPitch < pitchWeight.Item1) ? minPitch : pitchWeight.Item1;
-				maxPitch = (maxPitch > pitchWeight.Item1) ? maxPitch : pitchWeight.Item1;
+				minPitch = (minPitch < pitchWeight.Pitch.Int) ? minPitch : pitchWeight.Pitch.Int;
+				maxPitch = (maxPitch > pitchWeight.Pitch.Int) ? maxPitch : pitchWeight.Pitch.Int;
 			}
 		}
 
@@ -148,14 +140,14 @@ namespace Moritz.Spec
 			int maxPitch = 0;
 			int minPitch = int.MaxValue;
 
-			List<int> newPitches = new List<int>() { _pitchWeights[0].Item1 }; // newPitches initially has unbounded range
+			List<int> newPitches = new List<int>() { _pitchWeights[0].Pitch.Int }; // newPitches initially has unbounded range
 
 			int prevPitch;
 			int thisPitch;
 			for(int i = 1; i < _pitchWeights.Count; ++i)
 			{
 				prevPitch = newPitches[i - 1];
-				thisPitch = _pitchWeights[i].Item1;
+				thisPitch = _pitchWeights[i].Pitch.Int;
 				int pitchDiff = thisPitch - prevPitch;
 				if(Math.Abs(pitchDiff) > 6)
 				{
@@ -201,7 +193,7 @@ namespace Moritz.Spec
 				for(int i = 0; i < newPitches.Count; ++i)
 				{
 					int newPitch = newPitches[i] + transposition;
-					_pitchWeights[i] = new Tuple<int, int>(newPitch, _pitchWeights[i].Item2);
+					_pitchWeights[i] = new PitchWeight(newPitch, _pitchWeights[i].Weight.Int);
 					//Console.WriteLine($"{i + 1}: pitch = {newPitch}");
 				}
 			}
@@ -211,24 +203,12 @@ namespace Moritz.Spec
 			//Console.WriteLine("===================================");
 		}
 
-
-		private void AssertPitchWeightConsistency()
-		{
-			foreach(var pitchWeight in _pitchWeights)
-			{
-				Debug.Assert(pitchWeight.Item1 >= 0 && pitchWeight.Item1 <= 127);
-				Debug.Assert(pitchWeight.Item2 >= 0 && pitchWeight.Item2 <= 127);
-			}
-			Debug.Assert(_targetPitchWeight.Item1 >= 0 && _targetPitchWeight.Item1 <= 127);
-			Debug.Assert(_targetPitchWeight.Item2 >= 0 && _targetPitchWeight.Item2 <= 127);
-		}
-
 		#endregion constructors
 
-		public Tuple<int,int> TargetPitchWeight { get { return _targetPitchWeight; } }
-		private readonly Tuple<int, int> _targetPitchWeight;
-		public IReadOnlyList<Tuple<int, int>> PitchWeights{get{ return _pitchWeights; } }
-		private readonly List<Tuple<int, int>> _pitchWeights = new List<Tuple<int, int>>();
+		public PitchWeight TargetPitchWeight { get; }
+
+		public IReadOnlyList<PitchWeight> PitchWeights{get{ return _pitchWeights; } }
+		private readonly List<PitchWeight> _pitchWeights = new List<PitchWeight>();
 
 	}
 }

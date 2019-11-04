@@ -40,11 +40,11 @@ namespace Moritz.Algorithm.Study4
 			foreach(var pitchVector in pitchVectors)
 			{
 				Trk trk = new Trk(channel++);
-				IReadOnlyList<Tuple<int, int>> pitchWeights = pitchVector.PitchWeights;
+				IReadOnlyList<PitchWeight> pitchWeights = pitchVector.PitchWeights;
 				foreach(var def in pitchVector.PitchWeights)
 				{
-					List<byte> pitches = new List<byte>() { (byte)def.Item1 };
-					List<byte> velocities = new List<byte>() { (byte)def.Item2 };
+					List<UInt7> pitches = new List<UInt7>() { def.Pitch };
+					List<UInt7> velocities = new List<UInt7>() { def.Weight };
 					IUniqueDef midiChordDef = new MidiChordDef(pitches, velocities, barChordDuration, true);
 					trk.Add(midiChordDef);
 				}
@@ -56,15 +56,15 @@ namespace Moritz.Algorithm.Study4
 			List<IUniqueDef> tuttiChords = new List<IUniqueDef>();
 			for(int i = 0; i < nChords; ++i)
 			{
-				List<byte> pitches = new List<byte>();
-				List<byte> velocities = new List<byte>();
+				List<UInt7> pitches = new List<UInt7>();
+				List<UInt7> velocities = new List<UInt7>();
 
 				for(int j= 0; j < pitchVectors.Count; j++)
 				{
 					PitchVector pitchVector = pitchVectors[j];
 					var def = pitchVector.PitchWeights[i];
-					byte pitch = (byte)def.Item1;
-					byte velocity = (byte)def.Item2;
+					UInt7 pitch = (UInt7)def.Pitch;
+					UInt7 velocity = (UInt7)def.Weight;
 					if(!pitches.Contains(pitch))
 					{
 						int insertIndex = pitches.Count;
@@ -82,7 +82,7 @@ namespace Moritz.Algorithm.Study4
 					else
 					{
 						int pitchIndex = pitches.IndexOf(pitch);
-						byte existingVelocity = velocities[pitchIndex];
+						UInt7 existingVelocity = velocities[pitchIndex];
 						velocities[pitchIndex] = (existingVelocity > velocity) ? existingVelocity : velocity;
 					}
 				}
