@@ -49,8 +49,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UInt4.cs" />
-    <Compile Include="UInt7.cs" />
     <Compile Include="IMoritzForm1.cs" />
     <Compile Include="IODevices\Constants.cs" />
     <Compile Include="IODevices\DeviceCollections.cs" />

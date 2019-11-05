@@ -14,22 +14,6 @@ namespace Moritz.Spec
 	///</summary>
 	public class MidiChordDef : DurationDef, IUniqueSplittableChordDef
     {
-		public MidiChordDef(List<UInt7> pitches, List<UInt7> velocities, int msDuration, bool hasChordOff)
-			: base(msDuration)
-		{
-			List<byte> bPitches = new List<byte>();
-			foreach(var pitch in pitches)
-			{
-				bPitches.Add((byte)pitch);
-			}
-			List<byte> bVelocities = new List<byte>();
-			foreach(var velocity in velocities)
-			{
-				bVelocities.Add((byte)velocity);
-			}
-			ConstructorCompletion(bPitches, bVelocities, msDuration, hasChordOff);
-
-		}
 		#region constructors
 		/// <summary>
 		/// A MidiChordDef containing a single BasicMidiChordDef. Absent fields are set to 0 or null.
@@ -45,11 +29,8 @@ namespace Moritz.Spec
 			: base(msDuration)
 		{
 			#region conditions
-			Debug.Assert(bPitches.Count == bVelocities.Count);
-			foreach(byte pitch in bPitches)
-			{
-				AssertIsMidiValue(pitch);
-			}
+			M.Assert(bPitches.Count == bVelocities.Count);
+			M.AssertRange0_127(bPitches);
 			foreach(byte velocity in bVelocities)
 			{
 				AssertIsVelocityValue(velocity);
@@ -128,11 +109,8 @@ namespace Moritz.Spec
             List<BasicMidiChordDef> basicMidiChordDefs)
             : base(msDuration)
         {
-            Debug.Assert(rootMidiPitches.Count <= rootMidiVelocities.Count);
-            foreach(byte pitch in rootMidiPitches)
-            {
-                AssertIsMidiValue(pitch);
-            }
+            M.Assert(rootMidiPitches.Count <= rootMidiVelocities.Count);
+			M.AssertRange0_127(rootMidiPitches);
 
             MsPositionReFirstUD = 0;
             _pitchWheelDeviation = pitchWheelDeviation;
@@ -610,8 +588,8 @@ namespace Moritz.Spec
             for(int i = 0; i < 12; ++i)
             {
                 int v = velocityPerAbsolutePitch[i];
-                AssertIsVelocityValue(v);
-            }
+				AssertIsVelocityValue(v);
+			}
             Debug.Assert(this.NotatedMidiPitches.Count == NotatedMidiVelocities.Count);
             #endregion conditions
 
@@ -749,29 +727,22 @@ namespace Moritz.Spec
 
             SetNotatedValuesFromFirstBMCD();
         }
-        #endregion SetVerticalVelocityGradient
+		#endregion SetVerticalVelocityGradient
 
-        #region utilities
-        /// <summary>
-        /// A Debug.Assert that fails if the argument is outside the range 0..127.
-        /// </summary>
-        private static void AssertIsMidiValue(int value)
-        {
-            Debug.Assert(value >= 0 && value <= 127);
-        }
+		#region utilities
+		/// <summary>
+		/// Throws an ApplicationEexception if the argument is outside the range 1..127.
+		/// </summary>
+		private static void AssertIsVelocityValue(int velocity)
+		{
+			M.Assert(velocity > 0);
+			M.AssertRange0_127(velocity);
+		}
 
-        /// <summary>
-        /// A Debug.Assert that fails if the argument is outside the range 1..127.
-        /// </summary>
-        private static void AssertIsVelocityValue(int velocity)
-        {
-            Debug.Assert(velocity >= 1 && velocity <= 127);
-        }
-
-        /// <summary>
-        /// Returns the argument as a byte coerced to the range 0..127.
-        /// </summary>
-        private byte MidiValue(int value)
+		/// <summary>
+		/// Returns the argument as a byte coerced to the range 0..127.
+		/// </summary>
+		private byte MidiValue(int value)
         {
             value = (value >= 0) ? value : 1;
             value = (value <= 127) ? value : 127;
@@ -1410,13 +1381,10 @@ namespace Moritz.Spec
             get { return _notatedMidiPitches; } 
             set 
             {
-                // N.B. this value can be set even if value.Count != _notatedMidiVelocities.Count
-                // If the Count is changed, the _notatedMidiVelocities must subsequently be reset,
-                // otherwise a Debug.Assert will fail when the _notatedMidiVelocities are retrieved.
-                foreach(byte pitch in value)
-                {
-                    AssertIsMidiValue(pitch);
-                }
+				// N.B. this value can be set even if value.Count != _notatedMidiVelocities.Count
+				// If the Count is changed, the _notatedMidiVelocities must subsequently be reset,
+				// otherwise a Debug.Assert will fail when the _notatedMidiVelocities are retrieved.
+				M.AssertRange0_127(value);
                 _notatedMidiPitches = new List<byte>(value);
             } 
         }

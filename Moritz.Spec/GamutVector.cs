@@ -60,7 +60,7 @@ namespace Moritz.Spec
 				Debug.Assert(pitchVectorData.Item1 >= 0 && pitchVectorData.Item1 <= 127);
 				Debug.Assert(pitchVectorData.Item2 >= 0 && pitchVectorData.Item2 <= 127);
 
-				Tuple<UInt7, UInt7> pitchVector = new Tuple<UInt7, UInt7>((UInt7)pitchVectorData.Item1, (UInt7)pitchVectorData.Item2);
+				Tuple<int, int> pitchVector = new Tuple<int, int>(pitchVectorData.Item1, pitchVectorData.Item2);
 
 				PitchVector singlePitchVector = new PitchVector(startGamut, targetGamut, pitchVector, steps);
 				pitchVectors.Add(singlePitchVector);
@@ -91,9 +91,9 @@ namespace Moritz.Spec
 			int rval = 1;
 			foreach(var pitchWeight in pitchWeights)
 			{
-				if(pitchWeight.Pitch.Int == absPitch)
+				if(pitchWeight.Pitch == absPitch)
 				{
-					int weight = pitchWeight.Weight.Int;
+					int weight = pitchWeight.Weight;
 					rval = (rval > weight) ? rval : weight;
 				}
 			}
@@ -115,8 +115,8 @@ namespace Moritz.Spec
 				foreach(var pitchVector in pitchVectors)
 				{
 					PitchWeight pitchWeight = pitchVector.PitchWeights[step];
-					var absolutePitch = pitchWeight.Pitch.Int % 12; // for Gamut
-					var weight = pitchWeight.Weight.Int;
+					var absolutePitch = pitchWeight.Pitch % 12; // for Gamut
+					var weight = pitchWeight.Weight;
 					pitchWeights.Add(new PitchWeight(absolutePitch, weight));
 				}
 
@@ -157,15 +157,16 @@ namespace Moritz.Spec
 		/// <returns></returns>
 		public GamutVector Concat(GamutVector concatenatedGamutVector)
 		{
-			Debug.Assert(PitchVectors.Count == concatenatedGamutVector.PitchVectors.Count);
+			M.Assert(PitchVectors.Count == concatenatedGamutVector.PitchVectors.Count);
+
 			for(int i = 0; i < PitchVectors.Count; ++i)
 			{
 				PitchVector pitchVector = PitchVectors[i];
-				UInt7 targetPitch = pitchVector.TargetPitchWeight.Pitch;
+				int targetPitch = pitchVector.TargetPitchWeight.Pitch;
 				bool found = false;
 				foreach(PitchVector cPitchVector in concatenatedGamutVector.PitchVectors)
 				{
-					UInt7 linkedPitch = cPitchVector.PitchWeights[0].Pitch;
+					int linkedPitch = cPitchVector.PitchWeights[0].Pitch;
 					if(targetPitch == linkedPitch)
 					{
 						found = true;
@@ -185,7 +186,7 @@ namespace Moritz.Spec
 				List<PitchWeight> pitchWeights = new List<PitchWeight>();
 				foreach(PitchVector cPitchVector in concatenatedGamutVector.PitchVectors)
 				{
-					if(pitchVector.TargetPitchWeight.Pitch.Int % 12 == cPitchVector.PitchWeights[0].Pitch.Int % 12)
+					if(pitchVector.TargetPitchWeight.Pitch % 12 == cPitchVector.PitchWeights[0].Pitch % 12)
 					{
 						pitchWeights.AddRange(pitchVector.PitchWeights);
 						pitchWeights.AddRange(cPitchVector.PitchWeights);

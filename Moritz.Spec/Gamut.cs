@@ -5,6 +5,9 @@ using Moritz.Globals;
 
 namespace Moritz.Spec
 {
+	/// <summary>
+	/// A list of PitchWeight objects ordered by pitch.
+	/// </summary>
 	public class Gamut
 	{
 		/// <summary>
@@ -67,49 +70,44 @@ namespace Moritz.Spec
 		};
 
 		#region constructors
+		/// <summary>
+		/// This constructor creates a PitchWeight list in which pitches are in range 0..127,
+		/// with each octave containing the same absolute pitches, and
+		/// each instance of the same absolute pitch having the same weight.
+		/// </summary>
+		/// <param name="pitchHierarchyIndex">The index of the pitchHierarchy in the static PitchHierarchies list</param>
+		/// <param name="rootPitch">The value by which to transpose the pitchHierarchy</param>
+		/// <param name="pitchSet">The pitches to select from the transposed pitchHierarchy (in range 0..11)</param>
 		public Gamut(int pitchHierarchyIndex, int rootPitch, HashSet<int> pitchSet)
 		{
-			HashSet<UInt4> UInt4PitchSet = new HashSet<UInt4>();
-			foreach(var pitch in pitchSet)
-			{
-				UInt4PitchSet.Add((UInt4)pitch);
-			}
+			M.AssertRange0_11(pitchSet);
 
-			SetGamut(pitchHierarchyIndex, rootPitch, UInt4PitchSet);
-			AssertPitchWeightsValidity();
-		}
-
-		public Gamut(int pitchHierarchyIndex, int rootPitch, HashSet<UInt4> pitchSet)
-		{
 			SetGamut(pitchHierarchyIndex, rootPitch, pitchSet);
-			AssertPitchWeightsValidity();
+			AssertValidity();
+			AssertOctaveSimilarity();
 		}
 
 		public Gamut(IReadOnlyList<PitchWeight> pitchWeights)
 		{
 			PitchWeights = new List<PitchWeight>(pitchWeights);
-			AssertPitchWeightsValidity();
+			AssertValidity();
 		}
 
 		/// <summary>
-		/// The dictionary keys must be in range 0..11, the values must be in range 0..127
+		/// This constructor creates a PitchWeight list in which pitches are in range 0..127,
+		/// with each octave containing the same absolute pitches, and
+		/// each instance of the same absolute pitch having the same weight.
 		/// </summary>
-		/// <param name="absPitchWeightDict"></param>
+		/// <param name="absPitchWeightDict">keys must be in range 0..11, the values must be in range 0..127</param>
 		public Gamut(Dictionary<int, int> absPitchWeightDict)
 		{
-			#region conditions
-			foreach(var key in absPitchWeightDict.Keys)
-			{
-				Debug.Assert(key >= 0 && key <= 11);
-			}
-			foreach(var value in absPitchWeightDict.Values)
-			{
-				Debug.Assert(value >= 0 && value <= 127);
-			}
-			#endregion conditions
+			#region checks
+			M.AssertRange0_11(absPitchWeightDict.Keys);
+			M.AssertRange0_127(absPitchWeightDict.Values);
+			#endregion checks
 
 			var pitchWeights = new List<PitchWeight>();
-			for(int relPitch = 0; relPitch <= UInt7.MaxValue; ++relPitch)
+			for(int relPitch = 0; relPitch <= 127; ++relPitch)
 			{
 				int absPitch = relPitch % 12;
 				if(absPitchWeightDict.TryGetValue(absPitch, out int weight))
@@ -119,7 +117,9 @@ namespace Moritz.Spec
 				}
 			}
 			PitchWeights = pitchWeights;
-			AssertPitchWeightsValidity();
+
+			AssertValidity();
+			AssertOctaveSimilarity();
 		}
 
 		public object Clone()
@@ -127,7 +127,7 @@ namespace Moritz.Spec
 			return new Gamut(PitchWeights);
 		}
 
-		private void SetGamut(int pitchHierarchyIndex, int rootPitch, HashSet<UInt4> pitchSet)
+		private void SetGamut(int pitchHierarchyIndex, int rootPitch, HashSet<int> pitchSet)
 		{
 			IReadOnlyList<int> pitchHierarchy = new List<int>(PitchHierarchies[pitchHierarchyIndex]);
 
@@ -140,12 +140,12 @@ namespace Moritz.Spec
 
 			var pitchWeights = new List<PitchWeight>();
 
-			for(int relPitch = 0; relPitch <= UInt7.MaxValue; ++relPitch)
+			for(int relPitch = 0; relPitch <= 127; ++relPitch)
 			{
-				UInt4 absPitch = (UInt4)(relPitch % 12);
+				int absPitch = relPitch % 12;
 				if(pitchSet.Contains(absPitch))
 				{
-					int index = transpPitchHierarchy.FindIndex(x => x == absPitch.Int);
+					int index = transpPitchHierarchy.FindIndex(x => x == absPitch);
 					int weight = StandardWeights[transpPitchHierarchy[index]];
 					PitchWeight pitchWeight = new PitchWeight(relPitch, weight);
 					pitchWeights.Add(pitchWeight);
@@ -156,40 +156,54 @@ namespace Moritz.Spec
 		#endregion constructors
 
 		/// <summary>
-		/// Throws an exception if Gamut is invalid for any of the following reasons:
-		/// 1. Gamut is null or empty.
-		/// 2. All the pitch values must be different, in ascending order, and in range [0..127].
-		/// 3. Each absolute pitch exists in all possible octaves.
+		/// Throws an exception if the PitchWeights list
+		/// 1. is null or empty, or
+		/// 2. contains duplicate pitches, or
+		/// 3. the pitches are not in ascending order.
 		/// </summary>
-		private void AssertPitchWeightsValidity()
+		private void AssertValidity()
 		{
-			Debug.Assert(PitchWeights != null && PitchWeights.Count > 0, $"{nameof(PitchWeights)} is null or empty.");
+			if(PitchWeights == null || PitchWeights.Count == 0)
+			{
+				throw new ApplicationException($"{nameof(PitchWeights)} is null or empty.");
+			}
+			for(int i = 1; i < PitchWeights.Count; ++i)
+			{
+				if(PitchWeights[i].Pitch >= PitchWeights[i - 1].Pitch)
+				{
+					throw new ApplicationException($"Pitches must be unique and in ascending order.");
+				}
+			}
+		}
 
+		/// <summary>
+		/// Throws an exception if each absolute pitch does not exist in all possible octaves.
+		/// </summary>
+		private void AssertOctaveSimilarity()
+		{
 			HashSet<int> pitchSet = new HashSet<int>();
+			List<int> relPitches = new List<int>();
 			for(int i = 0; i < PitchWeights.Count; ++i)
 			{
 				if(i > 0)
 				{
 					Debug.Assert(PitchWeights[i].Pitch > PitchWeights[i - 1].Pitch, $"{nameof(PitchWeights)} values must be in ascending pitch order.");
 				}
-				int absPitch = PitchWeights[i].Pitch.Int % 12;
-				if(! pitchSet.Contains(absPitch))
-				{
-					pitchSet.Add(absPitch);
-				}
+				relPitches.Add(PitchWeights[i].Pitch);
+				pitchSet.Add(PitchWeights[i].Pitch % 12); // The bool return value is ignored here.
 			}
-			List<PitchWeight> pitchWeights = new List<PitchWeight>(PitchWeights); // so that FindIndex(...) can be used.
+
 			foreach(var absPitch in pitchSet)
 			{
-				int relPitch = absPitch; 
-				while(relPitch <= UInt7.MaxValue)
+				int relPitch = absPitch;
+				while(relPitch <= 127)
 				{
-					if(pitchWeights.FindIndex(x => x.Pitch.Int == relPitch) < 0)
+					if(relPitches.FindIndex(x => x == relPitch) < 0)
 					{
 						throw new ApplicationException("Gamut must contain each absolute pitch in each octave.");
 					}
-				}
-				relPitch += 12;
+					relPitch += 12;
+				}				
 			}
 		}
 
@@ -198,8 +212,8 @@ namespace Moritz.Spec
 			var newPitchWeights = new List<PitchWeight>();
 			foreach(var pitchWeight in PitchWeights)
 			{
-				int newPitch = pitchWeight.Pitch.Int + transposition;
-				if(newPitch >= UInt7.MinValue && newPitch <= UInt7.MaxValue)
+				int newPitch = pitchWeight.Pitch + transposition;
+				if(newPitch >= 0 && newPitch <= 127)
 				{
 					newPitchWeights.Add(new PitchWeight(newPitch, (int)pitchWeight.Weight));
 				}

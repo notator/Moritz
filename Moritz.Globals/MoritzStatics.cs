@@ -580,8 +580,6 @@ namespace Moritz.Globals
 			return sb.ToString();
 		}
 
-
-
 		/// <summary>
 		/// This function divides total into divisor parts, returning a List of ints whose:
 		///     * Count is equal to divisor.
@@ -650,10 +648,124 @@ namespace Moritz.Globals
             return intDivisionSizes;
         }
 
-        /// <summary>
-        /// Returns the value argument as a byte, coerced to the range [0..127] 
-        /// </summary>
-        public static byte MidiValue(int value)
+		/// <summary>
+		/// Throws an ApplicationException if condition is false
+		/// </summary>
+		/// <param name="v"></param>
+		public static void Assert(bool condition)
+		{
+			if(condition == false)
+			{
+				throw new ApplicationException($"Condition failed.");
+			}
+		}
+		/// <summary>
+		/// Used by AssertRange0_11(int) and AssertRange0_127(int)
+		/// </summary>
+		private static void AssertRange0_(int maxVal, int value)
+		{
+			if(value < 0 || value > maxVal)
+			{
+				throw new ApplicationException($"Value must be in range 0..{maxVal}");
+			}
+		}
+		/// <summary>
+		/// Used by AssertRange0_11(byte) and AssertRange0_127(byte)
+		/// </summary>
+		private static void AssertRange0_(int maxVal, byte value)
+		{
+			if(value < 0 || value > maxVal)
+			{
+				throw new ApplicationException($"Value must be in range 0..{maxVal}");
+			}
+		}
+		/// <summary>
+		/// Throws an ApplicationException if the argument is not in range 0..11. 
+		/// </summary>
+		public static void AssertRange0_11(int value)
+		{
+			AssertRange0_(11, value);
+		}
+		/// <summary>
+		/// Throws an ApplicationException if the argument is not in range 0..11. 
+		/// </summary>
+		public static void AssertRange0_11(byte value)
+		{
+			AssertRange0_(11, value);
+		}
+		/// <summary>
+		/// Throws an ApplicationException if the argument is not in range 0..127. 
+		/// </summary>
+		public static void AssertRange0_127(int value)
+		{
+			AssertRange0_(127, value);
+		}
+		/// <summary>
+		/// Throws an ApplicationException if the argument is not in range 0..127. 
+		/// </summary>
+		public static void AssertRange0_127(byte value)
+		{
+			AssertRange0_(127, value);
+		}
+		/// <summary>
+		/// Used by AssertRange0_11(int collection) and AssertRange0_127(int collection) 
+		/// </summary>
+		private static void AssertRange0_(int maxVal, ICollection<int> collection)
+		{
+			foreach(int value in collection)
+			{
+				if(value < 0 || value > maxVal)
+				{
+					throw new ApplicationException($"Value must be in range 0..{maxVal}");
+				}
+			}
+		}
+		/// <summary>
+		/// Used by AssertRange0_11(byte collection) and AssertRange0_127(byte collection) 
+		/// </summary>
+		private static void AssertRange0_(int maxVal, ICollection<byte> collection)
+		{
+			foreach(int value in collection)
+			{
+				if(value < 0 || value > maxVal)
+				{
+					throw new ApplicationException($"Value must be in range 0..{maxVal}");
+				}
+			}
+		}
+		/// <summary>
+		/// Throws an ApplicationException if an int in the argument is not in range 0..11. 
+		/// </summary>
+		public static void AssertRange0_11(ICollection<int> collection)
+		{
+			AssertRange0_(11, collection);
+		}
+		/// <summary>
+		/// Throws an ApplicationException if a byte in the argument is not in range 0..11. 
+		/// </summary>
+		public static void AssertRange0_11(ICollection<byte> collection)
+		{
+			AssertRange0_(11, collection);
+		}
+		/// <summary>
+		/// Throws an ApplicationException if an int in the argument is not in range 0..127. 
+		/// </summary>
+		public static void AssertRange0_127(ICollection<int> collection)
+		{
+			AssertRange0_(127, collection);
+		}
+		/// <summary>
+		/// Throws an ApplicationException if a byte in the argument is not in range 0..127. 
+		/// </summary>
+		public static void AssertRange0_127(ICollection<byte> collection)
+		{
+			AssertRange0_(127, collection);
+		}
+
+		/// <summary>
+		/// Returns the value argument as a byte, coerced to the range [0..127] 
+		/// </summary>
+		public static byte MidiValue(int value)
         {
             int rval;
 
