@@ -169,7 +169,7 @@ namespace Moritz.Spec
 			}
 			for(int i = 1; i < PitchWeights.Count; ++i)
 			{
-				if(PitchWeights[i].Pitch >= PitchWeights[i - 1].Pitch)
+				if(PitchWeights[i - 1].Pitch >= PitchWeights[i].Pitch)
 				{
 					throw new ApplicationException($"Pitches must be unique and in ascending order.");
 				}
