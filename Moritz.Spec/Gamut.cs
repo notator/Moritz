@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Moritz.Globals;
 
 namespace Moritz.Spec
@@ -60,13 +61,25 @@ namespace Moritz.Spec
 			new List<int>(){0, 4, 7, 2, 10, 9, 5, 1, 11, 6, 3, 8}, // index 23
 		};
 		/// <summary>
-		/// The standard weight associated with the corresponding position in a pitch hierarchy.
-		/// These weights are used by the initial Gamut constructor.
-		/// (A logarithmic scale from 64 to 127.)
+		/// The standard weight associated with a corresponding position in the above pitch hierarchy.
+		/// These standard weights can be used by Gamut constructors. 
+		/// Values 1 to 8 are the values Moritz associates with fff to ppp (see MoritzStatics.cs)
+		///   127 - fff
+		///	  113 - ff
+		///	  99 - f
+		///	  85 - mf
+		///	  71 - mp
+		///	  57 - p
+		///	  43 - pp
+		///	  29 - ppp
+		///	  25
+		///	  21
+		///	  17
+		///	  14 - (pppp is 15 in MoritzStatics.cs)
 		/// </summary>
 		public static IReadOnlyList<int> StandardWeights = new List<int>()
 		{
-			127, 107, 94, 84, 78, 74, 71, 69, 67, 66, 65, 64
+			127, 113, 99, 85, 71, 57, 43, 29, 25, 21, 17, 14
 		};
 
 		#region constructors
@@ -179,7 +192,7 @@ namespace Moritz.Spec
 		/// <summary>
 		/// Throws an exception if each absolute pitch does not exist in all possible octaves.
 		/// </summary>
-		private void AssertOctaveSimilarity()
+		public void AssertOctaveSimilarity()
 		{
 			HashSet<int> pitchSet = new HashSet<int>();
 			List<int> relPitches = new List<int>();
@@ -207,21 +220,166 @@ namespace Moritz.Spec
 			}
 		}
 
-		public Gamut Transpose(int transposition)
+		/// <summary>
+		/// Adds transposition (which can be positive, negative or zero) to all pitches.
+		/// If the extend argument is true, the PitchWeights list will subsequently be extended
+		/// to ensure that each absolute pitch exists in all possible octaves.
+		/// </summary>
+		/// <param name="transposition"></param>
+		/// <param name="extend"></param>
+		/// <returns></returns>
+		public Gamut Transpose(int transposition, bool extend)
 		{
-			var newPitchWeights = new List<PitchWeight>();
-			foreach(var pitchWeight in PitchWeights)
+			if(transposition != 0)
 			{
-				int newPitch = pitchWeight.Pitch + transposition;
-				if(newPitch >= 0 && newPitch <= 127)
+				var newPitchWeights = new List<PitchWeight>();
+				foreach(var pitchWeight in PitchWeights)
 				{
-					newPitchWeights.Add(new PitchWeight(newPitch, (int)pitchWeight.Weight));
+					int newPitch = pitchWeight.Pitch + transposition;
+					if(newPitch >= 0 && newPitch <= 127)
+					{
+						newPitchWeights.Add(new PitchWeight(newPitch, (int)pitchWeight.Weight));
+					}
 				}
+				PitchWeights = newPitchWeights;
+				if(extend)
+				{
+					List<int> sortedAbsolutePitches = new List<int>(AbsolutePitches);
+					sortedAbsolutePitches.Sort();
+					if(transposition > 0)
+					{
+						ExtendGamutAtLowEnd(sortedAbsolutePitches);
+					}
+					else
+					{
+						ExtendGamutAtHighEnd(sortedAbsolutePitches);
+					}
+				}
+				else
+				{
+					PitchWeights = newPitchWeights;
+				}
+
+				AssertValidity();
 			}
-			PitchWeights = newPitchWeights;
+
 			return this;
 		}
 
+		private void ExtendGamutAtLowEnd(List<int> sortedAbsolutePitches)
+		{
+			List<PitchWeight> absPitchWeights = new List<PitchWeight>();
+			foreach(var absPitch in sortedAbsolutePitches)
+			{
+				foreach(var pitchWeight in PitchWeights)
+				{
+					if(absPitch == (pitchWeight.Pitch % 12))
+					{
+						absPitchWeights.Add(new PitchWeight(absPitch, pitchWeight.Weight));
+						break;
+					}
+				}
+			}
+			List<PitchWeight> lowPitchWeights = new List<PitchWeight>();
+			int octave = 0;
+			int pitch = -1;
+			while(pitch < PitchWeights[0].Pitch)
+			{
+				foreach(var pitchWeight in absPitchWeights)
+				{
+					pitch = pitchWeight.Pitch + octave;
+					if(pitch >= PitchWeights[0].Pitch)
+					{
+						break;
+					}
+					lowPitchWeights.Add(new PitchWeight(pitch, pitchWeight.Weight));
+				}
+				octave += 12;
+			}
+
+			lowPitchWeights.AddRange(PitchWeights);
+			PitchWeights = lowPitchWeights;
+		}
+
+		private void ExtendGamutAtHighEnd(List<int> sortedAbsolutePitches)
+		{
+			List<PitchWeight> absPitchWeights = new List<PitchWeight>();
+			foreach(var absPitch in sortedAbsolutePitches)
+			{
+				for(int i = PitchWeights.Count - 1; i >= 0; i--)
+				{
+					PitchWeight pitchWeight = PitchWeights[i];
+					if(absPitch == (pitchWeight.Pitch % 12))
+					{
+						absPitchWeights.Add(new PitchWeight(absPitch, pitchWeight.Weight));
+						break;
+					}
+				}
+			}
+
+			int topPitch = PitchWeights[PitchWeights.Count -1].Pitch;
+			int firstAbsHighPitch = sortedAbsolutePitches[0];
+			List<PitchWeight> highPitchWeights = new List<PitchWeight>();
+			foreach(var absPitchWeight in absPitchWeights)
+			{
+				int highPitch = absPitchWeight.Pitch;
+				while(highPitch <= 127)
+				{
+					if(highPitch > topPitch)
+					{
+						highPitchWeights.Add(new PitchWeight(highPitch, absPitchWeight.Weight));
+					}
+					highPitch += 12;
+				}
+			}
+			highPitchWeights = highPitchWeights.OrderBy(x => x.Pitch).ToList<PitchWeight>();
+			List<PitchWeight> newPitchWeights = new List<PitchWeight>(PitchWeights);
+			newPitchWeights.AddRange(highPitchWeights);
+			PitchWeights = newPitchWeights;
+		}
+
+		public HashSet<int> AbsolutePitches
+		{
+			get
+			{
+				HashSet<int> absolutePitches = new HashSet<int>();
+				IReadOnlyList<int> pitches = Pitches;
+				foreach(int pitch in pitches)
+				{
+					int absPitch = pitch % 12;
+					if(!absolutePitches.Add(absPitch))
+					{
+						break;
+					}
+				}
+				return absolutePitches;
+			}
+		}
+
+		public IReadOnlyList<int> Pitches
+		{
+			get
+			{
+				List<int> pitches = new List<int>();
+				foreach(PitchWeight pitchWeight in PitchWeights)
+				{
+					pitches.Add(pitchWeight.Pitch);
+				}
+				return pitches;
+			}
+		}
+		public IReadOnlyList<int> Weights
+		{
+			get
+			{
+				List<int> weights = new List<int>();
+				foreach(PitchWeight pitchWeight in PitchWeights)
+				{
+					weights.Add(pitchWeight.Pitch);
+				}
+				return weights;
+			}
+		}
 		public IReadOnlyList<PitchWeight> PitchWeights { get; private set; }
 	}
 }

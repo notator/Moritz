@@ -24,16 +24,16 @@ namespace Moritz.Algorithm.Study4
 			HashSet<int> absPitchSet1_Target = new HashSet<int>() { 7, 0, 11, 9, 6 };
 			Gamut test1_TargetGamut = new Gamut(0, 0,absPitchSet1_Target);
 
-			//All ints (both pitches and weights) are in range [0..127]
-			List<Tuple<int, int>> test1_PitchVectorsData = new List<Tuple<int, int>>()
+			//All ints (both pitches and weights) must be in range [0..127]
+			List<Tuple<int, int>> test1_PitchVectorEndPoints = new List<Tuple<int, int>>()
 			{
 				new Tuple<int,int>(12,11 ),
 				new Tuple<int,int>( 4, 6 ),
 				new Tuple<int,int>(14, 9 ),
 				new Tuple<int,int>(11, 6 ),
-				new Tuple<int,int>( 3, 7 )
+				new Tuple<int,int>( 2, 7 )
 			};
-			var test1_GamutVector = new GamutVector(test1_StartGamut, test1_TargetGamut, test1_PitchVectorsData, 6);
+			var test1_GamutVector = new GamutVector(test1_StartGamut, test1_TargetGamut, test1_PitchVectorEndPoints, 6);
 
 			#endregion Gamut test1
 
@@ -53,18 +53,18 @@ namespace Moritz.Algorithm.Study4
 			};
 			Gamut test2_TargetGamut = new Gamut(test2_TargetAbsPitchWeightDict);
 
-			List<Tuple<int, int>> test2_PitchVectorsData = new List<Tuple<int, int>>()
+			List<Tuple<int, int>> test2_PitchVectorEndPoints = new List<Tuple<int, int>>()
 			{
-				new Tuple<int,int>( 12,11 ),
-				new Tuple<int,int>( 5,7 ),
-				new Tuple<int,int>( 5,10 ),
-				new Tuple<int,int>( 5,2 ),
-				new Tuple<int,int>( 6,7 ),
-				new Tuple<int,int>( 8,7 ),
-				new Tuple<int,int>( 13,9 ),
-				new Tuple<int,int>( 1,3 )
+				new Tuple<int,int>( 17, 8 ),
+				new Tuple<int,int>( 5,  7 ),
+				new Tuple<int,int>( 5,  8 ),
+				new Tuple<int,int>( 5,  9 ),
+				new Tuple<int,int>( 13, 7 ),
+				new Tuple<int,int>( 1, 21 ),
+				new Tuple<int,int>( 13, 9 ),
+				new Tuple<int,int>( 1, 19 )
 			};
-			var test2_GamutVector = new GamutVector(test2_StartGamut, test2_TargetGamut, test2_PitchVectorsData, 4);
+			var test2_GamutVector = new GamutVector(test2_StartGamut, test2_TargetGamut, test2_PitchVectorEndPoints, 4);
 
 			#endregion Gamut test2
 
@@ -86,20 +86,24 @@ namespace Moritz.Algorithm.Study4
 			};
 			Gamut test3_TargetGamut = new Gamut(test3_TargetAbsPitchWeightDict);
 
-			List<Tuple<int, int>> test3_PitchVectorsData = new List<Tuple<int, int>>()
+			List<Tuple<int, int>> test3_PitchVectorEndPoints = new List<Tuple<int, int>>()
 			{
-				new Tuple<int,int>( 1,7 ),
+				new Tuple<int,int>( 1,9 ),
 				new Tuple<int,int>( 14,8 ),
 				new Tuple<int,int>( 3,9 )
 			};
-			var test3_GamutVector = new GamutVector(test3_StartGamut, test3_TargetGamut, test3_PitchVectorsData, 4);
+			var test3_GamutVector = new GamutVector(test3_StartGamut, test3_TargetGamut, test3_PitchVectorEndPoints, 4);
 
 			#endregion Gamut test3
 
 			#region test4 transposition
 
+			test1_StartGamut.AssertOctaveSimilarity();
 			Gamut test3_StartGamut_Clone = test1_StartGamut.Clone() as Gamut;
-			test3_StartGamut_Clone.Transpose(5);
+			test3_StartGamut_Clone.Transpose(15, true);
+			test3_StartGamut_Clone.AssertOctaveSimilarity();
+			test3_StartGamut_Clone.Transpose(-30, true);
+			test3_StartGamut_Clone.AssertOctaveSimilarity();
 
 			#endregion test4
 		}

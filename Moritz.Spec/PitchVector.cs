@@ -6,27 +6,29 @@ using Moritz.Globals;
 namespace Moritz.Spec
 {
 	/// <summary>
+	/// A list of PitchWeights and a TargetPitchWeight.
+	/// The PitchWeights list cannot be null or empty.
+	/// The TargetPitchWeight cannot be null.
+	/// The PitchWeights list does not contain the TargetPitchWeight.	/// 
 	/// </summary>
 	public class PitchVector
 	{
 		#region constructors
 		/// <summary>
 		/// The PitchWeights list, which has a minimum Count of 1, does not contain the target.
-		/// Both start and end pitches All pitches and weights are in range 0..127.
 		/// </summary>
-		/// <param name="startGamut"></param>
-		/// <param name="targetGamut"></param>
-		/// <param name="pitchVector">All ints (both start and end pitches) are in range [0..127]</param>
-		/// <param name="steps">An integer greater than 1</param>
-		public PitchVector(Gamut startGamut, Gamut targetGamut, Tuple<int, int> pitchVector, int steps)
+		/// <param name="startGamut">Must contain the pitch pitchVectorEndPoints.Item1</param>
+		/// <param name="targetGamut">Must contain the pitch pitchVectorEndPoints.Item2</param>
+		/// <param name="pitchVectorEndPoints">All ints (both start and end pitches) are in range [0..127]</param>
+		/// <param name="steps">The number of PitchWeights in the constructed PitchWeights list. Must be greater than 0</param>
+		public PitchVector(Gamut startGamut, Gamut targetGamut, Tuple<int, int> pitchVectorEndPoints, int steps)
 		{
-			M.AssertRange0_127(pitchVector.Item1);
-			M.AssertRange0_127(pitchVector.Item2);
-			M.Assert(steps > 1);
+			M.AssertRange0_127(pitchVectorEndPoints.Item1);
+			M.AssertRange0_127(pitchVectorEndPoints.Item2);
+			M.Assert(steps > 0);
 
-			Debug.Assert(steps > 1);
-			int startPitch = pitchVector.Item1;
-			int startWeight = 1;
+			int startPitch = pitchVectorEndPoints.Item1;
+			int startWeight = -1;
 			foreach(var pitchWeight in startGamut.PitchWeights)
 			{
 				if(pitchWeight.Pitch == startPitch)
@@ -35,9 +37,13 @@ namespace Moritz.Spec
 					break;
 				}
 			}
+			if(startWeight == -1)
+			{
+				throw new ApplicationException($"startGamut does not contain pitch {pitchVectorEndPoints.Item1}");
+			}
 
-			int endPitch = pitchVector.Item2;
-			int endWeight = 1;
+			int endPitch = pitchVectorEndPoints.Item2;
+			int endWeight = -1;
 			foreach(var pitchWeight in targetGamut.PitchWeights)
 			{
 				if(pitchWeight.Pitch == endPitch)
@@ -45,6 +51,10 @@ namespace Moritz.Spec
 					endWeight = pitchWeight.Weight;
 					break;
 				}
+			}
+			if(endWeight == -1)
+			{
+				throw new ApplicationException($"targetGamut does not contain pitch {pitchVectorEndPoints.Item2}");
 			}
 
 			TargetPitchWeight = new PitchWeight(endPitch, endWeight);
@@ -82,10 +92,13 @@ namespace Moritz.Spec
 		/// <summary>
 		/// Transposes the pitchVector by octaves so that its minimum pitch is
 		/// both greater than or equal to lowerBound, and less than lowerBound + 12.
+		/// Returns false if this would result in any pitch having a value outside the range 0..127. 
 		/// </summary>
 		/// <param name="lowerBound"></param>
-		public void SetOctave(int lowerBound)
+		public bool SetOctave(int lowerBound)
 		{
+			bool returnValue = true;
+
 			GetRange(out int minPitch, out int maxPitch);
 
 			int transposition = 0;
@@ -106,7 +119,7 @@ namespace Moritz.Spec
 			}
 			if(minPitch < 0 || maxPitch > 127)
 			{
-				throw new ApplicationException($"Can't transpose pitches to lowerBound {lowerBound}");
+				returnValue = false;
 			}
 			#endregion
 
@@ -118,6 +131,9 @@ namespace Moritz.Spec
 					_pitchWeights[i] = new PitchWeight(newPitch, _pitchWeights[i].Weight);
 				}
 			}
+
+			return returnValue;
+
 		}
 
 		public void GetRange(out int minPitch, out int maxPitch)
@@ -136,6 +152,7 @@ namespace Moritz.Spec
 		/// If necessary, the pitchVector will automatically be transposed up or down by octaves
 		/// so that the resulting pitches are in range 0..127.
 		/// An ApplicationException is thrown if the resulting pitches can't be fit into range [0..127].
+		/// TargetPitchWeight is not currently changed...
 		/// </summary>
 		/// <param name="minPitch">The minimum pitch in the pitchVector when the function returns.</param>
 		/// <param name="maxPitch">The maximum pitch in the pitchVector when the function returns.</param>
@@ -209,8 +226,7 @@ namespace Moritz.Spec
 
 		#endregion constructors
 
-		public PitchWeight TargetPitchWeight { get; }
-
+		public PitchWeight TargetPitchWeight { get; private set; }
 		public IReadOnlyList<PitchWeight> PitchWeights{get{ return _pitchWeights; } }
 		private readonly List<PitchWeight> _pitchWeights = new List<PitchWeight>();
 

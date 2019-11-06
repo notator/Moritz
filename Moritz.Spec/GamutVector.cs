@@ -14,6 +14,8 @@ namespace Moritz.Spec
 		/// <summary>
 		/// GamutVector.Gamuts is a list of Gamuts that begins with startGamut and moves towards the targetGamut argument (which is not included in the list).
 		/// GamutVector.PitchVectors is a corresponding list of pitch vectors. Each pitch vector is a list of (startPitch, targetPitch) tuples.
+		/// GamutVector.Gamuts[0] is a clone of the constructor's startGamut argument.
+		/// GamutVector.TargetGamut is a clone of the constructor's targetGamut argument.
 		/// 
 		/// GamutVector.PitchVectors is first constructed by making linear connections between the pitches in the pitchVectorsData.
 		/// GamutVector.Gamuts is then constructed from the PitchVectors.
@@ -45,25 +47,20 @@ namespace Moritz.Spec
 		/// </summary>
 		/// <param name="startGamut"></param>
 		/// <param name="targetGamut"></param>
-		/// <param name="pitchVectorsData">All ints must be in range [0..127]. None of them have to be unique.</param>
+		/// <param name="pitchVectorEndPointsList">All ints must be in range [0..127]. None of them have to be unique.</param>
 		/// <param name="steps">An integer greater than 1</param>
 		/// <returns>A list of steps Gamuts, beginning with this Gamut and not including the target.</returns>
-		public GamutVector(Gamut startGamut, Gamut targetGamut, List<Tuple<int, int>> pitchVectorsData, int steps)
+		public GamutVector(Gamut startGamut, Gamut targetGamut, List<Tuple<int, int>> pitchVectorEndPointsList, int steps)
 		{
-			Debug.Assert(startGamut != null && targetGamut != null);
-			Debug.Assert(pitchVectorsData != null && pitchVectorsData.Count >= 1);
-			Debug.Assert(steps > 1);
+			M.Assert(startGamut != null && targetGamut != null);
+			M.Assert(pitchVectorEndPointsList != null && pitchVectorEndPointsList.Count >= 1);
+			M.Assert(steps > 1);
 
 			List<PitchVector> pitchVectors = new List<PitchVector>();
-			foreach(Tuple<int, int> pitchVectorData in pitchVectorsData)
+			foreach(Tuple<int, int> pitchVectorEndPoints in pitchVectorEndPointsList)
 			{
-				Debug.Assert(pitchVectorData.Item1 >= 0 && pitchVectorData.Item1 <= 127);
-				Debug.Assert(pitchVectorData.Item2 >= 0 && pitchVectorData.Item2 <= 127);
-
-				Tuple<int, int> pitchVector = new Tuple<int, int>(pitchVectorData.Item1, pitchVectorData.Item2);
-
-				PitchVector singlePitchVector = new PitchVector(startGamut, targetGamut, pitchVector, steps);
-				pitchVectors.Add(singlePitchVector);
+				PitchVector pitchVector = new PitchVector(startGamut, targetGamut, pitchVectorEndPoints, steps);
+				pitchVectors.Add(pitchVector);
 			}
 
 			PitchVectors = pitchVectors;
@@ -77,12 +74,24 @@ namespace Moritz.Spec
 				gamuts.Add(gamut);
 			}
 			Gamuts = gamuts;
+			TargetGamut = new Gamut(targetGamut.PitchWeights);
 		}
 
-		public GamutVector(List<Gamut> gamuts, List<PitchVector> pitchVectors)
+		public GamutVector(List<Gamut> gamuts, Gamut targetGamut, List<PitchVector> pitchVectors)
 		{
 			Gamuts = new List<Gamut>(gamuts);
+			TargetGamut = new Gamut(targetGamut.PitchWeights);
+			List<PitchVector> newPitchVectors = new List<PitchVector>();
+			foreach(var pitchVector in pitchVectors)
+			{
+				newPitchVectors.Add(new PitchVector(new List<PitchWeight>(pitchVector.PitchWeights), pitchVector.TargetPitchWeight));
+			}
 			PitchVectors = new List<PitchVector>(pitchVectors);
+		}
+
+		public object Clone()
+		{
+			return new GamutVector(Gamuts, TargetGamut, PitchVectors);
 		}
 
 		#region constructor helpers
@@ -196,13 +205,14 @@ namespace Moritz.Spec
 				}
 			}
 
-			return new GamutVector(gamuts, pitchVectors);
+			return new GamutVector(gamuts, concatenatedGamutVector.TargetGamut, pitchVectors);
 		}
 
 		/// <summary>
 		/// Gamuts does not contain TargetGamut
 		/// </summary>
-		public IReadOnlyList<Gamut> Gamuts { get; private set; }
-		public IReadOnlyList<PitchVector> PitchVectors { get; private set; }
+		public List<Gamut> Gamuts { get; private set; }
+		public Gamut TargetGamut { get; private set; }
+		public List<PitchVector> PitchVectors { get; private set; }
 	}
 }
