@@ -113,7 +113,7 @@ namespace Moritz.Spec
 
 	/// <summary>
 	/// The PitchWeight list contains pitches in range 0..127,
-	/// Each possible octave exists, and contains the same absolute pitches.
+	/// Each possible octave exists, and contains all possible absolute pitches.
 	/// </summary>
 	public class LongGamut : GamutBase
 	{
@@ -158,10 +158,9 @@ namespace Moritz.Spec
 
 		/// <summary>
 		/// Adds transposition (which can be positive, negative or zero) to all pitches.
-		/// Then extends the PitchWeights list to ensure that each absolute pitch exists in all possible octaves.
+		/// Then extends the PitchWeights list to ensure that each octave contains all possible absolute pitches.
 		/// </summary>
 		/// <param name="transposition"></param>
-		/// <param name="extend"></param>
 		/// <returns></returns>
 		public override void Transpose(int transposition)
 		{
@@ -234,32 +233,41 @@ namespace Moritz.Spec
 			List<PitchWeight> highAbsPitchWeights = GetHighAbsPitchWeights();
 
 			int topPitch = PitchWeights[PitchWeights.Count - 1].Pitch;
-			PitchWeight firstAbsHighPitchWeight = highAbsPitchWeights[0];
-			List<PitchWeight> highPitchWeights = new List<PitchWeight>();
-			int highPitch = 0;
-			while(highPitch < 127)
+			List<int> highPitches = new List<int>();
+			int octave = 12;
+			foreach(var absPitchWeight in highAbsPitchWeights)
 			{
-				foreach(var absPitchWeight in highAbsPitchWeights)
+				int highPitch = absPitchWeight.Pitch;
+				while(highPitch <= topPitch)
 				{
-					highPitch = absPitchWeight.Pitch;
-				while(highPitch <= topPitch && highPitch < 127)
-				{
-					highPitch += 12;
+					highPitch += octave;
 				}
-				if(highPitch > 127)
+				while(highPitch <= 127)
 				{
-					break;
-				}
-				topPitch = highPitch;
-				highPitchWeights.Add(new PitchWeight(highPitch, absPitchWeight.Weight));
+					highPitches.Add(highPitch);
+					highPitch += octave;
 				}
 			}
-			highPitchWeights = highPitchWeights.OrderBy(x => x.Pitch).ToList<PitchWeight>();
-			List<PitchWeight> newPitchWeights = new List<PitchWeight>(PitchWeights);
-			newPitchWeights.AddRange(highPitchWeights);
-			PitchWeights = newPitchWeights;
+			highPitches.Sort();
+
+			List<PitchWeight> highPitchWeights = new List<PitchWeight>();			
+			foreach(int pitch in highPitches)
+			{
+				int weightIndex = highAbsPitchWeights.FindIndex(x => x.Pitch == (pitch % 12));
+				PitchWeight pitchWeight = new PitchWeight(pitch, highAbsPitchWeights[weightIndex].Weight);
+				highPitchWeights.Add(pitchWeight);
+			}
+
+			List<PitchWeight> pitchWeights = new List<PitchWeight>(PitchWeights);
+			pitchWeights.AddRange(highPitchWeights);
+			PitchWeights = pitchWeights;
 		}
 
+		/// <summary>
+		/// Returns an unordered list of PitchWeights. The Pitches are in range 0..11.
+		/// The pitchWeights are derived from those in the top octave of the current PitchWeights.
+		/// </summary>
+		/// <returns></returns>
 		private List<PitchWeight> GetHighAbsPitchWeights()
 		{
 			List<PitchWeight> highAbsPitchWeights = new List<PitchWeight>();
@@ -275,7 +283,6 @@ namespace Moritz.Spec
 				absPitches.Add(absPitch);
 				highAbsPitchWeights.Add(new PitchWeight(absPitch, pitchWeight.Weight));
 			}
-			highAbsPitchWeights = highAbsPitchWeights.OrderBy(x => x.Pitch).ToList<PitchWeight>();
 
 			return highAbsPitchWeights;
 		}
@@ -304,7 +311,7 @@ namespace Moritz.Spec
 				{
 					if(relPitches.FindIndex(x => x == relPitch) < 0)
 					{
-						throw new ApplicationException("Gamut must contain each absolute pitch in each octave.");
+						throw new ApplicationException("Each absolute pitch must occur in each possible octave.");
 					}
 					relPitch += 12;
 				}
@@ -433,18 +440,6 @@ namespace Moritz.Spec
 			PitchWeights = pitchWeights;
 
 			AssertLongGamutValidity();
-		}
-
-		public StandardGamut(IReadOnlyList<PitchWeight> pitchWeights)
-		{
-			// don't implement!
-			throw new NotImplementedException();
-		}
-
-		public StandardGamut(Dictionary<int, int> absPitchWeightDictList)
-		{
-			// don't implement!
-			throw new NotImplementedException();
 		}
 
 		public override object Clone()

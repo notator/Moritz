@@ -51,18 +51,18 @@ namespace Moritz.Algorithm.Study4
 				{ 5, 43}, // pp
 				{ 9, 29}  // ppp
 			};
-			StandardGamut gamut1 = new StandardGamut(gamut1AbsPitchWeightDict);
-			StandardGamut gamut2 = gamut1.Clone() as StandardGamut;
+			LongGamut gamut1 = new LongGamut(gamut1AbsPitchWeightDict);
+			LongGamut gamut2 = gamut1.Clone() as LongGamut;
 			gamut2.Transpose(7);
-			StandardGamut gamut3 = gamut2.Clone() as StandardGamut;
+			LongGamut gamut3 = gamut2.Clone() as LongGamut;
 			gamut3.Transpose(7);
-			StandardGamut gamut4 = gamut3.Clone() as StandardGamut;
+			LongGamut gamut4 = gamut3.Clone() as LongGamut;
 			gamut4.Transpose(7);
-			StandardGamut gamut5 = gamut4.Clone() as StandardGamut;
+			LongGamut gamut5 = gamut4.Clone() as LongGamut;
 			gamut5.Transpose(7);
-			StandardGamut gamut6 = gamut5.Clone() as StandardGamut;
+			LongGamut gamut6 = gamut5.Clone() as LongGamut;
 			gamut6.Transpose(7);
-			StandardGamut gamut7 = gamut6.Clone() as StandardGamut;
+			LongGamut gamut7 = gamut6.Clone() as LongGamut;
 			gamut7.Transpose(7);
 
 			List<Tuple<int, int>> region21PitchVectorEndPoints = new List<Tuple<int, int>>()
