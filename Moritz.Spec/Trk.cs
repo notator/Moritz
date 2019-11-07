@@ -854,7 +854,7 @@ namespace Moritz.Spec
 				{
 					if(this[i] is MidiChordDef mcd)
 					{
-						mcd.PitchWheelDeviation = M.MidiValue(deviation);
+						mcd.PitchWheelDeviation = M.SetRange0_127(deviation);
 					}
 				}
 			}
@@ -896,7 +896,7 @@ namespace Moritz.Spec
             {
                 if(_uniqueDefs[i] is MidiChordDef umc)
                 {
-                    umc.PitchWheelDeviation = M.MidiValue((int)(pwValueAtBeginIndex * (Math.Pow(pwdfactor, i))));
+                    umc.PitchWheelDeviation = M.SetRange0_127((int)(pwValueAtBeginIndex * (Math.Pow(pwdfactor, i))));
                 }
             }
         }

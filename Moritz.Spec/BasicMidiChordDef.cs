@@ -42,8 +42,8 @@ namespace Moritz.Spec
             Velocities = new List<byte>(velocities);
 
             #region check values
-            Debug.Assert(BankIndex == null || BankIndex == M.MidiValue((int)BankIndex), "Bank out of range.");
-            Debug.Assert(PatchIndex == null || PatchIndex == M.MidiValue((int)PatchIndex), "Patch out of range.");
+            Debug.Assert(BankIndex == null || BankIndex == M.SetRange0_127((int)BankIndex), "Bank out of range.");
+            Debug.Assert(PatchIndex == null || PatchIndex == M.SetRange0_127((int)PatchIndex), "Patch out of range.");
             Debug.Assert(Pitches.Count == Velocities.Count, "There must be the same number of pitches and velocities.");
             foreach(byte pitch in Pitches)
                 Debug.Assert(pitch >= 0 && pitch <= 127);

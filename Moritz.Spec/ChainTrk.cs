@@ -173,7 +173,7 @@ namespace Moritz.Spec
 							var startVal = startPitches[pitchIndex];
 							var envVal = envelope[chordIndex];
 							double shearIncrement = shearListPerChord[chordIndex];
-							byte pitch = M.MidiValue((int)Math.Round(startVal + envVal + shearIncrement));
+							byte pitch = M.SetRange0_127((int)Math.Round(startVal + envVal + shearIncrement));
 							pitches.Add(pitch);
 						}
 					}

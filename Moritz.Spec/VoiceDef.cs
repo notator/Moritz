@@ -359,7 +359,7 @@ namespace Moritz.Spec
                     List<byte> midiPitches = iucd.NotatedMidiPitches;
                     for(int i = 0; i < midiPitches.Count; ++i)
                     {
-                        midiPitches[i] = M.MidiValue(midiPitches[i] + semitonesToTranspose);
+                        midiPitches[i] = M.SetRange0_127(midiPitches[i] + semitonesToTranspose);
                     }
                 }
             }

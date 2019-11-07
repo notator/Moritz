@@ -58,7 +58,7 @@ namespace Moritz.Spec
 			w.WriteEndElement(); // score:inputNote N.B. This element can be empty!
 		}
 
-		public byte NotatedMidiPitch { get { return _notatedMidiPitch; } set {_notatedMidiPitch = M.MidiValue(value); }}
+		public byte NotatedMidiPitch { get { return _notatedMidiPitch; } set {_notatedMidiPitch = M.SetRange0_127(value); }}
 		private byte _notatedMidiPitch;
 
 		public NoteOn NoteOn = null;

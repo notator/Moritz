@@ -765,7 +765,7 @@ namespace Moritz.Globals
 		/// <summary>
 		/// Returns the value argument as a byte, coerced to the range [0..127] 
 		/// </summary>
-		public static byte MidiValue(int value)
+		public static byte SetRange0_127(int value)
         {
             int rval;
 
@@ -788,7 +788,7 @@ namespace Moritz.Globals
 			var bytesList = new List<byte>();
 			foreach(var intValue in intValues )
 			{
-				bytesList.Add(MidiValue(intValue));
+				bytesList.Add(SetRange0_127(intValue));
 			}
 			return bytesList;
 		}

@@ -199,7 +199,7 @@ namespace Moritz.Palettes
                         {
                             foreach(byte rootMidiPitch in rootMidiPitches)
                             {
-                                combinedPitches.Add(M.MidiValue(rootMidiPitch + pitch));
+                                combinedPitches.Add(M.SetRange0_127(rootMidiPitch + pitch));
                             }
                         }
                         b.Pitches = combinedPitches;
@@ -209,7 +209,7 @@ namespace Moritz.Palettes
                         {
                             foreach(byte rootMidiVelocity in rootMidiVelocities)
                             {
-                                combinedVelocities.Add(M.MidiValue(rootMidiVelocity + velocity));
+                                combinedVelocities.Add(M.SetRange0_127(rootMidiVelocity + velocity));
                             }
                         }
                         b.Velocities = combinedVelocities;
@@ -282,7 +282,7 @@ namespace Moritz.Palettes
         /// </summary>
         private byte ByteOrDefaultValue(List<byte> values, int index, int defaultValue)
         {
-            return (values.Count > 0) ? values[index] : M.MidiValue(defaultValue);
+            return (values.Count > 0) ? values[index] : M.SetRange0_127(defaultValue);
         }
 
         /// <summary>
@@ -513,7 +513,7 @@ namespace Moritz.Palettes
 			};
 			for(int p = 0; p < nUpperPitches; p++)
             {
-                byte newpitch = M.MidiValue(midiPitches[p] + primeIntervals[p]);
+                byte newpitch = M.SetRange0_127(midiPitches[p] + primeIntervals[p]);
                 midiPitches.Add(newpitch);
             }
             return midiPitches;

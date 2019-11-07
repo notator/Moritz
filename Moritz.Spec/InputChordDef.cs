@@ -67,7 +67,7 @@ namespace Moritz.Spec
         {
 			for(int i = 0; i < _inputNoteDefs.Count; ++i)
             {
-				_inputNoteDefs[i].NotatedMidiPitch = M.MidiValue(_inputNoteDefs[i].NotatedMidiPitch + interval);
+				_inputNoteDefs[i].NotatedMidiPitch = M.SetRange0_127(_inputNoteDefs[i].NotatedMidiPitch + interval);
             }
         }
 
