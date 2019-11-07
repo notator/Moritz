@@ -20,7 +20,7 @@ namespace Moritz.Spec
 		/// 2. contains duplicate pitches, or
 		/// 3. the pitches are not in ascending order.
 		/// </summary>
-		protected virtual void AssertValidity()
+		private void AssertBaseValidity()
 		{
 			if(PitchWeights == null || PitchWeights.Count == 0)
 			{
@@ -80,7 +80,7 @@ namespace Moritz.Spec
 				}
 				PitchWeights = newPitchWeights;
 
-				AssertValidity();
+				AssertBaseValidity();
 			}
 		}
 
@@ -143,7 +143,7 @@ namespace Moritz.Spec
 			}
 			PitchWeights = pitchWeights;
 
-			AssertValidity();
+			AssertLongGamutValidity();
 		}
 
 		public LongGamut(IReadOnlyList<PitchWeight> pitchWeights)
@@ -177,7 +177,7 @@ namespace Moritz.Spec
 					ExtendGamutAtHighEnd();
 				}
 
-				AssertValidity();
+				AssertLongGamutValidity();
 			}
 		}
 
@@ -242,15 +242,16 @@ namespace Moritz.Spec
 				foreach(var absPitchWeight in highAbsPitchWeights)
 				{
 					highPitch = absPitchWeight.Pitch;
-					while(highPitch <= topPitch && highPitch < 127)
-					{
-						highPitch += 12;
-					}
-					if(highPitch < 127)
-					{
-						topPitch = highPitch;
-						highPitchWeights.Add(new PitchWeight(highPitch, absPitchWeight.Weight));
-					}
+				while(highPitch <= topPitch && highPitch < 127)
+				{
+					highPitch += 12;
+				}
+				if(highPitch > 127)
+				{
+					break;
+				}
+				topPitch = highPitch;
+				highPitchWeights.Add(new PitchWeight(highPitch, absPitchWeight.Weight));
 				}
 			}
 			highPitchWeights = highPitchWeights.OrderBy(x => x.Pitch).ToList<PitchWeight>();
@@ -282,9 +283,8 @@ namespace Moritz.Spec
 		/// <summary>
 		/// Throws an exception if each absolute pitch does not exist in all possible octaves.
 		/// </summary>
-		protected override void AssertValidity()
+		protected void AssertLongGamutValidity()
 		{
-			base.AssertValidity();
 			HashSet<int> pitchSet = new HashSet<int>();
 			List<int> relPitches = new List<int>();
 			for(int i = 0; i < PitchWeights.Count; ++i)
@@ -432,7 +432,7 @@ namespace Moritz.Spec
 			}
 			PitchWeights = pitchWeights;
 
-			AssertValidity();
+			AssertLongGamutValidity();
 		}
 
 		public StandardGamut(IReadOnlyList<PitchWeight> pitchWeights)
