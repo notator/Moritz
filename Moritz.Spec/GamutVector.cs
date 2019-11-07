@@ -50,37 +50,88 @@ namespace Moritz.Spec
 		/// <param name="pitchVectorEndPointsList">All ints must be in range [0..127]. None of them have to be unique.</param>
 		/// <param name="steps">An integer greater than 1</param>
 		/// <returns>A list of steps Gamuts, beginning with this Gamut and not including the target.</returns>
-		public GamutVector(Gamut startGamut, Gamut targetGamut, List<Tuple<int, int>> pitchVectorEndPointsList, int steps)
+		public GamutVector(LongGamut startGamut, LongGamut targetGamut, List<Tuple<int, int>> pitchVectorEndPointsList, int steps)
 		{
 			M.Assert(startGamut != null && targetGamut != null);
 			M.Assert(pitchVectorEndPointsList != null && pitchVectorEndPointsList.Count >= 1);
+			foreach(var tuple in pitchVectorEndPointsList)
+			{
+				M.Assert(tuple.Item1 >= 0 && tuple.Item1 <= 127);
+				M.Assert(tuple.Item2 >= 0 && tuple.Item2 <= 127);
+			}
 			M.Assert(steps > 1);
 
 			List<PitchVector> pitchVectors = new List<PitchVector>();
 			foreach(Tuple<int, int> pitchVectorEndPoints in pitchVectorEndPointsList)
 			{
-				PitchVector pitchVector = new PitchVector(startGamut, targetGamut, pitchVectorEndPoints, steps);
-				pitchVectors.Add(pitchVector);
+				PitchVector absPitchVector = new PitchVector(startGamut, targetGamut, pitchVectorEndPoints, steps);
+				pitchVectors.Add(absPitchVector);
 			}
 
-			PitchVectors = pitchVectors;
+			List<List<PitchVector>> pitchVectorsPerOctave = GetPitchVectorsPerOctave(pitchVectors);
 
-			List<Dictionary<int, int>> absPitchWeightDictList = GetAbsPitchWeightDictList(PitchVectors, steps);
-
-			List<Gamut> gamuts = new List<Gamut>();
-			foreach(var absPitchWeightDict in absPitchWeightDictList)
+			List<PitchVector> allPitchVectors = new List<PitchVector>();
+			foreach(var pitchvectors in pitchVectorsPerOctave)
 			{
-				Gamut gamut = new Gamut(absPitchWeightDict);
+				allPitchVectors.AddRange(pitchvectors);
+			}
+
+			PitchVectors = allPitchVectors;
+
+			List<List<PitchWeight>> pitchWeightsPerGamut = GetPitchWeightsListPerGamut(allPitchVectors);
+
+			List<LongGamut> gamuts = new List<LongGamut>();
+			foreach(var pitchWeights in pitchWeightsPerGamut)
+			{
+				LongGamut gamut = new LongGamut(pitchWeights);
 				gamuts.Add(gamut);
 			}
-			Gamuts = gamuts;
-			TargetGamut = new Gamut(targetGamut.PitchWeights);
+			LongGamuts = gamuts;
+			TargetLongGamut = new LongGamut(targetGamut.PitchWeights);
 		}
 
-		public GamutVector(List<Gamut> gamuts, Gamut targetGamut, List<PitchVector> pitchVectors)
+		/// <summary>
+		/// Returns a list of pitchVectors that includes the argument pitchVectors
+		/// transposed to all possible octaves.
+		/// </summary>
+		/// <param name="pitchVectors"></param>
+		/// <returns></returns>
+		private List<List<PitchVector>> GetPitchVectorsPerOctave(List<PitchVector> pitchVectors)
 		{
-			Gamuts = new List<Gamut>(gamuts);
-			TargetGamut = new Gamut(targetGamut.PitchWeights);
+			List<List<PitchVector>> pitchVectorsPerOctave = new List<List<PitchVector>>();
+
+			for(int octave = 0; octave < 127; octave += 12)
+			{
+				List<PitchVector> pitchVectorsInOctave = new List<PitchVector>();
+				foreach(var absPitchVector in pitchVectors)
+				{
+					IReadOnlyList<PitchWeight> absPitchWeights = absPitchVector.PitchWeights;
+					List<PitchWeight> relPitchWeights = new List<PitchWeight>();
+					foreach(var absPitchWeight in absPitchWeights)
+					{
+						int absPitch = absPitchWeight.Pitch;
+						int weight = absPitchWeight.Weight;
+						int relPitch = M.SetRange0_127(absPitch + octave);
+						relPitchWeights.Add(new PitchWeight(relPitch, weight));
+					}
+
+					int targetPitch = M.SetRange0_127(absPitchVector.TargetPitchWeight.Pitch + octave);
+					int targetWeight = absPitchVector.TargetPitchWeight.Weight;
+					PitchWeight targetPitchWeight = new PitchWeight(targetPitch, targetWeight);
+
+					pitchVectorsInOctave.Add(new PitchVector(relPitchWeights, targetPitchWeight));
+				}
+
+				pitchVectorsPerOctave.Add(pitchVectorsInOctave);
+
+			}
+			return pitchVectorsPerOctave;
+		}
+
+		public GamutVector(IReadOnlyList<LongGamut> gamuts, LongGamut targetGamut, IReadOnlyList<PitchVector> pitchVectors)
+		{
+			LongGamuts = new List<LongGamut>(gamuts);
+			TargetLongGamut = targetGamut.Clone() as LongGamut;
 			List<PitchVector> newPitchVectors = new List<PitchVector>();
 			foreach(var pitchVector in pitchVectors)
 			{
@@ -91,7 +142,7 @@ namespace Moritz.Spec
 
 		public object Clone()
 		{
-			return new GamutVector(Gamuts, TargetGamut, PitchVectors);
+			return new GamutVector(LongGamuts, TargetLongGamut, PitchVectors);
 		}
 
 		#region constructor helpers
@@ -111,43 +162,37 @@ namespace Moritz.Spec
 		}
 
 		/// <summary>
-		/// returns steps Dictionaries whose Key is absolute pitch, and Value is the maximum weight for that pitch in any pitch vector.
+		/// 
 		/// </summary>
-		/// <param name="steps">is greater than 0</param>
 		/// <param name="pitchVectors">All the pitches and weights are in range [0..127]</param>
-		private List<Dictionary<int, int>> GetAbsPitchWeightDictList(IReadOnlyList<PitchVector> pitchVectors, int steps)
+		private List<List<PitchWeight>> GetPitchWeightsListPerGamut(IReadOnlyList<PitchVector> pitchVectors)
 		{
-			List<List<PitchWeight>> pitchWeightsList = new List<List<PitchWeight>>();
-			for(int step = 0; step < steps; ++step)
+			List<List<PitchWeight>> pitchWeightsListPerGamut = new List<List<PitchWeight>>();
+			int nGamuts = pitchVectors[0].PitchWeights.Count;
+			for(int i = 0; i < nGamuts; i++)
 			{
-				List<PitchWeight> pitchWeights = new List<PitchWeight>();
-				foreach(var pitchVector in pitchVectors)
+				List<PitchWeight> gamutPitchWeights = new List<PitchWeight>();
+				pitchWeightsListPerGamut.Add(gamutPitchWeights);
+			}
+			foreach(var pitchVector in pitchVectors)
+			{
+				for(int i = 0; i < nGamuts; i++)
 				{
-					PitchWeight pitchWeight = pitchVector.PitchWeights[step];
-					var absolutePitch = pitchWeight.Pitch % 12; // for Gamut
-					var weight = pitchWeight.Weight;
-					pitchWeights.Add(new PitchWeight(absolutePitch, weight));
-				}
+					PitchWeight pitchWeight = pitchVector.PitchWeights[i];
+					int gPitchWeightIndex = pitchWeightsListPerGamut[i].FindIndex(x => x.Pitch == pitchWeight.Pitch);
 
-				pitchWeightsList.Add(pitchWeights);
+					if(gPitchWeightIndex == -1)
+					{
+						pitchWeightsListPerGamut[i].Add(pitchWeight);
+					}
+					else if(pitchWeightsListPerGamut[i][gPitchWeightIndex].Weight <= pitchWeight.Weight)
+					{
+						pitchWeightsListPerGamut[i][gPitchWeightIndex] = pitchWeight;
+					}
+				}
 			}
 
-			// Each pitchWeights in the pitchWeightsList can contain both multiple entries for each absolute pitch and weights that are 0.
-			// The pitches in the following dictionary use their maximum weight in the pitchWeights. Pitches that have weight == 0
-			// are filtered out. 
-			List<Dictionary<int, int>> absPitchWeightDictList = new List<Dictionary<int, int>>();
-			foreach(var pitchWeights in pitchWeightsList)
-			{
-				Dictionary<int, int> absPitchWeightDict = new Dictionary<int, int>();
-				for(int absPitch = 0; absPitch < 12; ++absPitch)
-				{
-					int maxWeight = GetMaxWeight(pitchWeights, absPitch);
-					absPitchWeightDict.Add(absPitch, maxWeight);
-				}
-				absPitchWeightDictList.Add(absPitchWeightDict);
-			}
-
-			return absPitchWeightDictList;
+			return pitchWeightsListPerGamut;
 		}
 
 		#endregion constructor helpers
@@ -185,8 +230,8 @@ namespace Moritz.Spec
 				Debug.Assert(found);
 			}
 
-			List<Gamut> gamuts = new List<Gamut>(Gamuts);
-			List<Gamut> cGamuts = new List<Gamut>(concatenatedGamutVector.Gamuts);
+			List<LongGamut> gamuts = new List<LongGamut>(LongGamuts);
+			List<LongGamut> cGamuts = new List<LongGamut>(concatenatedGamutVector.LongGamuts);
 			gamuts.AddRange(cGamuts);
 
 			List<PitchVector> pitchVectors = new List<PitchVector>();
@@ -205,14 +250,14 @@ namespace Moritz.Spec
 				}
 			}
 
-			return new GamutVector(gamuts, concatenatedGamutVector.TargetGamut, pitchVectors);
+			return new GamutVector(gamuts, concatenatedGamutVector.TargetLongGamut, pitchVectors);
 		}
 
 		/// <summary>
-		/// Gamuts does not contain TargetGamut
+		/// LongGamuts does not contain TargetLongGamut
 		/// </summary>
-		public List<Gamut> Gamuts { get; private set; }
-		public Gamut TargetGamut { get; private set; }
-		public List<PitchVector> PitchVectors { get; private set; }
+		public IReadOnlyList<LongGamut> LongGamuts { get; private set; }
+		public LongGamut TargetLongGamut { get; private set; }
+		public IReadOnlyList<PitchVector> PitchVectors { get; private set; }
 	}
 }

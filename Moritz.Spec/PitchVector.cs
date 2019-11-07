@@ -9,7 +9,7 @@ namespace Moritz.Spec
 	/// A list of PitchWeights and a TargetPitchWeight.
 	/// The PitchWeights list cannot be null or empty.
 	/// The TargetPitchWeight cannot be null.
-	/// The PitchWeights list does not contain the TargetPitchWeight.	/// 
+	/// The PitchWeights list does not contain the TargetPitchWeight. 
 	/// </summary>
 	public class PitchVector
 	{
@@ -21,41 +21,17 @@ namespace Moritz.Spec
 		/// <param name="targetGamut">Must contain the pitch pitchVectorEndPoints.Item2</param>
 		/// <param name="pitchVectorEndPoints">All ints (both start and end pitches) are in range [0..127]</param>
 		/// <param name="steps">The number of PitchWeights in the constructed PitchWeights list. Must be greater than 0</param>
-		public PitchVector(Gamut startGamut, Gamut targetGamut, Tuple<int, int> pitchVectorEndPoints, int steps)
+		public PitchVector(LongGamut startGamut, LongGamut targetGamut, Tuple<int, int> pitchVectorEndPoints, int steps)
 		{
 			M.AssertRange0_127(pitchVectorEndPoints.Item1);
 			M.AssertRange0_127(pitchVectorEndPoints.Item2);
 			M.Assert(steps > 0);
 
 			int startPitch = pitchVectorEndPoints.Item1;
-			int startWeight = -1;
-			foreach(var pitchWeight in startGamut.PitchWeights)
-			{
-				if(pitchWeight.Pitch == startPitch)
-				{
-					startWeight = pitchWeight.Weight;
-					break;
-				}
-			}
-			if(startWeight == -1)
-			{
-				throw new ApplicationException($"startGamut does not contain pitch {pitchVectorEndPoints.Item1}");
-			}
+			int startWeight = startGamut.Weight(startPitch);
 
 			int endPitch = pitchVectorEndPoints.Item2;
-			int endWeight = -1;
-			foreach(var pitchWeight in targetGamut.PitchWeights)
-			{
-				if(pitchWeight.Pitch == endPitch)
-				{
-					endWeight = pitchWeight.Weight;
-					break;
-				}
-			}
-			if(endWeight == -1)
-			{
-				throw new ApplicationException($"targetGamut does not contain pitch {pitchVectorEndPoints.Item2}");
-			}
+			int endWeight = targetGamut.Weight(endPitch);
 
 			TargetPitchWeight = new PitchWeight(endPitch, endWeight);
 
@@ -65,17 +41,19 @@ namespace Moritz.Spec
 			double dPitch = startPitch;
 			double dWeight = startWeight;
 			int iPitch, iWeight;
+			List<PitchWeight> pitchWeights = new List<PitchWeight>();
 			for(int i = 0; i < steps; ++i)
 			{
 				iPitch = (int)Math.Round(dPitch);
 				iWeight = (int)Math.Round(dWeight);
 				iWeight = (iWeight == 0) ? 1 : iWeight;
 				var kvp = new PitchWeight(iPitch, iWeight);
-				_pitchWeights.Add(kvp);
+				pitchWeights.Add(kvp);
 
 				dPitch += pitchIncrPerStep;
 				dWeight += weightIncrPerStep;
 			}
+			PitchWeights = pitchWeights;
 		}
 
 		/// <summary>
@@ -85,9 +63,11 @@ namespace Moritz.Spec
 		/// </summary>
 		public PitchVector(List<PitchWeight> pitchWeights, PitchWeight targetPitchWeight)
 		{
-			_pitchWeights = pitchWeights;
+			PitchWeights = pitchWeights;
 			TargetPitchWeight = targetPitchWeight;
 		}
+
+
 
 		/// <summary>
 		/// Transposes the pitchVector by octaves so that its minimum pitch is
@@ -123,14 +103,17 @@ namespace Moritz.Spec
 			}
 			#endregion
 
+			List<PitchWeight> pitchWeights = new List<PitchWeight>(PitchWeights);
 			if(transposition != 0)
 			{
-				for(int i = 0; i < _pitchWeights.Count; ++i)
+				for(int i = 0; i < PitchWeights.Count; ++i)
 				{
-					int newPitch = _pitchWeights[i].Pitch + transposition;
-					_pitchWeights[i] = new PitchWeight(newPitch, _pitchWeights[i].Weight);
+					int newPitch = PitchWeights[i].Pitch + transposition;
+					pitchWeights.Add(new PitchWeight(newPitch, PitchWeights[i].Weight));
 				}
 			}
+
+			PitchWeights = pitchWeights;
 
 			return returnValue;
 
@@ -140,7 +123,7 @@ namespace Moritz.Spec
 		{
 			maxPitch = 0;
 			minPitch = int.MaxValue;
-			foreach(var pitchWeight in _pitchWeights)
+			foreach(var pitchWeight in PitchWeights)
 			{
 				minPitch = (minPitch < pitchWeight.Pitch) ? minPitch : pitchWeight.Pitch;
 				maxPitch = (maxPitch > pitchWeight.Pitch) ? maxPitch : pitchWeight.Pitch;
@@ -161,14 +144,14 @@ namespace Moritz.Spec
 			int maxPitch = 0;
 			int minPitch = int.MaxValue;
 
-			List<int> newPitches = new List<int>() { _pitchWeights[0].Pitch }; // newPitches initially has unbounded range
+			List<int> newPitches = new List<int>() { PitchWeights[0].Pitch }; // newPitches initially has unbounded range
 
 			int prevPitch;
 			int thisPitch;
-			for(int i = 1; i < _pitchWeights.Count; ++i)
+			for(int i = 1; i < PitchWeights.Count; ++i)
 			{
 				prevPitch = newPitches[i - 1];
-				thisPitch = _pitchWeights[i].Pitch;
+				thisPitch = PitchWeights[i].Pitch;
 				int pitchDiff = thisPitch - prevPitch;
 				if(Math.Abs(pitchDiff) > 6)
 				{
@@ -211,12 +194,14 @@ namespace Moritz.Spec
 
 			if(transposition != 0)
 			{
+				List<PitchWeight> pitchWeights = new List<PitchWeight>(PitchWeights);
 				for(int i = 0; i < newPitches.Count; ++i)
 				{
 					int newPitch = newPitches[i] + transposition;
-					_pitchWeights[i] = new PitchWeight(newPitch, _pitchWeights[i].Weight);
+					pitchWeights.Add( new PitchWeight(newPitch, PitchWeights[i].Weight));
 					//Console.WriteLine($"{i + 1}: pitch = {newPitch}");
 				}
+				PitchWeights = pitchWeights;
 			}
 
 			//Console.WriteLine($"maxPitch before:after transposition = {maxBefore}:{maxPitch}");
@@ -227,8 +212,6 @@ namespace Moritz.Spec
 		#endregion constructors
 
 		public PitchWeight TargetPitchWeight { get; private set; }
-		public IReadOnlyList<PitchWeight> PitchWeights{get{ return _pitchWeights; } }
-		private readonly List<PitchWeight> _pitchWeights = new List<PitchWeight>();
-
+		public IReadOnlyList<PitchWeight> PitchWeights{ get; private set; }
 	}
 }
