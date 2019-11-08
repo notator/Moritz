@@ -649,6 +649,18 @@ namespace Moritz.Globals
         }
 
 		/// <summary>
+		/// Throws an ApplicationException if condition is false,
+		/// and displays a custom message.
+		/// </summary>
+		/// <param name="v"></param>
+		public static void Assert(bool condition, string message)
+		{
+			if(condition == false)
+			{
+				throw new ApplicationException(message);
+			}
+		}
+		/// <summary>
 		/// Throws an ApplicationException if condition is false
 		/// </summary>
 		/// <param name="v"></param>
