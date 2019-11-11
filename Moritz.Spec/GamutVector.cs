@@ -7,11 +7,13 @@ using Moritz.Globals;
 namespace Moritz.Spec
 {
 	/// <summary>
+	/// A temporal sequence of LongGamuts, a TargetLongGamut (not contained in the sequence), and
+	/// a list of parallel PitchWeightVectors connecting the Gamuts.
+	/// The PitchWeightVectors remind me somehow of the wiring inside a sequence of Enigma rotors...
 	/// </summary>
 	public class GamutVector
 	{
 		#region constructors
-
 		/// <summary>
 		/// The LongGamuts attribute is a time-sequence of LongGamuts as they occur in the score. The list contains at least one LongGamut.
 		/// TargetLongGamut is the LongGamut following the last LongGamut in LongGamuts. This value is used when concatenating.
@@ -166,6 +168,7 @@ namespace Moritz.Spec
 		/// so there must be the same number of PitchWeightVectors in both GamutVectors.
 		/// PitchWeightVectors will only concatenate if the first PitchWeightVector's TargetPitchWeight
 		/// equals the concatenated PitchVector's first PitchWeight.
+		/// Consecutive Enigma wheels... :-)
 		/// </summary>
 		/// <param name="concatenatedGamutVector"></param>
 		/// <returns></returns>
