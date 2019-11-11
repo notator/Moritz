@@ -53,7 +53,7 @@
     <Compile Include="FortePitchClassSet.cs" />
     <Compile Include="Gamut.cs" />
     <Compile Include="PitchWeight.cs" />
-    <Compile Include="PitchVector.cs" />
+    <Compile Include="PitchWeightVector.cs" />
     <Compile Include="GamutVector.cs" />
     <Compile Include="_oldModeProximity.cs" />
     <Compile Include="MidiMsg.cs" />

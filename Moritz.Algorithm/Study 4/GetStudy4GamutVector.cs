@@ -65,182 +65,118 @@ namespace Moritz.Algorithm.Study4
 			LongGamut gamut7 = gamut6.Clone() as LongGamut;
 			gamut7.Transpose(7);
 
-			List<Tuple<int, int>> region21PitchVectorEndPoints = new List<Tuple<int, int>>()
+			List<Tuple<LongGamut, LongGamut>> gamutsPerGamutVector = new List<Tuple<LongGamut, LongGamut>>
 			{
-				new Tuple<int,int>( 0,7 ),
-				new Tuple<int,int>( 14,9 ),
-				new Tuple<int,int>( 4,11 ),
-				new Tuple<int,int>( 5,0 ),
-				new Tuple<int,int>( 7,14 ),
-				new Tuple<int,int>( 9,4 ),
-				new Tuple<int,int>( 10,17 ),
-			};
-			var gamutVector21 = new GamutVector(gamut1, gamut2, region21PitchVectorEndPoints, 2);
+				new Tuple<LongGamut, LongGamut>(gamut1, gamut1),
+				new Tuple<LongGamut, LongGamut>(gamut1, gamut2),
+				new Tuple<LongGamut, LongGamut>(gamut2, gamut1),
+				new Tuple<LongGamut, LongGamut>(gamut1, gamut3),
+				new Tuple<LongGamut, LongGamut>(gamut3, gamut1),
+				new Tuple<LongGamut, LongGamut>(gamut1, gamut4),
+				new Tuple<LongGamut, LongGamut>(gamut4, gamut1),
+				new Tuple<LongGamut, LongGamut>(gamut1, gamut5),
+				new Tuple<LongGamut, LongGamut>(gamut5, gamut1),
+				new Tuple<LongGamut, LongGamut>(gamut1, gamut6),
+				new Tuple<LongGamut, LongGamut>(gamut6, gamut1),
+				new Tuple<LongGamut, LongGamut>(gamut1, gamut7),
+				new Tuple<LongGamut, LongGamut>(gamut7, gamut1),
+				new Tuple<LongGamut, LongGamut>(gamut1, null)
 
-			List<Tuple<int, int>> region22PitchVectorEndPoints = new List<Tuple<int, int>>()
-			{
-				new Tuple<int,int>( 0,5 ),
-				new Tuple<int,int>( 2,0 ),
-				new Tuple<int,int>( 4,9),
-				new Tuple<int,int>( 5,10 ),
-				new Tuple<int,int>( 7,7 ),
-				new Tuple<int,int>( 9,14 ),
-				new Tuple<int,int>( 11,16 ),
-			};
-			var gamutVector22 = new GamutVector(gamut2, gamut1, region22PitchVectorEndPoints, 2);
-
-			List<Tuple<int, int>> region31PitchVectorEndPoints = new List<Tuple<int, int>>()
-			{
-				new Tuple<int,int>(12,9 ),
-				new Tuple<int,int>( 2,4),
-				new Tuple<int,int>( 4,2),
-				new Tuple<int,int>( 5,7),
-				new Tuple<int,int>( 7,6),
-				new Tuple<int,int>( 9,11),
-				new Tuple<int,int>( 10,12),
-			};
-			var gamutVector31 = new GamutVector(gamut1, gamut3, region31PitchVectorEndPoints, 3);
-
-			List<Tuple<int, int>> region32PitchVectorEndPoints = new List<Tuple<int, int>>()
-			{
-				new Tuple<int,int>( 0,0),
-				new Tuple<int,int>( 2,4),
-				new Tuple<int,int>( 4,2),
-				new Tuple<int,int>( 6,10),
-				new Tuple<int,int>( 7,5),
-				new Tuple<int,int>( 9,7),
-				new Tuple<int,int>( 11,9),
-			};
-			var gamutVector32 = new GamutVector(gamut3, gamut1, region32PitchVectorEndPoints, 3);
-
-			List<Tuple<int, int>> region41PitchVectorEndPoints = new List<Tuple<int, int>>()
-			{
-				new Tuple<int,int>( 0,1),
-				new Tuple<int,int>( 14,9),
-				new Tuple<int,int>( 4,4),
-				new Tuple<int,int>( 5,2),
-				new Tuple<int,int>( 7,7),
-				new Tuple<int,int>( 9,6),
-				new Tuple<int,int>( 10,11),
-			};
-			var gamutVector41 = new GamutVector(gamut1, gamut4, region41PitchVectorEndPoints, 4);
-
-			List<Tuple<int, int>> region42PitchVectorEndPoints = new List<Tuple<int, int>>()
-			{
-				new Tuple<int,int>( 1,2),
-				new Tuple<int,int>( 2,0),
-				new Tuple<int,int>( 4,4),
-				new Tuple<int,int>( 6,9),
-				new Tuple<int,int>( 7,7),
-				new Tuple<int,int>( 9,10),
-				new Tuple<int,int>( 11,17),
-			};
-			var gamutVector42 = new GamutVector(gamut4, gamut1, region42PitchVectorEndPoints, 4);
-
-			List<Tuple<int, int>> region51PitchVectorEndPoints = new List<Tuple<int, int>>()
-			{
-				new Tuple<int,int>( 0,2 ),
-				new Tuple<int,int>( 14,11),
-				new Tuple<int,int>( 4,8),
-				new Tuple<int,int>( 5,1),
-				new Tuple<int,int>( 7,6),
-				new Tuple<int,int>( 9,4),
-				new Tuple<int,int>( 10,9),
-			};
-			var gamutVector51 = new GamutVector(gamut1, gamut5, region51PitchVectorEndPoints, 5);
-
-			List<Tuple<int, int>> region52PitchVectorEndPoints = new List<Tuple<int, int>>()
-			{
-				new Tuple<int,int>( 1,0),
-				new Tuple<int,int>( 2,4),
-				new Tuple<int,int>( 4,2),
-				new Tuple<int,int>( 6,9),
-				new Tuple<int,int>( 8,5),
-				new Tuple<int,int>( 9,7),
-				new Tuple<int,int>( 11,10),
-			};
-			var gamutVector52 = new GamutVector(gamut5, gamut1, region52PitchVectorEndPoints, 5);
-
-			List<Tuple<int, int>> region61PitchVectorEndPoints = new List<Tuple<int, int>>()
-			{
-				new Tuple<int,int>( 0,1),
-				new Tuple<int,int>( 2,3),
-				new Tuple<int,int>( 4,9),
-				new Tuple<int,int>( 5,6),
-				new Tuple<int,int>( 7,4),
-				new Tuple<int,int>( 9,11),
-				new Tuple<int,int>( 10,8),
-			};
-			var gamutVector61 = new GamutVector(gamut1, gamut6, region61PitchVectorEndPoints, 6);
-
-			List<Tuple<int, int>> region62PitchVectorEndPoints = new List<Tuple<int, int>>()
-			{
-				new Tuple<int,int>( 1,4),
-				new Tuple<int,int>( 3,9),
-				new Tuple<int,int>( 4,7),
-				new Tuple<int,int>( 6,2),
-				new Tuple<int,int>( 8,12),
-				new Tuple<int,int>( 9,10),
-				new Tuple<int,int>( 11,5),
-			};
-			var gamutVector62 = new GamutVector(gamut6, gamut1, region62PitchVectorEndPoints, 6);
-
-			List<Tuple<int, int>> region71PitchVectorEndPoints = new List<Tuple<int, int>>()
-			{
-				new Tuple<int,int>( 12,11),
-				new Tuple<int,int>( 14,10),
-				new Tuple<int,int>( 4,8),
-				new Tuple<int,int>( 5,1),
-				new Tuple<int,int>( 7,3),
-				new Tuple<int,int>( 9,6),
-				new Tuple<int,int>( 10,16),
-			};
-			var gamutVector71 = new GamutVector(gamut1, gamut7, region71PitchVectorEndPoints, 7);
-
-			List<Tuple<int, int>> region72PitchVectorEndPoints = new List<Tuple<int, int>>()
-			{
-				new Tuple<int,int>( 1,5),
-				new Tuple<int,int>( 3,0),
-				new Tuple<int,int>( 16,10),
-				new Tuple<int,int>( 6,9),
-				new Tuple<int,int>( 8,4),
-				new Tuple<int,int>( 10,14),
-				new Tuple<int,int>( 11,7),
-			};
-			var gamutVector72 = new GamutVector(gamut7, gamut1, region72PitchVectorEndPoints, 7);
-					   			 		  		  		 	   		
-			List<GamutVector> allGamutVectors = new List<GamutVector>
-			{
-				gamutVector21,
-				gamutVector22,
-				gamutVector31,
-				gamutVector32,
-				gamutVector41,
-				gamutVector42,
-				gamutVector51,
-				gamutVector52,
-				gamutVector61,
-				gamutVector62,
-				gamutVector71,
-				gamutVector72
 			};
 
-			GamutVector gamutVector = allGamutVectors[0];
-			for(int i= 1; i < allGamutVectors.Count; ++i)
+			List<List<int>> pitchVectorEndPointsPerGamutVector = new List<List<int>>()
 			{
-				gamutVector = gamutVector.Concat(allGamutVectors[i]);
+				// Each vertical column is a global pitch vector here.
+				// These are the pitch vectors in the 7th Oct. 2019 sketch in my A5 notebook.
+				new List<int>(){ 0, 14,  4,  5,  7,  9, 10}, // begin region1
+				new List<int>(){ 0, 14,  4,  5,  7,  9, 10}, // begin region21, end region1
+				new List<int>(){ 7,  9, 11,  0, 14,  4, 17}, // begin region22, end region21
+				new List<int>(){ 7, 14, 16,  5, 12,  9, 22}, // begin region31, end region22
+				new List<int>(){ 6, 16, 14,  7,  9, 11, 24}, // begin region32, end region31
+				new List<int>(){10, 14, 16,  5,  7,  9, 24}, // begin region41, end region32
+				new List<int>(){11,  9, 16,  2,  7,  6, 25}, // begin region42, end region41
+				new List<int>(){17, 10, 16,  0,  7,  9, 26}, // begin region51, end region42
+				new List<int>(){13,  9, 20,  2,  6,  4, 23}, // begin region52, end region51
+				new List<int>(){12,  7, 17,  4,  9,  2, 22}, // begin region61, end region52
+				new List<int>(){13,  4, 18,  9, 11,  3, 20}, // begin region62, end region61
+				new List<int>(){16,  7, 14, 10,  5,  9, 24}, // begin region71, end region62
+				new List<int>(){20,  3, 10, 16,  1,  6, 23}, // begin region72, end region71
+				new List<int>(){16,  0, 14, 10,  5,  9, 19}  // end region72
+			};
+
+			AssertConsistency(gamutsPerGamutVector, pitchVectorEndPointsPerGamutVector);
+
+			int nPitchVectors = pitchVectorEndPointsPerGamutVector[0].Count;
+			List<int> nGamutsPerGamutVector = new List<int>() { 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 };
+
+			List<GamutVector> gamutVectors = new List<GamutVector>();
+			for(int i = 0; i < pitchVectorEndPointsPerGamutVector.Count - 1; i++)
+			{
+				var regionBeginPVEndpoints = pitchVectorEndPointsPerGamutVector[i];
+				var regionEndPVEndpoints = pitchVectorEndPointsPerGamutVector[i + 1];
+
+				List<Tuple<int, int>> endpointsPerGamutVector = new List<Tuple<int, int>>();
+				for(int j = 0; j < nPitchVectors; j++)
+				{
+					Tuple<int, int> pvEndpoints = new Tuple<int, int>(regionBeginPVEndpoints[j], regionEndPVEndpoints[j]);
+					endpointsPerGamutVector.Add(pvEndpoints);
+				}
+				var startGamut = gamutsPerGamutVector[i].Item1;
+				var targetGamut = gamutsPerGamutVector[i].Item2;
+
+				var localGamutVector = new GamutVector(startGamut, targetGamut, endpointsPerGamutVector, nGamutsPerGamutVector[i]);
+				gamutVectors.Add(localGamutVector);
 			}
 
-			foreach(var pitchVector in gamutVector.PitchVectors)
+			var concatenatedGamutVector = gamutVectors[0];
+
+			for(int i= 1; i < gamutVectors.Count; ++i)
 			{
-				pitchVector.GetRange(out int minPitch1, out int maxPitch1);
-				pitchVector.MinimizePitchIntervals();
-				pitchVector.GetRange(out int minPitch2, out int maxPitch2);
-				M.Assert(pitchVector.SetOctave(60));
-				pitchVector.GetRange(out int minPitch3, out int maxPitch3);
+				concatenatedGamutVector = concatenatedGamutVector.Concat(gamutVectors[i]);
 			}
 
-			return gamutVector;
+			return concatenatedGamutVector;
+		}
+
+		/// <summary>
+		/// Checks 
+		/// 1. that the two arguments contain the same number of lists. 
+		/// 2. that all contained lists in pitchVectorEndPointsPerGamutVector have the same Count.
+		/// 3. that all values in pitchVectorEndPointsPerGamutVector are in range 0..127
+		/// 4. that each Item1 gamut in gamutsPerGamutVector contains the pitches in the corresponding pitchVectorEndPointsPerGamutVector list.
+		/// </summary>
+		/// <param name="gamutsPerGamutVector"></param>
+		/// <param name="pitchVectorEndPointsPerGamutVector"></param>
+		private void AssertConsistency(List<Tuple<LongGamut, LongGamut>> gamutsPerGamutVector, List<List<int>> pitchVectorEndPointsPerGamutVector)
+		{
+			int nEntries = pitchVectorEndPointsPerGamutVector.Count;
+			M.Assert(nEntries == gamutsPerGamutVector.Count); // condition 1
+
+			int listCount = pitchVectorEndPointsPerGamutVector[0].Count;
+			foreach(var list in pitchVectorEndPointsPerGamutVector)
+			{
+				M.Assert(listCount == list.Count); // condition 2
+				foreach(var value in list)
+				{
+					M.AssertRange0_127(value); // condition 3
+				}
+			}
+
+			List<List<int>> pitchListPerGamut = new List<List<int>>();
+			for(int i = 0; i < nEntries; i++)
+			{
+				List<int> pitches = new List<int>(gamutsPerGamutVector[i].Item1.Pitches);
+				pitchListPerGamut.Add(pitches);
+			}
+			for(int i = 0; i < nEntries; i++)
+			{
+				List<int> pitchList = pitchListPerGamut[i];
+				List<int> pitchVectorStartPoints = pitchVectorEndPointsPerGamutVector[i];
+				foreach(var pitchVectorStartPoint in pitchVectorStartPoints)
+				{
+					M.Assert(pitchList.Contains(pitchVectorStartPoint));
+				}
+			}
 		}
 	}
 }

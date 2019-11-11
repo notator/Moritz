@@ -19,6 +19,40 @@ namespace Moritz.Spec
 			Weight = weight;
 		}
 
+		/// <summary>
+		/// See https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/how-to-define-value-equality-for-a-type
+		/// </summary>
+		/// <param name="obj"></param>
+		/// <returns></returns>
+		public override bool Equals(object obj)
+		{
+			if(obj is PitchWeight)
+			{
+				return this.Equals((PitchWeight)obj);
+			}
+			return false;
+		}
+
+		public bool Equals(PitchWeight pitchWeight)
+		{
+			return (Pitch == pitchWeight.Pitch) && (Weight == pitchWeight.Weight);
+		}
+
+		public override int GetHashCode()
+		{
+			return Pitch ^ Weight;
+		}
+
+		public static bool operator ==(PitchWeight lhs, PitchWeight rhs)
+		{
+			return lhs.Equals(rhs);
+		}
+
+		public static bool operator !=(PitchWeight lhs, PitchWeight rhs)
+		{
+			return !(lhs.Equals(rhs));
+		}
+
 		public int Pitch { get; }
 		public int Weight { get; }
 	}
