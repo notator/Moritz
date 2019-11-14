@@ -96,7 +96,7 @@ namespace Moritz.Algorithm.Study4
 
 			// Temporary definition. Redefine the sequence later, when the actual bar content is known.
 			// Regions can repeat in any order since they all begin with, and end pointing at, the same Gamut.
-			RegionSequence regionSequence = new RegionSequence(regionDefs, "ABCDEFGAG");
+			RegionSequence regionSequence = new RegionSequence(regionDefs, "ABCDEFGA");
 
 			ScoreData scoreData = new ScoreData(regionSequence);
 
